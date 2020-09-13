@@ -1,22 +1,5 @@
 table 6151371 "NPR CS Setup"
 {
-    // NPR5.41/CLVA/20180313 CASE 306407 Object created - NP Capture Service
-    // NPR5.43/CLVA/20180511 CASE 307239 Added field Error Invalid Barcode
-    // NPR5.43/NPKNAV/20180629 CASE 304872 Transport NPR5.43 - 29 June 2018
-    // NPR5.47/CLVA/20181011 CASE 307282 Added field "Max Records In Search Result"
-    // NPR5.48/CLVA/20181113 CASE 335606 Added field "Warehouse Type"
-    // NPR5.48/CLVA/20181214 CASE 335606 Added field Media Library
-    // NPR5.49/TJ  /20190218 CASE 346066 Added field "Zero Def. Qty. to Handle"
-    // NPR5.50/CLVA/20190304 CASE 332844 Added field "Stock-Take Template"
-    // NPR5.50/CLVA/20190527 CASE 355694 Added field "Item Reclass. Jour Temp Name" and "Item Reclass. Jour Batch Name"
-    // NPR5.51/CLVA/20190627 CASE 359375 Added field Create Worksheet after Trans. for re-creation of worksheet after Stock-Take transfer
-    // NPR5.51/CLVA/20190812 CASE 362173 Added field "Phys. Inv Jour Temp Name" and "Phys. Inv Jour No. Series"
-    // NPR5.52/CLVA/20190904 CASE 365967 Added field "Post with Job Queue", "Job Queue Category Code","Job Queue Priority for Post","Notify On Success","Run in User Session" and "Sum Qty. to Handle"
-    // NPR5.53/CLVA/20191128 CASE 379973 Added field "Earliest Start Date/Time"
-    // NPR5.54/CLVA/20202003 CASE 389224 Added field "Batch Size"
-    // NPR5.55/CLVA/20200604 CASE 379709 Added fields "Import Tags to Shipping Doc." and "Use Whse. Receipt"
-    // NPR5.55/ALST/20200727 CASE 415521 added field Disregard Unknown RFID Tags
-
     Caption = 'CS Setup';
     DataClassification = CustomerContent;
 
@@ -205,6 +188,11 @@ table 6151371 "NPR CS Setup"
             DataClassification = CustomerContent;
             Description = 'NPR5.55 clean rfid tag values not found in our setup while scanning';
         }
+        field(51; "Exclude Invt. Posting Groups"; Text[100])
+        {
+            Caption = 'Exclude Invt. Posting Groups';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
@@ -222,5 +210,17 @@ table 6151371 "NPR CS Setup"
         DCHelperFunctions: Codeunit "NPR CS Helper Functions";
         TXT001: Label 'Update Wharehouse Type on all UIs?';
         TXT002: Label 'Job Queue Priority must be zero or positive.';
-}
 
+    procedure LookupInventoryPostingGroups(var Text: Text): Boolean
+    var
+        InvtPostingGroups: Page "Inventory Posting Groups";
+    begin
+        Clear(InvtPostingGroups);
+        InvtPostingGroups.LookupMode(true);
+        if InvtPostingGroups.RunModal() = Action::LookupOK then begin
+            Text := InvtPostingGroups.GetSelectionFilter();
+            exit(true);
+        end;
+        exit(false);
+    end;
+}

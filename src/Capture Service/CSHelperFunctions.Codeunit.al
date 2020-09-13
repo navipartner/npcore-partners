@@ -1,30 +1,5 @@
 codeunit 6151373 "NPR CS Helper Functions"
 {
-    // NPR5.41/CLVA/20180313 CASE 306407 Object created - NP Capture Service
-    // NPR5.43/CLVA/20180604 CASE 307239 Updated PublishWebService to cs_service
-    // NPR5.43/NPKNAV/20180629  CASE 304872 Transport NPR5.43 - 29 June 2018
-    // NPR5.47/CLVA/20181019 CASE 307282 Added functions CreateOfflineRfidData and DeleteRfidTagsInItemCrossRef
-    // NPR5.48/CLVA/20181119 CASE 335051 Added Tag family and model info
-    // NPR5.48/CLVA/20181214 CASE 335051 Added Timestamp filter and UpdateRfidTagsInItemCrossRef
-    // NPR5.50/CLVA/20190206 CASE 344466 Added device Id to log functionality
-    // NPR5.50/CLVA/20190227 CASE 346068 Added Event subscriber T5717OnAfterInsert, T5717OnAfterModify and T5717OnAfterDelete
-    // NPR5.50/CLVA/20190425 CASE 352134 Deleted functions GetRfidMasterData, GetRfidData, CreateOfflineRfidData, DeleteRfidTagsInItemCrossRef, UpdateRfidTagsInItemCrossRef and
-    // NPR5.50/CLVA/20190502 CASE 353741 Added elements to DeviceInfo
-    // NPR5.51/CLVA/20190820 CASE 365659 Removed ItemTags from export
-    //                                   Added missing WritePropertyName
-    //                                   Handling empty Item Group Code in export data
-    // NPR5.51/CLVA/20190822 CASE 365967 Added function PostTransferOrder and TryPostTransferOrder
-    // NPR5.51/CLVA/20190701 CASE 350696 Added function GetRfidOfflineDataDeltaV2
-    // NPR5.52/CLVA/20190904 CASE 365967 Removed function PostTransferOrder and TryPostTransferOrder
-    // NPR5.52/CLVA/20190910 CASE 364063 Added functions CreateNewCounting and CancelCounting
-    // NPR5.52/CLVA/20191102 CASE 375749 Changed code to support version specific changes (NAV 2018+).
-    // NPR5.53/CLVA/20191203 CASE 375919 Added Counting Supervisor functionality. Added function CreateNewCountingV2
-    // NPR5.53/CLVA/20200207 CASE 389864 Changed code to support version specific changes (NAV 2018+).
-    // NPR5.54/CLVA/20200220 CASE 384506 Added Supervisor and POS user filter on GetStoreDataV2 and GetStoreDataByStoreUser;
-    // NPR5.55/CLVA/20200520 CASE 379709 Added function CaptureServiceStatus and UpdateItemCrossRef
-    // NPR5.55/ALST/20200728 CASE 415521 added UpdateItemCrossRefFromRecord
-
-
     trigger OnRun()
     begin
     end;
@@ -115,9 +90,7 @@ codeunit 6151373 "NPR CS Helper Functions"
         CSCommunicationLog."Internal Request" := IsInternalRequest;
         CSCommunicationLog."Internal Log No." := InternalRequestId;
         CSCommunicationLog.User := UserId;
-        //-NPR5.50 [344466]
         CSCommunicationLog."Device Id" := "Device Id";
-        //+NPR5.50 [344466]
         CSCommunicationLog."Response Data".CreateOutStream(Ostream);
 
         BigTextDocument.Write(Ostream);
@@ -304,27 +277,6 @@ codeunit 6151373 "NPR CS Helper Functions"
             CSRfidItems.Close;
             WriteEndArray;
 
-            //-NPR5.51
-            // WritePropertyName('itemtag');
-            // WriteStartArray;
-            // IF CSDevices."Last Download Timestamp" <> 0 THEN
-            //  CSRfidItemTags.SETFILTER(Time_Stamp,STRSUBSTNO('>%1',CSDevices."Last Download Timestamp"));
-            // CSRfidItemTags.OPEN;
-            // WHILE CSRfidItemTags.READ DO BEGIN
-            //  WriteStartObject;
-            //  WritePropertyName('key');
-            //  WriteValue(CSRfidItemTags.Key);
-            //  WritePropertyName('item');
-            //  WriteValue(CSRfidItemTags.Combined_key);
-            //  WritePropertyName('itemgroup');
-            //  WriteValue(CSRfidItemTags.Item_Group_Code);
-            //  WriteEndObject;
-            // END;
-            // CSRfidItemTags.CLOSE;
-            // WriteEndArray;
-            //+NPR5.51
-
-            //-NPR5.50 [335051]
             WritePropertyName('supportedTagModels');
             WriteStartArray;
             CSRfidTagModelsQuery.Open;
@@ -340,9 +292,7 @@ codeunit 6151373 "NPR CS Helper Functions"
             end;
             CSRfidTagModelsQuery.Close;
             WriteEndArray;
-            //+NPR5.50 [335051]
 
-            //-NPR5.50 [335051]
             WritePropertyName('deviceinfo');
             WriteStartArray;
             WriteStartObject;
@@ -355,15 +305,10 @@ codeunit 6151373 "NPR CS Helper Functions"
                 WriteValue('TRUE')
             else
                 WriteValue('FALSE');
-            //-NPR5.50 [35374]
-            //-NPR5.51
             WritePropertyName('currenttagcount');
-            //+NPR5.51
             WriteValue(CSDevices."Current Tag Count");
-            //+NPR5.50 [35374]
             WriteEndObject;
             WriteEndArray;
-            //+NPR5.50 [335051]
 
             WriteEndObject;
             JObject := Token;
@@ -517,7 +462,6 @@ codeunit 6151373 "NPR CS Helper Functions"
             CSRfidItemTags.Close;
             WriteEndArray;
 
-            //-#335051 [335051]
             WritePropertyName('supportedTagModels');
             WriteStartArray;
             CSRfidTagModelsQuery.Open;
@@ -533,9 +477,7 @@ codeunit 6151373 "NPR CS Helper Functions"
             end;
             CSRfidTagModelsQuery.Close;
             WriteEndArray;
-            //+#335051 [335051]
 
-            //-#335051 [335051]
             WritePropertyName('deviceinfo');
             WriteStartArray;
             WriteStartObject;
@@ -552,7 +494,6 @@ codeunit 6151373 "NPR CS Helper Functions"
                 WriteValue('FALSE');
             WriteEndObject;
             WriteEndArray;
-            //+#335051 [335051]
 
             WriteEndObject;
             JObject := Token;
@@ -756,7 +697,6 @@ codeunit 6151373 "NPR CS Helper Functions"
         MagentoPicture: Record "NPR Magento Picture";
         CSSetup: Record "NPR CS Setup";
     begin
-        //-NPR5.50 [346068]
         if StrLen(ItemCrossReference."Cross-Reference No.") <> MaxStrLen(ItemCrossReference."Cross-Reference No.") then
             exit;
 
@@ -792,7 +732,6 @@ codeunit 6151373 "NPR CS Helper Functions"
             end;
             CSRfidOfflineData.Modify(true);
         end;
-        //+NPR5.50 [346068]
     end;
 
     local procedure DeleteCSRfidOfflineDataRecord(ItemCrossReference: Record "Item Cross Reference")
@@ -806,7 +745,6 @@ codeunit 6151373 "NPR CS Helper Functions"
         MagentoPicture: Record "NPR Magento Picture";
         CSSetup: Record "NPR CS Setup";
     begin
-        //-NPR5.50 [346068]
         if StrLen(ItemCrossReference."Cross-Reference No.") <> MaxStrLen(ItemCrossReference."Cross-Reference No.") then
             exit;
 
@@ -822,7 +760,6 @@ codeunit 6151373 "NPR CS Helper Functions"
                 CSRfidOfflineData.Delete(true);
 
         end;
-        //+NPR5.50 [346068]
     end;
 
     procedure CreateStockTakeWorksheet(Location: Code[20]; Name: Code[10]; var StockTakeWorksheet: Record "NPR Stock-Take Worksheet")
@@ -871,9 +808,7 @@ codeunit 6151373 "NPR CS Helper Functions"
             exit;
 
         CSDevices."Last Download Timestamp" := CurrentTimestamp;
-        //-NPR5.50 [353741]
         CSDevices."Refresh Item Catalog" := false;
-        //+NPR5.50 [353741]
         CSDevices.Location := Location;
         CSDevices.Modify(true);
 
@@ -909,7 +844,6 @@ codeunit 6151373 "NPR CS Helper Functions"
         if CSStockTakes.Closed <> 0DT then
             exit;
 
-        //-NPR5.52 [364063]
         if not LocationRec.Get(CSStockTakes.Location) then
             Error(Err_MissingLocation);
 
@@ -928,19 +862,8 @@ codeunit 6151373 "NPR CS Helper Functions"
             ItemJournalBatch.Delete(true);
 
         end;
-        // StockTakeWorksheetLine.SETRANGE("Stock-Take Config Code",Location);
-        // StockTakeWorksheetLine.SETRANGE("Worksheet Name",'SALESFLOOR');
-        // StockTakeWorksheetLine.DELETEALL(TRUE);
-        //
-        // CLEAR(StockTakeWorksheetLine);
-        // StockTakeWorksheetLine.SETRANGE("Stock-Take Config Code",Location);
-        // StockTakeWorksheetLine.SETRANGE("Worksheet Name",'STOCKROOM');
-        // StockTakeWorksheetLine.DELETEALL(TRUE);
-        //+NPR5.52 [364063]
 
-        //-NPR5.53
         CSStockTakes."Journal Posted" := CSStockTakes."Adjust Inventory";
-        //+NPR5.53
         CSStockTakes.Closed := CurrentDateTime;
         CSStockTakes."Closed By" := UserId;
         CSStockTakes.Note := Txt_CountingCancelled;
@@ -966,11 +889,8 @@ codeunit 6151373 "NPR CS Helper Functions"
         CSCountingSupervisor: Record "NPR CS Counting Supervisor";
         AdjustInventory: Boolean;
         CSStoreUsers: Record "NPR CS Store Users";
+        ExecuteCalculation: Boolean;
     begin
-        //IF NOT LocationRec.GET(GETFILTER(Location)) THEN
-        //  ERROR(Err_MissingLocation);
-
-        //-NPR5.54 [384506]
         if CSCountingSupervisor.Get(UserId) then begin
             AdjustInventory := true;
         end else begin
@@ -980,53 +900,29 @@ codeunit 6151373 "NPR CS Helper Functions"
             if CSStoreUsers.FindFirst then
                 AdjustInventory := true;
         end;
-        //+NPR5.54 [384506]
 
-        //-NPR5.52 [364063]
         Clear(CSStockTakes);
         CSStockTakes.SetRange(Location, Location.Code);
         CSStockTakes.SetRange(Closed, 0DT);
-        //-NPR5.54 [384506]
         if AdjustInventory then
             CSStockTakes.SetRange("Adjust Inventory", true)
         else
             CSStockTakes.SetRange("Adjust Inventory", false);
-        //+NPR5.54 [384506]
         if CSStockTakes.FindSet then
             Error(Err_CSStockTakes, CSStockTakes."Stock-Take Id");
 
-        //-NPR5.54 [384506]
         if AdjustInventory then begin
-            //+NPR5.54 [384506]
             Clear(CSStockTakes);
             CSStockTakes.SetRange(Location, Location.Code);
             CSStockTakes.SetFilter(Closed, '<>%1', 0DT);
             CSStockTakes.SetRange("Journal Posted", false);
-            //-NPR5.53
             CSStockTakes.SetRange("Adjust Inventory", true);
-            //+NPR5.53
             if CSStockTakes.FindSet then
                 Error(Err_PostingNotDone);
-            //-NPR5.53
-            //-NPR5.54 [384506]
         end;
-        //+NPR5.54 [384506]
 
-        //-NPR5.54 [384506]
-        // IF CSCountingSupervisor.GET(USERID) THEN BEGIN
-        //  AdjustInventory := TRUE;
-        // END ELSE BEGIN
-        //  CLEAR(CSStoreUsers);
-        //  CSStoreUsers.SETRANGE("User ID",USERID);
-        //  CSStoreUsers.SETRANGE("Adjust Inventory",TRUE);
-        //  IF CSStoreUsers.FINDFIRST THEN
-        //    AdjustInventory := TRUE;
-        // END;
-        //+NPR5.54 [384506]
-
+        CSSetup.Get;
         if AdjustInventory then begin
-            //+NPR5.53
-            CSSetup.Get;
             CSSetup.TestField("Phys. Inv Jour Temp Name");
             ItemJournalTemplate.Get(CSSetup."Phys. Inv Jour Temp Name");
             if not ItemJournalBatch.Get(CSSetup."Phys. Inv Jour Temp Name", Location.Code) then begin
@@ -1052,118 +948,68 @@ codeunit 6151373 "NPR CS Helper Functions"
                 if ItemJournalLine.Count > 0 then
                     Error(Err_StockTakeWorksheetNotEmpty, ItemJournalBatch."Journal Template Name", ItemJournalBatch.Name);
             end;
-            //-NPR5.53
         end;
-        //+NPR5.53
 
         NewCSStockTakes.Init;
         NewCSStockTakes."Stock-Take Id" := CreateGuid;
         NewCSStockTakes.Created := CurrentDateTime;
         NewCSStockTakes."Created By" := UserId;
         NewCSStockTakes.Location := Location.Code;
-        //-NPR5.53
         if AdjustInventory then begin
             NewCSStockTakes."Adjust Inventory" := true;
-            //+NPR5.53
             NewCSStockTakes."Journal Template Name" := ItemJournalBatch."Journal Template Name";
             NewCSStockTakes."Journal Batch Name" := ItemJournalBatch.Name;
-            //-NPR5.53
         end;
-        //+NPR5.53
         NewCSStockTakes.Insert(true);
 
         Commit;
 
-        if GuiAllowed then begin
-            if Confirm(StrSubstNo(Text002, Location.Code, true)) then begin
-                Clear(ItemJournalLine);
-                ItemJournalLine.Init;
-                ItemJournalLine.Validate("Journal Template Name", NewCSStockTakes."Journal Template Name");
-                ItemJournalLine.Validate("Journal Batch Name", NewCSStockTakes."Journal Batch Name");
-                ItemJournalLine."Location Code" := NewCSStockTakes.Location;
+        if GuiAllowed then
+            ExecuteCalculation := Confirm(StrSubstNo(Text002, Location.Code, true))
+        else
+            ExecuteCalculation := AdjustInventory;
 
-                Clear(NoSeriesMgt);
-                ItemJournalLine."Document No." := NoSeriesMgt.GetNextNo(ItemJournalBatch."No. Series", ItemJournalLine."Posting Date", false);
-                ItemJournalLine."Source Code" := ItemJournalTemplate."Source Code";
-                ItemJournalLine."Reason Code" := ItemJournalBatch."Reason Code";
-                ItemJournalLine."Posting No. Series" := ItemJournalBatch."Posting No. Series";
+        if ExecuteCalculation then begin
+            Clear(ItemJournalLine);
+            ItemJournalLine.Init;
+            ItemJournalLine.Validate("Journal Template Name", NewCSStockTakes."Journal Template Name");
+            ItemJournalLine.Validate("Journal Batch Name", NewCSStockTakes."Journal Batch Name");
+            ItemJournalLine."Location Code" := NewCSStockTakes.Location;
 
-                Clear(Item);
-                Item.SetFilter("Location Filter", NewCSStockTakes.Location);
-                if not Item.FindSet then
-                    Error(Text003, Location);
+            Clear(NoSeriesMgt);
+            ItemJournalLine."Document No." := NoSeriesMgt.GetNextNo(ItemJournalBatch."No. Series", ItemJournalLine."Posting Date", false);
+            ItemJournalLine."Source Code" := ItemJournalTemplate."Source Code";
+            ItemJournalLine."Reason Code" := ItemJournalBatch."Reason Code";
+            ItemJournalLine."Posting No. Series" := ItemJournalBatch."Posting No. Series";
 
-                Clear(CalculateInventory);
-                CalculateInventory.UseRequestPage(false);
-                CalculateInventory.SetTableView(Item);
-                CalculateInventory.SetItemJnlLine(ItemJournalLine);
-                //-NPR5.53 [389864]
-                //CalculateInventory.InitializeRequest(WORKDATE,ItemJournalLine."Document No.",FALSE);
-                CalculateInventory.InitializeRequest(WorkDate, ItemJournalLine."Document No.", false, false);
-                //+NPR5.53 [389864]
-                CalculateInventory.RunModal;
+            Clear(Item);
+            Item.SetFilter("Location Filter", NewCSStockTakes.Location);
+            if not Item.FindSet then
+                Error(Text003, Location);
 
-                Clear(ItemJournalLine);
-                ItemJournalLine.SetRange("Journal Template Name", NewCSStockTakes."Journal Template Name");
-                ItemJournalLine.SetRange("Journal Batch Name", NewCSStockTakes."Journal Batch Name");
-                ItemJournalLine.SetRange("Location Code", NewCSStockTakes.Location);
-                if ItemJournalLine.FindSet then begin
-                    repeat
-                        QtyCalculated += ItemJournalLine."Qty. (Calculated)"
-                    until ItemJournalLine.Next = 0;
-                end;
+            if CSSetup."Exclude Invt. Posting Groups" <> '' then
+                Item.SetFilter("Inventory Posting Group", ReversedInvtPostingGroupFilter(CSSetup."Exclude Invt. Posting Groups"));
 
-                NewCSStockTakes."Predicted Qty." := QtyCalculated;
-                NewCSStockTakes."Inventory Calculated" := true;
-                NewCSStockTakes.Modify(true);
+            Clear(CalculateInventory);
+            CalculateInventory.UseRequestPage(false);
+            CalculateInventory.SetTableView(Item);
+            CalculateInventory.SetItemJnlLine(ItemJournalLine);
+            CalculateInventory.InitializeRequest(WorkDate, ItemJournalLine."Document No.", false, false);
+            CalculateInventory.RunModal;
+
+            Clear(ItemJournalLine);
+            ItemJournalLine.SetRange("Journal Template Name", NewCSStockTakes."Journal Template Name");
+            ItemJournalLine.SetRange("Journal Batch Name", NewCSStockTakes."Journal Batch Name");
+            ItemJournalLine.SetRange("Location Code", NewCSStockTakes.Location);
+            if ItemJournalLine.FindSet then begin
+                repeat
+                    QtyCalculated += ItemJournalLine."Qty. (Calculated)"
+                until ItemJournalLine.Next = 0;
             end;
-        end else begin
-            //-NPR5.53
-            if AdjustInventory then begin
-                //+NPR5.53
-                Clear(ItemJournalLine);
-                ItemJournalLine.Init;
-                ItemJournalLine.Validate("Journal Template Name", NewCSStockTakes."Journal Template Name");
-                ItemJournalLine.Validate("Journal Batch Name", NewCSStockTakes."Journal Batch Name");
-                ItemJournalLine."Location Code" := NewCSStockTakes.Location;
 
-                Clear(NoSeriesMgt);
-                ItemJournalLine."Document No." := NoSeriesMgt.GetNextNo(ItemJournalBatch."No. Series", ItemJournalLine."Posting Date", false);
-                ItemJournalLine."Source Code" := ItemJournalTemplate."Source Code";
-                ItemJournalLine."Reason Code" := ItemJournalBatch."Reason Code";
-                ItemJournalLine."Posting No. Series" := ItemJournalBatch."Posting No. Series";
-
-                Clear(Item);
-                Item.SetFilter("Location Filter", NewCSStockTakes.Location);
-                if not Item.FindSet then
-                    Error(Text003, Location);
-
-                Clear(CalculateInventory);
-                CalculateInventory.UseRequestPage(false);
-                CalculateInventory.SetTableView(Item);
-                CalculateInventory.SetItemJnlLine(ItemJournalLine);
-                //-NPR5.53 [389864]
-                //CalculateInventory.InitializeRequest(WORKDATE,ItemJournalLine."Document No.",FALSE);
-                CalculateInventory.InitializeRequest(WorkDate, ItemJournalLine."Document No.", false, false);
-                //+NPR5.53 [389864]
-                CalculateInventory.RunModal;
-
-                Clear(ItemJournalLine);
-                ItemJournalLine.SetRange("Journal Template Name", NewCSStockTakes."Journal Template Name");
-                ItemJournalLine.SetRange("Journal Batch Name", NewCSStockTakes."Journal Batch Name");
-                ItemJournalLine.SetRange("Location Code", NewCSStockTakes.Location);
-                if ItemJournalLine.FindSet then begin
-                    repeat
-                        QtyCalculated += ItemJournalLine."Qty. (Calculated)"
-                    until ItemJournalLine.Next = 0;
-                end;
-
-                NewCSStockTakes."Predicted Qty." := QtyCalculated;
-                NewCSStockTakes."Inventory Calculated" := true;
-                NewCSStockTakes.Modify(true);
-                //-NPR5.53
-            end;
-            //+NPR5.53
+            NewCSStockTakes."Predicted Qty." := QtyCalculated;
+            NewCSStockTakes."Inventory Calculated" := true;
+            NewCSStockTakes.Modify(true);
         end;
     end;
 
@@ -1267,7 +1113,6 @@ codeunit 6151373 "NPR CS Helper Functions"
     var
         ItemCrossReference: Record "Item Cross Reference";
     begin
-        //-NPR5.55 [379709]
         Clear(ItemCrossReference);
         ItemCrossReference.SetRange("Cross-Reference Type", ItemCrossReference."Cross-Reference Type"::"Bar Code");
         ItemCrossReference.SetRange("NPR Is Retail Serial No.", true);
@@ -1276,17 +1121,38 @@ codeunit 6151373 "NPR CS Helper Functions"
                 CreateCSRfidOfflineDataRecord(ItemCrossReference);
             until ItemCrossReference.Next = 0;
         end;
-        //+NPR5.55 [379709]
     end;
 
     procedure UpdateItemCrossRefFromRecord(var ItemCrossReference: Record "Item Cross Reference")
     begin
-        //-NPR5.55 [415521]
         ItemCrossReference.TestField("Cross-Reference Type", ItemCrossReference."Cross-Reference Type"::"Bar Code");
         ItemCrossReference.TestField("NPR Is Retail Serial No.", true);
 
         CreateCSRfidOfflineDataRecord(ItemCrossReference);
-        //+NPR5.55 [415521]
+    end;
+
+    local procedure ReversedInvtPostingGroupFilter(InvtPostingGroupFilterIn: Text): Text
+    var
+        InvtPostingGr: Record "Inventory Posting Group";
+        SelectionFilterManagement: Codeunit SelectionFilterManagement;
+    begin
+        Clear(InvtPostingGr);
+        InvtPostingGr.SetFilter(Code, InvtPostingGroupFilterIn);
+        if InvtPostingGr.FindSet() then
+            repeat
+                InvtPostingGr.Mark(true);
+            until InvtPostingGr.Next() = 0;
+
+        InvtPostingGr.SetRange(Code);
+        if InvtPostingGr.FindSet() then
+            repeat
+                InvtPostingGr.Mark(not InvtPostingGr.Mark());
+            until InvtPostingGr.Next() = 0;
+
+        InvtPostingGr.MarkedOnly(true);
+        if InvtPostingGr.IsEmpty then
+            exit('');
+        exit(SelectionFilterManagement.GetSelectionFilterForInventoryPostingGroup(InvtPostingGr));
     end;
 
     local procedure "-- Subscribers"()
@@ -1298,7 +1164,6 @@ codeunit 6151373 "NPR CS Helper Functions"
     var
         CSSetup: Record "NPR CS Setup";
     begin
-        //-NPR5.50 [346068]
         if not CSSetup.Get then
             exit;
 
@@ -1315,7 +1180,6 @@ codeunit 6151373 "NPR CS Helper Functions"
             exit;
 
         CreateCSRfidOfflineDataRecord(Rec);
-        //+NPR5.50 [346068]
     end;
 
     [EventSubscriber(ObjectType::Table, 5717, 'OnAfterModifyEvent', '', true, true)]
@@ -1323,7 +1187,6 @@ codeunit 6151373 "NPR CS Helper Functions"
     var
         CSSetup: Record "NPR CS Setup";
     begin
-        //-NPR5.50 [346068]
         if not CSSetup.Get then
             exit;
 
@@ -1340,7 +1203,6 @@ codeunit 6151373 "NPR CS Helper Functions"
             exit;
 
         CreateCSRfidOfflineDataRecord(Rec);
-        //+NPR5.50 [346068]
     end;
 
     [EventSubscriber(ObjectType::Table, 5717, 'OnAfterDeleteEvent', '', true, true)]
@@ -1348,7 +1210,6 @@ codeunit 6151373 "NPR CS Helper Functions"
     var
         CSSetup: Record "NPR CS Setup";
     begin
-        //-NPR5.50 [346068]
         if not CSSetup.Get then
             exit;
 
@@ -1365,7 +1226,5 @@ codeunit 6151373 "NPR CS Helper Functions"
             exit;
 
         DeleteCSRfidOfflineDataRecord(Rec);
-        //+NPR5.50 [346068]
     end;
 }
-
