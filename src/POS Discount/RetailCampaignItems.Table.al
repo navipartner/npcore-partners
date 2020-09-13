@@ -7,32 +7,38 @@ table 6014612 "NPR Retail Campaign Items"
     // NPR5.55/ALST/20200508 CASE 397967 calculating quantity sold
 
     Caption = 'Period Discount Items';
+    DataClassification = CustomerContent;
 
     fields
     {
         field(1; "Retail Campaign Code"; Code[20])
         {
             Caption = 'Retail Campaign Code';
+            DataClassification = CustomerContent;
         }
         field(2; "Line No."; Integer)
         {
             Caption = 'Line No.';
+            DataClassification = CustomerContent;
         }
         field(5; "Disc. Type"; Option)
         {
             Caption = 'Disc. Type';
             OptionCaption = 'Periodic,Mix';
             OptionMembers = Periodic,Mix;
+            DataClassification = CustomerContent;
         }
         field(6; "Disc. Code"; Code[20])
         {
             Caption = 'Disc. Code';
+            DataClassification = CustomerContent;
         }
         field(12; "Item No."; Code[20])
         {
             Caption = 'Item No.';
             NotBlank = true;
             TableRelation = Item."No.";
+            DataClassification = CustomerContent;
         }
         field(13; Description; Text[50])
         {
@@ -55,6 +61,7 @@ table 6014612 "NPR Retail Campaign Items"
             Caption = 'Period Price';
             MaxValue = 9999999;
             MinValue = 0;
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -72,18 +79,21 @@ table 6014612 "NPR Retail Campaign Items"
             FieldClass = Normal;
             OptionCaption = 'Await,Active,Balanced';
             OptionMembers = Await,Active,Balanced;
+            DataClassification = CustomerContent;
         }
         field(17; "Starting Date"; Date)
         {
             Caption = 'Starting Date';
             Editable = false;
             FieldClass = Normal;
+            DataClassification = CustomerContent;
         }
         field(18; "Ending Date"; Date)
         {
             Caption = 'Closing Date';
             Editable = false;
             FieldClass = Normal;
+            DataClassification = CustomerContent;
         }
         field(43; "Units per Parcel"; Decimal)
         {
@@ -91,12 +101,14 @@ table 6014612 "NPR Retail Campaign Items"
             DecimalPlaces = 0 : 5;
             Description = 'NPR5.41';
             MinValue = 0;
+            DataClassification = CustomerContent;
         }
         field(110; "Discount %"; Decimal)
         {
             Caption = 'Discount %';
             MaxValue = 100;
             MinValue = 0;
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -110,6 +122,7 @@ table 6014612 "NPR Retail Campaign Items"
             Caption = 'Discount Amount';
             MaxValue = 9999999;
             MinValue = 0;
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -128,46 +141,56 @@ table 6014612 "NPR Retail Campaign Items"
         field(113; "Campaign Unit Cost"; Decimal)
         {
             Caption = 'Period Cost';
+            DataClassification = CustomerContent;
         }
         field(114; Profit; Decimal)
         {
             Caption = 'Revenue %';
+            DataClassification = CustomerContent;
         }
         field(120; Comment; Boolean)
         {
             Caption = 'Comment';
             Editable = false;
             FieldClass = Normal;
+            DataClassification = CustomerContent;
         }
         field(121; "Unit Cost"; Decimal)
         {
             Caption = 'Period purchase price';
+            DataClassification = CustomerContent;
         }
         field(122; "Unit Purchase Price"; Decimal)
         {
             Caption = 'Unit Purchase Price';
+            DataClassification = CustomerContent;
         }
         field(124; "Distribution Item"; Boolean)
         {
             Caption = 'Distributionitem';
+            DataClassification = CustomerContent;
         }
         field(125; "Vendor No."; Code[20])
         {
             Caption = 'Vendor No.';
             TableRelation = Vendor."No.";
+            DataClassification = CustomerContent;
         }
         field(126; "Vendor Item No."; Code[20])
         {
             Caption = 'Vendor Item No.';
+            DataClassification = CustomerContent;
         }
         field(127; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
             TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No."));
+            DataClassification = CustomerContent;
         }
         field(128; "Last Date Modified"; Date)
         {
             Caption = 'Last Date Modified';
+            DataClassification = CustomerContent;
         }
         field(130; "Date Filter"; Date)
         {
@@ -193,11 +216,13 @@ table 6014612 "NPR Retail Campaign Items"
         {
             Caption = 'Starting Time';
             Editable = false;
+            DataClassification = CustomerContent;
         }
         field(136; "Ending Time"; Time)
         {
             Caption = 'Closing Time';
             Editable = false;
+            DataClassification = CustomerContent;
         }
         field(1101; Inventory; Decimal)
         {
@@ -225,24 +250,29 @@ table 6014612 "NPR Retail Campaign Items"
         {
             Caption = 'Sold Quantity';
             FieldClass = Normal;
+            DataClassification = CustomerContent;
         }
         field(1201; Turnover; Decimal)
         {
             Caption = 'Turnover';
             FieldClass = Normal;
+            DataClassification = CustomerContent;
         }
         field(1202; "Internet Special Id"; Integer)
         {
             AutoIncrement = true;
             Caption = 'Internet Special ID';
+            DataClassification = CustomerContent;
         }
         field(1203; "Campaign Profit"; Decimal)
         {
             Caption = 'Campaign Profit';
+            DataClassification = CustomerContent;
         }
         field(1210; "Cross-Reference No."; Code[20])
         {
             Caption = 'Cross-Reference No.';
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             var
@@ -256,73 +286,89 @@ table 6014612 "NPR Retail Campaign Items"
             DecimalPlaces = 0 : 5;
             InitValue = 1;
             MinValue = 0;
+            DataClassification = CustomerContent;
         }
         field(2313; "Description 2"; Text[50])
         {
             Caption = 'Description 2';
+            DataClassification = CustomerContent;
         }
         field(2321; "Disc. Grouping Type"; Enum "NPR Disc. Grouping Type")
         {
             Caption = 'Disc. Grouping Type';
+            DataClassification = CustomerContent;
         }
         field(2330; Priority; Integer)
         {
             Caption = 'Priority';
+            DataClassification = CustomerContent;
         }
         field(4200; "Item Group"; Boolean)
         {
             Caption = 'Item Group';
+            DataClassification = CustomerContent;
         }
         field(5215; "Page no. in advert"; Integer)
         {
             Caption = 'Page no. in advert';
+            DataClassification = CustomerContent;
         }
         field(5217; "Priority 2"; Code[10])
         {
             Caption = 'Priority 2';
+            DataClassification = CustomerContent;
         }
         field(5220; Photo; Boolean)
         {
             Caption = 'Photo';
+            DataClassification = CustomerContent;
         }
         field(5500; "Comment 2"; Text[50])
         {
             Caption = 'Comments';
+            DataClassification = CustomerContent;
         }
         field(7017; "Mix Discount Type"; Option)
         {
             Caption = 'Discount Type';
             OptionCaption = ',Total Amount per Min. Qty.,Total Discount %,Total Discount Amt. per Min. Qty.,Priority Discount per Min. Qty,Multiple Discount Levels';
             OptionMembers = ,"Total Amount per Min. Qty.","Total Discount %","Total Discount Amt. per Min. Qty.","Priority Discount per Min. Qty","Multiple Discount Levels";
+            DataClassification = CustomerContent;
         }
         field(7018; "Total Discount %"; Decimal)
         {
             Caption = 'Total Discount %';
+            DataClassification = CustomerContent;
         }
         field(7020; "Max. Quantity"; Decimal)
         {
             BlankZero = true;
             Caption = 'Max. Quantity';
             DecimalPlaces = 0 : 5;
+            DataClassification = CustomerContent;
         }
         field(7025; "Total Discount Amount"; Decimal)
         {
             Caption = 'Total Discount Amount';
+            DataClassification = CustomerContent;
         }
         field(7030; "Item Discount Qty."; Decimal)
         {
             Caption = 'Item Discount Quantity';
             DecimalPlaces = 0 : 5;
+            DataClassification = CustomerContent;
         }
         field(7035; "Item Discount %"; Decimal)
         {
             Caption = 'Item Discount %';
+            DataClassification = CustomerContent;
         }
         field(7100; "Mix Type"; Option)
         {
             Caption = 'Mix Type';
             OptionCaption = ',Standard,Combination,Combination Part';
             OptionMembers = ,Standard,Combination,"Combination Part";
+            DataClassification = CustomerContent;
         }
     }
 

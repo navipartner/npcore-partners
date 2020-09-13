@@ -4,6 +4,7 @@ table 6059823 "NPR Smart Email Variable"
     // NPR5.55/THRO/20200511 CASE 343266 Added field "Variable Type" - used in Mandrill integration
 
     Caption = 'Smart Email Variable';
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -11,29 +12,35 @@ table 6059823 "NPR Smart Email Variable"
         {
             Caption = 'Transactional Email Code';
             TableRelation = "NPR Smart Email";
+            DataClassification = CustomerContent;
         }
         field(2; "Line No."; Integer)
         {
             Caption = 'Line No.';
+            DataClassification = CustomerContent;
         }
         field(10; "Variable Name"; Text[100])
         {
             Caption = 'Variable Name';
+            DataClassification = CustomerContent;
         }
         field(20; "Variable Type"; Option)
         {
             Caption = 'Variable Type';
             OptionCaption = ' ,Mailchimp,Handlebars';
             OptionMembers = " ",Mailchimp,Handlebars;
+            DataClassification = CustomerContent;
         }
         field(50; "Merge Table ID"; Integer)
         {
             Caption = 'Merge Table ID';
+            DataClassification = CustomerContent;
         }
         field(60; "Field No."; Integer)
         {
             Caption = 'Field No.';
             TableRelation = Field."No." WHERE(TableNo = FIELD("Merge Table ID"));
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -52,6 +59,7 @@ table 6059823 "NPR Smart Email Variable"
         field(70; "Const Value"; Text[100])
         {
             Caption = 'Const Value';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin

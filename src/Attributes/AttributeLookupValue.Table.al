@@ -5,6 +5,7 @@ table 6014557 "NPR Attribute Lookup Value"
     Caption = 'Attribute Code Lookup Value';
     DrillDownPageID = "NPR Attribute Value Lookup";
     LookupPageID = "NPR Attribute Value Lookup";
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -12,18 +13,22 @@ table 6014557 "NPR Attribute Lookup Value"
         {
             Caption = 'Attribute Code';
             TableRelation = "NPR Attribute".Code;
+            DataClassification = CustomerContent;
         }
         field(2; "Attribute Value Code"; Code[20])
         {
             Caption = 'Attribute Value Code';
+            DataClassification = CustomerContent;
         }
         field(10; "Attribute Value Name"; Text[100])
         {
             Caption = 'Attribute Value Name';
+            DataClassification = CustomerContent;
         }
         field(12; "Attribute Value Description"; Text[100])
         {
             Caption = 'Attribute Value Description';
+            DataClassification = CustomerContent;
         }
     }
 

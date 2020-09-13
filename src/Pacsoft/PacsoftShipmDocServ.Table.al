@@ -3,22 +3,26 @@ table 6014470 "NPR Pacsoft Shipm. Doc. Serv."
     // PS1.00/LS/20141201  CASE 200150 Pacsoft Module
 
     Caption = 'Pacsoft Shipment Document Services';
+    DataClassification = CustomerContent;
 
     fields
     {
         field(1; "Entry No."; BigInteger)
         {
             Caption = 'Entry No.';
+            DataClassification = CustomerContent;
         }
         field(2; "Shipping Agent Code"; Code[10])
         {
             Caption = 'Shipping Agent Code';
             TableRelation = "Shipping Agent";
+            DataClassification = CustomerContent;
         }
         field(3; "Shipping Agent Service Code"; Code[10])
         {
             Caption = 'Shipping Agent Service Code';
             TableRelation = "Shipping Agent Services".Code WHERE("Shipping Agent Code" = FIELD("Shipping Agent Code"));
+            DataClassification = CustomerContent;
         }
         field(20; Description; Text[50])
         {
@@ -32,11 +36,13 @@ table 6014470 "NPR Pacsoft Shipm. Doc. Serv."
         {
             Caption = 'Amount';
             Enabled = false;
+            DataClassification = CustomerContent;
         }
         field(22; Reference; Text[50])
         {
             Caption = 'Reference';
             Enabled = false;
+            DataClassification = CustomerContent;
         }
         field(23; "Reference Type"; Option)
         {
@@ -44,22 +50,26 @@ table 6014470 "NPR Pacsoft Shipm. Doc. Serv."
             Enabled = false;
             OptionCaption = ' ,TXT,OCR';
             OptionMembers = " ",TXT,OCR;
+            DataClassification = CustomerContent;
         }
         field(24; Miscellaneous; Text[80])
         {
             Caption = 'Miscellaneous';
             Enabled = false;
+            DataClassification = CustomerContent;
         }
         field(25; "Account No."; Code[20])
         {
             Caption = 'Account No.';
             Enabled = false;
+            DataClassification = CustomerContent;
         }
         field(26; "Account Type"; Text[5])
         {
             Caption = 'Account Type';
             Enabled = false;
             ValuesAllowed = 'ACCDK', 'BG', 'PG', 'KONTO';
+            DataClassification = CustomerContent;
         }
     }
 

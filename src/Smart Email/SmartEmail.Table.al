@@ -7,18 +7,21 @@ table 6059822 "NPR Smart Email"
     Caption = 'Smart Email';
     DrillDownPageID = "NPR Smart Email List";
     LookupPageID = "NPR Smart Email List";
+    DataClassification = CustomerContent;
 
     fields
     {
         field(1; "Code"; Code[20])
         {
             Caption = 'Code';
+            DataClassification = CustomerContent;
         }
         field(3; Provider; Option)
         {
             Caption = 'Provider';
             OptionCaption = 'Campaign Monitor,Mailchimp';
             OptionMembers = "Campaign Monitor",Mailchimp;
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -31,11 +34,13 @@ table 6059822 "NPR Smart Email"
         field(10; Description; Text[30])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
         }
         field(50; "Merge Table ID"; Integer)
         {
             Caption = 'Merge Table ID';
             TableRelation = "Table Metadata";
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             var
@@ -67,6 +72,7 @@ table 6059822 "NPR Smart Email"
             //This property is currently not supported
             //TestTableRelation = false;
             ValidateTableRelation = false;
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             var
@@ -81,37 +87,45 @@ table 6059822 "NPR Smart Email"
         field(110; "Smart Email Name"; Text[50])
         {
             Caption = 'Smart Email Name';
+            DataClassification = CustomerContent;
         }
         field(150; Status; Text[10])
         {
             Caption = 'Status';
+            DataClassification = CustomerContent;
         }
         field(160; Subject; Text[100])
         {
             Caption = 'Subject';
+            DataClassification = CustomerContent;
         }
         field(170; From; Text[80])
         {
             Caption = 'From';
+            DataClassification = CustomerContent;
         }
         field(180; "Reply To"; Text[80])
         {
             Caption = 'Reply To';
+            DataClassification = CustomerContent;
         }
         field(190; "Preview Url"; Text[200])
         {
             Caption = 'Preview Url';
+            DataClassification = CustomerContent;
         }
         field(200; "NpXml Template Code"; Code[20])
         {
             Caption = 'NpXml Template Code';
             TableRelation = "NPR NpXml Template";
+            DataClassification = CustomerContent;
         }
         field(300; "Merge Language (Mailchimp)"; Option)
         {
             Caption = 'Merge Language (Mailchimp)';
             OptionCaption = ' ,mailchimp,handlebars';
             OptionMembers = " ",mailchimp,handlebars;
+            DataClassification = CustomerContent;
         }
     }
 

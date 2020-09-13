@@ -1,11 +1,12 @@
 table 6151250 "NPR Retail Entertainment Cue"
 {
+    DataClassification = CustomerContent;
 
     fields
     {
         field(1; No; Integer)
         {
-            DataClassification = ToBeClassified;
+            DataClassification = CustomerContent;
         }
         field(2; "Issued Tickets"; Integer)
         {

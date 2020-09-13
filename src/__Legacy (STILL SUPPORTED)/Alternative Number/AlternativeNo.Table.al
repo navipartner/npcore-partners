@@ -7,6 +7,7 @@ table 6014416 "NPR Alternative No."
 
     Caption = 'Alternative No.';
     LookupPageID = "NPR Alternative Number";
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -20,6 +21,7 @@ table 6014416 "NPR Alternative No."
             ELSE
             IF (Type = CONST(SalesPerson)) "Salesperson/Purchaser".Code;
             ValidateTableRelation = true;
+            DataClassification = CustomerContent;
         }
         field(2; "Alt. No."; Code[20])
         {
@@ -37,26 +39,31 @@ table 6014416 "NPR Alternative No."
             //This property is currently not supported
             //TestTableRelation = false;
             ValidateTableRelation = false;
+            DataClassification = CustomerContent;
         }
         field(3; "Created the"; Date)
         {
             Caption = 'Created Date';
             Editable = false;
+            DataClassification = CustomerContent;
         }
         field(4; Type; Option)
         {
             Caption = 'Type';
             OptionCaption = 'Item,Customer,CRM Customer,Register drawer,Salesperson';
             OptionMembers = Item,Customer,"CRM Customer",Register,SalesPerson;
+            DataClassification = CustomerContent;
         }
         field(5; "Last Date Modified"; Date)
         {
             Caption = 'Last Date Modified';
+            DataClassification = CustomerContent;
         }
         field(6; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
             TableRelation = IF (Type = CONST(Item)) "Item Variant".Code WHERE("Item No." = FIELD(Code));
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             var
@@ -72,35 +79,42 @@ table 6014416 "NPR Alternative No."
         {
             Caption = 'Base Unit of Measure';
             TableRelation = "Item Unit of Measure".Code WHERE("Item No." = FIELD(Code));
+            DataClassification = CustomerContent;
         }
         field(8; "Sales Unit of Measure"; Code[10])
         {
             Caption = 'Sales Unit of Measure';
             TableRelation = "Item Unit of Measure".Code WHERE("Item No." = FIELD(Code));
+            DataClassification = CustomerContent;
         }
         field(9; "Purch. Unit of Measure"; Code[10])
         {
             Caption = 'Purch. Unit of Measure';
             TableRelation = "Item Unit of Measure".Code WHERE("Item No." = FIELD(Code));
+            DataClassification = CustomerContent;
         }
         field(10; "Blocked Reason Code"; Code[10])
         {
             Caption = 'Blocked Reason';
             TableRelation = "Reason Code".Code;
+            DataClassification = CustomerContent;
         }
         field(12; Discontinue; Boolean)
         {
             Caption = 'Discontinue Bar Code';
+            DataClassification = CustomerContent;
         }
         field(5000; Auto; Boolean)
         {
             Caption = 'Auto';
             InitValue = true;
+            DataClassification = CustomerContent;
         }
         field(6014400; "Variant Description"; Text[50])
         {
             Caption = 'Variant Description';
             Description = 'NPR5.48';
+            DataClassification = CustomerContent;
         }
     }
 

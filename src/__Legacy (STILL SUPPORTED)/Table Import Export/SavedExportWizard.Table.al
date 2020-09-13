@@ -7,20 +7,24 @@ table 6014511 "NPR Saved Export Wizard"
     DataCaptionFields = "Code", Description;
     DrillDownPageID = "NPR Saved Export Wizard";
     LookupPageID = "NPR Saved Export Wizard";
+    DataClassification = CustomerContent;
 
     fields
     {
         field(1; "Code"; Code[10])
         {
             Caption = 'Code';
+            DataClassification = CustomerContent;
         }
         field(10; Description; Text[30])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
         }
         field(100; "Saved Data"; BLOB)
         {
             Caption = 'Saved Data';
+            DataClassification = CustomerContent;
         }
     }
 

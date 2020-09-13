@@ -9,63 +9,76 @@ table 6014552 "NPR Attribute"
     Caption = 'Attribute';
     DrillDownPageID = "NPR Attributes";
     LookupPageID = "NPR Attributes";
+    DataClassification = CustomerContent;
 
     fields
     {
         field(1; "Code"; Code[20])
         {
             Caption = 'Code';
+            DataClassification = CustomerContent;
         }
         field(10; Name; Text[30])
         {
             Caption = 'Name';
+            DataClassification = CustomerContent;
         }
         field(11; "Code Caption"; Text[30])
         {
             Caption = 'Code Caption';
+            DataClassification = CustomerContent;
         }
         field(12; "Filter Caption"; Text[30])
         {
             Caption = 'Filter Caption';
+            DataClassification = CustomerContent;
         }
         field(13; Description; Text[80])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
         }
         field(14; Blocked; Boolean)
         {
             Caption = 'Blocked';
+            DataClassification = CustomerContent;
         }
         field(15; Global; Boolean)
         {
             Caption = 'Global';
+            DataClassification = CustomerContent;
         }
         field(20; "Value Datatype"; Option)
         {
             Caption = 'Value Datatype';
             OptionCaption = 'Text,Code,Date,Datetime,Decimal,Integer,Boolean';
             OptionMembers = DT_TEXT,DT_CODE,DT_DATE,DT_DATETIME,DT_DECIMAL,DT_INTEGER,DT_BOOLEAN;
+            DataClassification = CustomerContent;
         }
         field(21; "On Validate"; Option)
         {
             Caption = 'On Validate';
             OptionCaption = 'Datatype,Lookup';
             OptionMembers = DATATYPE,VALUE_LOOKUP;
+            DataClassification = CustomerContent;
         }
         field(22; "On Format"; Option)
         {
             Caption = 'On Format';
             OptionCaption = 'Native,User''s Culture,Custom';
             OptionMembers = NATIVE,USER,CUSTOM;
+            DataClassification = CustomerContent;
         }
         field(23; "LookUp Table"; Boolean)
         {
             Caption = 'LookUp Table';
+            DataClassification = CustomerContent;
         }
         field(24; "LookUp Table Id"; Integer)
         {
             Caption = 'LookUp Table Id';
             TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
+            DataClassification = CustomerContent;
         }
         field(25; "LookUp Table Name"; Text[30])
         {
@@ -79,6 +92,7 @@ table 6014552 "NPR Attribute"
         {
             Caption = 'LookUp Value Field Id';
             TableRelation = Field."No." WHERE(TableNo = FIELD("LookUp Table Id"));
+            DataClassification = CustomerContent;
         }
         field(27; "LookUp Value Field Name"; Text[30])
         {
@@ -91,6 +105,7 @@ table 6014552 "NPR Attribute"
         {
             Caption = 'LookUp Description Field Id';
             TableRelation = Field."No." WHERE(TableNo = FIELD("LookUp Table Id"));
+            DataClassification = CustomerContent;
         }
         field(29; "LookUp Description Field Name"; Text[30])
         {
@@ -103,6 +118,7 @@ table 6014552 "NPR Attribute"
         {
             Caption = 'Import File Column No.';
             Description = 'NPR5.39';
+            DataClassification = CustomerContent;
         }
     }
 

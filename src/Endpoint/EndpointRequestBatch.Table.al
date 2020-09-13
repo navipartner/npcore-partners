@@ -3,6 +3,7 @@ table 6014676 "NPR Endpoint Request Batch"
     // NPR5.23\BR\20160518  CASE 237658 Object created
 
     Caption = 'Endpoint Request Batch';
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -10,33 +11,40 @@ table 6014676 "NPR Endpoint Request Batch"
         {
             AutoIncrement = true;
             Caption = 'No.';
+            DataClassification = CustomerContent;
         }
         field(10; "Endpoint Code"; Code[20])
         {
             Caption = 'Endpoint Code';
             TableRelation = "NPR Endpoint";
+            DataClassification = CustomerContent;
         }
         field(30; Status; Option)
         {
             Caption = 'Status';
             OptionCaption = 'Collecting,Ready to Send,Sent';
             OptionMembers = Collecting,"Ready to Send",Sent;
+            DataClassification = CustomerContent;
         }
         field(40; "Creation Date"; DateTime)
         {
             Caption = 'Creation Date';
+            DataClassification = CustomerContent;
         }
         field(50; "Ready to Send Date"; DateTime)
         {
             Caption = 'Ready to Send Date';
+            DataClassification = CustomerContent;
         }
         field(60; "Sent Date"; DateTime)
         {
             Caption = 'Sent Date';
+            DataClassification = CustomerContent;
         }
         field(100; "Table No."; Integer)
         {
             Caption = 'Table No.';
+            DataClassification = CustomerContent;
         }
         field(200; "No. of Requests"; Integer)
         {

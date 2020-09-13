@@ -792,8 +792,8 @@ codeunit 6060152 "NPR Event Calendar Mgt."
         TimeZoneInfo := TimeZoneInfo.FindSystemTimeZoneById(TimeZoneId);
         SenderOffSet := TimeZoneInfo.GetUtcOffset(CurrentDateTime);
 
-        AppointmentItem.StartTimeZone := TimeZoneInfo.FindSystemTimeZoneById(TimeZoneId);
-        AppointmentItem.EndTimeZone := TimeZoneInfo.FindSystemTimeZoneById(TimeZoneId);
+        //AppointmentItem.StartTimeZone := TimeZoneInfo.FindSystemTimeZoneById(TimeZoneId);
+        //AppointmentItem.EndTimeZone := TimeZoneInfo.FindSystemTimeZoneById(TimeZoneId);
         //+NPR5.46 [323953]
 
         //-NPR5.32 [274405]

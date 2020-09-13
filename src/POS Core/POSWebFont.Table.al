@@ -13,6 +13,7 @@ table 6014621 "NPR POS Web Font"
     Caption = 'POS Web Font';
     DataCaptionFields = "Code", Name;
     DataPerCompany = false;
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -20,31 +21,38 @@ table 6014621 "NPR POS Web Font"
         {
             Caption = 'Code';
             NotBlank = true;
+            DataClassification = CustomerContent;
         }
         field(2; "Company Name"; Code[30])
         {
             Caption = 'Company Name';
             TableRelation = Company;
+            DataClassification = CustomerContent;
         }
         field(10; Name; Text[50])
         {
             Caption = 'Name';
+            DataClassification = CustomerContent;
         }
         field(11; "Font Face"; Text[80])
         {
             Caption = 'Font Face';
+            DataClassification = CustomerContent;
         }
         field(12; Prefix; Text[30])
         {
             Caption = 'Prefix';
+            DataClassification = CustomerContent;
         }
         field(20; Woff; BLOB)
         {
             Caption = 'Woff';
+            DataClassification = CustomerContent;
         }
         field(21; Css; BLOB)
         {
             Caption = 'Css';
+            DataClassification = CustomerContent;
         }
     }
 

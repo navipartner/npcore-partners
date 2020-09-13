@@ -5,16 +5,19 @@ table 6014530 "NPR POS Customer Location"
     // NPR5.31/MMV /20170316 CASE 264109 Added field 4.
 
     Caption = 'POS Customer Location';
+    DataClassification = CustomerContent;
 
     fields
     {
         field(1; "No."; Code[20])
         {
             Caption = 'No.';
+            DataClassification = CustomerContent;
         }
         field(2; Description; Text[50])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
         }
         field(3; "Contains Sales"; Boolean)
         {

@@ -4,30 +4,36 @@ table 6059820 "NPR Trx Email Setup"
     // NPR5.55/THRO/20200511 CASE 343266 Added Provider and Default
 
     Caption = 'Transactional Email Setup';
+    DataClassification = CustomerContent;
 
     fields
     {
         field(1; "Code"; Code[10])
         {
             Caption = 'Code';
+            DataClassification = CustomerContent;
         }
         field(3; Provider; Option)
         {
             Caption = 'Provider';
             OptionCaption = 'Campaign Monitor,Mailchimp';
             OptionMembers = "Campaign Monitor",Mailchimp;
+            DataClassification = CustomerContent;
         }
         field(10; "Client ID"; Text[100])
         {
             Caption = 'Client ID';
+            DataClassification = CustomerContent;
         }
         field(20; "API Key"; Text[100])
         {
             Caption = 'API Key';
+            DataClassification = CustomerContent;
         }
         field(30; "API URL"; Text[250])
         {
             Caption = 'API URL';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -39,6 +45,7 @@ table 6059820 "NPR Trx Email Setup"
         field(50; Default; Boolean)
         {
             Caption = 'Default';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             var

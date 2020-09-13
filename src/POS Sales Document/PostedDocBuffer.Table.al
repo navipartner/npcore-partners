@@ -5,6 +5,7 @@ table 6014433 "NPR Posted Doc. Buffer"
     Caption = 'Posted Document Buffer';
     DrillDownPageID = "NPR Posted Documents";
     LookupPageID = "NPR Posted Documents";
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -13,69 +14,84 @@ table 6014433 "NPR Posted Doc. Buffer"
             Caption = 'Document Type';
             OptionCaption = 'Prepayment Invoice,Prepayment Credit Memo';
             OptionMembers = "Prepayment Invoice","Prepayment Credit Memo";
+            DataClassification = CustomerContent;
         }
         field(2; "Document No."; Code[20])
         {
             Caption = 'Document No.';
+            DataClassification = CustomerContent;
         }
         field(3; "Source Record ID"; RecordID)
         {
             Caption = 'Source Record ID';
+            DataClassification = CustomerContent;
         }
         field(10; "External Document No."; Code[35])
         {
             Caption = 'External Document No.';
+            DataClassification = CustomerContent;
         }
         field(20; "Sell-to/Buy-from No."; Code[20])
         {
             Caption = 'Sell-to/Buy-from No.';
             TableRelation = Customer;
+            DataClassification = CustomerContent;
         }
         field(30; "Bill-to/Pay-to No."; Code[20])
         {
             Caption = 'Bill-to/Pay-to No.';
             TableRelation = Customer;
+            DataClassification = CustomerContent;
         }
         field(40; "Sell-to/Buy-from Name"; Text[50])
         {
             Caption = 'Sell-to/Buy-from Name';
+            DataClassification = CustomerContent;
         }
         field(50; "Sell-to/Buy-from Name 2"; Text[50])
         {
             Caption = 'Sell-to/Buy-from Name 2';
+            DataClassification = CustomerContent;
         }
         field(60; "Bill-to/Pay-to Name"; Text[50])
         {
             Caption = 'Bill-to/Pay-to Name';
+            DataClassification = CustomerContent;
         }
         field(70; "Bill-to/Pay-to Name 2"; Text[50])
         {
             Caption = 'Bill-to/Pay-to Name 2';
+            DataClassification = CustomerContent;
         }
         field(80; "Posting Date"; Date)
         {
             Caption = 'Posting Date';
+            DataClassification = CustomerContent;
         }
         field(90; "Document Date"; Date)
         {
             Caption = 'Document Date';
+            DataClassification = CustomerContent;
         }
         field(100; "Currency Code"; Code[10])
         {
             Caption = 'Currency Code';
             TableRelation = Currency;
+            DataClassification = CustomerContent;
         }
         field(110; Amount; Decimal)
         {
             AutoFormatExpression = "Currency Code";
             AutoFormatType = 1;
             Caption = 'Amount';
+            DataClassification = CustomerContent;
         }
         field(120; "Amount Including VAT"; Decimal)
         {
             AutoFormatExpression = "Currency Code";
             AutoFormatType = 1;
             Caption = 'Amount Including VAT';
+            DataClassification = CustomerContent;
         }
     }
 

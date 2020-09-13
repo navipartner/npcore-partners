@@ -15,6 +15,7 @@ table 6059896 "NPR Data Log Subscriber"
     Caption = 'Data Log Subscriber';
     DrillDownPageID = "NPR Data Log Subscribers";
     LookupPageID = "NPR Data Log Subscribers";
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -22,17 +23,20 @@ table 6059896 "NPR Data Log Subscriber"
         {
             Caption = 'Code';
             Description = 'DL1.07';
+            DataClassification = CustomerContent;
         }
         field(2; "Table ID"; Integer)
         {
             Caption = 'Table ID';
             TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
+            DataClassification = CustomerContent;
         }
         field(3; "Company Name"; Text[30])
         {
             Caption = 'Company Name';
             Description = 'DL1.10';
             TableRelation = Company;
+            DataClassification = CustomerContent;
         }
         field(5; "Table Name"; Text[30])
         {
@@ -45,16 +49,19 @@ table 6059896 "NPR Data Log Subscriber"
         field(10; "Last Log Entry No."; BigInteger)
         {
             Caption = 'Last Log Entry No.';
+            DataClassification = CustomerContent;
         }
         field(100; "Direct Data Processing"; Boolean)
         {
             Caption = 'Direct Data Processing';
             Description = 'DL1.01';
+            DataClassification = CustomerContent;
         }
         field(110; "Data Processing Codeunit ID"; Integer)
         {
             Caption = 'Data Processing Codeunit ID';
             Description = 'DL1.01';
+            DataClassification = CustomerContent;
         }
         field(115; "Data Processing Codeunit Name"; Text[30])
         {
@@ -69,6 +76,7 @@ table 6059896 "NPR Data Log Subscriber"
             Caption = 'Last Date Modified';
             Description = 'DL1.03';
             Editable = false;
+            DataClassification = CustomerContent;
         }
     }
 

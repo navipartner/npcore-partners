@@ -4,6 +4,7 @@ table 6014422 "NPR Retail Journal Line"
     // NPR5.51/MHA /20190822 CASE 365886 Discount Pct. is set to 0 when Unit Price is 0 in CalcDiscountPrice()
 
     Caption = 'Retail Journal Line';
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -11,6 +12,7 @@ table 6014422 "NPR Retail Journal Line"
         {
             Caption = 'No.';
             TableRelation = "NPR Retail Journal Header"."No.";
+            DataClassification = CustomerContent;
         }
         field(2; "Item No."; Code[20])
         {
@@ -19,6 +21,7 @@ table 6014422 "NPR Retail Journal Line"
             //This property is currently not supported
             //TestTableRelation = false;
             ValidateTableRelation = false;
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             var
@@ -103,15 +106,18 @@ table 6014422 "NPR Retail Journal Line"
         field(3; "Quantity to Print"; Decimal)
         {
             Caption = 'Quantity to Print';
+            DataClassification = CustomerContent;
         }
         field(4; Description; Text[50])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
         }
         field(5; "Vendor No."; Code[20])
         {
             Caption = 'Vendor No.';
             TableRelation = Vendor;
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             var
@@ -129,10 +135,12 @@ table 6014422 "NPR Retail Journal Line"
         field(6; "Vendor Item No."; Code[20])
         {
             Caption = 'Vendor Item No.';
+            DataClassification = CustomerContent;
         }
         field(7; "Discount Price Incl. Vat"; Decimal)
         {
             Caption = 'Discount Price Incl. Vat';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -150,6 +158,7 @@ table 6014422 "NPR Retail Journal Line"
         field(8; "Last Direct Cost"; Decimal)
         {
             Caption = 'Last Direct Cost';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -159,14 +168,17 @@ table 6014422 "NPR Retail Journal Line"
         field(9; "Line No."; Integer)
         {
             Caption = 'Line No.';
+            DataClassification = CustomerContent;
         }
         field(10; "Sales Unit of measure"; Code[10])
         {
             Caption = 'Sales Unit of measure';
+            DataClassification = CustomerContent;
         }
         field(11; Barcode; Code[50])
         {
             Caption = 'Barcode';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             var
@@ -186,15 +198,18 @@ table 6014422 "NPR Retail Journal Line"
         field(13; "Mixed Discount"; Code[20])
         {
             Caption = 'Mixed Discount';
+            DataClassification = CustomerContent;
         }
         field(14; "Period Discount"; Code[20])
         {
             Caption = 'Campaign/period discount';
+            DataClassification = CustomerContent;
         }
         field(17; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
             TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No."));
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             var
@@ -218,32 +233,39 @@ table 6014422 "NPR Retail Journal Line"
         field(18; "Description 2"; Text[50])
         {
             Caption = 'Description 2';
+            DataClassification = CustomerContent;
         }
         field(19; "Item group"; Code[10])
         {
             Caption = 'Item group';
             NotBlank = true;
+            DataClassification = CustomerContent;
         }
         field(20; Assortment; Code[20])
         {
             Caption = 'Assortment';
             NotBlank = true;
+            DataClassification = CustomerContent;
         }
         field(21; "New Item No."; Code[20])
         {
             Caption = 'New Item No.';
+            DataClassification = CustomerContent;
         }
         field(22; "New Item"; Boolean)
         {
             Caption = 'New Item';
+            DataClassification = CustomerContent;
         }
         field(23; "Purch. Unit of measure"; Code[10])
         {
             Caption = 'Purch. Unit of measure';
+            DataClassification = CustomerContent;
         }
         field(24; "Base Unit of measure"; Code[10])
         {
             Caption = 'Base Unit of measure';
+            DataClassification = CustomerContent;
         }
         field(25; Inventory; Decimal)
         {
@@ -261,14 +283,17 @@ table 6014422 "NPR Retail Journal Line"
         {
             Caption = 'Can''t edit unit price';
             FieldClass = Normal;
+            DataClassification = CustomerContent;
         }
         field(28; "Profit % (new)"; Decimal)
         {
             Caption = 'Profit % (new)';
+            DataClassification = CustomerContent;
         }
         field(29; "Unit Price"; Decimal)
         {
             Caption = 'Unit Price';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -280,10 +305,12 @@ table 6014422 "NPR Retail Journal Line"
         field(30; "Discount Unit Price"; Decimal)
         {
             Caption = 'Discount Unit Price';
+            DataClassification = CustomerContent;
         }
         field(31; "Serial No."; Code[20])
         {
             Caption = 'Serial No.';
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             var
@@ -338,15 +365,18 @@ table 6014422 "NPR Retail Journal Line"
         field(41; "Vendor Name"; Text[60])
         {
             Caption = 'Vendor Name';
+            DataClassification = CustomerContent;
         }
         field(42; "Vendor Search Description"; Code[50])
         {
             Caption = 'Vendor Search Description';
+            DataClassification = CustomerContent;
         }
         field(47; "Register No."; Code[20])
         {
             Caption = 'Cash Register No.';
             TableRelation = "NPR Register";
+            DataClassification = CustomerContent;
         }
         field(50; "Location Filter"; Code[10])
         {
@@ -360,6 +390,7 @@ table 6014422 "NPR Retail Journal Line"
             Description = 'Sag 70113';
             OptionCaption = ' ,Period,Mixed,Multiple Unit,Salesperson Discount,Inventory,Photo Work,Rounding,Combination,Customer';
             OptionMembers = " ",Campaign,Mix,Quantity,Manual,"BOM List","Photo work",Rounding,Combination,Customer;
+            DataClassification = CustomerContent;
         }
         field(61; "Discount Code"; Code[20])
         {
@@ -368,10 +399,12 @@ table 6014422 "NPR Retail Journal Line"
             TableRelation = IF ("Discount Type" = CONST(Mix)) "NPR Mixed Discount"
             ELSE
             IF ("Discount Type" = CONST(Quantity)) "NPR Quantity Discount Header";
+            DataClassification = CustomerContent;
         }
         field(62; "Discount Pct."; Decimal)
         {
             Caption = 'Discount %';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -383,6 +416,7 @@ table 6014422 "NPR Retail Journal Line"
         field(63; "Quantity for Discount Calc"; Decimal)
         {
             Caption = 'Quantity for Discount Calculation';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -394,22 +428,26 @@ table 6014422 "NPR Retail Journal Line"
         field(65; "Calculation Date"; Date)
         {
             Caption = 'Calculation Date';
+            DataClassification = CustomerContent;
         }
         field(70; "Customer Price Group"; Code[10])
         {
             Caption = 'Customer Price Group';
             TableRelation = "Customer Price Group";
+            DataClassification = CustomerContent;
         }
         field(72; "Customer Disc. Group"; Code[20])
         {
             Caption = 'Customer Disc. Group';
             Description = 'NPR5.31';
             TableRelation = "Customer Discount Group";
+            DataClassification = CustomerContent;
         }
         field(75; "Customer No."; Code[20])
         {
             Caption = 'Customer No.';
             TableRelation = Customer;
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             var
@@ -436,17 +474,20 @@ table 6014422 "NPR Retail Journal Line"
             CaptionClass = '1,1,1';
             Caption = 'Global Dimension 1 Code';
             TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+            DataClassification = CustomerContent;
         }
         field(77; "Shortcut Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,1,2';
             Caption = 'Global Dimension 2 Code';
             TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
+            DataClassification = CustomerContent;
         }
         field(78; "Location Code"; Code[10])
         {
             Caption = 'Location Code';
             TableRelation = Location;
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             var
@@ -463,6 +504,7 @@ table 6014422 "NPR Retail Journal Line"
         field(80; "Discount Price Excl. VAT"; Decimal)
         {
             Caption = 'Discount Price Excl. VAT';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -479,21 +521,25 @@ table 6014422 "NPR Retail Journal Line"
         field(81; "VAT %"; Decimal)
         {
             Caption = 'VAT %';
+            DataClassification = CustomerContent;
         }
         field(85; "Unit List Price"; Decimal)
         {
             AutoFormatType = 2;
             Caption = 'Unit List Price';
             MinValue = 0;
+            DataClassification = CustomerContent;
         }
         field(90; "RFID Tag Value"; Text[30])
         {
             Caption = 'RFID Tag Value';
+            DataClassification = CustomerContent;
         }
         field(100; "Exchange Label"; Code[13])
         {
             Caption = 'Exchange Label';
             Description = 'NPR5.49';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             var
@@ -548,11 +594,13 @@ table 6014422 "NPR Retail Journal Line"
         {
             Caption = 'Is Master';
             Description = 'VRT';
+            DataClassification = CustomerContent;
         }
         field(6059971; "Master Line No."; Integer)
         {
             Caption = 'Master Line No.';
             Description = 'VRT';
+            DataClassification = CustomerContent;
         }
     }
 

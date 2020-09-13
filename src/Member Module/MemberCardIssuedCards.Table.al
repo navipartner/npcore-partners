@@ -6,6 +6,7 @@ table 6059774 "NPR Member Card Issued Cards"
 
     Caption = 'Point Card - Issued Cards';
     LookupPageID = "NPR Member Card Issued Cards";
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -13,6 +14,7 @@ table 6059774 "NPR Member Card Issued Cards"
         {
             Caption = 'No.';
             NotBlank = false;
+            DataClassification = CustomerContent;
         }
         field(2; "Customer No"; Code[20])
         {
@@ -20,6 +22,7 @@ table 6059774 "NPR Member Card Issued Cards"
             TableRelation = IF ("Customer Type" = CONST(Customer)) Customer."No."
             ELSE
             IF ("Customer Type" = CONST(Contact)) Contact."No.";
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             var
@@ -48,10 +51,12 @@ table 6059774 "NPR Member Card Issued Cards"
             NotBlank = true;
             OptionCaption = 'Customer,Contact';
             OptionMembers = Customer,Contact;
+            DataClassification = CustomerContent;
         }
         field(4; "Issue Date"; Date)
         {
             Caption = 'Issue Date';
+            DataClassification = CustomerContent;
         }
         field(5; "Card Type"; Code[20])
         {
@@ -59,11 +64,13 @@ table 6059774 "NPR Member Card Issued Cards"
             NotBlank = true;
             TableRelation = "NPR Member Card Types";
             ValidateTableRelation = true;
+            DataClassification = CustomerContent;
         }
         field(6; Salesperson; Code[20])
         {
             Caption = 'Salesperson';
             TableRelation = "Salesperson/Purchaser".Code;
+            DataClassification = CustomerContent;
         }
         field(7; "Points (Total)"; Decimal)
         {
@@ -78,6 +85,7 @@ table 6059774 "NPR Member Card Issued Cards"
             Caption = 'Status';
             OptionCaption = 'Open,Cashed,Cancelled';
             OptionMembers = Open,Cashed,Cancelled;
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             var
@@ -89,11 +97,13 @@ table 6059774 "NPR Member Card Issued Cards"
         {
             Caption = 'Name';
             Description = 'NPR5.38';
+            DataClassification = CustomerContent;
         }
         field(11; Address; Text[50])
         {
             Caption = 'Address';
             Description = 'NPR5.38';
+            DataClassification = CustomerContent;
         }
         field(12; "ZIP Code"; Code[20])
         {
@@ -102,47 +112,58 @@ table 6059774 "NPR Member Card Issued Cards"
             //This property is currently not supported
             //TestTableRelation = false;
             ValidateTableRelation = false;
+            DataClassification = CustomerContent;
         }
         field(13; City; Text[50])
         {
             Caption = 'City';
             Description = 'NPR5.38';
+            DataClassification = CustomerContent;
         }
         field(33; "Date Created"; DateTime)
         {
             Caption = 'Date Created';
+            DataClassification = CustomerContent;
         }
         field(34; "Valid Until"; Date)
         {
             Caption = 'Valid Until';
+            DataClassification = CustomerContent;
         }
         field(35; Reference; Text[50])
         {
             Caption = 'Reference';
+            DataClassification = CustomerContent;
         }
         field(40; "Last Date Modified"; Date)
         {
             Caption = 'Last Date Modified';
+            DataClassification = CustomerContent;
         }
         field(54; "Canceling Salesperson"; Code[20])
         {
             Caption = 'Canceling Salesperson';
+            DataClassification = CustomerContent;
         }
         field(55; "Created in Company"; Code[30])
         {
             Caption = 'Created in Company';
+            DataClassification = CustomerContent;
         }
         field(56; "Offline - No."; Code[20])
         {
             Caption = 'Offline - No.';
+            DataClassification = CustomerContent;
         }
         field(57; "Primary Key Length"; Integer)
         {
             Caption = 'Primary Key Length';
+            DataClassification = CustomerContent;
         }
         field(63; "Secret Code"; Code[6])
         {
             Caption = 'Secret Code';
+            DataClassification = CustomerContent;
         }
         field(70; "Expiration Date Filter"; Date)
         {
@@ -152,6 +173,7 @@ table 6059774 "NPR Member Card Issued Cards"
         field(6014400; "No. Printed"; Integer)
         {
             Caption = 'No. Printed';
+            DataClassification = CustomerContent;
         }
         field(6014401; Comment; Boolean)
         {
@@ -163,6 +185,7 @@ table 6059774 "NPR Member Card Issued Cards"
         field(6060000; "Internet Number"; Integer)
         {
             Caption = 'Internet Number';
+            DataClassification = CustomerContent;
         }
     }
 

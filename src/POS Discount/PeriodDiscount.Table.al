@@ -14,12 +14,14 @@ table 6014413 "NPR Period Discount"
 
     Caption = 'Period Discount';
     LookupPageID = "NPR Campaign Discount List";
+    DataClassification = CustomerContent;
 
     fields
     {
         field(1; "Code"; Code[20])
         {
             Caption = 'Code';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -34,10 +36,12 @@ table 6014413 "NPR Period Discount"
         field(2; Description; Text[50])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
         }
         field(3; "Starting Date"; Date)
         {
             Caption = 'Starting Date';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -59,6 +63,7 @@ table 6014413 "NPR Period Discount"
         field(4; "Ending Date"; Date)
         {
             Caption = 'Closing Date';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -83,6 +88,7 @@ table 6014413 "NPR Period Discount"
             Caption = 'Status';
             OptionCaption = 'Await,Active,Closed';
             OptionMembers = Await,Active,Closed;
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -118,11 +124,13 @@ table 6014413 "NPR Period Discount"
         {
             Caption = 'Created Date';
             Editable = false;
+            DataClassification = CustomerContent;
         }
         field(11; "Last Date Modified"; Date)
         {
             Caption = 'Modified Date';
             Editable = false;
+            DataClassification = CustomerContent;
         }
         field(20; Comment; Boolean)
         {
@@ -135,18 +143,22 @@ table 6014413 "NPR Period Discount"
         field(21; "No. Series"; Code[20])
         {
             Caption = 'No. Series';
+            DataClassification = CustomerContent;
         }
         field(22; "Starting Time"; Time)
         {
             Caption = 'Starting Time';
+            DataClassification = CustomerContent;
         }
         field(23; "Ending Time"; Time)
         {
             Caption = 'Closing Time';
+            DataClassification = CustomerContent;
         }
         field(28; "Block Custom Disc."; Boolean)
         {
             Caption = 'Block Custom Discount';
+            DataClassification = CustomerContent;
         }
         field(100; "Period Type"; Option)
         {
@@ -154,6 +166,7 @@ table 6014413 "NPR Period Discount"
             Description = 'NPR5.42';
             OptionCaption = 'Every Day,Weekly';
             OptionMembers = "Every Day",Weekly;
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -166,6 +179,7 @@ table 6014413 "NPR Period Discount"
         {
             Caption = 'Monday';
             Description = 'NPR5.42';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -178,6 +192,7 @@ table 6014413 "NPR Period Discount"
         {
             Caption = 'Tuesday';
             Description = 'NPR5.42';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -190,6 +205,7 @@ table 6014413 "NPR Period Discount"
         {
             Caption = 'Wednesday';
             Description = 'NPR5.42';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -202,6 +218,7 @@ table 6014413 "NPR Period Discount"
         {
             Caption = 'Thursday';
             Description = 'NPR5.42';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -214,6 +231,7 @@ table 6014413 "NPR Period Discount"
         {
             Caption = 'Friday';
             Description = 'NPR5.42';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -226,6 +244,7 @@ table 6014413 "NPR Period Discount"
         {
             Caption = 'Saturday';
             Description = 'NPR5.42';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -238,6 +257,7 @@ table 6014413 "NPR Period Discount"
         {
             Caption = 'Sunday';
             Description = 'NPR5.42';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -250,6 +270,7 @@ table 6014413 "NPR Period Discount"
         {
             Caption = 'Period Description';
             Description = 'NPR5.42';
+            DataClassification = CustomerContent;
         }
         field(200; "Quantity Sold"; Decimal)
         {
@@ -279,6 +300,7 @@ table 6014413 "NPR Period Discount"
             //This property is currently not supported
             //TestTableRelation = false;
             ValidateTableRelation = false;
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             var
@@ -296,6 +318,7 @@ table 6014413 "NPR Period Discount"
             CaptionClass = '1,2,1';
             Caption = 'Global Dimension 1 Code';
             TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -307,6 +330,7 @@ table 6014413 "NPR Period Discount"
             CaptionClass = '1,2,2';
             Caption = 'Global Dimension 2 Code';
             TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -317,6 +341,7 @@ table 6014413 "NPR Period Discount"
         {
             Caption = 'Location Code';
             TableRelation = Location;
+            DataClassification = CustomerContent;
         }
     }
 

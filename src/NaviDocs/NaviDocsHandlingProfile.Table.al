@@ -5,6 +5,7 @@ table 6059770 "NPR NaviDocs Handling Profile"
     Caption = 'NaviDocs Entry Report Filters';
     DrillDownPageID = "NPR NaviDocs Handling Profiles";
     LookupPageID = "NPR NaviDocs Handling Profiles";
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -12,22 +13,27 @@ table 6059770 "NPR NaviDocs Handling Profile"
         {
             Caption = 'Entry No.';
             NotBlank = true;
+            DataClassification = CustomerContent;
         }
         field(10; Description; Text[80])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
         }
         field(20; "Report Required"; Boolean)
         {
             Caption = 'Report Required';
+            DataClassification = CustomerContent;
         }
         field(50; "Handle by NAS"; Boolean)
         {
             Caption = 'Handle by NAS';
+            DataClassification = CustomerContent;
         }
         field(100; "Default for Print"; Boolean)
         {
             Caption = 'Print All Containing Entry';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -39,6 +45,7 @@ table 6059770 "NPR NaviDocs Handling Profile"
         field(110; "Default for E-Mail"; Boolean)
         {
             Caption = 'Default for E-Mail';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -50,6 +57,7 @@ table 6059770 "NPR NaviDocs Handling Profile"
         field(120; "Default Electronic Document"; Boolean)
         {
             Caption = 'Default for Electronic Document';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin

@@ -7,12 +7,14 @@ table 6059781 "NPR Sales Price Maint. Setup"
     Caption = 'Sales Price Maintenance Setup';
     DrillDownPageID = "NPR Sales Price Maint. Setup";
     LookupPageID = "NPR Sales Price Maint. Setup";
+    DataClassification = CustomerContent;
 
     fields
     {
         field(1; Id; Integer)
         {
             Caption = 'Id';
+            DataClassification = CustomerContent;
         }
         field(10; "Sales Code"; Code[20])
         {
@@ -23,12 +25,14 @@ table 6059781 "NPR Sales Price Maint. Setup"
             ELSE
             IF ("Sales Type" = CONST(Campaign)) Campaign;
             ValidateTableRelation = false;
+            DataClassification = CustomerContent;
         }
         field(11; "Sales Type"; Option)
         {
             Caption = 'Sales Type';
             OptionCaption = 'Customer,Customer Price Group,All Customers,Campaign';
             OptionMembers = Customer,"Customer Price Group","All Customers",Campaign;
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -40,33 +44,40 @@ table 6059781 "NPR Sales Price Maint. Setup"
         {
             Caption = 'Currency Code';
             TableRelation = Currency;
+            DataClassification = CustomerContent;
         }
         field(13; "Prices Including VAT"; Boolean)
         {
             Caption = 'Prices Including VAT';
+            DataClassification = CustomerContent;
         }
         field(14; "Allow Invoice Disc."; Boolean)
         {
             Caption = 'Allow Invoice Disc.';
+            DataClassification = CustomerContent;
         }
         field(15; "Allow Line Disc."; Boolean)
         {
             Caption = 'Allow Line Disc.';
+            DataClassification = CustomerContent;
         }
         field(16; "Internal Unit Price"; Option)
         {
             Caption = 'Internal Unit Price';
             OptionCaption = 'Unit Price,Unit Cost,Standard Cost,Last Direct Cost';
             OptionMembers = "Unit Price","Unit Cost","Standard Cost","Last Direct Cost";
+            DataClassification = CustomerContent;
         }
         field(17; Factor; Decimal)
         {
             Caption = 'Factor';
+            DataClassification = CustomerContent;
         }
         field(18; "VAT Bus. Posting Gr. (Price)"; Code[10])
         {
             Caption = 'VAT Bus. Posting Gr. (Price)';
             TableRelation = "VAT Business Posting Group";
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -91,6 +102,7 @@ table 6059781 "NPR Sales Price Maint. Setup"
         field(20; "Exclude All Item Groups"; Boolean)
         {
             Caption = 'Exclude All Item Groups';
+            DataClassification = CustomerContent;
         }
     }
 

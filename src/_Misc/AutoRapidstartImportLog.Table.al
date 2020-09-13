@@ -1,14 +1,14 @@
 table 6014600 "NPR Auto Rapidstart Import Log"
 {
     Caption = 'Auto Rapidstart Import Log';
-    DataClassification = ToBeClassified;
+    DataClassification = CustomerContent;
 
     fields
     {
         field(1; "Package Name"; Code[20])
         {
             Caption = 'Package Name';
-            DataClassification = ToBeClassified;
+            DataClassification = CustomerContent;
         }
     }
 

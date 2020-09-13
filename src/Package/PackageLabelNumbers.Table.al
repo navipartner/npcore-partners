@@ -6,6 +6,7 @@ table 6014551 "NPR Package Label Numbers"
     // NPR4.01/JDH/20150309  CASE 201022 added extra option on "Type" field
 
     Caption = 'Package Label Numbers';
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -15,6 +16,7 @@ table 6014551 "NPR Package Label Numbers"
             TableRelation = IF (Type = CONST(Order)) "Sales Header"."No." WHERE("Document Type" = CONST(Order))
             ELSE
             IF (Type = CONST(Shipment)) "Sales Shipment Header";
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             var
@@ -38,6 +40,7 @@ table 6014551 "NPR Package Label Numbers"
         field(2; "Package Tracking Num"; Text[30])
         {
             Caption = 'Package Tracking Number';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             var
@@ -66,16 +69,19 @@ table 6014551 "NPR Package Label Numbers"
         field(3; "Kolli Num"; Integer)
         {
             Caption = 'Kolli Number';
+            DataClassification = CustomerContent;
         }
         field(4; Description; Text[250])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
         }
         field(5; Type; Option)
         {
             Caption = 'Type';
             OptionCaption = 'Order,Shipment,Return Order';
             OptionMembers = "Order",Shipment,ReturnOrder;
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -85,40 +91,49 @@ table 6014551 "NPR Package Label Numbers"
         field(6; "Type Caption"; Text[30])
         {
             Caption = 'Type Caption';
+            DataClassification = CustomerContent;
         }
         field(7; "Print Date"; Date)
         {
             Caption = 'Print Date';
+            DataClassification = CustomerContent;
         }
         field(8; "Shipping Agent"; Code[10])
         {
             Caption = 'Shipping Agent';
             TableRelation = "Shipping Agent";
+            DataClassification = CustomerContent;
         }
         field(10; "Sell-To Name"; Text[30])
         {
             Caption = 'Sell-To Name';
             FieldClass = Normal;
+            DataClassification = CustomerContent;
         }
         field(11; "Sell-To Email"; Text[80])
         {
             Caption = 'Sell-To Email';
+            DataClassification = CustomerContent;
         }
         field(20; "Track And Trace Link"; Text[250])
         {
             Caption = 'Track And Trace Link';
+            DataClassification = CustomerContent;
         }
         field(30; "DHL AWB Num"; Text[30])
         {
             Caption = 'DHL AWB No.';
+            DataClassification = CustomerContent;
         }
         field(31; "DHL Customer No"; Code[20])
         {
             Caption = 'DHL Customer No.';
+            DataClassification = CustomerContent;
         }
         field(40; Cancelled; Boolean)
         {
             Caption = 'Cancelled';
+            DataClassification = CustomerContent;
         }
     }
 

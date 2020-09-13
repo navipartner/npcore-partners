@@ -9,6 +9,7 @@ table 6059900 "NPR Task Template"
 
     Caption = 'Task Template';
     LookupPageID = "NPR Task Template";
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -16,20 +17,24 @@ table 6059900 "NPR Task Template"
         {
             Caption = 'Name';
             NotBlank = true;
+            DataClassification = CustomerContent;
         }
         field(2; Description; Text[80])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
         }
         field(5; "Test Report ID"; Integer)
         {
             Caption = 'Test Report ID';
             TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Report));
+            DataClassification = CustomerContent;
         }
         field(6; "Page ID"; Integer)
         {
             Caption = 'Form ID';
             TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Page));
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -42,6 +47,7 @@ table 6059900 "NPR Task Template"
             Caption = 'Type';
             OptionCaption = 'General,NaviPartner';
             OptionMembers = General,NaviPartner;
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             var
@@ -110,6 +116,7 @@ table 6059900 "NPR Task Template"
         {
             Caption = 'Task Worker Group';
             TableRelation = "NPR Task Worker Group";
+            DataClassification = CustomerContent;
         }
         field(30; "Mail Program"; Option)
         {
@@ -117,14 +124,17 @@ table 6059900 "NPR Task Template"
             InitValue = SMTPMail;
             OptionCaption = ' ,J-Mail,SMTP-Mail';
             OptionMembers = " ",JMail,SMTPMail;
+            DataClassification = CustomerContent;
         }
         field(31; "Mail From Address"; Text[80])
         {
             Caption = 'Mail From Address';
+            DataClassification = CustomerContent;
         }
         field(32; "Mail From Name"; Text[80])
         {
             Caption = 'Mail From Name';
+            DataClassification = CustomerContent;
         }
     }
 

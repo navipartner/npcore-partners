@@ -1,6 +1,7 @@
 table 6014563 "NPR RP Data Item Constr."
 {
     Caption = 'Data Item Constraint';
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -8,25 +9,30 @@ table 6014563 "NPR RP Data Item Constr."
         {
             Caption = 'Data Item Code';
             TableRelation = "NPR RP Data Items".Code;
+            DataClassification = CustomerContent;
         }
         field(2; "Data Item Line No."; Integer)
         {
             Caption = 'Data Item Line No.';
+            DataClassification = CustomerContent;
         }
         field(3; "Line No."; Integer)
         {
             Caption = 'Line No.';
+            DataClassification = CustomerContent;
         }
         field(4; "Constraint Type"; Option)
         {
             Caption = 'Constraint Type';
             OptionCaption = 'Is Empty,Is Not Empty';
             OptionMembers = IsEmpty,IsNotEmpty;
+            DataClassification = CustomerContent;
         }
         field(5; "Table ID"; Integer)
         {
             Caption = 'Table ID';
             TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
+            DataClassification = CustomerContent;
         }
         field(6; "Table Name"; Text[50])
         {

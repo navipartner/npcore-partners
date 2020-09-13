@@ -3,6 +3,7 @@ table 6014564 "NPR RP Data Item Constr. Links"
     // NPR5.47/MMV /20181017 CASE 318084 Added field 12
 
     Caption = 'Data Item Constraint Links';
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -10,15 +11,18 @@ table 6014564 "NPR RP Data Item Constr. Links"
         {
             Caption = 'Data Item Code';
             TableRelation = "NPR RP Data Item Constr."."Data Item Code";
+            DataClassification = CustomerContent;
         }
         field(2; "Constraint Line No."; Integer)
         {
             Caption = 'Constraint Line No.';
             TableRelation = "NPR RP Data Item Constr."."Line No.";
+            DataClassification = CustomerContent;
         }
         field(3; "Data Item Name"; Text[50])
         {
             Caption = 'Data Item Name';
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             var
@@ -82,10 +86,12 @@ table 6014564 "NPR RP Data Item Constr. Links"
         field(4; "Data Item Table ID"; Integer)
         {
             Caption = 'Data Item Table ID';
+            DataClassification = CustomerContent;
         }
         field(5; "Data Item Field ID"; Integer)
         {
             Caption = 'Data Item Field ID';
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             var
@@ -133,6 +139,7 @@ table 6014564 "NPR RP Data Item Constr. Links"
         field(6; "Data Item Field Name"; Text[50])
         {
             Caption = 'Data Item Field Name';
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             var
@@ -184,6 +191,7 @@ table 6014564 "NPR RP Data Item Constr. Links"
         field(7; "Field ID"; Integer)
         {
             Caption = 'Field ID';
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             var
@@ -225,6 +233,7 @@ table 6014564 "NPR RP Data Item Constr. Links"
         field(8; "Field Name"; Text[50])
         {
             Caption = 'Field Name';
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             var
@@ -272,6 +281,7 @@ table 6014564 "NPR RP Data Item Constr. Links"
             Caption = 'Filter Type';
             OptionCaption = 'TableLink,Fixed Filter';
             OptionMembers = TableLink,"Fixed Filter";
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -287,6 +297,7 @@ table 6014564 "NPR RP Data Item Constr. Links"
         field(10; "Filter Value"; Text[250])
         {
             Caption = 'Filter Value';
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             var
@@ -355,12 +366,14 @@ table 6014564 "NPR RP Data Item Constr. Links"
         field(11; "Line No."; Integer)
         {
             Caption = 'Line No.';
+            DataClassification = CustomerContent;
         }
         field(12; "Link Type"; Option)
         {
             Caption = 'Link Type';
             OptionCaption = '=,>,<,<>';
             OptionMembers = "=",">","<","<>";
+            DataClassification = CustomerContent;
         }
     }
 

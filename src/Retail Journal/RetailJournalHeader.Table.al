@@ -7,48 +7,57 @@ table 6014451 "NPR Retail Journal Header"
 
     Caption = 'Label Printing Header';
     LookupPageID = "NPR Retail Journal List";
+    DataClassification = CustomerContent;
 
     fields
     {
         field(1; "No."; Code[40])
         {
             Caption = 'Code';
+            DataClassification = CustomerContent;
         }
         field(2; Description; Text[50])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
         }
         field(3; "Date of creation"; Date)
         {
             Caption = 'Date';
+            DataClassification = CustomerContent;
         }
         field(4; "Salesperson Code"; Code[10])
         {
             Caption = 'Salesperson';
             TableRelation = "Salesperson/Purchaser".Code;
+            DataClassification = CustomerContent;
         }
         field(6; "No. Series"; Code[10])
         {
             Caption = 'No. Series';
             Editable = false;
             TableRelation = "No. Series";
+            DataClassification = CustomerContent;
         }
         field(7; "Shortcut Dimension 1 Code"; Code[20])
         {
             CaptionClass = '1,1,1';
             Caption = 'Global Dimension 1 Code';
             TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+            DataClassification = CustomerContent;
         }
         field(8; "Shortcut Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,1,2';
             Caption = 'Global Dimension 2 Code';
             TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
+            DataClassification = CustomerContent;
         }
         field(9; "Location Code"; Code[10])
         {
             Caption = 'Location Code';
             TableRelation = Location;
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             var
@@ -66,16 +75,19 @@ table 6014451 "NPR Retail Journal Header"
         {
             Caption = 'Cash Register No.';
             TableRelation = "NPR Register";
+            DataClassification = CustomerContent;
         }
         field(30; "Customer Price Group"; Code[10])
         {
             Caption = 'Customer Price Group';
             TableRelation = "Customer Price Group";
+            DataClassification = CustomerContent;
         }
         field(40; "Customer Disc. Group"; Code[20])
         {
             Caption = 'Customer Disc. Group';
             TableRelation = "Customer Discount Group";
+            DataClassification = CustomerContent;
         }
     }
 

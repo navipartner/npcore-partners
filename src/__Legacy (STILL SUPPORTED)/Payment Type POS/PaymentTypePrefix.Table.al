@@ -5,6 +5,7 @@ table 6014428 "NPR Payment Type - Prefix"
 
     Caption = 'Prefix-Payment Type';
     LookupPageID = "NPR Credit Card Prefix";
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -12,15 +13,18 @@ table 6014428 "NPR Payment Type - Prefix"
         {
             Caption = 'Payment Type';
             TableRelation = "NPR Payment Type POS"."No.";
+            DataClassification = CustomerContent;
         }
         field(2; "Register No."; Code[10])
         {
             Caption = 'Cash Register No.';
             TableRelation = IF ("Payment Type" = CONST('<>''')) "NPR Register"."Register No.";
+            DataClassification = CustomerContent;
         }
         field(3; Prefix; Code[20])
         {
             Caption = 'Prefix';
+            DataClassification = CustomerContent;
         }
         field(4; Status; Option)
         {
@@ -33,24 +37,29 @@ table 6014428 "NPR Payment Type - Prefix"
         field(5; Description; Text[30])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
         }
         field(6; Weight; Decimal)
         {
             Caption = 'Weight';
+            DataClassification = CustomerContent;
         }
         field(7; "Global Dimension 1 Code"; Code[20])
         {
             Caption = 'Global Dimension 1 Code';
             TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+            DataClassification = CustomerContent;
         }
         field(8; "Bill y/n"; Boolean)
         {
             Caption = 'Bill y/n';
+            DataClassification = CustomerContent;
         }
         field(20; "Global Dimension 2 Code"; Code[20])
         {
             Caption = 'Global Dimension 2 Code';
             TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
+            DataClassification = CustomerContent;
         }
     }
 

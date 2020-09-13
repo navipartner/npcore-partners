@@ -6,6 +6,7 @@ table 6014445 "NPR RP Template Line"
     // NPR5.51/MMV /20190712 CASE 360972 Added field 70
 
     Caption = 'RP Template Line';
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -13,14 +14,17 @@ table 6014445 "NPR RP Template Line"
         {
             Caption = 'Template Code';
             TableRelation = "NPR RP Template Header".Code;
+            DataClassification = CustomerContent;
         }
         field(3; "Line No."; Integer)
         {
             Caption = 'Line No.';
+            DataClassification = CustomerContent;
         }
         field(5; "Type Option"; Text[30])
         {
             Caption = 'Type Option';
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             var
@@ -86,26 +90,31 @@ table 6014445 "NPR RP Template Line"
         {
             BlankZero = true;
             Caption = 'Barcode Size/Width';
+            DataClassification = CustomerContent;
         }
         field(8; Rotation; Option)
         {
             Caption = 'Rotation';
             OptionCaption = '0,90,180,270';
             OptionMembers = "0","90","180","270";
+            DataClassification = CustomerContent;
         }
         field(9; X; Integer)
         {
             Caption = 'X';
+            DataClassification = CustomerContent;
         }
         field(10; Y; Integer)
         {
             Caption = 'Y';
+            DataClassification = CustomerContent;
         }
         field(11; "Data Item Table"; Integer)
         {
             BlankZero = true;
             Caption = 'Table';
             TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             begin
@@ -122,6 +131,7 @@ table 6014445 "NPR RP Template Line"
         field(12; "Data Item Name"; Text[50])
         {
             Caption = 'Table Name';
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             begin
@@ -150,6 +160,7 @@ table 6014445 "NPR RP Template Line"
         field(13; "Field"; Integer)
         {
             Caption = 'Field';
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             var
@@ -168,6 +179,7 @@ table 6014445 "NPR RP Template Line"
         field(14; "Field Name"; Text[50])
         {
             Caption = 'Field Name';
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             var
@@ -207,44 +219,53 @@ table 6014445 "NPR RP Template Line"
         {
             BlankZero = true;
             Caption = 'Max Length';
+            DataClassification = CustomerContent;
         }
         field(17; Prefix; Text[30])
         {
             Caption = 'Prefix';
+            DataClassification = CustomerContent;
         }
         field(18; Postfix; Text[30])
         {
             Caption = 'Postfix';
+            DataClassification = CustomerContent;
         }
         field(21; Comments; Text[128])
         {
             Caption = 'Comments';
+            DataClassification = CustomerContent;
         }
         field(22; Align; Option)
         {
             Caption = 'Align';
             OptionCaption = 'Left,Center,Right';
             OptionMembers = Left,Center,Right;
+            DataClassification = CustomerContent;
         }
         field(23; Height; Integer)
         {
             BlankZero = true;
             Caption = 'Height';
+            DataClassification = CustomerContent;
         }
         field(25; Type; Option)
         {
             Caption = 'Type';
             OptionCaption = 'Data,Loop,Command,Logo,FieldCaption';
             OptionMembers = Data,Loop,Command,Logo,FieldCaption;
+            DataClassification = CustomerContent;
         }
         field(26; "Parent Line No."; Integer)
         {
             Caption = 'Parent Line No.';
+            DataClassification = CustomerContent;
         }
         field(27; Level; Integer)
         {
             Caption = 'Level';
             MaxValue = 10;
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -257,10 +278,12 @@ table 6014445 "NPR RP Template Line"
             Caption = 'Operator';
             OptionCaption = '+,-,/,*';
             OptionMembers = "+","-","/","*";
+            DataClassification = CustomerContent;
         }
         field(31; "Field 2"; Integer)
         {
             Caption = 'Field 2';
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             var
@@ -279,6 +302,7 @@ table 6014445 "NPR RP Template Line"
         field(32; "Field 2 Name"; Text[50])
         {
             Caption = 'Field 2 Name';
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             var
@@ -318,6 +342,7 @@ table 6014445 "NPR RP Template Line"
         {
             Caption = 'Processing Codeunit';
             TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Codeunit));
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             var
@@ -331,6 +356,7 @@ table 6014445 "NPR RP Template Line"
         field(36; "Processing Function ID"; Code[30])
         {
             Caption = 'Processing Function ID';
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             var
@@ -344,65 +370,80 @@ table 6014445 "NPR RP Template Line"
         field(37; "Processing Value"; Text[250])
         {
             Caption = 'Proccesing Value';
+            DataClassification = CustomerContent;
         }
         field(40; "Start Char"; Integer)
         {
             BlankZero = true;
             Caption = 'Start Char';
+            DataClassification = CustomerContent;
         }
         field(41; "Prefix Next Line"; Boolean)
         {
             Caption = 'Prefix Next Line';
+            DataClassification = CustomerContent;
         }
         field(42; Attribute; Code[30])
         {
             Caption = 'Attribute';
             TableRelation = "NPR Attribute ID"."Attribute Code" WHERE("Table ID" = FIELD("Data Item Table"));
+            DataClassification = CustomerContent;
         }
         field(44; "Root Record No."; Integer)
         {
             Caption = 'Root Record No.';
+            DataClassification = CustomerContent;
         }
         field(45; "Template Column No."; Integer)
         {
             BlankZero = true;
             Caption = 'Column No.';
+            DataClassification = CustomerContent;
         }
         field(46; Bold; Boolean)
         {
             Caption = 'Bold';
+            DataClassification = CustomerContent;
         }
         field(47; "Pad Char"; Text[1])
         {
             Caption = 'Pad Char';
+            DataClassification = CustomerContent;
         }
         field(48; Underline; Boolean)
         {
             Caption = 'Underline';
+            DataClassification = CustomerContent;
         }
         field(49; "Blank Zero"; Boolean)
         {
             Caption = 'Blank Zero';
+            DataClassification = CustomerContent;
         }
         field(50; "Skip If Empty"; Boolean)
         {
             Caption = 'Skip If Empty';
+            DataClassification = CustomerContent;
         }
         field(51; "Default Value"; Text[250])
         {
             Caption = 'Default Value';
+            DataClassification = CustomerContent;
         }
         field(52; "Default Value Record Required"; Boolean)
         {
             Caption = 'Only Fill Default Value On Data';
+            DataClassification = CustomerContent;
         }
         field(60; "Data Item Record No."; Integer)
         {
             Caption = 'Data Item Record No.';
+            DataClassification = CustomerContent;
         }
         field(70; "Processing Function Parameter"; Text[30])
         {
             Caption = 'Processing Function Parameter';
+            DataClassification = CustomerContent;
         }
     }
 

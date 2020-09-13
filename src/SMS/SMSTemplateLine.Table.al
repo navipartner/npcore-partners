@@ -16,10 +16,12 @@ table 6059941 "NPR SMS Template Line"
         field(2; "Line No."; Integer)
         {
             Caption = 'Line No.';
+            DataClassification = CustomerContent;
         }
         field(10; "SMS Text"; Text[250])
         {
             Caption = 'Message';
+            DataClassification = CustomerContent;
         }
     }
 

@@ -15,6 +15,7 @@ table 6014412 "NPR Mixed Discount Line"
     // NPR5.55/ALST.20200608  CASE 407796 added possibility to find item by cross reference
 
     Caption = 'Mixed Discount Line';
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -22,6 +23,7 @@ table 6014412 "NPR Mixed Discount Line"
         {
             Caption = 'Code';
             TableRelation = "NPR Mixed Discount".Code;
+            DataClassification = CustomerContent;
         }
         field(2; "No."; Code[20])
         {
@@ -35,6 +37,7 @@ table 6014412 "NPR Mixed Discount Line"
             IF ("Disc. Grouping Type" = CONST("Item Disc. Group")) "Item Discount Group"
             ELSE
             IF ("Disc. Grouping Type" = CONST("Mix Discount")) "NPR Mixed Discount" WHERE("Mix Type" = CONST("Combination Part"));
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             var
@@ -95,6 +98,7 @@ table 6014412 "NPR Mixed Discount Line"
         {
             Caption = 'Description';
             Description = 'NPR5.31';
+            DataClassification = CustomerContent;
         }
         field(4; "Unit cost"; Decimal)
         {
@@ -135,6 +139,7 @@ table 6014412 "NPR Mixed Discount Line"
             Editable = false;
             OptionCaption = 'Pending,Active,Closed';
             OptionMembers = Pending,Active,Closed;
+            DataClassification = CustomerContent;
         }
         field(10; Quantity; Decimal)
         {
@@ -143,6 +148,7 @@ table 6014412 "NPR Mixed Discount Line"
             Description = 'NPR5.31';
             InitValue = 1;
             MinValue = 0;
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -157,6 +163,7 @@ table 6014412 "NPR Mixed Discount Line"
             Caption = 'Variant Code';
             Description = 'NPR5.31';
             TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("No."));
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -168,37 +175,45 @@ table 6014412 "NPR Mixed Discount Line"
         field(12; "Last Date Modified"; Date)
         {
             Caption = 'Last Date Modified';
+            DataClassification = CustomerContent;
         }
         field(13; "Description 2"; Text[50])
         {
             Caption = 'Description 2';
             Description = 'NPR5.31';
+            DataClassification = CustomerContent;
         }
         field(21; "Disc. Grouping Type"; Enum "NPR Disc. Grouping Type")
         {
             Caption = 'Disc. Grouping Type';
+            DataClassification = CustomerContent;
         }
         field(30; Priority; Integer)
         {
             Caption = 'Priority';
             Description = 'NPR5.31';
+            DataClassification = CustomerContent;
         }
         field(40; "Vendor No."; Code[20])
         {
             Caption = 'Vendor No.';
             TableRelation = Vendor."No.";
+            DataClassification = CustomerContent;
         }
         field(41; "Vendor Item No."; Code[20])
         {
             Caption = 'Vendor Item No.';
+            DataClassification = CustomerContent;
         }
         field(200; "Item Group"; Boolean)
         {
             Caption = 'Item Group';
+            DataClassification = CustomerContent;
         }
         field(210; "Cross-Reference No."; Code[20])
         {
             Caption = 'Cross-Reference No.';
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             var
@@ -238,21 +253,25 @@ table 6014412 "NPR Mixed Discount Line"
         {
             Caption = 'Starting Date';
             Editable = false;
+            DataClassification = CustomerContent;
         }
         field(301; "Ending Date"; Date)
         {
             Caption = 'Ending Date';
             Editable = false;
+            DataClassification = CustomerContent;
         }
         field(302; "Starting Time"; Time)
         {
             Caption = 'Starting Time';
             Editable = false;
+            DataClassification = CustomerContent;
         }
         field(303; "Ending Time"; Time)
         {
             Caption = 'Ending Time';
             Editable = false;
+            DataClassification = CustomerContent;
         }
     }
 

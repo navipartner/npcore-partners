@@ -13,6 +13,7 @@ table 6014580 "NPR Object Output Selection"
     // NPR5.53/THRO/20200106 CASE 383562 Added new Option 'PrintNode PDF' and 'PrintNode Raw' in field 10
 
     Caption = 'Object Output Selection';
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -36,6 +37,7 @@ table 6014580 "NPR Object Output Selection"
             Caption = 'Object Type';
             OptionCaption = 'Codeunit,Report,XMLPort';
             OptionMembers = "Codeunit","Report","XMLPort";
+            DataClassification = CustomerContent;
         }
         field(3; "Object ID"; Integer)
         {
@@ -45,6 +47,7 @@ table 6014580 "NPR Object Output Selection"
             IF ("Object Type" = CONST(Report)) AllObj."Object ID" WHERE("Object Type" = CONST(Report))
             ELSE
             IF ("Object Type" = CONST(XMLPort)) AllObj."Object ID" WHERE("Object Type" = CONST(XMLport));
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -54,21 +57,25 @@ table 6014580 "NPR Object Output Selection"
         field(5; "Object Name"; Text[80])
         {
             Caption = 'Object Name';
+            DataClassification = CustomerContent;
         }
         field(8; "Print Template"; Code[20])
         {
             Caption = 'Print Template';
             TableRelation = "NPR RP Template Header".Code;
+            DataClassification = CustomerContent;
         }
         field(10; "Output Type"; Option)
         {
             Caption = 'Output Type';
             OptionCaption = 'Printer Name,File,Epson Web,E-mail,Google Print,HTTP,Bluetooth,PrintNode PDF,PrintNode Raw';
             OptionMembers = "Printer Name",File,"Epson Web","E-mail","Google Print",HTTP,Bluetooth,"PrintNode PDF","PrintNode Raw";
+            DataClassification = CustomerContent;
         }
         field(11; "Output Path"; Text[250])
         {
             Caption = 'Output Path';
+            DataClassification = CustomerContent;
             //This property is currently not supported
             //TestTableRelation = false;
             //The property 'ValidateTableRelation' can only be set if the property 'TableRelation' is set

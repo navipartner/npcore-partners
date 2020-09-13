@@ -5,6 +5,7 @@ table 6014618 "NPR My Report"
     // NPR5.46/BHR /20180824  CASE 322752 Replace record Object to Allobj
 
     Caption = 'My Item';
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -15,12 +16,14 @@ table 6014618 "NPR My Report"
             //This property is currently not supported
             //TestTableRelation = false;
             ValidateTableRelation = false;
+            DataClassification = CustomerContent;
         }
         field(2; "Report No."; Integer)
         {
             Caption = 'Report No.';
             NotBlank = true;
             TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Report));
+            DataClassification = CustomerContent;
         }
     }
 

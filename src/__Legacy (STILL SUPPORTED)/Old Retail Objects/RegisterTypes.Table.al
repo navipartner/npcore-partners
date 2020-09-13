@@ -4,16 +4,19 @@ table 6014459 "NPR Register Types"
 
     Caption = 'Cash Register Type';
     LookupPageID = "NPR Register Types";
+    DataClassification = CustomerContent;
 
     fields
     {
         field(1; "Code"; Code[10])
         {
             Caption = 'Code';
+            DataClassification = CustomerContent;
         }
         field(2; Description; Text[30])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
         }
     }
 

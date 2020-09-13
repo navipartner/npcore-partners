@@ -10,6 +10,7 @@ table 6014492 "NPR Archive NpRv SL POS Vouch."
     Caption = 'Sale Line POS Retail Voucher';
     DrillDownPageID = "NPR NpRv Sales Lines";
     LookupPageID = "NPR NpRv Sales Lines";
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -18,30 +19,36 @@ table 6014492 "NPR Archive NpRv SL POS Vouch."
             Caption = 'Cash Register No.';
             NotBlank = true;
             TableRelation = "NPR Register";
+            DataClassification = CustomerContent;
         }
         field(5; "Sales Ticket No."; Code[20])
         {
             Caption = 'Sales Ticket No.';
             Editable = false;
             NotBlank = true;
+            DataClassification = CustomerContent;
         }
         field(10; "Sale Type"; Option)
         {
             Caption = 'Sale Type';
             OptionCaption = 'Sale,Payment,Debit Sale,Gift Voucher,Credit Voucher,Deposit,Out payment,Comment,Cancelled,Open/Close';
             OptionMembers = Sale,Payment,"Debit Sale","Gift Voucher","Credit Voucher",Deposit,"Out payment",Comment,Cancelled,"Open/Close";
+            DataClassification = CustomerContent;
         }
         field(15; "Sale Date"; Date)
         {
             Caption = 'Sale Date';
+            DataClassification = CustomerContent;
         }
         field(20; "Sale Line No."; Integer)
         {
             Caption = 'Sale Line No.';
+            DataClassification = CustomerContent;
         }
         field(25; "Line No."; Integer)
         {
             Caption = 'Line No.';
+            DataClassification = CustomerContent;
         }
         field(30; Type; Option)
         {
@@ -49,57 +56,69 @@ table 6014492 "NPR Archive NpRv SL POS Vouch."
             Description = 'NPR5.50';
             OptionCaption = 'New Voucher,Payment,Top-up,Partner Issue Voucher';
             OptionMembers = "New Voucher",Payment,"Top-up","Partner Issue Voucher";
+            DataClassification = CustomerContent;
         }
         field(40; "Applies-to Sale Line No."; Integer)
         {
             Caption = 'Applies-to Sale Line No.';
+            DataClassification = CustomerContent;
         }
         field(45; "Applies-to Voucher Line No."; Integer)
         {
             Caption = 'Applies-to Voucher Line No.';
+            DataClassification = CustomerContent;
         }
         field(50; "Voucher Type"; Code[20])
         {
             Caption = 'Voucher Type';
             TableRelation = "NPR NpRv Voucher Type";
+            DataClassification = CustomerContent;
         }
         field(55; "Voucher No."; Code[20])
         {
             Caption = 'Voucher No.';
             TableRelation = "NPR NpRv Voucher";
+            DataClassification = CustomerContent;
         }
         field(60; "Reference No."; Text[30])
         {
             Caption = 'Reference No.';
             Description = 'NPR5.49';
+            DataClassification = CustomerContent;
         }
         field(65; Description; Text[50])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
         }
         field(80; "Starting Date"; DateTime)
         {
             Caption = 'Starting Date';
+            DataClassification = CustomerContent;
         }
         field(103; "Send via Print"; Boolean)
         {
             Caption = 'Send via Print';
             Description = 'NPR5.48';
+            DataClassification = CustomerContent;
         }
         field(105; "Send via E-mail"; Boolean)
         {
             Caption = 'Send via E-mail';
             Description = 'NPR5.48';
+            DataClassification = CustomerContent;
         }
         field(107; "Send via SMS"; Boolean)
         {
             Caption = 'Send via SMS';
             Description = 'NPR5.48';
+            DataClassification = CustomerContent;
         }
         field(200; "Customer No."; Code[20])
         {
             Caption = 'Customer No.';
             TableRelation = Customer;
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -110,6 +129,7 @@ table 6014492 "NPR Archive NpRv SL POS Vouch."
         {
             Caption = 'Contact No.';
             TableRelation = Contact;
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             var
@@ -160,18 +180,22 @@ table 6014492 "NPR Archive NpRv SL POS Vouch."
             Caption = 'Name';
             TableRelation = Customer;
             ValidateTableRelation = false;
+            DataClassification = CustomerContent;
         }
         field(215; "Name 2"; Text[50])
         {
             Caption = 'Name 2';
+            DataClassification = CustomerContent;
         }
         field(220; Address; Text[50])
         {
             Caption = 'Address';
+            DataClassification = CustomerContent;
         }
         field(225; "Address 2"; Text[50])
         {
             Caption = 'Address 2';
+            DataClassification = CustomerContent;
         }
         field(230; "Post Code"; Code[20])
         {
@@ -182,6 +206,7 @@ table 6014492 "NPR Archive NpRv SL POS Vouch."
             //This property is currently not supported
             //TestTableRelation = false;
             ValidateTableRelation = false;
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             var
@@ -200,6 +225,7 @@ table 6014492 "NPR Archive NpRv SL POS Vouch."
             //This property is currently not supported
             //TestTableRelation = false;
             ValidateTableRelation = false;
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             var
@@ -212,27 +238,33 @@ table 6014492 "NPR Archive NpRv SL POS Vouch."
         field(240; County; Text[30])
         {
             Caption = 'County';
+            DataClassification = CustomerContent;
         }
         field(245; "Country/Region Code"; Code[10])
         {
             Caption = 'Country/Region Code';
             TableRelation = "Country/Region";
+            DataClassification = CustomerContent;
         }
         field(255; "E-mail"; Text[80])
         {
             Caption = 'E-mail';
+            DataClassification = CustomerContent;
         }
         field(260; "Phone No."; Text[30])
         {
             Caption = 'Phone No.';
+            DataClassification = CustomerContent;
         }
         field(300; "Voucher Message"; Text[250])
         {
             Caption = 'Voucher Message';
+            DataClassification = CustomerContent;
         }
         field(310; Posted; Boolean)
         {
             Caption = 'Posted';
+            DataClassification = CustomerContent;
         }
     }
 

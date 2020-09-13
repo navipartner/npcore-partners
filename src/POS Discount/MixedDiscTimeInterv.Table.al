@@ -3,6 +3,7 @@ table 6014420 "NPR Mixed Disc. Time Interv."
     // NPR5.45/MHA /20180820  CASE 323568 Object created
 
     Caption = 'Active Time Interval';
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -10,24 +11,29 @@ table 6014420 "NPR Mixed Disc. Time Interv."
         {
             Caption = 'MixCode';
             TableRelation = "NPR Mixed Discount";
+            DataClassification = CustomerContent;
         }
         field(5; "Line No."; Integer)
         {
             Caption = 'Line No.';
+            DataClassification = CustomerContent;
         }
         field(10; "Start Time"; Time)
         {
             Caption = 'Start Time';
+            DataClassification = CustomerContent;
         }
         field(15; "End Time"; Time)
         {
             Caption = 'End Time';
+            DataClassification = CustomerContent;
         }
         field(20; "Period Type"; Option)
         {
             Caption = 'Period Type';
             OptionCaption = 'Every Day,Weekly';
             OptionMembers = "Every Day",Weekly;
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -37,6 +43,7 @@ table 6014420 "NPR Mixed Disc. Time Interv."
         field(25; Monday; Boolean)
         {
             Caption = 'Monday';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -46,6 +53,7 @@ table 6014420 "NPR Mixed Disc. Time Interv."
         field(30; Tuesday; Boolean)
         {
             Caption = 'Tuesday';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -55,6 +63,7 @@ table 6014420 "NPR Mixed Disc. Time Interv."
         field(35; Wednesday; Boolean)
         {
             Caption = 'Wednesday';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -64,6 +73,7 @@ table 6014420 "NPR Mixed Disc. Time Interv."
         field(40; Thursday; Boolean)
         {
             Caption = 'Thursday';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -73,6 +83,7 @@ table 6014420 "NPR Mixed Disc. Time Interv."
         field(45; Friday; Boolean)
         {
             Caption = 'Friday';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -82,6 +93,7 @@ table 6014420 "NPR Mixed Disc. Time Interv."
         field(50; Saturday; Boolean)
         {
             Caption = 'Saturday';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -91,6 +103,7 @@ table 6014420 "NPR Mixed Disc. Time Interv."
         field(55; Sunday; Boolean)
         {
             Caption = 'Sunday';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -100,6 +113,7 @@ table 6014420 "NPR Mixed Disc. Time Interv."
         field(100; "Period Description"; Text[250])
         {
             Caption = 'Period Description';
+            DataClassification = CustomerContent;
         }
     }
 

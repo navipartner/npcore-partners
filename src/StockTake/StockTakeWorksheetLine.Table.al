@@ -12,6 +12,7 @@ table 6014664 "NPR Stock-Take Worksheet Line"
     Caption = 'Statement Line';
     DrillDownPageID = "NPR StockTake Worksh. Line";
     LookupPageID = "NPR StockTake Worksh. Line";
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -19,19 +20,23 @@ table 6014664 "NPR Stock-Take Worksheet Line"
         {
             Caption = 'Stock-Take Conf. Code';
             TableRelation = "NPR Stock-Take Configuration".Code;
+            DataClassification = CustomerContent;
         }
         field(2; "Worksheet Name"; Code[10])
         {
             Caption = 'Worksheet Name';
             TableRelation = "NPR Stock-Take Worksheet".Name WHERE("Stock-Take Config Code" = FIELD("Stock-Take Config Code"));
+            DataClassification = CustomerContent;
         }
         field(3; "Line No."; Integer)
         {
             Caption = 'Line No.';
+            DataClassification = CustomerContent;
         }
         field(10; Barcode; Text[30])
         {
             Caption = 'Barcode';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -43,6 +48,7 @@ table 6014664 "NPR Stock-Take Worksheet Line"
         {
             Caption = 'Item No.';
             TableRelation = Item."No.";
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             var
@@ -64,6 +70,7 @@ table 6014664 "NPR Stock-Take Worksheet Line"
         {
             Caption = 'Variant Code';
             TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No."));
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -73,10 +80,12 @@ table 6014664 "NPR Stock-Take Worksheet Line"
         field(13; "Qty. (Counted)"; Decimal)
         {
             Caption = 'Qty. (Counted)';
+            DataClassification = CustomerContent;
         }
         field(14; "Unit Cost"; Decimal)
         {
             Caption = 'Unit Cost';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -87,6 +96,7 @@ table 6014664 "NPR Stock-Take Worksheet Line"
         field(15; "Date of Inventory"; Date)
         {
             Caption = 'Date of Inventory';
+            DataClassification = CustomerContent;
         }
         field(16; Blocked; Boolean)
         {
@@ -104,12 +114,14 @@ table 6014664 "NPR Stock-Take Worksheet Line"
         field(20; "Shelf  No."; Code[10])
         {
             Caption = 'Shelf  No.';
+            DataClassification = CustomerContent;
         }
         field(34; "Shortcut Dimension 1 Code"; Code[20])
         {
             CaptionClass = '1,2,1';
             Caption = 'Shortcut Dimension 1 Code';
             TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -121,6 +133,7 @@ table 6014664 "NPR Stock-Take Worksheet Line"
             CaptionClass = '1,2,2';
             Caption = 'Shortcut Dimension 2 Code';
             TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -130,26 +143,31 @@ table 6014664 "NPR Stock-Take Worksheet Line"
         field(50; "Item Translation Source"; Integer)
         {
             Caption = 'Item Translation Source';
+            DataClassification = CustomerContent;
         }
         field(60; "Session ID"; Guid)
         {
             Caption = 'Session ID';
             Editable = false;
+            DataClassification = CustomerContent;
         }
         field(61; "Session Name"; Text[30])
         {
             Caption = 'Session Name';
+            DataClassification = CustomerContent;
         }
         field(62; "Session DateTime"; DateTime)
         {
             Caption = 'Session DateTime';
             Editable = false;
+            DataClassification = CustomerContent;
         }
         field(63; "Transfer State"; Option)
         {
             Caption = 'Transfer Option';
             OptionCaption = 'Ready,Ignore,Transferred';
             OptionMembers = READY,IGNORE,TRANSFERRED;
+            DataClassification = CustomerContent;
         }
         field(80; "Item Description"; Text[50])
         {
@@ -194,6 +212,7 @@ table 6014664 "NPR Stock-Take Worksheet Line"
             Caption = 'Dimension Set ID';
             Editable = false;
             TableRelation = "Dimension Set Entry";
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             begin
@@ -205,6 +224,7 @@ table 6014664 "NPR Stock-Take Worksheet Line"
             Caption = 'Item Tracking Code';
             Editable = false;
             TableRelation = "Item Tracking Code";
+            DataClassification = CustomerContent;
         }
     }
 

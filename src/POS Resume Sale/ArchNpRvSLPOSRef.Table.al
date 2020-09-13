@@ -10,6 +10,7 @@ table 6014493 "NPR Arch. NpRv SL POS Ref."
     Caption = 'Sale Line POS Retail Voucher Reference';
     DrillDownPageID = "NPR NpRv Sales Line Ref.";
     LookupPageID = "NPR NpRv Sales Line Ref.";
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -18,38 +19,46 @@ table 6014493 "NPR Arch. NpRv SL POS Ref."
             Caption = 'Cash Register No.';
             NotBlank = true;
             TableRelation = "NPR Register";
+            DataClassification = CustomerContent;
         }
         field(5; "Sales Ticket No."; Code[20])
         {
             Caption = 'Sales Ticket No.';
             Editable = false;
             NotBlank = true;
+            DataClassification = CustomerContent;
         }
         field(10; "Sale Type"; Option)
         {
             Caption = 'Sale Type';
             OptionCaption = 'Sale,Payment,Debit Sale,Gift Voucher,Credit Voucher,Deposit,Out payment,Comment,Cancelled,Open/Close';
             OptionMembers = Sale,Payment,"Debit Sale","Gift Voucher","Credit Voucher",Deposit,"Out payment",Comment,Cancelled,"Open/Close";
+            DataClassification = CustomerContent;
         }
         field(15; "Sale Date"; Date)
         {
             Caption = 'Sale Date';
+            DataClassification = CustomerContent;
         }
         field(20; "Sale Line No."; Integer)
         {
             Caption = 'Sale Line No.';
+            DataClassification = CustomerContent;
         }
         field(25; "Voucher Line No."; Integer)
         {
             Caption = 'Voucher Line No.';
+            DataClassification = CustomerContent;
         }
         field(30; "Line No."; Integer)
         {
             Caption = 'Line No.';
+            DataClassification = CustomerContent;
         }
         field(60; "Reference No."; Text[30])
         {
             Caption = 'Reference No.';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin

@@ -12,6 +12,7 @@ table 6059906 "NPR Task Worker Group"
     DataPerCompany = false;
     DrillDownPageID = "NPR Task Worker Group";
     LookupPageID = "NPR Task Worker Group";
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -19,14 +20,17 @@ table 6059906 "NPR Task Worker Group"
         {
             Caption = 'Code';
             NotBlank = true;
+            DataClassification = CustomerContent;
         }
         field(10; Description; Text[30])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
         }
         field(20; "Language ID"; Integer)
         {
             Caption = 'Language ID';
+            DataClassification = CustomerContent;
         }
         field(21; "Abbreviated Name"; Text[3])
         {
@@ -40,6 +44,7 @@ table 6059906 "NPR Task Worker Group"
             Description = 'CASE210797';
             OptionCaption = 'Process Task and End';
             OptionMembers = ExecuteTasksAndDie;
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -54,23 +59,28 @@ table 6059906 "NPR Task Worker Group"
         field(30; "Min Interval Between Check"; Duration)
         {
             Caption = 'Min Interval Between Check';
+            DataClassification = CustomerContent;
         }
         field(31; "Max Interval Between Check"; Duration)
         {
             Caption = 'Max Interval Between Check';
+            DataClassification = CustomerContent;
         }
         field(33; "Next Check Time"; DateTime)
         {
             Caption = 'Next Check Time';
             Description = 'Only used temporary';
+            DataClassification = CustomerContent;
         }
         field(40; Default; Boolean)
         {
             Caption = 'Standard';
+            DataClassification = CustomerContent;
         }
         field(50; "Max. Concurrent Threads"; Integer)
         {
             Caption = 'Max. Concurrent Threads';
+            DataClassification = CustomerContent;
         }
         field(51; "No. of Active Threads"; Integer)
         {

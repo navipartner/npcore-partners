@@ -10,6 +10,7 @@ table 6059901 "NPR Task Batch"
     Caption = 'Task Batch';
     DataCaptionFields = Name, Description;
     LookupPageID = "NPR Task Batch";
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -18,20 +19,24 @@ table 6059901 "NPR Task Batch"
             Caption = 'Journal Template Name';
             NotBlank = true;
             TableRelation = "NPR Task Template";
+            DataClassification = CustomerContent;
         }
         field(2; Name; Code[10])
         {
             Caption = 'Name';
             NotBlank = true;
+            DataClassification = CustomerContent;
         }
         field(3; Description; Text[50])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
         }
         field(19; "Task Worker Group"; Code[10])
         {
             Caption = 'Task Worker Group';
             TableRelation = "NPR Task Worker Group";
+            DataClassification = CustomerContent;
         }
         field(21; "Template Type"; Option)
         {
@@ -48,18 +53,22 @@ table 6059901 "NPR Task Batch"
             InitValue = SMTPMail;
             OptionCaption = ' ,J-Mail,SMTP-Mail';
             OptionMembers = " ",JMail,SMTPMail;
+            DataClassification = CustomerContent;
         }
         field(31; "Mail From Address"; Text[80])
         {
             Caption = 'Mail From Address';
+            DataClassification = CustomerContent;
         }
         field(32; "Mail From Name"; Text[80])
         {
             Caption = 'Mail From Name';
+            DataClassification = CustomerContent;
         }
         field(40; "Common Companies"; Boolean)
         {
             Caption = 'Common Companies';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             var
@@ -78,6 +87,7 @@ table 6059901 "NPR Task Batch"
         {
             Caption = 'Master Company';
             TableRelation = Company;
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -90,6 +100,7 @@ table 6059901 "NPR Task Batch"
         field(80; "Delete Log After"; Duration)
         {
             Caption = 'Delete Log After';
+            DataClassification = CustomerContent;
         }
     }
 

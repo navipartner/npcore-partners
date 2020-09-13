@@ -3,6 +3,7 @@ table 6014560 "NPR RP Device Settings"
     // NPR5.32/MMV /20170411 CASE 241995 Retail Print 2.0
 
     Caption = 'Device Settings';
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -10,10 +11,12 @@ table 6014560 "NPR RP Device Settings"
         {
             Caption = 'Template';
             TableRelation = "NPR RP Template Header".Code;
+            DataClassification = CustomerContent;
         }
         field(2; Name; Text[50])
         {
             Caption = 'Name';
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             var
@@ -50,10 +53,12 @@ table 6014560 "NPR RP Device Settings"
             Caption = 'Data Type';
             OptionCaption = 'Text,Integer,Decimal,Date,Boolean,Option';
             OptionMembers = Text,"Integer",Decimal,Date,Boolean,Option;
+            DataClassification = CustomerContent;
         }
         field(5; Value; Text[250])
         {
             Caption = 'Value';
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             var
@@ -87,6 +92,7 @@ table 6014560 "NPR RP Device Settings"
         field(6; Options; Text[250])
         {
             Caption = 'Options';
+            DataClassification = CustomerContent;
         }
     }
 

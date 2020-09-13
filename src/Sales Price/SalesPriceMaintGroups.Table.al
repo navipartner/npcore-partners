@@ -6,6 +6,7 @@ table 6059782 "NPR Sales Price Maint. Groups"
     Caption = 'Sales Price Maintenance Groups';
     DrillDownPageID = "NPR Sales Price Maint. Groups";
     LookupPageID = "NPR Sales Price Maint. Groups";
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -13,16 +14,19 @@ table 6059782 "NPR Sales Price Maint. Groups"
         {
             Caption = 'Id';
             TableRelation = "NPR Sales Price Maint. Setup";
+            DataClassification = CustomerContent;
         }
         field(2; "Item Group"; Code[10])
         {
             Caption = 'Item Group';
             TableRelation = "NPR Item Group";
+            DataClassification = CustomerContent;
         }
         field(10; Description; Text[50])
         {
             Caption = 'Description';
             Editable = false;
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             var

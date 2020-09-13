@@ -1,12 +1,12 @@
 table 6151248 "NPR NP Retail Admin Cue"
 {
-    // #343621/ZESO/20190725  CASE 343621 Object created.
-
+    DataClassification = CustomerContent;
 
     fields
     {
         field(1; "Primary key"; Code[10])
         {
+            DataClassification = CustomerContent;
         }
         field(20; "User Setups"; Integer)
         {
@@ -133,7 +133,7 @@ table 6151248 "NPR NP Retail Admin Cue"
 
         field(94; "Top Sales Person Today"; Text[100])
         {
-
+            DataClassification = CustomerContent;
         }
     }
 

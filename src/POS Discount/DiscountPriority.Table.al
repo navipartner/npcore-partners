@@ -6,12 +6,14 @@ table 6014417 "NPR Discount Priority"
     // NPR5.46/BHR /20180824  CASE 322752 Replace record Object to Allobj
 
     Caption = 'Discount Priority';
+    DataClassification = CustomerContent;
 
     fields
     {
         field(1; "Table ID"; Integer)
         {
             Caption = 'Table ID';
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             var
@@ -48,6 +50,7 @@ table 6014417 "NPR Discount Priority"
         field(2; Priority; Integer)
         {
             Caption = 'Priority';
+            DataClassification = CustomerContent;
         }
         field(3; "Table Name"; Text[30])
         {
@@ -61,11 +64,13 @@ table 6014417 "NPR Discount Priority"
         {
             Caption = 'Disabled';
             Description = 'NPR5.31';
+            DataClassification = CustomerContent;
         }
         field(15; "Discount Calc. Codeunit ID"; Integer)
         {
             Caption = 'Discount Calc. Codeunit ID';
             Description = 'NPR5.31';
+            DataClassification = CustomerContent;
         }
         field(20; "Discount Calc. Codeunit Name"; Text[30])
         {
@@ -79,6 +84,7 @@ table 6014417 "NPR Discount Priority"
         field(30; "Cross Line Calculation"; Boolean)
         {
             Caption = 'Cross Line Calculation';
+            DataClassification = CustomerContent;
         }
     }
 

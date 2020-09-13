@@ -6,6 +6,7 @@ table 6014624 "NPR Web Client Dependency"
 
     Caption = 'Web Client Dependency';
     DataPerCompany = false;
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -14,18 +15,22 @@ table 6014624 "NPR Web Client Dependency"
             Caption = 'Type';
             OptionCaption = 'JavaScript,CSS,HTML,SVG,DataUri';
             OptionMembers = JavaScript,CSS,HTML,SVG,DataUri;
+            DataClassification = CustomerContent;
         }
         field(2; "Code"; Code[10])
         {
             Caption = 'Code';
+            DataClassification = CustomerContent;
         }
         field(10; Description; Text[80])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
         }
         field(20; "BLOB"; BLOB)
         {
             Caption = 'BLOB';
+            DataClassification = CustomerContent;
         }
     }
 

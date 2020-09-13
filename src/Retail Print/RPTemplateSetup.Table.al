@@ -1,22 +1,26 @@
 table 6014565 "NPR RP Template Setup"
 {
     Caption = 'Template Setup';
+    DataClassification = CustomerContent;
 
     fields
     {
         field(1; "Primary Key"; Code[10])
         {
             Caption = 'Primary Key';
+            DataClassification = CustomerContent;
         }
         field(2; "Version Major Number"; Integer)
         {
             Caption = 'Version Major Number';
             InitValue = 1;
             MinValue = 1;
+            DataClassification = CustomerContent;
         }
         field(3; "Version Prefix"; Code[3])
         {
             Caption = 'Version Prefix';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             var

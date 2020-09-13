@@ -5,6 +5,7 @@ table 6014499 "NPR Print Tags"
     //                                   - "Print Tag" field set to be not blank
 
     Caption = 'Print Tags';
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -12,6 +13,7 @@ table 6014499 "NPR Print Tags"
         {
             Caption = 'Print Tag';
             NotBlank = true;
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             var

@@ -15,6 +15,7 @@ table 6059903 "NPR Task Queue"
     DataPerCompany = false;
     DrillDownPageID = "NPR Task Queue";
     LookupPageID = "NPR Task Queue";
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -23,18 +24,21 @@ table 6059903 "NPR Task Queue"
             Caption = 'Company';
             NotBlank = true;
             TableRelation = Company;
+            DataClassification = CustomerContent;
         }
         field(2; "Task Template"; Code[10])
         {
             Caption = 'Task Template';
             NotBlank = true;
             TableRelation = "NPR Task Template";
+            DataClassification = CustomerContent;
         }
         field(3; "Task Batch"; Code[10])
         {
             Caption = 'Task Batch';
             NotBlank = true;
             TableRelation = "NPR Task Batch".Name WHERE("Journal Template Name" = FIELD("Task Template"));
+            DataClassification = CustomerContent;
         }
         field(4; "Task Line No."; Integer)
         {
@@ -42,11 +46,13 @@ table 6059903 "NPR Task Queue"
             NotBlank = true;
             TableRelation = "NPR Task Line"."Line No." WHERE("Journal Template Name" = FIELD("Task Template"),
                                                           "Journal Batch Name" = FIELD("Task Batch"));
+            DataClassification = CustomerContent;
         }
         field(9; Enabled; Boolean)
         {
             Caption = 'Enabled';
             InitValue = true;
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             var
@@ -60,12 +66,14 @@ table 6059903 "NPR Task Queue"
         field(10; "Next Run time"; DateTime)
         {
             Caption = 'Next Run time';
+            DataClassification = CustomerContent;
         }
         field(15; Priority; Option)
         {
             Caption = 'Priority';
             OptionCaption = 'Low,,Medium,,High';
             OptionMembers = Low,,Medium,,High;
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -77,11 +85,13 @@ table 6059903 "NPR Task Queue"
         field(16; "Estimated Duration"; Duration)
         {
             Caption = 'Estimated Duration';
+            DataClassification = CustomerContent;
         }
         field(20; "Task Worker Group"; Code[10])
         {
             Caption = 'Task Worker Group';
             TableRelation = "NPR Task Worker Group";
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -96,12 +106,14 @@ table 6059903 "NPR Task Queue"
             Editable = false;
             OptionCaption = 'General,NaviPartner';
             OptionMembers = General,NaviPartner;
+            DataClassification = CustomerContent;
         }
         field(30; Status; Option)
         {
             Caption = 'Status';
             OptionCaption = 'Awaiting,Assigned,Started';
             OptionMembers = Awaiting,Assigned,Started;
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -139,28 +151,34 @@ table 6059903 "NPR Task Queue"
             //This property is currently not supported
             //TestTableRelation = false;
             ValidateTableRelation = false;
+            DataClassification = CustomerContent;
         }
         field(32; "Assigned Time"; DateTime)
         {
             Caption = 'Assigned Time';
+            DataClassification = CustomerContent;
         }
         field(33; "Started Time"; DateTime)
         {
             Caption = 'Started Time';
+            DataClassification = CustomerContent;
         }
         field(34; "Assigned to Service Inst.ID"; Integer)
         {
             Caption = 'Assigned to Service Inst.ID';
+            DataClassification = CustomerContent;
         }
         field(35; "Assigned to Session ID"; Integer)
         {
             Caption = 'Assigned to Session ID';
+            DataClassification = CustomerContent;
         }
         field(40; "Object Type"; Option)
         {
             Caption = 'Object Type';
             OptionCaption = ',Report,Codeunit';
             OptionMembers = " ","Report","Codeunit";
+            DataClassification = CustomerContent;
         }
         field(41; "Object No."; Integer)
         {
@@ -168,6 +186,7 @@ table 6059903 "NPR Task Queue"
             TableRelation = IF ("Object Type" = CONST(Report)) AllObj."Object ID" WHERE("Object Type" = CONST(Report))
             ELSE
             IF ("Object Type" = CONST(Codeunit)) AllObj."Object ID" WHERE("Object Type" = CONST(Codeunit));
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             var
@@ -178,6 +197,7 @@ table 6059903 "NPR Task Queue"
         field(60; "Last Task Log Entry No."; Integer)
         {
             Caption = 'Last Task Log Entry No.';
+            DataClassification = CustomerContent;
         }
         field(61; "Last Executed Date"; DateTime)
         {
@@ -192,10 +212,12 @@ table 6059903 "NPR Task Queue"
             Caption = 'Last Execution Status';
             OptionCaption = ' ,Started,Error,Succes';
             OptionMembers = " ",Started,Error,Succes;
+            DataClassification = CustomerContent;
         }
         field(63; "Last Successfull Run"; DateTime)
         {
             Caption = 'Last Successfull Run';
+            DataClassification = CustomerContent;
         }
     }
 

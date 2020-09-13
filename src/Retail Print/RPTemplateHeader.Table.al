@@ -9,22 +9,26 @@ table 6014446 "NPR RP Template Header"
     Caption = 'RP Template Header';
     DrillDownPageID = "NPR RP Template List";
     LookupPageID = "NPR RP Template List";
+    DataClassification = CustomerContent;
 
     fields
     {
         field(10; "Code"; Code[20])
         {
             Caption = 'Code';
+            DataClassification = CustomerContent;
         }
         field(40; "Printer Type"; Option)
         {
             Caption = 'Printer Type';
             OptionCaption = 'Matrix,Line';
             OptionMembers = Matrix,Line;
+            DataClassification = CustomerContent;
         }
         field(41; "Printer Device"; Text[30])
         {
             Caption = 'Printer Device';
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             begin
@@ -51,10 +55,12 @@ table 6014446 "NPR RP Template Header"
         field(50; Description; Text[128])
         {
             Caption = 'Comments';
+            DataClassification = CustomerContent;
         }
         field(60; Archived; Boolean)
         {
             Caption = 'Archived';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -64,29 +70,35 @@ table 6014446 "NPR RP Template Header"
         field(61; Version; Code[50])
         {
             Caption = 'Version';
+            DataClassification = CustomerContent;
         }
         field(62; "Version Comments"; Text[128])
         {
             Caption = 'Version Comments';
+            DataClassification = CustomerContent;
         }
         field(63; "Last Modified At"; DateTime)
         {
             Caption = 'Last Modified At';
+            DataClassification = CustomerContent;
         }
         field(64; "Last Modified By"; Code[50])
         {
             Caption = 'Last Modified By';
+            DataClassification = CustomerContent;
         }
         field(70; "Pre Processing Codeunit"; Integer)
         {
             Caption = 'Pre Processing Codeunit';
             TableRelation = AllObj."Object ID" WHERE("Object Type" = FILTER(Codeunit));
+            DataClassification = CustomerContent;
         }
         field(71; "Print Processing Object Type"; Option)
         {
             Caption = 'Print Processing Object Type';
             OptionCaption = 'Codeunit,Report';
             OptionMembers = "Codeunit","Report";
+            DataClassification = CustomerContent;
         }
         field(72; "Print Processing Object ID"; Integer)
         {
@@ -94,6 +106,7 @@ table 6014446 "NPR RP Template Header"
             TableRelation = IF ("Print Processing Object Type" = CONST(Codeunit)) AllObj."Object ID" WHERE("Object Type" = FILTER(Codeunit))
             ELSE
             IF ("Print Processing Object Type" = CONST(Report)) AllObj."Object ID" WHERE("Object Type" = FILTER(Report));
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -108,57 +121,68 @@ table 6014446 "NPR RP Template Header"
         {
             Caption = 'Post Processing Codeunit';
             TableRelation = AllObj."Object ID" WHERE("Object Type" = FILTER(Codeunit));
+            DataClassification = CustomerContent;
         }
         field(78; "Two Column Width 1"; Decimal)
         {
             Caption = 'Two Column Width 1';
             DecimalPlaces = 0 : 3;
+            DataClassification = CustomerContent;
         }
         field(79; "Two Column Width 2"; Decimal)
         {
             Caption = 'Two Column Width 2';
             DecimalPlaces = 0 : 3;
+            DataClassification = CustomerContent;
         }
         field(80; "Three Column Width 1"; Decimal)
         {
             Caption = 'Three Column Width 1';
             DecimalPlaces = 0 : 3;
+            DataClassification = CustomerContent;
         }
         field(81; "Three Column Width 2"; Decimal)
         {
             Caption = 'Three Column Width 2';
             DecimalPlaces = 0 : 3;
+            DataClassification = CustomerContent;
         }
         field(82; "Three Column Width 3"; Decimal)
         {
             Caption = 'Three Column Width 3';
             DecimalPlaces = 0 : 3;
+            DataClassification = CustomerContent;
         }
         field(84; "Four Column Width 1"; Decimal)
         {
             Caption = 'Four Column Width 1';
             DecimalPlaces = 0 : 3;
+            DataClassification = CustomerContent;
         }
         field(85; "Four Column Width 2"; Decimal)
         {
             Caption = 'Four Column Width 2';
             DecimalPlaces = 0 : 3;
+            DataClassification = CustomerContent;
         }
         field(86; "Four Column Width 3"; Decimal)
         {
             Caption = 'Four Column Width 3';
             DecimalPlaces = 0 : 3;
+            DataClassification = CustomerContent;
         }
         field(87; "Four Column Width 4"; Decimal)
         {
             Caption = 'Four Column Width 4';
             DecimalPlaces = 0 : 3;
+            DataClassification = CustomerContent;
         }
         field(90; "Default Decimal Rounding"; Option)
         {
             Caption = 'Default Decimal Rounding';
             OptionCaption = '2,3,4,5';
             OptionMembers = "2","3","4","5";
+            DataClassification = CustomerContent;
         }
         field(1000; "Table ID"; Integer)
         {

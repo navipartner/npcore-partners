@@ -3,6 +3,7 @@ table 6014675 "NPR Endpoint Filter"
     // NPR5.23\BR\20160518  CASE 237658 Object created
 
     Caption = 'Endpoint Filter';
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -10,16 +11,19 @@ table 6014675 "NPR Endpoint Filter"
         {
             Caption = 'Endpoint Code';
             TableRelation = "NPR Endpoint";
+            DataClassification = CustomerContent;
         }
         field(20; "Table No."; Integer)
         {
             Caption = 'Table No.';
             TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
+            DataClassification = CustomerContent;
         }
         field(30; "Field No."; Integer)
         {
             Caption = 'Field No.';
             TableRelation = Field."No." WHERE(TableNo = FIELD("Table No."));
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             var
@@ -46,6 +50,7 @@ table 6014675 "NPR Endpoint Filter"
         field(40; "Filter Text"; Text[250])
         {
             Caption = 'Filter Text';
+            DataClassification = CustomerContent;
         }
     }
 

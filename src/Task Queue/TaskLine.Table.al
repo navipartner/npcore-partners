@@ -18,6 +18,7 @@ table 6059902 "NPR Task Line"
     // NPR5.47/MHA /20181022  CASE 333301 Updated AllObj.GET to reflect Primary Key in Object No. - OnValidate()
 
     Caption = 'Task Line';
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -25,24 +26,29 @@ table 6059902 "NPR Task Line"
         {
             Caption = 'Journal Template Name';
             TableRelation = "NPR Task Template";
+            DataClassification = CustomerContent;
         }
         field(2; "Journal Batch Name"; Code[10])
         {
             Caption = 'Journal Batch Name';
             TableRelation = "NPR Task Batch".Name WHERE("Journal Template Name" = FIELD("Journal Template Name"));
+            DataClassification = CustomerContent;
         }
         field(3; "Line No."; Integer)
         {
             Caption = 'Line No.';
+            DataClassification = CustomerContent;
         }
         field(8; Description; Text[50])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
         }
         field(9; Enabled; Boolean)
         {
             Caption = 'Enabled';
             InitValue = true;
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             var
@@ -77,6 +83,7 @@ table 6059902 "NPR Task Line"
             Caption = 'Object Type';
             OptionCaption = ' ,Report,Codeunit';
             OptionMembers = " ","Report","Codeunit";
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -89,6 +96,7 @@ table 6059902 "NPR Task Line"
             TableRelation = IF ("Object Type" = CONST(Report)) AllObj."Object ID" WHERE("Object Type" = CONST(Report))
             ELSE
             IF ("Object Type" = CONST(Codeunit)) AllObj."Object ID" WHERE("Object Type" = CONST(Codeunit));
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             var
@@ -130,6 +138,7 @@ table 6059902 "NPR Task Line"
         field(12; "Call Object With Task Record"; Boolean)
         {
             Caption = 'Call Object With Task Record';
+            DataClassification = CustomerContent;
         }
         field(13; "Report Name"; Text[80])
         {
@@ -143,6 +152,7 @@ table 6059902 "NPR Task Line"
             Caption = 'Priority';
             OptionCaption = 'Low,,Medium,,High';
             OptionMembers = Low,,Medium,,High;
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -152,11 +162,13 @@ table 6059902 "NPR Task Line"
         field(16; "Estimated Duration"; Duration)
         {
             Caption = 'Estimated Duration';
+            DataClassification = CustomerContent;
         }
         field(19; "Task Worker Group"; Code[10])
         {
             Caption = 'Task Worker Group';
             TableRelation = "NPR Task Worker Group";
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -168,6 +180,7 @@ table 6059902 "NPR Task Line"
             Caption = 'Recurrence';
             OptionCaption = ' ,Hourly,Daily,Weekly,Custom,DateFormula,None';
             OptionMembers = " ",Hourly,Daily,Weekly,Custom,DateFormula,"None";
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -199,72 +212,88 @@ table 6059902 "NPR Task Line"
         field(21; "Recurrence Interval"; Duration)
         {
             Caption = 'Recurrence Interval';
+            DataClassification = CustomerContent;
         }
         field(22; "Recurrence Method"; Option)
         {
             Caption = 'Recurrence Method';
             OptionCaption = 'Static,Dynamic';
             OptionMembers = Static,Dynamic;
+            DataClassification = CustomerContent;
         }
         field(23; "Recurrence Calc. Interval"; Duration)
         {
             Caption = 'Recurrence Calculation Interval';
+            DataClassification = CustomerContent;
         }
         field(25; "Recurrence Formula"; DateFormula)
         {
             Caption = 'Recurrence Formula';
+            DataClassification = CustomerContent;
         }
         field(26; "Recurrence Time"; Time)
         {
             Caption = 'Recurrence Time';
+            DataClassification = CustomerContent;
         }
         field(30; "Run on Monday"; Boolean)
         {
             Caption = 'Run on Monday';
+            DataClassification = CustomerContent;
         }
         field(31; "Run on Tuesday"; Boolean)
         {
             Caption = 'Run on Tuesday';
+            DataClassification = CustomerContent;
         }
         field(32; "Run on Wednesday"; Boolean)
         {
             Caption = 'Run on Wednesday';
+            DataClassification = CustomerContent;
         }
         field(33; "Run on Thursday"; Boolean)
         {
             Caption = 'Run on Thursday';
+            DataClassification = CustomerContent;
         }
         field(34; "Run on Friday"; Boolean)
         {
             Caption = 'Run on Friday';
+            DataClassification = CustomerContent;
         }
         field(35; "Run on Saturday"; Boolean)
         {
             Caption = 'Run on Saturday';
+            DataClassification = CustomerContent;
         }
         field(36; "Run on Sunday"; Boolean)
         {
             Caption = 'Run on Sunday';
+            DataClassification = CustomerContent;
         }
         field(40; "Retry Interval (On Error)"; Duration)
         {
             Caption = 'Retry Interval (On Error)';
+            DataClassification = CustomerContent;
         }
         field(41; "Max No. Of Retries (On Error)"; Integer)
         {
             Caption = 'Max No. Of Retries (On Error)';
+            DataClassification = CustomerContent;
         }
         field(42; "Action After Max. No. of Retri"; Option)
         {
             Caption = 'Action After Max. No. of Retri';
             OptionCaption = 'Reschedule To Next Runtime,Stop Task';
             OptionMembers = Reschedule2NextRuntime,StopTask;
+            DataClassification = CustomerContent;
         }
         field(50; "Type Of Output"; Option)
         {
             Caption = 'Type Of Output';
             OptionCaption = ' ,Paper,XMLFile,HTMLFile,PDFFile,Excel,Word';
             OptionMembers = " ",Paper,XMLFile,HTMLFile,PDFFile,Excel,Word;
+            DataClassification = CustomerContent;
         }
         field(51; "Printer Name"; Text[100])
         {
@@ -273,6 +302,7 @@ table 6059902 "NPR Task Line"
             //This property is currently not supported
             //TestTableRelation = false;
             ValidateTableRelation = false;
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             begin
@@ -282,6 +312,7 @@ table 6059902 "NPR Task Line"
         field(52; "File Path"; Text[100])
         {
             Caption = 'File Path';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -297,28 +328,34 @@ table 6059902 "NPR Task Line"
         field(53; "File Name"; Text[100])
         {
             Caption = 'File Name';
+            DataClassification = CustomerContent;
         }
         field(55; "File Type"; Option)
         {
             Caption = 'File Type';
             OptionCaption = ' ,HTML,XML,PDF';
             OptionMembers = " ",HTML,XML,PDF;
+            DataClassification = CustomerContent;
         }
         field(60; "Error Counter"; Integer)
         {
             Caption = 'Error Counter';
+            DataClassification = CustomerContent;
         }
         field(61; "First E-Mail on Error No."; Integer)
         {
             Caption = 'First E-mail on Error No.';
+            DataClassification = CustomerContent;
         }
         field(62; "Last E-Mail on Error No."; Integer)
         {
             Caption = 'Last E-mail on Error No.';
+            DataClassification = CustomerContent;
         }
         field(70; "Last Modified Date"; DateTime)
         {
             Caption = 'Last Modified Date';
+            DataClassification = CustomerContent;
         }
         field(71; "Last Modified By User"; Code[50])
         {
@@ -327,18 +364,22 @@ table 6059902 "NPR Task Line"
             //This property is currently not supported
             //TestTableRelation = false;
             ValidateTableRelation = false;
+            DataClassification = CustomerContent;
         }
         field(80; "Delete Log After"; Duration)
         {
             Caption = 'Delete Log After';
+            DataClassification = CustomerContent;
         }
         field(81; "Disable File Logging"; Boolean)
         {
             Caption = 'Disable Logging of files';
+            DataClassification = CustomerContent;
         }
         field(90; "Language ID"; Integer)
         {
             Caption = 'Language ID';
+            DataClassification = CustomerContent;
         }
         field(91; "Abbreviated Name"; Text[3])
         {
@@ -350,20 +391,24 @@ table 6059902 "NPR Task Line"
         field(111; "Valid After"; Time)
         {
             Caption = 'Valid After';
+            DataClassification = CustomerContent;
         }
         field(112; "Valid Until"; Time)
         {
             Caption = 'Valid Until';
+            DataClassification = CustomerContent;
         }
         field(130; Indentation; Integer)
         {
             Caption = 'Indentation';
+            DataClassification = CustomerContent;
         }
         field(131; "Dependence Type"; Option)
         {
             Caption = 'Dependence Type';
             OptionCaption = ' ,Error,Succes';
             OptionMembers = " ",Error,Succes;
+            DataClassification = CustomerContent;
         }
         field(140; "Task Parameters"; Integer)
         {
@@ -377,22 +422,27 @@ table 6059902 "NPR Task Line"
         field(150; "Table 1 No."; Integer)
         {
             Caption = 'Table 1 No.';
+            DataClassification = CustomerContent;
         }
         field(151; "Table 1 Filter"; TableFilter)
         {
             Caption = 'Table 1 Filter';
+            DataClassification = CustomerContent;
         }
         field(160; "Request Page XML"; BLOB)
         {
             Caption = 'Request Page XML';
+            DataClassification = CustomerContent;
         }
         field(161; "Report Request Page Options"; Boolean)
         {
             Caption = 'Report Request Page Options';
+            DataClassification = CustomerContent;
         }
         field(170; "Send E-Mail (On Start)"; Boolean)
         {
             Caption = 'Send Email On Start';
+            DataClassification = CustomerContent;
         }
         field(171; "No. of E-Mail (On Start)"; Integer)
         {
@@ -406,6 +456,7 @@ table 6059902 "NPR Task Line"
         field(175; "Send E-Mail (On Error)"; Boolean)
         {
             Caption = 'Send Email On Error';
+            DataClassification = CustomerContent;
         }
         field(176; "No. of E-Mail (On Error)"; Integer)
         {
@@ -419,14 +470,17 @@ table 6059902 "NPR Task Line"
         field(177; "First E-Mail After Error No."; Integer)
         {
             Caption = 'First E-Mail After Error No.';
+            DataClassification = CustomerContent;
         }
         field(178; "Last E-Mail After Error No."; Integer)
         {
             Caption = 'Last E-Mail After Error No.';
+            DataClassification = CustomerContent;
         }
         field(180; "Send E-Mail (On Success)"; Boolean)
         {
             Caption = 'Send Email On Success';
+            DataClassification = CustomerContent;
         }
         field(181; "No. of E-Mail (On Success)"; Integer)
         {
@@ -440,11 +494,13 @@ table 6059902 "NPR Task Line"
         field(182; "Send Only if File Exists"; Boolean)
         {
             Caption = 'Send only if File Exists';
+            DataClassification = CustomerContent;
         }
         field(183; "Exclude File(s) in Mail"; Boolean)
         {
             Caption = 'Exclude File(s) in Mail';
             Description = 'TQ1.27';
+            DataClassification = CustomerContent;
         }
         field(185; "No. of E-Mail (On Run)"; Integer)
         {

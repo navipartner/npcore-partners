@@ -3,6 +3,7 @@ table 6059772 "NPR Member Card Setup"
     // NPR5.31/JLK /20170331  CASE 268274 Changed ENU Caption
 
     Caption = 'Point Card Properties';
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -10,12 +11,14 @@ table 6059772 "NPR Member Card Setup"
         {
             Caption = 'Card Code';
             TableRelation = "NPR Member Card Types";
+            DataClassification = CustomerContent;
         }
         field(2; Type; Option)
         {
             Caption = 'Type';
             OptionCaption = 'Item,Item Group,Gift Voucher';
             OptionMembers = Item,"Item Group","Gift Voucher";
+            DataClassification = CustomerContent;
         }
         field(3; "No."; Code[20])
         {
@@ -26,33 +29,40 @@ table 6059772 "NPR Member Card Setup"
             ELSE
             IF (Type = CONST("Gift Voucher")) "NPR Payment Type POS"."No." WHERE("Processing Type" = CONST("Gift Voucher"));
             ValidateTableRelation = false;
+            DataClassification = CustomerContent;
         }
         field(5; "Units Per Point"; Decimal)
         {
             Caption = 'Units Per Point';
+            DataClassification = CustomerContent;
         }
         field(6; Points; Decimal)
         {
             Caption = 'Points';
+            DataClassification = CustomerContent;
         }
         field(7; "Customer Group"; Code[10])
         {
             Caption = 'Customer Group';
             TableRelation = "Customer Posting Group";
+            DataClassification = CustomerContent;
         }
         field(9; "Base Calculation On"; Option)
         {
             Caption = 'Base Calculation On';
             OptionCaption = 'Amounts,Quantity';
             OptionMembers = Amounts,Quantity;
+            DataClassification = CustomerContent;
         }
         field(10; "Starting Date"; Date)
         {
             Caption = 'Starting Date';
+            DataClassification = CustomerContent;
         }
         field(11; "Ending Date"; Date)
         {
             Caption = 'Ending Date';
+            DataClassification = CustomerContent;
         }
     }
 

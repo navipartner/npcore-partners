@@ -14,6 +14,7 @@ table 6151017 "NPR NpRv Sales Line Ref."
         field(1; Id; Guid)
         {
             Description = 'NPR5.55';
+            DataClassification = CustomerContent;
         }
         field(10; "Sales Line Id"; Guid)
         {

@@ -26,6 +26,7 @@ table 6014426 "NPR Retail Document Lines"
 
     Caption = 'Retail Document Line';
     LookupPageID = "NPR Retail Document Lines";
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -34,20 +35,24 @@ table 6014426 "NPR Retail Document Lines"
             Caption = 'Document Type';
             OptionCaption = ' ,Selection,Retail Order,Wish,Customization,Delivery,Rental contract,Purchase contract,Qoute';
             OptionMembers = " ","Selection Contract","Retail Order",Wish,Customization,Delivery,"Rental contract","Purchase contract",Quote;
+            DataClassification = CustomerContent;
         }
         field(2; "Customer No."; Code[20])
         {
             Caption = 'Customer No.';
             TableRelation = Customer;
+            DataClassification = CustomerContent;
         }
         field(3; "Document No."; Code[20])
         {
             Caption = 'Document No.';
             TableRelation = "NPR Retail Document Header"."No." WHERE("Document Type" = FIELD("Document Type"));
+            DataClassification = CustomerContent;
         }
         field(4; "Line No."; Integer)
         {
             Caption = 'Line No.';
+            DataClassification = CustomerContent;
         }
         field(5; "No."; Code[20])
         {
@@ -68,6 +73,7 @@ table 6014426 "NPR Retail Document Lines"
             //This property is currently not supported
             //TestTableRelation = false;
             ValidateTableRelation = false;
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             var
@@ -150,10 +156,12 @@ table 6014426 "NPR Retail Document Lines"
         field(6; Description; Text[50])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
         }
         field(7; Quantity; Decimal)
         {
             Caption = 'Quantity';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -173,6 +181,7 @@ table 6014426 "NPR Retail Document Lines"
         {
             CaptionClass = GetCaptionClass(FieldNo("Unit price"));
             Caption = 'Unit Price';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -183,10 +192,12 @@ table 6014426 "NPR Retail Document Lines"
         {
             Caption = 'Amount';
             FieldClass = Normal;
+            DataClassification = CustomerContent;
         }
         field(10; "Line discount %"; Decimal)
         {
             Caption = 'Line Discount %';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -201,6 +212,7 @@ table 6014426 "NPR Retail Document Lines"
         field(11; "Line discount amount"; Decimal)
         {
             Caption = 'Line Discount Amount';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -214,14 +226,17 @@ table 6014426 "NPR Retail Document Lines"
         field(12; "Unit Cost (LCY)"; Decimal)
         {
             Caption = 'Unit Cost (LCY)';
+            DataClassification = CustomerContent;
         }
         field(13; "Salesperson Code"; Code[10])
         {
             Caption = 'Salesperson Code';
+            DataClassification = CustomerContent;
         }
         field(14; "Quantity in order"; Decimal)
         {
             Caption = 'Quantity in order';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -239,6 +254,7 @@ table 6014426 "NPR Retail Document Lines"
         field(15; "Quantity received"; Decimal)
         {
             Caption = 'Quantity received';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -261,6 +277,7 @@ table 6014426 "NPR Retail Document Lines"
         field(16; "Quantity Shipped"; Decimal)
         {
             Caption = 'Quantity Shipped';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -276,10 +293,12 @@ table 6014426 "NPR Retail Document Lines"
         field(17; "Received (LCY)"; Decimal)
         {
             Caption = 'Received (LCY)';
+            DataClassification = CustomerContent;
         }
         field(18; "Outstanding quantity"; Decimal)
         {
             Caption = 'Outstanding quantity';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -301,20 +320,24 @@ table 6014426 "NPR Retail Document Lines"
             Caption = 'Unit of measure';
             Description = 'NPR5.48';
             TableRelation = "Item Unit of Measure".Code WHERE("Item No." = FIELD("No."));
+            DataClassification = CustomerContent;
         }
         field(20; "Std. quantity"; Decimal)
         {
             Caption = 'Std. quantity';
+            DataClassification = CustomerContent;
         }
         field(21; Open; Boolean)
         {
             Caption = 'Open';
+            DataClassification = CustomerContent;
         }
         field(22; "Sales Type"; Option)
         {
             Caption = 'Sales Type';
             OptionCaption = 'Sale,Payment,Debit Sale,Gift Voucher,Credit Voucher,Deposit,Out payment,Comment,Cancelled,Open/Close';
             OptionMembers = Sale,Payment,"Debit Sale","Gift Voucher","Credit Voucher",Deposit,"Out payment",Comment,Cancelled,"Open/Close";
+            DataClassification = CustomerContent;
         }
         field(23; Type; Option)
         {
@@ -322,6 +345,7 @@ table 6014426 "NPR Retail Document Lines"
             InitValue = Item;
             OptionCaption = ' ,G/L Account,Item,Resource,Fixed Asset,Charge (Item),Catalouge items';
             OptionMembers = " ","G/L Account",Item,Resource,"Fixed Asset","Charge (Item)","Catalouge items";
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -335,23 +359,28 @@ table 6014426 "NPR Retail Document Lines"
         field(24; "Received last"; Date)
         {
             Caption = 'Received last';
+            DataClassification = CustomerContent;
         }
         field(25; "Letter printed"; Boolean)
         {
             Caption = 'Letter printed';
+            DataClassification = CustomerContent;
         }
         field(26; Color; Code[20])
         {
             Caption = 'Color';
+            DataClassification = CustomerContent;
         }
         field(27; Size; Code[20])
         {
             Caption = 'Size';
+            DataClassification = CustomerContent;
         }
         field(28; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
             TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("No."));
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -362,10 +391,12 @@ table 6014426 "NPR Retail Document Lines"
         {
             Caption = 'Vendor No.';
             TableRelation = Vendor."No.";
+            DataClassification = CustomerContent;
         }
         field(32; "Serial No."; Code[20])
         {
             Caption = 'Serial No.';
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             var
@@ -380,10 +411,12 @@ table 6014426 "NPR Retail Document Lines"
         field(34; "Price including VAT"; Boolean)
         {
             Caption = 'Price Includes VAT';
+            DataClassification = CustomerContent;
         }
         field(35; "Amount Including VAT"; Decimal)
         {
             Caption = 'Amount Including VAT';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -396,6 +429,7 @@ table 6014426 "NPR Retail Document Lines"
         field(36; "Rental Amount incl. VAT"; Decimal)
         {
             Caption = 'Rental Amount incl. VAT';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -410,66 +444,79 @@ table 6014426 "NPR Retail Document Lines"
         {
             Caption = 'Total Rental Amount incl. VAT';
             FieldClass = Normal;
+            DataClassification = CustomerContent;
         }
         field(38; Accessory; Boolean)
         {
             Caption = 'Accessory';
+            DataClassification = CustomerContent;
         }
         field(39; "VAT Amount"; Decimal)
         {
             AutoFormatType = 1;
             Caption = 'VAT Amount';
             Editable = false;
+            DataClassification = CustomerContent;
         }
         field(40; "Return Reason Code"; Code[10])
         {
             Caption = 'Return Reason Code';
             TableRelation = "Return Reason";
+            DataClassification = CustomerContent;
         }
         field(41; "Reason Code"; Code[10])
         {
             Caption = 'Reason Code';
             TableRelation = "Reason Code";
+            DataClassification = CustomerContent;
         }
         field(42; "Qty. to Ship"; Decimal)
         {
             Caption = 'Qty. to Ship';
             DecimalPlaces = 0 : 5;
+            DataClassification = CustomerContent;
         }
         field(43; "Delivery Item"; Boolean)
         {
             Caption = 'Delivery Item';
+            DataClassification = CustomerContent;
         }
         field(44; "Deposit item"; Boolean)
         {
             Caption = 'Deposit item';
+            DataClassification = CustomerContent;
         }
         field(45; "Location Code"; Code[10])
         {
             Caption = 'Location Code';
             TableRelation = Location;
+            DataClassification = CustomerContent;
         }
         field(46; "Global Dimension 1 Code"; Code[20])
         {
             CaptionClass = '1,1,1';
             Caption = 'Global Dimension 1 Code';
             TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+            DataClassification = CustomerContent;
         }
         field(47; "Global Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,1,2';
             Caption = 'Global Dimension 2 Code';
             TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
+            DataClassification = CustomerContent;
         }
         field(77; "VAT Calculation Type"; Enum "Tax Calculation Type")
         {
             Caption = 'VAT Calculation Type';
             Editable = false;
+            DataClassification = CustomerContent;
         }
         field(89; "VAT Bus. Posting Group"; Code[10])
         {
             Caption = 'VAT Bus. Posting Group';
             TableRelation = "VAT Business Posting Group";
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -480,6 +527,7 @@ table 6014426 "NPR Retail Document Lines"
         {
             Caption = 'VAT Prod. Posting Group';
             TableRelation = "VAT Product Posting Group";
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             var
@@ -518,6 +566,7 @@ table 6014426 "NPR Retail Document Lines"
             Caption = 'Currency Code';
             Editable = false;
             TableRelation = Currency;
+            DataClassification = CustomerContent;
         }
         field(99; "VAT Base Amount"; Decimal)
         {
@@ -525,6 +574,7 @@ table 6014426 "NPR Retail Document Lines"
             AutoFormatType = 1;
             Caption = 'VAT Base Amount';
             Editable = false;
+            DataClassification = CustomerContent;
         }
         field(100; "Printing filter"; Integer)
         {
@@ -537,40 +587,49 @@ table 6014426 "NPR Retail Document Lines"
             AutoFormatType = 1;
             Caption = 'VAT Difference';
             Editable = false;
+            DataClassification = CustomerContent;
         }
         field(106; "VAT Identifier"; Code[10])
         {
             Caption = 'VAT Identifier';
             Editable = false;
+            DataClassification = CustomerContent;
         }
         field(110; "Lock Code"; Code[10])
         {
             Caption = 'Lock Code';
             Description = 'NPR4.001.003';
+            DataClassification = CustomerContent;
         }
         field(200; "Package quantity"; Decimal)
         {
             Caption = 'Package quantity';
+            DataClassification = CustomerContent;
         }
         field(201; "Belongs to Item"; Code[20])
         {
             Caption = 'Belongs to Item';
+            DataClassification = CustomerContent;
         }
         field(202; "Serial No. not Created"; Code[30])
         {
             Caption = 'Serial No. not Created';
+            DataClassification = CustomerContent;
         }
         field(1000; HjemOverUd; Boolean)
         {
             Caption = 'Home Preceeds out';
+            DataClassification = CustomerContent;
         }
         field(1001; "Vat %"; Decimal)
         {
             Caption = 'Vat %';
+            DataClassification = CustomerContent;
         }
         field(1002; "Date of rental"; Date)
         {
             Caption = 'Date of rental';
+            DataClassification = CustomerContent;
         }
     }
 

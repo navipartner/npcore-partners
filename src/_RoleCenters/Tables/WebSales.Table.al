@@ -1,5 +1,6 @@
 table 6151246 "NPR Web Sales"
 {
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -26,7 +27,7 @@ table 6151246 "NPR Web Sales"
         field(5; No; Integer)
         {
             AutoIncrement = true;
-            DataClassification = ToBeClassified;
+            DataClassification = CustomerContent;
         }
     }
 

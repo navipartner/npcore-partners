@@ -4,22 +4,26 @@ table 6014642 "NPR Tax Free Handler Param."
     // NPR5.40/MMV /20180112 CASE 293106 Refactored tax free module
 
     Caption = 'Tax Free Handler Parameters';
+    DataClassification = CustomerContent;
 
     fields
     {
         field(1; Parameter; Text[30])
         {
             Caption = 'Parameter';
+            DataClassification = CustomerContent;
         }
         field(2; "Data Type"; Option)
         {
             Caption = 'Data Type';
             OptionCaption = 'Text,Integer,Decimal,Date,Boolean,Option';
             OptionMembers = Text,"Integer",Decimal,Date,Boolean,Option;
+            DataClassification = CustomerContent;
         }
         field(3; Value; Text[250])
         {
             Caption = 'Value';
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             begin

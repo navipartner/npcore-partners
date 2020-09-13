@@ -11,12 +11,14 @@ table 6059811 "NPR Retail Sales Cue"
     // NPR5.55/JAVA/20200727  CASE 413695 NPR Core for AL: Merge Role Centers extension into the core.
 
     Caption = 'NaviConnect Cue';
+    DataClassification = CustomerContent;
 
     fields
     {
         field(1; "Primary Key"; Code[10])
         {
             Caption = 'Primary Key';
+            DataClassification = CustomerContent;
         }
         field(10; "Import Pending"; Integer)
         {

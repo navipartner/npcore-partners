@@ -5,6 +5,7 @@ table 6014427 "NPR Mixed Discount Level"
     Caption = 'Mixed Discount Level';
     DrillDownPageID = "NPR Mixed Discount Levels";
     LookupPageID = "NPR Mixed Discount Levels";
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -12,16 +13,19 @@ table 6014427 "NPR Mixed Discount Level"
         {
             Caption = 'Mixed Discount Code';
             TableRelation = "NPR Mixed Discount";
+            DataClassification = CustomerContent;
         }
         field(10; Quantity; Decimal)
         {
             Caption = 'Quantity';
             DecimalPlaces = 0 : 5;
             MinValue = 0;
+            DataClassification = CustomerContent;
         }
         field(15; "Multiple Of"; Boolean)
         {
             Caption = 'Multiple Of';
+            DataClassification = CustomerContent;
         }
         field(20; "Discount Amount"; Decimal)
         {
@@ -30,6 +34,7 @@ table 6014427 "NPR Mixed Discount Level"
             CaptionClass = GetCaptionClass(FieldNo("Discount Amount"));
             Caption = 'Discount Amount';
             MinValue = 0;
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -44,6 +49,7 @@ table 6014427 "NPR Mixed Discount Level"
             DecimalPlaces = 0 : 5;
             MaxValue = 100;
             MinValue = 0;
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin

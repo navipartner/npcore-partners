@@ -6,6 +6,7 @@ table 6014555 "NPR Attribute Value Set"
 
     Caption = 'Attribute Value Set';
     LookupPageID = "NPR Attribute Values";
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -13,15 +14,18 @@ table 6014555 "NPR Attribute Value Set"
         {
             Caption = 'Attribute Set ID';
             TableRelation = "NPR Attribute Key"."Attribute Set ID";
+            DataClassification = CustomerContent;
         }
         field(2; "Attribute Code"; Code[20])
         {
             Caption = 'Attribute Code';
             TableRelation = "NPR Attribute".Code;
+            DataClassification = CustomerContent;
         }
         field(10; "Text Value"; Text[250])
         {
             Caption = 'Text Value';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -33,6 +37,7 @@ table 6014555 "NPR Attribute Value Set"
         field(11; "Datetime Value"; DateTime)
         {
             Caption = 'Datetime Value';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -45,6 +50,7 @@ table 6014555 "NPR Attribute Value Set"
         {
             Caption = 'Numeric Value';
             DecimalPlaces = 0 : 5;
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -56,6 +62,7 @@ table 6014555 "NPR Attribute Value Set"
         field(13; "Boolean Value"; Boolean)
         {
             Caption = 'Boolean Value';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
