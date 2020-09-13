@@ -5,6 +5,7 @@ table 6059899 "NPR Data Log Field"
     // DL1.06/MH/20150126  CASE 203653 Added Log Date to Key for optimizing Cleanup: Log Date,Table ID.
 
     Caption = 'Data Log Field';
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -12,36 +13,44 @@ table 6059899 "NPR Data Log Field"
         {
             AutoIncrement = true;
             Caption = 'Entry No.';
+            DataClassification = CustomerContent;
         }
         field(10; "Table ID"; Integer)
         {
             Caption = 'Table ID';
+            DataClassification = CustomerContent;
         }
         field(20; "Field No."; Integer)
         {
             Caption = 'Field No.';
+            DataClassification = CustomerContent;
         }
         field(21; "Field Value"; Text[250])
         {
             Caption = 'Field Value';
+            DataClassification = CustomerContent;
         }
         field(30; "Log Date"; DateTime)
         {
             Caption = 'Log Date';
+            DataClassification = CustomerContent;
         }
         field(50; "Field Value Changed"; Boolean)
         {
             Caption = 'Field Value Changed';
+            DataClassification = CustomerContent;
         }
         field(51; "Previous Field Value"; Text[250])
         {
             Caption = 'Previous Field Value';
+            DataClassification = CustomerContent;
         }
         field(100; "Data Log Record Entry No."; BigInteger)
         {
             Caption = 'Data Log Record Entry No.';
             Editable = false;
             TableRelation = "NPR Data Log Record";
+            DataClassification = CustomerContent;
         }
         field(110; "User ID"; Code[250])
         {

@@ -3,6 +3,7 @@ table 6014450 "NPR Imp. Exp. Media Buffer"
     // NPR5.48/MMV /20190215 CASE 342396 Created object
 
     Caption = 'Import Export Media Buffer';
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -10,14 +11,17 @@ table 6014450 "NPR Imp. Exp. Media Buffer"
         {
             AutoIncrement = true;
             Caption = 'Primary Key';
+            DataClassification = CustomerContent;
         }
         field(2; Media; Media)
         {
             Caption = 'Media';
+            DataClassification = CustomerContent;
         }
         field(3; MediaSet; MediaSet)
         {
             Caption = 'MediaSet';
+            DataClassification = CustomerContent;
         }
     }
 

@@ -9,12 +9,14 @@ table 6014623 "NPR .NET Assembly"
     DataPerCompany = false;
     ObsoleteState = Removed;
     ObsoleteReason = 'Replaced with dependency mgt. extension downloading files to add-in NST folder instead of deploying runtime from npdeploy';
+    DataClassification = CustomerContent;
 
     fields
     {
         field(1; "Assembly Name"; Text[250])
         {
             Caption = 'Assembly Name';
+            DataClassification = CustomerContent;
         }
         field(2; "User ID"; Code[50])
         {
@@ -26,14 +28,17 @@ table 6014623 "NPR .NET Assembly"
         field(10; Assembly; BLOB)
         {
             Caption = 'Assembly';
+            DataClassification = CustomerContent;
         }
         field(11; "Debug Information"; BLOB)
         {
             Caption = 'Debug Information';
+            DataClassification = CustomerContent;
         }
         field(12; "MD5 Hash"; Text[32])
         {
             Caption = 'MD5 Hash';
+            DataClassification = CustomerContent;
         }
     }
 

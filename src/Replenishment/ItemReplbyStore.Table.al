@@ -3,32 +3,38 @@ table 6014474 "NPR Item Repl. by Store"
     // NPR4.16/TJ/20151115 CASE 222281 Table Created
 
     Caption = 'Item Replenishment by Store';
+    DataClassification = CustomerContent;
 
     fields
     {
         field(1; "Store Group Code"; Code[20])
         {
             Caption = 'Store Group Code';
+            DataClassification = CustomerContent;
         }
         field(2; "Item No."; Code[20])
         {
             Caption = 'Item No.';
             TableRelation = Item;
+            DataClassification = CustomerContent;
         }
         field(3; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
             TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No."));
+            DataClassification = CustomerContent;
         }
         field(10; "Reorder Policy"; Option)
         {
             Caption = 'Reorder Policy';
             OptionCaption = ' ,Fixed Reorder Qty.,Maximum Qty.,Order';
             OptionMembers = " ","Fixed Reorder Qty.","Maximum Qty.","Order";
+            DataClassification = CustomerContent;
         }
         field(20; "Reorder Point"; Decimal)
         {
             Caption = 'Reorder Point';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -38,6 +44,7 @@ table 6014474 "NPR Item Repl. by Store"
         field(21; "Reorder Point Text"; Text[30])
         {
             Caption = 'Reorder Point Text';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -50,6 +57,7 @@ table 6014474 "NPR Item Repl. by Store"
         field(30; "Reorder Quantity"; Decimal)
         {
             Caption = 'Reorder Quantity';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -59,6 +67,7 @@ table 6014474 "NPR Item Repl. by Store"
         field(31; "Reorder Quantity Text"; Text[30])
         {
             Caption = 'Reorder Quantity Text';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -71,6 +80,7 @@ table 6014474 "NPR Item Repl. by Store"
         field(40; "Maximum Inventory"; Decimal)
         {
             Caption = 'Maximum Inventory';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -80,6 +90,7 @@ table 6014474 "NPR Item Repl. by Store"
         field(41; "Maximum Inventory Text"; Text[30])
         {
             Caption = 'Maximum Inventory Text';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -107,10 +118,12 @@ table 6014474 "NPR Item Repl. by Store"
         field(6059970; "Is Master"; Boolean)
         {
             Caption = 'Is Master';
+            DataClassification = CustomerContent;
         }
         field(6059972; "Master Record Reference"; Text[250])
         {
             Caption = 'Master Record Reference';
+            DataClassification = CustomerContent;
         }
     }
 

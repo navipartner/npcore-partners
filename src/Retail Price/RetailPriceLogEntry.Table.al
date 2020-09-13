@@ -3,6 +3,7 @@ table 6014476 "NPR Retail Price Log Entry"
     // NPR5.40/MHA /20180316  CASE 304031 Object created
 
     Caption = 'Retail Price Log Entry';
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -10,35 +11,42 @@ table 6014476 "NPR Retail Price Log Entry"
         {
             AutoIncrement = true;
             Caption = 'Entry No.';
+            DataClassification = CustomerContent;
         }
         field(3; "Date and Time"; DateTime)
         {
             Caption = 'Date and Time';
+            DataClassification = CustomerContent;
         }
         field(5; "Date"; Date)
         {
             Caption = 'Date';
+            DataClassification = CustomerContent;
         }
         field(10; "Time"; Time)
         {
             Caption = 'Time';
+            DataClassification = CustomerContent;
         }
         field(15; "User ID"; Code[50])
         {
             Caption = 'User ID';
             TableRelation = User."User Name";
+            DataClassification = CustomerContent;
             //This property is currently not supported
             //TestTableRelation = false;
         }
         field(20; "Change Log Entry No."; BigInteger)
         {
             Caption = 'Change Log Entry No.';
+            DataClassification = CustomerContent;
         }
         field(25; "Table No."; Integer)
         {
             Caption = 'Table No.';
             TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Table),
                                                                  "Object ID" = FILTER(27 | 7002 | 7004 | 6014414));
+            DataClassification = CustomerContent;
         }
         field(27; "Table Caption"; Text[249])
         {
@@ -52,6 +60,7 @@ table 6014476 "NPR Retail Price Log Entry"
         {
             Caption = 'Field No.';
             TableRelation = Field."No." WHERE(TableNo = FIELD("Table No."));
+            DataClassification = CustomerContent;
         }
         field(35; "Field Caption"; Text[80])
         {
@@ -65,19 +74,23 @@ table 6014476 "NPR Retail Price Log Entry"
         {
             Caption = 'Item No.';
             TableRelation = Item;
+            DataClassification = CustomerContent;
         }
         field(55; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
             TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No."));
+            DataClassification = CustomerContent;
         }
         field(100; "Old Value"; Decimal)
         {
             Caption = 'Old Value';
+            DataClassification = CustomerContent;
         }
         field(105; "New Value"; Decimal)
         {
             Caption = 'New Value';
+            DataClassification = CustomerContent;
         }
     }
 

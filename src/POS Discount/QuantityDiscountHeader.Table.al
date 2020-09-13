@@ -6,6 +6,7 @@ table 6014439 "NPR Quantity Discount Header"
 
     Caption = 'Multiple Price Header';
     LookupPageID = "NPR Quantity Discount List";
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -13,37 +14,45 @@ table 6014439 "NPR Quantity Discount Header"
         {
             Caption = 'Item no.';
             TableRelation = Item."No.";
+            DataClassification = CustomerContent;
         }
         field(2; "Main No."; Code[20])
         {
             Caption = 'Main no.';
+            DataClassification = CustomerContent;
         }
         field(3; Description; Text[30])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
         }
         field(4; "Starting Date"; Date)
         {
             Caption = 'Starting date';
+            DataClassification = CustomerContent;
         }
         field(5; "Closing Date"; Date)
         {
             Caption = 'Closing Date';
+            DataClassification = CustomerContent;
         }
         field(6; Status; Option)
         {
             Caption = 'Status';
             OptionCaption = 'Await,Active,Balanced';
             OptionMembers = Await,Active,Balanced;
+            DataClassification = CustomerContent;
         }
         field(7; "Creating Date"; Date)
         {
             Caption = 'Creating date';
+            DataClassification = CustomerContent;
         }
         field(11; "Last Date Modified"; Date)
         {
             Caption = 'Modified Date';
             Editable = false;
+            DataClassification = CustomerContent;
         }
         field(20; Comment; Boolean)
         {
@@ -57,24 +66,29 @@ table 6014439 "NPR Quantity Discount Header"
         field(21; "No. Series"; Code[20])
         {
             Caption = 'No. Series';
+            DataClassification = CustomerContent;
         }
         field(22; "Starting Time"; Time)
         {
             Caption = 'Starting Time';
+            DataClassification = CustomerContent;
         }
         field(23; "Closing Time"; Time)
         {
             Caption = 'Closing Time';
+            DataClassification = CustomerContent;
         }
         field(28; "Block Custom Discount"; Boolean)
         {
             Caption = 'Block Custom Discount';
+            DataClassification = CustomerContent;
         }
         field(316; "Global Dimension 1 Code"; Code[20])
         {
             CaptionClass = '1,2,1';
             Caption = 'Shortcut Dimension 1 Code';
             TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -86,6 +100,7 @@ table 6014439 "NPR Quantity Discount Header"
             CaptionClass = '1,2,2';
             Caption = 'Global Dimension 2 Code';
             TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -96,6 +111,7 @@ table 6014439 "NPR Quantity Discount Header"
         {
             Caption = 'Period Discount';
             TableRelation = "NPR Period Discount";
+            DataClassification = CustomerContent;
         }
     }
 

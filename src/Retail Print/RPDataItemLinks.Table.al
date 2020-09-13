@@ -4,6 +4,7 @@ table 6014562 "NPR RP Data Item Links"
     // NPR5.47/MMV /20181017 CASE 318084 Added field 19
 
     Caption = 'Data Item Links';
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -11,22 +12,27 @@ table 6014562 "NPR RP Data Item Links"
         {
             Caption = 'Data Item Code';
             TableRelation = "NPR RP Data Items".Code;
+            DataClassification = CustomerContent;
         }
         field(2; "Parent Line No."; Integer)
         {
             Caption = 'Parent Line No.';
+            DataClassification = CustomerContent;
         }
         field(4; "Child Line No."; Integer)
         {
             Caption = 'Child Line No.';
+            DataClassification = CustomerContent;
         }
         field(11; "Parent Table ID"; Integer)
         {
             Caption = 'Parent Table ID';
+            DataClassification = CustomerContent;
         }
         field(12; "Parent Field ID"; Integer)
         {
             Caption = 'Parent Field ID';
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             var
@@ -58,6 +64,7 @@ table 6014562 "NPR RP Data Item Links"
         field(13; "Parent Field Name"; Text[50])
         {
             Caption = 'Parent Field Name';
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             var
@@ -93,10 +100,12 @@ table 6014562 "NPR RP Data Item Links"
         field(14; "Table ID"; Integer)
         {
             Caption = 'Table ID';
+            DataClassification = CustomerContent;
         }
         field(15; "Field ID"; Integer)
         {
             Caption = 'Field ID';
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             var
@@ -128,6 +137,7 @@ table 6014562 "NPR RP Data Item Links"
         field(16; "Field Name"; Text[50])
         {
             Caption = 'Field Name';
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             var
@@ -165,6 +175,7 @@ table 6014562 "NPR RP Data Item Links"
             Caption = 'Filter Type';
             OptionCaption = 'TableLink,Fixed Filter';
             OptionMembers = TableLink,"Fixed Filter";
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -179,6 +190,7 @@ table 6014562 "NPR RP Data Item Links"
         field(18; "Filter Value"; Text[250])
         {
             Caption = 'Filter Value';
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             var
@@ -244,6 +256,7 @@ table 6014562 "NPR RP Data Item Links"
             Caption = 'Link Type';
             OptionCaption = '=,>,<,<>';
             OptionMembers = "=",">","<","<>";
+            DataClassification = CustomerContent;
         }
     }
 

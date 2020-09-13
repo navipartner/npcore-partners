@@ -3,22 +3,26 @@ table 6014569 "NPR RP Imp. Worksh."
     // NPR5.38/MMV /20171212 CASE 294095 Created object.
 
     Caption = 'Import Worksheet';
+    DataClassification = CustomerContent;
 
     fields
     {
         field(1; "Entry No."; Integer)
         {
             Caption = 'Entry No.';
+            DataClassification = CustomerContent;
         }
         field(2; Template; Code[20])
         {
             Caption = 'Template';
+            DataClassification = CustomerContent;
         }
         field(3; "Action"; Option)
         {
             Caption = 'Action';
             OptionCaption = 'Create,Replace,Skip';
             OptionMembers = Create,Replace,Skip;
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -34,34 +38,42 @@ table 6014569 "NPR RP Imp. Worksh."
         field(4; Warning; Boolean)
         {
             Caption = 'Warning';
+            DataClassification = CustomerContent;
         }
         field(5; "Existing Description"; Text[250])
         {
             Caption = 'Existing Description';
+            DataClassification = CustomerContent;
         }
         field(6; "New Description"; Text[250])
         {
             Caption = 'New Description';
+            DataClassification = CustomerContent;
         }
         field(7; "Existing Version"; Code[50])
         {
             Caption = 'Existing Version';
+            DataClassification = CustomerContent;
         }
         field(8; "New Version"; Code[50])
         {
             Caption = 'New Version';
+            DataClassification = CustomerContent;
         }
         field(9; "Existing Last Modified At"; DateTime)
         {
             Caption = 'Existing Last Modified At';
+            DataClassification = CustomerContent;
         }
         field(10; "New Last Modified At"; DateTime)
         {
             Caption = 'New Last Modified At';
+            DataClassification = CustomerContent;
         }
         field(11; "New Template"; Boolean)
         {
             Caption = 'New Template';
+            DataClassification = CustomerContent;
         }
     }
 

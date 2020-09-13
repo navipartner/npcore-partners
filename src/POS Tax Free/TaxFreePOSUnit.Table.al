@@ -5,6 +5,7 @@ table 6014641 "NPR Tax Free POS Unit"
 
     Caption = 'Tax Free POS Unit';
     LookupPageID = "NPR Tax Free POS Units";
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -12,10 +13,12 @@ table 6014641 "NPR Tax Free POS Unit"
         {
             Caption = 'POS Unit No.';
             TableRelation = "NPR Register"."Register No.";
+            DataClassification = CustomerContent;
         }
         field(2; "Handler ID"; Text[30])
         {
             Caption = 'Handler ID';
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             var
@@ -40,35 +43,42 @@ table 6014641 "NPR Tax Free POS Unit"
         field(3; "Handler Parameters"; BLOB)
         {
             Caption = 'Handler Parameters';
+            DataClassification = CustomerContent;
         }
         field(4; Mode; Option)
         {
             Caption = 'Mode';
             OptionCaption = 'PROD,TEST';
             OptionMembers = PROD,TEST;
+            DataClassification = CustomerContent;
         }
         field(5; "Log Level"; Option)
         {
             Caption = 'Log Level';
             OptionCaption = 'ERROR,FULL,NONE';
             OptionMembers = ERROR,FULL,"NONE";
+            DataClassification = CustomerContent;
         }
         field(6; "Check POS Terminal IIN"; Boolean)
         {
             Caption = 'Check POS Terminal IIN';
+            DataClassification = CustomerContent;
         }
         field(7; "Min. Sales Amount Incl. VAT"; Decimal)
         {
             Caption = 'Min. Sales Amount Incl. VAT';
             Description = 'DEPRECATED';
+            DataClassification = CustomerContent;
         }
         field(9; "Request Timeout (ms)"; Integer)
         {
             Caption = 'Request Timeout (ms)';
+            DataClassification = CustomerContent;
         }
         field(10; "Store Voucher Prints"; Boolean)
         {
             Caption = 'Store Voucher Prints';
+            DataClassification = CustomerContent;
         }
     }
 

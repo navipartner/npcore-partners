@@ -5,6 +5,7 @@ table 6014626 "NPR Lookup Template"
     // NPR5.46/BHR /20180824  CASE 322752 Replace record Object to Allobj
 
     Caption = 'Lookup Template';
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -12,6 +13,7 @@ table 6014626 "NPR Lookup Template"
         {
             Caption = 'Table No.';
             TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Table));
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -22,11 +24,13 @@ table 6014626 "NPR Lookup Template"
         field(11; Class; Text[30])
         {
             Caption = 'Class';
+            DataClassification = CustomerContent;
         }
         field(12; "Value Field No."; Integer)
         {
             Caption = 'Value Field No.';
             TableRelation = Field."No." WHERE(TableNo = FIELD("Table No."));
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             var
@@ -50,12 +54,14 @@ table 6014626 "NPR Lookup Template"
         {
             Caption = 'Preemptive Push';
             Description = 'NPR5.22';
+            DataClassification = CustomerContent;
         }
         field(15; "Sort By Field No."; Integer)
         {
             Caption = 'Sort By Field No.';
             Description = 'NPR5.22';
             TableRelation = Field."No." WHERE(TableNo = FIELD("Table No."));
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             var
@@ -73,6 +79,7 @@ table 6014626 "NPR Lookup Template"
             Description = 'NPR5.22';
             OptionCaption = 'Ascending,Descending';
             OptionMembers = "Ascending","Descending";
+            DataClassification = CustomerContent;
         }
         field(91; "Table Caption"; Text[30])
         {

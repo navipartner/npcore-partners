@@ -33,6 +33,7 @@ table 6014414 "NPR Period Discount Line"
     // NPR5.51/MHA /20190722 CASE 358985 Added hook OnGetVATPostingSetup()
 
     Caption = 'Period Discount Line';
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -42,12 +43,14 @@ table 6014414 "NPR Period Discount Line"
             Editable = false;
             NotBlank = true;
             TableRelation = "NPR Period Discount".Code;
+            DataClassification = CustomerContent;
         }
         field(2; "Item No."; Code[20])
         {
             Caption = 'Item No.';
             NotBlank = true;
             TableRelation = Item."No.";
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -84,6 +87,7 @@ table 6014414 "NPR Period Discount Line"
             Caption = 'Period Price';
             MaxValue = 9999999;
             MinValue = 0;
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -100,22 +104,26 @@ table 6014414 "NPR Period Discount Line"
             Editable = false;
             OptionCaption = 'Await,Active,Closed';
             OptionMembers = Await,Active,Closed;
+            DataClassification = CustomerContent;
         }
         field(7; "Starting Date"; Date)
         {
             Caption = 'Starting Date';
             Editable = false;
+            DataClassification = CustomerContent;
         }
         field(8; "Ending Date"; Date)
         {
             Caption = 'Closing Date';
             Editable = false;
+            DataClassification = CustomerContent;
         }
         field(10; "Discount %"; Decimal)
         {
             Caption = 'Discount %';
             MaxValue = 100;
             MinValue = 0;
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -130,6 +138,7 @@ table 6014414 "NPR Period Discount Line"
             Caption = 'Discount Amount';
             MaxValue = 9999999;
             MinValue = 0;
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -149,6 +158,7 @@ table 6014414 "NPR Period Discount Line"
         field(13; "Campaign Unit Cost"; Decimal)
         {
             Caption = 'Period Cost';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             var
@@ -190,6 +200,7 @@ table 6014414 "NPR Period Discount Line"
         field(14; Profit; Decimal)
         {
             Caption = 'Revenue %';
+            DataClassification = CustomerContent;
         }
         field(20; Comment; Boolean)
         {
@@ -203,28 +214,34 @@ table 6014414 "NPR Period Discount Line"
         field(21; "Unit Cost Purchase"; Decimal)
         {
             Caption = 'Period purchase price';
+            DataClassification = CustomerContent;
         }
         field(24; "Distribution Item"; Boolean)
         {
             Caption = 'Distributionitem';
+            DataClassification = CustomerContent;
         }
         field(25; "Vendor No."; Code[20])
         {
             Caption = 'Vendor No.';
             TableRelation = Vendor."No.";
+            DataClassification = CustomerContent;
         }
         field(26; "Vendor Item No."; Code[20])
         {
             Caption = 'Vendor Item No.';
+            DataClassification = CustomerContent;
         }
         field(27; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
             TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No."));
+            DataClassification = CustomerContent;
         }
         field(28; "Last Date Modified"; Date)
         {
             Caption = 'Last Date Modified';
+            DataClassification = CustomerContent;
         }
         field(30; "Date Filter"; Date)
         {
@@ -250,11 +267,13 @@ table 6014414 "NPR Period Discount Line"
         {
             Caption = 'Starting Date';
             Editable = false;
+            DataClassification = CustomerContent;
         }
         field(36; "Ending Time"; Time)
         {
             Caption = 'Closing Date';
             Editable = false;
+            DataClassification = CustomerContent;
         }
         field(101; Inventory; Decimal)
         {
@@ -312,10 +331,12 @@ table 6014414 "NPR Period Discount Line"
         {
             AutoIncrement = true;
             Caption = 'Internet Special ID';
+            DataClassification = CustomerContent;
         }
         field(203; "Campaign Profit"; Decimal)
         {
             Caption = 'Campaign Profit';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             var
@@ -352,6 +373,7 @@ table 6014414 "NPR Period Discount Line"
         field(210; "Cross-Reference No."; Code[20])
         {
             Caption = 'Cross-Reference No.';
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             var
@@ -366,21 +388,25 @@ table 6014414 "NPR Period Discount Line"
         {
             Caption = 'Page no. in advert';
             Description = 'NPR5.38';
+            DataClassification = CustomerContent;
         }
         field(217; Priority; Code[10])
         {
             Caption = 'Priority';
             Description = 'NPR5.38';
+            DataClassification = CustomerContent;
         }
         field(219; "Pagenumber in paper"; Text[30])
         {
             Caption = 'Pagenumber in paper';
             Description = 'NPR5.38';
+            DataClassification = CustomerContent;
         }
         field(220; Photo; Boolean)
         {
             Caption = 'Photo';
             Description = 'NPR5.38';
+            DataClassification = CustomerContent;
         }
     }
 

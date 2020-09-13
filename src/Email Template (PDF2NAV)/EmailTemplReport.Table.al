@@ -6,6 +6,7 @@ table 6014461 "NPR E-mail Templ. Report"
     // PN1.08/MHA/20151214  CASE 228859 Pdf2Nav (New Version List)
 
     Caption = 'Report Selections - E-mail';
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -13,11 +14,13 @@ table 6014461 "NPR E-mail Templ. Report"
         {
             Caption = 'E-mail Template Code';
             TableRelation = "NPR E-mail Template Header";
+            DataClassification = CustomerContent;
         }
         field(2; "Report ID"; Integer)
         {
             Caption = 'Report ID';
             TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Report));
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -27,6 +30,7 @@ table 6014461 "NPR E-mail Templ. Report"
         field(40; Filename; Text[250])
         {
             Caption = 'Filename';
+            DataClassification = CustomerContent;
         }
         field(100; "Report Name"; Text[80])
         {

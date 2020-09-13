@@ -8,6 +8,7 @@ table 6059940 "NPR SMS Template Header"
     Caption = 'SMS Template Header';
     DrillDownPageID = "NPR SMS Template List";
     LookupPageID = "NPR SMS Template List";
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -15,15 +16,18 @@ table 6059940 "NPR SMS Template Header"
         {
             Caption = 'Code';
             NotBlank = true;
+            DataClassification = CustomerContent;
         }
         field(10; Description; Text[30])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
         }
         field(20; "Table No."; Integer)
         {
             Caption = 'Table No.';
             TableRelation = "Table Metadata";
+            DataClassification = CustomerContent;
         }
         field(25; "Table Caption"; Text[80])
         {
@@ -35,10 +39,12 @@ table 6059940 "NPR SMS Template Header"
         field(30; "Alt. Sender"; Text[30])
         {
             Caption = 'Alt. Sender';
+            DataClassification = CustomerContent;
         }
         field(50; Recipient; Text[30])
         {
             Caption = 'Recipient';
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             var
@@ -61,11 +67,13 @@ table 6059940 "NPR SMS Template Header"
         field(100; "Table Filters"; BLOB)
         {
             Caption = 'Table Filters';
+            DataClassification = CustomerContent;
         }
         field(120; "Report ID"; Integer)
         {
             Caption = 'Report ID';
             TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Report));
+            DataClassification = CustomerContent;
         }
     }
 

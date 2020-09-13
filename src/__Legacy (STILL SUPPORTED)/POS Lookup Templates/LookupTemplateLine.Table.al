@@ -3,6 +3,7 @@ table 6014627 "NPR Lookup Template Line"
     // NPR5.20/VB/20160310 CASE 236519 Added support for configurable lookup templates.
 
     Caption = 'Lookup Template Line';
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -10,19 +11,23 @@ table 6014627 "NPR Lookup Template Line"
         {
             Caption = 'Lookup Template Table No.';
             TableRelation = "NPR Lookup Template"."Table No.";
+            DataClassification = CustomerContent;
         }
         field(2; "Row No."; Integer)
         {
             Caption = 'Row No.';
+            DataClassification = CustomerContent;
         }
         field(3; "Col No."; Integer)
         {
             Caption = 'Col No.';
+            DataClassification = CustomerContent;
         }
         field(4; "Field No."; Integer)
         {
             Caption = 'Field No.';
             TableRelation = Field."No." WHERE(TableNo = FIELD("Lookup Template Table No."));
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             var
@@ -45,12 +50,14 @@ table 6014627 "NPR Lookup Template Line"
         field(11; Class; Text[30])
         {
             Caption = 'Class';
+            DataClassification = CustomerContent;
         }
         field(12; "Caption Type"; Option)
         {
             Caption = 'Caption Type';
             OptionCaption = 'Text,Field Caption,Table Caption';
             OptionMembers = Text,"Field","Table";
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -63,6 +70,7 @@ table 6014627 "NPR Lookup Template Line"
             BlankZero = true;
             Caption = 'Caption Table No.';
             TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Table));
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -75,6 +83,7 @@ table 6014627 "NPR Lookup Template Line"
             BlankZero = true;
             Caption = 'Caption Field No.';
             TableRelation = Field."No." WHERE(TableNo = FIELD("Lookup Template Table No."));
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             var
@@ -89,6 +98,7 @@ table 6014627 "NPR Lookup Template Line"
         field(15; "Caption Text"; Text[30])
         {
             Caption = 'Caption Text';
+            DataClassification = CustomerContent;
         }
         field(16; "Caption Field Name"; Text[50])
         {
@@ -103,29 +113,35 @@ table 6014627 "NPR Lookup Template Line"
             Caption = 'Text Align';
             OptionCaption = 'None,Left,Right,Center,Justify';
             OptionMembers = "None",Left,Right,Center,Justify;
+            DataClassification = CustomerContent;
         }
         field(18; "Font Size (pt)"; Integer)
         {
             Caption = 'Font Size (pt)';
+            DataClassification = CustomerContent;
         }
         field(19; "Width (CSS)"; Text[30])
         {
             Caption = 'Width (CSS)';
+            DataClassification = CustomerContent;
         }
         field(20; "Number Format"; Option)
         {
             Caption = 'Number Format';
             OptionCaption = 'None,Number,Percentage,Integer,IntegerThousand';
             OptionMembers = "None",Number,Percentage,"Integer",IntegerThousand;
+            DataClassification = CustomerContent;
         }
         field(21; Searchable; Boolean)
         {
             Caption = 'Searchable';
+            DataClassification = CustomerContent;
         }
         field(22; "Related Table No."; Integer)
         {
             Caption = 'Related Table No.';
             Editable = false;
+            DataClassification = CustomerContent;
         }
         field(23; "Related Table Name"; Text[30])
         {
@@ -139,6 +155,7 @@ table 6014627 "NPR Lookup Template Line"
         {
             Caption = 'Related Field No.';
             TableRelation = Field."No." WHERE(TableNo = FIELD("Related Table No."));
+            DataClassification = CustomerContent;
 
             trigger OnLookup()
             var

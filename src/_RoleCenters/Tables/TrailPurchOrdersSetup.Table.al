@@ -1,6 +1,7 @@
 table 6151249 "NPR Trail. Purch. Orders Setup"
 {
     Caption = 'Trailing Purchase Orders Setup';
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -14,28 +15,33 @@ table 6151249 "NPR Trail. Purch. Orders Setup"
             Caption = 'Period Length';
             OptionCaption = 'Day,Week,Month,Quarter,Year';
             OptionMembers = Day,Week,Month,Quarter,Year;
+            DataClassification = CustomerContent;
         }
         field(3; "Show Orders"; Option)
         {
             Caption = 'Show Orders';
             OptionCaption = 'All Orders,Orders Until Today,Delayed Orders';
             OptionMembers = "All Orders","Orders Until Today","Delayed Orders";
+            DataClassification = CustomerContent;
         }
         field(4; "Use Work Date as Base"; Boolean)
         {
             Caption = 'Use Work Date as Base';
+            DataClassification = CustomerContent;
         }
         field(5; "Value to Calculate"; Option)
         {
             Caption = 'Value to Calculate';
             OptionCaption = 'Amount Excl. VAT,No. of Orders';
             OptionMembers = "Amount Excl. VAT","No. of Orders";
+            DataClassification = CustomerContent;
         }
         field(6; "Chart Type"; Option)
         {
             Caption = 'Chart Type';
             OptionCaption = 'Stacked Area,Stacked Area (%),Stacked Column,Stacked Column (%)';
             OptionMembers = "Stacked Area","Stacked Area (%)","Stacked Column","Stacked Column (%)";
+            DataClassification = CustomerContent;
         }
         field(7; "Latest Order Document Date"; Date)
         {

@@ -6,6 +6,7 @@ table 6014662 "NPR Stock-Take Worksheet"
 
     Caption = 'Stock-Take Worksheet';
     LookupPageID = "NPR Stock-Take Worksheets";
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -13,32 +14,38 @@ table 6014662 "NPR Stock-Take Worksheet"
         {
             Caption = 'Stock-Take Conf. Code';
             TableRelation = "NPR Stock-Take Configuration".Code;
+            DataClassification = CustomerContent;
         }
         field(2; Name; Code[10])
         {
             Caption = 'Name';
+            DataClassification = CustomerContent;
         }
         field(10; Description; Text[50])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
         }
         field(100; Status; Option)
         {
             Caption = 'Status';
             OptionCaption = 'Open,Ready to Transfer,Partially Transferred,Complete';
             OptionMembers = OPEN,READY_TO_TRANSFER,PARTIALLY_TRANSFERRED,COMPLETE;
+            DataClassification = CustomerContent;
         }
         field(212; "Item Group Filter"; Text[200])
         {
             Caption = 'Item Group Filter';
             TableRelation = "NPR Item Group"."No.";
             ValidateTableRelation = false;
+            DataClassification = CustomerContent;
         }
         field(213; "Vendor Code Filter"; Text[200])
         {
             Caption = 'Vendor Code Filter';
             TableRelation = Vendor;
             ValidateTableRelation = false;
+            DataClassification = CustomerContent;
         }
         field(214; "Global Dimension 1 Code Filter"; Code[20])
         {
@@ -46,6 +53,7 @@ table 6014662 "NPR Stock-Take Worksheet"
             Caption = 'Global Dimension 1 Code Filter';
             TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
             ValidateTableRelation = true;
+            DataClassification = CustomerContent;
         }
         field(215; "Global Dimension 2 Code Filter"; Code[20])
         {
@@ -53,10 +61,12 @@ table 6014662 "NPR Stock-Take Worksheet"
             Caption = 'Global Dimension 2 Code Filter';
             TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
             ValidateTableRelation = true;
+            DataClassification = CustomerContent;
         }
         field(226; "Allow User Modification"; Boolean)
         {
             Caption = 'Allow User Modification';
+            DataClassification = CustomerContent;
         }
         field(301; "Conf Calc. Date"; Date)
         {
@@ -133,6 +143,7 @@ table 6014662 "NPR Stock-Take Worksheet"
         {
             Caption = 'Topup Worksheet';
             Editable = false;
+            DataClassification = CustomerContent;
         }
     }
 

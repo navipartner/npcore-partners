@@ -2,12 +2,14 @@ table 6014411 "NPR Mixed Discount"
 {
     Caption = 'Mixed Discount';
     LookupPageID = "NPR Mixed Discount List";
+    DataClassification = CustomerContent;
 
     fields
     {
         field(1; "Code"; Code[20])
         {
             Caption = 'Code';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             var
@@ -22,6 +24,7 @@ table 6014411 "NPR Mixed Discount"
         field(2; Description; Text[50])
         {
             Caption = 'Description';
+            DataClassification = CustomerContent;
         }
         field(4; "Min. Quantity"; Decimal)
         {
@@ -29,20 +32,24 @@ table 6014411 "NPR Mixed Discount"
             DecimalPlaces = 0 : 5;
             Description = 'NPR5.31';
             MinValue = 1;
+            DataClassification = CustomerContent;
         }
         field(5; "Total Amount"; Decimal)
         {
             Caption = 'Total Amount';
             Description = 'NPR5.31';
             MinValue = 0;
+            DataClassification = CustomerContent;
         }
         field(6; "Created the"; Date)
         {
             Caption = 'Created Date';
+            DataClassification = CustomerContent;
         }
         field(7; "Last Date Modified"; Date)
         {
             Caption = 'Last Date Modified';
+            DataClassification = CustomerContent;
         }
         field(8; Status; Option)
         {
@@ -50,6 +57,7 @@ table 6014411 "NPR Mixed Discount"
             Description = 'NPR5.38';
             OptionCaption = 'Pending,Active,Closed';
             OptionMembers = Pending,Active,Closed;
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             var
@@ -84,10 +92,12 @@ table 6014411 "NPR Mixed Discount"
         field(10; "No. Serie"; Code[20])
         {
             Caption = 'No. Series';
+            DataClassification = CustomerContent;
         }
         field(11; "Starting date"; Date)
         {
             Caption = 'Start Date';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             var
@@ -101,6 +111,7 @@ table 6014411 "NPR Mixed Discount"
         field(12; "Ending date"; Date)
         {
             Caption = 'End Date';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             var
@@ -114,15 +125,18 @@ table 6014411 "NPR Mixed Discount"
         field(13; "Starting time"; Time)
         {
             Caption = 'Start Time';
+            DataClassification = CustomerContent;
         }
         field(14; "Ending time"; Time)
         {
             Caption = 'End Time';
+            DataClassification = CustomerContent;
         }
         field(15; Lot; Boolean)
         {
             Caption = 'Lot';
             Description = 'NPR5.31';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -135,6 +149,7 @@ table 6014411 "NPR Mixed Discount"
         field(17; "Discount Type"; Enum "NPR Mixed Discount Type")
         {
             Caption = 'Discount Type';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -148,10 +163,12 @@ table 6014411 "NPR Mixed Discount"
         {
             Caption = 'Total Discount %';
             Description = 'NPR5.31';
+            DataClassification = CustomerContent;
         }
         field(19; "Block Custom Discount"; Boolean)
         {
             Caption = 'Block Custom Discount';
+            DataClassification = CustomerContent;
         }
         field(20; "Max. Quantity"; Decimal)
         {
@@ -159,27 +176,32 @@ table 6014411 "NPR Mixed Discount"
             Caption = 'Max. Quantity';
             DecimalPlaces = 0 : 5;
             Description = 'NPR5.31';
+            DataClassification = CustomerContent;
         }
         field(25; "Total Discount Amount"; Decimal)
         {
             Caption = 'Total Discount Amount';
             Description = 'NPR5.31';
+            DataClassification = CustomerContent;
         }
         field(30; "Item Discount Qty."; Decimal)
         {
             Caption = 'Item Discount Quantity';
             DecimalPlaces = 0 : 5;
             Description = 'NPR5.31';
+            DataClassification = CustomerContent;
         }
         field(35; "Item Discount %"; Decimal)
         {
             Caption = 'Item Discount %';
             Description = 'NPR5.31';
+            DataClassification = CustomerContent;
         }
         field(40; "Total Amount Excl. VAT"; Boolean)
         {
             Caption = 'Total Amount Excl. VAT';
             Description = 'NPR5.40';
+            DataClassification = CustomerContent;
         }
         field(100; "Mix Type"; Option)
         {
@@ -187,6 +209,7 @@ table 6014411 "NPR Mixed Discount"
             Description = 'NPR5.31';
             OptionCaption = 'Standard,Combination,Combination Part';
             OptionMembers = Standard,Combination,"Combination Part";
+            DataClassification = CustomerContent;
         }
         field(200; "Quantity sold"; Decimal)
         {
@@ -214,6 +237,7 @@ table 6014411 "NPR Mixed Discount"
             //This property is currently not supported
             //TestTableRelation = false;
             ValidateTableRelation = false;
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             var
@@ -231,6 +255,7 @@ table 6014411 "NPR Mixed Discount"
             CaptionClass = '1,2,1';
             Caption = 'Global Dimension 1 Code';
             TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -243,6 +268,7 @@ table 6014411 "NPR Mixed Discount"
             CaptionClass = '1,2,2';
             Caption = 'Global Dimension 2 Code';
             TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -254,6 +280,7 @@ table 6014411 "NPR Mixed Discount"
         {
             Caption = 'Period Discount';
             TableRelation = "NPR Period Discount";
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
@@ -267,10 +294,12 @@ table 6014411 "NPR Mixed Discount"
         field(500; "Actual Discount Amount"; Decimal)
         {
             Caption = 'Actual Discount Amount';
+            DataClassification = CustomerContent;
         }
         field(505; "Actual Item Qty."; Decimal)
         {
             Caption = 'Actual Item Qty.';
+            DataClassification = CustomerContent;
         }
     }
 
