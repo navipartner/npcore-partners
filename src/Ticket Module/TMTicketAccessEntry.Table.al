@@ -13,7 +13,7 @@ table 6059786 "NPR TM Ticket Access Entry"
 
     fields
     {
-        field(1; "Entry No."; BigInteger)
+        field(1; "Entry No."; Integer)
         {
             AutoIncrement = true;
             Caption = 'Entry No.';
