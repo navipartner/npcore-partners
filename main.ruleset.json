@@ -3,11 +3,6 @@
     "description": "These rules must be respected by all the AL code written within the company.",
     "rules": [
         {
-            "id": "AS0016",
-            "action": "Warning",
-            "justification": "Since we're targeting OnPrem, DataClassification is not yet mandatory."
-        },
-        {
             "id": "AS0053",
             "action":"Hidden",
             "justification": "We want to use some of the AppSourceCop checks while we're OnPrem."
