@@ -245,7 +245,7 @@ codeunit 6060109 "NPR TM Offline Ticket Valid."
         exit(ImportBatchNo);
     end;
 
-    local procedure RegisterArrival_Worker(TicketAccessEntryNo: BigInteger; TicketAdmissionSchEntryNo: BigInteger; pDate: Date; pTime: Time)
+    local procedure RegisterArrival_Worker(TicketAccessEntryNo: Integer; TicketAdmissionSchEntryNo: Integer; pDate: Date; pTime: Time)
     var
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
         AdmittedTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";

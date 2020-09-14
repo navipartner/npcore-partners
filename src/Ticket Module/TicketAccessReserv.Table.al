@@ -9,7 +9,7 @@ table 6059788 "NPR Ticket Access Reserv."
 
     fields
     {
-        field(1; "Entry No."; BigInteger)
+        field(1; "Entry No."; Integer)
         {
             AutoIncrement = true;
             Caption = 'Entry No.';
@@ -34,7 +34,7 @@ table 6059788 "NPR Ticket Access Reserv."
                 Description := TicketType.Description;
             end;
         }
-        field(10; "Ticket Access Capacity Slot ID"; BigInteger)
+        field(10; "Ticket Access Capacity Slot ID"; Integer)
         {
             Caption = 'Ticket Access Capacity';
             DataClassification = CustomerContent;

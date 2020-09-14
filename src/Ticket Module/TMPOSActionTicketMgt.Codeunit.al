@@ -916,7 +916,7 @@ codeunit 6060123 "NPR TM POS Action: Ticket Mgt."
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
         Ticket: Record "NPR TM Ticket";
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
-        TicketAccessEntryNo: BigInteger;
+        TicketAccessEntryNo: Integer;
         Token: Text;
         ResponseMessage: Text;
         UnitPrice: Decimal;
@@ -984,7 +984,7 @@ codeunit 6060123 "NPR TM POS Action: Ticket Mgt."
         SaleLinePOS: Record "NPR Sale Line POS";
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
         Ticket: Record "NPR TM Ticket";
-        TicketAccessEntryNo: BigInteger;
+        TicketAccessEntryNo: Integer;
         Token: Text[100];
         ResponseMessage: Text;
         HaveSalesTicket: Boolean;
@@ -1018,7 +1018,7 @@ codeunit 6060123 "NPR TM POS Action: Ticket Mgt."
         SaleLinePOS: Record "NPR Sale Line POS";
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
         Ticket: Record "NPR TM Ticket";
-        TicketAccessEntryNo: BigInteger;
+        TicketAccessEntryNo: Integer;
         Token: Text[100];
         ResponseMessage: Text;
         ResponseCode: Integer;
@@ -1048,7 +1048,7 @@ codeunit 6060123 "NPR TM POS Action: Ticket Mgt."
         SaleLinePOS: Record "NPR Sale Line POS";
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
         Ticket: Record "NPR TM Ticket";
-        TicketAccessEntryNo: BigInteger;
+        TicketAccessEntryNo: Integer;
         Token: Text[100];
         ResponseMessage: Text;
     begin

@@ -314,7 +314,7 @@ codeunit 6059784 "NPR TM Ticket Management"
         PrintTicketFromSalesTicketNo(SalePOS."Sales Ticket No.");
     end;
 
-    procedure ValidateTicketForArrival(TicketIdentifierType: Option INTERNAL_TICKET_NO,EXTERNAL_TICKET_NO,PRINTED_TICKET_NO; TicketIdentifier: Text[50]; AdmissionCode: Code[20]; AdmissionScheduleEntryNo: BigInteger; FailWithError: Boolean; var ResponseMessage: Text) MessageNumber: Integer
+    procedure ValidateTicketForArrival(TicketIdentifierType: Option INTERNAL_TICKET_NO,EXTERNAL_TICKET_NO,PRINTED_TICKET_NO; TicketIdentifier: Text[50]; AdmissionCode: Code[20]; AdmissionScheduleEntryNo: Integer; FailWithError: Boolean; var ResponseMessage: Text) MessageNumber: Integer
     var
         Admission: Record "NPR TM Admission";
         ReservationSchEntry: Record "NPR TM Admis. Schedule Entry";
@@ -325,7 +325,7 @@ codeunit 6059784 "NPR TM Ticket Management"
         DetailedTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         AllowUntilDate: Date;
-        TicketAccessEntryNo: BigInteger;
+        TicketAccessEntryNo: Integer;
     begin
 
         ResponseMessage := '';//SUCCESS;
@@ -660,7 +660,7 @@ codeunit 6059784 "NPR TM Ticket Management"
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
         DetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
         ResultCode: Integer;
-        TicketAccessEntryNo: BigInteger;
+        TicketAccessEntryNo: Integer;
     begin
 
         //-TM1.20 [269171]
@@ -846,7 +846,7 @@ codeunit 6059784 "NPR TM Ticket Management"
         //+TM1.38 [332109]
     end;
 
-    procedure VerifyTicketReference(TicketIdentifierType: Option INTERNAL_TICKET_NO,EXTERNAL_TICKET_NO,PRINTED_TICKET_NO; TicketIdentifier: Text[50]; AdmissionCode: Code[20]; var TicketAccessEntryNo: BigInteger; FailWithError: Boolean; var ResponseMessage: Text) MessageNumber: Integer
+    procedure VerifyTicketReference(TicketIdentifierType: Option INTERNAL_TICKET_NO,EXTERNAL_TICKET_NO,PRINTED_TICKET_NO; TicketIdentifier: Text[50]; AdmissionCode: Code[20]; var TicketAccessEntryNo: Integer; FailWithError: Boolean; var ResponseMessage: Text) MessageNumber: Integer
     var
         Ticket: Record "NPR TM Ticket";
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
@@ -979,7 +979,7 @@ codeunit 6059784 "NPR TM Ticket Management"
     begin
     end;
 
-    local procedure VerifyScheduleReference(TicketAccessEntryNo: BigInteger; AdmissionCode: Code[20]; var AdmissionScheduleEntryNo: BigInteger; FailWithError: Boolean; var ResponseMessage: Text) MessageNumber: Integer
+    local procedure VerifyScheduleReference(TicketAccessEntryNo: Integer; AdmissionCode: Code[20]; var AdmissionScheduleEntryNo: Integer; FailWithError: Boolean; var ResponseMessage: Text) MessageNumber: Integer
     var
         Admission: Record "NPR TM Admission";
         AdmissionSchEntry: Record "NPR TM Admis. Schedule Entry";
@@ -1089,7 +1089,7 @@ codeunit 6059784 "NPR TM Ticket Management"
         exit(0);
     end;
 
-    local procedure VerifyAdmissionDependencies(TicketAccessEntryNo: BigInteger; FailWithError: Boolean; var ResponseMessage: Text) MessageNumber: Integer
+    local procedure VerifyAdmissionDependencies(TicketAccessEntryNo: Integer; FailWithError: Boolean; var ResponseMessage: Text) MessageNumber: Integer
     var
         Admission: Record "NPR TM Admission";
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
@@ -1292,7 +1292,7 @@ codeunit 6059784 "NPR TM Ticket Management"
             RandomHexString := CopyStr(RandomHexString, Bytes + 1);
     end;
 
-    local procedure RegisterArrival_Worker(TicketAccessEntryNo: BigInteger; TicketAdmissionSchEntryNo: BigInteger)
+    local procedure RegisterArrival_Worker(TicketAccessEntryNo: Integer; TicketAdmissionSchEntryNo: Integer)
     var
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
         AdmittedTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
@@ -1325,7 +1325,7 @@ codeunit 6059784 "NPR TM Ticket Management"
         CloseReservationEntry(AdmittedTicketAccessEntry);
     end;
 
-    local procedure RegisterReservation_Worker(TicketAccessEntryNo: BigInteger; TicketAdmissionSchEntryNo: BigInteger)
+    local procedure RegisterReservation_Worker(TicketAccessEntryNo: Integer; TicketAdmissionSchEntryNo: Integer)
     var
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
         ReservationTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
@@ -1363,7 +1363,7 @@ codeunit 6059784 "NPR TM Ticket Management"
         //+TM1.45 [374620]
     end;
 
-    local procedure RegisterDeparture_Worker(TicketAccessEntryNo: BigInteger)
+    local procedure RegisterDeparture_Worker(TicketAccessEntryNo: Integer)
     var
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
         DepartureTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
@@ -1391,7 +1391,7 @@ codeunit 6059784 "NPR TM Ticket Management"
         //+TM1.45 [374620]
     end;
 
-    local procedure RegisterPayment_Worker(TicketAccessEntryNo: BigInteger; PaymentType: Option; PaymentReferenceNo: Code[20])
+    local procedure RegisterPayment_Worker(TicketAccessEntryNo: Integer; PaymentType: Option; PaymentReferenceNo: Code[20])
     var
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
         PaymentTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
@@ -1437,7 +1437,7 @@ codeunit 6059784 "NPR TM Ticket Management"
         //+TM1.45 [374620]
     end;
 
-    local procedure RegisterCancel_Worker(TicketAccessEntryNo: BigInteger)
+    local procedure RegisterCancel_Worker(TicketAccessEntryNo: Integer)
     var
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
         CancelTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
@@ -1643,7 +1643,7 @@ codeunit 6059784 "NPR TM Ticket Management"
         exit(Closed);
     end;
 
-    local procedure GetReservationEntry(TicketAccessEntryNo: BigInteger; var DetailedTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry") Closed: Boolean
+    local procedure GetReservationEntry(TicketAccessEntryNo: Integer; var DetailedTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry") Closed: Boolean
     begin
         //-NPR4.16 - New Function
 
@@ -1657,7 +1657,7 @@ codeunit 6059784 "NPR TM Ticket Management"
         exit(DetailedTicketAccessEntry.FindFirst());
     end;
 
-    procedure GetCurrentScheduleEntry(AdmissionCode: Code[20]; WithCreate: Boolean): BigInteger
+    procedure GetCurrentScheduleEntry(AdmissionCode: Code[20]; WithCreate: Boolean): Integer
     var
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
         Admission: Record "NPR TM Admission";

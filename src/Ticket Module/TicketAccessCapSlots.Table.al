@@ -7,7 +7,7 @@ table 6059787 "NPR Ticket Access Cap. Slots"
 
     fields
     {
-        field(1; "Slot ID"; BigInteger)
+        field(1; "Slot ID"; Integer)
         {
             AutoIncrement = true;
             Caption = 'Entry No.';

@@ -103,7 +103,7 @@
                     TicketManagement: Codeunit "NPR TM Ticket Management";
                     MessageId: Integer;
                     MessageText: Text;
-                    NoValue: BigInteger;
+                    NoValue: Integer;
                 begin
 
                     //-TM1.27 [301140]
@@ -137,7 +137,7 @@
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Block/Unblock';
                 Image = Change;
-                
+
 
                 trigger OnAction()
                 begin
