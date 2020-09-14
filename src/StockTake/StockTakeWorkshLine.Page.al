@@ -1,11 +1,5 @@
 page 6014664 "NPR StockTake Worksh. Line"
 {
-    // NPR4.16/TS/20150525 CASE 213313 Page Created
-    // NPR4.16/TSA20150715 CASE 213313 Adopted dimensions
-    // NPR5.46/TSA /20181001 CASE 329899 Added Retail Print
-    // TM1.39/TSA /20181102 CASE 334585 A control of type 'FlowFilter' is not allowed in a parent control of type 'Repeater'
-    // NPR5.51/RA  /20190617 CASE 355055 Added field "Item Tracking Code"
-
     AutoSplitKey = true;
     Caption = 'Stock-Take Worksheet Line';
     PageType = ListPart;
@@ -159,7 +153,7 @@ page 6014664 "NPR StockTake Worksh. Line"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        ShowLineDimensions();
                     end;
                 }
                 separator(Separator6150649)
@@ -390,22 +384,10 @@ page 6014664 "NPR StockTake Worksh. Line"
         SetRange("Require Variant Code");
     end;
 
-    procedure ShowDimensions()
+    local procedure ShowLineDimensions()
     begin
-        //-NPR4.16
         ShowDimensions();
         CurrPage.Update(false);
-
-        // JournalLineDimension.FILTERGROUP (2);
-        // JournalLineDimension.SETFILTER ("Table ID", '=%1', DATABASE::"Stock-Take Worksheet Line");
-        // JournalLineDimension.SETFILTER ("Journal Template Name", '=%1', "Stock-Take Config Code");
-        // JournalLineDimension.SETFILTER ("Journal Batch Name", '=%1', "Worksheet Name");
-        // JournalLineDimension.SETFILTER ("Journal Line No.", '=%1', "Line No.");
-        // JournalLineDimension.FILTERGROUP (0);
-        //
-        // PAGE.SETTABLEVIEW (JournalLineDimension);
-        // PAGE.RUNMODAL
-        //+NPR4.16
     end;
 
     procedure SetFontBold(FieldNumber: Integer) SetBold: Boolean
@@ -459,11 +441,7 @@ page 6014664 "NPR StockTake Worksh. Line"
         StockTakeWorksheetLine: Record "NPR Stock-Take Worksheet Line";
         StockTakeManager: Codeunit "NPR Stock-Take Manager";
     begin
-
-        //-NPR5.46 [329899]
         CurrPage.SetSelectionFilter(StockTakeWorksheetLine);
         StockTakeManager.RetailPrint(StockTakeWorksheetLine);
-        //+NPR5.46 [329899]
     end;
 }
-
