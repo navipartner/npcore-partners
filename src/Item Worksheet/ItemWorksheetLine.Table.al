@@ -1509,10 +1509,9 @@ table 6060042 "NPR Item Worksheet Line"
         {
             Caption = 'Product Group Code';
             DataClassification = CustomerContent;
-            TableRelation = "Product Group".Code WHERE("Item Category Code" = FIELD("Item Category Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
-            ValidateTableRelation = false;
+            ObsoleteState = No;
+            //ObsoleteReason = 'Product Groups became first level children of Item Categories.';
+            //ObsoleteTag = '15.0';
         }
         field(5900; "Service Item Group"; Code[10])
         {
