@@ -2124,7 +2124,7 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
     begin
     end;
 
-    [IntegrationEvent(TRUE, TRUE)]
+    [IntegrationEvent(true, false)]
     local procedure OnAfterDebitSalePostEvent(SalePOS: Record "NPR Sale POS"; SalesHeader: Record "Sales Header"; Posted: Boolean; WriteInAuditRoll: Boolean)
     begin
     end;

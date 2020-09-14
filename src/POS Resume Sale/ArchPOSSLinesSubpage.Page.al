@@ -1,10 +1,8 @@
 page 6150745 "NPR Arch. POS S. Lines Subpage"
 {
-    // NPR5.54/ALPO/20200203 CASE 364658 Resume POS Sale
-
     Caption = 'Archive POS Sale Lines';
     Editable = false;
-    PageType = List;
+    PageType = ListPart;
     SourceTable = "NPR Archive Sale Line POS";
 
     layout
@@ -77,4 +75,3 @@ page 6150745 "NPR Arch. POS S. Lines Subpage"
         }
     }
 }
-
