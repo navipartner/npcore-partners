@@ -75,6 +75,7 @@ table 6151416 "NPR Magento Brand"
         }
         field(15; "Short Description"; BLOB)
         {
+            DataClassification = CustomerContent;
         }
         field(100; "Logo Picture"; Text[250])
         {

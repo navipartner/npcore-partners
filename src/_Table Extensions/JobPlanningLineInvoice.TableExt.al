@@ -7,11 +7,13 @@ tableextension 6014402 "NPR Job Planning Line Invoice" extends "Job Planning Lin
         {
             Caption = 'Cash Register No.';
             Description = 'NPR5.49';
+            DataClassification = CustomerContent;
         }
         field(6014401; "NPR POS Store Code"; Code[10])
         {
             Caption = 'POS Store Code';
             Description = 'NPR5.49';
+            DataClassification = CustomerContent;
         }
     }
 }

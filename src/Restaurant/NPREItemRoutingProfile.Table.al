@@ -17,6 +17,7 @@ table 6150668 "NPR NPRE Item Routing Profile"
         }
         field(20; Description; Text[50])
         {
+            DataClassification = CustomerContent;
         }
     }
 

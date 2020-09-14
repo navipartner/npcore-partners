@@ -130,6 +130,7 @@ table 6151369 "NPR CS Rfid Lines"
         }
         field(26; "Transferred to Whse. Receipt"; Boolean)
         {
+            DataClassification = CustomerContent;
         }
         field(27; "Tag Shipped"; Boolean)
         {
