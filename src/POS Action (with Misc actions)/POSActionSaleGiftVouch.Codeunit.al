@@ -502,7 +502,7 @@ codeunit 6150800 "NPR POS Action: SaleGiftVouch."
         GiftVoucher."Created in Company" := Format(RetailSetup."Company No.");
         GiftVoucher.Name := '';
         if SalePOS.Get(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.") then begin
-            GiftVoucher.Salesperson := SalePOS."Salesperson Code";
+            GiftVoucher."Salesperson Code" := SalePOS."Salesperson Code";
             GiftVoucher."Customer No." := SalePOS."Customer No.";
         end;
         GiftVoucher."Currency Code" := SaleLinePOS."Currency Code";

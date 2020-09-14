@@ -100,7 +100,7 @@ report 6014438 "NPR Gift Voucher A5 Right"
                     else
                         Barcode := '';
 
-                    if SalespersonPurchaser.Get("Gift Voucher".Salesperson) then;
+                    if SalespersonPurchaser.Get("Gift Voucher"."Salesperson Code") then;
 
 
                     if RetailSetup."Salesperson on Sales Ticket" then
