@@ -765,7 +765,7 @@ codeunit 6060131 "NPR MM Member Retail Integr."
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
     begin
-        Message('Member Module: OnAfterInsertPOSSalesLine');
+        //Message('Member Module: OnAfterInsertPOSSalesLine');
 
         MemberInfoCapture.SetCurrentKey("Receipt No.", "Line No.");
         MemberInfoCapture.SetFilter("Receipt No.", '=%1', POSEntry."Document No.");

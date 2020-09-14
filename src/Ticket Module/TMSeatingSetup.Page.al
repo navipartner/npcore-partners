@@ -1,10 +1,12 @@
-page 6151130 "NPR TM Seating Setup"
+﻿page 6151130 "NPR TM Seating Setup"
 {
     // TM1.45/TSA /20191113 CASE 322432 Initial Version
 
     Caption = 'Seating Setup';
     PageType = List;
     SourceTable = "NPR TM Seating Setup";
+    UsageCategory = Administration;
+    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
 
     layout
     {
@@ -14,19 +16,19 @@ page 6151130 "NPR TM Seating Setup"
             {
                 field("Admission Code"; "Admission Code")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Seat Numbering"; "Seat Numbering")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Row Numbering"; "Row Numbering")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Template Cache"; "Template Cache")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
             }
         }
@@ -38,11 +40,13 @@ page 6151130 "NPR TM Seating Setup"
         {
             action("Seating Template")
             {
+                ToolTip = 'Navigate to Seating Template.';
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Seating Template';
                 Image = Template;
                 Promoted = true;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
 
                 trigger OnAction()
                 var

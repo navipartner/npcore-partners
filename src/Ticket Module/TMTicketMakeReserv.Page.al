@@ -1,4 +1,4 @@
-page 6060113 "NPR TM Ticket Make Reserv."
+﻿page 6060113 "NPR TM Ticket Make Reserv."
 {
     // TM1.09/TSA /20160301  CASE 235860 Sell event tickets in POS
     // TM1.12/TSA /20160407  CASE 230600 Added DAN Captions
@@ -38,6 +38,7 @@ page 6060113 "NPR TM Ticket Make Reserv."
     PageType = StandardDialog;
     SourceTable = "NPR TM Ticket Reservation Req.";
     SourceTableTemporary = true;
+    UsageCategory = None;
 
     layout
     {
@@ -47,7 +48,7 @@ page 6060113 "NPR TM Ticket Make Reserv."
             {
                 field("External Item Code"; "External Item Code")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Item No.';
                     Editable = false;
                     Style = Unfavorable;
@@ -63,7 +64,7 @@ page 6060113 "NPR TM Ticket Make Reserv."
                 }
                 field("Admission Code"; "Admission Code")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Editable = false;
                     Style = Unfavorable;
                     StyleExpr = gVisualQueueUnfavorable;
@@ -77,7 +78,7 @@ page 6060113 "NPR TM Ticket Make Reserv."
                 }
                 field("Scheduled Time Description"; "Scheduled Time Description")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Editable = false;
                     Style = Unfavorable;
                     StyleExpr = gVisualQueueUnfavorable;
@@ -98,7 +99,7 @@ page 6060113 "NPR TM Ticket Make Reserv."
                 }
                 field("Admission Description"; "Admission Description")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Editable = false;
                     Style = Unfavorable;
                     StyleExpr = gVisualQueueUnfavorable;
@@ -111,7 +112,7 @@ page 6060113 "NPR TM Ticket Make Reserv."
                 }
                 field(Quantity; Quantity)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Editable = gAllowQuantityChange;
                     Style = Unfavorable;
                     StyleExpr = gVisualQueueUnfavorable;
@@ -138,7 +139,7 @@ page 6060113 "NPR TM Ticket Make Reserv."
                 }
                 field("Admission Inclusion"; "Admission Inclusion")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketAdvanced;
 
                     trigger OnValidate()
                     var
@@ -181,7 +182,7 @@ page 6060113 "NPR TM Ticket Make Reserv."
                 }
                 field("Customer No."; "Customer No.")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Visible = gBatchTicketCreateMode;
 
                     trigger OnValidate()
@@ -197,7 +198,7 @@ page 6060113 "NPR TM Ticket Make Reserv."
                 }
                 field("External Order No."; "External Order No.")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Visible = gBatchTicketCreateMode;
 
                     trigger OnValidate()
@@ -213,7 +214,7 @@ page 6060113 "NPR TM Ticket Make Reserv."
                 }
                 field("Payment Option"; "Payment Option")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Visible = false;
 
                     trigger OnValidate()
@@ -229,7 +230,7 @@ page 6060113 "NPR TM Ticket Make Reserv."
                 }
                 field("Waiting List Reference Code"; "Waiting List Reference Code")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketAdvanced;
 
                     trigger OnValidate()
                     var
@@ -284,7 +285,7 @@ page 6060113 "NPR TM Ticket Make Reserv."
                 Visible = gShowDeliverTo;
                 field(gDeliverTicketTo; gDeliverTicketTo)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Deliver eTicket To';
                 }
             }
@@ -293,7 +294,7 @@ page 6060113 "NPR TM Ticket Make Reserv."
                 ShowCaption = false;
                 field(gConfirmStatusText; gConfirmStatusText)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Reservation Confirm Status';
                     Enabled = false;
                     Style = Favorable;
@@ -309,11 +310,13 @@ page 6060113 "NPR TM Ticket Make Reserv."
         {
             action("Select Schedule")
             {
+                ToolTip = 'Select a schedule entry for admission.';
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Select Schedule';
                 Image = ChangeDate;
                 Promoted = true;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
 
                 trigger OnAction()
                 begin
@@ -324,9 +327,11 @@ page 6060113 "NPR TM Ticket Make Reserv."
             }
             action("Update Schedule")
             {
+                ToolTip = 'Append to the list of generated time slots.';
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Update Schedule';
                 Image = "Action";
-                ApplicationArea = All;
+
 
                 trigger OnAction()
                 var

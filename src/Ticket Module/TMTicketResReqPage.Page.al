@@ -1,4 +1,4 @@
-page 6060094 "NPR TM Ticket Res. Req. Page"
+﻿page 6060094 "NPR TM Ticket Res. Req. Page"
 {
     // TM1.22/NPKNAV/20170612  CASE 278142 Transport T0007 - 12 June 2017
     // TM1.23/TSA /20170724 CASE 284752 Added NPR Attribute Support
@@ -8,6 +8,7 @@ page 6060094 "NPR TM Ticket Res. Req. Page"
     Caption = 'Ticket Res. Request Page';
     PageType = Card;
     SourceTable = "NPR TM Ticket Reservation Req.";
+    UsageCategory = None;
 
     layout
     {
@@ -18,18 +19,18 @@ page 6060094 "NPR TM Ticket Res. Req. Page"
                 Caption = 'General';
                 field("Entry No."; "Entry No.")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Editable = false;
                     Visible = false;
                 }
                 field("Session Token ID"; "Session Token ID")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Editable = false;
                 }
                 field("Created Date Time"; "Created Date Time")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Editable = false;
                 }
             }
@@ -38,35 +39,35 @@ page 6060094 "NPR TM Ticket Res. Req. Page"
                 Caption = 'Reguest Details';
                 field("External Item Code"; "External Item Code")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Item No."; "Item No.")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Variant Code"; "Variant Code")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field(Quantity; Quantity)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("External Adm. Sch. Entry No."; "External Adm. Sch. Entry No.")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Scheduled Time Description"; "Scheduled Time Description")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Admission Code"; "Admission Code")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Admission Description"; "Admission Description")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 group(Process)
                 {
@@ -74,36 +75,36 @@ page 6060094 "NPR TM Ticket Res. Req. Page"
                 }
                 field("Ext. Line Reference No."; "Ext. Line Reference No.")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Visible = false;
                 }
                 field("Request Status"; "Request Status")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Request Status Date Time"; "Request Status Date Time")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Revoke Ticket Request"; "Revoke Ticket Request")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Revoke Access Entry No."; "Revoke Access Entry No.")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Expires Date Time"; "Expires Date Time")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Admission Created"; "Admission Created")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Payment Option"; "Payment Option")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
             }
             group(References)
@@ -111,35 +112,35 @@ page 6060094 "NPR TM Ticket Res. Req. Page"
                 Caption = 'References';
                 field("External Member No."; "External Member No.")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketAdvanced;
                 }
                 field("External Ticket Number"; "External Ticket Number")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Notification Method"; "Notification Method")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Notification Address"; "Notification Address")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("External Order No."; "External Order No.")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Customer No."; "Customer No.")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Receipt No."; "Receipt No.")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Line No."; "Line No.")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
             }
             group(Print)
@@ -147,11 +148,11 @@ page 6060094 "NPR TM Ticket Res. Req. Page"
                 Caption = 'Print';
                 field("DIY Print Order Requested"; "DIY Print Order Requested")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
                 }
                 field("DIY Print Order At"; "DIY Print Order At")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
                 }
             }
             group(Attributes)
@@ -159,7 +160,7 @@ page 6060094 "NPR TM Ticket Res. Req. Page"
                 Caption = 'Attributes';
                 field(NPRAttrTextArray_01; NPRAttrTextArray[1])
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketAdvanced;
                     CaptionClass = '6014555,6060116,1,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible01;
@@ -171,7 +172,7 @@ page 6060094 "NPR TM Ticket Res. Req. Page"
                 }
                 field(NPRAttrTextArray_02; NPRAttrTextArray[2])
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketAdvanced;
                     CaptionClass = '6014555,6060116,2,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible02;
@@ -183,7 +184,7 @@ page 6060094 "NPR TM Ticket Res. Req. Page"
                 }
                 field(NPRAttrTextArray_03; NPRAttrTextArray[3])
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketAdvanced;
                     CaptionClass = '6014555,6060116,3,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible03;
@@ -195,7 +196,7 @@ page 6060094 "NPR TM Ticket Res. Req. Page"
                 }
                 field(NPRAttrTextArray_04; NPRAttrTextArray[4])
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketAdvanced;
                     CaptionClass = '6014555,6060116,4,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible04;
@@ -207,7 +208,7 @@ page 6060094 "NPR TM Ticket Res. Req. Page"
                 }
                 field(NPRAttrTextArray_05; NPRAttrTextArray[5])
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketAdvanced;
                     CaptionClass = '6014555,6060116,5,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible05;
@@ -219,7 +220,7 @@ page 6060094 "NPR TM Ticket Res. Req. Page"
                 }
                 field(NPRAttrTextArray_06; NPRAttrTextArray[6])
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketAdvanced;
                     CaptionClass = '6014555,6060116,6,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible06;
@@ -231,7 +232,7 @@ page 6060094 "NPR TM Ticket Res. Req. Page"
                 }
                 field(NPRAttrTextArray_07; NPRAttrTextArray[7])
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketAdvanced;
                     CaptionClass = '6014555,6060116,7,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible07;
@@ -243,7 +244,7 @@ page 6060094 "NPR TM Ticket Res. Req. Page"
                 }
                 field(NPRAttrTextArray_08; NPRAttrTextArray[8])
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketAdvanced;
                     CaptionClass = '6014555,6060116,8,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible08;
@@ -255,7 +256,7 @@ page 6060094 "NPR TM Ticket Res. Req. Page"
                 }
                 field(NPRAttrTextArray_09; NPRAttrTextArray[9])
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketAdvanced;
                     CaptionClass = '6014555,6060116,9,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible09;
@@ -267,7 +268,7 @@ page 6060094 "NPR TM Ticket Res. Req. Page"
                 }
                 field(NPRAttrTextArray_10; NPRAttrTextArray[10])
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketAdvanced;
                     CaptionClass = '6014555,6060116,10,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible10;

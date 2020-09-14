@@ -1,4 +1,4 @@
-page 6060093 "NPR TM Offline Ticket Valid."
+﻿page 6060093 "NPR TM Offline Ticket Valid."
 {
     // TM1.22/NPKNAV/20170612  CASE 278142 Transport T0007 - 12 June 2017
     // TM90.1.46/TSA /20200203 CASE 383196 Added mass modify on event date and event time
@@ -7,6 +7,7 @@ page 6060093 "NPR TM Offline Ticket Valid."
     PageType = List;
     SourceTable = "NPR TM Offline Ticket Valid.";
     UsageCategory = Tasks;
+    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
 
     layout
     {
@@ -16,39 +17,39 @@ page 6060093 "NPR TM Offline Ticket Valid."
             {
                 field("Entry No."; "Entry No.")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Visible = false;
                 }
                 field("Ticket Reference Type"; "Ticket Reference Type")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Visible = false;
                 }
                 field("Ticket Reference No."; "Ticket Reference No.")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Admission Code"; "Admission Code")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Member Reference Type"; "Member Reference Type")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketAdvanced;
                     Visible = false;
                 }
                 field("Member Reference No."; "Member Reference No.")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketAdvanced;
                     Visible = false;
                 }
                 field("Event Type"; "Event Type")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Event Date"; "Event Date")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
 
                     trigger OnValidate()
                     begin
@@ -68,7 +69,7 @@ page 6060093 "NPR TM Offline Ticket Valid."
                 }
                 field("Event Time"; "Event Time")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
 
                     trigger OnValidate()
                     begin
@@ -88,7 +89,7 @@ page 6060093 "NPR TM Offline Ticket Valid."
                 }
                 field("Process Status"; "Process Status")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
 
                     trigger OnValidate()
                     begin
@@ -107,19 +108,19 @@ page 6060093 "NPR TM Offline Ticket Valid."
                 }
                 field("Process Response Text"; "Process Response Text")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Import Reference No."; "Import Reference No.")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Imported At"; "Imported At")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Import Reference Name"; "Import Reference Name")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
             }
         }
@@ -131,11 +132,13 @@ page 6060093 "NPR TM Offline Ticket Valid."
         {
             action("Process Entry")
             {
+                ToolTip = 'Generate admission entries for this ticket.';
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Process Entry';
                 Image = Post;
                 Promoted = true;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
 
                 trigger OnAction()
                 begin
@@ -146,11 +149,13 @@ page 6060093 "NPR TM Offline Ticket Valid."
             }
             action("Process Batch")
             {
+                ToolTip = 'Generate admission entries for all tickets for the batch of tickets.';
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Process Batch';
                 Image = PostBatch;
                 Promoted = true;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
 
                 trigger OnAction()
                 begin
@@ -164,13 +169,15 @@ page 6060093 "NPR TM Offline Ticket Valid."
         {
             action(Ticket)
             {
+                ToolTip = 'Navigate to Ticket List';
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Ticket';
                 Image = Navigate;
                 Promoted = true;
                 PromotedIsBig = true;
                 RunObject = Page "NPR TM Ticket List";
                 RunPageLink = "External Ticket No." = FIELD("Ticket Reference No.");
-                ApplicationArea = All;
+
             }
         }
     }

@@ -1,4 +1,4 @@
-page 6060112 "NPR TM Ticket Select Schedule"
+﻿page 6060112 "NPR TM Ticket Select Schedule"
 {
     // TM80.1.09/TSA/20160301  CASE 235860 Sell event tickets in POS
     // TM1.12/TSA/20160407  CASE 230600 Added DAN Captions
@@ -25,6 +25,7 @@ page 6060112 "NPR TM Ticket Select Schedule"
     SourceTable = "NPR TM Admis. Schedule Entry";
     SourceTableTemporary = true;
     SourceTableView = SORTING("Admission Start Date", "Admission Start Time");
+    Usagecategory = None;
 
     layout
     {
@@ -34,44 +35,44 @@ page 6060112 "NPR TM Ticket Select Schedule"
             {
                 field("Schedule Code"; "Schedule Code")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Editable = false;
                 }
                 field("Admission Code"; "Admission Code")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Editable = false;
                     Visible = false;
                 }
                 field("Admission Start Date"; "Admission Start Date")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Editable = false;
                     Style = Favorable;
                     StyleExpr = CalendarExceptionText = '';
                 }
                 field("Admission Start Time"; "Admission Start Time")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Editable = false;
                 }
                 field("Remaining Reservation"; RemainingReservations)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Remaining Reservation';
                     Editable = false;
                     Visible = false;
                 }
                 field(RemainingAdmitted; RemainingAdmitted)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Remaining Admitted';
                     Editable = false;
                     Visible = false;
                 }
                 field(Remaining; RemainingText)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Remaining';
                     Editable = false;
                     Style = Unfavorable;
@@ -79,7 +80,7 @@ page 6060112 "NPR TM Ticket Select Schedule"
                 }
                 field(CalendarException; CalendarExceptionText)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketAdvanced;
                     Caption = 'Calendar Exception';
                     Editable = false;
                     Style = Unfavorable;
@@ -92,7 +93,7 @@ page 6060112 "NPR TM Ticket Select Schedule"
                 ShowCaption = false;
                 field(LocalDateTimeText; LocalDateTimeText)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Time:';
                     Enabled = false;
                 }

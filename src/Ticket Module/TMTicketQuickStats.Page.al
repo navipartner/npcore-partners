@@ -1,4 +1,4 @@
-page 6060111 "NPR TM Ticket Quick Stats"
+﻿page 6060111 "NPR TM Ticket Quick Stats"
 {
     // TM1.15/TSA/20160512  CASE 240863 POS Quick Statistics
     // TM1.19/TSA/20170202  CASE 265061 To be able to expose the page as a webservice and give the webserivce the ability to filter, GUIALLOWED was added in the OnOpenPage where default filter is set
@@ -13,6 +13,8 @@ page 6060111 "NPR TM Ticket Quick Stats"
     ShowFilter = false;
     SourceTable = "NPR TM Admis. Schedule Entry";
     SourceTableTemporary = true;
+    UsageCategory = ReportsAndAnalysis;
+    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
 
     layout
     {
@@ -23,35 +25,35 @@ page 6060111 "NPR TM Ticket Quick Stats"
                 Editable = false;
                 field("Admission Code"; "Admission Code")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Admission Start Date"; "Admission Start Date")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Admission Start Time"; "Admission Start Time")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Admission End Time"; "Admission End Time")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Open Reservations"; "Open Reservations")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Open Admitted"; "Open Admitted")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field(Departed; Departed)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field(AdmittedCount; AdmittedCount)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Admitted Today';
                 }
             }

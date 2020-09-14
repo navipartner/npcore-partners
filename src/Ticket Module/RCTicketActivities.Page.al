@@ -1,4 +1,4 @@
-page 6060108 "NPR RC Ticket Activities"
+﻿page 6060108 "NPR RC Ticket Activities"
 {
     // TM1.16/TSA/20160816  CASE 233430 Transport TM1.16 - 19 July 2016
 
@@ -15,31 +15,31 @@ page 6060108 "NPR RC Ticket Activities"
                 Caption = 'Events (Today)';
                 field("Event Count 1"; "Event Count 1")
                 {
-                    ApplicationArea = All;
+
                     Image = Library;
                 }
                 field("Event Capacity 1"; "Event Capacity 1")
                 {
-                    ApplicationArea = All;
+
                     Image = People;
                 }
                 field("Event Open Reservations 1"; "Event Open Reservations 1")
                 {
-                    ApplicationArea = All;
+
                     Image = Person;
                 }
                 field("Event Admitted 1"; "Event Admitted 1")
                 {
-                    ApplicationArea = All;
+
                     Image = Person;
                 }
                 field("Event Utilization Avg. 1"; "Event Utilization Avg. 1")
                 {
-                    ApplicationArea = All;
+
                 }
                 field(Control6150619; '')
                 {
-                    ApplicationArea = All;
+
                     Image = Heart;
                     ShowCaption = false;
                 }
@@ -49,27 +49,27 @@ page 6060108 "NPR RC Ticket Activities"
                 Caption = 'Events (Tomorrow)';
                 field("Event Count 2"; "Event Count 2")
                 {
-                    ApplicationArea = All;
+
                     Image = Library;
                 }
                 field("Event Capacity 2"; "Event Capacity 2")
                 {
-                    ApplicationArea = All;
+
                     Image = People;
                 }
                 field("Event Open Reservations 2"; "Event Open Reservations 2")
                 {
-                    ApplicationArea = All;
+
                     Image = Person;
                 }
                 field("Event Admitted 2"; "Event Admitted 2")
                 {
-                    ApplicationArea = All;
+
                     Image = Person;
                 }
                 field("Event Utilization Avg. 2"; "Event Utilization Avg. 2")
                 {
-                    ApplicationArea = All;
+
                     Image = Heart;
                 }
             }
@@ -82,9 +82,10 @@ page 6060108 "NPR RC Ticket Activities"
         {
             action("Set Up Cues")
             {
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Set Up Cues';
                 Image = Setup;
-                ApplicationArea = All;
+
 
                 trigger OnAction()
                 var

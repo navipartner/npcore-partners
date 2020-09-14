@@ -1,4 +1,4 @@
-page 6060114 "NPR TM Ticket Access Facts"
+﻿page 6060114 "NPR TM Ticket Access Facts"
 {
     // NPR4.14/TSA/20150803/CASE214262 - Initial Version
     // TM1.00/TSA/20151217  CASE 228982 NaviPartner Ticket Management
@@ -8,6 +8,7 @@ page 6060114 "NPR TM Ticket Access Facts"
     PageType = List;
     SourceTable = "NPR TM Ticket Access Fact";
     UsageCategory = ReportsAndAnalysis;
+    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
 
     layout
     {
@@ -17,21 +18,21 @@ page 6060114 "NPR TM Ticket Access Facts"
             {
                 field("Fact Name"; "Fact Name")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Editable = false;
                 }
                 field("Fact Code"; "Fact Code")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Editable = false;
                 }
                 field(Description; Description)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field(Block; Block)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
             }
         }

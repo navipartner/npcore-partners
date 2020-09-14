@@ -1,4 +1,4 @@
-page 6059786 "NPR TM Ticket AccessEntry List"
+﻿page 6059786 "NPR TM Ticket AccessEntry List"
 {
     // TM1.00/TSA/20151217  CASE 219658-01 NaviPartner Ticket Management
     // TM1.12/TSA/20160407  CASE 230600 Added DAN Captions
@@ -20,43 +20,43 @@ page 6059786 "NPR TM Ticket AccessEntry List"
             {
                 field("Entry No."; "Entry No.")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Ticket No."; "Ticket No.")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Ticket Type Code"; "Ticket Type Code")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Admission Code"; "Admission Code")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Access Date"; "Access Date")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Access Time"; "Access Time")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field(Description; Description)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Member Card Code"; "Member Card Code")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketAdvanced;
                 }
                 field(Status; Status)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field(Quantity; Quantity)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
             }
         }
@@ -68,22 +68,35 @@ page 6059786 "NPR TM Ticket AccessEntry List"
         {
             action("Detailed Access Entries")
             {
+                ToolTip = 'Navigate to ticket admission details.';
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Detailed Access Entries';
                 Image = LedgerEntries;
                 Promoted = true;
                 PromotedCategory = Process;
-                RunObject = Page "NPR TM Det. Ticket AccessEntry";
-                ApplicationArea = All;
-                //RunPageLink = "Ticket Access Entry No."=FIELD("Entry No.");
+                //RunObject = Page "NPR TM Det. Ticket AccessEntry";
+                //RunPageLink = "Ticket Access Entry No." = FIELD("Entry No.");
+
+                trigger OnAction()
+                var
+                    PageDetAccessEntry: Page "NPR TM Det. Ticket AccessEntry";
+                    DetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
+                begin
+                    DetTicketAccessEntry.SetFilter("Ticket Access Entry No.", '=%1', Rec."Entry No.");
+                    PageDetAccessEntry.SetTableView(DetTicketAccessEntry);
+                    PageDetAccessEntry.Run();
+                end;
             }
         }
         area(processing)
         {
             action("Register Arrival")
             {
+                ToolTip = 'Register arrival event for selected admission.';
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Register Arrival';
                 Image = Approve;
-                ApplicationArea = All;
+
 
                 trigger OnAction()
                 var
@@ -102,9 +115,11 @@ page 6059786 "NPR TM Ticket AccessEntry List"
             }
             action("Register Departure")
             {
+                ToolTip = 'Register departure event for selected admission.';
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Register Departure';
                 Image = DefaultFault;
-                ApplicationArea = All;
+
 
                 trigger OnAction()
                 var
@@ -118,9 +133,11 @@ page 6059786 "NPR TM Ticket AccessEntry List"
             }
             action("Block/Unblock")
             {
+                ToolTip = 'Prevents the tickets from being used (reversible).';
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Block/Unblock';
                 Image = Change;
-                ApplicationArea = All;
+                
 
                 trigger OnAction()
                 begin
