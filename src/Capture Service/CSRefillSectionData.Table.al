@@ -1,5 +1,6 @@
 table 6151365 "NPR CS Refill Section Data"
 {
+    DataClassification = CustomerContent;
     // NPR5.54/CLVA/20200310  CASE 384506 Object created
 
 
