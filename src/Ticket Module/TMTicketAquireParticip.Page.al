@@ -1,4 +1,4 @@
-page 6060110 "NPR TM Ticket Aquire Particip."
+﻿page 6060110 "NPR TM Ticket Aquire Particip."
 {
     // TM1.16/TSA/20160816  CASE 245004 Transport TM1.16 - 19 July 2016
     // TM1.17/TSA/20160913  CASE 251883 Added SMS as Notification Method
@@ -12,6 +12,7 @@ page 6060110 "NPR TM Ticket Aquire Particip."
     InsertAllowed = false;
     PageType = StandardDialog;
     SourceTable = "NPR TM Ticket Reservation Req.";
+    UsageCategory = None;
 
     layout
     {
@@ -26,11 +27,11 @@ page 6060110 "NPR TM Ticket Aquire Particip."
                     ShowCaption = false;
                     field("Notification Method"; "Notification Method")
                     {
-                        ApplicationArea = All;
+                        ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     }
                     field("Notification Address"; "Notification Address")
                     {
-                        ApplicationArea = All;
+                        ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                         ShowMandatory = RequireNotificationAddress;
                         Width = 40;
 
@@ -46,7 +47,7 @@ page 6060110 "NPR TM Ticket Aquire Particip."
                 Caption = 'Attributes';
                 field(NPRAttrTextArray_01; NPRAttrTextArray[1])
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketAdvanced;
                     CaptionClass = '6014555,6060116,1,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible01;
@@ -58,7 +59,7 @@ page 6060110 "NPR TM Ticket Aquire Particip."
                 }
                 field(NPRAttrTextArray_02; NPRAttrTextArray[2])
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketAdvanced;
                     CaptionClass = '6014555,6060116,2,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible02;
@@ -70,7 +71,7 @@ page 6060110 "NPR TM Ticket Aquire Particip."
                 }
                 field(NPRAttrTextArray_03; NPRAttrTextArray[3])
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketAdvanced;
                     CaptionClass = '6014555,6060116,3,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible03;
@@ -82,7 +83,7 @@ page 6060110 "NPR TM Ticket Aquire Particip."
                 }
                 field(NPRAttrTextArray_04; NPRAttrTextArray[4])
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketAdvanced;
                     CaptionClass = '6014555,6060116,4,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible04;
@@ -94,7 +95,7 @@ page 6060110 "NPR TM Ticket Aquire Particip."
                 }
                 field(NPRAttrTextArray_05; NPRAttrTextArray[5])
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketAdvanced;
                     CaptionClass = '6014555,6060116,5,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible05;
@@ -106,7 +107,7 @@ page 6060110 "NPR TM Ticket Aquire Particip."
                 }
                 field(NPRAttrTextArray_06; NPRAttrTextArray[6])
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketAdvanced;
                     CaptionClass = '6014555,6060116,6,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible06;
@@ -118,7 +119,7 @@ page 6060110 "NPR TM Ticket Aquire Particip."
                 }
                 field(NPRAttrTextArray_07; NPRAttrTextArray[7])
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketAdvanced;
                     CaptionClass = '6014555,6060116,7,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible07;
@@ -130,7 +131,7 @@ page 6060110 "NPR TM Ticket Aquire Particip."
                 }
                 field(NPRAttrTextArray_08; NPRAttrTextArray[8])
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketAdvanced;
                     CaptionClass = '6014555,6060116,8,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible08;
@@ -142,7 +143,7 @@ page 6060110 "NPR TM Ticket Aquire Particip."
                 }
                 field(NPRAttrTextArray_09; NPRAttrTextArray[9])
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketAdvanced;
                     CaptionClass = '6014555,6060116,9,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible09;
@@ -154,7 +155,7 @@ page 6060110 "NPR TM Ticket Aquire Particip."
                 }
                 field(NPRAttrTextArray_10; NPRAttrTextArray[10])
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketAdvanced;
                     CaptionClass = '6014555,6060116,10,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible10;

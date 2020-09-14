@@ -1,9 +1,10 @@
-page 6151135 "NPR TM Admis. Forecast Matrix"
+﻿page 6151135 "NPR TM Admis. Forecast Matrix"
 {
     // TM1.48/TSA /20200625 CASE 409741 Initial Version
 
     Caption = 'Admission Forecast Matrix';
     UsageCategory = ReportsAndAnalysis;
+    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
 
     layout
     {
@@ -14,7 +15,7 @@ page 6151135 "NPR TM Admis. Forecast Matrix"
                 ShowCaption = false;
                 field(AdmissionCode; PageAdmissionCode)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Admission Code';
                     TableRelation = "NPR TM Admission";
 
@@ -30,7 +31,7 @@ page 6151135 "NPR TM Admis. Forecast Matrix"
                     ShowCaption = false;
                     field(DisplayOption; PageStatisticsOption)
                     {
-                        ApplicationArea = All;
+                        ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                         Caption = 'Display Option';
                         OptionCaption = 'Sales,Reservations,Utilization Pct.,Capacity Pct.';
 
@@ -42,7 +43,7 @@ page 6151135 "NPR TM Admis. Forecast Matrix"
                     }
                     field(Periodtype; PagePeriodOption)
                     {
-                        ApplicationArea = All;
+                        ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                         Caption = 'Periodtype';
                         OptionCaption = 'Actual,Day,Week,Month,Quarter,Year';
 
@@ -57,7 +58,7 @@ page 6151135 "NPR TM Admis. Forecast Matrix"
             }
             part(MATRIX; "NPR TM Admis. Forecast Lines")
             {
-                ApplicationArea = All;
+
             }
         }
     }
@@ -68,13 +69,14 @@ page 6151135 "NPR TM Admis. Forecast Matrix"
         {
             action("Previous Set")
             {
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Previous Set';
                 Image = PreviousSet;
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ToolTip = 'Previous Set';
-                ApplicationArea = All;
+
 
                 trigger OnAction()
                 begin
@@ -85,13 +87,14 @@ page 6151135 "NPR TM Admis. Forecast Matrix"
             }
             action("Previous Column")
             {
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Previous Column';
                 Image = PreviousRecord;
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ToolTip = 'Previous Set';
-                ApplicationArea = All;
+
 
                 trigger OnAction()
                 begin
@@ -102,13 +105,14 @@ page 6151135 "NPR TM Admis. Forecast Matrix"
             }
             action("Next Column")
             {
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Next Column';
                 Image = NextRecord;
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ToolTip = 'Next Set';
-                ApplicationArea = All;
+
 
                 trigger OnAction()
                 begin
@@ -119,13 +123,14 @@ page 6151135 "NPR TM Admis. Forecast Matrix"
             }
             action("Next Set")
             {
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Next Set';
                 Image = NextSet;
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ToolTip = 'Next Set';
-                ApplicationArea = All;
+
 
                 trigger OnAction()
                 begin
@@ -138,6 +143,8 @@ page 6151135 "NPR TM Admis. Forecast Matrix"
         {
             action(Statistics)
             {
+                ToolTip = 'Navigate to Ticket Statistics';
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Ticket Statistics';
                 Ellipsis = true;
                 Image = Statistics;
@@ -145,7 +152,7 @@ page 6151135 "NPR TM Admis. Forecast Matrix"
                 PromotedCategory = "Report";
                 PromotedIsBig = true;
                 RunObject = Page "NPR TM Ticket Acc. Stat. Mtrx";
-                ApplicationArea = All;
+
             }
         }
     }

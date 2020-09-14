@@ -1,4 +1,4 @@
-page 6060079 "NPR TM Ticket Setup"
+﻿page 6060079 "NPR TM Ticket Setup"
 {
     // TM1.26/NPKNAV/20171122  CASE 285601-01 Transport TM1.26 - 22 November 2017
     // TM1.27/TSA /20171218 CASE 300395 added field "Timeout (ms)"
@@ -10,6 +10,9 @@ page 6060079 "NPR TM Ticket Setup"
     Caption = 'Ticket Setup';
     PageType = Card;
     SourceTable = "NPR TM Ticket Setup";
+    UsageCategory = Administration;
+
+    AdditionalSearchTerms = 'Ticket Wizard, Ticket Application Area';
 
     layout
     {
@@ -19,57 +22,57 @@ page 6060079 "NPR TM Ticket Setup"
             {
                 field("Print Server Generator URL"; "Print Server Generator URL")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
                 }
                 field("Print Server Gen. Username"; "Print Server Gen. Username")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
                 }
                 field("Print Server Gen. Password"; "Print Server Gen. Password")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
                 }
                 field("Print Server Ticket URL"; "Print Server Ticket URL")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
                 }
                 field("Print Server Order URL"; "Print Server Order URL")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
                 }
                 field("Default Ticket Language"; "Default Ticket Language")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
                 }
                 field("Timeout (ms)"; "Timeout (ms)")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
                 }
                 group("Description Selection")
                 {
                     field("Store Code"; "Store Code")
                     {
-                        ApplicationArea = All;
+                        ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
                     }
                     field("Ticket Title"; "Ticket Title")
                     {
-                        ApplicationArea = All;
+                        ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
                     }
                     field("Ticket Sub Title"; "Ticket Sub Title")
                     {
-                        ApplicationArea = All;
+                        ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
                     }
                     field("Ticket Name"; "Ticket Name")
                     {
-                        ApplicationArea = All;
+                        ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
                     }
                     field("Ticket Description"; "Ticket Description")
                     {
-                        ApplicationArea = All;
+                        ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
                     }
                     field("Ticket Full Description"; "Ticket Full Description")
                     {
-                        ApplicationArea = All;
+                        ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
                     }
                 }
             }
@@ -78,34 +81,34 @@ page 6060079 "NPR TM Ticket Setup"
                 Caption = 'eTicket';
                 field("NP-Pass Server Base URL"; "NP-Pass Server Base URL")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
                 }
                 field("NP-Pass Notification Method"; "NP-Pass Notification Method")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
                 }
                 field("NP-Pass API"; "NP-Pass API")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
                 }
                 field("NP-Pass Token"; "NP-Pass Token")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
                 }
                 group(Control)
                 {
                     Caption = 'Control';
                     field("Suppress Print When eTicket"; "Suppress Print When eTicket")
                     {
-                        ApplicationArea = All;
+                        ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
                     }
                     field("Show Send Fail Message In POS"; "Show Send Fail Message In POS")
                     {
-                        ApplicationArea = All;
+                        ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
                     }
                     field("Show Message Body (Debug)"; "Show Message Body (Debug)")
                     {
-                        ApplicationArea = All;
+                        ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
                         Visible = false;
                     }
                 }
@@ -118,23 +121,23 @@ page 6060079 "NPR TM Ticket Setup"
                     Caption = 'Prepaid';
                     field("Prepaid Excel Export Prompt"; "Prepaid Excel Export Prompt")
                     {
-                        ApplicationArea = All;
+                        ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     }
                     field("Prepaid Offline Valid. Prompt"; "Prepaid Offline Valid. Prompt")
                     {
-                        ApplicationArea = All;
+                        ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     }
                     field("Prepaid Ticket Result List"; "Prepaid Ticket Result List")
                     {
-                        ApplicationArea = All;
+                        ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     }
                     field("Prepaid Default Quantity"; "Prepaid Default Quantity")
                     {
-                        ApplicationArea = All;
+                        ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     }
                     field("Prepaid Ticket Server Export"; "Prepaid Ticket Server Export")
                     {
-                        ApplicationArea = All;
+                        ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     }
                 }
                 group(Postpaid)
@@ -142,19 +145,19 @@ page 6060079 "NPR TM Ticket Setup"
                     Caption = 'Postpaid';
                     field("Postpaid Excel Export Prompt"; "Postpaid Excel Export Prompt")
                     {
-                        ApplicationArea = All;
+                        ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     }
                     field("Postpaid Ticket Result List"; "Postpaid Ticket Result List")
                     {
-                        ApplicationArea = All;
+                        ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     }
                     field("Postpaid Default Quantity"; "Postpaid Default Quantity")
                     {
-                        ApplicationArea = All;
+                        ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     }
                     field("Postpaid Ticket Server Export"; "Postpaid Ticket Server Export")
                     {
-                        ApplicationArea = All;
+                        ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     }
                 }
             }
@@ -163,31 +166,31 @@ page 6060079 "NPR TM Ticket Setup"
                 Caption = 'Wizard';
                 field("Wizard Ticket Type No. Series"; "Wizard Ticket Type No. Series")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Wizard Ticket Type Template"; "Wizard Ticket Type Template")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Wizard Ticket Bom Template"; "Wizard Ticket Bom Template")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Wizard Adm. Code No. Series"; "Wizard Adm. Code No. Series")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Wizard Admission Template"; "Wizard Admission Template")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Wizard Sch. Code No. Series"; "Wizard Sch. Code No. Series")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Wizard Item No. Series"; "Wizard Item No. Series")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
             }
         }
@@ -197,6 +200,50 @@ page 6060079 "NPR TM Ticket Setup"
     {
         area(navigation)
         {
+            action(ApplicationArea)
+            {
+
+                Caption = 'Ticket Application Area';
+                Ellipsis = true;
+                RunObject = Page "NPR Ticket App. Area Setup";
+            }
+
+        }
+        area(Processing)
+        {
+            action(TicketWizard)
+            {
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                ToolTip = 'Create all required setup for a ticket from a single page.';
+                Caption = 'Ticket Wizard';
+                Ellipsis = true;
+                Image = Action;
+                Promoted = true;
+                PromotedCategory = Process;
+                trigger OnAction()
+                var
+                    TicketWizardMgr: Codeunit "NPR TM Ticket Wizard";
+                begin
+                    TicketWizardMgr.Run();
+                end;
+
+            }
+
+            action(DemoData)
+            {
+                ApplicationArea = NPRTicketAdvanced;
+                Caption = 'Create DEMO Data';
+                ToolTip = 'Creates the NPR Demo Setup used when demonstrating ticketing.';
+                Ellipsis = true;
+                Image = CarryOutActionMessage;
+                Promoted = false;
+                trigger OnAction()
+                var
+                    TicketDemoSetup: Codeunit "NPR TM Ticket Create Demo Data";
+                begin
+                    TicketDemoSetup.CreateTicketDemoData(false);
+                end;
+            }
         }
     }
 }

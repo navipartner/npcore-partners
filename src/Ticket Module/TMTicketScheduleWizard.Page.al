@@ -1,4 +1,4 @@
-page 6151134 "NPR TM Ticket Schedule Wizard"
+﻿page 6151134 "NPR TM Ticket Schedule Wizard"
 {
     // TM90.1.46/TSA /20200320 CASE 397084 Initial Version
 
@@ -8,6 +8,7 @@ page 6151134 "NPR TM Ticket Schedule Wizard"
     ShowFilter = false;
     SourceTable = "NPR TM Admis. Schedule";
     SourceTableTemporary = true;
+    usagecategory = None;
 
     layout
     {
@@ -18,63 +19,63 @@ page 6151134 "NPR TM Ticket Schedule Wizard"
                 ShowCaption = false;
                 field("Schedule Code"; "Schedule Code")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Visible = false;
                 }
                 field("Start Time"; "Start Time")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ShowMandatory = true;
                 }
                 field("Stop Time"; "Stop Time")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ShowMandatory = true;
                 }
                 field(Monday; Monday)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field(Tuesday; Tuesday)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field(Wednesday; Wednesday)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field(Thursday; Thursday)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field(Friday; Friday)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field(Saturday; Saturday)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field(Sunday; Sunday)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Capacity Control"; "Capacity Control")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Max Capacity Per Sch. Entry"; "Max Capacity Per Sch. Entry")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Capacity';
                 }
                 field("Prebook From"; "Prebook From")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Prebook Is Required"; "Prebook Is Required")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
             }
         }

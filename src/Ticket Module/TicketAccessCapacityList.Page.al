@@ -1,4 +1,4 @@
-page 6059787 "NPR Ticket AccessCapacity List"
+﻿page 6059787 "NPR Ticket AccessCapacity List"
 {
     Caption = 'Access Capacity';
     SourceTable = "NPR Ticket Access Cap. Slots";
@@ -9,7 +9,7 @@ page 6059787 "NPR Ticket AccessCapacity List"
         {
             field(TicketTypeFilter; TicketTypeFilter)
             {
-                ApplicationArea = All;
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Type';
 
                 trigger OnLookup(var Text: Text): Boolean
@@ -27,7 +27,7 @@ page 6059787 "NPR Ticket AccessCapacity List"
             }
             field(DateFilter; DateFilter)
             {
-                ApplicationArea = All;
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Date';
 
                 trigger OnValidate()
@@ -43,31 +43,31 @@ page 6059787 "NPR Ticket AccessCapacity List"
                 ShowCaption = false;
                 field("Ticket Type Code"; "Ticket Type Code")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Access Date"; "Access Date")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Access Start"; "Access Start")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Access End"; "Access End")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field(Description; Description)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field(Quantity; Quantity)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Quantity Reserved"; "Quantity Reserved")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
             }
         }

@@ -1,4 +1,4 @@
-page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
+﻿page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
 {
     // NPR4.14/TSA/20150803 CASE214262 - Initial Version
     // TM1.00/TSA /20151217 CASE 219658-01 NaviPartner Ticket Management
@@ -21,6 +21,7 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
     Caption = 'Ticket Access Statistics Matrix';
     PageType = ListPlus;
     UsageCategory = ReportsAndAnalysis;
+    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
 
     layout
     {
@@ -33,7 +34,7 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
                     Caption = 'Matrix';
                     field("fld_LineFactOption"; LineFactOption)
                     {
-                        ApplicationArea = All;
+                        ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                         Caption = 'Show as Lines';
                         Importance = Promoted;
                         OptionCaption = 'Item,Ticket Type,Admission Date,Admission Hour,Period,Admission Code,Variant Code';
@@ -52,7 +53,7 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
                     }
                     field("fld_ColumnFactOption"; ColumnFactOption)
                     {
-                        ApplicationArea = All;
+                        ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                         Caption = 'Show as Columns';
                         Importance = Promoted;
                         OptionCaption = 'Item,Ticket Type,Admission Date,Admission Hour,Period,Admission Code,Variant Code';
@@ -77,7 +78,7 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
                     Caption = 'Display';
                     field("fld_FactNameAsColumnHeading"; FactNameAsColumnHeading)
                     {
-                        ApplicationArea = All;
+                        ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                         Caption = 'Fact Name As Column Heading';
                         Importance = Additional;
 
@@ -89,7 +90,7 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
                     }
                     field("fld_HideAdmission"; HideLinesWithZeroAdmissionCount)
                     {
-                        ApplicationArea = All;
+                        ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                         Caption = 'Hide Lines having Zero Admitted';
                         Importance = Additional;
 
@@ -107,14 +108,14 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
                     Caption = 'Metrics';
                     field(VerticalTotalText; VerticalTotalText)
                     {
-                        ApplicationArea = All;
+                        ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                         Caption = 'Matrix Total';
                         Editable = false;
                         Importance = Promoted;
                     }
                     field(AdmissionDefinition; AdmissionDefinition)
                     {
-                        ApplicationArea = All;
+                        ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                         Caption = 'Admission Count Def.';
                         Importance = Additional;
                         OptionCaption = 'Admitted Count,Admitted minus Revoked,Admitted incl. Revisits';
@@ -127,7 +128,7 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
                     }
                     field("fld_DisplayOption"; DisplayOption)
                     {
-                        ApplicationArea = All;
+                        ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                         Caption = 'Show Value As';
                         Importance = Promoted;
                         OptionCaption = 'Admission Count,Count & Trend,Trend';
@@ -140,7 +141,7 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
                     }
                     field("fld_PeriodType"; PeriodType)
                     {
-                        ApplicationArea = All;
+                        ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                         Caption = 'View by';
                         Importance = Additional;
                         OptionCaption = 'Day,Week,Month,Quarter,Year,Accounting Period';
@@ -155,7 +156,7 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
                     }
                     field("fld_TrendPeriodType"; TrendPeriodType)
                     {
-                        ApplicationArea = All;
+                        ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                         Caption = 'Trend Period Type';
                         Importance = Additional;
                         OptionCaption = 'Period,Year';
@@ -171,14 +172,14 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
             part(MATRIX; "NPR TM Ticket Acs. Stat.Lines")
             {
                 ShowFilter = false;
-                ApplicationArea = All;
+
             }
             group("Matrix Filters")
             {
                 Caption = 'Matrix Filters';
                 field(ItemFactFilter; ItemFactFilter)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Item Filter';
 
                     trigger OnLookup(var Text: Text): Boolean
@@ -197,7 +198,7 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
                 }
                 field(TicketTypeFactFilter; TicketTypeFactFilter)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Ticket Type Filter';
 
                     trigger OnLookup(var Text: Text): Boolean
@@ -216,7 +217,7 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
                 }
                 field(DateFactFilter; DateFactFilter)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Date Filter';
 
                     trigger OnLookup(var Text: Text): Boolean
@@ -252,7 +253,7 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
                 }
                 field(HourFactFilter; HourFactFilter)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Hour Filter';
 
                     trigger OnLookup(var Text: Text): Boolean
@@ -269,7 +270,7 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
                 }
                 field(AdmissionCodeFilter; AdmissionCodeFilter)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Admission Code Filter';
 
                     trigger OnLookup(var Text: Text): Boolean
@@ -286,7 +287,7 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
                 }
                 field(VariantCodeFilter; VariantCodeFilter)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Variant Code Filter';
 
                     trigger OnLookup(var Text: Text): Boolean
@@ -307,31 +308,31 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
                 Caption = 'Blocked Facts';
                 field(BlockedItemFactFilter; BlockedItemFactFilter)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Blocked Item Filter';
                     Editable = false;
                 }
                 field(BlockedTicketTypeFactFilter; BlockedTicketTypeFactFilter)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Blocked Ticket Type Filter';
                     Editable = false;
                 }
                 field(BlockedHourFactFilter; BlockedHourFactFilter)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Blocked Hour Filter';
                     Editable = false;
                 }
                 field(BlockedAdmissionFactFilter; BlockedAdmissionFactFilter)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Blocked Admisson Filter';
                     Editable = false;
                 }
                 field(BlockedVariantFactFilter; BlockedVariantFactFilter)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Blocked Variant Code Filter';
                     Editable = false;
                 }
@@ -345,11 +346,13 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
         {
             action("Update Statistics")
             {
+                ToolTip = 'Update statistics with the latest admission information.';
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Update Statistics';
                 Image = Refresh;
                 Promoted = true;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
 
                 trigger OnAction()
                 begin
@@ -365,11 +368,13 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
                 Caption = 'Periods';
                 action("Next Period")
                 {
+                    ToolTip = 'Next Period';
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Next Period';
                     Image = NextRecord;
                     Promoted = true;
                     PromotedCategory = Process;
-                    ApplicationArea = All;
+
 
                     trigger OnAction()
                     begin
@@ -383,11 +388,13 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
                 }
                 action("Previous Period")
                 {
+                    ToolTip = 'Previous Period';
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Previous Period';
                     Image = PreviousRecord;
                     Promoted = true;
                     PromotedCategory = Process;
-                    ApplicationArea = All;
+
 
                     trigger OnAction()
                     begin
@@ -401,13 +408,14 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
                 }
                 action("Previous Set")
                 {
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Previous Set';
                     Image = PreviousSet;
                     Promoted = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ToolTip = 'Previous Set';
-                    ApplicationArea = All;
+
 
                     trigger OnAction()
                     begin
@@ -417,13 +425,14 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
                 }
                 action("Previous Column")
                 {
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Previous Column';
                     Image = PreviousRecord;
                     Promoted = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ToolTip = 'Previous Set';
-                    ApplicationArea = All;
+
 
                     trigger OnAction()
                     begin
@@ -433,13 +442,14 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
                 }
                 action("Next Column")
                 {
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Next Column';
                     Image = NextRecord;
                     Promoted = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ToolTip = 'Next Set';
-                    ApplicationArea = All;
+
 
                     trigger OnAction()
                     begin
@@ -449,13 +459,14 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
                 }
                 action("Next Set")
                 {
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Next Set';
                     Image = NextSet;
                     Promoted = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ToolTip = 'Next Set';
-                    ApplicationArea = All;
+
 
                     trigger OnAction()
                     begin
@@ -469,6 +480,8 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
         {
             action(Forecast)
             {
+                ToolTip = 'Navigate to Admission Forecast.';
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Admission Forecast';
                 Ellipsis = true;
                 Image = Forecast;
@@ -476,7 +489,7 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
                 PromotedCategory = "Report";
                 PromotedIsBig = true;
                 RunObject = Page "NPR TM Admis. Forecast Matrix";
-                ApplicationArea = All;
+
             }
         }
     }

@@ -1,4 +1,4 @@
-page 6059788 "NPR Ticket Access Reserv. List"
+﻿page 6059788 "NPR Ticket Access Reserv. List"
 {
     Caption = 'Ticket Access Reservation';
     PageType = List;
@@ -12,27 +12,27 @@ page 6059788 "NPR Ticket Access Reserv. List"
             {
                 field(Description; Description)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field(StartTime; StartTime)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'From Time';
                     Editable = false;
                 }
                 field(EndTime; EndTime)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'To Time';
                     Editable = false;
                 }
                 field("Customer No."; "Customer No.")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field(Quantity; Quantity)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
             }
         }
@@ -44,10 +44,12 @@ page 6059788 "NPR Ticket Access Reserv. List"
         {
             action("Print Ticket")
             {
+                ToolTip = 'Print single ticket.';
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Print Ticket';
                 Image = Print;
                 ShortCutKey = 'Ctrl+P';
-                ApplicationArea = All;
+
 
                 trigger OnAction()
                 var
@@ -61,10 +63,12 @@ page 6059788 "NPR Ticket Access Reserv. List"
             }
             action("Print Selected Tickets")
             {
+                ToolTip = 'Print selected tickets.';
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Print Selected Tickets';
                 Image = Print;
                 ShortCutKey = 'Shift+Ctrl+P';
-                ApplicationArea = All;
+
 
                 trigger OnAction()
                 var
