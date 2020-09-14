@@ -1,4 +1,4 @@
-page 6060120 "NPR TM Ticket Admissions"
+﻿page 6060120 "NPR TM Ticket Admissions"
 {
     // TM1.00/TSA/20151217  CASE 228982 NaviPartner Ticket Management
     // TM1.08/TSA/20160262  CASE 232262 Dependant admission objects
@@ -20,6 +20,7 @@ page 6060120 "NPR TM Ticket Admissions"
     PageType = List;
     SourceTable = "NPR TM Admission";
     UsageCategory = Administration;
+    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
 
     layout
     {
@@ -29,89 +30,89 @@ page 6060120 "NPR TM Ticket Admissions"
             {
                 field("Admission Code"; "Admission Code")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field(Type; Type)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field(Description; Description)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Location Admission Code"; "Location Admission Code")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketAdvanced;
                     Visible = false;
                 }
                 field("Capacity Limits By"; "Capacity Limits By")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Default Schedule"; "Default Schedule")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Prebook Is Required"; "Prebook Is Required")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Max Capacity Per Sch. Entry"; "Max Capacity Per Sch. Entry")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Reserved For Web"; "Reserved For Web")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketAdvanced;
                     Visible = false;
                 }
                 field("Reserved For Members"; "Reserved For Members")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketAdvanced;
                     Visible = false;
                 }
                 field("Capacity Control"; "Capacity Control")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Prebook From"; "Prebook From")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Ticketholder Notification Type"; "Ticketholder Notification Type")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Stakeholder (E-Mail/Phone No.)"; "Stakeholder (E-Mail/Phone No.)")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketAdvanced;
                 }
                 field("Dependent Admission Code"; "Dependent Admission Code")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketAdvanced;
                     Visible = false;
                 }
                 field("Dependency Type"; "Dependency Type")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketAdvanced;
                     Visible = false;
                 }
                 field("Dependency Timeframe"; "Dependency Timeframe")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketAdvanced;
                     Visible = false;
                 }
                 field("POS Schedule Selection Date F."; "POS Schedule Selection Date F.")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Admission Base Calendar Code"; "Admission Base Calendar Code")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketAdvanced;
                 }
                 field("AdmissionCustomized Calendar"; CalendarMgmt.CustomizedChangesExist(CustomizedCalendarChangeAdmissionTemp))
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketAdvanced;
                     Caption = 'Admission Customized Calendar';
                     Editable = false;
 
@@ -124,11 +125,11 @@ page 6060120 "NPR TM Ticket Admissions"
                 }
                 field("Ticket Base Calendar Code"; "Ticket Base Calendar Code")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketAdvanced;
                 }
                 field("TicketCustomized Calendar"; CalendarMgmt.CustomizedChangesExist(CustomizedCalendarChangeTicketTemp))
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketAdvanced;
                     Caption = 'Ticket Customized Calendar';
                     Editable = false;
 
@@ -141,12 +142,12 @@ page 6060120 "NPR TM Ticket Admissions"
                 }
                 field("eTicket Type Code"; "eTicket Type Code")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
                     Visible = false;
                 }
                 field("Waiting List Setup Code"; "Waiting List Setup Code")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketAdvanced;
                 }
             }
         }
@@ -158,53 +159,65 @@ page 6060120 "NPR TM Ticket Admissions"
         {
             action("Ticket BOM")
             {
+                ToolTip = 'Navigate to Ticket BOM.';
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Ticket Admission BOM';
                 Image = BOM;
                 Promoted = true;
                 PromotedCategory = Process;
                 RunObject = Page "NPR TM Ticket BOM";
                 RunPageLink = "Admission Code" = FIELD("Admission Code");
-                ApplicationArea = All;
+
             }
             action(Schedules)
             {
+                ToolTip = 'Navigate to Schedules';
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Schedules';
                 Image = Workdays;
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR TM Ticket Schedules";
-                ApplicationArea = All;
+
             }
             action("Admission Schedules")
             {
+                ToolTip = 'Navigate to Admission Schedules.';
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Admission Schedules';
                 Image = CalendarWorkcenter;
                 Promoted = true;
                 PromotedCategory = Process;
                 RunObject = Page "NPR TM Admis. Schedule Lines";
                 RunPageLink = "Admission Code" = FIELD("Admission Code");
-                ApplicationArea = All;
+
             }
             action("Event List")
             {
+                ToolTip = 'Generate a report on admissions.';
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Event List';
                 Image = CustomerList;
                 RunObject = Report "NPR TM Admission List";
-                ApplicationArea = All;
+
             }
             action("Seating Setup")
             {
+                ToolTip = 'Navigate to Seating Setup';
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Seating Setup';
                 Image = Segment;
                 //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedIsBig = true;
                 RunObject = Page "NPR TM Seating Setup";
                 RunPageLink = "Admission Code" = FIELD("Admission Code");
-                ApplicationArea = All;
+
             }
             action("Waiting List Setup")
             {
+                ToolTip = 'Navigate to Waiting List Setup';
+                ApplicationArea = NPRTicketAdvanced;
                 Caption = 'Waiting List Setup';
                 Ellipsis = true;
                 Image = Open;
@@ -213,16 +226,18 @@ page 6060120 "NPR TM Ticket Admissions"
                 //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedIsBig = true;
                 RunObject = Page "NPR TM Waiting List Setup";
-                ApplicationArea = All;
+
             }
         }
         area(processing)
         {
             action("Send Waitinglist Notifications")
             {
+                ToolTip = 'Send notifications to those on waitinglist.';
+                ApplicationArea = NPRTicketAdvanced;
                 Caption = 'Send Waitinglist Notifications';
                 Image = Interaction;
-                ApplicationArea = All;
+
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = Process;
                 //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
@@ -244,11 +259,13 @@ page 6060120 "NPR TM Ticket Admissions"
         {
             action("Admission Forecast")
             {
+                ToolTip = 'Navigate to Admission Forecast.';
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Image = Forecast;
                 Promoted = true;
                 PromotedCategory = "Report";
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
 
                 trigger OnAction()
                 var
@@ -270,13 +287,13 @@ page 6060120 "NPR TM Ticket Admissions"
         CustomizedCalendarChangeAdmissionTemp."Source Type" := CustomizedCalendarChangeAdmissionTemp."Source Type"::Location;
         CustomizedCalendarChangeAdmissionTemp."Source Code" := "Admission Code";
         CustomizedCalendarChangeAdmissionTemp."Base Calendar Code" := "Admission Base Calendar Code";
-        CustomizedCalendarChangeAdmissionTemp.Insert();
+        if (not CustomizedCalendarChangeAdmissionTemp.Insert()) then;
 
         Clear(CustomizedCalendarChangeTicketTemp);
         CustomizedCalendarChangeTicketTemp."Source Type" := CustomizedCalendarChangeTicketTemp."Source Type"::Service;
         CustomizedCalendarChangeTicketTemp."Source Code" := "Admission Code";
         CustomizedCalendarChangeTicketTemp."Base Calendar Code" := "Ticket Base Calendar Code";
-        CustomizedCalendarChangeTicketTemp.Insert();
+        if (not CustomizedCalendarChangeTicketTemp.Insert()) then;
     end;
 
     var

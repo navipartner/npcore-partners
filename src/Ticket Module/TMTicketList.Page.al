@@ -1,4 +1,4 @@
-page 6059785 "NPR TM Ticket List"
+﻿page 6059785 "NPR TM Ticket List"
 {
     // TM1.00/TSA/20151217  CASE 219658-01 NaviPartner Ticket Management
     // TM1.12/TSA/20160407  CASE 230600 Added DAN Captions
@@ -26,6 +26,7 @@ page 6059785 "NPR TM Ticket List"
     SourceTable = "NPR TM Ticket";
     SourceTableView = ORDER(Descending);
     UsageCategory = Lists;
+    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
 
     layout
     {
@@ -35,101 +36,101 @@ page 6059785 "NPR TM Ticket List"
             {
                 field("No."; "No.")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("External Ticket No."; "External Ticket No.")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Ticket Type Code"; "Ticket Type Code")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Valid From Date"; "Valid From Date")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Valid From Time"; "Valid From Time")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Valid To Date"; "Valid To Date")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Valid To Time"; "Valid To Time")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field(Blocked; Blocked)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Blocked Date"; "Blocked Date")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Printed Date"; "Printed Date")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Visible = false;
                 }
                 field("Salesperson Code"; "Salesperson Code")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Document Date"; "Document Date")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Source Code"; "Source Code")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Visible = false;
                 }
                 field("Customer No."; "Customer No.")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Visible = false;
                 }
                 field("Sales Header Type"; "Sales Header Type")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Visible = false;
                 }
                 field("Sales Header No."; "Sales Header No.")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Visible = false;
                 }
                 field("Sales Receipt No."; "Sales Receipt No.")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Line No."; "Line No.")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("External Member Card No."; "External Member Card No.")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketAdvanced;
                 }
                 field("No. Of Access"; "No. Of Access")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Visible = false;
                 }
                 field("Item No."; "Item No.")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Variant Code"; "Variant Code")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Last Date Modified"; "Last Date Modified")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
             }
         }
@@ -141,11 +142,13 @@ page 6059785 "NPR TM Ticket List"
         {
             action("Create eTicket")
             {
+                ToolTip = 'Create and send ticket to wallet.';
+                ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
                 Caption = 'Create eTicket';
                 Image = ElectronicNumber;
                 Promoted = true;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
 
                 trigger OnAction()
                 begin
@@ -157,9 +160,11 @@ page 6059785 "NPR TM Ticket List"
             }
             action("Block/Unblock Tickets")
             {
+                ToolTip = 'Prevents the tickets from being used (reversible).';
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Block/Unblock Tickets';
                 Image = Change;
-                ApplicationArea = All;
+
 
                 trigger OnAction()
                 begin
@@ -168,10 +173,12 @@ page 6059785 "NPR TM Ticket List"
             }
             action("Revoke Ticket")
             {
+                ToolTip = 'Prevents the tickets from being used (irreversible).';
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Revoke Ticket';
                 Ellipsis = true;
                 Image = RemoveLine;
-                ApplicationArea = All;
+
 
                 trigger OnAction()
                 begin
@@ -183,6 +190,8 @@ page 6059785 "NPR TM Ticket List"
         {
             action("Access Entries")
             {
+                ToolTip = 'Navigate to ticket access entries.';
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Access Entries';
                 Ellipsis = true;
                 Image = EntriesList;
@@ -191,16 +200,18 @@ page 6059785 "NPR TM Ticket List"
                 PromotedIsBig = true;
                 RunObject = Page "NPR TM Ticket AccessEntry List";
                 RunPageLink = "Ticket No." = FIELD("No.");
-                ApplicationArea = All;
+
             }
             action(Ticketholder)
             {
+                ToolTip = 'Edit ticket holder.';
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Ticketholder';
                 Ellipsis = true;
                 Image = WIPEntries;
                 Promoted = true;
                 PromotedCategory = Process;
-                ApplicationArea = All;
+
 
                 trigger OnAction()
                 begin
@@ -209,6 +220,8 @@ page 6059785 "NPR TM Ticket List"
             }
             action("Ticket Request")
             {
+                ToolTip = 'Navigate to Ticket Request.';
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Ticket Request';
                 Ellipsis = true;
                 Image = Navigate;
@@ -216,18 +229,20 @@ page 6059785 "NPR TM Ticket List"
                 PromotedCategory = Process;
                 RunObject = Page "NPR TM Ticket Request";
                 RunPageLink = "Entry No." = FIELD("Ticket Reservation Entry No.");
-                ApplicationArea = All;
+
             }
             separator(Separator6014406)
             {
             }
             action("View Online Ticket")
             {
+                ToolTip = 'Display the ticket as created on ticket server.';
+                ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
                 Caption = 'View Online Ticket';
                 Image = Web;
                 Promoted = true;
                 PromotedCategory = Process;
-                ApplicationArea = All;
+
 
                 trigger OnAction()
                 var
@@ -239,23 +254,27 @@ page 6059785 "NPR TM Ticket List"
             }
             action("View Ticket Notifications")
             {
+                ToolTip = 'Navigate to ticket notification entries.';
+                ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
                 Caption = 'View Ticket Notifications';
                 Ellipsis = true;
                 Image = ElectronicNumber;
                 RunObject = Page "NPR TM Ticket Notif. Entry";
                 RunPageLink = "Ticket No." = FIELD("No.");
-                ApplicationArea = All;
+
             }
             separator(Separator6014407)
             {
             }
             action("Print Selected Tickets")
             {
+                ToolTip = 'Print selected tickets.';
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Print Selected Tickets';
                 Image = Print;
                 Promoted = true;
                 ShortCutKey = 'Shift+Ctrl+P';
-                ApplicationArea = All;
+
 
                 trigger OnAction()
                 var
@@ -274,10 +293,12 @@ page 6059785 "NPR TM Ticket List"
             }
             action("Report Issued Tickets")
             {
+                ToolTip = 'Print a report of issued tickets.';
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Issued Tickets';
                 Image = Print;
                 RunObject = Report "NPR Issued Tickets";
-                ApplicationArea = All;
+
             }
         }
     }

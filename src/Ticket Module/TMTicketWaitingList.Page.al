@@ -1,4 +1,4 @@
-page 6151138 "NPR TM Ticket Waiting List"
+﻿page 6151138 "NPR TM Ticket Waiting List"
 {
     // TM1.45/TSA/20200122  CASE 380754 Transport TM1.45 - 22 January 2020
 
@@ -6,6 +6,8 @@ page 6151138 "NPR TM Ticket Waiting List"
     InsertAllowed = false;
     PageType = List;
     SourceTable = "NPR TM Ticket Wait. List";
+    UsageCategory = Lists;
+    ApplicationArea = NPRTicketAdvanced;
 
     layout
     {
@@ -15,65 +17,65 @@ page 6151138 "NPR TM Ticket Waiting List"
             {
                 field("Entry No."; "Entry No.")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketAdvanced;
                     Editable = false;
                     Visible = false;
                 }
                 field("External Schedule Entry No."; "External Schedule Entry No.")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketAdvanced;
                     Editable = false;
                     Visible = false;
                 }
                 field("Admission Code"; "Admission Code")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketAdvanced;
                     Editable = false;
                 }
                 field("Schedule Entry Description"; "Schedule Entry Description")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketAdvanced;
                     Editable = false;
                 }
                 field("Notification Address"; "Notification Address")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketAdvanced;
                 }
                 field("Created At"; "Created At")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketAdvanced;
                     Editable = false;
                 }
                 field(Token; Token)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketAdvanced;
                     Editable = false;
                 }
                 field("Item No."; "Item No.")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketAdvanced;
                     Editable = false;
                 }
                 field("Variant Code"; "Variant Code")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketAdvanced;
                     Editable = false;
                 }
                 field(Status; Status)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketAdvanced;
                 }
                 field("Notification Count"; "Notification Count")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketAdvanced;
                 }
                 field("Notified At"; "Notified At")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketAdvanced;
                 }
                 field("Notification Expires At"; "Notification Expires At")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketAdvanced;
                 }
             }
         }
@@ -85,6 +87,8 @@ page 6151138 "NPR TM Ticket Waiting List"
         {
             action("Notification Entries")
             {
+                ToolTip = 'Navigate to notification entries.';
+                ApplicationArea = NPRTicketAdvanced;
                 Caption = 'Notification Entries';
                 Ellipsis = true;
                 Image = ElectronicNumber;
@@ -93,16 +97,18 @@ page 6151138 "NPR TM Ticket Waiting List"
                 PromotedIsBig = true;
                 RunObject = Page "NPR TM Ticket Notif. Entry";
                 RunPageLink = "Ticket Token" = FIELD(Token);
-                ApplicationArea = All;
+
             }
             action("Notify Now")
             {
+                ToolTip = 'Send waitinglist notification now.';
+                ApplicationArea = NPRTicketAdvanced;
                 Caption = 'Notify Now';
                 Image = Interaction;
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
 
                 trigger OnAction()
                 var

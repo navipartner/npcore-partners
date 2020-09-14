@@ -1,4 +1,4 @@
-page 6060115 "NPR TM Ticket Access Stats"
+﻿page 6060115 "NPR TM Ticket Access Stats"
 {
     // NPR4.14/TSA/20150803/CASE214262 - Initial Version
     // TM1.00/TSA/20151217  CASE 228982 NaviPartner Ticket Management
@@ -13,6 +13,7 @@ page 6060115 "NPR TM Ticket Access Stats"
     PageType = List;
     SourceTable = "NPR TM Ticket Access Stats";
     UsageCategory = ReportsAndAnalysis;
+    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
 
     layout
     {
@@ -22,56 +23,56 @@ page 6060115 "NPR TM Ticket Access Stats"
             {
                 field("Entry No."; "Entry No.")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Visible = false;
                 }
                 field("Item No."; "Item No.")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Variant Code"; "Variant Code")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Ticket Type"; "Ticket Type")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Admission Code"; "Admission Code")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Admission Date"; "Admission Date")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Admission Hour"; "Admission Hour")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Admission Count"; "Admission Count")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Admission Count (Neg)"; "Admission Count (Neg)")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Admission Count (Re-Entry)"; "Admission Count (Re-Entry)")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Generated Count (Pos)"; "Generated Count (Pos)")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Generated Count (Neg)"; "Generated Count (Neg)")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Sum Admission Count"; "Sum Admission Count")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
             }
         }

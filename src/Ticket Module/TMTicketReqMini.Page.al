@@ -1,4 +1,4 @@
-page 6060101 "NPR TM Ticket Req. Mini"
+﻿page 6060101 "NPR TM Ticket Req. Mini"
 {
     // TM1.19/NPKNAV/20170309  CASE 266372 Transport TM1.19 - 8 March 2017
     // TM90.1.46/TSA /20200304 CASE 399138 Added a currpage update as changes did not "stick"
@@ -9,6 +9,7 @@ page 6060101 "NPR TM Ticket Req. Mini"
     PageType = ListPlus;
     SourceTable = "NPR TM Ticket Reservation Req.";
     SourceTableTemporary = true;
+    UsageCategory = None;
 
     layout
     {
@@ -18,12 +19,12 @@ page 6060101 "NPR TM Ticket Req. Mini"
             {
                 field("External Item Code"; "External Item Code")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Editable = false;
                 }
                 field(Quantity; Quantity)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
 
                     trigger OnValidate()
                     begin
@@ -35,21 +36,21 @@ page 6060101 "NPR TM Ticket Req. Mini"
                 }
                 field("Admission Code"; "Admission Code")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Editable = false;
                 }
                 field("Admission Description"; "Admission Description")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Editable = false;
                 }
                 field("Notification Method"; "Notification Method")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Notification Address"; "Notification Address")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
             }
         }

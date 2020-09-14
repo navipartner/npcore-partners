@@ -1,4 +1,4 @@
-page 6151131 "NPR TM Seating Template"
+﻿page 6151131 "NPR TM Seating Template"
 {
     // TM1.45/TSA/20200122  CASE 322432-01 Transport TM1.45 - 22 January 2020
 
@@ -8,6 +8,8 @@ page 6151131 "NPR TM Seating Template"
     PageType = List;
     SourceTable = "NPR TM Seating Template";
     SourceTableView = SORTING("Admission Code", Path);
+    UsageCategory = Administration;
+    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
 
     layout
     {
@@ -20,32 +22,32 @@ page 6151131 "NPR TM Seating Template"
                 ShowAsTree = true;
                 field(Description; Description)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Seating Code"; "Seating Code")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Admission Code"; "Admission Code")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Visible = false;
                 }
                 field("Entry Type"; "Entry Type")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field(Capacity; Capacity)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Reservation Category"; "Reservation Category")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Unit Price"; "Unit Price")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Style = StandardAccent;
                     StyleExpr = AccentuatedPrice;
                     Visible = false;
@@ -66,7 +68,7 @@ page 6151131 "NPR TM Seating Template"
                 }
                 field(UnitPrice; UnitPrice)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Unit Price';
                     Style = StandardAccent;
                     StyleExpr = AccentuatedPrice;
@@ -86,15 +88,15 @@ page 6151131 "NPR TM Seating Template"
                 }
                 field(Ordinal; Ordinal)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field(Path; Path)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Indent Level"; "Indent Level")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
             }
         }
@@ -106,11 +108,13 @@ page 6151131 "NPR TM Seating Template"
         {
             action("Delete")
             {
+                ToolTip = 'Remove area.';
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Delete';
                 Image = Delete;
                 Promoted = true;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
 
                 trigger OnAction()
                 begin
@@ -120,8 +124,10 @@ page 6151131 "NPR TM Seating Template"
             }
             action("Add Root")
             {
+                ToolTip = 'Add a new top area.';
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Add Root';
-                ApplicationArea = All;
+
 
                 trigger OnAction()
                 begin
@@ -132,13 +138,17 @@ page 6151131 "NPR TM Seating Template"
             }
             action("Add Parent")
             {
+                ToolTip = 'Add a parent area to selected area.';
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Add Parent';
-                ApplicationArea = All;
+
             }
             action("Add Child")
             {
+                ToolTip = 'Add a sub area to the selected area.';
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Add Child';
-                ApplicationArea = All;
+
 
                 trigger OnAction()
                 begin
@@ -148,8 +158,10 @@ page 6151131 "NPR TM Seating Template"
             }
             action("Add Sibling")
             {
+                ToolTip = 'Add an area on the same level as selected area.';
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Add Sibling';
-                ApplicationArea = All;
+
 
                 trigger OnAction()
                 begin
@@ -159,8 +171,10 @@ page 6151131 "NPR TM Seating Template"
             }
             action("Structure Wizard")
             {
+                ToolTip = 'Start the are create wizard.';
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Structure Wizard';
-                ApplicationArea = All;
+
 
                 trigger OnAction()
                 var
@@ -172,8 +186,10 @@ page 6151131 "NPR TM Seating Template"
             }
             action("Numbering Wizard")
             {
+                ToolTip = 'Start the seat number wizard.';
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Numbering Wizard';
-                ApplicationArea = All;
+
 
                 trigger OnAction()
                 var
@@ -186,8 +202,10 @@ page 6151131 "NPR TM Seating Template"
             }
             action("Split Wizard")
             {
+                ToolTip = 'Start the area split wizard.';
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Split Wizard';
-                ApplicationArea = All;
+
 
                 trigger OnAction()
                 var
@@ -203,6 +221,8 @@ page 6151131 "NPR TM Seating Template"
                 Caption = 'Order';
                 action("Move Up")
                 {
+                    ToolTip = 'Move area up.';
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Move Up';
                     Enabled = MoveUpEnabled;
                     Image = MoveUp;
@@ -210,7 +230,7 @@ page 6151131 "NPR TM Seating Template"
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
                     ShortCutKey = 'Shift+Ctrl+Up';
-                    ApplicationArea = All;
+
 
                     trigger OnAction()
                     begin
@@ -221,6 +241,8 @@ page 6151131 "NPR TM Seating Template"
                 }
                 action("Move Down")
                 {
+                    ToolTip = 'Move area down.';
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Move Down';
                     Enabled = MoveDownEnabled;
                     Image = MoveDown;
@@ -228,7 +250,7 @@ page 6151131 "NPR TM Seating Template"
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
                     ShortCutKey = 'Shift+Ctrl+Down';
-                    ApplicationArea = All;
+
 
                     trigger OnAction()
                     begin
@@ -243,8 +265,10 @@ page 6151131 "NPR TM Seating Template"
                 Caption = 'Indent';
                 action(DoUnindent)
                 {
+                    ToolTip = 'Unindent area.';
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Unindent';
-                    ApplicationArea = All;
+
 
                     trigger OnAction()
                     var
@@ -257,8 +281,10 @@ page 6151131 "NPR TM Seating Template"
                 }
                 action(Action6014422)
                 {
+                    ToolTip = 'Indent area. ';
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Indent';
-                    ApplicationArea = All;
+
 
                     trigger OnAction()
                     begin

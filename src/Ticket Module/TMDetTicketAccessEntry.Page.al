@@ -1,4 +1,4 @@
-page 6060123 "NPR TM Det. Ticket AccessEntry"
+﻿page 6060123 "NPR TM Det. Ticket AccessEntry"
 {
     // TM1.00/TSA/20151217  CASE 228982 NaviPartner Ticket Management
     // TM1.09/TSA/20160311  CASE 236742 UX Improvemets
@@ -14,6 +14,7 @@ page 6060123 "NPR TM Det. Ticket AccessEntry"
     ModifyAllowed = false;
     PageType = List;
     SourceTable = "NPR TM Det. Ticket AccessEntry";
+    UsageCategory = None;
 
     layout
     {
@@ -23,58 +24,58 @@ page 6060123 "NPR TM Det. Ticket AccessEntry"
             {
                 field("Entry No."; "Entry No.")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Posting Date"; "Posting Date")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Visible = false;
                 }
                 field("Ticket No."; "Ticket No.")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Ticket Access Entry No."; "Ticket Access Entry No.")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field(Type; Type)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("External Adm. Sch. Entry No."; "External Adm. Sch. Entry No.")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Scheduled Time"; ScheduledTime)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Scheduled Time';
                     Editable = false;
                 }
                 field(Quantity; Quantity)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Closed By Entry No."; "Closed By Entry No.")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field(Open; Open)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Sales Channel No."; "Sales Channel No.")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Created Datetime"; "Created Datetime")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("User ID"; "User ID")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
             }
         }
@@ -86,6 +87,8 @@ page 6060123 "NPR TM Det. Ticket AccessEntry"
         {
             action("Admission Schedule Entry")
             {
+                ToolTip = 'Navigate to list of issued tickets for this time entry.';
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Admission Schedule Entry';
                 Ellipsis = true;
                 Image = WorkCenterLoad;
@@ -94,17 +97,19 @@ page 6060123 "NPR TM Det. Ticket AccessEntry"
                 PromotedIsBig = true;
                 RunObject = Page "NPR TM Admis. Schedule Entry";
                 RunPageLink = "External Schedule Entry No." = FIELD("External Adm. Sch. Entry No.");
-                ApplicationArea = All;
+
             }
             action("Ticket Request")
             {
+                ToolTip = 'Navigate to list of ticket requests for thie time entry.';
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Ticket Request';
                 Ellipsis = true;
                 Image = Navigate;
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
 
                 trigger OnAction()
                 begin
@@ -118,9 +123,11 @@ page 6060123 "NPR TM Det. Ticket AccessEntry"
         {
             action("Unconsume Item")
             {
+                ToolTip = 'Unconsume the complimenatry item linked with this ticket.';
+                ApplicationArea = NPRTicketAdvanced;
                 Caption = 'Unconsume Item';
                 Image = ConsumptionJournal;
-                ApplicationArea = All;
+
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = Process;
 

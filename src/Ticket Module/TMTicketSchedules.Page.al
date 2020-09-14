@@ -1,4 +1,4 @@
-page 6060118 "NPR TM Ticket Schedules"
+﻿page 6060118 "NPR TM Ticket Schedules"
 {
     // TM1.00/TSA /20151217 CASE 228982 NaviPartner Ticket Management
     // TM1.11/TSA /20160404 CASE 232250 Added new fields 47 and 48
@@ -12,6 +12,7 @@ page 6060118 "NPR TM Ticket Schedules"
     PageType = List;
     SourceTable = "NPR TM Admis. Schedule";
     UsageCategory = Administration;
+    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
 
     layout
     {
@@ -21,155 +22,155 @@ page 6060118 "NPR TM Ticket Schedules"
             {
                 field("Schedule Code"; "Schedule Code")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Schedule Type"; "Schedule Type")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Admission Is"; "Admission Is")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field(Description; Description)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Start From"; "Start From")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Recurrence Until Pattern"; "Recurrence Until Pattern")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("End After Occurrence Count"; "End After Occurrence Count")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("End After Date"; "End After Date")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Recurrence Pattern"; "Recurrence Pattern")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Recur Every N On"; "Recur Every N On")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Start Time"; "Start Time")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Stop Time"; "Stop Time")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Event Duration"; "Event Duration")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Event Arrival From Time"; "Event Arrival From Time")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Event Arrival Until Time"; "Event Arrival Until Time")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Sales From Date (Rel.)"; "Sales From Date (Rel.)")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Sales From Time"; "Sales From Time")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Sales Until Date (Rel.)"; "Sales Until Date (Rel.)")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Sales Until Time"; "Sales Until Time")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field(Monday; Monday)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field(Tuesday; Tuesday)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field(Wednesday; Wednesday)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field(Thursday; Thursday)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field(Friday; Friday)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field(Saturday; Saturday)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field(Sunday; Sunday)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Prebook Is Required"; "Prebook Is Required")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Notify Stakeholder"; "Notify Stakeholder")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketAdvanced;
                 }
                 field("Max Capacity Per Sch. Entry"; "Max Capacity Per Sch. Entry")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Reserved For Web"; "Reserved For Web")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketAdvanced;
                     Visible = false;
                 }
                 field("Reserved For Members"; "Reserved For Members")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketAdvanced;
                     Visible = false;
                 }
                 field("Unbookable Before Start (Secs)"; "Unbookable Before Start (Secs)")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketAdvanced;
                     Visible = false;
                 }
                 field("Bookable Passed Start (Secs)"; "Bookable Passed Start (Secs)")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketAdvanced;
                     Visible = false;
                 }
                 field("Capacity Control"; "Capacity Control")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Prebook From"; "Prebook From")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Admission Base Calendar Code"; "Admission Base Calendar Code")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketAdvanced;
                 }
                 field("Customized Calendar"; CalendarMgmt.CustomizedChangesExist(CustomizedCalendarChangeTemp))
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketAdvanced;
                     Caption = 'Customized Calendar';
                     Editable = false;
 
@@ -190,15 +191,19 @@ page 6060118 "NPR TM Ticket Schedules"
         {
             action(Admission)
             {
+                ToolTip = 'Navigate to Admission List.';
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Admission';
                 Image = WorkCenter;
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
             }
             action("Admission Schedules")
             {
+                ToolTip = 'Navigate to Admission Schedules.';
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Admission Schedules';
                 Image = CalendarWorkcenter;
                 Promoted = true;
@@ -206,7 +211,7 @@ page 6060118 "NPR TM Ticket Schedules"
                 PromotedIsBig = true;
                 RunObject = Page "NPR TM Admis. Schedule Lines";
                 RunPageLink = "Schedule Code" = FIELD("Schedule Code");
-                ApplicationArea = All;
+
             }
         }
     }

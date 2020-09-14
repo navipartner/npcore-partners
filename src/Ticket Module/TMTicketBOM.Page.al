@@ -1,4 +1,4 @@
-page 6060121 "NPR TM Ticket BOM"
+﻿page 6060121 "NPR TM Ticket BOM"
 {
     // TM1.00/TSA/20151217  CASE 228982 NaviPartner Ticket Management
     // TM1.07/TSA/20160125  CASE 232495 Added field Default for auto selection for admission code
@@ -27,6 +27,7 @@ page 6060121 "NPR TM Ticket BOM"
     PageType = List;
     SourceTable = "NPR TM Ticket Admission BOM";
     UsageCategory = Administration;
+    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
 
     layout
     {
@@ -36,94 +37,94 @@ page 6060121 "NPR TM Ticket BOM"
             {
                 field("Item No."; "Item No.")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Variant Code"; "Variant Code")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Admission Code"; "Admission Code")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field(Default; Default)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Sales From Date"; "Sales From Date")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketAdvanced;
                 }
                 field("Sales Until Date"; "Sales Until Date")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketAdvanced;
                 }
                 field("Enforce Schedule Sales Limits"; "Enforce Schedule Sales Limits")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketAdvanced;
                 }
                 field("Admission Entry Validation"; "Admission Entry Validation")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Activation Method"; "Activation Method")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Visible = false;
                 }
                 field("Percentage of Adm. Capacity"; "Percentage of Adm. Capacity")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketAdvanced;
                 }
                 field("Max No. Of Entries"; "Max No. Of Entries")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Revisit Condition (Statistics)"; "Revisit Condition (Statistics)")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Duration Formula"; "Duration Formula")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Allow Rescan Within (Sec.)"; "Allow Rescan Within (Sec.)")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketAdvanced;
                 }
                 field("Prefered Sales Display Method"; "Prefered Sales Display Method")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketAdvanced;
                     Visible = false;
                 }
                 field(Quantity; Quantity)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketAdvanced;
                     Visible = false;
                 }
                 field(Description; Description)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Admission Description"; "Admission Description")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Revoke Policy"; "Revoke Policy")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Refund Price %"; "Refund Price %")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Ticket Base Calendar Code"; "Ticket Base Calendar Code")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketAdvanced;
                 }
                 field("Ticket Customized Calendar"; CalendarMgmt.CustomizedChangesExist(CustomizedCalendarChangeTemp))
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketAdvanced;
                     Caption = 'Customized Calendar';
                     Editable = false;
 
@@ -136,15 +137,15 @@ page 6060121 "NPR TM Ticket BOM"
                 }
                 field("Publish As eTicket"; "Publish As eTicket")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
                 }
                 field("eTicket Type Code"; "eTicket Type Code")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
                 }
                 field("Publish Ticket URL"; "Publish Ticket URL")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
                 }
             }
         }
@@ -156,32 +157,38 @@ page 6060121 "NPR TM Ticket BOM"
         {
             action(Admissions)
             {
+                ToolTip = 'Navigate to Admissions Setup';
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Admissions';
                 Image = WorkCenter;
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR TM Ticket Admissions";
-                ApplicationArea = All;
+
             }
             action("Ticket Setup")
             {
+                ToolTip = 'Navigate to ticket setup.';
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Ticket Setup';
                 Image = Setup;
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR TM Ticket Setup";
-                ApplicationArea = All;
+
             }
         }
         area(processing)
         {
             action("Create Prepaid Tickets")
             {
+                ToolTip = 'Create a set of tickets for which payment has already been handled. (F.ex. free tickets.) ';
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Create Prepaid Tickets';
                 Image = PrepaymentInvoice;
-                ApplicationArea = All;
+
 
                 trigger OnAction()
                 begin
@@ -190,9 +197,11 @@ page 6060121 "NPR TM Ticket BOM"
             }
             action("Create Postpaid Tickets")
             {
+                ToolTip = 'Create a set of tickets that can be invoiced after ticket has been used.';
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Create Postpaid Tickets';
                 Image = Invoice;
-                ApplicationArea = All;
+
 
                 trigger OnAction()
                 begin
@@ -208,7 +217,7 @@ page 6060121 "NPR TM Ticket BOM"
         CustomizedCalendarChangeTemp."Source Type" := CustomizedCalendarChangeTemp."Source Type"::Service;
         CustomizedCalendarChangeTemp."Source Code" := "Admission Code";
         CustomizedCalendarChangeTemp."Base Calendar Code" := "Ticket Base Calendar Code";
-        CustomizedCalendarChangeTemp.Insert();
+        if (not CustomizedCalendarChangeTemp.Insert()) then;
     end;
 
     var

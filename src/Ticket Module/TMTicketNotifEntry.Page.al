@@ -1,4 +1,4 @@
-page 6060065 "NPR TM Ticket Notif. Entry"
+﻿page 6060065 "NPR TM Ticket Notif. Entry"
 {
     // TM1.38/TSA/20181025  CASE 332109 Transport TM1.38 - 25 October 2018
     // TM1.39/NPKNAV/20190125  CASE 310057 Transport TM1.39 - 25 January 2019
@@ -11,6 +11,7 @@ page 6060065 "NPR TM Ticket Notif. Entry"
     InsertAllowed = false;
     PageType = List;
     SourceTable = "NPR TM Ticket Notif. Entry";
+    UsageCategory = None;
 
     layout
     {
@@ -20,163 +21,163 @@ page 6060065 "NPR TM Ticket Notif. Entry"
             {
                 field("Entry No."; "Entry No.")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Date To Notify"; "Date To Notify")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Notification Send Status"; "Notification Send Status")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Notification Sent At"; "Notification Sent At")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Notification Sent By User"; "Notification Sent By User")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Notification Trigger"; "Notification Trigger")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Ticket Trigger Type"; "Ticket Trigger Type")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Ticket Type Code"; "Ticket Type Code")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Ticket No."; "Ticket No.")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Ticket List Price"; "Ticket List Price")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Notification Method"; "Notification Method")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Notification Address"; "Notification Address")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Relevant Date"; "Relevant Date")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Relevant Time"; "Relevant Time")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Relevant Datetime"; "Relevant Datetime")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Expire Date"; "Expire Date")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Expire Time"; "Expire Time")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Expire Datetime"; "Expire Datetime")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field(Voided; Voided)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("External Ticket No."; "External Ticket No.")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Ticket No. for Printing"; "Ticket No. for Printing")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field(Section; Section)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field(Row; Row)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field(Seat; Seat)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Ticket Holder E-Mail"; "Ticket Holder E-Mail")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Ticket Holder Name"; "Ticket Holder Name")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Ticket BOM Adm. Description"; "Ticket BOM Adm. Description")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Adm. Event Description"; "Adm. Event Description")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Adm. Location Description"; "Adm. Location Description")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Ticket BOM Description"; "Ticket BOM Description")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Event Start Date"; "Event Start Date")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Event Start Time"; "Event Start Time")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Quantity To Admit"; "Quantity To Admit")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("Waiting List Reference Code"; "Waiting List Reference Code")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketAdvanced;
                 }
                 field("Failed With Message"; "Failed With Message")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("eTicket Type Code"; "eTicket Type Code")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
                 }
                 field("eTicket Pass Id"; "eTicket Pass Id")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
                 }
                 field("eTicket Pass Default URL"; "eTicket Pass Default URL")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
                 }
                 field("eTicket Pass Andriod URL"; "eTicket Pass Andriod URL")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
                 }
                 field("eTicket Pass Landing URL"; "eTicket Pass Landing URL")
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
                 }
             }
         }
@@ -188,12 +189,14 @@ page 6060065 "NPR TM Ticket Notif. Entry"
         {
             action("Recreate eTicket")
             {
+                ToolTip = 'Recreate wallet notification event.';
+                ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
                 Caption = 'Recreate eTicket';
                 Image = ElectronicNumber;
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
+
 
                 trigger OnAction()
                 var
@@ -209,11 +212,13 @@ page 6060065 "NPR TM Ticket Notif. Entry"
             }
             action("Resend eTicket")
             {
+                ToolTip = 'Resend wallet notification event. This will update wallet contents.';
+                ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
                 Caption = 'Resend eTicket';
                 Image = SendElectronicDocument;
                 Promoted = true;
                 PromotedCategory = Process;
-                ApplicationArea = All;
+
 
                 trigger OnAction()
                 var
@@ -236,9 +241,11 @@ page 6060065 "NPR TM Ticket Notif. Entry"
             }
             action("Show eTicket Template Data")
             {
+                ToolTip = 'Display information sent to wallet.';
+                ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
                 Caption = 'Show eTicket Template Data';
                 Image = ElectronicDoc;
-                ApplicationArea = All;
+
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = Process;
 
@@ -255,11 +262,13 @@ page 6060065 "NPR TM Ticket Notif. Entry"
             }
             action("Send Notification")
             {
+                ToolTip = 'Send notification to ticket holder.';
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Send Notification';
                 Image = SendElectronicDocument;
                 Promoted = true;
                 PromotedCategory = Process;
-                ApplicationArea = All;
+
 
                 trigger OnAction()
                 var

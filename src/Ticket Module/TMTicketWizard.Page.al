@@ -1,4 +1,4 @@
-page 6151133 "NPR TM Ticket Wizard"
+﻿page 6151133 "NPR TM Ticket Wizard"
 {
     // TM90.1.46/TSA /20200320 CASE 397084 Initial Version
 
@@ -12,7 +12,7 @@ page 6151133 "NPR TM Ticket Wizard"
     ShowFilter = false;
     SourceTable = "NPR TM Ticket Type";
     SourceTableTemporary = true;
-    UsageCategory = Administration;
+    UsageCategory = None;
 
     layout
     {
@@ -22,7 +22,7 @@ page 6151133 "NPR TM Ticket Wizard"
             {
                 field(TicketTypeCode; TmpTicketTypeCode)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Code';
                     ShowMandatory = true;
                     TableRelation = "NPR TM Ticket Type".Code;
@@ -34,7 +34,7 @@ page 6151133 "NPR TM Ticket Wizard"
                 }
                 field(ItemNo; TmpItemNo)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'No.';
                     TableRelation = Item;
 
@@ -45,7 +45,7 @@ page 6151133 "NPR TM Ticket Wizard"
                 }
                 field(Description; TmpDescription)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Description';
                     Editable = NOT (ItemNumberValid);
                     ShowMandatory = true;
@@ -61,7 +61,7 @@ page 6151133 "NPR TM Ticket Wizard"
                 }
                 field(ItemGroup; TmpItemGroup)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Item Group';
                     Editable = NOT (ItemNumberValid);
                     ShowMandatory = true;
@@ -69,7 +69,7 @@ page 6151133 "NPR TM Ticket Wizard"
                 }
                 field(UnitPrice; TmpUnitPrice)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Unit Price';
                 }
                 group(Control6014409)
@@ -77,12 +77,12 @@ page 6151133 "NPR TM Ticket Wizard"
                     ShowCaption = false;
                     field(StartDate; TmpStartDate)
                     {
-                        ApplicationArea = All;
+                        ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                         Caption = 'Start Date';
                     }
                     field(UntilDate; TmpUntilDate)
                     {
-                        ApplicationArea = All;
+                        ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                         Caption = 'Until Date';
                     }
                 }
@@ -90,7 +90,7 @@ page 6151133 "NPR TM Ticket Wizard"
             part(Schedules; "NPR TM Ticket Schedule Wizard")
             {
                 Caption = 'Schedules';
-                ApplicationArea = All;
+
             }
             group(Advanced)
             {
@@ -100,13 +100,13 @@ page 6151133 "NPR TM Ticket Wizard"
                     Caption = 'Ticket Type';
                     field(TicketTypeDescription; TmpTicketTypeDescription)
                     {
-                        ApplicationArea = All;
+                        ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                         Caption = 'Description';
                         Editable = NOT (TicketTypeCodeValid);
                     }
                     field(TmpTicketTypeTemplate; TmpTicketTypeTemplate)
                     {
-                        ApplicationArea = All;
+                        ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                         Caption = 'Ticket Type Template Code';
                         Importance = Additional;
                         TableRelation = "Config. Template Header" WHERE("Table ID" = CONST(6059784));
@@ -117,7 +117,7 @@ page 6151133 "NPR TM Ticket Wizard"
                     Caption = 'Admission';
                     field(AdmissionCode; TmpAdmissionCode)
                     {
-                        ApplicationArea = All;
+                        ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                         Caption = 'Code';
                         TableRelation = "NPR TM Admission"."Admission Code";
 
@@ -128,13 +128,13 @@ page 6151133 "NPR TM Ticket Wizard"
                     }
                     field(AdmissionDescription; TmpAdmissionDescription)
                     {
-                        ApplicationArea = All;
+                        ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                         Caption = 'Description';
                         Editable = NOT (AdmissionCodeValid);
                     }
                     field(TmpAdmissionTemplate; TmpAdmissionTemplate)
                     {
-                        ApplicationArea = All;
+                        ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                         Caption = 'Admission Template Code';
                         Importance = Additional;
                         TableRelation = "Config. Template Header" WHERE("Table ID" = CONST(6060120));
@@ -145,7 +145,7 @@ page 6151133 "NPR TM Ticket Wizard"
                     Caption = 'Ticket BOM';
                     field(TmpTicketBomTemplate; TmpTicketBomTemplate)
                     {
-                        ApplicationArea = All;
+                        ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                         Caption = 'Ticket BOM Template Code';
                         Importance = Additional;
                         TableRelation = "Config. Template Header" WHERE("Table ID" = CONST(6060121));
@@ -161,6 +161,8 @@ page 6151133 "NPR TM Ticket Wizard"
         {
             action("Config. Template List")
             {
+                ToolTip = 'Navigate to Template List';
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Config. Template List';
                 Ellipsis = true;
                 Image = Template;
@@ -168,7 +170,7 @@ page 6151133 "NPR TM Ticket Wizard"
                 //PromotedIsBig = true;
                 RunObject = Page "Config. Template List";
                 RunPageView = WHERE("Table ID" = FILTER(6059784 .. 6060130));
-                ApplicationArea = All;
+
             }
         }
     }
