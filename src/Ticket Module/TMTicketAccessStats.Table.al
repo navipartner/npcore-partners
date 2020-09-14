@@ -78,7 +78,7 @@ table 6060115 "NPR TM Ticket Access Stats"
             Caption = 'Generated Count (Neg)';
             DataClassification = CustomerContent;
         }
-        field(90; "Highest Access Entry No."; BigInteger)
+        field(90; "Highest Access Entry No."; Integer)
         {
             Caption = 'Highest Access Entry No.';
             DataClassification = CustomerContent;

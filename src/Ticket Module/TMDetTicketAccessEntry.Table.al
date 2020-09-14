@@ -16,7 +16,7 @@ table 6060123 "NPR TM Det. Ticket AccessEntry"
 
     fields
     {
-        field(1; "Entry No."; BigInteger)
+        field(1; "Entry No."; Integer)
         {
             AutoIncrement = true;
             Caption = 'Entry No.';
@@ -58,7 +58,7 @@ table 6060123 "NPR TM Det. Ticket AccessEntry"
             Caption = 'Quantity';
             DataClassification = CustomerContent;
         }
-        field(13; "Closed By Entry No."; BigInteger)
+        field(13; "Closed By Entry No."; Integer)
         {
             Caption = 'Closed By Entry No.';
             DataClassification = CustomerContent;

@@ -489,8 +489,8 @@ codeunit 6060114 "NPR TM Ticket Access Stats"
         TmpTicketStatisticsResult: Record "NPR TM Ticket Access Stats" temporary;
         StartDate: Date;
         MaxDate: Date;
-        FirstEntryNo: BigInteger;
-        LastEntryNo: BigInteger;
+        FirstEntryNo: Integer;
+        LastEntryNo: Integer;
         TmpRecBuf: Record "Record Buffer" temporary;
         PreviousAdmissionDate: Date;
         Ticket: Record "NPR TM Ticket";
@@ -530,8 +530,8 @@ codeunit 6060114 "NPR TM Ticket Access Stats"
     procedure BuildCompressedStatisticsAdHoc(FromDate: Date; UntilDate: Date; var TmpTicketStatisticsResult: Record "NPR TM Ticket Access Stats" temporary)
     var
         DetailAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
-        FirstEntryNo: BigInteger;
-        LastEntryNo: BigInteger;
+        FirstEntryNo: Integer;
+        LastEntryNo: Integer;
     begin
 
         //-TM1.39 [341335]
@@ -556,7 +556,7 @@ codeunit 6060114 "NPR TM Ticket Access Stats"
         //+TM1.39 [341335]
     end;
 
-    local procedure BuildCompressedStatisticsWorker(FirstEntryNo: BigInteger; LastEntryNo: BigInteger; AdHoc: Boolean; var TmpTicketStatisticsResult: Record "NPR TM Ticket Access Stats" temporary)
+    local procedure BuildCompressedStatisticsWorker(FirstEntryNo: Integer; LastEntryNo: Integer; AdHoc: Boolean; var TmpTicketStatisticsResult: Record "NPR TM Ticket Access Stats" temporary)
     var
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
         DetailAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
@@ -767,7 +767,7 @@ codeunit 6060114 "NPR TM Ticket Access Stats"
         end;
     end;
 
-    local procedure AddAccessStatistic(var tmpTicketStatistics: Record "NPR TM Ticket Access Stats"; TicketAccessEntry: Record "NPR TM Ticket Access Entry"; Ticket: Record "NPR TM Ticket"; AdmissionEntryNo: BigInteger; AdmissionType: Option; IsReEntry: Boolean)
+    local procedure AddAccessStatistic(var tmpTicketStatistics: Record "NPR TM Ticket Access Stats"; TicketAccessEntry: Record "NPR TM Ticket Access Entry"; Ticket: Record "NPR TM Ticket"; AdmissionEntryNo: Integer; AdmissionType: Option; IsReEntry: Boolean)
     var
         ItemFactCode: Code[20];
         TicketTypeFactCode: Code[20];
@@ -962,7 +962,7 @@ codeunit 6060114 "NPR TM Ticket Access Stats"
         exit(not DetTicketAccessEntry2.IsEmpty());
     end;
 
-    local procedure SelectEntriesOnDateTime(var FirstEntryNo: BigInteger; var LastEntryNo: BigInteger; var StartDate: Date; var MaxDate: Date)
+    local procedure SelectEntriesOnDateTime(var FirstEntryNo: Integer; var LastEntryNo: Integer; var StartDate: Date; var MaxDate: Date)
     var
         DetailAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
         TicketStatistics: Record "NPR TM Ticket Access Stats";
@@ -1017,7 +1017,7 @@ codeunit 6060114 "NPR TM Ticket Access Stats"
         LastEntryNo := DetailAccessEntry."Entry No.";
     end;
 
-    local procedure SelectEntries(var FirstEntryNo: BigInteger; var LastEntryNo: BigInteger; var StartDate: Date; var MaxDate: Date): Integer
+    local procedure SelectEntries(var FirstEntryNo: Integer; var LastEntryNo: Integer; var StartDate: Date; var MaxDate: Date): Integer
     var
         TicketAccessStatistics: Record "NPR TM Ticket Access Stats";
         DetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
@@ -1048,7 +1048,7 @@ codeunit 6060114 "NPR TM Ticket Access Stats"
         exit(LastEntryNo);
     end;
 
-    local procedure ReSelectEntries(var FirstEntryNo: BigInteger; var LastEntryNo: BigInteger): Integer
+    local procedure ReSelectEntries(var FirstEntryNo: Integer; var LastEntryNo: Integer): Integer
     var
         TicketAccessStatistics: Record "NPR TM Ticket Access Stats";
         DetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
