@@ -314,7 +314,7 @@ codeunit 6014505 "NPR Touch Screen - Func."
         //hentVisEkspStat()
         HeadingText := Txt001;
         SalePOSStatistics.SetRecord(SalePOS);
-        SalePOSStatistics.OnInit(0);
+        SalePOSStatistics.Initialize(0);
         SalePOSStatistics.GetSaleLineStat(NPRTempBuffer);
     end;
 
