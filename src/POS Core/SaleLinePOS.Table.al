@@ -1759,7 +1759,9 @@ table 6014406 "NPR Sale Line POS"
         {
             Caption = 'Product Group Code';
             DataClassification = CustomerContent;
-            Description = 'NPR5.000 [250375]';
+            ObsoleteState = No;
+            //ObsoleteReason = 'Product Groups became first level children of Item Categories.';
+            //ObsoleteTag = '15.0';
         }
         field(6055; "Lock Code"; Code[10])
         {

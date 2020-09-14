@@ -453,8 +453,9 @@ table 6150622 "NPR POS Sales Line"
         {
             Caption = 'Product Group Code';
             DataClassification = CustomerContent;
-            Description = 'NPR5.32.10';
-            TableRelation = "Product Group".Code WHERE("Item Category Code" = FIELD("Item Category Code"));
+            ObsoleteState = No;
+            //ObsoleteReason = 'Product Groups became first level children of Item Categories.';
+            //ObsoleteTag = '15.0';
         }
         field(208; "Planned Delivery Date"; Date)
         {

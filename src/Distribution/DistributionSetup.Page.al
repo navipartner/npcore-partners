@@ -1,9 +1,7 @@
 page 6151062 "NPR Distribution Setup"
 {
-    // NPR5.38.01/JKL /20180126  CASE 289017 Object created - Replenishment Module
-
     Caption = 'Distribution Setup';
-    PageType = List;
+    PageType = ListPart;
     SourceTable = "NPR Distribution Setup";
 
     layout
@@ -87,4 +85,3 @@ page 6151062 "NPR Distribution Setup"
     var
         TextCreated: Label 'Records Created!';
 }
-
