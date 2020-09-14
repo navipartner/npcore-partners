@@ -1385,7 +1385,7 @@ codeunit 6151413 "NPR Magento Sales Order Mgt."
         GiftVoucher."Gift Voucher Message".CreateOutStream(Ostream);
         Ostream.Write(NpXmlDomMgt.GetXmlText(XmlElement, 'message', 0, true));
         GiftVoucher."Issue Date" := Today;
-        GiftVoucher.Salesperson := SalesHeader."Salesperson Code";
+        GiftVoucher."Salesperson Code" := SalesHeader."Salesperson Code";
         GiftVoucher."External No." := SalesHeader."External Document No.";
         GiftVoucher."Customer No." := SalesHeader."Sell-to Customer No.";
         GiftVoucher.Insert(true);

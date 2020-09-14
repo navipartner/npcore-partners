@@ -80,7 +80,7 @@ page 6014419 "NPR Gift Voucher"
                     ApplicationArea = All;
                     Editable = false;
                 }
-                field(Salesperson; Salesperson)
+                field("Salesperson Code"; "Salesperson Code")
                 {
                     ApplicationArea = All;
                     Editable = false;

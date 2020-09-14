@@ -947,7 +947,7 @@ codeunit 6014435 "NPR Retail Form Code"
                                     Gavekort."External No." := Ekspeditionslinie."Foreign No.";
                                     Gavekort.Insert(true);
                                     Gavekort."Issue Date" := Today;
-                                    Gavekort.Salesperson := "Salesperson Code";
+                                    Gavekort."Salesperson Code" := "Salesperson Code";
                                     Gavekort."Shortcut Dimension 1 Code" := "Shortcut Dimension 1 Code";
                                     Gavekort."Location Code" := "Location Code";
                                     Gavekort.Status := Gavekort.Status::Cashed;
@@ -2723,12 +2723,12 @@ codeunit 6014435 "NPR Retail Form Code"
             cno := '';
     end;
 
-    [IntegrationEvent(TRUE, TRUE)]
+    [IntegrationEvent(true, false)]
     local procedure OnValidateSaleLinePosBeforePostingEvent(var SalePOS: Record "NPR Sale POS"; var SaleLinePos: Record "NPR Sale Line POS"; var AuditRole: Record "NPR Audit Roll")
     begin
     end;
 
-    [IntegrationEvent(TRUE, TRUE)]
+    [IntegrationEvent(true, false)]
     procedure OnBeforeAuditRoleLineInsertEvent(var SalePOS: Record "NPR Sale POS"; var SaleLinePos: Record "NPR Sale Line POS"; var AuditRole: Record "NPR Audit Roll")
     begin
     end;

@@ -110,9 +110,9 @@ report 6014561 "NPR Gift Voucher A5"
                     BarcodeLib.GenerateBarcode("Gift Voucher"."No.", TempBlob);
                     BlobBuffer.GetFromTempBlob(TempBlob, 1);
 
-                    if Get("Gift Voucher".Salesperson) then
+                    if Get("Gift Voucher"."Salesperson Code") then
                         if RetailSetup."Salesperson on Sales Ticket" then
-                            SalesPersonText := StrSubstNo('%1 %2', "Gift Voucher".FieldCaption(Salesperson), Name);
+                            SalesPersonText := StrSubstNo('%1 %2', "Gift Voucher".FieldCaption("Salesperson Code"), Name);
                 end;
             }
 

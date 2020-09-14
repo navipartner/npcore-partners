@@ -71,7 +71,7 @@ page 6014431 "NPR Gift Voucher List"
                 {
                     ApplicationArea = All;
                 }
-                field(Salesperson; Salesperson)
+                field("Salesperson Code"; "Salesperson Code")
                 {
                     ApplicationArea = All;
                     Editable = false;

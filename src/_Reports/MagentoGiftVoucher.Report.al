@@ -29,7 +29,7 @@ report 6151406 "NPR Magento Gift Voucher"
             column(IssueDate_GiftVoucher; Format("Gift Voucher"."Issue Date"))
             {
             }
-            column(Salesperson_GiftVoucher; "Gift Voucher".Salesperson)
+            column(Salesperson_GiftVoucher; "Gift Voucher"."Salesperson Code")
             {
             }
             column(ShortcutDimension1Code_GiftVoucher; "Gift Voucher"."Shortcut Dimension 1 Code")

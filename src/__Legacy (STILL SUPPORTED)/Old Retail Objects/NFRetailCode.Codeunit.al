@@ -446,7 +446,7 @@ codeunit 6014434 "NPR NF Retail Code"
             Text10600000 + ' ' + GiftVoucher.Reference,
             AmountToInvoice,
             GiftVoucher."No.",
-            GiftVoucher.Salesperson);
+            GiftVoucher."Salesperson Code");
 
         GiftVoucher.Validate(Invoiced, true);
         GiftVoucher.Validate("Invoiced by Document No.");

@@ -179,7 +179,7 @@ codeunit 6014400 "NPR Retail Table Code"
             GlobalGiftVoucher."Sales Ticket No." := "Sales Ticket No.";
             GlobalGiftVoucher.Reference := Reference;
             GlobalGiftVoucher."Issue Date" := "Issue Date";
-            GlobalGiftVoucher.Salesperson := Salesperson;
+            GlobalGiftVoucher."Salesperson Code" := "Salesperson Code";
             GlobalGiftVoucher."Shortcut Dimension 1 Code" := "Shortcut Dimension 1 Code";
             GlobalGiftVoucher."Shortcut Dimension 2 Code" := "Shortcut Dimension 2 Code";
             GlobalGiftVoucher."Location Code" := "Location Code";
