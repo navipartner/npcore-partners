@@ -191,7 +191,7 @@ page 6014410 "NPR Sale POS - Statistics"
             AverageAuditRollSaleAmt := 0;
     end;
 
-    procedure OnInit(StatMenu: Integer)
+    procedure Initialize(StatMenu: Integer)
     begin
         //OnInit
         FilterGroup(2);
