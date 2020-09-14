@@ -4,7 +4,7 @@ page 6150621 "NPR POS Unit to Bin Relation"
     // NPR5.51/YAHA/20190717 CASE 360536 Field "POS Unit No.","POS Payment Bin No." set to Mandatory(TRUE)
 
     Caption = 'POS Unit to Bin Relation';
-    PageType = List;
+    PageType = ListPart;
     SourceTable = "NPR POS Unit to Bin Relation";
 
     layout
