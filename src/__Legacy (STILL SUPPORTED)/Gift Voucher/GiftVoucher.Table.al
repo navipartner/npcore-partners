@@ -67,9 +67,9 @@ table 6014409 "NPR Gift Voucher"
             Caption = 'Issue Date';
             DataClassification = CustomerContent;
         }
-        field(5; Salesperson; Code[10])
+        field(5; "Salesperson Code"; Code[10])
         {
-            Caption = 'Salesperson';
+            Caption = 'Salesperson Code';
             DataClassification = CustomerContent;
             TableRelation = "Salesperson/Purchaser".Code;
         }
@@ -615,7 +615,7 @@ table 6014409 "NPR Gift Voucher"
         "Issuing Sales Ticket No." := AuditRoll."Sales Ticket No.";
         "Issuing Audit Roll Type" := AuditRoll."Sale Type";
         "Issuing Audit Roll Line" := AuditRoll."Line No.";
-        Salesperson := AuditRoll."Salesperson Code";
+        "Salesperson Code" := AuditRoll."Salesperson Code";
         Status := Status::Open;
     end;
 
@@ -756,7 +756,7 @@ table 6014409 "NPR Gift Voucher"
         "Issuing POS Sale Line No." := POSSalesLine."Line No.";
         "Issuing POS Unit No." := POSSalesLine."POS Unit No.";
         "Issuing Sales Ticket No." := POSSalesLine."Document No.";
-        Salesperson := POSSalesLine."Salesperson Code";
+        "Salesperson Code" := POSSalesLine."Salesperson Code";
         Status := Status::Open;
         //-NPR5.38 [302766]
     end;

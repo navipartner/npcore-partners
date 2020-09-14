@@ -233,7 +233,7 @@ codeunit 6014561 "NPR Report - Gift Voucher"
         else
             Barcode := '';
 
-        if Salesperson.Get(GiftVoucher.Salesperson) then;
+        if Salesperson.Get(GiftVoucher."Salesperson Code") then;
 
         if RetailConfiguration."Salesperson on Sales Ticket" then
             //-NPR5.29 [241549]
