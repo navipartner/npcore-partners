@@ -1,10 +1,8 @@
 page 6151368 "NPR CS RFID Lines Subpage"
 {
-    // NPR5.55/CLVA  /20200506  CASE 379709 Object created - NP Capture Service
-
     Caption = 'RFID Tags';
     Editable = false;
-    PageType = List;
+    PageType = ListPart;
     SourceTable = "NPR CS Rfid Lines";
 
     layout
@@ -73,4 +71,3 @@ page 6151368 "NPR CS RFID Lines Subpage"
     {
     }
 }
-
