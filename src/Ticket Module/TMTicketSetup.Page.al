@@ -11,7 +11,7 @@
     PageType = Card;
     SourceTable = "NPR TM Ticket Setup";
     UsageCategory = Administration;
-
+    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
     AdditionalSearchTerms = 'Ticket Wizard, Ticket Application Area';
 
     layout
