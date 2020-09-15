@@ -835,7 +835,7 @@ report 6014510 "NPR Purch Return Order"
         DimSetEntry1: Record "Dimension Set Entry";
         DimSetEntry2: Record "Dimension Set Entry";
         RespCenter: Record "Responsibility Center";
-        Language: Record Language;
+        Language: Codeunit Language;
         CurrExchRate: Record "Currency Exchange Rate";
         PurchCountPrinted: Codeunit "Purch.Header-Printed";
         FormatAddr: Codeunit "Format Address";

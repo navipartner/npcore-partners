@@ -1207,7 +1207,7 @@ report 6014617 "NPR Purchase Order"
         PrepmtDimSetEntry: Record "Dimension Set Entry";
         PrepmtInvBuf: Record "Prepayment Inv. Line Buffer" temporary;
         RespCenter: Record "Responsibility Center";
-        Language: Record Language;
+        Language: Codeunit Language;
         CurrExchRate: Record "Currency Exchange Rate";
         PurchSetup: Record "Purchases & Payables Setup";
         PurchCountPrinted: Codeunit "Purch.Header-Printed";
