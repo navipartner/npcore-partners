@@ -26,11 +26,6 @@
             "id": "AS0061",
             "action": "Warning",
             "justification": "Since we're targeting OnPrem, OnBeforeCompanyOpen & OnAfterCompanyOpen are still valid events to use."
-        },
-        {
-            "id": "AS0062",
-            "action": "Warning",
-            "justification": "Since we're targeting OnPrem, ApplicationArea is not yet mandatory."
         }
     ]
 }
