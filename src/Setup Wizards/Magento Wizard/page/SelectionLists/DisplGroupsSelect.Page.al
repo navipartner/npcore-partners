@@ -14,9 +14,11 @@ page 6014626 "NPR Displ Groups Select"
             {
                 field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
                 field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
             }
         }

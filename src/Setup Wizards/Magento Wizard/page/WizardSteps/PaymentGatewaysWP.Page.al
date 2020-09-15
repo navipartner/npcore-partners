@@ -14,27 +14,35 @@ page 6014528 "NPR Payment Gateways WP"
             {
                 field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
                 field("Api Url"; "Api Url")
                 {
+                    ApplicationArea = All;
                 }
                 field("Api Username"; "Api Username")
                 {
+                    ApplicationArea = All;
                 }
                 field("Api Password"; "Api Password")
                 {
+                    ApplicationArea = All;
                 }
                 field("Merchant ID"; "Merchant ID")
                 {
+                    ApplicationArea = All;
                 }
                 field("Merchant Name"; "Merchant Name")
                 {
+                    ApplicationArea = All;
                 }
                 field("Currency Code"; "Currency Code")
                 {
+                    ApplicationArea = All;
                 }
                 field("Capture Codeunit Id"; "Capture Codeunit Id")
                 {
+                    ApplicationArea = All;
                     trigger OnLookup(var Text: Text): Boolean
                     var
                         AllObj: Record AllObj;
@@ -60,6 +68,7 @@ page 6014528 "NPR Payment Gateways WP"
                 }
                 field("Refund Codeunit Id"; "Refund Codeunit Id")
                 {
+                    ApplicationArea = All;
                     trigger OnLookup(var Text: Text): Boolean
                     var
                         AllObj: Record AllObj;
@@ -85,6 +94,7 @@ page 6014528 "NPR Payment Gateways WP"
                 }
                 field("Cancel Codeunit Id"; "Cancel Codeunit Id")
                 {
+                    ApplicationArea = All;
                     trigger OnLookup(var Text: Text): Boolean
                     var
                         AllObj: Record AllObj;

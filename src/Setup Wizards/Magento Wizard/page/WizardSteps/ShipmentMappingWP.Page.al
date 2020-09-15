@@ -14,10 +14,12 @@ page 6014551 "NPR Shipment Mapping WP"
             {
                 field("External Shipment Method Code"; "External Shipment Method Code")
                 {
+                    ApplicationArea = All;
                     ShowMandatory = true;
                 }
                 field("Shipment Method Code"; "Shipment Method Code")
                 {
+                    ApplicationArea = All;
                     trigger OnLookup(var Text: Text): Boolean
                     var
                         ShipmentMethod: Record "Shipment Method";
@@ -37,6 +39,7 @@ page 6014551 "NPR Shipment Mapping WP"
                 }
                 field("Shipping Agent Code"; "Shipping Agent Code")
                 {
+                    ApplicationArea = All;
                     trigger OnLookup(var Text: Text): Boolean
                     var
                         ShippingAgent: Record "Shipping Agent";
@@ -56,6 +59,7 @@ page 6014551 "NPR Shipment Mapping WP"
                 }
                 field("Shipping Agent Service Code"; "Shipping Agent Service Code")
                 {
+                    ApplicationArea = All;
                     trigger OnLookup(var Text: Text): Boolean
                     var
                         ShippingAgentServices: Record "Shipping Agent Services";
@@ -77,6 +81,7 @@ page 6014551 "NPR Shipment Mapping WP"
                 }
                 field("Shipment Fee Type"; "Shipment Fee Type")
                 {
+                    ApplicationArea = All;
                     trigger OnValidate()
                     begin
                         "Shipment Fee No." := '';
@@ -84,6 +89,7 @@ page 6014551 "NPR Shipment Mapping WP"
                 }
                 field("Shipment Fee No."; "Shipment Fee No.")
                 {
+                    ApplicationArea = All;
                     trigger OnLookup(var Text: Text): Boolean
                     var
                         GLAccount: Record "G/L Account";

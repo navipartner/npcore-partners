@@ -14,6 +14,7 @@ page 6014616 "NPR Display Groups WP"
             {
                 field("Code"; Code)
                 {
+                    ApplicationArea = All;
                     ShowMandatory = true;
 
                     trigger OnValidate()
@@ -23,6 +24,7 @@ page 6014616 "NPR Display Groups WP"
                 }
                 field(Description; Description)
                 {
+                    ApplicationArea = All;
                 }
             }
         }
