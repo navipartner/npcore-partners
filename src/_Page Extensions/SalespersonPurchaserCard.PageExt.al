@@ -13,6 +13,7 @@ pageextension 6014455 "NPR Salesperson/Purchaser Card" extends "Salesperson/Purc
                 field("NPR Register Password"; "NPR Register Password")
                 {
                     ApplicationArea = All;
+                    ExtendedDatatype = Masked;
                 }
                 field("NPR Supervisor POS"; "NPR Supervisor POS")
                 {
