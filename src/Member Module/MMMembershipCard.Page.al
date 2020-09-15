@@ -113,7 +113,6 @@ page 6060137 "NPR MM Membership Card"
                 field(Control6014412; "Auto-Renew")
                 {
                     ApplicationArea = All;
-                    ShowCaption = false;
                 }
                 field("Auto-Renew Payment Method Code"; "Auto-Renew Payment Method Code")
                 {
