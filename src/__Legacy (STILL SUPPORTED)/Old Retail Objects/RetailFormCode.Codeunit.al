@@ -310,6 +310,7 @@ codeunit 6014435 "NPR Retail Form Code"
         FromComment: Record "NPR Retail Comment";
         ToComment: Record "NPR Retail Comment";
         ItemTrackingCode: Record "Item Tracking Code";
+        ItemTrackingSetup: Record "Item Tracking Setup";
         SerialNoInfo: Record "Serial No. Information";
         FormCode: Codeunit "NPR Retail Form Code";
         "Retail Document Handling": Codeunit "NPR Retail Document Handling";
@@ -335,10 +336,6 @@ codeunit 6014435 "NPR Retail Form Code"
         ErrMinExceeded: Label 'The amount on payment option %1 must not be below %2';
         ErrItemVariant: Label 'A line with item no. %1 must have a variant code';
         txtRevComment: Label '%1-No %3 to %2';
-        SNRequired: Boolean;
-        LotRequired: Boolean;
-        SNInfoRequired: Boolean;
-        LotInfoRequired: Boolean;
         Ticketmanagement: Codeunit "NPR TM Ticket Management";
         MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
         MSPOSSaleLine: Record "NPR Sale Line POS";
@@ -463,12 +460,12 @@ codeunit 6014435 "NPR Retail Form Code"
                         //-NPR4.18
                         if Vare."Item Tracking Code" <> '' then begin
                             ItemTrackingCode.Get(Vare."Item Tracking Code");
-                            ItemTrackingManagement.GetItemTrackingSettings(ItemTrackingCode, 1, false, SNRequired, LotRequired, SNInfoRequired, LotInfoRequired);
-                            if SNRequired then begin
+                            ItemTrackingManagement.GetItemTrackingSetup(ItemTrackingCode, 1, false, ItemTrackingSetup);
+                            if ItemTrackingSetup."Serial No. Required" then begin
                                 if Ekspeditionslinie."Serial No." = '' then
                                     Error(Text10600400, Ekspeditionslinie."No.", Ekspeditionslinie.Description);
                             end;
-                            if SNInfoRequired then begin
+                            if ItemTrackingSetup."Serial No. Info Required" then begin
                                 SerialNoInfo.Get(Ekspeditionslinie."No.", Ekspeditionslinie."Variant Code", Ekspeditionslinie."Serial No.");
                                 SerialNoInfo.TestField(Blocked, false);
                             end;

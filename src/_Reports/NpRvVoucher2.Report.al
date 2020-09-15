@@ -158,11 +158,9 @@ report 6151014 "NPR NpRv Voucher 2"
 
             trigger OnAfterGetRecord()
             var
-                Language: Record Language;
+                Language: Codeunit Language;
             begin
-                //-NPR5.55 [397527]
                 CurrReport.Language := Language.GetLanguageID("Language Code");
-                //+NPR5.55 [397527]
 
                 Evaluate(StartingDate, Format(DT2Date("NpRv Voucher"."Starting Date")));
                 Evaluate(EndingDate, Format(DT2Date("NpRv Voucher"."Ending Date")));

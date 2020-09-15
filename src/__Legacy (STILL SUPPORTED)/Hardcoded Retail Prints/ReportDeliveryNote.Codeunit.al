@@ -72,7 +72,7 @@ codeunit 6014566 "NPR Report - Delivery Note"
         ReferenceTxt: Text[30];
         ShowUnderType: Boolean;
         RetailSetup: Record "NPR Retail Setup";
-        Language: Record Language;
+        Language: Codeunit Language;
         CompanyInfo: Record "Company Information";
         SalesPurchPerson: Record "Salesperson/Purchaser";
         RespCenter: Record "Responsibility Center";
@@ -328,15 +328,8 @@ codeunit 6014566 "NPR Report - Delivery Note"
             ReferenceText2 := SalesShipmentHeader.FieldCaption("Your Reference");
         FormatAdr.SalesShptShipTo(ShipToCustomerAddress, SalesShipmentHeader);
 
-        //-NPR5.29 [258545]
         ShowBillToCustomerAddress := FormatAdr.SalesShptBillTo(BillToCustomerAddress, ShipToCustomerAddress, SalesShipmentHeader);
 
-        // FormatAdr.SalesShptBillTo(BillToCustomerAddress,SalesShipmentHeader);
-        // ShowBillToCustomerAddress := SalesShipmentHeader."Bill-to Customer No." <> SalesShipmentHeader."Sell-to Customer No.";
-        // FOR i := 1 TO ARRAYLEN(BillToCustomerAddress) DO
-        //   IF BillToCustomerAddress[i] <> ShipToCustomerAddress[i] THEN
-        //     ShowBillToCustomerAddress := TRUE;
-        //+NPR5.29 [258545]
         CurrReportLANGUAGE := Language.GetLanguageID(SalesShipmentHeader."Language Code");
 
         CompanyInfo.Get;
@@ -361,14 +354,7 @@ codeunit 6014566 "NPR Report - Delivery Note"
             ReferenceText := SalesShipmentHeader.FieldCaption("Your Reference");
         FormatAddr.SalesShptShipTo(ShipToAddr, SalesShipmentHeader);
 
-        //-NPR5.29 [258545]
         ShowCustAddr := FormatAddr.SalesShptBillTo(CustAddr, ShipToAddr, SalesShipmentHeader);
-        // FormatAddr.SalesShptBillTo(CustAddr,SalesShipmentHeader);
-        // ShowCustAddr := SalesShipmentHeader."Bill-to Customer No." <> SalesShipmentHeader."Sell-to Customer No.";
-        // FOR i := 1 TO ARRAYLEN(CustAddr) DO
-        //  IF CustAddr[i] <> ShipToAddr[i] THEN
-        //    ShowCustAddr := TRUE;
-        //+NPR5.29 [258545]
     end;
 
     procedure GetRecords()
