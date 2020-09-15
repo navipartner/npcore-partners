@@ -13,18 +13,23 @@ page 6014620 "NPR Websites Select"
             {
                 field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
                 field(Name; Name)
                 {
+                    ApplicationArea = All;
                 }
                 field("Default Website"; "Default Website")
                 {
+                    ApplicationArea = All;
                 }
                 field("Global Dimension 1 Code"; "Global Dimension 1 Code")
                 {
+                    ApplicationArea = All;
                 }
                 field("Global Dimension 2 Code"; "Global Dimension 2 Code")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

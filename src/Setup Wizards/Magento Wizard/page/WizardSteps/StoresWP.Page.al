@@ -14,6 +14,7 @@ page 6014522 "NPR Stores WP"
             {
                 field("Code"; Code)
                 {
+                    ApplicationArea = All;
                     ShowMandatory = true;
 
                     trigger OnValidate()
@@ -23,6 +24,7 @@ page 6014522 "NPR Stores WP"
                 }
                 field("Website Code"; "Website Code")
                 {
+                    ApplicationArea = All;
                     trigger OnLookup(var Text: Text): Boolean
                     var
                         MagentoWebsites: Page "NPR Websites Select";
@@ -44,9 +46,11 @@ page 6014522 "NPR Stores WP"
                 }
                 field(Name; Name)
                 {
+                    ApplicationArea = All;
                 }
                 field("Language Code"; "Language Code")
                 {
+                    ApplicationArea = All;
                     trigger OnLookup(var Text: Text): Boolean
                     var
                         Language: Record "Language";
