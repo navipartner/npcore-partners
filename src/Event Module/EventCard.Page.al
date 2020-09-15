@@ -1156,10 +1156,9 @@ page 6060150 "NPR Event Card"
         }
         area(factboxes)
         {
-            part(Control6014404; "Comment Sheet")
+            part(Control6014404; "NPR Event Comment Sheet")
             {
-                SubPageLink = "Table Name" = CONST(Job),
-                              "No." = FIELD("No.");
+                SubPageLink = "Table Name" = CONST(Job), "No." = FIELD("No.");
                 ApplicationArea = All;
             }
             part(Control1902018507; "Customer Statistics FactBox")

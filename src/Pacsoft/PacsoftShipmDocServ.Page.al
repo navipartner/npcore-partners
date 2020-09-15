@@ -4,7 +4,7 @@ page 6014414 "NPR Pacsoft Shipm. Doc. Serv."
 
     Caption = 'Pacsoft Shipment Document Services';
     DelayedInsert = true;
-    PageType = List;
+    PageType = ListPart;
     SourceTable = "NPR Pacsoft Shipm. Doc. Serv.";
     SourceTableView = SORTING("Entry No.", "Shipping Agent Code", "Shipping Agent Service Code");
     UsageCategory = Lists;

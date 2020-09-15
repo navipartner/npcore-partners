@@ -164,7 +164,7 @@ page 6151451 "NPR Magento DragDropPic. Addin"
         Commit;
     end;
 
-    [IntegrationEvent(false, TRUE)]
+    [IntegrationEvent(false, false)]
     local procedure OnSavePictureLinks(PictureType: Integer; var TempMagentoPicture2: Record "NPR Magento Picture" temporary; var Handled: Boolean)
     begin
     end;

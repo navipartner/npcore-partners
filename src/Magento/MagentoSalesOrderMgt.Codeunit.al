@@ -600,7 +600,7 @@ codeunit 6151413 "NPR Magento Sales Order Mgt."
             CreditVoucher."Currency Code" := SalesHeader."Currency Code";
             //-MAG2.25 [386010]
             CreditVoucher."Issue Date" := Today;
-            CreditVoucher.Salesperson := SalesHeader."Salesperson Code";
+            CreditVoucher."Salesperson Code" := SalesHeader."Salesperson Code";
             //+MAG2.25 [386010]
             CreditVoucher.Insert(true);
 

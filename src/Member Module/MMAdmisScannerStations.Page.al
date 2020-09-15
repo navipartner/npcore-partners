@@ -4,7 +4,7 @@ page 6060069 "NPR MM Admis. Scanner Stations"
     // NPR5.55/CLVA  /20200608  CASE 402284 Added field "Admission Code"
 
     Caption = 'MM Admission Scanner Stations';
-    PageType = List;
+    PageType = ListPart;
     SourceTable = "NPR MM Admis. Scanner Stations";
 
     layout

@@ -255,18 +255,4 @@ page 6151411 "NPR Magento Pictures"
         MiniatureLinePicture := MagentoSetup."Miniature Picture" in [MagentoSetup."Miniature Picture"::LinePicture, MagentoSetup."Miniature Picture"::"SinglePicture+LinePicture"];
         //+MAG1.21
     end;
-
-    [TryFunction]
-    procedure TryCheckPicture()
-    var
-        WebRequest: DotNet NPRNetWebRequest;
-        WebResponse: DotNet NPRNetWebResponse;
-    begin
-        //-MAG2.22 [361234]
-        WebRequest := WebRequest.CreateHttp(GetMagentotUrl());
-        WebRequest.Method := 'HEAD';
-        WebResponse := WebRequest.GetResponse();
-        //+MAG2.22 [361234]
-    end;
 }
-
