@@ -89,8 +89,8 @@
             }
             part(Schedules; "NPR TM Ticket Schedule Wizard")
             {
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Schedules';
-
             }
             group(Advanced)
             {

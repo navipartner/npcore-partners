@@ -22,6 +22,7 @@
     PageType = ListPlus;
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+    AdditionalSearchTerms = 'Ticket Statistics, Admission Statistics';
 
     layout
     {
@@ -171,8 +172,8 @@
             }
             part(MATRIX; "NPR TM Ticket Acs. Stat.Lines")
             {
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 ShowFilter = false;
-
             }
             group("Matrix Filters")
             {

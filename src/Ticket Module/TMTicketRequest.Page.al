@@ -149,9 +149,9 @@
         {
             part(Attributes; "NPR TM Ticket Req. Factbox")
             {
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Attributes';
                 SubPageLink = "Entry No." = FIELD("Entry No.");
-
             }
         }
     }
