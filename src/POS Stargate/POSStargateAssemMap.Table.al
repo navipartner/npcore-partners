@@ -29,6 +29,9 @@ table 6150720 "NPR POS Stargate Assem. Map"
         key(Key1; "Assembly Name")
         {
         }
+        key(Key2; Status)
+        {
+        }
     }
 
     fieldgroups
