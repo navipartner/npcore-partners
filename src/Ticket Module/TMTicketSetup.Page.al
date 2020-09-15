@@ -202,7 +202,7 @@
         {
             action(ApplicationArea)
             {
-
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Ticket Application Area';
                 Ellipsis = true;
                 RunObject = Page "NPR Ticket App. Area Setup";
