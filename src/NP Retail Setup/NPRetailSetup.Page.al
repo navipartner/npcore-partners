@@ -449,13 +449,6 @@ page 6150613 "NPR NP Retail Setup"
                         RunObject = Page "NPR Lookup Templates";
                         ApplicationArea = All;
                     }
-                    action("Trigger Permission Set Mgt.")
-                    {
-                        Caption = 'Trigger Permission Set Mgt.';
-                        Image = AddAction;
-                        RunObject = Codeunit "NPR Permission Set Mgt.";
-                        ApplicationArea = All;
-                    }
                 }
                 action("Client Diagnostics")
                 {
