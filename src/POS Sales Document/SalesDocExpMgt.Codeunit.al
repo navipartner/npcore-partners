@@ -730,12 +730,9 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
         Item: Record Item;
         SerialNoInfo: Record "Serial No. Information";
         ItemTrackingCode: Record "Item Tracking Code";
+        ItemTrackingSetup: Record "Item Tracking Setup";
         RetailFormCode: Codeunit "NPR Retail Form Code";
         ItemTrackingManagement: Codeunit "Item Tracking Management";
-        SNRequired: Boolean;
-        LotRequired: Boolean;
-        SNInfoRequired: Boolean;
-        LotInfoRequired: Boolean;
     begin
         if SaleLinePOS.FindSet then
             repeat
@@ -828,12 +825,12 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
                 if Item.Get(SaleLinePOS."No.") then begin
                     if Item."Item Tracking Code" <> '' then begin
                         ItemTrackingCode.Get(Item."Item Tracking Code");
-                        ItemTrackingManagement.GetItemTrackingSettings(ItemTrackingCode, 1, false, SNRequired, LotRequired, SNInfoRequired, LotInfoRequired);
-                        if SNRequired then begin
+                        ItemTrackingManagement.GetItemTrackingSetup(ItemTrackingCode, 1, false, ItemTrackingSetup);
+                        if ItemTrackingSetup."Serial No. Required" then begin
                             if SaleLinePOS."Serial No." = '' then
                                 Error(Text000013, SaleLinePOS."No.", SaleLinePOS.Description);
                         end;
-                        if SNInfoRequired then begin
+                        if ItemTrackingSetup."Serial No. Info Required" then begin
                             SerialNoInfo.Get(SaleLinePOS."No.", SaleLinePOS."Variant Code", SaleLinePOS."Serial No.");
                             SerialNoInfo.TestField(Blocked, false);
                         end;
@@ -1099,7 +1096,7 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
 
         //CaptionText := ReserveSalesLine.Caption(SalesLine);
 
-        ReservationManagement.SetSalesLine(SalesLine);
+        ReservationManagement.SetReservSource(SalesLine);
 
         //Run auto reserve
         ReservationManagement.AutoReserve(

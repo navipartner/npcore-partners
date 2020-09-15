@@ -834,7 +834,7 @@ report 6014545 "NPR Acc. Statement w FIK-Card"
         Cust2: Record Customer;
         Currency: Record Currency;
         Currency2: Record Currency temporary;
-        Language: Record Language;
+        Language: Codeunit Language;
         "Cust. Ledger Entry": Record "Cust. Ledger Entry";
         DtldCustLedgEntries2: Record "Detailed Cust. Ledg. Entry";
         AgingBandBuf: Record "Aging Band Buffer" temporary;
