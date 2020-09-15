@@ -14,6 +14,7 @@ page 6014523 "NPR Customer Mapping WP"
             {
                 field("Country/Region Code"; "Country/Region Code")
                 {
+                    ApplicationArea = All;
                     trigger OnLookup(var Text: Text): Boolean
                     var
                         CountryRegion: Record "Country/Region";
@@ -38,6 +39,7 @@ page 6014523 "NPR Customer Mapping WP"
                 }
                 field("Post Code"; "Post Code")
                 {
+                    ApplicationArea = All;
                     trigger OnLookup(var Text: Text): Boolean
                     var
                         PostCode: Record "Post Code";
@@ -64,16 +66,19 @@ page 6014523 "NPR Customer Mapping WP"
                 }
                 field(CountryRegionName; CountryRegionName)
                 {
+                    ApplicationArea = All;
                     Caption = 'Country/Region';
                     Editable = false;
                 }
                 field(CityName; CityName)
                 {
+                    ApplicationArea = All;
                     Caption = 'City';
                     Editable = false;
                 }
                 field("Customer Template Code"; "Customer Template Code")
                 {
+                    ApplicationArea = All;
                     trigger OnLookup(var Text: Text): Boolean
                     var
                         CustomerTemplate: Record "Customer Template";
@@ -93,6 +98,7 @@ page 6014523 "NPR Customer Mapping WP"
                 }
                 field("Config. Template Code"; "Config. Template Code")
                 {
+                    ApplicationArea = All;
                     trigger OnLookup(var Text: Text): Boolean
                     var
                         ConfigTemplateHdr: Record "Config. Template Header";

@@ -14,15 +14,19 @@ page 6014520 "NPR Website List WP"
             {
                 field("Code"; Code)
                 {
+                    ApplicationArea = All;
                 }
                 field(Name; Name)
                 {
+                    ApplicationArea = All;
                 }
                 field("Default Website"; "Default Website")
                 {
+                    ApplicationArea = All;
                 }
                 field("Global Dimension 1 Code"; "Global Dimension 1 Code")
                 {
+                    ApplicationArea = All;
                     trigger OnLookup(var Text: Text): Boolean
                     var
                         GlobalDimension1: Record "Dimension Value";
@@ -45,6 +49,7 @@ page 6014520 "NPR Website List WP"
                 }
                 field("Global Dimension 2 Code"; "Global Dimension 2 Code")
                 {
+                    ApplicationArea = All;
                     Visible = false;
 
                     trigger OnLookup(var Text: Text): Boolean

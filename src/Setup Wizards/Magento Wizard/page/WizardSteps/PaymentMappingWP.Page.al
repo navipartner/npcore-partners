@@ -14,13 +14,16 @@ page 6014531 "NPR Payment Mapping WP"
             {
                 field("External Payment Method Code"; "External Payment Method Code")
                 {
+                    ApplicationArea = All;
                     ShowMandatory = true;
                 }
                 field("External Payment Type"; "External Payment Type")
                 {
+                    ApplicationArea = All;
                 }
                 field("Payment Method Code"; "Payment Method Code")
                 {
+                    ApplicationArea = All;
                     trigger OnLookup(var Text: Text): Boolean
                     var
                         PaymentMethod: Record "Payment Method";
@@ -40,9 +43,11 @@ page 6014531 "NPR Payment Mapping WP"
                 }
                 field("Allow Adjust Payment Amount"; "Allow Adjust Payment Amount")
                 {
+                    ApplicationArea = All;
                 }
                 field("Payment Gateway Code"; "Payment Gateway Code")
                 {
+                    ApplicationArea = All;
                     trigger OnLookup(var Text: Text): Boolean
                     var
                         PaymentGateways: Page "NPR Pmt. Gateways Select";
@@ -64,6 +69,7 @@ page 6014531 "NPR Payment Mapping WP"
                 }
                 field("Captured Externally"; "Captured Externally")
                 {
+                    ApplicationArea = All;
                 }
             }
         }

@@ -15,6 +15,7 @@ page 6014552 "NPR Brands WP"
                 ShowCaption = false;
                 field(Id; Id)
                 {
+                    ApplicationArea = All;
                     ShowMandatory = true;
 
                     trigger OnValidate()
@@ -24,12 +25,15 @@ page 6014552 "NPR Brands WP"
                 }
                 field(Name; Name)
                 {
+                    ApplicationArea = All;
                 }
                 field(Picture; Picture)
                 {
+                    ApplicationArea = All;
                 }
                 field("Sorting"; Sorting)
                 {
+                    ApplicationArea = All;
                 }
             }
         }

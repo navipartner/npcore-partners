@@ -15,15 +15,19 @@ page 6014625 "NPR Brands Select"
                 ShowCaption = false;
                 field(Id; Id)
                 {
+                    ApplicationArea = All;
                 }
                 field(Name; Name)
                 {
+                    ApplicationArea = All;
                 }
                 field(Picture; Picture)
                 {
+                    ApplicationArea = All;
                 }
                 field("Sorting"; Sorting)
                 {
+                    ApplicationArea = All;
                 }
             }
         }

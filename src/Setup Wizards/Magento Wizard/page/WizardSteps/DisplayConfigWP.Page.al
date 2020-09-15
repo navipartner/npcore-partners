@@ -15,6 +15,7 @@ page 6014617 "NPR Display Config WP"
                 ShowCaption = false;
                 field(Type; Type)
                 {
+                    ApplicationArea = All;
                     trigger OnValidate()
                     begin
                         "No." := '';
@@ -22,6 +23,7 @@ page 6014617 "NPR Display Config WP"
                 }
                 field("No."; "No.")
                 {
+                    ApplicationArea = All;
                     trigger OnLookup(var Text: Text): Boolean
                     var
                         Item: Record Item;
@@ -76,6 +78,7 @@ page 6014617 "NPR Display Config WP"
                 }
                 field("Sales Type"; "Sales Type")
                 {
+                    ApplicationArea = All;
                     trigger OnValidate()
                     begin
                         "Sales Code" := '';
@@ -83,6 +86,7 @@ page 6014617 "NPR Display Config WP"
                 }
                 field("Sales Code"; "Sales Code")
                 {
+                    ApplicationArea = All;
                     trigger OnLookup(var Text: Text): Boolean
                     var
                         Customer: Record Customer;
@@ -122,18 +126,23 @@ page 6014617 "NPR Display Config WP"
                 }
                 field("Is Visible"; "Is Visible")
                 {
+                    ApplicationArea = All;
                 }
                 field("Starting Date"; "Starting Date")
                 {
+                    ApplicationArea = All;
                 }
                 field("Starting Time"; "Starting Time")
                 {
+                    ApplicationArea = All;
                 }
                 field("Ending Date"; "Ending Date")
                 {
+                    ApplicationArea = All;
                 }
                 field("Ending Time"; "Ending Time")
                 {
+                    ApplicationArea = All;
                 }
             }
         }
