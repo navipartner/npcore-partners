@@ -15,13 +15,13 @@
             {
                 field(SelectedSectionCount; SelectedSectionCount)
                 {
-
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Selected Sections';
                     Editable = false;
                 }
                 field(SpanSections; SpanSections)
                 {
-
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Numbering Spans Sections';
                 }
             }
@@ -30,22 +30,22 @@
                 Caption = 'Structure';
                 field(RowLabel; RowLabel)
                 {
-
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Row Label';
                 }
                 field(Rows; Rows)
                 {
-
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Rows to Create';
                 }
                 field(SeatLabel; SeatLabel)
                 {
-
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Seat Label';
                 }
                 field(SeatsPerRow; SeatsPerRow)
                 {
-
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Seats per Row';
                 }
             }
@@ -57,17 +57,17 @@
                     Caption = 'Row';
                     field(RowStartNumber; RowStartNumber)
                     {
-
+                        ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                         Caption = 'Start with Number (Row)';
                     }
                     field("SeatingSetup.""Row Numbering"""; SeatingSetup."Row Numbering")
                     {
-
+                        ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                         Caption = 'Numbering (Row)';
                     }
                     field(RowNumberLayout; RowNumberLayout)
                     {
-
+                        ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                         Caption = 'Section Numbering Layout';
                         OptionCaption = 'Across Sections,Section by Section';
                     }
@@ -77,23 +77,23 @@
                     Caption = 'Seat';
                     field(SeatStartNumber; SeatStartNumber)
                     {
-
+                        ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                         Caption = 'Start with Number (Seat)';
                     }
                     field("SeatingSetup.""Seat Numbering"""; SeatingSetup."Seat Numbering")
                     {
-
+                        ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                         Caption = 'Numbering (Seat)';
                     }
                     field(SeatingIncrement; SeatingIncrement)
                     {
-
+                        ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                         Caption = 'Increment Style';
                         OptionCaption = 'Consecutive,Odd,Even';
                     }
                     field(ContinuousNumbering; ContinuousNumbering)
                     {
-
+                        ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                         Caption = 'Continuous Numbering';
                     }
                 }
@@ -102,12 +102,12 @@
             {
                 field(SplitOption; SplitOption)
                 {
-
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Horizontal,Vertical,Diagonal (Left to Right),Diagonal (Right to Left)';
                 }
                 field(SplitList; SplitList)
                 {
-
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Split On';
                 }
             }

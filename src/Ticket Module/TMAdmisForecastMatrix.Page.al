@@ -5,6 +5,7 @@
     Caption = 'Admission Forecast Matrix';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+    AdditionalSearchTerms = 'Ticket Forecast';
 
     layout
     {
@@ -58,7 +59,7 @@
             }
             part(MATRIX; "NPR TM Admis. Forecast Lines")
             {
-
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
             }
         }
     }

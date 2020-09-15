@@ -27,20 +27,20 @@
             {
                 field("Code"; Code)
                 {
-
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field(Name; Name)
                 {
-
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
                 field("LINE_Total"; LINE_Total)
                 {
-
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Admissions';
                 }
                 field(Field1; MATRIX_CellData[1])
                 {
-                    ApplicationArea = NPRTicketAdvanced;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     CaptionClass = '3,' + MATRIX_CaptionSet[1];
                     StyleExpr = 'Strong';
 
@@ -51,7 +51,7 @@
                 }
                 field(Field2; MATRIX_CellData[2])
                 {
-                    ApplicationArea = NPRTicketAdvanced;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     CaptionClass = '3,' + MATRIX_CaptionSet[2];
                     StyleExpr = 'Strong';
 
@@ -62,7 +62,7 @@
                 }
                 field(Field3; MATRIX_CellData[3])
                 {
-                    ApplicationArea = NPRTicketAdvanced;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     CaptionClass = '3,' + MATRIX_CaptionSet[3];
                     StyleExpr = 'Strong';
 
@@ -73,7 +73,7 @@
                 }
                 field(Field4; MATRIX_CellData[4])
                 {
-                    ApplicationArea = NPRTicketAdvanced;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     CaptionClass = '3,' + MATRIX_CaptionSet[4];
                     StyleExpr = 'Strong';
 
@@ -84,7 +84,7 @@
                 }
                 field(Field5; MATRIX_CellData[5])
                 {
-                    ApplicationArea = NPRTicketAdvanced;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     CaptionClass = '3,' + MATRIX_CaptionSet[5];
                     StyleExpr = 'Strong';
 
@@ -95,7 +95,7 @@
                 }
                 field(Field6; MATRIX_CellData[6])
                 {
-                    ApplicationArea = NPRTicketAdvanced;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     CaptionClass = '3,' + MATRIX_CaptionSet[6];
                     StyleExpr = 'Strong';
 
@@ -106,7 +106,7 @@
                 }
                 field(Field7; MATRIX_CellData[7])
                 {
-                    ApplicationArea = NPRTicketAdvanced;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     CaptionClass = '3,' + MATRIX_CaptionSet[7];
                     StyleExpr = 'Strong';
 
@@ -117,7 +117,7 @@
                 }
                 field(Field8; MATRIX_CellData[8])
                 {
-                    ApplicationArea = NPRTicketAdvanced;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     CaptionClass = '3,' + MATRIX_CaptionSet[8];
                     StyleExpr = 'Strong';
 
@@ -128,7 +128,7 @@
                 }
                 field(Field9; MATRIX_CellData[9])
                 {
-                    ApplicationArea = NPRTicketAdvanced;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     CaptionClass = '3,' + MATRIX_CaptionSet[9];
                     StyleExpr = 'Strong';
 
@@ -139,7 +139,7 @@
                 }
                 field(Field10; MATRIX_CellData[10])
                 {
-                    ApplicationArea = NPRTicketAdvanced;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     CaptionClass = '3,' + MATRIX_CaptionSet[10];
                     StyleExpr = 'Strong';
 
@@ -150,7 +150,7 @@
                 }
                 field(Field11; MATRIX_CellData[11])
                 {
-                    ApplicationArea = NPRTicketAdvanced;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     CaptionClass = '3,' + MATRIX_CaptionSet[11];
                     StyleExpr = 'Strong';
 
@@ -161,7 +161,7 @@
                 }
                 field(Field12; MATRIX_CellData[12])
                 {
-                    ApplicationArea = NPRTicketAdvanced;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
 
                     CaptionClass = '3,' + MATRIX_CaptionSet[12];
                     StyleExpr = 'Strong';
