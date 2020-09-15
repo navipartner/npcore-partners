@@ -407,7 +407,7 @@ codeunit 6014434 "NPR NF Retail Code"
             Text10600001 + ' ' + CreditVoucher.Reference,
             CreditVoucher.Amount,
             CreditVoucher."No.",
-            CreditVoucher.Salesperson);
+            CreditVoucher."Salesperson Code");
 
         CreditVoucher.Validate(Invoiced, true);
         CreditVoucher.Validate("Invoiced on enclosure", DocType);

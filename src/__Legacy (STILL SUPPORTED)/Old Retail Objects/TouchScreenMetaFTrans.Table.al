@@ -10,7 +10,7 @@ table 6014444 "Touch Screen - Meta F. Trans"
         field(1; "On function call"; Code[50])
         {
             Caption = 'On function call';
-            TableRelation = "NPR Touch Screen: Meta Func.".Code;
+            //TableRelation = "NPR Touch Screen: Meta Func.".Code;
             DataClassification = CustomerContent;
         }
         field(2; "Language Code"; Code[10])

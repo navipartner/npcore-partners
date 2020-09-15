@@ -1030,7 +1030,7 @@ codeunit 6014435 "NPR Retail Form Code"
                                     Tilgodebevis."External no" := Ekspeditionslinie."Foreign No.";
                                     Tilgodebevis.Insert(true);
                                     Tilgodebevis."Issue Date" := Today;
-                                    Tilgodebevis.Salesperson := "Salesperson Code";
+                                    Tilgodebevis."Salesperson Code" := "Salesperson Code";
                                     Tilgodebevis."Shortcut Dimension 1 Code" := "Shortcut Dimension 1 Code";
                                     Tilgodebevis."Location Code" := "Location Code";
                                     Tilgodebevis.Status := Tilgodebevis.Status::Cashed;

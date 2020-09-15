@@ -192,7 +192,7 @@ codeunit 6014553 "NPR Touch: Payment Line POS"
                 CreditVoucher."Shortcut Dimension 1 Code" := SaleLinePOS."Shortcut Dimension 1 Code";
                 CreditVoucher."Location Code" := SaleLinePOS."Location Code";
                 if SalePOS.Get("Register No.", "Sales Ticket No.") then
-                    CreditVoucher.Salesperson := SalePOS."Salesperson Code";
+                    CreditVoucher."Salesperson Code" := SalePOS."Salesperson Code";
                 //-+NPR5.29 [263109] Tilgodebevis.INSERT;
                 CreditVoucher.Insert(true);
                 Commit;

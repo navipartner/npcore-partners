@@ -58,7 +58,7 @@ page 6014430 "NPR Credit Voucher List"
                 {
                     ApplicationArea = All;
                 }
-                field(Salesperson; Salesperson)
+                field("Salesperson Code"; "Salesperson Code")
                 {
                     ApplicationArea = All;
                 }

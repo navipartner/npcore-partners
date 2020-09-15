@@ -75,7 +75,7 @@ page 6014418 "NPR Credit Voucher"
                     ApplicationArea = All;
                     Editable = false;
                 }
-                field(Salesperson; Salesperson)
+                field("Salesperson Code"; "Salesperson Code")
                 {
                     ApplicationArea = All;
                     Editable = false;

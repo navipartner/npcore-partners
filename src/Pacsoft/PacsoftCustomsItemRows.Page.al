@@ -34,7 +34,7 @@ page 6014422 "NPR Pacsoft Customs Item Rows"
                 {
                     ApplicationArea = All;
                 }
-                field(Content; Content)
+                field("Entry Content"; Content)
                 {
                     ApplicationArea = All;
                 }

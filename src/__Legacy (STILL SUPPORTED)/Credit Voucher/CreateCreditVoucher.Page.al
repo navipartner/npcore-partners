@@ -49,7 +49,7 @@ page 6014445 "NPR Create Credit Voucher"
                     {
                         ApplicationArea = All;
                     }
-                    field(Salesperson; Salesperson)
+                    field("Salesperson Code"; "Salesperson Code")
                     {
                         ApplicationArea = All;
                     }

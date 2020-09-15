@@ -46,7 +46,6 @@ codeunit 6059915 "NPR Create Person Group"
     local procedure CreateRequest(var Contact: Record Contact)
     var
         CompanyContact: Record Contact;
-        TempBlob_old: Record TempBlob;
         TempBlob: Codeunit "Temp Blob";
         FileMgt: Codeunit "File Management";
         InStr: InStream;
