@@ -16,12 +16,7 @@
             "id": "AS0058",
             "action":"Warning",
             "justification": "We need to find a better solution for code that is using AssertError!"
-        },  
-        {
-            "id": "AS0059",
-            "action":"Warning",
-            "justification": "Rework adding permissions!"
-        },                 
+        },               
         {
             "id": "AS0061",
             "action": "Warning",
