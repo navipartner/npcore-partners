@@ -113,9 +113,9 @@ report 6014564 "NPR Credit Voucher A5"
                     BarcodeLib.GenerateBarcode("Credit Voucher"."No.", TempBlob);
                     BlobBuffer.GetFromTempBlob(TempBlob, 1);
 
-                    if Get("Credit Voucher".Salesperson) then
+                    if Get("Credit Voucher"."Salesperson Code") then
                         if RetailSetup."Salesperson on Sales Ticket" then
-                            SalespersonText := StrSubstNo('%1 %2', "Credit Voucher".FieldCaption(Salesperson), Name);
+                            SalespersonText := StrSubstNo('%1 %2', "Credit Voucher".FieldCaption("Salesperson Code"), Name);
                 end;
             }
 

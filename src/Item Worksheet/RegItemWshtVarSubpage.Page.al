@@ -6,7 +6,7 @@ page 6060048 "NPR Reg. ItemWsht Var.Subpage"
     AutoSplitKey = true;
     Caption = 'Reg. Item Wsht Variety Subpage';
     Editable = false;
-    PageType = List;
+    PageType = ListPart;
     SourceTable = "NPR Reg. Item Wsht Var. Line";
     SourceTableView = SORTING("Registered Worksheet No.", "Registered Worksheet Line No.", "Variety 1 Value", "Variety 2 Value", "Variety 3 Value", "Variety 4 Value")
                       ORDER(Ascending);

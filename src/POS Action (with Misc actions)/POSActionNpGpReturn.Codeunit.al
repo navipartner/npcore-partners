@@ -9,8 +9,6 @@ codeunit 6151169 "NPR POS Action: NpGp Return"
     // NPR5.53/ALST/20191216 CASE 379255 changed EAN box handler
     // NPR5.54/MMV /20200220 CASE 391871 Moved GUID creation from table subscribers to table trigger to have everything centralized.
 
-    Permissions = TableData "Service Password" = rimd;
-
     trigger OnRun()
     begin
     end;
@@ -53,26 +51,21 @@ codeunit 6151169 "NPR POS Action: NpGp Return"
               Sender.Type::Generic,
               Sender."Subscriber Instances Allowed"::Multiple)
             then begin
-                //-NPR5.53 [376308]
-                //RegisterWorkflowStep('getReferenceNumber','{stringpad({title: labels.title,caption: labels.refprompt,notBlank: true}).cancel(abort)};');
                 RegisterWorkflowStep('getReferenceNumber',
-                'if (param.ReferenceBarcode === "")' +
-                '{' +
-                    'stringpad({title: labels.title,caption: labels.refprompt,notBlank: true}).cancel(abort);' +
-                '}' +
-                'else' +
-                '{' +
-                    'respond();' +
-                '};');
-                //+NPR5.53 [376308]
+                    'if (param.ReferenceBarcode === "")' +
+                    '{' +
+                        'stringpad({title: labels.title,caption: labels.refprompt,notBlank: true}).cancel(abort);' +
+                    '}' +
+                    'else' +
+                    '{' +
+                        'respond();' +
+                    '};');
                 RegisterWorkflowStep('reasonReturn', 'context.PromptForReason && respond();');
                 RegisterWorkflowStep('handle', 'respond();');
                 RegisterWorkflow(true);
 
                 RegisterBooleanParameter('ShowFullSale', false);
-                //-NPR5.53 [376308]
                 RegisterTextParameter('ReferenceBarcode', '');
-                //+NPR5.53 [376308]
             end;
     end;
 
@@ -115,9 +108,7 @@ codeunit 6151169 "NPR POS Action: NpGp Return"
                 end;
             'handle':
                 begin
-                    //-NPR5.52 [371388]
                     CheckSetup(POSSession);
-                    //+NPR5.52 [371388]
                     FindReference(Context, FrontEnd, POSSession, TempNpGpPOSSalesLine, TempNpGpPOSSalesEntry);
                     if CompanyName = TempNpGpPOSSalesEntry."Original Company" then begin
                         VerifyReceiptForReversal(Context, FrontEnd, TempNpGpPOSSalesEntry."Document No.");
@@ -160,20 +151,11 @@ codeunit 6151169 "NPR POS Action: NpGp Return"
         JSON: Codeunit "NPR POS JSON Management";
         ReferenceNumber: Text;
     begin
-        //-NPR5.53 [376308]
         HandleReferenceNumber(Context, FrontEnd, ReferenceNumber);
-        // JSON.InitializeJObjectParser(Context,FrontEnd);
-        //
-        // JSON.SetScope('$getReferenceNumber', TRUE);
-        // ReferenceNumber := JSON.GetString('numpad', TRUE);
-        //+NPR5.53 [376308]
         if (DelChr(ReferenceNumber, '<', ' ') = '') then
             Error(RefNoBlankErr);
 
-        //-NPR5.53 [376308]
-        //FindGlobalSaleByReferenceNo(FrontEnd,POSSession,Context,ReferenceNumber,JSON,TempNpGpPOSSalesLine,TempNpGpPOSSalesEntry);
         FindGlobalSaleByReferenceNo(FrontEnd, POSSession, Context, ReferenceNumber, TempNpGpPOSSalesLine, TempNpGpPOSSalesEntry);
-        //+NPR5.53 [376308]
     end;
 
     local procedure CheckSetup(POSSession: Codeunit "NPR POS Session"): Boolean
@@ -184,25 +166,17 @@ codeunit 6151169 "NPR POS Action: NpGp Return"
         POSSetup: Codeunit "NPR POS Setup";
         HttpUtility: DotNet NPRNetHttpUtility;
     begin
-        //-NPR5.52 [371388]
         POSSession.GetSetup(POSSetup);
         POSSetup.GetPOSUnit(POSUnit);
 
         POSUnit.TestField("Global POS Sales Setup");
         NpGpPOSSalesSetup.Get(POSUnit."Global POS Sales Setup");
-        //+NPR5.52 [371388]
 
         if DelChr(NpGpPOSSalesSetup."Company Name", '<', ' ') = '' then
             Error(EmptyFieldErr, NpGpPOSSalesSetup.FieldName("Company Name"), NpGpPOSSalesSetup.TableName);
 
         if DelChr(NpGpPOSSalesSetup."Service Url", '<', ' ') = '' then
             Error(EmptyFieldErr, NpGpPOSSalesSetup.FieldName("Service Url"), NpGpPOSSalesSetup.TableName);
-
-        //-NPR5.53 [337539] not relevant on this level
-        // IF STRPOS(HttpUtility.UrlDecode(NpGpPOSSalesSetup."Service Url"),NpGpPOSSalesSetup."Company Name") = 0 THEN
-        //  IF NOT CONFIRM(MissmatchCompanyNameCaption,TRUE,NpGpPOSSalesSetup.FIELDNAME("Company Name"),NpGpPOSSalesSetup.TABLENAME) THEN
-        //    ERROR('');
-        //+NPR5.53 [337539]
     end;
 
     local procedure FindGlobalSaleByReferenceNo(FrontEnd: Codeunit "NPR POS Front End Management"; POSSession: Codeunit "NPR POS Session"; Context: JsonObject; ReferenceNo: Code[50]; var TempNpGpPOSSalesLine: Record "NPR NpGp POS Sales Line" temporary; var TempNpGpPOSSalesEntry: Record "NPR NpGp POS Sales Entry" temporary)
@@ -238,13 +212,11 @@ codeunit 6151169 "NPR POS Action: NpGp Return"
         FullSale: Boolean;
         InterCompSetup: Boolean;
     begin
-        //-NPR5.52 [371388]
         POSSession.GetSetup(POSSetup);
         POSSetup.GetPOSUnit(POSUnit);
 
         POSUnit.TestField("Global POS Sales Setup");
         NpGpPOSSalesSetup.Get(POSUnit."Global POS Sales Setup");
-        //+NPR5.52 [371388]
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
 
@@ -319,9 +291,6 @@ codeunit 6151169 "NPR POS Action: NpGp Return"
 
         GetRecordsFromXml(XmlDoc, TempNpGpPOSSalesLine, TempNpGpPOSSalesEntry);
 
-        //-NPR5.53 [372895]
-        // IF NOT NpGpCrossCompanySetup.GET(TempNpGpPOSSalesEntry."Original Company") AND
-        //  (COMPANYNAME <> TempNpGpPOSSalesEntry."Original Company") THEN
         InterCompSetup := NpGpCrossCompanySetup.Get(TempNpGpPOSSalesEntry."Original Company");
 
         if not InterCompSetup then begin
@@ -330,7 +299,6 @@ codeunit 6151169 "NPR POS Action: NpGp Return"
         end;
 
         if (not InterCompSetup) and (CompanyName <> TempNpGpPOSSalesEntry."Original Company") then
-            //+NPR5.53 [372895]
             Error(NoInterCompTradeErr, CompanyName, TempNpGpPOSSalesEntry."Original Company");
 
         if not FullSale then
@@ -478,10 +446,6 @@ codeunit 6151169 "NPR POS Action: NpGp Return"
                 SaleLinePOS."Return Sale Sales Ticket No." := TempNpGpPOSSalesEntry."Document No.";
                 SaleLinePOS."Return Sales Sales Type" := SalePOS."Sale type";
                 SaleLinePOS."Return Reason Code" := ReturnReasonCode;
-                //-NPR5.54 [391871]
-                //    SaleLinePOS."Retail ID" := CREATEGUID;
-                //+NPR5.54 [391871]
-
                 SaleLinePOS.Modify(true);
 
                 RetailCrossReference."Retail ID" := SaleLinePOS."Retail ID";
@@ -538,20 +502,11 @@ codeunit 6151169 "NPR POS Action: NpGp Return"
         AuditRoll: Record "NPR Audit Roll";
         ReferenceNumber: Text;
     begin
-        //-NPR5.53 [376308]
         HandleReferenceNumber(Context, FrontEnd, ReferenceNumber);
-        // JSON.InitializeJObjectParser(Context,FrontEnd);
-        //
-        // JSON.SetScope('/',TRUE);
-        // JSON.SetScope('$getReferenceNumber',TRUE);
-        //+NPR5.53 [376308]
 
         AuditRoll.SetRange("Sales Ticket No.", SalesTicketNo);
         if not AuditRoll.FindFirst then
-            //-NPR5.53 [376308]
-            // ERROR(NotFoundErr,JSON.GetString('numpad', TRUE));
             Error(NotFoundErr, ReferenceNumber);
-        //+NPR5.53 [376308]
     end;
 
     local procedure CreateNormalReverseSale(Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var TempNpGpPOSSalesEntry: Record "NPR NpGp POS Sales Entry" temporary; var TempNpGpPOSSalesLine: Record "NPR NpGp POS Sales Line" temporary)
@@ -662,9 +617,6 @@ codeunit 6151169 "NPR POS Action: NpGp Return"
                 else
                     SaleLinePOS.Validate(Quantity, -1);
 
-                //-NPR5.54 [391871]
-                //    SaleLinePOS."Retail ID" := CREATEGUID;
-                //+NPR5.54 [391871]
                 SaleLinePOS."Return Sale No." := SalePOS."Sales Ticket No.";
                 SaleLinePOS."Return Sale Register No." := SalePOS."Register No.";
                 SaleLinePOS."Return Sale Sales Ticket No." := TempNpGpPOSSalesEntry."Document No.";
@@ -717,7 +669,6 @@ codeunit 6151169 "NPR POS Action: NpGp Return"
     var
         JSON: Codeunit "NPR POS JSON Management";
     begin
-        //-NPR5.53 [376308]
         JSON.InitializeJObjectParser(Context, FrontEnd);
 
         ReferenceNumber := JSON.GetStringParameter('ReferenceBarcode', true);
@@ -726,12 +677,8 @@ codeunit 6151169 "NPR POS Action: NpGp Return"
             ReferenceNumber := JSON.GetString('numpad', true);
         end;
 
-        //-NPR5.53 [379255]
-        //ReferenceNumber := DELCHR(ReferenceNumber,'=','[]');
         if CopyStr(ReferenceNumber, StrLen(ReferenceNumber) - 1) = 'XX' then
             ReferenceNumber := CopyStr(ReferenceNumber, 1, StrLen(ReferenceNumber) - 2);
-        //+NPR5.53 [379255]
-        //+NPR5.53 [376308]
     end;
 
     local procedure "--- Ean Box Event Handling"()
@@ -743,7 +690,6 @@ codeunit 6151169 "NPR POS Action: NpGp Return"
     var
         ExchangeLabel: Record "NPR Exchange Label";
     begin
-        //-NPR5.53 [376308]
         if not EanBoxEvent.Get(EventCodeExchLabel()) then begin
             EanBoxEvent.Init;
             EanBoxEvent.Code := EventCodeExchLabel();
@@ -754,16 +700,13 @@ codeunit 6151169 "NPR POS Action: NpGp Return"
             EanBoxEvent."Event Codeunit" := CODEUNIT::"NPR POS Action: NpGp Return";
             EanBoxEvent.Insert(true);
         end;
-        //+NPR5.53 [376308]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6060105, 'OnInitEanBoxParameters', '', true, true)]
     local procedure OnInitEanBoxParameters(var Sender: Codeunit "NPR Ean Box Setup Mgt."; EanBoxEvent: Record "NPR Ean Box Event")
     begin
-        //-NPR5.53 [376308]
         if EanBoxEvent.Code = EventCodeExchLabel() then
             Sender.SetNonEditableParameterValues(EanBoxEvent, 'ReferenceBarcode', true, '');
-        //+NPR5.53 [376308]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6060107, 'SetEanBoxEventInScope', '', true, true)]
@@ -771,26 +714,15 @@ codeunit 6151169 "NPR POS Action: NpGp Return"
     var
         ExchangeLabel: Record "NPR Exchange Label";
     begin
-        //-NPR5.53 [376308]
         if EanBoxSetupEvent."Event Code" <> EventCodeExchLabel() then
             exit;
 
-        //-NPR5.53 [379255]
-        // IF (STRLEN(EanBoxValue) <= MAXSTRLEN(ExchangeLabel."Retail Cross Reference No.") + 2) AND
-        //  (COPYSTR(EanBoxValue,1,1) = '[') AND
-        //  (COPYSTR(EanBoxValue,STRLEN(EanBoxValue)) = ']')
-        // THEN
-        //  InScope := TRUE;
         InScope := (CopyStr(EanBoxValue, StrLen(EanBoxValue) - 1, 2) = 'XX') and (StrLen(EanBoxValue) > 2);
-        //+NPR5.53 [379255]
-        //+NPR5.53 [376308]
     end;
 
     local procedure EventCodeExchLabel(): Code[20]
     begin
-        //-NPR5.53 [376308]
         exit('GLOBAL_EXCHANGE');
-        //+NPR5.53 [376308]
     end;
 }
 

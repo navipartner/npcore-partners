@@ -30,7 +30,7 @@ report 6151405 "NPR Magento Credit Voucher"
             column(IssueDate_CreditVoucher; Format("Credit Voucher"."Issue Date"))
             {
             }
-            column(Salesperson_CreditVoucher; "Credit Voucher".Salesperson)
+            column(Salesperson_CreditVoucher; "Credit Voucher"."Salesperson Code")
             {
             }
             column(ShortcutDimension1Code_CreditVoucher; "Credit Voucher"."Shortcut Dimension 1 Code")

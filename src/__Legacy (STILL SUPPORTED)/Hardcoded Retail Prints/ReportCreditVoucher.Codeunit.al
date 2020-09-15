@@ -231,7 +231,7 @@ codeunit 6014563 "NPR Report - Credit Voucher"
         else
             Barcode := '';
 
-        if Salesperson.Get(CreditVoucher.Salesperson) then;
+        if Salesperson.Get(CreditVoucher."Salesperson Code") then;
 
         if RetailConfiguration."Salesperson on Sales Ticket" then
             //-NPR5.27 [256097]
