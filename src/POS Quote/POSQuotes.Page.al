@@ -9,7 +9,7 @@ page 6151002 "NPR POS Quotes"
     Caption = 'POS Quotes';
     CardPageID = "NPR POS Quote Card";
     Editable = false;
-    PageType = Document;
+    PageType = List;
     SourceTable = "NPR POS Quote Entry";
     UsageCategory = Lists;
 
@@ -75,11 +75,6 @@ page 6151002 "NPR POS Quotes"
                 {
                     ApplicationArea = All;
                 }
-            }
-            part(Control6014417; "NPR POS Quote Subpage")
-            {
-                SubPageLink = "Quote Entry No." = FIELD("Entry No.");
-                ApplicationArea = All;
             }
         }
     }
