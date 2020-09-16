@@ -18,7 +18,7 @@ page 6059982 "NPR Web Processor Role Center"
                 {
                     ApplicationArea = All;
                 }
-                part(Control6150618; "Item List")
+                part(Control6150618; "NPR Item List")
                 {
                     ApplicationArea = All;
                 }
