@@ -109,9 +109,6 @@ report 6014617 "NPR Purchase Order"
                     column(ReportTitleCopyText; StrSubstNo(Text004, CopyText))
                     {
                     }
-                    column(CurrRepPageNo; StrSubstNo(Text005, Format(CurrReport.PageNo)))
-                    {
-                    }
                     column(CompanyAddr1; CompanyAddr[1])
                     {
                     }
@@ -1003,7 +1000,6 @@ report 6014617 "NPR Purchase Order"
 
                     if Number > 1 then
                         CopyText := Text003;
-                    CurrReport.PageNo := 1;
                     OutputNo := OutputNo + 1;
 
                     TotalSubTotal := 0;
@@ -1167,7 +1163,7 @@ report 6014617 "NPR Purchase Order"
 
         trigger OnOpenPage()
         begin
-            ArchiveDocument := PurchSetup."Archive Quotes and Orders";
+            ArchiveDocument := PurchSetup."Archive Orders";
             LogInteraction := SegManagement.FindInteractTmplCode(13) <> '';
 
             LogInteractionEnable := LogInteraction;
@@ -1190,7 +1186,7 @@ report 6014617 "NPR Purchase Order"
         Text002: Label 'Total %1 Incl. VAT';
         Text003: Label ' COPY';
         Text004: Label 'Order%1';
-        Text005: Label 'Page %1';
+        Text005: Label 'Page';
         Text006: Label 'Total %1 Excl. VAT';
         GLSetup: Record "General Ledger Setup";
         CompanyInfo: Record "Company Information";

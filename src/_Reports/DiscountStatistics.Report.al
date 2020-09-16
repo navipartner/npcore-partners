@@ -1,13 +1,5 @@
 report 6014402 "NPR Discount Statistics"
 {
-    // NPR7.000.000 LS, 05-11-12, CASE:144111 : Convert Report to Nav 2013
-    // NPR5.38/JLK /20180124  CASE 300892 Corrected AL Error on Caption name
-    //                                    Obsolite property CurrReport_PAGENO
-    // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
-    // NPR5.49/BHR /20190115  CASE 341969 Corrections as per OMA Guidelines
-    // NPR5.55/ANPA/20200505  CASE 402932 Changed layout so the table is alligned with the header
-    // NPR5.55/BHR /20200220  CASE 361515 Replace the field Sales LCY flowfield
-    // NPR5.55/YAHA/20200610  CASE 394884 Header layout modification
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Discount Statistics.rdlc';
 
@@ -112,7 +104,7 @@ report 6014402 "NPR Discount Statistics"
                 {
                     DataItemLink = "Item No." = FIELD("No.");
                     DataItemLinkReference = Item;
-                    DataItemTableView = SORTING("NPR Group Sale", "Posting Date", "Salespers./Purch. Code", "Item Ledger Entry Type") WHERE("Item Ledger Entry Type" = CONST(Sale));
+                    DataItemTableView = SORTING("Item No.", "Posting Date", "Item Ledger Entry Type") WHERE("Item Ledger Entry Type" = CONST(Sale));
                     RequestFilterFields = "NPR Discount Type", "NPR Register No.";
                     column(Entry_No_Caption; Entry_No_Caption_Lbl)
                     {
@@ -147,6 +139,9 @@ report 6014402 "NPR Discount Statistics"
                     column(Total_VE_Discount_Amt; Total_VE_Discount_Amt)
                     {
                     }
+                    column(GroupSale; "NPR Group Sale")
+                    {
+                    }
 
                     trigger OnAfterGetRecord()
                     begin
@@ -172,17 +167,11 @@ report 6014402 "NPR Discount Statistics"
 
                 trigger OnPreDataItem()
                 begin
-                    //-NPR5.39
-                    //CurrReport.CREATETOTALS("Value Entry"."Discount Amount", "Value Entry"."Sales Amount (Actual)","Value Entry"."Invoiced Quantity");
-                    //+NPR5.39
                 end;
             }
 
             trigger OnPreDataItem()
             begin
-                //-NPR5.39
-                //CurrReport.CREATETOTALS("Value Entry"."Discount Amount", "Value Entry"."Sales Amount (Actual)","Value Entry"."Invoiced Quantity");
-                //+NPR5.39
             end;
         }
         dataitem("Salesperson/Purchaser 2"; "Salesperson/Purchaser")
@@ -212,16 +201,12 @@ report 6014402 "NPR Discount Statistics"
             var
                 ValueEntry2: Record "Value Entry";
             begin
-
-                //-NPR5.55 [361515]
-                //Item.COPYFILTER("Date Filter", "Salesperson/Purchaser 2"."Date Filter");
                 ValueEntry2.SetCurrentKey("Item Ledger Entry Type", "Posting Date");
                 Item.CopyFilter("Date Filter", ValueEntry2."Posting Date");
                 ValueEntry2.SetRange("Salespers./Purch. Code", "Salesperson/Purchaser 2".Code);
                 ValueEntry2.SetRange("Item Ledger Entry Type", ValueEntry2."Item Ledger Entry Type"::Sale);
                 ValueEntry2.CalcSums("Sales Amount (Actual)");
                 SalesLCY := ValueEntry2."Sales Amount (Actual)";
-                //-NPR5.55 [361515]
             end;
         }
     }
@@ -269,12 +254,6 @@ report 6014402 "NPR Discount Statistics"
         SupplierFilter := Item.GetFilter("Vendor No.");
         ItemNoFilter := Item.GetFilter("No.");
         DiscountFilter := "Value Entry".GetFilter("NPR Discount Type");
-
-        //-NPR5.39
-        // Object.SETRANGE(ID, 6014402);
-        // Object.SETRANGE(Type, 3);
-        // Object.FIND('-');
-        //+NPR5.39
     end;
 
     var

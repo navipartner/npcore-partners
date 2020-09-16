@@ -427,6 +427,8 @@ report 6014663 "NPR Retail Calc. Inv."
                                 if WhseEntry."Qty. (Base)" <> 0 then begin
                                     if "Order Type" = "Order Type"::Production then
                                         OrderLineNo := "Order Line No.";
+                                    ReservEntry."Serial No." := WhseEntry."Serial No.";
+                                    ReservEntry."Lot No." := WhseEntry."Lot No.";
                                     CreateReservEntry.CreateReservEntryFor(
                                       DATABASE::"Item Journal Line",
                                       "Entry Type",
@@ -437,8 +439,7 @@ report 6014663 "NPR Retail Calc. Inv."
                                       "Qty. per Unit of Measure",
                                       Abs(WhseEntry.Quantity),
                                       Abs(WhseEntry."Qty. (Base)"),
-                                      WhseEntry."Serial No.",
-                                      WhseEntry."Lot No.");
+                                      ReservEntry);
                                     if WhseEntry."Qty. (Base)" < 0 then             // only Date on positive adjustments
                                         CreateReservEntry.SetDates(WhseEntry."Warranty Date", WhseEntry."Expiration Date");
                                     CreateReservEntry.CreateEntry(
@@ -518,17 +519,16 @@ report 6014663 "NPR Retail Calc. Inv."
     var
         WhseEntry: Record "Warehouse Entry";
         WhseEntry2: Record "Warehouse Entry";
+        WhseItemTrackingSetup: Record "Item Tracking Setup";
         ItemTrackingMgt: Codeunit "Item Tracking Management";
         WhseQuantity: Decimal;
-        WhseSNRequired: Boolean;
-        WhseLNRequired: Boolean;
         NoWhseEntry: Boolean;
         NoWhseEntry2: Boolean;
     begin
         AdjustPosQty := false;
         with QuantityOnHandBuffer do begin
-            ItemTrackingMgt.CheckWhseItemTrkgSetup("Item No.", WhseSNRequired, WhseLNRequired, false);
-            ItemTrackingSplit := WhseSNRequired or WhseLNRequired;
+            ItemTrackingMgt.GetWhseItemTrkgSetup("Item No.", WhseItemTrackingSetup);
+            ItemTrackingSplit := WhseItemTrackingSetup."Serial No. Required" or WhseItemTrackingSetup."Lot No. Required";
             WhseEntry.SetCurrentKey(
               "Item No.", "Bin Code", "Location Code", "Variant Code", "Unit of Measure Code",
               "Lot No.", "Serial No.", "Entry Type");
@@ -540,7 +540,7 @@ report 6014663 "NPR Retail Calc. Inv."
             WhseQuantity := WhseEntry."Qty. (Base)";
             WhseEntry.SetRange("Bin Code", AdjmtBin);
 
-            if WhseSNRequired then begin
+            if WhseItemTrackingSetup."Serial No. Required" then begin
                 WhseEntry.SetRange("Entry Type", WhseEntry."Entry Type"::"Positive Adjmt.");
                 WhseEntry.CalcSums("Qty. (Base)");
                 PosQuantity := WhseQuantity - WhseEntry."Qty. (Base)";

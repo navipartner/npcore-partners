@@ -3267,6 +3267,9 @@ End Function
         <Field Name="Total_VE_Discount_AmtFormat">
           <DataField>Total_VE_Discount_AmtFormat</DataField>
         </Field>
+        <Field Name="GroupSale">
+          <DataField>GroupSale</DataField>
+        </Field>
         <Field Name="Code_Salesperson_Purchaser_2">
           <DataField>Code_Salesperson_Purchaser_2</DataField>
         </Field>

@@ -10400,9 +10400,6 @@ End Function</Code>
         <Field Name="ReportTitleCopyText">
           <DataField>ReportTitleCopyText</DataField>
         </Field>
-        <Field Name="CurrRepPageNo">
-          <DataField>CurrRepPageNo</DataField>
-        </Field>
         <Field Name="CompanyAddr1">
           <DataField>CompanyAddr1</DataField>
         </Field>

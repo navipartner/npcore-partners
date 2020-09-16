@@ -114,9 +114,6 @@ report 6014447 "NPR Sales Invoice A4 (Retail)"
                     column(PostingDate_SalesInvoiceHeader; "Sales Invoice Header"."Posting Date")
                     {
                     }
-                    column(PAGENO; Format(CurrReport.PageNo))
-                    {
-                    }
                     column(LevAdresse_1_SideLoekke; LevAdresse[1])
                     {
                     }

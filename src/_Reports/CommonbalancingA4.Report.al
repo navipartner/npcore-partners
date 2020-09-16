@@ -178,11 +178,7 @@ report 6014473 "NPR Common balancing A4"
 
             trigger OnPreDataItem()
             begin
-
                 SetView(Sales.GetView);
-
-                if skiftsideprsektion then CurrReport.NewPage;
-
                 n := 0;
             end;
         }
@@ -225,9 +221,6 @@ report 6014473 "NPR Common balancing A4"
             trigger OnPreDataItem()
             begin
                 SetView(Sales.GetView);
-
-                if skiftsideprsektion then CurrReport.NewPage;
-
                 n := 0;
             end;
         }
@@ -246,9 +239,6 @@ report 6014473 "NPR Common balancing A4"
             trigger OnPreDataItem()
             begin
                 SetView(Sales.GetView);
-
-                if skiftsideprsektion then CurrReport.NewPage;
-
                 n := 0;
             end;
         }
@@ -276,7 +266,6 @@ report 6014473 "NPR Common balancing A4"
 
             trigger OnPreDataItem()
             begin
-                if skiftsideprsektion then CurrReport.NewPage;
             end;
         }
     }
@@ -337,7 +326,7 @@ report 6014473 "NPR Common balancing A4"
         show_today: Boolean;
         dato: Date;
         tid: Time;
-        skiftsideprsektion: Boolean;
+        NewPagePerSection: Boolean;
         decformattxt: Text[100];
         tgkdebet: Decimal;
         sumsalg: array[100] of Decimal;

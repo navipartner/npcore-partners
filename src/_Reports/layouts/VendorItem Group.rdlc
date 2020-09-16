@@ -7,7 +7,7 @@
         <DataProvider>SQL</DataProvider>
         <ConnectString />
       </ConnectionProperties>
-      <rd:SecurityType>None</rd:SecurityType>
+      <rd:DataSourceID>6516fc2e-d0b3-457e-beac-a2ae3084fd2a</rd:DataSourceID>
     </DataSource>
   </DataSources>
   <ReportSections>
@@ -3595,7 +3595,7 @@
                 <Paragraph>
                   <TextRuns>
                     <TextRun>
-                      <Value EvaluationMode="Constant" />
+                      <Value>=Parameters!PageNoLbl.Value &amp; " " &amp; Globals!PageNumber</Value>
                       <Style>
                         <FontSize>7pt</FontSize>
                         <FontWeight>Bold</FontWeight>
@@ -3603,7 +3603,7 @@
                     </TextRun>
                   </TextRuns>
                   <Style>
-                    <TextAlign>Left</TextAlign>
+                    <TextAlign>Right</TextAlign>
                   </Style>
                 </Paragraph>
               </Paragraphs>
@@ -3896,11 +3896,20 @@
       </DefaultValue>
       <Prompt>TotalItemGrp</Prompt>
     </ReportParameter>
+    <ReportParameter Name="PageNoLbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>PageNoLbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>PageNoLbl</Prompt>
+    </ReportParameter>
   </ReportParameters>
   <ReportParametersLayout>
     <GridLayoutDefinition>
       <NumberOfColumns>1</NumberOfColumns>
-      <NumberOfRows>23</NumberOfRows>
+      <NumberOfRows>24</NumberOfRows>
       <CellDefinitions>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
@@ -4016,6 +4025,11 @@
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>22</RowIndex>
           <ParameterName>TotalItemGrp</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>23</RowIndex>
+          <ParameterName>PageNoLbl</ParameterName>
         </CellDefinition>
       </CellDefinitions>
     </GridLayoutDefinition>
@@ -4177,6 +4191,7 @@ End Function
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Cm</rd:ReportUnitType>
+  <rd:ReportID>6492f484-47af-4d10-953b-d0ba37cd7db0</rd:ReportID>
   <DataSets>
     <DataSet Name="DataSet_Result">
       <Fields>
@@ -4242,9 +4257,6 @@ End Function
         </Field>
         <Field Name="COMPANYNAME">
           <DataField>COMPANYNAME</DataField>
-        </Field>
-        <Field Name="CurrReport_PAGENO">
-          <DataField>CurrReport_PAGENO</DataField>
         </Field>
         <Field Name="viskunhovedtal">
           <DataField>viskunhovedtal</DataField>

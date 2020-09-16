@@ -142,7 +142,7 @@ report 6150660 "NPR NPRE: Rest. Daily Turnover"
         }
         dataitem(POSSalesLineCons; "NPR POS Sales Line")
         {
-            DataItemTableView = SORTING("Planned Delivery Date");
+            DataItemTableView = SORTING("POS Entry No.", "Line No.");
             UseTemporary = true;
             column(LineNo; LineNo)
             {
