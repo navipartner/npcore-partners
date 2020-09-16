@@ -8662,9 +8662,6 @@ End Function</Code>
         <Field Name="PostingDate_SalesInvoiceHeader">
           <DataField>PostingDate_SalesInvoiceHeader</DataField>
         </Field>
-        <Field Name="PAGENO">
-          <DataField>PAGENO</DataField>
-        </Field>
         <Field Name="LevAdresse_1_SideLoekke">
           <DataField>LevAdresse_1_SideLoekke</DataField>
         </Field>

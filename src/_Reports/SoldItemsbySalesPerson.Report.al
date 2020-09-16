@@ -1,7 +1,5 @@
 report 6014412 "NPR Sold Items by Sales Person"
 {
-    // NPR70.00.00.00/LS Convert Report to Nav 2013
-    // NPR5.38/JLK /20180124  CASE 300892 Corrected AL Error on obsolite property CurrReport_PAGENO
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Sold Items by Sales Person.rdlc';
 
@@ -41,7 +39,7 @@ report 6014412 "NPR Sold Items by Sales Person"
             dataitem("Item Ledger Entry"; "Item Ledger Entry")
             {
                 DataItemLink = "Item No." = FIELD("No."), "Variant Code" = FIELD("Variant Filter"), "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"), "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter"), "Posting Date" = FIELD("Date Filter"), "Location Code" = FIELD("Location Filter");
-                DataItemTableView = SORTING("Item No.", "NPR Salesperson Code") WHERE("Invoiced Quantity" = FILTER(<> 0), "Entry Type" = CONST(Sale), "NPR Salesperson Code" = FILTER(<> ''));
+                DataItemTableView = SORTING("Item No.", "Entry Type") WHERE("Invoiced Quantity" = FILTER(<> 0), "Entry Type" = CONST(Sale), "NPR Salesperson Code" = FILTER(<> ''));
                 column(ItemNo_ItemLedgerEntry; "Item Ledger Entry"."Item No.")
                 {
                 }
@@ -57,13 +55,9 @@ report 6014412 "NPR Sold Items by Sales Person"
 
                 trigger OnAfterGetRecord()
                 begin
-                    //-NPR70.00.00.00
                     SalespersonName := '';
-                    SalespersonPurchaser.Reset;
-                    SalespersonPurchaser.SetRange(Code, "NPR Salesperson Code");
-                    if SalespersonPurchaser.Find('-') then
+                    if SalespersonPurchaser.Get("NPR Salesperson Code") then
                         SalespersonName := SalespersonPurchaser.Name;
-                    //+NPR70.00.00.00
                 end;
             }
 
@@ -112,9 +106,6 @@ report 6014412 "NPR Sold Items by Sales Person"
         SalespersonPurchaser: Record "Salesperson/Purchaser";
         ProfitPct: Decimal;
         "Object": Record "Object";
-        "//-NPR7": Integer;
         ObjectDetails: Text[100];
         SalespersonName: Text[30];
-        "//+NPR7": Integer;
 }
-

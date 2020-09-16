@@ -7,7 +7,7 @@
         <DataProvider>SQL</DataProvider>
         <ConnectString />
       </ConnectionProperties>
-      <rd:SecurityType>None</rd:SecurityType>
+      <rd:DataSourceID>e8ea282e-12c4-4aec-9487-2cd642c72376</rd:DataSourceID>
     </DataSource>
   </DataSources>
   <ReportSections>
@@ -686,6 +686,7 @@
                             </Border>
                           </Style>
                         </Rectangle>
+                        <rd:Selected>true</rd:Selected>
                       </CellContents>
                     </TablixCell>
                   </TablixCells>
@@ -714,6 +715,14 @@
                       </Filter>
                     </Filters>
                   </Group>
+                  <SortExpressions>
+                    <SortExpression>
+                      <Value>=Fields!No_Item.Value</Value>
+                    </SortExpression>
+                    <SortExpression>
+                      <Value>=Fields!SalespersonCode_ItemLedgerEntry.Value</Value>
+                    </SortExpression>
+                  </SortExpressions>
                 </TablixMember>
               </TablixMembers>
             </TablixRowHierarchy>
@@ -1300,6 +1309,7 @@ End Function
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Cm</rd:ReportUnitType>
+  <rd:ReportID>fbcc1208-1f25-4c10-a334-b89b9b8acbf7</rd:ReportID>
   <DataSets>
     <DataSet Name="DataSet_Result">
       <Fields>

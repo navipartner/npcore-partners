@@ -69,9 +69,6 @@ report 6014435 "NPR Vendor/Item Group"
             column(COMPANYNAME; CompanyName)
             {
             }
-            column(CurrReport_PAGENO; CurrReport.PageNo)
-            {
-            }
             column(viskunhovedtal; Viskunhovedtal)
             {
             }
@@ -556,6 +553,7 @@ report 6014435 "NPR Vendor/Item Group"
         Total_Caption = 'Total';
         SalesAmt_Caption = 'Sales Amount';
         TotalItemGrp = 'Total Item Group';
+        PageNoLbl = 'Page';
     }
 
     trigger OnInitReport()

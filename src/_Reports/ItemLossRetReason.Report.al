@@ -69,9 +69,6 @@ report 6014544 "NPR Item Loss - Ret. Reason"
             column(USERID; UserId)
             {
             }
-            column(CurrReport_PAGENO; CurrReport.PageNo)
-            {
-            }
             column(Reason_Code_Code; Code)
             {
             }

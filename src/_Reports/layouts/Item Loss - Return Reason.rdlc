@@ -1732,9 +1732,6 @@ End Function
         <Field Name="USERID">
           <DataField>USERID</DataField>
         </Field>
-        <Field Name="CurrReport_PAGENO">
-          <DataField>CurrReport_PAGENO</DataField>
-        </Field>
         <Field Name="Reason_Code_Code">
           <DataField>Reason_Code_Code</DataField>
         </Field>

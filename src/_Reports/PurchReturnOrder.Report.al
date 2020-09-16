@@ -682,7 +682,6 @@ report 6014510 "NPR Purch Return Order"
                         CopyText := Text003;
                         OutputNo += 1;
                     end;
-                    CurrReport.PageNo := 1;
 
                     TotalSubTotal := 0;
                     TotalInvoiceDiscountAmount := 0;
