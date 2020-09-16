@@ -624,7 +624,6 @@ report 6014545 "NPR Acc. Statement w FIK-Card"
                     CurrReport.Skip;
 
                 FormatAddr.Customer(CustAddr, Customer);
-                CurrReport.PageNo := 1;
 
                 if not CurrReport.Preview then begin
                     Customer.LockTable;

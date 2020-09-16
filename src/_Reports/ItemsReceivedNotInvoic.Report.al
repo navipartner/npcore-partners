@@ -21,9 +21,6 @@ report 6014450 "NPR Items Received&Not Invoic."
             column(COMPANYNAME; CompanyName)
             {
             }
-            column(CurrReport_PAGENO; CurrReport.PageNo)
-            {
-            }
             column(USERID; UserId)
             {
             }
