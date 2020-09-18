@@ -4,7 +4,7 @@ page 6059983 "NPR Store Manager Activ."
     // NPR5.43/JDH /20180604 CASE 317971 Changed captions to ENU
 
     Caption = 'Order Processing';
-    PageType = List;
+    PageType = ListPart;
     SourceTable = "NPR Retail Order Cue";
 
     layout

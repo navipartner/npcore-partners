@@ -21,7 +21,7 @@ page 6151263 "NPR Retail Ticket Role Center"
 
             part(Control6150614; "NPR RC Ticket Activities")
             {
-                  ApplicationArea = All;
+                ApplicationArea = All;
             }
             part(Control6150626; "NPR Retail Activities")
             {
@@ -30,7 +30,7 @@ page 6151263 "NPR Retail Ticket Role Center"
 
             part(Control4; "NPR RC Members. Burndown Chart")
             {
-                  ApplicationArea = All;
+                ApplicationArea = All;
             }
             part(Control6150624; "NPR Retail Sales Chart")
             {
@@ -78,96 +78,82 @@ page 6151263 "NPR Retail Ticket Role Center"
         }
         area(embedding)
         {
-            group(Members)
+            action("Ticket List")
+            {
+                Caption = 'Ticket List';
+                Image = List;
+                RunObject = Page "NPR TM Ticket List";
+                ApplicationArea = All;
+            }
+            action(Memberships)
+            {
+                Caption = 'Memberships';
+                Image = CustomerList;
+                RunObject = Page "NPR MM Memberships";
+                ApplicationArea = All;
+            }
+            action(Action6150625)
             {
                 Caption = 'Members';
-                action("Ticket List")
-                {
-                    Caption = 'Ticket List';
-                    Image = List;
-                    RunObject = Page "NPR TM Ticket List";
-                    ApplicationArea = All;
-                }
-                separator(Separator6150618)
-                {
-                }
-                action(Memberships)
-                {
-                    Caption = 'Memberships';
-                    Image = CustomerList;
-                    RunObject = Page "NPR MM Memberships";
-                    ApplicationArea = All;
-                }
-                action(Action6150625)
-                {
-                    Caption = 'Members';
-                    Image = Customer;
-                    RunObject = Page "NPR MM Members";
-                    ApplicationArea = All;
-                }
-                action(Membercards)
-                {
-                    Caption = 'Membercards';
-                    Image = CreditCard;
-                    RunObject = Page "NPR MM Member Card List";
-                    ApplicationArea = All;
-                }
-                separator(Separator6150616)
-                {
-                }
+                Image = Customer;
+                RunObject = Page "NPR MM Members";
+                ApplicationArea = All;
             }
-            group(General)
+            action(Membercards)
             {
-                Caption = 'General';
-                action(Items)
-                {
-                    Caption = 'Items';
-                    Image = Item;
-                    RunObject = Page "NPR Retail Item List";
-                    ApplicationArea = All;
-                }
-                action(Contacts)
-                {
-                    Caption = 'Contacts';
-                    Image = CustomerContact;
-                    RunObject = Page "Contact List";
-                    ApplicationArea = All;
-                }
-                action(Customers)
-                {
-                    Caption = 'Customers';
-                    Image = Customer;
-                    RunObject = Page "Customer List";
-                    ApplicationArea = All;
-                }
-                action(Campaigns)
-                {
-                    Caption = 'Campaigns';
-                    Image = Campaign;
-                    RunObject = Page "Campaign List";
-                    ApplicationArea = All;
-                }
-                action(Segments)
-                {
-                    Caption = 'Segments';
-                    Image = Segment;
-                    RunObject = Page "Segment List";
-                    ApplicationArea = All;
-                }
-                action("To-dos")
-                {
-                    Caption = 'To-dos';
-                    Image = TaskList;
-                    RunObject = Page "Task List";
-                    ApplicationArea = All;
-                }
-                action(Teams)
-                {
-                    Caption = 'Teams';
-                    Image = TeamSales;
-                    RunObject = Page Teams;
-                    ApplicationArea = All;
-                }
+                Caption = 'Membercards';
+                Image = CreditCard;
+                RunObject = Page "NPR MM Member Card List";
+                ApplicationArea = All;
+            }
+            action(Items)
+            {
+                Caption = 'Items';
+                Image = Item;
+                RunObject = Page "NPR Retail Item List";
+                ApplicationArea = All;
+            }
+            action(Contacts)
+            {
+                Caption = 'Contacts';
+                Image = CustomerContact;
+                RunObject = Page "Contact List";
+                ApplicationArea = All;
+            }
+            action(Customers)
+            {
+                Caption = 'Customers';
+                Image = Customer;
+                RunObject = Page "Customer List";
+                ApplicationArea = All;
+            }
+            action(Campaigns)
+            {
+                Caption = 'Campaigns';
+                Image = Campaign;
+                RunObject = Page "Campaign List";
+                ApplicationArea = All;
+            }
+            action(Segments)
+            {
+                Caption = 'Segments';
+                Image = Segment;
+                RunObject = Page "Segment List";
+                ApplicationArea = All;
+            }
+            action("To-dos")
+            {
+                Caption = 'To-dos';
+                Image = TaskList;
+                RunObject = Page "Task List";
+                ApplicationArea = All;
+            }
+            action(Teams)
+            {
+                Caption = 'Teams';
+                Image = TeamSales;
+                RunObject = Page Teams;
+                ApplicationArea = All;
             }
         }
         area(sections)
