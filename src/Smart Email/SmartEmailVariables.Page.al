@@ -5,6 +5,7 @@ page 6059823 "NPR Smart Email Variables"
 
     Caption = 'Smart Email Variables';
     PageType = ListPart;
+    UsageCategory = Administration;
     SourceTable = "NPR Smart Email Variable";
 
     layout

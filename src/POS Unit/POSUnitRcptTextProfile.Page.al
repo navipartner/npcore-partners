@@ -4,6 +4,7 @@ page 6151265 "NPR POS Unit Rcpt.Text Profile"
 
     Caption = 'POS Unit Receipt Text Profile';
     PageType = Card;
+    UsageCategory = Administration;
     SourceTable = "NPR POS Unit Rcpt.Txt Profile";
 
     layout

@@ -5,6 +5,7 @@ page 6151510 "NPR Nc Task Output List"
     Caption = 'Task Output List';
     Editable = false;
     PageType = List;
+    UsageCategory = Administration;
     PromotedActionCategories = 'New,Process,Report,Navigate,NaviPartner';
     SourceTable = "NPR Nc Task Output";
 

@@ -2,6 +2,7 @@ page 6151062 "NPR Distribution Setup"
 {
     Caption = 'Distribution Setup';
     PageType = ListPart;
+    UsageCategory = Administration;
     SourceTable = "NPR Distribution Setup";
 
     layout

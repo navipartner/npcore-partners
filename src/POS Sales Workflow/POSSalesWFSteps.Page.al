@@ -6,6 +6,7 @@ page 6150730 "NPR POS Sales WF Steps"
     Caption = 'POS Sales Workflow Steps';
     DelayedInsert = true;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR POS Sales Workflow Step";
     SourceTableView = SORTING("Sequence No.")
                       ORDER(Ascending);

@@ -6,6 +6,7 @@ page 6059992 "NPR Item Repair Tests"
     Caption = 'Item Repair Tests';
     ModifyAllowed = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR Item Repair Tests";
 
     layout

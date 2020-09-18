@@ -4,6 +4,7 @@ page 6184506 "NPR EFT Verifone Paym. Param."
 
     Caption = 'EFT Verifone Payment Parameter';
     PageType = Card;
+    UsageCategory = Administration;
     SourceTable = "NPR EFT Verifone Paym. Param.";
 
     layout

@@ -5,6 +5,7 @@ page 6059832 "NPR Event Plan. Line Buffer"
     AutoSplitKey = true;
     Caption = 'Event Planning Line Buffer';
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR Event Plan. Line Buffer";
 
     layout

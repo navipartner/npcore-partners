@@ -10,6 +10,7 @@ page 6150660 "NPR NPRE Waiter Pad"
     Caption = 'Waiter Pad';
     InsertAllowed = false;
     PageType = Document;
+    UsageCategory = Administration;
     PromotedActionCategories = 'New,Process,Report,Kitchen Print';
     SourceTable = "NPR NPRE Waiter Pad";
 

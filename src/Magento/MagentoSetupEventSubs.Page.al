@@ -5,6 +5,7 @@ page 6151422 "NPR Magento Setup Event Subs."
     Caption = 'Magento Setup Event Subscriptions';
     DelayedInsert = true;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR Magento Setup Event Sub.";
 
     layout

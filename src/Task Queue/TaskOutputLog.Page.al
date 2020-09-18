@@ -6,6 +6,7 @@ page 6059911 "NPR Task Output Log"
 
     Caption = 'Task Output Log';
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR Task Output Log";
 
     layout

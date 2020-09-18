@@ -8,6 +8,7 @@ page 6184497 "NPR Pepper Version Card"
 
     Caption = 'Pepper Version Card';
     PageType = Card;
+    UsageCategory = Administration;
     SourceTable = "NPR Pepper Version";
 
     layout

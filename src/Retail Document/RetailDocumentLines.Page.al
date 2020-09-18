@@ -17,6 +17,7 @@ page 6014470 "NPR Retail Document Lines"
     Caption = 'Rental Sub Form';
     Editable = true;
     PageType = ListPart;
+    UsageCategory = Administration;
     RefreshOnActivate = true;
     SourceTable = "NPR Retail Document Lines";
     SourceTableView = SORTING("Document Type", "Document No.", "Line No.");

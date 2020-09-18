@@ -6,6 +6,7 @@ page 6014546 "NPR Dim. Select.Mul.w.Filter"
     DeleteAllowed = false;
     InsertAllowed = false;
     PageType = Worksheet;
+    UsageCategory = Administration;
     SourceTable = "Dimension Selection Buffer";
     SourceTableTemporary = true;
 

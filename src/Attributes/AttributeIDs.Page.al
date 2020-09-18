@@ -4,6 +4,7 @@ page 6014607 "NPR Attribute IDs"
 
     Caption = 'Client Attribute IDs';
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR Attribute ID";
 
     layout

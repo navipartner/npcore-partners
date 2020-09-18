@@ -11,6 +11,7 @@ page 6014596 "NPR Item Cat. Code Stats"
     Caption = 'Item Category Stats Subpage';
     Editable = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = Item;
 
     layout

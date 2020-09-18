@@ -9,6 +9,7 @@ page 6151560 "NPR NpXml Templ. Trigger Links"
     Caption = 'Xml Trigger Links';
     DelayedInsert = true;
     PageType = ListPart;
+    UsageCategory = Administration;
     SourceTable = "NPR NpXml Templ.Trigger Link";
 
     layout

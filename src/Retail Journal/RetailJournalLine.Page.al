@@ -33,6 +33,7 @@ page 6014472 "NPR Retail Journal Line"
     Caption = 'Lines';
     DelayedInsert = true;
     PageType = ListPart;
+    UsageCategory = Administration;
     SourceTable = "NPR Retail Journal Line";
     SourceTableView = SORTING("No.", "Line No.");
 

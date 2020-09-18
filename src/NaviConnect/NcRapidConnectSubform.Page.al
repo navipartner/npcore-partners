@@ -6,6 +6,7 @@ page 6151092 "NPR Nc RapidConnect Subform"
     Caption = 'Export Triggers';
     DelayedInsert = true;
     PageType = ListPart;
+    UsageCategory = Administration;
     RefreshOnActivate = true;
     SourceTable = "NPR Nc RapidConnect Trig.Table";
 

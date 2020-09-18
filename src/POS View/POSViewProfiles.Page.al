@@ -6,6 +6,7 @@ page 6150635 "NPR POS View Profiles"
     Caption = 'POS View Profiles';
     CardPageID = "NPR POS View Profile Card";
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR POS View Profile";
 
     layout

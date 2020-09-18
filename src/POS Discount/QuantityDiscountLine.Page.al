@@ -2,6 +2,7 @@ page 6014444 "NPR Quantity Discount Line"
 {
     Caption = 'Multiple Unit Price';
     PageType = CardPart;
+    UsageCategory = Administration;
     SourceTable = "NPR Quantity Discount Line";
 
     layout

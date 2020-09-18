@@ -9,6 +9,7 @@ page 6059813 "NPR Retail Sales Chart"
 
     Caption = 'Margin/Turnover by Period';
     PageType = CardPart;
+    UsageCategory = Administration;
     SourceTable = "Business Chart Buffer";
 
     layout

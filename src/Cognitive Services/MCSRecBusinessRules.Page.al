@@ -4,6 +4,7 @@ page 6060083 "NPR MCS Rec. Business Rules"
 
     Caption = 'MCS Rec. Business Rules';
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR MCS Rec. Bus. Rule";
 
     layout

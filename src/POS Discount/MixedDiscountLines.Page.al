@@ -11,6 +11,7 @@ page 6014451 "NPR Mixed Discount Lines"
     Caption = 'Mix Discount Lines';
     DelayedInsert = true;
     PageType = ListPart;
+    UsageCategory = Administration;
     SourceTable = "NPR Mixed Discount Line";
 
     layout

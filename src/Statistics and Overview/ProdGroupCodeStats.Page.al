@@ -9,6 +9,7 @@ page 6014597 "NPR Prod. Group Code Stats"
     Caption = 'Product Group Code Statistics';
     Editable = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = Item;
 
     layout

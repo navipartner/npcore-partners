@@ -2,6 +2,7 @@ page 6151371 "NPR CS Setup"
 {
     Caption = 'CS Setup';
     PageType = Card;
+    UsageCategory = Administration;
     SourceTable = "NPR CS Setup";
 
     layout

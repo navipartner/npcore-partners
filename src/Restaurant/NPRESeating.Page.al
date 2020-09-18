@@ -8,6 +8,7 @@ page 6150665 "NPR NPRE Seating"
 
     Caption = 'Seating';
     PageType = Card;
+    UsageCategory = Administration;
     SourceTable = "NPR NPRE Seating";
 
     layout

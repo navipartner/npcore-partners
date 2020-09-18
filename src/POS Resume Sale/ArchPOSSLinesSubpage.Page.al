@@ -3,6 +3,7 @@ page 6150745 "NPR Arch. POS S. Lines Subpage"
     Caption = 'Archive POS Sale Lines';
     Editable = false;
     PageType = ListPart;
+    UsageCategory = Administration;
     SourceTable = "NPR Archive Sale Line POS";
 
     layout

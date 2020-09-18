@@ -7,6 +7,7 @@ page 6014459 "NPR Item Group List"
     CardPageID = "NPR Item Group Page";
     Editable = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR Item Group";
 
     layout

@@ -9,6 +9,7 @@ page 6059796 "NPR E-mail Log"
     Caption = 'Mail And Document Log List';
     Editable = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR E-mail Log";
 
     layout

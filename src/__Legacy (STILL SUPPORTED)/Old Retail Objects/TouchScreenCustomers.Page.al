@@ -16,6 +16,7 @@ page 6014526 "NPR Touch Screen: Customers"
     Editable = false;
     InsertAllowed = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = Customer;
 
     layout

@@ -7,6 +7,7 @@ page 6014613 "NPR Retail Campgn.Item Subform"
     Caption = 'Retail Campaign Items';
     Editable = false;
     PageType = ListPart;
+    UsageCategory = Administration;
     SourceTable = "NPR Retail Campaign Items";
     SourceTableTemporary = true;
 

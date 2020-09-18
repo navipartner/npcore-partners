@@ -9,6 +9,7 @@ page 6151485 "NPR Magento Top 10 S.Person"
     CardPageID = "NPR Salesperson Card";
     Editable = false;
     PageType = ListPart;
+    UsageCategory = Administration;
     SourceTable = "Salesperson/Purchaser";
     SourceTableTemporary = true;
     SourceTableView = SORTING("Search E-Mail")

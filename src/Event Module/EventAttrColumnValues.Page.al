@@ -6,6 +6,7 @@ page 6060164 "NPR Event Attr. Column Values"
     AutoSplitKey = true;
     Caption = 'Attribute Column Values';
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR Event Attr. Column Value";
 
     layout

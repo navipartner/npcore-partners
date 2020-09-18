@@ -2,6 +2,7 @@ page 6151337 "NPR Restaurant Headline RC"
 {
     Caption = 'Headline';
     PageType = HeadlinePart;
+    UsageCategory = Administration;
     RefreshOnActivate = true;
 
     layout

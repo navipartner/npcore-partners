@@ -6,6 +6,7 @@ page 6014662 "NPR Stock-Take Worksheets"
 
     Caption = 'Stock-Take Worksheets';
     PageType = Worksheet;
+    UsageCategory = Administration;
     SourceTable = "NPR Stock-Take Worksheet";
 
     layout

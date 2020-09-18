@@ -5,6 +5,7 @@ page 6060153 "NPR Event Activities"
 
     Caption = 'Activities';
     PageType = CardPart;
+    UsageCategory = Administration;
     SourceTable = "NPR Event Cue";
 
     layout

@@ -7,6 +7,7 @@ page 6059932 "NPR Doc. Exchange Activities"
 
     Caption = 'Doc. Exchange Activities';
     PageType = CardPart;
+    UsageCategory = Administration;
     SourceTable = "NPR Doc. Exch. Cue";
 
     layout

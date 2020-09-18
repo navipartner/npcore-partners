@@ -8,6 +8,7 @@ page 6151433 "NPR Magento Attribute Set List"
     CardPageID = "NPR Magento Attribute Sets";
     Editable = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR Magento Attribute Set";
 
     layout

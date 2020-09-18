@@ -2,6 +2,7 @@ page 6151333 "NPR O365 Activities Ext"
 {
     Caption = 'Activities';
     PageType = CardPart;
+    UsageCategory = Administration;
     RefreshOnActivate = true;
     ShowFilter = false;
     SourceTable = "Activities Cue";

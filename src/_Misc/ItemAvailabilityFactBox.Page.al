@@ -6,6 +6,7 @@ page 6014601 "NPR Item Availability FactBox"
 
     Caption = 'Item Availability Details';
     PageType = CardPart;
+    UsageCategory = Administration;
     RefreshOnActivate = true;
     ShowFilter = true;
     SourceTable = Item;

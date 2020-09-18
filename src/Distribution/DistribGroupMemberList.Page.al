@@ -4,6 +4,7 @@ page 6151069 "NPR Distrib. Group Member List"
 
     Caption = 'Distribution Group Member List';
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR Distrib. Group Members";
 
     layout

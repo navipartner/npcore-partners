@@ -5,6 +5,7 @@ page 6060163 "NPR Event Attr. Row Values"
     AutoSplitKey = true;
     Caption = 'Attribute Row Values';
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR Event Attr. Row Value";
 
     layout

@@ -12,6 +12,7 @@ page 6014529 "NPR Touch Screen: Balanc.Line"
     DeleteAllowed = false;
     InsertAllowed = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR Payment Type - Detailed";
 
     layout

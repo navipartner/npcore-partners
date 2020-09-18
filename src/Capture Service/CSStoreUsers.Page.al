@@ -5,6 +5,7 @@ page 6151393 "NPR CS Store Users"
 
     Caption = 'CS Store Users';
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR CS Store Users";
 
     layout

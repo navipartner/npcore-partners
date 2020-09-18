@@ -6,6 +6,7 @@ page 6151374 "NPR CS Fields"
     Caption = 'CS Fields';
     Editable = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "Field";
 
     layout

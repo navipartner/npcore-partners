@@ -10,6 +10,7 @@ page 6151418 "NPR Magento Category Links"
     DelayedInsert = true;
     LinksAllowed = false;
     PageType = ListPart;
+    UsageCategory = Administration;
     ShowFilter = false;
     SourceTable = "NPR Magento Category Link";
 

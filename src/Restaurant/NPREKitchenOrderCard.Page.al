@@ -6,6 +6,7 @@ page 6150696 "NPR NPRE Kitchen Order Card"
     DeleteAllowed = false;
     InsertAllowed = false;
     PageType = Card;
+    UsageCategory = Administration;
     SourceTable = "NPR NPRE Kitchen Order";
 
     layout

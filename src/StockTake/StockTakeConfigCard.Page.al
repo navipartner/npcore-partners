@@ -5,6 +5,7 @@ page 6014668 "NPR Stock-Take Config. Card"
 
     Caption = 'Stock-Take Configuration Card';
     PageType = Card;
+    UsageCategory = Administration;
     SourceTable = "NPR Stock-Take Configuration";
 
     layout

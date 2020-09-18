@@ -5,6 +5,7 @@ page 6014481 "NPR Retail Report Select. List"
 
     Caption = 'Report Type List - Retail';
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR Report Selection Retail";
 
     layout

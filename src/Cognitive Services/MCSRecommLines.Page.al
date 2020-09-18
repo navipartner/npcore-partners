@@ -5,6 +5,7 @@ page 6060085 "NPR MCS Recomm. Lines"
     Caption = 'MCS Recommendations Lines';
     Editable = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR MCS Recommendations Line";
 
     layout

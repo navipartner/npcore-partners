@@ -7,6 +7,7 @@ page 6151005 "NPR POS Quote Lines"
     Caption = 'POS Quote Lines';
     Editable = false;
     PageType = Worksheet;
+    UsageCategory = Administration;
     SourceTable = "NPR POS Quote Line";
 
     layout

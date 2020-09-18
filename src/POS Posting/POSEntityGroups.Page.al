@@ -5,6 +5,7 @@ page 6150649 "NPR POS Entity Groups"
     Caption = 'POS Entity Groups';
     DataCaptionExpression = GetFormCaption;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR POS Entity Group";
 
     layout

@@ -6,6 +6,7 @@ page 6014676 "NPR Endpoint Filters"
     DelayedInsert = true;
     MultipleNewLines = false;
     PageType = ListPart;
+    UsageCategory = Administration;
     PopulateAllFields = true;
     SourceTable = "NPR Endpoint Filter";
 

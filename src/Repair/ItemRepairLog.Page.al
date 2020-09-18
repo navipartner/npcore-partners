@@ -5,6 +5,7 @@ page 6059993 "NPR Item Repair Log"
 
     Caption = 'Item Repair Log';
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR Item Repair Log";
 
     layout

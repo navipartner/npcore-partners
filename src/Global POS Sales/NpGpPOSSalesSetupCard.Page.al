@@ -6,6 +6,7 @@ page 6151172 "NPR NpGp POS Sales Setup Card"
 
     Caption = 'Global POS Sales Setup Card';
     PageType = Card;
+    UsageCategory = Administration;
     SourceTable = "NPR NpGp POS Sales Setup";
 
     layout

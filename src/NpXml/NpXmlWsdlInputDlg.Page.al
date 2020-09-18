@@ -5,6 +5,7 @@ page 6151565 "NPR NpXml Wsdl Input Dlg"
 
     Caption = 'WSDL Input Dialog';
     PageType = StandardDialog;
+    UsageCategory = Administration;
 
     layout
     {

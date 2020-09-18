@@ -4,6 +4,7 @@ page 6014606 "NPR Attribute Translations"
 
     Caption = 'Client Attribute Translations';
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR Attribute Translation";
 
     layout

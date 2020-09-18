@@ -5,6 +5,7 @@ page 6150742 "NPR POS Admin. Template Scopes"
     Caption = 'POS Admin. Template Scopes';
     DelayedInsert = true;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR POS Admin. Template Scope";
 
     layout

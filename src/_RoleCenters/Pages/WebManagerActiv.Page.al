@@ -4,6 +4,7 @@ page 6059984 "NPR Web Manager Activ."
 
     Caption = 'Web Order Activities';
     PageType = CardPart;
+    UsageCategory = Administration;
     SourceTable = "NPR Retail Order Cue";
 
     layout

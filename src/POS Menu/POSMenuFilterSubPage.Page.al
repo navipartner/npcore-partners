@@ -5,6 +5,7 @@ page 6150717 "NPR POS Menu Filter SubPage"
     AutoSplitKey = true;
     Caption = 'Filter Line';
     PageType = ListPart;
+    UsageCategory = Administration;
     SourceTable = "NPR POS Menu Filter Line";
 
     layout

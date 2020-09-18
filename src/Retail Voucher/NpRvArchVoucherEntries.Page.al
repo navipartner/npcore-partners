@@ -8,6 +8,7 @@ page 6151023 "NPR NpRv Arch. Voucher Entries"
     Caption = 'Archived Retail Voucher Entries';
     Editable = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR NpRv Arch. Voucher Entry";
 
     layout

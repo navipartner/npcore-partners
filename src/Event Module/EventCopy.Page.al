@@ -10,6 +10,7 @@ page 6151577 "NPR Event Copy"
 
     Caption = 'Copy Job';
     PageType = StandardDialog;
+    UsageCategory = Administration;
 
     layout
     {

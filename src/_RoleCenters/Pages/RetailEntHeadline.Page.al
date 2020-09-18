@@ -2,6 +2,7 @@ page 6151332 "NPR Retail Ent Headline"
 {
     Caption = 'Headline';
     PageType = HeadlinePart;
+    UsageCategory = Administration;
     RefreshOnActivate = true;
     SourceTable = "NPR Retail Entertainment Cue";
 

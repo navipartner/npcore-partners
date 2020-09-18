@@ -10,6 +10,7 @@ page 6059944 "NPR SMS Send Message"
     InsertAllowed = false;
     ModifyAllowed = false;
     PageType = StandardDialog;
+    UsageCategory = Administration;
     SourceTable = "NPR SMS Template Header";
 
     layout

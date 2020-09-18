@@ -5,6 +5,7 @@ page 6151173 "NPR NpGp POS Info POS Entry"
     Caption = 'Global POS Info Entries';
     Editable = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR NpGp POS Info POS Entry";
 
     layout

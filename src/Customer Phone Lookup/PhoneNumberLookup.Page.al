@@ -6,6 +6,7 @@ page 6014413 "NPR Phone Number Lookup"
     Caption = 'Online service Name and Numbers search';
     Editable = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR Phone Lookup Buffer";
     SourceTableTemporary = true;
 

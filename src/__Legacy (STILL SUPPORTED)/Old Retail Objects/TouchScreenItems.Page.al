@@ -7,6 +7,7 @@ page 6014525 "NPR Touch Screen - Items"
     CardPageID = "NPR Retail Item Card";
     Editable = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = Item;
 
     layout

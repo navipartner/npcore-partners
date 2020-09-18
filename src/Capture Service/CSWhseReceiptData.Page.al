@@ -5,6 +5,7 @@ page 6151391 "NPR CS Whse. Receipt Data"
     Caption = 'CS Whse. Receipt Data';
     Editable = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR CS Whse. Receipt Data";
 
     layout

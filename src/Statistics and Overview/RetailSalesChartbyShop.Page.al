@@ -6,6 +6,7 @@ page 6059818 "NPR Retail Sales Chart by Shop"
 
     Caption = 'Margin/Turnover by Shop';
     PageType = CardPart;
+    UsageCategory = Administration;
     SourceTable = "Business Chart Buffer";
 
     layout

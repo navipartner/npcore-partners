@@ -8,6 +8,7 @@ page 6151088 "NPR RIS Retail Inv. Buffer"
     InsertAllowed = false;
     ModifyAllowed = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR RIS Retail Inv. Buffer";
 
     layout

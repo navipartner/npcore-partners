@@ -6,6 +6,7 @@ page 6059898 "NPR Data Log Records"
     Caption = 'Data Log Records';
     Editable = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR Data Log Record";
 
     layout

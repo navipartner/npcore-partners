@@ -6,6 +6,7 @@ page 6151174 "NPR NpGp User Sale Return"
     DeleteAllowed = false;
     InsertAllowed = false;
     PageType = StandardDialog;
+    UsageCategory = Administration;
     SourceTable = "NPR NpGp POS Sales Line";
     SourceTableTemporary = true;
 

@@ -8,6 +8,7 @@ page 6151202 "NPR NpCs Store Card Workflows"
     Caption = 'Store Workflow Relations';
     DelayedInsert = true;
     PageType = ListPart;
+    UsageCategory = Administration;
     SourceTable = "NPR NpCs Store Workflow Rel.";
 
     layout

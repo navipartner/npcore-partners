@@ -7,6 +7,7 @@ page 6184478 "NPR EFT Type Pay. Gen. Param."
     InsertAllowed = false;
     LinksAllowed = false;
     PageType = ListPart;
+    UsageCategory = Administration;
     ShowFilter = false;
     SourceTable = "NPR EFT Type Pay. Gen. Param.";
 

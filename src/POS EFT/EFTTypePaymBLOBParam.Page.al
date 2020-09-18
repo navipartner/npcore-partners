@@ -7,6 +7,7 @@ page 6184476 "NPR EFT Type Paym. BLOB Param."
     InsertAllowed = false;
     LinksAllowed = false;
     PageType = ListPart;
+    UsageCategory = Administration;
     ShowFilter = false;
     SourceTable = "NPR EFTType Paym. BLOB Param.";
 

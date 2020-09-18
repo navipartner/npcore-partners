@@ -8,6 +8,7 @@ page 6150718 "NPR POS Menu Filter"
     Caption = 'POS Menu Filter';
     DelayedInsert = true;
     PageType = Card;
+    UsageCategory = Administration;
     SourceTable = "NPR POS Menu Filter";
 
     layout

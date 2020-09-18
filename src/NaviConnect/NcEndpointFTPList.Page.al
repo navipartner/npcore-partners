@@ -9,6 +9,7 @@ page 6151522 "NPR Nc Endpoint FTP List"
     InsertAllowed = false;
     ModifyAllowed = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR Nc Endpoint FTP";
 
     layout

@@ -23,6 +23,7 @@ page 6151553 "NPR NpXml Elements"
     DeleteAllowed = false;
     MultipleNewLines = true;
     PageType = List;
+    UsageCategory = Administration;
     PromotedActionCategories = 'New,Process,Report,Manage';
     SourceTable = "NPR NpXml Element";
 

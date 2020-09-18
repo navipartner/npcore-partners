@@ -3,6 +3,7 @@ page 6150704 "NPR POS Action Param."
     Caption = 'POS Action Parameters';
     DelayedInsert = true;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR POS Action Parameter";
 
     layout

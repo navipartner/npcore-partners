@@ -7,6 +7,7 @@ page 6151439 "NPR Magento Store Item List"
 
     Caption = 'Webshops';
     PageType = ListPlus;
+    UsageCategory = Administration;
     SourceTable = "NPR Magento Store Item";
 
     layout

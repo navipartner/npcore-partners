@@ -5,6 +5,7 @@ page 6151589 "NPR Event Task Lines"
     Caption = 'Event Task Lines';
     DataCaptionFields = "Job No.";
     PageType = List;
+    UsageCategory = Administration;
     SaveValues = true;
     SourceTable = "Job Task";
 

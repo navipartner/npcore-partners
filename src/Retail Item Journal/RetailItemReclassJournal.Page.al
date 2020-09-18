@@ -9,6 +9,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
     DataCaptionFields = "Journal Batch Name";
     DelayedInsert = true;
     PageType = Worksheet;
+    UsageCategory = Administration;
     SaveValues = true;
     SourceTable = "Item Journal Line";
 

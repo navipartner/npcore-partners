@@ -8,6 +8,7 @@ page 6151592 "NPR NpDc Coupon Card"
     DeleteAllowed = false;
     InsertAllowed = false;
     PageType = Card;
+    UsageCategory = Administration;
     SourceTable = "NPR NpDc Coupon";
 
     layout

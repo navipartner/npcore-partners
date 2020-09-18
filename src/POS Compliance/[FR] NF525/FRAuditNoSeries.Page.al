@@ -6,6 +6,7 @@ page 6184851 "NPR FR Audit No. Series"
     Caption = 'FR Audit No. Series';
     DelayedInsert = true;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR FR Audit No. Series";
 
     layout

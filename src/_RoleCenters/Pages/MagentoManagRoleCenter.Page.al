@@ -9,6 +9,7 @@ page 6151480 "NPR Magento Manag. Role Center"
 
     Caption = 'Role Center';
     PageType = RoleCenter;
+    UsageCategory = Administration;
 
     layout
     {

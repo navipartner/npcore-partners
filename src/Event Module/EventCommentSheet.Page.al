@@ -7,6 +7,7 @@ page 6059834 "NPR Event Comment Sheet"
     LinksAllowed = false;
     MultipleNewLines = true;
     PageType = ListPart;
+    UsageCategory = Administration;
     SourceTable = "Comment Line";
 
     layout

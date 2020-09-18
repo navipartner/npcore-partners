@@ -6,6 +6,7 @@ page 6059909 "NPR Task Line Parameters"
 
     Caption = 'Task Line Parameters';
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR Task Line Parameters";
 
     layout

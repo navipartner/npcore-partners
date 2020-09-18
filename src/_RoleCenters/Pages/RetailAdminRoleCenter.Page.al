@@ -4,6 +4,7 @@ page 6014556 "NPR Retail Admin Role Center"
 
     Caption = 'Role Center';
     PageType = RoleCenter;
+    UsageCategory = Administration;
 
     layout
     {

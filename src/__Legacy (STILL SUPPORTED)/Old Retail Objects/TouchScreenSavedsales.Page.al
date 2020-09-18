@@ -18,6 +18,7 @@ page 6014532 "NPR TouchScreen: Saved sales"
     InsertAllowed = false;
     ModifyAllowed = false;
     PageType = StandardDialog;
+    UsageCategory = Administration;
     SourceTable = "NPR Sale POS";
     SourceTableView = SORTING("Salesperson Code", "Saved Sale")
                       WHERE("Saved Sale" = CONST(true));

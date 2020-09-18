@@ -9,6 +9,7 @@ page 6014449 "NPR Input Dialog"
 
     Caption = 'Input Dialog';
     PageType = StandardDialog;
+    UsageCategory = Administration;
 
     layout
     {

@@ -9,6 +9,7 @@ page 6014572 "NPR Tax Free Vouch. Sale Links"
     LinksAllowed = false;
     ModifyAllowed = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR Tax Free Voucher Sale Link";
 
     layout

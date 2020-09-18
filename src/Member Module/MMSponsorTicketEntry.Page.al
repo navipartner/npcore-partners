@@ -5,6 +5,7 @@ page 6151186 "NPR MM Sponsor. Ticket Entry"
     Caption = 'Sponsorship Ticket Entry';
     InsertAllowed = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR MM Sponsors. Ticket Entry";
 
     layout

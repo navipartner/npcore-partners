@@ -6,6 +6,7 @@ page 6060144 "NPR MM Member Notific. Entry"
     Caption = 'Member Notification Entry';
     InsertAllowed = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR MM Member Notific. Entry";
 
     layout

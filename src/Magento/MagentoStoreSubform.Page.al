@@ -7,6 +7,7 @@ page 6151408 "NPR Magento Store Subform"
     Caption = 'Magento Store Subform';
     InsertAllowed = false;
     PageType = ListPart;
+    UsageCategory = Administration;
     ShowFilter = false;
     SourceTable = "NPR Magento Store";
 

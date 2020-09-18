@@ -7,6 +7,7 @@ page 6151492 "NPR Raptor Data Buffer Entries"
     Editable = false;
     LinksAllowed = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR Raptor Data Buffer";
     SourceTableTemporary = true;
 

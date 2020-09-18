@@ -8,6 +8,7 @@ page 6151376 "NPR CS UI Subform"
     Caption = 'CS UI Subform';
     LinksAllowed = false;
     PageType = ListPart;
+    UsageCategory = Administration;
     SourceTable = "NPR CS UI Line";
 
     layout

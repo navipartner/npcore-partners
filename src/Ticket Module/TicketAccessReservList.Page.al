@@ -2,6 +2,7 @@
 {
     Caption = 'Ticket Access Reservation';
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR Ticket Access Reserv.";
 
     layout

@@ -32,6 +32,7 @@ page 6060136 "NPR MM Member Card"
     DataCaptionExpression = "External Member No.";
     InsertAllowed = false;
     PageType = Document;
+    UsageCategory = Administration;
     PromotedActionCategories = 'New,Process,Report,History,Raptor';
     SourceTable = "NPR MM Member";
 

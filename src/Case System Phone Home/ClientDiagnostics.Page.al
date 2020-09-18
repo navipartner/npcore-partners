@@ -7,6 +7,7 @@ page 6059999 "NPR Client Diagnostics"
     InsertAllowed = false;
     ModifyAllowed = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR Client Diagnostics";
 
     layout

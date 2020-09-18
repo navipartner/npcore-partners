@@ -6,6 +6,7 @@ page 6151563 "NPR NpXml Templ. Chng. History"
     Caption = 'NpXml Template Change History';
     Editable = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR NpXml Template History";
 
     layout

@@ -13,6 +13,7 @@ page 6151483 "NPR Magento Top 10 Customers"
     CardPageID = "Customer Card";
     Editable = false;
     PageType = ListPart;
+    UsageCategory = Administration;
     SourceTable = Customer;
     SourceTableTemporary = true;
     SourceTableView = SORTING("Search Name")

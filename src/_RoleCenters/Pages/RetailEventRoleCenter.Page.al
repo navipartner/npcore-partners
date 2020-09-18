@@ -8,6 +8,7 @@ page 6151243 "NPR Retail Event Role Center"
 
     Caption = 'NP Retail Event Role Center';
     PageType = RoleCenter;
+    UsageCategory = Administration;
 
     layout
     {

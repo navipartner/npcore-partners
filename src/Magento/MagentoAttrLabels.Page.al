@@ -8,6 +8,7 @@ page 6151432 "NPR Magento Attr. Labels"
     Caption = 'Attribute Labels';
     DelayedInsert = true;
     PageType = ListPart;
+    UsageCategory = Administration;
     ShowFilter = false;
     SourceTable = "NPR Magento Attr. Label";
 

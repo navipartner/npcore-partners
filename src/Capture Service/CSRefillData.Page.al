@@ -5,6 +5,7 @@ page 6151389 "NPR CS Refill Data"
     Caption = 'Approve Counting';
     Editable = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR CS Refill Data";
 
     layout

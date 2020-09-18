@@ -6,6 +6,7 @@ page 6014569 "NPR Exp. Wizard Filters"
     Caption = 'Export Wizard Filters';
     MultipleNewLines = true;
     PageType = ListPart;
+    UsageCategory = Administration;
     SourceTable = "Table Filter";
     SourceTableTemporary = true;
 

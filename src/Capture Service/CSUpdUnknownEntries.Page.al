@@ -4,6 +4,7 @@ page 6151365 "NPR CS Upd. Unknown Entries"
 
     Caption = 'Update Unknown Entries';
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR CS Stock-Takes Data";
 
     layout

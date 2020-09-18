@@ -4,6 +4,7 @@ page 6151027 "NPR NpRv Partner Card"
 
     Caption = 'Retail Voucher Partner';
     PageType = Card;
+    UsageCategory = Administration;
     SourceTable = "NPR NpRv Partner";
 
     layout

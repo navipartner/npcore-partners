@@ -13,6 +13,7 @@ page 6184504 "NPR EFT Adyen Paym. Type Setup"
     InsertAllowed = false;
     LinksAllowed = false;
     PageType = Card;
+    UsageCategory = Administration;
     ShowFilter = false;
     SourceTable = "NPR EFT Adyen Paym. Type Setup";
 

@@ -11,6 +11,7 @@ page 6014588 "NPR Item Statistics Subpage"
     Caption = 'Item Statistics Subform';
     Editable = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = Item;
 
     layout

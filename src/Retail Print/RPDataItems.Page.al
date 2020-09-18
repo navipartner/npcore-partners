@@ -7,6 +7,7 @@ page 6014561 "NPR RP Data Items"
     AutoSplitKey = true;
     Caption = 'Data Items';
     PageType = Worksheet;
+    UsageCategory = Administration;
     ShowFilter = false;
     SourceTable = "NPR RP Data Items";
 

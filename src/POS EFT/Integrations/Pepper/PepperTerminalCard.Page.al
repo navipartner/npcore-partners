@@ -8,6 +8,7 @@ page 6184493 "NPR Pepper Terminal Card"
 
     Caption = 'Pepper Terminal Card';
     PageType = Card;
+    UsageCategory = Administration;
     SourceTable = "NPR Pepper Terminal";
 
     layout

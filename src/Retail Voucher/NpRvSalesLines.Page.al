@@ -7,6 +7,7 @@ page 6151017 "NPR NpRv Sales Lines"
     CardPageID = "NPR NpRv Sales Line Card";
     Editable = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR NpRv Sales Line";
     SourceTableView = SORTING(Type, "Voucher Type", "Voucher No.", "Reference No.");
 
