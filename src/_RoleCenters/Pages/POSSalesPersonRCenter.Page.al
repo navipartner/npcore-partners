@@ -1143,7 +1143,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                 {
                     Caption = 'Sales - Invoice';
                     Image = "Report";
-                    RunObject = Report "Sales - Invoice";
+                    RunObject = Report "Standard Sales - Invoice";
                     ApplicationArea = All;
                 }
                 action("Period Discount Statistics")
