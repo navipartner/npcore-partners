@@ -8,6 +8,7 @@ page 6151429 "NPR Magento Itm Cstm Opt.Value"
     DeleteAllowed = false;
     InsertAllowed = false;
     PageType = CardPart;
+    UsageCategory = Administration;
     SourceTable = "NPR Magento Itm Cstm Opt.Value";
     SourceTableTemporary = true;
 

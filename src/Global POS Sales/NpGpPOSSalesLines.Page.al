@@ -5,6 +5,7 @@ page 6151169 "NPR NpGp POS Sales Lines"
     Caption = 'Global POS Sales Lines';
     Editable = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR NpGp POS Sales Line";
 
     layout

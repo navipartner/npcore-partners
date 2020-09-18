@@ -4,6 +4,7 @@ page 6014491 "NPR Receipt Stats"
 
     Caption = 'Receipt statistics';
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = Date;
 
     layout

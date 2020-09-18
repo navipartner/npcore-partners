@@ -10,6 +10,7 @@ page 6151382 "NPR CS StockTake Rfid List"
     InsertAllowed = false;
     ModifyAllowed = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR CS Stock-Take Handl. Rfid";
 
     layout

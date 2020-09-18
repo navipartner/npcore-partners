@@ -5,6 +5,7 @@ page 6060049 "NPR Item Worksh. Missing Setup"
 
     Caption = 'Item Worksheet Missing Setup';
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR Missing Setup Table";
     SourceTableView = SORTING("Table ID", "Field No.")
                       ORDER(Ascending)

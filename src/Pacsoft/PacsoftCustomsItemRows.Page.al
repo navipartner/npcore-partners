@@ -5,6 +5,7 @@ page 6014422 "NPR Pacsoft Customs Item Rows"
     Caption = 'Pacsoft Customs Item Rows';
     DelayedInsert = true;
     PageType = ListPart;
+    UsageCategory = Administration;
     SourceTable = "NPR Pacsoft Customs Item Rows";
     SourceTableView = SORTING("Shipment Document Entry No.", "Entry No.");
 

@@ -4,6 +4,7 @@ page 6184890 "NPR Server Overview"
 
     Caption = 'Server Overview';
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = File;
 
     layout

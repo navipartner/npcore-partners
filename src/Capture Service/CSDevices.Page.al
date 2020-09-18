@@ -6,6 +6,7 @@ page 6151384 "NPR CS Devices"
     Caption = 'CS Devices';
     Editable = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR CS Devices";
 
     layout

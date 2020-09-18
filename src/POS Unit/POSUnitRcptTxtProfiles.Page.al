@@ -6,6 +6,7 @@ page 6151264 "NPR POS Unit Rcpt.Txt Profiles"
     CardPageID = "NPR POS Unit Rcpt.Text Profile";
     Editable = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR POS Unit Rcpt.Txt Profile";
 
     layout

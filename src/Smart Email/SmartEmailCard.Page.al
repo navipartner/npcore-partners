@@ -6,6 +6,7 @@ page 6059822 "NPR Smart Email Card"
 
     Caption = 'Smart Email Card';
     PageType = Card;
+    UsageCategory = Administration;
     SourceTable = "NPR Smart Email";
 
     layout

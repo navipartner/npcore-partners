@@ -5,6 +5,7 @@ page 6059953 "NPR Disp. Content Lines Img"
     Caption = 'Display Content Lines Image';
     LinksAllowed = false;
     PageType = CardPart;
+    UsageCategory = Administration;
     ShowFilter = false;
     SourceTable = "NPR Display Content Lines";
 

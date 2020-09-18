@@ -8,6 +8,7 @@ page 6151396 "NPR CS Approved Data"
     InsertAllowed = false;
     ModifyAllowed = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR CS Approved Data";
     SourceTableTemporary = true;
 

@@ -6,6 +6,7 @@ page 6059980 "NPR Sales Person Role Center"
 
     Caption = 'Role Center';
     PageType = RoleCenter;
+    UsageCategory = Administration;
 
     layout
     {

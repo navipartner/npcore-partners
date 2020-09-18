@@ -6,6 +6,7 @@ page 6151124 "NPR GDPR Consent Log"
     InsertAllowed = false;
     ModifyAllowed = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR GDPR Consent Log";
 
     layout

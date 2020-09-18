@@ -7,6 +7,7 @@ page 6014635 "NPR GCP Auth Setup"
 
     Caption = 'Google Cloud Print Account Setup';
     PageType = StandardDialog;
+    UsageCategory = Administration;
 
     layout
     {

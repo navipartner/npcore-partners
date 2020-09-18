@@ -4,6 +4,7 @@ page 6059969 "NPR Description Control"
 
     Caption = 'Description Control';
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR Description Control";
 
     layout

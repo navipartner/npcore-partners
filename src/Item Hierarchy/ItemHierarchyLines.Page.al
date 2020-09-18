@@ -4,6 +4,7 @@ page 6151053 "NPR Item Hierarchy Lines"
 
     Caption = 'Item Hiearachy Lines';
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR Item Hierarchy Line";
     SourceTableView = SORTING("Linked Table Key Value");
 

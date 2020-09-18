@@ -8,6 +8,7 @@ page 6151020 "NPR NpRv Sales Line Ref."
     DataCaptionExpression = Format(Quantity) + ' ' + VoucherType.Description;
     DelayedInsert = true;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR NpRv Sales Line Ref.";
     SourceTableView = SORTING("Sales Line Id", "Voucher No.", "Reference No.");
 

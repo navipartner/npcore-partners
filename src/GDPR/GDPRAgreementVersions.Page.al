@@ -5,6 +5,7 @@ page 6151122 "NPR GDPR Agreement Versions"
     Caption = 'GDPR Agreement Versions';
     DelayedInsert = true;
     PageType = ListPart;
+    UsageCategory = Administration;
     SourceTable = "NPR GDPR Agreement Version";
 
     layout

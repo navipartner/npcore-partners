@@ -5,6 +5,7 @@ page 6151196 "NPR NpCs Store Card"
 
     Caption = 'Collect Store Card';
     PageType = Card;
+    UsageCategory = Administration;
     SourceTable = "NPR NpCs Store";
 
     layout

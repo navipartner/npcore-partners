@@ -8,6 +8,7 @@ page 6151217 "NPR NpCs Open.Hour Set S.page"
     Caption = 'Opening Hours';
     DelayedInsert = true;
     PageType = ListPart;
+    UsageCategory = Administration;
     SourceTable = "NPR NpCs Open. Hour Entry";
 
     layout

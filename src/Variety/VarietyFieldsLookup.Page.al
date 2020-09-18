@@ -6,6 +6,7 @@ page 6059979 "NPR Variety Fields Lookup"
 
     Caption = 'Variety Fields Lookup';
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR Variety Field Setup";
     SourceTableView = SORTING("Sort Order")
                       WHERE(Disabled = CONST(false));

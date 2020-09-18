@@ -3,6 +3,7 @@ page 6150645 "NPR POS Info Look. Field Setup"
     Caption = 'POS Info Lookup Field Setup';
     DelayedInsert = true;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR POS Info Lookup Setup";
     SourceTableTemporary = true;
 

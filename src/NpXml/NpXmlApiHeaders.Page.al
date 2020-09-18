@@ -5,6 +5,7 @@ page 6151566 "NPR NpXml Api Headers"
     Caption = 'NpXml Api Headers';
     DelayedInsert = true;
     PageType = ListPart;
+    UsageCategory = Administration;
     SourceTable = "NPR NpXml Api Header";
 
     layout

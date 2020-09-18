@@ -8,6 +8,7 @@ page 6014567 "NPR Retail Logo Factbox"
     InsertAllowed = false;
     ModifyAllowed = false;
     PageType = CardPart;
+    UsageCategory = Administration;
     SourceTable = "NPR Retail Logo";
 
     layout

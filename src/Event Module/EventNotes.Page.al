@@ -7,6 +7,7 @@ page 6151575 "NPR Event Notes"
     Caption = 'Event Notes';
     Editable = false;
     PageType = ListPart;
+    UsageCategory = Administration;
     SourceTable = "Record Link";
     SourceTableTemporary = true;
 

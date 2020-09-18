@@ -6,6 +6,7 @@ page 6151219 "NPR NpCs Coll. Store Inv.Lines"
     Caption = 'Lines';
     Editable = false;
     PageType = ListPart;
+    UsageCategory = Administration;
     SourceTable = "Sales Invoice Line";
 
     layout

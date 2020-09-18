@@ -6,6 +6,7 @@ page 6150658 "NPR POS Posting Log"
     Caption = 'POS Posting Log';
     Editable = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR POS Posting Log";
 
     layout

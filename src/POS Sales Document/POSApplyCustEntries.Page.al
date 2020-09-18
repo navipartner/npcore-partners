@@ -10,6 +10,7 @@ page 6014493 "NPR POS Apply Cust. Entries"
     InsertAllowed = false;
     LinksAllowed = false;
     PageType = Worksheet;
+    UsageCategory = Administration;
     SourceTable = "Cust. Ledger Entry";
 
     layout

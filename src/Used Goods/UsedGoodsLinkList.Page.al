@@ -5,6 +5,7 @@ page 6014508 "NPR Used Goods Link List"
     Caption = 'Used Items Link List';
     Editable = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR Used Goods Registration";
 
     layout

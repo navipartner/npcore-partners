@@ -5,6 +5,7 @@ page 6184892 "NPR Storage Types"
     Caption = 'Storage Types';
     Editable = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR Storage Type";
     SourceTableTemporary = true;
 

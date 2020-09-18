@@ -10,6 +10,7 @@ page 6151437 "NPR Magento Item Attr. Values"
     DeleteAllowed = false;
     InsertAllowed = false;
     PageType = ListPart;
+    UsageCategory = Administration;
     ShowFilter = false;
     SourceTable = "NPR Magento Item Attr. Value";
 

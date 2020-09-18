@@ -2,6 +2,7 @@ page 6060102 "NPR Date Periodes"
 {
     Caption = 'Date Periodes';
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR Periodes";
 
     layout

@@ -5,6 +5,7 @@ page 6151380 "NPR CS Stock-Take Handling"
 
     Caption = 'CS Stock-Take Handling';
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR CS Stock-Take Handling";
 
     layout

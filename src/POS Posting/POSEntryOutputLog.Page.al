@@ -10,6 +10,7 @@ page 6150672 "NPR POS Entry Output Log"
     InsertAllowed = false;
     ModifyAllowed = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR POS Entry Output Log";
 
     layout

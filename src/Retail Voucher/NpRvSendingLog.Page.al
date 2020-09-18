@@ -5,6 +5,7 @@ page 6151029 "NPR NpRv Sending Log"
     Caption = 'Retail Voucher Sending Log';
     Editable = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR NpRv Sending Log";
 
     layout

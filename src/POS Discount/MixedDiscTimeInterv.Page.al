@@ -8,6 +8,7 @@ page 6014448 "NPR Mixed Disc. Time Interv."
     Caption = 'Active Time Intervals';
     DelayedInsert = true;
     PageType = ListPart;
+    UsageCategory = Administration;
     SourceTable = "NPR Mixed Disc. Time Interv.";
 
     layout

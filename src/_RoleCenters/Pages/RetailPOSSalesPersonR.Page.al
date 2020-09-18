@@ -5,6 +5,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
 
     Caption = 'NP Retail Salesperson';
     PageType = RoleCenter;
+    UsageCategory = Administration;
 
     layout
     {

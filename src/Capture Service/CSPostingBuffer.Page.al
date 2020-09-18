@@ -7,6 +7,7 @@ page 6151392 "NPR CS Posting Buffer"
     Caption = 'CS Posting Buffer';
     Editable = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR CS Posting Buffer";
 
     layout

@@ -8,6 +8,7 @@ page 6150723 "NPR POS Entry Comments"
     InsertAllowed = false;
     ModifyAllowed = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR POS Entry Comm. Line";
 
     layout

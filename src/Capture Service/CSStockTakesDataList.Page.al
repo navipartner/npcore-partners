@@ -10,6 +10,7 @@ page 6151387 "NPR CS Stock-Takes Data List"
     InsertAllowed = false;
     ModifyAllowed = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR CS Stock-Takes Data";
     SourceTableView = SORTING(Created);
 

@@ -5,6 +5,7 @@ page 6151596 "NPR NpDc Extra Coupon Item"
     AutoSplitKey = true;
     Caption = 'Extra Coupon Item';
     PageType = Card;
+    UsageCategory = Administration;
     SourceTable = "NPR NpDc Extra Coupon Item";
 
     layout

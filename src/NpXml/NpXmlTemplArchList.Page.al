@@ -8,6 +8,7 @@ page 6151562 "NPR NpXml Templ. Arch. List"
     InsertAllowed = false;
     ModifyAllowed = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR NpXml Template Arch.";
 
     layout

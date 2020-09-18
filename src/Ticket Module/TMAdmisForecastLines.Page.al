@@ -5,6 +5,7 @@
     Caption = 'Admission Forecast Lines';
     Editable = false;
     PageType = ListPart;
+    UsageCategory = Administration;
     SourceTable = "NPR TM Admis. Schedule Lines";
     SourceTableTemporary = true;
 

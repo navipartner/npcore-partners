@@ -11,6 +11,7 @@ page 6014519 "NPR Sales Order Pick Subform"
     LinksAllowed = false;
     MultipleNewLines = true;
     PageType = ListPart;
+    UsageCategory = Administration;
     SourceTable = "Sales Line";
     SourceTableView = WHERE("Document Type" = FILTER(Order));
 

@@ -6,6 +6,7 @@ page 6059982 "NPR Web Processor Role Center"
 
     Caption = 'Role Center';
     PageType = RoleCenter;
+    UsageCategory = Administration;
 
     layout
     {

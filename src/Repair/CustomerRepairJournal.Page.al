@@ -7,6 +7,7 @@ page 6014504 "NPR Customer Repair Journal"
     AutoSplitKey = true;
     Caption = 'Customer Repair Register';
     PageType = ListPart;
+    UsageCategory = Administration;
     SourceTable = "NPR Customer Repair Journal";
 
     layout

@@ -7,6 +7,7 @@ page 6151450 "NPR Magento Text Editor Dialog"
 
     Caption = 'Magento Text Editor Dialog';
     PageType = StandardDialog;
+    UsageCategory = Administration;
 
     layout
     {

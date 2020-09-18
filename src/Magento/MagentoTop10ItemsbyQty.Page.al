@@ -12,6 +12,7 @@ page 6151484 "NPR Magento Top10 Items by Qty"
     CardPageID = "Item Card";
     Editable = false;
     PageType = ListPart;
+    UsageCategory = Administration;
     SourceTable = Item;
     SourceTableTemporary = true;
     SourceTableView = SORTING("Low-Level Code")

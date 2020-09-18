@@ -6,6 +6,7 @@ page 6151111 "NPR NpRi S. Inv. SetupSubpage"
     Caption = 'Lines';
     DelayedInsert = true;
     PageType = ListPart;
+    UsageCategory = Administration;
     SourceTable = "NPR NpRi Sales Inv. Setup Line";
 
     layout

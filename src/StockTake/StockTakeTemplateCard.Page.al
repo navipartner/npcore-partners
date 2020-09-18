@@ -4,6 +4,7 @@ page 6014667 "NPR Stock-Take Template Card"
 
     Caption = 'Stock-Take Template Card';
     PageType = Card;
+    UsageCategory = Administration;
     SourceTable = "NPR Stock-Take Template";
 
     layout

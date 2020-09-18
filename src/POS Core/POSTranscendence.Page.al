@@ -8,6 +8,7 @@ page 6150700 "NPR POS (Transcendence)"
 
     Caption = 'POS';
     PageType = List;
+    UsageCategory = Administration;
 
     layout
     {

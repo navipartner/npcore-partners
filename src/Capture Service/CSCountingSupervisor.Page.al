@@ -4,6 +4,7 @@ page 6151395 "NPR CS Counting Supervisor"
 
     Caption = 'CS Counting Supervisor';
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR CS Counting Supervisor";
 
     layout

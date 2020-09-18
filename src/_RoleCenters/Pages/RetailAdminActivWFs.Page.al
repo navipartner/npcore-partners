@@ -4,6 +4,7 @@ page 6014693 "NPR Retail Admin Activ. - WFs"
 
     Caption = 'Retail Admin Activities - WFs';
     PageType = CardPart;
+    UsageCategory = Administration;
     RefreshOnActivate = true;
     SourceTable = "NPR Retail Admin Cue";
 

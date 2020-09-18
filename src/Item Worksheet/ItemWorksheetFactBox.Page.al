@@ -5,6 +5,7 @@ page 6060051 "NPR Item Worksheet FactBox"
 
     Caption = 'Item Worksheet FactBox';
     PageType = CardPart;
+    UsageCategory = Administration;
     RefreshOnActivate = true;
     SourceTable = "NPR Item Worksheet Line";
 

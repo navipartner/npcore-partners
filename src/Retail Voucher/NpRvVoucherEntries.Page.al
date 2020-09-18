@@ -9,6 +9,7 @@ page 6151016 "NPR NpRv Voucher Entries"
     Caption = 'Retail Voucher Entries';
     Editable = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR NpRv Voucher Entry";
 
     layout

@@ -6,6 +6,7 @@ page 6151246 "NPR Retail Store Man. RC"
 
     Caption = 'NP Retail Store Manager Role Center';
     PageType = RoleCenter;
+    UsageCategory = Administration;
 
 
     layout

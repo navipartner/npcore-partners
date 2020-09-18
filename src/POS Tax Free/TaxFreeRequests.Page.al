@@ -9,6 +9,7 @@ page 6014645 "NPR Tax Free Requests"
     InsertAllowed = false;
     ModifyAllowed = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR Tax Free Request";
 
     layout

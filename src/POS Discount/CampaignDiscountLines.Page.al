@@ -17,6 +17,7 @@ page 6014454 "NPR Campaign Discount Lines"
     Caption = 'Period Discount Lines';
     DelayedInsert = true;
     PageType = ListPart;
+    UsageCategory = Administration;
     SourceTable = "NPR Period Discount Line";
 
     layout

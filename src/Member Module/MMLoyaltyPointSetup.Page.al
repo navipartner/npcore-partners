@@ -7,6 +7,7 @@ page 6060106 "NPR MM Loyalty Point Setup"
     AutoSplitKey = true;
     Caption = 'Loyalty Points Setup';
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR MM Loyalty Point Setup";
 
     layout

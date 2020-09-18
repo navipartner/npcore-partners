@@ -5,6 +5,7 @@ page 6150725 "NPR POS Select Lang. Dialog"
 
     Caption = 'POS Select Language Dialog';
     PageType = StandardDialog;
+    UsageCategory = Administration;
 
     layout
     {

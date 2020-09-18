@@ -8,6 +8,7 @@ page 6151367 "NPR CS Transfer Handling Batch"
     InsertAllowed = false;
     ModifyAllowed = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR CS Transf. Handl. Rfid";
 
     layout

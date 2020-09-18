@@ -14,6 +14,7 @@ page 6014637 "NPR RP Templ. Matrix Designer"
     AutoSplitKey = true;
     Caption = 'Template Matrix Designer';
     PageType = ListPart;
+    UsageCategory = Administration;
     ShowFilter = false;
     SourceTable = "NPR RP Template Line";
 

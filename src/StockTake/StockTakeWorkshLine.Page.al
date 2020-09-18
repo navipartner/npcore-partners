@@ -3,6 +3,7 @@ page 6014664 "NPR StockTake Worksh. Line"
     AutoSplitKey = true;
     Caption = 'Stock-Take Worksheet Line';
     PageType = ListPart;
+    UsageCategory = Administration;
     SourceTable = "NPR Stock-Take Worksheet Line";
     SourceTableView = SORTING("Stock-Take Config Code", "Worksheet Name", "Line No.")
                       ORDER(Ascending);

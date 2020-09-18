@@ -2,6 +2,7 @@ page 6014520 "NPR Website List WP"
 {
     Caption = 'Websites';
     PageType = ListPart;
+    UsageCategory = Administration;
     SourceTable = "NPR Magento Website";
     SourceTableTemporary = true;
     DelayedInsert = true;

@@ -11,6 +11,7 @@ page 6151240 "NPR Retail: Manager RoleCenter"
 
     Caption = 'NP Retail - Manager Role Center';
     PageType = RoleCenter;
+    UsageCategory = Administration;
 
     layout
     {

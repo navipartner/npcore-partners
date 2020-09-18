@@ -5,6 +5,7 @@ page 6150697 "NPR NPRE Kitchen Req.Src.Links"
     Caption = 'Kitchen Request Source Links';
     Editable = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR NPRE Kitchen Req.Src. Link";
 
     layout

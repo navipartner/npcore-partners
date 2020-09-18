@@ -5,6 +5,7 @@ page 6151060 "NPR Distribution Plan"
     AutoSplitKey = true;
     Caption = 'Distribution Plan';
     PageType = ListPlus;
+    UsageCategory = Administration;
     SourceTable = "NPR Distribution Headers";
 
     layout

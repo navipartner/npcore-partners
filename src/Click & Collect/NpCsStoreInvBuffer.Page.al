@@ -5,6 +5,7 @@ page 6151210 "NPR NpCs Store Inv. Buffer"
     Caption = 'Collect Store Inventory List';
     Editable = false;
     PageType = ListPart;
+    UsageCategory = Administration;
     SourceTable = "NPR NpCs Store Inv. Buffer";
     SourceTableTemporary = true;
 

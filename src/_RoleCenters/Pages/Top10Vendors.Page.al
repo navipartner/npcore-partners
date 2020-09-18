@@ -6,6 +6,7 @@ page 6151258 "NPR Top 10 Vendors"
     CardPageID = "Vendor Card";
     Editable = true;
     PageType = ListPart;
+    UsageCategory = Administration;
     SourceTable = Vendor;
     SourceTableTemporary = true;
     SourceTableView = SORTING("Search Name")

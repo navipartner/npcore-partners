@@ -5,6 +5,7 @@ page 6151455 "NPR Magento Video Links"
 
     Caption = 'Magento Video Links';
     PageType = Worksheet;
+    UsageCategory = Administration;
     SourceTable = "NPR Magento Video Link";
 
     layout

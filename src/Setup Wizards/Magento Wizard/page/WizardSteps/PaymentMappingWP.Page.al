@@ -2,6 +2,7 @@ page 6014531 "NPR Payment Mapping WP"
 {
     Caption = 'Payment Method Mapping';
     PageType = ListPart;
+    UsageCategory = Administration;
     SourceTable = "NPR Magento Payment Mapping";
     SourceTableTemporary = true;
     DelayedInsert = true;

@@ -3,6 +3,7 @@ page 6014498 "NPR Serial Numbers Lookup"
     Caption = 'Serial Numbers Lookup';
     Editable = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "Item Ledger Entry";
 
     layout

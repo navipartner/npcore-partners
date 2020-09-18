@@ -7,6 +7,7 @@ page 6150727 "NPR POS Param. Values Temp."
     DeleteAllowed = false;
     InsertAllowed = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR POS Parameter Value";
     SourceTableTemporary = true;
 

@@ -12,6 +12,7 @@ page 6150632 "NPR POS Audit Profiles"
     CardPageID = "NPR POS Audit Profile";
     Editable = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR POS Audit Profile";
 
     layout

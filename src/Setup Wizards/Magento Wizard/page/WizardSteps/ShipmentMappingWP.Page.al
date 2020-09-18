@@ -2,6 +2,7 @@ page 6014551 "NPR Shipment Mapping WP"
 {
     Caption = 'Shipment Method Mapping';
     PageType = ListPart;
+    UsageCategory = Administration;
     SourceTable = "NPR Magento Shipment Mapping";
     SourceTableTemporary = true;
     DelayedInsert = true;

@@ -5,6 +5,7 @@ page 6151094 "NPR Nc RapidConnect Trg.Fields"
     Caption = 'RapidConnect Trigger Fields';
     DelayedInsert = true;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR Nc RapidConnect Trig.Field";
 
     layout

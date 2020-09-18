@@ -5,6 +5,7 @@ page 6151185 "NPR MM Sponsors. Ticket Setup"
     Caption = 'Sponsorship Ticket Setup';
     DelayedInsert = true;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR MM Sponsors. Ticket Setup";
 
     layout

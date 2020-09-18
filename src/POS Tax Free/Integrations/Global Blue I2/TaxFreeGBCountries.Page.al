@@ -9,6 +9,7 @@ page 6014578 "NPR Tax Free GB Countries"
     LinksAllowed = false;
     ModifyAllowed = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR Tax Free GB Country";
 
     layout

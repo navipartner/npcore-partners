@@ -3,6 +3,7 @@ page 6150625 "NPR POS NPRE Restaur. Profiles"
     // NPR5.55/ALPO/20200730 CASE 414938 POS Store/POS Unit - Restaurant link
 
     PageType = ListPlus;
+    UsageCategory = Administration;
     SourceTable = "NPR POS NPRE Rest. Profile";
 
     layout

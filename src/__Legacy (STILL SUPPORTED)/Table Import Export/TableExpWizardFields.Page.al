@@ -5,6 +5,7 @@ page 6014457 "NPR Table Exp. Wizard Fields"
     Caption = 'Table Export Wizard Fields';
     DelayedInsert = true;
     PageType = ListPart;
+    UsageCategory = Administration;
     SourceTable = "Field";
     SourceTableTemporary = true;
 

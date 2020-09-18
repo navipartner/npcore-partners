@@ -8,6 +8,7 @@ page 6059943 "NPR SMS Field List"
     InsertAllowed = false;
     ModifyAllowed = false;
     PageType = ListPart;
+    UsageCategory = Administration;
     RefreshOnActivate = true;
     ShowFilter = false;
     SourceTable = "Field";

@@ -6,6 +6,7 @@ page 6014473 "NPR Retail Journal Print"
     Caption = 'Retail Journal Print';
     InsertAllowed = false;
     PageType = Worksheet;
+    UsageCategory = Administration;
     SourceTable = "NPR Retail Journal Line";
 
     layout

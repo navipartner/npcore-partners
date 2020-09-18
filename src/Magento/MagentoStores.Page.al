@@ -7,6 +7,7 @@ page 6151406 "NPR Magento Stores"
     Caption = 'Stores';
     Editable = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR Magento Store";
 
     layout

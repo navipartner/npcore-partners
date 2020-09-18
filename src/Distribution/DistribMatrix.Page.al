@@ -4,6 +4,7 @@ page 6151061 "NPR Distrib. Matrix"
 
     Caption = 'Distribution Matrix';
     PageType = ListPart;
+    UsageCategory = Administration;
     SourceTable = "NPR Item Hierarchy Line";
     SourceTableView = SORTING("Linked Table Key Value");
 

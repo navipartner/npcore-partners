@@ -10,6 +10,7 @@ page 6060142 "NPR MM Member Notific. Setup"
 
     Caption = 'Member Notification Setup';
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR MM Member Notific. Setup";
 
     layout

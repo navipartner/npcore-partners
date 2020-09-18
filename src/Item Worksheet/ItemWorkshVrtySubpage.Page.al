@@ -9,6 +9,7 @@ page 6060043 "NPR Item Worksh. Vrty. Subpage"
     AutoSplitKey = true;
     Caption = 'Item Worksheet Variety Subpage';
     PageType = ListPart;
+    UsageCategory = Administration;
     SourceTable = "NPR Item Worksh. Variant Line";
     SourceTableView = SORTING("Worksheet Template Name", "Worksheet Name", "Worksheet Line No.", "Variety 1 Value", "Variety 2 Value", "Variety 3 Value", "Variety 4 Value")
                       ORDER(Ascending);

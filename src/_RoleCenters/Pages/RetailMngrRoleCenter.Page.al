@@ -11,6 +11,7 @@ page 6014558 "NPR Retail - Mngr. Role Center"
 
     Caption = 'Role Center';
     PageType = RoleCenter;
+    UsageCategory = Administration;
 
     layout
     {

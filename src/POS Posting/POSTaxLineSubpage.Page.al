@@ -5,6 +5,7 @@ page 6150722 "NPR POS Tax Line Subpage"
     Caption = 'POS Tax Line Subpage';
     Editable = false;
     PageType = ListPart;
+    UsageCategory = Administration;
     SourceTable = "NPR POS Tax Amount Line";
 
     layout

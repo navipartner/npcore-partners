@@ -3,6 +3,7 @@ page 6014617 "NPR Display Config WP"
     Caption = 'Display Config';
     DelayedInsert = true;
     PageType = ListPart;
+    UsageCategory = Administration;
     SourceTable = "NPR Magento Display Config";
     SourceTableTemporary = true;
 

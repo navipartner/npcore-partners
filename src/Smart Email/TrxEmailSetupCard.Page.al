@@ -4,6 +4,7 @@ page 6059826 "NPR Trx Email Setup Card"
 
     Caption = 'Transaction Email Setup Card';
     PageType = Card;
+    UsageCategory = Administration;
     SourceTable = "NPR Trx Email Setup";
 
     layout

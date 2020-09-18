@@ -5,6 +5,7 @@ page 6014680 "NPR Endpoint QueryFilt. S.form"
 
     Caption = 'Endpoint Query Filter Subform';
     PageType = ListPart;
+    UsageCategory = Administration;
     SourceTable = "NPR Endpoint Query Filter";
 
     layout

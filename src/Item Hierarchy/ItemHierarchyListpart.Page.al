@@ -6,6 +6,7 @@ page 6151052 "NPR Item Hierarchy Listpart"
     Caption = 'Item Hiearachy Levels';
     DelayedInsert = true;
     PageType = ListPart;
+    UsageCategory = Administration;
     SourceTable = "NPR Item Hierarchy Level";
 
     layout

@@ -4,6 +4,7 @@ page 6150626 "NPR POS Audit Profile"
 
     Caption = 'POS Audit Profile';
     PageType = Card;
+    UsageCategory = Administration;
     SourceTable = "NPR POS Audit Profile";
 
     layout

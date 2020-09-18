@@ -7,6 +7,7 @@ page 6059991 "NPR Item Repair"
     Caption = 'Item Repair';
     InsertAllowed = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR Item Repair";
 
     layout

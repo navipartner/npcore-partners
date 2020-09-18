@@ -3,6 +3,7 @@ page 6150714 "NPR POS Stargate Pckg Method"
     Caption = 'POS Stargate Package Method';
     Editable = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR POS Stargate Pckg. Method";
 
     layout

@@ -2,6 +2,7 @@ page 6014539 "NPR Insurance Category"
 {
     Caption = 'Insurance Category';
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR Insurance Category";
 
     layout

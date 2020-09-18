@@ -8,6 +8,7 @@ page 6060098 "NPR Ean Box Setup Events"
     Caption = 'Ean Box Setup Events';
     DelayedInsert = true;
     PageType = ListPart;
+    UsageCategory = Administration;
     SourceTable = "NPR Ean Box Setup Event";
 
     layout

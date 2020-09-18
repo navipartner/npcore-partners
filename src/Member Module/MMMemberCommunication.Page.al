@@ -5,6 +5,7 @@ page 6151188 "NPR MM Member Communication"
     Caption = 'Member Communication';
     InsertAllowed = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR MM Member Communication";
 
     layout

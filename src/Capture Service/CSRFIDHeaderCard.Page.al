@@ -7,6 +7,7 @@ page 6151399 "NPR CS RFID Header Card"
     InsertAllowed = false;
     ModifyAllowed = false;
     PageType = Card;
+    UsageCategory = Administration;
     SourceTable = "NPR CS Rfid Header";
 
     layout

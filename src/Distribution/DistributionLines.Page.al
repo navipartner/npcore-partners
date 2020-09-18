@@ -5,6 +5,7 @@ page 6151059 "NPR Distribution Lines"
     AutoSplitKey = true;
     Caption = 'Distribution Lines';
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR Distribution Lines";
 
     layout

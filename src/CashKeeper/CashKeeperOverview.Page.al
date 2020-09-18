@@ -9,6 +9,7 @@ page 6059961 "NPR CashKeeper Overview"
     InsertAllowed = false;
     ModifyAllowed = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR CashKeeper Overview";
 
     layout

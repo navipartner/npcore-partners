@@ -6,6 +6,7 @@ page 6151441 "NPR Magento Cont.Pmt.Methods"
     Caption = 'Contact Payment Methods';
     DelayedInsert = true;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR Magento Contact Pmt.Meth.";
 
     layout

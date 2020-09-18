@@ -5,6 +5,7 @@ page 6060069 "NPR MM Admis. Scanner Stations"
 
     Caption = 'MM Admission Scanner Stations';
     PageType = ListPart;
+    UsageCategory = Administration;
     SourceTable = "NPR MM Admis. Scanner Stations";
 
     layout

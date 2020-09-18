@@ -6,6 +6,7 @@ page 6060148 "NPR RC Members. Burndown Chart"
 
     Caption = 'Membership Burndown Chart';
     PageType = CardPart;
+    UsageCategory = Administration;
     SourceTable = "Business Chart Buffer";
 
     layout

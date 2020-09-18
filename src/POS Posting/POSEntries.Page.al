@@ -11,6 +11,7 @@ page 6150650 "NPR POS Entries"
     Caption = 'POS Entries';
     Editable = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR POS Entry";
 
     layout

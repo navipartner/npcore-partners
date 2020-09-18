@@ -2,6 +2,7 @@ page 6014626 "NPR Displ Groups Select"
 {
     Caption = 'Display Groups';
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR Magento Display Group";
     SourceTableTemporary = true;
     Editable = false;

@@ -4,6 +4,7 @@ page 6151251 "NPR Retail Enter. Act: Others"
 
     Caption = 'Activities';
     PageType = CardPart;
+    UsageCategory = Administration;
     RefreshOnActivate = true;
     SourceTable = "NPR Retail Entertainment Cue";
 

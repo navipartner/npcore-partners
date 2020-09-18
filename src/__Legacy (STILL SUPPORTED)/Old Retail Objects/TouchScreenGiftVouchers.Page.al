@@ -16,6 +16,7 @@ page 6014545 "NPR TouchScreen: Gift Vouchers"
     InsertAllowed = false;
     ModifyAllowed = false;
     PageType = ListPlus;
+    UsageCategory = Administration;
     SourceTable = "NPR Gift Voucher";
 
     layout

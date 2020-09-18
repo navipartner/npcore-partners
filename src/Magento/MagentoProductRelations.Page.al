@@ -7,6 +7,7 @@ page 6151421 "NPR Magento Product Relations"
     DelayedInsert = true;
     LinksAllowed = false;
     PageType = CardPart;
+    UsageCategory = Administration;
     ShowFilter = false;
     SourceTable = "NPR Magento Product Relation";
 

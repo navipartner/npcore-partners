@@ -8,6 +8,7 @@ page 6059952 "NPR Display Content Lines"
     LinksAllowed = false;
     MultipleNewLines = true;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR Display Content Lines";
 
     layout

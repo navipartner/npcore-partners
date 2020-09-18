@@ -5,6 +5,7 @@ page 6059996 "NPR Scanner Service Setup"
 
     Caption = 'Scanner Service Setup';
     PageType = Card;
+    UsageCategory = Administration;
     SourceTable = "NPR Scanner Service Setup";
 
     layout

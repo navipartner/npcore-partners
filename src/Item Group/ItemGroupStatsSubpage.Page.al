@@ -50,6 +50,7 @@ page 6014587 "NPR Item Group Stats Subpage"
     Editable = false;
     InsertAllowed = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR Item Group";
     SourceTableView = SORTING("Sorting-Key");
 

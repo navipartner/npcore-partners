@@ -6,6 +6,7 @@ page 6150634 "NPR NPRE Print Templ. Subpage"
 
     Caption = 'NPRE Print Templates Subpage';
     PageType = ListPart;
+    UsageCategory = Administration;
     SourceTable = "NPR NPRE Print Templ.";
 
     layout

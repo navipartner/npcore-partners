@@ -5,6 +5,7 @@ page 6014581 "NPR Web Print Buffer"
     Caption = 'Web Print Buffer';
     Editable = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR Web Print Buffer";
 
     layout

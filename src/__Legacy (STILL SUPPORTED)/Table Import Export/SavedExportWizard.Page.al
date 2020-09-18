@@ -4,6 +4,7 @@ page 6014568 "NPR Saved Export Wizard"
 
     Caption = 'Saved Export Wizard';
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR Saved Export Wizard";
 
     layout

@@ -11,6 +11,7 @@ page 6151128 "NPR NpIa ItemAddOn Line Opt."
     Caption = 'Item AddOn Line Options';
     DelayedInsert = true;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR NpIa ItemAddOn Line Opt.";
 
     layout

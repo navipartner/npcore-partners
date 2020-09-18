@@ -4,6 +4,7 @@ page 6151366 "NPR CS Select Entries"
 
     Caption = 'Update Unknown Entries';
     PageType = ConfirmationDialog;
+    UsageCategory = Administration;
     SourceTable = "NPR CS Stock-Takes Data";
     SourceTableTemporary = true;
 

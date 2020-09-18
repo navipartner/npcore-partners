@@ -7,6 +7,7 @@ page 6151503 "NPR Nc Task Fields"
     Caption = 'Nc Task List Subform';
     Editable = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR Nc Task Field";
 
     layout

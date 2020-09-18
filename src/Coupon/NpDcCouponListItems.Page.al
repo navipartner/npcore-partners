@@ -9,6 +9,7 @@ page 6151597 "NPR NpDc Coupon List Items"
     Caption = 'Coupon List Items';
     DelayedInsert = true;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR NpDc Coupon List Item";
     SourceTableView = SORTING("Coupon Type", "Line No.")
                       WHERE("Line No." = FILTER(>= 0));

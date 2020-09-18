@@ -9,6 +9,7 @@ page 6014518 "NPR Sales Order Pick"
 
     Caption = 'Sales Order';
     PageType = Card;
+    UsageCategory = Administration;
     RefreshOnActivate = true;
     SourceTable = "Sales Header";
     SourceTableView = WHERE("Document Type" = FILTER(Order));

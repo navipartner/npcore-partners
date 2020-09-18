@@ -3,6 +3,7 @@ page 6014429 "NPR Audit Roll Statistics"
     Caption = 'Audit Roll Statistics';
     Editable = false;
     PageType = Worksheet;
+    UsageCategory = Administration;
     SourceTable = "NPR Audit Roll";
 
     layout

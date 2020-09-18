@@ -5,6 +5,7 @@ page 6150676 "NPR POS Tax Line List"
     Caption = 'POS Tax Line List';
     Editable = false;
     PageType = List;
+    UsageCategory = Administration;
     PromotedActionCategories = 'New,Process,Report,POS Entry';
     SourceTable = "NPR POS Tax Amount Line";
 

@@ -6,6 +6,7 @@ page 6151153 "NPR GDPR Anonymization Req."
     Caption = 'GDPR Anonymization Request';
     Editable = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR GDPR Anonymization Request";
 
     layout

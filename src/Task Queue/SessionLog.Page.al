@@ -6,6 +6,7 @@ page 6059908 "NPR Session Log"
     Caption = 'Session Log';
     Editable = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR Session Log";
 
     layout

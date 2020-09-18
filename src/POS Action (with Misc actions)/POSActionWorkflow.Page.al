@@ -3,6 +3,7 @@ page 6150706 "NPR POS Action Workflow"
     AutoSplitKey = true;
     Caption = 'POS Action Workflow';
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR POS Action Workflow";
 
     layout

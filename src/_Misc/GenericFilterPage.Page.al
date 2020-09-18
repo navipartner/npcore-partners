@@ -9,6 +9,7 @@ page 6014649 "NPR Generic Filter Page"
     DeleteAllowed = false;
     InsertAllowed = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "Field";
 
     layout

@@ -7,6 +7,7 @@ page 6151582 "NPR Event Events by Attributes"
     CardPageID = "NPR Event Card";
     Editable = false;
     PageType = ListPart;
+    UsageCategory = Administration;
     SaveValues = true;
     SourceTable = Job;
 

@@ -11,6 +11,7 @@ page 6060131 "NPR MM Member Cards ListPart"
     DeleteAllowed = false;
     InsertAllowed = false;
     PageType = ListPart;
+    UsageCategory = Administration;
     SourceTable = "NPR MM Member Card";
 
     layout

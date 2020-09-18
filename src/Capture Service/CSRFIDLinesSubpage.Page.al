@@ -3,6 +3,7 @@ page 6151368 "NPR CS RFID Lines Subpage"
     Caption = 'RFID Tags';
     Editable = false;
     PageType = ListPart;
+    UsageCategory = Administration;
     SourceTable = "NPR CS Rfid Lines";
 
     layout

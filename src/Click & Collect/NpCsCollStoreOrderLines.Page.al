@@ -6,6 +6,7 @@ page 6151207 "NPR NpCs Coll. StoreOrderLines"
     Caption = 'Lines';
     Editable = false;
     PageType = ListPart;
+    UsageCategory = Administration;
     SourceTable = "Sales Line";
 
     layout

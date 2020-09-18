@@ -11,6 +11,7 @@ page 6151445 "NPR Magento Store Items"
     InsertAllowed = false;
     LinksAllowed = false;
     PageType = ListPlus;
+    UsageCategory = Administration;
     ShowFilter = false;
     SourceTable = "NPR Magento Store Item";
     SourceTableView = SORTING("Item No.", "Store Code");

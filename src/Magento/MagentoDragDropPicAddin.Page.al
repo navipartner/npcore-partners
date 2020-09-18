@@ -21,6 +21,7 @@ page 6151451 "NPR Magento DragDropPic. Addin"
     InsertAllowed = false;
     ModifyAllowed = false;
     PageType = CardPart;
+    UsageCategory = Administration;
     ShowFilter = false;
     SourceTable = "NPR Magento Picture";
 

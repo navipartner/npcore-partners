@@ -8,6 +8,7 @@ page 6151557 "NPR NpXml Batch Filters"
     Caption = 'Xml Batch Filters';
     DelayedInsert = true;
     PageType = ListPart;
+    UsageCategory = Administration;
     ShowFilter = false;
     SourceTable = "NPR NpXml Filter";
 

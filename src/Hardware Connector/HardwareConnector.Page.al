@@ -6,6 +6,7 @@ page 6014627 "NPR Hardware Connector"
     Caption = 'Hardware Connector';
     Editable = false;
     PageType = StandardDialog;
+    UsageCategory = Administration;
 
     layout
     {

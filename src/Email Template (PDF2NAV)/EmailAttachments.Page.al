@@ -8,6 +8,7 @@ page 6059797 "NPR E-mail Attachments"
     AutoSplitKey = true;
     Caption = 'E-mail Attachments';
     PageType = List;
+    UsageCategory = Administration;
     RefreshOnActivate = true;
     SaveValues = true;
     SourceTable = "NPR E-mail Attachment";

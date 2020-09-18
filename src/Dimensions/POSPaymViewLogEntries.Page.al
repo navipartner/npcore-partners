@@ -5,6 +5,7 @@ page 6151043 "NPR POS Paym. View Log Entries"
     Caption = 'POS Payment View Log Entries';
     Editable = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR POS Paym. View Log Entry";
 
     layout

@@ -7,6 +7,7 @@ page 6151601 "NPR NpDc Arch.Coupon Entries"
     Caption = 'Archived Coupon Entries';
     Editable = false;
     PageType = List;
+    UsageCategory = Administration;
     PopulateAllFields = true;
     SourceTable = "NPR NpDc Arch.Coupon Entry";
 

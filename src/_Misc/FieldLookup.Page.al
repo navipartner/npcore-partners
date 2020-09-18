@@ -3,6 +3,7 @@ page 6014547 "NPR Field Lookup"
     Caption = 'Field Lookup';
     Editable = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "Field";
 
     layout

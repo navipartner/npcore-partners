@@ -4,6 +4,7 @@ page 6151152 "NPR Customers to Anon. List"
 
     Caption = 'Customers to Anonymize List';
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR Customers to Anonymize";
 
     layout

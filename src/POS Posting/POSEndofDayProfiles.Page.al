@@ -8,6 +8,7 @@ page 6150637 "NPR POS End of Day Profiles"
 
     Caption = 'POS End of Day Profile';
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR POS End of Day Profile";
 
     layout

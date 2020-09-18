@@ -5,6 +5,7 @@ page 6014623 "NPR Generic Key List"
     Caption = 'Select sorting key';
     Editable = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "Integer";
 
     layout

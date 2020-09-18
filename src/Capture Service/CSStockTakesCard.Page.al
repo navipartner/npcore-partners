@@ -13,6 +13,7 @@ page 6151386 "NPR CS Stock-Takes Card"
     InsertAllowed = false;
     ModifyAllowed = false;
     PageType = Card;
+    UsageCategory = Administration;
     SourceTable = "NPR CS Stock-Takes";
 
     layout

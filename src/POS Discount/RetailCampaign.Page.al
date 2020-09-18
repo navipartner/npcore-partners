@@ -7,6 +7,7 @@ page 6014611 "NPR Retail Campaign"
 
     Caption = 'Retail Campaign';
     PageType = Card;
+    UsageCategory = Administration;
     SourceTable = "NPR Retail Campaign Header";
 
     layout

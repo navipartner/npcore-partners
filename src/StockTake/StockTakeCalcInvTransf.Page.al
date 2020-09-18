@@ -7,6 +7,7 @@ page 6014669 "NPR StockTake Calc.Inv.Transf."
     DeleteAllowed = false;
     InsertAllowed = false;
     PageType = Card;
+    UsageCategory = Administration;
     SourceTable = "NPR Stock-Take Worksheet";
 
     layout

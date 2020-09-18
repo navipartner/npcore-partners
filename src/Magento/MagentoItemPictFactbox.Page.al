@@ -9,6 +9,7 @@ page 6151447 "NPR Magento Item Pict. Factbox"
 
     Caption = 'Picture';
     PageType = CardPart;
+    UsageCategory = Administration;
     SourceTable = Item;
 
     layout

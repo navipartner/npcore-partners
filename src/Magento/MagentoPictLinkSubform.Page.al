@@ -20,6 +20,7 @@ page 6151412 "NPR Magento Pict. Link Subform"
     Caption = 'Magento Picture Link Subform';
     DelayedInsert = true;
     PageType = ListPart;
+    UsageCategory = Administration;
     RefreshOnActivate = true;
     ShowFilter = false;
     SourceTable = "NPR Magento Picture Link";

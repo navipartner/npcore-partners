@@ -7,6 +7,7 @@ page 6150622 "NPR POS Paym. Bin Eject Params"
     DeleteAllowed = false;
     InsertAllowed = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR POS Paym. Bin Eject Param.";
 
     layout

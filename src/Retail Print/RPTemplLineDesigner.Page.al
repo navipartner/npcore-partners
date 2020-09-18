@@ -7,6 +7,7 @@ page 6014630 "NPR RP Templ. Line Designer"
     AutoSplitKey = true;
     Caption = 'Template Line Designer';
     PageType = ListPart;
+    UsageCategory = Administration;
     ShowFilter = false;
     SourceTable = "NPR RP Template Line";
 

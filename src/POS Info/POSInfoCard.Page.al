@@ -7,6 +7,7 @@ page 6150640 "NPR POS Info Card"
 
     Caption = 'POS Info Card';
     PageType = Card;
+    UsageCategory = Administration;
     SourceTable = "NPR POS Info";
 
     layout

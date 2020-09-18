@@ -21,6 +21,7 @@ page 6150628 "NPR POS Payment Bin Checkpoint"
     DeleteAllowed = false;
     InsertAllowed = false;
     PageType = Card;
+    UsageCategory = Administration;
     SourceTable = "NPR POS Payment Bin Checkp.";
 
     layout

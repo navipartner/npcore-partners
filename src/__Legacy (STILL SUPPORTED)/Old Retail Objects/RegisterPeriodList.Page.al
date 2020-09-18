@@ -4,6 +4,7 @@ page 6014464 "NPR Register Period List"
     CardPageID = "NPR Periods";
     Editable = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR Period";
 
     layout

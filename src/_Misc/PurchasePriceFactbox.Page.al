@@ -8,6 +8,7 @@ page 6151072 "NPR Purchase Price Factbox"
     InsertAllowed = false;
     ModifyAllowed = false;
     PageType = ListPart;
+    UsageCategory = Administration;
     SourceTable = "Purchase Price";
 
     layout

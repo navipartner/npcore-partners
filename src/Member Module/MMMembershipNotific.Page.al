@@ -7,6 +7,7 @@ page 6060143 "NPR MM Membership Notific."
     Caption = 'Membership Notification';
     InsertAllowed = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR MM Membership Notific.";
 
     layout

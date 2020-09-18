@@ -4,6 +4,7 @@ page 6151071 "NPR Retail Replenish. SKU List"
 
     Caption = 'Retail Replenishment SKUs';
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "Stockkeeping Unit";
 
     layout

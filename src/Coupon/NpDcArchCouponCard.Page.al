@@ -9,6 +9,7 @@ page 6151600 "NPR NpDc Arch. Coupon Card"
     Editable = false;
     InsertAllowed = false;
     PageType = Card;
+    UsageCategory = Administration;
     SourceTable = "NPR NpDc Arch. Coupon";
 
     layout

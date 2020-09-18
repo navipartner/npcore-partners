@@ -6,6 +6,7 @@ page 6150738 "NPR POS Setup List"
     Caption = 'POS Setup List';
     CardPageID = "NPR POS Setup";
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR POS Setup";
 
     layout

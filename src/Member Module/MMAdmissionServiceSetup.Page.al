@@ -5,6 +5,7 @@ page 6060090 "NPR MM Admission Service Setup"
 
     Caption = 'MM Admission Service Setup';
     PageType = Card;
+    UsageCategory = Administration;
     SourceTable = "NPR MM Admis. Service Setup";
 
     layout

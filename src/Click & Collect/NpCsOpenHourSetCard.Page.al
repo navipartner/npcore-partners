@@ -4,6 +4,7 @@ page 6151216 "NPR NpCs Open. Hour Set Card"
 
     Caption = 'Collect Store Opening Hour Set Card';
     PageType = Card;
+    UsageCategory = Administration;
     SourceTable = "NPR NpCs Open. Hour Set";
 
     layout

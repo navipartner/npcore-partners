@@ -6,6 +6,7 @@ page 6014612 "NPR Retail Campaign Subform"
     Caption = 'Discounts';
     DelayedInsert = true;
     PageType = ListPart;
+    UsageCategory = Administration;
     SourceTable = "NPR Retail Campaign Line";
 
     layout

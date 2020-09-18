@@ -7,6 +7,7 @@ page 6060166 "NPR Event Next 10 Events"
     CardPageID = "NPR Event Card";
     Editable = false;
     PageType = ListPart;
+    UsageCategory = Administration;
     SourceTable = Job;
     SourceTableTemporary = true;
 

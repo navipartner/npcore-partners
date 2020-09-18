@@ -7,6 +7,7 @@ page 6151377 "NPR CS UIs"
     CardPageID = "NPR CS UI";
     Editable = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR CS UI Header";
 
     layout

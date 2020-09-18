@@ -5,6 +5,7 @@ page 6151588 "NPR Event Atributes Info"
     Caption = 'Event Atributes Info';
     InsertAllowed = false;
     PageType = ListPart;
+    UsageCategory = Administration;
     SourceTable = "NPR Event Attribute";
 
     layout

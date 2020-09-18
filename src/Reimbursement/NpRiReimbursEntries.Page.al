@@ -5,6 +5,7 @@ page 6151103 "NPR NpRi Reimburs. Entries"
     Caption = 'Reimbursement Entries';
     Editable = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR NpRi Reimbursement Entry";
 
     layout

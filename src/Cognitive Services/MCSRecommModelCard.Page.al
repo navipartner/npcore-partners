@@ -4,6 +4,7 @@ page 6060082 "NPR MCS Recomm. Model Card"
 
     Caption = 'MCS Recommendations Model Card';
     PageType = Card;
+    UsageCategory = Administration;
     SourceTable = "NPR MCS Recomm. Model";
 
     layout

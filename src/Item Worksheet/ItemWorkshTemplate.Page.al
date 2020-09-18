@@ -7,6 +7,7 @@ page 6060058 "NPR Item Worksh. Template"
 
     Caption = 'Item Worksheet Template';
     PageType = Card;
+    UsageCategory = Administration;
     SourceTable = "NPR Item Worksh. Template";
 
     layout

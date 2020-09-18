@@ -6,6 +6,7 @@ page 6151576 "NPR Event Resource Overview"
     Caption = 'Event Resource Overview';
     Editable = false;
     PageType = ListPart;
+    UsageCategory = Administration;
     SourceTable = Resource;
 
     layout

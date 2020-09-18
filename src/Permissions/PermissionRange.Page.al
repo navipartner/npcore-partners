@@ -4,6 +4,7 @@ page 6059938 "NPR Permission Range"
 
     Caption = 'Permission Range';
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "Permission Range";
 
     layout

@@ -11,6 +11,7 @@ page 6014594 "NPR Sales Stats Subform"
     InsertAllowed = false;
     ModifyAllowed = false;
     PageType = ListPart;
+    UsageCategory = Administration;
     SourceTable = "NPR Sales Stats Time Period";
 
     layout

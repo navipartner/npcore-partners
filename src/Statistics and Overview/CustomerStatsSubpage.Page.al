@@ -7,6 +7,7 @@ page 6014589 "NPR Customer Stats Subpage"
     Caption = 'Customer Statistics Subform';
     Editable = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = Customer;
 
     layout

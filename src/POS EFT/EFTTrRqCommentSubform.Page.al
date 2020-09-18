@@ -8,6 +8,7 @@ page 6184499 "NPR EFT Tr.Rq.Comment Subform"
     Caption = 'EFT Tr. Rq. Comment Subform';
     Editable = false;
     PageType = ListPart;
+    UsageCategory = Administration;
     SourceTable = "NPR EFT Transact. Req. Comment";
 
     layout

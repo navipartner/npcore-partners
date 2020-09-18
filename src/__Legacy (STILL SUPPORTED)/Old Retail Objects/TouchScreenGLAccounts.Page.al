@@ -7,6 +7,7 @@ page 6014527 "NPR TouchScreen: G/L Accounts"
     Caption = 'Touch Screen - Lookup G/L Account';
     ModifyAllowed = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "G/L Account";
     SourceTableView = SORTING("Search Name")
                       ORDER(Ascending)

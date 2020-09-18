@@ -6,6 +6,7 @@ page 6014458 "NPR Alternative Number"
     DelayedInsert = true;
     Editable = true;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR Alternative No.";
 
     layout

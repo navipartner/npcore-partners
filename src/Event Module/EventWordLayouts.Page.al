@@ -5,6 +5,7 @@ page 6060157 "NPR Event Word Layouts"
 
     Caption = 'Event Word Layouts';
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR Event Word Layout";
 
     layout

@@ -2,6 +2,7 @@ page 6014540 "NPR Insurrance Combination"
 {
     Caption = 'Insurance - Combination';
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR Insurance Combination";
 
     layout

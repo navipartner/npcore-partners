@@ -2,6 +2,7 @@ page 6059987 "NPR Discount Activities"
 {
     Caption = 'Discount Activities';
     PageType = CardPart;
+    UsageCategory = Administration;
     SourceTable = "NPR Discount Cue";
 
     layout

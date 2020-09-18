@@ -6,6 +6,7 @@ page 6059804 "NPR E-mail Txt Editor Dlg"
 
     Caption = 'NaviConnect Text Editor Dialog';
     PageType = StandardDialog;
+    UsageCategory = Administration;
 
     layout
     {

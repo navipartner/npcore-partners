@@ -9,6 +9,7 @@ page 6150673 "NPR POS Audit Log"
     InsertAllowed = false;
     ModifyAllowed = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR POS Audit Log";
 
     layout

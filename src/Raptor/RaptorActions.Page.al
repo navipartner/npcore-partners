@@ -6,6 +6,7 @@ page 6151493 "NPR Raptor Actions"
     Caption = 'Raptor Actions';
     DelayedInsert = true;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR Raptor Action";
 
     layout

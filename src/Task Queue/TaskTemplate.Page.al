@@ -5,6 +5,7 @@ page 6059900 "NPR Task Template"
 
     Caption = 'Task Template';
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR Task Template";
 
     layout

@@ -6,6 +6,7 @@ page 6059773 "NPR Member Card Trx Logs"
     Caption = 'Point Card - Transaction Logs';
     Editable = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR Member Card Trx Log";
 
     layout

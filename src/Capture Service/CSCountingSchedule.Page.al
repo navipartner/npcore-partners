@@ -4,6 +4,7 @@ page 6151394 "NPR CS Counting Schedule"
 
     Caption = 'CS Counting Schedule';
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR CS Counting schedule";
 
     layout

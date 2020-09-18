@@ -5,6 +5,7 @@ page 6184861 "NPR Azure Storage Overview"
     Caption = 'Azure Storage Overview';
     Editable = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR Azure Storage Overview";
 
     layout

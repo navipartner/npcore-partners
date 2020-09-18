@@ -7,6 +7,7 @@ page 6151530 "NPR Nc Collec. Filters"
     DelayedInsert = true;
     MultipleNewLines = false;
     PageType = ListPart;
+    UsageCategory = Administration;
     PopulateAllFields = true;
     SourceTable = "NPR Nc Collector Filter";
 

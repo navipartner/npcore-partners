@@ -5,6 +5,7 @@ page 6151200 "NPR NpCs Document List"
     Caption = 'Collect Document List';
     InsertAllowed = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR NpCs Document";
 
     layout

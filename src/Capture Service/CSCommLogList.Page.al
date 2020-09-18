@@ -7,6 +7,7 @@ page 6151372 "NPR CS Comm. Log List"
     CardPageID = "NPR CS Comm. Log Card";
     Editable = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR CS Comm. Log";
     SourceTableView = SORTING("Request Start")
                       ORDER(Descending);

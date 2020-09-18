@@ -4,6 +4,7 @@ page 6151534 "NPR Nc Collector Req.Filt.Subf"
 
     Caption = 'Nc Collector Req. Filter Subf.';
     PageType = ListPart;
+    UsageCategory = Administration;
     SourceTable = "NPR Nc Collector Req. Filter";
 
     layout

@@ -8,6 +8,7 @@ page 6060128 "NPR MM Members.Member ListPart"
     Caption = 'Membership Members';
     InsertAllowed = false;
     PageType = ListPart;
+    UsageCategory = Administration;
     SourceTable = "NPR MM Membership Role";
 
     layout

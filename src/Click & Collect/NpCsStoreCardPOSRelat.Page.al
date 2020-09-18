@@ -5,6 +5,7 @@ page 6151209 "NPR NpCs Store Card POSRelat."
     Caption = 'Collect Store POS Relations';
     DelayedInsert = true;
     PageType = ListPart;
+    UsageCategory = Administration;
     SourceTable = "NPR NpCs Store POS Relation";
 
     layout

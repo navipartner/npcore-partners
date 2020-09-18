@@ -101,6 +101,7 @@ page 6014425 "NPR Retail Item Card"
 
     Caption = 'Retail Item Card';
     PageType = Card;
+    UsageCategory = Administration;
     PromotedActionCategories = 'New,Process,Reports,Manage,Retail,Magento';
     RefreshOnActivate = true;
     SourceTable = Item;

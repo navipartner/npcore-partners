@@ -5,6 +5,7 @@ page 6150686 "NPR NPRE Kitchen Station Card"
 
     Caption = 'Restaurant Kitchen Station Card';
     PageType = Card;
+    UsageCategory = Administration;
     SourceTable = "NPR NPRE Kitchen Station";
 
     layout

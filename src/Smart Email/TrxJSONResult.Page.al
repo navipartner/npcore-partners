@@ -9,6 +9,7 @@ page 6059829 "NPR Trx JSON Result"
     InsertAllowed = false;
     ModifyAllowed = false;
     PageType = List;
+    UsageCategory = Administration;
     ShowFilter = false;
     SourceTable = "NPR Trx JSON Result";
     SourceTableTemporary = true;

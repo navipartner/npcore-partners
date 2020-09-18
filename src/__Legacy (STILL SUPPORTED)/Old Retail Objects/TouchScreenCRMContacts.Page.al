@@ -9,6 +9,7 @@ page 6014524 "NPR Touch Screen: CRM Contacts"
     Caption = 'Contact List';
     CardPageID = "Contact Card";
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = Contact;
 
     layout

@@ -7,6 +7,7 @@ page 6014614 "NPR Discount FactBox"
     Caption = 'Discount FactBox';
     InsertAllowed = false;
     PageType = CardPart;
+    UsageCategory = Administration;
     SourceTable = Item;
 
     layout

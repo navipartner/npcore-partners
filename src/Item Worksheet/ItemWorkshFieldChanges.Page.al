@@ -6,6 +6,7 @@ page 6060055 "NPR Item Worksh. Field Changes"
     Caption = 'Item Worksheet Field Changes';
     Editable = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR Item Worksh. Field Change";
 
     layout

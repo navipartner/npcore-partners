@@ -5,6 +5,7 @@ page 6151168 "NPR NpGp POSSalesEntry Subpage"
     Caption = 'Sales Lines';
     Editable = false;
     PageType = ListPart;
+    UsageCategory = Administration;
     SourceTable = "NPR NpGp POS Sales Line";
 
     layout

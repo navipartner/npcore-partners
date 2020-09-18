@@ -6,6 +6,7 @@ page 6059945 "NPR CashKeeper Setup"
 
     Caption = 'CashKeeper Setup';
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR CashKeeper Setup";
 
     layout

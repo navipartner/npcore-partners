@@ -7,6 +7,7 @@ page 6151435 "NPR Magento Attr. Set Values"
     Caption = 'Attribute Set Values';
     DelayedInsert = true;
     PageType = ListPart;
+    UsageCategory = Administration;
     SourceTable = "NPR Magento Attr. Set Value";
     SourceTableView = SORTING(Position);
 

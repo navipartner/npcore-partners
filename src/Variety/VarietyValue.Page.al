@@ -2,6 +2,7 @@ page 6059973 "NPR Variety Value"
 {
     Caption = 'Variety Value';
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR Variety Value";
 
     layout

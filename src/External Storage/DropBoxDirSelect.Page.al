@@ -4,6 +4,7 @@ page 6184872 "NPR DropBox Dir. Select"
 
     Caption = 'Select Upload Directory';
     PageType = ListPlus;
+    UsageCategory = Administration;
     SourceTable = "NPR DropBox Overview";
     SourceTableTemporary = true;
 

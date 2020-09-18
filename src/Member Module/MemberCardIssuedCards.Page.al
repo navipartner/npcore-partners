@@ -4,6 +4,7 @@ page 6059775 "NPR Member Card Issued Cards"
     CardPageID = "NPR Member Card Iss. Card";
     Editable = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR Member Card Issued Cards";
 
     layout

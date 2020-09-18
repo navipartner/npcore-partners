@@ -5,6 +5,7 @@ page 6014633 "NPR GCP Ticket Options"
 
     Caption = 'Google Cloud Print Ticket Options';
     PageType = StandardDialog;
+    UsageCategory = Administration;
 
     layout
     {

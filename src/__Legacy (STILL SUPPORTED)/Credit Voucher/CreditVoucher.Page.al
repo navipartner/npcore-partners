@@ -10,6 +10,7 @@ page 6014418 "NPR Credit Voucher"
     Caption = 'Credit Voucher';
     InsertAllowed = false;
     PageType = Card;
+    UsageCategory = Administration;
     SourceTable = "NPR Credit Voucher";
 
     layout

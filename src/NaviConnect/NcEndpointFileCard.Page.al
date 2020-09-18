@@ -8,6 +8,7 @@ page 6151527 "NPR Nc Endpoint File Card"
     DeleteAllowed = false;
     InsertAllowed = false;
     PageType = Card;
+    UsageCategory = Administration;
     SourceTable = "NPR Nc Endpoint File";
 
     layout

@@ -7,6 +7,7 @@ page 6150638 "NPR POS Posting Profiles"
     CardPageID = "NPR POS Post. Profile Card";
     Editable = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR POS Posting Profile";
 
     layout

@@ -16,6 +16,7 @@ page 6014450 "NPR Mixed Discount"
 
     Caption = 'Mix Discount';
     PageType = Card;
+    UsageCategory = Administration;
     SourceTable = "NPR Mixed Discount";
 
     layout

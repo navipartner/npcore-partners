@@ -7,6 +7,7 @@ page 6014571 "NPR Tax Free Consolidation"
     LinksAllowed = false;
     ModifyAllowed = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR Tax Free Consolidation";
     SourceTableTemporary = true;
 

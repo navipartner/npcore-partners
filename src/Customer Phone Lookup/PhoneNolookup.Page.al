@@ -4,6 +4,7 @@ page 6014412 "NPR Phone No lookup"
 
     Caption = 'Phone No lookup';
     PageType = Card;
+    UsageCategory = Administration;
     SourceTable = "NPR Phone Lookup Buffer";
     SourceTableTemporary = true;
 

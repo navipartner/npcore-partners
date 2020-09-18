@@ -6,6 +6,7 @@ page 6151070 "NPR Retail Repl. Demand Lines"
 
     Caption = 'Retail Repl. Demand Lines';
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR Retail Repl. Demand Line";
 
     layout

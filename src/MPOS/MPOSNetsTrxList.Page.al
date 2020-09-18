@@ -8,6 +8,7 @@ page 6059966 "NPR MPOS Nets Trx List"
     CardPageID = "NPR MPOS Nets Trans. Card";
     Editable = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR MPOS Nets Transactions";
 
     layout

@@ -4,6 +4,7 @@ page 6184507 "NPR EFT Verifone Unit Param."
 
     Caption = 'EFT Verifone Unit Parameters';
     PageType = Card;
+    UsageCategory = Administration;
     SourceTable = "NPR EFT Verifone Unit Param.";
 
     layout
