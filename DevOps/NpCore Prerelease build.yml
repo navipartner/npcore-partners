@@ -45,3 +45,4 @@ jobs:
     versionVariableName: 'LastUsedVerNo'
     versionRevisionSeed: 9000
     nuGetSuffix: Prerelease
+    runtimePackage: TRUE
