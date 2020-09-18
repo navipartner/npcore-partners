@@ -230,7 +230,11 @@ codeunit 6060150 "NPR Event Management"
         //  JobPlanningLine.SETCURRENTKEY("Job No.");
         //  JobPlanningLine.SETRANGE("Job No.",Rec."No.");
         //+NPR5.36 [287267]
-        JobPlanningLine.ModifyAll("NPR Event Status", Rec."NPR Event Status", true);
+        if JobPlanningLine.FindSet() then
+            repeat
+                JobPlanningLine.Validate("NPR Event Status", Rec."NPR Event Status");
+                JobPlanningLine.Modify(true);
+            until JobPlanningLine.Next() = 0;
         //-NPR5.31 [269162]
         //END;
         //NPR5.31 [269162]
@@ -508,6 +512,12 @@ codeunit 6060150 "NPR Event Management"
         //-NPR5.38 [291965]
         CalcLineAmountInclVAT(Rec);
         //+NPR5.38 [291965]
+    end;
+
+    [EventSubscriber(ObjectType::Table, 1003, 'OnAfterValidateEvent', 'NPR Event Status', false, false)]
+    local procedure JobPlanningLineEventStatusOnAfterValidate(var Rec: Record "Job Planning Line"; var xRec: Record "Job Planning Line"; CurrFieldNo: Integer)
+    begin
+        CheckResAvailability(Rec, xRec);
     end;
 
     [EventSubscriber(ObjectType::Table, 1022, 'OnAfterInsertEvent', '', false, false)]
@@ -913,7 +923,7 @@ codeunit 6060150 "NPR Event Management"
             Resource.CalcFields("Qty. on Order (Job)", "Qty. Quoted (Job)", Capacity, "NPR Qty. Planned (Job)");
             TotalCapacity := Resource."Qty. on Order (Job)" + Resource."Qty. Quoted (Job)" + Resource."NPR Qty. Planned (Job)";
             //+NPR5.40 [301375]
-            if (xRec.Quantity > 0) and (xRec.Quantity <> Quantity) then
+            if xRec.Quantity > 0 then
                 TotalCapacity -= xRec.Quantity;
             AvailCap := Resource.Capacity - TotalCapacity;
             exit((Resource.Capacity = 0) or ((Resource.Capacity > 0) and (Quantity + TotalCapacity <= Resource.Capacity)));
@@ -1080,6 +1090,7 @@ codeunit 6060150 "NPR Event Management"
         [RunOnClient]
         WordApplication: DotNet NPRNetApplicationClass;
         [RunOnClient]
+
 
         WordDocument: DotNet NPRNetDocument;
         [RunOnClient]
