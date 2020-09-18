@@ -7,6 +7,7 @@ page 6151506 "NPR Nc Task Proces. Lines"
     Caption = 'Nc Task Proces. Lines';
     DelayedInsert = true;
     PageType = ListPart;
+    UsageCategory = Administration;
     SourceTable = "NPR Nc Task Proces. Line";
 
     layout

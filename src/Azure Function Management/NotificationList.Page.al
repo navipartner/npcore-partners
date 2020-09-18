@@ -6,6 +6,7 @@ page 6151041 "NPR Notification List"
     CardPageID = "NPR Notification Card";
     Editable = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR AF Notification Hub";
 
     layout

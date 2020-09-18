@@ -9,6 +9,7 @@ page 6151556 "NPR NpXml Filters"
     Caption = 'Xml Filters';
     DelayedInsert = true;
     PageType = ListPart;
+    UsageCategory = Administration;
     SourceTable = "NPR NpXml Filter";
 
     layout

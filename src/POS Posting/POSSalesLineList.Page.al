@@ -7,6 +7,7 @@ page 6150655 "NPR POS Sales Line List"
     Caption = 'POS Sales Line List';
     Editable = false;
     PageType = List;
+    UsageCategory = Administration;
     PromotedActionCategories = 'New,Process,Report,POS Entry';
     SourceTable = "NPR POS Sales Line";
 

@@ -4,6 +4,7 @@ page 6151218 "NPR NpCs Open. Hour Calendar"
 
     Caption = 'Collect Store Opening Hour Calendar';
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR NpCs Open. Hour Cal. Entry";
 
     layout

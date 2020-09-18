@@ -7,6 +7,7 @@ page 6150670 "NPR POS Balancing Line"
     Caption = 'POS Balancing Line';
     Editable = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR POS Balancing Line";
 
     layout

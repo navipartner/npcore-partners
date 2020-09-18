@@ -5,6 +5,7 @@ page 6150906 "NPR POS HC Endpoint Setup"
 
     Caption = 'Endpoint Setup';
     PageType = Card;
+    UsageCategory = Administration;
     SourceTable = "NPR POS HC Endpoint Setup";
 
     layout

@@ -6,6 +6,7 @@ page 6151397 "NPR CS StockTake Batch List"
     InsertAllowed = false;
     ModifyAllowed = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR CS Stock-Take Handl. Rfid";
 
     layout

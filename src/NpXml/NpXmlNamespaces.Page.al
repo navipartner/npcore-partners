@@ -6,6 +6,7 @@ page 6151564 "NPR NpXml Namespaces"
     Caption = 'Namespaces';
     DelayedInsert = true;
     PageType = ListPart;
+    UsageCategory = Administration;
     ShowFilter = false;
     SourceTable = "NPR NpXml Namespace";
 

@@ -10,6 +10,7 @@ page 6059793 "NPR E-mail Templ. Subform"
     AutoSplitKey = true;
     Caption = 'E-mail Template Subform';
     PageType = ListPart;
+    UsageCategory = Administration;
     SourceTable = "NPR E-mail Templ. Line";
 
     layout

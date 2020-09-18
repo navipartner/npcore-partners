@@ -7,6 +7,7 @@ page 6059770 "NPR NaviDocs Comment Subpage"
     InsertAllowed = false;
     ModifyAllowed = false;
     PageType = ListPart;
+    UsageCategory = Administration;
     RefreshOnActivate = true;
     SourceTable = "Activity Log";
     SourceTableTemporary = true;

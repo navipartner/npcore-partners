@@ -5,6 +5,7 @@ page 6151378 "NPR CS UI Functions"
 
     Caption = 'CS UI Functions';
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR CS UI Function";
 
     layout

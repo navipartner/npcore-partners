@@ -5,6 +5,7 @@ page 6151058 "NPR Distrib. Grp Memb Listpart"
     AutoSplitKey = true;
     Caption = 'Distribution Group Members';
     PageType = ListPart;
+    UsageCategory = Administration;
     SourceTable = "NPR Distrib. Group Members";
 
     layout

@@ -14,6 +14,7 @@ page 6151385 "NPR CS Stock-Takes List"
     InsertAllowed = false;
     ModifyAllowed = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR CS Stock-Takes";
     SourceTableView = SORTING(Created)
                       ORDER(Descending);

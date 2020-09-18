@@ -8,6 +8,7 @@ page 6151208 "NPR NpCs Stores by Distance"
     InsertAllowed = false;
     ModifyAllowed = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR NpCs Store";
     SourceTableTemporary = true;
     SourceTableView = SORTING("Distance (km)");

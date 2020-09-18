@@ -5,6 +5,7 @@ page 6184893 "NPR Storage Operation Types"
     Caption = 'Storage Operation Types';
     Editable = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR Storage Operation Type";
     SourceTableTemporary = true;
 

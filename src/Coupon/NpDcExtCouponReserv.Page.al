@@ -4,6 +4,7 @@ page 6151608 "NPR NpDc Ext. Coupon Reserv."
 
     Caption = 'External Coupon Reservations';
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR NpDc Ext. Coupon Reserv.";
 
     layout

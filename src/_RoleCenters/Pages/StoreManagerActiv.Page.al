@@ -5,6 +5,7 @@ page 6059983 "NPR Store Manager Activ."
 
     Caption = 'Order Processing';
     PageType = ListPart;
+    UsageCategory = Administration;
     SourceTable = "NPR Retail Order Cue";
 
     layout

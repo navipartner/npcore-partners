@@ -4,6 +4,7 @@ page 6184862 "NPR Azr. Storage Cogn. Search"
 
     Caption = 'Azure Storage Cognitive Search';
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR Azure Storage Cogn. Search";
 
     layout

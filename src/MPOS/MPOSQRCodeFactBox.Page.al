@@ -5,6 +5,7 @@ page 6059963 "NPR MPOS QR Code FactBox"
 
     Caption = 'MPOS QR Code FactBox';
     PageType = CardPart;
+    UsageCategory = Administration;
     ShowFilter = false;
     SourceTable = "NPR MPOS QR Code";
 

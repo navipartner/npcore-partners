@@ -5,6 +5,7 @@ page 6150901 "NPR HC Audit Roll Stats"
     Caption = 'HC Audit Roll Statistics';
     Editable = false;
     PageType = Worksheet;
+    UsageCategory = Administration;
     SourceTable = "NPR HC Audit Roll";
 
     layout

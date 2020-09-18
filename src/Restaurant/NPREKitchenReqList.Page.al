@@ -7,6 +7,7 @@ page 6150691 "NPR NPRE Kitchen Req. List"
     Caption = 'Kitchen Request List';
     Editable = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR NPRE Kitchen Request";
 
     layout

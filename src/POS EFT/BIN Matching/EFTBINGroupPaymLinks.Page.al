@@ -4,6 +4,7 @@ page 6184512 "NPR EFT BIN Group Paym. Links"
 
     Caption = 'EFT BIN Group Payment Links';
     PageType = ListPart;
+    UsageCategory = Administration;
     SourceTable = "NPR EFT BIN Group Paym. Link";
 
     layout

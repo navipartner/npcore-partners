@@ -6,6 +6,7 @@ page 6059942 "NPR SMS Template Subform"
     AutoSplitKey = true;
     Caption = 'Lines';
     PageType = ListPart;
+    UsageCategory = Administration;
     SourceTable = "NPR SMS Template Line";
 
     layout

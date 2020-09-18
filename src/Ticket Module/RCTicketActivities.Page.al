@@ -4,6 +4,7 @@
 
     Caption = 'Ticket Activities';
     PageType = CardPart;
+    UsageCategory = Administration;
     SourceTable = "NPR RC Ticket Cues";
 
     layout

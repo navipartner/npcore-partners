@@ -10,6 +10,7 @@ page 6060076 "NPR MM Members.Setup Card"
 
     Caption = 'Membership Setup Card';
     PageType = Card;
+    UsageCategory = Administration;
     SourceTable = "NPR MM Membership Setup";
 
     layout

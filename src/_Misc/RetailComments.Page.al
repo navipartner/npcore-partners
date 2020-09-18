@@ -7,6 +7,7 @@ page 6014492 "NPR Retail Comments"
     AutoSplitKey = true;
     Caption = 'NPR Comment Sheet';
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR Retail Comment";
 
     layout

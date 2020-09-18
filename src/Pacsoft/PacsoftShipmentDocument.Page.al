@@ -11,6 +11,7 @@ page 6014486 "NPR Pacsoft Shipment Document"
     InsertAllowed = false;
     ModifyAllowed = true;
     PageType = Card;
+    UsageCategory = Administration;
     SourceTable = "NPR Pacsoft Shipment Document";
 
     layout

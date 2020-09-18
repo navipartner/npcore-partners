@@ -8,6 +8,7 @@ page 6151405 "NPR Magento Website Links"
     DelayedInsert = true;
     Editable = true;
     PageType = ListPart;
+    UsageCategory = Administration;
     ShowFilter = false;
     SourceTable = "NPR Magento Website Link";
 

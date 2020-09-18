@@ -7,6 +7,7 @@ page 6014590 "NPR Vendor Statistics Subpage"
     Caption = 'Vendor Statistics Subform';
     Editable = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = Vendor;
 
     layout

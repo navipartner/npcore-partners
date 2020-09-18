@@ -6,6 +6,7 @@ page 6014643 "NPR RP Data Item Constr. Links"
     Caption = 'Data Item Constraint Links';
     DelayedInsert = true;
     PageType = ListPart;
+    UsageCategory = Administration;
     ShowFilter = false;
     SourceTable = "NPR RP Data Item Constr. Links";
 

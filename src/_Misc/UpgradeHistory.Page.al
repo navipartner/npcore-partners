@@ -5,6 +5,7 @@ page 6151000 "NPR Upgrade History"
     Caption = 'NPR Upgrade History';
     Editable = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR Upgrade History";
     SourceTableView = SORTING("Entry No.")
                       ORDER(Descending);

@@ -5,6 +5,7 @@ page 6151170 "NPR NpGp Det. POS S. Entries"
     Caption = 'Detailed Global POS Sales Entries';
     Editable = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR NpGp Det. POS Sales Entry";
 
     layout

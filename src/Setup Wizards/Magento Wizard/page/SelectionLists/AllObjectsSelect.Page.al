@@ -4,6 +4,7 @@ page 6014621 "NPR All Objects Select"
     DataCaptionFields = "Object Type";
     Editable = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = AllObj;
     SourceTableTemporary = true;
 

@@ -5,6 +5,7 @@ page 6151212 "NPR NpCs Arch.Doc.Log Entries"
     Caption = 'Archived Collect Document Log Entries';
     Editable = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR NpCs Arch. Doc. Log Entry";
 
     layout

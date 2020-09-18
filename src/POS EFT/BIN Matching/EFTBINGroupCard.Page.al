@@ -4,6 +4,7 @@ page 6184513 "NPR EFT BIN Group Card"
 
     Caption = 'EFT BIN Group Card';
     PageType = Card;
+    UsageCategory = Administration;
     SourceTable = "NPR EFT BIN Group";
 
     layout

@@ -6,6 +6,7 @@ page 6059946 "NPR CashKeeper Transaction"
     Caption = 'CashKeeper Transaction';
     Editable = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR CashKeeper Transaction";
 
     layout

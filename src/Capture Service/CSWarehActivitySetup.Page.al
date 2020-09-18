@@ -5,6 +5,7 @@ page 6151364 "NPR CS Wareh. Activity Setup"
     Caption = 'CS Warehouse Activity Setup';
     DelayedInsert = true;
     PageType = ListPlus;
+    UsageCategory = Administration;
     SourceTable = "NPR CS Wareh. Activ. Setup";
 
     layout

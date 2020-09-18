@@ -2,6 +2,7 @@ page 6151331 "NPR Legal Page"
 {
     Caption = 'Legal Page';
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR NP Retail Setup";
     layout
     {

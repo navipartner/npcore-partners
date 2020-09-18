@@ -8,6 +8,7 @@ page 6151370 "NPR CS Users"
     Caption = 'CS Users';
     DelayedInsert = true;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR CS User";
 
     layout

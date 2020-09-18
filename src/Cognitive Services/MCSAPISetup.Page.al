@@ -5,6 +5,7 @@ page 6059955 "NPR MCS API Setup"
 
     Caption = 'MCS API Setup';
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR MCS API Setup";
 
     layout

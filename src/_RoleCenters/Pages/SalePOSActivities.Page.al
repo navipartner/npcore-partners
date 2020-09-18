@@ -5,6 +5,7 @@ page 6059986 "NPR Sale POS Activities"
 
     Caption = 'Sale Activities';
     PageType = CardPart;
+    UsageCategory = Administration;
     SourceTable = "NPR Sale POS Cue";
 
     layout

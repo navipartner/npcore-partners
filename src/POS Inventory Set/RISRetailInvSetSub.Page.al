@@ -6,6 +6,7 @@ page 6151087 "NPR RIS Retail Inv. Set Sub."
     Caption = 'Inventory Set Entries';
     DelayedInsert = true;
     PageType = ListPart;
+    UsageCategory = Administration;
     SourceTable = "NPR RIS Retail Inv. Set Entry";
 
     layout

@@ -25,6 +25,7 @@ page 6059830 "NPR Event Group.Plan. Line Sub"
     Caption = 'Grouped Planning Lines';
     DataCaptionExpression = Caption;
     PageType = ListPart;
+    UsageCategory = Administration;
     SourceTable = "Job Planning Line";
 
     layout

@@ -6,6 +6,7 @@ page 6150744 "NPR Archive POS Sale"
     Caption = 'Archive POS Sale';
     Editable = false;
     PageType = Document;
+    UsageCategory = Administration;
     SourceTable = "NPR Archive Sale POS";
 
     layout

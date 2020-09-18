@@ -5,6 +5,7 @@ page 6014442 "NPR Item - Series Number"
     Caption = 'Item Serial No.';
     Editable = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "Item Ledger Entry";
 
     layout

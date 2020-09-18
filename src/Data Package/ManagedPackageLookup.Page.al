@@ -8,6 +8,7 @@ page 6014598 "NPR Managed Package Lookup"
     InsertAllowed = false;
     ModifyAllowed = false;
     PageType = StandardDialog;
+    UsageCategory = Administration;
     SourceTable = "NPR Managed Package Lookup";
     SourceTableTemporary = true;
 

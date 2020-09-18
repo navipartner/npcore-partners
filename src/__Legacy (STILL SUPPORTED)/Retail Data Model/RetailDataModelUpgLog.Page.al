@@ -6,6 +6,7 @@ page 6150699 "NPR Retail Data Model Upg.Log"
     Caption = 'Retail Data Model Upgrade Log';
     Editable = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR Data Model Upg. Log Entry";
 
     layout

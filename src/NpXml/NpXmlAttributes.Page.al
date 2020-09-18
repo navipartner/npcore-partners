@@ -9,6 +9,7 @@ page 6151555 "NPR NpXml Attributes"
     Caption = 'Xml Attributes';
     DelayedInsert = true;
     PageType = ListPart;
+    UsageCategory = Administration;
     SourceTable = "NPR NpXml Attribute";
 
     layout

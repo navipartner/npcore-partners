@@ -6,6 +6,7 @@ page 6150656 "NPR POS Payment Line List"
     Caption = 'POS Payment Line List';
     Editable = false;
     PageType = List;
+    UsageCategory = Administration;
     PromotedActionCategories = 'New,Process,Report,POS Entry';
     SourceTable = "NPR POS Payment Line";
 

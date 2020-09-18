@@ -8,6 +8,7 @@ page 6151398 "NPR CS RFID Header List"
     InsertAllowed = false;
     ModifyAllowed = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR CS Rfid Header";
 
     layout

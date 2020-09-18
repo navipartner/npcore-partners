@@ -4,6 +4,7 @@ page 6060044 "NPR Item Worksh.Vrty. Values"
 
     Caption = 'Item Worksheet Variety Values';
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR Item Worksh. Variety Value";
 
     layout

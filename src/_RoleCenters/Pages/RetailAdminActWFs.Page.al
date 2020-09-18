@@ -4,6 +4,7 @@ page 6151247 "NPR Retail Admin Act - WFs"
 
     Caption = 'NP Retail - POS Workflow Setups';
     PageType = CardPart;
+    UsageCategory = Administration;
     RefreshOnActivate = true;
     SourceTable = "NPR NP Retail Admin Cue";
 

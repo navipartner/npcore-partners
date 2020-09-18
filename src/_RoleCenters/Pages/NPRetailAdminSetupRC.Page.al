@@ -4,6 +4,7 @@ page 6151245 "NPR NP Retail Admin Setup RC"
 
     Caption = 'NP Retail Admin Setup';
     PageType = RoleCenter;
+    UsageCategory = Administration;
 
     layout
     {

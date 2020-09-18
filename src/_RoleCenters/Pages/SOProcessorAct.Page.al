@@ -2,6 +2,7 @@ page 6151340 "NPR SO Processor Act"
 {
     Caption = 'Activities';
     PageType = CardPart;
+    UsageCategory = Administration;
     RefreshOnActivate = true;
     SourceTable = "Sales Cue";
 

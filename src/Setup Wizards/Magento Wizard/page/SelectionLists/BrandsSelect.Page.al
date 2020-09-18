@@ -2,6 +2,7 @@ page 6014625 "NPR Brands Select"
 {
     Caption = 'Brands';
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR Magento Brand";
     SourceTableTemporary = true;
     Editable = false;

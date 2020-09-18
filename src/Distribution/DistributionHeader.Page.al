@@ -5,6 +5,7 @@ page 6151057 "NPR Distribution Header"
     AutoSplitKey = true;
     Caption = 'Distribution Group Setup';
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR Distribution Headers";
 
     layout

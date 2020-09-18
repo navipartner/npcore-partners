@@ -4,6 +4,7 @@ page 6151163 "NPR MM Loyalty Alter Members."
 
     Caption = 'Loyalty Alter Membership';
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR MM Loyalty Alter Members.";
 
     layout

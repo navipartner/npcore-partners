@@ -6,6 +6,7 @@ page 6151452 "NPR Magento Order Status"
     Caption = 'Order Status';
     Editable = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR Magento Order Status";
 
     layout

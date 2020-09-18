@@ -4,6 +4,7 @@ page 6059937 "NPR RSS Feed Channel Sub."
 
     Caption = 'RSS Feed Channel Subscriptions';
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR RSS Feed Channel Sub.";
 
     layout

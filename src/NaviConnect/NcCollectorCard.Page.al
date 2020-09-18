@@ -5,6 +5,7 @@ page 6151529 "NPR Nc Collector Card"
 
     Caption = 'Nc Collector Card';
     PageType = Card;
+    UsageCategory = Administration;
     SourceTable = "NPR Nc Collector";
 
     layout

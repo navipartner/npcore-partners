@@ -7,6 +7,7 @@ page 6151402 "NPR Magento Inv. Companies"
     Caption = 'Inventory Companies';
     DelayedInsert = true;
     PageType = ListPart;
+    UsageCategory = Administration;
     SourceTable = "NPR Magento Inv. Company";
 
     layout

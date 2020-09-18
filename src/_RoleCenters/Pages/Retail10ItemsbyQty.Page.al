@@ -13,6 +13,7 @@ page 6059815 "NPR Retail 10 Items by Qty."
     CardPageID = "Item Card";
     Editable = true;
     PageType = ListPart;
+    UsageCategory = Administration;
     SourceTable = Item;
     SourceTableTemporary = true;
     SourceTableView = SORTING("Low-Level Code")

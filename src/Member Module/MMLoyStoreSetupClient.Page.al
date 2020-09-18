@@ -4,6 +4,7 @@ page 6151162 "NPR MM Loy. Store Setup Client"
 
     Caption = 'Loyalty Store Setup (Server)';
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR MM Loyalty Store Setup";
     SourceTableView = WHERE(Setup = CONST(CLIENT));
 

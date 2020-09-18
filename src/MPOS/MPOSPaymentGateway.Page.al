@@ -5,6 +5,7 @@ page 6059994 "NPR MPOS Payment Gateway"
 
     Caption = 'MPOS Payment Gateway';
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR MPOS Payment Gateway";
 
     layout

@@ -4,6 +4,7 @@ page 6151068 "NPR Distrib. Group Member Card"
 
     Caption = 'Distribution Group Member';
     PageType = Card;
+    UsageCategory = Administration;
     SourceTable = "NPR Distrib. Group Members";
 
     layout

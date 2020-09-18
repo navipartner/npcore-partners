@@ -8,6 +8,7 @@ page 6151383 "NPR CS Stock-Take Rfid Card"
     InsertAllowed = false;
     ModifyAllowed = false;
     PageType = Card;
+    UsageCategory = Administration;
     SourceTable = "NPR CS Stock-Take Handl. Rfid";
 
     layout

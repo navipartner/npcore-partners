@@ -14,6 +14,7 @@ page 6151375 "NPR CS UI"
     Caption = 'CS UI';
     DataCaptionFields = "Code";
     PageType = ListPlus;
+    UsageCategory = Administration;
     SourceTable = "NPR CS UI Header";
 
     layout

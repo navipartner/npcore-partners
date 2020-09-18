@@ -4,6 +4,7 @@ page 6151110 "NPR NpRi Sales Inv. Setup"
 
     Caption = 'Sales Invoice Reimbursement Setup';
     PageType = Card;
+    UsageCategory = Administration;
     SourceTable = "NPR NpRi Sales Inv. Setup";
 
     layout

@@ -14,6 +14,7 @@ page 6059814 "NPR Retail Top 10 Customers"
     CardPageID = "Customer Card";
     Editable = true;
     PageType = ListPart;
+    UsageCategory = Administration;
     SourceTable = Customer;
     SourceTableTemporary = true;
     SourceTableView = SORTING("Search Name")

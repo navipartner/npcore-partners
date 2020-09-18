@@ -5,6 +5,7 @@ page 6151256 "NPR Retail Top10 Selling Items"
     CardPageID = "Item Card";
     Editable = true;
     PageType = ListPart;
+    UsageCategory = Administration;
     SourceTable = Item;
     SourceTableTemporary = true;
     SourceTableView = SORTING("Low-Level Code")

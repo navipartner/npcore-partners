@@ -5,6 +5,7 @@ page 6151081 "NPR ExRv Vouchers"
     Caption = 'External Retail Vouchers';
     DelayedInsert = true;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR ExRv Voucher";
 
     layout

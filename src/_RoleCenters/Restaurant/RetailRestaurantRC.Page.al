@@ -2,6 +2,7 @@ page 6151334 "NPR Restaurant RC"
 {
     Caption = 'NP Retail Restaurant', Comment = '{Dependency=Match,"ProfileDescription_NPR RESTAURANT"}';
     PageType = RoleCenter;
+    UsageCategory = Administration;
 
     layout
     {

@@ -7,6 +7,7 @@ page 6184479 "NPR EFTType POSUnit Gen.Param."
     InsertAllowed = false;
     LinksAllowed = false;
     PageType = ListPart;
+    UsageCategory = Administration;
     ShowFilter = false;
     SourceTable = "NPR EFTType POSUnit Gen.Param.";
 

@@ -5,6 +5,7 @@ page 6151201 "NPR NpCs Document Log Entries"
     Caption = 'Collect Document Log Entries';
     Editable = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR NpCs Document Log Entry";
 
     layout

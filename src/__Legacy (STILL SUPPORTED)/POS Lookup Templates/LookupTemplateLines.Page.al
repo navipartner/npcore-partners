@@ -5,6 +5,7 @@ page 6014672 "NPR Lookup Template Lines"
     Caption = 'Lookup Template Lines';
     DelayedInsert = true;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR Lookup Template Line";
 
     layout

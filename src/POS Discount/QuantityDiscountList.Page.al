@@ -9,6 +9,7 @@ page 6014467 "NPR Quantity Discount List"
     CardPageID = "NPR Quantity Discount Card";
     Editable = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR Quantity Discount Header";
 
     layout

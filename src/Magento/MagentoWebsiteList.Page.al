@@ -8,6 +8,7 @@ page 6151404 "NPR Magento Website List"
     CardPageID = "NPR Magento Websites";
     Editable = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR Magento Website";
 
     layout

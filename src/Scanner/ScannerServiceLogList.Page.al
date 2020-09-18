@@ -7,6 +7,7 @@ page 6059997 "NPR Scanner Service Log List"
     CardPageID = "NPR Scanner Service Log Card";
     Editable = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR Scanner Service Log";
     SourceTableView = SORTING("Request Start")
                       ORDER(Descending);

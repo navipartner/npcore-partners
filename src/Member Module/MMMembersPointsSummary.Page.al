@@ -7,6 +7,7 @@ page 6151165 "NPR MM Members. Points Summary"
     InsertAllowed = false;
     ModifyAllowed = false;
     PageType = ListPart;
+    UsageCategory = Administration;
     RefreshOnActivate = true;
     ShowFilter = false;
     SourceTable = "NPR MM Members. Points Summary";

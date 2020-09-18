@@ -5,6 +5,7 @@ page 6151561 "NPR NpXml Field Value Buffer"
 
     Caption = 'NpXml Field Value Buffer';
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR NpXml Field Val. Buffer";
 
     layout

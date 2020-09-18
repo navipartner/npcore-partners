@@ -13,6 +13,7 @@ page 6151559 "NPR NpXml Templ. Trigger List"
     DelayedInsert = true;
     Editable = false;
     PageType = ListPart;
+    UsageCategory = Administration;
     ShowFilter = false;
     SourceTable = "NPR NpXml Template Trigger";
 

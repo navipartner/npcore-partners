@@ -11,6 +11,7 @@ page 6184474 "NPR EFT Auxiliary Operations"
     ModifyAllowed = false;
     MultipleNewLines = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR EFT Aux Operation";
 
     layout

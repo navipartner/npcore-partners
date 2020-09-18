@@ -11,6 +11,7 @@ page 6014579 "NPR Retail List"
     DeleteAllowed = false;
     InsertAllowed = false;
     PageType = Worksheet;
+    UsageCategory = Administration;
     SourceTable = "NPR Retail List";
     SourceTableTemporary = true;
 

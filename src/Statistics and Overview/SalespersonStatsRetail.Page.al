@@ -9,6 +9,7 @@ page 6014586 "NPR Salesperson Stats Retail"
     Editable = false;
     InsertAllowed = false;
     PageType = Card;
+    UsageCategory = Administration;
     SourceTable = "Salesperson/Purchaser";
 
     layout

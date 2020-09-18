@@ -11,6 +11,7 @@ page 6060149 "NPR RC Member Mgr RoleCenter"
 
     Caption = 'Role Center';
     PageType = RoleCenter;
+    UsageCategory = Administration;
 
     layout
     {

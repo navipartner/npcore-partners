@@ -5,6 +5,7 @@ page 6150621 "NPR POS Unit to Bin Relation"
 
     Caption = 'POS Unit to Bin Relation';
     PageType = ListPart;
+    UsageCategory = Administration;
     SourceTable = "NPR POS Unit to Bin Relation";
 
     layout

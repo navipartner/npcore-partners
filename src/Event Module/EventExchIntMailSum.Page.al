@@ -5,6 +5,7 @@ page 6151584 "NPR Event Exch. Int. Mail Sum."
     Caption = 'Event Exch. Int. Email Summary';
     Editable = false;
     PageType = Worksheet;
+    UsageCategory = Administration;
     SourceTable = "NPR Event Exc.Int.Summ. Buffer";
     SourceTableTemporary = true;
 

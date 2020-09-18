@@ -7,6 +7,7 @@ page 6151381 "NPR CS Rfid Tag Models"
 
     Caption = 'CS Rfid Tag Models';
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR CS Rfid Tag Models";
 
     layout

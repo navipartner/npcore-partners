@@ -8,6 +8,7 @@ page 6151427 "NPR Magento Custom Opt.Subform"
     AutoSplitKey = true;
     Caption = 'Magento Custom Option Subform';
     PageType = CardPart;
+    UsageCategory = Administration;
     SourceTable = "NPR Magento Custom Optn. Value";
 
     layout

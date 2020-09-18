@@ -7,6 +7,7 @@ page 6151603 "NPR NpDc Valid Time Interv."
     Caption = 'Valid Time Intervals';
     DelayedInsert = true;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR NpDc Valid Time Interval";
 
     layout

@@ -6,6 +6,7 @@ page 6014564 "NPR Warranty Cat. Lines"
     AutoSplitKey = true;
     Caption = 'Warranty Cat. Lines';
     PageType = ListPart;
+    UsageCategory = Administration;
     SourceTable = "NPR Warranty Line";
 
     layout

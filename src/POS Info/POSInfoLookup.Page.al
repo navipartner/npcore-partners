@@ -2,6 +2,7 @@ page 6150646 "NPR POS Info Lookup"
 {
     Caption = 'POS Info Lookup';
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR POS Info Lookup";
     SourceTableTemporary = true;
 

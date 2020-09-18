@@ -9,6 +9,7 @@ page 6151263 "NPR Retail Ticket Role Center"
 
     Caption = 'Role Center';
     PageType = RoleCenter;
+    UsageCategory = Administration;
 
     layout
     {

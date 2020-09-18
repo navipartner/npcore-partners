@@ -11,6 +11,7 @@ page 6059794 "NPR E-mail Templ. Filters"
     AutoSplitKey = true;
     Caption = 'E-mail Template Filters';
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR E-mail Template Filter";
 
     layout

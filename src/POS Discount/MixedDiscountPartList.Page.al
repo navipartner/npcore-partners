@@ -6,6 +6,7 @@ page 6014447 "NPR Mixed Discount Part List"
     CardPageID = "NPR Mixed Discount";
     Editable = false;
     PageType = List;
+    UsageCategory = Administration;
     SourceTable = "NPR Mixed Discount";
     SourceTableView = SORTING("Starting date", "Starting time", "Ending date", "Ending time")
                       WHERE("Mix Type" = CONST("Combination Part"));

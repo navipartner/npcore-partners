@@ -6,6 +6,7 @@ page 6059899 "NPR Data Log Records Subform"
     Caption = 'Data Log Records Subform';
     Editable = false;
     PageType = ListPart;
+    UsageCategory = Administration;
     SourceTable = "NPR Data Log Field";
 
     layout

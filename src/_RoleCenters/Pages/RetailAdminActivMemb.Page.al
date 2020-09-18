@@ -4,6 +4,7 @@ page 6014691 "NPR Retail Admin Activ. - Memb"
 
     Caption = 'Retail Admin Activities - Memb';
     PageType = CardPart;
+    UsageCategory = Administration;
     RefreshOnActivate = true;
     SourceTable = "NPR Retail Admin Cue";
 

@@ -6,6 +6,7 @@ page 6151373 "NPR CS Comm. Log Card"
     Caption = 'CS Communication Log Card';
     Editable = false;
     PageType = Card;
+    UsageCategory = Administration;
     SourceTable = "NPR CS Comm. Log";
 
     layout

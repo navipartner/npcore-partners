@@ -5,6 +5,7 @@ page 6014460 "NPR Inventory Pick Scan"
 
     Caption = 'Inventory Pick';
     PageType = Document;
+    UsageCategory = Administration;
     RefreshOnActivate = true;
     SourceTable = "Warehouse Activity Header";
     SourceTableView = WHERE(Type = CONST("Invt. Pick"));

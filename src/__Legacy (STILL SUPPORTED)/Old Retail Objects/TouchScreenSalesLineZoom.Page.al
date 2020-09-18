@@ -9,6 +9,7 @@ page 6014554 "NPR TouchScreen: SalesLineZoom"
     DeleteAllowed = false;
     InsertAllowed = false;
     PageType = Card;
+    UsageCategory = Administration;
     SourceTable = "NPR Sale Line POS";
 
     layout

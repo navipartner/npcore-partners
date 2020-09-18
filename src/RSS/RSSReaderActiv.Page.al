@@ -6,6 +6,7 @@ page 6059995 "NPR RSS Reader Activ."
     Caption = 'RSS Activities';
     Editable = false;
     PageType = ListPart;
+    UsageCategory = Administration;
     SourceTable = "NPR RSS Reader Activity";
     SourceTableTemporary = true;
 
