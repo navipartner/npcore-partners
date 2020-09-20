@@ -153,7 +153,9 @@ page 6059932 "NPR Doc. Exchange Activities"
     var
         IncomingDocument: Record "Incoming Document";
     begin
-        IncomingDocument.CreateIncomingDocumentFromServerFile(PictureName, PictureFilePath);
+        IncomingDocument.CreateIncomingDocument(PictureName, '');
+        IncomingDocument.AddAttachmentFromServerFile(PictureName, PictureFilePath);
+
         CurrPage.Update;
     end;
 }
