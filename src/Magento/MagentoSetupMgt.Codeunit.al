@@ -1091,7 +1091,7 @@ codeunit 6151401 "NPR Magento Setup Mgt."
         NcManagedNavModulesMgt.FindMissingObjects(MagentoVersionId(), MagentoSetup."Version No.",
           MagentoSetup."Managed Nav Api Url", MagentoSetup."Managed Nav Api Username", MagentoSetup."Managed Nav Api Password", TempObject);
 
-        PAGE.Run(PAGE::"Code Coverage Object", TempObject);
+        PAGE.Run(PAGE::"Code Coverage AL Object", TempObject);
     end;
 
     procedure MagentoVersionId(): Text
