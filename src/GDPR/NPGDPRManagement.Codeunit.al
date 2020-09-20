@@ -351,7 +351,8 @@ codeunit 6151060 "NPR NP GDPR Management"
         Customer."Telex No." := '';
         Customer."Fax No." := '';
         Customer."VAT Registration No." := '';
-        Clear(Customer.Picture);
+        if Customer.Image.HasValue then
+            Clear(Customer.Image);
         Customer.GLN := '';
         Customer."Post Code" := '';
         Customer."Country/Region Code" := '';
@@ -399,8 +400,8 @@ codeunit 6151060 "NPR NP GDPR Management"
                 Contact."Phone No." := '';
                 Contact."Fax No." := '';
                 Contact."VAT Registration No." := '';
-                ;
-                Clear(Contact.Picture);
+                if Contact.Image.HasValue then
+                    Clear(Contact.Image);
                 Contact."Post Code" := '';
                 Contact."Country/Region Code" := '';
                 //-NPR5.53 [358656]
@@ -447,8 +448,8 @@ codeunit 6151060 "NPR NP GDPR Management"
             Contact."Phone No." := '';
             Contact."Fax No." := '';
             Contact."VAT Registration No." := '';
-            ;
-            Clear(Contact.Picture);
+            if Contact.Image.HasValue then
+                Clear(Contact.Image);
             Contact."Post Code" := '';
             Contact."Country/Region Code" := '';
             //-NPR5.53 [358656]
