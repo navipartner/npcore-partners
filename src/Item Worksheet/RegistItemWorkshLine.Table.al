@@ -1,18 +1,5 @@
 table 6060046 "NPR Regist. Item Worksh Line"
 {
-    // NPR4.18\BR\20160209  CASE 182391 Object Created
-    // NPR4.19\BR\20160216  CASE 182391 Added Tariff No.
-    // NPR5.25\BR \20160704 CASE 246088 Added many extra fields from the Item Table
-    // NPR5.25\BR \20160729 CASE 246088 Set ValidateTableRelation and TestTableRelation to No
-    // NPR5.31\JLK \20170331  CASE 268274 Changed ENU Caption
-    // NPR5.33\BR  \20170607  CASE 279610 Deleted fields: Properties, Item Sales Prize, Program No., Assortment, Auto, Out of Stock Print, Print Quantity, Labels per item, ISBN, Label Date, Open quarry unit cost, Hand Out Item No., Model, Basis Number, It
-    // NPR5.33\BR  \20170629  CASE 280329 Changed Captions
-    // NPR5.38\BR  \20171124  CASE 297587 Added fields Sales Price Start Date and Purchase Price Start Date
-    // NPR5.46\TJ  \20180925  CASE 326664 Changed the length of field Meta Title from 50 to 70
-    // NPR5.48/TJ  /20181115  CASE 330832 Increased Length of field Item Category Code from 10 to 20
-    // NPR5.48/BHR /20190111 CASE 341967 remove blank space from options
-    // NPR5.49/BHR /20190111 CASE 341967 Increase size of Variety Tables from code 20 to code 40
-
     Caption = 'Registered Item Worksheet Line';
     DataClassification = CustomerContent;
 
@@ -53,8 +40,6 @@ table 6060046 "NPR Regist. Item Worksh Line"
             Caption = 'Item No.';
             DataClassification = CustomerContent;
             TableRelation = Item;
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(7; "Vendor Item No."; Text[20])
@@ -146,8 +131,6 @@ table 6060046 "NPR Regist. Item Worksh Line"
             Caption = 'Base Unit of Measure';
             DataClassification = CustomerContent;
             TableRelation = "Unit of Measure";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(23; "Inventory Posting Group"; Code[10])
@@ -155,8 +138,6 @@ table 6060046 "NPR Regist. Item Worksh Line"
             Caption = 'Inventory Posting Group';
             DataClassification = CustomerContent;
             TableRelation = "Inventory Posting Group";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(24; "Costing Method"; Option)
@@ -165,10 +146,6 @@ table 6060046 "NPR Regist. Item Worksh Line"
             DataClassification = CustomerContent;
             OptionCaption = 'FIFO,LIFO,Specific,Average,Standard';
             OptionMembers = FIFO,LIFO,Specific,"Average",Standard;
-            //This property is currently not supported
-            //TestTableRelation = false;
-            //The property 'ValidateTableRelation' can only be set if the property 'TableRelation' is set
-            //ValidateTableRelation = false;
         }
         field(25; "Item Disc. Group"; Code[20])
         {
@@ -176,8 +153,6 @@ table 6060046 "NPR Regist. Item Worksh Line"
             DataClassification = CustomerContent;
             Description = 'NPR5.25';
             TableRelation = "Item Discount Group";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(26; "Allow Invoice Disc."; Option)
@@ -315,8 +290,6 @@ table 6060046 "NPR Regist. Item Worksh Line"
             Caption = 'Tariff No.';
             DataClassification = CustomerContent;
             TableRelation = "Tariff Number";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(48; "Duty Unit Conversion"; Decimal)
@@ -332,8 +305,6 @@ table 6060046 "NPR Regist. Item Worksh Line"
             DataClassification = CustomerContent;
             Description = 'NPR5.25';
             TableRelation = "Country/Region";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(50; "Budget Quantity"; Decimal)
@@ -387,8 +358,6 @@ table 6060046 "NPR Regist. Item Worksh Line"
             Caption = 'VAT Bus. Posting Group';
             DataClassification = CustomerContent;
             TableRelation = "VAT Business Posting Group";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(90; "VAT Bus. Posting Gr. (Price)"; Code[10])
@@ -396,8 +365,6 @@ table 6060046 "NPR Regist. Item Worksh Line"
             Caption = 'VAT Bus. Posting Gr. (Price)';
             DataClassification = CustomerContent;
             TableRelation = "VAT Business Posting Group";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(91; "Gen. Prod. Posting Group"; Code[10])
@@ -405,8 +372,6 @@ table 6060046 "NPR Regist. Item Worksh Line"
             Caption = 'Gen. Prod. Posting Group';
             DataClassification = CustomerContent;
             TableRelation = "Gen. Product Posting Group";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(95; "Country/Region of Origin Code"; Code[10])
@@ -415,8 +380,6 @@ table 6060046 "NPR Regist. Item Worksh Line"
             DataClassification = CustomerContent;
             Description = 'NPR5.25';
             TableRelation = "Country/Region";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(96; "Automatic Ext. Texts"; Option)
@@ -433,8 +396,6 @@ table 6060046 "NPR Regist. Item Worksh Line"
             Caption = 'No. Series';
             DataClassification = CustomerContent;
             TableRelation = "No. Series";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(98; "Tax Group Code"; Code[10])
@@ -442,8 +403,6 @@ table 6060046 "NPR Regist. Item Worksh Line"
             Caption = 'Tax Group Code';
             DataClassification = CustomerContent;
             TableRelation = "Tax Group";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(99; "VAT Prod. Posting Group"; Code[10])
@@ -451,8 +410,6 @@ table 6060046 "NPR Regist. Item Worksh Line"
             Caption = 'VAT Prod. Posting Group';
             DataClassification = CustomerContent;
             TableRelation = "VAT Product Posting Group";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
 
             trigger OnValidate()
@@ -477,8 +434,6 @@ table 6060046 "NPR Regist. Item Worksh Line"
             Caption = 'Global Dimension 1 Code';
             DataClassification = CustomerContent;
             TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(106; "Global Dimension 2 Code"; Code[20])
@@ -487,8 +442,6 @@ table 6060046 "NPR Regist. Item Worksh Line"
             Caption = 'Global Dimension 2 Code';
             DataClassification = CustomerContent;
             TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(120; "Stockout Warning"; Option)
@@ -527,8 +480,6 @@ table 6060046 "NPR Regist. Item Worksh Line"
             DataClassification = CustomerContent;
             Description = 'Variety';
             TableRelation = "NPR Variety";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(201; "Variety 1 Table (Base)"; Code[40])
@@ -537,8 +488,6 @@ table 6060046 "NPR Regist. Item Worksh Line"
             DataClassification = CustomerContent;
             Description = 'Variety';
             TableRelation = "NPR Variety Table".Code WHERE(Type = FIELD("Variety 1"));
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
 
             trigger OnValidate()
@@ -611,8 +560,6 @@ table 6060046 "NPR Regist. Item Worksh Line"
             DataClassification = CustomerContent;
             Description = 'Variety';
             TableRelation = "NPR Variety";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(221; "Variety 3 Table (Base)"; Code[40])
@@ -621,8 +568,6 @@ table 6060046 "NPR Regist. Item Worksh Line"
             DataClassification = CustomerContent;
             Description = 'Variety';
             TableRelation = "NPR Variety Table".Code WHERE(Type = FIELD("Variety 3"));
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
 
             trigger OnValidate()
@@ -655,8 +600,6 @@ table 6060046 "NPR Regist. Item Worksh Line"
             DataClassification = CustomerContent;
             Description = 'Variety';
             TableRelation = "NPR Variety";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(231; "Variety 4 Table (Base)"; Code[40])
@@ -665,8 +608,6 @@ table 6060046 "NPR Regist. Item Worksh Line"
             DataClassification = CustomerContent;
             Description = 'Variety';
             TableRelation = "NPR Variety Table".Code WHERE(Type = FIELD("Variety 4"));
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
 
             trigger OnValidate()
@@ -707,8 +648,6 @@ table 6060046 "NPR Regist. Item Worksh Line"
             DataClassification = CustomerContent;
             Description = 'Variety';
             TableRelation = "NPR Variety Group";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
 
             trigger OnValidate()
@@ -727,8 +666,6 @@ table 6060046 "NPR Regist. Item Worksh Line"
             Caption = 'Sales Price Currency Code';
             DataClassification = CustomerContent;
             TableRelation = Currency;
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(410; "Purchase Price Currency Code"; Code[10])
@@ -736,8 +673,6 @@ table 6060046 "NPR Regist. Item Worksh Line"
             Caption = 'Purchase Price Currency Code';
             DataClassification = CustomerContent;
             TableRelation = Currency;
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(910; "Assembly Policy"; Option)
@@ -772,8 +707,6 @@ table 6060046 "NPR Regist. Item Worksh Line"
             DataClassification = CustomerContent;
             Description = 'NPR5.25';
             TableRelation = "No. Series";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(5407; "Scrap %"; Decimal)
@@ -870,8 +803,6 @@ table 6060046 "NPR Regist. Item Worksh Line"
             Caption = 'Sales Unit of Measure';
             DataClassification = CustomerContent;
             TableRelation = "Unit of Measure";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(5426; "Purch. Unit of Measure"; Code[10])
@@ -879,8 +810,6 @@ table 6060046 "NPR Regist. Item Worksh Line"
             Caption = 'Purch. Unit of Measure';
             DataClassification = CustomerContent;
             TableRelation = "Unit of Measure";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(5440; "Reordering Policy"; Option)
@@ -957,8 +886,6 @@ table 6060046 "NPR Regist. Item Worksh Line"
             Caption = 'Manufacturer Code';
             DataClassification = CustomerContent;
             TableRelation = Manufacturer;
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(5702; "Item Category Code"; Code[20])
@@ -966,8 +893,6 @@ table 6060046 "NPR Regist. Item Worksh Line"
             Caption = 'Item Category Code';
             DataClassification = CustomerContent;
             TableRelation = "Item Category";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
 
             trigger OnValidate()
@@ -980,10 +905,9 @@ table 6060046 "NPR Regist. Item Worksh Line"
         {
             Caption = 'Product Group Code';
             DataClassification = CustomerContent;
-            TableRelation = "Product Group".Code WHERE("Item Category Code" = FIELD("Item Category Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
-            ValidateTableRelation = false;
+            ObsoleteState = No;
+            //ObsoleteReason = 'Product Groups became first level children of Item Categories.';
+            //ObsoleteTag = '15.0';
         }
         field(5900; "Service Item Group"; Code[10])
         {
@@ -1005,8 +929,6 @@ table 6060046 "NPR Regist. Item Worksh Line"
             DataClassification = CustomerContent;
             Description = 'NPR5.25';
             TableRelation = "Item Tracking Code";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(6501; "Lot Nos."; Code[10])
@@ -1015,8 +937,6 @@ table 6060046 "NPR Regist. Item Worksh Line"
             DataClassification = CustomerContent;
             Description = 'NPR5.25';
             TableRelation = "No. Series";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(6502; "Expiration Calculation"; DateFormula)
@@ -1031,8 +951,6 @@ table 6060046 "NPR Regist. Item Worksh Line"
             DataClassification = CustomerContent;
             Description = 'NPR5.25';
             TableRelation = "Special Equipment";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(7302; "Put-away Template Code"; Code[10])
@@ -1041,8 +959,6 @@ table 6060046 "NPR Regist. Item Worksh Line"
             DataClassification = CustomerContent;
             Description = 'NPR5.25';
             TableRelation = "Put-away Template Header";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(7307; "Put-away Unit of Measure Code"; Code[10])
@@ -1058,8 +974,6 @@ table 6060046 "NPR Regist. Item Worksh Line"
             DataClassification = CustomerContent;
             Description = 'NPR5.25';
             TableRelation = "Phys. Invt. Counting Period";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
 
             trigger OnValidate()
@@ -1156,8 +1070,6 @@ table 6060046 "NPR Regist. Item Worksh Line"
             Caption = 'Item Group';
             DataClassification = CustomerContent;
             TableRelation = "NPR Item Group" WHERE(Blocked = CONST(false));
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
 
             trigger OnValidate()
@@ -1186,10 +1098,6 @@ table 6060046 "NPR Regist. Item Worksh Line"
             Caption = 'Label barcode';
             DataClassification = CustomerContent;
             Description = 'NPR5.25';
-            //This property is currently not supported
-            //TestTableRelation = false;
-            //The property 'ValidateTableRelation' can only be set if the property 'TableRelation' is set
-            //ValidateTableRelation = false;
         }
         field(6014418; "Explode BOM auto"; Option)
         {
@@ -1257,8 +1165,6 @@ table 6060046 "NPR Regist. Item Worksh Line"
             DataClassification = CustomerContent;
             Description = 'NPR5.25';
             TableRelation = "NPR Insurance Category";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(6014509; "Item Brand"; Code[10])
@@ -1318,8 +1224,6 @@ table 6060046 "NPR Regist. Item Worksh Line"
             DataClassification = CustomerContent;
             Description = 'NPR5.25';
             TableRelation = "NPR TM Ticket Type";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(6151400; "Magento Item"; Option)
@@ -1371,8 +1275,6 @@ table 6060046 "NPR Regist. Item Worksh Line"
             DataClassification = CustomerContent;
             Description = 'NPR5.25';
             TableRelation = "NPR Magento Brand";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(6151435; "Seo Link"; Text[250])
@@ -1457,8 +1359,6 @@ table 6060046 "NPR Regist. Item Worksh Line"
             DataClassification = CustomerContent;
             Description = 'NPR5.25';
             TableRelation = "Routing Header";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(99000751; "Production BOM No."; Code[20])
@@ -1467,8 +1367,6 @@ table 6060046 "NPR Regist. Item Worksh Line"
             DataClassification = CustomerContent;
             Description = 'NPR5.25';
             TableRelation = "Production BOM Header";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
 
             trigger OnValidate()
