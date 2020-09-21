@@ -1,10 +1,5 @@
 table 6151061 "NPR Retail Repl. Demand Line"
 {
-    // NPR5.38.01/JKL /20180126 CASE 289017 Object created - Replenishment Module
-    // NPR5.39/JKL /20180222 CASE 299436 Added field 43 + 6151070 + 6151071
-    // NPR5.48/JDH /20181109 CASE 334163 Added caption to field Discount Comment
-    // NPR5.48/TJ  /20181115 CASE 330832 Increased Length of field Item Category Code from 10 to 20
-
     Caption = 'Retail Replenishment Demand Line';
     DataClassification = CustomerContent;
 
@@ -48,7 +43,6 @@ table 6151061 "NPR Retail Repl. Demand Line"
             trigger OnValidate()
             begin
                 "Quantity (Base)" := CalcBaseQty("Demanded Quantity");
-                //TESTFIELD("Reordering Policy");
                 TestField(Confirmed, false);
             end;
         }
@@ -57,8 +51,6 @@ table 6151061 "NPR Retail Repl. Demand Line"
             Caption = 'Vendor No.';
             DataClassification = CustomerContent;
             TableRelation = Vendor;
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
 
             trigger OnValidate()
@@ -480,7 +472,9 @@ table 6151061 "NPR Retail Repl. Demand Line"
         {
             Caption = 'Product Group Code';
             DataClassification = CustomerContent;
-            TableRelation = "Product Group".Code WHERE("Item Category Code" = FIELD("Item Category Code"));
+            ObsoleteState = No;
+            //ObsoleteReason = 'Product Groups became first level children of Item Categories.';
+            //ObsoleteTag = '15.0';
         }
         field(5706; "Transfer-from Code"; Code[10])
         {
