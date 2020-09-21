@@ -2,7 +2,7 @@ table 6059955 "NPR MCS API Setup"
 {
     // NPR5.29/CLVA/20170125 CASE 264333 Added fields "Image Orientation" and "Use Cognitive Services"
     // 252646 /CLVA/20170220 CASE 252646 Added option value "Recommendation" to field API
-    // NPR5.30/NPKNAV/20170310  CASE 252646 Transport NPR5.30 - 26 January 2017
+    //  NPR5.30/NPKNAV/20170310  CASE 252646 Transport NPR5.30 - 26 January 2017
 
     Caption = 'MCS API Setup';
     DataClassification = CustomerContent;
