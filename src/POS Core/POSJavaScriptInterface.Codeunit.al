@@ -23,7 +23,6 @@ codeunit 6150701 "NPR POS JavaScript Interface"
     // NPR5.50/VB  /20181205  CASE 338666 Supporting Workflows 2.0 (changed signature on ApplyDataState function)
     // NPR5.51/MMV /20190731  CASE 363458 Added log of callstack when errors happen.
 
-
     var
         Text001: Label 'Action %1 does not seem to have a registered handler, or the registered handler failed to notify the framework about successful processing of the action.';
         Text002: Label 'An unknown method was invoked by the front end (JavaScript).\\Method: %1\Context: %2';
@@ -34,6 +33,44 @@ codeunit 6150701 "NPR POS JavaScript Interface"
         Stopwatches: DotNet NPRNetDictionary_Of_T_U;
         Text006: Label 'No protocol codeunit responded to %1 method, sender ''%2'', event ''%3''. Protocol user interface %4 will now be aborted.';
         Text007: Label 'No protocol codeunit responded to Timer request. Protocol user interface %1 will now be aborted.';
+        TextErrorMustNotRunThisCodeunit: Label 'You must not run this codeunit directly. This codeunit is intended to be run only from within itself.', Locked = true; // This is development type of error, do not translate!
+
+        OnRunInitialized: Boolean;
+        OnRunPOSAction: Record "NPR POS Action";
+        OnRunWorkflowStep: Text;
+        OnRunContext: JsonObject;
+        OnRunPOSSession: Codeunit "NPR POS Session";
+        OnRunFrontEnd: Codeunit "NPR POS Front End Management";
+        Handled: Boolean;
+
+    trigger OnRun()
+    var
+        ContextString: Text;
+    begin
+        if not OnRunInitialized then
+            Error(TextErrorMustNotRunThisCodeunit);
+
+        OnAction(OnRunPOSAction, OnRunWorkflowStep, OnRunContext, OnRunPOSSession, OnRunFrontEnd, Handled);
+        if not Handled then begin
+            OnRunContext.writeTo(ContextString);
+            OnActionV2(OnRunPOSAction, OnRunWorkflowStep, ContextString, OnRunPOSSession, OnRunFrontEnd, Handled);
+        end;
+    end;
+
+    local procedure InvokeOnActionThroughOnRun(POSActionIn: Record "NPR POS Action"; WorkflowStepIn: Text; ContextIn: JsonObject; POSSessionIn: Codeunit "NPR POS Session"; FrontEndIn: Codeunit "NPR POS Front End Management"; Self: Codeunit "NPR POS JavaScript Interface") Success: Boolean
+    begin
+        Handled := false;
+        OnRunInitialized := true;
+
+        OnRunPOSAction := POSActionIn;
+        OnRunWorkflowStep := WorkflowStepIn;
+        OnRunContext := ContextIn;
+        OnRunPOSSession := POSSessionIn;
+        OnRunFrontEnd := FrontEndIn;
+        Success := Self.Run();
+
+        OnRunInitialized := false;
+    end;
 
     procedure Initialize(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
@@ -60,13 +97,11 @@ codeunit 6150701 "NPR POS JavaScript Interface"
             FrontEnd.ReportBug(StrSubstNo(Text005, 'OnAction'));
     end;
 
-    procedure InvokeAction("Action": Text; WorkflowStep: Text; WorkflowId: Integer; ActionId: Integer; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
+    procedure InvokeAction("Action": Text; WorkflowStep: Text; WorkflowId: Integer; ActionId: Integer; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; Self: Codeunit "NPR POS JavaScript Interface")
     var
         POSAction: Record "NPR POS Action";
         Signal: DotNet NPRNetWorkflowCallCompletedRequest;
-        Handled: Boolean;
-        Executing: Boolean;
-        ContextString: Text;
+        Success: Boolean;
     begin
         StopwatchResetAll();
 
@@ -83,28 +118,17 @@ codeunit 6150701 "NPR POS JavaScript Interface"
         POSSession.SetInAction(true);
         FrontEnd.WorkflowBackEndStepBegin(WorkflowId, ActionId);
         StopwatchStart('Action');
-        asserterror
-        begin
-            Executing := true;
-            OnAction(POSAction, WorkflowStep, Context, POSSession, FrontEnd, Handled);
-            //-NPR5.48 [341077]
-            if not Handled then begin
-                Context.writeTo(ContextString);
-                OnActionV2(POSAction, WorkflowStep, ContextString, POSSession, FrontEnd, Handled);
-            end;
-            //+NPR5.48 [341077]
-            Executing := false;
-            Commit;
-            Error('');
-        end;
+
+        Success := InvokeOnActionThroughOnRun(POSAction, WorkflowStep, Context, POSSession, FrontEnd, Self);
+
         StopwatchStop('Action');
         FrontEnd.WorkflowBackEndStepEnd();
         POSSession.SetInAction(false);
 
-        if not Handled and not Executing then
+        if not Handled and Success then
             FrontEnd.ReportBug(StrSubstNo(Text001, Action));
 
-        if not Executing then begin
+        if Success then begin
             OnAfterInvokeAction(POSAction, WorkflowStep, Context, POSSession, FrontEnd);
             StopwatchStart('Data');
             RefreshData(POSSession, FrontEnd);
@@ -132,7 +156,7 @@ codeunit 6150701 "NPR POS JavaScript Interface"
         FrontEnd.WorkflowCallCompleted(Signal);
     end;
 
-    procedure InvokeMethod(Method: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
+    procedure InvokeMethod(Method: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; Self: Codeunit "NPR POS JavaScript Interface")
     begin
         // A method invoked from JavaScript logic that requests C/AL to execute specific non-business-logic processing (e.g. infrastructure, etc.)
         OnBeforeInvokeMethod(Method, Context, POSSession, FrontEnd);
@@ -145,9 +169,9 @@ codeunit 6150701 "NPR POS JavaScript Interface"
             'BeforeWorkflow':
                 Method_BeforeWorkflow(POSSession, FrontEnd, Context);
             'Login':
-                Method_Login(POSSession, FrontEnd, Context);
+                Method_Login(POSSession, FrontEnd, Context, Self);
             'TextEnter':
-                Method_TextEnter(POSSession, FrontEnd, Context);
+                Method_TextEnter(POSSession, FrontEnd, Context, Self);
             'InvokeDeviceResponse':
                 Method_InvokeDeviceResponse(POSSession, FrontEnd, Context);
             'Protocol':
@@ -156,7 +180,7 @@ codeunit 6150701 "NPR POS JavaScript Interface"
                 Method_FrontEndId(POSSession, FrontEnd, Context);
             //-NPR5.37 [293905]
             'Unlock':
-                Method_Unlock(POSSession, FrontEnd, Context);
+                Method_Unlock(POSSession, FrontEnd, Context, Self);
             'MajorTomEvent':
                 Method_MajorTomEvent(POSSession, FrontEnd, Context);
             //+NPR5.37 [293905]
@@ -369,7 +393,7 @@ codeunit 6150701 "NPR POS JavaScript Interface"
         FrontEnd.WorkflowCallCompleted(Signal);
     end;
 
-    local procedure Method_Login(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; Context: JsonObject)
+    local procedure Method_Login(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; Context: JsonObject; Self: Codeunit "NPR POS JavaScript Interface")
     var
         "Action": Record "NPR POS Action";
         Setup: Codeunit "NPR POS Setup";
@@ -378,10 +402,10 @@ codeunit 6150701 "NPR POS JavaScript Interface"
         //Setup.Action_Login(Action);
         Setup.Action_Login(Action, POSSession);
         //-NPR5.40 [306347]
-        InvokeAction(Action.Code, '', 0, 0, Context, POSSession, FrontEnd);
+        InvokeAction(Action.Code, '', 0, 0, Context, POSSession, FrontEnd, Self);
     end;
 
-    local procedure Method_TextEnter(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; Context: JsonObject)
+    local procedure Method_TextEnter(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; Context: JsonObject; Self: Codeunit "NPR POS JavaScript Interface")
     var
         "Action": Record "NPR POS Action";
         Setup: Codeunit "NPR POS Setup";
@@ -391,7 +415,7 @@ codeunit 6150701 "NPR POS JavaScript Interface"
         Setup.Action_TextEnter(Action, POSSession);
         //+NPR5.40 [306347]
         // TODO: extract workflow/action information from the front-end context or solve this some other way, but it cannot be 0,0 at this point
-        InvokeAction(Action.Code, '', 0, 0, Context, POSSession, FrontEnd);
+        InvokeAction(Action.Code, '', 0, 0, Context, POSSession, FrontEnd, Self);
     end;
 
     local procedure Method_InvokeDeviceResponse(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; Context: JsonObject)
@@ -462,7 +486,7 @@ codeunit 6150701 "NPR POS JavaScript Interface"
         FrontEnd.HardwareInitializationComplete();
     end;
 
-    local procedure Method_Unlock(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; Context: JsonObject)
+    local procedure Method_Unlock(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; Context: JsonObject; Self: Codeunit "NPR POS JavaScript Interface")
     var
         "Action": Record "NPR POS Action";
         Setup: Codeunit "NPR POS Setup";
@@ -472,7 +496,7 @@ codeunit 6150701 "NPR POS JavaScript Interface"
         //IF (Setup.Action_UnlockPOS(Action)) THEN
         if (Setup.Action_UnlockPOS(Action, POSSession)) then
             //+NPR5.40 [306347]
-            InvokeAction(Action.Code, '', 0, 0, Context, POSSession, FrontEnd)
+            InvokeAction(Action.Code, '', 0, 0, Context, POSSession, FrontEnd, Self)
         else
             POSSession.ChangeViewSale();
         //+NPR5.37 [293905]

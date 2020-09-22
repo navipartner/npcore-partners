@@ -28,7 +28,7 @@ page 6150750 "NPR POS (Dragonglass)"
                         exit;
                     POSSession.DebugWithTimestamp('Method:' + method);
                     if not PreHandleMethod(method, eventContext) then
-                        JavaScript.InvokeMethod(method, eventContext, POSSession, FrontEnd);
+                        JavaScript.InvokeMethod(method, eventContext, POSSession, FrontEnd, JavaScript);
                 end;
 
                 trigger OnAction("action": Text; workflowStep: Text; workflowId: Integer; actionId: Integer; context: JsonObject)
@@ -36,14 +36,10 @@ page 6150750 "NPR POS (Dragonglass)"
                     if POSSession.IsFinalized() then
                         Error(SESSION_FINALIZED_ERROR);
                     POSSession.DebugWithTimestamp('Action:' + action);
-                    JavaScript.InvokeAction(action, workflowStep, workflowId, actionId, context, POSSession, FrontEnd);
+                    JavaScript.InvokeAction(action, workflowStep, workflowId, actionId, context, POSSession, FrontEnd, JavaScript);
                 end;
             }
         }
-    }
-
-    actions
-    {
     }
 
     trigger OnClosePage()
