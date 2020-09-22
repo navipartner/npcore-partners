@@ -36,7 +36,7 @@ page 6150700 "NPR POS (Transcendence)"
                     //+NPR5.43 [318028]
                     POSSession.DebugWithTimestamp('Method:' + method);
                     if not PreHandleMethod(method, eventContext) then
-                        JavaScript.InvokeMethod(method, eventContext, POSSession, FrontEnd);
+                        JavaScript.InvokeMethod(method, eventContext, POSSession, FrontEnd, JavaScript);
                 end;
 
                 trigger OnAction("action": Text; workflowStep: Text; workflowId: Integer; actionId: Integer; Context: JsonObject)
@@ -46,7 +46,7 @@ page 6150700 "NPR POS (Transcendence)"
                         Error(SESSION_FINALIZED_ERROR);
                     //+NPR5.43 [318028]
                     POSSession.DebugWithTimestamp('Action:' + action);
-                    JavaScript.InvokeAction(action, workflowStep, workflowId, actionId, Context, POSSession, FrontEnd);
+                    JavaScript.InvokeAction(action, workflowStep, workflowId, actionId, Context, POSSession, FrontEnd, JavaScript);
                 end;
             }
         }
