@@ -5,9 +5,15 @@ codeunit 6150728 "NPR POS View Change WF Mgt."
     // NPR5.49/MHA /20190206  CASE 343617 Added OnAfterLogin Workflow
     // NPR5.49/MHA /20190301  CASE 347382 Added function SetupSalesItem() to skip Non Inventory Items
 
+    TableNo = "NPR POS Sales Workflow Step";
 
     trigger OnRun()
+    var
+        POSSession: Codeunit "NPR POS Session";
     begin
+        POSSession.GetSession(POSSession, true);
+        OnAfterLogin(Rec, POSSession);
+        Commit;
     end;
 
     var
@@ -16,9 +22,7 @@ codeunit 6150728 "NPR POS View Change WF Mgt."
         Text002: Label 'Insufficient Inventory:';
         Text003: Label 'When POS View is changed from Login to Sale';
 
-    local procedure "--- Discovery"()
-    begin
-    end;
+    // Discovery
 
     [EventSubscriber(ObjectType::Table, 6150729, 'OnDiscoverPOSSalesWorkflows', '', true, true)]
     local procedure OnDiscoverPOSWorkflows(var Sender: Record "NPR POS Sales Workflow")
@@ -34,9 +38,7 @@ codeunit 6150728 "NPR POS View Change WF Mgt."
         exit(CODEUNIT::"NPR POS View Change WF Mgt.");
     end;
 
-    local procedure "--- OnPaymentView Workflow"()
-    begin
-    end;
+    // OnPaymentView Workflow
 
     local procedure OnPaymentViewCode(): Code[20]
     begin
@@ -80,15 +82,20 @@ codeunit 6150728 "NPR POS View Change WF Mgt."
     begin
     end;
 
-    local procedure "--- OnAfterLogin Workflow"()
-    begin
-    end;
+
+    // OnAfterLogin Workflow
 
     local procedure OnAfterLoginCode(): Code[20]
     begin
         //-NPR5.49 [343617]
         exit('AFTER_LOGIN');
         //+NPR5.49 [343617]
+    end;
+
+    local procedure OnAfterLogin_OnRun(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; POSSession: Codeunit "NPR POS Session")
+    begin
+        Commit();
+        if not Codeunit.Run(Codeunit::"NPR POS View Change WF Mgt.") then;
     end;
 
     procedure InvokeOnAfterLoginWorkflow(var POSSession: Codeunit "NPR POS Session")
@@ -116,13 +123,7 @@ codeunit 6150728 "NPR POS View Change WF Mgt."
             exit;
 
         repeat
-            Commit;
-            asserterror
-            begin
-                OnAfterLogin(POSSalesWorkflowStep, POSSession);
-                Commit;
-                Error('');
-            end;
+            OnAfterLogin_OnRun(POSSalesWorkflowStep, POSSession);
         until POSSalesWorkflowStep.Next = 0;
 
         POSSession.AddServerStopwatch('AFTER_LOGIN_WORKFLOWS', CurrentDateTime - StartTime);
@@ -136,9 +137,7 @@ codeunit 6150728 "NPR POS View Change WF Mgt."
         //+NPR5.49 [343617]
     end;
 
-    local procedure "--- Test Item Inventory"()
-    begin
-    end;
+    // Test Item Inventory
 
     [EventSubscriber(ObjectType::Table, 6150730, 'OnBeforeInsertEvent', '', true, true)]
     local procedure OnBeforeInsertWorkflowStep(var Rec: Record "NPR POS Sales Workflow Step"; RunTrigger: Boolean)

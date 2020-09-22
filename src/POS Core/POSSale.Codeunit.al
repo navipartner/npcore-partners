@@ -38,6 +38,28 @@ codeunit 6150705 "NPR POS Sale"
 
     trigger OnRun()
     begin
+        case OnRunType of
+
+            // If somebody accidentally (or even intentionall) calls this codeunit without defining what kind of
+            // run type is needed, then codeunit simply exits
+            OnRunType::Undefined:
+                exit;
+
+            OnRunType::RunAfterEndSale:
+                begin
+                    InvokeOnFinishSaleWorkflow(Rec);
+                    Commit;
+                    OnAfterEndSale(OnRunXRec);
+                    Commit;
+                end;
+
+            OnRunType::OnFinishSale:
+                begin
+                    OnFinishSale(OnRunPOSSalesWorkflowStep, Rec);
+                    Commit;
+                end;
+
+        end;
     end;
 
     var
@@ -72,6 +94,11 @@ codeunit 6150705 "NPR POS Sale"
         Text000: Label 'During End Sale, after Audit Roll Insert, before Audit Roll Posting';
         ERROR_AFTER_END_SALE: Label 'An error occurred after the sale ended: %1';
         IsMock: Boolean;
+
+        // OnRun helper globals
+        OnRunType: Option Undefined,RunAfterEndSale,OnFinishSale;
+        OnRunPOSSalesWorkflowStep: Record "NPR POS Sales Workflow Step";
+        OnRunXRec: Record "NPR Sale POS";
 
     procedure InitializeAtLogin(RegisterIn: Record "NPR Register"; SetupIn: Codeunit "NPR POS Setup")
     begin
@@ -750,6 +777,15 @@ codeunit 6150705 "NPR POS Sale"
         //+NPR5.54 [364658]
     end;
 
+    local procedure RunAfterEndSale_OnRun(xRec: Record "NPR Sale POS") Success: Boolean;
+    begin
+        OnRunType := OnRunType::RunAfterEndSale;
+        OnRunXRec := xRec;
+        Commit();
+        Success := This.Run();
+        OnRunType := OnRunType::Undefined;
+    end;
+
     local procedure RunAfterEndSale(xRec: Record "NPR Sale POS")
     var
         Success: Boolean;
@@ -757,21 +793,7 @@ codeunit 6150705 "NPR POS Sale"
         //-NPR5.40 [308457]
         //Any error at this timing would leave the POS with inconsistent front-end state.
         ClearLastError;
-        asserterror
-        begin
-            InvokeOnFinishSaleWorkflow(Rec);
-            Commit;
-            //-NPR5.53 [376362]
-            //  CODEUNIT.RUN(CODEUNIT::"POS End Sale Post Processing",Rec);
-            //  COMMIT;
-            //+NPR5.53 [376362]
-            OnAfterEndSale(xRec);
-            Commit;
-
-            Success := true;
-            Error('');
-        end;
-
+        Success := RunAfterEndSale_OnRun(xRec);
         if not Success then
             Message(ERROR_AFTER_END_SALE, GetLastErrorText);
         //+NPR5.40 [308457]
@@ -899,6 +921,14 @@ codeunit 6150705 "NPR POS Sale"
         //+NPR5.39 [302779]
     end;
 
+    local procedure InvokeOnFinishSaleSubscribers_OnRun(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step")
+    begin
+        OnRunPOSSalesWorkflowStep := POSSalesWorkflowStep;
+        OnRunType := OnRunType::OnFinishSale;
+        if This.Run() then;
+        OnRunType := OnRunType::Undefined;
+    end;
+
     procedure InvokeOnFinishSaleWorkflow(SalePOS: Record "NPR Sale POS")
     var
         POSUnit: Record "NPR POS Unit";
@@ -923,12 +953,7 @@ codeunit 6150705 "NPR POS Sale"
 
         Refresh(SalePOS);
         repeat
-            asserterror
-            begin
-                OnFinishSale(POSSalesWorkflowStep, Rec);
-                Commit;
-                Error('');
-            end;
+            InvokeOnFinishSaleSubscribers_OnRun(POSSalesWorkflowStep);
         until POSSalesWorkflowStep.Next = 0;
 
         //-NPR5.43 [315838]
