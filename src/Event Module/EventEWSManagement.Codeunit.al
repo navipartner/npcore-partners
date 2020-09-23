@@ -415,8 +415,10 @@ codeunit 6060151 "NPR Event EWS Management"
         EmailTemplateFilter: Record "NPR E-mail Template Filter";
         FieldRef: FieldRef;
         FieldRef2: FieldRef;
+        RecRef2: RecordRef;
     begin
         RecRef.SetRecFilter;
+        RecRef2 := RecRef.Duplicate();
         EmailTemplateHeader.SetRange("Table No.", RecRef.Number);
         if EmailTemplateHeader.FindSet then
             repeat
@@ -435,7 +437,7 @@ codeunit 6060151 "NPR Event EWS Management"
                         RecordExists := RecRef.FINDFIRST;
                         CLEAR(FieldRef);
                         */
-                        FieldRef2 := RecRef.Field(EmailTemplateFilter."Field No.");
+                        FieldRef2 := RecRef2.Field(EmailTemplateFilter."Field No.");
                         if Evaluate(FieldRef2, EmailTemplateFilter.Value) then
                             RecordExists := RecordExists and (Format(FieldRef2) = Format(FieldRef))
                         else
