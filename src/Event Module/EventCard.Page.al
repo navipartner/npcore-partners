@@ -1652,6 +1652,8 @@ page 6060150 "NPR Event Card"
                         ApplicationArea = All;
 
                         trigger OnAction()
+                        var
+                            EventEmailMgt: Codeunit "NPR Event Email Management";
                         begin
                             //-NPR5.55 [374887]
                             //EventEmailMgt.SendEMail(Rec,0);
@@ -1668,6 +1670,8 @@ page 6060150 "NPR Event Card"
                         ApplicationArea = All;
 
                         trigger OnAction()
+                        var
+                            EventEmailMgt: Codeunit "NPR Event Email Management";
                         begin
                             //-NPR5.55 [374887]
                             //EventEmailMgt.SendEMail(Rec,1);
@@ -1771,7 +1775,6 @@ page 6060150 "NPR Event Card"
         [InDataSet]
         CurrencyCodeEditable: Boolean;
         EventCalendarMgt: Codeunit "NPR Event Calendar Mgt.";
-        EventEmailMgt: Codeunit "NPR Event Email Management";
         EventMgt: Codeunit "NPR Event Management";
         WrongCompanyErr: Label 'You cannot select a layout that is specific to another company.';
         EventAttrMgt: Codeunit "NPR Event Attribute Mgt.";
