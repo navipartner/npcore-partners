@@ -1,0 +1,107 @@
+trigger: none
+resources:
+  repositories:
+  - repository: scriptsRepo
+    type: git
+    name: 'NpCore/NpDevOps'
+
+pool:
+  name: NP Deployment
+
+variables: 
+  url: https://bcartifacts.blob.core.windows.net/onprem/16.3.14085.14238
+  feed: 'https://pkgs.dev.azure.com/navipartner/_packaging/BCSymbols/nuget/v3/index.json'
+  packageId: Microsoft.BC.160
+
+jobs:
+- template: YAML/Templates/Job/PopulateSymbolFeeds.yml@scriptsRepo
+  parameters:
+    scriptsRepo: scriptsRepo    
+    symbolPackages:
+    - name: au #Country
+      url: $(url)/au #Country
+      appPackages:
+      - sourcePath: \Applications\BaseApp\Source\Base Application.Source.zip
+        appPath: \Applications\BaseApp\Source\Microsoft_Base Application.app
+        packageId: $(packageId).Base_Application.au #Country
+      feed: $(feed)
+
+    - name: dk #Country
+      url: $(url)/dk #Country
+      appPackages:
+      - sourcePath: \Applications\BaseApp\Source\Base Application.Source.zip
+        appPath: \Applications\BaseApp\Source\Microsoft_Base Application.app
+        packageId: $(packageId).Base_Application.dk #Country
+      feed: $(feed)
+
+    - name: es #Country
+      url: $(url)/es #Country
+      appPackages:
+      - sourcePath: \Applications\BaseApp\Source\Base Application.Source.zip
+        appPath: \Applications\BaseApp\Source\Microsoft_Base Application.app
+        packageId: $(packageId).Base_Application.es #Country
+      feed: $(feed)
+
+    - name: fr #Country
+      url: $(url)/fr #Country
+      appPackages:
+      - sourcePath: \Applications\BaseApp\Source\Base Application.Source.zip
+        appPath: \Applications\BaseApp\Source\Microsoft_Base Application.app
+        packageId: $(packageId).Base_Application.fr #Country
+      feed: $(feed)
+
+    - name: gb #Country
+      url: $(url)/gb #Country
+      appPackages:
+      - sourcePath: \Applications\BaseApp\Source\Base Application.Source.zip
+        appPath: \Applications\BaseApp\Source\Microsoft_Base Application.app
+        packageId: $(packageId).Base_Application.gb #Country
+      feed: $(feed)
+
+    - name: it #Country
+      url: $(url)/it #Country
+      appPackages:
+      - sourcePath: \Applications\BaseApp\Source\Base Application.Source.zip
+        appPath: \Applications\BaseApp\Source\Microsoft_Base Application.app
+        packageId: $(packageId).Base_Application.it #Country
+      feed: $(feed)
+
+    - name: na #Country
+      url: $(url)/na #Country
+      appPackages:
+      - sourcePath: \Applications\BaseApp\Source\Base Application.Source.zip
+        appPath: \Applications\BaseApp\Source\Microsoft_Base Application.app
+        packageId: $(packageId).Base_Application.na #Country
+      feed: $(feed)
+
+    - name: nl #Country
+      url: $(url)/nl #Country
+      appPackages:
+      - sourcePath: \Applications\BaseApp\Source\Base Application.Source.zip
+        appPath: \Applications\BaseApp\Source\Microsoft_Base Application.app
+        packageId: $(packageId).Base_Application.nl #Country
+      feed: $(feed)
+      
+    - name: no #Country
+      url: $(url)/no #Country
+      appPackages:
+      - sourcePath: \Applications\BaseApp\Source\Base Application.Source.zip
+        appPath: \Applications\BaseApp\Source\Microsoft_Base Application.app
+        packageId: $(packageId).Base_Application.no #Country
+      feed: $(feed)
+
+    - name: nz #Country
+      url: $(url)/nz #Country
+      appPackages:
+      - sourcePath: \Applications\BaseApp\Source\Base Application.Source.zip
+        appPath: \Applications\BaseApp\Source\Microsoft_Base Application.app
+        packageId: $(packageId).Base_Application.nz #Country
+      feed: $(feed)
+      
+    - name: se #Country
+      url: $(url)/se #Country
+      appPackages:
+      - sourcePath: \Applications\BaseApp\Source\Base Application.Source.zip
+        appPath: \Applications\BaseApp\Source\Microsoft_Base Application.app
+        packageId: $(packageId).Base_Application.se #Country
+      feed: $(feed)
