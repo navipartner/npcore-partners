@@ -1,7 +1,5 @@
 codeunit 6014452 "NPR E-mail Templ. Mgt."
 {
-    // NPR5.48/MHA /20190123  CASE 341711 Object created - Contains functionality around E-mail Templates
-
 
     trigger OnRun()
     begin
@@ -124,18 +122,6 @@ codeunit 6014452 "NPR E-mail Templ. Mgt."
         EmailTemplateHeader.Modify(true);
     end;
 
-    procedure EditHtmlTemplate(var EmailTemplateHeader: Record "NPR E-mail Template Header")
-    var
-        FileManagement: Codeunit "File Management";
-        Path: Text[1024];
-    begin
-        Path := ExportHtmlTemplate(EmailTemplateHeader, false);
-        RunProcess('notepad.exe', Path, true);
-        ImportHtmlTemplate(Path, false, EmailTemplateHeader);
-
-        FileManagement.DeleteClientFile(Path);
-    end;
-
     procedure ExportHtmlTemplate(var EmailTemplateHeader: Record "NPR E-mail Template Header"; UseDialog: Boolean) Path: Text[1024]
     var
         FileManagement: Codeunit "File Management";
@@ -180,23 +166,6 @@ codeunit 6014452 "NPR E-mail Templ. Mgt."
     begin
         Path := ExportHtmlTemplate(EmailTemplateHeader, false);
         HyperLink(Path);
-    end;
-
-    local procedure "--- Aux"()
-    begin
-    end;
-
-    local procedure RunProcess(Filename: Text; Arguments: Text; Modal: Boolean)
-    var
-        [RunOnClient]
-        Process: DotNet NPRNetProcess;
-        [RunOnClient]
-        ProcessStartInfo: DotNet NPRNetProcessStartInfo;
-    begin
-        ProcessStartInfo := ProcessStartInfo.ProcessStartInfo(Filename, Arguments);
-        Process := Process.Start(ProcessStartInfo);
-        if Modal then
-            Process.WaitForExit();
     end;
 }
 

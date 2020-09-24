@@ -1,10 +1,5 @@
 page 6059795 "NPR E-mail Templates"
 {
-    // PN1.00/MH/20140730  NAV-AddOn: PDF2NAV
-    //   - Refactored module from the "Mail And Document Handler" Module.
-    //   - This Page Contains a List of E-mail Templates used for sending E-mail using PDF2NAV.
-    // PN1.08/MHA/20151214  CASE 228859 Pdf2Nav (New Version List)
-    // NPR5.48/MHA /20190123  CASE 341711 Added Page Actions
 
     Caption = 'E-mail Templates';
     CardPageID = "NPR E-mail Template";
@@ -43,22 +38,6 @@ page 6059795 "NPR E-mail Templates"
     {
         area(processing)
         {
-            action(EditHTMLTemplate)
-            {
-                Caption = 'Edit HTML Template';
-                Image = Edit;
-                Visible = ("Transactional E-mail" = 0) OR ("Transactional E-mail Code" = '');
-                ApplicationArea = All;
-
-                trigger OnAction()
-                var
-                    EmailTemplateMgt: Codeunit "NPR E-mail Templ. Mgt.";
-                begin
-                    //-NPR5.48 [341711]
-                    EmailTemplateMgt.EditHtmlTemplate(Rec);
-                    //+NPR5.48 [341711]
-                end;
-            }
             action(ViewHTMLTemplate)
             {
                 Caption = 'View HTML Template';
@@ -70,9 +49,7 @@ page 6059795 "NPR E-mail Templates"
                 var
                     EmailTemplateMgt: Codeunit "NPR E-mail Templ. Mgt.";
                 begin
-                    //-NPR5.48 [341711]
                     EmailTemplateMgt.ViewHtmlTemplate(Rec);
-                    //+NPR5.48 [341711]
                 end;
             }
             action(ImportHTMLTemplate)
@@ -87,9 +64,7 @@ page 6059795 "NPR E-mail Templates"
                     EmailTemplateMgt: Codeunit "NPR E-mail Templ. Mgt.";
                     Path: Text;
                 begin
-                    //-NPR5.48 [341711]
                     EmailTemplateMgt.ImportHtmlTemplate(Path, true, Rec);
-                    //+NPR5.48 [341711]
                 end;
             }
             action(ExportHtmlTemplate)
@@ -103,9 +78,7 @@ page 6059795 "NPR E-mail Templates"
                 var
                     EmailTemplateMgt: Codeunit "NPR E-mail Templ. Mgt.";
                 begin
-                    //-NPR5.48 [341711]
                     EmailTemplateMgt.ExportHtmlTemplate(Rec, true);
-                    //+NPR5.48 [341711]
                 end;
             }
             action(CopyFromTemplate)
@@ -119,9 +92,7 @@ page 6059795 "NPR E-mail Templates"
                 var
                     EmailTemplateMgt: Codeunit "NPR E-mail Templ. Mgt.";
                 begin
-                    //-NPR5.48 [341711]
                     EmailTemplateMgt.CopyFromTemplate(Rec);
-                    //+NPR5.48 [341711]
                 end;
             }
             action(DeleteHTMLTemplate)
@@ -135,9 +106,7 @@ page 6059795 "NPR E-mail Templates"
                 var
                     EmailTemplateMgt: Codeunit "NPR E-mail Templ. Mgt.";
                 begin
-                    //-NPR5.48 [341711]
                     EmailTemplateMgt.DeleteHtmlTemplate(Rec);
-                    //+NPR5.48 [341711]
                 end;
             }
         }
