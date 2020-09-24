@@ -5,13 +5,30 @@ codeunit 6150733 "NPR POS Workflows 2.0"
     // NPR5.53/VB  /20190917  CASE 362777 Support for workflow sequencing (configuring/registering "before" and "after" workflow sequences that execute before or after another workflow)
 
 
-    trigger OnRun()
-    begin
-    end;
-
     var
         Text001: Label 'Action %1 does not seem to have a registered handler, or the registered handler failed to notify the framework about successful processing of the action.';
         Stopwatches: DotNet NPRNetDictionary_Of_T_U;
+        TextErrorMustNotRunThisCodeunit: Label 'You must not run this codeunit directly. This codeunit is intended to be run only from within itself.', Locked = true; // This is development type of error, do not translate!
+        OnRunInitialized: Boolean;
+        OnRunPOSAction: Record "NPR POS Action";
+        OnRunWorkflowStep: Text;
+        OnRunContext: Codeunit "NPR POS JSON Management";
+        OnRunWorkflows20State: Codeunit "NPR POS WF 2.0: State";
+        OnRunPOSSession: Codeunit "NPR POS Session";
+        OnRunFrontEnd: Codeunit "NPR POS Front End Management";
+        ActionHandled: Boolean;
+
+
+    trigger OnRun()
+    var
+        ContextString: Text;
+    begin
+        if not OnRunInitialized then
+            Error(TextErrorMustNotRunThisCodeunit);
+        OnAction(OnRunPOSAction, OnRunWorkflowStep, OnRunContext, OnRunPOSSession, OnRunWorkflows20State, OnRunFrontEnd, ActionHandled);
+        if not ActionHandled then
+            Error(Text001, OnRunPOSAction);
+    end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnCustomMethod', '', false, false)]
     local procedure OnAction20(Method: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
@@ -21,6 +38,7 @@ codeunit 6150733 "NPR POS Workflows 2.0"
         Workflowstep: Text;
         ActionId: Integer;
         ActionContext: JsonObject;
+        POSWorkflows20: Codeunit "NPR POS Workflows 2.0";
     begin
         if Method <> 'OnAction20' then
             exit;
@@ -28,7 +46,7 @@ codeunit 6150733 "NPR POS Workflows 2.0"
         Handled := true;
 
         RetrieveActionContext(Context, ActionCode, WorkflowId, Workflowstep, ActionId, ActionContext);
-        InvokeAction20(ActionCode, WorkflowId, Workflowstep, ActionId, ActionContext, POSSession, FrontEnd);
+        POSWorkflows20.InvokeAction20(ActionCode, WorkflowId, Workflowstep, ActionId, ActionContext, POSSession, FrontEnd, POSWorkflows20);
     end;
 
     local procedure RetrieveActionContext(Context: JsonObject; var ActionCode: Text; var WorkflowId: Integer; var WorkflowStep: Text; var ActionId: Integer; var ActionContext: JsonObject)
@@ -56,7 +74,20 @@ codeunit 6150733 "NPR POS Workflows 2.0"
         ActionContext := JToken.AsObject();
     end;
 
-    local procedure InvokeAction20("Action": Text; WorkflowId: Integer; WorkflowStep: Text; ActionId: Integer; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
+    local procedure InvokeOnActionThroughOnRun(POSActionIn: Record "NPR POS Action"; WorkflowStepIn: Text; ContextIn: Codeunit "NPR POS JSON Management"; POSSessionIn: Codeunit "NPR POS Session"; FrontEndIn: Codeunit "NPR POS Front End Management"; Self: Codeunit "NPR POS Workflows 2.0") Success: Boolean
+    begin
+        ActionHandled := false;
+        OnRunInitialized := true;
+        OnRunPOSAction := POSActionIn;
+        OnRunWorkflowStep := WorkflowStepIn;
+        OnRunContext := ContextIn;
+        OnRunPOSSession := POSSessionIn;
+        OnRunFrontEnd := FrontEndIn;
+        Success := Self.Run();
+        OnRunInitialized := false;
+    end;
+
+    procedure InvokeAction20("Action": Text; WorkflowId: Integer; WorkflowStep: Text; ActionId: Integer; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; Self: Codeunit "NPR POS Workflows 2.0")
     var
         POSAction: Record "NPR POS Action";
         JavaScriptInterface: Codeunit "NPR POS JavaScript Interface";
@@ -65,8 +96,7 @@ codeunit 6150733 "NPR POS Workflows 2.0"
         FrontEnd20: Codeunit "NPR POS Front End Management";
         Signal: DotNet NPRNetWorkflowCallCompletedRequest;
         ActionContext: DotNet NPRNetDictionary_Of_T_U;
-        Handled: Boolean;
-        Executing: Boolean;
+        Success: Boolean;
     begin
         StopwatchResetAll();
 
@@ -82,28 +112,16 @@ codeunit 6150733 "NPR POS Workflows 2.0"
 
         POSSession.SetInAction(true);
         StopwatchStart('Action');
-        asserterror
-        begin
-            Executing := true;
-            OnAction(POSAction, WorkflowStep, JSON, POSSession, State, FrontEnd20, Handled);
-            //-NPR5.53 [362777]
-            if Handled then begin
-                //+NPR5.53 [362777]
-                Executing := false;
-                Commit;
-                Error('');
-                //-NPR5.53 [362777]
-            end else
-                Error(Text001, Action);
-            //+NPR5.53 [362777]
-        end;
+
+        Success := InvokeOnActionThroughOnRun(POSAction, WorkflowStep, JSON, POSSession, FrontEnd, Self);
+
         StopwatchStop('Action');
         POSSession.SetInAction(false);
 
-        if not Handled and not Executing then
+        if not ActionHandled then
             FrontEnd20.ReportBug(StrSubstNo(Text001, Action));
 
-        if not Executing then begin
+        if Success then begin
             OnAfterInvokeAction(POSAction, WorkflowStep, Context, POSSession, FrontEnd20);
             StopwatchStart('Data');
             JavaScriptInterface.RefreshData(POSSession, FrontEnd20);
@@ -111,9 +129,7 @@ codeunit 6150733 "NPR POS Workflows 2.0"
             Signal := Signal.SignalSuccess(WorkflowId, ActionId);
         end else begin
             Signal := Signal.SignalFailreAndThrowError(WorkflowId, ActionId, GetLastErrorText);
-            //-NPR5.51 [363458]
             FrontEnd20.Trace(Signal, 'ErrorCallStack', GetLastErrorCallstack);
-            //+NPR5.51 [363458]
         end;
 
         StopwatchStop('All');

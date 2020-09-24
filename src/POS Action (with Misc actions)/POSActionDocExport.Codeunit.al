@@ -129,6 +129,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
         CaptionSendICOrderConfirmation: Label 'Send IC Order Cnfmn.';
         DescSendICOrderConfirmation: Label 'Send intercompany order confirmation immediately after sales document has been created. ';
 
+
     local procedure ActionCode(): Text
     begin
         exit('SALES_DOC_EXP');
@@ -531,83 +532,21 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
 
     local procedure HandlePrepayment(POSSession: Codeunit "NPR POS Session"; SalesHeader: Record "Sales Header"; PrepaymentValue: Decimal; PrepaymentIsAmount: Boolean; Print: Boolean; Send: Boolean; Pdf2Nav: Boolean)
     var
-        Success: Boolean;
-        POSSale: Codeunit "NPR POS Sale";
-        SalePOS: Record "NPR Sale POS";
-        RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt.";
+        HandlePayment: Codeunit "NPR POS Handle Payment";
     begin
         //An error after sale end, before front end sync, is not allowed so we catch all
-
         Commit;
-        asserterror
-        begin
-            //-NPR5.53 [377510]
-            SalesHeader.LockTable;
-            if SalesHeader.Find then begin
-                //+NPR5.53 [377510]
-                POSSession.GetSale(POSSale);
-                POSSale.GetCurrentSale(SalePOS);
-                //-NPR5.53 [377510]
-                SalePOS."Customer Type" := SalePOS."Customer Type"::Ord;
-                SalePOS.Validate("Customer No.", SalesHeader."Bill-to Customer No.");
-                //+NPR5.53 [377510]
-                SalePOS.Modify(true);
-                POSSale.RefreshCurrent();
-
-                RetailSalesDocMgt.CreatePrepaymentLine(POSSession, SalesHeader, PrepaymentValue, Print, Send, Pdf2Nav, true, PrepaymentIsAmount);
-
-                POSSession.RequestRefreshData();
-                Commit;
-            end;
-
-            Success := true;
-            Error('');
-        end;
-
-        if not Success then
+        if not HandlePayment.HandlePrepaymentTransactional(POSSession, SalesHeader, PrepaymentValue, PrepaymentIsAmount, Print, Send, Pdf2Nav, HandlePayment) then
             Message(ERR_PREPAY, GetLastErrorText);
     end;
 
     local procedure HandlePayAndPost(POSSession: Codeunit "NPR POS Session"; SalesHeader: Record "Sales Header"; Print: Boolean; Pdf2Nav: Boolean; Send: Boolean; FullPosting: Boolean)
     var
-        Success: Boolean;
-        POSSale: Codeunit "NPR POS Sale";
-        SalePOS: Record "NPR Sale POS";
-        RetailSalesDocImpMgt: Codeunit "NPR Sales Doc. Imp. Mgt.";
+        HandlePayment: Codeunit "NPR POS Handle Payment";
     begin
         //An error after sale end, before front end sync, is not allowed so we catch all
-
         Commit;
-        asserterror
-        begin
-            //-NPR5.53 [377510]
-            SalesHeader.LockTable;
-            if SalesHeader.Find then begin
-
-                if FullPosting then begin
-                    RetailSalesDocImpMgt.SetDocumentToFullPosting(SalesHeader)
-                end;
-                //+NPR5.53 [377510]
-
-                POSSession.GetSale(POSSale);
-                POSSale.GetCurrentSale(SalePOS);
-                //-NPR5.53 [377510]
-                SalePOS."Customer Type" := SalePOS."Customer Type"::Ord;
-                SalePOS.Validate("Customer No.", SalesHeader."Bill-to Customer No.");
-                //+NPR5.53 [377510]
-                SalePOS.Modify(true);
-                POSSale.RefreshCurrent();
-
-                RetailSalesDocImpMgt.SalesDocumentAmountToPOS(POSSession, SalesHeader, true, true, true, Print, Pdf2Nav, Send, true);
-
-                POSSession.RequestRefreshData();
-                Commit;
-            end;
-            Success := true;
-            Error('');
-        end;
-
-        if not Success then
+        if not HandlePayment.HandlePayAndPostTransactional(POSSession, SalesHeader, Print, Pdf2Nav, Send, FullPosting, HandlePayment) then
             Message(ERR_PAY, GetLastErrorText);
     end;
 
