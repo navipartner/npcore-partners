@@ -1,9 +1,10 @@
 trigger: none
+
 resources:
   repositories:
   - repository: scriptsRepo
     type: git
-    name: 'NpCore/NpDevOps'
+    name:  'NpCore/NpDevOps'
 
 pool:
   name: NP Deployment
