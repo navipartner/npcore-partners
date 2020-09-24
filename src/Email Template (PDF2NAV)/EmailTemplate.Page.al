@@ -1,19 +1,5 @@
 page 6059791 "NPR E-mail Template"
 {
-    // PN1.00/MH/20140730  NAV-AddOn: PDF2NAV
-    //   - Refactored module from the "Mail And Document Handler" Module.
-    //   - This Page Contains E-mail Templates used for sending E-mail using PDF2NAV.
-    // PN1.01/MH/20140731  NAV-AddOn: PDF2NAV
-    //   - Added Action Item: AdditionalReports.
-    // PN1.06/LS/20150525  CASE 205029  Added fields "Cc Recipient Address" & "Bcc Recipient Address"
-    // PN1.07/TTH/20151005 CASE 222376 Adding the possibility to use HTML Template
-    // PN1.08/MHA/20151214  CASE 228859 Pdf2Nav(New Version List)
-    // PN1.10/MHA/20160314 CASE 236653 "Report Format"(Word) deleted
-    // NPR5.36/THRO/20170913  CASE 289216 Added Group.
-    // NPR5.38/THRO/20180108  CASE 286713 Added Transaction E-mail fields + hide Html + Line if TransEmail is used
-    // NPR5.41/TS  /20180105  CASE 300893 Removed Caption on ActionContainer
-    // NPR5.43/THRO/20180626  CASE 318935 Added "Fieldnumber Start Tag" + "Fieldnumber End Tag"
-    // NPR5.48/MHA /20190123  CASE 341711 Added Html Template Functions
 
     Caption = 'E-mail Template';
     SourceTable = "NPR E-mail Template Header";
@@ -100,25 +86,17 @@ page 6059791 "NPR E-mail Template"
                             Instream: InStream;
                             Outstream: OutStream;
                         begin
-                            //-PN1.07
                             Clear(TextEditorPage);
                             CalcFields("HTML Template");
                             HtmlText := '';
-                            //-NPR5.48 [341711]
-                            //"HTML Template".CREATEINSTREAM(Instream);
                             "HTML Template".CreateInStream(Instream, TEXTENCODING::UTF8);
-                            //+NPR5.48 [341711]
                             Instream.ReadText(HtmlText);
                             if TextEditorPage.EditText(HtmlText) then begin
                                 Clear("HTML Template");
-                                //-NPR5.48 [341711]
-                                //"HTML Template".CREATEOUTSTREAM(Outstream);
                                 "HTML Template".CreateOutStream(Outstream, TEXTENCODING::UTF8);
-                                //+NPR5.48 [341711]
                                 Outstream.WriteText(HtmlText);
                                 Modify;
                             end;
-                            //+PN1.07
                         end;
                     }
                 }
@@ -141,15 +119,6 @@ page 6059791 "NPR E-mail Template"
                 {
                     ApplicationArea = All;
                     Importance = Additional;
-
-                    trigger OnValidate()
-                    begin
-                        //-NPR5.48 [341711]
-                        ////-NPR5.38 [286713]
-                        //SetTransactionalType;
-                        ////+NPR5.38 [286713]
-                        //+NPR5.48 [341711]
-                    end;
                 }
                 group(Control6150643)
                 {
@@ -159,15 +128,6 @@ page 6059791 "NPR E-mail Template"
                     {
                         ApplicationArea = All;
                         Importance = Additional;
-
-                        trigger OnValidate()
-                        begin
-                            //-NPR5.48 [341711]
-                            ////-NPR5.38 [286713]
-                            //SetTransactionalType;
-                            ////+NPR5.38 [286713]
-                            //+NPR5.48 [341711]
-                        end;
                     }
                 }
             }
@@ -198,22 +158,6 @@ page 6059791 "NPR E-mail Template"
     {
         area(processing)
         {
-            action(EditHTMLTemplate)
-            {
-                Caption = 'Edit HTML Template';
-                Image = Edit;
-                Visible = ("Transactional E-mail" = 0) OR ("Transactional E-mail Code" = '');
-                ApplicationArea = All;
-
-                trigger OnAction()
-                var
-                    EmailTemplateMgt: Codeunit "NPR E-mail Templ. Mgt.";
-                begin
-                    //-NPR5.48 [341711]
-                    EmailTemplateMgt.EditHtmlTemplate(Rec);
-                    //+NPR5.48 [341711]
-                end;
-            }
             action(ViewHTMLTemplate)
             {
                 Caption = 'View HTML Template';
@@ -225,9 +169,7 @@ page 6059791 "NPR E-mail Template"
                 var
                     EmailTemplateMgt: Codeunit "NPR E-mail Templ. Mgt.";
                 begin
-                    //-NPR5.48 [341711]
                     EmailTemplateMgt.ViewHtmlTemplate(Rec);
-                    //+NPR5.48 [341711]
                 end;
             }
             action(ImportHTMLTemplate)
@@ -242,9 +184,7 @@ page 6059791 "NPR E-mail Template"
                     EmailTemplateMgt: Codeunit "NPR E-mail Templ. Mgt.";
                     Path: Text;
                 begin
-                    //-NPR5.48 [341711]
                     EmailTemplateMgt.ImportHtmlTemplate(Path, true, Rec);
-                    //+NPR5.48 [341711]
                 end;
             }
             action(ExportHtmlTemplate)
@@ -258,9 +198,7 @@ page 6059791 "NPR E-mail Template"
                 var
                     EmailTemplateMgt: Codeunit "NPR E-mail Templ. Mgt.";
                 begin
-                    //-NPR5.48 [341711]
                     EmailTemplateMgt.ExportHtmlTemplate(Rec, true);
-                    //+NPR5.48 [341711]
                 end;
             }
             action(CopyFromTemplate)
@@ -274,9 +212,7 @@ page 6059791 "NPR E-mail Template"
                 var
                     EmailTemplateMgt: Codeunit "NPR E-mail Templ. Mgt.";
                 begin
-                    //-NPR5.48 [341711]
                     EmailTemplateMgt.CopyFromTemplate(Rec);
-                    //+NPR5.48 [341711]
                 end;
             }
             action(DeleteHTMLTemplate)
@@ -290,9 +226,7 @@ page 6059791 "NPR E-mail Template"
                 var
                     EmailTemplateMgt: Codeunit "NPR E-mail Templ. Mgt.";
                 begin
-                    //-NPR5.48 [341711]
                     EmailTemplateMgt.DeleteHtmlTemplate(Rec);
-                    //+NPR5.48 [341711]
                 end;
             }
         }
@@ -345,19 +279,5 @@ page 6059791 "NPR E-mail Template"
             }
         }
     }
-
-    trigger OnAfterGetCurrRecord()
-    begin
-        //-NPR5.48 [341711]
-        ////-NPR5.38 [286713]
-        //SetTransactionalType;
-        ////+NPR5.38 [286713]
-        //+NPR5.48 [341711]
-    end;
-
-    var
-        Text000: Label 'Export failed';
-        Text001: Label 'All values on %1 will be replaced with values from %2';
-        Text002: Label 'Do you want to delete the HTML Template?';
 }
 
