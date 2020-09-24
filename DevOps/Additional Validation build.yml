@@ -1,5 +1,12 @@
 trigger: none
 
+schedules:
+  - cron: "0 22 * * *" #UTC TIME! mm HH DD MM DW
+    displayName: Daily after-midnight test runner build
+    branches:
+      include:
+      - masters/NPR_BC16_W1
+
 resources:
   repositories:
   - repository: scriptsRepo
@@ -71,6 +78,3 @@ jobs:
         - source: 'https://pkgs.dev.azure.com/navipartner/_packaging/BCSymbols/nuget/v3/index.json'
           id: Microsoft.BC.160.Base_Application.se
         ISOcountryCode: SE
-    latestPrereleaseAppNuGetSource: 
-        source: 'https://pkgs.dev.azure.com/navipartner/_packaging/NpCore/nuget/v3/index.json'
-        id: NaviPartner.NPCore.BC160
