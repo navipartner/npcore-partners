@@ -14,7 +14,7 @@ resources:
     name:  'NpCore/NpDevOps'
 
 pool:
-  name: NP Core Additional Validation Pipelines
+  name: NP Core Pipelines
   demands: 
   - docker
   # Now only 2019 is available but in the future it will be every newer version.
