@@ -30,47 +30,6 @@ jobs:
     dependancyPackages:
       - source: 'https://api.nuget.org/v3/index.json;https://pkgs.dev.azure.com/navipartner/_packaging/NprAddIns/nuget/v3/index.json'
         id: NaviPartner.NPRetail.AddIns.BC #CASE SENSITIVE!
-    alternativeSystemALPackages:
-      - packages:
-        - source: 'https://pkgs.dev.azure.com/navipartner/_packaging/BCSymbols/nuget/v3/index.json'
-          id: Microsoft.BC.160.Base_Application.au
-        ISOcountryCode: AU
-      - packages:
-        - source: 'https://pkgs.dev.azure.com/navipartner/_packaging/BCSymbols/nuget/v3/index.json'
-          id: Microsoft.BC.160.Base_Application.dk
-        ISOcountryCode: DK
-      - packages:
-        - source: 'https://pkgs.dev.azure.com/navipartner/_packaging/BCSymbols/nuget/v3/index.json'
-          id: Microsoft.BC.160.Base_Application.fr
-        ISOcountryCode: FR
-      - packages:
-        - source: 'https://pkgs.dev.azure.com/navipartner/_packaging/BCSymbols/nuget/v3/index.json'
-          id: Microsoft.BC.160.Base_Application.gb
-        ISOcountryCode: GB
-      - packages:
-        - source: 'https://pkgs.dev.azure.com/navipartner/_packaging/BCSymbols/nuget/v3/index.json'
-          id: Microsoft.BC.160.Base_Application.it
-        ISOcountryCode: IT
-      - packages:
-        - source: 'https://pkgs.dev.azure.com/navipartner/_packaging/BCSymbols/nuget/v3/index.json'
-          id: Microsoft.BC.160.Base_Application.na
-        ISOcountryCode: NA
-      - packages:
-        - source: 'https://pkgs.dev.azure.com/navipartner/_packaging/BCSymbols/nuget/v3/index.json'
-          id: Microsoft.BC.160.Base_Application.nl
-        ISOcountryCode: NL
-      - packages:
-        - source: 'https://pkgs.dev.azure.com/navipartner/_packaging/BCSymbols/nuget/v3/index.json'
-          id: Microsoft.BC.160.Base_Application.no
-        ISOcountryCode: NO
-      - packages:
-        - source: 'https://pkgs.dev.azure.com/navipartner/_packaging/BCSymbols/nuget/v3/index.json'
-          id: Microsoft.BC.160.Base_Application.nz
-        ISOcountryCode: NZ
-      - packages:
-        - source: 'https://pkgs.dev.azure.com/navipartner/_packaging/BCSymbols/nuget/v3/index.json'
-          id: Microsoft.BC.160.Base_Application.se
-        ISOcountryCode: SE
     latestPrereleaseAppNuGetSource: 
         source: 'https://pkgs.dev.azure.com/navipartner/_packaging/NpCore/nuget/v3/index.json'
         id: NaviPartner.NPCore.BC160
