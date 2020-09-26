@@ -573,17 +573,6 @@ dotnet
         }
     }
 
-    assembly("Microsoft.Dynamics.Nav.SMTP")
-    {
-        Version = '16.0.0.0';
-        Culture = 'neutral';
-        PublicKeyToken = '31bf3856ad364e35';
-
-        type("Microsoft.Dynamics.Nav.SMTP.SmtpMessage"; "NPRNetSmtpMessage")
-        {
-        }
-    }
-
     assembly("NaviPartner.Retail.Nav")
     {
         Version = '5.0.398.0';
