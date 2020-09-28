@@ -221,6 +221,7 @@ codeunit 6151024 "NPR NpRv Sales Doc. Mgt."
         NpRvSalesLine.SetRange("Document Type", SalesHeader."Document Type");
         NpRvSalesLine.SetRange("Document No.", SalesHeader."No.");
         NpRvSalesLine.SetRange(Type, NpRvSalesLine.Type::Payment);
+        NpRvSalesLine.SetRange(Posted, false);
         if NpRvSalesLine.IsEmpty then
             exit;
 
@@ -240,6 +241,8 @@ codeunit 6151024 "NPR NpRv Sales Doc. Mgt."
     begin
         if not SalesHeader.Invoice then
             exit;
+
+        OnBeforeReleaseSalesDoc(SalesHeader);
 
         NpRvSalesLine.SetRange("Document Source", NpRvSalesLine."Document Source"::"Payment Line");
         NpRvSalesLine.SetRange("Document Type", SalesHeader."Document Type");
