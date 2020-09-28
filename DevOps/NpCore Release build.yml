@@ -23,7 +23,7 @@ jobs:
 - template: YAML/Templates/Job/BuildALApp.yml@scriptsRepo
   parameters:
     containerImageName: mcr.microsoft.com/dynamicsnav:10.0.17763.1397-generic
-    artifactURL: https://bcartifacts.azureedge.net/onprem/16.4.14693.15090/w1
+    artifactURL: https://bcartifacts.azureedge.net/onprem/16.3.14085.14238/w1
     containerName: Build-$(Build.BuildId)
     serverInstanceName: BC
     containerAdminUsername: admin
