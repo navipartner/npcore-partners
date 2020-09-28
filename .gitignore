@@ -1,7 +1,9 @@
 ## Ignore NAV Instance Specific files
 .alpackages/
 .alcache/
-.vscode/
+.vscode/*
+Test/.vscode/*
+!Test/.vscode/settings.json
 .netpackages/
 .altemplates/
 *.app
