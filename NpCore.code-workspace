@@ -1,0 +1,16 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"name": "TEST",
+			"path": ".\\Test"
+		}
+	],
+	"settings": {
+		"al.compilationOptions": {			
+			"parallel": true
+		}
+	}
+}
