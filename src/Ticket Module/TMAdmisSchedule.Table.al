@@ -264,6 +264,22 @@ table 6060118 "NPR TM Admis. Schedule"
             OptionCaption = ' ,All,Reserve,Reserve & Cancel,Admit,Admit & Depart';
             OptionMembers = NA,ALL,RESERVE,RESERVE_CANCEL,ADMIT,ADMIT_DEPART;
         }
+
+        field(71; "Notify Stakeholder On Sell-Out"; Option)
+        {
+            Caption = 'Notify Stakeholder On Sell-Out';
+            OptionCaption = 'Off,Both,Ticket Capacity,Waiting List Capacity';
+            OptionMembers = OFF,BOTH,TICKET,WAITINGLIST;
+            DataClassification = CustomerContent;
+        }
+        field(72; "Notify When Percentage Sold"; Decimal)
+        {
+            Caption = 'Notify When Percentage Sold';
+            InitValue = 95;
+            MinValue = 0;
+            MaxValue = 100;
+            DataClassification = CustomerContent;
+        }
         field(100; "Admission Base Calendar Code"; Code[10])
         {
             Caption = 'Admission Base Calendar Code';

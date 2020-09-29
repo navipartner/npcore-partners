@@ -110,6 +110,14 @@
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
+                field("Reschedule Policy"; "Reschedule Policy")
+                {
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                }
+                field("Reschedule Cut-Off (Hours)"; "Reschedule Cut-Off (Hours)")
+                {
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                }
                 field("Revoke Policy"; "Revoke Policy")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;

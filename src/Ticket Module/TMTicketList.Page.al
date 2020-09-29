@@ -185,6 +185,20 @@
                     RevokeTicket();
                 end;
             }
+            action("Change Ticket Reservation")
+            {
+                Caption = 'Change Ticket Reservation';
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                ToolTip = 'Change the time slots that the ticket is valid for.';
+                Ellipsis = true;
+                Image = Reserve;
+                Promoted = true;
+                PromotedIsBig = true;
+                trigger OnAction()
+                begin
+                    ChangeTicketReservation();
+                end;
+            }
         }
         area(navigation)
         {
@@ -227,8 +241,12 @@
                 Image = Navigate;
                 Promoted = true;
                 PromotedCategory = Process;
-                RunObject = Page "NPR TM Ticket Request";
-                RunPageLink = "Entry No." = FIELD("Ticket Reservation Entry No.");
+
+                trigger OnAction()
+                begin
+                    DisplayTicketRequest("Ticket Reservation Entry No.");
+                end;
+
 
             }
             separator(Separator6014406)
@@ -330,11 +348,11 @@
         // CASE TicketReservationRequest."Notification Method" OF
         //  TicketReservationRequest."Notification Method"::EMAIL : SuggestNotificationMethod := SuggestNotificationMethod::EMAIL;
         //  TicketReservationRequest."Notification Method"::SMS : SuggestNotificationMethod := SuggestNotificationMethod::SMS;
-        //  ELSE BEGIN
+        //  ELSE begin
         //    SuggestNotificationMethod := SuggestNotificationMethod::NA;
         //    TicketReservationRequest."Notification Address" := '';
-        //  END;
-        // END;
+        //  end;
+        // end;
 
         //TicketNotifyParticipant.AquireTicketParticipant (TicketReservationRequest."Session Token ID", TicketReservationRequest."Notification Method", TicketReservationRequest."Notification Address");
         TicketNotifyParticipant.AquireTicketParticipantForce(TicketReservationRequest."Session Token ID", TicketReservationRequest."Notification Method", TicketReservationRequest."Notification Address", true);
@@ -425,6 +443,80 @@
         end;
 
         Message(ETICKET_SENT);
+    end;
+
+    local procedure ChangeTicketReservation();
+    var
+        Ticket: Record "NPR TM Ticket";
+        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+        TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
+        TicketMakeReservationPage: Page "NPR TM Ticket Make Reserv.";
+        RequestToken: Text[100];
+        ResponseMessage: Text;
+        PageAction: Action;
+    begin
+
+        //-#417417 [417417]
+        CurrPage.SETSELECTIONFILTER(Ticket);
+        Ticket.FINDFIRST();
+
+        TicketReservationRequest.GET("Ticket Reservation Entry No.");
+        if (NOT TicketRequestManager.CreateChangeRequest(Ticket."External Ticket No.",
+                  TicketReservationRequest."Authorization Code", RequestToken, ResponseMessage)) then
+            ERROR(ResponseMessage);
+
+        COMMIT();
+
+        RESET();
+        TicketMakeReservationPage.SetTicketItem(Ticket."Item No.", Ticket."Variant Code");
+        TicketMakeReservationPage.LoadTicketRequest(RequestToken);
+        TicketMakeReservationPage.LOOKUPMODE(TRUE);
+        PageAction := TicketMakeReservationPage.RUNMODAL();
+        if (PageAction = ACTION::LookupOK) then begin
+            TicketMakeReservationPage.FinalizeChangeRequest(TRUE, ResponseMessage);
+        end;
+
+        //+#417417 [417417]
+    end;
+
+    local procedure DisplayTicketRequest(RequestEntryNo: Integer);
+    var
+        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+        TmpTicketReservationRequest: Record "NPR TM Ticket Reservation Req." temporary;
+    begin
+
+        //-#417417 [417417]
+        TicketReservationRequest.GET(RequestEntryNo);
+        AddRequestToTmp(TicketReservationRequest."Session Token ID", TmpTicketReservationRequest);
+
+        TicketReservationRequest.CALCFIELDS("Is Superseeded");
+        repeat
+            if (TicketReservationRequest."Is Superseeded") then begin
+                TicketReservationRequest.RESET();
+                TicketReservationRequest.SETFILTER("Superseeds Entry No.", '=%1', TicketReservationRequest."Entry No.");
+                TicketReservationRequest.FINDFIRST();
+                AddRequestToTmp(TicketReservationRequest."Session Token ID", TmpTicketReservationRequest);
+
+                TicketReservationRequest.CALCFIELDS("Is Superseeded");
+            end;
+        until (NOT TicketReservationRequest."Is Superseeded");
+
+        PAGE.RUN(PAGE::"NPR TM Ticket Request", TmpTicketReservationRequest);
+    end;
+
+    local procedure AddRequestToTmp(Token: Text[100]; var TmpTicketReservationRequest: Record "NPR TM Ticket Reservation Req." temporary);
+    var
+        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+    begin
+
+        //-#417417 [417417]
+        TicketReservationRequest.SETFILTER("Session Token ID", '=%1', Token);
+        if (TicketReservationRequest.FINDSET()) then begin
+            repeat
+                TmpTicketReservationRequest.TRANSFERFIELDS(TicketReservationRequest, TRUE);
+                TmpTicketReservationRequest.INSERT();
+            until (TicketReservationRequest.NEXT() = 0);
+        end;
     end;
 }
 

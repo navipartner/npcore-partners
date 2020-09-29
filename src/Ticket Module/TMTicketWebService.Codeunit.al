@@ -1,28 +1,5 @@
 codeunit 6060115 "NPR TM Ticket WebService"
 {
-    // TM1.04/TSA/20160114 CASE 231834 Added the Confirm Reservation WS
-    // TM1.08/TSA/20160222 CASE 235208 Addded WS to combine reservation, confirmation and arrival in go
-    // TM1.09/TSA/20160305  CASE 235860 Restructured, moved request related functions to its own codeunit
-    // TM1.12/TSA/20160407  CASE 230600 Added DAN Captions
-    // TM1.15/TSA/20160603  CASE 240864 Transport TM1.15 - 1 June 2016
-    // TM1.15.02/MHA/20160726  CASE 242557 Magento reference updated according to NC2.00
-    // TM1.18/TSA/20161220  CASE 261405 Added service GetComplementaryMembershipItemNo that returns Ticket Type.Membership Sales Item No.
-    // TM1.19/TSA/20170130  CASE 264591 ConfirmTicketReservation had boolean response that was not set correctly on exit.
-    // TM1.21/TSA/20170419  CASE 272421 ResolveIdentifiers SOAP Action
-    // TM1.22/TSA/20170601  CASE 274464 Added OfflineTicketValidation
-    // TM1.22/BHR/20170609  CASE 280133 Set default value for ImportTypes
-    // TM1.23/TSA /20170724 CASE 284752 New SOAPAction SetReservationAttributes
-    // TM1.24/TSA /20170824 CASE 287582 Added SOAPAction GetAdmissionCapacity
-    // TM1.24/TSA /20170911 CASE 276842 Added SOAPAction ListTickets
-    // TM1.26/TSA /20171102 CASE 285601 Added SOAPAction GetTicketPrintUrl
-    // TM1.26/TSA /20171109 CASE 295981 Change the error path of MakeTicketReservation
-    // TM1.29/TSA /20180322 CASE 308975 Adding ConsumeComplementaryItem, and changing GetComplementaryMembershipItemNo to check if consumed
-    // TM1.36/TSA /20180830 CASE 326733 Removed ResolveIdentifiers()
-    // TM1.38/TSA /20181025 CASE 332109 SendETicket()
-    // TM1.45/TSA /20200114 CASE 384490 Ticket blocked checked for complementary item
-    // TM90.1.46/TSA /20200128 CASE 387877 Added ListTicketItems() service
-    // TM1.48/TSA /20200727 CASE 414413 Changed import status to imported true, even when there there is failure (keeping runtime error flag)
-
 
     trigger OnRun()
     begin
@@ -78,16 +55,6 @@ codeunit 6060115 "NPR TM Ticket WebService"
         NaviConnectSyncMgt.ProcessImportEntry(ImportEntry);
 
         ImportEntry.Get(ImportEntry."Entry No.");
-        //-TM1.26 [295981]
-        // IF (NOT ImportEntry.Imported) THEN
-        //  ERROR (ImportEntry."Error Message");
-        //
-        // ImportEntry."Document Source".CREATEOUTSTREAM(OutStr);
-        // Reservation.SetReservationResult (ImportEntry."Document ID");
-        // Reservation.SETDESTINATION(OutStr);
-        // Reservation.EXPORT;
-        // ImportEntry.MODIFY(TRUE);
-        // COMMIT;
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
         if (not ImportEntry.Imported) then begin
@@ -100,7 +67,7 @@ codeunit 6060115 "NPR TM Ticket WebService"
         Reservation.Export;
         ImportEntry.Modify(true);
         Commit;
-        //+TM1.26 [295981]
+
     end;
 
     procedure PreConfirmTicketReservation(var PreConfirm: XMLport "NPR TM Ticket PreConfirm"; ScannerStationId: Code[10])
@@ -210,6 +177,81 @@ codeunit 6060115 "NPR TM Ticket WebService"
         exit(true);
     end;
 
+    procedure GetTicketChangeRequest(VAR TicketChangeRequest: XMLport "NPR TM Ticket Change Request");
+    var
+        ImportEntry: Record "NPR Nc Import Entry";
+        NaviConnectSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
+        OutStr: OutStream;
+    begin
+
+        TicketChangeRequest.IMPORT();
+        InsertImportEntry('GetTicketChangeRequest', ImportEntry);
+
+        ImportEntry."Document ID" := UPPERCASE(DELCHR(FORMAT(CREATEGUID), '=', '{}-'));
+        ImportEntry."Document Name" := STRSUBSTNO('GetTicketChangeRequest-%1.xml', ImportEntry."Document ID");
+        ImportEntry."Sequence No." := GetDocumentSequence(ImportEntry."Document ID");
+
+        ImportEntry."Document Source".CREATEOUTSTREAM(OutStr);
+        TicketChangeRequest.SETDESTINATION(OutStr);
+        TicketChangeRequest.EXPORT;
+        ImportEntry.MODIFY(TRUE);
+
+        COMMIT();
+        NaviConnectSyncMgt.ProcessImportEntry(ImportEntry);
+
+        ImportEntry.GET(ImportEntry."Entry No.");
+        if (ImportEntry.Imported) then begin
+            TicketChangeRequest.SetChangeRequestId(ImportEntry."Document ID");
+        end else begin
+            ImportEntry.Imported := TRUE;
+            ImportEntry."Runtime Error" := TRUE;
+            TicketChangeRequest.SetError(ImportEntry."Error Message");
+        end;
+
+        ImportEntry."Document Source".CREATEOUTSTREAM(OutStr);
+        TicketChangeRequest.SETDESTINATION(OutStr);
+        TicketChangeRequest.EXPORT;
+        ImportEntry.MODIFY(TRUE);
+    end;
+
+    procedure ConfirmTicketChangeRequest(VAR TicketConfChangeRequest: XMLport "NPR TM Ticket Conf. Change Req");
+    var
+        ImportEntry: Record "NPR Nc Import Entry";
+        NaviConnectSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
+        OutStr: OutStream;
+    begin
+
+        TicketConfChangeRequest.IMPORT();
+        InsertImportEntry('ConfirmTicketChangeRequest', ImportEntry);
+
+        ImportEntry."Document ID" := TicketConfChangeRequest.GetToken();
+        ImportEntry."Document Name" := STRSUBSTNO('ConfirmTicketChangeRequest-%1.xml', ImportEntry."Document ID");
+        ImportEntry."Sequence No." := GetDocumentSequence(ImportEntry."Document ID");
+
+        ImportEntry."Document Source".CREATEOUTSTREAM(OutStr);
+        TicketConfChangeRequest.SETDESTINATION(OutStr);
+        TicketConfChangeRequest.EXPORT;
+        ImportEntry.MODIFY(TRUE);
+
+        COMMIT();
+        NaviConnectSyncMgt.ProcessImportEntry(ImportEntry);
+
+        ImportEntry.GET(ImportEntry."Entry No.");
+        if (ImportEntry.Imported) then begin
+            TicketConfChangeRequest.SetChangeRequestId(ImportEntry."Document ID");
+        end else begin
+            ImportEntry.Imported := TRUE;
+            ImportEntry."Runtime Error" := TRUE;
+            TicketConfChangeRequest.SetError(ImportEntry."Error Message");
+        end;
+
+        ImportEntry."Document Source".CREATEOUTSTREAM(OutStr);
+        TicketConfChangeRequest.SETDESTINATION(OutStr);
+        TicketConfChangeRequest.EXPORT;
+        ImportEntry.MODIFY(TRUE);
+
+    end;
+
     procedure MakeTicketReservationConfirmAndValidateArrival(var Reservation: XMLport "NPR TM Ticket Reserv.AndArrive"; ScannerStationId: Code[10])
     var
         ImportEntry: Record "NPR Nc Import Entry";
@@ -255,16 +297,12 @@ codeunit 6060115 "NPR TM Ticket WebService"
         ReasonText: Text;
     begin
 
-        //-TM1.18 [261405]
         Ticket.SetFilter("External Ticket No.", '=%1', ExternalTicketNo);
         if (not Ticket.FindFirst()) then
             exit(-10);
 
-        //-TM1.45 [384490]
         if (Ticket.Blocked) then
             exit(-13);
-        //+TM1.45 [384490]
-
 
         if (not TicketType.Get(Ticket."Ticket Type Code")) then
             exit(-11);
@@ -277,16 +315,12 @@ codeunit 6060115 "NPR TM Ticket WebService"
             ComplementaryItemNo := TicketType."Membership Sales Item No.";
         end;
 
-        //-#308975 [308975]
         if (TicketManagement.CheckIfConsumed(false, Ticket."No.", '', ComplementaryItemNo, ReasonText)) then begin
             ComplementaryItemNo := '';
             exit(-20);
         end;
-        //+#308975 [308975]
-
         exit(1);
 
-        //+TM1.18 [261405]
     end;
 
     procedure ConsumeComplementaryItem(ExternalTicketNo: Code[20]; var ComplementaryItemNo: Code[20]) Success: Integer
@@ -297,16 +331,12 @@ codeunit 6060115 "NPR TM Ticket WebService"
         ReasonText: Text;
     begin
 
-        //-#308975 [308975]
-
         Ticket.SetFilter("External Ticket No.", '=%1', ExternalTicketNo);
         if (not Ticket.FindFirst()) then
             exit(-10);
 
-        //-TM1.45 [384490]
         if (Ticket.Blocked) then
             exit(-13);
-        //+TM1.45 [384490]
 
         if (not TicketType.Get(Ticket."Ticket Type Code")) then
             exit(-11);
@@ -321,7 +351,7 @@ codeunit 6060115 "NPR TM Ticket WebService"
 
         TicketManagement.ConsumeItem(false, Ticket."No.", '', ComplementaryItemNo, ReasonText);
         exit(1);
-        //+#308975 [308975]
+
     end;
 
     procedure OfflineTicketValidation(var OfflineTicketValidation: XMLport "NPR TM Offline Ticket Valid.") Success: Boolean
@@ -357,7 +387,6 @@ codeunit 6060115 "NPR TM Ticket WebService"
         NaviConnectSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
         OutStr: OutStream;
     begin
-        //-TM1.23 [284752]
 
         Attributes.Import;
 
@@ -389,16 +418,14 @@ codeunit 6060115 "NPR TM Ticket WebService"
         Commit();
 
         exit(true);
-        //+TM1.23 [284752]
     end;
 
     procedure GetAdmissionCapacity(var AdmissionCapacityCheck: XMLport "NPR TM Admis. Capacity Check")
     begin
 
-        //-TM1.24 [287582]
         AdmissionCapacityCheck.Import;
         AdmissionCapacityCheck.AddResponse();
-        //+TM1.24 [287582]
+
     end;
 
     procedure GetTicketPrintUrl(var TicketGetTicketPrintURL: XMLport "NPR TM Ticket Get Print URL")
@@ -411,36 +438,24 @@ codeunit 6060115 "NPR TM Ticket WebService"
     procedure ListTickets(var TicketDetails: XMLport "NPR TM Ticket Details")
     begin
 
-        //-#276842 [276842]
         TicketDetails.Import;
         TicketDetails.CreatResponse();
-        //+#276842 [276842]
+
     end;
 
     procedure SendETicket(var SendETicket: XMLport "NPR TM Send eTicket")
     begin
 
-        //-TM1.38 [332109]
         SendETicket.Import();
         SendETicket.CreateResponse();
-        //+TM1.38 [332109]
+
     end;
 
     procedure ListTicketItems(var ListTicketItems: XMLport "NPR TM List Ticket Items")
     begin
 
-        //-TM90.1.46 [387877]
-        // implicit export
         ListTicketItems.CreateResponse();
-        //+TM90.1.46 [387877]
-    end;
 
-    local procedure "--"()
-    begin
-    end;
-
-    local procedure "--Internal"()
-    begin
     end;
 
     local procedure InsertImportEntry(WebserviceFunction: Text; var ImportEntry: Record "NPR Nc Import Entry")
@@ -501,6 +516,8 @@ codeunit 6060115 "NPR TM Ticket WebService"
         CreateImportType('TICKET-05', 'Ticket reservation', 'ReserveConfirmArrive');
         CreateImportType('TICKET-06', 'Ticket reservation', 'OfflineTicketValidation');
         CreateImportType('TICKET-07', 'Ticket reservation', 'SetAttributes');
+        CreateImportType('TICKET-08', 'Ticket reservation', 'GetTicketChangeRequest');
+        CreateImportType('TICKET-09', 'Ticket reservation', 'ConfirmTicketChangeRequest');
     end;
 
     local procedure CreateImportType("Code": Code[20]; Description: Text[30]; FunctionName: Text[30])
@@ -515,9 +532,8 @@ codeunit 6060115 "NPR TM Ticket WebService"
         ImportType."Webservice Enabled" := true;
         ImportType."Import Codeunit ID" := CODEUNIT::"NPR TM Ticket WebService Mgr";
         ImportType."Webservice Codeunit ID" := CODEUNIT::"NPR TM Ticket WebService";
-        //-TM1.22 [280133]
         ImportType."Lookup Codeunit ID" := CODEUNIT::"NPR TM View Ticket Requests";
-        //+TM1.22 [280133]
+
         ImportType.Insert();
     end;
 

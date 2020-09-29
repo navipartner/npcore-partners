@@ -463,7 +463,7 @@ codeunit 6151139 "NPR TM Ticket WaitingList Mgr."
             exit;
 
         // NOTE: this occures during posting, so sending should be false (sending SMS requires a commit)
-        if (DetTicketAccessEntry.Type = DetTicketAccessEntry.Type::CANCELED) then begin
+        if (DetTicketAccessEntry.Type = DetTicketAccessEntry.Type::CANCELED_ADMISSION) then begin
             ; // Event is not needed as we are not tiggering notification directly by a revoke
         end;
     end;

@@ -58,6 +58,12 @@ table 6060111 "NPR TM Ticket Setup"
             OptionCaption = 'Item Description,Admission Description,Ticket Type Description,Ticket BOM Description,Webshop Short Description,Webshop Description,Variant Description,Blank';
             OptionMembers = ITEM_DESC,ADM_DESC,TYPE_DESC,BOM_DESC,WEBSHOP_SHORT,WEBSHOP_FULL,VARIANT_DESC,BLANK;
         }
+
+        field(80; "Authorization Code Scheme"; Code[20])
+        {
+            Caption = 'Authorization Code Scheme';
+            DataClassification = CustomerContent;
+        }
         field(100; "Print Server Generator URL"; Text[200])
         {
             Caption = 'Print Server Generator URL';

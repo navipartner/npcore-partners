@@ -113,6 +113,17 @@ xmlport 6060120 "NPR TM Ticket Details"
                                 valid_until := Format(TmpTicket."Valid To Date", 0, 9);
                             end;
                         }
+                        textelement(pin_code)
+                        {
+                            trigger OnBeforePassVariable()
+                            var
+                                TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+                            begin
+                                pin_code := '';
+                                if (TicketReservationRequest.Get()) then
+                                    pin_code := TicketReservationRequest."Authorization Code";
+                            end;
+                        }
                         tableelement("ticket access entry"; "NPR TM Ticket Access Entry")
                         {
                             LinkFields = "Ticket No." = FIELD("No.");

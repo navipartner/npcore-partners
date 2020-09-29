@@ -117,6 +117,11 @@ table 6060110 "NPR TM Ticket Notif. Entry"
             Caption = 'Notification Address';
             DataClassification = CustomerContent;
         }
+        field(85; "Authorization Code"; Code[10])
+        {
+            Caption = 'Authorization Code';
+            DataClassification = CustomerContent;
+        }
         field(90; "Relevant Date"; Date)
         {
             Caption = 'Relevant Date';
@@ -252,8 +257,8 @@ table 6060110 "NPR TM Ticket Notif. Entry"
         {
             Caption = 'Ticket Trigger Type';
             DataClassification = CustomerContent;
-            OptionCaption = 'Reservation,Cancelation,Admitted,Departed,Added to Waiting List,Waitinglist Notification,Sales,Not Applicable';
-            OptionMembers = RESERVE,CANCEL_RESERVE,ADMIT,DEPART,ADDED_TO_WL,NOTIFIED_BY_WL,SALES,NA;
+            OptionCaption = 'Reservation,Cancelation,Admitted,Departed,Added to Waiting List,Waitinglist Notification,Sales,Not Applicable,SellOut,Capacity to Waiting List';
+            OptionMembers = RESERVE,CANCEL_RESERVE,ADMIT,DEPART,ADDED_TO_WL,NOTIFIED_BY_WL,SALES,NA,SELLOUT,CAPACITY_TO_WL;
         }
         field(405; "eTicket Type Code"; Text[30])
         {
