@@ -132,6 +132,14 @@
                 {
                     ApplicationArea = NPRTicketAdvanced;
                 }
+                field("Notify Stakeholder On Sell-Out"; "Notify Stakeholder On Sell-Out")
+                {
+                    ApplicationArea = NPRTicketAdvanced;
+                }
+                field("Notify When Percentage Sold"; "Notify When Percentage Sold")
+                {
+                    ApplicationArea = NPRTicketAdvanced;
+                }
                 field("Max Capacity Per Sch. Entry"; "Max Capacity Per Sch. Entry")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;

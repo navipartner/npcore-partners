@@ -23,18 +23,33 @@
                     Editable = false;
                     Visible = false;
                 }
-                field("Session Token ID"; "Session Token ID")
+                field("Entry Type"; "Entry Type")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    Importance = Additional;
                     Editable = false;
                 }
+
                 field("Created Date Time"; "Created Date Time")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Editable = false;
                 }
+                group(EntryId)
+                {
+                    field("Session Token ID"; "Session Token ID")
+                    {
+                        ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                        Editable = false;
+                    }
+                    field("Authorization Code"; "Authorization Code")
+                    {
+                        ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                        Editable = false;
+                    }
+                }
             }
-            group("Reguest Details")
+            group("Request Details")
             {
                 Caption = 'Reguest Details';
                 field("External Item Code"; "External Item Code")

@@ -126,6 +126,9 @@ xmlport 6060117 "NPR TM Ticket Confirmation"
                                 //+TM1.38 [332109]
                             end;
                         }
+                        textelement(pin_code)
+                        {
+                        }
                         tableelement("ticket access entry"; "NPR TM Ticket Access Entry")
                         {
                             LinkFields = "Ticket No." = FIELD("No.");
@@ -193,6 +196,7 @@ xmlport 6060117 "NPR TM Ticket Confirmation"
                         if (TicketReservationRequest.Get(tmpTicketReservationResponse."Request Entry No.")) then begin
                             external_id := TicketReservationRequest."External Item Code";
                             line_no := Format(TicketReservationRequest."Ext. Line Reference No.", 0, 9);
+                            pin_code := TicketReservationRequest."Authorization Code";
                         end;
                     end;
                 }

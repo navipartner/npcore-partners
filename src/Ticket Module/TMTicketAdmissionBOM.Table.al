@@ -84,6 +84,20 @@ table 6060121 "NPR TM Ticket Admission BOM"
             MaxValue = 100;
             MinValue = 0;
         }
+        field(30; "Reschedule Policy"; Option)
+        {
+            Caption = 'Reschedule Policy';
+            DataClassification = CustomerContent;
+            OptionCaption = 'Not Allowed,Always (Until Used),Cut-Off (Hours)';
+            OptionMembers = NOT_ALLOWED,UNTIL_USED,CUTOFF_HOUR;
+        }
+        field(32; "Reschedule Cut-Off (Hours)"; Decimal)
+        {
+            Caption = 'Reschedule Cut-Off (Hours)';
+            DataClassification = CustomerContent;
+            DecimalPlaces = 0 : 2;
+            BlankNumbers = BlankZero;
+        }
         field(45; "Duration Formula"; DateFormula)
         {
             Caption = 'Duration Formula';

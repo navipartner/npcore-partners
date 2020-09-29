@@ -204,6 +204,30 @@ table 6060116 "NPR TM Ticket Reservation Req."
             DataClassification = CustomerContent;
             TableRelation = Customer;
         }
+        field(120; "Entry Type"; Option)
+        {
+            Caption = 'Entry Type';
+            OptionMembers = PRIMARY,CHANGE;
+            OptionCaption = 'Primary,Change';
+            DataClassification = CustomerContent;
+        }
+        field(123; "Superseeds Entry No."; Integer)
+        {
+            Caption = 'Superseeds Entry No.';
+            DataClassification = CustomerContent;
+        }
+        field(126; "Is Superseeded"; Boolean)
+        {
+            Caption = 'Is Superseeded';
+            FieldClass = FlowField;
+            CalcFormula = Exist ("NPR TM Ticket Reservation Req." WHERE("Superseeds Entry No." = FIELD("Entry No.")));
+            Editable = false;
+        }
+        field(129; "Authorization Code"; Code[10])
+        {
+            Caption = 'Authorization Code';
+            DataClassification = CustomerContent;
+        }
         field(1000; "Receipt No."; Code[20])
         {
             Caption = 'Receipt No.';
@@ -230,6 +254,10 @@ table 6060116 "NPR TM Ticket Reservation Req."
         }
         key(Key4; "Request Status", "Expires Date Time")
         {
+        }
+        key(Key5; "Superseeds Entry No.")
+        {
+
         }
     }
 

@@ -1,26 +1,5 @@
 codeunit 6060114 "NPR TM Ticket Access Stats"
 {
-    // NPR4.14/TSA/20150803 CASE214262 - Initial Version
-    // TM1.00/TSA /20151217 CASE 228982 NaviPartner Ticket Management
-    // TM1.07/TSA /20160125 CASE 232495 Admission Code as a fact in ticket statistics
-    // TM1.12/TSA /20160407 CASE 230600 Added DAN Captions
-    // TM1.14/TSA /20160520 CASE 240358 Fixed various features witht the RTC version of Access Statistics Matrix
-    // TM1.15/TSA /20160530 CASE 242771 Added a vertical sum (CalcVerticalTotal) function
-    // TM1.17/TSA /20161025 CASE 256152 Conform to OMA Guidelines
-    // TM1.20/TSA /20170314 CASE 263142 Recognize the initial change from 0D to date as an invalid reason for commiting the statistics.
-    // TM1.22/TSA /20170601 CASE 274464 Changing the principal for recognizing last transaction aggregated
-    // TM1.23/TSA /20170719 CASE 279257 Fixed minor issues with blocking facts
-    // TM1.26/TSA /20171120 CASE 293916 Added support for AdmissionDefinition parameter - refactored CalcCount and CalcVerticalTotal
-    // TM1.29/TSA /20180315 CASE 308299 I18 hardcoded date
-    // TM1.33/TSA /20180525 CASE 316468 Only cancelled admissions should count as cancelled, (not cancelled sales)
-    // TM1.36/TSA /20180727 CASE 323024 Added dimension variant code
-    // TM1.36/TSA /20180727 CASE 323400 Added Sum Admission Count (Re-Entry) handling
-    // TM1.39/TSA /20181120 CASE 336823 Fixed a concurrency issue when 2 people update statistics at the exact same time.
-    // TM1.39/TSA /20190103 CASE 341289 Hide lines that have zero count
-    // TM1.39/TSA /20190122 CASE 341335 Expose adhoc statistics to 3rd party.
-    // TM1.42/TSA /20190411 CASE 351050 Supporting different types of revisitor statistics
-
-
     trigger OnRun()
     begin
         BuildCompressedStatistics(Today);
@@ -108,7 +87,6 @@ codeunit 6060114 "NPR TM Ticket Access Stats"
                     PeriodInitialized := true;
                 end;
 
-            //-TM1.36 [323024]
             DimOption::"Variant Code":
                 begin
                     TicketFact.SetFilter("Fact Name", '=%1', TicketFact."Fact Name"::VARIANT_CODE);
@@ -117,15 +95,12 @@ codeunit 6060114 "NPR TM Ticket Access Stats"
                     if (Found) then
                         CopyFactToBuf(TicketFact, DimCodeBuffer);
                 end;
-            //+TM1.36 [323024]
 
             else
                 Error('Unhandled option value in FindRec()');
         end;
 
-        //-TM1.39 [341289]
         DimCodeBuffer.Visible := false;
-        //+TM1.39 [341289]
 
         exit(Found);
     end;
@@ -193,7 +168,6 @@ codeunit 6060114 "NPR TM Ticket Access Stats"
                     if (ResultSteps <> 0) then
                         CopyPeriodToBuf(Period, DimCodeBuffer, PeriodFilter);
                 end;
-            //-TM1.36 [323024]
             DimOption::"Variant Code":
                 begin
                     TicketFact.SetFilter("Fact Name", '=%1', TicketFact."Fact Name"::VARIANT_CODE);
@@ -202,14 +176,13 @@ codeunit 6060114 "NPR TM Ticket Access Stats"
                     if (ResultSteps <> 0) then
                         CopyFactToBuf(TicketFact, DimCodeBuffer);
                 end;
-            //+TM1.36 [323024]
             else
                 Error('Unhandled option value in NextRec()');
         end;
 
-        //-TM1.39 [341289]
+
         DimCodeBuffer.Visible := false;
-        //+TM1.39 [341289]
+
 
         exit(ResultSteps);
     end;
@@ -246,7 +219,7 @@ codeunit 6060114 "NPR TM Ticket Access Stats"
         TicketStatistics: Record "NPR TM Ticket Access Stats";
     begin
 
-        //-TM1.26 [293916] Refactored
+
         TicketStatistics.Reset();
         TicketStatistics.Init();
         SumAdmissionCount := 0;
@@ -267,7 +240,7 @@ codeunit 6060114 "NPR TM Ticket Access Stats"
             1:
                 TicketStatistics.CalcFields("Sum Admission Count", "Sum Admission Count (Neg)");
             2:
-                TicketStatistics.CalcFields("Sum Admission Count", "Sum Admission Count (Re-Entry)"); //-+TM1.36 [323400]
+                TicketStatistics.CalcFields("Sum Admission Count", "Sum Admission Count (Re-Entry)");
         end;
 
         case AdmissionDefinition of
@@ -276,7 +249,7 @@ codeunit 6060114 "NPR TM Ticket Access Stats"
             1:
                 SumAdmissionCount := TicketStatistics."Sum Admission Count" - TicketStatistics."Sum Admission Count (Neg)";
             2:
-                SumAdmissionCount := TicketStatistics."Sum Admission Count" + TicketStatistics."Sum Admission Count (Re-Entry)";//-+TM1.36 [323400]
+                SumAdmissionCount := TicketStatistics."Sum Admission Count" + TicketStatistics."Sum Admission Count (Re-Entry)";
         end;
 
         exit(SumAdmissionCount);
@@ -287,7 +260,7 @@ codeunit 6060114 "NPR TM Ticket Access Stats"
         TicketStatistics: Record "NPR TM Ticket Access Stats";
     begin
 
-        //-TM1.26 [293916] Refactored
+
         TicketStatistics.Reset();
         TicketStatistics.Init();
         AdmissionTotal := 0;
@@ -305,7 +278,7 @@ codeunit 6060114 "NPR TM Ticket Access Stats"
             1:
                 TicketStatistics.CalcFields("Sum Admission Count", "Sum Admission Count (Neg)");
             2:
-                TicketStatistics.CalcFields("Sum Admission Count", "Sum Admission Count (Re-Entry)"); //-+TM1.36 [323400]
+                TicketStatistics.CalcFields("Sum Admission Count", "Sum Admission Count (Re-Entry)");
         end;
 
         case AdmissionDefinition of
@@ -314,7 +287,7 @@ codeunit 6060114 "NPR TM Ticket Access Stats"
             1:
                 AdmissionTotal := TicketStatistics."Sum Admission Count" - TicketStatistics."Sum Admission Count (Neg)";
             2:
-                AdmissionTotal := TicketStatistics."Sum Admission Count" + TicketStatistics."Sum Admission Count (Re-Entry)";//-+TM1.36 [323400]
+                AdmissionTotal := TicketStatistics."Sum Admission Count" + TicketStatistics."Sum Admission Count (Re-Entry)";
         end;
 
         exit(AdmissionTotal);
@@ -352,7 +325,6 @@ codeunit 6060114 "NPR TM Ticket Access Stats"
                         if (AdmissionCount2 <> 0) then
                             CellValue := StrSubstNo('%1 [%2%]', AdmissionCount, Round((AdmissionCount - AdmissionCount2) / AdmissionCount2 * 100, 1));
 
-                        // CellValue := STRSUBSTNO ('%1 [%2] {%3}', AdmissionCount, AdmissionCount2, PeriodFilter);
                     end;
                 DisplayOption::TREND:
                     begin
@@ -396,10 +368,8 @@ codeunit 6060114 "NPR TM Ticket Access Stats"
             FactOption::Period:
                 TicketStatistics.SetFilter("Admission Date", PeriodFilter);
 
-            //-TM1.36 [323024]
             FactOption::"Variant Code":
                 TicketStatistics.SetFilter("Variant Code", '=%1', FactCode);
-            //+TM1.36 [323024]
 
             else
                 Error('Unhandled option value in SetCodeFilter()');
@@ -438,10 +408,8 @@ codeunit 6060114 "NPR TM Ticket Access Stats"
             FactOption::Period:
                 TicketStatistics.SetFilter("Admission Date Filter", PeriodFilter);
 
-            //-TM1.36 [323024]
             FactOption::"Variant Code":
                 TicketStatistics.SetFilter("Variant Code Filter", '=%1', FactCode);
-            //+TM1.36 [323024]
 
             else
                 Error('Unhandled option value in SetCodeFlowFilter()');
@@ -471,8 +439,7 @@ codeunit 6060114 "NPR TM Ticket Access Stats"
 
         if (TrendPeriodType = TrendPeriodType::YEAR) then begin
             PeriodFormMgt.FindDate('', Calendar, PeriodType);
-            TicketStatistics.SetRange("Admission Date Filter", CalcDate('<-1Y>', Calendar."Period Start"),
-                                                                CalcDate('<-1Y>', Calendar."Period End"));
+            TicketStatistics.SetRange("Admission Date Filter", CalcDate('<-1Y>', Calendar."Period Start"), CalcDate('<-1Y>', Calendar."Period End"));
         end;
 
         if TicketStatistics.GetRangeMin("Admission Date Filter") = TicketStatistics.GetRangeMax("Admission Date Filter") then
@@ -510,7 +477,6 @@ codeunit 6060114 "NPR TM Ticket Access Stats"
             if (not Confirm(Text003, true, StrSubstNo('[%1 - %2]', StartDate, MaxDate))) then
                 exit;
 
-            //-TM1.39 [336823] Acquire lock and re-acquire workscope.
             LockResource();
             DoneAggregating := false;
             if (SelectEntries(FirstEntryNo, LastEntryNo, StartDate, MaxDate) = -1) then
@@ -518,11 +484,8 @@ codeunit 6060114 "NPR TM Ticket Access Stats"
 
             if (FirstEntryNo = 0) then
                 exit; // Done, someone else did all work already.
-                      //+TM1.39 [336823]
 
-            //-TM1.39 [341335] All code moved to worker
             BuildCompressedStatisticsWorker(FirstEntryNo, LastEntryNo, false, TmpTicketStatisticsResult);
-            //+TM1.39 [341335]
 
         end;
     end;
@@ -534,7 +497,6 @@ codeunit 6060114 "NPR TM Ticket Access Stats"
         LastEntryNo: Integer;
     begin
 
-        //-TM1.39 [341335]
         if (not TmpTicketStatisticsResult.IsTemporary()) then
             Error('Result table must be temporary.');
 
@@ -553,7 +515,6 @@ codeunit 6060114 "NPR TM Ticket Access Stats"
         TmpTicketStatisticsResult.SetFilter("Admission Date", '<%1|>%2', FromDate, UntilDate);
         TmpTicketStatisticsResult.DeleteAll();
 
-        //+TM1.39 [341335]
     end;
 
     local procedure BuildCompressedStatisticsWorker(FirstEntryNo: Integer; LastEntryNo: Integer; AdHoc: Boolean; var TmpTicketStatisticsResult: Record "NPR TM Ticket Access Stats" temporary)
@@ -570,7 +531,6 @@ codeunit 6060114 "NPR TM Ticket Access Stats"
         ValidEntry: Boolean;
     begin
 
-        //-TM1.39 [341335]
         DetailAccessEntry.Reset;
         DetailAccessEntry.SetRange("Entry No.", FirstEntryNo, LastEntryNo);
         if (not DetailAccessEntry.FindSet()) then
@@ -587,30 +547,21 @@ codeunit 6060114 "NPR TM Ticket Access Stats"
 
         repeat
             if ((DetailAccessEntry.Type = DetailAccessEntry.Type::ADMITTED) or
-                (DetailAccessEntry.Type = DetailAccessEntry.Type::CANCELED) or
+                (DetailAccessEntry.Type = DetailAccessEntry.Type::CANCELED_ADMISSION) or
                 (DetailAccessEntry.Type = DetailAccessEntry.Type::INITIAL_ENTRY)) then begin
-
-                //-TM1.42 [351050]
-                // IF (TicketAccessEntry.GET (DetailAccessEntry."Ticket Access Entry No.")) THEN BEGIN
-                //IsReEntry := CheckForReEntry (DetailAccessEntry);
 
                 ValidEntry := TicketAccessEntry.Get(DetailAccessEntry."Ticket Access Entry No.");
                 ValidEntry := ValidEntry and Ticket.Get(TicketAccessEntry."Ticket No.");
                 ValidEntry := ValidEntry and TicketAdmissionBOM.Get(Ticket."Item No.", Ticket."Variant Code", TicketAccessEntry."Admission Code");
                 if (ValidEntry) then begin
                     IsReEntry := CheckForReEntry(DetailAccessEntry, TicketAdmissionBOM."Revisit Condition (Statistics)");
-                    //+TM1.42 [351050]
 
                     TicketAccessEntry."Access Date" := DT2Date(DetailAccessEntry."Created Datetime");
                     TicketAccessEntry."Access Time" := DT2Time(DetailAccessEntry."Created Datetime");
                     TicketAccessEntry.Quantity := DetailAccessEntry.Quantity;
 
-                    //-TM1.39 [341335] No need for fact in adhoc mode
-                    // AddAccessFact (TicketAccessEntry);
-                    // AddAccessStatistic (TmpTicketStatistics, TicketAccessEntry, DetailAccessEntry."Entry No.", DetailAccessEntry.Type, IsReEntry);
                     if (not AdHoc) then
                         AddAccessFact(TicketAccessEntry);
-                    //+TM1.39 [341335]
 
                     if (GuiAllowed) then begin
                         if (ProgressCurrentCount mod 100 = 0) then begin
@@ -621,15 +572,14 @@ codeunit 6060114 "NPR TM Ticket Access Stats"
                     ProgressCurrentCount += 1;
 
                     if (PreviousAdmissionDate <> DT2Date(DetailAccessEntry."Created Datetime")) then begin
-                        if (PreviousAdmissionDate <> 0D) then begin //-+TM1.20 [263142]
+                        if (PreviousAdmissionDate <> 0D) then begin
                             SaveStatistics(TmpTicketStatistics, AdHoc, TmpTicketStatisticsResult);
                             TmpTicketStatistics.DeleteAll();
                             TmpRecBuf.DeleteAll();
                             Commit;
 
-                            //-TM1.39 [341335] No need to lock resource in adhoc mode,
                             if (not AdHoc) then begin
-                                //-TM1.39 [336823] Acquire lock and re-acquire workscope.
+
                                 LockResource();
                                 ReSelectEntries(FirstEntryNo, LastEntryNo);
                                 DoneAggregating := (FirstEntryNo = 0);
@@ -637,24 +587,16 @@ codeunit 6060114 "NPR TM Ticket Access Stats"
                                     DetailAccessEntry.SetRange("Entry No.", FirstEntryNo, LastEntryNo);
                                     DetailAccessEntry.FindSet();
                                 end;
-                                //+TM1.39 [336823]
-                            end;
 
+                            end;
                         end;
                     end;
 
-                    //-TM1.39 [341335]
-                    //-TM1.42 [351050]
-                    //AddAccessStatistic (TmpTicketStatistics, TicketAccessEntry, DetailAccessEntry."Entry No.", DetailAccessEntry.Type, IsReEntry);
                     AddAccessStatistic(TmpTicketStatistics, TicketAccessEntry, Ticket, DetailAccessEntry."Entry No.", DetailAccessEntry.Type, IsReEntry);
-                    //+TM1.42 [351050]
-                    //+TM1.39 [341335]
-
                     PreviousAdmissionDate := DT2Date(DetailAccessEntry."Created Datetime");
 
                 end;
             end;
-        //UNTIL (DetailAccessEntry.NEXT () = 0);
         until ((DetailAccessEntry.Next() = 0) or (DoneAggregating));
 
         SaveStatistics(TmpTicketStatistics, AdHoc, TmpTicketStatisticsResult);
@@ -692,7 +634,6 @@ codeunit 6060114 "NPR TM Ticket Access Stats"
             TicketFact.Insert();
         end;
 
-        //-TM1.36 [323024]
         // VAriant Code
         FactCode := '';
         if (FactCode = '') then
@@ -710,7 +651,6 @@ codeunit 6060114 "NPR TM Ticket Access Stats"
                 TicketFact.Description := CopyStr(Variant.Description, 1, MaxStrLen(TicketFact.Description));
             TicketFact.Insert();
         end;
-        //+TM1.36 [323024]
 
         // Ticket Type
         FactCode := '';
@@ -776,8 +716,7 @@ codeunit 6060114 "NPR TM Ticket Access Stats"
         DetailAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
     begin
 
-        //-TM1.33 [316468]
-        if (AdmissionType = DetailAccessEntry.Type::CANCELED) then begin
+        if (AdmissionType = DetailAccessEntry.Type::CANCELED_ADMISSION) then begin
             // only cancelled admissions should count as cancelled
             DetailAccessEntry.SetCurrentKey("Ticket Access Entry No.", Type);
             DetailAccessEntry.SetFilter("Ticket Access Entry No.", '=%1', TicketAccessEntry."Entry No.");
@@ -785,26 +724,12 @@ codeunit 6060114 "NPR TM Ticket Access Stats"
             if (DetailAccessEntry.IsEmpty()) then
                 exit;
         end;
-        //+TM1.33 [316468]
-
-        // Item No.,Ticket Type,Admission Date,Admission Hour
-
-        //-TM1.42 [351050]
-        // ItemFactCode := ''; //TicketAccessEntry."Item No.";
-        // IF (ItemFactCode = '') THEN
-        //  IF (Ticket.GET (TicketAccessEntry."Ticket No.")) THEN BEGIN
-        //    ItemFactCode := Ticket."Item No.";
-        //    //-TM1.36 [323024]
-        //    VariantFactCode := Ticket."Variant Code";
-        //    //+TM1.36 [323024]
-        //  END;
 
         ItemFactCode := '';
         if (ItemFactCode = '') then begin
             ItemFactCode := Ticket."Item No.";
             VariantFactCode := Ticket."Variant Code";
         end;
-        //+TM1.42 [351050]
 
         if (ItemFactCode = '') then
             ItemFactCode := '<BLANK>';
@@ -824,10 +749,7 @@ codeunit 6060114 "NPR TM Ticket Access Stats"
         tmpTicketStatistics.SetFilter("Admission Code", '=%1', TicketAccessEntry."Admission Code");
         tmpTicketStatistics.SetFilter("Admission Date", '=%1', TicketAccessEntry."Access Date");
         tmpTicketStatistics.SetFilter("Admission Hour", '=%1', AdmissionHour);
-
-        //-TM1.36 [323024]
         tmpTicketStatistics.SetFilter("Variant Code", '=%1', VariantFactCode);
-        //+TM1.36 [323024]
 
         if (tmpTicketStatistics.FindFirst()) then begin
             SetAdmissionCount(tmpTicketStatistics, AdmissionType, IsReEntry, TicketAccessEntry.Quantity);
@@ -843,9 +765,7 @@ codeunit 6060114 "NPR TM Ticket Access Stats"
             tmpTicketStatistics."Admission Code" := TicketAccessEntry."Admission Code";
             tmpTicketStatistics."Admission Date" := TicketAccessEntry."Access Date";
             tmpTicketStatistics."Admission Hour" := AdmissionHour;
-            //-TM1.36 [323024]
             tmpTicketStatistics."Variant Code" := VariantFactCode;
-            //+TM1.36 [323024]
 
             SetAdmissionCount(tmpTicketStatistics, AdmissionType, IsReEntry, TicketAccessEntry.Quantity);
 
@@ -868,7 +788,7 @@ codeunit 6060114 "NPR TM Ticket Access Stats"
                 TmpTicketStatistics."Admission Count (Re-Entry)" += Abs(AdmissionCount);
         end;
 
-        if (AdmissionType = DetailAccessEntry.Type::CANCELED) then begin
+        if (AdmissionType = DetailAccessEntry.Type::CANCELED_ADMISSION) then begin
             if (not IsReEntry) then
                 TmpTicketStatistics."Admission Count (Neg)" += Abs(AdmissionCount);
         end;
@@ -895,10 +815,7 @@ codeunit 6060114 "NPR TM Ticket Access Stats"
                 Window.Update(1, Text002);
 
             repeat
-                //-TM1.39 [341335]
-                // TicketStatistics.TRANSFERFIELDS (tmpTicketStatistics, FALSE);
-                // TicketStatistics."Entry No." := 0;
-                // TicketStatistics.INSERT ();
+
                 if (not AdHoc) then begin
                     TicketStatistics.TransferFields(tmpTicketStatistics, false);
                     TicketStatistics."Entry No." := 0;
@@ -909,7 +826,6 @@ codeunit 6060114 "NPR TM Ticket Access Stats"
                     TmpAdHocTicketStatistics."Entry No." := AdHocEntryCounter;
                     TmpAdHocTicketStatistics.Insert();
                 end;
-            //+TM1.39 [341335]
 
             until (tmpTicketStatistics.Next() = 0);
         end;
@@ -944,20 +860,16 @@ codeunit 6060114 "NPR TM Ticket Access Stats"
         TicketAdmissionBOM: Record "NPR TM Ticket Admission BOM";
     begin
 
-        //-TM1.42 [351050]
         if (ReEntryOption = TicketAdmissionBOM."Revisit Condition (Statistics)"::NEVER) then
             exit(false);
-        //+TM1.42 [351050]
 
         DetTicketAccessEntry2.SetCurrentKey("Ticket Access Entry No.", Type);
         DetTicketAccessEntry2.SetFilter("Ticket Access Entry No.", '=%1', DetTicketAccessEntry."Ticket Access Entry No.");
         DetTicketAccessEntry2.SetFilter(Type, '=%1', DetTicketAccessEntry.Type);
         DetTicketAccessEntry2.SetFilter("Entry No.", '<%1', DetTicketAccessEntry."Entry No.");
 
-        //-TM1.42 [351050]
         if (ReEntryOption = TicketAdmissionBOM."Revisit Condition (Statistics)"::DAILY_NONINITIAL) then
             DetTicketAccessEntry2.SetFilter("Created Datetime", '>=%1', CreateDateTime(DT2Date(DetTicketAccessEntry."Created Datetime"), 0T));
-        //+TM1.42 [351050]
 
         exit(not DetTicketAccessEntry2.IsEmpty());
     end;
@@ -980,7 +892,7 @@ codeunit 6060114 "NPR TM Ticket Access Stats"
         MaxDate := CalcDate('<-1D>', Today);
 
         // Find from which time to start
-        StartDate := DMY2Date(1, 1, 1900); //010100D;
+        StartDate := DMY2Date(1, 1, 1900);
         StartTime := 0T;
         if (TicketStatistics.Find('+')) then begin
             StartDate := TicketStatistics."Admission Date";
@@ -1023,10 +935,8 @@ codeunit 6060114 "NPR TM Ticket Access Stats"
         DetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
     begin
 
-        //-TM1.39 [336823]
         FirstEntryNo := 0;
         LastEntryNo := 0;
-        //+TM1.39 [336823]
 
         TicketAccessStatistics.SetCurrentKey("Highest Access Entry No.");
 
@@ -1054,7 +964,6 @@ codeunit 6060114 "NPR TM Ticket Access Stats"
         DetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
     begin
 
-        //-TM1.39 [336823]
         FirstEntryNo := 0;
         LastEntryNo := 0;
 
@@ -1073,7 +982,6 @@ codeunit 6060114 "NPR TM Ticket Access Stats"
 
         exit(LastEntryNo);
 
-        //+TM1.39 [336823]
     end;
 
     local procedure LockResource()

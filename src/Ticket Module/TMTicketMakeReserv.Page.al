@@ -71,32 +71,51 @@
 
                     trigger OnDrillDown()
                     begin
-
                         SelectSchedule();
                         CurrPage.Update(false);
                     end;
                 }
-                field("Scheduled Time Description"; "Scheduled Time Description")
+                field(ScheduledTimeDescription_PrimaryRequest; "Scheduled Time Description")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Editable = false;
                     Style = Unfavorable;
                     StyleExpr = gVisualQueueUnfavorable;
+                    Visible = gPrimaryRequestMode;
 
                     trigger OnDrillDown()
                     begin
-
                         SelectSchedule();
                         CurrPage.Update(false);
                     end;
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-
                         SelectSchedule();
                         CurrPage.Update(false);
                     end;
                 }
+                field(ScheduledTimeDescription_ChangeRequest; "Scheduled Time Description")
+                {
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    Editable = false;
+                    Style = Subordinate;
+                    StyleExpr = gDisallowReschedule;
+                    Visible = gChangeRequestMode;
+
+                    trigger OnDrillDown()
+                    begin
+                        SelectSchedule();
+                        CurrPage.Update(false);
+                    end;
+
+                    trigger OnLookup(var Text: Text): Boolean
+                    begin
+                        SelectSchedule();
+                        CurrPage.Update(false);
+                    end;
+                }
+
                 field("Admission Description"; "Admission Description")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
@@ -122,7 +141,6 @@
                         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
                         ResponseMessage: Text;
                     begin
-
                         //-TM1.45 [382535]
                         if ("Admission Inclusion" = "Admission Inclusion"::NOT_SELECTED) then
                             Error(QTY_NOT_EDITABLE);
@@ -355,13 +373,15 @@
                 gConfirmStatusText := STATUS_UNCONFIRMED
             else
                 gConfirmStatusText := STATUS_CONFIRMED;
+
+        gDisallowReschedule := NOT IsRescheduleAllowed("External Adm. Sch. Entry No.");
     end;
 
     trigger OnModifyRecord(): Boolean
     begin
 
         //-TM1.47 [382535]
-        //IF ("Admission Created") THEN
+        //if ("Admission Created") then
         //  ERROR ('Confirmed admissions can not be altered.');
         if (("Request Status" = "Request Status"::CONFIRMED) and ("Admission Created")) then
             Error('Confirmed admissions can not be altered.');
@@ -409,6 +429,11 @@
         NOT_EDITABLE: Label '%1 can not be changed when admission is required.';
         NOT_REQUIRED: Label '%1 can not be chanegd to required when intial value was optional.';
         gIgnoreScheduleFilter: Boolean;
+        gChangeRequestMode: Boolean;
+        gPrimaryRequestMode: Boolean;
+        gDisallowReschedule: Boolean;
+        gTicketRequestEntryNo: Integer;
+        RESCHEDULE_NOT_ALLOWED: Label 'ENU=The reschedule policy disallows change at this time.';
 
     local procedure ChangeQuantity(NewQuantity: Integer)
     var
@@ -449,6 +474,9 @@
         ToDate: Date;
     begin
 
+        if (NOT IsRescheduleAllowed("External Adm. Sch. Entry No.")) then
+            Error(RESCHEDULE_NOT_ALLOWED);
+
         //AdmissionScheduleEntry.FILTERGROUP (2);
         AdmissionScheduleEntry.SetFilter("Admission Code", '=%1', "Admission Code");
         AdmissionScheduleEntry.SetFilter("Admission Start Date", '>=%1', Today);
@@ -477,7 +505,7 @@
         PageAction := PageScheduleEntry.RunModal();
 
         //-TM1.38 [331917]
-        //IF (PageAction = ACTION::Yes) THEN BEGIN
+        //if (PageAction = ACTION::Yes) then begin
         if ((PageAction = ACTION::Yes) or (PageAction = ACTION::LookupOK)) then begin
             //+TM1.38 [331917]
             OldEntryNo := "External Adm. Sch. Entry No.";
@@ -580,8 +608,8 @@
                 //+TM1.45 [322432]
                 end;
 
-                //IF ((ScheduleLine."Max Capacity Per Sch. Entry" - AdmissionSchEntry."Open Reservations" - AdmissionSchEntry."Open Admitted") < TicketReservationRequest.Quantity) THEN
-                //  EXIT (TRUE);
+                //if ((ScheduleLine."Max Capacity Per Sch. Entry" - AdmissionSchEntry."Open Reservations" - AdmissionSchEntry."Open Admitted") < TicketReservationRequest.Quantity) then
+                //  exit (TRUE);
                 exit(Remaining < TicketReservationRequest.Quantity);
                 //+TM1.20 [269171]
             end;
@@ -621,12 +649,20 @@
 
                     end;
                 end;
-            //+TM1.45 [380754]
+                //+TM1.45 [380754]
+
+                if ("Primary Request Line") then
+                    gTicketRequestEntryNo := TicketReservationRequest."Entry No.";
+                if (("Primary Request Line") and (TicketReservationRequest."Entry Type" = TicketReservationRequest."Entry Type"::CHANGE)) then
+                    gTicketRequestEntryNo := TicketReservationRequest."Superseeds Entry No.";
 
             until (TicketReservationRequest.Next() = 0);
         end;
+
         gReservationEdited := false;
         gBatchTicketCreateMode := (Rec."Payment Option" <> Rec."Payment Option"::DIRECT);
+        gChangeRequestMode := ("Entry Type" = "Entry Type"::CHANGE);
+        gPrimaryRequestMode := not gChangeRequestMode;
 
         //-TM1.45 [380754]
         if (ShowDifferentDatesWarning) then
@@ -744,7 +780,7 @@
                 TicketReservationRequest."Admission Inclusion" := Rec."Admission Inclusion"; //-+TM1.45 [382535]
 
                 //-TM1.45 [382535]
-                //TicketReservationRequest.MODIFY ();
+                //TicketReservationRequest.Modify ();
                 if (not TicketReservationRequest."Admission Created") then
                     TicketReservationRequest.Modify();
             //+TM1.45 [382535]
@@ -752,6 +788,79 @@
             until (Rec.Next() = 0);
             TicketRequestManager.SetShowProgressBar(gBatchTicketCreateMode);
             exit(TicketRequestManager.IssueTicketFromReservationToken(Rec."Session Token ID", FailWithError, ResponseMessage));
+        end;
+
+        exit(0);
+    end;
+
+    procedure FinalizeChangeRequest(FailWithError: Boolean; var ResponseMessage: Text): Integer;
+    var
+        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+        TickeChangeRequest: Record "NPR TM Ticket Reservation Req.";
+        TicketBOM: Record "NPR TM Ticket Admission BOM";
+        Ticket: Record "NPR TM Ticket";
+        TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
+        TicketWaitingListMgr: Codeunit "NPR TM Ticket WaitingList Mgr.";
+        TicketManagement: Codeunit "NPR TM Ticket Management";
+        NewTicketRequestEntryNo: Integer;
+    begin
+
+        //-#417417 [417417]
+        if (gDeliverTicketTo <> '') then begin
+            Rec.RESET;
+            if (Rec.FINDSET()) then;
+            repeat
+                TicketReservationRequest.GET(Rec."Entry No.");
+                TicketReservationRequest."Notification Address" := gDeliverTicketTo;
+                if (STRPOS(gDeliverTicketTo, '@') > 0) then
+                    TicketReservationRequest."Notification Method" := TicketReservationRequest."Notification Method"::EMAIL
+                else
+                    TicketReservationRequest."Notification Method" := TicketReservationRequest."Notification Method"::SMS;
+
+                TicketReservationRequest.Modify();
+            until (Rec.NEXT() = 0);
+        end;
+
+        Rec.RESET;
+        Rec.SETFILTER("Scheduled Time Description", '=%1', WAITING_LIST);
+        if (NOT (Rec.ISEMPTY())) then begin
+            ResponseMessage := 'Not in this version: It is not supported to change to a timeslot that is on a waitinglist.';
+            exit(13);
+        end;
+
+        if (gReservationEdited) then begin
+            Rec.RESET();
+
+            // Transfer the changed data
+            Rec.FINDSET();
+            repeat
+                TicketReservationRequest.GET(Rec."Entry No.");
+                TicketReservationRequest."External Adm. Sch. Entry No." := Rec."External Adm. Sch. Entry No.";
+                TicketReservationRequest."Scheduled Time Description" := Rec."Scheduled Time Description";
+                TicketReservationRequest.Modify();
+            until (Rec.NEXT() = 0);
+
+            // Find tickets and update reservations
+            Rec.RESET();
+            Rec.SETFILTER("Primary Request Line", '=%1', TRUE);
+            Rec.FINDFIRST();
+            NewTicketRequestEntryNo := Rec."Entry No.";
+
+            Ticket.SETFILTER("Ticket Reservation Entry No.", '=%1', Rec."Superseeds Entry No.");
+            if (Ticket.FINDSET()) then begin
+                repeat
+                    Rec.RESET();
+                    Rec.FINDSET();
+                    repeat
+                        TicketManagement.RescheduleTicketAdmission(TRUE, Ticket."No.", Rec."External Adm. Sch. Entry No.", TRUE, Rec."Request Status Date Time", ResponseMessage);
+                    until (Rec.NEXT() = 0);
+                until (Ticket.NEXT() = 0);
+
+                // Relink tickets to this request
+                Ticket.MODIFYALL("Ticket Reservation Entry No.", NewTicketRequestEntryNo, FALSE);
+            end;
+
+            TicketRequestManager.ConfirmChangeRequest(Rec."Session Token ID");
         end;
 
         exit(0);
@@ -801,9 +910,9 @@
                     if ((AdmissionScheduleEntry1."Admission Start Date" = AdmissionScheduleEntry2."Admission Start Date") and
                         (Admission.Type = Admission.Type::OCCASION)) then
                         TimeOverlapIssue := (((AdmissionScheduleEntry1."Admission Start Time" >= AdmissionScheduleEntry2."Admission Start Time") and
-                                              (AdmissionScheduleEntry1."Admission Start Time" <= AdmissionScheduleEntry2."Admission End Time")) or
-                                             ((AdmissionScheduleEntry1."Admission End Time" >= AdmissionScheduleEntry2."Admission Start Time") and
-                                              (AdmissionScheduleEntry1."Admission End Time" <= AdmissionScheduleEntry2."Admission End Time")));
+                                              (AdmissionScheduleEntry1."Admission Start Time" <= AdmissionScheduleEntry2."Admission end Time")) or
+                                             ((AdmissionScheduleEntry1."Admission end Time" >= AdmissionScheduleEntry2."Admission Start Time") and
+                                              (AdmissionScheduleEntry1."Admission end Time" <= AdmissionScheduleEntry2."Admission end Time")));
 
                 end;
             end;
@@ -829,6 +938,25 @@
         exit(gIgnoreScheduleFilter);
 
         //+TM90.1.46 [386850]
+    end;
+
+    local procedure IsRescheduleAllowed(ExtAdmSchEntryNo: Integer) RescheduleAllowed: Boolean;
+    var
+        Ticket: Record 6059785;
+        TicketManagement: Codeunit 6059784;
+    begin
+
+        //-#417417 [417417]
+        RescheduleAllowed := TRUE;
+
+        if (gChangeRequestMode) then begin
+            Ticket.SETFILTER("Ticket Reservation Entry No.", '=%1', gTicketRequestEntryNo);
+            if (Ticket.FINDFIRST()) then
+                RescheduleAllowed := TicketManagement.IsRescheduleAllowed(Ticket."External Ticket No.", ExtAdmSchEntryNo, CURRENTDATETIME());
+        end;
+
+        exit(RescheduleAllowed);
+        //+#417417 [417417]
     end;
 }
 
