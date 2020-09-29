@@ -1,42 +1,17 @@
 codeunit 6060118 "NPR TM Admission Sch. Mgt."
 {
-    // NPR4.16/TSA/20151026 CASE 219658 Initial Version
-    // TM1.00/TSA/20151217  CASE 228982 NaviPartner Ticket Management
-    // TM1.11/TSA/20160325  CASE 237486 Added hard enddate endtime
-    // TM1.11/BR/20160331   CASE 237850 Changed recurrance calculation, added support for ONCE
-    // TM1.11/TSA/20160404  CASE 232250 Populate new field 47 and 48
-    // TM1.12/TSA/20160407  CASE 230600 Added DAN Captions
-    // TM1.16/TSA/20160714  CASE 245004 Added function to create the notification list
-    // TM1.17/TSA/20160916  CASE 245004 Added admission description to worksheet entry
-    // TM1.17/TSA/20161025  CASE 256205 Changed the isIdentical to not include bookable before/after to make it overrideable
-    // TM1.19/TSA/20170213  CASE 265771 Refactored
-    // TM1.21/TSA/20170505  CASE 271405 Schedule Entries can now own its open/close status will be lost on force generate from RTC page
-    // TM1.21/TSA/20170504  CASE 274828 Added some robustness to handle data integrity failure
-    // TM1.21/TSA/20170515  CASE 267611 Added a new date field "Schedule Generated At" determin when the schedule line was last examined for an entry
-    // TM1.21/TSA/20170515  CASE 267611 New function IsUpdateScheduleEntryRequired ()
-    // TM1.23/TSA/20170623  CASE 280612 Ignore lines with "Regenerate With" Manual
-    // TM1.25/TSA /20170824 CASE 288396 Added a conditional modify, added a filter on Cancel
-    // TM1.28/TSA /20180131 CASE 303925 Added Base Calendar from Admission to manage non-working (closed) days
-    // TM1.28/TSA /20180221 CASE 306039 Added "Visibility On Web" field
-    // #308299/TSA /20180315 CASE 308299 I18 hardcoded date
-    // TM1.37/TSA /20180905 CASE 327324 Added fields for better control of arrival window
-    // TM1.45/TSA /20191120 CASE 378212 Added the sales cut-off date
-    // TM1.47/TSA /20200508 CASE 403559 Added possibility to schedule the schedule creation by task queue
-
 
     trigger OnRun()
     var
         Admission: Record "NPR TM Admission";
     begin
 
-        //-TM1.47 [403559]
         if (Admission.FindSet()) then begin
             repeat
                 Commit;
                 CreateAdmissionSchedule(Admission."Admission Code", false, Today);
             until (Admission.Next() = 0);
         end;
-        //+TM1.47 [403559]
     end;
 
     var
@@ -79,14 +54,12 @@ codeunit 6060118 "NPR TM Admission Sch. Mgt."
                 until (AdmissionScheduleLines.Next() = 0);
             end;
 
-            //-TM1.21 [267611]
             if (not Regenerate) then begin
                 if ((GenerateUntilDate > AdmissionScheduleLines."Schedule Generated Until") and
                     (AdmissionScheduleLines."Schedule Generated Until" > Today)) then
                     GenerateFromDate := AdmissionScheduleLines."Schedule Generated Until";
             end;
             //MESSAGE ('%1 from %2 until %3', AdmissionScheduleLines."Schedule Code", GenerateFromDate, GenerateUntilDate);
-            //+TM1.21 [267611]
 
             // Start generating entries
             DateRecord.Reset();
@@ -119,7 +92,6 @@ codeunit 6060118 "NPR TM Admission Sch. Mgt."
     var
         AdmissionScheduleLines: Record "NPR TM Admis. Schedule Lines";
     begin
-        //-TM1.21
         if (ReferenceDate = 0D) then
             ReferenceDate := Today;
 
@@ -127,14 +99,13 @@ codeunit 6060118 "NPR TM Admission Sch. Mgt."
         AdmissionScheduleLines.SetFilter(Blocked, '=%1', false);
         AdmissionScheduleLines.SetFilter("Schedule Generated At", '<%1', ReferenceDate);
         exit(not AdmissionScheduleLines.IsEmpty());
-        //+TM1.21
     end;
 
     procedure GetRecurrenceEndDate(StartDate: Date; Occurences: Integer; RecurrencePattern: Option WEEKLY,DAILY) EndDate: Date
     var
         Pattern: Code[20];
     begin
-        //-TM1.11
+
         if (Occurences = 0) then
             Occurences := 1;
 
@@ -143,7 +114,7 @@ codeunit 6060118 "NPR TM Admission Sch. Mgt."
             Pattern := StrSubstNo('<CW+%1D>', 7 * (Occurences - 1));
 
         EndDate := CalcDate(Pattern, StartDate);
-        //+TM1.11
+
     end;
 
     local procedure GenerateScheduleEntry(AdmissionScheduleLines: Record "NPR TM Admis. Schedule Lines"; Regenerate: Boolean; GenerateForDate: Date; var TmpAdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry" temporary)
@@ -165,15 +136,10 @@ codeunit 6060118 "NPR TM Admission Sch. Mgt."
 
         if (not CalculateScheduleDateRange(AdmissionScheduleLines, GenerateForDate, 0D, true, ScheduleStartDate, ScheduleEndDate)) then begin
             // This schedule has expired in some way
-            //-TM1.25 [288396]
-            // AdmissionScheduleLines."Schedule Generated At" := TODAY;
-            // AdmissionScheduleLines.MODIFY ();
             if (AdmissionScheduleLines."Schedule Generated At" <> Today) then begin
                 AdmissionScheduleLines."Schedule Generated At" := Today;
                 AdmissionScheduleLines.Modify();
             end;
-            //+TM1.25 [288396]
-
             exit;
         end;
 
@@ -265,8 +231,6 @@ codeunit 6060118 "NPR TM Admission Sch. Mgt."
 
         Admission.Get(AdmissionScheduleLines."Admission Code");
         Schedule.Get(AdmissionScheduleLines."Schedule Code");
-
-        //AdmissionScheduleLines."Schedule Generated Until"
 
         // setup start and enddate
         StartDate := ReferenceDate;
@@ -364,16 +328,13 @@ codeunit 6060118 "NPR TM Admission Sch. Mgt."
                 "Event Duration" := Schedule."Event Duration";
             end;
 
-            //-TM1.37 [327324]
             // will be deprecated
             "Unbookable Before Start (Secs)" := AdmissionScheduleLines."Unbookable Before Start (Secs)";
             "Bookable Passed Start (Secs)" := AdmissionScheduleLines."Bookable Passed Start (Secs)";
             // new fields
             "Event Arrival From Time" := AdmissionScheduleLines."Event Arrival From Time";
             "Event Arrival Until Time" := AdmissionScheduleLines."Event Arrival Until Time";
-            //+TM1.37 [327324]
 
-            //-TM1.45 [378212]
             if (Format(AdmissionScheduleLines."Sales From Date (Rel.)") <> '') then
                 "Sales From Date" := CalcDate(AdmissionScheduleLines."Sales From Date (Rel.)", "Admission Start Date");
 
@@ -394,17 +355,13 @@ codeunit 6060118 "NPR TM Admission Sch. Mgt."
             if (("Sales From Date" = "Admission Start Date") and ("Sales From Time" > "Admission End Time")) then
                 "Sales From Time" := "Admission Start Time";
 
-            //+TM1.45 [378212]
 
             "Max Capacity Per Sch. Entry" := AdmissionScheduleLines."Max Capacity Per Sch. Entry";
 
             "Admission Is" := Schedule."Admission Is";
 
-            //-TM1.28 [306039]
             "Visibility On Web" := AdmissionScheduleLines."Visibility On Web";
-            //+TM1.28 [306039]
 
-            //-TM1.28 [303925]
             if ((Admission."Admission Base Calendar Code" <> '') and ("Admission Is" = "Admission Is"::OPEN)) then begin
                 CustomizedCalendarChangeTemp.Init();
                 CustomizedCalendarChangeTemp."Source Type" := CustomizedCalendarChangeTemp."Source Type"::Location;
@@ -449,7 +406,6 @@ codeunit 6060118 "NPR TM Admission Sch. Mgt."
                 if (CustomizedCalendarChangeTemp.Nonworking) then
                     "Admission Is" := Schedule."Admission Is"::CLOSED;
             end;
-            //+TM1.28 [303925]
 
             Cancelled := false;
             "Reason Code" := 'NTE'; // New Time Entry
@@ -465,7 +421,6 @@ codeunit 6060118 "NPR TM Admission Sch. Mgt."
         UniqKey: Text;
     begin
 
-        //-#260812 [260812]
         // is there a manual override?
         AdmissionScheduleEntry.SetFilter("Admission Code", '=%1', AdmissionCode);
         AdmissionScheduleEntry.SetFilter("Admission Start Date", '=%1', ReferenceDate);
@@ -477,7 +432,6 @@ codeunit 6060118 "NPR TM Admission Sch. Mgt."
             exit(true); // Ignore this line by saying a idenical line exist.
 
         AdmissionScheduleEntry.Reset();
-        //+#260812 [260812]
 
         if (TmpAdmissionScheduleEntry.IsEmpty()) then begin
             AdmissionScheduleEntry.SetFilter("Admission Code", '=%1', AdmissionCode);
@@ -515,7 +469,6 @@ codeunit 6060118 "NPR TM Admission Sch. Mgt."
                     exit(false);
 
             UniqKey := GetIdentifyingString(TmpAdmissionScheduleEntry);
-        // PreviousAdmissionScheduleEntry.COPY (TmpAdmissionScheduleEntry);
 
         until (TmpAdmissionScheduleEntry.Next() = 0);
 
@@ -570,8 +523,6 @@ codeunit 6060118 "NPR TM Admission Sch. Mgt."
             AdmissionScheduleEntry."Admission Code",
             AdmissionScheduleEntry."Admission Start Date",
             AdmissionScheduleEntry."Admission Start Time")
-          //AdmissionScheduleEntry."Admission Is")
-          //AdmissionScheduleEntry.Cancelled)
           );
     end;
 
@@ -599,7 +550,6 @@ codeunit 6060118 "NPR TM Admission Sch. Mgt."
     begin
 
         AdmissionScheduleEntry.SetFilter("Admission Code", '=%1', TmpAdmissionScheduleEntry."Admission Code");
-        //AdmissionScheduleEntry.SETFILTER ("Schedule Code", '=%1', TmpAdmissionScheduleEntry."Schedule Code"); //267611
         AdmissionScheduleEntry.SetFilter("Admission Start Date", '=%1', TmpAdmissionScheduleEntry."Admission Start Date");
         AdmissionScheduleEntry.SetFilter("Admission Start Time", '=%1', TmpAdmissionScheduleEntry."Admission Start Time");
 
@@ -621,9 +571,12 @@ codeunit 6060118 "NPR TM Admission Sch. Mgt."
         AdmissionScheduleEntry.SetFilter("Schedule Code", '=%1', ScheduleCode);
         AdmissionScheduleEntry.SetFilter("Admission Start Date", '%1..%2', FromDate, ToDate);
         AdmissionScheduleEntry.SetFilter(Cancelled, '=%1', false);
-
         AdmissionScheduleEntry.ModifyAll("Reason Code", 'CTE01');
         AdmissionScheduleEntry.ModifyAll(Cancelled, true);
+
+        AdmissionScheduleEntry.SetFilter("Admission Start Date", '>%1', ToDate);
+        AdmissionScheduleEntry.ModifyALL("Reason Code", 'CTE01B');
+        AdmissionScheduleEntry.ModifyALL(Cancelled, TRUE);
     end;
 
     local procedure GetHighestDateEntry(AdmissionCode: Code[20]; ScheduleCode: Code[20]; ReferenceDate: Date): Date
@@ -651,10 +604,6 @@ codeunit 6060118 "NPR TM Admission Sch. Mgt."
         if (AdmissionScheduleEntry1.Cancelled <> AdmissionScheduleEntry2.Cancelled) then exit(false);
 
         exit(true);
-    end;
-
-    local procedure "--"()
-    begin
     end;
 
     procedure CreateNotificationList(ScheduleEntryNo: Integer)
@@ -719,11 +668,8 @@ codeunit 6060118 "NPR TM Admission Sch. Mgt."
             Ticket.Get(DetTicketAccessEntry."Ticket No.");
             Admission.Get(TicketAccessEntry."Admission Code");
 
-            //-TM1.21 [274828]
-            //TicketReservationRequest.GET (Ticket."Ticket Reservation Entry No.");
             if (not TicketReservationRequest.Get(Ticket."Ticket Reservation Entry No.")) then
                 Clear(TicketReservationRequest);
-            //-TM1.21 [274828]
 
             TmpTicketParticipantWks.Init;
             EntryCount += 1;
@@ -738,7 +684,6 @@ codeunit 6060118 "NPR TM Admission Sch. Mgt."
             TmpTicketParticipantWks."Det. Ticket Access Entry No." := DetTicketAccessEntry."Entry No.";
 
             /// the source is the last schedule entry and its not canceled - reminder
-            ///if (RescheduleToScheduleEntry.Cancelled = false) and (ScheduleEntryNo = RescheduleToScheduleEntry."Entry No.") then
             // Default is reminder
             TmpTicketParticipantWks."Notification Type" := TmpTicketParticipantWks."Notification Type"::REMINDER;
 
@@ -767,13 +712,10 @@ codeunit 6060118 "NPR TM Admission Sch. Mgt."
 
             TmpTicketParticipantWks."Notifcation Created At" := CurrentDateTime();
 
-            //-TM1.21 [274828]
             if (TicketAccessEntry.Status = TicketAccessEntry.Status::ACCESS) then
                 TmpTicketParticipantWks.Insert();
-        //+TM1.21 [274828]
 
         until (DetTicketAccessEntry.Next() = 0);
-
 
         /// Mark duplicate notification address as duplicate
         TmpTicketParticipantWks.Reset();

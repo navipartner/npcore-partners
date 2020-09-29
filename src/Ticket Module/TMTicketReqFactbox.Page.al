@@ -16,11 +16,28 @@
             {
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
             }
+
+            field("Entry Type"; "Entry Type")
+            {
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+            }
+
+            field("Superseeds Entry No."; "Superseeds Entry No.")
+            {
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                Visible = false;
+            }
             field("Session Token ID"; "Session Token ID")
             {
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Visible = false;
             }
+
+            field("Authorization Code"; "Authorization Code")
+            {
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+            }
+
             field("Created Date Time"; "Created Date Time")
             {
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;

@@ -1,11 +1,5 @@
 codeunit 6060113 "NPR TM Ticket DIY Ticket Print"
 {
-    // TM1.26/TSA /20171101 CASE 276843 Initial Version
-    // TM1.26/TSA /20171122  CASE 285601-01 Transport TM1.26 - 22 November 2017
-    // TM1.27/TSA /20171218 CASE 300395 Added setup Timeout (ms)
-    // TM1.43/TSA /20191004 CASE 367471 refactored signatures to return fault message
-    // TM90.1.46/TSA /20200127 CASE 387138 Added CheckPublishTicketUrl(), CheckSendTicketUrl(), PublishTicketUrl(), SendTicketUrl()
-    // 
     // 
     // *** TICKET SERVER setup ***
     //   http://test.ticket.navipartner.dk/import/api/rest/v1/ticket/orders
@@ -33,20 +27,23 @@ codeunit 6060113 "NPR TM Ticket DIY Ticket Print"
     var
         GEN_NOT_ISSUE: Label 'There was a problem creating the notification entry.';
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="TicketNo"></param>
+    /// <returns></returns>
     procedure CheckPublishTicketUrl(TicketNo: Code[20]): Boolean
     var
         Ticket: Record "NPR TM Ticket";
         TicketBOM: Record "NPR TM Ticket Admission BOM";
     begin
 
-        //-TM90.1.46 [387138]
         if (not Ticket.Get(TicketNo)) then
             exit(false);
 
         TicketBOM.SetFilter("Item No.", '=%1', Ticket."Item No.");
         TicketBOM.SetFilter("Publish Ticket URL", '>=%1', TicketBOM."Publish Ticket URL"::PUBLISH);
         exit(not TicketBOM.IsEmpty);
-        //+TM90.1.46 [387138]
     end;
 
     procedure PublishTicketUrl(TicketNo: Code[20]; var ResponseMessage: Text): Boolean
@@ -54,12 +51,11 @@ codeunit 6060113 "NPR TM Ticket DIY Ticket Print"
         Ticket: Record "NPR TM Ticket";
     begin
 
-        //-TM90.1.46 [387138]
         if (not Ticket.Get(TicketNo)) then
             exit(false);
 
         exit(GenerateTicketPrint(Ticket."Ticket Reservation Entry No.", true, ResponseMessage));
-        //+TM90.1.46 [387138]
+
     end;
 
     procedure CheckSendTicketUrl(TicketNo: Code[20]): Boolean
@@ -68,14 +64,13 @@ codeunit 6060113 "NPR TM Ticket DIY Ticket Print"
         TicketBOM: Record "NPR TM Ticket Admission BOM";
     begin
 
-        //-TM90.1.46 [387138]
         if (not Ticket.Get(TicketNo)) then
             exit(false);
 
         TicketBOM.SetFilter("Item No.", '=%1', Ticket."Item No.");
         TicketBOM.SetFilter("Publish Ticket URL", '=%1', TicketBOM."Publish Ticket URL"::SEND);
         exit(not TicketBOM.IsEmpty);
-        //+TM90.1.46 [387138]
+
     end;
 
     procedure SendTicketUrl(TicketNo: Code[20]; var ResponseMessage: Text): Boolean
@@ -112,11 +107,8 @@ codeunit 6060113 "NPR TM Ticket DIY Ticket Print"
         if (TicketReservationRequest."DIY Print Order Requested") then
             exit(true);
 
-        //-TM1.43 [367471]
-        //CreatTicketPrintOrderXml (TicketRequestXml, TicketReservationRequest."Session Token ID", MarkTicketAsPrinted);
         if (not CreatTicketPrintOrderXml(TicketRequestXml, TicketReservationRequest."Session Token ID", MarkTicketAsPrinted, FailReasonText)) then
             exit(false);
-        //+TM1.43 [367471]
 
         if (WebServiceApi(FailReasonText, TicketRequestXml, ServiceResponse)) then begin
             FailReasonText := '';
@@ -163,6 +155,7 @@ codeunit 6060113 "NPR TM Ticket DIY Ticket Print"
     var
         Ticket: Record "NPR TM Ticket";
         TicketSetup: Record "NPR TM Ticket Setup";
+        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         FailReason: Text;
     begin
 
@@ -175,6 +168,13 @@ codeunit 6060113 "NPR TM Ticket DIY Ticket Print"
             Error(FailReason);
 
         HyperLink(StrSubstNo('%1%2', TicketSetup."Print Server Ticket URL", Ticket."External Ticket No."));
+        TicketReservationRequest.GET(Ticket."Ticket Reservation Entry No.");
+        case TicketReservationRequest."Entry Type" of
+            TicketReservationRequest."Entry Type"::PRIMARY:
+                HYPERLINK(STRSUBSTNO('%1%2', TicketSetup."Print Server Ticket URL", Ticket."External Ticket No."));
+            TicketReservationRequest."Entry Type"::CHANGE:
+                HYPERLINK(STRSUBSTNO('%1%2-%3', TicketSetup."Print Server Ticket URL", Ticket."External Ticket No.", Ticket."Ticket Reservation Entry No."));
+        end;
     end;
 
     procedure ValidateSetup(): Boolean
@@ -225,12 +225,9 @@ codeunit 6060113 "NPR TM Ticket DIY Ticket Print"
         ReasonText := '';
         HttpWebRequest := HttpWebRequest.Create(Url);
 
-        //-TM1.27 [300395]
-        //HttpWebRequest.Timeout := 2000;
         HttpWebRequest.Timeout := 10000;
         if (TicketSetup."Timeout (ms)" > 0) then
             HttpWebRequest.Timeout := TicketSetup."Timeout (ms)";
-        //+TM1.27 [300395]
 
         HttpWebRequest.KeepAlive(false);
 
@@ -338,7 +335,6 @@ codeunit 6060113 "NPR TM Ticket DIY Ticket Print"
             StatusCode := Format(StatusCodeInt);
             StatusDescription := HttpWebResponse.StatusDescription;
             if ((StatusCode[1] = '4') and (StatusCode <> '400')) then
-                // IF (StatusCode[1] = '4') THEN // 4xx messages do not normally carry a body
                 exit;
         end;
 
@@ -387,11 +383,8 @@ codeunit 6060113 "NPR TM Ticket DIY Ticket Print"
     begin
         TempBlob.CreateOutStream(OutStr, TEXTENCODING::UTF8);
 
-        //-TM1.43 [367471]
-        //TicketTicketServerRequest.SetRequestEntryNo (Token, MarkTicketAsPrinted);
         if (not TicketTicketServerRequest.SetRequestEntryNo(Token, MarkTicketAsPrinted, FailureReason)) then
             exit(false);
-        //+TM1.43 [367471]
 
         TicketTicketServerRequest.SetDestination(OutStr);
         TicketTicketServerRequest.Export;
@@ -408,9 +401,7 @@ codeunit 6060113 "NPR TM Ticket DIY Ticket Print"
 
         if (UserId = 'TSA') then Message(CopyStr(XmlText, 1, 1024));
 
-        //-TM1.43 [367471]
         exit(true);
-        //+TM1.43 [367471]
     end;
 
     local procedure WebExceptionResponse(var XmlDoc: DotNet "NPRNetXmlDocument"; var ErrorCode: Code[10]; var ErrorText: Text): Boolean

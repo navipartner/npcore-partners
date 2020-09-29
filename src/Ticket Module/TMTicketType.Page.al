@@ -1,16 +1,5 @@
 ﻿page 6059784 "NPR TM Ticket Type"
 {
-    // TM1.00/TSA/20150804  CASE 219658 - Added new fields
-    // TM1.00/TSA/20151217  CASE 219658-01 NaviPartner Ticket Management
-    // TM1.03/TSA/20160113  CASE 231260 Added new fields "Admission Registration"
-    // TM1.12/TSA/20160407  CASE 230600 Added DAN Captions
-    // TM1.15/TSA/20160530  CASE 240831 Field 40 default true, hidden
-    // TM1.16/TSA/20160816  CASE 245455 Transport TM1.16 - 19 July 2016
-    // #258974/TSA/20161121  CASE 258974 Page Navigation enhancements -
-    // TM1.18/TSA/20161220  CASE 261405 Added support for ticket to membership cross reference
-    // TM1.26/NPKNAV/20171122  CASE 285601-01 Transport TM1.26 - 22 November 2017
-    // TM1.27/TSA /20180125 CASE 269456 Print template support in Ticket module.
-    // TM1.38/TSA /20181012 CASE 332109 Added NP-Pass fields/Functions
 
     Caption = 'Ticket Type';
     PageType = List;
@@ -112,6 +101,89 @@
 
     actions
     {
+        area(processing)
+        {
+            action("Edit Pass Template")
+            {
+                ToolTip = 'Define information sent to wallet.';
+                ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
+                Caption = 'Edit Pass Template';
+                Image = Template;
+                Promoted = true;
+                PromotedIsBig = true;
+                Visible = not WebClient;
+
+                trigger OnAction()
+                begin
+                    EditPassTemplate();
+                end;
+            }
+
+            action("Export Wallet Template File")
+            {
+                Caption = 'Export Wallet Template File';
+                ToolTip = 'Exports the default or current template used to send information to wallet.';
+                Image = ExportAttachment;
+                Visible = WebClient;
+                ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
+
+                trigger OnAction()
+                var
+                    TempBlob: Codeunit "Temp Blob";
+                    FileMgt: Codeunit "File Management";
+                    TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
+                    Path: Text;
+                    PassData: Text;
+                    TemplateOutStream: outstream;
+                begin
+                    CalcFields("eTicket Template");
+                    if (not "eTicket Template".HasValue()) then begin
+                        PassData := TicketRequestManager.GetDefaultTemplate();
+                        "eTicket Template".CreateOutStream(TemplateOutStream);
+                        TemplateOutStream.Write(PassData);
+                        Modify();
+                        CalcFields("eTicket Template");
+                    end;
+
+                    TempBlob.FromRecord(Rec, FieldNo("eTicket Template"));
+                    if (not TempBlob.HasValue()) then
+                        exit;
+                    Path := FileMgt.BLOBExport(TempBlob, TemporaryPath + StrSubstNo('%1 - %2.json', Code, Description), true);
+
+                end;
+            }
+            action("Import File")
+            {
+                Caption = 'Import Wallet Template File';
+                ToolTip = 'Define information sent to wallet.';
+                Image = ImportCodes;
+                Visible = WebClient;
+                ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
+
+                trigger OnAction()
+                var
+                    TempBlob: Codeunit "Temp Blob";
+                    FileMgt: Codeunit "File Management";
+                    Path: Text;
+                    FileName: Text;
+                    RecRef: RecordRef;
+                begin
+                    FileName := FileMgt.BLOBImportWithFilter(TempBlob, IMPORT_FILE, '', 'Template Files (*.json)|*.json', 'json');
+
+                    if (FileName = '') then
+                        exit;
+
+                    RecRef.GetTable(Rec);
+                    TempBlob.ToRecordRef(RecRef, Rec.FieldNo("eTicket Template"));
+                    RecRef.SetTable(Rec);
+
+                    Modify(true);
+                    Clear(TempBlob);
+
+                end;
+            }
+
+        }
         area(navigation)
         {
             action("Ticket Setup")
@@ -187,26 +259,19 @@
                 RunPageView = WHERE("Table No." = CONST(6060110));
 
             }
-            action("Edit Pass Template")
-            {
-                ToolTip = 'Define information sent to wallet.';
-                ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
-                Caption = 'Edit Pass Template';
-                Image = Template;
-                Promoted = true;
-                PromotedIsBig = true;
 
-
-                trigger OnAction()
-                begin
-                    EditPassTemplate();
-                end;
-            }
         }
     }
 
+    trigger OnOpenPage()
+    begin
+        WebClient := IsWebClient();
+    end;
+
     var
+        IMPORT_FILE: Label 'Import File';
         FileManagement: Codeunit "File Management";
+        Webclient: Boolean;
 
     procedure HideTickets()
     begin
@@ -218,6 +283,15 @@
 
         Rec.EditPassTemplate();
         CurrPage.Update(true);
+    end;
+
+    local procedure IsWebClient(): Boolean
+    var
+        ActiveSession: Record "Active Session";
+    begin
+        if ActiveSession.Get(ServiceInstanceId, SessionId) then
+            exit(ActiveSession."Client Type" = ActiveSession."Client Type"::"Web Client");
+        exit(false);
     end;
 }
 

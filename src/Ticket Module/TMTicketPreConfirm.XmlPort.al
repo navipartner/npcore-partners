@@ -61,7 +61,8 @@ xmlport 6060115 "NPR TM Ticket PreConfirm"
                             begin
 
                                 //-TM1.48 [415894]
-                                AtUTC := Format(CurrentDateTime() + (tmpTicketReservationResponse."Exires (Seconds)" - 1) * 1000, 0, 9);
+                                IF (tmpTicketReservationResponse.Status) THEN
+                                    AtUTC := Format(CurrentDateTime() + (tmpTicketReservationResponse."Exires (Seconds)" - 1) * 1000, 0, 9);
                                 //+TM1.48 [415894]
                             end;
                         }

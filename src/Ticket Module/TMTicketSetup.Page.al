@@ -18,6 +18,13 @@
     {
         area(content)
         {
+            group(General)
+            {
+                field("Authorization Code Scheme"; "Authorization Code Scheme")
+                {
+                    ApplicationArea = NPRTicketEssentials, NPRTicketAdvanced;
+                }
+            }
             group("Ticket Print")
             {
                 field("Print Server Generator URL"; "Print Server Generator URL")

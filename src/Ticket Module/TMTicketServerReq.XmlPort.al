@@ -20,6 +20,7 @@ xmlport 6060123 "NPR TM Ticket Server Req."
             {
                 XmlName = 'ticket_order';
                 UseTemporary = true;
+
                 fieldattribute(order_uid; TmpTicketReservationRequest."Session Token ID")
                 {
                 }
@@ -29,7 +30,7 @@ xmlport 6060123 "NPR TM Ticket Server Req."
                     LinkTable = TmpTicketReservationRequest;
                     XmlName = 'ticket';
                     UseTemporary = true;
-                    fieldattribute(ticket_uid; TmpTicket."External Ticket No.")
+                    textattribute(ticket_uid)
                     {
                     }
                     fieldelement(barcode; TmpTicket."Ticket No. for Printing")
@@ -52,12 +53,6 @@ xmlport 6060123 "NPR TM Ticket Server Req."
                     }
                     textelement(ticket_title)
                     {
-
-                        trigger OnBeforePassVariable()
-                        var
-                            Item: Record Item;
-                        begin
-                        end;
                     }
                     fieldelement(purchased_date; TmpTicket."Document Date")
                     {
@@ -101,89 +96,15 @@ xmlport 6060123 "NPR TM Ticket Server Req."
                     textelement(ticket_full_description)
                     {
                     }
+                    textelement(pincode)
+                    {
+                    }
 
                     trigger OnAfterGetRecord()
                     var
                         Customer: Record Customer;
                         TicketType: Record "NPR TM Ticket Type";
                     begin
-
-                        //-TM1.48 [399259] Refactored
-                        //
-                        // GeneralLedgerSetup.GET ();
-                        //
-                        // //-TM1.43 [367471]
-                        // // TicketSetup.GET ();
-                        // // TicketSetup.TESTFIELD ("Default Ticket Language");
-                        // //
-                        // // TicketType.GET (TmpTicket."Ticket Type Code");
-                        // // TicketType.TESTFIELD ("DIY Print Layout Code");
-                        //
-                        // TicketType.GET (TmpTicket."Ticket Type Code");
-                        // //+TM1.43 [367471]
-                        //
-                        // Item.GET (TmpTicket."Item No.");
-                        //
-                        // TicketBOM.SETFILTER ("Item No.", '=%1', TmpTicket."Item No.");
-                        // TicketBOM.SETFILTER ("Variant Code", '=%1', TmpTicket."Variant Code");
-                        // TicketBOM.SETFILTER (Default, '=%1', TRUE);
-                        // IF (NOT TicketBOM.FINDFIRST ()) THEN
-                        //  TicketBOM.SETFILTER (Default, '=%1', FALSE);
-                        // TicketBOM.FINDFIRST ();
-                        // Admission.GET (TicketBOM."Admission Code");
-                        //
-                        // // default
-                        // language := TicketSetup."Default Ticket Language";
-                        //
-                        // //-TM1.35 [320783]
-                        // //visit_date := STRSUBSTNO ('%1 %2', TmpTicket."Valid From Date", TmpTicket."Valid From Time");
-                        // //visit_end_date := STRSUBSTNO ('%1 %2', TmpTicket."Valid To Date", TmpTicket."Valid To Time");
-                        // visit_date := FORMAT (TmpTicket."Valid From Date", 0, 9);
-                        // visit_end_date := FORMAT (TmpTicket."Valid To Date", 0,9);
-                        // //+TM1.35 [320783]
-                        //
-                        // ticket_title := Item.Description;
-                        // price := STRSUBSTNO ('%1 %2', Item."Unit Price", GeneralLedgerSetup."LCY Code");
-                        //
-                        // //-TM1.35 [320783]
-                        // //valid_from := FORMAT (CREATEDATETIME (TmpTicket."Valid From Date", TmpTicket."Valid From Time"), 0, 9);
-                        // //valid_to  := FORMAT (CREATEDATETIME (TmpTicket."Valid To Date", TmpTicket."Valid To Time"), 0, 9);
-                        // valid_from := FORMAT (TmpTicket."Valid From Date", 0, 9);
-                        // valid_to  := FORMAT (TmpTicket."Valid To Date", 0, 9);
-                        //
-                        // //+TM1.35 [320783]
-                        //
-                        // DetTicketAccessEntry.SETFILTER ("Ticket No.", '=%1', TmpTicket."No.");
-                        // DetTicketAccessEntry.SETFILTER (Type, '=%1', DetTicketAccessEntry.Type::RESERVATION);
-                        // IF (DetTicketAccessEntry.FINDFIRST ()) THEN BEGIN
-                        //  AdmissionScheduleEntry.SETFILTER ("External Schedule Entry No.", '=%1', DetTicketAccessEntry."External Adm. Sch. Entry No.");
-                        //  IF (AdmissionScheduleEntry.FINDFIRST ()) THEN BEGIN
-                        //
-                        //    //-TM1.35 [320783]
-                        //    //visit_date := STRSUBSTNO ('%1 %2', AdmissionScheduleEntry."Admission Start Date", AdmissionScheduleEntry."Admission Start Time");
-                        //    //visit_end_date := STRSUBSTNO ('%1 %2', AdmissionScheduleEntry."Admission End Date", AdmissionScheduleEntry."Admission End Time");
-                        //    visit_date := STRSUBSTNO ('%1 %2', FORMAT (AdmissionScheduleEntry."Admission Start Date", 0, 9), FORMAT (AdmissionScheduleEntry."Admission Start Time", 0, '<Filler Character,0><Hours24,2>:<Minutes,2>:<Seconds,2>'));
-                        //    visit_end_date := STRSUBSTNO ('%1 %2', FORMAT (AdmissionScheduleEntry."Admission End Date", 0, 9), FORMAT (AdmissionScheduleEntry."Admission End Time", 0, '<Filler Character,0><Hours24,2>:<Minutes,2>:<Seconds,2>'));
-                        //    //+TM1.35 [320783]
-                        //
-                        //    Admission.GET (AdmissionScheduleEntry."Admission Code");
-                        //  END;
-                        // END;
-                        //
-                        // TicketAccessEntry.SETFILTER ("Ticket No.", '=%1', TmpTicket."No.");
-                        // TicketAccessEntry.SETFILTER ("Admission Code", '=%1', Admission."Admission Code");
-                        // TicketAccessEntry.FINDFIRST ();
-                        // TmpTicketReservationRequest.Quantity := TicketAccessEntry.Quantity;
-                        //
-                        // ticket_sub_title := Admission.Description;
-                        // quantity := FORMAT (TmpTicketReservationRequest.Quantity, 0, 9);
-                        //
-                        // //-TM1.45 [352050]
-                        // IF (TmpTicketReservationRequest."Customer No." <> '') THEN
-                        //  IF (Customer.GET (TmpTicketReservationRequest."Customer No.")) THEN
-                        //    name := Customer.Name;
-                        // //+TM1.45 [352050]
-
 
                         TicketType.Get(TmpTicket."Ticket Type Code");
                         visit_date := Format(TmpTicket."Valid From Date", 0, 9);
@@ -201,6 +122,10 @@ xmlport 6060123 "NPR TM Ticket Server Req."
                         valid_from := Format(TmpTicket."Valid From Date", 0, 9);
                         valid_to := Format(TmpTicket."Valid To Date", 0, 9);
 
+                        pincode := TmpTicketReservationRequest."Authorization Code";
+                        ticket_uid := TmpTicket."External Ticket No.";
+                        if (TmpTicketReservationRequest."Entry Type" = TmpTicketReservationRequest."Entry Type"::CHANGE) then
+                            ticket_uid := STRSUBSTNO('%1-%2', TmpTicket."External Ticket No.", TmpTicket."Ticket Reservation Entry No.");
 
                         DetTicketAccessEntry.SetFilter("Ticket No.", '=%1', TmpTicket."No.");
                         DetTicketAccessEntry.SetFilter(Type, '=%1', DetTicketAccessEntry.Type::RESERVATION);

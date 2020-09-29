@@ -1,34 +1,19 @@
 codeunit 6060120 "NPR TM Ticket Notify Particpt."
 {
-    // TM1.16/TSA/20160816  CASE 245004 Transport TM1.16 - 19 July 2016
-    // TM1.17/TSA/20160916  CASE 251883 Added SMS Option
-    // TM1.17/TSA/20160930  CASE 254019 Fixed pressing cancel in ticket holder dialog.
-    // TM1.23/TSA /20170725 CASE 284752 Copy Attributes to all reservation lines
-    // TM1.38/TSA/20181025  CASE 332109 Transport TM1.38 - 25 October 2018
-    // TM1.45/TSA /20191101 CASE 374620 Added OnNotifyStakeholder()
-    // TM1.45/TSA /20191202 CASE 374620 SendGeneralNotification()
-    // TM90.1.46/TSA /20200127 CASE 387138 CreateDiyPrintNotification()
-    // TM90.1.46/TSA /20200331 CASE 390657 Added PrePaid and PostPaid as confirmed payment for stakeholder notifications
-
-
     trigger OnRun()
     var
         TicketNotificationEntry: Record "NPR TM Ticket Notif. Entry";
     begin
 
-        //-TM1.45 [374620]
         TicketNotificationEntry.Reset();
         TicketNotificationEntry.SetFilter("Notification Trigger", '=%1', TicketNotificationEntry."Notification Trigger"::STAKEHOLDER);
         TicketNotificationEntry.SetFilter("Notification Process Method", '=%1', TicketNotificationEntry."Notification Process Method"::BATCH);
         SendGeneralNotification(TicketNotificationEntry);
-        //+TM1.45 [374620]
 
-        //-#380754 [380754]
         TicketNotificationEntry.Reset();
         TicketNotificationEntry.SetFilter("Notification Trigger", '=%1', TicketNotificationEntry."Notification Trigger"::WAITINGLIST);
         TicketNotificationEntry.SetFilter("Notification Process Method", '=%1', TicketNotificationEntry."Notification Process Method"::BATCH);
         SendGeneralNotification(TicketNotificationEntry);
-        //+#380754 [380754]
     end;
 
     var
@@ -37,6 +22,7 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
         CONFIRM_SEND_NOTIFICATION: Label 'Do you want to send %1 pending notifications?';
         INVALID: Label 'Invalid %1';
         NO_SMS_TEMPLATE: Label 'Template for table %1 not found amoung SMS Templates.';
+        StakeholderNotificationGroupType: Option SALES,SELLOUT,WAITINGLIST;
 
     procedure NotifyRecipients(var TicketParticipantWks: Record "NPR TM Ticket Particpt. Wks.")
     var
@@ -155,7 +141,6 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
         EMailMgt: Codeunit "NPR E-mail Management";
     begin
 
-        //-TM1.45 [374620]
         if (TicketNotificationEntry."Notification Address" = '') then begin
             ResponseMessage := StrSubstNo(INVALID, TicketNotificationEntry.FieldCaption("Notification Address"));
             exit(false);
@@ -164,7 +149,6 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
         RecordRef.GetTable(TicketNotificationEntry);
         ResponseMessage := EMailMgt.SendEmail(RecordRef, TicketNotificationEntry."Notification Address", true);
         exit(ResponseMessage = '');
-        //+TM1.45 [374620]
     end;
 
     local procedure SendSmsNotificationEntry(TicketNotificationEntry: Record "NPR TM Ticket Notif. Entry"; var ResponseMessage: Text): Boolean
@@ -175,7 +159,6 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
         SMSMessage: Text;
     begin
 
-        //-TM1.45 [374620]
         ResponseMessage := '';
 
         if (TicketNotificationEntry."Notification Address" = '') then begin
@@ -190,7 +173,7 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
             ResponseMessage := StrSubstNo(NO_SMS_TEMPLATE, TicketNotificationEntry.TableCaption);
 
         exit(ResponseMessage = '');
-        //+TM1.45 [374620]
+
     end;
 
     local procedure "--"()
@@ -200,17 +183,15 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
     procedure AquireTicketParticipant(Token: Text[100]; SuggestNotificationMethod: Option NA,EMAIL,SMS; SuggestNotificationAddress: Text[100]): Boolean
     begin
 
-        //-TM90.1.46 [387138] refactored, moved code to local worker
         exit(AquireTicketParticipantWorker(Token, SuggestNotificationMethod, SuggestNotificationAddress, false));
-        //+TM90.1.46 [387138]
+
     end;
 
     procedure AquireTicketParticipantForce(Token: Text[100]; SuggestNotificationMethod: Option NA,EMAIL,SMS; SuggestNotificationAddress: Text[100]; ForceDialog: Boolean): Boolean
     begin
 
-        //-TM90.1.46 [387138]
         exit(AquireTicketParticipantWorker(Token, SuggestNotificationMethod, SuggestNotificationAddress, ForceDialog));
-        //+TM90.1.46 [387138]
+
     end;
 
     local procedure AquireTicketParticipantWorker(Token: Text[100]; SuggestNotificationMethod: Option NA,EMAIL,SMS; SuggestNotificationAddress: Text[100]; ForceDialog: Boolean): Boolean
@@ -230,7 +211,6 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
         AttributeManagement: Codeunit "NPR Attribute Management";
     begin
 
-        //-TM90.1.46 [387138]
         if (not (TicketRequestManager.GetTokenTicket(Token, TicketNo))) then
             exit(false);
 
@@ -250,7 +230,6 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
             end;
         until (TicketAccessEntry.Next() = 0);
 
-        //-TM1.38 [332109]
         // Check if eTicket
         if (RequireParticipantInformation = RequireParticipantInformation::NOT_REQUIRED) then begin
             TicketAdmissionBOM.SetFilter("Item No.", '=%1', Ticket."Item No.");
@@ -263,7 +242,6 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
                     RequireParticipantInformation := RequireParticipantInformation::OPTIONAL;
             end;
 
-            //-TM90.1.46 [387138]
             TicketAdmissionBOM.Reset();
             TicketAdmissionBOM.SetFilter("Item No.", '=%1', Ticket."Item No.");
             TicketAdmissionBOM.SetFilter("Variant Code", '=%1', Ticket."Variant Code");
@@ -274,21 +252,14 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
                 if (SuggestNotificationAddress = '') then
                     RequireParticipantInformation := RequireParticipantInformation::OPTIONAL;
             end;
-            //+TM90.1.46 [387138]
 
         end;
-        //+TM1.38 [332109]
-
-        //-TM90.1.46 [387138]
-        //IF (RequireParticipantInformation = RequireParticipantInformation::NOT_REQUIRED) THEN
-        //  EXIT (FALSE);
         if (not ForceDialog) then
             if (RequireParticipantInformation = RequireParticipantInformation::NOT_REQUIRED) then
                 exit(false);
 
         if (AdmissionCode = '') then
             AdmissionCode := Admission."Admission Code";
-        //+TM90.1.46 [387138]
 
         TicketReservationRequest.Reset();
         TicketReservationRequest.FilterGroup(2);
@@ -319,14 +290,11 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
             TicketReservationRequest."Notification Address" := TicketReservationRequest2."Notification Address";
             TicketReservationRequest.Modify();
 
-            //-TM1.23 [284752]
             AttributeManagement.CopyEntryAttributeValue(DATABASE::"NPR TM Ticket Reservation Req.", TicketReservationRequest2."Entry No.", TicketReservationRequest."Entry No.");
-        //+TM1.23 [284752]
 
         until (TicketReservationRequest.Next() = 0);
 
         exit(PageAction = ACTION::LookupOK);
-        //+TM90.1.46 [387138]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6059784, 'OnDetailedTicketEvent', '', true, true)]
@@ -339,15 +307,10 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
         ReservationConfirmed: Boolean;
     begin
 
-        //-TM1.45 [374620]
         if (DetTicketAccessEntry."External Adm. Sch. Entry No." <= 0) then begin
 
-            //-TM90.1.46 [390657]
-            //IF (DetTicketAccessEntry.Type <> DetTicketAccessEntry.Type::PAYMENT) THEN
-            //   EXIT;
             if (not (DetTicketAccessEntry.Type in [DetTicketAccessEntry.Type::PAYMENT, DetTicketAccessEntry.Type::PREPAID, DetTicketAccessEntry.Type::POSTPAID])) then
                 exit;
-            //+TM90.1.46 [390657]
 
             ReserveTicketAccessEntry.SetFilter("Ticket Access Entry No.", '=%1', DetTicketAccessEntry."Ticket Access Entry No.");
             ReserveTicketAccessEntry.SetFilter(Type, '=%1', ReserveTicketAccessEntry.Type::RESERVATION);
@@ -399,14 +362,33 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
                                 CreateStakeholderNotification(Admission, Schedule, AdmissionScheduleEntry, DetTicketAccessEntry);
                 end;
 
-            DetTicketAccessEntry.Type::CANCELED:
+            DetTicketAccessEntry.Type::CANCELED_ADMISSION:
                 ; // Stakeholder notifications are for reservtions only.
 
             else
                 Message('Type %1 is not handled in stakeholder notification.', DetTicketAccessEntry.Type);
         end;
 
-        //+TM1.45 [374620]
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, 6059784, 'OnSelloutThresholdReached', '', true, true)]
+    local procedure OnSellOutReached(SellOutEventType: Option NA,TICKET,WAITINGLIST; Ticket: Record "NPR TM Ticket"; AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry"; AdmittedCount: Integer; MaxCapacity: Integer);
+    var
+        Schedule: Record "NPR TM Admis. Schedule";
+    begin
+
+        if (SellOutEventType = 0) then
+            exit;
+
+        Schedule.GET(AdmissionScheduleEntry."Schedule Code");
+
+        if (SellOutEventType = 1) then
+            if (Schedule."Notify Stakeholder On Sell-Out" IN [Schedule."Notify Stakeholder On Sell-Out"::TICKET, Schedule."Notify Stakeholder On Sell-Out"::BOTH]) then
+                CreateStakeholderSellOutNotification(StakeholderNotificationGroupType::SELLOUT, Ticket, AdmissionScheduleEntry, AdmittedCount);
+
+        if (SellOutEventType = 2) then
+            if (Schedule."Notify Stakeholder On Sell-Out" IN [Schedule."Notify Stakeholder On Sell-Out"::WAITINGLIST, Schedule."Notify Stakeholder On Sell-Out"::BOTH]) then
+                CreateStakeholderSellOutNotification(StakeholderNotificationGroupType::WAITINGLIST, Ticket, AdmissionScheduleEntry, AdmittedCount);
     end;
 
     local procedure CreateStakeholderNotification(Admission: Record "NPR TM Admission"; Schedule: Record "NPR TM Admis. Schedule"; AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry"; DetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry")
@@ -416,7 +398,6 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
     begin
 
-        //-TM1.45 [374620]
         NotificationEntry."Entry No." := 0;
         NotificationEntry."Notification Trigger" := NotificationEntry."Notification Trigger"::STAKEHOLDER;
         NotificationEntry."Notification Address" := Admission."Stakeholder (E-Mail/Phone No.)";
@@ -452,7 +433,7 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
         NotificationEntry."Quantity To Admit" := TicketReservationRequest.Quantity;
 
         NotificationEntry."Ticket Holder E-Mail" := TicketReservationRequest."Notification Address";
-        NotificationEntry."External Order No." := TicketReservationRequest."External Order No."; //-+#TM1.46 [387138]
+        NotificationEntry."External Order No." := TicketReservationRequest."External Order No.";
 
         NotificationEntry."Relevant Date" := AdmissionScheduleEntry."Admission Start Date";
         NotificationEntry."Relevant Time" := AdmissionScheduleEntry."Admission Start Time";
@@ -467,7 +448,62 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
 
         NotificationEntry."Notification Process Method" := NotificationEntry."Notification Process Method"::BATCH;
         NotificationEntry.Insert();
-        //+TM1.45 [374620]
+
+    end;
+
+    local procedure CreateStakeholderSellOutNotification(Type: Option; Ticket: Record "NPR TM Ticket"; AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry"; ReachedQuantity: Integer);
+    var
+        Admission: Record "NPR TM Admission";
+        Schedule: Record "NPR TM Admis. Schedule";
+        AdmissionScheduleLines: Record "NPR TM Admis. Schedule Lines";
+        NotificationEntry: Record "NPR TM Ticket Notif. Entry";
+        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+    begin
+
+        Admission.GET(AdmissionScheduleEntry."Admission Code");
+        if (Admission."Stakeholder (E-Mail/Phone No.)" = '') then
+            exit;
+
+        Schedule.GET(AdmissionScheduleEntry."Schedule Code");
+        TicketReservationRequest.GET(Ticket."Ticket Reservation Entry No.");
+
+        NotificationEntry."Entry No." := 0;
+        NotificationEntry."Notification Trigger" := NotificationEntry."Notification Trigger"::STAKEHOLDER;
+
+        if (Type = StakeholderNotificationGroupType::SELLOUT) then
+            NotificationEntry."Ticket Trigger Type" := NotificationEntry."Ticket Trigger Type"::SELLOUT;
+
+        if (Type = StakeholderNotificationGroupType::WAITINGLIST) then
+            NotificationEntry."Ticket Trigger Type" := NotificationEntry."Ticket Trigger Type"::CAPACITY_TO_WL;
+
+        NotificationEntry."Notification Address" := Admission."Stakeholder (E-Mail/Phone No.)";
+        NotificationEntry."Date To Notify" := TODAY;
+
+        NotificationEntry."Admission Schedule Entry No." := AdmissionScheduleEntry."Entry No.";
+
+        NotificationEntry."Ticket Type Code" := Ticket."Ticket Type Code";
+        NotificationEntry."Ticket No." := Ticket."No.";
+        NotificationEntry."External Ticket No." := Ticket."External Ticket No.";
+        NotificationEntry."Ticket No. for Printing" := Ticket."External Ticket No.";
+        NotificationEntry."Admission Code" := Admission."Admission Code";
+        NotificationEntry."Adm. Event Description" := Admission.Description;
+        NotificationEntry."Quantity To Admit" := ReachedQuantity;
+        NotificationEntry."Ticket External Item No." := TicketReservationRequest."External Item Code";
+
+        NotificationEntry."Relevant Date" := AdmissionScheduleEntry."Admission Start Date";
+        NotificationEntry."Relevant Time" := AdmissionScheduleEntry."Admission Start Time";
+        NotificationEntry."Relevant Datetime" := CREATEDATETIME(NotificationEntry."Relevant Date", NotificationEntry."Relevant Time");
+
+        NotificationEntry."Notification Method" := NotificationEntry."Notification Method"::NA;
+        if (STRPOS(Admission."Stakeholder (E-Mail/Phone No.)", '@') > 0) then
+            NotificationEntry."Notification Method" := NotificationEntry."Notification Method"::EMAIL;
+
+        if (STRLEN(DELCHR(NotificationEntry."Notification Address", '<=>', '+0123456789 ')) = 0) then
+            NotificationEntry."Notification Method" := NotificationEntry."Notification Method"::SMS;
+
+        NotificationEntry."Notification Process Method" := NotificationEntry."Notification Process Method"::BATCH;
+        NotificationEntry.INSERT();
+
     end;
 
     procedure CreateDiyPrintNotification(TicketNo: Code[20]) NotificationEntryNo: Integer
@@ -484,7 +520,6 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
     begin
 
-        //-TM90.1.46 [387138]
         if (not TicketSetup.Get()) then
             exit;
 
@@ -538,6 +573,7 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
         NotificationEntry."Ticket Variant Code" := Ticket."Variant Code";
         NotificationEntry."Ticket External Item No." := TicketReservationRequest."External Item Code";
         NotificationEntry."Ticket Token" := TicketReservationRequest."Session Token ID";
+        NotificationEntry."Authorization Code" := TicketReservationRequest."Authorization Code";
 
         NotificationEntry."Ticket BOM Description" := TicketBom.Description;
         NotificationEntry."Ticket BOM Adm. Description" := TicketBom."Admission Description";
@@ -568,7 +604,7 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
         NotificationEntry.Insert();
 
         exit(NotificationEntry."Entry No.");
-        //+TM90.1.46 [387138]
+
     end;
 
     procedure SendGeneralNotification(var TicketNotificationEntryFilters: Record "NPR TM Ticket Notif. Entry")
@@ -581,7 +617,6 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
         Current: Integer;
     begin
 
-        //-TM1.45 [374620]
         TicketNotificationEntry.CopyFilters(TicketNotificationEntryFilters);
         TicketNotificationEntry.SetFilter("Notification Send Status", '=%1', TicketNotificationEntry."Notification Send Status"::PENDING);
 
@@ -636,7 +671,6 @@ codeunit 6060120 "NPR TM Ticket Notify Particpt."
                 Window.Close();
 
         end;
-        //+TM1.45 [374620]
     end;
 }
 
