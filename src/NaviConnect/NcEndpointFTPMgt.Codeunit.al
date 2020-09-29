@@ -263,8 +263,8 @@ codeunit 6151524 "NPR Nc Endpoint FTP Mgt."
         case NcEndpointFTP.Type of
             NcEndpointFTP.Type::DotNet:
                 SendDotNetFtpOutput(NcTaskOutput, NcEndpointFTP);
-        //  NcEndpointFTP.Type::SharpSFTP :
-        //    SendSharpSFTP(NcEndpointFTP,OutputText,Filename,ResponseDescriptionText,ResponseCodeText,ConnectionString);
+            NcEndpointFTP.Type::SharpSFTP:
+                SendSFTPOutput(NcTaskOutput, NcEndpointFTP);
         end;
         //+308107 [308107]
     end;
@@ -475,6 +475,27 @@ codeunit 6151524 "NPR Nc Endpoint FTP Mgt."
 
     local procedure "---Subscribers"()
     begin
+    end;
+
+    local procedure SendSFTPOutput(NcTaskOutput: Record "NPR Nc Task Output"; NcEndpointFTP: Record "NPR Nc Endpoint FTP")
+    var
+        SSHNETSFTPClient: Codeunit "NPR SSH.NET SFTP Client";
+        TempBlob: Codeunit "Temp Blob";
+        Istream: InStream;
+        OStream: OutStream;
+        RemotePath: Text;
+    begin
+        SSHNETSFTPClient.Construct(NcEndpointFTP.Server, NcEndpointFTP.Username, NcEndpointFTP.Password, NcEndpointFTP.Port, 10000);
+        SSHNETSFTPClient.SetKeepAliveInterval(0, 0, 0);
+        if NcEndpointFTP.Directory <> '' then
+            RemotePath := '/' + NcEndpointFTP.Directory.TrimStart('/').TrimEnd('/') + '/'
+        else
+            RemotePath := '/';
+        NcTaskOutput.Data.CreateInStream(Istream);
+        TempBlob.CreateOutStream(OStream);
+        CopyStream(OStream, Istream);
+        SSHNETSFTPClient.UploadFileFromBlob(TempBlob, RemotePath + NcTaskOutput.Name);
+        SSHNETSFTPClient.Destruct();
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6151522, 'OnAfterGetOutputTriggerTask', '', false, false)]
