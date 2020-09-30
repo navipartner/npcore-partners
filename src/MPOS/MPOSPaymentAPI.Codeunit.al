@@ -116,12 +116,7 @@ codeunit 6059966 "NPR MPOS Payment API"
         if not mPosAppSetup.Enable then
             exit;
 
-        //-NPR5.46 [323996]
-        if mPosAppSetup."Handle EFT Print in NAV" then
-            InAppPrinting := 0
-        else
-            InAppPrinting := 1;
-        //+NPR5.46 [323996]
+        InAppPrinting := 0;
 
         mPosAppSetup.TestField(Enable, true);
         mPosAppSetup.TestField("Payment Gateway");
@@ -607,19 +602,12 @@ codeunit 6059966 "NPR MPOS Payment API"
             CreateReceiptData(mPOSNetsTransactionsResponse."Register No.", mPOSNetsTransactionsResponse."Sales Ticket No.", mPOSNetsTransactionsResponse."Sales Line No.", TempBlob);
         end;
 
-        if MPOSAppSetup.Get(mPOSNetsTransactionsResponse."Register No.") then
-            if MPOSAppSetup."Handle EFT Print in NAV" then begin
-                CreditCardTransaction.SetRange("Register No.", mPOSNetsTransactionsResponse."Register No.");
-                CreditCardTransaction.SetRange("Sales Ticket No.", mPOSNetsTransactionsResponse."Sales Ticket No.");
-                //-NPR5.37 [291652]
-                CreditCardTransaction.SetRange("No. Printed", 0);
-                //+NPR5.37 [291652]
-                //-NPR5.46 [290734]
-                //CreditCardTransaction.PrintTerminalReceipt(FALSE);
-                CreditCardTransaction.PrintTerminalReceipt();
-                //+NPR5.46 [290734]
-            end;
-        //+NPR5.36 [291652]
+        if MPOSAppSetup.Get(mPOSNetsTransactionsResponse."Register No.") then begin
+            CreditCardTransaction.SetRange("Register No.", mPOSNetsTransactionsResponse."Register No.");
+            CreditCardTransaction.SetRange("Sales Ticket No.", mPOSNetsTransactionsResponse."Sales Ticket No.");
+            CreditCardTransaction.SetRange("No. Printed", 0);
+            CreditCardTransaction.PrintTerminalReceipt();
+        end;
     end;
 
     local procedure CreateReceiptData(RegisterNo: Code[10]; SalesTicketNo: Code[20]; LineNo: Integer; var TempBlob: Codeunit "Temp Blob")

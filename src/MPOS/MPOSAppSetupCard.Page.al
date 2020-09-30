@@ -38,10 +38,6 @@ page 6059968 "NPR MPOS App Setup Card"
             group(Payment)
             {
                 Caption = 'Payment';
-                field("Handle EFT Print in NAV"; "Handle EFT Print in NAV")
-                {
-                    ApplicationArea = All;
-                }
                 field("Payment Gateway"; "Payment Gateway")
                 {
                     ApplicationArea = All;

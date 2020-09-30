@@ -72,6 +72,8 @@ table 6059966 "NPR MPOS App Setup"
             Caption = 'Handle EFT Print in NAV';
             DataClassification = CustomerContent;
             Description = 'NPR5.36';
+            ObsoleteState = Removed;
+            ObsoleteReason = 'We always print mpos EFT receipts from NAV now';
         }
     }
 

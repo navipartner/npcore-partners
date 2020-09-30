@@ -416,10 +416,7 @@ codeunit 6184524 "NPR EFT ISMP Baxi Prot."
         EFTSetup.FindSetup(EFTTransactionRequest."Register No.", EFTTransactionRequest."POS Payment Type Code");
         MerchantID := GetMerchantID(EFTSetup);
 
-        if MPOSAppSetup."Handle EFT Print in NAV" then
-            InAppPrinting := 0
-        else
-            InAppPrinting := 1;
+        InAppPrinting := 0;
 
         case EFTTransactionRequest."Processing Type" of
             EFTTransactionRequest."Processing Type"::REFUND:
