@@ -808,7 +808,7 @@ codeunit 6151416 "NPR Magento Pmt. Mgt."
             GenJnlLine."Source Type" := GenJnlLine."Source Type"::Customer;
             GenJnlLine."Source No." := "Bill-to Customer No.";
             GenJnlLine."Source Code" := SourceCode;
-            GenJnlLine."Salespers./Purch. Code" := "Salesperson Code";
+            GenJnlLine.Validate("Salespers./Purch. Code", "Salesperson Code");
             GenJnlLine."Allow Zero-Amount Posting" := true;
         end;
     end;
