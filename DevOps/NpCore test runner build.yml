@@ -46,6 +46,7 @@ jobs:
     testRunsToRun:
       - testRunName: 'Microsoft Base App tests'
         testApps:
+          - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Misc.app'
           - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Bank.app'
           - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Cash Flow.app'
           - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Cost Accounting.app'
@@ -61,7 +62,6 @@ jobs:
           - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Job.app'
           - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Local.app'
           # - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Marketing.app' Microsoft.Dynamics.Nav.Integration.Office.Mock assembly missing
-          - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Misc.app'
           - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Permissions.app'
           - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Physical Inventory.app'
           - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Prepayment.app'
@@ -70,7 +70,7 @@ jobs:
           - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Resource.app'
           - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Reverse.app'
           - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-SCM.app'
-          - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-SINGLESERVER.app'
+          # - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-SINGLESERVER.app' Freddy always skips this app in his scripts?!
           - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-SMB.app'
           - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-SMTP.app'
           - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Upgrade.app'
