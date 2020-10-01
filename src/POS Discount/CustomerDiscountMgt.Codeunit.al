@@ -1,13 +1,5 @@
 codeunit 6014433 "NPR Customer Discount Mgt."
 {
-    // NPR5.29/TJ/20161223 CASE 249720 Replaced calling of standard codeunit 7000 Sales Price Calc. Mgt. with our own codeunit 6014453 POS Sales Price Calc. Mgt.
-    // NPR5.31/MHA /20170210  CASE 262904 Applied Event triggered Discount Calculation: OnInitDiscountPriority(),OnApplyDiscount(),IsSubscribedDiscount(),DiscSourceTableId(),DiscCalcCodeunitId()
-    // NPR5.38/MHA /20171204  CASE 298276 Removed Discount Cache
-    // NPR5.40/MMV /20180213  CASE 294655 Performance optimization
-    // NPR5.44/MMV /20180627  CASE 312154 Fixed incorrect cross line discount handling when different types collided.
-    // NPR5.48/MMV /20181214 CASE 340109 Set discount modified flag on lines being considered so auto disable works.
-
-
     trigger OnRun()
     begin
     end;
@@ -19,25 +11,6 @@ codeunit 6014433 "NPR Customer Discount Mgt."
     begin
         if Customer.Get(SalePOS."Customer No.") and not Customer."Allow Line Disc." then
             exit;
-
-        //-NPR5.44 [312154]
-        // IF NOT TempSaleLinePOS.GET(Rec."Register No.", Rec."Sales Ticket No.", Rec.Date, Rec."Sale Type", Rec."Line No.") THEN
-        //  EXIT;
-        // IF NOT TempSaleLinePOS."Allow Line Discount" THEN
-        //  EXIT;
-        //
-        // IF TempSaleLinePOS."Discount Type" = TempSaleLinePOS."Discount Type"::" " THEN BEGIN
-        //  ApplyCustomerDiscountOnLine(SalePOS, TempSaleLinePOS);
-        //  TempSaleLinePOS.MODIFY;
-        // END;
-        //
-        // IF TempSaleLinePOS."Discount Type" = TempSaleLinePOS."Discount Type"::Campaign THEN BEGIN
-        //  TempSaleLinePOS2.COPY(TempSaleLinePOS, TRUE);
-        //  ApplyCustomerDiscountOnLine(SalePOS, TempSaleLinePOS2);
-        //  IF TempSaleLinePOS2."Discount %" <= TempSaleLinePOS."Discount %" THEN
-        //    EXIT;
-        //  TempSaleLinePOS2.MODIFY;
-        // END;
 
         Clear(TempSaleLinePOS);
         if RecalculateAllLines then begin
@@ -53,18 +26,14 @@ codeunit 6014433 "NPR Customer Discount Mgt."
         end else
             if TempSaleLinePOS.Get(Rec."Register No.", Rec."Sales Ticket No.", Rec.Date, Rec."Sale Type", Rec."Line No.") then
                 ApplyDiscountOnLine(SalePOS, TempSaleLinePOS);
-        //+NPR5.44 [312154]
     end;
 
     local procedure ApplyDiscountOnLine(SalePOS: Record "NPR Sale POS"; var TempSaleLinePOS: Record "NPR Sale Line POS" temporary)
     var
         TempSaleLinePOS2: Record "NPR Sale Line POS" temporary;
     begin
-        //-NPR5.44 [312154]
-        //-NPR5.48 [340109]
         TempSaleLinePOS."Discount Calculated" := true;
         TempSaleLinePOS.Modify;
-        //+NPR5.48 [340109]
 
         if not TempSaleLinePOS."Allow Line Discount" then
             exit;
@@ -81,14 +50,12 @@ codeunit 6014433 "NPR Customer Discount Mgt."
                 exit;
             TempSaleLinePOS2.Modify;
         end;
-        //+NPR5.44 [312154]
     end;
 
     local procedure ApplyCustomerDiscountOnLine(SalePOS: Record "NPR Sale POS"; var TempSaleLinePOS: Record "NPR Sale Line POS" temporary)
     var
         POSSalesPriceCalcMgt: Codeunit "NPR POS Sales Price Calc. Mgt.";
     begin
-        //-NPR5.40 [294655]
         POSSalesPriceCalcMgt.FindSalesLineLineDisc(SalePOS, TempSaleLinePOS);
         if TempSaleLinePOS."Discount %" > 0 then begin
             TempSaleLinePOS."Discount Type" := TempSaleLinePOS."Discount Type"::Customer;
@@ -97,7 +64,6 @@ codeunit 6014433 "NPR Customer Discount Mgt."
             TempSaleLinePOS."Discount Calculated" := true;
             TempSaleLinePOS.Modify;
         end;
-        //+NPR5.40 [294655]
     end;
 
     local procedure "--- Subscription"()
@@ -107,7 +73,6 @@ codeunit 6014433 "NPR Customer Discount Mgt."
     [EventSubscriber(ObjectType::Codeunit, 6014455, 'InitDiscountPriority', '', true, true)]
     local procedure OnInitDiscountPriority(var DiscountPriority: Record "NPR Discount Priority")
     begin
-        //-NPR5.31 [262904]
         if DiscountPriority.Get(DiscSourceTableId()) then
             exit;
 
@@ -117,7 +82,6 @@ codeunit 6014433 "NPR Customer Discount Mgt."
         DiscountPriority.Disabled := false;
         DiscountPriority."Discount Calc. Codeunit ID" := DiscCalcCodeunitId();
         DiscountPriority.Insert(true);
-        //+NPR5.31 [262904]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014455, 'ApplyDiscount', '', true, true)]
@@ -126,21 +90,16 @@ codeunit 6014433 "NPR Customer Discount Mgt."
         if not IsSubscribedDiscount(DiscountPriority) then
             exit;
 
-        //-NPR5.44 [312154]
-        //ApplyCustomerDiscount(SalePOS,TempSaleLinePOS,Rec);
         ApplyCustomerDiscount(SalePOS, TempSaleLinePOS, Rec, RecalculateAllLines);
-        //+NPR5.44 [312154]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014455, 'OnFindActiveSaleLineDiscounts', '', false, false)]
-    local procedure OnFindActiveSaleLineDiscounts(var tmpDiscountPriority: Record "NPR Discount Priority" temporary; Rec: Record "NPR Sale Line POS"; xRec: Record "NPR Sale Line POS"; LineOperation: Option Insert,Modify,Delete)
+    local procedure OnFindActiveSaleLineDiscounts(var tmpDiscountPriority: Record "NPR Discount Priority" temporary; SalePOS: Record "NPR Sale POS"; Rec: Record "NPR Sale Line POS"; xRec: Record "NPR Sale Line POS"; LineOperation: Option Insert,Modify,Delete)
     var
         IsActive: Boolean;
         DiscountPriority: Record "NPR Discount Priority";
         POSSalesPriceCalcMgt: Codeunit "NPR POS Sales Price Calc. Mgt.";
-        SalePOS: Record "NPR Sale POS";
     begin
-        //-NPR5.40 [294655]
         if not DiscountPriority.Get(DiscSourceTableId()) then
             exit;
         if not IsSubscribedDiscount(DiscountPriority) then
@@ -148,32 +107,23 @@ codeunit 6014433 "NPR Customer Discount Mgt."
         if not IsValidLineOperation(Rec, xRec, LineOperation) then
             exit;
 
-        SalePOS.Get(Rec."Register No.", Rec."Sales Ticket No.");
         if POSSalesPriceCalcMgt.SalesLineLineDiscExists(SalePOS, Rec, false) then begin
             tmpDiscountPriority.Init;
             tmpDiscountPriority := DiscountPriority;
             tmpDiscountPriority.Insert;
         end;
-        //+NPR5.40 [294655]
     end;
 
     local procedure IsValidLineOperation(Rec: Record "NPR Sale Line POS"; xRec: Record "NPR Sale Line POS"; LineOperation: Option Insert,Modify,Delete): Boolean
     begin
-        //-NPR5.40 [294655]
         if LineOperation = LineOperation::Delete then
             exit(false);
 
-        // IF LineOperation = LineOperation::Modify THEN
-        //  IF (Rec.Type = Rec.Type::Item) AND (Rec.Type = xRec.Type) AND (Rec."No." = xRec."No.") THEN
-        //    EXIT(Rec.Quantity <> xRec.Quantity);
-
         exit(true);
-        //+NPR5.40 [294655]
     end;
 
     local procedure IsSubscribedDiscount(DiscountPriority: Record "NPR Discount Priority"): Boolean
     begin
-        //-NPR5.31 [262904]
         if DiscountPriority.Disabled then
             exit(false);
         if DiscountPriority."Table ID" <> DiscSourceTableId() then
@@ -182,21 +132,16 @@ codeunit 6014433 "NPR Customer Discount Mgt."
             exit(false);
 
         exit(true);
-        //+NPR5.31 [262904]
     end;
 
     local procedure DiscSourceTableId(): Integer
     begin
-        //-NPR5.31 [262904]
         exit(DATABASE::"Sales Line Discount");
-        //+NPR5.31 [262904]
     end;
 
     local procedure DiscCalcCodeunitId(): Integer
     begin
-        //-NPR5.31 [262904]
         exit(CODEUNIT::"NPR Customer Discount Mgt.");
-        //+NPR5.31 [262904]
     end;
 
     local procedure DiscountLineActiveNow(var SalesLineDiscount: Record "Sales Line Discount"): Boolean
@@ -204,7 +149,6 @@ codeunit 6014433 "NPR Customer Discount Mgt."
         CurrDate: Date;
         CurrTime: Time;
     begin
-        //-NPR5.31 [262904]
         if SalesLineDiscount.IsTemporary then
             exit(false);
 
@@ -216,7 +160,5 @@ codeunit 6014433 "NPR Customer Discount Mgt."
             exit(false);
 
         exit(true);
-        //+NPR5.31 [262904]
     end;
 }
-

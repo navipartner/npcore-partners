@@ -1,6 +1,5 @@
 codeunit 6014450 "NPR E-mail Management"
 {
-
     trigger OnRun()
     begin
     end;
@@ -104,9 +103,7 @@ codeunit 6014450 "NPR E-mail Management"
         exit(CopyStr(ErrorMessage, 1, 1024));
     end;
 
-    procedure "--- SmtpMessage"()
-    begin
-    end;
+    //--- SmtpMessage ---
 
     local procedure AddAdditionalReportsToSmtpMessage(EmailTemplateHeader: Record "NPR E-mail Template Header"; var RecRef: RecordRef) ErrorMessage: Text
     var
@@ -186,7 +183,7 @@ codeunit 6014450 "NPR E-mail Management"
     begin
         EmailAttachment.CalcFields("Attached File");
         if not EmailAttachment."Attached File".HasValue then begin
-            SetLastErrorMessage(StrSubstNo(AttachmentNoData, EmailAttachment.Description));
+            if SetLastErrorMessage(StrSubstNo(AttachmentNoData, EmailAttachment.Description)) then;
             exit(false);
         end;
         AttachmentBuffer.Reset;
@@ -356,9 +353,7 @@ codeunit 6014450 "NPR E-mail Management"
         Exit(Result.TrimEnd(';'));
     end;
 
-    procedure "--- Setup"()
-    begin
-    end;
+    //--- Setup ---
 
     procedure SetupEmailTemplate(var RecRef: RecordRef; RecipientEmail: Text[250]; Silent: Boolean; var EmailTemplateHeader: Record "NPR E-mail Template Header") ErrorMessage: Text[1024]
     begin
@@ -384,9 +379,7 @@ codeunit 6014450 "NPR E-mail Management"
         exit('');
     end;
 
-    procedure "--- PDF"()
-    begin
-    end;
+    //--- PDF ---
 
     local procedure PrintPDF(ReportID: Integer; RecVariant: Variant; Filename: Text): Boolean
     var
@@ -403,7 +396,7 @@ codeunit 6014450 "NPR E-mail Management"
         ClearRequestParameters(ReportID);
         if not EmailAttachmentTemp."Attached File".HasValue then begin
             Result := false;
-            SetLastErrorMessage(NoOutputFromReport);
+            if SetLastErrorMessage(NoOutputFromReport) then;
         end;
         if Result then begin
             EmailAttachmentTemp.Insert;
@@ -414,9 +407,7 @@ codeunit 6014450 "NPR E-mail Management"
         exit(Result);
     end;
 
-    procedure "--- Get"()
-    begin
-    end;
+    //--- Get ---
 
     local procedure GetEmailFromAddress(EmailTemplateHeader: Record "NPR E-mail Template Header") NewEmailFromAddress: Text[250]
     var
@@ -862,9 +853,7 @@ codeunit 6014450 "NPR E-mail Management"
             ReqParamStoreDict.Remove(ReportID);
     end;
 
-    procedure "--- Email Log"()
-    begin
-    end;
+    //--- Email Log ---
 
     local procedure AddEmailLogEntry(RecRef: RecordRef)
     var
@@ -907,9 +896,9 @@ codeunit 6014450 "NPR E-mail Management"
         for i := 1 to StrLen(Input) do
             case Input[i] of
                 '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-              'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
-              'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
-              'u', 'v', 'w', 'x', 'y', 'z', 'U', 'V', 'W', 'X', 'Y', 'Z', '-', '.':
+                'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
+                'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
+                'u', 'v', 'w', 'x', 'y', 'z', 'U', 'V', 'W', 'X', 'Y', 'Z', '-', '.':
                     Output += Format(Input[i]);
                 'æ':
                     Output += 'ae';
@@ -942,9 +931,10 @@ codeunit 6014450 "NPR E-mail Management"
         MailManagement.CheckValidEmailAddress(EmailAddress);
     end;
 
+    [TryFunction]
     local procedure SetLastErrorMessage(ErrorMessage: Text)
     begin
-        asserterror Error(ErrorMessage);
+        Error(ErrorMessage);
     end;
 
     procedure ConfirmResendEmail(var RecRef: RecordRef): Boolean
@@ -991,4 +981,3 @@ codeunit 6014450 "NPR E-mail Management"
     begin
     end;
 }
-

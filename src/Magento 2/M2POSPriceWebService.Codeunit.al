@@ -1,17 +1,5 @@
 codeunit 6151145 "NPR M2 POS Price WebService"
 {
-    // NPR5.48/TSA /20181207 CASE 320426 Initial Version
-    // NPR5.49/TSA /20190305 CASE 345373 Adding Item Availability By Period Service
-    // NPR5.49/TSA /20190307 CASE 345375 Added Customer Item By Period Service
-    // MAG2.21/TSA /20190423 CASE 350006 Added consideration of a price date other than TODAY.
-    // MAG2.21/TSA /20190423 CASE 350006 Corrected a spelling mistake.
-    // MAG2.23/TSA /20190930 CASE 370652 Customer No. was not set on request record passeed to ERP Price Calculation, removed TryFunction from TryPosQuoteRequest
-    // MAG2.23/TSA /20190930 CASE 370652 Unit of Measure Code was not set on request record passed to ERP Price Calculation,
-    // MAG2.25/TSA /20200213 CASE 349999 Added EstimateDeliveryDate(), GetWorkingDayCalendar ()
-    // MAG2.25/TSA /20200226 CASE 391299 Added a "Allow Line Disc." check on the best price calculation.
-    // MAG2.25/TSA /20200323 CASE 397545 Default VAT percent setup not supplied in itemprice response
-
-
     trigger OnRun()
     begin
         // TEST_SOAP_PosPrice ();
@@ -23,7 +11,6 @@ codeunit 6151145 "NPR M2 POS Price WebService"
         TmpSalePOS: Record "NPR Sale POS" temporary;
         TmpSaleLinePOS: Record "NPR Sale Line POS" temporary;
     begin
-
         SelectLatestVersion();
 
         POSPriceRequest.Import;
@@ -31,31 +18,26 @@ codeunit 6151145 "NPR M2 POS Price WebService"
 
         if (TryPosQuoteRequest(TmpSalePOS, TmpSaleLinePOS)) then begin
             POSPriceRequest.SetResponse(TmpSalePOS, TmpSaleLinePOS);
-
         end else begin
             POSPriceRequest.SetErrorResponse(GetLastErrorText);
-
         end;
-
-        asserterror Error(''); // rollback any changes to the database we did in TryPosQuoteRequest()
     end;
 
-    local procedure TryPosQuoteRequest(var TmpSalePOS: Record "NPR Sale POS" temporary; var TmpSaleLinePOS: Record "NPR Sale Line POS" temporary): Boolean
+    [TryFunction]
+    local procedure TryPosQuoteRequest(var TmpSalePOS: Record "NPR Sale POS" temporary; var TmpSaleLinePOS: Record "NPR Sale Line POS" temporary)
     var
         Customer: Record Customer;
         VATBusPostingGroup: Code[20];
         VATPostingSetup: Record "VAT Posting Setup";
-        "--": Integer;
         GeneralLedgerSetup: Record "General Ledger Setup";
-        SalePOS: Record "NPR Sale POS";
         TmpDiscountPriority: Record "NPR Discount Priority" temporary;
         DiscountPriority: Record "NPR Discount Priority";
         TmpSaleLinePOS2: Record "NPR Sale Line POS" temporary;
         POSSalesPriceCalcMgt: Codeunit "NPR POS Sales Price Calc. Mgt.";
         Item: Record Item;
         POSSalesDiscountCalcMgt: Codeunit "NPR POS Sales Disc. Calc. Mgt.";
+        CurrencyDiscCalcNotSupported: Label 'Discount module "%1" does not support discount calculations when exchange rates apply (%2 -> %3).';
     begin
-
         // Prepare Lines for VAT
         TmpSalePOS."Prices Including VAT" := true;
 
@@ -115,17 +97,15 @@ codeunit 6151145 "NPR M2 POS Price WebService"
 
         GeneralLedgerSetup.Get();
 
-        // Discount functions require a persistent receipt header
-        SalePOS.TransferFields(TmpSalePOS, true);
-        if (not SalePOS.Insert()) then SalePOS.Modify();
-
         DiscountPriority.SetCurrentKey(Priority);
-        DiscountPriority.SetFilter(Disabled, '=%1', false);
+        DiscountPriority.SetRange(Disabled, false);
         if (DiscountPriority.FindSet()) then begin
             repeat
-                if (DiscountPriority."Table ID" = 6014439) and (TmpSaleLinePOS."Currency Code" <> '') and (TmpSaleLinePOS."Currency Code" <> GeneralLedgerSetup."LCY Code") then begin
+                if (DiscountPriority."Table ID" = Database::"NPR Quantity Discount Header") and
+                   (TmpSaleLinePOS."Currency Code" <> '') and (TmpSaleLinePOS."Currency Code" <> GeneralLedgerSetup."LCY Code")
+                then begin
                     DiscountPriority.CalcFields("Table Name");
-                    Error('Discount module "%1" does not support discount calculations when exchange rates apply (%2 -> %3).', DiscountPriority."Table Name", GeneralLedgerSetup."LCY Code", TmpSaleLinePOS."Currency Code");
+                    Error(CurrencyDiscCalcNotSupported, DiscountPriority."Table Name", GeneralLedgerSetup."LCY Code", TmpSaleLinePOS."Currency Code");
                 end;
 
                 POSSalesDiscountCalcMgt.ApplyDiscount(DiscountPriority, TmpSalePOS, TmpSaleLinePOS2, TmpSaleLinePOS, TmpSaleLinePOS, 0, true);
@@ -136,22 +116,14 @@ codeunit 6151145 "NPR M2 POS Price WebService"
         TmpSaleLinePOS2.Reset();
         if (TmpSaleLinePOS2.FindSet()) then begin
             repeat
-                //TmpSaleLinePOS2.UpdateAmounts (TmpSaleLinePOS2);
-
                 with TmpSaleLinePOS2 do
                     TmpSaleLinePOS.Get("Register No.", "Sales Ticket No.", Date, "Sale Type", "Line No.");
 
                 TmpSaleLinePOS.TransferFields(TmpSaleLinePOS2, false);
                 TmpSaleLinePOS.UpdateAmounts(TmpSaleLinePOS);
                 TmpSaleLinePOS.Modify();
-
             until (TmpSaleLinePOS2.Next() = 0);
-
         end;
-
-        //-MAG2.23, [370652]
-        exit(true);
-        //+MAG2.23, [370652]
     end;
 
     local procedure TEST_SOAP_PosPrice()
@@ -218,7 +190,6 @@ codeunit 6151145 "NPR M2 POS Price WebService"
         ResponseMessage: Text;
         ResponseCode: Code[10];
     begin
-
         SelectLatestVersion();
 
         ItemPriceRequest.Import;
@@ -226,13 +197,9 @@ codeunit 6151145 "NPR M2 POS Price WebService"
 
         if (TryItemPriceRequest(TmpSalesPriceRequest, TmpPriceBracketResponse, TmpDiscountBracketResponse, TmpPricePointResponse, TmpSalesPriceResponse, ResponseMessage, ResponseCode)) then begin
             ItemPriceRequest.SetSalesPriceResponse(TmpPricePointResponse, TmpSalesPriceResponse, ResponseMessage, ResponseCode);
-
         end else begin
             ItemPriceRequest.SetErrorResponse(GetLastErrorText);
-
         end;
-
-        asserterror Error(''); // rollback any changes to the database
     end;
 
     [TryFunction]
@@ -249,7 +216,6 @@ codeunit 6151145 "NPR M2 POS Price WebService"
         GeneralLedgerSetup: Record "General Ledger Setup";
         RequestLineErrorMessage: Text;
     begin
-
         TmpSalesPriceRequest.Reset;
         if (not TmpSalesPriceRequest.FindSet()) then
             exit;
@@ -259,7 +225,6 @@ codeunit 6151145 "NPR M2 POS Price WebService"
 
         // Validate the Request
         repeat
-
             RequestLineErrorMessage := '';
 
             // Requires
@@ -275,11 +240,9 @@ codeunit 6151145 "NPR M2 POS Price WebService"
             TmpSalesPriceResponse."Show Details" := TmpSalesPriceRequest."Show Details";
             TmpSalesPriceResponse."Minimum Quantity" := TmpSalesPriceRequest."Minimum Quantity";
 
-            //-MAG2.21 [350006]
             TmpSalesPriceResponse."Price End Date" := TmpSalesPriceRequest."Price End Date";
             if (TmpSalesPriceResponse."Price End Date" < Today) then
                 TmpSalesPriceResponse."Price End Date" := Today;
-            //+MAG2.21 [350006]
 
             // Provide Defaults
             if (Item.Get(TmpSalesPriceRequest."Item No.")) then begin
@@ -292,14 +255,9 @@ codeunit 6151145 "NPR M2 POS Price WebService"
 
                 CurrencyExchangeRate.SetFilter("Currency Code", '=%1', TmpSalesPriceResponse."Currency Code");
 
-                //-MAG2.21 [350006]
-                // CurrencyExchangeRate.SETFILTER ("Starting Date", '..%1', TODAY);
-                // IF (CurrencyExchangeRate.ISEMPTY ()) THEN
-                //   RequestLineErrorMessage += STRSUBSTNO ('There is no Currency Exchange Rate within the filter "%1" "..%2".;', TmpSalesPriceResponse."Currency Code", TODAY);
                 CurrencyExchangeRate.SetFilter("Starting Date", '..%1', TmpSalesPriceResponse."Price End Date");
                 if (CurrencyExchangeRate.IsEmpty()) then
                     RequestLineErrorMessage += StrSubstNo('There is no Currency Exchange Rate within the filter "%1" "..%2".;', TmpSalesPriceResponse."Currency Code", TmpSalesPriceResponse."Price End Date");
-                //+MAG2.21 [350006]
 
                 if (TmpSalesPriceResponse."Unit of Measure Code" = '') then
                     TmpSalesPriceResponse."Unit of Measure Code" := Item."Sales Unit of Measure";
@@ -310,9 +268,7 @@ codeunit 6151145 "NPR M2 POS Price WebService"
                 if (not ItemUnitofMeasure.Get(Item."No.", TmpSalesPriceResponse."Unit of Measure Code")) then
                     RequestLineErrorMessage += StrSubstNo('Unit of Measure Code "%1" is not valid for item "%2".;', TmpSalesPriceResponse."Unit of Measure Code", Item."No.");
 
-                //-MAG2.25 [397545]
                 TmpSalesPriceResponse."VAT Prod. Posting Group" := Item."VAT Prod. Posting Group";
-                //+MAG2.25 [397545]
 
                 // Validate the customer
                 if (Customer."No." <> TmpSalesPriceRequest."Source Code") then
@@ -398,16 +354,11 @@ codeunit 6151145 "NPR M2 POS Price WebService"
         if (VATPostingSetup.Get(TmpSalesPriceResponse."VAT Bus. Posting Gr. (Price)", TmpSalesPriceResponse."VAT Prod. Posting Group")) then
             TmpSalesPriceResponse."Total VAT %" := VATPostingSetup."VAT %";
 
-        //-MAG2.21 [350006]
-        // TmpSalesHeader."Order Date" := TODAY;
         TmpSalesHeader."Order Date" := TmpSalesPriceResponse."Price End Date";
-        //+MAG2.21 [350006]
 
         TmpSalesHeader.Validate("Currency Code", TmpSalesPriceResponse."Currency Code"); // Request Parameters, could be blank
         TmpSalesHeader."Bill-to Customer No." := Customer."No.";
-        //-MAG2.23 [370652]
         TmpSalesHeader."Sell-to Customer No." := Customer."No.";
-        //+MAG2.23 [370652]
         TmpSalesHeader."Prices Including VAT" := false;
 
         TmpSalesLine.Type := TmpSalesLine.Type::Item;
@@ -419,10 +370,7 @@ codeunit 6151145 "NPR M2 POS Price WebService"
         TmpSalesLine."VAT Prod. Posting Group" := Item."VAT Prod. Posting Group";
         TmpSalesLine."VAT %" := VATPostingSetup."VAT %";
 
-        //-MAG2.23 [370652]
-        //TmpSalesLine."Unit of Measure" := TmpSalesPriceResponse."Unit of Measure Code"; // Request Parameters, could be blank
         TmpSalesLine."Unit of Measure Code" := TmpSalesPriceResponse."Unit of Measure Code"; // Request Parameters, could be blank
-        //-MAG2.23 [370652]
 
         // Build the qty bracket for which we will return prices
         TmpQtyBracket.DeleteAll();
@@ -437,12 +385,8 @@ codeunit 6151145 "NPR M2 POS Price WebService"
 
         // Unit Price Brackets
         SalesPrice.SetFilter("Item No.", '=%1', TmpSalesPriceResponse."Item No.");
-        //-MAG2.21 [350006]
-        // SalesPrice.SETFILTER ("Starting Date", '=%1|<=%2', 0D, TODAY);
-        // SalesPrice.SETFILTER ("Ending Date", '=%1|>=%2', 0D, TODAY);
         SalesPrice.SetFilter("Starting Date", '=%1|<=%2', 0D, TmpSalesPriceResponse."Price End Date");
         SalesPrice.SetFilter("Ending Date", '=%1|>=%2', 0D, TmpSalesPriceResponse."Price End Date");
-        //+MAG2.21 [350006]
 
         SalesPrice.SetFilter("Variant Code", '=%1|=%2', '', TmpSalesPriceResponse."Variant Code");
         SalesPrice.SetFilter("Currency Code", '=%1|=%2', '', TmpSalesPriceResponse."Currency Code");
@@ -455,12 +399,8 @@ codeunit 6151145 "NPR M2 POS Price WebService"
         SalesLineDiscount.Reset();
         SalesLineDiscount.SetFilter(Type, '=%1', SalesLineDiscount.Type::Item);
         SalesLineDiscount.SetFilter(Code, '=%1', TmpSalesPriceResponse."Item No.");
-        //-MAG2.21 [350006]
-        // SalesLineDiscount.SETFILTER ("Starting Date", '=%1|<=%2', 0D, TODAY);
-        // SalesLineDiscount.SETFILTER ("Ending Date", '=%1|>=%2', 0D, TODAY);
         SalesLineDiscount.SetFilter("Starting Date", '=%1|<=%2', 0D, TmpSalesPriceResponse."Price End Date");
         SalesLineDiscount.SetFilter("Ending Date", '=%1|>=%2', 0D, TmpSalesPriceResponse."Price End Date");
-        //+MAG2.21 [350006]
 
         SalesLineDiscount.SetFilter("Variant Code", '=%1|=%2', '', TmpSalesPriceResponse."Variant Code");
         SalesLineDiscount.SetFilter("Currency Code", '=%1|=%2', '', TmpSalesPriceResponse."Currency Code");
@@ -571,12 +511,8 @@ codeunit 6151145 "NPR M2 POS Price WebService"
             repeat
                 TmpSalesLine.Quantity := TmpQtyBracket."Minimum Quantity";
                 TmpSalesLine."Qty. per Unit of Measure" := 1;
-                //-MAG2.23 [370652]
-                //IF (TmpSalesLine."Unit of Measure" <> '') THEN
-                //  IF (ItemUnitofMeasure.GET (TmpSalesLine."No.", TmpSalesLine."Unit of Measure")) THEN
                 if (TmpSalesLine."Unit of Measure Code" <> '') then
                     if (ItemUnitofMeasure.Get(TmpSalesLine."No.", TmpSalesLine."Unit of Measure Code")) then
-                        //+MAG2.23 [370652]
                         if (ItemUnitofMeasure."Qty. per Unit of Measure" > 0) then
                             TmpSalesLine."Qty. per Unit of Measure" := ItemUnitofMeasure."Qty. per Unit of Measure";
 
@@ -585,11 +521,8 @@ codeunit 6151145 "NPR M2 POS Price WebService"
 
                 SalesPriceCalcMgt.FindSalesLinePrice(TmpSalesHeader, TmpSalesLine, 0);
 
-                //-MAG2.25 [391299]
-                // SalesPriceCalcMgt.FindSalesLineLineDisc (TmpSalesHeader, TmpSalesLine);
                 if (TmpSalesLine."Allow Line Disc.") then
                     SalesPriceCalcMgt.FindSalesLineLineDisc(TmpSalesHeader, TmpSalesLine);
-                //+MAG2.25 [391299]
 
                 TmpPricePoint.TransferFields(TmpSalesPriceResponse);
                 TmpPricePoint."Unit Price Base" := TmpSalesLine."Unit Price";
@@ -674,42 +607,27 @@ codeunit 6151145 "NPR M2 POS Price WebService"
 
     procedure ItemAvailabilityByPeriod(var ItemAvailabilityByPeriod: XMLport "NPR M2 Item Availab. By Period")
     begin
-
-        //-NPR5.49 [345373]
         ItemAvailabilityByPeriod.Import;
         ItemAvailabilityByPeriod.CalculateAvailability();
-
         // All logic in XML port to generate output on export
-        //+NPR5.49 [345373]
     end;
 
     procedure CustomerItemByPeriod(var CustomerItemByPeriod: XMLport "NPR M2 Customer Item By Period")
     begin
-
-        //-NPR5.49 [345375]
         CustomerItemByPeriod.Import();
         CustomerItemByPeriod.ValidateRequest();
-
         // All logic in XML port to generate output on export
-        //+NPR5.49 [345375]
     end;
 
     procedure EstimateDeliveryDate(var EstimateDeliveryDate: XMLport "NPR M2 Estimate Delivery Date")
     begin
-
-        //-MAG2.25 [349999]
         EstimateDeliveryDate.Import();
         EstimateDeliveryDate.PrepareResult();
-        //+MAG2.25 [349999]
     end;
 
     procedure GetWorkingDayCalendar(var GetWorkingDayCalendar: XMLport "NPR M2 Get WorkingDay Calendar")
     begin
-
-        //-MAG2.25 [349999]
         GetWorkingDayCalendar.Import();
         GetWorkingDayCalendar.PrepareResponse();
-        //+MAG2.25 [349999]
     end;
 }
-
