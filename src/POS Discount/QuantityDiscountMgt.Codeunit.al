@@ -1,18 +1,5 @@
 codeunit 6014432 "NPR Quantity Discount Mgt."
 {
-    // NPR5.27/LS  /20161020 CASE 255541 Issue when finding multiple Unit price using only Main No.
-    // NPR5.31/MHA /20170210  CASE 262904 Applied Event triggered Discount Calculation: OnInitDiscountPriority(),OnApplyDiscount(),IsSubscribedDiscount(),DiscSourceTableId(),DiscCalcCodeunitId()
-    // NPR5.38/BHR /20170630  CASE 270508 Skip Discount when we have customer price group
-    // NPR5.38/MHA /20171204  CASE 298276 Removed Discount Cache
-    // NPR5.40/MMV /20180213  CASE 294655 Performance optimization
-    // NPR5.42/MMV /20180514  CASE 313873 Set "Discount Modified" field correctly.
-    // NPR5.44/MMV /20180627  CASE 312154 Fixed incorrect cross line discount handling when different types collided.
-    // NPR5.48/TSA /20181210 CASE 339434 Unit Price was assumed to be the same across all lines
-    // NPR5.48/MMV /20181210 CASE 339413 Event discover subscriber was not setting cross line parameter.
-    // NPR5.48/TSA /20181214 CASE 339434 Also added Unit Price consideration and VAT inclustion. Ignoring negative discounts
-    // NPR5.55/TJ  /20200420 CASE 400524 Setting "Discount Code" as basis for dimension transfer
-
-
     trigger OnRun()
     begin
     end;
@@ -30,12 +17,9 @@ codeunit 6014432 "NPR Quantity Discount Mgt."
 
         Clear(TempSaleLinePOS);
 
-        //-NPR5.44 [312154]
-        // TempSaleLinePOS.SETRANGE("No.", Rec."No.");
         if not RecalculateAllLines then
             TempSaleLinePOS.SetRange("No.", Rec."No.");
         TempSaleLinePOS.SetRange("Discount Type", TempSaleLinePOS."Discount Type"::" ");
-        //+NPR5.44 [312154]
 
         if TempSaleLinePOS.IsEmpty then
             exit;
@@ -57,16 +41,9 @@ codeunit 6014432 "NPR Quantity Discount Mgt."
             TempQuantityDiscountLine.SetFilter(Quantity, '>%1&<=%2', 0, Abs(ItemQuantity));
 
             if TempQuantityDiscountLine.FindLast then begin
-                //-NPR5.48 [339434]
-                // DiscountPercent := 100 - TempQuantityDiscountLine."Unit Price" / TempSaleLinePOS."Unit Price" * 100;
-                //+NPR5.48 [339434]
-
                 TempSaleLinePOS.SetRange("No.", TempQuantityDiscountLine."Item No.");
-
                 if TempSaleLinePOS.FindSet then
                     repeat
-
-                        //-NPR5.48 [339434]
                         TempQuantityDiscountLine.CalcFields("Price Includes VAT");
                         DiscountPercent := 0;
                         if (TempSaleLinePOS."Unit Price" <> 0) then begin
@@ -83,20 +60,14 @@ codeunit 6014432 "NPR Quantity Discount Mgt."
                             end;
 
                         end;
-                        //+NPR5.48 [339434]
 
                         TempSaleLinePOS."Discount %" := DiscountPercent;
                         TempSaleLinePOS."Discount Type" := TempSaleLinePOS."Discount Type"::Quantity;
-                        //-NPR5.55 [400524]
                         TempSaleLinePOS."Discount Code" := TempQuantityDiscountLine."Main no.";
-                        //+NPR5.55 [400524]
                         TempSaleLinePOS."FP Anvendt" := true;
 
-                        //-NPR5.48 [338181]
-                        //TempSaleLinePOS.MODIFY;
                         if (DiscountPercent >= 0) then
                             TempSaleLinePOS.Modify;
-                    //+NPR5.48 [338181]
 
                     until TempSaleLinePOS.Next = 0;
             end;
@@ -120,13 +91,10 @@ codeunit 6014432 "NPR Quantity Discount Mgt."
                 QuantityDiscountHeader.SetFilter("Global Dimension 1 Code", '=%1|=%2', TempSaleLinePOS."Shortcut Dimension 1 Code", '');
                 QuantityDiscountHeader.SetFilter("Global Dimension 2 Code", '=%1|=%2', TempSaleLinePOS."Shortcut Dimension 2 Code", '');
 
-                //-NPR5.42 [313873]
-                //IF QuantityDiscountHeader.FINDSET THEN REPEAT
                 if QuantityDiscountHeader.FindSet then begin
                     TempSaleLinePOS."Discount Calculated" := true;
                     TempSaleLinePOS.Modify;
                     repeat
-                        //+NPR5.42 [313873]
                         QuantityDiscountLine.SetRange("Main no.", QuantityDiscountHeader."Main No.");
                         QuantityDiscountLine.SetRange("Item No.", QuantityDiscountHeader."Item No.");
 
@@ -140,17 +108,9 @@ codeunit 6014432 "NPR Quantity Discount Mgt."
                                     TempQuantityDiscountLine.TransferFields(QuantityDiscountLine);
                                     TempQuantityDiscountLine.Insert;
                                 until QuantityDiscountLine.Next = 0;
-                            //-NPR5.42 [313873]
-                            //-NPR5.40 [294655]
-                            //        TempSaleLinePOS."Discount Modified" := TRUE;
-                            //        TempSaleLinePOS.MODIFY;
-                            //+NPR5.40 [294655]
-                            //+NPR5.42 [313873]
                         end;
                     until QuantityDiscountHeader.Next = 0;
-                    //-NPR5.42 [313873]
                 end;
-            //+NPR5.42 [313873]
             until TempSaleLinePOS.Next = 0;
     end;
 
@@ -161,7 +121,6 @@ codeunit 6014432 "NPR Quantity Discount Mgt."
     [EventSubscriber(ObjectType::Codeunit, 6014455, 'InitDiscountPriority', '', true, true)]
     local procedure OnInitDiscountPriority(var DiscountPriority: Record "NPR Discount Priority")
     begin
-        //-NPR5.31 [262904]
         if DiscountPriority.Get(DiscSourceTableId()) then
             exit;
 
@@ -170,11 +129,8 @@ codeunit 6014432 "NPR Quantity Discount Mgt."
         DiscountPriority.Priority := 4;
         DiscountPriority.Disabled := false;
         DiscountPriority."Discount Calc. Codeunit ID" := DiscCalcCodeunitId();
-        //-NPR5.48 [339413]
         DiscountPriority."Cross Line Calculation" := true;
-        //+NPR5.48 [339413]
         DiscountPriority.Insert(true);
-        //+NPR5.31 [262904]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014455, 'ApplyDiscount', '', true, true)]
@@ -183,10 +139,7 @@ codeunit 6014432 "NPR Quantity Discount Mgt."
         if not IsSubscribedDiscount(DiscountPriority) then
             exit;
 
-        //-NPR5.44 [312154]
-        //ApplyQuantityDiscounts(SalePOS,TempSaleLinePOS, Rec);
         ApplyQuantityDiscounts(SalePOS, TempSaleLinePOS, Rec, RecalculateAllLines);
-        //+NPR5.44 [312154]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014455, 'OnFindActiveSaleLineDiscounts', '', false, false)]
@@ -196,7 +149,6 @@ codeunit 6014432 "NPR Quantity Discount Mgt."
         IsActive: Boolean;
         DiscountPriority: Record "NPR Discount Priority";
     begin
-        //-NPR5.40 [294655]
         if not DiscountPriority.Get(DiscSourceTableId()) then
             exit;
         if not IsSubscribedDiscount(DiscountPriority) then
@@ -214,33 +166,17 @@ codeunit 6014432 "NPR Quantity Discount Mgt."
             tmpDiscountPriority := DiscountPriority;
             tmpDiscountPriority.Insert;
         end;
-        //+NPR5.40 [294655]
     end;
 
     local procedure IsValidLineOperation(Rec: Record "NPR Sale Line POS"; xRec: Record "NPR Sale Line POS"; LineOperation: Option Insert,Modify,Delete): Boolean
     var
         SaleLinePOS: Record "NPR Sale Line POS";
     begin
-        //-NPR5.44 [312154]
-        // IF LineOperation = LineOperation::Delete THEN BEGIN
-        //  //Check if any other line has the same item no. - If not, the operation should not trigger discount calculation in sale.
-        //  SaleLinePOS.SETRANGE("Register No.", Rec."Register No.");
-        //  SaleLinePOS.SETRANGE("Sales Ticket No.", Rec."Sales Ticket No.");
-        //  SaleLinePOS.SETRANGE(Date, Rec.Date);
-        //  SaleLinePOS.SETRANGE("Sale Type", Rec."Sale Type");
-        //  SaleLinePOS.SETRANGE(Type, Rec.Type);
-        //  SaleLinePOS.SETRANGE("No.", Rec."No.");
-        //  SaleLinePOS.SETFILTER("Line No.", '<>%1', Rec."Line No.");
-        //  EXIT(NOT SaleLinePOS.ISEMPTY);
-        // END;
-        //+NPR5.44 [312154]
-
         exit(true);
     end;
 
     local procedure IsSubscribedDiscount(DiscountPriority: Record "NPR Discount Priority"): Boolean
     begin
-        //-NPR5.31 [262904]
         if DiscountPriority.Disabled then
             exit(false);
         if DiscountPriority."Table ID" <> DiscSourceTableId() then
@@ -249,21 +185,16 @@ codeunit 6014432 "NPR Quantity Discount Mgt."
             exit(false);
 
         exit(true);
-        //+NPR5.31 [262904]
     end;
 
     local procedure DiscSourceTableId(): Integer
     begin
-        //-NPR5.31 [262904]
         exit(DATABASE::"NPR Quantity Discount Header");
-        //+NPR5.31 [262904]
     end;
 
     local procedure DiscCalcCodeunitId(): Integer
     begin
-        //-NPR5.31 [262904]
         exit(CODEUNIT::"NPR Quantity Discount Mgt.");
-        //+NPR5.31 [262904]
     end;
 
     local procedure DiscountActiveNow(var QuantityDiscountHeader: Record "NPR Quantity Discount Header"): Boolean
@@ -271,7 +202,6 @@ codeunit 6014432 "NPR Quantity Discount Mgt."
         CurrDate: Date;
         CurrTime: Time;
     begin
-        //-NPR5.31 [262904]
         if QuantityDiscountHeader.IsTemporary then
             exit(false);
 
@@ -294,14 +224,12 @@ codeunit 6014432 "NPR Quantity Discount Mgt."
             exit(false);
 
         exit(true);
-        //+NPR5.31 [262904]
     end;
 
     local procedure DiscountLineActiveNow(var QuantityDiscountLine: Record "NPR Quantity Discount Line"): Boolean
     var
         QuantityDiscountHeader: Record "NPR Quantity Discount Header";
     begin
-        //-NPR5.31 [262904]
         if QuantityDiscountLine.IsTemporary then
             exit(false);
 
@@ -309,7 +237,5 @@ codeunit 6014432 "NPR Quantity Discount Mgt."
             exit(false);
 
         exit(DiscountActiveNow(QuantityDiscountHeader));
-        //+NPR5.31 [262904]
     end;
 }
-

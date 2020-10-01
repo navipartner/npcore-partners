@@ -1,11 +1,5 @@
 codeunit 6151209 "NPR NpCs Arch. Collect Mgt."
 {
-    // NPR5.51/MHA /20190717  CASE 344264 Object created - Archive Collect in Store Documents
-    // NPR5.51/MHA /20190719  CASE 344264 Added "Opening Hour Set"
-    // NPR5.51/MHA /20190821  CASE 364557 Added "Post on", "Sell-to Customer Name", "Location Code"
-    // NPR5.54/MHA /20200214  CASE 390590 Posting of Sales Document is only mandatory for Store Stock Orders
-
-
     trigger OnRun()
     begin
     end;
@@ -16,54 +10,28 @@ codeunit 6151209 "NPR NpCs Arch. Collect Mgt."
         Text003: Label 'Document Archived';
         Text004: Label 'Sales %1 %2 posted';
         Text005: Label 'Delivery printed: %1';
-        Text006: Label 'Sales %1 %2 must be posted when %3 = %4';
 
-    local procedure "--- Archive"()
-    begin
-    end;
+    //--- Archive ---
 
     procedure ArchiveCollectDocument(var NpCsDocument: Record "NPR NpCs Document"): Boolean
     var
-        SalesHeader: Record "Sales Header";
         NpCsArchDocument: Record "NPR NpCs Arch. Document";
         NpCsArchDocumentLogEntry: Record "NPR NpCs Arch. Doc. Log Entry";
         PrevNpCsDocument: Record "NPR NpCs Document";
         NpCsDocumentLogEntry: Record "NPR NpCs Document Log Entry";
         NpCsWorkflowModule: Record "NPR NpCs Workflow Module";
         NpCsWorkflowMgt: Codeunit "NPR NpCs Workflow Mgt.";
-        ErrorText: Text;
+        Success: Boolean;
     begin
         PrevNpCsDocument := NpCsDocument;
 
-        asserterror
-        begin
-            if SalesHeader.Get(NpCsDocument."Document Type", NpCsDocument."Document No.") then begin
-                case NpCsDocument."Bill via" of
-                    NpCsDocument."Bill via"::POS:
-                        begin
-                            SalesHeader.Delete(true);
-                        end;
-                    NpCsDocument."Bill via"::"Sales Document":
-                        begin
-                            //-NPR5.54 [390590]
-                            if (NpCsDocument."Delivery Status" = NpCsDocument."Delivery Status"::Delivered) and NpCsDocument."Store Stock" then
-                                Error(Text006, NpCsDocument."Document Type", NpCsDocument."Document No.", NpCsDocument.FieldCaption("Bill via"), NpCsDocument."Bill via");
-                            //+NPR5.54 [390590]
-
-                            SalesHeader.Delete(true);
-                        end;
-                end;
-            end;
-
-            Commit;
-            Error('');
-        end;
-        ErrorText := GetLastErrorText;
+        ClearLastError();
+        Success := Codeunit.Run(Codeunit::"NPR NpCs Delete Related S.Doc.", NpCsDocument);
 
         NpCsWorkflowModule.Type := NpCsWorkflowModule.Type::"Post Processing";
-        NpCsWorkflowMgt.InsertLogEntry(NpCsDocument, NpCsWorkflowModule, Text003, ErrorText <> '', ErrorText);
+        NpCsWorkflowMgt.InsertLogEntry(NpCsDocument, NpCsWorkflowModule, Text003, not Success, GetLastErrorText);
         Commit;
-        if ErrorText <> '' then
+        if not Success then
             exit(false);
 
         InsertArchCollectDocument(NpCsDocument, NpCsArchDocument);
@@ -88,10 +56,8 @@ codeunit 6151209 "NPR NpCs Arch. Collect Mgt."
         NpCsArchDocument."Document Type" := NpCsDocument."Document Type";
         NpCsArchDocument."Document No." := NpCsDocument."Document No.";
         NpCsArchDocument."Reference No." := NpCsDocument."Reference No.";
-        //-NPR5.51 [362443]
         NpCsArchDocument."Inserted at" := NpCsDocument."Inserted at";
         NpCsArchDocument."Archived at" := CurrentDateTime;
-        //+NPR5.51 [362443]
         NpCsArchDocument."Workflow Code" := NpCsDocument."Workflow Code";
         NpCsArchDocument."Next Workflow Step" := NpCsDocument."Next Workflow Step";
         NpCsArchDocument."From Document Type" := NpCsDocument."From Document Type";
@@ -103,9 +69,7 @@ codeunit 6151209 "NPR NpCs Arch. Collect Mgt."
         NpCsArchDocument."To Document Type" := NpCsDocument."To Document Type";
         NpCsArchDocument."To Document No." := NpCsDocument."To Document No.";
         NpCsArchDocument."To Store Code" := NpCsDocument."To Store Code";
-        //-NPR5.51 [362443]
         NpCsArchDocument."Opening Hour Set" := NpCsDocument."Opening Hour Set";
-        //+NPR5.51 [362443]
         NpCsArchDocument."Processing Expiry Duration" := NpCsDocument."Processing Expiry Duration";
         NpCsArchDocument."Processing Status" := NpCsDocument."Processing Status";
         NpCsArchDocument."Processing updated at" := NpCsDocument."Processing updated at";
@@ -137,14 +101,10 @@ codeunit 6151209 "NPR NpCs Arch. Collect Mgt."
         NpCsArchDocument."Delivery Document No." := NpCsDocument."Delivery Document No.";
         NpCsArchDocument."Archive on Delivery" := NpCsDocument."Archive on Delivery";
         NpCsArchDocument."Location Code" := NpCsDocument."Location Code";
-        //-NPR5.51 [364557]
         NpCsArchDocument."Sell-to Customer Name" := NpCsDocument."Sell-to Customer Name";
         NpCsArchDocument."Post on" := NpCsDocument."Post on";
-        //+NPR5.51 [364557]
         NpCsArchDocument."Bill via" := NpCsDocument."Bill via";
-        //-NPR5.51 [364557]
         NpCsArchDocument."Processing Print Template" := NpCsDocument."Processing Print Template";
-        //+NPR5.51 [364557]
         NpCsArchDocument."Delivery Print Template (POS)" := NpCsDocument."Delivery Print Template (POS)";
         NpCsArchDocument."Delivery Print Template (S.)" := NpCsDocument."Delivery Print Template (S.)";
         NpCsArchDocument."Salesperson Code" := NpCsDocument."Salesperson Code";
@@ -171,4 +131,3 @@ codeunit 6151209 "NPR NpCs Arch. Collect Mgt."
         NpCsArchDocumentLogEntry.Insert(true);
     end;
 }
-
