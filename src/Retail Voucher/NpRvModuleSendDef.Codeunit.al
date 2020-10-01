@@ -1,13 +1,23 @@
 codeunit 6151013 "NPR NpRv Module Send: Def."
 {
-    // NPR5.37/MHA /20171023  CASE 267346 Object created - NaviPartner Retail Voucher
-    // NPR5.43/MHA /20180606  CASE 307022 Added RecFilter in PrintVoucher()
-    // NPR5.48/MHA /20190123  CASE 341711 Added Send Methods E-mail and SMS
-    // NPR5.55/MHA /20200702  CASE 407070 Object created
-
+    TableNo = "NPR NpRv Voucher";
 
     trigger OnRun()
+    var
+        Voucher: Record "NPR NpRv Voucher";
     begin
+        Voucher := Rec;
+
+        case true of
+            Voucher."Send via Print":
+                TrySendVoucherViaPrint(Voucher);
+            Voucher."Send via E-mail":
+                TrySendVoucherViaEmail(Voucher);
+            Voucher."Send via SMS":
+                TrySendVoucherViaSMS(Voucher);
+        end;
+
+        Rec := Voucher;
     end;
 
     var
@@ -21,7 +31,6 @@ codeunit 6151013 "NPR NpRv Module Send: Def."
         ErrorText: Text;
         LastErrorText: Text;
     begin
-        //-NPR5.55 [407070]
         Commit;
         if NpRvVoucher."Send via Print" then begin
             LastErrorText := SendVoucherViaPrint(NpRvVoucher);
@@ -49,106 +58,124 @@ codeunit 6151013 "NPR NpRv Module Send: Def."
 
         if ErrorText <> '' then
             Error(CopyStr(ErrorText, 1, 1000));
-        //+NPR5.55 [407070]
     end;
 
     procedure SendVoucherViaPrint(Voucher: Record "NPR NpRv Voucher") LastErrorText: Text
     var
         NpRvSendingLog: Record "NPR NpRv Sending Log";
+        Voucher2: Record "NPR NpRv Voucher";
         NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
-        RPTemplateMgt: Codeunit "NPR RP Template Mgt.";
     begin
-        if Voucher."Print Template Code" = '' then
-            exit;
+        Voucher2 := Voucher;
+        Voucher2."Send via E-mail" := false;
+        Voucher2."Send via SMS" := false;
 
-        //-NPR5.43 [307022]
-        Voucher.SetRecFilter;
-        //+NPR5.43 [307022]
-
-        //-NPR5.55 [407070]
-        asserterror
-        begin
-            RPTemplateMgt.PrintTemplate(Voucher."Print Template Code", Voucher, 0);
-            Commit;
-            Error('');
+        ClearLastError();
+        if not Codeunit.Run(Codeunit::"NPR NpRv Module Send: Def.", Voucher2) then begin
+            LastErrorText := GetLastErrorText;
+            NpRvVoucherMgt.LogSending(Voucher, NpRvSendingLog."Sending Type"::Print, StrSubstNo(Text001, Voucher."Print Template Code"), '', LastErrorText);
         end;
-        LastErrorText := GetLastErrorText;
-        NpRvVoucherMgt.LogSending(Voucher, NpRvSendingLog."Sending Type"::Print, StrSubstNo(Text001, Voucher."Print Template Code"), '', LastErrorText);
         Commit;
         exit(LastErrorText);
-        //+NPR5.55 [407070]
+    end;
+
+    local procedure TrySendVoucherViaPrint(var Voucher: Record "NPR NpRv Voucher")
+    var
+        RPTemplateMgt: Codeunit "NPR RP Template Mgt.";
+    begin
+        if Voucher.Find() then;
+        if Voucher."Print Template Code" = '' then
+            exit;
+        Voucher.SetRecFilter;
+        RPTemplateMgt.PrintTemplate(Voucher."Print Template Code", Voucher, 0);
     end;
 
     procedure SendVoucherViaEmail(Voucher: Record "NPR NpRv Voucher") LastErrorText: Text
     var
         NpRvSendingLog: Record "NPR NpRv Sending Log";
+        Voucher2: Record "NPR NpRv Voucher";
+        NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
+    begin
+        Voucher2 := Voucher;
+        Voucher2."Send via Print" := false;
+        Voucher2."Send via SMS" := false;
+
+        ClearLastError();
+        if not Codeunit.Run(Codeunit::"NPR NpRv Module Send: Def.", Voucher2) then begin
+            LastErrorText := GetLastErrorText;
+            NpRvVoucherMgt.LogSending(Voucher, NpRvSendingLog."Sending Type"::"E-mail", StrSubstNo(Text002, Voucher2."E-mail Template Code"), Voucher."E-mail", LastErrorText);
+        end;
+        Commit;
+        exit(LastErrorText);
+    end;
+
+    local procedure TrySendVoucherViaEmail(var Voucher: Record "NPR NpRv Voucher")
+    var
         EmailTemplateHeader: Record "NPR E-mail Template Header";
         TempBlob: Codeunit "Temp Blob";
         BarcodeLibrary: Codeunit "NPR Barcode Library";
         EmailManagement: Codeunit "NPR E-mail Management";
-        NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
         RecRef: RecordRef;
     begin
-        //-NPR5.55 [407070]
-        asserterror
-        begin
-            if Voucher."E-mail Template Code" <> '' then begin
-                if EmailTemplateHeader.Get(Voucher."E-mail Template Code") then
-                    EmailTemplateHeader.SetRecFilter;
-            end;
-
-            if not Voucher.Barcode.HasValue then begin
-                BarcodeLibrary.GenerateBarcode(Voucher."Reference No.", TempBlob);
-
-                RecRef.GetTable(Voucher);
-                TempBlob.ToRecordRef(RecRef, Voucher.FieldNo(Barcode));
-                RecRef.SetTable(Voucher);
-
-                Voucher.Modify;
-            end;
-            RecRef.GetTable(Voucher);
-            RecRef.SetRecFilter;
-            if EmailTemplateHeader."Report ID" > 0 then
-                EmailManagement.SendReportTemplate(EmailTemplateHeader."Report ID", RecRef, EmailTemplateHeader, Voucher."E-mail", true)
-            else
-                EmailManagement.SendEmailTemplate(RecRef, EmailTemplateHeader, Voucher."E-mail", true);
-            Commit;
-            Error('');
+        if Voucher.Find() then;
+        if Voucher."E-mail Template Code" <> '' then begin
+            if EmailTemplateHeader.Get(Voucher."E-mail Template Code") then
+                EmailTemplateHeader.SetRecFilter;
         end;
-        LastErrorText := GetLastErrorText;
-        NpRvVoucherMgt.LogSending(Voucher, NpRvSendingLog."Sending Type"::"E-mail", StrSubstNo(Text002, EmailTemplateHeader.Code), Voucher."E-mail", LastErrorText);
-        Commit;
-        exit(LastErrorText);
-        //+NPR5.55 [407070]
+
+        if not Voucher.Barcode.HasValue then begin
+            BarcodeLibrary.GenerateBarcode(Voucher."Reference No.", TempBlob);
+
+            RecRef.GetTable(Voucher);
+            TempBlob.ToRecordRef(RecRef, Voucher.FieldNo(Barcode));
+            RecRef.SetTable(Voucher);
+
+            Voucher.Modify;
+        end;
+
+        RecRef.GetTable(Voucher);
+        RecRef.SetRecFilter;
+        if EmailTemplateHeader."Report ID" > 0 then
+            EmailManagement.SendReportTemplate(EmailTemplateHeader."Report ID", RecRef, EmailTemplateHeader, Voucher."E-mail", true)
+        else
+            EmailManagement.SendEmailTemplate(RecRef, EmailTemplateHeader, Voucher."E-mail", true);
+        Voucher."E-mail Template Code" := EmailTemplateHeader.Code;
     end;
 
     procedure SendVoucherViaSMS(Voucher: Record "NPR NpRv Voucher") LastErrorText: Text
     var
         NpRvSendingLog: Record "NPR NpRv Sending Log";
-        SMSTemplateHeader: Record "NPR SMS Template Header";
-        SMSManagement: Codeunit "NPR SMS Management";
+        Voucher2: Record "NPR NpRv Voucher";
         NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
-        SMSMessage: Text;
-        Sender: Text;
     begin
-        //-NPR5.55 [407070]
-        asserterror
-        begin
-            if (Voucher."SMS Template Code" = '') or (not SMSTemplateHeader.Get(Voucher."SMS Template Code")) then begin
-                if not SMSManagement.FindTemplate(Voucher, SMSTemplateHeader) then
-                    exit;
-            end;
+        Voucher2 := Voucher;
+        Voucher2."Send via Print" := false;
+        Voucher2."Send via E-mail" := false;
 
-            SMSMessage := SMSManagement.MakeMessage(SMSTemplateHeader, Voucher);
-            SMSManagement.SendSMS(Voucher."Phone No.", SMSTemplateHeader."Alt. Sender", SMSMessage);
-            Commit;
-            Error('');
+        ClearLastError();
+        if not Codeunit.Run(Codeunit::"NPR NpRv Module Send: Def.", Voucher2) then begin
+            LastErrorText := GetLastErrorText;
+            NpRvVoucherMgt.LogSending(Voucher, NpRvSendingLog."Sending Type"::SMS, StrSubstNo(Text003, Voucher."SMS Template Code"), Voucher."Phone No.", LastErrorText);
         end;
-        LastErrorText := GetLastErrorText;
-        NpRvVoucherMgt.LogSending(Voucher, NpRvSendingLog."Sending Type"::SMS, StrSubstNo(Text003, SMSTemplateHeader.Code), Voucher."Phone No.", LastErrorText);
         Commit;
         exit(LastErrorText);
-        //+NPR5.55 [407070]
+    end;
+
+    local procedure TrySendVoucherViaSMS(var Voucher: Record "NPR NpRv Voucher")
+    var
+        SMSTemplateHeader: Record "NPR SMS Template Header";
+        SMSManagement: Codeunit "NPR SMS Management";
+        SMSMessage: Text;
+    begin
+        if Voucher.Find() then;
+        if (Voucher."SMS Template Code" = '') or (not SMSTemplateHeader.Get(Voucher."SMS Template Code")) then begin
+            if not SMSManagement.FindTemplate(Voucher, SMSTemplateHeader) then
+                exit;
+            Voucher."SMS Template Code" := SMSTemplateHeader.Code;
+        end;
+
+        SMSMessage := SMSManagement.MakeMessage(SMSTemplateHeader, Voucher);
+        SMSManagement.SendSMS(Voucher."Phone No.", SMSTemplateHeader."Alt. Sender", SMSMessage);
     end;
 
     local procedure "--- Voucher Interface"()
@@ -189,10 +216,6 @@ codeunit 6151013 "NPR NpRv Module Send: Def."
         if not IsSubscriber(VoucherType) then
             exit;
 
-        //-NPR5.48 [341711]
-        // VoucherType.TESTFIELD("Print Template Code");
-        // RPTemplateHeader.GET(VoucherType."Print Template Code");
-        // PAGE.RUN(PAGE::"RP Template Card",RPTemplateHeader);
         Selection := VoucherType."Send Method via POS";
         if Selection = VoucherType."Send Method via POS"::Ask then
             Selection := SelectSendMethod(VoucherType);
@@ -217,7 +240,6 @@ codeunit 6151013 "NPR NpRv Module Send: Def."
                     PAGE.Run(PAGE::"NPR SMS Template Card", SMSTemplateHeader);
                 end;
         end;
-        //+NPR5.48 [341711]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6151011, 'OnRunSendVoucher', '', true, true)]
@@ -230,10 +252,7 @@ codeunit 6151013 "NPR NpRv Module Send: Def."
 
         Handled := true;
 
-        //-NPR5.48 [341711]
-        //PrintVoucher(Voucher);
         SendVoucher(Voucher);
-        //+NPR5.48 [341711]
     end;
 
     local procedure "--- Aux"()
@@ -259,7 +278,6 @@ codeunit 6151013 "NPR NpRv Module Send: Def."
     var
         SelectionStr: Text;
     begin
-        //-NPR5.48 [341711]
         Selection := VoucherType."Send Method via POS";
         if VoucherType."Send Method via POS" = VoucherType."Send Method via POS"::Ask then begin
             SelectionStr := GetSendMethodSelectionStr(VoucherType, Selection);
@@ -269,12 +287,10 @@ codeunit 6151013 "NPR NpRv Module Send: Def."
         end;
 
         exit(Selection);
-        //+NPR5.48 [341711]
     end;
 
     local procedure GetSendMethodSelectionStr(VoucherType: Record "NPR NpRv Voucher Type"; var Selection: Integer) SelectionStr: Text
     begin
-        //-NPR5.48 [341711]
         Selection := 0;
         if VoucherType."Print Template Code" <> '' then begin
             SelectionStr := Format(VoucherType."Send Method via POS"::Print);
@@ -294,16 +310,12 @@ codeunit 6151013 "NPR NpRv Module Send: Def."
         end;
 
         exit(SelectionStr);
-        //+NPR5.48 [341711]
     end;
 
     local procedure NewLine() CRLF: Text[2]
     begin
-        //-NPR5.55 [407070]
         CRLF[1] := 13;
         CRLF[2] := 10;
         exit(CRLF);
-        //+NPR5.55 [407070]
     end;
 }
-

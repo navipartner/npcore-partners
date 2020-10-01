@@ -1,8 +1,5 @@
 codeunit 6151024 "NPR NpRv Sales Doc. Mgt."
 {
-    // NPR5.55/MHA /20200427  CASE 402013 Object created - contains functions for issuing Retail Vouchers via Sales Document
-
-
     trigger OnRun()
     begin
     end;
@@ -448,22 +445,17 @@ codeunit 6151024 "NPR NpRv Sales Doc. Mgt."
 
     local procedure SendVoucher(NpRvVoucher: Record "NPR NpRv Voucher")
     var
-        NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
         LastErrorText: Text;
     begin
         NpRvVoucher.CalcFields(Amount);
         if NpRvVoucher.Amount > 0 then begin
-            asserterror
-            begin
-                NpRvVoucherMgt.SendVoucher(NpRvVoucher);
-                Commit;
-                Error('');
+            ClearLastError();
+            if not Codeunit.Run(codeunit::"NPR NpRv Voucher Mgt.", NpRvVoucher) then begin
+                LastErrorText := GetLastErrorText;
+                if LastErrorText <> '' then
+                    Message(LastErrorText);
             end;
-
-            LastErrorText := GetLastErrorText;
-            if LastErrorText <> '' then
-                Message(LastErrorText);
+            Commit();
         end;
     end;
 }
-

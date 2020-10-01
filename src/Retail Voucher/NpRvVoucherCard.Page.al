@@ -1,16 +1,5 @@
 page 6151014 "NPR NpRv Voucher Card"
 {
-    // NPR5.37/MHA /20171023  CASE 267346 Object created - NaviPartner Retail Voucher
-    // NPR5.46/MHA /20180928  CASE 330222 Removed caption on Group Control6014409
-    // NPR5.48/MHA /20181122  CASE 302179 Added fields 85, 1005, 1007, 1010, 1013
-    // NPR5.48/MHA /20190123  CASE 341711 Added field 90 "E-mail Template Code", 95 "SMS Template Code", 103 "Send via Print", 105 "Send via E-mail", 107 "Send via SMS"
-    // NPR5.49/MHA /20190228  CASE 342811 Added Retail Voucher Partner fields used with Cross Company Vouchers
-    // NPR5.50/MHA /20190426  CASE 353079 Added field 62 "Allow Top-up"
-    // NPR5.53/MHA /20191211  CASE 380284 Added field 76 "Initial Amount"
-    // NPR5.55/MHA /20200427  CASE 402015 Removed field 85 "In-use Quantity (External)"
-    // NPR5.55/MHA /20200701  CASE 397527 Added field 270 "Language Code"
-    // NPR5.55/MHA /20200702  CASE 407070 Added Sending Log
-
     Caption = 'Retail Voucher Card';
     SourceTable = "NPR NpRv Voucher";
 
@@ -260,10 +249,8 @@ page 6151014 "NPR NpRv Voucher Card"
                     ApplicationArea = All;
 
                     trigger OnAction()
-                    var
-                        NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
                     begin
-                        NpRvVoucherMgt.SendVoucher(Rec);
+                        Codeunit.Run(codeunit::"NPR NpRv Voucher Mgt.", Rec);
                     end;
                 }
             }
@@ -335,4 +322,3 @@ page 6151014 "NPR NpRv Voucher Card"
         Text000: Label 'Are you sure you want to delete Vouchers In-use?';
         Text001: Label 'Archive Voucher Manually?';
 }
-

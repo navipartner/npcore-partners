@@ -1,27 +1,22 @@
 codeunit 6151195 "NPR NpCs Collect Mgt."
 {
-    // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
-    // NPR5.51/MHA /20190627  CASE 344264 Moved Archivation functionality to separate codeunit and added Expiration to Status Update
-    // NPR5.51/MHA /20190819  CASE 364557 It should be possible to create collect order from one local store to another local store and added posting functions
-    // NPR5.53/MHA /20191129  CASE 378216 Archivation moved to asynchronous workflow procedure
-    // NPR5.54/MHA /20200214  CASE 390590 Added 10 seconds delay to Run Workflow
-    // NPR5.54/MHA /20200224  CASE 391754 Posting should go through PostDocument()
-    // NPR5.54/MHA /20200130  CASE 378956 Added Store Notification to ExpireProcessing() and ExpireDelivery()
-
+    TableNo = "NPR NpCs Document";
 
     trigger OnRun()
+    var
+        NpCsDocument: Record "NPR NpCs Document";
     begin
+        NpCsDocument := Rec;
+        PrintDelivery(NpCsDocument);
+        Rec := NpCsDocument;
     end;
 
     var
         Text001: Label 'Processing Status updated to %1';
         Text002: Label 'Delivery Status updated to %1';
         Text005: Label 'Delivery printed: %1';
-        Text007: Label 'Sales %1 %2 posted to %3 %4';
 
-    local procedure "--- Init"()
-    begin
-    end;
+    //--- Init ---
 
     procedure InitCollectInStoreService()
     var
@@ -75,9 +70,7 @@ codeunit 6151195 "NPR NpCs Collect Mgt."
         NpCsDocument.Insert(true);
     end;
 
-    local procedure "--- Processing"()
-    begin
-    end;
+    //--- Processing ---
 
     procedure UpdateProcessingStatus(var NpCsDocument: Record "NPR NpCs Document"; NewStatus: Integer)
     var
@@ -105,16 +98,14 @@ codeunit 6151195 "NPR NpCs Collect Mgt."
     begin
         UpdateProcessingStatus(NpCsDocument, NpCsDocument."Processing Status"::Confirmed);
         UpdateDeliveryStatus(NpCsDocument, NpCsDocument."Delivery Status"::Ready, 0, '');
-        //-NPR5.51 [364557]
-        if NpCsDocument."Post on" = NpCsDocument."Post on"::Processing then
-            PostDocument(NpCsDocument);
-        //+NPR5.51 [364557]
+        if NpCsDocument."Post on" = NpCsDocument."Post on"::Processing then begin
+            Commit();
+            ScheduleDocumentPosting(NpCsDocument);
+        end;
         NpCsWorkflowMgt.SendNotificationToCustomer(NpCsDocument);
         Commit;
 
-        //-NPR5.54 [390590]
         NpCsWorkflowMgt.ScheduleRunWorkflowDelay(NpCsDocument, 10000);
-        //+NPR5.54 [390590]
         if NpCsDocument."Delivery expires at" > 0DT then
             NpCsExpirationMgt.ScheduleUpdateExpirationStatus(NpCsDocument, NpCsDocument."Delivery expires at");
     end;
@@ -130,9 +121,7 @@ codeunit 6151195 "NPR NpCs Collect Mgt."
         NpCsWorkflowMgt.SendNotificationToCustomer(NpCsDocument);
         Commit;
 
-        //-NPR5.54 [390590]
         NpCsWorkflowMgt.ScheduleRunWorkflowDelay(NpCsDocument, 10000);
-        //+NPR5.54 [390590]
     end;
 
     procedure ExpireProcessing(var NpCsDocument: Record "NPR NpCs Document"; SkipWorkflow: Boolean)
@@ -141,20 +130,14 @@ codeunit 6151195 "NPR NpCs Collect Mgt."
     begin
         UpdateProcessingStatus(NpCsDocument, NpCsDocument."Processing Status"::Expired);
         NpCsWorkflowMgt.SendNotificationToCustomer(NpCsDocument);
-        //-NPR5.54 [378956]
         NpCsWorkflowMgt.SendNotificationToStore(NpCsDocument);
-        //+NPR5.54 [378956]
         Commit;
 
         if not SkipWorkflow then
-            //-NPR5.54 [390590]
             NpCsWorkflowMgt.ScheduleRunWorkflowDelay(NpCsDocument, 10000);
-        //+NPR5.54 [390590]
     end;
 
-    local procedure "--- Deliver"()
-    begin
-    end;
+    //--- Deliver ---
 
     procedure UpdateDeliveryStatus(var NpCsDocument: Record "NPR NpCs Document"; NewStatus: Integer; DeliveryDocumentType: Integer; DeliveryDocumentNo: Code[20])
     var
@@ -167,9 +150,7 @@ codeunit 6151195 "NPR NpCs Collect Mgt."
             exit;
 
         NpCsDocument.Validate("Delivery Status", NewStatus);
-        //-NPR5.51 [344264]
         NpCsExpirationMgt.SetExpiresAt(NpCsDocument);
-        //+NPR5.51 [344264]
         if NpCsDocument."Delivery Status" in [NpCsDocument."Delivery Status"::Delivered, NpCsDocument."Delivery Status"::Expired] then
             NpCsDocument."Next Workflow Step" := NpCsDocument."Next Workflow Step"::"Post Processing";
         NpCsDocument."Delivery Document Type" := DeliveryDocumentType;
@@ -187,42 +168,27 @@ codeunit 6151195 "NPR NpCs Collect Mgt."
         SalesHeader: Record "Sales Header";
         NpCsWorkflowMgt: Codeunit "NPR NpCs Workflow Mgt.";
         LogMessage: Text;
-        ErrorText: Text;
+        Success: Boolean;
     begin
         case NpCsDocument."Bill via" of
             NpCsDocument."Bill via"::POS:
                 begin
                     if NpCsDocument."Delivery Print Template (POS)" <> '' then begin
-                        asserterror
-                        begin
-                            PrintDelivery(NpCsDocument);
-                            Commit;
-                            Error('');
-                        end;
-                        ErrorText := GetLastErrorText;
-                        //-NPR5.51 [344264]
+                        ClearLastError();
+                        Success := Codeunit.Run(Codeunit::"NPR NpCs Collect Mgt.", NpCsDocument);
                         LogMessage := StrSubstNo(Text005, NpCsDocument."Delivery Print Template (POS)");
-                        //+NPR5.51 [344264]
-                        NpCsWorkflowMgt.InsertLogEntry(NpCsDocument, NpCsWorkflowModule, LogMessage, ErrorText <> '', ErrorText);
+                        NpCsWorkflowMgt.InsertLogEntry(NpCsDocument, NpCsWorkflowModule, LogMessage, not Success, GetLastErrorText);
                     end;
                 end;
             NpCsDocument."Bill via"::"Sales Document":
                 begin
-                    //-NPR5.51 [344264]
                     if NpCsDocument."Delivery Print Template (S.)" <> '' then begin
-                        asserterror
-                        begin
-                            PrintDelivery(NpCsDocument);
-                            Commit;
-                            Error('');
-                        end;
-                        ErrorText := GetLastErrorText;
+                        ClearLastError();
+                        Success := Codeunit.Run(Codeunit::"NPR NpCs Collect Mgt.", NpCsDocument);
                         LogMessage := StrSubstNo(Text005, NpCsDocument."Delivery Print Template (S.)");
-                        NpCsWorkflowMgt.InsertLogEntry(NpCsDocument, NpCsWorkflowModule, LogMessage, ErrorText <> '', ErrorText);
+                        NpCsWorkflowMgt.InsertLogEntry(NpCsDocument, NpCsWorkflowModule, LogMessage, not Success, GetLastErrorText);
                         Commit;
                     end;
-                    //+NPR5.51 [344264]
-                    //-NPR5.51 [364557]
                     case NpCsDocument."Document Type" of
                         NpCsDocument."Document Type"::Order, NpCsDocument."Document Type"::Invoice:
                             begin
@@ -232,38 +198,15 @@ codeunit 6151195 "NPR NpCs Collect Mgt."
                                     SalesHeader.Modify;
                                     Commit;
                                 end;
-                                //-NPR5.54 [391754]
-                                // SalesHeader.Ship := TRUE;
-                                // SalesHeader.Invoice := TRUE;
-                                // ASSERTERROR BEGIN
-                                //  CODEUNIT.RUN(CODEUNIT::"Sales-Post",SalesHeader);
-                                //  COMMIT;
-                                //  ERROR('');
-                                // END;
-                                // ErrorText := GETLASTERRORTEXT;
-                                //
-                                // NpCsWorkflowModule.Type := NpCsWorkflowModule.Type::"Post Processing";
-                                // LogMessage := STRSUBSTNO(Text004,NpCsDocument."Document Type",NpCsDocument."Document No.");
-                                // NpCsWorkflowMgt.InsertLogEntry(NpCsDocument,NpCsWorkflowModule,LogMessage,ErrorText <> '',ErrorText);
-                                //
-                                // IF ErrorText = '' THEN BEGIN
-                                //  NpCsDocument."Document Type" := NpCsDocument."Document Type"::"Posted Invoice";
-                                //  NpCsDocument."Document No." := SalesHeader."Last Posting No.";
-                                //  NpCsDocument.MODIFY(TRUE);
-                                // END;
                                 if NpCsDocument."Post on" = NpCsDocument."Post on"::Delivery then
-                                    PostDocument(NpCsDocument);
-                                //+NPR5.54 [391754]
+                                    ScheduleDocumentPosting(NpCsDocument);
                             end;
                     end;
-                    //+NPR5.51 [364557]
                 end;
         end;
         Commit;
 
-        //-NPR5.54 [390590]
         NpCsWorkflowMgt.ScheduleRunWorkflowDelay(NpCsDocument, 10000);
-        //+NPR5.54 [390590]
     end;
 
     procedure ExpireDelivery(var NpCsDocument: Record "NPR NpCs Document"; SkipWorkflow: Boolean)
@@ -271,97 +214,21 @@ codeunit 6151195 "NPR NpCs Collect Mgt."
         NpCsWorkflowMgt: Codeunit "NPR NpCs Workflow Mgt.";
     begin
         UpdateDeliveryStatus(NpCsDocument, NpCsDocument."Delivery Status"::Expired, 0, '');
-        //-NPR5.54 [378956]
         NpCsWorkflowMgt.SendNotificationToStore(NpCsDocument);
-        //+NPR5.54 [378956]
         Commit;
 
         if not SkipWorkflow then
-            //-NPR5.54 [390590]
             NpCsWorkflowMgt.ScheduleRunWorkflowDelay(NpCsDocument, 10000);
-        //+NPR5.54 [390590]
     end;
 
-    local procedure "--- Posting"()
+    //--- Posting ---
+
+    local procedure ScheduleDocumentPosting(var NpCsDocument: Record "NPR NpCs Document")
     begin
+        TaskScheduler.CreateTask(Codeunit::"NPR NpCs Post Document", 0, true, CompanyName, CurrentDateTime + 10000, NpCsDocument.RecordId);
     end;
 
-    local procedure PostDocument(var NpCsDocument: Record "NPR NpCs Document")
-    var
-        NpCsWorkflowModule: Record "NPR NpCs Workflow Module";
-        SalesHeader: Record "Sales Header";
-        NpCsWorkflowMgt: Codeunit "NPR NpCs Workflow Mgt.";
-        LogMessage: Text;
-        ErrorText: Text;
-    begin
-        //-NPR5.51 [364557]
-        if SkipPosting(NpCsDocument) then
-            exit;
-
-        SalesHeader.Get(NpCsDocument."Document Type", NpCsDocument."Document No.");
-
-        SalesHeader.Ship := true;
-        SalesHeader.Invoice := true;
-        //-NPR5.54 [391754]
-        asserterror
-        begin
-            CODEUNIT.Run(CODEUNIT::"Sales-Post", SalesHeader);
-            Commit;
-            Error('');
-        end;
-        ErrorText := GetLastErrorText;
-        if ErrorText = '' then begin
-            case SalesHeader."Document Type" of
-                SalesHeader."Document Type"::Order, SalesHeader."Document Type"::Invoice:
-                    begin
-                        NpCsDocument."Document Type" := NpCsDocument."Document Type"::"Posted Invoice";
-                    end;
-                SalesHeader."Document Type"::"Return Order", SalesHeader."Document Type"::"Credit Memo":
-                    begin
-                        NpCsDocument."Document Type" := NpCsDocument."Document Type"::"Posted Credit Memo";
-                    end;
-            end;
-            NpCsDocument."Document No." := SalesHeader."Last Posting No.";
-            NpCsDocument.Modify(true);
-        end;
-
-        LogMessage := StrSubstNo(Text007, SalesHeader."Document Type", SalesHeader."No.", NpCsDocument."Document Type", NpCsDocument."Document No.");
-        NpCsWorkflowModule.Type := NpCsWorkflowModule.Type::"Order Status";
-        NpCsWorkflowMgt.InsertLogEntry(NpCsDocument, NpCsWorkflowModule, LogMessage, ErrorText <> '', ErrorText);
-        //+NPR5.54 [391754]
-        //+NPR5.51 [364557]
-    end;
-
-    local procedure SkipPosting(NpCsDocument: Record "NPR NpCs Document"): Boolean
-    begin
-        //-NPR5.54 [391754]
-        if NpCsDocument."Bill via" <> NpCsDocument."Bill via"::"Sales Document" then
-            exit(true);
-        //+NPR5.54 [391754]
-
-        //-NPR5.51 [364557]
-        if not NpCsDocument."Store Stock" then
-            exit(true);
-
-        if NpCsDocument."Document Type" = NpCsDocument."Document Type"::Quote then
-            exit(true);
-
-        if NpCsDocument."Document Type" = NpCsDocument."Document Type"::"Blanket Order" then
-            exit(true);
-
-        if NpCsDocument."Document Type" = NpCsDocument."Document Type"::"Posted Invoice" then
-            exit(true);
-
-        if NpCsDocument."Document Type" = NpCsDocument."Document Type"::"Posted Credit Memo" then
-            exit(true);
-
-        exit(false);
-        //+NPR5.51 [364557]
-    end;
-
-    local procedure "--- UI"()
-    begin
-    end;
+    //--- UI ---
 
     procedure NewCollectOrder()
     var
@@ -372,16 +239,12 @@ codeunit 6151195 "NPR NpCs Collect Mgt."
         SalesHeader: Record "Sales Header";
         NpCsStoreMgt: Codeunit "NPR NpCs Store Mgt.";
     begin
-        //-NPR5.51 [364557]
         NpCsStoreMgt.FindLocalStore(NpCsStoreLocal);
         SalesHeader.SetRange("Location Code", NpCsStore."Location Code");
-        //+NPR5.51 [364557]
         if not SelectSalesOrder(SalesHeader) then
             exit;
 
-        //-NPR5.51 [364557]
         NpCsStore.SetFilter(Code, '<>%1', NpCsStoreLocal.Code);
-        //+NPR5.51 [364557]
         if not SelectStore(NpCsStore) then
             exit;
 
@@ -495,7 +358,6 @@ codeunit 6151195 "NPR NpCs Collect Mgt."
             end;
         end;
 
-        //-NPR5.51 [364557]
         case NpCsDocument."Document Type" of
             NpCsDocument."Document Type"::"Posted Invoice":
                 begin
@@ -514,7 +376,6 @@ codeunit 6151195 "NPR NpCs Collect Mgt."
                     exit;
                 end;
         end;
-        //+NPR5.51 [364557]
 
         SalesHeader.Get(NpCsDocument."Document Type", NpCsDocument."Document No.");
         RecRef.GetTable(SalesHeader);
@@ -563,21 +424,17 @@ codeunit 6151195 "NPR NpCs Collect Mgt."
         PAGE.Run(PageId, NpCsDocument);
     end;
 
-    local procedure "--- Print"()
-    begin
-    end;
+    //--- Print ---
 
     procedure PrintOrder(var NpCsDocument: Record "NPR NpCs Document")
     var
         NpCsDocument2: Record "NPR NpCs Document";
         RPTemplateMgt: Codeunit "NPR RP Template Mgt.";
     begin
-        //-NPR5.51 [364557]
         NpCsDocument2.Copy(NpCsDocument);
         NpCsDocument2.SetRecFilter;
         NpCsDocument2.TestField("Processing Print Template");
         RPTemplateMgt.PrintTemplate(NpCsDocument2."Processing Print Template", NpCsDocument2, 0);
-        //+NPR5.51 [364557]
     end;
 
     procedure PrintDelivery(var NpCsDocument: Record "NPR NpCs Document")
@@ -601,9 +458,7 @@ codeunit 6151195 "NPR NpCs Collect Mgt."
         end;
     end;
 
-    local procedure "--- Aux"()
-    begin
-    end;
+    //--- Aux ---
 
     procedure CollectInStoreWsCodeunitId(): Integer
     begin
@@ -629,4 +484,3 @@ codeunit 6151195 "NPR NpCs Collect Mgt."
         end;
     end;
 }
-

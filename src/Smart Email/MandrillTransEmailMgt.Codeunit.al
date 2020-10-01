@@ -1,8 +1,5 @@
 codeunit 6059822 "NPR Mandrill Trans. Email Mgt"
 {
-    // NPR5.55/THRO/20200511 CASE 343266 Object created
-
-
     trigger OnRun()
     begin
     end;
@@ -101,40 +98,41 @@ codeunit 6059822 "NPR Mandrill Trans. Email Mgt"
     end;
 
     procedure GetMessageDetails(EmailLog: Record "NPR Trx Email Log")
+    var
+        JObject: DotNet NPRNetJObject;
     begin
         ClearLastError;
-        asserterror
-        begin
-            TryGetMessageDetails(EmailLog);
+        if TryGetMessageDetails(EmailLog, JObject) then begin
+            SaveMessageDetails(EmailLog, JObject);
             Commit();
-            Error('');
         end;
     end;
 
-    local procedure TryGetMessageDetails(EmailLog: Record "NPR Trx Email Log")
+    [TryFunction]
+    local procedure TryGetMessageDetails(EmailLog: Record "NPR Trx Email Log"; var JObject: DotNet NPRNetJObject)
     var
-        JObject: DotNet NPRNetJObject;
         MessageId: Text;
     begin
         Initialize(GetFullURL('/messages/info.json'), 'POST');
-
         MessageId := DelChr(EmailLog."Message ID", '<=>', '{-}');
-
         AddPropertyToJObject(BodyJObject, 'id', MessageId);
-
         if not ExecuteWebServiceRequest then
             Error(GetLastErrorText);
 
         JObject := JObject.Parse(GetWebResonseText);
-        if not IsNull(JObject) then begin
-            EmailLog.Status := GetString(JObject, 'state');
-            EmailLog.Recipient := CopyStr(GetString(JObject, 'email'), 1, MaxStrLen(EmailLog.Recipient));
-            if Evaluate(EmailLog."Smart Email ID", GetString(JObject, 'template')) then;
-            EmailLog."Total Opens" := GetInt(JObject, 'opens');
-            EmailLog."Total Clicks" := GetInt(JObject, 'clicks');
-            EmailLog.Subject := GetString(JObject, 'subject');
-            EmailLog.Modify;
-        end;
+    end;
+
+    local procedure SaveMessageDetails(EmailLog: Record "NPR Trx Email Log"; var JObject: DotNet NPRNetJObject)
+    begin
+        if IsNull(JObject) then
+            exit;
+        EmailLog.Status := GetString(JObject, 'state');
+        EmailLog.Recipient := CopyStr(GetString(JObject, 'email'), 1, MaxStrLen(EmailLog.Recipient));
+        if Evaluate(EmailLog."Smart Email ID", GetString(JObject, 'template')) then;
+        EmailLog."Total Opens" := GetInt(JObject, 'opens');
+        EmailLog."Total Clicks" := GetInt(JObject, 'clicks');
+        EmailLog.Subject := GetString(JObject, 'subject');
+        EmailLog.Modify;
     end;
 
     procedure SendSmartEmail(SmartEmail: Record "NPR Smart Email"; Recipient: Text; Cc: Text; Bcc: Text; RecRef: RecordRef; Silent: Boolean) ErrorMessage: Text
@@ -602,6 +600,4 @@ codeunit 6059822 "NPR Mandrill Trans. Email Mgt"
     begin
         exit(MimeMapping.GetMimeMapping(FileName));
     end;
-
 }
-

@@ -1,7 +1,5 @@
 codeunit 6151512 "NPR NpXml Batch Processing"
 {
-    // NPR5.55/MHA /20200630  CASE 411410 Object created - Process NpXml Batches via Job Queue
-
     TableNo = "Job Queue Entry";
 
     trigger OnRun()
@@ -32,29 +30,13 @@ codeunit 6151512 "NPR NpXml Batch Processing"
     end;
 
     local procedure ProcessNpXmlBatch(var NpXmlTemplate: Record "NPR NpXml Template")
-    var
-        NpXmlBatchMgt: Codeunit "NPR NpXml Batch Mgt.";
-        ErrorText: Text;
     begin
-        asserterror
-        begin
-            NpXmlBatchMgt.RunBatch(NpXmlTemplate);
-            Commit;
-            Error('');
-        end;
-
-        ErrorText := GetLastErrorText;
-        if ErrorText = '' then
-            exit;
-
-        asserterror
-        begin
+        if not Codeunit.run(Codeunit::"NPR NpXml Process Single Batch", NpXmlTemplate) then begin
             NpXmlTemplate."Runtime Error" := true;
-            NpXmlTemplate."Last Error Message" := CopyStr(ErrorText, 1, MaxStrLen(NpXmlTemplate.Code));
+            NpXmlTemplate."Last Error Message" := CopyStr(GetLastErrorText, 1, MaxStrLen(NpXmlTemplate.Code));
             NpXmlTemplate.Modify(true);
-            Commit;
-            Error('');
         end;
+        Commit;
     end;
 
     local procedure FindNpXmlTemplate(JobQueueEntry: Record "Job Queue Entry"; var NpXmlTemplate: Record "NPR NpXml Template"): Boolean
@@ -183,4 +165,3 @@ codeunit 6151512 "NPR NpXml Batch Processing"
         JobQueueEntry.Insert(true);
     end;
 }
-

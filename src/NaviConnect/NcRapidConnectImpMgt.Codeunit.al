@@ -1,23 +1,15 @@
 codeunit 6151092 "NPR Nc RapidConnect Imp. Mgt."
 {
-    // NC2.12/MHA /20180418  CASE 308107 Object created - RapidStart with NaviConnect
-    // NC2.16/MHA /20180906  CASE 313184 Apply Package has COMMIT in RapidStart meaning Import and Apply must be split
-    // NC2.17/MHA /20181116  CASE 335927 Removed green code and added Xml Import
-    // NC2.22/MHA /20190621  CASE 358239 Added FormatValue() to format from Xml value to native format
-    // NC14.00.2.22/MHA /20190715  CASE 361941 Excel support
-
     TableNo = "NPR Nc Import Entry";
 
     trigger OnRun()
     begin
-        //-NC2.17 [335927]
-        //ImportExcel(Rec);
         ImportRapidConnect(Rec);
-        //+NC2.17 [335927]
     end;
 
     local procedure ImportRapidConnect(var NcImportEntry: Record "NPR Nc Import Entry")
     var
+        RcApplyPackage: Codeunit "NPR Nc RapidConnect Apply Pckg";
         NcRapidConnectSetup: Record "NPR Nc RapidConnect Setup";
         DataLogMgt: Codeunit "NPR Data Log Management";
         XmlDoc: DotNet "NPRNetXmlDocument";
@@ -29,47 +21,28 @@ codeunit 6151092 "NPR Nc RapidConnect Imp. Mgt."
         if not NcRapidConnectSetup.FindSet then
             exit;
 
-        //-NC2.17 [335927]
         XmlLoaded := TryLoadXml(NcImportEntry, XmlDoc);
-        if XmlLoaded then
-            TableIdFilter := GetTableIdFilter(XmlDoc);
-        //+NC2.17 [335927]
+        if not XmlLoaded then
+            exit;
+
+        TableIdFilter := GetTableIdFilter(XmlDoc);
 
         repeat
             DataLogMgt.DisableDataLog(NcRapidConnectSetup."Disable Data Log on Import");
-            //-NC14.00.2.22 [361941]
-            if XmlLoaded then
-                ImportXmlPackage(NcRapidConnectSetup, XmlDoc);
-        //+NC2.17 [335927]
-        //+NC14.00.2.22 [361941]
-
+            ImportXmlPackage(NcRapidConnectSetup, XmlDoc);
         until NcRapidConnectSetup.Next = 0;
 
-        //-NC2.16 [313184]
         Commit;
-        asserterror
-        begin
-            NcRapidConnectSetup.FindSet;
-            repeat
-                DataLogMgt.DisableDataLog(NcRapidConnectSetup."Disable Data Log on Import");
-                //-NC14.00.2.22 [361941]
-                if XmlLoaded then
-                    ApplyXmlPackage(NcRapidConnectSetup, TableIdFilter);
-            //+NC14.00.2.22 [361941]
-            until NcRapidConnectSetup.Next = 0;
-            Commit;
-            Error('');
-        end;
-        //+NC2.16 [313184]
+        Clear(RcApplyPackage);
+        RcApplyPackage.SetProcessingOptions(TableIdFilter, UseDialog());
+        if RcApplyPackage.Run(NcRapidConnectSetup) then;
 
         DataLogMgt.DisableDataLog(false);
     end;
 
     local procedure UseDialog(): Boolean
     begin
-        //-NC2.16 [313184]
         exit(false);
-        //+NC2.16 [313184]
     end;
 
     local procedure "--- Xml Import"()
@@ -89,7 +62,6 @@ codeunit 6151092 "NPR Nc RapidConnect Imp. Mgt."
         PackageNo: Integer;
         TableId: Integer;
     begin
-        //-NC2.17 [335927]
         if IsNull(XmlDoc) then
             exit;
 
@@ -121,14 +93,11 @@ codeunit 6151092 "NPR Nc RapidConnect Imp. Mgt."
                 ConfigPackageData."No." := ConfigPackageRecord."No.";
                 Evaluate(ConfigPackageData."Field ID", XmlElement2.GetAttribute('field_no'), 9);
                 ConfigPackageData.Value := CopyStr(XmlElement2.InnerText, 1, MaxStrLen(ConfigPackageData.Value));
-                //-NC2.22 [358239]
                 if Field.Get(ConfigPackageData."Table ID", ConfigPackageData."Field ID") then
                     ConfigPackageData.Value := CopyStr(FormatValue(Field, ConfigPackageData.Value), 1, MaxStrLen(ConfigPackageData.Value));
-                //+NC2.22 [358239]
                 ConfigPackageData.Insert(true);
             end;
         end;
-        //+NC2.17 [335927]
     end;
 
     local procedure FormatValue("Field": Record "Field"; Value: Text): Text
@@ -143,7 +112,6 @@ codeunit 6151092 "NPR Nc RapidConnect Imp. Mgt."
         BigIntegerValue: BigInteger;
         DateTimeValue: DateTime;
     begin
-        //-NC2.22 [358239]
         case Field.Type of
             Field.Type::Code, Field.Type::Text:
                 begin
@@ -196,39 +164,6 @@ codeunit 6151092 "NPR Nc RapidConnect Imp. Mgt."
                     exit(Format(TimeValue));
                 end;
         end;
-        //+NC2.22 [358239]
-    end;
-
-    local procedure ApplyXmlPackage(NcRapidConnectSetup: Record "NPR Nc RapidConnect Setup"; TableIdFilter: Text)
-    var
-        ConfigPackage: Record "Config. Package";
-        TempBlob: Codeunit "Temp Blob";
-        TempConfigPackageTable: Record "Config. Package Table" temporary;
-        ConfigPackageTable: Record "Config. Package Table";
-        ConfigPackageMgt: Codeunit "Config. Package Management";
-    begin
-        //-NC2.17 [335927]
-        if NcRapidConnectSetup."Package Code" = '' then
-            exit;
-        if not NcRapidConnectSetup."Apply Package" then
-            exit;
-
-        ConfigPackage.Get(NcRapidConnectSetup."Package Code");
-        ConfigPackageTable.SetRange("Package Code", NcRapidConnectSetup."Package Code");
-        if ConfigPackage."Exclude Config. Tables" then begin
-            ConfigPackageTable.FilterGroup(40);
-            ConfigPackageTable.SetFilter("Table ID", '<>%1&<>%2&<>%3&<>%4&<>%5&<>%6&<>%7&<>%8',
-              DATABASE::"Config. Template Header", DATABASE::"Config. Template Line",
-              DATABASE::"Config. Questionnaire", DATABASE::"Config. Question Area", DATABASE::"Config. Question",
-              DATABASE::"Config. Line", DATABASE::"Config. Package Filter", DATABASE::"Config. Field Mapping");
-        end;
-
-        ConfigPackageTable.FilterGroup(41);
-        ConfigPackageTable.SetFilter("Table ID", TableIdFilter);
-
-        ConfigPackageMgt.SetHideDialog(not UseDialog());
-        ConfigPackageMgt.ApplyPackage(ConfigPackage, ConfigPackageTable, false);
-        //+NC2.17 [335927]
     end;
 
     local procedure GetTableIdFilter(var XmlDoc: DotNet "NPRNetXmlDocument") TableIdFilter: Text
@@ -238,7 +173,6 @@ codeunit 6151092 "NPR Nc RapidConnect Imp. Mgt."
         XmlElement: DotNet NPRNetXmlElement;
         TableId: Integer;
     begin
-        //-NC2.17 [335927]
         if IsNull(XmlDoc) then
             exit('=0&<>0');
         XmlDocElement := XmlDoc.DocumentElement;
@@ -260,16 +194,12 @@ codeunit 6151092 "NPR Nc RapidConnect Imp. Mgt."
 
         TableIdFilter := DelStr(TableIdFilter, 1, 1);
         exit(TableIdFilter);
-        //+NC2.17 [335927]
     end;
 
     [TryFunction]
     local procedure TryLoadXml(var NcImportEntry: Record "NPR Nc Import Entry"; var XmlDoc: DotNet "NPRNetXmlDocument")
     begin
-        //-NC2.17 [335927]
         if not NcImportEntry.LoadXmlDoc(XmlDoc) then
             Error('');
-        //+NC2.17 [335927]
     end;
 }
-

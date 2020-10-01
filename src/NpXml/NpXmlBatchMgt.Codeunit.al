@@ -1,10 +1,5 @@
 codeunit 6151552 "NPR NpXml Batch Mgt."
 {
-    // NC1.00/MH/20150113  CASE 199932 Refactored object from Web - XML
-    // NC1.01/MH/20150115  CASE 199932 Removed Timer functionality
-    // NC1.13/MH/20150414  CASE 211360 Restructured NpXml Codeunits. Independent functions moved to new codeunits
-    // NC2.00/MHA/20160525  CASE 240005 NaviConnect
-
     SingleInstance = true;
 
     trigger OnRun()
@@ -21,7 +16,6 @@ codeunit 6151552 "NPR NpXml Batch Mgt."
     var
         RunDatetime: DateTime;
     begin
-        //-NC1.13
         if not NPXmlTemplate."Batch Task" then
             exit(false);
         if NPXmlTemplate."Batch Active From" = 0DT then
@@ -36,14 +30,18 @@ codeunit 6151552 "NPR NpXml Batch Mgt."
             exit(false);
 
         exit(true);
-        //+NC1.13
     end;
 
+    [Obsolete('Replaced with Codeunit.run(Codeunit::"NPR NpXml Process Single Batch"...) or RunSingleBatch function')]
     procedure RunBatch(var NPXmlTemplate: Record "NPR NpXml Template")
+    begin
+        RunSingleBatch(NPXmlTemplate);
+    end;
+
+    procedure RunSingleBatch(var NPXmlTemplate: Record "NPR NpXml Template")
     var
         RecRef: RecordRef;
     begin
-        //-NC1.13
         NPXmlTemplate.Get(NPXmlTemplate.Code);
         NPXmlTemplate."Batch Last Run" := CurrentDateTime();
         NPXmlTemplate."Next Batch Run" := CalcNextBatchDatetime(NPXmlTemplate);
@@ -61,31 +59,20 @@ codeunit 6151552 "NPR NpXml Batch Mgt."
         NPXmlTemplate.Get(NPXmlTemplate.Code);
         NPXmlTemplate."Runtime Error" := false;
         NPXmlTemplate.Modify(true);
-        //+NC1.13
     end;
 
     procedure RunBatches()
     var
         NpXmlTemplate: Record "NPR NpXml Template";
     begin
-        //-NC1.13
-        //CLEAR(XMLTemplate);
-        //IF XMLTemplate.FINDSET THEN
-        //  REPEAT
-        //    BatchStarted := TRUE;
-        //    IF XMLMgt.CheckRunBatch(XMLTemplate) THEN
-        //      XMLMgt.RunBatch(XMLTemplate);
-        //    BatchStarted := FALSE;
-        //  UNTIL XMLTemplate.NEXT = 0;
         Clear(NpXmlTemplate);
         if NpXmlTemplate.FindSet then
             repeat
                 BatchStarted := true;
                 if CheckRunBatch(NpXmlTemplate) then
-                    RunBatch(NpXmlTemplate);
+                    RunSingleBatch(NpXmlTemplate);
                 BatchStarted := false;
             until NpXmlTemplate.Next = 0;
-        //+NC1.13
     end;
 
     local procedure "--- Filter"()
@@ -109,7 +96,6 @@ codeunit 6151552 "NPR NpXml Batch Mgt."
         if NpXmlFilter.FindSet then
             repeat
                 FieldRef := RecRef.Field(NpXmlFilter."Parent Field No.");
-                //-NC1.11
                 case LowerCase(Format(FieldRef.Type)) of
                     'boolean':
                         FieldRef.SetFilter('=%1', LowerCase(NpXmlFilter."Filter Value") in ['1', 'yes', 'ja', 'true']);
@@ -126,7 +112,6 @@ codeunit 6151552 "NPR NpXml Batch Mgt."
                     else
                         FieldRef.SetRange(NpXmlFilter."Filter Value");
                 end;
-            //+NC1.11
             until NpXmlFilter.Next = 0;
 
         NpXmlFilter.SetRange("Filter Type", NpXmlFilter."Filter Type"::Filter);
@@ -157,4 +142,3 @@ codeunit 6151552 "NPR NpXml Batch Mgt."
         exit(CreateDateTime(NextDate, NextTime));
     end;
 }
-
