@@ -25,10 +25,11 @@ pool:
 jobs:
 - template: YAML/Templates/Job/BuildALApp.yml@scriptsRepo
   parameters:
+    jobName: First_build
     timeoutInMinutes: 180
     containerImageName: mcr.microsoft.com/dynamicsnav:10.0.17763.1397-generic
     artifactURL: https://bcartifacts.azureedge.net/onprem/16.4.14693.15090/w1 
-    containerName: Build-$(Build.BuildId)
+    containerName: Build-$(Build.BuildId)-1
     serverInstanceName: BC
     containerAdminUsername: admin
     containerAdminPassword: P@ssword1
@@ -78,3 +79,20 @@ jobs:
         - source: 'https://pkgs.dev.azure.com/navipartner/_packaging/BCSymbols/nuget/v3/index.json'
           id: Microsoft.BC.160.Base_Application.se
         ISOcountryCode: SE
+
+- template: YAML/Templates/Job/BuildALApp.yml@scriptsRepo
+  parameters:
+    jobName: Second_build
+    jobDisplayName: Build AL app - Insider Build
+    timeoutInMinutes: 180
+    containerImageName: mcr.microsoft.com/dynamicsnav:10.0.17763.1397-generic
+    artifactURL: https://bcinsider.azureedge.net/sandbox/17.0.15821.0/w1?sv=2019-12-12&ss=b&srt=sco&st=2020-09-15T00%3A00%3A00Z&se=2021-04-01T00%3A00%3A00Z&sp=rl&spr=https&sig=9PznJJRE47DoKjlG44Av6ZKtG4MRfh3N6gyFT7RNWSQ%3D
+    containerName: Build-$(Build.BuildId)-2
+    serverInstanceName: BC
+    containerAdminUsername: admin
+    containerAdminPassword: P@ssword1
+    licenseSecureFileName: 'DEV_BC OP 16.flf'
+    scriptsRepo: ScriptsRepo
+    dependancyPackages:
+      - source: 'https://api.nuget.org/v3/index.json;https://pkgs.dev.azure.com/navipartner/_packaging/NprAddIns/nuget/v3/index.json'
+        id: NaviPartner.NPRetail.AddIns.BC #CASE SENSITIVE!
