@@ -1,8 +1,5 @@
 xmlport 6151154 "NPR M2 Add Shipto Address"
 {
-    // NPR5.48/TSA /20181221 CASE 320424 Intial Version
-    // MAG2.23/TSA /20191015 CASE 373151 Added field Contact, fixed cardinality problem of address
-
     Caption = 'Add Shipto Address';
     Encoding = UTF8;
     FormatEvaluate = Xml;
@@ -44,7 +41,7 @@ xmlport 6151154 "NPR M2 Add Shipto Address"
                         fieldelement(Address2; TmpShipToAddressRequest."Address 2")
                         {
                         }
-                        fieldelement(Postcode; TmpShipToAddressRequest."Phone No.")
+                        fieldelement(Postcode; TmpShipToAddressRequest."Post Code")
                         {
                         }
                         fieldelement(City; TmpShipToAddressRequest.City)
@@ -66,9 +63,7 @@ xmlport 6151154 "NPR M2 Add Shipto Address"
                         trigger OnBeforeInsertRecord()
                         begin
 
-                            //-MAG2.23 [373151]
                             TmpShipToAddressRequest.Code := Format(TmpShipToAddressRequest.Count() + 1);
-                            //+MAG2.23 [373151]
                         end;
                     }
                 }
@@ -130,7 +125,7 @@ xmlport 6151154 "NPR M2 Add Shipto Address"
                             fieldelement(Address2; TmpShipToAddressResponse."Address 2")
                             {
                             }
-                            fieldelement(Postcode; TmpShipToAddressResponse."Phone No.")
+                            fieldelement(Postcode; TmpShipToAddressResponse."Post Code")
                             {
                             }
                             fieldelement(City; TmpShipToAddressResponse.City)

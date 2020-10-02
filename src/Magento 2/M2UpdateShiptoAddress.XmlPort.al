@@ -1,8 +1,5 @@
 xmlport 6151155 "NPR M2 Update Shipto Address"
 {
-    // NPR5.48/TSA /20181221 CASE 320424 Intial Version
-    // MAG2.23/TSA /20191015 CASE 373151 Added the contact field
-
     Caption = 'Add Shipto Address';
     Encoding = UTF8;
     FormatEvaluate = Xml;
@@ -47,7 +44,7 @@ xmlport 6151155 "NPR M2 Update Shipto Address"
                         fieldelement(Address2; TmpShipToAddressRequest."Address 2")
                         {
                         }
-                        fieldelement(Postcode; TmpShipToAddressRequest."Phone No.")
+                        fieldelement(Postcode; TmpShipToAddressRequest."Post Code")
                         {
                         }
                         fieldelement(City; TmpShipToAddressRequest.City)
@@ -125,7 +122,7 @@ xmlport 6151155 "NPR M2 Update Shipto Address"
                             fieldelement(Address2; TmpShipToAddressResponse."Address 2")
                             {
                             }
-                            fieldelement(Postcode; TmpShipToAddressResponse."Phone No.")
+                            fieldelement(Postcode; TmpShipToAddressResponse."Post Code")
                             {
                             }
                             fieldelement(City; TmpShipToAddressResponse.City)
