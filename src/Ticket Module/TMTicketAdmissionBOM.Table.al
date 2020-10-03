@@ -98,6 +98,12 @@ table 6060121 "NPR TM Ticket Admission BOM"
             DecimalPlaces = 0 : 2;
             BlankNumbers = BlankZero;
         }
+        field(40; "Admission Dependency Code"; Code[20])
+        {
+            Caption = 'Admission Dependency Code';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR TM Adm. Dependency";
+        }
         field(45; "Duration Formula"; DateFormula)
         {
             Caption = 'Duration Formula';
