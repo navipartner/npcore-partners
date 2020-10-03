@@ -80,6 +80,10 @@
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
+                field("Admission Dependency Code"; "Admission Dependency Code")
+                {
+                    ApplicationArea = NPRTicketAdvanced;
+                }
                 field("Revisit Condition (Statistics)"; "Revisit Condition (Statistics)")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
