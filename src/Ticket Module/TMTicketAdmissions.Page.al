@@ -87,20 +87,9 @@
                 {
                     ApplicationArea = NPRTicketAdvanced;
                 }
-                field("Dependent Admission Code"; "Dependent Admission Code")
+                field("Dependency Code"; "Dependency Code")
                 {
                     ApplicationArea = NPRTicketAdvanced;
-                    Visible = false;
-                }
-                field("Dependency Type"; "Dependency Type")
-                {
-                    ApplicationArea = NPRTicketAdvanced;
-                    Visible = false;
-                }
-                field("Dependency Timeframe"; "Dependency Timeframe")
-                {
-                    ApplicationArea = NPRTicketAdvanced;
-                    Visible = false;
                 }
                 field("POS Schedule Selection Date F."; "POS Schedule Selection Date F.")
                 {

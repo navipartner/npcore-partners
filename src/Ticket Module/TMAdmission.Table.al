@@ -107,6 +107,8 @@ table 6060120 "NPR TM Admission"
             Caption = 'Dependent Admission Code';
             DataClassification = CustomerContent;
             TableRelation = "NPR TM Admission";
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Replace by NPR TM Adm. Dependency subtables to handle more complex setup';
         }
         field(51; "Dependency Type"; Option)
         {
@@ -114,11 +116,21 @@ table 6060120 "NPR TM Admission"
             DataClassification = CustomerContent;
             OptionCaption = ' ,Within Timeframe,Exclude';
             OptionMembers = NA,TIMEFRAME,EXCLUDE;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Replace by NPR TM Adm. Dependency subtables to handle more complex setup';
         }
         field(52; "Dependency Timeframe"; DateFormula)
         {
             Caption = 'Dependency Timeframe';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Replace by NPR TM Adm. Dependency subtables to handle more complex setup';
+        }
+        field(53; "Dependency Code"; Code[20])
+        {
+            Caption = 'Admission Dependency Code';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR TM Adm. Dependency";
         }
         field(60; "Ticketholder Notification Type"; Option)
         {
