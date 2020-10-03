@@ -1,14 +1,5 @@
 table 6184490 "NPR Pepper Config."
 {
-    // NPR5.22\BR\20160316  CASE 231481 Object Created
-    // NPR5.22\BR\20160412  CASE 231481 Added fields "End of Day on Close", "Unload Library on Close", "End of Day Receipt Mandatory"
-    // NPR5.22\BR\20160413  CASE 231481 Added fields Offline Mode
-    // NPR5.22\BR\20160422  CASE 231481 Added fields Transaction Type Install Code
-    // NPR5.25/BR/20160608  CASE 231481 Added fields Customer ID, License ID,
-    // NPR5.29/BR/20161230  CASE 262269 Get License Key from File
-    // NPR5.34/BR/20170320  CASE 268697 Added fields Min. Length Authorisation No. and Max. Length Authorisation No.
-    // NPR5.31/BR/20170502  CASE 274457 Fixed tablerelations for Pepper Transaction Types
-
     Caption = 'Pepper Configuration';
     DataClassification = CustomerContent;
     DataCaptionFields = "Code", Description;
@@ -263,9 +254,7 @@ table 6184490 "NPR Pepper Config."
 
             trigger OnValidate()
             begin
-                //-NPR5.34 [268697]
                 CheckMinMaxLengthAuthorisationNo;
-                //+NPR5.34 [268697]
             end;
         }
         field(667; "Max. Length Authorisation No."; Integer)
@@ -279,9 +268,7 @@ table 6184490 "NPR Pepper Config."
 
             trigger OnValidate()
             begin
-                //-NPR5.34 [268697]
                 CheckMinMaxLengthAuthorisationNo;
-                //+NPR5.34 [268697]
             end;
         }
         field(700; "Customer ID"; Text[8])
@@ -348,18 +335,17 @@ table 6184490 "NPR Pepper Config."
         TxtXMLfilefilter: Label '*.xml';
         TxtXMLfileDescription: Label 'XML Files (*.xml)|*.xml';
         PepperConfigManagement: Codeunit "NPR Pepper Config. Mgt.";
-        PepperLibrary: Codeunit "NPR Pepper Library";
+        PepperLibrary: Codeunit "NPR Pepper Library TSD";
         RecRef: RecordRef;
     begin
-        //-NPR5.22
-        //UploadResult := FileManagement.BLOBImport(TempBlob,'');
+
         case FileType of
             FileType::License:
                 UploadResult := FileManagement.BLOBImportWithFilter(TempBlob, TxtCaptionLicense, '', TxtXMLfileDescription, TxtXMLfilefilter);
             FileType::AdditionalParameters:
                 UploadResult := FileManagement.BLOBImportWithFilter(TempBlob, TxtCaptionAdditionalParameters, '', TxtXMLfileDescription, TxtXMLfilefilter);
         end;
-        //+NPR5.22
+
         if UploadResult = '' then
             Error(TxtNotUploaded);
         Message(StrSubstNo(TxtSuccess, UploadResult));
@@ -368,8 +354,7 @@ table 6184490 "NPR Pepper Config."
                 begin
                     CalcFields("License File");
                     Clear("License File");
-                    //-NPR5.22
-                    //"License File" := TempBlob.Blob;
+
                     Modify;
                     CalcFields("License File");
 
@@ -377,11 +362,9 @@ table 6184490 "NPR Pepper Config."
                     TempBlob.ToRecordRef(RecRef, FieldNo("License File"));
                     RecRef.SetTable(Rec);
 
-                    //-NPR5.29 [262269]
                     "License ID" := PepperLibrary.GetKeyFromLicenseText(PepperConfigManagement.GetConfigurationText(Rec, 0));
-                    //+NPR5.29 [262269]
                     Modify;
-                    //+NPR5.22
+
                     if not "License File".HasValue then
                         Error(TxtNotStored);
                 end;
@@ -389,8 +372,7 @@ table 6184490 "NPR Pepper Config."
                 begin
                     CalcFields("Additional Parameters");
                     Clear("Additional Parameters");
-                    //-NPR5.22
-                    //"Additional Parameters" := TempBlob.Blob;
+
                     Modify;
                     CalcFields("Additional Parameters");
 
@@ -399,7 +381,6 @@ table 6184490 "NPR Pepper Config."
                     RecRef.SetTable(Rec);
 
                     Modify;
-                    //+NPR5.22
                     if not "Additional Parameters".HasValue then
                         Error(TxtNotStored);
                 end;
@@ -460,7 +441,7 @@ table 6184490 "NPR Pepper Config."
         TxtXMLFileFilter: Label 'XML Files (*.xml)|*.xml';
         TempFile: File;
     begin
-        //-NPR5.22
+
         case FileType of
             FileType::License:
                 begin
@@ -495,7 +476,7 @@ table 6184490 "NPR Pepper Config."
                     DownloadFromStream(StreamIn, TxtTitle, '', TxtXMLFileFilter, ExportName);
                 end;
         end;
-        //+NPR5.22
+
     end;
 
     procedure ShowFile(OptFileType: Option License,Configuration,AdditionalParameters)
@@ -546,11 +527,9 @@ table 6184490 "NPR Pepper Config."
 
     local procedure CheckMinMaxLengthAuthorisationNo()
     begin
-        //-NPR5.34 [268697]
         if ("Min. Length Authorisation No." <> 0) and ("Max. Length Authorisation No." <> 0) then
             if "Min. Length Authorisation No." > "Max. Length Authorisation No." then
                 Error(StrSubstNo(Txt001, FieldCaption("Min. Length Authorisation No."), FieldCaption("Max. Length Authorisation No.")));
-        //+NPR5.34 [268697]
     end;
 }
 

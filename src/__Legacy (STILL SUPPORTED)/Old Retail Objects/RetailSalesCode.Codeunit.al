@@ -913,7 +913,6 @@ codeunit 6014418 "NPR Retail Sales Code"
         GiftVoucher: Record "NPR Gift Voucher";
         CreditVoucher: Record "NPR Credit Voucher";
         PepperTransactionRequest: Record "NPR EFT Transaction Request";
-        PepperProtocol: Codeunit "NPR Pepper Protocol";
         CCTrans: Record "NPR EFT Receipt";
         Register: Record "NPR Register";
         AmountItt: Integer;

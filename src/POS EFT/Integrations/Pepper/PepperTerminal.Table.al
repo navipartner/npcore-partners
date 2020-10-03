@@ -1,17 +1,5 @@
 table 6184492 "NPR Pepper Terminal"
 {
-    // NPR5.22\BR\20160316  CASE 231481 Object Created
-    // NPR5.22\BR\20160407  CASE 231481 Added support for offline
-    // NPR5.22\BR\20160412  CASE 231481 Added ExporFile function
-    // NPR5.22\BR\20160422  CASE 231481 Added Field Customer Signature Space
-    // NPR5.25/BR/20160509  CASE 231481 Added field Fixed Currency
-    // NPR5.25/BR/20160608  CASE 231481 Added fields Customer ID, License ID, License File, function StoreLicense
-    // NPR5.26/BR/20160810  CASE 248685 Fixed bug with uploading and displaying license
-    // NPR5.27/BR/20161025  CASE 255131 Added field Close Automatically
-    // NPR5.29/BR/20161221  CASE 261673 Added Nets requirement for signature confirmation
-    // NPR5.29/BR/20161230  CASE 262269 Get License Key from File
-    // NPR5.30/TJ/20170215  CASE 265504 Changed ENU captions on fields with word Register in their name
-
     Caption = 'Pepper Terminal';
     DataClassification = CustomerContent;
     DataCaptionFields = "Code", Description;
@@ -228,11 +216,9 @@ table 6184492 "NPR Pepper Terminal"
             var
                 TxtOfflineDisabled: Label 'Offline mode is disabled in the Pepper Configuration.';
             begin
-                //-NPR5.22
                 if Rec.Status = Rec.Status::ActiveOffline then
                     if not GetOfflineAllowed then
                         Error(TxtOfflineDisabled);
-                //+NPR5.22
             end;
         }
         field(650; "Fixed Currency Code"; Code[10])
@@ -240,8 +226,6 @@ table 6184492 "NPR Pepper Terminal"
             Caption = 'Fixed Currency Code';
             DataClassification = CustomerContent;
             TableRelation = Currency;
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(700; "Customer ID"; Text[8])
@@ -292,15 +276,11 @@ table 6184492 "NPR Pepper Terminal"
         TxtXMLfilefilter: Label '*.xml';
         TxtXMLfileDescription: Label 'XML Files (*.xml)|*.xml';
         CaptionText: Text;
-        PepperLibrary: Codeunit "NPR Pepper Library";
+        PepperLibrary: Codeunit "NPR Pepper Library TSD";
         PepperConfigManagement: Codeunit "NPR Pepper Config. Mgt.";
         LicensedTerminalType: Integer;
         RecRef: RecordRef;
     begin
-        //-NPR5.22
-        //UploadResult := FileManagement.BLOBImport(TempBlob,'');
-        //-NPR5.26 [248685]
-        //UploadResult := FileManagement.BLOBImportWithFilter(TempBlob,TxtCaptionAdditionalParameters,'',TxtXMLfileDescription,TxtXMLfilefilter);
         case FileType of
             FileType::AdditionalParameters:
                 CaptionText := TxtCaptionAdditionalParameters;
@@ -308,8 +288,6 @@ table 6184492 "NPR Pepper Terminal"
                 CaptionText := TxtCaptionLicense;
         end;
         UploadResult := FileManagement.BLOBImportWithFilter(TempBlob, CaptionText, '', TxtXMLfileDescription, TxtXMLfilefilter);
-        //+NPR5.26 [248685]
-        //+NPR5.22
         if UploadResult = '' then
             Error(TxtNotUploaded);
         Message(StrSubstNo(TxtSuccess, UploadResult));
@@ -318,8 +296,6 @@ table 6184492 "NPR Pepper Terminal"
                 begin
                     CalcFields("Additional Parameters File");
                     Clear("Additional Parameters File");
-                    //-NPR5.22
-                    //"Additional Parameters File" := TempBlob.Blob;
                     Modify;
                     CalcFields("Additional Parameters File");
 
@@ -328,11 +304,11 @@ table 6184492 "NPR Pepper Terminal"
                     RecRef.SetTable(Rec);
 
                     Modify;
-                    //-NPR5.22
+
                     if not "Additional Parameters File".HasValue then
                         Error(TxtNotStored);
                 end;
-            //-NPR5.25 [231481]
+
             FileType::License:
                 begin
                     CalcFields("License File");
@@ -344,7 +320,6 @@ table 6184492 "NPR Pepper Terminal"
                     TempBlob.ToRecordRef(RecRef, FieldNo("License File"));
                     RecRef.SetTable(Rec);
 
-                    //-NPR5.29 [262269]
                     "License ID" := PepperLibrary.GetKeyFromLicenseText(PepperConfigManagement.GetTerminalText(Rec, 0));
                     LicensedTerminalType := PepperLibrary.GetTerminalTypeFromLicenseText(PepperConfigManagement.GetTerminalText(Rec, 0));
                     if LicensedTerminalType <> 0 then begin
@@ -355,12 +330,12 @@ table 6184492 "NPR Pepper Terminal"
                                 if LicensedTerminalType <> "Terminal Type Code" then
                                     Message(TxtTerminalTypeNotLicensed, LicensedTerminalType);
                     end;
-                    //+NPR5.29 [262269]
+
                     Modify;
                     if not "License File".HasValue then
                         Error(TxtNotStored);
                 end;
-        //+NPR5.25 [231481]
+
         end;
     end;
 
@@ -376,7 +351,7 @@ table 6184492 "NPR Pepper Terminal"
         TxtLicenseCleared: Label 'License deleted.';
         TxtAdditionalParametersCleared: Label 'Additional Parameters deleted.';
     begin
-        //-NPR5.25 [231481]
+
         case FileType of
             FileType::License:
                 begin
@@ -401,7 +376,7 @@ table 6184492 "NPR Pepper Terminal"
                     Message(TxtAdditionalParametersCleared);
                 end;
         end;
-        //+NPR5.25 [231481]
+
     end;
 
     procedure ShowFile(OptFileType: Option License,AdditionalParameters)
@@ -410,30 +385,25 @@ table 6184492 "NPR Pepper Terminal"
         TxtNoAddParam: Label 'This Pepper Terminal does not have Additional Parameters set up. The Addition Parameters will be taken from Pepper Configuration %1.';
         TxtNoLicense: Label 'This Pepper Terminal does not have License set up. The License will be taken from Pepper Configuration %1.';
     begin
-        //-NPR5.25 [231481]
+
         case OptFileType of
             OptFileType::AdditionalParameters:
                 begin
-                    //+NPR5.25 [231481]
                     CalcFields("Additional Parameters File");
                     if not "Additional Parameters File".HasValue then
                         Message(TxtNoAddParam, "Configuration Code");
                     Message(PepperConfigManagement.GetTerminalText(Rec, OptFileType));
-                    //-NPR5.25 [231481]
+
                 end;
             OptFileType::License:
                 begin
-                    //-NPR5.26 [248685]
-                    //CALCFIELDS("Additional Parameters File");
-                    //IF NOT "Additional Parameters File".HASVALUE THEN
                     CalcFields("License File");
                     if not "License File".HasValue then
-                        //+NPR5.26 [248685]
                         Message(TxtNoLicense, "Configuration Code");
                     Message(PepperConfigManagement.GetTerminalText(Rec, OptFileType));
                 end;
         end;
-        //+NPR5.25 [231481]
+
     end;
 
     procedure ExportFile(OptFileType: Option License,AdditionalParameters)
@@ -448,16 +418,14 @@ table 6184492 "NPR Pepper Terminal"
         TxtTitle: Label 'XML File Export';
         TxtXMLFileFilter: Label 'XML Files (*.xml)|*.xml';
     begin
-        //-NPR5.25 [231481]
+
         case OptFileType of
             OptFileType::License:
                 begin
                     CalcFields("License File");
                     if not "License File".HasValue then
-                        //-NPR5.29 [262269]
-                        //ERROR(TxtNoLicense);
                         Error(TxtNoLicenseToExport);
-                    //-NPR5.29 [262269]
+
                     ExportName := TxtFileNameLicense;
                     "License File".CreateInStream(StreamIn);
                     DownloadFromStream(StreamIn, TxtTitle, '', TxtXMLFileFilter, ExportName);
@@ -471,7 +439,7 @@ table 6184492 "NPR Pepper Terminal"
                     DownloadFromStream(StreamIn, TxtTitle, '', TxtXMLFileFilter, ExportName);
                 end;
         end;
-        //+NPR5.25 [231481]
+
     end;
 
     local procedure CheckDuplicateRegister()
@@ -534,11 +502,11 @@ table 6184492 "NPR Pepper Terminal"
         PepperInstance: Record "NPR Pepper Instance";
         PepperConfiguration: Record "NPR Pepper Config.";
     begin
-        //-NPR5.22
+
         CalcFields("Configuration Code");
         PepperConfiguration.Get("Configuration Code");
         exit(PepperConfiguration."Offline mode" <> 0);
-        //+NPR5.22
+
     end;
 
     procedure StoreLicense(LicenseString: Text): Boolean
@@ -546,7 +514,7 @@ table 6184492 "NPR Pepper Terminal"
         BText: BigText;
         Ostream: OutStream;
     begin
-        //-NPR5.25 [231481]
+
         if (LicenseString = '') then
             exit(false);
         CalcFields("License File");
@@ -558,7 +526,7 @@ table 6184492 "NPR Pepper Terminal"
         BText.Write(Ostream);
         Modify;
         exit(true);
-        //+NPR5.25 [231481]
+
     end;
 }
 
