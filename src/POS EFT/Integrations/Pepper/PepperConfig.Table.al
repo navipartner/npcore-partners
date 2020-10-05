@@ -90,9 +90,9 @@ table 6184490 "NPR Pepper Config."
         {
             Caption = 'Logging Level';
             DataClassification = CustomerContent;
-            InitValue = warning;
             OptionCaption = 'Nolog,Error,Warning,Info,Debug';
             OptionMembers = nolog,error,warning,info,debug;
+            InitValue = "warning";
         }
         field(220; "Logging Max. File Size (MB)"; Integer)
         {
