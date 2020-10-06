@@ -375,6 +375,11 @@ page 6060136 "NPR MM Member Card"
         }
         area(factboxes)
         {
+            part(PersonStatistics; "NPR Person Statistics")
+            {
+                Caption = 'Facial Recognition';
+                ApplicationArea = All;
+            }
             systempart(Control6150638; Notes)
             {
                 ApplicationArea = All;
@@ -599,6 +604,75 @@ page 6060136 "NPR MM Member Card"
                     //+MM1.42 [372557]
                 end;
             }
+            group("NPR FacialRecognition")
+            {
+                Caption = 'Facial Recognition';
+                Image = PersonInCharge;
+                action("NPR ImportFace")
+                {
+                    Caption = 'Import Face Image';
+                    ApplicationArea = All;
+                    Image = Picture;
+
+                    trigger OnAction()
+                    var
+                        Contact: Record Contact;
+                        FacialRecognitionSetup: Record "NPR Facial Recogn. Setup";
+                        FacialRecognitionDetect: Codeunit "NPR Detect Face";
+                        FacialRecognitionPersonGroup: Codeunit "NPR Create Person Group";
+                        FacialRecognitionPerson: Codeunit "NPR Create Person";
+                        FacialRecognitionPersonFace: Codeunit "NPR Add Person Face";
+                        FacialRecognitionTrainPersonGroup: Codeunit "NPR Train Person Group";
+                        ImageMgt: Codeunit "NPR Image Mgt.";
+                        ImageFilePath: Text;
+                        EntryNo: Integer;
+                        CalledFrom: Option Contact,Member;
+                        NotSetUp: Label 'Facial Recognition is not active. \It can be enabled from the Facial Recognition setup.';
+                        ImgCantBeProcessed: Label 'Media not supported \ \Image can''t be processed. \Please use .jpg or .png images .';
+                        ConnectionError: Label 'The API can''t be reached. \Please contact your administrator.';
+                        NoNameError: Label 'Member information is not complete. \Action aborted.';
+                    begin
+                        if not FacialRecognitionSetup.FindFirst() or not FacialRecognitionSetup.Active then begin
+                            Message(NotSetUp);
+                            exit;
+                        end;
+
+                        if not FacialRecognitionPersonGroup.GetPersonGroups() then begin
+                            Message(ConnectionError);
+                            exit;
+                        end;
+
+                        if not Contact.Get("Contact No.") then
+                            exit;
+
+                        if Contact."Name" = '' then begin
+                            Message(NoNameError);
+                            exit;
+                        end;
+
+                        FacialRecognitionPersonGroup.CreatePersonGroup(Contact, false);
+
+                        FacialRecognitionPerson.CreatePerson(Contact, false);
+
+                        FacialRecognitionDetect.DetectFace(Contact, ImageFilePath, EntryNo, false, CalledFrom::Member);
+                        case ImageFilePath of
+                            '':
+                                exit;
+                            'WrongExtension':
+                                begin
+                                    Message(ImgCantBeProcessed);
+                                    exit;
+                                end;
+                        end;
+
+                        if FacialRecognitionPersonFace.AddPersonFace(Contact, ImageFilePath, EntryNo) then begin
+                            FacialRecognitionTrainPersonGroup.TrainPersonGroup(Contact, false);
+                            ImageMgt.UpdateRecordImage("External Member No.", CalledFrom::Member, ImageFilePath);
+                        end else
+                            Message(ImgCantBeProcessed);
+                    end;
+                }
+            }
         }
         area(navigation)
         {
@@ -799,7 +873,14 @@ page 6060136 "NPR MM Member Card"
     end;
 
     trigger OnAfterGetRecord()
+    var
+        FacialRecognition: Record "NPR Facial Recognition";
     begin
+        FacialRecognition.SetRange("Contact No.", "Contact No.");
+        if FacialRecognition.FindLast() then
+            CurrPage.PersonStatistics.Page.SetValues(FacialRecognition.Age, FacialRecognition.Gender)
+        else
+            CurrPage.PersonStatistics.Page.ResetValues();
 
         //+MM1.40 [360242]
         GetMasterDataAttributeValue();
