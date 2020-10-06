@@ -1,9 +1,5 @@
 codeunit 6151603 "NPR NpDc Non-POS App. Mgt."
 {
-    // NPR5.51/MHA /20190724  CASE 343352 Object created
-    // NPR5.53/MHA /20190115  CASE 343352 Added VAT % from request
-
-
     trigger OnRun()
     begin
     end;
@@ -122,9 +118,7 @@ codeunit 6151603 "NPR NpDc Non-POS App. Mgt."
         SaleLinePOS.Type := SaleLinePOS.Type::Item;
         SaleLinePOS."No." := TempSaleLinePOS."No.";
         SaleLinePOS."Variant Code" := TempSaleLinePOS."Variant Code";
-        //-NPR5.53 [343352]
         SaleLinePOS."VAT %" := TempSaleLinePOS."VAT %";
-        //+NPR5.53 [343352]
         SaleLinePOS.Description := TempSaleLinePOS.Description;
         SaleLinePOS."Description 2" := TempSaleLinePOS."Description 2";
         SaleLinePOS."Unit Price" := TempSaleLinePOS."Unit Price";
@@ -137,9 +131,11 @@ codeunit 6151603 "NPR NpDc Non-POS App. Mgt."
             SaleLinePOS."Unit of Measure Code" := TempSaleLinePOS."Unit of Measure Code";
         SaleLinePOS."Qty. per Unit of Measure" := UOMMgt.GetQtyPerUnitOfMeasure(Item, SaleLinePOS."Unit of Measure Code");
         SaleLinePOS."Quantity (Base)" := UOMMgt.CalcBaseQty(SaleLinePOS.Quantity, SaleLinePOS."Qty. per Unit of Measure");
-        //-NPR5.53 [343352]
-        //SaleLinePOS.UpdateAmounts(SaleLinePOS);
-        //+NPR5.53 [343352]
+
+        SaleLinePOS."Price Includes VAT" := (SaleLinePOS."VAT %" > 0);
+        if (not SaleLinePOS."Price Includes VAT") then
+            SaleLinePOS.Amount := TempSaleLinePOS."Amount Including VAT";
+
         SaleLinePOS.Insert;
     end;
 
