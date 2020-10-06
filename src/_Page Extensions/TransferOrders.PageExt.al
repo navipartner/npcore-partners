@@ -37,7 +37,6 @@ pageextension 6014464 "NPR Transfer Orders" extends "Transfer Orders"
 
     var
         TemplateN: Text;
-        TransferHdr: Record "Transfer Header";
         PostingVisibility: Boolean;
         PostingVisibilityPOS: Boolean;
         Codeunit6059823: Codeunit "NPR TransferOrder-Post + Print";
@@ -62,11 +61,10 @@ pageextension 6014464 "NPR Transfer Orders" extends "Transfer Orders"
     */
     //end;
 
-    procedure SetValues(TemplateName: Text; TransferHeader: Record "Transfer Header")
+    procedure SetValues(TemplateName: Text)
     begin
         //-NPR5.55 [362312]
         TemplateN := TemplateName;
-        TransferHdr := TransferHeader;
         //+NPR5.55 [362312]
     end;
 }

@@ -1,13 +1,5 @@
 codeunit 6150731 "NPR POS Action: Transf. Order"
 {
-    // NPR5.43/THRO/20180604 CASE 315072 Transfer order list
-    // NPR5.51/ALST/20190722 CASE 358552 added possibility to auto create new order woth location and global dimension set from the register
-    // NPR5.52/ALST/20191009 CASE 358552 fixed new record functionality
-    // NPR5.53/ALPO/20191025 CASE 371956 Dimensions: POS Store & POS Unit integration; discontinue dimensions on Cash Register
-    // NPR5.55/YAHA/20191127 CASE 362312 Added Functionality to use template for printing
-    // NPR5.55/ALPO/20200724 CASE 416100 A new parameter to preset Trasfer-to location code, when creating new orders
-
-
     trigger OnRun()
     begin
     end;
@@ -34,8 +26,7 @@ codeunit 6150731 "NPR POS Action: Transf. Order"
 
     local procedure ActionVersion(): Text
     begin
-        exit('1.2');  //NPR5.55 [416100]
-        exit('1.1');
+        exit('1.2');
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', true, true)]
@@ -52,10 +43,8 @@ codeunit 6150731 "NPR POS Action: Transf. Order"
             Sender.RegisterOptionParameter('Register Location', ' ,Use as Transfer-from filter,Use as Transfer-to filter', ' ');
             Sender.RegisterTextParameter('Transfer-from Filter', '');
             Sender.RegisterTextParameter('Transfer-to Filter', '');
-            //-NPR5.51 [358552]
             Sender.RegisterBooleanParameter('NewRecord', false);
-            //+NPR5.51 [358552]
-            Sender.RegisterTextParameter('DefaultTransferToCode', '');  //NPR5.55 [416100]
+            Sender.RegisterTextParameter('DefaultTransferToCode', '');
         end;
     end;
 
@@ -72,7 +61,7 @@ codeunit 6150731 "NPR POS Action: Transf. Order"
         TemplateMgt: Codeunit "NPR RP Template Mgt.";
         ReportSelection: Record "Report Selections";
         Template: Text;
-        Page5742: Page "Transfer Orders";
+        TransferOrderList: Page "Transfer Orders";
         Codeunit6059823: Codeunit "NPR TransferOrder-Post + Print";
     begin
         if not Action.IsThisAction(ActionCode) then
@@ -84,16 +73,9 @@ codeunit 6150731 "NPR POS Action: Transf. Order"
         JSON.SetScope('parameters', true);
         UsePOSLocationAs := JSON.GetInteger('Register Location', true);
 
-        //-NPR5.51 [358552]
         POSSession.GetSetup(POSSetup);
         POSSetup.GetRegisterRecord(Register);
-        //+NPR5.51 [358552]
 
-        //-NPR5.51 [358552]
-        //  IF UsePOSLocationAs > 0 THEN BEGIN
-        //    POSSession.GetSetup(POSSetup);
-        //    POSSetup.GetRegisterRecord(Register);
-        //+NPR5.51 [358552]
         case UsePOSLocationAs of
             1:
                 TransferFromFilter := Register."Location Code";
@@ -101,19 +83,10 @@ codeunit 6150731 "NPR POS Action: Transf. Order"
                 TransferToFilter := Register."Location Code";
         end;
 
-        //-NPR5.51 [358552]
-        if JSON.GetBooleanParameter('NewRecord', true) then
-        //-NPR5.52 [358552]
-        begin
-            //+NPR5.52 [358552]
+        if JSON.GetBooleanParameter('NewRecord', true) then begin
             if Confirm(CreateNewRecordCaption, true, TransferHeader.FieldCaption("Transfer-from Code"), TransferHeader.FieldCaption("Shortcut Dimension 1 Code")) then
-                //AddNewRecord(Register);  //NPR5.55 [416100]-revoked
-                AddNewRecord(Register, JSON.GetStringParameter('DefaultTransferToCode', false));  //NPR5.55 [416100]
-                                                                                                  //-NPR5.52 [358552]
-        end
-        //+NPR5.52 [358552]
-        else begin
-            //+NPR5.51 [358552]
+                AddNewRecord(Register, JSON.GetStringParameter('DefaultTransferToCode', false));
+        end else begin
             if TransferFromFilter = '' then
                 TransferFromFilter := JSON.GetString('Transfer-from Filter', true);
             if TransferToFilter = '' then
@@ -124,30 +97,27 @@ codeunit 6150731 "NPR POS Action: Transf. Order"
             if TransferToFilter <> '' then
                 TransferHeader.SetFilter("Transfer-to Code", TransferToFilter);
 
-            //-NPR5.55 [362312]
-            //PAGE.RUN(5742,TransferHeader);
             ReportSelectionRetail.Reset;
             ReportSelectionRetail.SetRange("Report Type", ReportSelectionRetail."Report Type"::"Transfer Order");
             if ReportSelectionRetail.FindFirst then begin
                 Template := ReportSelectionRetail."Print Template";
                 Codeunit6059823.SetValues(true);
             end;
-            Page5742.SetValues(Template, TransferHeader);
-            Page5742.Run();
-            //+NPR5.55 [362312]
+
+            Clear(TransferOrderList);
+            TransferOrderList.SetTableView(TransferHeader);
+            TransferOrderList.SetValues(Template);
+            TransferOrderList.Run();
         end;
 
         POSSession.RequestRefreshData;
     end;
 
-    local procedure "--- Subscribers"()
-    begin
-    end;
+    //--- Subscribers ---
 
     [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterNameCaption', '', false, false)]
     procedure OnGetParameterNameCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     begin
-        //-NPR5.51 [358552]
         if POSParameterValue."Action Code" <> ActionCode then
             exit;
 
@@ -160,12 +130,9 @@ codeunit 6150731 "NPR POS Action: Transf. Order"
                 Caption := TransferToFilterCaption;
             'NewRecord':
                 Caption := NewRecordCaption;
-            //-NPR5.55 [416100]
             'DefaultTransferToCode':
                 Caption := DefaultTransferToCodeCaption;
-        //+NPR5.55 [416100]
         end;
-        //+NPR5.51 [358552]
     end;
 
     [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterDescriptionCaption', '', false, false)]
@@ -173,7 +140,6 @@ codeunit 6150731 "NPR POS Action: Transf. Order"
     var
         TransferHeader: Record "Transfer Header";
     begin
-        //-NPR5.51 [358552]
         if POSParameterValue."Action Code" <> ActionCode then
             exit;
 
@@ -186,18 +152,14 @@ codeunit 6150731 "NPR POS Action: Transf. Order"
                 Caption := StrSubstNo(TransferFilterDescriptionCaption, TransferHeader.FieldCaption("Transfer-to Code"), TransferHeader.TableCaption);
             'NewRecord':
                 Caption := StrSubstNo(NewRecordDescriptionCaption, TransferHeader.TableCaption);
-            //-NPR5.55 [416100]
             'DefaultTransferToCode':
                 Caption := DefaultTransferToCodeDescription;
-        //+NPR5.55 [416100]
         end;
-        //+NPR5.51 [358552]
     end;
 
     [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterOptionStringCaption', '', false, false)]
     procedure OnGetParameterOptionStringCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     begin
-        //-NPR5.55 [416100]
         if POSParameterValue."Action Code" <> ActionCode then
             exit;
 
@@ -205,7 +167,6 @@ codeunit 6150731 "NPR POS Action: Transf. Order"
             'Register Location':
                 Caption := RegisterLocationOptionCaption;
         end;
-        //+NPR5.55 [416100]
     end;
 
     [EventSubscriber(ObjectType::Table, 6150705, 'OnLookupValue', '', false, false)]
@@ -214,7 +175,6 @@ codeunit 6150731 "NPR POS Action: Transf. Order"
         Location: Record Location;
         LocationList: Page "Location List";
     begin
-        //-NPR5.55 [416100]
         if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
@@ -249,7 +209,6 @@ codeunit 6150731 "NPR POS Action: Transf. Order"
                         POSParameterValue.Value := Location.Code;
                 end;
         end;
-        //+NPR5.55 [416100]
     end;
 
     [EventSubscriber(ObjectType::Table, 6150705, 'OnValidateValue', '', false, false)]
@@ -257,7 +216,6 @@ codeunit 6150731 "NPR POS Action: Transf. Order"
     var
         Location: Record Location;
     begin
-        //-NPR5.54 [399189]
         if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
@@ -271,12 +229,9 @@ codeunit 6150731 "NPR POS Action: Transf. Order"
                     Location.Find;
                 end;
         end;
-        //+NPR5.54 [399189]
     end;
 
-    local procedure "--- Auxiliary"()
-    begin
-    end;
+    //--- Auxiliary ---
 
     local procedure AddNewRecord(Register: Record "NPR Register"; TransferToCodeString: Text)
     var
@@ -285,24 +240,16 @@ codeunit 6150731 "NPR POS Action: Transf. Order"
         TransferHeader: Record "Transfer Header";
         TransferOrder: Page "Transfer Order";
     begin
-        //-NPR5.51 [358552]
         TransferHeader.Insert(true);
         TransferHeader.Validate("Transfer-from Code", Register."Location Code");
-        //-NPR5.55 [416100]
         if Location.Get(CopyStr(TransferToCodeString, 1, MaxStrLen(Location.Code))) then
             if not Location."Use As In-Transit" and (TransferHeader."Transfer-from Code" <> Location.Code) then
                 TransferHeader.Validate("Transfer-to Code", TransferToCodeString);
-        //+NPR5.55 [416100]
-        //TransferHeader.VALIDATE("Shortcut Dimension 1 Code",Register."Global Dimension 1 Code");  //NPR5.53 [371956]-revoked
-        //-NPR5.53 [371956]
         POSUnit.Get(Register."Register No.");
         TransferHeader.Validate("Shortcut Dimension 1 Code", POSUnit."Global Dimension 1 Code");  //Why only 1st global dim?
-        //+NPR5.53 [371956]
         TransferHeader.Modify;
 
         TransferOrder.SetRecord(TransferHeader);
         TransferOrder.Run;
-        //+NPR5.51 [358552]
     end;
 }
-
