@@ -1,12 +1,8 @@
 page 6151005 "NPR POS Quote Lines"
 {
-    // NPR5.47/MHA /20181011  CASE 302636 Object created - POS Quote (Saved POS Sale)
-    // NPR5.48/MHA /20181129  CASE 336498 Added Customer info fields
-    // NPR5.51/MMV /20190820  CASE 364694 Handle EFT approvals
-
     Caption = 'POS Quote Lines';
     Editable = false;
-    PageType = Worksheet;
+    PageType = List;
     UsageCategory = Administration;
     SourceTable = "NPR POS Quote Line";
 
@@ -208,4 +204,3 @@ page 6151005 "NPR POS Quote Lines"
             POSQuoteEntry.CalcFields(Amount, "Amount Including VAT");
     end;
 }
-
