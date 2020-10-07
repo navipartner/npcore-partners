@@ -5,7 +5,6 @@ resources:
   - repository: scriptsRepo
     type: git
     name:  'NpCore/NpDevOps'
-    ref: topic/User-Story-1997--Pull-bundle.js-from-Dragonglass-build-pipeline
 
 pool:
   name: NP Core Pull Request Pipelines
