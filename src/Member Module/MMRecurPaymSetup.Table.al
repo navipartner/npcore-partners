@@ -1,9 +1,5 @@
 table 6060093 "NPR MM Recur. Paym. Setup"
 {
-    // MM1.27/TSA /20180202 CASE 300681 Initial Version
-    // MM1.28/TSA /20180418 CASE 303635 Fixed relation for field "Gen. Journal Batch Name"
-    // #334163/JDH /20181109 CASE 334163 Added caption to field Gen. Journal Batch Name
-    // MM1.36/NPKNAV/20190125  CASE 343948 Transport MM1.36 - 25 January 2019
 
     Caption = 'Recurring Payment Setup';
     DataClassification = CustomerContent;

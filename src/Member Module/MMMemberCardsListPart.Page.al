@@ -1,10 +1,5 @@
 page 6060131 "NPR MM Member Cards ListPart"
 {
-    // MM1.00/TSA/20151217  CASE 229684 NaviPartner Member Management Module
-    // MM80.1.02/TSA/20151228  CASE 229980 Print Membercard
-    // MM1.22/TSA /20170905 CASE 289434 New function GetCurrentEntryNo()
-    // MM1.22/NPKNAV/20170914  CASE 284560-01 Transport MM1.22 - 13 September 2017
-    // MM1.29/TSA /20180524 CASE 313795 Touched
 
     Caption = 'Member Cards';
     CardPageID = "NPR MM Member Card Card";

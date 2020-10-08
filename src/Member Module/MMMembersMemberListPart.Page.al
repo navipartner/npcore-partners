@@ -1,9 +1,5 @@
 page 6060128 "NPR MM Members.Member ListPart"
 {
-    // TM1.00/TSA/20151215  CASE 228982 NaviPartner Ticket Management
-    // MM1.00/TSA/20151217  CASE 229684 NaviPartner Member Management Module
-    // MM1.22/TSA /20170816 CASE 287080 Added field "Anonymous Member Count" and filter <> Anonymous
-    // MM1.29/TSA /20180509 CASE 313795 Added GDPR fields
 
     Caption = 'Membership Members';
     InsertAllowed = false;
@@ -93,7 +89,6 @@ page 6060128 "NPR MM Members.Member ListPart"
     trigger OnOpenPage()
     begin
 
-        //-MM1.22 [287080]
         SetFilter("Member Role", '<> %1', "Member Role"::ANONYMOUS);
     end;
 }

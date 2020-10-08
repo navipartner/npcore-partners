@@ -1,12 +1,5 @@
 table 6060130 "NPR MM Members. Points Entry"
 {
-    // MM1.00/TSA/20151217  CASE 229684 NaviPartner Member Management Module
-    // MM1.17/TSA/20161214  CASE 243075 Member Point System implementation added fields for tracking points
-    // MM1.22/TSA /20170731 CASE 285403 Added field "Redeem Ref. Type" and "Redeem Reference No."
-    // MM1.23/TSA /20171010 CASE 257011 Added entry type SYNCHRONIZATION, field Adjustment
-    // MM1.36/TSA /20181105 CASE 333874 Incorrect table relation on field Entry No removed
-    // MM1.37/TSA /20190130 CASE 338215 Added Description, POS Store Code, POS Unit Code and removed table validation on customer and itrem to be able to run "bank" mode.
-    // MM1.37/TSA /20190130 CASE 338215 Added Entry Type Reserved and Captured, Authorization Code, added a key for auth code and type
 
     Caption = 'Membership Points Entry';
     DataClassification = CustomerContent;

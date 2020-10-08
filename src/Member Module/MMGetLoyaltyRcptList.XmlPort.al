@@ -1,7 +1,5 @@
 xmlport 6060149 "NPR MM Get Loyalty Rcpt. List"
 {
-    // MM1.40/TSA /20190828 CASE 365879 Initial Version
-    // MM1.42/TSA /20191106 CASE 365879 Added storeaddress and currencycode
 
     Caption = 'Get Loyalty Receipt List';
     FormatEvaluate = Xml;
@@ -262,7 +260,6 @@ xmlport 6060149 "NPR MM Get Loyalty Rcpt. List"
         GeneralLedgerSetup: Record "General Ledger Setup";
     begin
 
-
         if (MembershipEntryNo <= 0) then begin
             AddErrorResponse('Invalid membership entry no.');
             exit;
@@ -292,10 +289,9 @@ xmlport 6060149 "NPR MM Get Loyalty Rcpt. List"
             end;
         end;
 
-        //-MM1.42 [365879]
         GeneralLedgerSetup.Get();
         currencycode := GeneralLedgerSetup."LCY Code";
-        //+MM1.42 [365879]
+
     end;
 
     procedure AddErrorResponse(ErrorMessage: Text)

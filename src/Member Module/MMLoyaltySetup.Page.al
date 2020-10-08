@@ -1,12 +1,5 @@
 page 6060105 "NPR MM Loyalty Setup"
 {
-    // MM1.17/TSA/20161214  CASE 243075 Member Point System
-    // MM1.19/TSA/20170525  CASE 278061 Handling issues reported by OMA
-    // MM1.23/TSA /20171025 CASE 257011 Added fields "Amount Factor", "Point Rate"
-    // MM1.37/TSA /20190227 CASE 343053 Expire points functionality
-    // MM1.38/TSA /20190425 CASE 338215 Added Loyalty Point Server setups
-    // MM1.40/TSA /20190816 CASE 361664 Added field "Auto Upgrade Point Source" and Action to "Auto Upgrade Point Threshold" page
-    // MM1.43/TSA /20200203 CASE 388058 Adde expire points at calculation for "as you go"
 
     Caption = 'Loyalty Setup';
     PageType = List;
@@ -33,9 +26,9 @@ page 6060105 "NPR MM Loyalty Setup"
 
                     trigger OnValidate()
                     begin
-                        //-MM1.37 [343053]
+
                         CurrPage.Update(true);
-                        //+MM1.37 [343053]
+
                     end;
                 }
                 field("Fixed Period Start"; "Fixed Period Start")
@@ -46,9 +39,9 @@ page 6060105 "NPR MM Loyalty Setup"
 
                     trigger OnValidate()
                     begin
-                        //-MM1.37 [343053]
+
                         CurrPage.Update(true);
-                        //+MM1.37 [343053]
+
                     end;
                 }
                 field("Collection Period Length"; "Collection Period Length")
@@ -59,9 +52,9 @@ page 6060105 "NPR MM Loyalty Setup"
 
                     trigger OnValidate()
                     begin
-                        //-MM1.37 [343053]
+
                         CurrPage.Update(true);
-                        //+MM1.37 [343053]
+
                     end;
                 }
                 field("Expire Uncollected Points"; "Expire Uncollected Points")
@@ -70,9 +63,9 @@ page 6060105 "NPR MM Loyalty Setup"
 
                     trigger OnValidate()
                     begin
-                        //-MM1.37 [343053]
+
                         CurrPage.Update(true);
-                        //+MM1.37 [343053]
+
                     end;
                 }
                 field("Expire Uncollected After"; "Expire Uncollected After")
@@ -81,9 +74,9 @@ page 6060105 "NPR MM Loyalty Setup"
 
                     trigger OnValidate()
                     begin
-                        //-MM1.37 [343053]
+
                         CurrPage.Update(true);
-                        //+MM1.37 [343053]
+
                     end;
                 }
                 field(TestDate; TestDate)
@@ -96,10 +89,10 @@ page 6060105 "NPR MM Loyalty Setup"
                     var
                         LoyaltyPointManagement: Codeunit "NPR MM Loyalty Point Mgt.";
                     begin
-                        //-MM1.37 [343053]
+
                         LoyaltyPointManagement.CalcultatePointsValidPeriod(Rec, TestDate, CollectionPeriodStart, CollectionPeriodEnd);
                         CurrPage.Update(true);
-                        //+MM1.37 [343053]
+
                     end;
                 }
                 field(CollectionPeriodStart; CollectionPeriodStart)
@@ -261,7 +254,6 @@ page 6060105 "NPR MM Loyalty Setup"
         LoyaltyPointManagement: Codeunit "NPR MM Loyalty Point Mgt.";
     begin
 
-        //-MM1.37 [343053]
         CollectionPeriodEnd := 0D;
         CollectionPeriodStart := 0D;
         ReasonText := '';
@@ -276,15 +268,13 @@ page 6060105 "NPR MM Loyalty Setup"
 
             PeriodCalculationIssue := not LoyaltyPointManagement.ValidateFixedPeriodCalculation(Rec, ReasonText);
         end;
-        //+MM1.37 [343053]
 
-        //-MM1.43 [388058]
         if (Rec."Collection Period" = Rec."Collection Period"::AS_YOU_GO) then begin
             if ("Expire Uncollected Points") then
                 if (Format("Expire Uncollected After") <> '') then
                     ExpirePointsAt := CalcDate("Expire Uncollected After", Today);
         end;
-        //+MM1.43 [388058]
+
     end;
 
     trigger OnInit()

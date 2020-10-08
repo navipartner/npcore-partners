@@ -1,9 +1,5 @@
 codeunit 6151185 "NPR MM Sponsorship Ticket Mgt"
 {
-    // MM1.41/TSA /20191004 CASE 367471 Initial Version
-    // MM1.42/TSA/20200122  CASE 382728 Transport MM1.43 - 22 January 2020
-    // MM1.43/TSA /20200226 CASE 392659 Shifted all code from OnAfterInsertMembershipEntry() to a global function OnMembershipPayment();
-
 
     trigger OnRun()
     begin
@@ -56,10 +52,8 @@ codeunit 6151185 "NPR MM Sponsorship Ticket Mgt"
         Token := TicketRequestManager.GetNewToken();
         Member.Get(MembershipRole."Member Entry No.");
 
-        //-MM1.42 [382728]
         //CreateTicketRequest (Token, Member, SponsorshipTicketSetup);
         CreateTicketRequest(Token, MembershipRole, SponsorshipTicketSetup);
-        //+MM1.42 [382728]
 
         if (0 <> TicketRequestManager.IssueTicketFromReservationToken(Token, false, ResponseMessage)) then begin
             TicketRequestManager.DeleteReservationRequest(Token, true);
@@ -94,7 +88,6 @@ codeunit 6151185 "NPR MM Sponsorship Ticket Mgt"
             TicketReservationRequest."Entry No." := 0;
             TicketReservationRequest."Session Token ID" := Token;
 
-            //-MM1.42 [382728]
             //  TicketReservationRequest.Quantity := SponsorshipTicketSetup.Quantity;
             //
             //  TicketReservationRequest."External Item Code" := TicketRequestManager.GetExternalNo (SponsorshipTicketSetup."Item No.", SponsorshipTicketSetup."Variant Code");
@@ -132,7 +125,6 @@ codeunit 6151185 "NPR MM Sponsorship Ticket Mgt"
                 TicketReservationRequest."Admission Description" := TicketAdmissionBOM."Admission Description";
             TicketReservationRequest."Payment Option" := TicketReservationRequest."Payment Option"::PREPAID;
             TicketReservationRequest.Quantity := SponsorshipTicketSetup.Quantity;
-            //+MM1.42 [382728]
 
             TicketReservationRequest."External Order No." := '';
             TicketReservationRequest."Customer No." := '';
@@ -140,7 +132,7 @@ codeunit 6151185 "NPR MM Sponsorship Ticket Mgt"
             TicketReservationRequest."Created Date Time" := CurrentDateTime;
             TicketReservationRequest.Insert();
         until (TicketAdmissionBOM.Next() = 0);
-        Commit;
+        Commit();
     end;
 
     local procedure FinalizeTicketReservation(FailWithError: Boolean; MembershipRole: Record "NPR MM Membership Role"; var SponsorshipTicketSetup: Record "NPR MM Sponsors. Ticket Setup"; var ResponseMessage: Text): Boolean
@@ -344,7 +336,7 @@ codeunit 6151185 "NPR MM Sponsorship Ticket Mgt"
 
         SponsorshipTicketEntry."Failed With Message" := CopyStr(ResponseMessage, 1, MaxStrLen(SponsorshipTicketEntry."Failed With Message"));
         SponsorshipTicketEntry.Modify();
-        Commit;
+        Commit();
     end;
 
     local procedure ExportToTicketServer(var SponsorshipTicketEntry: Record "NPR MM Sponsors. Ticket Entry"; var ReasonText: Text): Boolean
@@ -406,7 +398,7 @@ codeunit 6151185 "NPR MM Sponsorship Ticket Mgt"
             ResponseMessage := 'Phone number is missing.';
 
         if (SponsorshipTicketEntry."Notification Address" <> '') then begin
-            Commit;
+            Commit();
             ResponseMessage := 'Template not found.';
             if (SMSManagement.FindTemplate(RecordRef, SMSTemplateHeader)) then begin
                 SmsBody := SMSManagement.MakeMessage(SMSTemplateHeader, SponsorshipTicketEntry);
@@ -506,7 +498,6 @@ codeunit 6151185 "NPR MM Sponsorship Ticket Mgt"
             end;
         end;
 
-
         ResponseMessage := '';
         exit(true);
     end;
@@ -518,8 +509,6 @@ codeunit 6151185 "NPR MM Sponsorship Ticket Mgt"
         SponsorshipTicketSetup: Record "NPR MM Sponsors. Ticket Setup";
         ResponseMessage: Text;
     begin
-
-        //-MM1.43 [392659] moved from event body OnAfterInsertMembershipEntry to separate function
 
         // When sponsorship is active for membership
         // New membership - activate created tickets
@@ -566,7 +555,6 @@ codeunit 6151185 "NPR MM Sponsorship Ticket Mgt"
                     FinalizeTicketReservation(true, MembershipRole, SponsorshipTicketSetup, ResponseMessage);
         end;
 
-        //+MM1.43 [392659]
     end;
 
     local procedure "--Subscribers"()
@@ -611,9 +599,8 @@ codeunit 6151185 "NPR MM Sponsorship Ticket Mgt"
     local procedure OnAfterInsertMembershipEntry(MembershipEntry: Record "NPR MM Membership Entry")
     begin
 
-        //-MM1.43 [392659] refactored, move all code to function OnMembershipPayment ()
         OnMembershipPayment(MembershipEntry);
-        //+MM1.43 [392659]
+
     end;
 }
 

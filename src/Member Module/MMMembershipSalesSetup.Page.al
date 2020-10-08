@@ -1,21 +1,5 @@
 page 6060125 "NPR MM Membership Sales Setup"
 {
-    // MM1.00/TSA/20151217  CASE 229684 NaviPartner Member Management Module
-    // MM1.10/TSA/20160331  CASE 234591 CreateMembershipAll changed signature
-    // MM1.15/TSA/20160817  CASE 248625 Transport MM1.15 - 19 July 2016
-    // MM1.17/TSA/20161227  CASE 262040 Added Suggested Membercount In Sales
-    // MM1.18/TSA/20170217  CASE 255459 The Member Info Page needs to know the item number because it has become smarter
-    // MM1.18/TSA/20170220 CASE 266768 Added default filter to not show blocked entries
-    // MM1.22/TSA /20170808 CASE 285403 Added "Assign Loyalty Points On Sale"
-    // MM1.22/TSA /20170821 CASE 287080 Business Flow Type "Anonymous"
-    // MM1.22/TSA /20170829 CASE 286922 Added field "Auto-Renew To"
-    // MM1.29.02/TSA /20180530 CASE 316450 Added field "Auto-Admitt Member On Sale"
-    // MM1.32/TSA /20180711 CASE 318132 Member Card Type
-    // MM1.40/TSA /20190612 CASE 357360 Disallowing foreign membership management from this page;
-    // MM1.40/TSA /20190726 CASE 356090 Adding field "Magento M2 Membership Sign-up"
-    // MM1.40/TSA /20190808 CASE 363147 Made CreateMembership function public and changed signature, refactored to use parameter record instance instead of Rec; previous comments /  versions removed
-    // MM1.44/TSA /20200529 CASE 407401 Added Age Verification
-    // MM1.45/TSA /20200728 CASE 407401 Added "Requires Guardian"
 
     Caption = 'Membership Sales Setup';
     PageType = List;
@@ -200,7 +184,6 @@ page 6060125 "NPR MM Membership Sales Setup"
     trigger OnOpenPage()
     begin
 
-        //-+MM1.18 [266769]
         Rec.SetFilter(Blocked, '=%1', false);
     end;
 
@@ -219,7 +202,6 @@ page 6060125 "NPR MM Membership Sales Setup"
         Rec: Record Item;
     begin
 
-        //-MM1.40 [363147] Function refactored to use parameter record instance instead of Rec; previous comments /  versions removed
         MembershipSetup.Get(MembershipSalesSetup."Membership Code");
 
         MemberCommunity.Get(MembershipSetup."Community Code");
@@ -267,7 +249,7 @@ page 6060125 "NPR MM Membership Sales Setup"
                     MembershipManagement.IssueMemberCard(true, MemberInfoCapture, MemberInfoCapture."Card Entry No.", ResponseMessage);
             end;
         end;
-        //+MM1.40 [363147]
+
     end;
 }
 

@@ -1,7 +1,5 @@
 codeunit 6151186 "NPR MM NpXml Members. Trigger"
 {
-    // MM1.45/TSA /20200710 CASE 413622 Initial Version
-
 
     trigger OnRun()
     begin
@@ -89,7 +87,6 @@ codeunit 6151186 "NPR MM NpXml Members. Trigger"
                     end;
                 end;
 
-
             else
                 Handled := false;
         end;
@@ -125,8 +122,8 @@ codeunit 6151186 "NPR MM NpXml Members. Trigger"
                                 ChildLinkRecRef.SetTable(Membership);
                                 if (not IsMembershipReadyForExportWorker(Membership."Entry No.")) then
                                     exit;
-                                //TempMembership.TRANSFERFIELDS (Membership, TRUE);
-                                //TempMembership.INSERT;
+                                //TempMembership.TransferFields (Membership, TRUE);
+                                //TempMembership.Insert();
                                 ParentRecRef.GetTable(Membership);
                             end;
 
@@ -136,8 +133,8 @@ codeunit 6151186 "NPR MM NpXml Members. Trigger"
                                 if (not IsMembershipReadyForExportWorker(MembershipRole."Membership Entry No.")) then
                                     exit;
                                 Membership.Get(MembershipRole."Membership Entry No.");
-                                //TempMembership.TRANSFERFIELDS (Membership, TRUE);
-                                //TempMembership.INSERT;
+                                //TempMembership.TransferFields (Membership, TRUE);
+                                //TempMembership.Insert();
                                 ParentRecRef.GetTable(Membership);
                             end;
 
@@ -161,8 +158,8 @@ codeunit 6151186 "NPR MM NpXml Members. Trigger"
                                 if (MembershipRole.FindSet()) then begin
                                     repeat
                                         if (IsMembershipReadyForExportWorker(MembershipRole."Membership Entry No.")) then begin
-                                            //TempMembershipRole.TRANSFERFIELDS (MembershipRole, TRUE);
-                                            //TempMembershipRole.INSERT;
+                                            //TempMembershipRole.TransferFields (MembershipRole, TRUE);
+                                            //TempMembershipRole.Insert();
                                             ParentRecRef.GetTable(MembershipRole);
                                         end;
                                     until (MembershipRole.Next() = 0);
@@ -176,8 +173,8 @@ codeunit 6151186 "NPR MM NpXml Members. Trigger"
                                     MembershipRole.SetFilter("Membership Entry No.", '=%1', MemberCard."Membership Entry No.");
                                     MembershipRole.SetFilter("Member Entry No.", '=%1', MemberCard."Member Entry No.");
                                     if (MembershipRole.FindFirst()) then begin
-                                        //TempMembershipRole.TRANSFERFIELDS (MembershipRole, TRUE);
-                                        //TempMembershipRole.INSERT;
+                                        //TempMembershipRole.TransferFields (MembershipRole, TRUE);
+                                        //TempMembershipRole.Insert();
                                         ParentRecRef.GetTable(MembershipRole);
                                     end;
                                 end;

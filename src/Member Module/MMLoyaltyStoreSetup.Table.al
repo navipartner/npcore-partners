@@ -1,7 +1,5 @@
 table 6151161 "NPR MM Loyalty Store Setup"
 {
-    // MM1.37/TSA/20190328  CASE 338215 Transport T0009 - 28 March 2019
-    // MM1.38/TSA /20190524 CASE 338215 Made some field name adjustments
 
     Caption = 'Loyalty Store Setup';
     DataClassification = CustomerContent;

@@ -1,8 +1,5 @@
 codeunit 6060149 "NPR RC MM Members.Burndown Mgt"
 {
-    // TM1.16/TSA/20160816  CASE 233430 Transport TM1.16 - 19 July 2016
-    // #302920/TSA /20180124 CASE 302920 Added auto-renew
-
 
     trigger OnRun()
     begin
@@ -23,7 +20,7 @@ codeunit 6060149 "NPR RC MM Members.Burndown Mgt"
                 "Chart Type" := "Chart Type"::"Stacked Area";
                 "Show Change As" := "Show Change As"::ACK;
                 Evaluate("StartDate Offset", '<+12M>');
-                Insert;
+                Insert();
             end;
     end;
 

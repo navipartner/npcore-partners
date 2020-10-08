@@ -1,7 +1,5 @@
 xmlport 6151121 "NPR MM GDPR GetSet Appr. State"
 {
-    // MM1.29/TSA /20180517 CASE 313795 Initial Version
-    // MM1.35/TSA /20181023 CASE 333592 Added handling of data subject id
 
     Caption = 'GDPR Get Set Approval State';
     FormatEvaluate = Xml;
@@ -259,19 +257,18 @@ xmlport 6151121 "NPR MM GDPR GetSet Appr. State"
             until MembershipRole.Next() = 0;
         end;
 
-
         // MembershipRole.RESET ();
-        // MembershipRole.SETFILTER ("Membership Entry No.", '<>%1', MembershipEntryNo);
-        // MembershipRole.SETFILTER ("Member Entry No.", '=%1', MemberEntryNo);
-        // IF (MembershipRole.FINDSET ()) THEN BEGIN
+        // MembershipRole.SetFilter ("Membership Entry No.", '<>%1', MembershipEntryNo);
+        // MembershipRole.SetFilter ("Member Entry No.", '=%1', MemberEntryNo);
+        // IF (MembershipRole.FindSet ()) THEN BEGIN
         //  IF (MembershipRole."Member Role" = MembershipRole."Member Role"::GUARDIAN) THEN BEGIN
-        //    TmpGuardians.TRANSFERFIELDS (MembershipRole, TRUE);
-        //    //IF (TmpGuardians.INSERT ()) THEN ;
+        //    TmpGuardians.TransferFields (MembershipRole, TRUE);
+        //    //IF (TmpGuardians.Insert ()) THEN ;
         //  END;
         //
         //  IF (MembershipRole."Member Role" <> MembershipRole."Member Role"::GUARDIAN) THEN BEGIN
-        //    TmpDependents.TRANSFERFIELDS (MembershipRole, TRUE);
-        //    //IF (Tmpdependents.INSERT ()) THEN ;
+        //    TmpDependents.TransferFields (MembershipRole, TRUE);
+        //    //IF (Tmpdependents.Insert ()) THEN ;
         //  END;
         // END;
     end;

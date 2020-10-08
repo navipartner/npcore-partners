@@ -1,6 +1,5 @@
 page 6151185 "NPR MM Sponsors. Ticket Setup"
 {
-    // MM1.41/TSA /20191004 CASE 367471 Initial Version
 
     Caption = 'Sponsorship Ticket Setup';
     DelayedInsert = true;

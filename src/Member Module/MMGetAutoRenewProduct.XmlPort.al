@@ -1,6 +1,5 @@
 xmlport 6060139 "NPR MM Get AutoRenew Product"
 {
-    // MM1.28/TSA /20180418 CASE 303635 Initial Version
 
     Caption = 'Get AutoRenew Product';
     FormatEvaluate = Xml;

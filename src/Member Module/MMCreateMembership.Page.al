@@ -1,8 +1,5 @@
 page 6060139 "NPR MM Create Membership"
 {
-    // MM1.00/TSA/20151217  CASE 229684 NaviPartner Member Management Module
-    // MM1.10/TSA/20160331  CASE 234591 CreateMembershipAll changed signature
-    // MM1.40/TSA /20190808 CASE 363147 CreateMembership was stale, invokes a maintained functions on 6060125 instead of duplicating functionality
 
     Caption = 'Create Membership';
     DeleteAllowed = false;
@@ -121,12 +118,11 @@ page 6060139 "NPR MM Create Membership"
         MembershipSalesSetup: Page "NPR MM Membership Sales Setup";
     begin
 
-        //-MM1.40 [363147]
         // MemberInfoCapture.INIT ();
-        // MemberInfoCapture.INSERT ();
+        // MemberInfoCapture.Insert ();
         //
         // MemberInfoCapturePage.SETRECORD (MemberInfoCapture);
-        // MemberInfoCapture.SETFILTER ("Entry No.", '=%1', MemberInfoCapture."Entry No.");
+        // MemberInfoCapture.SetFilter ("Entry No.", '=%1', MemberInfoCapture."Entry No.");
         // MemberInfoCapturePage.SETTABLEVIEW (MemberInfoCapture);
         // COMMIT ();
         //
@@ -142,7 +138,7 @@ page 6060139 "NPR MM Create Membership"
         // END;
 
         MembershipSalesSetup.CreateMembership(Rec);
-        //+MM1.40 [363147]
+
     end;
 }
 

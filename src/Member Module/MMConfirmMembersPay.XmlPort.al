@@ -1,8 +1,6 @@
 xmlport 6060137 "NPR MM Confirm Members. Pay."
 {
     // 
-    // MM1.24/TSA /20171026 CASE 290599 Initial Version
-    // MM1.26/TSA /20180219 CASE 305631 removed element membershipnumber, replaced it with document id
 
     Caption = 'Confirm Membership Payment';
     FormatEvaluate = Xml;

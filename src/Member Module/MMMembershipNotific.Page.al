@@ -1,8 +1,5 @@
 page 6060143 "NPR MM Membership Notific."
 {
-    // MM1.14/TSA/20160523  CASE 240871 Reminder Service
-    // MM1.26/NPKNAV/20180222  CASE 300681 Transport MM1.26 - 22 February 2018
-    // MM1.29/TSA /20180506 CASE 314131 Added field for wallet services
 
     Caption = 'Membership Notification';
     InsertAllowed = false;

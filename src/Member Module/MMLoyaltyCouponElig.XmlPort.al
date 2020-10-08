@@ -1,6 +1,5 @@
 xmlport 6060147 "NPR MM Loyalty Coupon Elig."
 {
-    // MM1.40/TSA /20190813 CASE 343352 Initial Version
 
     Caption = 'Loyalty Coupon Eligibility';
     FormatEvaluate = Xml;
@@ -208,7 +207,6 @@ xmlport 6060147 "NPR MM Loyalty Coupon Elig."
         Member: Record "NPR MM Member";
         MembershipRole: Record "NPR MM Membership Role";
     begin
-
 
         if (MembershipEntryNo <= 0) then begin
             AddErrorResponse('Invalid membership entry no.');

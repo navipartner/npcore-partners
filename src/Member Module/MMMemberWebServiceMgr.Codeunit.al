@@ -1,51 +1,5 @@
 codeunit 6060129 "NPR MM Member WebService Mgr"
 {
-    // MM80.1.00/TSA/20151217  CASE 229684 - NaviPartner Member Management Module
-    // MM80.1.02/TSA/20151228  CASE 229684 - Touch-up and enchancements
-    // MM1.03/TSA/20160104  CASE 230647 - Added NewsLetter CRM option
-    // MM1.06/TSA/20160126  CASE 232910 - Added Block Member function
-    // MM1.09/TSA/20160229  CASE 235805 Changed to Ticket Reservation handling in IssueTicket function
-    // MM1.10/TSA/20160331  CASE 234591 Added parameter to CreateMembership to include creation of ledger entry,
-    // MM1.11/TSA/20160427  CASE 239052 added ChangeMembership service
-    // MM1.12/TSA/20160503  CASE 240661 Added DAN Captions
-    // MM1.14/TSA/20160518  CASE 240870 Refactored GetMembershipChangeITemsList
-    // MM1.14/TSA/20160524  CASE 239052 - Added customernumber as a search parameter
-    // MM1.14.01/MHA/20160726  CASE 242557 Magento reference updated according to NC2.00
-    // MM1.15/TSA/20160817  CASE 244443 General Bug fix Changing signature on AddMemberAndCard function
-    // MM1.16/TSA/20160913  CASE 252216 Signature change on search function
-    // MM1.17/TSA/20161208  CASE 259671 Extended functionality for handling the start date of membership, signature change on IsMembershipActive
-    // MM1.17/TSA/20161208  CASE 259671 Added activationdate to CreateMembership
-    // MM1.17/TSA/20161228  CASE 262040 Signature Change on AddMemberAndCard
-    // MM1.18/TSA/20170207  CASE 265562 Change to XML date format on inbound
-    // MM1.21/TSA /20170719 CASE 284560 Added handling for membercardnumber in soapaction addmember
-    // MM1.22/TSA /20170808 CASE 285403 Added an initial unit price for web sales, to get the points calculation to work
-    // MM1.22/TSA /20170817 CASE 287080 Added Anonymous Member support
-    // MM1.22/TSA /20170911 CASE 284560 Added Temporary Member Card in AddMembershipMember
-    // MM1.23/TSA /20170918 CASE 276832 Handling of Guardian Attribute to email
-    // MM1.24/TSA /20171031 CASE 276832 moved email from complex type with attributes to elements due to web
-    // MM1.24/TSA /20171031 CASE 276832 moved exernal cardnumber from complex type witht attributes to elements due to web
-    // MM1.24/TSA /20171206 CASE 290599 Handling of ConfirmMembershipPayment
-    // MM1.25/TSA /20180115 CASE 299537 Added printing capability
-    // MM1.26/TSA /20180219 CASE 305631 Refactored ImportConfirmMembership to handle documentid as a parameter
-    // MM1.26/TSA /20180219 CASE 305631 Added RegretMembership
-    // MM1.27/TSA /20180226 CASE 306121 Changed GetMembership to be successful, although the membership is not actived or expired.
-    // MM1.28/TSA /20180417 CASE 303635 Added handler of GetMembershipAutoRenewProduct
-    // MM1.29/TSA /20180516 CASE 313795 Added GDPR Approval, SetGDPRApproval
-    // MM1.29/TSA /20180517 CASE 304945 Added SELECTLATESTVERSION as a permanent change, to handle cache issue between multiple WS calls that hits different NST's
-    // MM1.30/TSA /20180615 CASE 319243 Housecleaning - removing unused variables
-    // MM1.32/TSA /20180711 CASE 318132 Added "Member Card Type"::None on AddMembershipMember, selected notifiction type based on supplied data
-    // MM1.35/TSA /20181023 CASE 333592 Added GetMembershipRoles
-    // MM1.36/TSA /20190110 CASE 328141 Added CreateWalletMemberPass support, CreateWallet(), ProcessCreateWalletRequest(), GetCreateWalletRequest()
-    // MM1.39/TSA /20190529 CASE 350968 Added GetSetAutoRenewOption service
-    // MM1.40/TSA /20190827 CASE 360242 Added Support to attributes
-    // MM1.41/TSA /20191001 CASE 359703 Added assignment of companyname on membership create
-    // MM1.42/TSA /20191205 CASE  Added notification method
-    // MM1.42/TSA /20191210 CASE 381356 Correct VAT calculation for membership amount
-    // MM1.42/TSA /20191212 CASE 382170 General enhancements
-    // MM1.42/TSA /20191231 CASE 382728 Added GetSetMemberCommunicationOption service
-    // MM1.43/TSA /20200130 CASE 386080 Added customer no and contact no to membership info for pre-assign customers/contacts
-    // MM1.43/TSA /20200226 CASE 392659 Added finalization for sponsorship tickets
-    // MM1.44/TSA /20200506 CASE 400429 Added ImportBlockMember and renamed functions to reflect actual work done
 
     TableNo = "NPR Nc Import Entry";
 
@@ -56,7 +10,7 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
         MemberInfoCapture: Record "NPR MM Member Info Capture";
     begin
 
-        Commit;
+        Commit();
         SelectLatestVersion();
 
         if (not MemberInfoCapture.IsEmpty()) then begin
@@ -85,14 +39,11 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
                 'UpdateMember':
                     ImportUpdateMembers(XmlDoc, "Document ID");
 
-
-                //-MM1.44 [400429]
                 // 'BlockMembership'                 : ImportBlockMembers (XmlDoc, "Document ID");
                 'BlockMembership':
                     ImportBlockMemberships(XmlDoc, "Document ID");
                 'BlockMember':
                     ImportBlockMembers(XmlDoc, "Document ID");
-                //+MM1.44 [400429]
 
                 'ChangeMembership':
                     ImportChangeMemberships(XmlDoc, "Document ID");
@@ -163,7 +114,7 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
             ImportCreateMembership(XmlElement, DocumentID);
         end;
 
-        Commit;
+        Commit();
     end;
 
     local procedure ImportCreateMembership(XmlElement: DotNet NPRNetXmlElement; DocumentID: Text[100]) Imported: Boolean
@@ -185,17 +136,14 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
         MemberInfoCapture."Import Entry Document ID" := DocumentID;
         InsertCreateMembership(XmlElement, MemberInfoCapture);
 
-        //-MM1.40 [360242]
         TransferAttributes(XmlElement, MemberInfoCapture);
-        //+MM1.40 [360242]
 
         MembershipSalesSetup.Get(MembershipSalesSetup.Type::ITEM, MemberInfoCapture."Item No.");
 
-        //-#285403 [285403]
         if (MemberInfoCapture.Amount = 0) then begin
             Item.Get(MemberInfoCapture."Item No.");
             MemberInfoCapture."Unit Price" := Item."Unit Price";
-            //-MM1.42 [381356]
+
             // MemberInfoCapture.Amount := Item."Unit Price";
             // MemberInfoCapture."Amount Incl VAT" := Item."Unit Price";
             VATPostingSetup.SetFilter("VAT Bus. Posting Group", '=%1', Item."VAT Bus. Posting Gr. (Price)");
@@ -210,10 +158,8 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
                 MemberInfoCapture.Amount := Item."Unit Price";
                 MemberInfoCapture."Amount Incl VAT" := Round(MemberInfoCapture.Amount * ((100 + VATPostingSetup."VAT %") / 100.0), 0.01);
             end;
-            //+MM1.42 [381356]
 
         end;
-        //+#285403 [285403]
 
         MemberInfoCapture."Membership Entry No." := MembershipManagement.CreateMembership(MembershipSalesSetup, MemberInfoCapture, true);
         MemberInfoCapture.Modify();
@@ -222,7 +168,6 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
         Membership."Document ID" := DocumentID;
         Membership.Modify();
 
-        //-MM1.25 [299537]
         Membership.Get(MemberInfoCapture."Membership Entry No.");
         MembershipSetup.Get(Membership."Membership Code");
         case MembershipSetup."Web Service Print Action" of
@@ -231,7 +176,6 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
             MembershipSetup."Web Service Print Action"::OFFLINE:
                 MembershipManagement.PrintOffline(MemberInfoCapture."Information Context"::PRINT_MEMBERSHIP, MemberInfoCapture."Membership Entry No.");
         end;
-        //+MM1.25 [299537]
 
         exit(true);
     end;
@@ -243,7 +187,6 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
         i: Integer;
     begin
 
-        //-MM1.24 [290599]
         if IsNull(XmlDoc) then
             exit;
         XmlElement := XmlDoc.DocumentElement;
@@ -261,8 +204,8 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
             ImportConfirmMembership(XmlElement, DocumentID);
         end;
 
-        Commit;
-        //+MM1.24 [290599]
+        Commit();
+
     end;
 
     local procedure ImportConfirmMembership(XmlElement: DotNet NPRNetXmlElement; DocumentID: Text[100]) Imported: Boolean
@@ -275,7 +218,6 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
         TargetDocumentId: Text[100];
     begin
 
-        //-MM1.24 [290599]
         if IsNull(XmlElement) then
             exit(false);
 
@@ -283,7 +225,6 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
         MemberInfoCapture."Import Entry Document ID" := DocumentID;
         MemberInfoCapture.Insert();
 
-        //-MM1.26 [305631] - refactored
         TargetDocumentId := NpXmlDomMgt.GetXmlText(XmlElement, 'documentid', MaxStrLen(MemberInfoCapture."Import Entry Document ID"), true);
         MembershipEntry.SetFilter("Import Entry Document ID", '=%1', TargetDocumentId);
         MembershipEntry.SetFilter(Blocked, '=%1', false);
@@ -310,13 +251,10 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
 
         MembershipEntry.Modify();
 
-        //-MM1.43 [392659]
         SponsorshipTicketMgmt.OnMembershipPayment(MembershipEntry);
-        //+MM1.43 [392659]
 
         exit(true);
-        //+MM1.26 [305631]
-        //+MM1.24 [290599]
+
     end;
 
     local procedure ImportAddMembershipMembers(XmlDoc: DotNet "NPRNetXmlDocument"; DocumentID: Text[100])
@@ -343,7 +281,7 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
             ImportAddMembershipMember(XmlElement, DocumentID);
         end;
 
-        Commit;
+        Commit();
     end;
 
     local procedure ImportAddMembershipMember(XmlElement: DotNet NPRNetXmlElement; DocumentID: Text[100]) Imported: Boolean
@@ -376,9 +314,7 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
         if (MembershipEntryNo = 0) then
             Error(INVALID_MEMBERSHIP_NO, MemberInfoCapture."External Membership No.");
 
-        //-MM1.40 [360242]
         TransferAttributes(XmlElement, MemberInfoCapture);
-        //+MM1.40 [360242]
 
         if (not (MembershipManagement.AddMemberAndCard(true, MembershipEntryNo, MemberInfoCapture, true, MemberInfoCapture."Member Entry No", ResponseMessage))) then
             Error(ResponseMessage);
@@ -389,7 +325,6 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
         Member."Document ID" := DocumentID;
         Member.Modify();
 
-        //-MM1.25 [299537]
         Membership.Get(MembershipEntryNo);
         MembershipSetup.Get(Membership."Membership Code");
         MemberCard.Get(MemberInfoCapture."Card Entry No.");
@@ -400,7 +335,6 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
             MembershipSetup."Web Service Print Action"::OFFLINE:
                 MembershipManagement.PrintOffline(MemberInfoCapture."Information Context"::PRINT_CARD, MemberInfoCapture."Card Entry No.");
         end;
-        //+MM1.25 [299537]
 
         exit(true);
     end;
@@ -429,7 +363,7 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
             ImportAddAnonymousMember(XmlElement, DocumentID);
         end;
 
-        Commit;
+        Commit();
     end;
 
     local procedure ImportAddAnonymousMember(XmlElement: DotNet NPRNetXmlElement; DocumentID: Text[100]) Imported: Boolean
@@ -485,7 +419,7 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
             ImportGetMemberQuery(XmlElement, DocumentID);
         end;
 
-        Commit;
+        Commit();
     end;
 
     local procedure ImportGetMembershipTicketList(XmlDoc: DotNet "NPRNetXmlDocument"; DocumentID: Text[100])
@@ -512,7 +446,7 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
             ImportGetMemberQuery(XmlElement, DocumentID);
         end;
 
-        Commit;
+        Commit();
     end;
 
     local procedure ImportGetMembershipMembers(XmlDoc: DotNet "NPRNetXmlDocument"; DocumentID: Text[100])
@@ -539,7 +473,7 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
             ImportGetMemberQuery(XmlElement, DocumentID);
         end;
 
-        Commit;
+        Commit();
     end;
 
     local procedure ImportGetMemberQuery(XmlElement: DotNet NPRNetXmlElement; DocumentID: Text[100]) Imported: Boolean
@@ -589,26 +523,17 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
         if (not Membership.Get(MembershipEntryNo)) then
             Error(NOT_FOUND);
 
-
-        //-MM1.17 [259671]
         //IF (NOT MembershipManagement.IsMembershipActive (MembershipEntryNo, WORKDATE, FALSE)) THEN
         //    ERROR (NOT_ACTIVE, Membership."External Membership No.");
         IsValid := MembershipManagement.IsMembershipActive(MembershipEntryNo, WorkDate, false);
         if (not IsValid) then
             IsValid := MembershipManagement.MembershipNeedsActivation(MembershipEntryNo);
 
-        //-#306121 [306121]
         //IF (NOT IsValid) THEN
         //  ERROR (NOT_ACTIVE, Membership."External Membership No.");
-        //+#306121 [306121]
-
-        //+MM1.17 [259671]
-
-
 
         MemberInfoCapture."Membership Entry No." := MembershipEntryNo;
 
-        //-MM80.1.08
         if (MemberInfoCapture."External Member No" <> '') then begin
             if (MemberInfoCapture."Member Entry No" = 0) then
                 MemberInfoCapture."Member Entry No" := MembershipManagement.GetMemberFromExtMemberNo(MemberInfoCapture."External Member No");
@@ -618,7 +543,6 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
             if (MemberInfoCapture."Member Entry No" = 0) then
                 MemberInfoCapture."Member Entry No" := MembershipManagement.GetMemberFromExtCardNo(MemberInfoCapture."External Card No.", WorkDate, NotFoundReason);
         end;
-        //+MM80.1.08
 
         MemberInfoCapture.Modify();
 
@@ -649,7 +573,7 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
             ImportUpdateMember(XmlElement, DocumentID);
         end;
 
-        Commit;
+        Commit();
     end;
 
     local procedure ImportUpdateMember(XmlElement: DotNet NPRNetXmlElement; DocumentID: Text[100]) Imported: Boolean
@@ -676,9 +600,7 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
         if (MemberInfoCapture."Membership Entry No." = 0) then
             Error(INVALID_MEMBERSHIP_NO, MemberInfoCapture."External Member No");
 
-        //-MM1.40 [360242]
         TransferAttributes(XmlElement, MemberInfoCapture);
-        //+MM1.40 [360242]
 
         MembershipManagement.UpdateMember(MemberInfoCapture."Membership Entry No.", MemberInfoCapture."Member Entry No", MemberInfoCapture);
         MemberInfoCapture.Modify();
@@ -697,8 +619,6 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
         i: Integer;
     begin
 
-        //-+MM1.44 [400429] renamed ImportBlockMembers -> ImportBlockMemberships
-
         if IsNull(XmlDoc) then
             exit;
         XmlElement := XmlDoc.DocumentElement;
@@ -716,7 +636,7 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
             ImportBlockMembership(XmlElement, DocumentID);
         end;
 
-        Commit;
+        Commit();
     end;
 
     local procedure ImportBlockMembership(XmlElement: DotNet NPRNetXmlElement; DocumentID: Text[100]) Imported: Boolean
@@ -725,8 +645,6 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
         Membership: Record "NPR MM Membership";
     begin
-
-        //-+MM1.44 [400429] renamed ImportBlockMember -> ImportBlockMembership
 
         if IsNull(XmlElement) then
             exit(false);
@@ -741,7 +659,6 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
             if (MemberInfoCapture."Membership Entry No." = 0) then
                 Error(INVALID_MEMBERSHIP_NO, MemberInfoCapture."External Membership No.");
         end;
-
 
         if (MemberInfoCapture."External Member No" <> '') then begin
             MemberInfoCapture."Membership Entry No." := MembershipManagement.GetMembershipFromExtMemberNo(MemberInfoCapture."External Member No");
@@ -770,8 +687,6 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
         i: Integer;
     begin
 
-        //-MM1.44 [400429]
-
         if IsNull(XmlDoc) then
             exit;
         XmlElement := XmlDoc.DocumentElement;
@@ -789,9 +704,8 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
             ImportBlockMember(XmlElement, DocumentID);
         end;
 
-        Commit;
+        Commit();
 
-        //+MM1.44 [400429]
     end;
 
     local procedure ImportBlockMember(XmlElement: DotNet NPRNetXmlElement; DocumentID: Text[100]) Imported: Boolean
@@ -802,8 +716,6 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
         MembershipRole: Record "NPR MM Membership Role";
         Member: Record "NPR MM Member";
     begin
-
-        //-MM1.44 [400429]
 
         if IsNull(XmlElement) then
             exit(false);
@@ -849,10 +761,8 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
 
         until (MembershipRole.Next() = 0);
 
-
-
         exit(true);
-        //+MM1.44 [400429]
+
     end;
 
     local procedure ImportChangeMemberships(XmlDoc: DotNet "NPRNetXmlDocument"; DocumentID: Text[100])
@@ -879,7 +789,7 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
             ImportChangeMembership(XmlElement, DocumentID);
         end;
 
-        Commit;
+        Commit();
     end;
 
     local procedure ImportChangeMembership(XmlElement: DotNet NPRNetXmlElement; DocumentID: Text[100]) Imported: Boolean
@@ -979,10 +889,8 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
         if IsNull(XmlElement) then
             exit;
 
-        //-#303635 [303635]
         // IF NOT NpXmlDomMgt.FindNodes(XmlElement,'getchangemembershiplist',XmlNodeList) THEN
         //  EXIT;
-        //+#303635 [303635]
 
         if not NpXmlDomMgt.FindNodes(XmlElement, 'request', XmlNodeList) then
             exit;
@@ -992,7 +900,7 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
             ImportGetChangeMembershipItems(XmlElement, DocumentID);
         end;
 
-        Commit;
+        Commit();
     end;
 
     local procedure ImportGetChangeMembershipItems(XmlElement: DotNet NPRNetXmlElement; DocumentID: Text[100]) Imported: Boolean
@@ -1052,7 +960,7 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
             ImportRegretMembership(XmlElement, DocumentID);
         end;
 
-        Commit;
+        Commit();
     end;
 
     local procedure ImportRegretMembership(XmlElement: DotNet NPRNetXmlElement; DocumentID: Text[100]) Imported: Boolean
@@ -1070,7 +978,6 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
         MemberInfoCapture."Import Entry Document ID" := DocumentID;
         MemberInfoCapture.Insert();
 
-        //-MM1.26 [305631] - refactored
         TargetDocumentId := NpXmlDomMgt.GetXmlText(XmlElement, 'documentid', MaxStrLen(MemberInfoCapture."Import Entry Document ID"), true);
         MembershipEntry.SetFilter("Import Entry Document ID", '=%1', TargetDocumentId);
         MembershipEntry.SetFilter(Blocked, '=%1', false);
@@ -1100,7 +1007,6 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
         i: Integer;
     begin
 
-        //-MM1.29 [313795]
         if IsNull(XmlDoc) then
             exit;
         XmlElement := XmlDoc.DocumentElement;
@@ -1118,8 +1024,8 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
             ImportGdprApprovalRequest(XmlElement, DocumentID);
         end;
 
-        Commit;
-        //+MM1.29 [313795]
+        Commit();
+
     end;
 
     local procedure ImportGdprApprovalRequest(XmlElement: DotNet NPRNetXmlElement; DocumentID: Text[100]) Imported: Boolean
@@ -1132,7 +1038,6 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
         DataSubjectId: Text[40];
     begin
 
-        //-MM1.29 [313795]
         if IsNull(XmlElement) then
             exit(false);
 
@@ -1169,7 +1074,7 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
             GDPRManagement.SetApprovalState(MembershipRole."GDPR Agreement No.", MembershipRole."GDPR Data Subject Id", MemberInfoCapture."GDPR Approval");
 
         exit(true);
-        //+MM1.29 [313795]
+
     end;
 
     local procedure CreateWallet(XmlDoc: DotNet "NPRNetXmlDocument"; DocumentID: Text[100])
@@ -1179,7 +1084,6 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
         i: Integer;
     begin
 
-        //-MM1.36 [328141]
         if IsNull(XmlDoc) then
             exit;
 
@@ -1198,8 +1102,8 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
             ProcessCreateWalletRequest(XmlElement, DocumentID);
         end;
 
-        Commit;
-        //+MM1.36 [328141]
+        Commit();
+
     end;
 
     local procedure ProcessCreateWalletRequest(XmlElement: DotNet NPRNetXmlElement; DocumentID: Text[100]) Imported: Boolean
@@ -1216,7 +1120,6 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
         NotificationEntryNo: Integer;
     begin
 
-        //-MM1.36 [328141]
         if IsNull(XmlElement) then
             exit(false);
 
@@ -1252,7 +1155,6 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
 
         exit(true);
 
-        //+MM1.36 [328141]
     end;
 
     local procedure "--Database"()
@@ -1268,13 +1170,10 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
         Evaluate(MemberInfoCapture."Document Date", NpXmlDomMgt.GetXmlText(XmlElement, 'activationdate', 0, false), 9);
         MemberInfoCapture.Insert();
 
-        //-MM1.41 [359703]
         MemberInfoCapture."Company Name" := NpXmlDomMgt.GetXmlText(XmlElement, 'companyname', MaxStrLen(MemberInfoCapture."Company Name"), false);
-        //+MM1.41 [359703]
 
-        //-MM1.43 [386080]
         MemberInfoCapture."Customer No." := NpXmlDomMgt.GetXmlText(XmlElement, 'preassigned_customer_number', MaxStrLen(MemberInfoCapture."Customer No."), false);
-        //+MM1.43 [386080]
+
     end;
 
     local procedure GetXmlMembershipMemberInfo(XmlElement: DotNet NPRNetXmlElement; var MemberInfoCapture: Record "NPR MM Member Info Capture")
@@ -1296,12 +1195,10 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
         MemberInfoCapture."First Name" := NpXmlDomMgt.GetXmlText(XmlElement, 'firstname', MaxStrLen(MemberInfoCapture."First Name"), true);
         MemberInfoCapture."E-Mail Address" := LowerCase(NpXmlDomMgt.GetXmlText(XmlElement, 'email', MaxStrLen(MemberInfoCapture."E-Mail Address"), true));
 
-        //-MM1.24 [276832]
         // GetMemberEmailAttributes (MemberInfoCapture, XmlElement);
         MemberInfoCapture."Guardian External Member No." := NpXmlDomMgt.GetXmlText(XmlElement, 'guardian/membernumber', MaxStrLen(MemberInfoCapture."Guardian External Member No."), false);
         if (MemberInfoCapture."Guardian External Member No." <> '') then
             MemberInfoCapture."E-Mail Address" := LowerCase(NpXmlDomMgt.GetXmlText(XmlElement, 'guardian/email', MaxStrLen(MemberInfoCapture."E-Mail Address"), true));
-        //+MM1.24 [276832]
 
         MemberInfoCapture."Middle Name" := NpXmlDomMgt.GetXmlText(XmlElement, 'middlename', MaxStrLen(MemberInfoCapture."Middle Name"), false);
         MemberInfoCapture."Last Name" := NpXmlDomMgt.GetXmlText(XmlElement, 'lastname', MaxStrLen(MemberInfoCapture."Last Name"), true);
@@ -1312,7 +1209,6 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
         MemberInfoCapture.Country := NpXmlDomMgt.GetXmlText(XmlElement, 'country', MaxStrLen(MemberInfoCapture.Country), false);
         MemberInfoCapture."Phone No." := NpXmlDomMgt.GetXmlText(XmlElement, 'phoneno', MaxStrLen(MemberInfoCapture."Phone No."), false);
 
-        //-MM1.32 [318132]
         if (MemberInfoCapture."E-Mail Address" = '') and (MemberInfoCapture."Phone No." <> '') then
             MemberInfoCapture."Notification Method" := MemberInfoCapture."Notification Method"::SMS;
 
@@ -1321,9 +1217,7 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
 
         if (MemberInfoCapture."E-Mail Address" <> '') and (MemberInfoCapture."Phone No." <> '') then
             MemberInfoCapture."Notification Method" := MemberInfoCapture."Notification Method"::EMAIL;
-        //+MM1.32 [318132]
 
-        //-MM1.42 [381222]
         NotificationMethodText := NpXmlDomMgt.GetXmlText(XmlElement, 'notificationmethod', MaxStrLen(NotificationMethodText), false);
         case UpperCase(NotificationMethodText) of
             'NO_THANKYOU', '0':
@@ -1337,12 +1231,9 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
             'DEFAULT', '4', Format(MemberInfoCapture."Notification Method"::DEFAULT, 0, 9):
                 ; // Do nothing
         end;
-        //+MM1.42 [381222]
 
-        //-MM1.18 [265562]
         //EVALUATE (MemberInfoCapture.Birthday, NpXmlDomMgt.GetXmlText (XmlElement, 'birthday', 0, FALSE));
         Evaluate(MemberInfoCapture.Birthday, NpXmlDomMgt.GetXmlText(XmlElement, 'birthday', 0, false), 9);
-        //-MM1.18 [265562]
 
         GenderText := NpXmlDomMgt.GetXmlText(XmlElement, 'gender', MaxStrLen(GenderText), false);
         case UpperCase(GenderText) of
@@ -1369,7 +1260,6 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
         MemberInfoCapture."User Logon ID" := UpperCase(NpXmlDomMgt.GetXmlText(XmlElement, 'username', MaxStrLen(MemberInfoCapture."User Logon ID"), false));
         MemberInfoCapture."Password SHA1" := NpXmlDomMgt.GetXmlText(XmlElement, 'password', MaxStrLen(MemberInfoCapture."Password SHA1"), false);
 
-        //-MM1.29 [313795]
         GdprText := NpXmlDomMgt.GetXmlText(XmlElement, 'gdpr_approval', MaxStrLen(GdprText), false);
         case UpperCase(GdprText) of
             'PENDING', '1', UpperCase(Format(MemberInfoCapture."GDPR Approval"::PENDING, 0, 9)):
@@ -1381,18 +1271,15 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
             else
                 MemberInfoCapture."GDPR Approval" := MemberInfoCapture."GDPR Approval"::NA;
         end;
-        //+MM1.29 [313795]
 
-
-        //-MM1.24 [276832]
-        // //-MM1.21 [284560]
+        // 
         // MemberInfoCapture."External Card No." := NpXmlDomMgt.GetXmlText (XmlElement, 'membercardnumber', MAXSTRLEN (MemberInfoCapture."External Card No."), FALSE);
-        // //+MM1.21 [284560]
+        // 
         //
-        // //-MM1.22 [284560]
+        // 
         // IF (MemberInfoCapture."External Card No." <> '') THEN
         //  GetMemberCardNumberAttributes (MemberInfoCapture, XmlElement);
-        // //+MM1.22 [284560]
+        // 
 
         MemberInfoCapture."External Card No." := NpXmlDomMgt.GetXmlText(XmlElement, 'membercard/cardnumber', MaxStrLen(MemberInfoCapture."External Card No."), false);
         if (MemberInfoCapture."External Card No." <> '') then begin
@@ -1413,16 +1300,11 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
             Evaluate(MemberInfoCapture."Valid Until", DateTextField, 9);
 
         end;
-        //+MM1.24 [276832]
 
-        //-MM1.32 [318132]
         MemberInfoCapture."Member Card Type" := MemberInfoCapture."Member Card Type"::NONE;
-        //+MM1.32 [318132]
 
-        //-MM1.43 [386080]
         MemberInfoCapture."Customer No." := NpXmlDomMgt.GetXmlText(XmlElement, 'preassigned_customer_number', MaxStrLen(MemberInfoCapture."Customer No."), false);
         MemberInfoCapture."Contact No." := NpXmlDomMgt.GetXmlText(XmlElement, 'preassigned_contact_number', MaxStrLen(MemberInfoCapture."Contact No."), false);
-        //+MM1.43 [386080]
 
         MemberInfoCapture.Insert();
     end;
@@ -1437,7 +1319,6 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
         isPermanent: Boolean;
     begin
 
-        //-MM1.22 [284560]
         if not NpXmlDomMgt.FindNodes(XmlElement, 'membercardnumber', XmlNodeList) then
             exit;
 
@@ -1456,7 +1337,7 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
                 DateTextField := Format(CalcDate('<CM>', CalcDate('<CM+1M-10D>', Today)), 0, 9); // End of next month
             Evaluate(MemberInfoCapture."Valid Until", DateTextField, 9);
         end;
-        //+MM1.22 [284560]
+
     end;
 
     local procedure GetMemberEmailAttributes(var MemberInfoCapture: Record "NPR MM Member Info Capture"; XmlElement: DotNet NPRNetXmlElement)
@@ -1495,18 +1376,16 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
             Membership.SetFilter("Customer No.", '=%1', CustomerNo);
             Membership.SetFilter(Blocked, '=%1', false);
             if (Membership.FindFirst()) then
-                //-MM1.42 [382170]
+
                 //MemberInfoCapture."External Member No" := Membership."External Membership No.";
-                if (MemberInfoCapture."External Membership No." = '') then //-+MM1.42 [382170]
+                if (MemberInfoCapture."External Membership No." = '') then 
                     MemberInfoCapture."External Membership No." := Membership."External Membership No.";
             if (MemberInfoCapture."External Membership No." <> Membership."External Membership No.") then
                 MemberInfoCapture."External Membership No." := '';
-            //+MM1.42 [382170]
+
         end;
 
-        //-#303635 [303635]
         MemberInfoCapture."Document No." := UpperCase(NpXmlDomMgt.GetXmlText(XmlElement, 'externaldocumentnumber', MaxStrLen(MemberInfoCapture."Document No."), false));
-        //+#303635 [303635]
 
         MemberInfoCapture.Insert();
     end;
@@ -1517,7 +1396,6 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
         BoolText: Text;
     begin
 
-        //-MM1.36 [328141]
         MemberInfoCapture."Entry No." := 0;
         MemberInfoCapture."External Card No." := NpXmlDomMgt.GetXmlText(XmlElement, 'cardnumber', MaxStrLen(MemberInfoCapture."External Card No."), false);
 
@@ -1547,7 +1425,7 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
         // END;
 
         MemberInfoCapture.Insert();
-        //+MM1.36 [328141]
+
     end;
 
     local procedure AppendChangeMembership(XmlElement: DotNet NPRNetXmlElement; var MemberInfoCapture: Record "NPR MM Member Info Capture")
@@ -1590,14 +1468,12 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
     local procedure GetAnonymousMemberArgs(XmlElement: DotNet NPRNetXmlElement; var MemberInfoCapture: Record "NPR MM Member Info Capture")
     begin
 
-        //-MM1.22 [287080]
         MemberInfoCapture."Entry No." := 0;
         MemberInfoCapture."External Membership No." := NpXmlDomMgt.GetXmlText(XmlElement, 'membershipnumber', MaxStrLen(MemberInfoCapture."External Membership No."), false);
         Evaluate(MemberInfoCapture.Quantity, NpXmlDomMgt.GetXmlText(XmlElement, 'addmembercount', 0, false), 9);
 
         MemberInfoCapture.Insert();
 
-        //+MM1.22 [287080]
     end;
 
     local procedure GetGdprArgs(XmlElement: DotNet NPRNetXmlElement; var MemberInfoCapture: Record "NPR MM Member Info Capture"; var DataSubjectId: Text[40])
@@ -1605,7 +1481,6 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
         GdprText: Text;
     begin
 
-        //-MM1.29 [313795]
         MemberInfoCapture."Entry No." := 0;
         MemberInfoCapture."External Card No." := NpXmlDomMgt.GetXmlText(XmlElement, 'cardnumber', MaxStrLen(MemberInfoCapture."External Card No."), false);
         DataSubjectId := NpXmlDomMgt.GetXmlText(XmlElement, 'datasubjectid', MaxStrLen(DataSubjectId), false);
@@ -1624,7 +1499,6 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
 
         MemberInfoCapture.Insert();
 
-        //+MM1.29 [313795]
     end;
 
     local procedure TransferAttributes(var XmlElementIn: DotNet NPRNetXmlElement; MemberInfoCapture: Record "NPR MM Member Info Capture")
@@ -1636,7 +1510,6 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
         i: Integer;
     begin
 
-        //-MM1.40 [360242]
         if not NpXmlDomMgt.FindNodes(XmlElementIn, 'request/attributes/attribute', XmlNodeList) then
             exit;
 
@@ -1651,7 +1524,7 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
 
             ApplyAttributesToMemberInfoCapture(MemberInfoCapture."Entry No.", AttributeCode, AttributeValue);
         end;
-        //+MM1.40 [360242]
+
     end;
 
     local procedure ApplyAttributesToMemberInfoCapture(MemberInfoCaptureEntryNo: Integer; AttributeCode: Code[20]; AttributeValue: Text)
@@ -1663,7 +1536,6 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
         NPRAttributeManagement: Codeunit "NPR Attribute Management";
     begin
 
-        //-MM1.40 [360242]
         TableId := DATABASE::"NPR MM Member Info Capture";
 
         if (not NPRAttribute.Get(AttributeCode)) then
@@ -1678,7 +1550,6 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
         // update the request
         NPRAttributeManagement.SetEntryAttributeValue(TableId, NPRAttributeID."Shortcut Attribute ID", MemberInfoCaptureEntryNo, AttributeValue);
 
-        //+MM1.40 [360242]
     end;
 }
 

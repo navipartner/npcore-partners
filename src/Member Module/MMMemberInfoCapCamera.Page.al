@@ -1,6 +1,5 @@
 page 6060145 "NPR MM Member Info Cap. Camera"
 {
-    // MM1.19/TSA/20170525  CASE 278061 Handling issues reported by OMA
 
     Caption = 'Member Info Capture Camera';
     SourceTable = "NPR MM Member Info Capture";
@@ -28,7 +27,7 @@ page 6060145 "NPR MM Member Info Cap. Camera"
                         MemoryStream := MemoryStream.MemoryStream(Bytes);
                         Picture.CreateOutStream(OutS);
                         MemoryStream.WriteTo(OutS);
-                        Modify;
+                        Modify();
 
                         //  Picture.CREATEOUTSTREAM(OutS);
                         //  StreamWriter := StreamWriter.StreamWriter(OutS);
@@ -36,7 +35,7 @@ page 6060145 "NPR MM Member Info Cap. Camera"
                         //  StreamWriter.Write(HTML);
                         //  StreamWriter.Flush();
                         //  StreamWriter.Close();
-                        //  MODIFY;
+                        //  Modify();
 
                     end;
 

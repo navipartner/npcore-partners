@@ -1,6 +1,5 @@
 table 6059771 "NPR Member Card Types"
 {
-    // NPR5.31/TSA/20170503  CASE 274589 changed field 25 Point Account from length 10 to 20
 
     Caption = 'Point Card';
     DataCaptionFields = "Code";

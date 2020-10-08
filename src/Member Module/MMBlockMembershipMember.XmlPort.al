@@ -1,6 +1,5 @@
 xmlport 6151187 "NPR MM Block Membership Member"
 {
-    // MM1.44/TSA /20200506 CASE 400429 Initial Version
 
     Caption = 'Block Membership';
     UseDefaultNamespace = true;

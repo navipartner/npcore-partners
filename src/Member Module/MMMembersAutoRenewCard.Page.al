@@ -1,7 +1,5 @@
 page 6060071 "NPR MM Members. AutoRenew Card"
 {
-    // MM1.22/NPKNAV/20170914  CASE 286922 Transport MM1.22 - 13 September 2017
-    // MM1.25/NPKNAV/20180122  CASE 301463 Transport MM1.25 - 22 January 2018
 
     Caption = 'Membership Auto Renew Card';
     PageType = Card;

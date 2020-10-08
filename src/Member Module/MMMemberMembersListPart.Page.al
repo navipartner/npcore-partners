@@ -1,9 +1,5 @@
 page 6060138 "NPR MM Member Members.ListPart"
 {
-    // TM1.00/TSA/20151215  CASE 228982 NaviPartner Ticket Management
-    // MM1.00/TSA/20151217  CASE 229684 NaviPartner Member Management Module
-    // MM1.29/TSA /20180509 CASE 313795 Added GDPR fields
-    // MM1.29/TSA /20180509 CASE 313795 New function GetSelectedMembershipEntryNo()
 
     Caption = 'Member Memberships';
     InsertAllowed = false;

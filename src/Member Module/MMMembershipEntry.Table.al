@@ -1,17 +1,5 @@
 table 6060129 "NPR MM Membership Entry"
 {
-    // MM1.00/TSA/20151217  CASE 229684 NaviPartner Member Management Module
-    // MM1.10/TSA/20160321  CASE Cancel Membership
-    // MM1.11/TSA/20160425  CASE 233824 Added Close By Entry No.
-    // MM1.12/TSA/20160503  CASE 240661 Added DAN Captions
-    // MM1.14/TSA/20160518  CASE 240870 Added Membership Code to be able to rollback on cancel upgrade
-    // MM1.17/TSA/20161208  CASE 259671 Added Activate On First Use boolean field
-    // MM1.19/TSA/20170324  CASE 270309 Added field "Member Card Entry No." a link to a the created membercard generated in this transaction.
-    // MM1.22/TSA /20170829 CASE 286922 Added Context AUTORENEW, and field "Auto Renew Entry No."
-    // MM1.23/TSA /20171003 CASE 257011 Added Context FOREIGN "Foreign Membership" for timeframes created as a result of a foreign membership import
-    // MM1.25/TSA /20180116 CASE 300685 Keeping original context when regretting
-    // MM1.29/TSA /20180522 CASE 316141 Added field "Unit Price (Base)"
-    // MM1.34/TSA /20180907 CASE 327605 Added function CalculateRemainingAmount()
 
     Caption = 'Membership Entry';
     DataClassification = CustomerContent;

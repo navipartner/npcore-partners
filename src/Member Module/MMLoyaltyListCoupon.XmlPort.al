@@ -1,6 +1,5 @@
 xmlport 6151164 "NPR MM Loyalty List Coupon"
 {
-    // MM1.42/TSA /20200114 CASE 370398 Initial Version
 
     Caption = 'Loyalty Create Coupon';
     FormatEvaluate = Xml;

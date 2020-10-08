@@ -1,7 +1,5 @@
 table 6060090 "NPR MM Admis. Service Setup"
 {
-    // NPR5.31/NPKNAV/20170502  CASE 263737 Transport NPR5.31 - 2 May 2017
-    // NPR5.43/CLVA  /20180611  CASE 318579 Added fields "Turnstile Default Image", "Turnstile Ok Image" and  "Turnstile Error Image"
 
     Caption = 'MM Admission Service Setup';
     DataClassification = CustomerContent;

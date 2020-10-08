@@ -1,17 +1,5 @@
 xmlport 6060130 "NPR MM Get Members. Members"
 {
-    // MM80.1.00/TSA/20151217  CASE 229684 NaviPartner Member Management Module
-    // MM80.1.02/TSA/20151228  CASE 229684 Touch-up and enchancements
-    // MM1.03/TSA/20160104  CASE 230647 - Added NewsLetter CRM option
-    // MM1.18/TSA/20170207  CASE Changed to XML format
-    // MM1.22/TSA /20170817 CASE 287080 Exclude Anonymous Member
-    // MM1.23/TSA /20170906 CASE 276832 Handling Guardian - added role type to xml response
-    // MM1.29/TSA /20180517 CASE 313795 GDPR section
-    // MM1.29.03/TSA /20180608 CASE 313795 element cardnumber was accidentily removed and now restored
-    // MM1.32/TSA/20180725  CASE 323333 Transport MM1.32 - 25 July 2018
-    // MM1.37/TSA /20190213 CASE 345855 Cardnumber not returned for perpetual cards
-    // MM1.40/TSA /20190827 CASE 360242 Adding attribute support
-    // MM1.42/TSA /20191205 CASE 381222 Added notification method
 
     Caption = 'Get Membership Members';
     FormatEvaluate = Xml;
@@ -215,9 +203,8 @@ xmlport 6060130 "NPR MM Get Members. Members"
 
         MembershipRole.SetFilter("Membership Entry No.", '=%1', MembershipEntryNo);
         MembershipRole.SetFilter(Blocked, '=%1', false);
-        //-MM1.22 [287080]
+
         MembershipRole.SetFilter("Member Role", '<>%1&<>%2', MembershipRole."Member Role"::ANONYMOUS, MembershipRole."Member Role"::GUARDIAN);
-        //+MM1.22 [287080]
 
         if (MembershipRole.FindSet()) then begin
             repeat
@@ -227,10 +214,9 @@ xmlport 6060130 "NPR MM Get Members. Members"
                 tmpMemberInfoResponse.TransferFields(Member, true);
 
                 MemberCard.SetFilter("Member Entry No.", '=%1', Member."Entry No.");
-                //-MM1.37 [345855]
-                //MemberCard.SETFILTER ("Valid Until", '>=%1', TODAY);
+
+                //MemberCard.SetFilter ("Valid Until", '>=%1', TODAY);
                 MemberCard.SetFilter("Valid Until", '>=%1|=%2', Today, 0D);
-                //+MM1.37 [345855]
 
                 MemberCard.SetFilter(Blocked, '=%1', false);
                 if (MemberCard.FindFirst()) then begin
@@ -244,7 +230,6 @@ xmlport 6060130 "NPR MM Get Members. Members"
                 tmpMemberInfoResponse."Member Entry No" := Member."Entry No.";
                 tmpMemberInfoResponse."Membership Entry No." := MembershipRole."Membership Entry No.";
 
-                //-MM1.29 [313795]
                 MembershipRole.CalcFields("GDPR Approval");
                 case MembershipRole."GDPR Approval" of
                     MembershipRole."GDPR Approval"::ACCEPTED:
@@ -256,9 +241,7 @@ xmlport 6060130 "NPR MM Get Members. Members"
                     else
                         tmpMemberInfoRequest."GDPR Approval" := tmpMemberInfoRequest."GDPR Approval"::NA;
                 end;
-                //+MM1.29 [313795]
 
-                //-MM1.40 [360242]
                 NPRAttributeKey.SetFilter("Table ID", '=%1', DATABASE::"NPR MM Member");
                 NPRAttributeKey.SetFilter("MDR Code PK", '=%1', Format(Member."Entry No.", 0, '<integer>'));
                 if (NPRAttributeKey.FindFirst()) then begin
@@ -271,7 +254,6 @@ xmlport 6060130 "NPR MM Get Members. Members"
                         until (NPRAttributeValueSet.Next() = 0);
                     end;
                 end;
-                //+MM1.40 [360242]
 
                 if (not Member.Blocked) then
                     if (tmpMemberInfoResponse.Insert()) then;
@@ -281,7 +263,6 @@ xmlport 6060130 "NPR MM Get Members. Members"
 
                 if ((MemberExternalCardNo <> '') and (MemberExternalCardNo <> tmpMemberInfoResponse."External Card No.")) then
                     if (tmpMemberInfoResponse.Delete()) then;
-
 
             until (MembershipRole.Next() = 0);
         end;

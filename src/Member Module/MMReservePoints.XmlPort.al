@@ -1,7 +1,5 @@
 xmlport 6151163 "NPR MM Reserve Points"
 {
-    // MM1.37/TSA /20190206 CASE 338215 Initial Version
-    // MM1.38/TSA /20190221 CASE 338215 Caption
 
     Caption = 'Reserve Points';
     FormatEvaluate = Xml;

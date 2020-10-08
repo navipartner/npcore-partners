@@ -80,7 +80,7 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
                 MembershipEntry.Context::RENEW:
                     MembershipAlterationSetup.SetFilter("Alteration Type", '=%1', MembershipAlterationSetup."Alteration Type"::RENEW);
                 MembershipEntry.Context::AUTORENEW:
-                    exit; //AutoRenew is always via invoice. Loyalty from Value Entry //MembershipAlterationSetup.SETFILTER ("Alteration Type", '=%1', MembershipAlterationSetup."Alteration Type"::AUTORENEW);
+                    exit; //AutoRenew is always via invoice. Loyalty from Value Entry //MembershipAlterationSetup.SetFilter ("Alteration Type", '=%1', MembershipAlterationSetup."Alteration Type"::AUTORENEW);
                 MembershipEntry.Context::EXTEND:
                     MembershipAlterationSetup.SetFilter("Alteration Type", '=%1', MembershipAlterationSetup."Alteration Type"::EXTEND);
                 MembershipEntry.Context::UPGRADE:
@@ -843,7 +843,7 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
 
         MembershipPointsEntry.Quantity := 1;
 
-        MembershipPointsEntry.Insert;
+        MembershipPointsEntry.Insert();
     end;
 
     procedure UnRedeemPointsCoupon(MembershipEntryNo: Integer; DocumentNo: Code[20]; DocumentDate: Date; CouponNo: Code[20]): Boolean
@@ -877,7 +877,7 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
         MembershipPointsEntry.Points *= -1;
         MembershipPointsEntry.Adjustment := true;
 
-        MembershipPointsEntry.Insert;
+        MembershipPointsEntry.Insert();
         exit(true);
     end;
 
@@ -1200,7 +1200,7 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
         MembershipPointsEntry.Quantity := 1;
         MembershipPointsEntry.Description := Description;
 
-        MembershipPointsEntry.Insert;
+        MembershipPointsEntry.Insert();
 
         AfterMembershipPointsUpdate(Membership."Entry No.", MembershipPointsEntry."Entry No.");
 
@@ -1352,7 +1352,6 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
             if (not Confirm(CONFIRM_EXPIRE_POINTS, true, CollectionPeriodEnd, Today)) then
                 Error('');
         end;
-
 
         MembershipSetup.SetFilter("Loyalty Code", '=%1', LoyaltyCode);
         if (MembershipSetup.FindSet()) then begin
@@ -1561,7 +1560,6 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
 
         MemberInfoCapture.Init();
         MemberInfoCapture."Entry No." := 0;
-
 
         MemberInfoCapture."Membership Entry No." := MembershipEntryNo;
         MemberInfoCapture."Membership Code" := LoyaltyAlterMembership."From Membership Code";

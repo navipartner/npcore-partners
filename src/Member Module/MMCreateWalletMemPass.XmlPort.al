@@ -1,7 +1,5 @@
 xmlport 6060143 "NPR MM Create Wallet Mem. Pass"
 {
-    // MM1.34/TSA /20180913 CASE 328141 Adding SOAP Action to send the membercard as wallet pass
-    // MM1.36/NPKNAV/20190125  CASE 328141-02 Transport MM1.36 - 25 January 2019
 
     Caption = 'Create Wallet Member Pass';
     FormatEvaluate = Xml;

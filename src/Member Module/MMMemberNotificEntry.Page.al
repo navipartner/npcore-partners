@@ -1,7 +1,5 @@
 page 6060144 "NPR MM Member Notific. Entry"
 {
-    // MM1.14/TSA/20160523  CASE 240871 Reminder Service
-    // MM1.29/TSA /20180506 CASE 314131 Added field for wallet services
 
     Caption = 'Member Notification Entry';
     InsertAllowed = false;

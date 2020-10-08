@@ -1,13 +1,5 @@
 codeunit 6060144 "NPR MM Member Lim. Mgr."
 {
-    // MM1.21/NPKNAV/20170728  CASE 284653 Transport MM1.21 - 28 July 2017
-    // MM1.22/TSA /20170911 CASE 284560 Handling of Temp_membercard constraint type
-    // MM1.23/TSA /20171004 CASE 257011 Extending Card number length (inconsistent)
-    // MM1.29/TSA /20180511 CASE 313795 GDPR Constraint Source
-    // MM1.29/TSA /20180525 CASE 316468 When rules where processed by webservice, the there were no rollback on created artifacts
-    // MM1.32/TSA/20180725  CASE 323333 Transport MM1.32 - 25 July 2018
-    // MM1.45/TSA /20200729 CASE 416671 Added a feature to check without actual logging Signature change, added ReUseLogEntryNo parameter
-
 
     trigger OnRun()
     begin
@@ -60,7 +52,6 @@ codeunit 6060144 "NPR MM Member Lim. Mgr."
         DoReuseLogEntry: Boolean;
     begin
 
-        //-MM1.45 [416671]
         //MemberArrivalLogEntry."Entry No." := 0;
 
         DoReuseLogEntry := (ReUseLogEntryNo > 0);
@@ -73,7 +64,6 @@ codeunit 6060144 "NPR MM Member Lim. Mgr."
             MemberArrivalLogEntry.Init();
             MemberArrivalLogEntry.Insert();
         end;
-        //+MM1.45 [416671]
 
         MemberArrivalLogEntry."Event Type" := MemberArrivalLogEntry."Event Type"::ARRIVAL;
         MemberArrivalLogEntry."Created At" := CurrentDateTime();
@@ -86,9 +76,7 @@ codeunit 6060144 "NPR MM Member Lim. Mgr."
         MemberArrivalLogEntry."Scanner Station Id" := ScannerStationId;
         MemberArrivalLogEntry."Admission Code" := AdmissionCode;
 
-        //-MM1.22 [284560]
         MemberArrivalLogEntry."Temporary Card" := IsTemporaryCard(ExternalMemberCardNo);
-        //+MM1.22 [284560]
 
         MemberArrivalLogEntry."Response Message" := CopyStr(ResponseMessage, 1, MaxStrLen(MemberArrivalLogEntry."Response Message"));
 
@@ -104,12 +92,11 @@ codeunit 6060144 "NPR MM Member Lim. Mgr."
 
         MemberArrivalLogEntry."Response Rule Entry No." := ResponseRuleEntry;
 
-        //-MM1.45 [416671]
-        //MemberArrivalLogEntry.INSERT ();
+        //MemberArrivalLogEntry.Insert ();
 
         MemberArrivalLogEntry.Modify();
         ReUseLogEntryNo := MemberArrivalLogEntry."Entry No.";
-        //+MM1.45 [416671]
+
     end;
 
     local procedure CheckLimitMemberCardArrival(ClientType: Option POS,WS; ExternalMemberCardNo: Text[50]; AdmissionCode: Code[20]; ScannerStationId: Code[10]; var ReUseLogEntryNo: Integer; var ResponseMessage: Text; var ResponseCode: Integer) RuleNo: Integer
@@ -125,12 +112,12 @@ codeunit 6060144 "NPR MM Member Lim. Mgr."
 
         // Log the sent message and code
         if (ResponseCode <> 0) then begin
-            //-MM1.45 [416671]
+
             // LogMemberCardArrival (ExternalMemberCardNo, AdmissionCode, ScannerStationId, ResponseMessage, ResponseCode);
             GetExternalMemberNo(ExternalMemberCardNo, ExternalMemberNo, IgnoreMessage);
             GetExternalMembershipNo(ExternalMemberCardNo, ExternalMembershipNo, MembershipCode, IgnoreMessage);
             InternalLogArrival(ExternalMembershipNo, ExternalMemberNo, ExternalMemberCardNo, AdmissionCode, ScannerStationId, ReUseLogEntryNo, ResponseMessage, ResponseCode, 0);
-            //-MM1.45 [416671]
+
             exit;
         end;
 
@@ -184,11 +171,9 @@ codeunit 6060144 "NPR MM Member Lim. Mgr."
                 end;
             end;
 
-            //-#316468 [316468]
             if (ClientType = ClientType::WS) then
                 if (MembershipLimitationSetup."WS Response Action" = MembershipLimitationSetup."WS Response Action"::USER_ERROR) then
                     asserterror Error(''); // This will rollback our successful transaction - whatever it did!!
-                                           //+#316468 [316468]
 
         end;
 
@@ -205,17 +190,15 @@ codeunit 6060144 "NPR MM Member Lim. Mgr."
                 case MembershipLimitationSetup."POS Response Action" of
                     // ASSERTERROR will rollback transaction, COMMIT must only effect log entry. Downstream code may error the responsemessage
                     MembershipLimitationSetup."POS Response Action"::USER_ERROR:
-                        Commit;
+                        Commit();
                     MembershipLimitationSetup."POS Response Action"::USER_CONFIRM:
-                        Commit;
+                        Commit();
                 end;
             end;
 
-            //-#316468 [316468]
             if (ClientType = ClientType::WS) then
                 if (MembershipLimitationSetup."WS Response Action" = MembershipLimitationSetup."WS Response Action"::USER_ERROR) then
-                    Commit;
-            //+#316468 [316468]
+                    Commit();
 
         end;
 
@@ -226,7 +209,6 @@ codeunit 6060144 "NPR MM Member Lim. Mgr."
     var
         MembershipLimitationSetup: Record "NPR MM Membership Lim. Setup";
     begin
-
 
         if (IsTemporaryCard(ExternalMemberCardNo)) then begin
             RuleNo := CheckLimitations(ClientType, MembershipCode, MembershipLimitationSetup."Constraint Source"::TEMP_MEMBERCARD,
@@ -250,7 +232,6 @@ codeunit 6060144 "NPR MM Member Lim. Mgr."
         if (RuleNo <> 0) then
             exit(RuleNo);
 
-        //-MM1.29 [313795]
         RuleNo := CheckLimitations(ClientType, MembershipCode, MembershipLimitationSetup."Constraint Source"::GDPR_PENDING,
                                     ExternalMemberCardNo, AdmissionCode, ScannerStationId, ResponseMessage, ResponseCode);
         if (RuleNo <> 0) then
@@ -260,7 +241,6 @@ codeunit 6060144 "NPR MM Member Lim. Mgr."
                                     ExternalMemberCardNo, AdmissionCode, ScannerStationId, ResponseMessage, ResponseCode);
         if (RuleNo <> 0) then
             exit(RuleNo);
-        //+MM1.29 [313795]
 
         // Also test rules without AdmissionCode
         // Has impact on how POS will handle action (error,confirm,message), WS will deny access either way.
@@ -346,7 +326,7 @@ codeunit 6060144 "NPR MM Member Lim. Mgr."
                         MemberArrivalLogEntry.SetFilter("External Card No.", '=%1', CopyStr(KeyValue, 1, MaxStrLen(MemberArrivalLogEntry."External Card No.")));
                         MemberArrivalLogEntry.SetFilter("Temporary Card", '=%1', true);
                     end;
-                //-MM1.29 [313795]
+
                 "Constraint Source"::GDPR_PENDING:
                     begin
                         if (not MemberHasPendingGDPRRequest(CopyStr(KeyValue, 1, MaxStrLen(MemberArrivalLogEntry."External Card No.")))) then
@@ -355,7 +335,7 @@ codeunit 6060144 "NPR MM Member Lim. Mgr."
                     end;
                 "Constraint Source"::GDPR_REJECTED:
                     exit(MemberHasRejectedGDPRRequest(CopyStr(KeyValue, 1, MaxStrLen(MemberArrivalLogEntry."External Card No."))));
-            //+MM1.29 [313795]
+
             end;
 
             case "Event Type" of
@@ -467,7 +447,6 @@ codeunit 6060144 "NPR MM Member Lim. Mgr."
         MembershipRole: Record "NPR MM Membership Role";
     begin
 
-        //-MM1.29 [313795]
         MemberCard.SetFilter("External Card No.", '=%1', ExternalCardNumber);
         if (not MemberCard.FindFirst()) then
             exit(false);
@@ -492,7 +471,7 @@ codeunit 6060144 "NPR MM Member Lim. Mgr."
         end;
 
         exit(MembershipRole."GDPR Approval" = MembershipRole."GDPR Approval"::PENDING);
-        //+MM1.29 [313795]
+
     end;
 
     local procedure MemberHasRejectedGDPRRequest(ExternalCardNumber: Text[100]): Boolean
@@ -501,7 +480,6 @@ codeunit 6060144 "NPR MM Member Lim. Mgr."
         MembershipRole: Record "NPR MM Membership Role";
     begin
 
-        //-MM1.29 [313795]
         MemberCard.SetFilter("External Card No.", '=%1', ExternalCardNumber);
         if (not MemberCard.FindFirst()) then
             exit(false);
@@ -526,7 +504,7 @@ codeunit 6060144 "NPR MM Member Lim. Mgr."
         end;
 
         exit(MembershipRole."GDPR Approval" = MembershipRole."GDPR Approval"::REJECTED);
-        //+MM1.29 [313795]
+
     end;
 }
 

@@ -1,6 +1,5 @@
 page 6151163 "NPR MM Loyalty Alter Members."
 {
-    // MM1.40/TSA /20190816 CASE 361664 Initial Version
 
     Caption = 'Loyalty Alter Membership';
     PageType = List;

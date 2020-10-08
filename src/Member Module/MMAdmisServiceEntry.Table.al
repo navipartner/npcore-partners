@@ -1,8 +1,5 @@
 table 6060091 "NPR MM Admis. Service Entry"
 {
-    // NPR5.31/NPKNAV/20170502  CASE 263737 Transport NPR5.31 - 2 May 2017
-    // NPR5.43/CLVA  /20180627  CASE 318579 Added new fields "Ticket Type Code","Ticket Type Description","Membership Code" and "Membership Description"
-    // NPR5.44/CLVA  /20180711  CASE 318579 Changed field lenght on "Ticket Type Description" from 30 to 50
 
     Caption = 'MM Admission Service Entry';
     DataClassification = CustomerContent;

@@ -1,6 +1,5 @@
 xmlport 6060146 "NPR MM GetSet AutoRenew Option"
 {
-    // MM1.39/TSA /20190529 CASE 350968 Initial Version
 
     Caption = 'GetSet AutoRenew Option';
     Encoding = UTF8;
