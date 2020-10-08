@@ -1,11 +1,5 @@
 codeunit 6151017 "NPR NpRv Module Pay.: Default"
 {
-    // NPR5.37/MHA /20171023  CASE 267346 Object created - NaviPartner Retail Voucher
-    // NPR5.40/VB  /20180307 CASE 306347 Refactored InvokeWorkflow call.
-    // NPR5.48/MHA /20190213  CASE 342920 Return Amount should not be rounded and consider Min. Amount on Payment Type
-    // NPR5.55/MHA /20200603  CASE 363864 Added interface for Sales Document Payments
-
-
     trigger OnRun()
     begin
     end;
@@ -33,7 +27,6 @@ codeunit 6151017 "NPR NpRv Module Pay.: Default"
             exit;
 
         if ReturnVoucherType.Get(VoucherType.Code) then;
-        //-NPR5.48 [342920]
         if VoucherType2.Get(ReturnVoucherType."Return Voucher Type") and PaymentTypePOS.Get(VoucherType2."Payment Type") then begin
             ReturnAmount := SaleAmount - PaidAmount;
             if PaymentTypePOS."Rounding Precision" > 0 then
@@ -41,13 +34,12 @@ codeunit 6151017 "NPR NpRv Module Pay.: Default"
 
             if (PaymentTypePOS."Minimum Amount" > 0) and (Abs(ReturnAmount) < (PaymentTypePOS."Minimum Amount")) then
                 exit;
+            if (VoucherType2."Minimum Amount Issue" > 0) and (Abs(ReturnAmount) < VoucherType2."Minimum Amount Issue") then
+                exit;
+
         end;
-        //+NPR5.48 [342920]
-        //-NPR5.40 [306347]
-        //POSAction.GET(ReturnPOSActionMgt.ActionCode());
         if not POSSession.RetrieveSessionAction(ReturnPOSActionMgt.ActionCode(), POSAction) then
             POSAction.Get(ReturnPOSActionMgt.ActionCode());
-        //+NPR5.40 [306347]
         POSAction.SetWorkflowInvocationParameter('VoucherTypeCode', ReturnVoucherType."Return Voucher Type", FrontEnd);
         FrontEnd.InvokeWorkflow(POSAction);
     end;
@@ -68,7 +60,6 @@ codeunit 6151017 "NPR NpRv Module Pay.: Default"
         LineNo: Integer;
         ReturnLineExists: Boolean;
     begin
-        //-NPR5.55 [363864]
         NpRvSalesLine.Get(NpRvSalesLine.Id);
         NpRvSalesLine.TestField("Document Source", NpRvSalesLine."Document Source"::"Payment Line");
         MagentoPaymentLine.Get(DATABASE::"Sales Header", SalesHeader."Document Type", SalesHeader."No.", NpRvSalesLine."Document Line No.");
@@ -171,7 +162,6 @@ codeunit 6151017 "NPR NpRv Module Pay.: Default"
         NpRvSalesLineReference."Reference No." := TempNpRvVoucher."Reference No.";
         NpRvSalesLineReference."Sales Line Id" := NpRvSalesLineNew.Id;
         NpRvSalesLineReference.Insert(true);
-        //+NPR5.55 [363864]
     end;
 
     local procedure RemoveReturnVoucher(NpRvSalesLineParent: Record "NPR NpRv Sales Line")
@@ -179,7 +169,6 @@ codeunit 6151017 "NPR NpRv Module Pay.: Default"
         MagentoPaymentLine: Record "NPR Magento Payment Line";
         NpRvSalesLine: Record "NPR NpRv Sales Line";
     begin
-        //-NPR5.55 [363864]
         NpRvSalesLine.SetRange("Parent Id", NpRvSalesLineParent.Id);
         NpRvSalesLine.SetRange("Document Source", NpRvSalesLine."Document Source"::"Payment Line");
         NpRvSalesLine.SetRange(Type, NpRvSalesLine.Type::"New Voucher");
@@ -192,12 +181,9 @@ codeunit 6151017 "NPR NpRv Module Pay.: Default"
 
                 NpRvSalesLine.Delete(true);
             until NpRvSalesLine.Next = 0;
-        //+NPR5.55 [363864]
     end;
 
-    local procedure "--- Voucher Interface"()
-    begin
-    end;
+    //--- Voucher Interface ---
 
     [EventSubscriber(ObjectType::Codeunit, 6151011, 'OnInitVoucherModules', '', true, true)]
     local procedure OnInitVoucherModules(var VoucherModule: Record "NPR NpRv Voucher Module")
@@ -255,7 +241,6 @@ codeunit 6151017 "NPR NpRv Module Pay.: Default"
     [EventSubscriber(ObjectType::Codeunit, 6151011, 'OnRunApplyPaymentSalesDoc', '', true, true)]
     local procedure OnRunApplyPaymentSalesDoc(VoucherType: Record "NPR NpRv Voucher Type"; SalesHeader: Record "Sales Header"; var NpRvSalesLine: Record "NPR NpRv Sales Line"; var Handled: Boolean)
     begin
-        //-NPR5.55 [363864]
         if Handled then
             exit;
         if not IsSubscriber(VoucherType) then
@@ -264,12 +249,9 @@ codeunit 6151017 "NPR NpRv Module Pay.: Default"
         Handled := true;
 
         ApplyPaymentSalesDoc(VoucherType, SalesHeader, NpRvSalesLine);
-        //+NPR5.55 [363864]
     end;
 
-    local procedure "--- Aux"()
-    begin
-    end;
+    //--- Aux ---
 
     local procedure CurrCodeunitId(): Integer
     begin
@@ -292,12 +274,9 @@ codeunit 6151017 "NPR NpRv Module Pay.: Default"
         VATAmountLineTemp: Record "VAT Amount Line" temporary;
         SalesPost: Codeunit "Sales-Post";
     begin
-        //-NPR5.55 [363864]
         SalesPost.GetSalesLines(SalesHeader, SalesLineTemp, 0);
         SalesLineTemp.CalcVATAmountLines(0, SalesHeader, SalesLineTemp, VATAmountLineTemp);
         SalesLineTemp.UpdateVATOnLines(0, SalesHeader, SalesLineTemp, VATAmountLineTemp);
         exit(VATAmountLineTemp.GetTotalAmountInclVAT());
-        //+NPR5.55 [363864]
     end;
 }
-
