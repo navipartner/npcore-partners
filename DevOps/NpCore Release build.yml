@@ -34,6 +34,9 @@ jobs:
     dependancyPackages:
       - source: 'https://api.nuget.org/v3/index.json;https://pkgs.dev.azure.com/navipartner/_packaging/NprAddIns/nuget/v3/index.json'
         id: NaviPartner.NPRetail.AddIns.BC #CASE SENSITIVE!
+      - source: 'https://pkgs.dev.azure.com/navipartner/_packaging/JSDependancies/nuget/v3/index.json'
+        id: NaviPartner.Dragonglass.BC
+        destinationPath: $(Build.SourcesDirectory)/$(Build.Repository.Name)/src/_ControlAddIns/Dragonglass/Scripts
     appNuGetSource: 
         source: 'https://pkgs.dev.azure.com/navipartner/_packaging/NpCore/nuget/v3/index.json'
         id: NaviPartner.NPCore.BC160
