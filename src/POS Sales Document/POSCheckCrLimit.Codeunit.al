@@ -21,7 +21,7 @@ codeunit 6014412 "NPR POS-Check Cr. Limit"
         else
             if InstructionMgt.IsEnabled(CustCheckCrLimit.GetInstructionType(Format(SalesHeader."Document Type"), SalesHeader."No.")) then begin
                 CreditLimitExceeded := true;
-                SalesHeader.OnCustomerCreditLimitExceeded;
+                SalesHeader.CustomerCreditLimitExceeded;
             end;
     end;
 
