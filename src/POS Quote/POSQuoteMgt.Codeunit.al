@@ -1,33 +1,22 @@
 codeunit 6151006 "NPR POS Quote Mgt."
 {
-    // NPR5.48/MHA /20181115  CASE 334633 Object created
-    // NPR5.48/MHA /20181130  CASE 338208 Added POS Sales Data (.xml) functionality to fully back/restore POS Sale
-    // NPR5.51/MMV /20190820  CASE 364694 Cleanup before register balancing based on register no. for consistency.
-    //                                    Otherwise someone working day shift can have POS quotes living forever.
-    // NPR5.53/ALPO/20191127  CASE 379255 Include "Retail Cross Reference" into scope
-    // NPR5.54/ALPO/20200203  CASE 364658 Preserve current values of Device/Host/User from being overwritten by the ones from saved sale
-    // NPR5.55/MHA /20200512  CASE 402015 Added Retail ID to Retail Voucher and changed voucher payment to voucher reference
-    // NPR5.55/ALPO/20200710  CASE 413786 Sale dates were not updated in auxiliary tables, while retrieving a saved sale
-
-
     trigger OnRun()
     begin
     end;
 
     var
-        Text000: Label 'Delete all saved POS Quotes,Terminate/Delete saved POS Quotes manually';
+        Text000: Label 'Delete all saved POS Quotes,Review saved POS Quotes';
         EFT_WARNING: Label 'WARNING:\%1 %2 has one or more POS Quotes linked to it with approved EFT transactions inside. These should be voided or completed as the transaction has already occurred!\\Do you want to continue with end of day?';
 
     procedure CleanupPOSQuotesBeforeBalancing(SalePOS: Record "NPR Sale POS") Confirmed: Boolean
     var
         POSQuoteEntry: Record "NPR POS Quote Entry";
+        POSQuotes: Page "NPR POS Quotes";
         SelectedMenu: Integer;
     begin
         if not GuiAllowed then
             exit(true);
 
-        //-NPR5.51 [364694]
-        //SetSalePOSFilter(SalePOS,POSQuoteEntry);
         POSQuoteEntry.SetAutoCalcFields("Contains EFT Approval");
         POSQuoteEntry.SetRange("Register No.", SalePOS."Register No.");
         POSQuoteEntry.SetRange("Contains EFT Approval", true);
@@ -36,7 +25,6 @@ codeunit 6151006 "NPR POS Quote Mgt."
                 exit(false);
 
         POSQuoteEntry.SetRange("Contains EFT Approval");
-        //+NPR5.51 [364694]
 
         if not POSQuoteEntry.FindFirst then
             exit(true);
@@ -50,7 +38,10 @@ codeunit 6151006 "NPR POS Quote Mgt."
                 end;
             2:
                 begin
-                    Confirmed := PAGE.RunModal(0, POSQuoteEntry) = ACTION::LookupOK;
+                    Clear(POSQuotes);
+                    POSQuotes.SetIsInEndOfTheDayProcess(true);
+                    POSQuotes.LookupMode(true);
+                    Confirmed := POSQuotes.RunModal() = ACTION::LookupOK;
                 end;
         end;
 
@@ -61,7 +52,6 @@ codeunit 6151006 "NPR POS Quote Mgt."
     begin
         Clear(POSQuoteEntry);
         POSQuoteEntry.FilterGroup(40);
-        //-NPR5.51 [364694]
         case Filter of
             Filter::Register:
                 begin
@@ -77,7 +67,6 @@ codeunit 6151006 "NPR POS Quote Mgt."
                     POSQuoteEntry.SetRange("Register No.", SalePOS."Register No.");
                 end;
         end;
-        //+NPR5.51 [364694]
         POSQuoteEntry.FilterGroup(0);
     end;
 
@@ -110,7 +99,6 @@ codeunit 6151006 "NPR POS Quote Mgt."
         XmlElement6: DotNet NPRNetXmlElement;
         RecRef: RecordRef;
     begin
-        //-NPR5.48 [338208]
         RecRef.GetTable(SalePOS);
         FindFields(RecRef, false, SalePOSFieldBuffer);
 
@@ -135,10 +123,8 @@ codeunit 6151006 "NPR POS Quote Mgt."
         RecRef.GetTable(NpDcSaleLinePOSNewCoupon);
         FindFields(RecRef, false, NpDcSaleLinePOSNewCouponFieldBuffer);
 
-        //-NPR5.53 [379255]
         RecRef.GetTable(RetailCrossReference);
         FindFields(RecRef, false, RetailCrossReferenceFieldBuffer);
-        //+NPR5.53 [379255]
 
         NpXmlDomMgt.InitDoc(XmlDoc, XmlRoot, 'pos_sale');
         RecRef.GetTable(SalePOS);
@@ -193,9 +179,7 @@ codeunit 6151006 "NPR POS Quote Mgt."
                     until NpIaSaleLinePOSAddOn.Next = 0;
                 end;
 
-                //-NPR5.55 [402015]
                 NpRvSalesLine.SetRange("Retail ID", SaleLinePOS."Retail ID");
-                //+NPR5.55 [402015]
                 if NpRvSalesLine.FindSet then begin
                     NpXmlDomMgt.AddElement(XmlElement2, 'retail_vouchers', XmlElement3);
                     repeat
@@ -203,7 +187,6 @@ codeunit 6151006 "NPR POS Quote Mgt."
                         RecRef.GetTable(NpRvSalesLine);
                         RecRef2Xml(RecRef, XmlElement4, NpRvSalesLineFieldBuffer);
 
-                        //-NPR5.55 [402015]
                         NpRvSalesLineReference.SetRange("Sales Line Id", NpRvSalesLine.Id);
                         if NpRvSalesLineReference.FindSet then begin
                             NpXmlDomMgt.AddElement(XmlElement4, 'references', XmlElement5);
@@ -213,7 +196,6 @@ codeunit 6151006 "NPR POS Quote Mgt."
                                 RecRef2Xml(RecRef, XmlElement6, NpRvSalesLineReferenceFieldBuffer);
                             until NpRvSalesLineReference.Next = 0;
                         end;
-                    //+NPR5.55 [402015]
                     until NpRvSalesLine.Next = 0;
                 end;
 
@@ -245,7 +227,6 @@ codeunit 6151006 "NPR POS Quote Mgt."
                     until NpDcSaleLinePOSNewCoupon.Next = 0;
                 end;
 
-                //-NPR5.53 [379255]
                 if not IsNullGuid(SaleLinePOS."Retail ID") then
                     if RetailCrossReference.Get(SaleLinePOS."Retail ID") then begin
                         NpXmlDomMgt.AddElement(XmlElement2, 'retail_cross_references', XmlElement3);
@@ -253,12 +234,10 @@ codeunit 6151006 "NPR POS Quote Mgt."
                         RecRef.GetTable(RetailCrossReference);
                         RecRef2Xml(RecRef, XmlElement4, RetailCrossReferenceFieldBuffer);
                     end;
-                //+NPR5.53 [379255]
 
                 OnPOSSaleLine2Xml(SaleLinePOS, XmlElement);
             until SaleLinePOS.Next = 0;
         end;
-        //+NPR5.48 [338208]
     end;
 
     local procedure RecRef2Xml(RecRef: RecordRef; XmlElement: DotNet NPRNetXmlElement; var TempField: Record "Field" temporary)
@@ -266,14 +245,12 @@ codeunit 6151006 "NPR POS Quote Mgt."
         XmlElement2: DotNet NPRNetXmlElement;
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
     begin
-        //-NPR5.48 [338208]
         NpXmlDomMgt.AddAttribute(XmlElement, 'table_no', Format(RecRef.Number, 0, 9));
         NpXmlDomMgt.AddElement(XmlElement, 'fields', XmlElement2);
         if TempField.FindSet then
             repeat
                 Field2Xml(RecRef, TempField, XmlElement2);
             until TempField.Next = 0;
-        //+NPR5.48 [338208]
     end;
 
     local procedure FindFields(RecRef: RecordRef; ExclKeyField: Boolean; var TempField: Record "Field" temporary)
@@ -284,7 +261,6 @@ codeunit 6151006 "NPR POS Quote Mgt."
         FieldRef: FieldRef;
         i: Integer;
     begin
-        //-NPR5.48 [338208]
         if not TempField.IsTemporary then begin
             TempField.SetFilter("No.", '=%1&<>%1', 1);
             exit;
@@ -316,7 +292,6 @@ codeunit 6151006 "NPR POS Quote Mgt."
                 TempField.Insert;
             end;
         until Field.Next = 0;
-        //+NPR5.48 [338208]
     end;
 
     local procedure Field2Xml(RecRef: RecordRef; "Field": Record "Field"; var XmlElement: DotNet NPRNetXmlElement)
@@ -326,7 +301,6 @@ codeunit 6151006 "NPR POS Quote Mgt."
         XmlElement2: DotNet NPRNetXmlElement;
         FieldValue: Text;
     begin
-        //-NPR5.48 [338208]
         if not GetFieldValue(RecRef, Field, FieldValue) then
             exit;
 
@@ -335,14 +309,12 @@ codeunit 6151006 "NPR POS Quote Mgt."
         XmlCDATA := XmlElement2.OwnerDocument.CreateCDataSection('');
         XmlElement2.AppendChild(XmlCDATA);
         XmlCDATA.AppendData(FieldValue);
-        //+NPR5.48 [338208]
     end;
 
     local procedure GetFieldValue(RecRef: RecordRef; "Field": Record "Field"; var FieldValue: Text): Boolean
     var
         FieldRef: FieldRef;
     begin
-        //-NPR5.48 [338208]
         FieldRef := RecRef.Field(Field."No.");
         case Field.Type of
             Field.Type::BigInteger, Field.Type::Boolean, Field.Type::Date, Field.Type::DateFormula, Field.Type::DateTime, Field.Type::Decimal,
@@ -364,14 +336,12 @@ codeunit 6151006 "NPR POS Quote Mgt."
         end;
 
         exit(false);
-        //+NPR5.48 [338208]
     end;
 
     procedure LoadPOSSaleData(POSQuoteEntry: Record "NPR POS Quote Entry"; var XmlDoc: DotNet "NPRNetXmlDocument"): Boolean
     var
         InStr: InStream;
     begin
-        //-NPR5.48 [338208]
         if not POSQuoteEntry."POS Sales Data".HasValue then
             exit(false);
         POSQuoteEntry.CalcFields("POS Sales Data");
@@ -379,7 +349,6 @@ codeunit 6151006 "NPR POS Quote Mgt."
         XmlDoc := XmlDoc.XmlDocument;
         XmlDoc.Load(InStr);
         exit(not IsNull(XmlDoc));
-        //+NPR5.48 [338208]
     end;
 
     procedure Xml2POSSale(var XmlDoc: DotNet "NPRNetXmlDocument"; var SalePOS: Record "NPR Sale POS")
@@ -409,7 +378,6 @@ codeunit 6151006 "NPR POS Quote Mgt."
         PrevRec: Text;
         Position: Integer;
     begin
-        //-NPR5.48 [338208]
         if IsNull(XmlDoc) then
             exit;
         XmlRoot := XmlDoc.DocumentElement;
@@ -422,14 +390,12 @@ codeunit 6151006 "NPR POS Quote Mgt."
         FindFields(RecRef, true, SalePOSFieldBuffer);
         if SalePOSFieldBuffer.Get(RecRef.Number, SalePOS.FieldNo("POS Sale ID")) then
             SalePOSFieldBuffer.Delete;
-        //-NPR5.54 [364658]
         if SalePOSFieldBuffer.Get(RecRef.Number, SalePOS.FieldNo("Device ID")) then
             SalePOSFieldBuffer.Delete;
         if SalePOSFieldBuffer.Get(RecRef.Number, SalePOS.FieldNo("Host Name")) then
             SalePOSFieldBuffer.Delete;
         if SalePOSFieldBuffer.Get(RecRef.Number, SalePOS.FieldNo("User ID")) then
             SalePOSFieldBuffer.Delete;
-        //+NPR5.54 [364658]
 
         RecRef.GetTable(SaleLinePOS);
         FindFields(RecRef, false, SaleLinePOSFieldBuffer);
@@ -452,10 +418,8 @@ codeunit 6151006 "NPR POS Quote Mgt."
         RecRef.GetTable(NpDcSaleLinePOSNewCoupon);
         FindFields(RecRef, false, NpDcSaleLinePOSNewCouponFieldBuffer);
 
-        //-NPR5.53 [379255]
         RecRef.GetTable(RetailCrossReference);
         FindFields(RecRef, false, RetailCrossReferenceFieldBuffer);
-        //+NPR5.53 [379255]
 
         RecRef.GetTable(SalePOS);
         PrevRec := Format(RecRef);
@@ -470,7 +434,7 @@ codeunit 6151006 "NPR POS Quote Mgt."
             RecRef.SetTable(POSInfoTransaction);
             POSInfoTransaction."Register No." := SalePOS."Register No.";
             POSInfoTransaction."Sales Ticket No." := SalePOS."Sales Ticket No.";
-            POSInfoTransaction."Sale Date" := SalePOS.Date;  //NPR5.55 [413786]
+            POSInfoTransaction."Sale Date" := SalePOS.Date;
             POSInfoTransaction."Sales Line No." := 0;
             POSInfoTransaction.Insert(true);
         end;
@@ -484,7 +448,7 @@ codeunit 6151006 "NPR POS Quote Mgt."
             RecRef.SetTable(SaleLinePOS);
             SaleLinePOS."Register No." := SalePOS."Register No.";
             SaleLinePOS."Sales Ticket No." := SalePOS."Sales Ticket No.";
-            SaleLinePOS.Date := SalePOS.Date;  //NPR5.55 [413786]
+            SaleLinePOS.Date := SalePOS.Date;
             SaleLinePOS.Insert(true);
 
             foreach XmlElement2 in XmlElement.SelectNodes('pos_info_transactions/pos_info_transaction') do begin
@@ -494,7 +458,7 @@ codeunit 6151006 "NPR POS Quote Mgt."
                 RecRef.SetTable(POSInfoTransaction);
                 POSInfoTransaction."Register No." := SalePOS."Register No.";
                 POSInfoTransaction."Sales Ticket No." := SalePOS."Sales Ticket No.";
-                POSInfoTransaction."Sale Date" := SalePOS.Date;  //NPR5.55 [413786]
+                POSInfoTransaction."Sale Date" := SalePOS.Date;
                 POSInfoTransaction.Insert(true);
             end;
 
@@ -505,7 +469,7 @@ codeunit 6151006 "NPR POS Quote Mgt."
                 RecRef.SetTable(NpIaSaleLinePOSAddOn);
                 NpIaSaleLinePOSAddOn."Register No." := SalePOS."Register No.";
                 NpIaSaleLinePOSAddOn."Sales Ticket No." := SalePOS."Sales Ticket No.";
-                NpIaSaleLinePOSAddOn."Sale Date" := SalePOS.Date;  //NPR5.55 [413786]
+                NpIaSaleLinePOSAddOn."Sale Date" := SalePOS.Date;
                 NpIaSaleLinePOSAddOn.Insert(true);
             end;
 
@@ -514,15 +478,12 @@ codeunit 6151006 "NPR POS Quote Mgt."
                 RecRef.GetTable(NpRvSalesLine);
                 Xml2RecRef(XmlElement2, NpRvSalesLineFieldBuffer, RecRef);
                 RecRef.SetTable(NpRvSalesLine);
-                //-NPR5.55 [402015]
                 NpRvSalesLine."Retail ID" := SaleLinePOS."Retail ID";
-                //+NPR5.55 [402015]
                 NpRvSalesLine."Register No." := SalePOS."Register No.";
                 NpRvSalesLine."Sales Ticket No." := SalePOS."Sales Ticket No.";
-                NpRvSalesLine."Sale Date" := SalePOS.Date;  //NPR5.55 [413786]
+                NpRvSalesLine."Sale Date" := SalePOS.Date;
                 NpRvSalesLine.Insert(true);
 
-                //-NPR5.55 [402015]
                 foreach XmlElement3 in XmlElement2.SelectNodes('references/reference') do begin
                     NpRvSalesLineReference.Init;
                     RecRef.GetTable(NpRvSalesLineReference);
@@ -532,7 +493,6 @@ codeunit 6151006 "NPR POS Quote Mgt."
                     NpRvSalesLineReference.Id := NpRvSalesLine."Register No.";
                     NpRvSalesLineReference.Insert(true);
                 end;
-                //+NPR5.55 [402015]
             end;
 
             foreach XmlElement2 in XmlElement.SelectNodes('discount_coupons/discount_coupon') do begin
@@ -542,7 +502,7 @@ codeunit 6151006 "NPR POS Quote Mgt."
                 RecRef.SetTable(NpDcSaleLinePOSCoupon);
                 NpDcSaleLinePOSCoupon."Register No." := SalePOS."Register No.";
                 NpDcSaleLinePOSCoupon."Sales Ticket No." := SalePOS."Sales Ticket No.";
-                NpDcSaleLinePOSCoupon."Sale Date" := SalePOS.Date;  //NPR5.55 [413786]
+                NpDcSaleLinePOSCoupon."Sale Date" := SalePOS.Date;
                 NpDcSaleLinePOSCoupon.Insert(true);
             end;
 
@@ -553,11 +513,10 @@ codeunit 6151006 "NPR POS Quote Mgt."
                 RecRef.SetTable(NpDcSaleLinePOSNewCoupon);
                 NpDcSaleLinePOSNewCoupon."Register No." := SalePOS."Register No.";
                 NpDcSaleLinePOSNewCoupon."Sales Ticket No." := SalePOS."Sales Ticket No.";
-                NpDcSaleLinePOSNewCoupon."Sale Date" := SalePOS.Date;  //NPR5.55 [413786]
+                NpDcSaleLinePOSNewCoupon."Sale Date" := SalePOS.Date;
                 NpDcSaleLinePOSNewCoupon.Insert(true);
             end;
 
-            //-NPR5.53 [379255]
             foreach XmlElement2 in XmlElement.SelectNodes('retail_cross_references/retail_cross_reference') do begin
                 RetailCrossReference.Init;
                 RecRef.GetTable(RetailCrossReference);
@@ -570,11 +529,9 @@ codeunit 6151006 "NPR POS Quote Mgt."
                     RetailCrossReference."Record Value" := SalePOS."Sales Ticket No.";
                 RetailCrossReference.Insert(true);
             end;
-            //+NPR5.53 [379255]
 
             OnXml2POSSaleLine(XmlElement, SaleLinePOS);
         end;
-        //+NPR5.48 [338208]
     end;
 
     local procedure Xml2RecRef(XmlElement: DotNet NPRNetXmlElement; var TempField: Record "Field" temporary; var RecRef: RecordRef)
@@ -582,7 +539,6 @@ codeunit 6151006 "NPR POS Quote Mgt."
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
         XmlElement2: DotNet NPRNetXmlElement;
     begin
-        //-NPR5.48 [338208]
         if not TempField.FindSet then
             exit;
         if NpXmlDomMgt.GetXmlAttributeText(XmlElement, 'table_no', false) <> Format(RecRef.Number, 0, 9) then
@@ -592,7 +548,6 @@ codeunit 6151006 "NPR POS Quote Mgt."
             if NpXmlDomMgt.FindNode(XmlElement, 'fields/field[@field_no = ' + Format(TempField."No.", 0, 9) + ']', XmlElement2) then
                 Xml2Field(XmlElement2, TempField, RecRef);
         until TempField.Next = 0;
-        //+NPR5.48 [338208]
     end;
 
     local procedure Xml2Field(XmlElement: DotNet NPRNetXmlElement; "Field": Record "Field"; var RecRef: RecordRef)
@@ -611,7 +566,6 @@ codeunit 6151006 "NPR POS Quote Mgt."
         GUIDValue: Guid;
         RecordIDValue: RecordID;
     begin
-        //-NPR5.48 [338208]
         FieldRef := RecRef.Field(Field."No.");
         case Field.Type of
             Field.Type::BigInteger:
@@ -680,7 +634,6 @@ codeunit 6151006 "NPR POS Quote Mgt."
                     FieldRef.Value := TextValue;
                 end;
         end;
-        //+NPR5.48 [338208]
     end;
 
     procedure ViewPOSSalesData(POSQuoteEntry: Record "NPR POS Quote Entry")
@@ -693,7 +646,6 @@ codeunit 6151006 "NPR POS Quote Mgt."
         InStr: InStream;
         Path: Text;
     begin
-        //-NPR5.48 [338208]
         if not POSQuoteEntry."POS Sales Data".HasValue then
             exit;
 
@@ -710,42 +662,30 @@ codeunit 6151006 "NPR POS Quote Mgt."
         TempBlob.FromRecord(POSQuoteEntry, POSQuoteEntry.FieldNo("POS Sales Data"));
         Path := FileMgt.BLOBExport(TempBlob, TemporaryPath + POSQuoteEntry."Sales Ticket No." + '.xml', false);
         HyperLink(Path);
-        //+NPR5.48 [338208]
     end;
 
     local procedure IsWebClient(): Boolean
     var
         ActiveSession: Record "Active Session";
     begin
-        //-NPR5.48 [338208]
         if ActiveSession.Get(ServiceInstanceId, SessionId) then
             exit(ActiveSession."Client Type" = ActiveSession."Client Type"::"Web Client");
         exit(false);
-        //+NPR5.48 [338208]
     end;
 
     local procedure OnPOSSale2Xml(SalePOS: Record "NPR Sale POS"; XmlRoot: DotNet NPRNetXmlElement)
     begin
-        //-NPR5.48 [338208]
-        //+NPR5.48 [338208]
     end;
 
     local procedure OnPOSSaleLine2Xml(SaleLinePOS: Record "NPR Sale Line POS"; XmlElement: DotNet NPRNetXmlElement)
     begin
-        //-NPR5.48 [338208]
-        //+NPR5.48 [338208]
     end;
 
     local procedure OnXml2POSSale(XmlRoot: DotNet NPRNetXmlElement; SalePOS: Record "NPR Sale POS")
     begin
-        //-NPR5.48 [338208]
-        //+NPR5.48 [338208]
     end;
 
     local procedure OnXml2POSSaleLine(XmlElement: DotNet NPRNetXmlElement; SaleLinePOS: Record "NPR Sale Line POS")
     begin
-        //-NPR5.48 [338208]
-        //+NPR5.48 [338208]
     end;
 }
-

@@ -1,15 +1,10 @@
 page 6151002 "NPR POS Quotes"
 {
-    // NPR5.47/MHA /20181011  CASE 302636 Object created - POS Quote (Saved POS Sale)
-    // NPR5.48/MHA /20181129  CASE 336498 Added Customer info fields
-    // NPR5.48/MHA /20181130  CASE 338208 Added Action "View POS Sales Data"
-    // NPR5.51/MMV /20190820  CASE 364694 Handle EFT approvals
-    // NPR5.55/ALPO/20200722  CASE 392042 POS quote cleanup: removed legacy functionality with load from hardcoded fields
-
     Caption = 'POS Quotes';
     CardPageID = "NPR POS Quote Card";
-    Editable = false;
-    PageType = List;
+    InsertAllowed = false;
+    ModifyAllowed = false;
+    PageType = Document;
     SourceTable = "NPR POS Quote Entry";
     UsageCategory = Lists;
 
@@ -93,12 +88,34 @@ page 6151002 "NPR POS Quotes"
                 var
                     POSQuoteMgt: Codeunit "NPR POS Quote Mgt.";
                 begin
-                    //-NPR5.48 [338208]
                     POSQuoteMgt.ViewPOSSalesData(Rec);
-                    //+NPR5.48 [338208]
                 end;
             }
         }
     }
-}
 
+    var
+        IsInEndOfTheDayProcess: Boolean;
+
+    trigger OnQueryClosePage(CloseAction: Action): Boolean
+    var
+        POSQuote: Record "NPR POS Quote Entry";
+        EntriesLeft: Label 'You have not closed all the POS Quotes. If you continue with the balancing process, the remaining quotes will stay in the system.\Are you sure you want to continue?';
+        ConfrimCancel: Label 'Are you sure you want to cancel the balancing process?';
+    begin
+        if IsInEndOfTheDayProcess then begin
+            if CloseAction = ACTION::LookupOK then begin
+                if POSQuote.ISEMPTY then
+                    exit(true);
+                exit(Confirm(EntriesLeft, false));
+            end else
+                exit(Confirm(ConfrimCancel, false));
+        end;
+        exit(true);
+    end;
+
+    procedure SetIsInEndOfTheDayProcess(Set: Boolean)
+    begin
+        IsInEndOfTheDayProcess := Set;
+    end;
+}

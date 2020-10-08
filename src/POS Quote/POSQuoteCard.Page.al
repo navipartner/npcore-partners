@@ -1,13 +1,8 @@
 page 6151003 "NPR POS Quote Card"
 {
-    // NPR5.47/MHA /20181011  CASE 302636 Object created - POS Quote (Saved POS Sale)
-    // NPR5.48/MHA /20181129  CASE 336498 Added Customer info fields
-    // NPR5.48/MHA /20181130  CASE 338208 Added Action "View POS Sales Data"
-    // NPR5.51/MMV /20190820  CASE 364694 Handle EFT approvals
-    // NPR5.55/ALPO/20200722  CASE 392042 POS quote cleanup: removed legacy functionality with load from hardcoded fields
-
     Caption = 'POS Quote Card';
-    Editable = false;
+    InsertAllowed = false;
+    ModifyAllowed = false;
     SourceTable = "NPR POS Quote Entry";
 
     layout
@@ -108,12 +103,9 @@ page 6151003 "NPR POS Quote Card"
                 var
                     POSQuoteMgt: Codeunit "NPR POS Quote Mgt.";
                 begin
-                    //-NPR5.48 [338208]
                     POSQuoteMgt.ViewPOSSalesData(Rec);
-                    //+NPR5.48 [338208]
                 end;
             }
         }
     }
 }
-
