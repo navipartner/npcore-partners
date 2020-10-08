@@ -1,9 +1,5 @@
 xmlport 6060132 "NPR MM Block Membership"
 {
-    // MM80.1.00/TSA/20151217  CASE 229684 NaviPartner Member Management Module
-    // MM80.1.02/TSA/20151228  CASE 229684 Touch-up and enchancements
-    // MM1.03/TSA/20160104  CASE 230647 - Added NewsLetter CRM option
-    // MM1.06/TSA/20160127  CASE 232910 Member Management
 
     Caption = 'Block Membership';
     UseDefaultNamespace = true;

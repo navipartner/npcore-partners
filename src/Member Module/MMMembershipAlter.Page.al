@@ -1,18 +1,5 @@
 page 6060141 "NPR MM Membership Alter."
 {
-    // MM1.11/TSA/20160502  CASE 233824 Transport MM1.11 - 29 April 2016
-    // MM1.14/TSA/20160603  CASE 240870 Transport MM1.13 - 1 June 2016
-    // MM1.19/TSA/20170322  CASE 268166 Added field "Upgrade With New Duration"
-    // MM1.22/TSA /20170816 CASE 287080 Added field "Anonymous Member Unit Price"
-    // MM1.22/TSA /20170829 CASE 286922 Added field "Auto-Renew To"
-    // MM1.23/TSA /20170918 CASE 276869 Added field "Not Available Via Web Service"
-    // MM1.24/TSA /20171205 CASE 297852 Added field "Assign Loyalty Points On Sale"
-    // MM1.25/NPKNAV/20180122  CASE 300256 Transport MM1.25 - 22 January 2018
-    // MM1.30/TSA/20180615  CASE 317428 Transport MM1.30 - 15 June 2018
-    // MM1.40/TSA /20190730 CASE 360275 Added field "Auto-Admit Member On Sale"
-    // MM1.41/TSA /20191016 CASE 373297 Added "Grace Period Presets" and made some grace period settings fields not visible (by default)
-    // MM1.43/TSA /20200331 CASE 398328 added "Presentation Order"
-    // MM1.44/TSA /20200529 CASE 407401 Added Age Verification
 
     Caption = 'Membership Alteration';
     PageType = List;

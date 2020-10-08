@@ -1,9 +1,5 @@
 table 6060137 "NPR MM Member Notific. Setup"
 {
-    // MM1.14/TSA/20160523  CASE 240871 Reminder Service
-    // MM1.29/TSA /20180506 CASE 314131 Added fields "Activate NP Pass" and "Processing Method"
-    // MM1.32/TSA /20180710 CASE 318132 Added option Wallet_Create to the Type
-    // MM1.44/TSA /20200416 CASE 400601 Added Magento Password URL support
 
     Caption = 'MM Member Notification Setup';
     DataClassification = CustomerContent;
@@ -78,7 +74,7 @@ table 6060137 "NPR MM Member Notific. Setup"
         {
             Caption = 'Processing Method';
             DataClassification = CustomerContent;
-            Description = '//-MM1.29 [314131]';
+            Description = '';
             OptionCaption = 'Batch,Manual,Inline';
             OptionMembers = BATCH,MANUAL,INLINE;
         }
@@ -86,14 +82,14 @@ table 6060137 "NPR MM Member Notific. Setup"
         {
             Caption = 'NP Pass Server Base URL';
             DataClassification = CustomerContent;
-            Description = '//-MM1.29 [314131]';
+            Description = '';
             InitValue = 'https://passes.npecommerce.dk/api/v1';
         }
         field(105; "Pass Notification Method"; Option)
         {
             Caption = 'Pass Notification Method';
             DataClassification = CustomerContent;
-            Description = '//-MM1.29 [314131]';
+            Description = '';
             OptionCaption = 'Asynchronous,Synchronous';
             OptionMembers = ASYNCHRONOUS,SYNCHRONOUS;
         }
@@ -101,44 +97,44 @@ table 6060137 "NPR MM Member Notific. Setup"
         {
             Caption = 'Passes API';
             DataClassification = CustomerContent;
-            Description = '//-MM1.29 [314131]';
+            Description = '';
             InitValue = '/passes/%1/%2';
         }
         field(120; "PUT Passes Template"; BLOB)
         {
             Caption = 'PUT Passes Template';
             DataClassification = CustomerContent;
-            Description = '//-MM1.29 [314131]';
+            Description = '';
         }
         field(130; "Pass Token"; Text[150])
         {
             Caption = 'Pass Token';
             DataClassification = CustomerContent;
-            Description = '//-MM1.29 [314131]';
+            Description = '';
         }
         field(135; "Pass Type Code"; Text[30])
         {
             Caption = 'Pass Type Code';
             DataClassification = CustomerContent;
-            Description = '//-MM1.29 [314131]';
+            Description = '';
         }
         field(140; "Include NP Pass"; Boolean)
         {
             Caption = 'Include NP Pass';
             DataClassification = CustomerContent;
-            Description = '//-MM1.29 [314131]';
+            Description = '';
         }
         field(150; "Generate Magento PW URL"; Boolean)
         {
             Caption = 'Generate Magento PW URL';
             DataClassification = CustomerContent;
-            Description = '//-MM1.44 [400601]';
+            Description = '';
         }
         field(155; "Fallback Magento PW URL"; Text[150])
         {
             Caption = 'Fallback Magento PW URL';
             DataClassification = CustomerContent;
-            Description = '//-MM1.44 [400601]';
+            Description = '';
         }
     }
 

@@ -1,19 +1,5 @@
 table 6060131 "NPR MM Member Card"
 {
-    // MM1.00/TSA/20151217  CASE 229684 NaviPartner Member Management Module
-    // MM1.02/TSA/20151228  CASE 229684 Touch-up and enchancements
-    // MM1.07/TSA/20160203  CASE 233438 Added flowfields
-    // MM1.10/TSA/20130321  CASE 237176 Added flowfield company name
-    // MM1.12/TSA/20160503  CASE 240661 Added DAN Captions
-    // MM1.15/TSA/20160718  CASE 242519 Bug fix - checking for duplicate external member card no on manual input
-    // MM1.15/TSA/20160725  CASE 238445 Added flowfield for membership code
-    // MM1.16/TSA/20160913  CASE 252216 Signature change on search function
-    // MM1.17/TSA/20161214 CASE 243075 Added page 6060130 as the default lookup/drilldown page
-    // MM1.22/TSA /20170911 CASE 284560 Added field Card Is Temporary
-    // MM1.25/TSA /20180117 CASE 300256 Card Expire and Renew functionality
-    // MM1.29/TSA /20180503 CASE 313795 Added block option "ANONYMIZED"
-    // MM1.29/TSA /20180522 CASE 316251 Added index on field "External Card No."
-    // MM1.44/TSA /20200508 CASE 402040 Added key, "Membership Entry No.", "Member Entry No."
 
     Caption = 'Member Card';
     DataClassification = CustomerContent;

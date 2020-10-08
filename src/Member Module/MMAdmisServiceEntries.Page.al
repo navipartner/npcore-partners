@@ -1,7 +1,5 @@
 page 6060091 "NPR MM Admis. Service Entries"
 {
-    // NPR5.31/NPKNAV/20170502  CASE 263737 Transport NPR5.31 - 2 May 2017
-    // NPR5.43/CLVA  /20180627  CASE 318579 Added new fields "Ticket Type Code","Ticket Type Description","Membership Code" and "Membership Description"
 
     Caption = 'MM Admission Service Entries';
     Editable = false;

@@ -1,7 +1,5 @@
 page 6151164 "NPR MM NPR Loy. Wizard"
 {
-    // MM1.38/TSA /20190221 CASE 338215 Initial Version
-    // MM1.40/TSA /20190613 CASE 358460 Added support for tenants on URL to server
 
     Caption = 'NPR Loyalty Wizard';
     SourceTable = "Integer";
@@ -62,7 +60,6 @@ page 6151164 "NPR MM NPR Loy. Wizard"
                     trigger OnValidate()
                     begin
 
-                        //-MM1.40 [358460]
                         if (StrLen(ServiceBaseURL) < StrLen('/Codeunit/')) then
                             Error('Invalid URL.');
 
@@ -71,7 +68,7 @@ page 6151164 "NPR MM NPR Loy. Wizard"
 
                         if (CopyStr(ServiceBaseURL, StrLen(ServiceBaseURL) - StrLen('Codeunit/')) <> '/Codeunit/') then
                             Error('Invalid URL. URL must end with "Codeunit/" (without the quotes).');
-                        //+MM1.40 [358460]
+
                     end;
                 }
                 field(TenentName; TenentName)
@@ -129,7 +126,6 @@ page 6151164 "NPR MM NPR Loy. Wizard"
     trigger OnQueryClosePage(CloseAction: Action): Boolean
     begin
 
-        //-MM1.40 [358460]
         if (CloseAction <> ACTION::LookupOK) then
             exit(true);
 
@@ -137,7 +133,7 @@ page 6151164 "NPR MM NPR Loy. Wizard"
             Error('The server side Membership code must be specified.');
 
         exit(true);
-        //+MM1.40 [358460]
+
     end;
 
     var

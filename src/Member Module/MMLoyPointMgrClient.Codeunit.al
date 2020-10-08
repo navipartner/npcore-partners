@@ -1,8 +1,5 @@
 codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
 {
-    // MM1.38/TSA /20190204 CASE 338215 Initial Version
-    // MM1.40/TSA /20190823 CASE 357360 Fixed a problem with short card numbers
-
 
     trigger OnRun()
     begin
@@ -221,7 +218,6 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
         LoyaltyPointsPSPClient: Codeunit "NPR MM Loy. Point PSP (Client)";
     begin
 
-
         if (not GetStoreSetup(EFTTransactionRequest."Register No.", ResponseText, LoyaltyStoreSetup)) then
             exit(false);
 
@@ -369,7 +365,7 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
         EFTTransactionRequest.Successful := (ResponseCode = 'OK');
         FinalizeTransactionRequest(EFTTransactionRequest, MessageCode, ResponseMessage, AuthorizationCode, ReferenceNumber);
         EFTTransactionRequest.Modify();
-        Commit;
+        Commit();
 
         ReceiptText := CreateReservePointsSlip(EFTTransactionRequest, 0);
         EFTTransactionRequest."Receipt 1".CreateOutStream(OStream);
@@ -428,7 +424,7 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
         EFTTransactionRequest.Successful := (ResponseCode = 'OK');
         FinalizeTransactionRequest(EFTTransactionRequest, MessageCode, ResponseMessage, AuthorizationCode, ReferenceNumber);
         EFTTransactionRequest.Modify();
-        Commit;
+        Commit();
 
         if (not EvaluateToInteger(PointsEarned, NpXmlDomMgt.GetXmlAttributeText(XmlPoints, 'PointsEarned', false))) then
             PointsEarned := 0;
@@ -444,7 +440,7 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
         OStream.Write(ReceiptText);
 
         EFTTransactionRequest.Modify();
-        Commit;
+        Commit();
     end;
 
     local procedure FinalizeTransactionRequest(var EFTTransactionRequest: Record "NPR EFT Transaction Request"; MessageCode: Text; ResponseMessage: Text; AuthorizationCode: Text; ReferenceNumber: Text)
@@ -526,7 +522,6 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
 
         ReceiptText += WriteSlipLine(CreditCardTransaction, '');
 
-        //-MM1.40 [357360]
         // ReceiptText += WriteSlipLine (CreditCardTransaction, LeftRightText (TicketWidth,
         //    EFTTransactionRequest.FIELDCAPTION ("Card Number") +' :',
         //    COPYSTR (EFTTransactionRequest."Card Number", STRLEN(EFTTransactionRequest."Card Number")-7)));
@@ -546,7 +541,6 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
             ReceiptText += WriteSlipLine(CreditCardTransaction, LeftRightText(TicketWidth,
                 EFTTransactionRequest.FieldCaption("Card Number") + ' :',
                 CopyStr(EFTTransactionRequest."Card Number", LastNChars)));
-        //+MM1.40 [357360]
 
         ReceiptText += WriteSlipLine(CreditCardTransaction, '');
 
@@ -637,7 +631,6 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
               StrSubstNo('(%1)', EFTTransactionRequest."Result Code")));
         end;
 
-        //-MM1.40 [357360]
         // ReceiptText += WriteSlipLine (CreditCardTransaction, LeftRightText (TicketWidth,
         //    EFTTransactionRequest.FIELDCAPTION ("Card Number") +' :',
         //    COPYSTR (EFTTransactionRequest."Card Number", STRLEN(EFTTransactionRequest."Card Number")-7)));
@@ -657,7 +650,6 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
             ReceiptText += WriteSlipLine(CreditCardTransaction, LeftRightText(TicketWidth,
                 EFTTransactionRequest.FieldCaption("Card Number") + ' :',
                 CopyStr(EFTTransactionRequest."Card Number", LastNChars)));
-        //+MM1.40 [357360]
 
         ReceiptText += WriteSlipLine(CreditCardTransaction, '');
 

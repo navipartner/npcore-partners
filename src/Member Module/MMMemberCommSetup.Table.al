@@ -1,6 +1,5 @@
 table 6151187 "NPR MM Member Comm. Setup"
 {
-    // MM1.42/TSA/20200122  CASE 382728 Transport MM1.43 - 22 January 2020
 
     Caption = 'Member Communication Setup';
     DataClassification = CustomerContent;

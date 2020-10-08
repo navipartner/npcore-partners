@@ -1,7 +1,5 @@
 table 6151162 "NPR MM Loy. LedgerEntry (Srvr)"
 {
-    // MM1.37/TSA/20190328  CASE 338215 Transport T0009 - 28 March 2019
-    // MM1.38/TSA /20190522 CASE 338215 Added Company Name, some adjustments
 
     Caption = 'Loyalty Server Store Ledger';
     DataClassification = CustomerContent;

@@ -1,7 +1,5 @@
 xmlport 6060138 "NPR MM Regret Member Timeframe"
 {
-    // MM1.26/TSA /20180219 CASE 305631 Initial Version
-    // MM1.28/TSA /20180419 CASE 303635 External Document No
 
     Caption = 'Change Membership';
     FormatEvaluate = Xml;

@@ -1,8 +1,5 @@
 table 6060147 "NPR MM POS Sales Info"
 {
-    // MM1.23/TSA /20171025 CASE 257011 Initial Version
-    // #334163/JDH /20181109 CASE 334163 Added caption to object
-    // MM1.36/NPKNAV/20190125  CASE 343948 Transport MM1.36 - 25 January 2019
 
     Caption = 'MM POS Sales Info';
     DataClassification = CustomerContent;

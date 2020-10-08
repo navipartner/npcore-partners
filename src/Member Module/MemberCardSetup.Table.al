@@ -1,6 +1,5 @@
 table 6059772 "NPR Member Card Setup"
 {
-    // NPR5.31/JLK /20170331  CASE 268274 Changed ENU Caption
 
     Caption = 'Point Card Properties';
     DataClassification = CustomerContent;

@@ -1,50 +1,5 @@
 codeunit 6060128 "NPR MM Member WebService"
 {
-    // MM1.00/TSA/20151217  CASE 229684 NaviPartner Member Management Module
-    // MM1.02/TSA/20151228  CASE 229684 Touch-up and enchancements
-    // MM1.03/TSA/20160107  CASE 231199 Filter by member only of member is used in search
-    // MM1.06/TSA/20160122  CASE 232674 Added webservice
-    // MM1.06/TSA/20160125  CASE 232910 Blocking memberships (and member account, card)
-    // MM1.08/TSA/20160219  CASE 232494 Slight refactor of the single member ticket create function to 2 separate functions
-    // MM1.08/TSA/20160219  CASE 232494 Added function for GetMembershipTicketList, IssueAndValidateMemberTicketBatch
-    // MM1.09/TSA/20160229  CASE 235805 Changed to Ticket Reservation handling in IssueTicket function
-    // MM1.11/TSA/20160427  CASE 239052 added ChangeMembership service
-    // MM1.14.01/MHA/20160726  CASE 242557 Magento reference updated according to NC2.00
-    // MM1.16/TSA/20160913  CASE 252216 Signature change on search function
-    // MM1.17/TSA/20161208  CASE 259671 Extended functionality for handling the start date of membership, signature change on IsMembershipActive
-    // MM1.17/TSA/20161208  CASE 259671 Changed member validation to accept unactivated memberships to be valid (but not activated)
-    // MM1.17/TSA/20161208  CASE 259671 Added Service ActivateMembership to explicitly activate a membership. Activation also occur on first use.
-    // MM1.17/TSA/20161208  CASE 259671 Relocated function TranslateBarcodeToItemVariant to codeunit MM Member Retail Integration
-    // MM1.19/TSA/20170328  CASE 270627 Changed response message to contain ticket information on success
-    // MM1.19/MMV /20170407 CASE 271789 Only delete filtered member capture records.
-    // MM1.19/TSA/20170419  CASE 272422 ResolveIdentifiers SOAP Action
-    // MM1.19/TSA/20170524  CASE GetMembershipTicketList message is always marked as success.
-    // MM1.21/TSA /20170720 CASE 284653 Implementing Member Card scan Limits
-    // MM1.22/TSA /20170823 CASE 287080 Added SOAP Action AddAnonymousMember()
-    // MM1.23/TSA /20171002 CASE 257011 Made a hard check on membershipentry being 0
-    // MM1.24/TSA /20171120 CASE 296437 Refactoring to get the first membercard number when only member is provided
-    // MM1.24/TSA /20171206 CASE 290599 Added ConfirmMembershipPayment service
-    // MM1.24/TSA /20171206 CASE 290599 Cleaned out old comments
-    // MM1.25/TSA /20180118 CASE 300256 Signature change
-    // MM1.26/TSA /20180209 CASE 304982 Missing filter
-    // MM1.26/TSA /20180219 CASE 305631 Added RegretMembershipTimeframe service
-    // MM1.26/TSA /20180219 CASE 305685 Added PrintMemberCard() service
-    // MM1.28/TSA /20180417 CASE 303635 (Adyen) Autorenew services
-    // MM1.29/TSA /20180517 CASE 313795 Set GDPR Approval service
-    // MM1.32/TSA /20180711 CASE 318132 Added PrintMemberCard option 3 - Wallet / NP Pass
-    // MM1.32/TSA /20180723 CASE 316468 Fixed a filtering issue for reusing tickets on member scan
-    // MM1.33/TSA /20180801 CASE 326756 Refactored IssueMemberTicketAndRegisterArrival() to use ticket API instead
-    // MM1.34/TSA /20180827 CASE 325803 Removed ResolveIdentifiers(), added ResolveMemberIdentifier()
-    // MM1.34/TSA /20180913 CASE 328141 Adding SOAP Action to sent the membercard as wallet pass
-    // MM1.35/TSA /20181023 CASE 333592 Added GetMembershipRoles()
-    // MM1.35/TSA /20181024 CASE 328141 Removed the dedicated SOAP Action, since it is same as option 3 in PrintMemberCard()
-    // MM1.36/TSA /20190110 CASE 328141 Added CreateWalletMemberPass()
-    // MM1.38/TSA /20190517 CASE 355234 Added ValidateNotificationToken(), ExpireNotificationToken(), GenerateNotificationToken()
-    // MM1.39/TSA /20190529 CASE 350968 Added GetSetAutoRenew
-    // MM1.42/TSA /20191231 CASE 382728 Added GetSetMemberCommunication service
-    // MM1.44/TSA /20200506 CASE 400429 Added BlockMember() action
-    // MM1.45/TSA/20200730  CASE 416671 Transport MM1.45 - 30 July 2020
-
 
     trigger OnRun()
     begin
@@ -336,10 +291,8 @@ codeunit 6060128 "NPR MM Member WebService"
             AnonymousMember.ClearResponse();
             AnonymousMember.AddResponse();
 
-            //-MM1.26 [304982]
             MemberInfoCapture.SetCurrentKey("Import Entry Document ID");
             MemberInfoCapture.SetFilter("Import Entry Document ID", '=%1', ImportEntry."Document ID");
-            //+MM1.26 [304982]
 
             MemberInfoCapture.DeleteAll();
 
@@ -474,7 +427,7 @@ codeunit 6060128 "NPR MM Member WebService"
         member.Export;
         ImportEntry.Modify(true);
 
-        Commit;
+        Commit();
     end;
 
     procedure UpdateMember(var member: XMLport "NPR MM Update Member"; ScannerStationId: Code[10])
@@ -579,7 +532,7 @@ codeunit 6060128 "NPR MM Member WebService"
         member.Export;
         ImportEntry.Modify(true);
 
-        Commit;
+        Commit();
     end;
 
     procedure BlockMember(var member: XMLport "NPR MM Block Membership Member"; ScannerStationId: Code[10])
@@ -590,7 +543,6 @@ codeunit 6060128 "NPR MM Member WebService"
         MemberInfoCapture: Record "NPR MM Member Info Capture";
     begin
 
-        //-MM1.44 [400429]
         member.Import();
 
         InsertImportEntry('BlockMember', ImportEntry);
@@ -623,8 +575,8 @@ codeunit 6060128 "NPR MM Member WebService"
         member.Export;
         ImportEntry.Modify(true);
 
-        Commit;
-        //+MM1.44 [400429]
+        Commit();
+
     end;
 
     procedure GetMembershipRoles(var roles: XMLport "NPR MM Get Member GDPR Roles")
@@ -635,7 +587,6 @@ codeunit 6060128 "NPR MM Member WebService"
         MemberInfoCapture: Record "NPR MM Member Info Capture";
     begin
 
-        //-MM1.35 [333592]õ
         roles.Import();
 
         InsertImportEntry('GetMembershipRoles', ImportEntry);
@@ -665,7 +616,7 @@ codeunit 6060128 "NPR MM Member WebService"
         end;
 
         Commit();
-        //+MM1.35 [333592]
+
     end;
 
     procedure GetSetGDPRApprovalState(var gdpr: XMLport "NPR MM GDPR GetSet Appr. State")
@@ -715,7 +666,6 @@ codeunit 6060128 "NPR MM Member WebService"
         MemberInfoCapture: Record "NPR MM Member Info Capture";
     begin
 
-        //-MM1.24 [290599]
         ConfirmMembershipPayment.Import();
 
         InsertImportEntry('ConfirmMembershipPayment', ImportEntry);
@@ -748,11 +698,8 @@ codeunit 6060128 "NPR MM Member WebService"
         ConfirmMembershipPayment.Export;
         ImportEntry.Modify(true);
 
-        Commit;
+        Commit();
 
-
-
-        //+MM1.24 [290599]
     end;
 
     procedure RegretMembershipTimeframe(var Membership: XMLport "NPR MM Regret Member Timeframe")
@@ -805,7 +752,6 @@ codeunit 6060128 "NPR MM Member WebService"
         EntryNo: Integer;
     begin
 
-        //-MM1.26 [305685]
         MemberCard.SetFilter("External Card No.", '=%1', ExternalMemberCardNo);
         if (not MemberCard.FindFirst()) then
             exit(false);
@@ -816,7 +762,6 @@ codeunit 6060128 "NPR MM Member WebService"
             2:
                 MembershipManagement.PrintOffline(MemberInfoCapture."Information Context"::PRINT_CARD, MemberCard."Entry No.");
 
-            //-MM1.32 [318132]
             3:
                 begin
                     EntryNo := MemberNotification.CreateWalletSendNotification(MemberCard."Membership Entry No.", MemberCard."Member Entry No.", MemberCard."Entry No.");
@@ -824,14 +769,13 @@ codeunit 6060128 "NPR MM Member WebService"
                         if (MembershipNotification."Processing Method" = MembershipNotification."Processing Method"::INLINE) then
                             MemberNotification.HandleMembershipNotification(MembershipNotification);
                 end;
-            //+MM1.32 [318132]
 
             else
                 Error('Print Directive 1: Print to Google printer, 2: Print to Offline Journal, 3: Wallet, print to NP Pass Server');
         end;
 
         exit(true);
-        //+MM1.26 [305685]
+
     end;
 
     procedure CreateWalletMemberPass(var CreateMemberPass: XMLport "NPR MM Create Wallet Mem. Pass")
@@ -878,7 +822,6 @@ codeunit 6060128 "NPR MM Member WebService"
         MembershipRole: Record "NPR MM Membership Role";
     begin
 
-        //-MM1.38 [355234]
         if (StrLen(Token) <> MaxStrLen(MembershipRole."Notification Token")) then
             exit(false);
 
@@ -891,7 +834,7 @@ codeunit 6060128 "NPR MM Member WebService"
         ExternalMemberNumber := MembershipRole."External Member No.";
 
         exit(true);
-        //+MM1.38 [355234]
+
     end;
 
     procedure ExpireNotificationToken(Token: Text[64])
@@ -899,7 +842,6 @@ codeunit 6060128 "NPR MM Member WebService"
         MembershipRole: Record "NPR MM Membership Role";
     begin
 
-        //-MM1.38 [355234]
         if (StrLen(Token) <> MaxStrLen(MembershipRole."Notification Token")) then
             exit;
 
@@ -909,7 +851,7 @@ codeunit 6060128 "NPR MM Member WebService"
 
         MembershipRole."Notification Token" := StrSubstNo('Token Expired at %1 %2', Today, Time);
         MembershipRole.Modify();
-        //+MM1.38 [355234]
+
     end;
 
     procedure GenerateNotificationToken(ExternalMembershipNumber: Code[20]; ExternalMemberNumber: Code[20]; var Token: Text[64]): Boolean
@@ -920,7 +862,6 @@ codeunit 6060128 "NPR MM Member WebService"
         MemberNotification: Codeunit "NPR MM Member Notification";
     begin
 
-        //-MM1.38 [355234]
         Membership.SetFilter("External Membership No.", '=%1', ExternalMembershipNumber);
         if (not Membership.FindFirst()) then
             exit(false);
@@ -936,7 +877,7 @@ codeunit 6060128 "NPR MM Member WebService"
         MembershipRole."Notification Token" := Token;
 
         exit(MembershipRole.Modify());
-        //+MM1.38 [355234]
+
     end;
 
     procedure GetSetComOptions(var GetSetMemberComOptions: XMLport "NPR MM Member Comm.")
@@ -953,8 +894,6 @@ codeunit 6060128 "NPR MM Member WebService"
         MembershipEntryNo: Integer;
         ResponseMessage: Text;
     begin
-
-        //-MM1.42 [382728]
 
         GetSetMemberComOptions.Import();
 
@@ -1020,7 +959,7 @@ codeunit 6060128 "NPR MM Member WebService"
         ImportEntry.Modify(true);
 
         Commit();
-        //+MM1.42 [382728]
+
     end;
 
     local procedure "--RecuringPayment"()
@@ -1128,7 +1067,6 @@ codeunit 6060128 "NPR MM Member WebService"
         MembershipEntryNo: Integer;
     begin
 
-        //-MM1.39 [350968]
         GetSetAutoRenew.Import();
 
         InsertImportEntry('GetSetAutoRenewOption', ImportEntry);
@@ -1156,7 +1094,7 @@ codeunit 6060128 "NPR MM Member WebService"
         ImportEntry.Modify(true);
 
         Commit();
-        //+MM1.39 [350968]
+
     end;
 
     local procedure "--Helper WS"()
@@ -1166,10 +1104,9 @@ codeunit 6060128 "NPR MM Member WebService"
     procedure ResolveMemberIdentifier(var MemberIdentifier: XMLport "NPR MM Member Identifier")
     begin
 
-        //-MM1.34 [325803]
         MemberIdentifier.Import();
         MemberIdentifier.CreateResult();
-        //+MM1.34 [325803]
+
     end;
 
     local procedure "--Locals"()
@@ -1181,10 +1118,8 @@ codeunit 6060128 "NPR MM Member WebService"
         MembershipMgr: Codeunit "NPR MM Membership Mgt.";
     begin
 
-        //-#292221 [292221]
         if (MembershipEntryNo = 0) then
             exit(false);
-        //+#292221 [292221]
 
         IsValid := MembershipMgr.IsMembershipActive(MembershipEntryNo, WorkDate, false);
         if (not IsValid) then
@@ -1210,7 +1145,6 @@ codeunit 6060128 "NPR MM Member WebService"
 
         MembershipEntryNo := MembershipMgr.GetMembershipFromExtMemberNo(ExternalMemberNo);
 
-        //-MM1.24 [296437]
         if (not Membership.Get(MembershipEntryNo)) then;
         if (not MembershipSetup.Get(Membership."Membership Code")) then;
         if (not Member.Get(MembershipMgr.GetMemberFromExtMemberNo(ExternalMemberNo))) then
@@ -1237,23 +1171,18 @@ codeunit 6060128 "NPR MM Member WebService"
         Success := 0;
         ResponseMessage := '';
 
-        //-#407401 [407401]
         LimitLogEntry := 0;
         MemberLimitationMgr.WS_CheckLimitMemberCardArrival(ExternalMemberCardNo, AdmissionCode, ScannerStationId, LimitLogEntry, ResponseMessage, Success); //MM1.21 [284653]
         if (Success <> 0) then
             exit(Success);
-        //+#407401 [407401]
-
 
         if (MembershipSetup."Ticket Item Barcode" <> '') then begin
 
-            //-MM1.33 [326756]
             // TicketRequestManager.LockResources ();
             Success := IssueMemberTicketAndRegisterArrival(MembershipSetup."Ticket Item Barcode", AdmissionCode, ScannerStationId, Member, ResponseMessage);
 
             // MemberLimitationMgr.WS_CheckLimitMemberCardArrival (ExternalMemberCardNo, AdmissionCode, ScannerStationId, ResponseMessage, Success); //MM1.21 [284653]
             // EXIT (Success);
-            //+MM1.33 [326756]
 
         end;
 
@@ -1279,12 +1208,11 @@ codeunit 6060128 "NPR MM Member WebService"
             exit(-1);
         end;
 
-        //-MM1.32 [316468]
         Ticket.SetCurrentKey("External Member Card No.");
         Ticket.SetFilter("Item No.", '=%1', ItemNo);
         Ticket.SetFilter("Variant Code", '=%1', VariantCode);
         Ticket.SetFilter("Document Date", '=%', Today);
-        //+MM1.32 [316468]
+
         Ticket.SetFilter("External Member Card No.", '=%1', Member."External Member No.");
         if (Ticket.FindLast()) then begin
             // IF (Ticket."Document Date" = TODAY) THEN BEGIN
@@ -1301,22 +1229,19 @@ codeunit 6060128 "NPR MM Member WebService"
             // END;
         end;
 
-        //-MM1.33 [326756]
         //ResponseCode := MemberRetailIntegration.IssueTicketFromMemberScan (FALSE, ItemNo, VariantCode, Member, TicketNo, ResponseMessage);
         //IF (ResponseCode <> 0) THEN
         //  EXIT (ResponseCode);
-        Commit;
+        Commit();
         if (not TicketMakeReservation(TicketItemNo, AdmissionCode, Member."External Member No.", ScannerStationId, Token, ResponseMessage)) then
             exit(-1);
 
-        Commit;
+        Commit();
 
         if not (TicketConfirmReservation(Token, ScannerStationId, TicketNo, ResponseMessage)) then
             exit(-1);
 
-        Commit;
-        //+MM1.33 [326756]
-
+        Commit();
 
         Ticket.Get(TicketNo);
         Success := TicketMgr.ValidateTicketForArrival(0, TicketNo, AdmissionCode, -1, false, ResponseMessage);
@@ -1380,7 +1305,7 @@ codeunit 6060128 "NPR MM Member WebService"
         CreateImportType('MEMBER-19', 'MemberManagement', 'GetSetMemberComOption');
         CreateImportType('MEMBER-20', 'MemberManagement', 'BlockMember');
 
-        Commit;
+        Commit();
     end;
 
     local procedure CreateImportType("Code": Code[20]; Description: Text[30]; FunctionName: Text[30])
@@ -1433,8 +1358,6 @@ codeunit 6060128 "NPR MM Member WebService"
         txtRead: Text;
     begin
 
-        //-MM1.33 [326756]
-
         xmltext :=
         '<?xml version="1.0" encoding="UTF-8" standalone="no"?>' +
         '<tickets xmlns="urn:microsoft-dynamics-nav/xmlports/x6060114">' +
@@ -1458,7 +1381,6 @@ codeunit 6060128 "NPR MM Member WebService"
 
         exit(ReservationStatus);
 
-        //+MM1.33 [326756]
     end;
 
     local procedure TicketConfirmReservation(Token: Text[100]; ScannerStation: Code[20]; var TicketNumber: Code[20]; var ResponseMessage: Text) ConfirmationStatus: Boolean
@@ -1472,8 +1394,6 @@ codeunit 6060128 "NPR MM Member WebService"
         TicketReservationResponse: Record "NPR TM Ticket Reserv. Resp.";
         Ticket: Record "NPR TM Ticket";
     begin
-
-        //-MM1.33 [326756]
 
         xmltext :=
         '<?xml version="1.0" encoding="UTF-8" standalone="no"?>' +
@@ -1512,9 +1432,8 @@ codeunit 6060128 "NPR MM Member WebService"
             end;
         end;
 
-
         exit(ConfirmationStatus);
-        //+MM1.33 [326756]
+
     end;
 }
 

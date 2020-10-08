@@ -1,6 +1,5 @@
 page 6151165 "NPR MM Members. Points Summary"
 {
-    // MM1.45/TSA /20200629 CASE 411768 Initial Version
 
     Caption = 'Membership Points Summary';
     DeleteAllowed = false;

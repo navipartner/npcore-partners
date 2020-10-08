@@ -1,11 +1,5 @@
 page 6060130 "NPR MM Member Card List"
 {
-    // MM1.07/TSA/20160203  CASE 233438 Member Management
-    // MM1.10/TSA/20130321  CASE 237176 Added flowfield company name
-    // MM1.15/TSA/20160817  CASE 238445 Transport MM1.15 - 19 July 2016
-    // MM1.18/TSA/20170220 CASE 266768 Added default filter to not show blocked entries
-    // MM1.21/TSA /20170721 CASE 284653 Added button "Arrival Log"
-    // MM1.22/TSA /20170911 CASE 284560 Added field Card Is Temporary
 
     Caption = 'Member Card List';
     DeleteAllowed = false;

@@ -1,16 +1,5 @@
 table 6060128 "NPR MM Membership Role"
 {
-    // MM1.00/TSA/20151217  CASE 229684 NaviPartner Member Management Module
-    // MM1.10/TSA/20160321  CASE 237176 Added flowfield company name
-    // MM1.18/TSA/20170302  CASE 265340 Added field contact no, the field on member shoul be deprecated
-    // MM1.19/TSA/20170525  CASE 278061 Handling issues reported by OMA
-    // MM1.22/TSA /20170816 CASE 287080 Added option Anonymous and field "Member Count", "Created At"
-    // MM1.22/TSA /20170818 CASE 279343 Cascade member block to contact
-    // MM1.22/TSA /20170904 CASE 276832 Added option Guardian to Role Type
-    // MM1.29/TSA /20180504 CASE 314131 Added fields for wallet
-    // MM1.29/TSA /20180522 CASE 313795 Added option Dependent to Role Type
-    // MM1.36/TSA /20181114 CASE 335667 Added function ReflectMembershipRoles()
-    // MM1.38/TSA /20190517 CASE 355234 Added Notification Token fiels, renamed "Password SHA1" to "Password Hash" and extended to 80
 
     Caption = 'Membership Role';
     DataClassification = CustomerContent;
@@ -54,12 +43,10 @@ table 6060128 "NPR MM Membership Role"
                     "Blocked By" := UserId;
                 end;
 
-                //-MM1.22 [279343]
                 if (Contact.Get(MembershipRole."Contact No.")) then begin
                     Contact.Validate("NPR Magento Contact", not Blocked);
                     Contact.Modify();
                 end;
-                //+MM1.22 [279343]
 
                 MembershipManagement.ReflectMembershipRoles(Rec."Membership Entry No.", Rec."Member Entry No.", Rec.Blocked);
             end;
@@ -160,20 +147,20 @@ table 6060128 "NPR MM Membership Role"
         {
             Caption = 'Wallet Pass Id';
             DataClassification = CustomerContent;
-            Description = '//-MM1.29 [314131]';
+            Description = '';
         }
         field(500; "GDPR Agreement No."; Code[20])
         {
             Caption = 'GDPR Agreement No.';
             DataClassification = CustomerContent;
-            Description = '//-MM1.29 [313795]';
+            Description = '';
             TableRelation = "NPR GDPR Agreement";
         }
         field(505; "GDPR Data Subject Id"; Text[35])
         {
             Caption = 'GDPR Data Subject Id';
             DataClassification = CustomerContent;
-            Description = '//-MM1.29 [313795]';
+            Description = '';
         }
         field(510; "GDPR Current Entry No."; Integer)
         {
@@ -182,7 +169,7 @@ table 6060128 "NPR MM Membership Role"
                                                                     "Agreement Version" = FIELD("GDPR Version Filter"),
                                                                     "Valid From Date" = FIELD("GDPR Date Filter")));
             Caption = 'GDPR Current Entry No.';
-            Description = '//-MM1.29 [313795]';
+            Description = '';
             Editable = false;
             FieldClass = FlowField;
         }
@@ -190,7 +177,7 @@ table 6060128 "NPR MM Membership Role"
         {
             CalcFormula = Lookup ("NPR GDPR Consent Log"."Entry Approval State" WHERE("Entry No." = FIELD("GDPR Current Entry No.")));
             Caption = 'GDPR Approval';
-            Description = '//-MM1.29 [313795]';
+            Description = '';
             Editable = false;
             FieldClass = FlowField;
             OptionCaption = ' ,Pending,Accepted,Rejected,Delegated to Guardian';
@@ -199,13 +186,13 @@ table 6060128 "NPR MM Membership Role"
         field(530; "GDPR Version Filter"; Integer)
         {
             Caption = 'GDPR Version Filter';
-            Description = '//-MM1.29 [313795]';
+            Description = '';
             FieldClass = FlowFilter;
         }
         field(540; "GDPR Date Filter"; Date)
         {
             Caption = 'GDPR Date Filter';
-            Description = '//-MM1.29 [313795]';
+            Description = '';
             FieldClass = FlowFilter;
         }
     }

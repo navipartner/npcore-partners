@@ -1,38 +1,5 @@
 table 6060134 "NPR MM Member Info Capture"
 {
-    // MM1.00/TSA/20151217  CASE 229684 NaviPartner Member Management Module
-    // MM1.02/TSA/20151228  CASE 229684 Touch-up and enchancements
-    // MM1.03/TSA/20160104  CASE 230647 - Added NewsLetter CRM option
-    // MM1.08/TSA/20160223  CASE 234913 - Include company name field on membership
-    // MM1.08/TSA/20160223  CASE 234592 - update of city from post code
-    // MM1.09/TSA/20160229 CASE 235805 Added support for Sales Context
-    // MM1.10/TSA/20160325 CASE 236532 Added the picture BLOB field
-    // MM1.11/TSA/20160502  CASE 233824 Transport MM1.11 - 29 April 2016
-    // MM1.12/TSA/20160503  CASE 240661 Added DAN Captions
-    // MM1.14/TSA/20160523  CASE 240871 Notification Service field 40
-    // MM1.15/TSA/20160615  CASE Bug fix Added field Description to capture a posting description
-    // MM1.15/TSA/20160718  CASE 242519 Bug fix - checking for duplicate external member card no on manual input
-    // MM1.15/TSA/20160810  CASE 248625 Added Field "imported"
-    // MM1.16/TSA/20160913  CASE 252216 Signature change on search function
-    // MM1.17/TSA/20161230  CASE 261216 Added field Replace External Card No.
-    // MM1.19/TSA/20170421  CASE 271971 Adding Key on Receipt No.,Line No.
-    // MM1.22/TSA /20170817 CASE 287080 Added field Quantity
-    // MM1.22/TSA /20170829 CASE 286922 Added field "Enable Auto-Renew", added context type AUTORENEW
-    // MM1.22/TSA /20170904 CASE 276832 Added Guardian External Member No.
-    // MM1.22/TSA /20170911 CASE 284560 Added field Temporary Member Card, Membership, Member
-    // MM1.22/TSA /20170913 CASE 286922 Added field Payment Method Code to filter out different payment methods for auto renew
-    // MM1.23/TSA /20171003 CASE 257011 Added Context FOREIGN, "Initial Loyalty Point Count"
-    // MM1.24/TSA /20171101 CASE 294950 Added Notification Method Manual
-    // MM1.25/TSA /20171213 CASE 299783 Added a few more Source Types
-    // MM1.25/TSA /20171215 CASE 299783 Added fields Response Status and Response Message to improve batch processing
-    // MM1.25/TSA /20180115 CASE 299537 Added Context types for printing
-    // MM1.26/TSA /20180122 CASE 301124 Removed Title Property
-    // MM1.29/TSA /20180511 CASE 313795 GDPR Approval Option field
-    // MM1.29.02/TSA /20180528 CASE 317156 Added SMS as notification option
-    // MM1.32/TSA /20180710 CASE 318132 Added field "Member Card Type" option
-    // MM1.40/TSA /20190730 CASE 360275 Added field "Auto-Admit Member"
-    // MM1.42/TSA /20191205 CASE 381222 Changed InitValue for Notification Method from EMAIL to new option DEFAULT
-    // MM1.43/TSA /20200130 CASE 386080 Added field Customer No and Contact No
 
     Caption = 'Member Info Capture';
     DataClassification = CustomerContent;

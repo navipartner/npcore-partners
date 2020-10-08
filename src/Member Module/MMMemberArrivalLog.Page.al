@@ -1,6 +1,5 @@
 page 6060088 "NPR MM Member Arrival Log"
 {
-    // MM1.21/TSA /20170721 CASE 284653 First Version
 
     Caption = 'Member Arrival Log';
     DeleteAllowed = false;

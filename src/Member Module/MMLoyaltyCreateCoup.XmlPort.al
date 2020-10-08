@@ -1,7 +1,5 @@
 xmlport 6060148 "NPR MM Loyalty Create Coup."
 {
-    // MM1.40/TSA /20190813 CASE 343352 Initial Version
-    // MM1.42/TSA /20191024 CASE 374403 Added documentno, documentdate
 
     Caption = 'Loyalty Create Coupon';
     FormatEvaluate = Xml;
@@ -222,7 +220,6 @@ xmlport 6060148 "NPR MM Loyalty Create Coup."
         Member: Record "NPR MM Member";
         MembershipRole: Record "NPR MM Membership Role";
     begin
-
 
         if (MembershipEntryNo <= 0) then begin
             AddErrorResponse('Invalid membership entry no.');

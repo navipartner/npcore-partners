@@ -1,12 +1,5 @@
 page 6060142 "NPR MM Member Notific. Setup"
 {
-    // MM1.14/TSA/20160523  CASE 240871 Reminder Service
-    // MM1.29/TSA /20180506 CASE 314131 Added field for wallet services
-    // MM1.29.02/TSA /20180528 CASE 317156 Refactored Default template, Added SMS Template action
-    // MM1.32/TSA/20180725  CASE 323333 Transport MM1.32 - 25 July 2018
-    // MM1.36/TSA /20181120 CASE 331590 Added Action "Refresh Renew Notification"
-    // MM1.40/TSA /20190722 CASE 362794 Removed RunCmdModal(), added RunProcess() to use interop
-    // MM1.44/TSA /20200416 CASE 400601 Added fields "Generate Magento PW URL", "Fallback Magento PW URL"
 
     Caption = 'Member Notification Setup';
     PageType = List;
@@ -170,7 +163,6 @@ page 6060142 "NPR MM Member Notific. Setup"
                     MembershipSetup: Record "NPR MM Membership Setup";
                 begin
 
-                    //-MM1.36 [331590]
                     TestField(Type, Type::RENEWAL);
                     if ("Membership Code" <> '') then begin
                         if (not Confirm(REFRESH_ALL_RENEW, true, Rec.FieldCaption("Membership Code"), "Membership Code")) then
@@ -189,7 +181,7 @@ page 6060142 "NPR MM Member Notific. Setup"
                                 MemberNotification.RefreshAllMembershipRenewalNotifications(MembershipSetup.Code);
                             until (MembershipSetup.Next() = 0);
                         end;
-                    //+MM1.36 [331590]
+
                 end;
             }
         }
@@ -222,7 +214,7 @@ page 6060142 "NPR MM Member Notific. Setup"
     begin
         CalcFields("PUT Passes Template");
         if (not "PUT Passes Template".HasValue()) then begin
-            //-+MM1.29.02 [317156] Create the default template for passes
+
             PassData := MemberNotification.GetDefaultTemplate();
             "PUT Passes Template".CreateOutStream(outstream);
             outstream.Write(PassData);
@@ -272,10 +264,9 @@ page 6060142 "NPR MM Member Notific. Setup"
         extra: Text[30];
     begin
 
-        //-MM1.40 [362794]
         // RunCmdModal('"notepad.exe" "'+ Path + '"');
         RunProcess(Path, '', true);
-        //+MM1.40 [362794]
+
     end;
 
     procedure RunProcess(Filename: Text; Arguments: Text; Modal: Boolean)
@@ -286,13 +277,11 @@ page 6060142 "NPR MM Member Notific. Setup"
         ProcessStartInfo: DotNet NPRNetProcessStartInfo;
     begin
 
-        //-#362783 [362783]
         ProcessStartInfo := ProcessStartInfo.ProcessStartInfo(Filename, Arguments);
         Process := Process.Start(ProcessStartInfo);
         if Modal then
             Process.WaitForExit();
 
-        //+#362783 [362783]
     end;
 }
 

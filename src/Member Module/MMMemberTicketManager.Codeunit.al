@@ -1,19 +1,5 @@
 codeunit 6060130 "NPR MM Member Ticket Manager"
 {
-    // MM1.00/TSA/20151217  CASE 229684 NaviPartner Member Management Module
-    // MM80.1.08/TSA/20160222  CASE 232494 Validating Member Assign Tickets in the self service ticket validation
-    // MM1.17/TSA/20161208  CASE 259671 Extended functionality for handling the start date of membership, signature change on IsMembershipActive
-    // MM1.36/TSA /20181119 CASE 335889 Fixed casting between external and internal item nos
-    // MM1.36/TSA /20181119 CASE 335889 Refactored, relocated PromptForMemberGuestArrival() and MemberFastCheckIn()
-    // MM1.37/TSA /20190327 CASE 350288 Signature Change
-    // MM1.40/TSA /20190812 CASE 364741 Signature Change
-    // MM1.41/TSA /20190906 CASE 367779 Signature Change to PromptForMemberGuestArrival() and MemberFastCheckIn() to include token used for ticket arrival
-    // MM1.41/TSA /20190910 CASE 368119 Refactored usage of "External Item Code"
-    // MM1.42/TSA /20191220 CASE 382728 Refactored usage of Notification Method
-    // MM1.43/TSA /20200214 CASE 391044 Incorrect table in BuildMemberGuestRequest ()
-    // MM1.43/TSA /20200302 CASE 337112 Printing of tickets from membercard scan
-    // MM1.43/TSA /20200305 CASE 337112 Removed green code
-
 
     trigger OnRun()
     begin
@@ -71,7 +57,6 @@ codeunit 6060130 "NPR MM Member Ticket Manager"
                 exit(false);
             Error(NO_MEMBER);
         end;
-
 
         MembershipEntryNo := MemberManagement.GetMembershipFromExtMemberNo(TmpTicketReservationRequest."External Member No.");
         if (not (MemberManagement.IsMembershipActive(MembershipEntryNo, WorkDate, true))) then begin
@@ -192,7 +177,7 @@ codeunit 6060130 "NPR MM Member Ticket Manager"
             exit;
 
         // Let user specify guest count for each ticket type
-        Commit;
+        Commit();
         TicketRequestMini.FillRequestTable(TmpTicketReservationRequest);
         TicketRequestMini.LookupMode(true);
         PageAction := TicketRequestMini.RunModal();
@@ -214,10 +199,10 @@ codeunit 6060130 "NPR MM Member Ticket Manager"
 
         if (TicketRequestManager.RevalidateRequestForTicketReuse(TmpTicketReservationRequest, ReusedToken, ResponseMessage)) then begin
             TicketToken := ReusedToken;
-            Commit;
-            //-MM1.43 [337112] Ticket print
+            Commit();
+
             PrintReusedGuestTickets(MembershipEntryNo, TmpTicketReservationRequest);
-            //+MM1.43 [337112]
+
             exit(true); // previously created tickets are reused.
         end;
 
@@ -255,7 +240,7 @@ codeunit 6060130 "NPR MM Member Ticket Manager"
             end;
         until (TmpTicketReservationRequest.Next() = 0);
 
-        Commit;
+        Commit();
         ResponseMessage := '';
 
         // Issue the tickets, validate, confirm and register arrival.
@@ -271,12 +256,10 @@ codeunit 6060130 "NPR MM Member Ticket Manager"
 
         TicketRequestManager.RegisterArrivalRequest(Token);
 
-        Commit;
+        Commit();
         TicketToken := Token;
 
-        //-MM1.43 [337112] Ticket print
         PrintGuestTicketBatch(MembershipEntryNo, Token);
-        //+MM1.43 [337112]
 
         exit(true);
     end;
@@ -305,11 +288,9 @@ codeunit 6060130 "NPR MM Member Ticket Manager"
         if (not Member.Get(MemberEntryNo)) then
             Error(ErrorReason);
 
-        //-MM1.43 [337112]
         MembershipEntryNo := MembershipManagement.GetMembershipFromExtCardNo(ExternalMemberCardNo, Today, ErrorReason);
         if (MembershipEntryNo = 0) then
             Error(ErrorReason);
-        //+MM1.43 [337112]
 
         if not (MemberRetailIntegration.TranslateBarcodeToItemVariant(ExternalItemNo, ItemNo, VariantCode, ResolvingTable)) then
             Error(MISSING_CROSSREF);
@@ -334,32 +315,31 @@ codeunit 6060130 "NPR MM Member Ticket Manager"
                                 ResponseCode := TicketManagement.ValidateTicketForArrival(0, Ticket."No.", AdmissionCode, -1, false, ErrorReason); // Reuse existing ticket (if possible)
                         end;
             until ((Ticket.Next() = 0) or (ResponseCode = 0));
-            //-MM1.43 [337112]
+
             if (ResponseCode = 0) then
                 TicketToPrint.Get(Ticket."No.");
             TicketToPrint.SetRecFilter();
-            //+MM1.43 [337112]
+
         end;
 
         // Create new ticket
         if (ResponseCode <> 0) then begin
             MemberRetailIntegration.IssueTicketFromMemberScan(true, ItemNo, VariantCode, Member, TicketNo, ErrorReason);
             TicketManagement.ValidateTicketForArrival(0, TicketNo, AdmissionCode, -1, true, ErrorReason);
-            //-MM1.43 [337112]
+
             TicketToPrint.Get(TicketNo);
             TicketToPrint.SetRecFilter();
-            //+MM1.43 [337112]
+
         end;
 
         Message(WELCOME, Member."Display Name");
 
-        //-MM1.43 [337112]
         if (TicketToPrint.GetFilters() <> '') then begin
             Membership.Get(MembershipEntryNo);
             MembershipSetup.Get(Membership."Membership Code");
             PrintTicket(MembershipSetup, TicketToPrint);
         end;
-        //-MM1.43 [337112]
+
     end;
 
     local procedure BuildMemberGuestRequest(MembershipEntryNo: Integer; MemberEntryNo: Integer; var TmpTicketReservationRequest: Record "NPR TM Ticket Reservation Req." temporary): Boolean
@@ -383,12 +363,11 @@ codeunit 6060130 "NPR MM Member Ticket Manager"
             ItemNo := MembershipAdmissionSetup."Ticket No.";
             VariantCode := '';
             if (MembershipAdmissionSetup."Ticket No. Type" = MembershipAdmissionSetup."Ticket No. Type"::ITEM_CROSS_REF) then
-                //-MM1.43 [337112]
+
                 //IF (NOT TicketRequestManager.TranslateBarcodeToItemVariant (ExternalItemNo, ItemNo, VariantCode, ResolvingTable)) THEN
                 //  ERROR ('Invalid Item Cross Reference barcode %1, it does not translate to an item / variant.', ItemNo);
                 if (not TicketRequestManager.TranslateBarcodeToItemVariant(MembershipAdmissionSetup."Ticket No.", ItemNo, VariantCode, ResolvingTable)) then
                     Error('Invalid Item Cross Reference barcode %1, it does not translate to an item / variant.', ItemNo);
-            //+MM1.43 [337112]
 
             PrefillTicketRequest(MemberEntryNo, MembershipEntryNo, ItemNo, VariantCode, MembershipAdmissionSetup."Admission Code", TmpTicketReservationRequest);
 
@@ -413,7 +392,6 @@ codeunit 6060130 "NPR MM Member Ticket Manager"
         Address: Text[200];
     begin
 
-        //-MM1.42 [382728]
         Admission.Get(AdmissionCode);
         Member.Get(MemberEntryNo);
 
@@ -447,7 +425,6 @@ codeunit 6060130 "NPR MM Member Ticket Manager"
 
         TmpTicketReservationRequest."External Member No." := Member."External Member No.";
 
-        //+MM1.42 [382728]
     end;
 
     local procedure PrintTicket(MembershipSetup: Record "NPR MM Membership Setup"; var Ticket: Record "NPR TM Ticket")
@@ -457,7 +434,6 @@ codeunit 6060130 "NPR MM Member Ticket Manager"
         ReportPrinterInterface: Codeunit "NPR Report Printer Interface";
         PrintTemplateMgt: Codeunit "NPR RP Template Mgt.";
     begin
-        //-MM1.43 [337112]
 
         case MembershipSetup."Ticket Print Object Type" of
             MembershipSetup."Ticket Print Object Type"::NO_PRINT:
@@ -479,7 +455,6 @@ codeunit 6060130 "NPR MM Member Ticket Manager"
                 Error(ILLEGAL_VALUE, MembershipSetup."Ticket Print Object Type", MembershipSetup.FieldCaption("Ticket Print Object Type"));
         end;
 
-        //+MM1.43 [337112]
     end;
 
     local procedure PrintGuestTicketBatch(MembershipEntryNo: Integer; RequestToken: Text[100])
@@ -490,7 +465,6 @@ codeunit 6060130 "NPR MM Member Ticket Manager"
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
     begin
 
-        //-MM1.43 [337112]
         Membership.Get(MembershipEntryNo);
         MembershipSetup.Get(Membership."Membership Code");
 
@@ -506,7 +480,7 @@ codeunit 6060130 "NPR MM Member Ticket Manager"
                     PrintTicket(MembershipSetup, Ticket);
             until (TicketReservationRequest.Next() = 0);
         end;
-        //+MM1.43 [337112]
+
     end;
 
     local procedure PrintReusedGuestTickets(MembershipEntryNo: Integer; var TmpTicketReservationRequest: Record "NPR TM Ticket Reservation Req." temporary)
@@ -516,7 +490,6 @@ codeunit 6060130 "NPR MM Member Ticket Manager"
         Ticket: Record "NPR TM Ticket";
     begin
 
-        //-MM1.43 [337112]
         Membership.Get(MembershipEntryNo);
         MembershipSetup.Get(Membership."Membership Code");
 
@@ -530,7 +503,7 @@ codeunit 6060130 "NPR MM Member Ticket Manager"
             if (not Ticket.IsEmpty()) then
                 PrintTicket(MembershipSetup, Ticket);
         until (TmpTicketReservationRequest.Next() = 0);
-        //+MM1.43 [337112]
+
     end;
 }
 

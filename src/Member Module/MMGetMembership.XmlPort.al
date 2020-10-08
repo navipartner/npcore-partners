@@ -1,16 +1,5 @@
 xmlport 6060129 "NPR MM Get Membership"
 {
-    // MM1.00/TSA/20151217  CASE 229684 NaviPartner Member Management Module
-    // MM1.06/TSA/20160127  CASE 232910 - Enchanced error handling when there is a runtime error processing the request
-    // MM1.08/TSA/20160219  CASE 234298 - Added valid to from contents
-    // MM1.14/TSA/20160524  CASE 239052 - Added customernumber as a search parameter
-    // MM1.18/TSA/20170207  CASE 265562 - Changed to XML format
-    // MM1.18/TSA/20170216  CASE 265729 - Added membercardinality and membercount
-    // MM1.22/TSA /20170818 CASE 287080 - Added details to member count attribute named and anonymous
-    // MM1.29/TSA /20180502 CASE 306121 - Added membership entry details to output
-    // MM1.40/TSA /20190827 CASE 360242 - Added support for Attributes
-    // MM1.42/TSA /20191121 CASE 378339 - Added descriptive names
-    // MM1.44/TSA /20200420 CASE 400649 - Added loyalty program information
 
     Caption = 'Get Membership';
     FormatEvaluate = Xml;
@@ -148,11 +137,10 @@ xmlport 6060129 "NPR MM Get Membership"
                                         NPRAttribute: Record "NPR Attribute";
                                     begin
 
-                                        //-MM1.42 [378339]
                                         AttributeName := '';
                                         if (NPRAttribute.Get(TmpAttributeValueSet."Attribute Code")) then
                                             AttributeName := NPRAttribute.Name;
-                                        //+MM1.42 [378339]
+
                                     end;
                                 }
                                 fieldattribute(value; TmpAttributeValueSet."Text Value")
@@ -183,7 +171,6 @@ xmlport 6060129 "NPR MM Get Membership"
                                     trigger OnBeforePassVariable()
                                     begin
 
-                                        //-MM1.42 [378339]
                                         case TmpMembershipEntry.Context of
                                             TmpMembershipEntry.Context::NEW:
                                                 ContextName := 'New';
@@ -202,7 +189,7 @@ xmlport 6060129 "NPR MM Get Membership"
                                             TmpMembershipEntry.Context::UPGRADE:
                                                 ContextName := 'Upgrade';
                                         end;
-                                        //+MM1.42 [378339]
+
                                     end;
                                 }
                             }
@@ -285,37 +272,29 @@ xmlport 6060129 "NPR MM Get Membership"
         tmpMembershipResponse.TransferFields(Membership, true);
         if (tmpMembershipResponse.Insert()) then;
 
-
         MembershipSetup.Get(Membership."Membership Code");
         MemberCardinality := Format(MembershipSetup."Membership Member Cardinality");
 
-        //-MM1.42 [378339]
         MemberCommunity.Get(Membership."Community Code");
         CommunityName := MemberCommunity.Description;
         MembershipName := MembershipSetup.Description;
-        //-MM1.42 [378339]
 
-        //-MM1.44 [400649]
         if (MemberCommunity."Activate Loyalty Program") then begin
             if (LoyaltySetup.Get(MembershipSetup."Loyalty Code")) then begin
                 LoyaltyCode := LoyaltySetup.Code;
                 LoyaltyName := LoyaltySetup.Description;
             end;
         end;
-        //+MM1.44 [400649]
 
-        //-MM1.22 [287080]
-        // MembershipRole.SETFILTER ("Membership Entry No.", '=%1', MembershipEntryNo);
-        // MembershipRole.SETFILTER (Blocked, '=%1', FALSE);
+        // MembershipRole.SetFilter ("Membership Entry No.", '=%1', MembershipEntryNo);
+        // MembershipRole.SetFilter (Blocked, '=%1', FALSE);
         // MemberCount := FORMAT (MembershipRole.COUNT ());
 
         MembershipManagement.GetMemberCount(MembershipEntryNo, AdminMemberCount, NamedMemberCount, AnonMemberCount);
         NamedMemberCountText := Format(AdminMemberCount + NamedMemberCount, 0, 9);
         AnonMemberCountText := Format(AnonMemberCount, 0, 9);
         TotalMemberCountText := Format(AdminMemberCount + NamedMemberCount + AnonMemberCount, 0, 9);
-        //+MM1.22 [287080]
 
-        //-MM1.29 [306121]
         MembershipEntry.SetFilter("Membership Entry No.", '=%1', MembershipEntryNo);
         if (MembershipEntry.FindSet()) then begin
             repeat
@@ -323,9 +302,7 @@ xmlport 6060129 "NPR MM Get Membership"
                 TmpMembershipEntry.Insert();
             until (MembershipEntry.Next() = 0);
         end;
-        //+MM1.29 [306121]
 
-        //-MM1.40 [360242]
         TmpAttributeValueSet.DeleteAll();
         NPRAttributeKey.SetFilter("Table ID", '=%1', DATABASE::"NPR MM Membership");
         NPRAttributeKey.SetFilter("MDR Code PK", '=%1', Format(MembershipEntryNo, 0, '<integer>'));
@@ -338,7 +315,7 @@ xmlport 6060129 "NPR MM Get Membership"
                 until (NPRAttributeValueSet.Next() = 0);
             end;
         end;
-        //+MM1.40 [360242]
+
     end;
 
     procedure AddErrorResponse(ErrorMessage: Text)

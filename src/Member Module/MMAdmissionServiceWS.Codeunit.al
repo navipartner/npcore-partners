@@ -1,14 +1,5 @@
 codeunit 6060093 "NPR MM Admission Service WS"
 {
-    // NPR5.31/NPKNAV/20170502  CASE 263737 Transport NPR5.31 - 2 May 2017
-    // NPR5.41/CLVA  /20180419  CASE 303493 Added function ValidateConnection
-    // NPR5.43/CLVA  /20180612  CASE 318579 Added function GetTurnstileImages and GetImageContentAndExtension
-    // NPR5.43/CLVA  /20180627  CASE 318579 Added extra info to MM Admission Service Entry. Added upgraded function GuestArrivalV2 to support additional info on the login screen/display name
-    // NPR5.44/NPKNAV/20180727  CASE 318579-01 Transport NPR5.44 - 27 July 2018
-    // NPR5.54/CLVA  /20200316  CASE 364422 Added function GuestValidationV2
-    // NPR5.55/CLVA  /20200608  CASE 402284 Added "Admission Code" validation and SELECTLATESTVERSION
-    // NPR5.55/JAKUBV/20200807  CASE 402284 Transport NPR5.55 - 31 July 2020
-
 
     trigger OnRun()
     var
@@ -22,7 +13,7 @@ codeunit 6060093 "NPR MM Admission Service WS"
             WebService."Service Name" := 'admission_service';
             WebService."Object ID" := 6060093;
             WebService.Published := true;
-            WebService.Insert;
+            WebService.Insert();
         end;
     end;
 
@@ -57,9 +48,8 @@ codeunit 6060093 "NPR MM Admission Service WS"
         AdmissionCode: Code[20];
         MMAdmissionScannerStations: Record "NPR MM Admis. Scanner Stations";
     begin
-        //-NPR5.55 [402284]
+
         SelectLatestVersion;
-        //+NPR5.55 [402284]
 
         MMAdmissionServiceLog.Init;
         MMAdmissionServiceLog.Action := MMAdmissionServiceLog.Action::"Guest Validation";
@@ -77,7 +67,7 @@ codeunit 6060093 "NPR MM Admission Service WS"
 
         MMAdmissionServiceLog."Entry No." := MMAdmissionServiceEntry."Entry No.";
         MMAdmissionServiceLog.Modify(true);
-        Commit;
+        Commit();
 
         No := '';
         Token := '';
@@ -97,11 +87,9 @@ codeunit 6060093 "NPR MM Admission Service WS"
             DataError := true;
         end;
 
-        //-NPR5.55 [402284]
         AdmissionCode := '';
         if MMAdmissionScannerStations.Get(ScannerStationId) then
             AdmissionCode := MMAdmissionScannerStations."Admission Code";
-        //+NPR5.55 [402284]
 
         if not DataError then begin
             if MMAdmissionServiceSetup."Validate Members" and not AdmissionIsValid then begin
@@ -125,13 +113,11 @@ codeunit 6060093 "NPR MM Admission Service WS"
                             MMAdmissionServiceEntry."External Membership No." := MemberCard."External Membership No.";
                             MMAdmissionServiceEntry."Display Name" := Member."Display Name";
 
-                            //-NPR5.43 [318579]
                             if MMMembership.Get(MemberCard."Membership Entry No.") then begin
                                 MMAdmissionServiceEntry."Membership Code" := MMMembership."Membership Code";
                                 if MMMembershipSetup.Get(MMMembership."Membership Code") then
                                     MMAdmissionServiceEntry."Membership Description" := MMMembershipSetup.Description;
                             end;
-                            //+NPR5.43 [318579]
 
                             AdmissionIsValid := true;
                         end;
@@ -139,10 +125,9 @@ codeunit 6060093 "NPR MM Admission Service WS"
                 end;
             end;
             if MMAdmissionServiceSetup."Validate Tickes" and not AdmissionIsValid then begin
-                //-NPR5.55 [402284]
+
                 //IF TMTicketWebService.ValidateTicketArrival('',Barcode,ScannerStationId,MessageText) THEN BEGIN
                 if TMTicketWebService.ValidateTicketArrival(AdmissionCode, Barcode, ScannerStationId, MessageText) then begin
-                    //+NPR5.55 [402284]
 
                     MMAdmissionServiceLog."Response No" := Barcode;
                     MMAdmissionServiceLog."Response Token" := CreateToken();
@@ -161,7 +146,6 @@ codeunit 6060093 "NPR MM Admission Service WS"
                     MMAdmissionServiceEntry."External Ticket No." := TMTicket."External Ticket No.";
                     MMAdmissionServiceEntry."External Card No." := TMTicket."External Member Card No.";
 
-                    //-NPR5.44 [318579]
                     //      IF TMTicketType.GET(TMTicket."Ticket Type Code") THEN BEGIN
                     //        MMAdmissionServiceEntry."Ticket Type Code" := TMTicketType.Code;
                     //        MMAdmissionServiceEntry."Ticket Type Description" := TMTicketType.Description;
@@ -174,7 +158,6 @@ codeunit 6060093 "NPR MM Admission Service WS"
                             MMAdmissionServiceEntry."Ticket Type Description" := Item.Description;
                         //MMAdmissionServiceEntry."Ticket Type Description" := Item.Description;
                     end;
-                    //+NPR5.44 [318579]
 
                     MemberCard.SetCurrentKey("External Card No.");
                     MemberCard.SetRange("External Card No.", MMAdmissionServiceEntry."External Card No.");
@@ -228,7 +211,7 @@ codeunit 6060093 "NPR MM Admission Service WS"
         MMAdmissionServiceLog.Key := No;
         MMAdmissionServiceLog.Token := Token;
         MMAdmissionServiceLog.Modify(true);
-        Commit;
+        Commit();
 
         exit(MMAdmissionServiceLog."Return Value");
     end;
@@ -256,7 +239,7 @@ codeunit 6060093 "NPR MM Admission Service WS"
         MMAdmissionServiceLog."Request Scanner Station Id" := MMAdmissionServiceLog."Scanner Station Id";
         MMAdmissionServiceLog."Created Date" := CurrentDateTime;
         MMAdmissionServiceLog.Insert(true);
-        Commit;
+        Commit();
 
         Name := '';
         PictureBase64 := '';
@@ -342,7 +325,7 @@ codeunit 6060093 "NPR MM Admission Service WS"
         MMAdmissionServiceLog."Return Value" := (DataError <> true);
         MMAdmissionServiceLog."Response PictureBase64" := (PictureBase64 <> '');
         MMAdmissionServiceLog.Modify(true);
-        Commit;
+        Commit();
 
         exit(MMAdmissionServiceLog."Return Value");
     end;
@@ -370,7 +353,7 @@ codeunit 6060093 "NPR MM Admission Service WS"
         MMAdmissionServiceLog."Request Scanner Station Id" := MMAdmissionServiceLog."Scanner Station Id";
         MMAdmissionServiceLog."Created Date" := CurrentDateTime;
         MMAdmissionServiceLog.Insert(true);
-        Commit;
+        Commit();
 
         Name := '';
         PictureBase64 := '';
@@ -467,7 +450,7 @@ codeunit 6060093 "NPR MM Admission Service WS"
         MMAdmissionServiceLog."Return Value" := (DataError <> true);
         MMAdmissionServiceLog."Response PictureBase64" := (PictureBase64 <> '');
         MMAdmissionServiceLog.Modify(true);
-        Commit;
+        Commit();
 
         exit(MMAdmissionServiceLog."Return Value");
     end;
@@ -665,9 +648,8 @@ codeunit 6060093 "NPR MM Admission Service WS"
         AdmissionCode: Code[20];
         MMAdmissionScannerStations: Record "NPR MM Admis. Scanner Stations";
     begin
-        //-NPR5.55 [402284]
+
         SelectLatestVersion;
-        //+NPR5.55 [402284]
 
         MMAdmissionServiceLog.Init;
         MMAdmissionServiceLog.Action := MMAdmissionServiceLog.Action::"Guest Validation";
@@ -685,7 +667,7 @@ codeunit 6060093 "NPR MM Admission Service WS"
 
         MMAdmissionServiceLog."Entry No." := MMAdmissionServiceEntry."Entry No.";
         MMAdmissionServiceLog.Modify(true);
-        Commit;
+        Commit();
 
         No := '';
         Token := '';
@@ -707,11 +689,9 @@ codeunit 6060093 "NPR MM Admission Service WS"
             DataError := true;
         end;
 
-        //-NPR5.55 [402284]
         AdmissionCode := '';
         if MMAdmissionScannerStations.Get(ScannerStationId) then
             AdmissionCode := MMAdmissionScannerStations."Admission Code";
-        //+NPR5.55 [402284]
 
         if not DataError then begin
             if MMAdmissionServiceSetup."Validate Members" and not AdmissionIsValid then begin
@@ -735,13 +715,11 @@ codeunit 6060093 "NPR MM Admission Service WS"
                             MMAdmissionServiceEntry."External Membership No." := MemberCard."External Membership No.";
                             MMAdmissionServiceEntry."Display Name" := Member."Display Name";
 
-                            //-NPR5.43 [318579]
                             if MMMembership.Get(MemberCard."Membership Entry No.") then begin
                                 MMAdmissionServiceEntry."Membership Code" := MMMembership."Membership Code";
                                 if MMMembershipSetup.Get(MMMembership."Membership Code") then
                                     MMAdmissionServiceEntry."Membership Description" := MMMembershipSetup.Description;
                             end;
-                            //+NPR5.43 [318579]
 
                             AdmissionIsValid := true;
                             LightColor := '2';
@@ -750,10 +728,9 @@ codeunit 6060093 "NPR MM Admission Service WS"
                 end;
             end;
             if MMAdmissionServiceSetup."Validate Tickes" and not AdmissionIsValid then begin
-                //-NPR5.55 [402284]
+
                 //IF TMTicketWebService.ValidateTicketArrival('',Barcode,ScannerStationId,MessageText) THEN BEGIN
                 if TMTicketWebService.ValidateTicketArrival(AdmissionCode, Barcode, ScannerStationId, MessageText) then begin
-                    //+NPR5.55 [402284]
 
                     MMAdmissionServiceLog."Response No" := Barcode;
                     MMAdmissionServiceLog."Response Token" := CreateToken();
@@ -772,7 +749,6 @@ codeunit 6060093 "NPR MM Admission Service WS"
                     MMAdmissionServiceEntry."External Ticket No." := TMTicket."External Ticket No.";
                     MMAdmissionServiceEntry."External Card No." := TMTicket."External Member Card No.";
 
-                    //-NPR5.44 [318579]
                     //      IF TMTicketType.GET(TMTicket."Ticket Type Code") THEN BEGIN
                     //        MMAdmissionServiceEntry."Ticket Type Code" := TMTicketType.Code;
                     //        MMAdmissionServiceEntry."Ticket Type Description" := TMTicketType.Description;
@@ -785,7 +761,6 @@ codeunit 6060093 "NPR MM Admission Service WS"
                             MMAdmissionServiceEntry."Ticket Type Description" := Item.Description;
                         //MMAdmissionServiceEntry."Ticket Type Description" := Item.Description;
                     end;
-                    //+NPR5.44 [318579]
 
                     MemberCard.SetCurrentKey("External Card No.");
                     MemberCard.SetRange("External Card No.", MMAdmissionServiceEntry."External Card No.");
@@ -840,7 +815,7 @@ codeunit 6060093 "NPR MM Admission Service WS"
         MMAdmissionServiceLog.Key := No;
         MMAdmissionServiceLog.Token := Token;
         MMAdmissionServiceLog.Modify(true);
-        Commit;
+        Commit();
 
         exit(MMAdmissionServiceLog."Return Value");
     end;

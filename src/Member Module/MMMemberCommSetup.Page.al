@@ -1,6 +1,5 @@
 page 6151187 "NPR MM Member Comm. Setup"
 {
-    // MM1.42/TSA /20191219 CASE 382728 Initial Version
 
     Caption = 'Member Communication Setup';
     PageType = List;

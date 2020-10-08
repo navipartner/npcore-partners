@@ -1,11 +1,5 @@
 codeunit 6151161 "NPR MM Loy. Point Mgr (Server)"
 {
-    // MM1.37/TSA /20190204 CASE 338215 Initial Version
-    // MM1.38/TSA /20190523 CASE 338215 Added GetLoyaltyConfiguration
-    // MM1.40/TSA /20190819 CASE 365517 Fixing version difference for how deleteall() starts a transaction when table is empty.
-    // MM1.42/TSA /20191125 CASE 371694 Added post point assignment invokation
-    // MM1.42/TSA /20191127 CASE 371694 Added Template Type selection (General / Intercompnay)
-
 
     trigger OnRun()
     begin
@@ -97,9 +91,7 @@ codeunit 6151161 "NPR MM Loy. Point Mgr (Server)"
         LoyaltyStoreLedger.Balance := Membership."Remaining Points";
         LoyaltyStoreLedger.Insert();
 
-        //-MM1.42 [371694]
         LoyaltyPointManagement.AfterMembershipPointsUpdate(Membership."Entry No.", 0);
-        //+MM1.42 [371694]
 
         TmpPointsOut.TransferFields(LoyaltyStoreLedger, true);
         TmpPointsOut.Insert();
@@ -151,9 +143,7 @@ codeunit 6151161 "NPR MM Loy. Point Mgr (Server)"
         LoyaltyStoreLedger.Balance := Membership."Remaining Points";
         LoyaltyStoreLedger.Insert();
 
-        //-MM1.42 [371694]
         LoyaltyPointManagement.AfterMembershipPointsUpdate(Membership."Entry No.", 0);
-        //+MM1.42 [371694]
 
         TmpPointsOut.TransferFields(LoyaltyStoreLedger, true);
         TmpPointsOut.Insert();
@@ -169,7 +159,6 @@ codeunit 6151161 "NPR MM Loy. Point Mgr (Server)"
         MembershipEntryNo: Integer;
     begin
 
-        //-MM1.38 [338215]
         if (not ValidateAuthorizarion(true, TmpAuthorizationIn, MembershipEntryNo, ResponseMessage, ResponseMessageId)) then
             exit(false);
 
@@ -186,7 +175,7 @@ codeunit 6151161 "NPR MM Loy. Point Mgr (Server)"
         TmpLoyaltySetup.TransferFields(LoyaltySetup, true);
         TmpLoyaltySetup.Insert();
         exit(true);
-        //+MM1.38 [338215]
+
     end;
 
     local procedure ValidateAuthorizarion(BasicCheck: Boolean; var TmpAuthorizationIn: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary; var MembershipEntryNo: Integer; var ResponseMessage: Text; var ResponseMessageId: Text): Boolean
@@ -232,7 +221,6 @@ codeunit 6151161 "NPR MM Loy. Point Mgr (Server)"
         if ((BasicCheck) and (TmpAuthorizationIn."Transaction Date" = 0D)) then
             TmpAuthorizationIn."Transaction Date" := Today;
 
-        //-MM1.38 [338215] reorganized validation order
         //IF ((TmpAuthorizationIn."Transaction Date" = 0D) OR (TmpAuthorizationIn."Transaction Date" > TODAY)) THEN BEGIN
         if (TmpAuthorizationIn."Transaction Date" = 0D) then begin
             ResponseMessage := E1104_DATE_INCORRECT;
@@ -273,8 +261,6 @@ codeunit 6151161 "NPR MM Loy. Point Mgr (Server)"
 
         if (BasicCheck) then
             exit(true);
-
-        //+MM1.38 [338215]
 
         if (TmpAuthorizationIn."Reference Number" = '') then begin
             ResponseMessage := E1103_RECEIPT_INCORRECT;
@@ -732,8 +718,7 @@ codeunit 6151161 "NPR MM Loy. Point Mgr (Server)"
         JnlType: Option;
     begin
 
-        //-MM1.42 [371694]
-        // GenJournalBatch.SETFILTER ("Template Type", '=%1', GenJournalBatch."Template Type"::General);
+        // GenJournalBatch.SetFilter ("Template Type", '=%1', GenJournalBatch."Template Type"::General);
         JnlType := StrMenu(StrSubstNo('%1,%2', Format(GenJournalBatch."Template Type"::General), Format(GenJournalBatch."Template Type"::Intercompany)), 1, SELECT_JNL_TYPE);
         case JnlType of
             1:
@@ -743,19 +728,17 @@ codeunit 6151161 "NPR MM Loy. Point Mgr (Server)"
             else
                 Error('');
         end;
-        //+MM1.42 [371694]
 
         GenJournalBatch.SetFilter(Recurring, '=%1', false);
         GenJournalBatch.FindFirst();
 
-        //-MM1.40 [365517]
-        // GenJournalLine.SETFILTER ("Journal Template Name", '=%1', GenJournalBatch."Journal Template Name");
-        // GenJournalLine.SETFILTER ("Journal Batch Name", '=%1', GenJournalBatch.Name);
-        // IF (NOT GenJournalLine.ISEMPTY ()) THEN
+        // GenJournalLine.SetFilter ("Journal Template Name", '=%1', GenJournalBatch."Journal Template Name");
+        // GenJournalLine.SetFilter ("Journal Batch Name", '=%1', GenJournalBatch.Name);
+        // IF (NOT GenJournalLine.IsEmpty ()) THEN
         //  IF (NOT CONFIRM (JNL_NOT_EMPTY, FALSE, GenJournalBatch."Journal Template Name", GenJournalBatch.Name)) THEN
         //    ERROR ('');
         //
-        // GenJournalLine.DELETEALL ();
+        // GenJournalLine.DeleteALL ();
         //
         // IF (GenJournalBatch."No. Series" <> '') THEN BEGIN
         //  DocumentNo := NoSeriesManagement.TryGetNextNo (GenJournalBatch."No. Series", WORKDATE);
@@ -774,7 +757,6 @@ codeunit 6151161 "NPR MM Loy. Point Mgr (Server)"
 
             GenJournalLine.DeleteAll();
         end;
-        //+MM1.40 [365517]
 
         LoyaltyStoreSetup.FindSet();
         repeat
@@ -795,8 +777,7 @@ codeunit 6151161 "NPR MM Loy. Point Mgr (Server)"
         JnlType: Option;
     begin
 
-        //-MM1.42 [371694]
-        // GenJournalBatch.SETFILTER ("Template Type", '=%1', GenJournalBatch."Template Type"::General);
+        // GenJournalBatch.SetFilter ("Template Type", '=%1', GenJournalBatch."Template Type"::General);
         JnlType := StrMenu(StrSubstNo('%1,%2', Format(GenJournalBatch."Template Type"::General), Format(GenJournalBatch."Template Type"::Intercompany)), 1, SELECT_JNL_TYPE);
         case JnlType of
             1:
@@ -806,19 +787,17 @@ codeunit 6151161 "NPR MM Loy. Point Mgr (Server)"
             else
                 Error('');
         end;
-        //+MM1.42 [371694]
 
         GenJournalBatch.SetFilter(Recurring, '=%1', false);
         GenJournalBatch.FindFirst();
 
-        //-MM1.40 [365517]
-        // GenJournalLine.SETFILTER ("Journal Template Name", '=%1', GenJournalBatch."Journal Template Name");
-        // GenJournalLine.SETFILTER ("Journal Batch Name", '=%1', GenJournalBatch.Name);
-        // IF (NOT GenJournalLine.ISEMPTY ()) THEN
+        // GenJournalLine.SetFilter ("Journal Template Name", '=%1', GenJournalBatch."Journal Template Name");
+        // GenJournalLine.SetFilter ("Journal Batch Name", '=%1', GenJournalBatch.Name);
+        // IF (NOT GenJournalLine.IsEmpty ()) THEN
         //  IF (NOT CONFIRM (JNL_NOT_EMPTY, FALSE, GenJournalBatch."Journal Template Name", GenJournalBatch.Name)) THEN
         //    ERROR ('');
         //
-        // GenJournalLine.DELETEALL ();
+        // GenJournalLine.DeleteALL ();
         //
         // IF (GenJournalBatch."No. Series" <> '') THEN BEGIN
         //  DocumentNo := NoSeriesManagement.TryGetNextNo (GenJournalBatch."No. Series", WORKDATE);
@@ -837,7 +816,6 @@ codeunit 6151161 "NPR MM Loy. Point Mgr (Server)"
 
             GenJournalLine.DeleteAll();
         end;
-        //+MM1.40 [365517]
 
         InvoiceStoreWorker(GenJournalBatch."Journal Template Name", GenJournalBatch.Name, DocumentNo, LoyaltyStoreSetup);
 
@@ -931,26 +909,26 @@ codeunit 6151161 "NPR MM Loy. Point Mgr (Server)"
         //  DocumentNo,
         //  GenJournalLine."Document Type"::Invoice,
         //  LoyaltyStoreSetup."Customer No.",
-        //  STRSUBSTNO ('Earn ..%1, points: %2', UntilDate, EarnPoints),
+        //  StrSubstNo ('Earn ..%1, points: %2', UntilDate, EarnPoints),
         //  PostingBurnCurrencyCode, // Note: the earned points are projected and valued in burn exchange rate when realized.
         //  PostingEarnAmount,
         //  LoyaltyStoreSetup."G/L Account",
         //  InvoiceNo);
         // IF (PostingEarnAmount <> 0) THEN
-        //  GenJournalLine.INSERT (TRUE);
+        //  GenJournalLine.Insert (TRUE);
         //
         // MakeJournalLine (GenJournalLine,
         //  UntilDate,
         //  DocumentNo,
         //  GenJournalLine."Document Type"::"Credit Memo",
         //  LoyaltyStoreSetup."Customer No.",
-        //  STRSUBSTNO ('Burn ..%1, points: %2', UntilDate, BurnPoints),
+        //  StrSubstNo ('Burn ..%1, points: %2', UntilDate, BurnPoints),
         //  PostingBurnCurrencyCode,
         //  PostingBurnAmount,
         //  LoyaltyStoreSetup."G/L Account",
         //  InvoiceNo);
         // IF (PostingBurnAmount <> 0) THEN
-        //  GenJournalLine.INSERT (TRUE);
+        //  GenJournalLine.Insert (TRUE);
     end;
 
     local procedure MakeJournalLine(var GenJournalLine: Record "Gen. Journal Line"; PostingDate: Date; DocumentNo: Code[20]; DocType: Enum "Gen. Journal Document Type"; AccNo: Code[20]; Description: Text[50]; CurrencyCode: Code[10]; AmountToPost: Decimal; BalanceGLAccont: Code[20]; InvoiceNo: Code[20])

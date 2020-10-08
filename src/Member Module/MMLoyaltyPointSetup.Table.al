@@ -1,10 +1,5 @@
 table 6060141 "NPR MM Loyalty Point Setup"
 {
-    // MM1.17/TSA/20161214  CASE 243075 Member Point System
-    // MM1.22/TSA /20170731 CASE 285403 Added table relation and renamed field 30 to Coupon Type Code
-    // MM1.28/TSA /20180426 CASE 307048 Added field to handle Dynamic Coupon Values
-    // MM1.32/TSA /20180713 CASE 321176 Added some coupon lookup fields required for UI selection
-    // MM1.37/TSA /20190227 CASE 343053 Expire points - added field "Consume Available Points"
 
     Caption = 'Loyalty Points Setup';
     DataClassification = CustomerContent;

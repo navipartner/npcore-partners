@@ -1,8 +1,5 @@
 codeunit 6151162 "NPR MM Loy. Point PSP (Client)"
 {
-    // #341237/TSA /20190211 CASE 341237 Initial Version
-    // MM1.38/TSA/20190527  CASE 338215-01 Transport MM1.38 - 27 May 2019
-
 
     trigger OnRun()
     begin
@@ -30,7 +27,7 @@ codeunit 6151162 "NPR MM Loy. Point PSP (Client)"
         tmpEFTIntegrationType.Code := IntegrationName();
         tmpEFTIntegrationType.Description := Description;
         tmpEFTIntegrationType."Codeunit ID" := CODEUNIT::"NPR MM Loy. Point PSP (Client)";
-        tmpEFTIntegrationType.Insert;
+        tmpEFTIntegrationType.Insert();
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnCreatePaymentOfGoodsRequest', '', false, false)]
@@ -102,9 +99,9 @@ codeunit 6151162 "NPR MM Loy. Point PSP (Client)"
 
         // CreateGenericRequest(EftTransactionRequest);
         // EftTransactionRequest.Recoverable := TRUE;
-        // EftTransactionRequest.INSERT(TRUE);
+        // EftTransactionRequest.Insert(TRUE);
         // EftTransactionRequest."Reference Number Input" := FORMAT(EftTransactionRequest."Entry No.");
-        // EftTransactionRequest.MODIFY(TRUE);
+        // EftTransactionRequest.Modify(TRUE);
 
         Message('VOID');
     end;
@@ -143,7 +140,6 @@ codeunit 6151162 "NPR MM Loy. Point PSP (Client)"
                   CopyStr(EFTTransactionRequest."Card Number", StrLen(EFTTransactionRequest."Card Number") - 2)),
                 1, MaxStrLen(EFTTransactionRequest."POS Description"));
         end;
-
 
         if (not EFTTransactionRequest.Successful) then begin
             EFTTransactionRequest."POS Description" :=

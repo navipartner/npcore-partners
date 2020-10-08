@@ -1,6 +1,5 @@
 xmlport 6151160 "NPR MM Get Loyalty Config."
 {
-    // MM1.38/TSA /20190221 CASE 338215 Initial Version
 
     Caption = 'Get Loyalty Configuration';
     Encoding = UTF8;

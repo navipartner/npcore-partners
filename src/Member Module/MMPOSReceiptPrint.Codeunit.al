@@ -1,7 +1,5 @@
 codeunit 6060134 "NPR MM POS Receipt Print"
 {
-    // MM1.09/TSA/20160229 CASE 235812 Member Receipt Printing
-    // MM1.10/TSA/20160321 CASE 237393 Cancel Membership
 
     TableNo = "NPR MM Membership";
 

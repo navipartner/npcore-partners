@@ -1,6 +1,5 @@
 xmlport 6060144 "NPR MM Get Member GDPR Roles"
 {
-    // MM1.35/TSA /20181023 CASE 333592 Initial version
 
     Caption = 'Get Member GDPR Roles';
     Encoding = UTF8;

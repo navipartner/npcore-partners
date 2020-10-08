@@ -1,7 +1,5 @@
 table 6060092 "NPR MM Admis. Service Log"
 {
-    // NPR5.31/NPKNAV/20170502  CASE 263737 Transport NPR5.31 - 2 May 2017
-    // NPR5.38/MHA /20180104  CASE 301054 Removed TableRelation to Table51011 from field 11 "Entry No."
 
     Caption = 'MM Admission Service Log';
     DataClassification = CustomerContent;

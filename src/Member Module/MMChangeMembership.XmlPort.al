@@ -1,9 +1,5 @@
 xmlport 6060134 "NPR MM Change Membership"
 {
-    // MM1.11/TSA/20160428  CASE 239025 Online membership change management
-    // MM1.11/TSA/20160502  CASE 239052 Transport MM1.11 - 29 April 2016
-    // TM1.17/TSA /20161025  CASE 256152 Conform to OMA Guidelines
-    // MM1.26/TSA /20180219 CASE 305631 Added element documentid
 
     Caption = 'Change Membership';
     FormatEvaluate = Xml;

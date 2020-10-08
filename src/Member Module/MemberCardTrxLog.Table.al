@@ -1,7 +1,5 @@
 table 6059773 "NPR Member Card Trx Log"
 {
-    // NPR70.00.01.00/MH/20150113  CASE 199932 Removed Web references (WEB1.00).
-    // NPR4.11/JDH/20150622  CASE 216974 Added Captions
 
     Caption = 'Point Card - Transaction Log';
     DrillDownPageID = "NPR Member Card Trx Logs";
@@ -111,11 +109,11 @@ table 6059773 "NPR Member Card Trx Log"
 
     trigger OnModify()
     begin
-        //-NPR70.00.01.00
+
         //RecRef.GETTABLE(Rec);
         //xRecRef.GETTABLE(xRec);
         //Changelog.OnModify(RecRef,xRecRef);
-        //+NPR70.00.01.00
+
     end;
 
     var

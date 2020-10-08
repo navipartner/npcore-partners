@@ -1,9 +1,5 @@
 page 6060070 "NPR MM Members. AutoRenew List"
 {
-    // MM1.22/NPKNAV/20170914  CASE 286922 Transport MM1.22 - 13 September 2017
-    // MM1.25/NPKNAV/20180122  CASE 301463 Transport MM1.25 - 22 January 2018
-    // #334163/JDH /20181109 CASE 334163 Added Caption to Actions
-    // MM1.36/NPKNAV/20190125  CASE 343948 Transport MM1.36 - 25 January 2019
 
     Caption = 'Membership Auto Renew List';
     CardPageID = "NPR MM Members. AutoRenew Card";

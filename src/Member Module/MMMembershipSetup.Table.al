@@ -1,30 +1,5 @@
 table 6060124 "NPR MM Membership Setup"
 {
-    // MM80.1.00/TSA/20151217  CASE 229684 NaviPartner Member Management Module
-    // MM80.1.00/TSA/20151222  CASE 230109 Added "Ticket Item Barcode"
-    // MM80.1.01/TSA/20151222  CASE 230149 NaviPartner Member Management
-    // MM80.1.02/TSA/20151228  CASE 229980 Print Membercard
-    // MM1.09/TSA/20160226  CASE 235634 Membership connection to Customer & Contacts, renamed "template customer no." to "Customer Template Code"
-    // MM1.09/TSA/20160229  CASE 235812 Member Receipt Printing
-    // MM1.10/TSA/20160321 CASE 234209 Show member details on membercard scan
-    // MM1.12/TSA/20160503  CASE 240661 Added DAN Captions
-    // MM1.14/TSA/20160523  CASE 240871 Notification Service field 60
-    // MM1.17/TSA/20161214  CASE 243075 Member Point System added field "Loyalty Program" and "membership customer no." to be the price group customer when no crm
-    // MM1.19/TSA/20170315  CASE 264882 Config Template instead of Customer Template
-    // NPR5.33/MHA /20170608  CASE 279229 Added field 80 "Contact Config. Template Code"
-    // MM1.21/TSA /20170719 CASE 276840 Add lookup field on member ticket reference
-    // MM1.22/TSA /20170821 CASE 287080 Added option field "Anonymous Members"
-    // MM1.25/TSA /20180115 CASE 299537 Added fields for template print and options
-    // MM1.25/TSA /20180115 CASE 299537 Added different print alternatives for POS and WS
-    // MM1.25/TSA /20180122 CASE 300256 Card Expire Date calculation selection
-    // MM1.26/TSA /20180202 CASE 303876 Added Auto-Renew model and settings for Credit Limit checks
-    // MM1.27/TSA /20180322 CASE 307113 Added field Community Membership Entry No. - when in community mode there can only be one membership actually...
-    // MM1.29/TSA /20180509 CASE 313795 Added GDPR related fields
-    // #314131/TSA /20180517 CASE 314131 Added field "Activate NP Pass Integration"
-    // MM1.32/TSA/20180725  CASE 318132 Transport MM1.32 - 25 July 2018
-    // MM1.36/TSA /20181126 CASE 337110 Added Ticket Print option on member card swipe
-    // MM1.43/TSA /20200317 CASE 337112 Changed spelling, "Ticket Print Model"::CONDENSED
-    // MM1.44/TSA /20200529 CASE 407401 Added age verification setup
 
     Caption = 'Membership Setup';
     DataClassification = CustomerContent;
@@ -374,12 +349,11 @@ table 6060124 "NPR MM Membership Setup"
                 GDPRManagement: Codeunit "NPR MM GDPR Management";
             begin
 
-                //-MM1.29 [313795]
                 if (not Confirm(UPDATE_GDPR, false)) then
                     Error('');
 
                 GDPRManagement.OnMembershipGDPRModeChangeWorker(Code, xRec."GDPR Mode", Rec."GDPR Mode");
-                //+MM1.29 [313795]
+
             end;
         }
         field(510; "GDPR Agreement No."; Code[20])
@@ -393,12 +367,11 @@ table 6060124 "NPR MM Membership Setup"
                 GDPRManagement: Codeunit "NPR MM GDPR Management";
             begin
 
-                //-MM1.29 [313795]
                 if (not Confirm(UPDATE_GDPR, false)) then
                     Error('');
 
                 GDPRManagement.OnMembershipGDPRAgreementChangeWorker(Code, xRec."GDPR Agreement No.", Rec."GDPR Agreement No.");
-                //+MM1.29 [313795]
+
             end;
         }
     }

@@ -1,7 +1,5 @@
 table 6151185 "NPR MM Sponsors. Ticket Setup"
 {
-    // MM1.41/TSA /20191004 CASE 367471 Initial Version
-    // MM1.42/TSA /20191122 CASE 378827 The relation to variant table omitted which field, which broke during Item rename when item has variant.
 
     Caption = 'Sponsorship Ticket Setup';
     DataClassification = CustomerContent;

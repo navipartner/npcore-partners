@@ -1,15 +1,5 @@
 xmlport 6060127 "NPR MM Create Membership"
 {
-    // MM1.00/TSA/20151217  CASE 229684 NaviPartner Member Management Module
-    // MM1.05/TSA/20160121  CASE 232494 Added the membership valid from/until date implementation
-    // MM1.06/TSA/20160127  CASE 232910 - Enchanced error handling when there is a runtime error processing the request
-    // MM1.08/TSA/20160225  CASE 235204 Transport MM1.08 - 16 February 2016
-    // MM1.17/TSA/20161209  CASE 259671 Added activationdate as optional field
-    // MM1.18/TSA/20170207  CASE Changed to XML format
-    // MM1.26/TSA /20180219 CASE 305631 Added element DocumentID
-    // MM1.40/TSA /20190827 CASE 360242 Adding support for attributes
-    // MM1.41/TSA /20191001 CASE 359703 Added the optional field company name
-    // MM1.43/TSA /20200130 CASE 386080 Added preassigned_customer_number
 
     Caption = 'Create Membership';
     FormatEvaluate = Xml;

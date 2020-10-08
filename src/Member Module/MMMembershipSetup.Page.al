@@ -1,28 +1,5 @@
 page 6060124 "NPR MM Membership Setup"
 {
-    // TM1.00/TSA/20151215  CASE 228982 NaviPartner Ticket Management
-    // MM80.1.00/TSA/20151217  CASE 229684 NaviPartner Member Management Module
-    // MM80.1.01/TSA/20151222  CASE 230149 NaviPartner Member Management
-    // MM80.1.02/TSA/20151228  CASE 229980 Print setup for member card
-    // MM1.09/TSA/20160229 CASE 235812 Member Receipt Printing
-    // MM1.09/TSA/20160311  CASE 235634 Transport MM1.09 - 11 March 2016
-    // MM1.10/TSA/20160405  CASE 234209 Transport MM1.10 - 22 March 2016
-    // MM1.11/TSA/20160502  CASE 233824 Transport MM1.11 - 29 April 2016
-    // MM1.14/TSA/20160603  CASE 240871 Transport MM1.13 - 1 June 2016
-    // MM1.17/TSA/20161214  CASE 243075 Member Point System added field Loyalty Program
-    // MM1.18/TSA/20170220 CASE 266768 Added default filter to not show blocked entries
-    // NPR5.33/MHA /20170608  CASE 279229 Added field 80 "Contact Config. Template Code"
-    // MM1.21/TSA /20170721 CASE 284653 Added Limition Setup Button
-    // MM1.22/NPKNAV/20170914  CASE 287080 Transport MM1.22 - 13 September 2017
-    // MM1.25/TSA /20180115 CASE 299537 Added fields for template print code
-    // MM1.25/TSA /20180117 CASE 300256 Added fields "Card Expire Date Calculation", "Card Expired Action"
-    // MM1.29/TSA /20180510 CASE 313795 GDPR fields
-    // NPR5.43/CLVA/20180627 CASE 318490 Added Action Turnstile Setup
-    // MM1.32/TSA/20180725  CASE 323333 Transport MM1.32 - 25 July 2018
-    // MM1.36/NPKNAV/20190125  CASE 343948 Transport MM1.36 - 25 January 2019
-    // MM1.41/TSA  /20191010 CASE 367471 Added Sponsorship Ticket Setup related action
-    // MM1.42/TSA /20191219 CASE 382728 Added Member Communication Setup related action
-    // MM1.44/TSA /20200529 CASE 407401 Added age verification
 
     Caption = 'Membership Setup';
     CardPageID = "NPR MM Members.Setup Card";
@@ -356,7 +333,6 @@ page 6060124 "NPR MM Membership Setup"
     trigger OnOpenPage()
     begin
 
-        //-+MM1.18 [266769]
         Rec.SetFilter(Blocked, '=%1', false);
     end;
 }

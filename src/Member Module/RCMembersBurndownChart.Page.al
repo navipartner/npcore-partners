@@ -1,8 +1,5 @@
 page 6060148 "NPR RC Members. Burndown Chart"
 {
-    // TM1.16/TSA/20160816  CASE 233430 Transport TM1.16 - 19 July 2016
-    // NPR5.31/TJ  /20170328 CASE 269797 Switched control addin to use version 10.0.0.0 instead of 9.0.0.0
-    // NPR5.50/JAVA/20190619 CASE 359388 Update addins references to point to the correct version (13.0.0.0 => 14.0.0.0).
 
     Caption = 'Membership Burndown Chart';
     PageType = CardPart;

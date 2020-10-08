@@ -1,8 +1,5 @@
 query 6060136 "NPR MM Member Card Notific."
 {
-    // MM1.29/NPKNAV/20180524  CASE 314131 Transport MM1.29 - 24 May 2018
-    // #334163/JDH /20181109 CASE 334163 Missing Object Caption Added
-    // MM1.36/NPKNAV/20190125  CASE 343948 Transport MM1.36 - 25 January 2019
 
     Caption = 'MM Member Card Notification';
 

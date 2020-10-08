@@ -1,24 +1,5 @@
 table 6060127 "NPR MM Membership"
 {
-    // MM1.00/TSA/20151217  CASE 229684 NaviPartner Member Management Module
-    // MM80.1.08/TSA/20160223  CASE 234913 - Include company name field on membership
-    // MM1.12/TSA/20160503  CASE 240661 Added DAN Captions
-    // MM1.15/TSA/20160811  CASE 248625 Change ondelete code to remove the membercard when deleting membership
-    // MM1.17/TSA/20161214  CASE 243075 Member Point System - Added key to "Customer No.", Added Point flow fields 100-120
-    // MM1.18/TSA/20170302  CASE 265340 Added Customer and Contact sync on modify ();
-    // MM1.22/TSA /20170829 CASE 286922 Added field "Auto Renew", and "Auto-Renew Payment Method Code"
-    // MM1.23/TSA /20171025 CASE 257011 Added fields "Modified At", "Replicated At", "Synchronized At"
-    // MM1.24/TSA /20171129 CASE 298110 Refactored OnDelete trigger
-    // MM1.26/TSA /20180316 CASE 308332 Added validation code to handle customer number change
-    // MM1.29/TSA /20180503 CASE 313795 Add field 18 "Block Reason"
-    // MM1.32/TSA /20180522 CASE 316251 Added index on "External Membership No."
-    // MM1.33/TSA /20180824 CASE 326087 Testfield in onModify is not very good.
-    // MM1.38/TSA /20190527 CASE 356057 Minor change
-    // MM1.39/TSA /20190527 CASE 350968 Changed Auto-Renew from boolean to option
-    // MM1.41/TSA /20191021 CASE 369123 Block cascasde
-    // MM1.44/TSA /20200507 CASE 407401 Touched
-    // MM1.45/TSA /20200707 CASE 413622 Incorrect and not required filter and loop on membership role
-    // MM1.45/TSA /20200708 CASE 413622 Added field Has Membership Entries flow field
 
     Caption = 'Membership';
     DataClassification = CustomerContent;
@@ -65,7 +46,6 @@ table 6060127 "NPR MM Membership"
                     "Blocked By" := UserId;
                 end;
 
-                //-MM1.41 [369123]
                 MembershipRole.SetFilter("Membership Entry No.", '=%1', "Entry No.");
                 MembershipRole.SetFilter("Member Role", '<>%1', MembershipRole."Member Role"::ANONYMOUS);
                 if (MembershipRole.FindSet()) then begin
@@ -80,7 +60,7 @@ table 6060127 "NPR MM Membership"
                         end;
                     until (MembershipRole.Next() = 0);
                 end;
-                //+MM1.41 [369123]
+
             end;
         }
         field(16; "Blocked At"; DateTime)
@@ -122,7 +102,6 @@ table 6060127 "NPR MM Membership"
                 MembershipRole: Record "NPR MM Membership Role";
             begin
 
-                //-#308332 [308332]
                 Community.Get("Community Code");
 
                 if ((Rec."Customer No." <> '') and (xRec."Customer No." <> Rec."Customer No.")) then begin
@@ -144,7 +123,7 @@ table 6060127 "NPR MM Membership"
                     end;
                     Modify(); // membership must be updated before OnModify table trigger executes
                 end;
-                //+#308332 [308332]
+
             end;
         }
         field(22; "Membership Code"; Code[20])
@@ -310,26 +289,21 @@ table 6060127 "NPR MM Membership"
         Community: Record "NPR MM Member Community";
     begin
 
-        //+#308332 [308332]
         Community.Get("Community Code");
         if ("Customer No." = '') then
             if (Community."Membership to Cust. Rel.") then
-                //-MM1.33 [326087]
+
                 //TESTFIELD(Blocked);
                 exit;
-        //+MM1.33 [326087]
 
-        //+#308332 [308332]
-
-        //-MM1.45 [413622]
-        // MembershipRole.SETFILTER ("Member Entry No.", '=%1', "Entry No.");
-        // IF (MembershipRole.FINDSET ()) THEN BEGIN
+        // MembershipRole.SetFilter ("Member Entry No.", '=%1', "Entry No.");
+        // IF (MembershipRole.FindSet ()) THEN BEGIN
         //  REPEAT
         //    MembershipManagement.SynchronizeCustomerAndContact (MembershipRole."Membership Entry No.");
         //  UNTIL (MembershipRole.NEXT () = 0);
         // END;
         MembershipManagement.SynchronizeCustomerAndContact(Rec."Entry No.");
-        //+MM1.45 [413622]
+
     end;
 
     var

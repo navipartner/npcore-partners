@@ -1,6 +1,5 @@
 codeunit 6060126 "NPR MM Membership Kiosk"
 {
-    // MM1.28/TSA /20180213 CASE 302748 Initial Version
 
     SingleInstance = true;
 
@@ -723,7 +722,6 @@ codeunit 6060126 "NPR MM Membership Kiosk"
         ' height:196px;' +
         ' border:3px solid #005191;' +
         '}';
-
 
         Css +=
         '#container a.camera {' +

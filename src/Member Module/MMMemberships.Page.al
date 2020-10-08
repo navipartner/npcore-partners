@@ -1,20 +1,5 @@
 page 6060127 "NPR MM Memberships"
 {
-    // MM1.00/TSA/20151217  CASE 229684 NaviPartner Member Management Module
-    // MM1.08/TSA/20160223  CASE 234913 Include company name field on membership
-    // MM1.10/TSA/20160404  CASE 233948 Added a the Update Customer button to sync customer and contact
-    // MM1.14/TSA/20160523  CASE 240871 Reminder Service
-    // MM1.17/TSA/20170125  CASE 243075 Added the loyality reports
-    // MM1.18/TSA/20170220 CASE 266768 Added default filter to not show blocked entries
-    // MM1.19/TSA/20170525  CASE 278061 Handling issues reported by OMA
-    // MM1.21/TSA /20170721 CASE 284653 Added button "Arrival Log"
-    // MM1.22/TSA /20170829 CASE 286922 Added field "Auto-Renew"
-    // MM1.22/NPKNAV/20170914  CASE 285403 Transport MM1.22 - 13 September 2017
-    // MM1.34/TSA/20180927  CASE 327637 Transport MM1.34 - 27 September 2018
-    // NPR5.46/BHR/20180110 CASE 330112 Added field "Auto-Renew Payment Method Code"
-    // MM1.40/TSA /20190822 CASE 360242 Adding NPR Attributes
-    // MM1.40.01/TSA /20190822 CASE 360242 removing grouping withing repeater
-    // MM1.43/ALPO/20191125 CASE 387750 Added Raptor integration page actions: Browsing History, Recommendations
 
     Caption = 'Memberships';
     CardPageID = "NPR MM Membership Card";
@@ -90,9 +75,9 @@ page 6060127 "NPR MM Memberships"
 
                     trigger OnValidate()
                     begin
-                        //-MM1.40 [360242]
+
                         SetMasterDataAttributeValue(1);
-                        //+MM1.40 [360242]
+
                     end;
                 }
                 field(NPRAttrTextArray_02; NPRAttrTextArray[2])
@@ -104,9 +89,9 @@ page 6060127 "NPR MM Memberships"
 
                     trigger OnValidate()
                     begin
-                        //-MM1.40 [360242]
+
                         SetMasterDataAttributeValue(2);
-                        //+MM1.40 [360242]
+
                     end;
                 }
                 field(NPRAttrTextArray_03; NPRAttrTextArray[3])
@@ -118,9 +103,9 @@ page 6060127 "NPR MM Memberships"
 
                     trigger OnValidate()
                     begin
-                        //-MM1.40 [360242]
+
                         SetMasterDataAttributeValue(3);
-                        //+MM1.40 [360242]
+
                     end;
                 }
                 field(NPRAttrTextArray_04; NPRAttrTextArray[4])
@@ -132,9 +117,9 @@ page 6060127 "NPR MM Memberships"
 
                     trigger OnValidate()
                     begin
-                        //-MM1.40 [360242]
+
                         SetMasterDataAttributeValue(4);
-                        //+MM1.40 [360242]
+
                     end;
                 }
                 field(NPRAttrTextArray_05; NPRAttrTextArray[5])
@@ -146,9 +131,9 @@ page 6060127 "NPR MM Memberships"
 
                     trigger OnValidate()
                     begin
-                        //-MM1.40 [360242]
+
                         SetMasterDataAttributeValue(5);
-                        //+MM1.40 [360242]
+
                     end;
                 }
                 field(NPRAttrTextArray_06; NPRAttrTextArray[6])
@@ -160,9 +145,9 @@ page 6060127 "NPR MM Memberships"
 
                     trigger OnValidate()
                     begin
-                        //-MM1.40 [360242]
+
                         SetMasterDataAttributeValue(6);
-                        //+MM1.40 [360242]
+
                     end;
                 }
                 field(NPRAttrTextArray_07; NPRAttrTextArray[7])
@@ -174,9 +159,9 @@ page 6060127 "NPR MM Memberships"
 
                     trigger OnValidate()
                     begin
-                        //-MM1.40 [360242]
+
                         SetMasterDataAttributeValue(7);
-                        //+MM1.40 [360242]
+
                     end;
                 }
                 field(NPRAttrTextArray_08; NPRAttrTextArray[8])
@@ -188,9 +173,9 @@ page 6060127 "NPR MM Memberships"
 
                     trigger OnValidate()
                     begin
-                        //-MM1.40 [360242]
+
                         SetMasterDataAttributeValue(8);
-                        //+MM1.40 [360242]
+
                     end;
                 }
                 field(NPRAttrTextArray_09; NPRAttrTextArray[9])
@@ -202,9 +187,9 @@ page 6060127 "NPR MM Memberships"
 
                     trigger OnValidate()
                     begin
-                        //-MM1.40 [360242]
+
                         SetMasterDataAttributeValue(9);
-                        //+MM1.40 [360242]
+
                     end;
                 }
                 field(NPRAttrTextArray_10; NPRAttrTextArray[10])
@@ -216,9 +201,9 @@ page 6060127 "NPR MM Memberships"
 
                     trigger OnValidate()
                     begin
-                        //-MM1.40 [360242]
+
                         SetMasterDataAttributeValue(10);
-                        //+MM1.40 [360242]
+
                     end;
                 }
             }
@@ -291,11 +276,11 @@ page 6060127 "NPR MM Memberships"
                         RaptorAction: Record "NPR Raptor Action";
                         RaptorMgt: Codeunit "NPR Raptor Management";
                     begin
-                        //-MM1.43 [387750]
+
                         TestField("Customer No.");
                         if RaptorMgt.SelectRaptorAction(RaptorMgt.RaptorModule_GetUserIdHistory, true, RaptorAction) then
                             RaptorMgt.ShowRaptorData(RaptorAction, "Customer No.");
-                        //+MM1.43 [387750]
+
                     end;
                 }
                 action(RaptorRecommendations)
@@ -313,11 +298,11 @@ page 6060127 "NPR MM Memberships"
                         RaptorAction: Record "NPR Raptor Action";
                         RaptorMgt: Codeunit "NPR Raptor Management";
                     begin
-                        //-MM1.43 [387750]
+
                         TestField("Customer No.");
                         if RaptorMgt.SelectRaptorAction(RaptorMgt.RaptorModule_GetUserRecommendations, true, RaptorAction) then
                             RaptorMgt.ShowRaptorData(RaptorAction, "Customer No.");
-                        //+MM1.43 [387750]
+
                     end;
                 }
             }
@@ -376,12 +361,11 @@ page 6060127 "NPR MM Memberships"
                     NPRAttributeValueSet: Record "NPR Attribute Value Set";
                 begin
 
-                    //-MM1.40 [360242]
                     if (not NPRAttrManagement.SetAttributeFilter(NPRAttributeValueSet)) then
                         exit;
 
                     SetView(NPRAttrManagement.GetAttributeFilterView(NPRAttributeValueSet, Rec));
-                    //+MM1.40 [360242]
+
                 end;
             }
         }
@@ -401,9 +385,8 @@ page 6060127 "NPR MM Memberships"
             DisplayName := MembershipRole."Member Display Name";
         end;
 
-        //-MM1.40 [360242]
         GetMasterDataAttributeValue();
-        //+MM1.40 [360242]
+
     end;
 
     trigger OnOpenPage()
@@ -412,10 +395,8 @@ page 6060127 "NPR MM Memberships"
         n: Integer;
     begin
 
-        //-+MM1.18 [266769]
         Rec.SetFilter(Blocked, '=%1', false);
 
-        //-MM1.40 [360242]
         NPRAttrManagement.GetAttributeVisibility(GetAttributeTableId(), NPRAttrVisibleArray);
         // Because NAV is stupid!
         NPRAttrVisible01 := NPRAttrVisibleArray[1];
@@ -428,10 +409,9 @@ page 6060127 "NPR MM Memberships"
         NPRAttrVisible08 := NPRAttrVisibleArray[8];
         NPRAttrVisible09 := NPRAttrVisibleArray[9];
         NPRAttrVisible10 := NPRAttrVisibleArray[10];
-        //+MM1.40 [360242]
-        //-MM1.43 [387750]
+
         RaptorEnabled := (RaptorSetup.Get and RaptorSetup."Enable Raptor Functions");
-        //+MM1.43 [387750]
+
     end;
 
     var
@@ -472,42 +452,37 @@ page 6060127 "NPR MM Memberships"
     local procedure SetMasterDataAttributeValue(AttributeNumber: Integer)
     begin
 
-        //-MM1.40 [360242]
         NPRAttrManagement.SetEntryAttributeValue(GetAttributeTableId(), AttributeNumber, "Entry No.", NPRAttrTextArray[AttributeNumber]);
-        //+MM1.40 [360242]
+
     end;
 
     local procedure GetMasterDataAttributeValue()
     begin
 
-        //-MM1.40 [360242]
         NPRAttrManagement.GetEntryAttributeValue(NPRAttrTextArray, GetAttributeTableId, "Entry No.");
         NPRAttrEditable := CurrPage.Editable();
-        //+MM1.40 [360242]
+
     end;
 
     procedure GetAttributeVisibility(AttributeNumber: Integer): Boolean
     begin
 
-        //-MM1.40 [360242]
         exit(NPRAttrVisibleArray[AttributeNumber]);
-        //+MM1.40 [360242]
+
     end;
 
     local procedure GetAttributeTableId(): Integer
     begin
 
-        //-MM1.40 [360242]
         exit(DATABASE::"NPR MM Membership");
-        //+MM1.40 [360242]
+
     end;
 
     local procedure GetAttributeCaptionClass(AttributeNumber: Integer): Text[50]
     begin
 
-        //-MM1.40 [360242]
         exit(StrSubstNo('6014555,%1,%2,2', GetAttributeTableId(), AttributeNumber));
-        //+MM1.40 [360242]
+
     end;
 }
 

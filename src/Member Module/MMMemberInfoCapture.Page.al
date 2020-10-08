@@ -1,43 +1,5 @@
 page 6060134 "NPR MM Member Info Capture"
 {
-    // MM1.00/TSA/20151217  CASE 229684 NaviPartner Member Management Module
-    // MM1.03/TSA/20160104  CASE 230647 - Added NewsLetter CRM option
-    // MM1.07/TSA/20160202  CASE 232955 - Email verification does preemptive check.
-    // MM1.07/TSA/20160202  CASE 233246 Changed from Card to List, added email verification
-    // MM1.08/TSA/20160223  CASE 234913 - Include company name field on membership
-    // MM1.10/TSA/20160325  CASE 236532 - Added picture blob field
-    // MM1.11/TSA/20160502  CASE 233824 Transport MM1.11 - 29 April 2016
-    // MM1.14/TSA/20160523  CASE 240871 Notification Service
-    // MM1.15/CLV/20160608  CASE 243143 Picture handling
-    // MM1.15/TSA/20160810  CASE 248625 Adding import log functionality to also use this page
-    // MM1.15/CLVA/20160623 CASE 240868 Added action "Take Picture"
-    // MM1.16/TSA/20160915  CASE 252416 Fixed the member no data required setting
-    // MM1.17/TSA/20161124  CASE 259339 Added check on more required fields from setup.
-    // MM1.17/TSA/20161205  CASE 260181 Added function SetDefaultvalues
-    // MM1.17/TSA/20161208  CASE 259671 Added Document Date to page so defered activation can be registered
-    // MM1.17/TSA/20161227  CASE 262040 Making page responsive to field MembershipSalesSetup."Business Flow Type"::add_member
-    // MM1.17/TSA/20161229  CASE 261216 Making page responsive to field MembershipSalesSetup."Business Flow Type"::add_card
-    // MM1.19/CLVA/20170406 CASE 271377 Change pagetype from ListPlus to Card because of runtime errors
-    // MM1.19/TSA/20170525  CASE 278061 Handling issues reported by OMA
-    // MM1.21/NPKNAV/20170728  CASE 284653 Transport MM1.21 - 28 July 2017
-    // MM1.22/TSA /20170807 CASE 276832 Encapsulated the member email check to respect community setup
-    // MM1.22/TSA /20170816 CASE 287080 Handling Businessflow for Anononymous Member
-    // MM1.22/TS  /20180830  CASE 288705 Changed Importance of fields to Additional
-    // MM1.22/TSA /20170831 CASE 286922 Adding field Auto-Renew to page
-    // MM1.22/KENU/20170905 CASE 288705 Sections expanded initially
-    // MM1.25/TSA /20171213 CASE 299690 Added the SetGuardian mode to apply a guardian from backend on existing membership
-    // MM1.26/TSA /20180206 CASE 304580 Added phone no and external card no to repeater area, made fields editable
-    // MM1.29/TSA /20180502 CASE 313542 Change the logic around "Valid Until" date to correspond to how new setup works
-    // MM1.29/TSA /20180511 CASE 313795 GDPR Approval
-    // MM1.32/TSA /20180710 CASE 318132 Member Card Type, general usability improvements
-    // MM1.33/TSA /20180816 CASE 325198 Avoiding a hard error when membership sales setup does not provide a membership code.
-    // MM1.33/TSA /20180821 CASE 324065 Guardian set when adding a member for membership with a guardian defined
-    // MM1.34/TSA /20180906 CASE 327614 Added a test for maximum combined length of name fields
-    // MM1.40/TSA /20190822 CASE 360242 Adding NPR Attributes
-    // MM1.42/TSA /20191118 CASE 378202 Picture is not commited to DB, unless you commit the record and when a field is validated with code on the page, its not the same record - picture is removed.
-    // MM1.44/TSA /20200529 CASE 407401 Added Age Verification
-    // MM1.45/TSA /20200728 CASE 407401 Refactored GuardianMode
-    // MM1.45.01/TSA /20200529 CASE 407401 Age Verification, changed condition for mandatory
 
     Caption = 'Member Information';
     DataCaptionExpression = "External Member No";
@@ -248,9 +210,9 @@ page 6060134 "NPR MM Member Info Capture"
 
                     trigger OnValidate()
                     begin
-                        //-MM1.42 [378202]
-                        Commit;
-                        //+MM1.42 [378202]
+
+                        Commit();
+
                     end;
                 }
                 field(FirstName2; "First Name")
@@ -402,9 +364,8 @@ page 6060134 "NPR MM Member Info Capture"
                     trigger OnValidate()
                     begin
 
-                        //-MM1.42 [378202]
-                        Commit;
-                        //+MM1.42 [378202]
+                        Commit();
+
                     end;
                 }
                 field(Gender; Gender)
@@ -425,7 +386,6 @@ page 6060134 "NPR MM Member Info Capture"
                         ReasonText: Text;
                     begin
 
-                        //-MM1.44 [407401]
                         if (BirthDateMandatory) then begin
 
                             if (MembershipSalesSetup.Get(MembershipSalesSetup.Type::ITEM, "Item No.")) then begin
@@ -449,7 +409,7 @@ page 6060134 "NPR MM Member Info Capture"
                                     end;
                             end;
                         end;
-                        //+MM1.44 [407401]
+
                     end;
                 }
                 field("E-Mail Address"; "E-Mail Address")
@@ -585,7 +545,6 @@ page 6060134 "NPR MM Member Info Capture"
                                     if (CalcDate(MembershipSalesSetup."Duration Formula", "Document Date") < WorkDate) then
                                         Error(INVALID_ACTIVATION_DATE, "Document Date");
 
-                                    //-MM1.29 [313542]
                                     //IF (FORMAT (MembershipSetup."Card Number Valid Until") <> '') THEN
                                     //  "Valid Until" := CALCDATE (MembershipSetup."Card Number Valid Until", "Document Date");
                                     case MembershipSetup."Card Expire Date Calculation" of
@@ -596,13 +555,11 @@ page 6060134 "NPR MM Member Info Capture"
                                         else
                                             "Valid Until" := 0D;
                                     end;
-                                    //+MM1.29 [313542]
+
                                 end;
 
-                                //-MM1.29 [313542]
                                 if (MembershipSetup."Card Expire Date Calculation" = MembershipSetup."Card Expire Date Calculation"::NA) then
                                     "Valid Until" := 0D;
-                                //+MM1.29 [313542]
 
                             end;
                         end;
@@ -650,16 +607,16 @@ page 6060134 "NPR MM Member Info Capture"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        //-MM1.40 [360242]
+
                         OnAttributeLookup(1);
-                        //+MM1.40 [360242]
+
                     end;
 
                     trigger OnValidate()
                     begin
-                        //-MM1.40 [360242]
+
                         SetMasterDataAttributeValue(1);
-                        //+MM1.40 [360242]
+
                     end;
                 }
                 field(NPRAttrTextArray_02; NPRAttrTextArray[2])
@@ -671,16 +628,16 @@ page 6060134 "NPR MM Member Info Capture"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        //-MM1.40 [360242]
+
                         SetMasterDataAttributeValue(2);
-                        //+MM1.40 [360242]
+
                     end;
 
                     trigger OnValidate()
                     begin
-                        //-MM1.40 [360242]
+
                         SetMasterDataAttributeValue(2);
-                        //+MM1.40 [360242]
+
                     end;
                 }
                 field(NPRAttrTextArray_03; NPRAttrTextArray[3])
@@ -692,16 +649,16 @@ page 6060134 "NPR MM Member Info Capture"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        //-MM1.40 [360242]
+
                         OnAttributeLookup(3);
-                        //+MM1.40 [360242]
+
                     end;
 
                     trigger OnValidate()
                     begin
-                        //-MM1.40 [360242]
+
                         SetMasterDataAttributeValue(3);
-                        //+MM1.40 [360242]
+
                     end;
                 }
                 field(NPRAttrTextArray_04; NPRAttrTextArray[4])
@@ -713,16 +670,16 @@ page 6060134 "NPR MM Member Info Capture"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        //-MM1.40 [360242]
+
                         OnAttributeLookup(4);
-                        //+MM1.40 [360242]
+
                     end;
 
                     trigger OnValidate()
                     begin
-                        //-MM1.40 [360242]
+
                         SetMasterDataAttributeValue(4);
-                        //+MM1.40 [360242]
+
                     end;
                 }
                 field(NPRAttrTextArray_05; NPRAttrTextArray[5])
@@ -734,16 +691,16 @@ page 6060134 "NPR MM Member Info Capture"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        //-MM1.40 [360242]
+
                         OnAttributeLookup(5);
-                        //+MM1.40 [360242]
+
                     end;
 
                     trigger OnValidate()
                     begin
-                        //-MM1.40 [360242]
+
                         SetMasterDataAttributeValue(5);
-                        //+MM1.40 [360242]
+
                     end;
                 }
                 field(NPRAttrTextArray_06; NPRAttrTextArray[6])
@@ -755,16 +712,16 @@ page 6060134 "NPR MM Member Info Capture"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        //-MM1.40 [360242]
+
                         OnAttributeLookup(6);
-                        //+MM1.40 [360242]
+
                     end;
 
                     trigger OnValidate()
                     begin
-                        //-MM1.40 [360242]
+
                         SetMasterDataAttributeValue(6);
-                        //+MM1.40 [360242]
+
                     end;
                 }
                 field(NPRAttrTextArray_07; NPRAttrTextArray[7])
@@ -776,16 +733,16 @@ page 6060134 "NPR MM Member Info Capture"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        //-MM1.40 [360242]
+
                         OnAttributeLookup(7);
-                        //+MM1.40 [360242]
+
                     end;
 
                     trigger OnValidate()
                     begin
-                        //-MM1.40 [360242]
+
                         SetMasterDataAttributeValue(7);
-                        //+MM1.40 [360242]
+
                     end;
                 }
                 field(NPRAttrTextArray_08; NPRAttrTextArray[8])
@@ -797,16 +754,16 @@ page 6060134 "NPR MM Member Info Capture"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        //-MM1.40 [360242]
+
                         OnAttributeLookup(8);
-                        //+MM1.40 [360242]
+
                     end;
 
                     trigger OnValidate()
                     begin
-                        //-MM1.40 [360242]
+
                         SetMasterDataAttributeValue(8);
-                        //+MM1.40 [360242]
+
                     end;
                 }
                 field(NPRAttrTextArray_09; NPRAttrTextArray[9])
@@ -818,16 +775,16 @@ page 6060134 "NPR MM Member Info Capture"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        //-MM1.40 [360242]
+
                         OnAttributeLookup(9);
-                        //+MM1.40 [360242]
+
                     end;
 
                     trigger OnValidate()
                     begin
-                        //-MM1.40 [360242]
+
                         SetMasterDataAttributeValue(9);
-                        //+MM1.40 [360242]
+
                     end;
                 }
                 field(NPRAttrTextArray_10; NPRAttrTextArray[10])
@@ -839,16 +796,16 @@ page 6060134 "NPR MM Member Info Capture"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        //-MM1.40 [360242]
+
                         OnAttributeLookup(10);
-                        //+MM1.40 [360242]
+
                     end;
 
                     trigger OnValidate()
                     begin
-                        //-MM1.40 [360242]
+
                         SetMasterDataAttributeValue(10);
-                        //+MM1.40 [360242]
+
                     end;
                 }
             }
@@ -897,9 +854,9 @@ page 6060134 "NPR MM Member Info Capture"
 
     trigger OnAfterGetCurrRecord()
     begin
-        //-MM1.15
+
         Clear(xRec.Picture);
-        //+MM1.15
+
     end;
 
     trigger OnAfterGetRecord()
@@ -915,9 +872,7 @@ page 6060134 "NPR MM Member Info Capture"
 
         SetMandatoryVisualQue();
 
-        //+MM1.40 [360242]
         GetMasterDataAttributeValue();
-        //-MM1.40 [360242]
 
         CurrPage.Update(false);
     end;
@@ -933,7 +888,6 @@ page 6060134 "NPR MM Member Info Capture"
     begin
         SetDefaultValues();
 
-        //-MM1.40 [360242]
         NPRAttrManagement.GetAttributeVisibility(GetAttributeTableId(), NPRAttrVisibleArray);
         // Because NAV is stupid!
         NPRAttrVisible01 := NPRAttrVisibleArray[1];
@@ -947,7 +901,7 @@ page 6060134 "NPR MM Member Info Capture"
         NPRAttrVisible09 := NPRAttrVisibleArray[9];
         NPRAttrVisible10 := NPRAttrVisibleArray[10];
         NPRAttrEditable := CurrPage.Editable();
-        //+MM1.40 [360242]
+
     end;
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
@@ -1093,12 +1047,10 @@ page 6060134 "NPR MM Member Info Capture"
             MembershipSalesSetup.SetFilter("No.", '=%1', "Item No.");
             if (MembershipSalesSetup.FindFirst()) then begin
 
-                //-MM1.33 [325198]
                 // MembershipSetup.GET (MembershipSalesSetup."Membership Code");
                 // MemberCommunity.GET (MembershipSetup."Community Code");
                 if (MembershipSetup.Get(MembershipSalesSetup."Membership Code")) then
                     MemberCommunity.Get(MembershipSetup."Community Code");
-                //+MM1.33 [325198]
 
                 if (ShowNewMemberSection) then begin
                     case MemberCommunity."Member Unique Identity" of
@@ -1115,7 +1067,6 @@ page 6060134 "NPR MM Member Info Capture"
                     if (ActivationDateEditable) and (MemberInfoCapture."Document Date" = 0D) then
                         SetMissingInfo(MissingInformation, MissingFields, FieldCaption("Document Date"), ("Document Date" = 0D));
 
-                    //-MM1.44 [407401]
                     if (BirthDateMandatory) then begin
                         SetMissingInfo(MissingInformation, MissingFields, FieldCaption(Birthday), (MemberInfoCapture.Birthday = 0D));
                         if (MemberInfoCapture.Birthday <> 0D) then
@@ -1129,18 +1080,17 @@ page 6060134 "NPR MM Member Info Capture"
                                 Message(AGE_VERIFICATION, MemberInfoCapture."First Name", MembershipSalesSetup."Age Constraint (Years)");
                             end;
                     end;
-                    //+MM1.44 [407401]
 
                 end;
 
                 if (ShowNewCardSection) then begin
                     if (MembershipSetup."Card Number Scheme" = MembershipSetup."Card Number Scheme"::EXTERNAL) then begin
                         SetMissingInfo(MissingInformation, MissingFields, FieldCaption("External Card No."), (MemberInfoCapture."External Card No." = ''));
-                        //-MM1.29 [313542]
+
                         //SetMissingInfo (MissingInformation, MissingFields, FIELDCAPTION("Valid Until"), (MemberInfoCapture."Valid Until" = 0D));
                         if (MembershipSetup."Card Expire Date Calculation" <> MembershipSetup."Card Expire Date Calculation"::NA) then
                             SetMissingInfo(MissingInformation, MissingFields, FieldCaption("Valid Until"), (MemberInfoCapture."Valid Until" = 0D));
-                        //+MM1.29 [313542]
+
                     end;
                 end;
 
@@ -1155,16 +1105,13 @@ page 6060134 "NPR MM Member Info Capture"
                 if ("Enable Auto-Renew") then
                     SetMissingInfo(MissingInformation, MissingFields, FieldCaption("Auto-Renew Payment Method Code"), ("Auto-Renew Payment Method Code" = ''));
 
-                //-MM1.29 [313795]
                 case MembershipSetup."GDPR Mode" of
                     MembershipSetup."GDPR Mode"::REQUIRED:
                         SetMissingInfo(MissingInformation, MissingFields, Rec.FieldCaption("GDPR Approval"), (Rec."GDPR Approval" <> Rec."GDPR Approval"::ACCEPTED));
                     MembershipSetup."GDPR Mode"::CONSENT:
                         SetMissingInfo(MissingInformation, MissingFields, Rec.FieldCaption("GDPR Approval"), (Rec."GDPR Approval" = Rec."GDPR Approval"::NA));
                 end;
-                //+MM1.29 [313795]
 
-                //-MM1.34 [327614]
                 if (MemberCommunity."Membership to Cust. Rel.") then begin
                     NameTotalLength := StrLen(MemberInfoCapture."First Name") + StrLen(MemberInfoCapture."Middle Name") + StrLen(MemberInfoCapture."Last Name") + 2;
                     if ((NameTotalLength > MaxStrLen(Customer.Name)) and not (MissingInformation)) then begin
@@ -1182,7 +1129,6 @@ page 6060134 "NPR MM Member Info Capture"
                         exit(false);
                     end;
                 end;
-                //+MM1.34 [327614]
 
             end;
         end else begin
@@ -1212,13 +1158,10 @@ page 6060134 "NPR MM Member Info Capture"
             MembershipSalesSetup.SetFilter("No.", '=%1', "Item No.");
             if (MembershipSalesSetup.FindFirst()) then begin
 
-                //-MM1.33 [325198]
                 // MembershipSetup.GET (MembershipSalesSetup."Membership Code");
                 // MemberCommunity.GET (MembershipSetup."Community Code");
                 if (MembershipSetup.Get(MembershipSalesSetup."Membership Code")) then
                     MemberCommunity.Get(MembershipSetup."Community Code");
-                //+MM1.33 [325198]
-
 
                 case MemberCommunity."Member Unique Identity" of
                     MemberCommunity."Member Unique Identity"::NONE:
@@ -1233,9 +1176,7 @@ page 6060134 "NPR MM Member Info Capture"
 
                 ExternalCardNoMandatory := (MembershipSetup."Card Number Scheme" = MembershipSetup."Card Number Scheme"::EXTERNAL);
 
-                //-MM1.29 [313542]
                 CardValidUntilMandatory := not (MembershipSetup."Card Expire Date Calculation" = MembershipSetup."Card Expire Date Calculation"::NA);
-                //+MM1.29 [313542]
 
                 case MembershipSalesSetup."Valid From Base" of
                     MembershipSalesSetup."Valid From Base"::FIRST_USE:
@@ -1246,21 +1187,16 @@ page 6060134 "NPR MM Member Info Capture"
 
                 AutoRenewPaymentMethodMandatory := "Enable Auto-Renew";
 
-                //-MM1.44 [407401]
-                //-#407401 [407401]
                 //BirthDateMandatory := NOT (MembershipSetup."Validate Age Against" = MembershipSetup."Validate Age Against"::SALESDATE_Y)
                 BirthDateMandatory := MembershipSetup."Enable Age Verification";
-                //+#407401 [407401]
-                //+MM1.44 [407401]
 
             end;
         end else begin
             EmailMandatory := true;
             PhoneNoMandatory := false;
             SSNMandatory := false;
-            //-MM1.44 [407401]
+
             BirthDateMandatory := false;
-            //+MM1.44 [407401]
 
         end;
     end;
@@ -1285,10 +1221,8 @@ page 6060134 "NPR MM Member Info Capture"
         ShowQuantityField := false;
         EditMemberCardType := false;
 
-        //-MM1.45 [407401]
         ShowAttributesSection := true;
         GuardianMandatory := false;
-        //+MM1.45 [407401]
 
         Rec.Quantity := 1;
 
@@ -1301,10 +1235,10 @@ page 6060134 "NPR MM Member Info Capture"
             ShowCardholderSection := false;
             ShowNewCardSection := false;
             ShowQuantityField := false;
-            //-MM1.45 [407401]
+
             ShowAttributesSection := false;
             GuardianMandatory := true;
-            //+MM1.45 [407401]
+
         end;
 
         if ("Item No." <> '') then begin
@@ -1312,19 +1246,15 @@ page 6060134 "NPR MM Member Info Capture"
             MembershipSalesSetup.SetFilter("No.", '=%1', "Item No.");
             if (MembershipSalesSetup.FindFirst()) then begin
 
-                //-MM1.33 [325198]
                 // MembershipSetup.GET (MembershipSalesSetup."Membership Code");
                 // MemberCommunity.GET (MembershipSetup."Community Code");
                 if (MembershipSetup.Get(MembershipSalesSetup."Membership Code")) then
                     MemberCommunity.Get(MembershipSetup."Community Code");
-                //+MM1.33 [325198]
 
                 ShowNewCardSection := (MembershipSetup."Loyalty Card" = MembershipSetup."Loyalty Card"::YES);
 
-                //-MM1.32 [318132]
                 EditMemberCardType := (MembershipSalesSetup."Member Card Type Selection" = MembershipSalesSetup."Member Card Type Selection"::USER_SELECT);
                 "Member Card Type" := MembershipSalesSetup."Member Card Type";
-                //+MM1.32 [318132]
 
                 ShowAutoRenew := MemberCommunity."Membership to Cust. Rel.";
 
@@ -1357,13 +1287,11 @@ page 6060134 "NPR MM Member Info Capture"
                         end;
                 end;
 
-                //-MM1.29 [313542]
                 //    IF (FORMAT (MembershipSetup."Card Number Valid Until") <> '') THEN
                 //      IF ("Document Date" <> 0D) THEN
                 //        "Valid Until" := CALCDATE (MembershipSetup."Card Number Valid Until", "Document Date")
                 //      ELSE
                 //        "Valid Until" := CALCDATE (MembershipSetup."Card Number Valid Until", TODAY);
-                //+MM1.29 [313542]
 
                 ActivationDateEditable := false;
                 case MembershipSalesSetup."Valid From Base" of
@@ -1380,15 +1308,12 @@ page 6060134 "NPR MM Member Info Capture"
                         "Document Date" := 0D;
                 end;
 
-                //-MM1.29 [313542]
                 ValidUntilBaseDate := "Document Date";
                 if (ValidUntilBaseDate = 0D) then
                     ValidUntilBaseDate := WorkDate;
 
-                //-MM1.33 [325198]
                 if (MembershipSalesSetup."Membership Code" = '') then
                     MembershipSetup."Card Number Valid Until" := MembershipSalesSetup."Duration Formula";
-                //+MM1.33 [325198]
 
                 case MembershipSetup."Card Expire Date Calculation" of
                     MembershipSetup."Card Expire Date Calculation"::DATEFORMULA:
@@ -1398,9 +1323,7 @@ page 6060134 "NPR MM Member Info Capture"
                     else
                         "Valid Until" := 0D;
                 end;
-                //+MM1.29 [313542]
 
-                //-MM1.29 [313795]
                 GDPRMandatory := false;
                 GDPRSelected := true;
                 case MembershipSetup."GDPR Mode" of
@@ -1421,11 +1344,8 @@ page 6060134 "NPR MM Member Info Capture"
                             GDPRSelected := false;
                         end;
                 end;
-                //+MM1.29 [313795]
 
-                //-MM1.45 [407401]
                 GuardianMandatory := (MembershipSalesSetup."Requires Guardian");
-                //-MM1.45 [407401]
 
             end;
         end;
@@ -1487,7 +1407,6 @@ page 6060134 "NPR MM Member Info Capture"
 
         ExternalMembershipNo := Membership."External Membership No.";
 
-        //-MM1.33 [324065]
         // Set guardian
         if (ShowAddToMembershipSection) then begin
             MembershipRole.SetFilter("Membership Entry No.", '=%1', "Membership Entry No.");
@@ -1499,7 +1418,7 @@ page 6060134 "NPR MM Member Info Capture"
                 "E-Mail Address" := GuardianMember."E-Mail Address";
             end;
         end;
-        //+MM1.33 [324065]
+
     end;
 
     local procedure SetExternalMemberNo(pExternalMemberNo: Code[20])
@@ -1653,50 +1572,44 @@ page 6060134 "NPR MM Member Info Capture"
     local procedure SetMasterDataAttributeValue(AttributeNumber: Integer)
     begin
 
-        //-MM1.40 [360242]
         NPRAttrManagement.SetEntryAttributeValue(GetAttributeTableId(), AttributeNumber, "Entry No.", NPRAttrTextArray[AttributeNumber]);
-        //+MM1.40 [360242]
+
     end;
 
     local procedure GetMasterDataAttributeValue()
     begin
 
-        //-MM1.40 [360242]
         NPRAttrManagement.GetEntryAttributeValue(NPRAttrTextArray, GetAttributeTableId, "Entry No.");
         NPRAttrEditable := CurrPage.Editable();
-        //+MM1.40 [360242]
+
     end;
 
     procedure GetAttributeVisibility(AttributeNumber: Integer): Boolean
     begin
 
-        //-MM1.40 [360242]
         exit(NPRAttrVisibleArray[AttributeNumber]);
-        //+MM1.40 [360242]
+
     end;
 
     local procedure GetAttributeTableId(): Integer
     begin
 
-        //-MM1.40 [360242]
         exit(DATABASE::"NPR MM Member Info Capture");
-        //+MM1.40 [360242]
+
     end;
 
     local procedure GetAttributeCaptionClass(AttributeNumber: Integer): Text[50]
     begin
 
-        //-MM1.40 [360242]
         exit(StrSubstNo('6014555,%1,%2,2', GetAttributeTableId(), AttributeNumber));
-        //+MM1.40 [360242]
+
     end;
 
     local procedure OnAttributeLookup(AttributeNumber: Integer)
     begin
 
-        //-MM1.40 [360242]
         NPRAttrManagement.OnPageLookUp(GetAttributeTableId, AttributeNumber, Format(AttributeNumber, 0, '<integer>'), NPRAttrTextArray[AttributeNumber]);
-        //+MM1.40 [360242]
+
     end;
 }
 

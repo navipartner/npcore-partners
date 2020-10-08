@@ -1,7 +1,5 @@
 page 6060077 "NPR MM Recur. Payment Setup"
 {
-    // #334163/JDH /20181109 CASE 334163 Added Caption to Object
-    // MM1.36/NPKNAV/20190125  CASE 343948 Transport MM1.36 - 25 January 2019
 
     Caption = 'Recurring Payment Setup';
     PageType = Card;

@@ -1,10 +1,5 @@
 table 6060146 "NPR MM NPR Remote Endp. Setup"
 {
-    // MM1.23/TSA /20171025 CASE 257011 Initial Version
-    // #334163/JDH /20181109 CASE 334163 Added caption to object
-    // MM1.36/NPKNAV/20190125  CASE 343948 Transport MM1.36 - 25 January 2019
-    // MM1.37/TSA /20190228 CASE 343053 Added Loylaty Services
-    // MM1.40/TSA /20190604 CASE 357360 Added the option "Basic Authentication" to credentials type
 
     Caption = 'MM NPR Remote Endpoint Setup';
     DataClassification = CustomerContent;

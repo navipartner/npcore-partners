@@ -53,10 +53,9 @@ codeunit 6060131 "NPR MM Member Retail Integr."
     procedure POS_ShowMemberCard(InputMode: Option CARD_SCAN,FACIAL_RECOGNITION,NO_PROMPT; var ExternalMemberCardNo: Text[100]): Boolean
     begin
 
-        //-MM1.36 [335828]
         exit(
           POS_ValidateMemberCardNoWorker(true, true, InputMode, false, ExternalMemberCardNo, true));
-        //+MM1.36 [335828]
+
     end;
 
     local procedure POS_ValidateMemberCardNoWorker(FailWithError: Boolean; AllowVerboseMode: Boolean; InputMode: Option CARD_SCAN,FACIAL_RECOGNITION,NO_PROMPT; ActivateMembership: Boolean; var ExternalMemberCardNo: Text[100]; ForcedConfirmMember: Boolean): Boolean
@@ -82,7 +81,6 @@ codeunit 6060131 "NPR MM Member Retail Integr."
         PageAction: Action;
     begin
 
-        //+MM1.36 [335828]
         case InputMode of
             InputMode::NO_PROMPT:
                 ; // Prevalidated
@@ -116,7 +114,6 @@ codeunit 6060131 "NPR MM Member Retail Integr."
 
         // Check card number if it exists locally
 
-        //-MM1.33 [324413]
         // IF (STRLEN (ExternalMemberCardNo) <= 50) THEN
         //  MembershipEntryNo := MemberManagement.GetMembershipFromExtCardNo (ExternalMemberCardNo, TODAY, NotFoundReasonText);
         //
@@ -134,8 +131,6 @@ codeunit 6060131 "NPR MM Member Retail Integr."
             MembershipEntryNo := ForeignMembershipEntryNo;
             FormatedCardNumber := FormatedForeignCardNumber;
         end;
-        //+MM1.33 [324413]
-
 
         if (MembershipEntryNo = 0) then begin
             if (FailWithError) then
@@ -188,7 +183,7 @@ codeunit 6060131 "NPR MM Member Retail Integr."
         end;
 
         MembershipSetup.Get(Membership."Membership Code");
-        //-+MM1.23 [257011]
+
         if (MembershipSetup."Member Information" = MembershipSetup."Member Information"::NAMED) then begin
             // IF NOT (Member.GET (MemberManagement.GetMemberFromExtCardNo (ExternalMemberCardNo, TODAY, NotFoundReasonText))) THEN BEGIN
             if not (Member.Get(MemberManagement.GetMemberFromExtCardNo(FormatedCardNumber, Today, NotFoundReasonText))) then begin
@@ -197,10 +192,9 @@ codeunit 6060131 "NPR MM Member Retail Integr."
                 exit(false);
             end;
 
-            //-MM1.36 [335828]
             ShowMemberDialog := (AllowVerboseMode and MembershipSetup."Confirm Member On Card Scan") or (ForcedConfirmMember);
             if (ShowMemberDialog) then begin
-                Commit; //[276102] When Facial Recongnition is used and a face is written
+                Commit(); //[276102] When Facial Recongnition is used and a face is written
 
                 POSMemberCard.LookupMode(true);
                 POSMemberCard.SetRecord(Member);
@@ -224,7 +218,6 @@ codeunit 6060131 "NPR MM Member Retail Integr."
             //      END;
             //    END;
             //  END;
-            //+MM1.36 [335828]
 
         end;
 
@@ -266,10 +259,8 @@ codeunit 6060131 "NPR MM Member Retail Integr."
         MemberCard: Record "NPR MM Member Card";
     begin
 
-        //-MM1.32 [318132]
         PrintMembershipOnEndOfSalesWorker(SalesReceiptNo, false);
 
-        //+MM1.32 [318132]
     end;
 
     local procedure PrintMembershipOnEndOfSalesWorker(SalesReceiptNo: Code[20]; ForceCardPrint: Boolean)
@@ -284,7 +275,6 @@ codeunit 6060131 "NPR MM Member Retail Integr."
         MemberCard2: Record "NPR MM Member Card";
     begin
 
-        //-MM1.32 [318132]
         MembershipEntry.SetFilter("Receipt No.", '=%1', SalesReceiptNo);
         if (not (MembershipEntry.FindSet())) then
             exit;
@@ -302,7 +292,6 @@ codeunit 6060131 "NPR MM Member Retail Integr."
                         begin
                             PrintMembershipSalesReceiptWorker(Membership, MembershipSetup);
 
-                            //-#344400 [344400]
                             // IF (MembershipEntry."Member Card Entry No." <> 0) THEN BEGIN
                             //   IF (MemberCard.GET (MembershipEntry."Member Card Entry No.")) THEN BEGIN
                             //     MemberCard.SETRECFILTER ();
@@ -323,14 +312,12 @@ codeunit 6060131 "NPR MM Member Retail Integr."
                                     end;
                                 end;
                             end;
-                            //+#344400 [344400]
 
                         end;
                     MembershipSetup."POS Print Action"::OFFLINE:
                         begin
                             MembershipManagement.PrintOffline(MemberInfoCapture."Information Context"::PRINT_MEMBERSHIP, MembershipEntry."Membership Entry No.");
 
-                            //-#344400 [344400]
                             // IF (ForceCardPrint OR (CheckSalesSetupForCardPrint (MembershipEntry."Item No."))) THEN
                             //  MembershipManagement.PrintOffline (MemberInfoCapture."Information Context"::PRINT_CARD, MembershipEntry."Member Card Entry No.");
                             if (ForceCardPrint or (CheckSalesSetupForCardPrint(MembershipEntry."Item No."))) then begin
@@ -344,14 +331,13 @@ codeunit 6060131 "NPR MM Member Retail Integr."
                                     end;
                                 end;
                             end;
-                            //+#344400 [344400]
 
                         end;
                 end;
             end;
 
         until (MembershipEntry.Next() = 0);
-        //+MM1.32 [318132]
+
     end;
 
     procedure PrintMembershipSalesReceiptWorker(var Membership: Record "NPR MM Membership"; var MembershipSetup: Record "NPR MM Membership Setup")
@@ -402,7 +388,6 @@ codeunit 6060131 "NPR MM Member Retail Integr."
         MembershipSetup.Get(Membership."Membership Code");
         Member.SetFilter("Entry No.", '=%1', Member."Entry No.");
 
-
         case MembershipSetup."POS Print Action" of
             MembershipSetup."POS Print Action"::DIRECT:
                 PrintMemberAccountCardWorker(Member, MembershipSetup);
@@ -432,10 +417,8 @@ codeunit 6060131 "NPR MM Member Retail Integr."
             MembershipSetup."Account Print Object Type"::REPORT:
                 ReportPrinterInterface.RunReport(MembershipSetup."Account Print Object ID", false, false, Member);
 
-            //-MM1.44 [405500]
             MembershipSetup."Account Print Object Type"::TEMPLATE:
                 PrintTemplateMgt.PrintTemplate(MembershipSetup."Account Print Template Code", Member, 0);
-            //+MM1.44 [405500]
 
             else
                 Error(ILLEGAL_VALUE, MembershipSetup."Account Print Object Type", MembershipSetup.FieldCaption("Account Print Object Type"));
@@ -467,11 +450,9 @@ codeunit 6060131 "NPR MM Member Retail Integr."
         MemberCard.SetFilter("Entry No.", '=%1', MemberCard."Entry No.");
         MemberCard.FindFirst();
 
-        //-MM1.40 [360242]
         if ((MemberCard.Blocked) or (Membership.Blocked)) then
             if (not Confirm(CONFIRM_CARD_BLOCKED, true)) then
                 Error('');
-        //+MM1.40 [360242]
 
         case MembershipSetup."POS Print Action" of
             MembershipSetup."POS Print Action"::DIRECT:
@@ -576,8 +557,6 @@ codeunit 6060131 "NPR MM Member Retail Integr."
         if (SaleLinePOS.Quantity <> 1) then
             exit(-1101);
 
-
-        //-MM1.33 [325198]
         // IF (NOT MembershipSetup.GET (MembershipSalesSetup."Membership Code")) THEN
         //  EXIT (-1103);
 
@@ -588,17 +567,14 @@ codeunit 6060131 "NPR MM Member Retail Integr."
             if (not MembershipSetup.Get(MembershipSalesSetup."Membership Code")) then
                 exit(-1103);
         end;
-        //+MM1.33 [325198]
 
         if (MembershipSetup."Membership Member Cardinality" < 2) then
             MembershipSetup."Membership Member Cardinality" := 1;
 
-        //-MM1.32 [319845]
         if (MembershipSetup."Membership Type" = MembershipSetup."Membership Type"::INDIVIDUAL) then begin
             MembershipSetup."Membership Member Cardinality" := 1;
             MembershipSalesSetup."Suggested Membercount In Sales" := 1;
         end;
-        //+MM1.32 [319845]
 
         MemberInfoCapture.SetCurrentKey("Receipt No.", "Line No.");
         MemberInfoCapture.SetFilter("Receipt No.", '=%1', SaleLinePOS."Sales Ticket No.");
@@ -661,9 +637,9 @@ codeunit 6060131 "NPR MM Member Retail Integr."
                 Error('Business Flow Type %1 not handled when preparing user input.', MembershipSalesSetup."Business Flow Type");
         end;
 
-        Commit;
+        Commit();
         if (DisplayMemberInfoCaptureDialog(SaleLinePOS)) then begin
-            Commit;
+            Commit();
 
             MemberInfoCapture.LockTable();
 
@@ -672,7 +648,6 @@ codeunit 6060131 "NPR MM Member Retail Integr."
             MemberInfoCapture.SetFilter("Receipt No.", '=%1', SaleLinePOS."Sales Ticket No.");
             MemberInfoCapture.SetFilter("Line No.", '=%1', SaleLinePOS."Line No.");
 
-            //-MM1.40 [360275]
             if (MemberInfoCapture."Information Context" = MemberInfoCapture."Information Context"::NEW) then begin
                 if (MembershipSalesSetup."Auto-Admit Member On Sale" = MembershipSalesSetup."Auto-Admit Member On Sale"::ASK) then
                     if (Confirm(ADMIT_MEMBERS, true)) then
@@ -681,22 +656,17 @@ codeunit 6060131 "NPR MM Member Retail Integr."
                 if (MembershipSalesSetup."Auto-Admit Member On Sale" = MembershipSalesSetup."Auto-Admit Member On Sale"::YES) then
                     MemberInfoCapture.ModifyAll("Auto-Admit Member", true);
             end;
-            Commit;
-            //+MM1.40 [360275]
+            Commit();
 
-            //-MM1.30 [316450]
             //IF (CreateMemberships (FALSE, MemberInfoCapture, ReasonMessage)) THEN
             //  EXIT (1);
             if (CreateMemberships(false, MemberInfoCapture, ReasonMessage)) then begin
 
-                //-MM1.32 [320446]
                 if (SaleLinePOS.Get(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Sale Type", SaleLinePOS."Line No.")) then begin
                     SaleLinePOS."Description 2" := MemberInfoCapture."External Membership No.";
                     SaleLinePOS.Modify();
                 end;
-                //+MM1.32 [320446]
 
-                //-MM1.40 [360275]
                 //    COMMIT;
                 //
                 //    IF (MembershipSalesSetup."Auto-Admit Member On Sale" = MembershipSalesSetup."Auto-Admit Member On Sale"::ASK) THEN
@@ -709,12 +679,10 @@ codeunit 6060131 "NPR MM Member Retail Integr."
                 //        EXIT (-1100);
                 //      END;
                 //    END;
-                //+MM1.40 [360275]
 
-                Commit;
+                Commit();
                 exit(1);
             end;
-            //+MM1.30 [316450]
 
             // Failure PATH
             asserterror Error('%1', ReasonMessage); // Should rollback the faulty creations from CreateMemberships
@@ -723,7 +691,7 @@ codeunit 6060131 "NPR MM Member Retail Integr."
 
         DeleteMemberInfoCapture(SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.");
         if (SaleLinePOS.Delete()) then;
-        Commit;
+        Commit();
 
         if (ReasonMessage <> '') then begin
             gLastMessage := ReasonMessage;
@@ -793,7 +761,6 @@ codeunit 6060131 "NPR MM Member Retail Integr."
         ResponseMessage: Text;
     begin
 
-        //-+MM1.36 [307440] Code moved to a local worker function
         MemberInfoCapture.SetCurrentKey("Receipt No.", "Line No.");
         MemberInfoCapture.SetFilter("Receipt No.", '=%1', ReceiptNo);
         MemberInfoCapture.SetFilter("Line No.", '=%1', ReceiptLine);
@@ -829,7 +796,6 @@ codeunit 6060131 "NPR MM Member Retail Integr."
 
                     if (MembershipSalesSetup."Business Flow Type" = MembershipSalesSetup."Business Flow Type"::MEMBERSHIP) then begin
 
-                        //-MM1.40 [357360]
                         //MemberManagement.AddMembershipLedgerEntry_NEW (MemberInfoCapture."Membership Entry No.", SalesDate, MembershipSalesSetup, MemberInfoCapture);
                         if (IsForeignMembership(MembershipSalesSetup."Membership Code")) then begin
                             RemoteCreateMembership(MemberInfoCapture, MembershipSalesSetup);
@@ -841,21 +807,18 @@ codeunit 6060131 "NPR MM Member Retail Integr."
                         end else begin
                             MemberManagement.AddMembershipLedgerEntry_NEW(MemberInfoCapture."Membership Entry No.", SalesDate, MembershipSalesSetup, MemberInfoCapture);
                         end;
-                        //+MM1.40 [357360]
 
                     end;
 
                     if (MembershipSalesSetup."Business Flow Type" = MembershipSalesSetup."Business Flow Type"::ADD_NAMED_MEMBER) then begin
                         repeat
 
-                            //-MM1.40 [357360]
                             // MemberManagement.AddMemberAndCard (FALSE, MemberInfoCapture."Membership Entry No.", MemberInfoCapture, TRUE, MemberInfoCapture."Member Entry No", ResponseMessage);
                             if (IsForeignMembership(MembershipSalesSetup."Membership Code")) then begin
                                 RemoteAddMember(MemberInfoCapture, MembershipSalesSetup);
                             end else begin
                                 MemberManagement.AddMemberAndCard(false, MemberInfoCapture."Membership Entry No.", MemberInfoCapture, true, MemberInfoCapture."Member Entry No", ResponseMessage);
                             end;
-                        //+MM1.40 [357360]
 
                         until (MemberInfoCapture.Next() = 0);
 
@@ -920,10 +883,8 @@ codeunit 6060131 "NPR MM Member Retail Integr."
 
         end; // END CASE
 
-        //-MM1.40 [360275]
         if (MemberInfoCapture."Auto-Admit Member") then
             AdmitMembersOnEndOfSalesWorker(MemberInfoCapture, ResponseMessage);
-        //+MM1.40 [360275]
 
         MemberInfoCapture.DeleteAll();
     end;
@@ -941,13 +902,10 @@ codeunit 6060131 "NPR MM Member Retail Integr."
         if (MemberInfoCapture.FindSet()) then begin
             MembershipSalesSetup.Get(MembershipSalesSetup.Type::ITEM, MemberInfoCapture."Item No.");
 
-            //-MM1.40 [357360]
             if (IsForeignMembership(MembershipSalesSetup."Membership Code")) then begin
                 exit(true);
             end;
-            //+MM1.40 [357360]
 
-            //-MM1.17 [262040]
             case MembershipSalesSetup."Business Flow Type" of
                 MembershipSalesSetup."Business Flow Type"::MEMBERSHIP:
                     begin
@@ -972,7 +930,7 @@ codeunit 6060131 "NPR MM Member Retail Integr."
                 MembershipSalesSetup."Business Flow Type"::ADD_NAMED_MEMBER:
                     begin
                         repeat
-                            if (not IsForeignMembership(MembershipSalesSetup."Membership Code")) then //-+MM1.40 [357360]
+                            if (not IsForeignMembership(MembershipSalesSetup."Membership Code")) then 
                                 if (not (MemberManagement.AddMemberAndCard(FailWithError, MemberInfoCapture."Membership Entry No.", MemberInfoCapture, true, MemberInfoCapture."Member Entry No", ResponseMessage))) then begin
                                     exit(false);
                                 end;
@@ -981,25 +939,21 @@ codeunit 6060131 "NPR MM Member Retail Integr."
                         asserterror Error(''); // force a rollback, membercreation will be redone at checkout
                     end;
 
-                //-MM1.22 [287080]
                 MembershipSalesSetup."Business Flow Type"::ADD_ANONYMOUS_MEMBER:
                     begin
-                        //-MM1.40 [357360]
+
                         if (IsForeignMembership(MembershipSalesSetup."Membership Code")) then
                             Error(NOT_SUPPORTED_FOR_REMOTE);
-                        //+MM1.40 [357360]
 
                         MemberManagement.AddAnonymousMember(MemberInfoCapture, MemberInfoCapture.Quantity);
                         asserterror Error(''); // force a rollback, membercreation will be redone at checkout
                     end;
-                //+MM1.22 [287080]
 
                 MembershipSalesSetup."Business Flow Type"::ADD_CARD:
                     begin
-                        //-MM1.40 [357360]
+
                         if (IsForeignMembership(MembershipSalesSetup."Membership Code")) then
                             Error(NOT_SUPPORTED_FOR_REMOTE);
-                        //+MM1.40 [357360]
 
                         if (not MemberManagement.IssueMemberCard(false, MemberInfoCapture, MemberInfoCapture."Card Entry No.", ResponseMessage)) then
                             exit(false);
@@ -1008,10 +962,9 @@ codeunit 6060131 "NPR MM Member Retail Integr."
 
                 MembershipSalesSetup."Business Flow Type"::REPLACE_CARD:
                     begin
-                        //-MM1.40 [357360]
+
                         if (IsForeignMembership(MembershipSalesSetup."Membership Code")) then
                             Error(NOT_SUPPORTED_FOR_REMOTE);
-                        //+MM1.40 [357360]
 
                         if (MemberInfoCapture."Replace External Card No." <> '') then
                             MemberManagement.BlockMemberCard(MemberManagement.GetCardEntryNoFromExtCardNo(MemberInfoCapture."Replace External Card No."), true);
@@ -1021,7 +974,6 @@ codeunit 6060131 "NPR MM Member Retail Integr."
                     end;
 
             end;
-            //+MM1.17 [262040]
 
         end;
         exit(true);
@@ -1041,7 +993,6 @@ codeunit 6060131 "NPR MM Member Retail Integr."
         ReasonCode: Integer;
     begin
 
-        //-MM1.40 [360275]
         with MemberInfoCapture do
             if (not ("Information Context" in ["Information Context"::NEW,
                                               "Information Context"::RENEW,
@@ -1085,7 +1036,7 @@ codeunit 6060131 "NPR MM Member Retail Integr."
         end;
 
         exit(true);
-        //+MM1.40 [360275]
+
     end;
 
     procedure DeletePreemptiveMembership(ReceiptNo: Code[20]; LineNo: Integer)
@@ -1095,7 +1046,6 @@ codeunit 6060131 "NPR MM Member Retail Integr."
         MemberManagement: Codeunit "NPR MM Membership Mgt.";
     begin
 
-        //-MM1.24 [298110]
         MemberInfoCapture.SetCurrentKey("Receipt No.", "Line No.");
         MemberInfoCapture.SetFilter("Receipt No.", '=%1', ReceiptNo);
         MemberInfoCapture.SetFilter("Line No.", '=%1', LineNo);
@@ -1114,7 +1064,6 @@ codeunit 6060131 "NPR MM Member Retail Integr."
     procedure GetErrorText(MsgNo: Integer) ErrorText: Text
     begin
 
-        //-MM1.05
         ErrorText := '';
         case MsgNo of
             -1100:
@@ -1130,7 +1079,7 @@ codeunit 6060131 "NPR MM Member Retail Integr."
             -1105:
                 exit(MSG_1105);
         end;
-        //+MM1.05
+
     end;
 
     local procedure DeleteMemberInfoCapture(ReceiptNo: Code[20]; LineNo: Integer)
@@ -1138,14 +1087,13 @@ codeunit 6060131 "NPR MM Member Retail Integr."
         MemberInfoCapture: Record "NPR MM Member Info Capture";
     begin
 
-        //-MM1.19 [271971]
         MemberInfoCapture.SetCurrentKey("Receipt No.", "Line No.");
-        //+MM1.19 [271971]
+
         MemberInfoCapture.SetFilter("Receipt No.", '=%1', ReceiptNo);
         MemberInfoCapture.SetFilter("Line No.", '=%1', LineNo);
         if (not MemberInfoCapture.IsEmpty()) then begin
             MemberInfoCapture.DeleteAll();
-            Commit;
+            Commit();
         end;
     end;
 
@@ -1158,9 +1106,8 @@ codeunit 6060131 "NPR MM Member Retail Integr."
         NPRMembership: Codeunit "NPR MM NPR Membership";
     begin
 
-        //-MM1.40 [357360]
         exit(NPRMembership.IsForeignMembershipCommunity(MembershipCode));
-        //+MM1.40 [357360]
+
     end;
 
     local procedure RemoteCreateMembership(var MemberInfoCapture: Record "NPR MM Member Info Capture"; MembershipSalesSetup: Record "NPR MM Members. Sales Setup")
@@ -1170,12 +1117,11 @@ codeunit 6060131 "NPR MM Member Retail Integr."
         NotValidReason: Text;
     begin
 
-        //-MM1.40 [357360]
         MembershipSetup.Get(MembershipSalesSetup."Membership Code");
 
         if (not NPRMembership.CreateRemoteMembership(MembershipSetup."Community Code", MemberInfoCapture, NotValidReason)) then
             Error(NotValidReason);
-        //+MM1.40 [357360]
+
     end;
 
     local procedure RemoteAddMember(var MemberInfoCapture: Record "NPR MM Member Info Capture"; MembershipSalesSetup: Record "NPR MM Members. Sales Setup")
@@ -1185,12 +1131,11 @@ codeunit 6060131 "NPR MM Member Retail Integr."
         NotValidReason: Text;
     begin
 
-        //-MM1.40 [357360]
         MembershipSetup.Get(MembershipSalesSetup."Membership Code");
 
         if (not NPRMembership.CreateRemoteMember(MembershipSetup."Community Code", MemberInfoCapture, NotValidReason)) then
             Error(NotValidReason);
-        //+MM1.40 [357360]
+
     end;
 
     [EventSubscriber(ObjectType::Table, 6150730, 'OnBeforeInsertEvent', '', true, true)]
@@ -1238,7 +1183,6 @@ codeunit 6060131 "NPR MM Member Retail Integr."
         AlternativeNo: Record "NPR Alternative No.";
         ItemVariant: Record "Item Variant";
     begin
-
 
         ResolvingTable := 0;
         ItemNo := '';

@@ -1,12 +1,5 @@
 xmlport 6060135 "NPR MM Get Members. Chg. Items"
 {
-    // MM1.11/TSA/20160428  CASE 239025 Online membership change management
-    // MM1.11/TSA/20160502  CASE 239052 Transport MM1.11 - 29 April 2016
-    // MM1.14/TSA/20160603  CASE 240871 Transport MM1.13 - 1 June 2016
-    // MM1.17/TSA /20161025  CASE 256152 Conform to OMA Guidelines
-    // MM1.18/TSA/20170216  CASE 265729 Added membercardinality attribute
-    // MM1.23/TSA /20170918 CASE 276869 Added filter on "Not Available Via Web Service"
-    // MM1.43/TSA/20200402  CASE 398328 Transport MM1.43 - 2 April 2020
 
     Caption = 'Get Membership Change Items';
     FormatEvaluate = Xml;
@@ -183,9 +176,7 @@ xmlport 6060135 "NPR MM Get Members. Chg. Items"
 
         MembershipAlterationSetup.SetFilter("From Membership Code", '=%1', Membership."Membership Code");
 
-        //-MM1.23 [276869]
         MembershipAlterationSetup.SetFilter("Not Available Via Web Service", '=%1', false);
-        //+MM1.23 [276869]
 
         MembershipManagement.GetMembershipChangeOptions(MembershipEntryNo, MembershipAlterationSetup, TmpMembershipEntry);
     end;

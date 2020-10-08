@@ -1,12 +1,5 @@
 table 6060132 "NPR MM Member Community"
 {
-    // MM1.00/TSA/20151217  CASE 229684 NaviPartner Member Management Module
-    // MM1.09/TSA/20160226  case 235634 Membership connection to Customer & Contacts
-    // MM1.12/TSA/20160503  CASE 240661 Added DAN Captions
-    // MM1.14/TSA/20160523  CASE 240871 Reminder Service, field 60
-    // MM1.17/TSA/20161214  CASE 243075 Member Point System added field Activate Loyality Program
-    // MM1.30/TSA /20180614 CASE 319296 Added field Customer No. Series
-    // MM1.40/TSA /20190604 CASE 357360 Added "Foreign Membership" flowfield looking down into table 6060143
 
     Caption = 'Member Community';
     DataClassification = CustomerContent;

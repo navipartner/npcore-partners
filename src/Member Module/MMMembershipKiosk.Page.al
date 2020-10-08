@@ -1,10 +1,8 @@
 page 6060078 "NPR MM Membership Kiosk"
 {
-    // MM1.28/TSA /20180315 CASE 302748 initial version
-    // #334163/JDH /20181109 CASE 334163 Added Caption to Object
+
     // 
     // https://dev90.dynamics-retail.com/NPRetail90_W1_DEV_Latest/WebClient/?page=6060078&company=RetailDemo2016
-    // MM1.36/NPKNAV/20190125  CASE 343948 Transport MM1.36 - 25 January 2019
 
     Caption = 'Membership Kiosk';
     PageType = List;

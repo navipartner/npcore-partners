@@ -1,6 +1,5 @@
 page 6059772 "NPR Member Card Types Card"
 {
-    // NPR5.41/TS  /20180105 CASE 300893 Removed Caption on ActionContainer
 
     Caption = 'Point Card - Types Card';
     SourceTable = "NPR Member Card Types";

@@ -1,13 +1,5 @@
 xmlport 6060133 "NPR MM Get Members. TicketList"
 {
-    // MM1.08/TSA/20160219 CASE 232494 First version
-    // MM1.09/TSA/20160311  CASE 235812 Transport MM1.09 - 11 March 2016
-    // MM1.11/TSA/20160428  CASE 239657 Changed cardinality presentation in XML document
-    // TM1.17/TSA /20161025  CASE 256152 Conform to OMA Guidelines
-    // TM1.17/TSA/20161026  CASE 250321 Added membershipinfo section
-    // MM1.18/TSA/20170207  CASE Changed to XML format
-    // MM1.19/TSA/20170328  CASE 270877 Allowing blank admission code
-    // MM1.34/TSA /20180904 CASE 325813 Allowing members from all role types to be displayed (required by web to detect a member)
 
     Caption = 'Get Membership Ticket List';
     FormatEvaluate = Xml;
@@ -170,12 +162,12 @@ xmlport 6060133 "NPR MM Get Members. TicketList"
                         DateValidFromDate: Date;
                         DateValidUntilDate: Date;
                     begin
-                        //-#250321 [250321]
+
                         if (MembershipSetup.Get(tmpMembershipResponse."Membership Code")) then;
                         MembershipManagement.GetMembershipValidDate(tmpMembershipResponse."Entry No.", Today, DateValidFromDate, DateValidUntilDate);
                         ValidFromDate := Format(DateValidFromDate, 0, 9);
                         ValidUntilDate := Format(DateValidUntilDate, 0, 9);
-                        //+#250321 [250321]
+
                     end;
                 }
             }
@@ -230,14 +222,12 @@ xmlport 6060133 "NPR MM Get Members. TicketList"
 
         Membership.Get(MembershipEntryNo);
 
-
         MembershipRole.SetFilter("Membership Entry No.", '=%1', MembershipEntryNo);
         MembershipRole.SetFilter(Blocked, '=%1', false);
 
-        //-MM1.34 [325813] - Refactored if / else conditions
         if (MemberEntryNo > 0) then begin
             MembershipRole.SetFilter("Member Entry No.", '=%1', MemberEntryNo);
-            //IF (MembershipRole.ISEMPTY ()) THEN BEGIN
+            //IF (MembershipRole.IsEmpty ()) THEN BEGIN
             if (not MembershipRole.FindFirst()) then begin
                 AddErrorResponse(StrSubstNo('Membership %1 does not have a member %2', Membership."External Membership No.", tmpMemberInfoCapture."External Member No"));
                 exit;

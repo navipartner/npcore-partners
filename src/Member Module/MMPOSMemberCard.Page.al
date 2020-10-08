@@ -1,22 +1,6 @@
 page 6060140 "NPR MM POS Member Card"
 {
-    // MM1.10/TSA/20160405  CASE 234209 Transport MM1.10 - 22 March 2016
-    // MM1.11/TSA/20160418  CASE 239328 Added some more fields and chroma coding of good and abad values
-    // MM1.18/NAV/20170309  CASE 263198 Transport MM1.18 - 8 March 2017
-    // MM1.19/TSA/20170518  CASE 276779 Better handling of ValidUntilDate when membership is expired.
-    // MM1.19/TSA/20170519  case 276779 added the GetMembershipMaxValidUntilDate() function
-    // MM1.19/TSA/20170525  CASE 278061 Handling issues reported by OMA
-    // MM1.23/NPKNAV/20171025  CASE 257011 Transport MM1.23 - 25 October 2017
-    // MM1.26/TSA /20180124 CASE 299690 Added button Add Guardian and Activate Membership, clean-up
-    // MM1.27/TSA /20180321 CASE 308756 Added output for RemainingPoints
-    // MM1.29/TSA /20180511 CASE 314687 Added Contact Profile Questionnair
-    // MM1.29/TSA /20180511 CASE 313795 Added GDPR option for guardian
-    // MM1.34/TSA /20180907 CASE 327605 Open / Due Amount field
-    // MM1.40/TSA /20190823 CASE 360242 Cleaned Green Code
-    // MM1.41/TSA /20191008 CASE 366261 When Clienttype is Phone, there is no "LookupOK"
-    // MM1.42/TSA /20191118 CASE 378190 Adding Statistics and Ledger Entry Button
-    // MM1.42/ALPO/20191125 CASE 377727 Raptor integration: new page actions "Raptor Order History", "Raptor Recommendations"
-    // MM1.42/ALPO/20191127 CASE 379072 New tab 'CRM', same as on the page 6060136 "MM Member Card".
+
     //                                     - Controls moved to the tab: Picture, Gender, Birthday, "E-Mail News Letter"
 
     Caption = 'Member Details';
@@ -193,12 +177,11 @@ page 6060140 "NPR MM POS Member Card"
                     ResponseMessage: Text;
                 begin
 
-                    //-MM1.41 [366261]
                     if (not MemberWebService.MemberRegisterArrival("External Member No.", '', 'RTC-CLIENT', ResponseMessage)) then
                         Error(ResponseMessage);
 
                     Message(ResponseMessage);
-                    //+MM1.41 [366261]
+
                 end;
             }
             action("Activate Membership")
@@ -213,10 +196,8 @@ page 6060140 "NPR MM POS Member Card"
                 trigger OnAction()
                 begin
 
-                    //-MM1.22 [278175]
                     ActivateMembership();
 
-                    //+MM1.22 [278175]
                 end;
             }
             action("Add Guardian")
@@ -261,7 +242,7 @@ page 6060140 "NPR MM POS Member Card"
                     MembershipManagement: Codeunit "NPR MM Membership Mgt.";
                     MemberCardEntryNo: Integer;
                 begin
-                    //-MM1.22 [289434]
+
                     if (Confirm(CONFIRM_PRINT, true, StrSubstNo(CONFIRM_PRINT_FMT, "External Member No.", "Display Name"))) then begin
                         //MemberRetailIntegration.PrintMemberCard ("Entry No.", MembershipManagement.GetMemberCardEntryNo ("Entry No.", TODAY));
                         MemberCardEntryNo := CurrPage.MemberCardsSubpage.PAGE.GetCurrentEntryNo();
@@ -291,7 +272,6 @@ page 6060140 "NPR MM POS Member Card"
                         CustomerLedgerEntries: Page "Customer Ledger Entries";
                     begin
 
-                        //-MM1.42 [378190]
                         if (Membership."Customer No." = '') then
                             Error(NO_ENTRIES, Rec."External Member No.");
 
@@ -302,7 +282,7 @@ page 6060140 "NPR MM POS Member Card"
                         CustomerLedgerEntries.Editable(false);
                         CustomerLedgerEntries.SetTableView(CustLedgerEntry);
                         CustomerLedgerEntries.RunModal();
-                        //+MM1.42 [378190]
+
                     end;
                 }
                 action(ItemLedgerEntries)
@@ -317,7 +297,7 @@ page 6060140 "NPR MM POS Member Card"
                     var
                         ItemLedgerEntry: Record "Item Ledger Entry";
                     begin
-                        //-MM1.42 [377727]
+
                         if (Membership."Customer No." = '') then
                             Error(NO_ENTRIES, Rec."External Member No.");
 
@@ -329,7 +309,7 @@ page 6060140 "NPR MM POS Member Card"
                         ItemLedgerEntry.Ascending(false);
                         if ItemLedgerEntry.FindFirst then;
                         PAGE.RunModal(0, ItemLedgerEntry);
-                        //+MM1.42 [377727]
+
                     end;
                 }
                 action(CustomerStatisics)
@@ -347,7 +327,6 @@ page 6060140 "NPR MM POS Member Card"
                         CustomerStatistics: Page "Customer Statistics";
                     begin
 
-                        //-MM1.42 [378190]
                         if (Membership."Customer No." = '') then
                             Error(NO_ENTRIES, Rec."External Member No.");
 
@@ -355,7 +334,7 @@ page 6060140 "NPR MM POS Member Card"
                         CustomerStatistics.SetRecord(Customer);
                         CustomerStatistics.Editable(false);
                         CustomerStatistics.RunModal();
-                        //+MM1.42 [378190]
+
                     end;
                 }
             }
@@ -377,12 +356,12 @@ page 6060140 "NPR MM POS Member Card"
                         RaptorAction: Record "NPR Raptor Action";
                         RaptorMgt: Codeunit "NPR Raptor Management";
                     begin
-                        //-MM1.42 [377727]
+
                         if (Membership."Customer No." = '') then
                             Error(NO_ENTRIES, "External Member No.");
                         if RaptorMgt.SelectRaptorAction(RaptorMgt.RaptorModule_GetUserIdHistory, true, RaptorAction) then
                             RaptorMgt.ShowRaptorData(RaptorAction, Membership."Customer No.");
-                        //+MM1.42 [377727]
+
                     end;
                 }
                 action(RaptorRecommendations)
@@ -400,12 +379,12 @@ page 6060140 "NPR MM POS Member Card"
                         RaptorAction: Record "NPR Raptor Action";
                         RaptorMgt: Codeunit "NPR Raptor Management";
                     begin
-                        //-MM1.42 [377727]
+
                         if (Membership."Customer No." = '') then
                             Error(NO_ENTRIES, "External Member No.");
                         if RaptorMgt.SelectRaptorAction(RaptorMgt.RaptorModule_GetUserRecommendations, true, RaptorAction) then
                             RaptorMgt.ShowRaptorData(RaptorAction, Membership."Customer No.");
-                        //+MM1.42 [377727]
+
                     end;
                 }
             }
@@ -492,9 +471,9 @@ page 6060140 "NPR MM POS Member Card"
     var
         RaptorSetup: Record "NPR Raptor Setup";
     begin
-        //-MM1.42 [377727]
+
         RaptorEnabled := (RaptorSetup.Get and RaptorSetup."Enable Raptor Functions");
-        //+MM1.42 [377727]
+
     end;
 
     var

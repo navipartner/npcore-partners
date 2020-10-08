@@ -1,6 +1,5 @@
 page 6060135 "NPR MM Members. Admis. Setup"
 {
-    // MM80.1.08/TSA/20160225  CASE 232494-01 Transport MM1.08 - 16 February 2016
 
     Caption = 'Membership Admission Setup';
     PageType = List;

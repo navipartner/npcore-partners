@@ -1,10 +1,5 @@
 codeunit 6060142 "NPR MM Loyalty WebService Mgr"
 {
-    // MM1.19/NPKNAV/20170525  CASE 274690 Transport MM1.20 - 25 May 2017
-    // MM1.37/TSA /20190226 CASE 338215 Points for payments refactored
-    // MM1.37/TSA /20190226 CASE 338215 Added GetLoyaltyPointsEntries
-    // MM1.40/TSA /20190828 CASE 365879 Added GetLoyaltyReceiptList
-    // MM1.42/TSA /20191212 CASE 382170 General enhancements
 
     TableNo = "NPR Nc Import Entry";
 
@@ -21,9 +16,9 @@ codeunit 6060142 "NPR MM Loyalty WebService Mgr"
                 'GetLoyaltyPoints':
                     GetLoyaltyPoints(XmlDoc, "Document ID");
                 'GetLoyaltyPointEntries':
-                    GetLoyaltyPoints(XmlDoc, "Document ID"); //-+MM1.37 [338215]
+                    GetLoyaltyPoints(XmlDoc, "Document ID"); 
                 'GetLoyaltyReceiptList':
-                    GetLoyaltyPoints(XmlDoc, "Document ID"); //-+MM1.40 [365879]
+                    GetLoyaltyPoints(XmlDoc, "Document ID"); 
 
                 else
                     Error('Implementation for %1 %2 missing in codeunit 6060142', "Import Type", FunctionName);
@@ -52,15 +47,12 @@ codeunit 6060142 "NPR MM Loyalty WebService Mgr"
         if IsNull(XmlElement) then
             exit;
 
-        //-MM1.37 [338215] refactored
-
         if (not NpXmlDomMgt.FindNodes(XmlElement, 'request', XmlNodeList)) then
             Error('request node not found.');
 
         XmlElementNode := XmlNodeList.ItemOf(0);
         DecodeLoyaltyPointsQuery(XmlElementNode, DocumentID);
 
-        //+MM1.37 [338215]
     end;
 
     local procedure "--Handlers"()
@@ -90,12 +82,12 @@ codeunit 6060142 "NPR MM Loyalty WebService Mgr"
             MemberInfoCapture."Membership Entry No." := MembershipManagement.GetMembershipFromExtMembershipNo(MemberInfoCapture."External Membership No.");
 
         if (MemberInfoCapture."External Card No." <> '') then begin
-            //-MM1.40 [365879]
+
             //IF (MemberInfoCapture."Member Entry No" = 0) THEN
             //  MemberInfoCapture."Membership Entry No." := MembershipManagement.GetMembershipFromExtCardNo(MemberInfoCapture."External Card No.", WORKDATE, NotFoundReason);
             if (MemberInfoCapture."Membership Entry No." = 0) then
                 MemberInfoCapture."Membership Entry No." := MembershipManagement.GetMembershipFromExtCardNo(MemberInfoCapture."External Card No.", WorkDate, NotFoundReason);
-            //+MM1.40 [365879]
+
         end;
 
         if (MemberInfoCapture."Membership Entry No." = 0) then
@@ -129,16 +121,15 @@ codeunit 6060142 "NPR MM Loyalty WebService Mgr"
             Membership.SetFilter("Customer No.", '=%1', CustomerNo);
             Membership.SetFilter(Blocked, '=%1', false);
             if (Membership.FindFirst()) then
-                //-MM1.42 [382170]
-                //-MM1.40 [365879]õ
+
                 //MemberInfoCapture."External Member No" := Membership."External Membership No.";
                 //MemberInfoCapture."External Membership No." := Membership."External Membership No.";
-                //+MM1.40 [365879]
-                if (MemberInfoCapture."External Membership No." = '') then //-+MM1.42 [382170]
+
+                if (MemberInfoCapture."External Membership No." = '') then 
                     MemberInfoCapture."External Membership No." := Membership."External Membership No.";
             if (MemberInfoCapture."External Membership No." <> Membership."External Membership No.") then
                 MemberInfoCapture."External Membership No." := '';
-            //+MM1.42 [382170]
+
         end;
 
         MemberInfoCapture.Insert

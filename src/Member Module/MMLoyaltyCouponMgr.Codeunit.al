@@ -1,9 +1,5 @@
 codeunit 6060143 "NPR MM Loyalty Coupon Mgr"
 {
-    // MM1.22/TSA /20170731 CASE 285403 Initial Version
-    // MM1.28/TSA /20180425 CASE 307048 Refactored to handle value to redeem
-    // MM1.42/TSA /20191024 CASE 374403 Changed signature on IssueOneCoupon(), IssueOneCouponAndPrint(), and IssueCoupon()
-
 
     trigger OnRun()
     begin
@@ -24,10 +20,9 @@ codeunit 6060143 "NPR MM Loyalty Coupon Mgr"
         CouponType.Get(CouponTypeCode);
         CouponType.TestField("Reference No. Pattern");
 
-        //-MM1.42 [374403]
         //CouponNo := IssueCoupon(CouponType, MembershipEntryNo, PointsToRedeem, ValueToRedeem, FALSE);
         CouponNo := IssueCoupon(CouponType, MembershipEntryNo, DocumentNo, PostingDate, PointsToRedeem, ValueToRedeem, false);
-        //+MM1.42 [374403]
+
     end;
 
     procedure IssueOneCouponAndPrint(CouponTypeCode: Code[20]; MembershipEntryNo: Integer; DocumentNo: Code[20]; PostingDate: Date; PointsToRedeem: Integer; ValueToRedeem: Decimal) CouponNo: Code[20]
@@ -40,10 +35,9 @@ codeunit 6060143 "NPR MM Loyalty Coupon Mgr"
         CouponType.Get(CouponTypeCode);
         CouponType.TestField("Reference No. Pattern");
 
-        //-MM1.42 [374403]
         //CouponNo := IssueCoupon(CouponType, MembershipEntryNo, PointsToRedeem, ValueToRedeem, TRUE);
         CouponNo := IssueCoupon(CouponType, MembershipEntryNo, DocumentNo, PostingDate, PointsToRedeem, ValueToRedeem, true);
-        //+MM1.42 [374403]
+
     end;
 
     local procedure IssueCoupon(CouponType: Record "NPR NpDc Coupon Type"; MembershipEntryNo: Integer; DocumentNo: Code[20]; PostingDate: Date; PointsToRedeem: Integer; ValueToRedeem: Decimal; WithPrint: Boolean) CouponNo: Code[20]
@@ -75,10 +69,8 @@ codeunit 6060143 "NPR MM Loyalty Coupon Mgr"
         if (ValueToRedeem = 0) then
             CouponMgt.PostIssueCoupon(Coupon);
 
-        //-MM1.42 [374403]
         //LoyaltyPointMgt.RedeemPointsCoupon (MembershipEntryNo, '', TODAY, Coupon."No.", PointsToRedeem);
         LoyaltyPointMgt.RedeemPointsCoupon(MembershipEntryNo, DocumentNo, PostingDate, Coupon."No.", PointsToRedeem);
-        //+MM1.42 [374403]
 
         if (WithPrint) then
             CouponMgt.PrintCoupon(Coupon);

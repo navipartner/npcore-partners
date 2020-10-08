@@ -1,19 +1,5 @@
 table 6060136 "NPR MM Members. Alter. Setup"
 {
-    // MM1.12/TSA/20160503  CASE 240661 Added DAN Captions
-    // MM1.14/TSA/20160503  CASE 240697 Added Price fraction calculations.
-    // MM1.19/TSA/20170322  CASE 268166 New field "Upgrade With New Duration"
-    // MM1.22/TSA /20170816 CASE 287080 Added field Anonymous Member Unit Price
-    // MM1.22/TSA /20170829 CASE 286922 New fields and type "Auto-Renew To" and type "Auto-Renew"
-    // MM1.23/TSA /20170918 CASE 276869 Added a filter for web service "Not Available Via Web Service"
-    // MM1.24/NPKNAV/20171207  CASE 297852 Transport MM1.24 - 7 December 2017
-    // MM1.25/TSA /20180119 CASE 300256 Card Expired Action
-    // MM1.30/TSA /20180605 CASE 317428 Added "Grace Period Calculation"
-    // MM1.40/TSA /20190730 CASE 360275 Added field 85 "Auto-Admit Member On Sale"
-    // MM1.41/TSA /20191016 CASE 373297 Added Grace Period Preset
-    // MM1.43/TSA /20200331 CASE 398328 Added new field "Presentation Order" and key
-    // MM1.44/TSA /20200427 CASE 397911 Added new option to "Alteration Activate From"::Back-to-Back
-    // MM1.44/TSA /20200529 CASE 407401 Added Age verification setup
 
     Caption = 'Membership Alteration Setup';
     DataClassification = CustomerContent;
@@ -256,8 +242,6 @@ table 6060136 "NPR MM Members. Alter. Setup"
         if ("Alteration Type" = "Alteration Type"::UPGRADE) then
             TestField("To Membership Code");
 
-        //-+MM1.19 [268166] IF ("Alteration Type" IN ["Alteration Type"::EXTEND, "Alteration Type"::RENEW]) THEN begin
-        //-+MM1.22 [286922] IF (("Alteration Type" IN ["Alteration Type"::EXTEND, "Alteration Type"::RENEW]) OR
         if (("Alteration Type" in ["Alteration Type"::EXTEND, "Alteration Type"::RENEW, "Alteration Type"::AUTORENEW]) or
           (("Alteration Type" = "Alteration Type"::UPGRADE) and ("Upgrade With New Duration"))) then begin
             TestField("Membership Duration");

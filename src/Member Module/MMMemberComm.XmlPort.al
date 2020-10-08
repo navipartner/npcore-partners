@@ -1,6 +1,5 @@
 xmlport 6151188 "NPR MM Member Comm."
 {
-    // MM1.42/TSA /20191231 CASE 382728 Initial Version
 
     Caption = 'Member Communication';
     Encoding = UTF8;

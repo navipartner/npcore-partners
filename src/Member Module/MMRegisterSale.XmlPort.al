@@ -1,7 +1,5 @@
 xmlport 6151162 "NPR MM Register Sale"
 {
-    // MM1.37/TSA /20190206 CASE 338215 Initial Version
-    // MM1.38/TSA /20190522 CASE 338215 Added Company Name
 
     Caption = 'Register Sale';
     FormatEvaluate = Xml;

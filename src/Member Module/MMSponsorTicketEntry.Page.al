@@ -1,6 +1,5 @@
 page 6151186 "NPR MM Sponsor. Ticket Entry"
 {
-    // MM1.41/TSA /20191004 CASE 367471 Initial Version
 
     Caption = 'Sponsorship Ticket Entry';
     InsertAllowed = false;

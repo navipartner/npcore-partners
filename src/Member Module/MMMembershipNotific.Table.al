@@ -1,13 +1,5 @@
 table 6060138 "NPR MM Membership Notific."
 {
-    // MM1.14/TSA/20160603  CASE 240871 Transport MM1.13 - 1 June 2016
-    // MM1.22/TSA/20170525  CASE 278061 Handling issues reported by OMA
-    // MM1.26/TSA /20180202 CASE 300681 Added flowfield for external membership no and external member no
-    // MM1.29/TSA /20180504 CASE 314131 Include NP Pass / Wallet data in welcome mail
-    // MM1.32/TSA /20180710 CASE 318132 Added option Wallet_Create to the Notification Trigger
-    // MM1.32/TSA /20180711 CASE 318132 Added field Member Card Entry No.
-    // #334163/JDH /20181109 CASE 334163 Added caption to field Member Card Entry No.
-    // MM1.36/NPKNAV/20190125  CASE 328141-02 Transport MM1.36 - 25 January 2019
 
     Caption = 'Membership Notification';
     DataClassification = CustomerContent;
@@ -102,7 +94,7 @@ table 6060138 "NPR MM Membership Notific."
         {
             Caption = 'Processing Method';
             DataClassification = CustomerContent;
-            Description = '//-MM1.29 [314131]';
+            Description = '';
             OptionCaption = 'Batch,Manual,Inline';
             OptionMembers = BATCH,MANUAL,INLINE;
         }
@@ -131,7 +123,7 @@ table 6060138 "NPR MM Membership Notific."
         {
             Caption = 'Include NP Pass';
             DataClassification = CustomerContent;
-            Description = '//-MM1.29 [314131]';
+            Description = '';
         }
     }
 

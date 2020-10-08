@@ -1,16 +1,5 @@
 codeunit 6060141 "NPR MM Loyalty WebService"
 {
-    // MM1.19/NPKNAV/20170525  CASE 274690 Transport MM1.20 - 25 May 2017
-    // MM1.37/TSA /20190204 CASE 338215 Points for payment, RegisterSale(), ReservePoints()
-    // MM1.38/TSA /20190523 CASE 338215 Added Service GetLoyaltyConfiguration
-    // MM1.40/TSA /20190813 CASE 343352 Added GetCouponEligibility(), TransformPointsToCoupon()
-    // MM1.40/TSA /20190828 CASE 365879 Added ReceiptList and Receipt as PDF
-    // MM1.42/TSA /20191024 CASE 374403 Changed signature on IssueOneCoupon(), IssueOneCouponAndPrint(), and IssueCoupon()
-    // MM1.43/TSA /20200113 CASE 370398 Added the ListCoupons() service
-    // MM1.43/TSA /20200123 CASE 387009 Fixed an initialization issue with CreateCoupon()
-    // MM1.43/MHA /20200217 CASE 390998 Added default report in GetMembershipReceiptPdf()
-    // MM1.45/TSA /20200612 CASE 404908 Added language selection from user personalization
-
 
     trigger OnRun()
     begin
@@ -107,7 +96,6 @@ codeunit 6060141 "NPR MM Loyalty WebService"
         MemberInfoCapture: Record "NPR MM Member Info Capture";
     begin
 
-        //-MM1.40 [365879]
         GetLoyaltyReceiptList.Import();
 
         InsertImportEntry('GetLoyaltyReceiptList', ImportEntry);
@@ -140,7 +128,7 @@ codeunit 6060141 "NPR MM Loyalty WebService"
         ImportEntry.Modify(true);
 
         MemberInfoCapture.DeleteAll();
-        //+MM1.40 [365879]
+
     end;
 
     procedure GetMembershipReceiptPdf(ExternalMembershipNumber: Code[20]; ReceiptEntryNo: Integer) PdfDoc: Text
@@ -153,14 +141,12 @@ codeunit 6060141 "NPR MM Loyalty WebService"
         LanguageId: Integer;
     begin
 
-        //-MM1.40 [365879]
         ReportSelections.SetFilter("Report Type", '=%1', ReportSelections."Report Type"::"Large Sales Receipt (POS Entry)");
         ReportSelections.SetFilter("Report ID", '<>%1', 0);
-        //-MM1.43 [390998]
-        //ReportSelections.FINDFIRST;
+
+        //ReportSelections.FindFirst;
         if not ReportSelections.FindFirst then
             ReportSelections."Report ID" := REPORT::"NPR Sales Ticket A4 - POS Rdlc";
-        //+MM1.43 [390998]
 
         Membership.SetFilter("External Membership No.", '=%1', ExternalMembershipNumber);
         Membership.FindFirst();
@@ -172,18 +158,14 @@ codeunit 6060141 "NPR MM Loyalty WebService"
 
         Filename := TemporaryPath + 'Receipt-' + Format(ReceiptEntryNo, 0, 9) + '.pdf';
 
-        //-MM1.45 [404908]
         UserPersonalization.SetFilter("User ID", '%1', UserId);
         if (UserPersonalization.FindFirst()) then
             LanguageId := GlobalLanguage(UserPersonalization."Language ID");
-        //+MM1.45 [404908]
 
         REPORT.SaveAsPdf(ReportSelections."Report ID", Filename, POSEntry);
 
-        //-MM1.45 [404908]
         if (LanguageId <> 0) then
             GlobalLanguage(LanguageId);
-        //+MM1.45 [404908]
 
         PdfDoc := GetBase64(Filename);
         if Erase(Filename) then;
@@ -373,7 +355,6 @@ codeunit 6060141 "NPR MM Loyalty WebService"
         ResponseMessageId: Text;
     begin
 
-        //-MM1.40 [343352]
         LoyaltyCouponEligibility.Import();
 
         InsertImportEntry('LoyaltyCouponEligibility', ImportEntry);
@@ -417,7 +398,7 @@ codeunit 6060141 "NPR MM Loyalty WebService"
         ImportEntry."Runtime Error" := false;
 
         ImportEntry.Modify(true);
-        //+MM1.40 [343352]
+
     end;
 
     procedure CreateCoupon(var LoyaltyCreateCoupon: XMLport "NPR MM Loyalty Create Coup.")
@@ -436,7 +417,6 @@ codeunit 6060141 "NPR MM Loyalty WebService"
         MembershipEntryNo: Integer;
     begin
 
-        //-MM1.40 [343352]
         LoyaltyCreateCoupon.Import();
 
         InsertImportEntry('LoyaltyCreateCoupon', ImportEntry);
@@ -463,19 +443,17 @@ codeunit 6060141 "NPR MM Loyalty WebService"
             if (TmpLoyaltyPointsSetup.FindSet()) then begin
                 repeat
 
-                    //-MM1.43 [387009]
                     // IF (LoyaltyPointsSetup.GET (TmpLoyaltyPointsSetup.Code, TmpLoyaltyPointsSetup."Line No.")) THEN BEGIN
                     TmpLoyaltyPointsSetupEligible.DeleteAll();
                     LoyaltyPointManagement.GetCouponToRedeemWS(MembershipEntryNo, TmpLoyaltyPointsSetupEligible, TmpMemberInfoCapture."Amount Incl VAT", ResponseMessage);
                     if (TmpLoyaltyPointsSetupEligible.Get(TmpLoyaltyPointsSetup.Code, TmpLoyaltyPointsSetup."Line No.")) then begin
-                        //+MM1.43 [387009]
 
                         TmpLoyaltyPointsSetup.TransferFields(TmpLoyaltyPointsSetupEligible, true);
-                        //-MM1.42 [374403]
+
                         //IF (Coupon.GET (LoyaltyPointManagement.IssueOneCoupon (MembershipEntryNo, TmpLoyaltyPointsSetup, TmpMemberInfoCapture."Amount Incl VAT"))) THEN BEGIN
                         with TmpMemberInfoCapture do
                             if (Coupon.Get(LoyaltyPointManagement.IssueOneCoupon(MembershipEntryNo, TmpLoyaltyPointsSetup, "Document No.", "Document Date", "Amount Incl VAT"))) then begin
-                                //+MM1.42 [374403]
+
                                 TmpCoupon.TransferFields(Coupon, true);
                                 TmpCoupon.Insert();
                             end;
@@ -485,7 +463,7 @@ codeunit 6060141 "NPR MM Loyalty WebService"
 
             if (not TmpCoupon.IsEmpty()) then begin
                 LoyaltyCreateCoupon.AddResponse(MembershipEntryNo, TmpCoupon, ResponseMessage);
-                Commit;
+                Commit();
             end else begin
                 LoyaltyCreateCoupon.AddErrorResponse('No coupons created.');
             end;
@@ -519,7 +497,6 @@ codeunit 6060141 "NPR MM Loyalty WebService"
         MembershipEntryNo: Integer;
     begin
 
-        //-MM1.43 [370398]
         LoyaltyListCoupon.Import();
 
         InsertImportEntry('LoyaltyListCoupon', ImportEntry);
@@ -561,7 +538,7 @@ codeunit 6060141 "NPR MM Loyalty WebService"
 
             if (not TmpCoupon.IsEmpty()) then begin
                 LoyaltyListCoupon.AddResponse(MembershipEntryNo, TmpCoupon, ResponseMessage);
-                Commit;
+                Commit();
             end else begin
                 LoyaltyListCoupon.AddErrorResponse('No coupons available.');
             end;
@@ -579,7 +556,7 @@ codeunit 6060141 "NPR MM Loyalty WebService"
         ImportEntry."Runtime Error" := false;
 
         ImportEntry.Modify(true);
-        //+MM1.43 [370398]
+
     end;
 
     local procedure "--Locals"()
@@ -627,7 +604,7 @@ codeunit 6060141 "NPR MM Loyalty WebService"
         CreateImportType('POINTS-02', 'PointManagement', 'ReservePoints');
         CreateImportType('POINTS-03', 'PointManagement', 'GetLoyaltyConfiguration');
 
-        Commit;
+        Commit();
     end;
 
     local procedure CreateImportType("Code": Code[20]; Description: Text[30]; FunctionName: Text[30])
@@ -672,7 +649,6 @@ codeunit 6060141 "NPR MM Loyalty WebService"
         f: File;
     begin
 
-        //-MM1.40 [365879]
         Value := '';
 
         f.Open(Filename);
@@ -686,7 +662,7 @@ codeunit 6060141 "NPR MM Loyalty WebService"
         Clear(MemoryStream);
         f.Close;
         exit(Value);
-        //+MM1.40 [365879]
+
     end;
 }
 

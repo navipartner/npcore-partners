@@ -1,7 +1,5 @@
 codeunit 6060137 "NPR MM Member Camera Hook"
 {
-    // MM1.16/NPKNAV/20161026  CASE 240868 Transport T0003 - MM1.16
-
 
     trigger OnRun()
     begin

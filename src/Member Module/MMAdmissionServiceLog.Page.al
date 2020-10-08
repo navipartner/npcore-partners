@@ -1,7 +1,5 @@
 page 6060092 "NPR MM Admission Service Log"
 {
-    // NPR5.31/NPKNAV/20170502  CASE 263737 Transport NPR5.31 - 2 May 2017
-    // NPR5.48/CLVA  /20190102  CASE 340731 Added ActionItems Test
 
     Caption = 'MM Admission Service Log';
     Editable = false;

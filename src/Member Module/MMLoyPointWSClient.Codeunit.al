@@ -1,10 +1,8 @@
 codeunit 6151164 "NPR MM Loy. Point WS (Client)"
 {
-    // MM1.38/TSA /20190221 CASE 338215 Initial Version
-    // MM1.40/TSA /20190604 CASE 357360 Refactored - removed duplicate code, reuse webservice api code in codeunit 6060147
+
     // 
     // *** This codeunit should be decommisioned ***
-
 
     trigger OnRun()
     begin
@@ -15,7 +13,6 @@ codeunit 6151164 "NPR MM Loy. Point WS (Client)"
         NPRMembership: Codeunit "NPR MM NPR Membership";
     begin
 
-        //-MM1.40 [357360]
         exit(NPRMembership.WebServiceApi(LoyaltyEndpointClient, SoapAction, ReasonText, XmlDocIn, XmlDocOut));
 
         //
@@ -29,8 +26,8 @@ codeunit 6151164 "NPR MM Loy. Point WS (Client)"
         //  LoyaltyEndpointClient."Credentials Type"::NAMED :
         //    BEGIN
         //      HttpWebRequest.UseDefaultCredentials (FALSE);
-        //      B64Credential := ToBase64 (STRSUBSTNO ('%1:%2', LoyaltyEndpointClient."User Account", LoyaltyEndpointClient."User Password"));
-        //      HttpWebRequest.Headers.Add ('Authorization', STRSUBSTNO ('Basic %1', B64Credential));
+        //      B64Credential := ToBase64 (StrSubstNo ('%1:%2', LoyaltyEndpointClient."User Account", LoyaltyEndpointClient."User Password"));
+        //      HttpWebRequest.Headers.Add ('Authorization', StrSubstNo ('Basic %1', B64Credential));
         //    END;
         //  ELSE
         //    HttpWebRequest.UseDefaultCredentials (TRUE);
@@ -38,7 +35,7 @@ codeunit 6151164 "NPR MM Loy. Point WS (Client)"
         //
         // HttpWebRequest.Method := 'POST';
         // HttpWebRequest.ContentType := 'application/xml; charset=utf-8';
-        // HttpWebRequest.Headers.Add ('SOAPAction', STRSUBSTNO ('"%1"', SoapAction));
+        // HttpWebRequest.Headers.Add ('SOAPAction', StrSubstNo ('"%1"', SoapAction));
         //
         // NpXmlDomMgt.SetTrustedCertificateValidation (HttpWebRequest);
         //
@@ -57,7 +54,7 @@ codeunit 6151164 "NPR MM Loy. Point WS (Client)"
         // GetExceptionDescription (XmlDocOut, SoapAction, LoyaltyEndpointClient."Endpoint URI");
         //
         // EXIT (FALSE);
-        //+MM1.40 [357360]
+
     end;
 
     procedure ToBase64(StringToEncode: Text) B64String: Text

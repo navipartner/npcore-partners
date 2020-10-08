@@ -1,6 +1,5 @@
 xmlport 6060145 "NPR MM Get Loy. Statement"
 {
-    // MM1.37/TSA /20190226 CASE 338215 Initial Version
 
     Caption = 'Get Loyalty Statement';
     FormatEvaluate = Xml;

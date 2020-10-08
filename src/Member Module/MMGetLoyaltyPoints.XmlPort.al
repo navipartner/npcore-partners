@@ -1,14 +1,5 @@
 xmlport 6060141 "NPR MM Get Loyalty Points"
 {
-    // MM1.00/TSA/20151217  CASE 229684 NaviPartner Member Management Module
-    // MM1.06/TSA/20160127  CASE 232910 - Enchanced error handling when there is a runtime error processing the request
-    // MM1.08/TSA/20160219  CASE 234298 - Added valid to from contents
-    // MM1.14/TSA/20160524  CASE 239052 - Added customernumber as a search parameter
-    // MM1.18/TSA/20170207  CASE 265562 - Changed to XML format
-    // MM1.18/TSA/20170216  CASE 265729 - Added membercardinality and membercount
-    // MM1.37/TSA /20190226 CASE 338215 - Touch-up on the response status section (breaking change)
-    // MM1.44/TSA /20200421 CASE 400845 - Additional loyalty info + tier info
-    // MM1.44/TSA /20200528 CASE 405974 - Added info regarding previous period
 
     Caption = 'Get Loyalty Points';
     FormatEvaluate = Xml;
@@ -285,7 +276,6 @@ xmlport 6060141 "NPR MM Get Loyalty Points"
         tmpMembershipResponse.TransferFields(Membership, true);
         if (tmpMembershipResponse.Insert()) then;
 
-        //-MM1.44 [400845]
         MemberCommunity.Get(Membership."Community Code");
         MembershipSetup.Get(Membership."Membership Code");
         CommunityName := MemberCommunity.Description;
@@ -298,12 +288,10 @@ xmlport 6060141 "NPR MM Get Loyalty Points"
                 LoyaltyCode := LoyaltySetup.Code;
                 LoyaltyName := LoyaltySetup.Description;
 
-                //-MM1.44 [405974]
                 LoyaltyCollectionPeriodCode := Format(LoyaltySetup."Collection Period", 0, 9);
                 LoyaltyCollectionPeriodName := Format(LoyaltySetup."Collection Period");
                 LoyaltyPointSourceCode := Format(LoyaltySetup."Voucher Point Source", 0, 9);
                 LoyaltyPointSourceName := Format(LoyaltySetup."Voucher Point Source");
-                //+MM1.44 [405974]
 
             end;
         end;
@@ -323,9 +311,7 @@ xmlport 6060141 "NPR MM Get Loyalty Points"
                 if (MembershipSetupTiers.Get(DowngradeToLevel)) then
                     DowngradeToName := MembershipSetupTiers.Description
         end;
-        //+MM1.44 [400845]
 
-        //-MM1.44 [405974]
         Earned := LoyaltyPointManagement.CalculateEarnedPointsCurrentPeriod(MembershipEntryNo);
         Redeemable := LoyaltyPointManagement.CalculateRedeemablePointsCurrentPeriod(MembershipEntryNo);
 
@@ -349,7 +335,7 @@ xmlport 6060141 "NPR MM Get Loyalty Points"
         LoyaltyPointManagement.CalculateSpendPeriod(MembershipEntryNo, Today, PeriodStart, PeriodEnd);
         spendperiodstart := Format(PeriodStart, 0, 9);
         spendperiodend := Format(PeriodEnd, 0, 9);
-        //+MM1.44 [405974]
+
     end;
 
     procedure AddErrorResponse(ErrorMessage: Text)

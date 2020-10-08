@@ -1,6 +1,5 @@
 page 6060087 "NPR MM Membership Lim. Setup"
 {
-    // MM1.21/TSA /20170721 CASE 284653 First Version
 
     Caption = 'Membership Limitation Setup';
     PageType = List;

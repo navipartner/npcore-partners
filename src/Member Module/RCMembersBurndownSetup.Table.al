@@ -1,6 +1,5 @@
 table 6060149 "NPR RC Members. Burndown Setup"
 {
-    // TM1.16/TSA/20160816  CASE 233430 Transport TM1.16 - 19 July 2016
 
     Caption = 'Trailing Sales Orders Setup';
     DataClassification = CustomerContent;
@@ -78,7 +77,7 @@ table 6060149 "NPR RC Members. Burndown Setup"
         //EXIT(FORMAT("Show Memberships") + '|' +
         //  FORMAT("Period Length") + '|' +
         //  FORMAT("Value to Calculate") + '|. (' +
-        //  STRSUBSTNO(Text001,TIME) + ')');
+        //  StrSubstNo(Text001,TIME) + ')');
 
         exit(StrSubstNo('%1|%2|%3|%4|. (%5)',
           "Show Memberships",
@@ -123,25 +122,25 @@ table 6060149 "NPR RC Members. Burndown Setup"
     procedure SetPeriodLength(PeriodLength: Option)
     begin
         "Period Length" := PeriodLength;
-        Modify;
+        Modify();
     end;
 
     procedure SetShowMemberships(ShowMembership: Integer)
     begin
         "Show Memberships" := ShowMembership;
-        Modify;
+        Modify();
     end;
 
     procedure SetValueToCalcuate(ValueToCalc: Integer)
     begin
         "Value to Calculate" := ValueToCalc;
-        Modify;
+        Modify();
     end;
 
     procedure SetChartType(ChartType: Integer)
     begin
         "Chart Type" := ChartType;
-        Modify;
+        Modify();
     end;
 
     procedure SetPeriodType(PeriodType: Option)

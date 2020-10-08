@@ -1,12 +1,5 @@
 xmlport 6060131 "NPR MM Update Member"
 {
-    // MM80.1.02/TSA/20151228  CASE 229684 Touch-up and enchancements
-    // MM1.03/TSA/20160104  CASE 230647 - Added NewsLetter CRM option
-    // MM1.06/TSA/20160127  CASE 232910 - Enchanced error handling when there is a runtime error processing the request
-    // MM1.18/NPKNAV/20170309  CASE 265562 Transport MM1.18 - 8 March 2017
-    // MM1.24/TSA /20171120 CASE 276832 - Added guardian section
-    // MM1.40/TSA /20190827 CASE 360242 - Added Attributes
-    // MM1.42/TSA /20191205 CASE 381222 Added notification method
 
     Caption = 'Update Member';
     FormatEvaluate = Xml;

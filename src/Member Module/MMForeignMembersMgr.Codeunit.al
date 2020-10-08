@@ -1,8 +1,5 @@
 codeunit 6060145 "NPR MM Foreign Members. Mgr."
 {
-    // MM1.23/TSA /20171002 CASE 257011 initial version of Foreign Membership Management and Loyalty
-    // MM1.33/TSA /20180808 CASE 324413 Handling long card numbers (more than 50 chars)
-
 
     trigger OnRun()
     begin
@@ -51,10 +48,8 @@ codeunit 6060145 "NPR MM Foreign Members. Mgr."
         MembershipEntryNo := 0;
         ForeignValidationSetup.SetCurrentKey("Invokation Priority");
 
-        //-MM1.33 [324413]
         if (StrLen(ForeignMembercardNumber) <= MaxStrLen(FormatedCardNumber)) then
             FormatedCardNumber := ForeignMembercardNumber;
-        //+MM1.33 [324413]
 
         ForeignValidationSetup.SetFilter("Community Code", '<>%1', '');
         if (CommunityCode <> '') then
@@ -73,12 +68,12 @@ codeunit 6060145 "NPR MM Foreign Members. Mgr."
         end;
 
         if (IsValid) then begin
-            //-MM1.33 [324413]
+
             FormatForeignCardnumberFromScan(ForeignValidationSetup."Community Code", ForeignValidationSetup."Manager Code", ForeignMembercardNumber, FormatedCardNumber);
 
             //MembershipEntryNo := MembershipManagement.GetMembershipFromExtCardNo (ForeignMembercardNumber, TODAY, NotValidReason);
             MembershipEntryNo := MembershipManagement.GetMembershipFromExtCardNo(FormatedCardNumber, Today, NotValidReason);
-            //+MM1.33 [324413]
+
         end;
     end;
 
