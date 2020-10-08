@@ -1,10 +1,5 @@
 page 6060074 "NPR MM Membership Print Jnl"
 {
-    // MM1.25/TSA /20180116 CASE 299537 Initial Version
-    // MM1.26/TSA /20180213 CASE 299537 Added Document No. to Jnl for grouping per order
-    // MM1.33/TSA /20180801 CASE 323652 Added the possibility to navigate to the NAV Shipment page
-    // #334163/JDH /20181109 CASE 334163 Added Caption to Actions
-    // MM1.36/NPKNAV/20190125  CASE 343948 Transport MM1.36 - 25 January 2019
 
     Caption = 'Membership Offline Print Journal';
     InsertAllowed = false;
@@ -201,7 +196,6 @@ page 6060074 "NPR MM Membership Print Jnl"
                     PostedSalesShipments: Page "Posted Sales Shipments";
                 begin
 
-                    //-MM1.33 [323652]
                     SalesShipmentHeader.SetFilter("External Document No.", '=%1', Rec."Document No.");
                     if (SalesShipmentHeader.IsEmpty()) then begin
                         SalesShipmentHeader.Reset;
@@ -214,7 +208,7 @@ page 6060074 "NPR MM Membership Print Jnl"
                     end else begin
                         Error(NoShippingFound, Rec."Document No.");
                     end;
-                    //+MM1.33 [323652]
+
                 end;
             }
         }

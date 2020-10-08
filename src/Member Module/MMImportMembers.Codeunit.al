@@ -1,14 +1,7 @@
 codeunit 6060132 "NPR MM Import Members"
 {
-    // MM1.15/TSA/20160810 CASE 248625 Import members according to template definition
-    // MM1.17/TSA/20161229  CASE 262040 Signature change to AddMemberAndCard
-    // MM1.24/TSA /20171101 CASE 294950 Added assignment for GMemberInfo."Notification Method"::Manual
-    // MM1.24/TSA /20171204 CASE 298666 Relabeling variable
-    // MM1.25/TSA /20171214 CASE 298666 Added filter to business flow type
-    // MM1.25/TSA /20180109 CASE 301612 Added import of loyalty points - **** Breaking Change for Field Layout ****
-    // #xxx/TSA /20180316 CASE xxx Added iComm setup warning
-    // MM1.42/TSA /20191205 CASE 372557 Added SMS option
 
+    // #xxx/TSA /20180316 CASE xxx Added iComm setup warning
 
     trigger OnRun()
     var
@@ -208,7 +201,7 @@ codeunit 6060132 "NPR MM Import Members"
         FldValidUntilDate := nextField(PLine);
         FldRole := nextField(PLine);
         FldNAVMembershipCode := nextField(PLine);
-        FldLoyaltyPoints := nextField(PLine); //-+MM1.25 [301612]
+        FldLoyaltyPoints := nextField(PLine); 
 
         // -- card
         FldExternalCardNo := nextField(PLine);
@@ -257,7 +250,7 @@ codeunit 6060132 "NPR MM Import Members"
             'manual':
                 GMemberInfo."Notification Method" := GMemberInfo."Notification Method"::MANUAL;
             'sms':
-                GMemberInfo."Notification Method" := GMemberInfo."Notification Method"::SMS; //-+MM1.42 [372557]
+                GMemberInfo."Notification Method" := GMemberInfo."Notification Method"::SMS; 
             else
                 GMemberInfo."Notification Method" := GMemberInfo."Notification Method"::NO_THANKYOU;
         end;
@@ -271,17 +264,14 @@ codeunit 6060132 "NPR MM Import Members"
         end;
 
         // -- Membership
-        //-MM1.24 [298666]
+
         //GMemberInfo."External Membership No." := validateTextField (GMemberInfo."External Membership No.", MAXSTRLEN (GMemberInfo."External Membership No."), OPTIONAL, GMemberInfo.FIELDCAPTION ("External Membership No."));
         GMemberInfo."External Membership No." := validateTextField(FldExternalMembershipNo, MaxStrLen(GMemberInfo."External Membership No."), OPTIONAL, GMemberInfo.FieldCaption("External Membership No."));
-        //+MM1.24 [298666]
 
         // fldRole
         GMemberInfo."Membership Code" := validateTextField(FldNAVMembershipCode, MaxStrLen(GMemberInfo."Membership Code"), REQUIRED, GMemberInfo.FieldCaption("Membership Code"));
 
-        //-MM1.25 [298666]
         MembershipSalesSetup.SetFilter("Business Flow Type", '=%1', MembershipSalesSetup."Business Flow Type"::MEMBERSHIP);
-        //+MM1.25 [298666]
 
         MembershipSalesSetup.SetFilter("Membership Code", '=%1', GMemberInfo."Membership Code");
         if not (MembershipSalesSetup.FindFirst()) then
@@ -306,9 +296,7 @@ codeunit 6060132 "NPR MM Import Members"
             GMemberInfo."Document Date" := validateDateField(FldPurchaseDate, GDateMask, REQUIRED, GMemberInfo.FieldCaption("Document Date"));
         end;
 
-        //-MM1.25 [301612]
         GMemberInfo."Initial Loyalty Point Count" := validateIntegerField(FldLoyaltyPoints, OPTIONAL, GMemberInfo.FieldCaption("Initial Loyalty Point Count"));
-        //+MM1.25 [301612]
 
         // -- Card
         GMemberInfo."External Card No." := validateTextField(FldExternalCardNo, MaxStrLen(GMemberInfo."External Card No."), OPTIONAL, GMemberInfo.FieldCaption("External Card No."));
@@ -387,10 +375,8 @@ codeunit 6060132 "NPR MM Import Members"
         if (MembershipEntryNo = 0) then
             MembershipEntryNo := MemberManagement.CreateMembership(MembershipSalesSetup, MemberInfoCapture, true);
 
-        //-MM1.25 [301612]
         if ((MembershipEntryNo <> 0) and (GMemberInfo."Initial Loyalty Point Count" > 0)) then
             LoyaltyPointManagement.ManualAddSalePoints(MembershipEntryNo, 'Import', GMemberInfo."Initial Loyalty Point Count", 0, 'Import');
-        //+MM1.25 [301612]
 
         //MemberEntryNo := MemberManagement.AddMemberAndCard (MembershipEntryNo, MemberInfoCapture, FALSE);
         MemberManagement.AddMemberAndCard(true, MembershipEntryNo, MemberInfoCapture, false, MemberEntryNo, ResponseMessage);
@@ -401,9 +387,9 @@ codeunit 6060132 "NPR MM Import Members"
         // Add comments.
         CRLF[1] := 13;
         CRLF[2] := 10;
-        //MakeNote (Member, STRSUBSTNO ('Dato: %1 %2Salgsted: %3 %2%4', fldSalesDate, crlf, fldSalesLocation, fldComment));
+        //MakeNote (Member, StrSubstNo ('Dato: %1 %2Salgsted: %3 %2%4', fldSalesDate, crlf, fldSalesLocation, fldComment));
 
-        MemberInfoCapture.Delete;
+        MemberInfoCapture.Delete();
     end;
 
     local procedure validateTextField(fieldValue: Text; fieldMaxLength: Integer; fieldValueIs: Integer; fieldCaptionName: Text): Text

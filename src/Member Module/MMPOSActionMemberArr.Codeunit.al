@@ -1,20 +1,6 @@
 codeunit 6060140 "NPR MM POS Action: Member Arr."
 {
     // 
-    // MM1.21/TSA/20170616  CASE 279495 MemberArrival had duplicate member validation dialogs when doing POS validation.
-    // MM1.21/TSA /20170721 CASE 284653 Added POS_CheckLimitMemberCardArrival in MemberArrival();
-    // MM1.22/TSA /20170809 CASE 276102 Changed condition for showing dialog and dialog type passed to facial recognition
-    // MM1.28/TSA /20180323 CASE 307113 Member Arrival consider named/anonymous setting
-    // MM1.28/TSA /20180411 CASE 307113 Added the call publisher for member arrival
-    // MM1.29/TSA /20180508 CASE 307230 Member guest checkin
-    // MM1.29.02/TSA/20180529 CASE 317673 Minor fixes, found during testing
-    // MM1.33/TSA /20180814 CASE 323744 Added DefaultInputValue handling for EAN box support
-    // MM1.33/MHA /20180817  CASE 326754 Added Ean Box Event Handler functions
-    // MM1.36/TSA /20181119 CASE 335889 Refactored MemberArrival with Guests
-    // MM1.37/MHA /20190328  CASE 350288 Added MaxStrLen to EanBox.Description in DiscoverEanBoxEvents()
-    // MM1.41/TSA /20190909 CASE 367779 SignatureChange PromptForMemberGuestArrival() and MemberFastCheckIn();
-    // MM1.44/TSA /20200519 CASE 405185 Changed spelling of param "Admission Code" to "AdmissionCode"
-
 
     trigger OnRun()
     begin
@@ -61,10 +47,8 @@ codeunit 6060140 "NPR MM POS Action: Member Arr."
           Sender.Type::Generic,
           Sender."Subscriber Instances Allowed"::Multiple)
         then begin
-            //-MM1.22 [276102]
 
             Sender.RegisterWorkflowStep('membercard_number', '(param.DefaultInputValue.length == 0 && param.DialogPrompt == 1) && input ({caption: labels.MemberCardPrompt, title: labels.MembershipTitle, value: param.DefaultInputValue}).cancel(abort);');
-            //+MM1.22 [276102]
 
             //Sender.RegisterWorkflowStep ('member_number',       '(param.DialogPrompt == 0) && input ({caption: labels.MemberNumberPrompt, title: labels.MembershipTitle}).cancel(abort);');
             //Sender.RegisterWorkflowStep ('membership_number',   '(param.DialogPrompt == 2) && input ({caption: labels.MembershipNumberPrompt, title: labels.MembershipTitle}).cancel(abort);');
@@ -142,10 +126,9 @@ codeunit 6060140 "NPR MM POS Action: Member Arr."
             POSWorkflowType := POSWorkflowMethod::POS;
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
-        //-MM1.44 [405185]
+
         //AdmissionCode := JSON.GetStringParameter ('Admission Code', FALSE);
         AdmissionCode := JSON.GetStringParameter('AdmissionCode', false);
-        //+MM1.44 [405185]
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
         ConfirmMember := JSON.GetBooleanParameter('ConfirmMember', true);
@@ -206,7 +189,6 @@ codeunit 6060140 "NPR MM POS Action: Member Arr."
 
                     ExternalItemNo := MemberRetailIntegration.POS_GetExternalTicketItemFromMembership(ExternalMemberCardNo);
 
-                    //-MM1.41 [367779]
                     // IF (POSWorkflowType = POSWorkflowMethod::Automatic) THEN
                     //   MemberTicketManager.MemberFastCheckIn (ExternalMemberCardNo, ExternalItemNo, AdmissionCode, 1);
                     //
@@ -222,7 +204,6 @@ codeunit 6060140 "NPR MM POS Action: Member Arr."
                         MemberTicketManager.PromptForMemberGuestArrival(ExternalMemberCardNo, AdmissionCode, Token);
                         MemberTicketManager.MemberFastCheckIn(ExternalMemberCardNo, ExternalItemNo, AdmissionCode, 1, Token);
                     end;
-                    //+MM1.41 [367779]
 
                 end;
         end;
@@ -263,27 +244,27 @@ codeunit 6060140 "NPR MM POS Action: Member Arr."
         MMMemberCard: Record "NPR MM Member Card";
         MMMembership: Record "NPR MM Membership";
     begin
-        //-MM1.33 [326754]
+
         if not EanBoxEvent.Get(EventCodeExtMemberCardNo()) then begin
             EanBoxEvent.Init;
             EanBoxEvent.Code := EventCodeExtMemberCardNo();
             EanBoxEvent."Module Name" := 'Membership Management';
-            //-MM1.37 [350288]
+
             //EanBoxEvent.Description := MMMemberCard.FIELDCAPTION("External Card No.");
             EanBoxEvent.Description := CopyStr(MMMemberCard.FieldCaption("External Card No."), 1, MaxStrLen(EanBoxEvent.Description));
-            //+MM1.37 [350288]
+
             EanBoxEvent."Action Code" := ActionCode();
             EanBoxEvent."POS View" := EanBoxEvent."POS View"::Sale;
             EanBoxEvent."Event Codeunit" := CurrCodeunitId();
             EanBoxEvent.Insert(true);
         end;
-        //+MM1.33 [326754]
+
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6060105, 'OnInitEanBoxParameters', '', true, true)]
     local procedure OnInitEanBoxParameters(var Sender: Codeunit "NPR Ean Box Setup Mgt."; EanBoxEvent: Record "NPR Ean Box Event")
     begin
-        //-MM1.33 [326754]
+
         case EanBoxEvent.Code of
             EventCodeExtMemberCardNo():
                 begin
@@ -292,7 +273,7 @@ codeunit 6060140 "NPR MM POS Action: Member Arr."
                     Sender.SetNonEditableParameterValues(EanBoxEvent, 'Function', false, 'Member Arrival');
                 end;
         end;
-        //+MM1.33 [326754]
+
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6060107, 'SetEanBoxEventInScope', '', true, true)]
@@ -300,7 +281,7 @@ codeunit 6060140 "NPR MM POS Action: Member Arr."
     var
         MMMemberCard: Record "NPR MM Member Card";
     begin
-        //-MM1.33 [326754]
+
         if EanBoxSetupEvent."Event Code" <> EventCodeExtMemberCardNo() then
             exit;
         if StrLen(EanBoxValue) > MaxStrLen(MMMemberCard."External Card No.") then
@@ -309,21 +290,21 @@ codeunit 6060140 "NPR MM POS Action: Member Arr."
         MMMemberCard.SetRange("External Card No.", UpperCase(EanBoxValue));
         if MMMemberCard.FindFirst then
             InScope := true;
-        //+MM1.33 [326754]
+
     end;
 
     local procedure EventCodeExtMemberCardNo(): Code[20]
     begin
-        //-MM1.33 [326754]
+
         exit('MEMBER_ARRIVAL');
-        //+MM1.33 [326754]
+
     end;
 
     local procedure CurrCodeunitId(): Integer
     begin
-        //-MM1.33 [326754]
+
         exit(CODEUNIT::"NPR MM POS Action: Member Arr.");
-        //+MM1.33 [326754]
+
     end;
 }
 

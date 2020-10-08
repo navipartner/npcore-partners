@@ -1,12 +1,5 @@
 page 6060073 "NPR MM Members. Alteration Jnl"
 {
-    // MM1.25/TSA /20171213 CASE 299783 Initial Version
-    // MM1.26/TSA /20180131 CASE 303546 Added Customer No as alternative search term in external membership no field
-    // MM1.34/JDH /20181109 CASE 334163 Added Caption to Actions
-    // MM1.36/NPKNAV/20190125  CASE 343948 Transport MM1.36 - 25 January 2019
-    // MM1.43/TSA /20200402 CASE 398329 Added action for batch renew
-    // MM1.44/TSA /20200423 CASE 401040 Added importing of alteration data, refactored validation functions
-    // MM1.44/TSA /20200423 CASE 401040 Added support for incorrect external reference
 
     Caption = 'Membership Alteration Journal';
     PageType = List;
@@ -167,11 +160,10 @@ page 6060073 "NPR MM Members. Alteration Jnl"
                     SkipFirstLine: Boolean;
                 begin
 
-                    //-MM1.44 [401040]
                     SkipFirstLine := Confirm(FILE_HAS_HEADINGS, true);
                     ImportAlterationFromFile(SkipFirstLine);
                     CurrPage.Update(false);
-                    //+MM1.44 [401040]
+
                 end;
             }
         }
@@ -328,9 +320,8 @@ page 6060073 "NPR MM Members. Alteration Jnl"
             exit;
         end;
 
-        //-MM1.26 [303546]
         Membership.SetFilter("External Membership No.", '=%1', pExternalMembershipNo);
-        //Membership.FINDFIRST ();
+        //Membership.FindFirst ();
         if (not Membership.FindFirst()) then begin
             Membership.Reset();
             Membership.SetFilter("Customer No.", '=%1', pExternalMembershipNo);
@@ -338,18 +329,17 @@ page 6060073 "NPR MM Members. Alteration Jnl"
             if not (Membership.FindFirst()) then begin
                 Membership.Reset;
                 Membership.SetFilter("External Membership No.", '=%1', pExternalMembershipNo);
-                //-MM1.44 [401040]
-                //Membership.FINDFIRST ();
+
+                //Membership.FindFirst ();
                 if (not Membership.FindFirst()) then begin
                     MemberInfoCapture."External Member No" := pExternalMembershipNo;
                     MemberInfoCapture."Response Message" := 'Invalid reference.';
                     MemberInfoCapture."Response Status" := MemberInfoCapture."Response Status"::FAILED;
                     exit;
                 end;
-                //+MM1.44 [401040]
+
             end;
         end;
-        //+MM1.26 [303546]
 
         MemberInfoCapture."Membership Entry No." := Membership."Entry No.";
         MemberInfoCapture."External Membership No." := Membership."External Membership No.";
@@ -476,7 +466,6 @@ page 6060073 "NPR MM Members. Alteration Jnl"
         Serverfilename: Text;
     begin
 
-        //-MM1.44 [401040]
         SuggestFileName := '';
         FileName := FileManagement.OpenFileDialog(SELECT_FILE_CAPTION, SuggestFileName, FILE_FILTER);
 
@@ -487,15 +476,14 @@ page 6060073 "NPR MM Members. Alteration Jnl"
         SetFileName(Serverfilename);
 
         ImportFromFile(SkipFirstLine);
-        //+MM1.44 [401040]
+
     end;
 
     procedure SetFileName(PFileName: Text[250])
     begin
 
-        //-MM1.44 [401040]
         GServerFileName := PFileName;
-        //+MM1.44 [401040]
+
     end;
 
     procedure ImportFromFile(SkipFirstLine: Boolean)
@@ -508,7 +496,6 @@ page 6060073 "NPR MM Members. Alteration Jnl"
         LowEntryNo: Integer;
     begin
 
-        //-MM1.44 [401040]
         REQUIRED := 1;
         OPTIONAL := 2;
 
@@ -550,13 +537,12 @@ page 6060073 "NPR MM Members. Alteration Jnl"
         TxtFile.Close();
         if GuiAllowed then
             Window.Close();
-        //+MM1.44 [401040]
+
     end;
 
     local procedure DecodeLine(CsvLine: Text)
     begin
 
-        //-MM1.44 [401040]
         FldAlterationType := nextField(CsvLine);
         FldExternalNumber := nextField(CsvLine);
         FldAlterationItemNo := nextField(CsvLine);
@@ -566,7 +552,7 @@ page 6060073 "NPR MM Members. Alteration Jnl"
         validateTextField(FldExternalNumber, MaxStrLen("External Membership No."), REQUIRED, FieldCaption("External Membership No."));
         validateTextField(FldAlterationItemNo, MaxStrLen("Item No."), OPTIONAL, FieldCaption("Item No."));
         validateDateField(FldAlterationDate, GDateMask, OPTIONAL, FieldCaption("Document Date"));
-        //+MM1.44 [401040]
+
     end;
 
     local procedure InsertLine()
@@ -574,7 +560,6 @@ page 6060073 "NPR MM Members. Alteration Jnl"
         MemberInfoCapture: Record "NPR MM Member Info Capture";
     begin
 
-        //-MM1.44 [401040]
         MemberInfoCapture.Init();
         MemberInfoCapture."Source Type" := MemberInfoCapture."Source Type"::ALTERATION_JNL;
         MemberInfoCapture."Document No." := CopyStr(UserId, 1, MaxStrLen(MemberInfoCapture."Document No."));
@@ -612,13 +597,12 @@ page 6060073 "NPR MM Members. Alteration Jnl"
         MemberInfoCapture."Originates From File Import" := true;
 
         MemberInfoCapture.Insert();
-        //+MM1.44 [401040]
+
     end;
 
     local procedure validateTextField(fieldValue: Text; fieldMaxLength: Integer; fieldValueIs: Integer; fieldCaptionName: Text): Text
     begin
 
-        //-MM1.44 [401040]
         if (StrLen(fieldValue) > fieldMaxLength) then
             Error(INVALID_LENGTH, fieldValue, fieldMaxLength, fieldCaptionName, GLineCount);
 
@@ -626,13 +610,12 @@ page 6060073 "NPR MM Members. Alteration Jnl"
             Error(VALUE_REQUIRED, fieldCaptionName, GLineCount);
 
         exit(fieldValue);
-        //+MM1.44 [401040]
+
     end;
 
     local procedure validateDateField(fieldValue: Text; dateMask: Code[20]; fieldValueIs: Integer; fieldCaptionName: Text) rDate: Date
     begin
 
-        //-MM1.44 [401040]
         rDate := 0D;
 
         if ((fieldValue = '') and (fieldValueIs = REQUIRED)) then
@@ -658,13 +641,12 @@ page 6060073 "NPR MM Members. Alteration Jnl"
         end;
 
         exit(rDate);
-        //+MM1.44 [401040]
+
     end;
 
     local procedure validateIntegerField(fieldValue: Text; fieldValueIs: Integer; fieldCaptionName: Text) rInteger: Integer
     begin
 
-        //-MM1.44 [401040]
         rInteger := 0;
 
         if ((fieldValue = '') and (fieldValueIs = REQUIRED)) then
@@ -677,15 +659,14 @@ page 6060073 "NPR MM Members. Alteration Jnl"
             Error(INVALID_VALUE, fieldValue, fieldCaptionName, GLineCount);
 
         exit(rInteger);
-        //+MM1.44 [401040]
+
     end;
 
     local procedure nextField(var VarLineOfText: Text[1024]) rField: Text[1024]
     begin
 
-        //-MM1.44 [401040]
         exit(forwardTokenizer(VarLineOfText, ';', '"'));
-        //+MM1.44 [401040]
+
     end;
 
     local procedure forwardTokenizer(var VarText: Text[1024]; PSeparator: Char; PQuote: Char) RField: Text[1024]
@@ -699,7 +680,6 @@ page 6060073 "NPR MM Members. Alteration Jnl"
         NextByte: Text[1];
     begin
 
-        //-MM1.44 [401040]
         //  This function splits the textline into 2 parts at first occurence of separator
         //  Quotecharacter enables separator to occur inside datablock
 
@@ -742,7 +722,7 @@ page 6060073 "NPR MM Members. Alteration Jnl"
 
         VarText := CopyStr(InputText, NextFieldPos);
         exit(RField);
-        //+MM1.44 [401040]
+
     end;
 }
 

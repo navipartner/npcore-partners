@@ -1,18 +1,5 @@
 table 6060125 "NPR MM Members. Sales Setup"
 {
-    // MM1.00/TSA/20151217  CASE 229684 NaviPartner Member Management Module
-    // MM1.17/TSA/20161208  CASE 259671 Extended options on field 40 with Prompt, Activate on first use
-    // MM1.17/TSA/20161227  CASE 262040 Added field 50 - Suggested Membercount In Sales
-    // MM1.17/TSA/20161227  CASE 262040 Added field 12 - Business Flow Type
-    // MM1.22/TSA /20170808 CASE 285403 New Field - "Assign Loyalty Points On Sale"
-    // MM1.22/TSA /20170816 CASE 287080 Added option business flow type: ADD_ANONYMOUS_MEMBER
-    // MM1.22/TSA /20170829 CASE 286922 Added field Auto-Renew To
-    // MM1.29.02/TSA /20180530 CASE 316450 Added field Auto-Admitt Member On Sale
-    // MM1.32/TSA /20180711 CASE 318132 Added Member Card Type and Member Card Type Selection
-    // MM1.40/TSA /20190726 CASE 356090 New field "Magento M2 Membership Sign-up"
-    // MM1.40/TSA /20190730 CASE 360275 Corrected spelling on field and caption for field 80
-    // MM1.44/TSA /20200529 CASE 407401 Added Age verification setup
-    // MM1.45/TSA /20200728 CASE 407401 Added "Requires Guardian"
 
     Caption = 'Membership Sales Setup';
     DataClassification = CustomerContent;

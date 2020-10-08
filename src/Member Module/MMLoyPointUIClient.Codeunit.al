@@ -1,7 +1,5 @@
 codeunit 6151163 "NPR MM Loy. Point UI (Client)"
 {
-    // #341237/TSA /20190212 CASE 341237 Initial Version
-    // MM1.38/TSA/20190527  CASE 338215-01 Transport MM1.38 - 27 May 2019
 
     SingleInstance = true;
 
@@ -216,8 +214,8 @@ codeunit 6151163 "NPR MM Loy. Point UI (Client)"
         EFTSetup.FindSetup(EFTTransactionRequest."Register No.", EFTTransactionRequest."Original POS Payment Type Code");
         // EFTFrameworkMgt.CreateAuxRequest(AbortEFTTransactionRequest, EFTSetup, 1, EFTTransactionRequest."Register No.", EFTTransactionRequest."Sales Ticket No.");
         // AbortEFTTransactionRequest."Processed Entry No." := EFTTransactionRequest."Entry No.";
-        // AbortEFTTransactionRequest.MODIFY;
-        Commit;
+        // AbortEFTTransactionRequest.Modify();
+        Commit();
         // EFTFrameworkMgt.SendRequest(AbortEFTTransactionRequest);
 
         if (POSSession.IsActiveSession(POSFrontEnd)) then

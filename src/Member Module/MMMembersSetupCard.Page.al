@@ -1,12 +1,5 @@
 page 6060076 "NPR MM Members.Setup Card"
 {
-    // MM1.25/TSA /20180119 CASE 302934
-    // MM1.29/NPKNAV/20180524  CASE 313795 Transport MM1.29 - 24 May 2018
-    // #334163/JDH /20181109 CASE 334163 Added Caption to Object
-    // MM1.36/NPKNAV/20190125  CASE 343948 Transport MM1.36 - 25 January 2019
-    // MM1.42/TSA /20191105 CASE 375381 Added Auto-Renew setup fields
-    // MM1.43/TSA /20200319 CASE 337112 Moved the ticket print setting to ticket tab
-    // MM1.44/TSA /20200529 CASE 407401 Add Age Verification
 
     Caption = 'Membership Setup Card';
     PageType = Card;

@@ -1,8 +1,5 @@
 table 6060144 "NPR MM Membership Lim. Setup"
 {
-    // MM1.21/NPKNAV/20170728  CASE 284653 Transport MM1.21 - 28 July 2017
-    // MM1.22/TSA /20170911 CASE 284560 New option to Constraint Type::TEMP_MEMBERCARD
-    // MM1.29/TSA /20180511 CASE 313795 GDPR constraint source
 
     Caption = 'Membership Limitation Setup';
     DataClassification = CustomerContent;

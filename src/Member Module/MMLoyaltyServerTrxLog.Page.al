@@ -1,6 +1,5 @@
 page 6151161 "NPR MM Loyalty Server Trx Log"
 {
-    // MM1.38/TSA /20190522 CASE 338215 Initial Version
 
     Caption = 'Loyalty Server Trans. Log';
     PageType = List;

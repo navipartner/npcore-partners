@@ -1,8 +1,5 @@
 table 6060143 "NPR MM Foreign Members. Setup"
 {
-    // MM1.23/TSA/20170612  CASE 257011 Initial version
-    // #334163/JDH /20181109 CASE 334163 Added captions to fields
-    // MM1.36/NPKNAV/20190125  CASE 343948 Transport MM1.36 - 25 January 2019
 
     Caption = 'External Validation';
     DataClassification = CustomerContent;

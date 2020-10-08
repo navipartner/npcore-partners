@@ -1,17 +1,5 @@
 page 6060132 "NPR MM Member Community"
 {
-    // TM1.00/TSA/20151215  CASE 228982 NaviPartner Ticket Management
-    // MM1.00/TSA/20151217  CASE 229684 NaviPartner Member Management Module
-    // MM1.09/TSA/20160226  case 235634 Membership connection to Customer & Contacts
-    // MM1.10/TSA/20160405  CASE 237670 Transport MM1.10 - 22 March 2016
-    // MM1.10/TSA/20160404  CASE 233948 Added a the Update Customer button to sync customer and contact
-    // MM1.14/TSA/20160603  CASE 240871 Transport MM1.13 - 1 June 2016
-    // MM1.17/TSA/20161116  CASE 258582 Added related information action Notification and Notification Setup
-    // MM1.17/TSA/20161214  CASE 243075 Member Point System added field Activate Loyalty Program
-    // MM1.23/TSA/20170614  CASE 257011 Navigate to Foreign Card Validation Setup
-    // MM1.23/TSA /20170831 CASE 286922 Added Navigation to Auto Renew Process List
-    // MM1.30/TSA /20180614 CASE 319296 Added "Customer No. Series"
-    // MM1.40/TSA /20190612 CASE 357360 Added "Foreign Membership" field, and made the "Activate Loyalty Program" default visible
 
     Caption = 'Member Community';
     PageType = List;

@@ -1,7 +1,6 @@
 xmlport 6060140 "NPR MM Confirm AutoRenew Pay."
 {
     // 
-    // MM1.28/TSA /20180418 CASE 303635 Initial version
 
     Caption = 'Confirm AutoRenew Payment';
     FormatEvaluate = Xml;

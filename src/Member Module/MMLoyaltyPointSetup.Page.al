@@ -1,8 +1,5 @@
 page 6060106 "NPR MM Loyalty Point Setup"
 {
-    // MM1.17/TSA /20161214  CASE 243075 Member Point System
-    // MM1.28/TSA /20180426  CASE 307048 Dynamic Coupons
-    // MM1.37/TSA /20190301 CASE 343053 Added field "Consume Available Points"
 
     AutoSplitKey = true;
     Caption = 'Loyalty Points Setup';

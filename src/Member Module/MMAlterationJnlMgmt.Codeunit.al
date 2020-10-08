@@ -1,7 +1,5 @@
 codeunit 6060094 "NPR MM Alteration Jnl Mgmt"
 {
-    // MM1.25/TSA /20171219 CASE 299783 Initial Version
-    // MM1.44/TSA/20200611  CASE 401040 Transport MM1.44 - 11 June 2020
 
     TableNo = "NPR MM Member Info Capture";
 
@@ -66,13 +64,12 @@ codeunit 6060094 "NPR MM Alteration Jnl Mgmt"
     begin
 
         MemberInfoCapture.Get(MemberInfoCaptureEntryNo);
-        //-MM1.44 [401040]
+
         //Membership.GET (MemberInfoCapture."Membership Entry No.");
         if (not Membership.Get(MemberInfoCapture."Membership Entry No.")) then begin
             ReasonMessage := StrSubstNo(NOT_FOUND, Membership.TableCaption, MemberInfoCapture."External Membership No.");
             exit(false);
         end;
-        //+MM1.44 [401040]
 
         case MemberInfoCapture."Information Context" of
 

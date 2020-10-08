@@ -1,15 +1,5 @@
 table 6060139 "NPR MM Member Notific. Entry"
 {
-    // MM1.14/TSA/20160603  CASE 240871 Transport MM1.13 - 1 June 2016
-    // MM1.24/TSA /20171101 CASE 294950 Added "Notification Method" Manual
-    // MM1.25/TSA /20180122 CASE 301124 Removed Title Property
-    // MM1.29/TSA /20180504 CASE 314131 Added fields for wallet
-    // MM1.29.02/TSA /20180529 CASE 317156 Added Notification Method option SMS
-    // MM1.29.02/TSA /20180529 CASE 317156 Added the field "Wallet Pass Landing URL" that will be a landing page
-    // MM1.32/TSA /20180710 CASE 318132 Added option Wallet_Create to the Notification Trigger
-    // MM1.38/TSA /20190517 CASE 355234 Added field Notification Token
-    // MM1.39/TSA /20190529 CASE 350968 Added Auto-Renew fields
-    // MM1.44/TSA /20200416 CASE 400601 Magento Get Password URL
 
     Caption = 'Member Notification Entry';
     DataClassification = CustomerContent;
@@ -248,9 +238,9 @@ table 6060139 "NPR MM Member Notific. Entry"
         }
         field(170; "Remaining Points"; Integer)
         {
-            CalcFormula = Sum ("NPR MM Members. Points Entry".Points WHERE("Membership Entry No." = FIELD("Membership Entry No.")));
+            CalcFormula = Sum("NPR MM Members. Points Entry".Points WHERE("Membership Entry No." = FIELD("Membership Entry No.")));
             Caption = 'Remaining Points';
-            Description = '//-MM1.29 [314131]';
+            Description = '';
             Editable = false;
             FieldClass = FlowField;
         }
@@ -268,37 +258,37 @@ table 6060139 "NPR MM Member Notific. Entry"
         {
             Caption = 'Include NP Pass';
             DataClassification = CustomerContent;
-            Description = '//-MM1.29 [314131]';
+            Description = '';
         }
         field(410; "Wallet Pass Id"; Text[35])
         {
             Caption = 'Wallet Pass Id';
             DataClassification = CustomerContent;
-            Description = '//-MM1.29 [314131]';
+            Description = '';
         }
         field(420; "Wallet Pass Default URL"; Text[200])
         {
             Caption = 'Wallet Pass Default URL';
             DataClassification = CustomerContent;
-            Description = '//-MM1.29 [314131]';
+            Description = '';
         }
         field(421; "Wallet Pass Andriod URL"; Text[200])
         {
             Caption = 'Wallet Pass Andriod URL';
             DataClassification = CustomerContent;
-            Description = '//-MM1.29 [314131]';
+            Description = '';
         }
         field(422; "Wallet Pass Landing URL"; Text[200])
         {
             Caption = 'Wallet Pass Combine URL';
             DataClassification = CustomerContent;
-            Description = '//-MM1.29.02 [317156]';
+            Description = '';
         }
         field(430; "Magento Get Password URL"; Text[200])
         {
             Caption = 'Magento Get Password URL';
             DataClassification = CustomerContent;
-            Description = '//-MM1.44 [400601]';
+            Description = '';
         }
     }
 

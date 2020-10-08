@@ -1,8 +1,6 @@
 codeunit 6060108 "NPR MM POS Action: BackEnd Fun"
 {
     // 
-    // MM1.35/TSA /20181008 CASE 325198 Adding back-end member management functionality to front-end
-
 
     trigger OnRun()
     begin
@@ -106,7 +104,7 @@ codeunit 6060108 "NPR MM POS Action: BackEnd Fun"
                         MembershipEntryNo := MembershipManagement.CreateMembershipAll(MembershipSalesSetup, MemberInfoCapture, true);
                         Membership.Get(MembershipEntryNo);
                         MembershipPage.SetRecord(Membership);
-                        Commit;
+                        Commit();
                         MembershipPage.RunModal();
                     end;
 

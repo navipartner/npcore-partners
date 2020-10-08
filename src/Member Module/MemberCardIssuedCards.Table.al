@@ -1,8 +1,5 @@
 table 6059774 "NPR Member Card Issued Cards"
 {
-    // NPR5.22/TJ  /20160412 CASE 238601 Commented out part that uses Sync Cards To Company
-    // NPR5.38/MHA /20180104  CASE 301054 Removed Property, Title, from field 10 Name, 11 Address, 13 City
-    // NPR5.39/TJ  /20180206  CASE 302634 Changed OptionString property of field 8 Status to english version
 
     Caption = 'Point Card - Issued Cards';
     LookupPageID = "NPR Member Card Issued Cards";
@@ -220,12 +217,10 @@ table 6059774 "NPR Member Card Issued Cards"
         if "No." = '' then begin
             PointCardTypes.TestField("Card No. Series");
 
-            //-NPR5.22
             /*
               IF PointCardTypes."Sync Cards To Company" <> '' THEN
                 NoSeriesManagement.SetCompany(PointCardTypes."Sync Cards To Company");
             */
-            //+NPR5.22
 
             NoSeriesManagement.InitSeries(PointCardTypes."Card No. Series",
                                           PointCardTypes."Card No. Series",

@@ -1,7 +1,5 @@
 page 6059773 "NPR Member Card Trx Logs"
 {
-    // NPR4.14/BHR/20150902 CASE 220758 Commented Code that does not make any sense
-    // NPR5.41/TS  /20180105 CASE 300893 Removed Caption on ActionContainer
 
     Caption = 'Point Card - Transaction Logs';
     Editable = false;
@@ -92,12 +90,12 @@ page 6059773 "NPR Member Card Trx Logs"
         PointCardIssuedCards: Record "NPR Member Card Issued Cards";
         PointCardTypes: Record "NPR Member Card Types";
     begin
-        //-NPR4.14
+
         //PointCardIssuedCards.RESET;
-        //IF PointCardIssuedCards.FINDFIRST THEN;
+        //IF PointCardIssuedCards.FindFirst THEN;
         //PointCardTypes.GET(PointCardIssuedCards."Card Type");
         //SETFILTER("Posting Date",'%1..%2',CALCDATE(PointCardTypes."Expiration Calculation",TODAY),TODAY);
-        //+NPR4.14
+
     end;
 }
 

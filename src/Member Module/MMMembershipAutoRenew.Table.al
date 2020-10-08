@@ -1,9 +1,5 @@
 table 6060148 "NPR MM Membership Auto Renew"
 {
-    // MM1.22/TSA /20170829 CASE 286922 Initial Version
-    // MM1.25/TSA /20180108 CASE 301463 Added fields "Posting Date Calculation" and "Due Date Calculation"
-    // #334163/JDH /20181109 CASE 334163 Added caption to field Salesperson Code
-    // MM1.36/NPKNAV/20190125  CASE 343948 Transport MM1.36 - 25 January 2019
 
     Caption = 'Membership Auto Renew';
     DataClassification = CustomerContent;

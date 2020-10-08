@@ -1,6 +1,5 @@
 page 6151188 "NPR MM Member Communication"
 {
-    // MM1.42/TSA /20191219 CASE 382728 Initial Version
 
     Caption = 'Member Communication';
     InsertAllowed = false;

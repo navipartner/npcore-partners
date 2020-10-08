@@ -1,6 +1,5 @@
 page 6059774 "NPR Member Card Iss. Card"
 {
-    // NPR5.41/TS  /20180105 CASE 300893 Removed Caption on ActionContainer
 
     Caption = 'Point Card - Issued Card';
     PageType = Card;

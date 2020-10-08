@@ -1,6 +1,5 @@
 page 6060107 "NPR MM Loy. Item Point Setup"
 {
-    // MM1.17/TSA/20161214  CASE 243075 Member Point System
 
     Caption = 'Loyalty Item Point Setup';
     PageType = List;

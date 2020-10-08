@@ -1,6 +1,5 @@
 page 6151160 "NPR MM Loy. Store Setup Server"
 {
-    // MM1.38/TSA /20190524 CASE 338215 Initial Version
 
     Caption = 'Loyalty Store Setup (Server)';
     PageType = List;

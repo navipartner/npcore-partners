@@ -1,11 +1,6 @@
 // TODO: CTRLUPGRADE - uses old Standard code; must be removed or refactored
 codeunit 6060135 "NPR MM Member POS UI"
 {
-    // MM1.14/TSA/20160603  CASE 240749 Transport MM1.13 - 1 June 2016
-    // MM1.15/TSA/20160817  CASE 244443 Transport MM1.15 - 19 July 2016
-    // MM1.16/TSA/20160908 CASE 251175 Adding support for facial recognition
-    // MM1.32/TSA /20180713 CASE 321176 Added a new template for selecting a coupon
-
 
     var
         // TODO: CTRLUPGRADE - declares a removed codeunit; all dependent functionality must be refactored
@@ -107,7 +102,6 @@ codeunit 6060135 "NPR MM Member POS UI"
                     Template.Rows.Add(Row);
                 end;
 
-            //-MM1.32 [321176]
             DATABASE::"NPR MM Loyalty Point Setup":
                 begin
                     Template.Class := 'view-available-coupons';
@@ -127,7 +121,6 @@ codeunit 6060135 "NPR MM Member POS UI"
                     Template.Rows.Add(Row);
 
                 end;
-        //+MM1.32 [321176]
 
         end;
     end;

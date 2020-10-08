@@ -1,8 +1,5 @@
 xmlport 6060142 "NPR MM Member Identifier"
 {
-    // MM1.33/TSA /20180827 CASE 325803 Initial Version
-    // #334163/JDH /20181108 CASE 334163 Adding missing Captions
-    // MM1.36/NPKNAV/20190125  CASE 343948 Transport MM1.36 - 25 January 2019
 
     Caption = 'MM Member Identifier';
     FormatEvaluate = Xml;

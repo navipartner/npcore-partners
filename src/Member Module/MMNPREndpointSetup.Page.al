@@ -1,6 +1,5 @@
 page 6060072 "NPR MM NPR Endpoint Setup"
 {
-    // MM1.23/NPKNAV/20171025  CASE 257011 Transport MM1.23 - 25 October 2017
 
     Caption = 'NPR Endpoint Setup';
     PageType = List;

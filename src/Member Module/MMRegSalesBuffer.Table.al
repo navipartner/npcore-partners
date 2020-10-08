@@ -1,6 +1,5 @@
 table 6151160 "NPR MM Reg. Sales Buffer"
 {
-    // MM1.37/TSA /20190130 CASE 338215 Initial Version
 
     Caption = 'Register Sales Buffer';
     DataClassification = CustomerContent;

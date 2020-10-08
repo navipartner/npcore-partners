@@ -1,18 +1,5 @@
 codeunit 6060148 "NPR MM Membership Auto Renew"
 {
-    // MM1.22/TSA /20170829 CASE 286922 Initial Version
-    // MM1.23/TSA /20171025 CASE 286922 Minor change
-    // MM1.25/TSA /20180103 CASE 299783 Support for reversing invoices
-    // MM1.25/TSA /20180108 CASE 301339 Handling of different date option on the invoice creation and logging
-    // MM1.25/TSA /20180109 CASE 301547 Refactoring due to handling a log
-    // MM1.25/TSA /20180119 CASE 302598 Added return values for entry no to be able to do one-of auto-renew
-    // MM1.26/TSA /20180120 CASE 299785 Improved error message on when auto-renew rule selection fails
-    // MM1.27/TSA /20180126 CASE 303696 Improved errors handling on auto-renew
-    // MM1.28/TSA /20180202 CASE 303876 Adapting for different auto-renew models
-    // MM1.28/TSA /20180411 CASE 303635 External Document No.
-    // MM1.39/TSA/20190529  CASE 350968 Transport MM1.38.01 - 29 May 2019
-    // MM1.43/TSA /20200218 CASE 391041 Disabled document creation for auto-renew, when membership is marked as external.
-
 
     trigger OnRun()
     begin
@@ -47,10 +34,8 @@ codeunit 6060148 "NPR MM Membership Auto Renew"
         if (MembershipAutoRenew."Membership Code" <> '') then
             Membership.SetFilter("Membership Code", '=%1', MembershipAutoRenew."Membership Code");
 
-        //-MM1.39 [350968]
-        //Membership.SETFILTER ("Auto-Renew", '=%1', TRUE);
+        //Membership.SetFilter ("Auto-Renew", '=%1', TRUE);
         Membership.SetFilter("Auto-Renew", '=%1', Membership."Auto-Renew"::YES_INTERNAL);
-        //+MM1.39 [350968]
 
         Membership.SetFilter("Auto-Renew Payment Method Code", '=%1', MembershipAutoRenew."Payment Method Code");
         Membership.SetFilter(Blocked, '=%1', false);
@@ -73,7 +58,7 @@ codeunit 6060148 "NPR MM Membership Auto Renew"
 
             MembershipAutoRenew."Started By" := UserId();
             MembershipAutoRenew.Modify();
-            Commit;
+            Commit();
 
             TmpMembershipAutoRenew.TransferFields(MembershipAutoRenew, true);
             TmpMembershipAutoRenew.Insert();
@@ -85,7 +70,7 @@ codeunit 6060148 "NPR MM Membership Auto Renew"
                     MembershipAutoRenew.Get(TmpMembershipAutoRenew."Entry No.");
                     MembershipAutoRenew.TransferFields(TmpMembershipAutoRenew, false);
                     MembershipAutoRenew.Modify();
-                    Commit;
+                    Commit();
                     if (GuiAllowed) then begin
                         Window.Update(5, MembershipAutoRenew."Auto-Renew Fail Count");
                         Window.Update(7, MembershipAutoRenew."Invoice Create Fail Count");
@@ -103,15 +88,13 @@ codeunit 6060148 "NPR MM Membership Auto Renew"
             MembershipAutoRenew.Get(TmpMembershipAutoRenew."Entry No.");
             MembershipAutoRenew.TransferFields(TmpMembershipAutoRenew, false);
             MembershipAutoRenew.Modify();
-            Commit;
+            Commit();
 
             if (TmpMembershipAutoRenew."Post Invoice") then begin
                 MemberInfoCapture.SetFilter("Auto-Renew Entry No.", '=%1', TmpMembershipAutoRenew."Entry No.");
                 if (MemberInfoCapture.FindSet()) then begin
 
-                    //-MM1.25 [301547]
                     TmpMembershipAutoRenew."First Invoice No." := '';
-                    //+MM1.25 [301547]
 
                     repeat
                         if (not PostDocument(MemberInfoCapture)) then begin
@@ -120,11 +103,9 @@ codeunit 6060148 "NPR MM Membership Auto Renew"
                             MemberInfoCapture.Modify();
                         end;
 
-                        //-MM1.25 [301547]
                         TmpMembershipAutoRenew."Last Invoice No." := MemberInfoCapture."Document No.";
                         if (TmpMembershipAutoRenew."First Invoice No." = '') then
                             TmpMembershipAutoRenew."First Invoice No." := MemberInfoCapture."Document No.";
-                        //+MM1.25 [301547]
 
                         if (GuiAllowed) then
                             if (MemberIndex mod 10 = 0) then
@@ -138,7 +119,7 @@ codeunit 6060148 "NPR MM Membership Auto Renew"
             MembershipAutoRenew.Get(TmpMembershipAutoRenew."Entry No.");
             MembershipAutoRenew.TransferFields(TmpMembershipAutoRenew, false);
             MembershipAutoRenew.Modify();
-            Commit;
+            Commit();
 
             MemberInfoCapture.Reset();
             MemberInfoCapture.SetFilter("Auto-Renew Entry No.", '=%1', TmpMembershipAutoRenew."Entry No.");
@@ -249,7 +230,7 @@ codeunit 6060148 "NPR MM Membership Auto Renew"
         SalesHeader.Ship := true;
         SalesHeader.Invoice := true;
         SalesHeader.Modify();
-        Commit;
+        Commit();
 
         Posted := SalesPost.Run(SalesHeader);
 
@@ -270,15 +251,12 @@ codeunit 6060148 "NPR MM Membership Auto Renew"
         if (not Membership.Get(MemberInfoCapture."Membership Entry No.")) then
             exit(false);
 
-        //-MM1.43 [391041]
         if (Membership."Auto-Renew" = Membership."Auto-Renew"::YES_EXTERNAL) then begin
             if (MemberInfoCapture."Document No." = Membership."External Membership No.") then
                 MemberInfoCapture."Document No." := '<EXTERNAL>';
             exit(true);
         end;
-        //+MM1.43 [391041]
 
-        //-#303876 [303876]
         MembershipSetup.Get(Membership."Membership Code");
         case MembershipSetup."Auto-Renew Model" of
             MembershipSetup."Auto-Renew Model"::INVOICE:
@@ -321,7 +299,6 @@ codeunit 6060148 "NPR MM Membership Auto Renew"
         SalesHeader.Validate("Payment Terms Code", MembershipAutoRenew."Payment Terms Code");
         SalesHeader.Validate("Salesperson Code", MembershipAutoRenew."Salesperson Code");
 
-        //+#301339 [301339]
         //SalesHeader.VALIDATE ("Posting Date", MembershipAutoRenew."Posting Date");
         //SalesHeader.VALIDATE ("Document Date", MemberInfoCapture."Document Date");
 
@@ -343,7 +320,6 @@ codeunit 6060148 "NPR MM Membership Auto Renew"
             else
                 Error(MISSING_CASE, MembershipAutoRenew.FieldCaption("Posting Date Calculation"), MembershipAutoRenew."Posting Date Calculation");
         end;
-        //+#301339 [301339]
 
         SalesHeader."External Document No." := SalesHeader."No.";
         SalesHeader.Modify(true);
@@ -416,9 +392,7 @@ codeunit 6060148 "NPR MM Membership Auto Renew"
             Validate(Amount, MemberInfoCapture."Unit Price");
             Validate(Description, StrSubstNo(AUTORENEW_TEXT, Membership."External Membership No.", ValidFromDate, ValidUntilDate));
 
-            //-#303635 [303635]
             "External Document No." := MemberInfoCapture."Document No.";
-            //+#303635 [303635]
 
             Modify(true);
 
@@ -437,7 +411,6 @@ codeunit 6060148 "NPR MM Membership Auto Renew"
         SalesPost: Codeunit "Sales-Post";
     begin
 
-        //-MM1.25 [299783]
         if (not SalesInvoiceHeader.Get(PostedInvoiceNumber)) then begin
             SalesInvoiceHeader.SetFilter("Pre-Assigned No.", '=%1', PostedInvoiceNumber);
             if (not SalesInvoiceHeader.FindFirst()) then
@@ -459,12 +432,12 @@ codeunit 6060148 "NPR MM Membership Auto Renew"
         SalesHeader.Ship := true;
         SalesHeader.Invoice := true;
         SalesHeader.Modify();
-        Commit;
+        Commit();
 
         Posted := SalesPost.Run(SalesHeader);
 
         exit(Posted);
-        //+MM1.25 [299783]
+
     end;
 
     local procedure "--Subscribers"()
@@ -477,12 +450,10 @@ codeunit 6060148 "NPR MM Membership Auto Renew"
         Customer: Record Customer;
     begin
 
-        //-MM1.39 [350968]
         //IF (NOT Membership."Auto-Renew") THEN
         //  EXIT;
         if (Membership."Auto-Renew" <> Membership."Auto-Renew"::YES_INTERNAL) then
             exit;
-        //+MM1.39 [350968]
 
         if (Membership."Customer No." = '') then
             exit;

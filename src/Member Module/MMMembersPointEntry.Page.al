@@ -1,6 +1,5 @@
 page 6060104 "NPR MM Members. Point Entry"
 {
-    // MM1.17/TSA/20161214  CASE 243075 Member Point System
 
     Caption = 'Membership Point Entry';
     Editable = false;

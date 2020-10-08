@@ -1,8 +1,5 @@
 codeunit 6151159 "NPR MM NRP Loyalty Wizard"
 {
-    // MM1.38/TSA /20190522 CASE 338215 Initial Version
-    // MM1.40/TSA /20190613 CASE 358460 Minor issues with wizard fixed.
-
 
     trigger OnRun()
     begin
@@ -34,7 +31,6 @@ codeunit 6151159 "NPR MM NRP Loyalty Wizard"
         BurnFactor: Decimal;
         EarnFactor: Decimal;
     begin
-
 
         NPRLoyaltyWizard.LookupMode(true);
         if (gCommunityCode <> '') then
@@ -91,10 +87,8 @@ codeunit 6151159 "NPR MM NRP Loyalty Wizard"
         MemberCommunity."Member Logon Credentials" := MemberCommunity."Member Logon Credentials"::NA;
         MemberCommunity."Membership to Cust. Rel." := false;
 
-        //-MM1.40 [358460]
         //MemberCommunity."Activate Loyalty Program" := FALSE;
         MemberCommunity."Activate Loyalty Program" := true;
-        //+MM1.40 [358460]
 
         MemberCommunity."Create Renewal Notifications" := false;
 
@@ -213,7 +207,7 @@ codeunit 6151159 "NPR MM NRP Loyalty Wizard"
             "User Account" := Username;
             "User Password" := Password;
             "Community Code" := CommunityCode;
-            //-MM1.40 [358460]
+
             // CASE Type OF
             //   Type::LoyaltyServices: "Endpoint URI" := BaseUrl+'loyalty_services';
             //   Type::MemberServices : "Endpoint URI" := BaseUrl+'member_services';
@@ -233,7 +227,6 @@ codeunit 6151159 "NPR MM NRP Loyalty Wizard"
                         "Endpoint URI" := StrSubstNo('%1%2?tenant=%3', BaseUrl, 'member_services', TenantName)
                 end;
             end;
-            //+MM1.40 [358460]
 
             "Connection Timeout (ms)" := 8000;
             Insert();
