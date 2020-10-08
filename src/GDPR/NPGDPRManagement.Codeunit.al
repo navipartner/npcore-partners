@@ -1,14 +1,5 @@
 codeunit 6151060 "NPR NP GDPR Management"
 {
-    // NPR5.52/ZESO/20190925 CASE 358656 Object Created
-    // NPR5.53/ZESO/20200115 CASE 358656 Reworked Codeunit to cater for new job parameters, check for ILES, remove customer no from email address
-    // NPR5.54/ZESO/20200303 CASE 358656 Anonymize Customers where To Anomymize On is less than or equal to TODAY.
-    // NPR5.54/ZESO/20200303 CASE 358656 Count of Customers which are actually being anonymized.
-    // NPR5.54/ZESO/20200310 CASE 358656 Refactored Code which gives list of Customers to be anonymised.
-    // NPR5.55/ZESO/20200427 CASE 401981 Added Anonymisation of Issued Reminders + Add Check on Journals/Statements
-    // NPR5.55/ZESO/20200513 CASE 388813 Refactored Code since fields on Customer Card were not being overwritten after contact update.
-    // NPR5.55/TSA /20200715 CASE 388813-2 Refactored DoAnonymization() and made a separate function for checking if anonymization is possible
-
     Permissions = TableData "Sales Shipment Header" = rm,
                   TableData "Sales Invoice Header" = rm,
                   TableData "Sales Cr.Memo Header" = rm,
@@ -24,33 +15,16 @@ codeunit 6151060 "NPR NP GDPR Management"
         GDPRSetup: Record "NPR Customer GDPR SetUp";
     begin
         VarCheckPeriod := GetParameterBool('CHECK_PERIOD');
-        //-NPR5.53 [358656]
-
-
-        //Customer.RESET;
-        //Customer.SETRANGE(Customer.Anonymized,FALSE);
-        //IF NOT VarCheckPeriod THEN
-        //Customer.SETRANGE("To Anonymize",TRUE);
-        //IF Customer.FINDSET THEN
-        //REPEAT
-        //DoAnonymization(Customer."No.",ReasonText);
-        //UNTIL Customer.NEXT =0;
-
-
         VarNoOfCustomers := GetParameterInt('NO_OF_CUSTOMERS');
 
         if GDPRSetup.Get then;
-
 
         case VarCheckPeriod of
             false:
                 begin
                     Customer.Reset;
                     Customer.SetRange(Customer."NPR Anonymized", false);
-                    //-NPR5.54 [358656]
-                    //Customer.SETRANGE(Customer."To Anonymize On",TODAY);
                     Customer.SetFilter(Customer."NPR To Anonymize On", '>%1&<=%2', 0D, Today);
-                    //+NPR5.54 [358656]
                     if Customer.FindSet then
                         repeat
                             DoAnonymization(Customer."No.", ReasonText);
@@ -65,15 +39,10 @@ codeunit 6151060 "NPR NP GDPR Management"
                         repeat
                             DoAnonymization(CustToAnonymise."Customer No", ReasonText);
                             CustToAnonymise.Delete;
-                        //-NPR5.54 [358656]
-                        //VarCount += 1;
-                        //+NPR5.54 [358656]
                         until (CustToAnonymise.Next = 0) or (VarCount = VarNoOfCustomers);
                 end;
         end;
 
-
-        //+NPR5.53 [358656]
     end;
 
     var
@@ -120,74 +89,7 @@ codeunit 6151060 "NPR NP GDPR Management"
         TransactionFound := false;
         OpenTransactionFound := false;
         MemberFound := false;
-        //-NPR5.55 [401981]
         JournalFound := false;
-        //+NPR5.55 [401981]
-
-
-        //-NPR5.55 [388813-2] Refactored and moved to function
-        // SalesHdr.SETCURRENTKEY("Sell-to Customer No.","External Document No.");
-        // SalesHdr.SETRANGE("Sell-to Customer No.",CustNo);
-        // IF SalesHdr.FINDFIRST THEN
-        //  OpenDocFound := TRUE;
-        //
-        //
-        // IF VarCheckPeriod THEN BEGIN
-        //  DateFormulaTxt := '-' + FORMAT(GDPRSetup."Anonymize After");
-        //  EVALUATE(VarPeriod,DateFormulaTxt);
-        //  CLE.SETCURRENTKEY("Customer No.","Posting Date","Currency Code");
-        //  CLE.SETRANGE("Customer No.",CustNo);
-        //  CLE.SETFILTER("Posting Date",'>%1',CALCDATE(VarPeriod,TODAY));
-        //  IF CLE.FINDFIRST THEN
-        //    TransactionFound := TRUE;
-        //
-        //  //-NPR5.53 [358656]
-        //  IF TransactionFound = FALSE THEN BEGIN
-        //    ILE.RESET;
-        //    ILE.SETCURRENTKEY("Source Type","Source No.","Item No.","Variant Code","Posting Date");
-        //    ILE.SETRANGE(ILE."Source Type",ILE."Source Type"::Customer);
-        //    ILE.SETRANGE(ILE."Source No.",CustNo);
-        //    ILE.SETFILTER("Posting Date",'>%1',CALCDATE(VarPeriod,TODAY));
-        //    IF ILE.FINDFIRST THEN
-        //      TransactionFound := TRUE;
-        //  END;
-        //  //+NPR5.53 [358656]
-        //
-        //
-        // END;
-        //
-        // CLE.SETCURRENTKEY("Customer No.",Open,Positive,"Due Date","Currency Code");
-        // CLE.SETRANGE("Customer No.",CustNo);
-        // CLE.SETRANGE(Open,TRUE);
-        // IF CLE.FINDFIRST THEN
-        //  OpenTransactionFound := TRUE;
-        //
-        // //-NPR5.53 [358656]
-        // IF NOT OpenTransactionFound  THEN BEGIN
-        //    ILE.RESET;
-        //    ILE.SETCURRENTKEY("Source Type","Source No.","Item No.","Variant Code","Posting Date");
-        //    ILE.SETRANGE(ILE."Source Type",ILE."Source Type"::Customer);
-        //    ILE.SETRANGE(ILE."Source No.",CustNo);
-        //    ILE.SETRANGE(Open,TRUE);
-        //    IF ILE.FINDFIRST THEN
-        //      OpenTransactionFound := TRUE;
-        // END;
-        // //+NPR5.53 [358656]
-        //
-        //
-        //
-        // Membership.SETRANGE("Customer No.",CustNo);
-        // IF Membership.FINDFIRST THEN
-        //  MemberFound := TRUE;
-        //
-        //
-        // //-NPR5.55 [401981]
-        // GenJnlLine.RESET;
-        // GenJnlLine.SETRANGE(GenJnlLine."Account Type",GenJnlLine."Account Type"::Customer);
-        // GenJnlLine.SETRANGE(GenJnlLine."Account No.",CustNo);
-        // IF GenJnlLine.FINDFIRST THEN
-        //  JournalFound := TRUE;
-        // //+NPR5.55 [401981]
 
         if (VarCheckPeriod) then
             Evaluate(VarPeriod, '-' + Format(GDPRSetup."Anonymize After"));
@@ -198,32 +100,18 @@ codeunit 6151060 "NPR NP GDPR Management"
         OpenTransactionFound := EvaluateResponseValue(AnonymizationResponseValue, 2);
         MemberFound := EvaluateResponseValue(AnonymizationResponseValue, 3);
         JournalFound := EvaluateResponseValue(AnonymizationResponseValue, 4);
-        //+NPR5.55 [388813-2]
 
-
-        //-NPR5.55 [401981]
-        //IF (OpenDocFound = FALSE) AND (TransactionFound =FALSE) AND (OpenTransactionFound = FALSE) AND (MemberFound = FALSE) THEN BEGIN
         if (OpenDocFound = false) and (TransactionFound = false) and (OpenTransactionFound = false) and (MemberFound = false) and (JournalFound = false) then begin
-            //+NPR5.55 [401981]
             AnonymizeCustomer(CustNo);
-            //-NPR5.54 [358656]
             VarCount += 1;
-            //+NPR5.54 [358656]
-
-            //-NPR5.55 [401981]
-            //InsertLogEntry(CustNo,TRUE,OpenDocFound,OpenTransactionFound,TransactionFound,MemberFound);
             InsertLogEntry(CustNo, true, OpenDocFound, OpenTransactionFound, TransactionFound, MemberFound, JournalFound);
-            //+NPR5.55 [401981]
-
 
             VarReason := StrSubstNo(Text001, CustNo);
             exit(true);
         end;
 
-        //-NPR5.55 [401981]
-        //InsertLogEntry(CustNo,FALSE,OpenDocFound,OpenTransactionFound,TransactionFound,MemberFound);
         InsertLogEntry(CustNo, false, OpenDocFound, OpenTransactionFound, TransactionFound, MemberFound, JournalFound);
-        //+NPR5.55 [401981]
+
         if (VarReason = '') and (MemberFound) then
             VarReason := StrSubstNo(Text003, CustNo);
 
@@ -242,7 +130,6 @@ codeunit 6151060 "NPR NP GDPR Management"
         Customer: Record Customer;
     begin
 
-        //-NPR5.55 [388813-2]
         ReasonCode := 0;
 
         if (not Customer.Get(CustomerNo)) then begin
@@ -261,8 +148,6 @@ codeunit 6151060 "NPR NP GDPR Management"
             ReasonCode += Power(2, 0); //OpenDocFound := TRUE;
 
         if (LimitedTimePeriod) then begin
-            // DateFormulaTxt := '-' + FORMAT(GDPRSetup."Anonymize After");
-            // EVALUATE(VarPeriod,DateFormulaTxt);
             CLE.SetCurrentKey("Customer No.", "Posting Date", "Currency Code");
             CLE.SetRange("Customer No.", CustomerNo);
             CLE.SetFilter("Posting Date", '>%1', CalcDate(LimitingDateFormula, Today));
@@ -296,7 +181,6 @@ codeunit 6151060 "NPR NP GDPR Management"
                 ReasonCode += Power(2, 2); //OpenTransactionFound := TRUE;
         end;
 
-
         Membership.SetRange("Customer No.", CustomerNo);
         if Membership.FindFirst then
             ReasonCode += Power(2, 3); // MemberFound := TRUE;
@@ -322,23 +206,15 @@ codeunit 6151060 "NPR NP GDPR Management"
         Customer: Record Customer;
     begin
 
-        //-NPR5.55 [388813]
-        //Customer.GET(CustNo);
         AnonymizePrimaryContact(CustNo);
         AnonymizeSalesInvoices(CustNo);
         AnonymizeSalesCrMemos(CustNo);
         AnonymizeSalesShipments(CustNo);
         AnonymizeReturnReceipts(CustNo);
         AnonymizeJobs(CustNo);
-        //+NPR5.55 [388813]
-
-        //-NPR5.55 [401981]
         AnonymizeIssuedReminders(CustNo);
-        //+NPR5.55 [401981]
 
-        //-NPR5.55 [388813]
         Customer.Get(CustNo);
-        //+NPR5.55 [388813]
 
         Customer.Name := '------';
         Customer."Search Name" := '------';
@@ -356,10 +232,7 @@ codeunit 6151060 "NPR NP GDPR Management"
         Customer.GLN := '';
         Customer."Post Code" := '';
         Customer."Country/Region Code" := '';
-        //-NPR5.53 [358656]
-        //Customer."E-Mail" := STRSUBSTNO ('anonymous%1@nowhere.com', CustNo);
         Customer."E-Mail" := '------@----';
-        //+NPR5.53 [358656]
         Customer."Home Page" := 'nowhere.com';
         Customer."NPR Anonymized" := true;
         Customer."NPR Anonymized Date" := CurrentDateTime;
@@ -367,15 +240,6 @@ codeunit 6151060 "NPR NP GDPR Management"
 
         Customer.Blocked := Customer.Blocked::All;
         Customer.Modify(true);
-
-        //-NPR5.55 [388813]
-        //AnonymizePrimaryContact(CustNo);
-        //AnonymizeSalesInvoices(CustNo);
-        //AnonymizeSalesCrMemos(CustNo);
-        //AnonymizeSalesShipments(CustNo);
-        //AnonymizeReturnReceipts(CustNo);
-        //AnonymizeJobs(CustNo);
-        //+NPR5.55 [388813]
     end;
 
     local procedure AnonymizePrimaryContact(VarCustNo: Code[20])
@@ -404,10 +268,7 @@ codeunit 6151060 "NPR NP GDPR Management"
                     Clear(Contact.Image);
                 Contact."Post Code" := '';
                 Contact."Country/Region Code" := '';
-                //-NPR5.53 [358656]
-                //Contact."E-Mail" := STRSUBSTNO ('anonymous%1@nowhere.com', Contact."No.");
                 Contact."E-Mail" := '------@----';
-                //-NPR5.53 [358656]
                 Contact."Home Page" := 'www.nowhere.com';
                 Contact."First Name" := '------';
                 Contact."Middle Name" := '------';
@@ -415,14 +276,10 @@ codeunit 6151060 "NPR NP GDPR Management"
                 Contact."Job Title" := '------';
                 Contact.Initials := '------';
                 Contact."Mobile Phone No." := '';
-                //-NPR5.53 [358656]
-                //Contact."Search E-Mail" := STRSUBSTNO ('anonymous%1@nowhere.com', Contact."No.");
                 Contact."Search E-Mail" := '------@----';
-                //+NPR5.53 [358656]
                 Contact."Company Name" := '------';
                 Contact.Pager := '';
                 Contact."NPR Magento Contact" := false;
-                Contact."NPR Magento Administrator" := false;
                 Contact.Modify(true);
 
                 if Contact."Company No." = '' then
@@ -452,10 +309,7 @@ codeunit 6151060 "NPR NP GDPR Management"
                 Clear(Contact.Image);
             Contact."Post Code" := '';
             Contact."Country/Region Code" := '';
-            //-NPR5.53 [358656]
-            //Contact."E-Mail" := STRSUBSTNO ('anonymous%1@nowhere.com', Contact."No.");
             Contact."E-Mail" := '------@----';
-            //-NPR5.53 [358656]
             Contact."Home Page" := 'www.nowhere.com';
             Contact."First Name" := '------';
             Contact."Middle Name" := '------';
@@ -463,14 +317,10 @@ codeunit 6151060 "NPR NP GDPR Management"
             Contact."Job Title" := '------';
             Contact.Initials := '------';
             Contact."Mobile Phone No." := '';
-            //-NPR5.53 [358656]
-            //Contact."Search E-Mail" := STRSUBSTNO ('anonymous%1@nowhere.com', Contact."No.");
             Contact."Search E-Mail" := '------@----';
-            //+NPR5.53 [358656]
             Contact."Company Name" := '------';
             Contact.Pager := '';
             Contact."NPR Magento Contact" := false;
-            Contact."NPR Magento Administrator" := false;
             Contact.Modify(true);
         end;
     end;
@@ -515,10 +365,7 @@ codeunit 6151060 "NPR NP GDPR Management"
                 SalesInvHdr."Bill-to Post Code" := '';
                 SalesInvHdr."Bill-to County" := '';
                 SalesInvHdr."Bill-to Country/Region Code" := '';
-                //-NPR5.53 [358656]
-                //SalesInvHdr."Bill-to E-mail" := STRSUBSTNO ('anonymous%1@nowhere.com', VarCustNo);
                 SalesInvHdr."NPR Bill-to E-mail" := '------@----';
-                //+NPR5.53 [358656]
                 SalesInvHdr."Sell-to Post Code" := '';
                 SalesInvHdr."Sell-to County" := '';
                 SalesInvHdr."Sell-to Country/Region Code" := '';
@@ -567,10 +414,7 @@ codeunit 6151060 "NPR NP GDPR Management"
                 SalesCrMemoHdr."Bill-to Post Code" := '';
                 SalesCrMemoHdr."Bill-to County" := '';
                 SalesCrMemoHdr."Bill-to Country/Region Code" := '';
-                //-NPR5.53 [358656]
-                //SalesCrMemoHdr."Bill-to E-mail" := STRSUBSTNO ('anonymous%1@nowhere.com', VarCustNo);
                 SalesCrMemoHdr."NPR Bill-to E-mail" := '------@----';
-                //+NPR5.53 [358656]
                 SalesCrMemoHdr."Sell-to Post Code" := '';
                 SalesCrMemoHdr."Sell-to County" := '';
                 SalesCrMemoHdr."Sell-to Country/Region Code" := '';
@@ -596,9 +440,7 @@ codeunit 6151060 "NPR NP GDPR Management"
         GDPRLogEntry."Open Cust. Ledger Entry" := OpenCLE;
         GDPRLogEntry."Has transactions" := TransactionInPeriod;
         GDPRLogEntry."Customer is a Member" := Member;
-        //-NPR5.55 [401981]
         GDPRLogEntry."Open Journal Entries/Statement" := Journals;
-        //+NPR5.55 [401981]
         GDPRLogEntry."Log Entry Date Time" := CurrentDateTime;
         GDPRLogEntry."Anonymized By" := UserId;
         GDPRLogEntry.Insert;
@@ -694,10 +536,7 @@ codeunit 6151060 "NPR NP GDPR Management"
                 SalesShipmentHdr."Sell-to Post Code" := '';
                 SalesShipmentHdr."Sell-to County" := '';
                 SalesShipmentHdr."Sell-to Country/Region Code" := '';
-                //-NPR5.53 [358656]
-                //SalesShipmentHdr."Bill-to E-mail" := STRSUBSTNO ('anonymous%1@nowhere.com', VarCustNo);
                 SalesShipmentHdr."NPR Bill-to E-mail" := '------@----';
-                //+NPR5.53 [358656]
                 SalesShipmentHdr.Modify(true);
             until SalesShipmentHdr.Next = 0;
     end;
@@ -764,17 +603,11 @@ codeunit 6151060 "NPR NP GDPR Management"
                 Job."Bill-to Contact" := '------';
                 Job."Bill-to Country/Region Code" := '';
                 Job."Bill-to County" := '';
-                //-NPR5.53 [358656]
-                //Job."Bill-to E-Mail" := STRSUBSTNO ('anonymous%1@nowhere.com', VarCustNo);
                 Job."NPR Bill-to E-Mail" := '------@----';
-                //+NPR5.53 [358656]
                 Job."Bill-to Name" := '------';
                 Job."Bill-to Name 2" := '------';
                 Job."Bill-to Post Code" := '';
-                //-NPR5.53 [358656]
-                //Job."Organizer E-Mail" := STRSUBSTNO ('anonymous%1@nowhere.com', VarCustNo);
                 Job."NPR Organizer E-Mail" := '------@----';
-                //+NPR5.53 [358656]
                 Job."NPR Person Responsible Name" := '------';
                 Job."Person Responsible" := '------';
                 Job.Modify(true);
@@ -799,11 +632,8 @@ codeunit 6151060 "NPR NP GDPR Management"
         VarDateToUse: Date;
         NoTrans: Boolean;
     begin
-        //-NPR5.53 [358656]
         CustToAnonymize.Reset;
         CustToAnonymize.DeleteAll;
-
-
         if GDPRSetup.Get then;
 
         DateFormulaTxt := '-' + Format(GDPRSetup."Anonymize After");
@@ -815,14 +645,9 @@ codeunit 6151060 "NPR NP GDPR Management"
         Customer.SetRange(Customer."NPR Anonymized", false);
         Customer.SetFilter(Customer."Customer Posting Group", GDPRSetup."Customer Posting Group Filter");
         Customer.SetFilter(Customer."Gen. Bus. Posting Group", GDPRSetup."Gen. Bus. Posting Group Filter");
-        //-NPR5.54 [358656]
         Customer.SetFilter("Last Date Modified", '<>%1', 0D);
-        //+NPR5.54 [358656]
         if Customer.FindSet then
             repeat
-                //-NPR5.54 [358656]
-                //IF (TODAY - Customer."Last Date Modified") >= (TODAY - CALCDATE(VarPeriod,TODAY)) THEN BEGIN
-
                 NoTrans := true;
 
                 CLE.Reset;
@@ -848,7 +673,6 @@ codeunit 6151060 "NPR NP GDPR Management"
                         VarEntryNo += 1;
                     end;
                 end else begin
-                    //-NPR5.54 [358656]
                     NoCLE := false;
                     NoILE := false;
                     CLE.Reset;
@@ -877,14 +701,12 @@ codeunit 6151060 "NPR NP GDPR Management"
                     end;
                 end;
             until Customer.Next = 0;
-        //+NPR5.53 [358656]
     end;
 
     local procedure AnonymizeIssuedReminders(VarCustNo: Code[20])
     var
         IssuedReminderHdr: Record "Issued Reminder Header";
     begin
-        //-NPR5.55 [401981]
         IssuedReminderHdr.Reset;
         IssuedReminderHdr.SetRange("Customer No.", VarCustNo);
         if not IssuedReminderHdr.FindFirst then
@@ -902,7 +724,7 @@ codeunit 6151060 "NPR NP GDPR Management"
                 IssuedReminderHdr."VAT Registration No." := '';
                 IssuedReminderHdr.Modify(true);
             until IssuedReminderHdr.Next = 0;
-        //+NPR5.55 [401981]
+
     end;
 }
 
