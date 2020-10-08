@@ -1,3 +1,8 @@
+##Ignore Dragonglass bundle.js
+src/_ControlAddIns/Dragonglass/Scripts/bundle.js
+src/_ControlAddIns/Dragonglass/Scripts/bundle.js.map
+
+
 ## Ignore NAV Instance Specific files
 .alpackages/
 .alcache/
@@ -255,4 +260,3 @@ ModelManifest.xml
 
 # FAKE - F# Make
 .fake/
-
