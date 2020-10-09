@@ -105,10 +105,6 @@ page 6060132 "NPR MM Member Community"
                 Caption = 'Auto Renew Process';
                 Ellipsis = true;
                 Image = AutoReserve;
-                //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                //PromotedCategory = Process;
-                //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
-                //PromotedIsBig = true;
                 RunObject = Page "NPR MM Members. AutoRenew List";
                 RunPageLink = "Community Code" = FIELD(Code);
                 ApplicationArea = All;
@@ -139,10 +135,6 @@ page 6060132 "NPR MM Member Community"
                 Caption = 'Foreign Membership Setup';
                 Ellipsis = true;
                 Image = ElectronicBanking;
-                //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                //PromotedCategory = Process;
-                //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
-                //PromotedIsBig = true;
                 RunObject = Page "NPR MM Foreign Members. Setup";
                 RunPageLink = "Community Code" = FIELD(Code);
                 ApplicationArea = All;
@@ -154,12 +146,25 @@ page 6060132 "NPR MM Member Community"
             {
                 Caption = 'Update Memberships Customer';
                 Image = CreateInteraction;
-                //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
-                //PromotedIsBig = true;
                 RunObject = Report "NPR MM Sync. Community Cust.";
                 ApplicationArea = All;
             }
+
+            action(CreateDemoData)
+            {
+                Caption = 'Create Demo Data';
+                ApplicationArea = All;
+
+                trigger OnAction()
+                var
+                    CreateDemo: Codeunit "NPR MM Member Create Demo Data";
+                begin
+                    CreateDemo.CreateDemoData(false);
+                end;
+
+            }
         }
+
     }
 }
 
