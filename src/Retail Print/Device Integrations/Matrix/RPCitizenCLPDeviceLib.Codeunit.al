@@ -304,7 +304,7 @@ codeunit 6014544 "NPR RP Citizen CLP Device Lib."
 
     local procedure AddToBuffer(Text: Text[1024])
     begin
-        AddTextToBuffer(LatinConvert(Text));
+        AddTextToBuffer(Text);
     end;
 
     local procedure AddCharToBuffer(CharCode: Integer)
@@ -315,14 +315,6 @@ codeunit 6014544 "NPR RP Citizen CLP Device Lib."
     local procedure AddTextToBuffer(Text: Text[1024])
     begin
         PrintBuffer += Text + ESC.CR + ESC.LF;
-    end;
-
-    procedure LatinConvert(Input: Text[1024]) Output: Text[1024]
-    var
-        txtTo: Label 'ÈÛ¹ÉßÄ®ÃÙÚ²â¿';
-        txtFrom: Label '‘›†’«Ž™š‚ÔŠ';
-    begin
-        Output := ConvertStr(Input, txtFrom, txtTo);
     end;
 
     procedure PadStrLeft(Input: Text[30]; Length: Integer; PadChr: Text[1]) Output: Text[30]
