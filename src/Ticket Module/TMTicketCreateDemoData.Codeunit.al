@@ -279,7 +279,7 @@ codeunit 6151134 "NPR TM Ticket Create Demo Data"
     end;
 
 
-    local procedure CreateAdmissionCode(AdmissionCode: Code[20]; Description: text[50]; AdmissionType: Option; CapacityLimit: Option; DefaultSchedule: Option): code[20]
+    procedure CreateAdmissionCode(AdmissionCode: Code[20]; Description: text[50]; AdmissionType: Option; CapacityLimit: Option; DefaultSchedule: Option): code[20]
     var
         Admission: Record "NPR TM Admission";
     begin
@@ -368,7 +368,7 @@ codeunit 6151134 "NPR TM Ticket Create Demo Data"
         exit(AdmissionGroupConcurrency.Code);
     end;
 
-    local procedure CreateItem(No: Code[20]; VariantCode: Code[10]; TicketTypeCode: Code[10]; Description: Text[30]; UnitPrice: Decimal): Code[20]
+    procedure CreateItem(No: Code[20]; VariantCode: Code[10]; TicketTypeCode: Code[10]; Description: Text[30]; UnitPrice: Decimal): Code[20]
     var
         TicketItem: Record "Item";
         ItemVariant: Record "Item Variant";
@@ -448,7 +448,7 @@ codeunit 6151134 "NPR TM Ticket Create Demo Data"
         end;
     end;
 
-    local procedure CreateSchedule(ScehduleCode: Code[20]; ScheduleType: Option; AdmissionIs: Option; StartFrom: Date; RecurrencePattern: Option; StartTime: Time; EndTime: Time; Monday: Boolean; Tuesday: Boolean; Wednesday: Boolean; Thursday: Boolean; Friday: Boolean; Saturday: Boolean; Sunday: Boolean): Code[20]
+    procedure CreateSchedule(ScehduleCode: Code[20]; ScheduleType: Option; AdmissionIs: Option; StartFrom: Date; RecurrencePattern: Option; StartTime: Time; EndTime: Time; Monday: Boolean; Tuesday: Boolean; Wednesday: Boolean; Thursday: Boolean; Friday: Boolean; Saturday: Boolean; Sunday: Boolean): Code[20]
     var
         AdmissionSchedule: Record "NPR TM Admis. Schedule";
     begin
@@ -478,7 +478,7 @@ codeunit 6151134 "NPR TM Ticket Create Demo Data"
         exit(ScehduleCode);
     end;
 
-    local procedure CreateSchedule(ScehduleCode: Code[20]; ScheduleType: Option; AdmissionIs: Option; StartFrom: Date; RecurrencePattern: Option; EndAfter: Date; StartTime: Time; EndTime: Time; Monday: Boolean; Tuesday: Boolean; Wednesday: Boolean; Thursday: Boolean; Friday: Boolean; Saturday: Boolean; Sunday: Boolean): Code[20]
+    procedure CreateSchedule(ScehduleCode: Code[20]; ScheduleType: Option; AdmissionIs: Option; StartFrom: Date; RecurrencePattern: Option; EndAfter: Date; StartTime: Time; EndTime: Time; Monday: Boolean; Tuesday: Boolean; Wednesday: Boolean; Thursday: Boolean; Friday: Boolean; Saturday: Boolean; Sunday: Boolean): Code[20]
     var
         AdmissionSchedule: Record "NPR TM Admis. Schedule";
     begin
@@ -493,7 +493,7 @@ codeunit 6151134 "NPR TM Ticket Create Demo Data"
     end;
 
 
-    local procedure CreateScheduleLine(AdmissionCode: Code[20]; ScheduleCode: Code[20]; ProcessOrder: Integer; PreBookRequired: Boolean; MaxCapacity: Integer; CapacityControl: Option; PrebookFromFormula: Text[30]; AllowAdmissionBeforeStart_Minutes: Integer; AllowAdmissionPassedStart_Minutes: Integer)
+    procedure CreateScheduleLine(AdmissionCode: Code[20]; ScheduleCode: Code[20]; ProcessOrder: Integer; PreBookRequired: Boolean; MaxCapacity: Integer; CapacityControl: Option; PrebookFromFormula: Text[30]; AllowAdmissionBeforeStart_Minutes: Integer; AllowAdmissionPassedStart_Minutes: Integer)
     var
         ScheduleLines: Record "NPR TM Admis. Schedule Lines";
     begin
@@ -544,7 +544,7 @@ codeunit 6151134 "NPR TM Ticket Create Demo Data"
         Schedule.MODIFY();
     end;
 
-    local procedure CreateTicketBOM(ItemNo: Code[20]; VariantCode: Code[10]; AdmissionCode: Code[20]; TicketBaseCalendarCode: Code[10]; Quantity: Integer; Default: Boolean; DurationFormula: Text[30]; MaxNoOfEntries: Integer; ActivationMethod: Option; EntryValidation: Option)
+    procedure CreateTicketBOM(ItemNo: Code[20]; VariantCode: Code[10]; AdmissionCode: Code[20]; TicketBaseCalendarCode: Code[10]; Quantity: Integer; Default: Boolean; DurationFormula: Text[30]; MaxNoOfEntries: Integer; ActivationMethod: Option; EntryValidation: Option)
     var
         TicketBom: Record "NPR TM Ticket Admission BOM";
         Item: Record Item;
@@ -576,7 +576,7 @@ codeunit 6151134 "NPR TM Ticket Create Demo Data"
         TicketBom.MODIFY();
     end;
 
-    local procedure CreateTicketType(TicketTypeCode: Code[10]; Description: text[50]; DurationFormula: Text[30]; MaxNumberOfEntries: Integer; AdmissionRegistration: Option; ActivationMethod: Option; EntryValidation: Option; ConfigurationSource: Option): Code[10]
+    procedure CreateTicketType(TicketTypeCode: Code[10]; Description: text[50]; DurationFormula: Text[30]; MaxNumberOfEntries: Integer; AdmissionRegistration: Option; ActivationMethod: Option; EntryValidation: Option; ConfigurationSource: Option): Code[10]
     var
         TicketType: Record "NPR TM Ticket Type";
     begin
