@@ -1,14 +1,5 @@
 page 6059769 "NPR NaviDocs Document List"
 {
-    // NPR5.23/THRO/20160601 CASE 236043 SetStatusHandled corrected to set status = Handled, Disabled E-mail Log as function called doesn't exists
-    // NPR5.23/MMV /20160609 CASE 240856 Changed key away from status since it will be changed as part of the handling process, causing some records to be hit twice by the record iterator.
-    // NPR5.26/THRO/20160808 CASE 248662 Field 3 Type removed. Removed Email log menuitem
-    // NPR5.26/THRO/20160908 CASE 250371 Added "Delay sending until"
-    // NPR5.30/THRO/20170209 CASE 243998 Logging in Activity Log - link to subpage changed
-    // NPR5.36/THRO/20170913 CASE 289216 Added Template Code
-    // NPR5.40/THRO/20180301 CASE 306875 Selected fields made editable
-    // NPR5.43/THRO/20180531 CASE 315958 Added Attachment subpage
-
     Caption = 'NaviDocs Document List';
     DeleteAllowed = false;
     InsertAllowed = false;
@@ -243,10 +234,7 @@ page 6059769 "NPR NaviDocs Document List"
                     begin
                         Clear(NaviDocsEntry2);
                         CurrPage.SetSelectionFilter(NaviDocsEntry2);
-                        //-NPR5.23 [236043]
-                        //ChangeStatus(1);
                         ChangeStatus(2);
-                        //+NPR5.23 [236043]
                     end;
                 }
             }
@@ -261,11 +249,9 @@ page 6059769 "NPR NaviDocs Document List"
 
                     trigger OnAction()
                     begin
-                        //-NPR5.40 [306875]
                         Clear(NaviDocsEntry2);
                         CurrPage.SetSelectionFilter(NaviDocsEntry2);
                         ChangeHandlingProfile;
-                        //+NPR5.40 [306875]
                     end;
                 }
             }
@@ -319,9 +305,7 @@ page 6059769 "NPR NaviDocs Document List"
 
     trigger OnAfterGetCurrRecord()
     begin
-        //-NPR5.30 [243998]
         CurrPage.NaviDocsCommentSubpage.PAGE.SetData(Rec, NaviDocsSetup."Log to Activity Log");
-        //+NPR5.30 [243998]
     end;
 
     trigger OnAfterGetRecord()
@@ -333,12 +317,8 @@ page 6059769 "NPR NaviDocs Document List"
     var
         NaviDocsEntryAttachment: Record "NPR NaviDocs Entry Attachment";
     begin
-        //-NPR5.30 [243998]
         NaviDocsSetup.Get;
-        //+NPR5.30 [243998]
-        //-NPR5.43 [315958]
         ShowAttachmentSubpage := not NaviDocsEntryAttachment.IsEmpty;
-        //+NPR5.43 [315958]
     end;
 
     var
@@ -359,13 +339,7 @@ page 6059769 "NPR NaviDocs Document List"
     var
         NaviDocsEntry3: Record "NPR NaviDocs Entry";
     begin
-        //-NPR5.23 [240856]
-        //NaviDocsEntry2.SETCURRENTKEY(Type, Status);
         NaviDocsEntry2.SetCurrentKey("Entry No.");
-        //+NPR5.23 [240856]
-        //-NPR5.26 [248662]
-        //NaviDocsEntry2.SETRANGE(Type,Type::"2");
-        //+NPR5.26 [248662]
         NaviDocsEntry2.SetRange(Status, 0, 1);
 
         if not Confirm(StrSubstNo(TxtConfirm001, Format(NaviDocsEntry2.Count), TxtConfirm011), true) then
@@ -374,17 +348,12 @@ page 6059769 "NPR NaviDocs Document List"
         if NaviDocsEntry2.FindSet then
             repeat
                 NaviDocsEntry3.Copy(NaviDocsEntry2);
-                if NaviDocsManagement.Run(NaviDocsEntry3) then;
-                //NaviDocsManagement.RUN(NaviDocsEntry3);
+                NaviDocsManagement.Process(NaviDocsEntry3);
                 Commit;
             until NaviDocsEntry2.Next = 0;
 
         NaviDocsEntry2.Reset;
-        //-NPR5.26 [248662]
-        //NaviDocsEntry2.SETCURRENTKEY(Type, Status);
-        //NaviDocsEntry2.SETRANGE(Type,Type::"2");
         NaviDocsEntry2.SetCurrentKey(Status);
-        //+NPR5.26 [248662]
         NaviDocsEntry2.SetRange(Status, 0, 1);
         if NaviDocsEntry2.Count > 0 then
             Message(TxtHandled001, NaviDocsEntry2.Count)
@@ -431,7 +400,6 @@ page 6059769 "NPR NaviDocs Document List"
         NewHandlingProfile: Record "NPR NaviDocs Handling Profile";
         TempChangedNaviDocsEntry: Record "NPR NaviDocs Entry" temporary;
     begin
-        //-NPR5.40 [306875]
         NaviDocsEntry2.SetCurrentKey("Entry No.");
 
         if PAGE.RunModal(0, NewHandlingProfile) <> ACTION::LookupOK then
@@ -456,7 +424,6 @@ page 6059769 "NPR NaviDocs Document List"
 
         NaviDocsEntry2.Reset;
         CurrPage.Update(false);
-        //+NPR5.40 [306875]
     end;
 }
 
