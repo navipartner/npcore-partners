@@ -4,32 +4,18 @@ codeunit 6059767 "NPR NaviDocs Management"
 
     trigger OnRun()
     var
-        ManagementStatus: Boolean;
     begin
-        if not (NaviDocsSetup.Get and
-                NaviDocsSetup."Enable NaviDocs" and
-                (Status <> 2)) then
+        if not (NaviDocsSetup.Get and NaviDocsSetup."Enable NaviDocs" and (Rec.Status <> 2)) then
             exit;
-        if ("Delay sending until" <> 0DT) and ("Delay sending until" > CurrentDateTime) then
+        if (Rec."Delay sending until" <> 0DT) and (Rec."Delay sending until" > CurrentDateTime) then
             exit;
-
-        "Processed Qty." += 1;
-        Status := 1;
-        Modify;
-        Commit;
-
-        ManagementStatus := TryDocManage(Rec);
-        if (not ManagementStatus) and (GetLastErrorText <> '') then begin
-            InsertComment(Rec, GetLastErrorText, true);
-            ClearLastError;
+        ClearLastError();
+        if not DocManage(Rec) then begin
+            commit;
+            Error('');
         end;
-
-        if ManagementStatus then
-            Status := 2
-        else
-            if TrySendWarningMail(Rec) then;
-
-        Modify(true);
+        Rec.Status := 2;
+        Rec.Modify(true);
     end;
 
     var
@@ -45,6 +31,38 @@ codeunit 6059767 "NPR NaviDocs Management"
         ActivityHandling: Label 'Handling';
         ActivityStatusChange: Label 'Status Change';
         EntryChangedTxt: Label '%1 changed to %2.';
+
+    procedure Process(NaviDocsEntry: Record "NPR NaviDocs Entry")
+    var
+        NaviDocsManagement: Codeunit "NPR NaviDocs Management";
+        ManagementStatus: Boolean;
+
+    begin
+        if not (NaviDocsSetup.Get and
+                NaviDocsSetup."Enable NaviDocs" and
+                (NaviDocsEntry.Status <> 2)) then
+            exit;
+        if (NaviDocsEntry."Delay sending until" <> 0DT) and (NaviDocsEntry."Delay sending until" > CurrentDateTime) then
+            exit;
+
+        NaviDocsEntry."Processed Qty." += 1;
+        NaviDocsEntry.Status := 1;
+        NaviDocsEntry.Modify;
+        Commit;
+        ManagementStatus := NaviDocsManagement.Run(NaviDocsEntry);
+        if (not ManagementStatus) and (GetLastErrorText <> '') then begin
+            InsertComment(NaviDocsEntry, GetLastErrorText, true);
+            ClearLastError;
+        end;
+
+        if ManagementStatus then
+            NaviDocsEntry.Status := 2
+        else
+            if TrySendWarningMail(NaviDocsEntry) then;
+
+        NaviDocsEntry.Modify(true);
+
+    end;
 
     procedure AddDocumentEntry(RecRef: RecordRef; ReportNo: Integer)
     var
@@ -347,23 +365,6 @@ codeunit 6059767 "NPR NaviDocs Management"
         end;
     end;
 
-    procedure "--- Document Management"()
-    begin
-    end;
-
-    local procedure TryDocManage(NaviDocsEntry: Record "NPR NaviDocs Entry"): Boolean
-    var
-        DocManageSuccess: Boolean;
-    begin
-        asserterror
-        begin
-            DocManageSuccess := DocManage(NaviDocsEntry);
-            Commit;
-            Error('');
-        end;
-        exit(DocManageSuccess);
-    end;
-
     procedure DocManage(NaviDocsEntry: Record "NPR NaviDocs Entry") DocManageSuccess: Boolean
     var
         Error002: Label 'Posted Sales Invoice %1 does not exist!';
@@ -559,10 +560,6 @@ codeunit 6059767 "NPR NaviDocs Management"
         exit(false);
     end;
 
-    local procedure "-- Handling Profile Management"()
-    begin
-    end;
-
     procedure CreateHandlingProfileLibrary()
     var
         HandlingTypePrintTxt: Label 'Print Document';
@@ -714,10 +711,6 @@ codeunit 6059767 "NPR NaviDocs Management"
             if TempHandlingProfiles.Insert then;
         end;
         exit(true);
-    end;
-
-    procedure "--- Aux"()
-    begin
     end;
 
     procedure InsertComment(NaviDocsEntry: Record "NPR NaviDocs Entry"; Comment: Text; Warning: Boolean)
@@ -987,10 +980,6 @@ codeunit 6059767 "NPR NaviDocs Management"
         MailAndDocumentHandling.ClearRequestParameters(ReportID);
     end;
 
-    procedure "--- UI"()
-    begin
-    end;
-
     procedure PageAccountCard(NaviDocsEntry: Record "NPR NaviDocs Entry")
     var
         Customer: Record Customer;
@@ -1064,10 +1053,6 @@ codeunit 6059767 "NPR NaviDocs Management"
         PAGE.RunModal(PAGE::"NPR E-mail Template", MailAndDocumentHeader);
     end;
 
-    local procedure "--- Publishers"()
-    begin
-    end;
-
     [IntegrationEvent(false, false)]
     local procedure OnBeforeAddDocumentEntry(var IsInsertHandled: Boolean; var RecRef: RecordRef; var HandlingProfile: Code[20]; var ReportNo: Integer; var Recipient: Text)
     begin
@@ -1090,10 +1075,6 @@ codeunit 6059767 "NPR NaviDocs Management"
 
     [IntegrationEvent(false, false)]
     local procedure OnShowTemplate(var RequestHandled: Boolean; NaviDocsEntry: Record "NPR NaviDocs Entry")
-    begin
-    end;
-
-    local procedure "--- Subscribers"()
     begin
     end;
 
@@ -1237,10 +1218,6 @@ codeunit 6059767 "NPR NaviDocs Management"
         InsertedEntryNo := NaviDocsEntry."Entry No.";
     end;
 
-    procedure "--- ErrorHandling"()
-    begin
-    end;
-
     [TryFunction]
     procedure TrySendWarningMail(NaviDocsEntry: Record "NPR NaviDocs Entry")
     var
@@ -1272,10 +1249,6 @@ codeunit 6059767 "NPR NaviDocs Management"
         if NaviDocsEntryComment.FindLast then
             SmtpMail.AppendBody(NaviDocsEntryComment.Description + '<br><br>');
         SmtpMail.Send();
-    end;
-
-    procedure "--- Enum"()
-    begin
     end;
 
     procedure NaviDocsStatusUnhandled(): Integer
