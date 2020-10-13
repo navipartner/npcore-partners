@@ -1,13 +1,5 @@
 codeunit 6150903 "NPR HC Connector Web Service"
 {
-    // NPR5.37/BR  /20171027 CASE 267552 HQ Connector Created Object
-    // NPR5.38/BR  /20171030 CASE 295007 Added Orderfunction
-    // NPR5.38/BR  /20171128 CASE 297946 Added Customer
-    // NPR5.38/BR  /20171205 CASE 297946 Added generic web serivce
-    // NPR5.39/BR  /20180222 CASE 295007 Added InsertPOSEntry
-    // NPR5.44/MHA /20180704 CASE 318391 Added ProcessImportEntry() to Insert functions
-
-
     trigger OnRun()
     begin
     end;
@@ -21,19 +13,14 @@ codeunit 6150903 "NPR HC Connector Web Service"
         SelectLatestVersion;
         auditrolllineimport.Import;
         InsertImportEntry('InsertAuditRoll', 6150904, NaviConnectImportEntry);
-        //-NPR5.44 [318391]
-        //NaviConnectImportEntry."Document Name" := 'BCConnectorAuditRoll.xml';
         NaviConnectImportEntry."Document Name" := CopyStr('NCConnectorAuditRoll' + auditrolllineimport.GetSalesTicketNo(), 1, MaxStrLen(NaviConnectImportEntry."Document Name") - 4) + '.xml';
-        //+NPR5.44 [318391]
         NaviConnectImportEntry."Document Source".CreateOutStream(OutStr);
         auditrolllineimport.SetDestination(OutStr);
         auditrolllineimport.Export;
         NaviConnectImportEntry.Modify(true);
         Commit;
 
-        //-NPR5.44 [318391]
         NaviConnectSyncMgt.ProcessImportEntry(NaviConnectImportEntry);
-        //+NPR5.44 [318391]
     end;
 
     procedure InsertPOSEntry(var posentryimport: XMLport "NPR HC POS Entry")
@@ -42,7 +29,6 @@ codeunit 6150903 "NPR HC Connector Web Service"
         NaviConnectSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
         OutStr: OutStream;
     begin
-        //-NPR5.39 [295007]
         SelectLatestVersion;
         posentryimport.Import;
         InsertImportEntry('InsertPOSEntry', 6150915, NaviConnectImportEntry);
@@ -52,11 +38,8 @@ codeunit 6150903 "NPR HC Connector Web Service"
         posentryimport.Export;
         NaviConnectImportEntry.Modify(true);
         Commit;
-        //+NPR5.39 [295007]
 
-        //-NPR5.44 [318391]
         NaviConnectSyncMgt.ProcessImportEntry(NaviConnectImportEntry);
-        //+NPR5.44 [318391]
     end;
 
     procedure InsertSalesDocument(var salesdocumentimport: XMLport "NPR HC Sales Document")
@@ -65,7 +48,6 @@ codeunit 6150903 "NPR HC Connector Web Service"
         NaviConnectSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
         OutStr: OutStream;
     begin
-        //-NPR5.38 [295007]
         SelectLatestVersion;
         salesdocumentimport.Import;
         InsertImportEntry('InsertSalesDocument', 6150906, NaviConnectImportEntry);
@@ -75,11 +57,8 @@ codeunit 6150903 "NPR HC Connector Web Service"
         salesdocumentimport.Export;
         NaviConnectImportEntry.Modify(true);
         Commit;
-        //+NPR5.38 [295007]
 
-        //-NPR5.44 [318391]
         NaviConnectSyncMgt.ProcessImportEntry(NaviConnectImportEntry);
-        //+NPR5.44 [318391]
     end;
 
     procedure InsertCustomer(var customerimport: XMLport "NPR HC Customer")
@@ -88,7 +67,6 @@ codeunit 6150903 "NPR HC Connector Web Service"
         NaviConnectSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
         OutStr: OutStream;
     begin
-        //-NPR5.38 [297946]
         SelectLatestVersion;
         customerimport.Import;
         InsertImportEntry('InsertCustomer', 6150907, NaviConnectImportEntry);
@@ -98,11 +76,8 @@ codeunit 6150903 "NPR HC Connector Web Service"
         customerimport.Export;
         NaviConnectImportEntry.Modify(true);
         Commit;
-        //+NPR5.38 [297946]
 
-        //-NPR5.44 [318391]
         NaviConnectSyncMgt.ProcessImportEntry(NaviConnectImportEntry);
-        //+NPR5.44 [318391]
     end;
 
     procedure GetCustomerPrice(var customerPriceRequest: XMLport "NPR HC Customer Price Request")
@@ -114,8 +89,6 @@ codeunit 6150903 "NPR HC Connector Web Service"
         TmpSalesHeader: Record "Sales Header" temporary;
         TmpSalesLine: Record "Sales Line" temporary;
     begin
-
-        //-NPR5.38 [297859]
         SelectLatestVersion;
         customerPriceRequest.Import;
         InsertImportEntry('GetCustomerPrice', 6150908, NaviConnectImportEntry);
@@ -139,7 +112,6 @@ codeunit 6150903 "NPR HC Connector Web Service"
             NaviConnectImportEntry.Imported := true;
             NaviConnectImportEntry."Runtime Error" := false;
         end;
-        asserterror Error(''); // rollback any changes to the database we did in TryProcessRequest()
 
         //Store Result
         NaviConnectImportEntry."Document Source".CreateOutStream(OutStr);
@@ -147,8 +119,6 @@ codeunit 6150903 "NPR HC Connector Web Service"
         customerPriceRequest.Export;
         NaviConnectImportEntry.Modify(true);
         Commit;
-
-        //+NPR5.38 [297859]
     end;
 
     procedure GenericWebRequest(var genericrequest: XMLport "NPR HC Generic Request")
@@ -159,7 +129,6 @@ codeunit 6150903 "NPR HC Connector Web Service"
         HCGenericWebReqManagement: Codeunit "NPR HC Generic Web Req. Mgt.";
         TmpHCGenericWebRequest: Record "NPR HC Generic Web Request" temporary;
     begin
-        //-NPR5.38 [297946]
         SelectLatestVersion;
         genericrequest.Import;
         InsertImportEntry('GenericWebRequest', 6150911, NaviConnectImportEntry);
@@ -183,7 +152,6 @@ codeunit 6150903 "NPR HC Connector Web Service"
             NaviConnectImportEntry.Imported := true;
             NaviConnectImportEntry."Runtime Error" := false;
         end;
-        asserterror Error(''); // rollback any changes to the database we did in TryProcessRequest()
 
         //Store Result
         NaviConnectImportEntry."Document Source".CreateOutStream(OutStr);
@@ -191,11 +159,8 @@ codeunit 6150903 "NPR HC Connector Web Service"
         genericrequest.Export;
         NaviConnectImportEntry.Modify(true);
         Commit;
-        //+NPR5.38 [297946]
 
-        //-NPR5.44 [318391]
         NaviConnectSyncMgt.ProcessImportEntry(NaviConnectImportEntry);
-        //+NPR5.44 [318391]
     end;
 
     local procedure InsertImportEntry(WebserviceFunction: Text; CodeunitID: Integer; var ImportEntry: Record "NPR Nc Import Entry")
@@ -231,4 +196,3 @@ codeunit 6150903 "NPR HC Connector Web Service"
         NcImportType.Insert(true);
     end;
 }
-

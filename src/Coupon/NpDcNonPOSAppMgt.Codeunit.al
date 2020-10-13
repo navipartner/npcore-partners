@@ -1,28 +1,49 @@
 codeunit 6151603 "NPR NpDc Non-POS App. Mgt."
 {
     trigger OnRun()
+    var
+        NotInitialized: Label 'Codeunit 6151603 wasn''t initialized properly. This is a programming bug, not a user error. Please contact system vendor.';
     begin
+        case FunctionToRun of
+            FunctionToRun::"Apply Discount":
+                ApplyDiscount_OnRun();
+            else
+                Error(NotInitialized);
+        end;
     end;
 
-    procedure ApplyDiscount(var TempSalePOS: Record "NPR Sale POS" temporary; var TempSaleLinePOS: Record "NPR Sale Line POS" temporary; var TempNpDcExtCouponBuffer: Record "NPR NpDc Ext. Coupon Buffer" temporary)
+    var
+        TempSalePOS: Record "NPR Sale POS" temporary;
+        TempSaleLinePOS: Record "NPR Sale Line POS" temporary;
+        TempNpDcExtCouponBuffer: Record "NPR NpDc Ext. Coupon Buffer" temporary;
+        FunctionToRun: Option " ","Apply Discount";
+
+    procedure ApplyDiscount(var TempSalePOSIn: Record "NPR Sale POS" temporary; var TempSaleLinePOSIn: Record "NPR Sale Line POS" temporary; var TempNpDcExtCouponBufferIn: Record "NPR NpDc Ext. Coupon Buffer" temporary; Self: Codeunit "NPR NpDc Non-POS App. Mgt.")
+    begin
+        FunctionToRun := FunctionToRun::"Apply Discount";
+        TempSalePOS.Copy(TempSalePOSIn, true);
+        TempSaleLinePOS.Copy(TempSaleLinePOSIn, true);
+        TempNpDcExtCouponBuffer.Copy(TempNpDcExtCouponBufferIn, true);
+
+        if Self.Run() then;
+
+        FunctionToRun := FunctionToRun::" ";
+        TempSalePOSIn.Copy(TempSalePOS, true);
+        TempSaleLinePOSIn.Copy(TempSaleLinePOS, true);
+    end;
+
+    local procedure ApplyDiscount_OnRun()
     var
         SalePOS: Record "NPR Sale POS";
-        LastErrorText: Text;
     begin
-        asserterror
-        begin
-            InsertPOSSale(TempSalePOS, TempSaleLinePOS, SalePOS);
+        InsertPOSSale(TempSalePOS, TempSaleLinePOS, SalePOS);
 
-            RemoveCouponReservations(TempNpDcExtCouponBuffer);
-            ScanCoupons(SalePOS, TempNpDcExtCouponBuffer);
+        RemoveCouponReservations(TempNpDcExtCouponBuffer);
+        ScanCoupons(SalePOS, TempNpDcExtCouponBuffer);
 
-            TransferPOSSalesLines(SalePOS, TempSaleLinePOS);
-            Error('');
-        end;
+        TransferPOSSalesLines(SalePOS, TempSaleLinePOS);
 
-        LastErrorText := GetLastErrorText;
-        if LastErrorText <> '' then
-            Error(LastErrorText);
+        Error('');  //Roll back all the changes done to persistent tables
     end;
 
     procedure CheckCoupons(var TempNpDcExtCouponBuffer: Record "NPR NpDc Ext. Coupon Buffer" temporary)
@@ -264,4 +285,3 @@ codeunit 6151603 "NPR NpDc Non-POS App. Mgt."
         TempNpDcExtCouponBuffer."In-use Quantity" := NpDcCoupon.CalcInUseQty();
     end;
 }
-

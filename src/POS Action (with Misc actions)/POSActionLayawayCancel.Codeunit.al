@@ -1,19 +1,11 @@
 codeunit 6150870 "NPR POS Action: Layaway Cancel"
 {
-    // NPR5.50/MMV /20181105 CASE 300557 Created object
-    // NPR5.50/MMV /20190613 CASE 300557 Changed application invocation.
-    // NPR5.53/MMV /20200108 CASE 373453 Error if there are unposted POS entries related to any of the layaway prepayment invoices.
-
-
     trigger OnRun()
     begin
     end;
 
     var
         ActionDescription: Label 'Cancel a layaway. Fees can be posted and paid prepayment invoices will be refunded.';
-        LAYAWAY_CANCEL_REFUND: Label 'Layaway order credited and deleted.\Refund line has been created for total paid amount minus fees.';
-        LAYAWAY_CANCEL: Label 'Layaway order credited and deleted';
-        LAYAWAY_REFUND: Label 'Layaway Refund';
         LAYAWAY_CANCEL_LINE: Label 'Layaway of %1 %2 cancelled.';
         ERR_APPLICATION: Label 'Layaway prepayments were credited and sales order %1 was deleted successfully but an error occurred while applying customer entries and calculating amount to refund:\%2';
         ERR_DOCUMENT_POSTED_LINE: Label '%1 %2 has partially posted lines. Aborting action.';
@@ -61,21 +53,20 @@ codeunit 6150870 "NPR POS Action: Layaway Cancel"
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
-        JSON: Codeunit "NPR POS JSON Management";
-        CancellationFeeItemNo: Text;
-        CancellationAmount: Decimal;
         SalesHeader: Record "Sales Header";
+        ServiceSalesInvoice: Record "Sales Invoice Header";
+        JSON: Codeunit "NPR POS JSON Management";
+        POSLayawayMgt: Codeunit "NPR POS Layaway Mgt.";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        CancellationFeeItemNo: Text;
+        CreditMemoNo: Text;
+        OrderPaymentTermsFilter: Text;
+        ServiceInvoiceNo: Text;
+        CancellationAmount: Decimal;
         RefundAmount: Decimal;
         ServiceFeeAmount: Decimal;
-        OrderPaymentTermsFilter: Text;
-        SkipFeeInvoice: Boolean;
         SelectCustomer: Boolean;
-        ServiceSalesInvoice: Record "Sales Invoice Header";
-        ServiceInvoiceNo: Text;
-        CreditMemoNo: Text;
-        POSRefundAmount: Decimal;
-        Success: Boolean;
-        POSSaleLine: Codeunit "NPR POS Sale Line";
+        SkipFeeInvoice: Boolean;
     begin
         if not Action.IsThisAction(ActionCode) then
             exit;
@@ -93,9 +84,7 @@ codeunit 6150870 "NPR POS Action: Layaway Cancel"
         if not SelectOrder(POSSession, SalesHeader, OrderPaymentTermsFilter) then
             exit;
 
-        //-NPR5.53 [373453]
         CheckForUnpostedLinkedPOSEntries(SalesHeader);
-        //+NPR5.53 [373453]
 
         POSSession.GetSaleLine(POSSaleLine);
 
@@ -106,24 +95,11 @@ codeunit 6150870 "NPR POS Action: Layaway Cancel"
         InsertCommentLine(POSSaleLine, StrSubstNo(LAYAWAY_CANCEL_LINE, SalesHeader."Document Type", SalesHeader."No."));
         Commit;
 
-        asserterror
-        begin
-            ApplyPrepaymentCreditMemoToOpenPrepaymentInvoices(CreditMemoNo, SalesHeader); //COMMITS
-            ApplyPrepaymentCreditMemoToServiceInvoice(CreditMemoNo, ServiceInvoiceNo); //COMMITS
-            POSRefundAmount := CreatePOSRefundForRemainingCreditMemoAmount(POSSession, CreditMemoNo);
-
-            Commit;
-            Success := true;
-            Error('');
-        end;
-
-        if not Success then
+        ClearLastError();
+        Clear(POSLayawayMgt);
+        POSLayawayMgt.SetRunApplyPrepmtCreditMemoAndRefund(POSSession, CreditMemoNo, ServiceInvoiceNo);
+        if not POSLayawayMgt.Run(SalesHeader) then
             Error(ERR_APPLICATION, SalesHeader."No.", GetLastErrorText);
-
-        if POSRefundAmount <> 0 then
-            Message(LAYAWAY_CANCEL_REFUND)
-        else
-            Message(LAYAWAY_CANCEL);
 
         POSSession.RequestRefreshData();
     end;
@@ -251,152 +227,9 @@ codeunit 6150870 "NPR POS Action: Layaway Cancel"
         exit(SalesHeader."Last Posting No.");
     end;
 
-    local procedure ApplyPrepaymentCreditMemoToOpenPrepaymentInvoices(CreditMemoNo: Text; var SalesHeader: Record "Sales Header")
-    var
-        SalesCrMemoHeader: Record "Sales Cr.Memo Header";
-        SalesInvoiceHeader: Record "Sales Invoice Header";
-        InvoiceFilterString: Text;
-        CustLedgerEntry: Record "Cust. Ledger Entry";
-        CreditMemoCustLedgerEntry: Record "Cust. Ledger Entry";
-        CustEntryApplyPostedEntries: Codeunit "CustEntry-Apply Posted Entries";
-    begin
-        if not SalesCrMemoHeader.Get(CreditMemoNo) then
-            exit;
-
-        CreditMemoCustLedgerEntry.SetAutoCalcFields("Remaining Amount");
-        CreditMemoCustLedgerEntry.SetRange("Customer No.", SalesHeader."Bill-to Customer No.");
-        CreditMemoCustLedgerEntry.SetRange("Document Type", CreditMemoCustLedgerEntry."Document Type"::"Credit Memo");
-        CreditMemoCustLedgerEntry.SetRange("Document No.", CreditMemoNo);
-        CreditMemoCustLedgerEntry.FindFirst;
-        CreditMemoCustLedgerEntry.TestField(Open);
-
-        SalesInvoiceHeader.SetRange("Prepayment Order No.", SalesHeader."No.");
-        if not SalesInvoiceHeader.FindSet then
-            exit;
-
-        repeat
-            if InvoiceFilterString <> '' then
-                InvoiceFilterString += '|';
-            InvoiceFilterString += '''' + SalesInvoiceHeader."No." + '''';
-        until SalesInvoiceHeader.Next = 0;
-
-        CustLedgerEntry.SetRange("Applies-to ID", UserId);
-        if not CustLedgerEntry.IsEmpty then
-            CustLedgerEntry.ModifyAll("Applies-to ID", '', true);
-        CustLedgerEntry.Reset;
-
-        CustLedgerEntry.SetAutoCalcFields("Remaining Amount");
-        CustLedgerEntry.SetRange("Customer No.", SalesHeader."Bill-to Customer No.");
-        CustLedgerEntry.SetRange(Open, true);
-        CustLedgerEntry.SetRange(Positive, true);
-        CustLedgerEntry.SetRange("Document Type", CustLedgerEntry."Document Type"::Invoice);
-        CustLedgerEntry.SetFilter("Document No.", InvoiceFilterString);
-
-        ApplyCustomerEntry(CreditMemoCustLedgerEntry, CustLedgerEntry);
-    end;
-
-    local procedure ApplyPrepaymentCreditMemoToServiceInvoice(CreditMemoNo: Text; ServiceInvoiceNo: Text)
-    var
-        SalesCrMemoHeader: Record "Sales Cr.Memo Header";
-        SalesInvoiceHeader: Record "Sales Invoice Header";
-        CreditMemoCustLedgerEntry: Record "Cust. Ledger Entry";
-        InvoiceCustLedgerEntry: Record "Cust. Ledger Entry";
-        CustLedgerEntry: Record "Cust. Ledger Entry";
-        CustEntryApplyPostedEntries: Codeunit "CustEntry-Apply Posted Entries";
-    begin
-        if not SalesCrMemoHeader.Get(CreditMemoNo) then
-            exit;
-        if not SalesInvoiceHeader.Get(ServiceInvoiceNo) then
-            exit;
-
-        CreditMemoCustLedgerEntry.SetAutoCalcFields("Remaining Amount");
-        CreditMemoCustLedgerEntry.SetRange("Customer No.", SalesCrMemoHeader."Bill-to Customer No.");
-        CreditMemoCustLedgerEntry.SetRange("Document Type", CreditMemoCustLedgerEntry."Document Type"::"Credit Memo");
-        CreditMemoCustLedgerEntry.SetRange("Document No.", SalesCrMemoHeader."No.");
-        CreditMemoCustLedgerEntry.FindFirst;
-        if not CreditMemoCustLedgerEntry.Open then
-            exit;
-        if CreditMemoCustLedgerEntry."Remaining Amount" = 0 then
-            exit;
-
-        InvoiceCustLedgerEntry.SetAutoCalcFields("Remaining Amount");
-        InvoiceCustLedgerEntry.SetRange("Customer No.", SalesInvoiceHeader."Bill-to Customer No.");
-        InvoiceCustLedgerEntry.SetRange("Document Type", InvoiceCustLedgerEntry."Document Type"::Invoice);
-        InvoiceCustLedgerEntry.SetRange("Document No.", SalesInvoiceHeader."No.");
-        InvoiceCustLedgerEntry.FindFirst;
-        if not InvoiceCustLedgerEntry.Open then
-            exit;
-        if InvoiceCustLedgerEntry."Remaining Amount" = 0 then
-            exit;
-
-        CustLedgerEntry.SetRange("Applies-to ID", UserId);
-        if not CustLedgerEntry.IsEmpty then
-            CustLedgerEntry.ModifyAll("Applies-to ID", '', true);
-
-        ApplyCustomerEntry(CreditMemoCustLedgerEntry, InvoiceCustLedgerEntry);
-    end;
-
-    local procedure CreatePOSRefundForRemainingCreditMemoAmount(var POSSession: Codeunit "NPR POS Session"; CreditMemoNo: Text): Decimal
-    var
-        CreditMemoCustLedgerEntry: Record "Cust. Ledger Entry";
-        SalesCrMemoHeader: Record "Sales Cr.Memo Header";
-        POSSaleLine: Codeunit "NPR POS Sale Line";
-        SaleLinePOS: Record "NPR Sale Line POS";
-    begin
-        if not SalesCrMemoHeader.Get(CreditMemoNo) then
-            exit(0);
-
-        CreditMemoCustLedgerEntry.SetAutoCalcFields("Remaining Amt. (LCY)");
-        CreditMemoCustLedgerEntry.SetRange("Customer No.", SalesCrMemoHeader."Bill-to Customer No.");
-        CreditMemoCustLedgerEntry.SetRange("Document Type", CreditMemoCustLedgerEntry."Document Type"::"Credit Memo");
-        CreditMemoCustLedgerEntry.SetRange("Document No.", SalesCrMemoHeader."No.");
-        CreditMemoCustLedgerEntry.FindFirst;
-        if CreditMemoCustLedgerEntry."Remaining Amt. (LCY)" = 0 then
-            exit(0);
-
-        POSSession.GetSaleLine(POSSaleLine);
-        POSSaleLine.GetNewSaleLine(SaleLinePOS);
-        SaleLinePOS."Sale Type" := SaleLinePOS."Sale Type"::Deposit;
-        SaleLinePOS.Type := SaleLinePOS.Type::Customer;
-        SaleLinePOS.Validate("No.", CreditMemoCustLedgerEntry."Customer No.");
-        SaleLinePOS.Validate("Unit Price", CreditMemoCustLedgerEntry."Remaining Amt. (LCY)");
-        SaleLinePOS.Validate(Quantity, 1);
-        SaleLinePOS."Buffer Document Type" := SaleLinePOS."Buffer Document Type"::"Credit Memo";
-        SaleLinePOS."Buffer Document No." := SalesCrMemoHeader."No.";
-        SaleLinePOS.Description := LAYAWAY_REFUND;
-        SaleLinePOS.UpdateAmounts(SaleLinePOS);
-        POSSaleLine.InsertLineRaw(SaleLinePOS, false);
-
-        exit(CreditMemoCustLedgerEntry."Remaining Amt. (LCY)");
-    end;
-
     local procedure DeleteOrder(var SalesHeader: Record "Sales Header")
     begin
         SalesHeader.Delete(true);
-    end;
-
-    local procedure ApplyCustomerEntry(var ApplyingCustLedgerEntry: Record "Cust. Ledger Entry"; var ApplyToCustLedgerEntries: Record "Cust. Ledger Entry")
-    var
-        CustEntryApplyPostedEntries: Codeunit "CustEntry-Apply Posted Entries";
-    begin
-        if not ApplyToCustLedgerEntries.FindSet(true) then
-            exit;
-        repeat
-            ApplyToCustLedgerEntries.Validate("Applies-to ID", UserId);
-            ApplyToCustLedgerEntries.Validate("Amount to Apply", ApplyToCustLedgerEntries."Remaining Amount");
-            ApplyToCustLedgerEntries.Modify(true);
-        until ApplyToCustLedgerEntries.Next = 0;
-
-        ApplyingCustLedgerEntry.Validate("Applying Entry", true);
-        ApplyingCustLedgerEntry.Validate("Applies-to ID", UserId);
-        ApplyingCustLedgerEntry.Validate("Amount to Apply", ApplyingCustLedgerEntry."Remaining Amount");
-        CODEUNIT.Run(CODEUNIT::"Cust. Entry-Edit", ApplyingCustLedgerEntry);
-        Commit;
-
-        //-NPR5.53 [300557]
-        //CustEntryApplyPostedEntries.Apply(ApplyingCustLedgerEntry, '', 0D);
-        CODEUNIT.Run(CODEUNIT::"CustEntry-Apply Posted Entries", ApplyingCustLedgerEntry);
-        //+NPR5.53 [300557]
     end;
 
     local procedure InsertCommentLine(POSSaleLine: Codeunit "NPR POS Sale Line"; Description: Text)
@@ -416,7 +249,6 @@ codeunit 6150870 "NPR POS Action: Layaway Cancel"
         SalesInvoiceHeader: Record "Sales Invoice Header";
         POSEntry: Record "NPR POS Entry";
     begin
-        //-NPR5.53 [373453]
         SalesInvoiceHeader.SetRange("Prepayment Order No.", SalesHeader."No.");
         if SalesInvoiceHeader.FindSet then
             repeat
@@ -436,7 +268,6 @@ codeunit 6150870 "NPR POS Action: Layaway Cancel"
                         end;
                     until POSEntrySalesDocLink.Next = 0;
             until SalesInvoiceHeader.Next = 0;
-        //+NPR5.53 [373453]
     end;
 
     [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterNameCaption', '', false, false)]
@@ -495,7 +326,6 @@ codeunit 6150870 "NPR POS Action: Layaway Cancel"
             exit;
 
         case POSParameterValue.Name of
-
             'CancellationFeeItemNo':
                 begin
                     Item.SetRange(Type, Item.Type::Service);
@@ -536,4 +366,3 @@ codeunit 6150870 "NPR POS Action: Layaway Cancel"
         end;
     end;
 }
-

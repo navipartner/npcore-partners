@@ -1,8 +1,5 @@
 codeunit 6151602 "NPR NpDc Non-POS Coupon WS"
 {
-    // NPR5.51/MHA /20190724  CASE 343352 Object created
-
-
     trigger OnRun()
     begin
     end;
@@ -17,7 +14,7 @@ codeunit 6151602 "NPR NpDc Non-POS Coupon WS"
         coupon_application.Import;
         coupon_application.GetRequest(TempSalePOS, TempSaleLinePOS, TempNpDcExtCouponBuffer);
 
-        NpDcNonPOSApplicationMgt.ApplyDiscount(TempSalePOS, TempSaleLinePOS, TempNpDcExtCouponBuffer);
+        NpDcNonPOSApplicationMgt.ApplyDiscount(TempSalePOS, TempSaleLinePOS, TempNpDcExtCouponBuffer, NpDcNonPOSApplicationMgt);
 
         coupon_application.SetResponse(TempSalePOS, TempSaleLinePOS);
     end;
@@ -64,4 +61,3 @@ codeunit 6151602 "NPR NpDc Non-POS Coupon WS"
         coupons.SetCoupons(TempNpDcExtCouponBuffer);
     end;
 }
-

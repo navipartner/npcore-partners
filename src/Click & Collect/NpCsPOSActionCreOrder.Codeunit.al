@@ -1,12 +1,5 @@
 codeunit 6151206 "NPR NpCs POSAction Cre. Order"
 {
-    // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
-    // NPR5.51/ALST/20190705  CASE 357848 function prototype changed
-    // NPR5.51/MHA /20190719  CASE 362443 It should be possible to send to another local store
-    // NPR5.52/MHA /20191002  CASE 369476 From Store Code should be set in OnActionSelectToStoreCode()
-    // NPR5.52/MMV /20191002  CASE 352473 Added pdf2nav & send support to prepayment function.
-
-
     trigger OnRun()
     begin
     end;
@@ -143,9 +136,7 @@ codeunit 6151206 "NPR NpCs POSAction Cre. Order"
         end;
     end;
 
-    local procedure "--- OnAction"()
-    begin
-    end;
+    //--- OnAction ---
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', true, true)]
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
@@ -309,9 +300,7 @@ codeunit 6151206 "NPR NpCs POSAction Cre. Order"
         POSSale.GetCurrentSale(SalePOS);
         FindItemPosLines(SalePOS, TempSaleLinePOS);
 
-        //-NPR5.51 [362443]
         ToNpCsStore.SetFilter(Code, '<>%1', FromNpCsStore.Code);
-        //+NPR5.51 [362443]
         ToNpCsStore.FindSet;
         repeat
             TempNpCsStore.Init;
@@ -340,7 +329,6 @@ codeunit 6151206 "NPR NpCs POSAction Cre. Order"
             NpCsStoreInventoryBuffer.SetRange("Store Code", TempNpCsStore.Code);
             NpCsStoreInventoryBuffer.SetRange("In Stock", false);
             TempNpCsStore."In Stock" := NpCsStoreInventoryBuffer.IsEmpty;
-            //-NPR5.52 [369476]
             NpCsStoreInventoryBuffer.SetRange("In Stock");
             if NpCsStoreInventoryBuffer.FindSet then
                 repeat
@@ -353,7 +341,6 @@ codeunit 6151206 "NPR NpCs POSAction Cre. Order"
                         TempNpCsStore."Fullfilled Qty." += NpCsStoreInventoryBuffer.Inventory;
                     end;
                 until NpCsStoreInventoryBuffer.Next = 0;
-            //+NPR5.52 [369476]
 
             if PrevRec <> Format(TempNpCsStore) then
                 TempNpCsStore.Modify;
@@ -364,9 +351,7 @@ codeunit 6151206 "NPR NpCs POSAction Cre. Order"
         Clear(NpCsStoreInventoryBuffer);
         NpCsStoresbyDistance.SetSourceTables(TempNpCsStore, NpCsStoreInventoryBuffer);
         NpCsStoresbyDistance.SetShowInventory(true);
-        //-NPR5.52 [369476]
         NpCsStoresbyDistance.SetFromStoreCode(FromStoreCode);
-        //+NPR5.52 [369476]
         NpCsStoresbyDistance.LookupMode(true);
         if NpCsStoresbyDistance.RunModal() <> ACTION::LookupOK then
             exit;
@@ -590,44 +575,18 @@ codeunit 6151206 "NPR NpCs POSAction Cre. Order"
 
     local procedure HandlePrepayment(POSSession: Codeunit "NPR POS Session"; RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt."; PrepaymentPct: Decimal; PrintPrepaymentInvoice: Boolean; PreviousSalePOS: Record "NPR Sale POS")
     var
-        Success: Boolean;
-        SalesHeader: Record "Sales Header";
-        POSSale: Codeunit "NPR POS Sale";
-        SalePOS: Record "NPR Sale POS";
+        HandlePrepmtCU: Codeunit "NPR NpCs Cr.Ord: Handle Prepmt";
     begin
         //An error after sale end, before front end sync, is not allowed.
-        RetailSalesDocMgt.GetCreatedSalesHeader(SalesHeader);
-        if not SalesHeader.Find then
-            exit;
-
         Commit;
-        asserterror
-        begin
-            POSSession.GetSale(POSSale);
-            POSSale.GetCurrentSale(SalePOS);
-            SalePOS.Validate("Customer Type", PreviousSalePOS."Customer Type");
-            SalePOS.Validate("Customer No.", PreviousSalePOS."Customer No.");
-            SalePOS.Modify(true);
-            POSSale.RefreshCurrent();
-
-            //-NPR5.52 [352473]
-            //  RetailSalesDocMgt.CreatePrepaymentLine(POSSession,SalesHeader,PrepaymentPct,PrintPrepaymentInvoice,TRUE,FALSE);
-            RetailSalesDocMgt.CreatePrepaymentLine(POSSession, SalesHeader, PrepaymentPct, PrintPrepaymentInvoice, false, false, true, false);
-            //+NPR5.52 [352473]
-
-            POSSession.RequestRefreshData();
-            Commit;
-            Success := true;
-            Error('');
-        end;
-
-        if not Success then
+        ClearLastError();
+        Clear(HandlePrepmtCU);
+        HandlePrepmtCU.SetParameters(POSSession, RetailSalesDocMgt, PrepaymentPct, PrintPrepaymentInvoice, PreviousSalePOS);
+        if not HandlePrepmtCU.Run() then
             Message(Text002, GetLastErrorText);
     end;
 
-    local procedure "--- Aux"()
-    begin
-    end;
+    //--- Aux ---
 
     local procedure StoreFromCodeOptionString(Index: Integer) OptionStr: Text
     begin
@@ -640,4 +599,3 @@ codeunit 6151206 "NPR NpCs POSAction Cre. Order"
         exit(OptionStr);
     end;
 }
-

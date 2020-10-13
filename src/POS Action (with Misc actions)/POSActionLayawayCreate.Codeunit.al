@@ -1,10 +1,5 @@
 codeunit 6150868 "NPR POS Action: Layaway Create"
 {
-    // NPR5.50/MMV /20181105 CASE 300557 Created object
-    // NPR5.51/ALST/20190705 CASE 357848 function prototype changed
-    // NPR5.52/MMV /20191004 CASE 352473 Fixed prepayment VAT.
-
-
     trigger OnRun()
     begin
     end;
@@ -79,20 +74,20 @@ codeunit 6150868 "NPR POS Action: Layaway Create"
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
+        PaymentTerms: Record "Payment Terms";
+        SalePOS: Record "NPR Sale POS";
+        SalesHeader: Record "Sales Header";
         JSON: Codeunit "NPR POS JSON Management";
+        POSLayawayMgt: Codeunit "NPR POS Layaway Mgt.";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
         DownpaymentPct: Decimal;
-        CreationFeeItemNo: Text;
-        ReserveItems: Boolean;
         Instalments: Integer;
+        CreationFeeItemNo: Text;
+        DownpaymentInvoiceNo: Text;
         OrderPaymentTerms: Text;
         PrepaymentPaymentTerms: Text;
-        SalesHeader: Record "Sales Header";
-        DownpaymentInvoiceNo: Text;
-        POSSaleLine: Codeunit "NPR POS Sale Line";
-        PaymentTerms: Record "Payment Terms";
-        POSSale: Codeunit "NPR POS Sale";
-        SalePOS: Record "NPR Sale POS";
-        Success: Boolean;
+        ReserveItems: Boolean;
     begin
         if not Action.IsThisAction(ActionCode) then
             exit;
@@ -122,28 +117,23 @@ codeunit 6150868 "NPR POS Action: Layaway Create"
         POSSale.GetCurrentSale(SalePOS);
         if not SelectCustomer(SalePOS) then
             SalePOS.TestField("Customer No.");
-        //-NPR5.52 [352473]
         if not SalePOS."Prices Including VAT" then begin
             SalePOS.Validate("Prices Including VAT", true);
             SalePOS.Modify(true);
         end;
-        //+NPR5.52 [352473]
         POSSale.RefreshCurrent();
 
         InsertCreationFeeItem(POSSession, CreationFeeItemNo);
         ExportToOrderAndEndSale(SalesHeader, POSSession, ReserveItems, OrderPaymentTerms);
 
         Commit;
-        asserterror
-        begin
-            DownpaymentInvoiceNo := CreateAndPostDownpaymentInvoice(SalesHeader, DownpaymentPct, PrepaymentPaymentTerms);
-            CreateAndPostLayawayInvoices(SalesHeader, Instalments, PrepaymentPaymentTerms, DownpaymentPct);
-
-            Commit;
-            Success := true;
-            Error('');
-        end;
-        if not Success then
+        ClearLastError();
+        Clear(POSLayawayMgt);
+        POSLayawayMgt.SetRunCreateAndPostDownpmtAndLayawayInvoices(DownpaymentPct, PrepaymentPaymentTerms, Instalments);
+        if POSLayawayMgt.Run(SalesHeader) then begin
+            DownpaymentInvoiceNo := POSLayawayMgt.GetDownpaymentInvoiceNo();
+            Commit();
+        end else
             Message(ErrorLayaway, GetLastErrorText);
 
         StartNewSale(POSSession, DownpaymentInvoiceNo);
@@ -207,62 +197,6 @@ codeunit 6150868 "NPR POS Action: Layaway Create"
         RetailSalesDocMgt.GetCreatedSalesHeader(SalesHeaderOut);
     end;
 
-    local procedure CreateAndPostDownpaymentInvoice(var SalesHeader: Record "Sales Header"; DownpaymentPct: Decimal; PrepaymentPaymentTerms: Text): Text
-    var
-        SalesLine: Record "Sales Line";
-        SalesPostPrepayments: Codeunit "Sales-Post Prepayments";
-    begin
-        SalesHeader.Validate("Prepayment %", 0);
-        SalesHeader.Validate("Prepmt. Payment Terms Code", PrepaymentPaymentTerms);
-        SalesHeader.Validate("Prepayment Due Date", WorkDate);
-        SalesHeader.Modify(true);
-
-        if DownpaymentPct <= 0 then
-            exit('');
-
-        SalesLine.SetRange("Document Type", SalesHeader."Document Type");
-        SalesLine.SetRange("Document No.", SalesHeader."No.");
-        SalesLine.SetRange(Type, SalesLine.Type::Item);
-        SalesLine.SetFilter("No.", '<>%1', '');
-
-        if not SalesLine.FindSet(true) then
-            exit('');
-
-        repeat
-            SalesLine.Validate("Prepayment %", DownpaymentPct);
-            SalesLine.Modify(true);
-        until SalesLine.Next = 0;
-
-        SalesPostPrepayments.Invoice(SalesHeader);
-        SalesHeader.Validate(Status, SalesHeader.Status::Open);
-        SalesHeader.Modify(true);
-        exit(SalesHeader."Last Prepayment No.");
-    end;
-
-    local procedure CreateAndPostLayawayInvoices(var SalesHeader: Record "Sales Header"; Instalments: Integer; PrepaymentPaymentTerms: Text; DownpaymentPct: Decimal)
-    var
-        InstalmentPct: Decimal;
-        SalesLine: Record "Sales Line";
-        i: Integer;
-        PaymentTerms: Record "Payment Terms";
-    begin
-        //Split the remaining amount out over X prepayment invoices ie. calculate the percentage.
-        //Set the remaining amount on the last instalment so any rounding diff is put onto this one.
-        SalesHeader.Validate("Prepmt. Payment Terms Code", PrepaymentPaymentTerms);
-        SalesHeader.Modify(true);
-
-        InstalmentPct := (100 - DownpaymentPct) / Instalments;
-        PaymentTerms.Get(PrepaymentPaymentTerms);
-
-        for i := 1 to Instalments do begin
-            if i > 1 then begin
-                SalesHeader.Validate("Prepayment Due Date", CalcDate(PaymentTerms."Due Date Calculation", SalesHeader."Prepayment Due Date"));
-                SalesHeader.Modify(true);
-            end;
-            AppendPrepaymentPctAndPostPrepaymentInvoice(SalesHeader, InstalmentPct, (i = Instalments));
-        end;
-    end;
-
     local procedure StartNewSale(POSSession: Codeunit "NPR POS Session"; DownpaymentInvoiceNo: Text)
     var
         POSSale: Codeunit "NPR POS Sale";
@@ -281,53 +215,15 @@ codeunit 6150868 "NPR POS Action: Layaway Create"
 
     local procedure HandleDownpayment(var POSSession: Codeunit "NPR POS Session"; DownpaymentInvoiceNo: Text)
     var
-        POSApplyCustomerEntries: Codeunit "NPR POS Apply Customer Entries";
-        Success: Boolean;
-        CustLedgerEntry: Record "Cust. Ledger Entry";
+        DummySalesHdr: Record "Sales Header";
+        POSLayawayMgt: Codeunit "NPR POS Layaway Mgt.";
     begin
         Commit;
-        asserterror
-        begin
-            POSApplyCustomerEntries.BalanceDocument(POSSession, CustLedgerEntry."Document Type"::Invoice, DownpaymentInvoiceNo, true);
-            Commit;
-            Success := true;
-            Error('');
-        end;
-
-        if not Success then
+        ClearLastError();
+        Clear(POSLayawayMgt);
+        POSLayawayMgt.SetRunHandleDownpayment(POSSession, DownpaymentInvoiceNo);
+        if not POSLayawayMgt.Run(DummySalesHdr) then
             Message(ErrorDownpayment, GetLastErrorText);
-    end;
-
-    local procedure AppendPrepaymentPctAndPostPrepaymentInvoice(SalesHeader: Record "Sales Header"; PrepaymentPct: Decimal; FullPrepayment: Boolean): Text
-    var
-        SalesPostPrepayments: Codeunit "Sales-Post Prepayments";
-        RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt.";
-        SalesLine: Record "Sales Line";
-        POSPrepaymentMgt: Codeunit "NPR POS Prepayment Mgt.";
-    begin
-        if FullPrepayment then begin
-            SalesLine.SetRange("Document Type", SalesHeader."Document Type");
-            SalesLine.SetRange("Document No.", SalesHeader."No.");
-            SalesLine.SetRange(Type, SalesLine.Type::Item);
-            SalesLine.SetFilter("No.", '<>%1', '');
-            if SalesLine.FindSet(true) then
-                repeat
-                    SalesLine.Validate("Prepayment %", 100);
-                    SalesLine.Modify(true);
-                until SalesLine.Next = 0;
-        end else
-            //-NPR5.52 [352473]
-            POSPrepaymentMgt.SetPrepaymentPercentageToPay(SalesHeader, true, PrepaymentPct);
-        //+NPR5.52 [352473]
-
-        SalesPostPrepayments.Invoice(SalesHeader);
-
-        if not FullPrepayment then begin
-            SalesHeader.Validate(Status, SalesHeader.Status::Open);
-            SalesHeader.Modify(true);
-        end;
-
-        exit(SalesHeader."Last Prepayment No.");
     end;
 
     local procedure SelectCustomer(var SalePOS: Record "NPR Sale POS"): Boolean
@@ -489,4 +385,3 @@ codeunit 6150868 "NPR POS Action: Layaway Create"
         end;
     end;
 }
-
