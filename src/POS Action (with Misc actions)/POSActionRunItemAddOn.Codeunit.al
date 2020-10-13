@@ -1,13 +1,5 @@
 codeunit 6151128 "NPR POS Action: Run Item AddOn"
 {
-    // NPR5.48/MHA /20181113 CASE 334922 Object created - Insert Item AddOns from the currently selected POS Sales Line
-    // NPR5.52/ALPO/20190912 CASE 354309 Suggest Item AddOns on after POS sale line insert
-    // NPR5.54/ALPO/20200218 CASE 388951 Removed SuggestItemAddOnsOnSaleLineInsert workflow step from sale workflow AFTER_INSERT_LINE. Moved to POS Action 'ITEM'
-    // NPR5.54/ALPO/20200219 CASE 374666 Item AddOns: auto-insert fixed quantity lines
-    //                                     - Function Approve(): new call parameter: OnlyFixedQtyLines (boolean)
-    //                                     - Functions InitScript(), InitScriptData(), CreateUserInterface(), WebDepCode(), InitCss(), InitHtml()
-    //                                       moved out to CU 6151125 to avoid excessive code dublication
-
     SingleInstance = true;
 
     trigger OnRun()
@@ -29,8 +21,7 @@ codeunit 6151128 "NPR POS Action: Run Item AddOn"
 
     local procedure ActionVersion(): Text
     begin
-        //EXIT('1.0');  //NPR5.52 [354309]-revoked
-        exit('1.1');  //NPR5.52 [354309]
+        exit('1.1');
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
@@ -49,7 +40,7 @@ codeunit 6151128 "NPR POS Action: Run Item AddOn"
                 RegisterWorkflow(false);
                 Sender.RegisterDataSourceBinding('BUILTIN_SALELINE');
                 Sender.RegisterCustomJavaScriptLogic('enable', 'return row.getField("ItemAddOn.ItemAddOn").rawValue;');
-                RegisterIntegerParameter('BaseLineNo', 0);  //NPR5.52 [354309]
+                RegisterIntegerParameter('BaseLineNo', 0);
             end;
         end;
     end;
@@ -62,10 +53,8 @@ codeunit 6151128 "NPR POS Action: Run Item AddOn"
         if not Action.IsThisAction(ActionCode) then
             exit;
 
-        //-NPR5.52 [354309]
         JSON.InitializeJObjectParser(Context, FrontEnd);
         BaseLineNo := JSON.GetIntegerParameter('BaseLineNo', false);
-        //+NPR5.52 [354309]
 
         case WorkflowStep of
             'run_addons':
@@ -86,17 +75,19 @@ codeunit 6151128 "NPR POS Action: Run Item AddOn"
         POSSaleLine: Codeunit "NPR POS Sale Line";
         AddOnNo: Code[20];
         AppliesToLineNo: Integer;
+        UpdateCurrentSaleLine: Boolean;
     begin
         POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
 
-        //-NPR5.52 [354309]
         if BaseLineNo <> 0 then
             AppliesToLineNo := BaseLineNo
         else
-            //+NPR5.52 [354309]
             AppliesToLineNo := FindAppliesToLineNo(SaleLinePOS);
+        UpdateCurrentSaleLine := SaleLinePOS."Line No." <> AppliesToLineNo;
         SaleLinePOS.Get(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Sale Type", AppliesToLineNo);
+        IF UpdateCurrentSaleLine THEN
+            POSSaleLine.SetPosition(SaleLinePOS.GetPosition());
 
         if SaleLinePOS.Type <> SaleLinePOS.Type::Item then
             exit;
@@ -109,21 +100,17 @@ codeunit 6151128 "NPR POS Action: Run Item AddOn"
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
         CurrNpIaItemAddOn := NpIaItemAddOn;
-        //CreateUserInterface(SalePOS,AppliesToLineNo,NpIaItemAddOn);  //NPR5.52 [354309]-revoked
-        //CreateUserInterface(SalePOS,SaleLinePOS,NpIaItemAddOn);  //NPR5.52 [354309]  //NPR5.54 [374666]-revoked
-        //+NPR5.54 [374666]
         if not NpIaItemAddOnMgt.UserInterfaceIsRequired(NpIaItemAddOn) then begin
             NpIaItemAddOnMgt.InsertFixedPOSAddOnLinesSilent(NpIaItemAddOn, POSSession, AppliesToLineNo);
+            if NpIaItemAddOnMgt.InsertedWithAutoSplitKey() then
+                POSSession.ChangeViewSale();  //there is no other way to refresh the lines, so they appear in correct order
             exit;
         end;
         NpIaItemAddOnMgt.CreateUserInterface(Model, SalePOS, SaleLinePOS, NpIaItemAddOn);
-        //+NPR5.54 [374666]
         ActiveModelID := FrontEnd.ShowModel(Model);
     end;
 
-    local procedure "--- Approve"()
-    begin
-    end;
+    //--- Approve ---
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnProtocolUIResponse', '', true, true)]
     local procedure OnProtocolUIResponse(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; ModelID: Guid; Sender: Text; EventName: Text; var Handled: Boolean)
@@ -133,26 +120,8 @@ codeunit 6151128 "NPR POS Action: Run Item AddOn"
 
         Handled := true;
 
-        //-NPR5.54 [374666]-revoked
-        /*
-        CASE Sender OF
-          'approve':
-            BEGIN
-              Approve(EventName,FrontEnd);
-              FrontEnd.CloseModel(ModelID);
-            END;
-          'cancel','close':
-            BEGIN
-              FrontEnd.CloseModel(ModelID);
-            END;
-        END;
-        */
-        //+NPR5.54 [374666]-revoked
-        //-NPR5.54 [374666]
         Approve(EventName, FrontEnd, Sender <> 'approve');
         FrontEnd.CloseModel(ModelID);
-        //+NPR5.54 [374666]
-
     end;
 
     local procedure Approve(JsonText: Text; FrontEnd: Codeunit "NPR POS Front End Management"; OnlyFixedQtyLines: Boolean)
@@ -169,26 +138,23 @@ codeunit 6151128 "NPR POS Action: Run Item AddOn"
         FrontEnd.GetSession(POSSession);
         POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
-        //-NPR5.52 [354309]
         if BaseLineNo <> 0 then
             AppliesToLineNo := BaseLineNo
         else
-            //+NPR5.52 [354309]
             AppliesToLineNo := FindAppliesToLineNo(SaleLinePOS);
-        //NpIaItemAddOnMgt.InsertPOSAddOnLines(CurrNpIaItemAddOn,AddOnLines,POSSession,AppliesToLineNo);  //NPR5.54 [374666]-revoked
-        if NpIaItemAddOnMgt.InsertPOSAddOnLines(CurrNpIaItemAddOn, AddOnLines, POSSession, AppliesToLineNo, OnlyFixedQtyLines) then begin  //NPR5.54 [374666]
-                                                                                                                                           //-NPR5.52 [354309]
+        if NpIaItemAddOnMgt.InsertPOSAddOnLines(CurrNpIaItemAddOn, AddOnLines, POSSession, AppliesToLineNo, OnlyFixedQtyLines) then begin
             SaleLinePOS.Get(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Sale Type", AppliesToLineNo);
             POSSaleLine.SetPosition(SaleLinePOS.GetPosition);
-            //+NPR5.52 [354309]
+            if NpIaItemAddOnMgt.InsertedWithAutoSplitKey() then begin
+                POSSession.ChangeViewSale();  //there is no other way to refresh the lines, so they appear in correct order
+                exit;
+            end;
             POSSession.RequestRefreshData();
-        end;  //NPR5.54 [374666]
+        end;
         POSJavaScriptInterface.RefreshData(POSSession, FrontEnd);
     end;
 
-    local procedure "--- Aux"()
-    begin
-    end;
+    //--- Aux ---
 
     local procedure FindAppliesToLineNo(SaleLinePOS: Record "NPR Sale Line POS"): Integer
     var
@@ -216,4 +182,3 @@ codeunit 6151128 "NPR POS Action: Run Item AddOn"
     begin
     end;
 }
-
