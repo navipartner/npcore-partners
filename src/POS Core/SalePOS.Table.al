@@ -1,48 +1,5 @@
 table 6014405 "NPR Sale POS"
 {
-    // NPR4.04/JDH /20150403 CASE 204978 Correct bug whereby the vat is added to all the items when previous transaction on POS had a "Vat Customer" made Var Local
-    // NPR4.16/MMV /20151028 CASE 225533 Renamed field 130 "Custom Report No." to "Custom Print Object ID"
-    //                                   Addded  field 131 "Custom Print Object Type" : Text [10]
-    // NPR4.18/MMV /20160128 CASE 224257 Added field 140 "Issue Tax Free Voucher" : Boolean
-    // NPR4.21/BHR /20160209 CASE 229736 Correct dimension
-    // NPR5.22/MMV /20160404 CASE 232067 Added field 150 "Customer Location No." : Code[20]
-    // NPR5.22/AP  /20160413 CASE 235391 Change scope-property for function UpdateAllLineDim from LOCAL to non-LOCAL.
-    // NPR5.27/JDH /20161018 CASE 255575 Removed unused functions
-    // NPR5.28/MMV /20161104 CASE 254575 Added field 60 "Send Receipt Email".
-    // NPR5.29/AP  /20170119 CASE 257938 Fixing dimension issues. Dimension Set not propagated correctly from header to line and with proper priority.
-    // NPR5.29/AP  /20170119 CASE 262628 Added field 160 POS Sale ID (Autoincerement). Future use as surrogate key of POS Sale
-    // NPR5.30/AP  /20170214 CASE 261728 Introducing POS Unit and POS Store.
-    //                                   Added field 3 "POS Store Code"
-    //                                   Added helper functions GetPOSUnit and GetPOSStore
-    //                                   Removed malicious global dimension handling.
-    // NPR5.30/TJ  /20170215 CASE 265504 Changed ENU captions on fields with word Register in their name
-    // NPR5.31/MHA /20170113 CASE 263093 Added field 45 "Customer Disc. Group"
-    // NPR5.31/TSA /20170314 CASE 269105 Removed field 5103 "Prices incl. VAT" from page since it is a duplicate of field 3.
-    // NPR5.31/AP  /20170227 CASE 248534 Re-introduced US Sales Tax
-    //                                   Added fields 74 "Gen. Bus. Posting Group", 141 "Tax Area Code", 142 "Tax Liable" and 143 "VAT Bus. Posting Group"
-    //                                   Setting up posting setup on the header for the lines to inherit from (instead of lines recalculating every time)
-    // NPR5.31/AP  /20170309 CASE 266785 Removed unused fields 103 "Customer Display Line1", 104 "Customer Display Line2", 124 "Meta Trigger Error" and 125 "Meta Trigger Error String"
-    //                                   Removed field 110 "Computer Name" and corresponding, unused key
-    // NPR5.31/AP  /20170427 CASE 269105 Reversed removal of 5103 "Prices incl. VAT".
-    // NPR5.32/AP  /20170519 CASE 248534 Apply header defaults to lines when validating customer. Some was never set, others was not set due to refactoring of HentMomsPct and HentBel¢b
-    // NPR5.32/JDH /20170525 CASE 278031 Changed SalesPerson Code field from 20 to 10. renamed a couple of variables to English
-    // NPR5.32.01/AP  /20170530 CASE 248534 More issues regarding VAT refactoring. VAT % not always set correct when updating exiting lines.
-    // NPR5.36/TJ  /20170904 CASE 286283 Renamed all the danish OptionString properties to english
-    // NPR5.37/TS  /20171012 CASE 292422 Added Field Customer Name ( 485 )
-    // NPR5.45/MHA /20180803  CASE 323705 Signature changed on SaleLinePOS.FindItemSalesPrice()
-    // NPR5.45/MMV /20180828  CASE 326466 Recalculate discount once on end of customer validate
-    // NPR5.50/MHA /20190422 CASE 337539 Added field 170 "Retail ID"
-    // NPR5.52/ALPO/20190820 CASE 359596 Do not change unit price on the line after customer is selected, should new unit price is higher than existing one, unless there was a customer change
-    // NPR5.52/MMV /20191007 CASE 352473 Added "Prices Including VAT" switch validation.
-    // NPR5.53/ALPO/20191025 CASE 371956 Dimensions: POS Store & POS Unit integration; discontinue dimensions on Cash Register
-    // NPR5.53/ALPO/20191105 CASE 376035 Save active event on Sale POS, copy event's dimensions directly to the sale instead of overwriting pos unit dimensions
-    // NPR5.53/BHR /20191008  CASE 369354 comment code in relation to 'New Customer Creation'
-    // NPR5.53/TJ  /20191205 CASE 380453 Country Code is now properly populated when setting Customer No.
-    // NPR5.53/ALPO/20191211 CASE 380609 NPRE: New guest arrival procedure. Store preselected Waiterpad No. and Seating Code as well as Number of Guests on Sale POS
-    // NPR5.54/ALPO/20200203 CASE 364658 Resume POS Sale
-    // NPR5.54/MMV /20200220 CASE 391871 Moved GUID creation from table subscribers to table trigger to have everything centralized.
-    // NPR5.55/ALPO/20200702 CASE 380979 Incorrect amount calculation, when a customer with prices set to be vat-including is changed to a customer with VAT-excluding prices
-
     Caption = 'Sale';
     DataClassification = CustomerContent;
 
@@ -68,14 +25,12 @@ table 6014405 "NPR Sale POS"
 
             trigger OnValidate()
             begin
-                //-NPR5.53 [371956]
                 CreateDim(
                   DATABASE::"NPR POS Unit", "Register No.",
                   DATABASE::"NPR POS Store", "POS Store Code",
-                  DATABASE::Job, "Event No.",  //NPR5.53 [376035]
+                  DATABASE::Job, "Event No.",
                   DATABASE::Customer, "Customer No.",
                   DATABASE::"Salesperson/Purchaser", "Salesperson Code");
-                //+NPR5.53 [371956]
             end;
         }
         field(4; "Salesperson Code"; Code[10])
@@ -88,12 +43,9 @@ table 6014405 "NPR Sale POS"
             trigger OnValidate()
             begin
                 CreateDim(
-                  //DATABASE::Register,"Register No.",  //NPR5.53 [371956]-revoked
-                  //-NPR5.53 [371956]
                   DATABASE::"NPR POS Unit", "Register No.",
                   DATABASE::"NPR POS Store", "POS Store Code",
-                  //+NPR5.53 [371956]
-                  DATABASE::Job, "Event No.",  //NPR5.53 [376035]
+                  DATABASE::Job, "Event No.",
                   DATABASE::Customer, "Customer No.",
                   DATABASE::"Salesperson/Purchaser", "Salesperson Code");
             end;
@@ -115,8 +67,6 @@ table 6014405 "NPR Sale POS"
             TableRelation = IF ("Customer Type" = CONST(Ord)) Customer."No."
             ELSE
             IF ("Customer Type" = CONST(Cash)) Contact."No.";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
 
             trigger OnValidate()
@@ -129,37 +79,27 @@ table 6014405 "NPR Sale POS"
                 Cust: Record Customer;
                 RetailFormCode: Codeunit "NPR Retail Form Code";
                 POSSalesDiscountCalcMgt: Codeunit "NPR POS Sales Disc. Calc. Mgt.";
-                NewUnitPrice: Decimal;
                 xSaleLinePOS: Record "NPR Sale Line POS";
                 POSSaleLine: Codeunit "NPR POS Sale Line";
             begin
                 RetailSetup.Get();
                 Register.Get("Register No.");
-                //-NPR5.30 [261728]
                 GetPOSUnit;
                 "POS Store Code" := POSUnit."POS Store Code";
                 GetPOSStore;
-                //+NPR5.30 [261728]
 
                 "Customer Price Group" := Register."Customer Price Group";
-                //-NPR5.31 [263093]
                 "Customer Disc. Group" := Register."Customer Disc. Group";
-                //+NPR5.31 [263093]
-                //-NPR5.31 [248534]
                 "Gen. Bus. Posting Group" := POSStore."Gen. Bus. Posting Group";
                 "Tax Area Code" := POSStore."Tax Area Code";
                 "Tax Liable" := POSStore."Tax Liable";
                 "VAT Bus. Posting Group" := POSStore."VAT Bus. Posting Group";
-                //+NPR5.31 [248534]
 
                 //- Alternative Customer no.
                 AltNo.SetCurrentKey("Alt. No.", Type);
                 AltNo.SetRange("Alt. No.", "Customer No.");
                 AltNo.SetFilter(Type, '=%1|=%2', AltNo.Type::Customer, AltNo.Type::"CRM Customer");
-                //-NPR5.45 [323705]
-                //IF AltNo.FIND('-') THEN BEGIN
                 if AltNo.FindFirst then begin
-                    //+NPR5.45 [323705]
                     if AltNo.Type = AltNo.Type::Customer then
                         "Customer Type" := "Customer Type"::Ord
                     else
@@ -169,29 +109,6 @@ table 6014405 "NPR Sale POS"
 
                 if ("Customer Type" = "Customer Type"::Cash) and ("Customer No." <> '') then begin
                     if not Contact.Get("Customer No.") then begin
-                        //-NPR5.53 [369354]
-                        //    DoCreate := FALSE;
-                        //    CASE RetailSetup."New Customer Creation" OF
-                        //      RetailSetup."New Customer Creation"::All :
-                        //        DoCreate := TRUE;
-                        //      RetailSetup."New Customer Creation"::"Cash Customer" :
-                        //        DoCreate := TRUE;
-                        //      RetailSetup."New Customer Creation"::"User Managed": BEGIN
-                        //        SalesPerson.GET("Salesperson Code");
-                        //        CASE SalesPerson."Customer Creation" OF
-                        //          SalesPerson."Customer Creation"::"1" :
-                        //            DoCreate := TRUE;
-                        //          SalesPerson."Customer Creation"::"2" :
-                        //            DoCreate := TRUE;
-                        //        END;
-                        //      END;
-                        //      RetailSetup."New Customer Creation"::Customer :
-                        //        DoCreate := FALSE;
-                        //    END;
-                        //
-                        //    IF NOT DoCreate THEN
-                        //      ERROR(Text1060002);
-                        //+NPR5.53 [369354]
                         RetailFormCode.CreateContact("Customer No.");
 
                         if "Customer No." <> '' then begin
@@ -201,9 +118,7 @@ table 6014405 "NPR Sale POS"
                             Address := Contact.Address;
                             "Address 2" := Contact."Address 2";
                             Validate("Post Code", Contact."Post Code");
-                            //-NPR5.53 [380453]
                             Validate("Country Code", Contact."Country/Region Code");
-                            //+NPR5.53 [380453]
                         end;
                     end else begin
                         Name := Contact.Name;
@@ -212,9 +127,7 @@ table 6014405 "NPR Sale POS"
                         "Post Code" := Contact."Post Code";
                         City := Contact.City;
                         "Contact No." := Contact."No.";
-                        //-NPR5.53 [380453]
                         Validate("Country Code", Contact."Country/Region Code");
-                        //+NPR5.53 [380453]
                     end;
                 end;
 
@@ -223,29 +136,6 @@ table 6014405 "NPR Sale POS"
                 if ("Customer No." <> '') and ("Customer Type" = "Customer Type"::Ord) then begin
                     //ohm - customer lookup
                     if not Cust.Get("Customer No.") then begin
-                        //-NPR5.53 [369354]
-                        //    DoCreate := FALSE;
-                        //    CASE RetailSetup."New Customer Creation" OF
-                        //      RetailSetup."New Customer Creation"::All :
-                        //        DoCreate := TRUE;
-                        //      RetailSetup."New Customer Creation"::"Cash Customer" :
-                        //        DoCreate := FALSE;
-                        //      RetailSetup."New Customer Creation"::"User Managed": BEGIN
-                        //        SalesPerson.GET("Salesperson Code");
-                        //        CASE SalesPerson."Customer Creation" OF
-                        //          SalesPerson."Customer Creation"::"1" :
-                        //            DoCreate := TRUE;
-                        //          SalesPerson."Customer Creation"::"2" :
-                        //            DoCreate := TRUE;
-                        //        END;
-                        //      END;
-                        //      RetailSetup."New Customer Creation"::Customer :
-                        //        DoCreate := TRUE;
-                        //    END;
-                        //
-                        //    IF NOT DoCreate THEN
-                        //      ERROR(Text1060002);
-                        //+NPR5.53 [369354]
                         RetailFormCode.CreateCustomer("Customer No.");
                     end;
 
@@ -256,17 +146,12 @@ table 6014405 "NPR Sale POS"
                         "Address 2" := Cust."Address 2";
                         "Post Code" := Cust."Post Code";
                         City := Cust.City;
-                        //-NPR5.53 [380453]
                         Validate("Country Code", Cust."Country/Region Code");
-                        //+NPR5.53 [380453]
                         if Cust."Customer Price Group" <> '' then
                             "Customer Price Group" := Cust."Customer Price Group";
-                        //-NPR5.31 [263093]
                         if Cust."Customer Disc. Group" <> '' then
                             "Customer Disc. Group" := Cust."Customer Disc. Group";
-                        //+NPR5.31 [263093]
 
-                        //-NPR5.31 [248534]
                         if POSStore."Default POS Posting Setup" = POSStore."Default POS Posting Setup"::Customer then begin
                             "Gen. Bus. Posting Group" := Cust."Gen. Bus. Posting Group";
                             "Tax Area Code" := Cust."Tax Area Code";
@@ -278,15 +163,6 @@ table 6014405 "NPR Sale POS"
                             "Tax Liable" := POSStore."Tax Liable";
                             "VAT Bus. Posting Group" := POSStore."VAT Bus. Posting Group";
                         end;
-                        //+NPR5.31 [248534]
-
-                        //-NPR5.30 [261728]
-                        //IF Cust."Global Dimension 1 Code" <> '' THEN
-                        //  VALIDATE("Shortcut Dimension 1 Code",Cust."Global Dimension 1 Code");
-                        //IF Cust."Global Dimension 2 Code" <> '' THEN
-                        //  VALIDATE("Shortcut Dimension 2 Code",Cust."Global Dimension 2 Code");
-                        //+NPR5.30 [261728]
-
                     end;
                 end;
 
@@ -297,19 +173,13 @@ table 6014405 "NPR Sale POS"
                     "Post Code" := '';
                     City := '';
                     "Contact No." := '';
-                    //-NPR5.53 [380453]
                     Validate("Country Code", '');
-                    //+NPR5.53 [380453]
                 end;
 
                 if Cust."No." <> '' then
                     "Prices Including VAT" := Cust."Prices Including VAT"
                 else
-                    //-NPR5.31 [269105]
-                    ////"Price including VAT" := Ops�tning."Prices incl. VAT";
-                    //"Price including VAT" := Ops�tning."Prices Include VAT";
                     "Prices Including VAT" := RetailSetup."Prices incl. VAT";
-                //+NPR5.31 [269105]
 
                 if not Modify then;
 
@@ -320,7 +190,6 @@ table 6014405 "NPR Sale POS"
                     SaleLinePOS.SetRange("Sale Type", SaleLinePOS."Sale Type"::Sale);
                     SaleLinePOS.SetRange(Type, SaleLinePOS.Type::Item);
                     SaleLinePOS.SetRange(Date, Date);
-                    //-NPR5.55 [380979]
                     if not SaleLinePOS.IsEmpty and ("Prices Including VAT" <> xRec."Prices Including VAT") then begin
                         SaleLinePOS.ModifyAll(Amount, 0);
                         SaleLinePOS.ModifyAll("Amount Including VAT", 0);
@@ -328,88 +197,43 @@ table 6014405 "NPR Sale POS"
                         SaleLinePOS.ModifyAll("Line Amount", 0);
                         SaleLinePOS.ModifyAll("Invoice Discount Amount", 0);
                     end;
-                    //+NPR5.55 [380979]
                     if SaleLinePOS.FindSet(true, false) then begin
                         repeat
-                            xSaleLinePOS := SaleLinePOS;  //NPR5.52 [359596]
+                            xSaleLinePOS := SaleLinePOS;
                             Item.Get(SaleLinePOS."No.");
                             SaleLinePOS.Internal := Cust."NPR Internal y/n";
                             SaleLinePOS."Customer Price Group" := "Customer Price Group";
-                            //-NPR5.32 [248534]
                             SaleLinePOS."Allow Line Discount" := "Allow Line Discount";
                             SaleLinePOS."Price Includes VAT" := "Prices Including VAT";
                             SaleLinePOS."Gen. Bus. Posting Group" := "Gen. Bus. Posting Group";
                             SaleLinePOS."VAT Bus. Posting Group" := "VAT Bus. Posting Group";
                             SaleLinePOS."Tax Area Code" := "Tax Area Code";
                             SaleLinePOS."Tax Liable" := "Tax Liable";
-                            //+NPR5.32 [248534]
-                            //-NPR5.32.01 [248534]
-                            //SaleLinePOS."VAT %"                   := SaleLinePOS.HentMomsPct( SaleLinePOS."Item Group" );
                             SaleLinePOS.UpdateVATSetup;
-                            //+NPR5.32.01 [248534]
-                            //-NPR5.45 [323705]
-                            //SaleLinePOS."Unit Price"              := SaleLinePOS.FindItemSalesPrice( SaleLinePOS );
-                            //SaleLinePOS."Unit Price" := SaleLinePOS.FindItemSalesPrice();  //NPR5.52 [359596]-revoked
-                            //-NPR5.52 [359596]
+
                             //Recalc.existing price to reflect possible VAT Rate/Price Inc. VAT change
                             POSSaleLine.ConvertPriceToVAT(
                               xSaleLinePOS."Price Includes VAT", xSaleLinePOS."VAT Bus. Posting Group", xSaleLinePOS."VAT Prod. Posting Group",
                               SaleLinePOS, SaleLinePOS."Unit Price");
-                            NewUnitPrice := SaleLinePOS.FindItemSalesPrice();
-                            if (NewUnitPrice < SaleLinePOS."Unit Price") or
-                               not (xRec."Customer No." in ['', "Customer No."])
-                            then
-                                SaleLinePOS."Unit Price" := NewUnitPrice;
-                            //+NPR5.52 [359596]
-                            //+NPR5.45 [323705]
+
+                            SaleLinePOS."Unit Price" := SaleLinePOS.FindItemSalesPrice();
                             SaleLinePOS.GetAmount(SaleLinePOS, Item, SaleLinePOS."Unit Price");
                             SaleLinePOS.Modify;
                         until SaleLinePOS.Next = 0;
-                        //-NPR5.52 [359596]-revoked
-                        //SaleLinePOS.VALIDATE("Unit of Measure Code");
-                        //SaleLinePOS.MODIFY;
-                        //+NPR5.52 [359596]-revoked
                     end;
                 end;
 
-                //-NPR5.45 [326466]
                 POSSalesDiscountCalcMgt.RecalculateAllSaleLinePOS(Rec);
-                //+NPR5.45 [326466]
 
                 //Ændring foretaget for at kunne validere på nummer og slette rabatter på linier, ved ændring af kundenummer.
                 Modify;
 
-                //-NPR5.30 [261728]
-                //IF Cust.GET("Customer No.") THEN BEGIN
-                //  IF Cust."Bill-to Customer No."<>'' THEN
-                //    Custno := Cust."Bill-to Customer No."
-                //  ELSE
-                //    Custno:=Cust."No.";
-                //END;
-                //+NPR5.30 [261728]
-
-                //TempNPRDim.GetDimensions(DATABASE::"Sale POS","Register No.","Sales Ticket No.",0,0D,0,'',TempNPRDim);
-
-                //-NPR4.21
-                //CreateDim(
-                //  DATABASE::Register,"Register No.",
-                //  DATABASE::Customer,Custno,
-                //  DATABASE::"Salesperson/Purchaser","Salesperson Code");
                 CreateDim(
-                  //-NPR5.30 [261728]
-                  //DATABASE::Customer,Custno,
                   DATABASE::Customer, "Customer No.",
-                  //+NPR5.30 [261728]
-                  //DATABASE::Register,"Register No.",  //NPR5.53 [371956]-revoked
-                  //-NPR5.53 [371956]
                   DATABASE::"NPR POS Unit", "Register No.",
                   DATABASE::"NPR POS Store", "POS Store Code",
-                  //+NPR5.53 [371956]
-                  DATABASE::Job, "Event No.",  //NPR5.53 [376035]
+                  DATABASE::Job, "Event No.",
                   DATABASE::"Salesperson/Purchaser", "Salesperson Code");
-                //+NPR4.21
-
-                //TempNPRDim.UpdateAllLineDim(DATABASE::"Sale POS","Register No.","Sales Ticket No.",0,0D,TempNPRDim);
             end;
         }
         field(8; Name; Text[50])
@@ -643,7 +467,6 @@ table 6014405 "NPR Sale POS"
                 xSaleLinePOS: Record "NPR Sale Line POS";
                 POSSaleLine: Codeunit "NPR POS Sale Line";
             begin
-                //-NPR5.52 [352473]
                 if "Prices Including VAT" = xRec."Prices Including VAT" then
                     exit;
 
@@ -663,7 +486,6 @@ table 6014405 "NPR Sale POS"
                         SaleLinePOS.Modify(true);
                     until SaleLinePOS.Next = 0;
                 end;
-                //+NPR5.52 [352473]
             end;
         }
         field(121; TouchScreen; Boolean)
@@ -757,14 +579,12 @@ table 6014405 "NPR Sale POS"
                 ToDefDim: Record "Default Dimension";
                 POSUnit: Record "NPR POS Unit";
             begin
-                //-NPR5.53 [376035]
                 CreateDim(
                   DATABASE::Job, "Event No.",
                   DATABASE::"NPR POS Unit", "Register No.",
                   DATABASE::"NPR POS Store", "POS Store Code",
                   DATABASE::Customer, "Customer No.",
                   DATABASE::"Salesperson/Purchaser", "Salesperson Code");
-                //+NPR5.53 [376035]
             end;
         }
         field(200; "Device ID"; Text[50])
@@ -790,7 +610,7 @@ table 6014405 "NPR Sale POS"
         field(300; Amount; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum ("NPR Sale Line POS".Amount WHERE("Register No." = FIELD("Register No."),
+            CalcFormula = Sum("NPR Sale Line POS".Amount WHERE("Register No." = FIELD("Register No."),
                                                             "Sales Ticket No." = FIELD("Sales Ticket No."),
                                                             "Sale Type" = FILTER(Sale | "Debit Sale" | "Gift Voucher" | "Credit Voucher" | Deposit),
                                                             Type = FILTER(<> Comment & <> "Open/Close")));
@@ -808,7 +628,7 @@ table 6014405 "NPR Sale POS"
         field(310; "Amount Including VAT"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum ("NPR Sale Line POS"."Amount Including VAT" WHERE("Register No." = FIELD("Register No."),
+            CalcFormula = Sum("NPR Sale Line POS"."Amount Including VAT" WHERE("Register No." = FIELD("Register No."),
                                                                             "Sales Ticket No." = FIELD("Sales Ticket No."),
                                                                             "Sale Type" = FILTER(Sale | "Debit Sale" | "Gift Voucher" | "Credit Voucher" | Deposit),
                                                                             Type = FILTER(<> Comment & <> "Open/Close")));
@@ -820,7 +640,7 @@ table 6014405 "NPR Sale POS"
         field(320; "Payment Amount"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum ("NPR Sale Line POS"."Amount Including VAT" WHERE("Register No." = FIELD("Register No."),
+            CalcFormula = Sum("NPR Sale Line POS"."Amount Including VAT" WHERE("Register No." = FIELD("Register No."),
                                                                             "Sales Ticket No." = FIELD("Sales Ticket No."),
                                                                             "Sale Type" = FILTER(Payment | "Out payment"),
                                                                             Type = FILTER(<> Comment & <> "Open/Close")));
@@ -843,7 +663,7 @@ table 6014405 "NPR Sale POS"
         }
         field(485; "Customer Name"; Text[50])
         {
-            CalcFormula = Lookup (Customer.Name WHERE("No." = FIELD("Customer No.")));
+            CalcFormula = Lookup(Customer.Name WHERE("No." = FIELD("Customer No.")));
             Caption = 'Customer Name';
             Description = 'NPR5.37';
             Editable = false;
@@ -861,7 +681,6 @@ table 6014405 "NPR Sale POS"
                 SaleLinePOS: Record "NPR Sale Line POS";
                 SaleLinePOS2: Record "NPR Sale Line POS";
             begin
-                //-NPR5.53 [380609]
                 SaleLinePOS.SetRange("Register No.", "Register No.");
                 SaleLinePOS.SetRange("Sales Ticket No.", "Sales Ticket No.");
                 SaleLinePOS.SetRange("Sale Type", SaleLinePOS."Sale Type"::Sale);
@@ -873,7 +692,6 @@ table 6014405 "NPR Sale POS"
                         SaleLinePOS2.Validate("NPRE Seating Code", "NPRE Pre-Set Seating Code");
                         SaleLinePOS2.Modify;
                     until SaleLinePOS.Next = 0;
-                //+NPR5.53 [380609]
             end;
         }
         field(701; "NPRE Pre-Set Waiter Pad No."; Code[20])
@@ -930,13 +748,11 @@ table 6014405 "NPR Sale POS"
         "Location Code" := Register."Location Code";
         "Customer Disc. Group" := Register."Customer Disc. Group";
         "POS Sale ID" := 0;
-        "Event No." := Register."Active Event No.";  //NPR5.53 [376035]
+        "Event No." := Register."Active Event No.";
 
-        //-NPR5.54 [391871]
         if IsNullGuid("Retail ID") then begin
             "Retail ID" := CreateGuid();
         end;
-        //+NPR5.54 [391871]
     end;
 
     var
@@ -951,7 +767,6 @@ table 6014405 "NPR Sale POS"
 
     procedure LookUpShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
     begin
-        //Lookupshortcutdimcode
         RetailSetup.Get;
         if RetailSetup."Use Adv. dimensions" then
             NPRDimMgt.LookupDimValueCode(FieldNumber, ShortcutDimCode);
@@ -961,8 +776,6 @@ table 6014405 "NPR Sale POS"
     var
         EkspeditionLinie: Record "NPR Sale Line POS";
     begin
-        //DeleteDimOnEkspAndLines()
-
         RetailSetup.Get;
         if not RetailSetup."Use Adv. dimensions" then
             exit;
@@ -973,10 +786,7 @@ table 6014405 "NPR Sale POS"
                 EkspeditionLinie.SetRange("Register No.", "Register No.");
                 EkspeditionLinie.SetRange("Sales Ticket No.", "Sales Ticket No.");
                 with EkspeditionLinie do begin
-                    //-NPR5.45 [323705]
-                    //IF FIND('-') THEN
                     if FindSet then
-                        //+NPR5.45 [323705]
                         repeat
                             NPRDimMgt.DeleteNPRDim(DATABASE::"NPR Sale Line POS", "Register No.",
                             "Sales Ticket No.", Date, "Sale Type", "Line No.", '');
@@ -999,31 +809,21 @@ table 6014405 "NPR Sale POS"
         No[2] := No2;
         TableID[3] := Type3;
         No[3] := No3;
-        //-NPR5.53 [371956]
         TableID[4] := Type4;
         No[4] := No4;
-        //+NPR5.53 [371956]
-        //-NPR5.53 [376035]
         TableID[5] := Type5;
         No[5] := No5;
-        //+NPR5.53 [376035]
         "Shortcut Dimension 1 Code" := '';
         "Shortcut Dimension 2 Code" := '';
         OldDimSetID := "Dimension Set ID";
         "Dimension Set ID" :=
           DimMgt.GetDefaultDimID(TableID, No, RetailConfiguration."Posting Source Code", "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", 0, 0);
 
-        //-NPR5.29
-        // IF (OldDimSetID <> "Dimension Set ID") AND SalesLinesExist THEN BEGIN
-        //  MODIFY;
-        //  UpdateAllLineDim("Dimension Set ID",OldDimSetID);
-        // END;
         if (OldDimSetID <> "Dimension Set ID") then begin
             Modify;
             if SalesLinesExist then
                 UpdateAllLineDim("Dimension Set ID", OldDimSetID);
         end;
-        //-NPR5.29
     end;
 
     procedure ValidateShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
@@ -1067,17 +867,10 @@ table 6014405 "NPR Sale POS"
         if NewParentDimSetID = OldParentDimSetID then
             exit;
 
-        // By default always update dimensions
-        // IF NOT CONFIRM(Text064) THEN
-        //   EXIT;
-
         SaleLinePOS.SetRange("Register No.", "Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", "Sales Ticket No.");
         SaleLinePOS.LockTable;
-        //-NPR5.45 [323705]
-        //IF SaleLinePOS.FIND('-') THEN
         if SaleLinePOS.FindSet then
-            //+NPR5.45 [323705]
             repeat
                 NewDimSetID := DimMgt.GetDeltaDimSetID(SaleLinePOS."Dimension Set ID", NewParentDimSetID, OldParentDimSetID);
                 if SaleLinePOS."Dimension Set ID" <> NewDimSetID then begin
@@ -1102,18 +895,13 @@ table 6014405 "NPR Sale POS"
 
     local procedure GetPOSUnit()
     begin
-        //-NPR5.30 [261728]
         if POSUnit."No." <> "Register No." then
             POSUnit.Get("Register No.");
-        //+NPR5.30 [261728]
     end;
 
     local procedure GetPOSStore()
     begin
-        //-NPR5.30 [261728]
         if POSStore.Code <> "POS Store Code" then
             POSStore.Get("POS Store Code");
-        //+NPR5.30 [261728]
     end;
 }
-
