@@ -1,43 +1,55 @@
 codeunit 6151592 "NPR NpDc Module Issue: Default"
 {
-    // NPR5.34/MHA /20170720  CASE 282799 Object created - NpDc: NaviPartner Discount Coupon
-    // NPR5.42/MHA /20180521  CASE 305859 Added "Print on Issue" functionality
-
-
     trigger OnRun()
     begin
     end;
 
     var
         Text000: Label 'Issue Coupon - Default';
+        CouponIssuedTxt: Label 'Coupon No. %1 has been issued.';
+        CouponPrintedText: Label 'Coupon No. %1 has been printed.';
+        CouponsIssuedTxt: Label '%1 coupons (No. %2 - %3) have been issued.';
+        CouponsPrintedText: Label '%1 coupons (No. %2 - %3) have been printed.';
 
-    procedure IssueCoupons(CouponType: Record "NPR NpDc Coupon Type")
+
+    procedure IssueCoupons(CouponType: Record "NPR NpDc Coupon Type"; IssueCouponsQty: Integer)
     var
         TempCoupon: Record "NPR NpDc Coupon" temporary;
         NpDcIssueCouponsQty: Report "NPR NpDc Request Coupon Qty.";
-        IssueCouponsQty: Integer;
         i: Integer;
+        FromCouponNo: Code[20];
     begin
         CouponType.TestField("Reference No. Pattern");
-        //-NPR5.42 [305859]
         if CouponType."Print on Issue" then
             CouponType.TestField("Print Template Code");
-        //+NPR5.42 [305859]
 
-        IssueCouponsQty := NpDcIssueCouponsQty.RequestCouponQty();
+        if IssueCouponsQty <= 0 then
+            IssueCouponsQty := NpDcIssueCouponsQty.RequestCouponQty();
         if IssueCouponsQty <= 0 then
             exit;
 
         for i := 1 to IssueCouponsQty do
-            //-NPR5.42 [305859]
-            //IssueCoupon(CouponType);
             IssueCoupon(CouponType, TempCoupon);
-        //+NPR5.42 [305859]
 
-        //-NPR5.42 [305859]
         if CouponType."Print on Issue" then
             PrintCoupons(TempCoupon);
-        //+NPR5.42 [305859]
+
+        if TempCoupon.IsEmpty then
+            exit;
+        TempCoupon.FindFirst();
+        if TempCoupon.Count = 1 then begin
+            if CouponType."Print on Issue" then
+                Message(CouponPrintedText, TempCoupon."No.")
+            else
+                Message(CouponIssuedTxt, TempCoupon."No.");
+        end else begin
+            FromCouponNo := TempCoupon."No.";
+            TempCoupon.FindLast();
+            if CouponType."Print on Issue" then
+                Message(CouponsPrintedText, IssueCouponsQty, FromCouponNo, TempCoupon."No.")
+            else
+                Message(CouponsIssuedTxt, IssueCouponsQty, FromCouponNo, TempCoupon."No.");
+        end;
     end;
 
     local procedure IssueCoupon(CouponType: Record "NPR NpDc Coupon Type"; var TempCoupon: Record "NPR NpDc Coupon" temporary)
@@ -52,11 +64,9 @@ codeunit 6151592 "NPR NpDc Module Issue: Default"
 
         CouponMgt.PostIssueCoupon(Coupon);
 
-        //-NPR5.42 [305859]
         TempCoupon.Init;
         TempCoupon := Coupon;
         TempCoupon.Insert;
-        //+NPR5.42 [305859]
     end;
 
     local procedure PrintCoupons(var TempCoupon: Record "NPR NpDc Coupon" temporary)
@@ -73,9 +83,7 @@ codeunit 6151592 "NPR NpDc Module Issue: Default"
         until TempCoupon.Next = 0;
     end;
 
-    local procedure "--- Coupon Interface"()
-    begin
-    end;
+    //--- Coupon Interface ---
 
     [EventSubscriber(ObjectType::Codeunit, 6151591, 'OnInitCouponModules', '', true, true)]
     local procedure OnInitCouponModules(var CouponModule: Record "NPR NpDc Coupon Module")
@@ -97,10 +105,7 @@ codeunit 6151592 "NPR NpDc Module Issue: Default"
         if not IsSubscriber(CouponType) then
             exit;
 
-        //-NPR5.42 [305859]
-        //HasIssueSetup := FALSE;
         HasIssueSetup := true;
-        //+NPR5.42 [305859]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6151591, 'OnSetupIssueCoupon', '', true, true)]
@@ -111,11 +116,9 @@ codeunit 6151592 "NPR NpDc Module Issue: Default"
         if not IsSubscriber(CouponType) then
             exit;
 
-        //-NPR5.42 [305859]
         CouponType.TestField("Print Template Code");
         RPTemplateHeader.Get(CouponType."Print Template Code");
         PAGE.Run(PAGE::"NPR RP Template Card", RPTemplateHeader);
-        //+NPR5.42 [305859]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6151591, 'OnRunIssueCoupon', '', true, true)]
@@ -127,12 +130,10 @@ codeunit 6151592 "NPR NpDc Module Issue: Default"
             exit;
 
         Handled := true;
-        IssueCoupons(CouponType);
+        IssueCoupons(CouponType, 0);
     end;
 
-    local procedure "--- Aux"()
-    begin
-    end;
+    //--- Aux ---
 
     local procedure CurrCodeunitId(): Integer
     begin
@@ -149,4 +150,3 @@ codeunit 6151592 "NPR NpDc Module Issue: Default"
         exit('DEFAULT');
     end;
 }
-
