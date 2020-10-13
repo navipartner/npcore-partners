@@ -1,13 +1,5 @@
 codeunit 6151127 "NPR POS Action: Ins. ItemAddOn"
 {
-    // NPR5.48/MHA /20181113 CASE 334922 Object created - Insert Item AddOns directly from POS Action
-    // NPR5.52/ALPO/20190912 CASE 354309 Updated function call to respect the new signature
-    // NPR5.54/ALPO/20200219 CASE 374666 Item AddOns: auto-insert fixed quantity lines regardless of user response
-    //                                     - Function Approve(): new call parameter: OnlyFixedQtyLines (boolean)
-    //                                     - Functions InitScript(), InitScriptData(), CreateUserInterface(), WebDepCode(), InitCss(), InitHtml()
-    //                                       moved out to CU 6151125 to avoid excessive code dublication
-    // NPR5.55/ALPO/20200803 CASE 417118 Item addon lines were not linked to a base line, if item addon insert action was called manually
-
     SingleInstance = true;
 
     trigger OnRun()
@@ -128,12 +120,9 @@ codeunit 6151127 "NPR POS Action: Ins. ItemAddOn"
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
         CurrNpIaItemAddOn := NpIaItemAddOn;
-        //CreateUserInterface(SalePOS,NpIaItemAddOn);  //NPR5.54 [374666]-revoked
-        //-NPR5.54 [374666]
         Clear(AppliesToSaleLinePOS);
-        FindBaseLine(POSSession, AppliesToSaleLinePOS);  //NPR5.55 [417118]
+        FindBaseLine(POSSession, AppliesToSaleLinePOS);
         NpIaItemAddOnMgt.CreateUserInterface(Model, SalePOS, AppliesToSaleLinePOS, NpIaItemAddOn);
-        //+NPR5.54 [374666]
         ActiveModelID := FrontEnd.ShowModel(Model);
     end;
 
@@ -142,8 +131,8 @@ codeunit 6151127 "NPR POS Action: Ins. ItemAddOn"
         SaleLinePOSAddOn: Record "NPR NpIa SaleLinePOS AddOn";
         NpIaItemAddOnMgt: Codeunit "NPR NpIa Item AddOn Mgt.";
         POSSaleLine: Codeunit "NPR POS Sale Line";
+        NoBaseLineFound: Label 'Item AddOn lines must be associated to a base item sale line. Please add a base item to the sale and then continue with the AddOns.';
     begin
-        //-NPR5.55 [417118]
         POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.GetCurrentSaleLine(AppliesToSaleLinePOS);
         NpIaItemAddOnMgt.FilterSaleLinePOS2ItemAddOnPOSLine(AppliesToSaleLinePOS, SaleLinePOSAddOn);
@@ -155,12 +144,12 @@ codeunit 6151127 "NPR POS Action: Ins. ItemAddOn"
                   AppliesToSaleLinePOS.Date,
                   AppliesToSaleLinePOS."Sale Type",
                   SaleLinePOSAddOn."Applies-to Line No.");
-        //+NPR5.55 [417118]
+
+        if AppliesToSaleLinePOS."Line No." = 0 then
+            Error(NoBaseLineFound);
     end;
 
-    local procedure "--- Approve"()
-    begin
-    end;
+    //--- Approve ---
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnProtocolUIResponse', '', true, true)]
     local procedure OnProtocolUIResponse(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; ModelID: Guid; Sender: Text; EventName: Text; var Handled: Boolean)
@@ -170,26 +159,8 @@ codeunit 6151127 "NPR POS Action: Ins. ItemAddOn"
 
         Handled := true;
 
-        //-NPR5.54 [374666]-revoked
-        /*
-        CASE Sender OF
-          'approve':
-            BEGIN
-              Approve(EventName,FrontEnd);
-              FrontEnd.CloseModel(ModelID);
-            END;
-          'cancel','close':
-            BEGIN
-              FrontEnd.CloseModel(ModelID);
-            END;
-        END;
-        */
-        //+NPR5.54 [374666]-revoked
-        //-NPR5.54 [374666]
         Approve(EventName, FrontEnd, Sender <> 'approve');
         FrontEnd.CloseModel(ModelID);
-        //+NPR5.54 [374666]
-
     end;
 
     local procedure Approve(JsonText: Text; FrontEnd: Codeunit "NPR POS Front End Management"; OnlyFixedQtyLines: Boolean)
@@ -202,16 +173,12 @@ codeunit 6151127 "NPR POS Action: Ins. ItemAddOn"
     begin
         AddOnLines := AddOnLines.Parse(JsonText);
         FrontEnd.GetSession(POSSession);
-        //NpIaItemAddOnMgt.InsertPOSAddOnLines(CurrNpIaItemAddOn,AddOnLines,POSSession,0);  //NPR5.54 [374666]-revoked
-        //NpIaItemAddOnMgt.InsertPOSAddOnLines(CurrNpIaItemAddOn,AddOnLines,POSSession,0,OnlyFixedQtyLines);  //NPR5.54 [374666]  //NPR5.55 [417118]-revoked
-        //-NPR5.55 [417118]
         FindBaseLine(POSSession, AppliesToSaleLinePOS);
         Clear(NpIaItemAddOnMgt);
         NpIaItemAddOnMgt.InsertPOSAddOnLines(
           CurrNpIaItemAddOn, AddOnLines, POSSession, AppliesToSaleLinePOS."Line No.", OnlyFixedQtyLines);
         if NpIaItemAddOnMgt.InsertedWithAutoSplitKey() then
             POSSession.ChangeViewSale();  //there is no other way to refresh the lines, so they appear in correct order
-        //+NPR5.55 [417118]
 
         POSSession.RequestRefreshData();
         POSJavaScriptInterface.RefreshData(POSSession, FrontEnd);
@@ -225,4 +192,3 @@ codeunit 6151127 "NPR POS Action: Ins. ItemAddOn"
     begin
     end;
 }
-
