@@ -1,31 +1,37 @@
 codeunit 6150629 "NPR POS Entry Management"
 {
-    // NPR5.36/BR  /20170705  CASE 276413 Object Created
-    // NPR5.38/BR  /20180122  CASE 302690 Added function ShowSalesDocument
-    // NPR5.38/BR  /20180123  CASE 302816 Fixed bug Return Sales Quantity
-    // NPR5.39/BR  /20180129  CASE 302696 Bugfix quantity calculation
-    // NPR5.39/BR  /20180129  CASE 302803 Fix Total Amount Calculation
-    // NPR5.40/MMV /20180228  CASE 300660 Added lookup function
-    // NPR5.40/MMV /20180328  CASE 276562 Adjusted totals for debit sale
-    // NPR5.48/MMV /20181120  CASE 318028 French audit
-    // NPR5.51/MMV /20190624  CASE 356076 Added support for new total fields.
-    //                                    Fixed header "Sales Amount" containing amount excl. VAT of only the last sale line.
-    //                                    Now called "Direct Item Sales (LCY)" based on what audit roll -> pos entry upgrade does.
-    // NPR5.51/ZESO/20190701  CASE 360453 Set Request Page to True
-    // NPR5.51/MHA /20190718  CASE 362329 Skip "Exclude from Posting" Sales Lines
-    // NPR5.51/ALPO/20190802  CASE 362747 Handle check of allowed number of receipt reprints
-    // NPR5.53/ALPO/20191025 CASE 371956 Dimensions: POS Store & POS Unit integration; discontinue dimensions on Cash Register
-    // NPR5.53/ALPO/20191218 CASE 382911 'DeObfuscateTicketNo' function moved here from CUs 6150798 and 6150821 to avoid code duplication
-    // NPR5.55/SARA/20200608 CASE 401473 Update Discount Amount in POS Entry
-
+    TableNo = "NPR POS Entry";
 
     trigger OnRun()
+    var
+        POSEntry: Record "NPR POS Entry";
+        NotInitialized: Label 'Codeunit 6150629 wasn''t initialized properly. This is a programming bug, not a user error. Please contact system vendor.';
     begin
+        POSEntry := Rec;
+        case FunctionToRun of
+            FunctionToRun::PrintEntry:
+                PrintEntry(POSEntry, LargePrint);
+            else
+                Error(NotInitialized);
+        end;
+        Rec := POSEntry;
     end;
 
     var
+        FunctionToRun: Option " ",PrintEntry;
+        LargePrint: Boolean;
         TextInconsistent: Label '%1 is set to %2 on %3 and to %4 on %4. %5 is inconsistent.';
         ReprintNotAllowedErrMsg: Label 'Additional reprints are not allowed for current sale (%1 %2).';
+
+    procedure SetFunctionToRun(FunctionToRunIn: Option " ",PrintEntry)
+    begin
+        FunctionToRun := FunctionToRunIn;
+    end;
+
+    procedure SetLargePrint(Set: Boolean)
+    begin
+        LargePrint := Set;
+    end;
 
     procedure RecalculatePOSEntry(var POSEntry: Record "NPR POS Entry"; var EntryModified: Boolean)
     var
@@ -52,31 +58,23 @@ codeunit 6150629 "NPR POS Entry Management"
 
         with POSEntry do begin
             POSSalesLine.SetRange("POS Entry No.", "Entry No.");
-            //-NPR5.51 [362329]
             POSSalesLine.SetRange("Exclude from Posting", false);
-            //+NPR5.51 [362329]
-            //-#362329 [362329]
             POSSalesLine.SetRange("Exclude from Posting", false);
-            //+#362329 [362329]
             if POSSalesLine.FindSet then
                 repeat
-                    //-NPR5.51 [356076]
                     CalcTotalAmountInclVATInclRounding += POSSalesLine."Amount Incl. VAT";
 
                     if POSSalesLine.Type <> POSSalesLine.Type::Rounding then begin
-                        //+NPR5.51 [356076]
                         CalcTotalAmount += POSSalesLine."Amount Excl. VAT";
                         CalcTotalAmountInclVAT += POSSalesLine."Amount Incl. VAT";
                         NoOfSalesLines += 1;
 
-                        //-NPR5.51 [356076]
                         if POSSalesLine.Type = POSSalesLine.Type::Item then begin
                             if POSSalesLine.Quantity > 0 then
                                 CalcItemSalesAmount += POSSalesLine."Amount Incl. VAT (LCY)";
                             if POSSalesLine.Quantity < 0 then
                                 CalcItemReturnsAmount += POSSalesLine."Amount Incl. VAT (LCY)";
                         end;
-                        //+NPR5.51 [356076]
 
                         if POSSalesLine.Type in [POSSalesLine.Type::Item, POSSalesLine.Type::"G/L Account"] then begin
                             if POSSalesLine.Quantity > 0 then
@@ -84,9 +82,7 @@ codeunit 6150629 "NPR POS Entry Management"
                             else
                                 CalcReturnSalesQty += POSSalesLine.Quantity;
                         end;
-                        //-NPR5.55 [401473]
                         CalcDiscountAmount += POSSalesLine."Line Discount Amount Excl. VAT";
-                        //+NPR5.55 [401473]
                     end;
                 until POSSalesLine.Next = 0;
 
@@ -143,7 +139,6 @@ codeunit 6150629 "NPR POS Entry Management"
                 Validate("No. of Sales Lines", NoOfSalesLines);
                 EntryModified := true;
             end;
-            //-NPR5.51 [356076]
             if CalcTotalAmountInclVATInclRounding <> "Amount Incl. Tax & Round" then begin
                 Validate("Amount Incl. Tax & Round", CalcTotalAmountInclVATInclRounding);
                 EntryModified := true;
@@ -152,7 +147,6 @@ codeunit 6150629 "NPR POS Entry Management"
                 Validate("Item Returns (LCY)", CalcItemReturnsAmount);
                 EntryModified := true;
             end;
-            //+NPR5.51 [356076]
         end;
     end;
 
@@ -219,10 +213,6 @@ codeunit 6150629 "NPR POS Entry Management"
         Register.Get(POSUnitCode);
         POSUnit."No." := Register."Register No.";
         POSUnit.Name := Register.Name;
-        //-NPR5.53 [371956]-revoked (Dimensions are controlled now from POS Unit)
-        //POSUnit.VALIDATE("Global Dimension 1 Code",Register."Global Dimension 1 Code");
-        //POSUnit.VALIDATE("Global Dimension 2 Code",Register."Global Dimension 2 Code");
-        //+NPR5.53 [371956]-revoked
         if not POSStore.Get(POSUnitCode) then
             CreatePOSStore(POSUnit, Register);
         if not POSPaymentBin.Get(POSUnitCode) then
@@ -247,14 +237,8 @@ codeunit 6150629 "NPR POS Entry Management"
         POSStore.Validate("E-Mail", Register."E-mail");
         POSStore.Validate("Location Code", Register."Location Code");
         POSStore.Validate("VAT Registration No.", Register."VAT No.");
-        //-NPR5.53 [371956]-revoked
-        //POSStore.VALIDATE("Global Dimension 1 Code",Register."Global Dimension 1 Code");
-        //POSStore.VALIDATE("Global Dimension 2 Code",Register."Global Dimension 2 Code");
-        //+NPR5.53 [371956]-revoked
-        //-NPR5.53 [371956]
         POSStore.Validate("Global Dimension 1 Code", POSUnit."Global Dimension 1 Code");
         POSStore.Validate("Global Dimension 2 Code", POSUnit."Global Dimension 2 Code");
-        //+NPR5.53 [371956]
         POSStore.Validate("Gen. Bus. Posting Group", Register."Gen. Business Posting Group");
         POSStore.Validate("VAT Bus. Posting Group", Register."VAT Gen. Business Post.Gr");
         POSStore.Validate("Default POS Posting Setup", POSStore."Default POS Posting Setup"::Customer);
@@ -284,7 +268,6 @@ codeunit 6150629 "NPR POS Entry Management"
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         SalesInvoiceHeader: Record "Sales Invoice Header";
     begin
-        //-NPR5.38 [302690]
         POSEntry.TestField("Sales Document No.");
         if SalesHeader.Get(POSEntry."Sales Document Type", POSEntry."Sales Document No.") then begin
             PAGE.Run(SalesHeader.GetCardpageID, SalesHeader);
@@ -331,50 +314,37 @@ codeunit 6150629 "NPR POS Entry Management"
                 end;
         end;
         exit(false);
-        //+NPR5.38 [302690]
     end;
 
     procedure FindPOSEntryViaEntryNo(EntryNo: Integer; var POSEntryOut: Record "NPR POS Entry"): Boolean
     begin
-        //-NPR5.40 [300660]
         //EntryNo = Auto increment primary key
-
         Clear(POSEntryOut);
         exit(POSEntryOut.Get(EntryNo));
-        //+NPR5.40 [300660]
     end;
 
     procedure FindPOSEntryViaDocumentNo(DocumentNo: Code[20]; var POSEntryOut: Record "NPR POS Entry"): Boolean
     begin
-        //-NPR5.40 [300660]
         //DocumentNo = Unique, volatile front end no. (=SalePOS."Sales Ticket No.")
-
         Clear(POSEntryOut);
         POSEntryOut.SetRange("Document No.", DocumentNo);
         exit(POSEntryOut.FindFirst);
-        //+NPR5.40 [300660]
     end;
 
     procedure FindPOSEntryViaFiscalNo(FiscalNo: Code[20]; var POSEntryOut: Record "NPR POS Entry"): Boolean
     begin
-        //-NPR5.40 [300660]
         //FiscalNo = Back end no. - Can be different from DocumentNo
-
         Clear(POSEntryOut);
         POSEntryOut.SetRange("Fiscal No.", FiscalNo);
         exit(POSEntryOut.FindFirst);
-        //+NPR5.40 [300660]
     end;
 
     procedure FindPOSEntryViaPOSSaleID(POSSaleID: Integer; var POSEntryOut: Record "NPR POS Entry"): Boolean
     begin
-        //-NPR5.40 [300660]
         //POSSaleID = Unique, constant front end no. (=SalePOS."POS Sale ID")
-
         Clear(POSEntryOut);
         POSEntryOut.SetRange("POS Sale ID", POSSaleID);
         exit(POSEntryOut.FindFirst);
-        //+NPR5.40 [300660]
     end;
 
     procedure PrintEntry(POSEntry: Record "NPR POS Entry"; Large: Boolean)
@@ -388,13 +358,11 @@ codeunit 6150629 "NPR POS Entry Management"
         POSUnit: Record "NPR POS Unit";
         IsReprint: Boolean;
     begin
-        //-NPR5.48 [318028]
         POSEntryOutputLog.SetRange("POS Entry No.", POSEntry."Entry No.");
         POSEntryOutputLog.SetRange("Output Method", POSEntryOutputLog."Output Method"::Print);
         POSEntryOutputLog.SetFilter("Output Type", '=%1|=%2', POSEntryOutputLog."Output Type"::SalesReceipt, POSEntryOutputLog."Output Type"::LargeSalesReceipt);
         IsReprint := not POSEntryOutputLog.IsEmpty;
 
-        //-NPR5.51 [362747]
         if IsReprint then begin
             POSEntry.TestField("POS Unit No.");
             POSUnit.Get(POSEntry."POS Unit No.");
@@ -406,7 +374,6 @@ codeunit 6150629 "NPR POS Entry Management"
             then
                 Error(ReprintNotAllowedErrMsg, POSEntryOutputLog.FieldCaption("POS Entry No."), POSEntry."Entry No.");
         end;
-        //+NPR5.51 [362747]
 
         OnBeforePrintEntry(POSEntry, IsReprint);
 
@@ -430,9 +397,7 @@ codeunit 6150629 "NPR POS Entry Management"
                     POSWorkshiftCheckpoint.FindFirst();
                     RecRef.GetTable(POSWorkshiftCheckpoint);
                     if Large then begin
-                        //-NPR5.51 [360453]
                         RetailReportSelectionMgt.SetRequestWindow(true);
-                        //-NPR5.51 [360453]
                         RetailReportSelectionMgt.RunObjects(RecRef, ReportSelectionRetail."Report Type"::"Large Balancing (POS Entry)")
                     end else
                         RetailReportSelectionMgt.RunObjects(RecRef, ReportSelectionRetail."Report Type"::"Balancing (POS Entry)");
@@ -440,7 +405,6 @@ codeunit 6150629 "NPR POS Entry Management"
         end;
 
         OnAfterPrintEntry(POSEntry, IsReprint);
-        //+NPR5.48 [318028]
     end;
 
     procedure DeObfuscateTicketNo(ObfucationMethod: Option "None",MI; var SalesTicketNo: Code[20])
@@ -448,7 +412,6 @@ codeunit 6150629 "NPR POS Entry Management"
         MyBigInt: BigInteger;
         RPAuxMiscLibrary: Codeunit "NPR RP Aux - Misc. Library";
     begin
-        //-NPR5.53 [382911]
         case ObfucationMethod of
             ObfucationMethod::MI:  //Multiplicative Inverse
                 begin
@@ -460,19 +423,15 @@ codeunit 6150629 "NPR POS Entry Management"
                         SalesTicketNo := Format(RPAuxMiscLibrary.MultiplicativeInverseDecode(MyBigInt), 0, 9);
                 end;
         end;
-        //+NPR5.53 [382911]
     end;
 
     [IntegrationEvent(false, false)]
     procedure OnBeforePrintEntry(POSEntry: Record "NPR POS Entry"; IsReprint: Boolean)
     begin
-        //-NPR5.48 [318028]
     end;
 
     [IntegrationEvent(false, false)]
     procedure OnAfterPrintEntry(POSEntry: Record "NPR POS Entry"; IsReprint: Boolean)
     begin
-        //-NPR5.48 [318028]
     end;
 }
-

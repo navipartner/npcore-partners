@@ -1,98 +1,96 @@
 codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
 {
-    // NPR5.50/MMV /20190320  CASE 300557 Refactored prepayment & posting flows.
-    // NPR5.50/MMV /20190606  CASE 352473 Improved error message when posting fails. Only transfer posted document fields when posted.
-    // NPR5.51/MMV /20190605  CASE 357277 Added support for skipping line transfer to POS entry.
-    // NPR5.51/MHA /20190614  CASE 358582 Removed function OnBeforeAuditRollDebitSaleLineInsertEvent() and added corresponding invokes to codeunit 6014435
-    // NPR5.51/ALST/20190705  CASE 357848 added possibility to prepay by amount not just percentage
-    // NPR5.52/MMV /20191002  CASE 352473 Fixed prepayment VAT & amount dialog bugs.
-    //                                    Added send & pdf2nav support to pre-sale end posting subscriber.
-    // NPR5.53/MMV /20191024 CASE 349793 Added Output Type handling
-    // NPR5.53/ALPO/20191216 CASE 378985 Finish credit sale workflow
-    // NPR5.53/MMV /20191219 CASE 377510 Rolled back #357277, replaced with a silent re-import into active sale before ending to keep order & POS sale contents in sync.
-    // NPR5.54/ALPO/20200206 CASE 389537 Sale header entry was not deleted from "Sales POS" table after Credit Sale has been posted
-    // NPR5.54/ALPO/20200213 CASE 385837 Copy comment lines from POS Sale to Sales Order
-    // NPR5.54/ALPO/20200228 CASE 392239 Possibility to use location code from POS store, POS sale or specific location as an alternative to using location from Register
-    // NPR5.55/ALPO/20200429 CASE 401616 Added support for sending intercompany sales order confirmation
-    // NPR5.55/MHA /20200605 CASE 402021 Retail Vouchers are now included
-    // NPR5.55/MHA /20200609 CASE 383018 Added support for LCY instead of blank Currency Code in CreateSalesHeader()
-
     Permissions = TableData "NPR Audit Roll" = rimd;
     TableNo = "NPR Sale POS";
 
     trigger OnRun()
     begin
-        case true of
-            StrPos(Parameters, 'SALESDOC_ASK_ON') > 0:
-                SetAsk(true);
-            StrPos(Parameters, 'SALESDOC_ASK_OFF') > 0:
-                SetAsk(false);
-            StrPos(Parameters, 'SALESDOC_PRINT_ON') > 0:
-                SetPrint(true);
-            StrPos(Parameters, 'SALESDOC_PRINT_OFF') > 0:
-                SetPrint(false);
-            StrPos(Parameters, 'SALESDOC_INVOICE_ON') > 0:
-                SetInvoice(true);
-            StrPos(Parameters, 'SALESDOC_INVOICE_OFF') > 0:
-                SetInvoice(false);
-            StrPos(Parameters, 'SALESDOC_POST_ON') > 0:
-                SetPost(true);
-            StrPos(Parameters, 'SALESDOC_POST_OFF') > 0:
-                SetPost(false);
-            StrPos(Parameters, 'SALESDOC_RECEIVE_ON') > 0:
-                SetReceive(true);
-            StrPos(Parameters, 'SALESDOC_RECEIVE_OFF') > 0:
-                SetReceive(false);
-            StrPos(Parameters, 'SALESDOC_SHIP_ON') > 0:
-                SetShip(true);
-            StrPos(Parameters, 'SALESDOC_SHIP_OFF') > 0:
-                SetShip(false);
-            StrPos(Parameters, 'SALESDOC_TYPE_ORD') > 0:
-                SetDocumentTypeOrder();
-            StrPos(Parameters, 'SALESDOC_TYPE_INV') > 0:
-                SetDocumentTypeInvoice();
-            StrPos(Parameters, 'SALESDOC_TYPE_RET') > 0:
-                SetDocumentTypeReturnOrder();
-            StrPos(Parameters, 'SALESDOC_TYPE_CRED') > 0:
-                SetDocumentTypeCreditMemo();
-            StrPos(Parameters, 'SALESDOC_WRITE_AUDIT') > 0:
-                SetWriteInAuditRoll(true);
-            StrPos(Parameters, 'SALESDOC_CR_MSG') > 0:
-                SetShowCreationMessage;
-            StrPos(Parameters, 'SALESDOC_RET_AMT') > 0:
-                SetReturnAmount(Parameters);
-            StrPos(Parameters, 'SALESDOC_OUTPUT_DOCUMENT') > 0:
-                SetOutput(Parameters);
-            StrPos(Parameters, 'SALESDOC_FINISH_SALE') > 0:
-                SetFinishSale;
-            StrPos(Parameters, 'SALESDOC_DEPOSIT_DLG') > 0:
-                SetShowDepositDialog;
-            StrPos(Parameters, 'SALESDOC_TEST_SALE') > 0:
-                TestSalePOS(Rec);
-            StrPos(Parameters, 'SALESDOC_PROCESS') > 0:
-                ProcessPOSSale(Rec);
-            StrPos(Parameters, 'SALESDOC_OPEN_PAGE') > 0:
-                OpenSalesDoc(Rec);
-            StrPos(Parameters, 'SALESDOC_ORD_TYPE') > 0:
-                SetOrderType(Parameters);
-            StrPos(Parameters, 'SALESDOC_TRSALESPERS') > 0:
-                SetTransferSalesPerson(true);
-            StrPos(Parameters, 'SALESDOC_TRPOSTINGSETUP') > 0:
-                SetTransferPostingsetup(true);
-            StrPos(Parameters, 'SALESDOC_TRDIMENSIONS') > 0:
-                SetTransferDimensions(true);
-            StrPos(Parameters, 'SALESDOC_TRPAYMENTMETHOD') > 0:
-                SetTransferPaymentMethod(true);
-            StrPos(Parameters, 'SALESDOC_TRSALESSETUP') > 0:
-                SetTransferTaxSetup(true);
-            StrPos(Parameters, 'SALESDOC_TRTRANSDATA') > 0:
-                SetTransferTransactionData(true);
+        case FunctionToRun of
+            FunctionToRun::"Invoke OnFinishCreditSale Subsribers":
+                begin
+                    OnFinishCreditSale(POSSalesWorkflowStepGlobal, Rec);
+                end;
             else
-                Error('');
+                case true of
+                    StrPos(Parameters, 'SALESDOC_ASK_ON') > 0:
+                        SetAsk(true);
+                    StrPos(Parameters, 'SALESDOC_ASK_OFF') > 0:
+                        SetAsk(false);
+                    StrPos(Parameters, 'SALESDOC_PRINT_ON') > 0:
+                        SetPrint(true);
+                    StrPos(Parameters, 'SALESDOC_PRINT_OFF') > 0:
+                        SetPrint(false);
+                    StrPos(Parameters, 'SALESDOC_INVOICE_ON') > 0:
+                        SetInvoice(true);
+                    StrPos(Parameters, 'SALESDOC_INVOICE_OFF') > 0:
+                        SetInvoice(false);
+                    StrPos(Parameters, 'SALESDOC_POST_ON') > 0:
+                        SetPost(true);
+                    StrPos(Parameters, 'SALESDOC_POST_OFF') > 0:
+                        SetPost(false);
+                    StrPos(Parameters, 'SALESDOC_RECEIVE_ON') > 0:
+                        SetReceive(true);
+                    StrPos(Parameters, 'SALESDOC_RECEIVE_OFF') > 0:
+                        SetReceive(false);
+                    StrPos(Parameters, 'SALESDOC_SHIP_ON') > 0:
+                        SetShip(true);
+                    StrPos(Parameters, 'SALESDOC_SHIP_OFF') > 0:
+                        SetShip(false);
+                    StrPos(Parameters, 'SALESDOC_TYPE_ORD') > 0:
+                        SetDocumentTypeOrder();
+                    StrPos(Parameters, 'SALESDOC_TYPE_INV') > 0:
+                        SetDocumentTypeInvoice();
+                    StrPos(Parameters, 'SALESDOC_TYPE_RET') > 0:
+                        SetDocumentTypeReturnOrder();
+                    StrPos(Parameters, 'SALESDOC_TYPE_CRED') > 0:
+                        SetDocumentTypeCreditMemo();
+                    StrPos(Parameters, 'SALESDOC_WRITE_AUDIT') > 0:
+                        SetWriteInAuditRoll(true);
+                    StrPos(Parameters, 'SALESDOC_CR_MSG') > 0:
+                        SetShowCreationMessage;
+                    StrPos(Parameters, 'SALESDOC_RET_AMT') > 0:
+                        SetReturnAmount(Parameters);
+                    StrPos(Parameters, 'SALESDOC_OUTPUT_DOCUMENT') > 0:
+                        SetOutput(Parameters);
+                    StrPos(Parameters, 'SALESDOC_FINISH_SALE') > 0:
+                        SetFinishSale;
+                    StrPos(Parameters, 'SALESDOC_DEPOSIT_DLG') > 0:
+                        SetShowDepositDialog;
+                    StrPos(Parameters, 'SALESDOC_TEST_SALE') > 0:
+                        TestSalePOS(Rec);
+                    StrPos(Parameters, 'SALESDOC_PROCESS') > 0:
+                        ProcessPOSSale(Rec);
+                    StrPos(Parameters, 'SALESDOC_OPEN_PAGE') > 0:
+                        OpenSalesDoc(Rec);
+                    StrPos(Parameters, 'SALESDOC_ORD_TYPE') > 0:
+                        SetOrderType(Parameters);
+                    StrPos(Parameters, 'SALESDOC_TRSALESPERS') > 0:
+                        SetTransferSalesPerson(true);
+                    StrPos(Parameters, 'SALESDOC_TRPOSTINGSETUP') > 0:
+                        SetTransferPostingsetup(true);
+                    StrPos(Parameters, 'SALESDOC_TRDIMENSIONS') > 0:
+                        SetTransferDimensions(true);
+                    StrPos(Parameters, 'SALESDOC_TRPAYMENTMETHOD') > 0:
+                        SetTransferPaymentMethod(true);
+                    StrPos(Parameters, 'SALESDOC_TRSALESSETUP') > 0:
+                        SetTransferTaxSetup(true);
+                    StrPos(Parameters, 'SALESDOC_TRTRANSDATA') > 0:
+                        SetTransferTransactionData(true);
+                    else
+                        Error('');
+                end;
         end;
     end;
 
+    procedure SetInvokeOnFinishCreditSaleSubsribers(POSSalesWorkflowStepIn: Record "NPR POS Sales Workflow Step")
+    begin
+        FunctionToRun := FunctionToRun::"Invoke OnFinishCreditSale Subsribers";
+        POSSalesWorkflowStepGlobal := POSSalesWorkflowStepIn;
+    end;
+
     var
+        POSSalesWorkflowStepGlobal: Record "NPR POS Sales Workflow Step";
+        FunctionToRun: Option Default,"Invoke OnFinishCreditSale Subsribers";
         Text000002: Label '%1 %2 %3 couldn''t be printed.';
         DocumentType: Enum "Sales Document Type";
         Ask: Boolean;
@@ -219,10 +217,8 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
 
     procedure SetDocumentTypeQuote()
     begin
-        //-NPR5.45 [325216]
         DocumentType := DocumentType::Quote;
         SkipDefaultValues := true;
-        //+NPR5.45 [325216]
     end;
 
     procedure SetWriteInAuditRoll(WriteInAuditRollIn: Boolean)
@@ -329,23 +325,17 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
 
     procedure SetOpenSalesDocAfterExport(OpenSalesDocAfterExportIn: Boolean)
     begin
-        //-NPR5.50 [300557]
         OpenSalesDocAfterExport := OpenSalesDocAfterExportIn;
-        //+NPR5.50 [300557]
     end;
 
     procedure SetSendDocument(SendDocumentIn: Boolean)
     begin
-        //-NPR5.52 [352473]
         SendDocument := SendDocumentIn;
-        //+NPR5.52 [352473]
     end;
 
     procedure SetSendICOrderConf(Set: Boolean)
     begin
-        //-NPR5.55 [401616]
         SendICOrderConf := Set;
-        //+NPR5.55 [401616]
     end;
 
     procedure Reset()
@@ -375,27 +365,19 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
         AutoReserveSalesLines := false;
         SendPostedPdf2Nav := false;
         RetailPrint := false;
-        //-NPR5.50 [300557]
         OpenSalesDocAfterExport := false;
-        //+NPR5.50 [300557]
         Clear(CreatedSalesHeader);
-        //-NPR5.52 [352473]
         SendDocument := false;
-        //+NPR5.52 [352473]
-        SendICOrderConf := false;  //NPR5.55 [401616]
+        SendICOrderConf := false;
     end;
 
     procedure SetLocationSource(NewSource: Option Register,"POS Store","POS Sale","Specific Location"; NewLocationCode: Code[10])
     begin
-        //-NPR5.54 [392239]
         UseLocationFrom := NewSource;
         UseLocationCode := NewLocationCode;
-        //+NPR5.54 [392239]
     end;
 
-    procedure "--- Sales Document Functions"()
-    begin
-    end;
+    //--- Sales Document Functions ---
 
     procedure ProcessPOSSale(var SalePOS: Record "NPR Sale POS"): Boolean
     var
@@ -452,7 +434,6 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
             SaleLinePOS.SetRange("Register No.", "Register No.");
             SaleLinePOS.SetRange("Sales Ticket No.", "Sales Ticket No.");
             SaleLinePOS.ModifyAll(Silent, true);
-            //SaleLinePOS.SETFILTER( "No.", '<>%1', '' );  //NPR5.54 [385837]-revoked
 
             if SaleLinePOS.FindSet then begin
                 CopySaleCommentLines(SalePOS, SalesHeader);
@@ -465,10 +446,8 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
             Commit;
 
             if OpenSalesDocAfterExport then begin
-                //-NPR5.53 [377510]
                 OpenSalesDocCardAndSyncChangesBackToPOSSale(SalesHeader, SalePOS);
                 Commit;
-                //+NPR5.53 [377510]
             end;
 
             CreatedSalesHeader := SalesHeader;
@@ -482,10 +461,8 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
             if Post and (not Posted) then
                 Message(POSTING_ERROR, SalesHeader."Document Type", SalesHeader."No.", GetLastErrorText);
 
-            //-NPR5.55 [401616]
             if not (Post and Posted) and SendICOrderConf then
                 SendICOrderConfirmation(SalesHeader);
-            //+NPR5.55 [401616]
 
             if WriteInAuditRoll then begin
                 CreateDocumentPostingAudit(SalesHeader, SalePOS, Posted);
@@ -493,16 +470,13 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
                     POSCreateEntry.CreatePOSEntryForCreatedSalesDocument(SalePOS, SalesHeader, Posted);
                 end;
                 SaleLinePOS.DeleteAll;
-                //-NPR5.54 [389537]
                 if not ReturnAmount then
                     SalePOS.Delete;
-                //+NPR5.54 [389537]
             end else
                 ConvertSaleLinePOSToComments(SalesHeader, SalePOS);
 
             Commit;
 
-            //-NPR5.53 [377510]
             if Post and Posted then begin
                 if Print then begin
                     POSSalesDocumentOutputMgt.SetOnRunOperation(0, 0);
@@ -522,7 +496,6 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
                         Message(Pdf2NavSendingErrorTxt, GetLastErrorText);
                 end;
             end;
-            //+NPR5.53 [377510]
 
             if ShowCreationMessage then
                 Message(Text000008, SalesHeader."Document Type", SalesHeader."No.");
@@ -548,7 +521,8 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
 
             PrintRetailReceipt(SalePOS);
 
-            InvokeOnFinishCreditSaleWorkflow(SalePOS);  //NPR5.53 [378985]
+            Commit();
+            InvokeOnFinishCreditSaleWorkflow(SalePOS);
 
             OnAfterDebitSalePostEvent(SalePOS, SalesHeader, Posted, WriteInAuditRoll);
 
@@ -562,8 +536,6 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
         Customer: Record Customer;
         GLSetup: Record "General Ledger Setup";
     begin
-        //Register.GET(SalePOS."Register No.");  //NPR5.54 [392239]-revoked
-
         SalesHeader.Init;
         SalesHeader."Document Type" := DocumentType;
         SalesHeader."Document Date" := WorkDate;
@@ -572,13 +544,10 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
         SalesHeader."Salesperson Code" := SalePOS."Salesperson Code";
         SalesHeader."Sell-to Customer No." := SalePOS."Customer No.";
         SalesHeader.Insert(true);
-        //-NPR5.53 [377510]
         if SalePOS."Customer No." <> '' then begin
-            //+NPR5.53 [377510]
             SalesHeader.Validate("Sell-to Customer No.", SalePOS."Customer No.");
         end;
 
-        //-NPR5.55 [383018]
         SalesHeader.Validate("Sell-to Customer No.");
         SalesHeader.Validate("Currency Code", '');
         if Customer.Get(SalesHeader."Bill-to Customer No.") then begin
@@ -586,7 +555,6 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
             if Customer."Currency Code" = GLSetup."LCY Code" then
                 SalesHeader.Validate("Currency Code", Customer."Currency Code");
         end;
-        //+NPR5.55 [383018]
         SalesHeader."Shortcut Dimension 1 Code" := SalePOS."Shortcut Dimension 1 Code";
         SalesHeader."Shortcut Dimension 2 Code" := SalePOS."Shortcut Dimension 2 Code";
         SalesHeader."Dimension Set ID" := SalePOS."Dimension Set ID";
@@ -610,8 +578,7 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
             SalesHeader."Sell-to Contact" := SalePOS."Contact No.";
         SalesHeader."Your Reference" := SalePOS.Reference;
         SalesHeader."External Document No." := SalePOS.Reference;
-        //SalesHeader.VALIDATE("Location Code", Register."Location Code");  //NPR5.54 [392239]-revoked
-        SalesHeader.Validate("Location Code", GetLocationCode(SalePOS));  //NPR5.54 [392239]
+        SalesHeader.Validate("Location Code", GetLocationCode(SalePOS));
         if Customer.Get(SalePOS."Customer No.") then
             SalesHeader."NPR Document Processing" := Customer."NPR Document Processing";
         SalesHeader.Ship := Ship;
@@ -621,9 +588,7 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
         if OrderTypeSet then
             SalesHeader."NPR Order Type" := OrderType;
 
-        //-NPR5.52 [352473]
         SalesHeader.Validate("Prices Including VAT", SalePOS."Prices Including VAT");
-        //+NPR5.52 [352473]
 
         TransferInfoFromSalePOS(SalePOS, SalesHeader);
 
@@ -751,9 +716,7 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
                     else
                         SalesLine.Type := SalesLine.Type::Item;
                 end;
-                //-NPR5.48 [339049]
                 SalesLine."Line No." := SaleLinePOS."Line No.";
-                //+NPR5.48 [339049]
                 SaleLinePOS.TransferToSalesLine(SalesLine);
                 SalesLine."Line No." := SaleLinePOS."Line No.";
                 SalesLine.Insert(true);
@@ -764,10 +727,6 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
                     if (SaleLinePOS."Credit voucher ref." <> '') and (SaleLinePOS.Quantity < 0) then
                         RetailFormCode.SetCreditVoucherStatus(SaleLinePOS."Credit voucher ref.", CreditVoucher.Status::Cancelled);
 
-                    //-NPR5.42 [299973]
-                    //    SalesLine.VALIDATE("Unit Price",SaleLinePOS."Unit Price");
-                    //+NPR5.42 [299973]
-
                     if SalesHeader."Document Type" in
                       [SalesHeader."Document Type"::"Return Order", SalesHeader."Document Type"::"Credit Memo"] then
                         SalesLine.Validate(Quantity, -SaleLinePOS.Quantity)
@@ -777,21 +736,12 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
                             SalesLine.Validate(Quantity, -SaleLinePOS.Quantity);
                     end;
 
-                    //-NPR5.42 [299973]
-                    //    IF (SaleLinePOS."Discount %" <> 0) OR (SaleLinePOS."Line Discount %, manually") OR
-                    //       (SaleLinePOS."Discount Type" = SaleLinePOS."Discount Type"::Manual) THEN
-                    //      SalesLine.VALIDATE("Line Discount %",SaleLinePOS."Discount %");
-                    //
-                    //    IF SaleLinePOS."Unit Price" = 0 THEN
-                    //      SalesLine.VALIDATE("Line Discount %",100);
-
                     if SalesLine."Unit Price" <> SaleLinePOS."Unit Price" then begin
                         SalesLine."Line Discount %" := SaleLinePOS."Discount %";
                         SalesLine.Validate("Unit Price", SaleLinePOS."Unit Price");
                     end;
                     if SalesLine."Line Discount %" <> SaleLinePOS."Discount %" then
                         SalesLine.Validate("Line Discount %", SaleLinePOS."Discount %");
-                    //+NPR5.42 [299973]
 
                     TransferInfoFromSaleLinePOS(SaleLinePOS, SalesLine);
                     SalesLine.Modify;
@@ -839,7 +789,6 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
                             SerialNoInfo.TestField(Blocked, false);
                     end;
                 end;
-                //-NPR5.55 [402021]
                 NpRvSalesLine.SetRange("Document Source", NpRvSalesLine."Document Source"::POS);
                 NpRvSalesLine.SetRange("Retail ID", SaleLinePOS."Retail ID");
                 if NpRvSalesLine.FindSet then
@@ -850,7 +799,6 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
                         NpRvSalesLine."Document Line No." := SalesLine."Line No.";
                         NpRvSalesLine.Modify(true);
                     until NpRvSalesLine.Next = 0;
-            //+NPR5.55 [402021]
             until SaleLinePOS.Next = 0;
     end;
 
@@ -866,10 +814,8 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
            (SaleLinePOS."Sale Type" = SaleLinePOS."Sale Type"::Deposit) then
             Error(Text000007);
 
-        //-NPR5.50 [300557]
         if SaleLinePOS."Buffer Document No." <> '' then
             Error(Text000007);
-        //+NPR5.50 [300557]
 
         if SaleLinePOS.Type = SaleLinePOS.Type::"Item Group" then
             Error(Text000003);
@@ -919,12 +865,11 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
                 SalesReturnOrder.SetRecord(SalesHeader);
                 SalesReturnOrder.RunModal;
             end;
-            //-NPR5.45 [325216]
+
             if DocumentType = DocumentType::Quote then begin
                 SalesQuote.SetRecord(SalesHeader);
                 SalesQuote.RunModal;
             end;
-            //+NPR5.45 [325216]
         end;
     end;
 
@@ -1026,18 +971,14 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
         SalesLine.SetFilter("Document Type", '=%1', SalesHeader."Document Type");
         SalesLine.SetFilter("Document No.", '=%1', SalesHeader."No.");
         SalesLine.SetFilter(Type, '=%1', SalesLine.Type::Item);
-        //-NPR5.50 [300557]
         SalesLine.SetFilter(Reserve, '<>%1', SalesLine.Reserve::Never);
-        //+NPR5.50 [300557]
         AllLinesReserved := true;
         if SalesLine.FindSet then begin
             repeat
                 if not ReserveSaleLine(SalesLine) then begin
                     AllLinesReserved := false;
-                    //-NPR5.50 [300557]
                     if WithError then
                         Error(RESERVE_FAIL_ERROR, Item.TableCaption, SalesLine."No.", SalesLine.FieldCaption(Quantity), SalesLine.Quantity);
-                    //+NPR5.50 [300557]
                 end;
             until (0 = SalesLine.Next);
         end;
@@ -1166,14 +1107,12 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
         AuditRoll: Record "NPR Audit Roll";
         POSEntry: Record "NPR POS Entry";
         NPRetailSetup: Record "NPR NP Retail Setup";
-        Success: Boolean;
         RetailReportSelectionMgt: Codeunit "NPR Retail Report Select. Mgt.";
         RecRef: RecordRef;
         ReportSelectionRetail: Record "NPR Report Selection Retail";
         RetailSalesCode: Codeunit "NPR Retail Sales Code";
         POSEntryManagement: Codeunit "NPR POS Entry Management";
     begin
-        //-NPR5.40 [304639]
         if not WriteInAuditRoll then
             exit;
 
@@ -1185,20 +1124,12 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
             POSEntry.SetRange("Document No.", SalePOS."Sales Ticket No.");
             if not POSEntry.FindFirst then
                 exit;
+
             ClearLastError;
-            asserterror
-            begin
-                //-NPR5.53 [349793]
-                //    RecRef.GETTABLE(POSEntry);
-                //    RetailReportSelectionMgt.SetRegisterNo(SalePOS."Register No.");
-                //    RetailReportSelectionMgt.RunObjects(RecRef, ReportSelectionRetail."Report Type"::"Sales Doc. Confirmation (POS Entry)");
-                POSEntryManagement.PrintEntry(POSEntry, false);
-                //+NPR5.53 [349793]
-                Commit;
-                Success := true;
-                Error('');
-            end;
-            if not Success then
+            clear(POSEntryManagement);
+            POSEntryManagement.SetFunctionToRun(1);
+            POSEntryManagement.SetLargePrint(false);
+            if not POSEntryManagement.Run(POSEntry) then
                 Message(RetailPrintErrorTxt, GetLastErrorText);
         end else begin
             AuditRoll.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
@@ -1207,7 +1138,6 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
             if not RetailSalesCode.Run(AuditRoll) then
                 Message(Text000002, Text000005, AuditRoll.FieldCaption("Sales Ticket No."), AuditRoll."Sales Ticket No.")
         end;
-        //+NPR5.40 [304639]
     end;
 
     local procedure PrintGiftVoucher(var SalePOS: Record "NPR Sale POS")
@@ -1216,7 +1146,6 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
         RetailTableCode: Codeunit "NPR Retail Table Code";
         GiftVoucher: Record "NPR Gift Voucher";
     begin
-        //-NPR5.50 [300557]
         AuditRoll.SetRange("Register No.", SalePOS."Register No.");
         AuditRoll.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
         AuditRoll.SetRange("Sale Date", SalePOS.Date);
@@ -1231,14 +1160,11 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
                         Message(Text000002, GiftVoucher.TableCaption, GiftVoucher.FieldCaption("No."), GiftVoucher."No.");
                 end;
             until AuditRoll.Next = 0;
-        //+NPR5.50 [300557]
     end;
 
     procedure GetCreatedSalesHeader(var CreatedSalesHeaderOut: Record "Sales Header")
     begin
-        //-NPR5.40 [300557]
         CreatedSalesHeaderOut := CreatedSalesHeader;
-        //+NPR5.40 [300557]
     end;
 
     local procedure PostPrepaymentBeforePOSSaleEnd(var SalesHeader: Record "Sales Header"; var SaleLinePOS: Record "NPR Sale Line POS")
@@ -1257,12 +1183,6 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
         with SaleLinePOS do begin
             SalesHeader.TestField("Document Type", SalesHeader."Document Type"::Order);
 
-            //-NPR5.52 [352473]
-            //-NPR5.51
-            // ApplyPrepaymentPercentageToAllLines(SalesHeader, "Sales Doc. Prepayment %", TRUE);
-            //ApplyPrepaymentValueToAllLines(SalesHeader,"Sales Doc. Prepayment Value",TRUE,FALSE);
-            //+NPR5.51
-
             if "Sales Doc. Prepay Is Percent" then
                 POSPrepaymentMgt.SetPrepaymentPercentageToPay(SalesHeader, true, "Sales Doc. Prepayment Value")
             else
@@ -1270,14 +1190,11 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
 
             Pdf2Nav := "Sales Document Pdf2Nav";
             Send := "Sales Document Send";
-            //+NPR5.52 [352473]
             Print := "Sales Document Print";
             "Sales Document Prepayment" := false;
             "Sales Document Print" := false;
-            //-NPR5.52 [352473]
             "Sales Document Pdf2Nav" := false;
             "Sales Document Send" := false;
-            //+NPR5.52 [352473]
             Modify(true);
 
             SalesPostPrepayments.Invoice(SalesHeader);
@@ -1289,7 +1206,6 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
 
             Commit;
 
-            //-NPR5.52 [352473]
             if Print then begin
                 POSSalesDocumentOutputMgt.PrintDocument(SalesHeader, 1);
             end;
@@ -1301,7 +1217,6 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
             if Pdf2Nav then begin
                 POSSalesDocumentOutputMgt.SendPdf2NavDocument(SalesHeader, 1);
             end;
-            //+NPR5.52 [352473]
         end;
     end;
 
@@ -1317,22 +1232,17 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
         Pdf2Nav: Boolean;
         POSSalesDocumentOutputMgt: Codeunit "NPR POS Sales Doc. Output Mgt.";
     begin
-        //-NPR5.50 [300557]
         with SaleLinePOS do begin
             SalesHeader.TestField("Document Type", SalesHeader."Document Type"::Order);
             DeleteAfter := "Sales Document Delete";
             Print := "Sales Document Print";
-            //-NPR5.52 [352473]
             Send := "Sales Document Send";
             Pdf2Nav := "Sales Document Pdf2Nav";
-            //+NPR5.52 [352473]
             "Sales Document Prepay. Refund" := false;
             "Sales Document Delete" := false;
             "Sales Document Print" := false;
-            //-NPR5.52 [352473]
             "Sales Document Send" := false;
             "Sales Document Pdf2Nav" := false;
-            //+NPR5.52 [352473]
             Modify(true);
 
             SalesPostPrepayments.CreditMemo(SalesHeader);
@@ -1347,7 +1257,6 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
 
             Commit;
 
-            //-NPR5.52 [352473]
             if Print then begin
                 POSSalesDocumentOutputMgt.PrintDocument(SalesHeader, 2);
             end;
@@ -1359,9 +1268,7 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
             if Pdf2Nav then begin
                 POSSalesDocumentOutputMgt.SendPdf2NavDocument(SalesHeader, 2);
             end;
-            //+NPR5.52 [352473]
         end;
-        //+NPR5.50 [300557]
     end;
 
     local procedure PostDocumentBeforePOSSaleEnd(var SalesHeader: Record "Sales Header"; var SaleLinePOS: Record "NPR Sale Line POS")
@@ -1378,7 +1285,6 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
         Pdf2Nav: Boolean;
         POSSalesDocumentOutputMgt: Codeunit "NPR POS Sales Doc. Output Mgt.";
     begin
-        //-NPR5.50 [300557]
         with SaleLinePOS do begin
             if not (SalesHeader."Document Type" in [SalesHeader."Document Type"::Invoice, SalesHeader."Document Type"::Order, SalesHeader."Document Type"::"Credit Memo", SalesHeader."Document Type"::"Return Order"]) then
                 SalesHeader.FieldError("Document Type");
@@ -1387,19 +1293,15 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
             SalesHeader.Receive := "Sales Document Receive";
             SalesHeader.Modify(true);
             Print := "Sales Document Print";
-            //-NPR5.52 [352473]
             Send := "Sales Document Send";
             Pdf2Nav := "Sales Document Pdf2Nav";
-            //+NPR5.52 [352473]
 
             "Sales Document Invoice" := false;
             "Sales Document Ship" := false;
             "Sales Document Receive" := false;
             "Sales Document Print" := false;
-            //-NPR5.52 [352473]
             "Sales Document Send" := false;
             "Sales Document Pdf2Nav" := false;
-            //+NPR5.52 [352473]
             Modify(true);
 
             SalesPost.Run(SalesHeader);
@@ -1455,7 +1357,6 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
             Modify(true);
             Commit;
 
-            //-NPR5.52 [352473]
             if Print then begin
                 POSSalesDocumentOutputMgt.PrintDocument(SalesHeader, 0);
             end;
@@ -1467,9 +1368,7 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
             if Pdf2Nav then begin
                 POSSalesDocumentOutputMgt.SendPdf2NavDocument(SalesHeader, 0);
             end;
-            //+NPR5.52 [352473]
         end;
-        //+NPR5.50 [300557]
     end;
 
     procedure CreatePrepaymentLine(var POSSession: Codeunit "NPR POS Session"; var SalesHeader: Record "Sales Header"; PrepaymentValue: Decimal; Print: Boolean; Send: Boolean; Pdf2Nav: Boolean; SyncPosting: Boolean; ValueIsAmount: Boolean)
@@ -1481,25 +1380,12 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
         SaleLinePOS: Record "NPR Sale Line POS";
         POSPrepaymentMgt: Codeunit "NPR POS Prepayment Mgt.";
     begin
-        //-NPR5.52 [352473]
-        // //-NPR5.51
-        // IF NOT PayByAmount THEN
-        // //+NPR5.51
-        //  IF (PrepaymentVal <= 0) OR (PrepaymentVal > 100) THEN
-        //      EXIT;
-        //
-        // //-NPR5.51
-        // // PrepaymentAmount := ApplyPrepaymentPercentageToAllLines(SalesHeader, PrepaymentPrc, FALSE);
-        // PrepaymentAmount := ApplyPrepaymentValueToAllLines(SalesHeader,PrepaymentVal,FALSE,PayByAmount);
-        // //+NPR5.51
-
         if ValueIsAmount then begin
             POSPrepaymentMgt.SetPrepaymentAmountToPayInclVAT(SalesHeader, true, PrepaymentValue);
             PrepaymentAmount := PrepaymentValue;
         end else begin
             PrepaymentAmount := POSPrepaymentMgt.SetPrepaymentPercentageToPay(SalesHeader, true, PrepaymentValue);
         end;
-        //+NPR5.52 [352473]
 
         if PrepaymentAmount = 0 then
             exit;
@@ -1526,18 +1412,11 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
         SaleLinePOS."Sales Document Type" := SalesHeader."Document Type";
         SaleLinePOS."Sales Document No." := SalesHeader."No.";
         SaleLinePOS."Sales Document Prepayment" := true;
-        //-NPR5.51
-        //SaleLinePOS."Sales Doc. Prepayment %" := PrepaymentPrc;
         SaleLinePOS."Sales Doc. Prepayment Value" := PrepaymentValue;
-        //+NPR5.51
-        //-NPR5.52 [352473]
         SaleLinePOS."Sales Doc. Prepay Is Percent" := not ValueIsAmount;
-        //+NPR5.52 [352473]
         SaleLinePOS."Sales Document Print" := Print;
-        //-NPR5.52 [352473]
         SaleLinePOS."Sales Document Send" := Send;
         SaleLinePOS."Sales Document Pdf2Nav" := Pdf2Nav;
-        //+NPR5.52 [352473]
         SaleLinePOS."Sales Document Sync. Posting" := SyncPosting;
         SaleLinePOS.Validate("Unit Price", PrepaymentAmount);
         SaleLinePOS.Description := StrSubstNo(PREPAYMENT, SalesHeader."Document Type", SalesHeader."No.");
@@ -1554,15 +1433,11 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
         SaleLinePOS: Record "NPR Sale Line POS";
         POSPrepaymentMgt: Codeunit "NPR POS Prepayment Mgt.";
     begin
-        //-NPR5.50 [300557]
         POSSession.GetSale(POSSale);
         POSSession.GetSaleLine(POSSaleLine);
         POSSale.GetCurrentSale(SalePOS);
 
-        //-NPR5.52 [352473]
-        //PrepaymentRefundAmount := GetTotalPrepaidAmountNotDeducted(SalesHeader);
         PrepaymentRefundAmount := POSPrepaymentMgt.GetPrepaymentAmountToDeductInclVAT(SalesHeader);
-        //+NPR5.52 [352473]
 
         POSSaleLine.GetNewSaleLine(SaleLinePOS);
         SaleLinePOS."Sale Type" := SaleLinePOS."Sale Type"::Deposit;
@@ -1573,17 +1448,14 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
         SaleLinePOS."Sales Document No." := SalesHeader."No.";
         SaleLinePOS."Sales Document Prepay. Refund" := true;
         SaleLinePOS."Sales Document Print" := Print;
-        //-NPR5.52 [352473]
         SaleLinePOS."Sales Document Send" := Send;
         SaleLinePOS."Sales Document Pdf2Nav" := Pdf2Nav;
-        //+NPR5.52 [352473]
         SaleLinePOS."Sales Document Sync. Posting" := SyncPosting;
         SaleLinePOS."Sales Document Delete" := DeleteDocumentAfter;
         SaleLinePOS.Validate("Unit Price", -PrepaymentRefundAmount);
         SaleLinePOS.Description := StrSubstNo(PREPAYMENT_REFUND, SalesHeader."Document Type", SalesHeader."No.");
         SaleLinePOS.UpdateAmounts(SaleLinePOS);
         POSSaleLine.InsertLineRaw(SaleLinePOS, false);
-        //+NPR5.50 [300557]
     end;
 
     procedure HandleLinkedDocuments(POSSession: Codeunit "NPR POS Session")
@@ -1594,7 +1466,6 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
         SaleLinePOS: Record "NPR Sale Line POS";
         SalesHeader: Record "Sales Header";
     begin
-        //-NPR5.50 [300557]
         //Error in this subscriber will block end-of-sale, but if we have several associated sales docs, some of them might post with commit before an error.
 
         POSSession.GetSale(POSSale);
@@ -1619,8 +1490,8 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
                             PostPrepaymentRefundBeforePOSSaleEnd(SalesHeader, SaleLinePOS);
 
                         "Sales Document Ship",
-                      "Sales Document Receive",
-                      "Sales Document Invoice":
+                        "Sales Document Receive",
+                        "Sales Document Invoice":
                             PostDocumentBeforePOSSaleEnd(SalesHeader, SaleLinePOS);
                     end;
                 end;
@@ -1628,7 +1499,6 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
 
             POSSaleLine.RefreshCurrent();
         end;
-        //+NPR5.50 [300557]
     end;
 
     local procedure OpenSalesDocCardAndSyncChangesBackToPOSSale(var SalesHeader: Record "Sales Header"; var SalePOS: Record "NPR Sale POS")
@@ -1636,7 +1506,6 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
         SalesHeader2: Record "Sales Header";
         ApplySalespersontoDocument: Codeunit "NPR Apply Salesperson to Doc.";
     begin
-        //-NPR5.53 [377510]
         SalesHeader2 := SalesHeader;
         SalesHeader2.SetRecFilter;
 
@@ -1650,14 +1519,12 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
 
         Commit;
         UpdateActiveSaleWithDocumentChanges(SalesHeader, SalePOS);
-        //+NPR5.53 [377510]
     end;
 
     local procedure UpdateActiveSaleWithDocumentChanges(SalesHeader: Record "Sales Header"; var SalePOS: Record "NPR Sale POS")
     var
         RetailSalesDocImpMgt: Codeunit "NPR Sales Doc. Imp. Mgt.";
     begin
-        //-NPR5.53 [377510]
         SalePOS."Sales Document Type" := SalesHeader."Document Type";
         SalePOS."Sales Document No." := SalesHeader."No.";
         SalePOS.Parameters := 'IMPORT_DOCUMENT_SYNC';
@@ -1666,7 +1533,6 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
             Error(ERR_ORDER_SALE_SYNC, SalesHeader."Document Type", SalesHeader."No.", GetLastErrorText);
 
         SalePOS.Get(SalePOS."Register No.", SalePOS."Sales Ticket No.");
-        //+NPR5.53 [377510]
     end;
 
     local procedure GetLocationCode(SalePOS: Record "NPR Sale POS"): Code[10]
@@ -1674,7 +1540,6 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
         POSStore: Record "NPR POS Store";
         Register: Record "NPR Register";
     begin
-        //-NPR5.54 [392239]
         case UseLocationFrom of
             UseLocationFrom::Register:
                 begin
@@ -1691,7 +1556,6 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
             UseLocationFrom::"Specific Location":
                 exit(UseLocationCode);
         end;
-        //+NPR5.54 [392239]
     end;
 
     local procedure SendICOrderConfirmation(var SalesHeader: Record "Sales Header")
@@ -1700,7 +1564,6 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
         ApprovalsMgmt: Codeunit "Approvals Mgmt.";
         ICInOutboxMgt: Codeunit ICInboxOutboxMgt;
     begin
-        //-NPR5.55 [401616]
         with SalesHeader do begin
             if not (
                 ("Document Type" in ["Document Type"::Order, "Document Type"::"Return Order"]) and
@@ -1720,12 +1583,9 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
 
             ICInOutboxMgt.SendSalesDoc(SalesHeader, false);
         end;
-        //+NPR5.55 [401616]
     end;
 
-    local procedure "--- Audit Roll Transfer"()
-    begin
-    end;
+    //--- Audit Roll Transfer ---
 
     procedure CreateDocumentPostingAudit(var SalesHeader: Record "Sales Header"; var SalePOS: Record "NPR Sale POS"; Posted: Boolean)
     var
@@ -1864,9 +1724,7 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
                 if AuditRoll.Offline then
                     AuditRoll.Posted := false;
 
-                //-NPR5.51 [358582]
                 RetailFormCode.OnBeforeAuditRoleLineInsertEvent(Sale, SaleLinePOS, AuditRoll);
-                //+NPR5.51 [358582]
 
                 AuditRoll.Insert(true);
                 DimMgt.CopySaleLineDimToAuditDim(SaleLinePOS, AuditRoll);
@@ -1907,9 +1765,7 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
                     if AuditRoll.Offline then
                         AuditRoll.Posted := false;
 
-                    //-NPR5.51 [358582]
                     RetailFormCode.OnBeforeAuditRoleLineInsertEvent(Sale, SaleLinePOS, AuditRoll);
-                    //+NPR5.51 [358582]
 
                     AuditRoll.Insert(true);
                 end;
@@ -1945,9 +1801,7 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
                     if AuditRoll.Offline then
                         AuditRoll.Posted := false;
 
-                    //-NPR5.51 [358582]
                     RetailFormCode.OnBeforeAuditRoleLineInsertEvent(Sale, SaleLinePOS, AuditRoll);
-                    //+NPR5.51 [358582]
 
                     AuditRoll.Insert(true);
                 end;
@@ -1955,9 +1809,7 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
             until SaleLinePOS.Next = 0;
     end;
 
-    procedure "--- Setup Functionality"()
-    begin
-    end;
+    //--- Setup Functionality ---
 
     local procedure GetSetupValues(var SalesHeader: Record "Sales Header"; Balance: Decimal)
     var
@@ -1965,13 +1817,8 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
     begin
         if not SkipDefaultValues then begin
             RetailSetup.Get;
-            //-NPR5.40 [304639]
             RetailPrint := RetailSetup."Retail Debitnote";
-            //+NPR5.40 [304639]
-            //-NPR5.40 [302617]
-            //  Print := RetailSetup."Sale Doc. Print On Post";
             SendPostedPdf2Nav := RetailSetup."Sale Doc. Print On Post";
-            //-NPR5.40 [302617]
             DocumentType := SalesHeader."Document Type";
             WriteInAuditRoll := true;
 
@@ -2060,31 +1907,22 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
             Post := Ship or Invoice or Receive or Ask;
     end;
 
-    local procedure "---Finish Credit Sale Workflow"()
-    begin
-        //NPR5.53 [378985]
-    end;
+    //---Finish Credit Sale Workflow ---
 
     [EventSubscriber(ObjectType::Table, 6150729, 'OnDiscoverPOSSalesWorkflows', '', true, false)]
     local procedure OnDiscoverPOSWorkflows(var Sender: Record "NPR POS Sales Workflow")
     begin
-        //-NPR5.53 [378985]
         Sender.DiscoverPOSSalesWorkflow(OnFinishCreditSaleCode(), OnFinishCreditSaleDescription, CurrCodeunitId(), 'OnFinishCreditSale');
-        //+NPR5.53 [378985]
     end;
 
     local procedure OnFinishCreditSaleCode(): Code[20]
     begin
-        //-NPR5.53 [378985]
         exit('FINISH_CREDIT_SALE');
-        //+NPR5.53 [378985]
     end;
 
     local procedure CurrCodeunitId(): Integer
     begin
-        //-NPR5.53 [378985]
         exit(CODEUNIT::"NPR Sales Doc. Exp. Mgt.");
-        //+NPR5.53 [378985]
     end;
 
     local procedure InvokeOnFinishCreditSaleWorkflow(SalePOS: Record "NPR Sale POS")
@@ -2092,8 +1930,8 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
         POSUnit: Record "NPR POS Unit";
         POSSalesWorkflowSetEntry: Record "NPR POS Sales WF Set Entry";
         POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step";
+        SalesDocExpMgt: Codeunit "NPR Sales Doc. Exp. Mgt.";
     begin
-        //-NPR5.53 [378985]
         POSSalesWorkflowStep.SetCurrentKey("Sequence No.");
         if POSUnit.Get(SalePOS."Register No.") and (POSUnit."POS Sales Workflow Set" <> '') and
            POSSalesWorkflowSetEntry.Get(POSUnit."POS Sales Workflow Set", OnFinishCreditSaleCode())
@@ -2107,19 +1945,14 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
             exit;
 
         repeat
-            asserterror
-            begin
-                OnFinishCreditSale(POSSalesWorkflowStep, SalePOS);
-                Commit;
-                Error('');
-            end;
+            Clear(SalesDocExpMgt);
+            SalesDocExpMgt.SetInvokeOnFinishCreditSaleSubsribers(POSSalesWorkflowStep);
+            if SalesDocExpMgt.Run(SalePOS) then;
+            Commit();
         until POSSalesWorkflowStep.Next = 0;
-        //+NPR5.53 [378985]
     end;
 
-    local procedure "--- Event Publishers"()
-    begin
-    end;
+    //--- Event Publishers ---
 
     [IntegrationEvent(true, false)]
     local procedure OnAfterDebitSalePostEvent(SalePOS: Record "NPR Sale POS"; SalesHeader: Record "Sales Header"; Posted: Boolean; WriteInAuditRoll: Boolean)
@@ -2129,7 +1962,5 @@ codeunit 6014407 "NPR Sales Doc. Exp. Mgt."
     [IntegrationEvent(false, false)]
     local procedure OnFinishCreditSale(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR Sale POS")
     begin
-        //NPR5.53 [378985]
     end;
 }
-

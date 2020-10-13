@@ -1,19 +1,21 @@
 codeunit 6151110 "NPR NpRi Reim. Sales Inv."
 {
-    // NPR5.53/MHA /20191104  CASE 364131 Object Created - NaviPartner Reimbursement - Sales Invoice
-
+    TableNo = "NPR NpRi Reimbursement Entry";
 
     trigger OnRun()
+    var
+        NpRiReimbursementEntryApply: Record "NPR NpRi Reimbursement Entry";
     begin
+        NpRiReimbursementEntryApply := Rec;
+        PostSalesInv(NpRiReimbursementEntryApply);
+        Rec := NpRiReimbursementEntryApply;
     end;
 
     var
         Text000: Label 'Sales Invoice';
         GeneralLedgerSetup: Record "General Ledger Setup";
 
-    local procedure "--- Discover"()
-    begin
-    end;
+    //--- Discover ---
 
     [EventSubscriber(ObjectType::Codeunit, 6151100, 'DiscoverModules', '', true, true)]
     local procedure DiscoverSalesInv(var NpRiModule: Record "NPR NpRi Reimbursement Module")
@@ -46,9 +48,7 @@ codeunit 6151110 "NPR NpRi Reim. Sales Inv."
             NpRiSalesInvSetup.Delete(RunTrigger);
     end;
 
-    local procedure "--- Setup Parameters"()
-    begin
-    end;
+    //--- Setup Parameters ---
 
     [EventSubscriber(ObjectType::Codeunit, 6151102, 'HasTemplateParameters', '', true, true)]
     procedure HasTemplateParameters(NpRiReimbursementTemplate: Record "NPR NpRi Reimbursement Templ."; var HasParameters: Boolean)
@@ -90,9 +90,7 @@ codeunit 6151110 "NPR NpRi Reim. Sales Inv."
         NpRiReimbursementTemplate.Modify(true);
     end;
 
-    local procedure "--- Reimbursement"()
-    begin
-    end;
+    //--- Reimbursement ---
 
     [EventSubscriber(ObjectType::Codeunit, 6151102, 'OnRunReimbursement', '', true, true)]
     local procedure OnRunReimbursement(var NpRiReimbursement: Record "NPR NpRi Reimbursement"; var NpRiReimbursementEntryApply: Record "NPR NpRi Reimbursement Entry"; var Handled: Boolean)
@@ -176,19 +174,16 @@ codeunit 6151110 "NPR NpRi Reim. Sales Inv."
 
         if TempNpRiReimbursementEntry.FindSet then
             repeat
-                asserterror
-                begin
-                    NpRiReimbursementEntryApply.Get(TempNpRiReimbursementEntry."Entry No.");
-                    if PostImmediately then
-                        PostSalesInv(NpRiReimbursementEntryApply);
-
-                    Commit;
-                    Error('');
+                if NpRiReimbursementEntryApply.Get(TempNpRiReimbursementEntry."Entry No.") and PostImmediately then begin
+                    ClearLastError();
+                    if Codeunit.Run(Codeunit::"NPR NpRi Reim. Sales Inv.", NpRiReimbursementEntryApply) then
+                        Commit()
+                    else begin
+                        LastErrorText := GetLastErrorText;
+                        if LastErrorText <> '' then
+                            ErrorText += LastErrorText + NewLine();
+                    end;
                 end;
-
-                LastErrorText := GetLastErrorText;
-                if LastErrorText <> '' then
-                    ErrorText += LastErrorText + NewLine();
             until TempNpRiReimbursementEntry.Next = 0;
 
         if ErrorText <> '' then
@@ -229,7 +224,7 @@ codeunit 6151110 "NPR NpRi Reim. Sales Inv."
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 80, 'OnAfterPostSalesDoc', '', true, true)]
-    local procedure OnAfterPostSalesInv(var SalesHeader: Record "Sales Header"; var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line"; SalesShptHdrNo: Code[20]; RetRcpHdrNo: Code[20]; SalesInvHdrNo: Code[20]; SalesCrMemoHdrNo: Code[20])
+    local procedure OnAfterPostSalesInv(var SalesHeader: Record "Sales Header"; SalesInvHdrNo: Code[20]; CommitIsSuppressed: Boolean)
     var
         NpRiReimbursementTemplate: Record "NPR NpRi Reimbursement Templ.";
         NpRiReimbursementEntry: Record "NPR NpRi Reimbursement Entry";
@@ -245,31 +240,28 @@ codeunit 6151110 "NPR NpRi Reim. Sales Inv."
         if not SalesInvHeader.Get(SalesInvHdrNo) then
             exit;
 
-        asserterror
-        begin
-            NpRiReimbursementTemplate.FindSet;
-            repeat
-                NpRiReimbursementEntry.SetRange("Template Code", NpRiReimbursementTemplate.Code);
-                NpRiReimbursementEntry.SetRange("Entry Type", NpRiReimbursementEntry."Entry Type"::Reimbursement);
-                NpRiReimbursementEntry.SetRange("Source Table No.", DATABASE::"Sales Header");
-                NpRiReimbursementEntry.SetRange("Source Record Position", SalesHeader.GetPosition(false));
-                if NpRiReimbursementEntry.FindSet then
-                    repeat
-                        NpRiReimbursementEntry.Description := SalesInvHeader."Posting Description";
-                        NpRiReimbursementEntry."Source Record ID" := SalesInvHeader.RecordId;
-                        NpRiReimbursementEntry."Source Table No." := DATABASE::"Sales Invoice Header";
-                        NpRiReimbursementEntry."Source Record Position" := SalesInvHeader.GetPosition(false);
-                        NpRiReimbursementEntry."Document Type" := NpRiReimbursementEntry."Document Type"::Invoice;
-                        NpRiReimbursementEntry."Document No." := SalesInvHeader."No.";
-                        NpRiReimbursementEntry."Account Type" := NpRiReimbursementEntry."Account Type"::Customer;
-                        NpRiReimbursementEntry."Account No." := SalesInvHeader."Bill-to Customer No.";
-                        NpRiReimbursementEntry.Modify;
-                    until NpRiReimbursementEntry.Next = 0;
-            until NpRiReimbursementTemplate.Next = 0;
+        NpRiReimbursementTemplate.FindSet;
+        repeat
+            NpRiReimbursementEntry.SetRange("Template Code", NpRiReimbursementTemplate.Code);
+            NpRiReimbursementEntry.SetRange("Entry Type", NpRiReimbursementEntry."Entry Type"::Reimbursement);
+            NpRiReimbursementEntry.SetRange("Source Table No.", DATABASE::"Sales Header");
+            NpRiReimbursementEntry.SetRange("Source Record Position", SalesHeader.GetPosition(false));
+            if NpRiReimbursementEntry.FindSet then
+                repeat
+                    NpRiReimbursementEntry.Description := SalesInvHeader."Posting Description";
+                    NpRiReimbursementEntry."Source Record ID" := SalesInvHeader.RecordId;
+                    NpRiReimbursementEntry."Source Table No." := DATABASE::"Sales Invoice Header";
+                    NpRiReimbursementEntry."Source Record Position" := SalesInvHeader.GetPosition(false);
+                    NpRiReimbursementEntry."Document Type" := NpRiReimbursementEntry."Document Type"::Invoice;
+                    NpRiReimbursementEntry."Document No." := SalesInvHeader."No.";
+                    NpRiReimbursementEntry."Account Type" := NpRiReimbursementEntry."Account Type"::Customer;
+                    NpRiReimbursementEntry."Account No." := SalesInvHeader."Bill-to Customer No.";
+                    NpRiReimbursementEntry.Modify;
+                until NpRiReimbursementEntry.Next = 0;
+        until NpRiReimbursementTemplate.Next = 0;
 
+        If not CommitIsSuppressed then
             Commit;
-            Error('');
-        end;
     end;
 
     local procedure ReapplyEntry(NpRiReimbursement: Record "NPR NpRi Reimbursement"; var NpRiReimbursementEntry: Record "NPR NpRi Reimbursement Entry"; var NpRiReimbursementEntryApply: Record "NPR NpRi Reimbursement Entry")
@@ -508,9 +500,7 @@ codeunit 6151110 "NPR NpRi Reim. Sales Inv."
         NpRiReimbursementEntryApply.Modify(true);
     end;
 
-    local procedure "--- Aux"()
-    begin
-    end;
+    //--- Aux ---
 
     local procedure CurrCodeunitId(): Integer
     begin
@@ -524,4 +514,3 @@ codeunit 6151110 "NPR NpRi Reim. Sales Inv."
         exit(CRLF);
     end;
 }
-
