@@ -50,6 +50,7 @@ jobs:
       - testRunName: 'Microsoft Base App tests'
         testApps:
           - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Misc.app'
+            testCodeunitsRange: '132500..138695|138698..' # skip CU138696 and CU138697 because of session issues
           - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Bank.app'
           - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Cash Flow.app'
           - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Cost Accounting.app'
