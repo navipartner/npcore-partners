@@ -1,9 +1,5 @@
 page 6014638 "NPR RP Template Card"
 {
-    // NPR5.32/MMV /20170424 CASE 241995 Retail Print 2.0
-    // NPR5.34/MMV /20170727 CASE 284505 Expose all column distributions.
-    // NPR5.41/MMV /20180417 CASE 311633 Added field "Default Decimal Rounding".
-
     Caption = 'Template Card';
     SourceTable = "NPR RP Template Header";
 
@@ -73,6 +69,10 @@ page 6014638 "NPR RP Template Card"
                 field("Default Decimal Rounding"; "Default Decimal Rounding")
                 {
                     ApplicationArea = All;
+                }
+                field("Log Output";"Log Output")
+                {
+                   ApplicationArea = All; 
                 }
             }
             group("Line Settings")
@@ -274,6 +274,17 @@ page 6014638 "NPR RP Template Card"
                     TemplateHeader.Get(Code);
                     TemplateHeader.Validate(Archived, true);
                 end;
+            }
+            action("Show Log")
+            {
+                Caption = 'Show Log';
+                Image = Log;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+                ApplicationArea = All;
+                RunObject = Page "NPR RP Template Output Log";
+                RunPageLink = "Template Name" = FIELD(Code);
             }
             action("View Archived Versions")
             {
