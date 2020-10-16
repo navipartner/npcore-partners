@@ -1,8 +1,6 @@
 table 6059897 "NPR Data Log Setup (Table)"
 {
-    // DL1.00/MHA /20140801  NP-AddOn: Data Log
-    //   - This Table contains Setup information of which Record Changes to log.
-    // DL1.16/MHA /20191127  Extended length of field 2 "Table Name" from 30 to 250
+    //This Table contains Setup information of which Record Changes to log.
 
     Caption = 'Data Log Setup (Table)';
     DataClassification = CustomerContent;
@@ -17,10 +15,8 @@ table 6059897 "NPR Data Log Setup (Table)"
         }
         field(2; "Table Name"; Text[250])
         {
-            CalcFormula = Lookup (AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Table),
-                                                                           "Object ID" = FIELD("Table ID")));
+            CalcFormula = Lookup(AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Table), "Object ID" = FIELD("Table ID")));
             Caption = 'Table Name';
-            Description = 'DL1.16';
             Editable = false;
             FieldClass = FlowField;
         }
@@ -49,6 +45,13 @@ table 6059897 "NPR Data Log Setup (Table)"
         {
             Caption = 'Keep Log For';
             DataClassification = CustomerContent;
+        }
+        field(20; "Ignored Fields"; Integer)
+        {
+            Caption = 'Ignored Fields';
+            Editable = false;
+            FieldClass = FlowField;
+            CalcFormula = count("NPR Data Log Setup (Field)" where("Table ID" = field("Table ID")));
         }
         field(110; "User ID"; Code[250])
         {
@@ -87,6 +90,15 @@ table 6059897 "NPR Data Log Setup (Table)"
         "Last Date Modified" := CurrentDateTime;
     end;
 
+    trigger OnDelete()
+    var
+        DataLogSetupField: Record "NPR Data Log Setup (Field)";
+    begin
+        DataLogSetupField.SetRange("Table ID", "Table ID");
+        if not DataLogSetupField.IsEmpty then
+            DataLogSetupField.DeleteAll();
+    end;
+
     var
         DataLogMgt: Codeunit "NPR Data Log Management";
 
@@ -106,4 +118,3 @@ table 6059897 "NPR Data Log Setup (Table)"
         Insert(true);
     end;
 }
-
