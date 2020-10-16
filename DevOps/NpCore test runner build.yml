@@ -50,7 +50,7 @@ jobs:
       - testRunName: 'Microsoft Base App tests'
         testApps:
           - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Misc.app'
-            disabledTests: '@{CodeunitName = "Page Troubleshooting Test"; Method = "*"},@{CodeunitName = "Profile Import/Export Test"; Method = "*"}' # skip CU138696 and CU138697 because of session issues              
+            disabledTests: '@{CodeunitName = "Page Troubleshooting Test"; Method = "*"},@{CodeunitName = "Profile Import/Export Test"; Method = "*"}' # skip CU138696 and CU138697 because of session issues
           - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Bank.app'
           - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Cash Flow.app'
           - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Cost Accounting.app'
