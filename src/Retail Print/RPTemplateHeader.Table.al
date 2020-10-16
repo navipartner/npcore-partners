@@ -1,11 +1,5 @@
 table 6014446 "NPR RP Template Header"
 {
-    // NPR5.30/MMV /20170301  CASE 241995 Retail Print 2.0
-    // NPR5.32/MMV /20170411  CASE 241995 Retail Print 2.0
-    // NPR5.34/MHA /20170721  CASE 282799 Added FlowField 1000 "Table ID"
-    // NPR5.34/MMV /20170724  CASE 284505 Expose all column distributions for custom setup.
-    // NPR5.41/MMV /20180417  CASE 311633 Added field "Default Decimal Rounding"
-
     Caption = 'RP Template Header';
     DrillDownPageID = "NPR RP Template List";
     LookupPageID = "NPR RP Template List";
@@ -182,6 +176,11 @@ table 6014446 "NPR RP Template Header"
             Caption = 'Default Decimal Rounding';
             OptionCaption = '2,3,4,5';
             OptionMembers = "2","3","4","5";
+            DataClassification = CustomerContent;
+        }
+        field(100; "Log Output"; Boolean)
+        {
+            Caption = 'Log Output';
             DataClassification = CustomerContent;
         }
         field(1000; "Table ID"; Integer)
