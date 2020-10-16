@@ -1,17 +1,5 @@
 page 6059897 "NPR Data Log Setup"
 {
-    // DL1.00/MHA /20140801  NP-AddOn: Data Log
-    //   - This Page contains Setup information of which Record Changes to log.
-    // DL1.01/MHA /20140820  NP-AddOn: Data Log
-    //   - Added Menu Item: Data Log Subscribers for defining consumers of the Data Log.
-    // DL1.07/MHA /20150515  CASE 214248 Added field "Last Log Update Entry No." and "Last Date Modified"
-    // DL1.11/MHA /20160601  CASE 242299 Functionality to Add Records to Data Log using Dynamice Request Page
-    // DL1.12/TR  /20161012  CASE 250790 Added COPYSTR on "Table Name" as RequestPageParametersHelper functions only takes text parameter of size 20.
-    // DL1.13/MHA /20170801  CASE 285518 Removed NPR5.27 from Version List and replaced with DL1.12
-    // DL1.15/BR  /20171128  CASE 297941 Add Primary Key fields to FilterRequestPage so that data log is visible in Web Client
-    // NPR5.40/TS  /20180319  CASE 308461 Reworked Adding field filter
-    // NPR5.41/BHR  /20180419  CASE 308556 Filter is not being applied on the RequestPage. Another workaround implemented.
-
     Caption = 'Data Log Setup';
     DelayedInsert = true;
     PageType = List;
@@ -28,6 +16,25 @@ page 6059897 "NPR Data Log Setup"
                 field("Table ID"; "Table ID")
                 {
                     ApplicationArea = All;
+
+                    trigger OnValidate()
+                    begin
+                        CalcFields("Table Name");
+                    end;
+
+                    trigger OnLookup(var Text: Text): Boolean
+                    var
+                        AllObjectsWithCaption: Record AllObjWithCaption;
+                    begin
+                        AllObjectsWithCaption.FilterGroup(2);
+                        AllObjectsWithCaption.SetRange("Object Type", AllObjectsWithCaption."Object Type"::Table);
+                        AllObjectsWithCaption.FilterGroup(0);
+                        if Page.RunModal(Page::"All Objects with Caption", AllObjectsWithCaption) = Action::LookupOK then begin
+                            Text := Format(AllObjectsWithCaption."Object ID");
+                            exit(true);
+                        end;
+                        exit(false);
+                    end;
                 }
                 field("Table Name"; "Table Name")
                 {
@@ -40,6 +47,17 @@ page 6059897 "NPR Data Log Setup"
                 field("Log Modification"; "Log Modification")
                 {
                     ApplicationArea = All;
+                }
+                field("Ignored Fields"; "Ignored Fields")
+                {
+                    ApplicationArea = All;
+                    BlankZero = true;
+
+                    trigger OnAssistEdit()
+                    begin
+                        TestField("Log Modification");
+                        AssistEditIgnoreList();
+                    end;
                 }
                 field("Log Deletion"; "Log Deletion")
                 {
@@ -89,9 +107,21 @@ page 6059897 "NPR Data Log Setup"
 
                 trigger OnAction()
                 begin
-                    //-DL1.11
                     AddRecordsToDataLog();
-                    //+DL1.11
+                end;
+            }
+            action(SetupIgnoreList)
+            {
+                Caption = 'Set Ignored Fields';
+                Image = MaintenanceRegistrations;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+                ApplicationArea = All;
+
+                trigger OnAction()
+                begin
+                    AssistEditIgnoreList();
                 end;
             }
         }
@@ -140,7 +170,6 @@ page 6059897 "NPR Data Log Setup"
         Counter: Integer;
         Total: Integer;
     begin
-        //-DL1.11
         if not RunDynamicRequestPage(Filters, '') then
             exit;
 
@@ -159,16 +188,12 @@ page 6059897 "NPR Data Log Setup"
             DataLogMgt.OnDatabaseInsert(RecRef);
         until RecRef.Next = 0;
         Window.Close;
-        //+DL1.11
     end;
 
     procedure CleanDataLog()
     begin
         if Confirm(Text001, false) then
-            //-DL1.07
-            //DataLogMgt.CleanDataLog();
             DataLogSubscriberMgt.CleanDataLog();
-        //+DL1.07
         CurrPage.Update(false);
     end;
 
@@ -185,11 +210,9 @@ page 6059897 "NPR Data Log Setup"
         DynamicRequestPageField: Record "Dynamic Request Page Field";
         DynamicRequestPageField1: Record "Dynamic Request Page Field";
     begin
-        //-DL1.11
         if not TableMetadata.Get("Table ID") then
             exit(false);
 
-        //-NPR5.41 [308556]
         DynamicRequestPageField.SetRange("Table ID", "Table ID");
         if not DynamicRequestPageField.FindSet then begin
             RecRef.Open("Table ID");
@@ -205,59 +228,20 @@ page 6059897 "NPR Data Log Setup"
                 Commit;
             end;
         end;
-        //+NPR5.41 [308556]
 
-        //-DL1.12 [250790]
-        //IF NOT RequestPageParametersHelper.BuildDynamicRequestPage(FilterPageBuilder,"Table Name","Table ID") THEN
         if not RequestPageParametersHelper.BuildDynamicRequestPage(FilterPageBuilder, CopyStr("Table Name", 1, 20), "Table ID") then
-            //+DL1.12 [250790]
             exit(false);
         if Filters <> '' then
-            //-DL1.12 [250790]
-            //IF NOT RequestPageParametersHelper.SetViewOnDynamicRequestPage(
-            //FilterPageBuilder,Filters,"Table Name","Table ID")
-            if not RequestPageParametersHelper.SetViewOnDynamicRequestPage(
-             FilterPageBuilder, Filters, CopyStr("Table Name", 1, 20), "Table ID")
-          //+DL1.12 [250790]
-          then
+            if not RequestPageParametersHelper.SetViewOnDynamicRequestPage(FilterPageBuilder, Filters, CopyStr("Table Name", 1, 20), "Table ID") then
                 exit(false);
-        //-NPR5.40 [308461]
-        //-DL1.15 [297941]
-        //RecRef.OPEN("Table ID");
 
-        //RecRef.CURRENTKEYINDEX(1);
-        //KyRef := RecRef.KEYINDEX(1);
-        //FOR j := 1 TO KyRef.FIELDCOUNT DO BEGIN
-        //FOR j := 1 TO 3 DO BEGIN
-        //  CLEAR(FldRef);
-        //  //FldRef := KyRef.FIELDINDEX(j);
-        //  FldRef := RecRef.FIELDINDEX(j);
-        //  //FilterPageBuilder.ADDFIELDNO(COPYSTR("Table Name",1,20),FldRef.NUMBER);
-        //  FilterPageBuilder.ADDFIELDNO(COPYSTR("Table Name",1,MAXSTRLEN("Table Name")),FldRef.NUMBER);
-        //END;
-        //+DL1.15 [297941]
-        //-NPR5.41 [308556]
-        // RecRef.OPEN("Table ID");
-        // FOR j := 1 TO 3 DO BEGIN
-        //  FilterPageBuilder.ADDRECORDREF(COPYSTR("Table Name",1,MAXSTRLEN("Table Name")),RecRef);
-        //  FldRef := RecRef.FIELDINDEX(j);
-        //  FilterPageBuilder.ADDFIELDNO(COPYSTR("Table Name",1,MAXSTRLEN("Table Name")),FldRef.NUMBER);
-        // END;
-        //+NPR5.41 [308556]
-        //+NPR5.40 [308461]
         FilterPageBuilder.PageCaption := StrSubstNo(Text003, "Table Name");
         if not FilterPageBuilder.RunModal then
             exit(false);
 
-        //-DL1.12 [250790]
-        //ReturnFilters :=
-        //  RequestPageParametersHelper.GetViewFromDynamicRequestPage(FilterPageBuilder,"Table Name","Table ID");
-        ReturnFilters :=
-          RequestPageParametersHelper.GetViewFromDynamicRequestPage(FilterPageBuilder, CopyStr("Table Name", 1, 20), "Table ID");
-        //+DL1.12 [250790]
+        ReturnFilters := RequestPageParametersHelper.GetViewFromDynamicRequestPage(FilterPageBuilder, CopyStr("Table Name", 1, 20), "Table ID");
 
         exit(true);
-        //+DL1.11
     end;
 
     local procedure SetFiltersOnTable(Filters: Text; var RecRef: RecordRef): Boolean
@@ -266,7 +250,6 @@ page 6059897 "NPR Data Log Setup"
         RequestPageParametersHelper: Codeunit "Request Page Parameters Helper";
         OutStream: OutStream;
     begin
-        //-DL1.11
         RecRef.Open("Table ID");
 
         if Filters = '' then
@@ -280,7 +263,19 @@ page 6059897 "NPR Data Log Setup"
             exit(false);
 
         exit(RecRef.FindSet);
-        //+DL1.11
+    end;
+
+    local procedure AssistEditIgnoreList()
+    var
+        "Field": Record "Field";
+        DataLogSetupFieldList: Page "NPR Data Log Setup Ignore List";
+    begin
+        Field.FilterGroup(2);
+        Field.SetRange(TableNo, "Table ID");
+        Field.SetFilter(ObsoleteState, '<>%1', Field.ObsoleteState::Removed);
+        Field.FilterGroup(0);
+        DataLogSetupFieldList.SetTableView(Field);
+        DataLogSetupFieldList.RunModal();
+        CalcFields("Ignored Fields");
     end;
 }
-

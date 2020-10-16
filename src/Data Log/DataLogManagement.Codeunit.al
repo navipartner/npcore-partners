@@ -1,26 +1,5 @@
 codeunit 6059899 "NPR Data Log Management"
 {
-    // DL1.00/MHA /20140801              NP-AddOn: Data Log
-    //                                   - This codeunit contains functions for logging Records Changes.
-    // DL1.01/MHA /20140820              Added/Updated Data Processing Functions
-    // DL1.02/MHA /20140820              Added Subscriber functionality for retrieving new Records.
-    //                                   - Removed TempDataLogSubscriber and replaced with real subscribers as they may change frequently due to Last Log Entry No.
-    // DL1.03/MHA /20140909  CASE 184907 Added Update of Subscribers Last Date Modified when getting new records.
-    // DL1.04/MHA /20141017  CASE 184907 Refactored GetNewRecords functions in order to retrieve new records chronologically.
-    // DL1.05/MHA /20141128  CASE 188079 Refactored GetNewRecords from handling each table one at a time to get all new records in one batch.
-    //                                   - Renamed function GetNewRecordsFromTableID() to InsertNewTempRecords().
-    //                                   - Added Extra filter to OnDatabaseTriggers as they might be loaded from other modules.
-    // DL1.06/MHA /20150126  CASE 203653 Changed functions for getting new records according to MaxCount.
-    // DL1.07/MHA /20150515  CASE 207589 Moved subscriber functionality to Data Log Subscriber Mgt.
-    // DL1.09/MHA /20151124  CASE 227978 All and only primary keys are logged during rename.
-    // DL1.12/TS  /20170317  CASE 269142 Delete Previous Record after renaming of primary key
-    // DL1.13/MHA /20170801  CASE 285518 Temporary Tables should not be logged
-    // DL1.15/MHA /20171123  CASE 297502 Added function DisableDataLog()
-    // NPR5.38/LS  /20171218 CASE 300124 Set property OnMissingLicense to Skip on all Functions
-    // NPR5.44/JDH /20180731  CASE 323499 Changed all functions to be External
-    // TM1.39/THRO/20181126 CASE 334644 Replaced Coudeunit 1 by Wrapper Codeunit
-    // NPR5.48/MHA /20190213  CASE 344618 Fields with ObsoleteState = Removed should be ignored
-
     Permissions = TableData "NPR Data Log Setup (Table)" = rimd,
                   TableData "NPR Data Log Record" = rimd;
     SingleInstance = true;
@@ -30,14 +9,16 @@ codeunit 6059899 "NPR Data Log Management"
     end;
 
     var
-        Text001: Label 'Error creating %1 - %2. It already exists.';
+        TempDataLogSetup: Record "NPR Data Log Setup (Table)" temporary;
+        TempDataLogSetupField: Record "NPR Data Log Setup (Field)" temporary;
         DataLogSubscriberMgt: Codeunit "NPR Data Log Sub. Mgt.";
         DataLogChecked: Boolean;
         DataLogActivated: Boolean;
         MonitoredTablesLoaded: Boolean;
-        TempDataLogSetup: Record "NPR Data Log Setup (Table)" temporary;
         DataLogDisabled: Boolean;
-        "--- Debug": Integer;
+        Text001: Label 'Error creating %1 - %2. It already exists.';
+
+        //--- Debug ---
         StartTime: Time;
 
     [EventSubscriber(ObjectType::Codeunit, 6014427, 'OnAfterGetDatabaseTableTriggerSetup', '', true, false)]
@@ -75,14 +56,11 @@ codeunit 6059899 "NPR Data Log Management"
         TimeStamp: DateTime;
         RecordEntryNo: BigInteger;
     begin
-        //-DL1.15 [297502]
         if DataLogDisabled then
             exit;
-        //+DL1.15 [297502]
-        //-DL1.13 [285518]
         if RecRef.IsTemporary then
             exit;
-        //+DL1.13 [285518]
+
         TimeStamp := CurrentDateTime;
         if not MonitoredTablesLoaded then begin
             MonitoredTablesLoaded := true;
@@ -95,10 +73,7 @@ codeunit 6059899 "NPR Data Log Management"
         if TempDataLogSetup."Log Insertion" = TempDataLogSetup."Log Insertion"::Detailed then
             InsertDataFields(RecRef, RecordEntryNo, TimeStamp, false);
 
-        //-DL1.07
-        //ProcessRecord('',TRUE,RecordEntryNo);
         DataLogSubscriberMgt.ProcessRecord('', true, RecordEntryNo);
-        //+DL1.07
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014427, 'OnAfterOnDatabaseModify', '', true, false)]
@@ -107,33 +82,27 @@ codeunit 6059899 "NPR Data Log Management"
         TimeStamp: DateTime;
         RecordEntryNo: BigInteger;
     begin
-        //-DL1.15 [297502]
         if DataLogDisabled then
             exit;
-        //+DL1.15 [297502]
-        //-DL1.13 [285518]
         if RecRef.IsTemporary then
             exit;
-        //+DL1.13 [285518]
+
         TimeStamp := CurrentDateTime;
         if not MonitoredTablesLoaded then begin
             MonitoredTablesLoaded := true;
             LoadMonTables;
         end;
-        if (not TempDataLogSetup.Get(RecRef.Number)) or (TempDataLogSetup."Log Modification" = TempDataLogSetup."Log Modification"::" ")
-        then
+        if (not TempDataLogSetup.Get(RecRef.Number)) or (TempDataLogSetup."Log Modification" = TempDataLogSetup."Log Modification"::" ") then
+            exit;
+
+        if OnlyIgroredFieldsModified(RecRef) then
             exit;
 
         RecordEntryNo := InsertDataRecord(RecRef, TimeStamp, 1);
-        if TempDataLogSetup."Log Modification" in [TempDataLogSetup."Log Modification"::Detailed, TempDataLogSetup."Log Modification"::
-        Changes] then
-            InsertDataFields(RecRef, RecordEntryNo, TimeStamp, TempDataLogSetup."Log Modification" = TempDataLogSetup."Log Modification"::
-          Changes);
+        if TempDataLogSetup."Log Modification" in [TempDataLogSetup."Log Modification"::Detailed, TempDataLogSetup."Log Modification"::Changes] then
+            InsertDataFields(RecRef, RecordEntryNo, TimeStamp, TempDataLogSetup."Log Modification" = TempDataLogSetup."Log Modification"::Changes);
 
-        //-DL1.07
-        //ProcessRecord('',TRUE,RecordEntryNo);
         DataLogSubscriberMgt.ProcessRecord('', true, RecordEntryNo);
-        //+DL1.07
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014427, 'OnAfterOnDatabaseDelete', '', true, false)]
@@ -144,14 +113,11 @@ codeunit 6059899 "NPR Data Log Management"
         TimeStamp: DateTime;
         RecordEntryNo: BigInteger;
     begin
-        //-DL1.15 [297502]
         if DataLogDisabled then
             exit;
-        //+DL1.15 [297502]
-        //-DL1.13 [285518]
         if RecRef.IsTemporary then
             exit;
-        //+DL1.13 [285518]
+
         TimeStamp := CurrentDateTime;
         if not MonitoredTablesLoaded then begin
             MonitoredTablesLoaded := true;
@@ -163,10 +129,8 @@ codeunit 6059899 "NPR Data Log Management"
         RecordEntryNo := InsertDataRecord(RecRef, TimeStamp, 3);
         if TempDataLogSetup."Log Deletion" = TempDataLogSetup."Log Deletion"::Detailed then
             InsertDataFields(RecRef, RecordEntryNo, TimeStamp, false);
-        //-DL1.07
-        //ProcessRecord('',TRUE,RecordEntryNo);
+
         DataLogSubscriberMgt.ProcessRecord('', true, RecordEntryNo);
-        //+DL1.07
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014427, 'OnAfterOnDatabaseRename', '', true, false)]
@@ -176,14 +140,11 @@ codeunit 6059899 "NPR Data Log Management"
         RecordEntryNo: BigInteger;
         PreviousRecordEntryNo: BigInteger;
     begin
-        //-DL1.15 [297502]
         if DataLogDisabled then
             exit;
-        //+DL1.15 [297502]
-        //-DL1.13 [285518]
         if RecRef.IsTemporary then
             exit;
-        //+DL1.13 [285518]
+
         TimeStamp := CurrentDateTime;
         if not MonitoredTablesLoaded then begin
             MonitoredTablesLoaded := true;
@@ -196,30 +157,15 @@ codeunit 6059899 "NPR Data Log Management"
            (TempDataLogSetup."Log Deletion" = TempDataLogSetup."Log Deletion"::" ") then
             exit;
 
-        //-DL1.12 [269142]
         PreviousRecordEntryNo := InsertDataRecord(xRecRef, TimeStamp, 3);
         DataLogSubscriberMgt.ProcessRecord('', true, PreviousRecordEntryNo);
-        //+DL1.12 [269142]
         RecordEntryNo := InsertDataRecordRename(RecRef, xRecRef, TimeStamp, 2);
-        //-DL1.09
-        //IF (TempDataLogSetup."Log Deletion" = TempDataLogSetup."Log Deletion"::Detailed) OR
-        //   (TempDataLogSetup."Log Modification" = TempDataLogSetup."Log Modification"::Detailed) OR
-        //   (TempDataLogSetup."Log Insertion" = TempDataLogSetup."Log Insertion"::Detailed) THEN
-        //  InsertDataFields(XRecRef,RecordEntryNo,TimeStamp,FALSE)
-        //ELSE
-        //  InsertPKDataFields(RecRef,XRecRef, RecordEntryNo,TimeStamp,FALSE);
         InsertPKDataFields(RecRef, xRecRef, RecordEntryNo, TimeStamp, false);
-        //+DL1.09
 
-        //-DL1.07
-        //ProcessRecord('',TRUE,RecordEntryNo);
         DataLogSubscriberMgt.ProcessRecord('', true, RecordEntryNo);
-        //+DL1.07
     end;
 
-    procedure "--- Setup"()
-    begin
-    end;
+    //--- Setup ---
 
     procedure InitializeIntegrationRecords(TableID: Integer)
     var
@@ -257,14 +203,10 @@ codeunit 6059899 "NPR Data Log Management"
 
     procedure DisableDataLog(Disable: Boolean)
     begin
-        //-DL1.15 [297502]
         DataLogDisabled := Disable;
-        //+DL1.15 [297502]
     end;
 
-    local procedure "--- Database"()
-    begin
-    end;
+    //--- Database ---
 
     local procedure InsertDataFields(var RecRef: RecordRef; RecordEntryNo: BigInteger; LastModified: DateTime; LogChanges: Boolean)
     var
@@ -288,31 +230,31 @@ codeunit 6059899 "NPR Data Log Management"
 
         Field.Reset;
         Field.SetRange(TableNo, RecRef.Number);
-        //-NPR5.48 [344618]
         Field.SetFilter(ObsoleteState, '<>%1', Field.ObsoleteState::Removed);
-        //+NPR5.48 [344618]
         if Field.FindSet then
             repeat
                 FieldRef := RecRef.Field(Field."No.");
-                FieldRefInit := RecRefInit.Field(Field."No.");
-                if CheckValueChanged then begin
-                    xFieldRef := xRecRef.Field(Field."No.");
-                    FieldValueChanged := (xFieldRef.Value <> FieldRef.Value) and (UpperCase(Format(xFieldRef.Class)) <> 'FLOWFIELD');
-                end;
-                if (Format(FieldRef.Value, 0, 9) <> Format(FieldRefInit.Value, 0, 9)) or (FieldValueChanged) then begin
-                    if UpperCase(Format(FieldRef.Class)) = 'FLOWFIELD' then
-                        FieldRef.CalcField;
-                    DataLogField.Init;
-                    DataLogField."Entry No." := 0;
-                    DataLogField."Table ID" := RecRef.Number;
-                    DataLogField."Log Date" := LastModified;
-                    DataLogField."Field No." := FieldRef.Number;
-                    DataLogField."Field Value" := Format(FieldRef.Value, 0, 9);
-                    DataLogField."Data Log Record Entry No." := RecordEntryNo;
-                    DataLogField."Field Value Changed" := FieldValueChanged;
-                    if FieldValueChanged then
-                        DataLogField."Previous Field Value" := Format(xFieldRef.Value, 0, 9);
-                    DataLogField.Insert;
+                if not IsIgnoredField(RecRef.Number, FieldRef.Number) then begin
+                    FieldRefInit := RecRefInit.Field(Field."No.");
+                    if CheckValueChanged then begin
+                        xFieldRef := xRecRef.Field(Field."No.");
+                        FieldValueChanged := (xFieldRef.Value <> FieldRef.Value) and (UpperCase(Format(xFieldRef.Class)) <> 'FLOWFIELD');
+                    end;
+                    if (Format(FieldRef.Value, 0, 9) <> Format(FieldRefInit.Value, 0, 9)) or (FieldValueChanged) then begin
+                        if UpperCase(Format(FieldRef.Class)) = 'FLOWFIELD' then
+                            FieldRef.CalcField;
+                        DataLogField.Init;
+                        DataLogField."Entry No." := 0;
+                        DataLogField."Table ID" := RecRef.Number;
+                        DataLogField."Log Date" := LastModified;
+                        DataLogField."Field No." := FieldRef.Number;
+                        DataLogField."Field Value" := Format(FieldRef.Value, 0, 9);
+                        DataLogField."Data Log Record Entry No." := RecordEntryNo;
+                        DataLogField."Field Value Changed" := FieldValueChanged;
+                        if FieldValueChanged then
+                            DataLogField."Previous Field Value" := Format(xFieldRef.Value, 0, 9);
+                        DataLogField.Insert;
+                    end;
                 end;
             until Field.Next = 0;
 
@@ -381,5 +323,77 @@ codeunit 6059899 "NPR Data Log Management"
 
         exit(DataLogRecord."Entry No.");
     end;
-}
 
+    local procedure OnlyIgroredFieldsModified(var RecRef: RecordRef): Boolean
+    var
+        DataLogSetupField: Record "NPR Data Log Setup (Field)";
+        "Field": Record "Field";
+        xRecRef: RecordRef;
+        FldRef: FieldRef;
+        xFldRef: FieldRef;
+    begin
+        if NoIgnoreListIsSetupForTable(RecRef.Number) then
+            exit(false);
+
+        xRecRef := RecRef.Duplicate;
+        if not xRecRef.Find then
+            exit(false);
+
+        Field.SetRange(TableNo, RecRef.Number);
+        Field.SetFilter(ObsoleteState, '<>%1', Field.ObsoleteState::Removed);
+        Field.SetRange(Class, Field.Class::Normal);
+        if Field.FindSet then
+            repeat
+                FldRef := RecRef.Field(Field."No.");
+                xFldRef := xRecRef.Field(Field."No.");
+                if xFldRef.Value <> FldRef.Value then begin
+                    if not IsIgnoredField(RecRef.Number, FldRef.Number) then
+                        exit(false);
+                end;
+            until Field.Next = 0;
+
+        exit(true);
+    end;
+
+    local procedure NoIgnoreListIsSetupForTable(TableID: Integer): Boolean
+    var
+        DataLogSetupField: Record "NPR Data Log Setup (Field)";
+    begin
+        if TempDataLogSetupField.Get(TableID, 0) then
+            exit(true);
+
+        TempDataLogSetupField.SetRange("Table ID", TableID);
+        if not TempDataLogSetup.IsEmpty then
+            exit(false);
+
+        DataLogSetupField.SetRange("Table ID", TableID);
+        DataLogSetupField.SetRange("Ignore Modification", true);
+        if DataLogSetupField.IsEmpty then begin
+            TempDataLogSetupField.Init();
+            TempDataLogSetupField."Table ID" := TableID;
+            TempDataLogSetupField."Field No." := 0;
+            TempDataLogSetupField.Insert();
+            exit(true);
+        end else
+            exit(false);
+    end;
+
+    local procedure IsIgnoredField(TableID: Integer; FieldNo: Integer): Boolean
+    var
+        DataLogSetupField: Record "NPR Data Log Setup (Field)";
+    begin
+        if NoIgnoreListIsSetupForTable(TableID) then
+            exit(false);
+
+        if not TempDataLogSetupField.get(TableID, FieldNo) then begin
+            if not DataLogSetupField.get(TableID, FieldNo) then begin
+                TempDataLogSetupField.Init();
+                TempDataLogSetupField."Table ID" := TableID;
+                TempDataLogSetupField."Field No." := FieldNo;
+            end else
+                TempDataLogSetupField := DataLogSetupField;
+            TempDataLogSetupField.Insert();
+        end;
+        exit(TempDataLogSetupField."Ignore Modification");
+    end;
+}
