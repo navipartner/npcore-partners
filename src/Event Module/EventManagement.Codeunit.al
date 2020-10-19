@@ -1,52 +1,5 @@
 codeunit 6060150 "NPR Event Management"
 {
-    // NPR5.31/TJ  /20170315 CASE 269162 "Planning Date" taken from header "Starting Date" if not empty
-    //                                   Changed how the Status field is getting updated
-    //                                   Recoded some lines using file name functions
-    //                                   Moved CopyAttributes function to "Event Attribute Management" codeunit
-    //                                   Moved global TextConstant NothingToCopyTxt to function CopyTemplates
-    //                                   Task Line is now created regardless of "Event Status"
-    // NPR5.32/TJ  /20170516 CASE 275957 Fixed a problem when copying template didn't copy BLOBs as well
-    //                                   CopyTemplate will now properly apply new event description on copied layout
-    //                                   Fixed a problem when copying a job that has allready been copied so templates were taken from original job rather then new source job
-    // NPR5.32/TJ  /20170519 CASE 275966 Changed how resource availability is checked
-    //                                   Removed local variable JobsSetup from all the functions so global variable is used instead
-    // NPR5.32/TJ  /20170519 CASE 275950 Updating planning lines if Starting Date is changed
-    // NPR5.32/TJ  /20170523 CASE 276753 Updating External Document No. with Job No. when creating sales invoice
-    // NPR5.32/TJ  /20170523 CASE 275963 Raising question to update date on planning lines only if coming from Starting Date field on header
-    // NPR5.32/TJ  /20170525 CASE 278090 Checking if job exists before checking resource availability
-    // NPR5.33/TJ  /20170607 CASE 277972 When job is deleted related new table Event Attribute is also deleted
-    // NPR5.33/TJ  /20170626 CASE 275966 Fixed time frame recognition by checking same start/end time
-    //                                   Displaying only marked lines so if same time frame falls into multiple rules it doesn't get showed multiple times
-    // NPR5.34/TJ  /20170707 CASE 277938 Function CreateFileName changed
-    //                                   When job is deleted so are exchange integration templates related to that job
-    //                                   When job is copied so are exchange integration templates related to that job
-    // NPR5.35/TJ  /20170731 CASE 275959 New subscribers to new field "Event Customer No." and standard field "Bill-to Customer No."
-    // NPR5.35/TJ  /20170803 CASE 285826 Recoded usage of .NET assemblies that are specific for current NAV version
-    // NPR5.35/TJ  /20170818 CASE 277938 Fixed a bug regarding copying exch. templates when copying event
-    // NPR5.35/TJ  /20170821 CASE 287270 Over capacitate setup is now checked for time frame availability as well
-    // NPR5.36/TJ  /20170901 CASE 289046 Reseting custom fields when Type is changed
-    // NPR5.36/TJ  /20170911 CASE 287267 Not validating Status when Completed as it changes Ending Date
-    // NPR5.36/TJ  /20170911 CASE 275966 Fixing issue with Status field not properly updating
-    // NPR5.38/TJ  /20171004 CASE 291965 New functionalities to find/update/calculate price/amount with VAT
-    // NPR5.38/TJ  /20171128 CASE 296160 Changing customer requires confirmation
-    // NPR5.40/TJ  /20180124 CASE 301375 Events in status Planning are now also included when checking for available capacity on resources
-    //                                   Time frame availability check was not checking on proper date when event was created as a copy
-    // NPR5.40/TJ  /20180306 CASE 307328 Comments are also copied when event is copied
-    // NPR5.44/TJ  /20180723 CASE 322879 Function CheckResTimeFrameAvailability changed to global
-    // NPR5.48/TJ  /20181119 CASE 287903 Added new process that allows posting inventory directly from sales invoice created from job
-    // NPR5.49/TJ  /20181207 CASE 331208 Integration with POS
-    // NPR5.49/TJ  /20190226 CASE 346780 Fixed an issue with specifying time on type thats not a resource
-    // NPR5.53/TJ  /20200110 CASE 346821 New functions to set statuses on Jobs Setup page
-    //                                   New process to block deletion of events in specified status
-    // NPR5.53/TJ  /20200206 CASE 385993 Fixed a bug preventing event delete with no setup
-    // NPR5.54/TJ  /20200306 CASE 395153 Fixed a bug where forced inventory posting was allowing sales invoice modifications
-    // NPR5.55/TJ  /20200330 CASE 397741 Variable MsgToDisplay set as return value in functions CheckResTimeFrameAvailability and CheckResAvailability
-    //                                   New feature to check resource availability in bulk
-    //                                   Functions AllowOverCapacitateResource and CheckResAvailability are now set as global
-    //                                   Resource availability and capacity checks are getting skipped when we're creating lines from buffer
-    // NPR5.55/TJ  /20200129 CASE 374887 Automatically sending e-mails
-
     Permissions = TableData "Job Ledger Entry" = imd,
                   TableData "Job Register" = imd,
                   TableData "Value Entry" = rimd;
@@ -101,24 +54,13 @@ codeunit 6060150 "NPR Event Management"
 
         if Rec."NPR Source Job No." <> Rec."No." then begin
             Job.Get(Rec."NPR Source Job No.");
-            //-NPR5.31 [269162]
-            //CopyAttributes(Rec."Source Job No.",Rec."No.",ReturnMsg);
             EventAttrMgt.CopyAttributes('', Rec."NPR Source Job No.", Rec."No.", ReturnMsg);
-            //+NPR5.31 [269162]
             CopyTemplates(Rec."NPR Source Job No.", Rec."No.", 0, ReturnMsg);
-            //-NPR5.34 [277938]
             CopyExchIntTemplates(Rec."NPR Source Job No.", Rec."No.", ReturnMsg);
-            //+NPR5.34 [277938]
-            //-NPR5.40 [307328]
             CopyComments(Rec."NPR Source Job No.", Rec."No.", ReturnMsg);
-            //+NPR5.40 [307328]
-            //-NPR5.32 [275957]
             Rec."NPR Source Job No." := Rec."No.";
-            //+NPR5.32 [275957]
         end;
-        //-NPR5.36 [275966]
         Rec.Validate("NPR Event Status");
-        //+NPR5.36 [275966]
         Rec.Modify;
     end;
 
@@ -133,17 +75,10 @@ codeunit 6060150 "NPR Event Management"
         if not IsEventJob(Rec) then
             exit;
 
-        //-NPR5.31 [269162]
         if (Rec."NPR Event Status" = xRec."NPR Event Status") and (Rec."NPR Event Status".AsInteger() < Rec."NPR Event Status"::Postponed.AsInteger()) and (Rec."NPR Event Status" <> Rec.Status) then begin
             Rec.Validate("NPR Event Status");
-            //-NPR5.36 [275966]
             Rec.Modify;
         end;
-        //-NPR5.36 [275966]
-
-        //IF NOT EventEWSMgt.CheckStatus(Rec,FALSE) THEN
-        //  EXIT;
-        //+NPR5.31 [269162]
 
         JobsSetup.Get();
         if (xRec."Bill-to Customer No." = '') and (Rec."Bill-to Customer No." <> xRec."Bill-to Customer No.") then
@@ -162,9 +97,7 @@ codeunit 6060150 "NPR Event Management"
     [EventSubscriber(ObjectType::Table, 167, 'OnBeforeDeleteEvent', '', true, true)]
     local procedure JobOnBeforeDelete(var Rec: Record Job; RunTrigger: Boolean)
     begin
-        //-NPR5.53 [346821]
         BlockDeleteIfInStatus(Rec);
-        //+NPR5.53 [346821]
     end;
 
     [EventSubscriber(ObjectType::Table, 167, 'OnAfterDeleteEvent', '', false, false)]
@@ -179,21 +112,15 @@ codeunit 6060150 "NPR Event Management"
 
         if not IsEventJob(Rec) then
             exit;
-        //-NPR5.33 [277972]
-        /*
-        EventAttributeEntry.SETRANGE("Job No.",Rec."No.");
-        EventAttributeEntry.DELETEALL;
-        */
+
         EventAttribute.SetRange("Job No.", Rec."No.");
         EventAttribute.DeleteAll(true);
-        //+NPR5.33 [277972]
+
         EventWordLayout.SetRange("Source Record ID", Rec.RecordId);
         EventWordLayout.DeleteAll;
-        //-NPR5.34 [277938]
+
         EventExchIntTempEntry.SetRange("Source Record ID", Rec.RecordId);
         EventExchIntTempEntry.DeleteAll;
-        //+NPR5.34 [277938]
-
     end;
 
     [EventSubscriber(ObjectType::Table, 167, 'OnAfterValidateEvent', 'NPR Event Status', false, false)]
@@ -203,17 +130,6 @@ codeunit 6060150 "NPR Event Management"
         EventExchIntTemplate: Record "NPR Event Exch. Int. Template";
         EmailCounter: Integer;
     begin
-        //-NPR5.31 [269162]
-        /*
-        IF xRec."Event Status" <> Rec."Event Status" THEN BEGIN
-          IF NOT (Rec."Event Status" IN [Rec."Event Status"::Postponed,Rec."Event Status"::Cancelled]) THEN
-        */
-        //-NPR5.36 [287267]
-        /*
-          IF Rec."Event Status" <= Rec."Event Status"::Postponed THEN
-        //+NPR5.31 [269162]
-            Rec.VALIDATE(Status,Rec."Event Status");
-        */
         JobPlanningLine.SetCurrentKey("Job No.");
         JobPlanningLine.SetRange("Job No.", Rec."No.");
 
@@ -227,19 +143,13 @@ codeunit 6060150 "NPR Event Management"
                 Rec.Validate(Status, Rec."NPR Event Status");
         end else
             Rec.Validate(Status, Rec.Status::Planning);
-        //  JobPlanningLine.SETCURRENTKEY("Job No.");
-        //  JobPlanningLine.SETRANGE("Job No.",Rec."No.");
-        //+NPR5.36 [287267]
+
         if JobPlanningLine.FindSet() then
             repeat
                 JobPlanningLine.Validate("NPR Event Status", Rec."NPR Event Status");
                 JobPlanningLine.Modify(true);
             until JobPlanningLine.Next() = 0;
-        //-NPR5.31 [269162]
-        //END;
-        //NPR5.31 [269162]
 
-        //-NPR5.55 [374887]
         if (CurrFieldNo = Rec.FieldNo("NPR Event Status")) and (Rec."NPR Event Status" <> xRec."NPR Event Status") then begin
             EventExchIntTemplate.SetRange("Auto. Send. Enabled (E-Mail)", true);
             EventExchIntTemplate.SetRange("Auto.Send.Event Status(E-Mail)", Rec."NPR Event Status");
@@ -251,8 +161,6 @@ codeunit 6060150 "NPR Event Management"
                     EmailCounter += 1;
                 until EventExchIntTemplate.Next = 0;
         end;
-        //+NPR5.55 [374887]
-
     end;
 
     [EventSubscriber(ObjectType::Table, 167, 'OnAfterValidateEvent', 'Starting Date', false, false)]
@@ -281,11 +189,8 @@ codeunit 6060150 "NPR Event Management"
             end;
         end;
 
-        //-NPR5.32 [275950]
         if Rec."Starting Date" <> xRec."Starting Date" then begin
-            //-NPR5.32 [275963]
             if CurrFieldNo = Rec.FieldNo("Starting Date") then
-                //+NPR5.32 [275963]
                 if not Confirm(StrSubstNo(StartingDateChangedQst, Rec.FieldCaption("Starting Date"))) then
                     exit;
             JobPlanningLine.SetRange("Job No.", Rec."No.");
@@ -295,7 +200,6 @@ codeunit 6060150 "NPR Event Management"
                     JobPlanningLine.Modify;
                 until JobPlanningLine.Next = 0;
         end;
-        //+NPR5.32 [275950]
     end;
 
     [EventSubscriber(ObjectType::Table, 167, 'OnAfterValidateEvent', 'NPR Starting Time', false, false)]
@@ -313,9 +217,7 @@ codeunit 6060150 "NPR Event Management"
     [EventSubscriber(ObjectType::Table, 167, 'OnAfterValidateEvent', 'Bill-to Customer No.', false, false)]
     local procedure JobBilltoCustomerNoOnAfterValidate(var Rec: Record Job; var xRec: Record Job; CurrFieldNo: Integer)
     begin
-        //-NPR5.35 [275959]
         Rec."NPR Event Customer No." := Rec."Bill-to Customer No.";
-        //+NPR5.35 [275959]
     end;
 
     [EventSubscriber(ObjectType::Table, 167, 'OnAfterValidateEvent', 'NPR Event Customer No.', false, false)]
@@ -331,13 +233,10 @@ codeunit 6060150 "NPR Event Management"
         i: Integer;
         ConfirmCustomerChange: Label 'Are you sure you want to change %1?';
     begin
-        //-NPR5.35 [275959]
         if (Rec."NPR Event Customer No." = '') or (Rec."NPR Event Customer No." <> xRec."NPR Event Customer No.") then begin
-            //-NPR5.38 [296160]
             if (Rec."NPR Event Customer No." <> xRec."NPR Event Customer No.") and (xRec."NPR Event Customer No." <> '') then
                 if not Confirm(StrSubstNo(ConfirmCustomerChange, Rec.FieldCaption("NPR Event Customer No."))) then
                     Error('');
-            //+NPR5.38 [296160]
             if JobLedgEntryExist(Rec) or RelatedSalesInvoiceCreditMemoExists(Rec) then
                 Error(RelatedJobEntriesExistErr, Rec.FieldCaption("NPR Event Customer No."), JobLedgerEntry.TableCaption, JobPlanningLineInvoice.TableCaption);
         end;
@@ -356,8 +255,6 @@ codeunit 6060150 "NPR Event Management"
         end;
         RecRef.Modify;
         RecRef.SetTable(Rec);
-        //Rec.GET(Rec."No.");
-        //+NPR5.35 [275959]
     end;
 
     [EventSubscriber(ObjectType::Table, 1003, 'OnAfterInsertEvent', '', false, false)]
@@ -371,17 +268,6 @@ codeunit 6060150 "NPR Event Management"
         Job.Get(Rec."Job No.");
         if not IsEventJob(Job) then
             exit;
-
-        //-NPR5.40 [301375]
-        /*
-        //-NPR5.31 [269162]
-        IF Job."Starting Date" <> 0D THEN BEGIN
-          Rec.VALIDATE("Planning Date",Job."Starting Date");
-          Rec.MODIFY;
-        END;
-        //+NPR5.31 [269162]
-        */
-        //+NPR5.40 [301375]
 
         if (Job."Starting Date" = Job."Ending Date") and (Job."NPR Starting Time" <> 0T) and (Rec.Type = Rec.Type::Resource) then begin
             Rec."NPR Starting Time" := Job."NPR Starting Time";
@@ -415,8 +301,6 @@ codeunit 6060150 "NPR Event Management"
     var
         Job: Record Job;
     begin
-        //-NPR5.36 [289046]
-        //if Type was Item which had issued ticket, user needs to be warned and if agreed, ticket should be removed
         Job.Get(Rec."Job No.");
         if not IsEventJob(Job) then
             exit;
@@ -430,7 +314,6 @@ codeunit 6060150 "NPR Event Management"
             Rec."NPR Mail Item Status" := Rec."NPR Mail Item Status"::" ";
             EventTicketMgt.CheckItemIsTicketAndRemove(Rec, xRec, true, true);
         end;
-        //+NPR5.36 [289046]
     end;
 
     [EventSubscriber(ObjectType::Table, 1003, 'OnAfterValidateEvent', 'No.', false, false)]
@@ -441,9 +324,7 @@ codeunit 6060150 "NPR Event Management"
     begin
         if (Rec.Type = Rec.Type::Resource) and (CurrFieldNo = Rec.FieldNo("No.")) then
             CalcResTimeQty(CurrFieldNo, Rec, xRec);
-        //-NPR5.38 [291965]
         FindJobUnitPriceInclVAT(Rec, CurrFieldNo);
-        //+NPR5.38 [291965]
     end;
 
     [EventSubscriber(ObjectType::Table, 1003, 'OnAfterValidateEvent', 'NPR Starting Time', false, false)]
@@ -470,48 +351,35 @@ codeunit 6060150 "NPR Event Management"
     local procedure JobPlanningLineQuantityOnAfterValidate(var Rec: Record "Job Planning Line"; var xRec: Record "Job Planning Line"; CurrFieldNo: Integer)
     begin
         if Rec.Type = Rec.Type::Resource then begin
-            //-NPR5.40 [301375]
-            //IF CurrFieldNo = Rec.FIELDNO(Quantity) THEN
             if CurrFieldNo = Rec.FieldNo(Quantity) then begin
-                //+NPR5.40 [301375]
                 CalcResTimeQty(CurrFieldNo, Rec, xRec);
                 CheckResAvailability(Rec, xRec);
-                //-NPR5.40 [301375]
             end else begin
                 if Rec.Quantity = 0 then begin
                     Rec.Validate("NPR Starting Time", 0T);
                     Rec.Validate("NPR Ending Time", 0T);
                 end;
             end;
-            //+NPR5.40 [301375]
         end;
-        //-NPR5.38 [291965]
         CalcLineAmountInclVAT(Rec);
-        //+NPR5.38 [291965]
     end;
 
     [EventSubscriber(ObjectType::Table, 1003, 'OnAfterValidateEvent', 'Unit Price', false, false)]
     local procedure JobPlanningLineUnitPriceOnAfterValidate(var Rec: Record "Job Planning Line"; var xRec: Record "Job Planning Line"; CurrFieldNo: Integer)
     begin
-        //-NPR5.38 [291965]
         UpdateUnitPriceInclVAT(Rec);
-        //+NPR5.38 [291965]
     end;
 
     [EventSubscriber(ObjectType::Table, 1003, 'OnAfterValidateEvent', 'Line Discount Amount', false, false)]
     local procedure JobPlanningLineLineDiscountAmountOnAfterValidate(var Rec: Record "Job Planning Line"; var xRec: Record "Job Planning Line"; CurrFieldNo: Integer)
     begin
-        //-NPR5.38 [291965]
         CalcLineAmountInclVAT(Rec);
-        //+NPR5.38 [291965]
     end;
 
     [EventSubscriber(ObjectType::Table, 1003, 'OnAfterValidateEvent', 'Line Discount %', false, false)]
     local procedure JobPlanningLineLineDiscountPctOnAfterValidate(var Rec: Record "Job Planning Line"; var xRec: Record "Job Planning Line"; CurrFieldNo: Integer)
     begin
-        //-NPR5.38 [291965]
         CalcLineAmountInclVAT(Rec);
-        //+NPR5.38 [291965]
     end;
 
     [EventSubscriber(ObjectType::Table, 1003, 'OnAfterValidateEvent', 'NPR Event Status', false, false)]
@@ -542,7 +410,6 @@ codeunit 6060150 "NPR Event Management"
         PostedDocType: Enum "Job Planning Line Invoice Document Type";
         JobPostLine: Codeunit "Job Post-Line";
     begin
-        //-NPR5.54 [395153]
         if not RunTrigger then
             exit;
         JobPlanningLineInvoice.SetRange("Line No.", Rec."Line No.");
@@ -555,7 +422,6 @@ codeunit 6060150 "NPR Event Management"
             exit;
         Rec."Job Contract Entry No." := JobPlanningLine."Job Contract Entry No.";
         JobPostLine.TestSalesLine(Rec);
-        //+NPR5.54 [395153]
     end;
 
     [EventSubscriber(ObjectType::Table, 37, 'OnBeforeDeleteEvent', '', true, true)]
@@ -565,7 +431,6 @@ codeunit 6060150 "NPR Event Management"
         DocType: Enum "Job Planning Line Invoice Document Type";
         JobPlanningLine: Record "Job Planning Line";
     begin
-        //-NPR5.48 [287903]
         if not RunTrigger then
             exit;
 
@@ -586,30 +451,25 @@ codeunit 6060150 "NPR Event Management"
             exit;
         if (Rec."Job Contract Entry No." = 0) and (JobPlanningLine."Job Contract Entry No." <> 0) then
             Rec."Job Contract Entry No." := JobPlanningLine."Job Contract Entry No.";
-        //+NPR5.48 [287903]
     end;
 
     [EventSubscriber(ObjectType::Table, 37, 'OnAfterValidateEvent', 'Job Contract Entry No.', true, true)]
     local procedure SalesLineJobContractEntryNoOnAfterValidate(var Rec: Record "Sales Line"; var xRec: Record "Sales Line"; CurrFieldNo: Integer)
     begin
-        //-NPR5.48 [287903]
         if CheckJobsSetup(0) then
             exit;
         if Rec."Job Contract Entry No." <> 0 then begin
             Rec."Job Contract Entry No." := 0;
             Rec.Modify;
         end;
-        //+NPR5.48 [287903]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 80, 'OnBeforePostSalesDoc', '', true, true)]
     local procedure SalesPostOnBeforePostSale(var SalesHeader: Record "Sales Header")
     begin
-        //-NPR5.48 [287903]
         if CheckJobsSetup(0) then
             exit;
         CheckSalesDoc(SalesHeader);
-        //+NPR5.48 [287903]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 80, 'OnAfterPostSalesDoc', '', true, true)]
@@ -619,7 +479,6 @@ codeunit 6060150 "NPR Event Management"
         PostedDocType: Enum "Job Planning Line Invoice Document Type";
         JobPlanningLineInvoice: Record "Job Planning Line Invoice";
     begin
-        //-NPR5.48 [287903]
         case SalesHeader."Document Type" of
             SalesHeader."Document Type"::Invoice:
                 PostedDocNo := SalesInvHdrNo;
@@ -633,7 +492,6 @@ codeunit 6060150 "NPR Event Management"
         if not JobPlanningLineInvoiceExists(DATABASE::"Sales Header", SalesHeader."Document Type", SalesHeader."No.", JobPlanningLineInvoice, PostedDocType) then
             exit;
         PostEventSalesDoc(JobPlanningLineInvoice, PostedDocType, PostedDocNo, SalesHeader."Posting Date");
-        //+NPR5.48 [287903]
     end;
 
     [EventSubscriber(ObjectType::Table, 6014406, 'OnAfterDeleteEvent', '', true, true)]
@@ -644,7 +502,6 @@ codeunit 6060150 "NPR Event Management"
         SalePOS: Record "NPR Sale POS";
         POSQuoteEntry: Record "NPR POS Quote Entry";
     begin
-        //-NPR5.49 [331208]
         if not RunTrigger then
             exit;
         POSQuoteEntry.SetRange("Register No.", Rec."Register No.");
@@ -664,7 +521,6 @@ codeunit 6060150 "NPR Event Management"
                 JobPlanningLine.UpdateQtyToTransfer();
                 JobPlanningLine.Modify;
             until JobPlanningLineInvoice.Next = 0;
-        //+NPR5.49 [331208]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150615, 'OnAfterPostPOSEntryBatch', '', true, true)]
@@ -676,7 +532,6 @@ codeunit 6060150 "NPR Event Management"
         PostedDocType: Enum "Job Planning Line Invoice Document Type";
         SkipThisEntry: Boolean;
     begin
-        //-NPR5.49 [331208]
         if PreviewMode then
             exit;
 
@@ -697,7 +552,6 @@ codeunit 6060150 "NPR Event Management"
                 if not SkipThisEntry then
                     PostEventSalesDoc(JobPlanningLineInvoice, PostedDocType, POSEntry2."Document No.", POSEntry2."Posting Date");
             until POSEntry2.Next = 0;
-        //+NPR5.49 [331208]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014414, 'OnAfterRunPostItemLedger', '', true, true)]
@@ -707,7 +561,6 @@ codeunit 6060150 "NPR Event Management"
         PostedDocType: Enum "Job Planning Line Invoice Document Type";
         SkipThisEntry: Boolean;
     begin
-        //-NPR5.49 [331208]
         if Rec.FindSet then
             repeat
                 AuditRollPosting := Rec;
@@ -720,7 +573,6 @@ codeunit 6060150 "NPR Event Management"
                 if not SkipThisEntry then
                     PostEventSalesDoc(JobPlanningLineInvoice, PostedDocType, AuditRollPosting."Posted Doc. No.", AuditRollPosting."Sale Date");
             until Rec.Next = 0;
-        //+NPR5.49 [331208]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6151005, 'OnAfterLoadFromQuote', '', true, true)]
@@ -730,7 +582,6 @@ codeunit 6060150 "NPR Event Management"
         PostedDocType: Enum "Job Planning Line Invoice Document Type";
         JobPlanningLineInvoice2: Record "Job Planning Line Invoice";
     begin
-        //-NPR5.49 [331208]
         with JobPlanningLineInvoice do begin
             SetRange("NPR POS Unit No.", POSQuoteEntry."Register No.");
             SetRange("NPR POS Store Code", SalePOS."POS Store Code");
@@ -746,7 +597,6 @@ codeunit 6060150 "NPR Event Management"
                     JobPlanningLineInvoice2.Insert(true);
                 until Next = 0;
         end;
-        //+NPR5.49 [331208]
     end;
 
     [EventSubscriber(ObjectType::Page, 463, 'OnAfterActionEvent', 'NPR SetStatusToBlockEventDelete', true, true)]
@@ -756,7 +606,6 @@ codeunit 6060150 "NPR Event Management"
         OutS: OutStream;
         OptionFilter: Text;
     begin
-        //-NPR5.53 [346821]
         GenericMultipleCheckList.SetOptions(GetJobEventStatusOptions(), GetBlockEventDeleteOptionFilter());
         GenericMultipleCheckList.LookupMode(true);
         if GenericMultipleCheckList.RunModal = ACTION::LookupOK then begin
@@ -769,7 +618,6 @@ codeunit 6060150 "NPR Event Management"
             end;
             Rec.Modify;
         end;
-        //+NPR5.53 [346821]
     end;
 
     local procedure CheckTime(StartDate: Date; EndDate: Date; StartTime: Time; EndTime: Time)
@@ -806,14 +654,14 @@ codeunit 6060150 "NPR Event Management"
                         if ("NPR Starting Time" = 0T) and (Quantity > 0) then
                             Validate("NPR Starting Time", "NPR Ending Time" - Quantity * 3600000);
                         if ("NPR Starting Time" <> 0T) and (Quantity = 0) then
-                            Validate(Quantity, ("NPR Ending Time" - "NPR Starting Time") / 3600000);
+                            Validate(Quantity, Round(("NPR Ending Time" - "NPR Starting Time") / 3600000, 1 / 100000, '='));
                     end;
                 FieldNo("NPR Starting Time"):
                     if "NPR Starting Time" <> 0T then begin
                         if ("NPR Ending Time" = 0T) and (Quantity > 0) then
                             Validate("NPR Ending Time", "NPR Starting Time" + Quantity * 3600000);
                         if ("NPR Ending Time" <> 0T) and (Quantity = 0) then
-                            Validate(Quantity, ("NPR Ending Time" - "NPR Starting Time") / 3600000);
+                            Validate(Quantity, Round(("NPR Ending Time" - "NPR Starting Time") / 3600000, 1 / 100000, '='));
                     end;
                 FieldNo(Quantity):
                     if Quantity > 0 then begin
@@ -840,16 +688,8 @@ codeunit 6060150 "NPR Event Management"
         if not JobsSetup.Get then
             exit;
 
-        //-NPR5.32 [275966]
-        //IF NOT JobsSetup."Resource Availability Warning" THEN
-        //  EXIT;
-        //+NPR5.32 [275966]
-
-        //-NPR5.32 [278090]
-        //Job.GET(Rec."Job No.");
         if not Job.Get(Rec."Job No.") then
             exit;
-        //+NPR5.32 [278090]
 
         if not IsEventJob(Job) then
             exit;
@@ -868,41 +708,23 @@ codeunit 6060150 "NPR Event Management"
                 exit;
             if "Planning Date" = 0D then
                 exit;
-            //-NPR5.55 [397741]
             if "NPR Skip Cap./Avail. Check" then
                 exit;
-            //+NPR5.55 [397741]
-            //-NPR5.35 [287270]
-            /*
-            //-NPR5.32 [275966]
-            OverCapacitateResourceSetupValue := GetOverCapacitateResourceSetup(Rec);
-            IF OverCapacitateResourceSetupValue IN [JobsSetup."Over Capacitate Resource"::" ",JobsSetup."Over Capacitate Resource"::Allow] THEN
-              EXIT;
-            //+NPR5.32 [275966]
-            */
             if AllowOverCapacitateResource(Rec, OverCapacitateResourceSetupValue) then
                 exit;
-            //-NPR5.35 [287270]
             if not IsResCapacityAvail(Rec, xRec, AvailCap) then begin
                 MsgToDisplay := StrSubstNo(Text002, "No.", Format("Planning Date"));
                 if AvailCap > 0 then
                     MsgToDisplay := MsgToDisplay + ' ' + StrSubstNo(Text003, Format(AvailCap), "Unit of Measure Code");
-                //-NPR5.55 [397741]
                 if BufferMode then
                     exit(MsgToDisplay);
-                //+NPR5.55 [397741]
-                //-NPR5.32 [275966]
                 if OverCapacitateResourceSetupValue = JobsSetup."NPR Over Capacitate Resource"::Disallow then
                     Error(MsgToDisplay);
-                //-NPR5.32 [275966]
                 MsgToDisplay := MsgToDisplay + ' ' + Text004 + ' ' + ContinueMsg;
                 if not Confirm(MsgToDisplay) then
                     Error('');
             end;
-            //-NPR5.55 [397741]
-            //CheckResTimeFrameAvailability(Rec);
             MsgToDisplay := CheckResTimeFrameAvailability(Rec);
-            //+NPR5.55 [397741]
         end;
 
     end;
@@ -915,14 +737,8 @@ codeunit 6060150 "NPR Event Management"
         with Rec do begin
             Resource.Get("No.");
             Resource.SetFilter("Date Filter", Format("Planning Date"));
-            //-NPR5.40 [301375]
-            /*
-            Resource.CALCFIELDS("Qty. on Order (Job)","Qty. Quoted (Job)",Capacity);
-            TotalCapacity := Resource."Qty. on Order (Job)" + Resource."Qty. Quoted (Job)";
-            */
             Resource.CalcFields("Qty. on Order (Job)", "Qty. Quoted (Job)", Capacity, "NPR Qty. Planned (Job)");
             TotalCapacity := Resource."Qty. on Order (Job)" + Resource."Qty. Quoted (Job)" + Resource."NPR Qty. Planned (Job)";
-            //+NPR5.40 [301375]
             if xRec.Quantity > 0 then
                 TotalCapacity -= xRec.Quantity;
             AvailCap := Resource.Capacity - TotalCapacity;
@@ -936,30 +752,19 @@ codeunit 6060150 "NPR Event Management"
         TimeFrameProblemMsg: Label 'Time frame %1 - %2 for resource %3 is allready partially/fully used on other event/line:\%4 If you keep current time frame, resource may have difficulties fulfilling all engagements.';
         OverCapacitateResourceSetupValue: Integer;
     begin
-        //-NPR5.49 [346780]
         if Rec.Type <> Rec.Type::Resource then
             exit;
-        //+NPR5.49 [346780]
-        //-NPR5.55 [397741]
         if Rec."NPR Skip Cap./Avail. Check" then
             exit;
-        //+NPR5.55 [397741]
-        //-NPR5.35 [287270]
         if AllowOverCapacitateResource(Rec, OverCapacitateResourceSetupValue) then
             exit;
-        //+NPR5.35 [287270]
         if not IsResTimeFrameAvail(Rec, MsgToDisplay) then begin
-            //-NPR5.35 [287270]
-            //MsgToDisplay := STRSUBSTNO(TimeFrameProblemMsg,FORMAT(Rec."Starting Time"),FORMAT(Rec."Ending Time"),Rec."No.",MsgToDisplay) + '\' + ContinueMsg;
             MsgToDisplay := StrSubstNo(TimeFrameProblemMsg, Format(Rec."NPR Starting Time"), Format(Rec."NPR Ending Time"), Rec."No.", MsgToDisplay);
-            //-NPR5.55 [397741]
             if BufferMode then
                 exit(MsgToDisplay);
-            //+NPR5.55 [397741]
             if OverCapacitateResourceSetupValue = JobsSetup."NPR Over Capacitate Resource"::Disallow then
                 Error(MsgToDisplay);
             MsgToDisplay := MsgToDisplay + '\' + ContinueMsg;
-            //+NPR5.35 [287270]
             if not Confirm(MsgToDisplay) then
                 Error('');
         end;
@@ -984,27 +789,18 @@ codeunit 6060150 "NPR Event Management"
             SetRange("Schedule Line", true);
 
             SetFilter("Job No.", '<>%1', Rec."Job No.");
-            //-NPR5.33 [275966]
-            //ApplyTimeCombinations(JobPlanningLine,Rec,MsgToDisplay);
             ApplyTimeCombinations(JobPlanningLine, Rec);
-            //+NPR5.33 [275966]
             SetRange("Job No.", Rec."Job No.");
             SetFilter("Job Task No.", '<>%1', Rec."Job Task No.");
-            //-NPR5.33 [275966]
-            //ApplyTimeCombinations(JobPlanningLine,Rec,MsgToDisplay);
             ApplyTimeCombinations(JobPlanningLine, Rec);
-            //+NPR5.33 [275966]
             SetRange("Job Task No.", Rec."Job Task No.");
             SetFilter("Line No.", '<>%1', Rec."Line No.");
-            //-NPR5.33 [275966]
-            //ApplyTimeCombinations(JobPlanningLine,Rec,MsgToDisplay);
             ApplyTimeCombinations(JobPlanningLine, Rec);
             SetRange("Job No.");
             SetRange("Job Task No.");
             SetRange("Line No.");
             MarkedOnly(true);
             AddToMessage(JobPlanningLine, MsgToDisplay);
-            //+NPR5.33 [275966]
         end;
         exit(MsgToDisplay = '');
     end;
@@ -1012,22 +808,6 @@ codeunit 6060150 "NPR Event Management"
     local procedure ApplyTimeCombinations(var JobPlanningLine: Record "Job Planning Line"; Rec: Record "Job Planning Line")
     begin
         with JobPlanningLine do begin
-            //-NPR5.33 [275966]
-            /*
-              SETFILTER("Starting Time",'<%1',Rec."Starting Time");
-              SETFILTER("Ending Time",'>%1',Rec."Ending Time");
-              AddToMessage(JobPlanningLine,MsgToDisplay);
-              SETFILTER("Ending Time",'<%1&>%2',Rec."Ending Time",Rec."Starting Time");
-              AddToMessage(JobPlanningLine,MsgToDisplay);
-
-              SETFILTER("Starting Time",'>%1',Rec."Starting Time");
-              SETFILTER("Ending Time",'<%1',Rec."Ending Time");
-              AddToMessage(JobPlanningLine,MsgToDisplay);
-
-              SETFILTER("Starting Time",'>%1&<%2',Rec."Starting Time",Rec."Ending Time");
-              SETFILTER("Ending Time",'>%1',Rec."Ending Time");
-              AddToMessage(JobPlanningLine,MsgToDisplay);
-            */
             SetFilter("NPR Starting Time", '<=%1', Rec."NPR Starting Time");
             SetFilter("NPR Ending Time", '>=%1', Rec."NPR Ending Time");
             MarkPlanningLine(JobPlanningLine);
@@ -1043,7 +823,6 @@ codeunit 6060150 "NPR Event Management"
             MarkPlanningLine(JobPlanningLine);
             SetRange("NPR Starting Time");
             SetRange("NPR Ending Time");
-            //+NPR5.33 [276966]
         end;
 
     end;
@@ -1117,21 +896,12 @@ codeunit 6060150 "NPR Event Management"
         Window.Open(WaitMsg);
         FileName := FileMgt.BLOBExport(TempBlob, FileName, false);
 
-        //-NPR5.35 [285826]
-        //WordApplication := WordHelper.GetApplication(ErrorMessage);
         EventVersionSpecificMgt.WordHelperGetApplication(WordApplication, ErrorMessage);
-        //+NPR5.35 [285826]
         if IsNull(WordApplication) then
             Error(WordNotFoundErr);
 
-        //-NPR5.35 [285826]
-        /*
-        WordHandler := WordHandler.WordHandler;
-        WordDocument := WordHelper.CallOpen(WordApplication,FileName,FALSE,FALSE);
-        */
         EventVersionSpecificMgt.WordHandlerConstructor();
         EventVersionSpecificMgt.WordHelperCallOpen(WordApplication, FileName, false, false, WordDocument);
-        //+NPR5.35 [285826]
         WordDocument.ActiveWindow.Caption := WordCaption;
         WordDocument.Application.Visible := true;
         WordDocument.ActiveWindow.WindowState := WdWindowState.wdWindowStateNormal;
@@ -1144,10 +914,7 @@ codeunit 6060150 "NPR Event Management"
         WordDocument.Saved := true;
         WordDocument.Application.Activate;
 
-        //-NPR5.35 [285826]
-        //NewFileName := WordHandler.WaitForDocument(WordDocument);
         NewFileName := EventVersionSpecificMgt.WordHandlerWaitForDocument(WordDocument);
-        //+NPR5.35 [285826]
         Window.Close;
 
         Clear(WordApplication);
@@ -1201,16 +968,11 @@ codeunit 6060150 "NPR Event Management"
             EventWordLayoutFrom.SetRange(Usage, CopyWhatHere);
         if EventWordLayoutFrom.FindSet then begin
             repeat
-                //-NPR5.32 [275957]
                 EventWordLayoutFrom.CalcFields(Layout, "XML Part");
-                //+NPR5.32 [275957]
                 EventWordLayoutTo.Init;
                 EventWordLayoutTo := EventWordLayoutFrom;
                 EventWordLayoutTo."Source Record ID" := JobTo.RecordId;
-                //-NPR5.32 [275957]
-                //EventWordLayoutTo.INSERT;
                 EventWordLayoutTo.Insert(true);
-            //+NPR5.32 [275957]
             until EventWordLayoutFrom.Next = 0;
             exit(true);
         end;
@@ -1245,10 +1007,7 @@ codeunit 6060150 "NPR Event Management"
         REPORT.SaveAsXml(EventWordLayout."Report ID", FileNameXml, Job);
         TempFile.Open(FileNameXml);
         TempFile.CreateInStream(InStrXmlData);
-        //-NPR5.35 [285826]
-        //OutStrWordDoc := NAVWordXMLMerger.MergeWordDocument(InStrWordDoc,InStrXmlData,OutStrWordDoc);
         EventVersionSpecificMgt.WordXMLMergerMergeWordDocument(InStrWordDoc, InStrXmlData, OutStrWordDoc, OutStrWordDoc);
-        //+NPR5.35 [285826]
         TempFile.Close;
 
         FileExtension := 'docx';
@@ -1259,13 +1018,7 @@ codeunit 6060150 "NPR Event Management"
         end;
 
         if FileName = '' then begin
-            //-NPR5.31 [269162]
-            //FileName := EventEmailMgt.CreateFileName(Job) + '.' + FileExtension;
-            //-NPR5.34 [277938]
-            //FileName := EventEWSMgt.CreateFileName(Job,0) + '.' + FileExtension;
             FileName := EventEWSMgt.CreateFileName(Job, EMailTemplateHeader) + '.' + FileExtension;
-            //+NPR5.34 [277938]
-            //+NPR5.31 [269162]
             FileMgt.BLOBExport(TempBlob, FileName, true)
         end else begin
             if FileMgt.GetExtension(FileName) <> FileExtension then
@@ -1280,10 +1033,7 @@ codeunit 6060150 "NPR Event Management"
         ValidationErrorFormat: Text;
         TemplateAfterUpdateValidationErr: Label 'The automatic update could not resolve all the conflicts in the current Word layout. For example, the layout uses fields that are missing in the report design or the report ID is wrong.\The following errors were detected:\%1\You must manually update the layout to match the current report design.';
     begin
-        //-NPR5.35 [285826]
-        //ValidationErrors := NAVWordXMLMerger.ValidateWordDocumentTemplate(DocumentStream,REPORT.WORDXMLPART(ReportID,TRUE));
         ValidationErrors := EventVersionSpecificMgt.WordXMLMergerValidateWordDocumentTemplate(DocumentStream, REPORT.WordXmlPart(ReportID, true));
-        //+NPR5.35 [285826]
         if ValidationErrors <> '' then begin
             ValidationErrorFormat := TemplateAfterUpdateValidationErr;
             Message(ValidationErrorFormat, ValidationErrors);
@@ -1299,15 +1049,8 @@ codeunit 6060150 "NPR Event Management"
     begin
         EventWordLayout.CalcFields(Layout);
         EventWordLayout.Layout.CreateInStream(DocumentStream);
-        //-NPR5.35 [285826]
-        /*
-        NAVWordXMLMerger := NAVWordXMLMerger.WordReportManager;
-        ValidationErrors :=
-          NAVWordXMLMerger.ValidateWordDocumentTemplate(DocumentStream,REPORT.WORDXMLPART(EventWordLayout."Report ID",TRUE));
-        */
         EventVersionSpecificMgt.WordXMLMergerConstructor();
         ValidationErrors := EventVersionSpecificMgt.WordXMLMergerValidateWordDocumentTemplate(DocumentStream, REPORT.WordXmlPart(EventWordLayout."Report ID", true));
-        //+NPR5.35 [285826]
         if ValidationErrors <> '' then begin
             if Confirm(TemplateValidationUpdateQst, false, ValidationErrors) then begin
                 ValidationErrors := EventWordLayout.TryUpdateLayout(false);
@@ -1328,10 +1071,7 @@ codeunit 6060150 "NPR Event Management"
     begin
         TempBlob.CreateInStream(InStreamWordDoc);
         TempBlobPdf.CreateOutStream(OutStreamPdfDoc);
-        //-NPR5.35 [285826]
-        //PdfWriter.ConvertToPdf(InStreamWordDoc,OutStreamPdfDoc);
         EventVersionSpecificMgt.PdfWriterConvertToPdf(InStreamWordDoc, OutStreamPdfDoc);
-        //+NPR5.35 [285826]
         TempBlob := TempBlobPdf;
     end;
 
@@ -1362,10 +1102,7 @@ codeunit 6060150 "NPR Event Management"
                 EventExchIntTempEntryTo := EventExchIntTempEntryFrom;
                 EventExchIntTempEntryTo."Source Record ID" := JobTo.RecordId;
                 EventExchIntTempEntryTo.Insert;
-            //-NPR5.35 [277938]
-            //UNTIL EventExchIntTempEntryTo.NEXT = 0;
             until EventExchIntTempEntryFrom.Next = 0;
-            //+NPR5.35 [277938]
             exit(true);
         end;
         ReturnMsg := NothingToCopyTxt;
@@ -1376,22 +1113,18 @@ codeunit 6060150 "NPR Event Management"
     var
         JobPlanningLineInvoice: Record "Job Planning Line Invoice";
     begin
-        //-NPR5.35 [275959]
         JobPlanningLineInvoice.SetRange("Job No.", Rec."No.");
         exit(not JobPlanningLineInvoice.IsEmpty);
-        //+NPR5.35 [275959]
     end;
 
     local procedure JobLedgEntryExist(Rec: Record Job): Boolean
     var
         JobLedgEntry: Record "Job Ledger Entry";
     begin
-        //-NPR5.35 [275959]
         Clear(JobLedgEntry);
         JobLedgEntry.SetCurrentKey("Job No.");
         JobLedgEntry.SetRange("Job No.", Rec."No.");
         exit(not JobLedgEntry.IsEmpty);
-        //+NPR5.35 [275959]
     end;
 
     procedure AllowOverCapacitateResource(Rec: Record "Job Planning Line"; var OverCapacitateResourceSetupValue: Integer): Boolean
@@ -1489,10 +1222,8 @@ codeunit 6060150 "NPR Event Management"
     var
         TotalPrice: Decimal;
     begin
-        //-NPR5.48 [287903]
         TotalPrice := Round(Qty * JobPlanningLine."Unit Price (LCY)", 0.01);
         exit(TotalPrice - Round(TotalPrice * JobPlanningLine."Line Discount %" / 100, 0.01));
-        //+NPR5.48 [287903]
     end;
 
     procedure PostEventSalesDoc(var JobPlanningLineInvoice: Record "Job Planning Line Invoice"; PostedDocType: Enum "Job Planning Line Invoice Document Type"; PostedDocNo: Code[20];
@@ -1500,18 +1231,15 @@ codeunit 6060150 "NPR Event Management"
     var
         JobPlanningLineInvoice2: Record "Job Planning Line Invoice";
     begin
-        //-NPR5.48 [287903]
         ChangeJobPlanInvoiceFromNonpostedToPosted(JobPlanningLineInvoice, PostedDocType, PostedDocNo, PostingDate, JobPlanningLineInvoice2);
         if not CheckJobsSetup(2) then
             exit;
         InitJobRegister();
         PrepareAndPostJournal(JobPlanningLineInvoice2, PostedDocNo);
-        //+NPR5.48 [287903]
     end;
 
     procedure CheckJobsSetup(ProcessStep: Option Creation,PostingInventoryOnly,PostingBothInventoryAndJob): Boolean
     begin
-        //-NPR5.48 [287903]
         JobsSetup.Get();
         case ProcessStep of
             ProcessStep::Creation:
@@ -1521,7 +1249,6 @@ codeunit 6060150 "NPR Event Management"
             ProcessStep::PostingBothInventoryAndJob:
                 exit(JobsSetup."NPR Post Event on S.Inv. Post" = JobsSetup."NPR Post Event on S.Inv. Post"::"Both Inventory and Job");
         end;
-        //+NPR5.48 [287903]
     end;
 
     local procedure CheckSalesDoc(SalesHeader: Record "Sales Header")
@@ -1533,7 +1260,6 @@ codeunit 6060150 "NPR Event Management"
         Job: Record Job;
         JobTask: Record "Job Task";
     begin
-        //-NPR5.48 [287903]
         JobPlanningLineInvoiceExists(DATABASE::"Sales Header", SalesHeader."Document Type", SalesHeader."No.", JobPlanningLineInvoice, PostedDocType);
         SalesLine.SetRange("Document Type", SalesHeader."Document Type");
         SalesLine.SetRange("Document No.", SalesHeader."No.");
@@ -1566,7 +1292,6 @@ codeunit 6060150 "NPR Event Management"
                     end;
                 end;
             until SalesLine.Next = 0;
-        //+NPR5.48 [287903]
     end;
 
     local procedure JobPlanningLineInvoiceExists(DocTableID: Integer; DocType: Enum "Sales Document Type"; DocNo: Code[20]; var JobPlanningLineInvoice: Record "Job Planning Line Invoice"; var PostedDocType: Enum "Job Planning Line Invoice Document Type"): Boolean
@@ -1574,7 +1299,6 @@ codeunit 6060150 "NPR Event Management"
         SalesHeader: Record "Sales Header";
         JobPlanInvLineDocType: Enum "Job Planning Line Invoice Document Type";
     begin
-        //-NPR5.48 [287903]
         PostedDocType := PostedDocType::" ";
         case DocTableID of
             DATABASE::"Sales Header":
@@ -1599,7 +1323,6 @@ codeunit 6060150 "NPR Event Management"
         JobPlanningLineInvoice.SetRange("Document Type", JobPlanInvLineDocType);
         JobPlanningLineInvoice.SetRange("Document No.", DocNo);
         exit(not JobPlanningLineInvoice.IsEmpty);
-        //+NPR5.48 [287903]
     end;
 
     local procedure ChangeJobPlanInvoiceFromNonpostedToPosted(var NonPostedJobPlanningLineInvoice: Record "Job Planning Line Invoice"; PostedDocType: Enum "Job Planning Line Invoice Document Type"; PostedDocNo: Code[20];
@@ -1610,7 +1333,6 @@ codeunit 6060150 "NPR Event Management"
         JobLedgEntry: Record "Job Ledger Entry";
         NextEntryNo: Integer;
     begin
-        //-NPR5.48 [287903]
         Clear(PostedJobPlanningLineInvoice);
         if NonPostedJobPlanningLineInvoice.FindSet then
             repeat
@@ -1631,7 +1353,6 @@ codeunit 6060150 "NPR Event Management"
             until NonPostedJobPlanningLineInvoice.Next = 0;
         PostedJobPlanningLineInvoice.SetRange("Document Type", PostedDocType);
         PostedJobPlanningLineInvoice.SetRange("Document No.", PostedDocNo);
-        //+NPR5.48 [287903]
     end;
 
     local procedure InitJobRegister()
@@ -1640,7 +1361,6 @@ codeunit 6060150 "NPR Event Management"
         SourceCodeSetup: Record "Source Code Setup";
         JobRegNo: Integer;
     begin
-        //-NPR5.48 [287903]
         if JobRegisterInitialized then
             exit;
         SourceCodeSetup.Get();
@@ -1664,14 +1384,12 @@ codeunit 6060150 "NPR Event Management"
         JobReg."User ID" := UserId;
         JobReg.Insert;
         JobRegisterInitialized := true;
-        //+NPR5.48 [287903]
     end;
 
     local procedure PrepareAndPostJournal(var JobPlanningLineInvoice: Record "Job Planning Line Invoice"; PostedDocNo: Code[20])
     var
         JobJnlLine: Record "Job Journal Line";
     begin
-        //-NPR5.48 [287903]
         if JobPlanningLineInvoice.FindSet then
             repeat
                 PrepareJobJournal(JobPlanningLineInvoice, 0, JobJnlLine); //Usage
@@ -1679,7 +1397,6 @@ codeunit 6060150 "NPR Event Management"
                 PrepareJobJournal(JobPlanningLineInvoice, 1, JobJnlLine); //Sale
                 PostJournal(JobPlanningLineInvoice, JobJnlLine);
             until JobPlanningLineInvoice.Next = 0;
-        //+NPR5.48 [287903]
     end;
 
     local procedure PrepareJobJournal(JobPlanningLineInvoice: Record "Job Planning Line Invoice"; EntryType: Option Usage,Sale; var JobJnlLine: Record "Job Journal Line")
@@ -1722,7 +1439,6 @@ codeunit 6060150 "NPR Event Management"
         ShortcutDimCode2: Code[20];
         DimSetID: Integer;
     begin
-        //-NPR5.48 [287903]
         JobPlanningLine.Get(JobPlanningLineInvoice."Job No.", JobPlanningLineInvoice."Job Task No.", JobPlanningLineInvoice."Job Planning Line No.");
         SourceCodeSetup.Get();
         JobTask.Get(JobPlanningLine."Job No.", JobPlanningLine."Job Task No.");
@@ -1734,11 +1450,9 @@ codeunit 6060150 "NPR Event Management"
                     case JobPlanningLineInvoice."Document Type" of
                         JobPlanningLineInvoice."Document Type"::"Posted Invoice":
                             begin
-                                //-NPR5.49 [331208]
                                 case POSDocPostType of
                                     POSDocPostType::" ":
                                         begin
-                                            //+NPR5.49 [331208]
                                             SalesInvHeader.Get(JobPlanningLineInvoice."Document No.");
                                             SalesInvLine.Get(JobPlanningLineInvoice."Document No.", JobPlanningLineInvoice."Line No.");
                                             DocumentDate := SalesInvHeader."Document Date";
@@ -1768,7 +1482,6 @@ codeunit 6060150 "NPR Event Management"
                                             ShortcutDimCode1 := SalesInvLine."Shortcut Dimension 1 Code";
                                             ShortcutDimCode2 := SalesInvLine."Shortcut Dimension 2 Code";
                                             DimSetID := SalesInvLine."Dimension Set ID";
-                                            //-NPR5.49 [331208]
                                         end;
                                     POSDocPostType::"Audit Roll":
                                         begin
@@ -1818,7 +1531,6 @@ codeunit 6060150 "NPR Event Management"
                                             DimSetID := POSSalesLine."Dimension Set ID";
                                         end;
                                 end;
-                                //+NPR5.49 [331208]
                             end;
                         JobPlanningLineInvoice."Document Type"::"Posted Credit Memo":
                             begin
@@ -1952,7 +1664,6 @@ codeunit 6060150 "NPR Event Management"
             EntryType::Usage:
                 JobJnlLine.UpdateDimensions;
         end;
-        //+NPR5.48 [287903]
     end;
 
     local procedure PostJournal(JobPlanningLineInvoice: Record "Job Planning Line Invoice"; var JobJnlLine: Record "Job Journal Line") JobLedgEntryNo: Integer
@@ -1973,7 +1684,6 @@ codeunit 6060150 "NPR Event Management"
         JobLedgEntry2: Record "Job Ledger Entry";
         TempRemainingQty: Decimal;
     begin
-        //-NPR5.48 [287903]
         with JobJnlLine do begin
             Job.Get("Job No.");
             TestField("Currency Code", Job."Currency Code"); //this should be tested when creating invoice so this process doesnt fail to late
@@ -2074,33 +1784,24 @@ codeunit 6060150 "NPR Event Management"
         end;
 
         exit(JobLedgEntryNo);
-        //+NPR5.48 [287903]
     end;
 
     local procedure ValidateUnitCostAndPrice(var JobJournalLine: Record "Job Journal Line"; Item: Record Item; UnitCost: Decimal; UnitPrice: Decimal)
     begin
-        //-NPR5.48 [287903]
         if Item."Costing Method" <> Item."Costing Method"::Standard then
             JobJournalLine.Validate("Unit Cost", UnitCost);
         JobJournalLine.Validate("Unit Price", UnitPrice);
-        //+NPR5.48 [287903]
     end;
 
     local procedure GetJobConsumptionValueEntry(JobPlanningLineInvoice: Record "Job Planning Line Invoice"; var ValueEntry: Record "Value Entry"; JobJournalLine: Record "Job Journal Line"): Boolean
     begin
-        //-NPR5.48 [287903]
         with JobJournalLine do begin
-            //ValueEntry.SETCURRENTKEY("Job No.","Job Task No.","Document No.");
             ValueEntry.SetRange("Item No.", "No.");
-            //ValueEntry.SETRANGE("Job No.","Job No.");
-            //ValueEntry.SETRANGE("Job Task No.","Job Task No.");
-            //ValueEntry.SETRANGE("Document No.","Document No.");
             ValueEntry.SetRange("Document No.", JobPlanningLineInvoice."Document No.");
             ValueEntry.SetRange("Item Ledger Entry Type", ValueEntry."Item Ledger Entry Type"::Sale);
             ValueEntry.SetRange("Job Ledger Entry No.", 0);
         end;
         exit(ValueEntry.FindSet);
-        //+NPR5.48 [287903]
     end;
 
     local procedure CreateJobLedgEntry(JobJnlLine: Record "Job Journal Line"): Integer
@@ -2113,7 +1814,6 @@ codeunit 6060150 "NPR Event Management"
         EventLinkUsage: Codeunit "NPR Event Link Usg.";
         JobPostLine: Codeunit "Job Post-Line";
     begin
-        //-NPR5.48 [287903]
         SetCurrency(JobJnlLine);
 
         JobLedgEntry.Init;
@@ -2192,18 +1892,11 @@ codeunit 6060150 "NPR Event Management"
             Job.Get(JobLedgEntry."Job No.");
             if Job."Apply Usage Link" or
                (JobJnlLine."Job Planning Line No." <> 0) or
-               //-NPR5.49 [331208]
-               /*
-                  JobLinkUsage.FindMatchingJobPlanningLine(JobPlanningLine,JobLedgEntry)
-               THEN
-                 JobLinkUsage.ApplyUsage(JobLedgEntry,JobJnlLine)
-               */
                EventLinkUsage.FindMatchingJobPlanningLine(JobPlanningLine, JobLedgEntry)
             then begin
                 EventLinkUsage.SetAutoConfirm(true);
                 EventLinkUsage.ApplyUsage(JobLedgEntry, JobJnlLine)
             end
-            //+NPR5.49 [331208]
             else
                 JobPostLine.InsertPlLineFromLedgEntry(JobLedgEntry)
         end;
@@ -2211,15 +1904,12 @@ codeunit 6060150 "NPR Event Management"
         NextEntryNo := NextEntryNo + 1;
 
         exit(JobLedgEntry."Entry No.");
-        //+NPR5.48 [287903]
-
     end;
 
     local procedure SetCurrency(JobJnlLine: Record "Job Journal Line")
     var
         Currency: Record Currency;
     begin
-        //-NPR5.48 [287903]
         if JobJnlLine."Currency Code" = '' then begin
             Clear(Currency);
             Currency.InitRoundingPrecision
@@ -2228,12 +1918,10 @@ codeunit 6060150 "NPR Event Management"
             Currency.TestField("Amount Rounding Precision");
             Currency.TestField("Unit-Amount Rounding Precision");
         end;
-        //+NPR5.48 [287903]
     end;
 
     local procedure InitResJnlLine(JobJnlLine: Record "Job Journal Line"; var ResJnlLine: Record "Res. Journal Line")
     begin
-        //-NPR5.48 [287903]
         with ResJnlLine do begin
             Init;
             "Entry Type" := Enum::"Res. Journal Line Entry Type".FromInteger(JobJnlLine."Entry Type");
@@ -2269,24 +1957,20 @@ codeunit 6060150 "NPR Event Management"
             "Time Sheet Line No." := JobJnlLine."Time Sheet Line No.";
             "Time Sheet Date" := JobJnlLine."Time Sheet Date";
         end;
-        //+NPR5.48 [287903]
     end;
 
     local procedure UpdateJobJnlLineTotalAmounts(var JobJnlLineToUpdate: Record "Job Journal Line"; AmtRoundingPrecision: Decimal)
     begin
-        //-NPR5.48 [287903]
         with JobJnlLineToUpdate do begin
             "Total Cost" := Round("Unit Cost" * Quantity, AmtRoundingPrecision);
             "Total Cost (LCY)" := Round("Unit Cost (LCY)" * Quantity, AmtRoundingPrecision);
             "Total Price" := Round("Unit Price" * Quantity, AmtRoundingPrecision);
             "Total Price (LCY)" := Round("Unit Price (LCY)" * Quantity, AmtRoundingPrecision);
         end;
-        //+NPR5.48 [287903]
     end;
 
     local procedure UpdateJobJnlLineAmount(var JobJnlLineToUpdate: Record "Job Journal Line"; var RemainingAmount: Decimal; var RemainingAmountLCY: Decimal; var RemainingQtyToTrack: Decimal; AmtRoundingPrecision: Decimal)
     begin
-        //-NPR5.48 [287903]
         with JobJnlLineToUpdate do begin
             "Line Amount" := Round(RemainingAmount * Quantity / RemainingQtyToTrack, AmtRoundingPrecision);
             "Line Amount (LCY)" := Round(RemainingAmountLCY * Quantity / RemainingQtyToTrack, AmtRoundingPrecision);
@@ -2295,7 +1979,6 @@ codeunit 6060150 "NPR Event Management"
             RemainingAmountLCY -= "Line Amount (LCY)";
             RemainingQtyToTrack -= Quantity;
         end;
-        //+NPR5.48 [287903]
     end;
 
     local procedure ValidateRelationship(SalesHeader: Record "Sales Header"; SalesLine: Record "Sales Line"; JobPlanningLine: Record "Job Planning Line")
@@ -2304,7 +1987,6 @@ codeunit 6060150 "NPR Event Management"
         Txt: Text[500];
         Text000: Label 'has been changed (initial a %1: %2= %3, %4= %5)';
     begin
-        //-NPR5.48 [287903]
         JobTask.Get(JobPlanningLine."Job No.", JobPlanningLine."Job Task No.");
         Txt := StrSubstNo(Text000,
             JobTask.TableCaption, JobTask.FieldCaption("Job No."), JobTask."Job No.",
@@ -2347,7 +2029,6 @@ codeunit 6060150 "NPR Event Management"
             if JobPlanningLine."VAT %" <> SalesLine."VAT %" then
                 SalesLine.FieldError("VAT %", Txt);
         end;
-        //+NPR5.48 [287903]
     end;
 
     procedure OpenSalesDocument(JobPlanningLineInvoice: Record "Job Planning Line Invoice")
@@ -2357,7 +2038,6 @@ codeunit 6060150 "NPR Event Management"
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         POSQuoteEntry: Record "NPR POS Quote Entry";
     begin
-        //-NPR5.49 [331208]
         with JobPlanningLineInvoice do
             case "Document Type" of
                 "Document Type"::Invoice:
@@ -2396,14 +2076,12 @@ codeunit 6060150 "NPR Event Management"
                         PAGE.RunModal(PAGE::"Posted Sales Credit Memo", SalesCrMemoHeader);
                     end;
             end;
-        //+NPR5.49 [331208]
     end;
 
     procedure GetJobPlanningLineInvoices(JobPlanningLine: Record "Job Planning Line")
     var
         JobPlanningLineInvoice: Record "Job Planning Line Invoice";
     begin
-        //-NPR5.49 [331208]
         ClearAll;
         with JobPlanningLine do begin
             if "Line No." = 0 then
@@ -2420,7 +2098,6 @@ codeunit 6060150 "NPR Event Management"
             end else
                 PAGE.RunModal(PAGE::"NPR Event Invoices", JobPlanningLineInvoice);
         end;
-        //+NPR5.49 [331208]
     end;
 
     procedure FindInvoices(var TempJobPlanningLineInvoice: Record "Job Planning Line Invoice" temporary; JobNo: Code[20]; JobTaskNo: Code[20]; JobPlanningLineNo: Integer; DetailLevel: Option All,"Per Job","Per Job Task","Per Job Planning Line")
@@ -2428,7 +2105,6 @@ codeunit 6060150 "NPR Event Management"
         JobPlanningLineInvoice: Record "Job Planning Line Invoice";
         RecordFound: Boolean;
     begin
-        //-NPR5.49 [331208]
         case DetailLevel of
             DetailLevel::All:
                 begin
@@ -2505,7 +2181,6 @@ codeunit 6060150 "NPR Event Management"
                 end;
             until JobPlanningLineInvoice.Next = 0;
         end;
-        //+NPR5.49 [331208]
     end;
 
     local procedure ShowProcessedPOSDocument(JobPlanningLineInvoice: Record "Job Planning Line Invoice"; Posted: Boolean) HasEntries: Boolean
@@ -2515,7 +2190,6 @@ codeunit 6060150 "NPR Event Management"
         NPRetailSetup: Record "NPR NP Retail Setup";
         AdvancedPostingActive: Boolean;
     begin
-        //-NPR5.49 [331208]
         AdvancedPostingActive := NPRetailSetup.Get and NPRetailSetup."Advanced Posting Activated";
         if AdvancedPostingActive then begin
             POSEntry.SetRange("POS Unit No.", JobPlanningLineInvoice."NPR POS Unit No.");
@@ -2535,14 +2209,12 @@ codeunit 6060150 "NPR Event Management"
                 PAGE.RunModal(0, AuditRoll);
         end;
         exit(HasEntries);
-        //+NPR5.49 [331208]
     end;
 
     procedure GetBlockEventDeleteOptionFilter() OptionFilter: Text
     var
         InS: InStream;
     begin
-        //-NPR5.53 [346821]
         JobsSetup.Get();
         if JobsSetup."NPR Block Event Deletion".HasValue then begin
             JobsSetup.CalcFields("NPR Block Event Deletion");
@@ -2550,7 +2222,6 @@ codeunit 6060150 "NPR Event Management"
             InS.Read(OptionFilter);
         end;
         exit(OptionFilter);
-        //+NPR5.53 [346821]
     end;
 
     local procedure GetJobEventStatusOptions() OptionCaption: Text
@@ -2559,14 +2230,12 @@ codeunit 6060150 "NPR Event Management"
         FldRef: FieldRef;
         Job: Record Job;
     begin
-        //-NPR5.53 [346821]
         RecRef.Open(DATABASE::Job);
         FldRef := RecRef.Field(Job.FieldNo("NPR Event Status"));
         OptionCaption := FldRef.OptionCaption;
         RecRef.Close;
         OptionCaption := RemoveEmptyOptionsFromEventStatusOption(OptionCaption);
         exit(OptionCaption);
-        //+NPR5.53 [346821]
     end;
 
     local procedure RemoveEmptyOptionsFromEventStatusOption(OptionString: Text) CleanedOptionString: Text
@@ -2575,7 +2244,6 @@ codeunit 6060150 "NPR Event Management"
         TypeHelper: Codeunit "Type Helper";
         OptionValue: Text;
     begin
-        //-NPR5.53 [346821]
         for i := 0 to TypeHelper.GetNumberOfOptions(OptionString) do begin
             OptionValue := SelectStr(i + 1, OptionString);
             if OptionValue <> '' then begin
@@ -2585,32 +2253,24 @@ codeunit 6060150 "NPR Event Management"
             end;
         end;
         exit(CleanedOptionString);
-        //+NPR5.53 [346821]
     end;
 
     local procedure BlockDeleteIfInStatus(Job: Record Job)
     var
         OptionFilter: Text;
     begin
-        //-NPR5.53 [346821]
         Job.SetRecFilter;
-        //-NPR5.53 [385993]
-        //Job.SETFILTER("Event Status",GetBlockEventDeleteOptionFilter());
         OptionFilter := GetBlockEventDeleteOptionFilter();
         if OptionFilter = '' then
             exit;
         Job.SetFilter("NPR Event Status", OptionFilter);
-        //+NPR5.53 [385993]
         if not Job.IsEmpty then
             Error(BlockDeleteErr, Job."No.", Format(Job."NPR Event Status"), JobsSetup.TableCaption);
-        //+NPR5.53 [346821]
     end;
 
     procedure SetBufferMode()
     begin
-        //-NPR5.55 [397741]
         BufferMode := true;
-        //+NPR5.55 [397741]
     end;
 }
 
