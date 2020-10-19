@@ -5,146 +5,129 @@ codeunit 6151220 "NPR PrintNode API Mgt."
 
     trigger OnRun()
     begin
-        SendPrintJob('69233945', 0, 'https://app.printnode.com/testpdfs/a4_portrait.pdf', 'Testprint form NAV', 'DEV_Latest', '', '');
+        SendPrintJob('69739205', 0, 'https://app.printnode.com/testpdfs/a4_portrait.pdf', 'Testprint form NAV', 'DEV_Latest', '', '');
     end;
 
     var
-        Text001: Label 'Property "%1" does not exist in JSON object.\\%2.';
-        ConnectOKTxt: Label 'Service Returned %1\%2';
-        RegistreredEmailTxt: Label 'Account registered to email %1';
         TitleDefaultTxt: Label 'NPRetail - Printjob';
         SourceDefaultTxt: Label 'NPRetail';
+        ServiceResultTxt: Label 'Service Returned %1 %2\%3';
 
     procedure TestConnection(ShowMessage: Boolean): Boolean
     var
-        HttpStatusCode: DotNet NPRNetHttpStatusCode;
-        ResponseHeaders: DotNet NPRNetNameValueCollection;
-        JObject: DotNet NPRNetJObject;
-        JToken: DotNet NPRNetJToken;
-        TempBlob: Codeunit "Temp Blob";
-        HttpWebRequestMgt: Codeunit "Http Web Request Mgt.";
-        ResponseInStream: InStream;
+        Client: HttpClient;
+        Headers: HttpHeaders;
+        ResponseMessage: HttpResponseMessage;
+        JSONManagement: Codeunit "JSON Management";
         ResponseText: Text;
+        RegisteredEmail: Variant;
+        RegistreredEmailTxt: Label 'Account registered to email %1';
+
     begin
-        HttpWebRequestMgt.Initialize(BaseUrl + 'whoami');
-        HttpWebRequestMgt.AddHeader('Authorization', GetBasicAuthInfo());
-        HttpWebRequestMgt.SetMethod('GET');
-        HttpWebRequestMgt.SetContentType('application/json');
-
-        Clear(TempBlob);
-        Clear(TempBlob);
-        TempBlob.CreateInStream(ResponseInStream);
-        if not HttpWebRequestMgt.GetResponse(ResponseInStream, HttpStatusCode, ResponseHeaders) then begin
-            if ShowMessage then
-                ErrorHandler();
-            exit(false);
-        end;
-        if ShowMessage then begin
-            ResponseInStream.ReadText(ResponseText);
-            JObject := JObject.Parse(ResponseText);
-            if GetJToken(JObject, JToken, 'email', false) then
-                Message(StrSubstNo(ConnectOKTxt, HttpStatusCode, StrSubstNo(RegistreredEmailTxt, JToken.ToString)))
-            else
-                Message(StrSubstNo(ConnectOKTxt, HttpStatusCode));
-        end;
-        exit(true);
-    end;
-
-    procedure GetPrinters(var PrintNodePrinter: Record "NPR PrintNode Printer"): Boolean
-    var
-        HttpStatusCode: DotNet NPRNetHttpStatusCode;
-        ResponseHeaders: DotNet NPRNetNameValueCollection;
-        JArray: DotNet NPRNetJArray;
-        JToken: DotNet NPRNetJToken;
-        TempBlob: Codeunit "Temp Blob";
-        HttpWebRequestMgt: Codeunit "Http Web Request Mgt.";
-        ResponseInStream: InStream;
-        ResponseText: Text;
-        I: Integer;
-        PrinterId: Text;
-    begin
-        HttpWebRequestMgt.Initialize(BaseUrl + 'printers');
-        HttpWebRequestMgt.AddHeader('Authorization', GetBasicAuthInfo());
-        HttpWebRequestMgt.SetMethod('GET');
-        HttpWebRequestMgt.SetContentType('application/json');
-
-        Clear(TempBlob);
-        Clear(TempBlob);
-        TempBlob.CreateInStream(ResponseInStream);
-        if not HttpWebRequestMgt.GetResponse(ResponseInStream, HttpStatusCode, ResponseHeaders) then begin
-            HttpWebRequestMgt.ProcessFaultXMLResponse('', '', '', '');
-            exit(false);
-        end;
-
-        ResponseInStream.ReadText(ResponseText);
-        JArray := JArray.Parse(ResponseText);
-        while I < JArray.Count do begin
-            JToken := JArray.Item(I);
-            PrintNodePrinter.Init;
-            PrinterId := GetString(JToken, 'id', true);
-            if not PrintNodePrinter.Get(PrinterId) then begin
-                PrintNodePrinter.Init;
-                PrintNodePrinter.Id := PrinterId;
-                PrintNodePrinter.Name := CopyStr(GetString(JToken, 'name', false), 1, MaxStrLen(PrintNodePrinter.Name));
-                PrintNodePrinter.Description := CopyStr(GetString(JToken, 'description', false), 1, MaxStrLen(PrintNodePrinter.Description));
-                PrintNodePrinter.Insert(true);
-            end else begin
-                PrintNodePrinter.Name := CopyStr(GetString(JToken, 'name', false), 1, MaxStrLen(PrintNodePrinter.Name));
-                PrintNodePrinter.Description := CopyStr(GetString(JToken, 'description', false), 1, MaxStrLen(PrintNodePrinter.Description));
-                PrintNodePrinter.Modify(true);
+        Headers := Client.DefaultRequestHeaders();
+        Headers.Add('Authorization', GetBasicAuthInfo());
+        Client.Get(BaseUrl() + 'whoami', ResponseMessage);
+        if not ResponseMessage.IsSuccessStatusCode then begin
+            if ShowMessage then begin
+                ResponseMessage.Content().ReadAs(ResponseText);
+                Message(StrSubstNo(ServiceResultTxt, ResponseMessage.HttpStatusCode, ResponseMessage.ReasonPhrase, ResponseText));
             end;
-            I += 1;
+            exit(false);
         end;
 
+        if ShowMessage then begin
+            ResponseMessage.Content().ReadAs(ResponseText);
+            if JSONManagement.InitializeFromString(ResponseText) then
+                JSONManagement.GetPropertyValueByName('email', RegisteredEmail);
+
+            if Format(RegisteredEmail) <> '' then
+                Message(StrSubstNo(ServiceResultTxt, ResponseMessage.HttpStatusCode, ResponseMessage.ReasonPhrase, StrSubstNo(RegistreredEmailTxt, RegisteredEmail)))
+            else
+                Message(StrSubstNo(ServiceResultTxt, ResponseMessage.HttpStatusCode, ResponseMessage.ReasonPhrase, ''));
+        end;
         exit(true);
     end;
 
-    procedure SendPrintJob(PrinterId: Code[20]; ContentType: Option pdf_uri,pdf_base64,raw_uri,raw_base64; Content: Text; Title: Text; SourceDescription: Text; Options: Text; Authentication: Text) PrintJobId: Integer
+    procedure GetPrinters(var JArray: JsonArray): Boolean
+    begin
+        exit(TryGetPrinters('', JArray));
+    end;
+
+    procedure GetPrinterInfo(PrinterId: Text; var JArray: JsonArray): Boolean
+    begin
+        exit(TryGetPrinters(PrinterId, JArray));
+    end;
+
+    [TryFunction]
+    local procedure TryGetPrinters(PrinterId: Text; var JArray: JsonArray)
     var
-        HttpStatusCode: DotNet NPRNetHttpStatusCode;
-        ResponseHeaders: DotNet NPRNetNameValueCollection;
-        JObject: DotNet NPRNetJObject;
-        TempBlob: Codeunit "Temp Blob";
-        HttpWebRequestMgt: Codeunit "Http Web Request Mgt.";
-        ResponseInStream: InStream;
-        BodyStream: OutStream;
+        Client: HttpClient;
+        Headers: HttpHeaders;
+        ResponseMessage: HttpResponseMessage;
         ResponseText: Text;
     begin
-        HttpWebRequestMgt.Initialize(BaseUrl + 'printjobs');
-        HttpWebRequestMgt.AddHeader('Authorization', GetBasicAuthInfo());
-        HttpWebRequestMgt.SetMethod('POST');
-        HttpWebRequestMgt.SetContentType('application/json');
+        Headers := Client.DefaultRequestHeaders();
+        Headers.Add('Authorization', GetBasicAuthInfo());
+        if PrinterId <> '' then
+            Client.Get(BaseUrl() + 'printers/' + PrinterId, ResponseMessage)
+        else
+            Client.Get(BaseUrl() + 'printers', ResponseMessage);
+
+        ResponseMessage.Content().ReadAs(ResponseText);
+
+        if not ResponseMessage.IsSuccessStatusCode then
+            Error(StrSubstNo(ServiceResultTxt, ResponseMessage.HttpStatusCode, ResponseMessage.ReasonPhrase, ResponseText));
+
+        JArray.ReadFrom(ResponseText);
+    end;
+
+    procedure SendPrintJob(PrinterId: Code[20]; ContentType: Option pdf_uri,pdf_base64,raw_uri,raw_base64; DataContent: Text; Title: Text; SourceDescription: Text; Options: Text; Authentication: Text) PrintJobId: Integer
+    var
+        Client: HttpClient;
+        Content: HttpContent;
+        Headers: HttpHeaders;
+        ResponseMessage: HttpResponseMessage;
+        Object: JsonObject;
+        OptionsObject: JsonObject;
+        JsonString: Text;
+        ResponseText: Text;
+    begin
 
         if Title = '' then
             Title := TitleDefaultTxt;
         if SourceDescription = '' then
             SourceDescription := SourceDefaultTxt;
-        JObject := JObject.JObject();
-        AddJPropertyToJObject(JObject, 'printerId', PrinterId);
-        AddJPropertyToJObject(JObject, 'title', Title);
-        AddJPropertyToJObject(JObject, 'contentType', Format(ContentType));
-        AddJPropertyToJObject(JObject, 'content', Content);
-        AddJPropertyToJObject(JObject, 'source', SourceDescription);
+
+        Object.Add('printerId', PrinterId);
+        Object.Add('title', Title);
+        Object.Add('contentType', Format(ContentType));
+        Object.Add('content', DataContent);
+        Object.Add('source', SourceDescription);
         if Options <> '' then
-            AddJPropertyToJObject(JObject, 'options', Options);
+            if OptionsObject.ReadFrom(Options) then
+                Object.Add('options', OptionsObject)
+            else
+                Object.Add('options', Options);
         if Authentication <> '' then
-            AddJPropertyToJObject(JObject, 'authentication', Authentication);
+            Object.Add('authentication', Authentication);
+        Object.WriteTo(JsonString);
 
-        Clear(TempBlob);
-        TempBlob.CreateOutStream(BodyStream);
-        BodyStream.WriteText(JObject.ToString());
-        HttpWebRequestMgt.AddBodyBlob(TempBlob);
+        Content.WriteFrom(JsonString);
+        Content.GetHeaders(Headers);
+        Headers.Clear();
+        Headers.Add('Content-Type', 'application/json');
 
-        Clear(TempBlob);
-        Clear(TempBlob);
-        TempBlob.CreateInStream(ResponseInStream);
-        if not HttpWebRequestMgt.GetResponse(ResponseInStream, HttpStatusCode, ResponseHeaders) then begin
-            ErrorHandler();
-            HttpWebRequestMgt.ProcessFaultXMLResponse('', '', '', '');
+        Headers := Client.DefaultRequestHeaders();
+        Headers.Add('Authorization', GetBasicAuthInfo());
+
+        Client.Post(BaseUrl() + 'printjobs', Content, ResponseMessage);
+
+        ResponseMessage.Content().ReadAs(ResponseText);
+
+        if not ResponseMessage.IsSuccessStatusCode then begin
+            Message(StrSubstNo(ServiceResultTxt, ResponseMessage.HttpStatusCode, ResponseMessage.ReasonPhrase, ResponseText));
             exit(0);
         end;
-
-        ResponseInStream.ReadText(ResponseText);
         if Evaluate(PrintJobId, ResponseText) then;
         exit(PrintJobId);
     end;
@@ -166,31 +149,6 @@ codeunit 6151220 "NPR PrintNode API Mgt."
         SendPrintJob(PrinterId, 3, Base64, Title, SourceDescription, Options, '');
     end;
 
-    local procedure GetJToken(var JObject: DotNet NPRNetJObject; var JToken: DotNet NPRNetJToken; Property: Text; WithError: Boolean): Boolean
-    var
-        JTokenTemp: DotNet NPRNetJToken;
-    begin
-
-        JTokenTemp := JObject.Item(Property);
-        if IsNull(JTokenTemp) then begin
-            if WithError then
-                Error(StrSubstNo(Text001, Property, JObject.ToString()));
-            exit(false);
-        end else
-            JToken := JTokenTemp;
-
-        exit(true);
-    end;
-
-    local procedure GetString(var JObject: DotNet NPRNetJObject; Property: Text; WithError: Boolean): Text
-    var
-        JToken: DotNet NPRNetJToken;
-    begin
-        if GetJToken(JObject, JToken, Property, WithError) then
-            exit(JToken.ToString());
-        exit('');
-    end;
-
     local procedure BaseUrl(): Text
     begin
         exit('https://api.printnode.com/');
@@ -198,40 +156,18 @@ codeunit 6151220 "NPR PrintNode API Mgt."
 
     local procedure GetBasicAuthInfo(): Text
     var
-        Convert: DotNet NPRNetConvert;
-        Encoding: DotNet NPRNetEncoding;
         PrintNodeSetup: Record "NPR PrintNode Setup";
+        Base64Convert: Codeunit "Base64 Convert";
+        TempBlob: Codeunit "Temp Blob";
+        IStream: InStream;
+        OStream: OutStream;
     begin
         PrintNodeSetup.Get;
         PrintNodeSetup.TestField("API Key");
-        exit('Basic ' + Convert.ToBase64String(Encoding.UTF8.GetBytes(PrintNodeSetup."API Key" + ':')));
-    end;
-
-    procedure AddJPropertyToJObject(var JObject: DotNet NPRNetJObject; propertyName: Text; value: Variant)
-    var
-        JObject2: DotNet NPRNetJObject;
-        JProperty: DotNet NPRNetJProperty;
-        ValueText: Text;
-    begin
-        case true of
-            value.IsDotNet:
-                begin
-                    JObject2 := value;
-                    JObject.Add(propertyName, JObject2);
-                end;
-            value.IsInteger,
-            value.IsDecimal,
-            value.IsBoolean:
-                begin
-                    JProperty := JProperty.JProperty(propertyName, value);
-                    JObject.Add(JProperty);
-                end;
-            else begin
-                    ValueText := Format(value, 0, 9);
-                    JProperty := JProperty.JProperty(propertyName, ValueText);
-                    JObject.Add(JProperty);
-                end;
-        end;
+        TempBlob.CreateOutStream(OStream, TextEncoding::UTF8);
+        OStream.WriteText(PrintNodeSetup."API Key" + ':');
+        TempBlob.CreateInStream(IStream);
+        exit('Basic ' + Base64Convert.ToBase64(IStream));
     end;
 
     local procedure StreamToBase64Text(var Stream: DotNet NPRNetMemoryStream): Text
@@ -239,26 +175,6 @@ codeunit 6151220 "NPR PrintNode API Mgt."
         Convert: DotNet NPRNetConvert;
     begin
         exit(Convert.ToBase64String(Stream.ToArray()));
-    end;
-
-    local procedure ErrorHandler()
-    var
-        WebRequestHelper: Codeunit "Web Request Helper";
-        WebException: DotNet NPRNetWebException;
-        ResponseInputStream: InStream;
-        ErrorText: Text;
-        ErrorPart: Text;
-        ServiceURL: Text;
-    begin
-        ErrorText := WebRequestHelper.GetWebResponseError(WebException, ServiceURL);
-        if not IsNull(WebException.Response) then begin
-            ResponseInputStream := WebException.Response.GetResponseStream;
-            while not ResponseInputStream.EOS do begin
-                ResponseInputStream.ReadText(ErrorPart);
-                ErrorText += '\' + ErrorPart;
-            end;
-        end;
-        Error(ErrorText);
     end;
 }
 

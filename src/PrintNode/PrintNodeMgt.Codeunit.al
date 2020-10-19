@@ -1,7 +1,5 @@
 codeunit 6151221 "NPR PrintNode Mgt."
 {
-    // NPR5.53/THRO/20200106 CASE 383562 Object Created
-
 
     trigger OnRun()
     begin
@@ -16,38 +14,141 @@ codeunit 6151221 "NPR PrintNode Mgt."
 
     procedure LookupPrinter(var PrinterId: Text): Boolean
     var
-        PrintNodePrinter: Record "NPR PrintNode Printer";
+        PrinterName: Text;
     begin
-        if PAGE.RunModal(6151221, PrintNodePrinter) = ACTION::LookupOK then begin
-            PrinterId := PrintNodePrinter.Id;
-            exit(true);
+        exit(LookupPrinterIdAndName(PrinterId, PrinterName));
+    end;
+
+    procedure LookupPrinterIdAndName(var PrinterID: Text; var PrinterName: Text): Boolean
+    var
+        TempRetailList: Record "NPR Retail List" temporary;
+        PrintNodeAPI: Codeunit "NPR PrintNode API Mgt.";
+        RetailList: Page "NPR Retail List";
+        JArray: JsonArray;
+        JToken: JsonToken;
+    begin
+        ClearLastError();
+        if not PrintNodeAPI.GetPrinters(JArray) then
+            Error(GetLastErrorText);
+        foreach JToken in JArray do begin
+            TempRetailList.Number += 1;
+            TempRetailList.Choice := CopyStr(GetString(JToken.AsObject(), 'name', false), 1, MaxStrLen(TempRetailList.Choice));
+            TempRetailList.Value := GetString(JToken.AsObject(), 'id', true);
+            TempRetailList.Insert();
+        end;
+        if TempRetailList.IsEmpty then
+            exit(false);
+        RetailList.SetRec(TempRetailList);
+        RetailList.SetShowValue(true);
+        RetailList.LookupMode(true);
+        if RetailList.RunModal() <> Action::LookupOK then
+            exit(false);
+        RetailList.GetRecord(TempRetailList);
+        PrinterID := TempRetailList.Value;
+        PrinterName := TempRetailList.Choice;
+        exit(true);
+    end;
+
+    procedure SetPrinterOptions(var PrintNodePrinter: Record "NPR PrintNode Printer")
+    var
+        PrintNodeAPI: Codeunit "NPR PrintNode API Mgt.";
+        PrintNodeSettings: Page "NPR PrintNode Printer Settings";
+        JArray: JsonArray;
+        JToken: JsonToken;
+        IStream: InStream;
+        OStream: OutStream;
+        SettingsJson: Text;
+        PrinterNotFoundErr: label 'Printer %1 not found in PrintNode.';
+    begin
+        if PrintNodePrinter.Id = '' then
+            exit;
+        if not PrintNodeAPI.GetPrinterInfo(PrintNodePrinter.Id, JArray) then
+            Error(PrinterNotFoundErr, PrintNodePrinter.Id);
+        if not JArray.Get(0, JToken) then
+            exit;
+        if not GetToken(JToken.AsObject(), JToken, 'capabilities', false) then
+            exit;
+        if PrintNodePrinter.Settings.HasValue then begin
+            PrintNodePrinter.CalcFields(Settings);
+            PrintNodePrinter.Settings.CreateInStream(IStream, TextEncoding::UTF8);
+            IStream.Read(SettingsJson);
+            PrintNodeSettings.LoadExistingSettings(SettingsJson);
+        end;
+        PrintNodeSettings.LookupMode(true);
+        JToken.WriteTo(SettingsJson);
+        PrintNodeSettings.SetPrinterJson(SettingsJson);
+        if PrintNodeSettings.RunModal() = Action::LookupOK then begin
+            SettingsJson := PrintNodeSettings.GetSettings();
+            if SettingsJson <> '' then begin
+                PrintNodePrinter.Settings.CreateOutStream(OStream, TextEncoding::UTF8);
+                OStream.Write(SettingsJson);
+            end else
+                clear(PrintNodePrinter.Settings);
+            PrintNodePrinter.Modify(true);
         end;
     end;
 
-    procedure RefreshPrinters()
+    procedure GetPrinterOptions(PrinterId: Text; ObjectType: Option "Report","Codeunit"; ObjectId: Integer): Text
     var
-        Printer: Record "NPR PrintNode Printer";
-        TempPrinter: Record "NPR PrintNode Printer" temporary;
-        PrintNodeAPIMgt: Codeunit "NPR PrintNode API Mgt.";
+        PrintNodePrinter: Record "NPR PrintNode Printer";
+        IStream: InStream;
+        SettingsJson: Text;
     begin
-        if not PrintNodeAPIMgt.GetPrinters(TempPrinter) then
+        PrintNodePrinter.SetAutoCalcFields(Settings);
+        if not PrintNodePrinter.Get(PrinterId, ObjectType, ObjectId) then
+            if not PrintNodePrinter.Get(PrinterId, ObjectType, 0) then
+                exit('');
+        if not PrintNodePrinter.Settings.HasValue then
+            exit('');
+        PrintNodePrinter.Settings.CreateInStream(IStream, TextEncoding::UTF8);
+        IStream.Read(SettingsJson);
+        exit(SettingsJson);
+    end;
+
+    procedure ViewPrinterInfo(PrinterId: Text)
+    var
+        PrintNodeAPI: Codeunit "NPR PrintNode API Mgt.";
+        TempBlob: Codeunit "Temp Blob";
+        JArray: JsonArray;
+        OStream: OutStream;
+        IStream: InStream;
+        Filename: Text;
+        PrinterNotFoundErr: Label 'Printer %1 not found in PrintNode.';
+    begin
+        if PrinterId = '' then
             exit;
-        if Printer.FindSet(true) then
-            repeat
-                if TempPrinter.Get(Printer.Id) then begin
-                    Printer.Name := TempPrinter.Name;
-                    Printer.Description := TempPrinter.Description;
-                    Printer.Modify(true);
-                    TempPrinter.Delete(false);
-                end else begin
-                    Printer.Delete(true);
-                end;
-            until Printer.Next = 0;
-        if TempPrinter.FindSet then
-            repeat
-                Printer := TempPrinter;
-                Printer.Insert(true);
-            until TempPrinter.Next = 0;
+        if not PrintNodeAPI.GetPrinterInfo(PrinterId, JArray) then
+            Error(PrinterNotFoundErr, PrinterId);
+        TempBlob.CreateOutStream(OStream);
+        if not JArray.WriteTo(OStream) then
+            exit;
+        TempBlob.CreateInStream(IStream);
+        Filename := 'Config' + PrinterId + '.json';
+        DownloadFromStream(Istream, 'Printer Config', '', 'JSON File (*.json)|*.json', Filename);
+    end;
+
+    local procedure GetToken(JObject: JsonObject; var JToken: JsonToken; TokenKey: Text; WithError: Boolean): Boolean
+    var
+        JSonString: Text;
+        KeyNotFoundTxt: Label 'Property "%1" does not exist in JSON object.\\%2.';
+    begin
+        if not JObject.Get(TokenKey, JToken) then begin
+            if WithError then begin
+                JObject.WriteTo(JSonString);
+                Error(StrSubstNo(KeyNotFoundTxt, TokenKey, JSonString));
+            end;
+            exit(false);
+        end;
+        exit(true);
+    end;
+
+    local procedure GetString(JObject: JsonObject; TokenKey: Text; WithError: Boolean): Text
+    var
+        JToken: JsonToken;
+    begin
+        if GetToken(JObject, JToken, TokenKey, WithError) then
+            exit(JToken.AsValue().AsText());
+        exit('');
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6059767, 'OnAddHandlingProfilesToLibrary', '', true, true)]
@@ -86,8 +187,6 @@ codeunit 6151221 "NPR PrintNode Mgt."
             exit;
 
         PrinterId := NaviDocsEntry."Template Code";
-        //IF PrinterId = '' THEN
-        //   PrinterId := FindPrinter(NaviDocsEntry."Insert User ID",ReportID);
 
         if PrinterId = '' then
             ErrorMessage := NoDefaultPrinterErr;
@@ -98,8 +197,6 @@ codeunit 6151221 "NPR PrintNode Mgt."
 
         // GetOutput
         if ErrorMessage = '' then begin
-            //TempBlob.INIT;
-            //TempBlob.CREATEOUTSTREAM(DataStream);
             RecRef.SetRecFilter;
             SetCustomReportLayout(RecRef, ReportID);
             OutPDFStream := OutPDFStream.MemoryStream();

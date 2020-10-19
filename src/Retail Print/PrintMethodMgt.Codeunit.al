@@ -1,26 +1,5 @@
 codeunit 6014582 "NPR Print Method Mgt."
 {
-    // NPR5.20/MMV/20160224 CASE 233229 Created CU to unify all print methods in one place independent of each device CU.
-    // 
-    // Called from each printer interface codeunit:
-    //   Line Printer Interface   (Receipt/display printers)
-    //   Matrix Printer Interface (Label printers)
-    //   Report Printer Interface (Everything else, ie. A4 printers)
-    // 
-    // NPR5.22/MMV/20160315 CASE 228382 Added handling of e-mail print, Google Cloud Print & small cleanup.
-    // NPR5.23/MMV /20160609 CASE 240856 Return any Google Cloud Print error instead of showing in message straight away.
-    // NPR5.26/MMV /20160824 CASE 246209 Use streams instead of temp files for report printing.
-    //                                   Use CLIENTTYPE instead of user setup to determine print route.
-    //                                   Removed old comments.
-    // NPR5.29/MMV /20161110 CASE 256521 Added support for file printing via stargate and client-side .NET
-    //                                   refactored.
-    // NPR5.29/MMV /20161220 CASE 253590 Added function PrintBytesHTTP
-    // NPR5.30/MMV /20170209 CASE 261964 Updated google print function.
-    // NPR5.30/MMV /20170209 CASE 261964 Updated google print function.
-    // NPR5.32/MMV /20170313 CASE 253590 Added support for bluetooth print.
-    // NPR5.51/MMV /20190801 CASE 360975 Invoke hardware connector when attempting to print raw outside the POS.
-    // NPR5.53/THRO/20200106 CASE 383562 Added function PrintViaPrintNodePdf
-
 
     procedure PrintBytesLocal(PrinterName: Text; PrintBytes: Text; TargetEncoding: Text)
     var
@@ -38,9 +17,7 @@ codeunit 6014582 "NPR Print Method Mgt."
                 if (POSSession.IsActiveSession(POSFrontEnd)) then
                     POSProxyRawPrint.Print(POSFrontEnd, PrinterName, TargetEncoding, PrintBytes, false)
                 else
-                    //-NPR5.51 [360975]
                     HardwareConnectorMgt.SendRawPrintRequest(PrinterName, PrintBytes, TargetEncoding);
-        //+NPR5.51 [360975]
         end;
     end;
 
@@ -111,22 +88,20 @@ codeunit 6014582 "NPR Print Method Mgt."
         SmtpMail.Send();
     end;
 
-    procedure PrintViaPrintNodePdf(PrinterID: Text; var PdfStream: DotNet NPRNetMemoryStream; DocumentDescription: Text)
+    procedure PrintViaPrintNodePdf(PrinterID: Text; var PdfStream: DotNet NPRNetMemoryStream; DocumentDescription: Text; ObjectType: Option "Report","Codeunit"; ObjectID: Integer)
     var
         PrintNodeAPIMgt: Codeunit "NPR PrintNode API Mgt.";
+        PrintNodeMgt: Codeunit "NPR PrintNode Mgt.";
     begin
-        //-NPR5.53 [383562]
-        PrintNodeAPIMgt.SendPDFStream(PrinterID, PdfStream, DocumentDescription, '', '');
-        //+NPR5.53 [383562]
+        PrintNodeAPIMgt.SendPDFStream(PrinterID, PdfStream, DocumentDescription, '', PrintNodeMgt.GetPrinterOptions(PrinterID, ObjectType, ObjectID));
     end;
 
-    procedure PrintViaPrintNodeRaw(PrinterID: Text; PrintBytes: Text; TargetEncoding: Text)
+    procedure PrintViaPrintNodeRaw(PrinterID: Text; PrintBytes: Text; TargetEncoding: Text; ObjectType: Option "Report","Codeunit"; ObjectID: Integer)
     var
         PrintNodeAPIMgt: Codeunit "NPR PrintNode API Mgt.";
+        PrintNodeMgt: Codeunit "NPR PrintNode Mgt.";
     begin
-        //-NPR5.53 [383562]
-        PrintNodeAPIMgt.SendRawText(PrinterID, PrintBytes, TargetEncoding, '', '', '');
-        //+NPR5.53 [383562]
+        PrintNodeAPIMgt.SendRawText(PrinterID, PrintBytes, TargetEncoding, '', '', PrintNodeMgt.GetPrinterOptions(PrinterID, ObjectType, ObjectID));
     end;
 
     procedure PrintBytesViaClientAddin(PrinterName: Text; PrintBytes: Text; TargetEncoding: Text)
@@ -217,9 +192,7 @@ codeunit 6014582 "NPR Print Method Mgt."
     var
         MobilePrintMgt: Codeunit "NPR Mobile Print Mgt.";
     begin
-        //-NPR5.32 [253590]
         MobilePrintMgt.PrintJobBluetooth(DeviceName, PrintBytes, TargetEncoding);
-        //+NPR5.32 [253590]
     end;
 }
 
