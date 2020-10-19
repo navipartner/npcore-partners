@@ -1,223 +1,64 @@
 codeunit 6184500 "NPR CleanCash Wrapper"
 {
-    // NPR4.21/JHL/20160302 CASE 222417 Created for wrapping CleanCash for the uses of only Swedish customer
-    // NPR5.26/JHL/20160711 CASE 242776 Out comment the functionality to check the connection.
-    // NPR5.26/JHL/20160916 CASE 244106 Handling the print function for CleanCash as subscriber to event publish by CU 6014560
-    //                           The functions InitCleanCashData, GetLines and GetCleanCashInformation is changed to local function
-    // NPR5.32/MMV /20170511 CASE 241995 Retail Print 2.0: Added OnReceiptFooter() subscriber for new receipt footer event.
-    // NPR5.39/MHA /20180202  CASE 302779 Added OnFinishSale POS Workflow and deleted deprecated function CreateOnSaleCleanCashWrapper()
-    // NPR5.40/MMV /20180208  CASE 304639 Changed event signature of OnReceiptFooter()
-
-    TableNo = "NPR Audit Roll";
-
-    trigger OnRun()
-    var
-        "Object": Record "Object";
-        LastSalesTicketNo: Code[20];
-    begin
-        //-NPR5.26
-        //IF NOT IsCleanCashPossible THEN
-        //  EXIT;
-
-        //AuditRoll.COPY(Rec);
-        //IF NOT IsRegisterCleanCash(AuditRoll) THEN
-        //  EXIT;
-
-        //RunSalesTicket();
-        //+NPR5.26
-    end;
 
     var
-        CleanCashCommunication: Codeunit "NPR CleanCash Comm.";
-        CleanCashAuditRoll: Record "NPR CleanCash Audit Roll";
-        LastReceiptNo: Code[10];
         Text000: Label 'Create Sales in CleanCash';
 
-    local procedure RunSalesTicket(var AuditRoll: Record "NPR Audit Roll")
+    // Append to Print Receipt
+    local procedure PrintCleanCash(var LinePrintMgt: Codeunit "NPR RP Line Print Mgt."; var PosEntry: Record "NPR POS Entry")
     var
-        CleanCashAuditRollMgt: Codeunit "NPR CleanCash AuditRoll Mgt.";
-        AuditRoll2: Record "NPR Audit Roll";
+        CleanCashTransaction: Record "NPR CleanCash Trans. Request";
     begin
-        AuditRoll2.Copy(AuditRoll);
-        CleanCashAuditRollMgt.Run(AuditRoll2);
+
+        CleanCashTransaction.SetFilter("POS Entry No.", '=%1', PosEntry."Entry No.");
+        CleanCashTransaction.SetFilter("Request Send Status", '=%1', CleanCashTransaction."Request Send Status"::COMPLETE);
+
+        CleanCashTransaction.SetFilter("Request Type", '=%1', CleanCashTransaction."Request Type"::RegisterSalesReceipt);
+        if (CleanCashTransaction.FindLast()) then
+            PrintCleanCashTransaction(LinePrintMgt, CleanCashTransaction."Entry No.");
+
+        CleanCashTransaction.SetFilter("Request Type", '=%1', CleanCashTransaction."Request Type"::RegisterReturnReceipt);
+        if (CleanCashTransaction.FindLast()) then
+            PrintCleanCashTransaction(LinePrintMgt, CleanCashTransaction."Entry No.");
     end;
 
-    procedure RunMissingSalesTicket()
+    // Append to Print Receipt
+    local procedure PrintCleanCashTransaction(var LinePrintMgt: Codeunit "NPR RP Line Print Mgt."; TransactionEntryNo: Integer)
+    var
+        CleanCashTransaction: Record "NPR CleanCash Trans. Request";
+        CleanCash: Interface "NPR CleanCash XCCSP Interface";
     begin
-        if not IsCleanCashPossible then
+        if (not CleanCashTransaction.Get(TransactionEntryNo)) then
             exit;
 
-        CleanCashCommunication.RunMultiSalesTicket();
+        CleanCash := CleanCashTransaction."Request Type";
+        CleanCash.AddToPrintBuffer(LinePrintMgt, CleanCashTransaction);
     end;
 
-    procedure TestConnection(RegisterNo: Code[20])
-    begin
-        if not IsCleanCashPossible then
-            exit;
-
-        //-NPR5.26
-        //CleanCashCommunication.CheckConnection(RegisterNo);
-        //+NPR5.26
-    end;
-
-    local procedure InitCleanCashData(var AuditRoll2: Record "NPR Audit Roll"): Boolean
-    begin
-        //-NPR5.26
-        //IF NOT IsCleanCashPossible THEN
-        //  EXIT(FALSE);
-
-        //+NPR5.26
-        CleanCashAuditRoll.SetRange("Register No.", AuditRoll2."Register No.");
-        CleanCashAuditRoll.SetRange("Sales Ticket No.", AuditRoll2."Sales Ticket No.");
-        CleanCashAuditRoll.SetRange("Sale Date", AuditRoll2."Sale Date");
-        if not CleanCashAuditRoll.FindSet then
-            if not IsRegisterCleanCash(AuditRoll2) then
-                exit(false);
-
-        LastReceiptNo := '0';
-        exit(true);
-    end;
-
-    local procedure GetLines(): Integer
-    begin
-        exit(CleanCashAuditRoll.Count);
-    end;
-
-    local procedure GetCleanCashInformation(var ReceiptNo: Code[10]; var SerialNo: Text[30]; var ControlCode: Text[100]; var CopySerialNo: Text[30]; var CopyControlCode: Text[100])
-    var
-        Stop: Boolean;
-    begin
-        ReceiptNo := '';
-        SerialNo := '';
-        ControlCode := '';
-        CopySerialNo := '';
-        CopyControlCode := '';
-
-
-        Stop := false;
-        if CleanCashAuditRoll.FindSet then
-            repeat
-                if LastReceiptNo <> CleanCashAuditRoll."CleanCash Reciept No." then begin
-                    Stop := true;
-                    LastReceiptNo := CleanCashAuditRoll."CleanCash Reciept No.";
-                    ReceiptNo := CleanCashAuditRoll."CleanCash Reciept No.";
-                    SerialNo := CleanCashAuditRoll."CleanCash Serial No.";
-                    ControlCode := CleanCashAuditRoll."CleanCash Control Code";
-                    CopySerialNo := CleanCashAuditRoll."CleanCash Copy Serial No.";
-                    CopyControlCode := CleanCashAuditRoll."CleanCash Copy Control Code";
-                end;
-            until (CleanCashAuditRoll.Next = 0) or Stop;
-    end;
-
-    local procedure IsRegisterCleanCash(var AuditRoll2: Record "NPR Audit Roll"): Boolean
-    var
-        CleanCashRegister: Record "NPR CleanCash Register";
-    begin
-        CleanCashRegister.SetRange("Register No.", AuditRoll2."Register No.");
-        CleanCashRegister.SetRange("CleanCash Integration", true);
-        if CleanCashRegister.FindFirst then
-            exit(true);
-        exit(false);
-    end;
-
-    local procedure IsCleanCashPossible(): Boolean
-    var
-        "Object": Record "Object";
-    begin
-        //-NPR5.26
-        /*
-        Object.SETRANGE(Type,Object.Type::Table);
-        Object.SETRANGE(ID,6184500);
-        IF Object.FINDFIRST THEN
-          EXIT(TRUE);
-        EXIT(FALSE);
-        */
-        //+NPR5.26
-
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, 6014560, 'OnPrintCleanCash', '', true, false)]
-    local procedure CreateOnPrintCleanCash(var LinePrintMgt: Codeunit "NPR RP Line Print Mgt."; var AuditRoll: Record "NPR Audit Roll")
-    begin
-        //-NPR5.26
-        PrintCleanCash(LinePrintMgt, AuditRoll);
-        //+NPR5.26
-    end;
-
-    local procedure PrintCleanCash(var LinePrintMgt: Codeunit "NPR RP Line Print Mgt."; var AuditRoll: Record "NPR Audit Roll")
-    var
-        CleanCashWrapper: Codeunit "NPR CleanCash Wrapper";
-        AuditRollCleanCash: Record "NPR Audit Roll";
-        Lines: Integer;
-        i: Integer;
-        ReceiptNo: Code[10];
-        SerialNo: Text[30];
-        ControlCode: Text[100];
-        CopySerialNo: Text[30];
-        CopyControlCode: Text[100];
-        txtReceiptNo: Label 'Receipt No.';
-        txtSerialNo: Label 'Serial No.';
-        txtControlCode: Label 'Control Code';
-    begin
-        //-NPR5.26
-        AuditRollCleanCash.Copy(AuditRoll);
-        if AuditRollCleanCash.FindFirst then
-            if InitCleanCashData(AuditRollCleanCash) then begin
-                Lines := GetLines();
-                for i := 1 to Lines do begin
-                    GetCleanCashInformation(ReceiptNo, SerialNo, ControlCode, CopySerialNo, CopyControlCode);
-                    LinePrintMgt.NewLine;
-                    LinePrintMgt.AddLine(txtReceiptNo);
-                    LinePrintMgt.AddLine(ReceiptNo);
-                    LinePrintMgt.NewLine;
-                    LinePrintMgt.AddLine(txtSerialNo);
-                    if CopySerialNo = '' then
-                        LinePrintMgt.AddLine(SerialNo)
-                    else
-                        LinePrintMgt.AddLine(CopySerialNo);
-                    LinePrintMgt.NewLine;
-                    LinePrintMgt.AddLine(txtControlCode);
-                    if CopySerialNo = '' then begin
-                        LinePrintMgt.AddLine(CopyStr(ControlCode, 1, 30));
-                        LinePrintMgt.AddLine(CopyStr(ControlCode, 31, 60));
-                    end else begin
-                        LinePrintMgt.AddLine(CopyStr(CopyControlCode, 1, 30));
-                        LinePrintMgt.AddLine(CopyStr(CopyControlCode, 31, 60));
-                    end;
-
-                end;
-            end;
-        //+NPR5.26
-    end;
-
+    // Subscriber to Footer Event in printing
     [EventSubscriber(ObjectType::Codeunit, 6014534, 'OnSalesReceiptFooter', '', true, false)]
     local procedure OnReceiptFooter(var TemplateLine: Record "NPR RP Template Line"; ReceiptNo: Text)
     var
         LinePrintMgt: Codeunit "NPR RP Line Print Mgt.";
-        AuditRoll: Record "NPR Audit Roll";
+        PosEntry: Record "NPR POS Entry";
     begin
-        //-NPR5.32 [241995]
         LinePrintMgt.SetFont(TemplateLine."Type Option");
         LinePrintMgt.SetBold(TemplateLine.Bold);
         LinePrintMgt.SetUnderLine(TemplateLine.Underline);
 
-        //-NPR5.40 [304639]
-        AuditRoll.SetRange("Sales Ticket No.", ReceiptNo);
-        AuditRoll.FindSet;
-        //+NPR5.40 [304639]
+        // TODO: A potential problem here, if different number series that overlap are used on different POS Units
+        PosEntry.SetFilter("Document No.", '=%1', ReceiptNo);
 
-        PrintCleanCash(LinePrintMgt, AuditRoll);
-        //+NPR5.32 [241995]
+        if (PosEntry.FindLast()) then
+            PrintCleanCash(LinePrintMgt, PosEntry);
     end;
 
-    local procedure "--- OnFinishSale Workflow"()
-    begin
-    end;
 
+    // Insert the workflow step in  POS Workflows
     [EventSubscriber(ObjectType::Table, 6150730, 'OnBeforeInsertEvent', '', true, true)]
     local procedure OnBeforeInsertWorkflowStep(var Rec: Record "NPR POS Sales Workflow Step"; RunTrigger: Boolean)
     begin
-        //-NPR5.39 [302779]
+
         if Rec."Subscriber Codeunit ID" <> CurrCodeunitId() then
             exit;
         if Rec."Subscriber Function" <> 'CreateCleanCashOnSale' then
@@ -225,37 +66,108 @@ codeunit 6184500 "NPR CleanCash Wrapper"
 
         Rec.Description := Text000;
         Rec."Sequence No." := 10;
-        //+NPR5.39 [302779]
     end;
 
     local procedure CurrCodeunitId(): Integer
     begin
-        //-NPR5.39 [302779]
         exit(CODEUNIT::"NPR CleanCash Wrapper");
-        //+NPR5.39 [302779]
     end;
 
+
+    // This method stores the receipt in CleanCash Black Box
+    procedure HandleCleanCashXCCSPReceipt(var PosEntry: Record "NPR POS Entry")
+    var
+        CleanCashXCCSP: Codeunit "NPR CleanCash XCCSP Protocol";
+        RequestEntryNo: Integer;
+        ResponseEntryNo: Integer;
+    begin
+        CleanCashXCCSP.StoreReceipt(PosEntry);
+    end;
+
+
+    // The methods subscribes to event posted during end of sale
     [EventSubscriber(ObjectType::Codeunit, 6150705, 'OnFinishSale', '', true, true)]
     local procedure CreateCleanCashOnSale(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR Sale POS")
     var
-        AuditRoll: Record "NPR Audit Roll";
+        PosEntry: Record "NPR POS Entry";
+        ResponseText: Text;
     begin
-        //-NPR5.39 [302779]
+
         if POSSalesWorkflowStep."Subscriber Codeunit ID" <> CurrCodeunitId() then
             exit;
         if POSSalesWorkflowStep."Subscriber Function" <> 'CreateCleanCashOnSale' then
             exit;
 
-        AuditRoll.SetRange("Register No.", SalePOS."Register No.");
-        AuditRoll.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
-        if not AuditRoll.FindFirst then
+        PosEntry.SetFilter("Document No.", '=%1', SalePOS."Sales Ticket No.");
+        PosEntry.SetFilter("POS Unit No.", '%1', SalePOS."Register No.");
+        if (not PosEntry.FindFirst()) then
             exit;
 
-        if not IsRegisterCleanCash(AuditRoll) then
+        if (PosEntry."Entry Type" in [PosEntry."Entry Type"::Other, PosEntry."Entry Type"::"Cancelled Sale"]) then
             exit;
 
-        RunSalesTicket(AuditRoll);
-        //+NPR5.39 [302779]
+        if (not IsCleanCashXCCSPComplianceEnabled(PosEntry."POS Unit No.")) then
+            exit;
+
+        if (not IsCleanCashSetupValid(PosEntry."POS Unit No.", ResponseText)) then
+            Message(ResponseText);
+
+        HandleCleanCashXCCSPReceipt(PosEntry);
+
     end;
+
+    // Check that CleanCash Audit Handler has been activated
+    local procedure IsCleanCashXCCSPComplianceEnabled(POSUnitNo: Code[10]): Boolean
+    var
+        PosUnit: Record "NPR POS Unit";
+        PosAuditProfile: Record "NPR POS Audit Profile";
+        CleanCashXCCSP: Codeunit "NPR CleanCash XCCSP Protocol";
+    begin
+        if (not PosUnit.Get(PosUnitNo)) then
+            exit(false);
+
+        if (PosUnit."POS Audit Profile" = '') then
+            exit(false);
+
+        if (not PosAuditProfile.Get(PosUnit."POS Audit Profile")) then
+            exit(false);
+
+        if (PosAuditProfile."Audit Handler" <> UpperCase(CleanCashXCCSP.HandlerCode())) then
+            exit(false);
+
+        exit(true);
+
+    end;
+
+    // Check that CleanCash Setup is valid when Audit Handler is actived
+    local procedure IsCleanCashSetupValid(PosUnitNo: Code[10]; var ResponseMessage: Text): Boolean
+    var
+        CleanCashSetup: Record "NPR CleanCash Setup";
+        PosUnit: Record "NPR POS Unit";
+        CCSetupNotFound: Label 'The "%1" for "%2" "%3" has enabled CleanCash as audit handler, but the CleanCash setup for "%2" "%3" is not found.';
+        FieldMustHaveValue: Label '"%1" must have a value for field "%2", for "%3" "%4".';
+    begin
+        PosUnit.Get(PosUnitNo);
+
+        ResponseMessage := '';
+
+        if (not CleanCashSetup.Get(PosUnitNo)) then
+            ResponseMessage := StrSubstNo(CCSetupNotFound, PosUnit.FieldName("POS Audit Profile"), PosUnit.TableName(), PosUnitNo);
+
+        if (CleanCashSetup."CleanCash No. Series" = '') then
+            ResponseMessage := StrSubstNo(FieldMustHaveValue, CleanCashSetup.TableName, CleanCashSetup.FieldName("CleanCash No. Series"), PosUnit.TableName(), PosUnitNo);
+
+        if (CleanCashSetup."CleanCash Register No." = '') then
+            ResponseMessage := StrSubstNo(FieldMustHaveValue, CleanCashSetup.TableName, CleanCashSetup.FieldName("CleanCash Register No."), PosUnit.TableName(), PosUnitNo);
+
+        if (CleanCashSetup."Connection String" = '') then
+            ResponseMessage := StrSubstNo(FieldMustHaveValue, CleanCashSetup.TableName, CleanCashSetup.FieldName("Connection String"), PosUnit.TableName(), PosUnitNo);
+
+        if (CleanCashSetup."Organization ID" = '') then
+            ResponseMessage := StrSubstNo(FieldMustHaveValue, CleanCashSetup.TableName, CleanCashSetup.FieldName("Organization ID"), PosUnit.TableName(), PosUnitNo);
+
+        exit(ResponseMessage = '');
+    end;
+
 }
 

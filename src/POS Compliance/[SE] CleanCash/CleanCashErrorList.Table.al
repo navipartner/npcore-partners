@@ -1,11 +1,10 @@
 table 6184501 "NPR CleanCash Error List"
 {
-    // NPR4.21/JHL/20160302 CASE 222417 Table created to catch error received from CleanCash server
-    // NPR5.29/JHL/20161028 CASE 256695 Change the Caption on field to be default
-    // NPR5.31/JHL/20170223 CASE 256695 Removed space in option value, in field EventResponse
-
     Caption = 'CleanCash Error List';
     DataClassification = CustomerContent;
+    ObsoleteReason = 'This table is not used anymore';
+    ObsoleteState = Pending;
+    ObsoleteTag = 'CleanCash To AL';
 
     fields
     {

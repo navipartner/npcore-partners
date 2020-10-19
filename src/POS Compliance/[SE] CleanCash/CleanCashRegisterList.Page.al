@@ -1,12 +1,10 @@
 page 6184503 "NPR CleanCash Register List"
 {
-    // NPR4.21/JHL/20160302 CASE 222417 Page created to show which register that is used to CleanCash
-    // NPR5.49/JAVA/20190401 CASE 350661 Added missing object caption.
 
     Caption = 'CleanCash Cash Register List';
     PageType = List;
     SourceTable = "NPR CleanCash Register";
-    UsageCategory = Lists;
+    UsageCategory = None;
 
     layout
     {
