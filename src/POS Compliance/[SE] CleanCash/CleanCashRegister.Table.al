@@ -1,11 +1,11 @@
 table 6184503 "NPR CleanCash Register"
 {
-    // NPR4.21/JHL/20160302 CASE 222417 Table created to handle registration of register using CleanCash
-    // NPR5.30/TJ  /20170215 CASE 265504 Changed ENU captions on fields/table with word Register in their name
 
     Caption = 'CleanCash Cash Register';
     DataClassification = CustomerContent;
-
+    ObsoleteReason = 'This table is not used anymore';
+    ObsoleteState = Pending;
+    ObsoleteTag = 'CleanCash To AL';
     fields
     {
         field(1; "Register No."; Code[10])

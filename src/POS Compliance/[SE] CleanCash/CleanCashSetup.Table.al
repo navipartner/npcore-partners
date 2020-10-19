@@ -1,10 +1,5 @@
 table 6184500 "NPR CleanCash Setup"
 {
-    // NPR4.21/JHL/20160302 CASE 222417 Table created to handle the setup for CleanCash
-    // NPR5.29/JHL/20161027 CASE 256695 Add field "CleanCash Register No." the number used to write to the Black box, must be unique.
-    // NPR5.30/TJ /20170215 CASE 265504 Changed ENU captions on fields with word Register in their name
-    // NPR5.31/JHL/20170223 CASE 256695 Added field "Run Local"
-    // NPR5.31/JLK /20170313 CASE 268274 Changed ENU Caption
 
     Caption = 'CleanCash Setup';
     DataClassification = CustomerContent;
@@ -31,6 +26,9 @@ table 6184500 "NPR CleanCash Setup"
         {
             Caption = 'Last Report Date';
             DataClassification = CustomerContent;
+            ObsoleteReason = 'This field is not used anymore';
+            ObsoleteState = Pending;
+            ObsoleteTag = 'CleanCash To AL';
         }
         field(5; "Last Z Report Time"; Time)
         {
@@ -41,6 +39,9 @@ table 6184500 "NPR CleanCash Setup"
         {
             Caption = 'Multi Organization ID Per POS';
             DataClassification = CustomerContent;
+            ObsoleteReason = 'This field is not used anymore';
+            ObsoleteState = Pending;
+            ObsoleteTag = 'CleanCash To AL';
         }
         field(7; Training; Boolean)
         {
@@ -58,17 +59,23 @@ table 6184500 "NPR CleanCash Setup"
             Caption = 'CleanCash Cash Register No.';
             DataClassification = CustomerContent;
 
-            trigger OnValidate()
-            var
-                UniqueRegisterNo: Code[16];
-            begin
-            end;
         }
+
+        field(20; "CleanCash No. Series"; Code[10])
+        {
+            Caption = 'CleanCash No. Series';
+            DataClassification = CustomerContent;
+            TableRelation = "No. Series";
+        }
+
         field(10; "Run Local"; Boolean)
         {
             Caption = 'Run Local';
             DataClassification = CustomerContent;
             Description = 'Used to tell where the CleanCashAPI dll is placed (third part application)';
+            ObsoleteReason = 'This field is not used anymore';
+            ObsoleteState = Pending;
+            ObsoleteTag = 'CleanCash To AL';
         }
     }
 

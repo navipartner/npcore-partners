@@ -1,11 +1,11 @@
 table 6184502 "NPR CleanCash Audit Roll"
 {
-    // NPR4.21/JHL/20160302 CASE 222417 Table created to handle CleanCash Audit Roll
-    // NPR5.29/JHL/20161028 CASE 256695 Inserted the field "CleanCash Register No."
-    // NPR5.30/TJ  /20170215 CASE 265504 Changed ENU captions on fields with word Register in their name
-
     Caption = 'CleanCash Audit Roll';
     DataClassification = CustomerContent;
+
+    ObsoleteReason = 'This table is not used anymore but kept for historical purposes.';
+    ObsoleteState = Pending;
+    ObsoleteTag = 'CleanCash To AL';
 
     fields
     {

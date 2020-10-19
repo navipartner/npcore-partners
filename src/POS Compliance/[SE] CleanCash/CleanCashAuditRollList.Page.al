@@ -1,9 +1,5 @@
 page 6184502 "NPR CleanCash Audit Roll List"
 {
-    // NPR4.21/JHL/20160302 CASE 222417 Page created to show CleanCash Audit Roll
-    // NPR5.29/JHL/20161028 CASE 256695 Created action to send not sent CleanCash receipts
-    // NPR5.48/BHR /20181206 CASE 338656 Added Missing Picture to Action
-    // NPR5.55/MHA /20200611  CASE 409228 Added Page Action "Send Receipt"
 
     Caption = 'CleanCash Audit Roll List';
     DeleteAllowed = false;
@@ -12,7 +8,11 @@ page 6184502 "NPR CleanCash Audit Roll List"
     PageType = List;
     RefreshOnActivate = true;
     SourceTable = "NPR CleanCash Audit Roll";
-    UsageCategory = Lists;
+    UsageCategory = History;
+    ApplicationArea = All;
+    ObsoleteReason = 'This page is not used anymore but kept for historical purposes.';
+    ObsoleteState = Pending;
+    ObsoleteTag = 'CleanCash To AL';
 
     layout
     {
@@ -120,43 +120,5 @@ page 6184502 "NPR CleanCash Audit Roll List"
         }
     }
 
-    actions
-    {
-        area(processing)
-        {
-            action("Send not sent receipts")
-            {
-                Caption = 'Send not sent CleanCash receipts';
-                Image = SendTo;
-                ApplicationArea = All;
-
-                trigger OnAction()
-                var
-                    CleanCashCommunication: Codeunit "NPR CleanCash Comm.";
-                begin
-                    CleanCashCommunication.RunMultiSalesTicket();
-                end;
-            }
-            action("Send Receipt")
-            {
-                Caption = 'Send Receipt';
-                Image = Start;
-                ApplicationArea = All;
-
-                trigger OnAction()
-                var
-                    CleanCashCommunication: Codeunit "NPR CleanCash Comm.";
-                begin
-                    //-NPR5.55 [409228]
-                    Rec.TestField("CleanCash Control Code", '');
-                    Rec.TestField("CleanCash Copy Control Code", '');
-                    Rec.TestField("Receipt Type", '');
-                    CleanCashCommunication.RunSingelSalesTicket(Rec."Sales Ticket No.", Rec."Register No.");
-                    CurrPage.Update(false);
-                    //+NPR5.55 [409228]
-                end;
-            }
-        }
-    }
 }
 
