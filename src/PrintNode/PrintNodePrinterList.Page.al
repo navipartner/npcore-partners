@@ -13,16 +13,29 @@ page 6151221 "NPR PrintNode Printer List"
         {
             repeater(Group)
             {
-                field(Id; Id)
+                field(Id; Rec.Id)
                 {
                     ApplicationArea = All;
                 }
-                field(Name; Name)
+                field("Object Type"; Rec."Object Type")
                 {
                     ApplicationArea = All;
                 }
-                field(Description; Description)
+                field("Object ID"; Rec."Object ID")
                 {
+                    ApplicationArea = All;
+                }
+                field(Name; Rec.Name)
+                {
+                    ApplicationArea = All;
+                }
+                field(Description; Rec.Description)
+                {
+                    ApplicationArea = All;
+                }
+                field(Settings; Rec.Settings.HasValue)
+                {
+                    Caption = 'Settings Stored';
                     ApplicationArea = All;
                 }
             }
@@ -33,22 +46,45 @@ page 6151221 "NPR PrintNode Printer List"
     {
         area(processing)
         {
-            action(RefreshPrinters)
+            action(ChangeSettings)
             {
-                Caption = 'Refresh Printers';
-                Image = PrintInstallment;
-                Promoted = true;
-                PromotedCategory = New;
+                Caption = 'Change Print Settings';
                 ApplicationArea = All;
 
+                Image = PrintAttachment;
+                Promoted = true;
+                PromotedCategory = Process;
                 trigger OnAction()
                 var
                     PrintNodeMgt: Codeunit "NPR PrintNode Mgt.";
                 begin
-                    PrintNodeMgt.RefreshPrinters();
-                    CurrPage.Update(false);
+                    PrintNodeMgt.SetPrinterOptions(Rec);
+                end;
+
+            }
+            action(PrinterInfo)
+            {
+                Caption = 'View Printer Info';
+                ApplicationArea = All;
+                Image = PrintCheck;
+                trigger OnAction()
+                var
+                    PrintNodeMgt: Codeunit "NPR PrintNode Mgt.";
+                begin
+                    PrintNodeMgt.ViewPrinterInfo(Rec.Id);
                 end;
             }
+        }
+        area(Navigation)
+        {
+            action(AccountSetup)
+            {
+                Caption = 'Setup Account';
+                ApplicationArea = All;
+                Image = PrintAcknowledgement;
+                RunObject = Page "NPR PrintNode Setup";
+            }
+
         }
     }
 }

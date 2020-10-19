@@ -1,12 +1,10 @@
 page 6151220 "NPR PrintNode Setup"
 {
-    // NPR5.53/THRO/20200106 CASE 383562 Object Created
-
     Caption = 'PrintNode Setup';
     PageType = Card;
     UsageCategory = Administration;
     SourceTable = "NPR PrintNode Setup";
-
+    InsertAllowed = false;
     layout
     {
         area(content)
@@ -30,6 +28,9 @@ page 6151220 "NPR PrintNode Setup"
                 Caption = 'Test Connection';
                 Image = Confirm;
                 ApplicationArea = All;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedOnly = true;
 
                 trigger OnAction()
                 var
@@ -43,10 +44,10 @@ page 6151220 "NPR PrintNode Setup"
 
     trigger OnOpenPage()
     begin
-        Reset;
-        if not Get() then begin
-            Init();
-            Insert(true);
+        Rec.Reset;
+        if not Rec.Get() then begin
+            Rec.Init();
+            Rec.Insert(true);
         end;
     end;
 }
