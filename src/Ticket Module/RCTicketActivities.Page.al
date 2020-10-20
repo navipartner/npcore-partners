@@ -38,12 +38,6 @@
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
-                field(Control6150619; '')
-                {
-                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                    Image = Heart;
-                    ShowCaption = false;
-                }
             }
             cuegroup("Events (Tomorrow)")
             {
