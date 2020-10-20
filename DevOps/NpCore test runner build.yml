@@ -1,7 +1,7 @@
 trigger: none
 
 schedules:
-  - cron: "0 0 * * *" #UTC TIME!
+  - cron: "0 20 * * *" #UTC TIME! mm HH DD MM DW
     displayName: Daily after-midnight test runner build
     branches:
       include:
