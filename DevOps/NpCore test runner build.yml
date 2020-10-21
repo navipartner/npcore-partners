@@ -49,6 +49,13 @@ jobs:
         - path: 'C:\Applications\TestFramework\TestLibraries\Any\Microsoft_Any.app'
         - path: 'C:\Applications\system application\test\Microsoft_System Application Test Library.app'
         - path: 'C:\Applications\baseapp\test\Microsoft_Tests-TestLibraries.app'
+      - package:
+          source: 'https://pkgs.dev.azure.com/navipartner/_packaging/NPCoreTestFixture/nuget/v3/index.json'
+          id: NaviPartner.NPCore.TestFixture.BC160
+          destinationPath: '$(Agent.TempDirectory)/TestFixture/'
+        appsToDeploy:
+          - path: '$(Agent.TempDirectory)/NpCore/TestFixture/Test_Fixture_Initializer.app'
+            afterCompile: TRUE
     testRunsToRun:
       - testRunName: 'Microsoft Base App tests'
         testApps:
