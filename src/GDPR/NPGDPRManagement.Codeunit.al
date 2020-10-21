@@ -103,6 +103,7 @@ codeunit 6151060 "NPR NP GDPR Management"
 
         if (OpenDocFound = false) and (TransactionFound = false) and (OpenTransactionFound = false) and (MemberFound = false) and (JournalFound = false) then begin
             AnonymizeCustomer(CustNo);
+            OnAfterDoAnonymization(CustNo);
             VarCount += 1;
             InsertLogEntry(CustNo, true, OpenDocFound, OpenTransactionFound, TransactionFound, MemberFound, JournalFound);
 
@@ -163,6 +164,7 @@ codeunit 6151060 "NPR NP GDPR Management"
                 if ILE.FindFirst then
                     ReasonCode += Power(2, 1); // TransactionFound := TRUE;
             end;
+
         end;
 
         CLE.SetCurrentKey("Customer No.", Open, Positive, "Due Date", "Currency Code");
@@ -171,20 +173,9 @@ codeunit 6151060 "NPR NP GDPR Management"
         if CLE.FindFirst then
             ReasonCode += Power(2, 2); // OpenTransactionFound := TRUE;
 
-        if (CLE.IsEmpty()) then begin
-            ILE.Reset;
-            ILE.SetCurrentKey("Source Type", "Source No.", "Item No.", "Variant Code", "Posting Date");
-            ILE.SetRange(ILE."Source Type", ILE."Source Type"::Customer);
-            ILE.SetRange(ILE."Source No.", CustomerNo);
-            ILE.SetRange(Open, true);
-            if ILE.FindFirst then
-                ReasonCode += Power(2, 2); //OpenTransactionFound := TRUE;
-        end;
-
         Membership.SetRange("Customer No.", CustomerNo);
         if Membership.FindFirst then
             ReasonCode += Power(2, 3); // MemberFound := TRUE;
-
 
         GenJnlLine.Reset;
         GenJnlLine.SetRange(GenJnlLine."Account Type", GenJnlLine."Account Type"::Customer);
@@ -725,6 +716,11 @@ codeunit 6151060 "NPR NP GDPR Management"
                 IssuedReminderHdr.Modify(true);
             until IssuedReminderHdr.Next = 0;
 
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterDoAnonymization(CustNo: Code[20])
+    begin
     end;
 }
 
