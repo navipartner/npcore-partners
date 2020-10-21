@@ -54,7 +54,7 @@ jobs:
           id: NaviPartner.NPCore.TestFixture.BC160
           destinationPath: '$(Agent.TempDirectory)/TestFixture/'
         appsToDeploy:
-          - path: '$(Agent.TempDirectory)/NpCore/TestFixture/Test_Fixture_Initializer.app'
+          - path: '$(Agent.TempDirectory)/TestFixture/Test_Fixture_Initializer.app'
             afterCompile: TRUE
     testRunsToRun:
       - testRunName: 'Microsoft Base App tests'
