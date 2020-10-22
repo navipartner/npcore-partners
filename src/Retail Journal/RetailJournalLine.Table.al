@@ -1,8 +1,5 @@
 table 6014422 "NPR Retail Journal Line"
 {
-    // NPR5.50/ALST/20190408 CASE 350435 modified logic to allow for multiple line inserts on items from the same batch
-    // NPR5.51/MHA /20190822 CASE 365886 Discount Pct. is set to 0 when Unit Price is 0 in CalcDiscountPrice()
-
     Caption = 'Retail Journal Line';
     DataClassification = CustomerContent;
 
@@ -18,8 +15,6 @@ table 6014422 "NPR Retail Journal Line"
         {
             Caption = 'Item No.';
             TableRelation = Item;
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
             DataClassification = CustomerContent;
 
@@ -32,44 +27,7 @@ table 6014422 "NPR Retail Journal Line"
                 BarcodeValue: Text;
                 ResolvingTable: Integer;
             begin
-                //-NPR5.46 [294354]
-                // IF BarcodeLibrary.TranslateBarcodeToItemVariant("Item No.",ItemNo,VariantCode,ResolvingTable,TRUE) THEN BEGIN
-                //  "Item No." := ItemNo;
-                //  VALIDATE("Variant Code", VariantCode);
-                // END;
-                //
-                // Item.GET("Item No.");
-                // VALIDATE( Description, Item.Description );
-                // VALIDATE( "Vendor No.", Item."Vendor No." );
-                // VALIDATE( "Vendor Item No.", Item."Vendor Item No." );
-                // VALIDATE( "Unit cost", Item."Last Direct Cost" );
-                // VALIDATE( "Unit price", Item."Unit Price" );
-                // "Item group"               := Item."Item Group";
-                // "Cannot edit unit price"   := Item."Cannot edit unit price";
-                //
-                // IF Quantity = 0 THEN
-                //  VALIDATE( Quantity, 1 );
-                //
-                // IF Item."Sales Unit of Measure" <> '' THEN
-                //  VALIDATE( "Sales Unit of measure", Item."Sales Unit of Measure" );
-                //
-                // IF "Variant Code" = '' THEN BEGIN
-                //  IF BarcodeLibrary.GetItemVariantBarcode(BarcodeValue, "Item No.", "Variant Code", ResolvingTable, FALSE) THEN
-                //    VALIDATE(Barcode, BarcodeValue);
-                //  //-NPR5.37 [289725]
-                //  VALIDATE("Description 2", Item."Description 2");
-                //  //+NPR5.37 [289725]
-                // END;
-                //
-                // VALIDATE( "Cannot edit unit price", Item."Cannot edit unit price" );
-                // VALIDATE("New Item No.", "Item No.");
-                //
-                // IF Vendor.GET(Item."Vendor No.") THEN BEGIN
-                //  VALIDATE("Vendor Name", Vendor.Name);
-                //  VALIDATE("Vendor Search Description", Vendor."Search Name");
-                // END;
 
-                // FindItemSalesPrice;
                 if "Item No." = '' then begin
                     Init;
                     exit;
@@ -87,20 +45,16 @@ table 6014422 "NPR Retail Journal Line"
                     "New Item No." := "Item No.";
                     if Item."Sales Unit of Measure" <> '' then
                         "Sales Unit of measure" := Item."Sales Unit of Measure";
-                    //-NPR5.47 [331700]
                     "Unit List Price" := Item."Unit List Price";
-                    //+NPR5.47 [331700]
 
                     UpdateBarcode;
                 end else begin
-                    //To support old code, we still support Barcodes in this field.
                     Validate(Barcode, "Item No.");
                     exit;
                 end;
 
                 "Quantity to Print" := 1;
                 Validate("Quantity for Discount Calc", 1);
-                //+NPR5.46 [294354]
             end;
         }
         field(3; "Quantity to Print"; Decimal)
@@ -117,19 +71,18 @@ table 6014422 "NPR Retail Journal Line"
         {
             Caption = 'Vendor No.';
             TableRelation = Vendor;
+            ValidateTableRelation = false;
             DataClassification = CustomerContent;
 
             trigger OnValidate()
             var
                 Vendor: Record Vendor;
             begin
-                //-NPR5.46 [294354]
                 if not Vendor.Get("Vendor No.") then
                     Vendor.Init;
 
                 "Vendor Name" := Vendor.Name;
                 "Vendor Search Description" := Vendor."Search Name";
-                //+NPR5.46 [294354]
             end;
         }
         field(6; "Vendor Item No."; Code[20])
@@ -187,12 +140,10 @@ table 6014422 "NPR Retail Journal Line"
                 VariantCode: Code[10];
                 ResolvingTable: Integer;
             begin
-                //-NPR5.46 [294354]
                 if BarcodeLibrary.TranslateBarcodeToItemVariant(Barcode, ItemNo, VariantCode, ResolvingTable, true) then begin
                     Validate("Item No.", ItemNo);
                     Validate("Variant Code", VariantCode);
                 end;
-                //+NPR5.46 [294354]
             end;
         }
         field(13; "Mixed Discount"; Code[20])
@@ -221,11 +172,7 @@ table 6014422 "NPR Retail Journal Line"
                 if ItemVariant.Get("Item No.", "Variant Code") then
                     "Description 2" := ItemVariant.Description;
 
-                //-NPR5.46 [294354]
-                //IF BarcodeLibrary.GetItemVariantBarcode(BarcodeValue, "Item No.", "Variant Code", ResolvingTable, FALSE) THEN
-                //  VALIDATE(Barcode, BarcodeValue);
                 UpdateBarcode;
-                //+NPR5.46 [294354]
 
                 FindItemSalesPrice;
             end;
@@ -269,7 +216,7 @@ table 6014422 "NPR Retail Journal Line"
         }
         field(25; Inventory; Decimal)
         {
-            CalcFormula = Sum ("Item Ledger Entry".Quantity WHERE("Item No." = FIELD("Item No."),
+            CalcFormula = Sum("Item Ledger Entry".Quantity WHERE("Item No." = FIELD("Item No."),
                                                                   "Global Dimension 1 Code" = FIELD("Shortcut Dimension 1 Code"),
                                                                   "Global Dimension 2 Code" = FIELD("Shortcut Dimension 2 Code"),
                                                                   "Location Code" = FIELD("Location Code"),
@@ -297,9 +244,7 @@ table 6014422 "NPR Retail Journal Line"
 
             trigger OnValidate()
             begin
-                //-NPR5.46 [294354]
                 CalcDiscountPrice(FieldNo("Unit Price"));
-                //+NPR5.46 [294354]
             end;
         }
         field(30; "Discount Unit Price"; Decimal)
@@ -323,7 +268,7 @@ table 6014422 "NPR Retail Journal Line"
         }
         field(36; "Net Change"; Decimal)
         {
-            CalcFormula = Sum ("Item Ledger Entry".Quantity WHERE("Item No." = FIELD("Item No."),
+            CalcFormula = Sum("Item Ledger Entry".Quantity WHERE("Item No." = FIELD("Item No."),
                                                                   "Global Dimension 1 Code" = FIELD("Shortcut Dimension 1 Code"),
                                                                   "Global Dimension 2 Code" = FIELD("Shortcut Dimension 2 Code"),
                                                                   "Location Code" = FIELD("Location Code"),
@@ -336,7 +281,7 @@ table 6014422 "NPR Retail Journal Line"
         }
         field(37; "Purchases (Qty.)"; Decimal)
         {
-            CalcFormula = Sum ("Item Ledger Entry"."Invoiced Quantity" WHERE("Entry Type" = CONST(Purchase),
+            CalcFormula = Sum("Item Ledger Entry"."Invoiced Quantity" WHERE("Entry Type" = CONST(Purchase),
                                                                              "Item No." = FIELD("Item No."),
                                                                              "Global Dimension 1 Code" = FIELD("Shortcut Dimension 1 Code"),
                                                                              "Global Dimension 2 Code" = FIELD("Shortcut Dimension 2 Code"),
@@ -350,7 +295,7 @@ table 6014422 "NPR Retail Journal Line"
         }
         field(38; "Sales (Qty.)"; Decimal)
         {
-            CalcFormula = - Sum ("Value Entry"."Invoiced Quantity" WHERE("Item Ledger Entry Type" = CONST(Sale),
+            CalcFormula = - Sum("Value Entry"."Invoiced Quantity" WHERE("Item Ledger Entry Type" = CONST(Sale),
                                                                         "Item No." = FIELD("Item No."),
                                                                         "Global Dimension 1 Code" = FIELD("Shortcut Dimension 1 Code"),
                                                                         "Global Dimension 2 Code" = FIELD("Shortcut Dimension 1 Code"),
@@ -408,9 +353,7 @@ table 6014422 "NPR Retail Journal Line"
 
             trigger OnValidate()
             begin
-                //-NPR5.46 [294354]
                 CalcDiscountPrice(FieldNo("Discount Pct."));
-                //+NPR5.46 [294354]
             end;
         }
         field(63; "Quantity for Discount Calc"; Decimal)
@@ -420,9 +363,7 @@ table 6014422 "NPR Retail Journal Line"
 
             trigger OnValidate()
             begin
-                //-NPR5.46 [294354]
                 FindItemSalesPrice;
-                //+NPR5.46 [294354]
             end;
         }
         field(65; "Calculation Date"; Date)
@@ -488,18 +429,6 @@ table 6014422 "NPR Retail Journal Line"
             Caption = 'Location Code';
             TableRelation = Location;
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            var
-                RetailJournalLine: Record "NPR Retail Journal Line";
-            begin
-                //-NPR5.46 [294354]
-                //-NPR5.41 [309131]
-                // RetailJournalLine.SETRANGE("No.", Rec."No.");
-                // RetailJournalLine.MODIFYALL("Location Filter", Rec."Location Code", TRUE);
-                //+NPR5.41
-                //+NPR5.46 [294354]
-            end;
         }
         field(80; "Discount Price Excl. VAT"; Decimal)
         {
@@ -508,14 +437,12 @@ table 6014422 "NPR Retail Journal Line"
 
             trigger OnValidate()
             begin
-                //-NPR5.46 [294354]
                 Currency.InitRoundingPrecision;
                 Validate("Discount Price Incl. Vat",
                   Round(
                     "Discount Price Excl. VAT" *
                     (1 + ("VAT %" / 100)),
                     Currency."Amount Rounding Precision"));
-                //+NPR5.46 [294354]
             end;
         }
         field(81; "VAT %"; Decimal)
@@ -548,13 +475,6 @@ table 6014422 "NPR Retail Journal Line"
                 RetailJournalLine2: Record "NPR Retail Journal Line";
                 MultipleLines: Boolean;
             begin
-                //-NPR5.49 [347533]
-                // //-NPR5.50 [350435]
-                // IF ExchangeLabel.FINDFIRST THEN BEGIN
-                //  VALIDATE("Item No.",ExchangeLabel."Item No.");
-                //  VALIDATE("Variant Code",ExchangeLabel."Variant Code");
-                // END;
-                // //+NPR5.49 [347533]
                 ExchangeLabel.SetRange(Barcode, "Exchange Label");
                 ExchangeLabel.FindFirst;
 
@@ -587,7 +507,6 @@ table 6014422 "NPR Retail Journal Line"
 
                     MultipleLines := true;
                 until (ExchangeLabel.Next = 0) or (not ExchangeLabel."Packaged Batch");
-                //+NPR5.50 [350435]
             end;
         }
         field(6059970; "Is Master"; Boolean)
@@ -617,14 +536,6 @@ table 6014422 "NPR Retail Journal Line"
 
     trigger OnInsert()
     begin
-        //-NPR5.46 [294354]
-        // IF NOT ISTEMPORARY THEN BEGIN
-        //  RetailJnlLine.SETRANGE("No.", "No.");
-        //  IF RetailJnlLine.ISEMPTY THEN
-        //    "Line No." := 10000;
-        // END;
-        //
-        //+NPR5.46 [294354]
         "Register No." := RetailFormCode.FetchRegisterNumber;
     end;
 
@@ -653,17 +564,11 @@ table 6014422 "NPR Retail Journal Line"
         TempSaleLinePOS2: Record "NPR Sale Line POS" temporary;
         Register: Record "NPR Register";
     begin
-        //-NPR5.45 [323705]
-        //POSSalesPriceCalcMgt.GetItemSalesPrice(TempSalesPrice,'',"Item No.","Variant Code",'',
-        //                                     RetailDocumentHeader."Prices Including VAT",Customer);
-        //
-        //"Unit price" := TempSalesPrice."Unit Price";
         TempSaleLinePOS.Type := TempSaleLinePOS.Type::Item;
         TempSaleLinePOS."No." := "Item No.";
         TempSaleLinePOS."Variant Code" := "Variant Code";
 
         POSSalesPriceCalcMgt.InitTempPOSItemSale(TempSaleLinePOS, TempSalePOS);
-        //-NPR5.47 [323705]
         if "Register No." <> '' then
             TempSalePOS."Register No." := "Register No."
         else
@@ -683,30 +588,19 @@ table 6014422 "NPR Retail Journal Line"
             TempSalePOS."Customer Disc. Group" := Register."Customer Disc. Group";
         if "Calculation Date" <> 0D then
             TempSalePOS.Date := "Calculation Date";
-        //+NPR5.47 [323705]
 
         TempSalePOS."Prices Including VAT" := true;
-        //-NPR5.46 [294354]
         Item.Get("Item No.");
-        //TempSalePOS."Customer Price Group" := "Customer Price Group";
-        //TempSalePOS."Customer Disc. Group" := "Customer Disc. Group";
-        //TempSalePOS.Date := "Calculation Date";
-
-        //TempSaleLinePOS."Customer Price Group" := "Customer Price Group";
         TempSaleLinePOS."Customer Price Group" := TempSalePOS."Customer Price Group";
 
         TempSaleLinePOS."Item Disc. Group" := Item."Item Disc. Group";
         TempSaleLinePOS.Silent := true;
         TempSaleLinePOS.Date := "Calculation Date";
         TempSaleLinePOS.Validate(Quantity, "Quantity for Discount Calc");
-        //+NPR5.46 [294354]
-        //-NPR5.47 [323705]
         TempSaleLinePOS."Register No." := "Register No.";
-        //+NPR5.47 [323705]
 
         POSSalesPriceCalcMgt.FindItemPrice(TempSalePOS, TempSaleLinePOS);
         POSSalesDiscountCalcMgt.InitDiscountPriority(TMPDiscountPriority);
-        //POSSalesDiscountCalcMgt.OnFindActiveSaleLineDiscounts(TMPDiscountPriority,TempSaleLinePOS,TempSaleLinePOS,0);
         TempSaleLinePOS2 := TempSaleLinePOS;
         TempSaleLinePOS2.Insert;
         TMPDiscountPriority.SetCurrentKey(Priority);
@@ -716,17 +610,12 @@ table 6014422 "NPR Retail Journal Line"
                 TempSaleLinePOS2.UpdateAmounts(TempSaleLinePOS2);
             until (TMPDiscountPriority.Next = 0) or (TempSaleLinePOS2."Discount Type" <> TempSaleLinePOS2."Discount Type"::" ");
         "Discount Price Incl. Vat" := TempSaleLinePOS2."Amount Including VAT";
-        //+NPR5.45 [323705]
-        //-NPR5.45 [326412]
         "VAT %" := TempSaleLinePOS2."VAT %";
         "Discount Price Excl. VAT" := TempSaleLinePOS2.Amount;
-        //+NPR5.45 [326412]
-        //-NPR5.46 [294354]
         "Unit Price" := TempSaleLinePOS2."Unit Price";
         "Discount Type" := TempSaleLinePOS2."Discount Type";
         "Discount Code" := TempSaleLinePOS2."Discount Code";
         "Discount Pct." := TempSaleLinePOS2."Discount %";
-        //+NPR5.46 [294354]
     end;
 
     procedure calcProfit()
@@ -757,18 +646,12 @@ table 6014422 "NPR Retail Journal Line"
                 "Profit % (new)" := tItem."Profit %";
             end;
         end;
-        //-NPR5.46 [294354]
-        // //-NPR5.45 [326412]
-        // "Discount Price Excl. VAT" := "Discount Price Incl. Vat" *((100-"VAT %")/100);
-        // //+NPR5.45 [326412]
-        //+NPR5.46 [294354]
     end;
 
     procedure SelectRetailJournal(var RetailJournalCode: Code[40]) JournalSelected: Boolean
     var
         RetailJnlLine: Record "NPR Retail Journal Line";
     begin
-        //-NPR5.46 [294354]
         if not RetailJournalHeader.Get(RetailJournalCode) then begin
             RetailJournalHeader.Init;
             RetailJournalHeader."No." := RetailJournalCode;
@@ -782,12 +665,10 @@ table 6014422 "NPR Retail Journal Line"
         else
             LineNo := 10000;
         exit(true);
-        //+NPR5.46 [294354]
     end;
 
     procedure UseGUI(TotalNoOfLines: Integer)
     begin
-        //-NPR5.46 [294354]
         if not GuiAllowed then
             exit;
 
@@ -798,14 +679,12 @@ table 6014422 "NPR Retail Journal Line"
         TotalRecNo := TotalNoOfLines;
 
         Dia.Open(Text001);
-        //+NPR5.46 [294354]
     end;
 
     procedure InitLine()
     var
         RetailJnlLine: Record "NPR Retail Journal Line";
     begin
-        //-NPR5.46 [294354]
         RetailJournalHeader.TestField("No.");
 
         RecNo += 1;
@@ -824,24 +703,20 @@ table 6014422 "NPR Retail Journal Line"
             "Register No." := RetailFormCode.FetchRegisterNumber
         else
             "Register No." := RetailJournalHeader."Register No.";
-        //+NPR5.46 [294354]
     end;
 
     procedure SetItem(ItemNo: Code[20]; VariantCode: Code[10]; BarcodeValue: Code[20])
     begin
-        //-NPR5.46 [294354]
         if Barcode <> '' then
             Validate(Barcode, BarcodeValue)
         else begin
             "Variant Code" := VariantCode;
             Validate("Item No.", ItemNo);
         end;
-        //+NPR5.46 [294354]
     end;
 
     procedure SetDiscountType(DiscountType: Option " ",Campaign,Mix,Quantity,Manual,"BOM List","Photo work",Rounding,Combination,Customer; DiscountCode: Code[20]; DiscountPrice: Decimal; DiscountQuantity: Decimal; PriceInclVAT: Boolean)
     begin
-        //+NPR5.46 [294354]
         "Discount Type" := DiscountType;
         "Discount Code" := DiscountCode;
         "Quantity for Discount Calc" := DiscountQuantity;
@@ -849,23 +724,19 @@ table 6014422 "NPR Retail Journal Line"
             Validate("Discount Price Incl. Vat", DiscountPrice)
         else
             Validate("Discount Price Excl. VAT", DiscountPrice);
-        //+NPR5.46 [294354]
     end;
 
     procedure CloseGUI()
     begin
-        //-NPR5.46 [294354]
         if not ShowDialog then
             exit;
 
         Dia.Close;
         ShowDialog := false;
-        //+NPR5.46 [294354]
     end;
 
     local procedure CalcDiscountPrice(CalledFromFieldNo: Integer)
     begin
-        //-NPR5.46 [294354]
         Currency.InitRoundingPrecision;
         case CalledFromFieldNo of
             FieldNo("Discount Pct."):
@@ -877,16 +748,13 @@ table 6014422 "NPR Retail Journal Line"
                 end;
             FieldNo("Unit Price"), FieldNo("Discount Price Incl. Vat"):
                 begin
-                    //-NPR5.51 [365886]
                     if ("Quantity for Discount Calc" = 0) or ("Unit Price" = 0) then begin
                         "Discount Pct." := 0;
                         exit;
                     end;
-                    //+NPR5.51 [365886]
                     "Discount Pct." := (1 - ("Discount Price Incl. Vat" / "Quantity for Discount Calc" / "Unit Price")) * 100;
                 end;
         end;
-        //+NPR5.46 [294354]
     end;
 
     procedure SetupNewLine(var LastRetailJnlLine: Record "NPR Retail Journal Line")
@@ -894,14 +762,6 @@ table 6014422 "NPR Retail Journal Line"
         RetailJnlHeader: Record "NPR Retail Journal Header";
         i: Integer;
     begin
-        //-NPR5.47 [294354]
-        //-NPR5.46 [294354]
-        //IF LastRetailJnlLine."No." <> '' THEN BEGIN
-        //  "Calculation Date" := LastRetailJnlLine."Calculation Date";
-        //  "Customer Price Group" := LastRetailJnlLine."Customer Price Group";
-        //  "Customer Disc. Group" := LastRetailJnlLine."Customer Disc. Group";
-        //  "Register No." := LastRetailJnlLine."Register No.";
-        //END ELSE BEGIN
         LastRetailJnlLine.FilterGroup(4);
         if not RetailJnlHeader.Get(LastRetailJnlLine.GetFilter("No.")) then begin
             RetailJnlHeader.Init;
@@ -916,10 +776,6 @@ table 6014422 "NPR Retail Journal Line"
         "Calculation Date" := RetailJnlHeader."Date of creation";
         "Customer Price Group" := RetailJnlHeader."Customer Price Group";
         "Customer Disc. Group" := RetailJnlHeader."Customer Disc. Group";
-
-        //END;
-        //+NPR5.46 [294354]
-        //+NPR5.47 [294354]
     end;
 
     local procedure UpdateBarcode()
@@ -930,7 +786,6 @@ table 6014422 "NPR Retail Journal Line"
         TmpItemNo: Code[20];
         TmpVarCode: Code[10];
     begin
-        //-NPR5.46 [294354]
         if (Barcode = '') then begin
             if BarcodeLibrary.GetItemVariantBarcode(BarcodeValue, "Item No.", "Variant Code", ResolvingTable, false) then
                 Barcode := BarcodeValue;
@@ -940,7 +795,6 @@ table 6014422 "NPR Retail Journal Line"
                 if BarcodeLibrary.GetItemVariantBarcode(BarcodeValue, "Item No.", "Variant Code", ResolvingTable, false) then
                     Barcode := BarcodeValue;
         end;
-        //+NPR5.46 [294354]
     end;
 }
 
