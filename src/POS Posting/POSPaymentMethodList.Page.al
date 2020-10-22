@@ -31,6 +31,24 @@ page 6150618 "NPR POS Payment Method List"
                 {
                     ApplicationArea = All;
                 }
+                field("Include In Counting"; "Include In Counting")
+                {
+                    ApplicationArea = All;
+                }
+                field("Bin for Virtual-Count";"Bin for Virtual-Count")
+                {
+                    ApplicationArea = All;
+                }
+                field("Rounding Gains Account"; "Rounding Gains Account")
+                {
+                    ApplicationArea = All;
+                    Visible = true;
+                }
+                field("Rounding Losses Account"; "Rounding Losses Account")
+                {
+                    ApplicationArea = All;
+                    Visible = true;
+                }
                 field("Vouched By"; "Vouched By")
                 {
                     ApplicationArea = All;
@@ -41,19 +59,15 @@ page 6150618 "NPR POS Payment Method List"
                     ApplicationArea = All;
                     Visible = false;
                 }
-                field("Include In Counting"; "Include In Counting")
-                {
-                    ApplicationArea = All;
-                }
                 field("Post Condensed"; "Post Condensed")
                 {
                     ApplicationArea = All;
-                    Visible = false;
+                    Visible = true;
                 }
                 field("Condensed Posting Description"; "Condensed Posting Description")
                 {
                     ApplicationArea = All;
-                    Visible = false;
+                    Visible = true;
                 }
                 field("Rounding Precision"; "Rounding Precision")
                 {
@@ -61,16 +75,6 @@ page 6150618 "NPR POS Payment Method List"
                     Visible = false;
                 }
                 field("Rounding Type"; "Rounding Type")
-                {
-                    ApplicationArea = All;
-                    Visible = false;
-                }
-                field("Rounding Gains Account"; "Rounding Gains Account")
-                {
-                    ApplicationArea = All;
-                    Visible = false;
-                }
-                field("Rounding Losses Account"; "Rounding Losses Account")
                 {
                     ApplicationArea = All;
                     Visible = false;
