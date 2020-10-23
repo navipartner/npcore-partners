@@ -1,15 +1,5 @@
 codeunit 6151404 "NPR Magento Functions"
 {
-    // MAG1.00/MH/20150113  CASE 199932 Refactored Object from Web Integration
-    // MAG1.01/MH/20150115  CASE 199932 Updated Picture Lookup and NaviEditor Plugin
-    // MAG1.04/TR/20150209  CASE 206156 Added Function PictureType.Customer()
-    // MAG1.05/TR/20150217  CASE 206156 Added SelectionFilter-functions
-    // MAG1.14/MH/20150429  CASE 212526 Changed parameters for LookupPicture() to PictureType, PictureName
-    // MAG1.14/MH/20150508  CASE 208941 Updated TextEditor Addin to JavaScript version
-    // MAG1.18/MH/20150714  CASE 218282 Added Clear Blob to NaviEditorEditBlob()
-    // MAG2.00/MHA/20160513 CASE 240005 Magento module refactored to new object area
-
-
     trigger OnRun()
     begin
     end;
@@ -39,7 +29,7 @@ codeunit 6151404 "NPR Magento Functions"
     procedure NaviEditorEditBlob(var FieldRef: FieldRef) NewValue: Boolean
     var
         TempBlob: Codeunit "Temp Blob";
-        TextEditorDialog: Page "NPR Magento Text Editor Dialog";
+        TextEditorDialog: Page "NPR Text Editor Dialog";
         Encoding: DotNet NPRNetEncoding;
         StreamReader: DotNet NPRNetStreamReader;
         InStr: InStream;
@@ -53,6 +43,11 @@ codeunit 6151404 "NPR Magento Functions"
         TempBlob.CreateInStream(InStr);
         InStr.ReadText(HtmlText);
         Clear(TextEditorDialog);
+
+        TextEditorDialog.InitTextEditorOptionKeyAndValueBuffer();
+        // An example (override the standard toolbar (the first one) to show only specific options - bold, italic):
+        // TextEditorDialog.AddTextEditorOptionKeyAndValue('toolbar1', 'bold italic');
+
         if TextEditorDialog.EditText(HtmlText) then begin
             Clear(TempBlob);
             if not (HtmlText in ['<p></p>', '<p><br data-mce-bogus="1"></p>']) then begin
