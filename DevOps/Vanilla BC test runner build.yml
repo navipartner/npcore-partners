@@ -1,0 +1,86 @@
+trigger: none
+    
+resources:
+  repositories:
+  - repository: scriptsRepo
+    type: git
+    name: 'NpCore/NpDevOps'
+
+pool:
+  name: NP Core Pipelines
+  demands: 
+  - docker
+  # Now only 2019 is available but in the future it will be every newer version.
+  # Then we will probably remove this requirement as it will alwyas TRUE.
+  - Agent.OS -equals Windows_NT
+  - Agent.OSVersion -equals 10.0.17763
+
+variables:
+  containerName: Build-$(Build.BuildId)
+  serverInstanceName: BC
+  containerAdminUsername: admin
+  containerAdminPassword: P@ssword1
+  artifactURL: https://bcartifacts.azureedge.net/onprem/16.3.14085.14238/w1   
+
+jobs:
+- template: YAML/Templates/Job/CreateBCContainer.yml@scriptsRepo
+  parameters:
+    timeoutInMinutes: 900
+    containerImageName: mcr.microsoft.com/dynamicsnav:10.0.17763.1397-generic
+    artifactURL: $(artifactURL)
+    containerName: $(containerName)
+    serverInstanceName: $(serverInstanceName)
+    containerAdminUsername: $(containerAdminUsername) 
+    containerAdminPassword: $(containerAdminPassword)
+    licenseSecureFileName: 'DEV_BC OP 16.flf'
+    scriptsRepo: ScriptsRepo
+    stepList:
+    - template: YAML/Templates/Step/HandleDependancies.yml@scriptsRepo 
+      parameters:
+        dependancies:
+        - appsToDeploy:
+          - path: 'C:\Applications\TestFramework\TestRunner\Microsoft_Test Runner.app'
+          - path: 'C:\Applications\TestFramework\TestLibraries\Assert\Microsoft_Library Assert.app'
+          - path: 'C:\Applications\TestFramework\TestLibraries\Any\Microsoft_Any.app'
+          - path: 'C:\Applications\system application\test\Microsoft_System Application Test Library.app'
+          - path: 'C:\Applications\baseapp\test\Microsoft_Tests-TestLibraries.app'
+        serverInstanceName: $(serverInstanceName)
+    - template: YAML/Templates/Step/SetupAndRunTests.yml@scriptsRepo
+      parameters:
+        serverInstanceName: $(serverInstanceName)
+        username: $(containerAdminUsername)
+        password: $(containerAdminPassword)
+        testRunName: 'Microsoft Base App tests'
+        testApps:
+          - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Misc.app'
+            disabledTests: '@{CodeunitName = "Page Troubleshooting Test"; Method = "*"},@{CodeunitName = "Profile Import/Export Test"; Method = "*"}' # skip CU138696 and CU138697 because of session issues
+          - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Bank.app'
+          - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Cash Flow.app'
+          - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Cost Accounting.app'
+          - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-CRM integration.app'
+          - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Data Exchange.app'
+          - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Dimension.app'
+          - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-ERM.app'
+          - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Fixed Asset.app'
+          - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-General Journal.app'
+          - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Graph.app'
+          - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Integration.app'
+          - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Invoicing.app'
+          - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Job.app'
+          - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Local.app'
+          # - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Marketing.app' Microsoft.Dynamics.Nav.Integration.Office.Mock assembly missing
+          - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Permissions.app'
+          - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Physical Inventory.app'
+          - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Prepayment.app'
+          - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Rapid Start.app'
+          - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Report.app'
+          - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Resource.app'
+          - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Reverse.app'
+          - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-SCM.app'
+          # - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-SINGLESERVER.app' Freddy always skips this app in his scripts?!
+          - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-SMB.app'
+          - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-SMTP.app'
+          - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Upgrade.app'
+          - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-User.app'
+          - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-VAT.app'
+          - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Workflow.app'
