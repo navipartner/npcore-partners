@@ -11,7 +11,7 @@ resources:
   repositories:
   - repository: scriptsRepo
     type: git
-    name:  'NpCore/NpDevOps'
+    name: 'NpCore/NpDevOps'
 
 pool:
   name: NP Core Pipelines
@@ -22,42 +22,65 @@ pool:
   - Agent.OS -equals Windows_NT
   - Agent.OSVersion -equals 10.0.17763
 
+variables:
+  containerName: Build-$(Build.BuildId)
+  serverInstanceName: BC
+  containerAdminUsername: admin
+  containerAdminPassword: P@ssword1
+  artifactURL: https://bcartifacts.azureedge.net/onprem/16.3.14085.14238/w1  
+
 jobs:
-- template: YAML/Templates/Job/BuildALApp.yml@scriptsRepo
+- template: YAML/Templates/Job/CreateBCContainer.yml@scriptsRepo
   parameters:
     timeoutInMinutes: 900
     containerImageName: mcr.microsoft.com/dynamicsnav:10.0.17763.1397-generic
-    artifactURL: https://bcartifacts.azureedge.net/onprem/16.3.14085.14238/w1
-    containerName: Build-$(Build.BuildId)
-    serverInstanceName: BC
-    containerAdminUsername: admin
-    containerAdminPassword: P@ssword1
+    artifactURL: $(artifactURL)
+    containerName: $(containerName)
+    serverInstanceName: $(serverInstanceName)
+    containerAdminUsername: $(containerAdminUsername) 
+    containerAdminPassword: $(containerAdminPassword)
     licenseSecureFileName: 'DEV_BC OP 16.flf'
     scriptsRepo: ScriptsRepo
-    dependancies:
-      - package:
-          source: 'https://api.nuget.org/v3/index.json;https://pkgs.dev.azure.com/navipartner/_packaging/NprAddIns/nuget/v3/index.json'
-          id: NaviPartner.NPRetail.AddIns.BC #CASE SENSITIVE!
-          destinationPath: '$(ServiceTierFolder)/Add-Ins'
-      - package:
-          source: 'https://pkgs.dev.azure.com/navipartner/_packaging/JSDependancies/nuget/v3/index.json'
-          id: NaviPartner.Dragonglass.BC
-          destinationPath: $(Build.SourcesDirectory)/$(Build.Repository.Name)/src/_ControlAddIns/Dragonglass/Scripts        
-      - appsToDeploy:
-        - path: 'C:\Applications\TestFramework\TestRunner\Microsoft_Test Runner.app'
-        - path: 'C:\Applications\TestFramework\TestLibraries\Assert\Microsoft_Library Assert.app'
-        - path: 'C:\Applications\TestFramework\TestLibraries\Any\Microsoft_Any.app'
-        - path: 'C:\Applications\system application\test\Microsoft_System Application Test Library.app'
-        - path: 'C:\Applications\baseapp\test\Microsoft_Tests-TestLibraries.app'
-      - package:
-          source: 'https://pkgs.dev.azure.com/navipartner/_packaging/NPCoreTestFixture/nuget/v3/index.json'
-          id: NaviPartner.NPCore.TestFixture.BC160
-          destinationPath: '$(Agent.TempDirectory)/TestFixture/'
-        appsToDeploy:
-          - path: '$(Agent.TempDirectory)/TestFixture/Test_Fixture_Initializer.app'
-            afterCompile: TRUE
-    testRunsToRun:
-      - testRunName: 'Microsoft Base App tests'
+    stepList:
+    - template: YAML/Templates/Step/BuildALApp.yml@scriptsRepo
+      parameters:
+        containerName: $(containerName)
+        containerAdminUsername: $(containerAdminUsername)
+        containerAdminPassword: $(containerAdminPassword)
+        serverInstanceName: $(serverInstanceName)
+        dependancies:
+        - package:
+            source: 'https://api.nuget.org/v3/index.json;https://pkgs.dev.azure.com/navipartner/_packaging/NprAddIns/nuget/v3/index.json'
+            id: NaviPartner.NPRetail.AddIns.BC #CASE SENSITIVE!
+            destinationPath: '$(ServiceTierFolder)/Add-Ins'
+        - package:
+            source: 'https://pkgs.dev.azure.com/navipartner/_packaging/JSDependancies/nuget/v3/index.json'
+            id: NaviPartner.Dragonglass.BC
+            destinationPath: $(Build.SourcesDirectory)/$(Build.Repository.Name)/src/_ControlAddIns/Dragonglass/Scripts
+
+    - template: YAML/Templates/Step/HandleDependancies.yml@scriptsRepo 
+      parameters:
+        dependancies:
+        - appsToDeploy:
+          - path: 'C:\Applications\TestFramework\TestRunner\Microsoft_Test Runner.app'
+          - path: 'C:\Applications\TestFramework\TestLibraries\Assert\Microsoft_Library Assert.app'
+          - path: 'C:\Applications\TestFramework\TestLibraries\Any\Microsoft_Any.app'
+          - path: 'C:\Applications\system application\test\Microsoft_System Application Test Library.app'
+          - path: 'C:\Applications\baseapp\test\Microsoft_Tests-TestLibraries.app'
+        - package:
+            source: 'https://pkgs.dev.azure.com/navipartner/_packaging/NPCoreTestFixture/nuget/v3/index.json'
+            id: NaviPartner.NPCore.TestFixture.BC160
+            destinationPath: '$(Agent.TempDirectory)/TestFixture/'
+          appsToDeploy:
+            - path: '$(Agent.TempDirectory)/TestFixture/Test_Fixture_Initializer.app'
+        serverInstanceName: $(serverInstanceName)
+
+    - template: YAML/Templates/Step/SetupAndRunTests.yml@scriptsRepo
+      parameters:
+        serverInstanceName: $(serverInstanceName)
+        username: $(containerAdminUsername)
+        password: $(containerAdminPassword)
+        testRunName: 'Microsoft Base App tests'
         testApps:
           - appPath: 'C:\Applications\baseapp\test\Microsoft_Tests-Misc.app'
             disabledTests: '@{CodeunitName = "Page Troubleshooting Test"; Method = "*"},@{CodeunitName = "Profile Import/Export Test"; Method = "*"}' # skip CU138696 and CU138697 because of session issues
