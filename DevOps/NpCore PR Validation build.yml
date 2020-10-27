@@ -15,27 +15,41 @@ pool:
   - Agent.OS -equals Windows_NT
   - Agent.OSVersion -equals 10.0.17763
 
+variables:
+  containerName: Build-$(Build.BuildId)
+  serverInstanceName: BC
+  containerAdminUsername: admin
+  containerAdminPassword: P@ssword1
+  artifactURL: https://bcartifacts.azureedge.net/onprem/16.3.14085.14238/w1  
+
 jobs:
-- template: YAML/Templates/Job/BuildALApp.yml@scriptsRepo
+- template: YAML/Templates/Job/CreateBCContainer.yml@scriptsRepo
   parameters:
     timeoutInMinutes: 180
     containerImageName: mcr.microsoft.com/dynamicsnav:10.0.17763.1397-generic
-    artifactURL: https://bcartifacts.azureedge.net/onprem/16.3.14085.14238/w1
-    containerName: Build-$(Build.BuildId)
-    serverInstanceName: BC
-    containerAdminUsername: admin
-    containerAdminPassword: P@ssword1
+    artifactURL: $(artifactURL)
+    containerName: $(containerName)
+    serverInstanceName: $(serverInstanceName)
+    containerAdminUsername: $(containerAdminUsername) 
+    containerAdminPassword: $(containerAdminPassword)
     licenseSecureFileName: 'DEV_BC OP 16.flf'
     scriptsRepo: ScriptsRepo
-    dependancies:
-      - package:
-          source: 'https://api.nuget.org/v3/index.json;https://pkgs.dev.azure.com/navipartner/_packaging/NprAddIns/nuget/v3/index.json'
-          id: NaviPartner.NPRetail.AddIns.BC #CASE SENSITIVE!
-          destinationPath: '$(ServiceTierFolder)/Add-Ins'
-      - package:
-          source: 'https://pkgs.dev.azure.com/navipartner/_packaging/JSDependancies/nuget/v3/index.json'
-          id: NaviPartner.Dragonglass.BC
-          destinationPath: $(Build.SourcesDirectory)/$(Build.Repository.Name)/src/_ControlAddIns/Dragonglass/Scripts
-    latestPrereleaseAppNuGetSource: 
-        source: 'https://pkgs.dev.azure.com/navipartner/_packaging/NpCore/nuget/v3/index.json'
-        id: NaviPartner.NPCore.BC160
+    stepList:
+    - template: YAML/Templates/Step/BuildALApp.yml@scriptsRepo
+      parameters:
+        containerName: $(containerName)
+        containerAdminUsername: $(containerAdminUsername)
+        containerAdminPassword: $(containerAdminPassword)
+        serverInstanceName: $(serverInstanceName)
+        dependancies:
+        - package:
+            source: 'https://api.nuget.org/v3/index.json;https://pkgs.dev.azure.com/navipartner/_packaging/NprAddIns/nuget/v3/index.json'
+            id: NaviPartner.NPRetail.AddIns.BC #CASE SENSITIVE!
+            destinationPath: '$(ServiceTierFolder)/Add-Ins'
+        - package:
+            source: 'https://pkgs.dev.azure.com/navipartner/_packaging/JSDependancies/nuget/v3/index.json'
+            id: NaviPartner.Dragonglass.BC
+            destinationPath: $(Build.SourcesDirectory)/$(Build.Repository.Name)/src/_ControlAddIns/Dragonglass/Scripts
+        latestPrereleaseAppNuGetSource: 
+          source: 'https://pkgs.dev.azure.com/navipartner/_packaging/NpCore/nuget/v3/index.json'
+          id: NaviPartner.NPCore.BC160

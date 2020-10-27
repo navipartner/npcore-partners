@@ -11,7 +11,7 @@ resources:
   repositories:
   - repository: scriptsRepo
     type: git
-    name:  'NpCore/NpDevOps'
+    name: 'NpCore/NpDevOps'
 
 pool:
   name: NP Core Pipelines
@@ -22,89 +22,110 @@ pool:
   - Agent.OS -equals Windows_NT
   - Agent.OSVersion -equals 10.0.17763
 
+variables:
+  containerName: Build-$(Build.BuildId)
+  serverInstanceName: BC
+  containerAdminUsername: admin
+  containerAdminPassword: P@ssword1
+  artifactURL: https://bcartifacts.azureedge.net/onprem/16.3.14085.14238/w1
+
 jobs:
-- template: YAML/Templates/Job/BuildALApp.yml@scriptsRepo
+- template: YAML/Templates/Job/CreateBCContainer.yml@scriptsRepo
   parameters:
-    jobName: First_build
+    jobName: First_build  
     timeoutInMinutes: 180
     containerImageName: mcr.microsoft.com/dynamicsnav:10.0.17763.1397-generic
-    artifactURL: https://bcartifacts.azureedge.net/onprem/16.3.14085.14238/w1
-    containerName: Build-$(Build.BuildId)-1
-    serverInstanceName: BC
-    containerAdminUsername: admin
-    containerAdminPassword: P@ssword1
+    artifactURL: $(artifactURL)
+    containerName: $(containerName)
+    serverInstanceName: $(serverInstanceName)
+    containerAdminUsername: $(containerAdminUsername) 
+    containerAdminPassword: $(containerAdminPassword)
     licenseSecureFileName: 'DEV_BC OP 16.flf'
     scriptsRepo: ScriptsRepo
-    dependancies:
-      - package:
-          source: 'https://api.nuget.org/v3/index.json;https://pkgs.dev.azure.com/navipartner/_packaging/NprAddIns/nuget/v3/index.json'
-          id: NaviPartner.NPRetail.AddIns.BC #CASE SENSITIVE!
-          destinationPath: '$(ServiceTierFolder)/Add-Ins'
-      - package:
-          source: 'https://pkgs.dev.azure.com/navipartner/_packaging/JSDependancies/nuget/v3/index.json'
-          id: NaviPartner.Dragonglass.BC
-          destinationPath: $(Build.SourcesDirectory)/$(Build.Repository.Name)/src/_ControlAddIns/Dragonglass/Scripts        
-    alternativeSystemALPackages:
-      - packages:
-        - source: 'https://pkgs.dev.azure.com/navipartner/_packaging/BCSymbols/nuget/v3/index.json'
-          id: Microsoft.BC.160.Base_Application.au
-        ISOcountryCode: AU
-      - packages:
-        - source: 'https://pkgs.dev.azure.com/navipartner/_packaging/BCSymbols/nuget/v3/index.json'
-          id: Microsoft.BC.160.Base_Application.dk
-        ISOcountryCode: DK
-      - packages:
-        - source: 'https://pkgs.dev.azure.com/navipartner/_packaging/BCSymbols/nuget/v3/index.json'
-          id: Microsoft.BC.160.Base_Application.fr
-        ISOcountryCode: FR
-      - packages:
-        - source: 'https://pkgs.dev.azure.com/navipartner/_packaging/BCSymbols/nuget/v3/index.json'
-          id: Microsoft.BC.160.Base_Application.gb
-        ISOcountryCode: GB
-      - packages:
-        - source: 'https://pkgs.dev.azure.com/navipartner/_packaging/BCSymbols/nuget/v3/index.json'
-          id: Microsoft.BC.160.Base_Application.it
-        ISOcountryCode: IT
-      - packages:
-        - source: 'https://pkgs.dev.azure.com/navipartner/_packaging/BCSymbols/nuget/v3/index.json'
-          id: Microsoft.BC.160.Base_Application.na
-        ISOcountryCode: NA
-      - packages:
-        - source: 'https://pkgs.dev.azure.com/navipartner/_packaging/BCSymbols/nuget/v3/index.json'
-          id: Microsoft.BC.160.Base_Application.nl
-        ISOcountryCode: NL
-      - packages:
-        - source: 'https://pkgs.dev.azure.com/navipartner/_packaging/BCSymbols/nuget/v3/index.json'
-          id: Microsoft.BC.160.Base_Application.no
-        ISOcountryCode: NO
-      - packages:
-        - source: 'https://pkgs.dev.azure.com/navipartner/_packaging/BCSymbols/nuget/v3/index.json'
-          id: Microsoft.BC.160.Base_Application.nz
-        ISOcountryCode: NZ
-      - packages:
-        - source: 'https://pkgs.dev.azure.com/navipartner/_packaging/BCSymbols/nuget/v3/index.json'
-          id: Microsoft.BC.160.Base_Application.se
-        ISOcountryCode: SE
+    stepList:
+    - template: YAML/Templates/Step/BuildALApp.yml@scriptsRepo
+      parameters:
+        containerName: $(containerName)
+        containerAdminUsername: $(containerAdminUsername)
+        containerAdminPassword: $(containerAdminPassword)
+        serverInstanceName: $(serverInstanceName)
+        dependancies:
+        - package:
+            source: 'https://api.nuget.org/v3/index.json;https://pkgs.dev.azure.com/navipartner/_packaging/NprAddIns/nuget/v3/index.json'
+            id: NaviPartner.NPRetail.AddIns.BC #CASE SENSITIVE!
+            destinationPath: '$(ServiceTierFolder)/Add-Ins'
+        - package:
+            source: 'https://pkgs.dev.azure.com/navipartner/_packaging/JSDependancies/nuget/v3/index.json'
+            id: NaviPartner.Dragonglass.BC
+            destinationPath: $(Build.SourcesDirectory)/$(Build.Repository.Name)/src/_ControlAddIns/Dragonglass/Scripts
+        alternativeSystemALPackages:
+        - packages:
+          - source: 'https://pkgs.dev.azure.com/navipartner/_packaging/BCSymbols/nuget/v3/index.json'
+            id: Microsoft.BC.160.Base_Application.au
+          ISOcountryCode: AU
+        - packages:
+          - source: 'https://pkgs.dev.azure.com/navipartner/_packaging/BCSymbols/nuget/v3/index.json'
+            id: Microsoft.BC.160.Base_Application.dk
+          ISOcountryCode: DK
+        - packages:
+          - source: 'https://pkgs.dev.azure.com/navipartner/_packaging/BCSymbols/nuget/v3/index.json'
+            id: Microsoft.BC.160.Base_Application.fr
+          ISOcountryCode: FR
+        - packages:
+          - source: 'https://pkgs.dev.azure.com/navipartner/_packaging/BCSymbols/nuget/v3/index.json'
+            id: Microsoft.BC.160.Base_Application.gb
+          ISOcountryCode: GB
+        - packages:
+          - source: 'https://pkgs.dev.azure.com/navipartner/_packaging/BCSymbols/nuget/v3/index.json'
+            id: Microsoft.BC.160.Base_Application.it
+          ISOcountryCode: IT
+        - packages:
+          - source: 'https://pkgs.dev.azure.com/navipartner/_packaging/BCSymbols/nuget/v3/index.json'
+            id: Microsoft.BC.160.Base_Application.na
+          ISOcountryCode: NA
+        - packages:
+          - source: 'https://pkgs.dev.azure.com/navipartner/_packaging/BCSymbols/nuget/v3/index.json'
+            id: Microsoft.BC.160.Base_Application.nl
+          ISOcountryCode: NL
+        - packages:
+          - source: 'https://pkgs.dev.azure.com/navipartner/_packaging/BCSymbols/nuget/v3/index.json'
+            id: Microsoft.BC.160.Base_Application.no
+          ISOcountryCode: NO
+        - packages:
+          - source: 'https://pkgs.dev.azure.com/navipartner/_packaging/BCSymbols/nuget/v3/index.json'
+            id: Microsoft.BC.160.Base_Application.nz
+          ISOcountryCode: NZ
+        - packages:
+          - source: 'https://pkgs.dev.azure.com/navipartner/_packaging/BCSymbols/nuget/v3/index.json'
+            id: Microsoft.BC.160.Base_Application.se
+          ISOcountryCode: SE        
 
-- template: YAML/Templates/Job/BuildALApp.yml@scriptsRepo
+- template: YAML/Templates/Job/CreateBCContainer.yml@scriptsRepo
   parameters:
     jobName: Second_build
-    jobDisplayName: Build AL app - Insider Build
+    jobDisplayName: Build AL app - Insider Build  
     timeoutInMinutes: 180
     containerImageName: mcr.microsoft.com/dynamicsnav:10.0.17763.1397-generic
     artifactURL: https://bcinsider.azureedge.net/sandbox/17.0.15821.0/w1?sv=2019-12-12&ss=b&srt=sco&st=2020-09-15T00%3A00%3A00Z&se=2021-04-01T00%3A00%3A00Z&sp=rl&spr=https&sig=9PznJJRE47DoKjlG44Av6ZKtG4MRfh3N6gyFT7RNWSQ%3D
     containerName: Build-$(Build.BuildId)-2
-    serverInstanceName: BC
-    containerAdminUsername: admin
-    containerAdminPassword: P@ssword1
+    serverInstanceName: $(serverInstanceName)
+    containerAdminUsername: $(containerAdminUsername) 
+    containerAdminPassword: $(containerAdminPassword)
     licenseSecureFileName: 'DEV_BC OP 16.flf'
     scriptsRepo: ScriptsRepo
-    dependancies:
-      - package:
-          source: 'https://api.nuget.org/v3/index.json;https://pkgs.dev.azure.com/navipartner/_packaging/NprAddIns/nuget/v3/index.json'
-          id: NaviPartner.NPRetail.AddIns.BC #CASE SENSITIVE!
-          destinationPath: '$(ServiceTierFolder)/Add-Ins'
-      - package:
-          source: 'https://pkgs.dev.azure.com/navipartner/_packaging/JSDependancies/nuget/v3/index.json'
-          id: NaviPartner.Dragonglass.BC
-          destinationPath: $(Build.SourcesDirectory)/$(Build.Repository.Name)/src/_ControlAddIns/Dragonglass/Scripts        
+    stepList:
+    - template: YAML/Templates/Step/BuildALApp.yml@scriptsRepo
+      parameters:
+        containerName: $(containerName)
+        containerAdminUsername: $(containerAdminUsername)
+        containerAdminPassword: $(containerAdminPassword)
+        serverInstanceName: $(serverInstanceName)
+        dependancies:
+        - package:
+            source: 'https://api.nuget.org/v3/index.json;https://pkgs.dev.azure.com/navipartner/_packaging/NprAddIns/nuget/v3/index.json'
+            id: NaviPartner.NPRetail.AddIns.BC #CASE SENSITIVE!
+            destinationPath: '$(ServiceTierFolder)/Add-Ins'
+        - package:
+            source: 'https://pkgs.dev.azure.com/navipartner/_packaging/JSDependancies/nuget/v3/index.json'
+            id: NaviPartner.Dragonglass.BC
+            destinationPath: $(Build.SourcesDirectory)/$(Build.Repository.Name)/src/_ControlAddIns/Dragonglass/Scripts
