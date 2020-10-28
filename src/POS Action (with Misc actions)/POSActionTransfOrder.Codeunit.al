@@ -53,7 +53,8 @@ codeunit 6150731 "NPR POS Action: Transf. Order"
     var
         JSON: Codeunit "NPR POS JSON Management";
         POSSetup: Codeunit "NPR POS Setup";
-        Register: Record "NPR Register";
+        POSUnit: Record "NPR POS Unit";
+        POSStore: Record "NPR POS Store";
         TransferHeader: Record "Transfer Header";
         UsePOSLocationAs: Integer;
         TransferFromFilter: Text;
@@ -74,18 +75,19 @@ codeunit 6150731 "NPR POS Action: Transf. Order"
         UsePOSLocationAs := JSON.GetInteger('Register Location', true);
 
         POSSession.GetSetup(POSSetup);
-        POSSetup.GetRegisterRecord(Register);
+        POSSetup.GetPOSUnit(POSUnit);
+        POSSetup.GetPOSStore(POSStore);
 
         case UsePOSLocationAs of
             1:
-                TransferFromFilter := Register."Location Code";
+                TransferFromFilter := POSStore."Location Code";
             2:
-                TransferToFilter := Register."Location Code";
+                TransferToFilter := POSStore."Location Code";
         end;
 
         if JSON.GetBooleanParameter('NewRecord', true) then begin
             if Confirm(CreateNewRecordCaption, true, TransferHeader.FieldCaption("Transfer-from Code"), TransferHeader.FieldCaption("Shortcut Dimension 1 Code")) then
-                AddNewRecord(Register, JSON.GetStringParameter('DefaultTransferToCode', false));
+                AddNewRecord(Posstore, POSUnit, JSON.GetStringParameter('DefaultTransferToCode', false));
         end else begin
             if TransferFromFilter = '' then
                 TransferFromFilter := JSON.GetString('Transfer-from Filter', true);
@@ -233,19 +235,17 @@ codeunit 6150731 "NPR POS Action: Transf. Order"
 
     //--- Auxiliary ---
 
-    local procedure AddNewRecord(Register: Record "NPR Register"; TransferToCodeString: Text)
+    local procedure AddNewRecord(POSStore: Record "NPR POS Store"; POSUnit: Record "NPR POS Unit"; TransferToCodeString: Text)
     var
         Location: Record Location;
-        POSUnit: Record "NPR POS Unit";
         TransferHeader: Record "Transfer Header";
         TransferOrder: Page "Transfer Order";
     begin
         TransferHeader.Insert(true);
-        TransferHeader.Validate("Transfer-from Code", Register."Location Code");
+        TransferHeader.Validate("Transfer-from Code", POSStore."Location Code");
         if Location.Get(CopyStr(TransferToCodeString, 1, MaxStrLen(Location.Code))) then
             if not Location."Use As In-Transit" and (TransferHeader."Transfer-from Code" <> Location.Code) then
                 TransferHeader.Validate("Transfer-to Code", TransferToCodeString);
-        POSUnit.Get(Register."Register No.");
         TransferHeader.Validate("Shortcut Dimension 1 Code", POSUnit."Global Dimension 1 Code");  //Why only 1st global dim?
         TransferHeader.Modify;
 
