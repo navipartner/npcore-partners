@@ -226,7 +226,6 @@ codeunit 6060130 "NPR MM Member Ticket Manager"
                     TicketRequestManager.POS_AppendToReservationRequest2(Token,
                       '', 0,
                       TmpTicketReservationRequest."Item No.", TmpTicketReservationRequest."Variant Code", TicketAdmissionBOM."Admission Code",
-                      //TmpTicketReservationRequest.Quantity, -1, Member."External Member No.", Member."External Member No.", '', TmpTicketReservationRequest."Notification Address");
                       TmpTicketReservationRequest.Quantity, 0, Member."External Member No.", Member."External Member No.", '', TmpTicketReservationRequest."Notification Address");
 
                 until (TicketAdmissionBOM.Next() = 0);
@@ -292,7 +291,7 @@ codeunit 6060130 "NPR MM Member Ticket Manager"
         if (MembershipEntryNo = 0) then
             Error(ErrorReason);
 
-        if not (MemberRetailIntegration.TranslateBarcodeToItemVariant(ExternalItemNo, ItemNo, VariantCode, ResolvingTable)) then
+        if (not (MemberRetailIntegration.TranslateBarcodeToItemVariant(ExternalItemNo, ItemNo, VariantCode, ResolvingTable))) then
             Error(MISSING_CROSSREF);
 
         Ticket.SetCurrentKey("External Member Card No.");
@@ -363,9 +362,6 @@ codeunit 6060130 "NPR MM Member Ticket Manager"
             ItemNo := MembershipAdmissionSetup."Ticket No.";
             VariantCode := '';
             if (MembershipAdmissionSetup."Ticket No. Type" = MembershipAdmissionSetup."Ticket No. Type"::ITEM_CROSS_REF) then
-
-                //IF (NOT TicketRequestManager.TranslateBarcodeToItemVariant (ExternalItemNo, ItemNo, VariantCode, ResolvingTable)) THEN
-                //  ERROR ('Invalid Item Cross Reference barcode %1, it does not translate to an item / variant.', ItemNo);
                 if (not TicketRequestManager.TranslateBarcodeToItemVariant(MembershipAdmissionSetup."Ticket No.", ItemNo, VariantCode, ResolvingTable)) then
                     Error('Invalid Item Cross Reference barcode %1, it does not translate to an item / variant.', ItemNo);
 
@@ -384,11 +380,12 @@ codeunit 6060130 "NPR MM Member Ticket Manager"
 
     procedure PrefillTicketRequest(MemberEntryNo: Integer; MembershipEntryNo: Integer; ItemNo: Code[20]; VariantCode: Code[10]; AdmissionCode: Code[20]; var TmpTicketReservationRequest: Record "NPR TM Ticket Reservation Req." temporary)
     var
-        Admission: Record "NPR TM Admission";
         Member: Record "NPR MM Member";
-        TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
+        Admission: Record "NPR TM Admission";
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         Method: Code[10];
+        NotificationEngine: Option;
         Address: Text[200];
     begin
 
@@ -403,7 +400,7 @@ codeunit 6060130 "NPR MM Member Ticket Manager"
         TmpTicketReservationRequest."Item No." := ItemNo;
         TmpTicketReservationRequest."Variant Code" := VariantCode;
 
-        MembershipManagement.GetCommunicationMethod_Ticket(Member."Entry No.", MembershipEntryNo, Method, TmpTicketReservationRequest."Notification Address");
+        MembershipManagement.GetCommunicationMethod_Ticket(Member."Entry No.", MembershipEntryNo, Method, TmpTicketReservationRequest."Notification Address", NotificationEngine);
         case Method of
             'SMS':
                 TmpTicketReservationRequest."Notification Method" := TmpTicketReservationRequest."Notification Method"::SMS;

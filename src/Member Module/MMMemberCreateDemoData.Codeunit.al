@@ -492,7 +492,7 @@ codeunit 6014439 "NPR MM Member Create Demo Data"
         MemberNotificationSetup."Include NP Pass" := true;
 
         MemberNotificationSetup."PUT Passes Template".CREATEOUTSTREAM(outstr);
-        outstr.WRITE(MemberNotification.GetDefaultTemplate());
+        outstr.WRITE(MemberNotification.GetDefaultWalletTemplate());
 
         MemberNotificationSetup.Modify
     end;
@@ -526,7 +526,7 @@ codeunit 6014439 "NPR MM Member Create Demo Data"
         MemberNotificationSetup."Include NP Pass" := true;
 
         MemberNotificationSetup."PUT Passes Template".CREATEOUTSTREAM(outstr);
-        outstr.WRITE(MemberNotification.GetDefaultTemplate());
+        outstr.WRITE(MemberNotification.GetDefaultWalletTemplate());
 
         MemberNotificationSetup.Modify();
     end;

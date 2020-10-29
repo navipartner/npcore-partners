@@ -59,6 +59,10 @@ xmlport 6060130 "NPR MM Get Members. Members"
                                     MemberRole := Format(MembershipRole."Member Role");
                             end;
                         }
+                        fieldattribute(contactno; tmpMemberInfoResponse."Contact No.")
+                        {
+
+                        }
                         fieldelement(membernumber; tmpMemberInfoResponse."External Member No")
                         {
                         }
@@ -229,6 +233,7 @@ xmlport 6060130 "NPR MM Get Members. Members"
                 tmpMemberInfoResponse."External Member No" := Member."External Member No.";
                 tmpMemberInfoResponse."Member Entry No" := Member."Entry No.";
                 tmpMemberInfoResponse."Membership Entry No." := MembershipRole."Membership Entry No.";
+                tmpMemberInfoResponse."Contact No." := MembershipRole."Contact No.";
 
                 MembershipRole.CalcFields("GDPR Approval");
                 case MembershipRole."GDPR Approval" of
