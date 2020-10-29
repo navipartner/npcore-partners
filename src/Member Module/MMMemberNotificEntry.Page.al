@@ -115,6 +115,16 @@ page 6060144 "NPR MM Member Notific. Entry"
                 {
                     ApplicationArea = All;
                 }
+
+                field("Membership Consecutive From"; "Membership Consecutive From")
+                {
+                    ApplicationArea = All;
+                }
+
+                field("Membership Consecutive Until"; "Membership Consecutive Until")
+                {
+                    ApplicationArea = All;
+                }
                 field("Target Member Role"; "Target Member Role")
                 {
                     ApplicationArea = All;

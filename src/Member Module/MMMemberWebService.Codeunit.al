@@ -764,7 +764,7 @@ codeunit 6060128 "NPR MM Member WebService"
 
             3:
                 begin
-                    EntryNo := MemberNotification.CreateWalletSendNotification(MemberCard."Membership Entry No.", MemberCard."Member Entry No.", MemberCard."Entry No.");
+                    EntryNo := MemberNotification.CreateWalletSendNotification(MemberCard."Membership Entry No.", MemberCard."Member Entry No.", MemberCard."Entry No.", TODAY);
                     if (MembershipNotification.Get(EntryNo)) then
                         if (MembershipNotification."Processing Method" = MembershipNotification."Processing Method"::INLINE) then
                             MemberNotification.HandleMembershipNotification(MembershipNotification);
@@ -1159,12 +1159,12 @@ codeunit 6060128 "NPR MM Member WebService"
 
         if (MembershipEntryNo = 0) then begin
             ResponseMessage := StrSubstNo('External Member Number %1, not found.', ExternalMemberNo);
-            MemberLimitationMgr.LogMemberCardArrival(ExternalMemberCardNo, AdmissionCode, ScannerStationId, ResponseMessage, -1); //MM1.21 [284653]
+            MemberLimitationMgr.LogMemberCardArrival(ExternalMemberCardNo, AdmissionCode, ScannerStationId, ResponseMessage, -1);
             exit(-1);
         end;
         if (not MembershipMgr.IsMembershipActive(MembershipEntryNo, WorkDate, true)) then begin
             ResponseMessage := StrSubstNo('Membership is not active for today (%1).', Format(WorkDate, 0, 9));
-            MemberLimitationMgr.LogMemberCardArrival(ExternalMemberCardNo, AdmissionCode, ScannerStationId, ResponseMessage, -1); //MM1.21 [284653]
+            MemberLimitationMgr.LogMemberCardArrival(ExternalMemberCardNo, AdmissionCode, ScannerStationId, ResponseMessage, -1);
             exit(-1);
         end;
 
@@ -1172,21 +1172,15 @@ codeunit 6060128 "NPR MM Member WebService"
         ResponseMessage := '';
 
         LimitLogEntry := 0;
-        MemberLimitationMgr.WS_CheckLimitMemberCardArrival(ExternalMemberCardNo, AdmissionCode, ScannerStationId, LimitLogEntry, ResponseMessage, Success); //MM1.21 [284653]
+        MemberLimitationMgr.WS_CheckLimitMemberCardArrival(ExternalMemberCardNo, AdmissionCode, ScannerStationId, LimitLogEntry, ResponseMessage, Success);
         if (Success <> 0) then
             exit(Success);
 
         if (MembershipSetup."Ticket Item Barcode" <> '') then begin
-
-            // TicketRequestManager.LockResources ();
             Success := IssueMemberTicketAndRegisterArrival(MembershipSetup."Ticket Item Barcode", AdmissionCode, ScannerStationId, Member, ResponseMessage);
-
-            // MemberLimitationMgr.WS_CheckLimitMemberCardArrival (ExternalMemberCardNo, AdmissionCode, ScannerStationId, ResponseMessage, Success); //MM1.21 [284653]
-            // EXIT (Success);
-
         end;
 
-        MemberLimitationMgr.WS_CheckLimitMemberCardArrival(ExternalMemberCardNo, AdmissionCode, ScannerStationId, LimitLogEntry, ResponseMessage, Success); //MM1.21 [284653]
+        MemberLimitationMgr.WS_CheckLimitMemberCardArrival(ExternalMemberCardNo, AdmissionCode, ScannerStationId, LimitLogEntry, ResponseMessage, Success);
         exit(Success);
     end;
 
@@ -1203,7 +1197,7 @@ codeunit 6060128 "NPR MM Member WebService"
         Token: Text[100];
     begin
 
-        if not (MemberRetailIntegration.TranslateBarcodeToItemVariant(TicketItemNo, ItemNo, VariantCode, ResolvingTable)) then begin
+        if (not (MemberRetailIntegration.TranslateBarcodeToItemVariant(TicketItemNo, ItemNo, VariantCode, ResolvingTable))) then begin
             ResponseMessage := StrSubstNo('%1 does not translate to an item. Check Item Cross-Reference or Item table.', TicketItemNo);
             exit(-1);
         end;
@@ -1215,7 +1209,6 @@ codeunit 6060128 "NPR MM Member WebService"
 
         Ticket.SetFilter("External Member Card No.", '=%1', Member."External Member No.");
         if (Ticket.FindLast()) then begin
-            // IF (Ticket."Document Date" = TODAY) THEN BEGIN
             ResponseCode := TicketMgr.ValidateTicketForArrival(0, Ticket."No.", AdmissionCode, -1, false, ResponseMessage);
             if (ResponseCode = 0) then begin
 
@@ -1226,19 +1219,15 @@ codeunit 6060128 "NPR MM Member WebService"
 
                 exit(ResponseCode);
             end;
-            // END;
         end;
 
-        //ResponseCode := MemberRetailIntegration.IssueTicketFromMemberScan (FALSE, ItemNo, VariantCode, Member, TicketNo, ResponseMessage);
-        //IF (ResponseCode <> 0) THEN
-        //  EXIT (ResponseCode);
         Commit();
         if (not TicketMakeReservation(TicketItemNo, AdmissionCode, Member."External Member No.", ScannerStationId, Token, ResponseMessage)) then
             exit(-1);
 
         Commit();
 
-        if not (TicketConfirmReservation(Token, ScannerStationId, TicketNo, ResponseMessage)) then
+        if (not (TicketConfirmReservation(Token, ScannerStationId, TicketNo, ResponseMessage))) then
             exit(-1);
 
         Commit();
@@ -1333,7 +1322,7 @@ codeunit 6060128 "NPR MM Member WebService"
         ImportType.SetRange("Webservice Codeunit ID", WebServiceCodeunitID);
         ImportType.SetFilter("Webservice Function", '%1', CopyStr(WebserviceFunction, 1, MaxStrLen(ImportType."Webservice Function")));
 
-        if ImportType.FindFirst then
+        if (ImportType.FindFirst()) then
             exit(ImportType.Code);
 
         exit('');

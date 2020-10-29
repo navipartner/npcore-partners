@@ -80,6 +80,9 @@ xmlport 6060135 "NPR MM Get Members. Chg. Items"
                                 fieldattribute(description; TmpMembershipEntry.Description)
                                 {
                                 }
+                                fieldattribute(targetmembershipcode; TmpMembershipEntry."Membership Code")
+                                {
+                                }
                                 fieldattribute(periodstart; TmpMembershipEntry."Valid From Date")
                                 {
                                 }

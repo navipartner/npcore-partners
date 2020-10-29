@@ -19,11 +19,11 @@ codeunit 6060141 "NPR MM Loyalty WebService"
 
         InsertImportEntry('GetLoyaltyPoints', ImportEntry);
         ImportEntry."Document Name" := StrSubstNo('GetLoyaltyPoints-%1.xml', Format(CurrentDateTime(), 0, 9));
-        ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid), '=', '{}-'));
+        ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
         GetLoyaltyPoints.SetDestination(OutStr);
-        GetLoyaltyPoints.Export;
+        GetLoyaltyPoints.Export();
         ImportEntry.Modify(true);
         Commit();
 
@@ -42,7 +42,7 @@ codeunit 6060141 "NPR MM Loyalty WebService"
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
         GetLoyaltyPoints.SetDestination(OutStr);
-        GetLoyaltyPoints.Export;
+        GetLoyaltyPoints.Export();
         ImportEntry.Modify(true);
 
         MemberInfoCapture.DeleteAll();
@@ -59,11 +59,11 @@ codeunit 6060141 "NPR MM Loyalty WebService"
 
         InsertImportEntry('GetLoyaltyPointEntries', ImportEntry);
         ImportEntry."Document Name" := StrSubstNo('GetLoyaltyPointEntries-%1.xml', Format(CurrentDateTime(), 0, 9));
-        ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid), '=', '{}-'));
+        ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
         GetLoyaltyStatement.SetDestination(OutStr);
-        GetLoyaltyStatement.Export;
+        GetLoyaltyStatement.Export();
         ImportEntry.Modify(true);
         Commit();
 
@@ -82,7 +82,7 @@ codeunit 6060141 "NPR MM Loyalty WebService"
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
         GetLoyaltyStatement.SetDestination(OutStr);
-        GetLoyaltyStatement.Export;
+        GetLoyaltyStatement.Export();
         ImportEntry.Modify(true);
 
         MemberInfoCapture.DeleteAll();
@@ -100,11 +100,11 @@ codeunit 6060141 "NPR MM Loyalty WebService"
 
         InsertImportEntry('GetLoyaltyReceiptList', ImportEntry);
         ImportEntry."Document Name" := StrSubstNo('GetLoyaltyReceiptList-%1.xml', Format(CurrentDateTime(), 0, 9));
-        ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid), '=', '{}-'));
+        ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
         GetLoyaltyReceiptList.SetDestination(OutStr);
-        GetLoyaltyReceiptList.Export;
+        GetLoyaltyReceiptList.Export();
         ImportEntry.Modify(true);
         Commit();
 
@@ -124,7 +124,7 @@ codeunit 6060141 "NPR MM Loyalty WebService"
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
         GetLoyaltyReceiptList.SetDestination(OutStr);
-        GetLoyaltyReceiptList.Export;
+        GetLoyaltyReceiptList.Export();
         ImportEntry.Modify(true);
 
         MemberInfoCapture.DeleteAll();
@@ -144,8 +144,7 @@ codeunit 6060141 "NPR MM Loyalty WebService"
         ReportSelections.SetFilter("Report Type", '=%1', ReportSelections."Report Type"::"Large Sales Receipt (POS Entry)");
         ReportSelections.SetFilter("Report ID", '<>%1', 0);
 
-        //ReportSelections.FindFirst;
-        if not ReportSelections.FindFirst then
+        if (not ReportSelections.FindFirst()) then
             ReportSelections."Report ID" := REPORT::"NPR Sales Ticket A4 - POS Rdlc";
 
         Membership.SetFilter("External Membership No.", '=%1', ExternalMembershipNumber);
@@ -168,7 +167,7 @@ codeunit 6060141 "NPR MM Loyalty WebService"
             GlobalLanguage(LanguageId);
 
         PdfDoc := GetBase64(Filename);
-        if Erase(Filename) then;
+        if (Erase(Filename)) then;
 
         exit(PdfDoc);
     end;
@@ -195,13 +194,13 @@ codeunit 6060141 "NPR MM Loyalty WebService"
 
         InsertImportEntry('RegisterSale', ImportEntry);
         ImportEntry."Document Name" := StrSubstNo('RegisterSale-%1.xml', Format(CurrentDateTime(), 0, 9));
-        ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid), '=', '{}-'));
+        ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
         ImportEntry.Modify(true);
         Commit();
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
         RegisterSale.SetDestination(OutStr);
-        RegisterSale.Export;
+        RegisterSale.Export();
         ImportEntry.Modify(true);
         Commit();
 
@@ -222,7 +221,7 @@ codeunit 6060141 "NPR MM Loyalty WebService"
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
         RegisterSale.SetDestination(OutStr);
-        RegisterSale.Export;
+        RegisterSale.Export();
 
         ImportEntry.Imported := true;
         ImportEntry."Runtime Error" := false;
@@ -247,13 +246,13 @@ codeunit 6060141 "NPR MM Loyalty WebService"
 
         InsertImportEntry('ReservePoints', ImportEntry);
         ImportEntry."Document Name" := StrSubstNo('ReservePoints-%1.xml', Format(CurrentDateTime(), 0, 9));
-        ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid), '=', '{}-'));
+        ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
         ImportEntry.Modify(true);
         Commit();
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
         ReservePoints.SetDestination(OutStr);
-        ReservePoints.Export;
+        ReservePoints.Export();
         ImportEntry.Modify(true);
         Commit();
 
@@ -274,7 +273,7 @@ codeunit 6060141 "NPR MM Loyalty WebService"
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
         ReservePoints.SetDestination(OutStr);
-        ReservePoints.Export;
+        ReservePoints.Export();
 
         ImportEntry.Imported := true;
         ImportEntry."Runtime Error" := false;
@@ -302,13 +301,13 @@ codeunit 6060141 "NPR MM Loyalty WebService"
 
         InsertImportEntry('GetLoyaltyConfiguration', ImportEntry);
         ImportEntry."Document Name" := StrSubstNo('GetLoyaltyConfiguration-%1.xml', Format(CurrentDateTime(), 0, 9));
-        ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid), '=', '{}-'));
+        ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
         ImportEntry.Modify(true);
         Commit();
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
         GetLoyaltyConfiguration.SetDestination(OutStr);
-        GetLoyaltyConfiguration.Export;
+        GetLoyaltyConfiguration.Export();
         ImportEntry.Modify(true);
         Commit();
 
@@ -330,7 +329,7 @@ codeunit 6060141 "NPR MM Loyalty WebService"
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
         GetLoyaltyConfiguration.SetDestination(OutStr);
-        GetLoyaltyConfiguration.Export;
+        GetLoyaltyConfiguration.Export();
 
         ImportEntry.Imported := true;
         ImportEntry."Runtime Error" := false;
@@ -359,7 +358,7 @@ codeunit 6060141 "NPR MM Loyalty WebService"
 
         InsertImportEntry('LoyaltyCouponEligibility', ImportEntry);
         ImportEntry."Document Name" := StrSubstNo('LoyaltyCouponEligibility-%1.xml', Format(CurrentDateTime(), 0, 9));
-        ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid), '=', '{}-'));
+        ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
         ImportEntry.Imported := false;
         ImportEntry."Runtime Error" := true;
         ImportEntry.Modify(true);
@@ -367,7 +366,7 @@ codeunit 6060141 "NPR MM Loyalty WebService"
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
         LoyaltyCouponEligibility.SetDestination(OutStr);
-        LoyaltyCouponEligibility.Export;
+        LoyaltyCouponEligibility.Export();
         ImportEntry.Modify(true);
         Commit();
 
@@ -392,7 +391,7 @@ codeunit 6060141 "NPR MM Loyalty WebService"
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
         LoyaltyCouponEligibility.SetDestination(OutStr);
-        LoyaltyCouponEligibility.Export;
+        LoyaltyCouponEligibility.Export();
 
         ImportEntry.Imported := true;
         ImportEntry."Runtime Error" := false;
@@ -421,15 +420,16 @@ codeunit 6060141 "NPR MM Loyalty WebService"
 
         InsertImportEntry('LoyaltyCreateCoupon', ImportEntry);
         ImportEntry."Document Name" := StrSubstNo('LoyaltyCreateCoupon-%1.xml', Format(CurrentDateTime(), 0, 9));
-        ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid), '=', '{}-'));
+        ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
         ImportEntry.Imported := false;
         ImportEntry."Runtime Error" := true;
+        ImportEntry."Import Started at" := CurrentDateTime;
         ImportEntry.Modify(true);
         Commit();
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
         LoyaltyCreateCoupon.SetDestination(OutStr);
-        LoyaltyCreateCoupon.Export;
+        LoyaltyCreateCoupon.Export();
         ImportEntry.Modify(true);
         Commit();
 
@@ -443,14 +443,12 @@ codeunit 6060141 "NPR MM Loyalty WebService"
             if (TmpLoyaltyPointsSetup.FindSet()) then begin
                 repeat
 
-                    // IF (LoyaltyPointsSetup.GET (TmpLoyaltyPointsSetup.Code, TmpLoyaltyPointsSetup."Line No.")) THEN BEGIN
                     TmpLoyaltyPointsSetupEligible.DeleteAll();
                     LoyaltyPointManagement.GetCouponToRedeemWS(MembershipEntryNo, TmpLoyaltyPointsSetupEligible, TmpMemberInfoCapture."Amount Incl VAT", ResponseMessage);
                     if (TmpLoyaltyPointsSetupEligible.Get(TmpLoyaltyPointsSetup.Code, TmpLoyaltyPointsSetup."Line No.")) then begin
 
                         TmpLoyaltyPointsSetup.TransferFields(TmpLoyaltyPointsSetupEligible, true);
 
-                        //IF (Coupon.GET (LoyaltyPointManagement.IssueOneCoupon (MembershipEntryNo, TmpLoyaltyPointsSetup, TmpMemberInfoCapture."Amount Incl VAT"))) THEN BEGIN
                         with TmpMemberInfoCapture do
                             if (Coupon.Get(LoyaltyPointManagement.IssueOneCoupon(MembershipEntryNo, TmpLoyaltyPointsSetup, "Document No.", "Document Date", "Amount Incl VAT"))) then begin
 
@@ -475,11 +473,12 @@ codeunit 6060141 "NPR MM Loyalty WebService"
         // Log result
         ImportEntry."Document Source".CreateOutStream(OutStr);
         LoyaltyCreateCoupon.SetDestination(OutStr);
-        LoyaltyCreateCoupon.Export;
+        LoyaltyCreateCoupon.Export();
 
         ImportEntry.Imported := true;
         ImportEntry."Runtime Error" := false;
-
+        ImportEntry."Import Completed at" := CurrentDateTime();
+        ImportEntry."Import Duration" := ImportEntry."Import Completed at" - ImportEntry."Import Started at";
         ImportEntry.Modify(true);
     end;
 
@@ -501,15 +500,16 @@ codeunit 6060141 "NPR MM Loyalty WebService"
 
         InsertImportEntry('LoyaltyListCoupon', ImportEntry);
         ImportEntry."Document Name" := StrSubstNo('LoyaltyListCoupon-%1.xml', Format(CurrentDateTime(), 0, 9));
-        ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid), '=', '{}-'));
+        ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
         ImportEntry.Imported := false;
         ImportEntry."Runtime Error" := true;
+        ImportEntry."Import Started at" := CurrentDateTime();
         ImportEntry.Modify(true);
         Commit();
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
         LoyaltyListCoupon.SetDestination(OutStr);
-        LoyaltyListCoupon.Export;
+        LoyaltyListCoupon.Export();
         ImportEntry.Modify(true);
         Commit();
 
@@ -550,24 +550,115 @@ codeunit 6060141 "NPR MM Loyalty WebService"
         // Log result
         ImportEntry."Document Source".CreateOutStream(OutStr);
         LoyaltyListCoupon.SetDestination(OutStr);
-        LoyaltyListCoupon.Export;
+        LoyaltyListCoupon.Export();
 
         ImportEntry.Imported := true;
         ImportEntry."Runtime Error" := false;
-
+        ImportEntry."Import Completed at" := CurrentDateTime();
+        ImportEntry."Import Duration" := ImportEntry."Import Completed at" - ImportEntry."Import Started at";
         ImportEntry.Modify(true);
 
     end;
 
-    local procedure "--Locals"()
+    procedure DeleteCoupon(var LoyaltyDeleteCoupon: XMLport 6151189);
+    var
+        ImportEntry: Record "NPR Nc Import Entry";
+        Coupon: Record "NPR NpDc Coupon";
+        TmpCoupon: Record "NPR NpDc Coupon" temporary;
+        Membership: Record "NPR MM Membership";
+        NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
+        NpDcExtCouponReservation: Record "NPR NpDc Ext. Coupon Reserv.";
+        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        LoyaltyPointManagement: Codeunit "NPR MM Loyalty Point Mgt.";
+        OutStr: OutStream;
+        ResponseMessage: Text;
+        ResponseMessageId: Text;
+        MembershipEntryNo: Integer;
+        ExternalMembershipNo: Code[20];
+        CouponReferenceNo: Text[30];
+        CurrSaleCouponCount: Integer;
     begin
+
+        LoyaltyDeleteCoupon.Import();
+
+        InsertImportEntry('LoyaltyDeleteCoupon', ImportEntry);
+        ImportEntry."Document Name" := StrSubstNo('LoyaltyDeleteCoupon-%1.xml', Format(CurrentDateTime(), 0, 9));
+        ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
+        ImportEntry.Imported := false;
+        ImportEntry."Runtime Error" := true;
+        ImportEntry."Import Started at" := CurrentDateTime();
+        ImportEntry.Modify(true);
+        Commit();
+
+        ImportEntry."Document Source".CreateOutStream(OutStr);
+        LoyaltyDeleteCoupon.SetDestination(OutStr);
+        LoyaltyDeleteCoupon.Export();
+        ImportEntry.Modify(true);
+        Commit();
+
+        // Process
+        LoyaltyDeleteCoupon.GetRequest(ExternalMembershipNo, CouponReferenceNo);
+
+        if (ExternalMembershipNo <> '') then
+            MembershipEntryNo := MembershipManagement.GetMembershipFromExtMembershipNo(ExternalMembershipNo);
+
+        if (MembershipEntryNo > 0) then begin
+
+            if (Membership.Get(MembershipEntryNo)) then begin
+                if (Membership."Customer No." <> '') then begin
+                    Coupon.SetFilter("Customer No.", '=%1', Membership."Customer No.");
+                    Coupon.SetFilter("Starting Date", '=%1|<=%2', 0DT, CurrentDateTime());
+                    Coupon.SetFilter("Ending Date", '=%1|>=%2', 0DT, CurrentDateTime());
+                    Coupon.SetFilter("Reference No.", '=%1', CouponReferenceNo);
+                    Coupon.SETAUTOCALCFIELDS("In-use Quantity", "Remaining Quantity");
+                    if (Coupon.FindFirst()) then begin
+
+                        NpDcSaleLinePOSCoupon.SetFilter(Type, '=%1', NpDcSaleLinePOSCoupon.Type::Coupon);
+                        NpDcSaleLinePOSCoupon.SetFilter("Coupon No.", '=%1', Coupon."No.");
+                        CurrSaleCouponCount := NpDcSaleLinePOSCoupon.COUNT;
+
+                        NpDcExtCouponReservation.SetFilter("Coupon No.", '=%1', Coupon."No.");
+                        CurrSaleCouponCount += NpDcExtCouponReservation.COUNT;
+
+                        if (CurrSaleCouponCount > 0) then begin
+                            LoyaltyDeleteCoupon.AddErrorResponse('Coupon has been applied to a sale, coupon reservation must be cancelled before it can be deleted.');
+
+                        end else begin
+                            if (LoyaltyPointManagement.UnRedeemPointsCoupon(0, '', TODAY, Coupon."No.")) then begin
+                                Coupon.Delete();
+                                LoyaltyDeleteCoupon.AddResponse('');
+                                Commit();
+                            end;
+                        end;
+
+                    end else begin
+                        LoyaltyDeleteCoupon.AddErrorResponse('Invalid coupon reference.');
+                    end;
+                end;
+            end;
+
+        end else begin
+            LoyaltyDeleteCoupon.AddErrorResponse('Invalid Search Value.');
+        end;
+
+        // Log result
+        ImportEntry."Document Source".CreateOutStream(OutStr);
+        LoyaltyDeleteCoupon.SetDestination(OutStr);
+        LoyaltyDeleteCoupon.Export();
+
+        ImportEntry.Imported := true;
+        ImportEntry."Runtime Error" := false;
+        ImportEntry."Import Completed at" := CurrentDateTime();
+        ImportEntry."Import Duration" := ImportEntry."Import Completed at" - ImportEntry."Import Started at";
+        ImportEntry.Modify(true);
+
     end;
 
     local procedure InsertImportEntry(WebserviceFunction: Text; var ImportEntry: Record "NPR Nc Import Entry")
     var
         NaviConnectSetupMgt: Codeunit "NPR Nc Setup Mgt.";
     begin
-        ImportEntry.Init;
+        ImportEntry.Init();
         ImportEntry."Entry No." := 0;
         ImportEntry."Import Type" := GetImportTypeCode(CODEUNIT::"NPR MM Loyalty WebService", WebserviceFunction);
         if (ImportEntry."Import Type" = '') then begin
@@ -599,6 +690,7 @@ codeunit 6060141 "NPR MM Loyalty WebService"
 
         CreateImportType('LOYALTY-05', 'LoyaltyManagement', 'GetLoyaltyReceiptList');
         CreateImportType('LOYALTY-06', 'LoyaltyManagement', 'LoyaltyListCoupon');
+        CreateImportType('LOYALTY-07', 'LoyaltyManagement', 'LoyaltyDeleteCoupon');
 
         CreateImportType('POINTS-01', 'PointManagement', 'RegisterSale');
         CreateImportType('POINTS-02', 'PointManagement', 'ReservePoints');
@@ -632,7 +724,7 @@ codeunit 6060141 "NPR MM Loyalty WebService"
         ImportType.SetRange("Webservice Codeunit ID", WebServiceCodeunitID);
         ImportType.SetFilter("Webservice Function", '%1', CopyStr(WebserviceFunction, 1, MaxStrLen(ImportType."Webservice Function")));
 
-        if ImportType.FindFirst then
+        if (ImportType.FindFirst()) then
             exit(ImportType.Code);
 
         exit('');

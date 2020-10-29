@@ -150,7 +150,9 @@ xmlport 6060145 "NPR MM Get Loy. Statement"
                                             "Entry Type"::POINT_DEPOSIT:
                                                 type := 'deposit';
                                             "Entry Type"::POINT_WITHDRAW:
-                                                type := 'withdrawl';
+                                                if (Points > 0) then
+                                                    type := 'withdrawal (reversed)' else
+                                                    type := 'withdrawal';
                                             "Entry Type"::REFUND:
                                                 type := 'refund';
                                             "Entry Type"::RESERVE:

@@ -32,6 +32,10 @@ page 6060142 "NPR MM Member Notific. Setup"
                 {
                     ApplicationArea = All;
                 }
+                field("Cancel Overdue Notif. (Days)"; "Cancel Overdue Notif. (Days)")
+                {
+                    ApplicationArea = All;
+                }
                 field("Processing Method"; "Processing Method")
                 {
                     ApplicationArea = All;
@@ -100,9 +104,10 @@ page 6060142 "NPR MM Member Notific. Setup"
 
     actions
     {
+
         area(navigation)
         {
-            action("E-Mail Templates")
+            action(EMailTemplates)
             {
                 Caption = 'E-Mail Templates';
                 Image = InteractionTemplate;
@@ -112,7 +117,7 @@ page 6060142 "NPR MM Member Notific. Setup"
                 RunPageView = WHERE("Table No." = CONST(6060139));
                 ApplicationArea = All;
             }
-            action("SMS Template")
+            action(SMSTemplate)
             {
                 Caption = 'SMS Template';
                 Image = InteractionTemplate;
@@ -122,22 +127,10 @@ page 6060142 "NPR MM Member Notific. Setup"
                 RunPageView = WHERE("Table No." = CONST(6060139));
                 ApplicationArea = All;
             }
-            action("Edit Pass Template")
-            {
-                Caption = 'Edit Pass Template';
-                Image = Template;
-                Promoted = true;
-                PromotedIsBig = true;
-                ApplicationArea = All;
 
-                trigger OnAction()
-                begin
-                    EditPassTemplate();
-                end;
-            }
-            action("Renew Notifications List")
+            action(RenewNotificationsList)
             {
-                Caption = 'Notifications';
+                Caption = 'Renewal Notification List';
                 Ellipsis = true;
                 Image = Note;
                 Promoted = true;
@@ -149,7 +142,70 @@ page 6060142 "NPR MM Member Notific. Setup"
         }
         area(processing)
         {
-            action("Refresh Renew Notification")
+
+            action(ExportWalletTemplateFile)
+            {
+                Caption = 'Export Wallet Template File';
+                ToolTip = 'Exports the default or current template used to send information to wallet.';
+                Image = ExportAttachment;
+                ApplicationArea = All;
+
+                trigger OnAction()
+                var
+                    TempBlob: Codeunit "Temp Blob";
+                    FileMgt: Codeunit "File Management";
+                    MemberNotification: Codeunit "NPR MM Member Notification";
+                    Path: Text;
+                    PassData: Text;
+                    TemplateOutStream: outstream;
+                begin
+                    CalcFields("PUT Passes Template");
+                    if (not "PUT Passes Template".HasValue()) then begin
+                        PassData := MemberNotification.GetDefaultWalletTemplate();
+                        "PUT Passes Template".CreateOutStream(TemplateOutStream);
+                        TemplateOutStream.Write(PassData);
+                        Modify();
+                        CalcFields("PUT Passes Template");
+                    end;
+
+                    TempBlob.FromRecord(Rec, FieldNo("PUT Passes Template"));
+                    if (not TempBlob.HasValue()) then
+                        exit;
+                    Path := FileMgt.BLOBExport(TempBlob, TemporaryPath + StrSubstNo('%1 - %2.json', Code, Description), true);
+
+                end;
+            }
+
+            action(ImportWalletTemplateFile)
+            {
+                Caption = 'Import Wallet Template File';
+                ToolTip = 'Define information sent to wallet.';
+                Image = ImportCodes;
+                ApplicationArea = All;
+
+                trigger OnAction()
+                var
+                    TempBlob: Codeunit "Temp Blob";
+                    FileMgt: Codeunit "File Management";
+                    Path: Text;
+                    FileName: Text;
+                    RecRef: RecordRef;
+                begin
+                    FileName := FileMgt.BLOBImportWithFilter(TempBlob, IMPORT_FILE, '', 'Template Files (*.json)|*.json', 'json');
+
+                    if (FileName = '') then
+                        exit;
+
+                    RecRef.GetTable(Rec);
+                    TempBlob.ToRecordRef(RecRef, Rec.FieldNo("PUT Passes Template"));
+                    RecRef.SetTable(Rec);
+
+                    Modify(true);
+                    Clear(TempBlob);
+
+                end;
+            }
+            action(RefreshRenewNotification)
             {
                 Caption = 'Refresh Renew Notification';
                 Image = Recalculate;
@@ -190,98 +246,7 @@ page 6060142 "NPR MM Member Notific. Setup"
     var
         FileManagement: Codeunit "File Management";
         REFRESH_ALL_RENEW: Label 'Refresh all renew notifications for %1 %2.';
+        IMPORT_FILE: Label 'Import File';
 
-    local procedure EditPassTemplate()
-    var
-        Path: Text[1024];
-    begin
-
-        Path := ExportPassTemplate(false);
-        RunPassTemplateEditor(Path, FieldCaption("PUT Passes Template"));
-        ImportPassTemplate(Path, false);
-        FileManagement.DeleteClientFile(Path);
-        CurrPage.Update(true);
-    end;
-
-    local procedure ExportPassTemplate(UseDialog: Boolean) Path: Text[1024]
-    var
-        outstream: OutStream;
-        instream: InStream;
-        PassData: Text;
-        ToFile: Text;
-        IsDownloaded: Boolean;
-        MemberNotification: Codeunit "NPR MM Member Notification";
-    begin
-        CalcFields("PUT Passes Template");
-        if (not "PUT Passes Template".HasValue()) then begin
-
-            PassData := MemberNotification.GetDefaultTemplate();
-            "PUT Passes Template".CreateOutStream(outstream);
-            outstream.Write(PassData);
-            Modify();
-            CalcFields("PUT Passes Template");
-        end;
-
-        "PUT Passes Template".CreateInStream(instream);
-
-        if (not UseDialog) then begin
-            ToFile := FileManagement.ClientTempFileName('json');
-        end else begin
-            ToFile := 'template.json';
-        end;
-
-        IsDownloaded := DownloadFromStream(instream, 'Export', '', '', ToFile);
-        if (IsDownloaded) then
-            exit(ToFile);
-
-        Error('Export failed.');
-    end;
-
-    local procedure ImportPassTemplate(Path: Text[1024]; UseDialog: Boolean)
-    var
-        TempBlob: Codeunit "Temp Blob";
-        outstream: OutStream;
-        instream: InStream;
-    begin
-
-        if (UseDialog) then begin
-            FileManagement.BLOBImport(TempBlob, '*.json');
-        end else begin
-            FileManagement.BLOBImport(TempBlob, Path);
-        end;
-
-        TempBlob.CreateInStream(instream);
-        "PUT Passes Template".CreateOutStream(outstream, TEXTENCODING::UTF8);
-        CopyStream(outstream, instream);
-
-        Modify(true);
-    end;
-
-    local procedure RunPassTemplateEditor(Path: Text[1024]; desc: Text[100])
-    var
-        ret: Integer;
-        f: File;
-        extra: Text[30];
-    begin
-
-        // RunCmdModal('"notepad.exe" "'+ Path + '"');
-        RunProcess(Path, '', true);
-
-    end;
-
-    procedure RunProcess(Filename: Text; Arguments: Text; Modal: Boolean)
-    var
-        [RunOnClient]
-        Process: DotNet NPRNetProcess;
-        [RunOnClient]
-        ProcessStartInfo: DotNet NPRNetProcessStartInfo;
-    begin
-
-        ProcessStartInfo := ProcessStartInfo.ProcessStartInfo(Filename, Arguments);
-        Process := Process.Start(ProcessStartInfo);
-        if Modal then
-            Process.WaitForExit();
-
-    end;
 }
 

@@ -536,13 +536,14 @@ page 6060136 "NPR MM Member Card"
 
                 end;
             }
-            action("Create Wallet Notification")
+            action("Send Wallet Notification")
             {
-                Caption = 'Create Wallet Notification';
+                Caption = 'Send Wallet Notification';
                 Image = Interaction;
                 Promoted = true;
                 PromotedCategory = Process;
                 ApplicationArea = All;
+                ToolTip = 'Creates a wallet notification message and sends it when processing method is set to inline';
 
                 trigger OnAction()
                 var
@@ -556,7 +557,12 @@ page 6060136 "NPR MM Member Card"
                     MembershipRole.SetFilter(Blocked, '=%1', false);
                     if (MembershipRole.FindSet()) then begin
                         repeat
-                            EntryNo := MemberNotification.CreateWalletSendNotification(MembershipRole."Membership Entry No.", MembershipRole."Member Entry No.", 0);
+                            if (MembershipRole."Wallet Pass Id" <> '') then
+                                EntryNo := MemberNotification.CreateUpdateWalletNotification(MembershipRole."Membership Entry No.", MembershipRole."Member Entry No.", 0, TODAY);
+
+                            if (MembershipRole."Wallet Pass Id" = '') then
+                                EntryNo := MemberNotification.CreateWalletSendNotification(MembershipRole."Membership Entry No.", MembershipRole."Member Entry No.", 0, TODAY);
+
                             if (MembershipNotification.Get(EntryNo)) then
                                 if (MembershipNotification."Processing Method" = MembershipNotification."Processing Method"::INLINE) then
                                     MemberNotification.HandleMembershipNotification(MembershipNotification);
