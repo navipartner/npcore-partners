@@ -52,4 +52,4 @@ jobs:
             destinationPath: $(Build.SourcesDirectory)/$(Build.Repository.Name)/src/_ControlAddIns/Dragonglass/Scripts
         latestPrereleaseAppNuGetSource: 
           source: 'https://pkgs.dev.azure.com/navipartner/_packaging/NpCore/nuget/v3/index.json'
-          id: NaviPartner.NPCore.BC160
+          id: NaviPartner.NPCore.BC170
