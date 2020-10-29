@@ -493,7 +493,7 @@ page 6060137 "NPR MM Membership Card"
                     EntryNo: Integer;
                 begin
 
-                    EntryNo := MemberNotification.CreateWalletSendNotification(Rec."Entry No.", 0, 0);
+                    EntryNo := MemberNotification.CreateWalletSendNotification(Rec."Entry No.", 0, 0, Today);
                     if (MembershipNotification.Get(EntryNo)) then
                         if (MembershipNotification."Processing Method" = MembershipNotification."Processing Method"::INLINE) then
                             MemberNotification.HandleMembershipNotification(MembershipNotification);

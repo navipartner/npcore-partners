@@ -33,16 +33,10 @@ codeunit 6060144 "NPR MM Member Lim. Mgr."
         CheckLimitMemberCardArrival(1, ExternalMemberCardNo, AdmissionCode, ScannerStationId, ReUseLogEntryNo, ResponseMessage, ResponseCode);
     end;
 
-    procedure POS_CheckLimitMemberCardArrival(ExternalMemberCardNo: Text[50]; AdmissionCode: Code[20]; ScannerStationId: Code[10]; var ResponseMessage: Text; var ResponseCode: Integer) LogEntryNo: Integer
-    var
-        ReUseLogEntryNo: Integer;
+    procedure POS_CheckLimitMemberCardArrival(ExternalMemberCardNo: Text[50]; AdmissionCode: Code[20]; ScannerStationId: Code[10]; var ReUseLogEntryNo: Integer; var ResponseMessage: Text; var ResponseCode: Integer) LogEntryNo: Integer
     begin
 
         CheckLimitMemberCardArrival(0, ExternalMemberCardNo, AdmissionCode, ScannerStationId, ReUseLogEntryNo, ResponseMessage, ResponseCode);
-    end;
-
-    local procedure "--Internal"()
-    begin
     end;
 
     local procedure InternalLogArrival(ExternalMemberShipNo: Code[20]; ExternalMemberNo: Code[20]; ExternalMemberCardNo: Text[50]; AdmissionCode: Code[20]; ScannerStationId: Code[10]; var ReUseLogEntryNo: Integer; ResponseMessage: Text; ResponseCode: Integer; ResponseRuleEntry: Integer)
@@ -51,8 +45,6 @@ codeunit 6060144 "NPR MM Member Lim. Mgr."
         MemberArrivalLogEntry: Record "NPR MM Member Arr. Log Entry";
         DoReuseLogEntry: Boolean;
     begin
-
-        //MemberArrivalLogEntry."Entry No." := 0;
 
         DoReuseLogEntry := (ReUseLogEntryNo > 0);
         if (DoReuseLogEntry) then DoReuseLogEntry := MemberArrivalLogEntry.Get(ReUseLogEntryNo);
@@ -130,7 +122,7 @@ codeunit 6060144 "NPR MM Member Lim. Mgr."
             if (not GetExternalMembershipNo(ExternalMemberCardNo, ExternalMembershipNo, MembershipCode, NewResponseMessage)) then
                 NewResponseCode := -9999;
 
-        // IF we can not resolve who we are, dont bother checking the rules
+        // if we can not resolve who we are, dont bother checking the rules
         if (ResponseCode <> 0) then begin
             InternalLogArrival(ExternalMembershipNo, ExternalMemberNo, ExternalMemberCardNo, AdmissionCode, ScannerStationId, ReUseLogEntryNo, NewResponseMessage, NewResponseCode, 0);
             exit;
@@ -147,7 +139,7 @@ codeunit 6060144 "NPR MM Member Lim. Mgr."
     begin
 
         // Get first rule that is violated
-        RuleNo := CheckAllLimitations(ClientType, MembershipCode, ExternalMemberShipNo, ExternalMemberNo, ExternalMemberCardNo, AdmissionCode, ScannerStationId, NewResponseMessage, NewResponseCode);
+        RuleNo := CheckAllLimitations(ClientType, MembershipCode, ExternalMemberShipNo, ExternalMemberNo, ExternalMemberCardNo, AdmissionCode, ScannerStationId, ReUseLogEntryNo, NewResponseMessage, NewResponseCode);
 
         // rollback our transaction if needed
         if (RuleNo <> 0) then begin
@@ -188,7 +180,7 @@ codeunit 6060144 "NPR MM Member Lim. Mgr."
             MembershipLimitationSetup.Get(RuleNo);
             if (ClientType = ClientType::POS) then begin
                 case MembershipLimitationSetup."POS Response Action" of
-                    // ASSERTERROR will rollback transaction, COMMIT must only effect log entry. Downstream code may error the responsemessage
+                    // ASSERTERROR will rollback transaction, Commit must only effect log entry. Downstream code may error the responsemessage
                     MembershipLimitationSetup."POS Response Action"::USER_ERROR:
                         Commit();
                     MembershipLimitationSetup."POS Response Action"::USER_CONFIRM:
@@ -205,50 +197,50 @@ codeunit 6060144 "NPR MM Member Lim. Mgr."
         exit(RuleNo);
     end;
 
-    local procedure CheckAllLimitations(ClientType: Option POS,WS; MembershipCode: Code[20]; ExternalMemberShipNo: Code[20]; ExternalMemberNo: Code[20]; ExternalMemberCardNo: Text[50]; AdmissionCode: Code[20]; ScannerStationId: Code[10]; var ResponseMessage: Text; var ResponseCode: Integer) RuleNo: Integer
+    local procedure CheckAllLimitations(ClientType: Option POS,WS; MembershipCode: Code[20]; ExternalMemberShipNo: Code[20]; ExternalMemberNo: Code[20]; ExternalMemberCardNo: Text[50]; AdmissionCode: Code[20]; ScannerStationId: Code[10]; IgnoreLogEntryNo: Integer; var ResponseMessage: Text; var ResponseCode: Integer) RuleNo: Integer
     var
         MembershipLimitationSetup: Record "NPR MM Membership Lim. Setup";
     begin
 
         if (IsTemporaryCard(ExternalMemberCardNo)) then begin
             RuleNo := CheckLimitations(ClientType, MembershipCode, MembershipLimitationSetup."Constraint Source"::TEMP_MEMBERCARD,
-                                        ExternalMemberCardNo, AdmissionCode, ScannerStationId, ResponseMessage, ResponseCode);
+                                        ExternalMemberCardNo, AdmissionCode, ScannerStationId, IgnoreLogEntryNo, ResponseMessage, ResponseCode);
             if (RuleNo <> 0) then
                 exit(RuleNo);
         end;
 
         RuleNo := CheckLimitations(ClientType, MembershipCode, MembershipLimitationSetup."Constraint Source"::MEMBERCARD,
-                                    ExternalMemberCardNo, AdmissionCode, ScannerStationId, ResponseMessage, ResponseCode);
+                                    ExternalMemberCardNo, AdmissionCode, ScannerStationId, IgnoreLogEntryNo, ResponseMessage, ResponseCode);
         if (RuleNo <> 0) then
             exit(RuleNo);
 
         RuleNo := CheckLimitations(ClientType, MembershipCode, MembershipLimitationSetup."Constraint Source"::MEMBER,
-                                    ExternalMemberNo, AdmissionCode, ScannerStationId, ResponseMessage, ResponseCode);
+                                    ExternalMemberNo, AdmissionCode, ScannerStationId, IgnoreLogEntryNo, ResponseMessage, ResponseCode);
         if (RuleNo <> 0) then
             exit(RuleNo);
 
         RuleNo := CheckLimitations(ClientType, MembershipCode, MembershipLimitationSetup."Constraint Source"::MEMBERSHIP,
-                                    ExternalMemberShipNo, AdmissionCode, ScannerStationId, ResponseMessage, ResponseCode);
+                                    ExternalMemberShipNo, AdmissionCode, ScannerStationId, IgnoreLogEntryNo, ResponseMessage, ResponseCode);
         if (RuleNo <> 0) then
             exit(RuleNo);
 
         RuleNo := CheckLimitations(ClientType, MembershipCode, MembershipLimitationSetup."Constraint Source"::GDPR_PENDING,
-                                    ExternalMemberCardNo, AdmissionCode, ScannerStationId, ResponseMessage, ResponseCode);
+                                    ExternalMemberCardNo, AdmissionCode, ScannerStationId, IgnoreLogEntryNo, ResponseMessage, ResponseCode);
         if (RuleNo <> 0) then
             exit(RuleNo);
 
         RuleNo := CheckLimitations(ClientType, MembershipCode, MembershipLimitationSetup."Constraint Source"::GDPR_REJECTED,
-                                    ExternalMemberCardNo, AdmissionCode, ScannerStationId, ResponseMessage, ResponseCode);
+                                    ExternalMemberCardNo, AdmissionCode, ScannerStationId, IgnoreLogEntryNo, ResponseMessage, ResponseCode);
         if (RuleNo <> 0) then
             exit(RuleNo);
 
         // Also test rules without AdmissionCode
         // Has impact on how POS will handle action (error,confirm,message), WS will deny access either way.
         if (AdmissionCode <> '') then
-            exit(CheckAllLimitations(ClientType, MembershipCode, ExternalMemberShipNo, ExternalMemberNo, ExternalMemberCardNo, '', ScannerStationId, ResponseMessage, ResponseCode));
+            exit(CheckAllLimitations(ClientType, MembershipCode, ExternalMemberShipNo, ExternalMemberNo, ExternalMemberCardNo, '', ScannerStationId, IgnoreLogEntryNo, ResponseMessage, ResponseCode));
     end;
 
-    local procedure CheckLimitations(ClientType: Option POS,WS; MembershipCode: Code[20]; KeyValueType: Option; KeyValue: Text[50]; AdmissionCode: Code[20]; ScannerStationId: Code[10]; var ResponseMessage: Text; var ResponseCode: Integer) RuleNo: Integer
+    local procedure CheckLimitations(ClientType: Option POS,WS; MembershipCode: Code[20]; KeyValueType: Option; KeyValue: Text[50]; AdmissionCode: Code[20]; ScannerStationId: Code[10]; IgnoreLogEntryNo: Integer; var ResponseMessage: Text; var ResponseCode: Integer) RuleNo: Integer
     var
         MembershipLimitationSetup: Record "NPR MM Membership Lim. Setup";
         LimitFound: Boolean;
@@ -272,7 +264,7 @@ codeunit 6060144 "NPR MM Member Lim. Mgr."
 
             if (MembershipLimitationSetup.FindSet()) then begin
                 repeat
-                    LimitFound := DoesRuleApply(ClientType, MembershipLimitationSetup."Entry No.", KeyValue, AdmissionCode, RuleMatchCount, ContraintText, RuleCondition);
+                    LimitFound := DoesRuleApply(ClientType, MembershipLimitationSetup."Entry No.", KeyValue, AdmissionCode, IgnoreLogEntryNo, RuleMatchCount, ContraintText, RuleCondition);
 
                     if (LimitFound) then begin
                         RuleNo := MembershipLimitationSetup."Entry No.";
@@ -298,7 +290,7 @@ codeunit 6060144 "NPR MM Member Lim. Mgr."
         exit(RuleNo);
     end;
 
-    local procedure DoesRuleApply(ClientType: Option; RuleEntryNo: Integer; KeyValue: Text[50]; AdmissionCode: Code[20]; var MatchCount: Integer; var RuleConstraint: Text; var RuleConditionalValue: Text): Boolean
+    local procedure DoesRuleApply(ClientType: Option; RuleEntryNo: Integer; KeyValue: Text[50]; AdmissionCode: Code[20]; var MatchCount: Integer; IgnoreLogEntryNo: Integer; var RuleConstraint: Text; var RuleConditionalValue: Text): Boolean
     var
         MembershipLimitationSetup: Record "NPR MM Membership Lim. Setup";
         MemberArrivalLogEntry: Record "NPR MM Member Arr. Log Entry";
@@ -309,10 +301,11 @@ codeunit 6060144 "NPR MM Member Lim. Mgr."
         with MembershipLimitationSetup do begin
 
             Get(RuleEntryNo);
-            MyTime := DT2Time(CurrentDateTime); // TIME from webclient and webservice is not same
+            MyTime := DT2Time(CurrentDateTime()); // TIME from webclient and webservice is not same
 
             MemberArrivalLogEntry.SetFilter("Admission Code", '=%1', AdmissionCode);
             MemberArrivalLogEntry.SetFilter("Temporary Card", '=%1', false);
+            MemberArrivalLogEntry.SetFilter("Entry No.", '<>%1', IgnoreLogEntryNo);
 
             case "Constraint Source" of
                 "Constraint Source"::MEMBER:
@@ -349,7 +342,7 @@ codeunit 6060144 "NPR MM Member Lim. Mgr."
                 "Constraint Type"::RELATIVE_TIME:
                     begin
                         RuleConditionalValue := StrSubstNo('%1', "Constraint Seconds");
-                        RelativeDateTime := CurrentDateTime - ("Constraint Seconds" * 1000);
+                        RelativeDateTime := CurrentDateTime() - ("Constraint Seconds" * 1000);
                         MemberArrivalLogEntry.SetFilter("Created At", '>=%1', RelativeDateTime);
                     end;
 
@@ -373,7 +366,7 @@ codeunit 6060144 "NPR MM Member Lim. Mgr."
             if (MemberArrivalLogEntry.FindFirst()) then begin
                 case "Constraint Type" of
                     "Constraint Type"::RELATIVE_TIME:
-                        ContraintText := StrSubstNo('%1', MembershipLimitationSetup."Constraint Seconds" - Round((CurrentDateTime - MemberArrivalLogEntry."Created At") / 1000, 1));
+                        ContraintText := StrSubstNo('%1', MembershipLimitationSetup."Constraint Seconds" - Round((CurrentDateTime() - MemberArrivalLogEntry."Created At") / 1000, 1));
                     "Constraint Type"::FIXED_TIME:
                         ContraintText := StrSubstNo('%1 - %', MemberArrivalLogEntry."Local Date", MemberArrivalLogEntry."Local Time");
                     "Constraint Type"::DATEFORMULA:

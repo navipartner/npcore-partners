@@ -169,6 +169,28 @@ xmlport 6060141 "NPR MM Get Loyalty Points"
                                 }
                             }
                         }
+                        textelement(pointsbyperiods)
+                        {
+                            tableelement(TmpMembershipPointsSummary; "NPR MM Members. Points Summary")
+                            {
+                                XmlName = 'period';
+                                UseTemporary = true;
+                                fieldattribute(relativeperiod; TmpMembershipPointsSummary."Relative Period")
+                                {
+                                }
+                                fieldelement(earnperiodstart; TmpMembershipPointsSummary."Earn Period Start") { }
+                                fieldelement(earnperiodend; TmpMembershipPointsSummary."Earn Period End") { }
+                                fieldelement(burnperiodstart; TmpMembershipPointsSummary."Burn Period Start") { }
+                                fieldelement(burnperiodend; TmpMembershipPointsSummary."Burn Period End") { }
+                                fieldelement(pointsearned; TmpMembershipPointsSummary."Points Earned") { }
+                                fieldelement(pointsredeemed; TmpMembershipPointsSummary."Points Redeemed") { }
+                                fieldelement(pointsremaining; TmpMembershipPointsSummary."Points Remaining") { }
+                                fieldelement(pointsexpired; TmpMembershipPointsSummary."Points Expired") { }
+                                fieldelement(amountlcyearned; TmpMembershipPointsSummary."Amount Earned (LCY)") { }
+                                fieldelement(amountlcyredeemed; TmpMembershipPointsSummary."Amount Redeemed (LCY)") { }
+                                fieldelement(amountlcyremaining; TmpMembershipPointsSummary."Amount Remaining (LCY)") { }
+                            }
+                        }
                         textelement(loyaltytiers)
                         {
                             MaxOccurs = Once;
@@ -292,6 +314,9 @@ xmlport 6060141 "NPR MM Get Loyalty Points"
                 LoyaltyCollectionPeriodName := Format(LoyaltySetup."Collection Period");
                 LoyaltyPointSourceCode := Format(LoyaltySetup."Voucher Point Source", 0, 9);
                 LoyaltyPointSourceName := Format(LoyaltySetup."Voucher Point Source");
+
+                LoyaltyPointManagement.CalculateFixedPeriodPointsTransaction(LoyaltySetup, Membership, 0, TmpMembershipPointsSummary); // Current period
+                LoyaltyPointManagement.CalculateFixedPeriodPointsTransaction(LoyaltySetup, Membership, -1, TmpMembershipPointsSummary); // Previous period
 
             end;
         end;

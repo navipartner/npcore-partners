@@ -50,8 +50,6 @@ codeunit 6060140 "NPR MM POS Action: Member Arr."
 
             Sender.RegisterWorkflowStep('membercard_number', '(param.DefaultInputValue.length == 0 && param.DialogPrompt == 1) && input ({caption: labels.MemberCardPrompt, title: labels.MembershipTitle, value: param.DefaultInputValue}).cancel(abort);');
 
-            //Sender.RegisterWorkflowStep ('member_number',       '(param.DialogPrompt == 0) && input ({caption: labels.MemberNumberPrompt, title: labels.MembershipTitle}).cancel(abort);');
-            //Sender.RegisterWorkflowStep ('membership_number',   '(param.DialogPrompt == 2) && input ({caption: labels.MembershipNumberPrompt, title: labels.MembershipTitle}).cancel(abort);');
             Sender.RegisterWorkflowStep('9', 'respond ();');
             Sender.RegisterWorkflow(false);
 
@@ -103,14 +101,14 @@ codeunit 6060140 "NPR MM POS Action: Member Arr."
 
         case DialogPrompt of
             0:
-                MemberCardNumber := ''; //COPYSTR (GetInput (JSON, 'member_number'), 1, MAXSTRLEN (MemberCardNumber));
+                MemberCardNumber := '';
             1:
                 begin
                     DialogMethodType := DialogMethod::NO_PROMPT;
                     MemberCardNumber := CopyStr(GetInput(JSON, 'membercard_number'), 1, MaxStrLen(MemberCardNumber));
                 end;
             2:
-                MemberCardNumber := ''; //COPYSTR (GetInput (JSON, 'membership_number'), 1, MAXSTRLEN (MemberCardNumber));
+                MemberCardNumber := '';
             3:
                 DialogMethodType := DialogMethod::FACIAL_RECOGNITION;
             4:
@@ -127,7 +125,6 @@ codeunit 6060140 "NPR MM POS Action: Member Arr."
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
 
-        //AdmissionCode := JSON.GetStringParameter ('Admission Code', FALSE);
         AdmissionCode := JSON.GetStringParameter('AdmissionCode', false);
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
@@ -149,20 +146,21 @@ codeunit 6060140 "NPR MM POS Action: Member Arr."
     local procedure MemberArrival(POSSession: Codeunit "NPR POS Session"; InputMethod: Option; POSWorkflowType: Option; ConfirmMember: Boolean; ExternalMemberCardNo: Text[100]; AdmissionCode: Code[20])
     var
         Member: Record "NPR MM Member";
-        Membership: Record "NPR MM Membership";
         MemberCard: Record "NPR MM Member Card";
+        Membership: Record "NPR MM Membership";
         MembershipSetup: Record "NPR MM Membership Setup";
         ThisShouldBeEmpty_SaleLinePOS: Record "NPR Sale Line POS";
-        MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
         MemberLimitationMgr: Codeunit "NPR MM Member Lim. Mgr.";
-        POSActionMemberManagement: Codeunit "NPR MM POS Action: MemberMgmt.";
-        MemberTicketManager: Codeunit "NPR MM Member Ticket Manager";
+        MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MemberTicketManager: Codeunit "NPR MM Member Ticket Manager";
+        POSActionMemberManagement: Codeunit "NPR MM POS Action: MemberMgmt.";
         ExternalItemNo: Code[20];
-        ResponseMessage: Text;
-        ResponseCode: Integer;
-        Token: Text[100];
         Parameter: Code[20];
+        LogEntryNo: Integer;
+        ResponseCode: Integer;
+        ResponseMessage: Text;
+        Token: Text[100];
     begin
 
         if (InputMethod = DialogMethod::NO_PROMPT) and (ExternalMemberCardNo = '') then
@@ -175,11 +173,12 @@ codeunit 6060140 "NPR MM POS Action: Member Arr."
             POSWorkflowMethod::Automatic,
             POSWorkflowMethod::GuestCheckin:
                 begin
-                    MemberRetailIntegration.POS_ValidateMemberCardNo(true, ConfirmMember, InputMethod, true, ExternalMemberCardNo);
+                    MemberLimitationMgr.POS_CheckLimitMemberCardArrival(ExternalMemberCardNo, AdmissionCode, 'POS', LogEntryNo, ResponseMessage, ResponseCode);
 
-                    MemberLimitationMgr.POS_CheckLimitMemberCardArrival(ExternalMemberCardNo, AdmissionCode, 'POS', ResponseMessage, ResponseCode);
                     if (ResponseCode <> 0) then
                         Error(ResponseMessage);
+
+                    Commit();
 
                     MemberCard.Get(MembershipManagement.GetCardEntryNoFromExtCardNo(ExternalMemberCardNo));
                     Membership.Get(MemberCard."Membership Entry No.");
@@ -188,14 +187,6 @@ codeunit 6060140 "NPR MM POS Action: Member Arr."
                     POSActionMemberManagement.OnBeforePOSMemberArrival(ThisShouldBeEmpty_SaleLinePOS, MembershipSetup."Community Code", MembershipSetup.Code, Membership."Entry No.", Member."Entry No.", MemberCard."Entry No.", ExternalMemberCardNo);
 
                     ExternalItemNo := MemberRetailIntegration.POS_GetExternalTicketItemFromMembership(ExternalMemberCardNo);
-
-                    // IF (POSWorkflowType = POSWorkflowMethod::Automatic) THEN
-                    //   MemberTicketManager.MemberFastCheckIn (ExternalMemberCardNo, ExternalItemNo, AdmissionCode, 1);
-                    //
-                    // IF (POSWorkflowType = POSWorkflowMethod::GuestCheckin) THEN BEGIN
-                    //   MemberTicketManager.PromptForMemberGuestArrival (ExternalMemberCardNo, AdmissionCode);
-                    //   MemberTicketManager.MemberFastCheckIn (ExternalMemberCardNo, ExternalItemNo, AdmissionCode, 1);
-                    // END;
 
                     if (POSWorkflowType = POSWorkflowMethod::Automatic) then
                         MemberTicketManager.MemberFastCheckIn(ExternalMemberCardNo, ExternalItemNo, AdmissionCode, 1, '');
@@ -245,12 +236,11 @@ codeunit 6060140 "NPR MM POS Action: Member Arr."
         MMMembership: Record "NPR MM Membership";
     begin
 
-        if not EanBoxEvent.Get(EventCodeExtMemberCardNo()) then begin
-            EanBoxEvent.Init;
+        if (not EanBoxEvent.Get(EventCodeExtMemberCardNo())) then begin
+            EanBoxEvent.Init();
             EanBoxEvent.Code := EventCodeExtMemberCardNo();
             EanBoxEvent."Module Name" := 'Membership Management';
 
-            //EanBoxEvent.Description := MMMemberCard.FIELDCAPTION("External Card No.");
             EanBoxEvent.Description := CopyStr(MMMemberCard.FieldCaption("External Card No."), 1, MaxStrLen(EanBoxEvent.Description));
 
             EanBoxEvent."Action Code" := ActionCode();
@@ -282,13 +272,13 @@ codeunit 6060140 "NPR MM POS Action: Member Arr."
         MMMemberCard: Record "NPR MM Member Card";
     begin
 
-        if EanBoxSetupEvent."Event Code" <> EventCodeExtMemberCardNo() then
+        if (EanBoxSetupEvent."Event Code" <> EventCodeExtMemberCardNo()) then
             exit;
-        if StrLen(EanBoxValue) > MaxStrLen(MMMemberCard."External Card No.") then
+        if (StrLen(EanBoxValue) > MaxStrLen(MMMemberCard."External Card No.")) then
             exit;
 
         MMMemberCard.SetRange("External Card No.", UpperCase(EanBoxValue));
-        if MMMemberCard.FindFirst then
+        if (MMMemberCard.FindFirst()) then
             InScope := true;
 
     end;

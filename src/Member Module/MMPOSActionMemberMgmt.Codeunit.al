@@ -60,14 +60,6 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
           Sender."Subscriber Instances Allowed"::Multiple)
         then begin
 
-            // FunctionOptionString := 'Member Arrival,'+
-            //                         'Select Membership,'+
-            //                         'View Membership Entry,Regret Membership Entry,'+
-            //                         'Renew Membership,Extend Membership,Upgrade Membership,Cancel Membership,Edit Membership,Show Member';
-            // FOR N := 1 TO 10 DO
-            //   JSArr += StrSubstNo ('"%1",', SELECTSTR (N, FunctionOptionString));
-            // JSArr := StrSubstNo ('var optionNames = [%1];', COPYSTR (JSArr, 1, STRLEN(JSArr)-1));
-
             FunctionOptionString := 'Member Arrival,' +
                                     'Select Membership,' +
                                     'View Membership Entry,Regret Membership Entry,' +
@@ -77,13 +69,7 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
             JSArr := StrSubstNo('var optionNames = [%1];', CopyStr(JSArr, 1, StrLen(JSArr) - 1));
 
             Sender.RegisterWorkflowStep('0', JSArr + 'windowTitle = labels.MembershipTitle.substitute (optionNames[param.Function].toString()); ');
-
-            //Sender.RegisterWorkflowStep ('membercard_number',   '(param.DialogPrompt <= 0) && input ({caption: labels.MemberCardPrompt, title: windowTitle}).cancel(abort);');
             Sender.RegisterWorkflowStep('membercard_number', '(param.DefaultInputValue.length == 0) && (param.DialogPrompt <= 0) && input ({caption: labels.MemberCardPrompt, title: windowTitle}).cancel(abort);');
-
-            //Sender.RegisterWorkflowStep ('member_number',       '(param.DialogPrompt == 3xx) && input ({caption: labels.MemberNumberPrompt, title: labels.MembershipTitle}).cancel(abort);');
-            //Sender.RegisterWorkflowStep ('membership_number',   '(param.DialogPrompt == 4xx) && input ({caption: labels.MembershipNumberPrompt, title: labels.MembershipTitle}).cancel(abort);');
-
             Sender.RegisterWorkflowStep('9', 'respond ();');
             Sender.RegisterWorkflow(false);
 
@@ -191,10 +177,10 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
         ReturnCode: Integer;
     begin
 
-        if POSSalesWorkflowStep."Subscriber Codeunit ID" <> CurrCodeunitId() then
+        if (POSSalesWorkflowStep."Subscriber Codeunit ID" <> CurrCodeunitId()) then
             exit;
 
-        if POSSalesWorkflowStep."Subscriber Function" <> 'UpdateMembershipOnSaleLineInsert' then
+        if (POSSalesWorkflowStep."Subscriber Function" <> 'UpdateMembershipOnSaleLineInsert') then
             exit;
 
         if (SaleLinePOS.IsTemporary) then
@@ -233,11 +219,6 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
         MemberInfoCapture.SetCurrentKey("Receipt No.", "Line No.");
         MemberInfoCapture.SetFilter("Receipt No.", '=%1', SaleLinePOS."Sales Ticket No.");
         MemberInfoCapture.SetFilter("Line No.", '=%1', SaleLinePOS."Line No.");
-
-        // IF (MemberInfoCapture.FindFirst ()) THEN
-        //  IF (SaleLinePOS."No." = MemberInfoCapture."Item No.") THEN
-        //    ERROR (QTY_CANT_CHANGE);
-
         if (MemberInfoCapture.FindFirst()) then begin
             if (SaleLinePOS."No." = MemberInfoCapture."Item No.") then begin
                 if (MembershipSalesSetup.Get(MembershipSalesSetup.Type::ITEM, MemberInfoCapture."Item No.")) then;
@@ -261,19 +242,20 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
 
     procedure MemberArrival(POSSession: Codeunit "NPR POS Session"; InputMethod: Option; ExternalMemberCardNo: Text[100])
     var
-        MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
-        ExternalItemNo: Code[20];
-        SaleLinePOS: Record "NPR Sale Line POS";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
         Member: Record "NPR MM Member";
-        Membership: Record "NPR MM Membership";
         MemberCard: Record "NPR MM Member Card";
-        ResponseMessage: Text;
-        ResponseCode: Integer;
-        MemberLimitationMgr: Codeunit "NPR MM Member Lim. Mgr.";
+        Membership: Record "NPR MM Membership";
         MembershipSetup: Record "NPR MM Membership Setup";
-        ItemDescription: Text;
+        SaleLinePOS: Record "NPR Sale Line POS";
+        MemberLimitationMgr: Codeunit "NPR MM Member Lim. Mgr.";
+        MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
+        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
         POSSaleLine: Codeunit "NPR POS Sale Line";
+        ExternalItemNo: Code[20];
+        LogEntryNo: Integer;
+        ResponseCode: Integer;
+        ItemDescription: Text;
+        ResponseMessage: Text;
     begin
 
         if (InputMethod = DialogMethod::NO_PROMPT) and (ExternalMemberCardNo = '') then
@@ -281,14 +263,10 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
                 Error(MEMBER_REQUIRED);
 
         MemberRetailIntegration.POS_ValidateMemberCardNo(true, true, InputMethod, true, ExternalMemberCardNo);
+        MemberLimitationMgr.POS_CheckLimitMemberCardArrival(ExternalMemberCardNo, '', 'POS', LogEntryNo, ResponseMessage, ResponseCode);
 
-        MemberLimitationMgr.POS_CheckLimitMemberCardArrival(ExternalMemberCardNo, '', 'POS', ResponseMessage, ResponseCode);
         if (ResponseCode <> 0) then
             Error(ResponseMessage);
-
-        // Membership.GET (MembershipManagement.GetMembershipFromExtCardNo (ExternalMemberCardNo, TODAY, ResponseMessage));
-        // Membership.GET (MemberCard."Membership Entry No.");
-        // MembershipSetup.GET (Membership."Membership Code");
 
         MemberCard.Get(MembershipManagement.GetCardEntryNoFromExtCardNo(ExternalMemberCardNo));
         Membership.Get(MemberCard."Membership Entry No.");
@@ -303,8 +281,6 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
         ItemDescription := '';
         OnCustomItemDescription(MembershipSetup."Community Code", MembershipSetup.Code, MemberCard."Entry No.", ItemDescription);
 
-        //ItemNo := MemberRetailIntegration.POS_GetExternalTicketItemFromMembership (ExternalMemberCardNo);
-        //AddItemToPOS (POSSession, 0, ItemNo, COPYSTR (ItemDescription, 1, MAXSTRLEN (SaleLinePOS.Description)), StrSubstNo ('%1/%2',Membership."External Membership No.", ExternalMemberCardNo), 1, 0, SaleLinePOS);
         ExternalItemNo := MemberRetailIntegration.POS_GetExternalTicketItemFromMembership(ExternalMemberCardNo);
         AddItemToPOS(POSSession, 0, ExternalItemNo, CopyStr(ItemDescription, 1, MaxStrLen(SaleLinePOS.Description)), StrSubstNo('%1/%2', Membership."External Membership No.", ExternalMemberCardNo), 1, 0, SaleLinePOS);
 
@@ -323,12 +299,6 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
                     OnAssociateSaleWithMember(POSSession, Membership."External Membership No.", Member."External Member No.");
                 end;
         end;
-
-        // Member.GET (MembershipManagement.GetMemberFromExtCardNo (ExternalMemberCardNo, TODAY, ResponseMessage));
-        // Membership.GET (MembershipManagement.GetMembershipFromExtCardNo (ExternalMemberCardNo, TODAY, ResponseMessage));
-        // UpdatePOSSalesInfo (SaleLinePOS, Membership."Entry No.", Member."Entry No.", 0, ExternalMemberCardNo);
-        //
-        // OnAssociateSaleWithMember (POSSession, Membership."External Membership No.", Member."External Member No.");
 
     end;
 
@@ -636,7 +606,6 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
         POSSalesInfo: Record "NPR MM POS Sales Info";
     begin
 
-        //IF (NOT POSSalesInfo.GET (POSSalesInfo."Association Type"::HEADER, SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.")) THEN BEGIN
         if (not POSSalesInfo.Get(POSSalesInfo."Association Type"::LINE, SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.")) then begin
             POSSalesInfo."Association Type" := POSSalesInfo."Association Type"::LINE;
             POSSalesInfo."Receipt No." := SaleLinePOS."Sales Ticket No.";
@@ -714,7 +683,6 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
             if (not SelectMemberCardUI(ExternalMemberCardNo)) then
                 exit;
 
-        //MemberRetailIntegration.POS_ValidateMemberCardNo (TRUE, TRUE, InputMethod, FALSE, ExternalMemberCardNo);
         MemberRetailIntegration.POS_ShowMemberCard(InputMethod, ExternalMemberCardNo);
 
     end;
@@ -760,7 +728,6 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
         if (UnitPrice < 0) then
             Line.Quantity := -1 * Abs(Quantity);
 
-        //Line."Unit Price" := UnitPrice;
         Line."Unit Price" := Abs(UnitPrice);
 
         // update info entry with this receipt number
@@ -947,11 +914,11 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
         MemberCard: Record "NPR MM Member Card";
     begin
 
-        // IF (ACTION::LookupOK <> PAGE.RUNMODAL (0, MemberCard)) THEN
-        //  EXIT (FALSE);
+        // if (ACTION::LookupOK <> PAGE.RUNMODAL (0, MemberCard)) then
+        //  exit (false);
         //
         // ExtMemberCardNo := MemberCard."External Card No.";
-        // EXIT (ExtMemberCardNo <> '');
+        // exit (ExtMemberCardNo <> '');
 
         exit(SelectMemberCardViaMemberUI(ExtMemberCardNo));
 
@@ -1066,7 +1033,7 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
 
         if (POSSalesInfo.Get(POSSalesInfo."Association Type"::HEADER, OriginalSalesTicketNo, 0)) then begin
             POSSalesInfo."Receipt No." := NewSalesTicketNo;
-            if not (POSSalesInfo.Insert()) then;
+            if (not (POSSalesInfo.Insert())) then;
         end;
 
         POSSalesInfo.SetFilter("Association Type", '=%1', POSSalesInfo."Association Type"::LINE);
@@ -1106,7 +1073,7 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
 
         if (POSSalesInfo.Get(POSSalesInfo."Association Type"::HEADER, OriginalSalesTicketNo, 0)) then begin
             POSSalesInfo."Receipt No." := NewSalesTicketNo;
-            if not (POSSalesInfo.Insert()) then;
+            if (not (POSSalesInfo.Insert())) then;
         end;
 
         POSSalesInfo.SetFilter("Association Type", '=%1', POSSalesInfo."Association Type"::LINE);
@@ -1129,7 +1096,7 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
     local procedure OnBeforeInsertWorkflowStep(var Rec: Record "NPR POS Sales Workflow Step"; RunTrigger: Boolean)
     begin
 
-        if Rec."Subscriber Codeunit ID" <> CurrCodeunitId() then
+        if (Rec."Subscriber Codeunit ID" <> CurrCodeunitId()) then
             exit;
 
         case Rec."Subscriber Function" of
@@ -1169,10 +1136,10 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
         MembershipSelected: Boolean;
     begin
 
-        if POSSalesWorkflowStep."Subscriber Codeunit ID" <> CurrCodeunitId() then
+        if (POSSalesWorkflowStep."Subscriber Codeunit ID" <> CurrCodeunitId()) then
             exit;
 
-        if POSSalesWorkflowStep."Subscriber Function" <> 'OnAfterLogin_SelectMemberRequired' then
+        if (POSSalesWorkflowStep."Subscriber Function" <> 'OnAfterLogin_SelectMemberRequired') then
             exit;
 
         POSSession.GetSale(POSSale);
@@ -1184,19 +1151,19 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
 
         repeat
 
-            //  MembershipSelected := FALSE;
+            //  MembershipSelected := false;
             //
-            //  IF (ExternalMemberCardNo = '') THEN
-            //    IF (NOT SelectMemberCardUI (ExternalMemberCardNo)) THEN
-            //      EXIT;
+            //  if (ExternalMemberCardNo = '') then
+            //    if (not SelectMemberCardUI (ExternalMemberCardNo)) then
+            //      exit;
             //
-            // IF (MemberRetailIntegration.POS_ValidateMemberCardNo (FALSE, TRUE, DialogMethod::NO_PROMPT, TRUE, ExternalMemberCardNo)) THEN
+            // if (MemberRetailIntegration.POS_ValidateMemberCardNo (false, true, DialogMethod::NO_PROMPT, true, ExternalMemberCardNo)) then
             //    MembershipSelected := AssignPOSMembership (SalePOS, ExternalMemberCardNo);
             //
-            //  IF (NOT MembershipSelected) THEN BEGIN
-            //    MESSAGE ('There was an error selecting member %1:\\%2', ExternalMemberCardNo, GETLASTERRORTEXT);
+            //  if (not MembershipSelected) then begin
+            //    MESSAGE ('There was an error selecting member %1:\\%2', ExternalMemberCardNo, GetLASTERRORTEXT);
             //    ExternalMemberCardNo := '';
-            //  END;
+            //  end;
 
             MembershipSelected := false;
 
@@ -1207,11 +1174,11 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
 
                 Clear(POSMemberCardEdit);
 
-                //  POSMemberCard.LOOKUPMODE (TRUE);
+                //  POSMemberCard.LOOKUPMODE (true);
                 //  POSMemberCard.SETRECORD (Member);
                 //  //POSMemberCard.SetMembershipEntryNo (Membership."Entry No.");
                 //
-                //  IF (POSMemberCard.RUNMODAL() = ACTION::LookupOK) THEN
+                //  if (POSMemberCard.RUNMODAL() = ACTION::LookupOK) then
                 //    MembershipSelected := AssignPOSMember (SalePOS, ExternalMemberNo);
 
                 POSMemberCardEdit.SetRecord(Member);
@@ -1242,7 +1209,7 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
     local procedure OnAfterLoginDiscovery(var Rec: Record "NPR POS Sales Workflow Step"; RunTrigger: Boolean)
     begin
 
-        if Rec."Subscriber Codeunit ID" <> CurrCodeunitId() then
+        if (Rec."Subscriber Codeunit ID" <> CurrCodeunitId()) then
             exit;
 
         case Rec."Subscriber Function" of

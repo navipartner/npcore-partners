@@ -34,6 +34,18 @@ table 6151187 "NPR MM Member Comm. Setup"
             OptionCaption = 'Member Preferred,SMS,E-Mail,Wallet (SMS),Wallet (E-Mail)';
             OptionMembers = MEMBER,SMS,EMAIL,WALLET_SMS,WALLET_EMAIL;
         }
+        field(30; "Notification Engine"; Option)
+        {
+            Caption = 'Notification Engine';
+            DataClassification = CustomerContent;
+            OptionCaption = 'Native, M2 E-Mail';
+            OptionMembers = NATIVE,M2_EMAILER;
+        }
+        field(31; "Sender Template"; BLOB)
+        {
+            Caption = 'Sender Template';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

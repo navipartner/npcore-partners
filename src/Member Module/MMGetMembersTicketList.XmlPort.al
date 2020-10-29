@@ -97,6 +97,79 @@ xmlport 6060133 "NPR MM Get Members. TicketList"
                                 MinOccurs = Zero;
                                 XmlName = 'validuntildate';
                             }
+                            textelement(MembershipPeriods)
+                            {
+                                MinOccurs = Zero;
+                                MaxOccurs = Once;
+                                XmlName = 'membershipperiods';
+
+                                tableelement(TmpMembershipEntry; "NPR MM Membership Entry")
+                                {
+                                    UseTemporary = true;
+                                    XmlName = 'period';
+                                    MinOccurs = Zero;
+
+                                    fieldattribute(validfromdate; TmpMembershipEntry."Valid From Date")
+                                    {
+
+                                    }
+                                    fieldattribute(validuntildate; TmpMembershipEntry."Valid Until Date")
+                                    {
+
+                                    }
+                                    fieldelement(createdate; TmpMembershipEntry."Created At")
+                                    {
+
+                                    }
+                                    fieldelement(context; TmpMembershipEntry.Context)
+                                    {
+                                        textattribute(ContextName)
+                                        {
+                                            XmlName = 'name';
+                                            trigger OnBeforePassVariable()
+                                            begin
+                                                CASE TmpMembershipEntry.Context OF
+                                                    TmpMembershipEntry.Context::NEW:
+                                                        ContextName := 'New';
+                                                    TmpMembershipEntry.Context::AUTORENEW:
+                                                        ContextName := 'Auto-Renew';
+                                                    TmpMembershipEntry.Context::CANCEL:
+                                                        ContextName := 'Cancel';
+                                                    TmpMembershipEntry.Context::EXTEND:
+                                                        ContextName := 'Extend';
+                                                    TmpMembershipEntry.Context::FOREIGN:
+                                                        ContextName := 'Foreign Membership';
+                                                    TmpMembershipEntry.Context::REGRET:
+                                                        ContextName := 'Regret';
+                                                    TmpMembershipEntry.Context::RENEW:
+                                                        ContextName := 'Renew';
+                                                    TmpMembershipEntry.Context::UPGRADE:
+                                                        ContextName := 'Upgrade';
+                                                END;
+                                            end;
+                                        }
+                                    }
+
+                                    fieldelement(blocked; TmpMembershipEntry.Blocked)
+                                    {
+
+                                    }
+                                    fieldelement(activateonfirstuse; TmpMembershipEntry."Activate On First Use")
+                                    {
+
+                                    }
+
+                                    fieldelement(productid; TmpMembershipEntry."Item No.")
+                                    {
+
+                                    }
+                                    fieldelement(documentid; TmpMembershipEntry."Import Entry Document ID")
+                                    {
+
+                                    }
+
+                                }
+                            }
                         }
                     }
                     textelement(membership)
@@ -204,6 +277,7 @@ xmlport 6060133 "NPR MM Get Members. TicketList"
         MembershipAdmissionSetup: Record "NPR MM Members. Admis. Setup";
         TotalCardinality: Integer;
         MembershipRole: Record "NPR MM Membership Role";
+        MembershipEntry: Record "NPR MM Membership Entry";
     begin
 
         errordescription := '';
@@ -249,6 +323,14 @@ xmlport 6060133 "NPR MM Get Members. TicketList"
             tmpMember.TransferFields(Member, true);
             tmpMember.Insert();
         end;
+
+        MembershipEntry.SETFILTER("Membership Entry No.", '=%1', MembershipEntryNo);
+        IF (MembershipEntry.FINDSET()) THEN BEGIN
+            REPEAT
+                TmpMembershipEntry.TRANSFERFIELDS(MembershipEntry, TRUE);
+                TmpMembershipEntry.INSERT();
+            UNTIL (MembershipEntry.NEXT() = 0);
+        END;
 
         xml_admissioncode := AdmissionCode;
 

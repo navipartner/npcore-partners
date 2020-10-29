@@ -113,14 +113,6 @@ codeunit 6060131 "NPR MM Member Retail Integr."
         end;
 
         // Check card number if it exists locally
-
-        // IF (STRLEN (ExternalMemberCardNo) <= 50) THEN
-        //  MembershipEntryNo := MemberManagement.GetMembershipFromExtCardNo (ExternalMemberCardNo, TODAY, NotFoundReasonText);
-        //
-        // ForeignMembershipEntryNo := ForeignMembershipMgr.DispatchToReplicateForeignMemberCard ('', ExternalMemberCardNo, ForeignCardIsValid, NotFoundReasonText);
-        // IF (ForeignCardIsValid) THEN
-        //  MembershipEntryNo := ForeignMembershipEntryNo;
-
         if (StrLen(ExternalMemberCardNo) <= 50) then begin
             MembershipEntryNo := MemberManagement.GetMembershipFromExtCardNo(ExternalMemberCardNo, Today, NotFoundReasonText);
             FormatedCardNumber := ExternalMemberCardNo;
@@ -141,12 +133,11 @@ codeunit 6060131 "NPR MM Member Retail Integr."
             exit(false);
         end;
 
-        //IF (NOT MemberManagement.IsMemberCardActive (ExternalMemberCardNo, TODAY)) THEN BEGIN
         if (not MemberManagement.IsMemberCardActive(FormatedCardNumber, Today)) then begin
             if (FailWithError) then begin
 
                 if (AllowVerboseMode) then begin
-                    if not (Confirm(MEMBERCARD_EXPIRED, true, ExternalMemberCardNo)) then begin
+                    if (not (Confirm(MEMBERCARD_EXPIRED, true, ExternalMemberCardNo))) then begin
                         Error(MEMBERCARD_EXPIRED, ExternalMemberCardNo);
                     end;
                 end else begin
@@ -185,8 +176,7 @@ codeunit 6060131 "NPR MM Member Retail Integr."
         MembershipSetup.Get(Membership."Membership Code");
 
         if (MembershipSetup."Member Information" = MembershipSetup."Member Information"::NAMED) then begin
-            // IF NOT (Member.GET (MemberManagement.GetMemberFromExtCardNo (ExternalMemberCardNo, TODAY, NotFoundReasonText))) THEN BEGIN
-            if not (Member.Get(MemberManagement.GetMemberFromExtCardNo(FormatedCardNumber, Today, NotFoundReasonText))) then begin
+            if (not (Member.Get(MemberManagement.GetMemberFromExtCardNo(FormatedCardNumber, Today, NotFoundReasonText)))) then begin
                 if (FailWithError) then
                     Error(NotFoundReasonText);
                 exit(false);
@@ -194,7 +184,7 @@ codeunit 6060131 "NPR MM Member Retail Integr."
 
             ShowMemberDialog := (AllowVerboseMode and MembershipSetup."Confirm Member On Card Scan") or (ForcedConfirmMember);
             if (ShowMemberDialog) then begin
-                Commit(); //[276102] When Facial Recongnition is used and a face is written
+                Commit(); // When Facial Recongnition is used and a face is written
 
                 POSMemberCard.LookupMode(true);
                 POSMemberCard.SetRecord(Member);
@@ -204,20 +194,6 @@ codeunit 6060131 "NPR MM Member Retail Integr."
                     Error('');
 
             end;
-
-            //  IF (AllowVerboseMode) THEN BEGIN
-            //    IF (MembershipSetup."Confirm Member On Card Scan") THEN BEGIN
-            //      COMMIT; //[276102] When Facial Recongnition is used and a face is written
-            //
-            //      POSMemberCard.LOOKUPMODE (TRUE);
-            //      POSMemberCard.SETRECORD (Member);
-            //      POSMemberCard.SetMembershipEntryNo (Membership."Entry No.");
-            //      IF (POSMemberCard.RUNMODAL() <> ACTION::LookupOK) THEN BEGIN
-            //        ERROR ('');
-            //
-            //      END;
-            //    END;
-            //  END;
 
         end;
 
@@ -292,13 +268,6 @@ codeunit 6060131 "NPR MM Member Retail Integr."
                         begin
                             PrintMembershipSalesReceiptWorker(Membership, MembershipSetup);
 
-                            // IF (MembershipEntry."Member Card Entry No." <> 0) THEN BEGIN
-                            //   IF (MemberCard.GET (MembershipEntry."Member Card Entry No.")) THEN BEGIN
-                            //     MemberCard.SETRECFILTER ();
-                            //     IF (ForceCardPrint OR (CheckSalesSetupForCardPrint (MembershipEntry."Item No."))) THEN
-                            //       PrintMemberCardWorker (MemberCard, MembershipSetup);
-                            //   END;
-                            // END;
                             if (ForceCardPrint or (CheckSalesSetupForCardPrint(MembershipEntry."Item No."))) then begin
                                 if (MembershipEntry."Member Card Entry No." <> 0) then begin
                                     MemberCard2.SetFilter("Entry No.", '%1..', MembershipEntry."Member Card Entry No.");
@@ -318,8 +287,6 @@ codeunit 6060131 "NPR MM Member Retail Integr."
                         begin
                             MembershipManagement.PrintOffline(MemberInfoCapture."Information Context"::PRINT_MEMBERSHIP, MembershipEntry."Membership Entry No.");
 
-                            // IF (ForceCardPrint OR (CheckSalesSetupForCardPrint (MembershipEntry."Item No."))) THEN
-                            //  MembershipManagement.PrintOffline (MemberInfoCapture."Information Context"::PRINT_CARD, MembershipEntry."Member Card Entry No.");
                             if (ForceCardPrint or (CheckSalesSetupForCardPrint(MembershipEntry."Item No."))) then begin
                                 if (MembershipEntry."Member Card Entry No." <> 0) then begin
                                     MemberCard.SetFilter("Entry No.", '%1..', MembershipEntry."Member Card Entry No.");
@@ -353,7 +320,7 @@ codeunit 6060131 "NPR MM Member Retail Integr."
                 ;
 
             MembershipSetup."Receipt Print Object Type"::CODEUNIT:
-                if ObjectOutputMgt.GetCodeunitOutputPath(MembershipSetup."Receipt Print Object ID") <> '' then
+                if (ObjectOutputMgt.GetCodeunitOutputPath(MembershipSetup."Receipt Print Object ID") <> '') then
                     LinePrintMgt.ProcessCodeunit(MembershipSetup."Receipt Print Object ID", Membership)
                 else
                     CODEUNIT.Run(MembershipSetup."Receipt Print Object ID", Membership);
@@ -557,9 +524,6 @@ codeunit 6060131 "NPR MM Member Retail Integr."
         if (SaleLinePOS.Quantity <> 1) then
             exit(-1101);
 
-        // IF (NOT MembershipSetup.GET (MembershipSalesSetup."Membership Code")) THEN
-        //  EXIT (-1103);
-
         if ((MembershipSalesSetup."Membership Code" = '') and
           (MembershipSalesSetup."Business Flow Type" in [MembershipSalesSetup."Business Flow Type"::ADD_CARD, MembershipSalesSetup."Business Flow Type"::REPLACE_CARD])) then begin
             MembershipSetup.Init();
@@ -638,6 +602,11 @@ codeunit 6060131 "NPR MM Member Retail Integr."
         end;
 
         Commit();
+
+        // When a sales line is created as part of web service (f.ex coupon complimentary item)
+        if (not GuiAllowed()) then
+            exit(-1100);
+
         if (DisplayMemberInfoCaptureDialog(SaleLinePOS)) then begin
             Commit();
 
@@ -658,27 +627,12 @@ codeunit 6060131 "NPR MM Member Retail Integr."
             end;
             Commit();
 
-            //IF (CreateMemberships (FALSE, MemberInfoCapture, ReasonMessage)) THEN
-            //  EXIT (1);
             if (CreateMemberships(false, MemberInfoCapture, ReasonMessage)) then begin
 
                 if (SaleLinePOS.Get(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Sale Type", SaleLinePOS."Line No.")) then begin
                     SaleLinePOS."Description 2" := MemberInfoCapture."External Membership No.";
                     SaleLinePOS.Modify();
                 end;
-
-                //    COMMIT;
-                //
-                //    IF (MembershipSalesSetup."Auto-Admit Member On Sale" = MembershipSalesSetup."Auto-Admit Member On Sale"::ASK) THEN
-                //      IF (NOT CONFIRM (ADMITT_MEMBERS, TRUE)) THEN
-                //        EXIT (1);
-                //
-                //    IF (MembershipSalesSetup."Auto-Admit Member On Sale" <> MembershipSalesSetup."Auto-Admit Member On Sale"::NO) THEN BEGIN
-                //      IF (NOT AdmittMembersOnCreateMembership (MemberInfoCapture, MembershipSalesSetup, MembershipSetup, ReasonMessage)) THEN BEGIN
-                //        gLastMessage := ReasonMessage;
-                //        EXIT (-1100);
-                //      END;
-                //    END;
 
                 Commit();
                 exit(1);
@@ -733,7 +687,6 @@ codeunit 6060131 "NPR MM Member Retail Integr."
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
     begin
-        //Message('Member Module: OnAfterInsertPOSSalesLine');
 
         MemberInfoCapture.SetCurrentKey("Receipt No.", "Line No.");
         MemberInfoCapture.SetFilter("Receipt No.", '=%1', POSEntry."Document No.");
@@ -796,13 +749,12 @@ codeunit 6060131 "NPR MM Member Retail Integr."
 
                     if (MembershipSalesSetup."Business Flow Type" = MembershipSalesSetup."Business Flow Type"::MEMBERSHIP) then begin
 
-                        //MemberManagement.AddMembershipLedgerEntry_NEW (MemberInfoCapture."Membership Entry No.", SalesDate, MembershipSalesSetup, MemberInfoCapture);
                         if (IsForeignMembership(MembershipSalesSetup."Membership Code")) then begin
                             RemoteCreateMembership(MemberInfoCapture, MembershipSalesSetup);
                             repeat
                                 RemoteAddMember(MemberInfoCapture, MembershipSalesSetup);
                             until (MemberInfoCapture.Next() = 0);
-                            //RemoteActivateMembership (MemberInfoCapture, MembershipSalesSetup);
+                            //TODO: Consider - RemoteActivateMembership (MemberInfoCapture, MembershipSalesSetup);
 
                         end else begin
                             MemberManagement.AddMembershipLedgerEntry_NEW(MemberInfoCapture."Membership Entry No.", SalesDate, MembershipSalesSetup, MemberInfoCapture);
@@ -813,7 +765,6 @@ codeunit 6060131 "NPR MM Member Retail Integr."
                     if (MembershipSalesSetup."Business Flow Type" = MembershipSalesSetup."Business Flow Type"::ADD_NAMED_MEMBER) then begin
                         repeat
 
-                            // MemberManagement.AddMemberAndCard (FALSE, MemberInfoCapture."Membership Entry No.", MemberInfoCapture, TRUE, MemberInfoCapture."Member Entry No", ResponseMessage);
                             if (IsForeignMembership(MembershipSalesSetup."Membership Code")) then begin
                                 RemoteAddMember(MemberInfoCapture, MembershipSalesSetup);
                             end else begin
@@ -832,13 +783,13 @@ codeunit 6060131 "NPR MM Member Retail Integr."
                         MemberManagement.BlockMemberCard(MemberManagement.GetCardEntryNoFromExtCardNo(MemberInfoCapture."Replace External Card No."), true);
                         MemberManagement.IssueMemberCard(false, MemberInfoCapture, MemberInfoCapture."Card Entry No.", ResponseMessage);
                         if (MembershipSalesSetup."Member Card Type" in [MembershipSalesSetup."Member Card Type"::CARD_PASSSERVER, MembershipSalesSetup."Member Card Type"::PASSSERVER]) then
-                            MemberNotification.CreateWalletSendNotification(MemberInfoCapture."Membership Entry No.", MemberInfoCapture."Member Entry No", MemberInfoCapture."Card Entry No.");
+                            MemberNotification.CreateWalletSendNotification(MemberInfoCapture."Membership Entry No.", MemberInfoCapture."Member Entry No", MemberInfoCapture."Card Entry No.", TODAY);
                     end;
 
                     if (MembershipSalesSetup."Business Flow Type" = MembershipSalesSetup."Business Flow Type"::ADD_CARD) then begin
                         MemberManagement.IssueMemberCard(false, MemberInfoCapture, MemberInfoCapture."Card Entry No.", ResponseMessage);
                         if (MembershipSalesSetup."Member Card Type" in [MembershipSalesSetup."Member Card Type"::CARD_PASSSERVER, MembershipSalesSetup."Member Card Type"::PASSSERVER]) then
-                            MemberNotification.CreateWalletSendNotification(MemberInfoCapture."Membership Entry No.", MemberInfoCapture."Member Entry No", MemberInfoCapture."Card Entry No.");
+                            MemberNotification.CreateWalletSendNotification(MemberInfoCapture."Membership Entry No.", MemberInfoCapture."Member Entry No", MemberInfoCapture."Card Entry No.", TODAY);
                     end;
 
                 end;
@@ -881,7 +832,7 @@ codeunit 6060131 "NPR MM Member Retail Integr."
                     MemberManagement.CancelMembership(MemberInfoCapture, false, true, MembershipStartDate, MembershipUntilDate, UnitPrice);
                 end;
 
-        end; // END CASE
+        end;
 
         if (MemberInfoCapture."Auto-Admit Member") then
             AdmitMembersOnEndOfSalesWorker(MemberInfoCapture, ResponseMessage);
@@ -910,7 +861,6 @@ codeunit 6060131 "NPR MM Member Retail Integr."
                 MembershipSalesSetup."Business Flow Type"::MEMBERSHIP:
                     begin
                         MembershipEntryNo := MemberManagement.CreateMembership(MembershipSalesSetup, MemberInfoCapture, false);
-                        //MemberInfoCapture."Member Entry No" := MemberManagement.AddMemberAndCard (MembershipEntryNo, MemberInfoCapture, FALSE);
                         if (not (MemberManagement.AddMemberAndCard(FailWithError, MembershipEntryNo, MemberInfoCapture, true, MemberInfoCapture."Member Entry No", ResponseMessage))) then
                             exit(false);
 
@@ -918,7 +868,6 @@ codeunit 6060131 "NPR MM Member Retail Integr."
                         MemberInfoCapture.Modify();
 
                         while (MemberInfoCapture.Next <> 0) do begin
-                            //MemberInfoCapture."Member Entry No" :=  MemberManagement.AddMemberAndCard (MembershipEntryNo, MemberInfoCapture, FALSE);
                             if (not (MemberManagement.AddMemberAndCard(FailWithError, MembershipEntryNo, MemberInfoCapture, true, MemberInfoCapture."Member Entry No", ResponseMessage))) then
                                 exit(false);
 
@@ -930,7 +879,7 @@ codeunit 6060131 "NPR MM Member Retail Integr."
                 MembershipSalesSetup."Business Flow Type"::ADD_NAMED_MEMBER:
                     begin
                         repeat
-                            if (not IsForeignMembership(MembershipSalesSetup."Membership Code")) then 
+                            if (not IsForeignMembership(MembershipSalesSetup."Membership Code")) then
                                 if (not (MemberManagement.AddMemberAndCard(FailWithError, MemberInfoCapture."Membership Entry No.", MemberInfoCapture, true, MemberInfoCapture."Member Entry No", ResponseMessage))) then begin
                                     exit(false);
                                 end;
@@ -991,6 +940,7 @@ codeunit 6060131 "NPR MM Member Retail Integr."
         ResolvingTable: Integer;
         Token: Text[100];
         ReasonCode: Integer;
+        LogEntryNo: Integer;
     begin
 
         with MemberInfoCapture do
@@ -1018,7 +968,7 @@ codeunit 6060131 "NPR MM Member Retail Integr."
                 MemberCard.SetFilter("Member Entry No.", '=%1', MemberInfoCapture."Member Entry No");
                 if (MemberCard.FindFirst()) then begin
                     if (MemberCard."External Card No." <> '') then
-                        MemberLimitationMgr.POS_CheckLimitMemberCardArrival(MemberCard."External Card No.", '', '<auto>', ReasonText, ReasonCode);
+                        MemberLimitationMgr.POS_CheckLimitMemberCardArrival(MemberCard."External Card No.", '', '<auto>', LogEntryNo, ReasonText, ReasonCode);
                     if (ReasonCode <> 0) then
                         Error(ReasonText);
                 end;
@@ -1142,9 +1092,9 @@ codeunit 6060131 "NPR MM Member Retail Integr."
     local procedure OnBeforeInsertWorkflowStep(var Rec: Record "NPR POS Sales Workflow Step"; RunTrigger: Boolean)
     begin
 
-        if Rec."Subscriber Codeunit ID" <> CurrCodeunitId() then
+        if (Rec."Subscriber Codeunit ID" <> CurrCodeunitId()) then
             exit;
-        if Rec."Subscriber Function" <> 'PrintMembershipsOnSale' then
+        if (Rec."Subscriber Function" <> 'PrintMembershipsOnSale') then
             exit;
 
         Rec.Description := Text000;
@@ -1163,9 +1113,9 @@ codeunit 6060131 "NPR MM Member Retail Integr."
         POSEntry: Record "NPR POS Entry";
     begin
 
-        if POSSalesWorkflowStep."Subscriber Codeunit ID" <> CurrCodeunitId() then
+        if (POSSalesWorkflowStep."Subscriber Codeunit ID" <> CurrCodeunitId()) then
             exit;
-        if POSSalesWorkflowStep."Subscriber Function" <> 'PrintMembershipsOnSale' then
+        if (POSSalesWorkflowStep."Subscriber Function" <> 'PrintMembershipsOnSale') then
             exit;
 
         POSEntry.SetFilter("Document No.", '=%1', SalePOS."Sales Ticket No.");

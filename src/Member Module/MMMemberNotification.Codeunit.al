@@ -17,7 +17,7 @@ codeunit 6060136 "NPR MM Member Notification"
         NOT_IMPLEMENTED: Label '%1 %2 not implemented.';
         BAD_REFERENCE: Label 'The field reference {:%1} in the textline "%2" does correspond to a valid field number.';
         INLINE_NOTIFICATION: Label 'Sends Inline Member Notifications on End of Sales.';
-        REFRESH_NOTIFICATION: Label '@1@@@@@@@@@@@@@@@@@@';
+        REFRESH_NOTIFICATION: Label '';
 
     procedure HandleBatchNotifications(ReferenceDate: Date)
     var
@@ -66,8 +66,6 @@ codeunit 6060136 "NPR MM Member Notification"
         end;
 
         MembershipNotification."Notification Processed At" := CurrentDateTime;
-
-        //MembershipNotification."Notification Processed By User" := USERID;
         MembershipNotification."Notification Processed By User" := CopyStr(UserId, 1, MaxStrLen(MembershipNotification."Notification Processed By User"));
 
         MembershipNotification.Modify();
@@ -92,10 +90,11 @@ codeunit 6060136 "NPR MM Member Notification"
         if (not NotificationSetup.Get(MembershipNotification."Notification Code")) then
             exit(0);
 
-        if (NotificationSetup."Cancel Overdue Notif. (Days)" <> 0) then begin
-            if (MembershipNotification."Date To Notify" + Abs(NotificationSetup."Cancel Overdue Notif. (Days)") < Today) then
-                exit(-1);
-        end;
+        if (NotificationSetup."Cancel Overdue Notif. (Days)" = 0) then
+            NotificationSetup."Cancel Overdue Notif. (Days)" := 7; // notification older than 7 days will be cancelled unless setup sets a different value
+
+        if (MembershipNotification."Date To Notify" + Abs(NotificationSetup."Cancel Overdue Notif. (Days)") < Today) then
+            exit(-1);
 
         case MembershipNotification."Notification Trigger" of
             MembershipNotification."Notification Trigger"::RENEWAL:
@@ -161,6 +160,7 @@ codeunit 6060136 "NPR MM Member Notification"
         MembershipSetup: Record "NPR MM Membership Setup";
         MemberCommunity: Record "NPR MM Member Community";
         NotificationSetup: Record "NPR MM Member Notific. Setup";
+        MembershipEntry: Record "NPR MM Membership Entry";
         Method: Code[10];
         Address: Text;
     begin
@@ -198,6 +198,7 @@ codeunit 6060136 "NPR MM Member Notification"
                     MemberNotificationEntry."Auto-Renew" := Membership."Auto-Renew";
                     MemberNotificationEntry."Auto-Renew External Data" := Membership."Auto-Renew External Data";
                     MemberNotificationEntry."Auto-Renew Payment Method Code" := Membership."Auto-Renew Payment Method Code";
+                    MemberNotificationEntry."Customer No." := Membership."Customer No.";
 
                     MemberNotificationEntry."Member Entry No." := Member."Entry No.";
                     MemberNotificationEntry."External Member No." := Member."External Member No.";
@@ -214,6 +215,7 @@ codeunit 6060136 "NPR MM Member Notification"
                     MemberNotificationEntry.Birthday := Member.Birthday;
                     MemberNotificationEntry."Phone No." := Member."Phone No.";
 
+                    MemberNotificationEntry."Contact No." := MembershipRole."Contact No.";
                     MemberNotificationEntry."Community Code" := MembershipRole."Community Code";
                     MemberNotificationEntry."Membership Code" := MembershipRole."Membership Code";
                     MemberNotificationEntry."External Membership No." := MembershipRole."External Membership No.";
@@ -242,33 +244,31 @@ codeunit 6060136 "NPR MM Member Notification"
                       MemberNotificationEntry."Membership Valid From",
                       MemberNotificationEntry."Membership Valid Until");
 
+                    MembershipManagement.GetConsecutiveTimeFrame(MembershipNotification."Membership Entry No.", MembershipNotification."Date To Notify",
+                      MemberNotificationEntry."Membership Consecutive From",
+                      MemberNotificationEntry."Membership Consecutive Until");
+
+                    MembershipEntry.SetFilter("Membership Entry No.", '=%1', Membership."Entry No.");
+                    MembershipEntry.SetFilter(Blocked, '=%1', false);
+                    MembershipEntry.SetFilter("Valid From Date", '=%1', MemberNotificationEntry."Membership Valid From");
+                    MembershipEntry.SetFilter("Valid Until Date", '=%1', MemberNotificationEntry."Membership Valid Until");
+                    if (not MembershipEntry.FindLast()) then
+                        MembershipEntry.Init();
+                    MemberNotificationEntry."Item No." := MembershipEntry."Item No.";
+
                     if (MemberNotificationEntry."Card Valid Until" = 0D) then
                         MemberNotificationEntry."Card Valid Until" := MemberNotificationEntry."Membership Valid Until";
 
-                    //CASE Member."Notification Method" OF
-                    //  Member."Notification Method"::EMAIL : MemberNotificationEntry."Notification Method" := MemberNotificationEntry."Notification Method"::EMAIL;
-                    //  Member."Notification Method"::NONE :  MemberNotificationEntry."Notification Method" := MemberNotificationEntry."Notification Method"::NONE;
-                    //  Member."Notification Method"::MANUAL : MemberNotificationEntry."Notification Method" := MemberNotificationEntry."Notification Method"::MANUAL;
-                    //  Member."Notification Method"::SMS : MemberNotificationEntry."Notification Method" := MemberNotificationEntry."Notification Method"::SMS;
-                    //  ELSE ERROR (NOT_IMPLEMENTED, Member.FIELDCAPTION (Member."Notification Method"), Member."Notification Method");
-                    //END;
-
-                    // WITH MembershipNotification DO
-                    //   CASE "Notification Trigger" OF
-                    //    "Notification Trigger"::WELCOME       : MembershipManagement.GetCommunicationMethod_Welcome ("Member Entry No.", "Membership Entry No.", Method, Address);
-                    //    "Notification Trigger"::RENEWAL       : MembershipManagement.GetCommunicationMethod_Renew ("Member Entry No.", "Membership Entry No.", Method, Address);
-                    //    "Notification Trigger"::WALLET_CREATE : MembershipManagement.GetCommunicationMethod_MemberCard ("Member Entry No.", "Membership Entry No.", Method, Address);
-                    //  END;
                     with MemberNotificationEntry do
                         case "Notification Trigger" of
                             "Notification Trigger"::WELCOME:
-                                MembershipManagement.GetCommunicationMethod_Welcome("Member Entry No.", "Membership Entry No.", Method, Address);
+                                MembershipManagement.GetCommunicationMethod_Welcome("Member Entry No.", "Membership Entry No.", Method, Address, "Notification Engine");
                             "Notification Trigger"::RENEWAL:
-                                MembershipManagement.GetCommunicationMethod_Renew("Member Entry No.", "Membership Entry No.", Method, Address);
+                                MembershipManagement.GetCommunicationMethod_Renew("Member Entry No.", "Membership Entry No.", Method, Address, "Notification Engine");
                             "Notification Trigger"::WALLET_CREATE:
-                                MembershipManagement.GetCommunicationMethod_MemberCard("Member Entry No.", "Membership Entry No.", Method, Address);
+                                MembershipManagement.GetCommunicationMethod_MemberCard("Member Entry No.", "Membership Entry No.", Method, Address, "Notification Engine");
                             "Notification Trigger"::WALLET_UPDATE:
-                                MembershipManagement.GetCommunicationMethod_MemberCard("Member Entry No.", "Membership Entry No.", Method, Address);
+                                MembershipManagement.GetCommunicationMethod_MemberCard("Member Entry No.", "Membership Entry No.", Method, Address, "Notification Engine");
                         end;
 
                     with MemberNotificationEntry do
@@ -320,6 +320,7 @@ codeunit 6060136 "NPR MM Member Notification"
         MemberNotificationEntry.SetFilter(Blocked, '=%1', false);
 
         if (MemberNotificationEntry.FindSet()) then begin
+            Commit();
             repeat
 
                 SendStatus := MemberNotificationEntry2."Notification Send Status"::FAILED;
@@ -332,9 +333,6 @@ codeunit 6060136 "NPR MM Member Notification"
 
                     MemberNotificationEntry."Notification Method"::EMAIL:
                         begin
-
-                            //IF (SendMail (MemberNotificationEntry, ResponseMessage)) THEN
-                            //  MemberNotificationEntry2."Notification Send Status" := MemberNotificationEntry2."Notification Send Status"::SENT;
 
                             if (MemberNotificationEntry."Include NP Pass") then begin
                                 CreateNpPass(MemberNotificationEntry);
@@ -382,10 +380,7 @@ codeunit 6060136 "NPR MM Member Notification"
 
                 MemberNotificationEntry2.Get(MemberNotificationEntry."Notification Entry No.", MemberNotificationEntry."Member Entry No.");
                 MemberNotificationEntry2."Notification Sent At" := CurrentDateTime();
-
-                // MemberNotificationEntry2."Notification Sent By User" := USERID;
                 MemberNotificationEntry2."Notification Sent By User" := CopyStr(UserId, 1, MaxStrLen(MemberNotificationEntry2."Notification Sent By User"));
-
                 MemberNotificationEntry2."Failed With Message" := CopyStr(ResponseMessage, 1, MaxStrLen(MemberNotificationEntry2."Failed With Message"));
                 MemberNotificationEntry2."Notification Send Status" := SendStatus;
                 MemberNotificationEntry2.Modify();
@@ -440,10 +435,15 @@ codeunit 6060136 "NPR MM Member Notification"
 
         RecordRef.GetTable(MemberNotificationEntry);
 
-        //ResponseMessage := EMailMgt.SendEmail(RecordRef, MemberNotificationEntry."E-Mail Address", TRUE);
         ResponseMessage := 'E-Mail address is missing.';
-        if (MemberNotificationEntry."E-Mail Address" <> '') then
-            ResponseMessage := EMailMgt.SendEmail(RecordRef, MemberNotificationEntry."E-Mail Address", true);
+        if (MemberNotificationEntry."E-Mail Address" <> '') then begin
+            case MemberNotificationEntry."Notification Engine" OF
+                MemberNotificationEntry."Notification Engine"::M2_EMAILER:
+                    ResponseMessage := SendEmailUsingM2Engine(MemberNotificationEntry, MemberNotificationEntry."E-Mail Address");
+                MemberNotificationEntry."Notification Engine"::NATIVE:
+                    ResponseMessage := EMailMgt.SendEmail(RecordRef, MemberNotificationEntry."E-Mail Address", true);
+            end;
+        end;
 
         exit(ResponseMessage = '');
     end;
@@ -460,6 +460,11 @@ codeunit 6060136 "NPR MM Member Notification"
 
         if (MemberNotificationEntry."Phone No." = '') then
             ResponseMessage := 'Phone number is missing.';
+
+        if (DelChr(MemberNotificationEntry."Phone No.", '<=>', '+1234567890 ') <> '') then begin
+            ResponseMessage := 'Phone number is not valid.';
+            exit(false);
+        end;
 
         if (MemberNotificationEntry."Phone No." <> '') then begin
             Commit();
@@ -534,7 +539,7 @@ codeunit 6060136 "NPR MM Member Notification"
 
         Membership.SetFilter("Membership Code", '=%1', MembershipCode);
         if (Membership.FindSet()) then begin
-            if (GuiAllowed) then
+            if (GuiAllowed()) then
                 Window.Open(REFRESH_NOTIFICATION);
 
             MaxCount := Membership.Count();
@@ -545,23 +550,20 @@ codeunit 6060136 "NPR MM Member Notification"
 
                 MembershipEntry.SetFilter("Membership Entry No.", '=%1', Membership."Entry No.");
                 MembershipEntry.SetFilter(Blocked, '=%1', false);
-                // NEW,REGRET,RENEW,UPGRADE,EXTEND,CANCEL,AUTORENEW,FOREIGN
-
-                //MembershipEntry.SetFilter (Context, '%1..%2 ', MembershipEntry.Context::NEW, MembershipEntry.Context::EXTEND);
                 MembershipEntry.SetFilter(Context, '%1..%2|%3', MembershipEntry.Context::NEW, MembershipEntry.Context::EXTEND, MembershipEntry.Context::AUTORENEW);
 
                 if (MembershipEntry.FindLast()) then
                     if (MembershipEntry."Valid Until Date" > Today) then
                         AddMembershipRenewalNotificationWorker(MembershipEntry, MembershipSetup, CommunitySetup);
 
-                if (GuiAllowed) then
+                if (GuiAllowed()) then
                     Window.Update(1, Round(CurrentCount / MaxCount * 10000, 1));
 
                 CurrentCount += 1;
 
             until (Membership.Next() = 0);
 
-            if (GuiAllowed) then
+            if (GuiAllowed()) then
                 Window.Close();
         end;
 
@@ -603,10 +605,7 @@ codeunit 6060136 "NPR MM Member Notification"
             repeat
                 MembershipNotification."Notification Status" := MembershipNotification."Notification Status"::CANCELED;
                 MembershipNotification."Notification Processed At" := CurrentDateTime();
-
-                // MembershipNotification."Notification Processed By User" := USERID;
                 MembershipNotification."Notification Processed By User" := CopyStr(UserId, 1, MaxStrLen(MembershipNotification."Notification Processed By User"));
-
                 MembershipNotification.Modify();
             until (MembershipNotification.Next() = 0);
         end;
@@ -651,7 +650,7 @@ codeunit 6060136 "NPR MM Member Notification"
     begin
 
         Randomize;
-        Token := UpperCase(DelChr(Format(CreateGuid), '=', '{}-'));
+        Token := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
 
         for n := StrLen(Token) to MaxStrLen(Token) do begin
             case Random(3) of
@@ -666,8 +665,50 @@ codeunit 6060136 "NPR MM Member Notification"
 
     end;
 
-    local procedure "-------Wallet"()
+    local procedure SendEmailUsingM2Engine(MemberNotificationEntry: Record "NPR MM Member Notific. Entry"; Recipient: Text) ResponseMessage: Text;
+    var
+        MemberCommunicationSetup: Record "NPR MM Member Comm. Setup";
+        TemplateData: Text;
+        TemplateText: Text;
+        instream: InStream;
+        RecRef: RecordRef;
+        MessageBody: DotNet NPRNetJToken;
+        MessageResponse: DotNet NPRNetJToken;
     begin
+
+        with MemberNotificationEntry do
+            case "Notification Trigger" OF
+                "Notification Trigger"::RENEWAL:
+                    MemberCommunicationSetup.Get("Membership Code", MemberCommunicationSetup."Message Type"::RENEW);
+                "Notification Trigger"::WELCOME:
+                    MemberCommunicationSetup.Get("Membership Code", MemberCommunicationSetup."Message Type"::WELCOME);
+                "Notification Trigger"::WALLET_CREATE:
+                    MemberCommunicationSetup.Get("Membership Code", MemberCommunicationSetup."Message Type"::MEMBERCARD);
+                "Notification Trigger"::WALLET_UPDATE:
+                    MemberCommunicationSetup.Get("Membership Code", MemberCommunicationSetup."Message Type"::MEMBERCARD);
+                else
+                    MemberCommunicationSetup.Get("Membership Code", MemberCommunicationSetup."Message Type"::WELCOME);
+            end;
+
+        MemberCommunicationSetup.CALCFIELDS("Sender Template");
+        if (not MemberCommunicationSetup."Sender Template".HASVALUE()) then
+            exit(StrSubstNo('The template for Notification Engine %1 has not been defined for %2 %3.', MemberCommunicationSetup."Notification Engine", MemberCommunicationSetup."Membership Code", MemberCommunicationSetup."Message Type"));
+
+        RecRef.GetTable(MemberNotificationEntry);
+        MemberCommunicationSetup."Sender Template".CreateInStream(instream);
+        while (not instream.EOS()) do begin
+            instream.ReadText(TemplateText);
+            TemplateData += AssignDataToPassTemplate(RecRef, templateText);
+        end;
+
+        MessageBody := MessageBody.Parse(TemplateData);
+        if (not MagentoApiPost_membership('welcome-email', MessageBody, MessageResponse)) then begin
+            ResponseMessage := CopyStr(StrSubstNo('%1 - %2', GetLASTERRORTEXT, MessageBody), 1, MaxStrLen(ResponseMessage));
+            exit(ResponseMessage);
+        end;
+
+        exit('');
+
     end;
 
     local procedure CreateNpPass(var MemberNotificationEntry: Record "NPR MM Member Notific. Entry")
@@ -693,13 +734,9 @@ codeunit 6060136 "NPR MM Member Notification"
                 PassData += AssignDataToPassTemplate(RecRef, templateText);
             end;
         end else begin
-            templateText := GetDefaultTemplate();
+            templateText := GetDefaultWalletTemplate();
             PassData += AssignDataToPassTemplate(RecRef, templateText);
         end;
-
-        //JObject := JObject.Parse (PassData);
-        //MESSAGE ('image type %1', GetStringValue (JObject, 'data.images[:1].type'));
-        //ERROR ('Pass Data %1', COPYSTR (PassData, 1, 2048));
 
         if (CreatePass(MemberNotificationEntry, PassData)) then
             SetPassUrl(MemberNotificationEntry);
@@ -717,7 +754,7 @@ codeunit 6060136 "NPR MM Member Notification"
         MembershipRole.Get(MemberNotificationEntry."Membership Entry No.", MemberNotificationEntry."Member Entry No.");
 
         if (MembershipRole."Wallet Pass Id" = '') then begin
-            MembershipRole."Wallet Pass Id" := UpperCase(DelChr(Format(CreateGuid), '=', '{}-'));
+            MembershipRole."Wallet Pass Id" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
             MembershipRole.Modify();
         end;
 
@@ -737,7 +774,7 @@ codeunit 6060136 "NPR MM Member Notification"
         if (not MemberNotificationSetup.Get(MemberNotificationEntry."Notification Code")) then
             exit(false);
 
-        if not (NPPassServerInvokeApi('GET', MemberNotificationSetup, MemberNotificationEntry."Wallet Pass Id", FailReason, '', JSONResult)) then
+        if (not (NPPassServerInvokeApi('GET', MemberNotificationSetup, MemberNotificationEntry."Wallet Pass Id", FailReason, '', JSONResult))) then
             exit(false);
 
         if (JSONResult = '') then
@@ -746,7 +783,7 @@ codeunit 6060136 "NPR MM Member Notification"
         JObject := JObject.Parse(JSONResult);
         MemberNotificationEntry."Wallet Pass Default URL" := GetStringValue(JObject, 'public_url.default');
         MemberNotificationEntry."Wallet Pass Andriod URL" := GetStringValue(JObject, 'public_url.android');
-        MemberNotificationEntry."Wallet Pass Landing URL" := GetStringValue(JObject, 'public_url.landing'); 
+        MemberNotificationEntry."Wallet Pass Landing URL" := GetStringValue(JObject, 'public_url.landing');
 
         exit(true);
     end;
@@ -793,7 +830,7 @@ codeunit 6060136 "NPR MM Member Notification"
             if (RecRef.FieldExist(FieldNumber)) then begin
 
                 FieldRef := RecRef.Field(FieldNumber);
-                if UpperCase(Format(FieldRef.Class)) = 'FLOWFIELD' then
+                if (UpperCase(Format(FieldRef.Class)) = 'FLOWFIELD') then
                     FieldRef.CalcField;
 
                 NewLine := DelStr(NewLine, StartPos, EndPos - StartPos + SeparatorLength);
@@ -830,7 +867,7 @@ codeunit 6060136 "NPR MM Member Notification"
         exit(NewLine);
     end;
 
-    procedure GetDefaultTemplate() template: Text
+    procedure GetDefaultWalletTemplate() template: Text
     var
         CRLF: Text[2];
     begin
@@ -894,7 +931,7 @@ codeunit 6060136 "NPR MM Member Notification"
         MessageText := StrSubstNo('{"id":"%1","storecode":"%2"}', ContactNo, Customer."NPR Magento Store Code");
         Body := Body.Parse(StrSubstNo('{"account": {"email":"%1", "accounts":[%2]}}', EmailAddress, MessageText));
 
-        if (not MagentoApiPost('password-reset-link', Body, Response)) then begin
+        if (not MagentoApiPost_b2b_customer('password-reset-link', Body, Response)) then begin
             ReasonText := CopyStr(GetLastErrorText, 1, MaxStrLen(ReasonText));
             exit;
         end;
@@ -918,96 +955,135 @@ codeunit 6060136 "NPR MM Member Notification"
 
     end;
 
-    [TryFunction]
-    procedure MagentoApiPost(Method: Text; var Body: DotNet NPRNetJToken; var Result: DotNet NPRNetJToken)
+    procedure MagentoApiPost(ApiUrl: Text; Method: Text; var Body: DotNet NPRNetJToken; var Result: DotNet NPRNetJToken)
     var
         MagentoSetup: Record "NPR Magento Setup";
+        StatusCode: Code[10];
+        Exception: DotNet NPRNetException;
         HttpWebRequest: DotNet NPRNetHttpWebRequest;
         HttpWebResponse: DotNet NPRNetHttpWebResponse;
-        StreamReader: DotNet NPRNetStreamReader;
-        Response: Text;
         ReqStream: DotNet NPRNetStream;
+        StreamReader: DotNet NPRNetStreamReader;
         ReqStreamWriter: DotNet NPRNetStreamWriter;
+        WebException: DotNet NPRNetWebException;
+        ResponseText: Text;
+        StatusDescription: Text;
     begin
 
-        Clear(Response);
-        if Method = '' then
+        if (Method = '') then
             exit;
 
-        MagentoSetup.Get;
-        MagentoSetup.TestField("Api Url");
-        if MagentoSetup."Api Url"[StrLen(MagentoSetup."Api Url")] <> '/' then
-            MagentoSetup."Api Url" += '/';
+        MagentoSetup.Get();
 
-        if (CopyStr(MagentoSetup."Api Url", StrLen(MagentoSetup."Api Url") - (StrLen('naviconnect/')) + 1) = 'naviconnect/') then
-            MagentoSetup."Api Url" := CopyStr(MagentoSetup."Api Url", 1, StrLen(MagentoSetup."Api Url") - (StrLen('naviconnect/'))) + 'b2b_customer/';
-
-        HttpWebRequest := HttpWebRequest.Create(MagentoSetup."Api Url" + Method);
+        HttpWebRequest := HttpWebRequest.Create(ApiUrl + Method);
         HttpWebRequest.Timeout := 1000 * 60;
 
         HttpWebRequest.Method := 'POST';
-        MagentoSetup.Get;
-        if MagentoSetup."Api Authorization" <> '' then
+        MagentoSetup.Get();
+        if (MagentoSetup."Api Authorization" <> '') then
             HttpWebRequest.Headers.Add('Authorization', MagentoSetup."Api Authorization")
         else
             HttpWebRequest.Headers.Add('Authorization', 'Basic ' + MagentoSetup.GetBasicAuthInfo());
 
         HttpWebRequest.ContentType('naviconnect/json');
 
-        ReqStream := HttpWebRequest.GetRequestStream;
-        ReqStreamWriter := ReqStreamWriter.StreamWriter(ReqStream);
-        ReqStreamWriter.Write(Body.ToString());
-        ReqStreamWriter.Flush;
-        ReqStreamWriter.Close;
-        Clear(ReqStreamWriter);
-        Clear(ReqStream);
+        if (TrySendWebRequest(Body.ToString(), HttpWebRequest, HttpWebResponse)) then begin
+            ResponseText := '{}';
+            if (TryReadResponseText(HttpWebResponse, ResponseText)) then
+                Result := Result.Parse(ResponseText);
+            exit;
+        end;
 
-        HttpWebResponse := HttpWebRequest.GetResponse();
+        Exception := GetLASTERROROBJECT();
+        if ((Format(GETDOTNETTYPE(Exception.GetBaseException()))) <> (FORMAT(GETDOTNETTYPE(WebException)))) then
+            Error(Exception.ToString());
 
-        StreamReader := StreamReader.StreamReader(HttpWebResponse.GetResponseStream);
-        Response := StreamReader.ReadToEnd;
-        Result := Result.Parse(Response);
+        WebException := Exception.GetBaseException();
+        TryReadExceptionResponseText(WebException, StatusCode, StatusDescription, ResponseText);
+
+        Error('%1 - %2: %3', StatusCode, StatusDescription, ResponseText);
     end;
 
-    local procedure "---Inline Notifications"()
-    begin
-    end;
-
-    procedure CreateUpdateWalletNotification(MembershipEntryNo: Integer; MemberEntryNo: Integer; MemberCardEntryNo: Integer) EntryNo: Integer
+    [TryFunction]
+    procedure MagentoApiPost_b2b_customer(Method: Text; var Body: DotNet NPRNetJToken; var Result: DotNet NPRNetJToken)
     var
-        Membership: Record "NPR MM Membership";
-        MembershipSetup: Record "NPR MM Membership Setup";
+        MagentoSetup: Record 6151401;
+        ApiUrl: Text;
+    begin
+
+        MagentoSetup.Get();
+        MagentoSetup.TESTFIELD("Api Url");
+        if (MagentoSetup."Api Url"[STRLEN(MagentoSetup."Api Url")] <> '/') then
+            MagentoSetup."Api Url" += '/';
+
+        if (CopyStr(MagentoSetup."Api Url", STRLEN(MagentoSetup."Api Url") - (STRLEN('naviconnect/')) + 1) = 'naviconnect/') then
+            ApiUrl := CopyStr(MagentoSetup."Api Url", 1, STRLEN(MagentoSetup."Api Url") - (STRLEN('naviconnect/'))) + 'b2b_customer/';
+
+        MagentoApiPost(ApiUrl, Method, Body, Result)
+
+    end;
+
+    [TryFunction]
+    procedure MagentoApiPost_membership(Method: Text; var Body: DotNet NPRNetJToken; var Result: DotNet NPRNetJToken)
+    var
+        MagentoSetup: Record 6151401;
+        ApiUrl: Text;
+    begin
+
+        MagentoSetup.Get();
+        MagentoSetup.TESTFIELD("Api Url");
+        if (MagentoSetup."Api Url"[STRLEN(MagentoSetup."Api Url")] <> '/') then
+            MagentoSetup."Api Url" += '/';
+
+        ApiUrl := StrSubstNo('%1membership/', MagentoSetup."Api Url");
+
+        MagentoApiPost(ApiUrl, Method, Body, Result)
+
+    end;
+
+    procedure GetDefaultM2WelcomeEmailTemplate() Template: Text;
+    var
+        CRLF: Text[2];
+    begin
+
+        CRLF[1] := 13;
+        CRLF[2] := 10;
+        Template :=
+        '{' + CRLF +
+          ' "membership": {' + CRLF +
+          '   "information: "FieldNumbers are based on table 6060139 - NPR MM Member Notification Entry.",' + CRLF +
+          '   "membership_number": "{[101]}",' + CRLF +
+          '   "member_number": "{[100]}",' + CRLF +
+          '   "contact_number": "{[106]}",' + CRLF +
+          '   "email": "{[110]}",' + CRLF +
+          '   "store_code": "default",' + CRLF +
+          '   "item_number": "{[152]}"' + CRLF +
+          ' }' + CRLF +
+        '}';
+
+    end;
+
+    procedure CreateUpdateWalletNotification(MembershipEntryNo: Integer; MemberEntryNo: Integer; MemberCardEntryNo: Integer; DateToSendNotification: Date) EntryNo: Integer
+    var
         NotificationSetup: Record "NPR MM Member Notific. Setup";
         MembershipNotification: Record "NPR MM Membership Notific.";
+    begin
+        exit(CreateWalletNotification(MembershipEntryNo, MemberEntryNo, MemberCardEntryNo, NotificationSetup.Type::WALLET_UPDATE, MembershipNotification."Notification Method Source"::MEMBER, DateToSendNotification));
+    end;
+
+    procedure CreateWalletSendNotification(MembershipEntryNo: Integer; MemberEntryNo: Integer; MemberCardEntryNo: Integer; DateToSendNotification: Date) EntryNo: Integer
+    var
+        NotificationSetup: Record "NPR MM Member Notific. Setup";
+        MembershipNotification: Record "NPR MM Membership Notific.";
+    begin
+        exit(CreateWalletNotification(MembershipEntryNo, MemberEntryNo, MemberCardEntryNo, NotificationSetup.Type::WALLET_CREATE, MembershipNotification."Notification Method Source"::MEMBER, DateToSendNotification));
+    end;
+
+    procedure CreateWalletWithoutSendingNotification(MembershipEntryNo: Integer; MemberEntryNo: Integer; MemberCardEntryNo: Integer; DateToSendNotification: Date) EntryNo: Integer
+    var
+        NotificationSetup: Record "NPR MM Member Notific. Setup";
         MembershipRole: Record "NPR MM Membership Role";
-        NotificationTriggerType: Integer;
-    begin
-
-        //EXIT (CreateWalletNotification (MembershipEntryNo, MemberEntryNo, MemberCardEntryNo, NotificationSetup.Type::WALLET_UPDATE));
-        exit(CreateWalletNotification(MembershipEntryNo, MemberEntryNo, MemberCardEntryNo, NotificationSetup.Type::WALLET_UPDATE, MembershipNotification."Notification Method Source"::MEMBER));
-
-    end;
-
-    procedure CreateWalletSendNotification(MembershipEntryNo: Integer; MemberEntryNo: Integer; MemberCardEntryNo: Integer) EntryNo: Integer
-    var
-        Membership: Record "NPR MM Membership";
-        MembershipSetup: Record "NPR MM Membership Setup";
-        NotificationSetup: Record "NPR MM Member Notific. Setup";
         MembershipNotification: Record "NPR MM Membership Notific.";
-    begin
-
-        //EXIT (CreateWalletNotification (MembershipEntryNo, MemberEntryNo, MemberCardEntryNo, NotificationSetup.Type::WALLET_CREATE));
-        exit(CreateWalletNotification(MembershipEntryNo, MemberEntryNo, MemberCardEntryNo, NotificationSetup.Type::WALLET_CREATE, MembershipNotification."Notification Method Source"::MEMBER));
-
-    end;
-
-    procedure CreateWalletWithoutSendingNotification(MembershipEntryNo: Integer; MemberEntryNo: Integer; MemberCardEntryNo: Integer) EntryNo: Integer
-    var
-        Membership: Record "NPR MM Membership";
-        MembershipSetup: Record "NPR MM Membership Setup";
-        NotificationSetup: Record "NPR MM Member Notific. Setup";
-        MembershipNotification: Record "NPR MM Membership Notific.";
-        MembershipRole: Record "NPR MM Membership Role";
         NotificationTriggerType: Option;
     begin
 
@@ -1017,11 +1093,11 @@ codeunit 6060136 "NPR MM Member Notification"
             if (MembershipRole."Wallet Pass Id" <> '') then
                 NotificationTriggerType := NotificationSetup.Type::WALLET_UPDATE;
 
-        exit(CreateWalletNotification(MembershipEntryNo, MemberEntryNo, MemberCardEntryNo, NotificationTriggerType, MembershipNotification."Notification Method Source"::EXTERNAL));
+        exit(CreateWalletNotification(MembershipEntryNo, MemberEntryNo, MemberCardEntryNo, NotificationTriggerType, MembershipNotification."Notification Method Source"::EXTERNAL, DateToSendNotification));
 
     end;
 
-    local procedure CreateWalletNotification(MembershipEntryNo: Integer; MemberEntryNo: Integer; MemberCardEntryNo: Integer; NotificationTriggerType: Option; NotificationSource: Option) EntryNo: Integer
+    local procedure CreateWalletNotification(MembershipEntryNo: Integer; MemberEntryNo: Integer; MemberCardEntryNo: Integer; NotificationTriggerType: Option; NotificationSource: Option; DateToSendNotification: Date) EntryNo: Integer
     var
         Membership: Record "NPR MM Membership";
         MembershipSetup: Record "NPR MM Membership Setup";
@@ -1053,6 +1129,9 @@ codeunit 6060136 "NPR MM Member Notification"
 
         NotificationSetup.FindFirst();
 
+        if (DateToSendNotification = 0D) then
+            DateToSendNotification := TODAY;
+
         MembershipNotification.SetFilter("Membership Entry No.", '=%1', MembershipEntryNo);
         MembershipNotification.SetFilter("Member Card Entry No.", '=%1', MemberCardEntryNo);
         MembershipNotification.SetFilter("Member Entry No.", '=%1', MemberEntryNo);
@@ -1060,6 +1139,7 @@ codeunit 6060136 "NPR MM Member Notification"
         MembershipNotification.SetFilter("Notification Status", '=%1', MembershipNotification."Notification Status"::PENDING);
         MembershipNotification.SetFilter("Date To Notify", '=%1', Today);
         MembershipNotification.SetFilter("Notification Trigger", '=%1', NotificationTriggerType);
+        MembershipNotification.SetFilter("Date To Notify", '=%1', DateToSendNotification);
         if (MembershipNotification.FindFirst()) then
             exit(MembershipNotification."Entry No.");
 
@@ -1067,7 +1147,7 @@ codeunit 6060136 "NPR MM Member Notification"
         MembershipNotification."Member Card Entry No." := MemberCardEntryNo;
         MembershipNotification."Member Entry No." := MemberEntryNo;
         MembershipNotification."Notification Code" := NotificationSetup.Code;
-        MembershipNotification."Date To Notify" := Today;
+        MembershipNotification."Date To Notify" := DateToSendNotification;
         MembershipNotification."Notification Status" := MembershipNotification."Notification Status"::PENDING;
         MembershipNotification."Notification Trigger" := NotificationTriggerType;
         MembershipNotification."Template Filter Value" := NotificationSetup."Template Filter Value";
@@ -1115,9 +1195,9 @@ codeunit 6060136 "NPR MM Member Notification"
     local procedure OnBeforeInsertWorkflowStep(var Rec: Record "NPR POS Sales Workflow Step"; RunTrigger: Boolean)
     begin
 
-        if Rec."Subscriber Codeunit ID" <> CurrCodeunitId() then
+        if (Rec."Subscriber Codeunit ID" <> CurrCodeunitId()) then
             exit;
-        if Rec."Subscriber Function" <> 'SendMemberNotificationOnSales' then
+        if (Rec."Subscriber Function" <> 'SendMemberNotificationOnSales') then
             exit;
 
         Rec.Description := INLINE_NOTIFICATION;
@@ -1135,16 +1215,12 @@ codeunit 6060136 "NPR MM Member Notification"
     local procedure SendMemberNotificationOnSales(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR Sale POS")
     begin
 
-        if POSSalesWorkflowStep."Subscriber Codeunit ID" <> CurrCodeunitId() then
+        if (POSSalesWorkflowStep."Subscriber Codeunit ID" <> CurrCodeunitId()) then
             exit;
-        if POSSalesWorkflowStep."Subscriber Function" <> 'SendMemberNotificationOnSales' then
+        if (POSSalesWorkflowStep."Subscriber Function" <> 'SendMemberNotificationOnSales') then
             exit;
 
         SendInlineNotifications();
-    end;
-
-    local procedure "-------"()
-    begin
     end;
 
     procedure NPPassServerInvokeApi(Method: Code[10]; MemberNotificationSetup: Record "NPR MM Member Notific. Setup"; PassID: Text; var ReasonText: Text; JSONIn: Text; var JSONOut: Text): Boolean
@@ -1237,12 +1313,8 @@ codeunit 6060136 "NPR MM Member Notification"
     var
         StreamReader: DotNet NPRNetStreamReader;
     begin
-
         StreamReader := StreamReader.StreamReader(HttpWebResponse.GetResponseStream());
-
-        //ResponseText := HttpWebResponse.Headers().ToString();
         ResponseText := StreamReader.ReadToEnd;
-
         StreamReader.Close;
         Clear(StreamReader);
     end;
@@ -1291,12 +1363,13 @@ codeunit 6060136 "NPR MM Member Notification"
     [TryFunction]
     local procedure TryGetWebExceptionResponse(var WebException: DotNet NPRNetWebException; var HttpWebResponse: DotNet NPRNetHttpWebResponse)
     begin
-
         HttpWebResponse := WebException.Response;
     end;
 
     [TryFunction]
-    local procedure TryGetInnerWebException(var WebException: DotNet NPRNetWebException; var InnerWebException: DotNet NPRNetWebException)
+    local procedure TryGetInnerWebException(var WebException: DotNet NPRNetWebException;
+    var
+        InnerWebException: DotNet NPRNetWebException)
     begin
 
         InnerWebException := WebException.InnerException;

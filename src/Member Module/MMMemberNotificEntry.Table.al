@@ -29,6 +29,13 @@ table 6060139 "NPR MM Member Notific. Entry"
             DataClassification = CustomerContent;
             TableRelation = "NPR MM Member Notific. Setup";
         }
+        field(15; "Notification Engine"; Option)
+        {
+            Caption = 'Notification Engine';
+            DataClassification = CustomerContent;
+            OptionMembers = NATIVE,M2_EMAILER;
+            OptionCaption = 'Native,M2 E-Mail';
+        }
         field(20; "Date To Notify"; Date)
         {
             Caption = 'Date To Notify';
@@ -95,6 +102,16 @@ table 6060139 "NPR MM Member Notific. Entry"
         field(100; "External Member No."; Code[20])
         {
             Caption = 'External Member No.';
+            DataClassification = CustomerContent;
+        }
+        field(105; "Customer No."; Code[20])
+        {
+            Caption = 'Customer No.';
+            DataClassification = CustomerContent;
+        }
+        field(106; "Contact No."; Code[20])
+        {
+            Caption = 'Contact No.';
             DataClassification = CustomerContent;
         }
         field(101; "External Membership No."; Code[20])
@@ -204,6 +221,18 @@ table 6060139 "NPR MM Member Notific. Entry"
             Caption = 'Membership Description';
             DataClassification = CustomerContent;
         }
+        field(157; "Membership Consecutive From"; Date)
+        {
+            Caption = 'Membership Consecutive From';
+            DataClassification = CustomerContent;
+        }
+        field(158; "Membership Consecutive Until"; Date)
+        {
+
+            Caption = 'Membership Consecutive Until';
+            DataClassification = CustomerContent;
+        }
+
         field(160; "External Member Card No."; Text[50])
         {
             Caption = 'External Member Card No.';
