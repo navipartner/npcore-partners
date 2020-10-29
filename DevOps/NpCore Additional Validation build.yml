@@ -27,7 +27,6 @@ variables:
   serverInstanceName: BC
   containerAdminUsername: admin
   containerAdminPassword: P@ssword1
-  artifactURL: https://bcartifacts.azureedge.net/onprem/16.3.14085.14238/w1
 
 jobs:
 - template: YAML/Templates/Job/CreateBCContainer.yml@scriptsRepo
@@ -35,7 +34,7 @@ jobs:
     jobName: First_build  
     timeoutInMinutes: 180
     containerImageName: mcr.microsoft.com/dynamicsnav:10.0.17763.1397-generic
-    artifactURL: $(artifactURL)
+    pipelineConfig: '$(Build.SourcesDirectory)/$(Build.Repository.Name)/DevOps/PipelineConfig.json'
     containerName: $(containerName)
     serverInstanceName: $(serverInstanceName)
     containerAdminUsername: $(containerAdminUsername) 
@@ -49,6 +48,7 @@ jobs:
         containerAdminUsername: $(containerAdminUsername)
         containerAdminPassword: $(containerAdminPassword)
         serverInstanceName: $(serverInstanceName)
+        alProjectRoot: $(Build.SourcesDirectory)/$(Build.Repository.Name)
         dependancies:
         - package:
             source: 'https://api.nuget.org/v3/index.json;https://pkgs.dev.azure.com/navipartner/_packaging/NprAddIns/nuget/v3/index.json'
@@ -106,13 +106,14 @@ jobs:
     jobDisplayName: Build AL app - Insider Build  
     timeoutInMinutes: 180
     containerImageName: mcr.microsoft.com/dynamicsnav:10.0.17763.1397-generic
-    artifactURL: https://bcinsider.azureedge.net/sandbox/17.0.15821.0/w1?sv=2019-12-12&ss=b&srt=sco&st=2020-09-15T00%3A00%3A00Z&se=2021-04-01T00%3A00%3A00Z&sp=rl&spr=https&sig=9PznJJRE47DoKjlG44Av6ZKtG4MRfh3N6gyFT7RNWSQ%3D
+    pipelineConfig: '$(Build.SourcesDirectory)/$(Build.Repository.Name)/DevOps/PipelineConfig-insider.json'
     containerName: Build-$(Build.BuildId)-2
     serverInstanceName: $(serverInstanceName)
     containerAdminUsername: $(containerAdminUsername) 
     containerAdminPassword: $(containerAdminPassword)
     licenseSecureFileName: 'DEV_BC OP 16.flf'
     scriptsRepo: ScriptsRepo
+    alProjectRoot: $(Build.SourcesDirectory)/$(Build.Repository.Name)
     stepList:
     - template: YAML/Templates/Step/BuildALApp.yml@scriptsRepo
       parameters:
