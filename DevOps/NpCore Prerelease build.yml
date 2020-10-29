@@ -29,14 +29,13 @@ variables:
   serverInstanceName: BC
   containerAdminUsername: admin
   containerAdminPassword: P@ssword1
-  artifactURL: https://bcartifacts.azureedge.net/onprem/16.3.14085.14238/w1
 
 jobs:
 - template: YAML/Templates/Job/CreateBCContainer.yml@scriptsRepo
   parameters:
     timeoutInMinutes: 180
     containerImageName: mcr.microsoft.com/dynamicsnav:10.0.17763.1397-generic
-    artifactURL: $(artifactURL)
+    pipelineConfig: '$(Build.SourcesDirectory)/$(Build.Repository.Name)/DevOps/PipelineConfig.json'
     containerName: $(containerName)
     serverInstanceName: $(serverInstanceName)
     containerAdminUsername: $(containerAdminUsername) 
@@ -50,6 +49,7 @@ jobs:
         containerAdminUsername: $(containerAdminUsername)
         containerAdminPassword: $(containerAdminPassword)
         serverInstanceName: $(serverInstanceName)
+        alProjectRoot: $(Build.SourcesDirectory)/$(Build.Repository.Name)
         translationsTargetRepoName: NpCore-Translations
         translationsRepo: translations
         dependancies:
