@@ -67,13 +67,13 @@ jobs:
         packageId: $(packageId).Base_Application.it #Country
       feed: $(feed)
 
-    - name: na #Country
-      url: $(url)/na #Country
-      appPackages:
-      - sourcePath: \Applications\BaseApp\Source\Base Application.Source.zip
-        appPath: \Applications\BaseApp\Source\Microsoft_Base Application.app
-        packageId: $(packageId).Base_Application.na #Country
-      feed: $(feed)
+    # - name: na #Country
+    #   url: $(url)/na #Country
+    #   appPackages:
+    #   - sourcePath: \Applications\BaseApp\Source\Base Application.Source.zip
+    #     appPath: \Applications\BaseApp\Source\Microsoft_Base Application.app
+    #     packageId: $(packageId).Base_Application.na #Country
+    #   feed: $(feed)
 
     - name: nl #Country
       url: $(url)/nl #Country
