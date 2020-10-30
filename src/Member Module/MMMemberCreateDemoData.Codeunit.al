@@ -88,6 +88,11 @@ codeunit 6014439 "NPR MM Member Create Demo Data"
 
 
         //****** Setting member tickets and guests //
+        CreateNoSerie('TM-ATF001', 'TMATF0000001');
+        CreateNoSerie('NPR-TICKET', 'NPR0000001');
+        CreateNoSerie('TM-PK10', 'TM-PK10000');
+        CreateNoSerie('TM-PK20', 'TM-PK2000000000');
+
         with Admission do begin
             TicketDemo.CreateAdmissionCode('MM-CASTLE', 'The Castle', Type::LOCATION, "Capacity Limits By"::OVERRIDE, "Default Schedule"::TODAY);
         end;
@@ -849,17 +854,12 @@ codeunit 6014439 "NPR MM Member Create Demo Data"
 
     local procedure GenerateCode10(): Code[20]
     begin
-        exit(GetNextNoFromSeries('C1'));
+        exit(GetNextNoFromSeries('C10'));
     end;
 
     local procedure GenerateCode20(): Code[20]
     begin
-        exit(GetNextNoFromSeries('C2'));
-    end;
-
-    local procedure GetNextNo(): Code[20]
-    begin
-        exit(GetNextNoFromSeries('TM'));
+        exit(GetNextNoFromSeries('C20'));
     end;
 
     local procedure GetNextNoFromSeries(FromSeries: Code[2]): Code[20]
