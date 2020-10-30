@@ -1046,10 +1046,12 @@ xmlport 6151402 "NPR Magento Document Export"
     local procedure InitLineTypeDict()
     var
         LineType: Text;
+        IndexOfOrdinal: Integer;
         Ordinal: Integer;
     begin
         foreach Ordinal in Enum::"Sales Line Type".Ordinals() do begin
-            Enum::"Sales Line Type".Names().Get(Ordinal, LineType);
+            IndexOfOrdinal := Enum::"Sales Line Type".Ordinals().IndexOf(Ordinal);
+            Enum::"Sales Line Type".Names().Get(IndexOfOrdinal, LineType);
             LineTypeDict.Add(Ordinal, LineType);
         end;
     end;
@@ -1164,4 +1166,3 @@ xmlport 6151402 "NPR Magento Document Export"
         end;
     end;
 }
-
