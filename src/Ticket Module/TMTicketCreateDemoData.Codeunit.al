@@ -172,7 +172,7 @@ codeunit 6151134 "NPR TM Ticket Create Demo Data"
             CreateTicketBOM('31003', '', AdmissionList[1], '', 1, TRUE, '', 0, "Activation Method"::SCAN, "Admission Entry Validation"::SINGLE);
             CreateTicketBOM('31004', '', AdmissionList[1], '', 1, TRUE, '', 0, "Activation Method"::SCAN, "Admission Entry Validation"::SINGLE);
 
-            CreateTicketBOM('31006', '', AdmissionList[1], SeasonBaseCalendar, 1, TRUE, 'CY', 4, "Activation Method"::SCAN, "Admission Entry Validation"::MULTIPLE);
+            CreateTicketBOM('31006', '', AdmissionList[1], SeasonBaseCalendar, 1, TRUE, '<CY>', 4, "Activation Method"::SCAN, "Admission Entry Validation"::MULTIPLE);
 
             CreateTicketBOM('31008', '', AdmissionList[1], '', 4, TRUE, '', 0, "Activation Method"::SCAN, "Admission Entry Validation"::SINGLE);
 
