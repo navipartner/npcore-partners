@@ -38,7 +38,7 @@ jobs:
     serverInstanceName: $(serverInstanceName)
     containerAdminUsername: $(containerAdminUsername) 
     containerAdminPassword: $(containerAdminPassword)
-    licenseSecureFileName: 'DEV_BC OP 16.flf'
+    licenseSecureFileName: 'DEV_BC OP 17.flf'
     scriptsRepo: ScriptsRepo
     stepList:
     - template: YAML/Templates/Step/BuildALApp.yml@scriptsRepo
