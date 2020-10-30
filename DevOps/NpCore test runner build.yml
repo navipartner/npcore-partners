@@ -5,7 +5,7 @@ schedules:
     displayName: Daily after-midnight test runner build
     branches:
       include:
-      - masters/NPR_BC16_W1
+      - masters/NPR_BC17_W1
     
 resources:
   repositories:
