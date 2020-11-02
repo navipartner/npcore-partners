@@ -113,7 +113,6 @@ jobs:
     containerAdminPassword: $(containerAdminPassword)
     licenseSecureFileName: 'DEV_BC OP 17.flf'
     scriptsRepo: ScriptsRepo
-    alProjectRoot: $(Build.SourcesDirectory)/$(Build.Repository.Name)
     stepList:
     - template: YAML/Templates/Step/BuildALApp.yml@scriptsRepo
       parameters:
@@ -121,6 +120,7 @@ jobs:
         containerAdminUsername: $(containerAdminUsername)
         containerAdminPassword: $(containerAdminPassword)
         serverInstanceName: $(serverInstanceName)
+        alProjectRoot: $(Build.SourcesDirectory)/$(Build.Repository.Name)
         dependancies:
         - package:
             source: 'https://api.nuget.org/v3/index.json;https://pkgs.dev.azure.com/navipartner/_packaging/NprAddIns/nuget/v3/index.json'
