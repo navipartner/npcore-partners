@@ -1,31 +1,5 @@
 table 6014402 "NPR Payment Type POS"
 {
-    // NPR4.10/JDH/20150609 CASE 215893 Added Location code so its possible to set up payments per location
-    // NPR4.13/BHR/20150714 CASE 213254 Changed Name of Fee % to Fee Pct. and Cost % to Cost Pct.
-    // NPR4.14/TS/20150828  CASE 221699 Deleted FieldNo 50002 (Stoooop field)
-    // NPR4.16/TS/20150828  CASE 222088 Changed LineNo form 1 to 10000
-    // MbP1.80/AP/20151110  CASE 226725 MobilePay
-    // NPR5.25/TTH/20160718 CASE 238859 Added fields for Swipp Payment processing
-    // NPR5.26/TJ/20160826 CASE 248264 Removing unused variables and fields, renaming fields and variables to use standard naming procedures
-    // NPR5.30/TJ/20170213 CASE 264909 Removed Swipp fields
-    // NPR5.30/TJ  /20170215 CASE 265504 Changed ENU captions on fields with word Register in their name
-    // NPR5.31/JLK /20170331 CASE 268274 Changed ENU Caption
-    // NPR5.38/MMV /20171123 CASE 296642 Added field "Rounding Direction"
-    // NPR5.38/TJ  /20171218 CASE 225415 Renumbered fields from range 50xxx to range below 50000
-    // NPR5.39/JC  /20180122 CASE 303086 Increased field Receipt filter size from 10 to 20
-    // NPR5.39/TJ  /20180208 CASE 302634 Removed local variables from Global Dimension 1 Code - OnLookup as they are not used
-    // NPR5.42/JC  /20180515 CASE 315194 Fix issue with getting register no. for Payment Type POS. Added function GetByRegister
-    // NPR5.46/MMV /20180925 CASE 290734 Renamed Processing Type "Cash Terminal" to "EFT"
-    // NPR5.46/BHR /20180824 CASE 322752 Replace record Object to Allobj field 329
-    // NPR5.47/TS  /20181022 CASE 309123 Deactivated Key 5  and removed unused fields
-    // NPR5.48/TS  /20181128 CASE 337806 Decreased Length of Location Code to 10
-    // NPR5.50/TSA /20190530 CASE 354832 Added field 100 - "Reverse Unrealized VAT"
-    // NPR5.51/TJ  /20190628 CASE 357069 Added field 110 "Open Drawer"
-    // NPR5.52/BHR /20190925 CASE 369605 Delete Null Key
-    // NPR5.52/MHA /20191016 CASE 373294 Added field 120 "Allow Cashback"
-    // NPR5.53/MHA /20191202 CASE 373294 Renamed field 120 to "Allow Refund"
-    // NPR5.54/MMV /20200224 CASE 364340 Added surcharge & tip fields
-    // NPR5.55/ALPO/20200623 CASE 410991 Zero as default payment amount on popup window for specific payment types
 
     Caption = 'Payment Type';
     DataClassification = CustomerContent;
@@ -60,44 +34,9 @@ table 6014402 "NPR Payment Type POS"
             trigger OnValidate()
             begin
                 TestField("Via Terminal", false);
-                /*
-                Betaling.SETCURRENTKEY(Kassenummer,Behandlingsart);
-                //Betaling.SETRANGE(Kassenummer,Betaling.Kassenummer);
-                IF xRec.Behandlingsart = Behandlingsart THEN
-                  EXIT;
-                IF (Behandlingsart = Behandlingsart::Kontant)
-                   OR (Behandlingsart = Behandlingsart::Tilgodebevis)
-                   OR (Behandlingsart = Behandlingsart::Gavekort)
-                   OR (Behandlingsart = Behandlingsart::Terminal) THEN BEGIN
-                  Betaling.SETRANGE(Behandlingsart,Behandlingsart);
-                  IF Betaling.COUNT = 1 THEN
-                    ERROR(Trans0001,Behandlingsart);
-                  Betaling.SETRANGE(Behandlingsart);
-                END;
-                             //-væk
-                IF (Behandlingsart = Behandlingsart::Kontant) OR (xRec.Behandlingsart = Behandlingsart::Kontant)
-                OR (Behandlingsart = Behandlingsart::Gavekort) OR (xRec.Behandlingsart = Behandlingsart::Gavekort)
-                OR (Behandlingsart = Behandlingsart::Tilgodebevis) OR (xRec.Behandlingsart = Behandlingsart::Tilgodebevis) THEN BEGIN
-                  IF Opsætning.GET THEN IF Opsætning."Kassestyret betalingsvalg" THEN
-                    Kasse.SETRANGE(Kassenummer,Betaling.Kassenummer);
-                  IF Kasse.FIND('-') THEN
-                    REPEAT
-                      CASE Behandlingsart OF
-                        Behandlingsart::Kontant      : Kasse.Kassekonto := Finanskonto;
-                        Behandlingsart::Gavekort     : Kasse.Kassekonto := Kasse.Gavekortskonto;  //Mark
-                        Behandlingsart::Tilgodebevis : Kasse.Kassekonto := Kasse.Tilgodebeviskonto;
-                      END;
-                      CASE xRec.Behandlingsart OF
-                        Behandlingsart::Kontant      : Kasse.Kassekonto := '';
-                        Behandlingsart::Gavekort     : Kasse.Kassekonto := '';
-                        Behandlingsart::Tilgodebevis : Kasse.Kassekonto := '';
-                      END;
-                      Kasse.MODIFY;
-                    UNTIL Kasse.NEXT = 0;
-                END;
-                                  //+væk
-                */
 
+                if (Rec."Processing Type" in [Rec."Processing Type"::"Foreign Credit Voucher", Rec."Processing Type"::"Foreign Currency", Rec."Processing Type"::"Foreign Gift Voucher"]) then
+                    Rec.TestField("Fixed Rate");
             end;
         }
         field(4; "G/L Account No."; Code[20])
@@ -108,11 +47,11 @@ table 6014402 "NPR Payment Type POS"
 
             trigger OnValidate()
             begin
-                if RetailSetup.Get then
-                    if RetailSetup."Payment Type By Register" then
+                if (RetailSetup.Get) then
+                    if (RetailSetup."Payment Type By Register") then
                         Register.SetRange("Register No.", PaymentTypePOS."Register No.");
 
-                if Register.Find('-') then begin
+                if (Register.Find('-')) then begin
                     repeat
                         case "Processing Type" of
                             "Processing Type"::Cash:
@@ -122,13 +61,11 @@ table 6014402 "NPR Payment Type POS"
                             "Processing Type"::"Credit Voucher":
                                 Register."Credit Voucher Account" := "G/L Account No.";
                         end;
-                        Register.Modify;
+                        Register.Modify();
                     until Register.Next = 0;
                 end;
-                if GLAccount.Get("G/L Account No.") then;
+                if (GLAccount.Get("G/L Account No.")) then;
                 GLAccount.TestField(Blocked, false);
-                // >> NPK (FM)
-                // Finanskontorec.TESTFIELD("Direct Posting",TRUE);
             end;
         }
         field(5; Status; Option)
@@ -142,10 +79,10 @@ table 6014402 "NPR Payment Type POS"
             var
                 Trans0001: Label 'You cannot change status, since there exists one or more non-posted audit rolls';
             begin
-                if Status = Status::Active then begin
-                    if "Account Type" = "Account Type"::"G/L Account" then
+                if (Status = Status::Active) then begin
+                    if ("Account Type" = "Account Type"::"G/L Account") then
                         TestField("G/L Account No.");
-                    if "Account Type" = "Account Type"::Customer then
+                    if ("Account Type" = "Account Type"::Customer) then
                         TestField("Customer No.");
                 end;
                 if (xRec.Status = xRec.Status::Active) and not (Status = Status::Active) then begin
@@ -154,7 +91,7 @@ table 6014402 "NPR Payment Type POS"
                     AuditRoll.SetRange(Type, AuditRoll.Type::"Debit Sale");
                     AuditRoll.SetRange(Posted, false);
                     AuditRoll.SetRange("No.", xRec."No.");
-                    if AuditRoll.Find('-') then
+                    if (AuditRoll.Find('-')) then
                         Error(Trans0001);
                 end;
             end;
@@ -212,7 +149,7 @@ table 6014402 "NPR Payment Type POS"
                 Trans0003: Label 'Credit note payments cannot be run via terminal';
                 Trans0004: Label 'Terminal is the link to via terminal, and cannot run via itself';
             begin
-                if "Via Terminal" then begin
+                if ("Via Terminal") then begin
                     case "Processing Type" of
                         "Processing Type"::Cash:
                             Error(Trans0001);
@@ -223,9 +160,9 @@ table 6014402 "NPR Payment Type POS"
                     end;
                 end;
 
-                if not "Via Terminal" then begin
+                if (not "Via Terminal") then begin
                     PaymentTypePrefix.SetRange("Payment Type", "No.");
-                    if PaymentTypePrefix.Find('-') then
+                    if (PaymentTypePrefix.Find('-')) then
                         Message(MsgPrefix);
                 end;
             end;
@@ -237,7 +174,7 @@ table 6014402 "NPR Payment Type POS"
         }
         field(27; "Amount in Audit Roll"; Decimal)
         {
-            CalcFormula = Sum ("NPR Audit Roll"."Amount Including VAT" WHERE("Register No." = FIELD("Register Filter"),
+            CalcFormula = Sum("NPR Audit Roll"."Amount Including VAT" WHERE("Register No." = FIELD("Register Filter"),
                                                                          "Sales Ticket No." = FIELD("Receipt Filter"),
                                                                          "Sale Date" = FIELD("Date Filter"),
                                                                          "Sale Type" = CONST(Payment),
@@ -261,10 +198,10 @@ table 6014402 "NPR Payment Type POS"
                 ErrNoCurrencyCode: Label 'Currency code for customer %1 must be blank';
                 ErrNoCustomerNo: Label 'Debtorcode cannot be empty';
             begin
-                if "Customer No." = '' then
+                if ("Customer No." = '') then
                     Error(ErrNoCustomerNo);
                 Customer.Get("Customer No.");
-                if Customer."Currency Code" <> '' then
+                if (Customer."Currency Code" <> '') then
                     Error(ErrNoCurrencyCode, "Customer No.");
             end;
         }
@@ -282,14 +219,14 @@ table 6014402 "NPR Payment Type POS"
                 ErrCustomer: Label 'A deptor must be chosen for this accounttype';
                 CustomerList: Page "Customer List";
             begin
-                RetailSetup.Get;
-                if "Account Type" = "Account Type"::Customer then begin
-                    if not RetailSetup."Post Payouts imme." then
+                RetailSetup.Get();
+                if ("Account Type" = "Account Type"::Customer) then begin
+                    if (not RetailSetup."Post Payouts imme.") then
                         Error(ErrNotAllowed);
 
                     Clear(CustomerList);
                     CustomerList.LookupMode(true);
-                    if CustomerList.RunModal <> ACTION::LookupOK then
+                    if (CustomerList.RunModal <> ACTION::LookupOK) then
                         Error(ErrCustomer);
 
                     CustomerList.GetRecord(Cust);
@@ -330,7 +267,7 @@ table 6014402 "NPR Payment Type POS"
         }
         field(37; "No. of Sales in Audit Roll"; Integer)
         {
-            CalcFormula = Count ("NPR Audit Roll" WHERE("Register No." = FIELD("Register Filter"),
+            CalcFormula = Count("NPR Audit Roll" WHERE("Register No." = FIELD("Register Filter"),
                                                     "Sales Ticket No." = FIELD("Receipt Filter"),
                                                     Type = CONST(Item),
                                                     "Sale Type" = CONST(Sale),
@@ -346,7 +283,7 @@ table 6014402 "NPR Payment Type POS"
         }
         field(38; "Normal Sale in Audit Roll"; Decimal)
         {
-            CalcFormula = Sum ("NPR Audit Roll"."Amount Including VAT" WHERE("Sale Date" = FIELD("Date Filter"),
+            CalcFormula = Sum("NPR Audit Roll"."Amount Including VAT" WHERE("Sale Date" = FIELD("Date Filter"),
                                                                          "Register No." = FIELD("Register Filter"),
                                                                          "Sale Type" = CONST(Sale),
                                                                          Type = CONST(Item),
@@ -361,7 +298,7 @@ table 6014402 "NPR Payment Type POS"
         }
         field(39; "Debit Sale in Audit Roll"; Decimal)
         {
-            CalcFormula = Sum ("NPR Audit Roll"."Amount Including VAT" WHERE("Sale Date" = FIELD("Date Filter"),
+            CalcFormula = Sum("NPR Audit Roll"."Amount Including VAT" WHERE("Sale Date" = FIELD("Date Filter"),
                                                                          "Register No." = FIELD("Register Filter"),
                                                                          "Sale Type" = CONST("Debit Sale"),
                                                                          Type = CONST(Item),
@@ -377,7 +314,7 @@ table 6014402 "NPR Payment Type POS"
         }
         field(40; "No. of Items in Audit Roll"; Decimal)
         {
-            CalcFormula = Sum ("NPR Audit Roll".Quantity WHERE("Register No." = FIELD("Register Filter"),
+            CalcFormula = Sum("NPR Audit Roll".Quantity WHERE("Register No." = FIELD("Register Filter"),
                                                            "Sales Ticket No." = FIELD("Receipt Filter"),
                                                            "Sale Date" = FIELD("Date Filter"),
                                                            Type = CONST(Item),
@@ -391,7 +328,7 @@ table 6014402 "NPR Payment Type POS"
         }
         field(41; "Cost Amount in Audit Roll"; Decimal)
         {
-            CalcFormula = Sum ("NPR Audit Roll".Cost WHERE("Register No." = FIELD("Register Filter"),
+            CalcFormula = Sum("NPR Audit Roll".Cost WHERE("Register No." = FIELD("Register Filter"),
                                                        "Sales Ticket No." = FIELD("Receipt Filter"),
                                                        "Sale Date" = FIELD("Date Filter"),
                                                        Type = CONST(Item),
@@ -406,7 +343,7 @@ table 6014402 "NPR Payment Type POS"
         }
         field(42; "No. of Sale Lines in Aud. Roll"; Integer)
         {
-            CalcFormula = Count ("NPR Audit Roll" WHERE("Register No." = FIELD("Register Filter"),
+            CalcFormula = Count("NPR Audit Roll" WHERE("Register No." = FIELD("Register Filter"),
                                                     "Sales Ticket No." = FIELD("Receipt Filter"),
                                                     "Sale Date" = FIELD("Date Filter"),
                                                     Type = FILTER(<> Cancelled & <> "Open/Close"),
@@ -426,7 +363,7 @@ table 6014402 "NPR Payment Type POS"
         }
         field(44; "No. of Items in Audit Debit"; Decimal)
         {
-            CalcFormula = Sum ("NPR Audit Roll".Quantity WHERE("Register No." = FIELD("Register Filter"),
+            CalcFormula = Sum("NPR Audit Roll".Quantity WHERE("Register No." = FIELD("Register Filter"),
                                                            "Sales Ticket No." = FIELD("Receipt Filter"),
                                                            "Sale Date" = FIELD("Date Filter"),
                                                            Type = CONST("Debit Sale"),
@@ -441,7 +378,7 @@ table 6014402 "NPR Payment Type POS"
         }
         field(45; "No. of Item Lines in Aud. Deb."; Integer)
         {
-            CalcFormula = Count ("NPR Audit Roll" WHERE("Register No." = FIELD("Register Filter"),
+            CalcFormula = Count("NPR Audit Roll" WHERE("Register No." = FIELD("Register Filter"),
                                                     "Sales Ticket No." = FIELD("Receipt Filter"),
                                                     Type = CONST("Debit Sale"),
                                                     "No." = FILTER(<> ''),
@@ -457,7 +394,7 @@ table 6014402 "NPR Payment Type POS"
         }
         field(46; "No. of Deb. Sales in Aud. Roll"; Integer)
         {
-            CalcFormula = Count ("NPR Audit Roll" WHERE("Register No." = FIELD("Register Filter"),
+            CalcFormula = Count("NPR Audit Roll" WHERE("Register No." = FIELD("Register Filter"),
                                                     "Sales Ticket No." = FIELD("Receipt Filter"),
                                                     "Sale Type" = CONST("Debit Sale"),
                                                     "Line No." = CONST(10000),
@@ -491,7 +428,7 @@ table 6014402 "NPR Payment Type POS"
 
             trigger OnValidate()
             begin
-                if "Fee G/L Acc. No." = '' then begin
+                if ("Fee G/L Acc. No." = '') then begin
                     "Fee Pct." := 0;
                     "Fixed Fee" := 0;
                     "Maximum Amount" := 0;
@@ -521,7 +458,7 @@ table 6014402 "NPR Payment Type POS"
         }
         field(53; "Norm. Sales in Audit Excl. VAT"; Decimal)
         {
-            CalcFormula = Sum ("NPR Audit Roll".Amount WHERE("Sale Date" = FIELD("Date Filter"),
+            CalcFormula = Sum("NPR Audit Roll".Amount WHERE("Sale Date" = FIELD("Date Filter"),
                                                          "Register No." = FIELD("Register Filter"),
                                                          "Sale Type" = CONST(Sale),
                                                          Type = CONST(Item),
@@ -547,7 +484,7 @@ table 6014402 "NPR Payment Type POS"
         }
         field(56; "Debit Cost Amount Audit Roll"; Decimal)
         {
-            CalcFormula = Sum ("NPR Audit Roll".Cost WHERE("Sale Date" = FIELD("Date Filter"),
+            CalcFormula = Sum("NPR Audit Roll".Cost WHERE("Sale Date" = FIELD("Date Filter"),
                                                        "Register No." = FIELD("Register Filter"),
                                                        "Sale Type" = CONST("Debit Sale"),
                                                        Type = CONST(Item),
@@ -563,7 +500,7 @@ table 6014402 "NPR Payment Type POS"
         }
         field(57; "Debit Sales in Audit Excl. VAT"; Decimal)
         {
-            CalcFormula = Sum ("NPR Audit Roll".Amount WHERE("Sale Date" = FIELD("Date Filter"),
+            CalcFormula = Sum("NPR Audit Roll".Amount WHERE("Sale Date" = FIELD("Date Filter"),
                                                          "Register No." = FIELD("Register Filter"),
                                                          "Sale Type" = CONST("Debit Sale"),
                                                          Type = CONST(Item),
@@ -641,7 +578,7 @@ table 6014402 "NPR Payment Type POS"
         }
         field(71; "Balancing Total"; Decimal)
         {
-            CalcFormula = Sum ("NPR Payment Type - Detailed".Amount WHERE("Payment No." = FIELD("No."),
+            CalcFormula = Sum("NPR Payment Type - Detailed".Amount WHERE("Payment No." = FIELD("No."),
                                                                       "Register No." = FIELD("Register Filter")));
             Caption = 'Counted';
             Editable = false;
@@ -904,7 +841,7 @@ table 6014402 "NPR Payment Type POS"
         AuditRoll.SetRange(Type, AuditRoll.Type::Payment);
         AuditRoll.SetRange(Posted, false);
         AuditRoll.SetRange("No.", xRec."No.");
-        if AuditRoll.Find('-') then
+        if (AuditRoll.Find('-')) then
             Error(Trans0001, "No.");
 
         PaymentTypePrefix.SetRange("Payment Type", "No.");
@@ -935,13 +872,13 @@ table 6014402 "NPR Payment Type POS"
     var
         ErrorNo1: Label 'All sales tickets in the audit roll concerning this payment type must be posted to rename payment type.';
     begin
-        AuditRoll.Reset;
+        AuditRoll.Reset();
         AuditRoll.SetCurrentKey("Sale Type", Type, "No.", Posted);
         AuditRoll.SetRange("Sale Type", AuditRoll."Sale Type"::Payment);
         AuditRoll.SetRange(Type, AuditRoll.Type::Payment);
         AuditRoll.SetRange(Posted, false);
         AuditRoll.SetRange("No.", xRec."No.");
-        if AuditRoll.Find('-') then
+        if (AuditRoll.Find('-')) then
             Error(ErrorNo1);
     end;
 
@@ -953,29 +890,27 @@ table 6014402 "NPR Payment Type POS"
         AuditRoll: Record "NPR Audit Roll";
         Customer: Record Customer;
         DimMgt: Codeunit DimensionManagement;
-        "//-SyncProfiles": Integer;
         CompanySyncMgt: Codeunit "NPR CompanySyncManagement";
         RecRef: RecordRef;
-        "//+SyncProfiles": Integer;
 
     procedure ValidateShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
     begin
         DimMgt.ValidateDimValueCode(FieldNumber, ShortcutDimCode);
         DimMgt.SaveDefaultDim(DATABASE::Customer, "No.", FieldNumber, ShortcutDimCode);
-        Modify;
+        Modify();
     end;
 
     procedure GetByRegister(PaymentCodeNo: Code[10]; RegisterNo: Code[10])
     begin
-        //-NPR5.42 [315194]
-        RetailSetup.Get;
 
-        if RetailSetup."Payment Type By Register" then begin
-            if not Get(PaymentCodeNo, RegisterNo) then
+        RetailSetup.Get();
+
+        if (RetailSetup."Payment Type By Register") then begin
+            if (not Get(PaymentCodeNo, RegisterNo)) then
                 Get(PaymentCodeNo, '');
         end else
             Get(PaymentCodeNo, '');
-        //+NPR5.42
+
     end;
 }
 
