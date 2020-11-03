@@ -1,13 +1,5 @@
 page 6151577 "NPR Event Copy"
 {
-    // NPR5.32/TJ  /20170523 CASE 275974 Object was created as a copy of page 1040
-    // NPR5.32/TJ  /20170523 CASE 275963 Set Visible property to FALSE on all controls in "Copy from" tab except SourceJobNo control
-    //                                   Added new controls under "Copy to" tab: "Starting Date", "Ending Date"
-    //                                   Added code to OnQueryClosePage
-    // NPR5.34/TJ  /20170724 CASE 281187 Added code to OnOpenPage
-    // NPR5.38/TJ  /20171110 CASE 296166 Added code to OnQueryClosePage
-    // NPR5.40/TJ  /20170124 CASE 301375 Keeping original value of Event Status/Status field from SourceJob
-
     Caption = 'Copy Job';
     PageType = StandardDialog;
     UsageCategory = Administration;
@@ -24,6 +16,7 @@ page 6151577 "NPR Event Copy"
                     ApplicationArea = All;
                     Caption = 'Job No.';
                     TableRelation = Job;
+                    ToolTip = 'Specifies the event number.';
 
                     trigger OnValidate()
                     begin
@@ -41,6 +34,7 @@ page 6151577 "NPR Event Copy"
                     ApplicationArea = All;
                     Caption = 'Job Task No. from';
                     Visible = false;
+                    ToolTip = 'Specifies the first event task number to be copied from. Only planning lines with an event task number equal to or higher than the number specified in this field will be included.';
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -66,6 +60,7 @@ page 6151577 "NPR Event Copy"
                     ApplicationArea = All;
                     Caption = 'Job Task No. to';
                     Visible = false;
+                    ToolTip = 'Specifies the last event task number to be copied from. Only planning lines with an event task number equal to or lower than the number specified in this field will be included.';
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -92,6 +87,7 @@ page 6151577 "NPR Event Copy"
                     Caption = 'Source';
                     OptionCaption = 'Job Planning Lines,Job Ledger Entries,None';
                     Visible = false;
+                    ToolTip = 'Specifies the basis on which you want the planning lines to be copied. If, for example, you want the planning lines to reflect actual usage and invoicing of items, resources, and general ledger expenses on the event you copy from, then select Job Ledger Entries in this field.';
 
                     trigger OnValidate()
                     begin
@@ -105,6 +101,7 @@ page 6151577 "NPR Event Copy"
                     Enabled = PlanningLineTypeEnable;
                     OptionCaption = 'Schedule+Contract,Schedule,Contract';
                     Visible = false;
+                    ToolTip = 'Specifies how copy planning lines. Budget+Billable: All planning lines are copied. Budget: Only lines of type Budget or type Both Budget and Billable are copied. Billable: Only lines of type Billable or type Both Budget and Billable are copied.';
                 }
                 field("Ledger Entry Line Type"; LedgerEntryType)
                 {
@@ -113,18 +110,21 @@ page 6151577 "NPR Event Copy"
                     Enabled = LedgerEntryLineTypeEnable;
                     OptionCaption = 'Usage+Sale,Usage,Sale';
                     Visible = false;
+                    ToolTip = 'Specifies how to copy job ledger entries. Usage+Sale: All job ledger entries are copied. Entries of type Usage are copied to new planning lines of type Budget. Entries of type Sale are copied to new planning lines of type Billable. Usage: All job ledger entries of type Usage are copied to new planning lines of type Budget. Sale: All job ledger entries of type Sale are copied to new planning lines of type Billable.';
                 }
                 field(FromDate; FromDate)
                 {
                     ApplicationArea = All;
                     Caption = 'Starting Date';
                     Visible = false;
+                    ToolTip = 'Specifies the date from which the report or batch job processes information.';
                 }
                 field(ToDate; ToDate)
                 {
                     ApplicationArea = All;
                     Caption = 'Ending Date';
                     Visible = false;
+                    ToolTip = 'Specifies the date to which the report or batch job processes information.';
                 }
             }
             group("Copy to")
@@ -134,22 +134,27 @@ page 6151577 "NPR Event Copy"
                 {
                     ApplicationArea = All;
                     Caption = 'Job No.';
+                    Editable = not Recurring;
+                    ToolTip = 'Specifies the event number.';
                 }
                 field(TargetJobDescription; TargetJobDescription)
                 {
                     ApplicationArea = All;
                     Caption = 'Job Description';
+                    ToolTip = 'Specifies a description of the event.';
                 }
                 field(TargetBillToCustomerNo; TargetBillToCustomerNo)
                 {
                     ApplicationArea = All;
                     Caption = 'Bill-To Customer No.';
                     TableRelation = Customer;
+                    ToolTip = 'Specifies the number of an alternate customer that the event is billed to instead of the main customer.';
                 }
                 field(NewStartingDate; NewStartingDate)
                 {
                     ApplicationArea = All;
                     Caption = 'Starting Date';
+                    ToolTip = 'Specifies a date from which the event will start.';
 
                     trigger OnValidate()
                     begin
@@ -160,11 +165,34 @@ page 6151577 "NPR Event Copy"
                 {
                     ApplicationArea = All;
                     Caption = 'Ending Date';
+                    ToolTip = 'Specifies a date at which the event will end.';
 
                     trigger OnValidate()
                     begin
                         CheckDate;
                     end;
+                }
+                field(Recurring; Recurring)
+                {
+                    ApplicationArea = All;
+                    Caption = 'Recurring';
+                    ToolTip = 'Specifies if you want to create a recurring event defined by parameters in Recurring Formula and Recurring Until.';
+                    trigger OnValidate()
+                    begin
+                        TargetJobNo := '';
+                    end;
+                }
+                field(RecurrFormula; RecurrFormula)
+                {
+                    ApplicationArea = All;
+                    Caption = 'Recurring Formula';
+                    ToolTip = 'Specifies a formula by which event will occur. For example, every seven days (7D), or every month (1M) and so on.';
+                }
+                field(RecurrUntil; RecurrUntil)
+                {
+                    ApplicationArea = All;
+                    Caption = 'Recurring Until';
+                    ToolTip = 'Specifies the last date until the event is supposed to recurr.';
                 }
             }
             group(Apply)
@@ -174,16 +202,19 @@ page 6151577 "NPR Event Copy"
                 {
                     ApplicationArea = All;
                     Caption = 'Copy Job Prices';
+                    ToolTip = 'Specifies that item prices, resource prices, and G/L prices will be copied from the event that you specified on the Copy From FastTab.';
                 }
                 field(CopyQuantity; CopyQuantity)
                 {
                     ApplicationArea = All;
                     Caption = 'Copy Quantity';
+                    ToolTip = 'Specifies that the quantities will be copied to the new event.';
                 }
                 field(CopyDimensions; CopyDimensions)
                 {
                     ApplicationArea = All;
                     Caption = 'Copy Dimensions';
+                    ToolTip = 'Specifies that the dimensions will be copied to the new event.';
                 }
             }
         }
@@ -198,37 +229,13 @@ page 6151577 "NPR Event Copy"
         PlanningLineType := PlanningLineType::"Schedule+Contract";
         LedgerEntryType := LedgerEntryType::"Usage+Sale";
         ValidateSource;
-        //-NPR5.34 [281187]
         CopyDimensions := true;
-        //+NPR5.34 [281187]
     end;
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
     begin
-        if CloseAction in [ACTION::OK, ACTION::LookupOK] then begin
-            ValidateUserInput;
-            CopyJob.SetCopyOptions(CopyJobPrices, CopyQuantity, CopyDimensions, Source, PlanningLineType, LedgerEntryType);
-            CopyJob.SetJobTaskRange(FromJobTaskNo, ToJobTaskNo);
-            CopyJob.SetJobTaskDateRange(FromDate, ToDate);
-            CopyJob.CopyJob(SourceJob, TargetJobNo, TargetJobDescription, TargetBillToCustomerNo);
-            //-NPR5.32 [275963]
-            TargetJob.Get(TargetJobNo);
-            TargetJob."Starting Date" := 0D;
-            TargetJob."Ending Date" := 0D;
-            if NewStartingDate <> 0D then
-                TargetJob.Validate("Starting Date", NewStartingDate);
-            if NewEndingDate <> 0D then
-                TargetJob.Validate("Ending Date", NewEndingDate);
-            //-NPR5.38 [296166]
-            TargetJob."NPR Event Status" := TargetJob.Status;
-            //+NPR5.38 [296166]
-            //-NPR5.40 [301375]
-            TargetJob.Validate("NPR Event Status", SourceJob."NPR Event Status");
-            //+NPR5.40 [301375]
-            TargetJob.Modify;
-            //+NPR5.32 [275963]
-            ConfirmAnswer := Confirm(Text001);
-        end
+        if CloseAction in [ACTION::OK, ACTION::LookupOK] then
+            CopyEvent();
     end;
 
     var
@@ -261,6 +268,12 @@ page 6151577 "NPR Event Copy"
         NewEndingDate: Date;
         Text011: Label '%1 must be equal to or earlier than %2.';
         TargetJob: Record Job;
+        Recurring: Boolean;
+        RecurrFormula: DateFormula;
+        RecurrUntil: Date;
+        EventDuration: Integer;
+        RecurrErr: Label 'For recurring events you need to specify Starting Date and all recurring fields.';
+        RecurrFormulaErr: Label 'You can''t specify negative Recurring Formula.';
 
     local procedure ValidateUserInput()
     var
@@ -269,15 +282,21 @@ page 6151577 "NPR Event Copy"
     begin
         if (SourceJobNo = '') or not SourceJob.Get(SourceJob."No.") then
             Error(Text004, SourceJob.TableCaption);
+        if Recurring then begin
+            if (NewStartingDate = 0D) or (RecurrUntil = 0D) or (Format(RecurrFormula) = '') then
+                Error(RecurrErr);
+            CheckRecurrFormula();
+        end;
 
         JobsSetup.Get;
         JobsSetup.TestField("Job Nos.");
         if TargetJobNo = '' then begin
             TargetJobNo := NoSeriesManagement.GetNextNo(JobsSetup."Job Nos.", 0D, true);
-            if not Confirm(Text002, true, TargetJobNo) then begin
-                TargetJobNo := '';
-                Error('');
-            end;
+            if not Recurring then
+                if not Confirm(Text002, true, TargetJobNo) then begin
+                    TargetJobNo := '';
+                    Error('');
+                end;
         end else
             NoSeriesManagement.TestManual(JobsSetup."Job Nos.");
     end;
@@ -326,6 +345,50 @@ page 6151577 "NPR Event Copy"
     begin
         if (NewStartingDate > NewEndingDate) and (NewEndingDate <> 0D) then
             Error(Text011, SourceJob.FieldCaption("Starting Date"), SourceJob.FieldCaption("Ending Date"));
+        if (NewStartingDate <> 0D) and (NewEndingDate <> 0D) then
+            EventDuration := NewEndingDate - NewStartingDate;
+    end;
+
+    local procedure CheckRecurrFormula()
+    var
+        NewStartDate: Date;
+    begin
+        NewStartDate := CalcDate(RecurrFormula, NewStartingDate);
+        if NewStartDate < NewStartingDate then
+            Error(RecurrFormulaErr);
+    end;
+
+    local procedure CopyEvent()
+    begin
+        repeat
+            ValidateUserInput;
+            CopyJob.SetCopyOptions(CopyJobPrices, CopyQuantity, CopyDimensions, Source, PlanningLineType, LedgerEntryType);
+            CopyJob.SetJobTaskRange(FromJobTaskNo, ToJobTaskNo);
+            CopyJob.SetJobTaskDateRange(FromDate, ToDate);
+            CopyJob.CopyJob(SourceJob, TargetJobNo, TargetJobDescription, TargetBillToCustomerNo);
+            TargetJob.Get(TargetJobNo);
+            TargetJob."Starting Date" := 0D;
+            TargetJob."Ending Date" := 0D;
+            if NewStartingDate <> 0D then
+                TargetJob.Validate("Starting Date", NewStartingDate);
+            if NewEndingDate <> 0D then
+                TargetJob.Validate("Ending Date", NewEndingDate);
+            if Recurring then
+                TargetJob.Validate("NPR Event Status", TargetJob."NPR Event Status"::Planning)
+            else begin
+                TargetJob."NPR Event Status" := TargetJob.Status;
+                TargetJob.Validate("NPR Event Status", SourceJob."NPR Event Status");
+            end;
+            TargetJob.Modify();
+            if Recurring then begin
+                NewStartingDate := CalcDate(RecurrFormula, NewStartingDate);
+                if NewEndingDate <> 0D then
+                    NewEndingDate := NewStartingDate + EventDuration;
+                TargetJobNo := '';
+            end;
+        until NewStartingDate > RecurrUntil;
+        if not Recurring then
+            ConfirmAnswer := Confirm(Text001);
     end;
 }
 
