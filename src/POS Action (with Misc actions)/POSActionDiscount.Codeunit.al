@@ -822,6 +822,8 @@ codeunit 6150792 "NPR POS Action - Discount"
         if (not SaleLinePOS.SetCurrentKey("Orig. POS Sale ID")) then;
 
         SaleLinePOS.SetFilter("Orig. POS Sale ID", '=%1', POSSaleID);
+        SaleLinePOS.SetFilter("Sale Type", '%1|%2', SaleLinePOS."Sale Type"::Sale, SaleLinePOS."Sale Type"::"Debit Sale");
+        SaleLinePOS.SetFilter(Type, '<>%1', SaleLinePOS.type::Comment);
         if (SaleLinePOS.FindSet()) then begin
             repeat
                 SaleLinePOS.UpdateAmounts(SaleLinePOS);
