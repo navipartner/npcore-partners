@@ -13,11 +13,47 @@ variables:
   url: https://bcartifacts.blob.core.windows.net/onprem/17.0.16993.0
   feed: 'https://pkgs.dev.azure.com/navipartner/_packaging/BCSymbols/nuget/v3/index.json'
   packageId: Microsoft.BC.170
+  containerName: Build-$(Build.BuildId)
+  serverInstanceName: BC
+  containerAdminUsername: admin
+  containerAdminPassword: P@ssword1  
 
 jobs:
+- template: YAML/Templates/Job/CreateBCContainer.yml@scriptsRepo
+  parameters:
+    timeoutInMinutes: 180
+    containerImageName: mcr.microsoft.com/dynamicsnav:10.0.17763.1397-generic
+    pipelineConfig: '$(Build.SourcesDirectory)/$(Build.Repository.Name)/DevOps/PipelineConfig.json'
+    containerName: $(containerName)
+    serverInstanceName: $(serverInstanceName)
+    containerAdminUsername: $(containerAdminUsername) 
+    containerAdminPassword: $(containerAdminPassword)
+    licenseSecureFileName: 'DEV_BC OP 17.flf'
+    scriptsRepo: scriptsRepo
+    stepList:
+      - task: PowerShell@2
+        inputs:
+          targetType: inline
+          script: |
+            Import-Module (Join-Path -Path $env:ServiceTierFolder -ChildPath 'Microsoft.Dynamics.Nav.Management.dll') -WarningAction SilentlyContinue
+            $nstInfo = get-navserverinstance -serverInstance $(serverInstanceName)
+            Write-Host "##vso[task.setvariable variable=nstVersion]$($nstInfo.Version)"   
+        displayName: 'Read NST properties'
+
+      - template: YAML/Templates/Step/GenerateAndPublishPackage.yml@scriptsRepo
+        parameters:
+          version: $(nstVersion)
+          description: AddIns for Microsoft Dynamics Business Central
+          authors: navipartner
+          files:
+          - '$(ServiceTierFolder)\Add-ins\**\*.*'
+          publishToSource: 
+            source: 'https://pkgs.dev.azure.com/navipartner/_packaging/NprAddIns/nuget/v3/index.json'
+            id: NaviPartner.NPRetail.AddIns.MS.BC
+
 - template: YAML/Templates/Job/PopulateSymbolFeeds.yml@scriptsRepo
   parameters:
-    scriptsRepo: scriptsRepo    
+    scriptsRepo: scriptsRepo
     symbolPackages:
     - name: au #Country
       url: $(url)/au #Country
