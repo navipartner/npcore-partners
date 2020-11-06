@@ -1,7 +1,7 @@
 page 6151450 "NPR Text Editor Dialog"
 {
     Caption = 'Text Editor Dialog';
-    PageType = StandardDialog;
+    PageType = Card;
     UsageCategory = Administration;
 
     layout
@@ -11,29 +11,29 @@ page 6151450 "NPR Text Editor Dialog"
             group(General)
             {
                 Caption = 'General';
-                usercontrol(TextEditor; "NPR TextEditor")
-                {
-                    ApplicationArea = All;
+            }
+            usercontrol(TextEditor; "NPR TextEditor")
+            {
+                ApplicationArea = All;
 
-                    trigger OnControlReady();
-                    begin
-                        SendOptionsToTextEditor();
-                        SendDataToTextEditor();
-                        CurrPage.TextEditor.InitTinyMce();
-                        Initialized := true;
-                    end;
+                trigger OnControlReady();
+                begin
+                    SendOptionsToTextEditor();
+                    SendDataToTextEditor();
+                    CurrPage.TextEditor.InitTinyMce();
+                    Initialized := true;
+                end;
 
-                    trigger OnAfterInit();
-                    begin
-                    end;
+                trigger OnAfterInit();
+                begin
+                end;
 
-                    trigger OnContentChange(Content: Text)
-                    begin
-                        EditorContent := Content;
-                        CanClose := true;
-                        CurrPage.Close();
-                    end;
-                }
+                trigger OnContentChange(Content: Text)
+                begin
+                    EditorContent := Content;
+                    CanClose := true;
+                    CurrPage.Close();
+                end;
             }
         }
     }

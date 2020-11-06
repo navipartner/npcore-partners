@@ -54,6 +54,7 @@ controladdin "NPR TextEditor"
     StartupScript = 'src/_ControlAddIns/TextEditor/Scripts/startup.js';
 
     StyleSheets =
+        'src/_ControlAddIns/TextEditor/Scripts/NaviPartner.RetailControls.TextEditor.css',
         'src/_ControlAddIns/TextEditor/Scripts/tinymce/skins/ui/oxide/skin.min.css';
 
     RequestedHeight = 500;
