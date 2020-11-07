@@ -1,35 +1,5 @@
 xmlport 6151401 "NPR Magento Sales Order Import"
 {
-    // MAG1.01/MHA /20150201  CASE 204133 Object created
-    // MAG1.03/MHA /20150205  CASE 199932 Added element gift_vouchers
-    // MAG1.04/TSA /20150212  CASE 201682 Change Shipment Node from Text to Table
-    // MAG1.05/TS  /20150223  CASE 201682 Change Buffer Field for shipment_method
-    // MAG1.14/MHA /20150423  CASE 211266 Added the following elements:
-    //                                    sales_order/external_document_no
-    //                                    sales_order/sell_to_customer/ean
-    //                                    sales_order/shipment/shipment_service
-    // MAG1.15/MHA /20150507  CASE 2013394 Changed buffer table for comments to BLOB in order to remove length restriction
-    // MAG1.18/MHA /20150709  CASE 218282 Localization neutrality implemented
-    // MAG1.20/TS  /20150810  CASE 218524 Added unit_code to sales_order_line
-    // MAG1.22/TS  /20160105  CASE 230767 Added Currency_code
-    // MAG1.22/MHA /20160115  CASE 232034 Updated Xml Port to Preserve Whitespaces
-    // MAG1.22/TS  /20160203  CASE 233611 Reading Multiple comments
-    // MAG1.22/MHA /20160209  CASE 233765 Corrected buffering of PaymentMethodType in connection to multiple payments
-    // MAG2.00/MHA /20160525  CASE 242557 Magento Integration
-    // MAG2.02/TS  /20170131  CASE 265017 Removed Table link on gift_voucher node and there were no precedent link
-    // MAG2.04/TS  /20170421  CASE 269100 Added link Table and Link Fields to associate Gift Voucher to corresponding SalesLine.
-    // MAG2.10/MHA /20171218  CASE 299976 Added <vat_registration_no> under <sales_order/sell_to_customer>
-    // MAG2.11/MHA /20180319  CASE 308406 Specific value removed from XmlVersionNo in order to be V2 extension compliant
-    // MAG2.11/TS  /20180323  CASE 288763 Changed transaction_id to text
-    // MAG2.12/TS  /20180406  CASE 288763 Correct Variable Assignment
-    // MAG2.17/TS  /20181025  CASE 324190 Added Description_2
-    // MAG2.19/MMV /20190314  CASE 347687 Added handling of shopper reference
-    // MAG2.20/MHA /20190411  CASE 349994 Added <use_customer_salesperson>
-    // MAG2.20/MHA /20190417  CASE 352201 Added <store_code>
-    // MAG2.22/BHR /20190604  CASE 350006 Added <requested_delivery_date>
-    // MAG2.26/MHA /20200526  CASE 406591 Added <collect_in_store> under <shipment> and fixed min/max occurences on several elements
-    // NPR5.55/MHA /20200730  CASE 412507 Added <prices_excluding_vat>, <unit_price_excl_vat>, <line_amount_excl_vat>
-
     Caption = 'Magento Sales Order Import';
     DefaultNamespace = 'urn:microsoft-dynamics-nav/xmlports/sales_order';
     Encoding = UTF8;
@@ -62,6 +32,11 @@ xmlport 6151401 "NPR Magento Sales Order Import"
                     MinOccurs = Zero;
                 }
                 textelement(external_document_no)
+                {
+                    MaxOccurs = Once;
+                    MinOccurs = Zero;
+                }
+                textelement(your_reference)
                 {
                     MaxOccurs = Once;
                     MinOccurs = Zero;
@@ -206,16 +181,12 @@ xmlport 6151401 "NPR Magento Sales Order Import"
 
                             trigger OnBeforePassVariable()
                             begin
-                                //-MAG1.22
                                 PaymentMethodType := LowerCase(TempPaymentLine."Document No.");
-                                //+MAG1.22
                             end;
 
                             trigger OnAfterAssignVariable()
                             begin
-                                //-MAG1.22
                                 TempPaymentLine."Document No." := PaymentMethodType;
-                                //+MAG1.22
                             end;
                         }
                         fieldattribute(code; TempPaymentLine.Description)
@@ -354,15 +325,6 @@ xmlport 6151401 "NPR Magento Sales Order Import"
                                 Line: Text;
                             begin
                                 comment := '';
-                                //-MAG2.00
-                                // IF TempItem."Webshop Description".HASVALUE THEN BEGIN
-                                //  TempItem.CALCFIELDS("Webshop Description");
-                                //  TempItem."Webshop Description".CREATEINSTREAM(InStream);
-                                //  WHILE NOT InStream.EOS  DO BEGIN
-                                //    InStream.READTEXT(Line);
-                                //    comment += Line;
-                                //  END;
-                                // END;
                                 if TempItem."NPR Magento Description".HasValue then begin
                                     TempItem.CalcFields("NPR Magento Description");
                                     TempItem."NPR Magento Description".CreateInStream(InStream);
@@ -371,38 +333,28 @@ xmlport 6151401 "NPR Magento Sales Order Import"
                                         comment += Line;
                                     end;
                                 end;
-                                //+MAG2.00
                             end;
 
                             trigger OnAfterAssignVariable()
                             var
                                 OutStream: OutStream;
                             begin
-                                //-MAG2.00
-                                //CLEAR(TempItem."Webshop Description");
-                                //TempItem."Webshop Description".CREATEOUTSTREAM(OutStream);
-                                //OutStream.WRITETEXT(comment);
                                 Clear(TempItem."NPR Magento Description");
                                 TempItem."NPR Magento Description".CreateOutStream(OutStream);
                                 OutStream.WriteText(comment);
-                                //+MAG2.00
                             end;
                         }
 
                         trigger OnAfterInitRecord()
                         begin
-                            //-MAG1.15
                             Clear(TempItem);
                             comment := '';
-                            //+MAG1.15
                         end;
 
                         trigger OnBeforeInsertRecord()
                         begin
-                            //-MAG1.15
                             LineNo += 1;
                             TempItem."No." := Format(10000000000.0 + LineNo);
-                            //+MAG1.15
                         end;
                     }
                 }
@@ -422,16 +374,12 @@ xmlport 6151401 "NPR Magento Sales Order Import"
 
                             trigger OnBeforePassVariable()
                             begin
-                                //-MAG1.18
                                 SalesOrderLineType := LowerCase(TempSalesLine."Shortcut Dimension 2 Code");
-                                //+MAG1.18
                             end;
 
                             trigger OnAfterAssignVariable()
                             begin
-                                //-MAG1.18
                                 TempSalesLine."Shortcut Dimension 2 Code" := SalesOrderLineType;
-                                //+MAG1.18
                             end;
                         }
                         fieldattribute(external_no; TempSalesLine."Description 2")
@@ -448,16 +396,13 @@ xmlport 6151401 "NPR Magento Sales Order Import"
 
                             trigger OnBeforePassVariable()
                             begin
-                                //-MAG2.17 [324190]
                                 Clear(TempSalesLine9);
                                 if TempSalesLine9.Get(TempSalesLine."Document Type", TempSalesLine."Document No.", TempSalesLine."Line No.") then;
                                 description_2 := TempSalesLine9."Description 2";
-                                //+MAG2.17 [324190]
                             end;
 
                             trigger OnAfterAssignVariable()
                             begin
-                                //-MAG2.17 [324190]
                                 if TempSalesLine9.Get(TempSalesLine."Document Type", TempSalesLine."Document No.", TempSalesLine."Line No.") then begin
                                     TempSalesLine9."Description 2" := description_2;
                                     TempSalesLine9.Modify;
@@ -467,7 +412,6 @@ xmlport 6151401 "NPR Magento Sales Order Import"
                                     TempSalesLine9."Description 2" := description_2;
                                     TempSalesLine9.Insert;
                                 end;
-                                //+MAG2.17 [324190]
                             end;
                         }
                         fieldelement(unit_price_incl_vat; TempSalesLine."Unit Price")
@@ -546,9 +490,7 @@ xmlport 6151401 "NPR Magento Sales Order Import"
 
                                 trigger OnPreXmlItem()
                                 begin
-                                    //-MAG2.04
                                     TempGiftVoucher.SetRange("Primary Key Length", TempSalesLine."Line No.");
-                                    //+MAG2.04
                                 end;
 
                                 trigger OnBeforeInsertRecord()
@@ -568,18 +510,12 @@ xmlport 6151401 "NPR Magento Sales Order Import"
 
                         trigger OnAfterInitRecord()
                         begin
-                            //-MAG2.04
                             LineNo += 1;
                             TempSalesLine."Line No." := LineNo;
-                            //+MAG2.04
                         end;
 
                         trigger OnBeforeInsertRecord()
                         begin
-                            //-MAG2.04
-                            //LineNo += 1;
-                            //TempSalesLine."Line No." := LineNo;
-                            //+MAG2.04
                         end;
                     }
                 }
