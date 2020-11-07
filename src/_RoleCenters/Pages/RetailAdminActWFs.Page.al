@@ -14,17 +14,9 @@ page 6151247 "NPR Retail Admin Act - WFs"
         {
             cuegroup(" ")
             {
-                /* group("1st group")
-                 {
-                     */
                 Caption = ' ';
-                // CueGroupLayout = Columns;
                 ShowCaption = false;
-                field("Workflow Steps Enabled"; "Workflow Steps Enabled")
-                {
-                    ApplicationArea = All;
-                }
-                field("Workflow Steps Not Enabled"; "Workflow Steps Not Enabled")
+                field("NPR POS Sales Workflow"; "NPR POS Sales Workflow")
                 {
                     ApplicationArea = All;
                 }
@@ -35,8 +27,6 @@ page 6151247 "NPR Retail Admin Act - WFs"
                     Caption = 'EAN BOX SETUP';
                     ShowCaption = true;
                 }
-
-
 
             }
 
