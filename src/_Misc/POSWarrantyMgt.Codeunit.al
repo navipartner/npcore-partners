@@ -1,9 +1,5 @@
 codeunit 6150746 "NPR POS Warranty Mgt."
 {
-    // NPR5.55/MMV /20200504 CASE 395393 Created codeunit & migrated business logic for triggering warranty certificate prints here instead of tables & templates.
-    //                                   Added output type handling.
-
-
     trigger OnRun()
     begin
     end;
@@ -20,7 +16,7 @@ codeunit 6150746 "NPR POS Warranty Mgt."
         if POSSalesWorkflowStep."Subscriber Codeunit ID" <> CODEUNIT::"NPR POS Warranty Mgt." then
             exit;
 
-        if SaleLinePOS.Type <> SaleLinePOS.Type::Item then
+        if (SaleLinePOS.Type <> SaleLinePOS.Type::Item) OR (SaleLinePOS."No." = '') then
             exit;
 
         Item.Get(SaleLinePOS."No.");
@@ -47,4 +43,3 @@ codeunit 6150746 "NPR POS Warranty Mgt."
         RetailReportSelectionMgt.RunObjects(RecRef, ReportSelectionRetail."Report Type"::"Warranty Certificate");
     end;
 }
-
