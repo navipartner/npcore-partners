@@ -106,6 +106,8 @@ codeunit 6014404 "NPR Event Subscriber"
         if not (CurrentClientType in [CLIENTTYPE::Windows, CLIENTTYPE::Web, CLIENTTYPE::Tablet, CLIENTTYPE::Phone, CLIENTTYPE::Desktop]) then
             exit;
 
+        Commit();
+
         if ServiceTierUserManagement.Run then;
     end;
 
