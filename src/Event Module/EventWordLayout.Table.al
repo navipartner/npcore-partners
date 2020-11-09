@@ -1,9 +1,5 @@
 table 6060151 "NPR Event Word Layout"
 {
-    // NPR5.29/NPKNAV/20170127  CASE 248723 Transport NPR5.29 - 27 januar 2017
-    // NPR5.31/TJ  /20170504 CASE 269162 Added code to function CopyRecord
-    // NPR5.51/TJ  /20190717 CASE 361677 Field 10 renamed from "Basic Layout ID" to "Basic Layout Code" and data type changed from Integer to Code 20
-
     Caption = 'Event Word Layout';
     DataClassification = CustomerContent;
     LookupPageID = "NPR Event Word Layouts";
@@ -51,10 +47,7 @@ table 6060151 "NPR Event Word Layout"
                     if not Confirm(StrSubstNo(ConfirmLayoutChange, FieldCaption("Basic Layout Code"))) then
                         Error('');
 
-                //-NPR5.51 [361677]
-                //IF "Basic Layout ID" = 0 THEN BEGIN
                 if "Basic Layout Code" = '' then begin
-                    //+NPR5.51 [361677]
                     Clear(Layout);
                     Clear("XML Part");
                 end else begin
@@ -94,7 +87,7 @@ table 6060151 "NPR Event Word Layout"
         }
         field(60; "Basic Layout Description"; Text[80])
         {
-            CalcFormula = Lookup ("Custom Report Layout".Description WHERE(Code = FIELD("Basic Layout Code")));
+            CalcFormula = Lookup("Custom Report Layout".Description WHERE(Code = FIELD("Basic Layout Code")));
             Caption = 'Basic Layout Description';
             Editable = false;
             FieldClass = FlowField;
@@ -103,6 +96,25 @@ table 6060151 "NPR Event Word Layout"
         {
             Caption = 'Description';
             DataClassification = CustomerContent;
+        }
+        field(80; "Request Page Parameters"; Blob)
+        {
+            Caption = 'Request Page Parameters';
+            DataClassification = CustomerContent;
+        }
+        field(81; "Use Req. Page Parameters"; Boolean)
+        {
+            Caption = 'Use Req. Page Parameters';
+            DataClassification = CustomerContent;
+            trigger OnValidate()
+            begin
+                if Rec."Use Req. Page Parameters" then
+                    RunReportRequestPage()
+                else begin
+                    Clear(Rec."Request Page Parameters");
+                    Message(RequestPageOptionsDeletedMsg);
+                end;
+            end;
         }
     }
 
@@ -138,6 +150,7 @@ table 6060151 "NPR Event Word Layout"
         EventMgt: Codeunit "NPR Event Management";
         ConfirmLayoutChange: Label 'Changing %1 will remove current layout. If you''ve customized it, it will be lost. We suggest that you first run Export Layout and then try changing again. Do you want to continue?';
         Job: Record Job;
+        RequestPageOptionsDeletedMsg: Label 'You have cleared the report parameters. Select the check box in the field to show the report request page again.';
 
     procedure CopyRecord()
     var
@@ -146,10 +159,7 @@ table 6060151 "NPR Event Word Layout"
     begin
         TestField(Usage);
         GetJobFromRecID(Job);
-        //-NPR5.31 [269162]
-        //EventCopy.SetFromCode(Job,Usage);
         EventCopy.SetFromEvent(Job."No.", Usage);
-        //+NPR5.31 [269162]
         EventCopy.RunModal;
     end;
 
@@ -347,6 +357,28 @@ table 6060151 "NPR Event Word Layout"
         TestField(Usage);
 
         EventMgt.MergeAndSaveWordLayout(Rec, 1, '');
+    end;
+
+    procedure RunReportRequestPage()
+    var
+        InStr: InStream;
+        OutStr: OutStream;
+        Parameters: Text;
+        NewParameters: Text;
+    begin
+        if "Request Page Parameters".HasValue then begin
+            CalcFields("Request Page Parameters");
+            "Request Page Parameters".CreateInStream(InStr, TextEncoding::UTF8);
+            InStr.ReadText(Parameters);
+        end;
+        NewParameters := Report.RunRequestPage("Report ID", Parameters);
+        if NewParameters <> '' then begin
+            Clear("Request Page Parameters");
+            "Request Page Parameters".CreateOutStream(OutStr, TextEncoding::UTF8);
+            OutStr.WriteText(NewParameters);
+            "Use Req. Page Parameters" := true;
+            Modify();
+        end;
     end;
 }
 
