@@ -968,7 +968,7 @@ codeunit 6060150 "NPR Event Management"
             EventWordLayoutFrom.SetRange(Usage, CopyWhatHere);
         if EventWordLayoutFrom.FindSet then begin
             repeat
-                EventWordLayoutFrom.CalcFields(Layout, "XML Part");
+                EventWordLayoutFrom.CalcFields(Layout, "XML Part", "Request Page Parameters");
                 EventWordLayoutTo.Init;
                 EventWordLayoutTo := EventWordLayoutFrom;
                 EventWordLayoutTo."Source Record ID" := JobTo.RecordId;
@@ -986,6 +986,7 @@ codeunit 6060150 "NPR Event Management"
         TempBlob: Codeunit "Temp Blob";
         FileMgt: Codeunit "File Management";
         InStrWordDoc: InStream;
+        InStrParameters: InStream;
         OutStrWordDoc: OutStream;
         DoConvertToPdf: Boolean;
         InStrXmlData: InStream;
@@ -994,21 +995,45 @@ codeunit 6060150 "NPR Event Management"
         FileExtension: Text;
         ExtensionMismatch: Label 'Provided file extension %1 can''t be used on file type %2.';
         EMailTemplateHeader: Record "NPR E-mail Template Header";
+        Parameters: Text;
+        EventCustTemplate: Report "NPR Event Customer Template";
+        EventTeamTemplate: Report "NPR Event Team Template";
     begin
         EventWordLayout.GetJobFromRecID(Job);
         Job.SetRecFilter;
         ValidateAndUpdateWordLayoutOnRecord(EventWordLayout);
         EventWordLayout.CalcFields(Layout);
         EventWordLayout.Layout.CreateInStream(InStrWordDoc);
+        if EventWordLayout."Request Page Parameters".HasValue then begin
+            EventWordLayout.CalcFields("Request Page Parameters");
+            EventWordLayout."Request Page Parameters".CreateInStream(InStrParameters);
+            InStrParameters.ReadText(Parameters);
+        end;
         ValidateWordLayoutCheckOnly(EventWordLayout."Report ID", InStrWordDoc);
         TempBlob.CreateOutStream(OutStrWordDoc);
 
         FileNameXml := FileMgt.ServerTempFileName('xml');
-        REPORT.SaveAsXml(EventWordLayout."Report ID", FileNameXml, Job);
+        Case EventWordLayout.Usage of
+            EventWordLayout.Usage::Customer:
+                begin
+                    EventCustTemplate.SetTableView(Job);
+                    if Parameters <> '' then
+                        EventCustTemplate.SetParameters(Parameters);
+                    EventCustTemplate.SaveAsXml(FileNameXml);
+                end;
+            EventWordLayout.Usage::Team:
+                begin
+                    EventTeamTemplate.SetTableView(Job);
+                    if Parameters <> '' then
+                        EventTeamTemplate.SetParameters(Parameters);
+                    EventTeamTemplate.SaveAsXml(FileNameXml);
+                end;
+        end;
         TempFile.Open(FileNameXml);
         TempFile.CreateInStream(InStrXmlData);
         EventVersionSpecificMgt.WordXMLMergerMergeWordDocument(InStrWordDoc, InStrXmlData, OutStrWordDoc, OutStrWordDoc);
         TempFile.Close;
+        FileMgt.DeleteServerFile(FileNameXml);
 
         FileExtension := 'docx';
         if SaveAs = SaveAs::Pdf then begin
@@ -1392,14 +1417,14 @@ codeunit 6060150 "NPR Event Management"
     begin
         if JobPlanningLineInvoice.FindSet then
             repeat
-                PrepareJobJournal(JobPlanningLineInvoice, 0, JobJnlLine); //Usage
+                PrepareJobJournal(JobPlanningLineInvoice, JobJnlLine."Entry Type"::Usage, JobJnlLine); //Usage
                 PostJournal(JobPlanningLineInvoice, JobJnlLine);
-                PrepareJobJournal(JobPlanningLineInvoice, 1, JobJnlLine); //Sale
+                PrepareJobJournal(JobPlanningLineInvoice, JobJnlLine."Entry Type"::Sale, JobJnlLine); //Sale
                 PostJournal(JobPlanningLineInvoice, JobJnlLine);
             until JobPlanningLineInvoice.Next = 0;
     end;
 
-    local procedure PrepareJobJournal(JobPlanningLineInvoice: Record "Job Planning Line Invoice"; EntryType: Option Usage,Sale; var JobJnlLine: Record "Job Journal Line")
+    local procedure PrepareJobJournal(JobPlanningLineInvoice: Record "Job Planning Line Invoice"; EntryType: Enum "Job Journal Line Entry Type"; var JobJnlLine: Record "Job Journal Line")
     var
         JobPlanningLine: Record "Job Planning Line";
         JobTask: Record "Job Task";
@@ -1924,7 +1949,7 @@ codeunit 6060150 "NPR Event Management"
     begin
         with ResJnlLine do begin
             Init;
-            "Entry Type" := Enum::"Res. Journal Line Entry Type".FromInteger(JobJnlLine."Entry Type");
+            "Entry Type" := JobJnlLine."Entry Type";
             "Document No." := JobJnlLine."Document No.";
             "External Document No." := JobJnlLine."External Document No.";
             "Posting Date" := JobJnlLine."Posting Date";
