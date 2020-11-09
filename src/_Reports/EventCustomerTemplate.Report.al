@@ -1,27 +1,5 @@
 report 6060150 "NPR Event Customer Template"
 {
-    // NPR5.29/NPKNAV/20170127  CASE 248723 Transport NPR5.29 - 27 januar 2017
-    // NPR5.30/TJ  /20170301 CASE 265580 Fixed DataItemLink property on data item Job Planning Line to properly show only lines for appropriate job
-    // NPR5.30/TJ  /20170302 CASE 267566 Added new dataitems and controls, cleaned unused fields from datasets
-    //                                   Removed word layout from report definition
-    //                                   Formatting date based on windows language setting
-    // NPR5.31/TJ  /20170419 CASE 269162 Changed how attributes are fetched
-    // NPR5.33/TJ  /20170606 CASE 277946 Function EventAttributeEntryAction has additional arguments
-    // NPR5.33/TJ  /20170606 CASE 277972 Changed how attributes are fetched
-    //                                   Removed some global variables and moved code from Event Attribute - OnPreDataItem and Event Attribute - OnAfterGetRecord to Event Attribute Management codeunit
-    //                                   Renamed DataItem Event Attribute to Event Attribute Set 1
-    //                                   Added new dataitem Event Attribute Set 2
-    //                                   Renamed some variables to be gramatically correct
-    // NPR5.35/TJ  /20170818 CASE 287270 Fixed a problem with report creation when there are no attributes on the event
-    // NPR5.38/TJ  /20171006 CASE 291965 Added new columns to dataitems Job and ItemLine
-    //                                   Item lines that will not be contracted are shown with 0 value
-    // NPR5.41/TJ  /20180409 CASE 310426 Not showing rows for attributes which don't have values for any column
-    // NPR5.48/TJ  /20181217 CASE 310452 Fixed deployed under 5.41 was pointing to wrong case no. Using proper case no. now
-    // NPR5.48/TJ  /20181217 CASE 310426 Using new field Comments for Customer
-    // NPR5.51/TJ  /20190611 CASE 357701 Field Picture_Job removed from dataset
-    // NPR5.54/TJ  /20200302 CASE 392832 Added "Description 2", "Planning Date", "Starting Time" and "Ending Time" under ItemLine
-    //                                   Added "Creation Date" and "VAT Registration No." under Job
-    //                                   Formatting all time fields with new FormatTime function
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Event Customer Template.rdlc';
 
@@ -31,7 +9,7 @@ report 6060150 "NPR Event Customer Template"
     {
         dataitem(Job; Job)
         {
-            RequestFilterFields = "No.";
+            DataItemTableView = sorting("No.");
             column(No_Job; Job."No.")
             {
             }
@@ -193,6 +171,12 @@ report 6060150 "NPR Event Customer Template"
                     column(EndingTime_TextLine; FormatTime(TextLine."NPR Ending Time"))
                     {
                     }
+
+                    trigger OnPreDataItem()
+                    begin
+                        if TextLineView <> '' then
+                            SetView(TextLineView);
+                    end;
                 }
                 dataitem(ResourceLine; "Job Planning Line")
                 {
@@ -220,6 +204,12 @@ report 6060150 "NPR Event Customer Template"
                     column(ResourceEMail_ResourceLine; ResourceLine."NPR Resource E-Mail")
                     {
                     }
+
+                    trigger OnPreDataItem()
+                    begin
+                        if ResourceLineView <> '' then
+                            SetView(ResourceLineView);
+                    end;
                 }
                 dataitem(ItemLine; "Job Planning Line")
                 {
@@ -280,7 +270,6 @@ report 6060150 "NPR Event Customer Template"
 
                     trigger OnAfterGetRecord()
                     begin
-                        //-NPR5.38 [291695]
                         if not ItemLine."Contract Line" then begin
                             ItemLine."Unit Price" := 0;
                             ItemLine."Line Discount Amount" := 0;
@@ -290,35 +279,35 @@ report 6060150 "NPR Event Customer Template"
                             ItemLine."NPR Est. Line Amount Incl. VAT" := 0;
                             ItemLine."NPR Est. VAT %" := 0;
                         end;
-                        //+NPR5.38 [291695]
                     end;
 
                     trigger OnPreDataItem()
                     begin
-                        //-NPR5.30 [267566]
+                        if ItemLineView <> '' then begin
+                            SetView(ItemLineView);
+                            ItemLineTotal.CopyFilters(ItemLine);
+                        end;
                         ItemLineTotal.SetRange("Job No.", Job."No.");
                         ItemLineTotal.SetRange("Job Task No.", "Job Task"."Job Task No.");
                         ItemLineTotal.SetRange(Type, ItemLineTotal.Type::Item);
                         if ItemLineTotal.FindSet then
                             repeat
-                                //-NPR5.38 [291695]
                                 if ItemLineTotal."Contract Line" then begin
-                                    //+NPR5.38 [291695]
                                     TotalAmount += ItemLineTotal."Line Amount";
-                                    //-NPR5.38 [291695]
                                     EstTotalAmtInclVAT += ItemLineTotal."NPR Est. Line Amount Incl. VAT";
                                 end;
-                            //+NPR5.38 [291695]
                             until ItemLineTotal.Next = 0;
-                        //+NPR5.30 [267566]
                     end;
                 }
+                trigger OnPreDataItem()
+                begin
+                    if JobTaskView <> '' then
+                        SetView(JobTaskView);
+                end;
 
                 trigger OnAfterGetRecord()
                 begin
-                    //-NPR5.30 [267566]
                     TotalAmount := 0;
-                    //+NPR5.30 [267566]
                 end;
             }
             dataitem("Event Attribute Set 1"; "NPR Event Attr. Row Value")
@@ -363,56 +352,20 @@ report 6060150 "NPR Event Customer Template"
                     i: Integer;
                     SkipRow: Boolean;
                 begin
-                    //-NPR5.33 [277972]
-                    /*
-                    //-NPR5.31 [269162]
-                    IF EventAttrCollumnValue.FINDSET THEN
-                      REPEAT
-                        i += 1;
-                        AttributeValue[i] := '';
-                        CollumnCaption[i] := EventAttrCollumnValue.Description;
-                        //-NPR5.33 [277946]
-                        //EventAttrMgt.EventAttributeEntryAction(2,EventAttributeTemplate.Name,Job."No.","Line No.",EventAttrCollumnValue."Line No.",EventAttrCollumnValue.Description,AttributeValue[i]);
-                        EventAttrMgt.EventAttributeEntryAction(2,EventAttributeTemplate.Name,Job."No.","Line No.",EventAttrCollumnValue."Line No.",EventAttrCollumnValue.Description,AttributeValue[i],FALSE,'');
-                        //-NPR5.33 [277946]
-                      UNTIL (EventAttrCollumnValue.NEXT = 0) OR (i = ARRAYLEN(AttributeValue));
-                    //+NPR5.31 [269162]
-                    */
                     EventAttrMgt.EventTemplateReportEventAttributeSetOnAfterGetRecord("Event Attribute Set 1", AttributeValue, ColumnCaption, Job."No.");
-                    //+NPR5.33 [277972]
-                    //-NPR5.41 [310452]
                     SkipRow := true;
                     for i := 1 to ArrayLen(AttributeValue) do
                         SkipRow := SkipRow and (AttributeValue[i] = '');
                     if SkipRow then
                         CurrReport.Skip;
-                    //+NPR5.41 [310452]
-
                 end;
 
                 trigger OnPreDataItem()
                 begin
-                    //-NPR5.33 [277972]
-                    /*
-                    //-NPR5.31 [269162]
-                    IF Job."Event Attribute Template Name" = '' THEN
-                      CurrReport.BREAK;
-                    EventAttributeTemplate.GET(Job."Event Attribute Template Name");
-                    SETRANGE("Template Name",EventAttributeTemplate."Row Template Name");
-                    SETRANGE(Promote,TRUE);
-                    EventAttrCollumnValue.SETRANGE("Template Name",EventAttributeTemplate."Column Template Name");
-                    EventAttrCollumnValue.SETRANGE(Promote,TRUE);
-                    //+NPR5.31 [269162]
-                    */
                     Clear(AttributeValue);
                     Clear(ColumnCaption);
-                    //-NPR5.35 [287270]
-                    //EventAttrMgt.EventTemplateReportEventAttributeSetOnPreDataItem(EventAttributeTempName1,"Event Attribute Set 1");
                     if not EventAttrMgt.EventTemplateReportEventAttributeSetOnPreDataItem(EventAttributeTempName1, "Event Attribute Set 1") then
                         CurrReport.Break;
-                    //+NPR5.35 [287270]
-                    //+NPR5.33 [277972]
-
                 end;
             }
             dataitem("Event Attribute Set 2"; "NPR Event Attr. Row Value")
@@ -457,30 +410,21 @@ report 6060150 "NPR Event Customer Template"
                     i: Integer;
                     SkipRow: Boolean;
                 begin
-                    //-NPR5.33 [277972]
                     EventAttrMgt.EventTemplateReportEventAttributeSetOnAfterGetRecord("Event Attribute Set 2", AttributeValue, ColumnCaption, Job."No.");
-                    //+NPR5.33 [277972]
-                    //-NPR5.41 [310452]
                     SkipRow := true;
                     for i := 1 to ArrayLen(AttributeValue) do
                         SkipRow := SkipRow and (AttributeValue[i] = '');
                     if SkipRow then
                         CurrReport.Skip;
-                    //+NPR5.41 [310452]
                 end;
 
                 trigger OnPreDataItem()
                 begin
-                    //-NPR5.33 [277972]
                     Clear(AttributeValue);
                     Clear(ColumnCaption);
                     Clear(EventAttrMgt);
-                    //-NPR5.35 [287270]
-                    //EventAttrMgt.EventTemplateReportEventAttributeSetOnPreDataItem(EventAttributeTempName2,"Event Attribute Set 2");
                     if not EventAttrMgt.EventTemplateReportEventAttributeSetOnPreDataItem(EventAttributeTempName2, "Event Attribute Set 2") then
                         CurrReport.Break;
-                    //+NPR5.35 [287270]
-                    //+NPR5.33 [277972]
                 end;
             }
             dataitem("Comment Line"; "Comment Line")
@@ -494,23 +438,18 @@ report 6060150 "NPR Event Customer Template"
 
             trigger OnAfterGetRecord()
             begin
-                //-NPR5.30 [267566]
                 if not Customer.Get("Bill-to Customer No.") then
                     Clear(Customer);
                 if not SalespersonPurchaser.Get(Customer."Salesperson Code") then
                     Clear(SalespersonPurchaser);
                 if not Resource.Get("Person Responsible") then
                     Clear(Resource);
-                //+NPR5.30 [267566]
-                //-NPR5.33 [277972]
                 EventAttribute.SetRange("Job No.", "No.");
                 EventAttribute.SetRange(Promote, true);
                 if EventAttribute.FindSet then
                     EventAttributeTempName1 := EventAttribute."Template Name";
                 if EventAttribute.Next <> 0 then
                     EventAttributeTempName2 := EventAttribute."Template Name";
-                //+NPR5.33 [277972]
-                //-NPR5.48 [310426]
                 CommentsForCustomer := '';
                 CommentLine.SetRange("Table Name", CommentLine."Table Name"::Job);
                 CommentLine.SetRange("No.", Job."No.");
@@ -518,7 +457,6 @@ report 6060150 "NPR Event Customer Template"
                     repeat
                         CommentsForCustomer += CommentLine.Comment;
                     until CommentLine.Next = 0;
-                //+NPR5.48 [310426]
             end;
         }
     }
@@ -555,6 +493,10 @@ report 6060150 "NPR Event Customer Template"
         EstTotalAmtInclVAT: Decimal;
         CommentsForCustomer: Text;
         CommentLine: Record "Comment Line";
+        JobTaskView: Text;
+        TextLineView: Text;
+        ResourceLineView: Text;
+        ItemLineView: Text;
 
     local procedure FormatDate(Date: Date): Text
     var
@@ -567,11 +509,34 @@ report 6060150 "NPR Event Customer Template"
 
     local procedure FormatTime(Time: Time): Text
     begin
-        //-NPR5.54 [392832]
         if Time <> 0T then
             exit(Format(Time, 0, '<Hours24,2><Filler Character,0>:<Minutes,2>'));
         exit('');
-        //+NPR5.54 [392832]
+    end;
+
+    procedure SetParameters(XmlParameters: Text)
+    var
+        XmlDoc: DotNet XmlDocument;
+        XmlNode: DotNet XmlNode;
+        XmlNodeList: DotNet XmlNodeList;
+        XmlAttribute: DotNet XmlAttribute;
+    begin
+        XmlDoc := XmlDoc.XmlDocument();
+        XmlDoc.LoadXml(XmlParameters);
+        XmlNodeList := XmlDoc.SelectNodes('//DataItem');
+        foreach XmlNode in XmlNodeList do begin
+            XMLAttribute := XmlNode.Attributes.GetNamedItem('name');
+            case XMLAttribute.Value of
+                'Job Task':
+                    JobTaskView := XmlNode.InnerText;
+                'TextLine':
+                    TextLineView := XmlNode.InnerText;
+                'ResourceLine':
+                    ResourceLineView := XmlNode.InnerText;
+                'ItemLine':
+                    ItemLineView := XmlNode.InnerText;
+            end;
+        end;
     end;
 }
 

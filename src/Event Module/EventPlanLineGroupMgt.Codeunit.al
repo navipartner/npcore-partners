@@ -1,8 +1,5 @@
 codeunit 6060165 "NPR Event Plan.Line Group. Mgt"
 {
-    // NPR5.55/TJ  /20200326 CASE 397741 New object
-
-
     trigger OnRun()
     begin
     end;
@@ -110,7 +107,7 @@ codeunit 6060165 "NPR Event Plan.Line Group. Mgt"
         EventPlanLineBuffer."Ending Time" := JobPlanningLine."NPR Ending Time";
         EventPlanLineBuffer.Quantity := JobPlanningLine.Quantity;
         EventPlanLineBuffer."Unit of Measure Code" := JobPlanningLine."Unit of Measure Code";
-        EventPlanLineBuffer.Type := JobPlanningLine.Type;
+        EventPlanLineBuffer.Type := JobPlanningLine.Type.AsInteger();
         EventPlanLineBuffer."No." := JobPlanningLine."No.";
         EventPlanLineBuffer.Insert;
         CheckCapAndTimeAvailability(JobPlanningLine, EventPlanLineBuffer);
@@ -165,7 +162,7 @@ codeunit 6060165 "NPR Event Plan.Line Group. Mgt"
     begin
         JobPlanningLineTemp."Job No." := EventPlanLineBuffer."Job No.";
         JobPlanningLineTemp."Job Task No." := EventPlanLineBuffer."Job Task No.";
-        JobPlanningLineTemp.Type := EventPlanLineBuffer.Type;
+        JobPlanningLineTemp.Type := "Job Planning Line Type".FromInteger(EventPlanLineBuffer.Type);
         JobPlanningLineTemp."No." := EventPlanLineBuffer."No.";
         JobPlanningLineTemp."Planning Date" := EventPlanLineBuffer."Planning Date";
         JobPlanningLineTemp."NPR Starting Time" := EventPlanLineBuffer."Starting Time";
@@ -221,8 +218,6 @@ codeunit 6060165 "NPR Event Plan.Line Group. Mgt"
         if EventPlanLineBuffer.IsEmpty then
             exit;
 
-        //NewRec := Rec;
-        //Rec.DELETE(TRUE);
         Job.Get(EventPlanLineBuffer."Job No.");
         JobTask.Get(Job."No.", EventPlanLineBuffer."Job Task No.");
         LineNo := 10000;
