@@ -36,5 +36,6 @@
   "showMyCode": true,
   "runtime": "6.0",
   "target": "OnPrem",
-  "features": [ "TranslationFile" ]
+  "features": [ "TranslationFile" ],
+  "keyVaultUrls": ["https://npcore.vault.azure.net/"]
 }
