@@ -1403,7 +1403,8 @@ codeunit 6014438 "NPR Scanner - Functions"
 
     local procedure Endswith(var String: Text; EndsWith: Text; AddEndsWith: Boolean): Boolean
     var
-        NetString: DotNet NPRNetString;
+        // NetString has been converted from DotNet
+        NetString: Text;
     begin
         //-NPR5.38 [301053]
         NetString := String;
