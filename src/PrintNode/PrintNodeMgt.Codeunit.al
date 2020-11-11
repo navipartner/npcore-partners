@@ -26,13 +26,15 @@ codeunit 6151221 "NPR PrintNode Mgt."
         RetailList: Page "NPR Retail List";
         JArray: JsonArray;
         JToken: JsonToken;
+        Hostname: Text;
     begin
         ClearLastError();
         if not PrintNodeAPI.GetPrinters(JArray) then
             Error(GetLastErrorText);
         foreach JToken in JArray do begin
             TempRetailList.Number += 1;
-            TempRetailList.Choice := CopyStr(GetString(JToken.AsObject(), 'name', false), 1, MaxStrLen(TempRetailList.Choice));
+            Hostname := GetString(JToken.AsObject(), 'computer.name', false);
+            TempRetailList.Choice := CopyStr(GetString(JToken.AsObject(), 'name', false) + ' (' + Hostname + ')', 1, MaxStrLen(TempRetailList.Choice));
             TempRetailList.Value := GetString(JToken.AsObject(), 'id', true);
             TempRetailList.Insert();
         end;
@@ -48,6 +50,8 @@ codeunit 6151221 "NPR PrintNode Mgt."
         PrinterName := TempRetailList.Choice;
         exit(true);
     end;
+
+
 
     procedure SetPrinterOptions(var PrintNodePrinter: Record "NPR PrintNode Printer")
     var
@@ -66,7 +70,7 @@ codeunit 6151221 "NPR PrintNode Mgt."
             Error(PrinterNotFoundErr, PrintNodePrinter.Id);
         if not JArray.Get(0, JToken) then
             exit;
-        if not GetToken(JToken.AsObject(), JToken, 'capabilities', false) then
+        if not SelectToken(JToken.AsObject(), JToken, 'capabilities', false) then
             exit;
         if PrintNodePrinter.Settings.HasValue then begin
             PrintNodePrinter.CalcFields(Settings);
@@ -127,26 +131,26 @@ codeunit 6151221 "NPR PrintNode Mgt."
         DownloadFromStream(Istream, 'Printer Config', '', 'JSON File (*.json)|*.json', Filename);
     end;
 
-    local procedure GetToken(JObject: JsonObject; var JToken: JsonToken; TokenKey: Text; WithError: Boolean): Boolean
+    local procedure SelectToken(JObject: JsonObject; var JToken: JsonToken; JPath: Text; WithError: Boolean): Boolean
     var
         JSonString: Text;
         KeyNotFoundTxt: Label 'Property "%1" does not exist in JSON object.\\%2.';
     begin
-        if not JObject.Get(TokenKey, JToken) then begin
+        if not JObject.SelectToken(JPath, JToken) then begin
             if WithError then begin
                 JObject.WriteTo(JSonString);
-                Error(StrSubstNo(KeyNotFoundTxt, TokenKey, JSonString));
+                Error(StrSubstNo(KeyNotFoundTxt, JPath, JSonString));
             end;
             exit(false);
         end;
         exit(true);
     end;
 
-    local procedure GetString(JObject: JsonObject; TokenKey: Text; WithError: Boolean): Text
+    local procedure GetString(JObject: JsonObject; JPath: Text; WithError: Boolean): Text
     var
         JToken: JsonToken;
     begin
-        if GetToken(JObject, JToken, TokenKey, WithError) then
+        if SelectToken(JObject, JToken, JPath, WithError) then
             exit(JToken.AsValue().AsText());
         exit('');
     end;
