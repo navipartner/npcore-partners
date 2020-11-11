@@ -1,7 +1,5 @@
 page 6014583 "NPR JS Bridge"
 {
-    // NPR5.29/CLVA/20161018 CASE 251922 Page created.
-
     Caption = 'JS Bridge';
     DeleteAllowed = false;
     Editable = false;
@@ -12,12 +10,26 @@ page 6014583 "NPR JS Bridge"
     {
         area(content)
         {
-            // AL-Conversion: TODO #361608 - AL: Problems with NaviPartner.POS.JSBridge addin.
-        }
-    }
+            usercontrol(JSBridge; "NPR JSBridge")
+            {
+                ApplicationArea = All;
 
-    actions
-    {
+                trigger ControlAddInReady();
+                begin
+                    if FunctionName <> '' then
+                        CurrPage.JSBridge.CallNativeFunction(FunctionParameter)
+                    else
+                        if JavaScript <> '' then
+                            CurrPage.JSBridge.InjectJavaScript(JavaScript);
+                end;
+
+                trigger ActionCompleted(JsonText: Text);
+                begin
+                    //Message(JsonText);
+                    CurrPage.Close();
+                end;
+            }
+        }
     }
 
     var
@@ -37,4 +49,3 @@ page 6014583 "NPR JS Bridge"
         exit('');
     end;
 }
-
