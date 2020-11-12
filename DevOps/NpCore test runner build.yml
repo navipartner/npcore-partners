@@ -65,6 +65,7 @@ jobs:
           - path: 'C:\Applications\TestFramework\TestRunner\Microsoft_Test Runner.app'
           - path: 'C:\Applications\TestFramework\TestLibraries\Assert\Microsoft_Library Assert.app'
           - path: 'C:\Applications\TestFramework\TestLibraries\Any\Microsoft_Any.app'
+          - path: 'C:\Applications\TestFramework\TestLibraries\Variable Storage\Microsoft_Library Variable Storage.app'
           - path: 'C:\Applications\system application\test\Microsoft_System Application Test Library.app'
           - path: 'C:\Applications\baseapp\test\Microsoft_Tests-TestLibraries.app'
         - package:
