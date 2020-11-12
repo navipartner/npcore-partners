@@ -201,7 +201,7 @@ codeunit 6060132 "NPR MM Import Members"
         FldValidUntilDate := nextField(PLine);
         FldRole := nextField(PLine);
         FldNAVMembershipCode := nextField(PLine);
-        FldLoyaltyPoints := nextField(PLine); 
+        FldLoyaltyPoints := nextField(PLine);
 
         // -- card
         FldExternalCardNo := nextField(PLine);
@@ -250,7 +250,7 @@ codeunit 6060132 "NPR MM Import Members"
             'manual':
                 GMemberInfo."Notification Method" := GMemberInfo."Notification Method"::MANUAL;
             'sms':
-                GMemberInfo."Notification Method" := GMemberInfo."Notification Method"::SMS; 
+                GMemberInfo."Notification Method" := GMemberInfo."Notification Method"::SMS;
             else
                 GMemberInfo."Notification Method" := GMemberInfo."Notification Method"::NO_THANKYOU;
         end;
@@ -379,7 +379,7 @@ codeunit 6060132 "NPR MM Import Members"
             LoyaltyPointManagement.ManualAddSalePoints(MembershipEntryNo, 'Import', GMemberInfo."Initial Loyalty Point Count", 0, 'Import');
 
         //MemberEntryNo := MemberManagement.AddMemberAndCard (MembershipEntryNo, MemberInfoCapture, FALSE);
-        MemberManagement.AddMemberAndCard(true, MembershipEntryNo, MemberInfoCapture, false, MemberEntryNo, ResponseMessage);
+        MemberManagement.AddMemberAndCard(MembershipEntryNo, MemberInfoCapture, false, MemberEntryNo, ResponseMessage);
 
         if (not (Member.Get(MemberEntryNo))) then
             exit;

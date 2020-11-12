@@ -768,7 +768,7 @@ page 6060137 "NPR MM Membership Card"
         PageAction := MemberInfoCapturePage.RunModal();
         if (PageAction = ACTION::LookupOK) then begin
             MemberInfoCapturePage.GetRecord(MemberInfoCapture);
-            MembershipManagement.AddMemberAndCard(true, "Entry No.", MemberInfoCapture, false, MemberInfoCapture."Member Entry No", ResponseMessage);
+            MembershipManagement.AddMemberAndCard("Entry No.", MemberInfoCapture, false, MemberInfoCapture."Member Entry No", ResponseMessage);
 
         end;
     end;

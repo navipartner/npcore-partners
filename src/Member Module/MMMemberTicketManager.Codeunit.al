@@ -153,6 +153,7 @@ codeunit 6060130 "NPR MM Member Ticket Manager"
         MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
         MemberTicketManager: Codeunit "NPR MM Member Ticket Manager";
+        TicketAttempCreate: Codeunit "NPR Ticket Attempt Create";
         EntryNo: Integer;
         TicketRequestMini: Page "NPR TM Ticket Req. Mini";
         PageAction: Action;
@@ -196,18 +197,16 @@ codeunit 6060130 "NPR MM Member Ticket Manager"
             exit(false); // all lines deleted - no guests
 
         PreValidateMemberGuestTicketRequest(TmpTicketReservationRequest, true);
+        //**
 
-        if (TicketRequestManager.RevalidateRequestForTicketReuse(TmpTicketReservationRequest, ReusedToken, ResponseMessage)) then begin
+        Commit();
+        if (TicketAttempCreate.RevalidateRequestForTicketReuse(TmpTicketReservationRequest, ReusedToken, ResponseMessage)) then begin
             TicketToken := ReusedToken;
             Commit();
 
             PrintReusedGuestTickets(MembershipEntryNo, TmpTicketReservationRequest);
-
             exit(true); // previously created tickets are reused.
         end;
-
-        // No ticket reuse.
-        asserterror Error(''); // Rollback any partial updates done by RevalidateRequestForTicketReuse()
 
         // Create the actual ticket request for the guests
         TmpTicketReservationRequest.Reset();

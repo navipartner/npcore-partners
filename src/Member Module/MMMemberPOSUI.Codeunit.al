@@ -9,22 +9,6 @@ codeunit 6060135 "NPR MM Member POS UI"
         POINTS_TO_DEDUCT: Label 'Points to Deduct';
         DISCOUNT_AMOUNT: Label 'Discount';
 
-    procedure SearchBox(Title: Text; Caption: Text; MaxStringLength: Integer) ScannedValue: Text
-    begin
-        // TODO: CTRLUPGRADE - the block below must be refactored without Marshaller
-        Error('CTRLUPGRADE');
-        /*
-        ScannedValue := Marshaller.SearchBox(Title, Caption, MaxStringLength);
-        */
-        if (ScannedValue = '<CANCEL>') then
-            Error('');
-
-        if (StrLen(ScannedValue) > MaxStringLength) then
-            Error(ILLEGAL_VALUE, ScannedValue, Title);
-
-        exit(ScannedValue);
-    end;
-
     procedure DoLookup(LookupCaption: Text; LookupRecRef: RecordRef) Position: Text
     var
         Template: DotNet NPRNetTemplate;

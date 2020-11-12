@@ -10,10 +10,10 @@ codeunit 6060116 "NPR TM Ticket WebService Mgr"
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
     begin
 
-        Commit;
+        Commit();
         TicketRequestManager.LockResources();
 
-        if LoadXmlDoc(XmlDoc) then begin
+        if (LoadXmlDoc(XmlDoc)) then begin
             FunctionName := GetWebserviceFunction("Import Type");
             case FunctionName of
                 'MakeTicketReservation':
@@ -39,7 +39,7 @@ codeunit 6060116 "NPR TM Ticket WebService Mgr"
             end;
         end;
 
-        Commit;
+        Commit();
     end;
 
     var
@@ -72,13 +72,13 @@ codeunit 6060116 "NPR TM Ticket WebService Mgr"
 
         TicketRequestManager.ExpireReservationRequests();
 
-        if IsNull(XmlDoc) then
+        if (IsNull(XmlDoc)) then
             exit;
         XmlElement := XmlDoc.DocumentElement;
-        if IsNull(XmlElement) then
+        if (IsNull(XmlElement)) then
             exit;
 
-        if not NpXmlDomMgt.FindNodes(XmlElement, 'reserve_tickets', XmlTokenNodeList) then
+        if (not NpXmlDomMgt.FindNodes(XmlElement, 'reserve_tickets', XmlTokenNodeList)) then
             exit;
 
         for Token_i := 0 to XmlTokenNodeList.Count - 1 do begin
@@ -87,10 +87,10 @@ codeunit 6060116 "NPR TM Ticket WebService Mgr"
             if (Token = '') then
                 Token := DocumentID;
 
-            if TicketRequestManager.TokenRequestExists(Token) then
+            if (TicketRequestManager.TokenRequestExists(Token)) then
                 TicketRequestManager.DeleteReservationRequest(Token, true);
 
-            if not NpXmlDomMgt.FindNodes(XmlTokenElement, 'ticket', XmlNodeList) then
+            if (not NpXmlDomMgt.FindNodes(XmlTokenElement, 'ticket', XmlNodeList)) then
                 exit;
 
             for i := 0 to XmlNodeList.Count - 1 do begin
@@ -101,7 +101,7 @@ codeunit 6060116 "NPR TM Ticket WebService Mgr"
 
         TicketReservationRequest.SetCurrentKey("Session Token ID");
         TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
-        //-TM1.21
+
         if (TicketReservationRequest.FindSet(true, false)) then begin
             TicketCreated := true;
             repeat
@@ -109,14 +109,12 @@ codeunit 6060116 "NPR TM Ticket WebService Mgr"
 
                 if (ValidTicketRequest(TicketReservationRequest, TicketReservationResponse)) then begin
 
-                    //-TM1.45 [380754]
-                    //TicketCreated := TicketCreated AND CreateTicket (TicketReservationRequest, TicketReservationResponse);
+                    //TicketCreated := TicketCreated and CreateTicket (TicketReservationRequest, TicketReservationResponse);
                     if (TicketReservationRequest."Request Status" = TicketReservationRequest."Request Status"::WAITINGLIST) then begin
                         TicketWaitingListMgr.CreateWaitingListEntry(TicketReservationRequest, TicketReservationRequest."Notification Address");
                     end else begin
                         TicketCreated := TicketCreated and CreateTicket(TicketReservationRequest, TicketReservationResponse);
                     end;
-                    //+TM1.45 [380754]
 
                 end else begin
                     TicketCreated := false;
@@ -124,7 +122,6 @@ codeunit 6060116 "NPR TM Ticket WebService Mgr"
 
             until ((TicketReservationRequest.Next() = 0));
         end;
-        //+TM1.21
 
         if (not TicketCreated) then
             TicketRequestManager.DeleteReservationRequest(Token, false);
@@ -136,7 +133,7 @@ codeunit 6060116 "NPR TM Ticket WebService Mgr"
         TicketReservationResponse: Record "NPR TM Ticket Reserv. Resp.";
     begin
 
-        if IsNull(XmlElement) then
+        if (IsNull(XmlElement)) then
             exit(false);
 
         TicketReservationRequest.Init();
@@ -157,13 +154,13 @@ codeunit 6060116 "NPR TM Ticket WebService Mgr"
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
     begin
 
-        if IsNull(XmlDoc) then
+        if (IsNull(XmlDoc)) then
             exit;
         XmlElement := XmlDoc.DocumentElement;
-        if IsNull(XmlElement) then
+        if (IsNull(XmlElement)) then
             exit;
 
-        if not NpXmlDomMgt.FindNodes(XmlElement, 'ticket_tokens', XmlNodeList) then
+        if (not NpXmlDomMgt.FindNodes(XmlElement, 'ticket_tokens', XmlNodeList)) then
             exit;
 
         Token := CopyStr(NpXmlDomMgt.GetXmlAttributeText(XmlElement, 'ticket_token', false), 1, MaxStrLen(Token));
@@ -174,7 +171,7 @@ codeunit 6060116 "NPR TM Ticket WebService Mgr"
         TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
         TicketReservationRequest.SetFilter("Request Status", '=%1', TicketReservationRequest."Request Status"::REGISTERED);
         if (TicketReservationRequest.FindSet(true, false)) then begin
-            TicketReservationRequest.ModifyAll("Expires Date Time", CurrentDateTime + 1500 * 1000);
+            TicketReservationRequest.ModifyAll("Expires Date Time", CurrentDateTime() + 1500 * 1000);
             exit;
         end;
 
@@ -220,13 +217,13 @@ codeunit 6060116 "NPR TM Ticket WebService Mgr"
         ResponseMessage: Text;
     begin
 
-        if IsNull(XmlDoc) then
+        if (IsNull(XmlDoc)) then
             exit;
         XmlElement := XmlDoc.DocumentElement;
-        if IsNull(XmlElement) then
+        if (IsNull(XmlElement)) then
             exit;
 
-        if not NpXmlDomMgt.FindNodes(XmlElement, 'ticket_tokens', XmlNodeList) then
+        if (not NpXmlDomMgt.FindNodes(XmlElement, 'ticket_tokens', XmlNodeList)) then
             exit;
 
         for i := 0 to XmlNodeList.Count - 1 do begin
@@ -254,13 +251,13 @@ codeunit 6060116 "NPR TM Ticket WebService Mgr"
         TicketReservationResponse: Record "NPR TM Ticket Reserv. Resp.";
     begin
 
-        if IsNull(XmlDoc) then
+        if (IsNull(XmlDoc)) then
             exit;
         XmlElement := XmlDoc.DocumentElement;
-        if IsNull(XmlElement) then
+        if (IsNull(XmlElement)) then
             exit;
 
-        if not NpXmlDomMgt.FindNodes(XmlElement, 'ticket_tokens', XmlNodeList) then
+        if (not NpXmlDomMgt.FindNodes(XmlElement, 'ticket_tokens', XmlNodeList)) then
             exit;
 
         Token := CopyStr(NpXmlDomMgt.GetXmlAttributeText(XmlElement, 'ticket_token', false), 1, MaxStrLen(Token));
@@ -274,43 +271,43 @@ codeunit 6060116 "NPR TM Ticket WebService Mgr"
 
     local procedure ImportTicketReservationConfirmArriveDoc(XmlDoc: DotNet "NPRNetXmlDocument"; RequestEntryNo: Integer; DocumentID: Text[100])
     var
+        TicketReservationResponse: Record "NPR TM Ticket Reserv. Resp.";
+        TicketReservationResponse2: Record "NPR TM Ticket Reserv. Resp.";
+        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+        TmpTicketReservationRequest: Record "NPR TM Ticket Reservation Req." temporary;
+        MemberTicketManager: Codeunit "NPR MM Member Ticket Manager";
+        TicketAttempCreate: Codeunit "NPR Ticket Attempt Create";
+        TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
+        TicketCreated: Boolean;
         XmlElement: DotNet NPRNetXmlElement;
         XmlNodeList: DotNet NPRNetXmlNodeList;
         i: Integer;
-        Token: Text[50];
-        MemberTicketManager: Codeunit "NPR MM Member Ticket Manager";
-        TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
-        TmpTicketReservationRequest: Record "NPR TM Ticket Reservation Req." temporary;
-        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
-        TicketReservationResponse: Record "NPR TM Ticket Reserv. Resp.";
-        TicketReservationResponse2: Record "NPR TM Ticket Reserv. Resp.";
-        TicketCreated: Boolean;
-        ReusedToken: Text;
         ResponseMessage: Text;
+        ReusedToken: Text;
+        Token: Text[50];
     begin
-        //-TM1.08
+
         TicketRequestManager.ExpireReservationRequests();
 
-        if IsNull(XmlDoc) then
+        if (IsNull(XmlDoc)) then
             exit;
         XmlElement := XmlDoc.DocumentElement;
-        if IsNull(XmlElement) then
+        if (IsNull(XmlElement)) then
             exit;
 
-        if not NpXmlDomMgt.FindNodes(XmlElement, 'ticket_tokens', XmlNodeList) then
+        if (not NpXmlDomMgt.FindNodes(XmlElement, 'ticket_tokens', XmlNodeList)) then
             exit;
 
         Token := CopyStr(NpXmlDomMgt.GetXmlAttributeText(XmlElement, 'ticket_token', false), 1, MaxStrLen(Token));
         if (Token = '') then
             Token := DocumentID;
 
-        if TicketRequestManager.TokenRequestExists(Token) then
+        if (TicketRequestManager.TokenRequestExists(Token)) then
             TicketRequestManager.DeleteReservationRequest(Token, true);
 
-        if not NpXmlDomMgt.FindNodes(XmlElement, 'ticket', XmlNodeList) then
+        if (not NpXmlDomMgt.FindNodes(XmlElement, 'ticket', XmlNodeList)) then
             exit;
 
-        //-#335889 [335889] refactoring ***
         for i := 0 to XmlNodeList.Count - 1 do begin
             XmlElement := XmlNodeList.ItemOf(i);
             InsertTemporaryTicketReservation(XmlElement, Token, TmpTicketReservationRequest);
@@ -318,13 +315,13 @@ codeunit 6060116 "NPR TM Ticket WebService Mgr"
 
         TmpTicketReservationRequest.Reset();
         if (TmpTicketReservationRequest.IsEmpty()) then
-            Error('Houston, we have a problem! 6060116.CreateTicketRequest() said ok, but token %1 was NOT found.', Token);
+            Error('Houston, we have a problem! 6060116.CreateTicketRequest() said ok, but token %1 was not found.', Token);
 
         // precheck member guest
         MemberTicketManager.PreValidateMemberGuestTicketRequest(TmpTicketReservationRequest, true);
 
-        //-TM1.40 [350287]
-        if (TicketRequestManager.RevalidateRequestForTicketReuse(TmpTicketReservationRequest, ReusedToken, ResponseMessage)) then begin
+        Commit();
+        if (TicketAttempCreate.RevalidateRequestForTicketReuse(TmpTicketReservationRequest, ReusedToken, ResponseMessage)) then begin
             // duplicate the previous response so SOAP Service gets a valid response
             TicketReservationResponse.SetFilter("Session Token ID", '=%1', ReusedToken);
             if (TicketReservationResponse.FindSet()) then begin
@@ -333,15 +330,13 @@ codeunit 6060116 "NPR TM Ticket WebService Mgr"
                     TicketReservationResponse2."Entry No." := 0;
                     TicketReservationResponse2."Session Token ID" := Token;
                     TicketReservationResponse2.Insert();
-                //-TM1.41 [353736]
-                //UNTIL (TicketReservationRequest.NEXT () = 0);
+
+                //until (TicketReservationRequest.NEXT () = 0);
                 until (TicketReservationResponse.Next() = 0);
-                //-TM1.41 [353736]
+
             end;
             exit;
         end;
-        //+TM1.40 [350287]
-
 
         TmpTicketReservationRequest.Reset();
         TmpTicketReservationRequest.FindSet();
@@ -350,8 +345,6 @@ codeunit 6060116 "NPR TM Ticket WebService Mgr"
             TicketReservationRequest."Entry No." := 0;
             TicketReservationRequest.Insert();
         until (TmpTicketReservationRequest.Next() = 0);
-        //+#335889 [335889]
-
 
         TicketReservationRequest.SetCurrentKey("Session Token ID");
         TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
@@ -370,9 +363,7 @@ codeunit 6060116 "NPR TM Ticket WebService Mgr"
             until ((TicketReservationRequest.Next() = 0));
         end;
 
-        //-#335889 [335889]
-        // MemberTicketManager.ValidateMemberAssignedTickets (Token, TRUE);
-        //+#335889 [335889]
+        // MemberTicketManager.ValidateMemberAssignedTickets (Token, true);
 
         TicketRequestManager.ConfirmReservationRequestWithValidate(Token);
         TicketRequestManager.RegisterArrivalRequest(Token);
@@ -388,23 +379,22 @@ codeunit 6060116 "NPR TM Ticket WebService Mgr"
         XmlNodeList: DotNet NPRNetXmlNodeList;
         i: Integer;
     begin
-        //-TM1.23 [284752]
 
-        if IsNull(XmlDoc) then
+        if (IsNull(XmlDoc)) then
             exit;
 
         XmlElement := XmlDoc.DocumentElement;
-        if IsNull(XmlElement) then
+        if (IsNull(XmlElement)) then
             exit;
 
-        if not NpXmlDomMgt.FindNodes(XmlElement, 'set_attributes', XmlNodeList) then
+        if (not NpXmlDomMgt.FindNodes(XmlElement, 'set_attributes', XmlNodeList)) then
             exit;
 
         Token := CopyStr(NpXmlDomMgt.GetXmlAttributeText(XmlElement, 'token', false), 1, MaxStrLen(Token));
         if (Token = '') then
             Token := DocumentID;
 
-        if not NpXmlDomMgt.FindNodes(XmlElement, 'attribute', XmlNodeList) then
+        if (not NpXmlDomMgt.FindNodes(XmlElement, 'attribute', XmlNodeList)) then
             exit;
 
         // Pass one - blank Admission Code
@@ -421,7 +411,7 @@ codeunit 6060116 "NPR TM Ticket WebService Mgr"
 
         end;
 
-        if not NpXmlDomMgt.FindNodes(XmlElement, 'attribute', XmlNodeList) then
+        if (not NpXmlDomMgt.FindNodes(XmlElement, 'attribute', XmlNodeList)) then
             exit;
         // Pass two - specific Admission Code
         for i := 0 to XmlNodeList.Count - 1 do begin
@@ -436,9 +426,8 @@ codeunit 6060116 "NPR TM Ticket WebService Mgr"
                 ApplyAttributes(Token, AdmissionCode, AttributeCode, AttributeValue);
 
         end;
-        //+TM1.23 [284752]
-    end;
 
+    end;
 
     local procedure ImportTicketChangeRequest(XmlDoc: DotNet NPRNetXmlDocument; RequestEntryNo: Integer; DocumentID: Text[100]);
     var
@@ -460,31 +449,30 @@ codeunit 6060116 "NPR TM Ticket WebService Mgr"
         ResponseMessage: Text;
     begin
 
-        //-#417417 [417417]
         TicketRequestManager.ExpireReservationRequests();
 
-        if ISNULL(XmlDoc) then
+        if (ISNULL(XmlDoc)) then
             exit;
 
         XmlElement := XmlDoc.DocumentElement;
-        if ISNULL(XmlElement) then
+        if (ISNULL(XmlElement)) then
             exit;
 
-        if (NOT NpXmlDomMgt.FindNode(XmlElement, 'ChangeReservation', XmlNodeChild)) then
+        if (not NpXmlDomMgt.FindNode(XmlElement, 'ChangeReservation', XmlNodeChild)) then
             exit;
 
-        TicketNumber := NpXmlDomMgt.GetElementText(XmlNodeChild, 'Request/TicketNumber', MAXSTRLEN(TicketNumber), TRUE);
-        PinCode := NpXmlDomMgt.GetElementText(XmlNodeChild, 'Request/PinCode', MAXSTRLEN(PinCode), TRUE);
+        TicketNumber := NpXmlDomMgt.GetElementText(XmlNodeChild, 'Request/TicketNumber', MaxStrLen(TicketNumber), true);
+        PinCode := NpXmlDomMgt.GetElementText(XmlNodeChild, 'Request/PinCode', MaxStrLen(PinCode), true);
 
-        if (NOT TicketRequestManager.CreateChangeRequest(TicketNumber, PinCode, DocumentID, ResponseMessage)) then
-            ERROR(ResponseMessage);
+        if (not TicketRequestManager.CreateChangeRequest(TicketNumber, PinCode, DocumentID, ResponseMessage)) then
+            Error(ResponseMessage);
 
-        TicketReservationRequest.RESET();
-        TicketReservationRequest.SETFILTER("Session Token ID", '=%1', DocumentID);
-        TicketReservationRequest.SETFILTER("Primary Request Line", '=%1', TRUE);
-        TicketReservationRequest.FINDFIRST();
+        TicketReservationRequest.Reset();
+        TicketReservationRequest.SetFilter("Session Token ID", '=%1', DocumentID);
+        TicketReservationRequest.SetFilter("Primary Request Line", '=%1', true);
+        TicketReservationRequest.FindFirst();
         CreateResponse(TicketReservationRequest, TicketReservationResponse);
-        //+#417417 [417417]
+
     end;
 
     local procedure ImportTicketConfirmChangeRequest(XmlDoc: DotNet NPRNetXmlDocument; RequestEntryNo: Integer; DocumentID: Text[100])
@@ -516,95 +504,94 @@ codeunit 6060116 "NPR TM Ticket WebService Mgr"
         ResponseCode: Integer;
     begin
 
-        //-#417417 [417417]
         TicketRequestManager.ExpireReservationRequests();
 
-        if ISNULL(XmlDoc) then
+        if (ISNULL(XmlDoc)) then
             exit;
         XmlElement := XmlDoc.DocumentElement;
-        if ISNULL(XmlElement) then
+        if (ISNULL(XmlElement)) then
             exit;
 
-        if NOT NpXmlDomMgt.FindNode(XmlElement, 'ConfirmChangeReservation', XmlNode) then
+        if (not NpXmlDomMgt.FindNode(XmlElement, 'ConfirmChangeReservation', XmlNode)) then
             exit;
 
-        ChangeRequestToken := NpXmlDomMgt.GetElementText(XmlNode, 'Request/ChangeRequestToken', MAXSTRLEN(ChangeRequestToken), TRUE);
-        if (NOT TicketRequestManager.TokenRequestExists(ChangeRequestToken)) then
+        ChangeRequestToken := NpXmlDomMgt.GetElementText(XmlNode, 'Request/ChangeRequestToken', MaxStrLen(ChangeRequestToken), true);
+        if (not TicketRequestManager.TokenRequestExists(ChangeRequestToken)) then
             exit;
 
-        if NOT NpXmlDomMgt.FindNodes(XmlNode, 'Request/Admissions/Admission', XmlTokenNodeList) then
+        if (not NpXmlDomMgt.FindNodes(XmlNode, 'Request/Admissions/Admission', XmlTokenNodeList)) then
             exit;
 
-        FOR Token_i := 0 TO XmlTokenNodeList.Count - 1 DO begin
+        FOR Token_i := 0 TO XmlTokenNodeList.Count - 1 do begin
             XmlTokenElement := XmlTokenNodeList.ItemOf(Token_i);
 
-            AdmissionCode := COPYSTR(NpXmlDomMgt.GetXmlAttributeText(XmlTokenElement, 'Code', TRUE), 1, MAXSTRLEN(AdmissionCode));
-            if (NOT EVALUATE(ExtScheduleEntryOld, COPYSTR(NpXmlDomMgt.GetXmlAttributeText(XmlTokenElement, 'OldScheduleEntryNo', TRUE), 1, 10))) then
+            AdmissionCode := CopyStr(NpXmlDomMgt.GetXmlAttributeText(XmlTokenElement, 'Code', true), 1, MaxStrLen(AdmissionCode));
+            if (not Evaluate(ExtScheduleEntryOld, CopyStr(NpXmlDomMgt.GetXmlAttributeText(XmlTokenElement, 'OldScheduleEntryNo', true), 1, 10))) then
                 ExtScheduleEntryOld := 0;
 
-            if (NOT EVALUATE(ExtScheduleEntryNew, COPYSTR(NpXmlDomMgt.GetXmlAttributeText(XmlTokenElement, 'NewScheduleEntryNo', TRUE), 1, 10))) then
+            if (not Evaluate(ExtScheduleEntryNew, CopyStr(NpXmlDomMgt.GetXmlAttributeText(XmlTokenElement, 'NewScheduleEntryNo', true), 1, 10))) then
                 ExtScheduleEntryNew := 0;
 
-            AdmissionScheduleEntry.SETFILTER("External Schedule Entry No.", '=%1', ExtScheduleEntryOld);
-            if (NOT AdmissionScheduleEntry.FINDFIRST()) then
-                ERROR('Invalid schedule entry %1.', ExtScheduleEntryOld);
+            AdmissionScheduleEntry.SetFilter("External Schedule Entry No.", '=%1', ExtScheduleEntryOld);
+            if (not AdmissionScheduleEntry.FindFirst()) then
+                Error('Invalid schedule entry %1.', ExtScheduleEntryOld);
 
             if (AdmissionCode <> AdmissionScheduleEntry."Admission Code") then
-                ERROR('Schedule Entry %1 does not correspond to admission code %2.', ExtScheduleEntryOld, AdmissionCode);
+                Error('Schedule Entry %1 does not correspond to admission code %2.', ExtScheduleEntryOld, AdmissionCode);
 
-            AdmissionScheduleEntry.SETFILTER("External Schedule Entry No.", '=%1', ExtScheduleEntryNew);
-            if (NOT AdmissionScheduleEntry.FINDFIRST()) then
-                ERROR('Invalid schedule entry %1.', ExtScheduleEntryNew);
+            AdmissionScheduleEntry.SetFilter("External Schedule Entry No.", '=%1', ExtScheduleEntryNew);
+            if (not AdmissionScheduleEntry.FindFirst()) then
+                Error('Invalid schedule entry %1.', ExtScheduleEntryNew);
 
             if (AdmissionCode <> AdmissionScheduleEntry."Admission Code") then
-                ERROR('Schedule Entry %1 does not correspond to admission code %2.', ExtScheduleEntryNew, AdmissionCode);
+                Error('Schedule Entry %1 does not correspond to admission code %2.', ExtScheduleEntryNew, AdmissionCode);
 
-            TicketReservationRequest.RESET();
-            TicketReservationRequest.SETFILTER("Session Token ID", '=%1', ChangeRequestToken);
-            TicketReservationRequest.SETFILTER("Admission Code", '=%1', AdmissionCode);
-            TicketReservationRequest.SETFILTER("External Adm. Sch. Entry No.", '=%1', ExtScheduleEntryOld);
-            if (TicketReservationRequest.FINDFIRST()) then
+            TicketReservationRequest.Reset();
+            TicketReservationRequest.SetFilter("Session Token ID", '=%1', ChangeRequestToken);
+            TicketReservationRequest.SetFilter("Admission Code", '=%1', AdmissionCode);
+            TicketReservationRequest.SetFilter("External Adm. Sch. Entry No.", '=%1', ExtScheduleEntryOld);
+            if (TicketReservationRequest.FindFirst()) then
                 if (TicketReservationRequest."Request Status" = TicketReservationRequest."Request Status"::CONFIRMED) then
-                    ERROR('Change request %1 has already been confirmed.', ChangeRequestToken);
+                    Error('Change request %1 has already been confirmed.', ChangeRequestToken);
 
-            TicketReservationRequest.SETFILTER("Request Status", '=%1', TicketReservationRequest."Request Status"::REGISTERED);
-            if (NOT TicketReservationRequest.FINDFIRST()) then
-                ERROR('A request for %1 and schedule entry %2 was not found for token %3', AdmissionCode, ExtScheduleEntryOld, ChangeRequestToken);
+            TicketReservationRequest.SetFilter("Request Status", '=%1', TicketReservationRequest."Request Status"::REGISTERED);
+            if (not TicketReservationRequest.FindFirst()) then
+                Error('A request for %1 and schedule entry %2 was not found for token %3', AdmissionCode, ExtScheduleEntryOld, ChangeRequestToken);
 
             TicketReservationRequest."External Adm. Sch. Entry No." := ExtScheduleEntryNew;
-            TicketReservationRequest.MODIFY();
+            TicketReservationRequest.Modify();
 
         end;
 
-        TicketReservationRequest.RESET();
-        TicketReservationRequest.SETFILTER("Session Token ID", '=%1', DocumentID);
-        TicketReservationRequest.FINDFIRST();
+        TicketReservationRequest.Reset();
+        TicketReservationRequest.SetFilter("Session Token ID", '=%1', DocumentID);
+        TicketReservationRequest.FindFirst();
 
         // Shift admission from old schedule entry to new
-        Ticket.SETFILTER("Ticket Reservation Entry No.", '=%1', TicketReservationRequest."Superseeds Entry No.");
-        if (Ticket.FINDSET()) then begin
-            REPEAT
-                TickeChangeRequest.SETFILTER("Session Token ID", '=%1', DocumentID);
-                TickeChangeRequest.FINDSET();
-                REPEAT
-                    TicketManagement.RescheduleTicketAdmission(TRUE, Ticket."No.", TickeChangeRequest."External Adm. Sch. Entry No.", TRUE, TickeChangeRequest."Request Status Date Time", ResponseMessage);
-                UNTIL (TickeChangeRequest.NEXT() = 0);
-            UNTIL (Ticket.NEXT() = 0);
+        Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketReservationRequest."Superseeds Entry No.");
+        if (Ticket.FindSet()) then begin
+            repeat
+                TickeChangeRequest.SetFilter("Session Token ID", '=%1', DocumentID);
+                TickeChangeRequest.FindSet();
+                repeat
+                    TicketManagement.RescheduleTicketAdmission(true, Ticket."No.", TickeChangeRequest."External Adm. Sch. Entry No.", true, TickeChangeRequest."Request Status Date Time", ResponseMessage);
+                until (TickeChangeRequest.NEXT() = 0);
+            until (Ticket.NEXT() = 0);
 
             // Relink tickets to this request
-            Ticket.MODIFYALL("Ticket Reservation Entry No.", TicketReservationRequest."Entry No.", FALSE);
+            Ticket.ModifyALL("Ticket Reservation Entry No.", TicketReservationRequest."Entry No.", false);
         end;
 
         TicketRequestManager.ConfirmChangeRequest(DocumentID);
 
-        TicketReservationRequest.RESET();
-        TicketReservationRequest.SETFILTER("Session Token ID", '=%1', DocumentID);
-        TicketReservationRequest.SETFILTER("Primary Request Line", '=%1', TRUE);
-        TicketReservationRequest.FINDFIRST();
+        TicketReservationRequest.Reset();
+        TicketReservationRequest.SetFilter("Session Token ID", '=%1', DocumentID);
+        TicketReservationRequest.SetFilter("Primary Request Line", '=%1', true);
+        TicketReservationRequest.FindFirst();
 
         if (CreateResponse(TicketReservationRequest, TicketReservationResponse)) then begin
-            TicketReservationResponse.Confirmed := TRUE;
-            TicketReservationResponse.MODIFY();
+            TicketReservationResponse.Confirmed := true;
+            TicketReservationResponse.Modify();
         end;
     end;
 
@@ -646,7 +633,7 @@ codeunit 6060116 "NPR TM Ticket WebService Mgr"
         ResponseCode: Integer;
     begin
 
-        TicketReservationRequest."Expires Date Time" := CurrentDateTime + TicketReservationResponse."Exires (Seconds)" * 1000;
+        TicketReservationRequest."Expires Date Time" := CurrentDateTime() + TicketReservationResponse."Exires (Seconds)" * 1000;
         TicketReservationRequest."Request Status" := TicketReservationRequest."Request Status"::REGISTERED;
         TicketReservationRequest.Modify();
 
@@ -688,10 +675,9 @@ codeunit 6060116 "NPR TM Ticket WebService Mgr"
             end;
         end;
 
-        //-TM1.43 [368043]
-        //if (NOT TicketRequestManager.TranslateBarcodeToItemVariant (TicketReservationRequest."External Item Code", ItemNo, VariantCode, ExternalItemType)) then begin
+        //if (not TicketRequestManager.TranslateBarcodeToItemVariant (TicketReservationRequest."External Item Code", ItemNo, VariantCode, ExternalItemType)) then begin
         if (not TicketRequestManager.TranslateBarcodeToItemVariant(TicketReservationRequest."External Item Code", TicketReservationRequest."Item No.", TicketReservationRequest."Variant Code", ExternalItemType)) then begin
-            //+TM1.43 [368043]
+
             TicketReservationResponse."Response Message" := StrSubstNo('External Item [%1] does not resolve to an internal item.', TicketReservationRequest."External Item Code");
             TicketReservationResponse.Status := false;
         end;
@@ -728,9 +714,8 @@ codeunit 6060116 "NPR TM Ticket WebService Mgr"
         TicketReservationRequest."Created Date Time" := CurrentDateTime();
 
         TicketReservationRequest."External Item Code" := CopyStr(NpXmlDomMgt.GetXmlAttributeText(XmlElement, 'external_id', true), 1, MaxStrLen(TicketReservationRequest."External Item Code"));
-        //-TM1.43 [368043]
+
         TicketRequestManager.TranslateBarcodeToItemVariant(TicketReservationRequest."External Item Code", TicketReservationRequest."Item No.", TicketReservationRequest."Variant Code", ExternalItemType);
-        //+TM1.43 [368043]
 
         Evaluate(TicketReservationRequest.Quantity, NpXmlDomMgt.GetXmlAttributeText(XmlElement, 'qty', true));
         Evaluate(TicketReservationRequest."Ext. Line Reference No.", NpXmlDomMgt.GetXmlAttributeText(XmlElement, 'line_no', true));
@@ -739,22 +724,19 @@ codeunit 6060116 "NPR TM Ticket WebService Mgr"
 
         Evaluate(TicketReservationRequest."External Adm. Sch. Entry No.", NpXmlDomMgt.GetXmlAttributeText(XmlElement, 'admission_schedule_entry', false));
 
-        //-TM1.45 [380754]
         TicketReservationRequest."Waiting List Reference Code" := CopyStr(NpXmlDomMgt.GetXmlAttributeText(XmlElement, 'waitinglist_reference_code', false), 1, MaxStrLen(TicketReservationRequest."Waiting List Reference Code"));
         WaitingListOptInAddress := CopyStr(NpXmlDomMgt.GetXmlAttributeText(XmlElement, 'waitinglist_opt-in_address', false), 1, MaxStrLen(WaitingListOptInAddress));
         if (WaitingListOptInAddress <> '') then begin
             TicketReservationRequest."Request Status" := TicketReservationRequest."Request Status"::WAITINGLIST;
             TicketReservationRequest."Notification Address" := WaitingListOptInAddress;
         end;
-        //+TM1.45 [380754]
-
 
         // //xx
         // if (TicketReservationRequest."External Member No." <> '') then begin
-        //  Member.SETFILTER ("External Member No.", '=%1', TicketReservationRequest."External Member No.");
-        //  Member.SETFILTER (Blocked, '=%1', FALSE);
-        //  if (Member.FINDFIRST ()) then begin
-        //    CASE Member."Notification Method" OF
+        //  Member.SetFilter ("External Member No.", '=%1', TicketReservationRequest."External Member No.");
+        //  Member.SetFilter (Blocked, '=%1', false);
+        //  if (Member.FindFirst ()) then begin
+        //    case Member."Notification Method" OF
         //      Member."Notification Method"::EMAIL :
         //        begin
         //          TicketReservationRequest."Notification Method" := TicketReservationRequest."Notification Method"::EMAIL;
@@ -770,7 +752,6 @@ codeunit 6060116 "NPR TM Ticket WebService Mgr"
         // end;
         // //xx
 
-
         TicketReservationRequest.Insert();
     end;
 
@@ -780,20 +761,19 @@ codeunit 6060116 "NPR TM Ticket WebService Mgr"
         ExternalItemType: Integer;
     begin
 
-        //-#335889 [335889]
         Initialize;
 
         with TmpTicketReservationRequest do begin
-            Init;
+            Init();
             TmpTicketReservationRequest."Entry No." := TmpTicketReservationRequest.Count() + 1;
             "Session Token ID" := Token;
             "Request Status" := "Request Status"::WIP;
             "Created Date Time" := CurrentDateTime();
 
             "External Item Code" := CopyStr(NpXmlDomMgt.GetXmlAttributeText(XmlElement, 'external_id', true), 1, MaxStrLen("External Item Code"));
-            //-TM1.43 [368043]
+
             TicketRequestManager.TranslateBarcodeToItemVariant("External Item Code", "Item No.", "Variant Code", ExternalItemType);
-            //+TM1.43 [368043]
+
             Evaluate(Quantity, NpXmlDomMgt.GetXmlAttributeText(XmlElement, 'qty', true));
             Evaluate("Ext. Line Reference No.", NpXmlDomMgt.GetXmlAttributeText(XmlElement, 'line_no', true));
             "External Member No." := CopyStr(NpXmlDomMgt.GetXmlAttributeText(XmlElement, 'member_number', false), 1, MaxStrLen("External Member No."));
@@ -803,7 +783,7 @@ codeunit 6060116 "NPR TM Ticket WebService Mgr"
 
             Insert();
         end;
-        //+#335889 [335889]
+
     end;
 
     local procedure ApplyAttributes(Token: Text[50]; AdmissionCode: Code[20]; AttributeCode: Code[20]; AttributeValue: Text)
@@ -851,7 +831,7 @@ codeunit 6060116 "NPR TM Ticket WebService Mgr"
     procedure Initialize()
     begin
 
-        if not Initialized then begin
+        if (not Initialized) then begin
             Initialized := true;
         end;
     end;

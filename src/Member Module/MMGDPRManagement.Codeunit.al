@@ -26,7 +26,7 @@ codeunit 6151121 "NPR MM GDPR Management"
     begin
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6060127, 'OnAfterMemberCreateEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, CodeUnit::"NPR MM Membership Events", 'OnAfterMemberCreateEvent', '', true, true)]
     local procedure OnNewMember(var Membership: Record "NPR MM Membership"; var Member: Record "NPR MM Member")
     var
         MembershipSetup: Record "NPR MM Membership Setup";
@@ -38,7 +38,7 @@ codeunit 6151121 "NPR MM GDPR Management"
         CheckLogEntry(MembershipSetup."GDPR Agreement No.", MembershipSetup."GDPR Mode", Membership."Entry No.", Member."Entry No.");
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6060127, 'OnAfterInsertMembershipEntry', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, CodeUnit::"NPR MM Membership Events", 'OnAfterInsertMembershipEntry', '', true, true)]
     local procedure OnNewMembershipTimeEntry(MembershipEntry: Record "NPR MM Membership Entry")
     var
         MembershipRole: Record "NPR MM Membership Role";

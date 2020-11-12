@@ -29,6 +29,7 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
         NOT_MEMBERSHIP_SALES: Label 'The selected sales line is not a membership sales.';
         Text000: Label 'Update Membership metadata on Sale Line Insert';
         ADMIT_MEMBERS: Label 'Do you want to admit the member(s) automatically?';
+        MembershipEvents: Codeunit "NPR MM Membership Events";
 
     local procedure "--Subscribers"()
     begin
@@ -209,8 +210,10 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
     local procedure OnBeforeSetQuantity(SaleLinePOS: Record "NPR Sale Line POS"; var NewQuantity: Decimal)
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
+        TmpMemberInfoCapture: Record "NPR MM Member Info Capture" temporary;
         MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
-        MemberManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipAppemptCreate: Codeunit "NPR Membership Attempt Create";
+        ReasonText: Text;
     begin
 
         if (SaleLinePOS.IsTemporary) then
@@ -222,22 +225,22 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
         if (MemberInfoCapture.FindFirst()) then begin
             if (SaleLinePOS."No." = MemberInfoCapture."Item No.") then begin
                 if (MembershipSalesSetup.Get(MembershipSalesSetup.Type::ITEM, MemberInfoCapture."Item No.")) then;
-                case MembershipSalesSetup."Business Flow Type" of
-                    MembershipSalesSetup."Business Flow Type"::ADD_ANONYMOUS_MEMBER:
-                        begin
-                            MemberManagement.AddAnonymousMember(MemberInfoCapture, NewQuantity);
-                            asserterror Error(''); // force a rollback, membercreation will be redone at checkout
-                        end;
-                    else
-                        Error(QTY_CANT_CHANGE);
-                end;
+
+                if (MembershipSalesSetup."Business Flow Type" <> MembershipSalesSetup."Business Flow Type"::ADD_ANONYMOUS_MEMBER) then
+                    Error(QTY_CANT_CHANGE);
+
+                TmpMemberInfoCapture.TransferFields(MemberInfoCapture, true);
+                TmpMemberInfoCapture.Quantity := NewQuantity;
+                TmpMemberInfoCapture.Insert();
+
+                MembershipAppemptCreate.SetAttemptCreateMembershipForcedRollback();
+                if (not MembershipAppemptCreate.run(TmpMemberInfoCapture)) then
+                    if (not MembershipAppemptCreate.WasSuccessful(ReasonText)) then
+                        error(ReasonText);
+
             end;
         end;
 
-    end;
-
-    local procedure "--Workers"()
-    begin
     end;
 
     procedure MemberArrival(POSSession: Codeunit "NPR POS Session"; InputMethod: Option; ExternalMemberCardNo: Text[100])
@@ -264,6 +267,7 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
 
         MemberRetailIntegration.POS_ValidateMemberCardNo(true, true, InputMethod, true, ExternalMemberCardNo);
         MemberLimitationMgr.POS_CheckLimitMemberCardArrival(ExternalMemberCardNo, '', 'POS', LogEntryNo, ResponseMessage, ResponseCode);
+        Commit();
 
         if (ResponseCode <> 0) then
             Error(ResponseMessage);
@@ -276,10 +280,10 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
         POSSaleLine.GetNewSaleLine(SaleLinePOS);
 
         Commit();
-        OnBeforePOSMemberArrival(SaleLinePOS, MembershipSetup."Community Code", MembershipSetup.Code, Membership."Entry No.", Member."Entry No.", MemberCard."Entry No.", ExternalMemberCardNo);
+        MembershipEvents.OnBeforePOSMemberArrival(SaleLinePOS, MembershipSetup."Community Code", MembershipSetup.Code, Membership."Entry No.", Member."Entry No.", MemberCard."Entry No.", ExternalMemberCardNo);
 
         ItemDescription := '';
-        OnCustomItemDescription(MembershipSetup."Community Code", MembershipSetup.Code, MemberCard."Entry No.", ItemDescription);
+        MembershipEvents.OnCustomItemDescription(MembershipSetup."Community Code", MembershipSetup.Code, MemberCard."Entry No.", ItemDescription);
 
         ExternalItemNo := MemberRetailIntegration.POS_GetExternalTicketItemFromMembership(ExternalMemberCardNo);
         AddItemToPOS(POSSession, 0, ExternalItemNo, CopyStr(ItemDescription, 1, MaxStrLen(SaleLinePOS.Description)), StrSubstNo('%1/%2', Membership."External Membership No.", ExternalMemberCardNo), 1, 0, SaleLinePOS);
@@ -289,14 +293,14 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
                 begin
                     Clear(Member);
                     UpdatePOSSalesInfo(SaleLinePOS, Membership."Entry No.", 0, MemberCard."Entry No.", ExternalMemberCardNo);
-                    OnAssociateSaleWithMember(POSSession, Membership."External Membership No.", CopyStr(ExternalMemberCardNo, 1, MaxStrLen(Member."External Member No.")));
+                    MembershipEvents.OnAssociateSaleWithMember(POSSession, Membership."External Membership No.", CopyStr(ExternalMemberCardNo, 1, MaxStrLen(Member."External Member No.")));
                 end;
 
             MembershipSetup."Member Information"::NAMED:
                 begin
                     Member.Get(MembershipManagement.GetMemberFromExtCardNo(ExternalMemberCardNo, Today, ResponseMessage));
                     UpdatePOSSalesInfo(SaleLinePOS, Membership."Entry No.", Member."Entry No.", MemberCard."Entry No.", ExternalMemberCardNo);
-                    OnAssociateSaleWithMember(POSSession, Membership."External Membership No.", Member."External Member No.");
+                    MembershipEvents.OnAssociateSaleWithMember(POSSession, Membership."External Membership No.", Member."External Member No.");
                 end;
         end;
 
@@ -849,30 +853,6 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
         exit(ItemNo);
     end;
 
-    local procedure DoLookupRetailList(var TmpRetailList: Record "NPR Retail List" temporary) ItemNo: Code[20]
-    var
-        LookupRecRef: RecordRef;
-        LineNo: Integer;
-        Position: Text;
-    begin
-        ItemNo := '';
-
-        LookupRecRef.GetTable(TmpRetailList);
-        // ConfigureLookupTemplate (Template, LookupRecRef);
-        // Position := Marshaller.Lookup(SELECT_PRODUCT, Template, LookupRecRef);
-        Position := UI.DoLookup(SELECT_PRODUCT, LookupRecRef);
-
-        if (Position <> '') then begin
-            LookupRecRef.SetPosition(Position);
-            if (LookupRecRef.Find()) then begin
-                LookupRecRef.SetTable(TmpRetailList);
-                ItemNo := TmpRetailList.Value;
-            end;
-        end;
-
-        exit(ItemNo);
-    end;
-
     local procedure DoLookupMembershipEntry(LookupCaption: Text; var TmpMembershipEntry: Record "NPR MM Membership Entry" temporary) ItemNo: Code[20]
     var
         LookupRecRef: RecordRef;
@@ -987,25 +967,6 @@ codeunit 6060138 "NPR MM POS Action: MemberMgmt."
         ExtMemberCardNo := MemberCard."External Card No.";
         exit(true);
 
-    end;
-
-    local procedure "--- Publisher"()
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    procedure OnAssociateSaleWithMember(POSSession: Codeunit "NPR POS Session"; ExternalMembershipNo: Code[20]; ExternalMemberNo: Code[20])
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    procedure OnBeforePOSMemberArrival(SaleLinePOS: Record "NPR Sale Line POS"; CommunityCode: Code[20]; MembershipCode: Code[20]; MembershipEntryNo: Integer; MemberEntryNo: Integer; MemberCardEntryNo: Integer; ScannedCardNumber: Text[100])
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnCustomItemDescription(CommunityCode: Code[20]; MembershipCode: Code[20]; MemberCardEntryNo: Integer; var NewDescription: Text)
-    begin
     end;
 
     local procedure "--- Subscribers"()

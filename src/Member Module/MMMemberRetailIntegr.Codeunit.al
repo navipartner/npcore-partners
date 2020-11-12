@@ -10,7 +10,7 @@ codeunit 6060131 "NPR MM Member Retail Integr."
         BLOCKED_NOT_FOUND: Label 'Member %1 is either blocked or not found.';
         CARD_BLOCKED_NOT_FOUND: Label 'Member Card %1 is either blocked or not found.';
         NO_PRINTOUT: Label 'Membership %1 is not setup for printing.';
-        MSG_1101: Label 'Quantity must be 1, when selling memberships.';
+
         MSG_1102: Label 'Member registration aborted.';
         MSG_1103: Label 'Membership code specified on sales item was not found.';
         MSG_1105: Label 'Nothing to edit.';
@@ -22,8 +22,15 @@ codeunit 6060131 "NPR MM Member Retail Integr."
         Text000: Label 'Print Membership';
         INVALID_TICKET_ITEM: Label 'Ticket Item specified on %1 %2, is not valid. ';
         ADMIT_MEMBERS: Label 'Do you want to admit the member(s)?';
-        NOT_SUPPORTED_FOR_REMOTE: Label 'This membership action is not supported for a remote membership';
         CONFIRM_CARD_BLOCKED: Label 'This membercard is blocked, do you want to continue anyway?';
+
+
+    trigger OnRun()
+    var
+    begin
+
+    end;
+
 
     procedure POS_ValidateMemberCardNo(FailWithError: Boolean; AllowVerboseMode: Boolean; InputMode: Option CARD_SCAN,FACIAL_RECOGNITION,NO_PROMPT; ActivateMembership: Boolean; var ExternalMemberCardNo: Text[100]): Boolean
     var
@@ -85,7 +92,7 @@ codeunit 6060131 "NPR MM Member Retail Integr."
             InputMode::NO_PROMPT:
                 ; // Prevalidated
             InputMode::CARD_SCAN:
-                ExternalMemberCardNo := UI.SearchBox(MEMBER_CARD_NO, MEMBER_MANAGEMENT, 100);
+                Error('CARD_SCAN is an obsolete feature of POS_ValidateMemberCardNoWorker()');
             InputMode::FACIAL_RECOGNITION:
                 begin
                     ExternalMemberCardNo := '';
@@ -510,6 +517,7 @@ codeunit 6060131 "NPR MM Member Retail Integr."
         MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
         MemberLinesToSuggest: Integer;
         ReasonMessage: Text;
+        AttemptCreateMembership: Codeunit "NPR Membership Attempt Create";
     begin
 
         if (SaleLinePOS.Quantity < 0) then
@@ -626,21 +634,18 @@ codeunit 6060131 "NPR MM Member Retail Integr."
                     MemberInfoCapture.ModifyAll("Auto-Admit Member", true);
             end;
             Commit();
+            AttemptCreateMembership.SetAttemptCreateMembershipForcedRollback();
+            if (not AttemptCreateMembership.run(MemberInfoCapture)) then
+                if (not AttemptCreateMembership.WasSuccessful(ReasonMessage)) then
+                    Error(ReasonMessage);
 
-            if (CreateMemberships(false, MemberInfoCapture, ReasonMessage)) then begin
-
-                if (SaleLinePOS.Get(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Sale Type", SaleLinePOS."Line No.")) then begin
-                    SaleLinePOS."Description 2" := MemberInfoCapture."External Membership No.";
-                    SaleLinePOS.Modify();
-                end;
-
-                Commit();
-                exit(1);
+            if (SaleLinePOS.Get(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Sale Type", SaleLinePOS."Line No.")) then begin
+                SaleLinePOS."Description 2" := MemberInfoCapture."External Membership No.";
+                SaleLinePOS.Modify();
             end;
 
-            // Failure PATH
-            asserterror Error('%1', ReasonMessage); // Should rollback the faulty creations from CreateMemberships
-
+            Commit();
+            exit(1);
         end;
 
         DeleteMemberInfoCapture(SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.");
@@ -709,9 +714,12 @@ codeunit 6060131 "NPR MM Member Retail Integr."
         MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
         MemberManagement: Codeunit "NPR MM Membership Mgt.";
         MemberNotification: Codeunit "NPR MM Member Notification";
+        CreateMembership: Codeunit "NPR Membership Attempt Create";
         MembershipStartDate: Date;
         MembershipUntilDate: Date;
         ResponseMessage: Text;
+        ReasonCode: Integer;
+        LogEntryNo: Integer;
     begin
 
         MemberInfoCapture.SetCurrentKey("Receipt No.", "Line No.");
@@ -728,261 +736,70 @@ codeunit 6060131 "NPR MM Member Retail Integr."
             MemberInfoCapture.Amount := Amount_LCY;
             MemberInfoCapture."Amount Incl VAT" := AmountInclVat_LCY;
             MemberInfoCapture.Description := CopyStr(Description, 1, MaxStrLen(MemberInfoCapture.Description));
+            MemberInfoCapture.Quantity := Quantity;
+            MemberInfoCapture."Document Date" := SalesDate;
             MemberInfoCapture.Modify();
         until (MemberInfoCapture.Next() = 0);
 
-        MemberInfoCapture.FindSet();
-        case MemberInfoCapture."Information Context" of
-
-            MemberInfoCapture."Information Context"::NEW:
-                begin
-
-                    MembershipSalesSetup.Get(MembershipSalesSetup.Type::ITEM, MemberInfoCapture."Item No.");
-
-                    case MembershipSalesSetup."Business Flow Type" of
-                        MembershipSalesSetup."Business Flow Type"::ADD_ANONYMOUS_MEMBER:
-                            ;
-                        else
-                            if (Quantity <> 1) then
-                                Error(GetErrorText(-1101));
-                    end;
-
-                    if (MembershipSalesSetup."Business Flow Type" = MembershipSalesSetup."Business Flow Type"::MEMBERSHIP) then begin
-
-                        if (IsForeignMembership(MembershipSalesSetup."Membership Code")) then begin
-                            RemoteCreateMembership(MemberInfoCapture, MembershipSalesSetup);
-                            repeat
-                                RemoteAddMember(MemberInfoCapture, MembershipSalesSetup);
-                            until (MemberInfoCapture.Next() = 0);
-                            //TODO: Consider - RemoteActivateMembership (MemberInfoCapture, MembershipSalesSetup);
-
-                        end else begin
-                            MemberManagement.AddMembershipLedgerEntry_NEW(MemberInfoCapture."Membership Entry No.", SalesDate, MembershipSalesSetup, MemberInfoCapture);
-                        end;
-
-                    end;
-
-                    if (MembershipSalesSetup."Business Flow Type" = MembershipSalesSetup."Business Flow Type"::ADD_NAMED_MEMBER) then begin
-                        repeat
-
-                            if (IsForeignMembership(MembershipSalesSetup."Membership Code")) then begin
-                                RemoteAddMember(MemberInfoCapture, MembershipSalesSetup);
-                            end else begin
-                                MemberManagement.AddMemberAndCard(false, MemberInfoCapture."Membership Entry No.", MemberInfoCapture, true, MemberInfoCapture."Member Entry No", ResponseMessage);
-                            end;
-
-                        until (MemberInfoCapture.Next() = 0);
-
-                    end;
-
-                    if (MembershipSalesSetup."Business Flow Type" = MembershipSalesSetup."Business Flow Type"::ADD_ANONYMOUS_MEMBER) then begin
-                        MemberManagement.AddAnonymousMember(MemberInfoCapture, Quantity);
-                    end;
-
-                    if (MembershipSalesSetup."Business Flow Type" = MembershipSalesSetup."Business Flow Type"::REPLACE_CARD) then begin
-                        MemberManagement.BlockMemberCard(MemberManagement.GetCardEntryNoFromExtCardNo(MemberInfoCapture."Replace External Card No."), true);
-                        MemberManagement.IssueMemberCard(false, MemberInfoCapture, MemberInfoCapture."Card Entry No.", ResponseMessage);
-                        if (MembershipSalesSetup."Member Card Type" in [MembershipSalesSetup."Member Card Type"::CARD_PASSSERVER, MembershipSalesSetup."Member Card Type"::PASSSERVER]) then
-                            MemberNotification.CreateWalletSendNotification(MemberInfoCapture."Membership Entry No.", MemberInfoCapture."Member Entry No", MemberInfoCapture."Card Entry No.", TODAY);
-                    end;
-
-                    if (MembershipSalesSetup."Business Flow Type" = MembershipSalesSetup."Business Flow Type"::ADD_CARD) then begin
-                        MemberManagement.IssueMemberCard(false, MemberInfoCapture, MemberInfoCapture."Card Entry No.", ResponseMessage);
-                        if (MembershipSalesSetup."Member Card Type" in [MembershipSalesSetup."Member Card Type"::CARD_PASSSERVER, MembershipSalesSetup."Member Card Type"::PASSSERVER]) then
-                            MemberNotification.CreateWalletSendNotification(MemberInfoCapture."Membership Entry No.", MemberInfoCapture."Member Entry No", MemberInfoCapture."Card Entry No.", TODAY);
-                    end;
-
-                end;
-
-            MemberInfoCapture."Information Context"::REGRET:
-                begin
-                    MemberManagement.RegretMembership(MemberInfoCapture, false, true, MembershipStartDate, MembershipUntilDate, UnitPrice);
-                end;
-
-            MemberInfoCapture."Information Context"::RENEW:
-                begin
-                    MemberManagement.RenewMembership(MemberInfoCapture, false, true, MembershipStartDate, MembershipUntilDate, UnitPrice);
-                end;
-
-            MemberInfoCapture."Information Context"::UPGRADE:
-                begin
-                    MemberManagement.UpgradeMembership(MemberInfoCapture, false, true, MembershipStartDate, MembershipUntilDate, UnitPrice);
-
-                    if (MembershipSalesSetup.Get(MembershipSalesSetup.Type::ITEM, MemberInfoCapture."Item No.")) then begin
-                        if (MembershipSalesSetup."Business Flow Type" = MembershipSalesSetup."Business Flow Type"::ADD_NAMED_MEMBER) then begin
-                            repeat
-                                MemberManagement.AddMemberAndCard(false, MemberInfoCapture."Membership Entry No.", MemberInfoCapture, true, MemberInfoCapture."Member Entry No", ResponseMessage);
-                            until (MemberInfoCapture.Next() = 0);
-                        end;
-
-                        if (MembershipSalesSetup."Business Flow Type" = MembershipSalesSetup."Business Flow Type"::ADD_ANONYMOUS_MEMBER) then begin
-                            MemberManagement.AddAnonymousMember(MemberInfoCapture, Quantity);
-                        end;
-                    end;
-
-                end;
-
-            MemberInfoCapture."Information Context"::EXTEND:
-                begin
-                    MemberManagement.ExtendMembership(MemberInfoCapture, false, true, MembershipStartDate, MembershipUntilDate, UnitPrice);
-                end;
-
-            MemberInfoCapture."Information Context"::CANCEL:
-                begin
-                    MemberManagement.CancelMembership(MemberInfoCapture, false, true, MembershipStartDate, MembershipUntilDate, UnitPrice);
-                end;
-
+        Commit();
+        CreateMembership.SetCreateMembership();
+        if (not CreateMembership.run(MemberInfoCapture)) then begin
+            Message('There was a issue when handling the membership on sales line %1 during end-of-sales: %2', ReceiptLine, GetLastErrorText());
+            exit;
         end;
 
-        if (MemberInfoCapture."Auto-Admit Member") then
-            AdmitMembersOnEndOfSalesWorker(MemberInfoCapture, ResponseMessage);
+        if (not AdmitMembersOnEndOfSalesWorker(MemberInfoCapture, ResponseMessage)) then begin
+            Message(ResponseMessage);
+            exit;
+        end;
 
         MemberInfoCapture.DeleteAll();
+        Commit();
     end;
 
-    local procedure CreateMemberships(FailWithError: Boolean; var MemberInfoCapture: Record "NPR MM Member Info Capture"; var ResponseMessage: Text): Boolean
+
+    local procedure AdmitMembersOnEndOfSalesWorker(var MemberInfoCapture: Record "NPR MM Member Info Capture"; var ReasonText: Text): Boolean;
     var
-        MemberManagement: Codeunit "NPR MM Membership Mgt.";
-        MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
-        MembershipEntryNo: Integer;
-    begin
-
-        // Filter should be sent in record variable
-        MemberInfoCapture.LockTable(true);
-
-        if (MemberInfoCapture.FindSet()) then begin
-            MembershipSalesSetup.Get(MembershipSalesSetup.Type::ITEM, MemberInfoCapture."Item No.");
-
-            if (IsForeignMembership(MembershipSalesSetup."Membership Code")) then begin
-                exit(true);
-            end;
-
-            case MembershipSalesSetup."Business Flow Type" of
-                MembershipSalesSetup."Business Flow Type"::MEMBERSHIP:
-                    begin
-                        MembershipEntryNo := MemberManagement.CreateMembership(MembershipSalesSetup, MemberInfoCapture, false);
-                        if (not (MemberManagement.AddMemberAndCard(FailWithError, MembershipEntryNo, MemberInfoCapture, true, MemberInfoCapture."Member Entry No", ResponseMessage))) then
-                            exit(false);
-
-                        MemberInfoCapture."Membership Entry No." := MembershipEntryNo;
-                        MemberInfoCapture.Modify();
-
-                        while (MemberInfoCapture.Next <> 0) do begin
-                            if (not (MemberManagement.AddMemberAndCard(FailWithError, MembershipEntryNo, MemberInfoCapture, true, MemberInfoCapture."Member Entry No", ResponseMessage))) then
-                                exit(false);
-
-                            MemberInfoCapture."Membership Entry No." := MembershipEntryNo;
-                            MemberInfoCapture.Modify();
-                        end;
-                    end;
-
-                MembershipSalesSetup."Business Flow Type"::ADD_NAMED_MEMBER:
-                    begin
-                        repeat
-                            if (not IsForeignMembership(MembershipSalesSetup."Membership Code")) then
-                                if (not (MemberManagement.AddMemberAndCard(FailWithError, MemberInfoCapture."Membership Entry No.", MemberInfoCapture, true, MemberInfoCapture."Member Entry No", ResponseMessage))) then begin
-                                    exit(false);
-                                end;
-                            MemberInfoCapture.Modify();
-                        until (MemberInfoCapture.Next() = 0);
-                        asserterror Error(''); // force a rollback, membercreation will be redone at checkout
-                    end;
-
-                MembershipSalesSetup."Business Flow Type"::ADD_ANONYMOUS_MEMBER:
-                    begin
-
-                        if (IsForeignMembership(MembershipSalesSetup."Membership Code")) then
-                            Error(NOT_SUPPORTED_FOR_REMOTE);
-
-                        MemberManagement.AddAnonymousMember(MemberInfoCapture, MemberInfoCapture.Quantity);
-                        asserterror Error(''); // force a rollback, membercreation will be redone at checkout
-                    end;
-
-                MembershipSalesSetup."Business Flow Type"::ADD_CARD:
-                    begin
-
-                        if (IsForeignMembership(MembershipSalesSetup."Membership Code")) then
-                            Error(NOT_SUPPORTED_FOR_REMOTE);
-
-                        if (not MemberManagement.IssueMemberCard(false, MemberInfoCapture, MemberInfoCapture."Card Entry No.", ResponseMessage)) then
-                            exit(false);
-                        asserterror Error(''); // force a rollback, membercreation will be redone at checkout
-                    end;
-
-                MembershipSalesSetup."Business Flow Type"::REPLACE_CARD:
-                    begin
-
-                        if (IsForeignMembership(MembershipSalesSetup."Membership Code")) then
-                            Error(NOT_SUPPORTED_FOR_REMOTE);
-
-                        if (MemberInfoCapture."Replace External Card No." <> '') then
-                            MemberManagement.BlockMemberCard(MemberManagement.GetCardEntryNoFromExtCardNo(MemberInfoCapture."Replace External Card No."), true);
-                        if (not MemberManagement.IssueMemberCard(false, MemberInfoCapture, MemberInfoCapture."Card Entry No.", ResponseMessage)) then
-                            exit(false);
-                        asserterror Error(''); // force a rollback, membercreation will be redone at checkout
-                    end;
-
-            end;
-
-        end;
-        exit(true);
-    end;
-
-    local procedure AdmitMembersOnEndOfSalesWorker(var MemberInfoCapture: Record "NPR MM Member Info Capture"; ReasonText: Text): Boolean
-    var
-        MembershipSetup: Record "NPR MM Membership Setup";
         Member: Record "NPR MM Member";
         MemberCard: Record "NPR MM Member Card";
-        TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
+        MembershipSetup: Record "NPR MM Membership Setup";
+        AttemptArrival: Codeunit "NPR MM Attempt Member Arrival";
         MemberLimitationMgr: Codeunit "NPR MM Member Lim. Mgr.";
-        TicketItemNo: Code[20];
+        TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         TicketVariantCode: Code[10];
+        TicketItemNo: Code[20];
+        LogEntryNo: Integer;
+        ReasonCode: Integer;
         ResolvingTable: Integer;
         Token: Text[100];
-        ReasonCode: Integer;
-        LogEntryNo: Integer;
     begin
 
-        with MemberInfoCapture do
-            if (not ("Information Context" in ["Information Context"::NEW,
-                                              "Information Context"::RENEW,
-                                              "Information Context"::UPGRADE,
-                                              "Information Context"::EXTEND])) then begin
+        MemberInfoCapture.FindSet();
+
+        if (not MemberInfoCapture."Auto-Admit Member") then
+            exit(true); // Must be consistent for all members on the same sales line
+
+        if (not (MemberInfoCapture."Information Context" in [MemberInfoCapture."Information Context"::NEW,
+                                              MemberInfoCapture."Information Context"::RENEW,
+                                              MemberInfoCapture."Information Context"::UPGRADE,
+                                              MemberInfoCapture."Information Context"::EXTEND])) then
+            exit(true); // Nothing to do
+
+        // Check that member limitations allow arrival
+        repeat
+            MemberCard.Get(MemberInfoCapture."Card Entry No.");
+            MemberLimitationMgr.POS_CheckLimitMemberCardArrival(MemberCard."External Card No.", '', '<auto>', LogEntryNo, ReasonText, ReasonCode);
+            if (ReasonCode <> 0) then
                 exit(false);
-            end;
+        until (MemberInfoCapture.Next() = 0);
 
-        MembershipSetup.Get(MemberInfoCapture."Membership Code");
-        MembershipSetup.TestField("Ticket Item Barcode");
-        if (not TranslateBarcodeToItemVariant(MembershipSetup."Ticket Item Barcode", TicketItemNo, TicketVariantCode, ResolvingTable)) then
-            Error(INVALID_TICKET_ITEM, MembershipSetup.TableCaption, MembershipSetup.Code);
-
-        // Filter should be sent in record variable
-        if (MemberInfoCapture.FindSet()) then begin
-            //Guestcheckin
-            repeat
-                // Swipe each member
-                if (Member.Get(MemberInfoCapture."Member Entry No")) then
-                    MemberInfoCapture."External Member No" := Member."External Member No.";
-
-                MemberCard.SetFilter("Membership Entry No.", '=%1', MemberInfoCapture."Membership Entry No.");
-                MemberCard.SetFilter("Member Entry No.", '=%1', MemberInfoCapture."Member Entry No");
-                if (MemberCard.FindFirst()) then begin
-                    if (MemberCard."External Card No." <> '') then
-                        MemberLimitationMgr.POS_CheckLimitMemberCardArrival(MemberCard."External Card No.", '', '<auto>', LogEntryNo, ReasonText, ReasonCode);
-                    if (ReasonCode <> 0) then
-                        Error(ReasonText);
-                end;
-
-                Token := TicketRequestManager.POS_CreateReservationRequest(MemberInfoCapture."Receipt No.", MemberInfoCapture."Line No.", TicketItemNo, TicketVariantCode, 1, MemberInfoCapture."External Member No");
-                if (0 <> TicketRequestManager.IssueTicketFromReservationToken(Token, false, ReasonText)) then
-                    Error(ReasonText);
-
-                if (not TicketRequestManager.ConfirmReservationRequest(Token, ReasonText)) then
-                    Error(ReasonText);
-
-                TicketRequestManager.RegisterArrivalRequest(Token);
-
-            until (MemberInfoCapture.Next() = 0);
+        // Batch register arrival creating tickets.
+        Commit();
+        AttemptArrival.AttemptMemberArrival(MemberInfoCapture, '', '<auto>');
+        if (not AttemptArrival.Run()) then begin
+            ReasonCode := AttemptArrival.GetAttemptMemberArrivalResponse(ReasonText);
+            MemberLimitationMgr.UpdateLogEntry(LogEntryNo, ReasonCode, ReasonText); // TODO: Add LogEntryNo to InfoCapture and update all entries ... 
+            exit(false);
         end;
 
         exit(true);
@@ -1018,8 +835,6 @@ codeunit 6060131 "NPR MM Member Retail Integr."
         case MsgNo of
             -1100:
                 exit(gLastMessage);
-            -1101:
-                exit(MSG_1101);
             -1102:
                 exit(MSG_1102);
             -1103:
@@ -1051,42 +866,6 @@ codeunit 6060131 "NPR MM Member Retail Integr."
     begin
     end;
 
-    local procedure IsForeignMembership(MembershipCode: Code[20]): Boolean
-    var
-        NPRMembership: Codeunit "NPR MM NPR Membership";
-    begin
-
-        exit(NPRMembership.IsForeignMembershipCommunity(MembershipCode));
-
-    end;
-
-    local procedure RemoteCreateMembership(var MemberInfoCapture: Record "NPR MM Member Info Capture"; MembershipSalesSetup: Record "NPR MM Members. Sales Setup")
-    var
-        NPRMembership: Codeunit "NPR MM NPR Membership";
-        MembershipSetup: Record "NPR MM Membership Setup";
-        NotValidReason: Text;
-    begin
-
-        MembershipSetup.Get(MembershipSalesSetup."Membership Code");
-
-        if (not NPRMembership.CreateRemoteMembership(MembershipSetup."Community Code", MemberInfoCapture, NotValidReason)) then
-            Error(NotValidReason);
-
-    end;
-
-    local procedure RemoteAddMember(var MemberInfoCapture: Record "NPR MM Member Info Capture"; MembershipSalesSetup: Record "NPR MM Members. Sales Setup")
-    var
-        MembershipSetup: Record "NPR MM Membership Setup";
-        NPRMembership: Codeunit "NPR MM NPR Membership";
-        NotValidReason: Text;
-    begin
-
-        MembershipSetup.Get(MembershipSalesSetup."Membership Code");
-
-        if (not NPRMembership.CreateRemoteMember(MembershipSetup."Community Code", MemberInfoCapture, NotValidReason)) then
-            Error(NotValidReason);
-
-    end;
 
     [EventSubscriber(ObjectType::Table, 6150730, 'OnBeforeInsertEvent', '', true, true)]
     local procedure OnBeforeInsertWorkflowStep(var Rec: Record "NPR POS Sales Workflow Step"; RunTrigger: Boolean)
