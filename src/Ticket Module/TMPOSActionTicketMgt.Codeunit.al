@@ -587,7 +587,7 @@ codeunit 6060123 "NPR TM POS Action: Ticket Mgt."
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6060138, 'OnAssociateSaleWithMember', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR MM Membership Events", 'OnAssociateSaleWithMember', '', false, false)]
     local procedure OnAssociateSaleWithMember(POSSession: Codeunit "NPR POS Session"; ExternalMembershipNo: Code[20]; ExternalMemberNo: Code[20])
     var
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";

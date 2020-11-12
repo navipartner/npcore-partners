@@ -444,7 +444,7 @@ codeunit 6060148 "NPR MM Membership Auto Renew"
     begin
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6060127, 'OnAfterMembershipCreateEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR MM Membership Events", 'OnAfterMembershipCreateEvent', '', true, true)]
     local procedure OnAfterMembershipCreateSubscriber(Membership: Record "NPR MM Membership")
     var
         Customer: Record Customer;

@@ -7,8 +7,6 @@ codeunit 6060128 "NPR MM Member WebService"
 
     var
         SETUP_MISSING: Label 'Setup is missing for %1.';
-        NEW_MEMBER_TICKET: Label 'Ticket %1 for admission %2 was created for member %3.';
-        MEMBER_TICKET: Label 'Ticket %1 for admission %2 was reused for member %3.';
 
     procedure MemberValidation(ExternalMemberNo: Code[20]; ScannerStationId: Code[10]) IsValid: Boolean
     var
@@ -1128,19 +1126,21 @@ codeunit 6060128 "NPR MM Member WebService"
         exit(IsValid);
     end;
 
-    local procedure ValidateMemberAndRegisterArrival(ExternalMemberNo: Code[20]; ExternalMemberCardNo: Text[50]; AdmissionCode: Code[20]; ScannerStationId: Code[10]; var ResponseMessage: Text) Success: Integer
+    local procedure ValidateMemberAndRegisterArrival(ExternalMemberNo: Code[20]; ExternalMemberCardNo: Text[50]; AdmissionCode: Code[20]; ScannerStationId: Code[10]; var ResponseMessage: Text) ResponseCode: Integer
     var
-        MembershipMgr: Codeunit "NPR MM Membership Mgt.";
-        MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
-        MemberLimitationMgr: Codeunit "NPR MM Member Lim. Mgr.";
-        MembershipEntryNo: Integer;
-        MemberCardEntryNo: Integer;
-        Membership: Record "NPR MM Membership";
-        MembershipSetup: Record "NPR MM Membership Setup";
         Member: Record "NPR MM Member";
         MemberCard: Record "NPR MM Member Card";
+        Membership: Record "NPR MM Membership";
+        MembershipSetup: Record "NPR MM Membership Setup";
+        AttempArrival: Codeunit "NPR MM Attempt Member Arrival";
+        MemberLimitationMgr: Codeunit "NPR MM Member Lim. Mgr.";
+        MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
+        MembershipMgr: Codeunit "NPR MM Membership Mgt.";
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         LimitLogEntry: Integer;
+        MemberCardEntryNo: Integer;
+        MembershipEntryNo: Integer;
+        TicketCreated: Boolean;
     begin
 
         MembershipEntryNo := MembershipMgr.GetMembershipFromExtMemberNo(ExternalMemberNo);
@@ -1168,81 +1168,30 @@ codeunit 6060128 "NPR MM Member WebService"
             exit(-1);
         end;
 
-        Success := 0;
+        ResponseCode := 0;
         ResponseMessage := '';
 
         LimitLogEntry := 0;
-        MemberLimitationMgr.WS_CheckLimitMemberCardArrival(ExternalMemberCardNo, AdmissionCode, ScannerStationId, LimitLogEntry, ResponseMessage, Success);
-        if (Success <> 0) then
-            exit(Success);
+        MemberLimitationMgr.WS_CheckLimitMemberCardArrival(ExternalMemberCardNo, AdmissionCode, ScannerStationId, LimitLogEntry, ResponseMessage, ResponseCode);
+        if (ResponseCode <> 0) then
+            exit(ResponseCode);
 
-        if (MembershipSetup."Ticket Item Barcode" <> '') then begin
-            Success := IssueMemberTicketAndRegisterArrival(MembershipSetup."Ticket Item Barcode", AdmissionCode, ScannerStationId, Member, ResponseMessage);
-        end;
+        commit();
 
-        MemberLimitationMgr.WS_CheckLimitMemberCardArrival(ExternalMemberCardNo, AdmissionCode, ScannerStationId, LimitLogEntry, ResponseMessage, Success);
-        exit(Success);
+        if (MembershipSetup."Ticket Item Barcode" = '') then
+            exit(0);
+
+        AttempArrival.AttemptMemberArrival(MembershipSetup."Ticket Item Barcode", AdmissionCode, ScannerStationId, Member);
+        TicketCreated := AttempArrival.run();
+        ResponseCode := AttempArrival.GetAttemptMemberArrivalResponse(ResponseMessage);
+
+        MemberLimitationMgr.UpdateLogEntry(LimitLogEntry, ResponseCode, ResponseMessage);
+
+        Commit();
+        exit(ResponseCode);
+
     end;
 
-    local procedure IssueMemberTicketAndRegisterArrival(TicketItemNo: Code[50]; AdmissionCode: Code[20]; ScannerStationId: Code[10]; Member: Record "NPR MM Member"; var ResponseMessage: Text) Success: Integer
-    var
-        TicketMgr: Codeunit "NPR TM Ticket Management";
-        MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
-        ItemNo: Code[20];
-        VariantCode: Code[10];
-        ResolvingTable: Integer;
-        TicketNo: Code[20];
-        Ticket: Record "NPR TM Ticket";
-        ResponseCode: Integer;
-        Token: Text[100];
-    begin
-
-        if (not (MemberRetailIntegration.TranslateBarcodeToItemVariant(TicketItemNo, ItemNo, VariantCode, ResolvingTable))) then begin
-            ResponseMessage := StrSubstNo('%1 does not translate to an item. Check Item Cross-Reference or Item table.', TicketItemNo);
-            exit(-1);
-        end;
-
-        Ticket.SetCurrentKey("External Member Card No.");
-        Ticket.SetFilter("Item No.", '=%1', ItemNo);
-        Ticket.SetFilter("Variant Code", '=%1', VariantCode);
-        Ticket.SetFilter("Document Date", '=%', Today);
-
-        Ticket.SetFilter("External Member Card No.", '=%1', Member."External Member No.");
-        if (Ticket.FindLast()) then begin
-            ResponseCode := TicketMgr.ValidateTicketForArrival(0, Ticket."No.", AdmissionCode, -1, false, ResponseMessage);
-            if (ResponseCode = 0) then begin
-
-                if (AdmissionCode = '') then
-                    AdmissionCode := '-default-';
-
-                ResponseMessage := StrSubstNo(MEMBER_TICKET, Ticket."No.", AdmissionCode, Member."External Member No.");
-
-                exit(ResponseCode);
-            end;
-        end;
-
-        Commit();
-        if (not TicketMakeReservation(TicketItemNo, AdmissionCode, Member."External Member No.", ScannerStationId, Token, ResponseMessage)) then
-            exit(-1);
-
-        Commit();
-
-        if (not (TicketConfirmReservation(Token, ScannerStationId, TicketNo, ResponseMessage))) then
-            exit(-1);
-
-        Commit();
-
-        Ticket.Get(TicketNo);
-        Success := TicketMgr.ValidateTicketForArrival(0, TicketNo, AdmissionCode, -1, false, ResponseMessage);
-
-        if (Success = 0) then begin
-            if (AdmissionCode = '') then
-                AdmissionCode := '-default-';
-            ResponseMessage := StrSubstNo(NEW_MEMBER_TICKET, TicketNo, AdmissionCode, Member."External Member No.");
-        end;
-
-        exit(Success);
-    end;
 
     local procedure InsertImportEntry(WebserviceFunction: Text; var ImportEntry: Record "NPR Nc Import Entry")
     var
@@ -1328,101 +1277,5 @@ codeunit 6060128 "NPR MM Member WebService"
         exit('');
     end;
 
-    local procedure "--Utils"()
-    begin
-    end;
-
-    local procedure "--TicketAPI"()
-    begin
-    end;
-
-    local procedure TicketMakeReservation(ExternalItemNumber: Code[20]; AdmissionCode: Code[20]; MemberReference: Code[20]; ScannerStation: Code[20]; var Token: Text[100]; var ResponseMessage: Text) ReservationStatus: Boolean
-    var
-        xmltext: Text;
-        TmpBLOBbuffer: Record "NPR BLOB buffer" temporary;
-        iStream: InStream;
-        oStream: OutStream;
-        TicketReservation: XMLport "NPR TM Ticket Reservation";
-        TicketWebService: Codeunit "NPR TM Ticket WebService";
-        txtRead: Text;
-    begin
-
-        xmltext :=
-        '<?xml version="1.0" encoding="UTF-8" standalone="no"?>' +
-        '<tickets xmlns="urn:microsoft-dynamics-nav/xmlports/x6060114">' +
-        '   <reserve_tickets token="">' +
-        StrSubstNo('       <ticket external_id="%1" line_no="1" qty="1" admission_schedule_entry="0" member_number="%2" admission_code="%3"/>', ExternalItemNumber, MemberReference, AdmissionCode) +
-        '   </reserve_tickets>' +
-        '</tickets>';
-
-        TmpBLOBbuffer.Insert();
-        TmpBLOBbuffer."Buffer 1".CreateOutStream(oStream);
-        oStream.WriteText(xmltext);
-        TmpBLOBbuffer.Modify();
-
-        TmpBLOBbuffer."Buffer 1".CreateInStream(iStream);
-        TicketReservation.SetSource(iStream);
-        TicketReservation.Import();
-
-        TicketWebService.MakeTicketReservation(TicketReservation, ScannerStation);
-
-        ReservationStatus := TicketReservation.GetResult(Token, ResponseMessage);
-
-        exit(ReservationStatus);
-
-    end;
-
-    local procedure TicketConfirmReservation(Token: Text[100]; ScannerStation: Code[20]; var TicketNumber: Code[20]; var ResponseMessage: Text) ConfirmationStatus: Boolean
-    var
-        xmltext: Text;
-        TmpBLOBbuffer: Record "NPR BLOB buffer" temporary;
-        iStream: InStream;
-        oStream: OutStream;
-        TicketWebService: Codeunit "NPR TM Ticket WebService";
-        TicketConfirmation: XMLport "NPR TM Ticket Confirmation";
-        TicketReservationResponse: Record "NPR TM Ticket Reserv. Resp.";
-        Ticket: Record "NPR TM Ticket";
-    begin
-
-        xmltext :=
-        '<?xml version="1.0" encoding="UTF-8" standalone="no"?>' +
-        '<tickets xmlns="urn:microsoft-dynamics-nav/xmlports/x6060117">' +
-        '  <ticket_tokens>' +
-        StrSubstNo('      <ticket_token>%1</ticket_token>', Token) +
-        '      <send_notification_to></send_notification_to>' +
-        '      <external_order_no>prepaid</external_order_no>' +
-        '  </ticket_tokens>' +
-        '</tickets>';
-
-        TmpBLOBbuffer.Insert();
-        TmpBLOBbuffer."Buffer 1".CreateOutStream(oStream);
-        oStream.WriteText(xmltext);
-        TmpBLOBbuffer.Modify();
-
-        TmpBLOBbuffer."Buffer 1".CreateInStream(iStream);
-        TicketConfirmation.SetSource(iStream);
-        TicketConfirmation.Import();
-
-        ConfirmationStatus := TicketWebService.ConfirmTicketReservation(TicketConfirmation, ScannerStation);
-
-        ResponseMessage := 'There was a problem with Confirm Ticket Reservation.';
-        TicketReservationResponse.SetFilter("Session Token ID", '=%1', Token);
-        if (TicketReservationResponse.FindFirst()) then begin
-
-            if (TicketReservationResponse.Confirmed) then begin
-                Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketReservationResponse."Request Entry No.");
-                if (Ticket.FindFirst()) then
-                    TicketNumber := Ticket."No.";
-                ResponseMessage := '';
-                ConfirmationStatus := true;
-            end else begin
-                ResponseMessage := TicketReservationResponse."Response Message";
-                ConfirmationStatus := false;
-            end;
-        end;
-
-        exit(ConfirmationStatus);
-
-    end;
 }
 
