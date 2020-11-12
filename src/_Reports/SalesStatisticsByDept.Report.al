@@ -108,6 +108,9 @@ report 6014535 "NPR Sales Statistics By Dept."
             column(LastYearShow; LastYearShow)
             {
             }
+            column(SalesPerson; SalesPerson)
+            {
+            }
 
             trigger OnAfterGetRecord()
             begin
@@ -139,6 +142,8 @@ report 6014535 "NPR Sales Statistics By Dept."
                     ValueEntryRec.SetFilter("Global Dimension 2 Code", dim2Filter);
                 if vendorFilter <> '' then
                     ValueEntryRec.SetFilter("NPR Vendor No.", vendorFilter);
+                if SalesPerson <> '' then
+                    ValueEntryRec.SETFILTER("NPR Salesperson Code", SalesPerson);
 
                 //-NPR5.30
                 //ValueEntryRec.CALCSUMS("Sales Amount (Actual)","Cost Amount (Actual)","Purchase Amount (Actual)","Balanced amount");
@@ -161,6 +166,8 @@ report 6014535 "NPR Sales Statistics By Dept."
                     ItemLedgerEntryRec.SetFilter("Global Dimension 2 Code", dim2Filter);
                 if vendorFilter <> '' then
                     ItemLedgerEntryRec.SetFilter("NPR Vendor No.", vendorFilter);
+                if SalesPerson <> '' then
+                    ItemLedgerEntryRec.SETFILTER("NPR Salesperson Code", SalesPerson);
 
                 ItemLedgerEntryRec.CalcSums(Quantity);
 
@@ -199,6 +206,8 @@ report 6014535 "NPR Sales Statistics By Dept."
                     ValueEntryLastYearRec.SetFilter("Global Dimension 2 Code", dim2Filter);
                 if vendorFilter <> '' then
                     ValueEntryLastYearRec.SetFilter("NPR Vendor No.", vendorFilter);
+                if SalesPerson <> '' then
+                    ValueEntryLastYearRec.SETFILTER("NPR Salesperson Code", SalesPerson);
 
                 if dateFilter <> '' then begin
                     ValueEntryLastYearRec.SetRange("Posting Date",
@@ -227,6 +236,8 @@ report 6014535 "NPR Sales Statistics By Dept."
                     ItemLedgerEntryLastYearRec.SetFilter("Global Dimension 2 Code", dim2Filter);
                 if vendorFilter <> '' then
                     ItemLedgerEntryLastYearRec.SetFilter("NPR Vendor No.", vendorFilter);
+                if SalesPerson <> '' then
+                    ItemLedgerEntryLastYearRec.SETFILTER("NPR Salesperson Code", SalesPerson);
 
                 if dateFilter <> '' then begin
                     ItemLedgerEntryLastYearRec.SetRange("Posting Date",
@@ -304,6 +315,8 @@ report 6014535 "NPR Sales Statistics By Dept."
                     ValueEntryRec.SetFilter("Global Dimension 2 Code", dim2Filter);
                 if vendorFilter <> '' then
                     ValueEntryRec.SetFilter("NPR Vendor No.", vendorFilter);
+                if SalesPerson <> '' then
+                    ValueEntryRec.SETFILTER(ValueEntryRec."NPR Salesperson Code", SalesPerson);
 
                 //-NPR5.30
                 //ValueEntryRec.CALCSUMS("Sales Amount (Actual)","Cost Amount (Actual)","Purchase Amount (Actual)","Balanced amount");
@@ -328,6 +341,8 @@ report 6014535 "NPR Sales Statistics By Dept."
                     ItemLedgerEntryRec.SetFilter("Global Dimension 2 Code", dim2Filter);
                 if vendorFilter <> '' then
                     ItemLedgerEntryRec.SetFilter("NPR Vendor No.", vendorFilter);
+                if SalesPerson <> '' then
+                    ItemLedgerEntryRec.SETFILTER("NPR Salesperson Code", SalesPerson);
 
                 ItemLedgerEntryRec.CalcSums(Quantity);
 
@@ -428,6 +443,8 @@ report 6014535 "NPR Sales Statistics By Dept."
                         ItemLedgerEntryLastYearRec.SetFilter("Global Dimension 2 Code", dim2Filter);
                     if vendorFilter <> '' then
                         ItemLedgerEntryLastYearRec.SetFilter("NPR Vendor No.", vendorFilter);
+                    if SalesPerson <> '' then
+                        ItemLedgerEntryLastYearRec.SETFILTER("NPR Salesperson Code", SalesPerson);
 
                     if dateFilter <> '' then begin
                         ItemLedgerEntryLastYearRec.SetRange("Posting Date",
@@ -502,6 +519,12 @@ report 6014535 "NPR Sales Statistics By Dept."
                         Caption = 'Group by';
                         ApplicationArea = All;
                     }
+                    field("Sales Person"; SalesPerson)
+                    {
+                        Caption = 'Sales Person';
+                        TableRelation = "Salesperson/Purchaser".Code;
+                        ApplicationArea = All;
+                    }
                 }
             }
         }
@@ -555,7 +578,10 @@ report 6014535 "NPR Sales Statistics By Dept."
 
     trigger OnPreReport()
     begin
-        FilterList := "Item Group".GetFilters;
+        if SalesPerson = '' then
+            FilterList := "Item Group".GetFilters
+        else
+            FilterList := "Item Group".GETFILTERS + ' SalesPerson: ' + SalesPerson;
         dateFilter := "Item Group".GetFilter("Date Filter");
         dim1Filter := "Item Group".GetFilter("Global Dimension 1 Filter");
         dim2Filter := "Item Group".GetFilter("Global Dimension 2 Filter");
@@ -579,6 +605,8 @@ report 6014535 "NPR Sales Statistics By Dept."
             ValueEntryRec.SetFilter("Global Dimension 2 Code", dim2Filter);
         if vendorFilter <> '' then
             ValueEntryRec.SetFilter("NPR Vendor No.", vendorFilter);
+        if SalesPerson <> '' then
+            ValueEntryRec.SETFILTER("NPR Salesperson Code", SalesPerson);
 
         //-NPR5.30
         //ValueEntryRec.CALCSUMS("Sales Amount (Actual)","Cost Amount (Actual)","Purchase Amount (Actual)","Balanced amount");
@@ -603,6 +631,8 @@ report 6014535 "NPR Sales Statistics By Dept."
             ItemLedgerEntryRec.SetFilter("Global Dimension 2 Code", dim2Filter);
         if vendorFilter <> '' then
             ItemLedgerEntryRec.SetFilter("NPR Vendor No.", vendorFilter);
+        if SalesPerson <> '' then
+            ItemLedgerEntryRec.SETFILTER("NPR Salesperson Code", SalesPerson);
 
         ItemLedgerEntryRec.CalcSums(Quantity);
 
@@ -636,6 +666,8 @@ report 6014535 "NPR Sales Statistics By Dept."
                 ValueEntryLastYearRec.SetFilter("Global Dimension 2 Code", dim2Filter);
             if vendorFilter <> '' then
                 ValueEntryLastYearRec.SetFilter("NPR Vendor No.", vendorFilter);
+            if SalesPerson <> '' then
+                ValueEntryLastYearRec.SETFILTER("NPR Salesperson Code", SalesPerson);
 
             if dateFilter <> '' then begin
                 ValueEntryLastYearRec.SetRange("Posting Date",
@@ -665,6 +697,8 @@ report 6014535 "NPR Sales Statistics By Dept."
                 ItemLedgerEntryLastYearRec.SetFilter("Global Dimension 2 Code", dim2Filter);
             if vendorFilter <> '' then
                 ItemLedgerEntryLastYearRec.SetFilter("NPR Vendor No.", vendorFilter);
+            if SalesPerson <> '' then
+                ItemLedgerEntryLastYearRec.SETFILTER("NPR Salesperson Code", SalesPerson);
 
             if dateFilter <> '' then begin
                 ItemLedgerEntryLastYearRec.SetRange("Posting Date",
@@ -759,6 +793,7 @@ report 6014535 "NPR Sales Statistics By Dept."
         CurrentYearShow: Boolean;
         LastYearShow: Boolean;
         LastYearShowFooter: Boolean;
+        SalesPerson: Text;
 
     procedure pct(var Value: Decimal; var total: Decimal) resultat: Decimal
     begin
