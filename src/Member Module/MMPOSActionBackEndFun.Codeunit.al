@@ -109,7 +109,7 @@ codeunit 6060108 "NPR MM POS Action: BackEnd Fun"
                     end;
 
                 MembershipSalesSetup."Business Flow Type"::ADD_NAMED_MEMBER:
-                    MembershipManagement.AddMemberAndCard(true, MemberInfoCapture."Membership Entry No.", MemberInfoCapture, true, MemberInfoCapture."Member Entry No", ResponseMessage);
+                    MembershipManagement.AddMemberAndCard(MemberInfoCapture."Membership Entry No.", MemberInfoCapture, true, MemberInfoCapture."Member Entry No", ResponseMessage);
 
                 MembershipSalesSetup."Business Flow Type"::ADD_ANONYMOUS_MEMBER:
                     MembershipManagement.AddAnonymousMember(MemberInfoCapture, MemberInfoCapture.Quantity);
@@ -117,11 +117,11 @@ codeunit 6060108 "NPR MM POS Action: BackEnd Fun"
                 MembershipSalesSetup."Business Flow Type"::REPLACE_CARD:
                     begin
                         MembershipManagement.BlockMemberCard(MembershipManagement.GetCardEntryNoFromExtCardNo(MemberInfoCapture."Replace External Card No."), true);
-                        MembershipManagement.IssueMemberCard(true, MemberInfoCapture, MemberInfoCapture."Card Entry No.", ResponseMessage);
+                        MembershipManagement.IssueMemberCard(MemberInfoCapture, MemberInfoCapture."Card Entry No.", ResponseMessage);
                     end;
 
                 MembershipSalesSetup."Business Flow Type"::ADD_CARD:
-                    MembershipManagement.IssueMemberCard(true, MemberInfoCapture, MemberInfoCapture."Card Entry No.", ResponseMessage);
+                    MembershipManagement.IssueMemberCard(MemberInfoCapture, MemberInfoCapture."Card Entry No.", ResponseMessage);
             end;
 
         end;

@@ -18,7 +18,7 @@ codeunit 6059923 "NPR Member Subscribers"
         ProcessPicture(Rec);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR MM Membership Mgt.", 'OnAfterMemberCreateEvent', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR MM Membership Events", 'OnAfterMemberCreateEvent', '', false, false)]
     local procedure ProcessPicture_OnAfterCreateMember(var Member: Record "NPR MM Member")
     var
         Member2: Record "NPR MM Member";
