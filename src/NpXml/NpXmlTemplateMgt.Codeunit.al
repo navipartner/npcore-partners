@@ -302,10 +302,13 @@ codeunit 6151556 "NPR NpXml Template Mgt."
 
         Clear(RecRef);
         RecRef.Open(TableID);
+        //-=Temporary disabled as we haven't updated yet our xml templates with new table names=-
+        /*
         if XmlElementTable.GetAttribute('table_name') <> Format(RecRef.Name, 0, 9) then begin
             RecRef.Close;
             exit;
         end;
+        */
 
         if XmlElementTable.HasChildNodes then begin
             XmlNodeList := XmlElementTable.ChildNodes;
@@ -315,8 +318,9 @@ codeunit 6151556 "NPR NpXml Template Mgt."
                 XmlCDATA := NetConvHelper;
                 if Evaluate(FieldID, XmlElementField.GetAttribute('field_no'), 9) and Field.Get(TableID, FieldID) then begin
                     FieldRef := RecRef.Field(FieldID);
-                    if XmlElementField.GetAttribute('field_name') = Format(FieldRef.Name, 0, 9) then
-                        AssignValue(FieldRef, XmlElementField.InnerText);
+                    //-=Temporary disabled as we haven't updated yet our xml templates with new table names=-
+                    //if XmlElementField.GetAttribute('field_name') = Format(FieldRef.Name, 0, 9) then
+                    AssignValue(FieldRef, XmlElementField.InnerText);
                 end;
             end;
         end;

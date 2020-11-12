@@ -155,6 +155,7 @@ codeunit 6060140 "NPR MM POS Action: Member Arr."
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
         MemberTicketManager: Codeunit "NPR MM Member Ticket Manager";
         POSActionMemberManagement: Codeunit "NPR MM POS Action: MemberMgmt.";
+        MembershipEvents: Codeunit "NPR MM Membership Events";
         ExternalItemNo: Code[20];
         Parameter: Code[20];
         LogEntryNo: Integer;
@@ -174,17 +175,16 @@ codeunit 6060140 "NPR MM POS Action: Member Arr."
             POSWorkflowMethod::GuestCheckin:
                 begin
                     MemberLimitationMgr.POS_CheckLimitMemberCardArrival(ExternalMemberCardNo, AdmissionCode, 'POS', LogEntryNo, ResponseMessage, ResponseCode);
+                    Commit();
 
                     if (ResponseCode <> 0) then
                         Error(ResponseMessage);
-
-                    Commit();
 
                     MemberCard.Get(MembershipManagement.GetCardEntryNoFromExtCardNo(ExternalMemberCardNo));
                     Membership.Get(MemberCard."Membership Entry No.");
                     MembershipSetup.Get(Membership."Membership Code");
 
-                    POSActionMemberManagement.OnBeforePOSMemberArrival(ThisShouldBeEmpty_SaleLinePOS, MembershipSetup."Community Code", MembershipSetup.Code, Membership."Entry No.", Member."Entry No.", MemberCard."Entry No.", ExternalMemberCardNo);
+                    MembershipEvents.OnBeforePOSMemberArrival(ThisShouldBeEmpty_SaleLinePOS, MembershipSetup."Community Code", MembershipSetup.Code, Membership."Entry No.", Member."Entry No.", MemberCard."Entry No.", ExternalMemberCardNo);
 
                     ExternalItemNo := MemberRetailIntegration.POS_GetExternalTicketItemFromMembership(ExternalMemberCardNo);
 

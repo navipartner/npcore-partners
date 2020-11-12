@@ -5,7 +5,6 @@ codeunit 6151220 "NPR PrintNode API Mgt."
 
     trigger OnRun()
     begin
-        SendPrintJob('69739205', 0, 'https://app.printnode.com/testpdfs/a4_portrait.pdf', 'Testprint form NAV', 'DEV_Latest', '', '');
     end;
 
     var

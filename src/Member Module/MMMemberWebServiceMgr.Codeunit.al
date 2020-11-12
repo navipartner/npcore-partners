@@ -311,7 +311,7 @@ codeunit 6060129 "NPR MM Member WebService Mgr"
 
         TransferAttributes(XmlElement, MemberInfoCapture);
 
-        if (not (MembershipManagement.AddMemberAndCard(true, MembershipEntryNo, MemberInfoCapture, true, MemberInfoCapture."Member Entry No", ResponseMessage))) then
+        if (not (MembershipManagement.AddMemberAndCard(MembershipEntryNo, MemberInfoCapture, true, MemberInfoCapture."Member Entry No", ResponseMessage))) then
             Error(ResponseMessage);
 
         MemberInfoCapture.Modify();
