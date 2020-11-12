@@ -22,19 +22,15 @@ codeunit 6151185 "NPR MM Sponsorship Ticket Mgt"
         DoNotifyRecipient(SponsorshipTicketEntryNo);
     end;
 
-    local procedure MakeTickets(FailWithError: Boolean; MembershipRole: Record "NPR MM Membership Role"; var SponsorshipTicketSetup: Record "NPR MM Sponsors. Ticket Setup"; var ResponseMessage: Text): Boolean
+    local procedure MakeTickets(MembershipRole: Record "NPR MM Membership Role"; var SponsorshipTicketSetup: Record "NPR MM Sponsors. Ticket Setup"; var ResponseMessage: Text): Boolean
     begin
 
         SponsorshipTicketSetup.FindSet();
         repeat
 
-            if (not MakeTicket(MembershipRole, SponsorshipTicketSetup, ResponseMessage)) then begin
-                if (FailWithError) then
-                    Error(ResponseMessage);
+            if (not MakeTicket(MembershipRole, SponsorshipTicketSetup, ResponseMessage)) then
+                Error(ResponseMessage);
 
-                asserterror Error(ResponseMessage);
-                exit(false);
-            end;
         until (SponsorshipTicketSetup.Next() = 0);
 
         exit(true);
@@ -52,7 +48,6 @@ codeunit 6151185 "NPR MM Sponsorship Ticket Mgt"
         Token := TicketRequestManager.GetNewToken();
         Member.Get(MembershipRole."Member Entry No.");
 
-        //CreateTicketRequest (Token, Member, SponsorshipTicketSetup);
         CreateTicketRequest(Token, MembershipRole, SponsorshipTicketSetup);
 
         if (0 <> TicketRequestManager.IssueTicketFromReservationToken(Token, false, ResponseMessage)) then begin
@@ -88,36 +83,6 @@ codeunit 6151185 "NPR MM Sponsorship Ticket Mgt"
             TicketReservationRequest."Entry No." := 0;
             TicketReservationRequest."Session Token ID" := Token;
 
-            //  TicketReservationRequest.Quantity := SponsorshipTicketSetup.Quantity;
-            //
-            //  TicketReservationRequest."External Item Code" := TicketRequestManager.GetExternalNo (SponsorshipTicketSetup."Item No.", SponsorshipTicketSetup."Variant Code");
-            //  TicketReservationRequest."Item No." := SponsorshipTicketSetup."Item No.";
-            //  TicketReservationRequest."Variant Code" := SponsorshipTicketSetup."Variant Code";
-            //
-            //  TicketReservationRequest."Admission Code" := TicketAdmissionBOM."Admission Code";
-            //  TicketReservationRequest."Admission Description" := TicketAdmissionBOM."Admission Description";
-            //  IF (TicketReservationRequest."Admission Description" = '') THEN
-            //    TicketReservationRequest."Admission Description" := Admission.Description;
-            //  TicketReservationRequest."Payment Option" := TicketReservationRequest."Payment Option"::PREPAID;
-            //
-            //  CASE Member."Notification Method" OF
-            //    Member."Notification Method"::EMAIL :
-            //      BEGIN
-            //        TicketReservationRequest."Notification Method" := TicketReservationRequest."Notification Method"::EMAIL;
-            //        TicketReservationRequest."Notification Address" := Member."E-Mail Address";
-            //      END;
-            //    Member."Notification Method"::SMS :
-            //      BEGIN
-            //        TicketReservationRequest."Notification Method" := TicketReservationRequest."Notification Method"::SMS;
-            //        TicketReservationRequest."Notification Address" := Member."Phone No.";
-            //      END;
-            //    ELSE BEGIN
-            //      TicketReservationRequest."Notification Method" := TicketReservationRequest."Notification Method"::NA;
-            //      TicketReservationRequest."Notification Address" := '';
-            //    END;
-            //  END;
-            //  TicketReservationRequest."External Member No." := Member."External Member No.";
-
             MemberTicketManager.PrefillTicketRequest(MembershipRole."Member Entry No.", MembershipRole."Membership Entry No.",
               TicketAdmissionBOM."Item No.", TicketAdmissionBOM."Variant Code", TicketAdmissionBOM."Admission Code", TicketReservationRequest);
 
@@ -135,7 +100,7 @@ codeunit 6151185 "NPR MM Sponsorship Ticket Mgt"
         Commit();
     end;
 
-    local procedure FinalizeTicketReservation(FailWithError: Boolean; MembershipRole: Record "NPR MM Membership Role"; var SponsorshipTicketSetup: Record "NPR MM Sponsors. Ticket Setup"; var ResponseMessage: Text): Boolean
+    local procedure FinalizeTicketReservation(MembershipRole: Record "NPR MM Membership Role"; var SponsorshipTicketSetup: Record "NPR MM Sponsors. Ticket Setup"; var ResponseMessage: Text): Boolean
     var
         SponsorshipTicketEntry: Record "NPR MM Sponsors. Ticket Entry";
         SponsorshipTicketEntryWork: Record "NPR MM Sponsors. Ticket Entry";
@@ -162,13 +127,8 @@ codeunit 6151185 "NPR MM Sponsorship Ticket Mgt"
             TicketReservationRequest.SetFilter("Request Status", '=%1', TicketReservationRequest."Request Status"::REGISTERED);
             if (TicketReservationRequest.FindSet()) then begin
                 repeat
-                    if (not TicketRequestManager.ConfirmReservationRequest(SponsorshipTicketEntry."Ticket Token", ResponseMessage)) then begin
-                        if (FailWithError) then
-                            Error(ResponseMessage);
-
-                        asserterror Error('');
-                        exit(false);
-                    end;
+                    if (not TicketRequestManager.ConfirmReservationRequest(SponsorshipTicketEntry."Ticket Token", ResponseMessage)) then
+                        Error(ResponseMessage);
                 until (TicketReservationRequest.Next() = 0);
             end;
 
@@ -465,7 +425,7 @@ codeunit 6151185 "NPR MM Sponsorship Ticket Mgt"
                 if (not MakeTicket(MembershipRole, SponsorshipTicketSetup, ResponseMessage)) then
                     Error(ResponseMessage);
 
-                FinalizeTicketReservation(true, MembershipRole, SponsorshipTicketSetup, ResponseMessage);
+                FinalizeTicketReservation(MembershipRole, SponsorshipTicketSetup, ResponseMessage);
 
                 if (SponsorshipTicketSetup."Delivery Method" = SponsorshipTicketSetup."Delivery Method"::ADMIN_MEMBER) then begin
                     SponsorshipTicketEntry.Reset();
@@ -547,12 +507,12 @@ codeunit 6151185 "NPR MM Sponsorship Ticket Mgt"
 
         case MembershipEntry.Context of
             MembershipEntry.Context::NEW:
-                FinalizeTicketReservation(true, MembershipRole, SponsorshipTicketSetup, ResponseMessage);
+                FinalizeTicketReservation(MembershipRole, SponsorshipTicketSetup, ResponseMessage);
 
             MembershipEntry.Context::RENEW,
           MembershipEntry.Context::AUTORENEW:
-                if (MakeTickets(true, MembershipRole, SponsorshipTicketSetup, ResponseMessage)) then
-                    FinalizeTicketReservation(true, MembershipRole, SponsorshipTicketSetup, ResponseMessage);
+                if (MakeTickets(MembershipRole, SponsorshipTicketSetup, ResponseMessage)) then
+                    FinalizeTicketReservation(MembershipRole, SponsorshipTicketSetup, ResponseMessage);
         end;
 
     end;
@@ -561,7 +521,7 @@ codeunit 6151185 "NPR MM Sponsorship Ticket Mgt"
     begin
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6060127, 'OnAfterMemberCreateEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, CodeUnit::"NPR MM Membership Events", 'OnAfterMemberCreateEvent', '', true, true)]
     local procedure OnAfterMemberCreateEvent(var Membership: Record "NPR MM Membership"; var Member: Record "NPR MM Member")
     var
         MembershipRole: Record "NPR MM Membership Role";
@@ -592,10 +552,10 @@ codeunit 6151185 "NPR MM Sponsorship Ticket Mgt"
 
         SponsorshipTicketSetup.FindSet();
 
-        MakeTickets(true, MembershipRole, SponsorshipTicketSetup, ResponseMessage);
+        MakeTickets(MembershipRole, SponsorshipTicketSetup, ResponseMessage);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6060127, 'OnAfterInsertMembershipEntry', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, CodeUnit::"NPR MM Membership Events", 'OnAfterInsertMembershipEntry', '', true, true)]
     local procedure OnAfterInsertMembershipEntry(MembershipEntry: Record "NPR MM Membership Entry")
     begin
 

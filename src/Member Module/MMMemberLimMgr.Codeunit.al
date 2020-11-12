@@ -39,6 +39,22 @@ codeunit 6060144 "NPR MM Member Lim. Mgr."
         CheckLimitMemberCardArrival(0, ExternalMemberCardNo, AdmissionCode, ScannerStationId, ReUseLogEntryNo, ResponseMessage, ResponseCode);
     end;
 
+    procedure UpdateLogEntry(EntryNo: Integer; MessageCode: Integer; MessageText: Text)
+    var
+        MemberArrivalLogEntry: Record "NPR MM Member Arr. Log Entry";
+    begin
+        if (not MemberArrivalLogEntry.Get(EntryNo)) then
+            exit;
+
+        MemberArrivalLogEntry."Response Code" := MessageCode;
+        MemberArrivalLogEntry."Response Message" := MessageText;
+        if (MessageCode = 0) then
+            MemberArrivalLogEntry."Response Type" := MemberArrivalLogEntry."Response Type"::SUCCESS else
+            MemberArrivalLogEntry."Response Type" := MemberArrivalLogEntry."Response Type"::ACCESS_DENIED;
+
+        MemberArrivalLogEntry.Modify();
+    end;
+
     local procedure InternalLogArrival(ExternalMemberShipNo: Code[20]; ExternalMemberNo: Code[20]; ExternalMemberCardNo: Text[50]; AdmissionCode: Code[20]; ScannerStationId: Code[10]; var ReUseLogEntryNo: Integer; ResponseMessage: Text; ResponseCode: Integer; ResponseRuleEntry: Integer)
     var
         MembershipSetup: Record "NPR MM Membership Setup";
@@ -148,24 +164,24 @@ codeunit 6060144 "NPR MM Member Lim. Mgr."
             if (ClientType = ClientType::POS) then begin
                 case MembershipLimitationSetup."POS Response Action" of
                     MembershipLimitationSetup."POS Response Action"::USER_ERROR:
-                        asserterror Error(''); // This will rollback our successful transaction - whatever it did!!
+                        ; // When a response code is returned, invoker must decide how to handle the error
+
                     MembershipLimitationSetup."POS Response Action"::USER_CONFIRM:
-                        if (not Confirm(USER_CONFIRM_MESSAGE, true, NewResponseMessage)) then begin
-                            asserterror Error(''); // This will rollback our successful transaction - whatever it did!!
-                        end else begin
+                        if (Confirm(USER_CONFIRM_MESSAGE, true, NewResponseMessage)) then begin
                             RuleNo := 0; // User confirmed that no rule was violated
+                            ResponseCode := 0;
+                            ResponseMessage := '';
                         end;
+
                     MembershipLimitationSetup."POS Response Action"::USER_MESSAGE:
                         begin
                             RuleNo := 0;
+                            ResponseCode := 0;
+                            ResponseMessage := '';
                             Message(NewResponseMessage);
                         end;
                 end;
             end;
-
-            if (ClientType = ClientType::WS) then
-                if (MembershipLimitationSetup."WS Response Action" = MembershipLimitationSetup."WS Response Action"::USER_ERROR) then
-                    asserterror Error(''); // This will rollback our successful transaction - whatever it did!!
 
         end;
 
@@ -175,24 +191,6 @@ codeunit 6060144 "NPR MM Member Lim. Mgr."
         end;
 
         InternalLogArrival(ExternalMemberShipNo, ExternalMemberNo, ExternalMemberCardNo, AdmissionCode, ScannerStationId, ReUseLogEntryNo, ResponseMessage, ResponseCode, RuleNo);
-
-        if (RuleNo <> 0) then begin
-            MembershipLimitationSetup.Get(RuleNo);
-            if (ClientType = ClientType::POS) then begin
-                case MembershipLimitationSetup."POS Response Action" of
-                    // ASSERTERROR will rollback transaction, Commit must only effect log entry. Downstream code may error the responsemessage
-                    MembershipLimitationSetup."POS Response Action"::USER_ERROR:
-                        Commit();
-                    MembershipLimitationSetup."POS Response Action"::USER_CONFIRM:
-                        Commit();
-                end;
-            end;
-
-            if (ClientType = ClientType::WS) then
-                if (MembershipLimitationSetup."WS Response Action" = MembershipLimitationSetup."WS Response Action"::USER_ERROR) then
-                    Commit();
-
-        end;
 
         exit(RuleNo);
     end;
@@ -277,7 +275,7 @@ codeunit 6060144 "NPR MM Member Lim. Mgr."
                                 ResponseMessage := '';
                         end;
                         if (ResponseMessage = '') then
-                            ResponseMessage := '[%5%4] - Membership Limitation Setup, rule %5 prevents this action. Threshold %1, Rule Match Count: %2, Entry Constraint %3';
+                            ResponseMessage := '[%5%4] - Membership Limitation Setup, rule %5 prevents this action. Threshold %1, Rule Match Count: %2, Entry Constraint: %3';
 
                         ResponseMessage := StrSubstNo(ResponseMessage, RuleCondition, RuleMatchCount, ContraintText, MembershipLimitationSetup."Response Code", RuleNo);
                         ResponseCode := MembershipLimitationSetup."Response Code";
@@ -368,9 +366,9 @@ codeunit 6060144 "NPR MM Member Lim. Mgr."
                     "Constraint Type"::RELATIVE_TIME:
                         ContraintText := StrSubstNo('%1', MembershipLimitationSetup."Constraint Seconds" - Round((CurrentDateTime() - MemberArrivalLogEntry."Created At") / 1000, 1));
                     "Constraint Type"::FIXED_TIME:
-                        ContraintText := StrSubstNo('%1 - %', MemberArrivalLogEntry."Local Date", MemberArrivalLogEntry."Local Time");
+                        ContraintText := StrSubstNo('%1 - %2', MemberArrivalLogEntry."Local Date", MemberArrivalLogEntry."Local Time");
                     "Constraint Type"::DATEFORMULA:
-                        ContraintText := StrSubstNo('%1 - %', MemberArrivalLogEntry."Local Date", MemberArrivalLogEntry."Local Time");
+                        ContraintText := StrSubstNo('%1 - %2', MemberArrivalLogEntry."Local Date", MemberArrivalLogEntry."Local Time");
                 end;
             end else begin
                 case "Constraint Type" of

@@ -40,7 +40,7 @@ codeunit 6060139 "NPR MM Loyalty Point Mgt."
         CreatePointEntryFromValueEntry(ValueEntry, LoyaltyPostingSourceEnum::VALUE_ENTRY);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6060127, 'OnAfterInsertMembershipEntry', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, CodeUnit::"NPR MM Membership Events", 'OnAfterInsertMembershipEntry', '', true, true)]
     local procedure OnAfterInsertMembershipEntry(MembershipEntry: Record "NPR MM Membership Entry")
     var
         Membership: Record "NPR MM Membership";
