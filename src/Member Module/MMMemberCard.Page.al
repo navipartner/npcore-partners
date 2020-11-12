@@ -433,7 +433,7 @@ page 6060136 "NPR MM Member Card"
                     //MembershipManagement.IssueNewMemberCard (TRUE, "Entry No.", CardEntryNo, ResponseMessage);
                     MemberInfoCapture."Member Entry No" := Rec."Entry No.";
                     MemberInfoCapture."Membership Entry No." := MembershipEntryNo;
-                    MembershipManagement.IssueMemberCard(true, MemberInfoCapture, CardEntryNo, ResponseMessage);
+                    MembershipManagement.IssueMemberCard(MemberInfoCapture, CardEntryNo, ResponseMessage);
 
                     MemberCard.Get(CardEntryNo);
 

@@ -174,6 +174,7 @@ page 6060152 "NPR Event List"
                 {
                     Caption = '&Dimensions';
                     Image = Dimensions;
+                    ToolTip = 'Groups actions related with dimensions.';
                     action("Dimensions-&Single")
                     {
                         Caption = 'Dimensions-&Single';
@@ -499,7 +500,7 @@ page 6060152 "NPR Event List"
                     Caption = 'Collect Ticket Printouts';
                     Image = GetSourceDoc;
                     ApplicationArea = All;
-                    ToolTip = 'Generates the web layout printouts of all the tickets created. Creation is performed by the tickets module.';
+                    ToolTip = 'Collects tickets printouts for all issued tickets. Used for tickets which have a layout defined in Magento.';
 
                     trigger OnAction()
                     begin
@@ -544,7 +545,7 @@ page 6060152 "NPR Event List"
                     Promoted = true;
                     PromotedCategory = Process;
                     ApplicationArea = All;
-                    ToolTip = 'Use a batch job to help you create job sales invoices for the involved job planning lines.';
+                    ToolTip = 'Use a batch job to help you create event sales invoices for the involved event planning lines.';
 
                     trigger OnAction()
                     var
@@ -665,7 +666,7 @@ page 6060152 "NPR Event List"
                 PromotedCategory = "Report";
                 RunObject = Report "Job Actual To Budget";
                 ApplicationArea = All;
-                ToolTip = 'Compare budgeted and usage amounts for selected jobs. All lines of the selected job show quantity, total cost, and line amount.';
+                ToolTip = 'Compare budgeted and usage amounts for selected event. All lines of the selected event show quantity, total cost, and line amount.';
             }
             action("Job Analysis")
             {
@@ -675,7 +676,7 @@ page 6060152 "NPR Event List"
                 PromotedCategory = "Report";
                 RunObject = Report "Job Analysis";
                 ApplicationArea = All;
-                ToolTip = 'Analyze the job, such as the budgeted prices, usage prices, and contract prices, and then compares the three sets of prices.';
+                ToolTip = 'Analyze the event, such as the budgeted prices, usage prices, and contract prices, and then compares the three sets of prices.';
             }
             action("Job - Planning Lines")
             {
@@ -685,7 +686,7 @@ page 6060152 "NPR Event List"
                 PromotedCategory = "Report";
                 RunObject = Report "Job - Planning Lines";
                 ApplicationArea = All;
-                ToolTip = 'View all planning lines for the job. You use this window to plan what items, resources, and general ledger expenses that you expect to use on a job (budget) or you can specify what you actually agreed with your customer that he should pay for the job (billable).';
+                ToolTip = 'View all planning lines for the event. You use this window to plan what items, resources, and general ledger expenses that you expect to use on an event (budget) or you can specify what you actually agreed with your customer that he should pay for the event (billable).';
             }
             action("Job - Suggested Billing")
             {
@@ -695,7 +696,7 @@ page 6060152 "NPR Event List"
                 PromotedCategory = "Report";
                 RunObject = Report "Job Suggested Billing";
                 ApplicationArea = All;
-                ToolTip = 'View a list of all jobs, grouped by customer, how much the customer has already been invoiced, and how much remains to be invoiced, that is, the suggested billing.';
+                ToolTip = 'View a list of all events, grouped by customer, how much the customer has already been invoiced, and how much remains to be invoiced, that is, the suggested billing.';
             }
             action("Jobs per Customer")
             {
@@ -713,7 +714,7 @@ page 6060152 "NPR Event List"
                 Promoted = false;
                 RunObject = Report "Items per Job";
                 ApplicationArea = All;
-                ToolTip = 'View which items are used for a specific job.';
+                ToolTip = 'View which items are used for a specific event.';
             }
             action("Jobs per Item")
             {
@@ -735,7 +736,7 @@ page 6060152 "NPR Event List"
                     Promoted = false;
                     RunObject = Report "Job WIP To G/L";
                     ApplicationArea = All;
-                    ToolTip = 'View the value of work in process on the jobs that you select compared to the amount that has been posted in the general ledger.';
+                    ToolTip = 'View the value of work in process on the events that you select compared to the amount that has been posted in the general ledger.';
                 }
             }
             group(ActionGroup23)
@@ -749,7 +750,7 @@ page 6060152 "NPR Event List"
                     Promoted = false;
                     RunObject = Report "Job - Transaction Detail";
                     ApplicationArea = All;
-                    ToolTip = 'View all postings with entries for a selected job for a selected period, which have been charged to a certain job. At the end of each job list, the amounts are totaled separately for the Sales and Usage entry types.';
+                    ToolTip = 'View all postings with entries for a selected event for a selected period, which have been charged to a certain event. At the end of each event list, the amounts are totaled separately for the Sales and Usage entry types.';
                 }
                 action("Job Register")
                 {

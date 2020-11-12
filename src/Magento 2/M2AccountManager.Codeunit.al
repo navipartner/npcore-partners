@@ -1410,7 +1410,7 @@ codeunit 6151151 "NPR M2 Account Manager"
             exit(false);
 
         // These functions will blow-up when failing and the error message will propregate back to caller
-        MembershipManagement.AddMemberAndCard(true, MembershipRole."Membership Entry No.", MemberInfoCapture, true, MemberEntryNo, ReasonText);
+        MembershipManagement.AddMemberAndCard(MembershipRole."Membership Entry No.", MemberInfoCapture, true, MemberEntryNo, ReasonText);
 
         MembershipRole.Get(MembershipRole."Membership Entry No.", MemberEntryNo);
         Contact.Get(MembershipRole."Contact No.");

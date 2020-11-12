@@ -1,10 +1,5 @@
 codeunit 6150733 "NPR POS Workflows 2.0"
 {
-    // NPR5.50/JAKUBV/20190603  CASE 338666 Transport NPR5.50 - 3 June 2019
-    // NPR5.51/MMV /20190731  CASE 363458 Added log of callstack when errors happen.
-    // NPR5.53/VB  /20190917  CASE 362777 Support for workflow sequencing (configuring/registering "before" and "after" workflow sequences that execute before or after another workflow)
-
-
     var
         Text001: Label 'Action %1 does not seem to have a registered handler, or the registered handler failed to notify the framework about successful processing of the action.';
         Stopwatches: DotNet NPRNetDictionary_Of_T_U;
@@ -16,17 +11,14 @@ codeunit 6150733 "NPR POS Workflows 2.0"
         OnRunWorkflows20State: Codeunit "NPR POS WF 2.0: State";
         OnRunPOSSession: Codeunit "NPR POS Session";
         OnRunFrontEnd: Codeunit "NPR POS Front End Management";
-        ActionHandled: Boolean;
-
+        OnRunHandled: Boolean;
 
     trigger OnRun()
-    var
-        ContextString: Text;
     begin
         if not OnRunInitialized then
             Error(TextErrorMustNotRunThisCodeunit);
-        OnAction(OnRunPOSAction, OnRunWorkflowStep, OnRunContext, OnRunPOSSession, OnRunWorkflows20State, OnRunFrontEnd, ActionHandled);
-        if not ActionHandled then
+        OnAction(OnRunPOSAction, OnRunWorkflowStep, OnRunContext, OnRunPOSSession, OnRunWorkflows20State, OnRunFrontEnd, OnRunHandled);
+        if not OnRunHandled then
             Error(Text001, OnRunPOSAction);
     end;
 
@@ -74,16 +66,19 @@ codeunit 6150733 "NPR POS Workflows 2.0"
         ActionContext := JToken.AsObject();
     end;
 
-    local procedure InvokeOnActionThroughOnRun(POSActionIn: Record "NPR POS Action"; WorkflowStepIn: Text; ContextIn: Codeunit "NPR POS JSON Management"; POSSessionIn: Codeunit "NPR POS Session"; FrontEndIn: Codeunit "NPR POS Front End Management"; Self: Codeunit "NPR POS Workflows 2.0") Success: Boolean
+    local procedure InvokeOnActionThroughOnRun(POSActionIn: Record "NPR POS Action"; WorkflowStepIn: Text; ContextIn: Codeunit "NPR POS JSON Management"; POSSessionIn: Codeunit "NPR POS Session"; FrontEndIn: Codeunit "NPR POS Front End Management"; Self: Codeunit "NPR POS Workflows 2.0"; var Handled: Boolean) Success: Boolean
     begin
-        ActionHandled := false;
+        OnRunHandled := false;
         OnRunInitialized := true;
         OnRunPOSAction := POSActionIn;
         OnRunWorkflowStep := WorkflowStepIn;
         OnRunContext := ContextIn;
         OnRunPOSSession := POSSessionIn;
         OnRunFrontEnd := FrontEndIn;
+
         Success := Self.Run();
+        Handled := OnRunHandled;
+
         OnRunInitialized := false;
     end;
 
@@ -97,6 +92,7 @@ codeunit 6150733 "NPR POS Workflows 2.0"
         Signal: DotNet NPRNetWorkflowCallCompletedRequest;
         ActionContext: DotNet NPRNetDictionary_Of_T_U;
         Success: Boolean;
+        Handled: Boolean;
     begin
         StopwatchResetAll();
 
@@ -113,12 +109,12 @@ codeunit 6150733 "NPR POS Workflows 2.0"
         POSSession.SetInAction(true);
         StopwatchStart('Action');
 
-        Success := InvokeOnActionThroughOnRun(POSAction, WorkflowStep, JSON, POSSession, FrontEnd, Self);
+        Success := InvokeOnActionThroughOnRun(POSAction, WorkflowStep, JSON, POSSession, FrontEnd20, Self, Handled);
 
         StopwatchStop('Action');
         POSSession.SetInAction(false);
 
-        if not ActionHandled then
+        if not Handled then
             FrontEnd20.ReportBug(StrSubstNo(Text001, Action));
 
         if Success then begin
@@ -201,4 +197,3 @@ codeunit 6150733 "NPR POS Workflows 2.0"
     begin
     end;
 }
-

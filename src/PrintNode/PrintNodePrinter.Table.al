@@ -19,7 +19,7 @@ table 6151221 "NPR PrintNode Printer"
             begin
                 if PrintNodeMgt.LookupPrinterIdAndName(PrinterId, PrinterName) then begin
                     Id := PrinterId;
-                    Name := PrinterName;
+                    Name := CopyStr(PrinterName, 1, MaxStrLen(Name));
                 end;
             end;
         }
@@ -37,7 +37,7 @@ table 6151221 "NPR PrintNode Printer"
             if ("Object Type" = const(Report)) AllObj."Object ID" where("Object Type" = const(Report));
             DataClassification = CustomerContent;
         }
-        field(10; Name; Text[50])
+        field(10; Name; Text[250])
         {
             Caption = 'Name';
             DataClassification = CustomerContent;
