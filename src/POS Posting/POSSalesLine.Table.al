@@ -1,30 +1,5 @@
 table 6150622 "NPR POS Sales Line"
 {
-    // NPR5.29/AP/20170126 CASE 262628 Recreated ENU-captions
-    // NPR5.30/AP/20170209 CASE 261728 Renamed field "Store Code" -> "POS Store Code"
-    // NPR5.32/AP/20170220 CASE 262628 Renamed field "Receipt No." -> "Document No."
-    // NPR5.32.10/BR/20170609 CASE 279551 Added fields for Item Ledger Entry Posting
-    // NPR5.36/BR/20170609 CASE 277101 Added fields for Item Ledger Entry Posting
-    // NPR5.36/AP/20170717 CASE 262628 Added "POS Ledg. Register No."
-    // NPR5.36/BR/20170810 CASE 277096 Filled LookupPageID and DrillDownPageID
-    // NPR5.37/BR/20171016 CASE 293227 Added Functions CalculateDiscountPerc
-    // NPR5.38/BR/20171108 CASE 294717 Added function ShowDimensions
-    // NPR5.38/BR  /20180122 CASE 302693 Added Type Option "Payout"
-    // NPR5.39/BR  /20180208 CASE 304739 Added Type Option "Rounding", adding to tablerelation of "No." field
-    // NPR5.39/MHA /20180221 CASE 305139 Added field 405 "Discount Authorised by"
-    // NPR5.42/TSA /20180511 CASE 314834 Dimensions are editable when entry is unposted
-    // NPR5.48/TJ  /20181115 CASE 330832 Increased Length of field Item Category Code from 10 to 20
-    // NPR5.48/JDH /20181203 CASE 335967 Field Line Amount added
-    // NPR5.50/MHA /20190422 CASE 337539 Added field 170 "Retail ID"
-    // NPR5.50/MMV /20190328 CASE 300557 Added field 143,144.
-    //                                   Renamed blank Type option to comment.
-    // NPR5.51/MHA /20190718 CASE 362329 Added field 500 "Exclude from Posting"
-    // NPR5.52/TSA /20190925 CASE 369231 Added field "Retail Serial No." aka "Serial No. not Created"
-    // NPR5.53/SARA/20191024 CASE 373672 Added Field 600..620
-    // NPR5.53/ALPO/20200108 CASE 380918 Post Seating Code and Number of Guests to POS Entries (for further sales analysis breakedown)
-    // NPR5.54/RA  /20200214 CASE 388514 Table relation to variant table was wrong, field 5402
-    // NPR5.54/ALPO/20200324 CASE 397063 Global dimensions were not updated on assigned dimension change through ShowDimensions() function ("Dimensions" button)
-
     Caption = 'POS Sales Line';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR POS Sales Line List";
@@ -91,8 +66,6 @@ table 6150622 "NPR POS Sales Line"
             IF (Type = CONST(Item)) Item
             ELSE
             IF (Type = CONST(Rounding)) "G/L Account";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(12; "Location Code"; Code[10])
@@ -256,12 +229,16 @@ table 6150622 "NPR POS Sales Line"
             DataClassification = CustomerContent;
             Editable = false;
         }
-        field(84; "Gen. Posting Type"; Option)
+        field(84; "Gen. Posting Type"; Enum "General Posting Type")
         {
             Caption = 'Gen. Posting Type';
             DataClassification = CustomerContent;
-            OptionCaption = ' ,Purchase,Sale';
-            OptionMembers = " ",Purchase,Sale;
+
+            trigger OnValidate()
+            begin
+                if "Gen. Posting Type" = "Gen. Posting Type"::Settlement then
+                    FieldError("Gen. Posting Type");
+            end;
         }
         field(85; "Tax Area Code"; Code[20])
         {
@@ -382,19 +359,6 @@ table 6150622 "NPR POS Sales Line"
             DataClassification = CustomerContent;
             Description = 'NPR5.32.10';
             TableRelation = Bin.Code WHERE("Location Code" = FIELD("Location Code"));
-
-            trigger OnLookup()
-            var
-                WMSManagement: Codeunit "WMS Management";
-                BinCode: Code[20];
-            begin
-            end;
-
-            trigger OnValidate()
-            var
-                WMSManagement: Codeunit "WMS Management";
-            begin
-            end;
         }
         field(201; "Qty. per Unit of Measure"; Decimal)
         {
@@ -411,12 +375,6 @@ table 6150622 "NPR POS Sales Line"
             Caption = 'Cross-Reference No.';
             DataClassification = CustomerContent;
             Description = 'NPR5.32.10';
-
-            trigger OnValidate()
-            var
-                ReturnedCrossRef: Record "Item Cross Reference";
-            begin
-            end;
         }
         field(203; "Originally Ordered No."; Code[20])
         {
@@ -499,9 +457,7 @@ table 6150622 "NPR POS Sales Line"
 
             trigger OnLookup()
             begin
-                //-NPR5.38 [294747]
                 ShowDimensions;
-                //+NPR5.38 [294747]
             end;
         }
         field(500; "Exclude from Posting"; Boolean)
@@ -512,7 +468,7 @@ table 6150622 "NPR POS Sales Line"
         }
         field(600; "Entry Date"; Date)
         {
-            CalcFormula = Lookup ("NPR POS Entry"."Entry Date" WHERE("Entry No." = FIELD("POS Entry No.")));
+            CalcFormula = Lookup("NPR POS Entry"."Entry Date" WHERE("Entry No." = FIELD("POS Entry No.")));
             Caption = 'Entry Date';
             Description = 'NPR5.53';
             Editable = false;
@@ -520,7 +476,7 @@ table 6150622 "NPR POS Sales Line"
         }
         field(610; "Starting Time"; Time)
         {
-            CalcFormula = Lookup ("NPR POS Entry"."Starting Time" WHERE("Entry No." = FIELD("POS Entry No.")));
+            CalcFormula = Lookup("NPR POS Entry"."Starting Time" WHERE("Entry No." = FIELD("POS Entry No.")));
             Caption = 'Starting Time';
             Description = 'NPR5.53';
             Editable = false;
@@ -528,7 +484,7 @@ table 6150622 "NPR POS Sales Line"
         }
         field(620; "Ending Time"; Time)
         {
-            CalcFormula = Lookup ("NPR POS Entry"."Ending Time" WHERE("Entry No." = FIELD("POS Entry No.")));
+            CalcFormula = Lookup("NPR POS Entry"."Ending Time" WHERE("Entry No." = FIELD("POS Entry No.")));
             Caption = 'Ending Time';
             Description = 'NPR5.53';
             Editable = false;
@@ -620,25 +576,15 @@ table 6150622 "NPR POS Sales Line"
         DimMgt: Codeunit DimensionManagement;
         POSEntry: Record "NPR POS Entry";
     begin
-        //-NPR5.42 [314834]
-
-        //-NPR5.38 [294717]
-        // DimMgt.ShowDimensionSet("Dimension Set ID",STRSUBSTNO('%1 %2 - %3',TABLECAPTION,"POS Entry No.","Line No."));
-        //+NPR5.38 [294717]
-
         POSEntry.Get("POS Entry No.");
         if ((POSEntry."Post Entry Status" = POSEntry."Post Entry Status"::Posted) and (POSEntry."Post Item Entry Status" = POSEntry."Post Item Entry Status"::Posted)) then begin
             DimMgt.ShowDimensionSet("Dimension Set ID", StrSubstNo('%1 %2 %3', TableCaption, "POS Entry No.", "Line No."));
         end else begin
-            //"Dimension Set ID" := DimMgt.EditDimensionSet ("Dimension Set ID",STRSUBSTNO('%1 %2 %3',TABLECAPTION,"POS Entry No.", "Line No."));  //NPR5.54 [397063]-revoked
-            //-NPR5.54 [397063]
             "Dimension Set ID" :=
               DimMgt.EditDimensionSet(
                 "Dimension Set ID", StrSubstNo('%1 %2 %3', TableCaption, "POS Entry No.", "Line No."), "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code");
-            //+NPR5.54 [397063]
             Modify();
         end;
-        //+NPR5.42 [314834]
     end;
 
     procedure UpdateLCYAmounts()
@@ -658,10 +604,7 @@ table 6150622 "NPR POS Sales Line"
 
     procedure CalculateDiscountPerc()
     begin
-        //-NPR5.37 [293227]
         if "Amount Excl. VAT" <> 0 then
             "Line Discount %" := ("Line Discount Amount Excl. VAT" / "Amount Excl. VAT") * 100;
-        //+NPR5.37 [293227]
     end;
 }
-

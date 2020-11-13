@@ -1,25 +1,5 @@
 codeunit 6150616 "NPR POS Post Item Entries"
 {
-    // NPR5.36/BR  /20170608  CASE 279551 Object Created
-    // NPR5.37/BR  /20171012  CASE 277101 Fix sign
-    // NPR5.37/BR  /20171023  CASE 294219 Add Item tracking Support
-    // NPR5.38/BR  /20180116  CASE 301600 Cost Adjustment and post to Item Ledger
-    // NPR5.38/BR  /20180118  CASE 302710 Added missing fields to posting
-    // NPR5.38/BR  /20180119  CASE 302772 Fix sign part 2
-    // NPR5.48/TJ  /20190111  CASE 340615 Removed usage of Product Group Code in standard objects
-    // NPR5.50/TSA /20190412 CASE 351655 Creating Service Items when setup CheckAndCreateServiceItemPos()
-    // NPR5.50/TSA /20190531 CASE 355186 Added link in table "POS Entry Sales Doc. Link" when a service item is created
-    // NPR5.51/TSA /20190624 CASE 359508 Added assignment of document no. from "POS Period Register."Document No.", when set
-    // NPR5.51/MHA /20190718  CASE 362329 Skip "Exclude from Posting" Sales Lines
-    // NPR5.52/ALPO/20190923 CASE 365326 POS Posting related fields moved to POS Posting Profiles from NP Retail Setup
-    // NPR5.52/TSA /20190925 CASE 369231 Added handling of Retail Serial No.
-    // NPR5.52/TSA /20191014 CASE 372920 Replenishment Method Assembly
-    // NPR5.53/TSA /20191212 CASE 381559 Fixed issue with assembly order rename
-    // NPR5.55/ALST/20200512 CASE 389261 modal pages are run on quantity validation, transaction needs to end before that
-    // NPR5.55/ALPO/20200528 CASE 407063 POS Store Location Code were not assigned to item journal line during item entry posting, if there was no location code coming from POS Sales Line
-    // NPR5.55/ALPO/20200601 CASE 407305 Try to use cash register's location code before using one from POS Store
-    // NPR5.55/ALPO/20200708 CASE 412312 Use POS sales line reason code, when posting item entries
-
     TableNo = "NPR POS Entry";
 
     trigger OnRun()
@@ -36,9 +16,7 @@ codeunit 6150616 "NPR POS Post Item Entries"
         FileManagement: Codeunit "File Management";
     begin
         OnBeforePostPOSEntry(Rec);
-        //-NPR5.38 [301600]
         NPRetailSetup.Get;
-        //+NPR5.38 [301600]
 
         POSEntry := Rec;
         with POSEntry do begin
@@ -60,48 +38,33 @@ codeunit 6150616 "NPR POS Post Item Entries"
 
             CheckPostingrestrictions(POSEntry);
 
-            NPRetailSetup.GetPostingProfile(POSEntry."POS Unit No.", POSPostingProfile);  //NPR5.52 [365326]
+            NPRetailSetup.GetPostingProfile(POSEntry."POS Unit No.", POSPostingProfile);
 
             POSSalesLine.Reset;
             POSSalesLine.SetRange("POS Entry No.", "Entry No.");
             POSSalesLine.SetRange(Type, POSSalesLine.Type::Item);
             POSSalesLine.SetFilter(Quantity, '<>0');
-            //-NPR5.51 [362329]
             POSSalesLine.SetRange("Exclude from Posting", false);
-            //+NPR5.51 [362329]
-
             if POSSalesLine.FindSet then
                 repeat
                     POSSalesLine."Item Entry No." := PostItemJnlLine(POSEntry, POSSalesLine);
                     POSSalesLine.Modify;
 
-                    //-NPR5.50 [351655]
                     CheckAndCreateServiceItemPos(POSEntry, POSSalesLine);
-                    //+NPR5.50 [351655]
 
-                    //-NPR5.38 [301600]
-                    //IF NPRetailSetup."Adj. Cost after Item Posting" THEN BEGIN  //NPR5.52 [365326]-revoked
-                    if POSPostingProfile."Adj. Cost after Item Posting" then begin  //NPR5.52 [365326]
+                    if POSPostingProfile."Adj. Cost after Item Posting" then begin
                         if not TempItemToAdjust.Get(POSSalesLine."No.") then begin
                             TempItemToAdjust."No." := POSSalesLine."No.";
                             TempItemToAdjust.Insert;
                         end;
                     end;
-                    //+NPR5.38 [301600]
 
-                    //-NPR5.52 [369231]
                     if (POSSalesLine."Retail Serial No." <> '') then
                         HandleRetailSerialNo(POSSalesLine);
-                //+NPR5.52 [369231]
-
                 until POSSalesLine.Next = 0;
-
         end;
 
-        //-NPR5.38 [301600]
-        //COMMIT;
-        //IF NPRetailSetup."Adj. Cost after Item Posting" THEN BEGIN  //NPR5.52 [365326]-revoked
-        if POSPostingProfile."Adj. Cost after Item Posting" then begin  //NPR5.52 [365326]
+        if POSPostingProfile."Adj. Cost after Item Posting" then begin
             if TempItemToAdjust.FindSet then
                 repeat
                     AdjustCostItemEntries.UseRequestPage(false);
@@ -110,14 +73,12 @@ codeunit 6150616 "NPR POS Post Item Entries"
                     Clear(AdjustCostItemEntries);
                 until TempItemToAdjust.Next = 0;
         end;
-        //IF NPRetailSetup."Post to G/L after Item Posting" THEN BEGIN  //NPR5.52 [365326]-revoked
-        if POSPostingProfile."Post to G/L after Item Posting" then begin  //NPR5.52 [365326]
+        if POSPostingProfile."Post to G/L after Item Posting" then begin
             PostInventoryCosttoGL.UseRequestPage(false);
             PostInventoryCosttoGL.InitializeRequest(1, '', true);
             PostInventoryCosttoGL.SaveAsXml(FileManagement.ServerTempFileName('.xml'));
             Clear(PostInventoryCosttoGL);
         end;
-        //+NPR5.38 [301600]
 
         OnAfterPostPOSEntry(Rec);
     end;
@@ -169,55 +130,36 @@ codeunit 6150616 "NPR POS Post Item Entries"
         if POSSalesLine."Withhold Item" and (POSSalesLine."Move to Location" = '') then
             exit;
 
-        //-NPR5.51 [359508]
         POSPeriodRegister.Get(POSEntry."POS Period Register No.");
-        //+NPR5.51 [359508]
 
         NPRetailSetup.Get;
         with POSSalesLine do begin
-
             ItemJnlLine.Init;
             ItemJnlLine."Posting Date" := POSEntry."Posting Date";
             ItemJnlLine."Document Date" := POSEntry."Document Date";
-
-            //-NPR5.51 [359508]
-            // ItemJnlLine."Document No." := POSEntry."Document No.";
             ItemJnlLine."Document No." := POSPeriodRegister."Document No.";
             if (ItemJnlLine."Document No." = '') then
                 ItemJnlLine."Document No." := POSEntry."Document No.";
-            //+NPR5.51 [359508]
-
             ItemJnlLine."Source Posting Group" := POSEntry."Customer Posting Group";
             ItemJnlLine."Salespers./Purch. Code" := POSEntry."Salesperson Code";
             ItemJnlLine."Country/Region Code" := POSEntry."Country/Region Code";
-            //-NPR5.55 [412312]
             if "Reason Code" <> '' then
                 ItemJnlLine."Reason Code" := "Reason Code"
             else
-                //+NPR5.55 [412312]
                 ItemJnlLine."Reason Code" := POSEntry."Reason Code";
             ItemJnlLine."Item No." := "No.";
             ItemJnlLine.Description := CopyStr(Description, 1, MaxStrLen(ItemJnlLine.Description));
             ItemJnlLine."Shortcut Dimension 1 Code" := "Shortcut Dimension 1 Code";
             ItemJnlLine."Shortcut Dimension 2 Code" := "Shortcut Dimension 2 Code";
             ItemJnlLine."Dimension Set ID" := "Dimension Set ID";
-            //-NPR5.55 [407305]
             if "Location Code" = '' then
                 "Location Code" := GetPOSUnitLocation(POSEntry."POS Unit No.");
-            //+NPR5.55 [407305]
             if "Location Code" = '' then begin
                 POSStore.Get(POSEntry."POS Store Code");
-                //-NPR5.55 [407063]-revoked
-                //  POSStore."Location Code" := POSStore."Location Code";
-                //END ELSE BEGIN
-                //+NPR5.55 [407063]-revoked
-                //-NPR5.55 [407063]
                 "Location Code" := POSStore."Location Code";
             end;
-            //+NPR5.55 [407063]
             ItemJnlLine."Location Code" := "Location Code";
             ItemJnlLine."Bin Code" := "Bin Code";
-            //END;  //NPR5.55 [407063]-revoked
             ItemJnlLine."Variant Code" := "Variant Code";
             ItemJnlLine."Inventory Posting Group" := "Posting Group";
             ItemJnlLine."Gen. Bus. Posting Group" := "Gen. Bus. Posting Group";
@@ -238,7 +180,6 @@ codeunit 6150616 "NPR POS Post Item Entries"
                 ItemJnlLine."Entry Type" := ItemJnlLine."Entry Type"::Sale;
             ItemJnlLine."Unit of Measure Code" := "Unit of Measure Code";
             ItemJnlLine."Qty. per Unit of Measure" := "Qty. per Unit of Measure";
-            //ItemJnlLine."Derived from Blanket Order" := "Blanket Order No." <> '';
             ItemJnlLine."Cross-Reference No." := "Cross-Reference No.";
             ItemJnlLine."Originally Ordered No." := "Originally Ordered No.";
             ItemJnlLine."Originally Ordered Var. Code" := "Originally Ordered Var. Code";
@@ -246,42 +187,21 @@ codeunit 6150616 "NPR POS Post Item Entries"
             ItemJnlLine."Item Category Code" := "Item Category Code";
             ItemJnlLine.Nonstock := Nonstock;
             ItemJnlLine."Purchasing Code" := "Product Group Code";
-            //-NPR5.48 [340615]
-            //ItemJnlLine."Product Group Code" := "Product Group Code";
-            //+NPR5.48 [340615]
             ItemJnlLine."Return Reason Code" := "Return Reason Code";
-            //ItemJnlLine."Item Group No." :=
             ItemJnlLine."Planned Delivery Date" := "Planned Delivery Date";
             ItemJnlLine."Order Date" := POSEntry."Entry Date";
             ItemJnlLine."NPR Document Time" := POSEntry."Ending Time";
             ItemJnlLine."Serial No." := "Serial No.";
             ItemJnlLine."Lot No." := "Lot No.";
-            //-NPR5.37 [294219]
-            //InsertTrackingLine(ItemJnlLine);
-            //+NPR5.37 [294219]
             ItemJnlLine."Document Line No." := "Line No.";
-            //-NPR5.37 [277101]
-            //ItemJnlLine.Quantity := -Quantity;
-            //ItemJnlLine."Quantity (Base)" := -"Quantity (Base)";
-            //ItemJnlLine."Invoiced Quantity" := -Quantity;
-            //ItemJnlLine."Invoiced Qty. (Base)" := -"Quantity (Base)";
             ItemJnlLine.Quantity := Quantity;
             ItemJnlLine."Quantity (Base)" := "Quantity (Base)";
             ItemJnlLine."Invoiced Quantity" := Quantity;
             ItemJnlLine."Invoiced Qty. (Base)" := "Quantity (Base)";
-            //+NPR5.37 [277101]
             ItemJnlLine."Unit Cost" := "Unit Cost (LCY)";
             ItemJnlLine."Source Currency Code" := POSEntry."Currency Code";
             ItemJnlLine."Unit Cost (ACY)" := "Unit Cost";
             ItemJnlLine."Value Entry Type" := ItemJnlLine."Value Entry Type"::"Direct Cost";
-            //-NPR5.38 [302772]
-            //    ItemJnlLine.Amount := -("Amount Excl. VAT");
-            //    IF POSEntry."Prices Including VAT" THEN
-            //      ItemJnlLine."Discount Amount" :=
-            //        -(("Line Discount Amount Incl. VAT") / (1 + "VAT %" / 100))
-            //    ELSE
-            //      ItemJnlLine."Discount Amount" :=
-            //        -("Line Discount Amount Incl. VAT");
             ItemJnlLine.Amount := ("Amount Excl. VAT");
             if POSEntry."Prices Including VAT" then
                 ItemJnlLine."Discount Amount" :=
@@ -289,25 +209,19 @@ codeunit 6150616 "NPR POS Post Item Entries"
             else
                 ItemJnlLine."Discount Amount" :=
                   ("Line Discount Amount Incl. VAT");
-            //+NPR5.38 [302772]
             ItemJnlLine."Source Type" := ItemJnlLine."Source Type"::Customer;
             ItemJnlLine."Source No." := "Customer No.";
             ItemJnlLine."Invoice-to Source No." := "Customer No.";
             ItemJnlLine."Source Code" := NPRetailSetup."Source Code";
-            //-NPR5.37 [294219]
             InsertTrackingLine(ItemJnlLine);
             ItemJnlLine."Serial No." := '';
             ItemJnlLine."Lot No." := '';
-            //+NPR5.37 [294219]
-            //-NPR5.38 [302710]
             ItemJnlLine."NPR Discount Type" := "Discount Type";
             ItemJnlLine."NPR Discount Code" := "Discount Code";
             if Item.Get("No.") then begin
                 ItemJnlLine."NPR Item Group No." := Item."NPR Item Group";
                 ItemJnlLine."NPR Vendor No." := Item."Vendor No.";
             end;
-            //+NPR5.38 [302710]
-            //ItemJnlLine."Item Shpt. Entry No." := ItemLedgShptEntryNo;
         end;
 
         OnAfterCreateItemJournalLine(POSEntry, POSSalesLine, ItemJnlLine);
@@ -327,19 +241,13 @@ codeunit 6150616 "NPR POS Post Item Entries"
         with ItemJournalLine do begin
             if ("Serial No." = '') and ("Lot No." = '') then
                 exit;
-            //-NPR5.37 [294219]
-            //ItemTrackingCode.GET(Item."Item Tracking Code");
-            //+NPR5.37 [294219]
             Item.Get("Item No.");
             Item.TestField("Item Tracking Code");
             ItemTrackingCode.Get(Item."Item Tracking Code");
             ReservationEntry.Init;
             ReservationEntry."Entry No." := 0;
             ReservationEntry.Positive := false;
-            //-NPR5.37 [294219]
-            //ReservationEntry."Item No." := "No.";
             ReservationEntry."Item No." := "Item No.";
-            //+NPR5.37 [294219]
             ReservationEntry."Variant Code" := "Variant Code";
             ReservationEntry."Location Code" := "Location Code";
             ReservationEntry."Quantity (Base)" := -Quantity;
@@ -354,10 +262,7 @@ codeunit 6150616 "NPR POS Post Item Entries"
                     ItemLedgerEntry.SetRange(Open, true);
                     ItemLedgerEntry.SetRange(Positive, true);
                     ItemLedgerEntry.SetRange("Serial No.", "Serial No.");
-                    //-NPR5.37 [294219]
-                    //ItemLedgerEntry.SETRANGE( "Item No.", "No." );
                     ItemLedgerEntry.SetRange("Item No.", "Item No.");
-                    //+NPR5.37 [294219]
                     ItemLedgerEntry.SetRange("Variant Code", "Variant Code");
                     ItemLedgerEntry.FindFirst;
                     ReservationEntry."Creation Date" := ItemLedgerEntry."Posting Date";
@@ -368,7 +273,7 @@ codeunit 6150616 "NPR POS Post Item Entries"
                 end;
             end;
             ReservationEntry."Source Type" := DATABASE::"Item Journal Line";
-            ReservationEntry."Source Subtype" := "Entry Type";
+            ReservationEntry."Source Subtype" := "Entry Type".AsInteger();
             ReservationEntry."Source ID" := "Journal Template Name";
             ReservationEntry."Source Batch Name" := "Journal Batch Name";
             ReservationEntry."Source Ref. No." := "Line No.";
@@ -404,8 +309,6 @@ codeunit 6150616 "NPR POS Post Item Entries"
         CreateAssembly: Boolean;
         CreateAssemblyLink: Boolean;
     begin
-
-        //-NPR5.52 [372920]
         if (POSSalesLine.Type <> POSSalesLine.Type::Item) then
             exit(true);
 
@@ -440,9 +343,7 @@ codeunit 6150616 "NPR POS Post Item Entries"
             AssemblyHeader.Init;
             AssemblyHeader.Validate("Document Type", AssemblyHeader."Document Type"::Order);
             AssemblyHeader.Insert(true);
-            //-NPR5.55 [389261]
             Commit;
-            //-NPR5.55 [389261]
 
             AssemblyHeader.Validate("Posting Date", POSEntry."Posting Date");
             AssemblyHeader.Validate("Item No.", POSSalesLine."No.");
@@ -464,15 +365,11 @@ codeunit 6150616 "NPR POS Post Item Entries"
         end;
 
         if ((not CreateAssemblyLink) and (CreateAssembly)) then begin
-            //-NPR5.53 [381559]
-            // POSEntrySalesDocLink."Sales Document No" := AssemblyHeader."No.";
-            // POSEntrySalesDocLink.MODIFY ();
             if (POSEntrySalesDocLink."Sales Document No" <> AssemblyHeader."No.") then begin
                 POSEntrySalesDocLink.Delete();
                 POSEntrySalesDocLink."Sales Document No" := AssemblyHeader."No.";
                 POSEntrySalesDocLink.Insert();
             end;
-            //+NPR5.53 [381559]
         end;
 
         // Commit the item posting for POS Sale, before attempting to post assembly order - note: there are commits in the AssemblyPost.RUN ();
@@ -492,7 +389,6 @@ codeunit 6150616 "NPR POS Post Item Entries"
             Error(GetLastErrorText);
 
         exit(false);
-        //+NPR5.52 [372920]
     end;
 
     local procedure CheckAndCreateServiceItemPos(POSEntry: Record "NPR POS Entry"; POSSalesLine: Record "NPR POS Sales Line")
@@ -517,8 +413,6 @@ codeunit 6150616 "NPR POS Post Item Entries"
         y: Integer;
         NextLineNo: Integer;
     begin
-
-        //-NPR5.50 [351655]
         // Check if create service item
         if (POSSalesLine.Type <> POSSalesLine.Type::Item) then
             exit;
@@ -564,25 +458,19 @@ codeunit 6150616 "NPR POS Post Item Entries"
                 ServItem.Insert;
             end;
 
-            //-NPR5.50 [355186]
             POSEntrySalesDocLink."POS Entry No." := POSEntry."Entry No.";
             POSEntrySalesDocLink."POS Entry Reference Type" := POSEntrySalesDocLink."POS Entry Reference Type"::SALESLINE;
             POSEntrySalesDocLink."POS Entry Reference Line No." := POSSalesLine."Line No.";
             POSEntrySalesDocLink."Sales Document Type" := POSEntrySalesDocLink."Sales Document Type"::SERVICE_ITEM;
             POSEntrySalesDocLink."Sales Document No" := ServItem."No.";
             if (not POSEntrySalesDocLink.Insert()) then;
-            //+NPR5.50 [355186]
 
-            // There is table validation to table 111, so this is not a good idea.
-            //ServItem."Sales/Serv. Shpt. Document No." := POSSalesLine."Document No.";
-            //ServItem."Sales/Serv. Shpt. Line No." := POSSalesLine."Line No.";
             ServItem."Shipment Type" := ServItem."Shipment Type"::Sales;
 
             ServItem.Validate(Description, CopyStr(POSSalesLine.Description, 1, MaxStrLen(ServItem.Description)));
             ServItem."Description 2" := CopyStr(StrSubstNo('%1 / %2 / %3', POSSalesLine."POS Store Code", POSSalesLine."POS Unit No.", POSSalesLine."Document No."), 1, MaxStrLen(ServItem."Description 2"));
 
             ServItem.Validate("Customer No.", POSEntry."Customer No.");
-            //ServItem.VALIDATE ("Ship-to Code", SalesHeader."Ship-to Code");
 
             ServItem.OmitAssignResSkills(true);
             ServItem.Validate("Item No.", Item."No.");
@@ -669,7 +557,6 @@ codeunit 6150616 "NPR POS Post Item Entries"
             Clear(ServLogMgt);
             ServLogMgt.ServItemAutoCreated(ServItem);
         end;
-        //+NPR5.50 [351655]
     end;
 
     local procedure AmountToLCY(FCAmount: Decimal; CurrencyFactor: Decimal; CurrencyCode: Code[10]; CurrencyDate: Date): Decimal
@@ -677,8 +564,6 @@ codeunit 6150616 "NPR POS Post Item Entries"
         CurrExchRate: Record "Currency Exchange Rate";
         Currency: Record Currency;
     begin
-
-        //-NPR5.50 [351655]
         Currency.Get(CurrencyCode);
         Currency.TestField("Unit-Amount Rounding Precision");
         exit(
@@ -687,16 +572,12 @@ codeunit 6150616 "NPR POS Post Item Entries"
               CurrencyDate, CurrencyCode,
               FCAmount, CurrencyFactor),
             Currency."Unit-Amount Rounding Precision"));
-
-        //+NPR5.50 [351655]
     end;
 
     local procedure HandleRetailSerialNo(POSSalesLine: Record "NPR POS Sales Line")
     var
         ItemCrossReference: Record "Item Cross Reference";
     begin
-
-        //-NPR5.52 [369231]
         if (POSSalesLine."Retail Serial No." = '') then
             exit;
 
@@ -708,16 +589,12 @@ codeunit 6150616 "NPR POS Post Item Entries"
             ItemCrossReference."Discontinue Bar Code" := true;
             ItemCrossReference.Modify();
         end;
-
-        //+NPR5.52 [369231]
     end;
 
     procedure PostAssemblyOrders(POSEntry: Record "NPR POS Entry"; FailOnError: Boolean): Boolean
     var
         POSSalesLine: Record "NPR POS Sales Line";
     begin
-        //-NPR5.52 [372920]
-
         if not PostToEntries(POSEntry) then
             exit;
 
@@ -734,22 +611,17 @@ codeunit 6150616 "NPR POS Post Item Entries"
             until (POSSalesLine.Next() = 0);
 
         exit(true);
-        //+NPR5.52 [372920]
     end;
 
     local procedure GetPOSUnitLocation(POSUnitCode: Code[10]): Code[10]
     var
         CashRegister: Record "NPR Register";
     begin
-        //-NPR5.55 [407305]
         if CashRegister.Get(POSUnitCode) then
             exit(CashRegister."Location Code");
-        //+NPR5.55 [407305]
     end;
 
-    local procedure "---Events"()
-    begin
-    end;
+    //--- Events ---
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforePostPOSEntry(var POSEntry: Record "NPR POS Entry")
@@ -776,4 +648,3 @@ codeunit 6150616 "NPR POS Post Item Entries"
     begin
     end;
 }
-

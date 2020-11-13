@@ -1,125 +1,5 @@
 table 6014406 "NPR Sale Line POS"
 {
-    // VRT1.00/JDH /20150305  CASE 201022 Possible to get customer prices on POS
-    // NPR4.04/JDH /20150427  CASE 212229  Removed references to old Variant solution "Color Size"
-    // NPR4.10/VB  /20150602  CASE 213003 Support for Web Client (JavaScript) client
-    // NPR4.10/RMT /20150603  CASE 214310 Removed filter when finding next line number
-    // NPR4.14/RMT /20150715  CASE 216519 Added fields - used for registering prepayment
-    //                                   140 "Sales Document Type"
-    //                                   141 "Sales Document No."
-    //                                   142 "Sales Document Line No."
-    //                                   143 "Sales Document Prepayment"
-    //                                   144 "Sales Doc. Prepayment %"
-    //                                   145 "Sales Document Invoice"
-    //                                   146 "Sales Document Ship"
-    //                                   recalculate Prepayment % if unit price is changed
-    // NPR4.16/JDH /20151104  CASE 212229 Removed references to old Variant solution "Color Size"
-    // NPR5.00/VB  /20160105  CASE 230373 Refactoring due to client-side formatting of decimal and date/time values
-    // NPR5.01/RMT /20160217  CASE 234145 Change field "Register No." property "SQL Data Type" from Variant to <Undefined>
-    //                                     Change field "Sales Ticket No." property "SQL Data Type" from Variant to <Undefined>
-    //                                     NOTE: require data upgrade
-    // TM1.09 /TSA /20160301  CASE 235860 Sell event tickets in POS
-    // NPR5.22/VB  /20160406  CASE 237866 Added SQL Server Timestamp field to keep track of record updates when exchanging data with JavaScript
-    // NPR5.22/MMV /20160408  CASE 232067 Added field 150 "Customer Location No." : Code[20]
-    // NPR5.22/JC  /20160421  CASE 239058 VAT calculation issue using VAT prod posting group from item
-    // NPR5.23/MMV /20160527  CASE 237189 Commented out deprecated function KundeDisplay()
-    // NPR5.23/MHA /20160530  CASE 242929 Field 6039 "Description 2" length increased from 30 to 50
-    // NPR5.29/THRO/20161130  CASE 259899 Bugfix. Trying to get Customer without checking if "Customer No." is customer or Contact
-    // NPR5.29/TJ  /20161223  CASE 249720 Replaced calling of standard codeunit 7000 Sales Price Calc. Mgt. with our own codeunit 6014453 POS Sales Price Calc. Mgt.
-    // NPR5.29/MMV /20170110  CASE 260033 Updated report selection code.
-    // NPR5.29/AP  /20170119  CASE 257938 Fixing dimension issues. Dimension Set not propagated correctly from header to line and with proper priority.
-    // NPR5.29/BHR /20172001  CASE 261127 Validate Variant to trigger correct description on sales line
-    // NPR5.29/MHA /20170117  CASE 263043 GetTrueItemNo() should only be invoked upon change of "No."
-    // NPR5.30/TS  /20170130  CASE 264914 Removed field SportingPartner
-    // NPR5.30/MHA /20170201  CASE 264918 Np Photo Module removed
-    // NPR5.30/TS  /20170130  CASE 264917 Removed code reference field 3.5x Variant
-    // NPR5.30/TJ  /20170215  CASE 265504 Changed ENU captions on fields with word Register in their name
-    // NPR5.30/AP  /20170302  CASE 266785 General clean-up, refactoring.
-    //                                    Renamed field "Price Group Code" -> "Customer Price Group"
-    //                                    Deleted fields 6040 "OK", 6042 "Hidden", 7015 "Shopname"
-    // NPR5.31/MHA /20170210  CASE 262904 Removed direct discount calculations and added functions to enable Subscriber based Discount Calculation: GetSkipCalcDiscount(),SetSkipCalcDiscount()
-    // NPR5.31/JLK /20170331  CASE 268274 Changed ENU Caption
-    // NPR5.31/AP  /20170227  CASE 248534 Re-introduced US Sales Tax
-    //                                    Added the fields 84 "Gen. Posting Type", 85 "Tax Area Code", 86 "Tax Liable", 87 "Tax Group Code", 88 "Use Tax"
-    // NPR5.31/AP  /20170403  CASE 262628 Added new fields 160 Orig. POS Sale ID and 161 Orig. Line No. - surrogate keys for originating refs. for tickets, memebers, payments etc.
-    // NPR5.31/MHA /20170413  CASE 272109 "BOM List" Lines should not be set as Type Item but will be converted to Comment Line in Audit Roll
-    // NPR5.32/AP  /20170227  CASE 248534 Fixed issues regarding VAT update
-    // NPR5.32/JDH /20170525  CASE 278031 Changed "Unit" to "Unit of measure Code" (should also be a type Code)
-    //                                    Changed "Belong to Item Group" to "Item Group"
-    //                                    Changed a couple of captions, and aligned an Option (field 302) where Enu caption didnt match option string
-    // NPR5.32.01/AP/20170530  CASE 248534 More issues regarding VAT refactoring. VAT % not always set correct when updating exiting lines. Discounts on returns not VAT'ed correctly when posting.
-    // NPR5.33/AP  /20170627  CASE 278605 Fixed issue with Reverse Charge VAT (EU)
-    //                                    Syncing option string and ENU Captions for VAT Calculation Type. Option string was in DAN and not correctly translated.
-    //                                    Also added option Puljemoms/Pool VAT seems not to be used in this context - and is not compatible with price calculations and debetsales.
-    //                                    Old Option string:
-    //                                      "Normal moms,Modtagermoms,Momskorrektion,Sales tax,Puljemoms"/ENU=ENU=Regular VAT,Reverse Charge VAT,VAT Correction,Sales VAT,Pool VAT
-    //                                    New Option string:
-    //                                      "Normal VAT,Reverse Charge VAT,Full VAT,Sales Tax"
-    // NPR5.34/JDH /20170629  CASE 280329 Reworked field "Special Price" - renamed vars etc (no functional change)
-    // NPR5.34/MHA /20170720  CASE 282799 Added fields 420 "Coupon Qty." and 425 "Coupon Discount Amount"
-    // NPR5.34/JC  /20170720  CASE 284658 Changed function ReverseCalculateTax to CalculateTax for North America Sales Tax
-    // NPR5.35/TJ  /20170809  CASE 286283 Renamed variables/function into english and into proper naming terminology
-    //                                    Removed unused variables
-    // NPR5.37/JDH /20171026  CASE 294640 Changed "Item group" and "Bin code" field to code 10.
-    // NPR5.38/MMV /20171122  CASE 296642 Do not round non-cash types with global precision setup.
-    //                                    Skip rounding entirely for transcendence.
-    // NPR5.38/TSA /20171121  CASE 296851 Fixed OnValidate code for "Discount Amount"
-    // NPR5.38/TJ  /20171218  CASE 225415 Renumbered fields from range 50xxx to range below 50000
-    // NPR5.38/MHA /20180105  CASE 301053 Renamed field 6026 and 6027 from Danish to English
-    // NPR5.40/BR  /20180126  CASE 303616 Fix Sales Tax Calculation
-    // NPR5.39/TJ  /20180208  CASE 302634 Renamed OptionString property of field 302 "Return Sales Type" to english
-    //                                    Renamed field 6029 to english
-    // NPR5.39/MHA /20180214 CASE 305139 Added field 405 "Discount Authorised by"
-    // NPR5.40/TSA /20180214 CASE 305045 Adding field 6100 "Main Line No."
-    // NPR5.40/MMV /20180215 CASE 294655 Renamed field 402 from "Delete Discount Line" to "Discount Modified"
-    //                                   Remove some obvious legacy code.
-    // NPR5.40/MMV /20180223 CASE 306257 Transfer description to sales line after validation.
-    // NPR5.41/MMV /20180416 CASE 311309 Refactored function UpdateAmounts for better sales tax implementation.
-    //                                   Renamed field "Std. quantity" to "Quantity (Base)".
-    //                                   Added field "VAT Identifier".
-    // NPR5.41/TSA /20180424 CASE 312575 Added "Item Category Code", and "Product Group Code" assignment for items
-    // NPR5.42/MMV /20180504 CASE 313062 Added "Coupon Applied"
-    // NPR5.42/JC  /20180522 CASE 315194 Fix issue with getting Payment Type POS if using setup Payment type per register
-    // NPR5.44/TJ  /20180717 CASE 317326 Moved item group confirmation to a subscriber
-    // NPR5.45/MHA /20180803 CASE 323705 FindItemSalesPrice() updated to invoke price codeunits directly and deleted unused function GetLineUnitPriceInclVat()
-    // NPR5.45/TSA /20180809 CASE 323615 "Discount Amount" should be same sign as quantity, changed UpdateAmounts()
-    // NPR5.45/MHA /20180821 CASE 324395 Reworked "No.".OnValidate()
-    // NPR5.48/TJ  /20181115 CASE 330832 Increased Length of field Item Category Code from 10 to 20
-    // NPR5.48/JDH /20181113 CASE 334555 Changed Unit of measure code from Text to Code
-    // NPR5.48/MHA /20181127 CASE 334922 Renamed field 21 "Line Discount %, manually" to "Manual Item Sales Price"
-    // NPR5.48/JDH /20181113 CASE 335967 Implemented Unit of measure
-    //                                   Renamed ItemGlobal to Item (Undocumented) and implemented function GetItem().
-    // NPR5.48/TSA /20181217 CASE 338181 "Line Amount" assignment moved to after "Discount Amount" is calculated in function UpdateAmounts()
-    // NPR5.48/MMV /20181220 CASE 340154 Renamed field 402
-    // NPR5.48/TJ  /20190102 CASE 340615 Commented out usage of field Item."Product Group Code"
-    // NPR5.50/MHA /20190422 CASE 337539 Added field 170 "Retail ID"
-    // NPR5.50/MMV /20190320 CASE 300557 Added fields 147, 148, 151, 152, 155, 156, 157, 158
-    //                                   Removed old prepayment % handling
-    // NPR5.50/TSA /20190514 CASE 354832 Added VAT settings for payment lines (specifically for vouchers)
-    // NPR5.51/THRO/20190624 CASE 359293 Make sure lastest version of Item is read in TestItem().
-    // NPR5.51/MMV /20190627 CASE 359385 Changed EFT delete error wording and renamed field
-    // NPR5.51/MHA /20190722 CASE 358985 Added hook OnGetVATPostingSetup() in UpdateVATSetup()
-    // NPR5.51/MHA /20190812 CASE 358490 Removed test on RegisterGlobal."Credit Voucher Account" in Quantity - OnValidate()
-    // NPR5.51/TSA /20190821 CASE 365487 Corner case when discount is 100% and VAT amount is rounded in different directions.
-    // NPR5.52/MMV /20190910 CASE 352473 Added fields for more sales document control
-    // NPR5.52/MHA /20191017 CASE 373294 Changed validation of Min. and Max. Amount for payment
-    // NPR5.53/ALPO/20191025 CASE 371956 Dimensions: POS Store & POS Unit integration; discontinue dimensions on Cash Register
-    //                                     - Cash Register has been removed from CreateDim function call parameters. It is not needed here, because register/pos unit
-    //                                       dimensions are inherited by Sale POS header and thus are received by all Sale POS lines. No need to consider them here again.
-    // NPR5.53/ALPO/20191024 CASE 371955 Rounding related fields moved to POS Posting Profiles
-    // NPR5.53/MHA /20191030 CASE 374819 Removed VAT % from TransferToSalesLine()
-    // NPR5.53/ALPO/20191210 CASE 380609 NPRE: inherit seating dimensions
-    // NPR5.53/SARA/20200129 CASE 387895 Roll back changes for case 380979
-    // NPR5.54/ALPO/20200213 CASE 385837 Copy comment lines from POS Sale to Sales Order
-    // NPR5.54/ALPO/20200203 CASE 364658 Resume POS Sale: DrillDownPageID set to page 6150748 "POS Sale Lines Subpage"
-    // NPR5.54/MMV /20200220 CASE 391871 Moved GUID creation from table subscribers to table trigger to have everything centralized.
-    // NPR5.54/TSA /20200311 CASE 395683 Initialization of currency to get correct rounding precision and including discount amount in rounding
-    // NPR5.54/ALPO/20200423 CASE 401611 5.54 upgrade performace optimization
-    // NPR5.55/ALPO/20200414 CASE 398263 Set additional filter on Variant Code when looking up for a serial number; Sort serial number list by Expiration date
-    // NPR5.55/ALPO/20200424 CASE 401611 Remove dummy fields needed for 5.54 upgrade performace optimization
-    // NPR5.55/ALPO/20200513 CASE 404458 InPay: Line Amount and VAT Base Amount were not recalculated properly on quantity change
-    // NPR5.55/ALPO/20200703 CASE 380979 Part of 'UpdateAmounts' code extracted to a subfunction 'UpdateLineVatAmounts' to isolate execution
-
     Caption = 'Sale Line';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR POS Sale Lines Subpage";
@@ -182,7 +62,6 @@ table 6014406 "NPR Sale Line POS"
 
             trigger OnValidate()
             begin
-                //-NPR5.45 [324395]
                 InitFromSalePOS();
 
                 RegisterGlobal.Get(Rec."Register No.");
@@ -225,13 +104,10 @@ table 6014406 "NPR Sale Line POS"
                 end;
 
                 CreateDim(
-                  //DATABASE::Register,"Register No.",  //NPR5.53 [371956]-revoked
                   NPRDimMgt.TypeToTableNPR(Type), "No.",
                   NPRDimMgt.DiscountTypeToTableNPR("Discount Type"), "Discount Code",
-                  DATABASE::"NPR NPRE Seating", "NPRE Seating Code",  //NPR5.53 [380609]
-                                                                      //0,'',  //NPR5.53 [371956]  //NPR5.53 [380609]-revoked
+                  DATABASE::"NPR NPRE Seating", "NPRE Seating Code",
                   0, '');
-                //+NPR5.45 [324395]
             end;
         }
         field(7; "Location Code"; Code[10])
@@ -270,21 +146,11 @@ table 6014406 "NPR Sale Line POS"
             var
                 UOMMgt: Codeunit "Unit of Measure Management";
             begin
-                //-NPR5.45 [324395]
-                //-NPR5.48 [335967]
-                // //RetailSalesLineCode.Unit(Rec,xRec,CustomerDiscount);
-                // IF NOT ItemUoM.GET("No.","Unit of Measure Code") THEN
-                //  ItemUoM."Qty. per Unit of Measure" := 1;
-                //
-                // VALIDATE("Quantity (Base)",ItemUoM."Qty. per Unit of Measure" * Quantity);
                 GetItem;
                 "Qty. per Unit of Measure" := UOMMgt.GetQtyPerUnitOfMeasure(Item, "Unit of Measure Code");
                 "Quantity (Base)" := CalcBaseQty(Quantity);
-                //+NPR5.48 [335967]
-
                 "Unit Price" := FindItemSalesPrice();
                 UpdateAmounts(Rec);
-                //+NPR5.45 [324395]
             end;
         }
         field(12; Quantity; Decimal)
@@ -302,13 +168,6 @@ table 6014406 "NPR Sale Line POS"
                 Err003: Label 'A quantity must be specified on the line';
                 OldUnitPrice: Decimal;
             begin
-                //-NPR5.48 [335967]
-                //CondFirstRun := FALSE;
-                //+NPR5.48 [335967]
-
-                //-NPR5.40 [294655]
-                //RetailSetup.GET;
-                //+NPR5.40 [294655]
                 if ("Serial No." <> '') and
                   ("Sale Type" = "Sale Type"::Sale) and
                     (Abs(Quantity) <> 1) then
@@ -318,10 +177,6 @@ table 6014406 "NPR Sale Line POS"
                 if ("Serial No." <> '') then
                     Validate("Serial No.", "Serial No.");
 
-                //-NPR5.48 [335967]
-                //Cost := "Unit Cost" * Quantity;
-                //+NPR5.48 [335967]
-
                 case Type of
                     Type::"G/L Entry":
                         begin
@@ -329,20 +184,10 @@ table 6014406 "NPR Sale Line POS"
                                 if Quantity = 0 then
                                     Error(Err003);
                             end;
-                            //-NPR5.55 [404458]-revoked
-                            //"Amount Including VAT" := "Unit Price" * Quantity;
-                            //Amount := "Amount Including VAT";
-                            //+NPR5.55 [404458]-revoked
-                            UpdateAmounts(Rec);  //NPR5.55 [404458]
+                            UpdateAmounts(Rec);
                         end;
                     Type::Item:
                         begin
-                            //-NPR5.48 [335967]
-                            // //-NPR5.45 [324395]
-                            // //RetailSalesLineCode.QuantityValidate(Rec,xRec,CustomerDiscount);
-                            // RetailSalesLineCode.QuantityValidate(Rec,xRec);
-                            // //+NPR5.45 [324395]
-                            // Copied code from RetailSalesLineCode.QuantityValidate (im not sure its correct, but its copyed "as is")
                             GetItem;
                             "Quantity (Base)" := CalcBaseQty(Quantity);
 
@@ -360,15 +205,11 @@ table 6014406 "NPR Sale Line POS"
                                 if OldUnitPrice <> "Unit Price" then
                                     UpdateAmounts(Rec);
                             end;
-                            //+NPR5.48 [335967]
                         end;
                     Type::"Item Group":
                         begin
                             if Quantity = 0 then
                                 Error(Err003);
-                            //-NPR5.40 [294655]
-                            //      IF RetailSetup.GET THEN
-                            //+NPR5.40 [294655]
                             if "Price Includes VAT" then
                                 "Amount Including VAT" := Round("Unit Price" * Quantity, 0.01)
                             else
@@ -389,9 +230,7 @@ table 6014406 "NPR Sale Line POS"
                             "Amount Including VAT" := 0;
                         end;
                 end;
-                //-NPR5.48 [335967]
                 UpdateCost;
-                //+NPR5.48 [335967]
             end;
         }
         field(13; "Invoice (Qty)"; Decimal)
@@ -427,17 +266,6 @@ table 6014406 "NPR Sale Line POS"
                 Err003: Label 'The sales price cannot be changed for this item';
                 TotalAmount: Decimal;
             begin
-                //-NPR5.50 [300557]
-                //-NPR4.14
-                // IF "Sales Document Prepayment" THEN BEGIN
-                //  IF "Sales Doc. Prepayment %"<>0 THEN BEGIN
-                //    TotalAmount := xRec."Unit Price" / ("Sales Doc. Prepayment %"/100);
-                //    IF TotalAmount <> 0 THEN
-                //      "Sales Doc. Prepayment %" := ("Unit Price"/TotalAmount) * 100;
-                //  END;
-                // END;
-                //+NPR4.14
-                //+NPR5.50 [300557]
                 RetailSetup.Get;
                 RegisterGlobal.Get("Register No.");
                 case Type of
@@ -447,10 +275,7 @@ table 6014406 "NPR Sale Line POS"
                                 "Amount Including VAT" := "Unit Price" * Quantity;
                                 Amount := "Amount Including VAT";
                             end;
-                            //-NPR5.40 [294655]
-                            //      IF RegisterGlobal.GET("Register No.") AND ("Sale Type" <> "Sale Type"::"Out payment") THEN
                             if ("Sale Type" <> "Sale Type"::"Out payment") then
-                                //+NPR5.40 [294655]
                                 if not Silent then
                                     if RegisterGlobal."Credit Voucher Account" = "No." then
                                         Error(Err002)
@@ -466,10 +291,7 @@ table 6014406 "NPR Sale Line POS"
                         begin
                             if "Unit Price" < 0 then
                                 Error(ErrItemBelow);
-                            //-NPR5.48 [335967]
-                            //ItemGlobal.GET("No.");
                             GetItem;
-                            //+NPR5.48 [335967]
 
                             if not Item."NPR Group sale" then begin
                                 if not ForceApris then begin
@@ -494,10 +316,7 @@ table 6014406 "NPR Sale Line POS"
                                             end;
                                         RetailSetup."Unit Cost Control"::"Disabled if Quantity > 0 and xUnit Cost > Unit Cost":
                                             begin
-                                                //-NPR5.45 [323705]
-                                                //IF NOT((Quantity < 0) OR ("Unit Price" >= FindItemSalesPrice(Rec))) THEN
                                                 if not ((Quantity < 0) or ("Unit Price" >= FindItemSalesPrice())) then
-                                                    //+NPR5.45 [323705]
                                                     Error(ErrDisX);
                                             end;
                                     end;
@@ -505,15 +324,9 @@ table 6014406 "NPR Sale Line POS"
                             end;
 
                             "Eksp. Salgspris" := true;
-                            //-NPR5.40 [294655]
-                            //      ItemGlobal.GET("No.");
-                            //+NPR5.40 [294655]
                             GetAmount(Rec, Item, "Unit Price");
                             if ("No." <> '') then begin
-                                //-NPR5.40 [294655]
-                                //        IF (ItemGlobal.GET("No.") AND ItemGlobal."Group sale") OR (ItemGlobal.GET("No.") AND (ItemGlobal."Unit Cost" = 0)) THEN BEGIN
                                 if (Item."NPR Group sale") or (Item."Unit Cost" = 0) then begin
-                                    //+NPR5.40 [294655]
                                     CalculateCostPrice();
                                 end else
                                     if ("Serial No." <> '') and (Quantity > 0) then
@@ -555,12 +368,8 @@ table 6014406 "NPR Sale Line POS"
 
             trigger OnValidate()
             begin
-                //-NPR5.48 [335967]
                 "Unit Cost" := "Unit Cost (LCY)";
-
-                //well i dont agree that we should maintain field "Cost" here, but its here, so we need to support it
                 UpdateCost;
-                //+NPR5.48 [335967]
             end;
         }
         field(17; "VAT %"; Decimal)
@@ -605,18 +414,8 @@ table 6014406 "NPR Sale Line POS"
                 if "Discount %" > 100 then
                     Error(ErrMax);
 
-                //-NPR5.48 [334922]
-                // IF CurrFieldNo = FIELDNO("Discount %") THEN
-                //  "Line Discount %, manually" := TRUE
-                // ELSE
-                //  "Line Discount %, manually" := FALSE;
-                //+NPR5.48 [334922]
-
-                //RetailSetup.GET;  //NPR5.53 [371955]-revoked
-                //-NPR5.53 [371955]
                 POSUnit.Get("Register No.");
                 POSSetup.SetPOSUnit(POSUnit);
-                //+NPR5.53 [371955]
 
                 case Type of
                     Type::"G/L Entry":
@@ -625,18 +424,14 @@ table 6014406 "NPR Sale Line POS"
                                 Error(Trans0003);
                             "Discount Type" := "Discount Type"::" ";
                             "Discount Code" := '';
-                            //"Discount Amount" := ROUND("Unit Price" * "Discount %" / 100,RetailSetup."Amount Rounding Precision");  //NPR5.53 [371955]-revoked
-                            "Discount Amount" := Round("Unit Price" * "Discount %" / 100, POSSetup.AmountRoundingPrecision);  //NPR5.53 [371955]
+                            "Discount Amount" := Round("Unit Price" * "Discount %" / 100, POSSetup.AmountRoundingPrecision);
                             "Amount Including VAT" := "Unit Price" - "Discount Amount";
                         end;
                     Type::Item:
                         begin
                             RemoveBOMDiscount;
-                            //-NPR5.34 [282799]
-                            //"Discount Type" := "Discount Type"::Manual;
                             if "Discount %" > 0 then
                                 "Discount Type" := "Discount Type"::Manual;
-                            //+NPR5.34 [282799]
                             "Discount Code" := xRec."Discount Code";
                             "Amount Including VAT" := 0;
                             "Discount Amount" := 0;
@@ -695,13 +490,11 @@ table 6014406 "NPR Sale Line POS"
 
             trigger OnValidate()
             begin
-                //-NPR5.38 [296851]
                 if "Price Includes VAT" then begin
                     Validate("Discount %", "Discount Amount" / "Unit Price" / Quantity * 100);
                 end else begin
                     Validate("Discount %", "Discount Amount" / "Unit Price" / Quantity / (100 + "VAT %") * 10000);
                 end;
-                //+NPR5.38 [296851]
             end;
         }
         field(21; "Manual Item Sales Price"; Boolean)
@@ -729,17 +522,11 @@ table 6014406 "NPR Sale Line POS"
             var
                 Trans0001: Label 'The sign on quantity and amount must be the same';
             begin
-                //-NPR5.40 [294655]
-                //RegisterGlobal.GET("Register No.");
-                //+NPR5.40 [294655]
                 if Amount <> xRec.Amount then begin
                     case Type of
                         Type::Item:
                             begin
-                                //-NPR5.48 [335967]
-                                //IF ItemGlobal.GET("No.") THEN BEGIN
                                 GetItem;
-                                //+NPR5.48 [335967]
                                 if Amount * xRec.Amount <> Abs(Amount) * Abs(xRec.Amount) then
                                     Error(Trans0001);
 
@@ -756,9 +543,6 @@ table 6014406 "NPR Sale Line POS"
                                 if Modify then;
 
                                 RetailSalesLineCode.CalcAmounts(Rec);
-                                //-NPR5.48 [335967]
-                                //END;
-                                //+NPR5.48 [335967]
                             end;
                     end;
                 end;
@@ -783,7 +567,6 @@ table 6014406 "NPR Sale Line POS"
                 end;
 
                 if Type = Type::Payment then begin
-                    //-NPR5.52 [373294]
                     if PaymentTypePOS."Maximum Amount" <> 0 then begin
                         if Abs("Amount Including VAT") > Abs(PaymentTypePOS."Maximum Amount") then
                             Error(ErrMaxExceeded, "No.", PaymentTypePOS."Maximum Amount");
@@ -792,7 +575,6 @@ table 6014406 "NPR Sale Line POS"
                         if Abs("Amount Including VAT") < PaymentTypePOS."Minimum Amount" then
                             Error(ErrMinExceeded, "No.", PaymentTypePOS."Minimum Amount");
                     end;
-                    //+NPR5.52 [373294]
                     if EuroExchRate <> 0 then
                         Euro := "Amount Including VAT" / EuroExchRate;
                 end;
@@ -851,32 +633,13 @@ table 6014406 "NPR Sale Line POS"
 
             trigger OnLookup()
             begin
-                //-NPR5.48 [335967]
-                //NFRetailCode.TR406SerialNoOnLookup(Rec);
                 SerialNoLookup;
-                // "Unit Cost"        := FindItemCostPrice(Item);
-                // Cost               := "Unit Cost" * Quantity;
-                // //-NPR5.45 [324395]
-                // //"Unit Price (LCY)" := "Unit Cost";
-                // "Unit Cost (LCY)" := "Unit Cost";
-                // //+NPR5.45 [324395]
-                //IF MODIFY THEN;
-                //+NPR5.48 [335967]
             end;
 
             trigger OnValidate()
             begin
-                //-NPR5.48 [335967]
-                //NFRetailCode.TR406SerialNoOnValidate(Rec,TotalNonAppliedQuantity,TotalAuditRollQuantity,TotalItemLedgerEntryQuantity);
                 SerialNoValidate();
-                // "Unit Cost"        := FindItemCostPrice(Item);
-                // Cost               := "Unit Cost" * Quantity;
-                // //-NPR5.45 [324395]
-                // //"Unit Price (LCY)" := "Unit Cost";
-                // "Unit Cost (LCY)" := "Unit Cost";
-                // //+NPR5.45 [324395]
                 Validate("Unit Cost (LCY)", GetUnitCostLCY);
-                //+NPR5.48 [335967]
             end;
         }
         field(44; "Customer/Item Discount %"; Decimal)
@@ -891,7 +654,7 @@ table 6014406 "NPR Sale Line POS"
         {
             AutoFormatExpression = "Currency Code";
             AutoFormatType = 1;
-            CalcFormula = Sum ("NPR Sale Line POS"."Amount Including VAT");
+            CalcFormula = Sum("NPR Sale Line POS"."Amount Including VAT");
             Caption = 'Sales Order Amount';
             Editable = false;
             FieldClass = FlowField;
@@ -990,11 +753,9 @@ table 6014406 "NPR Sale Line POS"
             trigger OnValidate()
             begin
                 CreateDim(
-                  //DATABASE::Register,"Register No.",  //NPR5.53 [371956]-revoked
                   NPRDimMgt.TypeToTableNPR(Type), "No.",
                   NPRDimMgt.DiscountTypeToTableNPR("Discount Type"), "Discount Code",
-                  DATABASE::"NPR NPRE Seating", "NPRE Seating Code",  //NPR5.53 [380609]
-                                                                      //0,'',  //NPR5.53 [371956]  //NPR5.53 [380609]-revoked
+                  DATABASE::"NPR NPRE Seating", "NPRE Seating Code",
                   0, '');
             end;
         }
@@ -1053,21 +814,12 @@ table 6014406 "NPR Sale Line POS"
                 Customer: Record Customer;
             begin
                 if "Special price" = 0 then begin
-                    //-NPR5.48 [335967]
-                    //ItemGlobal.GET("No.");
                     GetItem;
-                    //+NPR5.48 [335967]
                     "Custom Price" := false;
                     "Eksp. Salgspris" := false;
-                    //-NPR5.45 [323705]
-                    //GetAmount(Rec,ItemGlobal,FindItemSalesPrice(Rec));
                     GetAmount(Rec, Item, FindItemSalesPrice());
-                    //+NPR5.45 [323705]
                 end else begin
-                    //-NPR5.48 [335967]
-                    //SalePOS.GET("Register No.","Sales Ticket No.");
                     GetPOSHeader;
-                    //+NPR5.48 [335967]
                     if Customer.Get(SalePOS."Customer No.") then begin
                         if Customer."NPR Type" = Customer."NPR Type"::Cash then begin
                             if Customer."Prices Including VAT" then
@@ -1081,20 +833,18 @@ table 6014406 "NPR Sale Line POS"
                 end;
             end;
         }
-        field(84; "Gen. Posting Type"; Option)
+        field(84; "Gen. Posting Type"; Enum "General Posting Type")
         {
             Caption = 'Gen. Posting Type';
             DataClassification = CustomerContent;
             Description = 'NPR5.31';
-            OptionCaption = ' ,Purchase,Sale';
-            OptionMembers = " ",Purchase,Sale;
 
             trigger OnValidate()
             begin
-                //-NPR5.31 [248534]
-                if "Gen. Posting Type" > 0 then
+                if "Gen. Posting Type" = "Gen. Posting Type"::Settlement then
+                    FieldError("Gen. Posting Type");
+                if "Gen. Posting Type" <> "Gen. Posting Type"::" " then
                     TestField(Type, Type::"G/L Entry");
-                //+NPR5.31 [248534]
             end;
         }
         field(85; "Tax Area Code"; Code[20])
@@ -1148,14 +898,8 @@ table 6014406 "NPR Sale Line POS"
             begin
                 if "Unit Cost" <> 0 then begin
                     "Custom Cost" := true;
-                    //-NPR5.45 [324395]
-                    //"Unit Price (LCY)" := "Unit Cost";
                     "Unit Cost (LCY)" := "Unit Cost";
-                    //+NPR5.45 [324395]
-                    //-NPR5.48 [335967]
-                    //Cost := "Unit Cost" * Quantity;
                     UpdateCost;
-                    //+NPR5.48 [335967]
                 end else begin
                     "Custom Cost" := false;
                     Validate("No.");
@@ -1406,11 +1150,9 @@ table 6014406 "NPR Sale Line POS"
                 RetailSetup.Get;
                 if RetailSetup."Use Adv. dimensions" then
                     CreateDim(
-                    //DATABASE::Register,"Register No.",  //NPR5.53 [371956]-revoked
                     NPRDimMgt.TypeToTableNPR(Type), "No.",
                     NPRDimMgt.DiscountTypeToTableNPR("Discount Type"), "Discount Code",
-                    DATABASE::"NPR NPRE Seating", "NPRE Seating Code",  //NPR5.53 [380609]
-                    //0,'',  //NPR5.53 [371956]  //NPR5.53 [380609]-revoked
+                    DATABASE::"NPR NPRE Seating", "NPRE Seating Code",
                     0, '');
             end;
         }
@@ -1429,7 +1171,7 @@ table 6014406 "NPR Sale Line POS"
         }
         field(420; "Coupon Qty."; Integer)
         {
-            CalcFormula = Count ("NPR NpDc SaleLinePOS Coupon" WHERE("Register No." = FIELD("Register No."),
+            CalcFormula = Count("NPR NpDc SaleLinePOS Coupon" WHERE("Register No." = FIELD("Register No."),
                                                                    "Sales Ticket No." = FIELD("Sales Ticket No."),
                                                                    "Sale Type" = FIELD("Sale Type"),
                                                                    "Sale Date" = FIELD(Date),
@@ -1443,7 +1185,7 @@ table 6014406 "NPR Sale Line POS"
         field(425; "Coupon Discount Amount"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum ("NPR NpDc SaleLinePOS Coupon"."Discount Amount" WHERE("Register No." = FIELD("Register No."),
+            CalcFormula = Sum("NPR NpDc SaleLinePOS Coupon"."Discount Amount" WHERE("Register No." = FIELD("Register No."),
                                                                                    "Sales Ticket No." = FIELD("Sales Ticket No."),
                                                                                    "Sale Type" = FIELD("Sale Type"),
                                                                                    "Sale Date" = FIELD(Date),
@@ -1500,13 +1242,11 @@ table 6014406 "NPR Sale Line POS"
 
             trigger OnValidate()
             begin
-                //-NPR5.53 [380609]
                 CreateDim(
                   DATABASE::"NPR NPRE Seating", "NPRE Seating Code",
                   NPRDimMgt.TypeToTableNPR(Type), "No.",
                   NPRDimMgt.DiscountTypeToTableNPR("Discount Type"), "Discount Code",
                   0, '');
-                //+NPR5.53 [380609]
             end;
         }
         field(801; "Insurance Category"; Code[50])
@@ -1615,11 +1355,9 @@ table 6014406 "NPR Sale Line POS"
             trigger OnValidate()
             begin
                 CreateDim(
-                  //DATABASE::Register,"Register No.",  //NPR5.53 [371956]-revoked
                   NPRDimMgt.TypeToTableNPR(Type), "No.",
                   NPRDimMgt.DiscountTypeToTableNPR("Discount Type"), "Discount Code",
-                  DATABASE::"NPR NPRE Seating", "NPRE Seating Code",  //NPR5.53 [380609]
-                                                                      //0,'',  //NPR5.53 [371956]  //NPR5.53 [380609]-revoked
+                  DATABASE::"NPR NPRE Seating", "NPRE Seating Code",
                   0, '');
             end;
         }
@@ -1781,8 +1519,6 @@ table 6014406 "NPR Sale Line POS"
             DataClassification = CustomerContent;
             TableRelation = IF (Type = CONST(Item),
                                 "No." = FILTER(<> '')) "Item Discount Group" WHERE(Code = FIELD("Item Disc. Group"));
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(10000; Silent; Boolean)
@@ -1981,34 +1717,18 @@ table 6014406 "NPR Sale Line POS"
                     if GiftVoucher3.Get("Gift Voucher Ref.") then
                         if GiftVoucher3.Status <> GiftVoucher3.Status::Cancelled then begin
                             GiftVoucher3.Validate(Status, GiftVoucher3.Status::Cancelled);
-                            //-NPR5.48 [335967]
-                            //SalePOS2.GET("Register No.","Sales Ticket No.");
-                            //GiftVoucher3.VALIDATE("Canceling Salesperson",SalePOS2."Salesperson Code");
                             GetPOSHeader;
                             GiftVoucher3.Validate("Canceling Salesperson", SalePOS."Salesperson Code");
-                            //+NPR5.48 [335967]
                             GiftVoucher3.Modify(true);
                             if RetailSetup."Use I-Comm" then begin
                                 ICommRec.Get;
                                 if ICommRec."Company - Clearing" <> '' then
-                                    //-NPR5.48 [335967]
-                                    //RetailCode.GiftVoucherCommonValidate(SalePOS2,GiftVoucher3."No.",GiftVoucher3.Status::Cancelled);
                                     RetailCode.GiftVoucherCommonValidate(SalePOS, GiftVoucher3."No.", GiftVoucher3.Status::Cancelled);
-                                //+NPR5.48 [335967]
                             end;
                         end;
             end else
                 if (Type = Type::Payment) then begin
-                    //-NPR5.45 [324395]
-                    // IF RetailSetup.GET THEN
-                    //  IF RetailSetup."Payment Type By Register" THEN BEGIN
-                    //    IF NOT PaymentTypePOS.GET("No.","Register No.") THEN
-                    //      ERROR(Err001,"No.");
-                    //  END
-                    // ELSE IF NOT PaymentTypePOS.GET("No.") THEN
-                    //  ERROR(Err001,"No.");
                     GetPaymentTypePOS(PaymentTypePOS);
-                    //+NPR5.45 [324395]
                     if PaymentTypePOS."G/L Account No." <> '' then begin
                         case PaymentTypePOS."Processing Type" of
                             PaymentTypePOS."Processing Type"::Cash:
@@ -2082,9 +1802,7 @@ table 6014406 "NPR Sale Line POS"
                 SaleLinePOS.Delete;
         end;
 
-        //-TMx.xx
         TicketRequestManager.OnDeleteSaleLinePos(Rec);
-        //+TMx.xx
     end;
 
     trigger OnInsert()
@@ -2096,11 +1814,9 @@ table 6014406 "NPR Sale Line POS"
             "Orig. POS Line No." := "Line No.";
         end;
 
-        //-NPR5.54 [391871]
         if IsNullGuid("Retail ID") then begin
             "Retail ID" := CreateGuid();
         end;
-        //+NPR5.54 [391871]
     end;
 
     trigger OnRename()
@@ -2151,66 +1867,40 @@ table 6014406 "NPR Sale Line POS"
     var
         SalePOS2: Record "NPR Sale POS";
     begin
-        //-NPR5.48 [335967]
         if SalePOS2.Get("Register No.", "Sales Ticket No.") then
             SalePOS := SalePOS2;
-
         Currency.InitRoundingPrecision;
-        //+NPR5.48 [335967]
     end;
 
     procedure SetPOSHeader(NewSalePOS: Record "NPR Sale POS")
     begin
-        //-NPR5.48 [335967]
         SalePOS := NewSalePOS;
-
         Currency.InitRoundingPrecision;
-        //+NPR5.48 [335967]
     end;
 
     procedure CalculateCostPrice()
     var
         VATPercent: Decimal;
     begin
-        //-NPR5.48 [335967]
-        //Item.GET("No.");
         GetItem;
-        //+NPR5.48 [335967]
 
         if "Price Includes VAT" then
             VATPercent := "VAT %"
         else
             VATPercent := 0;
 
-        //-NPR5.48 [335967]
-        //IF (Item."Group sale") AND (Item."Profit %" <> 0) THEN
-        //  "Unit Cost" := (1 - Item."Profit %" / 100) * "Unit Price" / ( 1 + VATPercent/100)
-        //ELSE
-        //  "Unit Cost" := Item."Unit Cost";
-
-        //Cost := Quantity * "Unit Cost";
-        ////-NPR5.45 [324395]
-        ////"Unit Price (LCY)" := "Unit Cost";
-        //"Unit Cost (LCY)" := "Unit Cost";
-        ////+NPR5.45 [324395]
-
         if (Item."NPR Group sale") and (Item."Profit %" <> 0) then
             Validate("Unit Cost (LCY)", ((1 - Item."Profit %" / 100) * "Unit Price" / (1 + VATPercent / 100)) * "Qty. per Unit of Measure")
         else
             Validate("Unit Cost (LCY)", Item."Unit Cost" * "Qty. per Unit of Measure");
-        //+NPR5.48 [335967]
     end;
 
     procedure EuroExchRate(): Decimal
     var
         PaymentTypePOS2: Record "NPR Payment Type POS";
     begin
-        //EuroExchRate()
         PaymentTypePOS2.SetRange(Euro, true);
-        //-NPR5.38 [294640]
-        //IF PaymentTypePOS2.FIND('-') THEN
         if PaymentTypePOS2.FindFirst then
-            //+NPR5.38 [294640]
             exit(PaymentTypePOS2."Fixed Rate" / 100)
         else
             exit(0.01);
@@ -2249,23 +1939,13 @@ table 6014406 "NPR Sale Line POS"
         TempSaleLinePOS: Record "NPR Sale Line POS" temporary;
         POSSalesPriceCalcMgt: Codeunit "NPR POS Sales Price Calc. Mgt.";
     begin
-        //FindItemSalesPrice
-        //-NPR5.48 [334922]
         if "Manual Item Sales Price" then
             exit("Unit Price");
-        //+NPR5.48 [334922]
-        //-NPR5.45 [323705]
-        //EXIT(NFRetailCode.TR406FindItemSalesPrice(SaleLinePOS));
-        //-NPR5.48 [335967]
-        //IF (SalePOS."Register No." <> "Register No.") OR (SalePOS."Sales Ticket No." <> "Sales Ticket No.") THEN
-        //  SalePOS.GET("Register No.","Sales Ticket No.");
         GetPOSHeader;
-        //+NPR5.48 [335967]
         TempSaleLinePOS := Rec;
         TempSaleLinePOS."Currency Code" := '';
         POSSalesPriceCalcMgt.FindItemPrice(SalePOS, TempSaleLinePOS);
         exit(TempSaleLinePOS."Unit Price");
-        //+NPR5.45 [323705]
     end;
 
     procedure FindItemCostPrice(var Item: Record Item): Decimal
@@ -2312,10 +1992,6 @@ table 6014406 "NPR Sale Line POS"
         SaleLinePOS.Quantity := 1;
         SaleLinePOS."Unit Price" := -1 * RoundingAmount;
         SaleLinePOS."Amount Including VAT" := -1 * RoundingAmount;
-        //-NPR5.53 [371956]-revoked (Dimenensions are handled by the CreateDim() function)
-        //SaleLinePOS."Shortcut Dimension 1 Code" := RegisterGlobal."Global Dimension 1 Code";
-        //SaleLinePOS."Shortcut Dimension 2 Code" := RegisterGlobal."Global Dimension 2 Code";
-        //+NPR5.53 [371956]-revoked
         SaleLinePOS."Discount Type" := "Discount Type"::Rounding;
         SaleLinePOS.Insert(true);
 
@@ -2328,19 +2004,10 @@ table 6014406 "NPR Sale Line POS"
         RetailCode: Codeunit "NPR NF Retail Code";
         Txt001: Label 'Deposit';
     begin
-        //TransferToSalesLine
-
-        //-NPR5.40 [306257]
-        //SalesLine.Description := Description;
-        //+NPR5.40 [306257]
-
-        //IF "No." = '*' THEN BEGIN  //NPR5.54 [385837]-revoked
-        if ("No." = '*') or (Type = Type::Comment) then begin  //NPR5.54 [385837]
+        if ("No." = '*') or (Type = Type::Comment) then begin
             SalesLine."No." := '';
-            //-NPR5.40 [306257]
             SalesLine.Description := Description;
-            //+NPR5.40 [306257]
-            SalesLine."Description 2" := "Description 2";  //NPR5.54 [385837]
+            SalesLine."Description 2" := "Description 2";
             exit;
         end;
 
@@ -2357,10 +2024,6 @@ table 6014406 "NPR Sale Line POS"
         SalesLine.Validate(Quantity, Quantity);
         SalesLine.Description := Description;
         SalesLine."Unit Price" := "Unit Price";
-
-        //-NPR5.53 [374819]
-        //SalesLine."VAT %" := "VAT %";
-        //+NPR5.53 [374819]
         SalesLine."Line Discount %" := "Discount %";
         SalesLine."Line Discount Amount" := "Discount Amount";
         SalesLine.Amount := Amount;
@@ -2384,23 +2047,16 @@ table 6014406 "NPR Sale Line POS"
         SalesLine."VAT Calculation Type" := "VAT Calculation Type";
         SalesLine."NPR Internal" := Internal;
         SalesLine."NPR Serial No. not Created" := "Serial No. not Created";
-        //-NPR5.45 [324395]
-        //SalesLine."Unit Price (LCY)" := "Unit Cost (LCY)";
         SalesLine."Unit Cost (LCY)" := "Unit Cost (LCY)";
-        //+NPR5.45 [324395]
         SalesLine.Validate("Variant Code", "Variant Code");
-        //-NPR5.40 [306257]
         SalesLine.Description := Description;
         SalesLine."Description 2" := "Description 2";
-        //+NPR5.40 [306257]
     end;
 
     procedure CheckSerialNoApplication(ItemNo: Code[20]; SerialNo: Code[20])
     var
         ItemLedgerEntry: Record "Item Ledger Entry";
     begin
-        //-NPR5.48 [335967]
-        //NFRetailCode.TR406CheckSerialNoApplication(Rec,TotalAmountILE,ItemNo,SerialNo);
         ItemLedgerEntry.SetCurrentKey(Open, Positive, "Item No.", "Serial No.");
         ItemLedgerEntry.SetRange("Item No.", ItemNo);
         ItemLedgerEntry.SetRange(Open, true);
@@ -2412,7 +2068,6 @@ table 6014406 "NPR Sale Line POS"
             if ItemLedgerEntry.Count > 1 then
                 Error(Text002 + Text003, FieldName("Serial No."), "Serial No.");
         end;
-        //+NPR5.48 [335967]
     end;
 
     procedure CheckSerialNoAuditRoll(ItemNo: Code[20]; SerialNo: Code[20]; Positive: Boolean)
@@ -2446,20 +2101,17 @@ table 6014406 "NPR Sale Line POS"
     var
         ServiceItem: Record "Service Item";
     begin
-        //-NPR5.48 [335967]
-        //SalePOS3.GET("Register No.","Sales Ticket No.");
         GetPOSHeader;
-        //+NPR5.48 [335967]
         ServiceItem.Init;
         ServiceItem.Insert(true);
         ServiceItem.Validate("Item No.", "No.");
         ServiceItem.Validate("Serial No.", "Serial No.");
         ServiceItem.Validate(Status, ServiceItem.Status::Installed);
-        ServiceItem.Validate("Warranty Starting Date (Labor)", SalePOS.Date); //-NPR5.48 [335967] Changed SalePos3 to SalePos
-        ServiceItem.Validate("Warranty Ending Date (Labor)", CalcDate('<+1Y>', SalePOS.Date)); //-NPR5.48 [335967] Changed SalePos3 to SalePos
-        ServiceItem.Validate("Customer No.", SalePOS."Customer No."); //-NPR5.48 [335967] Changed SalePos3 to SalePos
+        ServiceItem.Validate("Warranty Starting Date (Labor)", SalePOS.Date);
+        ServiceItem.Validate("Warranty Ending Date (Labor)", CalcDate('<+1Y>', SalePOS.Date));
+        ServiceItem.Validate("Customer No.", SalePOS."Customer No.");
         ServiceItem.Validate("Unit of Measure Code", "Unit of Measure Code");
-        ServiceItem.Validate("Sales Date", SalePOS.Date);//-NPR5.48 [335967] Changed SalePos3 to SalePos
+        ServiceItem.Validate("Sales Date", SalePOS.Date);
         ServiceItem.Modify;
     end;
 
@@ -2471,16 +2123,14 @@ table 6014406 "NPR Sale Line POS"
         FromLineNo: Integer;
         ToLineNo: Integer;
     begin
-        if Sum = 0 then begin               //* Sker kun f¢rste gang *
-            if Quantity = 0
-              then
-                Quantity := 1;                //* Rettelse af fejl i antal under udpakning af stykliste *
+        if Sum = 0 then begin
+            if Quantity = 0 then
+                Quantity := 1;
             StartLineNo := Rec."Line No.";
             SaleLinePOS.Reset;
             SaleLinePOS.SetRange("Register No.", "Register No.");
             SaleLinePOS.SetRange("Sales Ticket No.", "Sales Ticket No.");
-            SaleLinePOS.SetFilter("Sale Type", '%1|%2|%3', "Sale Type"::Sale, "Sale Type"::Deposit,
-                            "Sale Type"::"Out payment");
+            SaleLinePOS.SetFilter("Sale Type", '%1|%2|%3', "Sale Type"::Sale, "Sale Type"::Deposit, "Sale Type"::"Out payment");
             SaleLinePOS.SetRange(Date, Date);
             SaleLinePOS.SetRange("Line No.", StartLineNo + 1, StartLineNo + 10000);
             if SaleLinePOS.FindFirst then
@@ -2488,13 +2138,8 @@ table 6014406 "NPR Sale Line POS"
             else
                 EndLineNo := StartLineNo + 10000;
 
-            //-NPR5.48 [335967]
-            //IF Item.GET(ItemNo) THEN
-            //  UnitPrice := Item."Unit Price";
             if Item2.Get(ItemNo) then
                 UnitPrice := Item2."Unit Price";
-            //+NPR5.48 [335967]
-
         end;
 
         BOMComponent.SetRange("Parent Item No.", ItemNo);
@@ -2547,24 +2192,18 @@ table 6014406 "NPR Sale Line POS"
 
     procedure GetSkipCalcDiscount(): Boolean
     begin
-        //-NPR5.31 [262904]
         exit(SkipCalcDiscount);
-        //+NPR5.31 [262904]
     end;
 
     procedure SetSkipCalcDiscount(NewSkipCalcDiscount: Boolean)
     begin
-        //-NPR5.31 [262904]
         SkipCalcDiscount := NewSkipCalcDiscount;
-        //+NPR5.31 [262904]
     end;
 
     procedure ShowDimensions()
     begin
         "Dimension Set ID" :=
           DimMgt.EditDimensionSet("Dimension Set ID", StrSubstNo('%1 %2 %3', "Register No.", "Sales Ticket No.", "Line No."));
-        // Investigate
-        // VerifyItemLineDim;
         DimMgt.UpdateGlobalDimFromDimSetID("Dimension Set ID", "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code");
     end;
 
@@ -2575,13 +2214,8 @@ table 6014406 "NPR Sale Line POS"
         No: array[10] of Code[20];
     begin
         RetailConfiguration.Get;
-        //-NPR5.29 [257938]
-        //-NPR5.48 [335967]
-        //SalePOS.GET("Register No.","Sales Ticket No.");
         GetPOSHeader;
-        //+NPR5.48 [335967]
 
-        //+NPR5.29 [257938]
         TableID[1] := Type1;
         No[1] := No1;
         TableID[2] := Type2;
@@ -2600,10 +2234,7 @@ table 6014406 "NPR Sale Line POS"
           DimMgt.GetDefaultDimID(
             TableID, No, RetailConfiguration."Posting Source Code",
             "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code",
-            //-NPR5.29 [257938]
-            //SalePOS."Dimension Set ID",DATABASE::"Sale Line POS");
             SalePOS."Dimension Set ID", DATABASE::Customer);
-        //+NPR5.29 [257938]
         DimMgt.UpdateGlobalDimFromDimSetID("Dimension Set ID", "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code");
     end;
 
@@ -2634,12 +2265,8 @@ table 6014406 "NPR Sale Line POS"
             "VAT Calculation Type" := "VAT Calculation Type"::"Normal VAT";
         end else begin
             VATPostingSetup.Get("VAT Bus. Posting Group", "VAT Prod. Posting Group");
-            //-NPR5.51 [358985]
             POSTaxCalculation.OnGetVATPostingSetup(VATPostingSetup, Handled);
-            //+NPR5.51 [358985]
-            //-NPR5.41 [311309]
             "VAT Identifier" := VATPostingSetup."VAT Identifier";
-            //+NPR5.41 [311309]
             "VAT Calculation Type" := VATPostingSetup."VAT Calculation Type";
 
             case "VAT Calculation Type" of
@@ -2668,13 +2295,7 @@ table 6014406 "NPR Sale Line POS"
         TotalAmountInclVAT: Decimal;
         TotalQuantityBase: Decimal;
     begin
-        //-NPR5.54 [395683]
-        //Currency.InitRoundingPrecision ();  //NPR5.55 [380979]-revoked
-        //+NPR5.54 [395683]
-
-        //-NPR5.31 [248534]
         with SaleLinePOS do begin
-            //-NPR5.48 [335967]
             SaleLinePOS2.SetRange("Register No.", "Register No.");
             SaleLinePOS2.SetRange("Sales Ticket No.", "Sales Ticket No.");
             SaleLinePOS2.SetRange(Date, Date);
@@ -2686,10 +2307,6 @@ table 6014406 "NPR Sale Line POS"
                 SaleLinePOS2.SetFilter(Amount, '<%1', 0);
             SaleLinePOS2.SetRange("VAT Identifier", "VAT Identifier");
             SaleLinePOS2.SetRange("Tax Group Code", "Tax Group Code");
-
-            //-NPR5.48 [338181]
-            //"Line Amount" := ROUND(Quantity * "Unit Price", Currency."Amount Rounding Precision") - "Discount Amount";
-            //+NPR5.48 [338181]:= ROUND(Quantity * "Unit Price", Currency."Amount Rounding Precision") - "Discount Amount";
 
             TotalLineAmount := 0;
             TotalInvDiscAmount := 0;
@@ -2710,161 +2327,17 @@ table 6014406 "NPR Sale Line POS"
                     TotalQuantityBase := SaleLinePOS2."Quantity (Base)";
                 end;
 
-            //-NPR5.55 [380979]
             UpdateLineVatAmounts(
-              SaleLinePOS, TotalLineAmount, TotalInvDiscAmount, TotalAmount, TotalAmountInclVAT);
-            //+NPR5.55 [380979]
-            //-NPR5.55 [380979]-revoked (Moved to subfunction 'UpdateLineVatAmounts')
-            /*
-            //+NPR5.48 [335967]
-            IF "Price Includes VAT" THEN BEGIN
-              "Amount Including VAT" := Quantity * "Unit Price";
-              IF "Discount %" <> 0 THEN
-                "Discount Amount" := ROUND("Amount Including VAT" * "Discount %"/100)
-              ELSE
-                IF "Discount Amount" <> 0 THEN
-                  "Discount %" := ROUND(100-("Amount Including VAT" - "Discount Amount")/"Amount Including VAT"*100,0.0001);
-              "Amount Including VAT" := "Amount Including VAT" - "Discount Amount";
-
-              //-NPR5.48 [338181]
-
-              //-NPR5.54 [395683]
-              //"Line Amount" := ROUND(Quantity * "Unit Price", Currency."Amount Rounding Precision") - "Discount Amount";
-              "Line Amount" := ROUND (Quantity * "Unit Price" - "Discount Amount", Currency."Amount Rounding Precision");
-              //+NPR5.54 [395683]
-
-              //+NPR5.48 [338181]
-
-              CASE "VAT Calculation Type" OF
-                "VAT Calculation Type"::"Reverse Charge VAT",
-                "VAT Calculation Type"::"Normal VAT":
-                  BEGIN
-                    //-NPR5.48 [335967]
-                    //Amount := ROUND("Amount Including VAT"/(1 + "VAT %"/100));
-                    Amount:= ROUND((TotalLineAmount -TotalInvDiscAmount + "Line Amount" - "Invoice Discount Amount") / (1 + "VAT %" / 100),
-                                     Currency."Amount Rounding Precision") - TotalAmount;
-                    //+NPR5.48 [335967]
-                    "Amount Including VAT" := ROUND("Amount Including VAT");
-                    //-NPR5.51 [365487]
-                    IF ("Amount Including VAT" = 0) THEN
-                      Amount := 0;
-                    //+NPR5.51 [365487]
-
-                    "VAT Base Amount" := Amount;
-                  END;
-                "VAT Calculation Type"::"Sales Tax":
-                  BEGIN
-                    //-NPR5.34 [284658]
-                    //Amount := SalesTaxCalculate.ReverseCalculateTax(
-                    //-NPR5.40 [303616]
-                    TESTFIELD("Tax Area Code");
-                    //+NPR5.40 [303616]
-                    //-NPR5.41 [311309]
-                    //Amount := SalesTaxCalculate.CalculateTax(
-                    Amount := SalesTaxCalculate.ReverseCalculateTax(
-                    //+NPR5.41 [311309]
-                    //+NPR5.34
-                      "Tax Area Code","Tax Group Code","Tax Liable",Rec.Date,
-                    //-NPR5.41 [311309]
-                    //  "Amount Including VAT",Quantity,0);
-                      "Amount Including VAT","Quantity (Base)",0);
-                    //-NPR5.41 [311309]
-                    IF Amount <> 0 THEN
-                      "VAT %" := ROUND(100 * ("Amount Including VAT" - Amount) / Amount,0.00001)
-                    ELSE
-                      "VAT %" := 0;
-                    "Amount Including VAT" := ROUND("Amount Including VAT");
-                    Amount := ROUND(Amount);
-                    "VAT Base Amount" := Amount;
-                  END;
-                ELSE
-                  ERROR(ErrVATCalcNotSupportInPOS,FIELDCAPTION("VAT Calculation Type"),"VAT Calculation Type");
-              END;
-            END ELSE BEGIN
-              Amount := Quantity * "Unit Price";
-              IF "Discount %" <> 0 THEN
-                "Discount Amount" := ROUND(Amount * "Discount %"/100)
-              ELSE
-                IF "Discount Amount" <> 0 THEN
-                  "Discount %" := ROUND(100-(Amount - "Discount Amount")/Amount*100,0.0001);
-              Amount := Amount - "Discount Amount";
-
-              //-NPR5.48 [338181]
-
-              //-NPR5.54 [395683]
-              //"Line Amount" := ROUND(Quantity * "Unit Price", Currency."Amount Rounding Precision") - "Discount Amount";
-              "Line Amount" := ROUND (Quantity * "Unit Price" - "Discount Amount", Currency."Amount Rounding Precision");
-              //+NPR5.54 [395683]
-
-              //+NPR5.48 [338181]
-
-              CASE "VAT Calculation Type" OF
-                "VAT Calculation Type"::"Reverse Charge VAT",
-                "VAT Calculation Type"::"Normal VAT":
-                  BEGIN
-                    //-NPR5.48 [335967]
-                    //"Amount Including VAT" := ROUND(Amount * (1 + "VAT %"/100));
-                    //Amount := ROUND(Amount);
-                    //"VAT Base Amount" := Amount;
-                    Amount := ROUND("Line Amount" - "Invoice Discount Amount",Currency."Amount Rounding Precision");
-                    "VAT Base Amount" := Amount;
-                    "Amount Including VAT" :=
-                      TotalAmount + Amount +
-                      ROUND(
-                        (TotalAmount + Amount) * "VAT %" / 100,
-                        Currency."Amount Rounding Precision",Currency.VATRoundingDirection) -
-                      TotalAmountInclVAT;
-                    //+NPR5.48 [335967]
-
-                    //-NPR5.51 [365487]
-                    IF (Amount  = 0) THEN
-                      "Amount Including VAT" := 0;
-                    //+NPR5.51 [365487]
-
-                  END;
-                "VAT Calculation Type"::"Sales Tax":
-                  BEGIN
-                    Amount := ROUND(Amount);
-                    "VAT Base Amount" := Amount;
-                    //-NPR5.34 [284658]
-                    //"Amount Including VAT" := Amount + ROUND(SalesTaxCalculate.ReverseCalculateTax(
-                    "Amount Including VAT" := Amount + ROUND(SalesTaxCalculate.CalculateTax(
-                    //+NPR5.34
-                      "Tax Area Code","Tax Group Code","Tax Liable",Rec.Date,
-                    //-NPR5.41 [311309]
-                      //Amount,Quantity,0));
-                      Amount,"Quantity (Base)",0));
-                    //+NPR5.41 [311309]
-                    IF "VAT Base Amount" <> 0 THEN
-                      "VAT %" := ROUND(100 * ("Amount Including VAT" - "VAT Base Amount") / "VAT Base Amount",0.00001)
-                    ELSE
-                      "VAT %" := 0;
-                  END;
-                ELSE
-                  ERROR(ErrVATCalcNotSupportInPOS,FIELDCAPTION("VAT Calculation Type"),"VAT Calculation Type");
-              END;
-            END;
-            //-NPR5.32.01 [248534]
-            */
-            //+NPR5.55 [380979]-revoked (Moved to subfunction 'UpdateLineVatAmounts')
+                SaleLinePOS, TotalLineAmount, TotalInvDiscAmount, TotalAmount, TotalAmountInclVAT);
 
             "Discount %" := Abs("Discount %");
-
-            //-NPR5.45 [323615] Discount Amount needs to be same sign as quantity field, this value propagates in posting to value entry.
-            //"Discount Amount" := ABS("Discount Amount");
-            //+NPR5.45 [323615]
-
-            //+NPR5.32.01 [248534]
         end;
-        //+NPR5.31 [248534]
-
     end;
 
     procedure UpdateLineVatAmounts(var SaleLinePOS: Record "NPR Sale Line POS"; TotalLineAmount: Decimal; TotalInvDiscAmount: Decimal; TotalAmount: Decimal; TotalAmountInclVAT: Decimal)
     var
         SalesTaxCalculate: Codeunit "Sales Tax Calculate";
     begin
-        //-NPR5.55 [380979] (Extracted from 'UpdateAmounts')
         if SaleLinePOS."Currency Code" <> '' then
             Currency.Get(SaleLinePOS."Currency Code")
         else
@@ -2961,17 +2434,11 @@ table 6014406 "NPR Sale Line POS"
                 end;
             end;
         end;
-        //+NPR5.55 [380979] (Extracted from 'UpdateAmounts')
     end;
 
     local procedure InitFromSalePOS()
     begin
-        //-NPR5.45 [324395]
-        //-NPR5.48 [335967]
-        //SalePOS.GET("Register No.","Sales Ticket No.");
         GetPOSHeader;
-        //+NPR5.48 [335967]
-
         "Allow Line Discount" := SalePOS."Allow Line Discount";
         "Location Code" := SalePOS."Location Code";
         "Price Includes VAT" := SalePOS."Prices Including VAT";
@@ -2980,8 +2447,7 @@ table 6014406 "NPR Sale Line POS"
         "VAT Bus. Posting Group" := SalePOS."VAT Bus. Posting Group";
         "Tax Area Code" := SalePOS."Tax Area Code";
         "Tax Liable" := SalePOS."Tax Liable";
-        //+NPR5.45 [324395]
-        "NPRE Seating Code" := SalePOS."NPRE Pre-Set Seating Code";  //NPR5.53 [380609]
+        "NPRE Seating Code" := SalePOS."NPRE Pre-Set Seating Code";
     end;
 
     local procedure InitFromCustomer()
@@ -2989,7 +2455,6 @@ table 6014406 "NPR Sale Line POS"
         Customer: Record Customer;
         GLSetup: Record "General Ledger Setup";
     begin
-        //-NPR5.45 [324395]
         if "No." = '' then
             exit;
 
@@ -3002,7 +2467,6 @@ table 6014406 "NPR Sale Line POS"
 
         Description := CopyStr(Customer.Name, 1, MaxStrLen(Description));
         Validate("Currency Code", Customer."Currency Code");
-        //+NPR5.45 [324395]
     end;
 
     local procedure InitFromGLAccount()
@@ -3012,7 +2476,6 @@ table 6014406 "NPR Sale Line POS"
         if "No." = '' then
             exit;
 
-        //*-NPR5.45 [324395]
         GLAccount.Get("No.");
         GLAccount.CheckGLAcc;
         Description := GLAccount.Name;
@@ -3020,29 +2483,20 @@ table 6014406 "NPR Sale Line POS"
         "Gen. Prod. Posting Group" := GLAccount."Gen. Prod. Posting Group";
         "VAT Prod. Posting Group" := GLAccount."VAT Prod. Posting Group";
         "Tax Group Code" := GLAccount."Tax Group Code";
-        //+NPR5.45 [324395]
     end;
 
     local procedure InitFromItem()
     var
         DescriptionControl: Codeunit "NPR Description Control";
     begin
-        //-NPR5.45 [324395]
         if "No." = '' then
             exit;
 
         TestItem();
-
-        //-NPR5.48 [335967]
-        //Item.GET("No.");
         GetItem;
-        //+NPR5.48 [335967]
         "Gen. Prod. Posting Group" := Item."Gen. Prod. Posting Group";
         "VAT Prod. Posting Group" := Item."VAT Prod. Posting Group";
         "Item Category Code" := Item."Item Category Code";
-        //-NPR5.48 [340615]
-        //"Product Group Code" := Item."Product Group Code";
-        //+NPR5.48 [340615]
         "Tax Group Code" := Item."Tax Group Code";
         "Posting Group" := Item."Inventory Posting Group";
         "Item Group" := Item."NPR Item Group";
@@ -3055,31 +2509,23 @@ table 6014406 "NPR Sale Line POS"
             "Insurance Category" := Item."NPR Insurrance category";
 
         DescriptionControl.GetDescriptionPOS(Rec, xRec, Item);
-        //+NPR5.45 [324395]
     end;
 
     local procedure InitFromItemGroup()
     var
         ItemGroup: Record "NPR Item Group";
     begin
-        //-NPR5.45 [324395]
         if "No." = '' then
             exit;
 
         ItemGroup.Get("No.");
-        //-NPR5.48 [335967]
-        //Item.GET(ItemGroup."No.");
         GetItem;
-        //+NPR5.48 [335967]
-
         Item.TestField("NPR Group sale");
-
         "Gen. Prod. Posting Group" := Item."Gen. Prod. Posting Group";
         "VAT Prod. Posting Group" := Item."VAT Prod. Posting Group";
         "Tax Group Code" := Item."Tax Group Code";
         "Item Disc. Group" := Item."Item Disc. Group";
         Description := CopyStr(ItemGroup.Description, 1, MaxStrLen(Description));
-        //+NPR5.45 [324395]
     end;
 
     local procedure InitFromPaymentTypePOS()
@@ -3087,7 +2533,6 @@ table 6014406 "NPR Sale Line POS"
         PaymentTypePOS: Record "NPR Payment Type POS";
         GLAccount: Record "G/L Account";
     begin
-        //-NPR5.45 [324395]
         if "No." = '' then
             exit;
 
@@ -3095,10 +2540,7 @@ table 6014406 "NPR Sale Line POS"
 
         GetPaymentTypePOS(PaymentTypePOS);
         Description := PaymentTypePOS."Sales Line Text";
-        //+NPR5.45 [324395]
 
-        //-NPR5.50 [354832]
-        //IF (PaymentTypePOS."Reverse Unrealized VAT") THEN begin
         if (PaymentTypePOS."Reverse Unrealized VAT") then begin
             if (PaymentTypePOS."Account Type" = PaymentTypePOS."Account Type"::"G/L Account") then begin
 
@@ -3112,14 +2554,12 @@ table 6014406 "NPR Sale Line POS"
                 UpdateVATSetup();
             end;
         end;
-        //+NPR5.50 [354832]
     end;
 
     procedure GetPaymentTypePOS(var PaymentTypePOS: Record "NPR Payment Type POS"): Boolean
     var
         RegisterNo: Code[10];
     begin
-        //-NPR5.45 [324395]
         Clear(PaymentTypePOS);
 
         RegisterNo := '';
@@ -3128,23 +2568,16 @@ table 6014406 "NPR Sale Line POS"
             RegisterNo := "Register No.";
 
         PaymentTypePOS.Get("No.", RegisterNo);
-        //+NPR5.45 [324395]
     end;
 
     local procedure TestItem()
     var
         ItemVariant: Record "Item Variant";
     begin
-        //-NPR5.45 [324395]
         if "No." = '' then
             exit;
 
-        //-NPR5.48 [335967]
-        //-NPR5.51 [359293]
         Item.Get("No.");
-        //-NPR5.51 [359293]
-        //+NPR5.48 [335967]
-
         Item.TestField(Blocked, false);
         Item.TestField("NPR Blocked on Pos", false);
         Item.TestField("Gen. Prod. Posting Group");
@@ -3156,7 +2589,6 @@ table 6014406 "NPR Sale Line POS"
             ItemVariant.Get(Item."No.", "Variant Code");
             ItemVariant.TestField("NPR Blocked", false);
         end;
-        //+NPR5.45 [324395]
     end;
 
     local procedure TestPaymentTypePOS()
@@ -3164,27 +2596,19 @@ table 6014406 "NPR Sale Line POS"
         POSUnit: Record "NPR POS Unit";
         SaleLinePOS: Record "NPR Sale Line POS";
     begin
-        //-NPR5.45 [324395]
         GetPaymentTypePOS(PaymentTypePOS);
-        //Register.GET("Register No.");  //NPR5.53 [371956]-revoked
-        POSUnit.Get("Register No.");  //NPR5.53 [371956]
+        POSUnit.Get("Register No.");
 
         if (PaymentTypePOS."G/L Account No." = '') and (PaymentTypePOS."Customer No." = '') and (PaymentTypePOS."Bank Acc. No." = '') then
             Error(Text001, "No.");
         PaymentTypePOS.TestField(Status, PaymentTypePOS.Status::Active);
         if PaymentTypePOS."Global Dimension 1 Code" <> '' then
-            //PaymentTypePOS.TESTFIELD("Global Dimension 1 Code",Register."Global Dimension 1 Code");  //NPR5.53 [371956]-revoked
-            //Why is it here? Why only 1st global dim? What was the idea here? If you know it, please explain (ALPO)
-            PaymentTypePOS.TestField("Global Dimension 1 Code", POSUnit."Global Dimension 1 Code");  //NPR5.53 [371956]
+            PaymentTypePOS.TestField("Global Dimension 1 Code", POSUnit."Global Dimension 1 Code");
 
         if PaymentTypePOS."Processing Type" <> PaymentTypePOS."Processing Type"::Invoice then
             exit;
 
-        //-NPR5.48 [335967]
-        //SalePOS.GET("Register No.","Sales Ticket No.");
         GetPOSHeader;
-        //+NPR5.48 [335967]
-
         SalePOS.TestField("Customer No.");
 
         SaleLinePOS.SetRange("Register No.", "Register No.");
@@ -3198,31 +2622,24 @@ table 6014406 "NPR Sale Line POS"
                 if PaymentTypePOS."Processing Type" = PaymentTypePOS."Processing Type"::Invoice then
                     Error(Text000);
             until SaleLinePOS.Next = 0;
-        //+NPR5.45 [324395]
     end;
 
     local procedure CalcBaseQty(Qty: Decimal): Decimal
     begin
-        //-NPR5.48 [335967]
         TestField("Qty. per Unit of Measure");
         exit(Round(Qty * "Qty. per Unit of Measure", 0.00001));
-        //+NPR5.48 [335967]
     end;
 
     local procedure GetItem()
     begin
-        //-NPR5.48 [335967]
         TestField("No.");
         if "No." <> Item."No." then
             Item.Get("No.");
-        //+NPR5.48 [335967]
     end;
 
     local procedure UpdateCost()
     begin
-        //-NPR5.48 [335967]
         Cost := "Unit Cost (LCY)" * Quantity;
-        //+NPR5.48 [335967]
     end;
 
     procedure GetUnitCostLCY(): Decimal
@@ -3233,9 +2650,6 @@ table 6014406 "NPR Sale Line POS"
         PriceMult: Decimal;
         TxtNoSerial: Label 'No open Item Ledger Entry has been found with the Serial No. %2';
     begin
-        //-NPR5.48 [335967]
-        // Copy of function "TR406FindItemCostPrice" from Codeunit 6014434 (deleted commented code, and obsolete code)
-        // im not sure if its working as it should, but its the best we have
         if "Custom Cost" then
             exit("Unit Cost");
 
@@ -3257,14 +2671,12 @@ table 6014406 "NPR Sale Line POS"
                 exit(ItemLedgerEntry."Cost Amount (Actual)");
             end;
         end;
-        //+NPR5.48 [335967]
     end;
 
     local procedure UpdateDependingLinesQuantity()
     var
         SaleLinePOS: Record "NPR Sale Line POS";
     begin
-        //-NPR5.48 [335967]
         if Silent then
             exit;
 
@@ -3323,60 +2735,18 @@ table 6014406 "NPR Sale Line POS"
                 SaleLinePOS.SetSkipCalcDiscount(true);
                 SaleLinePOS.Modify;
             until SaleLinePOS.Next = 0;
-        //+NPR5.48 [335967]
     end;
 
     procedure SerialNoLookup()
     var
         xSaleLinePOS2: Record "NPR Sale Line POS";
     begin
-        //-NPR5.55 [398263]-revoked (moved to subfunction SerialNoLookup2())
-        /*
-        //-NPR5.48 [335967]
-        //Copied from CU 6014434 - function TR406SerialNoOnLookup
-        RetailSetup.GET;
-        TESTFIELD("Sale Type", "Sale Type"::Sale);
-        TESTFIELD(Type, Type::Item);
-        
-        GetItem;
-        Item.TESTFIELD("Costing Method", Item."Costing Method"::Specific);
-        ItemLedgerEntry.SETCURRENTKEY(Open,Positive,"Item No.","Serial No.");
-        ItemLedgerEntry.SETRANGE(Open, TRUE);
-        ItemLedgerEntry.SETRANGE(Positive, TRUE);
-        ItemLedgerEntry.SETRANGE("Item No.", "No.");
-        ItemLedgerEntry.SETFILTER("Serial No.", '<> %1', '');
-        ItemLedgerEntry.SETRANGE("Location Code", "Location Code");
-        IF NOT RetailSetup."Not use Dim filter SerialNo" THEN
-          ItemLedgerEntry.SETRANGE("Global Dimension 1 Code", "Shortcut Dimension 1 Code");
-        IF ItemLedgerEntry.FIND('-') THEN
-          REPEAT
-            ItemLedgerEntry.SETRANGE("Serial No.", ItemLedgerEntry."Serial No.");
-            ItemLedgerEntry.FINDLAST;
-            TempItemLedgerEntry := ItemLedgerEntry;
-            TempItemLedgerEntry.INSERT;
-            ItemLedgerEntry.SETRANGE("Serial No.");
-          UNTIL ItemLedgerEntry.NEXT = 0;
-        
-        IF PAGE.RUNMODAL(PAGE::"Item - Series Number", TempItemLedgerEntry) <> ACTION::LookupOK THEN
-          EXIT;
-        
-        VALIDATE("Serial No.", TempItemLedgerEntry."Serial No.");
-        
-        TempItemLedgerEntry.CALCFIELDS("Cost Amount (Actual)");
-        VALIDATE("Unit Cost (LCY)", TempItemLedgerEntry."Cost Amount (Actual)");
-        "Custom Cost" := TRUE;
-        //+NPR5.48 [335967]
-        */
-        //+NPR5.55 [398263]-revoked (moved to subfunction SerialNoLookup2())
-        //-NPR5.55 [398263]
         xSaleLinePOS2 := Rec;
         if not SerialNoLookup2() then
             exit;
         if "Variant Code" <> xSaleLinePOS2."Variant Code" then
             Validate("Variant Code");
         Validate("Serial No.");
-        //+NPR5.55 [398263]
-
     end;
 
     procedure SerialNoLookup2(): Boolean
@@ -3384,7 +2754,6 @@ table 6014406 "NPR Sale Line POS"
         TempItemLedgerEntry: Record "Item Ledger Entry" temporary;
         ItemLedgerEntry: Record "Item Ledger Entry";
     begin
-        //NPR5.55 [398263] - code moved from SerialNoLookup()
         RetailSetup.Get;
         TestField("Sale Type", "Sale Type"::Sale);
         TestField(Type, Type::Item);
@@ -3397,10 +2766,8 @@ table 6014406 "NPR Sale Line POS"
         ItemLedgerEntry.SetRange("Item No.", "No.");
         ItemLedgerEntry.SetFilter("Serial No.", '<> %1', '');
         ItemLedgerEntry.SetRange("Location Code", "Location Code");
-        //-NPR5.55 [398263]
         if "Variant Code" <> '' then
             ItemLedgerEntry.SetRange("Variant Code", "Variant Code");
-        //+NPR5.55 [398263]
         if not RetailSetup."Not use Dim filter SerialNo" then
             ItemLedgerEntry.SetRange("Global Dimension 1 Code", "Shortcut Dimension 1 Code");
         if ItemLedgerEntry.Find('-') then
@@ -3412,7 +2779,6 @@ table 6014406 "NPR Sale Line POS"
                 ItemLedgerEntry.SetRange("Serial No.");
             until ItemLedgerEntry.Next = 0;
 
-        //-NPR5.55 [398263]
         TempItemLedgerEntry.SetFilter("Expiration Date", '<>%1', 0D);
         if not TempItemLedgerEntry.IsEmpty then
             TempItemLedgerEntry.SetCurrentKey("Expiration Date");
@@ -3421,22 +2787,18 @@ table 6014406 "NPR Sale Line POS"
             TempItemLedgerEntry.SetRange("Serial No.", "Serial No.");
         if TempItemLedgerEntry.FindFirst then;
         TempItemLedgerEntry.SetRange("Serial No.");
-        //+NPR5.55 [398263]
         if PAGE.RunModal(PAGE::"NPR Item - Series Number", TempItemLedgerEntry) <> ACTION::LookupOK then
             exit(false);
 
-        //VALIDATE("Serial No.", TempItemLedgerEntry."Serial No.");  //NPR5.55 [398263]-revoked
-        "Serial No." := TempItemLedgerEntry."Serial No.";  //NPR5.55 [398263]
+        "Serial No." := TempItemLedgerEntry."Serial No.";
 
         TempItemLedgerEntry.CalcFields("Cost Amount (Actual)");
-        //VALIDATE("Unit Cost (LCY)", TempItemLedgerEntry."Cost Amount (Actual)");  //NPR5.55 [398263]-revoked
-        //-NPR5.55 [398263]
         "Variant Code" := TempItemLedgerEntry."Variant Code";
         "Unit Cost (LCY)" := TempItemLedgerEntry."Cost Amount (Actual)";
         "Unit Cost" := "Unit Cost (LCY)";
-        //+NPR5.55 [398263]
         "Custom Cost" := true;
-        exit(true);  //NPR5.55 [398263]
+
+        exit(true);
     end;
 
     procedure SerialNoValidate()
@@ -3453,8 +2815,6 @@ table 6014406 "NPR Sale Line POS"
         Txt005: Label '%2 %1 is already in stock!';
         TotalNonAppliedQuantity: Decimal;
     begin
-        //-NPR5.48 [335967]
-        //Copied from CU 6014434 - function TR406SerialNoOnValidate (modifyed partly)
         if "Serial No." = '' then
             exit;
 
@@ -3466,10 +2826,6 @@ table 6014406 "NPR Sale Line POS"
         GetItem;
         Item.TestField("Item Tracking Code");
         ItemTrackingCode.Get(Item."Item Tracking Code");
-        //-NPR5.48 [335967]
-        //  IF ItemTrackingCode."SN Specific Tracking" THEN
-        //    Item.TESTFIELD("Costing Method",Item."Costing Method"::Specific);
-        //+NPR5.48 [335967]
 
         SaleLinePOS2.SetCurrentKey("Serial No.");
         SaleLinePOS2.SetRange("Serial No.", "Serial No.");
@@ -3481,7 +2837,6 @@ table 6014406 "NPR Sale Line POS"
                         Error(Text004, FieldName("Serial No."), "Serial No.");
             until SaleLinePOS2.Next = 0;
 
-        //If not sure what this is, but i have copied it 1:1
         if Quantity <> Abs(1) then
             Quantity := 1 * (Quantity / Abs(Quantity));
         Positive := (Quantity >= 0);
@@ -3505,7 +2860,5 @@ table 6014406 "NPR Sale Line POS"
                 end;
             end;
         end;
-        //+NPR5.48 [335967]
     end;
 }
-

@@ -1,7 +1,5 @@
 table 6151363 "NPR CS Wareh. Activ. Setup"
 {
-    // NPR5.55/ALPO/20200729 CASE 404663 Possibility to use vendor item number & description for CS warehouse activity lines
-
     Caption = 'CS Warehouse Activity Setup';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR CS Wareh. Activity Setup";
@@ -9,12 +7,10 @@ table 6151363 "NPR CS Wareh. Activ. Setup"
 
     fields
     {
-        field(1; "Source Document"; Option)
+        field(1; "Source Document"; Enum "Warehouse Activity Source Document")
         {
             Caption = 'Source Document';
             DataClassification = CustomerContent;
-            OptionCaption = ' ,Sales Order,,,Sales Return Order,Purchase Order,,,Purchase Return Order,Inbound Transfer,Outbound Transfer,Prod. Consumption,Prod. Output,,,,,,Service Order,,Assembly Consumption,Assembly Order';
-            OptionMembers = " ","Sales Order",,,"Sales Return Order","Purchase Order",,,"Purchase Return Order","Inbound Transfer","Outbound Transfer","Prod. Consumption","Prod. Output",,,,,,"Service Order",,"Assembly Consumption","Assembly Order";
         }
         field(2; "Activity Type"; Option)
         {
@@ -47,7 +43,7 @@ table 6151363 "NPR CS Wareh. Activ. Setup"
         Initialized: Boolean;
         UnsupportedRecordId: Label 'Unsupported record: %1';
 
-    procedure GetSetup(SourceDocument: Option; ActivityType: Option)
+    procedure GetSetup(SourceDocument: Enum "Warehouse Activity Source Document"; ActivityType: Option)
     begin
         SetRange("Source Document", SourceDocument);
         SetRange("Activity Type", ActivityType);
@@ -213,4 +209,3 @@ table 6151363 "NPR CS Wareh. Activ. Setup"
         exit('');
     end;
 }
-
