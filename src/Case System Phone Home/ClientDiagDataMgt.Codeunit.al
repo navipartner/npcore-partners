@@ -217,8 +217,8 @@ codeunit 6059998 "NPR Client Diag. Data Mgt."
     begin
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014427, 'OnBeforeCompanyOpen', '', true, true)]
-    local procedure OnBeforeCompanyOpen()
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::LogInManagement, 'OnAfterLogInStart', '', true, true)]
+    local procedure OnAfterLogInStart()
     begin
         if not (CurrentClientType in [CLIENTTYPE::Windows, CLIENTTYPE::Web, CLIENTTYPE::Tablet, CLIENTTYPE::Phone, CLIENTTYPE::Desktop]) then
             exit;
@@ -282,7 +282,7 @@ codeunit 6059998 "NPR Client Diag. Data Mgt."
         ClientDiagnostics.Username := UserId;
         ClientDiagnostics."Database Name" := ActiveSession."Database Name";
         ClientDiagnostics."Tenant ID" := TenantId;
-        if ClientDiagnostics.Find then;
+        if ClientDiagnostics.Find() then;
 
         exit(true);
     end;

@@ -19,6 +19,7 @@ codeunit 6014422 "NPR Environment Mgt."
     end;
 
     var
+        NPRetailSetupGlobal: Record "NPR NP Retail Setup";
         Caption_OptionMessage: Label 'The current environment has changed and is no longer verified! \This is caused by a change in database, tenant or company.\Please verify the new company environment type below:';
         Caption_EnvironmentOption: Label 'Production,Demo,Testing,Development';
         Caption_NotProdEnv: Label 'The current environment is not set as production.\Some external integrations are handled differently in this mode. You can change this in page "%1"';
@@ -27,9 +28,8 @@ codeunit 6014422 "NPR Environment Mgt."
         Caption_CleanLessor: Label 'Disable Lessor in this new environment?';
         Caption_CleanDC: Label 'Disable Continia Document Capture in this new environment?';
         Caption_MissingPermissions: Label 'You are missing permissions for table %1. \If data scrub is necessary for this table in the new environment, then you must switch user/permissions and handle it manually.';
-        NPRetailSetupGlobal: Record "NPR NP Retail Setup";
-        NPRetailSetupRead: Boolean;
         Caption_CleanJobQueue: Label 'Disable Job Queue entries in this new environment?';
+        NPRetailSetupRead: Boolean;
 
     local procedure "// Accessors"()
     begin
@@ -72,8 +72,8 @@ codeunit 6014422 "NPR Environment Mgt."
     begin
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014427, 'OnAfterCompanyOpen', '', true, false)]
-    local procedure OnAfterCompanyOpen()
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"System Initialization", 'OnAfterInitialization', '', true, false)]
+    local procedure OnAfterInitialization()
     var
         NPRetailSetup: Record "NPR NP Retail Setup";
         ActiveSession: Record "Active Session";
@@ -83,13 +83,12 @@ codeunit 6014422 "NPR Environment Mgt."
         if NavApp.IsInstalling() then
             exit;
 
-        if not (CurrentClientType in [CLIENTTYPE::Phone, CLIENTTYPE::Web, CLIENTTYPE::Windows, CLIENTTYPE::Tablet, CLIENTTYPE::Desktop, CLIENTTYPE::NAS]) then
+        if not (CurrentClientType() in [CLIENTTYPE::Phone, CLIENTTYPE::Web, CLIENTTYPE::Windows, CLIENTTYPE::Tablet, CLIENTTYPE::Desktop, CLIENTTYPE::NAS]) then
             exit;
 
-        if not NPRetailSetup.WritePermission then
+        if not NPRetailSetup.WritePermission() then
             exit;
 
-        // The activesession table has been observed to lag behind..
         while (not ActiveSession.Get(ServiceInstanceId, SessionId)) do begin
             Sleep(10);
             Iterations += 1;
@@ -98,17 +97,17 @@ codeunit 6014422 "NPR Environment Mgt."
         end;
 
         if CheckIfEmpty(NPRetailSetup, ActiveSession) then begin
-            Commit;
+            Commit();
             exit;
         end;
 
         if CheckIfTemplate(NPRetailSetup, ActiveSession) then begin
-            Commit;
+            Commit();
             exit;
         end;
 
         if CheckIfVerified(NPRetailSetup, ActiveSession) then begin
-            if GuiAllowed then
+            if GuiAllowed() then
                 if NPRetailSetup."Environment Type" in [NPRetailSetup."Environment Type"::DEV, NPRetailSetup."Environment Type"::TEST] then
                     Message(Caption_NotProdEnv, NPRetailSetupPage.Caption);
             exit;
@@ -135,7 +134,7 @@ codeunit 6014422 "NPR Environment Mgt."
     begin
         //In a completely new environment, assume it is verified PROD to preserve the status-quo as before this module was created.
         SelectLatestVersion();
-        RecFound := NPRetailSetup.Get;
+        RecFound := NPRetailSetup.Get();
         FirstTime := not RecFound;
 
         if RecFound then
@@ -143,16 +142,16 @@ codeunit 6014422 "NPR Environment Mgt."
 
         if FirstTime then begin
             if not RecFound then
-                NPRetailSetup.Init;
-            NPRetailSetup."Environment Company Name" := CompanyName;
+                NPRetailSetup.Init();
+            NPRetailSetup."Environment Company Name" := CompanyName();
             NPRetailSetup."Environment Database Name" := ActiveSession."Database Name";
             NPRetailSetup."Environment Tenant Name" := TenantId;
             NPRetailSetup."Environment Type" := NPRetailSetup."Environment Type"::PROD;
             NPRetailSetup."Environment Verified" := true;
-            if RecFound then
-                NPRetailSetup.Modify
-            else
-                NPRetailSetup.Insert;
+            if RecFound then begin
+                if NPRetailSetup.Modify() then;
+            end else
+                if NPRetailSetup.Insert() then;
             exit(true);
         end;
     end;
@@ -160,12 +159,12 @@ codeunit 6014422 "NPR Environment Mgt."
     local procedure CheckIfTemplate(var NPRetailSetup: Record "NPR NP Retail Setup"; var ActiveSession: Record "Active Session"): Boolean
     begin
         if NPRetailSetup."Environment Template" and NPRetailSetup."Environment Verified" then begin
-            if (NPRetailSetup."Environment Company Name" <> CompanyName) or (NPRetailSetup."Environment Database Name" <> ActiveSession."Database Name") or (NPRetailSetup."Environment Tenant Name" <> TenantId) then begin
+            if (NPRetailSetup."Environment Company Name" <> CompanyName()) or (NPRetailSetup."Environment Database Name" <> ActiveSession."Database Name") or (NPRetailSetup."Environment Tenant Name" <> TenantId) then begin
                 NPRetailSetup."Environment Template" := false;
-                NPRetailSetup."Environment Company Name" := CompanyName;
+                NPRetailSetup."Environment Company Name" := CompanyName();
                 NPRetailSetup."Environment Database Name" := ActiveSession."Database Name";
-                NPRetailSetup."Environment Tenant Name" := TenantId;
-                NPRetailSetup.Modify;
+                NPRetailSetup."Environment Tenant Name" := TenantId();
+                if NPRetailSetup.Modify() then;
             end;
             exit(true);
         end;
@@ -174,11 +173,11 @@ codeunit 6014422 "NPR Environment Mgt."
     local procedure CheckIfVerified(var NPRetailSetup: Record "NPR NP Retail Setup"; var ActiveSession: Record "Active Session"): Boolean
     begin
         if NPRetailSetup."Environment Verified" then
-            if (NPRetailSetup."Environment Company Name" = CompanyName) and (NPRetailSetup."Environment Database Name" = ActiveSession."Database Name") and (NPRetailSetup."Environment Tenant Name" = TenantId) then
+            if (NPRetailSetup."Environment Company Name" = CompanyName()) and (NPRetailSetup."Environment Database Name" = ActiveSession."Database Name") and (NPRetailSetup."Environment Tenant Name" = TenantId) then
                 exit(true)
             else begin
                 NPRetailSetup."Environment Verified" := false;
-                NPRetailSetup.Modify;
+                if NPRetailSetup.Modify() then;
             end;
     end;
 
@@ -189,27 +188,27 @@ codeunit 6014422 "NPR Environment Mgt."
         xRecTmp: Record "NPR NP Retail Setup" temporary;
     begin
         xRecTmp := NPRetailSetup;
-        xRecTmp.Insert;
+        xRecTmp.Insert();
 
-        if GuiAllowed then begin
+        if GuiAllowed() then begin
             Type := StrMenu(Caption_EnvironmentOption, 3, Caption_OptionMessage);
             if Type > 0 then begin
-                NPRetailSetup."Environment Company Name" := CompanyName;
+                NPRetailSetup."Environment Company Name" := CompanyName();
                 NPRetailSetup."Environment Database Name" := ActiveSession."Database Name";
                 NPRetailSetup."Environment Tenant Name" := TenantId;
                 NPRetailSetup."Environment Type" := Type - 1;
                 NPRetailSetup."Environment Verified" := true;
-                NPRetailSetup.Modify;
+                if NPRetailSetup.Modify() then;
             end;
 
             if not NPRetailSetup."Environment Verified" then
                 Message(Caption_UnverifiedWarning, NPRetailSetupPage.Caption);
 
             if (xRecTmp."Environment Type" <> NPRetailSetup."Environment Type") and (NPRetailSetup."Environment Type" <> NPRetailSetup."Environment Type"::PROD) then
-                PromptDataScrub;
+                PromptDataScrub();
         end;
 
-        Commit;
+        Commit();
 
         OnAfterEnvironmentTypeChange(xRecTmp, NPRetailSetup);
     end;
@@ -230,12 +229,12 @@ codeunit 6014422 "NPR Environment Mgt."
         TaskLine: Record "NPR Task Line";
     begin
         if not TaskLine.ReadPermission then begin
-            Message(Caption_MissingPermissions, TaskLine.TableCaption);
+            Message(Caption_MissingPermissions, TaskLine.TableCaption());
             exit;
         end;
 
         TaskLine.SetRange(Enabled, true);
-        if TaskLine.IsEmpty then
+        if TaskLine.IsEmpty() then
             exit;
 
         if not Confirm(Caption_CleanTaskQueue) then
