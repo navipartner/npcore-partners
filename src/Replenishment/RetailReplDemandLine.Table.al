@@ -219,7 +219,7 @@ table 6151061 "NPR Retail Repl. Demand Line"
         }
         field(68; Inventory; Decimal)
         {
-            CalcFormula = Sum ("Item Ledger Entry".Quantity WHERE("Item No." = FIELD("Item No."),
+            CalcFormula = Sum("Item Ledger Entry".Quantity WHERE("Item No." = FIELD("Item No."),
                                                                   "Location Code" = FIELD("Location Code"),
                                                                   "Variant Code" = FIELD("Variant Code")));
             Caption = 'Inventory';
@@ -230,7 +230,7 @@ table 6151061 "NPR Retail Repl. Demand Line"
         field(84; "Qty. on Purch. Order"; Decimal)
         {
             AccessByPermission = TableData "Purch. Rcpt. Header" = R;
-            CalcFormula = Sum ("Purchase Line"."Outstanding Qty. (Base)" WHERE("Document Type" = CONST(Order),
+            CalcFormula = Sum("Purchase Line"."Outstanding Qty. (Base)" WHERE("Document Type" = CONST(Order),
                                                                                Type = CONST(Item),
                                                                                "No." = FIELD("Item No."),
                                                                                "Location Code" = FIELD("Location Code"),
@@ -243,7 +243,7 @@ table 6151061 "NPR Retail Repl. Demand Line"
         field(85; "Qty. on Sales Order"; Decimal)
         {
             AccessByPermission = TableData "Sales Shipment Header" = R;
-            CalcFormula = Sum ("Sales Line"."Outstanding Qty. (Base)" WHERE("Document Type" = CONST(Order),
+            CalcFormula = Sum("Sales Line"."Outstanding Qty. (Base)" WHERE("Document Type" = CONST(Order),
                                                                             Type = CONST(Item),
                                                                             "No." = FIELD("Item No."),
                                                                             "Location Code" = FIELD("Location Code"),
@@ -296,17 +296,15 @@ table 6151061 "NPR Retail Repl. Demand Line"
             DataClassification = CustomerContent;
             DecimalPlaces = 0 : 5;
         }
-        field(5440; "Reordering Policy"; Option)
+        field(5440; "Reordering Policy"; Enum "Reordering Policy")
         {
             AccessByPermission = TableData "Req. Wksh. Template" = R;
-            CalcFormula = Lookup ("Stockkeeping Unit"."Reordering Policy" WHERE("Item No." = FIELD("Item No."),
+            CalcFormula = Lookup("Stockkeeping Unit"."Reordering Policy" WHERE("Item No." = FIELD("Item No."),
                                                                                 "Variant Code" = FIELD("Variant Code"),
                                                                                 "Location Code" = FIELD("Location Code")));
             Caption = 'Reordering Policy';
             Editable = false;
             FieldClass = FlowField;
-            OptionCaption = ' ,Fixed Reorder Qty.,Maximum Qty.,Order,Lot-for-Lot';
-            OptionMembers = " ","Fixed Reorder Qty.","Maximum Qty.","Order","Lot-for-Lot";
         }
         field(5520; "Demand Type"; Integer)
         {
@@ -548,7 +546,7 @@ table 6151061 "NPR Retail Repl. Demand Line"
         }
         field(6151070; "Vendor Name"; Text[50])
         {
-            CalcFormula = Lookup (Vendor.Name WHERE("No." = FIELD("Vendor No.")));
+            CalcFormula = Lookup(Vendor.Name WHERE("No." = FIELD("Vendor No.")));
             Caption = 'Vendor Name';
             Description = 'NPR5.39';
             FieldClass = FlowField;
@@ -622,4 +620,3 @@ table 6151061 "NPR Retail Repl. Demand Line"
         end;
     end;
 }
-

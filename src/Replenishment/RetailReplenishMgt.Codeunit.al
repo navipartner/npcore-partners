@@ -1,13 +1,5 @@
 codeunit 6151052 "NPR Retail Replenish. Mgt."
 {
-    // NPR5.38.01/JKL /20180126 CASE 289017 Object created - Replenishment Module
-    // NPR5.39/JKL /20180212 CASE 299436 added retail comment of 50 char to lines + CreateCampaignPurchOrdersDirectFromDemand + unit pr. parcel
-    // NPR5.40/JKL /20180327 CASE 299436 refactored function CreateCampaignPurchOrdersDirectFromDemand
-    // NPR5.42/JKL /20180524 CASE 301379  added dates to purchase order
-    // NPR5.46/JKL /20180918 CASE 3134287  added ordre date + expected receipt date to orders
-    // NPR5.51/TILA/20190718 CASE 361940   Removed a piece of code that contained non existing option
-
-
     trigger OnRun()
     begin
     end;
@@ -30,15 +22,8 @@ codeunit 6151052 "NPR Retail Replenish. Mgt."
         CreateStockkeepingUnit: Report "Create Stockkeeping Unit";
         LineNo: Integer;
     begin
-        //TEST Setup
         DistributionSetup.Get(DistributionGroup, ItemHierachyID);
         RetailReplenishmentSetup.Get;
-
-        //-NPR5.51 [361940]
-        //IF DistributionSetup."Distribution Type" = DistributionSetup."Distribution Type"::"2" THEN
-        //block items for purchase / set replenisment points to zero ?
-        //ERROR(BlockedError);
-        //+NPR5.51 [361940]
 
         if ReplenishmentDemandLine.FindLast then
             LineNo := ReplenishmentDemandLine."Entry No."
@@ -73,13 +58,8 @@ codeunit 6151052 "NPR Retail Replenish. Mgt."
                             ReplenishmentDemandLine."Entry No." := LineNo;
                             ReplenishmentDemandLine."Item No." := ItemHierarchyLine."Item No.";
                             ReplenishmentDemandLine.Description := Item.Description;
-                            //FIND SKU else create
-
                             ReplenishmentDemandLine."Vendor No." := Item."Vendor No.";
-                            //ReplenishmentDemandLine."Direct Unit Cost"
-                            //+NPR5.39 [299436]
                             ReplenishmentDemandLine."Units per Parcel" := Item."Units per Parcel";
-                            //-NPR5.39 [299436]
                             ReplenishmentDemandLine."Due Date" := DistributionSetup."Required Delivery Date";
                             ReplenishmentDemandLine."Location Code" := DistributionGroupMembers.Location;
                             ReplenishmentDemandLine."Vendor Item No." := Item."Vendor Item No.";
@@ -97,15 +77,11 @@ codeunit 6151052 "NPR Retail Replenish. Mgt."
                                                 ReplenishmentDemandLine.Priority := PeriodDiscountLine.Priority;
                                                 ReplenishmentDemandLine."Page no. in advert" := PeriodDiscountLine."Page no. in advert";
                                                 ReplenishmentDemandLine.Photo := PeriodDiscountLine.Photo;
-                                                //-NPR5.39 [299436]
                                                 RetailComment.SetRange("Table ID", 6014414);
                                                 RetailComment.SetRange("No.", PeriodDiscountLine.Code);
                                                 RetailComment.SetRange("No. 2", PeriodDiscountLine."Item No.");
                                                 if RetailComment.FindFirst then
                                                     ReplenishmentDemandLine."Discount Comment" := CopyStr(RetailComment.Comment, 1, 50);
-                                                //+NPR5.39 [299436]
-
-
                                             end;
                                         end;
                                     ItemHierarchyLine."Retail Campaign Disc. Type"::Mix:
@@ -125,7 +101,7 @@ codeunit 6151052 "NPR Retail Replenish. Mgt."
                             end;
                             ReplenishmentDemandLine.CalcFields("Reordering Policy");
                             ReplenishmentDemandLine.Status := ReplenishmentDemandLine.Status::"0";
-                            if ReplenishmentDemandLine."Reordering Policy" = 0 then
+                            if ReplenishmentDemandLine."Reordering Policy" = ReplenishmentDemandLine."Reordering Policy"::" " then
                                 ReplenishmentDemandLine.Status := ReplenishmentDemandLine.Status::"2";
                             if ReplenishmentDemandLine."Demanded Quantity" > 0 then
                                 ReplenishmentDemandLine."Demanded Quantity" := 0
@@ -173,7 +149,6 @@ codeunit 6151052 "NPR Retail Replenish. Mgt."
         ItemLedgerEntry.SetRange("Entry Type", ItemLedgerEntry."Entry Type"::Sale);
         ItemLedgerEntry.SetRange("Item No.", Item."No.");
         ItemLedgerEntry.SetRange("Location Code", Location.Code);
-        //ItemLedgerEntry.SETFILTER("Variant Code",
         ItemLedgerEntry.SetFilter("Posting Date", '%1..%2', StartSalesHistDate, Today);
         ItemLedgerEntry.CalcSums("Remaining Quantity", Quantity);
 
@@ -214,15 +189,11 @@ codeunit 6151052 "NPR Retail Replenish. Mgt."
         PurchaseLine: Record "Purchase Line";
         RetailCampaignHeader: Record "NPR Retail Campaign Header";
         LineNo: Integer;
+        MissingDiscFilter: Label 'Direct order must have a filter on dist. group and item hiearacy!';
     begin
-        //-NPR5.39 [299436]
-
-        //-NPR5.40 [299436]
-
         if ((RetaiReplDemandLine.GetFilter("Item Hierachy") <> '') and (RetaiReplDemandLine.GetFilter("Distribution Group") <> '')) then begin
             RetaiReplDemandLine.SetCurrentKey("Location Code");
             RetaiReplDemandLine.SetRange(Confirmed, true);
-            //RetaiReplDemandLine.SETFILTER(Status,'<>%1',RetaiReplDemandLine.Status::"9");
             if RetaiReplDemandLine.FindSet(true) then begin
                 repeat
                     LineNo := 0;
@@ -233,10 +204,6 @@ codeunit 6151052 "NPR Retail Replenish. Mgt."
                     PurchaseHeader.SetRange("Campaign No.", RetaiReplDemandLine."Item Hierachy");
                     PurchaseHeader.SetRange("Requested Receipt Date", RetaiReplDemandLine."Due Date");
                     PurchaseHeader.SetRange("Location Code", RetaiReplDemandLine."Location Code");
-                    //Vaersgo
-                    //set global dim 1 to store
-                    //PurchaseHeader."Shortcut Dimension 1 Code" := from dist group member
-                    //Vaersgo
                     if PurchaseHeader.FindFirst then begin
                         PurchaseHeader.TestField("Buy-from Vendor No.");
                         PurchaseHeader.TestField("Campaign No.");
@@ -254,35 +221,25 @@ codeunit 6151052 "NPR Retail Replenish. Mgt."
                         PurchaseLine.Insert(true);
                         PurchaseLine.Validate(Quantity, Abs(RetaiReplDemandLine."Quantity (Base)"));
                         PurchaseLine.Validate("Location Code", RetaiReplDemandLine."Location Code");
-                        //-NPR5.46 [3134287]
                         PurchaseLine.Validate("Order Date", Today);
-                        //+NPR5.46 [3134287]
                         PurchaseLine.Modify(true);
-                        //-NPR5.46 [3134287]
                         PurchaseLine.Validate("Expected Receipt Date", RetaiReplDemandLine."Due Date");
-                        //+NPR5.46 [3134287]
                         PurchaseLine.Validate("Direct Unit Cost", RetaiReplDemandLine."Campaign Unit Cost");
                         PurchaseLine.Modify(true);
                     end else begin
-                        //get alt numberseries //
                         Clear(NewPurchaseHeader);
                         NewPurchaseHeader.Init;
                         NewPurchaseHeader.Validate("Document Type", NewPurchaseHeader."Document Type"::Order);
                         NewPurchaseHeader.Validate("Buy-from Vendor No.", RetaiReplDemandLine."Vendor No.");
                         NewPurchaseHeader.Insert(true);
-                        //-NPR5.42 [301379]
                         NewPurchaseHeader.Validate("Document Date", Today);
                         NewPurchaseHeader.Validate("Posting Date", Today);
-                        //+NPR5.42 [301379]
-
                         NewPurchaseHeader.Validate("Requested Receipt Date", RetaiReplDemandLine."Due Date");
                         NewPurchaseHeader.Validate("Location Code", RetaiReplDemandLine."Location Code");
                         NewPurchaseHeader.Validate("Campaign No.", RetaiReplDemandLine."Item Hierachy");
-                        //-NPR5.46 [3134287]
                         NewPurchaseHeader.Validate("Expected Receipt Date", RetaiReplDemandLine."Due Date");
-                        //+NPR5.46 [3134287]
-
                         NewPurchaseHeader.Modify(true);
+
                         PurchaseLine.Init;
                         PurchaseLine."Document Type" := NewPurchaseHeader."Document Type";
                         PurchaseLine."Document No." := NewPurchaseHeader."No.";
@@ -291,16 +248,11 @@ codeunit 6151052 "NPR Retail Replenish. Mgt."
                         PurchaseLine.Validate("No.", RetaiReplDemandLine."Item No.");
                         PurchaseLine.Insert(true);
                         PurchaseLine.Validate(Quantity, Abs(RetaiReplDemandLine."Quantity (Base)"));
-
                         PurchaseLine.Validate("Location Code", RetaiReplDemandLine."Location Code");
-                        //-NPR5.46 [3134287]
                         PurchaseLine.Validate("Order Date", Today);
-                        //+NPR5.46 [3134287]
                         PurchaseLine.Modify(true);
                         PurchaseLine.Validate("Direct Unit Cost", RetaiReplDemandLine."Campaign Unit Cost");
-                        //-NPR5.46 [3134287]
                         PurchaseLine.Validate("Expected Receipt Date", RetaiReplDemandLine."Due Date");
-                        //+NPR5.46 [3134287]
                         PurchaseLine.Modify(true);
                     end;
                     RetaiReplDemandLine.Status := RetaiReplDemandLine.Status::"9";
@@ -308,10 +260,6 @@ codeunit 6151052 "NPR Retail Replenish. Mgt."
                 until RetaiReplDemandLine.Next = 0;
             end;
         end else
-            Error('Direct order must have a filter on dist. group and item hiearacy! ');
-        //+NPR5.40 [299436]
-
-        //+NPR5.39 [299436]
+            Error(MissingDiscFilter);
     end;
 }
-

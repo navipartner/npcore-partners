@@ -1,47 +1,5 @@
 page 6151401 "NPR Magento Setup"
 {
-    // MAG1.17/MHA /20150611  CASE 216142 Object Created - Includes magento specific fields from NaviConnect Setup
-    // MAG1.17/BHR /20150615  CASE 216109 Added field 450 "Exchange Web Code"
-    // MAG1.17/TR  /20150618  CASE 210183 ActionItems for previewing credit- and gift voucher added. Currency Code added.
-    // MAG1.19/TR  /20150721  CASE 218821 Currency Code added to TempGiftVoucher and TempCreditVoucher.
-    // MAG1.19/MHA /20150731  CASE 219367 Removed Generic Setup under General
-    // MAG1.20/TR  /20150810  CASE 218819 "Gift Voucher Activation" added to gift voucher section.
-    // MAG1.21/MHA /20151104  CASE 223835 Added field 35 "Variant Picture Dimension" and 37 "Picture Miniature"
-    // MAG1.21/MHA /20151123  CASE 227354 Added Field 140 "Multistore Enabled"
-    // MAG1.22/TS  /20150120  CASE 231762 Added field "Ticket Enabled"
-    // MAG1.22/TR  /20160414  CASE 238563 Added Field 131 "Custom Options Nos."
-    // MAG1.22/MHA /20160418  CASE 230240 Added field 38 "Max. Picture Size"
-    // MAG1.22/MHA /20160421  CASE 236917 Added inventory group
-    // MAG1.22/MHA /20160427  CASE 240212 Setup Magento Integration Action is split up into individual Actions: SetupNpXmlTemplates(), SetupVATBusinessPostingGroups(), SetupVATProductPostingGroups(), SetupMagentoCredentials(),
-    //                                    SetupMagentoWebsites(), SetupMagentoTaxClasses(), SetupMagentoCustomerGroups(), SetupNaviConnectPaymentMethods() and SetupNaviConnectShipmentMethods()
-    // MAG2.00/MHA /20160525  CASE 242557 Magento Integration
-    // MAG2.01/TS  /20161025  CASE 254385 Added Setup Import Types
-    // MAG2.02/MHA /20170221  CASE 266871 Added field 517 "Customer Config. Template Code"
-    // MAG2.03/MHA /20170316  CASE 267449 Added fields for replicating Special Price to Sales Price: 600 "Replicate to Sales Prices",605 "Replicate to Sales Type",610 "Replicate to Sales Code"
-    // MAG2.03/MHA /20170425  CASE 267094 Added field 615 "Auto Seo Link Disabled"
-    // MAG2.05/MHA /20170714  CASE 283777 Added field 77 "Api Authorization" and Navigate Action "Event Subscriptions"
-    // MAG2.06/TS  /20170529  CASE 269051 Added Enable Bundle Products
-    // MAG2.07/MHA /20170830  CASE 286943 Updated Magento Setup Actions to support Setup Event Subscription
-    // MAG2.08/MHA /20171016  CASE 292926 Added Removed VatBus- and VatProductPostingGroups from Publisher Setup Functions and added SetupNpXmlTemplates
-    // MAG2.09/MHA /20171211  CASE 292576 Added fields 345 "Voucher Number Format" and 350 "Voucher Date Format"
-    // MAG2.09/TS  /20180108  CASE 300893 Renamed Caption for Action Group
-    // MAG2.19/MHA /20190306  CASE 347974 Added field 535 "Release Order on Import"
-    // MAG2.20/MHA /20190426  CASE 320423 Added field 15 "Magento Version"
-    // MAG2.22/MHA /20190611  CASE 357662 Added field 490 "Customer Update Mode"
-    // MAG2.22/MHA /20190621  CASE 359146 Added field 540 "Use Blank Code for LCY"
-    // MAG2.22/MHA /20190625  CASE 359285 Added field 34 "Picture Variety Type"
-    // MAG2.22/MHA /20190708  CASE 352201 Added field 220 "Collect in Store Enabled"
-    // MAG14.00.2.22/MHA/20190717  CASE 362262 Removed DotNet Print functionality
-    // MAG2.23/MHA /20190826  CASE 363864 Added fields 700 "Post Retail Voucher on Import", 710 "E-mail Retail Vouchers to"
-    // MAG2.23/MHA /20190930  CASE 370831 B2B modules should not be visible for Magento 2
-    // MAG2.23/MHA /20191011  CASE 371791 Added fields 720 "Post Tickets on Import", 730 "Post Memberships on Import"
-    // MAG2.23/MHA /20191017  CASE 373262 Addded Post On Import Setup PagePart
-    // MAG2.25/MHA /20200204  CASE 387936 Added fields 750 "Send Order Confirmation", 760 "Order Conf. E-mail Template"
-    // MAG2.26/MHA /20200428  CASE 402247 Added Option "Fixed" to field 490 "Customer Update Mode"
-    // MAG2.26/MHA /20200430  CASE 402486 Added field 800 "Stock Calculation Method"
-    // MAG2.26/MHA /20200505  CASE 402488 Added field 810 "Stock NpXml Template", 820 "Stock Codeunit Id", 830 "Stock Codeunit Name", 840 "Stock Function Name"
-    // MAG2.26/MHA /20200526  CASE 406591 Added Collect in Store
-
     Caption = 'Magento Setup';
     PromotedActionCategories = 'New,Tasks,Reports,Display';
     RefreshOnActivate = true;
@@ -64,9 +22,7 @@ page 6151401 "NPR Magento Setup"
 
                     trigger OnValidate()
                     begin
-                        //-MAG2.26 [404580]
                         CurrPage.Update(true);
-                        //+MAG2.26 [404580]
                     end;
                 }
                 field("Magento Url"; "Magento Url")
@@ -113,10 +69,8 @@ page 6151401 "NPR Magento Setup"
                     var
                         MagentoGenericSetupMgt: Codeunit "NPR Magento Gen. Setup Mgt.";
                     begin
-                        //-MAG2.00
                         MagentoGenericSetupMgt.EditGenericMagentoSetup('template_setup');
                         CurrPage.Update(false);
-                        //+MAG2.00
                     end;
                 }
                 group("Managed Nav Module")
@@ -154,9 +108,7 @@ page 6151401 "NPR Magento Setup"
                         var
                             MagentoSetupMgt: Codeunit "NPR Magento Setup Mgt.";
                         begin
-                            //-MAG2.00
                             MagentoSetupMgt.ShowMissingObjects(Rec);
-                            //+MAG2.00
                         end;
                     }
                 }
@@ -169,9 +121,7 @@ page 6151401 "NPR Magento Setup"
 
                     trigger OnValidate()
                     begin
-                        //-MAG1.21
                         CurrPage.Update(true);
-                        //+MAG1.21
                     end;
                 }
                 group(Control6151447)
@@ -251,10 +201,8 @@ page 6151401 "NPR Magento Setup"
                         var
                             MagentoSetupMgt: Codeunit "NPR Magento Setup Mgt.";
                         begin
-                            //-MAG1.22
                             MagentoSetupMgt.InitCustomOptionNos(Rec);
                             CurrPage.Update(true);
-                            //+MAG1.22
                         end;
                     }
                     field("Bundled Products Enabled"; "Bundled Products Enabled")
@@ -406,7 +354,7 @@ page 6151401 "NPR Magento Setup"
                     group(Control6151427)
                     {
                         ShowCaption = false;
-                        Visible = "Replicate to Sales Type" <> 2;
+                        Visible = "Replicate to Sales Type" <> "Replicate to Sales Type"::"All Customers";
                         field("Replicate to Sales Code"; "Replicate to Sales Code")
                         {
                             ApplicationArea = All;
@@ -424,9 +372,7 @@ page 6151401 "NPR Magento Setup"
 
                     trigger OnValidate()
                     begin
-                        //-MAG2.26 [402488]
                         CurrPage.Update(true);
-                        //+MAG2.26 [402488]
                     end;
                 }
                 group(Control6151463)
@@ -440,9 +386,7 @@ page 6151401 "NPR Magento Setup"
 
                         trigger OnValidate()
                         begin
-                            //-MAG2.26 [402488]
                             CurrPage.Update(true);
-                            //+MAG2.26 [402488]
                         end;
                     }
                     field("Stock Codeunit Id"; "Stock Codeunit Id")
@@ -461,9 +405,7 @@ page 6151401 "NPR Magento Setup"
 
                     trigger OnValidate()
                     begin
-                        //-MAG2.26 [402488]
                         CurrPage.Update(true);
-                        //+MAG2.26 [402488]
                     end;
                 }
                 group(Control6150659)
@@ -601,20 +543,13 @@ page 6151401 "NPR Magento Setup"
                         Caption = 'Setup NpXml Templates';
                         Image = Setup;
                         ApplicationArea = All;
-                        //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                        //PromotedCategory = Process;
-                        //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
-                        //PromotedIsBig = true;
 
                         trigger OnAction()
                         var
                             MagentoSetupMgt: Codeunit "NPR Magento Setup Mgt.";
                         begin
                             CurrPage.Update(true);
-                            //-MAG2.08 [292926]
-                            //MagentoSetupMgt.SetupNpXmlTemplates();
                             MagentoSetupMgt.TriggerSetupNpXmlTemplates();
-                            //+MAG2.08 [292926]
                         end;
                     }
                     action("Setup Magento Credentials")
@@ -622,20 +557,13 @@ page 6151401 "NPR Magento Setup"
                         Caption = 'Setup Magento Api Credentials';
                         Image = Setup;
                         ApplicationArea = All;
-                        //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                        //PromotedCategory = Process;
-                        //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
-                        //PromotedIsBig = true;
 
                         trigger OnAction()
                         var
                             MagentoSetupMgt: Codeunit "NPR Magento Setup Mgt.";
                         begin
                             CurrPage.Update(true);
-                            //-MAG2.07 [286943]
-                            //MagentoSetupMgt.SetupMagentoCredentials();
                             MagentoSetupMgt.TriggerSetupMagentoCredentials();
-                            //+MAG2.07 [286943]
                         end;
                     }
                     action("Setup Magento Websites")
@@ -643,20 +571,13 @@ page 6151401 "NPR Magento Setup"
                         Caption = 'Setup Magento Websites';
                         Image = Setup;
                         ApplicationArea = All;
-                        //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                        //PromotedCategory = Process;
-                        //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
-                        //PromotedIsBig = true;
 
                         trigger OnAction()
                         var
                             MagentoSetupMgt: Codeunit "NPR Magento Setup Mgt.";
                         begin
                             CurrPage.Update(true);
-                            //-MAG2.07 [286943]
-                            //MagentoSetupMgt.SetupMagentoWebsites();
                             MagentoSetupMgt.TriggerSetupMagentoWebsites();
-                            //+MAG2.07 [286943]
                         end;
                     }
                     action("Setup Magento Customer Groups")
@@ -664,20 +585,13 @@ page 6151401 "NPR Magento Setup"
                         Caption = 'Setup Magento Customer Groups';
                         Image = Setup;
                         ApplicationArea = All;
-                        //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                        //PromotedCategory = Process;
-                        //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
-                        //PromotedIsBig = true;
 
                         trigger OnAction()
                         var
                             MagentoSetupMgt: Codeunit "NPR Magento Setup Mgt.";
                         begin
                             CurrPage.Update(true);
-                            //-MAG2.07 [286943]
-                            //MagentoSetupMgt.SetupMagentoCustomerGroups();
                             MagentoSetupMgt.TriggerSetupMagentoCustomerGroups();
-                            //+MAG2.07 [286943]
                         end;
                     }
                     action("Setup Categories")
@@ -694,10 +608,8 @@ page 6151401 "NPR Magento Setup"
                         var
                             MagentoSetupMgt: Codeunit "NPR Magento Setup Mgt.";
                         begin
-                            //-MAG2.26 [404580]
                             MagentoSetupMgt.TriggerSetupCategories();
                             Message(Text003);
-                            //+MAG2.26 [404580]
                         end;
                     }
                     action("Setup Brands")
@@ -714,10 +626,8 @@ page 6151401 "NPR Magento Setup"
                         var
                             MagentoSetupMgt: Codeunit "NPR Magento Setup Mgt.";
                         begin
-                            //-MAG2.26 [404580]
                             MagentoSetupMgt.TriggerSetupBrands();
                             Message(Text004);
-                            //+MAG2.26 [404580]
                         end;
                     }
                 }
@@ -730,20 +640,13 @@ page 6151401 "NPR Magento Setup"
                         Caption = 'Setup Magento Tax Classes';
                         Image = Setup;
                         ApplicationArea = All;
-                        //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                        //PromotedCategory = Process;
-                        //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
-                        //PromotedIsBig = true;
 
                         trigger OnAction()
                         var
                             MagentoSetupMgt: Codeunit "NPR Magento Setup Mgt.";
                         begin
                             CurrPage.Update(true);
-                            //-MAG2.07 [286943]
-                            //MagentoSetupMgt.SetupMagentoTaxClasses();
                             MagentoSetupMgt.TriggerSetupMagentoTaxClasses();
-                            //+MAG2.07 [286943]
                         end;
                     }
                     action("Setup VAT Business Posting Groups")
@@ -751,20 +654,13 @@ page 6151401 "NPR Magento Setup"
                         Caption = 'Setup VAT Business Posting Groups';
                         Image = Setup;
                         ApplicationArea = All;
-                        //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                        //PromotedCategory = Process;
-                        //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
-                        //PromotedIsBig = true;
 
                         trigger OnAction()
                         var
                             MagentoSetupMgt: Codeunit "NPR Magento Setup Mgt.";
                         begin
                             CurrPage.Update(true);
-                            //-MAG2.08 [292926]
-                            //MagentoSetupMgt.TriggerSetupVATBusinessPostingGroups();
                             MagentoSetupMgt.SetupVATBusinessPostingGroups();
-                            //+MAG2.08 [292926]
                             MagentoSetupMgt.CheckVATBusinessPostingGroups();
                         end;
                     }
@@ -773,20 +669,13 @@ page 6151401 "NPR Magento Setup"
                         Caption = 'Setup VAT Product Posting Groups';
                         Image = Setup;
                         ApplicationArea = All;
-                        //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                        //PromotedCategory = Process;
-                        //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
-                        //PromotedIsBig = true;
 
                         trigger OnAction()
                         var
                             MagentoSetupMgt: Codeunit "NPR Magento Setup Mgt.";
                         begin
                             CurrPage.Update(true);
-                            //-MAG2.08 [292926]
-                            //MagentoSetupMgt.TriggerSetupVATProductPostingGroups();
                             MagentoSetupMgt.SetupVATProductPostingGroups();
-                            //+MAG2.08 [292926]
                             MagentoSetupMgt.CheckVATProductPostingGroups();
                         end;
                     }
@@ -800,20 +689,13 @@ page 6151401 "NPR Magento Setup"
                         Caption = 'Setup Payment Method Mapping';
                         Image = Setup;
                         ApplicationArea = All;
-                        //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                        //PromotedCategory = Process;
-                        //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
-                        //PromotedIsBig = true;
 
                         trigger OnAction()
                         var
                             MagentoSetupMgt: Codeunit "NPR Magento Setup Mgt.";
                         begin
                             CurrPage.Update(true);
-                            //-MAG2.07 [286943]
-                            //MagentoSetupMgt.SetupNaviConnectPaymentMethods();
                             MagentoSetupMgt.TriggerSetupPaymentMethodMapping();
-                            //+MAG2.07 [286943]
                             MagentoSetupMgt.CheckNaviConnectPaymentMethods();
                         end;
                     }
@@ -822,21 +704,13 @@ page 6151401 "NPR Magento Setup"
                         Caption = 'Setup Shipment Method Mapping';
                         Image = Setup;
                         ApplicationArea = All;
-                        //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                        //PromotedCategory = Process;
-                        //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
-                        //PromotedIsBig = true;
 
                         trigger OnAction()
                         var
                             MagentoSetupMgt: Codeunit "NPR Magento Setup Mgt.";
                         begin
                             CurrPage.Update(true);
-                            //-MAG2.07 [286943]
-                            //MagentoSetupMgt.SetupNaviConnectShipmentMethods();
                             MagentoSetupMgt.TriggerSetupShipmentMethodMapping();
-                            //+MAG2.07 [286943]
-
                             MagentoSetupMgt.CheckNaviConnectShipmentMethods();
                         end;
                     }
@@ -856,12 +730,8 @@ page 6151401 "NPR Magento Setup"
                     var
                         MagentoSetupMgt: Codeunit "NPR Magento Setup Mgt.";
                     begin
-                        //-MAG2.00
                         MagentoSetupMgt.UpdateVersionNo(Rec);
-                        //+MAG2.00
-                        //-MAG2.22 [359285]
                         CurrPage.Update(true);
-                        //+MAG2.22 [359285]
                     end;
                 }
             }
@@ -878,9 +748,7 @@ page 6151401 "NPR Magento Setup"
                 var
                     MagentoSetupMgt: Codeunit "NPR Magento Setup Mgt.";
                 begin
-                    //-MAG2.01
                     MagentoSetupMgt.SetupImportTypes();
-                    //+MAG2.01
                 end;
             }
             action("Setup Control Add-ins")
@@ -896,10 +764,8 @@ page 6151401 "NPR Magento Setup"
                 var
                     MagentoSetupMgt: Codeunit "NPR Magento Setup Mgt.";
                 begin
-                    //-MAG2.00
                     CurrPage.Update(true);
                     MagentoSetupMgt.SetupClientAddIns();
-                    //+MAG2.00
                 end;
             }
             group(Resync)
@@ -928,16 +794,14 @@ page 6151401 "NPR Magento Setup"
                 {
                     Caption = 'Replicate Special Prices to Sales Prices';
                     Image = SuggestSalesPrice;
-                    Visible = "Replicate to Sales Prices" AND (("Replicate to Sales Type" = 2) OR ("Replicate to Sales Code" <> ''));
+                    Visible = "Replicate to Sales Prices" AND (("Replicate to Sales Type" = "Replicate to Sales Type"::"All Customers") OR ("Replicate to Sales Code" <> ''));
                     ApplicationArea = All;
 
                     trigger OnAction()
                     var
                         MagentoItemMgt: Codeunit "NPR Magento Item Mgt.";
                     begin
-                        //-MAG2.03 [267449]
                         MagentoItemMgt.InitReplicateSpecialPrice2SalesPrices();
-                        //+MAG2.03 [267449]
                     end;
                 }
             }
@@ -958,10 +822,8 @@ page 6151401 "NPR Magento Setup"
     var
         MagentoSetupMgt: Codeunit "NPR Magento Setup Mgt.";
     begin
-        //-MAG2.26 [404580]
         HasSetupCategories := MagentoSetupMgt.HasSetupCategories();
         HasSetupBrands := MagentoSetupMgt.HasSetupBrands();
-        //+MAG2.26 [404580]
     end;
 
     trigger OnOpenPage()
@@ -969,9 +831,7 @@ page 6151401 "NPR Magento Setup"
         if not Get then
             Insert;
 
-        //-MAG2.26 [406591]
         CurrPage.NpCsStoreCardWorkflows.PAGE.SetStoreCodeVisible(true);
-        //+MAG2.26 [406591]
     end;
 
     var
@@ -990,4 +850,3 @@ page 6151401 "NPR Magento Setup"
         Text003: Label 'Category update initiated';
         Text004: Label 'Brand update initiated';
 }
-

@@ -1,76 +1,5 @@
 table 6014400 "NPR Retail Setup"
 {
-    // NPR3.0m, NPK, DL, 05-03-07, Tilf¢jet felt 50014 pakkelabel
-    // 
-    // NPR3.4n, NIES, 29-03-07, Rounding flyttet til kasserne.
-    // NPR3.4o, NPK, DL, 02-04-07, Tilf¢jet felt 50016
-    // NPR3.4p, NPK, DL, 15-04-07, Tilf¢jet felt 50017
-    // NPR3.4q, NPK, DL, 19-04-07, Tilf¢jet felt 50018
-    // NPR3.4r, NPK, DL, 26-04-07, Tilf¢jet felt 50019
-    // PCM1.0 (NPR-Package1.0), NPK, DL, 18-03-08, Added fields 6500-6504
-    //                                   19-03-08, Added fields 6505-6508
-    //                                   04-04-08, Moved fields to table 6014550
-    // 
-    // NPR4.004.006, 07-07-09, MH - Tilf¢jet felt, 50044 Receipt type, der definerer, hvordan bon skal udskrives fra kassen.
-    // NPR6.001.005 20130313 LJJ - CASE 152082: Field 50050 - "Cust. Barcode Management" - added.
-    //                                          Field 50051 - "Cust. Barcode Prefix" - added.
-    // NPR6.001.006 20130702 LJJ - CASE 158804: Field 50052 - "Post Statement Per Journal" - added.
-    // NPR4.10/MMV/20150508 CASE 205310 Renamed field 50043
-    // NPR4.11/MMV/20150617 CASE 205310 Added field 90
-    // NPR4.11/JDH/20150626 CASE 217444 Removed about 150 unused fields + variables + code that was outcommented
-    // NPR4.12/MMV/20150702 CASE 217490 Changed captions on field Return Receipt Positive Amount to make it more clear what the button actually does on print.
-    // NPR4.13/RA/20150724  CASE 210079 Added fields "Hotkey for Louislane", "Hotkey for Request Commando" and "Support Picture"
-    // NPR4.14/RMT/20150826 CASE 216519 Added field 5035 "Use Standard Order Document"
-    // NPR4.15/MMV/20150925 CASE 217116 Added field 5006 "Print Total Item Quantity"
-    // NPR4.16/MMV/20151028 CASE 225533 Added field 5007 "Print Attributes On Receipt"
-    // NPR5.20/TTH/20160303 CASE 235900 Removed extra blank space from the OptionCaption of field 5061 Unit Cost Control.
-    // NPR5.23/MMV /20160527 CASE 242202 Removed deprecated field 5063 "Get Customername at Discount"
-    // NPR5.23/MMV /20160530 CASE 242921 Removed deprecated field 6247 "Print Ship. on SO Post+Print"
-    // NPR5.23/MMV /20160530 CASE 241549 Removed deprecated field 6166 "Printer Selection Type"
-    // NPR5.23/TJ/20160608 CASE 242690 Added new field Customer Template Code
-    // NPR5.23/MMV /20160610 CASE 244050 Removed 6 deprecated fields (print delay, navibar, purchase line options)
-    // NPR5.23.01/BR  /20160620 CASE 244575 Added field  "Use NAV Lookup in POS"
-    // NPR5.27/BHR/20161018 CASE 253261 Added field 'Not use Dim filter SerialNo'
-    //                                  to Skip filtering in global Dimension when searching for SerialNo in ItemLedger
-    // NPR5.29/MMV /20161216  CASE 241549 Removed deprecated print/report code.
-    // NPR5.29/JDH /20170105  CASE 260472 Description Control is now possible on different types of documents
-    // NPR5.29/BHR /20170105  CASE 262439 Field Query Sales By Shop
-    // NPR5.29/MMV /20170106  CASE 262678 Added field 6300
-    // NPR5.30/TS  /20170130  CASE 264914 Renamed fields an Captions
-    // NPR5.30/TS  /20170130  CASE 264914 Removed field SportingPartner
-    // NPR5.30/TJ  /20170202  CASE 264793 Removed unused fields
-    // NPR5.30/TS  /20170203  CASE 264917 Removed unused fields
-    // NPR5.30/TS  /20170203  CASE 264915 Removed field Mandatory Customer No.
-    // NPR5.30/TJ  /20170215  CASE 265504 Changed ENU captions on fields with word Register in their name
-    // NPR5.30/BHR /20170212  CASE 266279 Rename field "Query sales by Shop" to  "Margin And Turnover by Shop"
-    // NPR5.30/TJ  /20170223  CASE 264913 Removed fields Terms of Payment, Customer Posting Group and Gen. Bus. Posting Group
-    //                                    Added new field Customer Config. Template
-    // NPR5.31/TSA /20170314  CASE 269105 Removed field 5103 "Prices incl. VAT" from page since it is a duplicate of field 3.
-    // NPR5.31/JLK /20170331  CASE 268274 Changed ENU Caption
-    // NPR5.31/MMV /20170411  CASE 271728 Removed deprecated field 5162 "Default Customer no."
-    // NPR5.31/AP  /20170427  CASE 269105 Recreated field 5103 "Prices incl. VAT" (since its not duplicate).
-    // NPR5.32/JDH /20170525 CASE 278031  Changed fieldlengths for fields
-    //                                    5034 Statement Journal Name
-    //                                    5130 Cash Customer Deposit rel.
-    //                                    5139 Journalname
-    //                                    5141 Journal Type
-    //                                    6230 Staff Disc. Group
-    // NPR5.36/TJ  /20170904  CASE 286283 Renamed all the danish OptionString properties to english
-    // NPR5.38/TJ  /20171218  CASE 225415 Renumbered fields from range 50xxx to range below 50000
-    // NPR5.38/BR  /20180118  CASE 302761 Added field "Create POS Entries Only"
-    // NPR5.40/THRO/20180326  CASE 302617 Changed Caption on field 356 to 'Send Document On Post'
-    // NPR5.40/TJ  /20180303  CASE 301544 Removed fields not used: 5014 Poste when EAN Labe, 5034 Statement Journal Name, 6221 Password on General Ledger and 6252 Support Picture
-    //                                    Removed fields used only on page 6014424 Retail Setup
-    // NPR5.41/BHR /20180305  CASE 307094 Update all the captions accordingly.
-    // NPR5.46/BHR /20180824  CASE 322752 Replace record Object to Allobj
-    // NPR5.46/BHR /20181005  CASE 324954 Removed Unused fields fron Retail Setup
-    // NPR5.48/BHR /20190114  CASE 341974 Change field type of the fields 5116,5117 and 5118 from text30 to Code 20
-    // NPR5.53/ALPO/20191023  CASE 371955 Removed field 13 "Amount Rounding Precision": rounding related fields moved to POS Posting Profiles
-    // NPR5.53/BHR /20190810  CASE 369354 Delete field 1002 "New Customer Creation"
-    // NPR5.53/BHR /20191007  CASE 369361 Removed the fields "Company Function" - 6325,"Hotline no." - 5148, "Hosting Type" - 82
-    //                                    Removed function For online/Offline Checks
-    // NPR5.54/TJ  /20200302  CASE 393478 Removed fields 4016 "Overwrite Item No.", 5155 "Finish Register Warning" and 5159 "Item remarks"
-
     Caption = 'Retail Setup';
     DataClassification = CustomerContent;
 
@@ -449,14 +378,6 @@ table 6014400 "NPR Retail Setup"
         {
             Caption = 'Create New Customer';
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            begin
-                //-NPR5.53 [369354]
-                //IF NOT "Create New Customer" THEN
-                //  "New Customer Creation" := "New Customer Creation"::"0";
-                //+NPR5.53 [369354]
-            end;
         }
         field(1015; "Company No."; Code[20])
         {
@@ -1221,13 +1142,11 @@ table 6014400 "NPR Retail Setup"
             Caption = 'Show Discount';
             DataClassification = CustomerContent;
         }
-        field(6233; "Costing Method Standard"; Option)
+        field(6233; "Costing Method Standard"; Enum "Costing Method")
         {
             Caption = 'Costing Method Std.';
             DataClassification = CustomerContent;
             InitValue = Standard;
-            OptionCaption = 'FIFO,LIFO,Specific,Average,Standard';
-            OptionMembers = FIFO,LIFO,Specific,"Average",Standard;
         }
         field(6235; "Staff SalesPrice Calc Codeunit"; Integer)
         {
@@ -1237,17 +1156,6 @@ table 6014400 "NPR Retail Setup"
 
             trigger OnLookup()
             begin
-                //-NPR5.46 [322752]
-                // Objects.RESET;
-                // Objects.SETRANGE(Type, Objects.Type::Codeunit);
-                // Objects.SETRANGE(Compiled, TRUE);
-                // //Objects.setrange(Regnskabsnavn, companyname);
-                //
-                // IF PAGE.RUNMODAL(358, Objects) = ACTION::LookupOK THEN BEGIN
-                //  "Staff SalesPrice Calc Codeunit" := Objects.ID;
-                //  MODIFY;
-                // END;
-
                 AllObj.Reset;
                 AllObj.SetRange("Object Type", AllObj."Object Type"::Codeunit);
 
@@ -1255,7 +1163,6 @@ table 6014400 "NPR Retail Setup"
                     "Staff SalesPrice Calc Codeunit" := AllObj."Object ID";
                     Modify;
                 end;
-                //+NPR5.46 [322752]
             end;
         }
         field(6237; "Customer type"; Option)
@@ -1317,9 +1224,7 @@ table 6014400 "NPR Retail Setup"
             var
                 ChangeLogAutoEnabler: Codeunit "NPR Change Log Auto Enabler";
             begin
-                //-NPR5.29 [262678]
                 ChangeLogAutoEnabler.ValidateChangeLogLevel(Rec, xRec);
-                //+NPR5.29 [262678]
             end;
         }
         field(6310; "Customer Config. Template"; Code[10])
@@ -1387,7 +1292,6 @@ table 6014400 "NPR Retail Setup"
             var
                 NPRetailSetup: Record "NPR NP Retail Setup";
             begin
-                //-NPR5.38 [302761]
                 if "Create POS Entries Only" then begin
                     NPRetailSetup.Get;
                     NPRetailSetup.TestField("Advanced Posting Activated");
@@ -1396,7 +1300,6 @@ table 6014400 "NPR Retail Setup"
                         if not Confirm(TextAuditRollWillBeDisabled) then
                             "Create POS Entries Only" := false;
                 end;
-                //+NPR5.38 [302761]
             end;
         }
         field(10000; "Debug Posting"; Boolean)
@@ -1467,4 +1370,3 @@ table 6014400 "NPR Retail Setup"
         TextAuditRollWillBeDisabled: Label 'Warning: this will disable the creation of Audit Roll records. Do you want to continue?';
         AllObj: Record AllObj;
 }
-

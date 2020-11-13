@@ -1,8 +1,5 @@
 page 6014460 "NPR Inventory Pick Scan"
 {
-    // NPR5.33/NPKNAV/20170630  CASE 268412 Transport NPR5.33 - 30 June 2017
-    // NPR5.41/TS  /20180105 CASE 300893 Added an s to Source Document
-
     Caption = 'Inventory Pick';
     PageType = Document;
     UsageCategory = Administration;
@@ -62,14 +59,14 @@ page 6014460 "NPR Inventory Pick Scan"
                 field("Destination No."; "Destination No.")
                 {
                     ApplicationArea = All;
-                    CaptionClass = Format(WMSMgt.GetCaption("Destination Type".AsInteger(), "Source Document", 0));
+                    CaptionClass = Format(WMSMgt.GetCaption("Destination Type".AsInteger(), "Source Document".AsInteger(), 0));
                     Editable = false;
                     QuickEntry = false;
                 }
-                field("WMSMgt.GetDestinationName(""Destination Type"",""Destination No."")"; WMSMgt.GetDestinationName("Destination Type".AsInteger(), "Destination No."))
+                field("WMSMgt.GetDestinationName(""Destination Type"",""Destination No."")"; WMSMgt.GetDestinationEntityName("Destination Type", "Destination No."))
                 {
                     ApplicationArea = All;
-                    CaptionClass = Format(WMSMgt.GetCaption("Destination Type".AsInteger(), "Source Document", 1));
+                    CaptionClass = Format(WMSMgt.GetCaption("Destination Type".AsInteger(), "Source Document".AsInteger(), 1));
                     Caption = 'Name';
                     Editable = false;
                 }
@@ -87,13 +84,13 @@ page 6014460 "NPR Inventory Pick Scan"
                 field("External Document No."; "External Document No.")
                 {
                     ApplicationArea = All;
-                    CaptionClass = Format(WMSMgt.GetCaption("Destination Type".AsInteger(), "Source Document", 2));
+                    CaptionClass = Format(WMSMgt.GetCaption("Destination Type".AsInteger(), "Source Document".AsInteger(), 2));
                     QuickEntry = false;
                 }
                 field("External Document No.2"; "External Document No.2")
                 {
                     ApplicationArea = All;
-                    CaptionClass = Format(WMSMgt.GetCaption("Destination Type".AsInteger(), "Source Document", 3));
+                    CaptionClass = Format(WMSMgt.GetCaption("Destination Type".AsInteger(), "Source Document".AsInteger(), 3));
                     QuickEntry = false;
                 }
             }
@@ -377,8 +374,6 @@ page 6014460 "NPR Inventory Pick Scan"
                 Caption = 'Picking List';
                 Image = "Report";
                 Promoted = false;
-                //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                //PromotedCategory = "Report";
                 RunObject = Report "Picking List";
                 ApplicationArea = All;
             }
@@ -490,11 +485,14 @@ page 6014460 "NPR Inventory Pick Scan"
 
     local procedure HasItemTracking(ItemNo: Code[20]): Boolean
     var
+        WhseItemTrackingSetup: Record "Item Tracking Setup";
         ItemTrackingMgt: Codeunit "Item Tracking Management";
         ItemTrackingError: Label 'Item has item tracking enabled so you need to set %1 before scanning.';
         ItemTrackingNotEnabledError: Label 'Item doesn''t have item tracking enabled so you need to remove %1 before scanning.';
     begin
-        ItemTrackingMgt.CheckWhseItemTrkgSetup(ItemNo, SNRequired, LNRequired, false);
+        ItemTrackingMgt.GetWhseItemTrkgSetup(ItemNo, WhseItemTrackingSetup);
+        SNRequired := WhseItemTrackingSetup."Serial No. Required";
+        LNRequired := WhseItemTrackingSetup."Lot No. Required";
         if SNRequired then begin
             if SerialNo = '' then
                 Error(ItemTrackingError, SerialNoCaption);
@@ -622,7 +620,6 @@ page 6014460 "NPR Inventory Pick Scan"
             //splitting occurs here. first we remember old values and reset tracking and assign new quantity for splitting
             if FindSet then
                 repeat
-                    //Splitted := "Qty. (Base)" > "Qty. to Handle (Base)";
                     Splitted := ("Qty. (Base)" > "Qty. to Handle (Base)") and ("Qty. (Base)" > 1) and ("Qty. Outstanding (Base)" > 0);
                     if Splitted then begin
                         SourceWhseActivityLine.Copy(WhseActivityLine);
@@ -678,4 +675,3 @@ page 6014460 "NPR Inventory Pick Scan"
             until WhseActivityLine.Next = 0;
     end;
 }
-

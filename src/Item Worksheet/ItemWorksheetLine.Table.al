@@ -1,41 +1,5 @@
 table 6060042 "NPR Item Worksheet Line"
 {
-    // NPR4.18\BR\20160209  CASE 182391 Object Created
-    // NPR4.19\BR\20160216  CASE 182391 Added Tariff No., Changed the ValidateTableRelation properties on Variety table (Base) fields, fix error creating new items using existing ones
-    // NPR5.22\BR\20160315  CASE 182391 Fixed String overflow error,added fields 500,510,520
-    // NPR5.22\BR\20160323  CASE 182391 Added field Recommended Retail Price and support for updating function, added Created Date Time
-    // NPR5.22\BR\20160405  CASE 238374 Fix attributes not being deleted when deleteing line
-    // NPR5.23\BR\20160602  CASE 240330 Added Support for Prefixs, (+ bugfixed: changed tablerelation of field "Worksheet Name" and some captions)
-    // NPR5.23\BR\20160524  CASE 242329 Item Vendor No. and Internal Barcode fix
-    // NPR5.23\BR\20160525  CASE 242498 Added field Net Weight and Gross Weight
-    // NPR5.23\BR\20160525  CASE 242498 Added support to "Create Vendor  Barcodes"
-    // NPR5.25\BR \20160704 CASE 246088 Added many extra fileds from the Item Table
-    // NPR5.25\BR \20160725 CASE 246088 Set Vendor Item No. as item no
-    // NPR5.25\BR \20160729 CASE 246088 Set ValidateTableRelation and TestTableRelation to No
-    // NPR5.25\BR \20160803 CASE 234602 Added function to query information
-    // NPR5.28\BR \20161123 CASE 259210 Performance tuning
-    // NPR5.29\BR \20161229 CASE 262068 Moved barcode checks to validation
-    // NPR5.29\BR \20161124 CASE 259274 Changes to reflect the new Item Category structure in NAV 2017
-    // NPR5.31\JLK \20170331  CASE 268274 Changed ENU Caption
-    // NPR5.33\BR  \20170607  CASE 279610 Deleted fields: Properties, Item Sales Prize, Program No., Assortment, Auto, Out of Stock Print, Print Quantity, Labels per item, ISBN, Label Date, Open quarry unit cost, Hand Out Item No., Model, Basis Number, It
-    // NPR5.33\BR  \20170629  CASE 280329 Changed Captions and removed unnecessary locals and line breakds, made no of warning non-editable
-    // NPR5.37\BR  \20170816  CASE 268786 Fixed NavOption Error: skip if fields don't exist
-    // NPR5.37\BR  \20170821  CASE 268786 Set Variant lines to Create new if exist
-    // NPR5.37\BR  \20171012  CASE 268786 Fix Error when cycling through Variant Lines
-    // NPR5.37\BR  \20171013  CASE 293422 Changed Field Length Meta Title from 50 to 70
-    // NPR5.38\BR  \20171124  CASE 297587 Added fields Sales Price Start Date and Purchase Price Start Date
-    // NPR5.38\BR  \20171215  CASE 268786 Changed structure to use temp to increate performance
-    // NPR5.38/BR  /20180125  CASE 302803 Added Field "Tax Group Code"
-    // NPR5.39/BR  /20180206  CASE 304421 Do not delete different Variants
-    // NPR5.42/RA/20180507  CASE 310681 Added code on Existing Item No. - OnValidate()
-    // NPR5.48/TJ  /20181115 CASE 330832 Increased Length of field Item Category Code from 10 to 20
-    // NPR5.48/BHR /20190111 CASE 341967 remove blank space from options
-    // NPR5.48/JAVA/20190205  CASE 334163 Transport NPR5.48 - 5 February 2019
-    // NPR5.49/BHR /20190111 CASE 341967 Increase size of Variety Tables from code 20 to code 40
-    // NPR5.50/THRO/20190526 CASE 356260 Bugfix in CheckManualValidation
-    // NPR5.52/THRO/20191002 CASE 370475 Set Item Category Code from Item
-    // NPR5.54/ZESO/20200225 CASE 385388 Set Magento Item, Profit % and Description2 from Item
-
     Caption = 'Item Worksheet Line';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR Item Worksheet Page";
@@ -87,7 +51,6 @@ table 6060042 "NPR Item Worksheet Line"
                             end;
                             if "Item No." = '' then
                                 Validate("Item No.", GetNewItemNo);
-                            //-NPR5.37 [268786]
                             if (CurrFieldNo <> 0) and (xRec.Action = xRec.Action::Skip) and GuiAllowed then begin
                                 ItemWorksheetVariantLine.Reset;
                                 ItemWorksheetVariantLine.SetRange("Worksheet Template Name", "Worksheet Template Name");
@@ -98,20 +61,16 @@ table 6060042 "NPR Item Worksheet Line"
                                         ItemWorksheetVariantLine.SetUpdateFromWorksheetLine(true);
                                         if ItemWorksheetVariantLine.FindSet then
                                             repeat
-                                                //-NPR5.37 [268786]
                                                 if ItemWorksheetVariantLine.Action <> ItemWorksheetVariantLine.Action::Undefined then begin
                                                     ItemWorksheetVariantLine.Validate(Action, ItemWorksheetVariantLine.Action::CreateNew);
                                                     ItemWorksheetVariantLine.Modify(true);
                                                 end;
-                                            //-NPR5.37 [268786]
                                             until ItemWorksheetVariantLine.Next = 0;
                                         "Status Comment" := CopyStr(ItemWorksheetVariantLine.GetStatusCommentText, 1, MaxStrLen("Status Comment"));
                                     end;
                                 end;
                             end;
-                            //+NPR5.37 [268786]
                         end;
-
                 end;
                 UpdateVarietyHeadingText;
             end;
@@ -141,39 +100,20 @@ table 6060042 "NPR Item Worksheet Line"
                 "Sales Unit of Measure" := Item."Sales Unit of Measure";
                 "Purch. Unit of Measure" := Item."Purch. Unit of Measure";
                 "Costing Method" := Item."Costing Method";
-                //-NPR4.19
                 if "No. Series" = '' then
-                    //+NPR4.19
                     "No. Series" := Item."No. Series";
                 "Item Group" := Item."NPR Item Group";
                 "Sales Price" := Item."Unit Price";
                 "Direct Unit Cost" := Item."Last Direct Cost";
-                //-NPR5.38 [302803]
                 "Tax Group Code" := Item."Tax Group Code";
-                //+NPR5.38 [302803]
-                //-NPR5.23 [242498]
-                //IF "Vendor No." <> '' THEN
                 if "Vendor No." = '' then
-                    //+NPR5.23 [242498]
                     "Vendor No." := Item."Vendor No.";
-
-                //-NPR5.23 [242329]
-                //IF (CurrFieldNo <> FIELDNO("Vendor Item No.")) AND (CurrFieldNo <> 0) THEN
-                //  ItemNumberManagement.GetItemItemVendorNo(Item."No.",'',"Vendor No.");
                 if "Vendor Item No." = '' then
                     "Vendor Item No." := ItemNumberManagement.GetItemItemVendorNo(Item."No.", '', "Vendor No.");
-                //+NPR5.23 [242329]
 
-                //-NPR5.23 [242329]
-                //IF (CurrFieldNo <> FIELDNO("Internal Bar Code")) AND (CurrFieldNo <> 0) THEN
-                //  ItemNumberManagement.GetItemBarcode(Item."No.",'','',"Vendor No.");
-                //-NPR5.42
-                //IF "Internal Bar Code" = '' THEN
                 if ItemWorksheetTemplate2.Get("Worksheet Template Name") then;
                 if ("Internal Bar Code" = '') and not ItemWorksheetTemplate2."Do not Apply Internal Barcode" then
-                    //+NPR5.42
                     "Internal Bar Code" := ItemNumberManagement.GetItemBarcode(Item."No.", '', '', "Vendor No.");
-                //+NPR5.23 [242329]
 
                 if ItemWorksheetItemMgt.ItemVariantExists("Existing Item No.") then
                     "Use Variant" := true
@@ -183,86 +123,60 @@ table 6060042 "NPR Item Worksheet Line"
 
                 "Variety Group" := Item."NPR Variety Group";
                 "Cross Variety No." := Item."NPR Cross Variety No.";
-
-                //-NPR5.23 [242498]
                 "Gross Weight" := Item."Gross Weight";
                 "Net Weight" := Item."Net Weight";
-                //+NPR5.23 [242498]
-                //-NPR5.52 [370475]
                 "Item Category Code" := Item."Item Category Code";
-                //-NPR5.52 [370475]
-
-
-                //-NPR5.54 [385388]
                 "Profit %" := Item."Profit %";
                 "Description 2" := Item."Description 2";
                 if Item."NPR Magento Item" then
                     "Magento Item" := "Magento Item"::Yes
                 else
                     "Magento Item" := "Magento Item"::No;
-                //+NPR5.54 [385388]
 
                 CopyItemAttributes(Item."No.");
 
                 "Variety 1" := Item."NPR Variety 1";
-                //-NPR4.19
                 if VRTTable.Get("Variety 1", Item."NPR Variety 1 Table") then
                     if VRTTable."Is Copy" and (Action = Action::CreateNew) then begin
                         Validate("Variety 1 Table (Base)", VRTTable."Copy from");
                         "Create Copy of Variety 1 Table" := true;
                     end else begin
-                        //+NPR4.19
                         Validate("Variety 1 Table (Base)", Item."NPR Variety 1 Table");
                         "Create Copy of Variety 1 Table" := false;
-                        //-NPR4.19
                     end;
-                //+NPR4.19
 
                 "Variety 2" := Item."NPR Variety 2";
-                //-NPR4.19
                 if VRTTable.Get("Variety 2", Item."NPR Variety 2 Table") then
                     if VRTTable."Is Copy" and (Action = Action::CreateNew) then begin
                         Validate("Variety 2 Table (Base)", VRTTable."Copy from");
                         "Create Copy of Variety 2 Table" := true;
                     end else begin
-                        //+NPR4.19
                         Validate("Variety 2 Table (Base)", Item."NPR Variety 2 Table");
                         "Create Copy of Variety 2 Table" := false;
-                        //-NPR4.19
                     end;
-                //+NPR4.19
 
                 "Variety 3" := Item."NPR Variety 3";
-                //-NPR4.19
                 if VRTTable.Get("Variety 3", Item."NPR Variety 3 Table") then
                     if VRTTable."Is Copy" and (Action = Action::CreateNew) then begin
                         Validate("Variety 3 Table (Base)", VRTTable."Copy from");
                         "Create Copy of Variety 3 Table" := true;
                     end else begin
-                        //+NPR4.19
                         Validate("Variety 3 Table (Base)", Item."NPR Variety 3 Table");
                         "Create Copy of Variety 3 Table" := false;
-                        //-NPR4.19
                     end;
-                //+NPR4.19
 
                 "Variety 4" := Item."NPR Variety 4";
-                //-NPR4.19
                 if VRTTable.Get("Variety 4", Item."NPR Variety 4 Table") then
                     if VRTTable."Is Copy" and (Action = Action::CreateNew) then begin
                         Validate("Variety 4 Table (Base)", VRTTable."Copy from");
                         "Create Copy of Variety 4 Table" := true;
                     end else begin
-                        //+NPR4.19
                         Validate("Variety 4 Table (Base)", Item."NPR Variety 4 Table");
                         "Create Copy of Variety 4 Table" := false;
-                        //-NPR4.19
                     end;
-                //+NPR4.19
 
                 FillVarietyTableNew;
 
-                //-NPR4.19
                 if Action = Action::CreateNew then begin
                     if "Existing Item No." <> '' then begin
                         if "Item No." = '' then
@@ -270,13 +184,7 @@ table 6060042 "NPR Item Worksheet Line"
                     end;
                 end;
                 UpdateVarietyHeadingText;
-                //+NPR4.19
-
-                //CopyItemVariants(3);
-
-                //-NPR5.25 [246088]
                 FillMappedFields;
-                //+NPR5.25 [246088]
             end;
         }
         field(6; "Item No."; Code[20])
@@ -284,8 +192,6 @@ table 6060042 "NPR Item Worksheet Line"
             Caption = 'Item No.';
             DataClassification = CustomerContent;
             TableRelation = Item;
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
 
             trigger OnValidate()
@@ -307,10 +213,8 @@ table 6060042 "NPR Item Worksheet Line"
             trigger OnValidate()
             begin
                 ItemWorksheetItemMgt.MatchItemNo(Rec);
-                //-NPR5.25 [246088]
                 if ("Existing Item No." = '') then
                     Validate(Action);
-                //+NPR5.25 [246088]
             end;
         }
         field(8; "Internal Bar Code"; Code[20])
@@ -322,9 +226,6 @@ table 6060042 "NPR Item Worksheet Line"
             var
                 AlternativeNo: Record "NPR Alternative No.";
             begin
-                //-NPR5.29 [262068]
-                //ItemNumberManagement.CheckInternalBarCode("Internal Bar Code");
-                //+NPR5.29 [262068]
                 ItemWorksheetItemMgt.MatchItemNo(Rec);
             end;
         }
@@ -359,12 +260,6 @@ table 6060042 "NPR Item Worksheet Line"
             InitValue = Undefined;
             OptionCaption = 'Inventory,Service,,,,,,,,Undefined';
             OptionMembers = Inventory,Service,,,,,,,,Undefined;
-
-            trigger OnValidate()
-            var
-                ItemLedgEntry: Record "Item Ledger Entry";
-            begin
-            end;
         }
         field(15; "Shelf No."; Code[10])
         {
@@ -378,8 +273,6 @@ table 6060042 "NPR Item Worksheet Line"
             DataClassification = CustomerContent;
             Editable = false;
             TableRelation = Currency;
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(17; "Direct Unit Cost"; Decimal)
@@ -407,8 +300,6 @@ table 6060042 "NPR Item Worksheet Line"
             Caption = 'Base Unit of Measure';
             DataClassification = CustomerContent;
             TableRelation = "Unit of Measure";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
 
             trigger OnValidate()
@@ -425,16 +316,12 @@ table 6060042 "NPR Item Worksheet Line"
             Caption = 'Inventory Posting Group';
             DataClassification = CustomerContent;
             TableRelation = "Inventory Posting Group";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
-        field(24; "Costing Method"; Option)
+        field(24; "Costing Method"; Enum "Costing Method")
         {
             Caption = 'Costing Method';
             DataClassification = CustomerContent;
-            OptionCaption = 'FIFO,LIFO,Specific,Average,Standard';
-            OptionMembers = FIFO,LIFO,Specific,"Average",Standard;
         }
         field(25; "Item Disc. Group"; Code[20])
         {
@@ -442,8 +329,6 @@ table 6060042 "NPR Item Worksheet Line"
             DataClassification = CustomerContent;
             Description = 'NPR5.25';
             TableRelation = "Item Discount Group";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(26; "Allow Invoice Disc."; Option)
@@ -507,9 +392,6 @@ table 6060042 "NPR Item Worksheet Line"
             var
                 AlternativeNo: Record "NPR Alternative No.";
             begin
-                //-NPR5.29 [262068]
-                //ItemNumberManagement.CheckExternalBarCode("Vendors Bar Code");
-                //+NPR5.29 [262068]
                 ItemWorksheetItemMgt.MatchItemNo(Rec);
             end;
         }
@@ -599,8 +481,6 @@ table 6060042 "NPR Item Worksheet Line"
             Caption = 'Tariff No.';
             DataClassification = CustomerContent;
             TableRelation = "Tariff Number";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(48; "Duty Unit Conversion"; Decimal)
@@ -616,8 +496,6 @@ table 6060042 "NPR Item Worksheet Line"
             DataClassification = CustomerContent;
             Description = 'NPR5.25';
             TableRelation = "Country/Region";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(50; "Budget Quantity"; Decimal)
@@ -658,21 +536,12 @@ table 6060042 "NPR Item Worksheet Line"
             InitValue = Undefined;
             OptionCaption = 'No,Yes,Undefined';
             OptionMembers = No,Yes,Undefined;
-
-            trigger OnValidate()
-            var
-                VATPostingSetup: Record "VAT Posting Setup";
-                SalesSetup: Record "Sales & Receivables Setup";
-            begin
-            end;
         }
         field(89; "VAT Bus. Posting Group"; Code[10])
         {
             Caption = 'VAT Bus. Posting Group';
             DataClassification = CustomerContent;
             TableRelation = "VAT Business Posting Group";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
 
             trigger OnValidate()
@@ -685,8 +554,6 @@ table 6060042 "NPR Item Worksheet Line"
             Caption = 'VAT Bus. Posting Gr. (Price)';
             DataClassification = CustomerContent;
             TableRelation = "VAT Business Posting Group";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(91; "Gen. Prod. Posting Group"; Code[10])
@@ -694,8 +561,6 @@ table 6060042 "NPR Item Worksheet Line"
             Caption = 'Gen. Prod. Posting Group';
             DataClassification = CustomerContent;
             TableRelation = "Gen. Product Posting Group";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(95; "Country/Region of Origin Code"; Code[10])
@@ -704,8 +569,6 @@ table 6060042 "NPR Item Worksheet Line"
             DataClassification = CustomerContent;
             Description = 'NPR5.25';
             TableRelation = "Country/Region";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(96; "Automatic Ext. Texts"; Option)
@@ -722,8 +585,6 @@ table 6060042 "NPR Item Worksheet Line"
             Caption = 'No. Series';
             DataClassification = CustomerContent;
             TableRelation = "No. Series";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(98; "Tax Group Code"; Code[10])
@@ -731,8 +592,6 @@ table 6060042 "NPR Item Worksheet Line"
             Caption = 'Tax Group Code';
             DataClassification = CustomerContent;
             TableRelation = "Tax Group";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(99; "VAT Prod. Posting Group"; Code[10])
@@ -740,8 +599,6 @@ table 6060042 "NPR Item Worksheet Line"
             Caption = 'VAT Prod. Posting Group';
             DataClassification = CustomerContent;
             TableRelation = "VAT Product Posting Group";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
 
             trigger OnValidate()
@@ -750,7 +607,6 @@ table 6060042 "NPR Item Worksheet Line"
             begin
                 if not VATPostingSetup.Get("VAT Bus. Posting Group", "VAT Prod. Posting Group") then
                     VATPostingSetup.Init;
-                //"VAT Difference" := 0;
             end;
         }
         field(100; Reserve; Option)
@@ -769,8 +625,6 @@ table 6060042 "NPR Item Worksheet Line"
             Caption = 'Global Dimension 1 Code';
             DataClassification = CustomerContent;
             TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
 
             trigger OnValidate()
@@ -784,8 +638,6 @@ table 6060042 "NPR Item Worksheet Line"
             Caption = 'Global Dimension 2 Code';
             DataClassification = CustomerContent;
             TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
 
             trigger OnValidate()
@@ -829,8 +681,6 @@ table 6060042 "NPR Item Worksheet Line"
             DataClassification = CustomerContent;
             Description = 'Variety';
             TableRelation = "NPR Variety";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(201; "Variety 1 Table (Base)"; Code[40])
@@ -839,8 +689,6 @@ table 6060042 "NPR Item Worksheet Line"
             DataClassification = CustomerContent;
             Description = 'Variety';
             TableRelation = "NPR Variety Table".Code WHERE(Type = FIELD("Variety 1"));
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
 
             trigger OnValidate()
@@ -862,7 +710,6 @@ table 6060042 "NPR Item Worksheet Line"
 
             trigger OnValidate()
             begin
-                //"Variety 1 Table (New)" := GetVariety1Table();
                 if not "Create Copy of Variety 1 Table" then
                     if IsLockedVariety(1) then
                         if IsAddedVarietyValue(1) then
@@ -887,8 +734,6 @@ table 6060042 "NPR Item Worksheet Line"
             DataClassification = CustomerContent;
             Description = 'Variety';
             TableRelation = "NPR Variety";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(211; "Variety 2 Table (Base)"; Code[40])
@@ -897,8 +742,6 @@ table 6060042 "NPR Item Worksheet Line"
             DataClassification = CustomerContent;
             Description = 'Variety';
             TableRelation = "NPR Variety Table".Code WHERE(Type = FIELD("Variety 2"));
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
 
             trigger OnValidate()
@@ -920,7 +763,6 @@ table 6060042 "NPR Item Worksheet Line"
 
             trigger OnValidate()
             begin
-                //"Variety 2 Table (New)" := GetVariety2Table();
                 if not "Create Copy of Variety 2 Table" then
                     if IsLockedVariety(2) then
                         if IsAddedVarietyValue(2) then
@@ -945,8 +787,6 @@ table 6060042 "NPR Item Worksheet Line"
             DataClassification = CustomerContent;
             Description = 'Variety';
             TableRelation = "NPR Variety";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(221; "Variety 3 Table (Base)"; Code[40])
@@ -955,8 +795,6 @@ table 6060042 "NPR Item Worksheet Line"
             DataClassification = CustomerContent;
             Description = 'Variety';
             TableRelation = "NPR Variety Table".Code WHERE(Type = FIELD("Variety 3"));
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
 
             trigger OnValidate()
@@ -978,7 +816,6 @@ table 6060042 "NPR Item Worksheet Line"
 
             trigger OnValidate()
             begin
-                //"Variety 3 Table (New)" := GetVariety3Table();
                 if not "Create Copy of Variety 3 Table" then
                     if IsLockedVariety(3) then
                         if IsAddedVarietyValue(3) then
@@ -1003,8 +840,6 @@ table 6060042 "NPR Item Worksheet Line"
             DataClassification = CustomerContent;
             Description = 'Variety';
             TableRelation = "NPR Variety";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(231; "Variety 4 Table (Base)"; Code[40])
@@ -1013,8 +848,6 @@ table 6060042 "NPR Item Worksheet Line"
             DataClassification = CustomerContent;
             Description = 'Variety';
             TableRelation = "NPR Variety Table".Code WHERE(Type = FIELD("Variety 4"));
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
 
             trigger OnValidate()
@@ -1036,7 +869,6 @@ table 6060042 "NPR Item Worksheet Line"
 
             trigger OnValidate()
             begin
-                //"Variety 4 Table (New)" := GetVariety4Table();
                 if not "Create Copy of Variety 4 Table" then
                     if IsLockedVariety(4) then
                         if IsAddedVarietyValue(4) then
@@ -1069,15 +901,12 @@ table 6060042 "NPR Item Worksheet Line"
             DataClassification = CustomerContent;
             Description = 'Variety';
             TableRelation = "NPR Variety Group";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
 
             trigger OnValidate()
             var
                 VRTCheck: Codeunit "NPR Variety Check";
             begin
-                //-IW1.10
                 if "Variety Group" <> xRec."Variety Group" then begin
                     //updateitem
                     if "Variety Group" = '' then
@@ -1135,22 +964,13 @@ table 6060042 "NPR Item Worksheet Line"
 
                     Validate("Cross Variety No.", VRTGroup."Cross Variety No.");
 
-                    //-NPR4.19
                     if xRec."Variety Group" <> '' then begin
                         if HasVarietyLines then
                             Error(TextVarietyErrror, FieldCaption("Variety Group"));
                     end else begin
                         UpdateAddedVarietyValues;
                     end;
-                    //+NPR4.19
-
-                    //check change allowed
-                    //VRTCheck.ChangeItemVariety(Rec, xRec);
-
-                    //copy base table info (if needed)
-                    //VRTGroup.CopyTableData(Rec);
                 end;
-                //+IW1.10
             end;
         }
         field(260; "Recommended Retail Price"; Decimal)
@@ -1197,7 +1017,7 @@ table 6060042 "NPR Item Worksheet Line"
         }
         field(500; "Variety Lines to Skip"; Integer)
         {
-            CalcFormula = Count ("NPR Item Worksh. Variant Line" WHERE("Worksheet Template Name" = FIELD("Worksheet Template Name"),
+            CalcFormula = Count("NPR Item Worksh. Variant Line" WHERE("Worksheet Template Name" = FIELD("Worksheet Template Name"),
                                                                      "Worksheet Name" = FIELD("Worksheet Name"),
                                                                      "Worksheet Line No." = FIELD("Line No."),
                                                                      Action = CONST(Skip)));
@@ -1207,7 +1027,7 @@ table 6060042 "NPR Item Worksheet Line"
         }
         field(510; "Variety Lines to Update"; Integer)
         {
-            CalcFormula = Count ("NPR Item Worksh. Variant Line" WHERE("Worksheet Template Name" = FIELD("Worksheet Template Name"),
+            CalcFormula = Count("NPR Item Worksh. Variant Line" WHERE("Worksheet Template Name" = FIELD("Worksheet Template Name"),
                                                                      "Worksheet Name" = FIELD("Worksheet Name"),
                                                                      "Worksheet Line No." = FIELD("Line No."),
                                                                      Action = CONST(Update)));
@@ -1217,7 +1037,7 @@ table 6060042 "NPR Item Worksheet Line"
         }
         field(520; "Variety Lines to Create"; Integer)
         {
-            CalcFormula = Count ("NPR Item Worksh. Variant Line" WHERE("Worksheet Template Name" = FIELD("Worksheet Template Name"),
+            CalcFormula = Count("NPR Item Worksh. Variant Line" WHERE("Worksheet Template Name" = FIELD("Worksheet Template Name"),
                                                                      "Worksheet Name" = FIELD("Worksheet Name"),
                                                                      "Worksheet Line No." = FIELD("Line No."),
                                                                      Action = CONST(CreateNew)));
@@ -1232,7 +1052,7 @@ table 6060042 "NPR Item Worksheet Line"
         }
         field(610; "No. of Changes"; Integer)
         {
-            CalcFormula = Count ("NPR Item Worksh. Field Change" WHERE("Worksheet Template Name" = FIELD("Worksheet Template Name"),
+            CalcFormula = Count("NPR Item Worksh. Field Change" WHERE("Worksheet Template Name" = FIELD("Worksheet Template Name"),
                                                                      "Worksheet Name" = FIELD("Worksheet Name"),
                                                                      "Worksheet Line No." = FIELD("Line No."),
                                                                      Process = CONST(true)));
@@ -1243,7 +1063,7 @@ table 6060042 "NPR Item Worksheet Line"
         }
         field(611; "No. of Warnings"; Integer)
         {
-            CalcFormula = Count ("NPR Item Worksh. Field Change" WHERE("Worksheet Template Name" = FIELD("Worksheet Template Name"),
+            CalcFormula = Count("NPR Item Worksh. Field Change" WHERE("Worksheet Template Name" = FIELD("Worksheet Template Name"),
                                                                      "Worksheet Name" = FIELD("Worksheet Name"),
                                                                      "Worksheet Line No." = FIELD("Line No."),
                                                                      Warning = CONST(true)));
@@ -1284,8 +1104,6 @@ table 6060042 "NPR Item Worksheet Line"
             DataClassification = CustomerContent;
             Description = 'NPR5.25';
             TableRelation = "No. Series";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(5407; "Scrap %"; Decimal)
@@ -1382,8 +1200,6 @@ table 6060042 "NPR Item Worksheet Line"
             Caption = 'Sales Unit of Measure';
             DataClassification = CustomerContent;
             TableRelation = "Unit of Measure";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(5426; "Purch. Unit of Measure"; Code[10])
@@ -1466,8 +1282,6 @@ table 6060042 "NPR Item Worksheet Line"
             Caption = 'Manufacturer Code';
             DataClassification = CustomerContent;
             TableRelation = Manufacturer;
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(5702; "Item Category Code"; Code[20])
@@ -1475,35 +1289,7 @@ table 6060042 "NPR Item Worksheet Line"
             Caption = 'Item Category Code';
             DataClassification = CustomerContent;
             TableRelation = "Item Category";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
-
-            trigger OnValidate()
-            var
-                ItemCategory: Record "Item Category";
-            begin
-                //-NPR5.29 [259274]
-                // IF "Item Category Code" <> xRec."Item Category Code" THEN BEGIN
-                //  IF ItemCategory.GET("Item Category Code") THEN BEGIN
-                //    IF "Gen. Prod. Posting Group" = '' THEN
-                //      VALIDATE("Gen. Prod. Posting Group",ItemCategory."Def. Gen. Prod. Posting Group");
-                //    IF "VAT Prod. Posting Group" = '' THEN
-                //      VALIDATE("VAT Prod. Posting Group",ItemCategory."Def. VAT Prod. Posting Group");
-                //    IF "Inventory Posting Group" = '' THEN
-                //      VALIDATE("Inventory Posting Group",ItemCategory."Def. Inventory Posting Group");
-                //    IF "Tax Group Code" = '' THEN
-                //      VALIDATE("Tax Group Code",ItemCategory."Def. Tax Group Code");
-                //    VALIDATE("Costing Method",ItemCategory."Def. Costing Method");
-                //  END;
-                //
-                //  IF NOT ProductGrp.GET("Item Category Code","Product Group Code") THEN
-                //    VALIDATE("Product Group Code",'')
-                //  ELSE
-                //    VALIDATE("Product Group Code");
-                // END;
-                //+NPR5.29 [259274]
-            end;
         }
         field(5704; "Product Group Code"; Code[10])
         {
@@ -1519,15 +1305,7 @@ table 6060042 "NPR Item Worksheet Line"
             DataClassification = CustomerContent;
             Description = 'NPR5.25';
             TableRelation = "Service Item Group".Code;
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
-
-            trigger OnValidate()
-            var
-                ResSkill: Record "Resource Skill";
-            begin
-            end;
         }
         field(6500; "Item Tracking Code"; Code[10])
         {
@@ -1535,8 +1313,6 @@ table 6060042 "NPR Item Worksheet Line"
             DataClassification = CustomerContent;
             Description = 'NPR5.25';
             TableRelation = "Item Tracking Code";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(6501; "Lot Nos."; Code[10])
@@ -1545,8 +1321,6 @@ table 6060042 "NPR Item Worksheet Line"
             DataClassification = CustomerContent;
             Description = 'NPR5.25';
             TableRelation = "No. Series";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(6502; "Expiration Calculation"; DateFormula)
@@ -1561,8 +1335,6 @@ table 6060042 "NPR Item Worksheet Line"
             DataClassification = CustomerContent;
             Description = 'NPR5.25';
             TableRelation = "Special Equipment";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(7302; "Put-away Template Code"; Code[10])
@@ -1571,8 +1343,6 @@ table 6060042 "NPR Item Worksheet Line"
             DataClassification = CustomerContent;
             Description = 'NPR5.25';
             TableRelation = "Put-away Template Header";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(7307; "Put-away Unit of Measure Code"; Code[10])
@@ -1588,16 +1358,7 @@ table 6060042 "NPR Item Worksheet Line"
             DataClassification = CustomerContent;
             Description = 'NPR5.25';
             TableRelation = "Phys. Invt. Counting Period";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
-
-            trigger OnValidate()
-            var
-                PhysInvtCountPeriod: Record "Phys. Invt. Counting Period";
-                PhysInvtCountPeriodMgt: Codeunit "Phys. Invt. Count.-Management";
-            begin
-            end;
         }
         field(7384; "Use Cross-Docking"; Option)
         {
@@ -1686,8 +1447,6 @@ table 6060042 "NPR Item Worksheet Line"
             Caption = 'Item Group';
             DataClassification = CustomerContent;
             TableRelation = "NPR Item Group" WHERE(Blocked = CONST(false));
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
 
             trigger OnValidate()
@@ -1704,9 +1463,7 @@ table 6060042 "NPR Item Worksheet Line"
                 "Inventory Posting Group" := ItemGroup."Inventory Posting Group";
                 "Base Unit of Measure" := ItemGroup."Base Unit of Measure";
                 "Sales Unit of Measure" := ItemGroup."Sales Unit of Measure";
-                //-NPR5.38 [302803]
                 "Tax Group Code" := ItemGroup."Tax Group Code";
-                //+NPR5.38 [302803]
 
                 "Purch. Unit of Measure" := ItemGroup."Purch. Unit of Measure";
                 if Description = '' then
@@ -1742,10 +1499,6 @@ table 6060042 "NPR Item Worksheet Line"
             Caption = 'Label barcode';
             DataClassification = CustomerContent;
             Description = 'NPR5.25';
-            //This property is currently not supported
-            //TestTableRelation = false;
-            //The property 'ValidateTableRelation' can only be set if the property 'TableRelation' is set
-            //ValidateTableRelation = false;
         }
         field(6014418; "Explode BOM auto"; Option)
         {
@@ -1813,8 +1566,6 @@ table 6060042 "NPR Item Worksheet Line"
             DataClassification = CustomerContent;
             Description = 'NPR5.25';
             TableRelation = "NPR Insurance Category";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(6014509; "Item Brand"; Code[10])
@@ -1874,8 +1625,6 @@ table 6060042 "NPR Item Worksheet Line"
             DataClassification = CustomerContent;
             Description = 'NPR5.25';
             TableRelation = "NPR TM Ticket Type";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(6151400; "Magento Item"; Option)
@@ -1902,8 +1651,6 @@ table 6060042 "NPR Item Worksheet Line"
             DataClassification = CustomerContent;
             Description = 'NPR5.25';
             TableRelation = "NPR Magento Attribute Set";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(6151415; "Magento Description"; BLOB)
@@ -1930,8 +1677,6 @@ table 6060042 "NPR Item Worksheet Line"
             DataClassification = CustomerContent;
             Description = 'NPR5.25';
             TableRelation = "NPR Magento Brand";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(6151435; "Seo Link"; Text[250])
@@ -2016,8 +1761,6 @@ table 6060042 "NPR Item Worksheet Line"
             DataClassification = CustomerContent;
             Description = 'NPR5.25';
             TableRelation = "Routing Header";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(99000751; "Production BOM No."; Code[20])
@@ -2026,18 +1769,7 @@ table 6060042 "NPR Item Worksheet Line"
             DataClassification = CustomerContent;
             Description = 'NPR5.25';
             TableRelation = "Production BOM Header";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
-
-            trigger OnValidate()
-            var
-                MfgSetup: Record "Manufacturing Setup";
-                ProdBOMHeader: Record "Production BOM Header";
-                ItemUnitOfMeasure: Record "Item Unit of Measure";
-                CalcLowLevel: Codeunit "Calculate Low-Level Code";
-            begin
-            end;
         }
         field(99000757; "Overhead Rate"; Decimal)
         {
@@ -2055,14 +1787,6 @@ table 6060042 "NPR Item Worksheet Line"
             InitValue = Undefined;
             OptionCaption = 'None,Tracking Only,Tracking & Action Msg.,,,,,,,Undefined';
             OptionMembers = "None","Tracking Only","Tracking & Action Msg.",,,,,,,Undefined;
-
-            trigger OnValidate()
-            var
-                ReservEntry: Record "Reservation Entry";
-                ActionMessageEntry: Record "Action Message Entry";
-                TempReservationEntry: Record "Reservation Entry" temporary;
-            begin
-            end;
         }
         field(99000875; Critical; Option)
         {
@@ -2174,17 +1898,11 @@ table 6060042 "NPR Item Worksheet Line"
             "Sales Price Currency Code" := LastItemWorksheetLine."Sales Price Currency Code";
         if "Purchase Price Currency Code" = '' then
             "Purchase Price Currency Code" := LastItemWorksheetLine."Purchase Price Currency Code";
-        //-NPR4.19
-        //"No. Series" := LastItemWorksheetLine."No. Series";
-        //IF "No. Series"  = '' THEN
-        //+NPR4.19
         "No. Series" := ItemWorksheet."No. Series";
         if "No. Series" = '' then
             "No. Series" := ItemWorksheetTemplate."No. Series";
-        //-NPR4.19
         if "No. Series" = '' then
             "No. Series" := LastItemWorksheetLine."No. Series";
-        //+NPR4.19
 
         if "Vendor No." = '' then
             "Vendor No." := LastItemWorksheetLine."Vendor No.";
@@ -2273,7 +1991,6 @@ table 6060042 "NPR Item Worksheet Line"
 
     local procedure GetVariety1Table(): Code[20]
     begin
-        //-IW1.10
         if not "Create Copy of Variety 1 Table" then
             exit("Variety 1 Table (Base)");
 
@@ -2292,12 +2009,10 @@ table 6060042 "NPR Item Worksheet Line"
                 exit(VRTGroup."Variety 1 Table" + '-' + NewNosNoText);
         end;
         exit('');
-        //+IW1.10
     end;
 
     local procedure GetVariety2Table(): Code[20]
     begin
-        //-IW1.10
         if not VRTGroup."Create Copy of Variety 2 Table" then
             exit("Variety 2 Table (Base)");
 
@@ -2316,12 +2031,10 @@ table 6060042 "NPR Item Worksheet Line"
                 exit(VRTGroup."Variety 2 Table" + '-' + NewNosNoText);
         end;
         exit('');
-        //+IW1.10
     end;
 
     local procedure GetVariety3Table(): Code[20]
     begin
-        //-IW1.10
         if not VRTGroup."Create Copy of Variety 3 Table" then
             exit("Variety 3 Table (Base)");
 
@@ -2340,12 +2053,10 @@ table 6060042 "NPR Item Worksheet Line"
                 exit(VRTGroup."Variety 3 Table" + '-' + NewNosNoText);
         end;
         exit('');
-        //+IW1.10
     end;
 
     local procedure GetVariety4Table(): Code[20]
     begin
-        //-IW1.10
         if not VRTGroup."Create Copy of Variety 4 Table" then
             exit("Variety 4 Table (Base)");
 
@@ -2364,7 +2075,6 @@ table 6060042 "NPR Item Worksheet Line"
                 exit(VRTGroup."Variety 4 Table" + '-' + NewNosNoText);
         end;
         exit('');
-        //+IW1.10
     end;
 
     local procedure GetItem()
@@ -2387,14 +2097,12 @@ table 6060042 "NPR Item Worksheet Line"
     begin
         ItemWorksheetTemplate.Get("Worksheet Template Name");
 
-        //-NPR4.19
         ItemWorksheet.Get("Worksheet Template Name", "Worksheet Name");
         if ItemWorksheet."No. Series" <> '' then
             "No. Series" := ItemWorksheet."No. Series"
         else
             if ItemWorksheetTemplate."No. Series" <> '' then
                 "No. Series" := ItemWorksheetTemplate."No. Series";
-        //+NPR4.19
 
         if "No. Series" = '' then
             Validate("No. Series", ItemWorksheetTemplate."No. Series");
@@ -2408,11 +2116,9 @@ table 6060042 "NPR Item Worksheet Line"
             ItemWorksheetTemplate."Item No. Creation by"::NoSeriesInWorksheet:
                 begin
                     NoSeriesMgt.InitSeries("No. Series", "No. Series", 0D, "Item No.", "No. Series");
-                    //-NPR5.23
                     Prefix := ItemNoPrefix;
                     if StrLen(Prefix + "Item No.") < MaxStrLen("Item No.") then
                         exit(Prefix + "Item No.");
-                    //+NPR5.23
                     exit("Item No.");
                 end;
             ItemWorksheetTemplate."Item No. Creation by"::NoSeriesOnProcessing:
@@ -2422,15 +2128,11 @@ table 6060042 "NPR Item Worksheet Line"
             ItemWorksheetTemplate."Item No. Creation by"::VendorItemNo:
                 begin
                     NoSeriesMgt.TestManual("No. Series");
-                    //-NPR5.25 [246088]
                     if "Vendor Item No." = '' then
                         exit('');
-                    //+NPR5.25 [246088]
-                    //-NPR5.23
                     Prefix := ItemNoPrefix;
                     if StrLen(Prefix + "Vendor Item No.") < MaxStrLen("Vendor Item No.") then
                         exit(Prefix + "Vendor Item No.");
-                    //+NPR5.23
                     exit("Vendor Item No.");
                 end;
         end;
@@ -2519,26 +2221,6 @@ table 6060042 "NPR Item Worksheet Line"
             CopyItemVariants(3)
         else
             CopyItemVarieties(LinesType, IncludeHeaders);
-        //-NPR5.28 [259210]
-        // IF IncludeHeaders THEN BEGIN
-        //  //Recalc level on each non-header line
-        //  ItemWorksheetVar.RESET;
-        //  ItemWorksheetVar.SETRANGE("Worksheet Template Name", "Worksheet Template Name");
-        //  ItemWorksheetVar.SETRANGE("Worksheet Name", "Worksheet Name");
-        //  ItemWorksheetVar.SETRANGE("Worksheet Line No.", "Line No.");
-        //  ItemWorksheetVar.SETFILTER("Heading Text",'%1','');
-        //  IF ItemWorksheetVar.FINDSET THEN REPEAT
-        //    //-NPR5.28 [259210]
-        //    NewLevel := ItemWorksheetVar.CalcLevel;
-        //    IF NewLevel <> ItemWorksheetVar.Level THEN BEGIN
-        //      ItemWorksheetVar.Level := NewLevel;
-        //      ItemWorksheetVar.MODIFY;
-        //    END;
-        //    //ItemWorksheetVar.MODIFY(TRUE);
-        //    //+NPR5.28 [259210]
-        //  UNTIL ItemWorksheetVar.NEXT = 0;
-        // END;
-        //+NPR5.28 [259210]
         if IncludeHeaders then
             UpdateVarietyHeadingText;
     end;
@@ -2603,16 +2285,10 @@ table 6060042 "NPR Item Worksheet Line"
         ExistingVariantCode: Code[20];
         NewLevel: Integer;
     begin
-        //-NPR4.19
-        //InitItemWorksheetVarietyValue(ItemWorksheetVarietyValue1,"Variety 1","Variety 1 Table (New)");
-        //InitItemWorksheetVarietyValue(ItemWorksheetVarietyValue2,"Variety 2","Variety 2 Table (New)");
-        //InitItemWorksheetVarietyValue(ItemWorksheetVarietyValue3,"Variety 3","Variety 3 Table (New)");
-        //InitItemWorksheetVarietyValue(ItemWorksheetVarietyValue4,"Variety 4","Variety 4 Table (New)");
         InitItemWorksheetVarietyValue(ItemWorksheetVarietyValue1, "Variety 1", "Variety 1 Table (Base)");
         InitItemWorksheetVarietyValue(ItemWorksheetVarietyValue2, "Variety 2", "Variety 2 Table (Base)");
         InitItemWorksheetVarietyValue(ItemWorksheetVarietyValue3, "Variety 3", "Variety 3 Table (Base)");
         InitItemWorksheetVarietyValue(ItemWorksheetVarietyValue4, "Variety 4", "Variety 4 Table (Base)");
-        //+NPR4.19
 
         ItemWorksheetVariantLine.Reset;
         ItemWorksheetVariantLine.SetRange("Worksheet Template Name", "Worksheet Template Name");
@@ -2623,18 +2299,13 @@ table 6060042 "NPR Item Worksheet Line"
         else
             LineNo := 0;
 
-        //-NPR5.38 [268786]
         GetTempVarietyLines(ItemWorksheetVarietyValue1, TempItemWorksheetVarietyValue1, 1, LinesType);
         GetTempVarietyLines(ItemWorksheetVarietyValue2, TempItemWorksheetVarietyValue2, 2, LinesType);
         GetTempVarietyLines(ItemWorksheetVarietyValue3, TempItemWorksheetVarietyValue3, 3, LinesType);
         GetTempVarietyLines(ItemWorksheetVarietyValue4, TempItemWorksheetVarietyValue4, 4, LinesType);
-        //+NPR5.38 [268786]
 
-        //-NPR5.38 [268786]
-        //IF ItemWorksheetVarietyValue1.FINDFIRST THEN REPEAT
         if TempItemWorksheetVarietyValue1.FindFirst then
             repeat
-                //+NPR5.38 [268786]
                 if ("Variety 2 Table (New)" <> '') and IncludeHeaders then begin
                     //Insert Level 1 Header Line
                     LineNo := LineNo + 10000;
@@ -2643,28 +2314,18 @@ table 6060042 "NPR Item Worksheet Line"
                     ItemWorksheetVariantLine."Worksheet Name" := Rec."Worksheet Name";
                     ItemWorksheetVariantLine."Worksheet Line No." := Rec."Line No.";
                     ItemWorksheetVariantLine."Line No." := LineNo;
-                    //-NPR5.38 [268786]
-                    //ItemWorksheetVariantLine."Variety 1 Value" := ItemWorksheetVarietyValue1.Value;
                     ItemWorksheetVariantLine."Variety 1 Value" := TempItemWorksheetVarietyValue1.Value;
-                    //+NPR5.38 [268786]
                     ItemWorksheetVariantLine."Variety 2 Value" := '';
                     ItemWorksheetVariantLine."Variety 3 Value" := '';
                     ItemWorksheetVariantLine."Variety 4 Value" := '';
                     ItemWorksheetVariantLine.Action := ItemWorksheetVariantLine.Action::Undefined;
                     ItemWorksheetVariantLine."Item No." := "Item No.";
-                    //-NPR5.38 [268786]
-                    //ItemWorksheetVariantLine.VALIDATE("Existing Item No.","Existing Item No.");
-                    //ItemWorksheetVariantLine.INSERT(TRUE);
                     ItemWorksheetVariantLine."Existing Item No." := "Existing Item No.";
                     ItemWorksheetVariantLine.Insert;
-                    //+NPR5.38 [268786]
                 end;
 
-                //-NPR5.38 [268786]
-                //IF ItemWorksheetVarietyValue2.FINDFIRST THEN REPEAT
                 if TempItemWorksheetVarietyValue2.FindFirst then
                     repeat
-                        //+NPR5.38 [268786]
                         if ("Variety 3 Table (New)" <> '') and IncludeHeaders then begin
                             //Insert Level 2 Header Line
                             LineNo := LineNo + 10000;
@@ -2673,27 +2334,16 @@ table 6060042 "NPR Item Worksheet Line"
                             ItemWorksheetVariantLine."Worksheet Name" := Rec."Worksheet Name";
                             ItemWorksheetVariantLine."Worksheet Line No." := Rec."Line No.";
                             ItemWorksheetVariantLine."Line No." := LineNo;
-                            //-NPR5.38 [268786]
-                            //ItemWorksheetVariantLine."Variety 1 Value" := ItemWorksheetVarietyValue1.Value;
-                            //ItemWorksheetVariantLine."Variety 2 Value" := ItemWorksheetVarietyValue2.Value;
                             ItemWorksheetVariantLine."Variety 1 Value" := TempItemWorksheetVarietyValue1.Value;
                             ItemWorksheetVariantLine."Variety 2 Value" := TempItemWorksheetVarietyValue2.Value;
-                            //+NPR5.38 [268786]
                             ItemWorksheetVariantLine."Variety 3 Value" := '';
                             ItemWorksheetVariantLine."Variety 4 Value" := '';
                             ItemWorksheetVariantLine.Action := ItemWorksheetVariantLine.Action::Undefined;
-                            //-NPR5.38 [268786]
-                            //ItemWorksheetVariantLine.VALIDATE("Existing Item No.","Existing Item No.");
-                            //ItemWorksheetVariantLine.INSERT(TRUE);
                             ItemWorksheetVariantLine."Existing Item No." := "Existing Item No.";
                             ItemWorksheetVariantLine.Insert;
-                            //+NPR5.38 [268786]
                         end;
-                        //-NPR5.38 [268786]
-                        //IF ItemWorksheetVarietyValue3.FINDFIRST THEN REPEAT
                         if TempItemWorksheetVarietyValue3.FindFirst then
                             repeat
-                                //+NPR5.38 [268786]
                                 if ("Variety 4 Table (New)" <> '') and IncludeHeaders then begin
                                     //Insert Level 3 Header Line
                                     LineNo := LineNo + 10000;
@@ -2702,43 +2352,22 @@ table 6060042 "NPR Item Worksheet Line"
                                     ItemWorksheetVariantLine."Worksheet Name" := Rec."Worksheet Name";
                                     ItemWorksheetVariantLine."Worksheet Line No." := Rec."Line No.";
                                     ItemWorksheetVariantLine."Line No." := LineNo;
-                                    //-NPR5.38 [268786]
-                                    //ItemWorksheetVariantLine."Variety 1 Value" := ItemWorksheetVarietyValue1.Value;
-                                    //ItemWorksheetVariantLine."Variety 2 Value" := ItemWorksheetVarietyValue2.Value;
-                                    //ItemWorksheetVariantLine."Variety 3 Value" := ItemWorksheetVarietyValue3.Value;
                                     ItemWorksheetVariantLine."Variety 1 Value" := TempItemWorksheetVarietyValue1.Value;
                                     ItemWorksheetVariantLine."Variety 2 Value" := TempItemWorksheetVarietyValue2.Value;
                                     ItemWorksheetVariantLine."Variety 3 Value" := TempItemWorksheetVarietyValue3.Value;
-                                    //+NPR5.38 [268786]
                                     ItemWorksheetVariantLine."Variety 4 Value" := '';
                                     ItemWorksheetVariantLine."Item No." := "Item No.";
                                     ItemWorksheetVariantLine.Action := ItemWorksheetVariantLine.Action::Undefined;
                                     ItemWorksheetVariantLine."Item No." := "Item No.";
-                                    //-NPR5.38 [268786]
-                                    //ItemWorksheetVariantLine.VALIDATE("Existing Item No.","Existing Item No.");
-                                    //ItemWorksheetVariantLine.INSERT(TRUE);
                                     ItemWorksheetVariantLine."Existing Item No." := "Existing Item No.";
                                     ItemWorksheetVariantLine.Insert;
-                                    //+NPR5.38 [268786]
                                 end;
 
-                                //-NPR5.38 [268786]
-                                //IF ItemWorksheetVarietyValue4.FINDFIRST THEN REPEAT
                                 if TempItemWorksheetVarietyValue4.FindFirst then
                                     repeat
-
-                                        //-NPR4.19
-                                        //IF (((ItemWorksheetVarietyValue4.Value <> '') OR ("Variety 4 Table (New)" = '')) AND
-                                        //    ((ItemWorksheetVarietyValue3.Value <> '') OR ("Variety 3 Table (New)" = '')) AND
-                                        //     ((ItemWorksheetVarietyValue2.Value <> '') OR ("Variety 2 Table (New)" = '')))
-                                        //IF (((ItemWorksheetVarietyValue4.Value <> '') OR ("Variety 4 Table (Base)" = '')) AND
-                                        //    ((ItemWorksheetVarietyValue3.Value <> '') OR ("Variety 3 Table (Base)" = '')) AND
-                                        //    ((ItemWorksheetVarietyValue2.Value <> '') OR ("Variety 2 Table (Base)" = '')))
                                         if (((TempItemWorksheetVarietyValue4.Value <> '') or ("Variety 4 Table (Base)" = '')) and
                                             ((TempItemWorksheetVarietyValue3.Value <> '') or ("Variety 3 Table (Base)" = '')) and
                                             ((TempItemWorksheetVarietyValue2.Value <> '') or ("Variety 2 Table (Base)" = '')))
-                                          //+NPR5.38 [268786]
-                                          //+NPR4.19
                                           then begin
                                             UpdateLineNo := true;
                                             if (LinesType <> LinesType::None) then begin
@@ -2746,16 +2375,10 @@ table 6060042 "NPR Item Worksheet Line"
                                                 ItemWorksheetVariantLine."Worksheet Template Name" := Rec."Worksheet Template Name";
                                                 ItemWorksheetVariantLine."Worksheet Name" := Rec."Worksheet Name";
                                                 ItemWorksheetVariantLine."Worksheet Line No." := Rec."Line No.";
-                                                //-NPR5.38 [268786]
-                                                //ItemWorksheetVariantLine."Variety 1 Value" := ItemWorksheetVarietyValue1.Value;
-                                                //ItemWorksheetVariantLine."Variety 2 Value" := ItemWorksheetVarietyValue2.Value;
-                                                //ItemWorksheetVariantLine."Variety 3 Value" := ItemWorksheetVarietyValue3.Value;
-                                                //ItemWorksheetVariantLine."Variety 4 Value" := ItemWorksheetVarietyValue4.Value;
                                                 ItemWorksheetVariantLine."Variety 1 Value" := TempItemWorksheetVarietyValue1.Value;
                                                 ItemWorksheetVariantLine."Variety 2 Value" := TempItemWorksheetVarietyValue2.Value;
                                                 ItemWorksheetVariantLine."Variety 3 Value" := TempItemWorksheetVarietyValue3.Value;
                                                 ItemWorksheetVariantLine."Variety 4 Value" := TempItemWorksheetVarietyValue4.Value;
-                                                //+NPR5.38 [268786]
                                                 ItemWorksheetVariantLine."Item No." := Rec."Item No.";
                                                 ItemWorksheetVariantLine."Existing Item No." := Rec."Existing Item No.";
 
@@ -2789,40 +2412,14 @@ table 6060042 "NPR Item Worksheet Line"
                                                     end;
                                                     ItemWorksheetVariantLine.FillDescription;
                                                     ItemWorksheetVariantLine.Insert(true);
-                                                    //-NPR5.28 [259210]
-                                                    //UpdateLineNo := FALSE;
-                                                    //+NPR5.28 [259210]
                                                 end;
                                             end;
-                                            //-NPR5.28 [259210]
-                                            //IF UpdateLineNo THEN BEGIN
-                                            //Look for and update level numbering on existing line
-                                            //  ItemWorksheetVariantLine.RESET;
-                                            //  ItemWorksheetVariantLine.SETCURRENTKEY("Worksheet Template Name","Worksheet Name","Worksheet Line No.","Variety 1 Value","Variety 2 Value","Variety 3 Value","Variety 4 Value");
-                                            //  ItemWorksheetVariantLine.SETRANGE("Worksheet Template Name","Worksheet Template Name");
-                                            //  ItemWorksheetVariantLine.SETRANGE("Worksheet Name","Worksheet Name");
-                                            //  ItemWorksheetVariantLine.SETRANGE("Worksheet Line No.","Line No.");
-                                            //  ItemWorksheetVariantLine.SETRANGE("Variety 1 Value",ItemWorksheetVariantLine."Variety 1 Value");
-                                            //  ItemWorksheetVariantLine.SETRANGE("Variety 2 Value",ItemWorksheetVariantLine."Variety 2 Value");
-                                            //  ItemWorksheetVariantLine.SETRANGE("Variety 3 Value",ItemWorksheetVariantLine."Variety 3 Value");
-                                            //  ItemWorksheetVariantLine.SETRANGE("Variety 4 Value",ItemWorksheetVariantLine."Variety 4 Value");
-                                            //  IF ItemWorksheetVariantLine.FINDSET THEN REPEAT
-                                            //    ItemWorksheetVariantLine.MODIFY(TRUE);
-                                            //  UNTIL ItemWorksheetVariantLine.NEXT = 0;
-                                            //END;
-                                            //+NPR5.28 [259210]
                                         end;
-                                    //-NPR5.38 [268786]
-                                    //      UNTIL ItemWorksheetVarietyValue4.NEXT = 0;
-                                    //    UNTIL ItemWorksheetVarietyValue3.NEXT = 0;
-                                    //  UNTIL ItemWorksheetVarietyValue2.NEXT = 0;
-                                    // UNTIL ItemWorksheetVarietyValue1.NEXT = 0;
                                     until TempItemWorksheetVarietyValue4.Next = 0;
                             until TempItemWorksheetVarietyValue3.Next = 0;
                     until TempItemWorksheetVarietyValue2.Next = 0;
             until TempItemWorksheetVarietyValue1.Next = 0;
-        //+NPR5.38 [268786]
-        //-NPR5.28 [259210]
+
         //Look for and update level numbering on existing line
         ItemWorksheetVariantLine.Reset;
         ItemWorksheetVariantLine.SetCurrentKey("Worksheet Template Name", "Worksheet Name", "Worksheet Line No.", "Variety 1 Value", "Variety 2 Value", "Variety 3 Value", "Variety 4 Value");
@@ -2837,7 +2434,6 @@ table 6060042 "NPR Item Worksheet Line"
                     ItemWorksheetVariantLine.Modify;
                 end;
             until ItemWorksheetVariantLine.Next = 0;
-        //+NPR5.28 [259210]
     end;
 
     local procedure CopyItemAttributes(ItemNo: Code[20])
@@ -2973,15 +2569,11 @@ table 6060042 "NPR Item Worksheet Line"
                             end;
                         end else begin
                             //Variety 3 is a header line
-                            //-NPR5.38 [268786]
-                            //ItemWorksheetVariantLine."Heading Text" := MakeLineHeadingText(LineCounter[4],CreateCounter[4],UpdateCounter[4]);
-                            //ItemWorksheetVariantLine.MODIFY;
                             NewHeadingText := MakeLineHeadingText(LineCounter[4], CreateCounter[4], UpdateCounter[4]);
                             if NewHeadingText <> ItemWorksheetVariantLine."Heading Text" then begin
                                 ItemWorksheetVariantLine."Heading Text" := NewHeadingText;
                                 ItemWorksheetVariantLine.Modify;
                             end;
-                            //+NPR5.38 [268786]
                             LineCounter[4] := 0;
                             CreateCounter[4] := 0;
                             UpdateCounter[4] := 0;
@@ -3008,15 +2600,11 @@ table 6060042 "NPR Item Worksheet Line"
                                 end;
                             end else begin
                                 //Variety 2 is a header line
-                                //-NPR5.38 [268786]
-                                //ItemWorksheetVariantLine."Heading Text" := MakeLineHeadingText(LineCounter[3],CreateCounter[3],UpdateCounter[3]);
-                                //ItemWorksheetVariantLine.MODIFY;
                                 NewHeadingText := MakeLineHeadingText(LineCounter[3], CreateCounter[3], UpdateCounter[3]);
                                 if NewHeadingText <> ItemWorksheetVariantLine."Heading Text" then begin
                                     ItemWorksheetVariantLine."Heading Text" := NewHeadingText;
                                     ItemWorksheetVariantLine.Modify;
                                 end;
-                                //+NPR5.38 [268786]
                                 LineCounter[3] := 0;
                                 CreateCounter[3] := 0;
                                 UpdateCounter[3] := 0;
@@ -3038,15 +2626,11 @@ table 6060042 "NPR Item Worksheet Line"
                                 end;
                             end else begin
                                 //Variety 1 is a header line
-                                //-NPR5.38 [268786]
-                                //ItemWorksheetVariantLine."Heading Text" := MakeLineHeadingText(LineCounter[2],CreateCounter[2],UpdateCounter[2]);
-                                //ItemWorksheetVariantLine.MODIFY;
                                 NewHeadingText := MakeLineHeadingText(LineCounter[2], CreateCounter[2], UpdateCounter[2]);
                                 if NewHeadingText <> ItemWorksheetVariantLine."Heading Text" then begin
                                     ItemWorksheetVariantLine."Heading Text" := NewHeadingText;
                                     ItemWorksheetVariantLine.Modify;
                                 end;
-                                //+NPR5.38 [268786]
                                 LineCounter[2] := 0;
                                 CreateCounter[2] := 0;
                                 UpdateCounter[2] := 0;
@@ -3193,7 +2777,6 @@ table 6060042 "NPR Item Worksheet Line"
         ItemWorksheetVarValue: Record "NPR Item Worksh. Variety Value";
         VarietyValue: Record "NPR Variety Value";
     begin
-        //-NPR4.19
         ItemWorksheetVar.SetRange("Worksheet Template Name", "Worksheet Template Name");
         ItemWorksheetVar.SetRange("Worksheet Name", "Worksheet Name");
         ItemWorksheetVar.SetRange("Worksheet Line No.", "Line No.");
@@ -3223,19 +2806,16 @@ table 6060042 "NPR Item Worksheet Line"
                     end;
                 end;
             until ItemWorksheetVar.Next = 0;
-        //+NPR4.19
     end;
 
     local procedure HasVarietyLines(): Boolean
     var
         ItemWorksheetVar: Record "NPR Item Worksh. Variant Line";
     begin
-        //-NPR4.19
         ItemWorksheetVar.SetRange("Worksheet Template Name", "Worksheet Template Name");
         ItemWorksheetVar.SetRange("Worksheet Name", "Worksheet Name");
         ItemWorksheetVar.SetRange("Worksheet Line No.", "Line No.");
         exit(ItemWorksheetVar.FindFirst);
-        //+NPR4.19
     end;
 
     procedure EmptyLine(): Boolean
@@ -3246,11 +2826,7 @@ table 6060042 "NPR Item Worksheet Line"
     procedure UpdateBarcode()
     begin
         ItemWorksheetTemplate.Get("Worksheet Template Name");
-        //-NPR5.23 [242498]
-        //IF "Internal Bar Code"  = '' THEN
-        //  EXIT;
         if ("Internal Bar Code" <> '') and ("Variety 1" = '') then
-            //-NPR5.23 [242498]
             case ItemWorksheetTemplate."Create Internal Barcodes" of
                 ItemWorksheetTemplate."Create Internal Barcodes"::"As Alt. No.":
                     begin
@@ -3261,7 +2837,6 @@ table 6060042 "NPR Item Worksheet Line"
                         ItemNumberManagement.UpdateBarcode("Item No.", "Variant Code", "Internal Bar Code", 1);
                     end;
             end;
-        //-NPR5.23 [242498]
         if ("Vendors Bar Code" <> '') and ("Variety 1" = '') then
             case ItemWorksheetTemplate."Create Vendor  Barcodes" of
                 ItemWorksheetTemplate."Create Vendor  Barcodes"::"As Alt. No.":
@@ -3273,7 +2848,6 @@ table 6060042 "NPR Item Worksheet Line"
                         ItemNumberManagement.UpdateBarcode("Item No.", "Variant Code", "Vendors Bar Code", 1);
                     end;
             end;
-        //+NPR5.23 [242498]
     end;
 
     local procedure FillVarietyTableNew()
@@ -3298,37 +2872,24 @@ table 6060042 "NPR Item Worksheet Line"
         ItemWorksheetVar.SetRange("Worksheet Template Name", "Worksheet Template Name");
         ItemWorksheetVar.SetRange("Worksheet Name", "Worksheet Name");
         ItemWorksheetVar.SetRange("Worksheet Line No.", "Line No.");
-        //-NPR5.38 [268786]
-        //ItemWorksheetVar.DELETEALL(TRUE);
         ItemWorksheetVar.DeleteAll;
-        //+NPR5.38 [268786]
 
         ItemWorksheetVrtValue.SetRange("Worksheet Template Name", "Worksheet Template Name");
         ItemWorksheetVrtValue.SetRange("Worksheet Name", "Worksheet Name");
         ItemWorksheetVrtValue.SetRange("Worksheet Line No.", "Line No.");
-        //-NPR5.38 [268786]
-        //ItemWorksheetVrtValue.DELETEALL(TRUE);
         ItemWorksheetVrtValue.DeleteAll;
-        //+NPR5.38 [268786]
 
-        //-NPR5.22
         NPRAttributeKey.SetCurrentKey("Table ID", "MDR Code PK", "MDR Line PK", "MDR Option PK");
         NPRAttributeKey.SetRange("Table ID", DATABASE::"NPR Item Worksheet Line");
         NPRAttributeKey.SetRange("MDR Code PK", "Worksheet Template Name");
         NPRAttributeKey.SetRange("MDR Code 2 PK", "Worksheet Name");
         NPRAttributeKey.SetRange("MDR Line PK", "Line No.");
-        //-NPR5.38 [268786]
-        //NPRAttributeKey.DELETEALL(TRUE);
         NPRAttributeKey.DeleteAll;
-        //+NPR5.38 [268786]
-        //+NPR5.22
 
-        //-NPR5.25 [246088]
         ItemWorksheetFieldChange.SetRange("Worksheet Template Name", "Worksheet Template Name");
         ItemWorksheetFieldChange.SetRange("Worksheet Name", "Worksheet Name");
         ItemWorksheetFieldChange.SetRange("Worksheet Line No.", "Line No.");
         ItemWorksheetFieldChange.DeleteAll;
-        //+NPR5.25 [246088]
     end;
 
     local procedure SetUseVariant()
@@ -3344,7 +2905,6 @@ table 6060042 "NPR Item Worksheet Line"
     var
         ItemWorksheetVar: Record "NPR Item Worksh. Variant Line";
     begin
-        //-NPR5.22
         if "Recommended Retail Price" <> 0 then begin
             Validate("Sales Price", "Recommended Retail Price");
         end;
@@ -3371,15 +2931,12 @@ table 6060042 "NPR Item Worksheet Line"
                     end;
                 end;
             until ItemWorksheetVar.Next = 0;
-        //+NPR5.22
     end;
 
     local procedure ItemNoPrefix(): Code[4]
     var
         Separator: Code[10];
     begin
-        //-NPR5.23
-
         ItemWorksheetTemplate.Get("Worksheet Template Name");
         case ItemWorksheetTemplate."Item No. Prefix" of
             ItemWorksheetTemplate."Item No. Prefix"::None:
@@ -3406,14 +2963,12 @@ table 6060042 "NPR Item Worksheet Line"
                         exit(CopyStr(ItemWorksheet."Vendor No.", 1, 3) + Separator);
                 end;
         end;
-        //+NPR5.23
     end;
 
     procedure DeleteDuplicate()
     var
         DuplicateItemWorksheetLine: Record "NPR Item Worksheet Line";
     begin
-        //-NPR5.25 [246088]
         if not ItemWorksheetTemplate.Get("Worksheet Template Name") then
             exit;
         if not ItemWorksheetTemplate."Delete Unvalidated Duplicates" then
@@ -3425,49 +2980,38 @@ table 6060042 "NPR Item Worksheet Line"
         if "Item No." <> '' then begin
             DuplicateItemWorksheetLine.SetFilter("Item No.", "Item No.");
             if DuplicateItemWorksheetLine.FindLast then
-                //-NPR5.39 [304421]
                 if OldLineContainsSameVarieties(DuplicateItemWorksheetLine) then
-                    //+NPR5.39 [304421]
                     DuplicateItemWorksheetLine.Delete(true);
             exit;
         end;
         if "Existing Item No." <> '' then begin
             DuplicateItemWorksheetLine.SetFilter("Existing Item No.", "Existing Item No.");
             if DuplicateItemWorksheetLine.FindLast then
-                //-NPR5.39 [304421]
                 if OldLineContainsSameVarieties(DuplicateItemWorksheetLine) then
-                    //+NPR5.39 [304421]
                     DuplicateItemWorksheetLine.Delete(true);
             exit;
         end;
         if "Vendor Item No." <> '' then begin
             DuplicateItemWorksheetLine.SetFilter("Vendor Item No.", "Vendor Item No.");
             if DuplicateItemWorksheetLine.FindLast then
-                //-NPR5.39 [304421]
                 if OldLineContainsSameVarieties(DuplicateItemWorksheetLine) then
-                    //+NPR5.39 [304421]
                     DuplicateItemWorksheetLine.Delete(true);
             exit;
         end;
         if "Vendors Bar Code" <> '' then begin
             DuplicateItemWorksheetLine.SetFilter("Vendors Bar Code", "Vendors Bar Code");
             if DuplicateItemWorksheetLine.FindLast then
-                //-NPR5.39 [304421]
                 if OldLineContainsSameVarieties(DuplicateItemWorksheetLine) then
-                    //+NPR5.39 [304421]
                     DuplicateItemWorksheetLine.Delete(true);
             exit;
         end;
         if "Internal Bar Code" <> '' then begin
             DuplicateItemWorksheetLine.SetFilter("Internal Bar Code", "Internal Bar Code");
             if DuplicateItemWorksheetLine.FindLast then
-                //-NPR5.39 [304421]
                 if OldLineContainsSameVarieties(DuplicateItemWorksheetLine) then
-                    //+NPR5.39 [304421]
                     DuplicateItemWorksheetLine.Delete(true);
             exit;
         end;
-        //+NPR5.25 [246088]
     end;
 
     local procedure FillMappedFields()
@@ -3476,7 +3020,6 @@ table 6060042 "NPR Item Worksheet Line"
         LocRecItem: Record Item;
         LocRecItemWorksheetLine: Record "NPR Item Worksheet Line";
     begin
-        //-NPR5.25 [246088]
         if "Existing Item No." = '' then
             exit;
         LocRecItem.Get("Existing Item No.");
@@ -3484,7 +3027,6 @@ table 6060042 "NPR Item Worksheet Line"
         LocRecItemWorksheetLine := Rec;
         ValidateFields(LocRecItem, LocRecItemWorksheetLine);
         Rec := LocRecItemWorksheetLine;
-        //+NPR5.25 [246088]
     end;
 
     local procedure ValidateFields(var VarItem: Record Item; var VarItemWorksheetLine: Record "NPR Item Worksheet Line")
@@ -3500,7 +3042,6 @@ table 6060042 "NPR Item Worksheet Line"
         ItemWorksheetFieldChange: Record "NPR Item Worksh. Field Change";
         CountFields: Integer;
     begin
-        //-NPR5.25 [246088]
         VarItemWorksheetLine.Get("Worksheet Template Name", "Worksheet Name", "Line No.");
         ItemRecRef.Get(VarItem.RecordId);
         ItemWorksheetRecRef.Get(VarItemWorksheetLine.RecordId);
@@ -3533,16 +3074,12 @@ table 6060042 "NPR Item Worksheet Line"
                         if SourceFieldRec."No." <> 0 then begin
                             ItemFldRef := ItemRecRef.Field(SourceFieldRec."No.");
                             ValidateFieldRef(ItemFldRef, ItemWorksheetFldRef, false);
-
-                            //IF NOT ValidateFieldRef(ItemFldRef,ItemWorksheetFldRef) THEN
-                            //  ERROR(TxtFieldCouldNotValidate,TargetFieldRec."Field Caption",TargetFieldRec.TableName,FORMAT(ItemWorksheetFldRef));
                         end;
                     end;
                 end;
             until ItemWorksheetFieldSetup.Next = 0;
         ItemWorksheetRecRef.Modify;
         VarItemWorksheetLine.Get("Worksheet Template Name", "Worksheet Name", "Line No.");
-        //+NPR5.25 [246088]
     end;
 
     local procedure ValidateFieldRef(var SourceFldRef: FieldRef; var TargetFldRef: FieldRef; DoValidate: Boolean): Boolean
@@ -3559,7 +3096,6 @@ table 6060042 "NPR Item Worksheet Line"
         SourceRecRef: RecordRef;
         TargetRecRef: RecordRef;
     begin
-        //-NPR5.25 [246088]
         if DoValidate then begin
             case UpperCase(Format(TargetFldRef.Type)) of
                 'TEXT', 'CODE':
@@ -3627,24 +3163,19 @@ table 6060042 "NPR Item Worksheet Line"
                         exit(false);
             end;
         end else begin
-            //-NPR5.37 [268786]
             SourceRecRef := SourceFldRef.Record;
             TargetRecRef := TargetFldRef.Record;
             if SourceFieldRec.Get(SourceRecRef.Number, SourceFldRef.Number) and TargetFieldRec.Get(TargetRecRef.Number, TargetFldRef.Number) then begin
                 if SourceFieldRec.Type = TargetFieldRec.Type then begin
-                    //+NPR5.37 [268786]
                     TargetFldRef.Value(SourceFldRef.Value);
                     if UpperCase(Format(SourceFldRef.Type)) = 'BOOLEAN' then begin
                         if Evaluate(TmpInteger, Format(SourceFldRef.Value, 0, 2)) then
                             TargetFldRef.Value(TmpInteger);
                     end;
-                    //-NPR5.37 [268786]
                 end;
             end;
-            //+NPR5.37 [268786]
         end;
         exit(true);
-        //+NPR5.25 [246088]
     end;
 
     local procedure ValidateFieldText(SourceText: Text; TargetFldRef: FieldRef): Boolean
@@ -3657,7 +3188,6 @@ table 6060042 "NPR Item Worksheet Line"
         TmpBool: Boolean;
         TmpDateTime: DateTime;
     begin
-        //-NPR5.25 [246088]
         case UpperCase(Format(TargetFldRef.Type)) of
             'TEXT', 'CODE':
                 TargetFldRef.Validate(Format(SourceText));
@@ -3717,7 +3247,6 @@ table 6060042 "NPR Item Worksheet Line"
                     exit(false);
         end;
         exit(true);
-        //+NPR5.25 [246088]
     end;
 
     procedure CheckManualValidation()
@@ -3730,7 +3259,6 @@ table 6060042 "NPR Item Worksheet Line"
         FieldNumber: Integer;
         TxtWarnChange: Label 'The value of field %1 was changed but this value will be ignored because of the Field Mapping.';
     begin
-        //-NPR5.25 [246088]
         if not GuiAllowed then
             exit;
         RecRef.GetTable(Rec);
@@ -3744,10 +3272,7 @@ table 6060042 "NPR Item Worksheet Line"
                 ItemWorksheetFieldSetup.Reset;
                 ItemWorksheetFieldSetup.SetFilter("Worksheet Template Name", '=%1|=%2', "Worksheet Template Name", '');
                 ItemWorksheetFieldSetup.SetFilter("Worksheet Name", '=%1|=%2', "Worksheet Name", '');
-                //-NPR5.50 [356260]
-                //ItemWorksheetFieldSetup.SETRANGE("Field Number",FieldNumber);
                 ItemWorksheetFieldSetup.SetRange("Field Number", FldRef.Number);
-                //+NPR5.50 [356260]
                 ItemWorksheetFieldSetup.SetRange("Table No.", DATABASE::"NPR Item Worksheet Line");
                 if ItemWorksheetFieldSetup.FindLast then begin
                     if ItemWorksheetFieldSetup."Process Update" in [ItemWorksheetFieldSetup."Process Update"::Ignore, ItemWorksheetFieldSetup."Process Update"::"Warn and Ignore"] then
@@ -3755,7 +3280,6 @@ table 6060042 "NPR Item Worksheet Line"
                 end;
             end;
         until FieldNumber = RecRef.FieldCount;
-        //+NPR5.25 [246088]
     end;
 
     procedure CreateQueryItemInformation(OnlyNewAndUpdated: Boolean)
@@ -3765,7 +3289,6 @@ table 6060042 "NPR Item Worksheet Line"
         QueryName: Text;
         ItemWorksheetLine: Record "NPR Item Worksheet Line";
     begin
-        //-NPR5.25
         ItemWorksheetTemplate.Get("Worksheet Template Name");
         QueryName := ItemWorksheetTemplate."Item Info Query Name";
         case ItemWorksheetTemplate."Item Info Query Type" of
@@ -3804,14 +3327,12 @@ table 6060042 "NPR Item Worksheet Line"
                     EndpointManagement.CreateOutboundEndpointQuery(QueryName, ItemWorksheetLine, OnlyNewAndUpdated);
                 end;
         end;
-        //+NPR5.25
     end;
 
     procedure CleanupObsoleteLines()
     var
         ObsoleteWorksheetLine: Record "NPR Item Worksheet Line";
     begin
-        //-NPR5.27 [253672]
         if "Item No." = '' then
             exit;
         if "Line No." <= 0 then
@@ -3825,12 +3346,9 @@ table 6060042 "NPR Item Worksheet Line"
         ObsoleteWorksheetLine.SetRange("Item No.", "Item No.");
         if ObsoleteWorksheetLine.FindSet then
             repeat
-                //-NPR5.39 [304421]
                 if OldLineContainsSameVarieties(ObsoleteWorksheetLine) then
-                    //+NPR5.39 [304421]
                     ObsoleteWorksheetLine.Delete(true);
             until ObsoleteWorksheetLine.Next = 0;
-        //+NPR5.27 [253672]
     end;
 
     local procedure GetTempVarietyLines(var ItemWorksheetVarietyValue: Record "NPR Item Worksh. Variety Value"; var tempItemWorksheetVarietyValue: Record "NPR Item Worksh. Variety Value" temporary; ShortcutValue: Integer; LinesType: Option "None",Variants,"Varieties Without Variants",All)
@@ -3839,7 +3357,6 @@ table 6060042 "NPR Item Worksheet Line"
         VarFound: Boolean;
         ItemVariant: Record "Item Variant";
     begin
-        //-NPR5.38 [268786]
         if ItemWorksheetVarietyValue.FindSet then
             repeat
                 VarFound := false;
@@ -3908,7 +3425,6 @@ table 6060042 "NPR Item Worksheet Line"
                     tempItemWorksheetVarietyValue.Insert;
                 end;
             until ItemWorksheetVarietyValue.Next = 0;
-        //+NPR5.38 [268786]
     end;
 
     local procedure OldLineContainsSameVarieties(WorksheetLineToCompare: Record "NPR Item Worksheet Line"): Boolean
@@ -3916,7 +3432,6 @@ table 6060042 "NPR Item Worksheet Line"
         ItemWorksheetVariantLineToCompare: Record "NPR Item Worksh. Variant Line";
         ItemWorksheetVariantLine: Record "NPR Item Worksh. Variant Line";
     begin
-        //-NPR5.39 [304421]
         ItemWorksheetVariantLineToCompare.SetRange("Worksheet Template Name", WorksheetLineToCompare."Worksheet Template Name");
         ItemWorksheetVariantLineToCompare.SetRange("Worksheet Name", WorksheetLineToCompare."Worksheet Name");
         ItemWorksheetVariantLineToCompare.SetRange("Worksheet Line No.", WorksheetLineToCompare."Line No.");
@@ -3941,7 +3456,5 @@ table 6060042 "NPR Item Worksheet Line"
                     exit(false);
             until ItemWorksheetVariantLineToCompare.Next = 0;
         exit(true);
-        //+NPR5.39 [304421]
     end;
 }
-

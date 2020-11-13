@@ -1,23 +1,5 @@
 page 6014402 "NPR Retail Item Journal"
 {
-    // NPR7.100.000/LS/220114  : Retail Merge : Added actions : Matrix, Print EAN,  Import from Scanner
-    //                           NPR3.0e d.06-12-2005 v.Simon Sch¢bel
-    //                           Det indtastede varenummer bliver omskrevet hvis det findes som alt.varenummer.
-    //                           NPR4.0a, NPK, DL, 17-01-08, Added read from scanner function
-    //                           NPR4.000.001, Added VariaX functionality
-    // NPR4.13/MMV/20150724 CASE 214173 Changed "No." to variable to handle barcode scanning OnValidate trigger.
-    // NPR5.23/TS/20151021 CASE 214173 Removed Code related to release 4.13
-    // NPR5.22/TJ/20160411 CASE 238601 Set Control ID of Item No. field back to default.
-    //                                    Moved code from action Import from Scanner to NPR Event Subscriber codeunit
-    // NPR5.23/THRO/20160509 CASE 240777 "Cross-Reference No." inserted
-    // NPR5.23/JDH /20160513 CASE 240916 Deleted old VariaX Matrix Action
-    // NPR5.29/MMV /20161216 CASE 241549 Removed deprecated print/report code.
-    // NPR5.29/TJ  /20171301 CASE 262797 Removed NPR variables as they are not used
-    // NPR5.30/TJ  /20170222 CASE 266258 Creating template for new page ID if doesn't allready exist
-    // NPR5.30/TJ  /20170227 CASE 267424 Using GetItem function from RetailItemJnlMgt
-    // NPR5.53/SARA/20191119 CASE 377622 Added Print Price Label function
-    // NPR5.55/YAHA/20200623 CASE 408295 Caption Changed to Retail Item Journal
-
     ApplicationArea = Basic, Suite;
     AutoSplitKey = true;
     Caption = 'Retail Item Journal';
@@ -67,7 +49,6 @@ page 6014402 "NPR Retail Item Journal"
                 field("Entry Type"; "Entry Type")
                 {
                     ApplicationArea = All;
-                    OptionCaption = 'Purchase,Sale,Positive Adjmt.,Negative Adjmt.';
                 }
                 field("Document No."; "Document No.")
                 {
@@ -84,10 +65,7 @@ page 6014402 "NPR Retail Item Journal"
 
                     trigger OnValidate()
                     begin
-                        //-NPR5.30 [267424]
-                        //ItemJnlMgt.GetItem("Item No.",ItemDescription);
                         RetailItemJnlMgt.GetItem("Item No.", ItemDescription);
-                        //+NPR5.30 [267424]
                         ShowShortcutDimCode(ShortcutDimCode);
                     end;
                 }
@@ -419,8 +397,6 @@ page 6014402 "NPR Retail Item Journal"
                     Caption = 'Ledger E&ntries';
                     Image = ItemLedger;
                     Promoted = false;
-                    //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                    //PromotedCategory = Process;
                     RunObject = Page "Item Ledger Entries";
                     RunPageLink = "Item No." = FIELD("Item No.");
                     RunPageView = SORTING("Item No.");
@@ -662,13 +638,9 @@ page 6014402 "NPR Retail Item Journal"
                 Caption = 'Price Label';
                 Image = BinContent;
                 ApplicationArea = All;
-                //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                //PromotedCategory = Process;
 
                 trigger OnAction()
                 begin
-                    //-NPR5.53 [377622]
-                    //+NPR5.53 [377622]
                 end;
             }
         }
@@ -676,10 +648,7 @@ page 6014402 "NPR Retail Item Journal"
 
     trigger OnAfterGetCurrRecord()
     begin
-        //-NPR5.30 [267424]
-        //ItemJnlMgt.GetItem("Item No.",ItemDescription);
         RetailItemJnlMgt.GetItem("Item No.", ItemDescription);
-        //+NPR5.30 [267424]
     end;
 
     trigger OnAfterGetRecord()
@@ -699,8 +668,8 @@ page 6014402 "NPR Retail Item Journal"
 
     trigger OnInsertRecord(BelowxRec: Boolean): Boolean
     begin
-        if "Entry Type" > "Entry Type"::"Negative Adjmt." then
-            Error(Text000, "Entry Type");
+        if Rec."Entry Type".AsInteger() > Rec."Entry Type"::"Negative Adjmt.".AsInteger() then
+            Error(Text000, Rec."Entry Type");
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
@@ -718,10 +687,8 @@ page 6014402 "NPR Retail Item Journal"
             ItemJnlMgt.OpenJnl(CurrentJnlBatchName, Rec);
             exit;
         end;
-        //-NPR5.30 [266258]
         if not RetailItemJnlMgt.FindTemplate(PAGE::"NPR Retail Item Journal") then
             RetailItemJnlMgt.CreateTemplate(PAGE::"NPR Retail Item Journal", 0, false);
-        //+NPR5.30 [266258]
         ItemJnlMgt.TemplateSelection(PAGE::"NPR Retail Item Journal", 0, false, Rec, JnlSelected);
         if not JnlSelected then
             Error('');
@@ -748,4 +715,3 @@ page 6014402 "NPR Retail Item Journal"
         CurrPage.Update(false);
     end;
 }
-

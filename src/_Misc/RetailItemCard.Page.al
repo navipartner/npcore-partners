@@ -1,104 +1,5 @@
 page 6014425 "NPR Retail Item Card"
 {
-    // NPR3.1p, NPK, DL, 04-01-07, Added "Automatic Ext. Texts"
-    // NPR4.000.003, NPK, 29-03-09, MH, Tilf¢jet "Additional info" på web-fanebladet.
-    // NPR7.000.000    27.2.2013  TS   :was on Activate Trigger of Form :
-    // MAG1.00/MH/20150113    CASE 199932 Upgraded Magento Integration from WEB1.00
-    // NPR1.06/BHR/20150120   CASE 203485 Add field Blocked on POS
-    // MAG1.01/MH/20150201    CASE 199932 Updated Magento Group
-    // MAG1.04/MH/20150206    CASE 199932 Added WebVariant
-    // NPR3.07/MH/20150216    CASE 204110 Removed NaviShop References (WS).
-    // MAG1.05/MH/20150224    CASE 199932 Updated WebVariant
-    // VRT1.00/JDH/20150304   CASE 201022 Variety Page Added + Fields + shortcut to Matrix under button Item
-    // MAG1.09/MH/20150316    CASE 206395 Updated link to Subpage Magento Picture Link Subform
-    // MAG1.11/MH/20150325    CASE 209616 Added MagentoEditableWebVariantType
-    // MAG1.12/MH/20150408    CASE 210740 Changed importance of Additional Magento fields to Standard and added missing SetMagentoVisible-invoke
-    // MAG1.14/MH/20150415    CASE 211360 Added Test on Item Webshop Descriptions and reduced SetVisible Variables
-    // NPR4.04/JDH/20150427   CASE 212229  Removed references to old Variant solution "Color Size"
-    // NPR4.11/MMV/20150520   CASE 213635 Refactored label print code and added support for Variety
-    // NPR4.11/TSA/20150422   CASE 209946 - Entity and Shortcut Attributes
-    // NPR4.11/TSA/20150513   CASE 209946 - Made 5 of the new fields available on the general tab, default invisible
-    // NPR4.11/TSA/20150605   CASE 209946 - Change the attrbutes to have 1-5 on general tab 6-10 on property tag, visible if assigned
-    // MAG1.17/TR/20150402    CASE 210548 Multiwebsite Page (Magento Store Item Page) called.
-    // MAG1.17/MH/20150622    CASE 215533 Magento related NaviConnect Setup moved to Magento Setup
-    // NPR4.11/RMT/20150625   CASE 209946 - Set attribute fields editable when creating new items
-    // NPR4.11/JDH/20150625   CASE 217444 Removed Function "SamletLager" - didnt work (Changecompany and Calcfields)
-    // MAG1.18/MH/20150716    CASE 218309 Removed TESTFIELD on Webshop Descriptions
-    // NPR4.14/MMV/20150724   CASE 213635 Fixed variable naming and syntax of EAN Label actions. Moved PrintEAN() and references to CU 6014413
-    // NPR4.14/JDH/20150831   CASE 221837 Removed unused variables and functions
-    // NPR4.15/JDH/20151001   CASE 224204 Caption changed from GL to Item on the ledger entries lookup
-    // NPR4.15/TS/20151013    CASE 224751 Added NpAttribute Factbox
-    // NPR4.17/LS/20151022    CASE 225607 Next Counting Period removed ( no more in Table 27) + Item Tracking Entries Changed
-    // MAG1.21/MHA/20151118   CASE 227354 Added PromotedActionCategoriesML (5 = Retail,6 = Magento) and restructured Magento Groups
-    // MAG1.21/MHA/20151118   CASE 223835 Magento Pictures PagePart removed and functionality added to Action Magento Pictures
-    // MAG1.21/MHA/20151120   CASE 227734 WebVariant deleted [MAG1.04]
-    // MAG1.22/MHA/20151202   CASE 227734 Added ProductRelations subpage
-    // NPR4.18/MMV/20151229   CASE 225584 Added field "Print Tags"
-    // NPR4.18/MMV/20151230   CASE 229221 Removed action "EAN Label".
-    //                                    Disabled action "Shelf" since it is not used currently. Should be rewritten if needed.
-    //                                    Changed captions.
-    // NPR5.22/MMV/20160420   CASE 237743 Updated reference to Label Library CU.
-    //                                    Added missing action captions & properties from NPR4.18 release
-    // MAG1.22/TR  /20160414  CASE 238563 Added "Custom Options" field
-    // MAG1.22/MHA /20160422  CASE 239060 Magento Item Picture Factbox added to display Magento Base Picture
-    // NPR5.23/JDH /20160513  CASE 240916 Deleted old VariaX Matrix Action
-    // NPR5.23/TS  /20160524  CASE 242691  Added field Unit List Price
-    // VRT1.11/JDH /20160531  CASE 242940  Added action create missing barcode(s)
-    // NPR5.23/TS  /20160609  CASE 243984 Added field Type to be able to select Service/Inventory
-    // MAG2.00/MHA /20160525  CASE 242557 Magento Integration
-    // NPR5.26/MHA /20160810  CASE 248288 Reference removed to deleted Item Field: 6014417 "NPK Created"
-    // NPR5.26/OSFI/20160810  CASE 246167 Added option "POS Info" to allow links to POS info.
-    // NPR5.27/LS  /20161018  CASE 255541 Changed link on action "Multiple Unit Prices"
-    // NPR5.29/LS  /20161108  CASE 257874 Changed length from 100 to 250 for Global Var "NPRAttrTextArray"
-    // NPR5.29/LS  /20161125  CASE 259161 Added field Condition in General tab
-    // NPR5.29/MMV /20161201  CASE 259398 Refactored search field.
-    // NPR5.29/JDH /20161221  CASE 261631 removed code on Label Barcode field (no documentation), as well as restructured code on field AltNr
-    // NPR5.29/TS  /20161230  CASE 262167 Added "Country/Region of Origin Code"
-    // NPR5.29/TS  /20170103  CASE 261860 Added field Inventory Value Zero
-    // NPR5.29/BHR /20170126  CASE 264081 Change display sequence of these fields : Type, Item Group,  Base Unit of measure
-    // NPR5.30/TS  /20170112  CASE 259207 Removed field Change Quantity by PhotoOrder
-    // NPR5.30/BHR /20170217  CASE 262923 Add Action Reparation
-    // NPR5.30/TJ  /20170221  CASE 266258 Changed RunObject property on actions Item Journal and Item Reclassification Journal to use new pages Retail Item Journal and Retail Item Reclass. Journal
-    // NPR5.30/MMV /20170221  CASE 266517 Changed label action caption.
-    //                                    Removed not-visible sign action.
-    // NPR5.30/TJ  /20170224  CASE 267292 Added field "VAT Bus. Posting Gr. (Price)" under Invoicing tab
-    // NPR5.30/BR  /20170228  CASE 252646 Added RelatedInformation to MCS Recommendations Lines page
-    // NPR5.30/JDH /20170309  CASE 255961 Promoted Variety Actions
-    // NPR5.31/MMV /20170329  CASE 266049 Added "Units per Parcel"
-    // NPR5.33/ANEN/20170427  CASE 273989 Extending to 40 attributes
-    // NPR5.32/JLK /20170515  CASE 274419 Added field Item Status
-    // NPR5.32/JLK /20170524  CASE 277219 Added field 105 "Global Dimension 1 Code" and 106 "Global Dimension 2 Code"
-    // NPR5.34/ANEN/20170704  CASE 284384 Show attributes in group extra fields
-    // MAG2.06/MHA /20170817  CASE 286203 Added AutoOverwrite to Magento DragDrop
-    // NPR5.35/TJ  /20170809  CASE 286283 Renamed variables/function into english and into proper naming terminology
-    // NPR5.35/ANEN/20170704  CASE 284384 Show attributes in group extra fields
-    // NPR5.36/BHR /20170210  CASE 289871 Correct bug on search functionality
-    // NPR5.36/JLK /20171003  CASE 291592 Copied and placed OnLookup function to General tab for Client Attributes
-    // NPR5.37/JLK /20171009  CASE 291604 Added field "Sales (Qty.)" under Inventory field in General tab
-    // NPR5.38/BR  /20171116  CASE 295255 Added Action POS Sales Entries
-    // NPR5.38/MHA /20180104  CASE 299272 Added fields 6014635 "Sale Blocked" and 6014640 "Purchase Blocked"
-    // NPR5.38/BR  /20180125  CASE 302803 Added Field "Tax Group Code"
-    // NPR5.40/TS  /20180315  CASE 308197 Added filter Status to Period Discount
-    // NPR5.40/JLK /20180316  CASE 308393 Renamed Action Variety to Variety Matrix and moved Statistic Group to General Tab
-    // NPR5.42/MMV /20180504  CASE 297569 Added field "Custom Discount Blocked"
-    // NPR5.43/RA  /20180605  CASE 311123 Deskription was missing
-    // NPR5.43/TS  /20180606  CASE 314830 Code removed on Validate as it was not working.Move to on AfterGetCurrRecord to load values.
-    // NPR5.43/TS  /20180330  CASE 308196 Added Discount
-    // MAG2.15/TS  /20180531  CASE 311926 Added Magento Video Links
-    // NPR5.48/MHA /20181109  CASE 334922 Added field 6151125 "Item AddOn No."
-    // NPR5.48/TS  /20181220  CASE 339348 Adde Shortcut Key to Add Barcodes
-    // NPR5.48/TJ  /20190102  CASE 340615 Removed field "Product Group Code"
-    // NPR5.50/THRO/20190412  CASE 352040 Removed fixed key on card. Was "Primary Key Length"
-    // NPR5.50/BHR /20190506  CASE 353006 Add field Season
-    // MAG2.22/MHA /20190625  CASE 359285 Added field 6151500 "Magento Picture Variety Type"
-    // NPR5.51/ZESO/20190828  CASE 365796 Added field 6014642 Shelf Label Type
-    // NPR5.51/JAKUBV/20190904  CASE 361514 Transport NPR5.51 - 3 September 2019
-    // NPR5.52/ANPA/20191001  CASE 367476 Removed field "Units", "Barcodes" and "Reperation" in pageaction Related
-    // NPR5.52/SARA/20191014  CASE 372089 Redesign Magento fasttab for webclient
-    // NPR5.53/MHA /20191113  CASE 374721 Updated Page Caption
-    // MAG2.26/MHA /20200601  CASE 404580 Magento "Item Group" renamed to "Category"
-    // NPR5.55/ALPO/20200708  CASE 382428 Added field "Rest. Item Routing Profile"
-
     Caption = 'Retail Item Card';
     PageType = Card;
     UsageCategory = Administration;
@@ -128,11 +29,8 @@ page 6014425 "NPR Retail Item Card"
                             VariantCode: Code[10];
                             ResolvingTable: Integer;
                         begin
-                            //-NPR5.36 [289871]
                             if Format(OriginalRec) <> Format(Rec) then
                                 Modify(true);
-                            //+NPR5.36 [289871]
-                            // CurrPage.UPDATE(TRUE);
                             if BarcodeLibrary.TranslateBarcodeToItemVariant(SearchNo, ItemNo, VariantCode, ResolvingTable, true) then begin
                                 SetRange("No.", ItemNo);
                                 FindFirst;
@@ -154,23 +52,14 @@ page 6014425 "NPR Retail Item Card"
                         var
                             VarietyCloneData: Codeunit "NPR Variety Clone Data";
                         begin
-                            //-NPR5.29 [261631]
                             VarietyCloneData.LookupBarcodes("No.", '');
-                            //Altnr := Utility.CreateEAN("No.", '');
-                            //RetailFormCode.CreateNewAltItem(Rec,xRec,Altnr,'');
-                            //Altnr := '';
-                            //+NPR5.29 [261631]
                         end;
 
                         trigger OnValidate()
                         var
                             VarietyCloneData: Codeunit "NPR Variety Clone Data";
                         begin
-                            //-NPR5.29 [261631]
-                            //IF Altnr <> '' THEN
-                            //  RetailFormCode.CreateNewAltItem(Rec,xRec,Altnr,'');
                             VarietyCloneData.AddCustomBarcode("No.", '', Barcode);
-                            //+NPR5.29 [261631]
                             Barcode := '';
                         end;
                     }
@@ -232,14 +121,6 @@ page 6014425 "NPR Retail Item Card"
                     trigger OnDrillDown()
                     begin
                         CODEUNIT.Run(CODEUNIT::"Show Avg. Calc. - Item", Rec);
-                    end;
-
-                    trigger OnValidate()
-                    begin
-                        //-NPR5.43 [314830]
-                        //This code was written on the control.
-                        //ItemCostMgt.CalculateAverageCost(Rec,AverageCostLCY,AverageCostACY)
-                        //+NPR5.43 [314830]
                     end;
                 }
                 field("Automatic Ext. Texts"; "Automatic Ext. Texts")
@@ -379,9 +260,7 @@ page 6014425 "NPR Retail Item Card"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        //-NPR5.37
                         NPRAttrManagement.OnPageLookUp(DATABASE::Item, 1, "No.", NPRAttrTextArray[1]);
-                        //+NPR5.37
                     end;
 
                     trigger OnValidate()
@@ -398,9 +277,7 @@ page 6014425 "NPR Retail Item Card"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        //-NPR5.37
                         NPRAttrManagement.OnPageLookUp(DATABASE::Item, 2, "No.", NPRAttrTextArray[2]);
-                        //+NPR5.37
                     end;
 
                     trigger OnValidate()
@@ -417,9 +294,7 @@ page 6014425 "NPR Retail Item Card"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        //-NPR5.37
                         NPRAttrManagement.OnPageLookUp(DATABASE::Item, 3, "No.", NPRAttrTextArray[3]);
-                        //+NPR5.37
                     end;
 
                     trigger OnValidate()
@@ -436,9 +311,7 @@ page 6014425 "NPR Retail Item Card"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        //-NPR5.37
                         NPRAttrManagement.OnPageLookUp(DATABASE::Item, 4, "No.", NPRAttrTextArray[4]);
-                        //+NPR5.37
                     end;
 
                     trigger OnValidate()
@@ -455,9 +328,7 @@ page 6014425 "NPR Retail Item Card"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        //-NPR5.37
                         NPRAttrManagement.OnPageLookUp(DATABASE::Item, 5, "No.", NPRAttrTextArray[5]);
-                        //+NPR5.37
                     end;
 
                     trigger OnValidate()
@@ -491,16 +362,12 @@ page 6014425 "NPR Retail Item Card"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        //-NPR5.35 [284384]
                         NPRAttrManagement.OnPageLookUp(DATABASE::Item, 1, "No.", NPRAttrTextArray[1]);
-                        //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
-                        //-NPR5.34 [284384]
                         NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 1, "No.", NPRAttrTextArray[1]);
-                        //+NPR5.34 [284384]
                     end;
                 }
                 field(NPRAttrTextArray_02; NPRAttrTextArray[2])
@@ -512,16 +379,12 @@ page 6014425 "NPR Retail Item Card"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        //-NPR5.35 [284384]
                         NPRAttrManagement.OnPageLookUp(DATABASE::Item, 2, "No.", NPRAttrTextArray[2]);
-                        //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
-                        //-NPR5.34 [284384]
                         NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 2, "No.", NPRAttrTextArray[2]);
-                        //+NPR5.34 [284384]
                     end;
                 }
                 field(NPRAttrTextArray_03; NPRAttrTextArray[3])
@@ -533,16 +396,12 @@ page 6014425 "NPR Retail Item Card"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        //-NPR5.35 [284384]
                         NPRAttrManagement.OnPageLookUp(DATABASE::Item, 3, "No.", NPRAttrTextArray[3]);
-                        //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
-                        //-NPR5.34 [284384]
                         NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 3, "No.", NPRAttrTextArray[3]);
-                        //+NPR5.34 [284384]
                     end;
                 }
                 field(NPRAttrTextArray_04; NPRAttrTextArray[4])
@@ -554,16 +413,12 @@ page 6014425 "NPR Retail Item Card"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        //-NPR5.35 [284384]
                         NPRAttrManagement.OnPageLookUp(DATABASE::Item, 4, "No.", NPRAttrTextArray[4]);
-                        //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
-                        //-NPR5.34 [284384]
                         NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 4, "No.", NPRAttrTextArray[4]);
-                        //+NPR5.34 [284384]
                     end;
                 }
                 field(NPRAttrTextArray_05; NPRAttrTextArray[5])
@@ -575,16 +430,12 @@ page 6014425 "NPR Retail Item Card"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        //-NPR5.35 [284384]
                         NPRAttrManagement.OnPageLookUp(DATABASE::Item, 5, "No.", NPRAttrTextArray[5]);
-                        //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
-                        //-NPR5.34 [284384]
                         NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 5, "No.", NPRAttrTextArray[5]);
-                        //+NPR5.34 [284384]
                     end;
                 }
                 field(NPRAttrTextArray_06; NPRAttrTextArray[6])
@@ -596,16 +447,12 @@ page 6014425 "NPR Retail Item Card"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        //-NPR5.35 [284384]
                         NPRAttrManagement.OnPageLookUp(DATABASE::Item, 6, "No.", NPRAttrTextArray[6]);
-                        //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
-                        //-NPR5.34 [284384]
                         NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 6, "No.", NPRAttrTextArray[6]);
-                        //+NPR5.34 [284384]
                     end;
                 }
                 field(NPRAttrTextArray_07; NPRAttrTextArray[7])
@@ -617,16 +464,12 @@ page 6014425 "NPR Retail Item Card"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        //-NPR5.35 [284384]
                         NPRAttrManagement.OnPageLookUp(DATABASE::Item, 7, "No.", NPRAttrTextArray[7]);
-                        //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
-                        //-NPR5.34 [284384]
                         NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 7, "No.", NPRAttrTextArray[7]);
-                        //+NPR5.34 [284384]
                     end;
                 }
                 field(NPRAttrTextArray_08; NPRAttrTextArray[8])
@@ -638,16 +481,12 @@ page 6014425 "NPR Retail Item Card"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        //-NPR5.35 [284384]
                         NPRAttrManagement.OnPageLookUp(DATABASE::Item, 8, "No.", NPRAttrTextArray[8]);
-                        //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
-                        //-NPR5.34 [284384]
                         NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 8, "No.", NPRAttrTextArray[8]);
-                        //+NPR5.34 [284384]
                     end;
                 }
                 field(NPRAttrTextArray_09; NPRAttrTextArray[9])
@@ -659,16 +498,12 @@ page 6014425 "NPR Retail Item Card"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        //-NPR5.35 [284384]
                         NPRAttrManagement.OnPageLookUp(DATABASE::Item, 9, "No.", NPRAttrTextArray[9]);
-                        //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
-                        //-NPR5.34 [284384]
                         NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 9, "No.", NPRAttrTextArray[9]);
-                        //+NPR5.34 [284384]
                     end;
                 }
                 field(NPRAttrTextArray_10; NPRAttrTextArray[10])
@@ -680,16 +515,12 @@ page 6014425 "NPR Retail Item Card"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        //-NPR5.35 [284384]
                         NPRAttrManagement.OnPageLookUp(DATABASE::Item, 10, "No.", NPRAttrTextArray[10]);
-                        //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
-                        //-NPR5.34 [284384]
                         NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 10, "No.", NPRAttrTextArray[10]);
-                        //+NPR5.34 [284384]
                     end;
                 }
                 field(NPRAttrTextArray_11; NPRAttrTextArray[11])
@@ -701,16 +532,12 @@ page 6014425 "NPR Retail Item Card"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        //-NPR5.35 [284384]
                         NPRAttrManagement.OnPageLookUp(DATABASE::Item, 11, "No.", NPRAttrTextArray[11]);
-                        //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
-                        //-NPR5.34 [284384]
                         NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 11, "No.", NPRAttrTextArray[11]);
-                        //+NPR5.34 [284384]
                     end;
                 }
                 field(NPRAttrTextArray_12; NPRAttrTextArray[12])
@@ -722,16 +549,12 @@ page 6014425 "NPR Retail Item Card"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        //-NPR5.35 [284384]
                         NPRAttrManagement.OnPageLookUp(DATABASE::Item, 12, "No.", NPRAttrTextArray[12]);
-                        //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
-                        //-NPR5.34 [284384]
                         NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 12, "No.", NPRAttrTextArray[12]);
-                        //+NPR5.34 [284384]
                     end;
                 }
                 field(NPRAttrTextArray_13; NPRAttrTextArray[13])
@@ -743,16 +566,12 @@ page 6014425 "NPR Retail Item Card"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        //-NPR5.35 [284384]
                         NPRAttrManagement.OnPageLookUp(DATABASE::Item, 13, "No.", NPRAttrTextArray[13]);
-                        //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
-                        //-NPR5.34 [284384]
                         NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 13, "No.", NPRAttrTextArray[13]);
-                        //+NPR5.34 [284384]
                     end;
                 }
                 field(NPRAttrTextArray_14; NPRAttrTextArray[14])
@@ -764,16 +583,12 @@ page 6014425 "NPR Retail Item Card"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        //-NPR5.35 [284384]
                         NPRAttrManagement.OnPageLookUp(DATABASE::Item, 14, "No.", NPRAttrTextArray[14]);
-                        //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
-                        //-NPR5.34 [284384]
                         NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 14, "No.", NPRAttrTextArray[14]);
-                        //+NPR5.34 [284384]
                     end;
                 }
                 field(NPRAttrTextArray_15; NPRAttrTextArray[15])
@@ -785,16 +600,12 @@ page 6014425 "NPR Retail Item Card"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        //-NPR5.35 [284384]
                         NPRAttrManagement.OnPageLookUp(DATABASE::Item, 15, "No.", NPRAttrTextArray[15]);
-                        //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
-                        //-NPR5.34 [284384]
                         NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 15, "No.", NPRAttrTextArray[15]);
-                        //+NPR5.34 [284384]
                     end;
                 }
                 field(NPRAttrTextArray_16; NPRAttrTextArray[16])
@@ -806,16 +617,12 @@ page 6014425 "NPR Retail Item Card"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        //-NPR5.35 [284384]
                         NPRAttrManagement.OnPageLookUp(DATABASE::Item, 16, "No.", NPRAttrTextArray[16]);
-                        //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
-                        //-NPR5.34 [284384]
                         NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 16, "No.", NPRAttrTextArray[16]);
-                        //+NPR5.34 [284384]
                     end;
                 }
                 field(NPRAttrTextArray_17; NPRAttrTextArray[17])
@@ -827,16 +634,12 @@ page 6014425 "NPR Retail Item Card"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        //-NPR5.35 [284384]
                         NPRAttrManagement.OnPageLookUp(DATABASE::Item, 17, "No.", NPRAttrTextArray[17]);
-                        //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
-                        //-NPR5.34 [284384]
                         NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 17, "No.", NPRAttrTextArray[17]);
-                        //+NPR5.34 [284384]
                     end;
                 }
                 field(NPRAttrTextArray_18; NPRAttrTextArray[18])
@@ -848,16 +651,12 @@ page 6014425 "NPR Retail Item Card"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        //-NPR5.35 [284384]
                         NPRAttrManagement.OnPageLookUp(DATABASE::Item, 18, "No.", NPRAttrTextArray[18]);
-                        //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
-                        //-NPR5.34 [284384]
                         NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 18, "No.", NPRAttrTextArray[18]);
-                        //+NPR5.34 [284384]
                     end;
                 }
                 field(NPRAttrTextArray_19; NPRAttrTextArray[19])
@@ -869,16 +668,12 @@ page 6014425 "NPR Retail Item Card"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        //-NPR5.35 [284384]
                         NPRAttrManagement.OnPageLookUp(DATABASE::Item, 19, "No.", NPRAttrTextArray[19]);
-                        //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
-                        //-NPR5.34 [284384]
                         NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 19, "No.", NPRAttrTextArray[19]);
-                        //+NPR5.34 [284384]
                     end;
                 }
                 field(NPRAttrTextArray_20; NPRAttrTextArray[20])
@@ -890,16 +685,12 @@ page 6014425 "NPR Retail Item Card"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        //-NPR5.35 [284384]
                         NPRAttrManagement.OnPageLookUp(DATABASE::Item, 20, "No.", NPRAttrTextArray[20]);
-                        //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
-                        //-NPR5.34 [284384]
                         NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 20, "No.", NPRAttrTextArray[20]);
-                        //+NPR5.34 [284384]
                     end;
                 }
                 field(NPRAttrTextArray_21; NPRAttrTextArray[21])
@@ -911,16 +702,12 @@ page 6014425 "NPR Retail Item Card"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        //-NPR5.35 [284384]
                         NPRAttrManagement.OnPageLookUp(DATABASE::Item, 21, "No.", NPRAttrTextArray[21]);
-                        //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
-                        //-NPR5.34 [284384]
                         NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 21, "No.", NPRAttrTextArray[21]);
-                        //+NPR5.34 [284384]
                     end;
                 }
                 field(NPRAttrTextArray_22; NPRAttrTextArray[22])
@@ -932,16 +719,12 @@ page 6014425 "NPR Retail Item Card"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        //-NPR5.35 [284384]
                         NPRAttrManagement.OnPageLookUp(DATABASE::Item, 22, "No.", NPRAttrTextArray[22]);
-                        //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
-                        //-NPR5.34 [284384]
                         NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 22, "No.", NPRAttrTextArray[22]);
-                        //+NPR5.34 [284384]
                     end;
                 }
                 field(NPRAttrTextArray_23; NPRAttrTextArray[23])
@@ -953,16 +736,12 @@ page 6014425 "NPR Retail Item Card"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        //-NPR5.35 [284384]
                         NPRAttrManagement.OnPageLookUp(DATABASE::Item, 23, "No.", NPRAttrTextArray[23]);
-                        //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
-                        //-NPR5.34 [284384]
                         NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 23, "No.", NPRAttrTextArray[23]);
-                        //+NPR5.34 [284384]
                     end;
                 }
                 field(NPRAttrTextArray_24; NPRAttrTextArray[24])
@@ -974,16 +753,12 @@ page 6014425 "NPR Retail Item Card"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        //-NPR5.35 [284384]
                         NPRAttrManagement.OnPageLookUp(DATABASE::Item, 24, "No.", NPRAttrTextArray[24]);
-                        //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
-                        //-NPR5.34 [284384]
                         NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 24, "No.", NPRAttrTextArray[24]);
-                        //+NPR5.34 [284384]
                     end;
                 }
                 field(NPRAttrTextArray_25; NPRAttrTextArray[25])
@@ -995,16 +770,12 @@ page 6014425 "NPR Retail Item Card"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        //-NPR5.35 [284384]
                         NPRAttrManagement.OnPageLookUp(DATABASE::Item, 25, "No.", NPRAttrTextArray[25]);
-                        //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
-                        //-NPR5.34 [284384]
                         NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 25, "No.", NPRAttrTextArray[25]);
-                        //+NPR5.34 [284384]
                     end;
                 }
                 field(NPRAttrTextArray_26; NPRAttrTextArray[26])
@@ -1016,16 +787,12 @@ page 6014425 "NPR Retail Item Card"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        //-NPR5.35 [284384]
                         NPRAttrManagement.OnPageLookUp(DATABASE::Item, 26, "No.", NPRAttrTextArray[26]);
-                        //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
-                        //-NPR5.34 [284384]
                         NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 26, "No.", NPRAttrTextArray[26]);
-                        //+NPR5.34 [284384]
                     end;
                 }
                 field(NPRAttrTextArray_27; NPRAttrTextArray[27])
@@ -1037,16 +804,12 @@ page 6014425 "NPR Retail Item Card"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        //-NPR5.35 [284384]
                         NPRAttrManagement.OnPageLookUp(DATABASE::Item, 27, "No.", NPRAttrTextArray[27]);
-                        //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
-                        //-NPR5.34 [284384]
                         NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 27, "No.", NPRAttrTextArray[27]);
-                        //+NPR5.34 [284384]
                     end;
                 }
                 field(NPRAttrTextArray_28; NPRAttrTextArray[28])
@@ -1058,16 +821,12 @@ page 6014425 "NPR Retail Item Card"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        //-NPR5.35 [284384]
                         NPRAttrManagement.OnPageLookUp(DATABASE::Item, 28, "No.", NPRAttrTextArray[28]);
-                        //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
-                        //-NPR5.34 [284384]
                         NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 28, "No.", NPRAttrTextArray[28]);
-                        //+NPR5.34 [284384]
                     end;
                 }
                 field(NPRAttrTextArray_29; NPRAttrTextArray[29])
@@ -1079,16 +838,12 @@ page 6014425 "NPR Retail Item Card"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        //-NPR5.35 [284384]
                         NPRAttrManagement.OnPageLookUp(DATABASE::Item, 29, "No.", NPRAttrTextArray[29]);
-                        //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
-                        //-NPR5.34 [284384]
                         NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 29, "No.", NPRAttrTextArray[29]);
-                        //+NPR5.34 [284384]
                     end;
                 }
                 field(NPRAttrTextArray_30; NPRAttrTextArray[30])
@@ -1100,16 +855,12 @@ page 6014425 "NPR Retail Item Card"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        //-NPR5.35 [284384]
                         NPRAttrManagement.OnPageLookUp(DATABASE::Item, 30, "No.", NPRAttrTextArray[30]);
-                        //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
-                        //-NPR5.34 [284384]
                         NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 30, "No.", NPRAttrTextArray[30]);
-                        //+NPR5.34 [284384]
                     end;
                 }
                 field(NPRAttrTextArray_31; NPRAttrTextArray[31])
@@ -1121,16 +872,12 @@ page 6014425 "NPR Retail Item Card"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        //-NPR5.35 [284384]
                         NPRAttrManagement.OnPageLookUp(DATABASE::Item, 31, "No.", NPRAttrTextArray[31]);
-                        //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
-                        //-NPR5.34 [284384]
                         NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 31, "No.", NPRAttrTextArray[31]);
-                        //+NPR5.34 [284384]
                     end;
                 }
                 field(NPRAttrTextArray_32; NPRAttrTextArray[32])
@@ -1142,16 +889,12 @@ page 6014425 "NPR Retail Item Card"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        //-NPR5.35 [284384]
                         NPRAttrManagement.OnPageLookUp(DATABASE::Item, 32, "No.", NPRAttrTextArray[32]);
-                        //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
-                        //-NPR5.34 [284384]
                         NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 32, "No.", NPRAttrTextArray[32]);
-                        //+NPR5.34 [284384]
                     end;
                 }
                 field(NPRAttrTextArray_33; NPRAttrTextArray[33])
@@ -1163,16 +906,12 @@ page 6014425 "NPR Retail Item Card"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        //-NPR5.35 [284384]
                         NPRAttrManagement.OnPageLookUp(DATABASE::Item, 33, "No.", NPRAttrTextArray[33]);
-                        //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
-                        //-NPR5.34 [284384]
                         NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 33, "No.", NPRAttrTextArray[33]);
-                        //+NPR5.34 [284384]
                     end;
                 }
                 field(NPRAttrTextArray_34; NPRAttrTextArray[34])
@@ -1184,16 +923,12 @@ page 6014425 "NPR Retail Item Card"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        //-NPR5.35 [284384]
                         NPRAttrManagement.OnPageLookUp(DATABASE::Item, 34, "No.", NPRAttrTextArray[34]);
-                        //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
-                        //-NPR5.34 [284384]
                         NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 34, "No.", NPRAttrTextArray[34]);
-                        //+NPR5.34 [284384]
                     end;
                 }
                 field(NPRAttrTextArray_35; NPRAttrTextArray[35])
@@ -1205,16 +940,12 @@ page 6014425 "NPR Retail Item Card"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        //-NPR5.35 [284384]
                         NPRAttrManagement.OnPageLookUp(DATABASE::Item, 35, "No.", NPRAttrTextArray[35]);
-                        //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
-                        //-NPR5.34 [284384]
                         NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 35, "No.", NPRAttrTextArray[35]);
-                        //+NPR5.34 [284384]
                     end;
                 }
                 field(NPRAttrTextArray_36; NPRAttrTextArray[36])
@@ -1226,16 +957,12 @@ page 6014425 "NPR Retail Item Card"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        //-NPR5.35 [284384]
                         NPRAttrManagement.OnPageLookUp(DATABASE::Item, 36, "No.", NPRAttrTextArray[36]);
-                        //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
-                        //-NPR5.34 [284384]
                         NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 36, "No.", NPRAttrTextArray[36]);
-                        //+NPR5.34 [284384]
                     end;
                 }
                 field(NPRAttrTextArray_37; NPRAttrTextArray[37])
@@ -1247,16 +974,12 @@ page 6014425 "NPR Retail Item Card"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        //-NPR5.35 [284384]
                         NPRAttrManagement.OnPageLookUp(DATABASE::Item, 37, "No.", NPRAttrTextArray[37]);
-                        //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
-                        //-NPR5.34 [284384]
                         NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 37, "No.", NPRAttrTextArray[37]);
-                        //+NPR5.34 [284384]
                     end;
                 }
                 field(NPRAttrTextArray_38; NPRAttrTextArray[38])
@@ -1268,16 +991,12 @@ page 6014425 "NPR Retail Item Card"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        //-NPR5.35 [284384]
                         NPRAttrManagement.OnPageLookUp(DATABASE::Item, 38, "No.", NPRAttrTextArray[38]);
-                        //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
-                        //-NPR5.34 [284384]
                         NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 38, "No.", NPRAttrTextArray[38]);
-                        //+NPR5.34 [284384]
                     end;
                 }
                 field(NPRAttrTextArray_39; NPRAttrTextArray[39])
@@ -1289,16 +1008,12 @@ page 6014425 "NPR Retail Item Card"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        //-NPR5.35 [284384]
                         NPRAttrManagement.OnPageLookUp(DATABASE::Item, 39, "No.", NPRAttrTextArray[39]);
-                        //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
-                        //-NPR5.34 [284384]
                         NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 39, "No.", NPRAttrTextArray[39]);
-                        //+NPR5.34 [284384]
                     end;
                 }
                 field(NPRAttrTextArray_40; NPRAttrTextArray[40])
@@ -1310,16 +1025,12 @@ page 6014425 "NPR Retail Item Card"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        //-NPR5.35 [284384]
                         NPRAttrManagement.OnPageLookUp(DATABASE::Item, 40, "No.", NPRAttrTextArray[40]);
-                        //+NPR5.35 [284384]
                     end;
 
                     trigger OnValidate()
                     begin
-                        //-NPR5.34 [284384]
                         NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 40, "No.", NPRAttrTextArray[40]);
-                        //+NPR5.34 [284384]
                     end;
                 }
             }
@@ -1981,13 +1692,11 @@ page 6014425 "NPR Retail Item Card"
                         var
                             PrintTagsPage: Page "NPR Print Tags";
                         begin
-                            //-NPR4.18
                             Clear(PrintTagsPage);
 
                             PrintTagsPage.SetTagText("NPR Print Tags");
                             if PrintTagsPage.RunModal = ACTION::OK then
                                 "NPR Print Tags" := PrintTagsPage.ToText;
-                            //+NPR4.18
                         end;
                     }
                     field("NPRE Item Routing Profile"; "NPR NPRE Item Routing Profile")
@@ -2014,10 +1723,7 @@ page 6014425 "NPR Retail Item Card"
 
                         trigger OnValidate()
                         begin
-                            //-MAG1.21
-                            //SetMagentoVisible();
                             SetMagentoEnabled();
-                            //+MAG1.21
                         end;
                     }
                     field("Magento Status"; "NPR Magento Status")
@@ -2031,16 +1737,10 @@ page 6014425 "NPR Retail Item Card"
 
                         trigger OnValidate()
                         begin
-                            //-MAG2.00
-                            //IF "Seo Link" <> '' THEN
-                            //  IF NOT CONFIRM(Text6059800,FALSE) THEN
-                            //    EXIT;
-                            //VALIDATE("Seo Link","Webshop Name");
                             if "NPR Seo Link" <> '' then
                                 if not Confirm(Text6151400, false) then
                                     exit;
                             Validate("NPR Seo Link", "NPR Magento Name");
-                            //+MAG2.00
                         end;
                     }
                     field("FORMAT(""Magento Description"".HASVALUE)"; Format("NPR Magento Description".HasValue))
@@ -2055,16 +1755,10 @@ page 6014425 "NPR Retail Item Card"
                             FieldRef: FieldRef;
                         begin
                             RecRef.GetTable(Rec);
-                            //-MAG2.00
-                            //FieldRef := RecRef.FIELD(FIELDNO("Webshop Description"));
                             FieldRef := RecRef.Field(FieldNo("NPR Magento Description"));
-                            //+MAG2.00
                             if MagentoFunctions.NaviEditorEditBlob(FieldRef) then begin
                                 RecRef.SetTable(Rec);
                                 Modify(true);
-                                //-MAG1.22
-                                //MagentoItemMgt.TestItem(Rec);
-                                //+MAG1.22
                             end;
                         end;
                     }
@@ -2080,18 +1774,10 @@ page 6014425 "NPR Retail Item Card"
                             FieldRef: FieldRef;
                         begin
                             RecRef.GetTable(Rec);
-                            //-MAG2.00
-                            //FieldRef := RecRef.FIELD(FIELDNO("Webshop Short Description"));
                             FieldRef := RecRef.Field(FieldNo("NPR Magento Short Description"));
-                            //+MAG2.00
                             if MagentoFunctions.NaviEditorEditBlob(FieldRef) then begin
                                 RecRef.SetTable(Rec);
                                 Modify(true);
-                                //-MAG1.22
-                                ////-MAG1.18
-                                //MagentoItemMgt.TestItem(Rec);
-                                ////+MAG1.18
-                                //+MAG1.22
                             end;
                         end;
                     }
@@ -2146,11 +1832,9 @@ page 6014425 "NPR Retail Item Card"
                             MagentoFunctions: Codeunit "NPR Magento Functions";
                             MagentoItemCustomOptions: Page "NPR Magento Item Cstm Options";
                         begin
-                            //-MAG1.22
                             Clear(MagentoItemCustomOptions);
                             MagentoItemCustomOptions.SetItemNo("No.");
                             MagentoItemCustomOptions.Run;
-                            //+MAG1.22
                         end;
                     }
                     field(Backorder; "NPR Backorder")
@@ -2191,10 +1875,7 @@ page 6014425 "NPR Retail Item Card"
                         begin
                             if "NPR Attribute Set ID" <> 0 then begin
                                 CurrPage.Update(true);
-                                //-MAG1.21
-                                //MagentoAttributeSetMgt.EditItemAttributes("No.",'',FALSE);
                                 MagentoAttributeSetMgt.EditItemAttributes("No.", '');
-                                //+MAG1.21
                             end;
                         end;
                     }
@@ -2298,17 +1979,13 @@ page 6014425 "NPR Retail Item Card"
                     ApplicationArea = Basic, Suite;
                     Caption = 'Attributes';
                     Image = Category;
-                    //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                    //PromotedCategory = New;
                     ToolTip = 'View or edit the item''s attributes, such as color, size, or other characteristics that help to describe the item.';
 
                     trigger OnAction()
                     begin
-                        //-#361229 [361229]
                         PAGE.RunModal(PAGE::"Item Attribute Value Editor", Rec);
                         CurrPage.SaveRecord;
                         CurrPage.ItemAttributesFactbox.PAGE.LoadItemAttributesData("No.");
-                        //+#361229 [361229]
                     end;
                 }
                 group(Dimensions)
@@ -2494,8 +2171,6 @@ page 6014425 "NPR Retail Item Card"
                         Caption = 'Ledger E&ntries';
                         Image = ItemLedger;
                         Promoted = false;
-                        //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                        //PromotedCategory = Process;
                         RunObject = Page "Item Ledger Entries";
                         RunPageLink = "Item No." = FIELD("No.");
                         RunPageView = SORTING("Item No.");
@@ -2540,10 +2215,7 @@ page 6014425 "NPR Retail Item Card"
                         var
                             ItemTrackingDocMgt: Codeunit "Item Tracking Doc. Management";
                         begin
-                            //-NPR4.17
-                            //ItemTrackingMgt.CallItemTrackingEntryForm(3,'',"No.",'','','','');
                             ItemTrackingDocMgt.ShowItemTrackingForMasterData(3, '', "No.", '', '', '', '');
-                            //+NPR4.17
                         end;
                     }
                     action("&Warehouse Entries")
@@ -2968,7 +2640,7 @@ page 6014425 "NPR Retail Item Card"
                             ResourceSkill: Record "Resource Skill";
                         begin
                             Clear(SkilledResourceList);
-                            SkilledResourceList.Initialize(ResourceSkill.Type::Item.AsInteger(), "No.", Description);
+                            SkilledResourceList.Initialize(ResourceSkill.Type::Item, "No.", Description);
                             SkilledResourceList.RunModal;
                         end;
                     }
@@ -2990,15 +2662,12 @@ page 6014425 "NPR Retail Item Card"
                     var
                         MagentoVariantPictureList: Page "NPR Magento Item Pict. List";
                     begin
-                        //-MAG1.21
                         TestField("No.");
-                        //CLEAR(MagentoVariantPictureList);
                         FilterGroup(2);
                         MagentoVariantPictureList.SetItemNo("No.");
                         FilterGroup(0);
 
                         MagentoVariantPictureList.Run();
-                        //+MAG1.21
                     end;
                 }
                 action(Videos)
@@ -3025,13 +2694,11 @@ page 6014425 "NPR Retail Item Card"
                         MagentoStoreItem: Record "NPR Magento Store Item";
                         MagentoItemMgt: Codeunit "NPR Magento Item Mgt.";
                     begin
-                        //-MAG1.21
                         MagentoItemMgt.SetupMultiStoreData(Rec);
                         MagentoStoreItem.FilterGroup(0);
                         MagentoStoreItem.SetRange("Item No.", "No.");
                         MagentoStoreItem.FilterGroup(2);
                         PAGE.Run(PAGE::"NPR Magento Store Items", MagentoStoreItem);
-                        //+MAG1.21
                     end;
                 }
                 action(DisplayConfig)
@@ -3048,12 +2715,10 @@ page 6014425 "NPR Retail Item Card"
                         MagentoDisplayConfig: Record "NPR Magento Display Config";
                         MagentoDisplayConfigPage: Page "NPR Magento Display Config";
                     begin
-                        //-MAG1.21
                         MagentoDisplayConfig.SetRange("No.", "No.");
                         MagentoDisplayConfig.SetRange(Type, MagentoDisplayConfig.Type::Item);
                         MagentoDisplayConfigPage.SetTableView(MagentoDisplayConfig);
                         MagentoDisplayConfigPage.Run;
-                        //+MAG1.21
                     end;
                 }
             }
@@ -3204,9 +2869,6 @@ page 6014425 "NPR Retail Item Card"
                         RetailJournalLine.Validate("Item No.", Rec."No.");
                         RetailJournalLine.Validate("Quantity to Print", TempQty);
                         RetailJournalLine.Insert;
-                        //+TS
-                        //CurrForm.S¢gkode.ACTIVATE;
-                        //-TS
                     end;
                 }
             }
@@ -3228,14 +2890,7 @@ page 6014425 "NPR Retail Item Card"
                         PrintLabelAndDisplay: Codeunit "NPR Label Library";
                         ReportSelectionRetail: Record "NPR Report Selection Retail";
                     begin
-                        //-NPR5.22
-                        //PrintLabelAndDisplay.ResolveVariantAndPrintItem(Rec);
                         PrintLabelAndDisplay.ResolveVariantAndPrintItem(Rec, ReportSelectionRetail."Report Type"::"Price Label");
-                        //+NPR5.22
-
-                        //+TS
-                        //CurrForm.S¢gkode.ACTIVATE;
-                        //-TS
                     end;
                 }
             }
@@ -3258,9 +2913,7 @@ page 6014425 "NPR Retail Item Card"
                     var
                         VRTWrapper: Codeunit "NPR Variety Wrapper";
                     begin
-                        //-VRT1.00
                         VRTWrapper.ShowVarietyMatrix(Rec, 0);
-                        //+VRT1.00
                     end;
                 }
                 action("Variety Maintenance")
@@ -3276,17 +2929,13 @@ page 6014425 "NPR Retail Item Card"
                     var
                         VRTWrapper: Codeunit "NPR Variety Wrapper";
                     begin
-                        //-VRT1.11
                         VRTWrapper.ShowMaintainItemMatrix(Rec, 0);
-                        //+VRT1.11
                     end;
                 }
                 action("Add missing Barcode(s)")
                 {
                     Caption = 'Add missing Barcode(s)';
                     Image = BarCode;
-                    //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
-                    //PromotedIsBig = true;
                     ShortCutKey = 'Shift+Ctrl+B';
                     ApplicationArea = All;
 
@@ -3294,9 +2943,7 @@ page 6014425 "NPR Retail Item Card"
                     var
                         VRTCloneData: Codeunit "NPR Variety Clone Data";
                     begin
-                        //-VRT1.11
                         VRTCloneData.AssignBarcodes(Rec);
-                        //+VRT1.11
                     end;
                 }
             }
@@ -3360,9 +3007,7 @@ page 6014425 "NPR Retail Item Card"
                         Clear(CampaignDiscountLines);
                         CampaignDiscountLines.Editable(false);
                         PeriodDiscountLine.Reset;
-                        //-NPR5.40
                         PeriodDiscountLine.SetRange(Status, PeriodDiscountLine.Status::Active);
-                        //+NPR5.40
                         PeriodDiscountLine.SetRange("Item No.", "No.");
                         CampaignDiscountLines.SetTableView(PeriodDiscountLine);
                         CampaignDiscountLines.RunModal;
@@ -3395,20 +3040,11 @@ page 6014425 "NPR Retail Item Card"
     trigger OnAfterGetCurrRecord()
     begin
         SetRange("No.");
-        //-NPR5.36 [289871]
         OriginalRec := Rec;
-        //+NPR5.36 [289871]
 
-        //-MAG1.14
         CurrPage.MagentoPictureDragDropAddin.PAGE.SetItemNo("No.");
-        //-MAG1.21
-        //CurrPage.MagentoPictureDragDropAddin.PAGE.SetRecordPosition(0,CurrPage.MagentoPictureLinkSubform.PAGE.GetPictureName);
         CurrPage.MagentoPictureDragDropAddin.PAGE.SetHidePicture(true);
-        //+MAG1.21
-        //+MAG1.14
-        //-NPR5.43 [314830]
         ItemCostMgt.CalculateAverageCost(Rec, AverageCostLCY, AverageCostACY)
-        //+NPR5.43 [314830]
     end;
 
     trigger OnAfterGetRecord()
@@ -3449,15 +3085,9 @@ page 6014425 "NPR Retail Item Card"
 
     trigger OnOpenPage()
     begin
-        //-MAG1.21
-        //SetMagentoVisible();
         SetMagentoEnabled();
-        //+MAG1.21
-        //-MAG2.06 [286203]
         CurrPage.MagentoPictureDragDropAddin.PAGE.SetAutoOverwrite(true);
-        //+MAG2.06 [286203]
 
-        //-NPR4.11
         NPRAttrManagement.GetAttributeVisibility(DATABASE::Item, NPRAttrVisibleArray);
         NPRAttrVisible01 := NPRAttrVisibleArray[1];
         NPRAttrVisible02 := NPRAttrVisibleArray[2];
@@ -3469,10 +3099,7 @@ page 6014425 "NPR Retail Item Card"
         NPRAttrVisible08 := NPRAttrVisibleArray[8];
         NPRAttrVisible09 := NPRAttrVisibleArray[9];
         NPRAttrVisible10 := NPRAttrVisibleArray[10];
-        //+NPR4.11
 
-
-        //-NPR5.34 [284384]
         NPRAttrVisible11 := NPRAttrVisibleArray[11];
         NPRAttrVisible12 := NPRAttrVisibleArray[12];
         NPRAttrVisible13 := NPRAttrVisibleArray[13];
@@ -3503,11 +3130,8 @@ page 6014425 "NPR Retail Item Card"
         NPRAttrVisible38 := NPRAttrVisibleArray[38];
         NPRAttrVisible39 := NPRAttrVisibleArray[39];
         NPRAttrVisible40 := NPRAttrVisibleArray[40];
-        //-NPR5.34 [284384]
 
-        //-NPR4.11
         NPRAttrEditable := CurrPage.Editable();
-        //+NPR4.11
     end;
 
     var
@@ -3632,7 +3256,7 @@ page 6014425 "NPR Retail Item Card"
         DampenerQtyEnabled: Boolean;
         OverflowLevelEnabled: Boolean;
     begin
-        PlanningGetParam.SetUpPlanningControls("Reordering Policy", "Include Inventory",
+        PlanningGetParam.SetUpPlanningControls("Reordering Policy".AsInteger(), "Include Inventory",
           TimeBucketEnabled, SafetyLeadTimeEnabled, SafetyStockQtyEnabled,
           ReorderPointEnabled, ReorderQtyEnabled, MaximumInventoryEnabled,
           MinimumOrderQtyEnabled, MaximumOrderQtyEnabled, OrderMultipleEnabled, IncludeInventoryEnabled,
@@ -3694,12 +3318,10 @@ page 6014425 "NPR Retail Item Card"
         ItemCopy."Maximum Inventory" := 0;
         ItemCopy."Units per Parcel" := 0;
         ItemCopy."Search Description" := Description;
-        //-NPR5.43
         ItemCopy."NPR Label Barcode" := '';
         ItemCopy."Net Weight" := 0;
         CalcFields("NPR Magento Description");
         ItemCopy."NPR Magento Description" := "NPR Magento Description";
-        //+NPR5.43
         ItemCopy.Insert(true);
 
         ItemUnitofMeasure.SetRange("Item No.", "No.");
@@ -3712,17 +3334,13 @@ page 6014425 "NPR Retail Item Card"
         end;
 
         Get(ItemCopy."No.");
-        //+TS
-        //CurrForm.UPDATE(FALSE);
         CurrPage.Update(false);
-        //-TS
     end;
 
     procedure SetMagentoEnabled()
     var
         MagentoSetup: Record "NPR Magento Setup";
     begin
-        //-MAG1.21
         if not (MagentoSetup.Get and MagentoSetup."Magento Enabled") then
             exit;
 
@@ -3732,16 +3350,10 @@ page 6014425 "NPR Retail Item Card"
         MagentoEnabledSpecialPrices := MagentoSetup."Special Prices Enabled";
         MagentoEnabledMultistore := MagentoSetup."Multistore Enabled";
         MagentoEnabledDisplayConfig := MagentoSetup."Customers Enabled";
-        //+MAG1.21
-        //-MAG1.22
         MagentoEnabledProductRelations := MagentoSetup."Product Relations Enabled";
         MagentoEnabledCustomOptions := MagentoSetup."Custom Options Enabled";
-        //+MAG1.22
-        //-MAG2.22 [359285]
         MagentoPictureVarietyTypeVisible :=
           (MagentoSetup."Variant System" = MagentoSetup."Variant System"::Variety) and
           (MagentoSetup."Picture Variety Type" = MagentoSetup."Picture Variety Type"::"Select on Item");
-        //+MAG2.22 [359285]
     end;
 }
-

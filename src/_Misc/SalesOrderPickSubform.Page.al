@@ -1,10 +1,5 @@
 page 6014519 "NPR Sales Order Pick Subform"
 {
-    // NPR4.18/JC/20151202  CASE 227142 Sales Order Pick
-    // NPR4.18/BR/20160303 CASE 227142 Updated to 90
-    // NPR5.30/TJ/20170222 CASE 266875 Removed unused variables and functions
-    // NPR5.41/TS  /20180105 CASE 300893 Removed Name on Action
-
     AutoSplitKey = true;
     Caption = 'Lines';
     DelayedInsert = true;
@@ -1059,12 +1054,8 @@ page 6014519 "NPR Sales Order Pick Subform"
     begin
         if SalesHeader.Get("Document Type", "Document No.") then;
 
-        //-NPR4.18
-        //DocumentTotals.SalesUpdateTotalsControls(Rec,TotalSalesHeader,TotalSalesLine,RefreshMessageEnabled,
-        //    TotalAmountStyle,RefreshMessageText,InvDiscAmountEditable,VATAmount);
         DocumentTotals.SalesUpdateTotalsControls(Rec, TotalSalesHeader, TotalSalesLine, RefreshMessageEnabled,
             TotalAmountStyle, RefreshMessageText, InvDiscAmountEditable, false, VATAmount);
-        //+NPR4.18
 
         TypeChosen := Type <> Type::" ";
         SetLocationCodeMandatory;
@@ -1223,7 +1214,7 @@ page 6014519 "NPR Sales Order Pick Subform"
         OrderPromisingLine.SetRange("Source ID", "Document No.");
         OrderPromisingLine.SetRange("Source Line No.", "Line No.");
 
-        OrderPromisingLines.SetSourceType(OrderPromisingLine."Source Type"::Sales);
+        OrderPromisingLines.SetSourceType(OrderPromisingLine."Source Type"::Sales.AsInteger());
         OrderPromisingLines.SetTableView(OrderPromisingLine);
         OrderPromisingLines.RunModal;
     end;
@@ -1391,8 +1382,5 @@ page 6014519 "NPR Sales Order Pick Subform"
         SetRange(Type);
         SetRange("No.");
         SetRange("Variant Code");
-
-        //CurrPage.UPDATE;
     end;
 }
-

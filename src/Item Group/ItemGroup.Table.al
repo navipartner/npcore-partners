@@ -1,31 +1,5 @@
 table 6014410 "NPR Item Group"
 {
-    // NPR70.00.00.02/JDH/20141010 CASE 189462 possible to choose if you want to block / unblock sublevels - possible to have different status on sublevels compared to upper level
-    // NPR70.00.00.03/LS/20141222  CASE 201562 commented code onInsert toprevent creation of Item Group as Item
-    // NPR70.00.01.01/MH/20150113  CASE 199932 Removed Web references (WEB1.00).
-    // VRT1.00/JDH/20150304 CASE 201022 Added field Variety Group
-    // NPR4.11/BHR/20150424 CASE 211624 correct sorting issues.
-    // NPR5.20/JDH/20160309 CASE 234014 Changed sorting to use new field "Sorting Key"
-    // NPR5.23/THRO/20160509 CASE 240771 Added key Description (to allow sorting on description in dropdown)
-    // NPR5.23/JDH /20160512 CASE 240916 Removed reference to old Color Size solution
-    // NPR5.26/LS  /20160824 CASE 249735 Removed field 11 "Used"
-    // NPR5.26/BHR/20160914 CASE 252128 change the 'lookuppageid'and 'DrilldownPageid' from "Item Group Page" to "Item Group List"
-    // NPR5.27/MHA /20160929  CASE 253885 Replaced Sorting Key delimiter '-' with '/'
-    // NPR5.29/BHR /20170124 CASE 264081 Removed checks on 'inventory posting group'
-    // NPR5.30/TJ  /20170213 CASE 265534 Added field 80 Config. Template Header
-    // NPR5.30/TJ  /20170213 CASE 265533 Removed unused fields
-    //                                   Renamed some fields to follow naming standards
-    // NPR5.31/MHA /20170110 CASE 262904 Added "Disc. Grouping Type" to CalcFormula of FlowField 600 "In Mix"
-    // NPR5.31/JLK /20170331  CASE 268274 Changed ENU Caption
-    // NPR5.38/TJ  /20171218 CASE 225415 Renumbered fields from range 67xxx to range below 50000
-    // NPR5.38/BR  /20180125  CASE 302803 Added Field "Tax Group Code"
-    // NPR5.45/TJ  /20180801  CASE 323517 Changed LookupPageID and DrillDownPageID from Item Group List to Item Group Tree
-    // NPR5.48/TJ  /20181106  CASE 331261 Changed Length property of fields Description and Search Description from 30 to 50
-    // NPR5.48/TSA /20181102  CASE 334651 Renamed field "Sorting Key" to "Sorting-Key" since it conflicts in V2
-    // NPR5.48/TS  /20181128  CASE 337806 Increased Length of GlobalDimension1Filter,Global Dimension 2 Filter,Tarrif No. and Item Discount Group to 20
-    //                                    Reduced Location Code to 10
-    // NPR5.48/BHR /20190107  CASE 334217 Create field Type(11)
-
     Caption = 'Item Group';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR Item Group Tree";
@@ -75,11 +49,6 @@ table 6014410 "NPR Item Group"
 
             trigger OnValidate()
             begin
-                //-NPR5.20
-                //IF ("Belongs In Main Item Group" = "No.") AND
-                //   ("Parent Item Group" <> '') THEN ERROR(Text1060003);
-                //+NPR5.20
-
                 if "Parent Item Group No." = "No." then Error(Text1060004);
 
                 if (xRec."Parent Item Group No." <> '') then begin
@@ -92,14 +61,7 @@ table 6014410 "NPR Item Group"
                     Level := 0;
                 end;
 
-                //-NPR5.20
                 UpdateSortKey(Rec);
-                //+NPR5.20
-
-                //-NPR4.11
-                // IF "Parent Item Group" = '0' THEN
-                //   "Belongs In Main Item Group" := "No.";
-                //+NPR4.11
             end;
         }
         field(5; "Belongs In Main Item Group"; Code[10])
@@ -123,9 +85,7 @@ table 6014410 "NPR Item Group"
             var
                 ItemGroup: Record "NPR Item Group";
             begin
-                //-NPR5.20
                 CheckItemGroup(FieldNo(Blocked));
-                //+NPR5.20
 
                 ItemGroup.Reset;
                 ItemGroup.SetRange("Parent Item Group No.", "No.");
@@ -133,7 +93,6 @@ table 6014410 "NPR Item Group"
                     exit;
                 if not Confirm(Text1060012, true, FieldCaption(Blocked), Blocked) then
                     exit;
-                //+NPR70.00.00.02
 
                 BlockSubLevels("No.", Blocked);
             end;
@@ -150,17 +109,15 @@ table 6014410 "NPR Item Group"
             DataClassification = CustomerContent;
             Editable = false;
         }
-        field(11; Type; Option)
+        field(11; Type; Enum "Item Type")
         {
             Caption = 'Type';
             DataClassification = CustomerContent;
-            OptionCaption = 'Inventory,Service';
-            OptionMembers = Inventory,Service;
 
             trigger OnValidate()
-            var
-                ItemLedgEntry: Record "Item Ledger Entry";
             begin
+                if Type = Type::"Non-Inventory" then
+                    FieldError(Type);
             end;
         }
         field(12; "VAT Prod. Posting Group"; Code[10])
@@ -191,9 +148,7 @@ table 6014410 "NPR Item Group"
                 end else
                     "VAT Bus. Posting Group" := '';
 
-                //-NPR5.20
                 CheckItemGroup(FieldNo("Gen. Bus. Posting Group"));
-                //+NPR5.20
             end;
         }
         field(16; "Gen. Prod. Posting Group"; Code[10])
@@ -212,9 +167,7 @@ table 6014410 "NPR Item Group"
                 end else
                     "VAT Prod. Posting Group" := '';
 
-                //-NPR5.20
                 CheckItemGroup(FieldNo("Gen. Prod. Posting Group"));
-                //+NPR5.20
             end;
         }
         field(17; "Inventory Posting Group"; Code[10])
@@ -225,9 +178,7 @@ table 6014410 "NPR Item Group"
 
             trigger OnValidate()
             begin
-                //-NPR5.20
                 CheckItemGroup(FieldNo("Inventory Posting Group"));
-                //+NPR5.20
             end;
         }
         field(50; Level; Integer)
@@ -248,7 +199,7 @@ table 6014410 "NPR Item Group"
         }
         field(55; "Sales (Qty.)"; Decimal)
         {
-            CalcFormula = - Sum ("Item Ledger Entry".Quantity WHERE("Entry Type" = CONST(Sale),
+            CalcFormula = - Sum("Item Ledger Entry".Quantity WHERE("Entry Type" = CONST(Sale),
                                                                    "NPR Item Group No." = FIELD("No."),
                                                                    "NPR Vendor No." = FIELD("Vendor Filter"),
                                                                    "Posting Date" = FIELD("Date Filter"),
@@ -259,7 +210,7 @@ table 6014410 "NPR Item Group"
         }
         field(56; "Sales (LCY)"; Decimal)
         {
-            CalcFormula = Sum ("Value Entry"."Sales Amount (Actual)" WHERE("Item Ledger Entry Type" = CONST(Sale),
+            CalcFormula = Sum("Value Entry"."Sales Amount (Actual)" WHERE("Item Ledger Entry Type" = CONST(Sale),
                                                                            "NPR Item Group No." = FIELD("No."),
                                                                            "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
                                                                            "Posting Date" = FIELD("Date Filter"),
@@ -290,7 +241,7 @@ table 6014410 "NPR Item Group"
         }
         field(60; "Consumption (Amount)"; Decimal)
         {
-            CalcFormula = - Sum ("Value Entry"."Cost Amount (Actual)" WHERE("Item Ledger Entry Type" = CONST(Sale),
+            CalcFormula = - Sum("Value Entry"."Cost Amount (Actual)" WHERE("Item Ledger Entry Type" = CONST(Sale),
                                                                            "NPR Item Group No." = FIELD("No."),
                                                                            "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
                                                                            "Posting Date" = FIELD("Date Filter"),
@@ -358,17 +309,15 @@ table 6014410 "NPR Item Group"
             DataClassification = CustomerContent;
             TableRelation = "No. Series";
         }
-        field(65; "Costing Method"; Option)
+        field(65; "Costing Method"; Enum "Costing Method")
         {
             Caption = 'Costing Method';
             DataClassification = CustomerContent;
             InitValue = FIFO;
-            OptionCaption = 'FIFO,LIFO,Specific,Average,Standard';
-            OptionMembers = FIFO,LIFO,Specific,"Average",Standard;
         }
         field(66; Movement; Decimal)
         {
-            CalcFormula = Sum ("Item Ledger Entry".Quantity WHERE("NPR Item Group No." = FIELD("No."),
+            CalcFormula = Sum("Item Ledger Entry".Quantity WHERE("NPR Item Group No." = FIELD("No."),
                                                                   "NPR Vendor No." = FIELD("Vendor Filter"),
                                                                   "Posting Date" = FIELD("Date Filter"),
                                                                   "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
@@ -378,7 +327,7 @@ table 6014410 "NPR Item Group"
         }
         field(67; "Purchases (Qty.)"; Decimal)
         {
-            CalcFormula = Sum ("Item Ledger Entry".Quantity WHERE("Entry Type" = CONST(Purchase),
+            CalcFormula = Sum("Item Ledger Entry".Quantity WHERE("Entry Type" = CONST(Purchase),
                                                                   "NPR Item Group No." = FIELD("No."),
                                                                   "NPR Vendor No." = FIELD("Vendor Filter"),
                                                                   "Posting Date" = FIELD("Date Filter"),
@@ -389,7 +338,7 @@ table 6014410 "NPR Item Group"
         }
         field(68; "Purchases (LCY)"; Decimal)
         {
-            CalcFormula = Sum ("Value Entry"."Cost Amount (Actual)" WHERE("Item Ledger Entry Type" = CONST(Purchase),
+            CalcFormula = Sum("Value Entry"."Cost Amount (Actual)" WHERE("Item Ledger Entry Type" = CONST(Purchase),
                                                                           "NPR Item Group No." = FIELD("No."),
                                                                           "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
                                                                           "Posting Date" = FIELD("Date Filter"),
@@ -448,7 +397,7 @@ table 6014410 "NPR Item Group"
         }
         field(90; "Inventory Value"; Decimal)
         {
-            CalcFormula = Sum ("Value Entry"."Cost Amount (Actual)" WHERE("NPR Item Group No." = FIELD("No."),
+            CalcFormula = Sum("Value Entry"."Cost Amount (Actual)" WHERE("NPR Item Group No." = FIELD("No."),
                                                                           "NPR Vendor No." = FIELD("Vendor Filter"),
                                                                           "Posting Date" = FIELD("Date Filter"),
                                                                           "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
@@ -539,7 +488,7 @@ table 6014410 "NPR Item Group"
         }
         field(600; "Mixed Discount Line Exists"; Boolean)
         {
-            CalcFormula = Exist ("NPR Mixed Discount Line" WHERE("No." = FIELD("No."),
+            CalcFormula = Exist("NPR Mixed Discount Line" WHERE("No." = FIELD("No."),
                                                              "Disc. Grouping Type" = CONST("Item Group")));
             Caption = 'Mixed Discount Line Exists';
             FieldClass = FlowField;
@@ -614,7 +563,6 @@ table 6014410 "NPR Item Group"
         ItemGroup: Record "NPR Item Group";
         ItemGroup2: Record "NPR Item Group";
     begin
-        //-NPR5.20
         ItemGroup.SetRange("Parent Item Group No.", "No.");
         if not ItemGroup.IsEmpty then begin
             if not Confirm(Text001, false, "No.") then
@@ -627,39 +575,6 @@ table 6014410 "NPR Item Group"
                     ItemGroup2.Modify;
                 until ItemGroup.Next = 0;
         end;
-        //+NPR5.20
-
-        exit;
-        //the Exit above has been here for ages -> code below will never be executed -> code outcommented, to let OMA know that its not used
-
-        //RetailTable.VaregruppeOnDelete( Rec );
-
-        //IF "No." <> '' THEN BEGIN
-        //  Item.SETCURRENTKEY("Item Group");
-        //  Item.SETRANGE("Item Group","No.");
-        //  IF Item.FINDFIRST THEN
-        //    ERROR(Text1060000,TABLECAPTION,"No.");
-
-        //  ItemGroup.SETRANGE("Parent Item Group","No.");
-        //  IF ItemGroup.FINDFIRST THEN BEGIN
-        //    IF NOT CONFIRM(Text1060001,FALSE) THEN
-        //      ERROR(Text1060002);
-
-        //    Item.SETCURRENTKEY("Item Group");
-        //    Item.SETRANGE("Item Group","No.");
-        //    IF Item.FINDSET THEN
-        //      ERROR(Text1060000,TABLECAPTION,"No.");
-        //    REPEAT
-        //      DeleteSubLevels(ItemGroup."No.");
-        //      ItemGroup.DELETE(TRUE);
-        //    UNTIL ItemGroup.NEXT =  0;
-        //  END;
-        //END;
-
-        //RecRef.GETTABLE(Rec);
-        //CompanySyncMgt.OnDelete(RecRef);
-
-        //DimMgt.DeleteDefaultDim(DATABASE::"Item Group","No.");
     end;
 
     trigger OnInsert()
@@ -669,20 +584,15 @@ table 6014410 "NPR Item Group"
         "Created Date" := Today;
         "Primary Key Length" := StrLen("No.");
 
-        //-NPR5.20
         if "Parent Item Group No." <> '' then begin
             if ItemGroup.Get("Parent Item Group No.") then begin
                 Level := ItemGroup.Level + 1;
-                //-NPR5.27 [253885]
-                //"Sorting Key"                := ItemGroup."Sorting Key" + '-' + "No.";
                 "Sorting-Key" := ItemGroup."Sorting-Key" + '/' + "No.";
-                //+NPR5.27 [253885]
                 "Belongs In Main Item Group" := ItemGroup."Belongs In Main Item Group";
                 "Main Item Group" := false;
             end;
         end else
             "Sorting-Key" := "No.";
-        //+NPR5.20
 
         CopyParentItemGroupSetup(Rec);
 
@@ -691,17 +601,9 @@ table 6014410 "NPR Item Group"
         RecRef.GetTable(Rec);
         CompanySyncMgt.OnInsert(RecRef);
 
-        //-NPR70.00.00.03
-        /*
-        IF ("Parent Item Group" <> '') THEN
-          RetailTable.VaregruppeOnInsert( Rec, FALSE ,0);
-        */
-        //+NPR70.00.00.03
-
         DimMgt.UpdateDefaultDim(
           DATABASE::"NPR Item Group", "No.",
           "Global Dimension 1 Code", "Global Dimension 2 Code");
-
     end;
 
     trigger OnModify()
@@ -868,22 +770,11 @@ table 6014410 "NPR Item Group"
                 "Location Code" := ItemGroupParent."Location Code";
                 "Global Dimension 1 Code" := ItemGroupParent."Global Dimension 1 Code";
                 "Global Dimension 2 Code" := ItemGroupParent."Global Dimension 2 Code";
-                //-NPR5.23 [240916]
-                // "Size Group"               := ItemGroupParent."Size Group";
-                //+NPR5.23 [240916]
-
                 "Item Discount Group" := ItemGroupParent."Item Discount Group";
                 "Size Dimension" := ItemGroupParent."Size Dimension";
                 "Color Dimension" := ItemGroupParent."Color Dimension";
-                //-NPR4.11
-                //    "Belongs In Main Item Group" := ItemGroupParent."Belongs In Main Item Group";
-                //+NPR4.11
-                //-NPR5.38 [302803]
                 "Tax Group Code" := ItemGroupParent."Tax Group Code";
-                //+NPR5.38 [302803]
-                //-NPR5.48 [334217]
                 Type := ItemGroupParent.Type;
-                //+NPR5.48 [334217]
             end;
         end;
     end;
@@ -892,7 +783,6 @@ table 6014410 "NPR Item Group"
     var
         ItemGroup2: Record "NPR Item Group";
     begin
-        //-NPR5.22
         //Update Me
         ItemGroup."Main Item Group" := (ItemGroup."Parent Item Group No." = '');
         if ItemGroup."Main Item Group" then begin
@@ -903,10 +793,7 @@ table 6014410 "NPR Item Group"
         end else begin
             ItemGroup2.Get(ItemGroup."Parent Item Group No.");
             ItemGroup.Level := ItemGroup2.Level + 1;
-            //-NPR5.27 [253885]
-            //ItemGroup."Sorting Key"                := ItemGroup2."Sorting Key" + '-' + ItemGroup."No.";
             ItemGroup."Sorting-Key" := ItemGroup2."Sorting-Key" + '/' + ItemGroup."No.";
-            //+NPR5.27 [253885]
             ItemGroup."Belongs In Main Item Group" := ItemGroup2."Belongs In Main Item Group";
             ItemGroup."Main Item Group" := false;
         end;
@@ -919,32 +806,23 @@ table 6014410 "NPR Item Group"
             repeat
                 UpdateSortKey(ItemGroup2);
             until ItemGroup2.Next = 0;
-        //+NPR5.22
     end;
 
     local procedure CheckItemGroup(CalledFromFieldNo: Integer)
     var
         ItemGroup2: Record "NPR Item Group";
     begin
-        //-NPR5.22
         if CalledFromFieldNo = FieldNo(Blocked) then begin
             if not Blocked then begin
                 TestField("Gen. Prod. Posting Group");
                 TestField("Gen. Bus. Posting Group");
-                //-NPR5.29 [264081]
-                //TESTFIELD("Inventory Posting Group");
-                //+NPR5.29 [264081]
                 ItemGroup2.Get("Parent Item Group No.");
             end;
         end else
             if ("Gen. Prod. Posting Group" = '') or
                ("Gen. Bus. Posting Group" = '') or
-               //-NPR5.29 [264081]
-               // ("Inventory Posting Group" = '') OR
-               //+NPR5.29 [264081]
-               (not ItemGroup2.Get("Parent Item Group No.")) then
+               (not ItemGroup2.Get("Parent Item Group No."))
+            then
                 Blocked := true;
-        //+NPR5.22
     end;
 }
-

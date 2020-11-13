@@ -1,9 +1,5 @@
 page 6014493 "NPR POS Apply Cust. Entries"
 {
-    // NPR5.22/TJ/20160412 CASE 238601 Reworked how to check for Retail Setup read permission
-    // NPR5.29/TJ/20170118 CASE 263523 This object is a copy of a standard page 232 with inherited documentation
-    //  - Have cleaned up unused variables and separators as well
-
     Caption = 'Apply Customer Entries';
     DataCaptionFields = "Customer No.";
     DeleteAllowed = false;
@@ -777,7 +773,7 @@ page 6014493 "NPR POS Apply Cust. Entries"
 
         if ApplyingCustLedgEntry."Entry No." <> 0 then
             GenJnlApply.CheckAgainstApplnCurrency(
-              ApplnCurrencyCode, "Currency Code", GenJnlLine."Account Type"::Customer.AsInteger(), true);
+              ApplnCurrencyCode, "Currency Code", GenJnlLine."Account Type"::Customer, true);
 
         CustLedgEntry.Copy(Rec);
         CurrPage.SetSelectionFilter(CustLedgEntry);
@@ -1195,11 +1191,7 @@ page 6014493 "NPR POS Apply Cust. Entries"
 
     procedure SetSalesLine(NewGenJnlLine: Record "NPR Sale Line POS"; ApplnTypeSelect: Integer)
     begin
-        //-NPR5.22
-        //IF ApplicationManagement.CheckLicenseRetail THEN BEGIN
         if RetailSetup.ReadPermission then begin
-            //+NPR5.22
-
             SaleLinePOS := NewGenJnlLine;
             BalancePOSLine := true;
 
@@ -1249,4 +1241,3 @@ page 6014493 "NPR POS Apply Cust. Entries"
         end;
     end;
 }
-

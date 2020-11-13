@@ -1,7 +1,5 @@
 report 6014663 "NPR Retail Calc. Inv."
 {
-    // NPR5.29/JDH /20170206 CASE ?????? versioned for ??? dont know who changed this object
-
     Caption = 'Retail Calculate Inventory';
     ProcessingOnly = true;
 
@@ -73,9 +71,7 @@ report 6014663 "NPR Retail Calc. Inv."
                 begin
                     WhseEntry.SetCurrentKey("Item No.", "Bin Code", "Location Code", "Variant Code");
                     Item.CopyFilter("Bin Filter", WhseEntry."Bin Code");
-                    //-CASE213313
                     Item.CopyFilter("Date Filter", "Item Ledger Entry"."Posting Date");
-                    //+CASE213313
                     if ColumnDim = '' then
                         TempDimBufIn.SetRange("Table ID", DATABASE::Item)
                     else
@@ -431,7 +427,7 @@ report 6014663 "NPR Retail Calc. Inv."
                                     ReservEntry."Lot No." := WhseEntry."Lot No.";
                                     CreateReservEntry.CreateReservEntryFor(
                                       DATABASE::"Item Journal Line",
-                                      "Entry Type",
+                                      "Entry Type".AsInteger(),
                                       "Journal Template Name",
                                       "Journal Batch Name",
                                       OrderLineNo,
@@ -784,15 +780,11 @@ report 6014663 "NPR Retail Calc. Inv."
 
     procedure NPR_SetReportOptions(pZeroQty: Boolean; pPostingDate: Date; pHideValidationDialog: Boolean)
     begin
-        //-CASE213313
-
         ZeroQty := pZeroQty;
         HideValidationDialog := pHideValidationDialog;
         PostingDate := pPostingDate;
         ValidatePostingDate();
         ColumnDim := DimSelectionBuf.GetDimSelectionText(3, REPORT::"NPR Retail Calc. Inv.", '');
-
-        //+213313
     end;
 
     local procedure CreateDimFromItemDefault() DimEntryNo: Integer
@@ -825,4 +817,3 @@ report 6014663 "NPR Retail Calc. Inv."
         end;
     end;
 }
-

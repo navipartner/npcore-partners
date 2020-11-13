@@ -176,10 +176,6 @@ codeunit 6151145 "NPR M2 POS Price WebService"
         Message(xmltext);
     end;
 
-    local procedure "--"()
-    begin
-    end;
-
     procedure ItemPrice(var ItemPriceRequest: XMLport "NPR M2 Item Price Request")
     var
         TmpSalesPriceRequest: Record "NPR M2 Price Calc. Buffer" temporary;
@@ -334,7 +330,7 @@ codeunit 6151145 "NPR M2 POS Price WebService"
         SalesLineDiscount: Record "Sales Line Discount";
         TmpQtyBracket: Record "NPR M2 Price Calc. Buffer" temporary;
         TmpPricePointNew: Record "NPR M2 Price Calc. Buffer";
-        SalesType: Option;
+        SalesType: Enum "Sales Price Type";
         CampaignCode: Code[20];
     begin
 
@@ -416,22 +412,22 @@ codeunit 6151145 "NPR M2 POS Price WebService"
             SalesLineDiscount.SetFilter(Code, '=%1', TmpSalesPriceResponse."Item No.");
 
             case SalesType of
-                0:
+                SalesType::Customer:
                     begin
                         SalesPrice.SetFilter("Sales Code", '=%1', Customer."No.");
                         SalesLineDiscount.SetFilter("Sales Code", '=%1', Customer."No.");
                     end;
-                1:
+                SalesType::"Customer Price Group":
                     begin
                         SalesPrice.SetFilter("Sales Code", '=%1', Customer."Customer Price Group");
                         SalesLineDiscount.SetFilter("Sales Code", '=%1', Customer."Customer Disc. Group");
                     end;
-                2:
+                SalesType::"All Customers":
                     begin
                         SalesPrice.SetFilter("Sales Code", '=%1', '');
                         SalesLineDiscount.SetFilter("Sales Code", '=%1', '');
                     end;
-                3:
+                SalesType::Campaign:
                     begin
                         SalesPrice.SetFilter("Sales Code", '=%1', CampaignCode);
                         SalesLineDiscount.SetFilter("Sales Code", '=%1', CampaignCode);
@@ -599,10 +595,6 @@ codeunit 6151145 "NPR M2 POS Price WebService"
         iStream.Read(xmltext);
 
         Message(xmltext);
-    end;
-
-    local procedure "---"()
-    begin
     end;
 
     procedure ItemAvailabilityByPeriod(var ItemAvailabilityByPeriod: XMLport "NPR M2 Item Availab. By Period")
