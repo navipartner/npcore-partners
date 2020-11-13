@@ -18,14 +18,14 @@ codeunit 6014627 "NPR Managed Dependency Mgt."
     // NPR5.38/MMV /20171204 CASE 294095 Properly fixed DateTime handling by disabling newtonsoft date parsing to make it pass the exact XML NAV format back.
     // NPR5.38/MMV /20171219 CASE 299217 Don't block user login if background session cannot be started.
     // NPR5.38/MMV /20180112 CASE 302065 Better error handling & hardcoded caption that should not be translated.
-    // NPR5.38/LS  /20171218 CASE 300124 Set property OnMissingLicense to Skip for function OnAfterCompanyOpen
+    // NPR5.38/LS  /20171218 CASE 300124 Set property OnMissingLicense to Skip for function OnAfterInitialization
     // NPR5.38/MMV /20180119 CASE 300683 Skip subscriber when installing extension
     // NPR5.40/MMV /20180312 CASE 307878 Skip control add-ins on tenants without write access
     // NPR5.42/MMV /20180405 CASE 314114 Fallback to user session if STARTSESSION fails
     // TM1.39/THRO/20181126 CASE 334644 Replaced Coudeunit 1 by Wrapper Codeunit
 
     Permissions = TableData "NPR POS Web Font" = rimd,
-                  TableData "NPR .NET Assembly"=rimd,
+                  TableData "NPR .NET Assembly" = rimd,
                   TableData "NPR Web Client Dependency" = rimd,
                   TableData "Add-in" = rimd;
 
@@ -113,8 +113,8 @@ codeunit 6014627 "NPR Managed Dependency Mgt."
             until RecRef.Next = 0;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014427, 'OnAfterCompanyOpen', '', true, false)]
-    local procedure OnAfterCompanyOpen()
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"System Initialization", 'OnAfterInitialization', '', true, false)]
+    local procedure OnAfterInitialization()
     var
         SessionId: Integer;
     begin

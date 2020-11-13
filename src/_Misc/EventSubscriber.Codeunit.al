@@ -94,8 +94,8 @@ codeunit 6014404 "NPR Event Subscriber"
 
     //--- Codeunit 1 ApplicationManagement ---
 
-    [EventSubscriber(ObjectType::Codeunit, 6014427, 'OnBeforeCompanyOpen', '', true, false)]
-    local procedure C1OnBeforeCompanyOpen()
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::LogInManagement, 'OnBeforeLogInStart', '', true, false)]
+    local procedure OnBeforeLogInStart()
     var
         ServiceTierUserManagement: Codeunit "NPR Service Tier User Mgt.";
         NPRetailSetup: Record "NPR NP Retail Setup";
@@ -108,7 +108,7 @@ codeunit 6014404 "NPR Event Subscriber"
 
         Commit();
 
-        if ServiceTierUserManagement.Run then;
+        if ServiceTierUserManagement.Run() then;
     end;
 
     //--- Codeunit 22 Item Jnl.-Post Line ---

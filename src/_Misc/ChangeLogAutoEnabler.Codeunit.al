@@ -1,7 +1,7 @@
 codeunit 6014593 "NPR Change Log Auto Enabler"
 {
     // NPR5.29/NPKNAV/20170127  CASE 262678 Transport NPR5.29 - 27 januar 2017
-    // NPR5.38/LS  /20171218 CASE 300124 Set property OnMissingLicense to Skip for function OnAfterCompanyOpen
+    // NPR5.38/LS  /20171218 CASE 300124 Set property OnMissingLicense to Skip for function OnAfterInitialization
     // NPR5.38/MMV /20180119 CASE 300683 Skip subscriber when installing extension
     // TM1.39/THRO/20181126  CASE 334644 Replaced Coudeunit 1 by Wrapper Codeunit
 
@@ -10,23 +10,27 @@ codeunit 6014593 "NPR Change Log Auto Enabler"
     begin
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014427, 'OnAfterCompanyOpen', '', true, false)]
-    local procedure OnAfterCompanyOpen()
+    var
+        RunSilent: Boolean;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"System Initialization", 'OnAfterInitialization', '', true, false)]
+    local procedure OnAfterInitialization()
     var
         RetailSetup: Record "NPR Retail Setup";
     begin
         if NavApp.IsInstalling() then
             exit;
 
-        if not (CurrentClientType in [CLIENTTYPE::Windows, CLIENTTYPE::Web, CLIENTTYPE::Tablet, CLIENTTYPE::Phone, CLIENTTYPE::Desktop]) then
+        if not (CurrentClientType() in [CLIENTTYPE::Windows, CLIENTTYPE::Web, CLIENTTYPE::Tablet, CLIENTTYPE::Phone, CLIENTTYPE::Desktop]) then
             exit;
 
-        if not RetailSetup.ReadPermission then
+        if not RetailSetup.ReadPermission() then
             exit;
 
-        if not RetailSetup.Get then
+        if not RetailSetup.Get() then
             exit;
 
+        RunSilent := true;
         TestChangeLogSetup(RetailSetup);
     end;
 
@@ -38,17 +42,24 @@ codeunit 6014593 "NPR Change Log Auto Enabler"
         if RetailSetup."Auto Changelog Level" = RetailSetup."Auto Changelog Level"::None then
             exit;
 
-        if not (ChangeLogSetup.WritePermission and ChangeLogSetupTable.WritePermission) then
+        if not (ChangeLogSetup.WritePermission() and ChangeLogSetupTable.WritePermission()) then
             exit;
 
-        if not ChangeLogSetup.Get then begin
-            ChangeLogSetup.Init;
-            ChangeLogSetup.Insert(true);
+        if not ChangeLogSetup.Get() then begin
+            ChangeLogSetup.Init();
+            if not RunSilent then
+                ChangeLogSetup.Insert(true)
+            else
+                if not ChangeLogSetup.Insert(true) then
+                    exit;
         end;
 
         if not ChangeLogSetup."Change Log Activated" then begin
             ChangeLogSetup."Change Log Activated" := true;
-            ChangeLogSetup.Modify(true);
+            if not RunSilent then
+                ChangeLogSetup.Modify(true)
+            else
+                if ChangeLogSetup.Modify(true) then;
         end;
 
         TestTable(DATABASE::"Report Selections");
@@ -85,33 +96,32 @@ codeunit 6014593 "NPR Change Log Auto Enabler"
         ChangeLogSetupTable: Record "Change Log Setup (Table)";
         ModifyRec: Boolean;
     begin
-        with ChangeLogSetupTable do
-            if Get(TableID) then begin
-                if "Log Deletion" <> "Log Deletion"::"All Fields" then begin
-                    "Log Deletion" := "Log Deletion"::"All Fields";
-                    ModifyRec := true;
-                end;
-
-                if "Log Insertion" <> "Log Insertion"::"All Fields" then begin
-                    "Log Insertion" := "Log Insertion"::"All Fields";
-                    ModifyRec := true;
-                end;
-
-                if "Log Modification" <> "Log Modification"::"All Fields" then begin
-                    "Log Modification" := "Log Modification"::"All Fields";
-                    ModifyRec := true;
-                end;
-
-                if ModifyRec then
-                    if Modify then;
-            end else begin
-                Init;
-                "Table No." := TableID;
-                "Log Deletion" := "Log Deletion"::"All Fields";
-                "Log Insertion" := "Log Insertion"::"All Fields";
-                "Log Modification" := "Log Modification"::"All Fields";
-                if Insert then;
+        if ChangeLogSetupTable.Get(TableID) then begin
+            if ChangeLogSetupTable."Log Deletion" <> ChangeLogSetupTable."Log Deletion"::"All Fields" then begin
+                ChangeLogSetupTable."Log Deletion" := ChangeLogSetupTable."Log Deletion"::"All Fields";
+                ModifyRec := true;
             end;
+
+            if ChangeLogSetupTable."Log Insertion" <> ChangeLogSetupTable."Log Insertion"::"All Fields" then begin
+                ChangeLogSetupTable."Log Insertion" := ChangeLogSetupTable."Log Insertion"::"All Fields";
+                ModifyRec := true;
+            end;
+
+            if ChangeLogSetupTable."Log Modification" <> ChangeLogSetupTable."Log Modification"::"All Fields" then begin
+                ChangeLogSetupTable."Log Modification" := ChangeLogSetupTable."Log Modification"::"All Fields";
+                ModifyRec := true;
+            end;
+
+            if ModifyRec then
+                if ChangeLogSetupTable.Modify() then;
+        end else begin
+            ChangeLogSetupTable.Init();
+            ChangeLogSetupTable."Table No." := TableID;
+            ChangeLogSetupTable."Log Deletion" := ChangeLogSetupTable."Log Deletion"::"All Fields";
+            ChangeLogSetupTable."Log Insertion" := ChangeLogSetupTable."Log Insertion"::"All Fields";
+            ChangeLogSetupTable."Log Modification" := ChangeLogSetupTable."Log Modification"::"All Fields";
+            if ChangeLogSetupTable.Insert() then;
+        end;
     end;
 
     procedure ValidateChangeLogLevel(var Rec: Record "NPR Retail Setup"; var xRec: Record "NPR Retail Setup")
