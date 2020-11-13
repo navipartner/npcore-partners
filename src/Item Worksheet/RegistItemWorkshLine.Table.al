@@ -27,13 +27,6 @@ table 6060046 "NPR Regist. Item Worksh Line"
             Caption = 'Existing Item No.';
             DataClassification = CustomerContent;
             TableRelation = Item;
-
-            trigger OnValidate()
-            var
-                AlternativeNo: Record "NPR Alternative No.";
-                ItemCrossReference: Record "Item Cross Reference";
-            begin
-            end;
         }
         field(6; "Item No."; Code[20])
         {
@@ -46,23 +39,11 @@ table 6060046 "NPR Regist. Item Worksh Line"
         {
             Caption = 'Vendor Item No.';
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            var
-                Item: Record Item;
-            begin
-            end;
         }
         field(8; "Internal Bar Code"; Code[20])
         {
             Caption = 'Internal Bar Code';
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            var
-                AlternativeNo: Record "NPR Alternative No.";
-            begin
-            end;
         }
         field(9; "Vendor No."; Code[20])
         {
@@ -94,12 +75,6 @@ table 6060046 "NPR Regist. Item Worksh Line"
             InitValue = Undefined;
             OptionCaption = 'Inventory,Service,,,,,,,,Undefined';
             OptionMembers = Inventory,Service,,,,,,,,Undefined;
-
-            trigger OnValidate()
-            var
-                ItemLedgEntry: Record "Item Ledger Entry";
-            begin
-            end;
         }
         field(15; "Shelf No."; Code[10])
         {
@@ -140,12 +115,10 @@ table 6060046 "NPR Regist. Item Worksh Line"
             TableRelation = "Inventory Posting Group";
             ValidateTableRelation = false;
         }
-        field(24; "Costing Method"; Option)
+        field(24; "Costing Method"; Enum "Costing Method")
         {
             Caption = 'Costing Method';
             DataClassification = CustomerContent;
-            OptionCaption = 'FIFO,LIFO,Specific,Average,Standard';
-            OptionMembers = FIFO,LIFO,Specific,"Average",Standard;
         }
         field(25; "Item Disc. Group"; Code[20])
         {
@@ -211,12 +184,6 @@ table 6060046 "NPR Regist. Item Worksh Line"
         {
             Caption = 'Vendors Bar Code';
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            var
-                AlternativeNo: Record "NPR Alternative No.";
-            begin
-            end;
         }
         field(36; "Maximum Inventory"; Decimal)
         {
@@ -345,13 +312,6 @@ table 6060046 "NPR Regist. Item Worksh Line"
             InitValue = Undefined;
             OptionCaption = 'No,Yes,Undefined';
             OptionMembers = No,Yes,Undefined;
-
-            trigger OnValidate()
-            var
-                VATPostingSetup: Record "VAT Posting Setup";
-                SalesSetup: Record "Sales & Receivables Setup";
-            begin
-            end;
         }
         field(89; "VAT Bus. Posting Group"; Code[10])
         {
@@ -411,12 +371,6 @@ table 6060046 "NPR Regist. Item Worksh Line"
             DataClassification = CustomerContent;
             TableRelation = "VAT Product Posting Group";
             ValidateTableRelation = false;
-
-            trigger OnValidate()
-            var
-                VATPostingSetup: Record "VAT Posting Setup";
-            begin
-            end;
         }
         field(100; Reserve; Option)
         {
@@ -489,12 +443,6 @@ table 6060046 "NPR Regist. Item Worksh Line"
             Description = 'Variety';
             TableRelation = "NPR Variety Table".Code WHERE(Type = FIELD("Variety 1"));
             ValidateTableRelation = false;
-
-            trigger OnValidate()
-            var
-                VrtTable: Record "NPR Variety Table";
-            begin
-            end;
         }
         field(202; "Create Copy of Variety 1 Table"; Boolean)
         {
@@ -529,12 +477,6 @@ table 6060046 "NPR Regist. Item Worksh Line"
             Description = 'Variety';
             TableRelation = "NPR Variety Table".Code WHERE(Type = FIELD("Variety 2"));
             ValidateTableRelation = false;
-
-            trigger OnValidate()
-            var
-                VrtTable: Record "NPR Variety Table";
-            begin
-            end;
         }
         field(212; "Create Copy of Variety 2 Table"; Boolean)
         {
@@ -569,12 +511,6 @@ table 6060046 "NPR Regist. Item Worksh Line"
             Description = 'Variety';
             TableRelation = "NPR Variety Table".Code WHERE(Type = FIELD("Variety 3"));
             ValidateTableRelation = false;
-
-            trigger OnValidate()
-            var
-                VrtTable: Record "NPR Variety Table";
-            begin
-            end;
         }
         field(222; "Create Copy of Variety 3 Table"; Boolean)
         {
@@ -609,12 +545,6 @@ table 6060046 "NPR Regist. Item Worksh Line"
             Description = 'Variety';
             TableRelation = "NPR Variety Table".Code WHERE(Type = FIELD("Variety 4"));
             ValidateTableRelation = false;
-
-            trigger OnValidate()
-            var
-                VrtTable: Record "NPR Variety Table";
-            begin
-            end;
         }
         field(232; "Create Copy of Variety 4 Table"; Boolean)
         {
@@ -649,12 +579,6 @@ table 6060046 "NPR Regist. Item Worksh Line"
             Description = 'Variety';
             TableRelation = "NPR Variety Group";
             ValidateTableRelation = false;
-
-            trigger OnValidate()
-            var
-                VRTCheck: Codeunit "NPR Variety Check";
-            begin
-            end;
         }
         field(300; "Variant Code"; Code[20])
         {
@@ -894,12 +818,6 @@ table 6060046 "NPR Regist. Item Worksh Line"
             DataClassification = CustomerContent;
             TableRelation = "Item Category";
             ValidateTableRelation = false;
-
-            trigger OnValidate()
-            var
-                ItemCategory: Record "Item Category";
-            begin
-            end;
         }
         field(5704; "Product Group Code"; Code[10])
         {
@@ -916,12 +834,6 @@ table 6060046 "NPR Regist. Item Worksh Line"
             Description = 'NPR5.25';
             TableRelation = "Service Item Group".Code;
             ValidateTableRelation = false;
-
-            trigger OnValidate()
-            var
-                ResSkill: Record "Resource Skill";
-            begin
-            end;
         }
         field(6500; "Item Tracking Code"; Code[10])
         {
@@ -975,13 +887,6 @@ table 6060046 "NPR Regist. Item Worksh Line"
             Description = 'NPR5.25';
             TableRelation = "Phys. Invt. Counting Period";
             ValidateTableRelation = false;
-
-            trigger OnValidate()
-            var
-                PhysInvtCountPeriod: Record "Phys. Invt. Counting Period";
-                PhysInvtCountPeriodMgt: Codeunit "Phys. Invt. Count.-Management";
-            begin
-            end;
         }
         field(7384; "Use Cross-Docking"; Option)
         {
@@ -1071,12 +976,6 @@ table 6060046 "NPR Regist. Item Worksh Line"
             DataClassification = CustomerContent;
             TableRelation = "NPR Item Group" WHERE(Blocked = CONST(false));
             ValidateTableRelation = false;
-
-            trigger OnValidate()
-            var
-                ItemGroup: Record "NPR Item Group";
-            begin
-            end;
         }
         field(6014401; "Group sale"; Option)
         {
@@ -1368,15 +1267,6 @@ table 6060046 "NPR Regist. Item Worksh Line"
             Description = 'NPR5.25';
             TableRelation = "Production BOM Header";
             ValidateTableRelation = false;
-
-            trigger OnValidate()
-            var
-                MfgSetup: Record "Manufacturing Setup";
-                ProdBOMHeader: Record "Production BOM Header";
-                ItemUnitOfMeasure: Record "Item Unit of Measure";
-                CalcLowLevel: Codeunit "Calculate Low-Level Code";
-            begin
-            end;
         }
         field(99000757; "Overhead Rate"; Decimal)
         {
@@ -1394,14 +1284,6 @@ table 6060046 "NPR Regist. Item Worksh Line"
             InitValue = Undefined;
             OptionCaption = 'None,Tracking Only,Tracking & Action Msg.,,,,,,,Undefined';
             OptionMembers = "None","Tracking Only","Tracking & Action Msg.",,,,,,,Undefined;
-
-            trigger OnValidate()
-            var
-                ReservEntry: Record "Reservation Entry";
-                ActionMessageEntry: Record "Action Message Entry";
-                TempReservationEntry: Record "Reservation Entry" temporary;
-            begin
-            end;
         }
         field(99000875; Critical; Option)
         {
@@ -1451,4 +1333,3 @@ table 6060046 "NPR Regist. Item Worksh Line"
         RegItemWshtVariantLine: Record "NPR Reg. Item Wsht Var. Line";
         RegItemWshtVarietyValue: Record "NPR Reg. Item Wsht Var. Value";
 }
-

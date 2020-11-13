@@ -1,41 +1,5 @@
 table 6151401 "NPR Magento Setup"
 {
-    // MAG1.17/MHA /20150611  CASE 216142 Object Created - Magento specific fields from NaviConnect Setup
-    // MAG1.17/BHR /20150611  CASE 216108 Added field 430 "Exchange Web Code Pattern"
-    // MAG1.20/TR  /20150810  CASE 218819 Field "Gift Voucher Activation" added.
-    // MAG1.21/MHA /20151104  CASE 223835 Added field 35 "Variant Picture Dimension" and 37 "Picture Miniature"
-    // MAG1.21/MHA /20151120  CASE 227734 WebVariant (OptionString 4) Deleted from Field 30 "Variant System"
-    // MAG1.21/MHA /20151123  CASE 227354 Added Field 140 "Multistore Enabled"
-    // MAG1.22/TS  /20150120  CASE 231762 Added Field Tickets Enabled
-    // MAG1.22/TR  /20160414  CASE 238563 Added Field Custom Options Nos.
-    // MAG1.22/MHA /20160418  CASE 230240 Added field 38 "Max. Picture Size"
-    // MAG1.22/MHA /20160421  CASE 236917 Added inventory fields 50 "Inventory Location Filter" and 55 "Intercompany Inventory Enabled"
-    // MAG2.00/MHA /20160525  CASE 242557 Magento Integration
-    // MAG2.02/MHA /20170221  CASE 266871 Added field 517 "Customer Config. Template Code"
-    // MAG2.03/MHA /20170316  CASE 267449 Added fields for replicating Special Price to Sales Price: 600 "Replicate to Sales Prices",605 "Replicate to Sales Type",610 "Replicate to Sales Code"
-    // MAG2.03/MHA /20170425  CASE 267094 Added field 615 "Auto Seo Link Disabled"
-    // MAG2.05/MHA /20170714  CASE 283777 Added field 77 "Api Authorization"
-    // MAG2.08/MHA /20171011  CASE 292314 UpdateApi() is only invoked during "Magento Url".OnValidate()
-    // MAG2.09/MHA /20171211  CASE 292576 Added fields 345 "Voucher Number Format" and 350 "Voucher Date Format"
-    // MAG2.19/MHA /20190306  CASE 347974 Added field 535 "Release Order on Import"
-    // MAG2.20/MHA /20190426  CASE 320423 Added field 15 "Magento Version"
-    // MAG2.21/MHA /20190522  CASE 355271 Reworked OptionString for field 500 "Customer Mapping"
-    // MAG2.22/MHA /20190611  CASE 357662 Added field 490 "Customer Update Mode"
-    // MAG2.22/MHA /20190621  CASE 359146 Added field 540 "Use Blank Code for LCY"
-    // MAG2.22/MHA /20190625  CASE 359285 Added field 34 "Picture Variety Type"
-    // MAG2.22/MHA /20190625  CASE 359754 Added OptionValue "Customer No." to field 500 "Customer Mapping"
-    // MAG2.22/MHA /20190708  CASE 352201 Added field 220 "Collect in Store Enabled"
-    // MAG14.00.2.22/MHA/20190717  CASE 362262 Removed DotNet Print fields 340 "Gift Voucher Bitmap", 345 "Voucher Number Format", 350 "Voucher Date Format", 425 "Credit Voucher Bitmap"
-    // MAG2.23/MHA /20190826  CASE 363864 Added fields 700 "Post Retail Voucher on Import", 710 "E-mail Retail Vouchers to"
-    // MAG2.23/MHA /20190930  CASE 370831 B2B modules should be disabled for Magento 2 as Pull has been implemented via NAV Web Services
-    // MAG2.23/MHA /20191011  CASE 371791 Added fields 720 "Post Tickets on Import", 730 "Post Memberships on Import"
-    // MAG2.24/MHA /20191024  CASE 371807 Added Option "Phone No. to Customer No." to field 500 "Customer Mapping"
-    // MAG2.25/MHA /20200204  CASE 387936 Added fields 750 "Send Order Confirmation", 760 "Order Conf. E-mail Template"
-    // MAG2.26/MHA /20200428  CASE 402247 Added Option "Fixed" to field 490 "Customer Update Mode"
-    // MAG2.26/MHA /20200430  CASE 402486 Added field 800 "Stock Calculation Method"
-    // MAG2.26/MHA /20200505  CASE 402488 Added field 810 "Stock NpXml Template", 820 "Stock Codeunit Id", 830 "Stock Codeunit Name", 840 "Stock Function Name"
-    // MAG2.26/MHA /20200526  CASE 406591 Added fields 850 "NpCs Workflow Code", 860 "NpCs From Store Code"
-
     Caption = 'Magento Setup';
     DataClassification = CustomerContent;
 
@@ -62,13 +26,10 @@ table 6151401 "NPR Magento Setup"
 
             trigger OnValidate()
             begin
-                //-MAG2.20 [320423]
                 if xRec."Magento Version" <> "Magento Version" then begin
                     "Api Url" := '';
                     UpdateApi();
                 end;
-                //+MAG2.20 [320423]
-                //-MAG2.23 [370831]
                 case "Magento Version" of
                     "Magento Version"::"2":
                         begin
@@ -78,7 +39,6 @@ table 6151401 "NPR Magento Setup"
                             "Item Disc. Group Enabled" := false;
                         end;
                 end;
-                //+MAG2.23 [370831]
             end;
         }
         field(20; "Magento Url"; Text[250])
@@ -89,19 +49,13 @@ table 6151401 "NPR Magento Setup"
 
             trigger OnValidate()
             begin
-                //-MAG1.21
-                //IF ("Magento Url" <> '') AND ("Magento Url"[STRLEN("Magento Url")] <> '/') THEN
-                //  "Magento Url" += '/';
                 if "Magento Url" = '' then
                     exit;
                 if "Magento Url"[StrLen("Magento Url")] = '/' then
                     exit;
 
                 "Magento Url" += '/';
-                //+MAG1.21
-                //-MAG2.08 [292314]
                 UpdateApi();
-                //+MAG2.08 [292314]
             end;
         }
         field(30; "Variant System"; Option)
@@ -153,15 +107,11 @@ table 6151401 "NPR Magento Setup"
             DataClassification = CustomerContent;
             Description = 'MAG1.22';
             TableRelation = Location;
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
 
             trigger OnValidate()
             begin
-                //-MAG1.22
                 "Inventory Location Filter" := UpperCase("Inventory Location Filter");
-                //+MAG1.22
             end;
         }
         field(55; "Intercompany Inventory Enabled"; Boolean)
@@ -174,14 +124,12 @@ table 6151401 "NPR Magento Setup"
             var
                 MagentoInventoryCompany: Record "NPR Magento Inv. Company";
             begin
-                //-MAG1.22
                 if "Intercompany Inventory Enabled" and not MagentoInventoryCompany.Get(CompanyName) then begin
                     MagentoInventoryCompany.Init;
                     MagentoInventoryCompany."Company Name" := CompanyName;
                     MagentoInventoryCompany."Location Filter" := "Inventory Location Filter";
                     MagentoInventoryCompany.Insert(true);
                 end;
-                //+MAG1.22
             end;
         }
         field(60; "Api Url"; Text[250])
@@ -502,13 +450,11 @@ table 6151401 "NPR Magento Setup"
             DataClassification = CustomerContent;
             Description = 'MAG2.03';
         }
-        field(605; "Replicate to Sales Type"; Option)
+        field(605; "Replicate to Sales Type"; Enum "Sales Price Type")
         {
             Caption = 'Replicate to Sales Type';
             DataClassification = CustomerContent;
             Description = 'MAG2.03';
-            OptionCaption = 'Customer,Customer Price Group,All Customers,Campaign';
-            OptionMembers = Customer,"Customer Price Group","All Customers",Campaign;
 
             trigger OnValidate()
             begin
@@ -590,9 +536,7 @@ table 6151401 "NPR Magento Setup"
 
             trigger OnValidate()
             begin
-                //-MAG2.25 [387936]
                 "Release Order on Import" := true;
-                //+MAG2.25 [387936]
             end;
         }
         field(760; "E-mail Template (Order Conf.)"; Code[20])
@@ -628,7 +572,7 @@ table 6151401 "NPR Magento Setup"
         }
         field(830; "Stock Codeunit Name"; Text[30])
         {
-            CalcFormula = Lookup (AllObj."Object Name" WHERE("Object Type" = CONST(Codeunit),
+            CalcFormula = Lookup(AllObj."Object Name" WHERE("Object Type" = CONST(Codeunit),
                                                              "Object ID" = FIELD("Stock Codeunit Id")));
             Caption = 'Stock Codeunit Name';
             Description = 'MAG2.26';
@@ -645,7 +589,6 @@ table 6151401 "NPR Magento Setup"
             var
                 EventSubscription: Record "Event Subscription";
             begin
-                //-MAG2.26 [402488]
                 EventSubscription.SetRange("Publisher Object Type", EventSubscription."Publisher Object Type"::Codeunit);
                 EventSubscription.SetRange("Publisher Object ID", GetStockPublisherCodeunitId());
                 EventSubscription.SetRange("Published Function", GetStockPublisherFunctionName());
@@ -654,14 +597,12 @@ table 6151401 "NPR Magento Setup"
 
                 "Stock Codeunit Id" := EventSubscription."Subscriber Codeunit ID";
                 "Stock Function Name" := EventSubscription."Subscriber Function";
-                //+MAG2.26 [402488]
             end;
 
             trigger OnValidate()
             var
                 EventSubscription: Record "Event Subscription";
             begin
-                //-MAG2.26 [402488]
                 if "Stock Function Name" = '' then begin
                     "Stock Codeunit Id" := 0;
                     exit;
@@ -678,7 +619,6 @@ table 6151401 "NPR Magento Setup"
 
                 "Stock Codeunit Id" := EventSubscription."Subscriber Codeunit ID";
                 "Stock Function Name" := EventSubscription."Subscriber Function";
-                //+MAG2.26 [402488]
             end;
         }
         field(850; "NpCs Workflow Code"; Code[20])
@@ -699,26 +639,22 @@ table 6151401 "NPR Magento Setup"
             var
                 NpCsStore: Record "NPR NpCs Store";
             begin
-                //-MAG2.26 [406591]
                 NpCsStore.SetRange("Local Store", true);
                 NpCsStore.SetFilter("Location Code", "Inventory Location Filter");
                 if PAGE.RunModal(0, NpCsStore) = ACTION::LookupOK then
                     Validate("NpCs From Store Code", NpCsStore.Code);
-                //+MAG2.26 [406591]
             end;
 
             trigger OnValidate()
             var
                 NpCsStoreWorkflowRelation: Record "NPR NpCs Store Workflow Rel.";
             begin
-                //-MAG2.26 [406591]
                 if "NpCs From Store Code" = '' then
                     exit;
 
                 NpCsStoreWorkflowRelation.SetRange("Store Code");
                 if NpCsStoreWorkflowRelation.FindFirst then
                     Validate("NpCs Workflow Code", NpCsStoreWorkflowRelation."Workflow Code");
-                //+MAG2.26 [406591]
             end;
         }
     }
@@ -734,25 +670,10 @@ table 6151401 "NPR Magento Setup"
     {
     }
 
-    trigger OnInsert()
-    begin
-        //-MAG2.08 [292314]
-        //UpdateApi();
-        //+MAG2.08 [292314]
-    end;
-
-    trigger OnModify()
-    begin
-        //-MAG2.08 [292314]
-        //UpdateApi();
-        //+MAG2.08 [292314]
-    end;
-
     procedure GetApiUsername(): Text[250]
     var
         NpXmlMgt: Codeunit "NPR NpXml Mgt.";
     begin
-        //-MAG2.00
         case "Api Username Type" of
             "Api Username Type"::Automatic:
                 begin
@@ -761,14 +682,12 @@ table 6151401 "NPR Magento Setup"
             else
                 exit("Api Username");
         end;
-        //+MAG2.00
     end;
 
     local procedure UpdateApi()
     var
         FormsAuthentication: DotNet NPRNetFormsAuthentication;
     begin
-        //-MAG2.20 [320423]
         case "Magento Version" of
             "Magento Version"::"2":
                 begin
@@ -776,12 +695,9 @@ table 6151401 "NPR Magento Setup"
                     exit;
                 end;
         end;
-        //+MAG2.20 [320423]
-        //-MAG2.00
         "Api Url" := "Magento Url" + 'api/rest/naviconnect/';
         if "Api Password" = '' then
             "Api Password" := FormsAuthentication.HashPasswordForStoringInConfigFile(Format(CurrentDateTime, 0, 9), 'MD5');
-        //+MAG2.00
     end;
 
     procedure GetBasicAuthInfo(): Text
@@ -789,32 +705,23 @@ table 6151401 "NPR Magento Setup"
         Convert: DotNet NPRNetConvert;
         Encoding: DotNet NPRNetEncoding;
     begin
-        //-MAG2.00
         exit(Convert.ToBase64String(Encoding.UTF8.GetBytes(GetApiUsername() + ':' + "Api Password")));
-        //+MAG2.00
     end;
 
     procedure GetCredentialsHash(): Text
     var
         FormsAuthentication: DotNet NPRNetFormsAuthentication;
     begin
-        //-MAG2.00
         exit(LowerCase(FormsAuthentication.HashPasswordForStoringInConfigFile(GetApiUsername() + "Api Password" + 'D3W7k5pd7Pn64ctn25ng91ZkSvyDnjo2', 'MD5')));
-        //+MAG2.00
     end;
 
     local procedure GetStockPublisherCodeunitId(): Integer
     begin
-        //-MAG2.26 [402488]
         exit(CODEUNIT::"NPR Magento Item Mgt.");
-        //+MAG2.26 [402488]
     end;
 
     local procedure GetStockPublisherFunctionName(): Text
     begin
-        //-MAG2.26 [402488]
         exit('OnCalcStockQty');
-        //+MAG2.26 [402488]
     end;
 }
-
