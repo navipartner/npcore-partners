@@ -22,7 +22,7 @@ page 6059984 "NPR Web Manager Activ."
                 field("Open Credit Memos"; "Open Credit Memos")
                 {
                     ApplicationArea = All;
-                    DrillDownPageID = "Credit Memo Lines Subform";
+                    DrillDownPageID = "Sales Credit Memos";
                 }
                 field("Open Purchase Orders"; "Open Purchase Orders")
                 {
