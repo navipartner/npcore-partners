@@ -464,6 +464,10 @@ codeunit 6060118 "NPR TM Admission Sch. Mgt."
         UniqKey := '';
         repeat
 
+            if (UniqKey = '') then
+                if (not CheckExists(TmpAdmissionScheduleEntry)) then
+                    exit(false);
+
             if (UniqKey <> '') and (UniqKey <> GetIdentifyingString(TmpAdmissionScheduleEntry)) then
                 if (not CheckExists(TmpAdmissionScheduleEntry)) then
                     exit(false);
