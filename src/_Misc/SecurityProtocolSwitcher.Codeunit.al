@@ -8,7 +8,7 @@ codeunit 6014600 "NPR Security Protocol Switcher"
     // both are actually supported in .NET 4.5.2.
     // In some cases, if consuming external APIs that are strict about allowed protocols, not changing this behaviour means that no connection can be established at all.
     // 
-    // This codeunit hooks to OnAfterCompanyOpen and switches the property so that tls1.2 & tls1.1 is attempted as well - this is a GLOBAL setting for the entire NST process!
+    // This codeunit hooks to OnAfterInitialization and switches the property so that tls1.2 & tls1.1 is attempted as well - this is a GLOBAL setting for the entire NST process!
     // Changing this can also be accomplished via manual server registry key edits but this approach is deemed less intrusive.
     // This codeunit is specifically made so that it only enables new protocols on-top of what is already allowed so that nothing stops working for existing
     // web service integrations.
@@ -28,8 +28,8 @@ codeunit 6014600 "NPR Security Protocol Switcher"
     begin
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014427, 'OnAfterCompanyOpen', '', false, false)]
-    local procedure OnAfterCompanyOpen()
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"System Initialization", 'OnAfterInitialization', '', false, false)]
+    local procedure OnAfterInitialization()
     var
         ServicePointManager: DotNet NPRNetServicePointManager;
         SecurityProtocolType: DotNet NPRNetSecurityProtocolType;

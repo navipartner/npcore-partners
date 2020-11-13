@@ -31,16 +31,6 @@ codeunit 6014427 "NPR System Event Wrapper"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeCompanyOpen()
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterCompanyOpen()
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
     local procedure OnBeforeCompanyClose()
     begin
     end;
@@ -49,6 +39,7 @@ codeunit 6014427 "NPR System Event Wrapper"
     local procedure OnAfterCompanyClose()
     begin
     end;
+
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterCaptionClassTranslate(Language: Integer; CaptionExpression: Text[1024]; var Caption: Text[1024])
@@ -92,18 +83,6 @@ codeunit 6014427 "NPR System Event Wrapper"
 
     local procedure "--- Subscribers"()
     begin
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, 40, 'OnBeforeCompanyOpen', '', true, true)]
-    local procedure C40OnBeforeCompanyOpen()
-    begin
-        OnBeforeCompanyOpen();
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, 40, 'OnAfterCompanyOpen', '', true, true)]
-    local procedure C40OnAfterCompanyOpen()
-    begin
-        OnAfterCompanyOpen();
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 40, 'OnBeforeCompanyClose', '', true, true)]

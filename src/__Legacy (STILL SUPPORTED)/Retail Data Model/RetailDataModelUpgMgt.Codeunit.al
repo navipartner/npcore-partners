@@ -20,73 +20,81 @@ codeunit 6150699 "NPR Retail Data Model Upg Mgt."
         "Code": Code[10];
     begin
         RunSilent := false;
-        TestUpgradeDataModel;
+        TestUpgradeDataModel();
     end;
 
     var
         NPRetailSetup: Record "NPR NP Retail Setup";
         RunSilent: Boolean;
         TxtDefaultPaymentBinDescription: Label 'Cash Drawer %1';
+        DataModelUpgInvokedTxt: Label 'Data Model upgrade invoked from Data Upgrade Per Company.';
+        InitialExecutionTxt: Label 'Initial execution!, %1 created.', Comment = '%1=NPRetailSetup.TableName()';
+        DataModelUpgStartedTxt: Label 'Data model upgrade started. Upgrading from build %1 to %2', Comment = '%1=NPRetailSetup."Data Model Build", %2=GetCurrentDataModelBuild()';
+        DataModelUpgEndedTxt: Label 'Data model upgrade ended.';
+        DataModelUpgStepTxt: Label 'Data model upgrade build %1 started...', Comment = '%1=BuildStep';
+        DataModelUpgStepNotDefinedErr: Label 'Data model upgrade for Buildstep %1 not defined!', Comment = '%1=BuildStep';
+        DataModelUpgStepEndedTxt: Label '...data model upgrade build %1 ended', Comment = '%1=BuildStep';
 
     local procedure GetCurrentDataModelBuild(): Integer
     begin
-        //EXIT(1); //Initial Data Model Build
-        //EXIT(2); //-NPR5.30 [261964]
-        //EXIT(3); //-NPR5.30 [266258]
-        exit(4); //-NPR5.32 [241995]
+        exit(4);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014427, 'OnAfterCompanyOpen', '', true, true)]
-    local procedure TestUpgradeOnAfterCompanyOpen()
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"System Initialization", 'OnAfterInitialization', '', true, true)]
+    local procedure TestUpgradeOnOnAfterInitialization()
     var
     begin
         if NavApp.IsInstalling() then
             exit;
 
-        if not (CurrentClientType in [CLIENTTYPE::Windows, CLIENTTYPE::Web, CLIENTTYPE::Tablet, CLIENTTYPE::Phone, CLIENTTYPE::Desktop, CLIENTTYPE::NAS]) then
+        if not (CurrentClientType() in [CLIENTTYPE::Windows, CLIENTTYPE::Web, CLIENTTYPE::Tablet, CLIENTTYPE::Phone, CLIENTTYPE::Desktop, CLIENTTYPE::NAS]) then
             exit;
 
-        if not NPRetailSetup.WritePermission then
+        if not NPRetailSetup.WritePermission() then
             exit;
 
         RunSilent := true;
-        TestUpgradeDataModel;
-        Commit; //Commit changes and release lock.
+        TestUpgradeDataModel();
+        Commit();
     end;
 
     procedure TestUpgradeFromDataUpgradePerCompany()
     begin
         RunSilent := true;
-        //-NPR5.32 [274285]
-        //CreateLogEntry('Data Model upgrade invoked from Data Upgrade Per Company.',0,0,0);
-        CreateLogEntry('Data Model upgrade invoked from Data Upgrade Per Company.', 0, 0, -1);
-        //+NPR5.32 [274285]
-        TestUpgradeDataModel;
+        CreateLogEntry(DataModelUpgInvokedTxt, 0, 0, -1);
+        TestUpgradeDataModel();
     end;
 
     local procedure TestUpgradeDataModel()
     begin
-        with NPRetailSetup do begin
-            LockTable;
-            if not Get then begin
-                Init;
-                Insert;
-                CreateLogEntry(StrSubstNo('Initial execution!, %1 created.', NPRetailSetup.TableName), 0, 0, 0);
+        NPRetailSetup.LockTable();
+        if not NPRetailSetup.Get() then begin
+            NPRetailSetup.Init();
+            if not RunSilent then begin
+                NPRetailSetup.Insert();
+                CreateLogEntry(StrSubstNo(InitialExecutionTxt, NPRetailSetup.TableName()), 0, 0, 0);
+            end else begin
+                if not NPRetailSetup.Insert() then
+                    exit;
+                CreateLogEntry(StrSubstNo(InitialExecutionTxt, NPRetailSetup.TableName()), 0, 0, 0);
             end;
-
-            if "Data Model Build" >= GetCurrentDataModelBuild then
-                exit;
-
-            CreateLogEntry(StrSubstNo('Data model upgrade started. Upgrading from build %1 to %2', "Data Model Build", GetCurrentDataModelBuild), 0, 0, "Data Model Build");
-
-            "Prev. Data Model Build" := "Data Model Build";
-            "Data Model Build" := UpgradeDataModel("Prev. Data Model Build" + 1, GetCurrentDataModelBuild);
-            "Last Data Model Build Upgrade" := CurrentDateTime;
-            "Last Data Model Build User ID" := UserId;
-            Modify;
-
-            CreateLogEntry(StrSubstNo('Data model upgrade ended.'), 0, 0, "Data Model Build");
         end;
+
+        if NPRetailSetup."Data Model Build" >= GetCurrentDataModelBuild() then
+            exit;
+
+        CreateLogEntry(StrSubstNo(DataModelUpgStartedTxt, NPRetailSetup."Data Model Build", GetCurrentDataModelBuild()), 0, 0, NPRetailSetup."Data Model Build");
+
+        NPRetailSetup."Prev. Data Model Build" := NPRetailSetup."Data Model Build";
+        NPRetailSetup."Data Model Build" := UpgradeDataModel(NPRetailSetup."Prev. Data Model Build" + 1, GetCurrentDataModelBuild());
+        NPRetailSetup."Last Data Model Build Upgrade" := CurrentDateTime();
+        NPRetailSetup."Last Data Model Build User ID" := UserId();
+        if not RunSilent then begin
+            NPRetailSetup.Modify();
+            CreateLogEntry(DataModelUpgEndedTxt, 0, 0, NPRetailSetup."Data Model Build");
+        end else
+            if NPRetailSetup.Modify() then
+                CreateLogEntry(DataModelUpgEndedTxt, 0, 0, NPRetailSetup."Data Model Build");
     end;
 
     local procedure UpgradeDataModel(FromBuild: Integer; ToBuild: Integer): Integer
@@ -95,28 +103,22 @@ codeunit 6150699 "NPR Retail Data Model Upg Mgt."
     begin
         for BuildStep := FromBuild to ToBuild do
             if BuildStep > 0 then begin
-                CreateLogEntry(StrSubstNo('Data model upgrade build %1 started...', BuildStep), 0, 0, BuildStep);
+                CreateLogEntry(StrSubstNo(DataModelUpgStepTxt, BuildStep), 0, 0, BuildStep);
                 case BuildStep of
                     1:
-                        UpgradeDataModelBuildStep1;
-                    //-NPR5.30 [261964]
+                        UpgradeDataModelBuildStep1();
                     2:
-                        UpgradeDataModelBuildStep2;
-                    //+NPR5.30 [261964]
-                    //-NPR5.30 [266258]
+                        UpgradeDataModelBuildStep2();
                     3:
                         ;
-                    //+NPR5.30 [266258]
-                    //-NPR5.32 [241995]
                     4:
-                        UpgradeDataModelBuildStep4;
-                    //+NPR5.32 [241995]
+                        UpgradeDataModelBuildStep4();
                     else begin
-                            CreateLogEntry(StrSubstNo('Data model upgrade for Buildstep %1 not defined!', BuildStep), 1, 2, BuildStep);
+                            CreateLogEntry(StrSubstNo(DataModelUpgStepNotDefinedErr, BuildStep), 1, 2, BuildStep);
                             exit(BuildStep);
                         end;
                 end;
-                CreateLogEntry(StrSubstNo('...data model upgrade build %1 ended', BuildStep), 0, 0, BuildStep);
+                CreateLogEntry(StrSubstNo(DataModelUpgStepEndedTxt, BuildStep), 0, 0, BuildStep);
             end;
         exit(BuildStep);
     end;
@@ -157,17 +159,18 @@ codeunit 6150699 "NPR Retail Data Model Upg Mgt."
         if (not RunSilent) and (LogType = LogType::Error) then
             Error(LogText);
 
-        with DataModelUpgradeLogEntry do begin
-            Init;
-            "Entry No." := 0;
-            "Data Model Build" := LogBuildNo;
-            Text := LogText;
-            "User ID" := UserId;
-            "Date and Time" := CurrentDateTime;
-            Type := LogType;
-            Indent := LogIndent;
-            Insert;
-        end;
+        DataModelUpgradeLogEntry.Init;
+        DataModelUpgradeLogEntry."Entry No." := 0;
+        DataModelUpgradeLogEntry."Data Model Build" := LogBuildNo;
+        DataModelUpgradeLogEntry.Text := LogText;
+        DataModelUpgradeLogEntry."User ID" := UserId;
+        DataModelUpgradeLogEntry."Date and Time" := CurrentDateTime;
+        DataModelUpgradeLogEntry.Type := LogType;
+        DataModelUpgradeLogEntry.Indent := LogIndent;
+        if not RunSilent then
+            DataModelUpgradeLogEntry.Insert()
+        else
+            if DataModelUpgradeLogEntry.Insert() then;
     end;
 
     procedure ReRunUpgradeBuilds(FromBuildStep: Integer; ToBuildStep: Integer)
