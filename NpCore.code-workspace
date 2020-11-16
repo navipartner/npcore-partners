@@ -1,7 +1,8 @@
 {
 	"folders": [
 		{
-			"path": "."
+			"name": "APPLICATION",
+			"path": ".\\Application"
 		},
 		{
 			"name": "TEST",

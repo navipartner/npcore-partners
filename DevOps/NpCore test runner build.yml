@@ -47,7 +47,7 @@ jobs:
         containerAdminUsername: $(containerAdminUsername)
         containerAdminPassword: $(containerAdminPassword)
         serverInstanceName: $(serverInstanceName)
-        alProjectRoot: $(Build.SourcesDirectory)/$(Build.Repository.Name)        
+        alProjectRoot: $(Build.SourcesDirectory)/$(Build.Repository.Name)/Application       
         dependancies:
         - package:
             source: 'https://api.nuget.org/v3/index.json;https://pkgs.dev.azure.com/navipartner/_packaging/NprAddIns/nuget/v3/index.json'
@@ -56,7 +56,7 @@ jobs:
         - package:
             source: 'https://pkgs.dev.azure.com/navipartner/_packaging/JSDependancies/nuget/v3/index.json'
             id: NaviPartner.Dragonglass.BC
-            destinationPath: $(Build.SourcesDirectory)/$(Build.Repository.Name)/src/_ControlAddIns/Dragonglass/Scripts
+            destinationPath: $(Build.SourcesDirectory)/$(Build.Repository.Name)/Application/src/_ControlAddIns/Dragonglass/Scripts
 
     - template: YAML/Templates/Step/HandleDependancies.yml@scriptsRepo 
       parameters:
