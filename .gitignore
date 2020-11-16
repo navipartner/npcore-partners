@@ -1,16 +1,16 @@
 ##Ignore Dragonglass bundle.js
-src/_ControlAddIns/Dragonglass/Scripts/bundle.js
-src/_ControlAddIns/Dragonglass/Scripts/bundle.js.map
+*/src/_ControlAddIns/Dragonglass/Scripts/bundle.js
+*/src/_ControlAddIns/Dragonglass/Scripts/bundle.js.map
 
 
 ## Ignore NAV Instance Specific files
-.alpackages/
-.alcache/
-.vscode/*
+*/.alpackages/
+*/.alcache/
+*/.vscode/*
 Test/.vscode/*
 !Test/.vscode/settings.json
 .netpackages/
-.altemplates/
+*/.altemplates/
 *.app
 *.zip
 *.xlf
