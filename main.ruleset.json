@@ -16,11 +16,6 @@
             "id": "AS0058",
             "action":"Warning",
             "justification": "We need to find a better solution for code that is using AssertError!"
-        },               
-        {
-            "id": "AS0061",
-            "action": "Warning",
-            "justification": "Since we're targeting OnPrem, OnBeforeCompanyOpen & OnAfterCompanyOpen are still valid events to use."
         }
     ]
 }
