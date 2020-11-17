@@ -1,7 +1,5 @@
 codeunit 6014419 "NPR Post sale"
 {
-    // NPR5.36/TJ /20170920 CASE 286283 Renamed variables/function into english and into proper naming terminology
-
     TableNo = "NPR Audit Roll";
 
     trigger OnRun()

@@ -1,7 +1,5 @@
 query 6014410 "NPR VAT Totals"
 {
-    // NPR5.51/ZESO/20190702  Object created
-
     Caption = 'VAT Totals';
 
     elements

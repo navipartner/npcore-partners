@@ -1,10 +1,5 @@
 table 6150698 "NPR Audit Roll 2 POSEntry Link"
 {
-    // NPR5.36/AP  /20170420  CASE 262628  Tabel to store relation between old Audit Roll and new POS Entry during
-    //                                   phase in of new data model.
-    // NPR5.38/BR  /20171214  CASE 299888 Renamed from POS Ledg. Register No. to POS Period Register No. (incl. Captions)
-    // NPR5.38/BR  /20180109  CASE 301600 Added option field "Item Entry Posted By" and "Posted By"
-
     Caption = 'Audit Roll to POS Entry Link';
     DataClassification = CustomerContent;
 

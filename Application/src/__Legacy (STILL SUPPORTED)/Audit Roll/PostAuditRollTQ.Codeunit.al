@@ -1,9 +1,5 @@
 codeunit 6059912 "NPR Post Audit Roll TQ"
 {
-    // TQ1.28/MHA  /20151216  CASE 229609 Task Queue
-    // NPR5.29/MHA /20170116  CASE 262116 Added Item Ledger Posting to auto post missing Item Entries
-    // NPR5.30/JC  /20170213  CASE 265042 Option to create task for only posting Item ledgers
-
     TableNo = "NPR Task Line";
 
     trigger OnRun()
@@ -22,7 +18,6 @@ codeunit 6059912 "NPR Post Audit Roll TQ"
         AuditRoll.SetRange(Posted, false);
         AuditRoll.SetFilter("Sale Date", '<>%1', 0D);
 
-        //-NPR5.30 [265042]
         SkipPostGLEntry := false;
         SkipPostItemLedgerEntry := false;
         TaskLineParam.SetRange("Journal Template Name", "Journal Template Name");
@@ -33,21 +28,16 @@ codeunit 6059912 "NPR Post Audit Roll TQ"
             SkipPostItemLedgerEntry := GetParameterBool('SKIPPOSTILENTRY');
         end;
         OnlyItemLedgerPosting := SkipPostGLEntry and (not SkipPostItemLedgerEntry);
-        //+NPR5.30
 
         if AuditRoll.FindFirst then
             repeat
-                //will always post per register, per date
                 AuditRoll.SetRange("Register No.", AuditRoll."Register No.");
                 AuditRoll.SetRange("Sale Date", AuditRoll."Sale Date");
                 AuditRoll.FindLast;
-                //Post it
                 AuditRoll2.Copy(AuditRoll);
                 Clear(PostAuditRoll);
                 PostAuditRoll.ShowProgress(false);
-                //-NPR5.30 [265042]
                 PostAuditRoll.SetPostingParameters(SkipPostGLEntry, SkipPostItemLedgerEntry);
-                //-NPR5.30
                 PostAuditRoll.Run(AuditRoll2);
 
                 AddMessageLine2OutputLog(StrSubstNo(Text002, AuditRoll."Register No.", AuditRoll."Sale Date"));
@@ -58,7 +48,6 @@ codeunit 6059912 "NPR Post Audit Roll TQ"
                 AuditRoll.SetFilter("Sale Date", '<>%1', 0D);
 
                 if not TimeSlotStillValid then begin
-                    //Commit and throw an error if im out of time? (then the job fail, and normal TQ mail routine can be used to send error mail)
                     AddMessageLine2OutputLog(Text001);
                     Commit;
                     Error(Text001);
@@ -66,10 +55,7 @@ codeunit 6059912 "NPR Post Audit Roll TQ"
                 end;
             until AuditRoll.Next = 0;
 
-        //-NPR5.30 [265042]
         if not OnlyItemLedgerPosting then begin
-            //-NPR5.30
-            //-NPR5.29 [262116]
             AuditRoll.Reset;
             AuditRoll.SetRange(Posted, true);
             AuditRoll.SetRange("Item Entry Posted", false);
@@ -87,7 +73,6 @@ codeunit 6059912 "NPR Post Audit Roll TQ"
                 PostAuditRoll.ShowProgress(false);
                 PostAuditRoll.RunCode(AuditRoll2);
             until AuditRoll.Next = 0;
-            //+NPR5.29 [262116]
         end;
     end;
 
@@ -106,7 +91,6 @@ codeunit 6059912 "NPR Post Audit Roll TQ"
         Text001: Label 'No Parameters found. Do you with to have empty Parameters added?';
         FieldType: Option Text,Date,Time,DateTime,"Integer",Decimal,Boolean,DateFilter;
     begin
-        //-NPR5.30 [265042]
         with Rec do begin
             if (xRec."Object No." = 6059912) and ("Object No." <> 6059912) then begin
                 TaskLineParam.SetRange("Journal Template Name", "Journal Template Name");
@@ -133,7 +117,6 @@ codeunit 6059912 "NPR Post Audit Roll TQ"
 
             "Call Object With Task Record" := true;
         end;
-        //+NPR5.30
     end;
 }
 

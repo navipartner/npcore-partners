@@ -1,29 +1,5 @@
 codeunit 6014409 "NPR Post audit roll"
 {
-    // --->> NPR Version 1.7
-    //    Kalder codeunit 'Bogf¢r revisionsrulle aktivt'
-    // <<--- NPR Version 1.7 slut
-    // 
-    // 
-    // --->> NPR Version 1.8
-    //   Codeunit 'Bogf¢r revisionsrulle' (6014410) fjernet!
-    //   Codeunit 'Bogf¢r revisionsrulle aktivt' om¢bt til
-    //   Codeunit 'Bogf¢r revisionsrulle' (6014414)
-    //   Kalder codeunit 'Bogf¢r revisionsrulle' (6014414)
-    // <<--- NPR version 1.8
-    // 
-    // --->> NPR Version 1.93
-    //   Indf¢rt tjek for hængende udbetalinger via funktionen 'FjernHængendeUdbetalinger'.
-    // <<--- NPR Version 1.93
-    // 
-    // Lavet mulighed for at bruge temporer tabel til bogf¢ring af revisionsrullen
-    // 
-    // NPR5.23/JDH /20160429  CASE 240004 Possible to initiate from Task Queue (or other places) to avoid posting of items or GL
-    // NPR5.29/MHA /20170116  CASE 262116 Adjusted Filter Reset on Item Ledger Posting
-    // NPR5.36/TJ  /20170920  CASE 286283 Renamed variables/function into english and into proper naming terminology
-    //                                    Removed unused variables
-    // NPR5.53/BHR / 20191004 CASE 369361 Removed Invalid Functionalities
-
     TableNo = "NPR Audit Roll";
 
     trigger OnRun()
@@ -31,10 +7,6 @@ codeunit 6014409 "NPR Post audit roll"
         Txt001: Label 'Posting of audit roll is not possible in offline mode';
     begin
         RetailSetup.Get;
-        //-NPR5.53 [369361]
-        //IF RetailSetup."Company - Function" = RetailSetup."Company - Function"::Offline THEN
-        //  ERROR(Txt001);
-        //+NPR5.53 [369361]
         RunCode(Rec);
     end;
 
@@ -55,7 +27,6 @@ codeunit 6014409 "NPR Post audit roll"
         TotalCount: Integer;
         TxtDlgFin: Label 'Removing outstanding financial payments #1######### of #2########## @3@@@@@@@@@';
     begin
-        //FjernHængendeUdbetalinger
         Clear(AuditRoll2);
         AuditRoll2.SetCurrentKey("Sale Type", Type, "No.");
         AuditRoll.SetCurrentKey("Sale Type", Type, "No.");
@@ -111,7 +82,6 @@ codeunit 6014409 "NPR Post audit roll"
 
     procedure ShowProgress(ShowProgress: Boolean)
     begin
-        //ShowProgress
         ShowProgressGlobal := ShowProgress;
     end;
 
@@ -119,16 +89,8 @@ codeunit 6014409 "NPR Post audit roll"
     var
         TempAuditRollPosting: Record "NPR Audit Roll Posting" temporary;
     begin
-        //Bogf¢rperkassetemp
-
         if AuditRollPosting.Count > 0 then begin
-            //ohm-
-            //IF Kasse."Last G/L Posting No." = '' THEN
-            //  Kasse."Last G/L Posting No." := '0';
-            //Kasse."Last G/L Posting No." := INCSTR(Kasse."Last G/L Posting No.");
-            //Kasse.MODIFY;
             PostTempAuditRoll.SetPostingNo(PostTempAuditRoll.GetNewPostingNo(true));
-            //ohm+
 
             AuditRollPosting.ModifyAll("Internal Posting No.", 0);
 
@@ -154,17 +116,7 @@ codeunit 6014409 "NPR Post audit roll"
     var
         TempAuditRollPosting: Record "NPR Audit Roll Posting" temporary;
     begin
-        //Bogf¢rperkassetempItemLedger
-
         if AuditRollPosting.Count > 0 then begin
-            //ohm-
-            //IF Kasse."Last G/L Posting No." = '' THEN
-            //  Kasse."Last G/L Posting No." := '0';
-            //Kasse."Last G/L Posting No." := INCSTR(Kasse."Last G/L Posting No.");
-            //Kasse.MODIFY;
-            //tBogf¢r.setPostingNo(tBogf¢r.getNewPostingNo(TRUE));
-            //ohm+
-
             AuditRollPosting.ModifyAll("Internal Posting No.", 0);
 
             if AuditRollPosting.Find('-') then
@@ -191,19 +143,10 @@ codeunit 6014409 "NPR Post audit roll"
         t001: Label 'Posting of audit roll is not possible in offline mode';
         Dummy: Record "NPR Audit Roll" temporary;
     begin
-        //RunKode()
-
-        //-NPR5.29 [262116]
-        //dummy.COPYFILTERS(Rec);
         Dummy.Copy(Rec);
-        //+NPR5.29 [262116]
 
         RetailSetup.Get();
         Clear(AuditRollPosting);
-        //-NPR5.53 [369361]
-        //IF RetailSetup."Company - Function" = RetailSetup."Company - Function"::Offline THEN
-        //  ERROR(t001);
-        //+NPR5.53 [369361]
         RetailSetup.Validate("Posting Source Code", RetailSetup."Posting Source Code");
 
         Register.SetFilter("Register No.", Rec.GetFilter("Register No."));
@@ -212,10 +155,7 @@ codeunit 6014409 "NPR Post audit roll"
             PostTempAuditRoll.StatusWindowOpen();
         end;
 
-        /* G/L ENTRY POSTING */
-        //-NPR5.23
         if not SkipPostGL then begin
-            //+NPR5.23
             if not RetailSetup."Post registers compressed" then begin
                 if Register.Find('-') then
                     repeat
@@ -243,15 +183,9 @@ codeunit 6014409 "NPR Post audit roll"
 
                 PostPerRegisterTemp(Register);
                 AuditRollPosting.DeleteAll;
-
             end;
-
-            //-NPR5.23
         end;
-        //+NPR5.23
 
-
-        /* ITEM ENTRY POSTING */
         Clear(AuditRollPosting);
         AuditRollPosting.DeleteAll;
         Rec.CopyFilters(Dummy);
@@ -259,15 +193,11 @@ codeunit 6014409 "NPR Post audit roll"
         Register.SetFilter("Register No.", Rec.GetFilter("Register No."));
         AuditRollPosting2.DeleteAll;
 
-        //-NPR5.23
         if not SkipPostItem then begin
-            //+NPR5.23
-            //-NPR5.29 [262116]
             Rec.SetRange(Posted);
             Rec.SetRange("Item Entry Posted", false);
             Rec.SetRange("Sale Type", Rec."Sale Type"::Sale);
             Rec.SetRange(Type, Rec.Type::Item);
-            //+NPR5.29 [262116]
 
             if not RetailSetup."Post registers compressed" then begin
                 if Register.Find('-') then
@@ -288,14 +218,9 @@ codeunit 6014409 "NPR Post audit roll"
                 PostPerRegisterTempItemLedger(Register);
                 AuditRollPosting.DeleteAll;
             end;
-            //-NPR5.23
         end;
-        //+NPR5.23
 
-        //-NPR5.29 [262116]
-        //dummy.COPYFILTERS(Rec);
         Rec.Copy(Dummy);
-        //+NPR5.29 [262116]
 
         if ShowProgressGlobal then
             PostTempAuditRoll.StatusVindueLuk('');
@@ -304,10 +229,8 @@ codeunit 6014409 "NPR Post audit roll"
 
     procedure SetPostingParameters(SkipPostGLEntry: Boolean; SkipPostItemLedgerEntry: Boolean)
     begin
-        //-NPR5.23
         SkipPostGL := SkipPostGLEntry;
         SkipPostItem := SkipPostItemLedgerEntry;
-        //+NPR5.23
     end;
 }
 

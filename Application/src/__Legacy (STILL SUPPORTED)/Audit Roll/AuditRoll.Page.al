@@ -1,59 +1,5 @@
 page 6014432 "NPR Audit Roll"
 {
-    // //001
-    // Henter den afslutningsbon der indholder afslutningsoplysningerne, dvs. den der henvises til i
-    // felterne "Afsluttet på bonnr" og "På kassenummer"
-    // 
-    // NPR4.000.005, NPK, 07-04-09, MH - Tilf¢jet funktionen, SendAsPDF(), der sender den pågældene kvittering som vedhæftet via email.
-    //                                   Der benyttes "Mail And Document Handler"-modulet.
-    // NPR4.000.006, NPK, 23-04-09, MH - Tilrettet variabelNavne og sortering i SendAsPDF().
-    // NPR4.000.007, NPK, 23-04-09, MH - Fjernet funktionalitet i forhold til performance i SendAsPDF().
-    // NPR4.000.008, NPK, 11-06-09, MH - Tilf¢jet feltet "Lock Code" (sag 65422).
-    // NPR4.000.009, NPK, 06-07-09, MH - SendAsPDF(), flyttet til tabel, audit roll.
-    // PN1.04/MH/20140819  NAV-AddOn: PDF2NAV
-    //   - Added Menu Items on Function-button: "E-mail Log" and "Send as PDF".
-    // 
-    // NPR4.14/MMV/20150720 CASE 218865 Added code for printing A4 receipts. (was commented out before)
-    //                                  Changed caption on button for printing A4 receipts.
-    // NPR4.14/MMV/20150807 CASE 220160 Moved code for printing register receipts to CU 6014428 since its used elsewhere as well.
-    // NPR4.14/BHR/20150811 CASE 220159 Hide action Tax Free.(to remove action). property visible set to false
-    // NPR4.14/TS/20150818 CASE 220780 Change captions Posting to Post.
-    // PN1.08/MHA/20151214  CASE 228859 Pdf2Nav (New Version List)
-    // NPR4.18/MMV/20160202 CASE 224257 New tax free integration
-    // PN1.10/MHA/20160314 CASE 236653 Updated Record Specific Pdf2Nav functions with general Variant functions
-    // NPR5.22/VBA/20160411 CASE 237960 Added ENU captions where missing (for actions)
-    // NPR5.22/MMV/20160425 CASE 232067 Moved filter on rec to removable by user instead of hardcoded (As in classic)
-    // NPR5.22/MMV/20160426 CASE 239998 Promoted action "Register Report" & "Tax Free"
-    // NPR5.23/JDH /20160523 CASE 242105 Changed key to "Sale Date,Sales Ticket No.,Line No."
-    // NPR5.25/TS/20160701 CASE 245839 Added Action to MobilPay Transaction List
-    // NPR5.26/OSFI/20160811 CASE 246167 Added POS Info action to show POS Info lines linked to the sale
-    // NPR5.28/TS/20161110  CASE 258009 Added Desciption2
-    // NPR5.28/BR /20161124 CASE  259295 Added Action "Pepper Transaction Requests"
-    // NPR5.30/MMV /20170127 CASE 261964 Refactored tax free
-    // NPR5.32/JLK /20170502 CASE 274353 Added field "Gen. Bus. Posting Group"
-    // NPR5.34/TSA /20170704 CASE 283125 Removed EFT receipt printing from sales receipt printing and promoted the EFT Receipt button
-    // NPR5.35/TJ  /20170809 CASE 286283 Renamed variables/function into english and into proper naming terminology
-    //                                   Removed unused variables
-    // NPR5.38/BR  /20171117 CASE 295255 Added Action POS Entry
-    // NPR5.38/TS  /20171120 CASE 290609 Promoted Action Debit Print
-    // NPR5.38/BR  /20171207 CASE 299035 Changed Key to include Sale Type field
-    // NPR5.38/TS  /20171213 CASE 295566 SendAsPDF has been promoted.
-    // NPR5.38/BR  /20180108 CASE 301600 Show Warning if Advanced posting is on
-    // NPR5.38/MHA /20180109 CASE 295549 Action "MobilePay Transaction List" removed
-    // NPR5.38/TS  /20180110 CASE 301806 Removed Action Register Journal
-    // NPR5.39/MHA /20180214 CASE 305139 Added field 405 "Discount Authorised by"
-    // NPR5.40/MMV /20180112 CASE 293106 Refactored tax free module
-    // NPR5.42/BHR /20180518 CASE 314987 Added functionality to Change dimension
-    // NPR5.42/THRO/20180518 CASE 308179 Removed code from Action SendAsPdf and EmailLog
-    // NPR5.44/MHA /20180705 CASE 321231 Added "Reason Code"
-    // NPR5.45/TJ  /20180719 CASE 318531 New action Advanced Filter
-    // NPR5.46/MMV /20181001 CASE 290734 EFT framework refactoring
-    // NPR5.48/TJ  /20181129 CASE 318531 Give ability to preset different Type filter
-    // NPR5.48/TS  /20181213 CASE 339569 Added field Gift Voucher REf
-    // NPR5.48/TJ  /20190122 CASE 335967 Added field "Unit of Measure Code"
-    // NPR5.51/TJ  /20190123 CASE 343685 Fixed double posting doc. no. generation for same ticket
-    // NPR5.51/YAHA/20190718 CASE 365357 Page action moved from tab ACTION to tab HOME
-
     Caption = 'Audit Roll';
     Editable = false;
     PageType = List;
@@ -88,10 +34,8 @@ page 6014432 "NPR Audit Roll"
 
                 trigger OnAssistEdit()
                 begin
-                    //-NPR5.38 [301600]
                     PAGE.Run(PAGE::"NPR POS Entry List");
                     CurrPage.Close;
-                    //+NPR5.38 [301600]
                 end;
             }
             field(TypeFilter; TypeFilter)
@@ -102,7 +46,6 @@ page 6014432 "NPR Audit Roll"
 
                 trigger OnValidate()
                 begin
-                    // SalesColor := TRUE;
                     if TypeFilter > TypeFilter::" " then begin
                         SetRange(Type, TypeFilter - 1);
                         HideCancelled := false;
@@ -211,16 +154,6 @@ page 6014432 "NPR Audit Roll"
 
                 trigger OnValidate()
                 begin
-                    /*
-                   CASE Bogf¢rtfilter OF
-                     Bogf¢rtfilter::" " :
-                       SETRANGE(Posted);
-                     Bogf¢rtfilter::No :
-                       SETRANGE(Posted,FALSE);
-                     Bogf¢rtfilter::Yes :
-                       SETRANGE(Posted,TRUE);
-                   END;
-                   */
                     if PostedFilter = PostedFilter::" " then begin
                         SetRange(Posted);
                     end else begin
@@ -430,26 +363,9 @@ page 6014432 "NPR Audit Roll"
                     var
                         StdCodeunitCode: Codeunit "NPR Std. Codeunit Code";
                     begin
-                        //-NPR5.34 [283125]
-                        // {* Print Terminal receipt *}
-                        // Revisionsrulle.SETRANGE( "Cash Terminal Approved", TRUE );
-                        // Dankorttransaktion.RESET;
-                        // Dankorttransaktion.SETCURRENTKEY("Register No.","Sales Ticket No.",Type);
-                        // Dankorttransaktion.SETRANGE("Register No.","Register No.");
-                        // Dankorttransaktion.SETRANGE("Sales Ticket No.","Sales Ticket No.");
-                        // Dankorttransaktion.SETRANGE(Type,0);
-                        // //Dankorttransaktion.SETRANGE(Dato,Ekspeditionsdato);
-                        // IF Dankorttransaktion.FIND('-') THEN
-                        //  Dankorttransaktion.PrintTerminalReceipt(FALSE);
-                        //
-                        // Revisionsrulle.SETRANGE( "Cash Terminal Approved");
-                        //+NPR5.34 [283125]
-
-                        /** Print receipt **/
                         if (Type = Type::"Open/Close") or (Type = Type::Cancelled) then
                             Error(Text10600005);
                         AuditRollGlobal.Reset;
-                        //CurrPage.SETSELECTIONFILTER(Revisionsrulle);
                         AuditRollGlobal := Rec;
                         AuditRollGlobal.SetRecFilter;
                         AuditRollGlobal.MarkedOnly(false);
@@ -457,8 +373,6 @@ page 6014432 "NPR Audit Roll"
                         AuditRollGlobal.SetRange(Type);
                         AuditRollGlobal.SetRange("Line No.");
                         AuditRollGlobal.SetRange("No.");
-                        //Revisionsrulle.IncrementCount; //MIJ. Done in std. codeunit code
-                        //Revisionsrulle.UdskrivBon( FALSE );
                         StdCodeunitCode.PrintReceipt(AuditRollGlobal, true);
 
                     end;
@@ -475,19 +389,6 @@ page 6014432 "NPR Audit Roll"
                     var
                         AuditRoll: Record "NPR Audit Roll";
                     begin
-                        //-NPR4.14
-                        /*
-                        IF (Type=Type::"Open/Close") OR (Type=Type::Cancelled) THEN ERROR(Text10600005);
-                        CurrPage.SETSELECTIONFILTER(Revisionsrulle);
-                        Revisionsrulle.MARKEDONLY( FALSE );
-                        Revisionsrulle.SETRANGE( "Sale Type" );
-                        Revisionsrulle.SETRANGE( Type );
-                        Revisionsrulle.SETRANGE( "Line No." );
-                        Revisionsrulle.SETRANGE( "No." );
-                        Revisionsrulle.IncrementCount;
-                        Revisionsrulle.UdskrivBonA4(FALSE);
-                        */
-
                         if (Type = Type::"Open/Close") or (Type = Type::Cancelled) then
                             Error(Text10600005);
                         AuditRoll.Reset;
@@ -499,8 +400,6 @@ page 6014432 "NPR Audit Roll"
                         AuditRoll.SetRange("Line No.");
                         AuditRoll.SetRange("No.");
                         AuditRoll.PrintReceiptA4(true);
-                        //+NPR4.14
-
                     end;
                 }
                 action(Invoice)
@@ -517,13 +416,10 @@ page 6014432 "NPR Audit Roll"
                         AuditRoll3.Find('-');
                         AuditRoll3.TestField("Sale Type", "Sale Type"::"Debit Sale");
                         AuditRoll3.TestField("Allocated No.");
-                        //TESTFIELD("Document No.");
-                        //Salgsfakturahoved.GET("Document No.");
                         SalesInvoiceHeader.FilterGroup := 2;
                         SalesInvoiceHeader.SetRange("Pre-Assigned No.", "Sales Ticket No.");
                         SalesInvoiceHeader.Find('-');
                         SalesInvoiceHeader.FilterGroup := 0;
-                        //Salgsfakturahoved.SETRANGE("No.","Document No.");
 
                         SalesInvoiceHeader.PrintRecords(true);
                     end;
@@ -596,63 +492,7 @@ page 6014432 "NPR Audit Roll"
                     var
                         StdCodeunitCode: Codeunit "NPR Std. Codeunit Code";
                     begin
-                        //-NPR4.14
-                        //IF Type <> Type::"Open/Close" THEN
-                        //  ERROR(t001);
-
-                        //PrintType := STRMENU(Text10600008);
-
-                        //NPconfig.GET();
-                        //CLEAR(Revisionsrulle);
-
-                        //IF (NPconfig."Balancing Posting Type" = NPconfig."Balancing Posting Type"::"PER KASSE") OR (Revisionsrulle."Balanced on Sales Ticket No."='')THEN BEGIN
-                        //  Revisionsrulle.SETRANGE("Register No.","Register No.");
-                        //  Revisionsrulle.SETRANGE("Sales Ticket No.","Sales Ticket No.");
-                        //END;
-
-                        //IF (NPconfig."Balancing Posting Type" = NPconfig."Balancing Posting Type"::SAMLET) AND (Revisionsrulle."Balanced on Sales Ticket No."<>'') THEN BEGIN
-                        //  Revisionsrulle.SETRANGE("Register No.","On Register No.");
-                        //  Revisionsrulle.SETRANGE("Sales Ticket No.","Balanced on Sales Ticket No.");
-                        //  Revisionsrulle.SETRANGE("Sale Type","Sale Type"::Bemærkning);
-                        //  Revisionsrulle.SETRANGE("Line No.","Line No.");
-                        //  Revisionsrulle.SETRANGE("No.","On Register No.");
-                        //  Revisionsrulle.SETRANGE("Sale Date","Sale Date");
-                        //END;
-
-                        //IF (Revisionsrulle.COUNT <> 0) THEN BEGIN
-                        //  CASE PrintType OF
-                        //    PrintType::"To Printer" :
-                        //      BEGIN
-                        //        rapportvalg.SETRANGE("Report Type",rapportvalg."Report Type"::Kasseafslut);
-                        //        rapportvalg.SETFILTER("Report ID",'<>0');
-                        //        rapportvalg.SETRANGE( "Register No.", "Register No." );
-                        //        IF NOT rapportvalg.FIND('-') THEN
-                        //          rapportvalg.SETRANGE( "Register No.", '' );
-                        //        IF rapportvalg.FIND('-') THEN
-                        //        REPEAT
-                        //          REPORT.RUNMODAL(rapportvalg."Report ID",TRUE,FALSE,Revisionsrulle);
-                        //        UNTIL rapportvalg.NEXT = 0;
-
-                        //        // Test For Codeunit
-                        //        rapportvalg.SETRANGE("Report ID");
-                        //        rapportvalg.SETFILTER("Codeunit ID",'<>0');
-                        //        IF NOT rapportvalg.FIND('-') THEN
-                        //          rapportvalg.SETRANGE("Register No.", '');
-                        //
-                        //        IF rapportvalg.FIND('-') THEN REPEAT
-                        //          Table := Revisionsrulle;
-                        //          LinePrintBuffer.ProcessPrint(rapportvalg."Codeunit ID", Table);
-                        //        UNTIL rapportvalg.NEXT = 0;
-                        //      END;
-                        //    PrintType::"To Screen" :
-                        //      BEGIN
-                        //        REPORT.RUNMODAL(REPORT::"Balancing Ticket IV",TRUE,FALSE,Revisionsrulle);
-                        //      END;
-                        //  END;
-                        //END;
-
                         StdCodeunitCode.PrintRegisterReceipt(Rec);
-                        //+NPR4.14
                     end;
                 }
                 action("Tax Free")
@@ -681,11 +521,6 @@ page 6014432 "NPR Audit Roll"
                         AuditRollGlobal.SetRange("No.");
 
                         AuditRollGlobal.FindSet;
-                        //-NPR5.40 [293106]
-                        // IF TaxFreeMgt.TryGetVoucherFromReceiptNo(AuditRollGlobal."Sales Ticket No.",TaxFreeVoucher) THEN
-                        //  TaxFreeMgt.VoucherPrint(TaxFreeVoucher)
-                        // ELSE IF CONFIRM(TaxFree_Create,FALSE) THEN
-                        //+NPR5.40 [293106]
                         TaxFreeMgt.VoucherIssueFromPOSSale(AuditRollGlobal."Sales Ticket No.");
                     end;
                 }
@@ -712,26 +547,12 @@ page 6014432 "NPR Audit Roll"
                     var
                         EFTTransactionRequest: Record "NPR EFT Transaction Request";
                     begin
-                        //-NPR5.46 [290734]
-                        // CreditCardTransaction.RESET;
-                        // CreditCardTransaction.SETCURRENTKEY("Register No.","Sales Ticket No.",Type);
-                        // CreditCardTransaction.FILTERGROUP := 2;
-                        // CreditCardTransaction.SETRANGE("Register No.","Register No.");
-                        // CreditCardTransaction.SETRANGE("Sales Ticket No.","Sales Ticket No.");
-                        // CreditCardTransaction.SETRANGE(Type,0);
-                        //
-                        // CreditCardTransaction.FILTERGROUP := 0;
-                        // IF CreditCardTransaction.FIND('-') THEN
-                        //  CreditCardTransaction.PrintTerminalReceipt(FALSE)
-                        // ELSE
-                        //  MESSAGE(Text10600006,"Sales Ticket No.","Register No.");
                         EFTTransactionRequest.SetRange("Sales Ticket No.", "Sales Ticket No.");
                         EFTTransactionRequest.SetRange("Register No.", "Register No.");
                         if EFTTransactionRequest.FindSet then
                             repeat
                                 EFTTransactionRequest.PrintReceipts(true);
                             until EFTTransactionRequest.Next = 0;
-                        //+NPR5.46 [290734]
                     end;
                 }
                 action("Show credit Card Transaction")
@@ -750,7 +571,6 @@ page 6014432 "NPR Audit Roll"
                         CreditCardTransaction.SetRange(Date, "Sale Date");
                         CreditCardTransaction.FilterGroup := 0;
                         if CreditCardTransaction.Find('-') then
-                            //FORM.RUNMODAL(FORM::"Credit card transaction ticket",Dankorttransaktion)
                             PAGE.RunModal(PAGE::"NPR Credit Card Trx Receipt", CreditCardTransaction)
                         else
                             Message(Text10600006, "Sales Ticket No.", "Register No.");
@@ -860,7 +680,6 @@ page 6014432 "NPR Audit Roll"
                                     SalesInvoiceHeader.FilterGroup := 2;
                                     SalesInvoiceHeader.SetRange("Pre-Assigned No.", SalesTicketNo);
                                     SalesInvoiceHeader.FilterGroup := 0;
-                                    //FORM.RUNMODAL(FORM::"Posted Sales Invoice",Salgsfakturahoved);
                                     PAGE.RunModal(PAGE::"Posted Sales Invoice", SalesInvoiceHeader);
                                 end;
                             "Document Type"::Order:
@@ -868,7 +687,6 @@ page 6014432 "NPR Audit Roll"
                                     SalesShipmentHeader.FilterGroup := 2;
                                     SalesShipmentHeader.SetRange("NPR Sales Ticket No.", SalesTicketNo);
                                     SalesShipmentHeader.FilterGroup := 0;
-                                    //FORM.RUNMODAL(FORM::"Posted Sales Shipment", SalgsLevHoved);
                                     PAGE.RunModal(PAGE::"Posted Sales Shipment", SalesShipmentHeader);
                                 end;
                             "Document Type"::"Credit Memo":
@@ -876,7 +694,6 @@ page 6014432 "NPR Audit Roll"
                                     SalesCrMemoHeader.FilterGroup := 2;
                                     SalesCrMemoHeader.SetRange("Pre-Assigned No.", SalesTicketNo);
                                     SalesCrMemoHeader.FilterGroup := 0;
-                                    //FORM.RUNMODAL(FORM::"Posted Sales Credit Memo", SalgsKreditnotaHoved);
                                     PAGE.RunModal(PAGE::"Posted Sales Credit Memo", SalesCrMemoHeader);
                                 end;
                         end;
@@ -925,9 +742,7 @@ page 6014432 "NPR Audit Roll"
 
                     trigger OnAction()
                     begin
-                        //-NPR5.42 [314987]
                         SetDimensions;
-                        //+NPR5.42 [314987]
                     end;
                 }
                 action(Comment)
@@ -970,7 +785,6 @@ page 6014432 "NPR Audit Roll"
                         POSEntry: Record "NPR POS Entry";
                         POSEntryList: Page "NPR POS Entry List";
                     begin
-                        //-NPR5.38 [295255]
                         AuditRolltoPOSEntryLink.SetRange("Audit Roll Clustered Key", "Clustered Key");
                         if AuditRolltoPOSEntryLink.FindFirst then begin
                             POSEntry.SetRange("Entry No.", AuditRolltoPOSEntryLink."POS Entry No.");
@@ -978,7 +792,6 @@ page 6014432 "NPR Audit Roll"
                             POSEntryList.SetTableView(POSEntry);
                             POSEntryList.Run;
                         end;
-                        //+NPR5.38 [295255]
                     end;
                 }
                 action(AdvancedFilter)
@@ -1037,7 +850,6 @@ page 6014432 "NPR Audit Roll"
                         AuditRollGlobal.SetRange("Sale Type", "Sale Type"::Sale);
                         AuditRollGlobal.SetRange("Sale Date", "Sale Date");
                         AuditRollGlobal.FilterGroup := 0;
-                        //FORM.RUNMODAL(FORM::"Revisionsrulle Statistik",Revisionsrulle);
                         PAGE.RunModal(PAGE::"NPR Audit Roll Statistics", AuditRollGlobal);
                     end;
                 }
@@ -1064,7 +876,6 @@ page 6014432 "NPR Audit Roll"
                         AuditRollGlobal.SetRange("Sale Type", "Sale Type"::Sale);
                         AuditRollGlobal.SetRange("Sale Date", Today);
                         AuditRollGlobal.FilterGroup := 0;
-                        //FORM.RUNMODAL(FORM::"Revisionsrulle Statistik",Revisionsrulle);
                         PAGE.RunModal(PAGE::"NPR Audit Roll Statistics", AuditRollGlobal);
                     end;
                 }
@@ -1105,53 +916,20 @@ page 6014432 "NPR Audit Roll"
     trigger OnAfterGetRecord()
     begin
         SetStyleExpression;
-
-        //IF "No." = '80203' THEN SalesColor := TRUE
     end;
 
     trigger OnOpenPage()
     var
         NPRetailSetup: Record "NPR NP Retail Setup";
     begin
-        //-NPR5.48 [318531]
         if GetFilter(Type) = '' then
-            //+NPR5.48 [318531]
-            //-NPR5.22
             SetFilter(Type, '<>%1', Type::Cancelled);
-        //+NPR5.22
-
-        //-NPR5.23 [242105]
-        //IF FIND('+') THEN;
         if FindFirst then;
-        //+NPR5.23 [242105]
 
         SelectedTicketNo := "Sales Ticket No.";
 
-        /*IF NOT extFilters THEN BEGIN
-          CASE Filter[2] OF
-            Filter::Hængende : BEGIN
-              Filter[2] := Filter::" ";
-              Rec.COPYFILTERS(tRec[1]);
-              //CurrForm."Register No.".ACTIVATE;
-              FieldRegisterNo:=TRUE;
-              //CurrForm.UPDATE(TRUE);
-              CurrPage.UPDATE(TRUE);
-            END;
-            Filter::Hængende2 : BEGIN
-              Filter[2] := Filter::" ";
-              Rec.COPYFILTERS(tRec[1]);
-              //CurrForm."Register No.".ACTIVATE;
-              //CurrForm.UPDATE(TRUE);
-              CurrPage.UPDATE(TRUE);
-            END;
-          END;
-        END;*/
-
-        //-NPR5.38 [301600]
         if NPRetailSetup.Get then
             AdvancedPosting := NPRetailSetup."Advanced Posting Activated";
-        //+NPR5.38 [301600]
-
     end;
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
@@ -1159,12 +937,10 @@ page 6014432 "NPR Audit Roll"
         if Filter[2] = Filter::Payment then begin
             Filter[1] := PaymentEntries();
             CurrPage.Update(false);
-            //CurrForm.UPDATE(FALSE);
             exit(false);
         end;
         if Filter[2] = Filter::Deposit then begin
             Filter[1] := DepositEntries();
-            //CurrForm.UPDATE(FALSE);
             CurrPage.Update(true);
             exit(false);
         end;
@@ -1210,31 +986,23 @@ page 6014432 "NPR Audit Roll"
         TX001: Label 'Posted ?';
         PostDocNo: Code[20];
     begin
-        //PostReceipt
-
         AuditRoll4 := Rec;
         AuditRoll4.SetCurrentKey("Register No.", "Sales Ticket No.");
         AuditRoll4.SetRange("Register No.", "Register No.");
         AuditRoll4.SetRange("Sales Ticket No.", "Sales Ticket No.");
         if Confirm(TX001, true, AuditRoll4.GetFilters) then begin
-            /* FINANCES */
             AuditRollPosting.DeleteAll;
             AuditRollPosting.TransferFromRevSilent(AuditRoll4, AuditRollPosting);
-            //-NPR5.51 [343685]
-            //PostTempAuditRoll.SetPostingNo(PostTempAuditRoll.GetNewPostingNo(TRUE));
             PostDocNo := PostTempAuditRoll.GetNewPostingNo(true);
             PostTempAuditRoll.SetPostingNo(PostDocNo);
-            //+NPR5.51 [343685]
+
             PostTempAuditRoll.RunPost(AuditRollPosting);
             AuditRollPosting.UpdateChangesSilent;
 
-            /* ITEM LEDGER ENTRIES */
             AuditRollPosting.DeleteAll;
             AuditRollPosting.TransferFromRevSilentItemLedg(AuditRoll4, AuditRollPosting);
-            //-NPR5.51 [343685]
-            //PostTempAuditRoll.SetPostingNo(PostTempAuditRoll.GetNewPostingNo(TRUE));
             PostTempAuditRoll.SetPostingNo(PostDocNo);
-            //+NPR5.51 [343685]
+
             PostTempAuditRoll.RunPostItemLedger(AuditRollPosting);
             AuditRollPosting.UpdateChangesSilent;
         end;
@@ -1259,18 +1027,11 @@ page 6014432 "NPR Audit Roll"
     var
         NPRetail: Record "NPR Retail Setup";
     begin
-        //CurrForm.Funktion.VISIBLE(Filter[2] = Filter::Hængende);
-        //CurrForm.Udskriv.VISIBLE(Filter[2] = Filter::Hængende);
-        //CurrForm.Dankort.VISIBLE(Filter[2] = Filter::Hængende);
-        //CurrForm."Funktion - Udbetaling".VISIBLE(Filter[2] = Filter::" ");
-
         case Filter[2] of
             Filter::Payment:
                 begin
                     Filter[2] := Filter::" ";
                     Rec.CopyFilters(TempAuditRollArray[1]);
-                    //CurrForm."Register No.".ACTIVATE;
-                    //CurrForm.UPDATE(TRUE);
                     exit(Filter[2]);
                 end;
             Filter::" ":
@@ -1285,8 +1046,6 @@ page 6014432 "NPR Audit Roll"
                     SetRange(Posted, false);
                     SetRange("No.", '*');
                     FilterGroup(0);
-                    //CurrForm.UPDATE(TRUE);
-                    //CurrForm."No.".ACTIVATE;
                     exit(Filter[2]);
                 end;
         end;
@@ -1296,18 +1055,11 @@ page 6014432 "NPR Audit Roll"
     var
         NPRetail: Record "NPR Retail Setup";
     begin
-        //CurrForm.Funktion.VISIBLE(Filter[2] = Filter::Hængende2);
-        //CurrForm.Udskriv.VISIBLE(Filter[2] = Filter::Hængende2);
-        //CurrForm.Dankort.VISIBLE(Filter[2] = Filter::Hængende2);
-        //CurrForm."Funktion - Udbetaling".VISIBLE(Filter[2] = Filter::" ");
-
         case Filter[2] of
             Filter::Deposit:
                 begin
                     Filter[2] := Filter::" ";
                     Rec.CopyFilters(TempAuditRollArray[1]);
-                    //CurrForm."Register No.".ACTIVATE;
-                    //CurrForm.UPDATE(TRUE);
                     exit(Filter[2]);
                 end;
             Filter::" ":
@@ -1322,9 +1074,8 @@ page 6014432 "NPR Audit Roll"
                     SetRange(Posted, false);
                     SetRange("No.", '*');
                     FilterGroup(0);
-                    //CurrForm.UPDATE(TRUE);
                     CurrPage.Update(true);
-                    //CurrForm."No.".ACTIVATE;
+
                     exit(Filter[2]);
                 end;
         end;
@@ -1332,7 +1083,6 @@ page 6014432 "NPR Audit Roll"
 
     procedure SetExtFilters(ExtFilters1: Boolean)
     begin
-        //usingTS(isTouch1 : Boolean)
         ExtFilters := ExtFilters1;
     end;
 

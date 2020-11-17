@@ -1,13 +1,5 @@
 table 6014423 "NPR Period"
 {
-    // NPR4.12/MMV/20150619 CASE 216240 Updated some danish text constant captions
-    // NPR5.30/TJ  /20170215 CASE 265504 Changed ENU captions on fields with word Register in their name
-    // NPR5.35/TJ  /20170809 CASE 286283 Renamed variables/function into english and into proper naming terminology
-    //                                   Removed unused function
-    // NPR5.38/BR  /20171108 CASE 295190 Removed SQL Data Type = Integer from field Sales Ticket No.
-    // NPR5.48/BHR /20181120 CASE 329505 New fields 165-168
-    // NPR5.48/BHR /20190108 CASE 341465 Add missing captions for fields
-
     Caption = 'Period';
     LookupPageID = "NPR Register Period List";
     DataClassification = CustomerContent;
@@ -553,8 +545,6 @@ table 6014423 "NPR Period"
 
     procedure LookUpShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
     begin
-        //Opsætning.GET;
-        //IF Opsætning."Brug dimensionsstyring" THEN
         NPRDimMgt.LookupDimValueCode(FieldNumber, ShortcutDimCode);
     end;
 }

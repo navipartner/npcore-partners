@@ -1,7 +1,5 @@
 table 6060102 "NPR Periodes"
 {
-    // NPR5.31/JLK /20170331  CASE 268274 Changed ENU Caption
-
     Caption = 'Period';
     DataClassification = CustomerContent;
     DataPerCompany = false;

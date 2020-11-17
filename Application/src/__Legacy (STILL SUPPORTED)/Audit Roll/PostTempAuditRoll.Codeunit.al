@@ -1,44 +1,5 @@
 codeunit 6014414 "NPR Post Temp Audit Roll"
 {
-    // 
-    // 001 NPK,MSP Rettelse således at man på betalingsvalg lade udvalgte bevægelser
-    // bogf¢re på debitorposter i stedet som normalt på finanskontier
-    // //-002 Henrik, Overf¢r SeO til varekldlinie.
-    // 
-    // 13-07-04 Opdateret til at k¢re med temporer bogf¢ring
-    // 
-    // NPR3.03e OHM 260107 - Posting type sale if item
-    // 
-    // NPR4.14/RMT /20150715  CASE 216519 - post prepayment from sales document when payment is posted
-    // NPR4.18/RMT /20160128  CASE 233094 only lookup serial no in item ledger entries if full tracking for item
-    // NPR5.22/JC  /20160321  CASE 237352 Error Gen. Template missing for BE
-    // NPR5.22/TJ  /20160412  CASE 238601 Changed code in PosterDebitorIndbetaling to use our function when prepayment is processed
-    // NPR5.22/JC  /20160421  CASE 239058 VAT calculation issue using VAT prod posting group from item, modified func PrintKey Filter from Text250 to Text500
-    // NPR5.23/THRO/20160510  CASE 240004 RunUpdateChanges, RunTransfer and RunTransferItemLedger - fixed dialog not opened bug
-    // NPR5.23/RMT /20160603  CASE 243209 no applies to ID in the gen. journal
-    // NPR5.25/JC  /20160705  CASE 243792 Fixed VAT being added to discount amount
-    // NPR5.25.01/AP/20160903 CASE 250201 Fixed posting error that may result in missing postings of Balancing and Customer Entries
-    // NPR5.29/MHA /20170116  CASE 262116 Updated Gift- and Credit Voucher Text Variables to no overflow
-    // NPR5.29/BHR /20170120  CASE 264068 Code to Allow Posting for Item Type::Service
-    // NPR5.29/BHR /20172301  CASE 264081 Condition to check "Inventory posting Group"
-    // NPR5.30/TJ  /20170224  CASE 266866 Commented out code in PosterVarekladde
-    // NPR5.32/JDH /20170524  CASE 273761 Changed posting of negative sale with serial numbers
-    // NPR5.36/AP  /20170705  CASE 282903 Changes to allow comments that are not directly inserted into audit roll
-    //                                    Removed old and erroneous code that could update lines incorret before posting (changing posting setup).
-    // NPR5.36/BR  /20170914  CASE 289641 Fill field "Bill-to/Pay-to No."
-    // NPR5.36/TJ  /20170919  CASE 286283 Renamed variables/function with danish specific letter into english
-    //                                    Removed unused variables
-    // NPR5.38/BR  /20171030  CASE 294903 Added (Payment Type) Code to description
-    // NPR5.38/JC  /20171221  CASE 300763 Fixed date formula calculation for multi languages
-    // NPR5.38/BR  /20180109  CASE 301600 Added Check and Update of Audit Roll Link
-    // NPR5.41/JDH /20180426 CASE 312644  Added indirect permissions to table Audit roll
-    // NPR5.42/JC  /20180515 CASE 315194 Fix issue with getting register no. for Payment Type POS
-    // NPR5.49/TJ  /20181210 CASE 331208 Publisher added OnAfterRunPostItemLedger
-    // NPR5.51/LS  /20190709  CASE 351736  Changed function MovementEntries, length of "Global Dimension 1" from 10 to 20 as per standard Dim code
-    // NPR5.53/ALPO/20191024 CASE 371955 Rounding related fields moved to POS Posting Profiles
-    // NPR5.53/ALPO/20191025 CASE 371956 Dimensions: POS Store & POS Unit integration; discontinue dimensions on Cash Register
-    // NPR5.53/JAKUBV/20200121  CASE 369361 Transport NPR5.53 - 21 January 2020
-
     Permissions = TableData "NPR Audit Roll" = rimd;
 
     trigger OnRun()
@@ -92,8 +53,6 @@ codeunit 6014414 "NPR Post Temp Audit Roll"
     var
         "S & R Setup": Record "Sales & Receivables Setup";
     begin
-        //Bogf¢rVaresalg
-
         with TempPost do begin
             SetRange("Sale Date", TempPost."Sale Date");
             SetFilter("Sales Ticket No.", TempPost.GetFilter("Sales Ticket No."));
@@ -108,7 +67,6 @@ codeunit 6014414 "NPR Post Temp Audit Roll"
 
             PrintKey('Efter Dim', '', 92);
 
-            // Posting off full amount
             "S & R Setup".Get;
             if ("S & R Setup"."Discount Posting" = "S & R Setup"."Discount Posting"::"All Discounts") or
                ("S & R Setup"."Discount Posting" = "S & R Setup"."Discount Posting"::"Line Discounts")
@@ -120,7 +78,6 @@ codeunit 6014414 "NPR Post Temp Audit Roll"
                 MovementEntries(GeneralPostingSetup."Sales Account", -("Amount Including VAT"),
                                  "Register No.", AccountType::"G/L", TempPost."Shortcut Dimension 1 Code", '', BogfDate, TempPost);
 
-            // Posting of discount amount
             if (TempPost."Line Discount Amount" <> 0) and
               ("S & R Setup"."Discount Posting" = "S & R Setup"."Discount Posting"::"All Discounts") or
               ("S & R Setup"."Discount Posting" = "S & R Setup"."Discount Posting"::"Line Discounts") then
@@ -134,8 +91,6 @@ codeunit 6014414 "NPR Post Temp Audit Roll"
     var
         CurrentPost: Record "NPR Audit Roll Posting" temporary;
     begin
-        //Bogf¢rKasseBevægelser()
-
         RetailSetup.Get;
 
         with TempPost do begin
@@ -145,12 +100,10 @@ codeunit 6014414 "NPR Post Temp Audit Roll"
             PrintKey('Ekspeditionsart, Type, Nummer', GetFilters, 10);
             CalcSums("Amount Including VAT");
 
-            //-NPR5.42 [315194]
             if RetailSetup."Payment Type By Register" then begin
                 if not BetalingsValg.Get("No.", "Register No.") then
                     BetalingsValg.Get("No.", '');
             end else
-                //+NPR5.42
                 BetalingsValg.Get("No.");
             if BetalingsValg."Account Type" = BetalingsValg."Account Type"::"G/L Account" then begin
                 BetalingsValg.TestField("G/L Account No.");
@@ -158,10 +111,7 @@ codeunit 6014414 "NPR Post Temp Audit Roll"
                 if "Amount Including VAT" <> 0 then begin
                     MovementEntries(BetalingsValg."G/L Account No.", "Amount Including VAT", "Register No.", AccountType::"G/L",
                                     TempPost."Department Code", '', BogfDate, TempPost);
-                    //-NPR5.38 [300763]
-                    //SETFILTER( "Posting Date", '%1..', CALCDATE( '+1<D>', "Sale Date" ));
                     SetFilter("Posting Date", '%1..', CalcDate('<+1D>', "Sale Date"));
-                    //+NPR5.38
                     CalcSums("Amount Including VAT");
                     if "Amount Including VAT" <> 0 then begin
                         CurrentPost := TempPost;
@@ -198,16 +148,12 @@ codeunit 6014414 "NPR Post Temp Audit Roll"
     var
         Betalingsvalg: Record "NPR Payment Type POS";
     begin
-        //Bogf¢rKassebevægelserPrPost
-
         with RevRulle do begin
-            //-NPR5.42 [315194]
             RetailSetup.Get;
             if RetailSetup."Payment Type By Register" then begin
                 if not Betalingsvalg.Get("No.", "Register No.") then
                     Betalingsvalg.Get("No.", '');
             end else
-                //+NPR5.42
                 Betalingsvalg.Get("No.");
 
             if Betalingsvalg."Account Type" = Betalingsvalg."Account Type"::"G/L Account" then begin
@@ -263,17 +209,14 @@ codeunit 6014414 "NPR Post Temp Audit Roll"
         Bogf2: Label 'Paind on %1 Register %2';
         ItemGL: Record Item;
     begin
-        //PosterBevægelse
         Kasse.Get(Kassenr);
         Clear(FinKldLinie);
         Finkllbr += 1;
         FinKldLinie."Line No." := Finkllbr;
 
         FinKldLinie."Document No." := PostedInvoiceDocumentNo(TempPost);
-        //-NPR5.22
         FinKldLinie."Journal Template Name" := RetailSetup."Journal Type";
         FinKldLinie."Journal Batch Name" := RetailSetup."Journal Name";
-        //+NPR5.22
         FinKldLinie."Posting Date" := "Posting Date";
         FinKldLinie."Document Date" := "Posting Date";
         case Kontotype of
@@ -295,15 +238,11 @@ codeunit 6014414 "NPR Post Temp Audit Roll"
 
         if TempPost.Type = TempPost.Type::Item then
             FinKldLinie.Validate("Gen. Posting Type", FinKldLinie."Gen. Posting Type"::Sale);
-        //-NPR5.36 [289641]
         if (Kasse."VAT Customer No." <> '') and (not (FinKldLinie."Account Type" in [FinKldLinie."Account Type"::Customer, FinKldLinie."Account Type"::Vendor])) then
             if (TempPost."Customer Type" = TempPost."Customer Type"::"Ord.") and (TempPost."Customer No." <> '') then
                 FinKldLinie."Bill-to/Pay-to No." := TempPost."Customer No."
             else
                 FinKldLinie."Bill-to/Pay-to No." := Kasse."VAT Customer No.";
-        //+NPR5.36 [289641]
-
-        //-NPR5.22
         if TempPost.Type = TempPost.Type::Item then begin
             if ItemGL.Get(TempPost."No.") then begin
                 FinKldLinie.Validate("Gen. Prod. Posting Group", ItemGL."Gen. Prod. Posting Group");
@@ -311,7 +250,6 @@ codeunit 6014414 "NPR Post Temp Audit Roll"
             end;
 
         end;
-        //+NPR5.22
 
         FinKldLinie.Validate(Amount, Amount2);
 
@@ -319,39 +257,27 @@ codeunit 6014414 "NPR Post Temp Audit Roll"
             AccountType::"G/L":
                 begin
                     if TempPost."Gift voucher ref." <> '' then
-                        //-NPR5.29 [262116]
-                        //FinKldLinie.Description := STRSUBSTNO( Bogf3,TempPost."Gift voucher ref.",Kassenr)
                         FinKldLinie.Description := CopyStr(StrSubstNo(Text000, TempPost."Gift voucher ref.", Kassenr), 1, MaxStrLen(FinKldLinie.Description))
-                    //+NPR5.29 [262116]
                     else
                         if TempPost."Credit voucher ref." <> '' then
-                            //-NPR5.29 [262116]
-                            //FinKldLinie.Description := STRSUBSTNO( Bogf4,TempPost."Credit voucher ref.",Kassenr)
                             FinKldLinie.Description := CopyStr(StrSubstNo(Text001, TempPost."Credit voucher ref.", Kassenr), 1, MaxStrLen(FinKldLinie.Description))
-                        //+NPR5.29 [262116]
                         else
                             if RevisionUdbetaling."Sale Type" = RevisionUdbetaling."Sale Type"::"Out payment" then begin
                                 FinKldLinie.Description := CopyStr(RevisionUdbetaling.Description, 1, 50);
                                 Clear(RevisionUdbetaling);
                             end else
-                                //-NPR5.38 [294903]
-                                //FinKldLinie.Description := STRSUBSTNO( Bogf1,"Posting Date",Kassenr);
                                 if TempPost.Type = TempPost.Type::Payment then
                                     FinKldLinie.Description := CopyStr(StrSubstNo(CompressedGLDescr, TempPost."No.", "Posting Date", Kassenr), 1, MaxStrLen(FinKldLinie.Description))
                                 else
                                     FinKldLinie.Description := StrSubstNo(Bogf1, "Posting Date", Kassenr);
-                    //+NPR5.38 [294903]
                 end;
             AccountType::Customer:
                 FinKldLinie.Description := StrSubstNo(Bogf2, "Posting Date", Kassenr);
             AccountType::Bank:
-                //-NPR5.38 [294903]
-                //FinKldLinie.Description := STRSUBSTNO( Bogf1,"Posting Date",Kassenr);
                 if TempPost.Type = TempPost.Type::Payment then
                     FinKldLinie.Description := CopyStr(StrSubstNo(CompressedGLDescr, TempPost."No.", "Posting Date", Kassenr), 1, MaxStrLen(FinKldLinie.Description))
                 else
                     FinKldLinie.Description := StrSubstNo(Bogf1, "Posting Date", Kassenr);
-        //+NPR5.38 [294903]
         end;
 
         if ForceDesc <> '' then
@@ -382,8 +308,6 @@ codeunit 6014414 "NPR Post Temp Audit Roll"
         NrSerieStyring: Codeunit NoSeriesManagement;
         FinKldNavn: Record "Gen. Journal Batch";
     begin
-        //Bogf¢rDagensFinansposteringer();
-
         RetailSetup.Get;
         Clear(Counter);
         if FinKldLinie.Find('-') then begin
@@ -418,17 +342,6 @@ codeunit 6014414 "NPR Post Temp Audit Roll"
 
                     FinKld.Insert;
                 end else begin
-                    //-NPR5.25.01 [250201]
-                    /*Removing this modification.
-                     Never (ever!) change active key fields while performing iteration!
-                     If needed, these must be set before iteration starts or in another dublicate cursor variable,
-                     or else FinKldLinie.NEXT will behave unexpectable.
-                    //-NPR5.22
-                    FinKldLinie."Journal Template Name" := Ops�tning."Journal Type";
-                    FinKldLinie."Journal Batch Name"    := Ops�tning.Journalname;
-                    //+NPR5.22
-                    */
-                    //+NPR5.25.01 [250201]
                     NFRetailCode.CR414PostTodaysGLEntries(FinKldLinie);
                 end;
                 StatusVindueOpdater(10, '', Round(Counter / Total) * 10000);
@@ -462,8 +375,6 @@ codeunit 6014414 "NPR Post Temp Audit Roll"
 
     procedure PostTodaysItemEntries(var TempPost: Record "NPR Audit Roll Posting" temporary)
     begin
-        //Bogf¢rDagensFinansposteringer();
-
         RetailSetup.Get;
         Clear(Counter);
 
@@ -489,7 +400,6 @@ codeunit 6014414 "NPR Post Temp Audit Roll"
         Difference: Decimal;
         ErrNotSet: Label 'Fixedprice on paymentsselection %1 has not been set';
     begin
-        //PosterKasseafslutning()
         RetailSetup.Get();
         Kasse.Get(Rec."Register No.");
 
@@ -534,14 +444,11 @@ codeunit 6014414 "NPR Post Temp Audit Roll"
 
                 Difference := CurrencyAmount - Counting;
 
-                // Insert G/L journal line.
                 if Difference > 0 then begin
                     Finkllbr += 1;
                     FinKldLinie.Init;
-                    //-NPR5.25.01 [250201]
                     FinKldLinie."Journal Template Name" := RetailSetup."Journal Type";
                     FinKldLinie."Journal Batch Name" := RetailSetup."Journal Name";
-                    //+NPR5.25.01 [250201]
                     FinKldLinie."Line No." := Finkllbr;
 
                     FinKldLinie."Document No." := PostedInvoiceDocumentNo(Rec);
@@ -602,14 +509,13 @@ codeunit 6014414 "NPR Post Temp Audit Roll"
         ItemJrnl: Record Item;
         POSUnit: Record "NPR POS Unit";
     begin
-        //Postervarekladde()
         RetailSetup.Get;
 
         with RevRulle do begin
             VendorReturnReason.CreateRetPurchOrder(RevRulle);
 
             Kasse.Get("Register No.");
-            POSUnit.Get("Register No.");  //NPR5.53 [371956]
+            POSUnit.Get("Register No.");
             VarekldLinie.Init;
             Varekllbr += 1;
 
@@ -624,40 +530,21 @@ codeunit 6014414 "NPR Post Temp Audit Roll"
             VarekldLinie."Source No." := "Customer No.";
             VarekldLinie."Source Type" := VarekldLinie."Source Type"::Customer;
 
-            //-NPR5.30 [266866]
-            //IF "Customer Type" = "Customer Type"::Kontant THEN
-            //  VarekldLinie."Cash Customer Number"      := "Customer No.";
-            //+NPR5.30 [266866]
-
             VarekldLinie."Posting Date" := Bogfdate;
             VarekldLinie."NPR Document Time" := "Closing Time";
             VarekldLinie."Document Date" := Bogfdate;
-            //-NPR5.30 [266866]
-            //VarekldLinie.Color                    := Color;
-            //VarekldLinie.Size                     := Size;
-            //+NPR5.30 [266866]
             VarekldLinie."Discount Amount" := "Line Discount Amount";
-            //-NPR5.25 [243792]
             if (VarekldLinie."Discount Amount" <> 0) and ItemJrnl.Get(RevRulle."No.") then begin
                 if ItemJrnl."Price Includes VAT" then
                     VarekldLinie."Discount Amount" := VarekldLinie."Discount Amount" / ((100 + RevRulle."VAT %") / 100);
             end;
-            //+NPR5.25 [243792]
             VarekldLinie."NPR Discount Type" := "Discount Type";
             VarekldLinie."NPR Discount Code" := CopyStr("Discount Code", 1, 10);
-            //-NPR5.30 [266866]
-            //VarekldLinie."Term Discount Code"     := "Period Discount code";
-            //+NPR5.30 [266866]
             VarekldLinie."NPR Vendor No." := Vendor;
             VarekldLinie."NPR Item Group No." := "Item Group";
             VarekldLinie."NPR Register Number" := "Register No.";
             VarekldLinie."Reason Code" := "Reason Code";
             VarekldLinie."Bin Code" := "Bin Code";
-
-            //-NPR5.30 [266866]
-            //IF Ops�tning."Transfer SeO Item Entry" THEN
-            //  VarekldLinie."Serial No. not Created"           := "Serial No. not Created";
-            //+NPR5.30 [266866]
 
             if not Vare.Get("No.") then begin
                 AltVarenummer.SetCurrentKey("Alt. No.");
@@ -669,8 +556,6 @@ codeunit 6014414 "NPR Post Temp Audit Roll"
                 Vare.Get(AltVarenummer.Code);
             end;
 
-            //-NPR5.29 [264068]
-            //VarekldLinie.VALIDATE("Item No.","No.");
             if Vare.Type <> Vare.Type::Service then
                 VarekldLinie.Validate("Item No.", "No.")
             else begin
@@ -678,7 +563,7 @@ codeunit 6014414 "NPR Post Temp Audit Roll"
                 VarekldLinie."Gen. Bus. Posting Group" := "Gen. Bus. Posting Group";
                 VarekldLinie."Gen. Prod. Posting Group" := "Gen. Prod. Posting Group";
             end;
-            //+NPR5.29 [264068]
+
             VarekldLinie.Validate(Quantity, Quantity);
             VarekldLinie.Validate("Unit of Measure Code", Unit);
             VarekldLinie.Validate(Amount, Amount);
@@ -700,20 +585,13 @@ codeunit 6014414 "NPR Post Temp Audit Roll"
                 Sporing."Location Code" := Lokationskode;
                 Sporing."Quantity (Base)" := -Quantity;
                 Sporing."Reservation Status" := Sporing."Reservation Status"::Prospect;
-                //-NPR4.18
-                //IF Quantity > 0 THEN BEGIN
+
                 Vare.TestField("Item Tracking Code");
                 ItemTrackingCode.Get(Vare."Item Tracking Code");
                 if ItemTrackingCode."SN Specific Tracking" then begin
-                    //+NPR4.18
-                    //-NPR5.32 [273761]
                     if (Quantity <= 0) then begin
-                        //Return Sale
                         Sporing."Creation Date" := Today;
                     end else begin
-                        //Normal Sale
-                        //+NPR5.32 [273761]
-
                         Varepost.SetCurrentKey(Open, Positive, "Item No.", "Serial No.");
                         Varepost.SetRange(Open, true);
                         Varepost.SetRange(Positive, true);
@@ -721,19 +599,12 @@ codeunit 6014414 "NPR Post Temp Audit Roll"
                         Varepost.SetRange("Item No.", "No.");
                         Varepost.FindFirst;
                         Sporing."Creation Date" := Varepost."Posting Date";
-                        //-NPR5.32 [273761]
                     end;
-                    //+NPR5.32 [273761]
-
                 end else begin
-                    //-NPR4.18
                     if Quantity <= 0 then begin
-                        //+NPR4.18
                         Sporing."Creation Date" := Today;
                         VarekldLinie.Validate(Amount, -VarekldLinie.Amount);
-                        //-NPR4.18
                     end;
-                    //+NPR4.18
                 end;
                 Sporing."Source Type" := 83;
                 Sporing."Source Subtype" := 1;
@@ -761,20 +632,7 @@ codeunit 6014414 "NPR Post Temp Audit Roll"
 
             VarekldLinie.Validate("Return Reason Code", "Return Reason Code");
 
-            //-NPR5.53 [371956]-revoked
-            //  IF RevRulle."Shortcut Dimension 1 Code" = '' THEN
-            //    VarekldLinie.VALIDATE("Shortcut Dimension 1 Code",Kasse."Global Dimension 1 Code")
-            //  ELSE
-            //    VarekldLinie.VALIDATE("Shortcut Dimension 1 Code","Shortcut Dimension 1 Code");
-            //
-            //  IF RevRulle."Shortcut Dimension 2 Code" = '' THEN
-            //    VarekldLinie.VALIDATE("Shortcut Dimension 2 Code",Kasse."Global Dimension 2 Code")
-            //  ELSE
-            //    VarekldLinie.VALIDATE("Shortcut Dimension 2 Code","Shortcut Dimension 2 Code");
-            //+NPR5.53 [371956]-revoked
-
             VarekldLinie."Dimension Set ID" := "Dimension Set ID";
-            //-NPR5.53 [371956]
             if "Shortcut Dimension 1 Code" = '' then
                 VarekldLinie.Validate("Shortcut Dimension 1 Code", POSUnit."Global Dimension 1 Code")
             else
@@ -783,7 +641,6 @@ codeunit 6014414 "NPR Post Temp Audit Roll"
                 VarekldLinie.Validate("Shortcut Dimension 2 Code", POSUnit."Global Dimension 2 Code")
             else
                 VarekldLinie."Shortcut Dimension 2 Code" := "Shortcut Dimension 2 Code";
-            //+NPR5.53 [371956]
 
             if not RetailSetup."Debug Posting" then begin
                 VarekldLinie.Insert;
@@ -793,9 +650,7 @@ codeunit 6014414 "NPR Post Temp Audit Roll"
             end;
 
             if Straks then begin
-                //+DIM
                 ItemJnlPostLine.RunWithCheck(VarekldLinie);
-                //-DIM
             end;
         end;
     end;
@@ -818,8 +673,6 @@ codeunit 6014414 "NPR Post Temp Audit Roll"
         txtSalesReturnOrder: Label 'return order';
         StdCodeunitCode: Codeunit "NPR Std. Codeunit Code";
     begin
-        //PosterDebitorIndbetaling()
-
         Clear(FinKldLinie);
 
         with RevRulle do begin
@@ -827,10 +680,8 @@ codeunit 6014414 "NPR Post Temp Audit Roll"
 
             Finkllbr += 1;
             FinKldLinie."Line No." := Finkllbr;
-            //-NPR5.25.01 [250201]
             FinKldLinie."Journal Template Name" := RetailSetup."Journal Type";
             FinKldLinie."Journal Batch Name" := RetailSetup."Journal Name";
-            //+NPR5.25.01 [250201]
 
             FinKldLinie."Document No." := PostedInvoiceDocumentNo(RevRulle);
 
@@ -844,15 +695,10 @@ codeunit 6014414 "NPR Post Temp Audit Roll"
                 FinKldLinie.Validate("Account No.", "No.");
                 FinKldLinie.Validate(Amount, -"Amount Including VAT");
                 FinKldLinie."Allow Application" := true;
-                /*************************************************************************
-                * Bruges kun i forbindelse med udl�sninger fa gl.Butik3 / Butik2000     *
-                * l�sninger. Konverterer debetsalg til finansposteringer p� debitor     *
-                *************************************************************************/
+
                 if "N3 Debit Sale Conversion" then
                     FinKldLinie.Description := StrSubstNo(Bogf1, BogfDate, "Register No.")
                 else begin
-                    //-NPR4.14
-                    //FinKldLinie.Description := txtIndbetaling;
                     if RevRulle."Sales Document No." <> '' then begin
                         case RevRulle."Sales Document Type" of
                             SalesHeader."Document Type"::Quote:
@@ -871,7 +717,6 @@ codeunit 6014414 "NPR Post Temp Audit Roll"
                         FinKldLinie.Description := StrSubstNo(txtIndbetalingSales, SalesDocTypeText, RevRulle."Sales Document No.");
                     end else
                         FinKldLinie.Description := txtIndbetaling;
-                    //+NPR4.14
                 end;
             end;
 
@@ -896,9 +741,6 @@ codeunit 6014414 "NPR Post Temp Audit Roll"
             FinKldLinie."Document Date" := BogfDate;
             FinKldLinie."Applies-to Doc. Type" := RevRulle."Buffer Document Type";
             FinKldLinie.Validate("Applies-to Doc. No.", RevRulle."Buffer Invoice No.");
-            //-NPR5.23
-            //FinKldLinie.VALIDATE("Applies-to ID","Buffer ID");
-            //+NPR5.23
             FinKldLinie."Shortcut Dimension 1 Code" := "Shortcut Dimension 1 Code";
             FinKldLinie."Shortcut Dimension 2 Code" := "Shortcut Dimension 2 Code";
             FinKldLinie."Dimension Set ID" := "Dimension Set ID";
@@ -916,7 +758,6 @@ codeunit 6014414 "NPR Post Temp Audit Roll"
 
             Modify;
 
-            //-NPR4.14
             if SalesHeader.Get("Sales Document Type", "Sales Document No.") then begin
                 if "Sales Document Prepayment" then begin
                     SalesHeader.CalcFields("Amount Including VAT");
@@ -924,12 +765,7 @@ codeunit 6014414 "NPR Post Temp Audit Roll"
                     SalesHeader.Validate("Prepayment %", RevRulle."Sales Doc. Prepayment %");
                     SalesHeader.Modify(true);
 
-                    //-NPR5.22
-                    //        SalesPostYNPrepmt.SetHideValidationDialog(TRUE);
-                    //        SalesPostYNPrepmt.PostPrepmtInvoiceYN(SalesHeader,FALSE);
                     StdCodeunitCode.PostPrepmtInvoiceYN(SalesHeader);
-                    //+NPR5.22
-
                 end;
                 if "Sales Document Invoice" or "Sales Document Ship" then begin
                     SalesHeader.Ship := "Sales Document Ship";
@@ -938,7 +774,6 @@ codeunit 6014414 "NPR Post Temp Audit Roll"
                     SalesPost.Run(SalesHeader);
                 end;
             end;
-            //+NPR4.14
         end;
 
     end;
@@ -951,8 +786,6 @@ codeunit 6014414 "NPR Post Temp Audit Roll"
         "Bogf. Tekst 3": Label 'Register %1 to Change Register';
         Period: Record "NPR Period";
     begin
-        //PosterKasseafslutning()
-
         RetailSetup.Get();
         Kasse.Get(Rec."Register No.");
 
@@ -960,18 +793,12 @@ codeunit 6014414 "NPR Post Temp Audit Roll"
         Rec.TestField(Posted, false);
         Rec.TestField(Balancing, true);
 
-        // ********************************
-        //  Difference
-        // ********************************
-
         if Rec.Difference <> 0 then begin
             Finkllbr += 1;
             FinKldLinie.Init;
             FinKldLinie."Line No." := Finkllbr;
-            //-NPR5.25.01 [250201]
             FinKldLinie."Journal Template Name" := RetailSetup."Journal Type";
             FinKldLinie."Journal Batch Name" := RetailSetup."Journal Name";
-            //+NPR5.25.01 [250201]
 
             FinKldLinie."Document No." := PostedInvoiceDocumentNo(Rec);
 
@@ -1007,17 +834,11 @@ codeunit 6014414 "NPR Post Temp Audit Roll"
 
         PosterFremValDifferencer(Rec);
 
-        // ********************************
-        //  Overf¢r til Bank
-        // ********************************
-
         if Rec."Transferred to Balance Account" <> 0 then begin
             Finkllbr += 1;
             FinKldLinie.Init;
-            //-NPR5.25.01 [250201]
             FinKldLinie."Journal Template Name" := RetailSetup."Journal Type";
             FinKldLinie."Journal Batch Name" := RetailSetup."Journal Name";
-            //+NPR5.25.01 [250201]
             FinKldLinie."Line No." := Finkllbr;
 
             FinKldLinie."Document No." := PostedInvoiceDocumentNo(Rec);
@@ -1060,19 +881,11 @@ codeunit 6014414 "NPR Post Temp Audit Roll"
             end else
                 FinKldLinie.Insert;
         end;
-
-
-        // ********************************
-        //  Overf¢r til Vekselkasse
-        // ********************************
-
         if Rec."Change Register" <> 0 then begin
             Finkllbr += 1;
             FinKldLinie.Init;
-            //-NPR5.25.01 [250201]
             FinKldLinie."Journal Template Name" := RetailSetup."Journal Type";
             FinKldLinie."Journal Batch Name" := RetailSetup."Journal Name";
-            //+NPR5.25.01 [250201]
             FinKldLinie."Line No." := Finkllbr;
 
             FinKldLinie."Document No." := PostedInvoiceDocumentNo(Rec);
@@ -1125,8 +938,6 @@ codeunit 6014414 "NPR Post Temp Audit Roll"
         ln11: Label ' Posting G/L Entries      @10@@@@@@@@@@@@@@@@@ \';
         ln12: Label ' Posting Item Entries     @11@@@@@@@@@@@@@@@@@ \\';
     begin
-        //StatusVindueÅben()
-
         WindowIsOpen := true;
 
         Window.Open(ln100 + ln101 + ln102 + ln1 + ln2 + ln3 + ln4 + ln5 + ln7 + ln8 + ln9 + ln10 + ln11 + ln6 + ln12 + ln103);
@@ -1136,7 +947,6 @@ codeunit 6014414 "NPR Post Temp Audit Roll"
     var
         heltal: Record "Integer";
     begin
-        //StatusVindueClear
         if not WindowIsOpen then
             exit;
 
@@ -1151,7 +961,6 @@ codeunit 6014414 "NPR Post Temp Audit Roll"
 
     procedure StatusVindueLuk(Text: Text[100])
     begin
-        //StatusVindueLuk()
         if not WindowIsOpen then
             exit;
         Window.Close;
@@ -1160,7 +969,6 @@ codeunit 6014414 "NPR Post Temp Audit Roll"
 
     procedure StatusVindueOpdater(Number: Integer; Text: Text[100]; Value: Integer)
     begin
-        //StatusVindueOpdater()
         if not WindowIsOpen then
             exit;
 
@@ -1174,8 +982,6 @@ codeunit 6014414 "NPR Post Temp Audit Roll"
     var
         txtPos: Label 'POS %1-%2';
     begin
-        //Bogf¢rtBilagsNrFkt
-
         if PostOnlySalesTicketNo then
             if GlobalPostingNo = '' then
                 exit(StrSubstNo(txtPos, TempPost."Register No.", TempPost."Sales Ticket No."))
@@ -1187,8 +993,6 @@ codeunit 6014414 "NPR Post Temp Audit Roll"
 
     procedure StraksBogfVarePostFraAfslEksp(var Ekspedition: Record "NPR Sale POS"; StraksBogf: Boolean; PostParam: Boolean)
     begin
-        //StraksBogfVarePostFraAfslEksp
-
         EkspBogfVarepost.Copy(Ekspedition);
         StraksBogfVarePostFraEkspAfsl := StraksBogf;
         DoNotPost := not PostParam;
@@ -1196,7 +1000,6 @@ codeunit 6014414 "NPR Post Temp Audit Roll"
 
     procedure StraksBogfCurrent(SetProp: Boolean)
     begin
-        //StraksBogfCurrent()
         StraksBogf := SetProp;
     end;
 
@@ -1221,26 +1024,17 @@ codeunit 6014414 "NPR Post Temp Audit Roll"
         POSAuditRollIntegration: Codeunit "NPR POS-Audit Roll Integration";
         POSSetup: Codeunit "NPR POS Setup";
     begin
-        //RunPost
-
         with Rec do begin
             DebugPostingMsg := false;
             RetailSetup.Get();
-
-            //-NPR5.53 [369361]
-            //IF RetailSetup."Company - Function" = RetailSetup."Company - Function"::Offline THEN
-            //  ERROR(t002);
-            //+NPR5.53 [369361]
 
             if not Rec.FindLast then
                 exit;
 
             if not DoNotPost then begin
                 Kasse.Get("Register No.");
-                //-NPR5.53 [371955]
                 POSUnit.Get("Register No.");
                 POSSetup.SetPOSUnit(POSUnit);
-                //+NPR5.53 [371955]
                 PostOnlySalesTicketNo := true;
                 if FindSet then begin
                     XBonNr := "Sales Ticket No.";
@@ -1268,10 +1062,6 @@ codeunit 6014414 "NPR Post Temp Audit Roll"
 
                 LockTable;
 
-                /* #########################################
-                   Post register balancing (end-of-day )
-                  ######################################### */
-
                 Reset;
                 SetCurrentKey(Type, Balancing);
                 SetRange(Type, Type::"Open/Close");
@@ -1281,10 +1071,6 @@ codeunit 6014414 "NPR Post Temp Audit Roll"
                     repeat
                         PosterKasseAfslutning(Rec);
                     until Next = 0;
-
-                /* #########################################
-                   Post customer entries to debit zero sales
-                  ######################################### */
 
                 Clear(Quantity);
                 Clear(Dummy);
@@ -1311,10 +1097,6 @@ codeunit 6014414 "NPR Post Temp Audit Roll"
                 end;
                 StatusVindueOpdater(8, '', 10000);
 
-                /* ########################################
-                  Post payments on customer account
-                  ######################################## */
-
                 Reset;
                 Clear(Quantity);
                 SetCurrentKey("Sale Type", Type);
@@ -1331,23 +1113,14 @@ codeunit 6014414 "NPR Post Temp Audit Roll"
                 end;
                 StatusVindueOpdater(6, '', 10000);
 
-                /* ################################################
-                  Post (item) sales on g/l accounts
-                  ################################################ */
-
                 Clear(Dummy);
                 Clear(Counter);
                 Reset;
-                //-NPR5.22
-                //    SETCURRENTKEY( "Sale Type",Type,
-                //                   "Gen. Bus. Posting Group","Gen. Prod. Posting Group",
-                //                   "Shortcut Dimension 1 Code","Shortcut Dimension 2 Code","Dimension Set ID"
-                //                 );
+
                 SetCurrentKey("Sale Type", Type,
                                 "Gen. Bus. Posting Group", "Gen. Prod. Posting Group",
                                 "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", "Dimension Set ID",
                                 "VAT Bus. Posting Group", "VAT Prod. Posting Group");
-                //-NPR5.22
                 SetRange("Sale Type", "Sale Type"::Sale);
                 SetRange(Type, Type::Item);
                 Total := Count;
@@ -1358,35 +1131,23 @@ codeunit 6014414 "NPR Post Temp Audit Roll"
                     repeat
                         SetRange("Gen. Bus. Posting Group", "Gen. Bus. Posting Group");
                         SetRange("Gen. Prod. Posting Group", "Gen. Prod. Posting Group");
-                        //-NPR5.22
                         SetRange("VAT Bus. Posting Group", "VAT Bus. Posting Group");
                         SetRange("VAT Prod. Posting Group", "VAT Prod. Posting Group");
-                        //+NPR5.22
                         SetRange("Shortcut Dimension 1 Code", "Shortcut Dimension 1 Code");
                         SetRange("Shortcut Dimension 2 Code", "Shortcut Dimension 2 Code");
                         SetRange("Dimension Set ID", "Dimension Set ID");
                         Counter += Count;
                         PostSales(Rec);
-                        //-NPR5.22
-                        //    SETCURRENTKEY( "Sale Type",Type,
-                        //                   "Gen. Bus. Posting Group","Gen. Prod. Posting Group",
-                        //                   "Shortcut Dimension 1 Code","Shortcut Dimension 2 Code","Dimension Set ID"
-                        //                 );
                         SetCurrentKey("Sale Type", Type,
                                         "Gen. Bus. Posting Group", "Gen. Prod. Posting Group",
                                         "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", "Dimension Set ID",
                                         "VAT Bus. Posting Group", "VAT Prod. Posting Group");
-                        //-NPR5.22
                         FindLast;
                         CopyFilters(Dummy);
                         StatusVindueOpdater(4, '', Round(Counter / Total) * 10000);
                     until Next = 0;
                 end;
                 StatusVindueOpdater(4, '', 10000);
-
-                /* ##############################################
-                  Post money transactions - Payments
-                  ############################################## */
 
                 Clear(Counter);
                 Clear(Dummy);
@@ -1399,12 +1160,10 @@ codeunit 6014414 "NPR Post Temp Audit Roll"
                 Dummy.CopyFilters(Rec);
                 if FindSet then begin
                     repeat
-                        //-NPR5.42 [315194]
                         if RetailSetup."Payment Type By Register" then begin
                             if not BetValgRec.Get("No.", "Register No.") then
                                 BetValgRec.Get("No.", '');
                         end else
-                            //+NPR5.42
                             BetValgRec.Get("No.");
                         case BetValgRec.Posting of
                             BetValgRec.Posting::Condensed:
@@ -1430,10 +1189,6 @@ codeunit 6014414 "NPR Post Temp Audit Roll"
                 end;
                 StatusVindueOpdater(5, '', 10000);
 
-                /* #################################################################
-                  Post payments on g/l account - gift/credit vouchers
-                  ################################################################# */
-
                 Clear(Counter);
                 Reset;
                 SetCurrentKey("Sale Type", Type);
@@ -1449,10 +1204,6 @@ codeunit 6014414 "NPR Post Temp Audit Roll"
                     until Next = 0;
                 StatusVindueOpdater(9, '', 10000);
 
-                /* ##############################################
-                  Post outpayments on g/l accounts
-                  ############################################## */
-
                 Clear(Counter);
                 Reset;
                 SetCurrentKey("Sale Type", Type);
@@ -1464,8 +1215,7 @@ codeunit 6014414 "NPR Post Temp Audit Roll"
                     repeat
                         RevisionUdbetaling := Rec;
                         Counter += 1;
-                        //IF "No." = Kasse.Rounding THEN BEGIN  //NPR5.53 [371955]-revoked
-                        if "No." = POSSetup.RoundingAccount(true) then begin  //NPR5.53 [371955]
+                        if "No." = POSSetup.RoundingAccount(true) then begin
                             ChangeSum += "Amount Including VAT";
                             ChangeDep := "Department Code";
                         end else
@@ -1473,8 +1223,7 @@ codeunit 6014414 "NPR Post Temp Audit Roll"
                         StatusVindueOpdater(7, '', Round(Counter / Total) * 10000);
                     until Next = 0;
                 if ChangeSum <> 0 then
-                    //MovementEntries( Kasse.Rounding, ChangeSum, "Register No.", AccountType::"G/L", ChangeDep, '', BogfDate, Rec );  //NPR5.53 [371955]-revoked
-                    MovementEntries(POSSetup.RoundingAccount(true), ChangeSum, "Register No.", AccountType::"G/L", ChangeDep, '', BogfDate, Rec);  //NPR5.53 [371955]
+                    MovementEntries(POSSetup.RoundingAccount(true), ChangeSum, "Register No.", AccountType::"G/L", ChangeDep, '', BogfDate, Rec);
 
                 StatusVindueOpdater(7, '', 10000);
 
@@ -1484,12 +1233,10 @@ codeunit 6014414 "NPR Post Temp Audit Roll"
 
                 Reset;
 
-                //-NPR5.38 [301600]
                 if FindSet then
                     repeat
                         POSAuditRollIntegration.CheckPostingStatusFromAuditRollPosting(Rec, false, true);
                     until Next = 0;
-                //+NPR5.38 [301600]
 
                 if not RetailSetup."Debug Posting" then begin
                     SetRange("Posted Doc. No.", '');
@@ -1499,8 +1246,7 @@ codeunit 6014414 "NPR Post Temp Audit Roll"
                     FinKldLinie.DeleteAll(true);
                     VarekldLinie.DeleteAll(true);
                 end;
-
-            end;   /*** DoNotbogf�r ***/
+            end;
 
             Reset;
 
@@ -1514,16 +1260,9 @@ codeunit 6014414 "NPR Post Temp Audit Roll"
         t002: Label 'Posting of audit roll is not possible in offline mode';
         POSAuditRollIntegration: Codeunit "NPR POS-Audit Roll Integration";
     begin
-        //RunPostItemLedger
-
         with Rec do begin
             DebugPostingMsg := false;
             RetailSetup.Get();
-
-            //-NPR5.53 [369361]
-            //IF RetailSetup."Company - Function" = RetailSetup."Company - Function"::Offline THEN
-            //  ERROR(t002);
-            //+NPR5.53 [369361]
 
             if not Rec.FindLast then
                 exit;
@@ -1557,10 +1296,6 @@ codeunit 6014414 "NPR Post Temp Audit Roll"
 
                 LockTable;
 
-                /* ##############################################
-                  Post�rer Varebev�gelser
-                  ############################################## */
-
                 Reset;
                 SetCurrentKey("Sale Type", Type, "Item Entry Posted");
                 SetRange("Sale Type", "Sale Type"::Sale);
@@ -1572,9 +1307,7 @@ codeunit 6014414 "NPR Post Temp Audit Roll"
                 if FindSet then begin
                     repeat
                         Counter += 1;
-                        //-NPR5.38 [301600]
                         POSAuditRollIntegration.CheckPostingStatusFromAuditRollPosting(Rec, true, false);
-                        //+NPR5.38 [301600]
                         if Quantity <> 0 then begin
                             PosterVarekladde(Rec, false, BogfDate);
                         end;
@@ -1591,7 +1324,7 @@ codeunit 6014414 "NPR Post Temp Audit Roll"
 
                 Reset;
 
-            end;   /*** DoNotbogf�r ***/
+            end;
 
             if StraksBogfVarePostFraEkspAfsl then begin
                 SetCurrentKey("Sale Type", Type, "Item Entry Posted");
@@ -1613,16 +1346,11 @@ codeunit 6014414 "NPR Post Temp Audit Roll"
             Reset;
 
         end;
-
-        //-NPR5.49 [331208]
         OnAfterRunPostItemLedger(Rec);
-        //+NPR5.49 [331208]
-
     end;
 
     procedure SetProgressVis(Vis: Boolean)
     begin
-        //SetProgressVis
         ProgressVis := Vis;
     end;
 
@@ -1641,8 +1369,6 @@ codeunit 6014414 "NPR Post Temp Audit Roll"
         nCount: Integer;
         nTotal: Integer;
     begin
-        //RunTest
-
         with Rec do begin
             Reset;
             SetCurrentKey("Sale Date");
@@ -1655,69 +1381,11 @@ codeunit 6014414 "NPR Post Temp Audit Roll"
                         Window.Update(102, Round(nCount / nTotal * 10000, 1, '>'));
                     end;
 
-                    //-NPR5.36 [282903]
                     if ("Sale Type" <> "Sale Type"::Comment) and not (Type in [Type::Cancelled, Type::Comment]) then
-                        //+NPR5.36 [282903]
                         TestField("No.");
                     case "Sale Type" of
-
-                        /*-1-*/
                         "Sale Type"::Sale:
                             begin
-
-                                //-NPR5.36 [282903]
-                                //        {##########################################################
-                                //         ## Kodestykket er tilf�jet i forbindelse med indl�sning ##
-                                //         ## fra tekstbaseret Navision ---28012000 NP-MD V1.8     ##
-                                //         ##########################################################}
-                                //
-                                //         IF "System-Created Entry" THEN BEGIN
-                                //           Vare.LOCKTABLE;
-                                //           IF NOT Vare.GET("No.") THEN BEGIN
-                                //             IF STRLEN("No.") > 10 THEN
-                                //               Varegruppe.SETRANGE("No.",DELSTR("No.",9))
-                                //             ELSE
-                                //               Varegruppe.SETRANGE("No.","No.");
-                                //             IF NOT Varegruppe.FIND('-') THEN BEGIN
-                                //               Vare.INIT;
-                                //               Vare."No." := "No.";
-                                //               Vare.VALIDATE(Description,Description);
-                                //               Vare.VALIDATE("Item Group",'1');
-                                //               Vare.INSERT;
-                                //             END ELSE BEGIN
-                                //               Vare.INIT;
-                                //               Vare."No." := "No.";
-                                //               Vare.VALIDATE(Description, txtAuto + Description);
-                                //               Vare.VALIDATE("Item Group","No.");
-                                //               Vare."Group sale" := TRUE;
-                                //               Vare.INSERT;
-                                //             END;
-                                //           END;
-                                //         END;
-                                //
-                                //        {######------SLUT------######}
-                                //
-                                //        IF NOT Vare.GET("No.") THEN ERROR(t001,"No.",Description);
-                                //        Vare.TESTFIELD(Blocked,FALSE);
-                                //        Vare.TESTFIELD("VAT Bus. Posting Gr. (Price)");
-                                //        Vare.TESTFIELD("Gen. Prod. Posting Group");
-                                //        //-NPR5.29 [264081]
-                                //        IF Vare.Type <> Vare.Type::Service THEN
-                                //        //-NPR5.29 [264081]
-                                //        Vare.TESTFIELD("Inventory Posting Group");
-                                //        Vare.TESTFIELD("VAT Prod. Posting Group");
-                                //
-                                //
-                                //        {##########################################################
-                                //         ## Kodestykket er tilf�jet i forbindelse med indl�sning ##
-                                //         ## fra tekstbaseret Navision ---30112000 NP-MD          ##
-                                //         ##########################################################}
-                                //
-                                //        "VAT Bus. Posting Group" := Vare."VAT Bus. Posting Gr. (Price)";
-                                //        "VAT Prod. Posting Group" := Vare."VAT Prod. Posting Group";
-                                //        "Gen. Prod. Posting Group" := Vare."Gen. Prod. Posting Group";
-                                //        MODIFY;
-                                //+NPR5.36 [282903]
                                 TestField("Gen. Bus. Posting Group");
                                 "BogfOps.".Get("Gen. Bus. Posting Group", "Gen. Prod. Posting Group");
                                 "BogfOps.".TestField("Sales Account");
@@ -1728,13 +1396,7 @@ codeunit 6014414 "NPR Post Temp Audit Roll"
                                 MomsbogfOps.TestField("Sales VAT Account");
                                 Finanskonto.Get(MomsbogfOps."Sales VAT Account");
                                 Finanskonto.TestField(Blocked, false);
-
-                                /*######------SLUT------######*/
-
                             end;
-
-
-                        /*-2-*/
                         "Sale Type"::Deposit:
                             begin
 
@@ -1742,23 +1404,12 @@ codeunit 6014414 "NPR Post Temp Audit Roll"
                                     if not Debitor.Get("No.") then
                                         Error(t002, "No.", Description);
 
-                                    /*##########################################################
-                                     ## Kodestykket er tilf�jet i forbindelse med indl�sning ##
-                                     ## fra tekstbaseret Navision ---30112000 NP-MD          ##
-                                     ##########################################################*/
-
                                     DebBogfGrp.Get(Debitor."Customer Posting Group");
                                     DebBogfGrp.TestField("Receivables Account");
                                     Finanskonto.Get(DebBogfGrp."Receivables Account");
                                     Finanskonto.TestField(Blocked, false);
-
-                                    /*######------SLUT------######*/
-
                                 end;
                             end;
-
-
-                        /*-3-*/
                         "Sale Type"::"Out payment":
                             begin
                                 if Type = Type::"G/L" then begin
@@ -1768,17 +1419,9 @@ codeunit 6014414 "NPR Post Temp Audit Roll"
                                     Finanskonto.TestField(Blocked, false);
                                 end;
                             end;
-
-                        /*-4-*/
                         "Sale Type"::Payment:
                             begin
-
                                 Betalingsvalg.Get("No.");
-                                /*##########################################################
-                                 ## Kodestykket er tilf�jet i forbindelse med indl�sning ##
-                                 ## fra tekstbaseret Navision ---30112000 NP-MD          ##
-                                 ##########################################################*/
-
                                 case Betalingsvalg."Account Type" of
                                     Betalingsvalg."Account Type"::"G/L Account":
                                         begin
@@ -1793,42 +1436,29 @@ codeunit 6014414 "NPR Post Temp Audit Roll"
                                 end;
 
                                 Finanskonto.TestField(Blocked, false);
-
-                                /*######------SLUT------######*/
-
                             end;
                     end;
                 until Next = 0;
         end;
-        //-NPR5.23
         if ProgressVis then
-            //+NPR5.23
             Window.Update(102, 10000);
 
     end;
 
     procedure RunTransfer(var TempPost: Record "NPR Audit Roll Posting" temporary; var Revisionsrulle: Record "NPR Audit Roll"): Integer
     begin
-        //RunTransfer()
-        //-NPR5.23
-        //EXIT(TempPost.TransferFromRev( Revisionsrulle, TempPost, Window ));
         if WindowIsOpen then
             exit(TempPost.TransferFromRev(Revisionsrulle, TempPost, Window))
         else
             exit(TempPost.TransferFromRevSilent(Revisionsrulle, TempPost));
-        //+NPR5.23
     end;
 
     procedure RunTransferItemLedger(var TempPost: Record "NPR Audit Roll Posting" temporary; var Revisionsrulle: Record "NPR Audit Roll"): Integer
     begin
-        //RunTransferItemLedger
-        //-NPR5.23
-        //EXIT(TempPost.TransferFromRevItemLedger( Revisionsrulle, TempPost, Window ));
         if WindowIsOpen then
             exit(TempPost.TransferFromRevItemLedger(Revisionsrulle, TempPost, Window))
         else
             exit(TempPost.TransferFromRevSilentItemLedg(Revisionsrulle, TempPost));
-        //+NPR5.23
     end;
 
     procedure RemoveSuspendedPayouts(var Rulle: Record "NPR Audit Roll Posting" temporary)
@@ -1837,8 +1467,6 @@ codeunit 6014414 "NPR Post Temp Audit Roll"
         nTotal: Integer;
         Linie: Record "NPR Audit Roll Posting" temporary;
     begin
-        //FjernHængendeUdbetalingerTemp
-
         Rulle.SetCurrentKey("Sale Type", Type, "No.");
         Rulle.SetRange("Sale Type", Rulle."Sale Type"::"Out payment");
         Rulle.SetRange(Type, Rulle.Type::"G/L");
@@ -1887,19 +1515,14 @@ codeunit 6014414 "NPR Post Temp Audit Roll"
 
     procedure RunUpdateChanges(var TempPost: Record "NPR Audit Roll Posting" temporary)
     begin
-        //RunUpdateChanges()
-        //-NPR5.23
-        //TempPost.UpdateChanges( Window );
         if WindowIsOpen then
             TempPost.UpdateChanges(Window)
         else
             TempPost.UpdateChangesSilent();
-        //+NPR5.23
     end;
 
     procedure PostDayClearing(var TempAuditRoll: Record "NPR Audit Roll Posting" temporary; var PaymentType: Record "NPR Payment Type POS"; Amount: Decimal)
     begin
-        //PostDayClearing()
         PaymentType.TestField("Day Clearing Account");
 
         with TempAuditRoll do begin
@@ -1924,9 +1547,6 @@ codeunit 6014414 "NPR Post Temp Audit Roll"
         npc: Record "NPR Retail Setup";
         code20: Code[20];
     begin
-        //getNewPostingNo
-        //Instead of kasse."Last G/L Posting No."
-
         npc.Get;
         code20 := Nos.GetNextNo(npc."Posting No. Management", Today, increment1);
 
@@ -1935,8 +1555,6 @@ codeunit 6014414 "NPR Post Temp Audit Roll"
 
     procedure SetPostingNo("Last G/L Posting No. 1": Code[20])
     begin
-        //setPostingNo
-
         GlobalPostingNo := "Last G/L Posting No. 1";
     end;
 
