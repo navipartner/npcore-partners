@@ -1,8 +1,5 @@
 page 6014404 "NPR Periods"
 {
-    // NPR4.14/MMV/20150807 CASE 220160 Changed print code to call CU with updated version.
-    // NPR5.48/BHR /20181120 CASE 329505 Add fields 165..168
-
     Caption = 'Periods';
     Editable = false;
     PageType = List;
@@ -250,18 +247,8 @@ page 6014404 "NPR Periods"
                     begin
                         AuditRoll.SetRange("Register No.", "Register No.");
                         AuditRoll.SetRange("Sales Ticket No.", "Sales Ticket No.");
-                        //-NPR4.14
-                        //AuditRoll.FIND('-');
                         AuditRoll.FindFirst;
                         StdCodeunitCode.PrintRegisterReceipt(AuditRoll);
-
-                        //Reports.SETRANGE("Report Type", Reports."Report Type"::Kasseafslut);
-                        //Reports.SETFILTER("Register No.", '%1|%2', RetailFormCode.HentKassenummer, '');
-                        //IF Reports.FIND('-') THEN REPEAT
-                        //  REPORT.RUNMODAL(Reports."Report ID", TRUE, TRUE, AuditRoll);
-                        //UNTIL Reports.NEXT = 0;
-
-                        //-NPR4.14
                     end;
                 }
             }

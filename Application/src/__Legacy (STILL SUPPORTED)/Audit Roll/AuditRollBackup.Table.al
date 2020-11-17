@@ -1,15 +1,5 @@
 table 6014538 "NPR Audit Roll Backup"
 {
-    // NPR5.01/RMT/20160217 CASE 234145 Change field "Register No." property "SQL Data Type" from Variant to <Undefined>
-    //                                  Change field "Sales Ticket No." property "SQL Data Type" from Variant to <Undefined>
-    //                                  NOTE: requires data upgrade
-    // NPR5.23/MHA/20160530 CASE 242929 Field 6005 "Description 2" length increased from 30 to 50
-    // NPR5.27/LS  /20161020 CASE 252997 Changed LookupPageID and DrillDownPageID to "Audit Roll Backup List" from "Audit Roll"
-    // NPR5.30/TJ  /20170215 CASE 265504 Changed ENU captions on fields with word Register in their name
-    // NPR5.38/TJ  /20171218  CASE 225415 Renumbered fields from range 50xxx to range 60144xx
-    // NPR5.39/TJ  /20180206  CASE 302634 Changed OptionString property of field 3 "Sale Type" to english version
-    // NPR5.43/JDH /20180620 CASE 317453 Removed non existing table relation from Field 40 (ref to old Department table 11)
-
     Caption = 'Audit Roll Backup';
     DrillDownPageID = "NPR Audit Roll Backup List";
     LookupPageID = "NPR Audit Roll Backup List";

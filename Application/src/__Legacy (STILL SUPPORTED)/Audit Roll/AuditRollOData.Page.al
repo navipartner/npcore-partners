@@ -1,11 +1,5 @@
 page 6151140 "NPR Audit Roll - OData"
 {
-    // NPR5.47/TJ  /20181015 CASE 331725 New object
-    // NPR5.48/TJ  /20181129 CASE 338110 Added field "Posted Doc. No."
-    // NPR5.48/TJ  /20181204 CASE 338606 Added fields "Shortcut Dimension 1 Code" and "Shortcut Dimension 2 Code"
-    // NPR5.48/TJ  /20181206 CASE 338983 Added field "Unit Cost"
-    // NPR5.48/TJ  /20181218 CASE 340302 Added field "Unit Price"
-
     Caption = 'Audit Roll - OData';
     PageType = List;
     UsageCategory = Administration;

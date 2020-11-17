@@ -1,7 +1,5 @@
 table 6014440 "NPR Period Line"
 {
-    // NPR5.30/TJ  /20170215 CASE 265504 Changed ENU captions on fields with word Register in their name
-
     Caption = 'Period Line';
     DataClassification = CustomerContent;
 

@@ -1,17 +1,5 @@
 codeunit 6150617 "NPR POS-Audit Roll Integration"
 {
-    // NPR5.36/BR  /20170628  CASE 279551  Created Codeunit as temporary integration of new POS Entries into Old Audit Roll
-    // NPR5.36/BR  /20170628  CASE 279552  Added a subscriber to insert POS Entries
-    // NPR5.37/BR  /20171011  CASE 293133  Compare Audit Roll and POS Entry Posting
-    // NPR5.38/BR  /20171214  CASE 299888  Renamed from POSLedgerRegister to POSPeriodRegister
-    // NPR5.38/BR  /20180109  CASE 301600  Corrected spelling funtion, added posting source tracking
-    // NPR5.39/MHA /20180202  CASE 302779 Deleted deprecated function OnAfterAuditRollPostingPostItemEntries()
-    // NPR5.41/JDH /20180426 CASE 312644  Added indirect permissions to table Audit roll
-    // NPR5.41/JDH /20180426 CASE 312935  When Data Import is triggered, a test record is inserted, to find out if there is autoincrement in the PK. This causes an error in subscriber OnInsertPOSUnitInsertRegister
-    // NPR5.51/ALST/20190715 CASE 361931 removed MarkAuditRollPosted, PostItemEntries, OnClosingPOSPeriodRegisterPostItemEntries, SaleIsPostedInAuditRoll, POSEntryIsPostedInAuditRoll - unused
-    // NPR5.51/ALST/20190715 CASE 361931 removed FindPOSEntryNo, TryOpenPOSUnit - unused
-    // NPR5.53/ALPO/20191022 CASE 373743 Field "Sales Ticket Series" moved from "Cash Register" to "POS Audit Profile"
-
     Permissions = TableData "NPR Audit Roll" = rimd;
 
     trigger OnRun()
@@ -103,7 +91,6 @@ codeunit 6150617 "NPR POS-Audit Roll Integration"
         GenJnlPostPreview: Codeunit "Gen. Jnl.-Post Preview";
         AuditRollDocNo: Code[20];
     begin
-        //-NPR5.37 [293133];
         if POSEntry.FindSet then
             repeat
                 AuditRollDocNo := '';
@@ -124,10 +111,8 @@ codeunit 6150617 "NPR POS-Audit Roll Integration"
                 end;
                 if AuditRollDocNo = '' then
                     Error('Audit Roll not found');
-                //AuditRollDocNo := 'POS '+ POSEntry."POS Unit No." + '-' + POSEntry."Document No.";
                 CopyPostedEntriesToPreview(AuditRollDocNo, POSEntry."Posting Date");
             until POSEntry.Next = 0;
-        //+NPR5.37 [293133]
     end;
 
     local procedure CopyPostedEntriesToPreview(DocumentNo: Code[20]; PostingDate: Date)
@@ -198,7 +183,6 @@ codeunit 6150617 "NPR POS-Audit Roll Integration"
     var
         AuditRolltoPOSEntryLink: Record "NPR Audit Roll 2 POSEntry Link";
     begin
-        //-NPR5.38 [301600]
         AuditRolltoPOSEntryLink.SetRange("Audit Roll Clustered Key", AuditRoll."Clustered Key");
         if AuditRolltoPOSEntryLink.FindSet then
             repeat
@@ -208,14 +192,12 @@ codeunit 6150617 "NPR POS-Audit Roll Integration"
                     AuditRolltoPOSEntryLink."Posted By" := AuditRolltoPOSEntryLink."Posted By"::"Audit Roll";
                 AuditRolltoPOSEntryLink.Modify;
             until AuditRolltoPOSEntryLink.Next = 0;
-        //+NPR5.38 [301600]
     end;
 
     procedure UpdatePostingStatusFromAuditRollPosting(var AuditRollPosting: Record "NPR Audit Roll Posting")
     var
         AuditRolltoPOSEntryLink: Record "NPR Audit Roll 2 POSEntry Link";
     begin
-        //-NPR5.38 [301600]
         AuditRolltoPOSEntryLink.SetRange("Audit Roll Clustered Key", AuditRollPosting."Clustered Key");
         if AuditRolltoPOSEntryLink.FindSet then
             repeat
@@ -225,14 +207,12 @@ codeunit 6150617 "NPR POS-Audit Roll Integration"
                     AuditRolltoPOSEntryLink."Posted By" := AuditRolltoPOSEntryLink."Posted By"::"Audit Roll";
                 AuditRolltoPOSEntryLink.Modify;
             until AuditRolltoPOSEntryLink.Next = 0;
-        //+NPR5.38 [301600]
     end;
 
     procedure UpdatePostingStatusFromPOSEntry(var POSEntry: Record "NPR POS Entry")
     var
         AuditRolltoPOSEntryLink: Record "NPR Audit Roll 2 POSEntry Link";
     begin
-        //-NPR5.38 [301600]
         AuditRolltoPOSEntryLink.SetRange("POS Entry No.", POSEntry."Entry No.");
         if AuditRolltoPOSEntryLink.FindSet then
             repeat
@@ -242,7 +222,6 @@ codeunit 6150617 "NPR POS-Audit Roll Integration"
                     AuditRolltoPOSEntryLink."Posted By" := AuditRolltoPOSEntryLink."Posted By"::"POS Entry";
                 AuditRolltoPOSEntryLink.Modify;
             until AuditRolltoPOSEntryLink.Next = 0;
-        //+NPR5.38 [301600]
     end;
 
     procedure CheckPostingStatusFromAuditRollPosting(var AuditRollPosting: Record "NPR Audit Roll Posting"; ItemPosting: Boolean; Posting: Boolean)
@@ -250,7 +229,6 @@ codeunit 6150617 "NPR POS-Audit Roll Integration"
         AuditRolltoPOSEntryLink: Record "NPR Audit Roll 2 POSEntry Link";
         POSEntry: Record "NPR POS Entry";
     begin
-        //-NPR5.38 [301600]
         AuditRolltoPOSEntryLink.SetRange("Audit Roll Clustered Key", AuditRollPosting."Clustered Key");
         if AuditRolltoPOSEntryLink.FindSet then
             repeat
@@ -258,7 +236,6 @@ codeunit 6150617 "NPR POS-Audit Roll Integration"
                    (Posting and (AuditRolltoPOSEntryLink."Posted By" = AuditRolltoPOSEntryLink."Posted By"::"POS Entry")) then
                     Error(TextAllReadyPosted, AuditRollPosting.TableCaption, Format(AuditRollPosting.RecordId), POSEntry.TableCaption, AuditRolltoPOSEntryLink."POS Entry No.");
             until AuditRolltoPOSEntryLink.Next = 0;
-        //+NPR5.38 [301600]
     end;
 
     procedure CheckPostingStatusFromPOSEntry(var POSEntry: Record "NPR POS Entry"; ItemPosting: Boolean; Posting: Boolean)
@@ -266,7 +243,6 @@ codeunit 6150617 "NPR POS-Audit Roll Integration"
         AuditRolltoPOSEntryLink: Record "NPR Audit Roll 2 POSEntry Link";
         AuditRoll: Record "NPR Audit Roll";
     begin
-        //-NPR5.38 [301600]
         AuditRolltoPOSEntryLink.SetRange("POS Entry No.", POSEntry."Entry No.");
         if AuditRolltoPOSEntryLink.FindSet then
             repeat
@@ -274,12 +250,9 @@ codeunit 6150617 "NPR POS-Audit Roll Integration"
                    (Posting and (AuditRolltoPOSEntryLink."Posted By" = AuditRolltoPOSEntryLink."Posted By"::"Audit Roll")) then
                     Error(TextAllReadyPosted, POSEntry.TableCaption, POSEntry."Entry No.", AuditRoll.TableCaption, AuditRolltoPOSEntryLink."Audit Roll Clustered Key");
             until AuditRolltoPOSEntryLink.Next = 0;
-        //+NPR5.38 [301600]
     end;
 
-    local procedure "---Subscribers"()
-    begin
-    end;
+    //Subscribers
 
     [EventSubscriber(ObjectType::Table, 6150615, 'OnAfterInsertEvent', '', true, true)]
     local procedure OnInsertPOSUnitInsertRegister(var Rec: Record "NPR POS Unit"; RunTrigger: Boolean)
@@ -289,15 +262,12 @@ codeunit 6150617 "NPR POS-Audit Roll Integration"
     begin
         if Register.Get(Rec."No.") then
             exit;
-        //-NPR5.41 [312935]
         if Rec."POS Store Code" = '' then
             exit;
-        //+NPR5.41 [312935]
 
         Register.Init;
         Register."Register No." := Rec."No.";
         POSStore.Get(Rec."POS Store Code");
-        //Register."Sales Ticket Series" := POSStore."POS Entry Doc. No. Series";  //NPR5.53 [373743]-revoked
         Register."Location Code" := POSStore."Location Code";
         Register.Insert(true);
     end;
@@ -308,17 +278,13 @@ codeunit 6150617 "NPR POS-Audit Roll Integration"
         NPRetailSetup: Record "NPR NP Retail Setup";
         SalePOS: Record "NPR Sale POS";
     begin
-        //-NPR5.36 [279552]
         exit;
         if not NPRetailSetup.Get then
             exit;
-        //IF NOT (NPRetailSetup."Environment Type" IN [NPRetailSetup."Environment Type"::DEV,NPRetailSetup."Environment Type"::TEST]) THEN
-        //  EXIT;
         if not NPRetailSetup."Advanced POS Entries Activated" then
             exit;
         Sender.GetCurrentSale(SalePOS);
         TryCreateSalePOS(SalePOS, NPRetailSetup."Environment Type" <> NPRetailSetup."Environment Type"::PROD);
-        //+NPR5.36 [279552]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014505, 'OnBeforeRegisterOpen', '', true, true)]
@@ -334,28 +300,23 @@ codeunit 6150617 "NPR POS-Audit Roll Integration"
             exit;
         if not POSUnit.Get(Register."Register No.") then
             exit;
-        ///TryOpenPOSUnit(POSUnit,NPRetailSetup."Environment Type" <> NPRetailSetup."Environment Type"::PROD);
         OpenPOSUnit(POSUnit);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150615, 'OnAfterPostPOSEntry', '', true, true)]
     local procedure OnAfterPOSPostEntry(var POSEntry: Record "NPR POS Entry"; PreviewMode: Boolean)
     begin
-        //-NPR5.38 [301600]
         if PreviewMode then
             exit;
         UpdatePostingStatusFromPOSEntry(POSEntry);
-        //+NPR5.38 [301600]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150615, 'OnCheckPostingRestrictions', '', true, true)]
     local procedure OnBeforePOSPostEntry(var POSEntry: Record "NPR POS Entry"; PreviewMode: Boolean)
     begin
-        //-NPR5.38 [301600]
         if PreviewMode then
             exit;
         CheckPostingStatusFromPOSEntry(POSEntry, true, false);
-        //+NPR5.38 [301600]
     end;
 }
 

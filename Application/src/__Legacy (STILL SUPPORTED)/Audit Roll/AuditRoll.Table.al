@@ -1,75 +1,5 @@
 table 6014407 "NPR Audit Roll"
 {
-    // //----MG 14/9-01 rettelse til udskrivrecords
-    // 
-    // //-0023 : Henrik, Bonudskrivning af forskellig rapport afhængig af kasse.
-    // 
-    // //-NPK3.0a Ved Nikolai Pedersen
-    //   Tilf¢jet funktionen Sletning der sletter frem til indtastede dato
-    // 
-    // //-NPR3.1r NE
-    //   Incrementcount rettet.
-    // 
-    // // The Key
-    //       "Sale Date,Sale Type,Type,Starting Time,Closing Time,Shortcut Dimension 1 Code,Shortcut Dimension 2 Code"
-    // 
-    //     Is only required if the time analysis module is active... otherwise it can be switched off
-    // 
-    // NPR4.002.002, 11-06-09, MH, Tilf¢jet feltet "Lock Code" (sag 65422).
-    // NPR4.004.003, 01-12-09, MH, Added function, SendLatestAsPDF - Sends the latest audit by email (Job 79125).
-    // NPR4.004.004, 03-12-09, MH, Added "Label No." (job 59317).
-    // PN1.04/MH/20140819  NAV-AddOn: PDF2NAV
-    //   - Moved PDF functionality (NPR4.004.003) to Codeunit 6014464 "E-mail Document Management":
-    //     A. SendAsPDF() --> SendReportAuditRoll()
-    //     B. SendLatestAsPDF() --> SendReportLatestAuditRoll()
-    // NPR4.01/JDH /20150310  CASE 201022 Removed reference to assortments
-    // NPR4.04/JDH /20150427  CASE 212229 Removed references to old Variant solution "Color Size"
-    // NPR4.10/MMV /20150611  CASE 215921 Added method GetNoOfSales from latest 6.2 release
-    // NPR4.11/MMV /20150618  CASE 215957 Added new field 10020 to replace 50005. Updated function "IncrementCount" to new field.
-    // NPR4.11/MMV /20150618  CASE 215921 Removed hardcoded filter on Type in NPR4.10 change - More use cases when you define filters before calling function.
-    // NPR4.14/RMT /20150715  CASE 216519 Added fields - used for registering prepayment
-    //                                    140 "Sales Document Type"
-    //                                    141 "Sales Document No."
-    //                                    142 "Sales Document Line No."
-    //                                    143 "Sales Document Prepayment"
-    //                                    144 "Sales Doc. Prepayment %"
-    // NPR4.14/MMV /20150826  CASE 221045 Expanded field 106 from code10 to code20 to match size of all the sales doc. numbers.
-    // NPR5.01/RMT /20160217  CASE 234145 Change field "Register No." property "SQL Data Type" from Variant to <Undefined>
-    //                                    Change field "Sales Ticket No." property "SQL Data Type" from Variant to <Undefined>
-    //                                    NOTE: requires data upgrade
-    // NPR4.21/JHL /20160316  CASE 222417 Deleted old fields dealing with CleanCash
-    // NPR4.21/BHR /20160318  CASE 229736 Code to flow "dimension set ID"
-    // NPR5.23/JDH /20160523  CASE 242105 new key for sorting audit roll cronologically "Sale Date,Sales Ticket No.,Line No."
-    // NPR5.23/MMV /20160527  CASE 242202 Removed deprecated discount code.
-    //                                    Updated report selection reference.
-    // NPR5.23/MHA /20160530  CASE 242929 Field 6005 "Description 2" length increased from 30 to 50
-    // NPR5.27/JDH /20161018  CASE 255575 Removed unused functions
-    // NPR5.30/MHA /20170201  CASE 264918 Np Photo Module removed
-    // NPR5.30/TJ  /20170215  CASE 265504 Changed ENU captions on fields with word Register in their name
-    // NPR5.31/AP  /20160915  CASE 248534 US Sales Tax
-    //                                    Added the fields  85 "Tax Area Code", 86 "Tax Liable", 87 "Tax Group Code", 88 "Use Tax"
-    // NPR5.31/MMV /20170321  CASE 269028 Re-added function IncrementPrintedCount
-    // NPR5.31/AP  /20173103  CASE 262628 Added field 160 POS Sale ID. Surrogate key from POS Sale.
-    //                                    Added field 161 Orig. POS Sale ID and 162 Orig POS Line No.
-    // NPR5.31/JLK /20170420  CASE 272626 Changed ENU Caption on Sale Type
-    // NPR5.35/TJ  /20170809  CASE 286283 Renamed variables/function into english and into proper naming terminology
-    //                                    Removed unused variables
-    // NPR5.36/TJ  /20170904  CASE 286283 Renamed all the danish OptionString properties to english
-    // NPR5.38/BR  /20171207  CASE 299035 Added Key Sale Date,Sales Ticket No.,Sale Type,Line No., Disabled: Retail Document Type,Retail Document No., Sale Date,Invoiz Guid and Sale Date,Sales Ticket No.,Line No.
-    // NPR5.38/TJ  /20171218  CASE 225415 Renumbered fields from range 50xxx to range below 50000
-    // NPR5.38/MHA /20180105  CASE 301053 Renamed field 108 and 109 to reflect the field names from Sale Line POS
-    // NPR5.39/MHA /20180214 CASE 305139 Added field 405 "Discount Authorised by"
-    // NPR5.41/JDH /20180406 CASE 308194 Changed key "Sale Date","Sales Ticket No.","Sale Type","Line No." to "MaintainSQLIndex" = true, for better performance on page Audit Roll
-    // NPR5.42/BHR /20180518 CASE 314987 Added functionality to Change dimension
-    // NPR5.43/JDH /20180620 CASE 317453 Removed non existing table relation from Field 40 (ref to old Department table 11)
-    // NPR5.43/JC  /20180625 CASE 320335 Transfer value of serial no. not created
-    // NPR5.43/JDH /20180702 CASE 321012 Removed Color and size transfers - they are legacy
-    // NPR5.45/TSA /20180809 CASE 310137 Changed captions on field 110 ("Document Type" -> "Retail Document Type") and 111 ("No." -> Retail Document No.") to become different from existing fields (6 and 107)
-    // NPR5.45/THRO/20180815 CASE 321951 Added Fieldgroup Brick (Sales Ticket No.,Description,No.,Sale Date,Starting Time,Register No.)
-    // NPR5.45/MHA /20180821 CASE 324395 SaleLinePOS."Unit Price (LCY)" Renamed to "Unit Cost (LCY)"
-    // NPR5.48/JDH /20181113 CASE 334555 Changed Unit of measure code from Text to Code
-    // NPR5.53/BHR /20191111 CASE 369361 Comment Offline code
-
     Caption = 'Audit Roll';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR Audit Roll";
@@ -131,7 +61,6 @@ table 6014407 "NPR Audit Roll"
                     Type::"G/L":
                         begin
                             TestField(Type, Type::"G/L");
-                            //TESTFIELD("Sale Type","Sale Type"::Udbetaling);  //ohm - not applicable using gift vouchers
                             TestField(Posted, false);
                             if "No." <> '*' then begin
                                 GLAccount.Get("No.");
@@ -419,9 +348,6 @@ table 6014407 "NPR Audit Roll"
             trigger OnValidate()
             begin
                 ValidateShortcutDimCode(1, "Shortcut Dimension 1 Code");
-                //-NPR5.42 [314987]
-                //MODIFY;
-                //-NPR5.42 [314987]
             end;
         }
         field(71; "Shortcut Dimension 2 Code"; Code[20])
@@ -440,7 +366,6 @@ table 6014407 "NPR Audit Roll"
             trigger OnValidate()
             begin
                 ValidateShortcutDimCode(2, "Shortcut Dimension 2 Code");
-                //MODIFY;    //swteams an
             end;
         }
         field(72; "Offline - Gift voucher ref."; Code[20])
@@ -1149,19 +1074,15 @@ table 6014407 "NPR Audit Roll"
         Register2: Record "NPR Register";
         InsertAllowed: Boolean;
     begin
-        //KasseLoc.LOCKTABLE; //ohm 18/8/06 - why?
-
         if Register2.Get("Register No.") then begin
             InsertAllowed := false;
             case Register2.Status of
                 Register2.Status::" ":
                     begin
-                        // Alt tilladt
                         InsertAllowed := true;
                     end;
                 Register2.Status::Ekspedition:
                     begin
-                        // Alt tilladt
                         InsertAllowed := true;
                     end;
                 Register2.Status::Afsluttet:
@@ -1206,13 +1127,6 @@ table 6014407 "NPR Audit Roll"
         if "Offline receipt no." = '' then
             "Offline receipt no." := "Sales Ticket No.";
         RetailSetup.Get;
-        //-NPR5.53 [369361]
-        // IF RetailSetup."Company - Function" = RetailSetup."Company - Function"::"1" THEN BEGIN
-        //  Offline := TRUE;
-        //  "Offline - Gift voucher ref."   := "Gift voucher ref.";
-        //  "Offline - Credit voucher ref." := "Credit voucher ref.";
-        // END;
-        //+NPR5.53 [369361]
     end;
 
     var
@@ -1229,8 +1143,6 @@ table 6014407 "NPR Audit Roll"
     var
         StdCodeunitCode: Codeunit "NPR Std. Codeunit Code";
     begin
-        //PrintReceipt()
-
         StdCodeunitCode.OnRunSetShowDemand(ViewDemand);
         if HandleErrorUnderPrintReceipt then
             exit(StdCodeunitCode.Run(Rec))
@@ -1244,40 +1156,12 @@ table 6014407 "NPR Audit Roll"
         RecRef: RecordRef;
         ReportSelectionRetail: Record "NPR Report Selection Retail";
     begin
-        //PrintReceiptA4
-        //-NPR5.23 [242202]
-        //RetailSetup.GET;
-        //+NPR5.23 [242202]
-
         AuditRoll.Copy(Rec);
 
-        //-NPR5.23 [242202]
         RecRef.GetTable(AuditRoll);
         RetailReportSelectionMgt.SetRegisterNo("Register No.");
         RetailReportSelectionMgt.SetRequestWindow(ViewDemand);
         RetailReportSelectionMgt.RunObjects(RecRef, ReportSelectionRetail."Report Type"::"Large Sales Receipt");
-
-        // IF RetailSetup."Get Customername at Discount" AND Discount AND ( Revisionsrec.Kundenavn = '' ) THEN BEGIN
-        //  szKundenavn := '';
-        //  InputDialog.SetInput(1,szKundenavn,txtGetCust);
-        //   IF InputDialog.RUNMODAL = ACTION::OK THEN BEGIN
-        //     InputDialog.InputText(1, szKundenavn);
-        //     Revisionsrec.MODIFYALL( Kundenavn, szKundenavn );
-        //   END;
-        // END;
-        //
-        // WITH Revisionsrec DO BEGIN
-        //  Rapportvalg.SETRANGE("Report Type",Rapportvalg."Report Type"::"A4-Bon");
-        //  Rapportvalg.SETFILTER("Report ID",'<>0');
-        //  Rapportvalg.SETRANGE( "Register No.", "Register No." );
-        //  IF NOT Rapportvalg.FIND('-') THEN
-        //    Rapportvalg.SETRANGE( "Register No.", '' );
-        //  Rapportvalg.FIND('-');
-        //  REPEAT
-        //    REPORT.RUN(Rapportvalg."Report ID",visanfordring,FALSE,Revisionsrec);
-        //  UNTIL Rapportvalg.NEXT = 0;
-        // END;
-        //+NPR5.23 [242202]
     end;
 
     procedure LineIsGiftCert(): Boolean
@@ -1285,13 +1169,10 @@ table 6014407 "NPR Audit Roll"
         Register2: Record "NPR Register";
         GiftVoucher2: Record "NPR Gift Voucher";
     begin
-        //LineIsGiftCert
         if Type = Type::"G/L" then
             if "Sale Type" = "Sale Type"::Deposit then
                 if Register2.Get("Register No.") then
                     if "No." = Register2."Gift Voucher Account" then
-                        //        IF "Rabat kode" <> '' THEN
-                        //          IF GavekortLok.GET("Rabat kode") THEN
                         if "Gift voucher ref." <> '' then
                             if GiftVoucher2.Get("Gift voucher ref.") then
                                 exit(true);
@@ -1302,7 +1183,6 @@ table 6014407 "NPR Audit Roll"
     var
         Register2: Record "NPR Register";
     begin
-        //LineIsGiftCertDisc
         if Type = Type::"G/L" then
             if "Sale Type" = "Sale Type"::Deposit then
                 if Register2.Get("Register No.") then
@@ -1327,8 +1207,6 @@ table 6014407 "NPR Audit Roll"
 
     procedure LookUpShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
     begin
-        //RetailSetup.GET;
-        //IF RetailSetup."Brug dimensionsstyring" THEN
         NPRDimMgt.LookupDimValueCode(FieldNumber, ShortcutDimCode);
     end;
 
@@ -1341,7 +1219,6 @@ table 6014407 "NPR Audit Roll"
     var
         PaymentTypePOS: Record "NPR Payment Type POS";
     begin
-        //ImmediatePost()
         PaymentTypePOS.Reset;
         PaymentTypePOS.SetCurrentKey("Receipt - Post it Now");
         PaymentTypePOS.SetRange("Receipt - Post it Now", true);
@@ -1361,7 +1238,6 @@ table 6014407 "NPR Audit Roll"
 
     procedure PrintReceiptErrorHandle(HandleError: Boolean)
     begin
-        //PrintReceiptErrorHandle
         HandleErrorUnderPrintReceipt := HandleError;
     end;
 
@@ -1370,7 +1246,6 @@ table 6014407 "NPR Audit Roll"
         Register2: Record "NPR Register";
         CreditVoucher2: Record "NPR Credit Voucher";
     begin
-        //LineIsReceivable
         if Type = Type::"G/L" then
             if "Sale Type" = "Sale Type"::Deposit then
                 if Register2.Get("Register No.") then
@@ -1386,12 +1261,8 @@ table 6014407 "NPR Audit Roll"
         NoOfSales: Integer;
         LastSalesTicketNo: Code[20];
     begin
-        //-NPR4.10
         AuditRoll2.CopyFilters(Rec);
 
-        //-NPR4.11
-        //AuditRoll2.SETRANGE("Sale Type", AuditRoll2."Sale Type"::Salg);
-        //+NPR4.11
         if AuditRoll2.FindSet then
             repeat
                 if (AuditRoll2."Sales Ticket No." <> LastSalesTicketNo) then
@@ -1400,12 +1271,10 @@ table 6014407 "NPR Audit Roll"
             until AuditRoll2.Next = 0;
 
         exit(NoOfSales);
-        //+NPR4.10
     end;
 
     procedure TransferFromSaleLinePOS(var SaleLinePOS: Record "NPR Sale Line POS"; Time2: Time; Code2: Code[20]; AuditDocType: Integer; AuditAdvanceNo: Code[20])
     begin
-        //TransferFromSaleLinePOS()
         "No." := SaleLinePOS."No.";
         "Sale Date" := SaleLinePOS.Date;
         Type := Type::"Debit Sale";
@@ -1419,10 +1288,7 @@ table 6014407 "NPR Audit Roll"
         "Invoice (Qty)" := SaleLinePOS."Invoice (Qty)";
         "To Ship (Qty)" := SaleLinePOS."To Ship (Qty)";
         "Unit Price" := SaleLinePOS."Unit Price";
-        //-NPR5.45 [324395]
-        //"Unit Cost (LCY)" := SaleLinePOS."Unit Price (LCY)";
         "Unit Cost (LCY)" := SaleLinePOS."Unit Cost (LCY)";
-        //+NPR5.45 [324395]
         "VAT %" := SaleLinePOS."VAT %";
         "Qty. Discount %" := SaleLinePOS."Qty. Discount %";
         "Line Discount %" := SaleLinePOS."Discount %";
@@ -1431,9 +1297,7 @@ table 6014407 "NPR Audit Roll"
         "Amount Including VAT" := SaleLinePOS."Amount Including VAT";
         "Shortcut Dimension 1 Code" := SaleLinePOS."Shortcut Dimension 1 Code";
         "Shortcut Dimension 2 Code" := SaleLinePOS."Shortcut Dimension 2 Code";
-        //-NPR4.21
         "Dimension Set ID" := SaleLinePOS."Dimension Set ID";
-        //+NPR4.21
 
         "Price Group Code" := SaleLinePOS."Customer Price Group";
         "Serial No." := SaleLinePOS."Serial No.";
@@ -1451,13 +1315,7 @@ table 6014407 "NPR Audit Roll"
         "Salesperson Code" := "Salesperson Code";
         "Discount Type" := SaleLinePOS."Discount Type";
         "Discount Code" := SaleLinePOS."Discount Code";
-        //-NPR5.39 [305139]
         "Discount Authorised by" := SaleLinePOS."Discount Authorised by";
-        //+NPR5.39 [305139]
-        //-NPR5.43 [321012]
-        //Color := SaleLinePOS.Color;
-        //Size := SaleLinePOS.Size;
-        //+NPR5.43 [321012]
         "Customer No." := "Customer No.";
         "Customer Type" := "Customer Type";
         "Item Group" := SaleLinePOS."Item Group";
@@ -1477,25 +1335,20 @@ table 6014407 "NPR Audit Roll"
         if SaleLinePOS."Return Sale Sales Ticket No." <> '' then
             "Reverseing Sales Ticket No." := SaleLinePOS."Return Sale Sales Ticket No.";
 
-        //-NPR5.43 [320335]
         "Serial No. not Created" := SaleLinePOS."Serial No. not Created";
-        //+NPR5.43
     end;
 
     procedure IncrementPrintedCount()
     begin
-        //-NPR5.31 [269028]
         if FindSet(true, false) then
             repeat
                 "No. Printed" += 1;
                 Modify;
             until Next = 0;
-        //+NPR5.31 [269028]
     end;
 
     procedure SetDimensions()
     begin
-        //-NPR5.42 [314987]
         "Dimension Set ID" :=
           DimMgt.EditDimensionSet("Dimension Set ID", StrSubstNo('%1 %2 %3', "Register No.", "Sales Ticket No.", "Line No."));
 
@@ -1506,7 +1359,6 @@ table 6014407 "NPR Audit Roll"
 
         if (xRec."Shortcut Dimension 2 Code" <> "Shortcut Dimension 2 Code") then
             Validate("Shortcut Dimension 2 Code");
-        //-NPR5.42 [314987]
     end;
 }
 

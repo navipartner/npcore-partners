@@ -1,9 +1,5 @@
 page 6014495 "NPR Audit Roll Backup List"
 {
-    // NPR5.27/LS  /20160922 CASE 252997 Created Page for Audit Roll Backup
-    // NPR5.41/TS  /20180105 CASE 300893 Removed Caption on ActionContainer
-    // NPR5.48/TS  /20181206 CASE 338656 Added Missing Picture to Action
-
     Caption = 'Audit Roll Backup List';
     Editable = false;
     PageType = List;
@@ -116,7 +112,6 @@ page 6014495 "NPR Audit Roll Backup List"
                     AuditRollBackup: Record "NPR Audit Roll Backup";
                     AuditRoll: Record "NPR Audit Roll";
                 begin
-                    //-NPR5.27  [252997]
                     AuditRollBackup.Copy(Rec);
                     CurrPage.SetSelectionFilter(AuditRollBackup);
                     if AuditRollBackup.FindSet then
@@ -127,7 +122,6 @@ page 6014495 "NPR Audit Roll Backup List"
                                 AuditRoll.Insert;
                             end;
                         until AuditRollBackup.Next = 0;
-                    //+NPR5.27  [252997]
                 end;
             }
         }
