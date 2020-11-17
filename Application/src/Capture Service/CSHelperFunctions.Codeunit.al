@@ -564,7 +564,7 @@ codeunit 6151373 "NPR CS Helper Functions"
                                 MagentoPictureLink.SetRange("Base Image", true);
                                 if MagentoPictureLink.FindFirst then
                                     if MagentoPicture.Get(MagentoPicture.Type::Item, MagentoPictureLink."Picture Name") then
-                                        CSRefillData."Image Url" := MagentoPicture.GetMagentotUrl;
+                                        CSRefillData."Image Url" := MagentoPicture.GetMagentoUrl;
                             end;
                         end;
 
@@ -604,7 +604,7 @@ codeunit 6151373 "NPR CS Helper Functions"
                                 MagentoPictureLink.SetRange("Base Image", true);
                                 if MagentoPictureLink.FindFirst then
                                     if MagentoPicture.Get(MagentoPicture.Type::Item, MagentoPictureLink."Picture Name") then
-                                        CSRefillData."Image Url" := MagentoPicture.GetMagentotUrl;
+                                        CSRefillData."Image Url" := MagentoPicture.GetMagentoUrl;
                             end;
                         end;
 
@@ -727,7 +727,7 @@ codeunit 6151373 "NPR CS Helper Functions"
                     MagentoPictureLink.SetRange("Base Image", true);
                     if MagentoPictureLink.FindFirst then
                         if MagentoPicture.Get(MagentoPicture.Type::Item, MagentoPictureLink."Picture Name") then
-                            CSRfidOfflineData."Image Url" := MagentoPicture.GetMagentotUrl;
+                            CSRfidOfflineData."Image Url" := MagentoPicture.GetMagentoUrl;
                 end;
             end;
             CSRfidOfflineData.Modify(true);

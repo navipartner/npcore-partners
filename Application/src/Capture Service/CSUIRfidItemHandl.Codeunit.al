@@ -528,7 +528,7 @@ codeunit 6151369 "NPR CS UI Rfid Item Handl."
             MagentoPictureLink.SetRange("Base Image", true);
             if MagentoPictureLink.FindFirst then
                 if MagentoPicture.Get(MagentoPicture.Type::Item, MagentoPictureLink."Picture Name") then
-                    ImageUrl := MagentoPicture.GetMagentotUrl;
+                    ImageUrl := MagentoPicture.GetMagentoUrl;
             //-NPR5.48 [335051]
         end;
         //+NPR5.48 [335051]
