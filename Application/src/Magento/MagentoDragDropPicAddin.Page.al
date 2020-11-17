@@ -156,6 +156,7 @@ page 6151451 "NPR Magento DragDropPic. Addin"
     var
         MagentoPicture: Record "NPR Magento Picture";
         Skip: Boolean;
+        Base64: Codeunit "Base64 Convert";
     begin
         if MagentoPicture.Get(PictureType, TempMagentoPicture2.Name) then begin
             MagentoPicture."Size (kb)" := TempMagentoPicture."Size (kb)";
@@ -245,13 +246,7 @@ page 6151451 "NPR Magento DragDropPic. Addin"
         end;
     end;
 
-    local procedure "--- PictureAddin"()
-    begin
-    end;
-
     procedure DisplayPicture()
-    var
-        String: DotNet NPRNetString;
     begin
         if not ControlAddInReady then
             exit;
@@ -265,49 +260,55 @@ page 6151451 "NPR Magento DragDropPic. Addin"
             exit;
         end;
 
-        CurrPage.DragDropAddin.DisplayData(GetMagentotUrl());
+        CurrPage.DragDropAddin.DisplayData(GetMagentoUrl());
     end;
 
     procedure GetDataUri() DataUri: Text
     var
-        Convert: DotNet NPRNetConvert;
-        Image: DotNet NPRNetImage;
-        ImageFormat: DotNet NPRNetImageFormat;
-        MemoryStream: DotNet NPRNetMemoryStream;
+        Convert: Codeunit "Base64 Convert";
         InStream: InStream;
     begin
         if not Picture.HasValue then
             exit;
 
-        DataUri := 'data:image/';
-
         CalcFields(Picture);
         Picture.CreateInStream(InStream);
+
+        DataUri := 'data:image/' + GetMimeType(InStream);
+        DataUri += ';base64,' + Convert.ToBase64(InStream);
+        exit(DataUri);
+    end;
+
+    local procedure GetMimeType(Stream: InStream): Text;
+    var
+        Image: DotNet NPRNetImage;
+        ImageFormat: DotNet NPRNetImageFormat;
+        MemoryStream: DotNet NPRNetMemoryStream;
+    begin
+        if StrLen("Mime Type".Trim()) > 0 then
+            exit("Mime Type");
+
+        // TODO: This has to be refactored using DotNet_Image and DotNet_ImageFormat standard codeunits - however, they are not currently allowing full access to their functionality in non-OnPrem scenarios
+        //       I have started a suggestion process to add the missing functionality.
+        //       Whoever gets to refactor this part of DotNet - please contact me (Vjeko) about it before making any changes to this. Thanks a bunch!
         MemoryStream := MemoryStream.MemoryStream;
-        CopyStream(MemoryStream, InStream);
+        CopyStream(MemoryStream, Stream);
         Image := Image.FromStream(MemoryStream);
         ImageFormat := Image.RawFormat;
         case true of
             ImageFormat.Equals(ImageFormat.Gif):
-                DataUri += 'gif';
+                exit('gif');
             ImageFormat.Equals(ImageFormat.Jpeg):
-                DataUri += 'jpg';
+                exit('jpg');
             ImageFormat.Equals(ImageFormat.Png):
-                DataUri += 'png';
+                exit('png');
         end;
-
-        DataUri += ';base64,' + Convert.ToBase64String(MemoryStream.ToArray);
-        exit(DataUri);
     end;
 
     procedure ReplacePicture(): Boolean
     var
         MagentoPicture: Record "NPR Magento Picture";
         MagentoPictureLink: Record "NPR Magento Picture Link";
-    begin
-    end;
-
-    procedure "--- Aux"()
     begin
     end;
 
@@ -417,10 +418,12 @@ page 6151451 "NPR Magento DragDropPic. Addin"
 
     procedure SaveTempPicture()
     var
-        MemoryStream: DotNet NPRNetMemoryStream;
-        RegEx: DotNet NPRNetRegex;
-        Match: DotNet NPRNetMatch;
-        Convert: DotNet NPRNetConvert;
+        RegEx: Codeunit DotNet_Regex;
+        Match: Codeunit DotNet_Match;
+        Groups: Codeunit DotNet_GroupCollection;
+        Group1: Codeunit DotNet_Group;
+        Group2: Codeunit DotNet_Group;
+        Convert: Codeunit "Base64 Convert";
         OutStr: OutStream;
         DataUri: Text;
     begin
@@ -429,18 +432,20 @@ page 6151451 "NPR Magento DragDropPic. Addin"
 
         DataUri := PictureDataUri;
         PictureDataUri := '';
-        RegEx := RegEx.Regex('data\:image/(.*?);base64,(.*)');
-        Match := RegEx.Match(DataUri);
+        RegEx.Regex('data\:image/(.*?);base64,(.*)');
+        RegEx.Match(DataUri, Match);
         if Match.Success then begin
-            MemoryStream := MemoryStream.MemoryStream(Convert.FromBase64String(Match.Groups.Item(2).Value));
+            Match.Groups(Groups);
+            Groups.Item(1, Group1);
+            Groups.Item(2, Group2);
             TempMagentoPicture.Init;
             TempMagentoPicture.Type := PictureType;
             TempMagentoPicture.Name := PictureName;
             TempMagentoPicture."Size (kb)" := Round(PictureSize / 1000, 1);
+            TempMagentoPicture."Mime Type" := Group1.Value;
             TempMagentoPicture.Picture.CreateOutStream(OutStr);
-            CopyStream(OutStr, MemoryStream);
+            Convert.FromBase64(Group2.Value, OutStr);
             TempMagentoPicture.Insert;
-            MemoryStream.Dispose();
         end;
         PictureName := '';
     end;
