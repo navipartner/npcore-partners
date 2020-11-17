@@ -1,27 +1,5 @@
 table 6014424 "NPR Audit Roll Posting"
 {
-    // NPR4.01/JDH/20150310  CASE 201022 Removed reference to assortments
-    // NPR4.14/RMT/20150715  CASE 216519 Added fields - used for registering prepayment
-    //                                   140 "Sales Document Type"
-    //                                   141 "Sales Document No."
-    //                                   142 "Sales Document Line No."
-    //                                   143 "Sales Document Prepayment"
-    //                                   144 "Sales Doc. Prepayment %"
-    // NPR5.01/RMT/20160217  CASE 234145 Change field "Register No." property "SQL Data Type" from Variant to <Undefined>
-    //                                   Change field "Sales Ticket No." property "SQL Data Type" from Variant to <Undefined>
-    //                                   NOTE: requires data upgrade
-    // NPR5.22/BHR/20150317 CASE 234744 Change size of field 106(Document No) from 10 to 20
-    // NPR5.22/JC/20160421  CASE 239058 Added new key  'Sale Type,Type,Gen. Bus. Posting Group,Gen. Prod. Posting Group,Shortcut Dimension 1 Code,Shortcut Dimension 2 Code,Dimension Set ID,VAT Bus. Posting Group,VAT Prod. Posting Group'
-    // NPR5.23/THRO/20160511 CASE 240004 TransferFromRevSilent returns no of records transferred
-    //                                   TransferFromRevSilentItemLedg returns no of records transferred
-    //                                   Cleanup so we don't have same functionality in 2 functions
-    // NPR5.23/MHA/20160530 CASE 242929 Field 6005 "Description 2" length increased from 30 to 50
-    // NPR5.30/TJ  /20170215 CASE 265504 Changed ENU captions on fields with word Register in their name
-    // NPR5.36/TJ  /20170920 CASE 286283 Renamed all the danish OptionString properties to english
-    // NPR5.38/TJ  /20171218 CASE 225415 Renumbered fields from range 50xxx to range below 50000
-    // NPR5.43/JDH /20180620 CASE 317453 Removed non existing table relation from Field 40 (ref to old Department table 11)
-    // NPR5.55/ALPO/20200907 CASE 420356 Fixed Enum/Option conversion issues
-
     Caption = 'Audit Roll Posting';
     DataClassification = CustomerContent;
 
@@ -1002,43 +980,7 @@ table 6014424 "NPR Audit Roll Posting"
         Total: Integer;
         nCount: Integer;
     begin
-        //TransferFromRev()
-        //-NPR5.23
         exit(DoTransferFromRev(Revisionsrulle, RevPost, Dlg, true));
-        //+NPR5.23
-
-        //-NPR5.23
-        // Revisionsrulle.SETCURRENTKEY( "Register No.", Posted, "Sale Date" );
-        // Revisionsrulle.SETRANGE( Posted, FALSE );
-        //
-        // { Ohm - checking
-        // form6014432.setExtFilters(TRUE);
-        // form6014432.SETTABLEVIEW(Revisionsrulle);
-        // form6014432.RUNMODAL;
-        // }
-        //
-        // RevPost.SETFILTER( "Register No.", Revisionsrulle.GETFILTER( "Register No." ));
-        // RevPost.SETFILTER( "Sales Ticket No.", Revisionsrulle.GETFILTER( "Sales Ticket No." ));
-        // RevPost.SETFILTER( "Sale Type", Revisionsrulle.GETFILTER( "Sale Type" ));
-        // RevPost.SETFILTER( "Line No.", Revisionsrulle.GETFILTER( "Line No." ));
-        // RevPost.SETFILTER( "No.", Revisionsrulle.GETFILTER( "No." ));
-        // RevPost.SETFILTER( "Sale Date", Revisionsrulle.GETFILTER( "Sale Date" ));
-        // RevPost.SETFILTER( Type, Revisionsrulle.GETFILTER( Type ));
-        // RevPost.SETFILTER( Lokationskode, Revisionsrulle.GETFILTER( Lokationskode ));
-        // RevPost.SETFILTER( "Shortcut Dimension 1 Code", Revisionsrulle.GETFILTER( "Shortcut Dimension 1 Code" ));
-        // RevPost.SETFILTER( "Shortcut Dimension 2 Code", Revisionsrulle.GETFILTER( "Shortcut Dimension 2 Code" ));
-        // Total := Revisionsrulle.COUNT;
-        // IF Revisionsrulle.FIND('-') THEN REPEAT
-        //  nCount += 1;
-        //  Revisionsrulle.Description := COPYSTR(Revisionsrulle.Description,1,50);
-        //  RevPost.TRANSFERFIELDS( Revisionsrulle );
-        //  RevPost.INSERT;
-        //  Dlg.UPDATE( 100, ROUND( nCount / Total * 10000, 1 ));
-        // UNTIL Revisionsrulle.NEXT = 0;
-        // Revisionsrulle.SETRANGE( Posted );
-        // Dlg.UPDATE( 100, 10000 );
-        // EXIT(nCount);
-        //+NPR5.23
     end;
 
     procedure TransferFromRevItemLedger(var Revisionsrulle: Record "NPR Audit Roll"; var RevPost: Record "NPR Audit Roll Posting" temporary; var Dlg: Dialog): Integer
@@ -1046,45 +988,11 @@ table 6014424 "NPR Audit Roll Posting"
         Total: Integer;
         nCount: Integer;
     begin
-        //TransferFromRevItemLedger()
-        //-NPR5.23
         exit(DoTransferFromRevItemLedger(Revisionsrulle, RevPost, Dlg, true));
-        //+NPR5.23
-
-        //-NPR5.23
-        // Revisionsrulle.SETCURRENTKEY( "Sale Type", Type, "Item Entry Posted" );
-        // //Revisionsrulle.SETRANGE("Sale Type", Revisionsrulle."Sale Type"::Salg);
-        // //Revisionsrulle.SETFILTER(Type, '<>%1&<>%2', Revisionsrulle.Type::Cancelled, Revisionsrulle.Type::"Open/Close");
-        // Revisionsrulle.SETFILTER(Type, '=%1', Revisionsrulle.Type::Item);
-        // Revisionsrulle.SETRANGE( "Item Entry Posted", FALSE );
-        //
-        // RevPost.SETFILTER( "Register No.", Revisionsrulle.GETFILTER( "Register No." ));
-        // RevPost.SETFILTER( "Sales Ticket No.", Revisionsrulle.GETFILTER( "Sales Ticket No." ));
-        // RevPost.SETFILTER( "Sale Type", Revisionsrulle.GETFILTER( "Sale Type" ));
-        // RevPost.SETFILTER( "Line No.", Revisionsrulle.GETFILTER( "Line No." ));
-        // RevPost.SETFILTER( "No.", Revisionsrulle.GETFILTER( "No." ));
-        // RevPost.SETFILTER( "Sale Date", Revisionsrulle.GETFILTER( "Sale Date" ));
-        // RevPost.SETFILTER( Type, Revisionsrulle.GETFILTER( Type ));
-        // RevPost.SETFILTER( Lokationskode, Revisionsrulle.GETFILTER( Lokationskode ));
-        // RevPost.SETFILTER( "Shortcut Dimension 1 Code", Revisionsrulle.GETFILTER( "Shortcut Dimension 1 Code" ));
-        // RevPost.SETFILTER( "Shortcut Dimension 2 Code", Revisionsrulle.GETFILTER( "Shortcut Dimension 2 Code" ));
-        // Total := Revisionsrulle.COUNT;
-        // IF Revisionsrulle.FIND('-') THEN REPEAT
-        //  nCount += 1;
-        //  Revisionsrulle.Description := COPYSTR(Revisionsrulle.Description,1,50);
-        //  RevPost.TRANSFERFIELDS( Revisionsrulle );
-        //  RevPost.INSERT;
-        //  Dlg.UPDATE( 100, ROUND( nCount / Total * 10000, 1 ));
-        // UNTIL Revisionsrulle.NEXT = 0;
-        // Revisionsrulle.SETRANGE( Posted );
-        // Dlg.UPDATE( 100, 10000 );
-        // EXIT(nCount);
-        //+NPR5.23
     end;
 
     procedure TransferFromTemp(var Target: Record "NPR Audit Roll Posting" temporary; var Source: Record "NPR Audit Roll Posting" temporary)
     begin
-        //TransferFromTemp()
         Target.SetFilter("Register No.", Source.GetFilter("Register No."));
         Target.SetFilter("Sales Ticket No.", Source.GetFilter("Sales Ticket No."));
         Target.SetFilter("Sale Type", Source.GetFilter("Sale Type"));
@@ -1109,28 +1017,11 @@ table 6014424 "NPR Audit Roll Posting"
         Total: Integer;
         nCount: Integer;
     begin
-        //UpdateChanges()
-        //-NPR5.23
         DoUpdateChanges(Dlg, true);
-        //+NPR5.23
-
-        //-NPR5.23
-        // Total := COUNT;
-        // IF FIND('-') THEN REPEAT
-        //  nCount += 1;
-        //  Dlg.UPDATE( 103, ROUND( nCount / Total * 10000, 1 ));
-        //  Revisionsrulle.GET( "Register No.", "Sales Ticket No.", "Sale Type", "Line No.", "No.", "Sale Date" );
-        //  Revisionsrulle.TRANSFERFIELDS( Rec );
-        //  Revisionsrulle.MODIFY;
-        // UNTIL NEXT = 0;
-        // Dlg.UPDATE( 103, 10000 );
-        //+NPR5.23
     end;
 
     procedure CopyAllFilters(var RevRulle: Record "NPR Audit Roll")
     begin
-        //CopyAllFilters
-
         RevRulle.SetFilter("Register No.", GetFilter("Register No."));
         RevRulle.SetFilter("Sales Ticket No.", GetFilter("Sales Ticket No."));
         RevRulle.SetFilter("Sale Date", GetFilter("Sale Date"));
@@ -1152,66 +1043,14 @@ table 6014424 "NPR Audit Roll Posting"
     var
         Dlg: Dialog;
     begin
-        //TransferFromRevSilent()
-        //-NPR5.23
         exit(DoTransferFromRev(Revisionsrulle, RevPost, Dlg, false));
-        //+NPR5.23
-
-        //-NPR5.23
-        // Revisionsrulle.SETCURRENTKEY( "Register No.", Posted, "Sale Date" );
-        // Revisionsrulle.SETRANGE( Posted, FALSE );
-        // RevPost.SETFILTER( "Register No.", Revisionsrulle.GETFILTER( "Register No." ));
-        // RevPost.SETFILTER( "Sales Ticket No.", Revisionsrulle.GETFILTER( "Sales Ticket No." ));
-        // RevPost.SETFILTER( "Sale Type", Revisionsrulle.GETFILTER( "Sale Type" ));
-        // RevPost.SETFILTER( "Line No.", Revisionsrulle.GETFILTER( "Line No." ));
-        // RevPost.SETFILTER( "No.", Revisionsrulle.GETFILTER( "No." ));
-        // RevPost.SETFILTER( "Sale Date", Revisionsrulle.GETFILTER( "Sale Date" ));
-        // RevPost.SETFILTER( Type, Revisionsrulle.GETFILTER( Type ));
-        // RevPost.SETFILTER( Lokationskode, Revisionsrulle.GETFILTER( Lokationskode ));
-        // RevPost.SETFILTER( "Shortcut Dimension 1 Code", Revisionsrulle.GETFILTER( "Shortcut Dimension 1 Code" ));
-        // RevPost.SETFILTER( "Shortcut Dimension 2 Code", Revisionsrulle.GETFILTER( "Shortcut Dimension 2 Code" ));
-        // IF Revisionsrulle.FIND('-') THEN REPEAT
-        //  Revisionsrulle.Description := COPYSTR(Revisionsrulle.Description,1,50);
-        //  RevPost.TRANSFERFIELDS( Revisionsrulle );
-        //  RevPost.INSERT;
-        // UNTIL Revisionsrulle.NEXT = 0;
-        // Revisionsrulle.SETRANGE( Posted );
-        //+NPR5.23
     end;
 
     procedure TransferFromRevSilentItemLedg(var Revisionsrulle: Record "NPR Audit Roll"; var RevPost: Record "NPR Audit Roll Posting" temporary): Integer
     var
         Dlg: Dialog;
     begin
-        //TransferFromRevSilent()
-        //-NPR5.23
         exit(DoTransferFromRevItemLedger(Revisionsrulle, RevPost, Dlg, false));
-        //+NPR5.23
-
-        //-NPR5.23
-        // Revisionsrulle.SETCURRENTKEY( "Sale Type", Type, "Item Entry Posted" );
-        // //Revisionsrulle.SETRANGE("Sale Type", Revisionsrulle."Sale Type"::Salg);
-        // //Revisionsrulle.SETFILTER(Type, '<>%1&<>%2', Revisionsrulle.Type::Cancelled, Revisionsrulle.Type::"Open/Close");
-        // Revisionsrulle.SETFILTER(Type, '=%1', Revisionsrulle.Type::Item);
-        // Revisionsrulle.SETRANGE( "Item Entry Posted", FALSE );
-        //
-        // RevPost.SETFILTER( "Register No.", Revisionsrulle.GETFILTER( "Register No." ));
-        // RevPost.SETFILTER( "Sales Ticket No.", Revisionsrulle.GETFILTER( "Sales Ticket No." ));
-        // RevPost.SETFILTER( "Sale Type", Revisionsrulle.GETFILTER( "Sale Type" ));
-        // RevPost.SETFILTER( "Line No.", Revisionsrulle.GETFILTER( "Line No." ));
-        // RevPost.SETFILTER( "No.", Revisionsrulle.GETFILTER( "No." ));
-        // RevPost.SETFILTER( "Sale Date", Revisionsrulle.GETFILTER( "Sale Date" ));
-        // RevPost.SETFILTER( Type, Revisionsrulle.GETFILTER( Type ));
-        // RevPost.SETFILTER( Lokationskode, Revisionsrulle.GETFILTER( Lokationskode ));
-        // RevPost.SETFILTER( "Shortcut Dimension 1 Code", Revisionsrulle.GETFILTER( "Shortcut Dimension 1 Code" ));
-        // RevPost.SETFILTER( "Shortcut Dimension 2 Code", Revisionsrulle.GETFILTER( "Shortcut Dimension 2 Code" ));
-        // IF Revisionsrulle.FIND('-') THEN REPEAT
-        //  Revisionsrulle.Description := COPYSTR(Revisionsrulle.Description,1,50);
-        //  RevPost.TRANSFERFIELDS( Revisionsrulle );
-        //  RevPost.INSERT;
-        // UNTIL Revisionsrulle.NEXT = 0;
-        // Revisionsrulle.SETRANGE( Posted );
-        //+NPR5.23
     end;
 
     procedure UpdateChangesSilent()
@@ -1219,18 +1058,7 @@ table 6014424 "NPR Audit Roll Posting"
         Revisionsrulle: Record "NPR Audit Roll";
         Dlg: Dialog;
     begin
-        //UpdateChanges()
-        //-NPR5.23
         DoUpdateChanges(Dlg, false);
-        //+NPR5.23
-
-        //-NPR5.23
-        // IF FIND('-') THEN REPEAT
-        //  Revisionsrulle.GET( "Register No.", "Sales Ticket No.", "Sale Type", "Line No.", "No.", "Sale Date" );
-        //  Revisionsrulle.TRANSFERFIELDS( Rec );
-        //  Revisionsrulle.MODIFY;
-        // UNTIL NEXT = 0;
-        //+NPR5.23
     end;
 
     procedure DoTransferFromRev(var Revisionsrulle: Record "NPR Audit Roll"; var RevPost: Record "NPR Audit Roll Posting" temporary; var Dlg: Dialog; UpdateDialog: Boolean): Integer
@@ -1238,7 +1066,6 @@ table 6014424 "NPR Audit Roll Posting"
         Total: Integer;
         nCount: Integer;
     begin
-        //-NPR5.23
         Revisionsrulle.SetCurrentKey("Register No.", Posted, "Sale Date");
         Revisionsrulle.SetRange(Posted, false);
 
@@ -1267,7 +1094,6 @@ table 6014424 "NPR Audit Roll Posting"
         if UpdateDialog then
             Dlg.Update(100, 10000);
         exit(nCount);
-        //+NPR5.23
     end;
 
     procedure DoTransferFromRevItemLedger(var Revisionsrulle: Record "NPR Audit Roll"; var RevPost: Record "NPR Audit Roll Posting" temporary; var Dlg: Dialog; UpdateDialog: Boolean): Integer
@@ -1275,7 +1101,6 @@ table 6014424 "NPR Audit Roll Posting"
         Total: Integer;
         nCount: Integer;
     begin
-        //-NPR5.23
         Revisionsrulle.SetCurrentKey("Sale Type", Type, "Item Entry Posted");
         Revisionsrulle.SetFilter(Type, '=%1', Revisionsrulle.Type::Item);
         Revisionsrulle.SetRange("Item Entry Posted", false);
@@ -1305,7 +1130,6 @@ table 6014424 "NPR Audit Roll Posting"
         if UpdateDialog then
             Dlg.Update(100, 10000);
         exit(nCount);
-        //+NPR5.23
     end;
 
     procedure DoUpdateChanges(var Dlg: Dialog; UpdateDialog: Boolean)
@@ -1314,7 +1138,6 @@ table 6014424 "NPR Audit Roll Posting"
         Total: Integer;
         nCount: Integer;
     begin
-        //-NPR5.23
         if UpdateDialog then
             Total := Count;
         if Find('-') then
@@ -1329,7 +1152,6 @@ table 6014424 "NPR Audit Roll Posting"
             until Next = 0;
         if UpdateDialog then
             Dlg.Update(103, 10000);
-        //+NPR5.23
     end;
 }
 
