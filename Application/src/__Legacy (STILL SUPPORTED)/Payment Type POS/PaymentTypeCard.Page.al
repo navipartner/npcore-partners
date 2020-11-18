@@ -345,6 +345,22 @@ page 6014433 "NPR Payment Type - Card"
                     end;
                 }
             }
+
+            group(Dimensions_Menu)
+            {
+                Caption = '&Dimensions';
+                Image = Setup;
+                action(Dimensions)
+                {
+                    Caption = 'Dimensions-Single';
+                    Image = Dimensions;
+                    RunObject = Page "Default Dimensions";
+                    RunPageLink = "Table ID" = CONST(6014402),
+                                  "No." = FIELD("No.");
+                    ShortCutKey = 'Shift+Ctrl+D';
+                    ApplicationArea = All;
+                }
+            }
         }
     }
 
