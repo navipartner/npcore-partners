@@ -1,6 +1,5 @@
 pageextension 6014464 "NPR Transfer Orders" extends "Transfer Orders"
 {
-    // NPR5.55/YAHA/20191127 CASE 362312 added Functionality to use template for printing
     actions
     {
         modify(PostAndPrint)
@@ -19,17 +18,16 @@ pageextension 6014464 "NPR Transfer Orders" extends "Transfer Orders"
                 ShortCutKey = 'Shift+F9';
                 Visible = PostingVisibilityPOS;
                 ApplicationArea = All;
+                ToolTip = 'Finalize and prepare to print the document or journal. The values and quantities are posted to the related accounts. A report request window where you can specify what to include on the print-out.';
 
                 trigger OnAction()
                 var
                     CodeunitTransferOrderPP: Codeunit "NPR TransferOrder-Post + Print";
                 begin
-                    //-NPR5.55 [362312]
                     if TemplateN <> '' then begin
                         CodeunitTransferOrderPP.SetParameter(TemplateN, Rec);
                         CodeunitTransferOrderPP.Run(Rec);
                     end;
-                    //+NPR5.55 [362312]
                 end;
             }
         }
@@ -42,30 +40,9 @@ pageextension 6014464 "NPR Transfer Orders" extends "Transfer Orders"
         Codeunit6059823: Codeunit "NPR TransferOrder-Post + Print";
         Visiblitycheck: Boolean;
 
-
-    //Unsupported feature: Code Insertion on "OnOpenPage".
-
-    //trigger OnOpenPage()
-    //begin
-    /*
-    //-NPR5.55 [362312]
-    Visiblitycheck := Codeunit6059823.GetValues;
-    if Visiblitycheck then begin
-      PostingVisibility := false;
-      PostingVisibilityPOS := true;
-    end else begin
-      PostingVisibility := true;
-      PostingVisibilityPOS := false;
-    end;
-    //+NPR5.55 [362312]
-    */
-    //end;
-
-    procedure SetValues(TemplateName: Text)
+    procedure NPRSetValues(TemplateName: Text)
     begin
-        //-NPR5.55 [362312]
         TemplateN := TemplateName;
-        //+NPR5.55 [362312]
     end;
 }
 
