@@ -1,8 +1,5 @@
 codeunit 6014446 "NPR M2 Demo Picture Mgt2"
 {
-    // NPR5.48/TS /20180605  CASE 3331723 Temp Object Created
-
-
     trigger OnRun()
     begin
     end;
@@ -20,7 +17,6 @@ codeunit 6014446 "NPR M2 Demo Picture Mgt2"
         MagentoSetup: Record "NPR Magento Setup";
         MagentoSetupEventSub: Record "NPR Magento Setup Event Sub.";
         MagentoSetupMgt: Codeunit "NPR Magento Setup Mgt.";
-        String: DotNet NPRNetString;
     begin
         if not MagentoSetupMgt.IsMagentoSetupEventSubscriber(MagentoSetupEventSub.Type::"Magento Picture Url", CurrCodeunitId(), 'GetM2DemoPictureUrl') then
             exit;
