@@ -87,6 +87,25 @@ page 6014434 "NPR Payment Type - List"
 
     actions
     {
+        area(processing)
+        {
+
+            group(Dimensions_Menu)
+            {
+                Caption = '&Dimensions';
+                Image = Setup;
+                action(Dimensions)
+                {
+                    Caption = 'Dimensions';
+                    Image = Dimensions;
+                    RunObject = Page "Default Dimensions";
+                    RunPageLink = "Table ID" = CONST(6014402),
+                                  "No." = FIELD("No.");
+                    ShortCutKey = 'Shift+Ctrl+D';
+                    ApplicationArea = All;
+                }
+            }
+        }
     }
 
     var
