@@ -1,8 +1,5 @@
 codeunit 6014586 "NPR RP Template Mgt."
 {
-    // NPR5.39/MMV /20180207 CASE 304745 Added data upgrade functions
-
-
     trigger OnRun()
     begin
     end;
@@ -67,9 +64,8 @@ codeunit 6014586 "NPR RP Template Mgt."
 
     local procedure IncrementVersionNumber(VersionIn: Text): Text
     var
-        VersionArray: DotNet NPRNetArray;
-        Regex: DotNet NPRNetRegex;
-        Version: DotNet NPRNetString;
+        VersionList: list of [Text];
+        Version: Text;
         NewVersion: Text;
         VersionMatch: Boolean;
         MajorVersion: Integer;
@@ -77,8 +73,8 @@ codeunit 6014586 "NPR RP Template Mgt."
     begin
         TemplateSetup.Get;
 
-        VersionArray := Regex.Split(VersionIn, ',');
-        foreach Version in VersionArray do begin
+        VersionList := VersionIn.Split(',');
+        foreach Version in VersionList do begin
             if StrPos(Version, TemplateSetup."Version Prefix") = 1 then
                 if Evaluate(MajorVersion, CopyStr(Version, StrLen(TemplateSetup."Version Prefix") + 1, (StrPos(Version, '.') - StrLen(TemplateSetup."Version Prefix")))) then begin
                     if MajorVersion = TemplateSetup."Version Major Number" then
