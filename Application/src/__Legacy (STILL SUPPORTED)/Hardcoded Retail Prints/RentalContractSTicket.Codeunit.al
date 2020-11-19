@@ -1,23 +1,5 @@
 codeunit 6014568 "NPR Rental Contract S.Ticket"
 {
-    // Report - Rental Contract SalesTicket
-    //  Work started by Jerome Cader on 04-04-2013
-    //  Implements the functionality of the Rental Contract SalesTicket IV report.
-    //  Fills a temp buffer using the CU "Line Print Buffer Mgt.".
-    // 
-    //  Only functionlity for extending the Sales Ticket Print should
-    //  be put here. Nothing else.
-    // 
-    //  The individual functions reprensents sections in the report with
-    //  ID 6060112.
-    // 
-    //  The function GetRecords, applies table filters to the necesarry data
-    //  elements of the report, base on the codeunits run argument Rec: Record "Retail Document Header".
-    // 
-    // NPR5.26/MMV /20160916 CASE 249408 Moved control codes from captions to in-line strings.
-    // NPR5.36/TJ  /20170905 CASE 286283 Renamed variables/function into english and into proper naming terminology
-    //                                   Removed unused variables/functions
-
     TableNo = "NPR Retail Document Header";
 
     trigger OnRun()
@@ -31,10 +13,7 @@ codeunit 6014568 "NPR Rental Contract S.Ticket"
         RPLinePrintMgt.SetBold(false);
 
         for CurrPageNo := 1 to 1 do begin
-            // 0. Retail Document Header
             PrintRetailDocumentHeader;
-
-            // 0.Integer
             PrintSalesTicketText;
 
         end;
@@ -42,10 +21,7 @@ codeunit 6014568 "NPR Rental Contract S.Ticket"
         RPLinePrintMgt.SetFont('A11');
         RPLinePrintMgt.AddLine('');
         RPLinePrintMgt.SetFont('Control');
-        //-NPR5.26 [249408]
-        //Printer.AddLine(Text0002);
         RPLinePrintMgt.AddLine('P');
-        //+NPR5.26 [249408]
     end;
 
     var
@@ -86,36 +62,38 @@ codeunit 6014568 "NPR Rental Contract S.Ticket"
         SignatureTxt: Label 'Signature';
 
     procedure PrintRetailDocumentHeader()
+    var
+        POSStore: Record "NPR POS Store";
+        POSUnit: Record "NPR POS Unit";
+        POSSession: Codeunit "NPR POS Session";
+        POSFrontEnd: Codeunit "NPR POS Front End Management";
+        POSSetup: Codeunit "NPR POS Setup";
     begin
         RetailDocHeaderOnPreDataItem;
 
         RPLinePrintMgt.SetFont('Control');
-
-
-        // Retail Document Header, Header (1)
-        //-NPR5.26 [249408]
-        //Printer.AddLine(Text0000);
         RPLinePrintMgt.AddLine('A');
-        //+NPR5.26 [249408]
-
-        // Retail Document Header, Header (2) - OnPreSection()
         if RetailSetup.Get() then;
         if RetailSetup."Logo on Sales Ticket" then begin
-            //-NPR5.26 [249408]
-            //Printer.AddLine(Text0001);
             RPLinePrintMgt.AddLine('G');
-            //+NPR5.26 [249408]
         end;
-
 
         // Retail Document Header, Header (3) - OnPreSection()
         if RetailSetup."Name on Sales Ticket" then begin
             RPLinePrintMgt.SetFont('A11');
-            RPLinePrintMgt.AddTextField(1, 0, Register.Name);
-            RPLinePrintMgt.AddTextField(1, 0, Register.Address);
-            RPLinePrintMgt.AddTextField(1, 0, Register."Post Code" + ' ' + Register.City);
-            RPLinePrintMgt.AddTextField(1, 0, 'Telefon: ' + Format(Register."Phone No."));
-            RPLinePrintMgt.AddTextField(1, 0, 'Fax: ' + Format(Register."Fax No."));
+            if POSSession.IsActiveSession(POSFrontEnd) then begin
+                POSFrontEnd.GetSession(POSSession);
+                POSSession.GetSetup(POSSetup);
+                POSSetup.GetPOSStore(POSStore);
+            end else begin
+                if POSUnit.get(Register."Register No.") then
+                    POSStore.get(POSUnit."POS Store Code");
+            end;
+            RPLinePrintMgt.AddTextField(1, 0, POSStore.Name);
+            RPLinePrintMgt.AddTextField(1, 0, POSStore.Address);
+            RPLinePrintMgt.AddTextField(1, 0, POSStore."Post Code" + ' ' + POSStore.City);
+            RPLinePrintMgt.AddTextField(1, 0, 'Telefon: ' + Format(POSStore."Phone No."));
+            RPLinePrintMgt.AddTextField(1, 0, 'Fax: ' + Format(POSStore."Fax No."));
             RPLinePrintMgt.AddTextField(1, 0, 'CVR: ' + Format(Register."VAT No."));
         end;
 

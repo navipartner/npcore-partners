@@ -13,22 +13,6 @@ codeunit 6014567 "NPR Report - Debet Receipt"
     // 
     //  The function GetRecords, applies table filters to the necesarry data
     //  elements of the report, base on the codeunits run argument Rec: Record "Audit Roll".
-    // 
-    // 
-    // NPR4.13/MMV/20150225 CASE 205001 Added control character for correct logo printing on all epson drivers.
-    //                                  Fixed bug with comments printing twice (The second line was meant for >40 character comments).
-    //                                  Fixed bug with filtering on Audit Roll Detail lines.
-    //                                  Fixed bug in PrintRegister so the 2nd print has a logo as well.
-    // VRT1.01/MMV/20150522 CASE 204723 Added variety code from CU 6014560 and removed old. Renamed som old variables to work.
-    // NPR4.10/MMV/20150416 CASE 211666 Added lookup in General Ledger Setup for the currency code text instead of hardcode to 'DKK'.
-    //                                  Added missing norwegian translation to text constant.
-    // NPR4.10/MMV/20150611 CASE 216060 Changed customer signing text constants.
-    // NPR5.26/MMV /20160916 CASE 249408 Moved control codes from captions to in-line strings.
-    // NPR5.27/MMV /20161024 CASE 256102 Conditional reg. no. print.
-    // NPR5.29/MMV /20161128 CASE 258787 Fixed variant description being printed to many times.
-    //                                   Shop header info like the normal sales receipt.
-    // NPR5.30/BHR /20170208 CASE 265676 Removed size on variable BonInfo to prevent error for different translation
-    // NPR5.31/JLK /20170331  CASE 268274 Changed ENU Caption
 
     TableNo = "NPR Audit Roll";
 
@@ -136,28 +120,23 @@ codeunit 6014567 "NPR Report - Debet Receipt"
                 PrintAuditRollSale;
 
                 Printer.SetFont('Control');
-                //-NPR5.26 [249408]
-                //Printer.AddLine(Text0020);
                 Printer.AddLine('P');
-            //+NPR5.26 [249408]
-
             until LoopCounter.Next = 0;
     end;
 
     procedure PrintRegister()
+    var
+        POSStore: Record "NPR POS Store";
+        POSUnit: Record "NPR POS Unit";
+        POSSession: Codeunit "NPR POS Session";
+        POSFrontEnd: Codeunit "NPR POS Front End Management";
+        POSSetup: Codeunit "NPR POS Setup";
     begin
         // Register - Properties
-        //-NPR5.29 [258787]
-        // Register.SETCURRENTKEY("Register No.");
-        // Register.SETRANGE("Register No.", AuditRoll."Register No.");
         if not Register.Get(AuditRoll."Register No.") then
             exit;
-        //+NPR5.29 [258787]
 
         Printer.SetFont('Control');
-        //-NPR5.29 [258787]
-        //IF Register.FINDSET THEN REPEAT
-        //+NPR5.29 [258787]
 
         if Register."Money drawer attached" and Register."Money drawer - open on special" and
         (Register."Receipt Printer Type" = Register."Receipt Printer Type"::Samsung) then begin
@@ -181,39 +160,31 @@ codeunit 6014567 "NPR Report - Debet Receipt"
         end;
 
         Printer.SetFont('A11');
-        //-NPR5.29 [258787]
-        Printer.AddLine(Register.Name);
-        if StrLen(Register."Name 2") > 0 then
-            Printer.AddLine(Register."Name 2");
-        Printer.AddLine(Register.Address);
-        Printer.AddLine(Register."Post Code" + ' ' + Register.City);
-        if StrLen(Register."Phone No.") > 0 then
-            Printer.AddLine(Register.FieldCaption("Phone No.") + ' ' + Register."Phone No.");
+        if POSSession.IsActiveSession(POSFrontEnd) then begin
+            POSFrontEnd.GetSession(POSSession);
+            POSSession.GetSetup(POSSetup);
+            POSSetup.GetPOSStore(POSStore);
+        end else begin
+            if POSUnit.get(Register."Register No.") then
+                POSStore.get(POSUnit."POS Store Code");
+        end;
+        Printer.AddLine(POSStore.Name);
+        if StrLen(POSStore."Name 2") > 0 then
+            Printer.AddLine(POSStore."Name 2");
+        Printer.AddLine(POSStore.Address);
+        Printer.AddLine(POSStore."Post Code" + ' ' + POSStore.City);
+        if StrLen(POSStore."Phone No.") > 0 then
+            Printer.AddLine(POSStore.FieldCaption("Phone No.") + ' ' + POSStore."Phone No.");
         if StrLen(Register."Bank Registration No.") > 0 then
             Printer.AddTextField(1, 0, Text0015 + Register."Bank Registration No.");
         if StrLen(Register."Bank Account No.") > 0 then
             Printer.AddTextField(2, 0, Text0014 + Register."Bank Account No.");
         if StrLen(Register."VAT No.") > 0 then
             Printer.AddLine(Register.FieldCaption("VAT No.") + ' ' + Register."VAT No.");
-        if StrLen(Register."E-mail") > 0 then
-            Printer.AddLine(Register.FieldCaption("E-mail") + ' ' + Register."E-mail");
-        if StrLen(Register.Website) > 0 then
-            Printer.AddLine(Register.Website);
-
-        // Printer.AddTextField(1,0,Register.Name);
-        // Printer.AddTextField(1,0,Register.Address);
-        // Printer.AddTextField(1,0,Register."Post Code"+' ' + Register.City);
-        // Printer.AddTextField(1,0,Text0002+Register.Telephone);
-        // //-NPR5.27 [256102]
-        // IF STRLEN(Register."Bank Registration No.") > 0 THEN
-        //  Printer.AddTextField(1,0,Text0015+Register."Bank Registration No.");
-        // //+NPR5.27 [256102]
-        // Printer.AddTextField(2,0,Text0014+Register."Bank Account No.");
-        // Printer.AddTextField(1,0,Text0003+Register.Fax);
-        // Printer.AddTextField(1,0,Text0004+Register."VAT No.");
-
-        //UNTIL Register.NEXT = 0;
-        //+NPR5.29 [258787]
+        if StrLen(POSStore."E-mail") > 0 then
+            Printer.AddLine(POSStore.FieldCaption("E-mail") + ' ' + POSStore."E-mail");
+        if StrLen(POSStore."Home Page") > 0 then
+            Printer.AddLine(POSStore."Home Page");
     end;
 
     procedure PrintCustomer()

@@ -1,11 +1,5 @@
 report 6014486 "NPR Retail Document A4"
 {
-    // NPR70.00.00.00/LS/280613 CASE 155079 : Convert Report to Nav 2013
-    // NPR4.12/TSA/20150703 CASE 216800 - Created W1 Version, removed depreciated DK Fields (Ean No.) Use Ean No. on Customer
-    // NPR5.38/JLK /20180124  CASE 300892 Removed AL Error on obsolite property CurrReport_PAGENO
-    // NPR5.39/TJ  /20180208  CASE 302634 Renamed Name property of control salesPerson.Name
-    // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
-    // NPR5.49/BHR /20190115  CASE 341969 Corrections as per OMA Guidelines
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Retail Document A4.rdlc';
 
@@ -250,7 +244,6 @@ report 6014486 "NPR Retail Document A4"
                     else
                         TxtDiscountPct := Format("Line discount %") + '%';
 
-                    //-NPR70.00.00.00
                     ShowBody2 := false;
                     if Accessory and not DeliveryItem then
                         ShowBody2 := (Accessory and not DeliveryItem)
@@ -261,7 +254,6 @@ report 6014486 "NPR Retail Document A4"
                         if DeliveryItem then
                             ShowBody2 := false;
                     end;
-                    //+NPR70.00.00.00/
                 end;
             }
             dataitem("Integer"; "Integer")
@@ -283,6 +275,11 @@ report 6014486 "NPR Retail Document A4"
                 Country: Record "Country/Region";
                 ShipmentMethod: Record "Shipment Method";
                 Retailcomments: Record "NPR Retail Comment";
+                POSStore: Record "NPR POS Store";
+                POSUnit: Record "NPR POS Unit";
+                POSSession: Codeunit "NPR POS Session";
+                POSFrontEnd: Codeunit "NPR POS Front End Management";
+                POSSetup: Codeunit "NPR POS Setup";
                 i: Integer;
                 t001: Label 'Week';
                 t002: Label 'Prices are incl. VAT';
@@ -320,11 +317,6 @@ report 6014486 "NPR Retail Document A4"
                     InvoiceCustomer[5] := "Country Code" + '-' + Country.Name + ' [' + Country."EU Country/Region Code" + ']';
                 end;
 
-                //-NPR4.12
-                //IF "EAN No." <> '' THEN
-                //  invoiceCustomer[6] := FIELDCAPTION("EAN No.") + ' ' + "EAN No.";
-                //+NPR4.12
-
                 CompressArray(InvoiceCustomer);
 
                 if "Prices Including VAT" then
@@ -357,18 +349,26 @@ report 6014486 "NPR Retail Document A4"
                 if not Kasse.Get("Rent Register") then
                     Kasse.Get(RetailFormCode.FetchRegisterNumber);
 
+                if POSSession.IsActiveSession(POSFrontEnd) then begin
+                    POSFrontEnd.GetSession(POSSession);
+                    POSSession.GetSetup(POSSetup);
+                    POSSetup.GetPOSStore(POSStore);
+                end else begin
+                    if POSUnit.get(Kasse."Register No.") then
+                        POSStore.get(POSUnit."POS Store Code");
+                end;
                 // COMPANY INFO
-                Firmanavn[1] := Kasse.Name;
-                Firmanavn[2] := Kasse."Name 2";
-                Firmanavn[3] := Kasse.Address;
-                Firmanavn[4] := Format(Kasse."Post Code") + ' ' + Format(Kasse.City);
-                Firmanavn[5] := Kasse.FieldCaption("Phone No.") + ': ' + Kasse."Phone No.";
-                if Kasse."Fax No." <> '' then
-                    Firmanavn[6] := Kasse.FieldCaption("Fax No.") + ': ' + Kasse."Fax No.";
+                Firmanavn[1] := POSStore.Name;
+                Firmanavn[2] := POSStore."Name 2";
+                Firmanavn[3] := POSStore.Address;
+                Firmanavn[4] := Format(POSStore."Post Code") + ' ' + Format(POSStore.City);
+                Firmanavn[5] := POSStore.FieldCaption("Phone No.") + ': ' + POSStore."Phone No.";
+                if POSStore."Fax No." <> '' then
+                    Firmanavn[6] := POSStore.FieldCaption("Fax No.") + ': ' + POSStore."Fax No.";
                 if Kasse."VAT No." <> '' then
                     Firmanavn[7] := Kasse.FieldCaption("VAT No.") + ': ' + Kasse."VAT No.";
-                Firmanavn[8] := Kasse.Website;
-                Firmanavn[9] := Kasse."E-mail";
+                Firmanavn[8] := POSStore."Home Page";
+                Firmanavn[9] := POSStore."E-mail";
                 Firmanavn[10] := Kasse.FieldCaption("Bank Account No.") + ' ' + Kasse."Bank Account No.";
                 CompressArray(Firmanavn);
 
