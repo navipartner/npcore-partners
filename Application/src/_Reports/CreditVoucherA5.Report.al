@@ -1,10 +1,5 @@
 report 6014564 "NPR Credit Voucher A5"
 {
-    // NPR4.16/KN/20151009 CASE 220371   Created report based on report 55254 in Smykkebasen
-    // NPR4.16/KN/20151112 CASE 225533   Removed line duplicate in layout
-    // NPR4.18/KN/20160128 CASE 232717   Increased report margins in layout
-    // NPR5.38/NPKNAV/20180126  CASE 300892 Transport NPR5.38 - 26 January 2018
-    // NPR5.48/TS  /20190130  CASE 337257  Added Comment
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Credit Voucher A5.rdlc';
 
@@ -56,16 +51,16 @@ report 6014564 "NPR Credit Voucher A5"
                 dataitem(Register; "NPR Register")
                 {
                     DataItemLink = "Register No." = FIELD("Register No.");
-                    column(Name_Register; Register.Name)
+                    column(Name_Register; POSStore.Name)
                     {
                     }
-                    column(Address_Register; Register.Address)
+                    column(Address_Register; POSStore.Address)
                     {
                     }
-                    column(Email_Register; Register."E-mail")
+                    column(Email_Register; POSStore."E-mail")
                     {
                     }
-                    column(Wwwaddress_Register; Register.Website)
+                    column(Wwwaddress_Register; POSStore."Home Page")
                     {
                     }
                     column(RegisterPhoneText; RegisterPhoneText)
@@ -86,9 +81,23 @@ report 6014564 "NPR Credit Voucher A5"
                     }
 
                     trigger OnAfterGetRecord()
+                    var
+                        POSUnit: Record "NPR POS Unit";
+                        POSSession: Codeunit "NPR POS Session";
+                        POSFrontEnd: Codeunit "NPR POS Front End Management";
+                        POSSetup: Codeunit "NPR POS Setup";
                     begin
-                        RegisterPhoneText := StrSubstNo(Text1002, Register."Phone No.");
-                        RegisterPostCodeAndCityText := Register."Post Code" + ' ' + Register.City;
+                        clear(POSStore);
+                        if POSSession.IsActiveSession(POSFrontEnd) then begin
+                            POSFrontEnd.GetSession(POSSession);
+                            POSSession.GetSetup(POSSetup);
+                            POSSetup.GetPOSStore(POSStore);
+                        end else begin
+                            if POSUnit.get(Register."Register No.") then
+                                POSStore.get(POSUnit."POS Store Code");
+                        end;
+                        RegisterPhoneText := StrSubstNo(Text1002, POSStore."Phone No.");
+                        RegisterPostCodeAndCityText := POSStore."Post Code" + ' ' + POSStore.City;
                         RegisterVatNoText := StrSubstNo(Text1003, Register."VAT No.");
                     end;
                 }
@@ -102,13 +111,12 @@ report 6014564 "NPR Credit Voucher A5"
                         CopyText := Text1001;
 
                     DetailsText := Format("Issue Date") + ' ' + "Register No." + ' ' + "Sales Ticket No." + ' - ' + "No." + ' - ' + Format(Time);
-                    //+NPR5.38
+
                     ZipCodeCityText := "Post Code";
                     if ZipCodeCityText <> '' then
                         ZipCodeCityText += ', ' + City
                     else
                         ZipCodeCityText += City;
-                    //-NPR5.38
 
                     BarcodeLib.GenerateBarcode("Credit Voucher"."No.", TempBlob);
                     BlobBuffer.GetFromTempBlob(TempBlob, 1);
@@ -172,5 +180,6 @@ report 6014564 "NPR Credit Voucher A5"
         ZipCodeCityText: Text;
         TempBlob: Codeunit "Temp Blob";
         BlobBuffer: Record "NPR BLOB buffer" temporary;
+        POSStore: Record "NPR POS Store";
 }
 

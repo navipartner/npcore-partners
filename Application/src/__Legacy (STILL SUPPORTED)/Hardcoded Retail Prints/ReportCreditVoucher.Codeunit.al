@@ -13,12 +13,6 @@ codeunit 6014563 "NPR Report - Credit Voucher"
     // 
     //  The function GetRecords, applies table filters to the necesarry data
     //  elements of the report, base on the codeunits run argument Rec: Record "Credit Voucher".
-    // 
-    // NPR4.11/MMV/20150225 CASE 205001 Added control character for correct logo printing on all epson drivers.
-    // NPR4.11/MMV/20150508 CASE 205310 Added validity period
-    // NPR4.11/MMV/20150617 CASE 205310 Replaced above change with new field 90
-    // NPR5.26/MMV /20160916 CASE 249408 Moved control codes from captions to in-line strings.
-    // NPR5.27/MMV /20161024 CASE 256097 Replaced hardcoded caption.
 
     TableNo = "NPR Credit Voucher";
 
@@ -111,18 +105,14 @@ codeunit 6014563 "NPR Report - Credit Voucher"
         Printer.SetFont('Control');
         //Credit Voucher, Header(1) - OnPreSection
         if (LoopCounter = 2) and (Register."Receipt Printer Type" = Register."Receipt Printer Type"::Samsung) then
-            //-NPR5.26 [249408]
             //Printer.AddLine(Text10600008);
             Printer.AddLine('P');
-        //+NPR5.26 [249408]
 
         //Credit Voucher, Header(2) - OnPreSection
         if (RetailConfiguration."Logo on Sales Ticket") and (Register."Receipt Printer Type" = Register."Receipt Printer Type"::Samsung)
         then
-            //-NPR5.26 [249408]
             //Printer.AddLine(Text10600000);
             Printer.AddLine('G');
-        //+NPR5.26 [249408]
 
         //Credit Voucher, Header(3) - OnPreSection
         if (LoopCounter = 2) and (Register."Receipt Printer Type" = Register."Receipt Printer Type"::"TM-T88") then
@@ -131,30 +121,42 @@ codeunit 6014563 "NPR Report - Credit Voucher"
         //Credit Voucher, Header(4) - OnPreSection
         if (RetailConfiguration."Logo on Sales Ticket") and (Register."Receipt Printer Type" = Register."Receipt Printer Type"::
         "TM-T88") then begin
-            //-NPR5.26 [249408]
             //  Printer.AddLine(Text10600000);
             //  Printer.AddLine(Text10600011);
             Printer.AddLine('G');
             Printer.AddLine('h');
-            //+NPR5.26 [249408]
         end;
     end;
 
     procedure PrintBody()
+    var
+        POSStore: Record "NPR POS Store";
+        POSUnit: Record "NPR POS Unit";
+        POSSession: Codeunit "NPR POS Session";
+        POSFrontEnd: Codeunit "NPR POS Front End Management";
+        POSSetup: Codeunit "NPR POS Setup";
     begin
         //Credit Voucher, Body(5) - OnPreSection
         if Register.Get(CreditVoucher."Register No.") then;
         Printer.SetFont('B21');
-        Printer.AddLine(Register.Name);
+        if POSSession.IsActiveSession(POSFrontEnd) then begin
+            POSFrontEnd.GetSession(POSSession);
+            POSSession.GetSetup(POSSetup);
+            POSSetup.GetPOSStore(POSStore);
+        end else begin
+            if POSUnit.get(Register."Register No.") then
+                POSStore.get(POSUnit."POS Store Code");
+        end;
+        Printer.AddLine(POSStore.Name);
 
         Printer.SetFont('A11');
         Printer.SetBold(false);
-        Printer.AddLine(Register.Address);
-        Printer.AddLine(Register."Post Code" + ' ' + Register.City);
+        Printer.AddLine(POSStore.Address);
+        Printer.AddLine(POSStore."Post Code" + ' ' + POSStore.City);
         Printer.AddTextField(1, 0, Text10600002);
-        Printer.AddTextField(2, 2, Format(Register."Phone No."));
+        Printer.AddTextField(2, 2, Format(POSStore."Phone No."));
         Printer.AddTextField(1, 0, Text10600003);
-        Printer.AddTextField(2, 2, Format(Register."Fax No."));
+        Printer.AddTextField(2, 2, Format(POSStore."Fax No."));
         Printer.AddLine(Text10600001 + Format(Register."VAT No."));
 
         Printer.SetFont('B21');
@@ -192,10 +194,8 @@ codeunit 6014563 "NPR Report - Credit Voucher"
         //Credit Voucher, Body(8) - OnPreSection
         Printer.SetFont('B11');
         Printer.AddLine('');
-        //-NPR4.11
         if RetailConfiguration."Gift and Credit Valid Period" <> 0 then
             Printer.AddTextField(2, 1, StrSubstNo(ValidUntilTxt, RetailConfiguration."Gift and Credit Valid Period"));
-        //+NPR4.11
         Printer.AddTextField(2, 1, InvalidWithoutCompTxt);
         Printer.AddTextField(2, 1, CanOnlyBeRedeTxt);
         Printer.AddLine('');
@@ -234,10 +234,8 @@ codeunit 6014563 "NPR Report - Credit Voucher"
         if Salesperson.Get(CreditVoucher."Salesperson Code") then;
 
         if RetailConfiguration."Salesperson on Sales Ticket" then
-            //-NPR5.27 [256097]
             EkspedientTxt := SalespersonTxt + ' ' + Format(Salesperson.Name)
         //EkspedientTxt := 'Ekspedient '+FORMAT(Salesperson.Name)
-        //+NPR5.27 [256097]
         else
             EkspedientTxt := '';
 
@@ -271,10 +269,7 @@ codeunit 6014563 "NPR Report - Credit Voucher"
         Printer.AddLine('');
 
         Printer.SetFont('Control');
-        //-NPR5.26 [249408]
-        //Printer.AddLine(Text10600008);
         Printer.AddLine('P');
-        //+NPR5.26 [249408]
     end;
 }
 

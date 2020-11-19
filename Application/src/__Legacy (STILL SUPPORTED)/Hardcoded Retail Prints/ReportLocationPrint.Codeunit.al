@@ -1,10 +1,5 @@
 codeunit 6014573 "NPR Report: Location Print"
 {
-    // NPR5.22/MMV/20160408 CASE 232067 Renamed CU from "Receipt Print Reservation 14" to "Report - Location Print"
-    // NPR5.23/JDH /20160517 CASE 240916 Removed VariaX Solution
-    // NPR5.33/ANEN/20170427 CASE 273989 Extending to 40 attributes
-    // NPR5.33/JDH /20170629 CASE 280329 Removed call to getdiscountrounding - it returned 0 always
-
     TableNo = "NPR Sale POS";
 
     trigger OnRun()
@@ -61,6 +56,12 @@ codeunit 6014573 "NPR Report: Location Print"
         LocationTxt: Label 'Location';
 
     local procedure PrintHeader()
+    var
+        POSStore: Record "NPR POS Store";
+        POSUnit: Record "NPR POS Unit";
+        POSSession: Codeunit "NPR POS Session";
+        POSFrontEnd: Codeunit "NPR POS Front End Management";
+        POSSetup: Codeunit "NPR POS Setup";
     begin
         if RetailSetup."Logo on Sales Ticket" then begin
             Printer.SetFont('Control');
@@ -69,19 +70,27 @@ codeunit 6014573 "NPR Report: Location Print"
         end;
 
         Printer.SetFont('A11');
-        Printer.AddLine(Register.Name);
-        if Register."Name 2" <> '' then
-            Printer.AddLine(Register."Name 2");
-        Printer.AddLine(Register.Address);
-        Printer.AddLine(Register."Post Code" + ' ' + Register.City);
-        if Register."Phone No." <> '' then
-            Printer.AddLine(Register.FieldCaption("Phone No.") + ' ' + Register."Phone No.");
+        if POSSession.IsActiveSession(POSFrontEnd) then begin
+            POSFrontEnd.GetSession(POSSession);
+            POSSession.GetSetup(POSSetup);
+            POSSetup.GetPOSStore(POSStore);
+        end else begin
+            if POSUnit.get(Register."Register No.") then
+                POSStore.get(POSUnit."POS Store Code");
+        end;
+        Printer.AddLine(POSStore.Name);
+        if POSStore."Name 2" <> '' then
+            Printer.AddLine(POSStore."Name 2");
+        Printer.AddLine(POSStore.Address);
+        Printer.AddLine(POSStore."Post Code" + ' ' + POSStore.City);
+        if POSStore."Phone No." <> '' then
+            Printer.AddLine(POSStore.FieldCaption("Phone No.") + ' ' + POSStore."Phone No.");
         if Register."VAT No." <> '' then
             Printer.AddLine(Register.FieldCaption("VAT No.") + ' ' + Register."VAT No.");
-        if Register."E-mail" <> '' then
-            Printer.AddLine(Register.FieldCaption("E-mail") + ' ' + Register."E-mail");
-        if Register.Website <> '' then
-            Printer.AddLine(Register.Website);
+        if POSStore."E-mail" <> '' then
+            Printer.AddLine(POSStore.FieldCaption("E-mail") + ' ' + POSStore."E-mail");
+        if POSStore."Home Page" <> '' then
+            Printer.AddLine(POSStore."Home Page");
 
         Printer.SetPadChar(' ');
         Printer.AddLine('');
@@ -160,7 +169,6 @@ codeunit 6014573 "NPR Report: Location Print"
     begin
         if (SalePOS."Register No." <> '') and (SalePOS."Sales Ticket No." <> '') then begin
             with SaleLinePOS2 do begin
-                //Copied from CU 6014552 - "Touch - Sales Line POS".CalculateBalance()
                 SetCurrentKey("Discount Type");
                 SetRange("Register No.", SalePOS."Register No.");
                 SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
@@ -176,9 +184,6 @@ codeunit 6014573 "NPR Report: Location Print"
                 SetFilter("Discount Type", '<>%1', "Discount Type"::Rounding);
                 CalcSums("Amount Including VAT");
                 TotalInclVAT := TotalInclVAT - "Amount Including VAT";
-                //-NPR5.33 [280329]
-                //TotalInclVAT -= RetailFormCode.GetDiscountRounding("Sales Ticket No.","Register No.");
-                //+NPR5.33 [280329]
             end;
 
             if TotalInclVAT > 0 then begin
@@ -242,9 +247,7 @@ until TempRetailComments.Next = 0;
         Printer.AddLine('P');
     end;
 
-    local procedure "-- Aux"()
-    begin
-    end;
+    //Aux
 
     local procedure PrintItemAmountLine()
     var
@@ -310,31 +313,13 @@ until TempRetailComments.Next = 0;
         ItemVariant: Record "Item Variant";
     begin
         with SaleLinePOS do begin
-            //Variety
             if ItemVariant.Get("No.", "Variant Code") and
                ((ItemVariant."NPR Variety 1" <> '') or
                 (ItemVariant."NPR Variety 2" <> '') or
                 (ItemVariant."NPR Variety 3" <> '') or
                 (ItemVariant."NPR Variety 4" <> '')) then
                 VariantDesc := ItemVariant.Description
-            //-NPR5.23 [240916]
-            //  ELSE IF VariaXConfiguration.GET() THEN BEGIN
-            //  //VariaX
-            //    IF VariaXDimCombination.GET("Variant Code","No.",VariaXConfiguration."Color Dimension") THEN BEGIN
-            //      VariaXDimCombination.CALCFIELDS(Description);
-            //      ColorDesc := Text10600009 + FORMAT(VariaXDimCombination.Description) + ' ';
-            //    END;
-            //    IF VariaXDimCombination.GET("Variant Code","No.",VariaXConfiguration."Size Dimension") THEN BEGIN
-            //      VariaXDimCombination.CALCFIELDS(Description);
-            //      SizeDesc := Text10600010 + FORMAT(VariaXDimCombination.Description);
-            //    END;
-            //  END;
-            //+NPR5.23 [240916]
         end;
-        //-NPR5.23 [240916]
-        // IF VariantDesc = '' THEN
-        //  VariantDesc := ColorDesc + SizeDesc;
-        //+NPR5.23 [240916]
 
         if VariantDesc <> '' then
             Printer.AddLine(VariantDesc);

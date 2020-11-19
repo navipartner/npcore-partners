@@ -1,8 +1,5 @@
 report 6014438 "NPR Gift Voucher A5 Right"
 {
-    // NPR4.15/LS/20150904  CASE 217672 Create A5 Gift Voucher Report
-    // NPR5.40/JLK /20180307  CASE 307438 Removed unused Audit Roll variable
-    // NPR5.43/JDH /20180604 CASE 317971 Changed captions to ENU
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Gift Voucher A5 Right.rdlc';
 
@@ -21,19 +18,19 @@ report 6014438 "NPR Gift Voucher A5 Right"
                 column(RegisterNo_Register; Register."Register No.")
                 {
                 }
-                column(Name_Register; Register.Name)
+                column(Name_Register; POSStore.Name)
                 {
                 }
                 column(CopyText; CopyText)
                 {
                 }
-                column(Address_Register; Register.Address)
+                column(Address_Register; POSStore.Address)
                 {
                 }
-                column(PostCodeCity_Register; Register."Post Code" + ' ' + Register.City)
+                column(PostCodeCity_Register; POSStore."Post Code" + ' ' + POSStore.City)
                 {
                 }
-                column(Telephone_Register; Format(Register."Phone No."))
+                column(Telephone_Register; Format(POSStore."Phone No."))
                 {
                 }
                 column(FaxText; FaxText)
@@ -42,10 +39,10 @@ report 6014438 "NPR Gift Voucher A5 Right"
                 column(VAT_Register; Format(Register."VAT No."))
                 {
                 }
-                column(Email_Register; Register."E-mail")
+                column(Email_Register; POSStore."E-mail")
                 {
                 }
-                column(wwwaddress_Register; Register.Website)
+                column(wwwaddress_Register; POSStore."Home Page")
                 {
                 }
                 column(Name_GiftVoucher; "Gift Voucher".Name)
@@ -74,7 +71,21 @@ report 6014438 "NPR Gift Voucher A5 Right"
                 }
 
                 trigger OnAfterGetRecord()
+                var
+                    POSUnit: Record "NPR POS Unit";
+                    POSSession: Codeunit "NPR POS Session";
+                    POSFrontEnd: Codeunit "NPR POS Front End Management";
+                    POSSetup: Codeunit "NPR POS Setup";
                 begin
+                    clear(POSStore);
+                    if POSSession.IsActiveSession(POSFrontEnd) then begin
+                        POSFrontEnd.GetSession(POSSession);
+                        POSSession.GetSetup(POSSetup);
+                        POSSetup.GetPOSStore(POSStore);
+                    end else begin
+                        if POSUnit.get(Register."Register No.") then
+                            POSStore.get(POSUnit."POS Store Code");
+                    end;
                     "Gift Voucher"."No. Printed" += 1;
                     "Gift Voucher".Modify();
 
@@ -88,12 +99,12 @@ report 6014438 "NPR Gift Voucher A5 Right"
 
                     ShowBody1 := RetailSetup."Name on Sales Ticket";
 
-                    if (StrLen(Format(Register."Fax No.")) > 0) then
-                        FaxText := TextFax + Format(Register."Fax No.");
+                    if (StrLen(Format(POSStore."Fax No.")) > 0) then
+                        FaxText := TextFax + Format(POSStore."Fax No.");
 
-                    ShowEmail := Register."E-mail" <> '';
-                    ShowWebAdd := Register.Website <> '';
-                    ShowNameBody := Register.Name <> '';
+                    ShowEmail := POSStore."E-mail" <> '';
+                    ShowWebAdd := POSStore."Home Page" <> '';
+                    ShowNameBody := POSStore.Name <> '';
 
                     if RetailSetup."Bar Code on Sales Ticket Print" then
                         Barcode := "No."
@@ -112,11 +123,6 @@ report 6014438 "NPR Gift Voucher A5 Right"
 
             trigger OnAfterGetRecord()
             begin
-                //-NPR5.40
-                //AuditRoll.SETRANGE("Register No.","Gift Voucher"."Register No.");
-                //AuditRoll.SETRANGE("Sales Ticket No.","Gift Voucher"."Sales Ticket No.");
-                //+NPR5.40
-
                 if LoopCounter > 0 then
                     CurrReport.Break;
                 LoopCounter += 1;
@@ -193,5 +199,6 @@ report 6014438 "NPR Gift Voucher A5 Right"
         TextRegister: Label ' , Register';
         TextSalesTicket: Label ' - Sales Ticket';
         BlobBuffer: Record "NPR BLOB buffer" temporary;
+        POSStore: Record "NPR POS Store";
 }
 

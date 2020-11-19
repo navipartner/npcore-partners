@@ -14,17 +14,6 @@ codeunit 6014560 "NPR Report - Sales Ticket"
     // 
     //  The function GetRecords, applies table filters to the necesarry data
     //  elements of the report, base on the codeunits run argument Rec: Record "Audit Roll".
-    // 
-    // NPR4.21/JHL/20160322 CASE 222417 Added CleanCash information
-    // NPR5.25/MMV /20160627 CASE 245033 Print all customer/GL payments as sale lines (like gift vouchers) instead of under the body.
-    //                                   Print account no. on payments when not gift/credit voucher.
-    //                                   Removed old version comments.
-    //                                   Simplified printed VAT as difference between amount incl. VAT & amount (Same as 6.2 & older reports).
-    // NPR5.26/JHL/20160916 CASE 244106 Print CleanCash information through Event, in CU 6184500
-    // NPR5.27/TSA/20160923  CASE 253316 Fixed a performance issue to validate drawer opening
-    // NPR5.33/ANEN/20170427 CASE 273989 Extending to 40 attributes
-    // NPR5.34/KENU/20170726 CASE 284023 Removed all "PrefixSpace", using '  ' instead
-    // NPR5.53/ALPO/20191024 CASE 371955 Rounding related fields moved to POS Posting Profiles
 
     TableNo = "NPR Audit Roll";
 
@@ -135,6 +124,12 @@ codeunit 6014560 "NPR Report - Sales Ticket"
         IssuedTxt: Label 'Issued:';
 
     procedure PrintHeader()
+    var
+        POSStore: Record "NPR POS Store";
+        POSUnit: Record "NPR POS Unit";
+        POSSession: Codeunit "NPR POS Session";
+        POSFrontEnd: Codeunit "NPR POS Front End Management";
+        POSSetup: Codeunit "NPR POS Setup";
     begin
         Printer.SetThreeColumnDistribution(0.465, 0.35, 0.235);
 
@@ -149,19 +144,27 @@ codeunit 6014560 "NPR Report - Sales Ticket"
             Printer.AddLine('A');
 
         Printer.SetFont('A11');
-        Printer.AddLine(Register.Name);
-        if Register."Name 2" <> '' then
-            Printer.AddLine(Register."Name 2");
-        Printer.AddLine(Register.Address);
-        Printer.AddLine(Register."Post Code" + ' ' + Register.City);
-        if Register."Phone No." <> '' then
-            Printer.AddLine(Register.FieldCaption("Phone No.") + ' ' + Register."Phone No.");
+        if POSSession.IsActiveSession(POSFrontEnd) then begin
+            POSFrontEnd.GetSession(POSSession);
+            POSSession.GetSetup(POSSetup);
+            POSSetup.GetPOSStore(POSStore);
+        end else begin
+            if POSUnit.get(Register."Register No.") then
+                POSStore.get(POSUnit."POS Store Code");
+        end;
+        Printer.AddLine(POSStore.Name);
+        if POSStore."Name 2" <> '' then
+            Printer.AddLine(POSStore."Name 2");
+        Printer.AddLine(POSStore.Address);
+        Printer.AddLine(POSStore."Post Code" + ' ' + POSStore.City);
+        if POSStore."Phone No." <> '' then
+            Printer.AddLine(POSStore.FieldCaption("Phone No.") + ' ' + POSStore."Phone No.");
         if Register."VAT No." <> '' then
             Printer.AddLine(Register.FieldCaption("VAT No.") + ' ' + Register."VAT No.");
-        if Register."E-mail" <> '' then
-            Printer.AddLine(Register.FieldCaption("E-mail") + ' ' + Register."E-mail");
-        if Register.Website <> '' then
-            Printer.AddLine(Register.Website);
+        if POSStore."E-mail" <> '' then
+            Printer.AddLine(POSStore.FieldCaption("E-mail") + ' ' + POSStore."E-mail");
+        if POSStore."Home Page" <> '' then
+            Printer.AddLine(POSStore."Home Page");
 
         if (AuditRoll."No. Printed" > 0) and RetailConfiguration."Copy No. on Sales Ticket" then begin
             Printer.SetBold(true);
@@ -223,24 +226,19 @@ codeunit 6014560 "NPR Report - Sales Ticket"
     procedure PrintLine(var AuditRoll: Record "NPR Audit Roll")
     begin
         with AuditRoll do begin
-            //-NPR5.25 [245033]
-            //IF (Type = Type::Customer) OR ((Type = Type::"G/L") AND NOT ("No." = Register."Credit Voucher Account")) THEN BEGIN
             if (Type = Type::Customer) or ((Type = Type::"G/L") and ("No." in [Register."Credit Voucher Account", Register."Gift Voucher Account"])) then begin
                 if "No." = Register."Credit Voucher Account" then
                     Description += ' - ' + "Credit voucher ref.";
-                //+NPR5.25 [245033]
                 if StrLen(Description) > 20 then
                     Printer.AddLine(Description)
                 else
                     Printer.AddTextField(1, 0, Description);
                 Printer.AddDecimalField(2, 2, "Amount Including VAT");
-                //-NPR5.25 [245033]
             end else
                 if (Type = Type::Customer) or (Type = Type::"G/L") then begin
                     Printer.AddLine(Description);
                     Printer.AddTextField(1, 0, '  ' + "No.");
                     Printer.AddDecimalField(2, 2, "Amount Including VAT");
-                    //+NPR5.25 [245033]
                 end else
                     if (Type = Type::Comment) and ("Sales Document No." <> '') and ("Unit Price" <> 0) then begin
                         if StrLen(Description) > 20 then
@@ -378,31 +376,12 @@ codeunit 6014560 "NPR Report - Sales Ticket"
         ItemVariant: Record "Item Variant";
     begin
         with AuditRoll do begin
-            //Variety
             if ItemVariant.Get("No.", "Variant Code") and
                ((ItemVariant."NPR Variety 1" <> '') or
                 (ItemVariant."NPR Variety 2" <> '') or
                 (ItemVariant."NPR Variety 3" <> '') or
                 (ItemVariant."NPR Variety 4" <> '')) then begin
                 VariantDesc := ItemVariant.Description;
-                //-NPR5.23 [240916]
-                //  END ELSE IF VarianceSetUp.GET("No.",Color,Size) THEN BEGIN
-                //  //Color/Size
-                //    IF (VarianceSetUp."Description - Color" <> Text10600008) THEN
-                //      ColorDesc := Text10600009 + FORMAT(VarianceSetUp."Description - Color") + ' ';
-                //    IF (VarianceSetUp."Description - Size"<>'') THEN
-                //      SizeDesc  := Text10600010 + FORMAT(VarianceSetUp."Description - Size");
-                //  END ELSE IF VariaXConfiguration.GET() THEN BEGIN
-                //  //VariaX
-                //    IF VariaXDimCombination.GET("Variant Code","No.",VariaXConfiguration."Color Dimension") THEN BEGIN
-                //      VariaXDimCombination.CALCFIELDS(Description);
-                //      ColorDesc := Text10600009 + FORMAT(VariaXDimCombination.Description) + ' ';
-                //    END;
-                //    IF VariaXDimCombination.GET("Variant Code","No.",VariaXConfiguration."Size Dimension") THEN BEGIN
-                //      VariaXDimCombination.CALCFIELDS(Description);
-                //      SizeDesc := Text10600010 + FORMAT(VariaXDimCombination.Description);
-                //    END;
-                //+NPR5.23 [240916]
             end;
         end;
 
@@ -433,9 +412,6 @@ codeunit 6014560 "NPR Report - Sales Ticket"
         end;
 
         with AuditRoll do begin
-            //-NPR5.25 [245033]
-            //IF "Amount Including VAT" <> 0 THEN BEGIN
-            //+NPR5.25 [245033]
             Printer.SetBold(true);
             if GeneralLedgerSetup.Get then
                 CurrencyCode := GeneralLedgerSetup."LCY Code";
@@ -456,27 +432,15 @@ codeunit 6014560 "NPR Report - Sales Ticket"
                 Printer.AddDecimalField(3, 2, "Line Discount Amount");
             end;
 
-            //-NPR5.25 [245033]
-            //  IF "VAT Base Amount" <> 0 THEN BEGIN
-            //    Printer.AddTextField(1,0,TotalVAT);
-            //    Printer.AddDecimalField(2,2,"VAT Base Amount");
-            //  IF ("Amount Including VAT" - Amount) <> 0 THEN BEGIN
             Printer.AddTextField(1, 0, TotalVAT);
             Printer.AddDecimalField(2, 2, ("Amount Including VAT" - Amount));
-            //  END;
-            //+NPR5.25 [245033]
 
-            //-NPR5.25 [245033]
-            //IF RetailConfiguration."Euro on Sales Ticket" AND ("Amount Including VAT" <> 0) THEN BEGIN
             if RetailConfiguration."Euro on Sales Ticket" and ("Amount Including VAT" <> 0) and (RetailConfiguration."Euro Exchange Rate" <> 0) then begin
-                //+NPR5.25 [245033]
                 Printer.AddTextField(1, 0, TotalEuro);
                 Printer.AddDecimalField(2, 2, "Amount Including VAT" / RetailConfiguration."Euro Exchange Rate");
             end;
 
-            //-NPR5.25 [245033]
             if "Amount Including VAT" <> 0 then begin
-                //+NPR5.25 [245033]
                 Printer.SetBold(true);
                 Printer.AddLine(TotalSettlement);
                 Printer.SetBold(false);
@@ -501,22 +465,7 @@ codeunit 6014560 "NPR Report - Sales Ticket"
                         PaymentTypePOS.SetFilter("Processing Type", '%1|%2', PaymentTypePOS."Processing Type"::"Gift Voucher", PaymentTypePOS."Processing Type"::"Credit Voucher");
 
                         FlagCustomerPayment := PaymentTypePOS.IsEmpty;
-                        //-NPR5.25 [245033]
-                        //      IF NOT FlagCreditVoucher AND NOT (FlagGiftVoucher) THEN
-                        //        Printer.AddLine(DepositTxt);
-
-                        //      IF FlagCreditVoucher AND NOT (FlagGiftVoucher) THEN BEGIN
-                        //        Printer.AddLine(IssuedTxt);
-                        //      END;
-                        //+NPR5.25 [245033]
                     end;
-
-                //-NPR5.25 [245033]
-                //    IF ("Sale Type" = "Sale Type"::Indbetaling) AND NOT FlagGiftVoucher THEN BEGIN
-                //      Printer.AddTextField(1, 0, Description + ' ' + FORMAT("Credit voucher ref."));
-                //      Printer.AddDecimalField(1, 2, "Amount Including VAT");
-                //    END;
-                //+NPR5.25 [245033]
                 until Next = 0;
         end;
     end;
@@ -614,7 +563,7 @@ codeunit 6014560 "NPR Report - Sales Ticket"
         if TempRetailComments.FindSet then
             repeat
                 Printer.AddTextField(1, 1, TempRetailComments.Comment)
-until TempRetailComments.Next = 0;
+            until TempRetailComments.Next = 0;
 
         Printer.NewLine;
 
@@ -665,18 +614,13 @@ until TempRetailComments.Next = 0;
         Printer.AddTextField(1, 1, BonInfoTxt);
         Printer.AddTextField(1, 1, BonInfoTxt2);
 
-        //-NPR5.26
-        //PrintCleanCash;
         OnPrintCleanCash(Printer, AuditRoll);
-        //+NPR5.26
 
         Printer.SetFont('Control');
         Printer.AddLine('P');
     end;
 
-    procedure "--- Record Triggers ---"()
-    begin
-    end;
+    //Record Triggers
 
     procedure AuditRollSalesOnAfterGetRecord(var AuditRollSales: Record "NPR Audit Roll") DoNotSkip: Boolean
     begin
@@ -685,8 +629,7 @@ until TempRetailComments.Next = 0;
             if (Type = Type::Item) and Item.Get("No.") and Item."NPR No Print on Reciept" then
                 exit(false);
 
-            //IF ("Amount Including VAT" <> 0) AND (Type = Type::"G/L") AND ("No." = Register.Rounding) THEN BEGIN  //#[371955]-revoked
-            if ("Amount Including VAT" <> 0) and (Type = Type::"G/L") and ("No." = POSSetup.RoundingAccount(true)) then begin  //NPR5.53 [371955]
+            if ("Amount Including VAT" <> 0) and (Type = Type::"G/L") and ("No." = POSSetup.RoundingAccount(true)) then begin
                 SubCurrencyGL := "Amount Including VAT";
                 exit(false);
             end;
@@ -715,9 +658,7 @@ until TempRetailComments.Next = 0;
     begin
     end;
 
-    procedure "-- Init --"()
-    begin
-    end;
+    //Init
 
     procedure GetRecords()
     begin
@@ -739,15 +680,11 @@ until TempRetailComments.Next = 0;
 
         Register.Get(AuditRoll."Register No.");
         RetailConfiguration.Get;
-        //-NPR5.53 [371955]
         POSUnit.Get(AuditRoll."Register No.");
         POSSetup.SetPOSUnit(POSUnit);
-        //+NPR5.53 [371955]
     end;
 
-    procedure "-- Aux functions --"()
-    begin
-    end;
+    //Aux functions
 
     local procedure CalcSaleLineTotals(var "Audit Roll": Record "NPR Audit Roll")
     begin
@@ -755,11 +692,6 @@ until TempRetailComments.Next = 0;
             AuditRollTotals."Amount Including VAT" += "Amount Including VAT";
             AuditRollTotals.Amount += Amount;
             AuditRollTotals."Line Discount Amount" += "Line Discount Amount";
-
-            //-NPR5.25 [245033]
-            //  IF Type = Type::Item THEN
-            //    AuditRollTotals."VAT Base Amount"    += ("Amount Including VAT" - Amount);
-            //+NPR5.25 [245033]
 
             if ("Sale Type" = "Sale Type"::Deposit) and not ((Type = Type::"G/L") and ("No." in [Register."Credit Voucher Account", Register."Gift Voucher Account"])) then
                 CustomerPaymentAmount += "Amount Including VAT";
@@ -785,11 +717,7 @@ until TempRetailComments.Next = 0;
                 if PaymentTypePos.FindSet then
                     repeat
                         AuditRoll2.SetRange("No.", PaymentTypePos."No.");
-                        //-NPR5.27 [253316]
-                        //IF AuditRoll2.COUNT > 0 THEN
-                        //  FlagOpenDrawer := TRUE;
                         FlagOpenDrawer := not AuditRoll2.IsEmpty();
-                    //-NPR5.27 [253316]
                     until (PaymentTypePos.Next = 0) or FlagOpenDrawer;
             end;
         end;
@@ -824,60 +752,9 @@ until TempRetailComments.Next = 0;
             until (AuditRoll2.Next = 0) or (FlagDepositPayment = false);
     end;
 
-    local procedure PrintCleanCash()
-    var
-        CleanCashWrapper: Codeunit "NPR CleanCash Wrapper";
-        AuditRollCleanCash: Record "NPR Audit Roll";
-        Lines: Integer;
-        i: Integer;
-        ReceiptNo: Code[10];
-        SerialNo: Text[30];
-        ControlCode: Text[100];
-        CopySerialNo: Text[30];
-        CopyControlCode: Text[100];
-        txtReceiptNo: Label 'Receipt No.';
-        txtSerialNo: Label 'Serial No.';
-        txtControlCode: Label 'Control Code';
-    begin
-        //-NPR5.26
-        /*
-        AuditRollCleanCash.COPY(AuditRoll);
-        IF AuditRollCleanCash.FINDFIRST THEN
-          IF CleanCashWrapper.InitCleanCashData(AuditRollCleanCash) THEN BEGIN
-            Lines := CleanCashWrapper.GetLines();
-            FOR i := 1 TO Lines DO BEGIN
-              CleanCashWrapper.GetCleanCashInformation(ReceiptNo, SerialNo, ControlCode, CopySerialNo, CopyControlCode);
-              Printer.NewLine;
-              Printer.AddLine(txtReceiptNo);
-              Printer.AddLine(ReceiptNo);
-              Printer.NewLine;
-              Printer.AddLine(txtSerialNo);
-              IF CopySerialNo = '' THEN
-                Printer.AddLine(SerialNo)
-              ELSE
-                Printer.AddLine(CopySerialNo);
-              Printer.NewLine;
-              Printer.AddLine(txtControlCode);
-              IF CopySerialNo = '' THEN BEGIN
-                Printer.AddLine(COPYSTR(ControlCode,1,30));
-                Printer.AddLine(COPYSTR(ControlCode,31,60));
-              END ELSE BEGIN
-                Printer.AddLine(COPYSTR(CopyControlCode,1,30));
-                Printer.AddLine(COPYSTR(CopyControlCode,31,60));
-              END;
-        
-            END;
-          END;
-        */
-        //+NPR5.26
-
-    end;
-
     [IntegrationEvent(false, false)]
     local procedure OnPrintCleanCash(var LinePrintMgt: Codeunit "NPR RP Line Print Mgt."; var AuditRoll: Record "NPR Audit Roll")
     begin
-        //-NPR5.26
-        //+NPR5.26
     end;
 }
 
