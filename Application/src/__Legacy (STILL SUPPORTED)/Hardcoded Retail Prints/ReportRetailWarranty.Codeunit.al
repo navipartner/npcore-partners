@@ -13,13 +13,6 @@ codeunit 6014576 "NPR Report: Retail Warranty"
     // 
     //  The function GetRecords, applies table filters to the necesarry data
     //  elements of the report, base on the codeunits run argument Rec: Record "Sale Line POS".
-    // 
-    // NPR5.26/MMV /20160916 CASE 249408 Moved control codes from captions to in-line strings.
-    // NPR5.33/MMV /20170630 CASE 280196 Removed old code preventing compile.
-    // NPR5.37/TJ  /20171018 CASE 286283 Translated variables with danish specific letters into english
-    // NPR5.51/AlST/20190620 CASE 356129 allow for automatic printing of warranty on pos line creation
-    // NPR5.52/AlST/20191024 CASE 373793 focus on appropriate line for printing workflow
-    // NPR5.55/MMV /20200504 CASE 395393 Moved workflow step to separate object.
 
     TableNo = "NPR Sale Line POS";
 
@@ -113,19 +106,33 @@ codeunit 6014576 "NPR Report: Retail Warranty"
         WarrantyPrintCaption: Label 'Auto printing of the warranty for this item has failed with the error: %1';
 
     procedure PrintBody()
+    var
+        POSStore: Record "NPR POS Store";
+        POSUnit: Record "NPR POS Unit";
+        POSSession: Codeunit "NPR POS Session";
+        POSFrontEnd: Codeunit "NPR POS Front End Management";
+        POSSetup: Codeunit "NPR POS Setup";
     begin
         // Sale Line POS, Body (1)
         Printer.SetFont('A11');
         Printer.SetBold(true);
-        Printer.AddTextField(1, 0, receipt_register.Name);
+        if POSSession.IsActiveSession(POSFrontEnd) then begin
+            POSFrontEnd.GetSession(POSSession);
+            POSSession.GetSetup(POSSetup);
+            POSSetup.GetPOSStore(POSStore);
+        end else begin
+            if POSUnit.get(Register."Register No.") then
+                POSStore.get(POSUnit."POS Store Code");
+        end;
+        Printer.AddTextField(1, 0, POSStore.Name);
 
         Printer.SetBold(false);
-        Printer.AddTextField(1, 0, receipt_register.Address);
+        Printer.AddTextField(1, 0, POSStore.Address);
         Printer.AddTextField(2, 1, DateTxt);
         Printer.AddDateField(3, 2, DatoUd);
-        Printer.AddTextField(1, 0, receipt_register."Post Code" + ' ' + receipt_register.City);
+        Printer.AddTextField(1, 0, POSStore."Post Code" + ' ' + POSStore.City);
         Printer.AddTextField(1, 0, TelephoneTxt);
-        Printer.AddTextField(2, 0, receipt_register."Phone No.");
+        Printer.AddTextField(2, 0, POSStore."Phone No.");
         Printer.AddLine('');
 
         Printer.SetFont('A21');
@@ -199,15 +206,10 @@ codeunit 6014576 "NPR Report: Retail Warranty"
     procedure PrintFooter()
     begin
         Printer.SetFont('Control');
-        //-NPR5.26 [249408]
-        //Printer.AddLine(Text0002);
         Printer.AddLine('P');
-        //+NPR5.26 [249408]
     end;
 
-    procedure "--- Record Triggers ---"()
-    begin
-    end;
+    //Record Triggers
 
     procedure SaleLinePOSOnPreDataItem()
     var
@@ -220,25 +222,6 @@ codeunit 6014576 "NPR Report: Retail Warranty"
     procedure SaleLinePOSOnAfterGetRecord()
     begin
         // Sale Line POS - OnAfterGetRecord()
-        //-E2
-        //-NPR5.33 [280196]
-        // VN.SETRANGE("No.", SaleLinePOS."No.");
-        // IF VN.FIND('-') THEN
-        //  IF VN."Type Retail" = 'OVERDRAG' THEN BEGIN
-        //    eksp.SETRANGE("Register No.", SaleLinePOS."Register No.");
-        //    eksp.SETRANGE("Sales Ticket No.",SaleLinePOS."Sales Ticket No.");
-        //    IF eksp.FIND('-') THEN BEGIN
-        //      IF (eksp."Customer No." <> '') AND cust.GET(eksp."Customer No.") THEN BEGIN
-        //        cust.SETRANGE("No.",eksp."Customer No.");
-        //        REPORT.RUNMODAL(52000, FALSE, TRUE, cust);
-        //      END
-        //      ELSE
-        //        ERROR(TextNoCust);
-        //    END;
-        //  CurrReport_SKIP := TRUE;
-        //  END;
-        //+NPR5.33 [280196]
-
         if not CurrReport_SKIP then begin
             if not receipt_register.Get(SaleLinePOS."Register No.") then Error(Text10600003, SaleLinePOS."Register No.");
 
@@ -256,23 +239,16 @@ codeunit 6014576 "NPR Report: Retail Warranty"
                         DatoUd := SaleLinePOS.Date;
                 end;
 
-                //Slet ekstra blanke tegn i beskrivelse
                 if StrPos(SaleLinePOS.Description, ' ') <> 0 then
                     repeat
                         SaleLinePOS.Description := CopyStr(SaleLinePOS.Description, 1, StrPos(SaleLinePOS.Description, ' ') - 1)
                                            + CopyStr(SaleLinePOS.Description, StrPos(SaleLinePOS.Description, ' ') + 1);
                     until StrPos(SaleLinePOS.Description, ' ') = 0;
 
-                //"Beregner" kodepris udefra "K¢bspris kodeord"
                 if RetailConfiguration."Purchace Price Code" <> '' then begin
-                    //-NOK1.0
-                    //KodePris :=DELCHR(FORMAT(ROUND(100*Amount/Quantity,1),12),'=','.');
                     KodePris := DelChr(Format(Round(100 * SaleLinePOS."Amount Including VAT" / SaleLinePOS.Quantity, 1), 12), '=', '.');
-                    //+NPK1.0
                     KommaKodePris := ConvertStr(KodePris, '0123456789', RetailConfiguration."Purchace Price Code");
-                end
-                //"Beregner" kodepris, når "K¢bspris kodeord" er blankt
-                else begin
+                end else begin
                     if SaleLinePOS.Quantity <> 0 then
                         KodePris := DelChr(DelChr(Format(Round(100 * SaleLinePOS."Amount Including VAT" / SaleLinePOS.Quantity, 1), 12), '=', '.'));
                     CodePriceLength := StrLen(KodePris);
@@ -296,9 +272,7 @@ codeunit 6014576 "NPR Report: Retail Warranty"
         end;//IF NOT CurrReport_SKIP THEN BEGIN
     end;
 
-    procedure "-- Init --"()
-    begin
-    end;
+    //Init
 
     procedure GetRecords()
     begin

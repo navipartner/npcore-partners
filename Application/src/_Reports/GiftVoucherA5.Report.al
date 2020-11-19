@@ -1,10 +1,5 @@
 report 6014561 "NPR Gift Voucher A5"
 {
-    // NPR4.16/KN/20151009 CASE 220371   Created report based on report 55251 in Smykkebasen
-    // NPR4.18/KN/20160128 CASE 232717   Increased report margins in layout
-    // NPR5.38/JLK /20180124  CASE 300892 Corrected AL Error on blank Text Constants Text1002 to Text1006
-    // NPR5.38/JLK /20180125  CASE 303595 Added ENU object caption
-    // NPR5.40/JLK /20180307  CASE 307438 Removed unused Audit Roll variable
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Gift Voucher A5.rdlc';
 
@@ -57,16 +52,16 @@ report 6014561 "NPR Gift Voucher A5"
                 dataitem(Register; "NPR Register")
                 {
                     DataItemLink = "Register No." = FIELD("Register No.");
-                    column(Name_Register; Register.Name)
+                    column(Name_Register; POSStore.Name)
                     {
                     }
-                    column(Address_Register; Register.Address)
+                    column(Address_Register; POSStore.Address)
                     {
                     }
-                    column(Email_Register; Register."E-mail")
+                    column(Email_Register; POSStore."E-mail")
                     {
                     }
-                    column(WebAddress_Register; Register.Website)
+                    column(WebAddress_Register; POSStore."Home Page")
                     {
                     }
                     column(RegisterPhoneText; RegisterPhoneText)
@@ -80,9 +75,23 @@ report 6014561 "NPR Gift Voucher A5"
                     }
 
                     trigger OnAfterGetRecord()
+                    var
+                        POSUnit: Record "NPR POS Unit";
+                        POSSession: Codeunit "NPR POS Session";
+                        POSFrontEnd: Codeunit "NPR POS Front End Management";
+                        POSSetup: Codeunit "NPR POS Setup";
                     begin
-                        RegisterPhoneText := StrSubstNo(Text1002, Register."Phone No.");
-                        RegisterPostCodeAndCityText := Register."Post Code" + ' ' + Register.City;
+                        clear(POSStore);
+                        if POSSession.IsActiveSession(POSFrontEnd) then begin
+                            POSFrontEnd.GetSession(POSSession);
+                            POSSession.GetSetup(POSSetup);
+                            POSSetup.GetPOSStore(POSStore);
+                        end else begin
+                            if POSUnit.get(Register."Register No.") then
+                                POSStore.get(POSUnit."POS Store Code");
+                        end;
+                        RegisterPhoneText := StrSubstNo(Text1002, POSStore."Phone No.");
+                        RegisterPostCodeAndCityText := POSStore."Post Code" + ' ' + POSStore.City;
                         RegisterVatNoText := StrSubstNo(Text1003, Register."VAT No.");
                     end;
                 }
@@ -99,13 +108,11 @@ report 6014561 "NPR Gift Voucher A5"
 
                     DetailsText := Format("Issue Date") + ' ' + "Register No." + ' ' + "Sales Ticket No." + ' - ' + "No." + ' - ' + Format(Time);
 
-                    //+NPR5.38
                     ZipCodeCityText := "ZIP Code";
                     if ZipCodeCityText <> '' then
                         ZipCodeCityText += ', ' + City
                     else
                         ZipCodeCityText += City;
-                    //-NPR5.38
 
                     BarcodeLib.GenerateBarcode("Gift Voucher"."No.", TempBlob);
                     BlobBuffer.GetFromTempBlob(TempBlob, 1);
@@ -150,10 +157,6 @@ report 6014561 "NPR Gift Voucher A5"
         Lbl002 = 'THIS GIFT VOUCHER IS A SECURITY AND MUST';
         Lbl003 = 'BE PRESENTED UPON PURCHASE. THE ISSUER IS NOT';
         Lbl004 = 'RESPONSIBLE FOR LOSS.';
-        // The label 'Lbl005' could not be exported.
-        // The label 'Lbl006' could not be exported.
-        // The label 'Lbl007' could not be exported.
-        // The label 'Lbl008' could not be exported.
     }
 
     trigger OnInitReport()
@@ -178,5 +181,6 @@ report 6014561 "NPR Gift Voucher A5"
         Text1002: Label 'Phone No.: %1';
         Text1003: Label 'VAT No.: %1';
         BlobBuffer: Record "NPR BLOB buffer" temporary;
+        POSStore: Record "NPR POS Store";
 }
 

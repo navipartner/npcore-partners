@@ -2,55 +2,6 @@ table 6014401 "NPR Register"
 {
     // //-NPR-Dankort1.0c ved Nikolai Pedersen
     //   Credit Card Solution - tilf¢jet Sagem terminal
-    // 
-    // NPR4.10/VB/20150601  CASE 213003 Added field Control Add-in Type
-    // NPR4.12/VB/20150708  CASE 213003 Added fields Client Decimal Separator and client Thousands Separator
-    // NPR4.13/MMV/20150715 CASE 215400 Added field 620 - Type and name matches field Exchange Label Exchange Period in retail setup.
-    // NPR4.14/JS/20150922  CASE 223584 Added field 630 - Enable Contactless to allow the customer to switch contactless on and off.
-    // NPR4.14/VB/20151001  CASE 224232 Added field 819 Client Formatting Culture ID
-    // MbP1.80/AP/20151110  CASE 226725 MobilePay
-    // NPR4.16/JDH/20151115 CASE 225415 Removed all unused fields, and translated vars to ENU (all undocumented in code by purpose)
-    // NPR4.18/MMV/20160202  CASE 224257 New Tax Free integration:
-    //                                   Added fields 700 - 704.
-    //                                   Removed fields 613 - 615.
-    // NPR4.21/MMV/20160202  CASE 224257 Added field 705, added missing danish captions.
-    // NPR4.21/RMT/20160210 CASE 234145 Check that register no is an integer
-    // NPR4.21/MMV/20160223  CASE 223223 Added field 340
-    // NPR4.21/JLK/20160315  CASE 236022 Added Confirm dialog for delete register
-    // NPR5.00/VB/20151130  CASE 226832 Added fields 830, 831, and 832 to support changed POS device protocol functionality
-    // NPR5.00/VB/20151203  CASE 228807 Added option "SAGEM Flexiterm JavaScript" to field 103 Credit Card Solution
-    // NPR5.00/VB/20160105  CASE 230373 Refactoring due to client-side formatting of decimal and date/time values
-    // NPR5.00/NPKNAV/20160113  CASE 226832 NP Retail 2016
-    // NPR5.20/BR/20160215 CASE 231481 Added option "Pepper" to field 103 Credit Card Solution
-    // NPR5.22/VB/20160407 CASE 237866 Added field "Line Order on Screen"
-    // NPR5.25/TTH/20160718 CASE 238859 Added fields for Swipp Payment processing
-    // NPR5.26/BR /20160812 CASE 248762 Credit Card Solution Fixed ENU OptionCaption of Field 103 "Credit Card Solution"
-    // NPR5.28/MMV /20161104 CASE 254575 Added field 273 : "Sales Ticket Email Output"
-    // NPR5.28/VB/20161107 CASE 257796 Added field 834 : "Skip Infobox Update in Sale"
-    // NPR5.28/VB/20161122 CASE 259086 Removed Control Add-in Type field
-    // NPR5.29/CLVA/20161222 CASE 251884 Added field Adyen Payment Type
-    // NPR5.29/MMV /20161216 CASE 241549 Removed deprecated print/report code & fields.
-    //                                   Renamed F 271 along with A4 option in optionstring.
-    // NPR5.30/TJ  /20170213 CASE 264909 Removed Swipp fields
-    // NPR5.30/TJ  /20170215 CASE 265504 Changed ENU captions on fields with word Register in their name
-    // NPR5.31/MHA /20170113 CASE 263093 Added field 325 "Customer Disc. Group"
-    // NPR5.31/CLVA/20170328 CASE 251884 Change field name on field 6184491 from "Adyen Payment Type" to "mPos Payment Type"
-    // NPR5.36/BR  /20170914  CASE 289641 Added field VAT Customer No.
-    // NPR5.38/TJ  /20171218  CASE 225415 Renumbered fields from range below 50000
-    // NPR5.40/TS  /20180308  CASE 307432 Removed reference to Field Import credit card transact. and Auto Open/Close Terminal
-    // NPR5.40/TSA /20180209 CASE 303065 Added option AutoSplitKey to field 833 "Line Order on Screen"
-    // NPR5.40/JDH /20180330 CASE 309516 Removed Unused code
-    // NPR5.43/CLVA/20180606 CASE 300254 Added 2nd Display validaton on "Customer Display"
-    // NPR5.46/MMV /20181002 CASE 290734 EFT Framework refactoring
-    // NPR5.49/VB  /20181106 CASE 335141 Introducing the POS Theme functionality
-    // NPR5.49/TJ  /20190201 CASE 335739 Fields 20,819,820,821,822,833 and 6150721 moved to new table POS View Profile
-    //                                   Function DetectDecimalThousandsSeparator moved to same new table
-    // NPR5.50/BHR /20190410 CASE 348128 Rename field 274 (www.address)
-    // NPR5.52/ALPO/20190926 CASE 368673 Active event (from Event Management module) on cash register. Copy dimension from event on selection
-    // NPR5.53/ALPO/20191013 CASE 371955 Removed field 25 "Rounding": moved to "POS Posting Profile" (Table 6150653)
-    // NPR5.53/ALPO/20191023 CASE 373743 Removed field 21 "Sales Ticket Series": moved to "POS Audit Profile" (Table 6150650)
-    // NPR5.53/ALPO/20191025 CASE 371956 Dimensions: POS Store & POS Unit integration; discontinue dimensions on Cash Register
-    // NPR5.53/ALPO/20191105 CASE 376035 Save active event on Sale POS, copy event's dimensions directly to the sale instead of overwriting pos unit dimensions
 
     Caption = 'Cash Register';
     DataClassification = CustomerContent;
@@ -69,9 +20,7 @@ table 6014401 "NPR Register"
             var
                 RetailTableCode: Codeunit "NPR Retail Table Code";
             begin
-                //-NPR4.21
                 RetailTableCode.RegisterCheckNo("Register No.");
-                //+NPR4.21
             end;
         }
         field(2; Status; Option)
@@ -136,10 +85,6 @@ table 6014401 "NPR Register"
                     if Account = "Credit Voucher Account" then
                         Error(ErrTilgode);
                 end;
-
-                //-NPR5.40 [309516]
-                //InitialiserKasse;
-                //+NPR5.40 [309516]
             end;
         }
         field(12; "Gift Voucher Account"; Code[20])
@@ -159,9 +104,6 @@ table 6014401 "NPR Register"
                     if "Gift Voucher Account" = "Gift Voucher Discount Account" then
                         Error(Text1060006, "Gift Voucher Account", FieldCaption("Gift Voucher Discount Account"));
                 end;
-                //-NPR5.40 [309516]
-                //InitialiserKasse;
-                //+NPR5.40 [309516]
             end;
         }
         field(13; "Credit Voucher Account"; Code[20])
@@ -179,10 +121,6 @@ table 6014401 "NPR Register"
                     if "Credit Voucher Account" = "Gift Voucher Account" then
                         Error(ErrGavekort);
                 end;
-
-                //-NPR5.40 [309516]
-                //InitialiserKasse;
-                //+NPR5.40 [309516]
             end;
         }
         field(14; "Difference Account"; Code[20])
@@ -190,13 +128,6 @@ table 6014401 "NPR Register"
             Caption = 'Difference Account';
             DataClassification = CustomerContent;
             TableRelation = "G/L Account";
-
-            trigger OnValidate()
-            begin
-                //-NPR5.40 [309516]
-                //InitialiserKasse;
-                //+NPR5.40 [309516]
-            end;
         }
         field(15; "Balance Account"; Code[20])
         {
@@ -205,13 +136,6 @@ table 6014401 "NPR Register"
             TableRelation = IF ("Balanced Type" = CONST(Finans)) "G/L Account"
             ELSE
             IF ("Balanced Type" = CONST(Bank)) "Bank Account";
-
-            trigger OnValidate()
-            begin
-                //-NPR5.40 [309516]
-                //InitialiserKasse;
-                //+NPR5.40 [309516]
-            end;
         }
         field(16; "Difference Account - Neg."; Code[20])
         {
@@ -254,6 +178,9 @@ table 6014401 "NPR Register"
         {
             Caption = 'Name 2';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table is not used anymore. Move contact data to POS Store';
+            ObsoleteTag = 'NPR Register to NPR POS Store';
         }
         field(26; "Register Change Account"; Code[20])
         {
@@ -321,11 +248,9 @@ table 6014401 "NPR Register"
             var
                 DisplaySetup: Record "NPR Display Setup";
             begin
-                //-NPR5.43
                 if DisplaySetup.Get("Register No.") then
                     if DisplaySetup.Activate then
                         Error(TXT001, "Register No.");
-                //+NPR5.43
             end;
         }
         field(101; "Credit Card"; Boolean)
@@ -376,43 +301,51 @@ table 6014401 "NPR Register"
         {
             Caption = 'Name';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table is not used anymore. Move contact data to POS Store';
+            ObsoleteTag = 'NPR Register -> NPR POS Store';
         }
         field(257; Address; Text[50])
         {
             Caption = 'Address';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table is not used anymore. Move contact data to POS Store';
+            ObsoleteTag = 'NPR Register -> NPR POS Store';
         }
         field(258; City; Text[50])
         {
             Caption = 'City';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table is not used anymore. Move contact data to POS Store';
+            ObsoleteTag = 'NPR Register -> NPR POS Store';
         }
         field(259; "Post Code"; Code[20])
         {
             Caption = 'Post Code';
             DataClassification = CustomerContent;
             TableRelation = "Post Code";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
-
-            trigger OnValidate()
-            begin
-                PostCode.Reset;
-                PostCode.SetRange(Code, "Post Code");
-                if PostCode.Find('-') then
-                    City := PostCode.City;
-            end;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table is not used anymore. Move contact data to POS Store';
+            ObsoleteTag = 'NPR Register -> NPR POS Store';
         }
         field(260; "Phone No."; Text[30])
         {
             Caption = 'Phone No.';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table is not used anymore. Move contact data to POS Store';
+            ObsoleteTag = 'NPR Register -> NPR POS Store';
         }
         field(261; "Fax No."; Text[30])
         {
             Caption = 'Fax No.';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table is not used anymore. Move contact data to POS Store';
+            ObsoleteTag = 'NPR Register to NPR POS Store';
         }
         field(262; "Giro No."; Text[20])
         {
@@ -448,6 +381,9 @@ table 6014401 "NPR Register"
         {
             Caption = 'E-mail';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table is not used anymore. Move contact data to POS Store';
+            ObsoleteTag = 'NPR Register to NPR POS Store';
         }
         field(270; "Logon-User Name"; Code[20])
         {
@@ -472,6 +408,9 @@ table 6014401 "NPR Register"
         {
             Caption = 'Website';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table is not used anymore. Move contact data to POS Store';
+            ObsoleteTag = 'NPR Register to NPR POS Store';
         }
         field(277; CloseOnRegBal; Boolean)
         {
@@ -594,7 +533,7 @@ table 6014401 "NPR Register"
         }
         field(402; "Attendance Count in Audit Roll"; Integer)
         {
-            CalcFormula = Count ("NPR Audit Roll" WHERE("Register No." = FIELD("Register No."),
+            CalcFormula = Count("NPR Audit Roll" WHERE("Register No." = FIELD("Register No."),
                                                     "Sales Ticket No." = FIELD("Sales Ticket Filter"),
                                                     "Sale Type" = CONST(Sale),
                                                     "Line No." = CONST(1),
@@ -607,7 +546,7 @@ table 6014401 "NPR Register"
         }
         field(403; "Normal Sales in Audit Roll"; Decimal)
         {
-            CalcFormula = Sum ("NPR Audit Roll"."Amount Including VAT" WHERE("Sale Date" = FIELD("Date Filter"),
+            CalcFormula = Sum("NPR Audit Roll"."Amount Including VAT" WHERE("Sale Date" = FIELD("Date Filter"),
                                                                          "Register No." = FIELD("Register No."),
                                                                          "Sale Type" = CONST(Sale),
                                                                          Type = CONST(Item),
@@ -619,7 +558,7 @@ table 6014401 "NPR Register"
         }
         field(404; "Debit Sales in Audit Roll"; Decimal)
         {
-            CalcFormula = Sum ("NPR Audit Roll"."Amount Including VAT" WHERE("Sale Date" = FIELD("Date Filter"),
+            CalcFormula = Sum("NPR Audit Roll"."Amount Including VAT" WHERE("Sale Date" = FIELD("Date Filter"),
                                                                          "Register No." = FIELD("Register No."),
                                                                          "Sale Type" = CONST("Debit Sale"),
                                                                          "Gift voucher ref." = FILTER(= ''),
@@ -632,7 +571,7 @@ table 6014401 "NPR Register"
         }
         field(410; "Item Count in Audit Roll Debit"; Integer)
         {
-            CalcFormula = Count ("NPR Audit Roll" WHERE("Register No." = FIELD("Register No."),
+            CalcFormula = Count("NPR Audit Roll" WHERE("Register No." = FIELD("Register No."),
                                                     "Sales Ticket No." = FIELD("Sales Ticket Filter"),
                                                     Type = CONST("Debit Sale"),
                                                     "Line No." = CONST(2),
@@ -670,7 +609,7 @@ table 6014401 "NPR Register"
         }
         field(503; "All Normal Sales in Audit Roll"; Decimal)
         {
-            CalcFormula = Sum ("NPR Audit Roll"."Amount Including VAT" WHERE("Sale Date" = FIELD("Date Filter"),
+            CalcFormula = Sum("NPR Audit Roll"."Amount Including VAT" WHERE("Sale Date" = FIELD("Date Filter"),
                                                                          "Sale Type" = CONST(Sale),
                                                                          Type = CONST(Item),
                                                                          "Salesperson Code" = FIELD("Sales Person Filter"),
@@ -681,7 +620,7 @@ table 6014401 "NPR Register"
         }
         field(504; "All Debit Sales in Audit Roll"; Decimal)
         {
-            CalcFormula = Sum ("NPR Audit Roll"."Amount Including VAT" WHERE("Sale Date" = FIELD("Date Filter"),
+            CalcFormula = Sum("NPR Audit Roll"."Amount Including VAT" WHERE("Sale Date" = FIELD("Date Filter"),
                                                                          "Sale Type" = CONST("Debit Sale"),
                                                                          Type = CONST(Item),
                                                                          "Gift voucher ref." = FILTER(= ''),
@@ -872,46 +811,6 @@ table 6014401 "NPR Register"
             DataClassification = CustomerContent;
             Description = 'NPR5.52 [368673]';
             TableRelation = Job WHERE("NPR Event" = CONST(true));
-
-            trigger OnValidate()
-            var
-                FromDefDim: Record "Default Dimension";
-                ToDefDim: Record "Default Dimension";
-            begin
-                //-NPR5.53 [376035]-revoked
-                /*
-                //-NPR5.52 [368673]
-                IF "Active Event No." <> '' THEN BEGIN
-                  FromDefDim.SETRANGE("Table ID",DATABASE::Job);
-                  FromDefDim.SETRANGE("No.","Active Event No.");
-                  FromDefDim.SETFILTER("Dimension Code",'<>%1','');
-                  FromDefDim.SETFILTER("Dimension Value Code",'<>%1','');
-                  IF FromDefDim.FINDSET THEN
-                    REPEAT
-                      ToDefDim.INIT;
-                      //ToDefDim."Table ID" := DATABASE::Register;  //NPR5.53 [371956]-revoked
-                      ToDefDim."Table ID" := DATABASE::"POS Unit";  //NPR5.53 [371956]
-                      ToDefDim."No." := "Register No.";
-                      ToDefDim."Dimension Code" := FromDefDim."Dimension Code";
-                      IF NOT ToDefDim.FIND THEN
-                        ToDefDim.INSERT;
-                      ToDefDim."Dimension Value Code" := FromDefDim."Dimension Value Code";
-                      IF ToDefDim."Value Posting" = ToDefDim."Value Posting"::"No Code" THEN
-                        ToDefDim."Value Posting" := ToDefDim."Value Posting"::" ";
-                      ToDefDim.MODIFY;
-                    UNTIL FromDefDim.NEXT = 0;
-                  //DimMgt.UpdateDefaultDim(DATABASE::Register,"Register No.","Global Dimension 1 Code","Global Dimension 2 Code");  //NPR5.53 [371956]-revoked
-                  //-NPR5.53 [371956]
-                  POSUnit.GET("Register No.");
-                  DimMgt.UpdateDefaultDim(DATABASE::"POS Unit",POSUnit."No.",POSUnit."Global Dimension 1 Code",POSUnit."Global Dimension 2 Code");
-                  POSUnit.MODIFY;
-                  //+NPR5.53 [371956]
-                END;
-                //+NPR5.52 [368673]
-                */
-                //+NPR5.53 [376035]-revoked
-
-            end;
         }
         field(6184471; "MobilePay Payment Type"; Code[10])
         {
@@ -937,15 +836,6 @@ table 6014401 "NPR Register"
             Caption = 'MobilePay PoS Unit ID';
             DataClassification = CustomerContent;
             Description = 'MbP1.80';
-
-            trigger OnValidate()
-            begin
-                //-NPR5.46 [290734]
-                //-MbP1.80
-                //"MobilePay PoS Unit ID" := MobilePayPoSAPIIntegration.ResolvePoSUnitId("MobilePay PoS Unit ID");
-                //+MbP1.80
-                //+NPR5.46 [290734]
-            end;
         }
         field(6184475; "MobilePay PoS Registered"; Boolean)
         {
@@ -990,7 +880,6 @@ table 6014401 "NPR Register"
     var
         AuditRoll: Record "NPR Audit Roll";
     begin
-        //-NPR4.21
         AuditRoll.SetRange("Register No.", "Register No.");
         AuditRoll.SetRange("Sale Type", AuditRoll."Sale Type"::Sale);
         if AuditRoll.FindLast then begin
@@ -1000,7 +889,6 @@ table 6014401 "NPR Register"
             if not Confirm(StrSubstNo(Text1060009, "Register No."), false) then
                 Error('');
         end;
-        //+NPR4.21
         DimMgt.DeleteDefaultDim(DATABASE::"NPR Register", "Register No.");
     end;
 
@@ -1008,23 +896,9 @@ table 6014401 "NPR Register"
     var
         RetailTableCode: Codeunit "NPR Retail Table Code";
     begin
-        //-NPR4.21
         RetailTableCode.RegisterCheckNo("Register No.");
-        //+NPR4.21
-
-        // ERROR(Text1060000,Kassenummer);
-        //DimMgt.UpdateDefaultDim( DATABASE::Register,"Register No.", "Global Dimension 1 Code","Global Dimension 2 Code");  //NPR5.53 [371956]-revoked
 
         "Connected To Server" := true;
-
-        //-NPR5.49 [335739]
-        /*
-        //-NPR4.12
-        DetectDecimalThousandsSeparator();
-        //+NPR4.12
-        */
-        //+NPR5.49 [335739]
-
     end;
 
     trigger OnRename()
@@ -1132,28 +1006,19 @@ table 6014401 "NPR Register"
             Clear(InputDialog);
         until (Pwd = '4552') or (Pwd = '1304') or (PageAction <> ACTION::OK);
 
-        //-NPR4.21
         RetailTableCode.RegisterCheckNo(RegNo);
-        //+NPR4.21
 
         Register.Init;
         Register."Register No." := RegNo;
         Register."Closing Cash" := Primo;
         Register."Opening Cash" := Primo;
         if CompInf.Get then begin
-            Register.Name := CompInf.Name;
-            Register.Address := CompInf.Address;
-            Register.City := CompInf.City;
-            Register."Post Code" := CompInf."Post Code";
-            Register."Phone No." := CompInf."Phone No.";
-            Register."Fax No." := CompInf."Fax No.";
             Register."Giro No." := CompInf."Giro No.";
             Register."Bank Name" := CompInf."Bank Name";
             Register."Bank Registration No." := CompInf."Bank Branch No.";
             Register."Bank Account No." := CompInf."Bank Account No.";
             Register."Automatic Payment No." := CompInf."Payment Routing No.";
             Register."VAT No." := CompInf."VAT Registration No.";
-            Register."E-mail" := CompInf."E-Mail";
         end;
 
         RetailSetup.Get();
@@ -1185,9 +1050,7 @@ table 6014401 "NPR Register"
     var
         CannotChangeHereLbl: Label 'Dimensions cannot be changed on Cash Register. Please update them on POS Unit instead.';
     begin
-        //-NPR5.53 [371956]
         Error(CannotChangeHereLbl);
-        //+NPR5.53 [371956]
     end;
 }
 

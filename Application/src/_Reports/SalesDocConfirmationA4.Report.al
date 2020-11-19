@@ -1,6 +1,5 @@
 report 6014440 "NPR Sales Doc Confirmation A4"
 {
-    // NPR5.52/MAOT/20190715 CASE 351209 Created object
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Sales Doc Confirmation A4.rdlc';
 
@@ -32,25 +31,25 @@ report 6014440 "NPR Sales Doc Confirmation A4"
             column(RegisterNo_Register; Register."Register No.")
             {
             }
-            column(Name_Register; Register.Name)
+            column(Name_Register; POSStore.Name)
             {
             }
-            column(Addres_Register; Register.Address)
+            column(Addres_Register; POSStore.Address)
             {
             }
-            column(City_Register; Register.City)
+            column(City_Register; POSStore.City)
             {
             }
-            column(PostCode_Register; Register."Post Code")
+            column(PostCode_Register; POSStore."Post Code")
             {
             }
-            column(Telephone_Register; Register."Phone No.")
+            column(Telephone_Register; POSStore."Phone No.")
             {
             }
-            column(Email_Register; Register."E-mail")
+            column(Email_Register; POSStore."E-mail")
             {
             }
-            column(Website_Register; Register.Website)
+            column(Website_Register; POSStore."Home Page")
             {
             }
             column(VATRegNo; CompanyInformation."VAT Registration No.")
@@ -166,10 +165,23 @@ report 6014440 "NPR Sales Doc Confirmation A4"
 
             trigger OnAfterGetRecord()
             var
+                POSUnit: Record "NPR POS Unit";
+                POSSession: Codeunit "NPR POS Session";
+                POSFrontEnd: Codeunit "NPR POS Front End Management";
+                POSSetup: Codeunit "NPR POS Setup";
                 QueryVATTotals: Query "NPR VAT Totals";
                 varLineNo: Integer;
             begin
                 Register.Get("Audit Roll"."Register No.");
+                clear(POSStore);
+                if POSSession.IsActiveSession(POSFrontEnd) then begin
+                    POSFrontEnd.GetSession(POSSession);
+                    POSSession.GetSetup(POSSetup);
+                    POSSetup.GetPOSStore(POSStore);
+                end else begin
+                    if POSUnit.get(Register."Register No.") then
+                        POSStore.get(POSUnit."POS Store Code");
+                end;
                 RetailSetup.Get;
                 if SalespersonPurchaser.Get("Audit Roll"."Salesperson Code") then;
                 Clear(AuditRollTotals);
@@ -338,6 +350,7 @@ report 6014440 "NPR Sales Doc Confirmation A4"
         TotalDiscountPct: Text;
         IsItem: Boolean;
         UnitPriceExclDiscountLine: Text;
+        POSStore: Record "NPR POS Store";
 
     local procedure "--ContactInfo"()
     begin

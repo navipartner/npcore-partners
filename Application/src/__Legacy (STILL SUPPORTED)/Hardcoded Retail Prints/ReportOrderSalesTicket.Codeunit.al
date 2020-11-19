@@ -13,12 +13,6 @@ codeunit 6014570 "NPR Report: Order Sales Ticket"
     // 
     //  The function GetRecords, applies table filters to the necesarry data
     //  elements of the report, base on the codeunits run argument Rec: Record "Retail Document Header".
-    // 
-    // NPR4.13/MMV/20150622 CASE 216571 Removed array structure from register info and receipt text to prevent usage of COMPRESSARRAY (it crashed the CU).
-    //                                  Header info is now printed from the register instead of company information like in CU 6014560 - Sales ticket
-    // NPR4.13/MMV/20150710 CASE 216571 Refactored code, deleted obsolete comments and functions, moved hardcoded text to text constants, fixed bad syntax and naming.
-    // NPR5.26/MMV /20160916 CASE 249408 Moved control codes from captions to in-line strings.
-    // NPR5.48/ZESO/20181112 CASE 333932 Display Amount Incl. VAT instaed of Amount.
 
     TableNo = "NPR Retail Document Header";
 
@@ -42,10 +36,7 @@ codeunit 6014570 "NPR Report: Order Sales Ticket"
         Printer.SetFont('A11');
         Printer.AddLine('');
         Printer.SetFont('Control');
-        //-NPR5.26 [249408]
-        //Printer.AddLine(Text0002);
         Printer.AddLine('P');
-        //+NPR5.26 [249408]
     end;
 
     var
@@ -67,33 +58,41 @@ codeunit 6014570 "NPR Report: Order Sales Ticket"
         OrderNoTxt: Label 'Order No:';
 
     procedure PrintRetailDocumentHeader()
+    var
+        POSStore: Record "NPR POS Store";
+        POSUnit: Record "NPR POS Unit";
+        POSSession: Codeunit "NPR POS Session";
+        POSFrontEnd: Codeunit "NPR POS Front End Management";
+        POSSetup: Codeunit "NPR POS Setup";
     begin
         Printer.SetFont('Control');
-
-        //-NPR5.26 [249408]
-        // Printer.AddLine(Text0000);
-        // Printer.AddLine(Text0001);
         Printer.AddLine('A');
         Printer.AddLine('G');
         Printer.AddLine('h');
-        //+NPR5.26 [249408]
 
         Printer.SetFont('B21');
         Printer.SetBold(false);
-
-        Printer.AddLine(Register.Name);
-        if Register."Name 2" <> '' then
-            Printer.AddLine(Register."Name 2");
-        Printer.AddLine(Register.Address);
-        Printer.AddLine(Register."Post Code" + ' ' + Register.City);
-        if Register."Phone No." <> '' then
-            Printer.AddLine(Register.FieldCaption("Phone No.") + ' ' + Register."Phone No.");
+        if POSSession.IsActiveSession(POSFrontEnd) then begin
+            POSFrontEnd.GetSession(POSSession);
+            POSSession.GetSetup(POSSetup);
+            POSSetup.GetPOSStore(POSStore);
+        end else begin
+            if POSUnit.get(Register."Register No.") then
+                POSStore.get(POSUnit."POS Store Code");
+        end;
+        Printer.AddLine(POSStore.Name);
+        if POSStore."Name 2" <> '' then
+            Printer.AddLine(POSStore."Name 2");
+        Printer.AddLine(POSStore.Address);
+        Printer.AddLine(POSStore."Post Code" + ' ' + POSStore.City);
+        if POSStore."Phone No." <> '' then
+            Printer.AddLine(POSStore.FieldCaption("Phone No.") + ' ' + POSStore."Phone No.");
         if Register."VAT No." <> '' then
             Printer.AddLine(Register.FieldCaption("VAT No.") + ' ' + Register."VAT No.");
-        if Register."E-mail" <> '' then
-            Printer.AddLine(Register.FieldCaption("E-mail") + ' ' + Register."E-mail");
-        if Register.Website <> '' then
-            Printer.AddLine(Register.Website);
+        if POSStore."E-mail" <> '' then
+            Printer.AddLine(POSStore.FieldCaption("E-mail") + ' ' + POSStore."E-mail");
+        if POSStore."Home Page" <> '' then
+            Printer.AddLine(POSStore."Home Page");
 
         Printer.SetFont('B21');
         Printer.SetBold(false);
@@ -132,10 +131,7 @@ codeunit 6014570 "NPR Report: Order Sales Ticket"
             repeat
                 Printer.SetFont('A11');
                 Printer.AddTextField(1, 0, RetailDocumentLines."No." + ' ' + RetailDocumentLines.Description);
-                //-NPR5.48 [333932]
-                //Printer.AddDecimalField(2,2,RetailDocumentLines.Amount);
                 Printer.AddDecimalField(2, 2, RetailDocumentLines."Amount Including VAT");
-                //+NPR5.48 [333932]
                 PrintCommentLines;
             until RetailDocumentLines.Next = 0;
 
@@ -188,16 +184,11 @@ codeunit 6014570 "NPR Report: Order Sales Ticket"
         if TempRetailComments.FindSet then
             repeat
                 Printer.AddTextField(1, 1, TempRetailComments.Comment)
-until TempRetailComments.Next = 0;
+            until TempRetailComments.Next = 0;
     end;
 
-    procedure "--- Record Triggers ---"()
-    begin
-    end;
-
-    procedure "-- Init --"()
-    begin
-    end;
+    //Record Triggers
+    //Init
 
     procedure GetRecords()
     var

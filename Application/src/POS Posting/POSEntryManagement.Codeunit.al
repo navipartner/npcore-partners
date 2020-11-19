@@ -212,7 +212,6 @@ codeunit 6150629 "NPR POS Entry Management"
         POSUnit.Init;
         Register.Get(POSUnitCode);
         POSUnit."No." := Register."Register No.";
-        POSUnit.Name := Register.Name;
         if not POSStore.Get(POSUnitCode) then
             CreatePOSStore(POSUnit, Register);
         if not POSPaymentBin.Get(POSUnitCode) then
@@ -228,13 +227,6 @@ codeunit 6150629 "NPR POS Entry Management"
     begin
         POSStore.Init;
         POSStore.Code := POSUnit."No.";
-        POSStore.Validate(Name, Register.Name);
-        POSStore.Validate("Name 2", Register."Name 2");
-        POSStore.Validate(Address, Register.Address);
-        POSStore.Validate("Post Code", Register."Post Code");
-        POSStore.Validate(City, Register.City);
-        POSStore.Validate("Phone No.", Register."Phone No.");
-        POSStore.Validate("E-Mail", Register."E-mail");
         POSStore.Validate("Location Code", Register."Location Code");
         POSStore.Validate("VAT Registration No.", Register."VAT No.");
         POSStore.Validate("Global Dimension 1 Code", POSUnit."Global Dimension 1 Code");

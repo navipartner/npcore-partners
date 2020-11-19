@@ -13,27 +13,6 @@ codeunit 6014577 "NPR Report: TaxFree Receipt"
     // 
     //  The function GetRecords, applies table filters to the necesarry data
     //  elements of the report, base on the codeunits run argument Rec: Record "Audit Roll".
-    // 
-    // NPR4.15/MMV/20150916 CASE 222579 Changed text constant company name from 'Tax Free Worldwide-Denmark ApS' to 'Premier Tax Free'
-    //                                  and website/e-mail text constants.
-    // 
-    // NPR4.18/MMV/20160210 CASE 224257 Removed all code. Only used to set the printer in Object Output Selection now.
-    //                                  all tax free logic is now handled in CU 6014477.
-    // 
-    // NPR5.23/MMV/20160427 CASE 237927 Restored object with changes to make it work in latest release,
-    //                                  To be used as a fallback print whenever the new tax free web service fails.
-    // NPR5.23/JDH /20160518 CASE 240916 Removed unused variables
-    // NPR5.26/MMV /20160705 CASE 243285 Added support for newer offline barcode standard for use with faroe islands.
-    //                                   Removed plainly deprecated code.
-    //                                   Added missing fill on SaldoBarcode compared to latest 6.2 release.
-    //                                   Removed overwrite on Saldo compared to latest 6.2 release.
-    // NPR5.29/MMV /20161216 CASE 241549 Removed deprecated print/report code.
-    // NPR5.30/MMV /20170131 CASE 261964 Added support for new tax free module.
-    //                                   Fixed bug in barcode2 for faroe islands.
-    // NPR5.36/TJ  /20170921 CASE 286283 Renamed variables/function with danish specific letter into english
-    //                                   Removed unused variables
-    // NPR5.40/MMV /20180116 CASE 293106 Refactored tax free module.
-    // NPR5.43/JDH /20180702 CASE 321012 Removed references to Color and Size - they are legacy
 
     TableNo = "NPR Audit Roll";
 
@@ -43,10 +22,7 @@ codeunit 6014577 "NPR Report: TaxFree Receipt"
         AuditRoll.CopyFilters(Rec);
         GetRecords;
 
-        //-NPR5.30 [261964]
         GetOfflineParameters(AuditRoll."Register No.");
-        //+NPR5.30 [261964]
-
 
         Printer.SetFont('A11');
 
@@ -232,6 +208,12 @@ codeunit 6014577 "NPR Report: TaxFree Receipt"
         Error_MissingParameters: Label 'Missing parameters for handler %1 on tax free unit %2';
 
     procedure PrintAuditRoll()
+    var
+        POSStore: Record "NPR POS Store";
+        POSUnit: Record "NPR POS Unit";
+        POSSession: Codeunit "NPR POS Session";
+        POSFrontEnd: Codeunit "NPR POS Front End Management";
+        POSSetup: Codeunit "NPR POS Setup";
     begin
         // Audit Roll, Header (1)
         Printer.SetFont('Control');
@@ -240,33 +222,14 @@ codeunit 6014577 "NPR Report: TaxFree Receipt"
         // Audit Roll, Header (2) - OnPreSection()
         if "NP Retail Configuration".Get() then;
 
-        //-243285 [243285]
-        // IF thisReg.GET( AuditRoll."Register No." ) THEN BEGIN
-        // flgÅbenkasse := TRUE;
-        // IF (AuditRoll."Copy No.") < 0 THEN BEGIN
-        //  //IF NOT thisReg."Money drawer - open on special" THEN BEGIN
-        //    AuditTemp.SETRANGE("Sales Ticket No.",AuditRoll."Sales Ticket No.");
-        //    AuditTemp.SETRANGE(Description);
-        //    AuditTemp.SETRANGE("Sale Type");
-        //    AuditTemp.SETRANGE("No.",'DAN');
-        //    IF AuditTemp.FIND('-') THEN BEGIN
-        //      AuditTemp.SETRANGE("No.",'K');
-        //      AuditTemp.SETFILTER("Amount Including VAT",'<0');
-        //      flgÅbenkasse := AuditTemp.FIND('-');
-        //    END;// Find
-        //  //END; // IF "Money drawer - open on special"
-        // END; // IF Copy No. = 0
-        // END; // IF GET Register
-        // IF ({thisReg."Money drawer attached" AND} flgÅbenkasse) THEN BEGIN
-        //  // Audit Roll, Header (2)
-        //  Printer.SetFont('Control');
-        //  Printer.AddLine(Text10600000);
-        // END;
-
-        // Audit Roll, Header (3)
-        // Printer.SetFont('Control');
-        // Printer.AddLine('a');
-        //+243285 [243285]
+        if POSSession.IsActiveSession(POSFrontEnd) then begin
+            POSFrontEnd.GetSession(POSSession);
+            POSSession.GetSetup(POSSetup);
+            POSSetup.GetPOSStore(POSStore);
+        end else begin
+            if POSUnit.get(Register."Register No.") then
+                POSStore.get(POSUnit."POS Store Code");
+        end;
 
         // Audit Roll, Header (4) - OnPreSection()
         if ("NP Retail Configuration"."Logo on Sales Ticket") then begin
@@ -282,19 +245,19 @@ codeunit 6014577 "NPR Report: TaxFree Receipt"
             // Audit Roll, Header (5)
             Printer.SetFont('B21');
             Printer.SetBold(true);
-            Printer.AddTextField(1, 0, kasse.Name);
+            Printer.AddTextField(1, 0, POSStore.Name);
         end;
 
         // Audit Roll, Header (6) - OnPreSection()
-        if ("NP Retail Configuration"."Name on Sales Ticket") and (kasse."Name 2" <> '') then begin
+        if ("NP Retail Configuration"."Name on Sales Ticket") and (POSStore."Name 2" <> '') then begin
             // Audit Roll, Header (6)
             Printer.SetFont('A11');
             Printer.SetBold(false);
-            Printer.AddTextField(1, 0, kasse."Name 2");
+            Printer.AddTextField(1, 0, POSStore."Name 2");
         end;
 
         // Audit Roll, Body (7) - OnPreSection()
-        if (kasse."Fax No." <> '') then
+        if (POSStore."Fax No." <> '') then
             faxText := Text10600003 else
             faxText := '';
 
@@ -318,31 +281,24 @@ codeunit 6014577 "NPR Report: TaxFree Receipt"
         // Audit Roll, Body (7)
         Printer.SetFont('A11');
         Printer.SetBold(false);
-        Printer.AddTextField(1, 0, kasse.Address);
-        Printer.AddTextField(1, 0, kasse."Post Code" + ' ' + kasse.City);
-        Printer.AddTextField(1, 0, Text10600004 + Format(kasse."Phone No."));
-        Printer.AddTextField(2, 2, faxText + Format(kasse."Fax No."));
-        Printer.AddTextField(1, 0, kasse."E-mail");
-        Printer.AddTextField(1, 0, kasse.Website);
+        Printer.AddTextField(1, 0, POSStore.Address);
+        Printer.AddTextField(1, 0, POSStore."Post Code" + ' ' + POSStore.City);
+        Printer.AddTextField(1, 0, Text10600004 + Format(POSStore."Phone No."));
+        Printer.AddTextField(2, 2, faxText + Format(POSStore."Fax No."));
+        Printer.AddTextField(1, 0, POSStore."E-mail");
+        Printer.AddTextField(1, 0, POSStore."Home Page");
         Printer.AddTextField(1, 0, cvrText + Format(kasse."VAT No."));
     end;
 
     procedure PrintIntegerLoop()
     begin
-        // L¢kke - Properties
         LoopCounter.SetCurrentKey(Number);
-        //-243285 [243285]
-        //LoopCounter.SETFILTER(Number, '1..2');
         LoopCounter.SetFilter(Number, '1');
-        //+243285 [243285]
 
         if LoopCounter.FindSet then
             repeat
 
                 LOOPCurrReport_SKIP := false;
-
-                // L¢kke - OnAfterGetRecord()
-                LoopCounterOnAfterGetRecord();
 
                 if not LOOPCurrReport_SKIP then begin
                     // 2. Company Information
@@ -354,20 +310,11 @@ codeunit 6014577 "NPR Report: TaxFree Receipt"
                     // 2. Audit Roll
                     PrintAuditRollPaymentLines;
 
-                    // 2. NP Retail Configuration
-                    PrintNPRetailConfiguration;
-
-
                     //NewPagePerRecord
                     Printer.SetFont('A11');
                     Printer.AddLine('');
 
                 end //IF NOT LOOPCurrReport_SKIP
-
-            //Printer.SetFont('Control');
-            //Printer.AddLine(Text10000);
-
-
             until LoopCounter.Next = 0;
     end;
 
@@ -460,14 +407,6 @@ codeunit 6014577 "NPR Report: TaxFree Receipt"
                               and (AuditRollSalesLines."Sale Type" <> AuditRollSalesLines."Sale Type"::Comment) then begin
                         if not ((AuditRollSalesLines."Sale Type" = AuditRollSalesLines."Sale Type"::"Out payment") and
                          (AuditRollSalesLines."No." = thisReg."Gift Voucher Discount Account")) then begin
-
-                            //-NPR5.43 [321012]
-                            //IF AuditRollSalesLines."Variant Code" <> '' THEN
-                            //  Design := STRSUBSTNO('%1/%2/%3',AuditRollSalesLines."No.",AuditRollSalesLines.Color,AuditRollSalesLines.Size)
-                            //ELSE
-                            //  Design := AuditRollSalesLines."No.";
-                            //+NPR5.43 [321012]
-
                             if (AuditRollSalesLines."Sale Type" = AuditRollSalesLines."Sale Type"::"Out payment") then
                                 beskrvTXT := Format(AuditRollSalesLines."No.") + ' ' + AuditRollSalesLines.Description
                             else
@@ -544,31 +483,6 @@ codeunit 6014577 "NPR Report: TaxFree Receipt"
                         Printer.SetBold(false);
                         Printer.AddLine(' ' + SerieNrTxt);
                     end;
-
-                    //-NPR5.23 [240916]
-                    //  // Salgslinie, Body (8) - OnPreSection()
-                    //  FRV_STR_txt:='';
-                    //  farvetxt:='';
-                    //  st¢rrelseTXT:='';
-                    //
-                    //  IF variant1.GET(AuditRollSalesLines."No.",AuditRollSalesLines.Color,AuditRollSalesLines.Size) THEN BEGIN
-                    //     IF (variant1."Description - Color"<>Text10600008) THEN BEGIN
-                    //       farvetxt:=Text10600009+FORMAT(variant1."Description - Color");
-                    //       mellemrum:=' ';
-                    //       END
-                    //     ELSE
-                    //       mellemrum:='';
-                    //     IF (variant1."Description - Size"<>'') THEN st¢rrelseTXT:=Text10600010+FORMAT(variant1."Description - Size");
-                    //     END;
-                    //
-                    //  FRV_STR_txt:=farvetxt+mellemrum+st¢rrelseTXT;
-                    //
-                    //  IF FRV_STR_txt<>'' THEN BEGIN
-                    //    Printer.SetFont('B11');
-                    //    Printer.SetBold(FALSE);
-                    //    Printer.AddLine(' '+FRV_STR_txt);
-                    //  END;
-                    //+NPR5.23 [240916]
 
                     // Salgslinie, Body (9) - OnPreSection()
                     VareEnhedTxt := '';
@@ -694,7 +608,6 @@ codeunit 6014577 "NPR Report: TaxFree Receipt"
             until AuditRollSalesLines.Next = 0;
             PrintAuditRollSLFooter();
         end;
-        AuditRollSLOnPostDataItem();
     end;
 
     procedure PrintAuditRollSLFooter()
@@ -711,16 +624,14 @@ codeunit 6014577 "NPR Report: TaxFree Receipt"
         Saldo := AuditRoll1."Amount Including VAT";
         moms := AuditRoll1."Amount Including VAT" - AuditRoll1.Amount;
 
-        //-NPR5.26 [243285]
         SaldoBarcode := Saldo;
-        //+NPR5.26 [243285]
 
         if not (Saldo = 0) then begin
             if (Saldo < 0) then
                 negSaldo := true
             else
                 negSaldo := false;
-            Printer.SetFont('A11');//B21
+            Printer.SetFont('A11');
             Printer.SetBold(true);
             Printer.AddLine('');
             Printer.AddTextField(1, 0, TotalLCYTxt);
@@ -809,26 +720,6 @@ codeunit 6014577 "NPR Report: TaxFree Receipt"
         Printer.AddTextField(1, 0, letterPrice);
     end;
 
-    procedure PrintNPRetailConfiguration()
-    begin
-        // NP Retail Configuration, Body (1) - OnPreSection()
-        //IF NPK."Stregkode på bonudskrift" AND
-        //  (Register."Receipt Printer Type"=Register."Receipt Printer Type"::"TM-T88") THEN
-        //   CurrReport.SHOWOUTPUT(TRUE) ELSE
-        //  CurrReport.SHOWOUTPUT(FALSE);
-        // IF (NPK."Stregkode hvis manglende pris") AND
-        // (Register."Receipt Printer Type"=Register."Receipt Printer Type"::"TM-T88") AND
-        // (Saldo=0) THEN CurrReport.SHOWOUTPUT(TRUE) ELSE CurrReport.SHOWOUTPUT(FALSE);
-
-        //++004
-        //-NPR5.26 [243285]
-        // IF FALSE THEN BEGIN
-        //  Printer.AddBarcode('Barcode3', stregkode ,4);
-        // END;
-        //+NPR5.26 [243285]
-        //--004
-    end;
-
     procedure PrintTaxFree()
     begin
 
@@ -852,10 +743,7 @@ codeunit 6014577 "NPR Report: TaxFree Receipt"
                 Printer.SetFont('B11');
                 Printer.SetBold(false);
 
-                //-NPR5.30 [261964]
-                //CASE Register."Tax Free Country Code" OF
                 case CountryCode of
-                    //-NPR5.30 [261964]
                     '208': //Denmark
                         begin
                             Printer.AddTextField(1, 0, 'This is a VAT form issued by:');
@@ -1041,19 +929,14 @@ codeunit 6014577 "NPR Report: TaxFree Receipt"
                 Printer.AddLine('');
                 Printer.AddLine('');
 
-
                 // 1.NP Retail Configuration2()
                 PrintNPRetailConfiguration2()
 
-until TaxFree.Next = 0;
+        until TaxFree.Next = 0;
     end;
 
     procedure PrintNPRetailConfiguration2()
     begin
-
-        // NP Retail Configuration 2 - OnAfterGetRecord()
-        //COMPRESSARRAY(BonInfo);
-
         // NP Retail Configuration 2, Body (1)
         Printer.SetFont('B11');
         Printer.SetBold(false);
@@ -1062,9 +945,7 @@ until TaxFree.Next = 0;
         Printer.AddTextField(1, 1, NPRetailConfSP + ' ' + BonInfo2);
     end;
 
-    procedure "--- Record Triggers ---"()
-    begin
-    end;
+    //Record Triggers
 
     procedure AuditRollOnPreDataItem()
     begin
@@ -1072,7 +953,7 @@ until TaxFree.Next = 0;
         RetailConfiguration.Get();
         Register.Get(retailformcode.FetchRegisterNumber);
         if thisReg.Get(AuditRoll."Register No.") then;
-        GlobalLanguage := 1033;//ENU
+        GlobalLanguage := 1033;
     end;
 
     procedure AuditRollOnAfterGetRecord()
@@ -1089,55 +970,6 @@ until TaxFree.Next = 0;
             BonInfo2 := StrSubstNo(CopyStr(AuditRoll."Salesperson Code", 1, 30));
     end;
 
-    procedure LoopCounterOnAfterGetRecord()
-    begin
-        // L¢kke - OnAfterGetRecord()
-
-        //-243285 [243285]
-        // CASE LoopCounter.Number OF
-        // 1 : BEGIN
-        //     END;
-        // 2 : BEGIN
-        //
-        //     CLEAR(Saldo);
-        //     CLEAR(revrulle1);
-        //
-        //     IF (AuditRoll."Receipt Type" = AuditRoll."Receipt Type"::"Negative receipt") OR
-        //        (AuditRoll."Receipt Type" = AuditRoll."Receipt Type"::"Return items") OR
-        //        (AuditRoll."Receipt Type" = AuditRoll."Receipt Type"::"Sales in negative receipt")
-        //        AND NOT flgTilgodebevis
-        //        //udbetaling_check OR
-        //       // negSaldo OR
-        //       // (NOT flgNoCopy)
-        //       THEN BEGIN
-        //          Register.GET( RetailFormCode.FetchRegisterNumber);
-        //          Retursalg := TRUE;
-        //          RapportValg.SETRANGE("Report Type",RapportValg."Report Type"::"Return receipt");
-        //          RapportValg.SETFILTER("Report ID",'<>0');
-        //          RapportValg.SETRANGE("Register No.", RetailFormCode.FetchRegisterNumber);
-        //
-        //          revrulle1 := AuditRoll;
-        //          revrulle1.SETRECFILTER;
-        //
-        //          IF NOT RapportValg.FIND('-') THEN
-        //            RapportValg.SETRANGE("Register No.");
-        //
-        //          IF RapportValg.FIND('-') AND NOT flgTilgodebevis THEN //BEGIN
-        //          IF (FORMAT(RapportValg."Report ID") = LOOPCurrReport_OBJECTID) AND NOT flgTilgodebevis
-        //            THEN ERROR(txtError)
-        //           ELSE BEGIN
-        //              REPEAT
-        //                REPORT.RUNMODAL(RapportValg."Report ID", visAnfordring,FALSE,revrulle1);
-        //              UNTIL RapportValg.NEXT = 0;
-        //            END;
-        //          EXIT;//CurrReport.QUIT
-        //       END ELSE
-        //         LOOPCurrReport_SKIP := TRUE;
-        //   END;
-        //END;
-        //+243285 [243285]
-    end;
-
     procedure AuditRollSLOnAfterGetRecord()
     var
         Kasse: Record "NPR Register";
@@ -1146,7 +978,7 @@ until TaxFree.Next = 0;
         with AuditRollSalesLines do begin
 
             if ("Sale Type" = "Sale Type"::"Out payment") then begin
-                Saldo := Saldo;// - Salgslinie."Amount Including VAT";
+                Saldo := Saldo;
                 "Unit Price" := -1 * "Unit Price";
                 flgUdbetal := false;
             end
@@ -1162,31 +994,6 @@ until TaxFree.Next = 0;
                ((Salgslinie."Gift voucher ref." <> '') or (Salgslinie."Credit voucher ref." <> '')) and
                (LoopCounter.Number = 1) then begin
                 flgIndbetal := true;
-                //-NPR5.29 [241549]
-                //    IF Kasse.GET(Salgslinie."Register No.") THEN BEGIN
-                //      IF (Salgslinie."No." = Kasse."Gift Voucher Account") AND
-                //        Gavekort.GET(Salgslinie."Gift voucher ref.") AND NOT
-                //        "NP Retail Configuration"."Gavekorts journal" THEN BEGIN
-                //        Gavekort.FILTERGROUP(2);
-                //        Gavekort.SETRANGE("No.",Gavekort."No.");
-                //        Gavekort.FILTERGROUP(0);
-                //        //Gavekort."Udskriv Gavekort"(FALSE,FALSE);
-                //        flgGavekort:=TRUE;
-                //        IF "NP Retail Configuration"."Copy Sales Ticket on Giftvo." THEN
-                //          flgNoCopy:=FALSE
-                //        ELSE flgNoCopy:=TRUE;
-                //      END;
-                //      IF (Salgslinie."No." = Kasse."Credit Voucher Account") AND
-                //        Tilgodebevis.GET(Salgslinie."Credit voucher ref.") THEN BEGIN
-                //        Tilgodebevis.FILTERGROUP(2);
-                //        Tilgodebevis.SETRANGE("No.",Tilgodebevis."No.");
-                //        Tilgodebevis.FILTERGROUP(0);
-                //        //Tilgodebevis."Udskriv tilgodebevis"(FALSE,FALSE);
-                //        flgTilgodebevis := TRUE;
-                //        flgNoCopy:=TRUE;
-                //      END;
-                //    END;
-                //+NPR5.29 [241549]
             end;
 
             if (Salgslinie."Sale Type" = Salgslinie."Sale Type"::Deposit) and
@@ -1197,20 +1004,6 @@ until TaxFree.Next = 0;
 
 
         end;
-    end;
-
-    procedure AuditRollSLOnPostDataItem()
-    begin
-        // Salgslinie - OnPostDataItem()
-        //-NPR5.29 [241549]
-        // IF (RetailConfiguration."Gavekorts journal") AND
-        //   (BonnrGavekort<>'') AND
-        //   RetailConfiguration."Gavekorts journal" THEN BEGIN
-        //     flgGavekort:=TRUE;
-        //     flgNoCopy:=TRUE;
-        //     Gavekort."Udskriv Gavekorts Journal"(BonnrGavekort);
-        // END;
-        //+NPR5.29 [241549]
     end;
 
     procedure AuditRollPLOnAfterGetRecord()
@@ -1230,11 +1023,6 @@ until TaxFree.Next = 0;
         letterNine: Label 'nine_';
         letterComma: Label 'comma_';
     begin
-        // Betalingslinie - OnAfterGetRecord()
-
-        //-243285 [243285]
-        //Saldo := AuditRollPaymentLines.Amount;
-        //+243285 [243285]
         Clear(letterPrice);
         refund := "Calculate Refund Amount"(Saldo);
         letterPriceTmp := Format(refund, 0, '<Precision,2:2><Standard Format,1>');
@@ -1278,18 +1066,12 @@ until TaxFree.Next = 0;
         Clear(Barcode1);
         Clear(Barcode2);
 
-        //-NPR5.30 [261964]
-        //CASE Register."Tax Free Country Code" OF
         case CountryCode of
-            //+NPR5.30 [261964]
             '208': // Denmark -> Print old danish barcode standard
                 begin
 
                     Barcode1 := 'DI' +
-                                //-NPR5.30 [261964]
-                                //                  COPYSTR(padstr2(FORMAT(Register."Tax Free Merchant ID"), 5, '0'),1,5) +
                                 CopyStr(padstr2(Format(MerchantID), 5, '0'), 1, 5) +
-                                //+NPR5.30 [261964]
                                 CopyStr(padstr2(Format(Register."Register No."), 2, '0'), 1, 2);
 
                     Barcode1 += CopyStr(padstr2(AuditRoll."Sales Ticket No.", 5, '0'), 1, 5);
@@ -1305,11 +1087,7 @@ until TaxFree.Next = 0;
                 begin
                     Barcode1 := //Barcode version:
                                 '2' +
-                                //Country Code ISO 3166-1:
-                                //-NPR5.30 [261964]
                                 CopyStr(padstr2(Format(CountryCode), 3, '0'), 1, 3) +
-                                //                  COPYSTR(padstr2(FORMAT(Register."Tax Free Country Code"),3,'0'),1,3) +
-                                //+NPR5.30 [261964]
                                 //Sale Type:                    Single Sale, Cash Refund:
                                 '1' +
                                 //Voucher Issuing system:       Premier Manual Handwritten Form:
@@ -1317,10 +1095,7 @@ until TaxFree.Next = 0;
                                 //Source back office indicator: AX:
                                 '2' +
                                 //Tax Free Customer Number:
-                                //-NPR5.30 [261964]
                                 CopyStr(padstr2(Format(MerchantID), 6, '0'), 1, 6) +
-                                //                  COPYSTR(padstr2(FORMAT(Register."Tax Free Merchant ID"),6,'0'),1,6) +
-                                //+NPR5.30 [261964]
                                 //Till ID:
                                 CopyStr(padstr2(Format(Register."Register No."), 2, '0'), 1, 2) +
                                 //Our voucher no.:
@@ -1331,18 +1106,12 @@ until TaxFree.Next = 0;
                                 //VAT Rate:
                                 '1' +
                                 //Date:
-                                //-NPR5.30 [261964]
-                                //                  COPYSTR(FORMAT(DATE2DMY(TODAY,3)),4,1) + FORMAT(TODAY - DMY2DATE(1,1,DATE2DMY(TODAY,3))) +
                                 CopyStr(Format(Date2DMY(Today, 3)), 4, 1) + CopyStr(padstr2(Format(Today - DMY2Date(1, 1, Date2DMY(Today, 3))), 3, '0'), 1, 3) +
-                                //+NPR5.30 [261964]
                                 //Sale Price:
                                 CopyStr(padstr2(DelChr(Format(SaldoBarcode, 0, '<Precision,2:2><Standard Format,2>'), '=', ',.'), 12, '0'), 1, 12) +
                                 //Filler:
                                 '0000';
-                    //-NPR5.30 [261964]
-                    //      Barcode2 += FORMAT((calcChecksum(Barcode1) + calcChecksum(Barcode2)) MOD 87);
                     Barcode2 += CopyStr(padstr2(Format((calcChecksum(Barcode1) + calcChecksum(Barcode2)) mod 87), 2, '0'), 1, 2);
-                    //+NPR5.30 [261964]
                 end;
         end;
 
@@ -1359,9 +1128,7 @@ until TaxFree.Next = 0;
         end;
     end;
 
-    procedure "-- Init --"()
-    begin
-    end;
+    //Init
 
     procedure GetRecords()
     begin
@@ -1389,9 +1156,6 @@ until TaxFree.Next = 0;
         Betalt := 0;
         ReturAfrunding := 0;
         BonInfo := '';
-        //-NPR5.43 [321012]
-        //Design := '';
-        //+NPR5.43 [321012]
         BonDato := 0D;
         Clear(Bontext);
         Retursalg := false;
@@ -1453,27 +1217,12 @@ until TaxFree.Next = 0;
         tmpHandlerParameters: Record "NPR Tax Free Handler Param." temporary;
         Variant: Variant;
     begin
-        //-NPR5.30 [261964]
         TaxFreeUnit.Get(POSUnitNo);
-
-        //-NPR5.40 [293106]
-        // tmpHandlerParameters.Parameter := 'Merchant ID';
-        // tmpHandlerParameters."Data Type" := tmpHandlerParameters."Data Type"::Text;
-        // tmpHandlerParameters.INSERT;
-        //
-        // tmpHandlerParameters.Parameter := 'VAT Number';
-        // tmpHandlerParameters."Data Type" := tmpHandlerParameters."Data Type"::Text;
-        // tmpHandlerParameters.INSERT;
-        //
-        // tmpHandlerParameters.Parameter := 'Country Code';
-        // tmpHandlerParameters."Data Type" := tmpHandlerParameters."Data Type"::Integer;
-        // tmpHandlerParameters.INSERT;
 
         tmpHandlerParameters.AddParameter('Merchant ID', tmpHandlerParameters."Data Type"::Text);
         tmpHandlerParameters.AddParameter('VAT Number', tmpHandlerParameters."Data Type"::Text);
         tmpHandlerParameters.AddParameter('Country Code', tmpHandlerParameters."Data Type"::Integer);
         tmpHandlerParameters.AddParameter('Minimum Amount Limit', tmpHandlerParameters."Data Type"::Decimal);
-        //+NPR5.40 [293106]
 
         tmpHandlerParameters.DeserializeParameterBLOB(TaxFreeUnit);
 
@@ -1488,24 +1237,15 @@ until TaxFree.Next = 0;
 
         if (StrLen(MerchantID) = 0) or (StrLen(VATNumber) = 0) or (StrLen(CountryCode) = 0) then
             Error(Error_MissingParameters, TaxFreeUnit."Handler ID", TaxFreeUnit."POS Unit No.");
-        //+NPR5.30 [261964]
     end;
 
-    procedure "-- Report Functions --"()
-    begin
-    end;
+    //Report Functions
 
     procedure padstr2(str: Text; length: Integer; padString: Text[1]): Text
     var
         i: Integer;
         PaddedStr: Text;
     begin
-        //-NPR5.26 [243285]
-        //outStr := FORMAT(str);
-
-        // FOR i := STRLEN(FORMAT(str)) TO lenght-1 DO
-        //  outStr := padString+outStr;
-
         if StrLen(str) >= length then
             exit(str);
 
@@ -1514,7 +1254,6 @@ until TaxFree.Next = 0;
             PaddedStr := padString + PaddedStr;
 
         exit(PaddedStr);
-        //+NPR5.26 [243285]
     end;
 
     procedure calcChecksum(Value: Code[30]): BigInteger
@@ -1522,17 +1261,8 @@ until TaxFree.Next = 0;
         CRC32: DotNet NPRNetCRC32;
         calcInt: BigInteger;
     begin
-        //-NPR5.26 [243285]
         Evaluate(calcInt, CRC32.GetCRC32(Value));
         exit(calcInt);
-        // calcValue := CRC32.GetCRC32(barcode1+barcode2);
-        // IF EVALUATE(calcInt, calcValue) THEN
-        //  EXIT(FORMAT(calcInt MOD 72))
-        // ELSE
-        //  //ERROR('Automation returnerede dårligt resultat. Kontakt dit Navision Kundecenter \fejl: %1\%2',calcValue,calcInt);
-        //  //Removed error message. Caused errors in audit roll.
-        //  EXIT('-1');
-        //+NPR5.26 [243285]
     end;
 
     procedure "Calculate Refund Amount"(Saldo: Decimal) Refund: Decimal

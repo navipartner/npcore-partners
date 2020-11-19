@@ -1,19 +1,5 @@
 report 6014410 "NPR Sales Ticket A4"
 {
-    // NPR4.14/TR/20150805 CASE 218865 Report build on Sales Ticket design in codeunit 6014560.
-    // NPR4.14/RMT/20150715  CASE 216519 Added
-    // NPR5.23/JDH /20160513 CASE 240916 Removed old VariaX Solution
-    // NPR5.29/JLK /20161221 CASE 261538 Removed hardcoded Item in RDLC
-    // NPR5.49/BHR /20190207 CASE 343119 Correct report as per OMA
-    // NPR5.51/MITH/20190626 CASE 355048 Changed the variable to use for calculating totals.
-    // NPR5.51/ZESO/20190704 CASE 357511 Display summary of different VAT%, Added DataItem Audit Roll Group VAT Totals
-    // NPR5.51/ANPA/20190711 CASE 359431 Changed the length of email in layout, split amount and price into two values, space added between serial no and next line,
-    //                                   space between serial no. and text and removed "show customer info on ticket" parameter.
-    //                                   Split quantity and price into two columns.
-    // NPR5.51/ANPA/20190722 CASE 362537 Always showing discount
-    // NPR5.52/ANPA/20191009  CASE 359431 Added DiscountTxt value
-    // NPR5.52/ANPA/20191004  CASE 371523 Added Sales Type as parameter
-    // NPR5.53/ALPO/20191024 CASE 371955 Rounding related fields moved to POS Posting Profiles
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Sales Ticket A4.rdlc';
 
@@ -45,25 +31,25 @@ report 6014410 "NPR Sales Ticket A4"
             column(RegisterNo_Register; Register."Register No.")
             {
             }
-            column(Name_Register; Register.Name)
+            column(Name_Register; POSStore.Name)
             {
             }
-            column(Addres_Register; Register.Address)
+            column(Addres_Register; POSStore.Address)
             {
             }
-            column(City_Register; Register.City)
+            column(City_Register; POSStore.City)
             {
             }
-            column(PostCode_Register; Register."Post Code")
+            column(PostCode_Register; POSStore."Post Code")
             {
             }
-            column(Telephone_Register; Register."Phone No.")
+            column(Telephone_Register; POSStore."Phone No.")
             {
             }
-            column(Email_Register; Register."E-mail")
+            column(Email_Register; POSStore."E-mail")
             {
             }
-            column(Website_Register; Register.Website)
+            column(Website_Register; POSStore."Home Page")
             {
             }
             column(VATNo_Register; Register."VAT No.")
@@ -167,34 +153,20 @@ report 6014410 "NPR Sales Ticket A4"
                         AmountLine := "Amount Including VAT";
                     end else
                         if (Type = Type::Comment) and ("Sales Document No." <> '') and ("Unit Price" <> 0) then begin
-                            //-NPR5.51 [359431]
-                            //QuantityLine := FORMAT(Quantity) + ' * ' + FORMAT("Unit Price",0,'<Precision,2:2><Standard Format,0>');
                             QuantityLine := Format(Quantity);
                             UnitPriceExclDiscountLine := Format("Unit Price", 0, '<Precision,2:2><Standard Format,0>');
-                            //+NPR5.51 [359431]
                         end;
 
                     if RetailSetup."Description 2 on receipt" and ("Description 2" <> '') then
                         DescriptionLine2 := "Description 2";
 
                     if ("Audit Roll"."Amount Including VAT" <> 0) and (Type = Type::Item) then begin
-                        //-NPR5.51 [359431]
-                        //IF RetailSetup."Unit Price on Sales Ticket" AND (Quantity <> 0) THEN
                         if RetailSetup."Unit Price on Sales Ticket" and (Quantity <> 0) then begin
-
-                            //QuantityAmountLine := FORMAT(Quantity) + ' * ' +
-                            //FORMAT(("Amount Including VAT" + "Line Discount Amount") /
-                            //Quantity,0,'<Precision,2:2><Standard Format,0>')
                             QuantityLine := Format(Quantity);
                             UnitPriceExclDiscountLine := Format(("Amount Including VAT" + "Line Discount Amount") /
                                                           Quantity, 0, '<Precision,2:2><Standard Format,0>');
-                        end
-                        //+NPR5.51 [359431]
-                        else
-                            //-NPR5.51 [359431]
-                            //QuantityAmountLine := FORMAT(Quantity);
+                        end else
                             QuantityLine := Format(Quantity);
-                        //+NPR5.51 [359431]
 
                         if (Type = Type::Item) then
                             ItemNo := "No.";
@@ -215,15 +187,12 @@ report 6014410 "NPR Sales Ticket A4"
                         UnitPriceInlcDiscountLine := "Amount Including VAT" / Quantity;
                     end;
 
-                    //-362537 [362537]
-                    //IF ("Line Discount %" <> 0) AND (RetailSetup."Show Discount Percent") THEN BEGIN
                     if ("Line Discount %" <> 0) then begin
                         LineDiscountPct := AuditRollSale."Line Discount %";
                         LineDiscountPctNew := '-' + Format(AuditRollSale."Line Discount %", 0, '<Precision,2:2><Standard Format,0>') + '%';
                         LineDiscountAmount := '-' + Format(AuditRollSale."Line Discount Amount", 0, '<Precision,2:2><Standard Format,0>');
 
                     end;
-                    //+362537 [362537]
 
                     PrintLineVariantDesc(AuditRollSale);
 
@@ -233,11 +202,9 @@ report 6014410 "NPR Sales Ticket A4"
                     ShowOutPayment := "Sale Type" = "Sale Type"::"Out payment";
                     ShowDeposit := "Sale Type" = "Sale Type"::Deposit;
 
-                    //+NPR5.29
                     Clear(IsItem);
                     if Type = Type::Item then
                         IsItem := true;
-                    //-NPR5.29
                 end;
             }
             dataitem(AuditRollFinance; "NPR Audit Roll")
@@ -263,21 +230,7 @@ report 6014410 "NPR Sales Ticket A4"
                         PaymentTypePOS.SetFilter("Processing Type", '%1|%2', PaymentTypePOS."Processing Type"::"Gift Voucher", PaymentTypePOS."Processing Type"::"Credit Voucher");
 
                         FlagCustomerPayment := PaymentTypePOS.IsEmpty;
-
-                        //TODO
-                        //  IF FlagCustomerFound AND NOT FlagGiftVoucher THEN BEGIN
-                        //    Printer.AddLine(Text10600026);
-                        //    Printer.AddLine(Text10600027 + ' ' + FORMAT("No."));
-                        //    Printer.AddLine(FORMAT("Buffer Document Type")+' '+"Buffer ID");
-                        //  END ELSE BEGIN
-                        //    IF NOT FlagCreditVoucher AND NOT (FlagGiftVoucher) THEN
-                        //      Printer.AddLine('Indbetaling:');
-                        //    IF FlagCreditVoucher AND NOT (FlagGiftVoucher) THEN BEGIN
-                        //      Printer.AddLine('Udstedt:');
-                        //    END;
-                        //  END;
                     end;
-                    //TODO
 
                     if ("Sale Type" = "Sale Type"::Deposit) and not FlagGiftVoucher then
                         FinansDescriptionLine := Description + ' ' + Format("Credit voucher ref.");
@@ -355,31 +308,36 @@ report 6014410 "NPR Sales Ticket A4"
 
             trigger OnAfterGetRecord()
             var
+                POSUnit: Record "NPR POS Unit";
+                POSSession: Codeunit "NPR POS Session";
+                POSFrontEnd: Codeunit "NPR POS Front End Management";
+                POSSetup: Codeunit "NPR POS Setup";
                 QueryVATTotals: Query "NPR VAT Totals";
                 varLineNo: Integer;
             begin
                 Register.Get("Audit Roll"."Register No.");
-                //-NPR5.53 [371955]
                 POSUnit.Get("Register No.");
                 POSSetup.SetPOSUnit(POSUnit);
-                //+NPR5.53 [371955]
                 RetailSetup.Get;
                 if SalespersonPurchaser.Get("Audit Roll"."Salesperson Code") then;
+                clear(POSStore);
+                if POSSession.IsActiveSession(POSFrontEnd) then begin
+                    POSFrontEnd.GetSession(POSSession);
+                    POSSession.GetSetup(POSSetup);
+                    POSSetup.GetPOSStore(POSStore);
+                end else begin
+                    if POSUnit.get(Register."Register No.") then
+                        POSStore.get(POSUnit."POS Store Code");
+                end;
                 Clear(AuditRollTotals);
                 AuditRollTotals."Amount Including VAT" := 0;
                 AuditRollTotals.Amount := 0;
                 AuditRollTotals."Line Discount Amount" := 0;
 
-                //-NPR5.51 [359431]
-                //IF Customer.GET("Customer No.") AND  (RetailSetup."Show Customer info on ticket") AND ("Customer Type" = "Customer Type"::"Ord.") THEN
                 if Customer.Get("Customer No.") and ("Customer Type" = "Customer Type"::"Ord.") then
-                    //+NPR5.51 [359431]
                     PrintCustomerInfo
-                //-NPR5.51 [359431]
-                //ELSE IF Contact.GET("Customer No.") AND  (RetailSetup."Show Customer info on ticket") AND ("Customer Type" = "Customer Type"::Cash) THEN
                 else
                     if Contact.Get("Customer No.") and ("Customer Type" = "Customer Type"::Cash) then
-                        //+NPR5.51 [359431]
                         PrintContactInfo
                     else
                         if Customer.Get("Customer No.") and ("Customer Type" = "Customer Type"::"Ord.") then
@@ -391,7 +349,6 @@ report 6014410 "NPR Sales Ticket A4"
                 SetGiftCreditVoucherFlags;
                 Clear(AuditRollFinance);
 
-                //-NPR5.51 [357511]
                 if not "Audit Roll Group VAT Totals".FindFirst then begin
                     "Audit Roll Group VAT Totals".DeleteAll;
                     varLineNo := 1;
@@ -412,7 +369,6 @@ report 6014410 "NPR Sales Ticket A4"
                         end;
                     end;
                 end;
-                //+NPR5.51 [357511]
             end;
         }
         dataitem("Integer"; "Integer")
@@ -606,6 +562,7 @@ report 6014410 "NPR Sales Ticket A4"
         IsItem: Boolean;
         UnitPriceExclDiscountLine: Text;
         varTotalVat: Decimal;
+        POSStore: Record "NPR POS Store";
 
     local procedure "--ContactInfo"()
     begin
@@ -626,10 +583,7 @@ report 6014410 "NPR Sales Ticket A4"
         ContactName := Contact.Name;
         ContactAddress := Contact.Address;
         ContactPostCode := Contact."Post Code";
-        //-NPR5.29
-        //ContactCity := Customer.City;
         ContactCity := Contact.City;
-        //-NPR5.29
     end;
 
     procedure PrintStaffSaleInfo()
@@ -648,14 +602,7 @@ report 6014410 "NPR Sales Ticket A4"
     var
         ItemVariant: Record "Item Variant";
     begin
-        //-NPR5.23 [240916]
-        // ColorDesc := '';
-        // VariantDesc := '';
-        // SizeDesc := '';
-        //+NPR5.23 [240916]
-
         with AuditRoll do begin
-            //Variety
             if ItemVariant.Get("No.", "Variant Code") and
                ((ItemVariant."NPR Variety 1" <> '') or
                 (ItemVariant."NPR Variety 2" <> '') or
@@ -663,32 +610,7 @@ report 6014410 "NPR Sales Ticket A4"
                 (ItemVariant."NPR Variety 4" <> '')) then begin
                 VariantDesc := ItemVariant.Description;
             end;
-            //-NPR5.23 [240916]
-            //   ELSE IF VarianceSetUp.GET("No.",Color,Size) THEN BEGIN
-            //  //Color/Size
-            //    IF (VarianceSetUp."Description - Color" <> Text10600008) THEN
-            //      ColorDesc := Text10600009 + FORMAT(VarianceSetUp."Description - Color") + ' ';
-            //    IF (VarianceSetUp."Description - Size"<>'') THEN
-            //      SizeDesc  := Text10600010 + FORMAT(VarianceSetUp."Description - Size");
-            //  END ELSE IF VariaXConfiguration.GET() THEN BEGIN
-            //  //VariaX
-            //    IF VariaXDimCombination.GET("Variant Code","No.",VariaXConfiguration."Color Dimension") THEN BEGIN
-            //      VariaXDimCombination.CALCFIELDS(Description);
-            //      ColorDesc := Text10600009 + FORMAT(VariaXDimCombination.Description) + ' ';
-            //    END;
-            //    IF VariaXDimCombination.GET("Variant Code","No.",VariaXConfiguration."Size Dimension") THEN BEGIN
-            //      VariaXDimCombination.CALCFIELDS(Description);
-            //      SizeDesc := Text10600010 + FORMAT(VariaXDimCombination.Description);
-            //    END;
-            //  END;
-            //+NPR5.23 [240916]
-
         end;
-
-        //-NPR5.23 [240916]
-        // IF VariantDesc = '' THEN
-        //  VariantDesc := ColorDesc + SizeDesc;
-        //+NPR5.23 [240916]
     end;
 
     local procedure ResetVariables()
@@ -699,11 +621,9 @@ report 6014410 "NPR Sales Ticket A4"
         ItemInfo := '';
         ItemInfo2 := '';
         ItemNo := '';
-        // -362537 [362537]
         LineDiscountPct := 0;
         LineDiscountPctNew := '';
         LineDiscountAmount := '';
-        // +362537 [362537]
         QuantityAmountLine := '';
         QuantityLine := '';
         UnitPriceInlcDiscountLine := 0;
@@ -716,14 +636,9 @@ report 6014410 "NPR Sales Ticket A4"
 
     local procedure CalcSaleLineTotals(var AuditRoll: Record "NPR Audit Roll")
     begin
-        //-NPR5.51
-        //AuditRollTotals."Amount Including VAT" += "Audit Roll"."Amount Including VAT";
-        //AuditRollTotals.Amount += "Audit Roll".Amount;
-        //AuditRollTotals."Line Discount Amount" += "Audit Roll"."Line Discount Amount";
         AuditRollTotals."Amount Including VAT" += AuditRoll."Amount Including VAT";
         AuditRollTotals.Amount += AuditRoll.Amount;
         AuditRollTotals."Line Discount Amount" += AuditRoll."Line Discount Amount";
-        //+NPR5.51
     end;
 
     procedure AuditRollSalesOnAfterGetRecord(var AuditRollSales: Record "NPR Audit Roll") DoNotSkip: Boolean
@@ -733,17 +648,14 @@ report 6014410 "NPR Sales Ticket A4"
             if (Type = Type::Item) and Item.Get("No.") and Item."NPR No Print on Reciept" then
                 exit(false);
 
-            //IF ("Amount Including VAT" <> 0) AND (Type = Type::"G/L") AND ("No." = Register.Rounding) THEN BEGIN  //NPR5.53 [371955]-revoked
-            if ("Amount Including VAT" <> 0) and (Type = Type::"G/L") and ("No." = POSSetup.RoundingAccount(true)) then begin  //NPR5.53 [371955]
+            if ("Amount Including VAT" <> 0) and (Type = Type::"G/L") and ("No." = POSSetup.RoundingAccount(true)) then begin
                 SubCurrencyGL := "Amount Including VAT";
                 exit(false);
             end;
 
-            //* If there is a returned item, display the return receipt *
             if Quantity < 0 then
                 FlagReturnSale := true;
 
-            //* If payout. use negative amount *
             if "Sale Type" = "Sale Type"::"Out payment" then begin
                 "Unit Price" *= -1;
                 "Amount Including VAT" *= -1;
@@ -751,7 +663,6 @@ report 6014410 "NPR Sales Ticket A4"
                 FlagOutPayment := true;
             end;
 
-            //* If pay-in. Set the flag *
             if ("Sale Type" = "Sale Type"::Deposit) and (Type = Type::Customer) then begin
                 FlagCustomerPayment := true;
                 if "Sales Document Prepayment" then
@@ -783,7 +694,6 @@ report 6014410 "NPR Sales Ticket A4"
     var
         AuditRoll2: Record "NPR Audit Roll";
     begin
-        //-NPR4.14
         AuditRoll2.CopyFilters("Audit Roll");
         AuditRoll2.SetRange("Sale Type", AuditRoll2."Sale Type"::Deposit);
         AuditRoll2.SetRange(Type, AuditRoll2.Type::Customer);
@@ -791,11 +701,9 @@ report 6014410 "NPR Sales Ticket A4"
         FlagDepositPayment := true;
         if AuditRoll2.FindSet then
             repeat
-                //IF NOT AuditRoll2."Sales Document Prepayment" THEN
                 if (AuditRoll2."Sales Document No." = '') then
                     FlagDepositPayment := false;
             until (AuditRoll2.Next = 0) or (not FlagDepositPayment);
-        //+NPR4.14
     end;
 }
 

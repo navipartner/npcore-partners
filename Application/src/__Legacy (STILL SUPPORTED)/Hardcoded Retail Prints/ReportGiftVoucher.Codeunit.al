@@ -13,13 +13,6 @@ codeunit 6014561 "NPR Report - Gift Voucher"
     // 
     //  The function GetRecords, applies table filters to the necesarry data
     //  elements of the report, base on the codeunits run argument Rec: Record "Gift Voucher".
-    // 
-    // NPR4.02/MMV/20150416 CASE 211666 Added some missing norwegian translations to text constants.
-    // NPR4.11/MMV/20150508 CASE 205310 Added validity period
-    // NPR4.11/MMV/20150617 CASE 205310 Replaced above change with new field 90
-    // NPR5.26/MMV /20160916 CASE 249408 Moved control codes from captions to in-line strings.
-    // NPR5.29/MMV /20161109 CASE 241549 Replaced hardcoded caption.
-    // NPR5.40/TS  /20180305 CASE 304119 Added line External Reference No.
 
     TableNo = "NPR Gift Voucher";
 
@@ -113,28 +106,18 @@ codeunit 6014561 "NPR Report - Gift Voucher"
         Printer.SetFont('Control');
         //Gift Voucher, Header(1) - OnPreSection
         if (LoopCounter = 2) and (Register."Receipt Printer Type" = Register."Receipt Printer Type"::"TM-T88") then
-            //-NPR5.26 [249408]
-            //Printer.AddLine(Text10600008);
             Printer.AddLine('P');
-        //+NPR5.26 [249408]
 
         //Gift Voucher, Header(2) - OnPreSection
         if (RetailConfiguration."Logo on Sales Ticket") and (Register."Receipt Printer Type" = Register."Receipt Printer Type"::
         "TM-T88") then begin
-            //-NPR5.26 [249408]
-            //  Printer.AddLine(Text10600000);
-            //  Printer.AddLine(Text10600011);
             Printer.AddLine('G');
             Printer.AddLine('h');
-            //+NPR5.26 [249408]
         end;
 
         //Gift Voucher, Header(3) - OnPreSection
         if (LoopCounter = 2) and (Register."Receipt Printer Type" = Register."Receipt Printer Type"::Samsung) then
-            //-NPR5.26 [249408]
-            //  Printer.AddLine(Text10600008);
             Printer.AddLine('P');
-        //+NPR5.26 [249408]
 
         //Gift Voucher, Header(4) - OnPreSection
         if (RetailConfiguration."Logo on Sales Ticket") and (Register."Receipt Printer Type" = Register."Receipt Printer Type"::Samsung) then
@@ -145,21 +128,36 @@ codeunit 6014561 "NPR Report - Gift Voucher"
     end;
 
     procedure PrintBody()
+    var
+        POSStore: Record "NPR POS Store";
+        POSUnit: Record "NPR POS Unit";
+        POSSession: Codeunit "NPR POS Session";
+        POSFrontEnd: Codeunit "NPR POS Front End Management";
+        POSSetup: Codeunit "NPR POS Setup";
     begin
         //Gift Voucher, Body(5) - OnPreSection
         if Register.Get(GiftVoucher."Register No.") then;
         Printer.SetFont('B21');
         Printer.SetBold(true);
+        if POSSession.IsActiveSession(POSFrontEnd) then begin
+            POSFrontEnd.GetSession(POSSession);
+            POSSession.GetSetup(POSSetup);
+            POSSetup.GetPOSStore(POSStore);
+        end else begin
+            if POSUnit.get(Register."Register No.") then
+                POSStore.get(POSUnit."POS Store Code");
+        end;
         if RetailConfiguration."Name on Sales Ticket" then
-            Printer.AddLine(Register.Name);
+            Printer.AddLine(POSStore.Name);
 
         //Gift Voucher, Body(6) - OnPreSection
         Printer.SetFont('A11');
         Printer.SetBold(false);
-        Printer.AddLine(Register.Address);
-        Printer.AddLine(Register."Post Code" + ' ' + Register.City);
-        Printer.AddLine(Text10600001 + Format(Register."Phone No."));
-        Printer.AddLine(Text10600012 + Format(Register."E-mail"));
+
+        Printer.AddLine(POSStore.Address);
+        Printer.AddLine(POSStore."Post Code" + ' ' + POSStore.City);
+        Printer.AddLine(Text10600001 + Format(POSStore."Phone No."));
+        Printer.AddLine(Text10600012 + Format(POSStore."E-mail"));
         Printer.AddLine(Text10600003 + Format(Register."VAT No."));
 
         Printer.SetFont('B21');
@@ -169,9 +167,7 @@ codeunit 6014561 "NPR Report - Gift Voucher"
         Printer.AddTextField(2, 2, GiftVoucher."No.");
         Printer.AddTextField(1, 0, GiftVoucherTxt);
         Printer.AddDecimalField(2, 2, GiftVoucher.Amount);
-        //-NPR5.40
         Printer.AddLine(WebshopCode + ' ' + GiftVoucher."External Reference No.");
-        //+NPR5.40
         //Gift Voucher, Body(7) - OnPreSection
         if KopiTXT <> '' then begin
             Printer.SetFont('B21');
@@ -199,10 +195,8 @@ codeunit 6014561 "NPR Report - Gift Voucher"
         //Gift Voucher, Body(9) - OnPreSection
         Printer.SetFont('B11');
         Printer.AddLine('');
-        //-NPR4.11
         if RetailConfiguration."Gift and Credit Valid Period" <> 0 then
             Printer.AddTextField(2, 1, StrSubstNo(ValidUntilTxt, RetailConfiguration."Gift and Credit Valid Period"));
-        //+NPR4.11
         Printer.AddTextField(2, 1, InvalidWithoutCompTxt);
     end;
 
@@ -236,10 +230,7 @@ codeunit 6014561 "NPR Report - Gift Voucher"
         if Salesperson.Get(GiftVoucher."Salesperson Code") then;
 
         if RetailConfiguration."Salesperson on Sales Ticket" then
-            //-NPR5.29 [241549]
-            //  EkspedientTxt := 'Ekspedient '+FORMAT(Salesperson.Name)
             EkspedientTxt := StrSubstNo('%1 %2', SalespersonTxt, Format(Salesperson.Name))
-        //+NPR5.29 [241549]
         else
             EkspedientTxt := '';
 
@@ -273,10 +264,7 @@ codeunit 6014561 "NPR Report - Gift Voucher"
         Printer.AddLine('');
 
         Printer.SetFont('Control');
-        //-NPR5.26 [249408]
-        // Printer.AddLine(Text10600008);
         Printer.AddLine('P');
-        //+NPR5.26 [249408]
     end;
 }
 

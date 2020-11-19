@@ -1,14 +1,5 @@
 report 6014447 "NPR Sales Invoice A4 (Retail)"
 {
-    // NPR70.00.00.00/LS/ CASE 155078 : Convert Report to Nav 2013
-    //     Dias1.1b v.Simon Schoebel d.17-10-05
-    //     Har gjort bredden af feltet vare nr.
-    // 
-    // NPR4.12/TSA/20150703 CASE 216800 - Created W1 Version, adding wrappers on DK local fields
-    // NPR4.16/LS/20151022  CASE 225607 removed curly braces in Documentation trigger 2nd line
-    // NPR5.38/JLK /20180124 CASE 300892 Removed AL Error on obsolite property CurrReport_PAGENO
-    // NPR5.38/JLK /20180125 CASE 303595 Added ENU object caption
-    // NPR5.49/BHR /20190115  CASE 341969 Corrections as per OMA Guidelines
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Sales Invoice A4 (Retail).rdlc';
 
@@ -223,8 +214,6 @@ report 6014447 "NPR Sales Invoice A4 (Retail)"
                             MomsBeloebLinieTemp."VAT Base" := Amount;
                             MomsBeloebLinieTemp."Amount Including VAT" := "Amount Including VAT";
                             MomsBeloebLinieTemp.InsertLine;
-
-                            //-NPR70.00.00.00/LS/
                             case "Sales Invoice Line".Type of
                                 "Sales Invoice Line".Type::Item:
                                     begin
@@ -249,7 +238,6 @@ report 6014447 "NPR Sales Invoice A4 (Retail)"
                                         SalesInvLineType := '';
                                     end;
                             end;
-                            //+NPR70.00.00.00/LS/
                         end;
 
                         trigger OnPreDataItem()
@@ -261,7 +249,6 @@ report 6014447 "NPR Sales Invoice A4 (Retail)"
                             if not FlereLinier then
                                 CurrReport.Break;
                             SetRange("Line No.", 0, "Line No.");
-                            CurrReport.CreateTotals(Amount, "Amount Including VAT", "Inv. Discount Amount");
                         end;
                     }
                     dataitem(MomsTaeller; "Integer")
@@ -278,7 +265,6 @@ report 6014447 "NPR Sales Invoice A4 (Retail)"
                             if MomsBeloebLinieTemp.Count <= 1 then
                                 CurrReport.Break;
                             SetRange(Number, 1, MomsBeloebLinieTemp.Count);
-                            CurrReport.CreateTotals(MomsBeloebLinieTemp."VAT Base", MomsBeloebLinieTemp."VAT Amount");
                         end;
                     }
                     dataitem("I alt"; "Integer")
@@ -299,16 +285,11 @@ report 6014447 "NPR Sales Invoice A4 (Retail)"
 
                 trigger OnAfterGetRecord()
                 begin
-                    //-NPR70.00.00.00/LS
                     if Number > 1 then begin
                         CopyText := CopyTextStr;
                         OutputNo += 1;
                     end;
-                    //+NPR70.00.00.00/LS
 
-                    //-NPR5.38
-                    //CurrReport.PAGENO := 1;
-                    //+NPR5.38
                     if "Sales Invoice Header"."No. Printed" > 0 then
                         CopyText := CopyTextStr;
                 end;
@@ -329,9 +310,8 @@ report 6014447 "NPR Sales Invoice A4 (Retail)"
 
                     SetRange(Number, 1, LoekkeAntal);
 
-                    //-NPR70.00.00.00/LS
                     OutputNo := 1;
-                    //+NPR70.00.00.00/LS
+
                 end;
             }
 
@@ -339,10 +319,15 @@ report 6014447 "NPR Sales Invoice A4 (Retail)"
             var
                 Comments: Record "Sales Comment Line";
                 Register: Record "NPR Register";
-                Retailformcode: Codeunit "NPR Retail Form Code";
-                RestBeloeb: Decimal;
                 Debpost: Record "Cust. Ledger Entry";
                 Bestilling: Record "NPR Retail Document Header";
+                POSStore: Record "NPR POS Store";
+                POSUnit: Record "NPR POS Unit";
+                POSSession: Codeunit "NPR POS Session";
+                POSFrontEnd: Codeunit "NPR POS Front End Management";
+                POSSetup: Codeunit "NPR POS Setup";
+                Retailformcode: Codeunit "NPR Retail Form Code";
+                RestBeloeb: Decimal;
             begin
                 if "Order No." = '' then
                     OrdreNrTekst := ''
@@ -384,14 +369,10 @@ report 6014447 "NPR Sales Invoice A4 (Retail)"
                 DebAdr[7] := Lande.Name;
                 CompressArray(DebAdr);
 
-                //-NPR4.12
-                //IF Deb."EAN No." <> '' THEN
-                //  EANText := STRSUBSTNO(EANTextStr, Deb."EAN No.");
                 DK_Localization.T18_GetFieldValue(Deb, 'EAN No.', DK_VariantVar);
                 Evaluate(EAN_No, DK_VariantVar);
                 if (EAN_No <> '') then
                     EANText := StrSubstNo(EANTextStr, EAN_No);
-                //+NPR4.12
 
                 if "Sales Invoice Header"."External Document No." <> '' then
                     Reftext := StrSubstNo(Reftextstr, "Sales Invoice Header"."External Document No.");
@@ -408,14 +389,7 @@ report 6014447 "NPR Sales Invoice A4 (Retail)"
                 else
                     LevForm.Get("Shipment Method Code");
 
-                //-NPR5.29
-                //FormatAdr.SalesInvShipTo(LevAdresse,"Sales Invoice Header");
-                //VisLevAdr := "Sell-to Customer No." <> "Bill-to Customer No.";
-                //FOR o := 1 TO ARRAYLEN(LevAdresse) DO
-                //  IF LevAdresse[o] <> DebAdr[o] THEN
-                //    VisLevAdr := TRUE;
                 VisLevAdr := FormatAddr.SalesInvShipTo(LevAdresse, DebAdr, "Sales Invoice Header");
-                //+NPR5.29
 
                 if (FirmaOplysninger."Giro No." <> '') then
                     GiroNrTxt := 'Gironr.'
@@ -482,17 +456,21 @@ report 6014447 "NPR Sales Invoice A4 (Retail)"
 
                 if Register.Get(Retailformcode.FetchRegisterNumber) then begin
                     Clear(Companyaddr);
-                    Companyaddr[1] := Register.Name;
-                    Companyaddr[2] := Register."Name 2";
-                    Companyaddr[3] := Register.Address;
-                    Companyaddr[4] := Register."Post Code" + ' ' + Register.City;
-                    Companyaddr[5] := Register."Phone No.";
-                    Companyaddr[6] := Register."Fax No.";
-                    //companyaddr[7] := register."Bank Name";
-                    //companyaddr[8] := register."Bank Registration No.";
-                    //companyaddr[9] := register."Bank Account No.";
-                    //companyaddr[10] := register."VAT No.";
-                    //companyaddr[11] := register."Giro No.";
+                    clear(POSStore);
+                    if POSSession.IsActiveSession(POSFrontEnd) then begin
+                        POSFrontEnd.GetSession(POSSession);
+                        POSSession.GetSetup(POSSetup);
+                        POSSetup.GetPOSStore(POSStore);
+                    end else begin
+                        if POSUnit.get(Register."Register No.") then
+                            POSStore.get(POSUnit."POS Store Code");
+                    end;
+                    Companyaddr[1] := POSStore.Name;
+                    Companyaddr[2] := POSStore."Name 2";
+                    Companyaddr[3] := POSStore.Address;
+                    Companyaddr[4] := POSStore."Post Code" + ' ' + POSStore.City;
+                    Companyaddr[5] := POSStore."Phone No.";
+                    Companyaddr[6] := POSStore."Fax No.";
                     CompressArray(Companyaddr);
                 end;
 
@@ -514,19 +492,6 @@ report 6014447 "NPR Sales Invoice A4 (Retail)"
                 PaidDeposit := 0;
                 if "NPR Sales Ticket No." <> '' then begin
                     Auditroll.SetRange("Sales Ticket No.", "NPR Sales Ticket No.");
-
-                    //  IF auditroll.FIND('-') THEN REPEAT
-                    //    IF auditroll."Posted Doc. No." <> '' THEN BEGIN
-                    //      debposts.SETCURRENTKEY("Document No.","Document Type","Customer No.");
-                    //      debposts.SETRANGE("Document No.", auditroll."Posted Doc. No.");
-                    //      debposts.SETRANGE("Document Type", debposts."Document Type"::Payment);
-                    //      debposts.SETRANGE("Customer No.", "Bill-to Customer No.");
-                    //      IF debposts.FIND('-') THEN BEGIN
-                    //        debposts.CALCFIELDS(Amount);
-                    //        paidDeposit := -debposts.Amount;
-                    //      END;
-                    //    END;
-                    //  UNTIL auditroll.NEXT = 0;
 
                     if Auditroll.FindFirst then
                         repeat
@@ -576,8 +541,6 @@ report 6014447 "NPR Sales Invoice A4 (Retail)"
                         PaidDeposit := Bestilling.Deposit;
                 end;
 
-                //-NPR70.00.00.00/LS
-                //{ ohm - taget fra rep 50042 }
                 if "Sales Invoice Header"."Location Code" = '' then begin
                     Clear(FirmaAdr);
                     FirmaAdr[1] := FirmaOplysninger.Name;
@@ -604,7 +567,6 @@ report 6014447 "NPR Sales Invoice A4 (Retail)"
                         CompressArray(FirmaAdr);
                     end;
                 end;
-                //+NPR70.00.00.00/LS
             end;
         }
     }
