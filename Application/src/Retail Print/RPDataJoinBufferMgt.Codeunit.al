@@ -1,23 +1,5 @@
 codeunit 6014558 "NPR RP Data Join Buffer Mgt."
 {
-    // NPR4.14/MMV/20150825 CASE 181190 Added functions GetFieldFromRecordNo, GetCurrentRecordNo
-    // NPR4.15.01/MMV/20150917 CASE 181190 Added support for different package sizes on the print.
-    //                                  Fixed bug when filtering ChildDataItems.
-    // NPR5.32/MMV /20170501 CASE 241995 Retail Print 2.0
-    // NPR5.32.10/MMV /20170608 CASE 279696 Always add first PK field to buffer.
-    // NPR5.32.10/MMV /20170615 CASE 248985 Possible to skip entire print if no filter match.
-    // NPR5.34/MMV /20170726 CASE 284505 Added support for flowfields & flowfilters
-    // NPR5.40/MMV /20180208 CASE 304639 Added support for skipping templates based on data found/not found
-    // NPR5.41/MMV /20180416 CASE 311633 Added support for more than 2 decimals.
-    // NPR5.43/MHA /20180604 CASE 317998 Added CALCFIELD to Flowfields in FillRecord()
-    // NPR5.44/MMV /20180705 CASE 315362 Added support for retrieving record value based on iteration count instead of node placement.
-    // NPR5.45/THRO/20180822 CASE 316498 EXIT TRUE correctly in 315362
-    // NPR5.46/MMV /20180913 CASE 314067 Removed unnecessary field map check.
-    // NPR5.47/MMV /20181017 CASE 318084 Added support for different link types.
-    // NPR5.50/MMV /20190502 CASE 353588 Added support for distinct iteration.
-    // NPR5.51/MMV /20190712 CASE 354694 Added support for field value iteration.
-
-
     trigger OnRun()
     var
         Buffer2: Record "NPR RP Data Join Buffer" temporary;
@@ -301,9 +283,8 @@ codeunit 6014558 "NPR RP Data Join Buffer Mgt."
         ChildDataItems: Record "NPR RP Data Items";
         DataItemLinks: Record "NPR RP Data Item Links";
         ChildRecRef: RecordRef;
-        StringArray: DotNet NPRNetArray;
-        Regex: DotNet NPRNetRegex;
-        String: DotNet NPRNetString;
+        StringList: List of [Text];
+        String: Text;
         IntegerBuffer: Integer;
         FieldRef: FieldRef;
         DataProcessed: Boolean;
@@ -342,8 +323,8 @@ codeunit 6014558 "NPR RP Data Join Buffer Mgt."
                 begin
                     if ParentRecRef.FindFirst then; //Attempt fill of non-totalled fields with first record of set to allow printing of these as well.
 
-                    StringArray := Regex.Split(ParentDataItem."Total Fields", ',');
-                    foreach String in StringArray do begin
+                    StringList := ParentDataItem."Total Fields".Split(',');
+                    foreach String in StringList do begin
                         Evaluate(IntegerBuffer, String);
                         FieldRef := ParentRecRef.Field(IntegerBuffer);
                         FieldRef.CalcSum();
