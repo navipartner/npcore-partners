@@ -41,6 +41,12 @@ page 6151150 "NPR Customer GDPR Setup"
                 {
                     ApplicationArea = All;
                 }
+
+                field(EnableJobQueue; "Enable Job Queue")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Enqueue job queue entries for anonymization';
+                }
             }
         }
     }
@@ -167,6 +173,19 @@ page 6151150 "NPR Customer GDPR Setup"
                 PromotedCategory = Process;
                 RunObject = Page "NPR GDPR Anonymization Req.";
                 ApplicationArea = All;
+            }
+            action(JobQueueEntries)
+            {
+                ApplicationArea = All;
+                Caption = 'Job Queue Entries';
+                Image = JobLines;
+
+                trigger OnAction()
+                var
+                    GDPRManagement: Codeunit "NPR NP GDPR Management";
+                begin
+                    GDPRManagement.ShowJobQueueEntries(Rec);
+                end;
             }
         }
     }
