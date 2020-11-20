@@ -1,8 +1,5 @@
 table 6151060 "NPR Customer GDPR SetUp"
 {
-    // NPR5.52/ZESO/20190925 CASE 358656 Object Created
-    // NPR5.53/ZESO/20200115 CASE 358656 Added New Fields ID 3,4,5
-
     Caption = 'Customer GDPR SetUp';
     DataClassification = CustomerContent;
 
@@ -25,7 +22,7 @@ table 6151060 "NPR Customer GDPR SetUp"
         }
         field(4; "No of Customers"; Integer)
         {
-            CalcFormula = Count ("NPR Customers to Anonymize");
+            CalcFormula = Count("NPR Customers to Anonymize");
             Caption = 'No of Customers';
             FieldClass = FlowField;
         }
@@ -33,6 +30,17 @@ table 6151060 "NPR Customer GDPR SetUp"
         {
             Caption = 'Gen. Bus. Posting Group Filter';
             DataClassification = CustomerContent;
+        }
+        field(6; "Enable Job Queue"; Boolean)
+        {
+            Caption = 'Enable Job Queue';
+            DataClassification = CustomerContent;
+            trigger OnValidate()
+            var
+                GDPRMgt: Codeunit "NPR NP GDPR Management";
+            begin
+                GDPRMgt.EnqueueJobEntries(Rec);
+            end;
         }
     }
 
