@@ -1,16 +1,5 @@
 codeunit 6150801 "NPR POS Action - Customer"
 {
-    // NPR5.32/ANEN /20170324  CASE 268616 'refresh of Sale POS after geting retail order
-    // NPR5.47/THRO /20180821  CASE 309611 Added Option SamplingGet to CustomerType
-    // NPR5.47/THRO /20180821  CASE 309609 Added Option SamplingSend to CustomerType
-    // TM1.39/THRO /20181126  CASE 334644 Removed unused Coudeunit 1 variable
-    // NPR5.52/SARA/20191004 CASE 368447 Error when using the "Hent udvalg" button
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         ActionDescription: Label 'This is a built-in action for handling Customer Info';
         ErrorDescription: Label 'Error';
@@ -28,9 +17,7 @@ codeunit 6150801 "NPR POS Action - Customer"
 
     local procedure ActionVersion(): Text
     begin
-        //-NPR5.47 [309611]
         exit('1.1');
-        //+NPR5.47 [309611]
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
@@ -47,9 +34,7 @@ codeunit 6150801 "NPR POS Action - Customer"
                 RegisterWorkflowStep('1', 'respond();');
                 RegisterWorkflow(false);
 
-                //-NPR5.47 [309611]
                 RegisterOptionParameter('CustomerType', 'CustomerSTD,CustomerInfo,DebitInfo,CustomerCRM,CustomerILE,CustomerRemove,RepairSend,NPOrderSend,NPOrderGet,CustomerPay,SamplingGet,SamplingSend', 'CustomerSTD');
-                //+NPR5.47 [309611]
             end;
     end;
 
@@ -84,13 +69,11 @@ codeunit 6150801 "NPR POS Action - Customer"
         ReturnAmount: Decimal;
         PaidAmount: Decimal;
         SubTotal: Decimal;
-        View: DotNet NPRNetView0;
+        View: Codeunit "NPR POS View";
         TempSalesHeader: Record "Sales Header" temporary;
     begin
         if not Action.IsThisAction(ActionCode) then
             exit;
-
-        //MESSAGE('DEBUG: %1\\%2', WorkflowStep, Context.ToString());
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
         JSON.SetScope('parameters', true);
@@ -119,21 +102,14 @@ codeunit 6150801 "NPR POS Action - Customer"
                 SetRepairSend(SalePOS);
             7:
                 SetNPOrderSend(SalePOS, POSSession, POSSale, FrontEnd);
-            //-NPR5.32 [268616]
-            //8 : SetNPOrderGet(SalePOS);
             8:
                 SetNPOrderGet(SalePOS, POSSession, POSSale, FrontEnd);
-            //+NPR5.32 [268616]
             9:
                 DebitSale(SalePOS, POSSale, FrontEnd);
-            //-NPR5.47 [309611]
             10:
                 SetSamplingGet(SalePOS, POSSession, POSSale, View, FrontEnd);
-            //+NPR5.47 [309611]
-            //-NPR5.47 [309609]
             11:
                 SetSamplingSend(SalePOS, POSSession, POSSale, FrontEnd);
-        //+NPR5.47 [309609]
         end;
 
         POSSession.RequestRefreshData();
@@ -145,14 +121,13 @@ codeunit 6150801 "NPR POS Action - Customer"
     begin
     end;
 
-    procedure SetCustomer(var SalePOS: Record "NPR Sale POS"; POSSession: Codeunit "NPR POS Session"; POSSale: Codeunit "NPR POS Sale"; View: DotNet NPRNetView0; FrontEnd: Codeunit "NPR POS Front End Management")
+    procedure SetCustomer(var SalePOS: Record "NPR Sale POS"; POSSession: Codeunit "NPR POS Session"; POSSale: Codeunit "NPR POS Sale"; View: Codeunit "NPR POS View"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         SaleLinePOS: Record "NPR Sale Line POS";
         FormCode: Codeunit "NPR Retail Form Code";
         RetailSetup: Record "NPR Retail Setup";
         TempSalesHeader: Record "Sales Header" temporary;
         Register: Record "NPR Register";
-        ViewType: DotNet NPRNetViewType;
         IsCashSale: Boolean;
         Amount: Decimal;
         PaymentLinePOSObject: Codeunit "NPR Touch: Payment Line POS";
@@ -168,7 +143,7 @@ codeunit 6150801 "NPR POS Action - Customer"
 
             SaleLinePOS.SetRange("Register No.", "Register No.");
             SaleLinePOS.SetRange("Sales Ticket No.", "Sales Ticket No.");
-            ;
+
             SaleLinePOS.SetRange(Type, SaleLinePOS.Type::Customer);
             if SaleLinePOS.FindSet then
                 Error(CustDepositError);
@@ -200,7 +175,7 @@ codeunit 6150801 "NPR POS Action - Customer"
             else
                 IsCashSale := true;
 
-            if (View.Equals(ViewType.Payment)) and (not IsCashSale) then begin
+            if (View.Type = View.Type::Payment) and (not IsCashSale) then begin
                 POSSession.ChangeViewPayment();
             end;
         end;
@@ -239,10 +214,9 @@ codeunit 6150801 "NPR POS Action - Customer"
             Error(DebitSaleChangeCancelled);
     end;
 
-    procedure SetContact(var SalePOS: Record "NPR Sale POS"; POSSession: Codeunit "NPR POS Session"; POSSale: Codeunit "NPR POS Sale"; View: DotNet NPRNetView0)
+    procedure SetContact(var SalePOS: Record "NPR Sale POS"; POSSession: Codeunit "NPR POS Session"; POSSale: Codeunit "NPR POS Sale"; View: Codeunit "NPR POS View")
     var
         Register: Record "NPR Register";
-        ViewType: DotNet NPRNetViewType;
         IsCashSale: Boolean;
         Amount: Decimal;
         PaymentLinePOSObject: Codeunit "NPR Touch: Payment Line POS";
@@ -267,7 +241,7 @@ codeunit 6150801 "NPR POS Action - Customer"
             else
                 IsCashSale := true;
 
-            if (View.Equals(ViewType.Payment)) and (not IsCashSale) then begin
+            if (View.Type = View.Type::Payment) and (not IsCashSale) then begin
                 POSSession.ChangeViewPayment();
             end;
         end;
@@ -327,7 +301,6 @@ codeunit 6150801 "NPR POS Action - Customer"
                 TouchScreenFunctions.TestRegisterRegistration(SalePOS);
                 POSSession.ChangeViewPayment();
             end else begin
-                //POSSale.InitializeNewSale(Register,FrontEnd,POSSetup,POSSale);
                 POSSale.SelectViewForEndOfSale(POSSession);
 
             end;
@@ -343,10 +316,8 @@ codeunit 6150801 "NPR POS Action - Customer"
             RetailDocumentHandling.RetailDocument2Sale(SalePOS, "Salesperson Code");
         end;
 
-        //-NPR5.32 [268616]
         POSSale.Refresh(SalePOS);
         POSSale.Modify(true, false);
-        //+NPR5.32 [268616]
         POSSale.RefreshCurrent();
     end;
 
@@ -370,47 +341,29 @@ codeunit 6150801 "NPR POS Action - Customer"
                 TouchScreenFunctions.TestRegisterRegistration(SalePOS);
                 POSSession.ChangeViewPayment();
             end else begin
-                //-NPR5.47 [309609]
-                //POSSale.InitializeNewSale(Register,FrontEnd,POSSetup,POSSale);
                 POSSale.SelectViewForEndOfSale(POSSession);
-                //+NPR5.47 [309609]
             end;
         end;
     end;
 
-    local procedure SetSamplingGet(var SalePOS: Record "NPR Sale POS"; POSSession: Codeunit "NPR POS Session"; POSSale: Codeunit "NPR POS Sale"; View: DotNet NPRNetView0; FrontEnd: Codeunit "NPR POS Front End Management")
+    local procedure SetSamplingGet(var SalePOS: Record "NPR Sale POS"; POSSession: Codeunit "NPR POS Session"; POSSale: Codeunit "NPR POS Sale"; View: Codeunit "NPR POS View"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         RetailDocumentHandling: Codeunit "NPR Retail Document Handling";
         POSSaleLine: Codeunit "NPR POS Sale Line";
     begin
-        //-NPR5.47 [309611]
-        //IF SalePOS."Customer No." = '' THEN BEGIN
-        //  ERROR(CustNoMissing);
-        //  EXIT;
-        //END;
-        //+NPR5.47 [309611]
-
-        //-NPR5.52[368447]
         //Reload salePOS to avoid Runtime error when Modify record
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
         SalePOS.Find;
-        //+NPR5.52[368447]
         with SalePOS do begin
             "Retail Document Type" := "Retail Document Type"::"Selection Contract";
             RetailDocumentHandling.RetailDocument2Sale(SalePOS, "Salesperson Code");
 
-            //-NPR5.47 [309611]
-            //CASE "Customer Type" OF
-            //  "Customer Type"::Ord : SetCustomer(SalePOS,POSSession,POSSale,View,FrontEnd);
-            //  "Customer Type"::Cash : SetContact(SalePOS,POSSession,POSSale,View);
-            //END;
             POSSale.Refresh(SalePOS);
             POSSale.Modify(true, false);
             POSSession.GetSaleLine(POSSaleLine);
             if SalePOS.SalesLinesExist then
                 POSSaleLine.SetLast();
-            //+NPR5.47 [309611]
         end;
     end;
 
@@ -494,4 +447,3 @@ codeunit 6150801 "NPR POS Action - Customer"
         exit(true);
     end;
 }
-

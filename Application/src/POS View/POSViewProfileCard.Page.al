@@ -1,8 +1,5 @@
 page 6150636 "NPR POS View Profile Card"
 {
-    // NPR5.49/TJ  /20190201 CASE 335739 New object
-    // NPR5.55/TSA /20200527 CASE 406862 Added "Initial Sales View", "After End-of-Sale View"
-
     Caption = 'POS View Profile Card';
     PageType = Card;
     UsageCategory = Administration;
@@ -74,17 +71,14 @@ page 6150636 "NPR POS View Profile Card"
                     Caption = 'Detect Decimal and Thousands Separators';
                     Image = SuggestNumber;
                     ApplicationArea = All;
-                    //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                    //PromotedCategory = Process;
-                    //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
-                    //PromotedIsBig = true;
+                    Promoted = true;
+                    PromotedCategory = Process;
+                    PromotedIsBig = true;
 
                     trigger OnAction()
                     begin
-                        //-NPR4.14
                         DetectDecimalThousandsSeparator();
                         CurrPage.Update(true);
-                        //+NPR4.14
                     end;
                 }
             }
@@ -164,4 +158,3 @@ page 6150636 "NPR POS View Profile Card"
         }
     }
 }
-

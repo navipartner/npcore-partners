@@ -348,7 +348,7 @@ codeunit 6150861 "NPR POS Action: Doc. Import"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnDiscoverDataSourceExtensions', '', true, false)]
-    local procedure OnDiscoverDataSourceExtension(DataSourceName: Text; Extensions: DotNet NPRNetList_Of_T)
+    local procedure OnDiscoverDataSourceExtension(DataSourceName: Text; Extensions: List of [Text])
     begin
         //-NPR5.53 [378678]
         if ThisDataSource <> DataSourceName then
@@ -359,9 +359,9 @@ codeunit 6150861 "NPR POS Action: Doc. Import"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnGetDataSourceExtension', '', true, false)]
-    local procedure OnGetDataSourceExtension(DataSourceName: Text; ExtensionName: Text; var DataSource: DotNet NPRNetDataSource0; var Handled: Boolean; Setup: Codeunit "NPR POS Setup")
+    local procedure OnGetDataSourceExtension(DataSourceName: Text; ExtensionName: Text; var DataSource: Codeunit "NPR Data Source"; var Handled: Boolean; Setup: Codeunit "NPR POS Setup")
     var
-        DataType: DotNet NPRNetDataType;
+        DataType: Enum "NPR Data Type";
     begin
         //-NPR5.53 [378678]
         if (DataSourceName <> ThisDataSource) or (ExtensionName <> ThisExtension) then
@@ -369,12 +369,12 @@ codeunit 6150861 "NPR POS Action: Doc. Import"
 
         Handled := true;
 
-        DataSource.AddColumn('OpenOrdersQty', 'Number of open sales orders', DataType.String, true);
+        DataSource.AddColumn('OpenOrdersQty', 'Number of open sales orders', DataType::String, true);
         //+NPR5.53 [378678]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnDataSourceExtensionReadData', '', true, false)]
-    local procedure OnDataSourceExtensionReadData(DataSourceName: Text; ExtensionName: Text; var RecRef: RecordRef; DataRow: DotNet NPRNetDataRow0; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
+    local procedure OnDataSourceExtensionReadData(DataSourceName: Text; ExtensionName: Text; var RecRef: RecordRef; DataRow: Codeunit "NPR Data Row"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         SalesHeader: Record "Sales Header";
         LocationFilter: Text;

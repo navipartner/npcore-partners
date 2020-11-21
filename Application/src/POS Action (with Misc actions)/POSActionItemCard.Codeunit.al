@@ -1,15 +1,5 @@
 codeunit 6150827 "NPR POS Action: Item Card"
 {
-    // NPR5.34/BR /20170724  CASE 282747 Object Created
-    // NPR5.38/ANEN /201801013 CASE 289390 Added option to as for salesperson pwd or supervisor pwd.
-    // NPR5.46/TSA /20180914 CASE 314603 Refactored the security functionality to use secure methods
-    // NPR5.46/TSA /20180914 CASE 314603 Fixed ActionCode and ActionVersion GlobalText to Functions
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         ActionDescription: Label 'This built in function opens the item card page for a selected sales line in the POS';
 
@@ -66,15 +56,13 @@ codeunit 6150827 "NPR POS Action: Item Card"
         POSPaymentLine: Codeunit "NPR POS Payment Line";
         LinePOS: Record "NPR Sale Line POS";
         Item: Record Item;
-        CurrentView: DotNet NPRNetView0;
-        CurrentViewType: DotNet NPRNetViewType0;
-        ViewType: DotNet NPRNetViewType0;
+        CurrentView: Codeunit "NPR POS View";
         RetailItemCard: Page "NPR Retail Item Card";
     begin
         JSON.InitializeJObjectParser(Context, FrontEnd);
         POSSession.GetCurrentView(CurrentView);
 
-        if (CurrentView.Type.Equals(ViewType.Sale)) then begin
+        if (CurrentView.Type = CurrentView.Type::Sale) then begin
             POSSession.GetSaleLine(POSSaleLine);
             POSSaleLine.GetCurrentSaleLine(LinePOS);
             if LinePOS.Type = LinePOS.Type::Item then begin
@@ -94,4 +82,3 @@ codeunit 6150827 "NPR POS Action: Item Card"
         POSSession.RequestRefreshData();
     end;
 }
-

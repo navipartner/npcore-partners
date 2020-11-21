@@ -86,7 +86,6 @@ codeunit 6150790 "NPR POS Action: Customer Loc."
         POSSale: Codeunit "NPR POS Sale";
         SalePOS: Record "NPR Sale POS";
         POSCustLocMgt: Codeunit "NPR POS Customer Location Mgt.";
-        ViewType: DotNet NPRNetViewType0;
         POSSetup: Codeunit "NPR POS Setup";
     begin
         POSSession.GetSale(POSSale);

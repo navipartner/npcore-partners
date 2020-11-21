@@ -1,35 +1,5 @@
 codeunit 6150849 "NPR POS Action: EndOfDay V3"
 {
-    // 
-    // NOTES:
-    // Balancing requires a valid salesesperson and therefor must be done after a login
-    // We are therefor in a current sales transaction and should not start a new one.
-    // 
-    // NPR5.42/TSA /20180306 CASE 307267 V3 initial version
-    // NPR5.42/TSA /20180417 CASE 306858 Added dimensions to balance line
-    // NPR5.42/BHR /20180214 CASE 312830 Added Security functionality
-    // NPR5.45/TSA /20180809 CASE 322769 Removed obsolete code in ValidateRequirements ()
-    // NPR5.46/TSA /20180913 CASE 328326 Setting Unit Status
-    // NPR5.46/TSA /20180914 CASE 314603 Refactored the security functionality to use secure methods
-    // NPR5.46/MMV /20180927 CASE 290734 EFT framework refactoring
-    // NPR5.46/TSA /20181005 CASE 328338 Adjustments for keeping state on pos unit
-    // NPR5.48/MHA /20181115 CASE 334633 Replaced reference to function CheckSavedSales() with CleanupPOSQuotes() in ValidateRequirements()
-    // NPR5.48/TSA /20181127 CASE 336921 Changed POS Unit Status Management, cleaned up code
-    // NPR5.49/TSA /20190311 CASE 348458 Added CloseWorkshift function, cleaned commented code
-    // NPR5.51/TSA /20190622 CASE 359508 Adding support posting GL after balancing
-    // NPR5.52/ALPO/20190923 CASE 365326 POS Posting related fields moved to POS Posting Profiles from NP Retail Setup
-    // TODO Units and Bins must get correct status
-    // NPR5.53/BHR / 20191004 CASE 369361 Removed online checks
-    // NPR5.54/MMV /20200225 CASE 364340 Added EFT event before pause
-    // NPR5.55/TSA /20200424 CASE 401799 Added CloseWorkshift on slave when closing master
-    // NPR5.55/BHR /20200602 CASE 405112 Add Functionality for Auto Open Cash Register
-    // NPR5.55/TSA /20200424 CASE 401799 Refactored printing to handle print failure and EOD completion
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         ActionDescription: Label 'This is the built in function to perform balancing of the register (Version 1)';
         t001: Label 'Register already closed!';
@@ -46,10 +16,7 @@ codeunit 6150849 "NPR POS Action: EndOfDay V3"
 
     local procedure ActionVersion(): Text
     begin
-        //-NPR5.55 [405112]
-        //EXIT ('1.6');
         exit('1.8');
-        //+NPR5.55 [405112]
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
@@ -69,21 +36,16 @@ codeunit 6150849 "NPR POS Action: EndOfDay V3"
                 RegisterWorkflowStep('Eft_Discovery', 'respond()');
                 RegisterWorkflowStep('Eft_Close', 'respond()');
                 RegisterWorkflowStep('Eft_CloseDone', 'respond()');
-                //-NPR5.55 [405112]
                 RegisterWorkflowStep('OpenCashDrawer', 'respond()');
-                //+NPR5.55 [405112]
                 RegisterWorkflowStep('BalanceRegister', 'respond()');
                 RegisterWorkflowStep('EndOfWorkflow', 'respond()');
 
                 RegisterOptionParameter('Security', 'None,SalespersonPassword,CurrentSalespersonPassword,SupervisorPassword', 'None');
                 RegisterOptionParameter('Type', 'X-Report (prel),Z-Report (final),Close Workshift', 'X-Report (prel)');
-                //-NPR5.55 [405112]
                 RegisterBooleanParameter('Auto-Open Cash Drawer', false);
                 RegisterTextParameter('Cash Drawer No.', '');
-                //+NPR5.55 [405112]
 
                 RegisterWorkflow(false);
-
             end;
     end;
 
@@ -115,10 +77,8 @@ codeunit 6150849 "NPR POS Action: EndOfDay V3"
         RecID: RecordID;
         OpenCashRegister: Boolean;
         BalanceEntryToPrint: Integer;
-        CurrentView: DotNet NPRNetView0;
-        ViewType: DotNet NPRNetViewType0;
+        CurrentView: Codeunit "NPR POS View";
     begin
-
         if not Action.IsThisAction(ActionCode) then
             exit;
 
@@ -126,10 +86,8 @@ codeunit 6150849 "NPR POS Action: EndOfDay V3"
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
 
-        //-NPR5.55 [405112]
         OpenCashRegister := JSON.GetBooleanParameter('Auto-Open Cash Drawer', false);
         CashDrawerNo := JSON.GetStringParameter('Cash Drawer No.', false);
-        //+NPR5.55 [405112]
 
         EndOfDayType := JSON.GetIntegerParameter('Type', true);
         if (EndOfDayType < 0) then
@@ -158,31 +116,20 @@ codeunit 6150849 "NPR POS Action: EndOfDay V3"
                 end;
 
             'Eft_Discovery':
-                //-NPR5.49 [348458]
-                // EftDiscovery(POSSession);
                 if (EndOfDayType = EndOfDayTypeOption::"Z-Report") then
                     EftDiscovery(POSSession);
-            //+NPR5.49 [348458]
 
             'Eft_Close':
-                //-NPR5.49 [348458]
-                // EftClose(POSSession, FrontEnd);
                 if (EndOfDayType = EndOfDayTypeOption::"Z-Report") then
                     EftClose(POSSession, FrontEnd);
-            //+NPR5.49 [348458]
 
             'Eft_CloseDone':
-                //-NPR5.49 [348458]
-                // EftCloseDone(POSSession);
                 if (EndOfDayType = EndOfDayTypeOption::"Z-Report") then
                     EftCloseDone(POSSession);
-            //+NPR5.49 [348458]
 
-            //-NPR5.55 [405112]
             'OpenCashDrawer':
                 if (OpenCashRegister) then
                     OpenDrawer(CashDrawerNo, POSUnit, SalePOS);
-            //-NPR5.55 [405112]
 
             'BalanceRegister':
                 begin
@@ -195,33 +142,24 @@ codeunit 6150849 "NPR POS Action: EndOfDay V3"
                                 if (FinalEndOfDay(Register."Register No.", SalePOS."Dimension Set ID", BalanceEntryToPrint)) then begin
                                     ClosingEntryNo := POSCreateEntry.InsertUnitCloseEndEntry(Register."Register No.", SalespersonPurchaser.Code);
                                     POSManagePOSUnit.ClosePOSUnitNo(POSUnit."No.", ClosingEntryNo);
-                                    //-NPR5.51 [359508]
                                     CheckAndPostAfterBalancing(ClosingEntryNo);
-                                    //+NPR5.51 [359508]
 
-                                    //-NPR5.55 [401799]
                                     Commit;
                                     POSSession.ChangeViewLogin();
                                     PrintEndOfDayReport(POSUnit."No.", BalanceEntryToPrint);
-                                    //+NPR5.55 [401799]
-
                                 end else begin
                                     POSManagePOSUnit.ReOpenLastPeriodRegister(POSUnit."No.");
                                 end;
                             end;
 
-                        //-NPR5.49 [348458]
                         EndOfDayTypeOption::CloseWorkshift:
                             begin
                                 CloseWorkshift(Register."Register No.", SalePOS."Dimension Set ID", BalanceEntryToPrint);
                                 ClosingEntryNo := POSCreateEntry.InsertUnitCloseEndEntry(Register."Register No.", SalespersonPurchaser.Code);
                                 POSManagePOSUnit.ClosePOSUnitNo(POSUnit."No.", ClosingEntryNo);
 
-                                //-NPR5.51 [359508]
                                 CheckAndPostAfterBalancing(ClosingEntryNo);
-                                //+NPR5.51 [359508]
 
-                                //-NPR5.55 [401799]
                                 if (BalanceEntryToPrint <> 0) then begin
                                     Commit;
                                     POSSession.ChangeViewLogin();
@@ -229,34 +167,24 @@ codeunit 6150849 "NPR POS Action: EndOfDay V3"
                                 end;
 
                             end;
-                        //+NPR5.49 [348458]
                         else begin
                                 PreliminaryEndOfDay(Register."Register No.", SalePOS."Dimension Set ID");
                                 POSManagePOSUnit.ReOpenLastPeriodRegister(POSUnit."No.");
                             end;
                     end;
-
                 end;
 
             'EndOfWorkflow':
                 begin
-                    //-NPR5.55 [401799]
-                    // POSSession.ChangeViewLogin ();
                     POSSession.GetCurrentView(CurrentView);
-                    if (not CurrentView.Type.Equals(ViewType.Login)) then
+                    if (CurrentView.Type <> CurrentView.Type::Login) then
                         POSSession.ChangeViewLogin();
-                    //+NPR5.55 [401799]
                 end;
         end;
 
         case NextWorkflowStep of
-
-            //-NPR5.55 [405112]
-            //NextWorkflowStep::JUMP_BALANCE_REGISTER : FrontEnd.ContinueAtStep ('BalanceRegister');
             NextWorkflowStep::JUMP_BALANCE_REGISTER:
                 FrontEnd.ContinueAtStep('OpenCashDrawer');
-            //-NPR5.55 [405112]
-
             NextWorkflowStep::EFT_CLOSE:
                 FrontEnd.ContinueAtStep('Eft_Close');
         end;
@@ -280,7 +208,6 @@ codeunit 6150849 "NPR POS Action: EndOfDay V3"
         Action1: Action;
         closingType: Option Cancel,Normal,Saved;
     begin
-
         NPRetailSetup.Get();
         NPRetailSetup.TestField("Advanced Posting Activated");
 
@@ -289,10 +216,6 @@ codeunit 6150849 "NPR POS Action: EndOfDay V3"
 
         // TODO - Needs to verified for UNITS / BINS
         RetailSetup.Get;
-        //-NPR5.53 [369361]
-        //RetailSetup.CheckOnline;
-        //+NPR5.53 [369361]
-
         Register.Get(RegisterNo);
         if (Register.Status = Register.Status::Afsluttet) then
             Error(t001);
@@ -301,12 +224,8 @@ codeunit 6150849 "NPR POS Action: EndOfDay V3"
         if (RetailSalesLineCode.LineExists(SalePOS)) then
             Error(t002);
 
-        //-NPR5.48 [334633]
-        // IF (NOT RetailFormCode.CheckSavedSales (SalePOS)) THEN
-        //  ERROR ('');
         if not POSQuoteMgt.CleanupPOSQuotesBeforeBalancing(SalePOS) then
             Error('');
-        //+NPR5.48 [334633]
 
         if (RetailSetup."Balancing Posting Type" = RetailSetup."Balancing Posting Type"::TOTAL) then begin
             if (Register.FindSet()) then
@@ -333,9 +252,6 @@ codeunit 6150849 "NPR POS Action: EndOfDay V3"
         POSManagePOSUnit: Codeunit "NPR POS Manage POS Unit";
         ClosingEntryNo: Integer;
     begin
-
-        //-NPR5.55 [401799]
-        // Close workshift for the slave units.
         POSUnit.Get(UnitNo);
         if (POSUnit."POS End of Day Profile" <> '') then
             if (POSEndofDayProfile.Get(POSUnit."POS End of Day Profile")) then
@@ -353,22 +269,11 @@ codeunit 6150849 "NPR POS Action: EndOfDay V3"
                         until (POSUnitSlaves.Next() = 0);
                     end;
                 end;
-        //+NPR5.55 [401799]
 
-        //-NPR5.49 [348458]
         EntryNo := POSCheckpointMgr.EndWorkshift(EndOfDayTypeOption::"Z-Report", UnitNo, DimensionSetId);
-        //+NPR5.49 [348458]
 
         if (not POSEntry.Get(EntryNo)) then
             exit(false);
-
-        //-NPR5.55 [401799]
-        // PrintEndOfDayReport (UnitNo, EntryNo);
-        //+NPR5.55 [401799]
-
-        // We dont have a SalePOS as base for sending the SMS anymore
-        //IF (NOT CODEUNIT.RUN (CODEUNIT::"Send Register Balance", SalePOS)) THEN
-        //  MESSAGE(txtCannotSendSMSWB);
 
         POSWorkshiftCheckpoint.SetFilter("POS Entry No.", '=%1', EntryNo);
         if (POSWorkshiftCheckpoint.FindFirst()) then
@@ -383,12 +288,7 @@ codeunit 6150849 "NPR POS Action: EndOfDay V3"
         POSCheckpointMgr: Codeunit "NPR POS Workshift Checkpoint";
         EntryNo: Integer;
     begin
-
-        //-NPR5.49 [348458]
-        //EntryNo := POSCheckpointMgr.CreateCheckpointWithDimension (TRUE, FALSE, UnitNo, DimensionSetId);
         EntryNo := POSCheckpointMgr.EndWorkshift(EndOfDayTypeOption::"X-Report", UnitNo, DimensionSetId);
-        //+NPR5.49 [348458]
-
         if (not POSEntry.Get(EntryNo)) then
             exit(false);
 
@@ -407,8 +307,6 @@ codeunit 6150849 "NPR POS Action: EndOfDay V3"
         PosIsManaged: Boolean;
         WithPrint: Boolean;
     begin
-
-        //-NPR5.49 [348458]
         PosIsManaged := false;
         WithPrint := true;
         POSUnit.Get(UnitNo);
@@ -427,15 +325,10 @@ codeunit 6150849 "NPR POS Action: EndOfDay V3"
         if (not POSEntry.Get(EntryNo)) then
             exit(false);
 
-        //-NPR5.55 [401799]
-        //IF (WithPrint) THEN
-        //  PrintEndOfDayReport (UnitNo, EntryNo);
         if (WithPrint) then
             PrintEntryNo := EntryNo;
-        //+NPR5.55 [401799]
 
         exit(true);
-        //+NPR5.49 [348458]
     end;
 
     local procedure PrintEndOfDayReport(UnitNo: Code[10]; EntryNo: Integer)
@@ -446,7 +339,6 @@ codeunit 6150849 "NPR POS Action: EndOfDay V3"
         POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint";
         RecRef: RecordRef;
     begin
-
         POSEntry.Get(EntryNo);
         POSEntry.TestField("Entry Type", POSEntry."Entry Type"::Balancing);
 
@@ -464,7 +356,6 @@ codeunit 6150849 "NPR POS Action: EndOfDay V3"
         tmpEFTSetup: Record "NPR EFT Setup" temporary;
         EFTSetup: Record "NPR EFT Setup";
     begin
-
         EFTInterface.OnQueueCloseBeforeRegisterBalance(POSSession, tmpEFTSetup);
         if not tmpEFTSetup.FindSet then begin
             NextWorkflowStep := NextWorkflowStep::JUMP_BALANCE_REGISTER;
@@ -496,7 +387,6 @@ codeunit 6150849 "NPR POS Action: EndOfDay V3"
         SkipPause: Boolean;
         EFTTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
     begin
-
         POSSession.RetrieveActionStateRecordRef('eft_close_list', RecRef);
         if RecRef.Number = 0 then
             exit;
@@ -508,14 +398,7 @@ codeunit 6150849 "NPR POS Action: EndOfDay V3"
         POSSession.GetSetup(POSSetup);
         POSSale.GetCurrentSale(SalePOS);
 
-
-        //-NPR5.54 [364340]
-        // EFTFrameworkMgt.CreateEndWorkshiftRequest(EFTTransactionRequest, EFTSetup, POSSetup.Register, SalePOS."Sales Ticket No.");
-        // COMMIT;
-        // EFTFrameworkMgt.SendRequest(EFTTransactionRequest);
-        // POSFrontEnd.PauseWorkflow();
         EFTTransactionMgt.StartEndWorkshift(EFTSetup, SalePOS);
-        //+NPR5.54 [364340]
     end;
 
     local procedure EftCloseDone(POSSession: Codeunit "NPR POS Session")
@@ -547,8 +430,6 @@ codeunit 6150849 "NPR POS Action: EndOfDay V3"
         POSPeriodRegisterPostingFilter: Record "NPR POS Period Register";
         POSEntry: Record "NPR POS Entry";
     begin
-
-        //-NPR5.51 [359508]
         if (not POSEntry.Get(POSEntryno)) then
             exit;
 
@@ -557,7 +438,6 @@ codeunit 6150849 "NPR POS Action: EndOfDay V3"
 
         ItemPosting(POSPeriodRegister);
         POSPosting(POSPeriodRegister);
-        //+NPR5.51 [359508]
     end;
 
     local procedure POSPosting(POSPeriodRegister: Record "NPR POS Period Register")
@@ -566,16 +446,11 @@ codeunit 6150849 "NPR POS Action: EndOfDay V3"
         NPRetailSetup: Record "NPR NP Retail Setup";
         POSPostingProfile: Record "NPR POS Posting Profile";
     begin
-
-        //-NPR5.51 [359508]
         if (not NPRetailSetup.Get()) then
             exit;
 
-        //WITH NPRetailSetup DO  //NPR5.52 [365326]-revoked
-        //-NPR5.52 [365326]
         NPRetailSetup.GetPostingProfile(POSPeriodRegister."POS Unit No.", POSPostingProfile);
         with POSPostingProfile do
-            //+NPR5.52 [365326]
             case ("Automatic POS Posting") of
                 "Automatic POS Posting"::No:
                     exit;
@@ -605,14 +480,12 @@ codeunit 6150849 "NPR POS Action: EndOfDay V3"
                         POSPeriodRegisterPostingFilter.SetFilter("POS Store Code", '=%1', POSPeriodRegister."POS Store Code");
                     end;
                 else begin
-                        //MESSAGE ('The settting %1 is not yet supported.', NPRetailSetup."Automatic POS Posting");  //NPR5.52 [365326]-revoked
-                        Message('The setting %1 is not yet supported.', "Automatic POS Posting");  //NPR5.52 [365326]
+                        Message('The setting %1 is not yet supported.', "Automatic POS Posting");
                         exit;
                     end;
             end;
 
         PostPeriodEntries(POSPeriodRegisterPostingFilter, true, false);
-        //+NPR5.51 [359508]
     end;
 
     local procedure ItemPosting(POSPeriodRegister: Record "NPR POS Period Register")
@@ -622,16 +495,11 @@ codeunit 6150849 "NPR POS Action: EndOfDay V3"
         POSUnit: Record "NPR POS Unit";
         POSPostingProfile: Record "NPR POS Posting Profile";
     begin
-
-        //-NPR5.51 [359508]
         if (not NPRetailSetup.Get()) then
             exit;
 
-        //WITH NPRetailSetup DO  //NPR5.52 [365326]-revoked
-        //-NPR5.52 [365326]
         NPRetailSetup.GetPostingProfile(POSPeriodRegister."POS Unit No.", POSPostingProfile);
         with POSPostingProfile do
-            //+NPR5.52 [365326]
             case ("Automatic Item Posting") of
                 "Automatic Item Posting"::No:
                     exit;
@@ -669,7 +537,6 @@ codeunit 6150849 "NPR POS Action: EndOfDay V3"
             end;
 
         PostPeriodEntries(POSPeriodRegisterPostingFilter, false, true);
-        //+NPR5.51 [359508]
     end;
 
     local procedure PostPeriodEntries(var POSPeriodRegisterPostingFilter: Record "NPR POS Period Register"; pPostPOSEntries: Boolean; pPostItemEntries: Boolean)
@@ -678,8 +545,6 @@ codeunit 6150849 "NPR POS Action: EndOfDay V3"
         HaveUnpostedEntries: Boolean;
         PostingError: Boolean;
     begin
-
-        //-NPR5.51 [359508]
         POSPeriodRegisterPostingFilter.SetFilter("Opened Date", '%1..', CreateDateTime(CalcDate('<-7D>', Today), 0T));
         POSPeriodRegisterPostingFilter.Ascending(false);
         if (POSPeriodRegisterPostingFilter.FindSet()) then begin
@@ -705,7 +570,6 @@ codeunit 6150849 "NPR POS Action: EndOfDay V3"
 
             until ((POSPeriodRegisterPostingFilter.Next() = 0) or (PostingError));
         end;
-        //+NPR5.51 [359508]
     end;
 
     local procedure PostPeriodEntriesWorker(PosPeriodEntryNo: Integer; pPostPOSEntries: Boolean; pPostItemEntries: Boolean)
@@ -714,8 +578,6 @@ codeunit 6150849 "NPR POS Action: EndOfDay V3"
         POSPostEntries: Codeunit "NPR POS Post Entries";
         POSEntry: Record "NPR POS Entry";
     begin
-
-        //-NPR5.51 [359508]
         if (not POSPeriodRegister.Get(PosPeriodEntryNo)) then
             exit;
 
@@ -737,7 +599,6 @@ codeunit 6150849 "NPR POS Action: EndOfDay V3"
             POSPostEntries.Run(POSEntry);
             Commit;
         end;
-        //+NPR5.51 [359508]
     end;
 
     local procedure OpenDrawer(CashDrawerNo: Code[10]; POSUnit: Record "NPR POS Unit"; SalePOS: Record "NPR Sale POS")
@@ -745,8 +606,6 @@ codeunit 6150849 "NPR POS Action: EndOfDay V3"
         POSPaymentBin: Record "NPR POS Payment Bin";
         POSPaymentBinInvokeMgt: Codeunit "NPR POS Payment Bin Eject Mgt.";
     begin
-
-        //-NPR5.55 [405112]
         if (CashDrawerNo = '') then
             CashDrawerNo := POSUnit."Default POS Payment Bin";
 
@@ -757,8 +616,5 @@ codeunit 6150849 "NPR POS Action: EndOfDay V3"
             POSPaymentBin."Eject Method" := 'PRINTER';
 
         POSPaymentBinInvokeMgt.EjectDrawer(POSPaymentBin, SalePOS);
-
-        //+NPR5.55 [405112]
     end;
 }
-

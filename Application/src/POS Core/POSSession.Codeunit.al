@@ -1,53 +1,6 @@
 codeunit 6150700 "NPR POS Session"
 {
-    // This object is used to manage session state for a POS session.
-    // 
-    // Some very important information:
-    // - It must never ever ever be set to SingleInstance=Yes. Never. Did I say never? Good. So - never.
-    // - In Transcendence, there should be no single-instance codeunits at all. If you ever feel like creating one,
-    //   please talk to me (Vjeko), and let's discuss.
-    // - An instance of this codeunit is created by the POS page, and one (and only one) instance of this codeunit
-    //   belongs to an instance of the POS page. Once the page closes, the codeunit instance dies.
-    // - One of the primary goals of this codeunit is to contain the reference to the Framework control add-in and to
-    //   allow other codeunits to talk to the JavaScript. Therefore, the variable of this codeunit type must be passed
-    //   to all functions that may have anything to do with front end. This is no problem, because all events that are
-    //   ever sent from the front end pass the instance to this codeunit as a part of the event signature, and then
-    //   any event subscribers should make sure to pass this instance around.
-    // - Never keep a global variable of this codeunit type. It should only be locals and parameters. No globals.
-    // - No business logic belongs in here. This is infrastructure only.
-    // 
-    // NPR5.32.11/VB /20170621  CASE 281618 Added watermark initialization functionality.
-    // NPR5.37/VB /20170929   CASE 291777 Short-term solution for just-in-time Stargate synchronization in Major Tom
-    // NPR5.37/VB  /20171025  CASE 293905 Added support for locked view, fixing the issue with incorrect setup instance being used in some functions
-    // NPR5.37/NPKNAV/20171030  CASE 283791-01 Transport NPR5.37 - 27 October 2017
-    // NPR5.38/VB  /20171120  CASE 295800 Implemented support for front-end keyboard bindings
-    // NPR5.40/VB  /20180213  CASE 306347 Performance improvement due to parameters in BLOB and physical-table action discovery; refactored event model for session initialization.
-    // NPR5.40/VB  /20180327  CASE 304310 Refreshing the menu UI when switching register or reinitializing session.
-    // NPR5.41/MMV /20180410  CASE 307453 Changed implementation of 304310 to prevent double POS menu parse on first initialization.
-    // NPR5.43/MMV /20180531  CASE 315838 Added server stopwatch functionality
-    // NPR5.43/MMV /20180606  CASE 318028 Refactored session initialization and finalization.
-    // NPR5.43/VB  /20180611  CASE 314603 Implemented secure method behavior functionality.
-    // NPR5.43/MHA /20180613  CASE 318395 Added POS Sales Workflow in ChangeViewPayment()
-    // NPR5.44/VB  /20180705  CASE 286547 Fixed issue with custom javascript code not being properly passed to the front end.
-    // NPR5.44/JDH /20180731  CASE 323499 Changed all functions to be External
-    // NPR5.47/TSA /20181018  CASE 327471 Refactored InitializeSession(), initialize new logo on register change
-    // NPR5.49/VB  /20181106  CASE 335141 Introducing the POS Theme functionality
-    // NPR5.48/TJ  /20180806  CASE 323835 New discovery pattern for keybinds
-    // NPR5.49/MMV /20190312 CASE 345188 Added helper function to minimize confusion & boilerplate.
-    // NPR5.50/VB  /20181224  CASE 338666 Supporting Workflows 2.0 functionality
-    // NPR5.51/VB  /20190719  CASE 352582 POS Administrative Templates feature
-    // NPR5.53/VB  /20190917  CASE 362777 Support for workflow sequencing (configuring/registering "before" and "after" workflow sequences that execute before or after another workflow)
-    // NPR5.54/ALPO/20200203 CASE 364658 Resume POS Sale
-    // NPR5.54/MMV /20200305 CASE 364340 Added mock constructor.
-    // NPR5.55/MMV /20200423 CASE 398235 Guard against blank frontend ID
-    // NPR5.55/TSA /20200527 CASE 406862 Added ChangeViewRestaurant()
-    // NPR5.55/VB  /20200527 CASE 406862 Added functionality to mark session as Dragonglass
-
     EventSubscriberInstance = Manual;
-
-    trigger OnRun()
-    begin
-    end;
 
     var
         Register: Record "NPR Register";
@@ -60,9 +13,9 @@ codeunit 6150700 "NPR POS Session"
         This: Codeunit "NPR POS Session";
         Stargate: Codeunit "NPR POS Stargate Management";
         ActionState: DotNet NPRNetDictionary_Of_T_U;
-        DataStore: DotNet NPRNetDataStore;
-        CurrentView: DotNet NPRNetView0;
-        KeyboardBindings: DotNet NPRNetList_Of_T;
+        DataStore: Codeunit "NPR Data Store";
+        CurrentView: Codeunit "NPR POS View";
+        KeyboardBindings: List of [Text];
         ActionStateRecRef: array[1024] of RecordRef;
         ActionStateCurrentActionId: Guid;
         ActionStateCurrentAction: Text;
@@ -88,15 +41,12 @@ codeunit 6150700 "NPR POS Session"
         SESSION_MISSING: Label 'POS Session object could not be retrieved. This is a programming bug, not a user error.';
         FRONTEND_MISSING: Label 'POS Front End object could not be retrieved. This is a programming bug, not a user error.';
         DragonglassSession: Boolean;
-        "--- Workflow 2.0 state ---": Integer;
         Workflow20State: array[1000] of Codeunit "NPR POS WF 2.0: State";
         Workflow20StateIndex: DotNet NPRNetDictionary_Of_T_U;
         Workflow20Map: array[1000] of Boolean;
         IsMock: Boolean;
 
-    local procedure "---Initialization---"()
-    begin
-    end;
+    //#region Initialization
 
     procedure Constructor(FrameworkIn: Interface "NPR Framework Interface"; FrontEndIn: Codeunit "NPR POS Front End Management"; SetupIn: Codeunit "NPR POS Setup"; SessionIn: Codeunit "NPR POS Session")
     var
@@ -105,7 +55,6 @@ codeunit 6150700 "NPR POS Session"
         OldFrontEnd: Codeunit "NPR POS Front End Management";
     begin
         if not Initialized then begin
-            //-NPR5.43 [318028]
             if OldPOSSession.IsActiveSession(OldFrontEnd) then begin
                 //Cleanup previous POS Session before initializing new one.
                 OldFrontEnd.GetSession(OldPOSSession);
@@ -113,19 +62,14 @@ codeunit 6150700 "NPR POS Session"
             end;
 
             FrontEndIn.Initialize(FrameworkIn, SessionIn);
-            //+NPR5.43 [318028]
-
             FrontEnd := FrontEndIn;
             Setup := SetupIn;
             This := SessionIn;
             Clear(Stargate);
 
             JavaScriptInterface.Initialize(SessionIn, FrontEndIn);
-
-            //-NPR5.43 [318028]
             FrontEndKeeper.Initialize(FrameworkIn, FrontEnd, This);
             BindSubscription(FrontEndKeeper);
-            //+NPR5.43 [318028]
 
             OnInitialize(FrontEnd);
         end else
@@ -138,7 +82,6 @@ codeunit 6150700 "NPR POS Session"
     var
         NullObject: DotNet NPRNetObject;
     begin
-        //-NPR5.54 [364340]
         FrontEnd := FrontEndIn;
         Setup := SetupIn;
         This := SessionIn;
@@ -154,7 +97,6 @@ codeunit 6150700 "NPR POS Session"
         Initialized := true;
 
         InitializeSession(false);
-        //+NPR5.54 [364340]
     end;
 
     procedure InitializeUI()
@@ -164,95 +106,43 @@ codeunit 6150700 "NPR POS Session"
     begin
         // This method is intended to be called only from the POS page during the initialization stage of the page.
         // Do not call this method from elsewhere!
-
         if InitializedUI then
             exit;
 
-        //-NPR5.40 [306347]
         DebugWithTimestamp('GetSalespersonRecord');
-        //+NPR5.40 [306347]
         Setup.GetSalespersonRecord(Salesperson);
-        //-NPR5.40 [306347]
         DebugWithTimestamp('GetRegisterRecord');
-        //+NPR5.40 [306347]
         Setup.GetRegisterRecord(Register);
-
-        //-NPR5.40 [306347]
         DebugWithTimestamp('UI.Initialize');
-        //+NPR5.40 [306347]
         UI.Initialize(FrontEnd);
-        //-NPR5.37 [293905]
-        //UI.SetOptions();
-        //-NPR5.40 [306347]
         DebugWithTimestamp('UI.SetOptions');
-        //+NPR5.40 [306347]
         UI.SetOptions(Setup);
-        //+NPR5.37 [293905]
-        //-NPR5.40 [306347]
         DebugWithTimestamp('UI.InitializeCaptions');
-        //+NPR5.40 [306347]
         UI.InitializeCaptions();
-        //-NPR5.40 [306347]
         DebugWithTimestamp('UI.InitializeNumberAndDateFormat');
-        //+NPR5.40 [306347]
         UI.InitializeNumberAndDateFormat(Register);
-        //-NPR5.40 [306347]
         DebugWithTimestamp('UI.InitializeLogo');
-        //+NPR5.40 [306347]
         UI.InitializeLogo(Register);
-        //-NPR5.32.11 [281618]
-        //-NPR5.40 [306347]
         DebugWithTimestamp('UI.InitializeWatermark');
-        //+NPR5.40 [306347]
         UI.InitializeWatermark();
-        //+NPR5.32.11 [281618]
-        //-NPR5.40 [306347]
         DebugWithTimestamp('UI.ConfigureFonts');
-        //+NPR5.40 [306347]
         UI.ConfigureFonts();
-        //-NPR5.40 [306347]
         DebugWithTimestamp('UI.InitializeMenus');
-        //+NPR5.40 [306347]
         UI.InitializeMenus(Register, Salesperson, This);
-        //-NPR5.37 [293905]
-        //UI.ConfigureReusableWorkflows(This);
-        //-NPR5.40 [306347]
         DebugWithTimestamp('UI.ConfigureReusableWorkflow');
-        //+NPR5.40 [306347]
         UI.ConfigureReusableWorkflows(This, Setup);
-        //+NPR5.37 [293905]
-        //-NPR5.37 [291777]
-        //-NPR5.40 [306347]
         DebugWithTimestamp('AdvertiseStargatePackages');
-        //+NPR5.40 [306347]
         FrontEnd.AdvertiseStargatePackages();
-        //+NPR5.37 [291777]
-        //-NPR5.38 [295800]
         InitializeKeyboardBindings();
-        //+NPR5.38 [295800]
-        //-NPR5.43 [314603]
         DebugWithTimestamp('InitializeSecureMethods');
         FrontEnd.ConfigureSecureMethods();
-        //+NPR5.43 [314603]
-        //-NPR5.53 [362777]
         DebugWithTimestamp('ConfigureActionSequences');
         FrontEnd.ConfigureActionSequences(SessionActions);
-        //+NPR5.53 [362777]
-        //-NPR5.49 [335141]
         DebugWithTimestamp('InitializeTheme');
         UI.InitializeTheme(Register);
-        //+NPR5.49 [335141]
-        //-NPR5.51 [352582]
         DebugWithTimestamp('InitializeAdminTemplates');
         UI.InitializeAdministrativeTemplates(Register);
-        //+NPR5.51 [352582]
         InitializedUI := true;
-
-        //-NPR5.41 [307453]
-        //-NPR5.40 [304310]
-        //SendMenus := TRUE;
-        //+NPR5.40 [304310]
-        //+NPR5.41 [307453]
     end;
 
     procedure InitializeSession(ResendMenus: Boolean)
@@ -261,8 +151,6 @@ codeunit 6150700 "NPR POS Session"
         UI: Codeunit "NPR POS UI Management";
         PreviousRegisterNo: Code[10];
     begin
-
-        //-NPR5.47 [327471]
         PreviousRegisterNo := Register."Register No.";
         Setup.GetRegisterRecord(Register);
 
@@ -277,16 +165,19 @@ codeunit 6150700 "NPR POS Session"
 
         end;
         StartPOSSession();
-        //+NPR5.47 [327471]
     end;
 
     local procedure InitializeDataSources()
     var
         JS: Codeunit "NPR POS JavaScript Interface";
+        DataSource: Codeunit "NPR Data Source";
+        DataSources: JsonArray;
     begin
         Clear(DataStore);
 
-        DataStore := DataStore.DataStore(CurrentView.GetDataSources());
+        DataSources := CurrentView.GetDataSources();
+        DataStore.Constructor(DataSources);
+
         OnInitializeDataSource(DataStore);
 
         if DataStore.DataSources.Count > 0 then begin
@@ -297,10 +188,9 @@ codeunit 6150700 "NPR POS Session"
 
     procedure InitializeSessionId(HardwareIdIn: Text; SessionNameIn: Text; HostNameIn: Text)
     begin
-        //-NPR5.55 [398235]
         if HardwareIdIn = '' then
             Error('Hardware ID from front end is blank. This is a programming error.');
-        //+NPR5.55 [398235]
+
         HardwareId := HardwareIdIn;
         SessionName := SessionNameIn;
         HostName := HostNameIn;
@@ -311,15 +201,9 @@ codeunit 6150700 "NPR POS Session"
     var
         POSKeyboardBindingMgt: Codeunit "NPR POS Keyboard Binding Mgt.";
     begin
-        //-NPR5.38 [295800]
-        KeyboardBindings := KeyboardBindings.List();
-        //-NPR5.48 [323835]
-        //OnDiscoverKeyboardBindings(KeyboardBindings);
         POSKeyboardBindingMgt.DiscoverKeyboardBindings(KeyboardBindings);
-        //+NPR5.48 [323835]
         if KeyboardBindings.Count > 0 then
             FrontEnd.ConfigureKeyboardBindings(KeyboardBindings);
-        //+NPR5.38 [295800]
     end;
 
     procedure StartPOSSession()
@@ -328,24 +212,26 @@ codeunit 6150700 "NPR POS Session"
         CultureInfo: DotNet NPRNetCultureInfo;
     begin
         InitializePOSSession();
-
         ChangeViewLogin();
-
-        //-NPR5.40 [306347]
         if not SessionStarted then
             OnInitializationComplete(FrontEnd);
-        //+NPR5.40 [306347]
-
         SessionStarted := true;
     end;
 
-    local procedure "---Finalization---"()
+    local procedure InitializePOSSession()
     begin
+        Clear(Sale);
+        Setup.Initialize(UserId);
+        Setup.GetRegisterRecord(Register);
+        Sale.InitializeAtLogin(Register, Setup);
     end;
+
+    //#endregion
+
+    //#region Finalization
 
     procedure Destructor()
     begin
-        //-NPR5.43 [318028]
         if not Finalized then begin
             OnFinalize(FrontEnd);
             UnbindSubscription(FrontEndKeeper);
@@ -353,25 +239,21 @@ codeunit 6150700 "NPR POS Session"
             SessionActions.DeleteAll;
             Finalized := true;
         end;
-        //+NPR5.43 [318028]
     end;
 
     procedure IsFinalized(): Boolean
     begin
-        //-NPR5.43 [318028]
         exit(Finalized);
-        //+NPR5.43 [318028]
     end;
 
-    local procedure "---Workflow 2.0 State---"()
-    begin
-    end;
+    //#endregion
+
+    //#region Workflows 2.0 State
 
     procedure GetWorkflow20State(WorkflowId: Integer; ActionCode: Text; var State: Codeunit "NPR POS WF 2.0: State")
     var
         StateIndex: Integer;
     begin
-        //-NPR5.50 [338666]
         if (IsNull(Workflow20StateIndex)) then
             Workflow20StateIndex := Workflow20StateIndex.Dictionary();
 
@@ -384,14 +266,12 @@ codeunit 6150700 "NPR POS Session"
             StateIndex := Workflow20StateIndex.Item(WorkflowId);
 
         State := Workflow20State[StateIndex];
-        //+NPR5.50 [338666]
     end;
 
     local procedure GetNextWorkflow20StateIndex(): Integer
     var
         i: Integer;
     begin
-        //-NPR5.50 [338666]
         for i := 1 to 1000 do begin
             if not Workflow20Map[i] then begin
                 Workflow20Map[i] := true;
@@ -400,14 +280,12 @@ codeunit 6150700 "NPR POS Session"
         end;
 
         // TODO: Here either we should retry to recover an old ID, or we should throw an error
-        //+NPR5.50 [338666]
     end;
 
     procedure FreeWorkflow20State(WorkflowId: Integer)
     var
         StateIndex: Integer;
     begin
-        //-NPR5.50 [338666]
         if (not Workflow20StateIndex.ContainsKey(WorkflowId)) then
             exit;
 
@@ -415,16 +293,14 @@ codeunit 6150700 "NPR POS Session"
         Workflow20StateIndex.Remove(WorkflowId);
         Workflow20Map[StateIndex] := false;
         Clear(Workflow20State[StateIndex]);
-        //+NPR5.50 [338666]
     end;
 
-    local procedure "---Workflow Session Storage---"()
-    begin
-    end;
+    //#endregion
+
+    //#region  Workflows Session Storage
 
     procedure StartTransaction()
     var
-        Request: DotNet NPRNetStartTransactionJsonRequest;
         TransactionNo: Text;
     begin
         Clear(Sale);
@@ -433,10 +309,8 @@ codeunit 6150700 "NPR POS Session"
 
     procedure ResumeTransaction(SalePOS: Record "NPR Sale POS")
     begin
-        //-NPR5.54 [364658]
         Clear(Sale);
         Sale.ResumeExistingSale(SalePOS, Register, FrontEnd, Setup, Sale);
-        //+NPR5.54 [364658]
     end;
 
     procedure BeginAction("Action": Text): Guid
@@ -501,59 +375,63 @@ codeunit 6150700 "NPR POS Session"
         Clear(ActionStateCurrentActionId);
     end;
 
-    local procedure "---Session Action Methods---"()
+    local procedure StoreActionStateRecRef("Object": Variant) StoredIndex: Integer
     begin
-        // These methods are used to keep track of "known" actions inside of this session.
-        // Primarily this is used to prevent invalid action setup.
+        StoredIndex := ActionStateRecRefCounter;
+        ActionStateRecRef[StoredIndex].GetTable(Object);
+        ActionStateRecRefCounter += 1;
     end;
+
+    [TryFunction]
+    local procedure TryStoreActionState("Key": Text; "Object": Variant)
+    begin
+        if ActionState.ContainsKey(Key) then
+            ActionState.Remove(Key);
+
+        ActionState.Add(Key, Object);
+    end;
+
+    //#endregion
+
+    //#region Session Action Methods
+
+    // These methods are used to keep track of "known" actions inside of this session.
+    // Primarily this is used to prevent invalid action setup.
 
     procedure DiscoverActionsOnce()
     var
         POSAction: Record "NPR POS Action";
     begin
-        //-NPR5.40 [306347]
         if ActionsDiscovered then
             exit;
 
         POSAction.DiscoverActions();
         ActionsDiscovered := true;
-        //+NPR5.40 [306347]
     end;
 
     procedure DiscoverSessionAction(var ActionIn: Record "NPR POS Action" temporary)
     begin
-        //-NPR5.40 [306347]
-        //SessionActions.Code := Code;
-        //IF NOT SessionActions.FIND() THEN
-        //  SessionActions.INSERT();
         SessionActions := ActionIn;
         if not SessionActions.Insert then begin
             ActionIn.CalcFields(Workflow);
             SessionActions.Workflow := ActionIn.Workflow;
-            //-NPR5.44 [286547]
             ActionIn.CalcFields("Custom JavaScript Logic");
             SessionActions."Custom JavaScript Logic" := ActionIn."Custom JavaScript Logic";
-            //+NPR5.44 [286547]
             SessionActions.Modify;
         end;
-        //+NPR5.40 [306347]
     end;
 
     procedure RetrieveSessionAction(ActionCode: Code[20]; var ActionOut: Record "NPR POS Action"): Boolean
     begin
-        //-NPR5.40 [306347]
         if not SessionActions.Get(ActionCode) then
             exit(false);
 
         ActionOut := SessionActions;
         SessionActions.CalcFields(Workflow);
         ActionOut.Workflow := SessionActions.Workflow;
-        //-NPR5.44 [286547]
         SessionActions.CalcFields("Custom JavaScript Logic");
         ActionOut."Custom JavaScript Logic" := SessionActions."Custom JavaScript Logic";
-        //+NPR5.44 [286547]
         exit(true);
-        //+NPR5.40 [306347]
     end;
 
     procedure IsSessionAction("Code": Code[20]): Boolean
@@ -561,16 +439,16 @@ codeunit 6150700 "NPR POS Session"
         exit(SessionActions.Get(Code));
     end;
 
-    local procedure "---General Methods---"()
-    begin
-    end;
+    //#endregion
+
+    //#region General Methods
 
     procedure GetSetup(var SetupOut: Codeunit "NPR POS Setup")
     begin
         SetupOut := Setup;
     end;
 
-    procedure GetCurrentView(var ViewOut: DotNet NPRNetView0)
+    procedure GetCurrentView(var ViewOut: Codeunit "NPR POS View")
     begin
         ViewOut := CurrentView;
     end;
@@ -600,7 +478,7 @@ codeunit 6150700 "NPR POS Session"
         Sale.GetContext(SaleLineOut, PaymentLineOut);
     end;
 
-    procedure GetDataStore(var DataStoreOut: DotNet NPRNetDataStore)
+    procedure GetDataStore(var DataStoreOut: Codeunit "NPR Data Store")
     begin
         DataStoreOut := DataStore;
     end;
@@ -612,10 +490,6 @@ codeunit 6150700 "NPR POS Session"
 
     procedure ProcessKeyPress(KeyPress: Text) Handled: Boolean
     begin
-        //-NPR5.38 [295800]
-        if IsNull(KeyboardBindings) then
-            exit(false);
-
         if (KeyboardBindings.Count = 0) and (not KeyboardBindings.Contains(KeyPress)) then
             exit(false);
 
@@ -623,7 +497,6 @@ codeunit 6150700 "NPR POS Session"
 
         if not Handled then
             FrontEnd.ReportBug(StrSubstNo(Text006, KeyPress));
-        //+NPR5.38 [295800]
     end;
 
     procedure IsInAction(): Boolean
@@ -636,7 +509,7 @@ codeunit 6150700 "NPR POS Session"
         InAction := InActionNew;
     end;
 
-    procedure SetView(View: DotNet NPRNetView0)
+    procedure SetView(View: Codeunit "NPR POS View")
     begin
         CurrentView := View;
         InitializeDataSources();
@@ -651,61 +524,47 @@ codeunit 6150700 "NPR POS Session"
 
     procedure DebugWithTimestamp(Trace: Text)
     begin
-        //-NPR5.40 [306347]
         DebugTrace += Trace + ' at ' + Format(CurrentDateTime, 0, '<Hours24,2>:<Minutes,2>:<Seconds,2><Second dec>') + ';';
-        //+NPR5.40 [306347]
     end;
 
     procedure DebugFlush() Result: Text
     begin
-        //-NPR5.40 [306347]
         Result := DebugTrace;
         DebugTrace := '';
-        //+NPR5.40 [306347]
     end;
 
     procedure AddServerStopwatch(Keyword: Text; Duration: Duration)
     var
         Durationms: Integer;
     begin
-        //-NPR5.43 [315838]
         Durationms := Duration;
         ServerStopwatch += StrSubstNo('[%1:%2]', DelChr(Keyword, '=', '[:]'), Durationms);
-        //+NPR5.43 [315838]
     end;
 
     procedure ServerStopwatchFlush() Result: Text
     begin
-        //-NPR5.43 [315838]
         Result := ServerStopwatch;
         ServerStopwatch := '';
-        //+NPR5.43 [315838]
     end;
 
-    procedure IsAMockSession(): Boolean
+    procedure IsMockSession(): Boolean
     begin
-        //-NPR5.54 [364340]
         exit(IsMock);
-        //+NPR5.54 [364340]
     end;
 
     procedure SetDragonglassSession()
     begin
-        //-NPR5.55 [406862]
         DragonglassSession := true;
-        //+NPR5.55 [406862]
     end;
 
     procedure IsDragonglassSession(): Boolean
     begin
-        //-NPR5.55 [406862]
         exit(DragonglassSession);
-        //+NPR5.55 [406862]
     end;
 
-    local procedure "---Data Refresh---"()
-    begin
-    end;
+    //#endregion
+
+    //#region Data Refresh
 
     procedure RequestRefreshData()
     begin
@@ -718,55 +577,17 @@ codeunit 6150700 "NPR POS Session"
         DataRefreshRequested := false;
     end;
 
-    local procedure "---Local Functions---"()
-    begin
-    end;
+    //#endregion
 
-    local procedure InitializePOSSession()
-    begin
-        Clear(Sale);
-
-        Setup.Initialize(UserId);
-        Setup.GetRegisterRecord(Register);
-
-        Sale.InitializeAtLogin(Register, Setup);
-    end;
-
-    local procedure StoreActionStateRecRef("Object": Variant) StoredIndex: Integer
-    begin
-        StoredIndex := ActionStateRecRefCounter;
-        ActionStateRecRef[StoredIndex].GetTable(Object);
-        ActionStateRecRefCounter += 1;
-    end;
-
-    [TryFunction]
-    local procedure TryStoreActionState("Key": Text; "Object": Variant)
-    begin
-        if ActionState.ContainsKey(Key) then
-            ActionState.Remove(Key);
-
-        ActionState.Add(Key, Object);
-    end;
-
-    local procedure "---Process---"()
-    begin
-    end;
-
-    local procedure InitSale()
-    begin
-    end;
+    //#region View Changing Methods
 
     procedure ChangeViewLogin()
     begin
-        // TODO: any business logic goes here
-
         FrontEnd.LoginView(Setup);
     end;
 
     procedure ChangeViewSale()
     begin
-        // TODO: any business logic goes here
-
         FrontEnd.SaleView(Setup);
     end;
 
@@ -774,45 +595,35 @@ codeunit 6150700 "NPR POS Session"
     var
         POSViewChangeWorkflowMgt: Codeunit "NPR POS View Change WF Mgt.";
     begin
-        //-NPR5.43 [318395]
         POSViewChangeWorkflowMgt.InvokeOnPaymentViewWorkflow(This);
-        //+NPR5.43 [318395]
-
         FrontEnd.PaymentView(Setup);
     end;
 
     procedure ChangeViewLocked()
     begin
-        //-NPR5.37 [293905]
         FrontEnd.LockedView(Setup);
-        //+NPR5.37 [293905]
     end;
 
     procedure ChangeViewBalancing()
     begin
-        // TODO: any business logic goes here
-
         FrontEnd.BalancingView(Setup);
     end;
 
     procedure ChangeViewRestaurant()
     begin
 
-        //-NPR5.55 [406862]
         if (IsDragonglassSession()) then begin
-            //FrontEnd.RestaurantView (Setup);
             Error('FrontEnd.RestaurantView() missing');
             exit;
         end;
 
         Message('Restaurant view is not supported in this version. Change the setup on the POS View Profile. The default view is selected.');
         ChangeViewSale();
-        //+NPR5.55 [406862]
     end;
 
-    local procedure "---Framework auto-detection---"()
-    begin
-    end;
+    //#endregion
+
+    //#region Framework Auto-Detection
 
     procedure IsActiveSession(var FrontEndOut: Codeunit "NPR POS Front End Management"): Boolean
     var
@@ -828,17 +639,14 @@ codeunit 6150700 "NPR POS Session"
         Active: Boolean;
         POSFrontEnd: Codeunit "NPR POS Front End Management";
     begin
-        //-NPR5.49 [345188]
         OnDetectFramework(POSFrontEnd, POSSessionOut, Active);
         if WithError and (not Active) then
             Error(SESSION_MISSING);
         exit(Active);
-        //+NPR5.49 [345188]
     end;
 
     procedure GetFrontEnd(var POSFrontEndOut: Codeunit "NPR POS Front End Management"; WithError: Boolean): Boolean
     begin
-        //-NPR5.49 [345188]
         if not Initialized then begin
             if WithError then
                 Error(FRONTEND_MISSING)
@@ -848,7 +656,6 @@ codeunit 6150700 "NPR POS Session"
 
         POSFrontEndOut := FrontEnd;
         exit(true);
-        //+NPR5.49 [345188]
     end;
 
     [IntegrationEvent(false, false)]
@@ -856,9 +663,9 @@ codeunit 6150700 "NPR POS Session"
     begin
     end;
 
-    local procedure "---Events---"()
-    begin
-    end;
+    //#endregion
+
+    //#region Event Publishers
 
     [IntegrationEvent(false, false)]
     local procedure OnInitialize(FrontEnd: Codeunit "NPR POS Front End Management")
@@ -871,22 +678,17 @@ codeunit 6150700 "NPR POS Session"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterSetView(View: DotNet NPRNetView0)
+    local procedure OnAfterSetView(View: Codeunit "NPR POS View")
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnInitializeDataSource(DataStore: DotNet NPRNetDataStore)
+    local procedure OnInitializeDataSource(DataStore: Codeunit "NPR Data Store")
     begin
     end;
 
     [IntegrationEvent(false, false)]
     local procedure OnFrontEndId(HardwareId: Text; SessionName: Text; HostName: Text; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnDiscoverKeyboardBindings(KeyboardBindings: DotNet NPRNetList_Of_T)
     begin
     end;
 
@@ -899,5 +701,6 @@ codeunit 6150700 "NPR POS Session"
     local procedure OnFinalize(FrontEnd: Codeunit "NPR POS Front End Management")
     begin
     end;
-}
 
+    //#endregion
+}

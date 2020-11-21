@@ -1,36 +1,29 @@
 codeunit 6150853 "NPR POS Ext.: Line Format."
 {
-    // NPR5.43/CLVA/20180605 CASE 296709 Created this object to support front-end line formatting.
-
-
-    trigger OnRun()
-    begin
-    end;
-
     [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnDiscoverDataSourceExtensions', '', false, false)]
-    local procedure OnDiscover(DataSourceName: Text; Extensions: DotNet NPRNetList_Of_T)
+    local procedure OnDiscover(DataSourceName: Text; Extensions: List of [Text])
     begin
         if DataSourceName = 'BUILTIN_SALELINE' then
             Extensions.Add('LineFormat');
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnGetDataSourceExtension', '', false, false)]
-    local procedure OnGetExtension(DataSourceName: Text; ExtensionName: Text; var DataSource: DotNet NPRNetDataSource0; var Handled: Boolean; Setup: Codeunit "NPR POS Setup")
+    local procedure OnGetExtension(DataSourceName: Text; ExtensionName: Text; var DataSource: Codeunit "NPR Data Source"; var Handled: Boolean; Setup: Codeunit "NPR POS Setup")
     var
-        DataType: DotNet NPRNetDataType;
+        DataType: Enum "NPR Data Type";
     begin
         if (DataSourceName <> 'BUILTIN_SALELINE') or (ExtensionName <> 'LineFormat') then
             exit;
 
         Handled := true;
 
-        DataSource.AddColumn('Color', 'Text color', DataType.String, false);
-        DataSource.AddColumn('Weight', 'Font weight', DataType.String, false);
-        DataSource.AddColumn('Style', 'Font style', DataType.String, false);
+        DataSource.AddColumn('Color', 'Text color', DataType::String, false);
+        DataSource.AddColumn('Weight', 'Font weight', DataType::String, false);
+        DataSource.AddColumn('Style', 'Font style', DataType::String, false);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnDataSourceExtensionReadData', '', false, false)]
-    local procedure OnReadData(DataSourceName: Text; ExtensionName: Text; var RecRef: RecordRef; DataRow: DotNet NPRNetDataRow0; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
+    local procedure OnReadData(DataSourceName: Text; ExtensionName: Text; var RecRef: RecordRef; DataRow: Codeunit "NPR Data Row"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         SaleLine: Record "NPR Sale Line POS";
         Color: Text;
@@ -61,4 +54,3 @@ codeunit 6150853 "NPR POS Ext.: Line Format."
     begin
     end;
 }
-

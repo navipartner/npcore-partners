@@ -1,169 +1,113 @@
 codeunit 6150710 "NPR POS Data Management"
 {
-    // NPR5.36/VB  /20170925  CASE 291525 Adding data source extension functionality
-    // NPR5.37/MMV /20171026  CASE 287688 Replaced text constants with proper constants to avoid translation.
-    // NPR5.38/TSA /20170811  CASE 286726 added publisher OnSetupDataSourcesForView
-    // NPR5.38/MHA /20180105  CASE 301053 Changed Parameter name from DataSet to CurrDataset as DataSet is a reserved word in RecordToDataSet(),OnAfterRefreshDataSet(),OnRefreshDataSet()
-    // NPR5.40/MMV /20180214  CASE 294655 Small blip on performance trace: EVALUATE performing better than DotNet interop Int32.Parse
-    // NPR5.51/TSA /20190802 CASE 363746 AL can't cast NAV data type directly to System.Object.
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         Text001: Label 'Data Source "%1" is unknown or has not been defined.';
         Text002: Label 'Data Source "%1" did not bind variables.';
         Text003: Label 'Extension "%1" for data source "%2" did not respond to %3 event.';
 
-    procedure SetupDefaultDataSourcesForView(View: DotNet NPRNetView0; Setup: Codeunit "NPR POS Setup")
+    procedure SetupDefaultDataSourcesForView(View: Codeunit "NPR POS View"; Setup: Codeunit "NPR POS Setup")
     var
-        ViewType: DotNet NPRNetViewType0;
-        DataSource: DotNet NPRNetDataSource0;
+        DataSource: Codeunit "NPR Data Source";
     begin
-        case true of
-            //-NPR5.37 [287688]
-            View.Type.Equals(View.Type.Login):
+        case View.Type of
+            View.Type::Login:
                 begin
                     GetDataSource(BuiltInSale, DataSource, Setup);
-                    View.DataSources.Add(DataSource.Id, DataSource);
+                    View.AddDataSource(DataSource);
                 end;
-            View.Type.Equals(ViewType.Sale):
+            View.Type::Sale:
                 begin
                     GetDataSource(BuiltInSaleLine, DataSource, Setup);
-                    View.DataSources.Add(DataSource.Id, DataSource);
+                    View.AddDataSource(DataSource);
                     GetDataSource(BuiltInSale, DataSource, Setup);
-                    View.DataSources.Add(DataSource.Id, DataSource);
+                    View.AddDataSource(DataSource);
                 end;
-            View.Type.Equals(ViewType.Payment):
+            View.Type::Payment:
                 begin
                     GetDataSource(BuiltInPaymentLine, DataSource, Setup);
                     View.AddDataSource(DataSource);
                     GetDataSource(BuiltInSale, DataSource, Setup);
-                    View.DataSources.Add(DataSource.Id, DataSource);
+                    View.AddDataSource(DataSource);
                 end;
-            View.Type.Equals(ViewType.BalanceRegister):
+            View.Type::BalanceRegister:
                 begin
                     GetDataSource(BuiltInBalancing, DataSource, Setup);
                     View.AddDataSource(DataSource);
                 end;
-
-        //  View.Type.Equals(View.Type.Login):
-        //    BEGIN
-        //      //GetDataSource(DefaultDataSource_SaleLine,DataSource,Setup);
-        //      //View.DataSources.Add(DataSource.Id,DataSource);
-        //      GetDataSource(DefaultDataSource_Sale,DataSource,Setup);
-        //      View.DataSources.Add(DataSource.Id,DataSource);
-        //    END;
-        //  View.Type.Equals(ViewType.Sale):
-        //    BEGIN
-        //      GetDataSource(DefaultDataSource_SaleLine,DataSource,Setup);
-        //      View.DataSources.Add(DataSource.Id,DataSource);
-        //      GetDataSource(DefaultDataSource_Sale,DataSource,Setup);
-        //      View.DataSources.Add(DataSource.Id,DataSource);
-        //    END;
-        //  View.Type.Equals(ViewType.Payment):
-        //    BEGIN
-        //      GetDataSource(DefaultDataSource_PaymentLine,DataSource,Setup);
-        //      View.AddDataSource(DataSource);
-        //      GetDataSource(DefaultDataSource_Sale,DataSource,Setup);
-        //      View.DataSources.Add(DataSource.Id,DataSource);
-        //    END;
-        //  View.Type.Equals(ViewType.BalanceRegister):
-        //    BEGIN
-        //      GetDataSource(DefaultDataSource_Register,DataSource,Setup);
-        //      View.AddDataSource(DataSource);
-        //    END;
-        //+NPR5.37 [287688]
         end;
 
-        //-NPR5.38 [286726]
         OnSetupDataSourcesForView(View, Setup);
-        //+NPR5.38 [286726]
     end;
 
-    procedure GetDataSource(Name: Text; var DataSource: DotNet NPRNetDataSource0; Setup: Codeunit "NPR POS Setup")
+    procedure GetDataSource(Name: Text; var DataSource: Codeunit "NPR Data Source"; Setup: Codeunit "NPR POS Setup")
     var
-        Extensions: DotNet NPRNetList_Of_T;
-        ExtensionDataSource: DotNet NPRNetDataSource0;
-        Column: DotNet NPRNetDataColumn1;
+        Extensions: List of [Text];
+        ExtensionDataSource: Codeunit "NPR Data Source";
+        Column: JsonToken;
+        DataColumn: Codeunit "NPR Data Column";
         ExtensionName: Text;
         Handled: Boolean;
     begin
         OnGetDataSource(Name, DataSource, Handled, Setup);
-        if (not Handled) or (IsNull(DataSource)) then
+        if (not Handled) or (DataSource.IsNull()) then
             Error(Text001, Name);
 
-        //-NPR5.36 [291525]
-        Extensions := Extensions.List();
         OnDiscoverDataSourceExtensions(Name, Extensions);
         if Extensions.Count > 0 then begin
-            DataSource.Content.Add('_extensions', Extensions);
+            DataSource.AddExtensions(Extensions);
 
             foreach ExtensionName in Extensions do begin
                 Handled := false;
-                ExtensionDataSource := ExtensionDataSource.DataSource();
-                ExtensionDataSource.Id := ExtensionName;
+                ExtensionDataSource.Constructor();
+                ExtensionDataSource.SetId(ExtensionName);
                 OnGetDataSourceExtension(Name, ExtensionName, ExtensionDataSource, Handled, Setup);
                 if not Handled then
                     Error(Text003, ExtensionName, Name, 'OnGetDataSourceExtension');
 
-                foreach Column in ExtensionDataSource.Columns do
+                foreach Column in ExtensionDataSource.Columns do begin
+                    DataColumn.Constructor(Column);
                     DataSource.AddColumn(
-                      ExtensionName + '.' + Column.FieldId,
-                      Column.Caption,
-                      Column.DataType,
-                      Column.Visible);
+                      ExtensionName + '.' + DataColumn.FieldId,
+                      DataColumn.Caption,
+                      DataColumn.DataType,
+                      DataColumn.Visible);
+                end;
             end;
         end;
-        //+NPR5.36 [291525]
 
         OnAfterGetDataSource(Name, DataSource, Setup);
     end;
 
-    procedure RecordToDataSet("Record": Variant; var CurrDataSet: DotNet NPRNetDataSet; DataSource: DotNet NPRNetDataSource0; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
+    procedure RecordToDataSet("Record": Variant; var CurrDataSet: Codeunit "NPR Data Set"; DataSource: Codeunit "NPR Data Source"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         RecRef: RecordRef;
-        DataRow: DotNet NPRNetDataRow0;
+        DataRow: Codeunit "NPR Data Row";
         CurrentPosition: Text;
     begin
-        //-NPR5.38 [301053]
-        // DataSet := DataSet.DataSet(DataSource.Id);
-        //
-        // RecRef.GETTABLE(Record);
-        // CurrentPosition := RecRef.GETPOSITION();
-        // IF RecRef.FIND THEN
-        //  DataSet.CurrentPosition := CurrentPosition;
-        //
-        // IF RecRef.FINDSET THEN
-        //  REPEAT
-        //    DataRow := DataSet.NewRow(RecRef.GETPOSITION());
-        //    NavOneRecordToDataRow(RecRef,DataRow,DataSource,POSSession,FrontEnd);
-        //  UNTIL RecRef.NEXT = 0;
-        CurrDataSet := CurrDataSet.DataSet(DataSource.Id);
+        CurrDataSet.Constructor(DataSource.Id);
 
         RecRef.GetTable(Record);
         CurrentPosition := RecRef.GetPosition();
         if RecRef.Find then
-            CurrDataSet.CurrentPosition := CurrentPosition;
+            CurrDataSet.SetCurrentPosition(CurrentPosition);
 
         if RecRef.FindSet then
             repeat
-                DataRow := CurrDataSet.NewRow(RecRef.GetPosition());
+                CurrDataSet.NewRow(RecRef.GetPosition(), DataRow);
                 NavOneRecordToDataRow(RecRef, DataRow, DataSource, POSSession, FrontEnd);
             until RecRef.Next = 0;
-        //+NPR5.38 [301053]
     end;
 
-    local procedure NavOneRecordToDataRow(var RecRef: RecordRef; DataRow: DotNet NPRNetDataRow0; DataSource: DotNet NPRNetDataSource0; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
+    local procedure NavOneRecordToDataRow(var RecRef: RecordRef; DataRow: Codeunit "NPR Data Row"; DataSource: Codeunit "NPR Data Source"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         "Field": FieldRef;
-        DataColumn: DotNet NPRNetDataColumn1;
-        Int32: DotNet NPRNetInt32;
-        Extensions: DotNet NPRNetList_Of_T;
-        ExtensionDataRow: DotNet NPRNetDataRow0;
-        KeyValuePair: DotNet NPRNetKeyValuePair_Of_T_U;
+        DataColumnToken: JsonToken;
+        DataColumnObject: JsonObject;
+        DataColumnProxy: Codeunit "NPR Data Column";
+        Extensions: List of [Text];
+        ExtensionDataRow: Codeunit "NPR Data Row";
+        ExtensionKeys: List of [Text];
+        ExtensionKey: Text;
         VariableValue: Variant;
         FieldIdText: Text;
         Extension: Text;
@@ -174,35 +118,25 @@ codeunit 6150710 "NPR POS Data Management"
         IsExtensionField: Boolean;
         FieldValueVariant: Variant;
     begin
-        foreach DataColumn in DataSource.Columns do begin
-            //-NPR5.40 [294655]
-            //  IF Int32.TryParse(DataColumn.FieldId,FieldId) THEN BEGIN
-            if Evaluate(FieldId, DataColumn.FieldId) then begin
-                //+NPR5.40 [294655]
+        foreach DataColumnToken in DataSource.Columns do begin
+            DataColumnObject := DataColumnToken.AsObject();
+            FieldIdText := DataColumnProxy.FieldId(DataColumnObject);
+            if Evaluate(FieldId, FieldIdText) then begin
                 Field := RecRef.Field(FieldId);
-
-                //-NPR5.51 [363746]
-                // DataRow.Add(DataColumn.FieldId,Field.VALUE);
                 VariableValue := Field.Value;
-                DataRow.Add(DataColumn.FieldId, VariableValue);
-                //+NPR5.51 [363746]
-
-            end else
-              //-NPR5.36 [291525]
-              //    HasVariables := TRUE;
-              begin
-                if DataSource.Content.ContainsKey('_extensions') then begin
-                    Extensions := DataSource.Content.Item('_extensions');
+                DataRow.Add(FieldIdText, VariableValue);
+            end else begin
+                if DataSource.HasExtensions() then begin
+                    DataSource.GetExtensions(Extensions);
                     IsExtensionField := false;
                     foreach Extension in Extensions do
-                        if CopyStr(DataColumn.FieldId, 1, StrLen(Extension) + 1) = Extension + '.' then
+                        if CopyStr(FieldIdText, 1, StrLen(Extension) + 1) = Extension + '.' then
                             IsExtensionField := true;
                     if not IsExtensionField then
                         HasVariables := true;
                 end else
                     HasVariables := true;
             end;
-            //+NPR5.36 [291525]
         end;
 
         if HasVariables then begin
@@ -213,28 +147,27 @@ codeunit 6150710 "NPR POS Data Management"
             OnAfterReadDataSourceVariables(POSSession, RecRef, DataSource.Id, DataRow);
         end;
 
-        //-NPR5.36 [291525]
-        if DataSource.Content.ContainsKey('_extensions') then begin
-            Extensions := DataSource.Content.Item('_extensions');
+        if DataSource.HasExtensions() then begin
+            DataSource.GetExtensions(Extensions);
             foreach Extension in Extensions do begin
-                ExtensionDataRow := ExtensionDataRow.DataRow(DataRow.Position);
+                ExtensionDataRow.Constructor(DataRow.Position);
                 Handled := false;
                 OnDataSourceExtensionReadData(DataSource.Id, Extension, RecRef, ExtensionDataRow, POSSession, FrontEnd, Handled);
                 if not Handled then
                     FrontEnd.ReportBug(StrSubstNo(Text003, Extension, DataSource.Id, 'OnDataSourceExtensionReadData'));
-                foreach KeyValuePair in ExtensionDataRow.Fields do
-                    DataRow.Add(StrSubstNo('%1.%2', Extension, KeyValuePair.Key), KeyValuePair.Value);
+                ExtensionKeys := ExtensionDataRow.Fields().Keys();
+                foreach ExtensionKey in ExtensionKeys do
+                    DataRow.Add(StrSubstNo('%1.%2', Extension, ExtensionKey), ExtensionDataRow.Field(ExtensionKey));
             end;
         end;
-        //+NPR5.36 [291525]
     end;
 
-    procedure AddFieldToDataSource(DataSource: DotNet NPRNetDataSource0; "Record": Variant; FieldNo: Integer; Visible: Boolean)
+    procedure AddFieldToDataSource(DataSource: Codeunit "NPR Data Source"; "Record": Variant; FieldNo: Integer; Visible: Boolean)
     var
         RecRef: RecordRef;
         FieldRef: FieldRef;
-        DataType: DotNet NPRNetDataType;
-        DataColumn: DotNet NPRNetDataColumn1;
+        DataType: Enum "NPR Data Type";
+        DataColumn: Codeunit "NPR Data Column";
         Type: Text;
         Width: Integer;
     begin
@@ -245,27 +178,27 @@ codeunit 6150710 "NPR POS Data Management"
         case Type of
             'BOOLEAN':
                 begin
-                    DataType := DataType.Boolean;
+                    DataType := DataType::Boolean;
                     Width := 2;
                 end;
             'DATE', 'DATETIME', 'TIME':
                 begin
-                    DataType := DataType.DateTime;
+                    DataType := DataType::DateTime;
                     Width := 4;
                 end;
             'DECIMAL':
                 begin
-                    DataType := DataType.Decimal;
+                    DataType := DataType::Decimal;
                     Width := 5;
                 end;
             'INTEGER', 'BIGINTEGER':
                 begin
-                    DataType := DataType.Integer;
+                    DataType := DataType::Integer;
                     Width := 4;
                 end;
             'OPTION', 'TEXT', 'CODE':
                 begin
-                    DataType := DataType.String;
+                    DataType := DataType::String;
                     case true of
                         FieldRef.Length <= 10:
                             Width := 10;
@@ -281,8 +214,8 @@ codeunit 6150710 "NPR POS Data Management"
                 exit;
         end;
 
-        DataColumn := DataSource.AddColumn(Format(FieldRef.Number), FieldRef.Caption, DataType, Visible);
-        DataColumn.Width := Width;
+        DataSource.AddColumn(Format(FieldRef.Number), FieldRef.Caption, DataType, Visible, DataColumn);
+        DataColumn.SetWidth(Width);
     end;
 
     local procedure "--- Events ---"()
@@ -290,47 +223,47 @@ codeunit 6150710 "NPR POS Data Management"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnGetDataSource(Name: Text; var DataSource: DotNet NPRNetDataSource0; var Handled: Boolean; Setup: Codeunit "NPR POS Setup")
+    local procedure OnGetDataSource(Name: Text; var DataSource: Codeunit "NPR Data Source"; var Handled: Boolean; Setup: Codeunit "NPR POS Setup")
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterGetDataSource(Name: Text; DataSource: DotNet NPRNetDataSource0; Setup: Codeunit "NPR POS Setup")
+    local procedure OnAfterGetDataSource(Name: Text; DataSource: Codeunit "NPR Data Source"; Setup: Codeunit "NPR POS Setup")
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnDiscoverDataSourceExtensions(DataSourceName: Text; Extensions: DotNet NPRNetList_Of_T)
+    local procedure OnDiscoverDataSourceExtensions(DataSourceName: Text; Extensions: List of [Text])
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnGetDataSourceExtension(DataSourceName: Text; ExtensionName: Text; var DataSource: DotNet NPRNetDataSource0; var Handled: Boolean; Setup: Codeunit "NPR POS Setup")
+    local procedure OnGetDataSourceExtension(DataSourceName: Text; ExtensionName: Text; var DataSource: Codeunit "NPR Data Source"; var Handled: Boolean; Setup: Codeunit "NPR POS Setup")
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnDataSourceExtensionReadData(DataSourceName: Text; ExtensionName: Text; var RecRef: RecordRef; DataRow: DotNet NPRNetDataRow0; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
+    local procedure OnDataSourceExtensionReadData(DataSourceName: Text; ExtensionName: Text; var RecRef: RecordRef; DataRow: Codeunit "NPR Data Row"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnRefreshDataSet(POSSession: Codeunit "NPR POS Session"; DataSource: DotNet NPRNetDataSource0; var CurrDataSet: DotNet NPRNetDataSet; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
+    procedure OnRefreshDataSet(POSSession: Codeunit "NPR POS Session"; DataSource: Codeunit "NPR Data Source"; var CurrDataSet: Codeunit "NPR Data Set"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnAfterRefreshDataSet(POSSession: Codeunit "NPR POS Session"; DataSource: DotNet NPRNetDataSource0; CurrDataSet: DotNet NPRNetDataSet; FrontEnd: Codeunit "NPR POS Front End Management")
+    procedure OnAfterRefreshDataSet(POSSession: Codeunit "NPR POS Session"; DataSource: Codeunit "NPR Data Source"; CurrDataSet: Codeunit "NPR Data Set"; FrontEnd: Codeunit "NPR POS Front End Management")
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnReadDataSourceVariables(POSSession: Codeunit "NPR POS Session"; RecRef: RecordRef; DataSource: Text; DataRow: DotNet NPRNetDataRow0; var Handled: Boolean)
+    local procedure OnReadDataSourceVariables(POSSession: Codeunit "NPR POS Session"; RecRef: RecordRef; DataSource: Text; DataRow: Codeunit "NPR Data Row"; var Handled: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterReadDataSourceVariables(POSSession: Codeunit "NPR POS Session"; RecRef: RecordRef; DataSource: Text; DataRow: DotNet NPRNetDataRow0)
+    local procedure OnAfterReadDataSourceVariables(POSSession: Codeunit "NPR POS Session"; RecRef: RecordRef; DataSource: Text; DataRow: Codeunit "NPR Data Row")
     begin
     end;
 
@@ -345,7 +278,7 @@ codeunit 6150710 "NPR POS Data Management"
     end;
 
     [IntegrationEvent(FALSE, FALSE)]
-    local procedure OnSetupDataSourcesForView(View: DotNet NPRNetView0; Setup: Codeunit "NPR POS Setup")
+    local procedure OnSetupDataSourcesForView(View: Codeunit "NPR POS View"; Setup: Codeunit "NPR POS Setup")
     begin
     end;
 
@@ -355,30 +288,21 @@ codeunit 6150710 "NPR POS Data Management"
 
     local procedure BuiltInSale(): Text
     begin
-        //-NPR5.37 [287688]
         exit('BUILTIN_SALE');
-        //+NPR5.37 [287688]
     end;
 
     local procedure BuiltInSaleLine(): Text
     begin
-        //-NPR5.37 [287688]
         exit('BUILTIN_SALELINE');
-        //+NPR5.37 [287688]
     end;
 
     local procedure BuiltInPaymentLine(): Text
     begin
-        //-NPR5.37 [287688]
         exit('BUILTIN_PAYMENTLINE');
-        //+NPR5.37 [287688]
     end;
 
     local procedure BuiltInBalancing(): Text
     begin
-        //-NPR5.37 [287688]
         exit('BUILTIN_REGISTER_BALANCING');
-        //+NPR5.37 [287688]
     end;
 }
-

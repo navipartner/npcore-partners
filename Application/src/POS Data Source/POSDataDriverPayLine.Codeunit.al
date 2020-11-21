@@ -9,7 +9,7 @@ codeunit 6150713 "NPR POS Data Driver: Pay. Line"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnGetDataSource', '', false, false)]
-    local procedure GetDataSource(Name: Text; var DataSource: DotNet NPRNetDataSource0; var Handled: Boolean; Setup: Codeunit "NPR POS Setup")
+    local procedure GetDataSource(Name: Text; var DataSource: Codeunit "NPR Data Source"; var Handled: Boolean; Setup: Codeunit "NPR POS Setup")
     var
         SaleLine: Record "NPR Sale Line POS";
         DataMgt: Codeunit "NPR POS Data Management";
@@ -20,9 +20,9 @@ codeunit 6150713 "NPR POS Data Driver: Pay. Line"
             //+NPR5.36 [287688]
             exit;
 
-        DataSource := DataSource.DataSource();
-        DataSource.Id := Name;
-        DataSource.TableNo := DATABASE::"NPR Sale Line POS";
+        DataSource.Constructor();
+        DataSource.SetId(Name);
+        DataSource.SetTableNo(DATABASE::"NPR Sale Line POS");
 
         DataMgt.AddFieldToDataSource(DataSource, SaleLine, SaleLine.FieldNo(Description), true);
         DataMgt.AddFieldToDataSource(DataSource, SaleLine, SaleLine.FieldNo("Currency Amount"), true);
@@ -36,8 +36,8 @@ codeunit 6150713 "NPR POS Data Driver: Pay. Line"
         Handled := true;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnRefreshDataSet', '', false, false)]
-    local procedure RefreshDataSet(POSSession: Codeunit "NPR POS Session"; DataSource: DotNet NPRNetDataSource0; var CurrDataSet: DotNet NPRNetDataSet; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnRefreshDataSet', '', false, false)]
+    local procedure RefreshDataSet(POSSession: Codeunit "NPR POS Session"; DataSource: Codeunit "NPR Data Source"; var CurrDataSet: Codeunit "NPR Data Set"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         PaymentLine: Codeunit "NPR POS Payment Line";
     begin

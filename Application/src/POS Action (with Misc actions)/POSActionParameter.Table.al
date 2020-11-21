@@ -1,7 +1,5 @@
 table 6150704 "NPR POS Action Parameter"
 {
-    // NPR5.40/MMV /20180309 CASE 307453 Replaced .NET interop with standard NAV for option parsing performance
-
     Caption = 'POS Action Parameter';
     DataClassification = CustomerContent;
 
@@ -156,63 +154,39 @@ table 6150704 "NPR POS Action Parameter"
     var
         TypeHelper: Codeunit "Type Helper";
     begin
-        //-NPR5.40 [307453]
-        // POSActionParamMgt.SplitString(Options,Parts);
-        // FOREACH Part IN Parts DO BEGIN
-        //  IF (Part = Value) AND (Part <> '') THEN
-        //    EXIT;
-        //  Result += 1;
-        // END;
-        // EXIT(-1);
         exit(TypeHelper.GetOptionNo(Value, Options));
-        //+NPR5.40 [307453]
     end;
 
     procedure GetOptionString(Ordinal: Integer): Text
     var
         OptionOut: Text;
     begin
-        //-NPR5.40 [307453]
-        // POSActionParamMgt.SplitString(Options,Parts);
-        // IF (Ordinal >= 0) AND (Ordinal < Parts.Length) THEN
-        //  EXIT(Parts.GetValue(Ordinal))
-        // ELSE
-        //  EXIT(FORMAT(Ordinal));
-
         if TrySelectStr(Ordinal, OptionOut) then
             exit(OptionOut)
         else
             exit(Format(Ordinal));
-        //+NPR5.40 [307453]
     end;
 
     local procedure GetDefaultOptionString(): Text
     var
         OptionOut: Text;
     begin
-        //-NPR5.40 [307453]
-        // POSActionParamMgt.SplitString(Options,Parts);
-        // FOREACH Part IN Parts DO
-        //  IF Part <> '' THEN
-        //    EXIT(Part);
-
         if TrySelectStr(1, OptionOut) then
             exit(OptionOut);
-        //+NPR5.40 [307453]
     end;
 
-    procedure GetOptionsDictionary(var OptionsDict: DotNet NPRNetDictionary_Of_T_U)
+    procedure GetOptionsDictionary(var OptionsJson: JsonObject)
     var
         POSActionParamMgt: Codeunit "NPR POS Action Param. Mgt.";
-        Parts: DotNet NPRNetArray;
+        Parts: List of [Text];
         "Part": Text;
         Ordinal: Integer;
     begin
-        OptionsDict := OptionsDict.Dictionary();
+        Clear(OptionsJson);
         POSActionParamMgt.SplitString(Options, Parts);
         foreach Part in Parts do begin
             if (Part <> '') then
-                OptionsDict.Add(Part, Ordinal);
+                OptionsJson.Add(Part, Ordinal);
             Ordinal += 1;
         end;
     end;
@@ -220,9 +194,6 @@ table 6150704 "NPR POS Action Parameter"
     [TryFunction]
     local procedure TrySelectStr(Ordinal: Integer; var OptionOut: Text)
     begin
-        //-NPR5.40 [307453]
         OptionOut := SelectStr(Ordinal + 1, Options);
-        //+NPR5.40 [307453]
     end;
 }
-

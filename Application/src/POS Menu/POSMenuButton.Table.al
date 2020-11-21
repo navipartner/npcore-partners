@@ -1,27 +1,5 @@
 table 6150701 "NPR POS Menu Button"
 {
-    // NPR5.30/TJ  /20170215 CASE 265504 Changed ENU captions on fields with word Register in their name
-    // NPR5.32.11/TSA/20170614  CASE 280806 Added SetDefaultParamaters(), RefreshActionCode() functions to be used with refresh button
-    // NPR5.32.11/VB /20170621  CASE 281618 Added "Blocking UI" field and business logic, and logic to pass tooltip and description information to JavaScript
-    // NPR5.36/VB /20170912  CASE 289132 Added fields "Background Image Url" and "Caption Position" to support binding specific images to button backgrounds
-    // NPR5.36/VB /20170926  CASE 291454 Fixing bug with non-action button configuration not showing up in UI
-    // NPR5.37/VB /20171013  CASE 290485 Providing localization support for button captions (and other data)
-    // NPR5.37/TSA /20171023 CASE 292656 Refactored RefreshActionCode() to retain current values on shared parameter names
-    // NPR5.37/TSA /20171024 CASE 294214 Discontinued Action Type::ItemGroup - see case for replacement options
-    // NPR5.38/BR  /20171122 CASE 295074 Added field Update Parameters
-    // NPR5.39/VB  /20180130 CASE 303630 Fixing bug with moving hierarchies across other hierarchies
-    // NPR5.39/MMV /20180212 CASE 299114 Rolling back previous parameter upgrade approach
-    // NPR5.39/VB  /20180213 CASE 255773 Supporting Wysiwyg editor
-    // NPR5.40/VB  /20180213 CASE 306347 Performance improvement due to parameters in BLOB and physical-table action discovery
-    // NPR5.40/MMV /20180314 CASE 307453 Performance
-    // NPR5.42/MMV /20180508 CASE 314128 Re-added support for button parameters when type <> Action
-    // NPR5.42.01/MMV /20180627 CASE 320622 Filter correctly for button parameters
-    // NPR5.43/VB  /20180611 CASE 314603 Implemented secure method behavior functionality.
-    // NPR5.50/VB  /20180204 CASE 338666 When configuring actions for front end, parameters are not filtered if they already contain a filter on Table No.
-    //                                   Support for Item, Customer, and Payment metadata in actions. This allows additional information to be passed to front-end workflows.
-    // NPR5.54/TSA /20200221 CASE 392247 Added "Requires POS Type" to workflow content
-    // NPR5.54/VB  /20200408 CASE 399736 Added "Show Plus/Minus Buttons" field.
-
     Caption = 'POS Menu Button';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR POS Menu Buttons";
@@ -49,9 +27,7 @@ table 6150701 "NPR POS Menu Button"
 
             trigger OnValidate()
             begin
-                //-NPR5.39 [255773]
                 CalculateLevel;
-                //+NPR5.39 [255773]
             end;
         }
         field(4; Ordinal; Integer)
@@ -81,12 +57,10 @@ table 6150701 "NPR POS Menu Button"
             Caption = 'Tooltip';
             DataClassification = CustomerContent;
         }
-        field(13; "Action Type"; Option)
+        field(13; "Action Type"; Enum "NPR Action Type")
         {
             Caption = 'Action Type';
             DataClassification = CustomerContent;
-            OptionCaption = ' ,Popup Menu,Action,Workflow,Item,,Customer,Payment Type';
-            OptionMembers = Submenu,PopupMenu,"Action",Workflow,Item,ItemGroup_DISCONTINUED,Customer,PaymentType;
 
             trigger OnValidate()
             begin
@@ -112,9 +86,7 @@ table 6150701 "NPR POS Menu Button"
 
             trigger OnLookup()
             begin
-                //-NPR5.40 [306347]
                 LookupActionCode();
-                //+NPR5.40 [306347]
             end;
 
             trigger OnValidate()
@@ -171,13 +143,11 @@ table 6150701 "NPR POS Menu Button"
             Caption = 'Bold';
             DataClassification = CustomerContent;
         }
-        field(26; "Font Size"; Option)
+        field(26; "Font Size"; Enum "NPR Button Font Size")
         {
             Caption = 'Font Size';
             DataClassification = CustomerContent;
             InitValue = Normal;
-            OptionCaption = 'Extra Small,Small,Normal,Medium,Large,Extra Large';
-            OptionMembers = XSmall,Small,Normal,Medium,Large,XLarge;
         }
         field(27; "Position X"; Integer)
         {
@@ -191,12 +161,10 @@ table 6150701 "NPR POS Menu Button"
             Caption = 'Position Y';
             DataClassification = CustomerContent;
         }
-        field(29; Enabled; Option)
+        field(29; Enabled; Enum "NPR Button Enabled State")
         {
             Caption = 'Enabled';
             DataClassification = CustomerContent;
-            OptionCaption = 'Yes,Auto,No';
-            OptionMembers = Yes,Auto,No;
 
             trigger OnValidate()
             begin
@@ -234,13 +202,11 @@ table 6150701 "NPR POS Menu Button"
             var
                 SecureMethodTmp: Record "NPR POS Secure Method" temporary;
             begin
-                //-NPR5.43 [314603]
                 if ("Secure Method Code" = '') then
                     exit;
 
                 SecureMethodTmp.RunDiscovery();
                 SecureMethodTmp.Get("Secure Method Code");
-                //+NPR5.43 [314603]
             end;
         }
         field(34; "Show Plus/Minus Buttons"; Boolean)
@@ -251,10 +217,8 @@ table 6150701 "NPR POS Menu Button"
 
             trigger OnValidate()
             begin
-                //-NPR5.54 [399736]
                 if "Show Plus/Minus Buttons" then
                     TestField("Action Type", "Action Type"::Item);
-                //+NPR5.54 [399736]
             end;
         }
         field(41; "Register Type"; Code[10])
@@ -274,8 +238,6 @@ table 6150701 "NPR POS Menu Button"
             Caption = 'Salesperson Code';
             DataClassification = CustomerContent;
             TableRelation = "Salesperson/Purchaser".Code;
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(44; "Available on Desktop"; Boolean)
@@ -307,12 +269,8 @@ table 6150701 "NPR POS Menu Button"
     begin
         HandleDescendantsOnDelete();
         RearrangeOrdinalsAfterDelete();
-        //-NPR5.39 [255773]
         UnattendedDelete := false;
-        //+NPR5.39 [255773]
-        //-NPR5.40 [306347]
         ClearParameters();
-        //+NPR5.40 [306347]
     end;
 
     trigger OnInsert()
@@ -380,15 +338,11 @@ table 6150701 "NPR POS Menu Button"
                 if POSAction."Bound to DataSource" then
                     Enabled := Enabled::Auto;
                 "Data Source Name" := POSAction."Data Source Name";
-                //-NPR5.36 [281618]
                 "Blocking UI" := POSAction."Blocking UI";
                 if (POSAction.Tooltip <> '') and (Tooltip = '') then
                     Tooltip := POSAction.Tooltip;
-                //+NPR5.36 [281618]
-                //-NPR5.43 [314603]
                 if (POSAction."Secure Method Code" <> '') and ("Secure Method Code" = '') then
                     "Secure Method Code" := POSAction."Secure Method Code";
-                //+NPR5.43 [314603]
             end else begin
                 if "Action Code" = '' then begin
                     ClearActionSpecifics();
@@ -402,22 +356,16 @@ table 6150701 "NPR POS Menu Button"
         Clear("Action Code");
         Clear("Data Source Name");
         Clear(Enabled);
-        //-NPR5.32.11 [281618]
         Clear("Blocking UI");
         Clear(Tooltip);
-        //+NPR5.32.11 [281618]
-        //-NPR5.40 [306347]
         ClearParameters();
-        //+NPR5.40 [306347]
     end;
 
     local procedure ClearParameters()
     var
         ParamMgt: Codeunit "NPR POS Action Param. Mgt.";
     begin
-        //-NPR5.40 [306347]
         ParamMgt.ClearParametersForRecord(RecordId, 0);
-        //+NPR5.40 [306347]
     end;
 
     local procedure CopyParameters()
@@ -427,8 +375,6 @@ table 6150701 "NPR POS Menu Button"
         if "Action Code" = xRec."Action Code" then
             exit;
 
-        //-NPR5.40 [306347]
-        //SetDefaultParameters();
         ClearParameters();
         case "Action Type" of
             "Action Type"::Action:
@@ -436,7 +382,6 @@ table 6150701 "NPR POS Menu Button"
             "Action Type"::PopupMenu:
                 SetupPopupSizeParameters();
         end;
-        //+NPR5.40 [306347]
     end;
 
     local procedure LookupActionCode()
@@ -450,7 +395,6 @@ table 6150701 "NPR POS Menu Button"
         PaymentTypes: Page "NPR Payment Type - Register";
         POSMenus: Page "NPR POS Menus";
     begin
-        //-NPR5.40 [306347]
         case "Action Type" of
             "Action Type"::Action:
                 if POSActionMgt.LookupAction("Action Code") then
@@ -497,14 +441,12 @@ table 6150701 "NPR POS Menu Button"
                     end;
                 end;
         end;
-        //+NPR5.40 [306347]
     end;
 
     local procedure SetupPopupSizeParameters()
     var
         ParamValue: Record "NPR POS Parameter Value";
     begin
-        //-NPR5.40 [306347]
         ParamValue.InitForMenuButton(Rec);
         ParamValue.Name := 'Columns';
         ParamValue."Data Type" := ParamValue."Data Type"::Integer;
@@ -516,7 +458,6 @@ table 6150701 "NPR POS Menu Button"
         ParamValue."Data Type" := ParamValue."Data Type"::Integer;
         ParamValue.Value := Format(6);
         ParamValue.Insert;
-        //+NPR5.40 [306347]
     end;
 
     procedure RefreshParameters()
@@ -528,7 +469,6 @@ table 6150701 "NPR POS Menu Button"
         ParColumnsKnown: Boolean;
         ParRowsKnown: Boolean;
     begin
-        //-NPR5.40 [306347]
         case "Action Type" of
             "Action Type"::Action:
                 ParamMgt.RefreshParameters(RecordId, "Menu Code", ID, "Action Code");
@@ -552,154 +492,37 @@ table 6150701 "NPR POS Menu Button"
                     end;
                 end;
         end;
-        //+NPR5.40 [306347]
     end;
 
     procedure RefreshParametersRequired(): Boolean
     var
         ParamMgt: Codeunit "NPR POS Action Param. Mgt.";
     begin
-        //-NPR5.40 [306347]
         if ("Action Type" <> "Action Type"::Action) then
             exit(false)
         else
             exit(ParamMgt.RefreshParametersRequired(RecordId, "Menu Code", ID, "Action Code"));
-        //+NPR5.40 [306347]
     end;
 
-    procedure GetAction(var ActionOut: DotNet NPRNetAction; POSSession: Codeunit "NPR POS Session"; Source: Text; var POSParameterValue: Record "NPR POS Parameter Value")
+    procedure GetAction(var ActionOut: Interface "NPR IAction"; POSSession: Codeunit "NPR POS Session"; Source: Text; var POSParameterValue: Record "NPR POS Parameter Value"): Boolean
     var
         ActionMgt: Codeunit "NPR POS Action Management";
         ErrorText: Text;
         POSAction: Record "NPR POS Action";
+        ActionInterface: interface "NPR IAction";
     begin
-        case "Action Type" of
-            "Action Type"::Action:
-                GetWorkflowAction(ActionOut, POSSession);
-            "Action Type"::Item:
-                GetItemAction(ActionOut);
-            "Action Type"::PopupMenu:
-                GetMenuAction(ActionOut);
-            "Action Type"::PaymentType:
-                GetPaymentAction(ActionOut);
-            "Action Type"::Customer:
-                GetCustomerAction(ActionOut);
-        end;
-        if not IsNull(ActionOut) then begin
-            //-NPR5.42 [314128]
-            //StoreButtonParameters(ActionOut,POSParameterValue,POSActionParameter);
-            StoreButtonParameters(ActionOut, POSParameterValue);
-            //+NPR5.42 [314128]
-            StoreDataSource(ActionOut);
+        if ("Action Type" = "Action Type"::SubMenu) or (not "Action Type".Ordinals().Contains("Action Type".AsInteger())) then
+            exit(false);
 
-            //-NPR5.54 [392247]
-            // StoreActionOtherConfiguration(ActionOut);
-            StoreActionOtherConfiguration(ActionOut, POSSession);
-            //+NPR5.54 [392247]
+        ActionInterface := "Action Type";
+        ActionInterface.ConfigureFromMenuButton(Rec, POSSession, ActionOut);
 
-            ActionMgt.IsValidActionConfiguration(POSSession, ActionOut, Source, ErrorText, true);
+        StoreButtonParameters(ActionOut, POSParameterValue);
+        StoreDataSource(ActionOut);
+        StoreActionOtherConfiguration(ActionOut, POSSession);
+        ActionMgt.IsValidActionConfiguration(POSSession, ActionOut, Source, ErrorText, true);
 
-        end;
-    end;
-
-    local procedure GetWorkflowAction(var ActionOut: DotNet NPRNetAction; POSSession: Codeunit "NPR POS Session")
-    var
-        POSAction: Record "NPR POS Action" temporary;
-        WorkflowAction: DotNet NPRNetWorkflowAction;
-        WorkflowObj: DotNet NPRNetWorkflow;
-        StreamReader: DotNet NPRNetStreamReader;
-        "Object": DotNet NPRNetObject;
-        InStr: InStream;
-        Calculated: Boolean;
-    begin
-        with POSAction do begin
-            WorkflowAction := WorkflowAction.WorkflowAction();
-            //-NPR5.40 [306347]
-            //  IF GET("Action Code") THEN BEGIN
-            //    CALCFIELDS(Workflow);
-            if POSSession.RetrieveSessionAction("Action Code", POSAction) then begin
-                if Workflow.HasValue then begin
-                    //+NPR5.40 [306347]
-                    Workflow.CreateInStream(InStr);
-                    StreamReader := StreamReader.StreamReader(InStr);
-                    WorkflowAction.Workflow := WorkflowObj.FromJsonString(StreamReader.ReadToEnd(), GetDotNetType(WorkflowObj));
-                    if "Bound to DataSource" then
-                        WorkflowAction.Content.Add('DataBinding', true);
-                    if "Custom JavaScript Logic".HasValue then begin
-                        GetCustomJavaScriptLogic(Object);
-                        WorkflowAction.Content.Add('CustomJavaScript', Object);
-                    end;
-                    //-NPR5.32.11 [281618]
-                    if Description <> '' then
-                        WorkflowAction.Content.Add('Description', Description);
-                    //+NPR5.32.11 [281618]
-                    //-NPR5.40 [306347]
-                    //    END ELSE BEGIN
-                    Calculated := true;
-                end;
-            end;
-            if not Calculated then begin
-                //+NPR5.40 [306347]
-                WorkflowAction.Workflow := WorkflowObj.FromJsonString('{}', GetDotNetType(WorkflowObj));
-                WorkflowAction.Workflow.Name := Code;
-            end;
-
-            ActionOut := WorkflowAction;
-        end;
-    end;
-
-    local procedure GetItemAction(var ActionOut: DotNet NPRNetAction)
-    var
-        ItemAction: DotNet NPRNetItemAction;
-        Metadata: DotNet NPRNetDictionary_Of_T_U;
-    begin
-        ActionOut := ItemAction.ItemAction("Action Code");
-        //-NPR5.50 [338666]
-        Metadata := Metadata.Dictionary();
-        OnRetrieveItemMetadata(Metadata);
-        ActionOut.Content.Add('Metadata', Metadata);
-        //+NPR5.50 [338666]
-
-        //-NPR5.54 [399736]
-        if "Show Plus/Minus Buttons" then
-            ActionOut.Content.Add('ShowPlusMinus', true);
-        //+NPR5.54 [399736]
-    end;
-
-    local procedure GetMenuAction(var ActionOut: DotNet NPRNetAction)
-    var
-        MenuAction: DotNet NPRNetMenuAction;
-    begin
-        MenuAction := MenuAction.MenuAction();
-        MenuAction.OpenAsPopup := true;
-        MenuAction.MenuId := "Action Code";
-        ActionOut := MenuAction;
-    end;
-
-    local procedure GetPaymentAction(var ActionOut: DotNet NPRNetAction)
-    var
-        PaymentAction: DotNet NPRNetPaymentAction;
-        Metadata: DotNet NPRNetDictionary_Of_T_U;
-    begin
-        ActionOut := PaymentAction.PaymentAction("Action Code");
-        //-NPR5.50 [338666]
-        Metadata := Metadata.Dictionary();
-        OnRetrievePaymentMetadata(Metadata);
-        ActionOut.Content.Add('Metadata', Metadata);
-        //+NPR5.50 [338666]
-    end;
-
-    local procedure GetCustomerAction(var ActionOut: DotNet NPRNetAction)
-    var
-        CustomerAction: DotNet NPRNetCustomerAction;
-        Metadata: DotNet NPRNetDictionary_Of_T_U;
-    begin
-        ActionOut := CustomerAction.CustomerAction("Action Code");
-        //-NPR5.50 [338666]
-        Metadata := Metadata.Dictionary();
-        OnRetrieveCustomerMetadata(Metadata);
-        ActionOut.Content.Add('Metadata', Metadata);
-        //+NPR5.50 [338666]
+        exit(true);
     end;
 
     local procedure HandleEnabled()
@@ -713,80 +536,53 @@ table 6150701 "NPR POS Menu Button"
         end;
     end;
 
-    local procedure StoreButtonParameters(ActionIn: DotNet NPRNetAction; var POSParameterValue: Record "NPR POS Parameter Value" temporary)
+    local procedure StoreButtonParameters(ActionIn: interface "NPR IAction"; var POSParameterValue: Record "NPR POS Parameter Value" temporary)
     begin
-        //-NPR5.42 [314128]
-        // POSActionParameter.SETRANGE("POS Action Code", "Action Code");
-        // IF POSActionParameter.FINDSET THEN REPEAT
-        //  IF POSParameterValue.GET(DATABASE::"POS Menu Button", "Menu Code", ID, RECORDID, POSActionParameter.Name) THEN
-        //    POSParameterValue.AddParameterToAction(ActionIn);
-        // UNTIL POSActionParameter.NEXT = 0;
-
-        //-NPR5.50 [338666]
         if not POSParameterValue.GetParamFilterIndicator() then begin
-            //+NPR5.50 [338666]
-
             POSParameterValue.SetRange("Table No.", DATABASE::"NPR POS Menu Button");
             POSParameterValue.SetRange(Code, "Menu Code");
-            //-NPR5.42.01 [320622]
             POSParameterValue.SetRange("Record ID", RecordId);
-            //+NPR5.42.01 [320622]
             POSParameterValue.SetRange(ID, ID);
-
-            //-NPR5.50 [338666]
         end;
-        //+NPR5.50 [338666]
 
         if POSParameterValue.FindSet then
             repeat
                 POSParameterValue.AddParameterToAction(ActionIn);
             until POSParameterValue.Next = 0;
-        //+NPR5.42 [314128]
     end;
 
-    local procedure StoreActionOtherConfiguration(ActionIn: DotNet NPRNetAction; POSSession: Codeunit "NPR POS Session")
+    local procedure StoreActionOtherConfiguration(ActionIn: Interface "NPR IAction"; POSSession: Codeunit "NPR POS Session")
     var
         TempParam: Record "NPR POS Parameter Value" temporary;
         POSAction: Record "NPR POS Action";
         RecRef: RecordRef;
         FieldRef: FieldRef;
     begin
-        //-NPR5.36 [281618]
         if "Blocking UI" then
             ActionIn.Content.Add('Blocking', true);
-        //+NPR5.36 [281618]
 
-        //-NPR5.54 [392247]
         if (not POSSession.RetrieveSessionAction("Action Code", POSAction)) then
             exit;
 
         ActionIn.Content.Add('requirePosUnitType', Format(POSAction."Requires POS Type", 0, 9));
-        //+NPR5.54 [392247]
     end;
 
-    local procedure StoreDataSource(ActionIn: DotNet NPRNetAction)
+    local procedure StoreDataSource(ActionIn: Interface "NPR IAction")
     begin
         if "Data Source Name" <> '' then
             ActionIn.Content.Add('dataSource', "Data Source Name");
     end;
 
-    procedure StoreButtonConfiguration(MenuButtonObj: DotNet NPRNetMenuButton)
+    procedure StoreButtonConfiguration(MenuButtonObj: Codeunit "NPR POS Menu Button")
     begin
-        //-NPR5.36 [291454]
         if Tooltip <> '' then
-            //-290485 [290485]
-            //  MenuButtonObj.Tooltip := Tooltip;
-            MenuButtonObj.Tooltip := GetLocalizedCaption(FieldNo(Tooltip));
-        //+290485 [290485]
+            MenuButtonObj.SetTooltip(GetLocalizedCaption(FieldNo(Tooltip)));
         if "Background Image Url" <> '' then begin
             MenuButtonObj.Content.Add('BackgroundImageUrl', "Background Image Url");
             MenuButtonObj.Content.Add('CaptionPosition', "Caption Position");
         end;
-        //+NPR5.36 [291454]
-        //-NPR5.43 [314603]
         if "Secure Method Code" <> '' then
             MenuButtonObj.Content.Add('SecureMethod', "Secure Method Code");
-        //+NPR5.43 [314603]
     end;
 
     procedure SetSortOrderAndBaseMenuFilter(MenuCode: Code[20])
@@ -830,10 +626,7 @@ table 6150701 "NPR POS Menu Button"
     begin
         MenuButton.SetSortOrderAndBaseMenuFilter("Menu Code");
         MenuButton := Rec;
-        //-NPR5.39 [303630]
-        //EXIT(MenuButton.FindSibling('<'));
         exit(MenuButton.FindTarget('<'));
-        //+NPR5.39
     end;
 
     procedure MoveDownAllowed(): Boolean
@@ -842,10 +635,7 @@ table 6150701 "NPR POS Menu Button"
     begin
         MenuButton.SetSortOrderAndBaseMenuFilter("Menu Code");
         MenuButton := Rec;
-        //-NPR5.39 [303630]
-        //EXIT(MenuButton.FindSibling('>'));
         exit(MenuButton.FindTarget('>'));
-        //+NPR5.39
     end;
 
     procedure ActionIsEditable(): Boolean
@@ -967,18 +757,11 @@ table 6150701 "NPR POS Menu Button"
 
         MenuButton.SetSortOrderAndBaseMenuFilter("Menu Code");
         MenuButton := Rec;
-        //-NPR5.39 [303630]
-        //IF NOT MenuButton.FindSibling('<') THEN
-        //  EXIT;
-        //
-        //Rec.CopyHierarchy(TempMoveUp,TRUE);
-        //MenuButton.CopyHierarchy(TempMoveDown,TRUE);
-        //SwitchHierarchies(TempMoveUp,TempMoveDown,-1);
 
         if not MenuButton.FindTarget('<') then
             exit;
+
         SwitchNodes(Rec, MenuButton);
-        //+NPR5.39
         MenuButton := CopyRec;
         MenuButton.Reset();
         MenuButton.Find();
@@ -1000,18 +783,9 @@ table 6150701 "NPR POS Menu Button"
         MenuButton.SetSortOrderAndBaseMenuFilter("Menu Code");
         MenuButton := Rec;
 
-        //-NPR5.39 [303630]
-        //IF NOT MenuButton.FindSibling('>') THEN
-        //  EXIT;
-        //
-        //Rec.CopyHierarchy(TempMoveDown,TRUE);
-        //MenuButton.CopyHierarchy(TempMoveUp,MenuButton."Parent ID" = "Parent ID");
-        //SwitchHierarchies(TempMoveUp,TempMoveDown,1);
-
         if not MenuButton.FindTarget('>') then
             exit;
         SwitchNodes(Rec, MenuButton);
-        //+NPR5.39
 
         MenuButton := CopyRec;
         MenuButton.Reset();
@@ -1057,10 +831,6 @@ table 6150701 "NPR POS Menu Button"
     begin
         Source.CopyHierarchy(SourceHierarchy, true);
         Target.CopyHierarchy(TargetHierarchy, true);
-
-        //PAGE.RUNMODAL(50505,SourceHierarchy);
-        //PAGE.RUNMODAL(50505,TargetHierarchy);
-        //ERROR('');
 
         SourceHierarchy.FindFirst();
         TargetHierarchy.FindFirst();
@@ -1174,23 +944,16 @@ table 6150701 "NPR POS Menu Button"
         MenuButton: Record "NPR POS Menu Button";
         Choice: Option Cancel,Unindent,Delete;
     begin
-        //-NPR5.39 [255773]
-        //MenuButton.SETRANGE("Parent ID",ID);
         MenuButton.FilterSubtree(Rec, false);
-        //+NPR5.39 [255773]
         if MenuButton.IsEmpty then
             exit;
 
-        //-NPR5.39 [255773]
         if not UnattendedDelete then begin
-            //+NPR5.39 [255773]
             Choice := StrMenu(Text002, 1, Text001);
             if Choice = Choice::Cancel then
                 Error('');
-            //-NPR5.39 [255773]
         end else
             Choice := Choice::Delete;
-        //+NPR5.39 [255773]
 
         case Choice of
             Choice::Unindent:
@@ -1368,7 +1131,6 @@ table 6150701 "NPR POS Menu Button"
         FieldTmp: Record "Field" temporary;
         LocalizedCaptions: Page "NPR POS Localized Table Data";
     begin
-        //-290485 [290485]
         FieldTmp.TableNo := DATABASE::"NPR POS Menu Button";
 
         FieldTmp."No." := FieldNo(Caption);
@@ -1379,7 +1141,6 @@ table 6150701 "NPR POS Menu Button"
 
         LocalizedCaptions.PrepareLocalizationForRecord(RecordId, FieldTmp);
         LocalizedCaptions.RunModal();
-        //+290485 [290485]
     end;
 
     procedure GetLocalizedCaption(FieldNo: Integer): Text
@@ -1387,34 +1148,29 @@ table 6150701 "NPR POS Menu Button"
         Localization: Record "NPR POS Localized Caption";
         RecRef: RecordRef;
     begin
-        //-290485 [290485]
         if Localization.GetLocalization(RecordId, FieldNo) then
             exit(Localization.Caption);
         RecRef.GetTable(Rec);
         exit(RecRef.Field(FieldNo).Value);
-        //+290485 [290485]
     end;
 
     procedure SetUnattendedDeleteFlag()
     begin
-        //-NPR5.39 [255773]
         UnattendedDelete := true;
-        //+NPR5.39 [255773]
     end;
 
     [IntegrationEvent(TRUE, false)]
-    local procedure OnRetrieveItemMetadata(ItemMetadata: DotNet NPRNetDictionary_Of_T_U)
+    procedure OnRetrieveItemMetadata(ItemMetadata: JsonObject)
     begin
     end;
 
     [IntegrationEvent(TRUE, false)]
-    local procedure OnRetrieveCustomerMetadata(CustomerMetadata: DotNet NPRNetDictionary_Of_T_U)
+    procedure OnRetrieveCustomerMetadata(CustomerMetadata: JsonObject)
     begin
     end;
 
     [IntegrationEvent(TRUE, false)]
-    local procedure OnRetrievePaymentMetadata(PaymentMetadata: DotNet NPRNetDictionary_Of_T_U)
+    procedure OnRetrievePaymentMetadata(PaymentMetadata: JsonObject)
     begin
     end;
 }
-

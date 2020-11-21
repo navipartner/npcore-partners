@@ -1,21 +1,5 @@
 table 6150703 "NPR POS Action"
 {
-    // NPR5.32.11/VB /20170621  CASE 281618 Added "Blocking UI", Tooltip and "Codeunit ID" fields. Extended action discovery functionality.
-    // NPR5.38/BR  /20180126  CASE 303453 Fixed bug in refreshing POS Actions
-    // NPR5.39/VB  /20180209  CASE 304928 Making sure discovery is forced when Workflow BLOB field contains no data (to prevent error reported in this case).
-    // NPR5.39/MMV /20180209  CASE 299114 Added publisher for modules that need to act on updated actions.
-    // NPR5.40/VB  /20180228  CASE 306347 Performance improvement due to parameters in BLOB and physical-table action discovery
-    // NPR5.40/MMV /20180307  CASE 307453 Added update handling of POS action within new temp structure.
-    // NPR5.43/VB  /20180611  CASE 314603 Implemented secure method behavior functionality.
-    // NPR5.44/VB  /20180705  CASE 286547 Fixed issue with custom javascript code not being properly passed to the front end.
-    // NPR5.44/JDH /20180731  CASE 323499 Changed all functions to be External
-    // NPR5.46/MHA /20180927  CASE 329621 Removed redundant INSERT/MODIFY that caused error during Upgrade procedure in HandleActionUpdates()
-    // NPR5.50/VB  /20181205  CASE 338666 Supporting Workflows 2.0
-    //                                    Modifying the behavior of "Subscriber Instances Allowed" - it's now obsolete.
-    // NPR5.54/TSA /20200221 CASE 392247 Added field "Requires POS Type"
-    // NPR5.55/ALPO/20200330 CASE 335834 Update POS action description according to ML value set through translations
-    // NPR5.55/MMV /20200420 CASE 386254 Default "Blocking UI" to TRUE, since we only have 2 workflows that should not block UI while executing.
-
     Caption = 'POS Action';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR POS Actions";
@@ -134,24 +118,17 @@ table 6150703 "NPR POS Action"
         }
     }
 
-    fieldgroups
-    {
-    }
-
     trigger OnDelete()
     begin
-        //-NPR5.40 [307453]
-        //DeleteParameters();
         DeleteParameters(Code);
-        //+NPR5.40 [307453]
     end;
 
     var
         DiscoveredAction: Record "NPR POS Action" temporary;
         POSSession: Codeunit "NPR POS Session";
-        WorkflowObj: DotNet NPRNetWorkflow;
-        WorkflowInvocationParameters: DotNet NPRNetDictionary_Of_T_U;
-        WorkflowInvocationContext: DotNet NPRNetDictionary_Of_T_U;
+        WorkflowObj: Codeunit "NPR Workflow";
+        WorkflowInvocationParameters: JsonObject;
+        WorkflowInvocationContext: JsonObject;
         ActionInDiscovery: Text;
         Text001: Label 'A workflow step cannot be registered because the Workflow object has not been instantiated.';
         Text002: Label 'Discovery has started for action %1 while discovery for action %2 has not yet completed.';
@@ -175,10 +152,7 @@ table 6150703 "NPR POS Action"
     var
         Param: Record "NPR POS Action Parameter";
     begin
-        //-NPR5.40 [307453]
-        //Param.SETRANGE("POS Action Code",Code);
         Param.SetRange("POS Action Code", ActionCode);
-        //+NPR5.40 [307453]
         Param.DeleteAll();
     end;
 
@@ -209,29 +183,10 @@ table 6150703 "NPR POS Action"
             exit(false);
 
         MakeSureDiscoveryIsAllowed(Code);
-        //-NPR5.40 [306347]
-        //POSSession.DiscoverSessionAction(Code);
-        //+NPR5.40 [306347]
-
-        //-NPR5.40 [307453]
-        // INIT();
-        //
-        // Rec.Code := Code;
-        // IF FIND AND (ActionInRefresh <> Code) AND (Rec.Version >= Version) AND (Workflow.HASVALUE OR (Rec.Type = Rec.Type::BackEnd)) THEN
-        //  EXIT(FALSE);
-        //
-        // DeleteParameters();
-
-        //-NPR5.50 [338666]
         Version20 := false;
-        //+NPR5.50 [338666]
-
         ActionUpdateRequired := ActionUpdateCheck(Code, Version);
-
-        //-NPR5.55 [335834]
         if not ActionUpdateRequired then
             UpdateMLDescription(Code, Description);
-        //+NPR5.55 [335834]
 
         if not (IsTemporary or ActionUpdateRequired) then
             exit(false);
@@ -241,19 +196,13 @@ table 6150703 "NPR POS Action"
 
         Init();
         Rec.Code := Code;
-        //+NPR5.40 [307453]
         Rec.Description := Description;
         Rec.Version := Version;
         Rec.Type := Type;
-        //-NPR5.55 [386254]
         Rec."Blocking UI" := true;
-        //+NPR5.55 [386254]
 
-        //-NPR5.40 [307453]
-        //OnActionDiscovered(Rec);
         if ActionUpdateRequired then
             OnActionDiscovered(Rec);
-        //+NPR5.40 [307453]
 
         if not Insert then;
 
@@ -261,23 +210,14 @@ table 6150703 "NPR POS Action"
             Modify;
 
         if Rec.Type <> Rec.Type::BackEnd then begin
-            WorkflowObj := WorkflowObj.Workflow();
-            WorkflowObj.Name := Code;
+            Clear(WorkflowObj);
+            WorkflowObj.SetName(Code);
             ActionInDiscovery := Code;
         end else
             InitializeWorkflowDiscovery();
 
-        //-NPR5.40 [306347]
         if Rec.IsTemporary then
             POSSession.DiscoverSessionAction(Rec);
-        //+NPR5.40 [306347]
-
-        //-NPR5.40 [307453]
-        //-NPR5.39 [299114]
-        // tmpUpdatedActions := Rec;
-        // tmpUpdatedActions.INSERT;
-        //+NPR5.39 [299114]
-        //+NPR5.40 [307453]
 
         exit(true);
     end;
@@ -303,9 +243,7 @@ table 6150703 "NPR POS Action"
         Rec.Description := Description;
         Rec.Version := Version;
         Rec."Workflow Engine Version" := '2.0';
-        //-NPR5.55 [386254]
         Rec."Blocking UI" := true;
-        //+NPR5.55 [386254]
 
         if ActionUpdateRequired then
             OnActionDiscovered(Rec);
@@ -316,8 +254,8 @@ table 6150703 "NPR POS Action"
             Modify;
 
         if Rec.Type <> Rec.Type::BackEnd then begin
-            WorkflowObj := WorkflowObj.Workflow();
-            WorkflowObj.Name := Code;
+            Clear(WorkflowObj);
+            WorkflowObj.SetName(Code);
             ActionInDiscovery := Code;
             WorkflowObj.Content.Add('engineVersion', '2.0');
         end else
@@ -333,7 +271,6 @@ table 6150703 "NPR POS Action"
     var
         POSAction: Record "NPR POS Action";
     begin
-        //-NPR5.40 [307453]
         POSAction.SetRange(Code, Code);
         POSAction.SetRange(Version, Version);
         if POSAction.IsEmpty then begin
@@ -341,44 +278,31 @@ table 6150703 "NPR POS Action"
             tmpUpdatedActions.Insert;
             exit(true);
         end;
-        //+NPR5.40 [307453]
     end;
 
     local procedure HandleActionUpdates()
     var
         POSAction: Record "NPR POS Action";
     begin
-        //-NPR5.40 [307453]
         tmpUpdatedActions.SetAutoCalcFields(Workflow);
         tmpUpdatedActions.SetAutoCalcFields("Custom JavaScript Logic");
         if tmpUpdatedActions.FindSet then
             repeat
-                //-NPR5.46 [329621]
-                // POSAction := tmpUpdatedActions;
-                // IF NOT POSAction.INSERT THEN
-                //   POSAction.MODIFY;
-                // OnAfterActionUpdated(POSAction);
                 OnAfterActionUpdated(tmpUpdatedActions);
-            //+NPR5.46 [329621]
             until tmpUpdatedActions.Next = 0;
-        //+NPR5.40 [307453]
     end;
 
     procedure RegisterWorkflowStep(Label: Text; "Code": Text)
     var
         FrontEnd: Codeunit "NPR POS Front End Management";
-        WorkflowStep: DotNet NPRNetWorkflowStep;
+        WorkflowStep: JsonObject;
     begin
-        if IsNull(WorkflowObj) then
+        if ActionInDiscovery = '' then
             FrontEnd.ReportBug(Text001);
 
-        //-NPR5.50 [338666]
         RequireVersion10();
-        //+NPR5.50 [338666]
-
-        WorkflowStep := WorkflowStep.WorkflowStep();
-        WorkflowStep.Label := Label;
-        WorkflowStep.Code := Code;
+        WorkflowStep.Add('Label', Label);
+        WorkflowStep.Add('Code', Code);
         WorkflowObj.Steps.Add(WorkflowStep);
     end;
 
@@ -386,19 +310,15 @@ table 6150703 "NPR POS Action"
     var
         FrontEnd: Codeunit "NPR POS Front End Management";
     begin
-        //-NPR5.50 [338666]
         RequireVersion10();
-        //+NPR5.50 [338666]
 
         if Type = Type::BackEnd then
             FrontEnd.ReportBug(StrSubstNo(Text003, Code, Type));
 
-        WorkflowObj.RequestContext := WithOnBeforeWorkflowEvent;
+        WorkflowObj.SetRequestContext(WithOnBeforeWorkflowEvent);
         StreamWorkflowToBlob();
         Modify();
-        //-NPR5.40 [307453]
         UpdateActionBuffers();
-        //+NPR5.40 [307453]
 
         InitializeWorkflowDiscovery();
     end;
@@ -406,16 +326,14 @@ table 6150703 "NPR POS Action"
     procedure RegisterWorkflow20("Code": Text)
     var
         FrontEnd: Codeunit "NPR POS Front End Management";
-        WorkflowStep: DotNet NPRNetWorkflowStep;
+        WorkflowStep: JsonObject;
     begin
-        //-NPR5.50 [338666]
         RequireVersion20();
 
         if Type = Type::BackEnd then
             FrontEnd.ReportBug(StrSubstNo(Text003, Code, Type));
 
-        WorkflowStep := WorkflowStep.WorkflowStep();
-        WorkflowStep.Code := Code;
+        WorkflowStep.Add('Code', Code);
         WorkflowObj.Steps.Add(WorkflowStep);
 
         StreamWorkflowToBlob();
@@ -423,7 +341,6 @@ table 6150703 "NPR POS Action"
         UpdateActionBuffers();
 
         InitializeWorkflowDiscovery();
-        //+NPR5.50 [338666]
     end;
 
     procedure RegisterTextParameter(Name: Text; DefaultValue: Text)
@@ -472,10 +389,8 @@ table 6150703 "NPR POS Action"
     var
         Param: Record "NPR POS Action Parameter";
     begin
-        //-NPR5.40 [307453]
         if not ActionUpdateRequired then
             exit;
-        //+NPR5.40 [307453]
 
         Param."POS Action Code" := Code;
         Param.Name := Name;
@@ -484,10 +399,8 @@ table 6150703 "NPR POS Action"
         if DataType = Param."Data Type"::Option then
             Param.Options := Options;
 
-        //-NPR5.40 [306347]
         if not IsTemporary then
             Param.Validate("Default Value");
-        //+NPR5.40 [306347]
 
         Param.Insert;
     end;
@@ -496,9 +409,7 @@ table 6150703 "NPR POS Action"
     begin
         "Bound to DataSource" := true;
         Modify;
-        //-NPR5.40 [307453]
         UpdateActionBuffers();
-        //+NPR5.40 [307453]
     end;
 
     procedure RegisterDataSourceBinding(DataSource: Code[50])
@@ -506,75 +417,54 @@ table 6150703 "NPR POS Action"
         "Bound to DataSource" := true;
         "Data Source Name" := DataSource;
         Modify;
-        //-NPR5.40 [307453]
         UpdateActionBuffers();
-        //+NPR5.40 [307453]
     end;
 
     procedure RegisterCustomJavaScriptLogic(Method: Text; JavaScriptCode: Text)
     var
-        Dictionary: DotNet NPRNetDictionary_Of_T_U;
+        Json: JsonObject;
         MemStr: DotNet NPRNetMemoryStream;
         StreamWriter: DotNet NPRNetStreamWriter;
         OutStr: OutStream;
     begin
-        //-NPR5.44 [286547]
         if not IsTemporary then
             CalcFields("Custom JavaScript Logic");
-        //+NPR5.44 [286547]
         if "Custom JavaScript Logic".HasValue then begin
-            GetCustomJavaScriptLogic(Dictionary);
-            if Dictionary.ContainsKey(Method) then
-                Dictionary.Remove(Method);
-        end else
-            CreateDotNetDict(Dictionary);
+            Json := GetCustomJavaScriptLogic();
+            if Json.Contains(Method) then
+                Json.Remove(Method);
+        end;
 
-        Dictionary.Add(Method, JavaScriptCode);
-        StreamCustomJavaScriptToBlob(Dictionary);
-        Modify;
-        //-NPR5.40 [307453]
+        Json.Add(Method, JavaScriptCode);
+        StreamCustomJavaScriptToBlob(Json);
+        Modify();
         UpdateActionBuffers();
-        //+NPR5.40 [307453]
     end;
 
     procedure RegisterDataSource(Name: Code[50])
     begin
         "Data Source Name" := Name;
-        //-NPR5.40 [306347]
-        Modify;
-        //+NPR5.40 [306347]
-        //-NPR5.40 [307453]
+        Modify();
         UpdateActionBuffers();
-        //+NPR5.40 [307453]
     end;
 
     procedure RegisterBlockingUI(Blocking: Boolean)
     begin
-        //-NPR5.32.11 [281618]
         "Blocking UI" := Blocking;
-        Modify;
-        //+NPR5.32.11 [281618]
-        //-NPR5.40 [307453]
+        Modify();
         UpdateActionBuffers();
-        //+NPR5.40 [307453]
     end;
 
     procedure RegisterTooltip(TooltipIn: Text)
     begin
-        //-NPR5.32.11 [281618]
         Tooltip := CopyStr(TooltipIn, 1, MaxStrLen(Tooltip));
-        Modify;
-        //+NPR5.32.11 [281618]
-        //-NPR5.40 [307453]
+        Modify();
         UpdateActionBuffers();
-        //+NPR5.40 [307453]
     end;
 
     procedure RegisterSecureMethod(SecureMethodCode: Code[10])
     begin
-        //-NPR5.43 [314603]
         "Secure Method Code" := SecureMethodCode;
-        //+NPR5.43
     end;
 
     procedure IsThisAction("Code": Code[20]): Boolean
@@ -584,7 +474,6 @@ table 6150703 "NPR POS Action"
 
     local procedure UpdateActionBuffers()
     begin
-        //-NPR5.40 [307453]
         if Rec.IsTemporary then
             POSSession.DiscoverSessionAction(Rec);
 
@@ -592,7 +481,6 @@ table 6150703 "NPR POS Action"
             tmpUpdatedActions := Rec;
             tmpUpdatedActions.Modify;
         end;
-        //+NPR5.40 [307453]
     end;
 
     procedure RefreshWorkflow()
@@ -601,88 +489,38 @@ table 6150703 "NPR POS Action"
     begin
         ActionInRefresh := Code;
         OnDiscoverActions();
-        //-NPR5.39 [299114]
         if tmpUpdatedActions.Find then
             OnAfterActionUpdated(tmpUpdatedActions);
-        //+NPR5.39 [299114]
     end;
 
     local procedure StreamWorkflowToBlob()
     var
-        MemStr: DotNet NPRNetMemoryStream;
-        StreamWriter: DotNet NPRNetStreamWriter;
         OutStr: OutStream;
     begin
         Clear(Workflow);
         Workflow.CreateOutStream(OutStr);
-        StreamWriter := StreamWriter.StreamWriter(OutStr);
-        StreamWriter.Write(WorkflowObj.ToJsonString());
-        StreamWriter.Flush();
-        StreamWriter.Close();
+        WorkflowObj.GetJson().WriteTo(OutStr);
     end;
 
-    local procedure StreamCustomJavaScriptToBlob(Dictionary: DotNet NPRNetDictionary_Of_T_U)
+    local procedure StreamCustomJavaScriptToBlob(Json: JsonObject)
     var
-        Converters: DotNet NPRNetArray;
-        Converter: DotNet NPRNetJsonConverter;
-        KeyValuePairConverter: DotNet NPRNetKeyValuePairConverter;
-        MemStr: DotNet NPRNetMemoryStream;
-        StreamWriter: DotNet NPRNetStreamWriter;
-        JsonConvert: DotNet JsonConvert;
         OutStr: OutStream;
     begin
-        Converters := Converters.CreateInstance(GetDotNetType(Converter), 1);
-        Converters.SetValue(KeyValuePairConverter.KeyValuePairConverter, 0);
-
         Clear("Custom JavaScript Logic");
         "Custom JavaScript Logic".CreateOutStream(OutStr);
-        StreamWriter := StreamWriter.StreamWriter(OutStr);
-        StreamWriter.Write(JsonConvert.SerializeObject(Dictionary, Converters));
-        StreamWriter.Flush();
-        StreamWriter.Close();
-        //-NPR5.44 [286547]
-        Modify;
-        //+NPR5.44 [286547]
+        Json.WriteTo(OutStr);
+        Modify();
     end;
 
-    procedure GetCustomJavaScriptLogic(var "Object": DotNet NPRNetObject)
+    procedure GetCustomJavaScriptLogic() Json: JsonObject
     var
-        Dictionary: DotNet NPRNetDictionary_Of_T_U;
-        KeyValuePair: DotNet NPRNetKeyValuePair_Of_T_U;
-        JObject: DotNet JObject;
-        StreamReader: DotNet NPRNetStreamReader;
         InStr: InStream;
     begin
-        //-NPR5.44 [286547]
         if not IsTemporary then
             CalcFields("Custom JavaScript Logic");
-        //+NPR5.44 [286547]
+
         "Custom JavaScript Logic".CreateInStream(InStr);
-        StreamReader := StreamReader.StreamReader(InStr);
-        JObject := JObject.Parse(StreamReader.ReadToEnd());
-        StreamReader.Close();
-
-        CreateDotNetDict(Dictionary);
-        foreach KeyValuePair in JObject do
-            Dictionary.Add(KeyValuePair.Key, Format(KeyValuePair.Value));
-
-        Object := Dictionary;
-    end;
-
-    local procedure CreateDotNetDict(var Dict: DotNet NPRNetDictionary_Of_T_U)
-    var
-        Type: DotNet NPRNetType;
-        Activator: DotNet NPRNetActivator;
-        Arr: DotNet NPRNetArray;
-    begin
-        Arr := Arr.CreateInstance(GetDotNetType(Type), 2);
-        Arr.SetValue(GetDotNetType(''), 0);
-        Arr.SetValue(GetDotNetType(''), 1);
-
-        Type := GetDotNetType(Dict);
-        Type := Type.MakeGenericType(Arr);
-
-        Dict := Activator.CreateInstance(Type);
+        Json.ReadFrom(InStr);
     end;
 
     local procedure CheckParameter(Name: Text; Value: Variant; FrontEnd: Codeunit "NPR POS Front End Management")
@@ -710,15 +548,14 @@ table 6150703 "NPR POS Action"
         exit(Value.IsBigInteger or Value.IsInteger or Value.IsChar);
     end;
 
-    local procedure SetWorkflowInvocationDictionary(var Dictionary: DotNet NPRNetDictionary_Of_T_U; Name: Text; Value: Variant)
+    local procedure SetWorkflowInvocationDictionary(var Json: JsonObject; Name: Text; Value: Variant)
+    var
+        JsonMgt: Codeunit "NPR POS JSON Management";
     begin
-        if IsNull(Dictionary) then
-            Dictionary := Dictionary.Dictionary();
+        if Json.Contains(Name) then
+            Json.Remove(Name);
 
-        if Dictionary.ContainsKey(Name) then
-            Dictionary.Remove(Name);
-
-        Dictionary.Add(Name, Value);
+        JsonMgt.AddVariantValueToJsonObject(Json, Name, Value);
     end;
 
     procedure SetWorkflowInvocationParameter(Name: Text; Value: Variant; FrontEnd: Codeunit "NPR POS Front End Management")
@@ -732,7 +569,7 @@ table 6150703 "NPR POS Action"
         SetWorkflowInvocationDictionary(WorkflowInvocationContext, Name, Value);
     end;
 
-    procedure GetWorkflowInvocationContext(var WorkflowInvocationParametersOut: DotNet NPRNetDictionary_Of_T_U; var WorkflowInvocationContextOut: DotNet NPRNetDictionary_Of_T_U)
+    procedure GetWorkflowInvocationContext(var WorkflowInvocationParametersOut: JsonObject; var WorkflowInvocationContextOut: JsonObject)
     begin
         WorkflowInvocationParametersOut := WorkflowInvocationParameters;
         WorkflowInvocationContextOut := WorkflowInvocationContext;
@@ -742,48 +579,27 @@ table 6150703 "NPR POS Action"
     var
         CodeunitInstanceDetector: Codeunit "NPR POS Action Management";
     begin
-        //-NPR5.39 [299114]
-        //-NPR5.40 [306347]
         CodeunitInstanceDetector.InitializeActionDiscovery();
         BindSubscription(CodeunitInstanceDetector);
-        //+NPR5.40 [306347]
         OnDiscoverActions();
-        //-NPR5.40 [306347]
         UnbindSubscription(CodeunitInstanceDetector);
-        //+NPR5.40 [306347]
-
-        //-NPR5.40 [307453]
-        // IF tmpUpdatedActions.FINDSET THEN REPEAT
-        //  OnAfterActionUpdated(tmpUpdatedActions);
-        // UNTIL tmpUpdatedActions.NEXT = 0;
         HandleActionUpdates();
-        //+NPR5.40 [307453]
-        //+NPR5.39 [299114]
     end;
 
     local procedure RequireVersion10()
     var
         FrontEnd: Codeunit "NPR POS Front End Management";
     begin
-        //-NPR5.50 [338666]
         if Version20 then
             FrontEnd.ReportBug(Text007);
-        //+NPR5.50 [338666]
     end;
 
     local procedure RequireVersion20()
     var
         FrontEnd: Codeunit "NPR POS Front End Management";
     begin
-        //-NPR5.50 [338666]
         if not Version20 then
             FrontEnd.ReportBug(Text008);
-        //+NPR5.50 [338666]
-    end;
-
-    [IntegrationEvent(TRUE, false)]
-    local procedure OnRegisterActionWorkflow(Workflow: DotNet NPRNetWorkflow; var Handled: Boolean)
-    begin
     end;
 
     [IntegrationEvent(TRUE, false)]
@@ -805,8 +621,6 @@ table 6150703 "NPR POS Action"
     var
         POSAction: Record "NPR POS Action";
     begin
-
-        //-NPR5.54 [392247]
         "Requires POS Type" := "Requires POS Type"::ATTENDED;
         POSSession.DiscoverSessionAction(Rec);
         if (IsTemporary()) then begin
@@ -815,15 +629,12 @@ table 6150703 "NPR POS Action"
                 POSAction.Modify();
             end;
         end;
-        //+NPR5.54 [392247]
     end;
 
     procedure SetWorkflowTypeUnattended()
     var
         POSAction: Record "NPR POS Action";
     begin
-
-        //-NPR5.54 [392247]
         "Requires POS Type" := "Requires POS Type"::UNATTENDED;
         POSSession.DiscoverSessionAction(Rec);
         if (IsTemporary()) then begin
@@ -832,28 +643,21 @@ table 6150703 "NPR POS Action"
                 POSAction.Modify();
             end;
         end;
-        //+NPR5.54 [392247]
     end;
 
     procedure GetWorkflowType(): Integer
     begin
-
-        //-NPR5.54 [392247]
         exit("Requires POS Type");
-        //+NPR5.54 [392247]
     end;
 
     local procedure UpdateMLDescription("Code": Code[20]; Description: Text[250])
     var
         POSAction: Record "NPR POS Action";
     begin
-        //-NPR5.55 [335834]
         if POSAction.Get(Code) then
             if POSAction.Description <> Description then begin
                 POSAction.Description := Description;
                 POSAction.Modify;
             end;
-        //+NPR5.55 [335834]
     end;
 }
-

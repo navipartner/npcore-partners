@@ -1,16 +1,5 @@
 codeunit 6150711 "NPR POS Data Driver - Sale"
 {
-    // NPR5.32.10/TSA/20170619  CASE 279495 Added Name (field 8) to data management
-    // NPR5.36/TJ  /20170825  CASE 287688 Text constants with nontranslatable text are now functions with hardcoded values
-    // NPR5.38/TSA /20171113  CASE 295327 Added SalespersonName as a field, to make it available in POS footer.
-    // NPR5.38/MHA /20180105  CASE 301053 Updated signature of RefreshDataSet() to match new publisher signature
-    // NPR5.40/JC  /20180222 CASE 302192 Added Register, Customer, Contact names in POS info
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         Caption_CompanyName: Label 'Company Name';
         Caption_SalespersonName: Label 'Salesperson Name';
@@ -19,22 +8,19 @@ codeunit 6150711 "NPR POS Data Driver - Sale"
         Caption_ContactName: Label 'Contact Name';
 
     [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnGetDataSource', '', false, false)]
-    local procedure GetDataSource(Name: Text; var DataSource: DotNet NPRNetDataSource0; var Handled: Boolean; Setup: Codeunit "NPR POS Setup")
+    local procedure GetDataSource(Name: Text; var DataSource: Codeunit "NPR Data Source"; var Handled: Boolean; Setup: Codeunit "NPR POS Setup")
     var
         Sale: Record "NPR Sale POS";
         DataMgt: Codeunit "NPR POS Data Management";
-        DataType: DotNet NPRNetDataType;
+        DataType: Enum "NPR Data Type";
     begin
-        //-NPR5.36 [287688]
-        //IF Name <> SourceName THEN
         if Name <> GetSourceNameText() then
-            //+NPR5.36 [287688]
             exit;
 
-        DataSource := DataSource.DataSource();
-        DataSource.Id := Name;
-        DataSource.TableNo := DATABASE::"NPR Sale POS";
-        DataSource.PerSession := true;
+        DataSource.Constructor();
+        DataSource.SetId(Name);
+        DataSource.SetTableNo(DATABASE::"NPR Sale POS");
+        DataSource.SetPerSession(true);
 
         DataMgt.AddFieldToDataSource(DataSource, Sale, Sale.FieldNo("Register No."), false);
         DataMgt.AddFieldToDataSource(DataSource, Sale, Sale.FieldNo("Sales Ticket No."), false);
@@ -42,55 +28,32 @@ codeunit 6150711 "NPR POS Data Driver - Sale"
         DataMgt.AddFieldToDataSource(DataSource, Sale, Sale.FieldNo("Customer No."), false);
         DataMgt.AddFieldToDataSource(DataSource, Sale, Sale.FieldNo(Name), false);
         DataMgt.AddFieldToDataSource(DataSource, Sale, Sale.FieldNo(Sale.Date), false);
-
-        //-NPR5.40 [302192]
         DataMgt.AddFieldToDataSource(DataSource, Sale, Sale.FieldNo("Contact No."), false);
-        DataSource.AddColumn(GetRegisterNameText, Caption_RegisterName, DataType.String, false);
-        DataSource.AddColumn(GetCustomerNameText, Caption_CustomerName, DataType.String, false);
-        DataSource.AddColumn(GetContactNameText, Caption_ContactName, DataType.String, false);
-        //+NPR5.40
 
-        //-NPR5.36 [287688]
-        /*
-        DataSource.AddColumn(Field_LastSaleNo,'',DataType.String,FALSE);
-        DataSource.AddColumn(Field_LastSaleTotal,'',DataType.Decimal,FALSE);
-        DataSource.AddColumn(Field_LastSalePaid,'',DataType.Decimal,FALSE);
-        DataSource.AddColumn(Field_LastSaleChange,'',DataType.Decimal,FALSE);
-        DataSource.AddColumn(Field_LastSaleDate,'',DataType.String,FALSE);
-        DataSource.AddColumn(Field_CompanyName,Caption_CompanyName,DataType.String,FALSE);
-        */
-        DataSource.AddColumn(GetLastSaleNoText(), '', DataType.String, false);
-        DataSource.AddColumn(GetLastSaleTotalText(), '', DataType.Decimal, false);
-        DataSource.AddColumn(GetLastSalePaidText(), '', DataType.Decimal, false);
-        DataSource.AddColumn(GetLastSaleChangeText(), '', DataType.Decimal, false);
-        DataSource.AddColumn(GetLastSaleDateText(), '', DataType.String, false);
-        DataSource.AddColumn(GetCompanyNameText(), Caption_CompanyName, DataType.String, false);
-        //+NPR5.36 [287688]
-
-        //-NPR5.38 [295327]
-        DataSource.AddColumn(GetSalespersonNameText(), '', DataType.String, false);
-        //+NPR5.38 [295327]
+        DataSource.AddColumn(GetRegisterNameText, Caption_RegisterName, DataType::String, false);
+        DataSource.AddColumn(GetCustomerNameText, Caption_CustomerName, DataType::String, false);
+        DataSource.AddColumn(GetContactNameText, Caption_ContactName, DataType::String, false);
+        DataSource.AddColumn(GetLastSaleNoText(), '', DataType::String, false);
+        DataSource.AddColumn(GetLastSaleTotalText(), '', DataType::Decimal, false);
+        DataSource.AddColumn(GetLastSalePaidText(), '', DataType::Decimal, false);
+        DataSource.AddColumn(GetLastSaleChangeText(), '', DataType::Decimal, false);
+        DataSource.AddColumn(GetLastSaleDateText(), '', DataType::String, false);
+        DataSource.AddColumn(GetCompanyNameText(), Caption_CompanyName, DataType::String, false);
+        DataSource.AddColumn(GetSalespersonNameText(), '', DataType::String, false);
 
         Handled := true;
-
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnRefreshDataSet', '', false, false)]
-    local procedure RefreshDataSet(POSSession: Codeunit "NPR POS Session"; DataSource: DotNet NPRNetDataSource0; var CurrDataSet: DotNet NPRNetDataSet; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
+    local procedure RefreshDataSet(POSSession: Codeunit "NPR POS Session"; DataSource: Codeunit "NPR Data Source"; var CurrDataSet: Codeunit "NPR Data Set"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         Sale: Codeunit "NPR POS Sale";
     begin
-        //-NPR5.36 [287688]
-        //IF DataSource.Id <> SourceName THEN
         if DataSource.Id <> GetSourceNameText() then
-            //+NPR5.36 [287688]
             exit;
 
         POSSession.GetSale(Sale);
-        //-NPR5.38 [301053]
-        //Sale.ToDataset(DataSet,DataSource,POSSession,FrontEnd);
         Sale.ToDataset(CurrDataSet, DataSource, POSSession, FrontEnd);
-        //+NPR5.38 [301053]
         Handled := true;
     end;
 
@@ -99,10 +62,7 @@ codeunit 6150711 "NPR POS Data Driver - Sale"
     var
         Sale: Codeunit "NPR POS Sale";
     begin
-        //-NPR5.36 [287688]
-        //IF DataSource <> SourceName THEN
         if DataSource <> GetSourceNameText() then
-            //+NPR5.36 [287688]
             exit;
 
         POSSession.GetSale(Sale);
@@ -112,7 +72,7 @@ codeunit 6150711 "NPR POS Data Driver - Sale"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnReadDataSourceVariables', '', false, false)]
-    local procedure ReadDataSourceVariables(POSSession: Codeunit "NPR POS Session"; RecRef: RecordRef; DataSource: Text; DataRow: DotNet NPRNetDataRow0; var Handled: Boolean)
+    local procedure ReadDataSourceVariables(POSSession: Codeunit "NPR POS Session"; RecRef: RecordRef; DataSource: Text; DataRow: Codeunit "NPR Data Row"; var Handled: Boolean)
     var
         Sale: Codeunit "NPR POS Sale";
         LastSaleTotal: Decimal;
@@ -127,40 +87,24 @@ codeunit 6150711 "NPR POS Data Driver - Sale"
         Register: Record "NPR Register";
         ContactBusinessRelation: Record "Contact Business Relation";
     begin
-        //-NPR5.36 [287688]
-        //IF DataSource <> SourceName THEN
         if DataSource <> GetSourceNameText() then
-            //+NPR5.36 [287688]
             exit;
 
         POSSession.GetSale(Sale);
         Sale.GetLastSaleInfo(LastSaleTotal, LastSalePayment, LastSaleDateText, LastSaleReturnAmount, LastReceiptNo);
 
-        //-NPR5.36 [287688]
-        /*
-        DataRow.Add(Field_LastSaleNo,LastReceiptNo);
-        DataRow.Add(Field_LastSaleTotal,LastSaleTotal);
-        DataRow.Add(Field_LastSalePaid,LastSalePayment);
-        DataRow.Add(Field_LastSaleChange,LastSaleReturnAmount);
-        DataRow.Add(Field_LastSaleDate,LastSaleDateText);
-        DataRow.Add(Field_CompanyName,COMPANYNAME);
-        */
         DataRow.Add(GetLastSaleNoText(), LastReceiptNo);
         DataRow.Add(GetLastSaleTotalText(), LastSaleTotal);
         DataRow.Add(GetLastSalePaidText(), LastSalePayment);
         DataRow.Add(GetLastSaleChangeText(), LastSaleReturnAmount);
         DataRow.Add(GetLastSaleDateText(), LastSaleDateText);
         DataRow.Add(GetCompanyNameText(), CompanyName);
-        //+NPR5.36 [287688]
 
-        //-NPR5.38 [295327]
         Sale.GetCurrentSale(SalePOS);
         if (not SalespersonPurchaser.Get(SalePOS."Salesperson Code")) then
             SalespersonPurchaser.Name := 'Unknown';
         DataRow.Add(GetSalespersonNameText(), SalespersonPurchaser.Name);
-        //+NPR5.38 [295327]
 
-        //-NPR5.40 [302192]
         Sale.GetCurrentSale(SalePOS);
         Clear(Register);
         if Register.Get(SalePOS."Register No.") then;
@@ -179,10 +123,8 @@ codeunit 6150711 "NPR POS Data Driver - Sale"
         DataRow.Add(GetRegisterNameText(), Register.Description);
         DataRow.Add(GetCustomerNameText(), Customer.Name);
         DataRow.Add(GetContactNameText(), Contact.Name);
-        //+NPR5.40
 
         Handled := true;
-
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnIsDataSourceModified', '', false, false)]
@@ -190,10 +132,7 @@ codeunit 6150711 "NPR POS Data Driver - Sale"
     var
         Sale: Codeunit "NPR POS Sale";
     begin
-        //-NPR5.36 [287688]
-        //IF DataSource <> SourceName THEN
         if DataSource <> GetSourceNameText() then
-            //+NPR5.36 [287688]
             exit;
 
         POSSession.GetSale(Sale);
@@ -203,10 +142,7 @@ codeunit 6150711 "NPR POS Data Driver - Sale"
     [EventSubscriber(ObjectType::Table, 6150708, 'OnDiscoverDataSource', '', false, false)]
     local procedure OnDiscoverDataSource(var Rec: Record "NPR POS Data Source Discovery")
     begin
-        //-NPR5.36 [287688]
-        //Rec.RegisterDataSource(SourceName,'(Built-in data source)');
         Rec.RegisterDataSource(GetSourceNameText(), '(Built-in data source)');
-        //+NPR5.36 [287688]
     end;
 
     local procedure GetSourceNameText(): Text
@@ -246,30 +182,21 @@ codeunit 6150711 "NPR POS Data Driver - Sale"
 
     local procedure GetSalespersonNameText(): Text
     begin
-        //-NPR5.38 [295327]
         exit('SalespersonName');
-        //+NPR5.38 [295327]
     end;
 
     local procedure GetRegisterNameText(): Text
     begin
-        //-NPR5.40 [302192]
         exit('RegisterName');
-        //+NPR5.40
     end;
 
     local procedure GetCustomerNameText(): Text
     begin
-        //-NPR5.40 [302192]
         exit('CustomerName');
-        //+NPR5.40
     end;
 
     local procedure GetContactNameText(): Text
     begin
-        //-NPR5.40 [302192]
         exit('ContactName');
-        //+NPR5.40
     end;
 }
-

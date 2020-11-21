@@ -124,8 +124,7 @@ codeunit 6150725 "NPR POS Action: Payment"
         PaidAmount: Decimal;
         SubTotal: Decimal;
         ReturnPaymentTypePOS: Record "NPR Payment Type POS";
-        CurrentView: DotNet NPRNetView0;
-        CurrentViewType: DotNet NPRNetViewType0;
+        CurrentView: Codeunit "NPR POS View";
         NPRetailSetup: Record "NPR NP Retail Setup";
         POSUnit: Record "NPR POS Unit";
         POSAuditProfile: Record "NPR POS Audit Profile";
@@ -166,7 +165,7 @@ codeunit 6150725 "NPR POS Action: Payment"
         end;
 
         POSSession.GetCurrentView(CurrentView);
-        if (CurrentView.Type.Equals(CurrentViewType.Sale)) then
+        if (CurrentView.Type = CurrentView.Type::Sale) then
             POSSession.ChangeViewPayment();
 
         JSON.InitializeJObjectParser(Parameters, FrontEnd);
@@ -1203,4 +1202,3 @@ codeunit 6150725 "NPR POS Action: Payment"
         exit(true);
     end;
 }
-

@@ -241,14 +241,6 @@ dotnet
         {
         }
 
-        type("System.Diagnostics.Stopwatch"; "NPRNetStopwatch")
-        {
-        }
-
-        type("System.Collections.Generic.Stack`1"; "NPRNetStack_Of_T")
-        {
-        }
-
         type("System.Net.Security.AuthenticationLevel"; "NPRNetAuthenticationLevel")
         {
         }
@@ -583,63 +575,7 @@ dotnet
         {
         }
 
-        type("NaviPartner.Retail.Nav.App.Signalling.Signal"; "NPRNetSignal")
-        {
-        }
-
-        type("NaviPartner.Retail.Nav.App.Signalling.StartSession"; "NPRNetStartSession")
-        {
-        }
-
-        type("NaviPartner.Retail.Nav.App.Signalling.QueryClosePage"; "NPRNetQueryClosePage")
-        {
-        }
-
-        type("NaviPartner.Retail.Nav.App.Signalling.MessageResponse"; "NPRNetMessageResponse")
-        {
-        }
-
-        type("NaviPartner.Retail.Nav.Classes.Json.DataGrid.DataGrid"; "NPRNetDataGrid")
-        {
-        }
-
         type("NaviPartner.Retail.Nav.ObjectModel.Model"; "NPRNetModel")
-        {
-        }
-
-        type("NaviPartner.Retail.Nav.Enums.ViewType"; "NPRNetViewType")
-        {
-        }
-
-        type("NaviPartner.Retail.Nav.Classes.Json.View.SaleView"; "NPRNetSaleView")
-        {
-        }
-
-        type("NaviPartner.Retail.Nav.Enums.ClientType"; "NPRNetClientType")
-        {
-        }
-
-        type("NaviPartner.Retail.Nav.Classes.Json.View.PaymentView"; "NPRNetPaymentView")
-        {
-        }
-
-        type("NaviPartner.Retail.Nav.Classes.Json.View.View"; "NPRNetView")
-        {
-        }
-
-        type("NaviPartner.Retail.Nav.Classes.Json.View.IMenuButtonView"; "NPRNetIMenuButtonView")
-        {
-        }
-
-        type("NaviPartner.Retail.Nav.Classes.Json.ButtonGrid.ButtonGrid"; "NPRNetButtonGrid")
-        {
-        }
-
-        type("NaviPartner.Retail.Nav.Classes.Json.ButtonGrid.Button"; "NPRNetButton")
-        {
-        }
-
-        type("NaviPartner.Retail.Nav.Classes.Json.DataGrid.DataColumn"; "NPRNetDataColumn0")
         {
         }
 
@@ -648,10 +584,6 @@ dotnet
         }
 
         type("NaviPartner.Retail.Nav.Enums.NumberFormat"; "NPRNetNumberFormat")
-        {
-        }
-
-        type("NaviPartner.Retail.Nav.Classes.Json.Dialog.CalendarGrid"; "NPRNetCalendarGrid")
         {
         }
 
@@ -667,63 +599,7 @@ dotnet
         {
         }
 
-        type("NaviPartner.Retail.Nav.Enums.ButtonColor"; "NPRNetButtonColor")
-        {
-        }
-
-        type("NaviPartner.Retail.Nav.Enums.ShowBehavior"; "NPRNetShowBehavior")
-        {
-        }
-
-        type("NaviPartner.Retail.Nav.Classes.Json.Screen"; "NPRNetScreen")
-        {
-        }
-
-        type("NaviPartner.Retail.Nav.Classes.Eventing.MarshalResult.Result"; "NPRNetResult")
-        {
-        }
-
-        type("NaviPartner.Retail.Nav.Enums.MarshalStatus"; "NPRNetMarshalStatus")
-        {
-        }
-
-        type("NaviPartner.Retail.Nav.Classes.Json.Protocol.ResponseInfo"; "NPRNetResponseInfo")
-        {
-        }
-
-        type("NaviPartner.Retail.Nav.Classes.Json.Protocol.ResponseContent"; "NPRNetResponseContent")
-        {
-        }
-
-        type("NaviPartner.Retail.Nav.Enums.ResponseStatus"; "NPRNetResponseStatus")
-        {
-        }
-
-        type("NaviPartner.Retail.Nav.Classes.Eventing.KnownEvent"; "NPRNetKnownEvent")
-        {
-        }
-
         type("NaviPartner.Retail.Nav.Classes.Json.Dialog.Error"; "NPRNetError")
-        {
-        }
-
-        type("NaviPartner.Retail.Nav.Classes.Json.Dialog.Confirm"; "NPRNetConfirm")
-        {
-        }
-
-        type("NaviPartner.Retail.Nav.Classes.Json.Dialog.SearchBox"; "NPRNetSearchBox")
-        {
-        }
-
-        type("NaviPartner.Retail.Nav.Classes.Json.Dialog.Numpad"; "NPRNetNumpad")
-        {
-        }
-
-        type("NaviPartner.Retail.Nav.Enums.NumpadType"; "NPRNetNumpadType")
-        {
-        }
-
-        type("NaviPartner.Retail.Nav.Classes.Json.Protocol.ProtocolContext"; "NPRNetProtocolContext")
         {
         }
 
@@ -731,39 +607,7 @@ dotnet
         {
         }
 
-        type("NaviPartner.Retail.Nav.Classes.Json.InfoBox"; "NPRNetInfoBox")
-        {
-        }
-
-        type("NaviPartner.Retail.Nav.Classes.Eventing.Message.MessageEventArgs"; "NPRNetMessageEventArgs")
-        {
-        }
-
-        type("NaviPartner.Retail.Nav.Classes.Json.JavaScript"; "NPRNetJavaScript")
-        {
-        }
-
         type("NaviPartner.Retail.Nav.Classes.Json.Dialog.Response.Response"; "NPRNetResponse")
-        {
-        }
-
-        type("NaviPartner.Retail.Nav.Classes.Json.DataSource"; "NPRNetDataSource")
-        {
-        }
-
-        type("NaviPartner.Retail.Nav.App.ProtocolState"; "NPRNetProtocolState")
-        {
-        }
-
-        type("NaviPartner.Retail.Nav.App.ProtocolManager"; "NPRNetProtocolManager")
-        {
-        }
-
-        type("NaviPartner.Retail.Nav.Classes.State"; "NPRNetState0")
-        {
-        }
-
-        type("NaviPartner.Retail.Nav.Classes.Json.Protocol.Response.NumPadResponseContent"; "NPRNetNumPadResponseContent")
         {
         }
 
@@ -783,87 +627,7 @@ dotnet
         {
         }
 
-        type("NaviPartner.Retail.Nav.Classes.Eventing.MarshalEventArgsFactory"; "NPRNetMarshalEventArgsFactory")
-        {
-        }
-
-        type("NaviPartner.Retail.Nav.Classes.Json.View.LoginView"; "NPRNetLoginView")
-        {
-        }
-
-        type("NaviPartner.Retail.Nav.Enums.EventType"; "NPRNetEventType")
-        {
-        }
-
-        type("NaviPartner.Retail.Nav.Classes.Eventing.Message.CancelRequestMessageData"; "NPRNetCancelRequestMessageData")
-        {
-        }
-
-        type("NaviPartner.Retail.Nav.Classes.Json.Context"; "NPRNetContext")
-        {
-        }
-
-        type("NaviPartner.Retail.Nav.Enums.ButtonType"; "NPRNetButtonType")
-        {
-        }
-
-        type("NaviPartner.Retail.Nav.Classes.Eventing.Message.EanCodeScannedMessageData"; "NPRNetEanCodeScannedMessageData")
-        {
-        }
-
-        type("NaviPartner.Retail.Nav.Classes.Eventing.Message.KeyPressMessageData"; "NPRNetKeyPressMessageData")
-        {
-        }
-
-        type("NaviPartner.Retail.Nav.Enums.KeyCode"; "NPRNetKeyCode")
-        {
-        }
-
-        type("NaviPartner.Retail.Nav.Classes.Eventing.Message.LoginMessageData"; "NPRNetLoginMessageData")
-        {
-        }
-
-        type("NaviPartner.Retail.Nav.Classes.Eventing.Event.ChangeScreenEventArgs"; "NPRNetChangeScreenEventArgs")
-        {
-        }
-
-        type("NaviPartner.Retail.Nav.Classes.Eventing.Event.MarshalEventArgs"; "NPRNetMarshalEventArgs")
-        {
-        }
-
         type("NaviPartner.Retail.Nav.Classes.Json.Dialog.Dialog"; "NPRNetDialog")
-        {
-        }
-
-        type("NaviPartner.Retail.Nav.Classes.Json.Protocol.RequestFactory"; "NPRNetRequestFactory")
-        {
-        }
-
-        type("NaviPartner.Retail.Nav.Enums.DialogType"; "NPRNetDialogType")
-        {
-        }
-
-        type("NaviPartner.Retail.Nav.Classes.Json.Dialog.Response.NumpadResponse"; "NPRNetNumpadResponse")
-        {
-        }
-
-        type("NaviPartner.Retail.Nav.Classes.Json.Dialog.Response.ConfirmResponse"; "NPRNetConfirmResponse")
-        {
-        }
-
-        type("NaviPartner.Retail.Nav.Classes.Json.Dialog.Response.SearchBoxResponse"; "NPRNetSearchBoxResponse")
-        {
-        }
-
-        type("NaviPartner.Retail.Nav.Classes.Json.Dialog.Response.CalendarGridResponse"; "NPRNetCalendarGridResponse")
-        {
-        }
-
-        type("NaviPartner.Retail.Nav.Classes.Json.Dialog.Response.LookupResponse"; "NPRNetLookupResponse")
-        {
-        }
-
-        type("NaviPartner.Retail.Nav.Classes.Json.Dialog.RegisterBalancing"; "NPRNetRegisterBalancing")
         {
         }
     }
@@ -1366,28 +1130,6 @@ dotnet
         }
     }
 
-    assembly("NaviPartner.Retail.Device.Service")
-    {
-        Version = '5.0.398.0';
-        Culture = 'neutral';
-        PublicKeyToken = '909fa1bba7619e33';
-
-        type("NaviPartner.Retail.Device.Service.RequestHandler"; "NPRNetRequestHandler")
-        {
-        }
-    }
-
-    assembly("NaviPartner.Retail.Nav.Client")
-    {
-        Version = '5.0.398.0';
-        Culture = 'neutral';
-        PublicKeyToken = '909fa1bba7619e33';
-
-        type("NaviPartner.Retail.Nav.Client.Controls.IFramework"; "NPRNetIFramework")
-        {
-        }
-    }
-
     assembly("NavHelper.AssemblyResolver")
     {
         Version = '2.4.0.0';
@@ -1680,60 +1422,6 @@ dotnet
         }
     }
 
-    assembly("NaviPartner.Retail.Json.View")
-    {
-        Version = '5.3.817.2';
-        Culture = 'neutral';
-        PublicKeyToken = '909fa1bba7619e33';
-
-        type("NaviPartner.Retail.Json.View.View"; "NPRNetView0")
-        {
-        }
-
-        type("NaviPartner.Retail.Json.View.ViewType"; "NPRNetViewType0")
-        {
-        }
-
-        type("NaviPartner.Retail.Json.View.SetViewJsonRequest"; "NPRNetSetViewJsonRequest")
-        {
-        }
-    }
-
-    assembly("NaviPartner.Retail.Json.Data")
-    {
-        Version = '5.3.817.2';
-        Culture = 'neutral';
-        PublicKeyToken = '909fa1bba7619e33';
-
-        type("NaviPartner.Retail.Json.Data.DataSource"; "NPRNetDataSource0")
-        {
-        }
-
-        type("NaviPartner.Retail.Json.Data.DataType"; "NPRNetDataType")
-        {
-        }
-
-        type("NaviPartner.Retail.Json.Data.DataRow"; "NPRNetDataRow0")
-        {
-        }
-
-        type("NaviPartner.Retail.Json.Data.DataStore"; "NPRNetDataStore")
-        {
-        }
-
-        type("NaviPartner.Retail.Json.Data.DataSet"; "NPRNetDataSet")
-        {
-        }
-
-        type("NaviPartner.Retail.Json.Data.RefreshDataJsonRequest"; "NPRNetRefreshDataJsonRequest")
-        {
-        }
-
-        type("NaviPartner.Retail.Json.Data.DataColumn"; "NPRNetDataColumn1")
-        {
-        }
-    }
-
     assembly("Microsoft.Office.Interop.Word")
     {
         Version = '15.0.0.0';
@@ -1911,150 +1599,6 @@ dotnet
         }
 
         type("NaviPartner.Retail.Stargate.Messaging.OPOS.Responses.EjectDrawerResponse"; "NPRNetEjectDrawerResponse")
-        {
-        }
-    }
-
-    assembly("NaviPartner.Retail.Json.Core")
-    {
-        Version = '5.3.817.2';
-        Culture = 'neutral';
-        PublicKeyToken = '909fa1bba7619e33';
-
-        type("NaviPartner.Retail.Json.Core.Requests.StartTransactionJsonRequest"; "NPRNetStartTransactionJsonRequest")
-        {
-        }
-
-        type("NaviPartner.Retail.Json.Core.Objects.Font"; "NPRNetFont0")
-        {
-        }
-
-        type("NaviPartner.Retail.Json.Core.Requests.SetOptionJsonRequest"; "NPRNetSetOptionJsonRequest")
-        {
-        }
-
-        type("NaviPartner.Retail.Json.Core.Requests.ReportBugJsonRequest"; "NPRNetReportBugJsonRequest")
-        {
-        }
-
-        type("NaviPartner.Retail.Json.Core.Requests.AppGatewayProtocolResponse"; "NPRNetAppGatewayProtocolResponse")
-        {
-        }
-
-        type("NaviPartner.Retail.Json.Core.Requests.SetCaptionsJsonRequest"; "NPRNetSetCaptionsJsonRequest")
-        {
-        }
-
-        type("NaviPartner.Retail.Json.Core.Requests.SetFormatJsonRequest"; "NPRNetSetFormatJsonRequest")
-        {
-        }
-
-        type("NaviPartner.Retail.Json.Core.Requests.SetImageJsonRequest"; "NPRNetSetImageJsonRequest")
-        {
-        }
-
-        type("NaviPartner.Retail.Json.Core.Requests.ConfigureFontJsonRequest"; "NPRNetConfigureFontJsonRequest")
-        {
-        }
-
-        type("NaviPartner.Retail.Json.Core.Requests.InvokeDeviceRequest"; "NPRNetInvokeDeviceRequest")
-        {
-        }
-    }
-
-    assembly("NaviPartner.Retail.Json.Workflow")
-    {
-        Version = '5.3.817.2';
-        Culture = 'neutral';
-        PublicKeyToken = '909fa1bba7619e33';
-
-        type("NaviPartner.Retail.Json.Workflow.WorkflowCallCompletedRequest"; "NPRNetWorkflowCallCompletedRequest")
-        {
-        }
-
-        type("NaviPartner.Retail.Json.Workflow.WorkflowAction"; "NPRNetWorkflowAction")
-        {
-        }
-
-        type("NaviPartner.Retail.Json.Workflow.ConfigureReusableWorkflowRequest"; "NPRNetConfigureReusableWorkflowRequest")
-        {
-        }
-
-        type("NaviPartner.Retail.Json.Workflow.WorkflowRequest"; "NPRNetWorkflowRequest")
-        {
-        }
-
-        type("NaviPartner.Retail.Json.Workflow.PauseWorkflowJsonRequest"; "NPRNetPauseWorkflowJsonRequest")
-        {
-        }
-
-        type("NaviPartner.Retail.Json.Workflow.ResumeWorkflowJsonRequest"; "NPRNetResumeWorkflowJsonRequest")
-        {
-        }
-
-        type("NaviPartner.Retail.Json.Workflow.ProvideContextRequest"; "NPRNetProvideContextRequest")
-        {
-        }
-
-        type("NaviPartner.Retail.Json.Workflow.Workflow"; "NPRNetWorkflow")
-        {
-        }
-
-        type("NaviPartner.Retail.Json.Workflow.WorkflowStep"; "NPRNetWorkflowStep")
-        {
-        }
-    }
-
-    assembly("NaviPartner.Retail.Json.Menu")
-    {
-        Version = '5.3.817.2';
-        Culture = 'neutral';
-        PublicKeyToken = '909fa1bba7619e33';
-
-        type("NaviPartner.Retail.Json.Menu.Menu"; "NPRNetMenu")
-        {
-        }
-
-        type("NaviPartner.Retail.Json.Menu.MenuButton"; "NPRNetMenuButton")
-        {
-        }
-
-        type("NaviPartner.Retail.Json.Menu.ISubMenu"; "NPRNetISubMenu")
-        {
-        }
-
-        type("NaviPartner.Retail.Json.Menu.Actions.Action"; "NPRNetAction")
-        {
-        }
-
-        type("NaviPartner.Retail.Json.Menu.MenuRequest"; "NPRNetMenuRequest")
-        {
-        }
-
-        type("NaviPartner.Retail.Json.Menu.Actions.ItemAction"; "NPRNetItemAction")
-        {
-        }
-
-        type("NaviPartner.Retail.Json.Menu.Actions.MenuAction"; "NPRNetMenuAction")
-        {
-        }
-
-        type("NaviPartner.Retail.Json.Menu.Actions.PaymentAction"; "NPRNetPaymentAction")
-        {
-        }
-
-        type("NaviPartner.Retail.Json.Menu.Actions.CustomerAction"; "NPRNetCustomerAction")
-        {
-        }
-    }
-
-    assembly("NaviPartner.Retail.Json")
-    {
-        Version = '5.3.817.2';
-        Culture = 'neutral';
-        PublicKeyToken = '909fa1bba7619e33';
-
-        type("NaviPartner.Retail.Json.JsonRequest"; "NPRNetJsonRequest")
         {
         }
     }

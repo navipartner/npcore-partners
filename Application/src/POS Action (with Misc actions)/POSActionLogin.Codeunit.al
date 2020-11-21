@@ -65,7 +65,6 @@ codeunit 6150721 "NPR POS Action - Login"
         POSUnitIdentityRec: Record "NPR POS Unit Identity";
         Register: Record "NPR Register";
         UserSetup: Record "User Setup";
-        ViewType: DotNet NPRNetViewType0;
         Type: Text;
         Password: Text;
         HardwareId: Text;

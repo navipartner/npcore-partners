@@ -2,7 +2,7 @@ codeunit 6150733 "NPR POS Workflows 2.0"
 {
     var
         Text001: Label 'Action %1 does not seem to have a registered handler, or the registered handler failed to notify the framework about successful processing of the action.';
-        Stopwatches: DotNet NPRNetDictionary_Of_T_U;
+        Stopwatch: Codeunit "NPR Stopwatch";
         TextErrorMustNotRunThisCodeunit: Label 'You must not run this codeunit directly. This codeunit is intended to be run only from within itself.', Locked = true; // This is development type of error, do not translate!
         OnRunInitialized: Boolean;
         OnRunPOSAction: Record "NPR POS Action";
@@ -89,17 +89,16 @@ codeunit 6150733 "NPR POS Workflows 2.0"
         JSON: Codeunit "NPR POS JSON Management";
         State: Codeunit "NPR POS WF 2.0: State";
         FrontEnd20: Codeunit "NPR POS Front End Management";
-        Signal: DotNet NPRNetWorkflowCallCompletedRequest;
-        ActionContext: DotNet NPRNetDictionary_Of_T_U;
+        Signal: Codeunit "NPR Front-End: WkfCallCompl.";
         Success: Boolean;
         Handled: Boolean;
     begin
-        StopwatchResetAll();
+        Stopwatch.ResetAll();
 
         POSSession.RetrieveSessionAction(Action, POSAction);
         FrontEnd.CloneForWorkflow20(WorkflowId, FrontEnd20);
 
-        StopwatchStart('All');
+        Stopwatch.Start('All');
         JavaScriptInterface.ApplyDataState(Context, POSSession, FrontEnd20);
         JSON.InitializeJObjectParser(Context, FrontEnd20);
         POSSession.GetWorkflow20State(WorkflowId, Action, State);
@@ -107,11 +106,11 @@ codeunit 6150733 "NPR POS Workflows 2.0"
         OnBeforeInvokeAction(POSAction, WorkflowStep, Context, POSSession, FrontEnd20);
 
         POSSession.SetInAction(true);
-        StopwatchStart('Action');
+        Stopwatch.Start('Action');
 
         Success := InvokeOnActionThroughOnRun(POSAction, WorkflowStep, JSON, POSSession, FrontEnd20, Self, Handled);
 
-        StopwatchStop('Action');
+        Stopwatch.Stop('Action');
         POSSession.SetInAction(false);
 
         if not Handled then
@@ -119,67 +118,24 @@ codeunit 6150733 "NPR POS Workflows 2.0"
 
         if Success then begin
             OnAfterInvokeAction(POSAction, WorkflowStep, Context, POSSession, FrontEnd20);
-            StopwatchStart('Data');
+            Stopwatch.Start('Data');
             JavaScriptInterface.RefreshData(POSSession, FrontEnd20);
-            StopwatchStop('Data');
-            Signal := Signal.SignalSuccess(WorkflowId, ActionId);
+            Stopwatch.Stop('Data');
+            Signal.SignalSuccess(WorkflowId, ActionId);
         end else begin
-            Signal := Signal.SignalFailreAndThrowError(WorkflowId, ActionId, GetLastErrorText);
+            Signal.SignalFailureAndThrowError(WorkflowId, ActionId, GetLastErrorText);
             FrontEnd20.Trace(Signal, 'ErrorCallStack', GetLastErrorCallstack);
         end;
 
-        StopwatchStop('All');
-        FrontEnd20.Trace(Signal, 'durationAll', StopwatchGetDuration('All'));
-        FrontEnd20.Trace(Signal, 'durationAction', StopwatchGetDuration('Action'));
-        FrontEnd20.Trace(Signal, 'durationData', StopwatchGetDuration('Data'));
-        FrontEnd20.Trace(Signal, 'durationOverhead', StopwatchGetDuration('All') - StopwatchGetDuration('Action') - StopwatchGetDuration('Data'));
+        Stopwatch.Stop('All');
+        FrontEnd20.Trace(Signal, 'durationAll', Stopwatch.ElapsedMilliseconds('All'));
+        FrontEnd20.Trace(Signal, 'durationAction', Stopwatch.ElapsedMilliseconds('Action'));
+        FrontEnd20.Trace(Signal, 'durationData', Stopwatch.ElapsedMilliseconds('Data'));
+        FrontEnd20.Trace(Signal, 'durationOverhead', Stopwatch.ElapsedMilliseconds('All') - Stopwatch.ElapsedMilliseconds('Action') - Stopwatch.ElapsedMilliseconds('Data'));
 
-        JSON.GetContextObject(ActionContext);
-
-        Signal.Content.Add('workflowEngine', '2.0');
-        Signal.Content.Add('context', ActionContext);
+        Signal.SetEngine20(JSON.GetContextObject());
 
         FrontEnd20.WorkflowCallCompleted(Signal);
-    end;
-
-    local procedure StopwatchResetAll()
-    begin
-        Stopwatches := Stopwatches.Dictionary();
-    end;
-
-    local procedure StopwatchStart(Id: Text)
-    var
-        Stopwatch: DotNet NPRNetStopwatch;
-    begin
-        if IsNull(Stopwatches) then
-            Stopwatches := Stopwatches.Dictionary();
-
-        if not Stopwatches.ContainsKey(Id) then begin
-            Stopwatch := Stopwatch.Stopwatch();
-            Stopwatches.Add(Id, Stopwatch);
-        end else
-            Stopwatch := Stopwatches.Item(Id);
-
-        Stopwatch.Start();
-    end;
-
-    local procedure StopwatchStop(Id: Text): Integer
-    var
-        Stopwatch: DotNet NPRNetStopwatch;
-    begin
-        Stopwatch := Stopwatches.Item(Id);
-        Stopwatch.Stop();
-        exit(Stopwatch.ElapsedMilliseconds);
-    end;
-
-    local procedure StopwatchGetDuration(Id: Text): Integer
-    var
-        Stopwatch: DotNet NPRNetStopwatch;
-    begin
-        if Stopwatches.ContainsKey(Id) then begin
-            Stopwatch := Stopwatches.Item(Id);
-            exit(Stopwatch.ElapsedMilliseconds);
-        end;
     end;
 
     [IntegrationEvent(false, false)]

@@ -22,7 +22,7 @@ codeunit 6150732 "NPR POS Data Driver: Dim."
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnDiscoverDataSourceExtensions', '', false, false)]
-    local procedure OnDiscoverDataSourceExtensions(DataSourceName: Text; Extensions: DotNet NPRNetList_Of_T)
+    local procedure OnDiscoverDataSourceExtensions(DataSourceName: Text; Extensions: List of [Text])
     var
         MemberCommunity: Record "NPR MM Member Community";
     begin
@@ -34,7 +34,7 @@ codeunit 6150732 "NPR POS Data Driver: Dim."
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnGetDataSourceExtension', '', false, false)]
-    local procedure OnGetDataSourceExtension(DataSourceName: Text; ExtensionName: Text; var DataSource: DotNet NPRNetDataSource0; var Handled: Boolean; Setup: Codeunit "NPR POS Setup")
+    local procedure OnGetDataSourceExtension(DataSourceName: Text; ExtensionName: Text; var DataSource: Codeunit "NPR Data Source"; var Handled: Boolean; Setup: Codeunit "NPR POS Setup")
     var
         GeneralLedgerSetup: Record "General Ledger Setup";
     begin
@@ -56,9 +56,9 @@ codeunit 6150732 "NPR POS Data Driver: Dim."
         AddDimensionCode(DataSource, GeneralLedgerSetup."Shortcut Dimension 8 Code", '8');
     end;
 
-    local procedure AddDimensionCode(var DataSource: DotNet NPRNetDataSource0; DimensionCode: Code[20]; ShortcutNumber: Code[10])
+    local procedure AddDimensionCode(var DataSource: Codeunit "NPR Data Source"; DimensionCode: Code[20]; ShortcutNumber: Code[10])
     var
-        DataType: DotNet NPRNetDataType;
+        DataType: Enum "NPR Data Type";
         Dimension: Record Dimension;
     begin
 
@@ -66,14 +66,14 @@ codeunit 6150732 "NPR POS Data Driver: Dim."
             exit;
 
         Dimension.Get(DimensionCode);
-        DataSource.AddColumn(DimensionCode, Dimension.Description, DataType.String, false);
-        DataSource.AddColumn(ShortcutNumber, Dimension.Description, DataType.String, false);
+        DataSource.AddColumn(DimensionCode, Dimension.Description, DataType::String, false);
+        DataSource.AddColumn(ShortcutNumber, Dimension.Description, DataType::String, false);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnDataSourceExtensionReadData', '', false, false)]
-    local procedure OnDataSourceExtensionReadData(DataSourceName: Text; ExtensionName: Text; var RecRef: RecordRef; DataRow: DotNet NPRNetDataRow0; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
+    local procedure OnDataSourceExtensionReadData(DataSourceName: Text; ExtensionName: Text; var RecRef: RecordRef; DataRow: Codeunit "NPR Data Row"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
-        DataType: DotNet NPRNetDataType;
+        DataType: Enum "NPR Data Type";
         POSSale: Codeunit "NPR POS Sale";
         Setup: Codeunit "NPR POS Setup";
         DimensionManagement: Codeunit DimensionManagement;
@@ -105,7 +105,7 @@ codeunit 6150732 "NPR POS Data Driver: Dim."
         AddDimesionValue(DataRow, DimSetEntryTmp, GeneralLedgerSetup."Shortcut Dimension 8 Code", '8');
     end;
 
-    local procedure AddDimesionValue(var DataRow: DotNet NPRNetDataRow0; var DimSetEntryTmp: Record "Dimension Set Entry" temporary; DimensionCode: Code[20]; ShortcutNumber: Code[10])
+    local procedure AddDimesionValue(var DataRow: Codeunit "NPR Data Row"; var DimSetEntryTmp: Record "Dimension Set Entry" temporary; DimensionCode: Code[20]; ShortcutNumber: Code[10])
     begin
         //-NPR5.52 [368673]
         if DimensionCode = '' then

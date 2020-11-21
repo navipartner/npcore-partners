@@ -371,7 +371,7 @@ codeunit 6150706 "NPR POS Sale Line"
         end;
     end;
 
-    procedure ToDataset(var CurrDataSet: DotNet NPRNetDataSet; DataSource: DotNet NPRNetDataSource0; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
+    procedure ToDataset(var CurrDataSet: Codeunit "NPR Data Set"; DataSource: Codeunit "NPR Data Source"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         DataMgt: Codeunit "NPR POS Data Management";
         AmountExclVAT: Decimal;
@@ -379,7 +379,6 @@ codeunit 6150706 "NPR POS Sale Line"
         TotalAmount: Decimal;
     begin
         DataMgt.RecordToDataSet(Rec, CurrDataSet, DataSource, POSSession, FrontEnd);
-
         CalculateBalance(AmountExclVAT, VATAmount, TotalAmount);
         CurrDataSet.Totals.Add('AmountExclVAT', AmountExclVAT);
         CurrDataSet.Totals.Add('VATAmount', VATAmount);

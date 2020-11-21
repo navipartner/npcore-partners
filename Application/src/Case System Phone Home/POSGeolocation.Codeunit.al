@@ -52,20 +52,16 @@ codeunit 6150743 "NPR POS Geolocation"
 
     local procedure RegisterGeoLocationScript(FrontEnd: Codeunit "NPR POS Front End Management")
     var
-        RegisterModuleRequest: DotNet NPRNetJsonRequest;
+        RegisterModuleRequest: Codeunit "NPR Front-End: Generic";
         ScriptString: Text;
         WebClientDependency: Record "NPR Web Client Dependency";
     begin
-        RegisterModuleRequest := RegisterModuleRequest.JsonRequest();
-        RegisterModuleRequest.Method := 'RegisterModule';
-        RegisterModuleRequest.Content.Add('Name', 'GeoLocationByIP');
+        RegisterModuleRequest.SetMethod('RegisterModule');
+        RegisterModuleRequest.GetContent().Add('Name', 'GeoLocationByIP');
         ScriptString := '(function() {' +
         ' var geolocation = new n$.Event.Method("GeoLocationMethod"); ' +
         ' $.ajax({' +
-        //-NPR5.42 [313575]
-        //'   url: "https://navipartnerfa.azurewebsites.net/api/GetClientIPAddress?code=eavZjqJdKVynQxzsYPnsYpBGmSm61nxavel2VGulz6R5CrAxqhi6JA==",' +
         '   url: "https://api.ipstack.com/check?access_key=b29d29cb640d98bf01c320640e432f59",' +
-        //+NPR5.42 [313575]
         '   success: function (result) {' +
         '     geolocation.raise({ result: result });' +
         '   },' +
@@ -75,7 +71,7 @@ codeunit 6150743 "NPR POS Geolocation"
         '});' +
         '})()';
 
-        RegisterModuleRequest.Content.Add('Script', ScriptString);
+        RegisterModuleRequest.GetContent().Add('Script', ScriptString);
         FrontEnd.InvokeFrontEndMethod(RegisterModuleRequest);
     end;
 

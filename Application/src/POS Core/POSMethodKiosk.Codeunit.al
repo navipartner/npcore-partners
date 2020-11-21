@@ -12,7 +12,7 @@ codeunit 6150741 "NPR POS Method - Kiosk"
     local procedure OnUnlockKiosk(Method: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         JSON: Codeunit "NPR POS JSON Management";
-        Request: DotNet NPRNetJsonRequest;
+        Request: Codeunit "NPR Front-End: Generic";
         Pin: Text;
         POSSetup: Codeunit "NPR POS Setup";
         POSUnit: Record "NPR POS Unit";
@@ -26,11 +26,10 @@ codeunit 6150741 "NPR POS Method - Kiosk"
         POSSession.GetSetup(POSSetup);
         POSSetup.GetPOSUnit(POSUnit);
         //+NPR5.45 [323728]
-        Request := Request.JsonRequest;
-        Request.Method := 'UnlockKiosk';
+        Request.SetMethod('UnlockKiosk');
         //-NPR5.45 [323728]
         //Request.Content.Add('confirmed',IsValidPIN(JSON.GetString('pin',TRUE)));
-        Request.Content.Add('confirmed', IsValidPIN(JSON.GetString('pin', true), POSUnit."Kiosk Mode Unlock PIN"));
+        Request.GetContent().Add('confirmed', IsValidPIN(JSON.GetString('pin', true), POSUnit."Kiosk Mode Unlock PIN"));
         //+NPR5.45 [323728]
         FrontEnd.InvokeFrontEndMethod(Request);
 

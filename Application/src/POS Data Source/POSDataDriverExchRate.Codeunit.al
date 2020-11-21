@@ -20,7 +20,7 @@ codeunit 6150715 "NPR POS Data Driver: ExchRate"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnDiscoverDataSourceExtensions', '', false, false)]
-    local procedure OnDiscoverDataSourceExtensions(DataSourceName: Text; Extensions: DotNet NPRNetList_Of_T)
+    local procedure OnDiscoverDataSourceExtensions(DataSourceName: Text; Extensions: List of [Text])
     var
         MemberCommunity: Record "NPR MM Member Community";
     begin
@@ -32,9 +32,9 @@ codeunit 6150715 "NPR POS Data Driver: ExchRate"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnGetDataSourceExtension', '', false, false)]
-    local procedure OnGetDataSourceExtension(DataSourceName: Text; ExtensionName: Text; var DataSource: DotNet NPRNetDataSource0; var Handled: Boolean; Setup: Codeunit "NPR POS Setup")
+    local procedure OnGetDataSourceExtension(DataSourceName: Text; ExtensionName: Text; var DataSource: Codeunit "NPR Data Source"; var Handled: Boolean; Setup: Codeunit "NPR POS Setup")
     var
-        DataType: DotNet NPRNetDataType;
+        DataType: Enum "NPR Data Type";
         PaymentType: Record "NPR Payment Type POS";
     begin
 
@@ -46,7 +46,7 @@ codeunit 6150715 "NPR POS Data Driver: ExchRate"
         PaymentType.SetFilter("Register No.", '=%1', '');
         if (PaymentType.FindSet()) then begin
             repeat
-                DataSource.AddColumn(PaymentType."No.", PaymentType.Description, DataType.String, false);
+                DataSource.AddColumn(PaymentType."No.", PaymentType.Description, DataType::String, false);
             until (PaymentType.Next() = 0);
         end;
 
@@ -54,9 +54,9 @@ codeunit 6150715 "NPR POS Data Driver: ExchRate"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnDataSourceExtensionReadData', '', false, false)]
-    local procedure OnDataSourceExtensionReadData(DataSourceName: Text; ExtensionName: Text; var RecRef: RecordRef; DataRow: DotNet NPRNetDataRow0; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
+    local procedure OnDataSourceExtensionReadData(DataSourceName: Text; ExtensionName: Text; var RecRef: RecordRef; DataRow: Codeunit "NPR Data Row"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
-        DataType: DotNet NPRNetDataType;
+        DataType: Enum "NPR Data Type";
         POSSale: Codeunit "NPR POS Sale";
         POSPaymentLine: Codeunit "NPR POS Payment Line";
         Setup: Codeunit "NPR POS Setup";
