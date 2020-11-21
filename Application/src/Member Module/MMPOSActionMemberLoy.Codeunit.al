@@ -1,10 +1,5 @@
 codeunit 6060146 "NPR MM POS Action: Member Loy."
 {
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         ActionDescription: Label 'This action is capable of redeeming member points and applying them as a coupon.';
         LoyaltyWindowTitle: Label '%1 - Membership Loyalty.';
@@ -370,7 +365,7 @@ codeunit 6060146 "NPR MM POS Action: Member Loy."
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnDiscoverDataSourceExtensions', '', false, false)]
-    local procedure OnDiscoverDataSourceExtensions(DataSourceName: Text; Extensions: DotNet NPRNetList_Of_T)
+    local procedure OnDiscoverDataSourceExtensions(DataSourceName: Text; Extensions: List of [Text])
     var
         MemberCommunity: Record "NPR MM Member Community";
     begin
@@ -386,25 +381,24 @@ codeunit 6060146 "NPR MM POS Action: Member Loy."
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnGetDataSourceExtension', '', false, false)]
-    local procedure OnGetDataSourceExtension(DataSourceName: Text; ExtensionName: Text; var DataSource: DotNet NPRNetDataSource0; var Handled: Boolean; Setup: Codeunit "NPR POS Setup")
+    local procedure OnGetDataSourceExtension(DataSourceName: Text; ExtensionName: Text; var DataSource: Codeunit "NPR Data Source"; var Handled: Boolean; Setup: Codeunit "NPR POS Setup")
     var
-        DataType: DotNet NPRNetDataType;
+        DataType: Enum "NPR Data Type";
     begin
         if (DataSourceName <> ThisDataSource) or (ExtensionName <> ThisExtension) then
             exit;
 
-        DataSource.AddColumn('RemainingPoints', 'Remaining Points', DataType.String, false);
-        DataSource.AddColumn('RemainingValue', 'Remaining Points', DataType.String, false);
-
-        DataSource.AddColumn('RedeemablePoints', 'Redeemable Points', DataType.String, false);
+        DataSource.AddColumn('RemainingPoints', 'Remaining Points', DataType::String, false);
+        DataSource.AddColumn('RemainingValue', 'Remaining Points', DataType::String, false);
+        DataSource.AddColumn('RedeemablePoints', 'Redeemable Points', DataType::String, false);
 
         Handled := true;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnDataSourceExtensionReadData', '', false, false)]
-    local procedure OnDataSourceExtensionReadData(DataSourceName: Text; ExtensionName: Text; var RecRef: RecordRef; DataRow: DotNet NPRNetDataRow0; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
+    local procedure OnDataSourceExtensionReadData(DataSourceName: Text; ExtensionName: Text; var RecRef: RecordRef; DataRow: Codeunit "NPR Data Row"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
-        DataType: DotNet NPRNetDataType;
+        DataType: Enum "NPR Data Type";
         POSSale: Codeunit "NPR POS Sale";
         LoyaltyPointManagement: Codeunit "NPR MM Loyalty Point Mgt.";
         SalePOS: Record "NPR Sale POS";

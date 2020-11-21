@@ -60,9 +60,6 @@ codeunit 6150831 "NPR POS Action: Notif. Card"
     local procedure OpenNotificationPage(Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         JSON: Codeunit "NPR POS JSON Management";
-        CurrentView: DotNet NPRNetView0;
-        CurrentViewType: DotNet NPRNetViewType0;
-        ViewType: DotNet NPRNetViewType0;
         POSSale: Codeunit "NPR POS Sale";
         SalePOS: Record "NPR Sale POS";
         NotificationDialog: Page "NPR Notification Dialog";

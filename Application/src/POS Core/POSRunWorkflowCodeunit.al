@@ -2,24 +2,23 @@ codeunit 6150748 "NPR POS Run Workflow"
 {
     procedure RunWorkflow(ActionCode: Code[20]; var Parameters: Record "NPR POS Parameter Value" temporary; Context: JsonObject) Result: Guid
     var
-        Request: DotNet NPRNetJsonRequest;
+        Request: Codeunit "NPR Front-End: Generic";
         JContent: JsonObject;
         JParameters: JsonObject;
         FrontEnd: Codeunit "NPR POS Front End Management";
     begin
         Result := CreateGuid();
 
-        Request := Request.JsonRequest();
-        Request.Method := 'RunWorkflow';
-        Request.Content.Add('id', Result);
-        Request.Content.Add('action', ActionCode);
-        Request.Content.Add('context', Format(Context));
+        Request.SetMethod('RunWorkflow');
+        Request.GetContent().Add('id', Result);
+        Request.GetContent().Add('action', ActionCode);
+        Request.GetContent().Add('context', Format(Context));
 
         if Parameters.FindSet() then begin
             repeat
                 Parameters.AddParameterToJObject(JParameters);
             until Parameters.Next() = 0;
-            Request.Content.Add('parameters', Format(JParameters));
+            Request.GetContent().Add('parameters', Format(JParameters));
         end;
 
         FrontEnd.InvokeFrontEndMethod(Request);

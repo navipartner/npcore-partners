@@ -1,22 +1,5 @@
 codeunit 6060107 "NPR Ean Box Event Handler"
 {
-    // NPR5.32/NPKNAV/20170526  CASE 272577 Transport NPR5.32 - 26 May 2017
-    // NPR5.32.11/ANEN/20170615 Adding support for Decimal and Integer action parameter
-    // NPR5.36/ANEN  /20170901 CASE 288703 Adding support for data types
-    // NPR5.36/ANEN  /20170912 CASE 284550 Chaning default setup pattern
-    // NPR5.39/MMV /20180209 CASE 299114 Update stored parameters when actions are updated.
-    // NPR5.40/VB  /20180307 CASE 306347 Refactored retrieval of POS Action
-    // NPR5.40/TJ  /20180312 CASE 307454 Restored old usage of field OptionValueInteger as it's now properly stored
-    // NPR5.45/MHA /20180817  CASE 319706 Reworked Identifier Dissociation to Ean Box Event Handler
-    // NPR5.47/MHA /20181024  CASE 332237 Ean Box should be immediately cleared in FrontEnd during InvokeEanBox()
-    // NPR5.47/MHA /20181024  CASE 333512 Added Ean Box Setup Event Priority
-    // NPR5.55/TSA /20200514 CASE 404286 EAN Box is not selecting action parameter values from correct EAN box setup when multiple setup are defined
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         Text000: Label 'Ambigous input, please specify.';
         Text001: Label '"%1" not found.';
@@ -28,17 +11,11 @@ codeunit 6060107 "NPR Ean Box Event Handler"
     begin
         FrontEnd.SetOption('doNotClearTextBox', false);
         if not FindEanBoxSetup(POSSession, EanBoxSetup) then begin
-            //-NPR5.47 [332237]
-            //FrontEnd.SetOption('doNotClearTextBox',TRUE);
-            //+NPR5.47 [332237]
             Message(Text001, EanBoxValue);
             exit;
         end;
 
         if not FindEnabledEanBoxEvents(EanBoxSetup, EanBoxValue, TempEanBoxSetupEvent) then begin
-            //-NPR5.47 [332237]
-            //FrontEnd.SetOption('doNotClearTextBox',TRUE);
-            //+NPR5.47 [332237]
             Message(Text001, EanBoxValue);
             exit;
         end;
@@ -57,16 +34,15 @@ codeunit 6060107 "NPR Ean Box Event Handler"
         POSUnit: Record "NPR POS Unit";
         EanBoxSetupMgt: Codeunit "NPR Ean Box Setup Mgt.";
         POSSale: Codeunit "NPR POS Sale";
-        CurrView: DotNet NPRNetView0;
-        ViewType: DotNet NPRNetViewType0;
+        CurrView: Codeunit "NPR POS View";
     begin
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
         if POSUnit.Get(SalePOS."Register No.") then;
 
         POSSession.GetCurrentView(CurrView);
-        case true of
-            CurrView.Type.Equals(ViewType.Sale):
+        case CurrView.Type of
+            CurrView.Type::Sale:
                 begin
                     if POSUnit."Ean Box Sales Setup" = '' then
                         POSUnit."Ean Box Sales Setup" := EanBoxSetupMgt.DefaultSalesSetupCode();
@@ -115,13 +91,11 @@ codeunit 6060107 "NPR Ean Box Event Handler"
         MenuString: Text;
         i: Integer;
     begin
-        //-NPR5.47 [333512]
         UpdatePriority(TempEanBoxSetupEvent);
         TempEanBoxSetupEvent.SetCurrentKey(Priority);
         if not TempEanBoxSetupEvent.FindFirst then
             exit(false);
         TempEanBoxSetupEvent.SetRange(Priority, TempEanBoxSetupEvent.Priority);
-        //+NPR5.47 [333512]
         case TempEanBoxSetupEvent.Count of
             0:
                 exit(false);
@@ -154,7 +128,6 @@ codeunit 6060107 "NPR Ean Box Event Handler"
     var
         EanBoxSetupEvent: Record "NPR Ean Box Setup Event";
     begin
-        //-NPR5.47 [333512]
         if not TempEanBoxSetupEvent.FindSet then
             exit;
 
@@ -164,7 +137,6 @@ codeunit 6060107 "NPR Ean Box Event Handler"
                 TempEanBoxSetupEvent.Modify;
             end;
         until TempEanBoxSetupEvent.Next = 0;
-        //+NPR5.47 [333512]
     end;
 
     procedure InvokePOSAction(EanBoxValue: Text; EanBoxSetupEvent: Record "NPR Ean Box Setup Event"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"): Boolean
@@ -185,7 +157,7 @@ codeunit 6060107 "NPR Ean Box Event Handler"
     var
         EanBoxParameter: Record "NPR Ean Box Parameter";
     begin
-        EanBoxParameter.SetRange("Setup Code", EanBoxSetupEvent."Setup Code"); //-+NPR5.55 [404286]
+        EanBoxParameter.SetRange("Setup Code", EanBoxSetupEvent."Setup Code");
         EanBoxParameter.SetRange("Event Code", EanBoxSetupEvent."Event Code");
         if not EanBoxParameter.FindSet then
             exit;
@@ -227,4 +199,3 @@ codeunit 6060107 "NPR Ean Box Event Handler"
         end;
     end;
 }
-

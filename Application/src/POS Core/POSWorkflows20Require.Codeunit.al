@@ -1,13 +1,5 @@
 codeunit 6150735 "NPR POS Workflows 2.0: Require"
 {
-    // NPR5.50/JAKUBV/20190603  CASE 338666 Transport NPR5.50 - 3 June 2019
-    // NPR5.55/VB    /20200504  CASE 376799 Support for requiring images (as Data URI)
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         Text001: Label 'Custom Require method handler for require type "%1" was not found.';
 
@@ -31,10 +23,8 @@ codeunit 6150735 "NPR POS Workflows 2.0: Require"
                 RequireAction(POSSession, ID, JSON, FrontEnd);
             'script':
                 RequireScript(ID, JSON, FrontEnd);
-            //-NPR5.55 [376799]
             'image':
                 RequireImage(ID, JSON, FrontEnd);
-            //+NPR5.55 [376799]
             else begin
                     OnRequireCustom(ID, Type, JSON, FrontEnd, CustomHandled);
                     if not CustomHandled then begin
@@ -67,12 +57,12 @@ codeunit 6150735 "NPR POS Workflows 2.0: Require"
         POSAction: Record "NPR POS Action";
         POSActionParam: Record "NPR POS Action Parameter";
         POSParam: Record "NPR POS Parameter Value";
-        WorkflowAction: DotNet NPRNetWorkflowAction;
-        WorkflowObj: DotNet NPRNetWorkflow;
-        StreamReader: DotNet NPRNetStreamReader;
-        "Object": DotNet NPRNetObject;
+        WorkflowAction: Codeunit "NPR Workflow Action";
+        Workflow: Codeunit "NPR Workflow";
+        JavaScriptJson: JsonObject;
         InStr: InStream;
         ActionCode: Code[20];
+        WorkflowJson: JsonObject;
     begin
         JSON.SetScope('context', true);
         ActionCode := JSON.GetString('action', true);
@@ -83,15 +73,14 @@ codeunit 6150735 "NPR POS Workflows 2.0: Require"
             POSAction.CalcFields(Workflow);
         end;
 
-        WorkflowAction := WorkflowAction.WorkflowAction();
         POSAction.Workflow.CreateInStream(InStr);
-        StreamReader := StreamReader.StreamReader(InStr);
-        WorkflowAction.Workflow := WorkflowObj.FromJsonString(StreamReader.ReadToEnd(), GetDotNetType(WorkflowObj));
+        WorkflowAction.GetWorkflow(Workflow);
+        Workflow.DeserializeFromJsonStream(InStr);
         if POSAction."Bound to DataSource" then
             WorkflowAction.Content.Add('DataBinding', true);
         if POSAction."Custom JavaScript Logic".HasValue then begin
-            POSAction.GetCustomJavaScriptLogic(Object);
-            WorkflowAction.Content.Add('CustomJavaScript', Object);
+            JavaScriptJson := POSAction.GetCustomJavaScriptLogic();
+            WorkflowAction.Content.Add('CustomJavaScript', JavaScriptJson);
         end;
         if POSAction.Description <> '' then
             WorkflowAction.Content.Add('Description', POSAction.Description);
@@ -106,7 +95,7 @@ codeunit 6150735 "NPR POS Workflows 2.0: Require"
                 POSParam.AddParameterToAction(WorkflowAction);
             until POSActionParam.Next = 0;
 
-        FrontEnd.RequireResponse(ID, WorkflowAction);
+        FrontEnd.RequireResponse(ID, WorkflowAction.GetJson());
     end;
 
     local procedure RequireImage(ID: Integer; JSON: Codeunit "NPR POS JSON Management"; FrontEnd: Codeunit "NPR POS Front End Management")
@@ -114,11 +103,9 @@ codeunit 6150735 "NPR POS Workflows 2.0: Require"
         WebClientDependency: Record "NPR Web Client Dependency";
         ImageCode: Code[20];
     begin
-        //-NPR5.55 [376799]
         JSON.SetScope('context', true);
         ImageCode := JSON.GetString('code', true);
         FrontEnd.RequireResponse(ID, WebClientDependency.GetDataUri(ImageCode));
-        //+NPR5.55 [376799]
     end;
 
     [IntegrationEvent(false, false)]
@@ -126,4 +113,3 @@ codeunit 6150735 "NPR POS Workflows 2.0: Require"
     begin
     end;
 }
-

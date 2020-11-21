@@ -1,45 +1,8 @@
 codeunit 6150705 "NPR POS Sale"
 {
-    // RecorNPR5.32/NPKNAV/20170526  CASE 270909 Transport NPR5.32 - 26 May 2017
-    // NPR5.32.11/CLVA/20170623  CASE 279495 Added event OnBeforeEndSale, On
-    // NPR5.34/TSA /20170705  CASE 283019 Added SetDimension, SetGlobalDimension1 and SetGlobalDimension2
-    // NPR5.34/TSA /20170710  CASE 279495 Shifted OnBeforeEndSale to before sale is ended, and added OnAfterEndSales in EndSale
-    // NPR5.34/TSA /20170710  CASE 279495 Shifted change view function to StartPOSSession when sale should navigate to login view.
-    // NPR5.36/MHA /20170831  CASE 288988 Added SalePOS parameter to OnAfterEndSale()
-    // NPR5.37/BR  /20171018  CASE 293711 Moved balancing calculation for registering Change Given
-    // NPR5.37.03/MMV /20171122  CASE 296642 Renamed EndSale() to TryEndSaleWithoutPayment().
-    //                                       Added TryEndSaleWithPayment().
-    // NPR5.38/MMV /20171212  CASE 299509 Update line date when loading sale.
-    // NPR5.38/MMV /20180108  CASE 300957 Rounding fix
-    // NPR5.38/MHA /20180105  CASE 301053 Renamed parameter DataSet to CurrDataSet in function ToDataSet() as the word is reserved in V2
-    // NPR5.38/MMV /20180111  CASE 298025 Added accessors for sale totals, both when active and ended.
-    // NPR5.38/MHA /20180115  CASE 302221 Added Contact information to LoadSavedSale()
-    // NPR5.39/MHA /20180202  CASE 302779 Added OnFinishSale POS Workflow
-    // NPR5.39/BR  /20180215  CASE 305016 Added Fiscal No. determination
-    // NPR5.40/MMV /20180115 CASE 293106 Refactored tax free module.
-    // NPR5.40/MMV /20180316  CASE 308457 Moved fiscal no. pull inside pos entry create transaction.
-    //                                    Wrapped all functions after end sale in asserterror to prevent inconsistency.
-    // NPR5.43/MMV /20180531 CASE 315838 Added stopwatch functionality
-    // NPR5.44/JDH /20180731  CASE 323499 Changed all functions to be External
-    // NPR5.45/TSA /20180803 CASE 323780 Added function SetModified() to be able to force a data driver refresh without modifying the record.
-    // NPR5.45/MMV /20180808 CASE 323975 Refresh Rec before end sale attempt.
-    // NPR5.45/MHA /20180820 CASE 321266 Extended POS Sales Workflow with Set functionality
-    // NPR5.46/MHA /20180928 CASE 329523 Added Publisher function OnRefresh()
-    // NPR5.48/JDH /20181204 CASE 335967 Possible to call this object in Mock Mode, to allow the test framework to run without a Major Tom session
-    // NPR5.50/MMV /20190328 CASE 300557 Added sales document handling
-    //                                   Added init handling
-    // NPR5.53/MMV /20191106 CASE 376362 Added explicit pos entry auto post invoke.
-    // NPR5.53/MHA /20190114 CASE 384841 Signature updated for CalculateRemainingPaymentSuggestion()
-    // NPR5.54/ALPO/20200203 CASE 364658 Resume POS Sale
-    // NPR5.54/MMV /20200217 CASE 364658 Added configurable start of new sale to allow business logic first.
-    // NPR5.55/TSA /20200527 CASE 406862 Refactored SelectViewForEndOfSale()
-    // NPR5.55/ALPO/20200720 CASE 391678 Log sale resume to POS Entry
-
-
     trigger OnRun()
     begin
         case OnRunType of
-
             // If somebody accidentally (or even intentionall) calls this codeunit without defining what kind of
             // run type is needed, then codeunit simply exits
             OnRunType::Undefined:
@@ -109,8 +72,6 @@ codeunit 6150705 "NPR POS Sale"
     end;
 
     procedure InitializeNewSale(RegisterIn: Record "NPR Register"; FrontEndIn: Codeunit "NPR POS Front End Management"; SetupIn: Codeunit "NPR POS Setup"; ThisIn: Codeunit "NPR POS Sale")
-    var
-        ViewType: DotNet NPRNetViewType0;
     begin
         Initialized := true;
 
@@ -128,26 +89,15 @@ codeunit 6150705 "NPR POS Sale"
         InitSale();
         OnAfterInitSale(Rec, FrontEnd);
 
-        //-NPR5.48 [335967]
         if not IsMock then
-            //+NPR5.48 [335967]
-
             FrontEnd.StartTransaction(Rec);
-
-        //-NPR5.32 [266226]
-        //FrontEnd.SetView(ViewType.Sale,Setup);
-        //+NPR5.32 [266226]
-
-        // TODO: perhaps these two blocks above should be switched: first to start the transaction from the Front End, which would then invoke a real workflow (with all necessary UI quirks if needed) and then the back-end start of transaction
     end;
 
     local procedure CheckInit(WithError: Boolean): Boolean
     begin
-        //-NPR5.50 [300557]
         if WithError and (not Initialized) then
             Error('Codeunit POS Sale was invoked in uninitialized state. This is a programming bug, not a user error');
         exit(Initialized);
-        //+NPR5.50 [300557]
     end;
 
     local procedure InitSale()
@@ -156,42 +106,22 @@ codeunit 6150705 "NPR POS Sale"
         TouchScreenFunctions: Codeunit "NPR Touch Screen - Func.";
     begin
         with Rec do begin
-
-            //-NPR5.55 [406862]
-            // TODO: Assign the salesperson
-            // IF Register."Touch Screen Login Type" <> Register."Touch Screen Login Type"::Automatic THEN BEGIN
-            //   "Salesperson Code" := '';
-            // END;
-            //+NPR5.55 [406862]
             "Salesperson Code" := Setup.Salesperson();
-
             "Register No." := Register."Register No.";
             Register.TestField("Return Payment Type");
-
             "Sales Ticket No." := FormCode.FetchSalesTicketNumber("Register No.");
-
             Date := Today;
             "Start Time" := Time;
             "Sale type" := "Sale type"::Sale;
-
             "Saved Sale" := false;
             TouchScreen := true;
 
-            /* tjek om der er ekspeditioner på rev.rullen efter d.d. */
             TouchScreenFunctions.TestSalesDate;
 
-            UpdateSaleDeviceID(Rec);  //NPR5.54 [364658]
+            UpdateSaleDeviceID(Rec);
             Insert(true);
 
-            //-NPR5.31 [271728]
-            //  IF RetailSetup."Default Customer no." <> '' THEN BEGIN
-            //    "Customer Type" := "Customer Type"::Ord;
-            //    VALIDATE("Customer No.", RetailSetup."Default Customer no.");
-            //  END ELSE
-            //+NPR5.31 [271728]
             Validate("Customer No.", '');
-
-            //MODIFY;
 
             SaleLine.Init("Register No.", "Sales Ticket No.", This, Setup, FrontEnd);
             PaymentLine.Init("Register No.", "Sales Ticket No.", This, Setup, FrontEnd);
@@ -214,7 +144,7 @@ codeunit 6150705 "NPR POS Sale"
         PaymentLineOut := PaymentLine;
     end;
 
-    procedure ToDataset(var CurrDataSet: DotNet NPRNetDataSet; DataSource: DotNet NPRNetDataSource0; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
+    procedure ToDataset(var CurrDataSet: Codeunit "NPR Data Set"; DataSource: Codeunit "NPR Data Source"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         TempRec: Record "NPR Sale POS" temporary;
         DataMgt: Codeunit "NPR POS Data Management";
@@ -222,17 +152,11 @@ codeunit 6150705 "NPR POS Sale"
         if not Initialized then begin
             TempRec."Register No." := Register."Register No.";
             TempRec.Insert;
-            //-NPR5.38 [301053]
-            //DataMgt.RecordToDataSet(TempRec,DataSet,DataSource,POSSession,FrontEnd);
             DataMgt.RecordToDataSet(TempRec, CurrDataSet, DataSource, POSSession, FrontEnd);
-            //+NPR5.38 [301053]
             exit;
         end;
 
-        //-NPR5.38 [301053]
-        //DataMgt.RecordToDataSet(Rec,DataSet,DataSource,POSSession,FrontEnd);
         DataMgt.RecordToDataSet(Rec, CurrDataSet, DataSource, POSSession, FrontEnd);
-        //+NPR5.38 [301053]
     end;
 
     procedure SetPosition(Position: Text): Boolean
@@ -275,9 +199,7 @@ codeunit 6150705 "NPR POS Sale"
 
     procedure SetModified()
     begin
-        //-NPR5.45 [323780]
         IsModified := true;
-        //+NPR5.45 [323780]
     end;
 
     procedure GetTotals(var SalesAmountOut: Decimal; var PaidAmountOut: Decimal; var ChangeAmountOut: Decimal; var RoundingAmountOut: Decimal)
@@ -285,7 +207,6 @@ codeunit 6150705 "NPR POS Sale"
         ReturnAmount: Decimal;
         SubTotal: Decimal;
     begin
-        //-NPR5.38 [298025]
         if Ended then begin
             SalesAmountOut := EndedSalesAmount;
             PaidAmountOut := EndedPaidAmount;
@@ -293,7 +214,6 @@ codeunit 6150705 "NPR POS Sale"
             RoundingAmountOut := EndedRoundingAmount;
         end else
             PaymentLine.CalculateBalance(SalesAmountOut, PaidAmountOut, ReturnAmount, SubTotal); //ReturnAmount & SubTotal are legacy. Cannot calculate true return without knowing payment type that ended sale.
-        //+NPR5.38 [298025]
     end;
 
     procedure Modify(RunTriggers: Boolean; ReturnValue: Boolean) Result: Boolean
@@ -312,24 +232,15 @@ codeunit 6150705 "NPR POS Sale"
     procedure Refresh(var SalePOS: Record "NPR Sale POS")
     begin
         Rec.Copy(SalePOS);
-
-        //-NPR5.46 [329523]
         OnRefresh(Rec);
-        //+NPR5.46 [329523]
     end;
 
     procedure RefreshCurrent()
     var
         LocalSaleLinePOS: Record "NPR Sale Line POS";
     begin
-        //-NPR5.46 [329523]
-        // Rec.FINDFIRST ();
-        // SaleLine.GetCurrentSaleLine (LocalSaleLinePOS);
-        // IF (LocalSaleLinePOS.FINDFIRST ()) THEN
-        //  SaleLine.SetPosition (LocalSaleLinePOS.GETPOSITION);
         Rec.Get(Rec."Register No.", Rec."Sales Ticket No.");
         OnRefresh(Rec);
-        //+NPR5.46 [329523]
     end;
 
     procedure SetDimension(DimCode: Code[20]; DimValue: Code[20])
@@ -341,8 +252,6 @@ codeunit 6150705 "NPR POS Sale"
         DimValues: Page "Dimension Values";
         OldDimSetID: Integer;
     begin
-
-        //-NPR5.34 [283019]
         if (not Dim.Get(DimCode)) then
             Error(SetDimension01, DimCode);
 
@@ -369,15 +278,11 @@ codeunit 6150705 "NPR POS Sale"
             Rec.UpdateAllLineDim(Rec."Dimension Set ID", OldDimSetID);
 
         RefreshCurrent();
-        //+NPR5.34 [283019]
     end;
 
     procedure SetShortcutDimCode1(DimensionValue: Code[20])
     begin
-
-        //-NPR5.34 [283019]
         Rec.Validate(Rec."Shortcut Dimension 1 Code", DimensionValue);
-        //+NPR5.34 [283019]
     end;
 
     procedure SetShortcutDimCode2(DimensionValue: Code[20])
@@ -387,9 +292,7 @@ codeunit 6150705 "NPR POS Sale"
 
     procedure TryEndSale(POSSession: Codeunit "NPR POS Session"): Boolean
     begin
-        //-NPR5.54 [364658]
         exit(TryEndSale2(POSSession, true));
-        //+NPR5.54 [364658]
     end;
 
     procedure TryEndSale2(POSSession: Codeunit "NPR POS Session"; StartNew: Boolean): Boolean
@@ -410,7 +313,6 @@ codeunit 6150705 "NPR POS Sale"
         POSGiveChange: Codeunit "NPR POS Give Change";
         POSRounding: Codeunit "NPR POS Rounding";
     begin
-        //-NPR5.54 [364658]
         if not Initialized then
             exit(false);
         RefreshCurrent();
@@ -426,7 +328,6 @@ codeunit 6150705 "NPR POS Sale"
         EndedSalesAmount := SalesAmount;
         EndedPaidAmount := PaidAmount;
         exit(true);
-        //+NPR5.54 [364658]
     end;
 
     procedure TryEndSaleWithBalancing(POSSession: Codeunit "NPR POS Session"; PaymentType: Record "NPR Payment Type POS"; ReturnPaymentType: Record "NPR Payment Type POS"): Boolean
@@ -440,7 +341,6 @@ codeunit 6150705 "NPR POS Sale"
         ChangeAmount: Decimal;
         RoundAmount: Decimal;
     begin
-
         //PaymentType: The payment type just used in sale, triggering this end attempt.
         //ReturnPaymentType: The payment type to use for round & change in case of overtender.
 
@@ -458,7 +358,6 @@ codeunit 6150705 "NPR POS Sale"
         ChangeAmount := POSGiveChange.InsertChange(Rec, ReturnPaymentType, PaidAmount - SalesAmount);
         RoundAmount := POSRounding.InsertRounding(Rec, ReturnPaymentType, PaidAmount - SalesAmount - ChangeAmount);
 
-        //-NPR5.54 [364658]
         EndSale(POSSession, true);
         EndedSalesAmount := SalesAmount;
         EndedPaidAmount := PaidAmount;
@@ -466,7 +365,6 @@ codeunit 6150705 "NPR POS Sale"
         EndedRoundingAmount := RoundAmount;
 
         exit(true);
-        //-NPR5.54 [364658]
     end;
 
     local procedure EndSale(POSSession: Codeunit "NPR POS Session"; StartNew: Boolean)
@@ -499,11 +397,9 @@ codeunit 6150705 "NPR POS Sale"
 
         RunAfterEndSale(SalePOS);
 
-        //-NPR5.54 [364658]
         if StartNew then begin
             SelectViewForEndOfSale(POSSession);
         end;
-        //+NPR5.54 [364658]
     end;
 
     local procedure IsPaymentValidForEndingSale(PaymentType: Record "NPR Payment Type POS"; ReturnPaymentType: Record "NPR Payment Type POS"; SalesAmount: Decimal; PaidAmount: Decimal): Boolean
@@ -521,15 +417,6 @@ codeunit 6150705 "NPR POS Sale"
     var
         POSViewProfile: Record "NPR POS View Profile";
     begin
-
-        //-NPR5.55 [406862]
-        // IF (Register."Touch Screen Login Type" = Register."Touch Screen Login Type"::Automatic) THEN BEGIN
-        //  POSSession.StartTransaction ();
-        //  POSSession.ChangeViewSale ();
-        // END ELSE BEGIN
-        //  POSSession.StartPOSSession ();
-        // END;
-
         POSViewProfile.Init();
         Setup.GetPOSViewProfile(POSViewProfile);
 
@@ -546,8 +433,6 @@ codeunit 6150705 "NPR POS Sale"
         end else begin
             POSSession.StartPOSSession();
         end;
-
-        //+NPR5.55 [406862]
     end;
 
     procedure LoadSavedSale(var SalePOS: Record "NPR Sale POS")
@@ -609,9 +494,7 @@ codeunit 6150705 "NPR POS Sale"
                     SaleLinePOS1 := SaleLinePOS;
                     SaleLinePOS1."Register No." := "Register No.";
                     SaleLinePOS1."Sales Ticket No." := "Sales Ticket No.";
-                    //-NPR5.38 [299509]
                     SaleLinePOS1.Date := Date;
-                    //+NPR5.38 [299509]
 
                     Clear(SaleLinePOS1."Customer Location No.");
 
@@ -672,7 +555,6 @@ codeunit 6150705 "NPR POS Sale"
     var
         SalePOS: Record "NPR Sale POS";
     begin
-        //-NPR5.54 [364658]
         Initialized := true;
 
         FrontEnd := FrontEndIn;
@@ -691,7 +573,6 @@ codeunit 6150705 "NPR POS Sale"
 
         if not IsMock then
             FrontEnd.StartTransaction(Rec);
-        //+NPR5.54 [364658]
     end;
 
     local procedure ResumeSale(SalePOS_ToResume: Record "NPR Sale POS")
@@ -700,7 +581,6 @@ codeunit 6150705 "NPR POS Sale"
         POSResumeSale: Codeunit "NPR POS Resume Sale Mgt.";
         TouchScreenFunctions: Codeunit "NPR Touch Screen - Func.";
     begin
-        //-NPR5.54 [364658]
         Rec := SalePOS_ToResume;
         with Rec do begin
             Register.TestField("Return Payment Type");
@@ -733,9 +613,8 @@ codeunit 6150705 "NPR POS Sale"
 
             IsModified := true;
 
-            POSResumeSale.LogSaleResume(Rec, SalePOS_ToResume."Sales Ticket No.");  //NPR5.55 [391678]
+            POSResumeSale.LogSaleResume(Rec, SalePOS_ToResume."Sales Ticket No.");
         end;
-        //+NPR5.54 [364658]
     end;
 
     procedure ResumeFromPOSQuote(POSQuoteNo: Integer): Boolean
@@ -744,7 +623,6 @@ codeunit 6150705 "NPR POS Sale"
         POSResumeSale: Codeunit "NPR POS Resume Sale Mgt.";
         Ok: Boolean;
     begin
-        //-NPR5.54 [364658]
         Ok := POSResumeSale.LoadFromPOSQuote(Rec, POSQuoteNo);
         if Ok then begin
             SaleLinePOS.SetRange("Register No.", Rec."Register No.");
@@ -757,14 +635,12 @@ codeunit 6150705 "NPR POS Sale"
         end;
 
         exit(Ok);
-        //+NPR5.54 [364658]
     end;
 
     local procedure UpdateSaleDeviceID(var SalePOS: Record "NPR Sale POS")
     var
         POSUnitIdentity: Record "NPR POS Unit Identity";
     begin
-        //-NPR5.54 [364658]
         Setup.GetPOSUnitIdentity(POSUnitIdentity);
         with SalePOS do begin
             if POSUnitIdentity."Entry No." = 0 then
@@ -774,7 +650,6 @@ codeunit 6150705 "NPR POS Sale"
             "Host Name" := POSUnitIdentity."Host Name";
             "User ID" := POSUnitIdentity."User ID";
         end;
-        //+NPR5.54 [364658]
     end;
 
     local procedure RunAfterEndSale_OnRun(xRec: Record "NPR Sale POS") Success: Boolean;
@@ -790,19 +665,15 @@ codeunit 6150705 "NPR POS Sale"
     var
         Success: Boolean;
     begin
-        //-NPR5.40 [308457]
-        //Any error at this timing would leave the POS with inconsistent front-end state.
+        //Any error at this time would leave the POS with inconsistent front-end state.
         ClearLastError;
         Success := RunAfterEndSale_OnRun(xRec);
         if not Success then
             Message(ERROR_AFTER_END_SALE, GetLastErrorText);
-        //+NPR5.40 [308457]
 
-        //-NPR5.53 [376362]
         ClearLastError;
         if not CODEUNIT.Run(CODEUNIT::"NPR POS End Sale Post Proc.", Rec) then
             Message(ERROR_AFTER_END_SALE, GetLastErrorText);
-        //+NPR5.53 [376362]
     end;
 
     local procedure LogStopwatch(Keyword: Text; Duration: Duration)
@@ -810,12 +681,10 @@ codeunit 6150705 "NPR POS Sale"
         POSSession: Codeunit "NPR POS Session";
         FrontEnd: Codeunit "NPR POS Front End Management";
     begin
-        //-NPR5.43 [315838]
         if not POSSession.IsActiveSession(FrontEnd) then
             exit;
         FrontEnd.GetSession(POSSession);
         POSSession.AddServerStopwatch(Keyword, Duration);
-        //+NPR5.43 [315838]
     end;
 
     local procedure "---Events---"()
@@ -850,13 +719,11 @@ codeunit 6150705 "NPR POS Sale"
     [IntegrationEvent(false, false)]
     local procedure OnBeforeResumeSale(SalePOS: Record "NPR Sale POS"; FrontEnd: Codeunit "NPR POS Front End Management")
     begin
-        //NPR5.54 [364658]
     end;
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterResumeSale(SalePOS: Record "NPR Sale POS"; FrontEnd: Codeunit "NPR POS Front End Management")
     begin
-        //NPR5.54 [364658]
     end;
 
     [IntegrationEvent(TRUE, false)]
@@ -877,8 +744,6 @@ codeunit 6150705 "NPR POS Sale"
     [IntegrationEvent(false, false)]
     procedure OnRefresh(var SalePOS: Record "NPR Sale POS")
     begin
-        //-NPR5.46 [329523]
-        //+NPR5.46 [329523]
     end;
 
     local procedure "--- OnFinishSale Workflow"()
@@ -890,35 +755,27 @@ codeunit 6150705 "NPR POS Sale"
     var
         POSSalesWorkflow: Record "NPR POS Sales Workflow";
     begin
-        //-NPR5.39 [302779]
         POSSalesWorkflow.OnDiscoverPOSSalesWorkflows();
         if POSSalesWorkflow.FindSet then
             repeat
                 POSSalesWorkflow.InitPOSSalesWorkflowSteps();
             until POSSalesWorkflow.Next = 0;
-        //+NPR5.39 [302779]
     end;
 
     local procedure OnFinishSaleCode(): Code[20]
     begin
-        //-NPR5.39 [302779]
         exit('FINISH_SALE');
-        //+NPR5.39 [302779]
     end;
 
     [EventSubscriber(ObjectType::Table, 6150729, 'OnDiscoverPOSSalesWorkflows', '', true, true)]
     local procedure OnDiscoverPOSWorkflows(var Sender: Record "NPR POS Sales Workflow")
     begin
-        //-NPR5.39 [302779]
         Sender.DiscoverPOSSalesWorkflow(OnFinishSaleCode(), Text000, CurrCodeunitId(), 'OnFinishSale');
-        //+NPR5.39 [302779]
     end;
 
     local procedure CurrCodeunitId(): Integer
     begin
-        //-NPR5.39 [302779]
         exit(CODEUNIT::"NPR POS Sale");
-        //+NPR5.39 [302779]
     end;
 
     local procedure InvokeOnFinishSaleSubscribers_OnRun(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step")
@@ -936,16 +793,11 @@ codeunit 6150705 "NPR POS Sale"
         POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step";
         StartTime: DateTime;
     begin
-        //-NPR5.43 [315838]
         StartTime := CurrentDateTime;
-        //+NPR5.43 [315838]
-
         POSSalesWorkflowStep.SetCurrentKey("Sequence No.");
-        //-NPR5.45 [321266]
         POSSalesWorkflowStep.SetFilter("Set Code", '=%1', '');
         if POSUnit.Get(SalePOS."Register No.") and (POSUnit."POS Sales Workflow Set" <> '') and POSSalesWorkflowSetEntry.Get(POSUnit."POS Sales Workflow Set", OnFinishSaleCode()) then
             POSSalesWorkflowStep.SetRange("Set Code", POSSalesWorkflowSetEntry."Set Code");
-        //+NPR5.45 [321266]
         POSSalesWorkflowStep.SetRange("Workflow Code", OnFinishSaleCode());
         POSSalesWorkflowStep.SetRange(Enabled, true);
         if not POSSalesWorkflowStep.FindSet then
@@ -956,23 +808,16 @@ codeunit 6150705 "NPR POS Sale"
             InvokeOnFinishSaleSubscribers_OnRun(POSSalesWorkflowStep);
         until POSSalesWorkflowStep.Next = 0;
 
-        //-NPR5.43 [315838]
         LogStopwatch('FINISH_SALE_WORKFLOWS', CurrentDateTime - StartTime);
-        //+NPR5.43 [315838]
     end;
 
     [IntegrationEvent(false, false)]
     local procedure OnFinishSale(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR Sale POS")
     begin
-        //-NPR5.39 [302779]
-        //+NPR5.39 [302779]
     end;
 
     procedure SetMockMode()
     begin
-        //-NPR5.48 [335967]
         IsMock := true;
-        //+NPR5.48 [335967]
     end;
 }
-

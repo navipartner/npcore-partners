@@ -1,37 +1,5 @@
 codeunit 6150702 "NPR POS UI Management"
 {
-    // NPR5.32.11/VB /20170621  CASE 281618 Added watermark initialization.
-    // NPR5.36/VB  /20170926  CASE 291454 Fixing bug with non-action button configuration not showing up in UI
-    // NPR5.37/VB  /20171013  CASE 290485 Providing localization support for button captions (and other data)
-    // NPR5.37/TSA /20171025 CASE 292323 Changed Caption for CaptionLabelSubtotal to include LCY Code
-    // NPR5.37/VB  /20171025  CASE 293905 Added support for locked view and corresponding actions and options
-    // NPR5.38/VB  /20171204  CASE 255773 Implementing front-end WYSIWYG support for buttons
-    // NPR5.38/VB  /20180123  CASE 303053 Changing captions for the payment view
-    // NPR5.39/TSA /20180206 CASE 299908 Added CaptionLabelPaymentTotal2 as Sale %1 to get currency code on login page
-    // NPR5.40/VB  /20180213 CASE 306347 Performance improvement due to parameters in BLOB and physical-table action discovery
-    // NPR5.40/MMV /20180314 CASE 307453 Performance
-    // NPR5.42/MMV /20180508 CASE 314128 Re-added support for button parameters when type <> Action
-    // NPR5.45/TJ  /20180809 CASE 323728 New option setup added for kiosk unlock
-    // NPR5.49/VB  /20181106 CASE 335141 Introducing the POS Theme functionality
-    // NPR5.49/TJ  /20190102 CASE 335739 Using POS View Profile instead of Register
-    // NPR5.50/JAKUBV/20190603  CASE 338666 Transport NPR5.50 - 3 June 2019
-    // NPR5.51/MMV /20190625 CASE 359825 Added missing filter
-    // NPR5.51/VB  /20190709 CASE 361184 Passing NPR Version number to front end
-    // NPR5.51/VB  /20190719  CASE 352582 POS Administrative Templates feature
-    // NPR5.53/VB  /20190917  CASE 362777 Support for workflow sequencing (configuring/registering "before" and "after" workflow sequences that execute before or after another workflow)
-    // NPR5.53/TSA /20191219 CASE 382035 Added new caption Item_Count
-    // NPR5.54/TSA /20200219 CASE 391850 Refresh of the POS Setup record when POS Unit is changed
-    // NPR5.54/TSA /20200220 CASE 392121 Added optionvalue for named workflow "Idle Timeout Action Code", removed some green code
-    // NPR5.54/TSA /20200221 CASE 392247 Adde optionvalue for POS Type. [Attended, Unattended]
-    // NPR5.55/TSA /20200417 CASE 400734 Added optionvalue for named workflow "Admin Menu Action Code"
-    // NPR5.55/TSA /20200520 CASE 405186 Added Global_Abort
-    // NPR5.55/TSA /20200521 CASE 405186 Added localization captions for timeout action
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         FrontEnd: Codeunit "NPR POS Front End Management";
         WaterMarkDemo: Label 'DEMO demo DEMO demo';
@@ -47,17 +15,16 @@ codeunit 6150702 "NPR POS UI Management"
         Language: Record "Windows Language";
         Caption: Record "NPR POS Localized Caption";
         CaptionMgt: Codeunit "NPR POS Caption Management";
-        Captions: DotNet NPRNetDictionary_Of_T_U;
+        Captions: JsonObject;
     begin
         Language.Get(GlobalLanguage);
-        Captions := Captions.Dictionary();
         ConfigureCaptions(Captions);
 
         Caption.SetFilter("Caption ID", '<>%1', '');
         Caption.SetFilter("Language Code", '%1|%2', '', Language."Abbreviated Name");
         if Caption.FindSet then
             repeat
-                if Captions.ContainsKey(Caption."Caption ID") then
+                if Captions.Contains(Caption."Caption ID") then
                     Captions.Remove(Caption."Caption ID");
                 Captions.Add(Caption."Caption ID", Caption.Caption);
             until Caption.Next = 0;
@@ -71,123 +38,61 @@ codeunit 6150702 "NPR POS UI Management"
 
     procedure InitializeNumberAndDateFormat(Register: Record "NPR Register")
     var
-        CultureInfo: DotNet NPRNetCultureInfo;
-        NumberFormat: DotNet NPRNetNumberFormatInfo;
-        DateFormat: DotNet NPRNetDateTimeFormatInfo;
         POSUnit: Record "NPR POS Unit";
         POSViewProfile: Record "NPR POS View Profile";
     begin
-        //-NPR5.49 [335739]
-        /*
-        IF Register."Client Formatting Culture ID" <> '' THEN
-          CultureInfo := CultureInfo.CultureInfo(Register."Client Formatting Culture ID")
-        */
         if (not POSUnit.Get(Register."Register No.")) or (not POSViewProfile.Get(POSUnit."POS View Profile")) then
             Clear(POSViewProfile);
-        if POSViewProfile."Client Formatting Culture ID" <> '' then
-            CultureInfo := CultureInfo.CultureInfo(POSViewProfile."Client Formatting Culture ID")
-        //+NPR5.49 [335739]
-        else
-            CultureInfo := CultureInfo.CultureInfo(CultureInfo.CurrentUICulture.Name);
-        NumberFormat := CultureInfo.NumberFormat;
-        //-NPR5.49 [335739]
-        /*
-        IF Register."Client Decimal Separator" <> '' THEN
-          NumberFormat.NumberDecimalSeparator := Register."Client Decimal Separator";
-        IF Register."Client Thousands Separator" <> '' THEN
-          NumberFormat.NumberGroupSeparator := Register."Client Thousands Separator";
-        */
-        if POSViewProfile."Client Decimal Separator" <> '' then
-            NumberFormat.NumberDecimalSeparator := POSViewProfile."Client Decimal Separator";
-        if POSViewProfile."Client Thousands Separator" <> '' then
-            NumberFormat.NumberGroupSeparator := POSViewProfile."Client Thousands Separator";
-        //+NPR5.49 [335739]
 
-        DateFormat := CultureInfo.DateTimeFormat;
-        //-NPR5.49 [335739]
-        /*
-        IF Register."Client Date Separator" <> '' THEN
-          DateFormat.DateSeparator := Register."Client Date Separator";
-        */
-        if POSViewProfile."Client Date Separator" <> '' then
-            DateFormat.DateSeparator := POSViewProfile."Client Date Separator";
-        //+NPR5.49 [335739]
-
-        FrontEnd.ConfigureFormat(NumberFormat, DateFormat);
-
+        FrontEnd.ConfigureNumberAndDateFormats(POSViewProfile);
     end;
 
     procedure InitializeLogo(Register: Record "NPR Register")
     var
         InStr: InStream;
-        MemStream: DotNet NPRNetMemoryStream;
-        Convert: DotNet NPRNetConvert;
+        Base64: Codeunit "Base64 Convert";
         POSUnit: Record "NPR POS Unit";
         POSViewProfile: Record "NPR POS View Profile";
     begin
-        //-NPR5.49 [335739]
-        //IF NOT Register.Picture.HASVALUE() THEN
         if (not POSUnit.Get(Register."Register No.")) or (not POSViewProfile.Get(POSUnit."POS View Profile")) or (not POSViewProfile.Picture.HasValue()) then
-            //+NPR5.49 [335739]
             exit;
 
-        //-NPR5.49 [335739]
-        /*
-        Register.CALCFIELDS(Picture);
-        Register.Picture.CREATEINSTREAM(InStr);
-        */
         POSViewProfile.CalcFields(Picture);
         POSViewProfile.Picture.CreateInStream(InStr);
-        //+NPR5.49 [335739]
-        MemStream := MemStream.MemoryStream();
-        CopyStream(MemStream, InStr);
-
-        FrontEnd.ConfigureLogo(Convert.ToBase64String(MemStream.ToArray()));
-
+        FrontEnd.ConfigureLogo(Base64.ToBase64(InStr));
     end;
 
     procedure InitializeMenus(Register: Record "NPR Register"; Salesperson: Record "Salesperson/Purchaser"; POSSession: Codeunit "NPR POS Session")
     var
         Menu: Record "NPR POS Menu";
-        Menus: DotNet NPRNetList_Of_T;
-        MenuObj: DotNet NPRNetMenu;
+        Menus: JsonArray;
+        MenuObj: Codeunit "NPR POS Menu";
         tmpPOSParameterValue: Record "NPR POS Parameter Value" temporary;
     begin
-        //-NPR5.42 [314128]
-        //PreloadActionParameters(tmpPOSParameterValue,tmpPOSActionParameter);
         PreloadParameters(tmpPOSParameterValue);
-        //+NPR5.42 [314128]
 
         with Menu do begin
             SetRange(Blocked, false);
             SetFilter("Register Type", '%1|%2', Register."Register Type", '');
             SetFilter("Register No.", '%1|%2', Register."Register No.", '');
             SetFilter("Salesperson Code", '%1|%2', Salesperson.Code, '');
-            // SETFILTER("Available in App",'%1|%2',TRUE,FALSE);  // TODO: fix this after developing app stuff
             SetRange("Available on Desktop", true);                // TODO: fix this after developing app stuff
 
-            if FindSet then begin
-                Menus := Menus.List();
+            if FindSet then
                 repeat
-                    //-NPR5.42 [314128]
-                    //InitializeMenu(Menu,MenuObj,POSSession,tmpPOSParameterValue,tmpPOSActionParameter);
+                    Clear(MenuObj);
                     InitializeMenu(Menu, MenuObj, POSSession, tmpPOSParameterValue);
-                    //+NPR5.42 [314128]
-                    Menus.Add(MenuObj);
+                    Menus.Add(MenuObj.GetJson);
                 until Next = 0;
-                FrontEnd.ConfigureMenu(Menus);
-            end;
+            FrontEnd.ConfigureMenu(Menus);
         end;
     end;
 
-    local procedure InitializeMenu(var Menu: Record "NPR POS Menu"; var MenuObj: DotNet NPRNetMenu; POSSession: Codeunit "NPR POS Session"; var tmpPOSParameterValue: Record "NPR POS Parameter Value" temporary)
+    local procedure InitializeMenu(var Menu: Record "NPR POS Menu"; MenuObj: Codeunit "NPR POS Menu"; POSSession: Codeunit "NPR POS Session"; var tmpPOSParameterValue: Record "NPR POS Parameter Value" temporary)
     var
         MenuButton: Record "NPR POS Menu Button";
-        MenuButtonObj: DotNet NPRNetMenuButton;
     begin
-        //-NPR5.40 [306347]
         POSSession.DebugWithTimestamp('Initializing menu [' + Menu.Code + ']');
-        //+NPR5.40 [306347]
         InitializeMenuObject(Menu, MenuObj);
 
         with MenuButton do begin
@@ -195,31 +100,25 @@ codeunit 6150702 "NPR POS UI Management"
             SetRange(Blocked, false);
             Menu.CopyFilter("Register Type", "Register Type");
             Menu.CopyFilter("Register No.", "Register No.");
-            //Menu.COPYFILTER("Salesperson Code","Salesperson Code"); // TODO: this must happen in the front end
             Menu.CopyFilter("Available in App", "Available in App");
             Menu.CopyFilter("Available on Desktop", "Available on Desktop");
             SetRange("Parent ID", 0);
 
-            //-NPR5.42 [314128]
-            //InitializeMenuButtons(MenuButton,MenuObj,POSSession,tmpPOSParameterValue,tmpPOSActionParameter);
             InitializeMenuButtons(MenuButton, MenuObj, POSSession, tmpPOSParameterValue);
-            //+NPR5.42 [314128]
         end;
     end;
 
-    local procedure InitializeMenuObject(Menu: Record "NPR POS Menu"; var MenuObj: DotNet NPRNetMenu)
+    local procedure InitializeMenuObject(Menu: Record "NPR POS Menu"; MenuObj: Codeunit "NPR POS Menu")
     begin
         with Menu do begin
-            MenuObj := MenuObj.Menu();
-
-            MenuObj.Id := Code;
-            MenuObj.Caption := Caption;
-            MenuObj.Tooltip := Tooltip;
-            MenuObj.Class := "Custom Class Attribute";
+            MenuObj.SetId(Code);
+            MenuObj.SetCaption(Caption);
+            MenuObj.SetTooltip(Tooltip);
+            MenuObj.SetClass("Custom Class Attribute");
         end;
     end;
 
-    local procedure InitializeSubmenu(var MenuButton: Record "NPR POS Menu Button"; ISubMenu: DotNet NPRNetISubMenu; POSSession: Codeunit "NPR POS Session"; var tmpPOSParameterValue: Record "NPR POS Parameter Value" temporary)
+    local procedure InitializeSubmenu(var MenuButton: Record "NPR POS Menu Button"; ISubMenu: Interface "NPR ISubMenu"; POSSession: Codeunit "NPR POS Session"; var tmpPOSParameterValue: Record "NPR POS Parameter Value" temporary)
     var
         SubMenuButton: Record "NPR POS Menu Button";
     begin
@@ -227,98 +126,55 @@ codeunit 6150702 "NPR POS UI Management"
             CopyFilters(MenuButton);
             SetRange("Parent ID", MenuButton.ID);
 
-            //-NPR5.42 [314128]
-            //InitializeMenuButtons(SubMenuButton,ISubMenu,POSSession,tmpPOSParameterValue,tmpPOSActionParameter);
             InitializeMenuButtons(SubMenuButton, ISubMenu, POSSession, tmpPOSParameterValue);
-            //+NPR5.42 [314128]
         end;
     end;
 
-    local procedure InitializeMenuButtons(var SubMenuButton: Record "NPR POS Menu Button"; ISubMenu: DotNet NPRNetISubMenu; POSSession: Codeunit "NPR POS Session"; var tmpPOSParameterValue: Record "NPR POS Parameter Value" temporary)
+    local procedure InitializeMenuButtons(var SubMenuButton: Record "NPR POS Menu Button"; ISubMenu: Interface "NPR ISubMenu"; POSSession: Codeunit "NPR POS Session"; var tmpPOSParameterValue: Record "NPR POS Parameter Value" temporary)
     var
-        MenuButtonObj: DotNet NPRNetMenuButton;
+        MenuButtonObj: Codeunit "NPR POS Menu Button";
     begin
         with SubMenuButton do begin
             if FindSet then
                 repeat
-                    //-NPR5.42 [314128]
-                    //InitializeMenuButtonObject(SubMenuButton,MenuButtonObj,POSSession,tmpPOSParameterValue,tmpPOSActionParameter);
                     InitializeMenuButtonObject(SubMenuButton, MenuButtonObj, POSSession, tmpPOSParameterValue);
-                    //+NPR5.42 [314128]
-                    ISubMenu.MenuButtons.Add(MenuButtonObj);
+                    ISubMenu.AddMenuButton(MenuButtonObj);
                     if "Action Type" = "Action Type"::Submenu then
-                        //-NPR5.42 [314128]
-                        //InitializeSubmenu(SubMenuButton,MenuButtonObj,POSSession,tmpPOSParameterValue,tmpPOSActionParameter);
                         InitializeSubmenu(SubMenuButton, MenuButtonObj, POSSession, tmpPOSParameterValue);
-                //+NPR5.42 [314128]
                 until Next = 0;
         end;
     end;
 
-    local procedure InitializeMenuButtonObject(MenuButton: Record "NPR POS Menu Button"; var MenuButtonObj: DotNet NPRNetMenuButton; POSSession: Codeunit "NPR POS Session"; var tmpPOSParameterValue: Record "NPR POS Parameter Value" temporary)
+    local procedure InitializeMenuButtonObject(MenuButton: Record "NPR POS Menu Button"; var MenuButtonObj: Codeunit "NPR POS Menu Button"; POSSession: Codeunit "NPR POS Session"; var tmpPOSParameterValue: Record "NPR POS Parameter Value" temporary)
     var
-        "Action": DotNet NPRNetAction;
-        DotNetHelper: Variant;
+        ActionObj: Interface "NPR IAction";
     begin
         with MenuButton do begin
-            MenuButtonObj := MenuButtonObj.MenuButton();
-            //-NPR5.38 [290485]
-            //  MenuButtonObj.Caption := Caption;
-            MenuButtonObj.Caption := MenuButton.GetLocalizedCaption(FieldNo(Caption));
-            //+NPR5.38 [290485]
-            MenuButtonObj.Tooltip := Tooltip;
-            MenuButtonObj.BackgroundColor := "Background Color";
-            MenuButtonObj.Color := "Foreground Color";
-            MenuButtonObj.IconClass := "Icon Class";
-            MenuButtonObj.Class := "Custom Class Attribute";
-            MenuButtonObj.Bold := Bold;
-            MenuButtonObj.Row := "Position Y";
-            MenuButtonObj.Column := "Position X";
-
-            case "Font Size" of
-                "Font Size"::Normal:
-                    MenuButtonObj.FontSize := MenuButtonObj.FontSize.Normal;
-                "Font Size"::Large:
-                    MenuButtonObj.FontSize := MenuButtonObj.FontSize.Large;
-                "Font Size"::Medium:
-                    MenuButtonObj.FontSize := MenuButtonObj.FontSize.Medium;
-                "Font Size"::Small:
-                    MenuButtonObj.FontSize := MenuButtonObj.FontSize.Small;
-                "Font Size"::XLarge:
-                    MenuButtonObj.FontSize := MenuButtonObj.FontSize.XLarge;
-                "Font Size"::XSmall:
-                    MenuButtonObj.FontSize := MenuButtonObj.FontSize.XSmall;
-            end;
-
-            case Enabled of
-                Enabled::No:
-                    MenuButtonObj.Enabled := MenuButtonObj.Enabled.No;
-                Enabled::Yes:
-                    MenuButtonObj.Enabled := MenuButtonObj.Enabled.Yes;
-                Enabled::Auto:
-                    MenuButtonObj.Enabled := MenuButtonObj.Enabled.Auto;
-            end;
-
-            //-NPR5.38 [255773]
+            Clear(MenuButtonObj);
+            MenuButtonObj.SetCaption(MenuButton.GetLocalizedCaption(FieldNo(Caption)));
+            MenuButtonObj.SetTooltip(Tooltip);
+            MenuButtonObj.SetBackgroundColor("Background Color");
+            MenuButtonObj.SetColor("Foreground Color");
+            MenuButtonObj.SetIconClass("Icon Class");
+            MenuButtonObj.SetClass("Custom Class Attribute");
+            MenuButtonObj.SetBold(Bold);
+            MenuButtonObj.SetRow("Position Y");
+            MenuButtonObj.SetColumn("Position X");
+            MenuButtonObj.SetFontSize("Font Size");
+            MenuButtonObj.SetEnabledState(Enabled);
             MenuButtonObj.Content.Add('keyMenu', "Menu Code");
             MenuButtonObj.Content.Add('keyId', ID);
-            //+NPR5.38 [255773]
 
             InitializeMenuButtonObjectFilters(MenuButton, MenuButtonObj);
 
-            //-NPR5.42 [314128]
-            //GetAction(Action,POSSession,STRSUBSTNO('%1 [%2, %3]',MenuButton.TABLECAPTION,"Menu Code",Caption),tmpPOSParameterValue,tmpPOSActionParameter);
-            GetAction(Action, POSSession, StrSubstNo('%1 [%2, %3]', MenuButton.TableCaption, "Menu Code", Caption), tmpPOSParameterValue);
-            //+NPR5.42 [314128]
-            if not IsNull(Action) then
-                MenuButtonObj.Action := Action;
-            //-NPR5.36 [291454]
+            if GetAction(ActionObj, POSSession, StrSubstNo('%1 [%2, %3]', MenuButton.TableCaption, "Menu Code", Caption), tmpPOSParameterValue) then
+                MenuButtonObj.SetAction(ActionObj);
+
             StoreButtonConfiguration(MenuButtonObj);
-            //+NPR5.36 [291454]
         end;
     end;
 
-    local procedure InitializeMenuButtonObjectFilters(MenuButton: Record "NPR POS Menu Button"; var MenuButtonObj: DotNet NPRNetMenuButton)
+    local procedure InitializeMenuButtonObjectFilters(MenuButton: Record "NPR POS Menu Button"; MenuButtonObj: Codeunit "NPR POS Menu Button")
     begin
         if MenuButton."Salesperson Code" <> '' then
             MenuButtonObj.Content.Add('filterSalesPerson', MenuButton."Salesperson Code");
@@ -334,7 +190,6 @@ codeunit 6150702 "NPR POS UI Management"
         // a) the first parameter is a watermark image, you can set one the same way logo is set
         // b) the second parameter is a watermark text, you can pass whatever you want
         // If image is present, text won't be shown.
-        //-NPR5.32.11 [281618]
 
         if (not NPRetailSetup.Get()) then
             exit;
@@ -353,7 +208,6 @@ codeunit 6150702 "NPR POS UI Management"
             NPRetailSetup."Environment Type"::PROD:
                 ;
         end;
-        //+NPR5.32.11 [281618]
     end;
 
     procedure InitializeTheme(Register: Record "NPR Register")
@@ -361,31 +215,21 @@ codeunit 6150702 "NPR POS UI Management"
         POSTheme: Record "NPR POS Theme";
         ThemeDep: Record "NPR POS Theme Dependency";
         WebClientDep: Record "NPR Web Client Dependency";
-        ThemeLine: DotNet NPRNetDictionary_Of_T_U;
-        Theme: DotNet NPRNetList_Of_T;
+        ThemeLine: JsonObject;
+        Theme: JsonArray;
         DependencyContent: Text;
         POSUnit: Record "NPR POS Unit";
         POSViewProfile: Record "NPR POS View Profile";
     begin
-        //-NPR5.49 [335739]
-        /*
-        //-NPR5.49 [335141]
-        IF (Register."POS Theme Code" = '') OR (NOT POSTheme.GET(Register."POS Theme Code")) OR POSTheme.Blocked THEN
-          EXIT;
-        
-        ThemeDep.SETRANGE("POS Theme Code",Register."POS Theme Code");
-        */
         if (not POSUnit.Get(Register."Register No.")) or (not POSViewProfile.Get(POSUnit."POS View Profile")) or (not POSTheme.Get(POSViewProfile."POS Theme Code")) or POSTheme.Blocked then
             exit;
 
         ThemeDep.SetRange("POS Theme Code", POSViewProfile."POS Theme Code");
-        //+NPR5.49 [335739]
         ThemeDep.SetRange(Blocked, false);
         ThemeDep.SetFilter("Dependency Code", '<>%1', '');
         if not ThemeDep.FindSet() then
             exit;
 
-        Theme := Theme.List();
         repeat
             Clear(DependencyContent);
             case ThemeDep."Dependency Type" of
@@ -398,7 +242,7 @@ codeunit 6150702 "NPR POS UI Management"
             end;
 
             if DependencyContent <> '' then begin
-                ThemeLine := ThemeLine.Dictionary();
+                Clear(ThemeLine);
                 Theme.Add(ThemeLine);
 
                 ThemeLine.Add('targetType', ThemeDep."Target Type");
@@ -415,8 +259,6 @@ codeunit 6150702 "NPR POS UI Management"
             end;
         until ThemeDep.Next = 0;
         FrontEnd.ConfigureTheme(Theme);
-        //+NPR5.49 [335141]
-
     end;
 
     procedure InitializeAdministrativeTemplates(Register: Record "NPR Register")
@@ -425,10 +267,9 @@ codeunit 6150702 "NPR POS UI Management"
         AdminTemplateScope: Record "NPR POS Admin. Template Scope";
         AdminTemplateScopeTmp: Record "NPR POS Admin. Template Scope" temporary;
         POSUnit: Record "NPR POS Unit";
-        Templates: DotNet NPRNetList_Of_T;
-        Template: DotNet NPRNetDictionary_Of_T_U;
+        Templates: JsonArray;
+        Template: JsonObject;
     begin
-        //-NPR5.51 [352582]
         AdminTemplateScope.SetRange("Applies To", AdminTemplateScope."Applies To"::All);
         if AdminTemplateScope.FindSet then
             repeat
@@ -457,16 +298,15 @@ codeunit 6150702 "NPR POS UI Management"
         if AdminTemplateScopeTmp.IsEmpty then
             exit;
 
-        Templates := Templates.List();
         AdminTemplateScopeTmp.FindSet();
         repeat
             if AdminTemplate.Get(AdminTemplateScopeTmp."POS Admin. Template Id") and (AdminTemplate.Status <> AdminTemplate.Status::Draft) then begin
-                InitializeAdministrativeTemplatePolicy(Template, AdminTemplate.Id, AdminTemplate."Persist on Client", AdminTemplateScopeTmp."Applies To");
+                Template := CreateAdministrativeTemplatePolicy(AdminTemplate.Id, AdminTemplate."Persist on Client", AdminTemplateScopeTmp."Applies To");
                 case AdminTemplate.Status of
                     AdminTemplate.Status::Active:
                         begin
-                            InitialiteAdministrativeTemplatePasswordPolicy(Template, 'roleCenter', AdminTemplate."Role Center", AdminTemplate."Role Center Password");
-                            InitialiteAdministrativeTemplatePasswordPolicy(Template, 'configuration', AdminTemplate.Configuration, AdminTemplate."Configuration Password");
+                            ApplyAdministrativeTemplatePasswordPolicy(Template, 'roleCenter', AdminTemplate."Role Center", AdminTemplate."Role Center Password");
+                            ApplyAdministrativeTemplatePasswordPolicy(Template, 'configuration', AdminTemplate.Configuration, AdminTemplate."Configuration Password");
                         end;
                     AdminTemplate.Status::Retired:
                         Template.Add('retired', true);
@@ -475,24 +315,19 @@ codeunit 6150702 "NPR POS UI Management"
             Templates.Add(Template);
         until AdminTemplateScopeTmp.Next = 0;
         FrontEnd.ApplyAdministrativeTemplates(Templates);
-        //+NPR5.51 [352582]
     end;
 
-    local procedure InitializeAdministrativeTemplatePolicy(var Template: DotNet NPRNetDictionary_Of_T_U; Id: Guid; Persist: Boolean; AppliesTo: Integer)
+    local procedure CreateAdministrativeTemplatePolicy(Id: Guid; Persist: Boolean; AppliesTo: Integer) Template: JsonObject;
     begin
-        //-NPR5.51 [352582]
-        Template := Template.Dictionary();
         Template.Add('id', Id);
         Template.Add('persist', Persist);
         Template.Add('strength', AppliesTo);
-        //+NPR5.51 [352582]
     end;
 
-    local procedure InitialiteAdministrativeTemplatePasswordPolicy(Template: DotNet NPRNetDictionary_Of_T_U; PolicyName: Text; Policy: Option "Not Defined",Visible,Disabled,Hidden,Password; Password: Text)
+    local procedure ApplyAdministrativeTemplatePasswordPolicy(Template: JsonObject; PolicyName: Text; Policy: Option "Not Defined",Visible,Disabled,Hidden,Password; Password: Text)
     var
-        PolicyObject: DotNet NPRNetDictionary_Of_T_U;
+        PolicyObject: JsonObject;
     begin
-        //-NPR5.51 [352582]
         case Policy of
             Policy::Disabled:
                 Template.Add(PolicyName, 'deny');
@@ -502,32 +337,29 @@ codeunit 6150702 "NPR POS UI Management"
                 Template.Add(PolicyName, 'allow');
             Policy::Password:
                 begin
-                    PolicyObject := PolicyObject.Dictionary();
                     PolicyObject.Add('password', Password);
                     Template.Add(PolicyName, PolicyObject);
                 end;
         end;
-        //+NPR5.51 [352582]
     end;
 
     procedure ConfigureFonts()
     var
         WebFont: Record "NPR POS Web Font";
-        Font: DotNet NPRNetFont0;
+        Font: Codeunit "NPR Web Font";
     begin
         WebFont.SetFilter("Company Name", '%1|%2', '', CompanyName);
         if WebFont.FindSet then
             repeat
-                WebFont.GetFontDotNet(Font);
+                WebFont.GetWebFont(Font);
                 FrontEnd.ConfigureFont(Font);
             until WebFont.Next = 0;
     end;
 
-    local procedure ConfigureCaptions(Captions: DotNet NPRNetDictionary_Of_T_U)
+    local procedure ConfigureCaptions(Captions: JsonObject)
     var
         RecRef: RecordRef;
         FieldRef: FieldRef;
-        NumberFormat: DotNet NPRNetNumberFormatInfo;
         i: Integer;
         CaptionLabelReceiptNo: Label 'Sale';
         CaptionLabelEANHeader: Label 'Item No.';
@@ -638,35 +470,19 @@ codeunit 6150702 "NPR POS UI Management"
         Captions.Add('Login_FunctionButtonText', CaptionFunctionButtonText);
         Captions.Add('Login_MainMenuButtonText', CaptionMainMenuButtonText);
         Captions.Add('Sale_PaymentAmount', CaptionLabelPaymentAmount);
-
-        //-NPR5.55 [405186]
         Captions.Add('Sale_TimeoutTitle', Sale_TimeoutTitle);
         Captions.Add('Sale_TimeoutCaption', Sale_TimeoutCaption);
         Captions.Add('Sale_TimeoutButtonCaption', Sale_TimeoutButtonCaption);
         Captions.Add('Payment_TimeoutTitle', Payment_TimeoutTitle);
         Captions.Add('Payment_TimeoutCaption', Payment_TimeoutCaption);
         Captions.Add('Payment_TimeoutButtonCaption', Payment_TimeoutButtonCaption);
-        //+NPR5.55 [405186]
-
-        //-NPR5.39 [299908]
-        //Captions.Add('Sale_PaymentTotal',CaptionLabelPaymentTotal);
         Captions.Add('Sale_PaymentTotal', StrSubstNo(CaptionLabelPaymentTotal2, GetLCYCode()));
-        //+NPR5.39 [299908]
-
         Captions.Add('Sale_ReturnAmount', CaptionLabelReturnAmount);
         Captions.Add('Sale_RegisterNo', CaptionLabelRegisterNo);
         Captions.Add('Sale_SalesPersonCode', CaptionLabelSalesPersonCode);
         Captions.Add('Login_Clear', CaptionLabelClear);
-
-        //-NPR5.37 [292323]
-        //Captions.Add('Sale_SubTotal',CaptionLabelSubtotal);
         Captions.Add('Sale_SubTotal', StrSubstNo(CaptionLabelSubtotal, GetLCYCode));
-        //+NPR5.37 [292323]
-
-        //-NPR5.53 [382035]
         Captions.Add('Item_Count', CaptionItemCount);
-        //+NPR5.53 [382035]
-
         Captions.Add('Payment_PaymentInfo', CaptionPaymentInfo);
         Captions.Add('Global_Cancel', CaptionGlobalCancel);
         Captions.Add('Global_Close', CaptionGlobalClose);
@@ -743,11 +559,9 @@ codeunit 6150702 "NPR POS UI Management"
         Captions.Add('LastSale_Total', CaptionLastSale_Total);
         Captions.Add('LastSale_Paid', CaptionLastSale_Paid);
         Captions.Add('LastSale_Change', CaptionLastSale_Change);
-        //-NPR5.38 [303053]
         Captions.Add('Payment_SaleLCY', CaptionPayment_SaleLCY);
         Captions.Add('Payment_Paid', CaptionPayment_Paid);
         Captions.Add('Payment_Balance', CaptionPayment_Balance);
-        //+NPR5.38 [303053]
 
         RecRef.Open(DATABASE::"NPR Sale Line POS");
         for i := 1 to RecRef.FieldCount do begin
@@ -761,8 +575,6 @@ codeunit 6150702 "NPR POS UI Management"
         "Action": Record "NPR POS Action" temporary;
         POSSetup: Record "NPR POS Setup";
     begin
-
-        //-+NPR5.54 [392121] removed green code
         Setup.Action_Item(Action, POSSession);
         ConfigureReusableWorkflow(Action, POSSession, StrSubstNo('%1, %2', POSSetup.TableCaption, POSSetup.FieldCaption("Item Insert Action Code")), POSSetup.FieldNo("Item Insert Action Code"));
 
@@ -784,15 +596,11 @@ codeunit 6150702 "NPR POS UI Management"
         Setup.Action_TextEnter(Action, POSSession);
         ConfigureReusableWorkflow(Action, POSSession, StrSubstNo('%1, %2', POSSetup.TableCaption, POSSetup.FieldCaption("Text Enter Action Code")), POSSetup.FieldNo("Text Enter Action Code"));
 
-        //-NPR5.54 [392121]
         Setup.Action_IdleTimeout(Action, POSSession);
         ConfigureReusableWorkflow(Action, POSSession, StrSubstNo('%1, %2', POSSetup.TableCaption, POSSetup.FieldCaption("Idle Timeout Action Code")), POSSetup.FieldNo("Idle Timeout Action Code"));
-        //+NPR5.54 [392121]
 
-        //-NPR5.55 [400734]
         Setup.Action_AdminMenu(Action, POSSession);
         ConfigureReusableWorkflow(Action, POSSession, StrSubstNo('%1, %2', POSSetup.TableCaption, POSSetup.FieldCaption("Admin Menu Action Code")), POSSetup.FieldNo("Admin Menu Action Code"));
-        //+NPR5.55 [400734]
 
         OnConfigureReusableWorkflows(POSSession, Setup);
     end;
@@ -800,28 +608,20 @@ codeunit 6150702 "NPR POS UI Management"
     procedure ConfigureReusableWorkflow("Action": Record "NPR POS Action"; POSSession: Codeunit "NPR POS Session"; Source: Text; FieldNumber: Integer)
     var
         Button: Record "NPR POS Menu Button";
-        WorkflowAction: DotNet NPRNetWorkflowAction;
+        WorkflowAction: Codeunit "NPR Workflow Action";
         POSParameterValue: Record "NPR POS Parameter Value" temporary;
         POSSetup: Codeunit "NPR POS Setup";
         POSUnit: Record "NPR POS Unit";
     begin
-
-        //-NPR5.54 [391850]
         POSSession.GetSetup(POSSetup);
         POSSetup.GetPOSUnit(POSUnit);
-        //+NPR5.54 [391850]
 
-        //-+NPR5.54 [392121] removed green code
         with Button do begin
             "Action Type" := "Action Type"::Action;
             "Action Code" := Action.Code;
 
-            //-NPR5.54 [391850]
-            // RetrieveReusableWorkflowParameters(FieldNumber,POSParameterValue);
             RetrieveReusableWorkflowParameters(FieldNumber, POSUnit."POS Named Actions Profile", POSParameterValue);
-            //+NPR5.54 [391850]
-
-            GetAction(WorkflowAction, POSSession, Source, POSParameterValue);
+            WorkflowAction.ConfigureFromMenuButton(Button, POSSession, WorkflowAction);
 
             POSParameterValue.Reset();
             FrontEnd.ConfigureReusableWorkflow(WorkflowAction);
@@ -830,13 +630,10 @@ codeunit 6150702 "NPR POS UI Management"
 
     procedure SetOptions(Setup: Codeunit "NPR POS Setup")
     var
-        Request: DotNet NPRNetSetOptionJsonRequest;
-        Options: DotNet NPRNetDictionary_Of_T_U;
+        Options: JsonObject;
         POSSetup: Record "NPR POS Setup";
         POSActionParameterMgt: Codeunit "NPR POS Action Param. Mgt.";
     begin
-        Options := Request.GetDictionary();
-
         Options.Add('itemWorkflow', Setup.ActionCode_Item);
         Options.Add('paymentWorkflow', Setup.ActionCode_Payment);
         Options.Add('customerWorkflow', Setup.ActionCode_Customer);
@@ -846,21 +643,11 @@ codeunit 6150702 "NPR POS UI Management"
         Options.Add('loginWorkflow', Setup.ActionCode_Login);
         Options.Add('textEnterWorkflow', Setup.ActionCode_TextEnter);
         Options.Add('kioskUnlockEnabled', Setup.GetKioskUnlockEnabled());
-
-        //-NPR5.54 [392121]
         Options.Add('idleTimeoutWorkflow', Setup.ActionCode_IdleTimeout());
-        //+NPR5.54 [392121]
-
-        //-NPR5.54 [392247]
         Options.Add('posUnitType', Format(GetPOSUnitType(Setup), 0, 9));
-        //+NPR5.54 [392247]
-
-        //-NPR5.55 [400734]
         Options.Add('adminMenuWorkflow', Setup.ActionCode_AdminMenu());
         Setup.GetNamedActionSetup(POSSetup);
         Options.Add('adminMenuWorkflow_parameters', POSActionParameterMgt.GetParametersAsJson(POSSetup.RecordId, POSSetup.FieldNo("Admin Menu Action Code")));
-        //-NPR5.55 [400734]
-
         Options.Add('nprVersion', GetNPRVersion());
 
         OnSetOptions(Setup, Options);
@@ -868,7 +655,7 @@ codeunit 6150702 "NPR POS UI Management"
         FrontEnd.SetOptions(Options);
     end;
 
-    procedure AddActionCaption(Captions: DotNet NPRNetDictionary_Of_T_U; ActionCode: Text; CaptionId: Text; CaptionText: Text)
+    procedure AddActionCaption(Captions: Dictionary of [Text, Text]; ActionCode: Text; CaptionId: Text; CaptionText: Text)
     begin
         if (Captions.ContainsKey(ActionCode + '.' + CaptionId)) then
             exit;
@@ -884,36 +671,23 @@ codeunit 6150702 "NPR POS UI Management"
     var
         GeneralLedgerSetup: Record "General Ledger Setup";
     begin
-
-        //-NPR5.37 [292323]
         if (GeneralLedgerSetup.Get()) then
             if (GeneralLedgerSetup."LCY Code" <> '') then
                 exit(StrSubstNo('(%1)', GeneralLedgerSetup."LCY Code"));
 
         exit('');
-        //+NPR5.37 [292323]
     end;
 
     local procedure PreloadParameters(var tmpPOSParameterValue: Record "NPR POS Parameter Value" temporary)
     var
         POSParameterValue: Record "NPR POS Parameter Value";
     begin
-        //-NPR5.40 [307453]
-        //-NPR5.42 [314128]
-        // IF POSActionParameter.FINDSET THEN
-        //  REPEAT
-        //    tmpPOSActionParameter := POSActionParameter;
-        //    tmpPOSActionParameter.INSERT;
-        //  UNTIL POSActionParameter.NEXT = 0;
-        //+NPR5.42 [314128]
-
         POSParameterValue.SetRange("Table No.", DATABASE::"NPR POS Menu Button");
         if POSParameterValue.FindSet then
             repeat
                 tmpPOSParameterValue := POSParameterValue;
                 tmpPOSParameterValue.Insert;
             until POSParameterValue.Next = 0;
-        //+NPR5.40 [307453]
     end;
 
     local procedure RetrieveReusableWorkflowParameters(FieldNumber: Integer; POSSetupProfileCode: Code[20]; var TmpPOSParameterValue: Record "NPR POS Parameter Value" temporary)
@@ -921,28 +695,16 @@ codeunit 6150702 "NPR POS UI Management"
         POSParameterValue: Record "NPR POS Parameter Value";
         POSSetup: Record "NPR POS Setup";
     begin
-        //-NPR5.54 [391850]
-        // //-NPR5.51 [359825]
-        // POSSetup.GET;
-        // //+NPR5.51 [359825]
-
         POSSetup.Get(POSSetupProfileCode);
-        //+NPR5.54 [391850]
-
-
-        //-NPR5.50 [338666]
         POSParameterValue.SetRange("Table No.", DATABASE::"NPR POS Setup");
         POSParameterValue.SetRange(ID, FieldNumber);
-        //-NPR5.51 [359825]
         POSParameterValue.SetRange("Record ID", POSSetup.RecordId);
-        //+NPR5.51 [359825]
         if POSParameterValue.FindSet then
             repeat
                 TmpPOSParameterValue := POSParameterValue;
                 TmpPOSParameterValue.Insert;
             until POSParameterValue.Next = 0;
         TmpPOSParameterValue.SetParamFilterIndicator();
-        //+NPR5.50 [338666]
     end;
 
     procedure GetNPRVersion(): Text
@@ -955,7 +717,6 @@ codeunit 6150702 "NPR POS UI Management"
             exit(StrSubstNo('NPR %1', Npr.AppVersion()));
         // ... and if that fails, fallback to previous logic
 
-        //-NPR5.51 [361184]
         with NPRUpgradeHistory do begin
             SetCurrentKey("Upgrade Time");
             SetAscending("Upgrade Time", false);
@@ -963,17 +724,14 @@ codeunit 6150702 "NPR POS UI Management"
                 exit('');
             exit(Version);
         end;
-        //+NPR5.51 [361184]
     end;
 
     local procedure GetPOSUnitType(POSSetup: Codeunit "NPR POS Setup"): Integer
     var
         POSUnit: Record "NPR POS Unit";
     begin
-        //-NPR5.54 [392247]
         POSSetup.GetPOSUnit(POSUnit);
         exit(POSUnit."POS Type");
-        //+NPR5.54 [392247]
     end;
 
     [IntegrationEvent(true, false)]
@@ -982,7 +740,7 @@ codeunit 6150702 "NPR POS UI Management"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnSetOptions(Setup: Codeunit "NPR POS Setup"; var Options: DotNet NPRNetDictionary_Of_T_U)
+    local procedure OnSetOptions(Setup: Codeunit "NPR POS Setup"; var Options: JsonObject)
     begin
     end;
 }

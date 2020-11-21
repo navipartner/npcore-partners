@@ -1,13 +1,5 @@
 codeunit 6151202 "NPR NpCs POSAction Proc. Order"
 {
-    // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
-    // NPR5.53/MHA /20191128  CASE 378895 Added Parameter 'Sorting'
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         Text000: Label 'Process Collect in Store Orders';
 
@@ -18,9 +10,7 @@ codeunit 6151202 "NPR NpCs POSAction Proc. Order"
 
     local procedure ActionVersion(): Text
     begin
-        //-NPR5.53 [378895]
         exit('1.1');
-        //+NPR5.53 [378895]
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', true, true)]
@@ -41,9 +31,7 @@ codeunit 6151202 "NPR NpCs POSAction Proc. Order"
 
         Sender.RegisterOptionParameter('Location From', 'POS Store,Location Filter Parameter', 'POS Store');
         Sender.RegisterTextParameter('Location Filter', '');
-        //-NPR5.53 [378895]
         Sender.RegisterOptionParameter('Sorting', 'Entry No.,Reference No.,Processing expires at', 'Entry No.');
-        //+NPR5.53 [378895]
     end;
 
     [EventSubscriber(ObjectType::Table, 6150705, 'OnLookupValue', '', true, true)]
@@ -124,7 +112,6 @@ codeunit 6151202 "NPR NpCs POSAction Proc. Order"
         Sorting: Option "Entry No.","Reference No.","Processing expires at";
     begin
         SetUnprocessedFilter(LocationFilter, NpCsDocument);
-        //-NPR5.53 [378895]
         case JSON.GetIntegerParameter('Sorting', false) of
             Sorting::"Entry No.":
                 begin
@@ -139,8 +126,7 @@ codeunit 6151202 "NPR NpCs POSAction Proc. Order"
                     NpCsDocument.SetCurrentKey("Processing expires at");
                 end;
         end;
-        //+NPR5.53 [378895]
-        PAGE.RunModal(PAGE::"NPR NpCs Coll. Store Orders", NpCsDocument);
+        Page.RunModal(PAGE::"NPR NpCs Coll. Store Orders", NpCsDocument);
     end;
 
     local procedure GetLocationFilter(JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session") LocationFilter: Text
@@ -169,7 +155,7 @@ codeunit 6151202 "NPR NpCs POSAction Proc. Order"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnDiscoverDataSourceExtensions', '', false, false)]
-    local procedure OnDiscover(DataSourceName: Text; Extensions: DotNet NPRNetList_Of_T)
+    local procedure OnDiscover(DataSourceName: Text; Extensions: List of [Text])
     var
         NpCsStore: Record "NPR NpCs Store";
     begin
@@ -182,9 +168,9 @@ codeunit 6151202 "NPR NpCs POSAction Proc. Order"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnGetDataSourceExtension', '', false, false)]
-    local procedure OnGetExtension(DataSourceName: Text; ExtensionName: Text; var DataSource: DotNet NPRNetDataSource0; var Handled: Boolean; Setup: Codeunit "NPR POS Setup")
+    local procedure OnGetExtension(DataSourceName: Text; ExtensionName: Text; var DataSource: Codeunit "NPR Data Source"; var Handled: Boolean; Setup: Codeunit "NPR POS Setup")
     var
-        DataType: DotNet NPRNetDataType;
+        DataType: Enum "NPR Data Type";
     begin
         if DataSourceName <> 'BUILTIN_SALE' then
             exit;
@@ -193,12 +179,12 @@ codeunit 6151202 "NPR NpCs POSAction Proc. Order"
 
         Handled := true;
 
-        DataSource.AddColumn('UnprocessedOrdersExists', 'Unprocessed Orders Exists', DataType.Boolean, false);
-        DataSource.AddColumn('UnprocessedOrdersQty', 'Unprocessed Orders Qty.', DataType.Integer, false);
+        DataSource.AddColumn('UnprocessedOrdersExists', 'Unprocessed Orders Exists', DataType::Boolean, false);
+        DataSource.AddColumn('UnprocessedOrdersQty', 'Unprocessed Orders Qty.', DataType::Integer, false);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnDataSourceExtensionReadData', '', false, false)]
-    local procedure OnReadData(DataSourceName: Text; ExtensionName: Text; var RecRef: RecordRef; DataRow: DotNet NPRNetDataRow0; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
+    local procedure OnReadData(DataSourceName: Text; ExtensionName: Text; var RecRef: RecordRef; DataRow: Codeunit "NPR Data Row"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         UnprocessedOrdersExists: Boolean;
         LocationFilter: Text;
@@ -279,4 +265,3 @@ codeunit 6151202 "NPR NpCs POSAction Proc. Order"
         NpCsDocument.SetFilter("Location Code", LocationFilter);
     end;
 }
-

@@ -16,7 +16,7 @@ codeunit 6150744 "NPR POS Keyboard Binding Mgt."
         KeyBindFormatErr: Label 'Keybind must begin with a supported key.';
         ProcessNotSupportedErr: Label 'This process is no longer supported.';
 
-    procedure DiscoverKeyboardBindings(var KeyboardBindings: DotNet NPRNetList_Of_T)
+    procedure DiscoverKeyboardBindings(var KeyboardBindings: List of [Text])
     var
         POSKeyboardBindingSetupTemp: Record "NPR POS Keyboard Bind. Setup" temporary;
     begin
@@ -119,7 +119,7 @@ codeunit 6150744 "NPR POS Keyboard Binding Mgt."
             until POSKeyboardBindingSetup.Next = 0;
     end;
 
-    local procedure BuildKeyCollection(var KeyboardBindings: DotNet NPRNetList_Of_T)
+    local procedure BuildKeyCollection(var KeyboardBindings: List of [Text])
     var
         POSKeyboardBindingSetup: Record "NPR POS Keyboard Bind. Setup";
     begin

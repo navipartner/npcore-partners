@@ -3,13 +3,14 @@ codeunit 6150703 "NPR POS JSON Management"
     var
         FrontEnd: Codeunit "NPR POS Front End Management";
         Scope: Dictionary of [Guid, Text];
-        Context: DotNet NPRNetDictionary_Of_T_U;
+        Context: JsonObject;
         Text001: Label 'Property "%1" does not exist in JSON object.\\%2.';
         JObject: JsonObject;
         Text003: Label 'JObject parser is not initialized, and an attempt was made to parse value "%1".';
         JObjectBefore: JsonObject;
         JRoot: JsonObject;
         Initialized: Boolean;
+        TextErrorUnsupportedOptionType: Label 'Attempting to add property %1 of non-serializable type %2 to JSON object';
 
     procedure InitializeJObjectParser(JObjectIn: JsonObject; FrontEndIn: Codeunit "NPR POS Front End Management")
     begin
@@ -347,31 +348,106 @@ codeunit 6150703 "NPR POS JSON Management"
 
     procedure SetContext("Key": Text; Value: Variant)
     begin
-        MakeSureContextExists();
-        if Context.ContainsKey(Key) then
+        if Context.Contains(Key) then
             Context.Remove(Key);
 
-        //-NPR5.37 [289442]
+        AddVariantValueToJsonObject(Context, Key, Value);
+    end;
+
+    procedure GetContextObject(): JsonObject
+    begin
+        exit(Context);
+    end;
+
+    procedure AddVariantValueToJsonObject(Target: JsonObject; PropertyName: Text; PropertyValue: Variant)
+    var
+        ValueAsText: Text;
+        ValueAsDate: Date;
+        ValueAsDateTime: DateTime;
+        ValueAsBoolean: Boolean;
+        ValueAsDecimal: Decimal;
+        ValueAsInteger: Integer;
+        ValueAsByte: Byte;
+        ValueAsChar: Char;
+        ValueAsBigInteger: BigInteger;
+        ValueAsGuid: Guid;
+        ValueAsJsonToken: JsonToken;
+
+    begin
         case true of
-            Value.IsDate:
-                Context.Add(Key, Format(Value, 0, 9));
+            PropertyValue.IsJsonArray() or PropertyValue.IsJsonObject() or PropertyValue.IsJsonToken() or propertyValue.IsJsonValue():
+                begin
+                    ValueAsJsonToken := PropertyValue;
+                    Target.Add(PropertyName, ValueAsJsonToken);
+                end;
+            PropertyValue.IsByte():
+                begin
+                    ValueAsByte := PropertyValue;
+                    Target.Add(PropertyName, ValueAsByte);
+                end;
+            PropertyValue.IsChar():
+                begin
+                    ValueAsChar := PropertyValue;
+                    Target.Add(PropertyName, ValueAsChar);
+                end;
+            PropertyValue.IsGuid():
+                begin
+                    ValueAsGuid := PropertyValue;
+                    Target.Add(PropertyName, ValueAsGuid);
+                end;
+            PropertyValue.IsDate():
+                begin
+                    ValueAsDate := PropertyValue;
+                    Target.Add(PropertyName, Format(ValueAsDate, 0, 9));
+                end;
+            PropertyValue.IsDateTime():
+                begin
+                    ValueAsDateTime := PropertyValue;
+                    Target.Add(PropertyName, ValueAsDateTime);
+                end;
+            PropertyValue.IsBigInteger():
+                begin
+                    ValueAsBigInteger := PropertyValue;
+                    Target.Add(PropertyName, ValueAsBigInteger);
+                end;
+            PropertyValue.IsText() or PropertyValue.IsCode() or PropertyValue.IsTextConstant():
+                begin
+                    ValueAsText := PropertyValue;
+                    Target.Add(PropertyName, ValueAsText);
+                end;
+            PropertyValue.IsBoolean():
+                begin
+                    ValueAsBoolean := PropertyValue;
+                    Target.Add(PropertyName, ValueAsBoolean);
+                end;
+            PropertyValue.IsDecimal():
+                begin
+                    ValueAsDecimal := PropertyValue;
+                    Target.Add(PropertyName, ValueAsDecimal);
+                end;
+            PropertyValue.IsInteger() or PropertyValue.IsOption():
+                begin
+                    ValueAsInteger := PropertyValue;
+                    Target.Add(PropertyName, ValueAsInteger);
+                end;
             else
-                Context.Add(Key, Value);
+                Error(TextErrorUnsupportedOptionType, PropertyName, GetDotNetType(PropertyValue));
+        end;
+    end;
+
+    procedure GetTokenFromPath(FromObject: JsonObject; Path: Text) Result: JsonToken;
+    var
+        PathParts: List of [Text];
+        PathPart: Text;
+        Token: JsonToken;
+    begin
+        PathParts := Path.Split('.');
+        Token := FromObject.AsToken();
+        foreach PathPart in PathParts do begin
+            FromObject := Token.AsObject();
+            FromObject.Get(PathPart, Token);
         end;
 
-        //Context.Add(Key,Value);
-        //+NPR5.37 [289442]
-    end;
-
-    procedure GetContextObject(var ContextOut: DotNet NPRNetDictionary_Of_T_U)
-    begin
-        MakeSureContextExists();
-        ContextOut := Context;
-    end;
-
-    local procedure MakeSureContextExists()
-    begin
-        if IsNull(Context) then
-            Context := Context.Dictionary();
+        Result := Token;
     end;
 }

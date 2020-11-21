@@ -15,7 +15,7 @@ codeunit 6150740 "NPR POS Method - Wysiwyg"
     local procedure OnWysiwygMethod(Method: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         JSON: Codeunit "NPR POS JSON Management";
-        Request: DotNet NPRNetJsonRequest;
+        Request: Codeunit "NPR Front-End: Generic";
         RequestMethod: Text;
         RequestId: Guid;
         Success: Boolean;
@@ -23,8 +23,7 @@ codeunit 6150740 "NPR POS Method - Wysiwyg"
         if Method <> 'Wysiwyg' then
             exit;
 
-        Request := Request.JsonRequest;
-        Request.Method := 'WysiwygResponse';
+        Request.SetMethod('WysiwygResponse');
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
         RequestMethod := JSON.GetString('method', true);
@@ -43,15 +42,15 @@ codeunit 6150740 "NPR POS Method - Wysiwyg"
                 Success := LookupPopup(Request, JSON, POSSession, FrontEnd);
         end;
         JSON.SetScopeRoot(true);
-        Request.Content.Add('requestId', JSON.GetString('requestId', true));
-        Request.Content.Add('success', Success);
+        Request.GetContent().Add('requestId', JSON.GetString('requestId', true));
+        Request.GetContent().Add('success', Success);
 
         FrontEnd.InvokeFrontEndMethod(Request);
 
         Handled := true;
     end;
 
-    local procedure SaveConfiguration(Request: DotNet NPRNetJsonRequest; JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"): Boolean
+    local procedure SaveConfiguration(Request: Interface "NPR Front-End Async Request"; JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"): Boolean
     var
         POSAction: Record "NPR POS Action";
         TargetType: Text;
@@ -225,7 +224,7 @@ codeunit 6150740 "NPR POS Method - Wysiwyg"
             POSMenuButton.Modify();
     end;
 
-    local procedure LookupAction(Request: DotNet NPRNetJsonRequest; JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"): Boolean
+    local procedure LookupAction(Request: Interface "NPR Front-End Async Request"; JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"): Boolean
     var
         POSAction: Record "NPR POS Action";
         POSActions: Page "NPR POS Actions";
@@ -237,13 +236,13 @@ codeunit 6150740 "NPR POS Method - Wysiwyg"
         if (ActionCode <> '') or Check then begin
             if POSSession.RetrieveSessionAction(ActionCode, POSAction) then begin
                 if Check then begin
-                    Request.Content.Add('checkOk', true);
-                    Request.Content.Add('actionCode', POSAction.Code);
+                    Request.GetContent().Add('checkOk', true);
+                    Request.GetContent().Add('actionCode', POSAction.Code);
                     exit(true);
                 end;
             end else begin
                 if Check then begin
-                    Request.Content.Add('checkOk', false);
+                    Request.GetContent().Add('checkOk', false);
                     exit(true);
                 end;
             end;
@@ -253,12 +252,12 @@ codeunit 6150740 "NPR POS Method - Wysiwyg"
         POSActions.SetRecord(POSAction);
         if POSActions.RunModal = ACTION::LookupOK then begin
             POSActions.GetRecord(POSAction);
-            Request.Content.Add('actionCode', POSAction.Code);
+            Request.GetContent().Add('actionCode', POSAction.Code);
             exit(true);
         end;
     end;
 
-    local procedure LookupItem(Request: DotNet NPRNetJsonRequest; JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"): Boolean
+    local procedure LookupItem(Request: Interface "NPR Front-End Async Request"; JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"): Boolean
     var
         Item: Record Item;
         Items: Page "Item List";
@@ -270,14 +269,14 @@ codeunit 6150740 "NPR POS Method - Wysiwyg"
         if (ItemNo <> '') or Check then begin
             if Item.Get(ItemNo) then begin
                 if Check then begin
-                    Request.Content.Add('checkOk', true);
-                    Request.Content.Add('itemNo', Item."No.");
-                    Request.Content.Add('itemDesc', Item.Description);
+                    Request.GetContent().Add('checkOk', true);
+                    Request.GetContent().Add('itemNo', Item."No.");
+                    Request.GetContent().Add('itemDesc', Item.Description);
                     exit(true);
                 end;
             end else begin
                 if Check then begin
-                    Request.Content.Add('checkOk', false);
+                    Request.GetContent().Add('checkOk', false);
                     exit(true);
                 end;
             end;
@@ -287,13 +286,13 @@ codeunit 6150740 "NPR POS Method - Wysiwyg"
         Items.SetRecord(Item);
         if Items.RunModal = ACTION::LookupOK then begin
             Items.GetRecord(Item);
-            Request.Content.Add('itemNo', Item."No.");
-            Request.Content.Add('itemDesc', Item.Description);
+            Request.GetContent().Add('itemNo', Item."No.");
+            Request.GetContent().Add('itemDesc', Item.Description);
             exit(true);
         end;
     end;
 
-    local procedure LookupCustomer(Request: DotNet NPRNetJsonRequest; JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"): Boolean
+    local procedure LookupCustomer(Request: Interface "NPR Front-End Async Request"; JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"): Boolean
     var
         Cust: Record Customer;
         Customers: Page "Customer List";
@@ -305,14 +304,14 @@ codeunit 6150740 "NPR POS Method - Wysiwyg"
         if (CustNo <> '') or Check then begin
             if Cust.Get(CustNo) then begin
                 if Check then begin
-                    Request.Content.Add('checkOk', true);
-                    Request.Content.Add('custNo', Cust."No.");
-                    Request.Content.Add('custName', Cust.Name);
+                    Request.GetContent().Add('checkOk', true);
+                    Request.GetContent().Add('custNo', Cust."No.");
+                    Request.GetContent().Add('custName', Cust.Name);
                     exit(true);
                 end;
             end else begin
                 if Check then begin
-                    Request.Content.Add('checkOk', false);
+                    Request.GetContent().Add('checkOk', false);
                     exit(true);
                 end;
             end;
@@ -322,13 +321,13 @@ codeunit 6150740 "NPR POS Method - Wysiwyg"
         Customers.SetRecord(Cust);
         if Customers.RunModal = ACTION::LookupOK then begin
             Customers.GetRecord(Cust);
-            Request.Content.Add('custNo', Cust."No.");
-            Request.Content.Add('custName', Cust.Name);
+            Request.GetContent().Add('custNo', Cust."No.");
+            Request.GetContent().Add('custName', Cust.Name);
             exit(true);
         end;
     end;
 
-    local procedure LookupParameters(Request: DotNet NPRNetJsonRequest; JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"): Boolean
+    local procedure LookupParameters(Request: Interface "NPR Front-End Async Request"; JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"): Boolean
     var
         POSAction: Record "NPR POS Action";
         POSParam: Record "NPR POS Action Parameter";
@@ -367,11 +366,11 @@ codeunit 6150740 "NPR POS Method - Wysiwyg"
             until TempParam.Next = 0;
 
         JObject.WriteTo(JsonText);
-        Request.Content.Add('parameters', JsonText);
+        Request.GetContent().Add('parameters', JsonText);
         exit(true);
     end;
 
-    local procedure LookupPopup(Request: DotNet NPRNetJsonRequest; JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"): Boolean
+    local procedure LookupPopup(Request: Interface "NPR Front-End Async Request"; JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"): Boolean
     var
         POSMenu: Record "NPR POS Menu";
         POSMenus: Page "NPR POS Menus";
@@ -383,14 +382,14 @@ codeunit 6150740 "NPR POS Method - Wysiwyg"
         if (MenuCode <> '') or Check then begin
             if POSMenu.Get(MenuCode) then begin
                 if Check then begin
-                    Request.Content.Add('checkOk', true);
-                    Request.Content.Add('menuCode', POSMenu.Code);
-                    Request.Content.Add('caption', POSMenu.Caption);
+                    Request.GetContent().Add('checkOk', true);
+                    Request.GetContent().Add('menuCode', POSMenu.Code);
+                    Request.GetContent().Add('caption', POSMenu.Caption);
                     exit(true);
                 end;
             end else begin
                 if Check then begin
-                    Request.Content.Add('checkOk', false);
+                    Request.GetContent().Add('checkOk', false);
                     exit(true);
                 end;
             end;
@@ -401,8 +400,8 @@ codeunit 6150740 "NPR POS Method - Wysiwyg"
         POSMenus.SetRecord(POSMenu);
         if POSMenus.RunModal = ACTION::LookupOK then begin
             POSMenus.GetRecord(POSMenu);
-            Request.Content.Add('menuCode', POSMenu.Code);
-            Request.Content.Add('caption', POSMenu.Caption);
+            Request.GetContent().Add('menuCode', POSMenu.Code);
+            Request.GetContent().Add('caption', POSMenu.Caption);
             exit(true);
         end;
     end;
