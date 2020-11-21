@@ -1,12 +1,5 @@
 table 6150705 "NPR POS Parameter Value"
 {
-    // NPR5.40/VB  /20180213 CASE 306347 Table completely redesigned, and code largely dropped and replaced with new code.
-    // NPR5.40/MMV /20180314 CASE 307453 Performance
-    // NPR5.40/MMV /20180321 CASE 308050 Added event OnGetParameterInfo()
-    // NPR5.43/THRO/20180607 CASE 318038 Added events OnLookupValue and OnValidateValue
-    // NPR5.50/VB  /20190205 CASE 338666 Introduced functionality to keep track of parameter filter state, for the purpose of passing specific parameters for workflow 2.0
-    // NPR5.54/ALPO/20200330 CASE 335834 Enable lookup and value translations for parameters of type boolean
-
     Caption = 'POS Parameter Value';
     DataClassification = CustomerContent;
 
@@ -75,12 +68,8 @@ table 6150705 "NPR POS Parameter Value"
         }
     }
 
-    fieldgroups
-    {
-    }
-
     var
-        OptionStringCache: DotNet NPRNetDictionary_Of_T_U;
+        OptionStringCache: JsonObject;
         ParamFilterIndicator: Boolean;
 
     procedure InitForMenuButton(MenuButton: Record "NPR POS Menu Button")
@@ -133,34 +122,30 @@ table 6150705 "NPR POS Parameter Value"
         OptionsCaption: Text;
         BaseOption: Text;
     begin
-        //-NPR5.43 [318038]
         OnValidateValue(Rec);
-        //+NPR5.43 [318038]
         Param."Data Type" := "Data Type";
         Param.Options := GetOptions();
-        //-NPR5.54 [335834]
         if Param."Data Type" = Param."Data Type"::Boolean then
             OptionsCaption := BoolOptionMLCaptions();
-        //+NPR5.54 [335834]
-        //-NPR5.40 [308050]
         OnGetParameterOptionStringCaption(Rec, OptionsCaption);
         if OptionsCaption <> '' then
             if TryGetBaseOptionStringValue(Param.Options, OptionsCaption, Value, BaseOption) then
                 Value := BaseOption;
-        //+NPR5.40 [308050]
         Param.Validate("Default Value", Value);
         Value := Param."Default Value";
     end;
 
-    procedure AddParameterToAction(Target: DotNet NPRNetAction)
+    procedure AddParameterToAction(Target: Interface "NPR IAction")
     var
         Param: Record "NPR POS Action Parameter";
-        OptionsDict: DotNet NPRNetDictionary_Of_T_U;
+        OptionsJson: JsonObject;
         Date: Date;
         Decimal: Decimal;
         "Integer": Integer;
         Boolean: Boolean;
         CacheKey: Text;
+        JsonMgt: Codeunit "NPR POS JSON Management";
+        OptionToken: JsonToken;
     begin
         case "Data Type" of
             "Data Type"::Boolean:
@@ -188,20 +173,15 @@ table 6150705 "NPR POS Parameter Value"
             "Data Type"::Option:
                 begin
                     Param.Options := GetOptions();
-                    //-NPR5.40 [307453]
-                    //      Param.GetOptionsDictionary(OptionsDict);
-                    //      Target.Parameters.Add('_option_' + Name,OptionsDict);
-                    if IsNull(OptionStringCache) then
-                        OptionStringCache := OptionStringCache.Dictionary();
                     CacheKey := StrSubstNo('Action_%1-Param_%2', "Action Code", Name);
-                    if OptionStringCache.ContainsKey(CacheKey) then begin
-                        Target.Parameters.Add('_option_' + Name, OptionStringCache.Item(CacheKey));
+                    if OptionStringCache.Contains(CacheKey) then begin
+                        OptionStringCache.Get(CacheKey, OptionToken);
+                        JsonMgt.AddVariantValueToJsonObject(Target.Parameters, '_option_' + Name, OptionToken.AsObject());
                     end else begin
-                        Param.GetOptionsDictionary(OptionsDict);
-                        Target.Parameters.Add('_option_' + Name, OptionsDict);
-                        OptionStringCache.Add(CacheKey, OptionsDict);
+                        Param.GetOptionsDictionary(OptionsJson);
+                        JsonMgt.AddVariantValueToJsonObject(Target.Parameters, '_option_' + Name, OptionsJson);
+                        OptionStringCache.Add(CacheKey, OptionsJson);
                     end;
-                    //+NPR5.40 [307453]
                     Target.Parameters.Add(Name, Param.GetOptionInt(Value));
                     Target.Content.Add('param_option_' + Name + 'originalValue', Value);
                 end;
@@ -252,11 +232,9 @@ table 6150705 "NPR POS Parameter Value"
         Param: Record "NPR POS Action Parameter";
     begin
         if Param.Get("Action Code", Name) then
-            //-NPR5.54 [335834]
             if Param."Data Type" = Param."Data Type"::Boolean then
                 exit(BoolOptionNames())
             else
-                //+NPR5.54 [335834]
                 exit(Param.Options);
     end;
 
@@ -264,27 +242,23 @@ table 6150705 "NPR POS Parameter Value"
     var
         TempRetailList: Record "NPR Retail List" temporary;
         POSActionParamMgt: Codeunit "NPR POS Action Param. Mgt.";
-        Parts: DotNet NPRNetArray;
+        Parts: List of [Text];
         Options: Text;
         "Part": Text;
         OptionsCaption: Text;
         Handled: Boolean;
     begin
-        //-NPR5.43 [318038]
         OnLookupValue(Rec, Handled);
         if Handled then
             exit;
-        //+NPR5.43 [318038]
         case "Data Type" of
             "Data Type"::Option:
                 begin
                     Options := GetOptions();
-                    //-NPR5.40 [308050]
                     OnGetParameterOptionStringCaption(Rec, OptionsCaption);
                     if OptionsCaption <> '' then
                         POSActionParamMgt.SplitString(OptionsCaption, Parts)
                     else
-                        //+NPR5.40 [308050]
                         POSActionParamMgt.SplitString(Options, Parts);
                     foreach Part in Parts do begin
                         TempRetailList.Number += 1;
@@ -293,7 +267,6 @@ table 6150705 "NPR POS Parameter Value"
                     end;
                 end;
 
-            //-NPR5.54 [335834]
             "Data Type"::Boolean:
                 begin
                     POSActionParamMgt.SplitString(BoolOptionMLCaptions(), Parts);
@@ -303,14 +276,12 @@ table 6150705 "NPR POS Parameter Value"
                         TempRetailList.Insert;
                     end;
                 end;
-            //+NPR5.54 [335834]
             else
                 exit;
         end;
 
         if TempRetailList.IsEmpty then
             exit;
-        //-NPR5.54 [335834]
         if Value <> '' then
             case "Data Type" of
                 "Data Type"::Boolean:
@@ -320,7 +291,6 @@ table 6150705 "NPR POS Parameter Value"
             end;
         if TempRetailList.FindFirst then;
         TempRetailList.SetRange(Choice);
-        //+NPR5.54 [335834]
 
         if PAGE.RunModal(PAGE::"NPR Retail List", TempRetailList) = ACTION::LookupOK then
             Validate(Value, TempRetailList.Choice);
@@ -348,7 +318,6 @@ table 6150705 "NPR POS Parameter Value"
         RecRef: RecordRef;
         PageBuilder: FilterPageBuilder;
     begin
-        //-NPR5.43 [318038]
         RecRef.Open(TableID);
         PageBuilder.AddTable(RecRef.Caption, RecRef.Number);
         if (ViewString <> '') and (TrySetView(RecRef, ViewString)) then
@@ -357,7 +326,6 @@ table 6150705 "NPR POS Parameter Value"
             ViewString := PageBuilder.GetView(RecRef.Caption, false);
         end;
         exit(ViewString);
-        //+NPR5.43 [318038]
     end;
 
     [TryFunction]
@@ -365,77 +333,60 @@ table 6150705 "NPR POS Parameter Value"
     var
         TypeHelper: Codeunit "Type Helper";
     begin
-        //-NPR5.40 [308050]
         BaseOption := SelectStr(TypeHelper.GetOptionNo(CaptionValue, OptionStringCaption) + 1, OptionString);
-        //+NPR5.40 [308050]
     end;
 
     [TryFunction]
     local procedure TrySetView(RecRef: RecordRef; FilterString: Text)
     begin
-        //-NPR5.43 [318038]
         RecRef.SetView(FilterString);
-        //+NPR5.43 [318038]
     end;
 
     procedure SetParamFilterIndicator()
     begin
-        //-NPR5.50 [338666]
         ParamFilterIndicator := true;
-        //+NPR5.50 [338666]
     end;
 
     procedure GetParamFilterIndicator(): Boolean
     begin
-        //-NPR5.50 [338666]
         exit(ParamFilterIndicator);
-        //+NPR5.50 [338666]
     end;
 
     [IntegrationEvent(false, false)]
     procedure OnGetParameterNameCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     begin
-        //-NPR5.40 [308050]
     end;
 
     [IntegrationEvent(false, false)]
     procedure OnGetParameterDescriptionCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     begin
-        //-NPR5.40 [308050]
     end;
 
     [IntegrationEvent(false, false)]
     procedure OnGetParameterOptionStringCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     begin
-        //-NPR5.40 [308050]
     end;
 
     [IntegrationEvent(false, false)]
     local procedure OnLookupValue(var POSParameterValue: Record "NPR POS Parameter Value"; Handled: Boolean)
     begin
-        //-NPR5.43 [318038]
     end;
 
     [IntegrationEvent(false, false)]
     local procedure OnValidateValue(var POSParameterValue: Record "NPR POS Parameter Value")
     begin
-        //-NPR5.43 [318038]
     end;
 
     local procedure BoolOptionNames(): Text
     begin
-        //-NPR5.54 [335834]
         exit('false,true');
-        //+NPR5.54 [335834]
     end;
 
     local procedure BoolOptionMLCaptions(): Text
     var
         BoolMLOptionList: Label 'false,true';
     begin
-        //-NPR5.54 [335834]
         exit(BoolMLOptionList);
-        //+NPR5.54 [335834]
     end;
 
     procedure GetOptionStringCaption(ParameterOptionStringCaption: Text): Text
@@ -444,14 +395,12 @@ table 6150705 "NPR POS Parameter Value"
         TypeHelper: Codeunit "Type Helper";
         OptionCaption: Text;
     begin
-        //-NPR5.54 [335834]
         POSActionParameter.Get("Action Code", Name);
 
         if TrySelectStr(TypeHelper.GetOptionNo(Value, POSActionParameter.Options), ParameterOptionStringCaption, OptionCaption) then
             exit(OptionCaption)
         else
             exit(Value);
-        //+NPR5.54 [335834]
     end;
 
     procedure GetBooleanStringCaption(): Text
@@ -459,20 +408,15 @@ table 6150705 "NPR POS Parameter Value"
         TypeHelper: Codeunit "Type Helper";
         OptionCaption: Text;
     begin
-        //-NPR5.54 [335834]
         if TrySelectStr(TypeHelper.GetOptionNo(Value, BoolOptionNames), BoolOptionMLCaptions, OptionCaption) then
             exit(OptionCaption)
         else
             exit(Value);
-        //+NPR5.54 [335834]
     end;
 
     [TryFunction]
     local procedure TrySelectStr(Ordinal: Integer; OptionString: Text; var OptionOut: Text)
     begin
-        //-NPR5.54 [335834]
         OptionOut := SelectStr(Ordinal + 1, OptionString);
-        //+NPR5.54 [335834]
     end;
 }
-

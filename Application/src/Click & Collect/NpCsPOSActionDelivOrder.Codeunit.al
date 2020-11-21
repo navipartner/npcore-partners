@@ -1,17 +1,5 @@
 codeunit 6151203 "NPR NpCs POSAction Deliv.Order"
 {
-    // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
-    // NPR5.51/MHA /20190717  CASE 344264 "Delivery Only (non stock)" changed to "From Store Stock"
-    // NPR5.51/MHA /20190718  CASE 362329 Updated StrSubStNo on DeliveryText in InsertDocumentReference()
-    // NPR5.51/MHA /20190821  CASE 364557 Delivery should also be possible from Posted Invoice
-    // NPR5.53/MHA /20191128  CASE 378895 Added Parameter 'Sorting'
-    // NPR5.55/MHA /20200526  CASE 406591 Added Data Binding for Processed Order count
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         Text000: Label 'Deliver Collect in Store Documents';
         Text001: Label 'Collect in Store';
@@ -31,12 +19,7 @@ codeunit 6151203 "NPR NpCs POSAction Deliv.Order"
 
     local procedure ActionVersion(): Text
     begin
-        //-NPR5.55 [406591]
         exit('1.2');
-        //+NPR5.55 [406591]
-        //-NPR5.53 [378895]
-        exit('1.1');
-        //+NPR5.53 [378895]
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', true, true)]
@@ -54,18 +37,13 @@ codeunit 6151203 "NPR NpCs POSAction Deliv.Order"
         Sender.RegisterWorkflowStep('select_document', 'respond();');
         Sender.RegisterWorkflowStep('deliver_document', 'if(context.entry_no) {respond();}');
         Sender.RegisterWorkflow(false);
-        //-NPR5.55 [406591]
         Sender.RegisterDataSourceBinding('BUILTIN_SALE');
         Sender.RegisterCustomJavaScriptLogic('enable', 'return row.getField("CollectInStore.ProcessedOrdersExists").rawValue;');
-        //+NPR5.55 [406591]
-
         Sender.RegisterOptionParameter('Location From', 'POS Store,Location Filter Parameter', 'POS Store');
         Sender.RegisterTextParameter('Location Filter', '');
         Sender.RegisterTextParameter('Delivery Text', Text006);
         Sender.RegisterTextParameter('Prepaid Text', Text008);
-        //-NPR5.53 [378895]
         Sender.RegisterOptionParameter('Sorting', 'Entry No.,Reference No.,Delivery expires at', 'Entry No.');
-        //+NPR5.53 [378895]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', true, true)]
@@ -169,7 +147,6 @@ codeunit 6151203 "NPR NpCs POSAction Deliv.Order"
             exit;
 
         NpCsDocument.Get(EntryNo);
-        //-NPR5.51 [364557]
         case NpCsDocument."Document Type" of
             NpCsDocument."Document Type"::Order:
                 begin
@@ -180,7 +157,6 @@ codeunit 6151203 "NPR NpCs POSAction Deliv.Order"
                     DeliverPostedInvoice(JSON, POSSession, NpCsDocument);
                 end;
         end;
-        //+NPR5.51 [364557]
     end;
 
     local procedure DeliverOrder(JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; NpCsDocument: Record "NPR NpCs Document")
@@ -191,7 +167,6 @@ codeunit 6151203 "NPR NpCs POSAction Deliv.Order"
         POSSaleLine: Codeunit "NPR POS Sale Line";
         PrepaidText: Text;
     begin
-        //-NPR5.51 [364557]
         SalesHeader.Get(SalesHeader."Document Type"::Order, NpCsDocument."Document No.");
         POSSession.GetSaleLine(POSSaleLine);
         SalesLine.SetRange("Document Type", SalesHeader."Document Type");
@@ -211,7 +186,6 @@ codeunit 6151203 "NPR NpCs POSAction Deliv.Order"
                 PrepaidText := Text008;
             DeliverPrepaymentLine(NpCsDocument, NpCsSaleLinePOSReference, PrepaidText, POSSaleLine);
         end;
-        //+NPR5.51 [364557]
     end;
 
     local procedure DeliverPostedInvoice(JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; NpCsDocument: Record "NPR NpCs Document")
@@ -222,7 +196,6 @@ codeunit 6151203 "NPR NpCs POSAction Deliv.Order"
         POSSaleLine: Codeunit "NPR POS Sale Line";
         PrepaidText: Text;
     begin
-        //-NPR5.51 [364557]
         SalesInvHeader.Get(NpCsDocument."Document No.");
         POSSession.GetSaleLine(POSSaleLine);
         SalesInvLine.SetRange("Document No.", SalesInvHeader."No.");
@@ -241,7 +214,6 @@ codeunit 6151203 "NPR NpCs POSAction Deliv.Order"
                 PrepaidText := Text008;
             DeliverPrepaymentLine(NpCsDocument, NpCsSaleLinePOSReference, PrepaidText, POSSaleLine);
         end;
-        //+NPR5.51 [364557]
     end;
 
     local procedure InsertDocumentReference(JSON: Codeunit "NPR POS JSON Management"; NpCsDocument: Record "NPR NpCs Document"; POSSaleLine: Codeunit "NPR POS Sale Line"; var NpCsSaleLinePOSReference: Record "NPR NpCs Sale Line POS Ref.")
@@ -257,9 +229,7 @@ codeunit 6151203 "NPR NpCs POSAction Deliv.Order"
         if NpCsSaleLinePOSReference.FindFirst then
             Error(Text009, NpCsDocument."Document Type", NpCsDocument."Document No.");
 
-        //-NPR5.51 [362329]
         DeliveryText := StrSubstNo(JSON.GetStringParameter('Delivery Text', false), NpCsDocument."Document Type", NpCsDocument."Reference No.");
-        //+NPR5.51 [362329]
         if DeliveryText = '' then
             DeliveryText := StrSubstNo(Text006, NpCsDocument."Document Type", NpCsDocument."Reference No.");
         SaleLinePOS.Init;
@@ -288,10 +258,8 @@ codeunit 6151203 "NPR NpCs POSAction Deliv.Order"
         NpCsSaleLinePOSReference2: Record "NPR NpCs Sale Line POS Ref.";
         SaleLinePOS: Record "NPR Sale Line POS";
     begin
-        //-NPR5.51 [344264]
         if not NpCsDocument."Store Stock" then
             exit;
-        //+NPR5.51 [344264]
         if NpCsDocument."Bill via" <> NpCsDocument."Bill via"::POS then
             exit;
 
@@ -371,10 +339,8 @@ codeunit 6151203 "NPR NpCs POSAction Deliv.Order"
     local procedure DeliverSalesLineGLAccount(NpCsDocument: Record "NPR NpCs Document"; SalesLine: Record "Sales Line"; POSSaleLine: Codeunit "NPR POS Sale Line"; var SaleLinePOS: Record "NPR Sale Line POS")
     begin
         SaleLinePOS.Init;
-        //-NPR5.51 [344264]
         if not NpCsDocument."Store Stock" then
             SaleLinePOS."Sale Type" := SaleLinePOS."Sale Type"::"Debit Sale";
-        //+NPR5.51 [344264]
         if NpCsDocument."Bill via" <> NpCsDocument."Bill via"::POS then
             SaleLinePOS."Sale Type" := SaleLinePOS."Sale Type"::"Debit Sale";
 
@@ -392,10 +358,8 @@ codeunit 6151203 "NPR NpCs POSAction Deliv.Order"
     local procedure DeliverSalesLineItem(NpCsDocument: Record "NPR NpCs Document"; SalesLine: Record "Sales Line"; POSSaleLine: Codeunit "NPR POS Sale Line"; var SaleLinePOS: Record "NPR Sale Line POS")
     begin
         SaleLinePOS.Init;
-        //-NPR5.51 [344264]
         if not NpCsDocument."Store Stock" then
             SaleLinePOS."Sale Type" := SaleLinePOS."Sale Type"::"Debit Sale";
-        //+NPR5.51 [344264]
         if NpCsDocument."Bill via" <> NpCsDocument."Bill via"::POS then
             SaleLinePOS."Sale Type" := SaleLinePOS."Sale Type"::"Debit Sale";
         SaleLinePOS.Type := SaleLinePOS.Type::Item;
@@ -415,7 +379,6 @@ codeunit 6151203 "NPR NpCs POSAction Deliv.Order"
         NpCsSaleLinePOSReference2: Record "NPR NpCs Sale Line POS Ref.";
         SaleLinePOS: Record "NPR Sale Line POS";
     begin
-        //-NPR5.51 [364557]
         case SalesInvLine.Type of
             SalesInvLine.Type::" ":
                 begin
@@ -445,24 +408,20 @@ codeunit 6151203 "NPR NpCs POSAction Deliv.Order"
         NpCsSaleLinePOSReference2."Document Type" := NpCsSaleLinePOSReference."Document Type";
         NpCsSaleLinePOSReference2."Document Line No." := SalesInvLine."Line No.";
         NpCsSaleLinePOSReference2.Insert;
-        //+NPR5.51 [364557]
     end;
 
     local procedure DeliverSalesInvLineComment(SalesInvLine: Record "Sales Invoice Line"; POSSaleLine: Codeunit "NPR POS Sale Line"; var SaleLinePOS: Record "NPR Sale Line POS")
     begin
-        //-NPR5.51 [364557]
         SaleLinePOS.Init;
         SaleLinePOS.Type := SaleLinePOS.Type::Comment;
         SaleLinePOS."No." := '*';
         SaleLinePOS.Description := SalesInvLine.Description;
         SaleLinePOS."Description 2" := SalesInvLine."Description 2";
         POSSaleLine.InsertLine(SaleLinePOS);
-        //+NPR5.51 [364557]
     end;
 
     local procedure DeliverSalesInvLineGLAccount(NpCsDocument: Record "NPR NpCs Document"; SalesInvLine: Record "Sales Invoice Line"; POSSaleLine: Codeunit "NPR POS Sale Line"; var SaleLinePOS: Record "NPR Sale Line POS")
     begin
-        //-NPR5.51 [364557]
         SaleLinePOS.Init;
         if not NpCsDocument."Store Stock" then
             SaleLinePOS."Sale Type" := SaleLinePOS."Sale Type"::"Debit Sale";
@@ -478,12 +437,10 @@ codeunit 6151203 "NPR NpCs POSAction Deliv.Order"
         SaleLinePOS."Unit of Measure Code" := SalesInvLine."Unit of Measure Code";
         SaleLinePOS."Discount %" := SalesInvLine."Line Discount %";
         POSSaleLine.InsertLine(SaleLinePOS);
-        //+NPR5.51 [364557]
     end;
 
     local procedure DeliverSalesInvLineItem(NpCsDocument: Record "NPR NpCs Document"; SalesInvLine: Record "Sales Invoice Line"; POSSaleLine: Codeunit "NPR POS Sale Line"; var SaleLinePOS: Record "NPR Sale Line POS")
     begin
-        //-NPR5.51 [364557]
         SaleLinePOS.Init;
         if not NpCsDocument."Store Stock" then
             SaleLinePOS."Sale Type" := SaleLinePOS."Sale Type"::"Debit Sale";
@@ -499,7 +456,6 @@ codeunit 6151203 "NPR NpCs POSAction Deliv.Order"
         SaleLinePOS."Unit of Measure Code" := SalesInvLine."Unit of Measure Code";
         SaleLinePOS."Discount %" := SalesInvLine."Line Discount %";
         POSSaleLine.InsertLine(SaleLinePOS);
-        //+NPR5.51 [364557]
     end;
 
     local procedure FindDocument(JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; var NpCsDocument: Record "NPR NpCs Document"): Boolean
@@ -540,9 +496,7 @@ codeunit 6151203 "NPR NpCs POSAction Deliv.Order"
             exit(false);
 
         NpCsDocument.SetRange("Reference No.", ReferenceNo);
-        //-NPR5.51 [364557]
         NpCsDocument.SetRange(Type, NpCsDocument.Type::"Collect in Store");
-        //+NPR5.51 [364557]
         exit(NpCsDocument.FindFirst);
     end;
 
@@ -558,7 +512,6 @@ codeunit 6151203 "NPR NpCs POSAction Deliv.Order"
         NpCsDocument.SetRange("Delivery Status", NpCsDocument."Delivery Status"::Ready);
         if LocationFilter <> '' then
             NpCsDocument.SetFilter("Location Code", LocationFilter);
-        //-NPR5.53 [378895]
         case JSON.GetIntegerParameter('Sorting', false) of
             Sorting::"Entry No.":
                 begin
@@ -573,7 +526,6 @@ codeunit 6151203 "NPR NpCs POSAction Deliv.Order"
                     NpCsDocument.SetCurrentKey("Delivery expires at");
                 end;
         end;
-        //+NPR5.53 [378895]
         if PAGE.RunModal(PAGE::"NPR NpCs Coll. Store Orders", NpCsDocument) = ACTION::LookupOK then
             exit(true);
 
@@ -601,16 +553,11 @@ codeunit 6151203 "NPR NpCs POSAction Deliv.Order"
         exit(LocationFilter);
     end;
 
-    local procedure "--- POS Data Source"()
-    begin
-    end;
-
     [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnGetDataSourceExtension', '', false, false)]
-    local procedure OnGetExtension(DataSourceName: Text; ExtensionName: Text; var DataSource: DotNet NPRNetDataSource0; var Handled: Boolean; Setup: Codeunit "NPR POS Setup")
+    local procedure OnGetExtension(DataSourceName: Text; ExtensionName: Text; var DataSource: Codeunit "NPR Data Source"; var Handled: Boolean; Setup: Codeunit "NPR POS Setup")
     var
-        DataType: DotNet NPRNetDataType;
+        DataType: Enum "NPR Data Type";
     begin
-        //-NPR5.55 [406591]
         if DataSourceName <> 'BUILTIN_SALE' then
             exit;
         if ExtensionName <> 'CollectInStore' then
@@ -618,18 +565,16 @@ codeunit 6151203 "NPR NpCs POSAction Deliv.Order"
 
         Handled := true;
 
-        DataSource.AddColumn('ProcessedOrdersExists', 'Processed Orders Exists', DataType.Boolean, false);
-        DataSource.AddColumn('ProcessedOrdersQty', 'Processed Orders Qty.', DataType.Integer, false);
-        //+NPR5.55 [406591]
+        DataSource.AddColumn('ProcessedOrdersExists', 'Processed Orders Exists', DataType::Boolean, false);
+        DataSource.AddColumn('ProcessedOrdersQty', 'Processed Orders Qty.', DataType::Integer, false);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnDataSourceExtensionReadData', '', false, false)]
-    local procedure OnReadData(DataSourceName: Text; ExtensionName: Text; var RecRef: RecordRef; DataRow: DotNet NPRNetDataRow0; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
+    local procedure OnReadData(DataSourceName: Text; ExtensionName: Text; var RecRef: RecordRef; DataRow: Codeunit "NPR Data Row"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         ProcessedOrdersExists: Boolean;
         LocationFilter: Text;
     begin
-        //-NPR5.55 [406591]
         if DataSourceName <> 'BUILTIN_SALE' then
             exit;
         if ExtensionName <> 'CollectInStore' then
@@ -644,7 +589,6 @@ codeunit 6151203 "NPR NpCs POSAction Deliv.Order"
             DataRow.Fields.Add('ProcessedOrdersQty', GetProcessedOrdersQty(LocationFilter))
         else
             DataRow.Fields.Add('ProcessedOrdersQty', 0);
-        //+NPR5.55 [406591]
     end;
 
     local procedure GetPOSMenuButtonLocationFilter(POSSession: Codeunit "NPR POS Session") LocationFilter: Text
@@ -655,7 +599,6 @@ codeunit 6151203 "NPR NpCs POSAction Deliv.Order"
         SalePOS: Record "NPR Sale POS";
         POSSale: Codeunit "NPR POS Sale";
     begin
-        //-NPR5.55 [406591]
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
         POSMenuButton.SetRange("Action Code", ActionCode());
@@ -682,37 +625,29 @@ codeunit 6151203 "NPR NpCs POSAction Deliv.Order"
         end;
 
         exit('');
-        //+NPR5.55 [406591]
     end;
 
     local procedure GetProcessedOrdersExists(LocationFilter: Text): Boolean
     var
         NpCsDocument: Record "NPR NpCs Document";
     begin
-        //-NPR5.55 [406591]
         SetProcessedFilter(LocationFilter, NpCsDocument);
         exit(NpCsDocument.FindFirst);
-        //+NPR5.55 [406591]
     end;
 
     local procedure GetProcessedOrdersQty(LocationFilter: Text): Integer
     var
         NpCsDocument: Record "NPR NpCs Document";
     begin
-        //-NPR5.55 [406591]
         SetProcessedFilter(LocationFilter, NpCsDocument);
         exit(NpCsDocument.Count);
-        //+NPR5.55 [406591]
     end;
 
     local procedure SetProcessedFilter(LocationFilter: Text; var NpCsDocument: Record "NPR NpCs Document")
     begin
-        //-NPR5.55 [406591]
         NpCsDocument.SetRange(Type, NpCsDocument.Type::"Collect in Store");
         NpCsDocument.SetRange("Processing Status", NpCsDocument."Processing Status"::Confirmed);
         NpCsDocument.SetRange("Delivery Status", NpCsDocument."Delivery Status"::Ready);
         NpCsDocument.SetFilter("Location Code", LocationFilter);
-        //+NPR5.55 [406591]
     end;
 }
-

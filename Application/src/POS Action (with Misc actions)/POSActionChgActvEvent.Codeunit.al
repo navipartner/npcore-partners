@@ -128,7 +128,7 @@ codeunit 6060161 "NPR POS Action: Chg.Actv.Event"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnDiscoverDataSourceExtensions', '', true, false)]
-    local procedure OnDiscoverDataSourceExtensions(DataSourceName: Text; Extensions: DotNet NPRNetList_Of_T)
+    local procedure OnDiscoverDataSourceExtensions(DataSourceName: Text; Extensions: List of [Text])
     begin
         if ThisDataSource <> DataSourceName then
             exit;
@@ -137,21 +137,21 @@ codeunit 6060161 "NPR POS Action: Chg.Actv.Event"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnGetDataSourceExtension', '', true, false)]
-    local procedure OnGetDataSourceExtension(DataSourceName: Text; ExtensionName: Text; var DataSource: DotNet NPRNetDataSource0; var Handled: Boolean; Setup: Codeunit "NPR POS Setup")
+    local procedure OnGetDataSourceExtension(DataSourceName: Text; ExtensionName: Text; var DataSource: Codeunit "NPR Data Source"; var Handled: Boolean; Setup: Codeunit "NPR POS Setup")
     var
-        DataType: DotNet NPRNetDataType;
+        DataType: Enum "NPR Data Type";
     begin
         if (DataSourceName <> ThisDataSource) or (ExtensionName <> ThisExtension) then
             exit;
 
         Handled := true;
 
-        DataSource.AddColumn(DataSourceField_EventNo(), DataSourceField_EventNo(), DataType.String, false);
-        DataSource.AddColumn(DataSourceField_EventDescription(), DataSourceField_EventDescription(), DataType.String, false);
+        DataSource.AddColumn(DataSourceField_EventNo(), DataSourceField_EventNo(), DataType::String, false);
+        DataSource.AddColumn(DataSourceField_EventDescription(), DataSourceField_EventDescription(), DataType::String, false);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnDataSourceExtensionReadData', '', true, false)]
-    local procedure OnDataSourceExtensionReadData(DataSourceName: Text; ExtensionName: Text; var RecRef: RecordRef; DataRow: DotNet NPRNetDataRow0; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
+    local procedure OnDataSourceExtensionReadData(DataSourceName: Text; ExtensionName: Text; var RecRef: RecordRef; DataRow: Codeunit "NPR Data Row"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         CashRegister: Record "NPR Register";
         Job: Record Job;

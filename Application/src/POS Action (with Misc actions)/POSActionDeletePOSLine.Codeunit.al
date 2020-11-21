@@ -1,19 +1,5 @@
 codeunit 6150796 "NPR POSAction: Delete POS Line"
 {
-    // NPR5.32.10/TSA /20170615  CASE 280993 Added parameter for ConfirmDialog
-    // NPR5.37.02/MMV /20171114  CASE 296478 Moved text constant to in-line constant
-    // NPR5.42/BHR /20180510   CASE 313914 Added Security functionality
-    // NPR5.45/TSA /20180803  CASE 323780 Added call to Sale.SetModified() to have the data driver refresh data
-    // NPR5.46/TSA /20180914  CASE 314603 Refactored the security functionality to use secure methods
-    // NPR5.48/MHA /20181121  CASE 330181 Added function DeleteAccessories()
-    // NPR5.53/TJ  /20191021  CASE 373234 Added new publisher OnBeforeDeleteSaleLinePOS()
-    // NPR5.54/TSA /20200205 CASE 387912 Made OnBeforeDeleteSaleLinePOS() public
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         ActionDescription: Label 'This built in function deletes sales or payment line from the POS';
         Title: Label 'Delete Line';
@@ -28,7 +14,7 @@ codeunit 6150796 "NPR POSAction: Delete POS Line"
     local procedure ActionVersion(): Text
     begin
 
-        exit('1.2'); //-+NPR5.46 [314603]
+        exit('1.2');
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
@@ -48,9 +34,7 @@ codeunit 6150796 "NPR POSAction: Delete POS Line"
                 RegisterWorkflowStep('confirm', '(param.ConfirmDialog == param.ConfirmDialog["Yes"]) ? confirm({title: labels.title, caption: confirmtext}).respond() : respond();');
                 RegisterWorkflow(false);
                 RegisterDataBinding();
-                //-NPR5.42 [313914]
                 RegisterOptionParameter('Security', 'None,SalespersonPassword,CurrentSalespersonPassword,SupervisorPassword', 'None');
-                //+NPR5.42 [313914]
                 RegisterOptionParameter('ConfirmDialog', 'No,Yes', 'No');
             end;
     end;
@@ -83,38 +67,26 @@ codeunit 6150796 "NPR POSAction: Delete POS Line"
         POSPaymentLine: Codeunit "NPR POS Payment Line";
         LinePOS: Record "NPR Sale Line POS";
         POSSale: Codeunit "NPR POS Sale";
-        CurrentView: DotNet NPRNetView0;
-        CurrentViewType: DotNet NPRNetViewType0;
-        ViewType: DotNet NPRNetViewType0;
+        CurrentView: Codeunit "NPR POS View";
     begin
         JSON.InitializeJObjectParser(Context, FrontEnd);
         POSSession.GetCurrentView(CurrentView);
 
-        if (CurrentView.Type.Equals(ViewType.Sale)) then begin
+        if (CurrentView.Type = CurrentView.Type::Sale) then begin
             POSSession.GetSaleLine(POSSaleLine);
-            //-NPR5.53 [373234]
             OnBeforeDeleteSaleLinePOS(POSSaleLine);
-            //+NPR5.53 [373234]
-            //-NPR5.48 [330181]
             DeleteAccessories(POSSaleLine);
-            //+NPR5.48 [330181]
             POSSaleLine.DeleteLine();
         end;
 
-        if (CurrentView.Type.Equals(ViewType.Payment)) then begin
+        if (CurrentView.Type = CurrentView.Type::Payment) then begin
             POSSession.GetPaymentLine(POSPaymentLine);
-            //+NPR5.42 [288119]
             POSPaymentLine.RefreshCurrent();
-            //-NPR5.42 [288119]
-
             POSPaymentLine.DeleteLine();
         end;
 
-        //-NPR5.45 [323780]
         POSSession.GetSale(POSSale);
         POSSale.SetModified();
-        //+NPR5.45 [323780]
-
         POSSession.RequestRefreshData();
     end;
 
@@ -123,7 +95,6 @@ codeunit 6150796 "NPR POSAction: Delete POS Line"
         SaleLinePOS: Record "NPR Sale Line POS";
         SaleLinePOS2: Record "NPR Sale Line POS";
     begin
-        //-NPR5.48 [330181]
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
         if SaleLinePOS.Type <> SaleLinePOS.Type::Item then
             exit;
@@ -142,7 +113,6 @@ codeunit 6150796 "NPR POSAction: Delete POS Line"
 
         SaleLinePOS2.SetSkipCalcDiscount(true);
         SaleLinePOS2.DeleteAll(false);
-        //-NPR5.48 [330181]
     end;
 
     [IntegrationEvent(false, false)]
@@ -150,4 +120,3 @@ codeunit 6150796 "NPR POSAction: Delete POS Line"
     begin
     end;
 }
-

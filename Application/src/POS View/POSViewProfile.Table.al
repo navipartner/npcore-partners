@@ -1,8 +1,5 @@
 table 6150651 "NPR POS View Profile"
 {
-    // NPR5.49/TJ /20190201 CASE 335739 New object
-    // NPR5.55/TSA /20200527 CASE 406862 Added "Initial Sales View", "After End-of-Sale View"
-
     Caption = 'POS View Profile';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR POS View Profiles";
@@ -44,7 +41,12 @@ table 6150651 "NPR POS View Profile"
             Caption = 'Client Date Separator';
             DataClassification = CustomerContent;
         }
-        field(20; Picture; BLOB)
+        field(14; "Culture Info (Serialized)"; Blob)
+        {
+            Caption = 'Culture Info (Serialized)';
+            DataClassification = CustomerContent;
+        }
+        field(20; Picture; Blob)
         {
             Caption = 'Picture';
             DataClassification = CustomerContent;
@@ -86,32 +88,150 @@ table 6150651 "NPR POS View Profile"
         }
     }
 
-    fieldgroups
-    {
-    }
-
     trigger OnInsert()
     begin
         DetectDecimalThousandsSeparator();
     end;
 
-    procedure DetectDecimalThousandsSeparator()
+    local procedure ToCamelCase(String: Text): Text;
     var
-        CultureInfo: DotNet NPRNetCultureInfo;
+        Builder: TextBuilder;
     begin
-        if "Client Formatting Culture ID" = '' then begin
-            "Client Formatting Culture ID" := CultureInfo.CurrentUICulture.Name;
+        // Some well-known properties that won't camel-case automatically
+        case String of
+            'amDesignator':
+                exit('AMDesignator');
+            'pmDesignator':
+                exit('PMDesignator');
         end;
 
-        if ("Client Decimal Separator" = '') or ("Client Thousands Separator" = '') or ("Client Date Separator" = '') then begin
-            CultureInfo := CultureInfo.GetCultureInfo("Client Formatting Culture ID");
-            if "Client Decimal Separator" = '' then
-                "Client Decimal Separator" := CultureInfo.NumberFormat.NumberDecimalSeparator;
-            if "Client Thousands Separator" = '' then
-                "Client Thousands Separator" := CultureInfo.NumberFormat.NumberGroupSeparator;
-            if "Client Date Separator" = '' then
-                "Client Date Separator" := CultureInfo.DateTimeFormat.DateSeparator;
+        Builder.Append(String.Substring(1, 1).ToUpper());
+        if (StrLen(String)) > 1 then
+            Builder.Append(String.Substring(2));
+        exit(Builder.ToText());
+    end;
+
+    local procedure ConvertPropertyNamesToCamelCase(Object: JsonObject);
+    var
+        Property: Text;
+        Token: JsonToken;
+        Element: JsonToken;
+    begin
+        foreach Property in Object.Keys do begin
+            Object.Get(Property, Token);
+            Object.Remove(Property);
+            Object.Add(ToCamelCase(Property), Token);
+            if (Token.IsObject()) then
+                ConvertPropertyNamesToCamelCase(Token.AsObject());
+            if (Token.IsArray()) then
+                foreach Element in Token.AsArray() do begin
+                    if Element.IsObject() then
+                        ConvertPropertyNamesToCamelCase(Element.AsObject());
+                end;
         end;
     end;
-}
 
+    [TryFunction]
+    local procedure GetLocaleFormatsFromAzure(var Formats: JsonObject);
+    var
+        Http: HttpClient;
+        Response: HttpResponseMessage;
+        CouldNotRetrieve: Label 'We could not retrieve the culture info due to an error.\\%1';
+        ResponseText: Text;
+    begin
+        //Error('TODO: This function requires an API url.');
+        // TODO: We need to sort-out the URL below. Right now, it's a local function api on my machine. No good.
+
+        if not Http.Get(StrSubstNo('https://navipartner-af-dotnet-1-0-0.azurewebsites.net/api/GetLocaleFormats?code=GaBaj0Iepwn2nIizkdMO%2FuozjcRPEg%2FwClLNl49cI4MU%2FoZYFQegww%3D%3D&locale=%1', "Client Formatting Culture ID"), Response) then begin
+            // We need to see the message unconditionally. Simply doing Error would not show anything, and would exit with false.
+            Message(CouldNotRetrieve, GetLastErrorText);
+            Error('');
+        end;
+
+        Response.Content.ReadAs(ResponseText);
+        if not Response.IsSuccessStatusCode() then begin
+            // We need to see the message unconditionally. Simply doing Error would not show anything, and would exit with false.
+            Message(CouldNotRetrieve, StrSubstNo('%1 %2', Response.HttpStatusCode, ResponseText));
+            Error('');
+        end;
+
+        Formats.ReadFrom(ResponseText);
+        ConvertPropertyNamesToCamelCase(Formats);
+
+        exit(true);
+    end;
+
+    [TryFunction]
+    local procedure GetLocaleFormatsFromAzureAndCacheThem(var CultureJson: JsonObject);
+    var
+        Stream: OutStream;
+    begin
+        GetLocaleFormatsFromAzure(CultureJson);
+
+        "Culture Info (Serialized)".CreateOutStream(Stream);
+        CultureJson.WriteTo(Stream);
+    end;
+
+    procedure DetectDecimalThousandsSeparator()
+    var
+        Culture: Codeunit DotNet_CultureInfo;
+        CultureJson: JsonObject;
+        JsonMgt: Codeunit "NPR POS JSON Management";
+    begin
+        if "Client Formatting Culture ID" = '' then
+            "Client Formatting Culture ID" := Culture.CurrentCultureName();
+
+        GetLocaleFormatsFromAzureAndCacheThem(CultureJson);
+
+        if ("Client Decimal Separator" = '') or ("Client Thousands Separator" = '') or ("Client Date Separator" = '') then begin
+            if "Client Decimal Separator" = '' then
+                "Client Decimal Separator" := JsonMgt.GetTokenFromPath(CultureJson, 'NumberFormat.NumberDecimalSeparator').AsValue().AsText();
+            if "Client Thousands Separator" = '' then
+                "Client Thousands Separator" := JsonMgt.GetTokenFromPath(CultureJson, 'NumberFormat.NumberGroupSeparator').AsValue().AsText();
+            if "Client Date Separator" = '' then
+                "Client Date Separator" := JsonMgt.GetTokenFromPath(CultureJson, 'DateFormat.DateSeparator').AsValue().AsText();
+        end;
+    end;
+
+    // Fallback, when web service is unavailable, default format information for da-DK is used
+    local procedure GetDefaultFormats() Formats: JsonObject;
+    var
+        NumberFormat: JsonObject;
+        DateFormat: JsonObject;
+        DayNames: JsonArray;
+    begin
+        Formats.Add('NumberFormat', NumberFormat);
+        Formats.Add('DateFormat', DateFormat);
+
+        NumberFormat.Add('NumberGroupSeparator', '.');
+        NumberFormat.Add('NumberDecimalSeparator', ',');
+        NumberFormat.Add('CurrencySymbol', 'kr.');
+        NumberFormat.Add('NumberDecimalDigits', 2);
+
+        DateFormat.Add('ShortTimePattern', 'HH:mm');
+        DateFormat.Add('ShortDatePattern', 'dd-MM-yyyy');
+        DayNames.ReadFrom('["søndag", "mandag", "tirsdag", "onsdag", "torsdag", "fredag", "lørdag"]');
+        DateFormat.Add('DayNames', DayNames);
+    end;
+
+    procedure GetLocaleFormats() Formats: JsonObject;
+    var
+        Stream: InStream;
+    begin
+        TestField("Client Formatting Culture ID");
+
+        if not "Culture Info (Serialized)".HasValue() then begin
+            if not GetLocaleFormatsFromAzureAndCacheThem(Formats) then begin
+                exit(GetDefaultFormats());
+            end;
+
+            Modify();
+            exit(Formats);
+        end;
+
+        CalcFields("Culture Info (Serialized)");
+        "Culture Info (Serialized)".CreateInStream(Stream);
+        Formats.ReadFrom(Stream);
+        exit(Formats);
+    end;
+}

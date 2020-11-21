@@ -1,15 +1,8 @@
 codeunit 6150720 "NPR POS Caption Management"
 {
-    // NPR5.44/JDH /20180731  CASE 323499 Changed all functions to be External
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         FrontEnd: Codeunit "NPR POS Front End Management";
-        Captions: DotNet NPRNetDictionary_Of_T_U;
+        Captions: JsonObject;
         Duplicate: Integer;
         Initialized: Boolean;
         Text001: Label 'Caption management has not been initialized, and an attempt was made to use it. This is a programming bug, not a user error.';
@@ -19,23 +12,22 @@ codeunit 6150720 "NPR POS Caption Management"
     procedure Initialize(var FrontEndIn: Codeunit "NPR POS Front End Management")
     begin
         FrontEnd := FrontEndIn;
-        Captions := Captions.Dictionary;
         Initialized := true;
     end;
 
-    procedure Finalize(CaptionsOut: DotNet NPRNetDictionary_Of_T_U)
+    procedure Finalize(var CaptionsOut: JsonObject)
     var
-        KeyValuePair: DotNet NPRNetKeyValuePair_Of_T_U;
+        CaptionKey: Text;
+        CaptionToken: JsonToken;
         DuplicateWarning: Text;
     begin
         FailIfNotInitialized();
 
-        if IsNull(CaptionsOut) then
-            exit;
-
         Duplicate := 0;
-        foreach KeyValuePair in Captions do
-            AddCaptionToCollection(CaptionsOut, KeyValuePair.Key, KeyValuePair.Value, false);
+        foreach CaptionKey in Captions.Keys() do begin
+            Captions.Get(CaptionKey, CaptionToken);
+            AddCaptionToCollection(CaptionsOut, CaptionKey, CaptionToken.AsValue().AsText(), false);
+        end;
 
         if Duplicate > 0 then begin
             DuplicateWarning := StrSubstNo(Text003, Duplicate);
@@ -50,9 +42,9 @@ codeunit 6150720 "NPR POS Caption Management"
             Error(Text001);
     end;
 
-    local procedure AddCaptionToCollection(Target: DotNet NPRNetDictionary_Of_T_U; CaptionId: Text; CaptionText: Text; RejectDuplicate: Boolean)
+    local procedure AddCaptionToCollection(Target: JsonObject; CaptionId: Text; CaptionValue: Text; RejectDuplicate: Boolean)
     begin
-        if Target.ContainsKey(CaptionId) then begin
+        if Target.Contains(CaptionId) then begin
             FrontEnd.ReportWarning(StrSubstNo(Text002, CaptionId), false);
             Duplicate += 1;
             if RejectDuplicate then
@@ -60,7 +52,7 @@ codeunit 6150720 "NPR POS Caption Management"
             Target.Remove(CaptionId);
         end;
 
-        Target.Add(CaptionId, CaptionText);
+        Target.Add(CaptionId, CaptionValue);
     end;
 
     procedure AddCaption(CaptionId: Text; CaptionText: Text)
@@ -74,4 +66,3 @@ codeunit 6150720 "NPR POS Caption Management"
         AddCaption(ActionCode + '.' + CaptionId, CaptionText);
     end;
 }
-

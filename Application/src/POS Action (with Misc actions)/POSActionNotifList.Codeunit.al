@@ -1,13 +1,5 @@
 codeunit 6150833 "NPR POS Action: Notif. List"
 {
-    // NPR5.38/CLVA/20170918 CASE 269792 Object Created
-    // NPR5.38/MMV /20171114  CASE 296478 Moved text constant to in-line constant
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         ActionDescription: Label 'This built in function opens the notification list page';
         Title: Label 'Notification List';
@@ -60,9 +52,6 @@ codeunit 6150833 "NPR POS Action: Notif. List"
     local procedure OpenNotificationPage(Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         JSON: Codeunit "NPR POS JSON Management";
-        CurrentView: DotNet NPRNetView0;
-        CurrentViewType: DotNet NPRNetViewType0;
-        ViewType: DotNet NPRNetViewType0;
         POSSale: Codeunit "NPR POS Sale";
         SalePOS: Record "NPR Sale POS";
         NotificationList: Page "NPR Notification List";
@@ -76,4 +65,3 @@ codeunit 6150833 "NPR POS Action: Notif. List"
         NotificationList.Run;
     end;
 }
-

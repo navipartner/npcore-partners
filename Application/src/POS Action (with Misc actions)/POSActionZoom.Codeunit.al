@@ -1,10 +1,5 @@
 codeunit 6150803 "NPR POSAction: Zoom"
 {
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         ActionDescription: Label 'Zoom a sales line.';
 
@@ -43,12 +38,11 @@ codeunit 6150803 "NPR POSAction: Zoom"
         JSON: Codeunit "NPR POS JSON Management";
         Line: Record "NPR Sale Line POS";
         SaleLine: Codeunit "NPR POS Sale Line";
-        CurrentView: DotNet NPRNetView0;
-        ViewType: DotNet NPRNetViewType0;
+        CurrentView: Codeunit "NPR POS View";
     begin
 
         POSSession.GetCurrentView(CurrentView);
-        if (not CurrentView.Type.Equals(ViewType.Sale)) then
+        if (CurrentView.Type <> CurrentView.Type::Sale) then
             exit;
 
         POSSession.GetSaleLine(SaleLine);
@@ -69,4 +63,3 @@ codeunit 6150803 "NPR POSAction: Zoom"
         exit('1.0');
     end;
 }
-

@@ -1,14 +1,5 @@
 codeunit 6150709 "NPR POS Action Param. Mgt."
 {
-    // NPR5.40/VB  /20180228 CASE 306347 This is a completely new object, replacing the old object that was dropped in this release.
-    // NPR5.40/MMV /20180309 CASE 307453 String performance
-    // NPR5.55/TSA /20200422 CASE 400734 Added GetParametersAsJson()
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         Text001: Label 'There are no action parameters to edit for %1, %2, and action %3 does not define any parameters to copy from.';
         Text002: Label 'There are no action parameters defined for %1, %2. Do you want to insert the default parameters and their values?';
@@ -108,19 +99,12 @@ codeunit 6150709 "NPR POS Action Param. Mgt."
             until ActionParam.Next = 0;
     end;
 
-    procedure SplitString(Text: Text; var Parts: DotNet NPRNetArray)
+    procedure SplitString(Text: Text; var Parts: List of [Text])
     var
         String: DotNet NPRNetString;
         Char: DotNet NPRNetString;
     begin
-        String := Text;
-        Char := ',';
-        //-NPR5.40 [307453]
-        // Separators := Separators.CreateInstance(GETDOTNETTYPE(Char),1);
-        // Separators.SetValue(Char,0);
-        // Parts := String.Split(Separators);
-        Parts := String.Split(Char.ToCharArray());
-        //+NPR5.40 [307453]
+        Parts := Text.Split(',');
     end;
 
     procedure RefreshParameters(RecordID: RecordID; "Code": Code[20]; FieldID: Integer; ActionCode: Code[20])
@@ -205,8 +189,6 @@ codeunit 6150709 "NPR POS Action Param. Mgt."
         JObject: JsonObject;
         JObjectTextValue: Text;
     begin
-
-        //-NPR5.55 [400734]
         JObject.ReadFrom('{}');
 
         ParamValue.FilterParameters(RecordID, FieldID);
@@ -217,7 +199,5 @@ codeunit 6150709 "NPR POS Action Param. Mgt."
 
         JObject.WriteTo(JObjectTextValue);
         exit(StrSubstNo('{"parameters" : %1}', JObjectTextValue));
-        //+NPR5.55 [400734]
     end;
 }
-

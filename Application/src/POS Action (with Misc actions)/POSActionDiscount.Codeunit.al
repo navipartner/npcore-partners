@@ -150,7 +150,7 @@ codeunit 6150792 "NPR POS Action - Discount"
         DiscountType: Option TotalAmount,TotalDiscountAmount,DiscountPercentABS,DiscountPercentREL,LineAmount,LineDiscountAmount,LineDiscountPercentABS,LineDiscountPercentREL,LineUnitPrice,ClearLineDiscount,ClearTotalDiscount,DiscountPercentExtra,LineDiscountPercentExtra;
         SalePOS: Record "NPR Sale POS";
         SaleLinePOS: Record "NPR Sale Line POS";
-        View: DotNet NPRNetView0;
+        View: Codeunit "NPR POS View";
         TotalPrice: Decimal;
         PresetMultiLineDiscTarget: Integer;
     begin

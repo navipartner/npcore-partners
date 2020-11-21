@@ -80,7 +80,7 @@ table 6014621 "NPR POS Web Font"
         Font.Code := Code;
     end;
 
-    procedure GetFontDotNet(var Font: DotNet NPRNetFont0)
+    procedure GetWebFont(Font: Interface "NPR Font Definition")
     var
         WoffStream: InStream;
         CssStream: InStream;
@@ -89,8 +89,6 @@ table 6014621 "NPR POS Web Font"
         Woff.CreateInStream(WoffStream);
         Css.CreateInStream(CssStream);
 
-        Font := Font.Font(Name, "Font Face", Prefix, CssStream, WoffStream);
-        Font.Code := Code;
+        Font.Initialize(Code, Name, "Font Face", Prefix, CssStream, WoffStream);
     end;
 }
-

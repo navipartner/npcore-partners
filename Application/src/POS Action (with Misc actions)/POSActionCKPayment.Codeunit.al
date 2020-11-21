@@ -1,14 +1,5 @@
 codeunit 6150850 "NPR POS Action: CK Payment"
 {
-    // NPR5.43/CLVA/20180307 CASE 291921 Object created
-    // NPR5.43/CLVA/20180205 CASE 308887 Removed numpad step
-    // NPR5.43/CLVA/20180529 CASE 316560 Removed CashKeeper UI when amout = 0
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         ActionDescription: Label 'This is a built-in action for CashKeeper Payments';
         Setup: Codeunit "NPR POS Setup";
@@ -40,12 +31,6 @@ codeunit 6150850 "NPR POS Action: CK Payment"
           Sender.Type::Generic,
           Sender."Subscriber Instances Allowed"::Multiple)
         then begin
-
-            //Sender.RegisterWorkflowStep ('Amount', 'context.capture_amount && numpad({title: context.amount_description, caption: labels.Amount, value: context.amounttocapture}).respond().cancel(abort);');
-            //NPR5.43-
-            //Sender.RegisterWorkflowStep ('Amount', 'if ((context.capture_amount) && (context.amounttocapture != 0)) { numpad({title: context.amount_description, caption: labels.Amount, value: context.amounttocapture}).respond().cancel(abort); }');
-            //NPR5.43+
-
             Sender.RegisterWorkflowStep('CreateTransaction', 'respond();');
             Sender.RegisterWorkflowStep('InvokeDevice', 'respond();');
             Sender.RegisterWorkflowStep('CheckTransactionResult', 'respond();');
@@ -74,15 +59,14 @@ codeunit 6150850 "NPR POS Action: CK Payment"
         PaidAmount: Decimal;
         SubTotal: Decimal;
         ReturnPaymentTypePOS: Record "NPR Payment Type POS";
-        CurrentView: DotNet NPRNetView0;
-        CurrentViewType: DotNet NPRNetViewType0;
+        CurrentView: Codeunit "NPR POS View";
         CashKeeperSetup: Record "NPR CashKeeper Setup";
     begin
         if not Action.IsThisAction(ActionCode()) then
             exit;
 
         POSSession.GetCurrentView(CurrentView);
-        if (CurrentView.Type.Equals(CurrentViewType.Sale)) then
+        if (CurrentView.Type = CurrentView.Type::Sale) then
             POSSession.ChangeViewPayment();
 
         POSSession.GetSetup(Setup);
@@ -137,31 +121,16 @@ codeunit 6150850 "NPR POS Action: CK Payment"
 
             'CreateTransaction':
                 begin
-                    //NPR5.43-
                     POSSession.ClearActionState();
-                    //NPR5.43+
 
                     PaymentTypeNo := JSON.GetString('paymenttypeno', true);
                     AmountToCapture := JSON.GetDecimal('amounttocapture', true);
-
-                    //NPR5.43-
-                    //      NumpadAmount := 0;
-                    //      IF AmountToCapture <> 0 THEN BEGIN
-                    //        JSON.SetScope ('$Amount', TRUE);
-                    //        NumpadAmount := JSON.GetDecimal('numpad', TRUE);
-                    //      END ELSE
-                    //        POSSession.ClearActionState();
                     NumpadAmount := AmountToCapture;
-                    //NPR5.43+
 
                     JSON.SetContext('TransactionRequest_EntryNo', '');
                     FrontEnd.SetActionContext(ActionCode, JSON);
 
-                    //NPR5.43-
-                    //      EFTHandled := CreateTransaction(POSSession,AmountToCapture,PaymentTypeNo,NumpadAmount);
                     EFTHandled := CreateTransaction(POSSession, AmountToCapture, PaymentTypeNo, NumpadAmount);
-                    //NPR5.43+
-
                 end;
 
             'InvokeDevice':
@@ -420,7 +389,6 @@ codeunit 6150850 "NPR POS Action: CK Payment"
         POSSession: Codeunit "NPR POS Session";
         StepTxt: Text;
     begin
-        //-NPR5.43 [316560]
         if CashKeeperTransaction.Amount = 0 then begin
             CashKeeperTransaction."Paid In Value" := 0;
             CashKeeperTransaction."Paid Out Value" := 0;
@@ -428,7 +396,6 @@ codeunit 6150850 "NPR POS Action: CK Payment"
             CashKeeperTransaction.Modify(true);
             exit;
         end;
-        //+NPR5.43 [316560]
 
         CashKeeperSetup.Get(CashKeeperTransaction."Register No.");
 
@@ -546,4 +513,3 @@ codeunit 6150850 "NPR POS Action: CK Payment"
             FrontEnd.ResumeWorkflow();
     end;
 }
-

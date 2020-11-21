@@ -1,13 +1,5 @@
 codeunit 6151282 "NPR SS Action: Delete POS Line"
 {
-    // 
-    // NPR5.54/TSA /20200205 CASE 387912 Initial Version
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         ActionDescription: Label 'This built in function deletes sales or payment line from the POS';
         Title: Label 'Delete Line';
@@ -16,13 +8,11 @@ codeunit 6151282 "NPR SS Action: Delete POS Line"
 
     local procedure ActionCode(): Text
     begin
-
         exit('SS-DELETE-LINE');
     end;
 
     local procedure ActionVersion(): Text
     begin
-
         exit('1.0');
     end;
 
@@ -49,7 +39,6 @@ codeunit 6151282 "NPR SS Action: Delete POS Line"
         POSSaleLine: Codeunit "NPR POS Sale Line";
         Qty: Integer;
     begin
-
         if not Action.IsThisAction(ActionCode) then
             exit;
 
@@ -65,13 +54,7 @@ codeunit 6151282 "NPR SS Action: Delete POS Line"
         LinePOS: Record "NPR Sale Line POS";
         POSSale: Codeunit "NPR POS Sale";
         POSActionDeletePOSLine: Codeunit "NPR POSAction: Delete POS Line";
-        CurrentView: DotNet NPRNetView0;
-        CurrentViewType: DotNet NPRNetViewType0;
-        ViewType: DotNet NPRNetViewType0;
     begin
-
-        // This function should be "not local" for testability
-
         POSSession.GetSaleLine(POSSaleLine);
         POSActionDeletePOSLine.OnBeforeDeleteSaleLinePOS(POSSaleLine);
         DeleteAccessories(POSSaleLine);
@@ -88,8 +71,6 @@ codeunit 6151282 "NPR SS Action: Delete POS Line"
         SaleLinePOS: Record "NPR Sale Line POS";
         SaleLinePOS2: Record "NPR Sale Line POS";
     begin
-
-        // This function should be "not local" for testability
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
         if SaleLinePOS.Type <> SaleLinePOS.Type::Item then
             exit;
@@ -110,4 +91,3 @@ codeunit 6151282 "NPR SS Action: Delete POS Line"
         SaleLinePOS2.DeleteAll(false);
     end;
 }
-
