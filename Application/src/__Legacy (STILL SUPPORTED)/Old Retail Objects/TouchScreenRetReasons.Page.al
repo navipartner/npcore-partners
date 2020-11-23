@@ -1,9 +1,8 @@
 page 6014534 "NPR TouchScreen: Ret. Reasons"
 {
-    // NPR4.15/TS/20151001 CASE 222137 Added Fields
-
     Caption = 'Return reasons';
     SourceTable = "Return Reason";
+    Editable = false;
 
     layout
     {
@@ -20,12 +19,16 @@ page 6014534 "NPR TouchScreen: Ret. Reasons"
                 {
                     ApplicationArea = All;
                 }
+                field("Default Location Code"; "Default Location Code")
+                {
+                    ApplicationArea = All;
+                }
+                field("Inventory Value Zero"; "Inventory Value Zero")
+                {
+                    ApplicationArea = All;
+                    Visible = false;
+                }
             }
         }
     }
-
-    actions
-    {
-    }
 }
-

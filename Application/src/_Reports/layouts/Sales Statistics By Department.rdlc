@@ -3444,6 +3444,9 @@ End Function
         <Field Name="LastYearShow">
           <DataField>LastYearShow</DataField>
         </Field>
+        <Field Name="SalesPerson">
+          <DataField>SalesPerson</DataField>
+        </Field>
         <Field Name="Number_FooterTotal">
           <DataField>Number_FooterTotal</DataField>
         </Field>

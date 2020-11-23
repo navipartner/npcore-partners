@@ -1,17 +1,5 @@
 codeunit 6150798 "NPR POS Action: Reverse Sale"
 {
-    // NPR5.37.02/MMV /20171114  CASE 296478 Moved text constant to in-line constant
-    // NPR5.38/ANEN /2017-12-11/296724 Added customer no on reverse
-    // NPR5.40/MMV /20180115 Added event for acting on sale reverse and validating external integrations.
-    // NPR5.49/TSA /20190218 CASE 342244 Added DeObfucation of salesticket number - fraud protection
-    // NPR5.49/TSA /20190319 CASE 342090 Added first check for full return
-    // NPR5.49/TSA /20190319 CASE 342090 Fixed a filtering issue
-    // NPR5.50/TSA /20190502 CASE 353680 Quantity Return Management is only supported when POS Entry is enabled
-    // NPR5.53/ALPO/20191218 CASE 382911 'DeObfuscateTicketNo' function moved to CU 6150629 to avoid code duplication
-    // NPR5.53/ALPO/20191218 CASE 387339 The sub-total on the POS Sales screen was not updated when using the POS Action.
-    // NPR5.55/ALPO/20200713 CASE 412184 Copy dimensions from POS Entry being reversed to current sale header
-
-
     trigger OnRun()
     begin
     end;
@@ -39,8 +27,7 @@ codeunit 6150798 "NPR POS Action: Reverse Sale"
 
     local procedure ActionVersion(): Text
     begin
-        exit('1.3');  //NPR5.55 [412184]
-        exit('1.2');
+        exit('1.3');
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
@@ -60,11 +47,8 @@ codeunit 6150798 "NPR POS Action: Reverse Sale"
                 RegisterWorkflow(true);
 
                 RegisterOptionParameter('ItemCondition', 'Mint,Used,Not Suitable for Resale', 'Used');
-
-                //-NPR5.49 [342244]
                 RegisterOptionParameter('ObfucationMethod', 'None,MI', 'None');
-                //+NPR5.49 [342244]
-                RegisterBooleanParameter('CopyHeaderDimensions', false);  //NPR5.55 [412184]
+                RegisterBooleanParameter('CopyHeaderDimensions', false);
             end;
     end;
 
@@ -109,17 +93,12 @@ codeunit 6150798 "NPR POS Action: Reverse Sale"
         case WorkflowStep of
             'receipt':
                 begin
-                    //FrontEnd.PauseWorkflow();
-                    //VerifyReceiptForReversal (Context, POSSession, FrontEnd);
-                    //FrontEnd.ResumeWorkflow();
                 end;
             'reason':
                 begin
-                    //xx FrontEnd.PauseWorkflow();
                     ReturnReasonCode := SelectReturnReason(Context, POSSession, FrontEnd);
                     JSON.SetContext('ReturnReasonCode', ReturnReasonCode);
                     FrontEnd.SetActionContext(ActionCode, JSON);
-                    //xx FrontEnd.ResumeWorkflow();
                 end;
             'handle':
                 begin
@@ -129,7 +108,6 @@ codeunit 6150798 "NPR POS Action: Reverse Sale"
                     POSSession.RequestRefreshData();
                 end;
         end;
-        //message ('Now in workflowstep %1 have data %2', WorkflowStep, Context.ToString ());
 
         Handled := true;
     end;
@@ -156,25 +134,15 @@ codeunit 6150798 "NPR POS Action: Reverse Sale"
         if (SalesTicketNo = '') then
             Error('That receipt is not valid for sales reversal.');
 
-        //-NPR5.49 [342244]
-        // AuditRoll.SETRANGE ("Sales Ticket No.", SalesTicketNo);
-        // AuditRoll.FINDFIRST ();
-
         POSEntryMgt.DeObfuscateTicketNo(JSON.GetIntegerParameter('ObfucationMethod', false), SalesTicketNo);
         AuditRoll.SetRange("Sales Ticket No.", SalesTicketNo);
         if (not AuditRoll.FindFirst()) then
             Error(NotFound, JSON.GetString('input', true));
-        //+NPR5.49 [342244]
 
-        //-NPR5.49 [342090]
-        //Validate for duplicate reverse sales
         if (IsCompleteReversal(SalesTicketNo)) then
             Error(NOTHING_TO_RETURN, SalesTicketNo);
-        //+NPR5.49 [342090]
 
-        //-NPR5.40 [293106]
         OnBeforeReverseSalesTicket(AuditRoll."Sales Ticket No.");
-        //+NPR5.40 [293106]
     end;
 
     local procedure CopySalesReceiptForReversal(Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
@@ -199,44 +167,31 @@ codeunit 6150798 "NPR POS Action: Reverse Sale"
         POSSale.GetCurrentSale(SalePOS);
         POSSession.GetSaleLine(POSSaleLine);
 
-        //-NPR5.49 [342244]
         POSEntryMgt.DeObfuscateTicketNo(JSON.GetIntegerParameter('ObfucationMethod', false), SalesTicketNo);
-        //+NPR5.49 [342244]
 
-        //-NPR5.38 [296724]
         SetCustomerOnReverseSale(SalePOS, SalesTicketNo);
-        //+NPR5.38 [296724]
 
-        RetailSalesCode.ReverseSalesTicket2(SalePOS, SalesTicketNo);
+        RetailSetup.Get();
+        JSON.SetScope('/', true);
+        ReturnReasonCode := JSON.GetString('ReturnReasonCode', RetailSetup."Reason for Return Mandatory");
+
+        RetailSalesCode.ReverseSalesTicket2(SalePOS, SalesTicketNo, ReturnReasonCode);
 
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
 
-        RetailSetup.Get();
-        if (RetailSetup."Reason for Return Mandatory") then begin
-            JSON.SetScope('/', true);
-            ReturnReasonCode := JSON.GetString('ReturnReasonCode', true);
-            SaleLinePOS.ModifyAll("Return Reason Code", ReturnReasonCode);
-        end;
-
         SaleLinePOS.ModifyAll("Return Sale Sales Ticket No.", SalesTicketNo);
-        //-NPR5.53 [387339]
         if not SaleLinePOS.IsEmpty then
             POSSaleLine.SetLast();
-        //+NPR5.53 [387339]
 
-        //-NPR5.49 [342090]
         if (ApplyMaxReturnQty(SalePOS, SalesTicketNo)) then
             Message(QTY_ADJUSTED);
-        //+NPR5.49 [342090]
 
-        //-NPR5.55 [412184]
         if JSON.GetBooleanParameter('CopyHeaderDimensions', false) then
             if CopyDimensions(SalePOS, SalesTicketNo) then begin
                 POSSale.Refresh(SalePOS);
                 POSSale.SetModified();
             end;
-        //+NPR5.55 [412184]
 
         POSSaleLine.ResendAllOnAfterInsertPOSSaleLine();
 
@@ -263,7 +218,6 @@ codeunit 6150798 "NPR POS Action: Reverse Sale"
         Customer: Record Customer;
         Contact: Record Contact;
     begin
-        //-NPR5.38 [296724]
         AuditRoll.SetRange("Sales Ticket No.", SalesTicketNo);
         AuditRoll.SetRange("Sale Type", AuditRoll."Sale Type"::Sale);
         AuditRoll.SetRange(Type, AuditRoll.Type::Item);
@@ -296,8 +250,6 @@ codeunit 6150798 "NPR POS Action: Reverse Sale"
         POSSalesLine: Record "NPR POS Sales Line";
         ItemQty: Decimal;
     begin
-
-        //-NPR5.49 [342090]
         PosRmaLine.SetFilter("Sales Ticket No.", '=%1', SalesTicketNo);
         if (PosRmaLine.IsEmpty()) then
             exit(false); // No return sales for this register yet
@@ -316,7 +268,6 @@ codeunit 6150798 "NPR POS Action: Reverse Sale"
 
         // When returned quantity is equal to (or exceeds) sold quantity, all items have been returned
         exit(ItemQty <= 0);
-        //+NPR5.49 [342090]
     end;
 
     local procedure ApplyMaxReturnQty(CurrentSalePOS: Record "NPR Sale POS"; OriginalSalesTicketNo: Code[20]): Boolean
@@ -325,16 +276,11 @@ codeunit 6150798 "NPR POS Action: Reverse Sale"
         AdjustedQty: Decimal;
         QtyIsAdjusted: Boolean;
     begin
-
-        //-NPR5.49 [342090]
         SaleLinePOS.SetFilter("Sales Ticket No.", '=%1', CurrentSalePOS."Sales Ticket No.");
         if (SaleLinePOS.FindSet()) then begin
             repeat
                 if ((SaleLinePOS.Quantity < 0) and (SaleLinePOS.Type = SaleLinePOS.Type::Item) and (SaleLinePOS."Sale Type" = SaleLinePOS."Sale Type"::Sale)) then begin
-                    //-NPR5.50 [353680]
-                    // AdjustedQty := GetRemainingQtyToReturn (OriginalSalesTicketNo, SaleLinePOS."Line No.") * -1;
                     AdjustedQty := GetRemainingQtyToReturn(OriginalSalesTicketNo, Abs(SaleLinePOS.Quantity), SaleLinePOS."Line No.") * -1;
-                    //+NPR5.50 [353680]
                     if (AdjustedQty <> SaleLinePOS.Quantity) then begin
                         SaleLinePOS.Validate(Quantity, AdjustedQty);
                         SaleLinePOS.Modify();
@@ -345,7 +291,6 @@ codeunit 6150798 "NPR POS Action: Reverse Sale"
         end;
 
         exit(QtyIsAdjusted);
-        //+NPR5.49 [342090]
     end;
 
     local procedure GetRemainingQtyToReturn(SalesTicketNo: Code[20]; OriginalQty: Decimal; LineNo: Integer) MaxQuantity: Decimal
@@ -353,15 +298,10 @@ codeunit 6150798 "NPR POS Action: Reverse Sale"
         POSSalesLine: Record "NPR POS Sales Line";
         PosRmaLine: Record "NPR POS RMA Line";
     begin
-
-        //-NPR5.49 [342090]
         POSSalesLine.SetFilter("Document No.", '=%1', SalesTicketNo);
         POSSalesLine.SetFilter("Line No.", '=%1', LineNo);
         if (not POSSalesLine.FindFirst()) then
-            //-NPR5.50 [353680]
-            // EXIT (0); // Original sales was not found, 0 is max to return
             exit(OriginalQty);
-        //+NPR5.50 [353680]
 
         MaxQuantity := POSSalesLine.Quantity;
 
@@ -379,8 +319,6 @@ codeunit 6150798 "NPR POS Action: Reverse Sale"
         // Either sales ticket is a return order or we have over returned already.
         if (MaxQuantity < 0) then
             MaxQuantity := 0;
-
-        //+NPR5.49 [342090]
     end;
 
     local procedure CopyDimensions(var CurrentSalePOS: Record "NPR Sale POS"; OriginalSalesTicketNo: Code[20]): Boolean
@@ -389,7 +327,6 @@ codeunit 6150798 "NPR POS Action: Reverse Sale"
         RetailSetup: Record "NPR NP Retail Setup";
         OldDimSetID: Integer;
     begin
-        //-NPR5.55 [412184]
         RetailSetup.Get;
         if not RetailSetup."Advanced Posting Activated" then begin
             Message(DimsNotCopied);
@@ -414,7 +351,6 @@ codeunit 6150798 "NPR POS Action: Reverse Sale"
             end;
 
         exit(false);
-        //+NPR5.55 [412184]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150706, 'OnBeforeSetQuantity', '', true, true)]
@@ -423,8 +359,6 @@ codeunit 6150798 "NPR POS Action: Reverse Sale"
         PosRmaLine: Record "NPR POS RMA Line";
         SaleLinePOSCopy: Record "NPR Sale Line POS";
     begin
-
-        //-NPR5.49 [342090]
         // Publisher in Codeunit POS Sale Line
         // This subscriber is intended to prevent returning more items them originally sold
         if (NewQuantity >= 0) then
@@ -443,10 +377,7 @@ codeunit 6150798 "NPR POS Action: Reverse Sale"
             SaleLinePOSCopy.SetFilter("Sale Type", '=%1', SaleLinePOSCopy."Sale Type"::Sale);
             SaleLinePOSCopy.SetFilter(Type, '=%1', SaleLinePOSCopy.Type::Item);
             SaleLinePOSCopy.SetFilter(Quantity, '<%1', 0);
-            //-NPR5.49 [342090]
-            //SaleLinePOSCopy.SETFILTER ("Return Sale Sales Ticket No.", '=%1', '');
             SaleLinePOSCopy.SetFilter("Return Sale Sales Ticket No.", '<>%1', '');
-            //+NPR5.49 [342090]
             if (not SaleLinePOSCopy.IsEmpty()) then
                 Error(COPIED_RECEIPT, SaleLinePOS."Sales Ticket No.");
             exit;
@@ -461,20 +392,10 @@ codeunit 6150798 "NPR POS Action: Reverse Sale"
             if ((NewQuantity + PosRmaLine."FF Total Qty Sold" + PosRmaLine."FF Total Qty Returned") < 0) then
                 Error(MAX_TO_RETURN, PosRmaLine."FF Total Qty Sold" + PosRmaLine."FF Total Qty Returned")
         end;
-        //+NPR5.49 [342090]
-
-        // SaleLinePOS.
-    end;
-
-    local procedure "--- Event Publisher"()
-    begin
     end;
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeReverseSalesTicket(SalesTicketNo: Code[20])
     begin
-        //-NPR5.40 [293106]
-        //+NPR5.40 [293106]
     end;
 }
-

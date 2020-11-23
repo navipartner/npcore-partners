@@ -1,8 +1,5 @@
 codeunit 6150819 "NPR POSAction: Rev. Cred.Sale"
 {
-    // NPR5.37.02/MMV /20171114  CASE 296478 Moved text constant to in-line constant
-
-
     trigger OnRun()
     begin
     end;
@@ -86,19 +83,11 @@ codeunit 6150819 "NPR POSAction: Rev. Cred.Sale"
 
 
         case WorkflowStep of
-            'receipt':
-                begin
-                    //FrontEnd.PauseWorkflow();
-                    //VerifyReceiptForReversal (Context, POSSession, FrontEnd);
-                    //FrontEnd.ResumeWorkflow();
-                end;
             'reason':
                 begin
-                    //xx FrontEnd.PauseWorkflow();
                     ReturnReasonCode := SelectReturnReason(Context, POSSession, FrontEnd);
                     JSON.SetContext('ReturnReasonCode', ReturnReasonCode);
                     FrontEnd.SetActionContext(ActionCode, JSON);
-                    //xx FrontEnd.ResumeWorkflow();
                 end;
             'handle':
                 begin
@@ -108,7 +97,6 @@ codeunit 6150819 "NPR POSAction: Rev. Cred.Sale"
                     POSSession.RequestRefreshData();
                 end;
         end;
-        //message ('Now in workflowstep %1 have data %2', WorkflowStep, Context.ToString ());
 
         Handled := true;
     end;
@@ -160,17 +148,15 @@ codeunit 6150819 "NPR POSAction: Rev. Cred.Sale"
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
         POSSession.GetSaleLine(POSSaleLine);
-        RetailSalesCode.ReverseSalesTicket2(SalePOS, SalesTicketNo);
+
+        RetailSetup.Get();
+        JSON.SetScope('/', true);
+        ReturnReasonCode := JSON.GetString('ReturnReasonCode', RetailSetup."Reason for Return Mandatory");
+
+        RetailSalesCode.ReverseSalesTicket2(SalePOS, SalesTicketNo, ReturnReasonCode);
 
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
-
-        RetailSetup.Get();
-        if (RetailSetup."Reason for Return Mandatory") then begin
-            JSON.SetScope('/', true);
-            ReturnReasonCode := JSON.GetString('ReturnReasonCode', true);
-            SaleLinePOS.ModifyAll("Return Reason Code", ReturnReasonCode);
-        end;
 
         SaleLinePOS.ModifyAll("Return Sale Sales Ticket No.", SalesTicketNo);
 
@@ -191,4 +177,3 @@ codeunit 6150819 "NPR POSAction: Rev. Cred.Sale"
         Error(ReasonRequired);
     end;
 }
-
