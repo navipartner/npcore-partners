@@ -2826,15 +2826,6 @@ codeunit 6059784 "NPR TM Ticket Management"
         until (TmpDetailedAccessEntries.Next() = 0);
     end;
 
-    local procedure ToMD5(ToMd5: Text) Hash: Text[250]
-    var
-        FormsAuthentication: DotNet NPRNetFormsAuthentication;
-    begin
-
-        Hash := FormsAuthentication.HashPasswordForStoringInConfigFile(ToMd5, 'MD5');
-        exit(LowerCase(Hash));
-    end;
-
     [IntegrationEvent(false, false)]
     local procedure OnDetailedTicketEvent(DetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry")
     begin
