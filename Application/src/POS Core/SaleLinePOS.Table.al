@@ -878,6 +878,24 @@ table 6014406 "NPR Sale Line POS"
             Caption = 'Return Reason Code';
             DataClassification = CustomerContent;
             TableRelation = "Return Reason";
+
+            trigger OnValidate()
+            var
+                ReturnReason: Record "Return Reason";
+            begin
+                if "Return Reason Code" <> '' then begin
+                    ReturnReason.Get("Return Reason Code");
+                    if (ReturnReason."Default Location Code" <> '') and ("Location Code" <> ReturnReason."Default Location Code") then
+                        Validate("Location Code", ReturnReason."Default Location Code");
+                    if ReturnReason."Inventory Value Zero" then
+                        Validate("Unit Cost (LCY)", 0);
+                end else begin
+                    GetPOSHeader;
+                    if "Location Code" <> SalePOS."Location Code" then
+                        Validate("Location Code", SalePOS."Location Code");
+                    CalculateCostPrice();
+                end;
+            end;
         }
         field(91; "Reason Code"; Code[10])
         {

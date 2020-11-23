@@ -1334,6 +1334,7 @@ table 6014407 "NPR Audit Roll"
 
         if SaleLinePOS."Return Sale Sales Ticket No." <> '' then
             "Reverseing Sales Ticket No." := SaleLinePOS."Return Sale Sales Ticket No.";
+        "Return Reason Code" := SaleLinePOS."Return Reason Code";
 
         "Serial No. not Created" := SaleLinePOS."Serial No. not Created";
     end;
@@ -1361,4 +1362,3 @@ table 6014407 "NPR Audit Roll"
             Validate("Shortcut Dimension 2 Code");
     end;
 }
-
