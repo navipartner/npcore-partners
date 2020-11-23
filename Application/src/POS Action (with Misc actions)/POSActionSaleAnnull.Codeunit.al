@@ -1,15 +1,5 @@
 codeunit 6150821 "NPR POS Action - Sale Annull."
 {
-    // NPR5.33/ANEN/20170620 CASE 259685 Refactor to use standard NAV functions, removing calls to old customized code
-    // NPR5.43/JDH /20180704 CASE 321334 removed calls to incorrect update functions. They caused an incorrect update of the screen
-    // NPR5.48/TSA /20190208 CASE 343578 Added Creation of the POS Entry on document reversal
-    // NPR5.48/TSA /20190208 CASE 343578 Added support for creating entry lines in contexts of a debet sale (reversing an invoice from the POS)
-    // NPR5.49/TSA /20190218 CASE 342244 Added DeObfucation of salesticket number - fraud protection
-    // NPR5.52/SARA/20190920 CASE 365901 Update Dimension code for Return Order
-    // NPR5.53/ALPO/20191218 CASE 382911 'DeObfuscateTicketNo' function moved to CU 6150629 to avoid code duplication
-    // NPR5.53/ALPO/20200110 CASE 384386 POS Action did not respect settings for default view after end of sale and always applied sale view. And did it without starting new transaction.
-
-
     trigger OnRun()
     begin
     end;
@@ -53,13 +43,12 @@ codeunit 6150821 "NPR POS Action - Sale Annull."
               Sender."Subscriber Instances Allowed"::Multiple)
             then begin
                 RegisterWorkflowStep('ReceiptNumber', 'input(labels.title, labels.receiptprompt).respond().cancel(abort);');
+                RegisterWorkflowStep('reason', 'context.PromptForReason && respond();');
+                RegisterWorkflowStep('handle', 'respond();');
                 RegisterWorkflow(true);
+
                 RegisterOptionParameter('DocumentType', 'CreditMemo,ReturnOrder', 'ReturnOrder');
-
-                //-NPR5.49 [342244]
                 RegisterOptionParameter('ObfucationMethod', 'None,MI', 'None');
-                //+NPR5.49 [342244]
-
             end;
     end;
 
@@ -78,6 +67,7 @@ codeunit 6150821 "NPR POS Action - Sale Annull."
         POSSession.GetSetup(Setup);
         SalespersonPurchaser.Get(Setup.Salesperson);
         RetailSetup.Get();
+        Context.SetContext('PromptForReason', RetailSetup."Reason for Return Mandatory");
         case SalespersonPurchaser."NPR Reverse Sales Ticket" of
             SalespersonPurchaser."NPR Reverse Sales Ticket"::No:
                 Error(NotAllowed, SalespersonPurchaser.Name);
@@ -91,23 +81,24 @@ codeunit 6150821 "NPR POS Action - Sale Annull."
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         JSON: Codeunit "NPR POS JSON Management";
-        ReturnReasonCode: Code[20];
     begin
         if not Action.IsThisAction(ActionCode) then
             exit;
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
 
-
         case WorkflowStep of
-            'ReceiptNumber':
+            'reason':
+                begin
+                    JSON.SetContext('ReturnReasonCode', SelectReturnReason());
+                    FrontEnd.SetActionContext(ActionCode, JSON);
+                end;
+            'handle':
                 begin
                     VerifyReceiptNumber(Context, POSSession, FrontEnd);
+                    POSSession.RequestRefreshData();
                 end;
         end;
-
-        //POSSession.ChangeViewSale ();  //NPR5.53 [384386]-revoked
-        POSSession.RequestRefreshData();
 
         Handled := true;
     end;
@@ -147,6 +138,7 @@ codeunit 6150821 "NPR POS Action - Sale Annull."
         RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt.";
         POSCreateEntry: Codeunit "NPR POS Create Entry";
         POSEntryMgt: Codeunit "NPR POS Entry Management";
+        ReturnReasonCode: Code[10];
     begin
         POSSession.GetSetup(POSSetup);
         NPRetailSetup.Get;
@@ -171,12 +163,15 @@ codeunit 6150821 "NPR POS Action - Sale Annull."
                 Error('Document Type value %1 is not valid.', JSON.GetString('DocumentType', true));
         end;
 
+        RetailSetup.Get();
+        if RetailSetup."Reason for Return Mandatory" then begin
+            JSON.SetScope('/', true);
+            ReturnReasonCode := JSON.GetString('ReturnReasonCode', true);
+        end;
+
         //Check ticket
         AuditRoll.Reset;
 
-        //-NPR5.49 [342244]
-        // AuditRoll.SETRANGE ("Sales Ticket No.", SalesTicketNo);
-        // AuditRoll.FINDFIRST ();
         POSEntryMgt.DeObfuscateTicketNo(JSON.GetIntegerParameter('ObfucationMethod', false), SalesTicketNo);
         AuditRoll.SetRange("Sales Ticket No.", SalesTicketNo);
         if (not AuditRoll.FindFirst()) then begin
@@ -184,7 +179,6 @@ codeunit 6150821 "NPR POS Action - Sale Annull."
             JSON.SetScope('$ReceiptNumber', true);
             Error(NotFound, JSON.GetString('input', true));
         end;
-        //+NPR5.49 [342244]
 
         AuditRoll.TestField("Sale Type", AuditRoll."Sale Type"::"Debit Sale");
         AuditRoll.TestField(Posted, true);
@@ -204,7 +198,7 @@ codeunit 6150821 "NPR POS Action - Sale Annull."
             exit;
 
         //Create return document and add lines
-        SalesDocNo := CreateReturnDocument(DocumentType, Customer."No.", PostedSalesInvoice."No.", POSSetup.Salesperson);
+        SalesDocNo := CreateReturnDocument(DocumentType, Customer."No.", PostedSalesInvoice."No.", POSSetup.Salesperson, ReturnReasonCode);
         if SalesDocNo = '' then
             Error(ERR_DocNotCreated);
         SalesHeader.Get(DocumentType, SalesDocNo);
@@ -230,17 +224,12 @@ codeunit 6150821 "NPR POS Action - Sale Annull."
         SalePOS."Retursalg Bonnummer" := SalesTicketNo;
         SalePOS.Modify;
 
-
-        //-NPR5.52[365901]
-        //Update Dimension code for Return Order
         SalesHeader."Shortcut Dimension 1 Code" := SalePOS."Shortcut Dimension 1 Code";
         SalesHeader."Shortcut Dimension 2 Code" := SalePOS."Shortcut Dimension 2 Code";
         SalesHeader."Dimension Set ID" := SalePOS."Dimension Set ID";
         SalesHeader.Modify(true);
-        //+NPR5.52[365901]
 
-        if not RetailSalesCode.ReverseSalesTicket(SalePOS) then begin //Has commit in it so let i be before we actually post and stuff
-                                                                      //Back it all
+        if not RetailSalesCode.ReverseSalesTicket(SalePOS, ReturnReasonCode) then begin //Has commit in it so let i be before we actually post and stuff
             SalePOS."Retursalg Bonnummer" := '';
             SalePOS.Modify;
             SalesHeader.Delete(true);
@@ -250,13 +239,10 @@ codeunit 6150821 "NPR POS Action - Sale Annull."
             SaleLinePOS.SetFilter("Sales Ticket No.", '=%1', SalePOS."Sales Ticket No.");
             if SaleLinePOS.FindSet then
                 SaleLinePOS.DeleteAll(true);
-
         end else begin
-
             SalesPost.Run(SalesHeader);
             RetailSalesDocMgt.CreateDocumentPostingAudit(SalesHeader, SalePOS, true);
 
-            //-NPR5.48 [343578]
             SaleLinePOS.Reset;
             SaleLinePOS.SetFilter("Register No.", '=%1', SalePOS."Register No.");
             SaleLinePOS.SetFilter("Sales Ticket No.", '=%1', SalePOS."Sales Ticket No.");
@@ -266,9 +252,7 @@ codeunit 6150821 "NPR POS Action - Sale Annull."
                     SaleLinePOS.Modify();
                 until (SaleLinePOS.Next() = 0);
             end;
-            //-NPR5.52[365901]
             if NPRetailSetup."Advanced Posting Activated" then
-                //+NPR5.52[365901]
                 POSCreateEntry.CreatePOSEntryForCreatedSalesDocument(SalePOS, SalesHeader, true);
 
             SaleLinePOS.Reset;
@@ -276,25 +260,15 @@ codeunit 6150821 "NPR POS Action - Sale Annull."
             SaleLinePOS.SetFilter("Sales Ticket No.", '=%1', SalePOS."Sales Ticket No.");
             if (SaleLinePOS.FindSet()) then
                 SaleLinePOS.DeleteAll(true);
-            //+NPR5.48 [343578]
 
             Message(TDOCPOST);
         end;
 
-        //-NPR5.43 [321334]
-        //POSSession.ChangeViewSale ();
-        //POSSession.GetSale(POSSale);
-        //POSSale.GetCurrentSale(SalePOS);
-        //POSSale.Refresh(SalePOS);
-        //+NPR5.43 [321334]
         POSSale.RefreshCurrent();
-        //-NPR5.43 [321334]
-        //POSSession.RequestRefreshData();
-        //+NPR5.43 [321334]
         POSSale.SelectViewForEndOfSale(POSSession);
     end;
 
-    local procedure CreateReturnDocument(DocumentType: Option Quote,"Order",Invoice,"Credit Memo","Blanket Order","Return Order"; SellToCustomerNo: Code[20]; PostedInvoiceNo: Code[20]; SalecPersonCode: Code[10]) DocumentNo: Code[20]
+    local procedure CreateReturnDocument(DocumentType: Option Quote,"Order",Invoice,"Credit Memo","Blanket Order","Return Order"; SellToCustomerNo: Code[20]; PostedInvoiceNo: Code[20]; SalecPersonCode: Code[10]; ReturnReasonCode: Code[10]) DocumentNo: Code[20]
     var
         SalesHeader: Record "Sales Header";
         Customer: Record Customer;
@@ -306,6 +280,8 @@ codeunit 6150821 "NPR POS Action - Sale Annull."
         MissingExCostRevLink: Boolean;
         SalespersonPurchaser: Record "Salesperson/Purchaser";
         SalesLine: Record "Sales Line";
+        ReturnReason: Record "Return Reason";
+        UpdateLocation: Boolean;
     begin
         Customer.Get(SellToCustomerNo);
         SalesInvoiceHeader.Get(PostedInvoiceNo);
@@ -314,12 +290,20 @@ codeunit 6150821 "NPR POS Action - Sale Annull."
         SalesInvoiceLine.FindSet;
         SalespersonPurchaser.Get(SalecPersonCode);
 
+        if ReturnReasonCode <> '' then begin
+            ReturnReason.Get(ReturnReasonCode);
+            UpdateLocation := ReturnReason."Default Location Code" <> '';
+        end else
+            UpdateLocation := false;
+
         //Create return doc
         SalesHeader.Init;
         SalesHeader.Validate("Document Type", DocumentType);
         SalesHeader.Validate("Sell-to Customer No.", Customer."No.");
         SalesHeader.Insert(true);
         SalesHeader.Validate("Salesperson Code", SalespersonPurchaser.Code);
+        if UpdateLocation then
+            SalesHeader.Validate("Location Code", ReturnReason."Default Location Code");
         SalesHeader.Modify(true);
 
         //Lines to return
@@ -340,7 +324,32 @@ codeunit 6150821 "NPR POS Action - Sale Annull."
         if SalesLine.IsEmpty then
             Error(ERR_NotApplied, PostedInvoiceNo);
 
+        if ReturnReasonCode <> '' then
+            if SalesLine.FindSet() then
+                repeat
+                    if UpdateLocation and
+                       ((SalesLine."Location Code" <> '') or (SalesLine.Type = SalesLine.Type::Item)) and
+                       (SalesLine."Location Code" <> ReturnReason."Default Location Code")
+                    then
+                        SalesLine.Validate("Location Code", ReturnReason."Default Location Code");
+                    if (SalesLine.Type <> SalesLine.Type::" ") and (SalesLine."No." <> '') then
+                        SalesLine."Return Reason Code" := ReturnReasonCode;
+                    if ReturnReason."Inventory Value Zero" then
+                        SalesLine.Validate("Unit Cost (LCY)", 0);
+                    SalesLine.Modify();
+                until SalesLine.Next() = 0;
+
         exit(SalesHeader."No.");
     end;
-}
 
+    local procedure SelectReturnReason(): Code[10];
+    var
+        ReturnReason: Record "Return Reason";
+        ReasonRequiredErr: Label 'You must choose a return reason.';
+    begin
+        if Page.RunModal(Page::"NPR TouchScreen: Ret. Reasons", ReturnReason) = Action::LookupOK then
+            exit(ReturnReason.Code);
+
+        Error(ReasonRequiredErr);
+    end;
+}
