@@ -8,6 +8,7 @@ codeunit 6150849 "NPR POS Action: EndOfDay V3"
         NextWorkflowStep: Option NA,JUMP_BALANCE_REGISTER,EFT_CLOSE;
         EndOfDayTypeOption: Option "X-Report","Z-Report",CloseWorkshift;
         MustBeManaged: Label 'The Close Workshift function is only intended for POS units that are managed for End-of-Day. Use X-Report or Z-Report instead.';
+        POSEntryPostIssue: Label 'There was an issue during posting of entries for POS Period Register %1.';
 
     local procedure ActionCode(): Text
     begin
@@ -566,7 +567,7 @@ codeunit 6150849 "NPR POS Action: EndOfDay V3"
                 end;
 
                 if (PostingError) then
-                    Error('There was an error during posting of entries for POS Period Register %1.\\%2', POSPeriodRegisterPostingFilter."No.", GetLastErrorText);
+                    Message(POSEntryPostIssue, POSPeriodRegisterPostingFilter."No.");
 
             until ((POSPeriodRegisterPostingFilter.Next() = 0) or (PostingError));
         end;

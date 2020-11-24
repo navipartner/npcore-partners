@@ -59,6 +59,7 @@ codeunit 6150615 "NPR POS Post Entries"
         POSPaymentLine: Record "NPR POS Payment Line";
         TempGenJournalLine: Record "Gen. Journal Line" temporary;
         GenJnlPostPreview: Codeunit "Gen. Jnl.-Post Preview";
+        POSEntryTemp: Record "NPR POS Entry" temporary;
     begin
         NPRetailSetup.Get;
         if not NPRetailSetup."Advanced POS Entries Activated" then
@@ -109,17 +110,17 @@ codeunit 6150615 "NPR POS Post Entries"
             CreateGenJournalLinesFromSalesTax(POSEntry, TempGenJournalLine);
 
             if StopOnErrorVar then begin
-                CheckandPostGenJournal(TempGenJournalLine, POSEntry);
+                CheckandPostGenJournal(TempGenJournalLine, POSEntry, POSEntryTemp);
                 UpdatePOSPostingLogEntry(POSPostingLogEntryNo, false);
-                MarkPOSEntries(0, POSPostingLogEntryNo, POSEntry);
+                MarkPOSEntries(0, POSPostingLogEntryNo, POSEntry, POSEntryTemp);
             end else begin
                 Commit;
-                if not CheckandPostGenJournal(TempGenJournalLine, POSEntry) then begin
+                if not CheckandPostGenJournal(TempGenJournalLine, POSEntry, POSEntryTemp) then begin
                     UpdatePOSPostingLogEntry(POSPostingLogEntryNo, true);
-                    MarkPOSEntries(1, POSPostingLogEntryNo, POSEntry);
+                    MarkPOSEntries(1, POSPostingLogEntryNo, POSEntry, POSEntryTemp);
                 end else begin
                     UpdatePOSPostingLogEntry(POSPostingLogEntryNo, false);
-                    MarkPOSEntries(0, POSPostingLogEntryNo, POSEntry);
+                    MarkPOSEntries(0, POSPostingLogEntryNo, POSEntry, POSEntryTemp);
                 end;
 
             end;
@@ -537,7 +538,7 @@ codeunit 6150615 "NPR POS Post Entries"
             until POSEntry.Next = 0;
     end;
 
-    local procedure CheckandPostGenJournal(var GenJournalLine: Record "Gen. Journal Line"; var POSEntry: Record "NPR POS Entry"): Boolean
+    local procedure CheckandPostGenJournal(var GenJournalLine: Record "Gen. Journal Line"; var POSEntry: Record "NPR POS Entry"; var POSEntryWithError: Record "NPR POS Entry"): Boolean
     var
         GenJnlCheckLine: Codeunit "Gen. Jnl.-Check Line";
     begin
@@ -553,50 +554,78 @@ codeunit 6150615 "NPR POS Post Entries"
                 until GenJournalLine.Next = 0;
             end;
         end;
-        if GenJournalLine.FindSet then begin
-            repeat
-                GenJournalLine.SetRange("Posting Date", GenJournalLine."Posting Date");
-                GenJournalLine.SetRange("Document No.", GenJournalLine."Document No.");
-                if not CheckandPostGenJournalDocument(GenJournalLine, POSEntry) then
-                    exit(false);
-                GenJournalLine.FindLast;
-                GenJournalLine.SetRange("Posting Date");
-                GenJournalLine.SetRange("Document No.");
-            until GenJournalLine.Next = 0;
-        end;
+        if not CheckOrPostGenJnlPerDocument(GenJournalLine, POSEntry, POSEntryWithError, 0) then
+            exit(false);
+        if not CheckOrPostGenJnlPerDocument(GenJournalLine, POSEntry, POSEntryWithError, 1) then
+            exit(false);
         exit(true);
     end;
 
-    local procedure CheckandPostGenJournalDocument(var GenJournalLine: Record "Gen. Journal Line"; var POSEntry: Record "NPR POS Entry"): Boolean
-    var
-        TempGenJournalLine2: Record "Gen. Journal Line" temporary;
-        NPRetailSetup: Record "NPR NP Retail Setup";
-        POSPostingProfile: Record "NPR POS Posting Profile";
-        POSEntry2: Record "NPR POS Entry";
-        GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line";
-        DifferenceAmount: Decimal;
+    local procedure CheckOrPostGenJnlPerDocument(var GenJournalLine: Record "Gen. Journal Line"; var POSEntry: Record "NPR POS Entry"; var POSEntryWithError: Record "NPR POS Entry"; Action: Option Check,Post) Success: Boolean
     begin
-        DifferenceAmount := 0;
-        if GenJournalLine.FindSet then
+        if GenJournalLine.FindSet() then begin
             repeat
-                DifferenceAmount := DifferenceAmount + GenJournalLine."Amount (LCY)" + GenJournalLine."VAT Amount (LCY)";
-            until GenJournalLine.Next = 0;
+                GenJournalLine.SetRange("Posting Date", GenJournalLine."Posting Date");
+                GenJournalLine.SetRange("Document No.", GenJournalLine."Document No.");
+                case Action of
+                    Action::Check:
+                        Success := CheckGenJournalDocument(GenJournalLine, POSEntry);
+                    Action::Post:
+                        Success := PostGenJournalDocument(GenJournalLine, POSEntry);
+                end;
+                if not Success then begin
+                    if GenJournalLine.FindSet() then
+                        repeat
+                            GenJournalLine.Mark(true); //marking entries that need to be deleted
+                        until GenJournalLine.NEXT = 0;
+                    POSEntryWithError."Entry No." := POSEntryWithError."Entry No." + 1;
+                    POSEntryWithError."Document No." := GenJournalLine."Document No.";
+                    POSEntryWithError.Insert();
+                end;
+                GenJournalLine.FindLast();
+                GenJournalLine.SetRange("Posting Date");
+                GenJournalLine.SetRange("Document No.");
+            until GenJournalLine.Next() = 0;
+        end;
+        if Action = Action::Check then begin
+            GenJournalLine.MarkedOnly(true);
+            if GenJournalLine.IsTemporary then
+                GenJournalLine.DeleteAll();
+            GenJournalLine.MarkedOnly(false);
+        end;
+        exit(POSEntryWithError.IsEmpty);
+    end;
 
-        if (Abs(DifferenceAmount) > 0) then begin
-            NPRetailSetup.Get;
-            POSEntry2.Copy(POSEntry);
-            if POSEntry2."POS Unit No." = '' then
-                if not POSEntry2.FindFirst then
-                    POSEntry2.Init;
-            NPRetailSetup.GetPostingProfile(POSEntry2."POS Unit No.", POSPostingProfile);
-            if (Abs(DifferenceAmount) > POSPostingProfile."Max. POS Posting Diff. (LCY)") then begin
+    local procedure CheckGenJournalDocument(var GenJournalLine: Record "Gen. Journal Line"; var POSEntry: Record "NPR POS Entry"): Boolean
+    var
+        DifferenceAmount: Decimal;
+        POSPostingProfile: Record "NPR POS Posting Profile";
+    begin
+        DifferenceAmount := CalculateDifferenceAmount(GenJournalLine);
+        if ABS(DifferenceAmount) > 0 then begin
+            GetPOSPostingProfile(POSEntry, POSPostingProfile);
+            if ABS(DifferenceAmount) > POSPostingProfile."Max. POS Posting Diff. (LCY)" then begin
+                POSPostingProfile.TestField("POS Posting Diff. Account");
                 ErrorText := StrSubstNo(TextImbalance, GenJournalLine.FieldCaption("Document No."), GenJournalLine."Document No.", GenJournalLine.FieldCaption("Posting Date"), GenJournalLine."Posting Date", DifferenceAmount);
                 if StopOnErrorVar then
                     Error(ErrorText)
                 else
-                    exit(false);
+                    exit(FALSE);
             end;
-            POSPostingProfile.TestField("POS Posting Diff. Account");
+        end;
+        exit(true);
+    end;
+
+    local procedure PostGenJournalDocument(var GenJournalLine: Record "Gen. Journal Line"; var POSEntry: Record "NPR POS Entry"): Boolean
+    var
+        POSPostingProfile: Record "NPR POS Posting Profile";
+        GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line";
+        DifferenceAmount: Decimal;
+    begin
+        DifferenceAmount := CalculateDifferenceAmount(GenJournalLine);
+
+        if (Abs(DifferenceAmount) > 0) then begin
+            GetPOSPostingProfile(POSEntry, POSPostingProfile);
             MakeGenJournalLine(
               Enum::"Gen. Journal Account Type"::"G/L Account",
               POSPostingProfile."POS Posting Diff. Account",
@@ -1129,7 +1158,23 @@ codeunit 6150615 "NPR POS Post Entries"
         Error(TextAccountTypeNotSupported, POSPostingSetup.FieldCaption("Account Type"), POSPostingSetup.TableCaption);
     end;
 
-    local procedure MarkPOSEntries(OptStatus: Option Posted,Error; POSPostingLogEntryNo: Integer; var POSEntry: Record "NPR POS Entry")
+    local procedure GetPOSPostingProfile(var POSEntry: Record "NPR POS Entry"; var POSPostingProfile: Record "NPR POS Posting Profile")
+    var
+        NPRetailSetup: Record "NPR NP Retail Setup";
+        POSEntry2: Record "NPR POS Entry";
+    begin
+        NPRetailSetup.Get();
+        POSEntry2.Copy(POSEntry);
+        if POSEntry2."POS Unit No." = '' then
+            if not POSEntry2.FindFirst() then
+                POSEntry2.Init();
+        NPRetailSetup.GetPostingProfile(POSEntry2."POS Unit No.", POSPostingProfile);
+    end;
+
+    local procedure MarkPOSEntries(OptStatus: Option Posted,Error; POSPostingLogEntryNo: Integer; var POSEntry: Record "NPR POS Entry"; var POSEntryWithError: Record "NPR POS Entry")
+    var
+        ProceedWithUpdate: Boolean;
+        POSPeriodRegister: Record "NPR POS Period Register";
     begin
         if POSEntry.FindSet then
             repeat
@@ -1141,7 +1186,17 @@ codeunit 6150615 "NPR POS Post Entries"
                             end;
                         OptStatus::Error:
                             begin
-                                POSEntry.Validate("Post Entry Status", POSEntry."Post Entry Status"::"Error while Posting");
+                                //if posting is done in compressed state per Register Period, we're updating all the entries as error
+                                //if compressed by POS Entry or uncompressed, we're updating that specific pos entry as error
+                                POSPeriodRegister.Get(POSEntry."POS Period Register No.");
+                                POSEntryWithError.SetRange("Document No.", POSPeriodRegister."Document No.");
+                                ProceedWithUpdate := not POSEntryWithError.IsEmpty;
+                                if not ProceedWithUpdate then begin
+                                    POSEntryWithError.SetRange("Document No.", POSEntry."Document No.");
+                                    ProceedWithUpdate := not POSEntryWithError.IsEmpty;
+                                end;
+                                if ProceedWithUpdate then
+                                    POSEntry.Validate("Post Entry Status", POSEntry."Post Entry Status"::"Error while Posting");
                             end;
                     end;
                     POSEntry."POS Posting Log Entry No." := POSPostingLogEntryNo;
@@ -1626,6 +1681,14 @@ codeunit 6150615 "NPR POS Post Entries"
         GenJournalLine.Modify;
     end;
 
+    local procedure CalculateDifferenceAmount(var GenJournalLine: Record "Gen. Journal Line") DifferenceAmount: Decimal
+    begin
+        if GenJournalLine.FindSet() then
+            repeat
+                DifferenceAmount := DifferenceAmount + GenJournalLine."Amount (LCY)" + GenJournalLine."VAT Amount (LCY)";
+            until GenJournalLine.Next() = 0;
+        exit(DifferenceAmount);
+    end;
     //--- Subscribers ---
 
     [EventSubscriber(ObjectType::Table, 45, 'OnAfterModifyEvent', '', true, true)]
