@@ -150,6 +150,7 @@ codeunit 6150710 "NPR POS Data Management"
         if DataSource.HasExtensions() then begin
             DataSource.GetExtensions(Extensions);
             foreach Extension in Extensions do begin
+                Clear(ExtensionDataRow);
                 ExtensionDataRow.Constructor(DataRow.Position);
                 Handled := false;
                 OnDataSourceExtensionReadData(DataSource.Id, Extension, RecRef, ExtensionDataRow, POSSession, FrontEnd, Handled);
