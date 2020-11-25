@@ -1,6 +1,8 @@
 codeunit 6014626 "NPR .NET Assembly Resolver"
 {
     SingleInstance = true;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'This object will be removed after all DotNet dependencies are cleaned from project';
 
     trigger OnRun()
     begin
