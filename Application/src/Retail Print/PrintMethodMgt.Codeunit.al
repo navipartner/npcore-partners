@@ -52,11 +52,11 @@ codeunit 6014582 "NPR Print Method Mgt."
         end;
     end;
 
-    procedure PrintViaEpsonWebService(PrinterName: Text; SlavePrinterName: Text; PrintBytes: Text; TargetEncoding: Text)
+    procedure PrintViaEpsonWebService(PrinterName: Text; SlavePrinterName: Text; PrintBytes: Text; TargetEncoding: TextEncoding; CodePage: Integer)
     var
         WebPrintMgt: Codeunit "NPR RP Epson Web Print Mgt.";
     begin
-        WebPrintMgt.CreatePrintJob(PrinterName, SlavePrinterName, PrintBytes, TargetEncoding);
+        WebPrintMgt.CreatePrintJob(PrinterName, SlavePrinterName, PrintBytes, TargetEncoding, CodePage);
     end;
 
     procedure PrintViaGoogleCloud(PrinterID: Text; var Stream: DotNet NPRNetMemoryStream; ContentType: Text; ObjectType: Option "Report","Codeunit"; ObjectID: Integer): Boolean

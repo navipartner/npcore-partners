@@ -10,15 +10,6 @@ codeunit 6014548 "NPR RP Line Printer Interf."
     // If you are wondering why not just use a handled pattern with static instead of manual subscribers:
     // these publishers can be called thousand of times within loops. This way there is the least overhead.
     // If NAV ever gets a proper inheritance feature then refactor this codeunit to use it instead.
-    // 
-    // NPR5.32/MMV /20160603 CASE 241995 Retail Print 2.0
-    // NPR5.32.10/MMV /20170613 CASE  270885 Only unbind bound device libraries in dispose(). This is necessary as of NAV 2016 CU16 as UNBINDSUBSCRIPTION has a bug: Even when return value is handled it still
-    //                                    overwrites GETLASTERRORTEXT which breaks an assumption made in another NPR module.
-    // NPR5.34/MMV /20170724 CASE 284505 Fixed non-robust dispose() unbinds.
-    //                                   Added missing bind variables to GetDeviceList().
-    // NPR5.34.02/MMV /20170816 CASE 287060 Fixed invalid unbound call.
-    // NPR5.37/MMV /20171002 CASE 269767 Added ripac device library.
-    // NPR5.54/MITH/20200129 CASE 369235 Added Boca Device Library.
 
     SingleInstance = true;
 
@@ -48,14 +39,10 @@ codeunit 6014548 "NPR RP Line Printer Interf."
                 EpsonVBound := BindSubscription(EpsonVCommandLibrary);
             BixolonDispCommandLibrary.IsThisDevice(PrinterDevice):
                 BixolonBound := BindSubscription(BixolonDispCommandLibrary);
-            //-NPR5.37 [269767]
             RipacCommandLibrary.IsThisDevice(PrinterDevice):
                 RipacBound := BindSubscription(RipacCommandLibrary);
-            //+NPR5.37 [269767]
-            //-NPR5.54
             BocaCommandLibrary.IsThisDevice(PrinterDevice):
                 BocaBound := BindSubscription(BocaCommandLibrary);
-            //+NPR5.54
             else
                 Error(Error_NoHandler, PrinterDevice);
         end;
@@ -71,14 +58,10 @@ codeunit 6014548 "NPR RP Line Printer Interf."
             UnbindSubscription(EpsonVCommandLibrary);
         if BixolonBound then
             UnbindSubscription(BixolonDispCommandLibrary);
-        //-NPR5.37 [269767]
         if RipacBound then
             UnbindSubscription(RipacCommandLibrary);
-        //+NPR5.37 [269767]
-        //-NPR5.54
         if BocaBound then
             UnbindSubscription(BocaCommandLibrary);
-        //+NPR5.54
 
         ClearAll;
     end;
@@ -90,20 +73,12 @@ codeunit 6014548 "NPR RP Line Printer Interf."
 
         EpsonVBound := BindSubscription(EpsonVCommandLibrary);
         BixolonBound := BindSubscription(BixolonDispCommandLibrary);
-        //-NPR5.37 [269767]
         RipacBound := BindSubscription(RipacCommandLibrary);
-        //+NPR5.37 [269767]
-        //-NPR5.54
         BocaBound := BindSubscription(BocaCommandLibrary);
-        //+NPR5.54
 
         OnBuildDeviceList(tmpRetailList);
 
         Dispose();
-    end;
-
-    local procedure "// Create Job"()
-    begin
     end;
 
     [IntegrationEvent(false, false)]
@@ -123,10 +98,6 @@ codeunit 6014548 "NPR RP Line Printer Interf."
 
     [IntegrationEvent(false, false)]
     procedure OnEndJob()
-    begin
-    end;
-
-    local procedure "// Aux"()
     begin
     end;
 
@@ -152,6 +123,11 @@ codeunit 6014548 "NPR RP Line Printer Interf."
 
     [IntegrationEvent(false, false)]
     procedure OnGetTargetEncoding(var TargetEncoding: Text)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    procedure OnGetTargetEncodingWithCodePage(var TargetEncoding: TextEncoding; var CodePage: Integer)
     begin
     end;
 
