@@ -1,36 +1,29 @@
 codeunit 6014539 "NPR RP Epson Web Print Mgt."
 {
-    // NPR4.15/MMV/20151001 CASE 223893 Created CU for use with web service printing
-    // NPR5.20/MMV/20160224 CASE 233229 Added function CreatePrintJob()
-    // NPR5.32/MMV /20170425 CASE 241995 Retail Print 2.0
-
-
     trigger OnRun()
     begin
     end;
 
-    procedure CreatePrintJob(PrinterName: Text[250]; SlavePrinterName: Text[250]; PrintString: Text; TargetEncoding: Text)
+    procedure CreatePrintJob(PrinterName: Text[250]; SlavePrinterName: Text[250]; PrintString: Text; TargetEncoding: TextEncoding; CodePage: Integer)
     var
         WebPrintBuffer: Record "NPR Web Print Buffer";
-        OutStream: OutStream;
-        Hex: Text;
-        HexBuffer: Text;
-        XML: Text;
-        i: Integer;
         Encoding: DotNet NPRNetEncoding;
         ByteArray: DotNet NPRNetArray;
         BitConverter: DotNet NPRNetBitConverter;
         Regex: DotNet NPRNetRegex;
+        Base64Convert: Codeunit "Base64 Convert";
+        OutStr: OutStream;
+        Hex: Text;
+        HexBuffer: Text;
+        XML: Text;
+        i: Integer;
     begin
         if StrPos(PrinterName, 'EpsonW') > 0 then begin
-            //Convert PrintString to hex representation (without '0x') of the byte values.
-            Encoding := Encoding.GetEncoding(TargetEncoding);
-            ByteArray := Encoding.GetBytes(PrintString);
-            HexBuffer := BitConverter.ToString(ByteArray);
-            HexBuffer := Regex.Replace(HexBuffer, '-', '');
+            Base64Convert.ToBase64(PrintString, TargetEncoding, CodePage);
+            PrintString := PrintString.Replace('-', '');
 
-            WebPrintBuffer.Init;
-            WebPrintBuffer.Insert;
+            WebPrintBuffer.Init();
+            WebPrintBuffer.Insert();
             WebPrintBuffer."Printer ID" := PrinterName;
 
             XML += '<ePOSPrint>' +
@@ -49,11 +42,11 @@ codeunit 6014539 "NPR RP Epson Web Print Mgt."
                  '</PrintData>' +
                '</ePOSPrint>';
 
-            WebPrintBuffer."Print Data".CreateOutStream(OutStream);
-            OutStream.Write(XML);
+            WebPrintBuffer."Print Data".CreateOutStream(OutStr);
+            OutStr.Write(XML);
 
             WebPrintBuffer."Time Created" := CurrentDateTime();
-            WebPrintBuffer.Modify;
+            WebPrintBuffer.Modify();
         end;
     end;
 }

@@ -146,13 +146,15 @@ codeunit 6014580 "NPR Object Output Mgt."
     local procedure OnSendMatrixPrint(TemplateCode: Text; CodeunitId: Integer; ReportId: Integer; var Printer: Codeunit "NPR RP Matrix Printer Interf."; NoOfPrints: Integer)
     var
         ObjectOutput: Record "NPR Object Output Selection";
+        PrintMethodMgt: Codeunit "NPR Print Method Mgt.";
         PrintBytes: Text;
         TargetEncoding: Text;
-        Supported: Boolean;
         HTTPEndpoint: Text;
-        PrintMethodMgt: Codeunit "NPR Print Method Mgt.";
-        i: Integer;
+        Encoding: TextEncoding;
+        Supported: Boolean;
         Skip: Boolean;
+        i: Integer;
+        CodePage: Integer;
     begin
         if NoOfPrints < 1 then
             exit;
@@ -175,9 +177,9 @@ codeunit 6014580 "NPR Object Output Mgt."
             ObjectOutput."Output Type"::"Epson Web":
                 begin
                     Printer.OnGetPrintBytes(PrintBytes);
-                    Printer.OnGetTargetEncoding(TargetEncoding);
+                    Printer.OnGetTargetEncodingWithCodePage(Encoding, CodePage);
                     for i := 1 to NoOfPrints do
-                        PrintMethodMgt.PrintViaEpsonWebService(ObjectOutput."Output Path", '', PrintBytes, TargetEncoding);
+                        PrintMethodMgt.PrintViaEpsonWebService(ObjectOutput."Output Path", '', PrintBytes, Encoding, CodePage);
                 end;
 
             ObjectOutput."Output Type"::HTTP:
@@ -213,13 +215,15 @@ codeunit 6014580 "NPR Object Output Mgt."
     local procedure OnSendLinePrint(TemplateCode: Text; CodeunitId: Integer; ReportId: Integer; var Printer: Codeunit "NPR RP Line Printer Interf."; NoOfPrints: Integer)
     var
         ObjectOutput: Record "NPR Object Output Selection";
+        PrintMethodMgt: Codeunit "NPR Print Method Mgt.";
         PrintBytes: Text;
         TargetEncoding: Text;
-        Supported: Boolean;
         HTTPEndpoint: Text;
-        PrintMethodMgt: Codeunit "NPR Print Method Mgt.";
-        i: Integer;
+        Encoding: TextEncoding;
         Skip: Boolean;
+        Supported: Boolean;
+        i: Integer;
+        CodePage: Integer;
     begin
         if NoOfPrints < 1 then
             exit;
@@ -242,9 +246,9 @@ codeunit 6014580 "NPR Object Output Mgt."
             ObjectOutput."Output Type"::"Epson Web":
                 begin
                     Printer.OnGetPrintBytes(PrintBytes);
-                    Printer.OnGetTargetEncoding(TargetEncoding);
+                    Printer.OnGetTargetEncodingWithCodePage(Encoding, CodePage);
                     for i := 1 to NoOfPrints do
-                        PrintMethodMgt.PrintViaEpsonWebService(ObjectOutput."Output Path", '', PrintBytes, TargetEncoding);
+                        PrintMethodMgt.PrintViaEpsonWebService(ObjectOutput."Output Path", '', PrintBytes, Encoding, CodePage);
                 end;
 
             ObjectOutput."Output Type"::HTTP:

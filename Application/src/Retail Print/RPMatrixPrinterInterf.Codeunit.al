@@ -10,12 +10,6 @@ codeunit 6014546 "NPR RP Matrix Printer Interf."
     // If you are wondering why not just use a handled pattern with static instead of manual subscribers:
     // these publishers can be called thousand of times within loops. This way there is the least overhead.
     // If NAV ever gets a proper inheritance feature then refactor this codeunit to use it instead.
-    // 
-    // NPR5.32/MMV /20160603 CASE 241995 Retail Print 2.0
-    // NPR5.32.10/MMV /20170613 CASE  270885 Only unbind bound device libraries in dispose(). This is necessary as of NAV 2016 CU16 as UNBINDSUBSCRIPTION has a bug: Even when return value is handled it still
-    //                                    overwrites GETLASTERRORTEXT which breaks an assumption made in another NPR module.
-    // NPR5.34/MMV /20170724 CASE 284505 Fixed non-robust dispose() unbinds.
-    //                                   Added missing bind variables to GetDeviceList().
 
     SingleInstance = true;
 
@@ -58,13 +52,6 @@ codeunit 6014546 "NPR RP Matrix Printer Interf."
 
     procedure Dispose()
     begin
-        //-NPR5.34 [284505]
-        // CASE TRUE OF
-        //  BlasterBound : UNBINDSUBSCRIPTION(BlasterCLPCommandLibrary);
-        //  CitizenBound : UNBINDSUBSCRIPTION(CitizenCLPCommandLibrary);
-        //  ZebraBound : UNBINDSUBSCRIPTION(ZebraZPLCommandLibrary);
-        //  EpsonBound : UNBINDSUBSCRIPTION(EpsonLabelCommandLibrary);
-        // END;
         if BlasterBound then
             UnbindSubscription(BlasterCLPCommandLibrary);
         if CitizenBound then
@@ -73,7 +60,6 @@ codeunit 6014546 "NPR RP Matrix Printer Interf."
             UnbindSubscription(ZebraZPLCommandLibrary);
         if EpsonBound then
             UnbindSubscription(EpsonLabelCommandLibrary);
-        //-NPR5.34 [284505]
 
         ClearAll;
     end;
@@ -83,24 +69,14 @@ codeunit 6014546 "NPR RP Matrix Printer Interf."
         if Bound then
             Dispose();
 
-        //-NPR5.34 [284505]
-        // BINDSUBSCRIPTION(BlasterCLPCommandLibrary);
-        // BINDSUBSCRIPTION(CitizenCLPCommandLibrary);
-        // BINDSUBSCRIPTION(ZebraZPLCommandLibrary);
-        // BINDSUBSCRIPTION(EpsonLabelCommandLibrary);
         BlasterBound := BindSubscription(BlasterCLPCommandLibrary);
         CitizenBound := BindSubscription(CitizenCLPCommandLibrary);
         ZebraBound := BindSubscription(ZebraZPLCommandLibrary);
         EpsonBound := BindSubscription(EpsonLabelCommandLibrary);
-        //+NPR5.34 [284505]
 
         OnBuildDeviceList(tmpRetailList);
 
         Dispose();
-    end;
-
-    local procedure "// Print Job"()
-    begin
     end;
 
     [IntegrationEvent(false, false)]
@@ -115,10 +91,6 @@ codeunit 6014546 "NPR RP Matrix Printer Interf."
 
     [IntegrationEvent(false, false)]
     procedure OnEndJob()
-    begin
-    end;
-
-    local procedure "// Aux"()
     begin
     end;
 
@@ -144,6 +116,11 @@ codeunit 6014546 "NPR RP Matrix Printer Interf."
 
     [IntegrationEvent(false, false)]
     procedure OnGetTargetEncoding(var TargetEncoding: Text)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    procedure OnGetTargetEncodingWithCodePage(var TargetEncoding: TextEncoding; var CodePage: Integer)
     begin
     end;
 
