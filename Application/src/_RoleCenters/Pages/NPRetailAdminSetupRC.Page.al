@@ -40,9 +40,9 @@ page 6151245 "NPR NP Retail Admin Setup RC"
                     RunObject = Page "NPR POS Menus";
                     ApplicationArea = All;
                 }
-                action("Default Views")
+                action("POS Default View")
                 {
-                    Caption = 'Default Views';
+                    Caption = 'POS Default View';
                     Image = View;
                     RunObject = Page "NPR POS Default Views";
                     ApplicationArea = All;
@@ -54,9 +54,9 @@ page 6151245 "NPR NP Retail Admin Setup RC"
                     RunObject = Page "NPR POS Actions";
                     ApplicationArea = All;
                 }
-                action("View List")
+                action("POS View List")
                 {
-                    Caption = 'View List';
+                    Caption = 'POS View List';
                     Image = ViewDocumentLine;
                     RunObject = Page "NPR POS View List";
                     ApplicationArea = All;
@@ -128,9 +128,9 @@ page 6151245 "NPR NP Retail Admin Setup RC"
                     RunObject = Page "NPR Register List";
                     ApplicationArea = All;
                 }
-                action("Display Setup")
+                action("POS Display Setup")
                 {
-                    Caption = 'Display Setup';
+                    Caption = 'POS Display Setup';
                     RunObject = Page "NPR Display Setup";
                     ApplicationArea = All;
                 }
@@ -705,8 +705,6 @@ page 6151245 "NPR NP Retail Admin Setup RC"
             }
 
 
-
-
         }
         area(processing)
         {
@@ -726,25 +724,6 @@ page 6151245 "NPR NP Retail Admin Setup RC"
             {
                 Caption = 'MPOS App Setup';
                 RunObject = Page "NPR MPOS App Setup Card";
-                ApplicationArea = All;
-            }
-
-            action("Company Information")
-            {
-                Caption = 'Company Information';
-                RunObject = Page "Company Information";
-                ApplicationArea = All;
-            }
-            action("Table Export")
-            {
-                Caption = 'Table Export';
-                RunObject = Page "NPR Table Export Wizard";
-                ApplicationArea = All;
-            }
-            action("Table Import")
-            {
-                Caption = 'Table Import';
-                RunObject = Page "NPR Table Import Wizard";
                 ApplicationArea = All;
             }
             group("CS Setup")
