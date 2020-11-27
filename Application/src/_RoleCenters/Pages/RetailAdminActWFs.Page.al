@@ -19,6 +19,8 @@ page 6151247 "NPR Retail Admin Act - WFs"
                 field("NPR POS Sales Workflow"; "NPR POS Sales Workflow")
                 {
                     ApplicationArea = All;
+                    Caption = 'POS Sales Workflows';
+                    ShowCaption = true;
                 }
 
                 field("EAN SETUPr"; "EAN SETUP")
