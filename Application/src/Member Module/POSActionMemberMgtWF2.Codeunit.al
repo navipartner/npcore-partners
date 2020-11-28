@@ -48,44 +48,33 @@ codeunit 6014479 "NPR POS Action Member Mgt WF2"
                 // If function is one of the membership alteration actions, fetch the options and prompt teller to choose 
                 'if ($parameters.Function >= $parameters.Function["Renew Membership"] && $parameters.Function <= $parameters.Function["Upgrade Membership"] ) {' +
                     'let lookupProperties = JSON.parse (await workflow.respond ("GetMembershipAlterationLookup"));' +
-                    'debugger;' +
                     '$context.memberCardInput = lookupProperties.cardnumber;' +
-                    'if (lookupProperties.data.length == 0) {' +
+                    'let lookupDataArray = JSON.parse(lookupProperties.data);' +
+                    'if (lookupDataArray.length == 0) {' +
                         'await popup.error ({title: windowTitle, caption: lookupProperties.notFoundMessage});' +
                         'return;' +
                     '}' +
-                    'debugger;' + // REMOVE
-                    'await popup.message({title: lookupProperties.title, caption: lookupProperties.data});' + // REMOVE
-                    'await popup.message({title: lookupProperties.title, caption: lookupProperties.layout});' + // REMOVE
-                    '$context.itemNumber = "320100-RENEW";' +
-                // ** popup not yet available **
-                // 'let driver = data.createArrayDriver(JSON.parse($context.options));' +
-                // 'let source = data.createDataSource(driver);' +
-                //'let result = await popup.lookup({' +
-                //    'title: lookupProperties.title,' +
-                //    'caption: "Make your pick...", ' +
-                //    'configuration: {className: "custom-lookup", styleSheet: "", layout: JSON.parse($context.layout), result: rows => rows.map (row => row.itemno)}, ' +
-                //    'source: source});' +
-                //'if (result === null) {return;}' +
-                //'await popup.message({caption: result});' +
+
+                    'let driver = data.createArrayDriver(lookupDataArray);' +
+                    'let source = data.createDataSource(driver);' +
+                    'source.loadAll = false;' +
+                    'let result = await popup.lookup({' +
+                    '   title: lookupProperties.title,' +
+                    '   configuration: {className: "custom-lookup", styleSheet: "", layout: JSON.parse(lookupProperties.layout), result: rows => rows ? rows.map (row => row ? row.itemno : null) : null}, source: source});' +
+
+                    'if (result === null) {return;}' +
+                    '$context.itemNumber = result[0].itemno;' +
                 '}' +
 
-                'let membershipResponse = JSON.parse (await workflow.respond ("DoManageMembership"));' +
-                'if ($parameters.Function >= $parameters.Function["View Membership Entry"]) {' +
-                    'debugger;' + // REMOVE
-                    'await popup.message({title: membershipResponse.title, caption: membershipResponse.data});' + // REMOVE
-                    'await popup.message({title: membershipResponse.title, caption: membershipResponse.layout});' + // REMOVE
-                    '' +
-                // ** popup not yet available **
-                // 'let driver = data.createArrayDriver(JSON.parse($context.options));' +
-                // 'let source = data.createDataSource(driver);' +
-                //'let result = await popup.lookup({' +
-                //    'title: lookupProperties.title,' +
-                //    'caption: "Make your pick...", ' +
-                //    'configuration: {className: "custom-lookup", styleSheet: "", layout: JSON.parse($context.layout), result: rows => rows.map (row => row.itemno)}, ' +
-                //    'source: source});' +
-                //'if (result === null) {return;}' +
-                //'await popup.message({caption: result});' +
+                // Process the main request
+                'let membershipResponse = await workflow.respond ("DoManageMembership");' +
+                'if ($parameters.Function == $parameters.Function["View Membership Entry"]) {' +
+                    'let membershipEntries = JSON.parse (membershipResponse);' +
+                    'let driver = data.createArrayDriver(JSON.parse(membershipEntries.data));' +
+                    'let source = data.createDataSource(driver);' +
+                    'let result = await popup.lookup({' +
+                    '   title: membershipEntries.title,' +
+                    '   configuration: {className: "custom-lookup", styleSheet: "", layout: JSON.parse(membershipEntries.layout)}, source: source});' +
                 '}'
             );
 
@@ -118,7 +107,6 @@ codeunit 6014479 "NPR POS Action Member Mgt WF2"
         if (not Action.IsThisAction(ActionCode())) then
             exit;
 
-        Message('This is your WF2 context: %1', Context.ToString());
         Handled := true;
 
         case (WorkflowStep) of
@@ -138,7 +126,6 @@ codeunit 6014479 "NPR POS Action Member Mgt WF2"
         MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup";
     begin
         FunctionId := Context.GetIntegerParameter('Function', false);
-        FunctionId := 2; // ********* TODO REMOVE
 
         JsonText := '{}';
         case FunctionId of
@@ -191,7 +178,6 @@ codeunit 6014479 "NPR POS Action Member Mgt WF2"
 
         ExternalMemberCardNo := Context.GetString('memberCardInput', false);
         FrontEndInputMethod := Context.GetInteger('DialogPrompt', false);
-        FrontEndInputMethod := MemberSelectionMethod::NO_PROMPT; // ****** TODO REMOVE ******
 
         GetMembershipFromCardNumberWithUI(FrontEndInputMethod, ExternalMemberCardNo, Membership, MemberCard, true);
 
@@ -246,7 +232,6 @@ codeunit 6014479 "NPR POS Action Member Mgt WF2"
     begin
         ExternalMemberCardNo := Context.GetString('memberCardInput', false);
         FrontEndInputMethod := Context.GetInteger('DialogPrompt', false);
-        FrontEndInputMethod := MemberSelectionMethod::NO_PROMPT; // ****** TODO REMOVE ******
 
         GetMembershipFromCardNumberWithUI(FrontEndInputMethod, ExternalMemberCardNo, Membership, MemberCard, true);
 
@@ -286,7 +271,6 @@ codeunit 6014479 "NPR POS Action Member Mgt WF2"
     begin
         ExternalMemberCardNo := Context.GetString('memberCardInput', false);
         FrontEndInputMethod := Context.GetInteger('DialogPrompt', false);
-        FrontEndInputMethod := MemberSelectionMethod::NO_PROMPT; // ****** TODO REMOVE ******
 
         GetMembershipFromCardNumberWithUI(FrontEndInputMethod, ExternalMemberCardNo, Membership, MemberCard, false);
 
@@ -418,7 +402,6 @@ codeunit 6014479 "NPR POS Action Member Mgt WF2"
     begin
         ExternalMemberCardNo := Context.GetString('memberCardInput', false);
         FrontEndInputMethod := Context.GetInteger('DialogPrompt', false);
-        FrontEndInputMethod := MemberSelectionMethod::NO_PROMPT; // ****** TODO REMOVE ******
 
         if ((FrontEndInputMethod = MemberSelectionMethod::NO_PROMPT) and (ExternalMemberCardNo = '')) then
             if (not SelectMemberCardUI(ExternalMemberCardNo)) then
@@ -447,7 +430,6 @@ codeunit 6014479 "NPR POS Action Member Mgt WF2"
 
     begin
         FunctionId := Context.GetIntegerParameter('Function', false);
-        FunctionId := 4; // ********************************* //
 
         ExternalMemberCardNo := Context.GetString('memberCardInput', false);
         GetMembershipFromCardNumberWithUI(MemberSelectionMethod::NO_PROMPT, ExternalMemberCardNo, Membership, MemberCard, false);
@@ -492,9 +474,11 @@ codeunit 6014479 "NPR POS Action Member Mgt WF2"
         FailReasonText: Text;
     begin
 
-        if ((InputMethod = MemberSelectionMethod::NO_PROMPT) and (ExternalMemberCardNo = '')) then
+        if ((ExternalMemberCardNo = '') and (InputMethod in [MemberSelectionMethod::NO_PROMPT, MemberSelectionMethod::CARD_SCAN])) then begin
+            InputMethod := MemberSelectionMethod::NO_PROMPT;
             if (not SelectMemberCardUI(ExternalMemberCardNo)) then
                 Error(MEMBERSHIP_NOT_SELECTED);
+        end;
 
         MemberRetailIntegration.POS_ValidateMemberCardNo(true, true, InputMethod, WithActivate, ExternalMemberCardNo);
 
@@ -595,7 +579,6 @@ codeunit 6014479 "NPR POS Action Member Mgt WF2"
         until (TmpMembershipEntry.next() = 0);
 
         OptionsArray.WriteTo(Options);
-        Message(Options);
     end;
 
     local procedure GetMembershipEntryLookupDataToJson(var TmpMembershipEntry: Record "NPR MM Membership Entry" temporary) ChangeOption: JsonObject
@@ -603,9 +586,9 @@ codeunit 6014479 "NPR POS Action Member Mgt WF2"
         ChangeOption.Add('itemno', TmpMembershipEntry."Item No.");
         ChangeOption.Add('fromdate', TmpMembershipEntry."Valid From Date");
         ChangeOption.Add('untildate', TmpMembershipEntry."Valid Until Date");
-        ChangeOption.Add('unitprice', TmpMembershipEntry."Unit Price");
+        ChangeOption.Add('unitprice', format(TmpMembershipEntry."Unit Price", 0, '<Sign><Integer><Decimals,3>'));
         ChangeOption.Add('description', TmpMembershipEntry.Description);
-        ChangeOption.Add('price', TmpMembershipEntry.Amount);
+        ChangeOption.Add('amount', format(TmpMembershipEntry."Amount Incl VAT", 0, '<Sign><Integer><Decimals,3>'));
         ChangeOption.Add('context', format(TmpMembershipEntry.Context));
         ChangeOption.Add('originalcontext', format(TmpMembershipEntry."Original Context"));
 
@@ -626,7 +609,7 @@ codeunit 6014479 "NPR POS Action Member Mgt WF2"
         Control.Add(CreatLookupControl('custom-lookup-field', TmpMembershipEntry.FieldCaption("Original Context"), 'originalcontext', 'left', 'small', 'calc(20% - 2px)', false));
         Control.Add(CreatLookupControl('custom-lookup-field', TmpMembershipEntry.FieldCaption("Valid From Date"), 'fromdate', 'left', 'small', 'calc(20% - 2px)', false));
         Control.Add(CreatLookupControl('custom-lookup-field', TmpMembershipEntry.FieldCaption("Valid Until Date"), 'untildate', 'left', 'small', 'calc(20% - 2px)', false));
-        Control.Add(CreatLookupControl('custom-lookup-field', TmpMembershipEntry.FieldCaption(Amount), 'price', 'right', 'small', 'calc(20% - 2px)', false));
+        Control.Add(CreatLookupControl('custom-lookup-field', TmpMembershipEntry.FieldCaption(Amount), 'amount', 'right', 'small', 'calc(20% - 2px)', false));
         Row.ReadFrom('{}');
         Row.Add('className', 'custom-lookup-row-heading');
         Row.Add('controls', Control);
@@ -686,9 +669,9 @@ codeunit 6014479 "NPR POS Action Member Mgt WF2"
     begin
         FieldMetaData.Add('className', FieldClassName);
         FieldMetaData.Add('caption', FieldCaption);
-        FieldMetaData.Add('fieldno', FieldId);
+        FieldMetaData.Add('fieldNo', FieldId);
         FieldMetaData.Add('align', FieldAlignment);
-        FieldMetaData.Add('fontsize', FieldFontSize);
+        FieldMetaData.Add('fontSize', FieldFontSize);
         FieldMetaData.Add('width', FieldWidth);
         FieldMetaData.Add('searchable', IsSearchable);
 
