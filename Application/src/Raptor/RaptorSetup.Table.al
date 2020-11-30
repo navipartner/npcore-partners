@@ -1,11 +1,5 @@
 table 6151491 "NPR Raptor Setup"
 {
-    // NPR5.51/CLVA/20190710 CASE 355871 Object created
-    // NPR5.53/ALPO/20191125 CASE 377727 Raptor integration enhancements
-    // NPR5.53/ALPO/20191128 CASE 379012 Raptor tracking integration: send info about sold products to Raptor
-    // NPR5.54/ALPO/20200227 CASE 355871 Possibility to define Raptor tracking service types
-    // NPR5.55/ALPO/20200422 CASE 400925 Exclude webshop sales from data sent to Raptor
-
     Caption = 'Raptor Setup';
     DataClassification = CustomerContent;
 
@@ -73,12 +67,12 @@ table 6151491 "NPR Raptor Setup"
 
             trigger OnLookup()
             begin
-                RaptorMgt.SelectTrackingServiceType("Tracking Service Type");  //NPR5.54 [355871]
+                RaptorMgt.SelectTrackingServiceType("Tracking Service Type");
             end;
 
             trigger OnValidate()
             begin
-                RaptorMgt.ValidateTrackingServiceType("Tracking Service Type");  //NPR5.54 [355871]
+                RaptorMgt.ValidateTrackingServiceType("Tracking Service Type");
             end;
         }
         field(18; "Exclude Webshop Sales"; Boolean)
@@ -115,15 +109,14 @@ table 6151491 "NPR Raptor Setup"
         RaptorMgt: Codeunit "NPR Raptor Management";
 
     procedure InitUrls(Force: Boolean)
+    var
+        AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
     begin
         if ("Base Url" = '') or Force then
             "Base Url" := 'https://api.raptorsmartadvisor.com';
         if ("Tracking Service Url" = '') or Force then
             "Tracking Service Url" := 'https://t.raptorsmartadvisor.com';
-        //-NPR5.54 [355871]
         if ("Tracking Service Type" = '') or Force then
             RaptorMgt.GetDefaultTrackingServiceType("Tracking Service Type");
-        //+NPR5.54 [355871]
     end;
 }
-

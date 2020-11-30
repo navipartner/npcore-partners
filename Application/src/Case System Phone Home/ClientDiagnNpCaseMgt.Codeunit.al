@@ -1,18 +1,10 @@
 codeunit 6059999 "NPR Client Diagn.NpCase Mgt"
 {
-    // NPR5.38/CLVA/20171109 CASE 293179 Collecting client-side information
-    // NPR5.40/MHA /20180328 CASE 308907 Data Collection functions moved to Cu 6059998 "Client Diagnostics Data Mgt."
-    // NPR5.49/MHA /20190206  CASE 340731 Changed WS endpoint to Azure Api Management
-    // NPR5.50/MMV /20190529 CASE 356506 Skip message on success.
-    // NPR5.51/MHA /20190705  CASE 361164 Updated Exception Message parsing in SendClientDiagnostics()
-
     TableNo = "NPR Client Diagnostics";
 
     trigger OnRun()
     begin
-        //-NPR5.40 [308907]
         SendClientDiagnostics(Rec);
-        //+NPR5.40 [308907]
     end;
 
     var
@@ -23,14 +15,13 @@ codeunit 6059999 "NPR Client Diagn.NpCase Mgt"
     var
         NewSessionID: Integer;
     begin
-        //-NPR5.40 [308907]
         StartSession(NewSessionID, CODEUNIT::"NPR Client Diagn.NpCase Mgt", CompanyName, ClientDiagnostics);
-        //+NPR5.40 [308907]
     end;
 
     local procedure SendClientDiagnostics(ClientDiagnostics: Record "NPR Client Diagnostics")
     var
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
+        AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
         Credential: DotNet NPRNetNetworkCredential;
         HttpWebRequest: DotNet NPRNetHttpWebRequest;
         HttpWebResponse: DotNet NPRNetHttpWebResponse;
@@ -41,26 +32,22 @@ codeunit 6059999 "NPR Client Diagn.NpCase Mgt"
         ServiceName: Text;
         ErrorMessage: Text;
     begin
-        //-NPR5.40 [308907]
-        //-NPR5.49 [340731]
-        Uri := Uri.Uri('https://api.navipartner.dk/ClientDiagnostics');
+        Uri := Uri.Uri(AzureKeyVaultMgt.GetSecret('ApiHostUri'));
+        Uri := Uri.Uri(Uri, 'ClientDiagnostics');
+
         HttpWebRequest := HttpWebRequest.Create(Uri);
         HttpWebRequest.Method := 'POST';
         HttpWebRequest.ContentType := 'text/xml; charset=utf-8';
         HttpWebRequest.Headers.Add('SOAPAction', 'urn:microsoft-dynamics-schemas/codeunit/ClientDiagnostics:UpsertUser');
-        HttpWebRequest.Headers.Add('Ocp-Apim-Subscription-Key', '0deed0dee9e44975827b623077b875e0');
+        HttpWebRequest.Headers.Add('Ocp-Apim-Subscription-Key', AzureKeyVaultMgt.GetSecret('ClientDiagnosticsKey'));
         HttpWebRequest.Timeout(5000);
 
         InitRequest(ClientDiagnostics, XmlDoc);
-        //+NPR5.49 [340731]
 
-        //-NPR5.51 [361164]
         if not NpXmlDomMgt.SendWebRequest(XmlDoc, HttpWebRequest, HttpWebResponse, WebException) then begin
             ErrorMessage := NpXmlDomMgt.GetWebExceptionMessage(WebException);
             Error(CopyStr(ErrorMessage, 1, 1000));
         end;
-        //+NPR5.51 [361164]
-        //+NPR5.40 [308907]
     end;
 
     local procedure InitRequest(ClientDiagnostics: Record "NPR Client Diagnostics"; var XmlDoc: DotNet "NPRNetXmlDocument")
@@ -72,7 +59,6 @@ codeunit 6059999 "NPR Client Diagn.NpCase Mgt"
         MethodName: Text;
         MethodNS: Text;
     begin
-        //-NPR5.40 [308907]
         MethodName := 'UpsertUser';
         MethodNS := 'urn:microsoft-dynamics-schemas/codeunit/ServiceTierUser';
 
@@ -82,9 +68,7 @@ codeunit 6059999 "NPR Client Diagn.NpCase Mgt"
           '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" >' +
           '   <soapenv:Header/>' +
           '   <soapenv:Body>' +
-          //-NPR5.49 [340731]
           '      <' + MethodName + ' xmlns="urn:microsoft-dynamics-schemas/codeunit/ClientDiagnostics">' +
-          //+NPR5.49 [340731]
           '         <nav_service_tier_user>' +
           '            <NAVServiceTierUser xmlns="urn:microsoft-dynamics-schemas/codeunit/ServiceTierUser" />' +
           '         </nav_service_tier_user>' +
@@ -102,7 +86,6 @@ codeunit 6059999 "NPR Client Diagn.NpCase Mgt"
         AppendComputerInfo(ClientDiagnostics, MethodNS, XmlElement);
         AppendPosInfo(ClientDiagnostics, MethodNS, XmlElement);
         AppendLogoutInfo(ClientDiagnostics, MethodNS, XmlElement);
-        //+NPR5.40 [308907]
     end;
 
     local procedure AppendLoginInfo(ClientDiagnostics: Record "NPR Client Diagnostics"; MethodNS: Text; var XmlElement: DotNet NPRNetXmlElement)
@@ -110,7 +93,6 @@ codeunit 6059999 "NPR Client Diagn.NpCase Mgt"
         XmlElementNew: DotNet NPRNetXmlElement;
         XmlElementPosInfo: DotNet NPRNetXmlElement;
     begin
-        //-NPR5.40 [308907]
         if not ClientDiagnostics."Login Info" then
             exit;
 
@@ -127,7 +109,6 @@ codeunit 6059999 "NPR Client Diagn.NpCase Mgt"
         AddXmlElement(XmlElementPosInfo, 'windows_security_id', MethodNS, ClientDiagnostics."Windows Security ID", XmlElementNew);
         AddXmlElement(XmlElementPosInfo, 'user_login_type', MethodNS, Format(ClientDiagnostics."User Login Type", 0, 2), XmlElementNew);
         AddXmlElement(XmlElementPosInfo, 'application_version', MethodNS, ClientDiagnostics."Application Version", XmlElementNew);
-        //+NPR5.40 [308907]
     end;
 
     local procedure AppendLicenseInfo(ClientDiagnostics: Record "NPR Client Diagnostics"; MethodNS: Text; var XmlElement: DotNet NPRNetXmlElement)
@@ -135,7 +116,6 @@ codeunit 6059999 "NPR Client Diagn.NpCase Mgt"
         XmlElementNew: DotNet NPRNetXmlElement;
         XmlElementPosInfo: DotNet NPRNetXmlElement;
     begin
-        //-NPR5.40 [308907]
         if not ClientDiagnostics."License Info" then
             exit;
 
@@ -146,7 +126,6 @@ codeunit 6059999 "NPR Client Diagn.NpCase Mgt"
         AddXmlElement(XmlElementPosInfo, 'no_of_full_users', MethodNS, Format(ClientDiagnostics."No. of Full Users", 0, 9), XmlElementNew);
         AddXmlElement(XmlElementPosInfo, 'no_of_isv_users', MethodNS, Format(ClientDiagnostics."No. of ISV Users", 0, 9), XmlElementNew);
         AddXmlElement(XmlElementPosInfo, 'no_of_limited_users', MethodNS, Format(ClientDiagnostics."No. of Limited Users", 0, 9), XmlElementNew);
-        //+NPR5.40 [308907]
     end;
 
     local procedure AppendComputerInfo(ClientDiagnostics: Record "NPR Client Diagnostics"; MethodNS: Text; var XmlElement: DotNet NPRNetXmlElement)
@@ -154,7 +133,6 @@ codeunit 6059999 "NPR Client Diagn.NpCase Mgt"
         XmlElementNew: DotNet NPRNetXmlElement;
         XmlElementPosInfo: DotNet NPRNetXmlElement;
     begin
-        //-NPR5.40 [308907]
         if not ClientDiagnostics."Computer Info" then
             exit;
 
@@ -165,7 +143,6 @@ codeunit 6059999 "NPR Client Diagn.NpCase Mgt"
         AddXmlElement(XmlElementPosInfo, 'os_version', MethodNS, ClientDiagnostics."OS Version", XmlElementNew);
         AddXmlElement(XmlElementPosInfo, 'mac_addresses', MethodNS, ClientDiagnostics."Mac Adresses", XmlElementNew);
         AddXmlElement(XmlElementPosInfo, 'platform_version', MethodNS, ClientDiagnostics."Platform Version", XmlElementNew);
-        //+NPR5.40 [308907]
     end;
 
     local procedure AppendPosInfo(ClientDiagnostics: Record "NPR Client Diagnostics"; MethodNS: Text; var XmlElement: DotNet NPRNetXmlElement)
@@ -173,7 +150,6 @@ codeunit 6059999 "NPR Client Diagn.NpCase Mgt"
         XmlElementNew: DotNet NPRNetXmlElement;
         XmlElementPosInfo: DotNet NPRNetXmlElement;
     begin
-        //-NPR5.40 [308907]
         if not ClientDiagnostics."POS Info" then
             exit;
 
@@ -183,7 +159,6 @@ codeunit 6059999 "NPR Client Diagn.NpCase Mgt"
         AddXmlElement(XmlElementPosInfo, 'ip_address', MethodNS, ClientDiagnostics."IP Address", XmlElementNew);
         AddXmlElement(XmlElementPosInfo, 'geolocation_latitude', MethodNS, Format(ClientDiagnostics."Geolocation Latitude", 0, 9), XmlElementNew);
         AddXmlElement(XmlElementPosInfo, 'geolocation_longitude', MethodNS, Format(ClientDiagnostics."Geolocation Longitude", 0, 9), XmlElementNew);
-        //+NPR5.40 [308907]
     end;
 
     local procedure AppendLogoutInfo(ClientDiagnostics: Record "NPR Client Diagnostics"; MethodNS: Text; var XmlElement: DotNet NPRNetXmlElement)
@@ -191,7 +166,6 @@ codeunit 6059999 "NPR Client Diagn.NpCase Mgt"
         XmlElementNew: DotNet NPRNetXmlElement;
         XmlElementPosInfo: DotNet NPRNetXmlElement;
     begin
-        //-NPR5.40 [308907]
         if not ClientDiagnostics."Logout Info" then
             exit;
 
@@ -199,17 +173,13 @@ codeunit 6059999 "NPR Client Diagn.NpCase Mgt"
 
         AddXmlElement(XmlElementPosInfo, 'last_logout_date', MethodNS, Format(ClientDiagnostics."Last Logout Date", 0, 9), XmlElementNew);
         AddXmlElement(XmlElementPosInfo, 'last_logout_time', MethodNS, Format(ClientDiagnostics."Last Logout Time", 0, 9), XmlElementNew);
-        //+NPR5.40 [308907]
     end;
 
     local procedure AddXmlElement(var XmlElement: DotNet NPRNetXmlElement; ElementName: Text; Namespace: Text; InnerText: Text; var XmlElementNew: DotNet NPRNetXmlElement)
     var
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
     begin
-        //-NPR5.40 [308907]
         NpXmlDomMgt.AddElementNamespace(XmlElement, ElementName, Namespace, XmlElementNew);
         XmlElementNew.InnerText := InnerText;
-        //+NPR5.40 [308907]
     end;
 }
-

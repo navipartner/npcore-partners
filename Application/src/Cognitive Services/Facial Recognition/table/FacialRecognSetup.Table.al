@@ -69,10 +69,12 @@ table 6059916 "NPR Facial Recogn. Setup"
     end;
 
     local procedure CreateDefaultValues()
+    var
+        AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
     begin
         Code := 'Facial Recognition';
         BaseURL := 'https://northeurope.api.cognitive.microsoft.com/face/v1.0';
-        APIKey := '8bbe2f04fa3e4160b76d60220e6d01a6';
+        APIKey := AzureKeyVaultMgt.GetSecret('CognitiveServicesAPIKey');
         PersonGroupURI := '/persongroups/';
         PersonURI := '/persons/';
         DetectFaceURI := '/detect/';

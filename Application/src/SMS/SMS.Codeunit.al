@@ -1,17 +1,5 @@
 codeunit 6014502 "NPR SMS"
 {
-    // NPR3.0c, NPK, DL, 07-11-07, Changed SMS server
-    // NPR70.01.00.00/MH/20140610  Refactored: Http DotNet variable are utilized instead of Automation Variable.
-    // NPR4.02/TR/20150417  CASE 210206 If FINDLAST does not find any lines
-    //   the function would create an error. This has been corrected.
-    // NPR4.21/KN/20160218 CASE 213605 Added functionality to distinguish between danish and foreign phone numbers.
-    // NPR5.38/MHA /20180105  CASE 301053 Added ConstValue to empty Text Constant ErrEmpty and deleted unused function SendSMSMultiple()
-    // NPR5.40/JDH /20180320 CASE 308647 cleaned up code and variables
-    // NPR5.51/THRO/20190710 CASE 360944 Added option to send sms to Nc Endpoint
-    // NPR5.53/ZESO/20200110 CASE 382779 Change in Credentials Old UserName : navipartner, Old password : n4vipartner
-    // NPR5.54/ZESO/20200309 CASE 382779 Change in URL, '+'no longer accepted in Phone Nos by LinkMobility
-    // NPR5.55/BHR /20200504 CASE 400915 Add Publisher OnSendSMS
-    // NPR5.55/ZESO/20200512 CASE 403305 Cater for special characters.
 
 
     trigger OnRun()
@@ -60,7 +48,6 @@ codeunit 6014502 "NPR SMS"
                 end;
             IComm."SMS Type"::Eclub:
                 SmsEclub(Tlf, SMSMessage, IComm."E-Club Sender");
-            //-NPR5.51 [360944]
             IComm."SMS Type"::Endpoint:
                 begin
                     IComm.TestField("SMS Endpoint");
@@ -83,7 +70,6 @@ codeunit 6014502 "NPR SMS"
                     if not NcEndpointMgt.RunEndpoint(NcTaskOutput, NcEndpoint, Response) then
                         Error(SendFailedErr, NcEndpoint.Code);
                 end;
-        //-NPR5.51 [360944]
         end;
     end;
 
@@ -91,15 +77,17 @@ codeunit 6014502 "NPR SMS"
     var
         HttpRequest: DotNet NPRNetHttpWebRequest;
         Util: Codeunit "NPR Utility";
+        AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
+        Uri: Codeunit Uri;
         ServiceCode: Code[20];
         ForeignPhone: Boolean;
         SMSHandled: Boolean;
+        SMSServiceUri: Text;
     begin
-        //-[NPR5.55] [400951]
         OnSendSMS(SMSHandled, PhoneNo, From, SMSMessage);
         if SMSHandled then
             exit;
-        //+[NPR5.55] [400951]
+
         if (PhoneNo = '') or (SMSMessage = '') then
             Error(ErrEmpty);
 
@@ -111,44 +99,34 @@ codeunit 6014502 "NPR SMS"
             PhoneNo := '+45' + PhoneNo;
         end;
 
-        //-NPR5.54 [382779]
         PhoneNo := DelChr(PhoneNo, '=', '+');
-        //+NPR5.54 [382779]
 
         if ServiceCalc.useService(ServiceCode) then begin
             SMSMessage := DelChr(Util.Ansi2Ascii(SMSMessage), '%', '');
             if not IsNull(HttpRequest) then
                 Clear(HttpRequest);
 
-            //-NPR5.54 [382779]
-            //HttpRequest := HttpRequest.Create('http://sms.coolsmsc.dk/sendsms.php?message=' +
-            //SMSMessage +
-            //'&to=' + PhoneNo +
-            //'&from=' + From +
-            //-NPR5.53 [382779]
-            //'&username=navipartner' +
-            //'&password=n4vipartner');
-            // '&username= O7LbM2B6' +
-            //'&password=OujrSE78');
-            //+NPR5.53 [382779]
+            // Uses following Azure Key Vault secrets:
+            // - SMSHTTPRequestUrl    
+            //   The secret contains complete Request URL for sending SMS in the following format:
+            //   'https://wsx.sp247.net/linkdk/?username=%1&password=$2&from=$3&to=$4&message=%5&charset=$6'
+            //   EscapeDataString called after StrSubstNo
+            // - SMSUserName
+            // - SMSPassword
 
-            HttpRequest := HttpRequest.Create('https://wsx.sp247.net/linkdk/?' +
-                                              'username=2517_12D8' +
-                                              '&password=W36nshJ8' +
-                                              '&to=' + PhoneNo +
-                                              //-NPR5.55 [403305]
-                                              //'&message=' + SMSMessage +
-                                              '&message=' + SMSMessage + '&charset=utf-8' +
-                                              //+NPR5.55 [403305]
-                                              '&from=' + From);
-            //+NPR5.54 [382779]
+            SMSServiceUri := AzureKeyVaultMgt.GetSecret('SMSHTTPRequestUrl');
+            SMSServiceUri := StrSubstNo(SMSServiceUri, AzureKeyVaultMgt.GetSecret('SMSUserName'),
+                             SMSServiceUri, AzureKeyVaultMgt.GetSecret('SMSPassword'),
+                             From, PhoneNo, SMSMessage, 'utf-8');
+
+            SMSServiceUri := Uri.EscapeDataString(SMSServiceUri);
+
+            HttpRequest := HttpRequest.Create(SMSServiceUri);
+
             HttpRequest.Timeout := 10000;
             HttpRequest.UseDefaultCredentials(true);
             HttpRequest.Method := 'POST';
-            //-NPR5.55 [403305]
-            //HttpRequest.ContentType := 'text/xml; charset=utf-8';
             HttpRequest.ContentType := 'text/xml';
-            //+NPR5.55 [403305]
             HttpRequest.GetResponse();
             Clear(HttpRequest);
         end;
@@ -180,9 +158,6 @@ codeunit 6014502 "NPR SMS"
         InteractionLogEntry.Date := WorkDate;
         InteractionLogEntry.Description := Description;
         InteractionLogEntry.Subject := Subject;
-        //-NPR5.38 [301053]
-        //InteractionLogEntry."Correspondence Type" := InteractionLogEntry."Correspondence Type"::"4";
-        //+NPR5.38 [301053]
         InteractionLogEntry."User ID" := UserId;
         InteractionLogEntry."Information Flow" := InteractionLogEntry."Information Flow"::Outbound;
         InteractionLogEntry."Initiated By" := InteractionLogEntry."Initiated By"::Us;
@@ -210,4 +185,3 @@ codeunit 6014502 "NPR SMS"
     begin
     end;
 }
-

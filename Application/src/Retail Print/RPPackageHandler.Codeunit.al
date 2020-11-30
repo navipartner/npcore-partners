@@ -1,11 +1,5 @@
 codeunit 6014585 "NPR RP Package Handler"
 {
-    // NPR5.32/MMV /20170412 CASE 241995 Retail Print 2.0
-    // NPR5.38/MMV /20171201 CASE 294095 Added custom import routine
-    // NPR5.39/MMV /20180222 CASE 300666 Fixed picure import bug
-    // NPR5.55/MMV /20200615 CASE 409573 Moved deployment of retail print templates from npdeploy to azure blob storage.
-
-
     trigger OnRun()
     begin
     end;
@@ -148,8 +142,8 @@ codeunit 6014585 "NPR RP Package Handler"
     procedure DeployPackageFromBlobStorage()
     var
         ManagedPackageMgt: Codeunit "NPR Managed Package Mgt.";
+        AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
     begin
-        //-NPR5.55 [409573]
         ManagedPackageMgt.AddExpectedTableID(DATABASE::"NPR RP Template Header");
         ManagedPackageMgt.AddExpectedTableID(DATABASE::"NPR RP Template Line");
         ManagedPackageMgt.AddExpectedTableID(DATABASE::"NPR RP Data Items");
@@ -158,8 +152,7 @@ codeunit 6014585 "NPR RP Package Handler"
         ManagedPackageMgt.AddExpectedTableID(DATABASE::"NPR RP Data Item Constr. Links");
         ManagedPackageMgt.AddExpectedTableID(DATABASE::"NPR RP Device Settings");
         ManagedPackageMgt.AddExpectedTableID(DATABASE::"NPR RP Template Media Info");
-        ManagedPackageMgt.DeployPackageFromURL('https://npretailbasedata.blob.core.windows.net/retailprinttemplates/templates.json');
-        //+NPR5.55 [409573]
+        ManagedPackageMgt.DeployPackageFromURL(AzureKeyVaultMgt.GetSecret('NpRetailBaseDataBaseUrl') + '/retailprinttemplates/templates.json');
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014628, 'OnLoadPackage', '', false, false)]
@@ -176,7 +169,6 @@ codeunit 6014585 "NPR RP Package Handler"
         tmpMediaInfo: Record "NPR RP Template Media Info" temporary;
         TemplateHeader: Record "NPR RP Template Header";
     begin
-        //-NPR5.38 [294095]
         if Handled then
             exit;
         if LoadType = LoadType::Blob then
@@ -208,7 +200,6 @@ codeunit 6014585 "NPR RP Package Handler"
             exit;
 
         ImportPackage(tmpImportWorksheet, tmpTemplateHeader, tmpTemplateLine, tmpDataItem, tmpDataItemLinks, tmpDataItemConstraint, tmpDataItemConstraintLinks, tmpDeviceSettings, tmpMediaInfo);
-        //+NPR5.38 [294095]
     end;
 
     local procedure ParsePackage(JObject: DotNet JObject; var tmpTemplateHeader: Record "NPR RP Template Header" temporary; var tmpTemplateLine: Record "NPR RP Template Line" temporary; var tmpDataItem: Record "NPR RP Data Items" temporary; var tmpDataItemLinks: Record "NPR RP Data Item Links" temporary; var tmpDataItemConstraint: Record "NPR RP Data Item Constr." temporary; var tmpDataItemConstraintLinks: Record "NPR RP Data Item Constr. Links" temporary; var tmpDeviceSettings: Record "NPR RP Device Settings" temporary; var tmpMediaInfo: Record "NPR RP Template Media Info" temporary): Boolean
@@ -223,7 +214,6 @@ codeunit 6014585 "NPR RP Package Handler"
         ManagedPackageMgt: Codeunit "NPR Managed Package Mgt.";
         FieldsJObject: DotNet JObject;
     begin
-        //-NPR5.38 [294095]
         TotalRecords := JObject.Count;
         for i := 0 to TotalRecords - 1 do begin
             Evaluate(TableNo, JObject.Item(i).Item('Record').ToString());
@@ -260,7 +250,6 @@ codeunit 6014585 "NPR RP Package Handler"
         end;
 
         exit(tmpTemplateHeader.FindSet);
-        //+NPR5.38 [294095]
     end;
 
     local procedure ImportPackage(var tmpImportWorksheet: Record "NPR RP Imp. Worksh."; var tmpTemplateHeader: Record "NPR RP Template Header" temporary; var tmpTemplateLine: Record "NPR RP Template Line" temporary; var tmpDataItem: Record "NPR RP Data Items" temporary; var tmpDataItemLinks: Record "NPR RP Data Item Links" temporary; var tmpDataItemConstraint: Record "NPR RP Data Item Constr." temporary; var tmpDataItemConstraintLinks: Record "NPR RP Data Item Constr. Links" temporary; var tmpDeviceSettings: Record "NPR RP Device Settings" temporary; var tmpMediaInfo: Record "NPR RP Template Media Info" temporary)
@@ -276,7 +265,6 @@ codeunit 6014585 "NPR RP Package Handler"
         ReplaceCounter: Integer;
         CreateCounter: Integer;
     begin
-        //-NPR5.38 [294095]
         with tmpImportWorksheet do begin
             SetFilter(Action, '<>%1', Action::Skip);
             if FindSet then
@@ -342,9 +330,7 @@ codeunit 6014585 "NPR RP Package Handler"
                             DeviceSettings.Insert;
                         until tmpDeviceSettings.Next = 0;
 
-                    //-NPR5.39 [300666]
                     tmpMediaInfo.SetAutoCalcFields(Picture);
-                    //+NPR5.39 [300666]
                     if tmpMediaInfo.FindSet then
                         repeat
                             MediaInfo.Init;
@@ -357,7 +343,6 @@ codeunit 6014585 "NPR RP Package Handler"
 
         if (ReplaceCounter > 0) or (CreateCounter > 0) then
             Message(ImportedMessage, CreateCounter, ReplaceCounter);
-        //+NPR5.38 [294095]
     end;
 
     local procedure DeleteTemplate("Code": Text)
@@ -372,7 +357,6 @@ codeunit 6014585 "NPR RP Package Handler"
         MediaInfo: Record "NPR RP Template Media Info";
         TemplateArchive: Record "NPR RP Template Archive";
     begin
-        //-NPR5.38 [294095]
         TemplateHeader.Get(Code);
         if not TemplateHeader.Archived then begin
             if not TemplateArchive.Get(Code, TemplateHeader.Version) then begin
@@ -398,7 +382,5 @@ codeunit 6014585 "NPR RP Package Handler"
         DataItemConstraintLinks.DeleteAll;
         DeviceSettings.DeleteAll;
         MediaInfo.DeleteAll;
-        //+NPR5.38 [294095]
     end;
 }
-

@@ -9,6 +9,7 @@ codeunit 6014590 "NPR Service Tier User Mgt."
 
     var
         ActiveSession: Record "Active Session";
+
     local procedure "-- Aux"()
     begin
     end;
@@ -90,11 +91,12 @@ codeunit 6014590 "NPR Service Tier User Mgt."
         Response: HttpResponseMessage;
         ContentHeaders: HttpHeaders;
         Content: HttpContent;
+        AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
         Uri: Text;
         ServiceMethod: Text;
     begin
         ServiceMethod := 'GetUserExpirationMessage';
-        Uri := 'https://api.navipartner.dk/ServiceTierUser';
+        Uri := strsubstno('%1/ServiceTierUser', AzureKeyVaultMgt.GetSecret('ApiHostUri'));
 
         Content.WriteFrom(InitTestRequest(ServiceMethod));
 
@@ -162,11 +164,12 @@ codeunit 6014590 "NPR Service Tier User Mgt."
         Response: HttpResponseMessage;
         ContentHeaders: HttpHeaders;
         Content: HttpContent;
+        AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
         Uri: Text;
         ServiceMethod: Text;
     begin
         ServiceMethod := 'GetUserLockedMessage';
-        Uri := 'https://api.navipartner.dk/ServiceTierUser';
+        Uri := strsubstno('%1/ServiceTierUser', AzureKeyVaultMgt.GetSecret('ApiHostUri'));
 
         Content.WriteFrom(InitTestRequest(ServiceMethod));
 
