@@ -79,14 +79,6 @@ jobs:
         packageId: $(packageId).Base_Application.dk #Country
       feed: $(feed)
 
-    - name: es #Country
-      url: $(url)/es #Country
-      appPackages:
-      - sourcePath: \Applications\BaseApp\Source\Base Application.Source.zip
-        appPath: \Applications\BaseApp\Source\Microsoft_Base Application.app
-        packageId: $(packageId).Base_Application.es #Country
-      feed: $(feed)
-
     - name: fr #Country
       url: $(url)/fr #Country
       appPackages:
