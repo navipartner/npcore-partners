@@ -571,10 +571,9 @@ codeunit 6014476 "NPR Retail Price Log Mgt."
     local procedure GetQueryPriceLogView(var FilterView: Text; var FilterView2: Text): Boolean
     var
         PageDataPersonalization: Record "Page Data Personalization";
-        XMLDOMMgt: Codeunit "XML DOM Management";
-        InStream: InStream;
-        XmlDoc: DotNet "NPRNetXmlDocument";
-        XmlElement: DotNet NPRNetXmlElement;
+        IStream: InStream;
+        XmlDoc: XmlDocument;
+        XNode: XmlNode;
     begin
         if not FindQueryPriceLogView(PageDataPersonalization) then
             exit(false);
@@ -582,17 +581,17 @@ codeunit 6014476 "NPR Retail Price Log Mgt."
             exit(false);
 
         PageDataPersonalization.CalcFields(Value);
-        PageDataPersonalization.Value.CreateInStream(InStream);
-        XmlDoc := XmlDoc.XmlDocument;
-        XmlDoc.Load(InStream);
+        PageDataPersonalization.Value.CreateInStream(IStream);
 
-        if not XMLDOMMgt.FindNode(XmlDoc.DocumentElement, 'DataItems/DataItem[@name="' + GetTableName(DATABASE::Item) + '"]', XmlElement) then
+        XmlDocument.ReadFrom(IStream, XmlDoc);
+        if not XmlDoc.SelectSingleNode('//DataItems/DataItem[@name="' + GetTableName(DATABASE::Item) + '"]', XNode) then begin
             exit(false);
-        FilterView := XmlElement.InnerText;
+        end;
+        FilterView := XNode.AsXmlElement().InnerText;
 
-        if not XMLDOMMgt.FindNode(XmlDoc.DocumentElement, 'DataItems/DataItem[@name="' + GetTableName(DATABASE::"NPR Retail Price Log Entry") + '"]', XmlElement) then
+        if not XmlDoc.SelectSingleNode('//DataItems/DataItem[@name="' + GetTableName(DATABASE::"NPR Retail Price Log Entry") + '"]', XNode) then
             exit(false);
-        FilterView2 := XmlElement.InnerText;
+        FilterView2 := XNode.AsXmlElement().InnerText;
 
         exit(true);
     end;
@@ -601,25 +600,29 @@ codeunit 6014476 "NPR Retail Price Log Mgt."
     var
         PageDataPersonalization: Record "Page Data Personalization";
         User: Record User;
-        XMLDOMMgt: Codeunit "XML DOM Management";
-        DataItemXmlNode: DotNet NPRNetXmlNode;
-        DataItemsXmlNode: DotNet NPRNetXmlNode;
-        XmlDoc: DotNet "NPRNetXmlDocument";
-        ReportParametersXmlNode: DotNet NPRNetXmlNode;
-        OutStream: OutStream;
+        DataItemXmlNode: XmlElement;
+        DataItemsXmlNode: XmlElement;
+        ReportParametersXmlNode: XmlElement;
+        XmlDoc: XmlDocument;
+        OStream: OutStream;
     begin
-        XmlDoc := XmlDoc.XmlDocument;
+        XmlDoc := XmlDocument.Create();
 
-        XMLDOMMgt.AddRootElement(XmlDoc, 'ReportParameters', ReportParametersXmlNode);
-        XMLDOMMgt.AddDeclaration(XmlDoc, '1.0', 'utf-8', 'yes');
+        xmlDoc.SetDeclaration(xmlDeclaration.Create('1.0', 'utf-8', 'yes'));
 
-        XMLDOMMgt.AddElement(ReportParametersXmlNode, 'DataItems', '', '', DataItemsXmlNode);
+        ReportParametersXmlNode := XmlElement.Create('ReportParameters');
+        XmlDoc.Add(ReportParametersXmlNode);
 
-        XMLDOMMgt.AddElement(DataItemsXmlNode, 'DataItem', FilterPageBuilder.GetView(GetTableName(DATABASE::Item), false), '', DataItemXmlNode);
-        XMLDOMMgt.AddAttribute(DataItemXmlNode, 'name', GetTableName(DATABASE::Item));
+        DataItemsXmlNode := XmlElement.Create('DataItems');
+        ReportParametersXmlNode.Add(DataItemsXmlNode);
 
-        XMLDOMMgt.AddElement(DataItemsXmlNode, 'DataItem', FilterPageBuilder.GetView(GetTableName(DATABASE::"NPR Retail Price Log Entry"), false), '', DataItemXmlNode);
-        XMLDOMMgt.AddAttribute(DataItemXmlNode, 'name', GetTableName(DATABASE::"NPR Retail Price Log Entry"));
+        DataItemXmlNode := XmlElement.Create('DataItem', '', FilterPageBuilder.GetView(GetTableName(DATABASE::Item), false));
+        DataItemXmlNode.SetAttribute('name', GetTableName(DATABASE::Item));
+        DataItemsXmlNode.Add(DataItemXmlNode);
+
+        DataItemXmlNode := XmlElement.Create('DataItem', '', FilterPageBuilder.GetView(GetTableName(DATABASE::"NPR Retail Price Log Entry"), false));
+        DataItemXmlNode.SetAttribute('name', GetTableName(DATABASE::"NPR Retail Price Log Entry"));
+        DataItemsXmlNode.Add(DataItemXmlNode);
 
         if not FindQueryPriceLogView(PageDataPersonalization) then begin
             User.SetRange("User Name", UserId);
@@ -636,8 +639,8 @@ codeunit 6014476 "NPR Retail Price Log Mgt."
         end;
 
         Clear(PageDataPersonalization.Value);
-        PageDataPersonalization.Value.CreateOutStream(OutStream);
-        XmlDoc.Save(OutStream);
+        PageDataPersonalization.Value.CreateOutStream(OStream);
+        XmlDoc.WriteTo(OStream);
         PageDataPersonalization.Modify(true);
         Commit;
     end;
