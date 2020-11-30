@@ -8,8 +8,11 @@ codeunit 6014602 "NPR Import Base NPR Data"
     procedure ImportRapidPackageFromFeed(package: Text)
     var
         rapidStartBaseDataMgt: Codeunit "NPR RapidStart Base Data Mgt.";
+        AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
         packageName: Text;
         autoRapidstartImportLog: Record "NPR Auto Rapidstart Import Log";
+        BaseUri: Text;
+        Secret: Text;
     begin
         packageName := package.Replace('.rapidstart', '');
 
@@ -17,9 +20,11 @@ codeunit 6014602 "NPR Import Base NPR Data"
         if autoRapidstartImportLog.Get(packageName) then
             exit;
 
+        BaseUri := AzureKeyVaultMgt.GetSecret('NpRetailBaseDataBaseUrl');
+        Secret := AzureKeyVaultMgt.GetSecret('NpRetailBaseDataSecret');
+
         rapidStartBaseDataMgt.ImportPackage(
-                        'https://npretailbasedata.blob.core.windows.net/pos-test-data/' + package
-                        + '?sv=2019-10-10&ss=b&srt=co&sp=rlx&se=2050-06-23T00:45:22Z&st=2020-06-22T16:45:22Z&spr=https&sig=kIxoirxmw87n5k1rCHwsqjjS%2FMpOTTi5fCMCYzq2cH8%3D', packageName);
+                        BaseUri + '/pos-test-data/' + package + '?sv=2019-10-10&ss=b&srt=co&sp=rlx&se=2050-06-23T00:45:22Z&st=2020-06-22T16:45:22Z&spr=https&sig=' + Secret, packageName);
 
         autoRapidstartImportLog."Package Name" := packageName;
         autoRapidstartImportLog.Insert();

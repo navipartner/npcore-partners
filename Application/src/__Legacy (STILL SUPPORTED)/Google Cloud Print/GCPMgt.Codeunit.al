@@ -5,26 +5,12 @@ codeunit 6014589 "NPR GCP Mgt."
     // NP Google Account Info:
     //   navipartnerprint@gmail.com
     // 
-    //   OAuth2 Client ID:
-    //   991631407104-i42nu6qrb75n8it7s3cf79tr942mccoi.apps.googleusercontent.com
-    //   OAuth2 Client secret:
-    //   8wgdbmpow5hkSXpDVKx4pKNi
     // 
     // Google API Project (Above account is owner):
     //   https://console.developers.google.com/apis/credentials?project=cloudprint-1254
     // 
     // For supported content types (MIME types) see https://developers.google.com/cloud-print/docs/appInterfaces#submit
     // 
-    // NPR5.23/MMV/20160519 CASE 241549 Reduced max file size from test value (15MB) to 2MB.
-    // NPR5.26/MMV /20160824 CASE 246209 Added support for in-memory base64 printing.
-    //                                   Added support for stored print job specifications.
-    //                                   Renamed to GCP Mgt.
-    //                                   Refactored.
-    // NPR5.29/MMV /20161207 CASE 260366 Handle BLOB tokens.
-    // NPR5.30/MMV /20170208 CASE 261964 Refactored completely.
-    // NPR5.51/MMV /20190617 CASE 358889 Improved lock timing.
-    // NPR5.53/MMV /20191029 CASE 374501 Fixed #358889
-
 
     trigger OnRun()
     begin
@@ -67,9 +53,7 @@ codeunit 6014589 "NPR GCP Mgt."
         if API.GetAccessTokenValue() <> AccessTokenValue then
             Token.AddOrUpdate('GOOGLE_PRINT_ACCESS', API.GetAccessTokenValue(), API.GetAccessTokenTimeStamp(), API.GetAccessTokenExpiresIn());
 
-        //-NPR5.51 [358889]
         Commit; //In case access token was refreshed manually or as part of job ping-pong.
-        //+NPR5.51 [358889]
 
         if not Success then begin
             if GetLastErrorText() <> '' then
@@ -261,6 +245,8 @@ codeunit 6014589 "NPR GCP Mgt."
 
     procedure GetAuthURL(): Text
     var
+
+        AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
         response_type: Text;
         redirect_uri: Text;
         scope: Text;
@@ -277,7 +263,7 @@ codeunit 6014589 "NPR GCP Mgt."
         access_type := 'offline';
         AuthURL := 'https://accounts.google.com/o/oauth2/v2/auth';
         redirect_uri := 'urn:ietf:wg:oauth:2.0:oob';
-        ClientID := '991631407104-i42nu6qrb75n8it7s3cf79tr942mccoi.apps.googleusercontent.com';
+        ClientID := AzureKeyVaultMgt.GetSecret('GoogleCloudPrintClientId');
 
         exit(AuthURL + '?scope=' + scope + '&redirect_uri=' + redirect_uri + '&response_type=' + response_type + '&client_id=' + ClientID + '&access_type=' + access_type);
     end;
@@ -367,18 +353,14 @@ codeunit 6014589 "NPR GCP Mgt."
         if Token.Get('GOOGLE_PRINT_REFRESH') then
             OutRefreshTokenValue := Token.GetValue();
 
-        //-NPR5.51 [358889]
         Token.LockTable;
-        //+NPR5.51 [358889]
+
         if Token.Get('GOOGLE_PRINT_ACCESS') then begin
             if Token.IsExpired then begin
                 API.SetRefreshTokenValue(OutRefreshTokenValue);
                 API.RefreshAccessToken();
                 Token.AddOrUpdate('GOOGLE_PRINT_ACCESS', API.GetAccessTokenValue, API.GetAccessTokenTimeStamp, API.GetAccessTokenExpiresIn);
                 OutAccessTokenValue := API.GetAccessTokenValue;
-                //-NPR5.53 [374501]
-                //    COMMIT;
-                //+NPR5.53 [374501]
             end else
                 OutAccessTokenValue := Token.GetValue();
         end;
@@ -386,9 +368,7 @@ codeunit 6014589 "NPR GCP Mgt."
         if (StrLen(OutAccessTokenValue) = 0) or (StrLen(OutRefreshTokenValue) = 0) then
             Error(Text000002);
 
-        //-NPR5.53 [374501]
         Commit;
-        //+NPR5.53 [374501]
     end;
 }
 
