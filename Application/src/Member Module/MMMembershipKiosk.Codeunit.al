@@ -137,7 +137,7 @@ codeunit 6060126 "NPR MM Membership Kiosk"
         '<head>' +
         '    <meta charset="utf-8">' +
         '    <title>Self-service kiosk</title>' +
-        //'    <link href="https://navipartner.test.navipartner.dk/self-service-kiosk/css/styles.css" media="screen, projection" rel="stylesheet" type="text/css" />'+
+        //StrSubstNo('    <link href="%1/css/styles.css" media="screen, projection" rel="stylesheet" type="text/css" />', GetMMMembershipKioskBaseUrl()) +
         //'    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>'+
         //'    <link href="https://fonts.googleapis.com/css?family=Lato:400,700" rel="stylesheet">'+
         '</head>' +
@@ -145,7 +145,7 @@ codeunit 6060126 "NPR MM Membership Kiosk"
         '       <div id="main">' +
         '           <a href="#" title="Touch anywhere to start" onClick="NavigateNext();return false;">' +
         '           <div id="logo">' +
-        '               <img src="https://navipartner.test.navipartner.dk/self-service-kiosk/images/logo.gif" alt="Navipartner" />' +
+        StrSubstNo('               <img src="%1/images/logo.gif" alt="Navipartner" />', GetMMMembershipKioskBaseUrl()) +
         '           </div></a>' +
         '           <div class="touch-anywhere">' +
         '               Touch anywhere to start' +
@@ -180,16 +180,16 @@ codeunit 6060126 "NPR MM Membership Kiosk"
         '<head>' +
         '    <meta charset="utf-8">' +
         '    <title>Scan your barcode | Self-service kiosk</title>' +
-        //'    <link href="https://navipartner.test.navipartner.dk/self-service-kiosk/css/styles.css" media="screen, projection" rel="stylesheet" type="text/css" />'+
+        //StrSubstNo('    <link href="%1/css/styles.css" media="screen, projection" rel="stylesheet" type="text/css" />', GetMMMembershipKioskBaseUrl()) +
         '</head>' +
         '    <body>' +
         '       <div id="main">' +
-        '           <a href="#" OnClick="StartPage();return false";><img id="small-logo" src="https://navipartner.test.navipartner.dk/self-service-kiosk/images/logo.gif" alt="Navipartner" /></a>' +
+        StrSubstNo('           <a href="#" OnClick="StartPage();return false";><img id="small-logo" src="%1/images/logo.gif" alt="Navipartner" /></a>', GetMMMembershipKioskBaseUrl()) +
         '           <div id="container">' +
         '               <h1>New membership</h1>' +
         '               <div id="content">' +
         '                   <h2>Scan your barcode<br />to begin membership registration</h2>' +
-        '                   <a class="barcode" href="#"><img src="https://navipartner.test.navipartner.dk/self-service-kiosk/images/barcode.jpg" alt="Navipartner" /></a>' +
+        StrSubstNo('                   <a class="barcode" href="#"><img src="%1/images/barcode.jpg" alt="Navipartner" /></a>', GetMMMembershipKioskBaseUrl()) +
         '                   <input id="typed4" type="text" placeholder="Scan ticket number." />' +
         '               </div>' +
         '               <a class="next nav" href="#" onClick="NavigateNext(); return false;"><span>Next</span></a>' +
@@ -240,11 +240,11 @@ codeunit 6060126 "NPR MM Membership Kiosk"
         '    <meta charset="utf-8">' +
         '    <meta name="viewport" content="width=device-width, initial-scale=1" />' +
         '    <title>Data entry | Self-service kiosk</title>' +
-        //'    <link href="https://navipartner.test.navipartner.dk/self-service-kiosk/css/styles.css" media="screen, projection" rel="stylesheet" type="text/css" />'+
+        //StrSubstNo('    <link href="%1/css/styles.css" media="screen, projection" rel="stylesheet" type="text/css" />', GetMMMembershipKioskBaseUrl()) +
         '</head>' +
         '    <body>' +
         '       <div id="main">' +
-        '           <a href="#" OnClick="StartPage();return false";><img id="small-logo" src="https://navipartner.test.navipartner.dk/self-service-kiosk/images/logo.gif" alt="Navipartner" /></a>' +
+        StrSubstNo('           <a href="#" OnClick="StartPage();return false";><img id="small-logo" src="%1/images/logo.gif" alt="Navipartner" /></a>', GetMMMembershipKioskBaseUrl()) +
         '           <div id="container">' +
         '               <h1>New membership</h1>' +
         '               <div id="content">' +
@@ -316,16 +316,16 @@ codeunit 6060126 "NPR MM Membership Kiosk"
         '    <meta charset="utf-8">' +
         '    <meta name="viewport" content="width=device-width, initial-scale=1" />' +
         '    <title>Take a photo | Self-service kiosk</title>' +
-        //'    <link href="https://navipartner.test.navipartner.dk/self-service-kiosk/css/styles.css" media="screen, projection" rel="stylesheet" type="text/css" />'+
+        //StrSubstNo('    <link href="%1/css/styles.css" media="screen, projection" rel="stylesheet" type="text/css" />', GetMMMembershipKioskBaseUrl()) +
         '</head>' +
         '    <body>' +
         '       <div id="main">' +
-        '           <a href="#" OnClick="StartPage();return false";><img id="small-logo" src="https://navipartner.test.navipartner.dk/self-service-kiosk/images/logo.gif" alt="Navipartner" /></a>' +
+        StrSubstNo('           <a href="#" OnClick="StartPage();return false";><img id="small-logo" src="%1/images/logo.gif" alt="Navipartner" /></a>', GetMMMembershipKioskBaseUrl()) +
         '           <div id="container">' +
         '               <h1>New membership</h1>' +
         '               <div id="content">' +
         '                   <h2>Take a photo:</h2>' +
-        '                   <div class="photo-holder"><img src="https://navipartner.test.navipartner.dk/self-service-kiosk/images/transparent.png" alt="Navipartner" /></div>' +
+        StrSubstNo('                   <div class="photo-holder"><img src="%1/images/transparent.png" alt="Navipartner" /></div>', GetMMMembershipKioskBaseUrl()) +
         '                   <a class="camera" href="#"></a>' +
         '                   <h3>Press the icon when you are ready!</h3>' +
         '               </div>' +
@@ -378,17 +378,17 @@ codeunit 6060126 "NPR MM Membership Kiosk"
         '    <meta charset="utf-8">' +
         '    <meta name="viewport" content="width=device-width, initial-scale=1" />' +
         '    <title>Card preview | Self-service kiosk</title>' +
-        //'    <link href="https://navipartner.test.navipartner.dk/self-service-kiosk/css/styles.css" media="screen, projection" rel="stylesheet" type="text/css" />'+
+        //StrSubstNo('    <link href="%1/css/styles.css" media="screen, projection" rel="stylesheet" type="text/css" />', GetMMMembershipKioskBaseUrl()) +
         '</head>' +
         '    <body>' +
         '       <div id="main">' +
-        '           <a href="#" OnClick="StartPage();return false";><img id="small-logo" src="https://navipartner.test.navipartner.dk/self-service-kiosk/images/logo.gif" alt="Navipartner" /></a>' +
+        StrSubstNo('           <a href="#" OnClick="StartPage();return false";><img id="small-logo" src="%1/images/logo.gif" alt="Navipartner" /></a>', GetMMMembershipKioskBaseUrl()) +
         '           <div id="container">' +
         '               <h1>New membership</h1>' +
         '               <div id="content">' +
         '                   <h2>Membership card preview</h2>' +
         '                   <div class="preview-card-holder">' +
-        '                        <div class="left"><img src="https://navipartner.test.navipartner.dk/self-service-kiosk/images/photo.jpg" alt="Navipartner" /></div>' +
+        StrSubstNo('                        <div class="left"><img src="%1/images/photo.jpg" alt="Navipartner" /></div>', GetMMMembershipKioskBaseUrl()) +
         StrSubstNo('                            <div class="name">%1 %2</div>', GetStringValue(Parameters, 'FirstName'), GetStringValue(Parameters, 'LastName')) +
         StrSubstNo('                            <div class="date">%1</div>', GetStringValue(Parameters, 'DayOfBirth')) +
         StrSubstNo('                            <div class="name">%1</div>', GetStringValue(Parameters, 'EmailAddress')) +
@@ -450,7 +450,7 @@ codeunit 6060126 "NPR MM Membership Kiosk"
         '    <meta charset="utf-8">' +
         '    <meta name="viewport" content="width=device-width, initial-scale=1" />' +
         '    <title>Printing | Self-service kiosk</title>' +
-        //'    <link href="https://navipartner.test.navipartner.dk/self-service-kiosk/css/styles.css" media="screen, projection" rel="stylesheet" type="text/css" />'+
+        //StrSubstNo('    <link href="%1/css/styles.css" media="screen, projection" rel="stylesheet" type="text/css" />', GetMMMembershipKioskBaseUrl()) +
         '</head>' +
         '    <body>' +
         '       <div id="main">' +
@@ -458,7 +458,7 @@ codeunit 6060126 "NPR MM Membership Kiosk"
         '               <h1>New membership</h1>' +
         '               <div id="content">' +
         '                   <h2>Printing your membercard...</h2>' +
-        '                   <img id="small-printer" src="https://navipartner.test.navipartner.dk/self-service-kiosk/images/print.png" alt="Navipartner" />' +
+        StrSubstNo('                   <img id="small-printer" src="%1/images/print.png" alt="Navipartner" />', GetMMMembershipKioskBaseUrl()) +
         '                   <div class="loader12"></div>' +
         '               </div>' +
         '           </div>' +
@@ -500,7 +500,7 @@ codeunit 6060126 "NPR MM Membership Kiosk"
         '    <meta charset="utf-8">' +
         '    <meta name="viewport" content="width=device-width, initial-scale=1" />' +
         '    <title>Printing | Self-service kiosk</title>' +
-        //'    <link href="https://navipartner.test.navipartner.dk/self-service-kiosk/css/styles.css" media="screen, projection" rel="stylesheet" type="text/css" />'+
+        //StrSubstNo('    <link href="%1/css/styles.css" media="screen, projection" rel="stylesheet" type="text/css" />', GetMMMembershipKioskBaseUrl()) +
         '</head>' +
         '    <body>' +
         '       <div id="main">' +
@@ -677,7 +677,7 @@ codeunit 6060126 "NPR MM Membership Kiosk"
         '#container a.nav {' +
         ' font-weight:bold;' +
         ' color:#005191;' +
-        ' background:url(https://navipartner.test.navipartner.dk/self-service-kiosk/images/sprite.png) no-repeat;' +
+        StrSubstNo(' background:url(%1/images/sprite.png) no-repeat;', GetMMMembershipKioskBaseUrl()) +
         ' width:92px;' +
         ' height:92px;' +
         '}';
@@ -725,7 +725,7 @@ codeunit 6060126 "NPR MM Membership Kiosk"
 
         Css +=
         '#container a.camera {' +
-        ' background:url(https://navipartner.test.navipartner.dk/self-service-kiosk/images/sprite.png) no-repeat;' +
+        StrSubstNo(' background:url(%1/images/sprite.png) no-repeat;', GetMMMembershipKioskBaseUrl()) +
         ' width:87px;' +
         ' height:63px;' +
         ' background-position:-293px -14px;' +
@@ -768,7 +768,7 @@ codeunit 6060126 "NPR MM Membership Kiosk"
         '#container .preview-card-holder .right {' +
         ' float:left;' +
         ' text-align:left;' +
-        ' background:url(https://navipartner.test.navipartner.dk/self-service-kiosk/images/transparent-logo.png) no-repeat center center;' +
+        StrSubstNo(' background:url(%1/images/transparent-logo.png) no-repeat center center;', GetMMMembershipKioskBaseUrl()) +
         '}';
 
         Css +=
@@ -809,6 +809,13 @@ codeunit 6060126 "NPR MM Membership Kiosk"
         'margin:-50px auto 0;' +
         'margin-top:0;' +
         '}';
+    end;
+
+    local procedure GetMMMembershipKioskBaseUrl(): Text
+    var
+        AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt."; //Single instance, buffering secrets!        
+    begin
+        Exit(AzureKeyVaultMgt.GetSecret('NpSelfServiceKioskBaseUrl'));
     end;
 }
 

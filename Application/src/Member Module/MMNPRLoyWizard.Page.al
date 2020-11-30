@@ -155,8 +155,9 @@ page 6151164 "NPR MM NPR Loy. Wizard"
         BurnRation: Decimal;
 
     local procedure InitializeDefaults()
+    var
+        AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
     begin
-
         PaymentMethodCode := 'MM-LOYALTY';
         CommunityCode := 'NPR-CC';
         FS_Prefix := 'NPR';
@@ -165,9 +166,9 @@ page 6151164 "NPR MM NPR Loy. Wizard"
         LoyaltyCmpInSameDB := true;
 
         if (UserId = 'TSA') then begin
-            ServiceBaseURL := 'https://dev90.dynamics-retail.com:7087/NPRetail90_W1_DEV_Latest/WS/RD16_Server/Codeunit/';
-            ServiceUser := 'TSA';
-            ServicePassword := 'aA123456%';
+            ServiceBaseURL := AzureKeyVaultMgt.GetSecret('MMLoyaltyServiceBaseUrl');
+            ServiceUser := AzureKeyVaultMgt.GetSecret('MMLoyaltyServiceUsername');
+            ServicePassword := AzureKeyVaultMgt.GetSecret('MMLoyaltyServicePassword');
         end;
 
         BurnRation := 0.015;
@@ -205,4 +206,3 @@ page 6151164 "NPR MM NPR Loy. Wizard"
         vBurnFactor := BurnRation;
     end;
 }
-

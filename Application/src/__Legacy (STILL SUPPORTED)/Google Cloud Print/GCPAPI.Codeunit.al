@@ -1,13 +1,8 @@
 codeunit 6014588 "NPR GCP API"
 {
-    // NPR5.26/MMV /20160826 CASE 246209 Created codeunit.
-    // NPR5.30/MMV /20170207 CASE 261964 Refactored completely from assembly usage to DotNet interop.
-    // NPR5.38/MMV /20171027 CASE 294559 Type bug workaround for NAV2018.
-    // 
     // Google Cloud Print & Authorization Documentation:
     //   https://developers.google.com/cloud-print/docs/appInterfaces
     //   https://developers.google.com/identity/protocols/OAuth2InstalledApp
-
 
     trigger OnRun()
     begin
@@ -212,15 +207,16 @@ codeunit 6014588 "NPR GCP API"
         AuthenticationHeader: DotNet NPRNetAuthenticationHeaderValue;
         HttpResponseMessage: DotNet NPRNetHttpResponseMessage;
         JObject: DotNet JObject;
-        Dictionary: DotNet NPRNetDictionary_Of_T_U;
+        Dictionary: DotNet NPRNetDictionary_Of_T_U;        
+        AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
     begin
         Clear(_AccessToken);
         Clear(_RefreshToken);
 
         CreateDotNetDictionary(Dictionary);
         Dictionary.Add('code', AuthCode);
-        Dictionary.Add('client_id', '991631407104-i42nu6qrb75n8it7s3cf79tr942mccoi.apps.googleusercontent.com');
-        Dictionary.Add('client_secret', '8wgdbmpow5hkSXpDVKx4pKNi');
+        Dictionary.Add('client_id', AzureKeyVaultMgt.GetSecret('GoogleCloudPrintClientId')); 
+        Dictionary.Add('client_secret', AzureKeyVaultMgt.GetSecret('GoogleCloudPrintClientSecret'));
         Dictionary.Add('redirect_uri', 'urn:ietf:wg:oauth:2.0:oob');
         Dictionary.Add('grant_type', 'authorization_code');
 
@@ -251,13 +247,14 @@ codeunit 6014588 "NPR GCP API"
         HttpResponseMessage: DotNet NPRNetHttpResponseMessage;
         JObject: DotNet JObject;
         Dictionary: DotNet NPRNetDictionary_Of_T_U;
+        AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";        
     begin
         if StrLen(_RefreshToken) = 0 then
             Error(Error_MissingTokens);
 
         CreateDotNetDictionary(Dictionary);
-        Dictionary.Add('client_id', '991631407104-i42nu6qrb75n8it7s3cf79tr942mccoi.apps.googleusercontent.com');
-        Dictionary.Add('client_secret', '8wgdbmpow5hkSXpDVKx4pKNi');
+        Dictionary.Add('client_id', AzureKeyVaultMgt.GetSecret('GoogleCloudPrintClientId'));
+        Dictionary.Add('client_secret', AzureKeyVaultMgt.GetSecret('GoogleCloudPrintClientSecret'));
         Dictionary.Add('refresh_token', _RefreshToken);
         Dictionary.Add('grant_type', 'refresh_token');
 
@@ -304,11 +301,8 @@ codeunit 6014588 "NPR GCP API"
     var
         Text: Text;
     begin
-        //-NPR5.38 [294559]
-        //JObject := JObject.Parse(HttpResponseMessage.Content.ReadAsStringAsync().Result);
         Text := HttpResponseMessage.Content.ReadAsStringAsync().Result;
         JObject := JObject.Parse(Text);
-        //+NPR5.38 [294559]
     end;
 
     local procedure CreateDotNetDictionary(Dictionary: DotNet NPRNetDictionary_Of_T_U)

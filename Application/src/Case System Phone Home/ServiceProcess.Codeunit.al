@@ -20,7 +20,6 @@ codeunit 6014483 "NPR Service Process"
     var
         IComm: Record "NPR I-Comm";
         ServiceLibraryNamespaceUri: Label 'urn:microsoft-dynamics-schemas/codeunit/ServiceLibrary', Locked = true;
-        ServiceLibraryUri: Label 'https://api.navipartner.dk/servicelibrary', Locked = true;
 
     local procedure IsUserSubscribed(SubscriptionUserId: Text[50]; CustomerNo: Code[20]; ServiceId: Code[20]) Result: Boolean
     var
@@ -161,18 +160,17 @@ codeunit 6014483 "NPR Service Process"
         Headers: HttpHeaders;
         RequestMessage: HttpRequestMessage;
         ResponseMessage: HttpResponseMessage;
-
-
+        AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
     begin
         Content.WriteFrom(CreateXMLRequest(ServiceMethod, BodyXmlText));
         Content.GetHeaders(Headers);
         Headers.Remove('Content-Type');
         Headers.Add('Content-Type', 'text/xml; charset=utf-8');
         Headers.Add('SOAPAction', StrSubstNo('%1:%2', ServiceLibraryNamespaceUri, ServiceMethod));
-        Headers.Add('Ocp-Apim-Subscription-Key', '012e067d9f514816b6504e0ad9fb4e36');
+        Headers.Add('Ocp-Apim-Subscription-Key', AzureKeyVaultMgt.GetSecret('ServiceLibraryKey'));
         RequestMessage.Content(Content);
         RequestMessage.Method('POST');
-        RequestMessage.SetRequestUri(ServiceLibraryUri);
+        RequestMessage.SetRequestUri(StrSubstNo('%1/servicelibrary', AzureKeyVaultMgt.GetSecret('ApiHostUri')));
 
         Client.Timeout(5000);
         if not Client.Send(RequestMessage, ResponseMessage) then
@@ -197,6 +195,4 @@ codeunit 6014483 "NPR Service Process"
           '</Envelope>');
 
     end;
-
 }
-

@@ -1,27 +1,12 @@
 codeunit 6059940 "NPR SMS Management"
 {
-    // NPR5.26/THRO/20160908 CASE 244114 SMS Module
-    // NPR5.27/MHA /20161025 CASE 255580 Update Format on Option Evaluation
-    // NPR5.30/THRO/20170203 CASE 263182 Added EditAndSendSMS and SelectTemplate - used for show and send a sms
-    //                                   SMS Message Text shown in Send SMS page
-    //                                   Added Page subscribers
-    // NPR5.36/THRO/20170913 CASE 289216 Template saved on NaviDocs Entry
-    // NPR5.38/THRO/20170108 CASE 301396 Added SendBatchSMS and option to send through NaviDocs
-    // NPR5.40/THRO/20180314 CASE 304312 Support for Reportlink via Azure Functions, new paramter ReportID in MergeDataFields
-    //                                   Added POS Entry List page subscriber
-    // NPR5.40/JC  /20180320 CASE 292485 Fixed option value text
-    // NPR5.48/BHR /20181115 CASE 331217 Show correct template
-    // NPR5.51/SARA/20190819 CASE 363578 Sending an SMS with the turnover based on the POS Workshift Checkpoint
-    // NPR5.52/SARA/20190912 CASE 368395 Move SMS profile from POS Unit to POS End of day Profile
-    // NPR5.55/ZESO/20200511 CASE 403740 Use New API from LinkMobility,'\n'is for inserting new line.
-    // NPR5.55/SARA/20200305 CASE 389275 Send SMS for 'Cash Register Turnover Mobile 2' and 'Cash Register Turnover Mobile 3'
-
-
     trigger OnRun()
     begin
     end;
 
     var
+        DataTypeManagement: Codeunit "Data Type Management";
+        AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
         NaviDocsHandlingProfileTxt: Label 'Send SMS';
         SMSFilterCaption: Label 'Filters for %1 table';
         NoRecordSelectedTxt: Label 'No record was selected. Send SMS based on blank record?';
@@ -30,7 +15,6 @@ codeunit 6059940 "NPR SMS Management"
         Error001: Label 'SMS Message and Phone No must be suplied.';
         Error002: Label 'You are not allowed to use the %1 service.';
         Error003: Label 'Multiple receipients aren''t allowed.';
-        DataTypeManagement: Codeunit "Data Type Management";
         Error004: Label 'SMS wasn''t sent. The service returned:\%1';
         Error005: Label 'Can''t find %1 for %2 %3.';
         Error006: Label 'Send SMS returned: %1';
@@ -90,17 +74,7 @@ codeunit 6059940 "NPR SMS Management"
         end;
 
         if ServiceCalc.useService(ServiceCode) then begin
-            //-NPR5.55 [403740]
-            //StringContent := StringContent.StringContent(MakeSMSBody(PhoneNo,Sender,SMSMessage),Encoding.UTF8,'text/xml');
-
-            //IF CallRestWebService('http://api.linkmobility.dk/',
-            //STRSUBSTNO('v2/message.xml?apikey=%1',GetAPIKey),
-            //'POST',
-            //StringContent,
-            //HttpResponseMessage) THEN BEGIN
-            //Result := HttpResponseMessage.Content.ReadAsStringAsync.Result;
-            if CallRestWebServiceNew('https://wsx.sp247.net/sms/send', Sender, PhoneNo, SMSMessage, ResponseString) then begin
-                //+NPR5.55 [403740]
+            if CallRestWebServiceNew(AzureKeyVaultMgt.GetSecret('SMSMgtHTTPRequestUrl'), Sender, PhoneNo, SMSMessage, ResponseString) then begin
                 OnSMSSendSuccess(PhoneNo, Sender, SMSMessage, Result);
             end else begin
                 ErrorHandled := false;
@@ -126,23 +100,20 @@ codeunit 6059940 "NPR SMS Management"
         DialogPage.SetRecord(Template);
         if DialogPage.RunModal <> ACTION::OK then
             exit;
-        //-NPR5.30 [263182]
-        //-NPR5.38 [301396]
+
         DialogPage.GetData(SendTo, RecRef, SMSBodyText, Sender, SendingOption, DelayUntil);
-        //-NPR5.38 [301396]
+
         if Sender = '' then
             Sender := Template."Alt. Sender";
         if Sender = '' then
             Sender := GetDefaultSender;
-        //+NPR5.30 [263182]
         if Template."Table No." <> 0 then
             if IsRecRefEmpty(RecRef) then
                 if not Confirm(NoRecordSelectedTxt) then
                     exit;
-        //-NPR5.30 [263182]
+
         if SMSBodyText = '' then
             SMSBodyText := MakeMessage(Template, RecRef);
-        //-NPR5.38 [301396]
         if SendingOption = SendingOption::NaviDocs then begin
             if Sender <> Template."Alt. Sender" then
                 if Sender <> GetDefaultSender then
@@ -158,10 +129,8 @@ codeunit 6059940 "NPR SMS Management"
                 if not Confirm(MessageChangeTxt) then
                     exit;
         end;
-        //+NPR5.38 [301396]
         SendSMS(SendTo, Sender, SMSBodyText);
         Message(SMSSentTxt);
-        //+NPR5.30 [263182]
     end;
 
     procedure SendBatchSMS(SMSTemplateHeader: Record "NPR SMS Template Header")
@@ -178,7 +147,6 @@ codeunit 6059940 "NPR SMS Management"
         DummyTxt: Text;
         DummyRecRef: RecordRef;
     begin
-        //-NPR5.38 [301396]
         if not RunDynamicRequestPage(SMSTemplateHeader, Filters, '') then
             exit;
 
@@ -193,9 +161,7 @@ codeunit 6059940 "NPR SMS Management"
         end;
 
         SMSSendMessage.SetData('', DummyRecRef, SMSTemplateHeader."Alt. Sender", 2, StrSubstNo(BatchSendStatusText, SMSTemplateHeader."Table Caption", Total));
-        //-NPR5.48 [331217]
         SMSSendMessage.SetRecord(SMSTemplateHeader);
-        //+NPR5.48 [331217]
         if SMSSendMessage.RunModal <> ACTION::OK then
             exit;
 
@@ -217,7 +183,6 @@ codeunit 6059940 "NPR SMS Management"
                     SendSMS(SendTo, SMSTemplateHeader."Alt. Sender", MakeMessage(SMSTemplateHeader, RecRef));
             until RecRef.Next = 0;
         Window.Close;
-        //+NPR5.38 [301396]
     end;
 
     local procedure RunDynamicRequestPage(SMSTemplateHeader: Record "NPR SMS Template Header"; var ReturnFilters: Text; Filters: Text): Boolean
@@ -231,7 +196,6 @@ codeunit 6059940 "NPR SMS Management"
         DynamicRequestPageFieldAdded: Boolean;
         Index: Integer;
     begin
-        //-NPR5.38 [301396]
         SMSTemplateHeader.CalcFields("Table Caption");
         if not TableMetadata.Get(SMSTemplateHeader."Table No.") then
             exit(false);
@@ -265,7 +229,6 @@ codeunit 6059940 "NPR SMS Management"
           RequestPageParametersHelper.GetViewFromDynamicRequestPage(FilterPageBuilder, CopyStr(SMSTemplateHeader."Table Caption", 1, 20), SMSTemplateHeader."Table No.");
 
         exit(true);
-        //+NPR5.38 [301396]
     end;
 
     local procedure SetFiltersOnTable(SMSTemplateHeader: Record "NPR SMS Template Header"; Filters: Text; var RecRef: RecordRef): Boolean
@@ -274,7 +237,6 @@ codeunit 6059940 "NPR SMS Management"
         RequestPageParametersHelper: Codeunit "Request Page Parameters Helper";
         OutStream: OutStream;
     begin
-        //-NPR5.38 [301396]
         RecRef.Open(SMSTemplateHeader."Table No.");
 
         if Filters = '' then
@@ -298,7 +260,6 @@ codeunit 6059940 "NPR SMS Management"
             RecRef.FilterGroup(0);
         end;
         exit(true);
-        //+NPR5.38 [301396]
     end;
 
     procedure EditAndSendSMS(RecordToSendVariant: Variant)
@@ -313,7 +274,6 @@ codeunit 6059940 "NPR SMS Management"
         DelayUntil: DateTime;
         Changed: Boolean;
     begin
-        //-NPR5.30 [263182]
         if not DataTypeManagement.GetRecordRef(RecordToSendVariant, RecRef) then
             exit;
         if SelectTemplate(RecRef, SMSTemplateHeader) then begin
@@ -321,15 +281,13 @@ codeunit 6059940 "NPR SMS Management"
             if Sender = '' then
                 Sender := GetDefaultSender;
             SendTo := MergeDataFields(SMSTemplateHeader.Recipient, RecRef, 0);
-            //-NPR5.38 [301396]
+
             DialogPage.SetData(SendTo, RecRef, Sender, 1, '');
-            //+NPR5.38 [301396]
+
             DialogPage.SetRecord(SMSTemplateHeader);
             if DialogPage.RunModal <> ACTION::OK then
                 exit;
-            //-NPR5.38 [301396]
             DialogPage.GetData(SendTo, RecRef, SMSBodyText, Sender, SendingOption, DelayUntil);
-            //-NPR5.38 [301396]
 
             if SMSTemplateHeader."Table No." <> 0 then
                 if IsRecRefEmpty(RecRef) then
@@ -337,7 +295,6 @@ codeunit 6059940 "NPR SMS Management"
                         exit;
             if SMSBodyText = '' then
                 SMSBodyText := MakeMessage(SMSTemplateHeader, RecRef);
-            //-NPR5.38 [301396]
             if SendingOption = SendingOption::NaviDocs then begin
                 if Sender <> SMSTemplateHeader."Alt. Sender" then
                     if Sender <> GetDefaultSender then
@@ -353,12 +310,10 @@ codeunit 6059940 "NPR SMS Management"
                     if not Confirm(MessageChangeTxt) then
                         exit;
             end;
-            //+NPR5.38 [301396]
             SendSMS(SendTo, Sender, SMSBodyText);
             Message(SMSSentTxt);
         end else
             Message(NoTemplateTxt, SMSTemplateHeader.TableCaption, RecRef.Caption);
-        //+NPR5.30 [263182]
     end;
 
     local procedure MakeSMSBody(PhoneNo: Text; Sender: Text; SMSMessage: Text): Text
@@ -397,15 +352,7 @@ codeunit 6059940 "NPR SMS Management"
             Error(HttpResponseMessage.Content.ReadAsStringAsync.Result);
     end;
 
-    local procedure GetAPIKey(): Text
-    begin
-        exit('37840e6e3c65e3d6677ef0d3be559d8d4ca7af3b95efbc50f71ab019df83a35b');
-    end;
-
-    local procedure "--- Template handling"()
-    begin
-    end;
-
+    #region Template handling
     procedure FindTemplate(RecordVariant: Variant; var Template: Record "NPR SMS Template Header"): Boolean
     var
         TempBlob: Codeunit "Temp Blob";
@@ -456,7 +403,6 @@ codeunit 6059940 "NPR SMS Management"
         TemplateFound: Boolean;
         CanEvaluateFilters: Boolean;
     begin
-        //-NPR5.30 [263182]
         OnBeforeFindTemplate(IsHandled, RecordVariant, Template);
         if IsHandled then
             exit(true);
@@ -495,7 +441,6 @@ codeunit 6059940 "NPR SMS Management"
 
         OnAfterFindTemplate(RecordVariant, Template, TemplateFound);
         exit(TemplateFound);
-        //+NPR5.30 [263182]
     end;
 
     local procedure EvaluateConditionOnTable(SourceRecordVariant: Variant; TableId: Integer; TempBlob: Codeunit "Temp Blob"): Boolean
@@ -533,11 +478,7 @@ codeunit 6059940 "NPR SMS Management"
         NewLine: Text;
     begin
         SMSMessage := '';
-        //-NPR5.55 [403740]
-        //CRLF[1] := 13;
-        //CRLF[2] := 10;
         NewLine := '\n';
-        //+NPR5.55 [403740]
         if DataTypeManagement.GetRecordRef(RecordVariant, RecRef) then
             MergeRecord := not IsRecRefEmpty(RecRef);
 
@@ -548,10 +489,7 @@ codeunit 6059940 "NPR SMS Management"
                     SMSMessage += MergeDataFields(TemplateLine."SMS Text", RecRef, Template."Report ID")
                 else
                     SMSMessage += TemplateLine."SMS Text";
-                //-NPR5.55 [403740]
-                //SMSMessage += CRLF;
                 SMSMessage += NewLine;
-            //+NPR5.55 [403740]
             until TemplateLine.Next = 0;
         exit(SMSMessage);
     end;
@@ -572,7 +510,7 @@ codeunit 6059940 "NPR SMS Management"
                 TextLine := CopyStr(TextLine, Match.Index + Match.Length + 1);
             end;
         until not Match.Success;
-        //-NPR5.40 [304312]
+
         ResultText += TextLine;
         TextLine := ResultText;
         ResultText := '';
@@ -584,7 +522,7 @@ codeunit 6059940 "NPR SMS Management"
                 TextLine := CopyStr(TextLine, Match.Index + Match.Length + 1);
             end;
         until not Match.Success;
-        //-NPR5.40 [304312]
+
         ResultText += TextLine;
         exit(ResultText);
     end;
@@ -607,14 +545,8 @@ codeunit 6059940 "NPR SMS Management"
 
         if UpperCase(Format(Format(FldRef.Type))) = 'OPTION' then begin
             OptionString := Format(FldRef.OptionCaption);
-            //-NPR5.27 [255580]
-            //EVALUATE(OptionNo,FORMAT(FldRef.VALUE));
             Evaluate(OptionNo, Format(FldRef.Value, 0, 9));
-            //+NPR5.27 [255580]
-            //+NPR5.40 [292485]
-            //EXIT(SELECTSTR(OptionNo,OptionString));
             exit(SelectStr(OptionNo + 1, OptionString));
-            //+NPR5.40
         end else
             exit(Format(FldRef.Value, 0, AutoFormat.ResolveAutoFormat(Enum::"Auto Format".FromInteger(1), '')));
     end;
@@ -635,18 +567,15 @@ codeunit 6059940 "NPR SMS Management"
     var
         IComm: Record "NPR I-Comm";
     begin
-        //-NPR5.30 [263182]
         IComm.Get;
         IComm.TestField("E-Club Sender");
         exit(IComm."E-Club Sender");
-        //+NPR5.30 [263182]
     end;
 
     local procedure GetDefaultSenderTo(i: Integer): Text
     var
         IComm: Record "NPR I-Comm";
     begin
-        //-NPR5.51 [363578]
         IComm.Get;
         case i of
             1: //Default
@@ -654,20 +583,15 @@ codeunit 6059940 "NPR SMS Management"
                     IComm.TestField("Reg. Turnover Mobile No.");
                     exit(IComm."Reg. Turnover Mobile No.");
                 end;
-            //-NPR5.55 [389275]
             2:
                 exit(IComm."Register Turnover Mobile 2"); //Option 2
             3:
                 exit(IComm."Register Turnover Mobile 3"); //Option 3
-                                                          //+NPR5.55 [389275]
         end;
-        //-NPR5.51 [363578]
     end;
+    #endregion
 
-    local procedure "--- Publishers"()
-    begin
-    end;
-
+    #region Publishers
     [IntegrationEvent(false, false)]
     local procedure OnSendSMS(var Handled: Boolean; PhoneNo: Text; Sender: Text; SMSMessage: Text)
     begin
@@ -692,19 +616,15 @@ codeunit 6059940 "NPR SMS Management"
     local procedure OnAfterFindTemplate(RecordVariant: Variant; var Template: Record "NPR SMS Template Header"; var TemplateFound: Boolean)
     begin
     end;
+    #endregion Publishers
 
-    local procedure "-- Subscribers"()
-    begin
-    end;
-
+    #region Subscribers
     [EventSubscriber(ObjectType::Page, 21, 'OnAfterActionEvent', 'NPR SendSMS', true, true)]
     local procedure Page21OnAfterActionEventSendSMS(var Rec: Record Customer)
     var
         AlternativeNo: Record "NPR Alternative No.";
     begin
-        //-NPR5.30 [263182]
         EditAndSendSMS(Rec);
-        //+NPR5.30 [263182]
     end;
 
     [EventSubscriber(ObjectType::Page, 41, 'OnAfterActionEvent', 'NPR SendSMS', true, true)]
@@ -712,9 +632,7 @@ codeunit 6059940 "NPR SMS Management"
     var
         AlternativeNo: Record "NPR Alternative No.";
     begin
-        //-NPR5.30 [263182]
         EditAndSendSMS(Rec);
-        //+NPR5.30 [263182]
     end;
 
     [EventSubscriber(ObjectType::Page, 42, 'OnAfterActionEvent', 'NPR SendSMS', true, true)]
@@ -722,9 +640,7 @@ codeunit 6059940 "NPR SMS Management"
     var
         AlternativeNo: Record "NPR Alternative No.";
     begin
-        //-NPR5.30 [263182]
         EditAndSendSMS(Rec);
-        //+NPR5.30 [263182]
     end;
 
     [EventSubscriber(ObjectType::Page, 5050, 'OnAfterActionEvent', 'NPR SendSMS', true, true)]
@@ -732,17 +648,13 @@ codeunit 6059940 "NPR SMS Management"
     var
         AlternativeNo: Record "NPR Alternative No.";
     begin
-        //-NPR5.30 [263182]
         EditAndSendSMS(Rec);
-        //+NPR5.30 [263182]
     end;
 
     [EventSubscriber(ObjectType::Page, 6150652, 'OnAfterActionEvent', 'SendSMS', true, true)]
     local procedure Page6150652OnAfterActionEventSendSMS(var Rec: Record "NPR POS Entry")
     begin
-        //-NPR5.40 [304312]
         EditAndSendSMS(Rec);
-        //+NPR5.40 [304312]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150627, 'OnAfterEndWorkshift', '', true, true)]
@@ -759,15 +671,12 @@ codeunit 6059940 "NPR SMS Management"
         SMSManagement: Codeunit "NPR SMS Management";
         i: Integer;
     begin
-        //-NPR5.51 [363578]
         if Successful then begin
             if POSUnit.Get(UnitNo) then
-                //-NPR5.52 [368395]
                 if POSEndOfdayProfile.Get(POSUnit."POS End of Day Profile") then begin
-                    // SMSTemplateHeader.GET(POSEndOfdayProfile."SMS Profile");
                     if (not SMSTemplateHeader.Get(POSEndOfdayProfile."SMS Profile")) then
                         exit;
-                    //-NPR5.52 [368395]
+
                     POSWorkshifCheckpoint.Reset;
                     POSWorkshifCheckpoint.SetRange("POS Entry No.", PosEntryNo);
                     if POSWorkshifCheckpoint.FindFirst then
@@ -777,30 +686,23 @@ codeunit 6059940 "NPR SMS Management"
                     Sender := SMSTemplateHeader."Alt. Sender";
                     if Sender = '' then
                         Sender := GetDefaultSender;
-                    //-NPR5.55 [389275]
-                    //SendTo := GetDefaultSenderTo;
-                    //SendSMS(SendTo,Sender,SMSBodyText);
+
                     for i := 1 to 3 do begin
                         SendTo := GetDefaultSenderTo(i);
                         if SendTo <> '' then
                             SendSMS(SendTo, Sender, SMSBodyText);
                     end;
-                    //+NPR5.55 [389275]
                 end;
         end;
-        //+NPR5.51 [363578]
     end;
+    #endregion Subscribers
 
-    local procedure "-- NaviDocs functions"()
-    begin
-    end;
-
+    #region NaviDocs functions
     procedure IsNaviDocsAvailable(AskUserToMakeSetup: Boolean)
     var
         NaviDocsSetup: Record "NPR NaviDocs Setup";
         SetupOK: Boolean;
     begin
-        //-NPR5.38 [301396]
         SetupOK := (NaviDocsSetup.Get and NaviDocsSetup."Enable NaviDocs");
         if (not SetupOK) and AskUserToMakeSetup then
             if Confirm(StrSubstNo('%1 %2', NaviDocsNotEnabledTxt, SetupNaviDocsTxt)) then
@@ -809,7 +711,6 @@ codeunit 6059940 "NPR SMS Management"
         if not SetupOK then
             Error(NaviDocsNotEnabledTxt);
         AddNaviDocsHandlingProfile;
-        //+NPR5.38 [301396]
     end;
 
     procedure AddSMStoNaviDocs(RecordVariant: Variant; PhoneNo: Text)
@@ -826,10 +727,8 @@ codeunit 6059940 "NPR SMS Management"
         NaviDocsManagement: Codeunit "NPR NaviDocs Management";
         RecRef: RecordRef;
     begin
-        //-NPR5.38 [301396]
         DataTypeManagement.GetRecordRef(RecordVariant, RecRef);
         NaviDocsManagement.AddDocumentEntryWithHandlingProfileExt(RecRef, NaviDocsHandlingProfileCode, 0, PhoneNo, TemplateCode, DelayUntil);
-        //+NPR5.38 [301396]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6059767, 'OnAddHandlingProfilesToLibrary', '', true, true)]
@@ -850,13 +749,12 @@ codeunit 6059940 "NPR SMS Management"
             exit;
         RequestHandled := true;
 
-        //-NPR5.36 [289216]
         if NaviDocsEntry."Template Code" <> '' then
             if SMSTemplateHeader.Get(NaviDocsEntry."Template Code") then begin
                 PAGE.RunModal(PAGE::"NPR SMS Template Card", SMSTemplateHeader);
                 exit;
             end;
-        //+NPR5.36 [289216]
+
         if not RecRef.Get(NaviDocsEntry."Record ID") then
             exit;
         if FindTemplate(RecRef, SMSTemplateHeader) then
@@ -871,10 +769,8 @@ codeunit 6059940 "NPR SMS Management"
     begin
         if IsDocumentHandled or (ProfileCode <> NaviDocsHandlingProfileCode) then
             exit;
-        //-NPR5.36 [289216]
         if NaviDocsEntry."Template Code" <> '' then
             SMSTemplateHeader.SetRange(Code, NaviDocsEntry."Template Code");
-        //+NPR5.36 [289216]
 
         if RecRef.Get(NaviDocsEntry."Record ID") then;
         if not FindTemplate(RecRef, SMSTemplateHeader) then
@@ -898,16 +794,13 @@ codeunit 6059940 "NPR SMS Management"
     begin
         exit('SMS');
     end;
+    #endregion NaviDocs functions
 
-    local procedure "---Report Links Azure Functions"()
-    begin
-    end;
-
+    #region Report Links Azure Functions
     procedure AFReportLink(ReportId: Integer): Text
     var
         AFSetup: Record "NPR AF Setup";
     begin
-        //-NPR5.40 [304312]
         while not (AFSetup.Get and AFSetup."Msg Service - Site Created") do begin
             if not Confirm(AFSetupMissingTxt) then
                 exit('');
@@ -916,7 +809,6 @@ codeunit 6059940 "NPR SMS Management"
         if ReportId = 0 then
             exit('');
         exit(AFReportLinkTag);
-        //+NPR5.40 [304312]
     end;
 
     local procedure GetAFLink(RecRef: RecordRef; ReportID: Integer): Text
@@ -925,17 +817,14 @@ codeunit 6059940 "NPR SMS Management"
         Match: DotNet NPRNetMatch;
         AFAPIMsgService: Codeunit "NPR AF API - Msg Service";
     begin
-        //-NPR5.40 [304312]
         exit(AFAPIMsgService.CreateSMSBody(RecRef.RecordId, ReportID, ''));
-        //+NPR5.40 [304312]
     end;
 
     local procedure AFReportLinkTag(): Text
     begin
-        //-NPR5.40 [304312]
         exit('<<AFReportLink>>');
-        //+NPR5.40 [304312]
     end;
+    #endregion Report Links Azure Functions
 
     [TryFunction]
     local procedure CallRestWebServiceNew(RequestURL: Text; Sender: Text; Destination: Text; SMSMessage: Text; var ResponseString: Text)
@@ -948,19 +837,18 @@ codeunit 6059940 "NPR SMS Management"
         ResponseStream: DotNet NPRNetStream;
         ResponseStreamReader: DotNet NPRNetStreamReader;
     begin
-        RequestURL := 'https://wsx.sp247.net/sms/send';
         RequestString := '{';
         RequestString += '"source":"' + Sender + '",';
         RequestString += '"destination": "' + Destination + '",';
         RequestString += '"userData": "' + SMSMessage + '",';
         RequestString += '"platformId": "COOL",';
-        RequestString += '"platformPartnerId": "2035",';
+        RequestString += '"platformPartnerId": "' + AzureKeyVaultMgt.GetSecret('SMSMgtPlatformPartnerId') + '",';
         RequestString += '"useDeliveryReport": false}';
 
 
         HttpWebRequest := HttpWebRequest.Create(RequestURL);
         HttpWebRequest.ContentType('application/json;charset=utf-8');
-        HttpWebRequest.Headers.Add('Authorization', 'Basic ' + GetBasicAuthInfo('O7LbM2B6', 'OujrSE78'));
+        HttpWebRequest.Headers.Add('Authorization', 'Basic ' + GetBasicAuthInfo(AzureKeyVaultMgt.GetSecret('SMSMgtUsername'), AzureKeyVaultMgt.GetSecret('SMSMgtPassword')));
         HttpWebRequest.Method('POST');
 
         ReqStream := HttpWebRequest.GetRequestStream;
@@ -971,8 +859,6 @@ codeunit 6059940 "NPR SMS Management"
         ReqStreamWriter.Close;
         Clear(ReqStreamWriter);
         Clear(ReqStream);
-
-
 
         HttpWebResponse := HttpWebRequest.GetResponse;
         ResponseStream := HttpWebResponse.GetResponseStream;
@@ -991,4 +877,3 @@ codeunit 6059940 "NPR SMS Management"
         exit(Convert.ToBase64String(Encoding.UTF8.GetBytes(Username + ':' + Password)));
     end;
 }
-

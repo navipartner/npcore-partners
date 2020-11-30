@@ -1,8 +1,5 @@
 codeunit 6014697 "NPR Embedded Video Mgt."
 {
-    // NPR5.37/MHA /20171009  CASE 289471 Object created - Display Embedded Videos
-
-
     trigger OnRun()
     begin
     end;
@@ -115,16 +112,16 @@ codeunit 6014697 "NPR Embedded Video Mgt."
     local procedure InitEmbeddedVideoHttpWebRequest(SoapAction: Text; var HttpWebRequest: DotNet NPRNetHttpWebRequest)
     var
         Credential: DotNet NPRNetNetworkCredential;
+        AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
         Position: Text;
     begin
-        HttpWebRequest := HttpWebRequest.Create('https://dev100.dynamics-retail.com:7107/NPmarketing/WS/NPmarketing/Codeunit/embedded_video_service');
+        HttpWebRequest := HttpWebRequest.Create(AzureKeyVaultMgt.GetSecret('EmbeddedVideoUrl'));
         HttpWebRequest.Timeout := 1000 * 60;
         HttpWebRequest.UseDefaultCredentials(false);
-        Credential := Credential.NetworkCredential('VIDEO_HTML_WS_USER', 'uixwyWOd+1');
+        Credential := Credential.NetworkCredential(AzureKeyVaultMgt.GetSecret('EmbeddedVideoUsername'), AzureKeyVaultMgt.GetSecret('EmbeddedVideoPassword'));
         HttpWebRequest.Credentials(Credential);
         HttpWebRequest.Method := 'POST';
         HttpWebRequest.ContentType := 'text/xml; charset=utf-8';
         HttpWebRequest.Headers.Add('SOAPAction', SoapAction);
     end;
 }
-

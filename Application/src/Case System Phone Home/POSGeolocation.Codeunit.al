@@ -1,13 +1,10 @@
 codeunit 6150743 "NPR POS Geolocation"
 {
-    // NPR5.40/VB  /20180227  CASE 306242 Geolocation logging through Transcendence framework.
-    //                                    Usage note:
-    //                                      Geolocation is logged once per POS session.
-    //                                      If you want geolocation to be logged only once per NAV session, make this codeunit single-instance.
-    //                                      If you want geolocation logged once per NAV session regardless of if POS was loaded or not, then
-    //                                      apart from making this codeunit single-instance, you should also invoke the SetGeolocationLogged(TRUE);
-    // NPR5.40/MHA /20180328  CASE 308907 Added Publisher function OnTrackGeoLocationByIP() and changed codeunit to Single instance in order to reduce Tracking
-    // NPR5.42/CLVA/20180508  CASE 313575 Combined the collection of client ip address and geolocation in a single api.ipstack.com request
+    // Usage note:
+    //   Geolocation is logged once per POS session.
+    //   If you want geolocation to be logged only once per NAV session, make this codeunit single-instance.
+    //   If you want geolocation logged once per NAV session regardless of if POS was loaded or not, then
+    //   apart from making this codeunit single-instance, you should also invoke the SetGeolocationLogged(TRUE);
 
     SingleInstance = true;
 
@@ -20,24 +17,18 @@ codeunit 6150743 "NPR POS Geolocation"
         FrontEnd: Codeunit "NPR POS Front End Management";
         GeolocationLogged: Boolean;
 
-    local procedure "--- POS"()
-    begin
-    end;
-
+    // POS
     [EventSubscriber(ObjectType::Codeunit, 6150700, 'OnInitializationComplete', '', false, false)]
     local procedure OnAfterInitialize(FrontEnd: Codeunit "NPR POS Front End Management")
     begin
-        //-NPR5.40 [308907]
         if SkipGeolocationTracking() then
             exit;
-        //+NPR5.40 [308907]
 
         RegisterGeoLocationScript(FrontEnd);
     end;
 
     procedure SkipGeolocationTracking(): Boolean
     begin
-        //-NPR5.40 [308907]
         if GeolocationLogged then
             exit(true);
 
@@ -47,12 +38,12 @@ codeunit 6150743 "NPR POS Geolocation"
         end;
 
         exit(false);
-        //+NPR5.40 [308907]
     end;
 
     local procedure RegisterGeoLocationScript(FrontEnd: Codeunit "NPR POS Front End Management")
     var
         RegisterModuleRequest: Codeunit "NPR Front-End: Generic";
+        AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
         ScriptString: Text;
         WebClientDependency: Record "NPR Web Client Dependency";
     begin
@@ -61,7 +52,7 @@ codeunit 6150743 "NPR POS Geolocation"
         ScriptString := '(function() {' +
         ' var geolocation = new n$.Event.Method("GeoLocationMethod"); ' +
         ' $.ajax({' +
-        '   url: "https://api.ipstack.com/check?access_key=b29d29cb640d98bf01c320640e432f59",' +
+        '   url: "https://api.ipstack.com/check?access_key=' + AzureKeyVaultMgt.GetSecret('IPStackApiKey') + '",' +
         '   success: function (result) {' +
         '     geolocation.raise({ result: result });' +
         '   },' +
@@ -92,38 +83,30 @@ codeunit 6150743 "NPR POS Geolocation"
         if ErrorText <> '' then
             exit;
 
-        //-NPR5.40 [308907]
         TrackGeoLocationByIP(JSON.GetString('result', true));
-        //+NPR5.40 [308907]
     end;
 
     procedure TrackGeoLocationByIP(IPAddress: Text)
     begin
-        //-NPR5.40 [308907]
         if SkipGeolocationTracking() then
             exit;
 
         GeolocationLogged := true;
         OnTrackGeoLocationByIP(IPAddress);
-        //+NPR5.40 [308907]
     end;
 
     [IntegrationEvent(false, false)]
     local procedure OnTrackGeoLocationByIP(IPAddress: Text)
     begin
-        //-NPR5.40 [308907]
-        //+NPR5.40 [308907]
     end;
 
-    local procedure "--- Convert"()
-    begin
-    end;
-
+    // Convert
     procedure IPAddress2GeoPosition(IPAddress: Text; var Latitude: Decimal; var Longitude: Decimal)
     var
         Parameters: DotNet NPRNetDictionary_Of_T_U;
         AFManagement: Codeunit "NPR AF Management";
         AFHelperFunctions: Codeunit "NPR AF Helper Functions";
+        AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
         HttpResponseMessage: DotNet NPRNetHttpResponseMessage;
         Path: Text;
         JObject: JsonObject;
@@ -132,8 +115,8 @@ codeunit 6150743 "NPR POS Geolocation"
         Encoding: DotNet NPRNetEncoding;
         ResultVar: Boolean;
         PrevRec: Text;
+        BaseUrl: Text;
     begin
-        //-NPR5.40 [308907]
         if IPAddress = '' then
             exit;
 
@@ -141,10 +124,12 @@ codeunit 6150743 "NPR POS Geolocation"
         JObject.WriteTo(TextString);
         StringContent := StringContent.StringContent(TextString, Encoding.UTF8, 'application/json');
 
+        BaseUrl := AzureKeyVaultMgt.GetSecret('AFIP2GeoBaseUrl');
         Parameters := Parameters.Dictionary();
-        Parameters.Add('baseurl', 'https://navipartnerfa.azurewebsites.net');
+
+        Parameters.Add('baseurl', BaseUrl);
         Parameters.Add('restmethod', 'POST');
-        Parameters.Add('path', 'https://navipartnerfa.azurewebsites.net/api/GetClientGeoLocationByIPAddress?code=eavZjqJdKVynQxzsYPnsYpBGmSm61nxavel2VGulz6R5CrAxqhi6JA==');
+        Parameters.Add('path', StrSubstNo('%1/api/GetClientGeoLocationByIPAddress?code=$2', BaseUrl, AzureKeyVaultMgt.GetSecret('AFIP2GeoKey')));
         Parameters.Add('httpcontent', StringContent);
 
         ResultVar := AFManagement.CallRESTWebService(Parameters, HttpResponseMessage);
@@ -160,7 +145,6 @@ codeunit 6150743 "NPR POS Geolocation"
 
         Latitude := GetJsonValueAsDecimal(JObject, 'lat');
         Longitude := GetJsonValueAsDecimal(JObject, 'lon');
-        //+NPR5.40 [308907]
     end;
 
     local procedure GetJsonValueAsDecimal(JObject: JsonObject; PropertyName: Text) ReturnValue: Decimal
@@ -179,4 +163,3 @@ codeunit 6150743 "NPR POS Geolocation"
         JObject.ReadFrom(json);
     end;
 }
-

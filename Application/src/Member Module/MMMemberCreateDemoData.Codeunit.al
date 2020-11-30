@@ -467,6 +467,7 @@ codeunit 6014439 "NPR MM Member Create Demo Data"
     var
         MemberNotificationSetup: Record "NPR MM Member Notific. Setup";
         MemberNotification: Codeunit "NPR MM Member Notification";
+        AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
         outstr: OutStream;
     begin
 
@@ -489,10 +490,10 @@ codeunit 6014439 "NPR MM Member Create Demo Data"
         MemberNotificationSetup."Cancel Overdue Notif. (Days)" := 1;
         MemberNotificationSetup."Target Member Role" := MemberNotificationSetup."Target Member Role"::ALL_ADMINS;
         MemberNotificationSetup."Processing Method" := MemberNotificationSetup."Processing Method"::INLINE;
-        MemberNotificationSetup."NP Pass Server Base URL" := 'https://passes.npecommerce.dk/api/v1';
+        MemberNotificationSetup."NP Pass Server Base URL" := AzureKeyVaultMgt.GetSecret('PassesServerBaseUrl');
         MemberNotificationSetup."Pass Notification Method" := MemberNotificationSetup."Pass Notification Method"::SYNCHRONOUS;
         MemberNotificationSetup."Passes API" := '/passes/%1/%2';
-        MemberNotificationSetup."Pass Token" := 'eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1MjIyNDQyNjEsIm5iZiI6MTUyMjI0NDI2MSwidWlkIjo2fQ.yWeKjD8hDGhDNn8KLf345v7tYBZ-bA20DzS07bgHRxo';
+        MemberNotificationSetup."Pass Token" := AzureKeyVaultMgt.GetSecret('PassesToken');
         MemberNotificationSetup."Pass Type Code" := 'npmembership';
         MemberNotificationSetup."Include NP Pass" := true;
 
@@ -506,6 +507,7 @@ codeunit 6014439 "NPR MM Member Create Demo Data"
     var
         MemberNotificationSetup: Record "NPR MM Member Notific. Setup";
         MemberNotification: Codeunit "NPR MM Member Notification";
+        AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
         outstr: OutStream;
     begin
 
@@ -523,10 +525,10 @@ codeunit 6014439 "NPR MM Member Create Demo Data"
         MemberNotificationSetup."Cancel Overdue Notif. (Days)" := 1;
         MemberNotificationSetup."Target Member Role" := MemberNotificationSetup."Target Member Role"::ALL_ADMINS;
         MemberNotificationSetup."Processing Method" := MemberNotificationSetup."Processing Method"::INLINE;
-        MemberNotificationSetup."NP Pass Server Base URL" := 'https://passes.npecommerce.dk/api/v1';
+        MemberNotificationSetup."NP Pass Server Base URL" := AzureKeyVaultMgt.GetSecret('PassesServerBaseUrl');
         MemberNotificationSetup."Pass Notification Method" := MemberNotificationSetup."Pass Notification Method"::SYNCHRONOUS;
         MemberNotificationSetup."Passes API" := '/passes/%1/%2';
-        MemberNotificationSetup."Pass Token" := 'eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1MjIyNDQyNjEsIm5iZiI6MTUyMjI0NDI2MSwidWlkIjo2fQ.yWeKjD8hDGhDNn8KLf345v7tYBZ-bA20DzS07bgHRxo';
+        MemberNotificationSetup."Pass Token" := AzureKeyVaultMgt.GetSecret('PassesToken');
         MemberNotificationSetup."Pass Type Code" := 'npmembership';
         MemberNotificationSetup."Include NP Pass" := true;
 
