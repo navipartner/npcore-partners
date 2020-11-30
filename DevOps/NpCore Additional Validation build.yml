@@ -31,7 +31,8 @@ variables:
 jobs:
 - template: YAML/Templates/Job/CreateBCContainer.yml@scriptsRepo
   parameters:
-    jobName: First_build  
+    jobName: First_build
+    jobDisplayName: Build AL app - Localised base apps
     timeoutInMinutes: 180
     containerImageName: mcr.microsoft.com/dynamicsnav:10.0.17763.1397-generic
     pipelineConfig: '$(Build.SourcesDirectory)/$(Build.Repository.Name)/DevOps/PipelineConfig.json'
@@ -61,44 +62,56 @@ jobs:
         alternativeSystemALPackages:
         - packages:
           - source: 'https://pkgs.dev.azure.com/navipartner/_packaging/BCSymbols/nuget/v3/index.json'
-            id: Microsoft.BC.160.Base_Application.au
+            id: Microsoft.BC.170.Base_Application.au
           ISOcountryCode: AU
         - packages:
           - source: 'https://pkgs.dev.azure.com/navipartner/_packaging/BCSymbols/nuget/v3/index.json'
-            id: Microsoft.BC.160.Base_Application.dk
+            id: Microsoft.BC.170.Base_Application.ca
+          ISOcountryCode: CA
+        - packages:
+          - source: 'https://pkgs.dev.azure.com/navipartner/_packaging/BCSymbols/nuget/v3/index.json'
+            id: Microsoft.BC.170.Base_Application.dk
           ISOcountryCode: DK
         - packages:
           - source: 'https://pkgs.dev.azure.com/navipartner/_packaging/BCSymbols/nuget/v3/index.json'
-            id: Microsoft.BC.160.Base_Application.fr
+            id: Microsoft.BC.170.Base_Application.fr
           ISOcountryCode: FR
         - packages:
           - source: 'https://pkgs.dev.azure.com/navipartner/_packaging/BCSymbols/nuget/v3/index.json'
-            id: Microsoft.BC.160.Base_Application.gb
+            id: Microsoft.BC.170.Base_Application.gb
           ISOcountryCode: GB
         - packages:
           - source: 'https://pkgs.dev.azure.com/navipartner/_packaging/BCSymbols/nuget/v3/index.json'
-            id: Microsoft.BC.160.Base_Application.it
+            id: Microsoft.BC.170.Base_Application.it
           ISOcountryCode: IT
         - packages:
           - source: 'https://pkgs.dev.azure.com/navipartner/_packaging/BCSymbols/nuget/v3/index.json'
-            id: Microsoft.BC.160.Base_Application.na
-          ISOcountryCode: NA
+            id: Microsoft.BC.160.Base_Application.mx
+          ISOcountryCode: MX
         - packages:
           - source: 'https://pkgs.dev.azure.com/navipartner/_packaging/BCSymbols/nuget/v3/index.json'
-            id: Microsoft.BC.160.Base_Application.nl
+            id: Microsoft.BC.170.Base_Application.nl
           ISOcountryCode: NL
         - packages:
           - source: 'https://pkgs.dev.azure.com/navipartner/_packaging/BCSymbols/nuget/v3/index.json'
-            id: Microsoft.BC.160.Base_Application.no
+            id: Microsoft.BC.170.Base_Application.no
           ISOcountryCode: NO
         - packages:
           - source: 'https://pkgs.dev.azure.com/navipartner/_packaging/BCSymbols/nuget/v3/index.json'
-            id: Microsoft.BC.160.Base_Application.nz
+            id: Microsoft.BC.170.Base_Application.nz
           ISOcountryCode: NZ
         - packages:
           - source: 'https://pkgs.dev.azure.com/navipartner/_packaging/BCSymbols/nuget/v3/index.json'
-            id: Microsoft.BC.160.Base_Application.se
-          ISOcountryCode: SE        
+            id: Microsoft.BC.170.Base_Application.ru
+          ISOcountryCode: RU          
+        - packages:
+          - source: 'https://pkgs.dev.azure.com/navipartner/_packaging/BCSymbols/nuget/v3/index.json'
+            id: Microsoft.BC.170.Base_Application.se
+          ISOcountryCode: SE
+        - packages:
+          - source: 'https://pkgs.dev.azure.com/navipartner/_packaging/BCSymbols/nuget/v3/index.json'
+            id: Microsoft.BC.170.Base_Application.us
+          ISOcountryCode: US
 
 - template: YAML/Templates/Job/CreateBCContainer.yml@scriptsRepo
   parameters:
