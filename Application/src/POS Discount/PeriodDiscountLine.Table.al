@@ -1,37 +1,5 @@
 table 6014414 "NPR Period Discount Line"
 {
-    // //001 - Ohm - 230904
-    //   udmarkeret for at kunne modtage skanner signal
-    // 
-    // //xxx - Ohm - 05.10.04 - IF Status = Status::Aktiv // alle steder
-    // 
-    // // NaviShop2.00.00
-    // Fields Added:
-    //   Internet Number
-    // 
-    // OnInsert()
-    // If lisenced changes is replicated to webshoptable
-    // 
-    // OnDelete()
-    // If lisenced changes is replicated to webshoptable
-    // 
-    // OnModify()
-    // If lisenced changes is replicated to webshoptable
-    // NPR70.00.01.00/MH/20150113  CASE 199932 Removed Web references (WEB1.00).
-    // NPR70.00.02.00/MH/20150216  CASE 204110 Removed NaviShop References (WS).
-    // NPR4.14/MH/20150818  CASE 220972 Deleted deprecated Web fields and function, calcPriceWithoutTax()
-    // NPR5.23/JDH /20160516 CASE 240916 Removed old VariaX Solution
-    // NPR5.26/BHR/20160712 CASE 246594 Field 210
-    // NPR5.27/TJ/20160926 CASE 248284 Removing unused variables and fields, renaming fields and variables to use standard naming procedures
-    // NPR5.29/BHR/20161119 CASE Add fields 35,36
-    // NPR5.38/AP  /20171103  CASE 295330 Setting editable=no on flowfields (101, 102, 200 and 201)
-    // NPR5.38/MHA /20171106  CASE 295330 Renamed Option "Balanced" to "Closed" for field 6 "Status"
-    // NPR5.38/TS  /20171207  CASE 299031 Added field Page No. in advert
-    // NPR5.38/TS  /20171213  CASE 299274 Added fields Priority and Page Number
-    // NPR5.40/MMV /20180213  CASE 294655 Performance optimization. Made several fields true fields instead of flowfields and added a key using all of them.
-    // NPR5.50/THRO/20190528  CASE 299278 Corect Campaign Profit Calculation annd campaign price calculated based on profit
-    // NPR5.51/MHA /20190722 CASE 358985 Added hook OnGetVATPostingSetup()
-
     Caption = 'Period Discount Line';
     DataClassification = CustomerContent;
 
@@ -63,14 +31,14 @@ table 6014414 "NPR Period Discount Line"
         }
         field(3; Description; Text[50])
         {
-            CalcFormula = Lookup (Item.Description WHERE("No." = FIELD("Item No.")));
+            CalcFormula = Lookup(Item.Description WHERE("No." = FIELD("Item No.")));
             Caption = 'Description';
             Editable = false;
             FieldClass = FlowField;
         }
         field(4; "Unit Price"; Decimal)
         {
-            CalcFormula = Lookup (Item."Unit Price" WHERE("No." = FIELD("Item No.")));
+            CalcFormula = Lookup(Item."Unit Price" WHERE("No." = FIELD("Item No.")));
             Caption = 'Unit Price';
             Editable = false;
             FieldClass = FlowField;
@@ -92,8 +60,10 @@ table 6014414 "NPR Period Discount Line"
             trigger OnValidate()
             begin
                 CalcFields("Unit Price");
-                "Discount Amount" := Round("Unit Price" - "Campaign Unit Price");
-                "Discount %" := Round(("Unit Price" - "Campaign Unit Price") / "Unit Price" * 100);
+                if "Unit Price" <> 0 then begin
+                    "Discount Amount" := Round("Unit Price" - "Campaign Unit Price");
+                    "Discount %" := Round(("Unit Price" - "Campaign Unit Price") / "Unit Price" * 100);
+                end;
                 Validate("Campaign Unit Cost");
             end;
         }
@@ -145,12 +115,13 @@ table 6014414 "NPR Period Discount Line"
                 CalcFields("Unit Price");
                 "Campaign Unit Price" := Round("Unit Price" - "Discount Amount");
                 if "Unit Price" < "Campaign Unit Price" then Error(Text1060003);
-                "Discount %" := Round(("Unit Price" - "Campaign Unit Price") / "Unit Price" * 100);
+                if "Unit Price" <> 0 then
+                    "Discount %" := Round(("Unit Price" - "Campaign Unit Price") / "Unit Price" * 100);
             end;
         }
         field(12; "Unit Price Incl. VAT"; Boolean)
         {
-            CalcFormula = Lookup (Item."Price Includes VAT" WHERE("No." = FIELD("Item No.")));
+            CalcFormula = Lookup(Item."Price Includes VAT" WHERE("No." = FIELD("Item No.")));
             Caption = 'Price Includes VAT';
             Editable = false;
             FieldClass = FlowField;
@@ -170,16 +141,11 @@ table 6014414 "NPR Period Discount Line"
 
                 if Item.Get("Item No.") then begin
                     ItemGroup.Get(Item."NPR Item Group");
-                    //-NPR5.50 [299278]
                     if Item."Price Includes VAT" then begin
-                        //+NPR5.50 [299278]
-                        //-NPR5.51 [358985]
                         if VATPostingSetup.Get(ItemGroup."VAT Bus. Posting Group", ItemGroup."VAT Prod. Posting Group") then begin
                             POSTaxCalculation.OnGetVATPostingSetup(VATPostingSetup, Handled);
                             VATPct := VATPostingSetup."VAT %";
                         end;
-                        //+NPR5.51 [358985]
-                        //-NPR5.50 [299278]
                     end else
                         VATPct := 0;
 
@@ -192,8 +158,6 @@ table 6014414 "NPR Period Discount Line"
                     if ("Campaign Unit Price" <> 0) and (UnitCost <> 0) then begin
                         "Campaign Profit" := Round((1 - UnitCost / "Campaign Unit Price") * 100, 0.001);
                     end;
-                    //+NPR5.50 [299278]
-
                 end;
             end;
         }
@@ -204,7 +168,7 @@ table 6014414 "NPR Period Discount Line"
         }
         field(20; Comment; Boolean)
         {
-            CalcFormula = Exist ("NPR Retail Comment" WHERE("Table ID" = CONST(6014414),
+            CalcFormula = Exist("NPR Retail Comment" WHERE("Table ID" = CONST(6014414),
                                                         "No." = FIELD(Code),
                                                         "No. 2" = FIELD("Item No.")));
             Caption = 'Comment';
@@ -277,7 +241,7 @@ table 6014414 "NPR Period Discount Line"
         }
         field(101; Inventory; Decimal)
         {
-            CalcFormula = Sum ("Item Ledger Entry".Quantity WHERE("Item No." = FIELD("Item No."),
+            CalcFormula = Sum("Item Ledger Entry".Quantity WHERE("Item No." = FIELD("Item No."),
                                                                   "Posting Date" = FIELD("Date Filter"),
                                                                   "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
                                                                   "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
@@ -288,7 +252,7 @@ table 6014414 "NPR Period Discount Line"
         }
         field(102; "Quantity On Purchase Order"; Decimal)
         {
-            CalcFormula = Sum ("Purchase Line"."Outstanding Qty. (Base)" WHERE("Document Type" = CONST(Order),
+            CalcFormula = Sum("Purchase Line"."Outstanding Qty. (Base)" WHERE("Document Type" = CONST(Order),
                                                                                Type = CONST(Item),
                                                                                "No." = FIELD("Item No."),
                                                                                "Order Date" = FIELD("Date Filter"),
@@ -301,7 +265,7 @@ table 6014414 "NPR Period Discount Line"
         }
         field(200; "Quantity Sold"; Decimal)
         {
-            CalcFormula = - Sum ("Item Ledger Entry".Quantity WHERE("Item No." = FIELD("Item No."),
+            CalcFormula = - Sum("Item Ledger Entry".Quantity WHERE("Item No." = FIELD("Item No."),
                                                                    "NPR Discount Type" = CONST(Period),
                                                                    "NPR Discount Code" = FIELD(Code),
                                                                    "Entry Type" = CONST(Sale),
@@ -315,7 +279,7 @@ table 6014414 "NPR Period Discount Line"
         }
         field(201; Turnover; Decimal)
         {
-            CalcFormula = Sum ("Value Entry"."Sales Amount (Actual)" WHERE("Item No." = FIELD("Item No."),
+            CalcFormula = Sum("Value Entry"."Sales Amount (Actual)" WHERE("Item No." = FIELD("Item No."),
                                                                            "NPR Discount Type" = CONST(Period),
                                                                            "NPR Discount Code" = FIELD(Code),
                                                                            "Item Ledger Entry Type" = CONST(Sale),
@@ -346,17 +310,14 @@ table 6014414 "NPR Period Discount Line"
                 Handled: Boolean;
                 UnitCost: Decimal;
             begin
-                //-NPR5.50 [299278]
                 if ("Campaign Profit" < 100) and Item.Get("Item No.") then begin
                     GLSetup.Get();
                     ItemGroup.Get(Item."NPR Item Group");
                     if Item."Price Includes VAT" then begin
-                        //-NPR5.51 [358985]
                         if VATPostingSetup.Get(ItemGroup."VAT Bus. Posting Group", ItemGroup."VAT Prod. Posting Group") then begin
                             POSTaxCalculation.OnGetVATPostingSetup(VATPostingSetup, Handled);
                             VATPct := VATPostingSetup."VAT %";
                         end;
-                        //+NPR5.51 [358985]
                     end else
                         VATPct := 0;
 
@@ -367,7 +328,6 @@ table 6014414 "NPR Period Discount Line"
                     "Campaign Unit Price" := Round((UnitCost / (1 - "Campaign Profit" / 100)) * (1 + VATPct / 100),
                                                    GLSetup."Unit-Amount Rounding Precision");
                 end;
-                //+NPR5.50 [299278]
             end;
         }
         field(210; "Cross-Reference No."; Code[20])
@@ -379,9 +339,7 @@ table 6014414 "NPR Period Discount Line"
             var
                 BarcodeLibrary: Codeunit "NPR Barcode Library";
             begin
-                //-NPR5.26 [246594]
                 BarcodeLibrary.CallCrossRefNoLookupPeriodicDiscount(Rec);
-                //+NPR5.26 [246594]
             end;
         }
         field(215; "Page no. in advert"; Integer)
@@ -450,9 +408,7 @@ table 6014414 "NPR Period Discount Line"
 
         UpdatePeriodDiscount;
 
-        //-NPR5.40 [294655]
         UpdateLine();
-        //+NPR5.40 [294655]
     end;
 
     trigger OnModify()
@@ -461,9 +417,7 @@ table 6014414 "NPR Period Discount Line"
 
         UpdatePeriodDiscount;
 
-        //-NPR5.40 [294655]
         UpdateLine();
-        //+NPR5.40 [294655]
     end;
 
     trigger OnRename()
@@ -492,9 +446,7 @@ table 6014414 "NPR Period Discount Line"
             until RetailComment.Next = 0;
         RetailComment.DeleteAll;
 
-        //-NPR5.40 [294655]
         UpdateLine();
-        //+NPR5.40 [294655]
     end;
 
     var
@@ -531,7 +483,6 @@ table 6014414 "NPR Period Discount Line"
     var
         PeriodDiscount: Record "NPR Period Discount";
     begin
-        //-NPR5.40 [294655]
         if PeriodDiscount.Get(Code) then begin
             "Starting Date" := PeriodDiscount."Starting Date";
             "Ending Date" := PeriodDiscount."Ending Date";
@@ -539,7 +490,6 @@ table 6014414 "NPR Period Discount Line"
             "Ending Time" := PeriodDiscount."Ending Time";
             Status := PeriodDiscount.Status;
         end;
-        //+NPR5.40 [294655]
     end;
 }
 
