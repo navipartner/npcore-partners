@@ -37,6 +37,9 @@ report 6014561 "NPR Gift Voucher A5"
                 column(SalesTicketNo_GiftVoucher; "Gift Voucher"."Sales Ticket No.")
                 {
                 }
+                column(External_Reference_No_; "Gift Voucher"."External Reference No.")
+                {
+                }
                 column(ZipCodeCityText; ZipCodeCityText)
                 {
                 }
