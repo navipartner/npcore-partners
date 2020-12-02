@@ -1,61 +1,5 @@
 codeunit 6151505 "NPR Nc Sync. Mgt."
 {
-    // NC1.00/MHA /20150113  CASE 199932 Refactored object from Web Integration
-    // NC1.01/MHA /20150115  CASE 199932 Added functions for managing retry of failed tasks
-    // NC1.04/MHA /20150213  CASE 199932 Renamed functions:
-    //                                    - CommitCheckPoint --> TaskComplete
-    //                                    - CommitErrorPoint --> TaskError
-    //                                    - CommitErrorPointImport --> ImportEntryError
-    //                                    - Export --> ProcessTasks
-    //                                    - Import --> ProcessImportEntries
-    //                                    - ResetExecutionCount --> TaskResetCount
-    //                                    - SendChange --> ProcessTask
-    //                                    - SetCheckPoint --> TaskReset
-    //                                   Added Functions:
-    //                                    - ImportEntryComplete
-    //                                    - ImportEntryReset
-    //                                    - ProcessImportEntry
-    //                                    - Constants
-    //                                   Restructured TaskParameters.
-    // NC1.08/MHA /20150311  CASE 206395 Added function RunProcess() for launching launching Applications
-    // NC1.11/MHA /20150325  CASE 209616 Removed Task.SETRANGE("Process Error",FALSE) in ProcessTasks() as it is redundant because of Max Count
-    // NC1.14/MHA /20150415  CASE 211360 Added Timestamp Fields
-    // NC1.16/TS  /20150514  CASE 213778 Added ImportEntry.Type::Customer to import customers for B2B
-    // NC1.16/TS  /20150423  CASE 212103 Replaced hardcoded Import Codeunit Id with the NaviConnect Setup Import Codeunit
-    // NC1.17/MHA /20150622  CASE 215533 Changed key in TaskResetCount() for performance
-    //                                   Moved Import Codeunit Run to new codeunit
-    // NC1.18/MHA /20150710  CASE 218282 Added COMMIT in TaskResetCount()
-    // NC1.20/MHA /20150811  CASE 220379 Added GET when modifying ImportEntry after Processing
-    // NC1.21/MHA /20151022  CASE 225667 Added missing GET in ImportEntryReset()
-    // NC1.22/MHA /20160108  CASE 226040 Added Task.GET before executing processing in case of multiple processing codeunits
-    // NC1.22/MHA /20160317  CASE 237167 Implemented Import Type in FTPDownload()
-    // NC1.22/MHA /20160125  CASE 232733 Task Queue Worker Group replaced by NaviConnect Task Processor
-    // NC1.22/MHA /20160216  CASE 226995 Added LOCKTABLE to Task Update functions in case multiple threads tries to handle the same task
-    // NC2.00/MHA /20160525  CASE 240005 NaviConnect
-    // NC2.01/MHA /20161012  CASE 242552 Added function DownloadFTPType() and Ftp Backup functionality
-    // NC2.01/MHA /20161014  CASE 255397 Added Cleanup of Import Entries
-    // NC2.02/MHA /20170227  CASE 262318 Added Try function SendErrorMail()
-    // NC2.05/TR  /20170602  CASE 275177 Replaced FtpWebRequest.Method from LIST to NLST such that only filenames are retrieved. Updated subfunctions to handle the new response.
-    // NC2.06/MHA /20170918  CASE 290633 ReAdded FTP LIST in case NLST is not supported
-    // NC2.08/MHA /20171127  CASE 297750 CleanTasks() included in TaskResetCount()
-    // NC2.08/BR  /20171221  CASE 295322 Added FTP Binary support
-    // NC2.12/MHA /20180424  CASE 308107 DataLog is now enabled after each import in ProcessImportEntry()
-    // NC2.12/MHA /20180502  CASE 313362 Added Server File Download
-    // NC2.15/MHA /20180801  CASE 306532 Added function GetDocName() to truncate long filenames
-    // NC2.15/MHA /20180814  CASE 313184 Reworked Client File Download to support long filenames
-    // NC2.16/MHA /20180907  CASE 313184 Added Import Diagnostics and SyncEndTime to prevet NAS Threads to run for more than 30 minutes
-    // NC2.16/MHA /20180917  CASE 328432 Added Sftp Download functionality
-    // NC2.17/MHA /20181126  CASE 334216 Changed all functions to be External
-    // NC2.19/MHA /20180107  CASE 340695 Removed KeepAlive from FtpWebRequest and invoked SFTP.Close to clean up connections
-    // NC2.22/MHA /20190605  CASE 334216 Adjusted ImportEntryError() to only overwrite Error Message if Last Error Text has value
-    // NC2.22/MHA /20190613  CASE 358499 Added ClearLastErrorText before Task- and Import Processing
-    // NC2.22/MHA /20190715  CASE 361919 Parsed OutStream to IOStream in InsertImportEntrySftp() for AL Compatability
-    // NC2.23/MHA /20190927  CASE 369170 SendErrorMail() is no longer a Try function as it contains MODIFY transaction and removed Gambit integration
-    // NC2.25/MHA /20200120  CASE 386177 Ftp 'LIST' replaced with 'NLST' in CheckFtpUrlExists()
-    // NC2.26/TJ  /20200506  CASE 401322 Function TaskResetCount made global
-    // NC2.26/MHA /20200506  CASE 403279 Backup path check no longer throws error in InsertImportEntry()
-    // NPR5.55/MHA /20200604  CASE 408100 Redirected Import to Nc Import Processor
-
     TableNo = "NPR Task Line";
 
     trigger OnRun()
@@ -67,10 +11,8 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
         MaxRetry: Integer;
         ImportTypeCode: Code[20];
     begin
-        //-NC2.16 [313184]
         SyncStartTime := CurrentDateTime;
         SyncEndTime := SyncStartTime + GetMaxSyncDuration();
-        //+NC2.16 [313184]
         TaskProcessor.Code := CopyStr(UpperCase(GetParameterText("Parameter.TaskProcessorCode")), 1, MaxStrLen(TaskProcessor.Code));
         if TaskProcessor.Code = '' then begin
             TaskProcessor.Code := "Task Worker Group";
@@ -78,9 +20,7 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
         end;
         UpdateTaskProcessor(TaskProcessor);
         Commit;
-        //-NC2.12 [313362]
         ImportTypeCode := CopyStr(UpperCase(GetParameterText("Parameter.DownloadType")), 1, MaxStrLen(ImportType.Code));
-        //+NC2.12 [313362]
         if GetParameterBool("Parameter.DownloadFtp") then begin
             if ImportTypeCode = '' then
                 DownloadFtp()
@@ -89,7 +29,6 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
                     DownloadFtpType(ImportType);
         end;
 
-        //-NC2.12 [313362]
         if GetParameterBool("Parameter.DownloadServerFile") then begin
             if ImportTypeCode = '' then
                 DownloadServerFiles()
@@ -97,7 +36,6 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
                 if ImportType.Get(ImportTypeCode) then
                     DownloadServerFile(ImportType);
         end;
-        //+NC2.12 [313362]
 
         if GetParameterBool("Parameter.ProcessImport") then
             ProcessImportEntries();
@@ -123,10 +61,7 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
         SyncStartTime: DateTime;
         SyncEndTime: DateTime;
 
-    local procedure "--- Download Ftp"()
-    begin
-    end;
-
+    #region "Download Ftp"
     procedure DownloadFtp()
     var
         ImportType: Record "NPR Nc Import Type";
@@ -152,39 +87,32 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
         Filename: Text;
         ListDirectory: Text;
     begin
-        //-NC2.06 [290633]
-        //-NC2.08 [295322]
         if ImportType."Ftp Filename" <> '' then begin
             InsertImportEntry(ImportType, ImportType."Ftp Filename");
             exit(true);
         end;
-        //+NC2.08 [295322]
-        //-NC2.16 [328432]
+
         if ImportType.Sftp then begin
             if DownloadSftpFilenames(ImportType, ListDirectory) then begin
                 while CutNextFilename(ListDirectory, Filename) do
                     InsertImportEntrySftp(ImportType, Filename);
             end;
-
             exit(true);
         end;
-        //+NC2.16 [328432]
+
         if DownloadFtpListDirectory(ImportType, ListDirectory) then begin
             while CutNextFilename(ListDirectory, Filename) do
                 InsertImportEntry(ImportType, Filename);
-
             exit(true);
         end;
 
         if DownloadFtpListDirectoryDetails(ImportType, ListDirectory) then begin
             while CutNextFilenameDetailed(ListDirectory, Filename) do
                 InsertImportEntry(ImportType, Filename);
-
             exit(true);
         end;
 
         exit(false);
-        //+NC2.06 [290633]
     end;
 
     [TryFunction]
@@ -200,20 +128,15 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
         TargetUri: DotNet NPRNetUri;
         OutStream: OutStream;
     begin
-        //-NC2.06 [290633]
         if not ValidFilename(Filename) then
             exit;
 
         SourceUri := SourceUri.Uri(ImportType."Ftp Host" + '/' + ImportType."Ftp Path" + '/');
         FtpWebRequest := FtpWebRequest.Create(SourceUri.AbsoluteUri + Filename);
         FtpWebRequest.Method := 'RETR'; //WebRequestMethods.Ftp.DownloadFile
-        //-NC2.08 [295322]
         if ImportType."Ftp Binary" then
             FtpWebRequest.UseBinary := true;
-        //+NC2.08 [295322]
-        //-NC2.19 [340695]
         FtpWebRequest.KeepAlive := false;
-        //-NC2.19 [340695]
         FtpWebRequest.Credentials := Credential.NetworkCredential(ImportType."Ftp User", ImportType."Ftp Password");
         FtpWebResponse := FtpWebRequest.GetResponse;
         MemoryStream := FtpWebResponse.GetResponseStream();
@@ -221,9 +144,7 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
         ImportEntry."Entry No." := 0;
         ImportEntry."Import Type" := ImportType.Code;
         ImportEntry.Date := CurrentDateTime;
-        //-NC.2.15 [306532]
         ImportEntry."Document Name" := GetDocName(Filename, MaxStrLen(ImportEntry."Document Name"));
-        //+NC.2.15 [306532]
         ImportEntry.Imported := false;
         ImportEntry."Runtime Error" := false;
         ImportEntry."Document Source".CreateOutStream(OutStream);
@@ -240,19 +161,16 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
                 Error(CopyStr(StrSubstNo(Text001, Filename, GetLastErrorText), 1, 1000));
         end else begin
             TargetUri := TargetUri.Uri(SourceUri.AbsoluteUri + ImportType."Ftp Backup Path" + '/');
-            //-NC2.26 [403279]
             if (not CheckFtpUrlExists(TargetUri.AbsoluteUri, ImportType."Ftp User", ImportType."Ftp Password")) and
               (not CheckFtpUrlExists2(TargetUri.AbsoluteUri, ImportType."Ftp User", ImportType."Ftp Password"))
             then begin
                 if MakeFtpUrl(TargetUri.AbsoluteUri, ImportType."Ftp User", ImportType."Ftp Password") then;
             end;
-            //+NC2.26 [403279]
 
             if not RenameFtpFile(SourceUri.AbsoluteUri + Filename, ImportType."Ftp User", ImportType."Ftp Password", ImportType."Ftp Backup Path" + '/' + Filename) then
                 Error(CopyStr(StrSubstNo(Text001, Filename, GetLastErrorText), 1, 1000));
         end;
         Commit;
-        //+NC2.06 [290633]
     end;
 
     [TryFunction]
@@ -265,7 +183,6 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
         RemotePath: Text;
         NewRemotePath: Text;
     begin
-        //-NC2.16 [328432]
         if not ValidFilename(Filename) then
             exit;
 
@@ -285,10 +202,8 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
         ImportEntry.Imported := false;
         ImportEntry."Runtime Error" := false;
         ImportEntry."Document Source".CreateOutStream(OutStream);
-        //-NC2.22 [361919]
         IOStream := OutStream;
         SharpSFtp.Get(RemotePath + Filename, IOStream);
-        //+NC2.22 [361919]
 
         ImportEntry.Insert(true);
 
@@ -303,45 +218,49 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
         end;
 
         Commit;
-        //+NC2.16 [328432]
-        //-NC2.19 [340695]
         SharpSFtp.Close;
-        //+NC2.19 [340695]
     end;
+    #endregion "Download Ftp"
 
-    local procedure "--- Downlod Server File"()
-    begin
-    end;
-
+    #region "Downlod Server File"
     procedure DownloadServerFiles()
     var
+        NcImportEntryTmp: Record "NPR Nc Import Entry" temporary;
         NcImportType: Record "NPR Nc Import Type";
         LastErrorText: Text;
     begin
-        //-NC2.12 [313362]
         NcImportType.SetRange("Server File Enabled", true);
         if NcImportType.IsEmpty then
             exit;
 
         NcImportType.FindSet;
         repeat
-            asserterror
-            begin
-                DownloadServerFile(NcImportType);
-                Commit;
-
-                Error('');
-            end;
-
-            LastErrorText := GetLastErrorText + LastErrorText;
+            ClearLastError();
+            if not TryDownloadServerFile(NcImportType, NcImportEntryTmp) then
+                LastErrorText := GetLastErrorText + LastErrorText;
+            StoreImportEntries(NcImportEntryTmp);
+            Commit;
         until NcImportType.Next = 0;
 
         if LastErrorText <> '' then
             Error(CopyStr(LastErrorText, 1, 1000));
-        //+NC2.12 [313362]
+    end;
+
+    [TryFunction]
+    local procedure TryDownloadServerFile(NcImportType: Record "NPR Nc Import Type"; var NcImportEntryTmp: Record "NPR Nc Import Entry" temporary)
+    begin
+        DownloadServerFile(NcImportType, NcImportEntryTmp);
     end;
 
     procedure DownloadServerFile(NcImportType: Record "NPR Nc Import Type")
+    var
+        NcImportEntryTmp: Record "NPR Nc Import Entry" temporary;
+    begin
+        DownloadServerFile(NcImportType, NcImportEntryTmp);
+        StoreImportEntries(NcImportEntryTmp);
+    end;
+
+    procedure DownloadServerFile(NcImportType: Record "NPR Nc Import Type"; var NcImportEntryTmp: Record "NPR Nc Import Entry" temporary)
     var
         FileMgt: Codeunit "File Management";
         ArrayHelper: DotNet NPRNetArray;
@@ -349,69 +268,70 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
         i: Integer;
         Filename: Text;
     begin
-        //-NC2.12 [313362]
         NcImportType.TestField("Server File Enabled");
         NcImportType.TestField("Server File Path");
 
-        //-NC.2.15 [313184]
         ArrayHelper := ServerDirectoryHelper.GetFiles(NcImportType."Server File Path");
         for i := 0 to ArrayHelper.GetLength(0) - 1 do begin
             Filename := ArrayHelper.GetValue(i);
-            InsertImportEntry2(NcImportType, Filename);
+            InsertImportEntry2(NcImportType, NcImportEntryTmp, Filename);
         end;
-        //+NC.2.15 [313184]
-        //+NC2.12 [313362]
     end;
 
     [TryFunction]
-    procedure InsertImportEntry2(NcImportType: Record "NPR Nc Import Type"; Filename: Text)
+    local procedure InsertImportEntry2(NcImportType: Record "NPR Nc Import Type"; var NcImportEntryTmp: Record "NPR Nc Import Entry" temporary; Filename: Text)
     var
-        NcImportEntry: Record "NPR Nc Import Entry";
         TempBlob: Codeunit "Temp Blob";
         FileMgt: Codeunit "File Management";
         RecRef: RecordRef;
     begin
-        //-NC2.12 [313362]
         FileMgt.BLOBImportFromServerFile(TempBlob, Filename);
-        //+NC.2.15 [313184]
 
-        NcImportEntry.Init;
-        NcImportEntry."Entry No." := 0;
-        NcImportEntry."Import Type" := NcImportType.Code;
-        NcImportEntry.Date := CurrentDateTime;
-        //-NC.2.15 [306532]
-        NcImportEntry."Document Name" := GetDocName(FileMgt.GetFileName(Filename), MaxStrLen(NcImportEntry."Document Name"));
-        //+NC.2.15 [306532]
-        NcImportEntry.Imported := false;
-        NcImportEntry."Runtime Error" := false;
+        NcImportEntryTmp.Init;
+        NcImportEntryTmp."Entry No." := 0;
+        NcImportEntryTmp."Import Type" := NcImportType.Code;
+        NcImportEntryTmp.Date := CurrentDateTime;
+        NcImportEntryTmp."Document Name" := GetDocName(FileMgt.GetFileName(Filename), MaxStrLen(NcImportEntryTmp."Document Name"));
+        NcImportEntryTmp.Imported := false;
+        NcImportEntryTmp."Runtime Error" := false;
 
-        RecRef.GetTable(NcImportEntry);
-        TempBlob.ToRecordRef(RecRef, NcImportEntry.FieldNo("Document Source"));
-        RecRef.SetTable(NcImportEntry);
+        RecRef.GetTable(NcImportEntryTmp);
+        TempBlob.ToRecordRef(RecRef, NcImportEntryTmp.FieldNo("Document Source"));
+        RecRef.SetTable(NcImportEntryTmp);
 
-        NcImportEntry.Insert(true);
-
+        NcImportEntryTmp.Insert;
         if Erase(Filename) then;
-        Commit;
-        //+NC2.06 [290633]
     end;
 
-    local procedure "--- Process Import"()
+    local procedure StoreImportEntries(var NcImportEntryTmp: Record "NPR Nc Import Entry" temporary)
+    var
+        NcImportEntry: Record "NPR Nc Import Entry";
+        MustBeTemporaryErr: Label '%1: function call on a non-temporary variable. This is a programming bug, not a user error. Please contact system vendor.';
     begin
+        if not NcImportEntryTmp.IsTemporary then
+            Error(MustBeTemporaryErr, 'CU6151505.StoreImportEntries');
+        if not NcImportEntryTmp.FindSet() then
+            exit;
+        repeat
+            NcImportEntry := NcImportEntryTmp;
+            NcImportEntry."Entry No." := 0;
+            NcImportEntry.Insert(true);
+        until NcImportEntryTmp.Next() = 0;
+        NcImportEntryTmp.DeleteAll();
     end;
+    #endregion "Downlod Server File"
 
+    #region "Process Import"
     procedure ProcessImportEntry(var ImportEntry: Record "NPR Nc Import Entry"): Boolean
     var
         DataLogMgt: Codeunit "NPR Data Log Management";
         NaviConnectImportMgt: Codeunit "NPR Nc Import Mgt.";
     begin
-        //-NPR5.55 [408100]
         CODEUNIT.Run(CODEUNIT::"NPR Nc Import Processor", ImportEntry);
         if ImportEntry.Get(ImportEntry."Entry No.") then
             exit(ImportEntry.Imported);
 
         exit(false);
-        //+NPR5.55 [408100]
     end;
 
     procedure ProcessImportEntries()
@@ -420,16 +340,12 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
     begin
         ImportEntry.SetRange(Imported, false);
         ImportEntry.SetRange("Runtime Error", false);
-        //-NPR5.55 [408100]
         ImportEntry.SetFilter("Earliest Import Datetime", '<=%1', CurrentDateTime);
-        //+NPR5.55 [408100]
         if ImportEntry.FindSet then
             repeat
                 ProcessImportEntry(ImportEntry);
-                //-NC2.16 [313184]
                 if (CurrentDateTime > SyncEndTime) and (SyncEndTime <> 0DT) then
                     exit;
-            //+NC2.16 [313184]
             until ImportEntry.Next = 0;
     end;
 
@@ -443,9 +359,7 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
         if TaskSetup.FindSet then
             repeat
                 if Task.Get(Task."Entry No.") then;
-                //-NC2.22 [358499]
                 ClearLastError;
-                //+NC2.22 [358499]
                 if not CODEUNIT.Run(TaskSetup."Codeunit ID", Task) then begin
                     TaskError(Task);
                     exit(false);
@@ -468,17 +382,13 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
         if Task.FindSet then
             repeat
                 ProcessTask(Task);
-                //-NC2.16 [313184]
                 if (CurrentDateTime > SyncEndTime) and (SyncEndTime <> 0DT) then
                     exit;
-            //+NC2.16 [313184]
             until Task.Next = 0;
     end;
+    #endregion "Process Import"
 
-    local procedure "--- Status Mgt."()
-    begin
-    end;
-
+    #region "Status Mgt."
     local procedure TaskComplete(var NaviConnectTask: Record "NPR Nc Task")
     begin
         NaviConnectTask.LockTable;
@@ -501,10 +411,8 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
         if not NaviConnectTask.Get(NaviConnectTask."Entry No.") then
             exit;
 
-        //-NC2.16 [313184]
         NaviConnectTask."Last Processing Completed at" := CurrentDateTime;
         NaviConnectTask."Last Processing Duration" := (NaviConnectTask."Last Processing Completed at" - NaviConnectTask."Last Processing Started at") / 1000;
-        //+NC2.16 [313184]
 
         ErrorText := GetLastErrorText;
 
@@ -514,9 +422,7 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
             ClearLastError;
         end;
 
-        //-NC2.16 [313184]
         NaviConnectTask.Modify(true);
-        //+NC2.16 [313184]
         Commit;
     end;
 
@@ -542,10 +448,9 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
         NaviConnectTask: Record "NPR Nc Task";
         NcTaskMgt: Codeunit "NPR Nc Task Mgt.";
     begin
-        //-NC2.08 [297750]
         NcTaskMgt.CleanTasks();
         Commit;
-        //+NC2.08 [297750]
+
         NaviConnectTask.SetCurrentKey("Log Date", Processed);
         NaviConnectTask.SetRange(Processed, false);
         NaviConnectTask.ModifyAll("Process Count", 0);
@@ -564,26 +469,18 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
             TaskProcessor.Insert(true);
         end;
     end;
+    #endregion "Status Mgt."
 
-    local procedure "--- Ftp List"()
-    begin
-    end;
-
+    #region "Ftp List"
     local procedure CreateFtpWebRequest(ImportType: Record "NPR Nc Import Type"; var FtpWebRequest: DotNet NPRNetFtpWebRequest)
     var
         Uri: DotNet NPRNetUri;
     begin
-        //-NC2.06 [290633]
         Uri := Uri.Uri(ImportType."Ftp Host" + '/' + ImportType."Ftp Path" + '/');
         FtpWebRequest := FtpWebRequest.Create(Uri);
-        //+NC2.06 [290633]
-        //-NC2.08 [295322]
         if ImportType."Ftp Binary" then
             FtpWebRequest.UseBinary := true;
-        //+NC2.08 [295322]
-        //-NC2.19 [340695]
         FtpWebRequest.KeepAlive := false;
-        //+NC2.19 [340695]
     end;
 
     local procedure CutNextFilename(var ListDirectoryDetails: Text; var Filename: Text): Boolean
@@ -596,9 +493,7 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
         Filename := '';
         repeat
             CutNextLine(ListDirectoryDetails, Details);
-            //-NC2.05 [275177]
             Filename := Details;
-        //+NC2.05 [275177]
         until (Filename <> '') or (ListDirectoryDetails = '');
 
         exit((Filename <> '') or (ListDirectoryDetails <> ''));
@@ -608,7 +503,6 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
     var
         Details: Text;
     begin
-        //-NC2.06 [290633]
         if ListDirectoryDetails = '' then
             exit(false);
 
@@ -619,7 +513,6 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
         until (Filename <> '') or (ListDirectoryDetails = '');
 
         exit((Filename <> '') or (ListDirectoryDetails <> ''));
-        //+NC2.06 [290633]
     end;
 
     local procedure CutNextLine(var ListDirectoryDetails: Text; var Details: Text)
@@ -640,9 +533,7 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
             ListDirectoryDetails := '';
         end else begin
             Details := CopyStr(ListDirectoryDetails, 1, Position - 1);
-            //-NC2.05 [275177]
             ListDirectoryDetails := DelStr(ListDirectoryDetails, 1, Position + 1);
-            //-NC2.05 [275177]
         end;
     end;
 
@@ -650,7 +541,6 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
     var
         Position: Integer;
     begin
-        //-NC2.06 [290633]
         if ListDirectoryDetails = '' then
             exit;
 
@@ -667,7 +557,6 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
             Details := CopyStr(ListDirectoryDetails, 1, Position - 1);
             ListDirectoryDetails := DelStr(ListDirectoryDetails, 1, Position + 2);
         end;
-        //+NC2.06 [290633]
     end;
 
     [TryFunction]
@@ -679,7 +568,6 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
         MemoryStream: DotNet NPRNetMemoryStream;
         StreamReader: DotNet NPRNetStreamReader;
     begin
-        //-NC2.06 [290633]
         ListDirectory := '';
 
         if not ImportType."Ftp Enabled" then
@@ -695,7 +583,6 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
         MemoryStream.Flush;
         MemoryStream.Close;
         Clear(MemoryStream);
-        //+NC2.06 [290633]
     end;
 
     [TryFunction]
@@ -707,7 +594,6 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
         MemoryStream: DotNet NPRNetMemoryStream;
         StreamReader: DotNet NPRNetStreamReader;
     begin
-        //-NC2.06 [290633]
         ListDirectoryDetails := '';
 
         if not ImportType."Ftp Enabled" then
@@ -723,7 +609,6 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
         MemoryStream.Flush;
         MemoryStream.Close;
         Clear(MemoryStream);
-        //+NC2.06 [290633]
     end;
 
     [TryFunction]
@@ -736,7 +621,6 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
         RemotePath: Text;
         NetConvHelper: Variant;
     begin
-        //-NC2.16 [328432]
         SharpSFtp := SharpSFtp.Sftp(ImportType."Ftp Host", ImportType."Ftp User", ImportType."Ftp Password");
         SharpSFtp.Connect(ImportType."Ftp Port");
 
@@ -751,10 +635,7 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
                 ListDirectory += NewLine();
             ListDirectory += LsEntry.Filename;
         end;
-        //+NC2.16 [328432]
-        //-NC2.19 [340695]
         SharpSFtp.Close;
-        //+NC2.19 [340695]
     end;
 
     local procedure ParseFilename(Details: Text) Filename: Text
@@ -890,21 +771,16 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
             exit(false);
 
         Position := StrPos(Filename, '.');
-        //-NC2.05 [275177]
-        //IF Position = 1 THEN
         if (Position = 1) or (Position = 0) then
             exit(false);
-        //+NC2.05 [275177]
         if Position = StrLen(Filename) then
             exit;
 
         exit(true);
     end;
+    #endregion "Ftp List"
 
-    local procedure "--- Aux"()
-    begin
-    end;
-
+    #region Aux
     [TryFunction]
     local procedure CheckFtpUrlExists(FtpUrl: Text; Username: Text; Password: Text)
     var
@@ -914,12 +790,8 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
         MemoryStream: DotNet NPRNetMemoryStream;
     begin
         FtpWebRequest := FtpWebRequest.Create(FtpUrl);
-        //-NC2.25 [386177]
         FtpWebRequest.Method := 'NLST'; //WebRequestMethods.Ftp.ListDirectory
-        //+NC2.25 [386177]
-        //-NC2.19 [340695]
         FtpWebRequest.KeepAlive := false;
-        //-NC2.19 [340695]
         if Username <> '' then
             FtpWebRequest.Credentials := Credential.NetworkCredential(Username, Password);
         FtpWebResponse := FtpWebRequest.GetResponse;
@@ -937,7 +809,6 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
         FtpWebResponse: DotNet NPRNetFtpWebResponse;
         MemoryStream: DotNet NPRNetMemoryStream;
     begin
-        //-NC2.26 [403279]
         FtpWebRequest := FtpWebRequest.Create(FtpUrl);
         FtpWebRequest.Method := 'LIST'; //WebRequestMethods.Ftp.ListDirectory
         FtpWebRequest.KeepAlive := false;
@@ -948,7 +819,6 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
         MemoryStream.Flush;
         MemoryStream.Close;
         Clear(MemoryStream);
-        //+NC2.26 [403279]
     end;
 
     [TryFunction]
@@ -962,9 +832,7 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
         if Username <> '' then
             FtpWebRequest.Credentials := Credential.NetworkCredential(Username, Password);
         FtpWebRequest.Method := 'DELE'; //WebRequestMethods.Ftp.DeleteFile
-        //-NC2.19 [340695]
         FtpWebRequest.KeepAlive := false;
-        //-NC2.19 [340695]
         FtpWebResponse := FtpWebRequest.GetResponse;
     end;
 
@@ -973,7 +841,6 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
         FileMgt: Codeunit "File Management";
         DocExt: Text;
     begin
-        //-NC.2.15 [306532]
         DocName := Filename;
         if MaxLength <= 0 then
             exit(DocName);
@@ -987,7 +854,6 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
         DocName += DocExt;
 
         exit(DocName);
-        //+NC.2.15 [306532]
     end;
 
     [TryFunction]
@@ -1000,9 +866,7 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
     begin
         FtpWebRequest := FtpWebRequest.Create(FtpUrl);
         FtpWebRequest.Method := 'MKD'; //WebRequestMethods.Ftp.MakeDirectory
-        //-NC2.19 [340695]
         FtpWebRequest.KeepAlive := false;
-        //-NC2.19 [340695]
         if Username <> '' then
             FtpWebRequest.Credentials := Credential.NetworkCredential(Username, Password);
         FtpWebResponse := FtpWebRequest.GetResponse;
@@ -1034,17 +898,13 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
         if Username <> '' then
             FtpWebRequest.Credentials := Credential.NetworkCredential(Username, Password);
         FtpWebRequest.Method := 'RENAME'; //WebRequestMethods.Ftp.Rename
-        //-NC2.19 [340695]
         FtpWebRequest.KeepAlive := false;
-        //-NC2.19 [340695]
         FtpWebRequest.RenameTo := RenameTo;
         FtpWebResponse := FtpWebRequest.GetResponse;
     end;
+    #endregion Aux
 
-    procedure "--- Constants"()
-    begin
-    end;
-
+    #region Constants
     procedure "Parameter.CleanupImport"(): Code[20]
     begin
         exit('CLEANUP_IMPORT');
@@ -1057,9 +917,7 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
 
     procedure "Parameter.DownloadServerFile"(): Code[20]
     begin
-        //-NC2.12 [313362]
         exit('DOWNLOAD_SERVER_FILE');
-        //+NC2.12 [313362]
     end;
 
     procedure "Parameter.DownloadType"(): Code[20]
@@ -1096,11 +954,9 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
     begin
         exit('TASK_PROCESSOR_CODE');
     end;
+    #endregion Constants
 
-    procedure "--- UI"()
-    begin
-    end;
-
+    #region UI
     procedure RunProcess(Filename: Text; Arguments: Text; Modal: Boolean)
     var
         [RunOnClient]
@@ -1116,10 +972,8 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
 
     local procedure GetMaxSyncDuration() SyncDuration: Duration
     begin
-        //-NC2.16 [313184]
         SyncDuration := 120000T - 113000T;
         exit(SyncDuration);
-        //+NC2.16 [313184]
     end;
+    #endregion UI
 }
-
