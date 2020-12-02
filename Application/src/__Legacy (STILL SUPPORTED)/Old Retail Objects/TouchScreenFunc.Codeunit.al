@@ -971,7 +971,6 @@ codeunit 6014505 "NPR Touch Screen - Func."
         RetailSetup: Record "NPR Retail Setup";
         TempCust: Record Customer temporary;
         TouchEventSubscribers: Codeunit "NPR Touch - Event Subscribers";
-        Template: DotNet NPRNetTemplate;
         // TODO: CTRLUPGRADE - references a removed unused codeunit
         //POSWebUIMgt: Codeunit "POS Web UI Management";
         RecRef: RecordRef;
