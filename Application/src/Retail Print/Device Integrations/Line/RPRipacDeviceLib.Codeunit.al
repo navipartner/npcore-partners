@@ -1,11 +1,7 @@
 codeunit 6014559 "NPR RP Ripac Device Lib."
 {
-    // Ripac-10P1 Integrated Line Printer Device Library.
-    // 
     // This library is almost identical to Epsons as the printer also uses ESC/POS.
     // Differences are in characters per line, alignment and encoding.
-    // 
-    // NPR5.37/MMV /20171012 CASE 269767 Created codeunit
 
     EventSubscriberInstance = Manual;
 
@@ -738,10 +734,9 @@ codeunit 6014559 "NPR RP Ripac Device Lib."
         i: Integer;
         Numeric: Boolean;
         Code128: Text;
-        Char: DotNet NPRNetChar;
+        DummyDecimal: Decimal;
         ConsecutiveNumbers: Integer;
         j: Integer;
-        String: DotNet NPRNetString;
         CurrentMode: Option " ",CodeA,CodeB,CodeC;
         Buffer: Text;
         Beginning: Boolean;
@@ -756,7 +751,7 @@ codeunit 6014559 "NPR RP Ripac Device Lib."
             exit('');
 
         for i := 1 to Length do begin
-            Numeric := Char.IsNumber(Value[i]);
+            Numeric := Evaluate(DummyDecimal, Value[i]);
 
             if (not Numeric) and (ConsecutiveNumbers > 4) then
                 if (StrLen(Code128) = 0) or (ConsecutiveNumbers > 6) then
