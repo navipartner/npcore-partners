@@ -1,6 +1,8 @@
 codeunit 6014494 "NPR Azure Key Vault Mgt."
 {
     SingleInstance = true;
+    Access = Internal;
+
     procedure GetSecret(Name: Text) KeyValue: Text
     var
         "NPR GetSecretFailedMessage": Label 'Failed to retrieve Azure KeyVault secret %1';
