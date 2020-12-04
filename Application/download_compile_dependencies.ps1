@@ -36,7 +36,6 @@ if (-not [System.IO.File]::Exists('.\.netpackages\nuget.exe')) {
     
 .\.netpackages\nuget.exe install NaviPartner.NPRetail.AddIns.BC -Source "https://api.nuget.org/v3/index.json;https://pkgs.dev.azure.com/navipartner/_packaging/NprAddIns/nuget/v3/index.json" -OutputDirectory .\.netpackages
 .\.netpackages\nuget.exe install NaviPartner.NPRetail.AddIns.MS.BC -Source https://pkgs.dev.azure.com/navipartner/_packaging/NprAddIns/nuget/v3/index.json -OutputDirectory .\.netpackages
-.\.netpackages\nuget.exe install NaviPartner.Dragonglass.BC -Source https://pkgs.dev.azure.com/navipartner/_packaging/JSDependancies/nuget/v3/index.json -OutputDirectory .\src\_ControlAddIns\Dragonglass\Scripts
 
 MovePackageContent -OutputDirectory .\src\_ControlAddIns\Dragonglass\Scripts -PackageID NaviPartner.Dragonglass.BC -PackageDestinationPath .\src\_ControlAddIns\Dragonglass\Scripts
 

@@ -55,10 +55,6 @@ jobs:
             source: 'https://api.nuget.org/v3/index.json;https://pkgs.dev.azure.com/navipartner/_packaging/NprAddIns/nuget/v3/index.json'
             id: NaviPartner.NPRetail.AddIns.BC #CASE SENSITIVE!
             destinationPath: '$(ServiceTierFolder)/Add-Ins'
-        - package:
-            source: 'https://pkgs.dev.azure.com/navipartner/_packaging/JSDependancies/nuget/v3/index.json'
-            id: NaviPartner.Dragonglass.BC
-            destinationPath: $(Build.SourcesDirectory)/$(Build.Repository.Name)/Application/src/_ControlAddIns/Dragonglass/Scripts
         alternativeSystemALPackages:
         - packages:
           - source: 'https://pkgs.dev.azure.com/navipartner/_packaging/BCSymbols/nuget/v3/index.json'
@@ -140,7 +136,3 @@ jobs:
             source: 'https://api.nuget.org/v3/index.json;https://pkgs.dev.azure.com/navipartner/_packaging/NprAddIns/nuget/v3/index.json'
             id: NaviPartner.NPRetail.AddIns.BC #CASE SENSITIVE!
             destinationPath: '$(ServiceTierFolder)/Add-Ins'
-        - package:
-            source: 'https://pkgs.dev.azure.com/navipartner/_packaging/JSDependancies/nuget/v3/index.json'
-            id: NaviPartner.Dragonglass.BC
-            destinationPath: $(Build.SourcesDirectory)/$(Build.Repository.Name)/Application/src/_ControlAddIns/Dragonglass/Scripts
