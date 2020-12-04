@@ -723,13 +723,10 @@ codeunit 6151060 "NPR NP GDPR Management"
 
     procedure EnqueueJobEntries(var CustomerGDPRSetup: Record "NPR Customer GDPR SetUp")
     var
-        Customer: Record Customer;
         CustomerCount: Integer;
     begin
         if CustomerGDPRSetup."Enable Job Queue" then begin
-            CustomerCount := Customer.Count();
-            if CustomerCount = 0 then
-                CustomerCount := 2500;
+            CustomerCount := 2500;
             EnableJobQueueEntry(CustomerGDPRSetup, true, CustomerCount);
             EnableJobQueueEntry(CustomerGDPRSetup, false);
         end else begin
