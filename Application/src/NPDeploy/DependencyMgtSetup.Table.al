@@ -1,9 +1,5 @@
 table 6014625 "NPR Dependency Mgt. Setup"
 {
-    // NPR5.01/VB/20160223 CASE 234462 Object created to support managed dependency deployment
-    // NPR5.26/MMV /20160905 CASE 242977 Added field 17.
-    // NPR5.48/JDH /20181109 CASE 334163 Added Caption to field Disable Deployment
-
     Caption = 'Dependency Management Setup';
     DataPerCompany = false;
     DataClassification = CustomerContent;
@@ -85,6 +81,7 @@ table 6014625 "NPR Dependency Mgt. Setup"
         CopyStream(OutStream, MemStream);
     end;
 
+    [NonDebuggable]
     procedure GetManagedDependencyPassword() Pwd: Text
     var
         Convert: DotNet NPRNetConvert;

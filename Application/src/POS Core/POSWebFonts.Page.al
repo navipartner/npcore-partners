@@ -1,17 +1,5 @@
 page 6014622 "NPR POS Web Fonts"
 {
-    // NPR4.12/VB/20150707 CASE 213003 Support for Web Client (JavaScript) client
-    // NPR4.14/VB/20150909 CASE 222602 Version increase for NaviPartner.POS.Web assembly reference(s)
-    // NPR4.14/VB/20150925 CASE 222938 Version increase for NaviPartner.POS.Web assembly reference(s), due to refactoring of QUANTITY_POS and QUANTITY_NEG functions.
-    // NPR4.14/VB/20150930 CASE 224166 Added the icon font preview feature
-    // NPR4.15/VB/20150930 CASE 224237 Version increase for NaviPartner.POS.Web assembly reference(s)
-    // NPR5.00/VB/20150104 CASE 225607 Changed references for compiling under NAV 2016
-    // NPR5.00/VB/20160106 CASE 231100 Update .NET version from 1.9.1.305 to 1.9.1.369
-    // NPR5.00.03/VB/20160106 CASE 231100 Update .NET version from 1.9.1.369 to 5.0.398.0
-    // NPR5.01/VB/20160222 CASE 234462 Export Manifest file to managed services
-    // NPR5.32.10/MMV /20170308 CASE 265454 Changed export manifest action.
-    // NPR5.32.10/MMV /20170609 CASE 280081 Added support for payload versions in manifest.
-
     Caption = 'POS Web Fonts';
     PageType = List;
     SourceTable = "NPR POS Web Font";
@@ -205,15 +193,11 @@ page 6014622 "NPR POS Web Fonts"
                     var
                         ManagedDepMgt: Codeunit "NPR Managed Dependency Mgt.";
                         Rec2: Record "NPR POS Web Font";
-                        JArray: DotNet JArray;
+                        JArray: JsonArray;
                     begin
                         CurrPage.SetSelectionFilter(Rec2);
-                        //-NPR5.32.10 [265454]
-                        //ManagedDepMgt.ExportManifest(Rec2);
-                        JArray := JArray.JArray();
                         ManagedDepMgt.RecordToJArray(Rec2, JArray);
                         ManagedDepMgt.ExportManifest(Rec2, JArray, 0);
-                        //+NPR5.32.10 [265454]
                     end;
                 }
             }

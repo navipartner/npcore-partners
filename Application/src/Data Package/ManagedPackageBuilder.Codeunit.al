@@ -1,153 +1,115 @@
 codeunit 6014629 "NPR Managed Package Builder"
 {
-    // NPR5.26/MMV /20160915 CASE 252131 Created object.
-    // 
     // This object is made for building a generic manifest containing data from one or more tables.
     // Call AddRecord() however many times you wish, with filters on Record if you only want to add a subset, followed by either ExportToFile() or ExportToBlob() depending on your use case.
     // 
     // Exports are done here with full JSON formatting, since ground control removes it on import.
-    // 
-    // NPR5.27/MMV /20161014 CASE 252131 Fixed missing UTF-8 encoding on blob export.
-    // NPR5.38/MMV /20171204 CASE 294095 Removed incorrect progress dialog
-
 
     trigger OnRun()
     begin
     end;
 
     var
-        GlobalJArray: DotNet JArray;
         GlobalTableListTmp: Record AllObjWithCaption temporary;
+        GlobalJArray: JsonArray;
         Error_Parameter: Label 'Invalid parameter. Pass either Record or RecordRef';
         Error_NoData: Label 'No data has been added to the manifest';
+        Error_TooLarge: Label 'You cannot create a package containing above 5000 records';
+        DialogValues: array[2] of Integer;
         GlobalRecCount: Integer;
         IsDialogOpen: Boolean;
         ProgressDialog: Dialog;
-        DialogValues: array[2] of Integer;
-        Error_TooLarge: Label 'You cannot create a package containing above 5000 records';
 
-    procedure AddRecord("Record": Variant)
+    procedure AddRecord(Rec: Variant)
     var
-        JObject: DotNet JObject;
-        JObjectRec: DotNet JObject;
-        JArray: DotNet JArray;
-        RecRef: RecordRef;
-        Value: Variant;
-        i: Integer;
         ManagedDependencyMgt: Codeunit "NPR Managed Dependency Mgt.";
+        JObject: JsonObject;
+        JObjectRec: JsonObject;
+        JArray: JsonArray;
+        JToken: JsonToken;
+        RecRef: RecordRef;
+        FieldValue: Variant;
+        i: Integer;
         Itt: Integer;
         Total: Integer;
     begin
-        if Record.IsRecord then
-            RecRef.GetTable(Record)
+        if Rec.IsRecord() then
+            RecRef.GetTable(Rec)
         else
-            if Record.IsRecordRef then
-                RecRef := Record
+            if Rec.IsRecordRef() then
+                RecRef := Rec
             else
                 Error(Error_Parameter);
 
         if not RecRef.FindSet(false, false) then
             exit;
 
-        //-NPR5.38 [294095]
-        // OpenDialog();
-        //+NPR5.38 [294095]
-
-        Total := RecRef.Count;
+        Total := RecRef.Count();
         GlobalRecCount += Total;
-
 
         if GlobalRecCount > 5000 then
             Error(Error_TooLarge);
 
-        //-NPR5.38 [294095]
-        //UpdateDialog(1,RecRef.NUMBER);
-        //+NPR5.38 [294095]
-
         GlobalTableListTmp."Object Type" := GlobalTableListTmp."Object Type"::Table;
-        GlobalTableListTmp."Object ID" := RecRef.Number;
-        if GlobalTableListTmp.Insert then;
+        GlobalTableListTmp."Object ID" := RecRef.Number();
+        if GlobalTableListTmp.Insert() then;
 
-        if IsNull(GlobalJArray) then
-            GlobalJArray := GlobalJArray.JArray();
-
-        with ManagedDependencyMgt do begin
-            repeat
-                //-NPR5.38 [294095]
-                //    Itt += 1;
-                //    UpdateProgressDialog(2,Itt,Total);
-                //+NPR5.38 [294095]
-
-                JObject := JObject.JObject();
-                AddToJObject(JObject, 'Record', RecRef.Number);
-                JObjectRec := JObjectRec.JObject();
-                for i := 1 to RecRef.FieldCount do begin
-                    FieldRefToVariant(RecRef.FieldIndex(i), Value);
-                    AddToJObject(JObjectRec, Format(RecRef.FieldIndex(i).Number), Value);
-                end;
-                JObject.Add('Fields', JObjectRec);
-                AddToJArray(GlobalJArray, JObject);
-            until RecRef.Next = 0;
-        end;
-
-        RecRef.Close;
+        repeat
+            JObject.Add('Record', RecRef.Number());
+            Clear(JObjectRec);
+            for i := 1 to RecRef.FieldCount() do begin
+                ManagedDependencyMgt.FieldRefToVariant(RecRef.FieldIndex(i), FieldValue);
+                JToken := FieldValue;
+                JObjectRec.Add(Format(RecRef.FieldIndex(i).Number()), JToken);
+            end;
+            JObject.Add('Fields', JObjectRec);
+            GlobalJArray.Add(JObject);
+        until RecRef.Next() = 0;
+        RecRef.Close();
     end;
 
-    procedure ExportToFile(Name: Text; Version: Text; Description: Text; PrimaryPackageTable: Integer)
+    procedure ExportToFile(Name: Text; FileVersion: Text; Description: Text; PrimaryPackageTable: Integer)
     var
-        JObject: DotNet JObject;
-        JArray: DotNet JArray;
-        FileMgt: Codeunit "File Management";
-        MemoryStream: DotNet NPRNetMemoryStream;
-        Encoding: DotNet NPRNetEncoding;
+        Base64Convert: Codeunit "Base64 Convert";
+        TempBlob: Codeunit "Temp Blob";
+        InStr: InStream;
+        OutStr: OutStream;
         FileName: Variant;
     begin
-        //-NPR5.38 [294095]
-        //CloseDialog();
-        //+NPR5.38 [294095]
-
-        Encoding := Encoding.GetEncoding('utf-8');
-        MemoryStream := MemoryStream.MemoryStream(Encoding.GetBytes(CreateManifest(Name, Version, Description, PrimaryPackageTable)));
+        TempBlob.CreateOutStream(OutStr, TextEncoding::UTF8);
+        OutStr.WriteText(Base64Convert.ToBase64(CreateManifest(Name, FileVersion, Description, PrimaryPackageTable)));
+        TempBlob.CreateInStream(InStr);
         FileName := StrSubstNo('%1 Package.json', Name);
-        DownloadFromStream(MemoryStream, 'Save Package Manifest', '', 'JSON File (*.json)|*.json', FileName);
+        DownloadFromStream(InStr, 'Save Package Manifest', '', 'JSON File (*.json)|*.json', FileName);
     end;
 
-    procedure ExportToBlob(Name: Text; Version: Text; Description: Text; PrimaryPackageTable: Integer; var TempBlobOut: Codeunit "Temp Blob")
+    procedure ExportToBlob(Name: Text; FileVersion: Text; Description: Text; PrimaryPackageTable: Integer; var TempBlobOut: Codeunit "Temp Blob")
     var
         ManagedDependencyMgt: Codeunit "NPR Managed Dependency Mgt.";
-        JObject: DotNet JObject;
-        OutStream: OutStream;
-        JArray: DotNet JArray;
+        OutStr: OutStream;
     begin
-        //-NPR5.38 [294095]
-        //CloseDialog();
-        //+NPR5.38 [294095]
-
-        //-NPR5.27 [252131]
-        //TempBlobOut.Blob.CREATEOUTSTREAM(OutStream);
-        TempBlobOut.CreateOutStream(OutStream, TEXTENCODING::UTF8);
-        //+NPR5.27 [252131]
-        OutStream.Write(CreateManifest(Name, Version, Description, PrimaryPackageTable));
+        TempBlobOut.CreateOutStream(OutStr, TEXTENCODING::UTF8);
+        OutStr.Write(CreateManifest(Name, FileVersion, Description, PrimaryPackageTable));
     end;
 
-    local procedure CreateManifest(Name: Text; Version: Text; Description: Text; PrimaryPackageTable: Integer): Text
+    local procedure CreateManifest(Name: Text; FileVersion: Text; Description: Text; PrimaryPackageTable: Integer): Text
     var
         ManagedDependencyMgt: Codeunit "NPR Managed Dependency Mgt.";
-        JObject: DotNet JObject;
-        JArray: DotNet JArray;
+        JObject: JsonObject;
+        JArray: JsonArray;
+        JSON: Text;
     begin
-        if IsNull(GlobalJArray) then
+        if GlobalJArray.Count() = 0 then
             Error(Error_NoData);
 
-        ManagedDependencyMgt.CreateDependencyJObject(JObject, 'Data Package', Name, Version);
-        ManagedDependencyMgt.AddToJObject(JObject, 'Description', Description);
-        ManagedDependencyMgt.AddToJObject(JObject, 'Primary Package Table', PrimaryPackageTable);
+        JObject := ManagedDependencyMgt.CreateDependencyJObject('Data Package', Name, FileVersion);
+        JObject.Add('Description', Description);
+        JObject.Add('Primary Package Table', PrimaryPackageTable);
 
-        JArray := JArray.JArray();
-        GlobalTableListTmp.FindSet;
+        GlobalTableListTmp.FindSet();
         repeat
             JArray.Add(GlobalTableListTmp."Object ID");
-        until GlobalTableListTmp.Next = 0;
+        until GlobalTableListTmp.Next() = 0;
 
         JObject.Add('Packaged Tables', JArray);
         JObject.Add('Data', GlobalJArray);
@@ -157,7 +119,8 @@ codeunit 6014629 "NPR Managed Package Builder"
         Clear(GlobalRecCount);
         Clear(DialogValues);
 
-        exit(JObject.ToString());
+        JObject.WriteTo(JSON);
+        exit(JSON);
     end;
 }
 

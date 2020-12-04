@@ -1,12 +1,5 @@
 page 6014659 "NPR Web Client Dependencies"
 {
-    // NPR5.00/VB/20151130 CASE 226832 Object created to support dynamic Web client objects (scripts, stylesheets, HTML, and image data uris)
-    // NPR5.01/VB/20160222 CASE 234462 Export Manifest file to managed services
-    // NPR5.25/TTH/20160718 CASE 238859 Added Special handling for vector graphics.
-    // NPR5.32.10/MMV /20170308 CASE 265454 Changed export manifest action.
-    // NPR5.32.10/MMV /20170609 CASE 280081 Added support for payload versions in manifest.
-    // NPR5.38/CLVA/20170628 CASE 271423 Added Export functionality
-
     Caption = 'Web Client Dependencies';
     PageType = List;
     SourceTable = "NPR Web Client Dependency";
@@ -18,19 +11,19 @@ page 6014659 "NPR Web Client Dependencies"
         {
             repeater(Group)
             {
-                field(Type; Type)
+                field(Type; Rec.Type)
                 {
                     ApplicationArea = All;
                 }
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                 }
-                field("BLOB.HASVALUE"; BLOB.HasValue)
+                field("BLOB.HASVALUE"; Rec.BLOB.HasValue())
                 {
                     ApplicationArea = All;
                     Caption = 'BLOB Imported';
@@ -68,17 +61,13 @@ page 6014659 "NPR Web Client Dependencies"
 
                 trigger OnAction()
                 var
-                    ManagedDepMgt: Codeunit "NPR Managed Dependency Mgt.";
                     Rec2: Record "NPR Web Client Dependency";
-                    JArray: DotNet JArray;
+                    ManagedDepMgt: Codeunit "NPR Managed Dependency Mgt.";
+                    JArray: JsonArray;
                 begin
                     CurrPage.SetSelectionFilter(Rec2);
-                    //-NPR5.32.10 [265454]
-                    JArray := JArray.JArray();
                     ManagedDepMgt.RecordToJArray(Rec2, JArray);
                     ManagedDepMgt.ExportManifest(Rec2, JArray, 0);
-                    //ManagedDepMgt.ExportManifest(Rec2);
-                    //+NPR5.32.10 [265454]
                 end;
             }
             action("Export File")
@@ -89,9 +78,7 @@ page 6014659 "NPR Web Client Dependencies"
 
                 trigger OnAction()
                 begin
-                    //-NPR5.38
-                    ExportFile;
-                    //+NPR5.38
+                    ExportFile();
                 end;
             }
         }
@@ -104,10 +91,8 @@ page 6014659 "NPR Web Client Dependencies"
     var
         TempBlob: Codeunit "Temp Blob";
         FileManagement: Codeunit "File Management";
-        Asm: DotNet NPRNetAssembly;
         InStr: InStream;
         OutStr: OutStream;
-        FileName: Text;
         AllFilesTxt: Label 'All Files';
         JavaScriptFilesTxt: Label 'JavaScript Files';
         StyleSheetFilesTxt: Label 'StyleSheet Files';
@@ -115,15 +100,16 @@ page 6014659 "NPR Web Client Dependencies"
         SvgFilesTxt: Label 'Scalable Vector Graphics Files';
         ImportTitleTxt: Label 'Import Web Client Dependency Files';
         ImportFilter: Text;
+        FileName: Text;
     begin
-        case Type of
-            Type::JavaScript:
+        case Rec.Type of
+            Rec.Type::JavaScript:
                 ImportFilter := JavaScriptFilesTxt + ' (*.js)|*.js|';
-            Type::CSS:
+            Rec.Type::CSS:
                 ImportFilter := StyleSheetFilesTxt + ' (*.css)|*.css|';
-            Type::HTML:
+            Rec.Type::HTML:
                 ImportFilter := HtmlFilesTxt + ' (*.html)|*.html|';
-            Type::SVG:
+            Rec.Type::SVG:
                 ImportFilter := SvgFilesTxt + ' (*.svg)|*.svg|';
         end;
 
@@ -133,16 +119,13 @@ page 6014659 "NPR Web Client Dependencies"
 
         if FileName <> '' then begin
             TempBlob.CreateInStream(InStr);
-            BLOB.CreateOutStream(OutStr);
-            if Type = Type::DataUri then
+            Rec.BLOB.CreateOutStream(OutStr);
+            if Rec.Type = Rec.Type::DataUri then
                 ConvertImgToDataUri(InStr, OutStr)
-            //-NPR5.25
             else
-                if Type = Type::SVG then begin
+                if Rec.Type = Rec.Type::SVG then begin
                     ConvertSVGToDataUri(InStr, OutStr);
-                end
-                //+NPR5.25
-                else
+                end else
                     CopyStream(OutStr, InStr);
             CurrPage.Update(true);
         end;
@@ -150,29 +133,27 @@ page 6014659 "NPR Web Client Dependencies"
 
     procedure ExportFile()
     var
+        FileBlob: Codeunit "Temp Blob";
         FileManagement: Codeunit "File Management";
         fPath: Text[1024];
-        FileBlob: Codeunit "Temp Blob";
     begin
-        //-NPR5.38
-        if BLOB.HasValue then begin
-            CalcFields(BLOB);
+        if Rec.BLOB.HasValue() then begin
+            Rec.CalcFields(BLOB);
 
-            case Type of
-                Type::JavaScript:
-                    fPath := Code + '.js';
-                Type::CSS:
-                    fPath := Code + '.css';
-                Type::HTML:
-                    fPath := Code + '.html';
-                Type::SVG:
-                    fPath := Code + '.svg';
+            case Rec.Type of
+                Rec.Type::JavaScript:
+                    fPath := Rec.Code + '.js';
+                Rec.Type::CSS:
+                    fPath := Rec.Code + '.css';
+                Rec.Type::HTML:
+                    fPath := Rec.Code + '.html';
+                Rec.Type::SVG:
+                    fPath := Rec.Code + '.svg';
             end;
 
             FileBlob.FromRecord(Rec, FieldNo(BLOB));
             FileManagement.BLOBExport(FileBlob, fPath, true);
         end;
-        //+NPR5.38
     end;
 
     procedure ConvertImgToDataUri(InStr: InStream; var OutStr: OutStream)
