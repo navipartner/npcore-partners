@@ -1,7 +1,5 @@
 page 6150713 "NPR POS Stargate Packages"
 {
-    // NPR5.32.10/MMV /20170609 CASE 280081 Added support for payload versions in manifest.
-
     Caption = 'POS Stargate Packages';
     InsertAllowed = false;
     PageType = List;
@@ -15,15 +13,15 @@ page 6150713 "NPR POS Stargate Packages"
             repeater(Control6150614)
             {
                 ShowCaption = false;
-                field(Name; Name)
+                field(Name; Rec.Name)
                 {
                     ApplicationArea = All;
                 }
-                field(Version; Version)
+                field(Version; Rec.Version)
                 {
                     ApplicationArea = All;
                 }
-                field(Control6150619; Methods)
+                field(Control6150619; Rec.Methods)
                 {
                     ApplicationArea = All;
                     ShowCaption = false;
@@ -61,23 +59,20 @@ page 6150713 "NPR POS Stargate Packages"
 
                 trigger OnAction()
                 var
-                    ManagedDepMgt: Codeunit "NPR Managed Dependency Mgt.";
                     Rec2: Record "NPR POS Stargate Package";
-                    JArray: DotNet JArray;
                     StargatePackageMethods: Record "NPR POS Stargate Pckg. Method";
+                    ManagedDepMgt: Codeunit "NPR Managed Dependency Mgt.";
+                    JArray: JsonArray;
                 begin
-                    //-NPR5.32.10 [265454]
                     CurrPage.SetSelectionFilter(Rec2);
-                    JArray := JArray.JArray();
 
-                    if Rec2.FindSet then
+                    if Rec2.FindSet() then
                         repeat
                             StargatePackageMethods.SetRange("Package Name", Rec2.Name);
                             ManagedDepMgt.RecordToJArray(StargatePackageMethods, JArray);
-                        until Rec2.Next = 0;
+                        until Rec2.Next() = 0;
                     ManagedDepMgt.RecordToJArray(Rec2, JArray);
                     ManagedDepMgt.ExportManifest(Rec2, JArray, 1);
-                    //+NPR5.32.10 [265454]
                 end;
             }
         }
@@ -124,7 +119,6 @@ page 6150713 "NPR POS Stargate Packages"
         if String.IsNullOrWhiteSpace(FilePath) then
             exit;
 
-        //Package := Package.FromJsonString(IOFile.ReadAllText(FilePath));
         FileContent := IOFile.ReadAllText(FilePath);
         Package := Package.FromJsonString(FileContent);
 
@@ -149,7 +143,6 @@ page 6150713 "NPR POS Stargate Packages"
         Rec.Init;
         Rec.Name := Package.Name;
         Rec.Version := Package.Version;
-        //Rec.JSON.IMPORT(FilePath);
         Rec.JSON.CreateOutStream(OutStream);
         OutStream.Write(FileContent);
         Rec.Insert();

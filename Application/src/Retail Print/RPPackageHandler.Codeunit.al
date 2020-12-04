@@ -1,9 +1,5 @@
 codeunit 6014585 "NPR RP Package Handler"
 {
-    trigger OnRun()
-    begin
-    end;
-
     var
         ImportedMessage: Label 'Templates imported:\Created: %1\Replaced: %2';
 
@@ -156,7 +152,7 @@ codeunit 6014585 "NPR RP Package Handler"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014628, 'OnLoadPackage', '', false, false)]
-    local procedure OnLoadPackage(var Handled: Boolean; PrimaryPackageTable: Integer; JObject: DotNet JObject; LoadType: Option File,Blob,Download)
+    local procedure OnLoadPackage(var Handled: Boolean; PrimaryPackageTable: Integer; JToken: JsonToken; LoadType: Option File,Blob,Download)
     var
         tmpImportWorksheet: Record "NPR RP Imp. Worksh." temporary;
         tmpTemplateHeader: Record "NPR RP Template Header" temporary;
@@ -178,7 +174,7 @@ codeunit 6014585 "NPR RP Package Handler"
 
         Handled := true;
 
-        if not ParsePackage(JObject, tmpTemplateHeader, tmpTemplateLine, tmpDataItem, tmpDataItemLinks, tmpDataItemConstraint, tmpDataItemConstraintLinks, tmpDeviceSettings, tmpMediaInfo) then
+        if not ParsePackage(JToken, tmpTemplateHeader, tmpTemplateLine, tmpDataItem, tmpDataItemLinks, tmpDataItemConstraint, tmpDataItemConstraintLinks, tmpDeviceSettings, tmpMediaInfo) then
             exit;
 
         repeat
@@ -202,21 +198,29 @@ codeunit 6014585 "NPR RP Package Handler"
         ImportPackage(tmpImportWorksheet, tmpTemplateHeader, tmpTemplateLine, tmpDataItem, tmpDataItemLinks, tmpDataItemConstraint, tmpDataItemConstraintLinks, tmpDeviceSettings, tmpMediaInfo);
     end;
 
-    local procedure ParsePackage(JObject: DotNet JObject; var tmpTemplateHeader: Record "NPR RP Template Header" temporary; var tmpTemplateLine: Record "NPR RP Template Line" temporary; var tmpDataItem: Record "NPR RP Data Items" temporary; var tmpDataItemLinks: Record "NPR RP Data Item Links" temporary; var tmpDataItemConstraint: Record "NPR RP Data Item Constr." temporary; var tmpDataItemConstraintLinks: Record "NPR RP Data Item Constr. Links" temporary; var tmpDeviceSettings: Record "NPR RP Device Settings" temporary; var tmpMediaInfo: Record "NPR RP Template Media Info" temporary): Boolean
+    local procedure ParsePackage(JToken: JsonToken; var tmpTemplateHeader: Record "NPR RP Template Header" temporary; var tmpTemplateLine: Record "NPR RP Template Line" temporary; var tmpDataItem: Record "NPR RP Data Items" temporary; var tmpDataItemLinks: Record "NPR RP Data Item Links" temporary; var tmpDataItemConstraint: Record "NPR RP Data Item Constr." temporary; var tmpDataItemConstraintLinks: Record "NPR RP Data Item Constr. Links" temporary; var tmpDeviceSettings: Record "NPR RP Device Settings" temporary; var tmpMediaInfo: Record "NPR RP Template Media Info" temporary): Boolean
     var
-        i: Integer;
+        ManagedDependencyMgt: Codeunit "NPR Managed Dependency Mgt.";
+        ManagedPackageMgt: Codeunit "NPR Managed Package Mgt.";
+        JArray: JsonArray;
+        JArray2: JsonArray;
+        JObject: JsonObject;
+        JToken2: JsonToken;
+        JToken3: JsonToken;
+        JTokenFieldValue: JsonToken;
         TotalRecords: Integer;
         TableNo: Integer;
         RecRef: RecordRef;
-        FieldRef: FieldRef;
-        KeyValuePair: DotNet NPRNetKeyValuePair_Of_T_U;
-        ManagedDependencyMgt: Codeunit "NPR Managed Dependency Mgt.";
-        ManagedPackageMgt: Codeunit "NPR Managed Package Mgt.";
-        FieldsJObject: DotNet JObject;
+        FieldReference: FieldRef;
+        Index: Integer;
+        FieldName: Text;
     begin
-        TotalRecords := JObject.Count;
-        for i := 0 to TotalRecords - 1 do begin
-            Evaluate(TableNo, JObject.Item(i).Item('Record').ToString());
+        JArray := JToken.AsArray();
+        TotalRecords := JArray.Count();
+        foreach JTOken2 in JArray do begin
+            JObject := JToken2.AsObject();
+            JObject.get('Record', JToken2);
+            TableNo := JToken2.AsValue().AsInteger();
 
             case TableNo of
                 DATABASE::"NPR RP Template Header":
@@ -238,18 +242,22 @@ codeunit 6014585 "NPR RP Package Handler"
                 else
                     Error('Unexpected table.');
             end;
-
-            FieldsJObject := JObject.Item(i).Item('Fields');
-            foreach KeyValuePair in FieldsJObject do
-                if ManagedPackageMgt.FieldRefByID(RecRef, KeyValuePair.Key, FieldRef) then
-                    if not ManagedDependencyMgt.TextToFieldRef(KeyValuePair.Value, FieldRef) then
+            JObject.Get('Fields', JToken3);
+            JArray2 := JToken3.AsArray();
+            foreach JToken3 in JArray2 do begin
+                JObject := JToken3.AsObject();
+                JObject.Keys().Get(Index, FieldName);
+                JObject.Values.Get(Index, JTokenFieldValue);
+                if ManagedPackageMgt.FieldRefByID(RecRef, FieldName, FieldReference) then
+                    if not ManagedDependencyMgt.TextToFieldRef(JTokenFieldValue.AsValue().AsText(), FieldReference) then
                         Error('Unexpected field data.');
-
-            RecRef.Insert;
-            RecRef.Close;
+                Index += 1;
+            end;
+            RecRef.Insert();
+            RecRef.Close();
         end;
 
-        exit(tmpTemplateHeader.FindSet);
+        exit(tmpTemplateHeader.FindSet());
     end;
 
     local procedure ImportPackage(var tmpImportWorksheet: Record "NPR RP Imp. Worksh."; var tmpTemplateHeader: Record "NPR RP Template Header" temporary; var tmpTemplateLine: Record "NPR RP Template Line" temporary; var tmpDataItem: Record "NPR RP Data Items" temporary; var tmpDataItemLinks: Record "NPR RP Data Item Links" temporary; var tmpDataItemConstraint: Record "NPR RP Data Item Constr." temporary; var tmpDataItemConstraintLinks: Record "NPR RP Data Item Constr. Links" temporary; var tmpDeviceSettings: Record "NPR RP Device Settings" temporary; var tmpMediaInfo: Record "NPR RP Template Media Info" temporary)
@@ -384,3 +392,4 @@ codeunit 6014585 "NPR RP Package Handler"
         MediaInfo.DeleteAll;
     end;
 }
+
