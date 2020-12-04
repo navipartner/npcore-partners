@@ -1,11 +1,5 @@
 page 6014671 "NPR Lookup Templates"
 {
-    // NPR5.20/VB/20160310 CASE 236519 Added support for configurable lookup templates.
-    // NPR5.22/VB/20160330 CASE 238802 Preemptive push field.
-    // NPR5.22/VB/20160414 CASE 238802 Added support for sorting order.
-    // NPR5.32.10/MMV /20170308 CASE 265454 Changed export manifest action.
-    // NPR5.32.10/MMV /20170609 CASE 280081 Added support for payload versions in manifest.
-
     Caption = 'Lookup Templates';
     PageType = List;
     SourceTable = "NPR Lookup Template";
@@ -86,15 +80,11 @@ page 6014671 "NPR Lookup Templates"
                 var
                     ManagedDepMgt: Codeunit "NPR Managed Dependency Mgt.";
                     Rec2: Record "NPR Lookup Template";
-                    JArray: DotNet JArray;
+                    JArray: JsonArray;
                 begin
                     CurrPage.SetSelectionFilter(Rec2);
-                    //-NPR5.32.10 [265454]
-                    JArray := JArray.JArray();
                     ManagedDepMgt.RecordToJArray(Rec2, JArray);
                     ManagedDepMgt.ExportManifest(Rec2, JArray, 0);
-                    //ManagedDepMgt.ExportManifest(Rec2);
-                    //+NPR5.32.10 [265454]
                 end;
             }
         }
