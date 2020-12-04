@@ -77,6 +77,9 @@ jobs:
       - sourcePath: \Applications\BaseApp\Source\Base Application.Source.zip
         appPath: \Applications\BaseApp\Source\Microsoft_Base Application.app
         packageId: $(packageId).Base_Application.dk #Country
+      - sourcePath: \Applications\OIOUBL\Source\OIOUBL.Source.zip
+        appPath: \Applications\OIOUBL\Source\Microsoft_OIOUBL.app
+        packageId: $(packageId).OIOUBL.dk #Country        
       feed: $(feed)
 
     - name: fr #Country
