@@ -50,6 +50,7 @@ jobs:
           publishToSource: 
             source: 'https://pkgs.dev.azure.com/navipartner/_packaging/NprAddIns/nuget/v3/index.json'
             id: NaviPartner.NPRetail.AddIns.MS.BC
+          continueOnPublishError: true
 
 - template: YAML/Templates/Job/PopulateSymbolFeeds.yml@scriptsRepo
   parameters:
