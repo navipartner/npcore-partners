@@ -1,54 +1,54 @@
 codeunit 6059821 "NPR CampaignMonitor Mgt."
 {
-    // NPR5.38/THRO/20180108 CASE 286713 Object created
-    // NPR5.44/THRO/20180723 CASE 310042 Use NpXml to generate data to Campaign Monitor data
-    // NPR5.55/THRO/20200511 CASE 343266 Changed PK on Transactional Email Setup + Multiple Providers
-
-
     trigger OnRun()
     begin
     end;
 
     var
         ConnectionSuccessMsg: Label 'The connection test was successful. The settings are valid.';
-        ResponseTempBlob: Codeunit "Temp Blob";
-        HttpWebRequestMgt: Codeunit "Http Web Request Mgt.";
-        ResponseInStream: InStream;
-        HttpStatusCode: DotNet NPRNetHttpStatusCode;
-        ResponseHeaders: DotNet NPRNetNameValueCollection;
 
     procedure CheckConnection()
+    var
+        Client: HttpClient;
+        ResponseMessage: HttpResponseMessage;
+        Response: Text;
     begin
-        Initialize(GetCheckConnectionURL, 'GET');
+        InitializeClient(Client);
 
-        if not ExecuteWebServiceRequest then
-            Error(GetLastErrorText);
-
+        Client.Get(GetCheckConnectionURL, ResponseMessage);
+        if not ResponseMessage.IsSuccessStatusCode then begin
+            ResponseMessage.Content().ReadAs(Response);
+            Error(Response);
+        end;
         Message(ConnectionSuccessMsg);
     end;
 
     procedure GetSmartEmailList(var TransactionalJSONResult: Record "NPR Trx JSON Result" temporary)
     var
         TransactionalEmailSetup: Record "NPR Trx Email Setup";
-        JObject: DotNet JObject;
-        JArray: DotNet JArray;
+        JObject: JsonObject;
+        JArray: JsonArray;
+        JToken: JsonToken;
+        Client: HttpClient;
+        ResponseMessage: HttpResponseMessage;
         I: Integer;
+        Response: Text;
     begin
         TransactionalEmailSetup.Get(TransactionalEmailSetup.Provider::"Campaign Monitor");
-        Initialize(GetSmartEmailListURL(TransactionalEmailSetup."Client ID", ''), 'GET');
 
-        if not ExecuteWebServiceRequest then
-            Error(GetLastErrorText);
-
-        JArray := JArray.Parse(GetWebResonseText);
+        InitializeClient(Client);
+        Client.Get(GetSmartEmailListURL(TransactionalEmailSetup."Client ID", ''), ResponseMessage);
+        ResponseMessage.Content().ReadAs(Response);
+        if not ResponseMessage.IsSuccessStatusCode then
+            Error(Response);
+        JArray.ReadFrom(Response);
 
         for I := 0 to JArray.Count - 1 do begin
-            JObject := JArray.Item(I);
-            if not IsNull(JObject) then begin
+            JArray.Get(I, JToken);
+            if JToken.IsObject then begin
+                JObject := JToken.AsObject();
                 TransactionalJSONResult.Init;
-                //-NPR5.55 [343266]
                 TransactionalJSONResult.Provider := TransactionalJSONResult.Provider::"Campaign Monitor";
-                //+NPR5.55 [343266]
                 TransactionalJSONResult."Entry No" := I;
                 TransactionalJSONResult.ID := GetString(JObject, 'ID');
                 TransactionalJSONResult.Name := CopyStr(GetString(JObject, 'Name'), 1, MaxStrLen(TransactionalJSONResult.Name));
@@ -63,36 +63,51 @@ codeunit 6059821 "NPR CampaignMonitor Mgt."
     var
         SmartEmailVariable: Record "NPR Smart Email Variable";
         TempVariable: Record "NPR Smart Email Variable" temporary;
-        JObject: DotNet JObject;
-        JArray: DotNet JArray;
+        JObject: JsonObject;
+        JArray: JsonArray;
+        JToken: JsonToken;
+        Client: HttpClient;
+        ResponseMessage: HttpResponseMessage;
+        Response: Text;
         I: Integer;
     begin
         SmartEmail.TestField("Smart Email ID");
 
-        Initialize(GetSmartEmailDetailsURL(SmartEmail."Smart Email ID"), 'GET');
+        InitializeClient(Client);
+        Client.Get(GetSmartEmailDetailsURL(SmartEmail."Smart Email ID"), ResponseMessage);
 
-        if not ExecuteWebServiceRequest then
-            Error(GetLastErrorText);
-
-        JObject := JObject.Parse(GetWebResonseText);
+        ResponseMessage.Content().ReadAs(Response);
+        if not ResponseMessage.IsSuccessStatusCode then
+            Error(Response);
+        JObject.ReadFrom(Response);
 
         SmartEmail.Status := GetString(JObject, 'Status');
         SmartEmail."Smart Email Name" := CopyStr(GetString(JObject, 'Name'), 1, MaxStrLen(SmartEmail."Smart Email Name"));
-        if GetJToken(JObject, 'Properties', JObject) then begin
-            SmartEmail.From := CopyStr(GetString(JObject, 'From'), 1, MaxStrLen(SmartEmail.From));
-            SmartEmail."Reply To" := CopyStr(GetString(JObject, 'ReplyTo'), 1, MaxStrLen(SmartEmail."Reply To"));
-            SmartEmail.Subject := CopyStr(GetString(JObject, 'Subject'), 1, MaxStrLen(SmartEmail.Subject));
-            SmartEmail."Preview Url" := CopyStr(GetString(JObject, 'HtmlPreviewUrl'), 1, MaxStrLen(SmartEmail."Preview Url"));
-            if GetJToken(JObject, 'Content', JObject) then
-                if GetJToken(JObject, 'EmailVariables', JArray) then
-                    for I := 0 to JArray.Count() - 1 do begin
-                        TempVariable.Init;
-                        TempVariable."Transactional Email Code" := SmartEmail.Code;
-                        TempVariable."Line No." := I;
-                        TempVariable."Variable Name" := JArray.Item(I).ToString();
-                        TempVariable.Insert;
-                    end;
-        end;
+        if GetJToken(JObject, 'Properties', JToken) then
+            if JToken.IsObject then begin
+                JObject := JToken.AsObject();
+                SmartEmail.From := CopyStr(GetString(JObject, 'From'), 1, MaxStrLen(SmartEmail.From));
+                SmartEmail."Reply To" := CopyStr(GetString(JObject, 'ReplyTo'), 1, MaxStrLen(SmartEmail."Reply To"));
+                SmartEmail.Subject := CopyStr(GetString(JObject, 'Subject'), 1, MaxStrLen(SmartEmail.Subject));
+                SmartEmail."Preview Url" := CopyStr(GetString(JObject, 'HtmlPreviewUrl'), 1, MaxStrLen(SmartEmail."Preview Url"));
+                if GetJToken(JObject, 'Content', JToken) then
+                    if GetJToken(JToken.AsObject(), 'EmailVariables', JToken) then
+                        if JToken.IsArray then begin
+                            JArray := JToken.AsArray();
+                            for I := 0 to JArray.Count() - 1 do begin
+                                TempVariable.Init;
+                                TempVariable."Transactional Email Code" := SmartEmail.Code;
+                                TempVariable."Line No." := I;
+                                JArray.Get(I, JToken);
+                                if JToken.IsValue then begin
+                                    TempVariable."Variable Name" := CopyStr(JToken.AsValue().AsText(), 1, MaxStrLen(TempVariable."Variable Name"));
+                                    TempVariable.Insert;
+                                end;
+                            end;
+
+                        end;
+
+            end;
         SmartEmailVariable.SetRange("Transactional Email Code", SmartEmail.Code);
         if SmartEmailVariable.FindSet then
             repeat
@@ -117,26 +132,31 @@ codeunit 6059821 "NPR CampaignMonitor Mgt."
 
     procedure GetMessageDetails(EmailLog: Record "NPR Trx Email Log")
     var
-        JObject: DotNet JObject;
+        JObject: JsonObject;
+        JToken: JsonToken;
+        Client: HttpClient;
+        ResponseMessage: HttpResponseMessage;
+        Response: Text;
     begin
         if IsNullGuid(EmailLog."Message ID") then
             exit;
 
-        Initialize(GetMessageDetailsURL(EmailLog."Message ID", true), 'GET');
+        InitializeClient(Client);
+        Client.Get(GetMessageDetailsURL(EmailLog."Message ID", true), ResponseMessage);
 
-        if not ExecuteWebServiceRequest then
-            Error(GetLastErrorText);
+        ResponseMessage.Content().ReadAs(Response);
+        if not ResponseMessage.IsSuccessStatusCode then
+            Error(Response);
 
-        JObject := JObject.Parse(GetWebResonseText);
-        if not IsNull(JObject) then begin
+        if JObject.ReadFrom(Response) then begin
             EmailLog.Status := GetString(JObject, 'Status');
             EmailLog.Recipient := CopyStr(GetString(JObject, 'Recipient'), 1, MaxStrLen(EmailLog.Recipient));
             if Evaluate(EmailLog."Smart Email ID", GetString(JObject, 'SmartEmailID')) then;
             EmailLog."Sent At" := GetDateTime(JObject, 'SentAt');
             EmailLog."Total Opens" := GetInt(JObject, 'TotalOpens');
             EmailLog."Total Clicks" := GetInt(JObject, 'TotalClicks');
-            if GetJToken(JObject, 'Message', JObject) then
-                EmailLog.Subject := GetString(JObject, 'Subject');
+            if GetJToken(JObject, 'Message', JToken) then
+                EmailLog.Subject := GetString(JToken.AsObject(), 'Subject');
             EmailLog.Modify;
         end;
     end;
@@ -145,25 +165,16 @@ codeunit 6059821 "NPR CampaignMonitor Mgt."
     var
         Attachment: Record "NPR E-mail Attachment" temporary;
     begin
-        //-NPR5.55 [343266]
         exit(SendSmartEmailWAttachment(TransactionalEmail, Recipient, Cc, Bcc, RecRef, Attachment, Silent));
-        //+NPR5.55 [343266]
     end;
 
     procedure SendSmartEmailWAttachment(TransactionalEmail: Record "NPR Smart Email"; Recipient: Text; Cc: Text; Bcc: Text; RecRef: RecordRef; var Attachment: Record "NPR E-mail Attachment"; Silent: Boolean) ErrorMessage: Text
     var
         TransactionalEmailSetup: Record "NPR Trx Email Setup";
         TransactionalEmailVariable: Record "NPR Smart Email Variable";
-        TempBlob: Codeunit "Temp Blob";
         EmailLog: Record "NPR Trx Email Log";
         NpXmlTemplate: Record "NPR NpXml Template";
-        StringBuilder: DotNet NPRNetStringBuilder;
-        StringWriter: DotNet NPRNetStringWriter;
-        Encoding: DotNet NPRNetEncoding;
-        JTextWriter: DotNet JsonTextWriter;
-        Formatting: DotNet NPRNetFormatting;
-        JObject: DotNet JObject;
-        JArray: DotNet JArray;
+        TempBlob: Codeunit "Temp Blob";
         NpXmlMgt: Codeunit "NPR NpXml Mgt.";
         NpXmlValueMgt: Codeunit "NPR NpXml Value Mgt.";
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
@@ -173,26 +184,32 @@ codeunit 6059821 "NPR CampaignMonitor Mgt."
         FileManagement: Codeunit "File Management";
         XmlDocNode: DotNet NPRNetXmlNode;
         XmlDoc: DotNet "NPRNetXmlDocument";
+        JToken: JsonToken;
+        JArray: JsonArray;
+        JObject: JsonObject;
+        Client: HttpClient;
+        Content: HttpContent;
+        Headers: HttpHeaders;
+        ResponseMessage: HttpResponseMessage;
+        ContentText: Text;
+        Response: Text;
+        Separators: List of [Text];
+
     begin
         TransactionalEmail.TestField("Smart Email ID");
         TransactionalEmailSetup.Get(TransactionalEmailSetup.Provider::"Campaign Monitor");
 
-        Clear(HttpWebRequestMgt);
-        HttpWebRequestMgt.Initialize(SendSmartEmailURL(TransactionalEmail."Smart Email ID"));
-        HttpWebRequestMgt.SetMethod('POST');
-        HttpWebRequestMgt.AddHeader('Authorization', 'Basic ' + GetBasicAuthInfo(TransactionalEmailSetup."API Key", ''));
-        HttpWebRequestMgt.SetContentType('application/json');
-        HttpWebRequestMgt.SetReturnType('application/json');
+        InitMailAdrSeparators(Separators);
 
-        StringBuilder := StringBuilder.StringBuilder();
-        StringWriter := StringWriter.StringWriter(StringBuilder);
-        JTextWriter := JTextWriter.JsonTextWriter(StringWriter);
-        JTextWriter.Formatting := Formatting.Indented;
+        JObject.Add('To', ListToArray(Recipient.Split(Separators)));
+        if Cc <> '' then
+            JObject.Add('CC', ListToArray(Cc.Split(Separators)));
+        if Bcc <> '' then
+            JObject.Add('BCC', ListToArray(Bcc.Split(Separators)));
 
-        JTextWriter.WriteStartObject;
-        WriteRecipients(JTextWriter, Recipient, Cc, Bcc);
-        WriteAttachments(JTextWriter, Attachment);
-        //-NPR5.44 [310042]
+        if not Attachment.IsEmpty then
+            JObject.Add('Attachments', AttachmentsToArray(Attachment));
+
         if (TransactionalEmail."NpXml Template Code" <> '') and NpXmlTemplate.Get(TransactionalEmail."NpXml Template Code") then begin
             RecRef2 := RecRef.Duplicate;
             RecRef2.SetRecFilter;
@@ -200,41 +217,40 @@ codeunit 6059821 "NPR CampaignMonitor Mgt."
             NpXmlDomMgt.InitDoc(XmlDoc, XmlDocNode, NpXmlTemplate."Xml Root Name");
 
             NpXmlMgt.ParseDataToXmlDocNode(RecRef2, true, XmlDocNode);
-
-            JTextWriter.WritePropertyName('Data');
-            JTextWriter.WriteRawValue(NpXmlMgt.Xml2Json(XmlDoc, NpXmlTemplate));
+            JObject.Add('Data', NpXmlMgt.Xml2Json(XmlDoc, NpXmlTemplate));
         end else begin
             TransactionalEmailVariable.SetRange("Transactional Email Code", TransactionalEmail.Code);
-            WriteVariables(JTextWriter, TransactionalEmailVariable, RecRef);
+            JObject.Add('Data', GenerateVariablesObject(TransactionalEmailVariable, RecRef));
         end;
-        //+NPR5.44 [310042]
-        JTextWriter.WriteEndObject;
 
-        TempBlob.CreateOutStream(OStream, TEXTENCODING::UTF8);
-        OStream.WriteText(StringBuilder.ToString);
-        HttpWebRequestMgt.AddBodyBlob(TempBlob);
+        InitializeClient(Client);
+        Content.GetHeaders(Headers);
+        if Headers.Contains('Content-Type') then
+            Headers.Remove('Content-Type');
+        Headers.Add('Content-Type', 'application/json; charset=utf-8');
+        JObject.WriteTo(ContentText);
+        Content.WriteFrom(ContentText);
+        Client.Post(SendSmartEmailURL(TransactionalEmail."Smart Email ID"), Content, ResponseMessage);
 
-        if not ExecuteWebServiceRequest then begin
+        ResponseMessage.Content().ReadAs(Response);
+        if not ResponseMessage.IsSuccessStatusCode then
             if Silent then
-                exit(GetLastErrorText)
+                exit(Response)
             else
-                Error(GetLastErrorText);
-        end;
+                Error(Response);
 
-        JArray := JArray.Parse(GetWebResonseText);
-
-        for I := 0 to JArray.Count - 1 do begin
-            JObject := JArray.Item(I);
-            if not IsNull(JObject) then begin
-                EmailLog.Init;
-                EmailLog."Entry No." := 0;
-                //-NPR5.55 [343266]
-                EmailLog.Provider := EmailLog.Provider::"Campaign Monitor";
-                //+NPR5.55 [343266]
-                EmailLog."Message ID" := GetString(JObject, 'MessageID');
-                EmailLog.Status := GetString(JObject, 'Status');
-                EmailLog.Recipient := CopyStr(GetString(JObject, 'Recipient'), 1, MaxStrLen(EmailLog.Recipient));
-                EmailLog.Insert(true);
+        if JArray.ReadFrom(Response) then begin
+            for I := 0 to JArray.Count - 1 do begin
+                JArray.Get(I, JToken);
+                if JToken.IsObject then begin
+                    EmailLog.Init;
+                    EmailLog."Entry No." := 0;
+                    EmailLog.Provider := EmailLog.Provider::"Campaign Monitor";
+                    EmailLog."Message ID" := GetString(JToken.AsObject(), 'MessageID');
+                    EmailLog.Status := GetString(JToken.AsObject(), 'Status');
+                    EmailLog.Recipient := CopyStr(GetString(JToken.AsObject(), 'Recipient'), 1, MaxStrLen(EmailLog.Recipient));
+                    EmailLog.Insert(true);
+                end;
             end;
         end;
         exit('');
@@ -242,79 +258,83 @@ codeunit 6059821 "NPR CampaignMonitor Mgt."
 
     procedure SendClasicMail(Recipient: Text; Cc: Text; Bcc: Text; Subject: Text; BodyHtml: Text; BodyText: Text; From: Text; ReplyTo: Text; TrackOpen: Boolean; TrackClick: Boolean; Group: Text; AddRecipientsToListID: Text; var Attachment: Record "NPR E-mail Attachment"; Silent: Boolean): Text
     var
+        Separators: List of [Text];
+
+    begin
+        InitMailAdrSeparators(Separators);
+        exit(SendClasicMail(Recipient.Split(Separators), cc.Split(Separators), Bcc.Split(Separators), Subject, BodyHtml, BodyText, From, ReplyTo, TrackOpen, TrackClick, Group, AddRecipientsToListID, Attachment, Silent));
+    end;
+
+    procedure SendClasicMail(Recipient: List of [Text]; Cc: List of [Text]; Bcc: List of [Text]; Subject: Text; BodyHtml: Text; BodyText: Text; From: Text; ReplyTo: Text; TrackOpen: Boolean; TrackClick: Boolean; Group: Text; AddRecipientsToListID: Text; var Attachment: Record "NPR E-mail Attachment"; Silent: Boolean): Text
+    var
         TransactionalEmailSetup: Record "NPR Trx Email Setup";
-        TempBlob: Codeunit "Temp Blob";
         EmailLog: Record "NPR Trx Email Log";
-        StringBuilder: DotNet NPRNetStringBuilder;
-        StringWriter: DotNet NPRNetStringWriter;
-        Encoding: DotNet NPRNetEncoding;
-        JTextWriter: DotNet JsonTextWriter;
-        Formatting: DotNet NPRNetFormatting;
-        JObject: DotNet JObject;
-        JArray: DotNet JArray;
-        OStream: OutStream;
+        JToken: JsonToken;
+        JObject: JsonObject;
+        JArray: JsonArray;
+        Client: HttpClient;
+        Content: HttpContent;
+        Headers: HttpHeaders;
+        ResponseMessage: HttpResponseMessage;
+        ContentText: Text;
+        Response: Text;
         I: Integer;
     begin
         TransactionalEmailSetup.Get(TransactionalEmailSetup.Provider::"Campaign Monitor");
 
-        Clear(HttpWebRequestMgt);
-        HttpWebRequestMgt.Initialize(SendClassicEmailURL(TransactionalEmailSetup."Client ID"));
-        HttpWebRequestMgt.SetMethod('POST');
-        HttpWebRequestMgt.AddHeader('Authorization', 'Basic ' + GetBasicAuthInfo(TransactionalEmailSetup."API Key", ''));
-        HttpWebRequestMgt.SetContentType('application/json');
-        HttpWebRequestMgt.SetReturnType('application/json');
-
-        StringBuilder := StringBuilder.StringBuilder();
-        StringWriter := StringWriter.StringWriter(StringBuilder);
-        JTextWriter := JTextWriter.JsonTextWriter(StringWriter);
-        JTextWriter.Formatting := Formatting.Indented;
-
-        JTextWriter.WriteStartObject;
-        WriteNameValuePair(JTextWriter, 'Subject', Subject);
-        WriteNameValuePair(JTextWriter, 'From', From);
+        JObject.Add('Subject', Subject);
+        JObject.Add('From', From);
         if ReplyTo <> '' then
-            WriteNameValuePair(JTextWriter, 'ReplyTo', ReplyTo);
-        WriteRecipients(JTextWriter, Recipient, Cc, Bcc);
+            JObject.Add('ReplyTo', ReplyTo);
+        JObject.Add('To', ListToArray(Recipient));
+        if Cc.Count > 0 then
+            JObject.Add('CC', ListToArray(Cc));
+        if Bcc.Count > 0 then
+            JObject.Add('BCC', ListToArray(Bcc));
         if BodyHtml <> '' then
-            WriteNameValuePair(JTextWriter, 'Html', BodyHtml);
+            JObject.Add('Html', BodyHtml);
         if BodyText <> '' then
-            WriteNameValuePair(JTextWriter, 'Text', BodyText);
-        WriteAttachments(JTextWriter, Attachment);
+            JObject.Add('Text', BodyText);
+        if not Attachment.IsEmpty then
+            JObject.Add('Attachments', AttachmentsToArray(Attachment));
         if TrackOpen then
-            WriteNameValuePair(JTextWriter, 'TrackOpens', 'true');
+            JObject.Add('TrackOpens', true);
         if TrackClick then
-            WriteNameValuePair(JTextWriter, 'TrackClicks', 'true');
+            JObject.Add('TrackClicks', true);
         if Group <> '' then
-            WriteNameValuePair(JTextWriter, 'Group', Group);
+            JObject.Add('Group', Group);
         if AddRecipientsToListID <> '' then
-            WriteNameValuePair(JTextWriter, 'AddRecipientsToListID', AddRecipientsToListID);
-        JTextWriter.WriteEndObject;
+            JObject.Add('AddRecipientsToListID', AddRecipientsToListID);
 
-        TempBlob.CreateOutStream(OStream, TEXTENCODING::UTF8);
-        OStream.WriteText(StringBuilder.ToString);
-        HttpWebRequestMgt.AddBodyBlob(TempBlob);
+        InitializeClient(Client);
+        Content.GetHeaders(Headers);
+        if Headers.Contains('Content-Type') then
+            Headers.Remove('Content-Type');
+        Headers.Add('Content-Type', 'application/json; charset=utf-8');
+        JObject.WriteTo(ContentText);
+        Content.WriteFrom(ContentText);
 
-        if not ExecuteWebServiceRequest then begin
+        Client.Post(SendClassicEmailURL(TransactionalEmailSetup."Client ID"), Content, ResponseMessage);
+
+        ResponseMessage.Content().ReadAs(Response);
+        if not ResponseMessage.IsSuccessStatusCode then
             if Silent then
-                exit(GetLastErrorText)
+                exit(Response)
             else
-                Error(GetLastErrorText);
-        end;
+                Error(Response);
 
-        JArray := JArray.Parse(GetWebResonseText);
-
-        for I := 0 to JArray.Count - 1 do begin
-            JObject := JArray.Item(I);
-            if not IsNull(JObject) then begin
-                EmailLog.Init;
-                EmailLog."Entry No." := 0;
-                //-NPR5.55 [343266]
-                EmailLog.Provider := EmailLog.Provider::"Campaign Monitor";
-                //+NPR5.55 [343266]
-                EmailLog."Message ID" := GetString(JObject, 'MessageID');
-                EmailLog.Status := GetString(JObject, 'Status');
-                EmailLog.Recipient := CopyStr(GetString(JObject, 'Recipient'), 1, MaxStrLen(EmailLog.Recipient));
-                EmailLog.Insert(true);
+        if JArray.ReadFrom(Response) then begin
+            for I := 0 to JArray.Count - 1 do begin
+                JArray.Get(I, JToken);
+                if JToken.IsObject then begin
+                    EmailLog.Init;
+                    EmailLog."Entry No." := 0;
+                    EmailLog.Provider := EmailLog.Provider::"Campaign Monitor";
+                    EmailLog."Message ID" := GetString(JToken.AsObject(), 'MessageID');
+                    EmailLog.Status := GetString(JToken.AsObject(), 'Status');
+                    EmailLog.Recipient := CopyStr(GetString(JToken.AsObject(), 'Recipient'), 1, MaxStrLen(EmailLog.Recipient));
+                    EmailLog.Insert(true);
+                end;
             end;
         end;
         exit('');
@@ -322,47 +342,34 @@ codeunit 6059821 "NPR CampaignMonitor Mgt."
 
     procedure PreviewSmartEmail(SmartEmail: Record "NPR Smart Email")
     begin
-        //-NPR5.55 [343266]
         if SmartEmail."Preview Url" <> '' then
             HyperLink(SmartEmail."Preview Url");
-        //+NPR5.55 [343266]
     end;
 
-    local procedure Initialize(URL: Text; Method: Text[6])
+    local procedure InitializeClient(Client: HttpClient)
     var
         TransactionalEmailSetup: Record "NPR Trx Email Setup";
+        Headers: HttpHeaders;
     begin
         TransactionalEmailSetup.Get(TransactionalEmailSetup.Provider::"Campaign Monitor");
         TransactionalEmailSetup.TestField("Client ID");
         TransactionalEmailSetup.TestField("API Key");
 
-        Clear(HttpWebRequestMgt);
-        HttpWebRequestMgt.Initialize(URL);
-        HttpWebRequestMgt.SetMethod(Method);
-        HttpWebRequestMgt.AddHeader('Authorization', 'Basic ' + GetBasicAuthInfo(TransactionalEmailSetup."API Key", ''));
-        HttpWebRequestMgt.SetContentType('application/json');
-        HttpWebRequestMgt.SetReturnType('application/json');
-    end;
-
-    [TryFunction]
-    local procedure ExecuteWebServiceRequest()
-    begin
-        Clear(ResponseTempBlob);
-        ResponseTempBlob.CreateInStream(ResponseInStream);
-
-        if not GuiAllowed then
-            HttpWebRequestMgt.DisableUI;
-
-        if not HttpWebRequestMgt.GetResponse(ResponseInStream, HttpStatusCode, ResponseHeaders) then
-            HttpWebRequestMgt.ProcessFaultXMLResponse('', '', '', '');
+        Headers := Client.DefaultRequestHeaders();
+        Headers.Add('Authorization', GetBasicAuthInfo(TransactionalEmailSetup."API Key", ''));
     end;
 
     local procedure GetBasicAuthInfo(Username: Text; Password: Text): Text
     var
-        Convert: DotNet NPRNetConvert;
-        Encoding: DotNet NPRNetEncoding;
+        TempBlob: Codeunit "Temp Blob";
+        Base64Convert: Codeunit "Base64 Convert";
+        OStream: OutStream;
+        IStream: InStream;
     begin
-        exit(Convert.ToBase64String(Encoding.UTF8.GetBytes(Username + ':' + Password)));
+        TempBlob.CreateOutStream(OStream, TextEncoding::UTF8);
+        OStream.WriteText(Username + ':' + Password);
+        TempBlob.CreateInStream(IStream);
+        exit('Basic ' + Base64Convert.ToBase64(IStream));
     end;
 
     local procedure GetFullURL(PartialURL: Text): Text
@@ -441,19 +448,17 @@ codeunit 6059821 "NPR CampaignMonitor Mgt."
         exit('https://api.createsend.com/api/v3.1');
     end;
 
-    local procedure "---"()
-    begin
-    end;
-
-    local procedure GetString(JObject: DotNet JObject; Property: Text): Text
+    local procedure GetString(JObject: JsonObject; Property: Text): Text
     var
-        JToken: DotNet JToken;
+        JToken: JsonToken;
     begin
         if GetJToken(JObject, Property, JToken) then
-            exit(JToken.ToString());
+            if JToken.IsValue then
+                exit(JToken.AsValue().AsText());
+        exit('');
     end;
 
-    local procedure GetInt(JObject: DotNet JObject; Property: Text): Integer
+    local procedure GetInt(JObject: JsonObject; Property: Text): Integer
     var
         Number: Integer;
     begin
@@ -461,7 +466,7 @@ codeunit 6059821 "NPR CampaignMonitor Mgt."
             exit(Number);
     end;
 
-    local procedure GetDateTime(JObject: DotNet JObject; Property: Text): DateTime
+    local procedure GetDateTime(JObject: JsonObject; Property: Text): DateTime
     var
         DTVar: DateTime;
     begin
@@ -469,7 +474,7 @@ codeunit 6059821 "NPR CampaignMonitor Mgt."
             exit(DTVar);
     end;
 
-    local procedure GetDate(JObject: DotNet JObject; Property: Text): Date
+    local procedure GetDate(JObject: JsonObject; Property: Text): Date
     var
         DTVar: DateTime;
     begin
@@ -477,129 +482,80 @@ codeunit 6059821 "NPR CampaignMonitor Mgt."
             exit(DT2Date(DTVar));
     end;
 
-    local procedure GetJToken(JObject: DotNet JObject; Property: Text; var JToken: DotNet JToken): Boolean
+    local procedure GetJToken(JObject: JsonObject; Property: Text; var JToken: JsonToken): Boolean
     begin
-        JToken := JObject.Item(Property);
-        exit(not IsNull(JToken));
+        exit(JObject.Get(Property, JToken));
     end;
 
-    local procedure WriteRecipients(var JTextWriter: DotNet JsonTextWriter; Recipient: Text; Cc: Text; Bcc: Text)
-    begin
-        if Recipient <> '' then
-            WriteReceiver(JTextWriter, 'To', Recipient);
-
-        if Cc <> '' then
-            WriteReceiver(JTextWriter, 'CC', Cc);
-
-        if Bcc <> '' then
-            WriteReceiver(JTextWriter, 'BCC', Bcc);
-    end;
-
-    local procedure WriteReceiver(var JTextWriter: DotNet JsonTextWriter; Type: Text; MailAdresses: Text)
+    local procedure AttachmentsToArray(var Attachment: Record "NPR E-mail Attachment"): JsonArray;
     var
-        Pos: Integer;
-        "Part": Text;
-    begin
-        JTextWriter.WritePropertyName(Type);
-        JTextWriter.WriteStartArray;
-        Pos := StrPos(MailAdresses, ';');
-        if Pos > 0 then
-            repeat
-                Part := CopyStr(MailAdresses, 1, Pos - 1);
-                if Part <> '' then
-                    JTextWriter.WriteValue(Part);
-                MailAdresses := CopyStr(MailAdresses, Pos + 1);
-                Pos := StrPos(MailAdresses, ';');
-            until Pos = 0;
-        if MailAdresses <> '' then
-            JTextWriter.WriteValue(MailAdresses);
-        JTextWriter.WriteEndArray;
-    end;
-
-    local procedure WriteAttachments(var JTextWriter: DotNet JsonTextWriter; var Attachment: Record "NPR E-mail Attachment")
-    var
-        MemoryStream: DotNet NPRNetMemoryStream;
-        Bytes: DotNet NPRNetArray;
-        Convert: DotNet NPRNetConvert;
+        Base64Convert: Codeunit "Base64 Convert";
+        JArray: JsonArray;
+        JObject: JsonObject;
         IStream: InStream;
-        AttachmentText: Text;
     begin
         if Attachment.IsEmpty then
             exit;
-        JTextWriter.WritePropertyName('Attachments');
-        JTextWriter.WriteStartArray;
 
         if Attachment.FindSet then
             repeat
                 if Attachment."Attached File".HasValue then begin
                     Attachment.CalcFields("Attached File");
                     Attachment."Attached File".CreateInStream(IStream);
-                    MemoryStream := MemoryStream.MemoryStream();
-                    CopyStream(MemoryStream, IStream);
-                    Bytes := MemoryStream.GetBuffer();
-                    JTextWriter.WriteStartObject;
-                    JTextWriter.WritePropertyName('Content');
-                    JTextWriter.WriteValue(Convert.ToBase64String(Bytes));
-                    WriteNameValuePair(JTextWriter, 'Name', Attachment.Description);
-                    WriteNameValuePair(JTextWriter, 'Type', GetAttachmentType(Attachment.Description));
-                    JTextWriter.WriteEndObject;
+                    Clear(JObject);
+                    JObject.Add('Content', Base64Convert.ToBase64(IStream));
+                    JObject.Add('Name', Attachment.Description);
+                    JObject.Add('Type', GetAttachmentType(Attachment.Description));
+
+                    JArray.Add(JObject);
                 end;
             until Attachment.Next = 0;
-        JTextWriter.WriteEndArray;
+        exit(JArray);
     end;
 
-    local procedure WriteVariables(var JTextWriter: DotNet JsonTextWriter; var TransactionalEmailVariable: Record "NPR Smart Email Variable"; RecRef: RecordRef)
+    local procedure GenerateVariablesObject(var TransactionalEmailVariable: Record "NPR Smart Email Variable"; RecRef: RecordRef): JsonObject
     var
         FldRef: FieldRef;
+        JObject: JsonObject;
+        ValueString: Text;
     begin
         if TransactionalEmailVariable.FindSet then begin
-            JTextWriter.WritePropertyName('Data');
-            JTextWriter.WriteStartObject;
             repeat
-                JTextWriter.WritePropertyName(TransactionalEmailVariable."Variable Name");
                 if TransactionalEmailVariable."Const Value" <> '' then
-                    JTextWriter.WriteValue(TransactionalEmailVariable."Const Value")
+                    ValueString := TransactionalEmailVariable."Const Value"
                 else begin
                     FldRef := RecRef.Field(TransactionalEmailVariable."Field No.");
                     if Format(FldRef.Class) = 'FlowField' then
                         FldRef.CalcField;
-                    JTextWriter.WriteValue(Format(FldRef.Value));
+                    ValueString := Format(FldRef.Value);
                 end;
+                JObject.Add(TransactionalEmailVariable."Variable Name", ValueString);
             until TransactionalEmailVariable.Next = 0;
-            JTextWriter.WriteEndObject;
         end;
-    end;
-
-    local procedure WriteNameValuePair(var JTextWriter: DotNet JsonTextWriter; PropertyName: Text; Value: Text)
-    begin
-        JTextWriter.WritePropertyName(PropertyName);
-        JTextWriter.WriteValue(Value);
-    end;
-
-    local procedure GetChar(CharInt: Integer): Text[1]
-    var
-        Char: Char;
-    begin
-        Char := CharInt;
-        exit(Format(Char));
-    end;
-
-    local procedure GetWebResonseText() ResponseText: Text
-    var
-        PartText: Text;
-    begin
-        ResponseText := '';
-        while not ResponseInStream.EOS do begin
-            ResponseInStream.ReadText(PartText);
-            ResponseText += PartText;
-        end;
+        exit(JObject);
     end;
 
     local procedure GetAttachmentType(FileName: Text): Text
     var
-        MimeMapping: DotNet NPRNetMimeMapping;
+        FileManagement: Codeunit "File Management";
     begin
-        exit(MimeMapping.GetMimeMapping(FileName));
+        exit(FileManagement.GetFileNameMimeType(FileName));
+    end;
+
+    local procedure InitMailAdrSeparators(var MailAdrSeparators: List of [Text])
+    begin
+        MailAdrSeparators.Add(';');
+        MailAdrSeparators.Add(',');
+    end;
+
+    local procedure ListToArray(Data: List of [Text]): JsonArray
+    var
+        JArray: JsonArray;
+        ListElement: Text;
+    begin
+        foreach ListElement in Data do
+            JArray.Add(ListElement);
+        exit(JArray);
     end;
 
     [EventSubscriber(ObjectType::Table, 6059820, 'OnBeforeInsertEvent', '', false, false)]
@@ -608,5 +564,6 @@ codeunit 6059821 "NPR CampaignMonitor Mgt."
         if Rec."API URL" = '' then
             Rec."API URL" := DefaultAPIURL;
     end;
+
 }
 
