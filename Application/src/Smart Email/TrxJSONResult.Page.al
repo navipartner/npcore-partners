@@ -1,15 +1,11 @@
 page 6059829 "NPR Trx JSON Result"
 {
-    // NPR5.38/THRO/20171018 CASE 286713 Object created
-    // NPR5.55/THRO/20200511 CASE 343266 Multiple Providers
-
     Caption = 'Transactional JSON Result';
     DeleteAllowed = false;
     Editable = false;
     InsertAllowed = false;
     ModifyAllowed = false;
     PageType = List;
-    UsageCategory = Administration;
     ShowFilter = false;
     SourceTable = "NPR Trx JSON Result";
     SourceTableTemporary = true;
@@ -20,23 +16,23 @@ page 6059829 "NPR Trx JSON Result"
         {
             repeater(Group)
             {
-                field(Name; Name)
+                field(Name; Rec.Name)
                 {
                     ApplicationArea = All;
                 }
-                field(Status; Status)
+                field(Status; Rec.Status)
                 {
                     ApplicationArea = All;
                 }
-                field(Created; Created)
+                field(Created; Rec.Created)
                 {
                     ApplicationArea = All;
                 }
-                field(ID; ID)
+                field(ID; Rec.ID)
                 {
                     ApplicationArea = All;
                 }
-                field("Entry No"; "Entry No")
+                field("Entry No"; Rec."Entry No")
                 {
                     ApplicationArea = All;
                 }
@@ -52,10 +48,8 @@ page 6059829 "NPR Trx JSON Result"
     var
         TransactionalEmailMgt: Codeunit "NPR Transactional Email Mgt.";
     begin
-        if IsEmpty then
-            //-NPR5.55 [343266]
+        if Rec.IsEmpty then
             TransactionalEmailMgt.GetSmartEmailList(Rec);
-        //+NPR5.55 [343266]
     end;
 
     var

@@ -1,12 +1,7 @@
 page 6059822 "NPR Smart Email Card"
 {
-    // NPR5.38/THRO/20171018 CASE 286713 Object created
-    // NPR5.44/THRO/20180723 CASE 310042 Added "NpXml Template Code"
-    // NPR5.55/THRO/20200511 CASE 343266 Added Provider
-
     Caption = 'Smart Email Card';
     PageType = Card;
-    UsageCategory = Administration;
     SourceTable = "NPR Smart Email";
 
     layout
@@ -15,54 +10,50 @@ page 6059822 "NPR Smart Email Card"
         {
             group(General)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                 }
-                field(Provider; Provider)
+                field(Provider; Rec.Provider)
                 {
                     ApplicationArea = All;
 
                     trigger OnValidate()
                     begin
-                        //-NPR5.55 [343266]
-                        ShowMergeLanguage := Provider = Provider::Mailchimp;
-                        //+NPR5.55 [343266]
+                        ShowMergeLanguage := Rec.Provider = Rec.Provider::Mailchimp;
                     end;
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                 }
-                field("Merge Table ID"; "Merge Table ID")
+                field("Merge Table ID"; Rec."Merge Table ID")
                 {
                     ApplicationArea = All;
                 }
-                field("Table Caption"; "Table Caption")
+                field("Table Caption"; Rec."Table Caption")
                 {
                     ApplicationArea = All;
                 }
-                field("Smart Email ID"; "Smart Email ID")
+                field("Smart Email ID"; Rec."Smart Email ID")
                 {
                     ApplicationArea = All;
                     ShowMandatory = true;
                 }
-                field("NpXml Template Code"; "NpXml Template Code")
+                field("NpXml Template Code"; Rec."NpXml Template Code")
                 {
                     ApplicationArea = All;
 
                     trigger OnValidate()
                     begin
-                        //-NPR5.44 [310042]
-                        ShowVariablesSubPage := "NpXml Template Code" = '';
-                        //+NPR5.44 [310042]
+                        ShowVariablesSubPage := Rec."NpXml Template Code" = '';
                     end;
                 }
                 group(Control6014402)
                 {
                     ShowCaption = false;
                     Visible = ShowMergeLanguage;
-                    field("Merge Language (Mailchimp)"; "Merge Language (Mailchimp)")
+                    field("Merge Language (Mailchimp)"; Rec."Merge Language (Mailchimp)")
                     {
                         ApplicationArea = All;
                     }
@@ -72,25 +63,25 @@ page 6059822 "NPR Smart Email Card"
             {
                 Caption = 'Template Details';
                 Editable = false;
-                field("Smart Email Name"; "Smart Email Name")
+                field("Smart Email Name"; Rec."Smart Email Name")
                 {
                     ApplicationArea = All;
                     Editable = false;
                 }
-                field(Status; Status)
+                field(Status; Rec.Status)
                 {
                     ApplicationArea = All;
                     Editable = false;
                 }
-                field(Subject; Subject)
+                field(Subject; Rec.Subject)
                 {
                     ApplicationArea = All;
                 }
-                field(From; From)
+                field(From; Rec.From)
                 {
                     ApplicationArea = All;
                 }
-                field("Reply To"; "Reply To")
+                field("Reply To"; Rec."Reply To")
                 {
                     ApplicationArea = All;
                 }
@@ -104,7 +95,7 @@ page 6059822 "NPR Smart Email Card"
             group("Preview")
             {
                 Caption = 'Preview';
-                field("Preview Url"; "Preview Url")
+                field("Preview Url"; Rec."Preview Url")
                 {
                     ApplicationArea = All;
                     Editable = false;
@@ -114,9 +105,7 @@ page 6059822 "NPR Smart Email Card"
                     var
                         TransactionalEmailMgt: Codeunit "NPR Transactional Email Mgt.";
                     begin
-                        //-NPR5.55 [343266]
                         TransactionalEmailMgt.PreviewSmartEmail(Rec);
-                        //+NPR5.55 [343266]
                     end;
                 }
             }
@@ -129,12 +118,8 @@ page 6059822 "NPR Smart Email Card"
 
     trigger OnAfterGetRecord()
     begin
-        //-NPR5.44 [310042]
-        ShowVariablesSubPage := "NpXml Template Code" = '';
-        //+NPR5.44 [310042]
-        //-NPR5.55 [343266]
-        ShowMergeLanguage := Provider = Provider::Mailchimp;
-        //+NPR5.55 [343266]
+        ShowVariablesSubPage := Rec."NpXml Template Code" = '';
+        ShowMergeLanguage := Rec.Provider = Rec.Provider::Mailchimp;
     end;
 
     var
