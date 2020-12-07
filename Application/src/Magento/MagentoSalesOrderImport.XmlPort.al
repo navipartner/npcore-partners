@@ -36,6 +36,11 @@ xmlport 6151401 "NPR Magento Sales Order Import"
                     MaxOccurs = Once;
                     MinOccurs = Zero;
                 }
+                textelement(magento_coupon)
+                {
+                    MaxOccurs = Once;
+                    MinOccurs = Zero;
+                }
                 textelement(your_reference)
                 {
                     MaxOccurs = Once;
