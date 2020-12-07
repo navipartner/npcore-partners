@@ -181,18 +181,18 @@ codeunit 6014582 "NPR Print Method Mgt."
         FileMgt.DeleteClientFile(Filename);
     end;
 
-    procedure PrintBytesHTTP(URL: Text; Endpoint: Text; PrintBytes: Text; TargetEncoding: Text)
+    procedure PrintBytesHTTP(URL: Text; Endpoint: Text; PrintBytes: Text; TargetEncoding: TextEncoding; CodePage: Integer)
     var
         MobilePrintMgt: Codeunit "NPR Mobile Print Mgt.";
     begin
-        MobilePrintMgt.PrintJobHTTP(URL, Endpoint, PrintBytes, TargetEncoding);
+        MobilePrintMgt.PrintJobHTTP(URL, Endpoint, PrintBytes, TargetEncoding, CodePage);
     end;
 
-    procedure PrintBytesBluetooth(DeviceName: Text; PrintBytes: Text; TargetEncoding: Text)
+    procedure PrintBytesBluetooth(DeviceName: Text; PrintBytes: Text; TargetEncoding: TextEncoding; CodePage: Integer)
     var
         MobilePrintMgt: Codeunit "NPR Mobile Print Mgt.";
     begin
-        MobilePrintMgt.PrintJobBluetooth(DeviceName, PrintBytes, TargetEncoding);
+        MobilePrintMgt.PrintJobBluetooth(DeviceName, PrintBytes, TargetEncoding, CodePage);
     end;
 }
 
