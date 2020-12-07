@@ -188,8 +188,9 @@ codeunit 6014580 "NPR Object Output Mgt."
                     if not Supported then
                         Error(Error_UnsupportedOutput, Format(ObjectOutput."Output Type"::HTTP), TemplateCode);
                     Printer.OnGetPrintBytes(PrintBytes);
+                    Printer.OnGetTargetEncodingWithCodePage(Encoding, CodePage);
                     for i := 1 to NoOfPrints do
-                        PrintMethodMgt.PrintBytesHTTP(ObjectOutput."Output Path", HTTPEndpoint, PrintBytes, TargetEncoding);
+                        PrintMethodMgt.PrintBytesHTTP(ObjectOutput."Output Path", HTTPEndpoint, PrintBytes, Encoding, CodePage);
                 end;
 
             ObjectOutput."Output Type"::Bluetooth:
@@ -198,8 +199,9 @@ codeunit 6014580 "NPR Object Output Mgt."
                     if not Supported then
                         Error(Error_UnsupportedOutput, Format(ObjectOutput."Output Type"::Bluetooth), TemplateCode);
                     Printer.OnGetPrintBytes(PrintBytes);
+                    Printer.OnGetTargetEncodingWithCodePage(Encoding, CodePage);
                     for i := 1 to NoOfPrints do
-                        PrintMethodMgt.PrintBytesBluetooth(ObjectOutput."Output Path", PrintBytes, TargetEncoding);
+                        PrintMethodMgt.PrintBytesBluetooth(ObjectOutput."Output Path", PrintBytes, Encoding, CodePage);
                 end;
             ObjectOutput."Output Type"::"PrintNode Raw":
                 begin
@@ -257,8 +259,9 @@ codeunit 6014580 "NPR Object Output Mgt."
                     if not Supported then
                         Error(Error_UnsupportedOutput, Format(ObjectOutput."Output Type"::HTTP), TemplateCode);
                     Printer.OnGetPrintBytes(PrintBytes);
+                    Printer.OnGetTargetEncodingWithCodePage(Encoding, CodePage);
                     for i := 1 to NoOfPrints do
-                        PrintMethodMgt.PrintBytesHTTP(ObjectOutput."Output Path", HTTPEndpoint, PrintBytes, TargetEncoding);
+                        PrintMethodMgt.PrintBytesHTTP(ObjectOutput."Output Path", HTTPEndpoint, PrintBytes, Encoding, CodePage);
                 end;
 
             ObjectOutput."Output Type"::Bluetooth:
@@ -267,8 +270,9 @@ codeunit 6014580 "NPR Object Output Mgt."
                     if not Supported then
                         Error(Error_UnsupportedOutput, Format(ObjectOutput."Output Type"::Bluetooth), TemplateCode);
                     Printer.OnGetPrintBytes(PrintBytes);
+                    Printer.OnGetTargetEncodingWithCodePage(Encoding, CodePage);
                     for i := 1 to NoOfPrints do
-                        PrintMethodMgt.PrintBytesBluetooth(ObjectOutput."Output Path", PrintBytes, TargetEncoding);
+                        PrintMethodMgt.PrintBytesBluetooth(ObjectOutput."Output Path", PrintBytes, Encoding, CodePage);
                 end;
             ObjectOutput."Output Type"::"PrintNode Raw":
                 begin
