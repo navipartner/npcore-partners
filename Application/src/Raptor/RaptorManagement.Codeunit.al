@@ -1,12 +1,5 @@
 codeunit 6151491 "NPR Raptor Management"
 {
-    // NPR5.51/CLVA/20190710 CASE 355871 Object created
-    // NPR5.53/ALPO/20191125 CASE 377727 Raptor integration enhancements
-    // NPR5.53/ALPO/20191128 CASE 379012 Raptor tracking integration: send info about sold products to Raptor
-    // NPR5.54/ALPO/20200227 CASE 355871 Possibility to define Raptor tracking service types
-    // NPR5.55/ALPO/20200422 CASE 400925 Exclude webshop sales from data sent to Raptor. Default data sending frequency set to every 10 minuntes
-
-
     trigger OnRun()
     begin
     end;
@@ -41,21 +34,18 @@ codeunit 6151491 "NPR Raptor Management"
         RaptorAction.TestField("Raptor Module Code");
         if RaptorAction."Number of Entries to Return" <= 0 then
             RaptorAction."Number of Entries to Return" := 10;
-        //-NPR5.54 [355871]
         if RaptorAction."User Identifier Param. Name" = '' then
             RaptorAction."User Identifier Param. Name" := 'UserIdentifier';
-        //+NPR5.54 [355871]
 
         Baseurl := RaptorSetup."Base Url";
         Path :=
-          //STRSUBSTNO('/v1/%1/%2/%3/%4?UserIdentifier=%5&json=True',  //NPR5.54 [355871]-revoked
-          StrSubstNo('/v1/%1/%2/%3/%4?%5=%6&json=True',  //NPR5.54 [355871]
-            RaptorSetup."Customer ID",
-            RaptorAction.RaptorActionAPIReqString,
-            RaptorAction."Number of Entries to Return",
-            RaptorSetup."API Key",
-            RaptorAction."User Identifier Param. Name",  //NPR5.54 [355871]
-            UserIdentifier);
+            StrSubstNo('/v1/%1/%2/%3/%4?%5=%6&json=True',
+                RaptorSetup."Customer ID",
+                RaptorAction.RaptorActionAPIReqString,
+                RaptorAction."Number of Entries to Return",
+                RaptorSetup."API Key",
+                RaptorAction."User Identifier Param. Name",
+                UserIdentifier);
 
         exit(RaptorAPI.SendRaptorRequest(Baseurl, Path, ErrorMsg));
     end;
@@ -70,11 +60,10 @@ codeunit 6151491 "NPR Raptor Management"
             exit;
 
         Result :=
-          RaptorAPI.SendRaptorRequest(
-            RaptorSetup."Tracking Service Url",
-            //STRSUBSTNO('/%1.rsa',RaptorSetup."Customer ID") + GenerateUrlQueryString(Parameters),  //NPR5.54 [355871]-revoked
-            StrSubstNo('/%1.%2', RaptorSetup."Customer ID", RaptorSetup."Tracking Service Type") + GenerateUrlQueryString(Parameters),  //NPR5.54 [355871]
-            ErrorMsg);
+            RaptorAPI.SendRaptorRequest(
+                RaptorSetup."Tracking Service Url",
+                StrSubstNo('/%1.%2', RaptorSetup."Customer ID", RaptorSetup."Tracking Service Type") + GenerateUrlQueryString(Parameters),
+                ErrorMsg);
 
         if ErrorMsg <> '' then
             Error(ErrorMsg);
@@ -82,12 +71,13 @@ codeunit 6151491 "NPR Raptor Management"
 
     procedure GetRaptorData(RaptorAction: Record "NPR Raptor Action"; UserIdentifier: Text; var RaptorDataBuffer: Record "NPR Raptor Data Buffer")
     var
-        RaptorHelperFunctions: Codeunit "NPR Raptor Helper Functions";
-        JArray: DotNet NPRNetJArray;
-        JObject: DotNet NPRNetJObject;
+        JArray: JsonArray;
+        JObject: JsonObject;
+        JToken: JsonToken;
         ErrorMsg: Text;
         Result: Text;
         Handled: Boolean;
+        InvalidRespErr: Label 'Invalid response, expected a JSON array as root object.\Actual response: %1';
     begin
         RaptorDataBuffer.Reset;
         RaptorDataBuffer.DeleteAll;
@@ -95,36 +85,38 @@ codeunit 6151491 "NPR Raptor Management"
         Result := SendRaptorGetDataRequst(RaptorAction, UserIdentifier, ErrorMsg);
         if ErrorMsg <> '' then
             Error(ErrorMsg);
-        RaptorHelperFunctions.TryParse(Result, JArray);
-        foreach JObject in JArray do
-            with RaptorDataBuffer do begin
-                OnProcessRaptorDataLine(RaptorAction, UserIdentifier, JObject.ToString(), RaptorDataBuffer, Handled);
+        if not JArray.ReadFrom(Result) then
+            Error(InvalidRespErr, Result);
+        foreach JToken in JArray do begin
+            OnProcessRaptorDataLine(RaptorAction, UserIdentifier, JToken.AsValue().AsText(), RaptorDataBuffer, Handled);
 
-                if not Handled then
-                    case RaptorAction."Raptor Module Code" of
-                        RaptorModule_GetUserIdHistory:
-                            begin
-                                Init;
-                                "Entry No." += 1;
-                                "Date-Time Created" := RaptorHelperFunctions.GetValueAsDateTime(JObject, 'CreateDate');
-                                Priority := RaptorHelperFunctions.GetValueAsInteger(JObject, 'Priority');
-                                ParseItemNo(RaptorHelperFunctions.GetValueAsText(JObject, 'RecommendedId'), RaptorDataBuffer);
-                                Insert;
-                            end;
+            if not Handled then begin
+                JObject := JToken.AsObject();
+                case RaptorAction."Raptor Module Code" of
+                    RaptorModule_GetUserIdHistory:
+                        begin
+                            RaptorDataBuffer.Init;
+                            RaptorDataBuffer."Entry No." += 1;
+                            RaptorDataBuffer."Date-Time Created" := GetJsonToken(JObject, 'CreateDate').AsValue().AsDateTime();
+                            RaptorDataBuffer.Priority := GetJsonToken(JObject, 'Priority').AsValue().AsInteger();
+                            ParseItemNo(GetJsonToken(JObject, 'RecommendedId').AsValue().AsText(), RaptorDataBuffer);
+                            RaptorDataBuffer.Insert;
+                        end;
 
-                        RaptorModule_GetUserRecommendations:
-                            begin
-                                Init;
-                                "Entry No." += 1;
-                                Priority := RaptorHelperFunctions.GetValueAsInteger(JObject, 'Priority');
-                                ParseItemNo(RaptorHelperFunctions.GetValueAsText(JObject, 'RecommendedId'), RaptorDataBuffer);
-                                Insert;
-                            end;
+                    RaptorModule_GetUserRecommendations:
+                        begin
+                            RaptorDataBuffer.Init;
+                            RaptorDataBuffer."Entry No." += 1;
+                            RaptorDataBuffer.Priority := GetJsonToken(JObject, 'Priority').AsValue().AsInteger();
+                            ParseItemNo(GetJsonToken(JObject, 'RecommendedId').AsValue().AsText(), RaptorDataBuffer);
+                            RaptorDataBuffer.Insert;
+                        end;
 
-                        else
-                            Error(ActionNotSupported, RaptorAction.TableCaption, RaptorAction.Code);
-                    end;
+                    else
+                        Error(ActionNotSupported, RaptorAction.TableCaption, RaptorAction.Code);
+                end;
             end;
+        end;
     end;
 
     procedure ShowRaptorData(RaptorAction: Record "NPR Raptor Action"; UserIdentifier: Text)
@@ -200,7 +192,7 @@ codeunit 6151491 "NPR Raptor Management"
 
     local procedure GenerateUrlQueryString(var Parameters: Record "Name/Value Buffer") QueryString: Text
     var
-        HttpUtility: DotNet NPRNetHttpUtility;
+        TypeHelper: Codeunit "Type Helper";
     begin
         Parameters.SetFilter(Name, '<>%1', '_*');
         Parameters.SetFilter(Value, '<>%1', '');
@@ -211,7 +203,7 @@ codeunit 6151491 "NPR Raptor Management"
                 else
                     QueryString := '?';
                 QueryString := QueryString +
-                  StrSubstNo('%1=%2', HttpUtility.UrlEncode(Parameters.Name), HttpUtility.UrlEncode(Parameters.Value));
+                    StrSubstNo('%1=%2', TypeHelper.UrlEncode(Parameters.Name), TypeHelper.UrlEncode(Parameters.Value));
             until Parameters.Next = 0;
     end;
 
@@ -231,7 +223,7 @@ codeunit 6151491 "NPR Raptor Management"
                     if not RaptorSetup."Send Data to Raptor" then
                         exit(false);
                     RaptorSetup.TestField("Tracking Service Url");
-                    RaptorSetup.TestField("Tracking Service Type");  //NPR5.54 [355871]
+                    RaptorSetup.TestField("Tracking Service Type");
                 end;
         end;
         RaptorSetup.TestField("Customer ID");
@@ -293,18 +285,11 @@ codeunit 6151491 "NPR Raptor Management"
             AddDataLogSubscribers;
 
             JobQueueEntry.ScheduleRecurrentJobQueueEntry(
-              JobQueueEntry."Object Type to Run"::Codeunit, CODEUNIT::"NPR Raptor Send Data", DummyRecId);  // NAV versions 2017 and later
+                JobQueueEntry."Object Type to Run"::Codeunit, CODEUNIT::"NPR Raptor Send Data", DummyRecId);
             JobQueueEntry.Description := CopyStr(SendDataToRaptrorLbl, 1, MaxStrLen(JobQueueEntry.Description));
-            //-NPR5.55 [400925]-revoked
-            //JobQueueEntry."Starting Time" := 230000T;
-            //JobQueueEntry."Ending Time" := 235900T;
-            //JobQueueEntry."No. of Minutes between Runs" := 1200;
-            //+NPR5.55 [400925]-revoked
-            //-NPR5.55 [400925]
             JobQueueEntry."Starting Time" := 070000T;
             JobQueueEntry."Ending Time" := 230000T;
             JobQueueEntry."No. of Minutes between Runs" := 10;
-            //+NPR5.55 [400925]
             JobQueueEntry.Modify;
             Commit;
 
@@ -356,7 +341,6 @@ codeunit 6151491 "NPR Raptor Management"
     var
         ListOfTrackingServiceTypes: Record "Name/Value Buffer" temporary;
     begin
-        //-NPR5.54 [355871]
         GetListOfTrackingServiceTypes(ListOfTrackingServiceTypes);
         if TrackingServiceType <> '' then begin
             ListOfTrackingServiceTypes.SetRange(Value, TrackingServiceType);
@@ -368,37 +352,31 @@ codeunit 6151491 "NPR Raptor Management"
             exit(true);
         end else
             exit(false);
-        //+NPR5.54 [355871]
     end;
 
     procedure ValidateTrackingServiceType(TrackingServiceType: Text)
     var
         ListOfTrackingServiceTypes: Record "Name/Value Buffer" temporary;
     begin
-        //-NPR5.54 [355871]
         if TrackingServiceType = '' then
             exit;
         GetListOfTrackingServiceTypes(ListOfTrackingServiceTypes);
         ListOfTrackingServiceTypes.SetRange(Value, TrackingServiceType);
         if ListOfTrackingServiceTypes.IsEmpty then
             Error(UnknownValue, RaptorSetup.FieldCaption("Tracking Service Type"), TrackingServiceType);
-        //+NPR5.54 [355871]
     end;
 
     procedure GetDefaultTrackingServiceType(var TrackingServiceType: Text): Text
     var
         Handled: Boolean;
     begin
-        //-NPR5.54 [355871]
         OnGetDefaultTrackingServiceType(TrackingServiceType, Handled);
         if not Handled then
             TrackingServiceType := RaptorTrackService_rsa;
-        //+NPR5.54 [355871]
     end;
 
     local procedure GetListOfTrackingServiceTypes(var ListOfTrackingServiceTypes: Record "Name/Value Buffer")
     begin
-        //-NPR5.54 [355871]
         if not ListOfTrackingServiceTypes.IsTemporary then
             Error(IncorrectFunctionCallErr);
 
@@ -412,7 +390,6 @@ codeunit 6151491 "NPR Raptor Management"
         ListOfTrackingServiceTypes.Insert;
 
         OnGetListOfTrackingServiceTypes(ListOfTrackingServiceTypes);
-        //+NPR5.54 [355871]
     end;
 
     procedure RaptorModule_GetUserIdHistory(): Text
@@ -427,9 +404,7 @@ codeunit 6151491 "NPR Raptor Management"
 
     local procedure RaptorTrackService_rsa(): Text[30]
     begin
-        //-NPR5.54 [355871]
         exit('rsa');
-        //+NPR5.54 [355871]
     end;
 
     procedure RaptorDataLogSubscriber(): Code[30]
@@ -444,7 +419,6 @@ codeunit 6151491 "NPR Raptor Management"
         SalespersonList: Page "NPR Salesperson List";
         InQuotes: Label '''%1''';
     begin
-        //-NPR5.55 [400925]
         RaptorSendData.CreateTmpSalespersonList(SalespersonTmp);
 
         if SalespersonFilter <> '' then begin
@@ -472,7 +446,14 @@ codeunit 6151491 "NPR Raptor Management"
                     SalespersonFilter := SalespersonFilter + '|';
                 SalespersonFilter := SalespersonFilter + StrSubstNo(InQuotes, SalespersonTmp.Code);
             until SalespersonTmp.Next = 0;
-        //+NPR5.55 [400925]
+    end;
+
+    procedure GetJsonToken(JObject: JsonObject; TokenKey: Text) JToken: JsonToken
+    var
+        TokenNotFoundErr: Label 'Could not find a JSON token with key %1';
+    begin
+        if not JObject.Get(TokenKey, JToken) then
+            Error(TokenNotFoundErr, TokenKey);
     end;
 
     [IntegrationEvent(TRUE, false)]
@@ -493,13 +474,10 @@ codeunit 6151491 "NPR Raptor Management"
     [IntegrationEvent(false, false)]
     procedure OnGetListOfTrackingServiceTypes(var ListOfTrackingServiceTypes: Record "Name/Value Buffer")
     begin
-        //NPR5.54 [355871]
     end;
 
     [IntegrationEvent(false, false)]
     procedure OnGetDefaultTrackingServiceType(var TrackingServiceType: Text; var Handled: Boolean)
     begin
-        //NPR5.54 [355871]
     end;
 }
-
