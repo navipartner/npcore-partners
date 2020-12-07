@@ -75,7 +75,6 @@ codeunit 6014502 "NPR SMS"
 
     procedure SmsEclub(PhoneNo: Code[20]; SMSMessage: Text[250]; From: Text[20])
     var
-        HttpRequest: DotNet NPRNetHttpWebRequest;
         Util: Codeunit "NPR Utility";
         AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
         Uri: Codeunit Uri;
@@ -83,6 +82,10 @@ codeunit 6014502 "NPR SMS"
         ForeignPhone: Boolean;
         SMSHandled: Boolean;
         SMSServiceUri: Text;
+        HttpClient: HttpClient;
+        HttpResponseMsg: HttpResponseMessage;
+        Content: HttpContent;
+        HttpContentHdr: HttpHeaders;
     begin
         OnSendSMS(SMSHandled, PhoneNo, From, SMSMessage);
         if SMSHandled then
@@ -103,8 +106,6 @@ codeunit 6014502 "NPR SMS"
 
         if ServiceCalc.useService(ServiceCode) then begin
             SMSMessage := DelChr(Util.Ansi2Ascii(SMSMessage), '%', '');
-            if not IsNull(HttpRequest) then
-                Clear(HttpRequest);
 
             // Uses following Azure Key Vault secrets:
             // - SMSHTTPRequestUrl    
@@ -121,14 +122,10 @@ codeunit 6014502 "NPR SMS"
 
             SMSServiceUri := Uri.EscapeDataString(SMSServiceUri);
 
-            HttpRequest := HttpRequest.Create(SMSServiceUri);
-
-            HttpRequest.Timeout := 10000;
-            HttpRequest.UseDefaultCredentials(true);
-            HttpRequest.Method := 'POST';
-            HttpRequest.ContentType := 'text/xml';
-            HttpRequest.GetResponse();
-            Clear(HttpRequest);
+            Content.GetHeaders(HttpContentHdr);
+            HttpContentHdr.Clear();
+            HttpContentHdr.Add('Content-Type', 'text/xml');
+            HttpClient.Post(SMSServiceUri, Content, HttpResponseMsg);
         end;
     end;
 
