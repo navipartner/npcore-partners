@@ -1,31 +1,25 @@
 codeunit 6014697 "NPR Embedded Video Mgt."
 {
-    trigger OnRun()
-    begin
-    end;
-
     procedure ShowEmbeddedVideos(ModuleCode: Text)
     var
         EmbeddedVideos: Page "NPR Embedded Videos";
     begin
         EmbeddedVideos.SetModuleCode(ModuleCode);
-        EmbeddedVideos.Run;
+        EmbeddedVideos.Run();
     end;
 
     procedure FindEmbeddedVideos(VideoModule: Code[20]; var EmbeddedVideoBuffer: Record "NPR Embedded Video Buffer" temporary): Boolean
     var
-        NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
-        HttpWebRequest: DotNet NPRNetHttpWebRequest;
-        HttpWebResponse: DotNet NPRNetHttpWebResponse;
-        WebException: DotNet NPRNetWebException;
-        XmlDoc: DotNet "NPRNetXmlDocument";
-        XmlElement: DotNet NPRNetXmlElement;
-        Response: Text;
+        Document: XmlDocument;
+        Element: XmlElement;
+        Node: XmlNode;
+        NodeList: XmlNodeList;
+        Request, Response, XPathExcludeNamespacePattern : Text;
     begin
-        EmbeddedVideoBuffer.DeleteAll;
+        EmbeddedVideoBuffer.DeleteAll();
 
-        XmlDoc := XmlDoc.XmlDocument;
-        XmlDoc.LoadXml(
+        Request :=
+          '<?xml version="1.0" encoding="utf-8"?>' +
           '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:man="urn:microsoft-dynamics-schemas/codeunit/managed_nav_modules">' +
           '   <soapenv:Header/>' +
           '   <soapenv:Body>' +
@@ -35,93 +29,130 @@ codeunit 6014697 "NPR Embedded Video Mgt."
           '         </video_modules>' +
           '      </GetEmbeddedVideos>' +
           '   </soapenv:Body>' +
-          '</soapenv:Envelope>');
+          '</soapenv:Envelope>';
 
-        InitEmbeddedVideoHttpWebRequest('GetEmbeddedVideos', HttpWebRequest);
-        NpXmlDomMgt.SetTrustedCertificateValidation(HttpWebRequest);
-        if not NpXmlDomMgt.SendWebRequest(XmlDoc, HttpWebRequest, HttpWebResponse, WebException) then
+
+        if not SendEmbeddedVideoHttpWebRequest('GetEmbeddedVideos', Request, Response) then
             exit;
 
-        Response := NpXmlDomMgt.GetWebResponseText(HttpWebResponse);
-        if Response = '' then
+        XmlDocument.ReadFrom(Response, Document);
+        if not Document.GetRoot(Element) then
+            exit;
+        XPathExcludeNamespacePattern := '//*[local-name()=''%1'']';
+
+        if not Element.SelectNodes(StrSubstNo(XPathExcludeNamespacePattern, 'video_modules'), NodeList) then
             exit;
 
-        XmlDoc := XmlDoc.XmlDocument;
-        XmlDoc.LoadXml(Response);
-        NpXmlDomMgt.RemoveNameSpaces(XmlDoc);
-        if not NpXmlDomMgt.FindNode(XmlDoc.DocumentElement, 'Body/GetEmbeddedVideos_Result/video_modules/video_module', XmlElement) then
-            exit;
+        foreach Node in NodeList do begin
+            Element := Node.AsXmlElement();
+            ParseVideoModule2Buffer(Element, EmbeddedVideoBuffer, XPathExcludeNamespacePattern);
+        end;
 
-        repeat
-            ParseVideoModule2Buffer(XmlElement, EmbeddedVideoBuffer);
-            XmlElement := XmlElement.NextSibling;
-        until IsNull(XmlElement);
-
-        exit(EmbeddedVideoBuffer.FindFirst);
+        exit(EmbeddedVideoBuffer.FindFirst());
     end;
 
-    local procedure ParseVideoModule2Buffer(XmlElement: DotNet NPRNetXmlElement; var EmbeddedVideoBuffer: Record "NPR Embedded Video Buffer" temporary)
+    local procedure ParseVideoModule2Buffer(Element: XmlElement; var EmbeddedVideoBuffer: Record "NPR Embedded Video Buffer" temporary; XPathExcludeNamespacePattern: Text)
     var
-        NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
-        XmlElement2: DotNet NPRNetXmlElement;
-        ModuleCode: Code[20];
-        ModuleName: Text[50];
-        Columns: Integer;
+        NodeList: XmlNodeList;
+        Node: XmlNode;
+        Element2: XmlElement;
+        Attribute: XmlAttribute;
+        AttributeCollection: XmlAttributeCollection;
+        ModuleCode, ModuleName : Text;
+        Columns, i, LineNo : Integer;
     begin
-        if XmlElement.Name <> 'video_module' then
+        if not Element.SelectSingleNode(StrSubstNo(XPathExcludeNamespacePattern, 'video_module'), Node) then
             exit;
 
-        if not NpXmlDomMgt.FindNode(XmlElement, 'videos/video', XmlElement2) then
+        Element2 := Node.AsXmlElement();
+        if not Element2.HasAttributes() then
             exit;
+        AttributeCollection := Element2.Attributes();
+        if not AttributeCollection.get('code', Attribute) then
+            exit;
+        ModuleCode := Attribute.Value();
 
-        ModuleCode := CopyStr(UpperCase(NpXmlDomMgt.GetXmlAttributeText(XmlElement, 'module_code', false)), 1, MaxStrLen(EmbeddedVideoBuffer."Module Code"));
-        ModuleName := NpXmlDomMgt.GetXmlText(XmlElement, 'name', MaxStrLen(ModuleName), false);
-        if not Evaluate(Columns, NpXmlDomMgt.GetXmlText(XmlElement, 'columns', 0, false), 9) then
+        if Element2.SelectSingleNode(StrSubstNo(XPathExcludeNamespacePattern, 'name'), Node) then
+            ModuleName := Node.AsXmlElement().InnerText();
+
+        if Element2.SelectSingleNode(StrSubstNo(XPathExcludeNamespacePattern, 'columns'), Node) then
+            if Evaluate(Columns, Node.AsXmlElement().InnerText(), 9) then;
+        if Columns = 0 then
             Columns := 1;
 
-        repeat
-            ParseVideo2Buffer(ModuleCode, ModuleName, Columns, XmlElement2, EmbeddedVideoBuffer);
-            XmlElement2 := XmlElement2.NextSibling;
-        until IsNull(XmlElement2);
+        if not Element2.SelectNodes(StrSubstNo(XPathExcludeNamespacePattern, 'video'), NodeList) then
+            exit;
+
+        foreach Node in NodeList do begin
+            AttributeCollection := Node.AsXmlElement().Attributes();
+            if AttributeCollection.Get('line_no', Attribute) then begin
+                if Evaluate(LineNo, Attribute.Value(), 9) then
+                    ParseVideo2Buffer(ModuleCode, ModuleName, LineNo, Columns, Node.AsXmlElement(), EmbeddedVideoBuffer, XPathExcludeNamespacePattern);
+            end;
+        end;
     end;
 
-    local procedure ParseVideo2Buffer(ModuleCode: Code[20]; ModuleName: Text[50]; Columns: Integer; XmlElement: DotNet NPRNetXmlElement; var EmbeddedVideoBuffer: Record "NPR Embedded Video Buffer" temporary)
+    local procedure ParseVideo2Buffer(ModuleCode: Text; ModuleName: Text; LineNo: Integer; Columns: Integer; Element: XmlElement; var EmbeddedVideoBuffer: Record "NPR Embedded Video Buffer" temporary; XPathExcludeNamespacePattern: Text)
     var
-        NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
-        LineNo: Integer;
+        Node: XmlNode;
     begin
-        if XmlElement.Name <> 'video' then
-            exit;
-
-        if not Evaluate(LineNo, NpXmlDomMgt.GetXmlAttributeText(XmlElement, 'line_no', false), 9) then
-            exit;
         if EmbeddedVideoBuffer.Get(ModuleCode, LineNo) then
             exit;
 
-        EmbeddedVideoBuffer.Init;
+        EmbeddedVideoBuffer.Init();
         EmbeddedVideoBuffer."Module Code" := ModuleCode;
-        EmbeddedVideoBuffer."Module Name" := ModuleName;
+        EmbeddedVideoBuffer."Module Name" := Copystr(ModuleName, 1, MaxStrLen(EmbeddedVideoBuffer."Module Name"));
         EmbeddedVideoBuffer.Columns := Columns;
         EmbeddedVideoBuffer."Line No." := LineNo;
-        EmbeddedVideoBuffer."Video Html" := NpXmlDomMgt.GetXmlText(XmlElement, 'video_html', MaxStrLen(EmbeddedVideoBuffer."Video Html"), false);
-        if Evaluate(EmbeddedVideoBuffer."Width (px)", NpXmlDomMgt.GetXmlText(XmlElement, 'width', 0, false), 9) then;
-        if Evaluate(EmbeddedVideoBuffer."Height (px)", NpXmlDomMgt.GetXmlText(XmlElement, 'height', 0, false), 9) then;
-        EmbeddedVideoBuffer.Insert;
+        if Element.SelectSingleNode(StrSubstNo(XPathExcludeNamespacePattern, 'video_html'), Node) then
+            EmbeddedVideoBuffer."Video Html" := CopyStr(Node.AsXmlElement().InnerText(), 1, MaxStrLen(EmbeddedVideoBuffer."Video Html"));
+        if Element.SelectSingleNode(StrSubstNo(XPathExcludeNamespacePattern, 'width'), Node) then
+            if evaluate(EmbeddedVideoBuffer."Width (px)", Node.AsXmlElement().InnerText(), 9) then;
+        if Element.SelectSingleNode(StrSubstNo(XPathExcludeNamespacePattern, 'height'), Node) then
+            if evaluate(EmbeddedVideoBuffer."Height (px)", Node.AsXmlElement().InnerText(), 9) then;
+        EmbeddedVideoBuffer.Insert();
     end;
 
-    local procedure InitEmbeddedVideoHttpWebRequest(SoapAction: Text; var HttpWebRequest: DotNet NPRNetHttpWebRequest)
+    local procedure SendEmbeddedVideoHttpWebRequest(SoapAction: Text; Request: Text; var Response: Text): Boolean
     var
-        Credential: DotNet NPRNetNetworkCredential;
         AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
-        Position: Text;
+        TempBlob: Codeunit "Temp Blob";
+        Headers: HttpHeaders;
+        Content: HttpContent;
+        Client: HttpClient;
+        RequestMessage: HttpRequestMessage;
+        ResponseMessage: HttpResponseMessage;
+        OutStr: OutStream;
+        ContentText: Text;
     begin
-        HttpWebRequest := HttpWebRequest.Create(AzureKeyVaultMgt.GetSecret('EmbeddedVideoUrl'));
-        HttpWebRequest.Timeout := 1000 * 60;
-        HttpWebRequest.UseDefaultCredentials(false);
-        Credential := Credential.NetworkCredential(AzureKeyVaultMgt.GetSecret('EmbeddedVideoUsername'), AzureKeyVaultMgt.GetSecret('EmbeddedVideoPassword'));
-        HttpWebRequest.Credentials(Credential);
-        HttpWebRequest.Method := 'POST';
-        HttpWebRequest.ContentType := 'text/xml; charset=utf-8';
-        HttpWebRequest.Headers.Add('SOAPAction', SoapAction);
+        Response := '';
+        Content.WriteFrom(Request);
+        Content.GetHeaders(Headers);
+        Headers.Remove('Content-Type');
+        Headers.Add('Content-Type', 'text/xml; charset=utf-8');
+        Headers.Add('SOAPAction', SoapAction);
+
+        InitRequest(Client, RequestMessage);
+        RequestMessage.Method := 'POST';
+        RequestMessage.Content(Content);
+        Client.Timeout := 1000 * 60;
+
+        if not Client.Send(RequestMessage, ResponseMessage) then
+            exit;
+        if not ResponseMessage.IsSuccessStatusCode() then
+            exit;
+        if not ResponseMessage.Content().ReadAs(Response) then
+            exit;
+
+        exit(Response <> '');
+    end;
+
+    [NonDebuggable]
+    local procedure InitRequest(var Client: HttpClient; var RequestMessage: HttpRequestMessage)
+    var
+        AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
+    begin
+        Client.UseWindowsAuthentication(AzureKeyVaultMgt.GetSecret('EmbeddedVideoUsername'), AzureKeyVaultMgt.GetSecret('EmbeddedVideoPassword'));
+        RequestMessage.SetRequestUri(AzureKeyVaultMgt.GetSecret('EmbeddedVideoUrl'));
     end;
 }
