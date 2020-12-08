@@ -1,12 +1,5 @@
 codeunit 6059965 "NPR MPOS Webservice"
 {
-    // NPR5.34/CLVA/20170703 CASE 280444 Upgrading MPOS functionality to transcendence
-    // NPR5.36/CLVA/20170830 CASE 288630 Added register handling
-    // NPR5.38/CLVA/20170830 CASE 297273 Added function GetCompanyInfo
-    // NPR5.51/CLVA/20190808 CASE 364011 Added functions SetTransactionResponse, ParseNetsJson, GetString and GetInt
-    // NPR5.53/CLVA/20191227 CASE 361862 Removed optionalData handling from Nets transaction result
-
-
     trigger OnRun()
     var
         WebService: Record "Web Service";
@@ -29,9 +22,7 @@ codeunit 6059965 "NPR MPOS Webservice"
     procedure GetCompanyLogo() PictureBase64: Text
     var
         CompanyInformation: Record "Company Information";
-        BinaryReader: DotNet NPRNetBinaryReader;
-        MemoryStream: DotNet NPRNetMemoryStream;
-        Convert: DotNet NPRNetConvert;
+        Base64Convert: Codeunit "Base64 Convert";
         InStr: InStream;
     begin
         CompanyInformation.Get;
@@ -39,11 +30,7 @@ codeunit 6059965 "NPR MPOS Webservice"
         CompanyInformation.CalcFields(Picture);
         if CompanyInformation.Picture.HasValue then begin
             CompanyInformation.Picture.CreateInStream(InStr);
-            MemoryStream := InStr;
-            BinaryReader := BinaryReader.BinaryReader(InStr);
-            PictureBase64 := Convert.ToBase64String(BinaryReader.ReadBytes(MemoryStream.Length));
-            MemoryStream.Dispose;
-            Clear(MemoryStream);
+            PictureBase64 := Base64Convert.ToBase64(InStr);
         end;
 
         exit(PictureBase64);
@@ -84,7 +71,6 @@ codeunit 6059965 "NPR MPOS Webservice"
             UserSetup.Modify(true);
         end;
 
-        //NPR5.36-
         POSUnitIdentity.SetRange("Device ID", 'WebBrowser');
         if POSUnitIdentity.FindSet then begin
             if POSUnitIdentity."Default POS Unit No." <> RegisterId then begin
@@ -92,7 +78,6 @@ codeunit 6059965 "NPR MPOS Webservice"
                 POSUnitIdentity.Modify(true);
             end;
         end;
-        //NPR5.36+
 
         exit(true);
     end;
@@ -100,45 +85,28 @@ codeunit 6059965 "NPR MPOS Webservice"
     procedure GetCompanyInfo(): Text
     var
         CompanyInformation: Record "Company Information";
-        BinaryReader: DotNet NPRNetBinaryReader;
-        MemoryStream: DotNet NPRNetMemoryStream;
-        Convert: DotNet NPRNetConvert;
         InStr: InStream;
-        JObject: DotNet JObject;
-        JTokenWriter: DotNet NPRNetJTokenWriter;
+        JObject: JsonObject;
         Base64String: Text;
         MPOSHelperFunctions: Codeunit "NPR MPOS Helper Functions";
+        Base64Convert: Codeunit "Base64 Convert";
+        Result: Text;
     begin
         CompanyInformation.Get;
 
         CompanyInformation.CalcFields(Picture);
         if CompanyInformation.Picture.HasValue then begin
             CompanyInformation.Picture.CreateInStream(InStr);
-            MemoryStream := InStr;
-            BinaryReader := BinaryReader.BinaryReader(InStr);
-            Base64String := Convert.ToBase64String(BinaryReader.ReadBytes(MemoryStream.Length));
-            MemoryStream.Dispose;
-            Clear(MemoryStream);
+            Base64String := Base64Convert.ToBase64(InStr);
         end;
 
-        JTokenWriter := JTokenWriter.JTokenWriter;
-        with JTokenWriter do begin
-            WriteStartObject;
-            WritePropertyName('Base64Image');
-            WriteValue(Base64String);
-            WritePropertyName('Username');
-            WriteValue(MPOSHelperFunctions.GetUsername());
-            WritePropertyName('DatabaseName');
-            WriteValue(MPOSHelperFunctions.GetDatabaseName());
-            WritePropertyName('TenantID');
-            WriteValue(MPOSHelperFunctions.GetTenantID());
-            WritePropertyName('CompanyName');
-            WriteValue(CompanyName);
-            WriteEndObject;
-            JObject := Token;
-        end;
-
-        exit(JObject.ToString);
+        JObject.Add('Base64Image', Base64String);
+        JObject.Add('Username', MPOSHelperFunctions.GetUsername());
+        JObject.Add('DatabaseName', MPOSHelperFunctions.GetDatabaseName());
+        JObject.Add('TenantID', MPOSHelperFunctions.GetTenantID());
+        JObject.Add('CompanyName', CompanyName);
+        JObject.WriteTo(Result);
+        exit(Result);
     end;
 
     local procedure "// EFT Api"()
@@ -167,8 +135,8 @@ codeunit 6059965 "NPR MPOS Webservice"
 
     local procedure ParseNetsTransactionJson(ResponsData: Text): Boolean
     var
-        JToken: DotNet JToken;
-        JObject: DotNet JObject;
+        JToken: JsonToken;
+        JObject: JsonObject;
         IStream: InStream;
         BigTextVar: BigText;
         Ostream: OutStream;
@@ -178,9 +146,9 @@ codeunit 6059965 "NPR MPOS Webservice"
         if ResponsData = EmptyJasonResult then
             exit(false);
 
-        JToken := JObject.Parse(ResponsData);
+        JObject.ReadFrom(ResponsData);
 
-        TransactionNo := GetInt(JToken, 'transactionNo');
+        TransactionNo := GetInt(JObject, 'transactionNo');
 
         if not MPOSNetsTransactions.Get(TransactionNo) then
             exit(false);
@@ -191,51 +159,48 @@ codeunit 6059965 "NPR MPOS Webservice"
         MPOSNetsTransactions.Modify(true);
         Commit;
 
-        MPOSNetsTransactions."Callback Result" := GetInt(JToken, 'result');
-        MPOSNetsTransactions."Callback StatusDescription" := GetString(JToken, 'statusDescription');
+        MPOSNetsTransactions."Callback Result" := GetInt(JObject, 'result');
+        MPOSNetsTransactions."Callback StatusDescription" := GetString(JObject, 'statusDescription');
 
         if MPOSNetsTransactions."Callback Result" <> 99 then begin
-            MPOSNetsTransactions."Callback AccumulatorUpdate" := GetInt(JToken, 'accumulatorUpdate');
-            MPOSNetsTransactions."Callback IssuerId" := GetInt(JToken, 'issuerId');
-            MPOSNetsTransactions."Callback TruncatedPan" := GetString(JToken, 'truncatedPan');
-            MPOSNetsTransactions."Callback EncryptedPan" := GetString(JToken, 'encryptedPan');
-            MPOSNetsTransactions."Callback Timestamp" := GetString(JToken, 'timestamp');
-            MPOSNetsTransactions."Callback VerificationMethod" := GetInt(JToken, 'verificationMethod');
-            MPOSNetsTransactions."Callback SessionNumber" := GetString(JToken, 'sessionNumber');
-            MPOSNetsTransactions."Callback StanAuth" := GetString(JToken, 'stanAuth');
-            MPOSNetsTransactions."Callback SequenceNumber" := GetString(JToken, 'sequenceNumber');
-            MPOSNetsTransactions."Callback TotalAmount" := GetInt(JToken, 'totalAmount');
-            MPOSNetsTransactions."Callback TipAmount" := GetInt(JToken, 'tipAmount');
-            MPOSNetsTransactions."Callback SurchargeAmount" := GetInt(JToken, 'surchargeAmount');
-            MPOSNetsTransactions."Callback AcquiereMerchantID" := GetString(JToken, 'acquiereMerchantID');
-            MPOSNetsTransactions."Callback CardIssuerName" := GetString(JToken, 'cardIssuerName');
-            MPOSNetsTransactions."Callback TCC" := GetString(JToken, 'TCC');
-            MPOSNetsTransactions."Callback AID" := GetString(JToken, 'AID');
-            MPOSNetsTransactions."Callback TVR" := GetString(JToken, 'TVR');
-            MPOSNetsTransactions."Callback TSI" := GetString(JToken, 'TSI');
-            MPOSNetsTransactions."Callback ATC" := GetString(JToken, 'ATC');
-            MPOSNetsTransactions."Callback AED" := GetString(JToken, 'AED');
-            MPOSNetsTransactions."Callback IAC" := GetString(JToken, 'IAC');
-            MPOSNetsTransactions."Callback OrganisationNumber" := GetString(JToken, 'organisationNumber');
-            MPOSNetsTransactions."Callback BankAgent" := GetString(JToken, 'bankAgent');
-            MPOSNetsTransactions."Callback AccountType" := GetString(JToken, 'accountType');
-            //-NPR5.53 [361862]
-            //MPOSNetsTransactions."Callback OptionalData" := GetString(JToken,'optionalData');
-            //+NPR5.53 [361862]
-            MPOSNetsTransactions."Callback ResponseCode" := GetString(JToken, 'responseCode');
-            MPOSNetsTransactions."Callback RejectionSource" := GetInt(JToken, 'rejectionSource');
-            MPOSNetsTransactions."Callback RejectionReason" := GetString(JToken, 'rejectionReason');
-            MPOSNetsTransactions."Callback MerchantReference" := GetString(JToken, 'merchantReference');
+            MPOSNetsTransactions."Callback AccumulatorUpdate" := GetInt(JObject, 'accumulatorUpdate');
+            MPOSNetsTransactions."Callback IssuerId" := GetInt(JObject, 'issuerId');
+            MPOSNetsTransactions."Callback TruncatedPan" := GetString(JObject, 'truncatedPan');
+            MPOSNetsTransactions."Callback EncryptedPan" := GetString(JObject, 'encryptedPan');
+            MPOSNetsTransactions."Callback Timestamp" := GetString(JObject, 'timestamp');
+            MPOSNetsTransactions."Callback VerificationMethod" := GetInt(JObject, 'verificationMethod');
+            MPOSNetsTransactions."Callback SessionNumber" := GetString(JObject, 'sessionNumber');
+            MPOSNetsTransactions."Callback StanAuth" := GetString(JObject, 'stanAuth');
+            MPOSNetsTransactions."Callback SequenceNumber" := GetString(JObject, 'sequenceNumber');
+            MPOSNetsTransactions."Callback TotalAmount" := GetInt(JObject, 'totalAmount');
+            MPOSNetsTransactions."Callback TipAmount" := GetInt(JObject, 'tipAmount');
+            MPOSNetsTransactions."Callback SurchargeAmount" := GetInt(JObject, 'surchargeAmount');
+            MPOSNetsTransactions."Callback AcquiereMerchantID" := GetString(JObject, 'acquiereMerchantID');
+            MPOSNetsTransactions."Callback CardIssuerName" := GetString(JObject, 'cardIssuerName');
+            MPOSNetsTransactions."Callback TCC" := GetString(JObject, 'TCC');
+            MPOSNetsTransactions."Callback AID" := GetString(JObject, 'AID');
+            MPOSNetsTransactions."Callback TVR" := GetString(JObject, 'TVR');
+            MPOSNetsTransactions."Callback TSI" := GetString(JObject, 'TSI');
+            MPOSNetsTransactions."Callback ATC" := GetString(JObject, 'ATC');
+            MPOSNetsTransactions."Callback AED" := GetString(JObject, 'AED');
+            MPOSNetsTransactions."Callback IAC" := GetString(JObject, 'IAC');
+            MPOSNetsTransactions."Callback OrganisationNumber" := GetString(JObject, 'organisationNumber');
+            MPOSNetsTransactions."Callback BankAgent" := GetString(JObject, 'bankAgent');
+            MPOSNetsTransactions."Callback AccountType" := GetString(JObject, 'accountType');
+            MPOSNetsTransactions."Callback ResponseCode" := GetString(JObject, 'responseCode');
+            MPOSNetsTransactions."Callback RejectionSource" := GetInt(JObject, 'rejectionSource');
+            MPOSNetsTransactions."Callback RejectionReason" := GetString(JObject, 'rejectionReason');
+            MPOSNetsTransactions."Callback MerchantReference" := GetString(JObject, 'merchantReference');
 
             MPOSNetsTransactions.Handled := true;
 
             Clear(BigTextVar);
-            BigTextVar.AddText(GetString(JToken, 'receipt1'));
+            BigTextVar.AddText(GetString(JObject, 'receipt1'));
             MPOSNetsTransactions."Callback Receipt 1".CreateOutStream(Ostream);
             BigTextVar.Write(Ostream);
 
             Clear(BigTextVar);
-            BigTextVar.AddText(GetString(JToken, 'receipt2'));
+            BigTextVar.AddText(GetString(JObject, 'receipt2'));
             MPOSNetsTransactions."Callback Receipt 2".CreateOutStream(Ostream);
             BigTextVar.Write(Ostream);
         end;
@@ -247,8 +212,7 @@ codeunit 6059965 "NPR MPOS Webservice"
 
     local procedure ParseNetsEODJson(ResponsData: Text): Boolean
     var
-        JToken: DotNet JToken;
-        JObject: DotNet JObject;
+        JObject: JsonObject;
         IStream: InStream;
         BigTextVar: BigText;
         Ostream: OutStream;
@@ -257,7 +221,7 @@ codeunit 6059965 "NPR MPOS Webservice"
         if ResponsData = EmptyJasonResult then
             exit(false);
 
-        JToken := JObject.Parse(ResponsData);
+        JObject.ReadFrom(ResponsData);
 
         MPOSEODRecipts.Init;
         MPOSEODRecipts.Created := CurrentDateTime;
@@ -270,12 +234,12 @@ codeunit 6059965 "NPR MPOS Webservice"
         MPOSEODRecipts.Insert(true);
         Commit;
 
-        MPOSEODRecipts."Callback Timestamp" := GetString(JToken, 'timestamp');
-        MPOSEODRecipts."Callback Device Id" := GetString(JToken, 'deviceid');
-        MPOSEODRecipts."Callback Register No." := GetString(JToken, 'registerno');
+        MPOSEODRecipts."Callback Timestamp" := GetString(JObject, 'timestamp');
+        MPOSEODRecipts."Callback Device Id" := GetString(JObject, 'deviceid');
+        MPOSEODRecipts."Callback Register No." := GetString(JObject, 'registerno');
 
         Clear(BigTextVar);
-        BigTextVar.AddText(GetString(JToken, 'receipt1'));
+        BigTextVar.AddText(GetString(JObject, 'receipt1'));
         MPOSEODRecipts."Callback Receipt 1".CreateOutStream(Ostream);
         BigTextVar.Write(Ostream);
 
@@ -284,28 +248,22 @@ codeunit 6059965 "NPR MPOS Webservice"
         exit(true);
     end;
 
-    local procedure GetString(var JToken: DotNet JToken; JTokenName: Text): Text
+    local procedure GetString(var JObject: JsonObject; JTokenName: Text): Text
     var
-        JsonValue: Text;
+        JToken: JsonToken;
     begin
-        JsonValue := Format(JToken.SelectToken(JTokenName));
-        if UpperCase(JsonValue) = 'NULL' then
+        if JObject.SelectToken(JTokenName, JToken) then
+            exit(JToken.AsValue().AsText())
+        else
             exit('');
-
-        exit(JsonValue);
     end;
 
-    local procedure GetInt(var JToken: DotNet JToken; JTokenName: Text): Integer
+    local procedure GetInt(var JObject: JsonObject; JTokenName: Text): Integer
     var
-        JsonValue: Text;
-        JsonIntValue: Integer;
+        JToken: JsonToken;
     begin
-        JsonValue := Format(JToken.SelectToken(JTokenName));
-        if UpperCase(JsonValue) = 'NULL' then
-            exit(0);
-
-        if Evaluate(JsonIntValue, JsonValue) then
-            exit(JsonIntValue)
+        if JObject.SelectToken(JTokenName, JToken) then
+            exit(JToken.AsValue().AsInteger())
         else
             exit(0);
     end;
