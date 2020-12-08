@@ -97,11 +97,12 @@ codeunit 6151017 "NPR NpRv Module Pay.: Default"
             if PaymentTypePOS."Rounding Precision" > 0 then
                 ReturnAmount := Round(ReturnAmount, PaymentTypePOS."Rounding Precision");
 
-            if (PaymentTypePOS."Minimum Amount" > 0) and (Abs(ReturnAmount) < Abs(PaymentTypePOS."Minimum Amount")) then begin
-                if ReturnLineExists then
-                    RemoveReturnVoucher(NpRvSalesLine);
-                exit;
-            end;
+            if not PaymentTypePOS."No Min Amount on Web Orders" then
+                if (PaymentTypePOS."Minimum Amount" > 0) and (Abs(ReturnAmount) < Abs(PaymentTypePOS."Minimum Amount")) then begin
+                    if ReturnLineExists then
+                        RemoveReturnVoucher(NpRvSalesLine);
+                    exit;
+                end;
         end;
 
         if ReturnLineExists then begin
