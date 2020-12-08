@@ -280,6 +280,8 @@ codeunit 6151006 "NPR POS Quote Mgt."
         Clear(TempField);
         TempField.DeleteAll;
         Field.SetRange(TableNo, RecRef.Number);
+        Field.SetFilter("No.", '<%1', 2000000000);  //Exclude system fields
+        Field.SetFilter(ObsoleteState, '<>%1', Field.ObsoleteState::Removed);
         Field.SetRange(Class, Field.Class::Normal);
         Field.SetRange(Enabled, true);
         if not Field.FindSet then
