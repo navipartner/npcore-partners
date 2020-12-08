@@ -804,7 +804,7 @@ codeunit 6150615 "NPR POS Post Entries"
                     else
                         POSPostingBuffer.Type := POSSalesLineToBeCompressed.Type;
                 end;
-                if POSSalesLineToBeCompressed.Type in [POSSalesLineToBeCompressed.Type::"G/L Account", POSSalesLineToBeCompressed.Type::Customer, POSSalesLineToBeCompressed.Type::Voucher] then
+                if POSSalesLineToBeCompressed.Type in [POSSalesLineToBeCompressed.Type::"G/L Account", POSSalesLineToBeCompressed.Type::Customer] then
                     POSPostingBuffer."No." := POSSalesLineToBeCompressed."No.";
                 if POSSalesLineToBeCompressed.Type <> POSSalesLineToBeCompressed.Type::Customer then begin
                     POSPostingBuffer."Gen. Bus. Posting Group" := POSSalesLineToBeCompressed."Gen. Bus. Posting Group";
@@ -812,7 +812,14 @@ codeunit 6150615 "NPR POS Post Entries"
                 end;
                 if POSSalesLineToBeCompressed.Type = POSSalesLineToBeCompressed.Type::Payout then begin
                     POSPostingBuffer."No." := POSSalesLineToBeCompressed."No.";
+                    Compressionmethod := Compressionmethod::Uncompressed;
                 end;
+
+                if POSSalesLineToBeCompressed.type = POSSalesLineToBeCompressed.Type::Voucher then begin
+                    POSPostingBuffer."No." := POSSalesLineToBeCompressed."No.";
+                    Compressionmethod := Compressionmethod::Uncompressed;
+                end;
+
                 POSPostingBuffer."Applies-to Doc. Type" := POSSalesLineToBeCompressed."Applies-to Doc. Type";
                 POSPostingBuffer."Applies-to Doc. No." := POSSalesLineToBeCompressed."Applies-to Doc. No.";
                 POSPostingBuffer."Gen. Prod. Posting Group" := POSSalesLineToBeCompressed."Gen. Prod. Posting Group";
