@@ -1,28 +1,5 @@
 page 6014433 "NPR Payment Type - Card"
 {
-    // NPR4.10/JDH/20150609 CASE 215893 Added Location code so its possible to set up payments per location
-    // NPR4.12/TSA/20150630 CASE 217683 - Auto-Merge problem, Removed empty/blank global variable
-    // NPR5.00/NPKNAV/20160113  CASE 226725 NP Retail 2016
-    // NPR5.25/TTH/20160718 CASE 238859 Added Swipp Fields
-    // NPR5.27/TSA/20160928 CASE 253683 removed field "Amount in Audit Roll" from page. visible false seems not to be work
-    // NPR5.30/TJ /20170213 CASE 264909 Removed Swipp group with controls
-    // NPR5.35/TJ /20170816 CASE 286283 Renamed variables/function into english and into proper naming terminology
-    //                                  Removed unused variables
-    // NPR5.37.03/MMV /20171130 CASE 296642 Added field "Rounding Direction".
-    // NPR5.38/MMV /20180108 CASE 300957 Rolled back 5.37.03
-    // NPR5.44/NPKNAV/20180727  CASE 323064 Transport NPR5.44 - 27 July 2018
-    // NPR5.46/MMV /20180919 CASE Removed deprecated fields
-    // NPR5.47/TS  /20181022 CASE 309123 Removed unused fields
-    // NPR5.50/TSA /20190530 CASE 354832 Added field 100 - "Reverse Unrealized VAT"
-    // NPR5.51/MMV /20190628 CASE 359385 Removed PBS & Kvittering.dk fields from page.
-    // NPR5.51/TJ  /20190628 CASE 359385 Added field 110 "Open Drawer"
-    // NPR5.51/JAKUBV/20190903  CASE 357069 Transport NPR5.51 - 3 September 2019
-    // NPR5.52/JAKUBV/20191022  CASE 373294 Transport NPR5.52 - 22 October 2019
-    // NPR5.54/MMV /20200225 CASE 364340 Added tip & surcharge fields.
-    //                                   Removed legacy fields.
-    // NPR5.55/ALPO/20200623 CASE 410991 Zero as default payment amount on popup window for specific payment types
-    // NPR5.55/TJ  /20200430 CASE 399242 Removed Dimensions action (with entire RelatedInformation group) as it is no longer supported for this table
-
     Caption = 'Payment Type Card';
     PromotedActionCategories = 'New,Process,Prints,Master Data,Test5,Test6,Test7,Test8';
     SourceTable = "NPR Payment Type POS";
@@ -63,9 +40,6 @@ page 6014433 "NPR Payment Type - Card"
                                     "Customer No." := '';
                                     "G/L Account No." := '';
                                 end;
-                            //CurrForm.Customer.EDITABLE := "Account Type" = "Account Type"::Customer;
-                            //CurrForm."G/L Account".EDITABLE := "Account Type" = "Account Type"::"G/L Account";
-                            //CurrForm.Bank.EDITABLE := "Account Type" = "Account Type"::Bank;
                             CustomerEditable := "Account Type" = "Account Type"::Customer;
                             GlAccountEditable := "Account Type" = "Account Type"::"G/L Account";
                             BankEditable := "Account Type" = "Account Type"::Bank;
@@ -122,9 +96,6 @@ page 6014433 "NPR Payment Type - Card"
 
                         trigger OnValidate()
                         begin
-                            //CurrForm.FixedAmount.EDITABLE("Processing Type" = "Processing Type"::"Gift Voucher");
-                            //CurrForm.QtyPerSale.EDITABLE("Processing Type" = "Processing Type"::"Gift Voucher");
-                            //CurrForm.MinSalesAmount.EDITABLE("Processing Type" = "Processing Type"::"Gift Voucher");
                             FixedAmountEditable := ("Processing Type" = "Processing Type"::"Gift Voucher");
                             QtyperSaleEditable := ("Processing Type" = "Processing Type"::"Gift Voucher");
                             MinSalesAmountEditable := ("Processing Type" = "Processing Type"::"Gift Voucher");
@@ -229,6 +200,10 @@ page 6014433 "NPR Payment Type - Card"
                 {
                     ApplicationArea = All;
                 }
+                field("No Min Amount on Web Orders"; "No Min Amount on Web Orders")
+                {
+                    ApplicationArea = All;
+                }
                 field("Allow Refund"; "Allow Refund")
                 {
                     ApplicationArea = All;
@@ -303,7 +278,6 @@ page 6014433 "NPR Payment Type - Card"
                         PaymentTypePrefix.SetRange("Global Dimension 1 Code", "Global Dimension 1 Code");
                         CreditCardPrefix.SetTableView(PaymentTypePrefix);
                         CreditCardPrefix.LookupMode := true;
-                        //PræfixForm.Prefix;
                         CreditCardPrefix.ShowPrefix;
                         CreditCardPrefix.RunModal;
                     end;
@@ -340,7 +314,6 @@ page 6014433 "NPR Payment Type - Card"
                     begin
                         TestField("G/L Account No.");
                         GLAccount.Get("G/L Account No.");
-                        //FORM.RUNMODAL(FORM::"G/L Account Card",Finanskontorec);
                         PAGE.RunModal(PAGE::"G/L Account Card", GLAccount);
                     end;
                 }
@@ -389,4 +362,3 @@ page 6014433 "NPR Payment Type - Card"
         [InDataSet]
         MinSalesAmountEditable: Boolean;
 }
-

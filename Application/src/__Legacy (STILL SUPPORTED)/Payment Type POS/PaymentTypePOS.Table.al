@@ -655,6 +655,11 @@ table 6014402 "NPR Payment Type POS"
             DataClassification = CustomerContent;
             Description = 'NPR5.55';
         }
+        field(140; "No Min Amount on Web Orders"; Boolean)
+        {
+            Caption = 'No Min Amount on Web Orders';
+            DataClassification = CustomerContent;
+        }
         field(200; "PBS Gift Voucher"; Boolean)
         {
             Caption = 'PBS Gift Voucher';
