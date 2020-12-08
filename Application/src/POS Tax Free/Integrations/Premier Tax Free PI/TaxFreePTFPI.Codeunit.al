@@ -1,17 +1,5 @@
 codeunit 6014611 "NPR Tax Free PTF PI"
 {
-    // NPR5.30/NPKNAV/20170310  CASE 261964 Transport NPR5.30 - 26 January 2017
-    // NPR5.32/MMV /20170411 CASE 241995 Retail Print 2.0
-    // NPR5.40/MMV /20180112 CASE 293106 Refactored tax free module
-    // NPR5.41/MMV /20180425 CASE 312751 Correct encoding handling.
-    // NPR5.45/MMV /20180807 CASE 316333 Fixed BIN request xml
-    // NPR5.48/MMV /20181105 CASE 334588 Fixed mismatch in event subscriber signature
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         Error_Ineligible: Label 'Sale is not eligible.';
         Error_PrintFail: Label 'Printing of tax free voucher %1 failed with error "%2".\NOTE: The voucher is correctly issued and active. Please recreate the tax free voucher if the problem persists.';
@@ -221,10 +209,7 @@ codeunit 6014611 "NPR Tax Free PTF PI"
             TaxFreeRequest."External Voucher Barcode" := VoucherBarcode;
             Evaluate(TaxFreeRequest."Total Amount Incl. VAT", VoucherTotalAmount, 9);
             Evaluate(TaxFreeRequest."Refund Amount", VoucherRefundAmount, 9);
-            //-NPR5.41 [312751]
-            //TaxFreeRequest.Print.CREATEOUTSTREAM(OutStream);
             TaxFreeRequest.Print.CreateOutStream(OutStream, TEXTENCODING::UTF8);
-            //+NPR5.41 [312751]
             OutStream.Write(PrintXML);
         end else begin
             if TryGetFirstNodeContent(XMLDoc, 'error', false, ErrorNo) then
@@ -590,10 +575,7 @@ codeunit 6014611 "NPR Tax Free PTF PI"
         if Output = '' then
             Error(Error_MissingPrintSetup);
 
-        //-NPR5.41 [312751]
-        //TaxFreeRequest.Print.CREATEINSTREAM(InStream);
         TaxFreeRequest.Print.CreateInStream(InStream, TEXTENCODING::UTF8);
-        //+NPR5.41 [312751]
         MemoryStream := MemoryStream.MemoryStream();
         CopyStream(MemoryStream, InStream);
         MemoryStream.Position := 0;
@@ -756,24 +738,17 @@ codeunit 6014611 "NPR Tax Free PTF PI"
                 '<pos_application_version>NP Retail</pos_application_version>' +
               '</version>' +
               '<terminal>' +
-        //-NPR5.45 [316333]
                 '<terminal_id>' + POSUnitNo + '</terminal_id>' +
                 '<training_mode>0</training_mode>' +
-        //+NPR5.45 [316333]
                 '<merchant_id>' + MerchantID + '</merchant_id>' +
                 '<merchant_vat_number>' + VATNumber + '</merchant_vat_number>' +
                 '<merchant_country_code>' + Format(CountryCode) + '</merchant_country_code>' +
               '</terminal>' +
-        //-NPR5.45 [316333]
               '<operator_info>' +
                 '<operator_id>' + ReplaceSpecialChars(TaxFreeRequest."Salesperson Code") + '</operator_id>' +
               '</operator_info>' +
-        //+NPR5.45 [316333]
               '<card_number>' + IIN + '</card_number>' +
-        //-NPR5.45 [316333]
-        //      '<respond_in_language></respond_in_language>' +
               '<respond_in_language>' + Format(CountryCode) + '</respond_in_language>' +
-        //+NPR5.45 [316333]
             '</BRTSearchRequest>]]>' +
           '</v2:XMLString>' +
         '</v2:PerformBRTSearch>';
@@ -974,9 +949,7 @@ codeunit 6014611 "NPR Tax Free PTF PI"
         GetCDataXML(XMLDoc, ResponseTagName);
     end;
 
-    local procedure "// Event Subscribers"()
-    begin
-    end;
+    #region Event subscribers
 
     [EventSubscriber(ObjectType::Codeunit, 6014610, 'OnLookupHandler', '', false, false)]
     local procedure OnLookupHandler(var HashSet: DotNet NPRNetHashSet_Of_T)
@@ -1153,5 +1126,6 @@ codeunit 6014611 "NPR Tax Free PTF PI"
         InitializeHandler(TaxFreeRequest);
         Eligible := IsStoredSaleEligible(SalesTicketNo);
     end;
-}
 
+    #endregion
+}
