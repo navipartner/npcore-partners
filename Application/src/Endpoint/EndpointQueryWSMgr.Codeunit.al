@@ -1,256 +1,170 @@
 codeunit 6014673 "NPR Endpoint Query WS Mgr"
 {
-    // NPR5.25\BR \20160802 CASE 234602 Object Created
-    // NPR5.33/ANEN/20170427 CASE 273989 Removed variable not used
-
     TableNo = "NPR Nc Import Entry";
 
     trigger OnRun()
     var
-        XmlDoc: DotNet "NPRNetXmlDocument";
-        ImportType: Record "NPR Nc Import Type";
+        Document: XmlDocument;
         FunctionName: Text[100];
     begin
 
-        if LoadXmlDoc(XmlDoc) then begin
-            FunctionName := GetWebserviceFunction("Import Type");
+        if Load(Rec, Document) then begin
+            FunctionName := GetWebserviceFunction(Rec."Import Type");
             case FunctionName of
                 'Createendpointquery':
-                    CreateEndpointQueries(XmlDoc, "Entry No.", "Document ID");
+                    CreateEndpointQueries(Document, Rec."Entry No.", Rec."Document ID");
                 else
-                    Error(MISSING_CASE, "Import Type", FunctionName);
+                    Error(MissingCaseErr, Rec."Import Type", FunctionName);
             end;
 
         end;
     end;
 
     var
-        NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
-        ItemWshtImpExpMgt: Codeunit "NPR Item Wsht. Imp. Exp.";
-        Initialized: Boolean;
-        ITEM_NOT_FOUND: Label 'The sales item specified in external_id %1, was not found.';
-        CHANGE_NOT_ALLOWED: Label 'Confirmed tickets can''t be changed.';
-        TOKEN_NOT_FOUND: Label 'The token %1 was not found, or has incorrect state.';
-        TOKEN_EXPIRED: Label 'The token %1 has expired. Use PreConfirm to re-reserve tickets.';
-        TOKEN_INCORRECT_STATE: Label 'The token %1 can''t be changed when in the %1 state.';
-        MISSING_CASE: Label 'No handler for %1 [%2].';
-        ImportOption: Option "Replace lines","Add lines";
-        CombineVarieties: Boolean;
-        ActionIfVariantUnknown: Option Skip,Create;
-        ActionIfVarietyUnknown: Option Skip,Create;
-        VENDOR_NOT_FOUND: Label 'The Vendor %1 could not be found in the database.';
-        LastItemWorksheetLine: Record "NPR Item Worksheet Line";
+        MissingCaseErr: Label 'No handler for %1 [%2].', Comment = '%1="NPR Nc Import Entry"."Import Type",%2="NPR Nc Import Entry"."Webservice Function"';
 
-    local procedure CreateEndpointQueries(XmlDoc: DotNet "NPRNetXmlDocument"; RequestEntryNo: Integer; DocumentID: Text[100])
+    local procedure CreateEndpointQueries(Document: XmlDocument; RequestEntryNo: Integer; DocumentID: Text[100])
     var
-        TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
-        XmlElement: DotNet NPRNetXmlElement;
-        XmlNodeList: DotNet NPRNetXmlNodeList;
-        i: Integer;
+        Element: XmlElement;
+        Node: XmlNode;
+        NodeList: XmlNodeList;
+        Declaration: XmlDeclaration;
         Token: Text[50];
+        XPathExcludeNamespacePattern: Text;
     begin
-        if IsNull(XmlDoc) then
+        if not Document.GetRoot(Element) then
             exit;
-        XmlElement := XmlDoc.DocumentElement;
-        if IsNull(XmlElement) then
+        if not Document.GetDeclaration(Declaration) then
+            XPathExcludeNamespacePattern := '//*[local-name()=''%1'']'
+        else
+            case Declaration.Version() of
+                '1.0':
+                    XPathExcludeNamespacePattern := '//*[local-name()=''%1'']';
+                '2.0':
+                    XPathExcludeNamespacePattern := '//*:%1';
+            end;
+
+        if not Element.SelectNodes(StrSubstNo(XPathExcludeNamespacePattern, 'Createendpointquery'), NodeList) then
             exit;
-
-        if not NpXmlDomMgt.FindNodes(XmlElement, 'Createendpointquery', XmlNodeList) then
+        if not Element.SelectNodes(StrSubstNo(XPathExcludeNamespacePattern, 'endpointqueryimport'), NodeList) then
             exit;
-
-        if not NpXmlDomMgt.FindNodes(XmlElement, 'endpointqueryimport', XmlNodeList) then
-            exit;
-
-        if not NpXmlDomMgt.FindNodes(XmlElement, 'insertendpointquery', XmlNodeList) then
-            exit;
-
-        XmlElement := XmlNodeList.ItemOf(0);
-
-        SetImportParameters(XmlElement, Token);
-
-        if not NpXmlDomMgt.FindNodes(XmlElement, 'endpointquery', XmlNodeList) then
+        if not Element.SelectNodes(StrSubstNo(XPathExcludeNamespacePattern, 'insertendpointquery'), NodeList) then
             exit;
 
-        for i := 0 to XmlNodeList.Count - 1 do begin
-            XmlElement := XmlNodeList.ItemOf(i);
-            CreateEndpointQuery(XmlElement, Token, DocumentID);
+        NodeList.Get(0, Node);
+        Element := Node.AsXmlElement();
+
+        if not Element.SelectNodes(StrSubstNo(XPathExcludeNamespacePattern, 'endpointquery'), NodeList) then
+            exit;
+
+        foreach Node in NodeList do begin
+            Element := Node.AsXmlElement();
+            CreateEndpointQuery(Element, DocumentID, XPathExcludeNamespacePattern);
         end;
-
-        Commit;
     end;
 
-    local procedure CreateEndpointQuery(XmlElement: DotNet NPRNetXmlElement; Token: Text[100]; DocumentID: Text[100]) Imported: Boolean
+    local procedure CreateEndpointQuery(Element: XmlElement; DocumentID: Text[100]; XPathExcludeNamespacePattern: Text)
     var
-        XmlNodeList: DotNet NPRNetXmlNodeList;
         EndpointQuery: Record "NPR Endpoint Query";
+        Element2: XmlElement;
+        Node: XmlNode;
+        NodeList: XmlNodeList;
         i: Integer;
     begin
-
-        if IsNull(XmlElement) then
-            exit(false);
-
-        EndpointQuery.Init();
-
-        ReadEndpointQuery(XmlElement, Token, EndpointQuery);
-        if NpXmlDomMgt.FindNodes(XmlElement, 'endpointqueryfilter', XmlNodeList) then
-            for i := 0 to XmlNodeList.Count - 1 do begin
-                XmlElement := XmlNodeList.ItemOf(i);
-                CreateEndpointQueryFilter(XmlElement, Token, DocumentID, EndpointQuery);
+        ReadEndpointQuery(Element, EndpointQuery, XPathExcludeNamespacePattern);
+        if not Element.SelectNodes(StrSubstNo(XPathExcludeNamespacePattern, 'endpointqueryfilter'), NodeList) then
+            foreach Node in NodeList do begin
+                Element := Node.AsXmlElement();
+                CreateEndpointQueryFilter(Element2, DocumentID, EndpointQuery, XPathExcludeNamespacePattern);
             end;
-        EndpointQuery.ProcessQuery;
-        InsertEndpointQueries(EndpointQuery);
-
-
-        exit(true);
+        EndpointQuery.ProcessQuery();
     end;
 
-    local procedure CreateEndpointQueryFilter(XmlElement: DotNet NPRNetXmlElement; Token: Text[100]; DocumentID: Text[100]; var EndpointQuery: Record "NPR Endpoint Query") Imported: Boolean
+    local procedure CreateEndpointQueryFilter(Element: XmlElement; DocumentID: Text[100]; EndpointQuery: Record "NPR Endpoint Query"; XPathExcludeNamespacePattern: Text)
     var
         EndpointQueryFilter: Record "NPR Endpoint Query Filter";
     begin
-
-        if IsNull(XmlElement) then
-            exit(false);
-
-        EndpointQueryFilter.Init();
-
-        ReadEndpointQueryFilter(XmlElement, Token, EndpointQueryFilter, EndpointQuery);
-        InsertEndpointQueryFilters(EndpointQueryFilter);
-
-        exit(true);
+        ReadEndpointQueryFilter(Element, EndpointQueryFilter, EndpointQuery, XPathExcludeNamespacePattern);
     end;
 
-    local procedure "---Database"()
-    begin
-    end;
-
-    local procedure InsertEndpointQueries(var EndpointQuery: Record "NPR Endpoint Query"): Boolean
+    local procedure ReadEndpointQuery(Element: XmlElement; var EndpointQuery: Record "NPR Endpoint Query"; XPathExcludeNamespacePattern: Text)
     var
-        TicketReservationResponse: Record "NPR TM Ticket Reserv. Resp.";
-        TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
-        ResponseMessage: Text;
-        ResponseCode: Integer;
+        Node: XmlNode;
+        TableNoAsString: Text;
+        NewAndModifiedRecs: Text;
     begin
-
-        EndpointQuery.Init();
-    end;
-
-    local procedure ReadEndpointQuery(XmlElement: DotNet NPRNetXmlElement; Token: Text[100]; var EndpointQuery: Record "NPR Endpoint Query")
-    var
-        ItemWorksheetVariantLine: Record "NPR Item Worksh. Variant Line";
-        VarietyValue: Record "NPR Variety Value";
-        VendorVATRegNo: Text;
-        TempText: Text;
-        TempDec: Decimal;
-        TempBool: Boolean;
-        TempInteger: Integer;
-        TempDateFormula: DateFormula;
-        TempDate: Date;
-        ItemWkshCheckLine: Codeunit "NPR Item Wsht.-Check Line";
-    begin
-
-        Initialize;
-
         Clear(EndpointQuery);
-        EndpointQuery.Init;
+        EndpointQuery.Init();
+
         EndpointQuery."Creation Date" := CurrentDateTime();
-        if NpXmlDomMgt.GetXmlText(XmlElement, 'no', MaxStrLen(EndpointQuery.Name), false) <> '' then
-            Evaluate(EndpointQuery."External No.", NpXmlDomMgt.GetXmlText(XmlElement, 'no', MaxStrLen(EndpointQuery.Name), false), 9);
-        EndpointQuery.Name := NpXmlDomMgt.GetXmlText(XmlElement, 'name', MaxStrLen(EndpointQuery.Name), false);
-        if NpXmlDomMgt.GetXmlText(XmlElement, 'tableno', MaxStrLen(EndpointQuery.Name), false) <> '' then
-            Evaluate(EndpointQuery."Table No.", NpXmlDomMgt.GetXmlText(XmlElement, 'tableno', MaxStrLen(EndpointQuery.Name), false), 9);
-        EndpointQuery."Database Name" := NpXmlDomMgt.GetXmlText(XmlElement, 'senderdatabasename', MaxStrLen(EndpointQuery."Database Name"), false);
-        EndpointQuery."Company Name" := NpXmlDomMgt.GetXmlText(XmlElement, 'sendercompany', MaxStrLen(EndpointQuery."Company Name"), false);
-        EndpointQuery."User ID" := NpXmlDomMgt.GetXmlText(XmlElement, 'senderuserid', MaxStrLen(EndpointQuery."Company Name"), false);
-        if NpXmlDomMgt.GetXmlText(XmlElement, 'OnlyNewandmodified', 0, false) = 'true' then
-            EndpointQuery."Only New and Modified Records" := true;
+
+        if Element.SelectSingleNode(StrSubstNo(XPathExcludeNamespacePattern, 'no'), Node) then
+            Evaluate(EndpointQuery."External No.", CopyStr(Node.AsXmlElement().InnerText(), 1, Maxstrlen(format(EndpointQuery."External No."))), 9);
+
+        if Element.SelectSingleNode(StrSubstNo(XPathExcludeNamespacePattern, 'name'), Node) then
+            EndpointQuery.Name := CopyStr(Node.AsXmlElement().InnerText(), MaxStrLen(EndpointQuery.Name));
+
+        if Element.SelectSingleNode(StrSubstNo(XPathExcludeNamespacePattern, 'tableno'), Node) then begin
+            TableNoAsString := Node.AsXmlElement().InnerText();
+            if TableNoAsString <> '' then
+                Evaluate(EndpointQuery."Table No.", TableNoAsString, 9);
+        end;
+
+        if Element.SelectSingleNode(StrSubstNo(XPathExcludeNamespacePattern, 'senderdatabasename'), Node) then
+            EndpointQuery."Database Name" := CopyStr(Node.AsXmlElement().InnerText(), MaxStrLen(EndpointQuery."Database Name"));
+
+        if Element.SelectSingleNode(StrSubstNo(XPathExcludeNamespacePattern, 'sendercompany'), Node) then
+            EndpointQuery."Company Name" := CopyStr(Node.AsXmlElement().InnerText(), MaxStrLen(EndpointQuery."Company Name"));
+
+        if Element.SelectSingleNode(StrSubstNo(XPathExcludeNamespacePattern, 'senderuserid'), Node) then
+            EndpointQuery."User ID" := CopyStr(Node.AsXmlElement().InnerText(), MaxStrLen(EndpointQuery."User Id"));
+
+        if Element.SelectSingleNode(StrSubstNo(XPathExcludeNamespacePattern, 'OnlyNewandmodified'), Node) then begin
+            NewAndModifiedRecs := Node.AsXmlElement().InnerText();
+            if NewAndModifiedRecs = 'true' then
+                EndpointQuery."Only New and Modified Records" := true;
+        end;
+
         EndpointQuery.Insert(true);
-
-
-
-        //-NPR5.23 [242498]
-        //ItemWshtImpExpMgt.OnAfterImportWorksheetLine(ItemWorksheetLine);
-        //+NPR5.23 [242498]
     end;
 
-    local procedure InsertEndpointQueryFilters(var EndpointQueryFilter: Record "NPR Endpoint Query Filter"): Boolean
+    local procedure ReadEndpointQueryFilter(Element: XmlElement; var EndpointQueryFilter: Record "NPR Endpoint Query Filter"; EndpointQuery: Record "NPR Endpoint Query"; XPathExcludeNamespacePattern: Text)
     var
-        TicketReservationResponse: Record "NPR TM Ticket Reserv. Resp.";
-        TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
-        ResponseMessage: Text;
-        ResponseCode: Integer;
+        Node: XmlNode;
     begin
+        EndpointQueryFilter."Endpoint Query No." := EndpointQuery."No.";
+        if Element.SelectSingleNode(StrSubstNo(XPathExcludeNamespacePattern, 'tableno'), Node) then
+            Evaluate(EndpointQueryFilter."Table No.", Node.AsXmlElement().InnerText(), 9);
+
+        if Element.SelectSingleNode(StrSubstNo(XPathExcludeNamespacePattern, 'fieldno'), Node) then
+            Evaluate(EndpointQueryFilter."Field No.", Node.AsXmlElement().InnerText(), 9);
 
         EndpointQueryFilter.Init();
-    end;
-
-    local procedure ReadEndpointQueryFilter(XmlElement: DotNet NPRNetXmlElement; Token: Text[100]; var EndpointQueryFilter: Record "NPR Endpoint Query Filter"; var EndpointQuery: Record "NPR Endpoint Query")
-    var
-        ItemWorksheetVariantLine: Record "NPR Item Worksh. Variant Line";
-        VarietyValue: Record "NPR Variety Value";
-        VendorVATRegNo: Text;
-        TempText: Text;
-        TempDec: Decimal;
-        TempBool: Boolean;
-        TempInteger: Integer;
-        TempDateFormula: DateFormula;
-        TempDate: Date;
-        ItemWkshCheckLine: Codeunit "NPR Item Wsht.-Check Line";
-    begin
-
-        Initialize;
-
-        Clear(EndpointQueryFilter);
-        EndpointQueryFilter.Init;
-        EndpointQueryFilter."Endpoint Query No." := EndpointQuery."No.";
-        Evaluate(EndpointQueryFilter."Table No.", NpXmlDomMgt.GetXmlText(XmlElement, 'tableno', 0, false), 9);
-        Evaluate(EndpointQueryFilter."Field No.", NpXmlDomMgt.GetXmlText(XmlElement, 'fieldno', 0, false), 9);
-        EndpointQueryFilter."Filter Text" := NpXmlDomMgt.GetXmlText(XmlElement, 'filtertext', MaxStrLen(EndpointQueryFilter."Filter Text"), false);
+        if Element.SelectSingleNode(StrSubstNo(XPathExcludeNamespacePattern, 'filtertext'), Node) then
+            EndpointQueryFilter."Filter Text" := Node.AsXmlElement().InnerText();
         EndpointQueryFilter.Insert(true);
     end;
 
-    local procedure SetImportParameters(XmlElement: DotNet NPRNetXmlElement; Token: Text[100])
-    var
-        TempText: Text;
-    begin
-    end;
-
-    local procedure FindEndpointQuery(VendorNo: Code[20]; VendorVATRegNo: Text; ItemNo: Code[20]; var ItemWorksheetTemplateCode: Code[20]; var ItemWorksheetCode: Code[20]; var ItemWorksheetLineNo: Integer)
-    var
-        Vendor: Record Vendor;
-        ItemWorksheetTemplate: Record "NPR Item Worksh. Template";
-        ItemWorksheetTemplate2: Record "NPR Item Worksh. Template";
-        ItemWorksheet: Record "NPR Item Worksheet";
-        ItemWorksheetLine: Record "NPR Item Worksheet Line";
-    begin
-    end;
-
-    local procedure "--Utils"()
-    begin
-    end;
-
-    procedure Initialize()
-    begin
-
-        if not Initialized then begin
-            Initialized := true;
-        end;
-    end;
-
-    local procedure GetWebserviceFunction(ImportTypeCode: Code[20]) FunctionName: Text[100]
+    local procedure GetWebserviceFunction(ImportTypeCode: Code[20]): Text
     var
         ImportType: Record "NPR Nc Import Type";
     begin
-
-        Clear(ImportType);
-        ImportType.SetFilter(Code, '=%1', ImportTypeCode);
-        if (ImportType.FindFirst()) then;
-
-        exit(ImportType."Webservice Function");
+        ImportType.Code := ImportTypeCode;
+        if ImportType.Find() then
+            exit(ImportType."Webservice Function");
     end;
 
-    local procedure FindWorksheetVendorNio(VendorNo: Code[20])
+    procedure Load(var Rec: Record "NPR Nc Import Entry"; var Document: XmlDocument): Boolean
+    var
+        NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
+        InStr: InStream;
     begin
+        Rec.CalcFields("Document Source");
+        if not Rec."Document Source".HasValue() then
+            exit(false);
+
+        Rec."Document Source".CreateInStream(InStr);
+        exit(XmlDocument.ReadFrom(InStr, Document));
     end;
 }
 
