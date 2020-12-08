@@ -1,36 +1,23 @@
 codeunit 6059831 "NPR RFID Mgt."
 {
-    // NPR5.48/MMV /20181205 CASE 327107 Created object
-    // NPR5.53/MMV /20191114 CASE 377115 Removed confirm dialog. Added event instead for any future customization.
-    // NPR5.55/MMV /20200305 CASE 391561 Rolled back part of #377115
-    // NPR5.55/MMV /20200708 CASE 407265 Split insert item cross reference function into two to avoid locking reads.
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
-        TXT_SAVE_RFID: Label 'Transfer all RFID values to Item Cross Reference? (Only do this if tag printing was successful and will be used!)';
         ERR_RFID_CLASH: Label 'RFID value already exists';
-        ERR_RFID_VALUE_LENGTH: Label 'RFID value %1 is longer than limit';
+        ERR_RFID_VALUE_LENGTH: Label 'RFID value %1 is longer than limit', Comment = '%1=HexValue of RFIDSetup."RFID Value No. Series"';
 
     procedure LogRFIDPrint(var RetailJournalLine: Record "NPR Retail Journal Line"; BatchID: Guid)
     var
         RFIDPrintLog: Record "NPR RFID Print Log";
     begin
-        //-NPR5.55 [407265]
-        RFIDPrintLog.Init;
+        RFIDPrintLog.Init();
         RFIDPrintLog."Item No." := RetailJournalLine."Item No.";
         RFIDPrintLog."Variant Code" := RetailJournalLine."Variant Code";
         RFIDPrintLog.Barcode := RetailJournalLine.Barcode;
         RFIDPrintLog.Description := RetailJournalLine.Description;
         RFIDPrintLog."RFID Tag Value" := RetailJournalLine."RFID Tag Value";
         RFIDPrintLog."Batch ID" := BatchID;
-        RFIDPrintLog."User ID" := UserId;
-        RFIDPrintLog."Printed At" := CurrentDateTime;
-        RFIDPrintLog.Insert;
-        //+NPR5.55 [407265]
+        RFIDPrintLog."User ID" := UserId();
+        RFIDPrintLog."Printed At" := CurrentDateTime();
+        RFIDPrintLog.Insert();
     end;
 
     procedure GetNextRFIDValue(): Text
@@ -56,19 +43,17 @@ codeunit 6059831 "NPR RFID Mgt."
     var
         ItemCrossReference: Record "Item Cross Reference";
     begin
-        //-NPR5.55 [407265]
         ItemCrossReference.SetCurrentKey("Cross-Reference No.");
         ItemCrossReference.SetRange("Cross-Reference No.", TagValue);
-        if not ItemCrossReference.IsEmpty then
+        if not ItemCrossReference.IsEmpty() then
             ItemCrossReference.FieldError("Cross-Reference No.", ERR_RFID_CLASH);
-        //+NPR5.55 [407265]
     end;
 
     procedure InsertItemCrossReference(ItemNo: Text; VariantCode: Text; TagValue: Text)
     var
         ItemCrossReference: Record "Item Cross Reference";
     begin
-        ItemCrossReference.Init;
+        ItemCrossReference.Init();
         ItemCrossReference.Validate("Item No.", ItemNo);
         ItemCrossReference.Validate("Variant Code", VariantCode);
         ItemCrossReference.Validate("Cross-Reference Type", ItemCrossReference."Cross-Reference Type"::"Bar Code");
@@ -79,10 +64,10 @@ codeunit 6059831 "NPR RFID Mgt."
 
     local procedure IntToHex(BigInt: BigInteger): Text
     var
-        IntPtr: DotNet NPRNetIntPtr;
+        HexValue: Text;
     begin
-        IntPtr := IntPtr.IntPtr(BigInt);
-        exit(IntPtr.ToString('X'));
+        ToHexadecimal(BigInt, HexValue);
+        exit(Reverse(HexValue));
     end;
 
     local procedure PadLeft(Value: Text; PadChar: Text[1]; Length: Integer): Text
@@ -91,6 +76,104 @@ codeunit 6059831 "NPR RFID Mgt."
             exit(Value);
         exit(PadStr('', Length - StrLen(Value), PadChar) + Value);
     end;
+
+    local procedure Reverse(CurrValue: Text): Text
+    var
+        ReverseValue: Text;
+        I, J : Integer;
+    begin
+        if CurrValue = '' then
+            exit;
+        J := 0;
+        FOR I := StrLen(CurrValue) DOWNTO 1 DO BEGIN
+            J += 1;
+            ReverseValue[J] := CurrValue[I];
+        END;
+        exit(ReverseValue);
+    end;
+
+    local procedure ToHexadecimal(var Result: BigInteger; var HexReminder: Text)
+    var
+        Reminder: Integer;
+    begin
+        Reminder := Result mod 16;
+        if (Result = 0) and (Reminder = 0) then begin
+            if HexReminder = '' then
+                HexReminder := '0';
+            exit;
+        end;
+
+        Result := Result div 16;
+
+        case Reminder of
+            0:
+                begin
+                    HexReminder += '0';
+                end;
+            1:
+                begin
+                    HexReminder += '1';
+                end;
+            2:
+                begin
+                    HexReminder += '2';
+                end;
+            3:
+                begin
+                    HexReminder += '3';
+                end;
+            4:
+                begin
+                    HexReminder += '4';
+                end;
+            5:
+                begin
+                    HexReminder += '5';
+                end;
+            6:
+                begin
+                    HexReminder += '6';
+                end;
+            7:
+                begin
+                    HexReminder += '7';
+                end;
+            8:
+                begin
+                    HexReminder += '8';
+                end;
+            9:
+                begin
+                    HexReminder += '9';
+                end;
+            10:
+                begin
+                    HexReminder += 'A';
+                end;
+            11:
+                begin
+                    HexReminder += 'B';
+                end;
+            12:
+                begin
+                    HexReminder += 'C';
+                end;
+            13:
+                begin
+                    HexReminder += 'D';
+                end;
+            14:
+                begin
+                    HexReminder += 'E';
+                end;
+            15:
+                begin
+                    HexReminder += 'F';
+                end;
+        end;
+        ToHexadecimal(Result, HexReminder);
+    end;
+
 
     [IntegrationEvent(false, false)]
     procedure OnBeforeSaveItemCrossReferenceValue(var RetailJournalLine: Record "NPR Retail Journal Line")
