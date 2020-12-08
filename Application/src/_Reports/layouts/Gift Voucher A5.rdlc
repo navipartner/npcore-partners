@@ -1102,6 +1102,9 @@ End Function
         <Field Name="SalesTicketNo_GiftVoucher">
           <DataField>SalesTicketNo_GiftVoucher</DataField>
         </Field>
+        <Field Name="External_Reference_No_">
+          <DataField>External_Reference_No_</DataField>
+        </Field>
         <Field Name="ZipCodeCityText">
           <DataField>ZipCodeCityText</DataField>
         </Field>
