@@ -11,6 +11,7 @@ codeunit 6150704 "NPR POS Front End Management"
         ActionStack: Codeunit "NPR Stack of [Integer]";
         QueuedWorkflows: JsonArray;
         WorkflowResponseContent: Variant;
+        HasWorkflowResponse: Boolean;
         Initialized: Boolean;
         Text005: Label 'You attempted to retrieve a POS session instance outside of an active POS session, with no POS user interface currently running.';
         Text006: Label 'An unknown workflow was invoked: %1.';
@@ -935,7 +936,10 @@ codeunit 6150704 "NPR POS Front End Management"
     begin
         MakeSureFrameworkIsInitialized();
         if WorkflowID > 0 then begin
-            Request.SetWorkflowResponse(WorkflowResponseContent);
+            if HasWorkflowResponse then begin
+                HasWorkflowResponse := false;
+                Request.SetWorkflowResponse(WorkflowResponseContent);
+            end;
             if QueuedWorkflows.Count > 0 then
                 Request.SetQueuedWorkflows(QueuedWorkflows);
         end;
@@ -945,6 +949,7 @@ codeunit 6150704 "NPR POS Front End Management"
     procedure WorkflowResponse(ResponseContent: Variant)
     begin
         MakeSureFrameworkIsAvailableIn20(true);
+        HasWorkflowResponse := true;
         WorkflowResponseContent := ResponseContent;
     end;
 
