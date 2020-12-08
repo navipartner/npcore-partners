@@ -7,27 +7,27 @@ codeunit 6014582 "NPR Print Method Mgt."
         POSProxyRawPrint: Codeunit "NPR POS Proxy: Raw Print";
         POSSession: Codeunit "NPR POS Session";
         HardwareConnectorMgt: Codeunit "NPR Hardware Connector Mgt.";
+        Encoding: Codeunit "NPR Text Encoding Mapper";
     begin
         case CurrentClientType of
-            CLIENTTYPE::Windows:
-                PrintBytesViaClientAddin(PrinterName, PrintBytes, TargetEncoding);
             CLIENTTYPE::Web,
           CLIENTTYPE::Tablet,
           CLIENTTYPE::Phone:
                 if (POSSession.IsActiveSession(POSFrontEnd)) then
                     POSProxyRawPrint.Print(POSFrontEnd, PrinterName, TargetEncoding, PrintBytes, false)
                 else
-                    HardwareConnectorMgt.SendRawPrintRequest(PrinterName, PrintBytes, TargetEncoding);
+                    HardwareConnectorMgt.SendRawPrintRequest(PrinterName, PrintBytes, Encoding.EncodingNameToCodePageNumber(TargetEncoding));
         end;
     end;
 
     procedure PrintFileLocal(PrinterName: Text; var Stream: DotNet NPRNetMemoryStream; FileExtension: Text)
     var
-        // TODO: CTRLUPGRADE - references a possibly obsolete object
-        //FilePrintProxyProtocol: Codeunit "File Print Proxy Protocol";
         POSFrontEnd: Codeunit "NPR POS Front End Management";
         POSProxyFilePrint: Codeunit "NPR POS Proxy: File Print";
         POSSession: Codeunit "NPR POS Session";
+        HardwareConnectorMgt: Codeunit "NPR Hardware Connector Mgt.";
+        TempBlob: Codeunit "Temp Blob";
+        OutStr: OutStream;
     begin
         if Stream.Length < 1 then
             exit;
@@ -35,20 +35,17 @@ codeunit 6014582 "NPR Print Method Mgt."
         if StrLen(FileExtension) = 0 then
             exit;
 
+        TempBlob.CreateOutStream(OutStr);
+        CopyStream(OutStr, Stream);
+
         case CurrentClientType of
-            CLIENTTYPE::Windows:
-                PrintFileViaClientDotNet(PrinterName, false, Stream, FileExtension);
             CLIENTTYPE::Web,
           CLIENTTYPE::Tablet,
           CLIENTTYPE::Phone:
                 if (POSSession.IsActiveSession(POSFrontEnd)) then
                     POSProxyFilePrint.Print(POSFrontEnd, PrinterName, Stream, FileExtension, false, false)
                 else
-                    // TODO: CTRLUPGRADE - invokes old obsolete Proxy Manager Stargate v1 protocol
-                    ERROR('CTRLUPGRADE');
-        /*
-        FilePrintProxyProtocol.PrintJob(PrinterName, Stream, FileExtension, false);
-        */
+                    HardwareConnectorMgt.SendRawBytesPrintRequest(PrinterName, TempBlob);
         end;
     end;
 
@@ -104,83 +101,6 @@ codeunit 6014582 "NPR Print Method Mgt."
         PrintNodeAPIMgt.SendRawText(PrinterID, PrintBytes, TargetEncoding, '', '', PrintNodeMgt.GetPrinterOptions(PrinterID, ObjectType, ObjectID));
     end;
 
-    procedure PrintBytesViaClientAddin(PrinterName: Text; PrintBytes: Text; TargetEncoding: Text)
-    var
-        [RunOnClient]
-        StringBufferDotNet: DotNet NPRNetStringBuffer;
-    begin
-        StringBufferDotNet := StringBufferDotNet.StringBuffer();
-        StringBufferDotNet.ClearBuffer;
-        StringBufferDotNet.Append(PrintBytes);
-        if TargetEncoding = '' then
-            StringBufferDotNet.PrintBuffer(PrinterName)
-        else
-            StringBufferDotNet.PrintBufferWithEncoding(PrinterName, TargetEncoding);
-
-        Clear(StringBufferDotNet);
-    end;
-
-    procedure PrintFileViaClientDotNet(PrinterName: Text; PrinterDialog: Boolean; var Stream: DotNet NPRNetMemoryStream; FileExtension: Text)
-    var
-        [RunOnClient]
-        Process: DotNet NPRNetProcess;
-        [RunOnClient]
-        ProcessStartInfo: DotNet NPRNetProcessStartInfo;
-        [RunOnClient]
-        ProcessWindowStyle: DotNet NPRNetProcessWindowStyle;
-        [RunOnClient]
-        PrintDialog: DotNet NPRNetPrintDialog;
-        [RunOnClient]
-        DialogResult: DotNet NPRNetDialogResult;
-        FileMgt: Codeunit "File Management";
-        TempBlob: Codeunit "Temp Blob";
-        OutStream: OutStream;
-        Filename: Text;
-    begin
-        // Note: This function will use whatever software is set as default handler for the file extension type on the local machine.
-        // ie. if Adobe Reader is set as default PDF client, it will be Adobe Reader handling the print.
-        // This means the print can be sub-optimal or in some cases not even possible.
-
-        if PrinterDialog then begin
-            PrintDialog := PrintDialog.PrintDialog();
-            PrintDialog.AllowPrintToFile := false;
-            PrintDialog.AllowCurrentPage := false;
-            PrintDialog.AllowSelection := false;
-            PrintDialog.AllowSomePages := false;
-            PrintDialog.PrinterSettings.Copies := 1;
-            if not PrintDialog.ShowDialog().Equals(DialogResult.OK) then
-                exit;
-
-            PrinterName := PrintDialog.PrinterSettings.PrinterName;
-        end;
-
-        TempBlob.CreateOutStream(OutStream);
-        CopyStream(OutStream, Stream);
-        if not TempBlob.HasValue then
-            exit;
-
-        Filename := FileMgt.BLOBExport(TempBlob, FileExtension, false);
-        if StrLen(Filename) = 0 then
-            exit;
-
-        ProcessStartInfo := ProcessStartInfo.ProcessStartInfo(Filename);
-        ProcessStartInfo.CreateNoWindow := true;
-        ProcessStartInfo.WindowStyle := ProcessWindowStyle.Hidden;
-
-        if StrLen(PrinterName) = 0 then //Use default printer in windows.
-            ProcessStartInfo.Verb := 'Print'
-        else begin
-            ProcessStartInfo.UseShellExecute := true;
-            ProcessStartInfo.Arguments := '"' + PrinterName + '"';
-            ProcessStartInfo.Verb := 'PrintTo';
-        end;
-
-        Process := Process.Start(ProcessStartInfo);
-        Process.WaitForExit(5 * 1000); //Timeout after 5 seconds.
-
-        FileMgt.DeleteClientFile(Filename);
-    end;
-
     procedure PrintBytesHTTP(URL: Text; Endpoint: Text; PrintBytes: Text; TargetEncoding: TextEncoding; CodePage: Integer)
     var
         MobilePrintMgt: Codeunit "NPR Mobile Print Mgt.";
@@ -195,4 +115,3 @@ codeunit 6014582 "NPR Print Method Mgt."
         MobilePrintMgt.PrintJobBluetooth(DeviceName, PrintBytes, TargetEncoding, CodePage);
     end;
 }
-

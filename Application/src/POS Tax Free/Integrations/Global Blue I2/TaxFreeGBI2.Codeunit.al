@@ -1,7 +1,5 @@
 codeunit 6014613 "NPR Tax Free GB I2"
 {
-    // NPR5.30/NPKNAV/20170310  CASE 261964 Transport NPR5.30 - 26 January 2017
-    // 
     // Consumes Global Blue I2 solution, GRIPS MX API v16.06
     // 
     // test credentials:
@@ -10,16 +8,6 @@ codeunit 6014613 "NPR Tax Free GB I2"
     // Desk ID: 103661 //Thermal voucher
     // Username: TEST_SHOPID_92179
     // Password: TEST_SHOPID_92179
-    // 
-    // NPR5.40/MMV /20180112 CASE 293106 Refactored tax free module
-    // NPR5.48/MMV /20181105 CASE 334588 Fixed mismatch in event subscriber signature
-    // TM1.39/THRO/20181126 CASE 334644 Replaced Coudeunit 1 by Wrapper Codeunit
-    // NPR5.49/MMV /20190327 CASE 293106 Fixed invalid page reference
-
-
-    trigger OnRun()
-    begin
-    end;
 
     var
         Error_MissingPrintSetup: Label 'Missing object output setup';
@@ -85,9 +73,7 @@ codeunit 6014613 "NPR Tax Free GB I2"
         GlobalBlueServices.FindSet;
     end;
 
-    local procedure "--- Actions"()
-    begin
-    end;
+    #region Actions
 
     local procedure DownloadDeskConfiguration(var TaxFreeRequest: Record "NPR Tax Free Request")
     var
@@ -537,9 +523,9 @@ codeunit 6014613 "NPR Tax Free GB I2"
         TaxFreeRequest."Time End" := Time;
     end;
 
-    local procedure "--- Print Functions"()
-    begin
-    end;
+    #endregion
+
+    #region Print Functions
 
     [TryFunction]
     local procedure TryPrintVoucher(TaxFreeRequest: Record "NPR Tax Free Request")
@@ -729,9 +715,9 @@ codeunit 6014613 "NPR Tax Free GB I2"
         CopyStream(OutStream, MemoryStream);
     end;
 
-    local procedure "--- API Functions"()
-    begin
-    end;
+    #endregion
+
+    #region API Functions
 
     local procedure GetDeskConfiguration(var TaxFreeRequest: Record "NPR Tax Free Request")
     var
@@ -1128,9 +1114,7 @@ codeunit 6014613 "NPR Tax Free GB I2"
     var
         SystemEventWrapper: Codeunit "NPR System Event Wrapper";
     begin
-        //-TM1.39 [334644]
         exit(EscapeSpecialChars(SystemEventWrapper.ApplicationVersion()));
-        //+TM1.39 [334644]
     end;
 
     local procedure FormattedDateTime(): Text
@@ -1150,9 +1134,9 @@ codeunit 6014613 "NPR Tax Free GB I2"
         Value := XmlNode.Item(ItemName).InnerText;
     end;
 
-    local procedure "--- Aux"()
-    begin
-    end;
+    #endregion
+
+    #region Aux
 
     local procedure CaptureCustomerInfo(): Text
     var
@@ -1602,10 +1586,7 @@ codeunit 6014613 "NPR Tax Free GB I2"
             exit(tmpEligibleServices."Service ID");
 
         tmpEligibleServices.FindSet;
-        //-NPR5.49 [293106]
-        //IF PAGE.RUNMODAL(PAGE::"Generic Filter Page", tmpEligibleServices) <> ACTION::LookupOK THEN BEGIN
         if PAGE.RunModal(PAGE::"NPR Tax Free GB I2 Serv. Sel.", tmpEligibleServices) <> ACTION::LookupOK then begin
-            //+NPR5.49 [293106]
             if Confirm(Caption_CancelOperation) then
                 Error(Error_UserCancel)
             else
@@ -1632,7 +1613,6 @@ codeunit 6014613 "NPR Tax Free GB I2"
             AuditRoll.SetRange("Sale Type", AuditRoll."Sale Type"::Sale);
             AuditRoll.SetRange(Type, AuditRoll.Type::Item);
             AuditRoll.SetFilter(Quantity, '>0');
-            //AuditRoll.SETFILTER("VAT %", '>0');
             AuditRoll.FindSet;
 
             XML += '<Receipt>';
@@ -1745,9 +1725,9 @@ codeunit 6014613 "NPR Tax Free GB I2"
         exit(XML);
     end;
 
-    local procedure "--- Event Subscribers"()
-    begin
-    end;
+    #endregion
+
+    #region Event subscribers
 
     [EventSubscriber(ObjectType::Codeunit, 6014610, 'OnLookupHandler', '', false, false)]
     local procedure OnLookupHandler(var HashSet: DotNet NPRNetHashSet_Of_T)
@@ -1971,5 +1951,6 @@ codeunit 6014613 "NPR Tax Free GB I2"
         GlobalBlueServices.SetRange("Tax Free Unit", Rec."POS Unit No.");
         GlobalBlueServices.DeleteAll(true);
     end;
-}
 
+    #endregion
+}
