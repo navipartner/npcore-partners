@@ -32,56 +32,54 @@ codeunit 6014627 "NPR Managed Dependency Mgt."
 
     procedure ExportManifest("Record": Variant; var JArray: JsonArray; PayloadVersion: Integer)
     var
-        FileMgt: Codeunit "File Management";
-        TempBlob: Codeunit "Temp Blob";
-        RecRef: RecordRef;
         JObject: JsonObject;
-        OuStr: OutStream;
-        JObjectToString: Text;
+        RecRef: RecordRef;
         FileName: Text;
         FileType: Text;
         Name: Text;
         FileVersion: Text;
+        TempBlob: Codeunit "Temp Blob";
+        InStr: InStream;
+        OutStr: OutStream;
     begin
-        if JArray.Count() = 0 then
-            exit;
-
         RecRef.GetTable(Record);
-        if not RecRef.FindFirst() then
+
+        if JArray.Count = 0 then
+            exit;
+        if not RecRef.FindFirst then
             exit;
 
         GetTypeNameVersionFromRecordRef(RecRef, FileType, Name, FileVersion);
         FileName := StrSubstNo('%1 %2 %3.json', FileType, Name, FileVersion);
 
-        JObject := CreateDependencyJObject(FileType, Name, '1.0');
+        CreateDependencyJObject(JObject, FileType, Name, '1.0');
         JObject.Add('Description', '');
         JObject.Add('Payload Version', Format(PayloadVersion));
         JObject.Add('Data', JArray);
 
-        JObject.WriteTo(JObjectToString);
-        TempBlob.CreateOutStream(OuStr);
-        OuStr.WriteText(JObjectToString);
-        FileMgt.BLOBExport(TempBlob, FileName, true);
+        TempBlob.CreateOutStream(OutStr);
+        JObject.WriteTo(OutStr);
+        TempBlob.CreateInStream(InStr);
+        DownloadFromStream(InStr, 'TextExportTitle', '', 'JSON Files (*.json)|*.json|All Files (*.*)|*.*', FileName);
     end;
 
-    procedure RecordToJArray(Rec: Variant; var JArray: JsonArray)
+    procedure RecordToJArray("Record": Variant; var JArray: JsonArray)
     var
         RecRef: RecordRef;
         JObject: JsonObject;
         JObjectRec: JsonObject;
-        FieldValue: Variant;
         i: Integer;
-        FieldName: Text;
+        FieldValue: Variant;
     begin
-        RecRef.GetTable(Rec);
+        RecRef.GetTable(Record);
         if RecRef.FindSet(false, false) then
             repeat
                 Clear(JObject);
-                JObject.Add('Record', RecRef.Number());
+                AddToJObject(JObject, 'Record', RecRef.Number);
                 Clear(JObjectRec);
-                for i := 1 to RecRef.FieldCount() do begin
+                for i := 1 to RecRef.FieldCount do begin
                     FieldRefToVariant(RecRef.FieldIndex(i), FieldValue);
-                    JObjectRec.Add(Strsubstno('%1', RecRef.FieldIndex(i).Name()), format(FieldValue, 0, 9));
+                    AddToJObject(JObjectRec, RecRef.FieldIndex(i).Name, FieldValue);
                 end;
                 JObject.Add('Fields', JObjectRec);
                 JArray.Add(JObject);
@@ -115,12 +113,11 @@ codeunit 6014627 "NPR Managed Dependency Mgt."
         DepMgtSetup: Record "NPR Dependency Mgt. Setup";
         JObject: JsonObject;
         JArray: JsonArray;
-        Dependency: JsonObject;
         JToken: JsonToken;
-        JToken2: JsonToken;
-        JToken3: JsonToken;
-        JToken4: JsonToken;
-        DependencyFilter: Text;
+        DependencyObject: JsonObject;
+        DependencyToken: JsonToken;
+        i: Integer;
+        KeysCount: Integer;
     begin
         if not DependencyManagementConfigured(DepMgtSetup) then
             exit(false);
@@ -128,11 +125,12 @@ codeunit 6014627 "NPR Managed Dependency Mgt."
         if not GetJSON(DepMgtSetup, 'ManagedDependencyList', JToken, GetAvailableDependenciesFilter(DepMgtSetup), false) then
             exit(false);
 
-        if not JToken.IsArray() then
-            exit;
+        if JToken.IsArray then
+            KeysCount := JToken.AsArray.Count()
+        else
+            KeysCount := JToken.AsObject.Keys.Count;
 
-        JArray := JToken.AsArray();
-        if JArray.Count() = 0 then
+        if KeysCount = 0 then
             exit(true);
 
         HoldSemaphore(); //Only one session should start downloading and storing dependencies, since there is no real synchronization for sessions downloading concurrently.
@@ -140,52 +138,59 @@ codeunit 6014627 "NPR Managed Dependency Mgt."
         //Recheck that there are still unresolved dependencies after grabbing semaphore.
         Clear(JToken);
         if not GetJSON(DepMgtSetup, 'ManagedDependencyList', JToken, GetAvailableDependenciesFilter(DepMgtSetup), false) then begin
-            Commit();
+            Commit;
             exit(false);
         end;
 
-        JArray := JToken.AsArray();
         Result := true;
-        Clear(JToken);
-        foreach JToken in JArray do begin
-            Dependency := JToken.AsObject();
-            Dependency.Get('Type', JToken2);
-            Dependency.Get('Name', JToken3);
-            Dependency.Get('Version', JToken4);
-            DependencyFilter := StrSubstNo('&$filter=Type eq ''%1'' and Name eq ''%2'' and Version eq ''%3''',
-                                            JToken2.AsValue().AsText(),
-                                            JToken3.AsValue().AsText(),
-                                            JToken4.AsValue().AsText());
-            JToken2 := Dependency.AsToken();
-            if GetJSON(DepMgtSetup, 'ManagedDependency', JToken2, DependencyFilter, true) then begin
-                Dependency := JToken2.AsObject();
-                Dependency.Get('BLOB', JToken2);
-                if DeployDependency(JToken2.AsValue().AsText()) then
-                    Result := Result and UpdateLog(Dependency)
+        KeysCount := 0;
+
+        JArray := JToken.AsArray();
+        KeysCount := JArray.Count();
+
+        for i := 0 to JArray.Count - 1 do begin
+            JArray.Get(i, JToken);
+            DependencyObject := JToken.AsObject();
+            if GetJSON(
+              DepMgtSetup,
+              'ManagedDependency',
+              DependencyToken,
+              StrSubstNo(
+                '&$filter=Type eq ''%1'' and Name eq ''%2'' and Version eq ''%3''',
+                GetJObjectValueAsText(DependencyObject, 'Type'),
+                GetJObjectValueAsText(DependencyObject, 'Name'),
+                GetJObjectValueAsText(DependencyObject, 'Version')),
+              true)
+            then begin
+                if DeployDependency(GetJObjectValueAsText(DependencyToken.AsObject(), 'BLOB')) then
+                    Result := Result and UpdateLog(DependencyToken.AsObject())
                 else
                     Result := false;
-            end else begin
+            end else
                 Result := false;
-            end;
         end;
 
-        Commit();
+        Commit;
 
-        if Result and (JArray.Count() > 0) then
+        if Result and (KeysCount > 0) then
             OnDependenciesDeployed();
     end;
 
     local procedure DeployDependency(Base64: Text): Boolean
     var
-        JArray: JsonArray;
-        JToken: JsonToken;
         JObject: JsonObject;
+        JArray: JsonArray;
+        Jtoken: JsonToken;
+        i: Integer;
     begin
-        if not Base64StringToJObject(Base64, JArray) then
+        if not Base64StringToJObject(Base64, Jtoken) then
             exit(false);
 
-        foreach JToken in JArray do begin
-            if not DeployOneDependency(JToken.AsObject()) then
+        JArray := Jtoken.AsArray();
+        for i := 0 to JArray.Count - 1 do begin
+            JArray.Get(i, Jtoken);
+            JObject := Jtoken.AsObject();
+            if not DeployOneDependency(JObject) then
                 exit(false);
         end;
 
@@ -194,39 +199,37 @@ codeunit 6014627 "NPR Managed Dependency Mgt."
 
     local procedure DeployOneDependency(JObject: JsonObject) Result: Boolean
     var
-        AllObj: Record AllObj;
-        JToken: JsonToken;
-        JTokenFieldValue: JsonToken;
-        JArray: JsonArray;
         RecRef: RecordRef;
         FieldReference: FieldRef;
-        TableNo: Integer;
-        FieldName: Text;
-        JObjectKeys: List of [Text];
+        "Record": Integer;
+        AllObj: Record AllObj;
+        JToken: JsonToken;
+        FieldIDList: List of [Text];
+        FieldID: Text;
     begin
-        JObject.Get('Record', JToken);
-        TableNo := JToken.AsValue().AsInteger();
+        Evaluate(Record, GetJObjectValueAsText(JObject, 'Record'));
 
-        if not AllObj.Get(AllObj."Object Type"::Table, TableNo) then
+        if not AllObj.Get(AllObj."Object Type"::Table, Record) then
             exit(false);
 
-        RecRef.Open(TableNo);
-        if not RecRef.WritePermission() then
+        RecRef.Open(Record);
+        if not RecRef.WritePermission then
             exit(false);
 
         JObject.Get('Fields', JToken);
         JObject := JToken.AsObject();
-        JObjectKeys := JObject.Keys();
-        foreach FieldName in JObjectKeys do begin
-            JObject.Get(FieldName, JTokenFieldValue);
-            if FieldRefByName(RecRef, FieldName, FieldReference) then
-                if not TextToFieldRef(JTokenFieldValue.AsValue().AsText(), FieldReference) then
+        FieldIDList := JObject.Keys();
+
+        foreach FieldID in FieldIDList do
+            if FieldRefByName(RecRef, FieldID, FieldReference) then begin
+                JObject.Get(FieldID, JToken);
+                if not JValueToFieldRef(JToken.AsValue, FieldReference) then
                     exit(false);
-        end;
+            end;
 
         Result := RecRef.Insert(false);
         if not Result then
-            Result := RecRef.Modify();
+            Result := RecRef.Modify;
     end;
 
     [TryFunction]
@@ -234,72 +237,81 @@ codeunit 6014627 "NPR Managed Dependency Mgt."
     var
         Client: HttpClient;
         ResponseMessage: HttpResponseMessage;
-        JObject: JsonObject;
-        JArray: JsonArray;
-        Response: Text;
         Url: Text;
+        JObject: JsonObject;
+        JSON: Text;
     begin
         Client.UseWindowsAuthentication(DepMgtSetup.Username, DepMgtSetup.GetManagedDependencyPassword());
         Url := DepMgtSetup."OData URL" + '/' + Entity + '?$format=json' + FilterText;
-        Client.Get(Url, ResponseMessage);
-        ResponseMessage.Content().ReadAs(Response);
-        JToken := ParseJSON(Response);
-        JObject := JToken.AsObject();
+
+        if not Client.Get(URL, ResponseMessage) then
+            Error('Failed to call URL: %1', URL);
+
+        if not ResponseMessage.IsSuccessStatusCode then
+            Error('Web service has returnend an error:\\' + 'Status code: %1\' + 'Status code: %2', ResponseMessage.HttpStatusCode, ResponseMessage.ReasonPhrase);
+
+        ResponseMessage.Content.ReadAs(JSON);
+        JObject.ReadFrom(JSON);
         JObject.Get('value', JToken);
-        JArray := JToken.AsArray();
-        if Specific and (JArray.Count() = 1) then begin
-            JArray.Get(0, JToken);
-        end;
+
+        if Specific and (JToken.AsArray.Count = 1) then
+            JToken.AsArray.Get(0, JToken);
     end;
 
     [TryFunction]
-    procedure UpdateLog(Dependency: JsonObject)
+    procedure UpdateLog(Dependency: Jsonobject)
     var
         DepMgtSetup: Record "NPR Dependency Mgt. Setup";
         JObject: JsonObject;
-        JToken: JsonToken;
-        JToken2: JsonToken;
-        JToken3: JsonToken;
+        JSON: text;
         Client: HttpClient;
-        Headers: HttpHeaders;
-        Content: HttpContent;
-        RequestMessage: HttpRequestMessage;
-        ResponseMessage: HttpResponseMessage;
-        Request: Text;
+        RequestContent: HttpContent;
+        ContentHeader: HttpHeaders;
+        Response: HttpResponseMessage;
     begin
         GetDependencyMgtSetup(DepMgtSetup);
-        Dependency.Get('Type', JToken);
-        Dependency.Get('Name', JToken2);
-        Dependency.Get('Version', JToken3);
 
-        JObject := CreateDependencyJObject(
-                        JToken.AsValue().AsText(),
-                        JToken2.AsValue().AsText(),
-                        JToken3.AsValue().AsText());
-        JObject.Add('Service_Tier', GetServerID());
-        JObject.WriteTo(Request);
+        CreateDependencyJObject(
+          JObject,
+          GetJObjectValueAsText(Dependency, 'Type'),
+          GetJObjectValueAsText(Dependency, 'Name'),
+          GetJObjectValueAsText(Dependency, 'Version'));
+        JObject.Add('Service_Tier', GetServerID);
 
-        RequestMessage.Method := 'POST';
-        RequestMessage.SetRequestUri(DepMgtSetup."OData URL" + '/ManagedDependenciesLog?$format=json');
-        RequestMessage.GetHeaders(Headers);
-        Headers.Add('Accept', 'application/json');
-        Content.WriteFrom(Request);
-        RequestMessage.Content := Content;
-        Content.GetHeaders(Headers);
-        Headers.Remove('Content-Type');
-        Headers.Add('Content-Type', 'application/json');
+        JObject.WriteTo(JSON);
+
+        RequestContent.WriteFrom(JSON);
+        RequestContent.GetHeaders(ContentHeader);
+
+        ContentHeader.Clear();
+        ContentHeader.Remove('Content-Type');
+        ContentHeader.Add('Content-Type', 'application/json');
+        ContentHeader := Client.DefaultRequestHeaders();
 
         Client.UseWindowsAuthentication(DepMgtSetup.Username, DepMgtSetup.GetManagedDependencyPassword());
-        Client.Send(RequestMessage, ResponseMessage);
+        Client.Post(DepMgtSetup."OData URL" + '/ManagedDependenciesLog?$format=json', RequestContent, Response);
+
+        if not Response.IsSuccessStatusCode then
+            Error(Response.ReasonPhrase);
+    end;
+
+    local procedure GetJObjectValueAsText(JObject: JsonObject; TokenKey: Text) JTokenValueText: text
+    var
+        Jtoken: JsonToken;
+    begin
+        if JObject.Get(TokenKey, JToken) then
+            JTokenValueText := Jtoken.AsValue.AsText();
     end;
 
     procedure GetServerID() ID: Text
     var
         String: Text;
     begin
-        ID := GetUrl(CLIENTTYPE::Default);
+
+        ID := GetUrl(CLIENTTYPE::Windows);
         String := CopyStr(ID, StrPos(ID, '//'));
         ID := String.Replace('//', '') + '/' + TenantId;
+
         if ID = '' then
             Error('Invalid address returned by GETURL: %1', GetLastErrorText);
     end;
@@ -380,22 +392,87 @@ codeunit 6014627 "NPR Managed Dependency Mgt."
         end;
     end;
 
-    procedure CreateDependencyJObject(FileType: Text; Name: Text; FileVersion: Text): JsonObject
-    var
-        JObject: JsonObject;
+    procedure CreateDependencyJObject(var JObject: JsonObject; Type: Text; Name: Text; Version: Text)
     begin
-        JObject.Add('Type', FileType);
+        JObject.Add('Type', Type);
         JObject.Add('Name', Name);
-        JObject.Add('Version', FileVersion);
-        exit(JObject);
+        JObject.Add('Version', Version);
+    end;
+
+    procedure AddToJObject(JObject: JsonObject; "Key": Text; Value: Variant)
+    var
+        JValue: JsonValue;
+        Jtoken: JsonToken;
+        ValueInt: Integer;
+        ValueBigInt: BigInteger;
+        ValueOption: Option;
+        ValueDec: Decimal;
+        ValueBool: Boolean;
+        ValueDate: Date;
+        ValueDateTime: DateTime;
+        ValueTime: Time;
+        ValueDateFormula: DateFormula;
+        ValueDuration: Duration;
+    begin
+        case TRUE of
+            Value.IsInteger:
+                begin
+                    ValueInt := Value;
+                    JObject.Add(Key, ValueInt);
+                end;
+            Value.IsBigInteger:
+                begin
+                    ValueBigInt := Value;
+                    JObject.Add(Key, ValueBigInt);
+                end;
+            Value.IsOption:
+                begin
+                    ValueOption := Value;
+                    JObject.Add(Key, ValueOption);
+                end;
+            Value.IsDuration:
+                begin
+                    ValueDuration := Value;
+                    JObject.Add(Key, ValueDuration);
+                end;
+            Value.IsDecimal:
+                begin
+                    ValueDec := Value;
+                    JObject.Add(Key, ValueDec);
+                end;
+            Value.IsBoolean:
+                begin
+                    ValueBool := Value;
+                    JObject.Add(Key, ValueBool);
+                end;
+            Value.IsDate:
+                begin
+                    ValueDate := Value;
+                    JObject.Add(Key, ValueDate);
+                end;
+            Value.IsDateTime:
+                begin
+                    ValueDateTime := Value;
+                    JObject.Add(Key, ValueDateTime);
+                end;
+            Value.IsTime:
+                begin
+                    ValueTime := Value;
+                    JObject.Add(Key, ValueTime);
+                end;
+            else
+                JObject.Add(Key, Format(Value));
+        end;
     end;
 
     [TryFunction]
-    procedure Base64StringToJObject(Base64: Text; var JArray: JsonArray)
+    procedure Base64StringToJObject(Base64: Text; var Jtoken: JsonToken)
     var
-        Base64Convert: Codeunit "Base64 Convert";
+        Convert: Codeunit "Base64 Convert";
+        JSON: Text;
     begin
-        JArray.ReadFrom(Base64Convert.FromBase64(Base64));
+        JSON := Convert.FromBase64(Base64, TextEncoding::UTF8);
+        Jtoken.ReadFrom(JSON);
     end;
 
     procedure FieldRefToVariant(FieldReference: FieldRef; var FieldValue: Variant)
@@ -413,83 +490,59 @@ codeunit 6014627 "NPR Managed Dependency Mgt."
     end;
 
     [TryFunction]
-    procedure TextToFieldRef(FieldValue: Text; FieldReference: FieldRef)
+    procedure JValueToFieldRef(JValue: JsonValue; FieldReference: FieldRef)
     var
-        Base64Convert: Codeunit "Base64 Convert";
         TempBlob: Codeunit "Temp Blob";
+        Base64Convert: Codeunit "Base64 Convert";
         OutStr: OutStream;
-        ValueInt: Integer;
-        ValueBigInt: BigInteger;
-        ValueDec: Decimal;
-        ValueBool: Boolean;
-        ValueDate: Date;
-        ValueDateTime: DateTime;
-        ValueTime: Time;
         ValueText: Text;
         ValueDateFormula: DateFormula;
         ValueDuration: Duration;
         ValueGUID: Guid;
         ValueRecordID: RecordID;
     begin
-        case UpperCase(Format(FieldReference.Type())) of
+        case UpperCase(Format(FieldReference.Type)) of
             'CODE', 'TEXT':
-                FieldReference.Value := FieldValue;
-            'INTEGER', 'BIGINTEGER', 'OPTION':
-                begin
-                    Evaluate(ValueBigInt, FieldValue);
-                    FieldReference.Value := ValueBigInt;
-                end;
+                FieldReference.Value := JValue.AsText();
+            'OPTION':
+                FieldReference.Value := JValue.AsOption();
+            'INTEGER', 'BIGINTEGER':
+                FieldReference.Value := JValue.AsBigInteger();
             'DECIMAL':
-                begin
-                    Evaluate(ValueDec, FieldValue);
-                    FieldReference.Value := ValueDec;
-                end;
+                FieldReference.Value := JValue.AsDecimal();
             'BOOLEAN':
-                begin
-                    Evaluate(ValueBool, FieldValue);
-                    FieldReference.Value := ValueBool;
-                end;
+                FieldReference.Value := JValue.AsBoolean();
             'DATE':
-                begin
-                    Evaluate(ValueDate, FieldValue, 9);
-                    FieldReference.Value := ValueDate;
-                end;
+                FieldReference.Value := JValue.AsDate();
             'DATETIME':
-                begin
-                    if not Evaluate(ValueDateTime, FIeldValue, 9) then //Legacy: Fallback to non-XML format parse since some packages contain DateTimes in that format.
-                        Evaluate(ValueDateTime, FieldValue);
-                    FieldReference.Value := ValueDateTime;
-                end;
+                FieldReference.Value := JValue.AsDateTime();
             'TIME':
-                begin
-                    Evaluate(ValueTime, FieldValue, 9);
-                    FieldReference.Value := ValueTime;
-                end;
+                FieldReference.Value := JValue.AsTime();
             'BLOB':
                 begin
-                    ValueText := FieldValue;
+                    ValueText := JValue.AsText();
                     TempBlob.CreateOutStream(OutStr);
                     OutStr.WriteText(Base64Convert.FromBase64(ValueText));
                     TempBlob.ToFieldRef(FieldReference);
                 end;
             'DATEFORMULA':
                 begin
-                    Evaluate(ValueDateFormula, FieldValue, 9);
+                    Evaluate(ValueDateFormula, JValue.AsText(), 9);
                     FieldReference.Value := ValueDateFormula;
                 end;
             'DURATION':
                 begin
-                    Evaluate(ValueDuration, FieldValue, 9);
+                    Evaluate(ValueDuration, JValue.AsText(), 9);
                     FieldReference.Value := ValueDuration;
                 end;
             'GUID':
                 begin
-                    Evaluate(ValueGUID, FieldValue);
+                    Evaluate(ValueGUID, JValue.AsText());
                     FieldReference.Value := ValueGUID;
                 end;
             'RECORDID':
                 begin
-                    Evaluate(ValueRecordID, FieldValue, 9);
+                    Evaluate(ValueRecordID, JValue.AsText(), 9);
                     FieldReference.Value := ValueRecordID;
                 end;
             'TABLEFILTER':

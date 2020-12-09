@@ -112,7 +112,7 @@ page 6150713 "NPR POS Stargate Packages"
         Method: Text;
         WhichIs: Text;
         DefaultYes: Boolean;
-        OutStream: OutStream;
+        OutStr: OutStream;
         FileContent: Text;
     begin
         FilePath := FileMgt.OpenFileDialog(Text001, '', 'Stargate Package files (*.stargate)|*.stargate|JSON files(*.json)|*.json');
@@ -143,8 +143,8 @@ page 6150713 "NPR POS Stargate Packages"
         Rec.Init;
         Rec.Name := Package.Name;
         Rec.Version := Package.Version;
-        Rec.JSON.CreateOutStream(OutStream);
-        OutStream.Write(FileContent);
+        Rec.JSON.CreateOutStream(OutStr);
+        OutStr.Write(FileContent);
         Rec.Insert();
 
         PackageMethod.SetRange("Method Name", Package.Name);
