@@ -219,7 +219,6 @@ page 6014622 "NPR POS Web Fonts"
         CssHasValue: Boolean;
         Text001: Label '%1 already contains data. Do you want to overwrite it?';
         Text002: Label 'Import %1';
-        Text003: Label 'Export %1';
         Text004: Label 'Web Open Font Files';
         Text005: Label 'Cascading Style Sheet Files';
         Text006: Label 'All Files';
@@ -356,17 +355,15 @@ page 6014622 "NPR POS Web Fonts"
     var
         OutStr: OutStream;
     begin
-        with WebFont do begin
-            Name := Font.Name;
-            "Font Face" := Font.FontFace;
-            Prefix := Font.Prefix;
+        WebFont.Name := Font.Name;
+        WebFont."Font Face" := Font.FontFace;
+        WebFont.Prefix := Font.Prefix;
 
-            Woff.CreateOutStream(OutStr);
-            Font.CopyWoffToStream(OutStr);
-            Css.CreateOutStream(OutStr);
-            Font.CopyCssToStream(OutStr);
-            Modify(true);
-        end;
+        WebFont.Woff.CreateOutStream(OutStr);
+        Font.CopyWoffToStream(OutStr);
+        WebFont.Css.CreateOutStream(OutStr);
+        Font.CopyCssToStream(OutStr);
+        WebFont.Modify(true);
     end;
 
     local procedure ImportWithDialog(var TempBLOB: Codeunit "Temp Blob"; HasValue: Boolean; "Field": Text; FileType: Text; FileExt: Text): Boolean
