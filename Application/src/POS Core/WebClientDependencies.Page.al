@@ -192,8 +192,6 @@ page 6014659 "NPR Web Client Dependencies"
     procedure ConvertSVGToDataUri(InStr: InStream; var OutStr: OutStream)
     var
         Convert: DotNet NPRNetConvert;
-        Image: DotNet NPRNetImage;
-        ImageFormat: DotNet NPRNetImageFormat;
         MemStrIn: DotNet NPRNetMemoryStream;
         MemStrOut: DotNet NPRNetMemoryStream;
         Encoding: DotNet NPRNetEncoding;

@@ -9,10 +9,6 @@ codeunit 6014628 "NPR Managed Package Mgt."
     // If you wish to use the default import logic but bypass load method dialogs use:
     // SetLoadMethod()
 
-    trigger OnRun()
-    begin
-    end;
-
     var
         GlobalTableListTmp: Record AllObj temporary;
         Caption_LoadMethod: Label 'Select one of the following package load methods:';
@@ -54,7 +50,6 @@ codeunit 6014628 "NPR Managed Package Mgt."
     var
         FileMgt: Codeunit "File Management";
         TempBlob: Codeunit "Temp Blob";
-        ManagedDependencyMgt: Codeunit "NPR Managed Dependency Mgt.";
         JObject: JsonObject;
         JToken: JsonToken;
         InStr: InStream;
@@ -68,29 +63,27 @@ codeunit 6014628 "NPR Managed Package Mgt."
         TempBlob.CreateInStream(InStr, TEXTENCODING::UTF8);
 
         InStr.Read(JSON);
-        JToken := ManagedDependencyMgt.ParseJSON(JSON);
-        JObject := JToken.AsObject();
+        JObject.ReadFrom(JSON);
         JObject.Get('Primary Package Table', JToken);
-        PrimaryPackageTable := JToken.AsValue().AsInteger();
+        PrimaryPackageTable := JToken.AsValue.AsInteger();
         JObject.Get('Data', JToken);
+
 
         OnLoadPackage(Handled, PrimaryPackageTable, JToken, 0);
         if Handled then
             exit;
 
-        LoadPackage(JToken.AsArray());
+        LoadPackage(JToken);
     end;
 
     procedure ImportFromBlob(var TempBlob: Codeunit "Temp Blob")
     var
         JObject: JsonObject;
-        JToken: JsonToken;
-        JArray: JsonArray;
+        Jtoken: JsonToken;
         InStr: InStream;
         JSON: Text;
         Handled: Boolean;
         PrimaryPackageTable: Integer;
-        ManagedDependencyMgt: Codeunit "NPR Managed Dependency Mgt.";
     begin
         // Note: This function is made for manually importing a package manifest file/blob, so it will not expect
         // the JArray "Data" to be the root which is the case when parsing the base64 blob straight from ground control.
@@ -98,125 +91,139 @@ codeunit 6014628 "NPR Managed Package Mgt."
         TempBlob.CreateInStream(InStr, TEXTENCODING::UTF8);
 
         InStr.Read(JSON);
+        JObject.ReadFrom(JSON);
+        JObject.Get('Primary Package Table', Jtoken);
+        PrimaryPackageTable := Jtoken.AsValue.AsInteger();
+        JObject.Get('Data', Jtoken);
 
-        JToken := ManagedDependencyMgt.ParseJSON(JSON);
-        JObject := JToken.AsObject();
-        JObject.Get('Primary Package Table', JToken);
-        PrimaryPackageTable := JToken.AsValue().AsInteger();
-
-        JObject.Get('Data', JToken);
-
-        OnLoadPackage(Handled, PrimaryPackageTable, JToken, 1);
+        OnLoadPackage(Handled, PrimaryPackageTable, Jtoken, 1);
         if Handled then
             exit;
 
-        LoadPackage(JToken.AsArray());
+        LoadPackage(Jtoken);
     end;
 
     procedure DeployPackageFromGroundControl(PrimaryPackageTable: Integer): Boolean
     var
-        DepMgtSetup: Record "NPR Dependency Mgt. Setup";
-        TmpManagedPackageLookup: Record "NPR Managed Package Lookup" temporary;
         ManagedDependencyMgt: Codeunit "NPR Managed Dependency Mgt.";
-        FilterSpecific: Label '&$filter=Type eq ''%1'' and Name eq ''%2'' and Version eq ''%3''', Comment = '%1=Type;%2=Name;%3=Version';
-        JObjects: List of [JsonObject];
-        JToken: JsonToken;
-        JToken2: JsonToken;
-        JToken3: JsonToken;
-        JToken4: JsonToken;
-        JToken5: JsonToken;
-        JToken6: JsonToken;
-        JArray: JsonArray;
+        DepMgtSetup: Record "NPR Dependency Mgt. Setup";
         JObject: JsonObject;
+        JArray: JsonArray;
+        Jtoken: JsonToken;
         i: Integer;
+        Package: JsonObject;
+        PackageToken: JsonToken;
+        FilterSpecific: Label '&$filter=Type eq ''%1'' and Name eq ''%2'' and Version eq ''%3''';
+        DataToken: JsonToken;
+        TmpManagedPackageLookup: Record "NPR Managed Package Lookup" temporary;
         Handled: Boolean;
     begin
         ManagedDependencyMgt.GetDependencyMgtSetup(DepMgtSetup);
         if not DepMgtSetup.Configured then
             exit(false);
 
-        if not ManagedDependencyMgt.GetJSON(DepMgtSetup, 'ManagedDataPackageList', JToken, CreateFilterText(PrimaryPackageTable, DepMgtSetup), false) then
+        if not ManagedDependencyMgt.GetJSON(DepMgtSetup, 'ManagedDataPackageList', Jtoken, CreateFilterText(PrimaryPackageTable, DepMgtSetup), false) then
             exit(false);
 
-        JArray := JToken.AsArray();
-        clear(JToken);
-        foreach JToken in Jarray do begin
-            JObject := JToken.AsObject();
-            JObject.Get('Name', JToken2);
-            JObject.Get('Version', JToken3);
-            JObject.Get('Description', JToken4);
-            JObject.Get('Status', JToken5);
-            JObject.Get('Tags', JToken6);
+        JArray := Jtoken.AsArray();
+        for i := 0 to JArray.Count - 1 do begin
+            JArray.Get(i, PackageToken);
+            Package := PackageToken.AsObject();
 
             TmpManagedPackageLookup.Index := i;
-            TmpManagedPackageLookup.Name := JToken2.AsValue().AsText();
-            TmpManagedPackageLookup.Version := JToken3.AsValue().AsText();
-            TmpManagedPackageLookup.Description := JToken4.AsValue().AsText();
-            TmpManagedPackageLookup.Status := JToken5.AsValue().AsText();
-            TmpManagedPackageLookup.Tags := JToken6.AsValue().AsText();
-            TmpManagedPackageLookup.Insert();
-            JObjects.Add(JObject);
+            TmpManagedPackageLookup.Name := GetJObjectValueAsText(Package, 'Name');
+            TmpManagedPackageLookup.Version := GetJObjectValueAsText(Package, 'Version');
+            TmpManagedPackageLookup.Description := GetJObjectValueAsText(Package, 'Description');
+            TmpManagedPackageLookup.Status := GetJObjectValueAsText(Package, 'Status');
+            TmpManagedPackageLookup.Tags := GetJObjectValueAsText(Package, 'Tags');
+            TmpManagedPackageLookup.Insert;
         end;
 
-        if TmpManagedPackageLookup.IsEmpty() then
+        if TmpManagedPackageLookup.IsEmpty then
             exit(false);
 
         if not (PAGE.RunModal(PAGE::"NPR Managed Package Lookup", TmpManagedPackageLookup) = ACTION::LookupOK) then
             exit(false);
 
-        JObjects.Get(TmpManagedPackageLookup.Index, JObject);
-        JObject.Get('Type', JToken2);
-        JObject.Get('Name', JToken3);
-        JObject.Get('Version', JToken4);
-        Clear(JToken);
-        if ManagedDependencyMgt.GetJSON(DepMgtSetup, 'ManagedDependency', JToken, StrSubstNo(FilterSpecific, JToken2.AsValue().AsText(), JToken3.AsValue().AsText(), JToken4.AsValue().AsText()), true) then begin
-            JObject := JToken.AsObject();
-            JObject.Get('BLOB', JToken2);
-            if ManagedDependencyMgt.Base64StringToJObject(JToken2.AsValue().AsText(), JArray) then begin
-                OnLoadPackage(Handled, PrimaryPackageTable, JArray.AsToken(), 2);
-                if Handled then
-                    exit(ManagedDependencyMgt.UpdateLog(JObject));
+        JArray.Get(TmpManagedPackageLookup.Index, PackageToken);
+        Package := PackageToken.AsObject();
 
-                if LoadPackage(JArray) then
-                    exit(ManagedDependencyMgt.UpdateLog(JObject));
+        if ManagedDependencyMgt.GetJSON(DepMgtSetup, 'ManagedDependency', PackageToken, StrSubstNo(FilterSpecific, GetJObjectValueAsText(Package, 'Type'), GetJObjectValueAsText(Package, 'Name'), GetJObjectValueAsText(Package, 'Version')), true) then
+            if ManagedDependencyMgt.Base64StringToJObject(GetJObjectValueAsText(PackageToken.AsObject(), 'BLOB'), DataToken) then begin
+                OnLoadPackage(Handled, PrimaryPackageTable, DataToken, 2);
+                if Handled then
+                    exit(ManagedDependencyMgt.UpdateLog(PackageToken.AsObject()));
+
+                if LoadPackage(DataToken) then
+                    exit(ManagedDependencyMgt.UpdateLog(PackageToken.AsObject()));
             end;
-        end;
+
         exit(false);
+    end;
+
+    local procedure GetJObjectValueAsText(JObject: JsonObject; TokenKey: Text) JTokenValueText: text
+    var
+        Jtoken: JsonToken;
+    begin
+        if JObject.Get(TokenKey, JToken) then
+            JTokenValueText := Jtoken.AsValue.AsText();
     end;
 
     procedure DeployPackageFromURL(URL: Text)
     var
-        ManagedDependencyMgt: Codeunit "NPR Managed Dependency Mgt.";
         Client: HttpClient;
         ResponseMessage: HttpResponseMessage;
-        JObject: JsonObject;
-        JToken: JsonToken;
         JSON: Text;
+        JObject: JsonObject;
+        Jtoken: JsonToken;
         PrimaryPackageTable: Integer;
         Handled: Boolean;
     begin
-        Client.Get(Url, ResponseMessage);
-        ResponseMessage.Content().ReadAs(JSON);
-        JToken := ManagedDependencyMgt.ParseJSON(JSON);
-        JObject := JToken.AsObject();
-        JObject.Get('Primary Package Table', JToken);
-        Evaluate(PrimaryPackageTable, Format(JToken.AsValue().AsInteger()));
-        JObject.get('Data', JToken);
+        if not Client.Get(URL, ResponseMessage) then
+            Error('Failed to call URL: %1', URL);
 
-        OnLoadPackage(Handled, PrimaryPackageTable, JToken, 0);
+        if not ResponseMessage.IsSuccessStatusCode then
+            Error('Web service has returnend an error:\\' + 'Status code: %1\' + 'Status code: %2', ResponseMessage.HttpStatusCode, ResponseMessage.ReasonPhrase);
+
+        //Even though Encoding is not set, it returns same result as DotNet code with direct read to Text:
+        ResponseMessage.Content.ReadAs(JSON);
+
+        //At the end if needed to put Encoding, instead of reading direct to Text, going through TemBlob:
+        /*
+        ResponseMessage.Content.ReadAs(InStr);
+
+        TempBlob.CreateOutStream(OutStr, TextEncoding::UTF8);
+        CopyStream(OutStr, InStr);
+
+        TempBlob.CreateInStream(EncodedInStream);
+        EncodedInStream.Read(JSON);
+        */
+
+        JObject.ReadFrom(JSON);
+        JObject.Get('Primary Package Table', Jtoken);
+        PrimaryPackageTable := Jtoken.AsValue.AsInteger();
+        JObject.Get('Data', Jtoken);
+
+        OnLoadPackage(Handled, PrimaryPackageTable, Jtoken, 0);
         if Handled then
             exit;
 
-        LoadPackage(JToken.AsArray());
+        LoadPackage(Jtoken);
     end;
 
-    local procedure LoadPackage(JArray: JsonArray): Boolean
+    local procedure LoadPackage(JToken: JsonToken): Boolean
     var
-        RecRef: RecordRef;
-        LoadMethod: Option OnlyInsert,InsertOrModify,DeleteFirst;
         Selection: Integer;
+        LoadMethod: Option OnlyInsert,InsertOrModify,DeleteFirst;
+        RecRef: RecordRef;
+        Total: Integer;
     begin
-        if JArray.Count() < 1 then
+        if JToken.IsArray then
+            Total := JToken.AsArray.Count
+        else
+            Total := JToken.AsObject.Keys.Count;
+
+        if Total < 1 then
             exit;
 
         if GlobalLoadMethodOverwritten then
@@ -249,70 +256,78 @@ codeunit 6014628 "NPR Managed Package Mgt."
                 RecRef.Close;
             until GlobalTableListTmp.Next = 0;
 
-        if not LoadRecords(JArray, LoadMethod) then
+        if not LoadRecords(JToken, LoadMethod) then
             Error(Error_PackageLoad);
 
         exit(true);
     end;
 
-    local procedure LoadRecords(JArray: JsonArray; LoadMethod: Option OnlyInsert,InsertOrModify,DeleteFirst): Boolean
+    local procedure LoadRecords(JToken: JsonToken; LoadMethod: Option OnlyInsert,InsertOrModify,DeleteFirst): Boolean
     var
-        ManagedDependencyMgt: Codeunit "NPR Managed Dependency Mgt.";
-        JTokenRecord: JsonToken;
-        JToken: JsonToken;
-        JTokenFieldValue: JsonToken;
-        JObjectRecord: JsonObject;
-        JObject: JsonObject;
-        JArrayFields: JsonArray;
         RecRef: RecordRef;
         FieldReference: FieldRef;
         TableNo: Integer;
+        i: Integer;
+        ManagedDependencyMgt: Codeunit "NPR Managed Dependency Mgt.";
+        JObject: JsonObject;
+        JArray: JsonArray;
+        FieldIDList: List of [Text];
+        FieldID: Text;
         Total: Integer;
         Itt: Integer;
-        FieldName: Text;
-        JObjectKeys: List of [Text];
     begin
-        Total := JArray.Count();
+        JArray := JToken.AsArray();
+        Total := JArray.Count;
 
-        OpenDialog();
+        if Total < 1 then
+            exit;
 
-        foreach JTokenRecord in JArray do begin
+        OpenDialog;
+
+        for i := 0 to Total - 1 do begin
             Itt += 1;
-            JObjectRecord := JTokenRecord.AsObject();
-            JObjectRecord.Get('Record', JToken);
-            TableNo := JToken.AsValue().AsInteger();
+
+            JArray.Get(i, JToken);
+            JObject := JToken.AsObject();
+            JObject.Get('Record', JToken);
+            TableNo := JToken.AsValue.AsInteger();
+
             UpdateDialog(1, TableNo);
             UpdateProgressDialog(2, Itt, Total);
+
             if not GlobalTableListTmp.Get(GlobalTableListTmp."Object Type"::Table, TableNo) then //Only accept data for expected tables.
                 exit(false);
 
             RecRef.Open(TableNo);
-            JObjectRecord.Get('Fields', JToken);
-            JObject := JToken.AsObject();
-            JObjectKeys := JObject.Keys();
-            foreach FieldName in JOBjectKeys do begin
-                JObject.Get(FieldName, JTokenFieldValue);
-                if FieldRefByID(RecRef, FieldName, FieldReference) then
-                    if not ManagedDependencyMgt.TextToFieldRef(JTokenFieldValue.AsValue().AsText(), FieldReference) then
-                        exit(false);
 
-                case LoadMethod of
-                    LoadMethod::DeleteFirst:
-                        if not RecRef.Insert() then
-                            exit(false);
-                    LoadMethod::OnlyInsert:
-                        if not RecRef.Insert() then
-                            ;
-                    LoadMethod::InsertOrModify:
-                        if not RecRef.Insert() then
-                            if not RecRef.Modify() then
-                                exit(false);
+            JObject.Get('Fields', JToken);
+            JObject := JToken.AsObject();
+            FieldIDList := JObject.Keys();
+
+            foreach FieldID in FieldIDList do
+                if FieldRefByID(RecRef, FieldID, FieldReference) then begin
+                    JObject.Get(FieldID, JToken);
+                    if not ManagedDependencyMgt.JValueToFieldRef(JToken.AsValue(), FieldReference) then
+                        exit(false);
                 end;
 
-                RecRef.Close();
+            case LoadMethod of
+                LoadMethod::DeleteFirst:
+                    if not RecRef.Insert then
+                        exit(false);
+                LoadMethod::OnlyInsert:
+                    if not RecRef.Insert then
+                        ;
+                LoadMethod::InsertOrModify:
+                    if not RecRef.Insert then
+                        if not RecRef.Modify then
+                            exit(false);
             end;
+
+            RecRef.Close;
         end;
-        CloseDialog();
+
+        CloseDialog;
 
         exit(true);
     end;
@@ -326,7 +341,6 @@ codeunit 6014628 "NPR Managed Package Mgt."
         // and expand ground control with support for individual companies in its log to as data packages are not targeted at global tables.
         Filter := StrSubstNo('&$filter=(Service_Tier_Name eq ''%1'') and ', TypeHelper.UriEscapeDataString(ManagedDependencyMgt.GetServerID()));
         Filter += SelectStr(DepMgtSetup."Accept Statuses" + 1, '(Status eq ''Released'') and ,(Status eq ''Staging'' or Status eq ''Released'') and ,');
-        //+NPR5.39 [306227]
         Filter += StrSubstNo('(Primary_Package_Table eq %1)', PrimaryPackageTable);
     end;
 
@@ -345,7 +359,7 @@ codeunit 6014628 "NPR Managed Package Mgt."
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnLoadPackage(var Handled: Boolean; PrimaryPackageTable: Integer; JToken: JsonToken; LoadType: Option File,Blob,Download)
+    local procedure OnLoadPackage(var Handled: Boolean; PrimaryPackageTable: Integer; JObject: JsonToken; LoadType: Option File,Blob,Download)
     begin
         // Use this event to overwrite default import dialog flow and logic for your specific package type.
     end;
