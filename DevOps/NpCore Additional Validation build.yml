@@ -82,7 +82,7 @@ jobs:
           ISOcountryCode: IT
         - packages:
           - source: 'https://pkgs.dev.azure.com/navipartner/_packaging/BCSymbols/nuget/v3/index.json'
-            id: Microsoft.BC.160.Base_Application.mx
+            id: Microsoft.BC.170.Base_Application.mx
           ISOcountryCode: MX
         - packages:
           - source: 'https://pkgs.dev.azure.com/navipartner/_packaging/BCSymbols/nuget/v3/index.json'
