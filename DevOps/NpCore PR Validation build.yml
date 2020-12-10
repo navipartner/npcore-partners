@@ -49,3 +49,32 @@ jobs:
         latestPrereleaseAppNuGetSource: 
           source: 'https://pkgs.dev.azure.com/navipartner/_packaging/NpCore/nuget/v3/index.json'
           id: NaviPartner.NPCore.BC170
+
+    - template: YAML/Templates/Step/BuildALApp.yml@scriptsRepo
+      parameters:
+        containerName: $(containerName)
+        containerAdminUsername: $(containerAdminUsername)
+        containerAdminPassword: $(containerAdminPassword)
+        serverInstanceName: $(serverInstanceName)
+        alProjectRoot: $(Build.SourcesDirectory)/$(Build.Repository.Name)/Test
+
+    - template: YAML/Templates/Step/HandleDependancies.yml@scriptsRepo 
+      parameters:
+        dependancies:
+        - appsToDeploy:
+          - path: 'C:\Applications\TestFramework\TestRunner\Microsoft_Test Runner.app'
+          - path: 'C:\Applications\TestFramework\TestLibraries\Assert\Microsoft_Library Assert.app'
+          - path: 'C:\Applications\TestFramework\TestLibraries\Any\Microsoft_Any.app'
+          - path: 'C:\Applications\TestFramework\TestLibraries\Variable Storage\Microsoft_Library Variable Storage.app'
+          - path: 'C:\Applications\system application\test\Microsoft_System Application Test Library.app'
+          - path: 'C:\Applications\baseapp\test\Microsoft_Tests-TestLibraries.app'
+        serverInstanceName: $(serverInstanceName)
+
+    - template: YAML/Templates/Step/SetupAndRunTests.yml@scriptsRepo
+      parameters:
+        serverInstanceName: $(serverInstanceName)
+        username: $(containerAdminUsername)
+        password: $(containerAdminPassword)
+        testRunName: 'NPCore Tests'
+        testApps:
+          - appPath: $(Build.SourcesDirectory)/$(Build.Repository.Name)/Test/Output/Test.app
