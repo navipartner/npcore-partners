@@ -56,6 +56,14 @@ jobs:
   parameters:
     scriptsRepo: scriptsRepo
     symbolPackages:
+    - name: at #Country
+      url: $(url)/at #Country
+      appPackages:
+      - sourcePath: \Applications\BaseApp\Source\Base Application.Source.zip
+        appPath: \Applications\BaseApp\Source\Microsoft_Base Application.app
+        packageId: $(packageId).Base_Application.at #Country
+      feed: $(feed)
+
     - name: au #Country
       url: $(url)/au #Country
       appPackages:
@@ -64,12 +72,44 @@ jobs:
         packageId: $(packageId).Base_Application.au #Country
       feed: $(feed)
 
+    - name: be #Country
+      url: $(url)/be #Country
+      appPackages:
+      - sourcePath: \Applications\BaseApp\Source\Base Application.Source.zip
+        appPath: \Applications\BaseApp\Source\Microsoft_Base Application.app
+        packageId: $(packageId).Base_Application.be #Country
+      feed: $(feed)      
+
     - name: ca #Country
       url: $(url)/ca #Country
       appPackages:
       - sourcePath: \Applications\BaseApp\Source\Base Application.Source.zip
         appPath: \Applications\BaseApp\Source\Microsoft_Base Application.app
         packageId: $(packageId).Base_Application.ca #Country
+      feed: $(feed)
+
+    - name: ch #Country
+      url: $(url)/ch #Country
+      appPackages:
+      - sourcePath: \Applications\BaseApp\Source\Base Application.Source.zip
+        appPath: \Applications\BaseApp\Source\Microsoft_Base Application.app
+        packageId: $(packageId).Base_Application.ch #Country
+      feed: $(feed)
+
+    - name: cz #Country
+      url: $(url)/cz #Country
+      appPackages:
+      - sourcePath: \Applications\BaseApp\Source\Base Application.Source.zip
+        appPath: \Applications\BaseApp\Source\Microsoft_Base Application.app
+        packageId: $(packageId).Base_Application.cz #Country
+      feed: $(feed)
+
+    - name: de #Country
+      url: $(url)/de #Country
+      appPackages:
+      - sourcePath: \Applications\BaseApp\Source\Base Application.Source.zip
+        appPath: \Applications\BaseApp\Source\Microsoft_Base Application.app
+        packageId: $(packageId).Base_Application.de #Country
       feed: $(feed)      
 
     - name: dk #Country
@@ -81,6 +121,22 @@ jobs:
       - sourcePath: \Applications\OIOUBL\Source\OIOUBL.Source.zip
         appPath: \Applications\OIOUBL\Source\Microsoft_OIOUBL.app
         packageId: $(packageId).OIOUBL.dk #Country        
+      feed: $(feed)
+
+    - name: es #Country
+      url: $(url)/es #Country
+      appPackages:
+      - sourcePath: \Applications\BaseApp\Source\Base Application.Source.zip
+        appPath: \Applications\BaseApp\Source\Microsoft_Base Application.app
+        packageId: $(packageId).Base_Application.es #Country
+      feed: $(feed)
+
+    - name: fi #Country
+      url: $(url)/fi #Country
+      appPackages:
+      - sourcePath: \Applications\BaseApp\Source\Base Application.Source.zip
+        appPath: \Applications\BaseApp\Source\Microsoft_Base Application.app
+        packageId: $(packageId).Base_Application.fi #Country
       feed: $(feed)
 
     - name: fr #Country
@@ -97,6 +153,14 @@ jobs:
       - sourcePath: \Applications\BaseApp\Source\Base Application.Source.zip
         appPath: \Applications\BaseApp\Source\Microsoft_Base Application.app
         packageId: $(packageId).Base_Application.gb #Country
+      feed: $(feed)
+
+    - name: is #Country
+      url: $(url)/is #Country
+      appPackages:
+      - sourcePath: \Applications\BaseApp\Source\Base Application.Source.zip
+        appPath: \Applications\BaseApp\Source\Microsoft_Base Application.app
+        packageId: $(packageId).Base_Application.is #Country
       feed: $(feed)
 
     - name: it #Country
