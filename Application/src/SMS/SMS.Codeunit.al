@@ -73,19 +73,19 @@ codeunit 6014502 "NPR SMS"
         end;
     end;
 
-    procedure SmsEclub(PhoneNo: Code[20]; SMSMessage: Text[250]; From: Text[20])
+    procedure SmsEclub(PhoneNo: Text[20]; SMSMessage: Text[250]; From: Text[20])
     var
         Util: Codeunit "NPR Utility";
-        AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
         Uri: Codeunit Uri;
+        AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
+        Client: HttpClient;
+        Response: HttpResponseMessage;
+        ContentHeaders: HttpHeaders;
+        Content: HttpContent;
         ServiceCode: Code[20];
         ForeignPhone: Boolean;
         SMSHandled: Boolean;
         SMSServiceUri: Text;
-        HttpClient: HttpClient;
-        HttpResponseMsg: HttpResponseMessage;
-        Content: HttpContent;
-        HttpContentHdr: HttpHeaders;
     begin
         OnSendSMS(SMSHandled, PhoneNo, From, SMSMessage);
         if SMSHandled then
@@ -95,9 +95,9 @@ codeunit 6014502 "NPR SMS"
             Error(ErrEmpty);
 
         ForeignPhone := CopyStr(PhoneNo, 1, 1) = '+';
-        if ForeignPhone then begin
-            ServiceCode := 'SMSUDLAND';
-        end else begin
+        if ForeignPhone then
+            ServiceCode := 'SMSUDLAND'
+        else begin
             ServiceCode := 'ECLUBSMS';
             PhoneNo := '+45' + PhoneNo;
         end;
@@ -106,26 +106,30 @@ codeunit 6014502 "NPR SMS"
 
         if ServiceCalc.useService(ServiceCode) then begin
             SMSMessage := DelChr(Util.Ansi2Ascii(SMSMessage), '%', '');
-
             // Uses following Azure Key Vault secrets:
             // - SMSHTTPRequestUrl    
             //   The secret contains complete Request URL for sending SMS in the following format:
-            //   'https://wsx.sp247.net/linkdk/?username=%1&password=$2&from=$3&to=$4&message=%5&charset=$6'
+            //   'https://wsx.sp247.net/linkdk/?username=%1&password=%2&from=%3&to=%4&message=%5&charset=%6'
             //   EscapeDataString called after StrSubstNo
             // - SMSUserName
             // - SMSPassword
 
             SMSServiceUri := AzureKeyVaultMgt.GetSecret('SMSHTTPRequestUrl');
             SMSServiceUri := StrSubstNo(SMSServiceUri, AzureKeyVaultMgt.GetSecret('SMSUserName'),
-                             SMSServiceUri, AzureKeyVaultMgt.GetSecret('SMSPassword'),
+                             AzureKeyVaultMgt.GetSecret('SMSPassword'),
                              From, PhoneNo, SMSMessage, 'utf-8');
 
-            SMSServiceUri := Uri.EscapeDataString(SMSServiceUri);
 
-            Content.GetHeaders(HttpContentHdr);
-            HttpContentHdr.Clear();
-            HttpContentHdr.Add('Content-Type', 'text/xml');
-            HttpClient.Post(SMSServiceUri, Content, HttpResponseMsg);
+            Content.GetHeaders(contentHeaders);
+            ContentHeaders.Clear();
+            ContentHeaders.Add('Content-Type', 'text/xml; charset=utf-8');
+            Client.Timeout(10000);
+
+            if not Client.Post(SMSServiceUri, Content, Response) then
+                Error(GetLastErrorText);
+
+            if not response.IsSuccessStatusCode then
+                Error(format(response.HttpStatusCode));
         end;
     end;
 
