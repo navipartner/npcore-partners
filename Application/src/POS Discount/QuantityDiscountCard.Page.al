@@ -1,21 +1,5 @@
 page 6014466 "NPR Quantity Discount Card"
 {
-    // 
-    // //-NPR 290509 Ny menupunkt under funktion Sag 70115
-    // Send to Retail Journal
-    // 
-    // NPR4.002.003, 01-06-10, MH - Added Function, UpdateStatus(). It corrects the status depending on "Closing date" and "Closing Time"
-    //                         (Job 87927).
-    // 
-    // 
-    // 
-    // 
-    // // -NPR7-TS-18.10.12., On previous form there was code to set the Subform as visible or not ,as this CAL code do not work on page anymore,I created a global variable as boolean datatype,set Includedataser property to TRUE and then assign it as a
-    // source expression to the control's property you want to change.
-    // NPR5.30/BHR /20170223  CASE 265244 Copy Discount Functionality
-    // NPR5.46/JDH /20180927 CASE 294354 Send to retail journal recoded
-    // NPR5.55/TJ  /20200420 CASE 400524 Added dimension action with ActionContainer = RelatedInformation
-
     Caption = 'Multiple Price Header';
     SourceTable = "NPR Quantity Discount Header";
 
@@ -44,6 +28,11 @@ page 6014466 "NPR Quantity Discount Card"
                 field("Block Custom Discount"; "Block Custom Discount")
                 {
                     ApplicationArea = All;
+                }
+                field("Item Description"; "Item Description")
+                {
+                    ApplicationArea = All;
+                    Visible = false;
                 }
             }
             group(Conditions)
@@ -82,6 +71,8 @@ page 6014466 "NPR Quantity Discount Card"
                 SubPageLink = "Item No." = FIELD("Item No."),
                               "Main no." = FIELD("Main No.");
                 Visible = ActionVisible;
+                Editable = DynamicEditable;
+                Enabled = Rec."Main no." <> '';
                 ApplicationArea = All;
             }
         }
@@ -121,6 +112,7 @@ page 6014466 "NPR Quantity Discount Card"
                 Caption = 'List';
                 Image = List;
                 RunObject = Page "NPR Quantity Discount List";
+                RunPageLink = "Item No." = field("Item No.");
                 ApplicationArea = All;
             }
             separator(Separator6150623)
@@ -136,32 +128,7 @@ page 6014466 "NPR Quantity Discount Card"
                 var
                     RetailJournalMgt: Codeunit "NPR Retail Journal Code";
                 begin
-                    //-NPR5.46 [294354]
-                    // IF PAGE.RUNMODAL(PAGE::"Retail Journal List", "Retail Journal Header") <> ACTION::LookupOK THEN EXIT;
-                    //   QuantityDiscountLine.SETRANGE("Main no.","Main No.");
-                    //  IF QuantityDiscountLine.FIND('-') THEN REPEAT
-                    //     RetailJournalLine.RESET;
-                    //     RetailJournalLine.SETRANGE("No.", "Retail Journal Header"."No.");
-                    //     IF RetailJournalLine.FIND('+') THEN
-                    //        tempInt := RetailJournalLine."Line No." + 10000
-                    //     ELSE
-                    //       tempInt := 10000;
-                    //     tempAntal := QuantityDiscountLine.COUNT;
-                    //
-                    //  RetailJournalLine."No.":= "Retail Journal Header"."No.";
-                    //  RetailJournalLine."Line No.":=tempInt;
-                    //  RetailJournalLine.VALIDATE("Item No.",QuantityDiscountLine."Item No.");
-                    //  //RetailJournalLine."Variant Code":= QuantityDiscountLine."Variant Code";
-                    //  RetailJournalLine."Discount Type":= 3;
-                    //  RetailJournalLine."Discount Unit Price":= QuantityDiscountLine."Unit Price";
-                    //  //RetailJournalLine."Unit price":= QuantityDiscountLine."Campaign Unit price";
-                    //  RetailJournalLine.Quantity:= QuantityDiscountLine.Quantity;
-                    //  RetailJournalLine."Discount Code":= QuantityDiscountLine."Main no.";
-                    //  RetailJournalLine.INSERT(TRUE);
-                    // UNTIL QuantityDiscountLine.NEXT=0;
-                    // MESSAGE(txt001, tempAntal);
                     RetailJournalMgt.Quantity2RetailJnl("Item No.", "Main No.", '');
-                    //+NPR5.46 [294354]
                 end;
             }
             action("Copy Multiple Price Discount")
@@ -176,7 +143,6 @@ page 6014466 "NPR Quantity Discount Card"
                     QuantityDiscountLine1: Record "NPR Quantity Discount Line";
                     QuantityDiscountLine: Record "NPR Quantity Discount Line";
                 begin
-                    //-NPR5.30 [265244]
                     if PAGE.RunModal(PAGE::"NPR Quantity Discount List", QuantityDiscountHeader) <> ACTION::LookupOK then exit;
                     QuantityDiscountLine1.Reset;
                     QuantityDiscountLine1.SetRange("Main no.", "Main No.");
@@ -195,35 +161,37 @@ page 6014466 "NPR Quantity Discount Card"
                             QuantityDiscountLine.Insert(true);
                         until QuantityDiscountLine1.Next = 0;
 
-                    //+NPR5.30 [265244]
                 end;
             }
         }
     }
 
-    trigger OnOpenPage()
-    var
-        Flerstykhoved: Record "NPR Quantity Discount Header";
+    trigger OnAfterGetCurrRecord()
     begin
-        UpdateStatus();
+        DynamicEditable := CurrPage.Editable;
+    end;
 
-        Flerstykhoved.SetRange("Item No.", GetFilter("Item No."));
-        if not Flerstykhoved.Find('-') then begin
-
+    trigger OnOpenPage()
+    begin
+        Rec.SetRange("Item No.", Rec.GetFilter("Item No."));
+        if Rec.IsEmpty then begin
+            Rec.Init();
+            Rec."Main No." := Rec.GetFilter("Item No.");
+            Rec.Insert(true);
         end;
+        UpdateStatus();
         ActionVisible := true;
     end;
 
     var
         [InDataSet]
         ActionVisible: Boolean;
-        QuantityDiscountLine: Record "NPR Quantity Discount Line";
+        DynamicEditable: Boolean;
 
     procedure UpdateStatus()
     var
         "Quantity Discount Header 2": Record "NPR Quantity Discount Header";
     begin
-        //-NPK1.0
         "Quantity Discount Header 2".SetFilter(Status, '<>%1', Status::Balanced);
         if "Quantity Discount Header 2".FindFirst then
             repeat
@@ -233,7 +201,6 @@ page 6014466 "NPR Quantity Discount Card"
                     "Quantity Discount Header 2".Modify(true);
                 end;
             until "Quantity Discount Header 2".Next = 0;
-        //+NPK1.0
     end;
 }
 
