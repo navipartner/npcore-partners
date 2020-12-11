@@ -1,12 +1,9 @@
 table 6014439 "NPR Quantity Discount Header"
 {
-    // NPR4.01/JDH/20150309 CASE 201022 corrected Dimension update
-    // NPR5.27/TS/20160809 CASE 248290 Removed fields SalesPerson Filter,Order Due,Delivery week, Valutering and Auto
-    // NPR5.27/TJ/20160926 CASE 248290 Removing unused variables and fields, renaming fields and variables to use standard naming procedures
-
     Caption = 'Multiple Price Header';
     LookupPageID = "NPR Quantity Discount List";
     DataClassification = CustomerContent;
+    DataCaptionFields = "Item No.", "Item Description";
 
     fields
     {
@@ -56,7 +53,7 @@ table 6014439 "NPR Quantity Discount Header"
         }
         field(20; Comment; Boolean)
         {
-            CalcFormula = Exist ("NPR Retail Comment" WHERE("Table ID" = CONST(6014439),
+            CalcFormula = Exist("NPR Retail Comment" WHERE("Table ID" = CONST(6014439),
                                                         "No." = FIELD("Item No."),
                                                         "No. 2" = FIELD("Main No.")));
             Caption = 'Comment';
@@ -82,6 +79,13 @@ table 6014439 "NPR Quantity Discount Header"
         {
             Caption = 'Block Custom Discount';
             DataClassification = CustomerContent;
+        }
+        field(29; "Item Description"; Text[100])
+        {
+            CalcFormula = Lookup(Item.Description WHERE("No." = FIELD("Item No.")));
+            Caption = 'Item Description';
+            Editable = false;
+            FieldClass = FlowField;
         }
         field(316; "Global Dimension 1 Code"; Code[20])
         {
@@ -165,10 +169,7 @@ table 6014439 "NPR Quantity Discount Header"
 
         Date.SetRange("Period Type", Date."Period Type"::Date);
         "Starting Date" := Today;
-        //-NPR5.27
-        //IF DatoRec.FIND('+') THEN
         if Date.FindLast then
-            //+NPR5.27
             "Closing Date" := Date."Period Start";
 
         RecRef.GetTable(Rec);
@@ -198,10 +199,7 @@ table 6014439 "NPR Quantity Discount Header"
     procedure ValidateShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
     begin
         DimMgt.ValidateDimValueCode(FieldNumber, ShortcutDimCode);
-        //-NPR4.01
-        //DimMgt.SaveDefaultDim(DATABASE::Customer,"Main no.",FieldNumber,ShortcutDimCode);
         DimMgt.SaveDefaultDim(DATABASE::"NPR Quantity Discount Header", "Main No.", FieldNumber, ShortcutDimCode);
-        //+NPR4.01
         Modify;
     end;
 
