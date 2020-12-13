@@ -54,6 +54,7 @@ jobs:
 
 - template: YAML/Templates/Job/PopulateSymbolFeeds.yml@scriptsRepo
   parameters:
+    timeoutInMinutes: 180
     scriptsRepo: scriptsRepo
     symbolPackages:
     - name: at #Country
