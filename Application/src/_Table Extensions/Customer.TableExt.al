@@ -68,6 +68,7 @@ tableextension 6014423 "NPR Customer" extends Customer
             Description = 'PN1.00';
             OptionCaption = 'Print,E-mail,OIO,Print and E-Mail';
             OptionMembers = Print,Email,OIO,PrintAndEmail;
+            InitValue = Email;
         }
         field(6014416; "NPR Bill-to Company"; Text[30])
         {
