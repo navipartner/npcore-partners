@@ -120,21 +120,6 @@ codeunit 6014585 "NPR RP Package Handler"
         ManagedPackageMgt.ImportFromBlob(TempBlob);
     end;
 
-    procedure DeployPackageFromGC()
-    var
-        ManagedPackageMgt: Codeunit "NPR Managed Package Mgt.";
-    begin
-        ManagedPackageMgt.AddExpectedTableID(DATABASE::"NPR RP Template Header");
-        ManagedPackageMgt.AddExpectedTableID(DATABASE::"NPR RP Template Line");
-        ManagedPackageMgt.AddExpectedTableID(DATABASE::"NPR RP Data Items");
-        ManagedPackageMgt.AddExpectedTableID(DATABASE::"NPR RP Data Item Links");
-        ManagedPackageMgt.AddExpectedTableID(DATABASE::"NPR RP Data Item Constr.");
-        ManagedPackageMgt.AddExpectedTableID(DATABASE::"NPR RP Data Item Constr. Links");
-        ManagedPackageMgt.AddExpectedTableID(DATABASE::"NPR RP Device Settings");
-        ManagedPackageMgt.AddExpectedTableID(DATABASE::"NPR RP Template Media Info");
-        ManagedPackageMgt.DeployPackageFromGroundControl(DATABASE::"NPR RP Template Header");
-    end;
-
     procedure DeployPackageFromBlobStorage()
     var
         ManagedPackageMgt: Codeunit "NPR Managed Package Mgt.";

@@ -103,72 +103,6 @@ codeunit 6014628 "NPR Managed Package Mgt."
         LoadPackage(Jtoken);
     end;
 
-    procedure DeployPackageFromGroundControl(PrimaryPackageTable: Integer): Boolean
-    var
-        ManagedDependencyMgt: Codeunit "NPR Managed Dependency Mgt.";
-        DepMgtSetup: Record "NPR Dependency Mgt. Setup";
-        JObject: JsonObject;
-        JArray: JsonArray;
-        Jtoken: JsonToken;
-        i: Integer;
-        Package: JsonObject;
-        PackageToken: JsonToken;
-        FilterSpecific: Label '&$filter=Type eq ''%1'' and Name eq ''%2'' and Version eq ''%3''';
-        DataToken: JsonToken;
-        TmpManagedPackageLookup: Record "NPR Managed Package Lookup" temporary;
-        Handled: Boolean;
-    begin
-        ManagedDependencyMgt.GetDependencyMgtSetup(DepMgtSetup);
-        if not DepMgtSetup.Configured then
-            exit(false);
-
-        if not ManagedDependencyMgt.GetJSON(DepMgtSetup, 'ManagedDataPackageList', Jtoken, CreateFilterText(PrimaryPackageTable, DepMgtSetup), false) then
-            exit(false);
-
-        JArray := Jtoken.AsArray();
-        for i := 0 to JArray.Count - 1 do begin
-            JArray.Get(i, PackageToken);
-            Package := PackageToken.AsObject();
-
-            TmpManagedPackageLookup.Index := i;
-            TmpManagedPackageLookup.Name := GetJObjectValueAsText(Package, 'Name');
-            TmpManagedPackageLookup.Version := GetJObjectValueAsText(Package, 'Version');
-            TmpManagedPackageLookup.Description := GetJObjectValueAsText(Package, 'Description');
-            TmpManagedPackageLookup.Status := GetJObjectValueAsText(Package, 'Status');
-            TmpManagedPackageLookup.Tags := GetJObjectValueAsText(Package, 'Tags');
-            TmpManagedPackageLookup.Insert;
-        end;
-
-        if TmpManagedPackageLookup.IsEmpty then
-            exit(false);
-
-        if not (PAGE.RunModal(PAGE::"NPR Managed Package Lookup", TmpManagedPackageLookup) = ACTION::LookupOK) then
-            exit(false);
-
-        JArray.Get(TmpManagedPackageLookup.Index, PackageToken);
-        Package := PackageToken.AsObject();
-
-        if ManagedDependencyMgt.GetJSON(DepMgtSetup, 'ManagedDependency', PackageToken, StrSubstNo(FilterSpecific, GetJObjectValueAsText(Package, 'Type'), GetJObjectValueAsText(Package, 'Name'), GetJObjectValueAsText(Package, 'Version')), true) then
-            if ManagedDependencyMgt.Base64StringToJObject(GetJObjectValueAsText(PackageToken.AsObject(), 'BLOB'), DataToken) then begin
-                OnLoadPackage(Handled, PrimaryPackageTable, DataToken, 2);
-                if Handled then
-                    exit(ManagedDependencyMgt.UpdateLog(PackageToken.AsObject()));
-
-                if LoadPackage(DataToken) then
-                    exit(ManagedDependencyMgt.UpdateLog(PackageToken.AsObject()));
-            end;
-
-        exit(false);
-    end;
-
-    local procedure GetJObjectValueAsText(JObject: JsonObject; TokenKey: Text) JTokenValueText: text
-    var
-        Jtoken: JsonToken;
-    begin
-        if JObject.Get(TokenKey, JToken) then
-            JTokenValueText := Jtoken.AsValue.AsText();
-    end;
-
     procedure DeployPackageFromURL(URL: Text)
     var
         Client: HttpClient;
@@ -330,18 +264,6 @@ codeunit 6014628 "NPR Managed Package Mgt."
         CloseDialog;
 
         exit(true);
-    end;
-
-    local procedure CreateFilterText(PrimaryPackageTable: Integer; var DepMgtSetup: Record "NPR Dependency Mgt. Setup") "Filter": Text
-    var
-        ManagedDependencyMgt: Codeunit "NPR Managed Dependency Mgt.";
-        TypeHelper: Codeunit "Type Helper";
-    begin
-        // If we later want to add some auto-update logic for specific data packages, we will have to expand this filter with company name,
-        // and expand ground control with support for individual companies in its log to as data packages are not targeted at global tables.
-        Filter := StrSubstNo('&$filter=(Service_Tier_Name eq ''%1'') and ', TypeHelper.UriEscapeDataString(ManagedDependencyMgt.GetServerID()));
-        Filter += SelectStr(DepMgtSetup."Accept Statuses" + 1, '(Status eq ''Released'') and ,(Status eq ''Staging'' or Status eq ''Released'') and ,');
-        Filter += StrSubstNo('(Primary_Package_Table eq %1)', PrimaryPackageTable);
     end;
 
     procedure FieldRefByID(var RecRef: RecordRef; ID: Text; var FieldRef: FieldRef): Boolean
