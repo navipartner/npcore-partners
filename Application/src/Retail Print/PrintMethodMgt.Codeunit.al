@@ -49,11 +49,11 @@ codeunit 6014582 "NPR Print Method Mgt."
         end;
     end;
 
-    procedure PrintViaEpsonWebService(PrinterName: Text; SlavePrinterName: Text; PrintBytes: Text; TargetEncoding: TextEncoding; CodePage: Integer)
+    procedure PrintViaEpsonWebService(PrinterName: Text; SlavePrinterName: Text; PrintBytes: Text; TargetEncoding: Text)
     var
         WebPrintMgt: Codeunit "NPR RP Epson Web Print Mgt.";
     begin
-        WebPrintMgt.CreatePrintJob(PrinterName, SlavePrinterName, PrintBytes, TargetEncoding, CodePage);
+        WebPrintMgt.CreatePrintJob(PrinterName, SlavePrinterName, PrintBytes, TargetEncoding);
     end;
 
     procedure PrintViaGoogleCloud(PrinterID: Text; var Stream: DotNet NPRNetMemoryStream; ContentType: Text; ObjectType: Option "Report","Codeunit"; ObjectID: Integer): Boolean
@@ -89,29 +89,35 @@ codeunit 6014582 "NPR Print Method Mgt."
     var
         PrintNodeAPIMgt: Codeunit "NPR PrintNode API Mgt.";
         PrintNodeMgt: Codeunit "NPR PrintNode Mgt.";
+        TempBlob: Codeunit "Temp Blob";
+        OutStr: OutStream;
     begin
-        PrintNodeAPIMgt.SendPDFStream(PrinterID, PdfStream, DocumentDescription, '', PrintNodeMgt.GetPrinterOptions(PrinterID, ObjectType, ObjectID));
+        TempBlob.CreateOutStream(OutStr);
+        CopyStream(OutStr, PdfStream);
+
+        PrintNodeAPIMgt.SendPDFStream(PrinterID, TempBlob, DocumentDescription, '', PrintNodeMgt.GetPrinterOptions(PrinterID, ObjectType, ObjectID));
     end;
 
     procedure PrintViaPrintNodeRaw(PrinterID: Text; PrintBytes: Text; TargetEncoding: Text; ObjectType: Option "Report","Codeunit"; ObjectID: Integer)
     var
         PrintNodeAPIMgt: Codeunit "NPR PrintNode API Mgt.";
         PrintNodeMgt: Codeunit "NPR PrintNode Mgt.";
+        TextEncodingMapper: Codeunit "NPR Text Encoding Mapper";
     begin
-        PrintNodeAPIMgt.SendRawText(PrinterID, PrintBytes, TargetEncoding, '', '', PrintNodeMgt.GetPrinterOptions(PrinterID, ObjectType, ObjectID));
+        PrintNodeAPIMgt.SendRawText(PrinterID, PrintBytes, TextEncodingMapper.EncodingNameToCodePageNumber(TargetEncoding), '', '', PrintNodeMgt.GetPrinterOptions(PrinterID, ObjectType, ObjectID));
     end;
 
-    procedure PrintBytesHTTP(URL: Text; Endpoint: Text; PrintBytes: Text; TargetEncoding: TextEncoding; CodePage: Integer)
+    procedure PrintBytesHTTP(URL: Text; Endpoint: Text; PrintBytes: Text; TargetEncoding: Text)
     var
         MobilePrintMgt: Codeunit "NPR Mobile Print Mgt.";
     begin
-        MobilePrintMgt.PrintJobHTTP(URL, Endpoint, PrintBytes, TargetEncoding, CodePage);
+        MobilePrintMgt.PrintJobHTTP(URL, Endpoint, PrintBytes, TargetEncoding);
     end;
 
-    procedure PrintBytesBluetooth(DeviceName: Text; PrintBytes: Text; TargetEncoding: TextEncoding; CodePage: Integer)
+    procedure PrintBytesBluetooth(DeviceName: Text; PrintBytes: Text; TargetEncoding: Text)
     var
         MobilePrintMgt: Codeunit "NPR Mobile Print Mgt.";
     begin
-        MobilePrintMgt.PrintJobBluetooth(DeviceName, PrintBytes, TargetEncoding, CodePage);
+        MobilePrintMgt.PrintJobBluetooth(DeviceName, PrintBytes, TargetEncoding);
     end;
 }
