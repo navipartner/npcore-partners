@@ -107,19 +107,6 @@ page 6150701 "NPR POS Menus"
                     POSPackageHandler.ImportPOSMenuPackageFromFile();
                 end;
             }
-            action(DeployPackage)
-            {
-                Caption = 'Deploy Package From Ground Control';
-                Image = ImportDatabase;
-                ApplicationArea = All;
-
-                trigger OnAction()
-                var
-                    POSPackageHandler: Codeunit "NPR POS Package Handler";
-                begin
-                    POSPackageHandler.DeployPOSMenuPackageFromGroundControl();
-                end;
-            }
         }
     }
 }
