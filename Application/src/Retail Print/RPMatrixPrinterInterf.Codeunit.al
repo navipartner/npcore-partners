@@ -120,11 +120,6 @@ codeunit 6014546 "NPR RP Matrix Printer Interf."
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnGetTargetEncodingWithCodePage(var TargetEncoding: TextEncoding; var CodePage: Integer)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
     procedure OnPrepareJobForHTTP(var FormattedTargetEncoding: Text; var HTTPEndpoint: Text; var Supported: Boolean)
     begin
     end;

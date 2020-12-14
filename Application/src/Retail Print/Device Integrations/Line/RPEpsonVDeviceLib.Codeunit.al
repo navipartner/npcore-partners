@@ -152,22 +152,16 @@ codeunit 6014543 "NPR RP Epson V Device Lib."
         Width := GetPageWidth(FontFace);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014548, 'OnGetTargetEncodingWithCodePage', '', false, false)]
-    local procedure OnGetTargetEncoding(var TargetEncoding: TextEncoding; var CodePage: Integer)
+    [EventSubscriber(ObjectType::Codeunit, 6014548, 'OnGetTargetEncoding', '', false, false)]
+    local procedure OnGetTargetEncoding(var TargetEncoding: Text)
     begin
         case Encoding of
             Encoding::"Windows-1252":
-                begin
-                    TargetEncoding := TargetEncoding::Windows;
-                    //Hack: iso-8859-1 implements everything between 0-255 without any gaps, which we need for printing logos since all possible byte values need to be represented in the printjob.
-                    //Correct solution would be to build a bytearray instead of string in variable PrintBuffer. Biggest consequence at this moment is the lack of euro sign in iso-8859-1.
-                    CodePage := 28591;
-                end;
+                //Hack: iso-8859-1 implements everything between 0-255 without any gaps, which we need for printing logos since all possible byte values need to be represented in the printjob.
+                //Correct solution would be to build a bytearray instead of string in variable PrintBuffer. Biggest consequence at this moment is the lack of euro sign in iso-8859-1.
+                TargetEncoding := 'iso-8859-1';
             Encoding::"Windows-1256":
-                begin
-                    TargetEncoding := TargetEncoding::Windows;
-                    CodePage := 1256;
-                end;
+                TargetEncoding := 'Windows-1256';
         end;
     end;
 

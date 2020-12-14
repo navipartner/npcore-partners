@@ -4,14 +4,13 @@ codeunit 6014539 "NPR RP Epson Web Print Mgt."
     begin
     end;
 
-    procedure CreatePrintJob(PrinterName: Text[250]; SlavePrinterName: Text[250]; PrintString: Text; TargetEncoding: TextEncoding; CodePage: Integer)
+    procedure CreatePrintJob(PrinterName: Text[250]; SlavePrinterName: Text[250]; PrintString: Text; TargetEncoding: Text)
     var
         WebPrintBuffer: Record "NPR Web Print Buffer";
         Encoding: DotNet NPRNetEncoding;
         ByteArray: DotNet NPRNetArray;
         BitConverter: DotNet NPRNetBitConverter;
         Regex: DotNet NPRNetRegex;
-        Base64Convert: Codeunit "Base64 Convert";
         OutStr: OutStream;
         Hex: Text;
         HexBuffer: Text;
@@ -19,8 +18,11 @@ codeunit 6014539 "NPR RP Epson Web Print Mgt."
         i: Integer;
     begin
         if StrPos(PrinterName, 'EpsonW') > 0 then begin
-            Base64Convert.ToBase64(PrintString, TargetEncoding, CodePage);
-            PrintString := PrintString.Replace('-', '');
+            //Convert PrintString to hex representation (without '0x') of the byte values.
+            Encoding := Encoding.GetEncoding(TargetEncoding);
+            ByteArray := Encoding.GetBytes(PrintString);
+            HexBuffer := BitConverter.ToString(ByteArray);
+            HexBuffer := Regex.Replace(HexBuffer, '-', '');
 
             WebPrintBuffer.Init();
             WebPrintBuffer.Insert();

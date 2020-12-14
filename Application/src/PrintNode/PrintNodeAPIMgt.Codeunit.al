@@ -131,21 +131,23 @@ codeunit 6151220 "NPR PrintNode API Mgt."
         exit(PrintJobId);
     end;
 
-    procedure SendPDFStream(PrinterId: Code[20]; var PdfStream: DotNet NPRNetMemoryStream; Title: Text; SourceDescription: Text; Options: Text)
+    procedure SendPDFStream(PrinterId: Code[20]; var TempBlob: Codeunit "Temp Blob"; Title: Text; SourceDescription: Text; Options: Text)
+    var
+        Base64Convert: Codeunit "Base64 Convert";
+        IStream: InStream;
+        PrintBytes: Text;
     begin
-        SendPrintJob(PrinterId, 1, StreamToBase64Text(PdfStream), Title, SourceDescription, Options, '');
+        TempBlob.CreateInStream(IStream);
+        PrintBytes := Base64Convert.ToBase64(IStream);
+        SendPrintJob(PrinterId, 1, PrintBytes, Title, SourceDescription, Options, '');
     end;
 
-    procedure SendRawText(PrinterId: Code[20]; PrintBytes: Text; TargetEncoding: Text; Title: Text; SourceDescription: Text; Options: Text)
+    procedure SendRawText(PrinterId: Code[20]; PrintBytes: Text; TargetCodePage: Integer; Title: Text; SourceDescription: Text; Options: Text)
     var
-        Convert: DotNet NPRNetConvert;
-        Encoding: DotNet NPRNetEncoding;
-        Base64: Text;
+        Base64Convert: Codeunit "Base64 Convert";
     begin
-        Encoding := Encoding.GetEncoding(TargetEncoding);
-        Base64 := Convert.ToBase64String(Encoding.GetBytes(PrintBytes));
-
-        SendPrintJob(PrinterId, 3, Base64, Title, SourceDescription, Options, '');
+        PrintBytes := Base64Convert.ToBase64(PrintBytes, TextEncoding::Windows, TargetCodePage);
+        SendPrintJob(PrinterId, 3, PrintBytes, Title, SourceDescription, Options, '');
     end;
 
     local procedure BaseUrl(): Text
@@ -167,13 +169,6 @@ codeunit 6151220 "NPR PrintNode API Mgt."
         OStream.WriteText(PrintNodeSetup."API Key" + ':');
         TempBlob.CreateInStream(IStream);
         exit('Basic ' + Base64Convert.ToBase64(IStream));
-    end;
-
-    local procedure StreamToBase64Text(var Stream: DotNet NPRNetMemoryStream): Text
-    var
-        Convert: DotNet NPRNetConvert;
-    begin
-        exit(Convert.ToBase64String(Stream.ToArray()));
     end;
 }
 

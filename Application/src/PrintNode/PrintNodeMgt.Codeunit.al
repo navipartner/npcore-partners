@@ -181,11 +181,11 @@ codeunit 6151221 "NPR PrintNode Mgt."
     [EventSubscriber(ObjectType::Codeunit, 6059767, 'OnManageDocument', '', true, true)]
     local procedure HandleNaviDocsDocument(var IsDocumentHandled: Boolean; ProfileCode: Code[20]; var NaviDocsEntry: Record "NPR NaviDocs Entry"; ReportID: Integer; var WithSuccess: Boolean; var ErrorMessage: Text)
     var
-        OutPDFStream: DotNet NPRNetMemoryStream;
+        TempBlob: Codeunit "Temp Blob";
         PrintNodeAPIMgt: Codeunit "NPR PrintNode API Mgt.";
         RecRef: RecordRef;
         PrinterId: Text;
-        OutPDFStreamVar: Variant;
+        OStream: OutStream;
     begin
         if IsDocumentHandled or (ProfileCode <> NaviDocsHandlingProfileCode) then
             exit;
@@ -199,21 +199,17 @@ codeunit 6151221 "NPR PrintNode Mgt."
             if not RecRef.Get(NaviDocsEntry."Record ID") then
                 ErrorMessage := StrSubstNo(RecordNotFoundErr, NaviDocsEntry."Record ID");
 
-        // GetOutput
         if ErrorMessage = '' then begin
             RecRef.SetRecFilter;
             SetCustomReportLayout(RecRef, ReportID);
-            OutPDFStream := OutPDFStream.MemoryStream();
-            OutPDFStreamVar := OutPDFStream;
-            REPORT.SaveAs(ReportID, '', REPORTFORMAT::Pdf, OutPDFStreamVar, RecRef);
-            if OutPDFStream.Length < 1 then
+            TempBlob.CreateOutStream(OStream);
+            if not Report.SaveAs(ReportID, '', REPORTFORMAT::Pdf, OStream, RecRef) then
                 ErrorMessage := StrSubstNo(NoOutputErr, ReportID);
             ClearCustomReportLayout;
         end;
 
-        //Send to printer
         if ErrorMessage = '' then begin
-            PrintNodeAPIMgt.SendPDFStream(PrinterId, OutPDFStream, NaviDocsEntry."Document Description", '', '');
+            PrintNodeAPIMgt.SendPDFStream(PrinterId, TempBlob, NaviDocsEntry."Document Description", '', '');
         end;
 
         IsDocumentHandled := true;

@@ -150,11 +150,9 @@ codeunit 6014580 "NPR Object Output Mgt."
         PrintBytes: Text;
         TargetEncoding: Text;
         HTTPEndpoint: Text;
-        Encoding: TextEncoding;
         Supported: Boolean;
         Skip: Boolean;
         i: Integer;
-        CodePage: Integer;
     begin
         if NoOfPrints < 1 then
             exit;
@@ -177,9 +175,9 @@ codeunit 6014580 "NPR Object Output Mgt."
             ObjectOutput."Output Type"::"Epson Web":
                 begin
                     Printer.OnGetPrintBytes(PrintBytes);
-                    Printer.OnGetTargetEncodingWithCodePage(Encoding, CodePage);
+                    Printer.OnGetTargetEncoding(TargetEncoding);
                     for i := 1 to NoOfPrints do
-                        PrintMethodMgt.PrintViaEpsonWebService(ObjectOutput."Output Path", '', PrintBytes, Encoding, CodePage);
+                        PrintMethodMgt.PrintViaEpsonWebService(ObjectOutput."Output Path", '', PrintBytes, TargetEncoding);
                 end;
 
             ObjectOutput."Output Type"::HTTP:
@@ -188,9 +186,9 @@ codeunit 6014580 "NPR Object Output Mgt."
                     if not Supported then
                         Error(Error_UnsupportedOutput, Format(ObjectOutput."Output Type"::HTTP), TemplateCode);
                     Printer.OnGetPrintBytes(PrintBytes);
-                    Printer.OnGetTargetEncodingWithCodePage(Encoding, CodePage);
+                    Printer.OnGetTargetEncoding(TargetEncoding);
                     for i := 1 to NoOfPrints do
-                        PrintMethodMgt.PrintBytesHTTP(ObjectOutput."Output Path", HTTPEndpoint, PrintBytes, Encoding, CodePage);
+                        PrintMethodMgt.PrintBytesHTTP(ObjectOutput."Output Path", HTTPEndpoint, PrintBytes, TargetEncoding);
                 end;
 
             ObjectOutput."Output Type"::Bluetooth:
@@ -199,9 +197,9 @@ codeunit 6014580 "NPR Object Output Mgt."
                     if not Supported then
                         Error(Error_UnsupportedOutput, Format(ObjectOutput."Output Type"::Bluetooth), TemplateCode);
                     Printer.OnGetPrintBytes(PrintBytes);
-                    Printer.OnGetTargetEncodingWithCodePage(Encoding, CodePage);
+                    Printer.OnGetTargetEncoding(TargetEncoding);
                     for i := 1 to NoOfPrints do
-                        PrintMethodMgt.PrintBytesBluetooth(ObjectOutput."Output Path", PrintBytes, Encoding, CodePage);
+                        PrintMethodMgt.PrintBytesBluetooth(ObjectOutput."Output Path", PrintBytes, TargetEncoding);
                 end;
             ObjectOutput."Output Type"::"PrintNode Raw":
                 begin
@@ -221,11 +219,9 @@ codeunit 6014580 "NPR Object Output Mgt."
         PrintBytes: Text;
         TargetEncoding: Text;
         HTTPEndpoint: Text;
-        Encoding: TextEncoding;
         Skip: Boolean;
         Supported: Boolean;
         i: Integer;
-        CodePage: Integer;
     begin
         if NoOfPrints < 1 then
             exit;
@@ -248,9 +244,9 @@ codeunit 6014580 "NPR Object Output Mgt."
             ObjectOutput."Output Type"::"Epson Web":
                 begin
                     Printer.OnGetPrintBytes(PrintBytes);
-                    Printer.OnGetTargetEncodingWithCodePage(Encoding, CodePage);
+                    Printer.OnGetTargetEncoding(TargetEncoding);
                     for i := 1 to NoOfPrints do
-                        PrintMethodMgt.PrintViaEpsonWebService(ObjectOutput."Output Path", '', PrintBytes, Encoding, CodePage);
+                        PrintMethodMgt.PrintViaEpsonWebService(ObjectOutput."Output Path", '', PrintBytes, TargetEncoding);
                 end;
 
             ObjectOutput."Output Type"::HTTP:
@@ -259,9 +255,9 @@ codeunit 6014580 "NPR Object Output Mgt."
                     if not Supported then
                         Error(Error_UnsupportedOutput, Format(ObjectOutput."Output Type"::HTTP), TemplateCode);
                     Printer.OnGetPrintBytes(PrintBytes);
-                    Printer.OnGetTargetEncodingWithCodePage(Encoding, CodePage);
+                    Printer.OnGetTargetEncoding(TargetEncoding);
                     for i := 1 to NoOfPrints do
-                        PrintMethodMgt.PrintBytesHTTP(ObjectOutput."Output Path", HTTPEndpoint, PrintBytes, Encoding, CodePage);
+                        PrintMethodMgt.PrintBytesHTTP(ObjectOutput."Output Path", HTTPEndpoint, PrintBytes, TargetEncoding);
                 end;
 
             ObjectOutput."Output Type"::Bluetooth:
@@ -270,9 +266,9 @@ codeunit 6014580 "NPR Object Output Mgt."
                     if not Supported then
                         Error(Error_UnsupportedOutput, Format(ObjectOutput."Output Type"::Bluetooth), TemplateCode);
                     Printer.OnGetPrintBytes(PrintBytes);
-                    Printer.OnGetTargetEncodingWithCodePage(Encoding, CodePage);
+                    Printer.OnGetTargetEncoding(TargetEncoding);
                     for i := 1 to NoOfPrints do
-                        PrintMethodMgt.PrintBytesBluetooth(ObjectOutput."Output Path", PrintBytes, Encoding, CodePage);
+                        PrintMethodMgt.PrintBytesBluetooth(ObjectOutput."Output Path", PrintBytes, TargetEncoding);
                 end;
             ObjectOutput."Output Type"::"PrintNode Raw":
                 begin
