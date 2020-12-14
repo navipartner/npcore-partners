@@ -1,16 +1,5 @@
 page 6059789 "NPR E-mail Setup"
 {
-    // PN1.00/MH/20140730  NAV-AddOn: PDF2NAV
-    //   - Refactored module from the "Mail And Document Handler" Module.
-    //   - This Page contains the Setups for PDF2NAV.
-    //   - Actions contains functions for Creating Document Specific E-mail Templates.
-    // PN1.03/MH/20140814  NAV-AddOn: PDF2NAV
-    //   - Added Service Module
-    // PN1.04/MH/20140819  NAV-AddOn: PDF2NAV
-    //   - Added Audit Roll
-    // PN1.08/MHA/20151214  CASE 228859 Added field 55 "Username" and 60 "Password"
-    // PN1.09/MHA/20160115  CASE 231503 Added field 52 "Mail Server Port" and 65 "Enable Ssl"
-
     Caption = 'E-mail Setup';
     DeleteAllowed = false;
     InsertAllowed = false;
@@ -24,40 +13,40 @@ page 6059789 "NPR E-mail Setup"
         {
             group(General)
             {
-                field("Mail Server"; "Mail Server")
+                field("Mail Server"; Rec."Mail Server")
                 {
                     ApplicationArea = All;
                     ShowMandatory = true;
                 }
-                field("Mail Server Port"; "Mail Server Port")
+                field("Mail Server Port"; Rec."Mail Server Port")
                 {
                     ApplicationArea = All;
                 }
-                field("Enable Ssl"; "Enable Ssl")
+                field("Enable Ssl"; Rec."Enable Ssl")
                 {
                     ApplicationArea = All;
                 }
-                field(Username; Username)
+                field(Username; Rec.Username)
                 {
                     ApplicationArea = All;
                 }
-                field(Password; Password)
+                field(Password; Rec.Password)
                 {
                     ApplicationArea = All;
                 }
-                field("From E-mail Address"; "From E-mail Address")
+                field("From E-mail Address"; Rec."From E-mail Address")
                 {
                     ApplicationArea = All;
                     ShowMandatory = true;
                 }
-                field("From Name"; "From Name")
+                field("From Name"; Rec."From Name")
                 {
                     ApplicationArea = All;
                 }
             }
             group(NAS)
             {
-                field("NAS Folder"; "NAS Folder")
+                field("NAS Folder"; Rec."NAS Folder")
                 {
                     ApplicationArea = All;
                 }
@@ -80,12 +69,9 @@ page 6059789 "NPR E-mail Setup"
                     EmailDocumentMgt: Codeunit "NPR E-mail Doc. Mgt.";
                     EmailTemplateCount: Integer;
                 begin
-                    //-PN1.08
-                    //EmailTemplateCount := EmailMgt.CreateEmailTemplate();
                     EmailTemplateCount := EmailDocumentMgt.CreateEmailTemplates();
-                    //+PN1.08
                     if EmailTemplateCount > 0 then
-                        Message(StrSubstNo(Text001, EmailTemplateCount));
+                        Message(StrSubstNo(NoOfEmailTemplatesCreatedMsg, EmailTemplateCount));
                 end;
             }
             group(CreateEmailTemplateGroup)
@@ -102,11 +88,8 @@ page 6059789 "NPR E-mail Setup"
                         EmailDocumentMgt: Codeunit "NPR E-mail Doc. Mgt.";
                         EmailTemplateCode: Code[20];
                     begin
-                        //-PN1.08
-                        //EmailTemplateCode := EmailMgt.CreateEmailTemplate(EmailMgt."TemplateType.SalesQuote");
                         EmailTemplateCode := EmailDocumentMgt.CreateEmailTemplate(EmailDocumentMgt."TemplateType.SalesQuote");
-                        //+PN1.08
-                        Message(StrSubstNo(Text002, EmailTemplateCode));
+                        Message(StrSubstNo(EMailTemplateCreatedMsg, EmailTemplateCode));
                     end;
                 }
                 action(CreateSalesOrderEmailTemplate)
@@ -120,11 +103,8 @@ page 6059789 "NPR E-mail Setup"
                         EmailDocumentMgt: Codeunit "NPR E-mail Doc. Mgt.";
                         EmailTemplateCode: Code[20];
                     begin
-                        //-PN1.08
-                        //EmailTemplateCode := EmailMgt.CreateEmailTemplate(EmailMgt."TemplateType.SalesOrder");
                         EmailTemplateCode := EmailDocumentMgt.CreateEmailTemplate(EmailDocumentMgt."TemplateType.SalesOrder");
-                        Message(StrSubstNo(Text002, EmailTemplateCode));
-                        //+PN1.08
+                        Message(StrSubstNo(EMailTemplateCreatedMsg, EmailTemplateCode));
                     end;
                 }
                 action(CreateSalesShptEmailTemplate)
@@ -138,11 +118,8 @@ page 6059789 "NPR E-mail Setup"
                         EmailDocumentMgt: Codeunit "NPR E-mail Doc. Mgt.";
                         EmailTemplateCode: Code[20];
                     begin
-                        //-PN1.08
-                        //EmailTemplateCode := EmailMgt.CreateEmailTemplate(EmailMgt."TemplateType.SalesShpt");
                         EmailTemplateCode := EmailDocumentMgt.CreateEmailTemplate(EmailDocumentMgt."TemplateType.SalesShpt");
-                        Message(StrSubstNo(Text002, EmailTemplateCode));
-                        //+PN1.08
+                        Message(StrSubstNo(EMailTemplateCreatedMsg, EmailTemplateCode));
                     end;
                 }
                 action(CreateSalesInvEmailTemplate)
@@ -156,11 +133,8 @@ page 6059789 "NPR E-mail Setup"
                         EmailDocumentMgt: Codeunit "NPR E-mail Doc. Mgt.";
                         EmailTemplateCode: Code[20];
                     begin
-                        //-PN1.08
-                        //EmailTemplateCode := EmailMgt.CreateEmailTemplate(EmailMgt."TemplateType.SalesInv");
                         EmailTemplateCode := EmailDocumentMgt.CreateEmailTemplate(EmailDocumentMgt."TemplateType.SalesInv");
-                        Message(StrSubstNo(Text002, EmailTemplateCode));
-                        //+PN1.08
+                        Message(StrSubstNo(EMailTemplateCreatedMsg, EmailTemplateCode));
                     end;
                 }
                 action(CreateSalesCrMemoEmailTemplate)
@@ -174,11 +148,8 @@ page 6059789 "NPR E-mail Setup"
                         EmailDocumentMgt: Codeunit "NPR E-mail Doc. Mgt.";
                         EmailTemplateCode: Code[20];
                     begin
-                        //-PN1.08
-                        //EmailTemplateCode := EmailMgt.CreateEmailTemplate(EmailMgt."TemplateType.SalesCrMemo");
                         EmailTemplateCode := EmailDocumentMgt.CreateEmailTemplate(EmailDocumentMgt."TemplateType.SalesCrMemo");
-                        Message(StrSubstNo(Text002, EmailTemplateCode));
-                        //+PN1.08
+                        Message(StrSubstNo(EMailTemplateCreatedMsg, EmailTemplateCode));
                     end;
                 }
                 action(CreatePurchQuoteEmailTemplate)
@@ -192,11 +163,8 @@ page 6059789 "NPR E-mail Setup"
                         EmailDocumentMgt: Codeunit "NPR E-mail Doc. Mgt.";
                         EmailTemplateCode: Code[20];
                     begin
-                        //-PN1.08
-                        //EmailTemplateCode := EmailMgt.CreateEmailTemplate(EmailMgt."TemplateType.PurchQuote");
                         EmailTemplateCode := EmailDocumentMgt.CreateEmailTemplate(EmailDocumentMgt."TemplateType.PurchQuote");
-                        Message(StrSubstNo(Text002, EmailTemplateCode));
-                        //+PN1.08
+                        Message(StrSubstNo(EMailTemplateCreatedMsg, EmailTemplateCode));
                     end;
                 }
                 action(CreatePurchOrderEmailTemplate)
@@ -210,11 +178,8 @@ page 6059789 "NPR E-mail Setup"
                         EmailDocumentMgt: Codeunit "NPR E-mail Doc. Mgt.";
                         EmailTemplateCode: Code[20];
                     begin
-                        //-PN1.08
-                        //EmailTemplateCode := EmailMgt.CreateEmailTemplate(EmailMgt."TemplateType.PurchOrder");
                         EmailTemplateCode := EmailDocumentMgt.CreateEmailTemplate(EmailDocumentMgt."TemplateType.PurchOrder");
-                        Message(StrSubstNo(Text002, EmailTemplateCode));
-                        //+PN1.08
+                        Message(StrSubstNo(EMailTemplateCreatedMsg, EmailTemplateCode));
                     end;
                 }
                 action(CreatePurchRcptEmailTemplate)
@@ -228,11 +193,8 @@ page 6059789 "NPR E-mail Setup"
                         EmailDocumentMgt: Codeunit "NPR E-mail Doc. Mgt.";
                         EmailTemplateCode: Code[20];
                     begin
-                        //-PN1.08
-                        //EmailTemplateCode := EmailMgt.CreateEmailTemplate(EmailMgt."TemplateType.PurchRcpt");
                         EmailTemplateCode := EmailDocumentMgt.CreateEmailTemplate(EmailDocumentMgt."TemplateType.PurchRcpt");
-                        Message(StrSubstNo(Text002, EmailTemplateCode));
-                        //+PN1.08
+                        Message(StrSubstNo(EMailTemplateCreatedMsg, EmailTemplateCode));
                     end;
                 }
                 action(CreatePurchInvEmailTemplate)
@@ -246,11 +208,8 @@ page 6059789 "NPR E-mail Setup"
                         EmailDocumentMgt: Codeunit "NPR E-mail Doc. Mgt.";
                         EmailTemplateCode: Code[20];
                     begin
-                        //-PN1.08
-                        //EmailTemplateCode := EmailMgt.CreateEmailTemplate(EmailMgt."TemplateType.PurchInv");
                         EmailTemplateCode := EmailDocumentMgt.CreateEmailTemplate(EmailDocumentMgt."TemplateType.PurchInv");
-                        Message(StrSubstNo(Text002, EmailTemplateCode));
-                        //+PN1.08
+                        Message(StrSubstNo(EMailTemplateCreatedMsg, EmailTemplateCode));
                     end;
                 }
                 action(CreatePurchCrMemoEmailTemplate)
@@ -264,11 +223,8 @@ page 6059789 "NPR E-mail Setup"
                         EmailDocumentMgt: Codeunit "NPR E-mail Doc. Mgt.";
                         EmailTemplateCode: Code[20];
                     begin
-                        //-PN1.08
-                        //EmailTemplateCode := EmailMgt.CreateEmailTemplate(EmailMgt."TemplateType.PurchCrMemo");
                         EmailTemplateCode := EmailDocumentMgt.CreateEmailTemplate(EmailDocumentMgt."TemplateType.PurchCrMemo");
-                        Message(StrSubstNo(Text002, EmailTemplateCode));
-                        //+PN1.08
+                        Message(StrSubstNo(EMailTemplateCreatedMsg, EmailTemplateCode));
                     end;
                 }
                 action(CreateReminderEmailTemplate)
@@ -282,11 +238,8 @@ page 6059789 "NPR E-mail Setup"
                         EmailDocumentMgt: Codeunit "NPR E-mail Doc. Mgt.";
                         EmailTemplateCode: Code[20];
                     begin
-                        //-PN1.08
-                        //EmailTemplateCode := EmailMgt.CreateEmailTemplate(EmailMgt."TemplateType.Reminder");
                         EmailTemplateCode := EmailDocumentMgt.CreateEmailTemplate(EmailDocumentMgt."TemplateType.Reminder");
-                        Message(StrSubstNo(Text002, EmailTemplateCode));
-                        //+PN1.08
+                        Message(StrSubstNo(EMailTemplateCreatedMsg, EmailTemplateCode));
                     end;
                 }
                 action(CreateChargeMemoEmailTemplate)
@@ -300,11 +253,8 @@ page 6059789 "NPR E-mail Setup"
                         EmailDocumentMgt: Codeunit "NPR E-mail Doc. Mgt.";
                         EmailTemplateCode: Code[20];
                     begin
-                        //-PN1.08
-                        //EmailTemplateCode := EmailMgt.CreateEmailTemplate(EmailMgt."TemplateType.ChargeMemo");
                         EmailTemplateCode := EmailDocumentMgt.CreateEmailTemplate(EmailDocumentMgt."TemplateType.ChargeMemo");
-                        Message(StrSubstNo(Text002, EmailTemplateCode));
-                        //+PN1.08
+                        Message(StrSubstNo(EMailTemplateCreatedMsg, EmailTemplateCode));
                     end;
                 }
                 action(CreateStatementEmailTemplate)
@@ -318,11 +268,8 @@ page 6059789 "NPR E-mail Setup"
                         EmailDocumentMgt: Codeunit "NPR E-mail Doc. Mgt.";
                         EmailTemplateCode: Code[20];
                     begin
-                        //-PN1.08
-                        //EmailTemplateCode := EmailMgt.CreateEmailTemplate(EmailMgt."TemplateType.Statement");
                         EmailTemplateCode := EmailDocumentMgt.CreateEmailTemplate(EmailDocumentMgt."TemplateType.Statement");
-                        Message(StrSubstNo(Text002, EmailTemplateCode));
-                        //+PN1.08
+                        Message(StrSubstNo(EMailTemplateCreatedMsg, EmailTemplateCode));
                     end;
                 }
                 action(CreateServQuoteEmailTemplate)
@@ -336,11 +283,8 @@ page 6059789 "NPR E-mail Setup"
                         EmailDocumentMgt: Codeunit "NPR E-mail Doc. Mgt.";
                         EmailTemplateCode: Code[20];
                     begin
-                        //-PN1.08
-                        //EmailTemplateCode := EmailMgt.CreateEmailTemplate(EmailMgt."TemplateType.ServQuote");
                         EmailTemplateCode := EmailDocumentMgt.CreateEmailTemplate(EmailDocumentMgt."TemplateType.ServQuote");
-                        Message(StrSubstNo(Text002, EmailTemplateCode));
-                        //+PN1.08
+                        Message(StrSubstNo(EMailTemplateCreatedMsg, EmailTemplateCode));
                     end;
                 }
                 action(CreateServOrderEmailTemplate)
@@ -354,11 +298,8 @@ page 6059789 "NPR E-mail Setup"
                         EmailDocumentMgt: Codeunit "NPR E-mail Doc. Mgt.";
                         EmailTemplateCode: Code[20];
                     begin
-                        //-PN1.08
-                        //EmailTemplateCode := EmailMgt.CreateEmailTemplate(EmailMgt."TemplateType.ServOrder");
                         EmailTemplateCode := EmailDocumentMgt.CreateEmailTemplate(EmailDocumentMgt."TemplateType.ServOrder");
-                        Message(StrSubstNo(Text002, EmailTemplateCode));
-                        //+PN1.08
+                        Message(StrSubstNo(EMailTemplateCreatedMsg, EmailTemplateCode));
                     end;
                 }
                 action(CreateServShptEmailTemplate)
@@ -372,11 +313,8 @@ page 6059789 "NPR E-mail Setup"
                         EmailDocumentMgt: Codeunit "NPR E-mail Doc. Mgt.";
                         EmailTemplateCode: Code[20];
                     begin
-                        //-PN1.08
-                        //EmailTemplateCode := EmailMgt.CreateEmailTemplate(EmailMgt."TemplateType.ServShpt");
                         EmailTemplateCode := EmailDocumentMgt.CreateEmailTemplate(EmailDocumentMgt."TemplateType.ServShpt");
-                        Message(StrSubstNo(Text002, EmailTemplateCode));
-                        //+PN1.08
+                        Message(StrSubstNo(EMailTemplateCreatedMsg, EmailTemplateCode));
                     end;
                 }
                 action(CreateServInvEmailTemplate)
@@ -390,18 +328,15 @@ page 6059789 "NPR E-mail Setup"
                         EmailDocumentMgt: Codeunit "NPR E-mail Doc. Mgt.";
                         EmailTemplateCode: Code[20];
                     begin
-                        //-PN1.08
-                        //EmailTemplateCode := EmailMgt.CreateEmailTemplate(EmailMgt."TemplateType.ServInv");
                         EmailTemplateCode := EmailDocumentMgt.CreateEmailTemplate(EmailDocumentMgt."TemplateType.ServInv");
-                        Message(StrSubstNo(Text002, EmailTemplateCode));
-                        //+PN1.08
+                        Message(StrSubstNo(EMailTemplateCreatedMsg, EmailTemplateCode));
                     end;
                 }
                 action(CreateAuditRollEmailTemplate)
                 {
                     Caption = 'Sales Ticket';
                     Image = NewOrder;
-                    Visible = AuditRollExists;
+                    Visible = POSEntryExists;
                     ApplicationArea = All;
 
                     trigger OnAction()
@@ -409,11 +344,8 @@ page 6059789 "NPR E-mail Setup"
                         EmailDocumentMgt: Codeunit "NPR E-mail Doc. Mgt.";
                         EmailTemplateCode: Code[20];
                     begin
-                        //-PN1.08
-                        //EmailTemplateCode := EmailMgt.CreateEmailTemplate(EmailMgt."TemplateType.AuditRoll");
-                        EmailTemplateCode := EmailDocumentMgt.CreateEmailTemplate(EmailDocumentMgt."TemplateType.AuditRoll");
-                        Message(StrSubstNo(Text002, EmailTemplateCode));
-                        //+PN1.08
+                        EmailTemplateCode := EmailDocumentMgt.CreateEmailTemplate(EmailDocumentMgt."TemplateType.POSEntry");
+                        Message(StrSubstNo(EMailTemplateCreatedMsg, EmailTemplateCode));
                     end;
                 }
                 action(CreateCreditVoucherEmailTemplate)
@@ -428,10 +360,8 @@ page 6059789 "NPR E-mail Setup"
                         EmailDocumentMgt: Codeunit "NPR E-mail Doc. Mgt.";
                         EmailTemplateCode: Code[20];
                     begin
-                        //-PN1.08
                         EmailTemplateCode := EmailDocumentMgt.CreateEmailTemplate(EmailDocumentMgt."TemplateType.CreditVoucher");
-                        Message(StrSubstNo(Text002, EmailTemplateCode));
-                        //+PN1.08
+                        Message(StrSubstNo(EMailTemplateCreatedMsg, EmailTemplateCode));
                     end;
                 }
                 action(CreateGiftVoucherEmailTemplate)
@@ -446,10 +376,8 @@ page 6059789 "NPR E-mail Setup"
                         EmailDocumentMgt: Codeunit "NPR E-mail Doc. Mgt.";
                         EmailTemplateCode: Code[20];
                     begin
-                        //-PN1.08
                         EmailTemplateCode := EmailDocumentMgt.CreateEmailTemplate(EmailDocumentMgt."TemplateType.GiftVoucher");
-                        Message(StrSubstNo(Text002, EmailTemplateCode));
-                        //+PN1.08
+                        Message(StrSubstNo(EMailTemplateCreatedMsg, EmailTemplateCode));
                     end;
                 }
             }
@@ -458,19 +386,17 @@ page 6059789 "NPR E-mail Setup"
 
     trigger OnOpenPage()
     begin
-        Reset;
-        if not Get then
-            Insert;
+        Rec.Reset();
+        if not Rec.Get() then
+            Rec.Insert();
 
-        //-PN1.08
         SetVisible();
-        //+PN1.08
     end;
 
     var
-        Text001: Label '%1 E-mail Templates Created';
-        Text002: Label 'E-mail Template %1 Created';
-        AuditRollExists: Boolean;
+        NoOfEmailTemplatesCreatedMsg: Label '%1 E-mail Templates Created', Comment = '%1=EmailDocumentMgt.CreateEmailTemplates()';
+        EMailTemplateCreatedMsg: Label 'E-mail Template %1 Created', Comment = '%1=EmailDocumentMgt.CreateEmailTemplate(EmailDocumentMgt."TemplateType....")';
+        POSEntryExists: Boolean;
         CreditVoucherExists: Boolean;
         GiftVoucherExists: Boolean;
 
@@ -478,11 +404,9 @@ page 6059789 "NPR E-mail Setup"
     var
         EmailRetailMgt: Codeunit "NPR E-mail Retail Mgt.";
     begin
-        //-PN1.08
-        AuditRollExists := EmailRetailMgt.AuditRollExists();
+        POSEntryExists := EmailRetailMgt.POSEntryExists();
         CreditVoucherExists := EmailRetailMgt.CreditVoucherExists();
         GiftVoucherExists := EmailRetailMgt.GiftVoucherExists();
-        //+PN1.08
     end;
 }
 
