@@ -9,12 +9,13 @@ codeunit 6014584 "NPR Mobile Print Mgt."
         Err_InvalidClientType: Label 'Can not print through mobile add-in on %1';
         ERROR_SESSION: Label 'Critical Error: Session object could not be retrieved.';
 
-    procedure PrintJobHTTP(Address: Text; Endpoint: Text; PrintBytes: Text; TargetEncoding: TextEncoding; CodePage: Integer)
+    procedure PrintJobHTTP(Address: Text; Endpoint: Text; PrintBytes: Text; TargetEncoding: Text)
     var
         Convert: Codeunit "Base64 Convert";
+        TextEncodingMapper: Codeunit "NPR Text Encoding Mapper";
         Base64: Text;
     begin
-        Base64 := Convert.ToBase64(PrintBytes, TargetEncoding, CodePage);
+        Base64 := Convert.ToBase64(PrintBytes, TextEncoding::Windows, TextEncodingMapper.EncodingNameToCodePageNumber(TargetEncoding));
         PrintJobHTTPInternal(Address, Endpoint, Base64);
     end;
 
@@ -54,12 +55,13 @@ codeunit 6014584 "NPR Mobile Print Mgt."
         Clear(ActiveModelID);
     end;
 
-    procedure PrintJobBluetooth(DeviceName: Text; PrintBytes: Text; TargetEncoding: TextEncoding; CodePage: Integer)
+    procedure PrintJobBluetooth(DeviceName: Text; PrintBytes: Text; TargetEncoding: Text)
     var
         Convert: Codeunit "Base64 Convert";
+        TextEncodingMapper: Codeunit "NPR Text Encoding Mapper";
         Base64: Text;
     begin
-        Base64 := Convert.ToBase64(PrintBytes, TargetEncoding, CodePage);
+        Base64 := Convert.ToBase64(PrintBytes, TextEncoding::Windows, TextEncodingMapper.EncodingNameToCodePageNumber(TargetEncoding));
         PrintJobBluetoothInternal(DeviceName, Base64);
     end;
 
