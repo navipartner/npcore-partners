@@ -1,11 +1,5 @@
 table 6014468 "NPR E-mail Setup"
 {
-    // PN1.00/MH/20140730  NAV-AddOn: PDF2NAV
-    //   - Refactored module from the "Mail And Document Handler" Module.
-    //   - This Table contains the Setups for PDF2NAV.
-    // PN1.08/MHA/20151214  CASE 228859 Added field 55 "Username" and 60 "Password"
-    // PN1.09/MHA/20160115  CASE 231503 Added field 52 "Mail Server Port" and 65 "Enable Ssl"
-
     Caption = 'E-mail Setup';
     DataClassification = CustomerContent;
 

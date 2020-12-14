@@ -1,9 +1,5 @@
 codeunit 6014450 "NPR E-mail Management"
 {
-    trigger OnRun()
-    begin
-    end;
-
     var
         Text001: Label 'Enter recipient''s e-mail address:';
         Text002: Label 'E-mail has been sent.';
@@ -515,6 +511,11 @@ codeunit 6014450 "NPR E-mail Management"
     begin
     end;
 
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterGetReportIDEvent(RecRef: RecordRef; var ReportID: Integer)
+    begin
+    end;
+
     procedure GetReportIDFromRecRef(RecRef: RecordRef) ReportID: Integer
     var
         EmailTemplateHeader: Record "NPR E-mail Template Header";
@@ -525,6 +526,7 @@ codeunit 6014450 "NPR E-mail Management"
         CustomReportSelection: Record "Custom Report Selection";
     begin
         ReportID := 0;
+
         GetReportIDEvent(RecRef, ReportID);
 
         if ReportID = 0 then
@@ -532,7 +534,7 @@ codeunit 6014450 "NPR E-mail Management"
                 ReportID := EmailTemplateHeader."Report ID";
 
         if ReportID > 0 then begin
-            case RecRef.Number of
+            case RecRef.Number() of
                 DATABASE::"Sales Cr.Memo Header":
                     GetCustomEmailForReportID(DATABASE::Customer, Format(RecRef.Field(4).Value), ReportSelections.Usage::"S.Cr.Memo", EmailTemplateHeader."Report ID");
                 DATABASE::"Sales Header":
@@ -550,8 +552,10 @@ codeunit 6014450 "NPR E-mail Management"
                 DATABASE::"Sales Invoice Header":
                     GetCustomEmailForReportID(DATABASE::Customer, Format(RecRef.Field(4).Value), ReportSelections.Usage::"S.Invoice", EmailTemplateHeader."Report ID");
             end;
-            exit(ReportID);
         end;
+        OnAfterGetReportIDEvent(RecRef, ReportID);
+
+        exit(ReportID);
 
         Clear(ReportSelections);
         ReportSelections.SetFilter("Report ID", '<>%1', 0);
