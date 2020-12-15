@@ -1,7 +1,5 @@
 table 6151396 "NPR CS Phys. Inv. Handl."
 {
-    // NPR5.51/CLVA/20190812  CASE 362173 Object created
-
     Caption = 'CS Phys. Inventory Handling';
     DataClassification = CustomerContent;
 
@@ -64,14 +62,14 @@ table 6151396 "NPR CS Phys. Inv. Handl."
         }
         field(17; "Item Description"; Text[50])
         {
-            CalcFormula = Lookup (Item.Description WHERE("No." = FIELD("Item No.")));
+            CalcFormula = Lookup(Item.Description WHERE("No." = FIELD("Item No.")));
             Caption = 'Item Description';
             Editable = false;
             FieldClass = FlowField;
         }
         field(18; "Variant Description"; Text[50])
         {
-            CalcFormula = Lookup ("Item Variant".Description WHERE(Code = FIELD("Variant Code"),
+            CalcFormula = Lookup("Item Variant".Description WHERE(Code = FIELD("Variant Code"),
                                                                    "Item No." = FIELD("Item No.")));
             Caption = 'Variant Description';
             Editable = false;
@@ -82,22 +80,6 @@ table 6151396 "NPR CS Phys. Inv. Handl."
             Caption = 'Location Code';
             DataClassification = CustomerContent;
             TableRelation = Location;
-
-            trigger OnValidate()
-            begin
-                // IF "Location Code" <> xRec."Location Code" THEN BEGIN
-                //  "Bin Code" := '';
-                //  IF CurrFieldNo <> 0 THEN
-                //    WMSManagement.CheckItemJnlLineFieldChange(Rec,xRec,FIELDCAPTION("Location Code"));
-                //  IF ("Location Code" <> '') AND ("Item No." <> '') THEN BEGIN
-                //    GetLocation("Location Code");
-                //    IF Location."Bin Mandatory" AND NOT Location."Directed Put-away and Pick" THEN
-                //      WMSManagement.GetDefaultBin("Item No.","Variant Code","Location Code","Bin Code");
-                //  END;
-                // END;
-                //
-                // VALIDATE("Unit of Measure Code");
-            end;
         }
         field(20; "Bin Code"; Code[20])
         {

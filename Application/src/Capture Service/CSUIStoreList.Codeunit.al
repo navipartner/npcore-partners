@@ -1,7 +1,5 @@
 codeunit 6151354 "NPR CS UI Store List"
 {
-    // NPR5.52/CLVA/20190906  CASE 365967 Object created - NP Capture Service
-
     TableNo = "NPR CS UI Header";
 
     trigger OnRun()
@@ -10,7 +8,7 @@ codeunit 6151354 "NPR CS UI Store List"
     begin
         MiniformMgmt.Initialize(
           CSUIHeader, Rec, DOMxmlin, ReturnedNode,
-          RootNode, XMLDOMMgt, CSCommunication, CSUserId,
+          RootNode, CSCommunication, CSUserId,
           CurrentCode, StackCode, WhseEmpId, LocationFilter, CSSessionId);
 
         if Code <> CurrentCode then
@@ -24,12 +22,11 @@ codeunit 6151354 "NPR CS UI Store List"
     var
         CSUIHeader: Record "NPR CS UI Header";
         CSUIHeader2: Record "NPR CS UI Header";
-        XMLDOMMgt: Codeunit "XML DOM Management";
         CSCommunication: Codeunit "NPR CS Communication";
         CSManagement: Codeunit "NPR CS Management";
-        ReturnedNode: DotNet NPRNetXmlNode;
-        DOMxmlin: DotNet "NPRNetXmlDocument";
-        RootNode: DotNet NPRNetXmlNode;
+        ReturnedNode: XmlNode;
+        DOMxmlin: XmlDocument;
+        RootNode: XmlNode;
         TextValue: Text[250];
         CSUserId: Text[250];
         WhseEmpId: Text[250];
@@ -58,8 +55,8 @@ codeunit 6151354 "NPR CS UI Store List"
         POSStore: Record "NPR POS Store";
         Barcode: Text;
     begin
-        if XMLDOMMgt.FindNode(RootNode, 'Header/Input', ReturnedNode) then
-            TextValue := ReturnedNode.InnerText
+        if RootNode.AsXmlAttribute().SelectSingleNode('Header/Input', ReturnedNode) then
+            TextValue := ReturnedNode.AsXmlElement().InnerText
         else
             Error(Text006);
 

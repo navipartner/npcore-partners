@@ -1,11 +1,5 @@
 codeunit 6151392 "NPR CS UI Pick Inv. List"
 {
-    // NPR5.43/CLVA/20180607 CASE 315503 Object created
-    // NPR5.43/NPKNAV/20180629  CASE 304872 Transport NPR5.43 - 29 June 2018
-    // NPR5.48/CLVA  /20181109  CASE 335606 Added filter by "CS User"
-    // NPR5.50/CLVA  /20190514  CASE 352719 Added support for selection by barcode
-    // NPR5.52/CLVA  /20190904  CASE 365967 Added filter to support Job Queue Posting
-
     TableNo = "NPR CS UI Header";
 
     trigger OnRun()
@@ -14,7 +8,7 @@ codeunit 6151392 "NPR CS UI Pick Inv. List"
     begin
         MiniformMgmt.Initialize(
           MiniformHeader, Rec, DOMxmlin, ReturnedNode,
-          RootNode, XMLDOMMgt, CSCommunication, CSUserId,
+          RootNode, CSCommunication, CSUserId,
           CurrentCode, StackCode, WhseEmpId, LocationFilter, CSSessionId);
 
         if Code <> CurrentCode then
@@ -28,12 +22,11 @@ codeunit 6151392 "NPR CS UI Pick Inv. List"
     var
         MiniformHeader: Record "NPR CS UI Header";
         MiniformHeader2: Record "NPR CS UI Header";
-        XMLDOMMgt: Codeunit "XML DOM Management";
         CSCommunication: Codeunit "NPR CS Communication";
         CSMgt: Codeunit "NPR CS Management";
-        ReturnedNode: DotNet NPRNetXmlNode;
-        DOMxmlin: DotNet "NPRNetXmlDocument";
-        RootNode: DotNet NPRNetXmlNode;
+        ReturnedNode: XmlNode;
+        DOMxmlin: XmlDocument;
+        RootNode: XmlNode;
         TextValue: Text[250];
         CSUserId: Text[250];
         WhseEmpId: Text[250];
@@ -60,14 +53,13 @@ codeunit 6151392 "NPR CS UI Pick Inv. List"
         Barcode: Text;
         TmpWhseActivityHeader: Record "Warehouse Activity Header";
     begin
-        if XMLDOMMgt.FindNode(RootNode, 'Header/Input', ReturnedNode) then
-            TextValue := ReturnedNode.InnerText
+        if RootNode.AsXmlAttribute().SelectSingleNode('Header/Input', ReturnedNode) then
+            TextValue := ReturnedNode.AsXmlElement().InnerText
         else
             Error(Text006);
 
         Evaluate(TableNo, CSCommunication.GetNodeAttribute(ReturnedNode, 'TableNo'));
         RecRef.Open(TableNo);
-        //-NPR5.50 [352719]
         Barcode := CSCommunication.GetNodeAttribute(ReturnedNode, 'Barcode');
         if Barcode <> '' then begin
             if StrLen(Barcode) > MaxStrLen(WhseActivityHeader."No.") then
@@ -82,15 +74,12 @@ codeunit 6151392 "NPR CS UI Pick Inv. List"
             RecId := TmpWhseActivityHeader.RecordId;
             CSCommunication.SetNodeAttribute(ReturnedNode, 'RecordID', Format(RecId));
         end else
-            //+NPR5.50 [352719]
             Evaluate(RecId, CSCommunication.GetNodeAttribute(ReturnedNode, 'RecordID'));
         if RecRef.Get(RecId) then begin
             RecRef.SetTable(WhseActivityHeader);
             WhseActivityHeader.SetCurrentKey(Type, "No.");
             WhseActivityHeader.SetRange(Type, WhseActivityHeader.Type);
-            //-NPR5.48 [335606]
             if CSCommunication.SetDocumentFilter(CSUserId) then
-                //+NPR5.48 [335606]
                 WhseActivityHeader.SetRange("Assigned User ID", WhseEmpId);
             WhseActivityHeader.SetFilter("Location Code", LocationFilter);
             RecRef.GetTable(WhseActivityHeader);
@@ -143,17 +132,13 @@ codeunit 6151392 "NPR CS UI Pick Inv. List"
         CSPostingBuffer: Record "NPR CS Posting Buffer";
         CSSetup: Record "NPR CS Setup";
     begin
-        //-NPR5.52 [365967]
         SelectLatestVersion;
-        //+NPR5.52 [365967]
 
         with WhseActivityHeader do begin
             Reset;
             SetRange(Type, Type::"Invt. Pick");
             if WhseEmpId <> '' then begin
-                //-NPR5.48 [335606]
                 if CSCommunication.SetDocumentFilter(CSUserId) then
-                    //+NPR5.48 [335606]
                     SetRange("Assigned User ID", WhseEmpId);
                 SetFilter("Location Code", LocationFilter);
             end;
@@ -167,7 +152,6 @@ codeunit 6151392 "NPR CS UI Pick Inv. List"
                 MiniformHeader2.SaveXMLin(DOMxmlin);
                 CODEUNIT.Run(MiniformHeader2."Handling Codeunit", MiniformHeader2);
             end else begin
-                //-NPR5.52 [365967]
                 CSSetup.Get;
                 if CSSetup."Post with Job Queue" then begin
                     TempWhseActivityHeader.Reset;
@@ -201,14 +185,11 @@ codeunit 6151392 "NPR CS UI Pick Inv. List"
                         CODEUNIT.Run(MiniformHeader2."Handling Codeunit", MiniformHeader2);
                     end;
                 end else begin
-                    //+NPR5.52 [365967]
                     RecRef.GetTable(WhseActivityHeader);
                     CSCommunication.SetRecRef(RecRef);
                     ActiveInputField := 1;
                     SendForm(ActiveInputField);
-                    //-NPR5.52 [365967]
                 end;
-                //+NPR5.52 [365967]
             end;
         end;
     end;

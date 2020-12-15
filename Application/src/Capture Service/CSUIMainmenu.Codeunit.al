@@ -1,8 +1,5 @@
 codeunit 6151377 "NPR CS UI Mainmenu"
 {
-    // NPR5.41/CLVA/20180313 CASE 306407 Object created - NP Capture Service
-    // NPR5.43/CLVA/20180604 CASE 304872 Added ESC functionality to selection lists
-
     TableNo = "NPR CS UI Header";
 
     trigger OnRun()
@@ -11,7 +8,7 @@ codeunit 6151377 "NPR CS UI Mainmenu"
     begin
         MiniformMgt.Initialize(
           MiniformHeader, Rec, DOMxmlin, ReturnedNode,
-          RootNode, XMLDOMMgt, CSCommunication, CSUserId,
+          RootNode, CSCommunication, CSUserId,
           CurrentCode, StackCode, WhseEmpId, LocationFilter, CSSessionId);
 
         if Code <> CurrentCode then
@@ -25,12 +22,11 @@ codeunit 6151377 "NPR CS UI Mainmenu"
     var
         MiniformHeader: Record "NPR CS UI Header";
         MiniformHeader2: Record "NPR CS UI Header";
-        XMLDOMMgt: Codeunit "XML DOM Management";
         CSCommunication: Codeunit "NPR CS Communication";
         CSManagement: Codeunit "NPR CS Management";
-        ReturnedNode: DotNet NPRNetXmlNode;
-        RootNode: DotNet NPRNetXmlNode;
-        DOMxmlin: DotNet "NPRNetXmlDocument";
+        ReturnedNode: XmlNode;
+        RootNode: XmlNode;
+        DOMxmlin: XmlDocument;
         TextValue: Text[250];
         CSUserId: Text[250];
         WhseEmpId: Text[250];
@@ -45,12 +41,11 @@ codeunit 6151377 "NPR CS UI Mainmenu"
     var
         FuncGroup: Record "NPR CS UI Function Group";
     begin
-        if XMLDOMMgt.FindNode(RootNode, 'Header/Input', ReturnedNode) then
-            TextValue := ReturnedNode.InnerText
+        if RootNode.AsXmlAttribute().SelectSingleNode('Header/Input', ReturnedNode) then
+            TextValue := ReturnedNode.AsXmlElement().InnerText
         else
             Error(Text005);
 
-        //-NPR5.43 [304872]
         FuncGroup.KeyDef := CSCommunication.GetFunctionKey(MiniformHeader.Code, TextValue);
 
         case FuncGroup.KeyDef of
@@ -60,7 +55,6 @@ codeunit 6151377 "NPR CS UI Mainmenu"
                     exit;
                 end;
         end;
-        //+NPR5.43 [304872]
 
         CSCommunication.GetCallUI(MiniformHeader.Code, MiniformHeader2, TextValue);
         CSCommunication.IncreaseStack(DOMxmlin, MiniformHeader.Code);
@@ -70,10 +64,7 @@ codeunit 6151377 "NPR CS UI Mainmenu"
 
     local procedure SendForm(ActiveInputField: Integer)
     begin
-        //-NPR5.43 [304872]
-        //CSCommunication.EncodeUI(MiniformHeader,'',DOMxmlin,ActiveInputField,'',CSUserId);
         CSCommunication.EncodeUI(MiniformHeader, StackCode, DOMxmlin, ActiveInputField, Remark, CSUserId);
-        //+NPR5.43 [304872]
         CSCommunication.GetReturnXML(DOMxmlin);
         CSManagement.SendXMLReply(DOMxmlin);
     end;

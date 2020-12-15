@@ -1,8 +1,5 @@
 codeunit 6151375 "NPR CS UI Logon"
 {
-    // NPR5.41/CLVA/20180313 CASE 306407 Object created - NP Capture Service
-    // NPR5.43/NPKNAV/20180629  CASE 304872 Transport NPR5.43 - 29 June 2018
-
     TableNo = "NPR CS UI Header";
 
     trigger OnRun()
@@ -11,7 +8,7 @@ codeunit 6151375 "NPR CS UI Logon"
     begin
         MiniformMgmt.Initialize(
           MiniformHeader, Rec, DOMxmlin, ReturnedNode,
-          RootNode, XMLDOMMgt, CSCommunication, CSUserId,
+          RootNode, CSCommunication, CSUserId,
           CurrentCode, StackCode, WhseEmpId, LocationFilter, CSSessionId);
 
         if CSCommunication.GetNodeAttribute(ReturnedNode, 'RunReturn') = '0' then begin
@@ -29,13 +26,12 @@ codeunit 6151375 "NPR CS UI Logon"
         MiniformHeader: Record "NPR CS UI Header";
         MiniformHeader2: Record "NPR CS UI Header";
         CSUser: Record "NPR CS User";
-        XMLDOMMgt: Codeunit "XML DOM Management";
         CSCommunication: Codeunit "NPR CS Communication";
         CSManagement: Codeunit "NPR CS Management";
         RecRef: RecordRef;
-        DOMxmlin: DotNet "NPRNetXmlDocument";
-        ReturnedNode: DotNet NPRNetXmlNode;
-        RootNode: DotNet NPRNetXmlNode;
+        DOMxmlin: XmlDocument;
+        ReturnedNode: XmlNode;
+        RootNode: XmlNode;
         CSUserId: Text[250];
         Remark: Text[250];
         WhseEmpId: Text[250];
@@ -58,8 +54,8 @@ codeunit 6151375 "NPR CS UI Logon"
         FldNo: Integer;
         TextValue: Text[250];
     begin
-        if XMLDOMMgt.FindNode(RootNode, 'Header/Input', ReturnedNode) then
-            TextValue := ReturnedNode.InnerText
+        if RootNode.AsXmlAttribute().SelectSingleNode('Header/Input', ReturnedNode) then
+            TextValue := ReturnedNode.AsXmlElement().InnerText
         else
             Error(Text003);
 
@@ -175,7 +171,7 @@ codeunit 6151375 "NPR CS UI Logon"
     begin
         CSCommunication.EncodeUI(MiniformHeader, StackCode, DOMxmlin, InputField, Remark, CSUserId);
         CSCommunication.GetReturnXML(DOMxmlin);
-        DebugTxt := DOMxmlin.OuterXml;
+        DOMxmlin.WriteTo(DebugTxt);
         CSManagement.SendXMLReply(DOMxmlin);
     end;
 }

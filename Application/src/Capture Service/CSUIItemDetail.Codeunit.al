@@ -1,8 +1,5 @@
 codeunit 6151378 "NPR CS UI Item Detail"
 {
-    // NPR5.41/CLVA/20180313 CASE 306407 Object created - NP Capture Service
-    // NPR5.43/NPKNAV/20180629  CASE 304872 Transport NPR5.43 - 29 June 2018
-
     TableNo = "NPR CS UI Header";
 
     trigger OnRun()
@@ -11,7 +8,7 @@ codeunit 6151378 "NPR CS UI Item Detail"
     begin
         MiniformMgmt.Initialize(
           MiniformHeader, Rec, DOMxmlin, ReturnedNode,
-          RootNode, XMLDOMMgt, CSCommunication, CSUserId,
+          RootNode, CSCommunication, CSUserId,
           CurrentCode, StackCode, WhseEmpId, LocationFilter, CSSessionId);
 
         if Code <> CurrentCode then
@@ -24,13 +21,12 @@ codeunit 6151378 "NPR CS UI Item Detail"
 
     var
         MiniformHeader: Record "NPR CS UI Header";
-        XMLDOMMgt: Codeunit "XML DOM Management";
         CSCommunication: Codeunit "NPR CS Communication";
         CSManagement: Codeunit "NPR CS Management";
         RecRef: RecordRef;
-        DOMxmlin: DotNet "NPRNetXmlDocument";
-        ReturnedNode: DotNet NPRNetXmlNode;
-        RootNode: DotNet NPRNetXmlNode;
+        DOMxmlin: XmlDocument;
+        ReturnedNode: XmlNode;
+        RootNode: XmlNode;
         CSUserId: Text[250];
         Remark: Text[250];
         WhseEmpId: Text[250];
@@ -66,7 +62,7 @@ codeunit 6151378 "NPR CS UI Item Detail"
         RecId: RecordID;
         TableNo: Integer;
     begin
-        XMLDOMMgt.FindNode(RootNode, 'Header/Input', ReturnedNode);
+        RootNode.AsXmlElement().SelectSingleNode('Header/Input', ReturnedNode);
 
         if CSCommunication.GetNodeAttribute(ReturnedNode, 'LookupKey') = '' then
             Error(Text012);

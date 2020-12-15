@@ -1,10 +1,5 @@
 codeunit 6151379 "NPR CS UI Receipts List"
 {
-    // NPR5.41/CLVA/20180313 CASE 306407 Object created - NP Capture Service
-    // NPR5.43/NPKNAV/20180629  CASE 304872 Transport NPR5.43 - 29 June 2018
-    // NPR5.48/CLVA  /20181109  CASE 335606 Added filter by "CS User" and handling warehouse types
-    // NPR5.50/CLVA  /20190514  CASE 352719 Added support for selection by barcode
-
     TableNo = "NPR CS UI Header";
 
     trigger OnRun()
@@ -13,7 +8,7 @@ codeunit 6151379 "NPR CS UI Receipts List"
     begin
         MiniformMgmt.Initialize(
           MiniformHeader, Rec, DOMxmlin, ReturnedNode,
-          RootNode, XMLDOMMgt, CSCommunication, CSUserId,
+          RootNode, CSCommunication, CSUserId,
           CurrentCode, StackCode, WhseEmpId, LocationFilter, CSSessionId);
 
         if Code <> CurrentCode then
@@ -27,12 +22,11 @@ codeunit 6151379 "NPR CS UI Receipts List"
     var
         MiniformHeader: Record "NPR CS UI Header";
         MiniformHeader2: Record "NPR CS UI Header";
-        XMLDOMMgt: Codeunit "XML DOM Management";
         CSCommunication: Codeunit "NPR CS Communication";
         CSManagement: Codeunit "NPR CS Management";
-        ReturnedNode: DotNet NPRNetXmlNode;
-        DOMxmlin: DotNet "NPRNetXmlDocument";
-        RootNode: DotNet NPRNetXmlNode;
+        ReturnedNode: XmlNode;
+        DOMxmlin: XmlDocument;
+        RootNode: XmlNode;
         TextValue: Text[250];
         CSUserId: Text[250];
         WhseEmpId: Text[250];
@@ -63,14 +57,13 @@ codeunit 6151379 "NPR CS UI Receipts List"
         WhseEmployee: Record "Warehouse Employee";
         Location: Record Location;
     begin
-        if XMLDOMMgt.FindNode(RootNode, 'Header/Input', ReturnedNode) then
-            TextValue := ReturnedNode.InnerText
+        if RootNode.AsXmlAttribute().SelectSingleNode('Header/Input', ReturnedNode) then
+            TextValue := ReturnedNode.AsXmlElement().InnerText
         else
             Error(Text006);
 
         Evaluate(TableNo, CSCommunication.GetNodeAttribute(ReturnedNode, 'TableNo'));
         RecRef.Open(TableNo);
-        //-NPR5.50 [352719]
         Barcode := CSCommunication.GetNodeAttribute(ReturnedNode, 'Barcode');
         if Barcode <> '' then begin
             if StrLen(Barcode) > MaxStrLen(TmpWhseReceiptHeader."No.") then
@@ -112,13 +105,10 @@ codeunit 6151379 "NPR CS UI Receipts List"
             RecId := TmpWhseReceiptHeader.RecordId;
             CSCommunication.SetNodeAttribute(ReturnedNode, 'RecordID', Format(RecId));
         end else
-            //+NPR5.50 [352719]
             Evaluate(RecId, CSCommunication.GetNodeAttribute(ReturnedNode, 'RecordID'));
         if RecRef.Get(RecId) then begin
             RecRef.SetTable(WhseReceiptHeader);
-            //-NPR5.48 [335606]
             if CSCommunication.SetDocumentFilter(CSUserId) then
-                //+NPR5.48 [335606]
                 WhseReceiptHeader.SetRange("Assigned User ID", WhseEmpId);
             WhseReceiptHeader.SetFilter("Location Code", LocationFilter);
             RecRef.GetTable(WhseReceiptHeader);
@@ -173,11 +163,8 @@ codeunit 6151379 "NPR CS UI Receipts List"
         with WhseReceiptHeader do begin
             Reset;
             if WhseEmpId <> '' then begin
-                //-NPR5.48 [335606]
                 if CSCommunication.SetDocumentFilter(CSUserId) then
-                    //+NPR5.48 [335606]
                     SetRange("Assigned User ID", WhseEmpId);
-                //-NPR5.48 [335606]
                 if MiniformHeader."Warehouse Type" = MiniformHeader."Warehouse Type"::"Advanced (Bins)" then begin
 
                     if LocationFilter <> '' then begin
@@ -206,7 +193,6 @@ codeunit 6151379 "NPR CS UI Receipts List"
                     end else
                         SetFilter("Location Code", LocationFilter);
                 end else
-                    //+NPR5.48 [335606]
                     SetFilter("Location Code", LocationFilter);
             end;
             if not FindFirst then begin
@@ -234,4 +220,3 @@ codeunit 6151379 "NPR CS UI Receipts List"
         CSManagement.SendXMLReply(DOMxmlin);
     end;
 }
-

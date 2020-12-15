@@ -1,9 +1,5 @@
 codeunit 6151380 "NPR CS UI Whse. Rcpt. Line"
 {
-    // NPR5.41/CLVA/20180313 CASE 306407 Object created - NP Capture Service
-    // NPR5.43/NPKNAV/20180629  CASE 304872 Transport NPR5.43 - 29 June 2018
-    // NPR5.51/CLVA/20190612 CASE 357577 Added posting date functionality
-
     TableNo = "NPR CS UI Header";
 
     trigger OnRun()
@@ -12,7 +8,7 @@ codeunit 6151380 "NPR CS UI Whse. Rcpt. Line"
     begin
         MiniformMgmt.Initialize(
           MiniformHeader, Rec, DOMxmlin, ReturnedNode,
-          RootNode, XMLDOMMgt, CSCommunication, CSUserId,
+          RootNode, CSCommunication, CSUserId,
           CurrentCode, StackCode, WhseEmpId, LocationFilter, CSSessionId);
 
         if Code <> CurrentCode then
@@ -25,13 +21,12 @@ codeunit 6151380 "NPR CS UI Whse. Rcpt. Line"
 
     var
         MiniformHeader: Record "NPR CS UI Header";
-        XMLDOMMgt: Codeunit "XML DOM Management";
         CSCommunication: Codeunit "NPR CS Communication";
         CSManagement: Codeunit "NPR CS Management";
         RecRef: RecordRef;
-        DOMxmlin: DotNet "NPRNetXmlDocument";
-        ReturnedNode: DotNet NPRNetXmlNode;
-        RootNode: DotNet NPRNetXmlNode;
+        DOMxmlin: XmlDocument;
+        ReturnedNode: XmlNode;
+        RootNode: XmlNode;
         CSUserId: Text[250];
         Remark: Text[250];
         WhseEmpId: Text[250];
@@ -71,8 +66,8 @@ codeunit 6151380 "NPR CS UI Whse. Rcpt. Line"
         VariantCode: Code[10];
         ResolvingTable: Integer;
     begin
-        if XMLDOMMgt.FindNode(RootNode, 'Header/Input', ReturnedNode) then
-            TextValue := ReturnedNode.InnerText
+        if RootNode.AsXmlAttribute().SelectSingleNode('Header/Input', ReturnedNode) then
+            TextValue := ReturnedNode.AsXmlElement().InnerText
         else
             Error(Text006);
 
@@ -159,13 +154,10 @@ codeunit 6151380 "NPR CS UI Whse. Rcpt. Line"
         Remark := '';
         WhseReceiptLine.SetRange("No.", WhseReceiptHeader."No.");
         if WhseReceiptLine.FindSet then begin
-
-            //-NPR5.51 [357577]
             if MiniformHeader."Update Posting Date" then begin
                 WhseReceiptHeader.Validate("Posting Date", Today);
                 WhseReceiptHeader.Modify(true);
             end;
-            //+NPR5.51 [357577]
 
             repeat
                 WhsePostReceipt.Run(WhseReceiptLine);
@@ -184,7 +176,7 @@ codeunit 6151380 "NPR CS UI Whse. Rcpt. Line"
         TableNo: Integer;
         Lookup: Integer;
     begin
-        XMLDOMMgt.FindNode(RootNode, 'Header/Input', ReturnedNode);
+        RootNode.SelectSingleNode('Header/Input', ReturnedNode);
 
         Evaluate(TableNo, CSCommunication.GetNodeAttribute(ReturnedNode, 'TableNo'));
         RecRef.Open(TableNo);
@@ -205,28 +197,34 @@ codeunit 6151380 "NPR CS UI Whse. Rcpt. Line"
 
     local procedure SendForm(InputField: Integer)
     var
-        Records: DotNet NPRNetXmlElement;
+        Records: XmlElement;
+        RootElement: XmlElement;
     begin
         // Prepare Miniform
         CSCommunication.EncodeUI(MiniformHeader, StackCode, DOMxmlin, InputField, Remark, CSUserId);
         CSCommunication.GetReturnXML(DOMxmlin);
 
+        DOMxmlin.GetRoot(RootElement);
         if AddSummarize(Records) then
-            DOMxmlin.DocumentElement.AppendChild(Records);
+            RootElement.Add(Records);
 
         CSManagement.SendXMLReply(DOMxmlin);
     end;
 
-    local procedure AddAttribute(var NewChild: DotNet NPRNetXmlNode; AttribName: Text[250]; AttribValue: Text[250])
+    local procedure AddAttribute(var NewChild: XmlNode; AttribName: Text[250]; AttribValue: Text[250])
     begin
-        if XMLDOMMgt.AddAttribute(NewChild, AttribName, AttribValue) > 0 then
-            Error(Text002, AttribName);
+        NewChild.AsXmlElement().SetAttribute(AttribName, AttribValue);
     end;
 
-    local procedure AddSummarize(var Records: DotNet NPRNetXmlElement): Boolean
+    local procedure AddAttribute(var NewChild: XmlElement; AttribName: Text[250]; AttribValue: Text[250])
+    begin
+        NewChild.SetAttribute(AttribName, AttribValue);
+    end;
+
+    local procedure AddSummarize(var Records: XmlElement): Boolean
     var
-        "Record": DotNet NPRNetXmlElement;
-        Line: DotNet NPRNetXmlElement;
+        RecordElement: XmlElement;
+        Line: XmlElement;
         WhseReceiptHeader: Record "Warehouse Receipt Header";
         WhseReceiptLine: Record "Warehouse Receipt Line";
         Indicator: Text;
@@ -235,9 +233,9 @@ codeunit 6151380 "NPR CS UI Whse. Rcpt. Line"
         RecRef.SetTable(WhseReceiptHeader);
         WhseReceiptLine.SetRange("No.", WhseReceiptHeader."No.");
         if WhseReceiptLine.FindSet then begin
-            Records := DOMxmlin.CreateElement('Records');
+            Records := XmlElement.Create('Records');
             repeat
-                Record := DOMxmlin.CreateElement('Record');
+                RecordElement := XmlElement.Create('Record');
 
                 if (WhseReceiptLine."Qty. to Receive" < WhseReceiptLine."Qty. Outstanding") then
                     Indicator := 'minus'
@@ -247,49 +245,43 @@ codeunit 6151380 "NPR CS UI Whse. Rcpt. Line"
                     else
                         Indicator := 'plus';
 
-                Line := DOMxmlin.CreateElement('Line');
+                Line := XmlElement.Create('Line', '',
+                    StrSubstNo(Text015, WhseReceiptLine."Qty. to Receive", WhseReceiptLine."Qty. Outstanding",
+                        WhseReceiptLine."Item No.", WhseReceiptLine.Description));
                 AddAttribute(Line, 'Descrip', WhseReceiptLine.FieldCaption(Description));
                 AddAttribute(Line, 'Indicator', Indicator);
                 AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                Line.InnerText := StrSubstNo(Text015, WhseReceiptLine."Qty. to Receive", WhseReceiptLine."Qty. Outstanding", WhseReceiptLine."Item No.", WhseReceiptLine.Description);
-                Record.AppendChild(Line);
+                RecordElement.Add(Line);
 
-                Line := DOMxmlin.CreateElement('Line');
+                Line := XmlElement.Create('Line', '', WhseReceiptLine.Description);
                 AddAttribute(Line, 'Descrip', WhseReceiptLine.FieldCaption(Description));
                 AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                Line.InnerText := WhseReceiptLine.Description;
-                Record.AppendChild(Line);
+                RecordElement.Add(Line);
 
-                Line := DOMxmlin.CreateElement('Line');
+                Line := XmlElement.Create('Line', '', Format(WhseReceiptLine."Source Document"));
                 AddAttribute(Line, 'Descrip', WhseReceiptLine.FieldCaption("Source Document"));
                 AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                Line.InnerText := Format(WhseReceiptLine."Source Document");
-                Record.AppendChild(Line);
+                RecordElement.Add(Line);
 
-                Line := DOMxmlin.CreateElement('Line');
+                Line := XmlElement.Create('Line', '', WhseReceiptLine."Source No.");
                 AddAttribute(Line, 'Descrip', WhseReceiptLine.FieldCaption("Source No."));
                 AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                Line.InnerText := WhseReceiptLine."Source No.";
-                Record.AppendChild(Line);
+                RecordElement.Add(Line);
 
-                Line := DOMxmlin.CreateElement('Line');
+                Line := XmlElement.Create('Line', '', WhseReceiptLine."Unit of Measure Code");
                 AddAttribute(Line, 'Descrip', WhseReceiptLine.FieldCaption("Unit of Measure Code"));
                 AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                Line.InnerText := WhseReceiptLine."Unit of Measure Code";
-                Record.AppendChild(Line);
+                RecordElement.Add(Line);
 
-                Line := DOMxmlin.CreateElement('Line');
+                Line := XmlElement.Create('Line', '', WhseReceiptLine."Qty. per Unit of Measure");
                 AddAttribute(Line, 'Descrip', WhseReceiptLine.FieldCaption("Qty. per Unit of Measure"));
                 AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                Line.InnerText := Format(WhseReceiptLine."Qty. per Unit of Measure");
-                Record.AppendChild(Line);
-                Records.AppendChild(Record);
+                RecordElement.Add(Line);
+
+                Records.Add(RecordElement);
             until WhseReceiptLine.Next = 0;
             exit(true);
         end else
             exit(false);
     end;
-
-
 }
-

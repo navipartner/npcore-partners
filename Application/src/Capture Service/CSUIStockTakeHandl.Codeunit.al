@@ -1,13 +1,5 @@
 codeunit 6151386 "NPR CS UI StockTake Handl."
 {
-    // NPR5.41/NPKNAV/20180427  CASE 306407 Transport NPR5.41 - 27 April 2018
-    // NPR5.43/CLVA/20180511 CASE 307239 Added show/hide invalid barcode alert on device
-    // NPR5.43/CLVA/20180604 CASE 304872 Added previous value to qty
-    // NPR5.44/CLVA/20180719 CASE 315503 Added functionality to support defaults from last record
-    // NPR5.47/CLVA/20181026 CASE 307282 Added support for Rfid tags
-    // NPR5.48/CLVA/20181109 CASE 335606 Handling data transfer
-    // NPR5.51/CLVA/20190625 CASE 359375 Added Stock-Take transfer handling
-
     TableNo = "NPR CS UI Header";
 
     trigger OnRun()
@@ -16,7 +8,7 @@ codeunit 6151386 "NPR CS UI StockTake Handl."
     begin
         MiniformMgmt.Initialize(
           CSUIHeader, Rec, DOMxmlin, ReturnedNode,
-          RootNode, XMLDOMMgt, CSCommunication, CSUserId,
+          RootNode, CSCommunication, CSUserId,
           CurrentCode, StackCode, WhseEmpId, LocationFilter, CSSessionId);
 
         if Code <> CurrentCode then
@@ -29,13 +21,12 @@ codeunit 6151386 "NPR CS UI StockTake Handl."
 
     var
         CSUIHeader: Record "NPR CS UI Header";
-        XMLDOMMgt: Codeunit "XML DOM Management";
         CSCommunication: Codeunit "NPR CS Communication";
         CSMgt: Codeunit "NPR CS Management";
         RecRef: RecordRef;
-        DOMxmlin: DotNet "NPRNetXmlDocument";
-        ReturnedNode: DotNet NPRNetXmlNode;
-        RootNode: DotNet NPRNetXmlNode;
+        DOMxmlin: XmlDocument;
+        ReturnedNode: XmlNode;
+        RootNode: XmlNode;
         CSUserId: Text[250];
         Remark: Text[250];
         WhseEmpId: Text[250];
@@ -82,8 +73,8 @@ codeunit 6151386 "NPR CS UI StockTake Handl."
         Separator: DotNet NPRNetString;
         Value: Text;
     begin
-        if XMLDOMMgt.FindNode(RootNode, 'Header/Input', ReturnedNode) then
-            TextValue := ReturnedNode.InnerText
+        if RootNode.AsXmlAttribute().SelectSingleNode('Header/Input', ReturnedNode) then
+            TextValue := ReturnedNode.AsXmlElement().InnerText
         else
             Error(Text006);
 
@@ -99,13 +90,10 @@ codeunit 6151386 "NPR CS UI StockTake Handl."
             exit;
         end;
 
-        //-NPR5.47 [307282]
-        //FuncGroup.KeyDef := CSCommunication.GetFunctionKey(CSUIHeader.Code,TextValue);
         if StrLen(TextValue) < 250 then
             FuncGroup.KeyDef := CSCommunication.GetFunctionKey(CSUIHeader.Code, TextValue)
         else
             FuncGroup.KeyDef := FuncGroup.KeyDef::Input;
-        //+NPR5.47 [307282]
 
         ActiveInputField := 1;
 
@@ -232,7 +220,7 @@ codeunit 6151386 "NPR CS UI StockTake Handl."
         RecId: RecordID;
         TableNo: Integer;
     begin
-        XMLDOMMgt.FindNode(RootNode, 'Header/Input', ReturnedNode);
+        RootNode.AsXmlElement().SelectSingleNode('Header/Input', ReturnedNode);
 
         Evaluate(TableNo, CSCommunication.GetNodeAttribute(ReturnedNode, 'TableNo'));
         Evaluate(RecId, CSCommunication.GetNodeAttribute(ReturnedNode, 'RecordID'));
@@ -259,19 +247,21 @@ codeunit 6151386 "NPR CS UI StockTake Handl."
 
     local procedure SendForm(InputField: Integer)
     var
-        Records: DotNet NPRNetXmlElement;
+        Records: XmlElement;
+        RootElement: XmlElement;
         CSSetup: Record "NPR CS Setup";
     begin
         CSCommunication.EncodeUI(CSUIHeader, StackCode, DOMxmlin, InputField, Remark, CSUserId);
         CSCommunication.GetReturnXML(DOMxmlin);
 
         CSSetup.Get;
+        DOMxmlin.GetRoot(RootElement);
         if CSSetup."Aggregate Stock-Take Summarize" then begin
             if AddAggSummarize(Records) then
-                DOMxmlin.DocumentElement.AppendChild(Records);
+                RootElement.Add(Records);
         end else
             if AddSummarize(Records) then
-                DOMxmlin.DocumentElement.AppendChild(Records);
+                RootElement.Add(Records);
 
         CSMgt.SendXMLReply(DOMxmlin);
     end;
@@ -352,17 +342,11 @@ codeunit 6151386 "NPR CS UI StockTake Handl."
         CSStockTakeCounting."Created By" := UserId;
         CSStockTakeCounting.Created := CurrentDateTime;
 
-        //-NPR5.44 [315503]
         if CSUIHeader.Get(CurrentCode) then begin
             if CSUIHeader."Set defaults from last record" then begin
-                //+NPR5.44 [315503]
-                //-NPR5.43 [304872]
                 CSStockTakeCounting.Qty := NewCSStockTakeCounting.Qty;
-                //+NPR5.43 [304872]
-                //-NPR5.44 [315503]
             end;
         end;
-        //+NPR5.44 [315503]
 
         RecRefByVariant.GetTable(RecordVariant);
 
@@ -401,10 +385,8 @@ codeunit 6151386 "NPR CS UI StockTake Handl."
             CSStockTakeCounting."Item No." := ItemNo;
             CSStockTakeCounting."Variant Code" := VariantCode;
         end else begin
-            //-NPR5.43
             CSSetup.Get;
             if CSSetup."Error On Invalid Barcode" then
-                //+NPR5.43
                 Remark := StrSubstNo(Text010, CSStockTakeCounting.Barcode);
         end;
 
@@ -424,16 +406,20 @@ codeunit 6151386 "NPR CS UI StockTake Handl."
         CSStockTakeCounting.DeleteAll(true);
     end;
 
-    local procedure AddAttribute(var NewChild: DotNet NPRNetXmlNode; AttribName: Text[250]; AttribValue: Text[250])
+    local procedure AddAttribute(var NewChild: XmlNode; AttribName: Text[250]; AttribValue: Text[250])
     begin
-        if XMLDOMMgt.AddAttribute(NewChild, AttribName, AttribValue) > 0 then
-            Error(Text002, AttribName);
+        NewChild.AsXmlElement().SetAttribute(AttribName, AttribValue);
     end;
 
-    local procedure AddSummarize(var Records: DotNet NPRNetXmlElement): Boolean
+    local procedure AddAttribute(var NewChild: XmlElement; AttribName: Text[250]; AttribValue: Text[250])
+    begin
+        NewChild.SetAttribute(AttribName, AttribValue);
+    end;
+
+    local procedure AddSummarize(var Records: XmlElement): Boolean
     var
-        "Record": DotNet NPRNetXmlElement;
-        Line: DotNet NPRNetXmlElement;
+        RecordElement: XmlElement;
+        Line: XmlElement;
         Indicator: Text;
         LineType: Option TEXT,BUTTON;
         CurrRecordID: RecordID;
@@ -445,9 +431,9 @@ codeunit 6151386 "NPR CS UI StockTake Handl."
         SummarizeCounting.SetRange(Handled, true);
         SummarizeCounting.SetRange("Transferred to Worksheet", false);
         if SummarizeCounting.FindSet then begin
-            Records := DOMxmlin.CreateElement('Records');
+            Records := XmlElement.Create('Records');
             repeat
-                Record := DOMxmlin.CreateElement('Record');
+                RecordElement := XmlElement.Create('Record');
 
                 SummarizeCounting.CalcFields("Item Description", "Variant Description");
 
@@ -459,63 +445,61 @@ codeunit 6151386 "NPR CS UI StockTake Handl."
                 else
                     Indicator := 'ok';
 
-                Line := DOMxmlin.CreateElement('Line');
+
+                if (Indicator = 'ok') then
+                    Line := XmlElement.Create('Line', '',
+                        StrSubstNo(Text015, SummarizeCounting.Qty, SummarizeCounting."Item No.", SummarizeCounting."Item Description"))
+                else
+                    Line := XmlElement.Create('Line', '', StrSubstNo(Text016, SummarizeCounting.Qty, SummarizeCounting.Barcode));
                 AddAttribute(Line, 'Descrip', 'Description');
                 AddAttribute(Line, 'Indicator', Indicator);
-                if (Indicator = 'ok') then
-                    Line.InnerText := StrSubstNo(Text015, SummarizeCounting.Qty, SummarizeCounting."Item No.", SummarizeCounting."Item Description")
-                else
-                    Line.InnerText := StrSubstNo(Text016, SummarizeCounting.Qty, SummarizeCounting.Barcode);
-                Record.AppendChild(Line);
+                RecordElement.Add(Line);
 
-                Line := DOMxmlin.CreateElement('Line');
+                Line := XmlElement.Create('Line');
                 AddAttribute(Line, 'Descrip', 'Delete..');
                 AddAttribute(Line, 'Type', Format(LineType::BUTTON));
                 AddAttribute(Line, 'TableNo', Format(TableNo));
                 AddAttribute(Line, 'RecordID', Format(CurrRecordID));
                 AddAttribute(Line, 'FuncName', 'DELETELINE');
-                Record.AppendChild(Line);
+                RecordElement.Add(Line);
 
                 if (Indicator = 'ok') then begin
-                    Line := DOMxmlin.CreateElement('Line');
+                    Line := XmlElement.Create('Line', '', SummarizeCounting.Barcode);
                     AddAttribute(Line, 'Descrip', SummarizeCounting.FieldCaption(Barcode));
                     AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                    Line.InnerText := SummarizeCounting.Barcode;
-                    Record.AppendChild(Line);
+                    RecordElement.Add(Line);
                 end;
 
                 if (SummarizeCounting."Variant Code" <> '') then begin
-                    Line := DOMxmlin.CreateElement('Line');
+                    Line := XmlElement.Create('Line', '', SummarizeCounting."Variant Code");
                     AddAttribute(Line, 'Descrip', SummarizeCounting.FieldCaption("Variant Code"));
                     AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                    Line.InnerText := SummarizeCounting."Variant Code";
-                    Record.AppendChild(Line);
+                    RecordElement.Add(Line);
 
-                    Line := DOMxmlin.CreateElement('Line');
+                    Line := XmlElement.Create('Line', '', SummarizeCounting."Variant Description");
                     AddAttribute(Line, 'Descrip', SummarizeCounting.FieldCaption("Variant Description"));
                     AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                    Line.InnerText := SummarizeCounting."Variant Description";
-                    Record.AppendChild(Line);
+                    RecordElement.Add(Line);
                 end;
 
-                Records.AppendChild(Record);
+                Records.Add(RecordElement);
             until SummarizeCounting.Next = 0;
             exit(true);
         end else
             exit(false);
     end;
 
-    local procedure AddAggSummarize(var Records: DotNet NPRNetXmlElement) NotEmptyResult: Boolean
+    local procedure AddAggSummarize(var Records: XmlElement) NotEmptyResult: Boolean
     var
-        "Record": DotNet NPRNetXmlElement;
-        Line: DotNet NPRNetXmlElement;
+        RecordElement: XmlElement;
+        Line: XmlElement;
         Indicator: Text;
         LineType: Option TEXT,BUTTON;
         CurrRecordID: RecordID;
         TableNo: Integer;
         SummarizeCounting: Query "NPR CS Stock-Take Summarize";
     begin
-        Records := DOMxmlin.CreateElement('Records');
+        Records := XmlElement.Create('Records');
 
         SummarizeCounting.SetRange(Id, CSSessionId);
         SummarizeCounting.SetRange(Handled, true);
@@ -524,58 +508,41 @@ codeunit 6151386 "NPR CS UI StockTake Handl."
         while SummarizeCounting.Read do begin
 
             NotEmptyResult := true;
-            Record := DOMxmlin.CreateElement('Record');
-
-            //CurrRecordID := SummarizeCounting.RECORDID;
-            //TableNo := CurrRecordID.TABLENO;
+            RecordElement := XmlElement.Create('Record');
 
             if SummarizeCounting.Item_No = '' then
                 Indicator := 'minus'
             else
                 Indicator := 'ok';
 
-            Line := DOMxmlin.CreateElement('Line');
+            if (Indicator = 'ok') then
+                Line := XmlElement.Create('Line', '', StrSubstNo(Text015, SummarizeCounting.Count_, SummarizeCounting.Item_No, SummarizeCounting.Item_Description))
+            else
+                Line := XmlElement.Create('Line', StrSubstNo(Text016, SummarizeCounting.Count_, 'Unknown Tag Id'));
             AddAttribute(Line, 'Descrip', 'Description');
             AddAttribute(Line, 'Indicator', Indicator);
-            if (Indicator = 'ok') then
-                Line.InnerText := StrSubstNo(Text015, SummarizeCounting.Count_, SummarizeCounting.Item_No, SummarizeCounting.Item_Description)
-            else
-                Line.InnerText := StrSubstNo(Text016, SummarizeCounting.Count_, 'Unknown Tag Id');
-            Record.AppendChild(Line);
+            RecordElement.Add(Line);
 
-            //    Line := DOMxmlin.CreateElement('Line');
-            //    AddAttribute(Line,'Descrip','Delete..');
-            //    AddAttribute(Line,'Type',FORMAT(LineType::BUTTON));
-            //    AddAttribute(Line,'TableNo',FORMAT(TableNo));
-            //    AddAttribute(Line,'RecordID',FORMAT(CurrRecordID));
-            //    AddAttribute(Line,'FuncName','DELETELINE');
-            //    Record.AppendChild(Line);
-
-            Line := DOMxmlin.CreateElement('Line');
+            Line := XmlElement.Create('Line', '', SummarizeCounting.Item_No);
             AddAttribute(Line, 'Descrip', 'No.');
             AddAttribute(Line, 'Type', Format(LineType::TEXT));
-            Line.InnerText := SummarizeCounting.Item_No;
-            Record.AppendChild(Line);
+            RecordElement.Add(Line);
 
-            Line := DOMxmlin.CreateElement('Line');
+            Line := XmlElement.Create('Line', '', SummarizeCounting.Item_Description);
             AddAttribute(Line, 'Descrip', 'Name');
             AddAttribute(Line, 'Type', Format(LineType::TEXT));
-            Line.InnerText := SummarizeCounting.Item_Description;
-            Record.AppendChild(Line);
+            RecordElement.Add(Line);
 
             if (SummarizeCounting.Variant_Code <> '') then begin
-                Line := DOMxmlin.CreateElement('Line');
+                Line := XmlElement.Create('Line', '', SummarizeCounting.Variant_Code + ' - ' + SummarizeCounting.Variant_Description);
                 AddAttribute(Line, 'Descrip', 'Variant');
                 AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                Line.InnerText := SummarizeCounting.Variant_Code + ' - ' + SummarizeCounting.Variant_Description;
-                Record.AppendChild(Line);
+                RecordElement.Add(Line);
             end;
 
-            Records.AppendChild(Record);
+            Records.Add(RecordElement);
         end;
-
         SummarizeCounting.Close;
-
         exit(NotEmptyResult);
     end;
 
@@ -614,13 +581,11 @@ codeunit 6151386 "NPR CS UI StockTake Handl."
                 end;
             until CSStockTakeCounting.Next = 0;
             StockTakeMgr.ImportPostHandler(StockTakeWorksheet);
-            //-NPR5.51 [359375]
             StockTakeWorksheet.Validate(Status, StockTakeWorksheet.Status::READY_TO_TRANSFER);
             StockTakeWorksheet.Modify(true);
             OK := StartSession(SessionID, CODEUNIT::"NPR CS UI WH Count. Handl.", CompanyName, StockTakeWorksheet);
             if not OK then
                 Remark := GetLastErrorText;
-            //+NPR5.51 [359375]
         end;
     end;
 
@@ -630,9 +595,6 @@ codeunit 6151386 "NPR CS UI StockTake Handl."
         NewStockTakeWorksheetLine: Record "NPR Stock-Take Worksheet Line";
         LineNo: Integer;
     begin
-        //StockTakeWorksheet.GET(CSStockTakeCounting."Stock-Take Config Code",CSStockTakeCounting."Worksheet Name");
-        //StockTakeMgr.ImportPreHandler(StockTakeWorksheet);
-
         Clear(NewStockTakeWorksheetLine);
         NewStockTakeWorksheetLine.SetRange("Stock-Take Config Code", StockTakeWorksheet."Stock-Take Config Code");
         NewStockTakeWorksheetLine.SetRange("Worksheet Name", StockTakeWorksheet.Name);
@@ -652,10 +614,6 @@ codeunit 6151386 "NPR CS UI StockTake Handl."
         StockTakeWorkSheetLine."Session Name" := CSStockTakeCounting.Id;
         StockTakeWorkSheetLine."Date of Inventory" := WorkDate;
         StockTakeWorkSheetLine.Insert(true);
-
-        //StockTakeMgr.ImportPostHandler(StockTakeWorksheet);
-
         exit(true);
     end;
 }
-

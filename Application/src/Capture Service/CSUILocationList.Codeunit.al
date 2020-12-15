@@ -1,10 +1,5 @@
 codeunit 6151365 "NPR CS UI Location List"
 {
-    // NPR5.50/CLVA  /20190524  CASE 352719 Object created - NP Capture Service
-    // NPR5.51/CLVA  /20190628  CASE 359093 Changed location filter
-    // NPR5.51/LS  /20190709  CASE 361352 Changed text constant Text011
-    // NPR5.51/CLVA  /20190813  CASE 362173 Added loop back functionality
-
     TableNo = "NPR CS UI Header";
 
     trigger OnRun()
@@ -13,7 +8,7 @@ codeunit 6151365 "NPR CS UI Location List"
     begin
         MiniformMgmt.Initialize(
           MiniformHeader, Rec, DOMxmlin, ReturnedNode,
-          RootNode, XMLDOMMgt, CSCommunication, CSUserId,
+          RootNode, CSCommunication, CSUserId,
           CurrentCode, StackCode, WhseEmpId, LocationFilter, CSSessionId);
 
         if Code <> CurrentCode then
@@ -27,12 +22,11 @@ codeunit 6151365 "NPR CS UI Location List"
     var
         MiniformHeader: Record "NPR CS UI Header";
         MiniformHeader2: Record "NPR CS UI Header";
-        XMLDOMMgt: Codeunit "XML DOM Management";
         CSCommunication: Codeunit "NPR CS Communication";
         CSManagement: Codeunit "NPR CS Management";
-        ReturnedNode: DotNet NPRNetXmlNode;
-        DOMxmlin: DotNet "NPRNetXmlDocument";
-        RootNode: DotNet NPRNetXmlNode;
+        ReturnedNode: XmlNode;
+        DOMxmlin: XmlDocument;
+        RootNode: XmlNode;
         TextValue: Text[250];
         CSUserId: Text[250];
         WhseEmpId: Text[250];
@@ -64,8 +58,8 @@ codeunit 6151365 "NPR CS UI Location List"
         Barcode: Text;
         Bin: Record Bin;
     begin
-        if XMLDOMMgt.FindNode(RootNode, 'Header/Input', ReturnedNode) then
-            TextValue := ReturnedNode.InnerText
+        if RootNode.AsXmlAttribute().SelectSingleNode('Header/Input', ReturnedNode) then
+            TextValue := ReturnedNode.AsXmlElement().InnerText
         else
             Error(Text006);
 
@@ -73,7 +67,6 @@ codeunit 6151365 "NPR CS UI Location List"
         RecRef.Open(TableNo);
         Evaluate(RecId, CSCommunication.GetNodeAttribute(ReturnedNode, 'RecordID'));
 
-        //-NPR5.51 [362173]
         if TableNo = 7354 then begin
             RecRef.Get(RecId);
             RecRef.SetTable(Bin);
@@ -84,7 +77,6 @@ codeunit 6151365 "NPR CS UI Location List"
             TableNo := RecId.TableNo;
             RecRef.Open(TableNo);
         end;
-        //-NPR5.51 [362173]
 
         if RecRef.Get(RecId) then begin
             RecRef.SetTable(Location);
@@ -140,17 +132,9 @@ codeunit 6151365 "NPR CS UI Location List"
         with Location do begin
             Reset;
             if WhseEmpId <> '' then begin
-
-                //-NPR5.51 [359093]
-                //IF LocationFilter <> '' THEN
-                //  LocationFilter := COPYSTR(LocationFilter,1,(STRLEN(LocationFilter) - 1))
-                //ELSE
                 if LocationFilter = '' then
                     Error(Text010, WhseEmployee."User ID");
-                //+NPR5.51 [359093]
-
                 SetFilter(Code, LocationFilter);
-
             end;
             if not FindFirst then begin
                 if CSCommunication.GetNodeAttribute(ReturnedNode, 'RunReturn') = '0' then begin
@@ -177,4 +161,3 @@ codeunit 6151365 "NPR CS UI Location List"
         CSManagement.SendXMLReply(DOMxmlin);
     end;
 }
-

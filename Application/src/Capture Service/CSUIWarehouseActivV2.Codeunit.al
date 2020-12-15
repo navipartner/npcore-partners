@@ -1,7 +1,5 @@
 codeunit 6151399 "NPR CS UI Warehouse Activ. V2"
 {
-    // NPR5.54/CLVA/20180313 CASE 306407 Object created - NP Capture Service
-
     TableNo = "NPR CS UI Header";
 
     trigger OnRun()
@@ -10,7 +8,7 @@ codeunit 6151399 "NPR CS UI Warehouse Activ. V2"
     begin
         MiniformMgmt.Initialize(
           MiniformHeader, Rec, DOMxmlin, ReturnedNode,
-          RootNode, XMLDOMMgt, CSCommunication, CSUserId,
+          RootNode, CSCommunication, CSUserId,
           CurrentCode, StackCode, WhseEmpId, LocationFilter, CSSessionId);
 
         if Code <> CurrentCode then
@@ -23,13 +21,12 @@ codeunit 6151399 "NPR CS UI Warehouse Activ. V2"
 
     var
         MiniformHeader: Record "NPR CS UI Header";
-        XMLDOMMgt: Codeunit "XML DOM Management";
         CSCommunication: Codeunit "NPR CS Communication";
         CSMgt: Codeunit "NPR CS Management";
         RecRef: RecordRef;
-        DOMxmlin: DotNet "NPRNetXmlDocument";
-        ReturnedNode: DotNet NPRNetXmlNode;
-        RootNode: DotNet NPRNetXmlNode;
+        DOMxmlin: XmlDocument;
+        ReturnedNode: XmlNode;
+        RootNode: XmlNode;
         CSUserId: Text[250];
         Remark: Text[250];
         WhseEmpId: Text[250];
@@ -86,8 +83,8 @@ codeunit 6151399 "NPR CS UI Warehouse Activ. V2"
         ActionIndex: Integer;
         CSUILine: Record "NPR CS UI Line";
     begin
-        if XMLDOMMgt.FindNode(RootNode, 'Header/Input', ReturnedNode) then
-            TextValue := ReturnedNode.InnerText
+        if RootNode.AsXmlAttribute().SelectSingleNode('Header/Input', ReturnedNode) then
+            TextValue := ReturnedNode.AsXmlElement().InnerText
         else
             Error(Text006);
 
@@ -176,26 +173,6 @@ codeunit 6151399 "NPR CS UI Warehouse Activ. V2"
                     ActiveInputField := CSCommunication.GetActiveInputNo(CurrentCode, FldNo);
                     if Remark = '' then
                         if CSCommunication.LastEntryField(CurrentCode, FldNo) then begin
-
-                            //          CLEAR(CSFieldDefaults);
-                            //          CSFieldDefaults.SETRANGE(Id,CSUserId);
-                            //          CSFieldDefaults.SETRANGE("Use Case Code",CurrentCode);
-                            //          IF CSFieldDefaults.FINDSET THEN BEGIN
-                            //            REPEAT
-                            //
-                            //              CLEAR(CSUILine);
-                            //              CSUILine.SETRANGE("UI Code",MiniformHeader.Code);
-                            //              CSUILine.SETRANGE("Field No.",CSFieldDefaults."Field No");
-                            //              CSUILine.SETRANGE("Field Type",CSUILine."Field Type"::Input);
-                            //              IF NOT CSUILine.FINDSET THEN BEGIN
-                            //                CSCommunication.FieldSetvalue(RecRef,CSFieldDefaults."Field No",CSFieldDefaults.Value);
-                            //                RecRef.SETTABLE(CSWarehouseActivityHandling);
-                            //                RecRef.SETRECFILTER;
-                            //                CSCommunication.SetRecRef(RecRef);
-                            //              END;
-                            //            UNTIL CSFieldDefaults.NEXT = 0;
-                            //          END;
-
                             UpdateDataLine(CSWarehouseActivityHandling);
                             ClearDataLine(CSWarehouseActivityHandling);
                             RecRef.GetTable(CSWarehouseActivityHandling);
@@ -219,7 +196,7 @@ codeunit 6151399 "NPR CS UI Warehouse Activ. V2"
         RecId: RecordID;
         TableNo: Integer;
     begin
-        XMLDOMMgt.FindNode(RootNode, 'Header/Input', ReturnedNode);
+        RootNode.SelectSingleNode('Header/Input', ReturnedNode);
 
         Evaluate(TableNo, CSCommunication.GetNodeAttribute(ReturnedNode, 'TableNo'));
         Evaluate(RecId, CSCommunication.GetNodeAttribute(ReturnedNode, 'RecordID'));
@@ -245,16 +222,18 @@ codeunit 6151399 "NPR CS UI Warehouse Activ. V2"
 
     local procedure SendForm(InputField: Integer; CSWarehouseActivityHandling: Record "NPR CS Wareh. Activ. Handling")
     var
-        Records: DotNet NPRNetXmlElement;
+        Records: XmlElement;
+        RootElement: XmlElement;
     begin
         CSCommunication.EncodeUI(MiniformHeader, StackCode, DOMxmlin, InputField, Remark, CSUserId);
         CSCommunication.GetReturnXML(DOMxmlin);
 
+        DOMxmlin.GetRoot(RootElement);
         if MiniformHeader."Posting Type" = MiniformHeader."Posting Type"::"Prompt User" then
             AddAdditionalInfo(DOMxmlin, CSWarehouseActivityHandling);
 
         if AddSummarize(Records) then
-            DOMxmlin.DocumentElement.AppendChild(Records);
+            RootElement.Add(Records);
 
         CSMgt.SendXMLReply(DOMxmlin);
     end;
@@ -422,16 +401,20 @@ codeunit 6151399 "NPR CS UI Warehouse Activ. V2"
         end;
     end;
 
-    local procedure AddAttribute(var NewChild: DotNet NPRNetXmlNode; AttribName: Text[250]; AttribValue: Text[250])
+    local procedure AddAttribute(var NewChild: XmlNode; AttribName: Text[250]; AttribValue: Text[250])
     begin
-        if XMLDOMMgt.AddAttribute(NewChild, AttribName, AttribValue) > 0 then
-            Error(Text002, AttribName);
+        NewChild.AsXmlElement().SetAttribute(AttribName, AttribValue);
     end;
 
-    local procedure AddSummarize(var Records: DotNet NPRNetXmlElement): Boolean
+    local procedure AddAttribute(var NewChild: XmlElement; AttribName: Text[250]; AttribValue: Text[250])
+    begin
+        NewChild.SetAttribute(AttribName, AttribValue);
+    end;
+
+    local procedure AddSummarize(var Records: XmlElement): Boolean
     var
-        "Record": DotNet NPRNetXmlElement;
-        Line: DotNet NPRNetXmlElement;
+        RecordElement: XmlElement;
+        Line: XmlElement;
         Indicator: Text;
         CSWarehouseActivityHandling: Record "NPR CS Wareh. Activ. Handling";
         WhseActivityLine: Record "Warehouse Activity Line";
@@ -472,9 +455,9 @@ codeunit 6151399 "NPR CS UI Warehouse Activ. V2"
         end;
 
         if WhseActivityLine.FindSet then begin
-            Records := DOMxmlin.CreateElement('Records');
+            Records := XmlElement.Create('Records');
             repeat
-                Record := DOMxmlin.CreateElement('Record');
+                RecordElement := XmlElement.Create('Record');
 
                 CurrRecordID := WhseActivityLine.RecordId;
                 TableNo := CurrRecordID.TableNo;
@@ -490,131 +473,122 @@ codeunit 6151399 "NPR CS UI Warehouse Activ. V2"
                 if Indicator = 'minus' then begin
                     if MiniformHeader."Expand Summary Items" then begin
                         //1
-                        Line := DOMxmlin.CreateElement('Line');
+                        Line := XmlElement.Create('Line', '', WhseActivityLine."Bin Code");
                         AddAttribute(Line, 'Descrip', WhseActivityLine.FieldCaption(Description));
                         AddAttribute(Line, 'Indicator', Indicator);
                         AddAttribute(Line, 'Type', Format(LineType::TEXT));
                         AddAttribute(Line, 'CollapsItems', 'FALSE');
-                        Line.InnerText := WhseActivityLine."Bin Code";
-                        Record.AppendChild(Line);
+                        RecordElement.Add(Line);
 
                         //2
-                        Line := DOMxmlin.CreateElement('Line');
+                        Line := XmlElement.Create('Line', '',
+                            StrSubstNo(Text026, WhseActivityLine."Qty. to Handle", WhseActivityLine."Qty. Outstanding"));
                         AddAttribute(Line, 'Descrip', WhseActivityLine.FieldCaption("Qty. Outstanding"));
                         AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                        Line.InnerText := StrSubstNo(Text026, WhseActivityLine."Qty. to Handle", WhseActivityLine."Qty. Outstanding");
-                        Record.AppendChild(Line);
+                        RecordElement.Add(Line);
 
                         //3
-                        Line := DOMxmlin.CreateElement('Line');
+                        if WhseActivityLine."Variant Code" <> '' then
+                            Line := XmlElement.Create('Line', '',
+                                StrSubstNo(Text027, WhseActivityLine."Item No.", WhseActivityLine."Variant Code"))
+                        else
+                            Line := XmlElement.Create('Line', '', WhseActivityLine."Item No.");
                         AddAttribute(Line, 'Descrip', WhseActivityLine.FieldCaption("Item No."));
                         AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                        if WhseActivityLine."Variant Code" <> '' then
-                            Line.InnerText := StrSubstNo(Text027, WhseActivityLine."Item No.", WhseActivityLine."Variant Code")
-                        else
-                            Line.InnerText := WhseActivityLine."Item No.";
-                        Record.AppendChild(Line);
+                        RecordElement.Add(Line);
 
                         //4
-                        Line := DOMxmlin.CreateElement('Line');
+                        Line := XmlElement.Create('Line', '', WhseActivityLine."Unit of Measure Code");
                         AddAttribute(Line, 'Descrip', WhseActivityLine.FieldCaption("Unit of Measure Code"));
                         AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                        Line.InnerText := WhseActivityLine."Unit of Measure Code";
-                        Record.AppendChild(Line);
+                        RecordElement.Add(Line);
 
                         //5
-                        Line := DOMxmlin.CreateElement('Line');
+                        Line := XmlElement.Create('Line', '', WhseActivityLine.Description);
                         AddAttribute(Line, 'Descrip', WhseActivityLine.FieldCaption(Description));
                         AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                        Line.InnerText := WhseActivityLine.Description;
-                        Record.AppendChild(Line);
+                        RecordElement.Add(Line);
 
                         //6
-                        Line := DOMxmlin.CreateElement('Line');
+                        Line := XmlElement.Create('Line', '', '');
                         AddAttribute(Line, 'Descrip', '');
                         AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                        Line.InnerText := '';
-                        Record.AppendChild(Line);
+                        RecordElement.Add(Line);
 
                         if Location.Get(WhseActivityLine."Location Code") then
                             if Location."Bin Mandatory" then begin
-                                Line := DOMxmlin.CreateElement('Line');
+                                Line := XmlElement.Create('Line');
                                 AddAttribute(Line, 'Descrip', 'Split Line..');
                                 AddAttribute(Line, 'Type', Format(LineType::BUTTON));
                                 AddAttribute(Line, 'TableNo', Format(TableNo));
                                 AddAttribute(Line, 'RecordID', Format(CurrRecordID));
                                 AddAttribute(Line, 'FuncName', 'SPLITLINE');
-                                Record.AppendChild(Line);
+                                RecordElement.Add(Line);
                             end;
-
                     end else begin
-                        Line := DOMxmlin.CreateElement('Line');
+                        if WhseActivityLine."Variant Code" <> '' then
+                            Line := XmlElement.Create('Line', '',
+                                StrSubstNo(Text015, WhseActivityLine."Qty. to Handle", WhseActivityLine."Qty. Outstanding",
+                                    WhseActivityLine."Item No." + '-' + WhseActivityLine."Variant Code", WhseActivityLine.Description))
+                        else
+                            Line := XmlElement.Create('Line', '',
+                                StrSubstNo(Text015, WhseActivityLine."Qty. to Handle", WhseActivityLine."Qty. Outstanding",
+                                    WhseActivityLine."Item No.", WhseActivityLine.Description));
                         AddAttribute(Line, 'Descrip', WhseActivityLine.FieldCaption(Description));
                         AddAttribute(Line, 'Indicator', Indicator);
                         AddAttribute(Line, 'Type', Format(LineType::TEXT));
                         AddAttribute(Line, 'CollapsItems', 'TRUE');
-
-                        if WhseActivityLine."Variant Code" <> '' then
-                            Line.InnerText := StrSubstNo(Text015, WhseActivityLine."Qty. to Handle", WhseActivityLine."Qty. Outstanding", WhseActivityLine."Item No." + '-' + WhseActivityLine."Variant Code", WhseActivityLine.Description)
-                        else
-                            Line.InnerText := StrSubstNo(Text015, WhseActivityLine."Qty. to Handle", WhseActivityLine."Qty. Outstanding", WhseActivityLine."Item No.", WhseActivityLine.Description);
-                        Record.AppendChild(Line);
+                        RecordElement.Add(Line);
 
                         if Location.Get(WhseActivityLine."Location Code") then
                             if Location."Bin Mandatory" then begin
-                                Line := DOMxmlin.CreateElement('Line');
+                                Line := XmlElement.Create('Line');
                                 AddAttribute(Line, 'Descrip', 'Split Line..');
                                 AddAttribute(Line, 'Type', Format(LineType::BUTTON));
                                 AddAttribute(Line, 'TableNo', Format(TableNo));
                                 AddAttribute(Line, 'RecordID', Format(CurrRecordID));
                                 AddAttribute(Line, 'FuncName', 'SPLITLINE');
-                                Record.AppendChild(Line);
+                                RecordElement.Add(Line);
                             end;
 
-                        Line := DOMxmlin.CreateElement('Line');
+                        Line := XmlElement.Create('Line', '', WhseActivityLine.Description);
                         AddAttribute(Line, 'Descrip', WhseActivityLine.FieldCaption(Description));
                         AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                        Line.InnerText := WhseActivityLine.Description;
-                        Record.AppendChild(Line);
+                        RecordElement.Add(Line);
 
-                        Line := DOMxmlin.CreateElement('Line');
+                        Line := XmlElement.Create('Line', '', WhseActivityLine."Bin Code");
                         AddAttribute(Line, 'Descrip', WhseActivityLine.FieldCaption("Bin Code"));
                         AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                        Line.InnerText := WhseActivityLine."Bin Code";
-                        Record.AppendChild(Line);
+                        RecordElement.Add(Line);
 
-                        Line := DOMxmlin.CreateElement('Line');
+                        Line := XmlElement.Create('Line', '', Format(WhseActivityLine."Source Document"));
                         AddAttribute(Line, 'Descrip', WhseActivityLine.FieldCaption("Source Document"));
                         AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                        Line.InnerText := Format(WhseActivityLine."Source Document");
-                        Record.AppendChild(Line);
+                        RecordElement.Add(Line);
 
-                        Line := DOMxmlin.CreateElement('Line');
+                        Line := XmlElement.Create('Line', '', WhseActivityLine."Source No.");
                         AddAttribute(Line, 'Descrip', WhseActivityLine.FieldCaption("Source No."));
                         AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                        Line.InnerText := WhseActivityLine."Source No.";
-                        Record.AppendChild(Line);
+                        RecordElement.Add(Line);
 
-                        Line := DOMxmlin.CreateElement('Line');
+                        Line := XmlElement.Create('Line', '', WhseActivityLine."Unit of Measure Code");
                         AddAttribute(Line, 'Descrip', WhseActivityLine.FieldCaption("Unit of Measure Code"));
                         AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                        Line.InnerText := WhseActivityLine."Unit of Measure Code";
-                        Record.AppendChild(Line);
+                        RecordElement.Add(Line);
 
-                        Line := DOMxmlin.CreateElement('Line');
+                        Line := XmlElement.Create('Line', '', Format(WhseActivityLine."Qty. per Unit of Measure"));
                         AddAttribute(Line, 'Descrip', WhseActivityLine.FieldCaption("Qty. per Unit of Measure"));
                         AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                        Line.InnerText := Format(WhseActivityLine."Qty. per Unit of Measure");
-                        Record.AppendChild(Line);
+                        RecordElement.Add(Line);
                     end;
-                    Records.AppendChild(Record);
+                    Records.Add(RecordElement);
                 end;
             until WhseActivityLine.Next = 0;
 
             if not MiniformHeader."Hid Fulfilled Lines" then begin
                 if WhseActivityLine.FindSet then begin
                     repeat
-                        Record := DOMxmlin.CreateElement('Record');
+                        RecordElement := XmlElement.Create('Record');
 
                         CurrRecordID := WhseActivityLine.RecordId;
                         TableNo := CurrRecordID.TableNo;
@@ -630,121 +604,114 @@ codeunit 6151399 "NPR CS UI Warehouse Activ. V2"
                         if Indicator <> 'minus' then begin
                             if MiniformHeader."Expand Summary Items" then begin
                                 //1
-                                Line := DOMxmlin.CreateElement('Line');
+                                Line := XmlElement.Create('Line', '', WhseActivityLine."Bin Code");
                                 AddAttribute(Line, 'Descrip', WhseActivityLine.FieldCaption(Description));
                                 AddAttribute(Line, 'Indicator', Indicator);
                                 AddAttribute(Line, 'Type', Format(LineType::TEXT));
                                 AddAttribute(Line, 'CollapsItems', 'FALSE');
-                                Line.InnerText := WhseActivityLine."Bin Code";
-                                Record.AppendChild(Line);
+                                RecordElement.Add(Line);
 
                                 //2
-                                Line := DOMxmlin.CreateElement('Line');
+                                Line := XmlElement.Create('Line', '',
+                                    StrSubstNo(Text026, WhseActivityLine."Qty. to Handle", WhseActivityLine."Qty. Outstanding"));
                                 AddAttribute(Line, 'Descrip', WhseActivityLine.FieldCaption("Qty. Outstanding"));
                                 AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                                Line.InnerText := StrSubstNo(Text026, WhseActivityLine."Qty. to Handle", WhseActivityLine."Qty. Outstanding");
-                                Record.AppendChild(Line);
+                                RecordElement.Add(Line);
 
                                 //3
-                                Line := DOMxmlin.CreateElement('Line');
+                                if WhseActivityLine."Variant Code" <> '' then
+                                    Line := XmlElement.Create('Line', '',
+                                        StrSubstNo(Text027, WhseActivityLine."Item No.", WhseActivityLine."Variant Code"))
+                                else
+                                    Line := XmlElement.Create('Line', '', WhseActivityLine."Item No.");
                                 AddAttribute(Line, 'Descrip', WhseActivityLine.FieldCaption("Item No."));
                                 AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                                if WhseActivityLine."Variant Code" <> '' then
-                                    Line.InnerText := StrSubstNo(Text027, WhseActivityLine."Item No.", WhseActivityLine."Variant Code")
-                                else
-                                    Line.InnerText := WhseActivityLine."Item No.";
-                                Record.AppendChild(Line);
+                                RecordElement.Add(Line);
 
                                 //4
-                                Line := DOMxmlin.CreateElement('Line');
+                                Line := XmlElement.Create('Line', '', WhseActivityLine."Unit of Measure Code");
                                 AddAttribute(Line, 'Descrip', WhseActivityLine.FieldCaption("Unit of Measure Code"));
                                 AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                                Line.InnerText := WhseActivityLine."Unit of Measure Code";
-                                Record.AppendChild(Line);
+                                RecordElement.Add(Line);
 
                                 //5
-                                Line := DOMxmlin.CreateElement('Line');
+                                Line := XmlElement.Create('Line', '', WhseActivityLine.Description);
                                 AddAttribute(Line, 'Descrip', WhseActivityLine.FieldCaption(Description));
                                 AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                                Line.InnerText := WhseActivityLine.Description;
-                                Record.AppendChild(Line);
+                                RecordElement.Add(Line);
 
                                 //6
-                                Line := DOMxmlin.CreateElement('Line');
+                                Line := XmlElement.Create('Line', '', '');
                                 AddAttribute(Line, 'Descrip', '');
                                 AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                                Line.InnerText := '';
-                                Record.AppendChild(Line);
+                                RecordElement.Add(Line);
 
                                 if Location.Get(WhseActivityLine."Location Code") then
                                     if Location."Bin Mandatory" then begin
-                                        Line := DOMxmlin.CreateElement('Line');
+                                        Line := XmlElement.Create('Line');
                                         AddAttribute(Line, 'Descrip', 'Split Line..');
                                         AddAttribute(Line, 'Type', Format(LineType::BUTTON));
                                         AddAttribute(Line, 'TableNo', Format(TableNo));
                                         AddAttribute(Line, 'RecordID', Format(CurrRecordID));
                                         AddAttribute(Line, 'FuncName', 'SPLITLINE');
-                                        Record.AppendChild(Line);
+                                        RecordElement.Add(Line);
                                     end;
                             end else begin
-                                Line := DOMxmlin.CreateElement('Line');
+                                if WhseActivityLine."Variant Code" <> '' then
+                                    Line := XmlElement.Create('Line', '',
+                                        StrSubstNo(Text015, WhseActivityLine."Qty. to Handle", WhseActivityLine."Qty. Outstanding",
+                                            WhseActivityLine."Item No." + '-' + WhseActivityLine."Variant Code", WhseActivityLine.Description))
+                                else
+                                    Line := XmlElement.Create('Line', '',
+                                        StrSubstNo(Text015, WhseActivityLine."Qty. to Handle", WhseActivityLine."Qty. Outstanding",
+                                            WhseActivityLine."Item No.", WhseActivityLine.Description));
                                 AddAttribute(Line, 'Descrip', WhseActivityLine.FieldCaption(Description));
                                 AddAttribute(Line, 'Indicator', Indicator);
                                 AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                                if WhseActivityLine."Variant Code" <> '' then
-                                    Line.InnerText := StrSubstNo(Text015, WhseActivityLine."Qty. to Handle", WhseActivityLine."Qty. Outstanding", WhseActivityLine."Item No." + '-' + WhseActivityLine."Variant Code", WhseActivityLine.Description)
-                                else
-                                    Line.InnerText := StrSubstNo(Text015, WhseActivityLine."Qty. to Handle", WhseActivityLine."Qty. Outstanding", WhseActivityLine."Item No.", WhseActivityLine.Description);
-                                Record.AppendChild(Line);
+                                RecordElement.Add(Line);
 
                                 if Location.Get(WhseActivityLine."Location Code") then
                                     if Location."Bin Mandatory" then begin
-                                        Line := DOMxmlin.CreateElement('Line');
+                                        Line := XmlElement.Create('Line');
                                         AddAttribute(Line, 'Descrip', 'Split Line..');
                                         AddAttribute(Line, 'Type', Format(LineType::BUTTON));
                                         AddAttribute(Line, 'TableNo', Format(TableNo));
                                         AddAttribute(Line, 'RecordID', Format(CurrRecordID));
                                         AddAttribute(Line, 'FuncName', 'SPLITLINE');
-                                        Record.AppendChild(Line);
+                                        RecordElement.Add(Line);
                                     end;
 
-                                Line := DOMxmlin.CreateElement('Line');
+                                Line := XmlElement.Create('Line', '', WhseActivityLine.Description);
                                 AddAttribute(Line, 'Descrip', WhseActivityLine.FieldCaption(Description));
                                 AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                                Line.InnerText := WhseActivityLine.Description;
-                                Record.AppendChild(Line);
+                                RecordElement.Add(Line);
 
-                                Line := DOMxmlin.CreateElement('Line');
+                                Line := XmlElement.Create('Line', '', WhseActivityLine."Bin Code");
                                 AddAttribute(Line, 'Descrip', WhseActivityLine.FieldCaption("Bin Code"));
                                 AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                                Line.InnerText := WhseActivityLine."Bin Code";
-                                Record.AppendChild(Line);
+                                RecordElement.Add(Line);
 
-                                Line := DOMxmlin.CreateElement('Line');
+                                Line := XmlElement.Create('Line', '', Format(WhseActivityLine."Source Document"));
                                 AddAttribute(Line, 'Descrip', WhseActivityLine.FieldCaption("Source Document"));
                                 AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                                Line.InnerText := Format(WhseActivityLine."Source Document");
-                                Record.AppendChild(Line);
+                                RecordElement.Add(Line);
 
-                                Line := DOMxmlin.CreateElement('Line');
+                                Line := XmlElement.Create('Line', '', WhseActivityLine."Source No.");
                                 AddAttribute(Line, 'Descrip', WhseActivityLine.FieldCaption("Source No."));
                                 AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                                Line.InnerText := WhseActivityLine."Source No.";
-                                Record.AppendChild(Line);
+                                RecordElement.Add(Line);
 
-                                Line := DOMxmlin.CreateElement('Line');
+                                Line := XmlElement.Create('Line', '', WhseActivityLine."Unit of Measure Code");
                                 AddAttribute(Line, 'Descrip', WhseActivityLine.FieldCaption("Unit of Measure Code"));
                                 AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                                Line.InnerText := WhseActivityLine."Unit of Measure Code";
-                                Record.AppendChild(Line);
+                                RecordElement.Add(Line);
 
-                                Line := DOMxmlin.CreateElement('Line');
+                                Line := XmlElement.Create('Line', '', Format(WhseActivityLine."Qty. per Unit of Measure"));
                                 AddAttribute(Line, 'Descrip', WhseActivityLine.FieldCaption("Qty. per Unit of Measure"));
                                 AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                                Line.InnerText := Format(WhseActivityLine."Qty. per Unit of Measure");
-                                Record.AppendChild(Line);
+                                RecordElement.Add(Line);
                             end;
-                            Records.AppendChild(Record);
+                            Records.Add(RecordElement);
                         end;
                     until WhseActivityLine.Next = 0;
                 end;
@@ -754,10 +721,10 @@ codeunit 6151399 "NPR CS UI Warehouse Activ. V2"
             exit(false);
     end;
 
-    local procedure AddAdditionalInfo(var xmlout: DotNet "NPRNetXmlDocument"; CSWarehouseActivityHandling: Record "NPR CS Wareh. Activ. Handling")
+    local procedure AddAdditionalInfo(var xmlout: XmlDocument; CSWarehouseActivityHandling: Record "NPR CS Wareh. Activ. Handling")
     var
-        CurrentRootNode: DotNet NPRNetXmlNode;
-        XMLFunctionNode: DotNet NPRNetXmlNode;
+        CurrentRootNode: XmlElement;
+        XMLFunctionNode: XmlNode;
         StrMenuTxt: Text;
     begin
         if not (CSWarehouseActivityHandling."Activity Type" in [CSWarehouseActivityHandling."Activity Type"::"Invt. Put-away", CSWarehouseActivityHandling."Activity Type"::"Invt. Pick"]) then
@@ -770,11 +737,11 @@ codeunit 6151399 "NPR CS UI Warehouse Activ. V2"
                 StrMenuTxt := 'Handle,Handle & Invoice';
         end;
 
-        CurrentRootNode := xmlout.DocumentElement;
-        XMLDOMMgt.FindNode(CurrentRootNode, 'Header/Functions', ReturnedNode);
+        xmlout.GetRoot(CurrentRootNode);
+        CurrentRootNode.SelectSingleNode('Header/Functions', ReturnedNode);
 
-        foreach XMLFunctionNode in ReturnedNode.ChildNodes do begin
-            if (XMLFunctionNode.InnerText = 'REGISTER') then
+        foreach XMLFunctionNode in ReturnedNode.AsXmlElement().GetChildNodes() do begin
+            if (XMLFunctionNode.AsXmlElement().InnerText = 'REGISTER') then
                 AddAttribute(XMLFunctionNode, 'Actions', StrMenuTxt);
         end;
     end;
