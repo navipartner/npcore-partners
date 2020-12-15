@@ -1,10 +1,5 @@
 page 6014619 "NPR Retail - Sales RC MyReport"
 {
-    // #6014618/JC/20160110  CASE 258075 Created Object Retail Sales Role center Reports based on RC 6014557 Retail -Sales Psn Role center
-    // NPR5.29/NPKNAV/20170127  CASE 258075 Transport NPR5.29 - 27 januar 2017
-    // NPR5.31/TS  /20170328  CASE 270740 My Reports added
-    // NPR5.41/TS  /20180405  CASE 300893 Removed Action Electronic Invoices
-
     Caption = 'Role Center';
     PageType = RoleCenter;
     UsageCategory = Administration;
@@ -237,30 +232,6 @@ page 6014619 "NPR Retail - Sales RC MyReport"
                 Caption = 'Customer - T&op 10 List';
                 Image = "Report";
                 RunObject = Report "Customer - Top 10 List";
-                ApplicationArea = All;
-            }
-            action("Customer/&Item Sales")
-            {
-                Caption = 'Customer/&Item Sales';
-                Image = "Report";
-                RunObject = Report "Customer/Item Sales";
-                ApplicationArea = All;
-            }
-            separator(Separator6150663)
-            {
-            }
-            action("Salesperson - Sales &Statistics")
-            {
-                Caption = 'Salesperson - Sales &Statistics';
-                Image = "Report";
-                RunObject = Report "Salesperson - Sales Statistics";
-                ApplicationArea = All;
-            }
-            action("Price &List")
-            {
-                Caption = 'Price &List';
-                Image = "Report";
-                RunObject = Report "Price List";
                 ApplicationArea = All;
             }
             separator(Separator6150660)

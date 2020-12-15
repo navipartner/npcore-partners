@@ -1,59 +1,5 @@
 page 6014557 "NPR POS: SalesPerson R.Center"
 {
-    // NC1.17/MH/20150423        CASE 212263 Created NaviConnect Role Center
-    // NC1.17/BHR/20150428       CASE 212069 Removed "retail Document Activities
-    // NC1.20/BHR/20150925       CASE 223709 Added part 'NaviConnect Top 10 SalesPerson'
-    // NPR5.22/TJ/20160415       CASE 233762 Added part RSS Reader Activities
-    // NPR5.23/TS/20160509       CASE 240912  Removed Naviconnect Activities
-    // NPR5.23.03/SANK/20161517  CASE 234035 Menu Reorganised. Sales Activities Removed
-    // NPR5.23.03/MHA/20160726   CASE 242557 Magento references updated according to MAG2.00
-    // NPR5.27/JLK /20160908  CASE 251366 Removed POS Activity button
-    // NPR5.27/JLK /20160915  CASE 249468 Added Sales Orders, Purchase Orders, Customer Repair Lists, Transfer Orders Activity buttons
-    // NPR5.29/JLK /20161223  CASE 249468 Corrected Sales Orders and Purchase Orders to 9305 & 9307
-    // NPR5.29/BHR /20170104  CASE 262439 Hide RSS feed, Add New Chart "Retail Sales Chart by Shop"
-    // NPR5.31/TS  /20170328  CASE 270740 My Reports added
-    // NPR5.32/MHA /20170515  CASE 276241 Charts group moved into first column to reduce total column qty. from 3 to 2
-    // NPR5.33/KENU/20170511  CASE 275923 Modified the navigation pane
-    // NPR5.33/LS  /20170605  CASE 279275 Set Visible = False for Retail Top 10 Customers
-    // NPR5.33/MHA /20170616  CASE 281047 ActionGroup added: Magento
-    // NPR5.33/TS  /20170616  CASE 281061 Added Transfer Order in New
-    // NPR5.33/TS  /20170616  CASE 280913 Removed Fixed Assets,Human Resources and Marketing
-    // NPR5.33/TS  /20170616  CASE 281060 Removed Items described in attached images.
-    // NPR5.33/TS  /20170616  CASE 281137 Added Sales Return Order in New
-    // NPR5.33/TS  /20170616  CASE 281135 Removed Worksheets,(281133,281132) Removed Item list,SalesOrders,SalesTicketSatistics,Resources
-    // NPR5.33/TS  /20170616  CASE 281134 Moved Contact and Customer List to SalesMenu
-    // NPR5.34/TS  /20170620  CASE 281207 Removed Actions
-    // NPR5.34/TS  /20170620  CASE 281207 Added Company Information
-    // NPR5.34/KENU/20170623  CASE 281805 Added "TM Ticket Access Entry List" to Ticket Menu
-    // NPR5.34/KENU/20170623  CASE 281062 Added Menu Group POS and added Lists from Departments/Retail/Sale
-    // NPR5.34/KENU/20170623  CASE 281814 Added Menu Group Item & Prices and added Lists: 6014511, 6014427, 6014455, 6060041
-    // NPR5.34/KENU/20170623  CASE 281909 Ordered Menu Home Items
-    // NPR5.34/KENU/20170623  CASE 281933 12 Removed reports
-    // NPR5.34/KENU/20170623  CASE 282001 Removed 2 Page List
-    // NPR5.34/KENU/20170623  CASE 282002 Removed Retail - Manager Role Center
-    // NPR5.34/KENU/20170623  CASE 281997 Added Audit Roll to POS Menu
-    // NPR5.34/KENU/20170623  CASE 282006 Added Item List to Home Items
-    // NPR5.34/KENU/20170623  CASE 282016 Removed Customer Analysis report from Retail
-    // NPR5.34/KENU/20170623  CASE 282014 Added Event List to Ticket menu
-    // NPR5.34/KENU/20170627  CASE 282111 Moved Customer and Vendor to General Group
-    // NPR5.34/KENU/20170627  CASE 282001 New section called Retail
-    // NPR5.34/KENU/20170630  CASE 282644 Added Stock-Take Configurations(6014665) to "Item & Prices"
-    // NPR5.34/KENU/20170703  CASE 282782 Added report "Inventory by Date"
-    // NPR5.34/KENU/20170704  CASE 282977 Moved "My Reports" to 2nd Column
-    // NPR5.34/KENU/20170704  CASE 282959 Conforming to NPR RC Comments, added Home tabs: Sales, Item, Vendor
-    // NPR5.35/JDH /20170831  CASE        Replaced Item List with Retail Item List
-    // NPR5.36/MHA /20170803  CASE 285800 Added Discount Coupon Actions under ActionGroup POS: Coupons, Coupon Types
-    // NPR5.36/KENU/20170810  CASE 286465 Added "NP Retail Setup" page link to "General" section
-    // NPR5.36/KENU/20170828  CASE 288295 Added "Company Information" page link to "General" section
-    // NPR5.37/TS  /20171016  CASE 293530 Removed actions
-    // NPR5.37/JLK /20171025  CASE 294057 Changed property page run for Sales Order List, Sales Return Order List, Purchase Order List and Purchase Return Order List
-    // NPR5.38/TS  /20171108  CASE 295500 Removed actions
-    // NPR5.38/BR  /20180118  CASE 302790 Added POS Entry List
-    // NPR5.38.06/THRO/20180219  CASE 305188 Added Power BI Spinner part for NAV2017 + removed subgroups
-    // NPR5.40/TS  /20180320  CASE 307510 Added Page Retail Journal List
-    // NPR5.42/JLK /20180523  CASE 315306 Corrected ENU Caption to ENU=Retail Salesperson
-    // NPR5.55/YAHA/20200715  CASE 412525 Moved Customer list above Salesperson/purchasers action
-
     Caption = 'Retail Salesperson';
     PageType = RoleCenter;
     UsageCategory = Administration;
@@ -180,29 +126,8 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     RunObject = Report "Customer - Top 10 List";
                     ApplicationArea = All;
                 }
-                action("Customer/&Item Sales")
-                {
-                    Caption = 'Customer/&Item Sales';
-                    Image = "Report";
-                    RunObject = Report "Customer/Item Sales";
-                    ApplicationArea = All;
-                }
                 separator(Separator6150663)
                 {
-                }
-                action("Salesperson - Sales &Statistics")
-                {
-                    Caption = 'Salesperson - Sales &Statistics';
-                    Image = "Report";
-                    RunObject = Report "Salesperson - Sales Statistics";
-                    ApplicationArea = All;
-                }
-                action("Price &List")
-                {
-                    Caption = 'Price &List';
-                    Image = "Report";
-                    RunObject = Report "Price List";
-                    ApplicationArea = All;
                 }
                 separator(Separator6150660)
                 {
@@ -371,20 +296,6 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     Caption = 'Item Sales Statistics';
                     Image = Report2;
                     RunObject = Report "NPR Item Sales Stats/Provider";
-                    ApplicationArea = All;
-                }
-                action("Top 10 List")
-                {
-                    Caption = 'Top 10 List';
-                    Image = Report2;
-                    RunObject = Report "Inventory - Top 10 List";
-                    ApplicationArea = All;
-                }
-                action("Low Sales")
-                {
-                    Caption = 'Low Sales';
-                    Image = Report2;
-                    RunObject = Report "NPR Items With Low Sales";
                     ApplicationArea = All;
                 }
             }
@@ -1187,13 +1098,6 @@ page 6014557 "NPR POS: SalesPerson R.Center"
             {
                 Caption = 'Item';
                 Visible = false;
-                action("Inventory - Sales Statistics")
-                {
-                    Caption = 'Inventory - Sales Statistics';
-                    Image = "Report";
-                    RunObject = Report "Inventory - Sales Statistics";
-                    ApplicationArea = All;
-                }
                 action("Inventory by age")
                 {
                     Caption = 'Inventory by age';

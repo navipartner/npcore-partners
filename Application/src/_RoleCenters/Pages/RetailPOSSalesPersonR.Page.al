@@ -1,8 +1,5 @@
 page 6151241 "NPR Retail POS- Sales Person R"
 {
-
-    // #369128/YAHA/20190918  CASE 369128 Removing/Adding new menu
-
     Caption = 'NP Retail Salesperson';
     PageType = RoleCenter;
     UsageCategory = Administration;
@@ -111,29 +108,8 @@ page 6151241 "NPR Retail POS- Sales Person R"
                     RunObject = Report "Customer - Top 10 List";
                     ApplicationArea = All;
                 }
-                action("Customer/&Item Sales")
-                {
-                    Caption = 'Customer/&Item Sales';
-                    Image = "Report";
-                    RunObject = Report "Customer/Item Sales";
-                    ApplicationArea = All;
-                }
                 separator(Separator6150663)
                 {
-                }
-                action("Salesperson - Sales &Statistics")
-                {
-                    Caption = 'Salesperson - Sales &Statistics';
-                    Image = "Report";
-                    RunObject = Report "Salesperson - Sales Statistics";
-                    ApplicationArea = All;
-                }
-                action("Price &List")
-                {
-                    Caption = 'Price &List';
-                    Image = "Report";
-                    RunObject = Report "Price List";
-                    ApplicationArea = All;
                 }
                 separator(Separator6150660)
                 {
