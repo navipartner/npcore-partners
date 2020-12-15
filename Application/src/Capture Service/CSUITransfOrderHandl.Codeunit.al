@@ -1,10 +1,5 @@
 codeunit 6151390 "NPR CS UI Transf. Order Handl."
 {
-    // NPR5.43/CLVA/20180313 CASE 315503 Object created - NP Capture Service
-    // NPR5.43/NPKNAV/20180629  CASE 304872 Transport NPR5.43 - 29 June 2018
-    // NPR5.44/CLVA/20180719 CASE 315503 Added filter on Transfer Line
-    // NPR5.48/CLVA/20181109 CASE 335606 Handling UOM
-
     TableNo = "NPR CS UI Header";
 
     trigger OnRun()
@@ -13,7 +8,7 @@ codeunit 6151390 "NPR CS UI Transf. Order Handl."
     begin
         MiniformMgmt.Initialize(
           MiniformHeader, Rec, DOMxmlin, ReturnedNode,
-          RootNode, XMLDOMMgt, CSCommunication, CSUserId,
+          RootNode, CSCommunication, CSUserId,
           CurrentCode, StackCode, WhseEmpId, LocationFilter, CSSessionId);
 
         if Code <> CurrentCode then
@@ -26,13 +21,12 @@ codeunit 6151390 "NPR CS UI Transf. Order Handl."
 
     var
         MiniformHeader: Record "NPR CS UI Header";
-        XMLDOMMgt: Codeunit "XML DOM Management";
         CSCommunication: Codeunit "NPR CS Communication";
         CSMgt: Codeunit "NPR CS Management";
         RecRef: RecordRef;
-        DOMxmlin: DotNet "NPRNetXmlDocument";
-        ReturnedNode: DotNet NPRNetXmlNode;
-        RootNode: DotNet NPRNetXmlNode;
+        DOMxmlin: XmlDocument;
+        ReturnedNode: XmlNode;
+        RootNode: XmlNode;
         CSUserId: Text[250];
         Remark: Text[250];
         WhseEmpId: Text[250];
@@ -76,8 +70,8 @@ codeunit 6151390 "NPR CS UI Transf. Order Handl."
         CSFieldDefaults: Record "NPR CS Field Defaults";
         TransferLine: Record "Transfer Line";
     begin
-        if XMLDOMMgt.FindNode(RootNode, 'Header/Input', ReturnedNode) then
-            TextValue := ReturnedNode.InnerText
+        if RootNode.AsXmlAttribute().SelectSingleNode('Header/Input', ReturnedNode) then
+            TextValue := ReturnedNode.AsXmlElement().InnerText
         else
             Error(Text006);
 
@@ -202,7 +196,7 @@ codeunit 6151390 "NPR CS UI Transf. Order Handl."
         RecId: RecordID;
         TableNo: Integer;
     begin
-        XMLDOMMgt.FindNode(RootNode, 'Header/Input', ReturnedNode);
+        RootNode.SelectSingleNode('Header/Input', ReturnedNode);
 
         Evaluate(TableNo, CSCommunication.GetNodeAttribute(ReturnedNode, 'TableNo'));
         Evaluate(RecId, CSCommunication.GetNodeAttribute(ReturnedNode, 'RecordID'));
@@ -229,13 +223,15 @@ codeunit 6151390 "NPR CS UI Transf. Order Handl."
 
     local procedure SendForm(InputField: Integer)
     var
-        Records: DotNet NPRNetXmlElement;
+        Records: XmlElement;
+        RootElement: XmlElement;
     begin
         CSCommunication.EncodeUI(MiniformHeader, StackCode, DOMxmlin, InputField, Remark, CSUserId);
         CSCommunication.GetReturnXML(DOMxmlin);
 
+        DOMxmlin.GetRoot(RootElement);
         if AddSummarize(Records) then
-            DOMxmlin.DocumentElement.AppendChild(Records);
+            RootElement.Add(Records);
 
         CSMgt.SendXMLReply(DOMxmlin);
     end;
@@ -269,7 +265,6 @@ codeunit 6151390 "NPR CS UI Transf. Order Handl."
             CSTransferOrderHandling."Item No." := ItemNo;
             CSTransferOrderHandling."Variant Code" := VariantCode;
 
-            //-NPR5.48 [335606]
             if (ResolvingTable = DATABASE::"Item Cross Reference") then begin
                 with ItemCrossReference do begin
                     if (StrLen(InputValue) <= MaxStrLen("Cross-Reference No.")) then begin
@@ -281,8 +276,6 @@ codeunit 6151390 "NPR CS UI Transf. Order Handl."
                     end;
                 end;
             end;
-            //+NPR5.48 [335606]
-
         end else begin
             Remark := StrSubstNo(Text010, InputValue);
             exit;
@@ -370,16 +363,15 @@ codeunit 6151390 "NPR CS UI Transf. Order Handl."
         CSTransferOrderHandling.DeleteAll(true);
     end;
 
-    local procedure AddAttribute(var NewChild: DotNet NPRNetXmlNode; AttribName: Text[250]; AttribValue: Text[250])
+    local procedure AddAttribute(var NewChild: XmlElement; AttribName: Text[250]; AttribValue: Text[250])
     begin
-        if XMLDOMMgt.AddAttribute(NewChild, AttribName, AttribValue) > 0 then
-            Error(Text002, AttribName);
+        NewChild.SetAttribute(AttribName, AttribValue);
     end;
 
-    local procedure AddSummarize(var Records: DotNet NPRNetXmlElement): Boolean
+    local procedure AddSummarize(var Records: XmlElement): Boolean
     var
-        "Record": DotNet NPRNetXmlElement;
-        Line: DotNet NPRNetXmlElement;
+        RecordElement: XmlElement;
+        Line: XmlElement;
         Indicator: Text;
         CSTransferOrderHandling: Record "NPR CS Transf. Order Handl.";
         TransferLine: Record "Transfer Line";
@@ -396,52 +388,46 @@ codeunit 6151390 "NPR CS UI Transf. Order Handl."
         Clear(TransferLine);
         TransferLine.SetAscending("Line No.", false);
         TransferLine.SetRange("Document No.", CSTransferOrderHandling."No.");
-        //-NPR5.44 [315503]
         TransferLine.SetRange("Derived From Line No.", 0);
-        //+NPR5.44 [315503]
         if TransferLine.FindSet then begin
-            Records := DOMxmlin.CreateElement('Records');
+            Records := XmlElement.Create('Records');
             repeat
-                Record := DOMxmlin.CreateElement('Record');
+                RecordElement := XmlElement.Create('Record');
 
                 CurrRecordID := TransferLine.RecordId;
                 TableNo := CurrRecordID.TableNo;
 
                 Indicator := 'ok';
 
-                Line := DOMxmlin.CreateElement('Line');
+                Line := XmlElement.Create('Line', '',
+                    StrSubstNo(Text015, TransferLine.Quantity, TransferLine."Item No.", TransferLine.Description));
                 AddAttribute(Line, 'Descrip', TransferLine.FieldCaption(Description));
                 AddAttribute(Line, 'Indicator', Indicator);
                 AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                Line.InnerText := StrSubstNo(Text015, TransferLine.Quantity, TransferLine."Item No.", TransferLine.Description);
-                Record.AppendChild(Line);
+                RecordElement.Add(Line);
 
-                Line := DOMxmlin.CreateElement('Line');
+                Line := XmlElement.Create('Line');
                 AddAttribute(Line, 'Descrip', 'Delete..');
                 AddAttribute(Line, 'Type', Format(LineType::BUTTON));
                 AddAttribute(Line, 'TableNo', Format(TableNo));
                 AddAttribute(Line, 'RecordID', Format(CurrRecordID));
                 AddAttribute(Line, 'FuncName', 'DELETELINE');
-                Record.AppendChild(Line);
+                RecordElement.Add(Line);
 
                 if (TransferLine."Variant Code" <> '') then begin
-                    Line := DOMxmlin.CreateElement('Line');
+                    Line := XmlElement.Create('Line', '', TransferLine."Variant Code");
                     AddAttribute(Line, 'Descrip', TransferLine.FieldCaption("Variant Code"));
                     AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                    Line.InnerText := TransferLine."Variant Code";
-                    Record.AppendChild(Line);
+                    RecordElement.Add(Line);
 
                     if ItemVariant.Get(TransferLine."Item No.", TransferLine."Variant Code") then begin
-                        Line := DOMxmlin.CreateElement('Line');
+                        Line := XmlElement.Create('Line', '', ItemVariant.Description);
                         AddAttribute(Line, 'Descrip', ItemVariant.FieldCaption(Description));
                         AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                        Line.InnerText := ItemVariant.Description;
-                        Record.AppendChild(Line);
+                        RecordElement.Add(Line);
                     end;
                 end;
-
-                Records.AppendChild(Record);
-
+                Records.Add(RecordElement);
             until TransferLine.Next = 0;
             exit(true);
         end else
@@ -503,13 +489,10 @@ codeunit 6151390 "NPR CS UI Transf. Order Handl."
         if (CSTransferOrderHandling."Variant Code" <> '') then
             TransferLine.Validate("Variant Code", CSTransferOrderHandling."Variant Code");
         TransferLine.Validate(Quantity, CSTransferOrderHandling.Qty);
-        //-NPR5.48 [335606]
         if CSTransferOrderHandling."Unit of Measure" <> '' then
             TransferLine.Validate("Unit of Measure Code", CSTransferOrderHandling."Unit of Measure");
-        //+NPR5.48 [335606]
         TransferLine.Modify(true);
 
         exit(true);
     end;
 }
-

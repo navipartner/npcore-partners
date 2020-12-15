@@ -1,7 +1,5 @@
 codeunit 6151350 "NPR CS UI Stock Adjst. Unplan"
 {
-    // NPR5.53/SARA/20191030 CASE 375030 New object, ajustment for Location as Directed PutAway and Pick
-
     TableNo = "NPR CS UI Header";
 
     trigger OnRun()
@@ -10,7 +8,7 @@ codeunit 6151350 "NPR CS UI Stock Adjst. Unplan"
     begin
         MiniformMgmt.Initialize(
           MiniformHeader, Rec, DOMxmlin, ReturnedNode,
-          RootNode, XMLDOMMgt, CSCommunication, CSUserId,
+          RootNode, CSCommunication, CSUserId,
           CurrentCode, StackCode, WhseEmpId, LocationFilter, CSSessionId);
 
         if Code <> CurrentCode then
@@ -23,13 +21,12 @@ codeunit 6151350 "NPR CS UI Stock Adjst. Unplan"
 
     var
         MiniformHeader: Record "NPR CS UI Header";
-        XMLDOMMgt: Codeunit "XML DOM Management";
         CSCommunication: Codeunit "NPR CS Communication";
         CSMgt: Codeunit "NPR CS Management";
         RecRef: RecordRef;
-        DOMxmlin: DotNet "NPRNetXmlDocument";
-        ReturnedNode: DotNet NPRNetXmlNode;
-        RootNode: DotNet NPRNetXmlNode;
+        DOMxmlin: XmlDocument;
+        ReturnedNode: XmlNode;
+        RootNode: XmlNode;
         CSUserId: Text[250];
         Remark: Text[250];
         WhseEmpId: Text[250];
@@ -75,8 +72,8 @@ codeunit 6151350 "NPR CS UI Stock Adjst. Unplan"
         FuncFieldId: Integer;
         Step: Integer;
     begin
-        if XMLDOMMgt.FindNode(RootNode, 'Header/Input', ReturnedNode) then
-            TextValue := ReturnedNode.InnerText
+        if RootNode.AsXmlAttribute().SelectSingleNode('Header/Input', ReturnedNode) then
+            TextValue := ReturnedNode.AsXmlElement().InnerText
         else
             Error(Text006);
 
@@ -490,25 +487,29 @@ codeunit 6151350 "NPR CS UI Stock Adjst. Unplan"
         exit(CopyStr(BatchName, 2, 10));
     end;
 
-    local procedure AddAdditionalInfo(var xmlout: DotNet "NPRNetXmlDocument")
+    local procedure AddAdditionalInfo(var xmlout: XmlDocument)
     var
-        CurrentRootNode: DotNet NPRNetXmlNode;
-        XMLFunctionNode: DotNet NPRNetXmlNode;
+        CurrentRootElement: XmlElement;
+        XMLFunctionNode: XmlNode;
         StrMenuTxt: Text;
     begin
-        CurrentRootNode := xmlout.DocumentElement;
-        XMLDOMMgt.FindNode(CurrentRootNode, 'Header/Functions', ReturnedNode);
+        xmlout.GetRoot(CurrentRootElement);
+        CurrentRootElement.SelectSingleNode('Header/Functions', ReturnedNode);
 
-        foreach XMLFunctionNode in ReturnedNode.ChildNodes do begin
-            if (XMLFunctionNode.InnerText = 'REGISTER') then
+        foreach XMLFunctionNode in ReturnedNode.AsXmlElement().GetChildNodes() do begin
+            if (XMLFunctionNode.AsXmlElement().InnerText = 'REGISTER') then
                 AddAttribute(XMLFunctionNode, 'Actions', AdjustInventoryCaption);
         end;
     end;
 
-    local procedure AddAttribute(var NewChild: DotNet NPRNetXmlNode; AttribName: Text[250]; AttribValue: Text[250])
+    local procedure AddAttribute(var NewChild: XmlNode; AttribName: Text[250]; AttribValue: Text[250])
     begin
-        if XMLDOMMgt.AddAttribute(NewChild, AttribName, AttribValue) > 0 then
-            Error(AtributeErr, AttribName);
+        NewChild.AsXmlElement().SetAttribute(AttribName, AttribValue);
+    end;
+
+    local procedure AddAttribute(var NewChild: XmlElement; AttribName: Text[250]; AttribValue: Text[250])
+    begin
+        NewChild.SetAttribute(AttribName, AttribValue);
     end;
 
     local procedure AddDefault(FieldId: Integer; FuncValue: Text)

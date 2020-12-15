@@ -1,14 +1,5 @@
 codeunit 6151362 "NPR CS UI Stock Adjustment"
 {
-    // NPR5.51/ALST/20190731 CASE 362173 new object, used to adjust stock after counting bin contents
-    // NPR5.51/CLVA/20190826 CASE 362173 Rearranged code to optimize functionality
-    // NPR5.51/CLVA/20190830 CASE 366739 Changed error handling to overcome text overflow
-    // NPR5.53/SARA/20191030 CASE 375030 Added validation for Location = Directed PutAway and Pick
-    // NPR5.53/CLVA/20191118 CASE 377721 Changed posting to background posting
-    // NPR5.53/CLVA/20191128 CASE 379973 Handling duplicate entries
-    // NPR5.55/CLVA/20200513 CASE 379709 Added Journal line/Bin check
-    // NPR5.55/ALPO/20200723 CASE 384923 Stock adjustments for not bin-enabled locations
-
     TableNo = "NPR CS UI Header";
 
     trigger OnRun()
@@ -17,7 +8,7 @@ codeunit 6151362 "NPR CS UI Stock Adjustment"
     begin
         MiniformMgmt.Initialize(
           MiniformHeader, Rec, DOMxmlin, ReturnedNode,
-          RootNode, XMLDOMMgt, CSCommunication, CSUserId,
+          RootNode, CSCommunication, CSUserId,
           CurrentCode, StackCode, WhseEmpId, LocationFilter, CSSessionId);
 
         if Code <> CurrentCode then
@@ -30,13 +21,12 @@ codeunit 6151362 "NPR CS UI Stock Adjustment"
 
     var
         MiniformHeader: Record "NPR CS UI Header";
-        XMLDOMMgt: Codeunit "XML DOM Management";
         CSCommunication: Codeunit "NPR CS Communication";
         CSMgt: Codeunit "NPR CS Management";
         RecRef: RecordRef;
-        DOMxmlin: DotNet "NPRNetXmlDocument";
-        ReturnedNode: DotNet NPRNetXmlNode;
-        RootNode: DotNet NPRNetXmlNode;
+        DOMxmlin: XmlDocument;
+        ReturnedNode: XmlNode;
+        RootNode: XmlNode;
         CSUserId: Text[250];
         Remark: Text[250];
         WhseEmpId: Text[250];
@@ -84,8 +74,8 @@ codeunit 6151362 "NPR CS UI Stock Adjustment"
         FuncFieldId: Integer;
         Step: Integer;
     begin
-        if XMLDOMMgt.FindNode(RootNode, 'Header/Input', ReturnedNode) then
-            TextValue := ReturnedNode.InnerText
+        if RootNode.AsXmlAttribute().SelectSingleNode('Header/Input', ReturnedNode) then
+            TextValue := ReturnedNode.AsXmlElement().InnerText
         else
             Error(Text006);
 
@@ -243,10 +233,8 @@ codeunit 6151362 "NPR CS UI Stock Adjustment"
             exit;
         end;
 
-        //-NPR5.53 [375030]
         if Location."Directed Put-away and Pick" then
             Remark := Text020;
-        //+NPR5.53 [375030]
         CSWarehouseActivityHandling."Location Code" := InputValue;
     end;
 
@@ -281,7 +269,6 @@ codeunit 6151362 "NPR CS UI Stock Adjustment"
             CSWarehouseActivityHandling."Item No." := ItemNo;
             CSWarehouseActivityHandling."Variant Code" := VariantCode;
 
-            //-NPR5.53 [379973]
             if CSWarehouseActivityHandling."Bin Code" <> '' then begin
                 ItemJnlTemplate.SetRange(Type, ItemJnlTemplate.Type::Item);
                 if ItemJnlTemplate.FindFirst then begin
@@ -301,7 +288,6 @@ codeunit 6151362 "NPR CS UI Stock Adjustment"
 
                 end;
             end;
-            //+NPR5.53 [379973]
 
             if (ResolvingTable = DATABASE::"Item Cross Reference") then begin
                 with ItemCrossReference do begin
@@ -319,8 +305,7 @@ codeunit 6151362 "NPR CS UI Stock Adjustment"
             exit;
         end;
 
-        //CSWarehouseActivityHandling.CALCFIELDS("Bin Base Qty.");  //NPR5.55 [384923]-revoked
-        UpdateCurrentQtyOnStock(CSWarehouseActivityHandling);  //NPR5.55 [384923]
+        UpdateCurrentQtyOnStock(CSWarehouseActivityHandling);
         CSWarehouseActivityHandling.Barcode := InputValue;
     end;
 
@@ -348,7 +333,6 @@ codeunit 6151362 "NPR CS UI Stock Adjustment"
         ItemJournalBatch: Record "Item Journal Batch";
         ItemJournalLine: Record "Item Journal Line";
     begin
-        //-NPR5.55 [384923]
         if CSWarehouseActivityHandling."Location Code" = '' then begin
             Remark := LocationCodeErr;
             exit;
@@ -360,7 +344,6 @@ codeunit 6151362 "NPR CS UI Stock Adjustment"
             CSWarehouseActivityHandling."Bin Code" := '';
             exit;
         end;
-        //+NPR5.55 [384923]
 
         if InputValue = '' then begin
             Remark := Text019;
@@ -377,7 +360,6 @@ codeunit 6151362 "NPR CS UI Stock Adjustment"
             exit;
         end;
 
-        //-NPR5.55 [379709]
         if CSWarehouseActivityHandling."Item No." <> '' then begin
             ItemJnlTemplate.SetRange(Type, ItemJnlTemplate.Type::Item);
             if ItemJnlTemplate.FindFirst then begin
@@ -397,7 +379,6 @@ codeunit 6151362 "NPR CS UI Stock Adjustment"
 
             end;
         end;
-        //+NPR5.55 [379709]
 
         CSWarehouseActivityHandling."Bin Code" := InputValue;
     end;
@@ -460,22 +441,12 @@ codeunit 6151362 "NPR CS UI Stock Adjustment"
             exit;
         end;
 
-        //-NPR5.55 [384923]-revoked
-        //CSWarehouseActivityHandling.CALCFIELDS("Bin Base Qty.");
-        //OffsetQty := CSWarehouseActivityHandling.Qty - CSWarehouseActivityHandling."Bin Base Qty.";
-        //+NPR5.55 [384923]-revoked
         OffsetQty := CSWarehouseActivityHandling.Qty - CSWarehouseActivityHandling."Qty. in Stock";  //NPR5.55 [384923]
         if OffsetQty = 0 then begin
             Remark := QuantityCoincideErr;
             exit;
         end;
 
-        //NPR5.51-
-        //ItemJournalLine.INIT;
-        //ItemJournalTemplate.SETRANGE(Type,ItemJournalTemplate.Type::Item);
-        //ItemJournalTemplate.FINDFIRST;
-        //ItemJournalLine.VALIDATE("Journal Template Name",ItemJournalTemplate.Name);
-        //ItemJournalLine.VALIDATE("Journal Batch Name",CreateItemBatch(ItemJournalLine."Journal Template Name"));
         ItemJnlTemplate.SetRange(Type, ItemJnlTemplate.Type::Item);
         ItemJnlTemplate.FindFirst;
 
@@ -514,16 +485,11 @@ codeunit 6151362 "NPR CS UI Stock Adjustment"
         ItemJournalLine.Validate("Bin Code", CSWarehouseActivityHandling."Bin Code");
         ItemJournalLine.Validate("Posting Date", Today);
         ItemJournalLine."Document Date" := WorkDate;
-        //-NPR5.53 [377721]
-        //ItemJournalLine.VALIDATE("External Document No.",'MOBILE');
         ItemJournalLine.Validate("External Document No.", CSSessionId);
-        //+NPR5.53 [377721]
         ItemJournalLine.Validate("Changed by User", true);
         ItemJournalLine."Document No." := Format(Today);
         ItemJournalLine.Modify(true);
-        //NPR5.51+
 
-        //-NPR5.53 [377721]
         CSSetup.Get;
         if CSSetup."Post with Job Queue" then begin
             PostingRecRef.GetTable(ItemJournalBatch);
@@ -538,30 +504,19 @@ codeunit 6151362 "NPR CS UI Stock Adjustment"
             end else
                 Remark := GetLastErrorText;
         end else begin
-            //+NPR5.53 [377721]
             Commit;
             PostingFinished := CODEUNIT.Run(CODEUNIT::"Item Jnl.-Post Batch", ItemJournalLine);
-            //-NPR5.53 [377721]
         end;
-        //+NPR5.53 [377721]
-
-        //NPR5.51-
-        //DeleteItemBatch(ItemJournalLine."Journal Template Name",ItemJournalLine."Journal Batch Name");
-        //NPR5.51+
 
         if not PostingFinished then begin
-            //NPR5.51- [366739]
-            //Remark := STRSUBSTNO(AdjustingFailedErr,GETLASTERRORTEXT);
             Remark := CopyStr(GetLastErrorText, 1, MaxStrLen(Remark));
-            //NPR5.51+ [366739]
             exit;
         end;
 
-        UpdateCurrentQtyOnStock(CSWarehouseActivityHandling);  //NPR5.55 [384923]
+        UpdateCurrentQtyOnStock(CSWarehouseActivityHandling);
         Clear(CSWarehouseActivityHandling.Qty);
         Clear(CSWarehouseActivityHandling.Barcode);
-        //CSWarehouseActivityHandling.MODIFY;  //NPR5.55 [384923]-revoked
-        Input(CSWarehouseActivityHandling, CSWarehouseActivityHandling.FieldNo(Barcode), 0);  //NPR5.55 [384923]
+        Input(CSWarehouseActivityHandling, CSWarehouseActivityHandling.FieldNo(Barcode), 0);
     end;
 
     local procedure Input(CSWarehouseActivityHandling: Record "NPR CS Wareh. Activ. Handling"; FldNo: Integer; Step: Integer)
@@ -609,10 +564,7 @@ codeunit 6151362 "NPR CS UI Stock Adjustment"
     var
         ItemJournalBatch: Record "Item Journal Batch";
     begin
-        //NPR5.51-
-        //IF ItemJournalBatch.GET(TemplateName,BatchName) THEN
-        //  ItemJournalBatch.DELETE(TRUE);
-        //NPR5.51+
+
     end;
 
     local procedure CreateBatchName(): Code[10]
@@ -627,25 +579,25 @@ codeunit 6151362 "NPR CS UI Stock Adjustment"
         exit(CopyStr(BatchName, 2, 10));
     end;
 
-    local procedure AddAdditionalInfo(var xmlout: DotNet "NPRNetXmlDocument")
+    local procedure AddAdditionalInfo(var xmlout: XmlDocument)
     var
-        CurrentRootNode: DotNet NPRNetXmlNode;
-        XMLFunctionNode: DotNet NPRNetXmlNode;
+        CurrentRootElement: XmlElement;
+        XMLFunctionNode: XmlNode;
         StrMenuTxt: Text;
     begin
-        CurrentRootNode := xmlout.DocumentElement;
-        XMLDOMMgt.FindNode(CurrentRootNode, 'Header/Functions', ReturnedNode);
+        xmlout.GetRoot(CurrentRootElement);
 
-        foreach XMLFunctionNode in ReturnedNode.ChildNodes do begin
-            if (XMLFunctionNode.InnerText = 'REGISTER') then
+        CurrentRootElement.SelectSingleNode('Header/Functions', ReturnedNode);
+
+        foreach XMLFunctionNode in ReturnedNode.AsXmlElement().GetChildNodes() do begin
+            if (XMLFunctionNode.AsXmlElement().InnerText = 'REGISTER') then
                 AddAttribute(XMLFunctionNode, 'Actions', AdjustInventoryCaption);
         end;
     end;
 
-    local procedure AddAttribute(var NewChild: DotNet NPRNetXmlNode; AttribName: Text[250]; AttribValue: Text[250])
+    local procedure AddAttribute(var NewChild: XmlNode; AttribName: Text[250]; AttribValue: Text[250])
     begin
-        if XMLDOMMgt.AddAttribute(NewChild, AttribName, AttribValue) > 0 then
-            Error(AtributeErr, AttribName);
+        NewChild.AsXmlElement().SetAttribute(AttribName, AttribValue);
     end;
 
     local procedure AddDefault(FieldId: Integer; FuncValue: Text)
@@ -690,14 +642,11 @@ codeunit 6151362 "NPR CS UI Stock Adjustment"
     var
         Location: Record Location;
     begin
-        //-NPR5.55 [384923]
         exit(Location.Get(LocationCode) and Location."Bin Mandatory");
-        //+NPR5.55 [384923]
     end;
 
     local procedure UpdateCurrentQtyOnStock(var CSWarehouseActivityHandling: Record "NPR CS Wareh. Activ. Handling")
     begin
-        //-NPR5.55 [384923]
         if IsBinEnabledLocation(CSWarehouseActivityHandling."Location Code") then begin
             CSWarehouseActivityHandling.CalcFields("Bin Base Qty.");
             CSWarehouseActivityHandling."Qty. in Stock" := CSWarehouseActivityHandling."Bin Base Qty.";
@@ -705,7 +654,5 @@ codeunit 6151362 "NPR CS UI Stock Adjustment"
             CSWarehouseActivityHandling.CalcFields(Inventory);
             CSWarehouseActivityHandling."Qty. in Stock" := CSWarehouseActivityHandling.Inventory;
         end;
-        //+NPR5.55 [384923]
     end;
 }
-

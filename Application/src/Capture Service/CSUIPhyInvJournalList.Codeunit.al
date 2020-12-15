@@ -1,8 +1,5 @@
 codeunit 6151359 "NPR CS UI Phy.Inv.Journal List"
 {
-    // NPR5.51/CLVA  /20190820  CASE 365659 Object created - NP Capture Service
-    // NPR5.52/CLVA  /20190904  CASE 365967 added "Post with Job Queue" functionality
-
     TableNo = "NPR CS UI Header";
 
     trigger OnRun()
@@ -11,7 +8,7 @@ codeunit 6151359 "NPR CS UI Phy.Inv.Journal List"
     begin
         MiniformMgmt.Initialize(
           CSUIHeader, Rec, DOMxmlin, ReturnedNode,
-          RootNode, XMLDOMMgt, CSCommunication, CSUserId,
+          RootNode, CSCommunication, CSUserId,
           CurrentCode, StackCode, WhseEmpId, LocationFilter, CSSessionId);
 
         if Code <> CurrentCode then
@@ -25,12 +22,11 @@ codeunit 6151359 "NPR CS UI Phy.Inv.Journal List"
     var
         CSUIHeader: Record "NPR CS UI Header";
         CSUIHeader2: Record "NPR CS UI Header";
-        XMLDOMMgt: Codeunit "XML DOM Management";
         CSCommunication: Codeunit "NPR CS Communication";
         CSManagement: Codeunit "NPR CS Management";
-        ReturnedNode: DotNet NPRNetXmlNode;
-        DOMxmlin: DotNet "NPRNetXmlDocument";
-        RootNode: DotNet NPRNetXmlNode;
+        ReturnedNode: XmlNode;
+        DOMxmlin: XmlDocument;
+        RootNode: XmlNode;
         TextValue: Text[250];
         CSUserId: Text[250];
         WhseEmpId: Text[250];
@@ -63,8 +59,8 @@ codeunit 6151359 "NPR CS UI Phy.Inv.Journal List"
         WhseEmployee: Record "Warehouse Employee";
         ItemJournalBatch: Record "Item Journal Batch";
     begin
-        if XMLDOMMgt.FindNode(RootNode, 'Header/Input', ReturnedNode) then
-            TextValue := ReturnedNode.InnerText
+        if RootNode.AsXmlAttribute().SelectSingleNode('Header/Input', ReturnedNode) then
+            TextValue := ReturnedNode.AsXmlElement().InnerText
         else
             Error(Text006);
 
@@ -129,26 +125,11 @@ codeunit 6151359 "NPR CS UI Phy.Inv.Journal List"
         TestRecRef: RecordRef;
         CSPostingBuffer: Record "NPR CS Posting Buffer";
     begin
-        XMLDOMMgt.FindNode(RootNode, 'Header/Input', ReturnedNode);
+        RootNode.AsXmlElement().SelectSingleNode('Header/Input', ReturnedNode);
 
         Evaluate(TableNo, CSCommunication.GetNodeAttribute(ReturnedNode, 'TableNo'));
         RecRef.Open(TableNo);
         Evaluate(RecId, CSCommunication.GetNodeAttribute(ReturnedNode, 'RecordID'));
-
-        // IF TableNo = 6151396 THEN BEGIN
-        //  IF RecRef.GET(RecId) THEN BEGIN
-        //    RecRef.SETTABLE(CSPhysInventoryHandling);
-        //    RecRef.GETTABLE(CSPhysInventoryHandling);
-        //    Location.GET(CSPhysInventoryHandling."Location Code");
-        //    RecRef.CLOSE;
-        //    RecId := Location.RECORDID;
-        //    TableNo := RecId.TABLENO;
-        //    RecRef.OPEN(TableNo);
-        //  END ELSE BEGIN
-        //    CSCommunication.RunPreviousUI(DOMxmlin);
-        //    EXIT;
-        //  END;
-        // END;
 
         RecRef.Get(RecId);
         RecRef.SetTable(Location);
@@ -164,9 +145,7 @@ codeunit 6151359 "NPR CS UI Phy.Inv.Journal List"
             ItemJournalBatch.Insert(true);
         end;
 
-        //-NPR5.52 [365967]
         SelectLatestVersion;
-        //+NPR5.52 [365967]
 
         Clear(ItemJournalBatch);
         ItemJournalBatch.SetRange("Journal Template Name", CSSetup."Phys. Inv Jour Temp Name");
@@ -181,7 +160,6 @@ codeunit 6151359 "NPR CS UI Phy.Inv.Journal List"
             CSUIHeader2.SaveXMLin(DOMxmlin);
             CODEUNIT.Run(CSUIHeader2."Handling Codeunit", CSUIHeader2);
         end else begin
-            //-NPR5.52 [365967]
             CSSetup.Get;
             if CSSetup."Post with Job Queue" then begin
                 TempItemJournalBatch.Reset;
@@ -212,26 +190,26 @@ codeunit 6151359 "NPR CS UI Phy.Inv.Journal List"
                     CODEUNIT.Run(CSUIHeader2."Handling Codeunit", CSUIHeader2);
                 end;
             end else begin
-                //+NPR5.52 [365967]
                 RecRef.GetTable(ItemJournalBatch);
                 CSCommunication.SetRecRef(RecRef);
                 ActiveInputField := 1;
                 SendForm(ActiveInputField, ItemJournalBatch);
-                //-NPR5.52 [365967]
             end;
-            //+NPR5.52 [365967]
         end;
     end;
 
     local procedure SendForm(InputField: Integer; ItemJournalBatch: Record "Item Journal Batch")
     var
-        Records: DotNet NPRNetXmlElement;
+        Records: XmlElement;
+        RootElement: XmlElement;
     begin
         CSCommunication.EncodeUI(CSUIHeader, StackCode, DOMxmlin, InputField, Remark, CSUserId);
         CSCommunication.GetReturnXML(DOMxmlin);
 
-        if AddSummarize(Records, ItemJournalBatch) then
-            DOMxmlin.DocumentElement.AppendChild(Records);
+        if AddSummarize(Records, ItemJournalBatch) then begin
+            DOMxmlin.GetRoot(RootElement);
+            RootElement.Add(Records);
+        end;
 
         CSManagement.SendXMLReply(DOMxmlin);
     end;
@@ -246,7 +224,6 @@ codeunit 6151359 "NPR CS UI Phy.Inv.Journal List"
         PostingRecRef: RecordRef;
         CSPostEnqueue: Codeunit "NPR CS Post - Enqueue";
     begin
-        //-NPR5.52 [365967]
         CSSetup.Get;
         if CSSetup."Post with Job Queue" then begin
             PostingRecRef.GetTable(ItemJournalBatch);
@@ -260,7 +237,6 @@ codeunit 6151359 "NPR CS UI Phy.Inv.Journal List"
             else
                 Remark := GetLastErrorText;
         end else begin
-            //+NPR5.52 [365967]
             ItemJnlTemplate.Get(ItemJournalBatch."Journal Template Name");
             ItemJnlTemplate.TestField("Force Posting Report", false);
 
@@ -272,9 +248,7 @@ codeunit 6151359 "NPR CS UI Phy.Inv.Journal List"
                     ItemJnlPostBatch.Run(ItemJournalLine);
                 until ItemJournalLine.Next = 0;
             end;
-            //-NPR5.52 [365967]
         end;
-        //+NPR5.52 [365967]
     end;
 
     local procedure Reset(ItemJournalBatch: Record "Item Journal Batch")
@@ -288,10 +262,10 @@ codeunit 6151359 "NPR CS UI Phy.Inv.Journal List"
         ItemJournalLine.DeleteAll;
     end;
 
-    local procedure AddSummarize(var Records: DotNet NPRNetXmlElement; ItemJournalBatch: Record "Item Journal Batch") NotEmptyResult: Boolean
+    local procedure AddSummarize(var Records: XmlElement; ItemJournalBatch: Record "Item Journal Batch") NotEmptyResult: Boolean
     var
-        "Record": DotNet NPRNetXmlElement;
-        Line: DotNet NPRNetXmlElement;
+        RecordElement: XmlElement;
+        Line: XmlElement;
         Indicator: Text;
         LineType: Option TEXT,BUTTON;
         CurrRecordID: RecordID;
@@ -302,7 +276,7 @@ codeunit 6151359 "NPR CS UI Phy.Inv.Journal List"
     begin
         SelectLatestVersion;
 
-        Records := DOMxmlin.CreateElement('Records');
+        Records := XmlElement.Create('Records');
 
         CSItemJournalLines.SetRange(Journal_Template_Name, ItemJournalBatch."Journal Template Name");
         CSItemJournalLines.SetRange(Journal_Batch_Name, ItemJournalBatch.Name);
@@ -311,10 +285,7 @@ codeunit 6151359 "NPR CS UI Phy.Inv.Journal List"
 
             NotEmptyResult := true;
 
-            Record := DOMxmlin.CreateElement('Record');
-
-            //CurrRecordID := '';
-            //TableNo := '';
+            RecordElement := XmlElement.Create('Record');
 
             if CSItemJournalLines.Changed_by_User then
                 Indicator := 'ok'
@@ -324,85 +295,71 @@ codeunit 6151359 "NPR CS UI Phy.Inv.Journal List"
 
             if CSUIHeader."Expand Summary Items" then begin
                 //1
-                Line := DOMxmlin.CreateElement('Line');
+                Line := XmlElement.Create('Line', '', CSItemJournalLines.Item_No);
                 AddAttribute(Line, 'Descrip', 'No.');
                 AddAttribute(Line, 'Indicator', Indicator);
                 AddAttribute(Line, 'Type', Format(LineType::TEXT));
                 AddAttribute(Line, 'CollapsItems', 'FALSE');
-                Line.InnerText := CSItemJournalLines.Item_No;
-                Record.AppendChild(Line);
+                RecordElement.Add(Line);
 
                 //2
-                Line := DOMxmlin.CreateElement('Line');
+                Line := XmlElement.Create('Line', '',
+                    StrSubstNo(Text030, CSItemJournalLines.Qty_Calculated, CSItemJournalLines.Qty_Phys_Inventory, CSItemJournalLines.Quantity));
                 AddAttribute(Line, 'Descrip', 'Quantity');
                 AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                //Line.InnerText := FORMAT(CSItemJournalLines.Qty_Phys_Inventory);
-                Line.InnerText := StrSubstNo(Text030, CSItemJournalLines.Qty_Calculated, CSItemJournalLines.Qty_Phys_Inventory, CSItemJournalLines.Quantity);
-                Record.AppendChild(Line);
+                RecordElement.Add(Line);
 
                 //3
-                Line := DOMxmlin.CreateElement('Line');
+                Line := XmlElement.Create('Line', '', CSItemJournalLines.Variant_Code);
                 AddAttribute(Line, 'Descrip', 'Variant');
                 AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                Line.InnerText := CSItemJournalLines.Variant_Code;
-                Record.AppendChild(Line);
+                RecordElement.Add(Line);
 
                 //4
-                Line := DOMxmlin.CreateElement('Line');
+                Line := XmlElement.Create('Line', '', CSItemJournalLines.Unit_of_Measure_Code);
                 AddAttribute(Line, 'Descrip', 'UoM');
                 AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                Line.InnerText := CSItemJournalLines.Unit_of_Measure_Code;
-                Record.AppendChild(Line);
+                RecordElement.Add(Line);
 
                 //5
                 Item.Get(CSItemJournalLines.Item_No);
-                Line := DOMxmlin.CreateElement('Line');
+                Line := XmlElement.Create('Line', '', Item.Description);
                 AddAttribute(Line, 'Descrip', 'ItemDesc');
                 AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                Line.InnerText := Item.Description;
-                Record.AppendChild(Line);
+                RecordElement.Add(Line);
 
                 //6
-                Line := DOMxmlin.CreateElement('Line');
+                Line := XmlElement.Create('Line', '', '');
                 AddAttribute(Line, 'Descrip', '');
                 AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                Line.InnerText := '';
-                Record.AppendChild(Line);
+                RecordElement.Add(Line);
             end else begin
-                Line := DOMxmlin.CreateElement('Line');
+                Line := XmlElement.Create('Line', '', StrSubstNo(Text015, CSItemJournalLines.Qty_Phys_Inventory));
                 AddAttribute(Line, 'Descrip', 'Description');
                 AddAttribute(Line, 'Indicator', Indicator);
-                Line.InnerText := StrSubstNo(Text015, CSItemJournalLines.Qty_Phys_Inventory);
-                Record.AppendChild(Line);
+                RecordElement.Add(Line);
 
-                Line := DOMxmlin.CreateElement('Line');
+                Line := XmlElement.Create('Line', '', CSItemJournalLines.Item_No);
                 AddAttribute(Line, 'Descrip', 'No.');
                 AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                Line.InnerText := CSItemJournalLines.Item_No;
-                Record.AppendChild(Line);
+                RecordElement.Add(Line);
 
                 if (CSItemJournalLines.Variant_Code <> '') then begin
-                    Line := DOMxmlin.CreateElement('Line');
+                    Line := XmlElement.Create('Line', '', CSItemJournalLines.Variant_Code);
                     AddAttribute(Line, 'Descrip', 'Variant');
                     AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                    Line.InnerText := CSItemJournalLines.Variant_Code;
-                    Record.AppendChild(Line);
+                    RecordElement.Add(Line);
                 end;
-
             end;
-
-            Records.AppendChild(Record);
+            Records.Add(RecordElement);
         end;
-
         CSItemJournalLines.Close;
-
         exit(NotEmptyResult);
     end;
 
-    local procedure AddAttribute(var NewChild: DotNet NPRNetXmlNode; AttribName: Text[250]; AttribValue: Text[250])
+    local procedure AddAttribute(var NewChild: XmlElement; AttribName: Text[250]; AttribValue: Text[250])
     begin
-        if XMLDOMMgt.AddAttribute(NewChild, AttribName, AttribValue) > 0 then
-            Error(Text002, AttribName);
+        NewChild.SetAttribute(AttribName, AttribValue);
     end;
 }
 

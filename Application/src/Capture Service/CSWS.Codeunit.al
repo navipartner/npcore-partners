@@ -1,40 +1,5 @@
 codeunit 6151372 "NPR CS WS"
 {
-    // NPR5.41/CLVA/20180313 CASE 306407 Object created - NP Capture Service
-    // NPR5.43/CLVA/20180604 CASE 307239 Added Variant Filter
-    // NPR5.43/NPKNAV/20180629  CASE 304872 Transport NPR5.43 - 29 June 2018
-    // NPR5.47/CLVA/20181010 CASE 307282 Added Item Seach functionality, GetRfidOfflineData and GetRfidOfflineDataAndJournals
-    // NPR5.48/CLVA/20181220 CASE 318296 Added function GetItemPicture
-    // NPR5.48/JAVA/20190205  CASE 335191 Transport NPR5.48 - 5 February 2019
-    // NPR5.48/CLVA/20190222 CASE 318296 Updated function GetItemPicture
-    // NPR5.50/CLVA/20190206 CASE 344466 Added function ProcessData, GetRfidOfflineDataDelta, UpdateRfidDeviceInfo, GetRefillData, GetRfidTagData, SetRfidTagData, GetRfidWhseReceiptData
-    //                                                  GetRfidWhseReceiptData, ValidateRfidWhseReceiptData, CloseCounting, CloseRefill, UpdateRefill, ApproveCounting and CloseWarehouseCounting
-    //                                   Removed functions GetRfidOfflineData, GetRfidOfflineDataAndJournals, GetRfidMasterData and GetRfidData
-    // NPR5.50/CLVA/20190502 CASE 353741 Added functions ResetWarehouseCounting and GetItemObject
-    // NPR5.51/CLVA/20190610 CASE 356107 Added function SaveRfidWhseReceiptData
-    // NPR5.51/CLVA/20190712 CASE 350696 Added FRID model check
-    // NPR5.51/CLVA/20190820 CASE 365659 Changed CloseWarehouseCounting to use Phy. Inv. Journal
-    // NPR5.51/CLVA/20190826 CASE 365659 Added GetWarehouseCountingDetails
-    // NPR5.52/CLVA/20190917 CASE 368484 Added functions SetRfidTagDataByType,GetStoreData,StartStoreCounting,CloseStoreCounting,ApproveStoreCounting,ResetCounting and CreateStoreRefillData
-    // NPR5.52/CLVA/20190926 CASE 365659 Added Updated CloseWarehouseCounting
-    // NPR5.52/CLVA/20190925 CASE 370277 Changed "Document No." to Workdate
-    // NPR5.52/CLVA/20190930 CASE 370690 Added function CreateStoreCounting
-    // NPR5.52/CLVA/20191007 CASE 371453 Added RFID validation to GetItemPicture
-    // NPR5.53/CLVA/20191029 CASE 374331 Added Store Counting Approvel to Posting Buffer
-    //                                   Moved version specific functions to wrapper codeunit
-    // NPR5.53/CLVA/20191029 CASE 377467 Calculating Inventory if Inventory Calculation is missing because of lock error in CreateStoreCounting
-    // NPR5.53/CLVA/20191122 CASE 377462 Added Priority for Post for ApproveStoreCounting
-    // NPR5.53/CLVA/20191203 CASE 375919 Added Counting Supervisor functionality. Addded function CreateStoreCountingV2, SearchPOSStore and GetStoreDataV2
-    // NPR5.53/CLVA/20200207 CASE 389864 Changed code to support version specific changes (NAV 2018+).
-    // NPR5.54/CLVA/20202020 CASE 384506 Added Supervisor and POS user filter on GetStoreDataV2 and GetStoreDataByStoreUser;
-    // NPR5.54/CLVA/20200227 CASE 389224 Added batch handling
-    // NPR5.54/CLVA/20200310 CASE 384506 Added function CreateStoreRefillDataV2
-    // NPR5.55/CLVA/20200505 CASE 384506 Added changes to UpdateRefill, CreateStoreRefillData and CreateStoreRefillDataV2
-    // NPR5.55/CLVA/20200511 CASE 379709 Added functions SetRfidTagDataTransferBatch, SetRfidTagDataTransfer, ResetTransfer and CloseTransfer
-    // NPR5.55/CLVA/20200616 CASE 405675 Added function GetJournalItemCount and GetDocumentItemCount
-    // NPR5.55/ALST/20200727 CASE 415521 added possibility to clean RFID tag string of values not matching any models in the DB
-
-
     trigger OnRun()
     begin
         Message(CreateStoreRefillDataV2('{dac13779-be4d-4a13-802b-c419c0a6b2f2}'));
@@ -74,8 +39,8 @@ codeunit 6151372 "NPR CS WS"
     procedure ProcessDocument(var Document: Text)
     var
         XMLDOMManagement: Codeunit "XML DOM Management";
-        InputXmlDocument: DotNet "NPRNetXmlDocument";
-        OutputXmlDocument: DotNet "NPRNetXmlDocument";
+        InputXmlDocument: XmlDocument;
+        OutputXmlDocument: XmlDocument;
         CSManagement: Codeunit "NPR CS Management";
         CSHelperFunctions: Codeunit "NPR CS Helper Functions";
         CSCommunicationLog: Record "NPR CS Comm. Log";
@@ -84,10 +49,11 @@ codeunit 6151372 "NPR CS WS"
     begin
         CSHelperFunctions.CreateLogEntry(CSCommunicationLog, Document, IsEnable, LogCommunication);
 
-        XMLDOMManagement.LoadXMLDocumentFromText(Document, InputXmlDocument);
+        XmlDocument.ReadFrom(Document, InputXmlDocument);
+
         CSManagement.ProcessDocument(InputXmlDocument);
         CSManagement.GetOutboundDocument(OutputXmlDocument);
-        Document := OutputXmlDocument.OuterXml;
+        OutputXmlDocument.WriteTo(Document);
 
         CSHelperFunctions.UpdateLogEntry(CSCommunicationLog, 'ProcessDocument', IsInternal, InternalCallId, Document, LogCommunication, '');
     end;
@@ -101,10 +67,10 @@ codeunit 6151372 "NPR CS WS"
         BigTextData: BigText;
         ValInt: Integer;
         ValBool: Boolean;
-        CommaString: DotNet NPRNetString;
-        Separator: DotNet NPRNetString;
+        CommaString: Text;
+        Separator: Text;
         Value: Text;
-        Values: DotNet NPRNetArray;
+        Values: List of [Text];
     begin
         if (DeviceId = '') or (Data = '') then
             exit;
@@ -137,8 +103,8 @@ codeunit 6151372 "NPR CS WS"
 
         CommaString := Data;
         Separator := ',';
-        Values := CommaString.Split(Separator.ToCharArray());
-        CSStockTakeHandlingRfid.Tags := Values.Length;
+        Values := CommaString.Split(Separator);
+        CSStockTakeHandlingRfid.Tags := Values.Count;
         CSStockTakeHandlingRfid.Modify(false);
         Commit;
 
@@ -233,38 +199,22 @@ codeunit 6151372 "NPR CS WS"
 
     procedure GetItemPicture(Barcode: Code[20]) PictureBase64: Text
     var
-        Item: Record Item;
-        BarcodeLibrary: Codeunit "NPR Barcode Library";
-        ItemNo: Code[20];
-        VariantCode: Code[10];
-        ResolvingTable: Integer;
-        BinaryReader: DotNet NPRNetBinaryReader;
-        MemoryStream: DotNet NPRNetMemoryStream;
-        Convert: DotNet NPRNetConvert;
-        InStr: InStream;
-        ItemCrossReference: Record "Item Cross Reference";
-        CSRfidTagModels: Record "NPR CS Rfid Tag Models";
-        CSRfidData: Record "NPR CS Rfid Data";
-        TagFamily: Code[10];
-        TagModel: Code[10];
-        TagId: Code[20];
         CSWrapperFunctions: Codeunit "NPR CS Wrapper Functions";
     begin
-        //-NPR5.53 [374331]
         exit(CSWrapperFunctions.GetItemPicture(Barcode));
-        //+NPR5.53 [374331]
     end;
 
     procedure SearchItem(Word: Text): Text
     var
         CSItemSeachHandling: Record "NPR CS Item Search Handl." temporary;
         Item: Record Item;
-        JObject: DotNet JObject;
-        JTokenWriter: DotNet NPRNetJTokenWriter;
+        JObject: JsonObject;
         Result: Text;
         MaxItems: Integer;
         ItemsCounter: Integer;
         CSSetup: Record "NPR CS Setup";
+        ItemsArray: JsonArray;
+        ItemsObject: JsonObject;
     begin
         if Word = '' then
             exit;
@@ -345,26 +295,15 @@ codeunit 6151372 "NPR CS WS"
 
         CSItemSeachHandling.SetCurrentKey(Rank, "No.");
         if CSItemSeachHandling.FindSet then begin
-            JTokenWriter := JTokenWriter.JTokenWriter;
-            with JTokenWriter do begin
-                WriteStartObject;
-                WritePropertyName('items');
-                WriteStartArray;
-                repeat
-                    WriteStartObject;
-                    WritePropertyName('key');
-                    WriteValue(CSItemSeachHandling."No.");
-                    WritePropertyName('description1');
-                    WriteValue(CSItemSeachHandling.Description);
-                    WritePropertyName('description2');
-                    WriteValue(CSItemSeachHandling."Description 2");
-                    WriteEndObject;
-                until CSItemSeachHandling.Next = 0;
-                WriteEndArray;
-                WriteEndObject;
-                JObject := Token;
-            end;
-            Result := JObject.ToString();
+            repeat
+                Clear(ItemsObject);
+                ItemsObject.Add('key', CSItemSeachHandling."No.");
+                ItemsObject.Add('description1', CSItemSeachHandling.Description);
+                ItemsObject.Add('description2', CSItemSeachHandling."Description 2");
+                ItemsArray.Add(ItemsObject);
+            until CSItemSeachHandling.Next = 0;
+            JObject.Add('items', ItemsArray);
+            JObject.WriteTo(Result);
         end;
 
         exit(Result);
@@ -406,7 +345,6 @@ codeunit 6151372 "NPR CS WS"
         TagModel: Code[10];
         CSRfidItemPlaceholder: Record "NPR CS Rfid Item Handl.";
     begin
-        //-NPR5.51 [350696]
         if (StrLen(TagId) > MaxStrLen(CSRfidItemPlaceholder."Rfid Id")) or (StrLen(TagId) < MaxStrLen(CSRfidTagModels.Family)) then
             exit('UNKNOWNITEM');
 
@@ -418,7 +356,6 @@ codeunit 6151372 "NPR CS WS"
 
         if CSRfidTagModels.Discontinued then
             exit('UNKNOWNITEM');
-        //+NPR5.51 [350696]
 
         if CSRfidData.Get(TagId) then
             exit(CSRfidData."Combined key")
@@ -489,63 +426,42 @@ codeunit 6151372 "NPR CS WS"
     procedure GetRfidWhseReceiptData(DocNo: Text): Text
     var
         WhseReceiptLine: Record "Warehouse Receipt Line";
-        JObject: DotNet JObject;
-        JTokenWriter: DotNet NPRNetJTokenWriter;
+        JObject: JsonObject;
         Item: Record Item;
         ItemVariant: Record "Item Variant";
         ItemGroup: Record "NPR Item Group";
         Result: Text;
+        ItemArray: JsonArray;
+        ItemObject: JsonObject;
     begin
         if DocNo = '' then
             exit;
 
-        JTokenWriter := JTokenWriter.JTokenWriter;
-        with JTokenWriter do begin
-            WriteStartObject;
+        WhseReceiptLine.SetRange("No.", DocNo);
+        if WhseReceiptLine.FindSet then begin
+            repeat
+                Item.Get(WhseReceiptLine."Item No.");
+                if WhseReceiptLine."Variant Code" <> '' then
+                    ItemObject.Add('key', WhseReceiptLine."Item No." + '-' + WhseReceiptLine."Variant Code")
+                else
+                    ItemObject.Add('key', WhseReceiptLine."Item No.");
+                ItemObject.Add('title', WhseReceiptLine.Description);
+                ItemObject.Add('itemno', WhseReceiptLine."Item No.");
+                ItemObject.Add('variantcode', WhseReceiptLine."Variant Code");
+                if ItemVariant.Get(Item."No.", WhseReceiptLine."Variant Code") then
+                    ItemObject.Add('varianttitle', ItemVariant.Description)
+                else
+                    ItemObject.Add('varianttitle', '');
+                ItemObject.Add('itemgroup', Item."NPR Item Group");
+                ItemObject.Add('qtytoreceive', WhseReceiptLine."Qty. to Receive");
+                ItemObject.Add('qtyoutstanding', WhseReceiptLine."Qty. Outstanding");
 
-            WritePropertyName('item');
-            WriteStartArray;
-
-            WhseReceiptLine.SetRange("No.", DocNo);
-            if WhseReceiptLine.FindSet then begin
-                repeat
-
-                    Item.Get(WhseReceiptLine."Item No.");
-
-                    WriteStartObject;
-                    WritePropertyName('key');
-                    if WhseReceiptLine."Variant Code" <> '' then
-                        WriteValue(WhseReceiptLine."Item No." + '-' + WhseReceiptLine."Variant Code")
-                    else
-                        WriteValue(WhseReceiptLine."Item No.");
-                    WritePropertyName('title');
-                    WriteValue(WhseReceiptLine.Description);
-                    WritePropertyName('itemno');
-                    WriteValue(WhseReceiptLine."Item No.");
-                    WritePropertyName('variantcode');
-                    WriteValue(WhseReceiptLine."Variant Code");
-                    WritePropertyName('varianttitle');
-                    if ItemVariant.Get(Item."No.", WhseReceiptLine."Variant Code") then
-                        WriteValue(ItemVariant.Description)
-                    else
-                        WriteValue('');
-                    WritePropertyName('itemgroup');
-                    WriteValue(Item."NPR Item Group");
-                    WritePropertyName('qtytoreceive');
-                    WriteValue(WhseReceiptLine."Qty. to Receive");
-                    WritePropertyName('qtyoutstanding');
-                    WriteValue(WhseReceiptLine."Qty. Outstanding");
-                    WriteEndObject;
-                until WhseReceiptLine.Next = 0;
-            end;
-
-            WriteEndArray;
-
-            WriteEndObject;
-            JObject := Token;
-            Result := JObject.ToString();
-
+                ItemArray.Add(ItemObject);
+            until WhseReceiptLine.Next = 0;
         end;
+
+        JObject.Add('item', ItemArray);
+        JObject.WriteTo(Result);
 
         exit(Result);
     end;
@@ -693,8 +609,6 @@ codeunit 6151372 "NPR CS WS"
                 CSRefillData."Refilled Date" := CurrentDateTime;
                 CSRefillData.Modify;
             until CSRefillData.Next = 0;
-            //-NPR5.55 [384506]
-            //END;
         end else begin
             CSRefillData.Init;
             CSRefillData."Item No." := Item."No.";
@@ -705,7 +619,6 @@ codeunit 6151372 "NPR CS WS"
             CSRefillData."Refilled Date" := CurrentDateTime;
             CSRefillData.Insert;
         end;
-        //+NPR5.55 [384506]
 
         exit(StockTakeId);
     end;
@@ -757,14 +670,6 @@ codeunit 6151372 "NPR CS WS"
         ItemJournalLine: Record "Item Journal Line";
         ResetItemJournalLine: Record "Item Journal Line";
     begin
-        //-NPR5.52
-        // IF NOT StockTakeWorksheet.GET(StockTakeConfigCode,WorksheetName) THEN
-        //  EXIT('UNKNOWNSTOCKTAKEWORKSHEET');
-        //
-        // OK := STARTSESSION(SessionID, CODEUNIT::"CS UI WH Counting Handling", COMPANYNAME, StockTakeWorksheet);
-        // IF NOT OK THEN
-        //  EXIT(GETLASTERRORTEXT);
-
         if not CSSetup.Get then
             exit(StrSubstNo(Txt010, CompanyName));
 
@@ -776,20 +681,13 @@ codeunit 6151372 "NPR CS WS"
         if ItemJournalTemplate."Source Code" = '' then
             exit(StrSubstNo(Txt006, ItemJournalTemplate.Name));
 
-        //IF ItemJournalBatch."Reason Code" = '' THEN
-        //  EXIT(STRSUBSTNO(Txt007,ItemJournalBatch.Name));
-
         Clear(BaseItemJournalLine);
         BaseItemJournalLine.Init;
         BaseItemJournalLine.Validate("Journal Template Name", ItemJournalBatch."Journal Template Name");
         BaseItemJournalLine.Validate("Journal Batch Name", ItemJournalBatch.Name);
         BaseItemJournalLine."Location Code" := ItemJournalBatch.Name;
 
-        //-NPR5.52 [370277]
-        //CLEAR(NoSeriesMgt);
-        //BaseItemJournalLine."Document No." := NoSeriesMgt.GetNextNo(ItemJournalBatch."No. Series",BaseItemJournalLine."Posting Date",FALSE);
         BaseItemJournalLine."Document No." := Format(WorkDate);
-        //+NPR5.52 [370277]
         BaseItemJournalLine."Source Code" := ItemJournalTemplate."Source Code";
         BaseItemJournalLine."Reason Code" := ItemJournalBatch."Reason Code";
         BaseItemJournalLine."Posting No. Series" := ItemJournalBatch."Posting No. Series";
@@ -801,8 +699,6 @@ codeunit 6151372 "NPR CS WS"
             LineNo := TestItemJournalLine."Line No." + 1000
         else
             LineNo := 1000;
-
-        //EXIT(STRSUBSTNO(Txt009,StockTakeConfigCode,WorksheetName));
 
         CSStockTakesDataQy.SetRange(Worksheet_Name, ItemJournalBatch."Journal Template Name");
         CSStockTakesDataQy.SetRange(Stock_Take_Config_Code, ItemJournalBatch.Name);
@@ -862,12 +758,9 @@ codeunit 6151372 "NPR CS WS"
         Clear(CSStockTakesDataTb);
         CSStockTakesDataTb.SetRange("Worksheet Name", ItemJournalBatch."Journal Template Name");
         CSStockTakesDataTb.SetRange("Stock-Take Config Code", ItemJournalBatch.Name);
-        //CSStockTakesDataTb.SETFILTER("Item No.", '<>%1', '');
-        // CSStockTakesDataTb.DELETEALL(FALSE);
         CSStockTakesDataTb.ModifyAll("Transferred To Worksheet", true);
 
         exit(StockTakeConfigCode)
-        //+NPR5.52
     end;
 
     procedure ResetWarehouseCounting(StockTakeConfigCode: Text; WorksheetName: Text): Text
@@ -877,71 +770,32 @@ codeunit 6151372 "NPR CS WS"
         CSStockTakesData: Record "NPR CS Stock-Takes Data";
         CSStockTakeHandlingRfid: Record "NPR CS Stock-Take Handl. Rfid";
     begin
-        //-NPR5.51
-        //IF NOT StockTakeWorksheet.GET(StockTakeConfigCode,WorksheetName) THEN
         if not CSSetup.Get then
             exit(StrSubstNo(Txt010, CompanyName));
 
         if not ItemJournalBatch.Get(CSSetup."Phys. Inv Jour Temp Name", StockTakeConfigCode) then
             exit('UNKNOWNSTOCKTAKEWORKSHEET');
-        //+NPR5.51
 
         CSStockTakesData.SetRange("Transferred To Worksheet", false);
-        //-NPR5.54 [389224]
         CSStockTakesData.SetRange(Area, CSStockTakesData.Area::Warehouse);
-        //+NPR5.54 [389224]
-        //-NPR5.51
-        //CSStockTakesData.SETRANGE("Stock-Take Config Code",StockTakeWorksheet."Stock-Take Config Code");
-        //CSStockTakesData.SETRANGE("Worksheet Name",StockTakeWorksheet.Name);
         CSStockTakesData.SetRange("Worksheet Name", ItemJournalBatch."Journal Template Name");
         CSStockTakesData.SetRange("Stock-Take Config Code", ItemJournalBatch.Name);
-        //+NPR5.51
         CSStockTakesData.DeleteAll();
 
-        //-NPR5.54 [389224]
         Clear(CSStockTakeHandlingRfid);
         CSStockTakeHandlingRfid.SetRange("Stock-Take Config Code", StockTakeConfigCode);
         CSStockTakeHandlingRfid.SetRange("Worksheet Name", ItemJournalBatch."Journal Template Name");
         CSStockTakeHandlingRfid.SetRange(Area, CSStockTakeHandlingRfid.Area::Warehouse);
         CSStockTakeHandlingRfid.DeleteAll();
-        //+NPR5.54 [389224]
 
         exit(StockTakeConfigCode);
     end;
 
     procedure GetItemObject(Barcode: Code[20]): Text
     var
-        Item: Record Item;
-        Item2: Record Item;
-        BarcodeLibrary: Codeunit "NPR Barcode Library";
-        ItemNo: Code[20];
-        VariantCode: Code[10];
-        ResolvingTable: Integer;
-        PurchaseLine: Record "Purchase Line";
-        ItemLedgerEntry: Record "Item Ledger Entry";
-        JObject: DotNet JObject;
-        JTokenWriter: DotNet NPRNetJTokenWriter;
-        Result: Text;
-        Var01: Text;
-        Var02: Text;
-        Var03: Text;
-        Var04: Text;
-        Var05: Text;
-        Var06: Text;
-        Var07: Text;
-        Var08: Text;
-        Var09: Text;
-        Var10: Text;
-        Var11: Text;
-        BinaryReader: DotNet NPRNetBinaryReader;
-        MemoryStream: DotNet NPRNetMemoryStream;
-        Convert: DotNet NPRNetConvert;
-        InStr: InStream;
         CSWrapperFunctions: Codeunit "NPR CS Wrapper Functions";
     begin
-        //-NPR5.53 [374331]
         exit(CSWrapperFunctions.GetItemObject(Barcode));
-        //+NPR5.53 [374331]
     end;
 
     procedure GetWarehouseCountingDetails(BatchName: Text): Text
@@ -976,8 +830,7 @@ codeunit 6151372 "NPR CS WS"
         CSStoreUsers: Record "NPR CS Store Users";
         CSStockTakes: Record "NPR CS Stock-Takes";
         POSStore: Record "NPR POS Store";
-        JObject: DotNet NPRNetJObject;
-        JTokenWriter: DotNet NPRNetJTokenWriter;
+        JObject: JsonObject;
         Result: Text;
         SalespersonPurchaser: Record "Salesperson/Purchaser";
         Location: Record Location;
@@ -989,6 +842,8 @@ codeunit 6151372 "NPR CS WS"
         Item: Record Item;
         CalculateInventory: Report "Calculate Inventory";
         QtyCalculated: Decimal;
+        ItemObject: JsonObject;
+        ItemArray: JsonArray;
     begin
         if CurrUser = '' then
             Error(Txt012);
@@ -1019,9 +874,6 @@ codeunit 6151372 "NPR CS WS"
             CSStockTakes.TestField("Journal Template Name");
             CSStockTakes.TestField("Journal Batch Name");
 
-            //-NPR5.53 [377467]
-            //IF NOT CSStockTakes."Inventory Calculated" THEN
-            //  ERROR(STRSUBSTNO(Txt015,CSStockTakes."Journal Template Name",CSStockTakes."Journal Batch Name"));
             if not CSStockTakes."Inventory Calculated" then begin
                 CSSetup.Get;
                 CSSetup.TestField("Phys. Inv Jour Temp Name");
@@ -1073,97 +925,53 @@ codeunit 6151372 "NPR CS WS"
                 CSStockTakes.Modify(true);
 
             end;
-            //+NPR5.53 [377467]
-
         end;
 
-        JTokenWriter := JTokenWriter.JTokenWriter;
-        with JTokenWriter do begin
-            WriteStartObject;
+        ItemObject.Add('StoreId', POSStore.Code);
+        ItemObject.Add('StoreName', POSStore.Name);
+        ItemObject.Add('StoreLocationCode', POSStore."Location Code");
+        ItemObject.Add('StoreLocationName', Location.Name);
+        ItemObject.Add('StoreAddress', POSStore.Address);
+        ItemObject.Add('StoreAddress2', POSStore."Address 2");
+        ItemObject.Add('StorePostCode', POSStore."Post Code");
+        ItemObject.Add('StoreCountryRegionCode', POSStore."Country/Region Code");
+        ItemObject.Add('StoreCity', POSStore.City);
+        ItemObject.Add('StoreSupervisorId', SalespersonPurchaser.Code);
+        ItemObject.Add('StoreSupervisorName', SalespersonPurchaser.Name);
+        ItemObject.Add('StoreSupervisorPassword', SalespersonPurchaser."NPR Register Password");
+        ItemObject.Add('StockTakeId', Format(CSStockTakes."Stock-Take Id"));
+        ItemObject.Add('JournalTemplateName', CSStockTakes."Journal Template Name");
+        ItemObject.Add('JournalBatchName', CSStockTakes."Journal Batch Name");
+        ItemObject.Add('PredictedQty', Format(CSStockTakes."Predicted Qty."));
+        if CSStockTakes."Stockroom Closed" = 0DT then
+            ItemObject.Add('StockroomClosed', '0')
+        else
+            ItemObject.Add('StockroomClosed', '1');
 
-            WritePropertyName('item');
-            WriteStartArray;
+        if CSStockTakes."Salesfloor Closed" = 0DT then
+            ItemObject.Add('SalesfloorClosed', '0')
+        else
+            ItemObject.Add('SalesfloorClosed', '1');
 
-            WriteStartObject;
+        if CSStockTakes."Refill Closed" = 0DT then
+            ItemObject.Add('RefillClosed', '0')
+        else
+            ItemObject.Add('RefillClosed', '1');
 
-            WritePropertyName('StoreId');
-            WriteValue(POSStore.Code);
-            WritePropertyName('StoreName');
-            WriteValue(POSStore.Name);
-            WritePropertyName('StoreLocationCode');
-            WriteValue(POSStore."Location Code");
-            WritePropertyName('StoreLocationName');
-            WriteValue(Location.Name);
-            WritePropertyName('StoreAddress');
-            WriteValue(POSStore.Address);
-            WritePropertyName('StoreAddress2');
-            WriteValue(POSStore."Address 2");
-            WritePropertyName('StorePostCode');
-            WriteValue(POSStore."Post Code");
-            WritePropertyName('StoreCountryRegionCode');
-            WriteValue(POSStore."Country/Region Code");
-            WritePropertyName('StoreCity');
-            WriteValue(POSStore.City);
+        if CSStockTakes.Approved = 0DT then
+            ItemObject.Add('Approved', '0')
+        else
+            ItemObject.Add('Approved', '1');
 
-            WritePropertyName('StoreSupervisorId');
-            WriteValue(SalespersonPurchaser.Code);
-            WritePropertyName('StoreSupervisorName');
-            WriteValue(SalespersonPurchaser.Name);
-            WritePropertyName('StoreSupervisorPassword');
-            WriteValue(SalespersonPurchaser."NPR Register Password");
+        CSSetup.Get;
+        if (CSSetup."Batch Size" > 10) and (CSSetup."Batch Size" < 1000) then
+            ItemObject.Add('BatchSize', CSSetup."Batch Size")
+        else
+            ItemObject.Add('BatchSize', '10');
 
-            WritePropertyName('StockTakeId');
-            WriteValue(Format(CSStockTakes."Stock-Take Id"));
-            WritePropertyName('JournalTemplateName');
-            WriteValue(CSStockTakes."Journal Template Name");
-            WritePropertyName('JournalBatchName');
-            WriteValue(CSStockTakes."Journal Batch Name");
-            WritePropertyName('PredictedQty');
-            WriteValue(Format(CSStockTakes."Predicted Qty."));
-
-            WritePropertyName('StockroomClosed');
-            if CSStockTakes."Stockroom Closed" = 0DT then
-                WriteValue('0')
-            else
-                WriteValue('1');
-
-            WritePropertyName('SalesfloorClosed');
-            if CSStockTakes."Salesfloor Closed" = 0DT then
-                WriteValue('0')
-            else
-                WriteValue('1');
-
-            WritePropertyName('RefillClosed');
-            if CSStockTakes."Refill Closed" = 0DT then
-                WriteValue('0')
-            else
-                WriteValue('1');
-
-            WritePropertyName('Approved');
-            if CSStockTakes.Approved = 0DT then
-                WriteValue('0')
-            else
-                WriteValue('1');
-
-            //-NPR5.54 [389224]
-            CSSetup.Get;
-            WritePropertyName('BatchSize');
-            if (CSSetup."Batch Size" > 10) and (CSSetup."Batch Size" < 1000) then
-                WriteValue(CSSetup."Batch Size")
-            else
-                WriteValue('10');
-            //-NPR5.54 [389224]
-
-            WriteEndObject;
-
-            WriteEndArray;
-
-            WriteEndObject;
-            JObject := Token;
-            Result := JObject.ToString();
-
-        end;
-
+        ItemArray.Add(ItemObject);
+        JObject.Add('item', ItemArray);
+        JObject.WriteTo(Result);
         exit(Result);
     end;
 
@@ -1171,9 +979,6 @@ codeunit 6151372 "NPR CS WS"
     var
         CSStockTakes: Record "NPR CS Stock-Takes";
     begin
-        //IF STRLEN(StockTakeId) > MAXSTRLEN(CSStockTakes."Stock-Take Id") THEN
-        //  EXIT(Txt016);
-
         if not CSStockTakes.Get(StockTakeId) then
             exit(StrSubstNo(Txt017, StockTakeId));
 
@@ -1273,10 +1078,7 @@ codeunit 6151372 "NPR CS WS"
         if not CSStockTakes.Get(StockTakeId) then
             exit(StrSubstNo(Txt017, StockTakeId));
 
-        //-NPR5.53 [375919]
         if CSStockTakes."Adjust Inventory" then begin
-            //+NPR5.53 [375919]
-            //-NPR5.53 [374331]
             CSSetup.Get;
             if CSSetup."Post with Job Queue" then begin
                 PostingRecRef.GetTable(CSStockTakes);
@@ -1284,9 +1086,7 @@ codeunit 6151372 "NPR CS WS"
                 CSPostingBuffer."Table No." := PostingRecRef.Number;
                 CSPostingBuffer."Record Id" := PostingRecRef.RecordId;
                 CSPostingBuffer."Job Type" := CSPostingBuffer."Job Type"::"Approve Counting";
-                //-NPR5.53 [377462]
                 CSPostingBuffer."Job Queue Priority for Post" := 2000;
-                //+NPR5.53 [377462]
                 if CSPostingBuffer.Insert(true) then begin
                     CSPostEnqueue.Run(CSPostingBuffer);
                     if CSStockTakes.Approved = 0DT then begin
@@ -1298,7 +1098,6 @@ codeunit 6151372 "NPR CS WS"
                 end else
                     exit(GetLastErrorText);
             end;
-            //+NPR5.53 [374331]
 
             if not ItemJournalBatch.Get(CSStockTakes."Journal Template Name", CSStockTakes."Journal Batch Name") then
                 exit(StrSubstNo(Txt005, CSStockTakes."Journal Batch Name"));
@@ -1314,11 +1113,7 @@ codeunit 6151372 "NPR CS WS"
             BaseItemJournalLine.Validate("Journal Batch Name", ItemJournalBatch.Name);
             BaseItemJournalLine."Location Code" := ItemJournalBatch.Name;
 
-            //-NPR5.52 [370277]
-            //CLEAR(NoSeriesMgt);
-            //BaseItemJournalLine."Document No." := NoSeriesMgt.GetNextNo(ItemJournalBatch."No. Series",BaseItemJournalLine."Posting Date",FALSE);
             BaseItemJournalLine."Document No." := Format(WorkDate);
-            //+NPR5.52 [370277]
             BaseItemJournalLine."Source Code" := ItemJournalTemplate."Source Code";
             BaseItemJournalLine."Reason Code" := ItemJournalBatch."Reason Code";
             BaseItemJournalLine."Posting No. Series" := ItemJournalBatch."Posting No. Series";
@@ -1331,15 +1126,9 @@ codeunit 6151372 "NPR CS WS"
             else
                 LineNo := 1000;
 
-            //EXIT(STRSUBSTNO(Txt009,StockTakeConfigCode,WorksheetName));
-
             CSStockTakesDataQy.SetRange(Stock_Take_Id, StockTakeId);
-            //-NPR5.52 [370277]
-            //CSStockTakesDataQy.SETRANGE(Worksheet_Name,ItemJournalBatch."Journal Template Name");
-            //CSStockTakesDataQy.SETRANGE(Stock_Take_Config_Code,ItemJournalBatch.Name);
             CSStockTakesDataQy.SetRange(Stock_Take_Config_Code, ItemJournalBatch."Journal Template Name");
             CSStockTakesDataQy.SetRange(Worksheet_Name, ItemJournalBatch.Name);
-            //+NPR5.52 [370277]
             CSStockTakesDataQy.SetRange(Transferred_To_Worksheet, false);
             CSStockTakesDataQy.Open;
             while CSStockTakesDataQy.Read do begin
@@ -1392,18 +1181,10 @@ codeunit 6151372 "NPR CS WS"
                     ResetItemJournalLine.Modify(true);
                 until ResetItemJournalLine.Next = 0;
             end;
-            //-NPR5.53 [375919]
         end;
-        //+NPR5.53 [375919]
 
         Clear(CSStockTakesDataTb);
         CSStockTakesDataTb.SetRange("Stock-Take Id", StockTakeId);
-        //-NPR5.53 [375919]
-        //CSStockTakesDataQy.SETRANGE(Stock_Take_Config_Code,ItemJournalBatch."Journal Template Name");
-        //CSStockTakesDataQy.SETRANGE(Worksheet_Name,ItemJournalBatch.Name);
-        //+NPR5.53 [375919]
-        //CSStockTakesDataTb.SETRANGE("Worksheet Name",ItemJournalBatch."Journal Template Name");
-        //CSStockTakesDataTb.SETRANGE("Stock-Take Config Code",ItemJournalBatch.Name);
         CSStockTakesDataTb.SetRange("Stock-Take Config Code", ItemJournalBatch."Journal Template Name");
         CSStockTakesDataTb.SetRange("Worksheet Name", ItemJournalBatch.Name);
         CSStockTakesDataTb.ModifyAll("Transferred To Worksheet", true);
@@ -1414,7 +1195,6 @@ codeunit 6151372 "NPR CS WS"
             CSStockTakes.Modify(true);
         end;
 
-        //-NPR5.53 [375919]
         if CSStockTakes."Adjust Inventory" then begin
             if (ItemJournalBatch."No. Series" <> '') then begin
                 DocumentNo := NoSeriesMgt.GetNextNo(ItemJournalBatch."No. Series", WorkDate, false);
@@ -1437,17 +1217,10 @@ codeunit 6151372 "NPR CS WS"
         if CSStockTakes.Closed = 0DT then begin
             CSStockTakes.Closed := CurrentDateTime;
             CSStockTakes."Closed By" := UserId;
-            //-NPR5.54 [384506]
-            //CSStockTakes."Journal Posted" := CSStockTakes."Adjust Inventory";
-            //CSStockTakes.MODIFY(TRUE);
-            //+NPR5.54 [384506]
         end;
-        //+NPR5.53 [375919]
 
-        //-NPR5.54 [384506]
         CSStockTakes."Journal Posted" := CSStockTakes."Adjust Inventory";
         CSStockTakes.Modify(true);
-        //+NPR5.54 [384506]
 
         exit(StockTakeId)
     end;
@@ -1473,7 +1246,6 @@ codeunit 6151372 "NPR CS WS"
         end;
         CSStockTakesData.DeleteAll();
 
-        //-NPR5.54 [389224]
         Clear(CSStockTakeHandlingRfid);
         CSStockTakeHandlingRfid.SetRange("Stock-Take Config Code", StockTakeConfigCode);
         CSStockTakeHandlingRfid.SetRange("Worksheet Name", WorksheetName);
@@ -1486,184 +1258,13 @@ codeunit 6151372 "NPR CS WS"
                 CSStockTakeHandlingRfid.SetRange(Area, CSStockTakeHandlingRfid.Area::Stockroom);
         end;
         CSStockTakeHandlingRfid.DeleteAll();
-        //+NPR5.54 [389224]
 
         exit(StockTakeConfigCode);
     end;
 
     procedure CreateStoreRefillData(StockTakeId: Text) Result: Text
-    var
-        CSRefillData: Record "NPR CS Refill Data";
-        Item: Record Item;
-        ItemGroup: Record "NPR Item Group";
-        MagentoPicture: Record "NPR Magento Picture";
-        MagentoPictureLink: Record "NPR Magento Picture Link";
-        JObject: DotNet NPRNetJObject;
-        JTokenWriter: DotNet NPRNetJTokenWriter;
-        CSSetup: Record "NPR CS Setup";
-        CSRefillItems: Query "NPR CS Refill Items";
-        CSRefillSections: Query "NPR CS Refill Sections";
-        CSStockTakes: Record "NPR CS Stock-Takes";
-        CSStockTakesData: Record "NPR CS Stock-Takes Data";
     begin
-        //-NPR5.55 [384506]
         exit(CreateStoreRefillDataV2(StockTakeId));
-        //+NPR5.55 [384506]
-
-        if not CSSetup.Get then
-            exit;
-
-        if not CSSetup."Enable Capture Service" then
-            exit;
-
-        if not CSStockTakes.Get(StockTakeId) then
-            exit;
-
-        if (CSStockTakes."Create Refill Data Started" = 0DT) then begin
-
-            CSStockTakes."Create Refill Data Started" := CurrentDateTime;
-
-            CSStockTakesData.SetRange("Stock-Take Id", CSStockTakes."Stock-Take Id");
-            CSStockTakesData.SetRange(Area, CSStockTakesData.Area::Salesfloor);
-            CSStockTakesData.SetRange("Transferred To Worksheet", false);
-            if CSStockTakesData.FindSet then begin
-                repeat
-                    if CSStockTakesData."Item No." <> '' then begin
-                        if not CSRefillData.Get(CSStockTakesData."Item No.", CSStockTakesData."Variant Code", CSStockTakes.Location, CSStockTakes."Stock-Take Id") then begin
-                            //-NPR5.55 [384506]
-                            //CSRefillData.INIT;
-                            //CSRefillData.VALIDATE("Item No.",CSStockTakesData."Item No.");
-                            //CSRefillData.VALIDATE("Variant Code",CSStockTakesData."Variant Code");
-                            //CSRefillData.VALIDATE(Location,CSStockTakes.Location);
-                            //CSRefillData."Stock-Take Id" := CSStockTakes."Stock-Take Id";
-                            //CSRefillData.INSERT(TRUE);
-                            CSStockTakesData.CalcFields("Item Description", "Variant Description");
-                            CSRefillData.Init;
-                            CSRefillData.Validate("Item No.", CSStockTakesData."Item No.");
-                            CSRefillData.Validate("Variant Code", CSStockTakesData."Variant Code");
-                            CSRefillData.Validate(Location, CSStockTakes.Location);
-                            CSRefillData."Stock-Take Id" := CSStockTakes."Stock-Take Id";
-                            CSRefillData."Item Description" := CSStockTakesData."Item Description";
-                            CSRefillData."Variant Description" := CSStockTakesData."Variant Description";
-                            CSRefillData.Insert(true);
-                            //+NPR5.55 [384506]
-                        end;
-
-                        if CSRefillData."Variant Code" <> '' then
-                            CSRefillData."Combined key" := CSRefillData."Item No." + '-' + CSRefillData."Variant Code"
-                        else
-                            CSRefillData."Combined key" := CSRefillData."Item No.";
-
-                        CSRefillData."Qty. in Store" += 1;
-
-                        CSRefillData.Modify(true);
-                    end;
-                until CSStockTakesData.Next = 0;
-            end;
-
-            Clear(CSStockTakesData);
-            CSStockTakesData.SetRange("Stock-Take Id", CSStockTakes."Stock-Take Id");
-            CSStockTakesData.SetRange(Area, CSStockTakesData.Area::Stockroom);
-            CSStockTakesData.SetRange("Transferred To Worksheet", false);
-            if CSStockTakesData.FindSet then begin
-                repeat
-                    if CSStockTakesData."Item No." <> '' then begin
-                        if not CSRefillData.Get(CSStockTakesData."Item No.", CSStockTakesData."Variant Code", CSStockTakes.Location, CSStockTakes."Stock-Take Id") then begin
-                            //-NPR5.55 [384506]
-                            //CSRefillData.INIT;
-                            //CSRefillData.VALIDATE("Item No.",CSStockTakesData."Item No.");
-                            //CSRefillData.VALIDATE("Variant Code",CSStockTakesData."Variant Code");
-                            //CSRefillData.VALIDATE(Location,CSStockTakes.Location);
-                            //CSRefillData."Stock-Take Id" := CSStockTakes."Stock-Take Id";
-                            //CSRefillData.INSERT(TRUE);
-                            CSStockTakesData.CalcFields("Item Description", "Variant Description");
-                            CSRefillData.Init;
-                            CSRefillData.Validate("Item No.", CSStockTakesData."Item No.");
-                            CSRefillData.Validate("Variant Code", CSStockTakesData."Variant Code");
-                            CSRefillData.Validate(Location, CSStockTakes.Location);
-                            CSRefillData."Stock-Take Id" := CSStockTakes."Stock-Take Id";
-                            CSRefillData."Item Description" := CSStockTakesData."Item Description";
-                            CSRefillData."Variant Description" := CSStockTakesData."Variant Description";
-                            CSRefillData.Insert(true);
-                            //+NPR5.55 [384506]
-                        end;
-
-                        if CSRefillData."Variant Code" <> '' then
-                            CSRefillData."Combined key" := CSRefillData."Item No." + '-' + CSRefillData."Variant Code"
-                        else
-                            CSRefillData."Combined key" := CSRefillData."Item No.";
-
-                        CSRefillData."Qty. in Stock" += 1;
-
-                        CSRefillData.Modify(true);
-                    end;
-                until CSStockTakesData.Next = 0;
-            end;
-
-            CSStockTakes."Create Refill Data Ended" := CurrentDateTime;
-            CSStockTakes.Modify;
-
-        end;
-
-        JTokenWriter := JTokenWriter.JTokenWriter;
-        with JTokenWriter do begin
-            WriteStartObject;
-
-            WritePropertyName('section');
-            WriteStartArray;
-            CSRefillSections.SetFilter(Stock_Take_Id, CSStockTakes."Stock-Take Id");
-            CSRefillSections.Open;
-            while CSRefillSections.Read do begin
-                WriteStartObject;
-                WritePropertyName('key');
-                WriteValue(CSRefillSections.Item_No);
-                WritePropertyName('title');
-                WriteValue(CSRefillSections.Item_Description);
-                WritePropertyName('itemgroup');
-                WriteValue(CSRefillSections.Item_Group_Code);
-                WritePropertyName('marked');
-                WriteValue(CSRefillSections.Refilled);
-                WriteEndObject;
-            end;
-            CSRefillSections.Close;
-            WriteEndArray;
-
-            WritePropertyName('item');
-            WriteStartArray;
-            CSRefillItems.SetFilter(Stock_Take_Id, CSStockTakes."Stock-Take Id");
-            CSRefillItems.Open;
-            while CSRefillItems.Read do begin
-                WriteStartObject;
-                WritePropertyName('key');
-                WriteValue(CSRefillItems.Combined_key);
-                WritePropertyName('title');
-                WriteValue(CSRefillItems.Item_Description);
-                WritePropertyName('itemno');
-                WriteValue(CSRefillItems.Item_No);
-                WritePropertyName('variantcode');
-                WriteValue(CSRefillItems.Variant_Code);
-                WritePropertyName('varianttitle');
-                WriteValue(CSRefillItems.Variant_Description);
-                WritePropertyName('itemgroup');
-                WriteValue(CSRefillItems.Item_Group_Code);
-                WritePropertyName('imageurl');
-                WriteValue(CSRefillItems.Image_Url);
-                WritePropertyName('qtystock');
-                WriteValue(CSRefillItems.Qty_in_Stock);
-                WritePropertyName('qtystore');
-                WriteValue(CSRefillItems.Qty_in_Store);
-                WritePropertyName('marked');
-                WriteValue(CSRefillItems.Refilled);
-                WriteEndObject;
-            end;
-            CSRefillItems.Close;
-            WriteEndArray;
-
-            WriteEndObject;
-            JObject := Token;
-        end;
-
-        Result := JObject.ToString();
     end;
 
     procedure CreateStoreCounting(Location: Code[10]): Text
@@ -1690,12 +1291,13 @@ codeunit 6151372 "NPR CS WS"
     var
         CSItemSeachHandling: Record "NPR CS Item Search Handl." temporary;
         POSStore: Record "NPR POS Store";
-        JObject: DotNet NPRNetJObject;
-        JTokenWriter: DotNet NPRNetJTokenWriter;
+        JObject: JsonObject;
         Result: Text;
         CSSetup: Record "NPR CS Setup";
         MaxItems: Integer;
         ItemsCounter: Integer;
+        ItemsObject: JsonObject;
+        ItemsArray: JsonArray;
     begin
         if Word = '' then
             exit;
@@ -1779,26 +1381,14 @@ codeunit 6151372 "NPR CS WS"
 
         CSItemSeachHandling.SetCurrentKey(Rank, "No.");
         if CSItemSeachHandling.FindSet then begin
-            JTokenWriter := JTokenWriter.JTokenWriter;
-            with JTokenWriter do begin
-                WriteStartObject;
-                WritePropertyName('items');
-                WriteStartArray;
-                repeat
-                    WriteStartObject;
-                    WritePropertyName('key');
-                    WriteValue(CSItemSeachHandling."No.");
-                    WritePropertyName('description1');
-                    WriteValue(CSItemSeachHandling.Description);
-                    WritePropertyName('description2');
-                    WriteValue(CSItemSeachHandling."Description 2");
-                    WriteEndObject;
-                until CSItemSeachHandling.Next = 0;
-                WriteEndArray;
-                WriteEndObject;
-                JObject := Token;
-            end;
-            Result := JObject.ToString();
+            repeat
+                ItemsObject.Add('key', CSItemSeachHandling."No.");
+                ItemsObject.Add('description1', CSItemSeachHandling.Description);
+                ItemsObject.Add('description2', CSItemSeachHandling."Description 2");
+                ItemsArray.Add(ItemsObject);
+            until CSItemSeachHandling.Next = 0;
+            JObject.Add('items', ItemsArray);
+            JObject.WriteTo(Result);
         end;
 
         exit(Result);
@@ -1808,8 +1398,7 @@ codeunit 6151372 "NPR CS WS"
     var
         CSStockTakes: Record "NPR CS Stock-Takes";
         POSStore: Record "NPR POS Store";
-        JObject: DotNet NPRNetJObject;
-        JTokenWriter: DotNet NPRNetJTokenWriter;
+        JObject: JsonObject;
         Result: Text;
         Location: Record Location;
         ItemJournalLine: Record "Item Journal Line";
@@ -1823,6 +1412,8 @@ codeunit 6151372 "NPR CS WS"
         CSCountingSupervisor: Record "NPR CS Counting Supervisor";
         SalespersonPurchaser: Record "Salesperson/Purchaser";
         CSStoreUsers: Record "NPR CS Store Users";
+        ItemObject: JsonObject;
+        ItemArray: JsonArray;
     begin
         if CurrUser = '' then
             Error(Txt012);
@@ -1857,13 +1448,8 @@ codeunit 6151372 "NPR CS WS"
                 CSStockTakes.SetRange(Location, Location.Code);
                 CSStockTakes.SetRange(Closed, 0DT);
                 CSStockTakes.SetRange("Journal Posted", false);
-                //-NPR5.54 [384506]
                 CSStockTakes.SetRange("Adjust Inventory", true);
-                //+NPR5.54 [384506]
                 if CSStockTakes.FindFirst then begin
-                    //-NPR5.54 [384506]
-                    //IF CSStockTakes."Adjust Inventory" THEN BEGIN
-                    //+NPR5.54 [384506]
                     CSStockTakes.TestField("Journal Template Name");
                     CSStockTakes.TestField("Journal Batch Name");
 
@@ -1900,10 +1486,7 @@ codeunit 6151372 "NPR CS WS"
                         CalculateInventory.UseRequestPage(false);
                         CalculateInventory.SetTableView(Item);
                         CalculateInventory.SetItemJnlLine(ItemJournalLine);
-                        //-NPR5.53 [389864]
-                        //CalculateInventory.InitializeRequest(WORKDATE,ItemJournalLine."Document No.",FALSE);
                         CalculateInventory.InitializeRequest(WorkDate, ItemJournalLine."Document No.", false, false);
-                        //+NPR5.53 [389864]
                         CalculateInventory.RunModal;
 
                         Clear(ItemJournalLine);
@@ -1921,101 +1504,57 @@ codeunit 6151372 "NPR CS WS"
                         CSStockTakes.Modify(true);
 
                     end;
-                    //-NPR5.54 [384506]
-                    //END;
-                    //+NPR5.54 [384506]
                 end;
             end;
         end;
 
-        JTokenWriter := JTokenWriter.JTokenWriter;
-        with JTokenWriter do begin
-            WriteStartObject;
+        ItemObject.Add('StoreId', POSStore.Code);
+        ItemObject.Add('StoreName', POSStore.Name);
+        ItemObject.Add('StoreLocationCode', POSStore."Location Code");
+        ItemObject.Add('StoreLocationName', Location.Name);
+        ItemObject.Add('StoreAddress', POSStore.Address);
+        ItemObject.Add('StoreAddress2', POSStore."Address 2");
+        ItemObject.Add('StorePostCode', POSStore."Post Code");
+        ItemObject.Add('StoreCountryRegionCode', POSStore."Country/Region Code");
+        ItemObject.Add('StoreCity', POSStore.City);
+        ItemObject.Add('CountingSupervisor', '1');
+        ItemObject.Add('StoreSupervisorId', CSCountingSupervisor."User ID");
+        ItemObject.Add('StoreSupervisorName', CSCountingSupervisor."Full Name");
+        ItemObject.Add('StoreSupervisorPassword', CSCountingSupervisor.Pin);
+        ItemObject.Add('StockTakeId', Format(CSStockTakes."Stock-Take Id"));
+        ItemObject.Add('JournalTemplateName', CSStockTakes."Journal Template Name");
+        ItemObject.Add('JournalBatchName', CSStockTakes."Journal Batch Name");
+        ItemObject.Add('PredictedQty', Format(CSStockTakes."Predicted Qty."));
+        if CSStockTakes."Stockroom Closed" = 0DT then
+            ItemObject.Add('StockroomClosed', '0')
+        else
+            ItemObject.Add('StockroomClosed', '1');
 
-            WritePropertyName('item');
-            WriteStartArray;
+        if CSStockTakes."Salesfloor Closed" = 0DT then
+            ItemObject.Add('SalesfloorClosed', '0')
+        else
+            ItemObject.Add('SalesfloorClosed', '1');
 
-            WriteStartObject;
+        if CSStockTakes."Refill Closed" = 0DT then
+            ItemObject.Add('RefillClosed', '0')
+        else
+            ItemObject.Add('RefillClosed', '1');
 
-            WritePropertyName('StoreId');
-            WriteValue(POSStore.Code);
-            WritePropertyName('StoreName');
-            WriteValue(POSStore.Name);
-            WritePropertyName('StoreLocationCode');
-            WriteValue(POSStore."Location Code");
-            WritePropertyName('StoreLocationName');
-            WriteValue(Location.Name);
-            WritePropertyName('StoreAddress');
-            WriteValue(POSStore.Address);
-            WritePropertyName('StoreAddress2');
-            WriteValue(POSStore."Address 2");
-            WritePropertyName('StorePostCode');
-            WriteValue(POSStore."Post Code");
-            WritePropertyName('StoreCountryRegionCode');
-            WriteValue(POSStore."Country/Region Code");
-            WritePropertyName('StoreCity');
-            WriteValue(POSStore.City);
+        if CSStockTakes.Approved = 0DT then
+            ItemObject.Add('Approved', '0')
+        else
+            ItemObject.Add('Approved', '1');
 
-            WritePropertyName('CountingSupervisor');
-            WriteValue('1');
-            WritePropertyName('StoreSupervisorId');
-            WriteValue(CSCountingSupervisor."User ID");
-            WritePropertyName('StoreSupervisorName');
-            WriteValue(CSCountingSupervisor."Full Name");
-            WritePropertyName('StoreSupervisorPassword');
-            WriteValue(CSCountingSupervisor.Pin);
+        CSSetup.Get;
+        if (CSSetup."Batch Size" > 10) and (CSSetup."Batch Size" < 1000) then
+            ItemObject.Add('BatchSize', CSSetup."Batch Size")
+        else
+            ItemObject.Add('BatchSize', '10');
 
-            WritePropertyName('StockTakeId');
-            WriteValue(Format(CSStockTakes."Stock-Take Id"));
-            WritePropertyName('JournalTemplateName');
-            WriteValue(CSStockTakes."Journal Template Name");
-            WritePropertyName('JournalBatchName');
-            WriteValue(CSStockTakes."Journal Batch Name");
-            WritePropertyName('PredictedQty');
-            WriteValue(Format(CSStockTakes."Predicted Qty."));
+        ItemArray.Add(ItemObject);
 
-            WritePropertyName('StockroomClosed');
-            if CSStockTakes."Stockroom Closed" = 0DT then
-                WriteValue('0')
-            else
-                WriteValue('1');
-
-            WritePropertyName('SalesfloorClosed');
-            if CSStockTakes."Salesfloor Closed" = 0DT then
-                WriteValue('0')
-            else
-                WriteValue('1');
-
-            WritePropertyName('RefillClosed');
-            if CSStockTakes."Refill Closed" = 0DT then
-                WriteValue('0')
-            else
-                WriteValue('1');
-
-            WritePropertyName('Approved');
-            if CSStockTakes.Approved = 0DT then
-                WriteValue('0')
-            else
-                WriteValue('1');
-
-            //-NPR5.54 [389224]
-            CSSetup.Get;
-            WritePropertyName('BatchSize');
-            if (CSSetup."Batch Size" > 10) and (CSSetup."Batch Size" < 1000) then
-                WriteValue(CSSetup."Batch Size")
-            else
-                WriteValue('10');
-            //-NPR5.54 [389224]
-
-            WriteEndObject;
-
-            WriteEndArray;
-
-            WriteEndObject;
-            JObject := Token;
-            Result := JObject.ToString();
-
-        end;
+        JObject.Add('item', ItemArray);
+        JObject.WriteTo(Result);
 
         exit(Result);
     end;
@@ -2025,8 +1564,7 @@ codeunit 6151372 "NPR CS WS"
         CSStoreUsers: Record "NPR CS Store Users";
         CSStockTakes: Record "NPR CS Stock-Takes";
         POSStore: Record "NPR POS Store";
-        JObject: DotNet NPRNetJObject;
-        JTokenWriter: DotNet NPRNetJTokenWriter;
+        JObject: JsonObject;
         Result: Text;
         SalespersonPurchaser: Record "Salesperson/Purchaser";
         Location: Record Location;
@@ -2038,6 +1576,8 @@ codeunit 6151372 "NPR CS WS"
         Item: Record Item;
         CalculateInventory: Report "Calculate Inventory";
         QtyCalculated: Decimal;
+        ItemObject: JsonObject;
+        ItemArray: JsonArray;
     begin
         if CurrUser = '' then
             Error(Txt012);
@@ -2064,22 +1604,15 @@ codeunit 6151372 "NPR CS WS"
         CSStockTakes.SetRange(Location, POSStore."Location Code");
         CSStockTakes.SetRange(Closed, 0DT);
         CSStockTakes.SetRange("Journal Posted", false);
-        //-NPR5.54 [384506]
         if CSStoreUsers."Adjust Inventory" then
             CSStockTakes.SetRange("Adjust Inventory", true)
         else
             CSStockTakes.SetRange("Adjust Inventory", false);
-        //+NPR5.54 [384506]
         if CSStockTakes.FindFirst then begin
-            //-NPR5.53 [375919]
             if CSStockTakes."Adjust Inventory" then begin
-                //+NPR5.53 [375919]
                 CSStockTakes.TestField("Journal Template Name");
                 CSStockTakes.TestField("Journal Batch Name");
 
-                //-NPR5.53 [377467]
-                //IF NOT CSStockTakes."Inventory Calculated" THEN
-                //  ERROR(STRSUBSTNO(Txt015,CSStockTakes."Journal Template Name",CSStockTakes."Journal Batch Name"));
                 if not CSStockTakes."Inventory Calculated" then begin
                     CSSetup.Get;
                     CSSetup.TestField("Phys. Inv Jour Temp Name");
@@ -2113,10 +1646,7 @@ codeunit 6151372 "NPR CS WS"
                     CalculateInventory.UseRequestPage(false);
                     CalculateInventory.SetTableView(Item);
                     CalculateInventory.SetItemJnlLine(ItemJournalLine);
-                    //-NPR5.53 [389864]
-                    //CalculateInventory.InitializeRequest(WORKDATE,ItemJournalLine."Document No.",FALSE);
                     CalculateInventory.InitializeRequest(WorkDate, ItemJournalLine."Document No.", false, false);
-                    //+NPR5.53 [389864]
                     CalculateInventory.RunModal;
 
                     Clear(ItemJournalLine);
@@ -2132,104 +1662,52 @@ codeunit 6151372 "NPR CS WS"
                     CSStockTakes."Predicted Qty." := QtyCalculated;
                     CSStockTakes."Inventory Calculated" := true;
                     CSStockTakes.Modify(true);
-
                 end;
-                //+NPR5.53 [377467]
-                //-NPR5.53 [375919]
             end;
-            //+NPR5.53 [375919]
         end;
 
-        JTokenWriter := JTokenWriter.JTokenWriter;
-        with JTokenWriter do begin
-            WriteStartObject;
+        ItemObject.Add('StoreId', POSStore.Code);
+        ItemObject.Add('StoreName', POSStore.Name);
+        ItemObject.Add('StoreLocationCode', POSStore."Location Code");
+        ItemObject.Add('StoreLocationName', Location.Name);
+        ItemObject.Add('StoreAddress', POSStore.Address);
+        ItemObject.Add('StoreAddress2', POSStore."Address 2");
+        ItemObject.Add('StorePostCode', POSStore."Post Code");
+        ItemObject.Add('StoreCountryRegionCode', POSStore."Country/Region Code");
+        ItemObject.Add('StoreCity', POSStore.City);
+        ItemObject.Add('CountingSupervisor', '0');
+        ItemObject.Add('StoreSupervisorId', SalespersonPurchaser.Code);
+        ItemObject.Add('StoreSupervisorName', SalespersonPurchaser.Name);
+        ItemObject.Add('StoreSupervisorPassword', SalespersonPurchaser."NPR Register Password");
+        ItemObject.Add('StockTakeId', Format(CSStockTakes."Stock-Take Id"));
+        ItemObject.Add('JournalTemplateName', CSStockTakes."Journal Template Name");
+        ItemObject.Add('JournalBatchName', CSStockTakes."Journal Batch Name");
+        ItemObject.Add('PredictedQty', Format(CSStockTakes."Predicted Qty."));
+        if CSStockTakes."Stockroom Closed" = 0DT then
+            ItemObject.Add('StockroomClosed', '0')
+        else
+            ItemObject.Add('StockroomClosed', '1');
+        if CSStockTakes."Salesfloor Closed" = 0DT then
+            ItemObject.Add('SalesfloorClosed', '0')
+        else
+            ItemObject.Add('SalesfloorClosed', '1');
+        if CSStockTakes."Refill Closed" = 0DT then
+            ItemObject.Add('RefillClosed', '0')
+        else
+            ItemObject.Add('RefillClosed', '1');
+        if CSStockTakes.Approved = 0DT then
+            ItemObject.Add('Approved', '0')
+        else
+            ItemObject.Add('Approved', '1');
+        CSSetup.Get;
+        if (CSSetup."Batch Size" > 10) and (CSSetup."Batch Size" < 1000) then
+            ItemObject.Add('BatchSize', CSSetup."Batch Size")
+        else
+            ItemObject.Add('BatchSize', '10');
 
-            WritePropertyName('item');
-            WriteStartArray;
-
-            WriteStartObject;
-
-            WritePropertyName('StoreId');
-            WriteValue(POSStore.Code);
-            WritePropertyName('StoreName');
-            WriteValue(POSStore.Name);
-            WritePropertyName('StoreLocationCode');
-            WriteValue(POSStore."Location Code");
-            WritePropertyName('StoreLocationName');
-            WriteValue(Location.Name);
-            WritePropertyName('StoreAddress');
-            WriteValue(POSStore.Address);
-            WritePropertyName('StoreAddress2');
-            WriteValue(POSStore."Address 2");
-            WritePropertyName('StorePostCode');
-            WriteValue(POSStore."Post Code");
-            WritePropertyName('StoreCountryRegionCode');
-            WriteValue(POSStore."Country/Region Code");
-            WritePropertyName('StoreCity');
-            WriteValue(POSStore.City);
-            //-NPR5.53 [375919]
-            WritePropertyName('CountingSupervisor');
-            WriteValue('0');
-            //+NPR5.53 [375919]
-            WritePropertyName('StoreSupervisorId');
-            WriteValue(SalespersonPurchaser.Code);
-            WritePropertyName('StoreSupervisorName');
-            WriteValue(SalespersonPurchaser.Name);
-            WritePropertyName('StoreSupervisorPassword');
-            WriteValue(SalespersonPurchaser."NPR Register Password");
-
-            WritePropertyName('StockTakeId');
-            WriteValue(Format(CSStockTakes."Stock-Take Id"));
-            WritePropertyName('JournalTemplateName');
-            WriteValue(CSStockTakes."Journal Template Name");
-            WritePropertyName('JournalBatchName');
-            WriteValue(CSStockTakes."Journal Batch Name");
-            WritePropertyName('PredictedQty');
-            WriteValue(Format(CSStockTakes."Predicted Qty."));
-
-            WritePropertyName('StockroomClosed');
-            if CSStockTakes."Stockroom Closed" = 0DT then
-                WriteValue('0')
-            else
-                WriteValue('1');
-
-            WritePropertyName('SalesfloorClosed');
-            if CSStockTakes."Salesfloor Closed" = 0DT then
-                WriteValue('0')
-            else
-                WriteValue('1');
-
-            WritePropertyName('RefillClosed');
-            if CSStockTakes."Refill Closed" = 0DT then
-                WriteValue('0')
-            else
-                WriteValue('1');
-
-            WritePropertyName('Approved');
-            if CSStockTakes.Approved = 0DT then
-                WriteValue('0')
-            else
-                WriteValue('1');
-
-            //-NPR5.54 [389224]
-            CSSetup.Get;
-            WritePropertyName('BatchSize');
-            if (CSSetup."Batch Size" > 10) and (CSSetup."Batch Size" < 1000) then
-                WriteValue(CSSetup."Batch Size")
-            else
-                WriteValue('10');
-            //-NPR5.54 [389224]
-
-            WriteEndObject;
-
-            WriteEndArray;
-
-            WriteEndObject;
-            JObject := Token;
-            Result := JObject.ToString();
-
-        end;
-
+        ItemArray.Add(ItemObject);
+        JObject.Add('item', ItemArray);
+        JObject.WriteTo(Result);
         exit(Result);
     end;
 
@@ -2243,10 +1721,10 @@ codeunit 6151372 "NPR CS WS"
         BigTextData: BigText;
         ValInt: Integer;
         ValBool: Boolean;
-        CommaString: DotNet NPRNetString;
-        Separator: DotNet NPRNetString;
+        CommaString: Text;
+        Separator: Text;
         Value: Text;
-        Values: DotNet NPRNetArray;
+        Values: List of [Text];
         TagData: Text;
     begin
         BigTextData.AddText(TagIds);
@@ -2278,13 +1756,11 @@ codeunit 6151372 "NPR CS WS"
 
         CommaString := TagIds;
         Separator := ',';
-        Values := CommaString.Split(Separator.ToCharArray());
-        //-NPR5.55 [415521]
+        Values := CommaString.Split(Separator);
         CSSetup.SetRange("Disregard Unknown RFID Tags", true);
         if not CSSetup.IsEmpty then
             CleanTagEntries(Values);
-        //+NPR5.55 [415521]
-        CSStockTakeHandlingRfid.Tags := Values.Length;
+        CSStockTakeHandlingRfid.Tags := Values.Count;
         CSStockTakeHandlingRfid.Modify(false);
         Commit;
 
@@ -2327,13 +1803,16 @@ codeunit 6151372 "NPR CS WS"
         ItemGroup: Record "NPR Item Group";
         MagentoPicture: Record "NPR Magento Picture";
         MagentoPictureLink: Record "NPR Magento Picture Link";
-        JObject: DotNet NPRNetJObject;
-        JTokenWriter: DotNet NPRNetJTokenWriter;
+        JObject: JsonObject;
         CSSetup: Record "NPR CS Setup";
         CSStockTakes: Record "NPR CS Stock-Takes";
         CSStockTakesData: Record "NPR CS Stock-Takes Data";
         CSRefillSectionDataTmp: Record "NPR CS Refill Section Data" temporary;
         CSRefillData: Record "NPR CS Refill Data";
+        SectionObject: JsonObject;
+        SectionArray: JsonArray;
+        ItemObject: JsonObject;
+        ItemArray: JsonArray;
     begin
         if not CSSetup.Get then
             exit;
@@ -2344,45 +1823,15 @@ codeunit 6151372 "NPR CS WS"
         if not CSStockTakes.Get(StockTakeId) then
             exit;
 
-        //-NPR5.55 [384506]
-        //CLEAR(CSRefillData);
-        //CLEAR(CSRefillSectionData);
         Clear(CSRefillDataTmp);
         Clear(CSRefillSectionDataTmp);
-        //+NPR5.55 [384506]
 
         CSStockTakes."Create Refill Data Started" := CurrentDateTime;
-
         CSStockTakesData.SetRange("Stock-Take Id", CSStockTakes."Stock-Take Id");
         CSStockTakesData.SetRange(Area, CSStockTakesData.Area::Salesfloor);
-        //-NPR5.55 [384506]
-        //CSStockTakesData.SETRANGE("Transferred To Worksheet",FALSE);
-        //+NPR5.55 [384506]
         if CSStockTakesData.FindSet then begin
             repeat
                 if CSStockTakesData."Item No." <> '' then begin
-                    //-NPR5.55 [384506]
-                    //IF NOT CSRefillData.GET(CSStockTakesData."Item No.",CSStockTakesData."Variant Code",CSStockTakes.Location,CSStockTakes."Stock-Take Id") THEN BEGIN
-                    //  CSStockTakesData.CALCFIELDS("Item Description","Variant Description");
-                    //  CSRefillData.INIT;
-                    //  CSRefillData.VALIDATE("Item No.",CSStockTakesData."Item No.");
-                    //  CSRefillData.VALIDATE("Variant Code",CSStockTakesData."Variant Code");
-                    //  CSRefillData.VALIDATE(Location,CSStockTakes.Location);
-                    //  CSRefillData."Stock-Take Id" := CSStockTakes."Stock-Take Id";
-                    //  CSRefillData."Item Description" := CSStockTakesData."Item Description";
-                    //  CSRefillData."Variant Description" := CSStockTakesData."Variant Description";
-                    //  CSRefillData.INSERT(TRUE);
-                    //END;
-                    //
-                    //IF CSRefillData."Variant Code" <> '' THEN
-                    //  CSRefillData."Combined key" := CSRefillData."Item No." + '-' + CSRefillData."Variant Code"
-                    //ELSE
-                    //  CSRefillData."Combined key" := CSRefillData."Item No.";
-                    //
-                    //CSRefillData."Qty. in Store" += 1;
-                    //
-                    //CSRefillData.MODIFY(TRUE);
-
                     if not CSRefillDataTmp.Get(CSStockTakesData."Item No.", CSStockTakesData."Variant Code", CSStockTakes.Location, CSStockTakes."Stock-Take Id") then begin
                         CSStockTakesData.CalcFields("Item Description", "Variant Description");
                         CSRefillDataTmp.Init;
@@ -2403,7 +1852,6 @@ codeunit 6151372 "NPR CS WS"
                     CSRefillDataTmp."Qty. in Store" += 1;
 
                     CSRefillDataTmp.Modify(true);
-                    //+NPR5.55 [384506]
                 end;
             until CSStockTakesData.Next = 0;
         end;
@@ -2411,33 +1859,9 @@ codeunit 6151372 "NPR CS WS"
         Clear(CSStockTakesData);
         CSStockTakesData.SetRange("Stock-Take Id", CSStockTakes."Stock-Take Id");
         CSStockTakesData.SetRange(Area, CSStockTakesData.Area::Stockroom);
-        //-NPR5.55 [384506]
-        //CSStockTakesData.SETRANGE("Transferred To Worksheet",FALSE);
-        //+NPR5.55 [384506]
         if CSStockTakesData.FindSet then begin
             repeat
                 if CSStockTakesData."Item No." <> '' then begin
-                    //-NPR5.55 [384506]
-                    //IF NOT CSRefillData.GET(CSStockTakesData."Item No.",CSStockTakesData."Variant Code",CSStockTakes.Location,CSStockTakes."Stock-Take Id") THEN BEGIN
-                    //  CSStockTakesData.CALCFIELDS("Item Description","Variant Description");
-                    //  CSRefillData.INIT;
-                    //  CSRefillData.VALIDATE("Item No.",CSStockTakesData."Item No.");
-                    //  CSRefillData.VALIDATE("Variant Code",CSStockTakesData."Variant Code");
-                    //  CSRefillData.VALIDATE(Location,CSStockTakes.Location);
-                    //  CSRefillData."Stock-Take Id" := CSStockTakes."Stock-Take Id";
-                    //  CSRefillData."Item Description" := CSStockTakesData."Item Description";
-                    //  CSRefillData."Variant Description" := CSStockTakesData."Variant Description";
-                    //  CSRefillData.INSERT(TRUE);
-                    //END;
-
-                    //IF CSRefillData."Variant Code" <> '' THEN
-                    //  CSRefillData."Combined key" := CSRefillData."Item No." + '-' + CSRefillData."Variant Code"
-                    //ELSE
-                    //  CSRefillData."Combined key" := CSRefillData."Item No.";
-
-                    //CSRefillData."Qty. in Stock" += 1;
-
-                    //CSRefillData.MODIFY(TRUE);
                     if not CSRefillDataTmp.Get(CSStockTakesData."Item No.", CSStockTakesData."Variant Code", CSStockTakes.Location, CSStockTakes."Stock-Take Id") then begin
                         CSStockTakesData.CalcFields("Item Description", "Variant Description");
                         CSRefillDataTmp.Init;
@@ -2458,26 +1882,10 @@ codeunit 6151372 "NPR CS WS"
                     CSRefillDataTmp."Qty. in Stock" += 1;
 
                     CSRefillDataTmp.Modify(true);
-                    //+NPR5.55 [384506]
                 end;
             until CSStockTakesData.Next = 0;
         end;
 
-        //-NPR5.55 [384506]
-        //CSRefillData.SETFILTER("Qty. in Store",'>0');
-        //CSRefillData.DELETEALL(FALSE);
-        //CSRefillData.RESET;
-
-        //IF CSRefillData.FINDFIRST THEN BEGIN
-        //  REPEAT
-        //    IF NOT CSRefillSectionData.GET(CSStockTakesData."Item No.") THEN BEGIN
-        //      CSRefillSectionData.INIT;
-        //      CSRefillSectionData.VALIDATE("Item No.",CSRefillData."Item No.");
-        //      CSRefillSectionData."Item Description" := CSRefillData."Item Description";
-        //      CSRefillSectionData.Refilled := CSRefillData.Refilled;
-        //      CSRefillSectionData.INSERT(TRUE);
-        //    END;
-        //  UNTIL CSRefillData.NEXT = 0;
         CSRefillDataTmp.SetFilter("Qty. in Store", '>0');
         CSRefillDataTmp.DeleteAll(false);
         CSRefillDataTmp.Reset;
@@ -2490,117 +1898,45 @@ codeunit 6151372 "NPR CS WS"
                 CSRefillSectionDataTmp.Refilled := CSRefillDataTmp.Refilled;
                 if CSRefillSectionDataTmp.Insert(true) then;
             until CSRefillDataTmp.Next = 0;
-            //+NPR5.55 [384506]
         end;
 
         CSStockTakes."Create Refill Data Ended" := CurrentDateTime;
         CSStockTakes.Modify;
 
-        JTokenWriter := JTokenWriter.JTokenWriter;
-        with JTokenWriter do begin
-            WriteStartObject;
-
-            WritePropertyName('section');
-            WriteStartArray;
-            //-NPR5.55 [384506]
-            // IF CSRefillSectionData.FINDFIRST THEN BEGIN
-            //  REPEAT
-            //    WriteStartObject;
-            //    WritePropertyName('key');
-            //    WriteValue(CSRefillSectionData."Item No.");
-            //    WritePropertyName('title');
-            //    WriteValue(CSRefillSectionData."Item Description");
-            //    WritePropertyName('itemgroup');
-            //    WriteValue('');
-            //    WritePropertyName('marked');
-            //    WriteValue(CSRefillSectionData.Refilled);
-            //    WriteEndObject;
-            //  UNTIL CSRefillSectionData.NEXT = 0;
-            if CSRefillSectionDataTmp.FindFirst then begin
-                repeat
-                    WriteStartObject;
-                    WritePropertyName('key');
-                    WriteValue(CSRefillSectionDataTmp."Item No.");
-                    WritePropertyName('title');
-                    WriteValue(CSRefillSectionDataTmp."Item Description");
-                    WritePropertyName('itemgroup');
-                    WriteValue('');
-                    WritePropertyName('marked');
-                    Clear(CSRefillData);
-                    CSRefillData.SetRange("Stock-Take Id", CSStockTakes."Stock-Take Id");
-                    CSRefillData.SetRange("Item No.", CSRefillSectionDataTmp."Item No.");
-                    if CSRefillData.FindFirst then
-                        WriteValue(CSRefillData.Refilled)
-                    else
-                        WriteValue(CSRefillSectionDataTmp.Refilled);
-                    WriteEndObject;
-                until CSRefillSectionDataTmp.Next = 0;
-                //+NPR5.55 [384506]
-            end;
-            WriteEndArray;
-
-            WritePropertyName('item');
-            WriteStartArray;
-            //-NPR5.55 [384506]
-            // IF CSRefillData.FINDFIRST THEN BEGIN
-            //  REPEAT
-            //    WriteStartObject;
-            //    WritePropertyName('key');
-            //    WriteValue(CSRefillData."Combined key");
-            //    WritePropertyName('title');
-            //    WriteValue(CSRefillData."Item Description");
-            //    WritePropertyName('itemno');
-            //    WriteValue(CSRefillData."Item No.");
-            //    WritePropertyName('variantcode');
-            //    WriteValue(CSRefillData."Variant Code");
-            //    WritePropertyName('varianttitle');
-            //    WriteValue(CSRefillData."Variant Description");
-            //    WritePropertyName('itemgroup');
-            //    WriteValue(CSRefillData."Item Group Code");
-            //    WritePropertyName('imageurl');
-            //    WriteValue(CSRefillData."Image Url");
-            //    WritePropertyName('qtystock');
-            //    WriteValue(CSRefillData."Qty. in Stock");
-            //    WritePropertyName('qtystore');
-            //    WriteValue(CSRefillData."Qty. in Store");
-            //    WritePropertyName('marked');
-            //    WriteValue(CSRefillData.Refilled);
-            //    WriteEndObject;
-            //  UNTIL CSRefillData.NEXT = 0;
-            if CSRefillDataTmp.FindFirst then begin
-                repeat
-                    WriteStartObject;
-                    WritePropertyName('key');
-                    WriteValue(CSRefillDataTmp."Combined key");
-                    WritePropertyName('title');
-                    WriteValue(CSRefillDataTmp."Item Description");
-                    WritePropertyName('itemno');
-                    WriteValue(CSRefillDataTmp."Item No.");
-                    WritePropertyName('variantcode');
-                    WriteValue(CSRefillDataTmp."Variant Code");
-                    WritePropertyName('varianttitle');
-                    WriteValue(CSRefillDataTmp."Variant Description");
-                    WritePropertyName('itemgroup');
-                    WriteValue(CSRefillDataTmp."Item Group Code");
-                    WritePropertyName('imageurl');
-                    WriteValue(CSRefillDataTmp."Image Url");
-                    WritePropertyName('qtystock');
-                    WriteValue(CSRefillDataTmp."Qty. in Stock");
-                    WritePropertyName('qtystore');
-                    WriteValue(CSRefillDataTmp."Qty. in Store");
-                    WritePropertyName('marked');
-                    WriteValue(CSRefillDataTmp.Refilled);
-                    WriteEndObject;
-                until CSRefillDataTmp.Next = 0;
-                //+NPR5.55 [384506]
-            end;
-            WriteEndArray;
-
-            WriteEndObject;
-            JObject := Token;
+        if CSRefillSectionDataTmp.FindFirst then begin
+            repeat
+                SectionObject.Add('key', CSRefillSectionDataTmp."Item No.");
+                SectionObject.Add('title', CSRefillSectionDataTmp."Item Description");
+                SectionObject.Add('itemgroup', '');
+                Clear(CSRefillData);
+                CSRefillData.SetRange("Stock-Take Id", CSStockTakes."Stock-Take Id");
+                CSRefillData.SetRange("Item No.", CSRefillSectionDataTmp."Item No.");
+                if CSRefillData.FindFirst then
+                    SectionObject.Add('marked', CSRefillData.Refilled)
+                else
+                    SectionObject.Add('marked', CSRefillSectionDataTmp.Refilled);
+                SectionArray.Add(SectionObject);
+            until CSRefillSectionDataTmp.Next = 0;
         end;
+        JObject.Add('section', SectionArray);
 
-        Result := JObject.ToString();
+        if CSRefillDataTmp.FindFirst then begin
+            repeat
+                ItemObject.Add('key', CSRefillDataTmp."Combined key");
+                ItemObject.Add('title', CSRefillDataTmp."Item Description");
+                ItemObject.Add('itemno', CSRefillDataTmp."Item No.");
+                ItemObject.Add('variantcode', CSRefillDataTmp."Variant Code");
+                ItemObject.Add('varianttitle', CSRefillDataTmp."Variant Description");
+                ItemObject.Add('itemgroup', CSRefillDataTmp."Item Group Code");
+                ItemObject.Add('imageurl', CSRefillDataTmp."Image Url");
+                ItemObject.Add('qtystock', CSRefillDataTmp."Qty. in Stock");
+                ItemObject.Add('qtystore', CSRefillDataTmp."Qty. in Store");
+                ItemObject.Add('marked', CSRefillDataTmp.Refilled);
+                ItemArray.Add(ItemObject);
+            until CSRefillDataTmp.Next = 0;
+        end;
+        JObject.Add('item', ItemArray);
+        JObject.WriteTo(Result);
     end;
 
     procedure SetRfidTagDataTransferBatch(DocId: Text; TagIds: Text; ToDocNo: Text; DeviceId: Code[10]; BatchId: Text) ResultData: Text
@@ -2612,10 +1948,10 @@ codeunit 6151372 "NPR CS WS"
         BigTextData: BigText;
         ValInt: Integer;
         ValBool: Boolean;
-        CommaString: DotNet NPRNetString;
-        Separator: DotNet NPRNetString;
+        CommaString: Text;
+        Separator: Text;
         Value: Text;
-        Values: DotNet NPRNetArray;
+        Values: List of [Text];
         TagData: Text;
     begin
         BigTextData.AddText(TagIds);
@@ -2640,8 +1976,8 @@ codeunit 6151372 "NPR CS WS"
 
         CommaString := TagIds;
         Separator := ',';
-        Values := CommaString.Split(Separator.ToCharArray());
-        CSTransferHandlingRfid.Tags := Values.Length;
+        Values := CommaString.Split(Separator);
+        CSTransferHandlingRfid.Tags := Values.Count;
         CSTransferHandlingRfid.Modify(false);
         Commit;
 
@@ -2799,9 +2135,10 @@ codeunit 6151372 "NPR CS WS"
         ItemJournalBatch: Record "Item Journal Batch";
         CSItemJournalItems: Query "NPR CS Item Journal Items";
         CombinedKey: Code[30];
-        JObject: DotNet NPRNetJObject;
-        JTokenWriter: DotNet NPRNetJTokenWriter;
+        JObject: JsonObject;
         Result: Text;
+        ItemObject: JsonObject;
+        ItemArray: JsonArray;
     begin
         if not CSSetup.Get then
             exit(StrSubstNo(Txt010, CompanyName));
@@ -2809,103 +2146,72 @@ codeunit 6151372 "NPR CS WS"
         if not ItemJournalBatch.Get(CSSetup."Phys. Inv Jour Temp Name", WorksheetName) then
             exit('UNKNOWNSTOCKTAKEWORKSHEET');
 
-        JTokenWriter := JTokenWriter.JTokenWriter;
-        with JTokenWriter do begin
-            WriteStartObject;
-            WritePropertyName('item');
-            WriteStartArray;
-
-            CSItemJournalItems.SetRange(Journal_Template_Name, CSSetup."Phys. Inv Jour Temp Name");
-            CSItemJournalItems.SetRange(Journal_Batch_Name, ItemJournalBatch.Name);
-            CSItemJournalItems.Open;
-            while CSItemJournalItems.Read do begin
-                WriteStartObject;
-                WritePropertyName('key');
-
-                if CSItemJournalItems.Variant_Code <> '' then
-                    CombinedKey := CSItemJournalItems.Item_No + '-' + CSItemJournalItems.Variant_Code
-                else
-                    CombinedKey := CSItemJournalItems.Item_No;
-
-                WriteValue(CombinedKey);
-                WritePropertyName('predicted');
-                WriteValue(CSItemJournalItems.Sum_Qty_Calculated);
-                WriteEndObject;
-            end;
-
-            CSItemJournalItems.Close;
-
-            WriteEndArray;
-            WriteEndObject;
-            JObject := Token;
+        CSItemJournalItems.SetRange(Journal_Template_Name, CSSetup."Phys. Inv Jour Temp Name");
+        CSItemJournalItems.SetRange(Journal_Batch_Name, ItemJournalBatch.Name);
+        CSItemJournalItems.Open;
+        while CSItemJournalItems.Read do begin
+            Clear(ItemObject);
+            if CSItemJournalItems.Variant_Code <> '' then
+                CombinedKey := CSItemJournalItems.Item_No + '-' + CSItemJournalItems.Variant_Code
+            else
+                CombinedKey := CSItemJournalItems.Item_No;
+            ItemObject.Add('key', CombinedKey);
+            ItemObject.Add('predicted', CSItemJournalItems.Sum_Qty_Calculated);
+            ItemArray.Add(ItemObject);
         end;
-
-        Result := JObject.ToString();
+        CSItemJournalItems.Close;
+        JObject.Add('item', ItemArray);
+        JObject.WriteTo(Result);
         exit(Result);
     end;
 
     procedure GetDocumentItemCount(DocId: Text): Text
     var
-        JObject: DotNet NPRNetJObject;
-        JTokenWriter: DotNet NPRNetJTokenWriter;
+        JObject: JsonObject;
         Result: Text;
         CSRfidHeader: Record "NPR CS Rfid Header";
         CSRfidLines: Record "NPR CS Rfid Lines";
         CSRFIDDocumentItems: Query "NPR CS RFID Document Items";
         CombinedKey: Code[30];
+        ItemObject: JsonObject;
+        ItemArray: JsonArray;
     begin
         if not CSRfidHeader.Get(DocId) then
             exit('UNKNOWNDOCUMENT');
 
-        JTokenWriter := JTokenWriter.JTokenWriter;
-        with JTokenWriter do begin
-            WriteStartObject;
-            WritePropertyName('item');
-            WriteStartArray;
+        CSRFIDDocumentItems.SetRange(Id, CSRfidHeader.Id);
+        CSRFIDDocumentItems.SetRange(Tag_Shipped, true);
+        CSRFIDDocumentItems.Open;
+        while CSRFIDDocumentItems.Read do begin
+            Clear(ItemObject);
+            if CSRFIDDocumentItems.Variant_Code <> '' then
+                CombinedKey := CSRFIDDocumentItems.Item_No + '-' + CSRFIDDocumentItems.Variant_Code
+            else
+                CombinedKey := CSRFIDDocumentItems.Item_No;
 
-            CSRFIDDocumentItems.SetRange(Id, CSRfidHeader.Id);
-            CSRFIDDocumentItems.SetRange(Tag_Shipped, true);
-            CSRFIDDocumentItems.Open;
-            while CSRFIDDocumentItems.Read do begin
-                WriteStartObject;
-                WritePropertyName('key');
+            if CombinedKey = '' then
+                CombinedKey := 'UNKNOWNITEM';
 
-                if CSRFIDDocumentItems.Variant_Code <> '' then
-                    CombinedKey := CSRFIDDocumentItems.Item_No + '-' + CSRFIDDocumentItems.Variant_Code
-                else
-                    CombinedKey := CSRFIDDocumentItems.Item_No;
-
-                if CombinedKey = '' then
-                    CombinedKey := 'UNKNOWNITEM';
-
-                WriteValue(CombinedKey);
-                WritePropertyName('predicted');
-                WriteValue(CSRFIDDocumentItems.Count_);
-                WriteEndObject;
-            end;
-
-            CSRFIDDocumentItems.Close;
-
-            WriteEndArray;
-            WriteEndObject;
-            JObject := Token;
+            ItemObject.Add('key', CombinedKey);
+            ItemObject.Add('predicted', CSRFIDDocumentItems.Count_);
+            ItemArray.Add(ItemObject);
         end;
-
-        Result := JObject.ToString();
+        CSRFIDDocumentItems.Close;
+        JObject.Add('item', ItemArray);
+        JObject.WriteTo(Result);
         exit(Result);
     end;
 
-    local procedure CleanTagEntries(var Values: DotNet NPRNetArray)
+    local procedure CleanTagEntries(var Values: List of [Text])
     var
         CSRfidTagModels: Record "NPR CS Rfid Tag Models";
         CSSetup: Record "NPR CS Setup";
         TagIDs: Text;
-        Value: DotNet NPRNetString;
-        ValuesString: DotNet NPRNetString;
-        Separator: DotNet NPRNetString;
-        EmptyArray: DotNet NPRNetArray;
+        Value: Text;
+        ValuesString: Text;
+        Separator: Text;
+        EmptyArray: List of [Text];
     begin
-        //-NPR5.55 [415521]
         CSRfidTagModels.SetRange(Discontinued, false);
         if not CSRfidTagModels.FindSet then
             Error(NoRfidModelsInDBErr, CSRfidTagModels.TableCaption, CSSetup.FieldCaption("Disregard Unknown RFID Tags"), CSSetup.TableCaption);
@@ -2916,15 +2222,18 @@ codeunit 6151372 "NPR CS WS"
             CSRfidTagModels.SetRange(Family, Value.Substring(0, 4));
             CSRfidTagModels.SetRange(Model, Value.Substring(3, 4));
 
-            if not CSRfidTagModels.IsEmpty then
-                ValuesString.Concat(ValuesString, Separator, Value);
+            if not CSRfidTagModels.IsEmpty then begin
+                if ValuesString = '' then
+                    ValuesString := Value
+                else
+                    ValuesString := ValuesString + Separator + Value;
+            end;
         end;
 
-        if ValuesString.Equals('') then
-            Values := EmptyArray.CreateInstance(Value.GetType(), 0)
+        if ValuesString = '' then
+            Values := EmptyArray
         else
-            Values := ValuesString.Split(Separator.ToCharArray());
-        //+NPR5.55 [415521]
+            Values := ValuesString.Split(Separator);
     end;
 }
 

@@ -1,40 +1,5 @@
 codeunit 6151387 "NPR CS UI Warehouse Activity"
 {
-    // NPR5.41/CLVA/20180313 CASE 306407 Object created - NP Capture Service
-    // NPR5.43/CLVA/20180604 CASE 304872 Added previous value to qty
-    // NPR5.48/CLVA/20181109 CASE 335606 Handling Splitline, UOM and Outstanding Qty. Added function SplitLine
-    // NPR5.49/TJ  /20190215 CASE 346070 Line created with SplitLine also has Qty. to Handle = 0
-    //                                   Place line also updates Take line
-    // NPR5.49/TJ  /20190220 CASE 346066 Qty. to Receive is set to 0 when created from Purchase Line
-    //                                   Qty. to Handle is set to 0 when created from receipt
-    // NPR5.49/TJ  /20190221 CASE 346224 Variant Code displayed for other indicators as well
-    // NPR5.49/CLVA/20190327 CASE 349554 Added option to expand or collaps summary items
-    // NPR5.50/TJ  /20190325 CASE 349530 Fixed an issue with UpdateTakeLine when quantity is increased
-    // NPR5.50/CLVA/20190425 CASE 247747 Added Text Constant "Text027"
-    //                                   Addded default value handling
-    //                                   Added sorting key on AddSummarize
-    //                                   Added functionality to fulfilled lines
-    // NPR5.50/CLVA/20190426 CASE 347971 Added Posting options
-    //                                   Changed default posting for "Invt. Pick" and "Invt. Put-away" to "Ship & Invoice"
-    // NPR5.50/TJ  /20190417 CASE 351937 Blank InnerText is causing app to crash so have commented it out
-    // NPR5.50/CLVA/20190515 CASE 351937 Case 351937 is not an error but TJ using a old app version. Code uncomment again.
-    // NPR5.51/CLVA/20190612 CASE 357577 Added posting date functionality
-    // NPR5.51/CLVA/20190628 CASE 360425 Summarizing qty
-    // NPR5.51/CLVA/20190619 CASE 359268 Added receive posting.
-    // NPR5.52/CLVA/20190904 CASE 365967 Added support for Job Queue Posting and setup "Sum Qty. to Handle"
-    // NPR5.52/CLVA/20191010 CASE 370452 Changed posting functionality
-    // NPR5.52/TJ  /20191010 CASE 371682 Renamed function UpdateTakeLine to UpdateActivityLine and removed parameter QtyToHandle
-    //                                   Updating both Place and Take lines
-    //                                   Fixed suggested quantity after scan
-    //                                   Fixed quantity assign on split lines
-    // NPR5.52/TJ  /20190308 CASE 348151 Fixed issue with UpdateTakeLine
-    // NPR5.53/CLVA/20191112 CASE 377135 Object was not insync with hotfix 348151
-    // NPR5.53/CLVA/20191114 CASE 377135 Added posting options
-    // NPR5.53/CLVA/20191115 CASE 377135 Changed posting rutine
-    // NPR5.54/CLVA/20200220 CASE 391080 Added DeleteTransferredDataLines
-    // NPR5.54/CLVA/20200225 CASE 392901 Changed modify handling of record.
-    // NPR5.55/ALPO/20200729 CASE 404663 Possibility to use vendor item number & description for CS warehouse activity lines
-
     TableNo = "NPR CS UI Header";
 
     trigger OnRun()
@@ -43,7 +8,7 @@ codeunit 6151387 "NPR CS UI Warehouse Activity"
     begin
         MiniformMgmt.Initialize(
           MiniformHeader, Rec, DOMxmlin, ReturnedNode,
-          RootNode, XMLDOMMgt, CSCommunication, CSUserId,
+          RootNode, CSCommunication, CSUserId,
           CurrentCode, StackCode, WhseEmpId, LocationFilter, CSSessionId);
 
         if Code <> CurrentCode then
@@ -56,13 +21,12 @@ codeunit 6151387 "NPR CS UI Warehouse Activity"
 
     var
         MiniformHeader: Record "NPR CS UI Header";
-        XMLDOMMgt: Codeunit "XML DOM Management";
         CSCommunication: Codeunit "NPR CS Communication";
         CSMgt: Codeunit "NPR CS Management";
         RecRef: RecordRef;
-        DOMxmlin: DotNet "NPRNetXmlDocument";
-        ReturnedNode: DotNet NPRNetXmlNode;
-        RootNode: DotNet NPRNetXmlNode;
+        DOMxmlin: XmlDocument;
+        ReturnedNode: XmlNode;
+        RootNode: XmlNode;
         CSUserId: Text[250];
         Remark: Text[250];
         WhseEmpId: Text[250];
@@ -119,8 +83,8 @@ codeunit 6151387 "NPR CS UI Warehouse Activity"
         ActionIndex: Integer;
         CSUILine: Record "NPR CS UI Line";
     begin
-        if XMLDOMMgt.FindNode(RootNode, 'Header/Input', ReturnedNode) then
-            TextValue := ReturnedNode.InnerText
+        if RootNode.AsXmlAttribute().SelectSingleNode('Header/Input', ReturnedNode) then
+            TextValue := ReturnedNode.AsXmlElement().InnerText
         else
             Error(Text006);
 
@@ -142,10 +106,7 @@ codeunit 6151387 "NPR CS UI Warehouse Activity"
         case FuncGroup.KeyDef of
             FuncGroup.KeyDef::Esc:
                 begin
-                    //-NPR5.54 [391080]
-                    //DeleteEmptyDataLines();
                     DeleteTransferredDataLines();
-                    //+NPR5.54 [391080]
                     CSCommunication.RunPreviousUI(DOMxmlin);
                 end;
             FuncGroup.KeyDef::"Function":
@@ -176,10 +137,7 @@ codeunit 6151387 "NPR CS UI Warehouse Activity"
                                 Evaluate(FuncRecId, CSCommunication.GetNodeAttribute(ReturnedNode, 'FuncRecordID'));
                                 if FuncRecRef.Get(FuncRecId) then begin
                                     FuncRecRef.SetTable(WhseActivityLine);
-                                    //-NPR5.48 [335606]
-                                    //WhseActivityLine.SplitLine(WhseActivityLine);
                                     SplitLine(WhseActivityLine);
-                                    //+NPR5.48 [335606]
                                 end;
                             end;
                     end;
@@ -188,22 +146,11 @@ codeunit 6151387 "NPR CS UI Warehouse Activity"
                 Reset(CSWarehouseActivityHandling);
             FuncGroup.KeyDef::Register:
                 begin
-                    //-NPR5.48 [335606]
                     if not Evaluate(ActionIndex, CSCommunication.GetNodeAttribute(ReturnedNode, 'ActionIndex')) then
-                        //-NPR5.50 [347971]
-                        //ActionIndex := 1;
-                        //ActionIndex := 2;
-                        //-NPR5.52 [370452]
                         ActionIndex := MiniformHeader."Posting Type" + 1;
-                    //+NPR5.52 [370452]
-                    //+NPR5.50 [347971]
-                    //+NPR5.48 [335606]
                     Register(CSWarehouseActivityHandling, ActionIndex);
                     if Remark = '' then begin
-                        //-NPR5.54 [391080]
-                        //DeleteEmptyDataLines();
                         DeleteTransferredDataLines();
-                        //+NPR5.54 [391080]
                         CSCommunication.RunPreviousUI(DOMxmlin)
                     end else
                         SendForm(ActiveInputField, CSWarehouseActivityHandling);
@@ -273,7 +220,7 @@ codeunit 6151387 "NPR CS UI Warehouse Activity"
         RecId: RecordID;
         TableNo: Integer;
     begin
-        XMLDOMMgt.FindNode(RootNode, 'Header/Input', ReturnedNode);
+        RootNode.SelectSingleNode('Header/Input', ReturnedNode);
 
         Evaluate(TableNo, CSCommunication.GetNodeAttribute(ReturnedNode, 'TableNo'));
         Evaluate(RecId, CSCommunication.GetNodeAttribute(ReturnedNode, 'RecordID'));
@@ -300,26 +247,18 @@ codeunit 6151387 "NPR CS UI Warehouse Activity"
 
     local procedure SendForm(InputField: Integer; CSWarehouseActivityHandling: Record "NPR CS Wareh. Activ. Handling")
     var
-        Records: DotNet NPRNetXmlElement;
+        Records: XmlElement;
+        RootElement: XmlElement;
     begin
         CSCommunication.EncodeUI(MiniformHeader, StackCode, DOMxmlin, InputField, Remark, CSUserId);
         CSCommunication.GetReturnXML(DOMxmlin);
 
-        //-NPR5.50 [347971]
-        //-NPR5.52 [370452]
-        //IF MiniformHeader."Add Posting Options" THEN
-        //-NPR5.53 [377135]
-        //IF MiniformHeader."Posting Type" = MiniformHeader."Posting Type"::"Handle & Invoice" THEN
+        DOMxmlin.GetRoot(RootElement);
         if MiniformHeader."Posting Type" = MiniformHeader."Posting Type"::"Prompt User" then
-            //+NPR5.53 [377135]
-            //+NPR5.52 [370452]
-            //+NPR5.50 [347971]
             AddAdditionalInfo(DOMxmlin, CSWarehouseActivityHandling);
 
         if AddSummarize(Records) then
-            DOMxmlin.DocumentElement.AppendChild(Records);
-
-        //MiniformHeader.SaveXMLin(DOMxmlin);
+            RootElement.Add(Records);
 
         CSMgt.SendXMLReply(DOMxmlin);
     end;
@@ -356,47 +295,35 @@ codeunit 6151387 "NPR CS UI Warehouse Activity"
 
             CSWarehouseActivityHandling."Item No." := ItemNo;
             CSWarehouseActivityHandling."Variant Code" := VariantCode;
-            //+NPR5.54 [392901]
             CSWarehouseActivityHandling.Modify(true);
             UpdatedCSWarehouseActivityHandling.Get(CSWarehouseActivityHandling.Id, CSWarehouseActivityHandling."Line No.");
             Clear(CSWarehouseActivityHandling);
             CSWarehouseActivityHandling := UpdatedCSWarehouseActivityHandling;
-            //+NPR5.54 [392901]
 
-            //-NPR5.48 [335606]
             if (ResolvingTable = DATABASE::"Item Cross Reference") then begin
                 with ItemCrossReference do begin
                     if (StrLen(InputValue) <= MaxStrLen("Cross-Reference No.")) then begin
                         SetCurrentKey("Cross-Reference Type", "Cross-Reference No.");
                         SetFilter("Cross-Reference Type", '=%1', "Cross-Reference Type"::"Bar Code");
                         SetFilter("Cross-Reference No.", '=%1', UpperCase(InputValue));
-                        //+NPR5.54 [392901]
-                        //IF FINDFIRST() THEN
                         if FindFirst() then begin
-                            //+NPR5.54 [392901]
                             CSWarehouseActivityHandling."Unit of Measure" := ItemCrossReference."Unit of Measure";
-                            //+NPR5.54 [392901]
                             CSWarehouseActivityHandling.Modify(true);
                             UpdatedCSWarehouseActivityHandling.Get(CSWarehouseActivityHandling.Id, CSWarehouseActivityHandling."Line No.");
                             Clear(CSWarehouseActivityHandling);
                             CSWarehouseActivityHandling := UpdatedCSWarehouseActivityHandling;
                         end;
-                        //+NPR5.54 [392901]
                     end;
                 end;
             end;
-            //+NPR5.48 [335606]
 
         end else begin
             Remark := StrSubstNo(Text010, InputValue);
             exit;
         end;
 
-        //-NPR5.52 [365967]
         CSSetup.Get;
         if CSSetup."Sum Qty. to Handle" then begin
-            //+NPR5.52 [365967]
-            //-NPR5.51 [360425]
             QtytoHandle := 0;
             QtyOutstanding := 0;
 
@@ -405,14 +332,12 @@ codeunit 6151387 "NPR CS UI Warehouse Activity"
             WhseActivityLine.SetRange("No.", CSWarehouseActivityHandling."No.");
             WhseActivityLine.SetRange("Item No.", CSWarehouseActivityHandling."Item No.");
             WhseActivityLine.SetRange("Variant Code", CSWarehouseActivityHandling."Variant Code");
-            //-NPR5.52 [371682]
             case CSWarehouseActivityHandling."Activity Type" of
                 CSWarehouseActivityHandling."Activity Type"::Pick:
                     WhseActivityLine.SetRange("Action Type", WhseActivityLine."Action Type"::Take);
                 CSWarehouseActivityHandling."Activity Type"::"Put-away":
                     WhseActivityLine.SetRange("Action Type", WhseActivityLine."Action Type"::Place);
             end;
-            //+NPR5.52 [371682]
             if WhseActivityLine.FindSet then begin
                 repeat
                     QtytoHandle := QtytoHandle + WhseActivityLine."Qty. to Handle";
@@ -420,18 +345,12 @@ codeunit 6151387 "NPR CS UI Warehouse Activity"
                 until WhseActivityLine.Next = 0;
 
                 CSWarehouseActivityHandling.Qty := QtyOutstanding - QtytoHandle;
-                //+NPR5.54 [392901]
                 CSWarehouseActivityHandling.Modify(true);
                 UpdatedCSWarehouseActivityHandling.Get(CSWarehouseActivityHandling.Id, CSWarehouseActivityHandling."Line No.");
                 Clear(CSWarehouseActivityHandling);
                 CSWarehouseActivityHandling := UpdatedCSWarehouseActivityHandling;
-                //+NPR5.54 [392901]
-
             end;
-            //+NPR5.51 [360425]
-            //-NPR5.52 [365967]
         end;
-        //+NPR5.52 [365967]
 
         CSWarehouseActivityHandling.Barcode := InputValue;
     end;
@@ -500,17 +419,11 @@ codeunit 6151387 "NPR CS UI Warehouse Activity"
         CSWarehouseActivityHandling."Created By" := UserId;
         CSWarehouseActivityHandling.Created := CurrentDateTime;
 
-        //-NPR5.50 [247747]
         if CSUIHeader.Get(CurrentCode) then begin
             if CSUIHeader."Set defaults from last record" then begin
-                //+NPR5.50 [247747]
-                //-NPR5.43 [304872]
                 CSWarehouseActivityHandling.Qty := NewCSWarehouseActivityHandling.Qty;
-                //+NPR5.43 [304872]
-                //-NPR5.50 [247747]
             end;
         end;
-        //+NPR5.50 [247747]
 
         RecRefByVariant.GetTable(RecordVariant);
 
@@ -556,16 +469,20 @@ codeunit 6151387 "NPR CS UI Warehouse Activity"
         CSWarehouseActivityHandling.DeleteAll(true);
     end;
 
-    local procedure AddAttribute(var NewChild: DotNet NPRNetXmlNode; AttribName: Text[250]; AttribValue: Text[250])
+    local procedure AddAttribute(var NewChild: XmlElement; AttribName: Text[250]; AttribValue: Text[250])
     begin
-        if XMLDOMMgt.AddAttribute(NewChild, AttribName, AttribValue) > 0 then
-            Error(Text002, AttribName);
+        NewChild.SetAttribute(AttribName, AttribValue);
     end;
 
-    local procedure AddSummarize(var Records: DotNet NPRNetXmlElement): Boolean
+    local procedure AddAttribute(var NewChild: XmlNode; AttribName: Text[250]; AttribValue: Text[250])
+    begin
+        NewChild.AsXmlElement().SetAttribute(AttribName, AttribValue);
+    end;
+
+    local procedure AddSummarize(var Records: XmlElement): Boolean
     var
-        "Record": DotNet NPRNetXmlElement;
-        Line: DotNet NPRNetXmlElement;
+        RecordElement: XmlElement;
+        Line: XmlElement;
         Indicator: Text;
         CSWarehouseActivityHandling: Record "NPR CS Wareh. Activ. Handling";
         WhseActivityLine: Record "Warehouse Activity Line";
@@ -582,21 +499,14 @@ codeunit 6151387 "NPR CS UI Warehouse Activity"
         if not CSWarehouseActivityHandling.FindLast then
             exit(false);
 
-        //-NPR5.50 [247747]
         if Location.Get(CSWarehouseActivityHandling."Location Code") then
             BinIsMandatory := Location."Bin Mandatory";
 
         if BinIsMandatory then
             WhseActivityLine.SetCurrentKey("Bin Code", "Location Code", "Action Type", "Breakbulk No.");
-        //+NPR5.50 [247747]
 
         WhseActivityLine.SetRange("No.", CSWarehouseActivityHandling."No.");
         WhseActivityLine.SetRange("Activity Type", CSWarehouseActivityHandling."Activity Type");
-
-        //-NPR5.50 [247747]
-        //IF Location.GET(CSWarehouseActivityHandling."Location Code") THEN
-        //  BinIsMandatory := Location."Bin Mandatory";
-        //+NPR5.50 [247747]
 
         if BinIsMandatory then begin
             case CSWarehouseActivityHandling."Activity Type" of
@@ -615,9 +525,9 @@ codeunit 6151387 "NPR CS UI Warehouse Activity"
         end;
 
         if WhseActivityLine.FindSet then begin
-            Records := DOMxmlin.CreateElement('Records');
+            Records := XmlElement.Create('Records');
             repeat
-                Record := DOMxmlin.CreateElement('Record');
+                RecordElement := XmlElement.Create('Record');
 
                 CurrRecordID := WhseActivityLine.RecordId;
                 TableNo := CurrRecordID.TableNo;
@@ -631,167 +541,117 @@ codeunit 6151387 "NPR CS UI Warehouse Activity"
                         Indicator := 'plus';
 
                 if Indicator = 'minus' then begin
-                    //-NPR5.49 [349554]
                     if MiniformHeader."Expand Summary Items" then begin
                         //1
-                        Line := DOMxmlin.CreateElement('Line');
+                        Line := XmlElement.Create('Line', '', WhseActivityLine."Bin Code");
                         AddAttribute(Line, 'Descrip', WhseActivityLine.FieldCaption(Description));
                         AddAttribute(Line, 'Indicator', Indicator);
                         AddAttribute(Line, 'Type', Format(LineType::TEXT));
                         AddAttribute(Line, 'CollapsItems', 'FALSE');
-                        Line.InnerText := WhseActivityLine."Bin Code";
-                        Record.AppendChild(Line);
+                        RecordElement.Add(Line);
 
                         //2
-                        Line := DOMxmlin.CreateElement('Line');
+                        Line := XmlElement.Create('Line', '',
+                            StrSubstNo(Text026, WhseActivityLine."Qty. to Handle", WhseActivityLine."Qty. Outstanding"));
                         AddAttribute(Line, 'Descrip', WhseActivityLine.FieldCaption("Qty. Outstanding"));
                         AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                        Line.InnerText := StrSubstNo(Text026, WhseActivityLine."Qty. to Handle", WhseActivityLine."Qty. Outstanding");
-                        Record.AppendChild(Line);
+                        RecordElement.Add(Line);
 
                         //3
-                        Line := DOMxmlin.CreateElement('Line');
+                        ItemIdentifier := CSWarehouseActivitySetup.ItemIdentifier(WhseActivityLine.RecordId, true, ' | ');
+                        Line := XmlElement.Create('Line', '', ItemIdentifier);
                         AddAttribute(Line, 'Descrip', WhseActivityLine.FieldCaption("Item No."));
                         AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                        //-NPR5.55 [404663]-revoked
-                        //        //-NPR5.50 [247747]
-                        //        IF WhseActivityLine."Variant Code" <> '' THEN
-                        //          Line.InnerText := STRSUBSTNO(Text027,WhseActivityLine."Item No.",WhseActivityLine."Variant Code")
-                        //        ELSE
-                        //        //-NPR5.50 [247747]
-                        //          Line.InnerText := WhseActivityLine."Item No.";
-                        //+NPR5.55 [404663]-revoked
-                        //-NPR5.55 [404663]
-                        ItemIdentifier := CSWarehouseActivitySetup.ItemIdentifier(WhseActivityLine.RecordId, true, ' | ');
-                        Line.InnerText := ItemIdentifier;
-                        //+NPR5.55 [404663]
-                        Record.AppendChild(Line);
+                        RecordElement.Add(Line);
 
                         //4
-                        Line := DOMxmlin.CreateElement('Line');
+                        Line := XmlElement.Create('Line', '', WhseActivityLine."Unit of Measure Code");
                         AddAttribute(Line, 'Descrip', WhseActivityLine.FieldCaption("Unit of Measure Code"));
                         AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                        Line.InnerText := WhseActivityLine."Unit of Measure Code";
-                        Record.AppendChild(Line);
+                        RecordElement.Add(Line);
 
                         //5
-                        Line := DOMxmlin.CreateElement('Line');
+                        Line := XmlElement.Create('Line', '', WhseActivityLine.Description);
                         AddAttribute(Line, 'Descrip', WhseActivityLine.FieldCaption(Description));
                         AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                        Line.InnerText := WhseActivityLine.Description;
-                        Record.AppendChild(Line);
+                        RecordElement.Add(Line);
 
                         //6
-                        //-NPR5.50 [351937]
-                        Line := DOMxmlin.CreateElement('Line');
+                        Line := XmlElement.Create('Line', '', '');
                         AddAttribute(Line, 'Descrip', '');
                         AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                        Line.InnerText := '';
-                        Record.AppendChild(Line);
-                        //+NPR5.50 [351937]
+                        RecordElement.Add(Line);
 
-                        //-NPR5.48 [335606]
                         if Location.Get(WhseActivityLine."Location Code") then
                             if Location."Bin Mandatory" then begin
-                                //+NPR5.48 [335606]
-                                Line := DOMxmlin.CreateElement('Line');
+                                Line := XmlElement.Create('Line');
                                 AddAttribute(Line, 'Descrip', 'Split Line..');
                                 AddAttribute(Line, 'Type', Format(LineType::BUTTON));
                                 AddAttribute(Line, 'TableNo', Format(TableNo));
                                 AddAttribute(Line, 'RecordID', Format(CurrRecordID));
                                 AddAttribute(Line, 'FuncName', 'SPLITLINE');
-                                Record.AppendChild(Line);
-                                //-NPR5.48 [335606]
+                                RecordElement.Add(Line);
                             end;
-                        //+NPR5.48 [335606]
-
                     end else begin
-                        //+NPR5.49 [349554]
-                        Line := DOMxmlin.CreateElement('Line');
+                        ItemIdentifier := CSWarehouseActivitySetup.ItemIdentifier(WhseActivityLine.RecordId, true, '-');
+                        Line := XmlElement.Create('Line', '',
+                            StrSubstNo(Text015, WhseActivityLine."Qty. to Handle", WhseActivityLine."Qty. Outstanding",
+                                ItemIdentifier, WhseActivityLine.Description));
                         AddAttribute(Line, 'Descrip', WhseActivityLine.FieldCaption(Description));
                         AddAttribute(Line, 'Indicator', Indicator);
                         AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                        //-NPR5.49 [349554]
                         AddAttribute(Line, 'CollapsItems', 'TRUE');
-                        //+NPR5.49 [349554]
-                        //-NPR5.55 [404663]-revoked
-                        //        //-NPR5.49 [346224]
-                        //        IF WhseActivityLine."Variant Code" <> '' THEN
-                        //          Line.InnerText := STRSUBSTNO(Text015,WhseActivityLine."Qty. to Handle",WhseActivityLine."Qty. Outstanding",WhseActivityLine."Item No."+'-'+WhseActivityLine."Variant Code",WhseActivityLine.Description)
-                        //        ELSE
-                        //        //+NPR5.49 [346224]
-                        //        Line.InnerText := STRSUBSTNO(Text015,WhseActivityLine."Qty. to Handle",WhseActivityLine."Qty. Outstanding",WhseActivityLine."Item No.",WhseActivityLine.Description);
-                        //+NPR5.55 [404663]-revoked
-                        //-NPR5.55 [404663]
-                        ItemIdentifier := CSWarehouseActivitySetup.ItemIdentifier(WhseActivityLine.RecordId, true, '-');
-                        Line.InnerText :=
-                          StrSubstNo(Text015, WhseActivityLine."Qty. to Handle", WhseActivityLine."Qty. Outstanding", ItemIdentifier, WhseActivityLine.Description);
-                        //+NPR5.55 [404663]
-                        Record.AppendChild(Line);
+                        RecordElement.Add(Line);
 
-                        //-NPR5.48 [335606]
                         if Location.Get(WhseActivityLine."Location Code") then
                             if Location."Bin Mandatory" then begin
-                                //+NPR5.48 [335606]
-                                Line := DOMxmlin.CreateElement('Line');
+                                Line := XmlElement.Create('Line');
                                 AddAttribute(Line, 'Descrip', 'Split Line..');
                                 AddAttribute(Line, 'Type', Format(LineType::BUTTON));
                                 AddAttribute(Line, 'TableNo', Format(TableNo));
                                 AddAttribute(Line, 'RecordID', Format(CurrRecordID));
                                 AddAttribute(Line, 'FuncName', 'SPLITLINE');
-                                Record.AppendChild(Line);
-                                //-NPR5.48 [335606]
+                                RecordElement.Add(Line);
                             end;
-                        //+NPR5.48 [335606]
-                        Line := DOMxmlin.CreateElement('Line');
+
+                        Line := XmlElement.Create('Line', '', WhseActivityLine.Description);
                         AddAttribute(Line, 'Descrip', WhseActivityLine.FieldCaption(Description));
                         AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                        Line.InnerText := WhseActivityLine.Description;
-                        Record.AppendChild(Line);
+                        RecordElement.Add(Line);
 
-                        Line := DOMxmlin.CreateElement('Line');
+                        Line := XmlElement.Create('Line', '', WhseActivityLine."Bin Code");
                         AddAttribute(Line, 'Descrip', WhseActivityLine.FieldCaption("Bin Code"));
                         AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                        Line.InnerText := WhseActivityLine."Bin Code";
-                        Record.AppendChild(Line);
+                        RecordElement.Add(Line);
 
-                        Line := DOMxmlin.CreateElement('Line');
+                        Line := XmlElement.Create('Line', '', Format(WhseActivityLine."Source Document"));
                         AddAttribute(Line, 'Descrip', WhseActivityLine.FieldCaption("Source Document"));
                         AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                        Line.InnerText := Format(WhseActivityLine."Source Document");
-                        Record.AppendChild(Line);
+                        RecordElement.Add(Line);
 
-                        Line := DOMxmlin.CreateElement('Line');
+                        Line := XmlElement.Create('Line', '', WhseActivityLine."Source No.");
                         AddAttribute(Line, 'Descrip', WhseActivityLine.FieldCaption("Source No."));
                         AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                        Line.InnerText := WhseActivityLine."Source No.";
-                        Record.AppendChild(Line);
+                        RecordElement.Add(Line);
 
-                        Line := DOMxmlin.CreateElement('Line');
+                        Line := XmlElement.Create('Line', '', WhseActivityLine."Unit of Measure Code");
                         AddAttribute(Line, 'Descrip', WhseActivityLine.FieldCaption("Unit of Measure Code"));
                         AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                        Line.InnerText := WhseActivityLine."Unit of Measure Code";
-                        Record.AppendChild(Line);
+                        RecordElement.Add(Line);
 
-                        Line := DOMxmlin.CreateElement('Line');
+                        Line := XmlElement.Create('Line', '', Format(WhseActivityLine."Qty. per Unit of Measure"));
                         AddAttribute(Line, 'Descrip', WhseActivityLine.FieldCaption("Qty. per Unit of Measure"));
                         AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                        Line.InnerText := Format(WhseActivityLine."Qty. per Unit of Measure");
-                        Record.AppendChild(Line);
-                        //-NPR5.49 [349554]
+                        RecordElement.Add(Line);
                     end;
-                    //+NPR5.49 [349554]
-                    Records.AppendChild(Record);
+                    Records.Add(RecordElement);
                 end;
             until WhseActivityLine.Next = 0;
 
-            //-NPR5.50 [247747]
             if not MiniformHeader."Hid Fulfilled Lines" then begin
-                //+NPR5.50 [247747]
                 if WhseActivityLine.FindSet then begin
-                    //Records := DOMxmlin.CreateElement('Records');
                     repeat
-                        Record := DOMxmlin.CreateElement('Record');
+                        RecordElement := XmlElement.Create('Record');
 
                         CurrRecordID := WhseActivityLine.RecordId;
                         TableNo := CurrRecordID.TableNo;
@@ -805,193 +665,139 @@ codeunit 6151387 "NPR CS UI Warehouse Activity"
                                 Indicator := 'plus';
 
                         if Indicator <> 'minus' then begin
-                            //-NPR5.49 [349554]
                             if MiniformHeader."Expand Summary Items" then begin
                                 //1
-                                Line := DOMxmlin.CreateElement('Line');
+                                Line := XmlElement.Create('Line', '', WhseActivityLine."Bin Code");
                                 AddAttribute(Line, 'Descrip', WhseActivityLine.FieldCaption(Description));
                                 AddAttribute(Line, 'Indicator', Indicator);
                                 AddAttribute(Line, 'Type', Format(LineType::TEXT));
                                 AddAttribute(Line, 'CollapsItems', 'FALSE');
-                                Line.InnerText := WhseActivityLine."Bin Code";
-                                Record.AppendChild(Line);
+                                RecordElement.Add(Line);
 
                                 //2
-                                Line := DOMxmlin.CreateElement('Line');
+                                Line := XmlElement.Create('Line', '',
+                                    StrSubstNo(Text026, WhseActivityLine."Qty. to Handle", WhseActivityLine."Qty. Outstanding"));
                                 AddAttribute(Line, 'Descrip', WhseActivityLine.FieldCaption("Qty. Outstanding"));
                                 AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                                Line.InnerText := StrSubstNo(Text026, WhseActivityLine."Qty. to Handle", WhseActivityLine."Qty. Outstanding");
-                                Record.AppendChild(Line);
+                                RecordElement.Add(Line);
 
                                 //3
-                                Line := DOMxmlin.CreateElement('Line');
+                                ItemIdentifier := CSWarehouseActivitySetup.ItemIdentifier(WhseActivityLine.RecordId, true, ' | ');
+                                Line := XmlElement.Create('Line', '', ItemIdentifier);
                                 AddAttribute(Line, 'Descrip', WhseActivityLine.FieldCaption("Item No."));
                                 AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                                //-NPR5.55 [404663]-revoked
-                                //            //-NPR5.50 [247747]
-                                //            IF WhseActivityLine."Variant Code" <> '' THEN
-                                //              Line.InnerText := STRSUBSTNO(Text027,WhseActivityLine."Item No.",WhseActivityLine."Variant Code")
-                                //            ELSE
-                                //            //-NPR5.50 [247747]
-                                //              Line.InnerText := WhseActivityLine."Item No.";
-                                //+NPR5.55 [404663]-revoked
-                                //-NPR5.55 [404663]
-                                ItemIdentifier := CSWarehouseActivitySetup.ItemIdentifier(WhseActivityLine.RecordId, true, ' | ');
-                                Line.InnerText := ItemIdentifier;
-                                //+NPR5.55 [404663]
-                                Record.AppendChild(Line);
+                                RecordElement.Add(Line);
 
                                 //4
-                                Line := DOMxmlin.CreateElement('Line');
+                                Line := XmlElement.Create('Line', '', WhseActivityLine."Unit of Measure Code");
                                 AddAttribute(Line, 'Descrip', WhseActivityLine.FieldCaption("Unit of Measure Code"));
                                 AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                                Line.InnerText := WhseActivityLine."Unit of Measure Code";
-                                Record.AppendChild(Line);
+                                RecordElement.Add(Line);
 
                                 //5
-                                Line := DOMxmlin.CreateElement('Line');
+                                Line := XmlElement.Create('Line', '', WhseActivityLine.Description);
                                 AddAttribute(Line, 'Descrip', WhseActivityLine.FieldCaption(Description));
                                 AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                                Line.InnerText := WhseActivityLine.Description;
-                                Record.AppendChild(Line);
+                                RecordElement.Add(Line);
 
                                 //6
-                                Line := DOMxmlin.CreateElement('Line');
+                                Line := XmlElement.Create('Line', '', '');
                                 AddAttribute(Line, 'Descrip', '');
                                 AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                                Line.InnerText := '';
-                                Record.AppendChild(Line);
+                                RecordElement.Add(Line);
 
-                                //-NPR5.48 [335606]
                                 if Location.Get(WhseActivityLine."Location Code") then
                                     if Location."Bin Mandatory" then begin
-                                        //+NPR5.48 [335606]
-                                        Line := DOMxmlin.CreateElement('Line');
+                                        Line := XmlElement.Create('Line');
                                         AddAttribute(Line, 'Descrip', 'Split Line..');
                                         AddAttribute(Line, 'Type', Format(LineType::BUTTON));
                                         AddAttribute(Line, 'TableNo', Format(TableNo));
                                         AddAttribute(Line, 'RecordID', Format(CurrRecordID));
                                         AddAttribute(Line, 'FuncName', 'SPLITLINE');
-                                        Record.AppendChild(Line);
-                                        //-NPR5.48 [335606]
+                                        RecordElement.Add(Line);
                                     end;
-                                //+NPR5.48 [335606]
                             end else begin
-                                //+NPR5.49 [349554]
-                                Line := DOMxmlin.CreateElement('Line');
+                                ItemIdentifier := CSWarehouseActivitySetup.ItemIdentifier(WhseActivityLine.RecordId, true, '-');
+                                Line := XmlElement.Create('Line', '',
+                                    StrSubstNo(Text015, WhseActivityLine."Qty. to Handle", WhseActivityLine."Qty. Outstanding",
+                                        ItemIdentifier, WhseActivityLine.Description));
                                 AddAttribute(Line, 'Descrip', WhseActivityLine.FieldCaption(Description));
                                 AddAttribute(Line, 'Indicator', Indicator);
                                 AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                                //-NPR5.55 [404663]-revoked
-                                //            //-NPR5.49 [346224]
-                                //            IF WhseActivityLine."Variant Code" <> '' THEN
-                                //              Line.InnerText := STRSUBSTNO(Text015,WhseActivityLine."Qty. to Handle",WhseActivityLine."Qty. Outstanding",WhseActivityLine."Item No."+'-'+WhseActivityLine."Variant Code",WhseActivityLine.Description)
-                                //            ELSE
-                                //            //+NPR5.49 [346224]
-                                //            Line.InnerText := STRSUBSTNO(Text015,WhseActivityLine."Qty. to Handle",WhseActivityLine."Qty. Outstanding",WhseActivityLine."Item No.",WhseActivityLine.Description);
-                                //+NPR5.55 [404663]-revoked
-                                //-NPR5.55 [404663]
-                                ItemIdentifier := CSWarehouseActivitySetup.ItemIdentifier(WhseActivityLine.RecordId, true, '-');
-                                Line.InnerText :=
-                                  StrSubstNo(Text015, WhseActivityLine."Qty. to Handle", WhseActivityLine."Qty. Outstanding", ItemIdentifier, WhseActivityLine.Description);
-                                //+NPR5.55 [404663]
-                                Record.AppendChild(Line);
+                                RecordElement.Add(Line);
 
-                                //-NPR5.48 [335606]
                                 if Location.Get(WhseActivityLine."Location Code") then
                                     if Location."Bin Mandatory" then begin
-                                        //+NPR5.48 [335606]
-                                        Line := DOMxmlin.CreateElement('Line');
+                                        Line := XmlElement.Create('Line');
                                         AddAttribute(Line, 'Descrip', 'Split Line..');
                                         AddAttribute(Line, 'Type', Format(LineType::BUTTON));
                                         AddAttribute(Line, 'TableNo', Format(TableNo));
                                         AddAttribute(Line, 'RecordID', Format(CurrRecordID));
                                         AddAttribute(Line, 'FuncName', 'SPLITLINE');
-                                        Record.AppendChild(Line);
-                                        //-NPR5.48 [335606]
+                                        RecordElement.Add(Line);
                                     end;
-                                //+NPR5.48 [335606]
 
-                                Line := DOMxmlin.CreateElement('Line');
+                                Line := XmlElement.Create('Line', '', WhseActivityLine.Description);
                                 AddAttribute(Line, 'Descrip', WhseActivityLine.FieldCaption(Description));
                                 AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                                Line.InnerText := WhseActivityLine.Description;
-                                Record.AppendChild(Line);
+                                RecordElement.Add(Line);
 
-                                Line := DOMxmlin.CreateElement('Line');
+                                Line := XmlElement.Create('Line', '', WhseActivityLine."Bin Code");
                                 AddAttribute(Line, 'Descrip', WhseActivityLine.FieldCaption("Bin Code"));
                                 AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                                Line.InnerText := WhseActivityLine."Bin Code";
-                                Record.AppendChild(Line);
+                                RecordElement.Add(Line);
 
-                                Line := DOMxmlin.CreateElement('Line');
+                                Line := XmlElement.Create('Line', '', Format(WhseActivityLine."Source Document"));
                                 AddAttribute(Line, 'Descrip', WhseActivityLine.FieldCaption("Source Document"));
                                 AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                                Line.InnerText := Format(WhseActivityLine."Source Document");
-                                Record.AppendChild(Line);
+                                RecordElement.Add(Line);
 
-                                Line := DOMxmlin.CreateElement('Line');
+                                Line := XmlElement.Create('Line', '', WhseActivityLine."Source No.");
                                 AddAttribute(Line, 'Descrip', WhseActivityLine.FieldCaption("Source No."));
                                 AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                                Line.InnerText := WhseActivityLine."Source No.";
-                                Record.AppendChild(Line);
+                                RecordElement.Add(Line);
 
-                                Line := DOMxmlin.CreateElement('Line');
+                                Line := XmlElement.Create('Line', '', WhseActivityLine."Unit of Measure Code");
                                 AddAttribute(Line, 'Descrip', WhseActivityLine.FieldCaption("Unit of Measure Code"));
                                 AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                                Line.InnerText := WhseActivityLine."Unit of Measure Code";
-                                Record.AppendChild(Line);
+                                RecordElement.Add(Line);
 
-                                Line := DOMxmlin.CreateElement('Line');
+                                Line := XmlElement.Create('Line', '', Format(WhseActivityLine."Qty. per Unit of Measure"));
                                 AddAttribute(Line, 'Descrip', WhseActivityLine.FieldCaption("Qty. per Unit of Measure"));
                                 AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                                Line.InnerText := Format(WhseActivityLine."Qty. per Unit of Measure");
-                                Record.AppendChild(Line);
-                                //-NPR5.49 [349554]
+                                RecordElement.Add(Line);
                             end;
-                            //+NPR5.49 [349554]
-                            Records.AppendChild(Record);
+                            Records.Add(RecordElement);
                         end;
                     until WhseActivityLine.Next = 0;
                 end;
-                //-NPR5.50 [247747]
             end;
-            //+NPR5.50 [247747]
             exit(true);
         end else
             exit(false);
     end;
 
-    local procedure AddAdditionalInfo(var xmlout: DotNet "NPRNetXmlDocument"; CSWarehouseActivityHandling: Record "NPR CS Wareh. Activ. Handling")
+    local procedure AddAdditionalInfo(var xmlout: XmlDocument; CSWarehouseActivityHandling: Record "NPR CS Wareh. Activ. Handling")
     var
-        CurrentRootNode: DotNet NPRNetXmlNode;
-        XMLFunctionNode: DotNet NPRNetXmlNode;
+        CurrentRootNode: XmlElement;
+        XMLFunctionNode: XmlNode;
         StrMenuTxt: Text;
     begin
         if not (CSWarehouseActivityHandling."Activity Type" in [CSWarehouseActivityHandling."Activity Type"::"Invt. Put-away", CSWarehouseActivityHandling."Activity Type"::"Invt. Pick"]) then
             exit;
 
         case CSWarehouseActivityHandling."Activity Type" of
-            //-NPR5.53 [377135]
-            //CSWarehouseActivityHandling."Activity Type"::"Invt. Put-away" : StrMenuTxt := 'Receive,Receive and Invoice';
             CSWarehouseActivityHandling."Activity Type"::"Invt. Put-away":
                 StrMenuTxt := 'Handle,Handle & Invoice';
-            //+NPR5.53 [377135]
-            //-NPR5.51
-            //CSWarehouseActivityHandling."Activity Type"::"Invt. Pick" : StrMenuTxt := 'Ship,Ship and Invoice';
-            //-NPR5.53 [377135]
-            //CSWarehouseActivityHandling."Activity Type"::"Invt. Pick" : StrMenuTxt := 'Ship,Ship and Receive';
             CSWarehouseActivityHandling."Activity Type"::"Invt. Pick":
                 StrMenuTxt := 'Handle,Handle & Invoice';
-        //+NPR5.53 [377135]
-        //+NPR5.51
         end;
 
-        CurrentRootNode := xmlout.DocumentElement;
-        XMLDOMMgt.FindNode(CurrentRootNode, 'Header/Functions', ReturnedNode);
+        xmlout.GetRoot(CurrentRootNode);
+        CurrentRootNode.SelectSingleNode('Header/Functions', ReturnedNode);
 
-        foreach XMLFunctionNode in ReturnedNode.ChildNodes do begin
-            if (XMLFunctionNode.InnerText = 'REGISTER') then
+        foreach XMLFunctionNode in ReturnedNode.AsXmlElement().GetChildElements() do begin
+            if (XMLFunctionNode.AsXmlElement().InnerText = 'REGISTER') then
                 AddAttribute(XMLFunctionNode, 'Actions', StrMenuTxt);
         end;
     end;
@@ -1027,29 +833,16 @@ codeunit 6151387 "NPR CS UI Warehouse Activity"
 
         if WhseActivityLine.FindSet then begin
             repeat
-                //-NPR5.49 [346070]
                 xRecQtyToHandle := WhseActivityLine."Qty. to Handle";
-                //+NPR5.49 [346070]
                 WhseActivityLine.Validate("Qty. to Handle", 0);
-                //-NPR5.50 [247747]
-                //WhseActivityLine.VALIDATE("Bin Code",'');
-                //+NPR5.50 [247747]
                 WhseActivityLine.Modify;
-                //-NPR5.52 [371682]
-                /*
-                //-NPR5.49 [346070]
-                UpdateTakeLine(WhseActivityLine,xRecQtyToHandle,1);
-                //+NPR5.49 [346070]
-                */
                 UpdateActivityLine(WhseActivityLine, 1);
-            //+NPR5.52 [371682]
             until WhseActivityLine.Next = 0;
         end else
             Error(Text007);
 
         CSCommunication.SetRecRef(RecRef);
         ActiveInputField := 1;
-
     end;
 
     local procedure Register(CSWarehouseActivityHandling: Record "NPR CS Wareh. Activ. Handling"; Index: Integer)
@@ -1066,7 +859,6 @@ codeunit 6151387 "NPR CS UI Warehouse Activity"
     begin
         Remark := '';
 
-        //-NPR5.52 [365967]
         CSSetup.Get;
         if CSSetup."Post with Job Queue" then begin
             WarehouseActivityHeader.Get(CSWarehouseActivityHandling."Activity Type", CSWarehouseActivityHandling."No.");
@@ -1096,22 +888,16 @@ codeunit 6151387 "NPR CS UI Warehouse Activity"
                 Remark := GetLastErrorText;
             exit;
         end;
-        //+NPR5.52 [365967]
 
         WhseActivityLine.SetRange("No.", CSWarehouseActivityHandling."No.");
 
         if WhseActivityLine.FindSet then begin
-
-            //-NPR5.51 [357577]
             if MiniformHeader."Update Posting Date" then begin
                 WarehouseActivityHeader.Get(CSWarehouseActivityHandling."Activity Type", CSWarehouseActivityHandling."No.");
                 WarehouseActivityHeader.Validate("Posting Date", Today);
                 WarehouseActivityHeader.Modify(true);
             end;
-            //+NPR5.51 [357577]
-            //-NPR5.53 [377135]
             Posted := false;
-            //+NPR5.53 [377135]
             repeat
                 case CSWarehouseActivityHandling."Activity Type" of
                     CSWarehouseActivityHandling."Activity Type"::Pick, CSWarehouseActivityHandling."Activity Type"::"Put-away":
@@ -1119,32 +905,20 @@ codeunit 6151387 "NPR CS UI Warehouse Activity"
                             if CheckBalanceQtyToHandle(WhseActivityLine) then begin
                                 WhseActivityRegister.ShowHideDialog(true);
                                 WhseActivityRegister.Run(WhseActivityLine);
-                                //-NPR5.53 [377135]
                                 Posted := true;
-                                //+NPR5.53 [377135]
                             end;
                         end;
                     CSWarehouseActivityHandling."Activity Type"::"Invt. Pick", CSWarehouseActivityHandling."Activity Type"::"Invt. Put-away":
                         begin
-                            //-NPR5.51 [359268]
                             if WhseActivityLine."Qty. to Handle" <> 0 then begin
-                                //+NPR5.51 [359268]
                                 WhseActivityPost.SetInvoiceSourceDoc(Index = 2);
                                 WhseActivityPost.Run(WhseActivityLine);
                                 Clear(WhseActivityPost);
-                                //-NPR5.53 [377135]
                                 Posted := true;
-                                //+NPR5.53 [377135]
-                                //-NPR5.51 [359268]
                             end;
-                            //+NPR5.51 [359268]
                         end;
                 end;
-            //-NPR5.53 [377135]
-            //UNTIL WhseActivityLine.NEXT = 0;
             until (WhseActivityLine.Next = 0) or Posted;
-            //+NPR5.53 [377135]
-
         end else
             Error(Text007);
     end;
@@ -1167,10 +941,8 @@ codeunit 6151387 "NPR CS UI Warehouse Activity"
         WhseActivityLine.SetCurrentKey("Activity Type", "No.", "Sorting Sequence No.");
         WhseActivityLine.SetRange("No.", CSWarehouseActivityHandling."No.");
         WhseActivityLine.SetRange("Item No.", CSWarehouseActivityHandling."Item No.");
-        //-NPR5.50 [247747]
         if CSWarehouseActivityHandling."Variant Code" <> '' then
             WhseActivityLine.SetRange("Variant Code", CSWarehouseActivityHandling."Variant Code");
-        //+NPR5.50 [247747]
         if Location.Get(CSWarehouseActivityHandling."Location Code") then
             BinIsMandatory := Location."Bin Mandatory";
 
@@ -1201,102 +973,38 @@ codeunit 6151387 "NPR CS UI Warehouse Activity"
                 until WhseActivityLineSum.Next = 0;
 
                 CurrQtytoHandle := CSWarehouseActivityHandling.Qty;
-
-                //UOM handling
-                //    Item.GET(CSWarehouseActivityHandling."Item No.");
-                //    IF (CSWarehouseActivityHandling."Unit of Measure" <> '') THEN BEGIN
-                //      IF (Item."Base Unit of Measure" <> '') AND (CSWarehouseActivityHandling."Unit of Measure" <> Item."Base Unit of Measure") THEN BEGIN
-                //        IF ItemUnitofMeasure.GET(Item."No.",CSWarehouseActivityHandling."Unit of Measure") THEN
-                //          CurrQtytoHandle := CalcBaseQty(WhseActivityLine,ItemUnitofMeasure."Qty. per Unit of Measure");
-                //      END;
-                //    END;
-
             end;
 
             repeat
-
-                //IF (WhseActivityLine."Qty. to Handle" < WhseActivityLine."Qty. Outstanding") THEN BEGIN
                 if (QtytoHandle < QtyOutstanding) then begin
-
-                    //-NPR5.50 [247747]
-                    //      IF (CSWarehouseActivityHandling."Bin Code" <> WhseActivityLine."Bin Code") AND (WhseActivityLine."Bin Code" <> '') THEN BEGIN
-                    //        //ERROR(Text018,WhseActivityLine."Bin Code");
-                    //        Remark := STRSUBSTNO(Text018,WhseActivityLine."Bin Code");
-                    //        EXIT(FALSE);
-                    //      END;
-                    //+NPR5.50 [247747]
-
                     FoundedRecToUpdate := true;
-
-                    //IF (WhseActivityLine."Qty. to Handle" + CSWarehouseActivityHandling.Qty) > WhseActivityLine."Qty. Outstanding" THEN BEGIN
                     if ((QtytoHandle + CSWarehouseActivityHandling.Qty) > QtyOutstanding) or (CurrQtytoHandle > QtyOutstanding) then begin
-                        //-NPR5.48 [335606]
-                        //Qty := WhseActivityLine."Qty. Outstanding"
                         Remark := Text016;
                         exit(false);
-                        //-NPR5.48 [335606]
-                    end;// ELSE
-
-                    //      ERROR('QtytoHandle: ' + FORMAT(QtytoHandle) +
-                    //          '\' + 'QtyOutstanding: ' + FORMAT(QtyOutstanding) +
-                    //          '\' + 'CurrQtytoHandle: ' + FORMAT(CurrQtytoHandle));
+                    end;
 
                     if (WhseActivityLine."Qty. to Handle" < WhseActivityLine."Qty. Outstanding") and (CurrQtytoHandle > 0) then begin
-
-                        //IF (WhseActivityLine."Qty. to Handle" + CSWarehouseActivityHandling.Qty) <= WhseActivityLine."Qty. Outstanding" THEN BEGIN
                         if (WhseActivityLine."Qty. to Handle" + CurrQtytoHandle) <= WhseActivityLine."Qty. Outstanding" then begin
-                            //-NPR5.52 [371682]
-                            /*
-                            //-NPR5.50 [247747]
-                            //IF CurrQtytoHandle > 0 THEN BEGIN
-                            //  Qty := CurrQtytoHandle;
-                            //  CurrQtytoHandle := 0;
-                            //END ELSE BEGIN
-                              Qty := WhseActivityLine."Qty. to Handle" + CSWarehouseActivityHandling.Qty;
-                              CurrQtytoHandle := CurrQtytoHandle - CSWarehouseActivityHandling.Qty;
-                            //END;
-                            //+NPR5.50 [247747]
-                            */
                             Qty := WhseActivityLine."Qty. to Handle" + CurrQtytoHandle;
                             CurrQtytoHandle := 0;
-                            //+NPR5.52 [371682]
                         end else begin
                             Qty := WhseActivityLine."Qty. Outstanding" - WhseActivityLine."Qty. to Handle";
                             CurrQtytoHandle := CurrQtytoHandle - Qty;
                         end;
 
-                        //        ERROR('QtytoHandle: ' + FORMAT(QtytoHandle) +
-                        //          '\' + 'QtyOutstanding: ' + FORMAT(QtyOutstanding) +
-                        //          '\' + 'Qty: ' + FORMAT(Qty) +
-                        //          '\' + 'CurrQtytoHandle: ' + FORMAT(CurrQtytoHandle) +
-                        //          '\' + 'CSWarehouseActivityHandling.Qty: ' + FORMAT(CSWarehouseActivityHandling.Qty));
-
                         WhseActivityLine.Validate("Qty. to Handle", Qty);
-                        //-NPR5.50 [247747]
                         if CSWarehouseActivityHandling."Bin Code" <> '' then
                             WhseActivityLine.Validate("Bin Code", CSWarehouseActivityHandling."Bin Code");
-                        //-NPR5.50 [247747]
                         WhseActivityLine.Modify(true);
-                        //-NPR5.52 [371682]
-                        /*
-                        //-NPR5.49 [346070]
-                        UpdateTakeLine(WhseActivityLine,WhseActivityLine."Qty. to Handle",0);
-                        //+NPR5.49 [346070]
-                        */
                         UpdateActivityLine(WhseActivityLine, 0);
-                        //+NPR5.52 [371682]
                     end;
                 end;
 
-            //UNTIL (WhseActivityLine.NEXT = 0) OR FoundedRecToUpdate;
             until (WhseActivityLine.Next = 0) or (CurrQtytoHandle = 0);
 
             if not FoundedRecToUpdate then begin
-                //-NPR5.48 [335606]
-                //ERROR(Text016);
                 Remark := Text016;
                 exit(false);
-                //-NPR5.48 [335606]
             end;
 
         end else begin
@@ -1404,8 +1112,6 @@ codeunit 6151387 "NPR CS UI Warehouse Activity"
             WhseActivLine.TestField("Action Type", WhseActivLine."Action Type"::Place);
         end;
         if WhseActivLine."Qty. to Handle" = WhseActivLine."Qty. Outstanding" then begin
-            //WhseActivLine.FIELDERROR(
-            //  "Qty. to Handle",STRSUBSTNO(Text003,WhseActivLine.FIELDCAPTION("Qty. Outstanding")));
             Remark := StrSubstNo(Text003, WhseActivLine.FieldCaption("Qty. to Handle"), WhseActivLine.FieldCaption("Qty. Outstanding"));
             exit;
         end;
@@ -1427,14 +1133,8 @@ codeunit 6151387 "NPR CS UI Warehouse Activity"
           WhseActivLine."Qty. Outstanding (Base)" - WhseActivLine."Qty. to Handle (Base)";
         NewWhseActivLine."Qty. Outstanding" := NewWhseActivLine.Quantity;
         NewWhseActivLine."Qty. Outstanding (Base)" := NewWhseActivLine."Qty. (Base)";
-        //-NPR5.49 [346070]
-        /*
-        NewWhseActivLine."Qty. to Handle" := NewWhseActivLine.Quantity;
-        NewWhseActivLine."Qty. to Handle (Base)" := NewWhseActivLine."Qty. (Base)";
-        */
         NewWhseActivLine."Qty. to Handle" := 0;
         NewWhseActivLine."Qty. to Handle (Base)" := 0;
-        //+NPR5.49 [346070]
         NewWhseActivLine."Qty. Handled" := 0;
         NewWhseActivLine."Qty. Handled (Base)" := 0;
 
@@ -1495,38 +1195,6 @@ codeunit 6151387 "NPR CS UI Warehouse Activity"
         UpdateActionType: Integer;
         QtyToHandle: Decimal;
     begin
-        //-NPR5.52 [371682]
-        /*
-        //-NPR5.50 [348151]
-        IF NOT (WhseActivityLine."Action Type" = WhseActivityLine."Action Type"::Place) THEN
-          EXIT;
-        //+NPR5.50 [348151]
-        
-        //-NPR5.49 [346070]
-        //-NPR5.52 [348151]
-        IF NOT (WhseActivityLine."Action Type" = WhseActivityLine."Action Type"::Place) THEN
-          EXIT;
-        //+NPR5.52 [348151]
-        IF ActionToTake = ActionToTake::Decrease THEN
-          QtyToHandle := -1 * QtyToHandle;
-        WhseActivityLineTake.SETRANGE("Activity Type",WhseActivityLine."Activity Type");
-        WhseActivityLineTake.SETRANGE("No.",WhseActivityLine."No.");
-        WhseActivityLineTake.SETRANGE("Source Type",WhseActivityLine."Source Type");
-        WhseActivityLineTake.SETRANGE("Source Subtype",WhseActivityLine."Source Subtype");
-        WhseActivityLineTake.SETRANGE("Source No.",WhseActivityLine."Source No.");
-        WhseActivityLineTake.SETRANGE("Source Line No.",WhseActivityLine."Source Line No.");
-        WhseActivityLineTake.SETRANGE("Action Type",WhseActivityLineTake."Action Type"::Take);
-        IF WhseActivityLineTake.FINDFIRST THEN BEGIN
-          //-NPR5.50 [349530]
-          IF ActionToTake = ActionToTake::Increase THEN
-            WhseActivityLineTake.VALIDATE("Qty. to Handle",QtyToHandle)
-          ELSE
-          //-NPR5.50 [349530]
-            WhseActivityLineTake.VALIDATE("Qty. to Handle",WhseActivityLineTake."Qty. to Handle" + QtyToHandle);
-          WhseActivityLineTake.MODIFY(TRUE);
-        END;
-        //+NPR5.49 [346070]
-        */
         if WhseActivityLine."Action Type" = WhseActivityLine."Action Type"::" " then
             exit;
         case WhseActivityLine."Action Type" of
@@ -1562,8 +1230,6 @@ codeunit 6151387 "NPR CS UI Warehouse Activity"
             WhseActivityLineUpdate.Validate("Qty. to Handle", QtyToHandle);
             WhseActivityLineUpdate.Modify(true);
         end;
-        //+NPR5.52 [371682]
-
     end;
 
     [EventSubscriber(ObjectType::Table, 7317, 'OnAfterInsertEvent', '', true, true)]
@@ -1571,7 +1237,6 @@ codeunit 6151387 "NPR CS UI Warehouse Activity"
     var
         CSSetup: Record "NPR CS Setup";
     begin
-        //-NPR5.50 [346066]
         if Rec.IsTemporary then
             exit;
         if not CSSetup.Get then
@@ -1580,7 +1245,6 @@ codeunit 6151387 "NPR CS UI Warehouse Activity"
             exit;
         Rec.Validate("Qty. to Receive", 0);
         Rec.Modify(true);
-        //+NPR5.50 [346066]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 7313, 'OnAfterWhseActivLineInsert', '', true, true)]
@@ -1588,14 +1252,12 @@ codeunit 6151387 "NPR CS UI Warehouse Activity"
     var
         CSSetup: Record "NPR CS Setup";
     begin
-        //-NPR5.50 [346066]
         if not CSSetup.Get then
             exit;
         if not CSSetup."Zero Def. Qty. to Handle" then
             exit;
         WarehouseActivityLine.Validate("Qty. to Handle", 0);
         WarehouseActivityLine.Modify(true);
-        //+NPR5.50 [346066]
     end;
 
     local procedure DeleteTransferredDataLines()
@@ -1606,4 +1268,3 @@ codeunit 6151387 "NPR CS UI Warehouse Activity"
         CSWarehouseActivityHandling.DeleteAll(true);
     end;
 }
-

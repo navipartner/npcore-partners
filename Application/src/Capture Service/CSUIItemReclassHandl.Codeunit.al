@@ -1,14 +1,5 @@
 codeunit 6151364 "NPR CS UI Item Reclass. Handl."
 {
-    // NPR5.50/CLVA/20190527  CASE 355694 Object created
-    // NPR5.51/CLVA/20190527  CASE 355694 Added bin content code by barcode
-    // NPR5.51/CLVA/20190527  CASE 360382 Added option list
-    // NPR5.52/CLVA/20190927  CASE 370509 Added support for background posting
-    // NPR5.53/CLVA/20191118  CASE 377888 Changed posting to background posting
-    // NPR5.53/CLVA/20191121  CASE 377462 Changed No. Serie to TODAY. Added Qty validation
-    // NPR5.53/CLVA/20191211  CASE 381606 Changed background posting to journal line
-    // NPR5.55/CLVA/20200513 CASE 379709 Added Journal line/Bin check
-
     TableNo = "NPR CS UI Header";
 
     trigger OnRun()
@@ -17,7 +8,7 @@ codeunit 6151364 "NPR CS UI Item Reclass. Handl."
     begin
         MiniformMgmt.Initialize(
           CSUIHeader, Rec, DOMxmlin, ReturnedNode,
-          RootNode, XMLDOMMgt, CSCommunication, CSUserId,
+          RootNode, CSCommunication, CSUserId,
           CurrentCode, StackCode, WhseEmpId, LocationFilter, CSSessionId);
 
         if Code <> CurrentCode then
@@ -30,13 +21,12 @@ codeunit 6151364 "NPR CS UI Item Reclass. Handl."
 
     var
         CSUIHeader: Record "NPR CS UI Header";
-        XMLDOMMgt: Codeunit "XML DOM Management";
         CSCommunication: Codeunit "NPR CS Communication";
         CSMgt: Codeunit "NPR CS Management";
         RecRef: RecordRef;
-        DOMxmlin: DotNet "NPRNetXmlDocument";
-        ReturnedNode: DotNet NPRNetXmlNode;
-        RootNode: DotNet NPRNetXmlNode;
+        DOMxmlin: XmlDocument;
+        ReturnedNode: XmlNode;
+        RootNode: XmlNode;
         CSUserId: Text[250];
         Remark: Text[250];
         WhseEmpId: Text[250];
@@ -86,14 +76,14 @@ codeunit 6151364 "NPR CS UI Item Reclass. Handl."
         CSItemReclassHandling: Record "NPR CS Item Reclass. Handling";
         CSItemReclassHandling2: Record "NPR CS Item Reclass. Handling";
         CSFieldDefaults: Record "NPR CS Field Defaults";
-        CommaString: DotNet NPRNetString;
-        Values: DotNet NPRNetArray;
-        Separator: DotNet NPRNetString;
+        CommaString: Text;
+        Separator: Text;
+        Values: List of [Text];
         Value: Text;
         ItemJournalLine: Record "Item Journal Line";
     begin
-        if XMLDOMMgt.FindNode(RootNode, 'Header/Input', ReturnedNode) then
-            TextValue := ReturnedNode.InnerText
+        if RootNode.AsXmlElement().SelectSingleNode('Header/Input', ReturnedNode) then
+            TextValue := ReturnedNode.AsXmlElement().InnerText
         else
             Error(Text006);
 
@@ -112,9 +102,7 @@ codeunit 6151364 "NPR CS UI Item Reclass. Handl."
         FuncGroup.KeyDef := CSCommunication.GetFunctionKey(CSUIHeader.Code, TextValue);
 
         ActiveInputField := 1;
-        //-NPR5.51 [360382]
         StrMenuTxt := '';
-        //+NPR5.51 [360382]
 
         case FuncGroup.KeyDef of
             FuncGroup.KeyDef::Esc:
@@ -177,7 +165,7 @@ codeunit 6151364 "NPR CS UI Item Reclass. Handl."
 
                     CommaString := TextValue;
                     Separator := ',';
-                    Values := CommaString.Split(Separator.ToCharArray());
+                    Values := CommaString.Split(Separator);
 
                     foreach Value in Values do begin
 
@@ -246,7 +234,7 @@ codeunit 6151364 "NPR CS UI Item Reclass. Handl."
         RecId: RecordID;
         TableNo: Integer;
     begin
-        XMLDOMMgt.FindNode(RootNode, 'Header/Input', ReturnedNode);
+        RootNode.AsXmlElement().SelectSingleNode('Header/Input', ReturnedNode);
 
         Evaluate(TableNo, CSCommunication.GetNodeAttribute(ReturnedNode, 'TableNo'));
         Evaluate(RecId, CSCommunication.GetNodeAttribute(ReturnedNode, 'RecordID'));
@@ -273,18 +261,20 @@ codeunit 6151364 "NPR CS UI Item Reclass. Handl."
 
     local procedure SendForm(InputField: Integer)
     var
-        Records: DotNet NPRNetXmlElement;
+        Records: XmlElement;
+        RootElement: XmlElement;
         CSSetup: Record "NPR CS Setup";
-        Options: DotNet NPRNetXmlElement;
+        Options: XmlElement;
     begin
         CSCommunication.EncodeUI(CSUIHeader, StackCode, DOMxmlin, InputField, Remark, CSUserId);
         CSCommunication.GetReturnXML(DOMxmlin);
 
+        DOMxmlin.GetRoot(RootElement);
         if AddOptions(Options) then
-            DOMxmlin.DocumentElement.AppendChild(Options);
+            RootElement.Add(Options);
 
         if AddSummarize(Records) then
-            DOMxmlin.DocumentElement.AppendChild(Records);
+            RootElement.Add(Records);
 
         CSMgt.SendXMLReply(DOMxmlin);
     end;
@@ -325,7 +315,6 @@ codeunit 6151364 "NPR CS UI Item Reclass. Handl."
             exit;
         end;
 
-        //-NPR5.51 [355694]
         Clear(BinContent);
         BinContent.SetRange("Location Code", CSItemReclassHandling."Location Code");
         BinContent.SetRange("Item No.", ItemNo);
@@ -334,15 +323,11 @@ codeunit 6151364 "NPR CS UI Item Reclass. Handl."
         if not BinContent.FindFirst then begin
             Remark := StrSubstNo(Text022, BinContent.GetFilters());
             exit;
-            //-NPR5.51 [360382]
         end else begin
-            //+NPR5.51 [360382]
             BinContent.CalcFields(Quantity);
             CSItemReclassHandling."Bin Code" := BinContent."Bin Code";
             CSItemReclassHandling.Qty := BinContent.Quantity;
-            //-NPR5.51 [360382]
 
-            //-NPR5.53 [379973]
             if CSItemReclassHandling."Bin Code" <> '' then begin
                 CSSetup.Get;
                 if ItemJournalBatch.Get(CSSetup."Item Reclass. Jour Temp Name", CSSetup."Item Reclass. Jour Batch Name") then begin
@@ -358,16 +343,13 @@ codeunit 6151364 "NPR CS UI Item Reclass. Handl."
                     end;
                 end;
             end;
-            //+NPR5.53 [379973]
 
             repeat
                 BinContent.CalcFields(Quantity);
                 StrMenuTxt := StrMenuTxt + BinContent."Bin Code" + ' | ' + Format(BinContent.Quantity) + ' ' + BinContent."Unit of Measure Code" + ',';
             until BinContent.Next = 0;
             StrMenuTxt := CopyStr(StrMenuTxt, 1, (StrLen(StrMenuTxt) - 1));
-            //+NPR5.51 [360382]
         end;
-        //+NPR5.51 [355694]
 
         CSItemReclassHandling.Barcode := InputValue;
     end;
@@ -396,17 +378,11 @@ codeunit 6151364 "NPR CS UI Item Reclass. Handl."
         BinContent.SetRange("Item No.", CSItemReclassHandlingPlaceholder."Item No.");
         BinContent.SetRange("Variant Code", CSItemReclassHandlingPlaceholder."Variant Code");
         BinContent.SetRange("Bin Code", InputValue);
-        //-NPR5.53 [381606]
-        //IF NOT BinContent.FINDSET THEN
         if not BinContent.FindSet then begin
-            //+NPR5.53 [381606]
             Remark := Text021;
-            //-NPR5.53 [381606]
             exit;
         end;
-        //+NPR5.53 [381606]
 
-        //-NPR5.55 [379709]
         if CSItemReclassHandlingPlaceholder."Item No." <> '' then begin
             CSSetup.Get;
             if ItemJournalBatch.Get(CSSetup."Item Reclass. Jour Temp Name", CSSetup."Item Reclass. Jour Batch Name") then begin
@@ -422,13 +398,10 @@ codeunit 6151364 "NPR CS UI Item Reclass. Handl."
                 end;
             end;
         end;
-        //+NPR5.55 [379709]
 
         CSItemReclassHandlingPlaceholder."Bin Code" := InputValue;
-        //-NPR5.51 [355694]
         BinContent.CalcFields(Quantity);
         CSItemReclassHandlingPlaceholder.Qty := BinContent.Quantity;
-        //+NPR5.51 [355694]
     end;
 
     local procedure CheckNewBinCode(var CSItemReclassHandlingPlaceholder: Record "NPR CS Item Reclass. Handling"; InputValue: Text)
@@ -447,32 +420,18 @@ codeunit 6151364 "NPR CS UI Item Reclass. Handl."
             exit;
         end;
 
-        //-NPR5.51 [355694]
         if InputValue = CSItemReclassHandlingPlaceholder."Bin Code" then begin
             Remark := Text024;
             exit;
         end;
 
-        // CLEAR(BinContent);
-        // BinContent.SETRANGE("Location Code",CSItemReclassHandlingPlaceholder."Location Code");
-        // BinContent.SETRANGE("Item No.",CSItemReclassHandlingPlaceholder."Item No.");
-        // BinContent.SETRANGE("Variant Code",CSItemReclassHandlingPlaceholder."Variant Code");
-        // IF NOT BinContent.FINDSET THEN
-        //  Remark := Text021;
-
         Clear(Bin);
         Bin.SetRange("Location Code", CSItemReclassHandlingPlaceholder."Location Code");
         Bin.SetRange(Code, InputValue);
-        //-NPR5.53 [381606]
-        //IF NOT Bin.FINDSET THEN
         if not Bin.FindSet then begin
-            //+NPR5.53 [381606]
             Remark := Text021;
-            //+NPR5.51 [355694]
-            //-NPR5.53 [381606]
             exit;
         end;
-        //+NPR5.53 [381606]
 
         CSItemReclassHandlingPlaceholder."New Bin Code" := InputValue;
     end;
@@ -492,14 +451,11 @@ codeunit 6151364 "NPR CS UI Item Reclass. Handl."
             exit;
         end;
 
-        //-NPR5.53 [377462]
         if Qty = 0 then begin
             Remark := Text026;
             exit;
         end;
-        //+NPR5.53 [377462]
 
-        //-NPR5.51 [355694]
         Clear(BinContent);
         BinContent.SetRange("Location Code", CSItemReclassHandlingPlaceholder."Location Code");
         BinContent.SetRange("Item No.", CSItemReclassHandlingPlaceholder."Item No.");
@@ -511,14 +467,11 @@ codeunit 6151364 "NPR CS UI Item Reclass. Handl."
             exit;
         end;
 
-        //-NPR5.51 [355694]
         BinContent.CalcFields(Quantity);
-        //+NPR5.51 [355694]
         if Qty > BinContent.Quantity then begin
             Remark := Text023;
             exit;
         end;
-        //+NPR5.51 [355694]
 
         CSItemReclassHandlingPlaceholder.Qty := Qty;
     end;
@@ -573,17 +526,10 @@ codeunit 6151364 "NPR CS UI Item Reclass. Handl."
         LineNo: Integer;
         CSSetup: Record "NPR CS Setup";
     begin
-        //-NPR5.53 [377462]
-        //CSSetup.GET;
-        //+NPR5.53 [377462]
-
         CSItemReclassHandling.Handled := true;
         CSItemReclassHandling.Modify(true);
 
-        //-NPR5.53 [377462]
-        //IF TransferDataLine(CSItemReclassHandling,CSSetup) THEN BEGIN
         if TransferDataLine(CSItemReclassHandling) then begin
-            //+NPR5.53 [377462]
             CSItemReclassHandling."Transferred to Worksheet" := true;
             CSItemReclassHandling.Modify(true);
         end;
@@ -599,16 +545,20 @@ codeunit 6151364 "NPR CS UI Item Reclass. Handl."
         CSItemReclassHandling.DeleteAll(true);
     end;
 
-    local procedure AddAttribute(var NewChild: DotNet NPRNetXmlNode; AttribName: Text[250]; AttribValue: Text[250])
+    local procedure AddAttribute(var NewChild: XmlNode; AttribName: Text[250]; AttribValue: Text[250])
     begin
-        if XMLDOMMgt.AddAttribute(NewChild, AttribName, AttribValue) > 0 then
-            Error(Text002, AttribName);
+        NewChild.AsXmlElement().SetAttribute(AttribName, AttribValue);
     end;
 
-    local procedure AddSummarize(var Records: DotNet NPRNetXmlElement): Boolean
+    local procedure AddAttribute(var NewChild: XmlElement; AttribName: Text[250]; AttribValue: Text[250])
+    begin
+        NewChild.SetAttribute(AttribName, AttribValue);
+    end;
+
+    local procedure AddSummarize(var Records: XmlElement): Boolean
     var
-        "Record": DotNet NPRNetXmlElement;
-        Line: DotNet NPRNetXmlElement;
+        RecordElement: XmlElement;
+        Line: XmlElement;
         Indicator: Text;
         LineType: Option TEXT,BUTTON;
         CurrRecordID: RecordID;
@@ -617,11 +567,6 @@ codeunit 6151364 "NPR CS UI Item Reclass. Handl."
         CSSetup: Record "NPR CS Setup";
         ItemJournalLine: Record "Item Journal Line";
     begin
-        //CLEAR(CSItemReclassHandling);
-        //CSItemReclassHandling.SETRANGE(Id,CSSessionId);
-        //IF NOT CSItemReclassHandling.FINDLAST THEN
-        //  EXIT(FALSE);
-
         CSSetup.Get;
 
         Clear(ItemJournalLine);
@@ -629,73 +574,69 @@ codeunit 6151364 "NPR CS UI Item Reclass. Handl."
         ItemJournalLine.SetRange("Journal Batch Name", CSSetup."Item Reclass. Jour Batch Name");
         ItemJournalLine.SetRange("External Document No.", CSSessionId);
         if ItemJournalLine.FindSet then begin
-            Records := DOMxmlin.CreateElement('Records');
+            Records := XmlElement.Create('Records');
             repeat
-                Record := DOMxmlin.CreateElement('Record');
+                RecordElement := XmlElement.Create('Record');
 
                 CurrRecordID := ItemJournalLine.RecordId;
                 TableNo := CurrRecordID.TableNo;
 
                 Indicator := 'ok';
 
-                Line := DOMxmlin.CreateElement('Line');
+                Line := XmlElement.Create('Line', '',
+                    StrSubstNo(Text015, ItemJournalLine.Quantity, ItemJournalLine."Item No.", ItemJournalLine.Description));
                 AddAttribute(Line, 'Descrip', 'Description');
                 AddAttribute(Line, 'Indicator', Indicator);
-                Line.InnerText := StrSubstNo(Text015, ItemJournalLine.Quantity, ItemJournalLine."Item No.", ItemJournalLine.Description);
-                Record.AppendChild(Line);
+                RecordElement.Add(Line);
 
-                Line := DOMxmlin.CreateElement('Line');
+                Line := XmlElement.Create('Line');
                 AddAttribute(Line, 'Descrip', 'Delete..');
                 AddAttribute(Line, 'Type', Format(LineType::BUTTON));
                 AddAttribute(Line, 'TableNo', Format(TableNo));
                 AddAttribute(Line, 'RecordID', Format(CurrRecordID));
                 AddAttribute(Line, 'FuncName', 'DELETELINE');
-                Record.AppendChild(Line);
+                RecordElement.Add(Line);
 
-                Line := DOMxmlin.CreateElement('Line');
+                Line := XmlElement.Create('Line', '', ItemJournalLine."Item No.");
                 AddAttribute(Line, 'Descrip', ItemJournalLine.FieldCaption("Item No."));
                 AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                Line.InnerText := ItemJournalLine."Item No.";
-                Record.AppendChild(Line);
+                RecordElement.Add(Line);
 
                 if (ItemJournalLine."Variant Code" <> '') then begin
-                    Line := DOMxmlin.CreateElement('Line');
+                    Line := XmlElement.Create('Line', '', ItemJournalLine."Variant Code");
                     AddAttribute(Line, 'Descrip', ItemJournalLine.FieldCaption("Variant Code"));
                     AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                    Line.InnerText := ItemJournalLine."Variant Code";
-                    Record.AppendChild(Line);
+                    RecordElement.Add(Line);
                 end;
 
-                Line := DOMxmlin.CreateElement('Line');
+                Line := XmlElement.Create('Line', '', ItemJournalLine."Bin Code");
                 AddAttribute(Line, 'Descrip', ItemJournalLine.FieldCaption("Bin Code"));
                 AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                Line.InnerText := ItemJournalLine."Bin Code";
-                Record.AppendChild(Line);
+                RecordElement.Add(Line);
 
-                Line := DOMxmlin.CreateElement('Line');
+                Line := XmlElement.Create('Line', '', ItemJournalLine."New Bin Code");
                 AddAttribute(Line, 'Descrip', ItemJournalLine.FieldCaption("New Bin Code"));
                 AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                Line.InnerText := ItemJournalLine."New Bin Code";
-                Record.AppendChild(Line);
+                RecordElement.Add(Line);
 
-                Records.AppendChild(Record);
+                Records.Add(RecordElement);
             until ItemJournalLine.Next = 0;
             exit(true);
         end else
             exit(false);
     end;
 
-    local procedure AddAggSummarize(var Records: DotNet NPRNetXmlElement) NotEmptyResult: Boolean
+    local procedure AddAggSummarize(var Records: XmlElement) NotEmptyResult: Boolean
     var
-        "Record": DotNet NPRNetXmlElement;
-        Line: DotNet NPRNetXmlElement;
+        RecordElement: XmlElement;
+        Line: XmlElement;
         Indicator: Text;
         LineType: Option TEXT,BUTTON;
         CurrRecordID: RecordID;
         TableNo: Integer;
         SummarizeCounting: Query "NPR CS Stock-Take Summarize";
     begin
-        Records := DOMxmlin.CreateElement('Records');
+        Records := XmlElement.Create('Records');
 
         SummarizeCounting.SetRange(Id, CSSessionId);
         SummarizeCounting.SetRange(Handled, true);
@@ -704,54 +645,42 @@ codeunit 6151364 "NPR CS UI Item Reclass. Handl."
         while SummarizeCounting.Read do begin
 
             NotEmptyResult := true;
-            Record := DOMxmlin.CreateElement('Record');
-
-            //CurrRecordID := SummarizeCounting.RECORDID;
-            //TableNo := CurrRecordID.TABLENO;
+            RecordElement := XmlElement.Create('Record');
 
             if SummarizeCounting.Item_No = '' then
                 Indicator := 'minus'
             else
                 Indicator := 'ok';
 
-            Line := DOMxmlin.CreateElement('Line');
+            if (Indicator = 'ok') then
+                Line := XmlElement.Create('Line', '',
+                    StrSubstNo(Text015, SummarizeCounting.Count_, SummarizeCounting.Item_No, SummarizeCounting.Item_Description))
+            else
+                Line := XmlElement.Create('Line', '',
+                    StrSubstNo(Text016, SummarizeCounting.Count_, 'Unknown Tag Id'));
             AddAttribute(Line, 'Descrip', 'Description');
             AddAttribute(Line, 'Indicator', Indicator);
-            if (Indicator = 'ok') then
-                Line.InnerText := StrSubstNo(Text015, SummarizeCounting.Count_, SummarizeCounting.Item_No, SummarizeCounting.Item_Description)
-            else
-                Line.InnerText := StrSubstNo(Text016, SummarizeCounting.Count_, 'Unknown Tag Id');
-            Record.AppendChild(Line);
+            RecordElement.Add(Line);
 
-            //    Line := DOMxmlin.CreateElement('Line');
-            //    AddAttribute(Line,'Descrip','Delete..');
-            //    AddAttribute(Line,'Type',FORMAT(LineType::BUTTON));
-            //    AddAttribute(Line,'TableNo',FORMAT(TableNo));
-            //    AddAttribute(Line,'RecordID',FORMAT(CurrRecordID));
-            //    AddAttribute(Line,'FuncName','DELETELINE');
-            //    Record.AppendChild(Line);
-
-            Line := DOMxmlin.CreateElement('Line');
+            Line := XmlElement.Create('Line', '', SummarizeCounting.Item_No);
             AddAttribute(Line, 'Descrip', 'No.');
             AddAttribute(Line, 'Type', Format(LineType::TEXT));
-            Line.InnerText := SummarizeCounting.Item_No;
-            Record.AppendChild(Line);
+            RecordElement.Add(Line);
 
-            Line := DOMxmlin.CreateElement('Line');
+            Line := XmlElement.Create('Line', '', SummarizeCounting.Item_Description);
             AddAttribute(Line, 'Descrip', 'Name');
             AddAttribute(Line, 'Type', Format(LineType::TEXT));
-            Line.InnerText := SummarizeCounting.Item_Description;
-            Record.AppendChild(Line);
+            RecordElement.Add(Line);
 
             if (SummarizeCounting.Variant_Code <> '') then begin
-                Line := DOMxmlin.CreateElement('Line');
+                Line := XmlElement.Create('Line', '',
+                    SummarizeCounting.Variant_Code + ' - ' + SummarizeCounting.Variant_Description);
                 AddAttribute(Line, 'Descrip', 'Variant');
                 AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                Line.InnerText := SummarizeCounting.Variant_Code + ' - ' + SummarizeCounting.Variant_Description;
-                Record.AppendChild(Line);
+                RecordElement.Add(Line);
             end;
 
-            Records.AppendChild(Record);
+            Records.Add(RecordElement);
         end;
 
         SummarizeCounting.Close;
@@ -759,16 +688,15 @@ codeunit 6151364 "NPR CS UI Item Reclass. Handl."
         exit(NotEmptyResult);
     end;
 
-    local procedure AddOptions(var Options: DotNet NPRNetXmlElement) NotEmptyResult: Boolean
+    local procedure AddOptions(var Options: XmlElement) NotEmptyResult: Boolean
     begin
         NotEmptyResult := StrMenuTxt <> '';
 
         if not NotEmptyResult then
             exit(NotEmptyResult);
 
-        Options := DOMxmlin.CreateElement('Options');
+        Options := XmlElement.Create('Options', '', StrMenuTxt);
         AddAttribute(Options, 'Descrip', Text025);
-        Options.InnerText := StrMenuTxt;
 
         exit(NotEmptyResult);
     end;
@@ -779,14 +707,6 @@ codeunit 6151364 "NPR CS UI Item Reclass. Handl."
         CSSetup: Record "NPR CS Setup";
         ItemJournalLine: Record "Item Journal Line";
     begin
-        // CLEAR(CSItemReclassHandling);
-        // CSItemReclassHandling.SETRANGE(Id,CSSessionId);
-        // CSItemReclassHandling.SETRANGE("Journal Template Name",CurrCSItemReclassHandling."Journal Template Name");
-        // CSItemReclassHandling.SETRANGE("Journal Batch Name",CurrCSItemReclassHandling."Journal Batch Name");
-        // CSItemReclassHandling.SETRANGE(Handled,FALSE);
-        // CSItemReclassHandling.SETRANGE("Transferred to Worksheet",FALSE);
-        // CSItemReclassHandling.DELETEALL(TRUE);
-
         CSSetup.Get;
 
         Clear(ItemJournalLine);
@@ -811,7 +731,6 @@ codeunit 6151364 "NPR CS UI Item Reclass. Handl."
         ItemJournalBatch: Record "Item Journal Batch";
     begin
         CSSetup.Get;
-        //-NPR5.52 [370509]
         if CSSetup."Post with Job Queue" then begin
             ItemJournalBatch.Get(CSSetup."Item Reclass. Jour Temp Name", CSSetup."Item Reclass. Jour Batch Name");
             PostingRecRef.GetTable(ItemJournalBatch);
@@ -826,7 +745,6 @@ codeunit 6151364 "NPR CS UI Item Reclass. Handl."
             else
                 Remark := GetLastErrorText;
         end else begin
-            //+NPR5.52 [370509]
             ItemJnlTemplate.Get(CSSetup."Item Reclass. Jour Temp Name");
             ItemJnlTemplate.TestField("Force Posting Report", false);
 
@@ -839,9 +757,7 @@ codeunit 6151364 "NPR CS UI Item Reclass. Handl."
                     ItemJnlPostBatch.Run(ItemJournalLine);
                 until ItemJournalLine.Next = 0;
             end;
-            //-NPR5.52 [370509]
         end;
-        //+NPR5.52 [370509]
     end;
 
     local procedure TransferDataLine(var CSItemReclassHandling: Record "NPR CS Item Reclass. Handling"): Boolean
@@ -858,9 +774,7 @@ codeunit 6151364 "NPR CS UI Item Reclass. Handl."
         CSPostingBuffer: Record "NPR CS Posting Buffer";
         CSSetup: Record "NPR CS Setup";
     begin
-        //-NPR5.53 [377462]
         CSSetup.Get;
-        //+NPR5.53 [377462]
 
         Clear(NewItemJournalLine);
         NewItemJournalLine.SetRange("Journal Template Name", CSSetup."Item Reclass. Jour Temp Name");
@@ -891,26 +805,20 @@ codeunit 6151364 "NPR CS UI Item Reclass. Handl."
         ItemJnlTemplate.Get(ItemJournalLine."Journal Template Name");
         ItemJnlBatch.Get(ItemJournalLine."Journal Template Name", ItemJournalLine."Journal Batch Name");
 
-        //-NPR5.53 [377462]
         if CSSetup."Post with Job Queue" then begin
             ItemJournalLine."Document No." := Format(Today);
         end else begin
             Clear(NoSeriesMgt);
             ItemJournalLine."Document No." := NoSeriesMgt.GetNextNo(ItemJnlBatch."No. Series", ItemJournalLine."Posting Date", false);
         end;
-        //+NPR5.53 [377462]
         ItemJournalLine."Source Code" := ItemJnlTemplate."Source Code";
         ItemJournalLine."Reason Code" := ItemJnlBatch."Reason Code";
         ItemJournalLine."Posting No. Series" := ItemJnlBatch."Posting No. Series";
         ItemJournalLine."External Document No." := CSSessionId;
         ItemJournalLine.Modify(true);
 
-        //-NPR5.53 [377888]
         if CSSetup."Post with Job Queue" then begin
-            //-NPR5.53 [381606]
             PostingRecRef.GetTable(ItemJnlBatch);
-            //PostingRecRef.GETTABLE(ItemJournalLine);
-            //+NPR5.53 [381606]
             CSPostingBuffer.Init;
             CSPostingBuffer."Table No." := PostingRecRef.Number;
             CSPostingBuffer."Record Id" := PostingRecRef.RecordId;
@@ -921,15 +829,9 @@ codeunit 6151364 "NPR CS UI Item Reclass. Handl."
             else
                 Remark := GetLastErrorText;
         end else begin
-            //+NPR5.53 [377888]
-            //-NPR5.51 [355694]
             ItemJnlPostBatch.Run(ItemJournalLine);
-            //+NPR5.51 [355694]
-            //-NPR5.53 [377888]
         end;
-        //+NPR5.53 [377888]
 
         exit(true);
     end;
 }
-

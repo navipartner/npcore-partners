@@ -1,10 +1,5 @@
 codeunit 6151391 "NPR CS UI Price Check Handl."
 {
-    // NPR5.43/CLVA/20180605 CASE 304872 Object created - NP Capture Service
-    // NPR5.45/MHA /20180803 CASE 323705 Changed GetItemPrices() to use Retail Price function
-    // NPR5.48/CLVA/20181109 CASE 335606 Handling UOM
-    // NPR5.48/CLVA/20181207 CASE 335606 Added new price calculation GetItemPricesV2
-
     TableNo = "NPR CS UI Header";
 
     trigger OnRun()
@@ -13,7 +8,7 @@ codeunit 6151391 "NPR CS UI Price Check Handl."
     begin
         MiniformMgmt.Initialize(
           CSUIHeader, Rec, DOMxmlin, ReturnedNode,
-          RootNode, XMLDOMMgt, CSCommunication, CSUserId,
+          RootNode, CSCommunication, CSUserId,
           CurrentCode, StackCode, WhseEmpId, LocationFilter, CSSessionId);
 
         if Code <> CurrentCode then
@@ -26,13 +21,12 @@ codeunit 6151391 "NPR CS UI Price Check Handl."
 
     var
         CSUIHeader: Record "NPR CS UI Header";
-        XMLDOMMgt: Codeunit "XML DOM Management";
         CSCommunication: Codeunit "NPR CS Communication";
         CSMgt: Codeunit "NPR CS Management";
         RecRef: RecordRef;
-        DOMxmlin: DotNet "NPRNetXmlDocument";
-        ReturnedNode: DotNet NPRNetXmlNode;
-        RootNode: DotNet NPRNetXmlNode;
+        DOMxmlin: XmlDocument;
+        ReturnedNode: XmlNode;
+        RootNode: XmlNode;
         CSUserId: Text[250];
         Remark: Text[250];
         WhseEmpId: Text[250];
@@ -85,13 +79,13 @@ codeunit 6151391 "NPR CS UI Price Check Handl."
         CSPriceCheckHandling: Record "NPR CS Price Check Handl.";
         CSPriceCheckHandling2: Record "NPR CS Price Check Handl.";
         CSFieldDefaults: Record "NPR CS Field Defaults";
-        CommaString: DotNet NPRNetString;
-        Values: DotNet NPRNetArray;
-        Separator: DotNet NPRNetString;
+        CommaString: Text;
+        Values: List of [Text];
+        Separator: Text;
         Value: Text;
     begin
-        if XMLDOMMgt.FindNode(RootNode, 'Header/Input', ReturnedNode) then
-            TextValue := ReturnedNode.InnerText
+        if RootNode.AsXmlAttribute().SelectSingleNode('Header/Input', ReturnedNode) then
+            TextValue := ReturnedNode.AsXmlElement().InnerText
         else
             Error(Text006);
 
@@ -157,7 +151,7 @@ codeunit 6151391 "NPR CS UI Price Check Handl."
 
                     CommaString := TextValue;
                     Separator := ',';
-                    Values := CommaString.Split(Separator.ToCharArray());
+                    Values := CommaString.Split(Separator);
 
                     foreach Value in Values do begin
 
@@ -194,13 +188,8 @@ codeunit 6151391 "NPR CS UI Price Check Handl."
                                     end;
 
                                     UpdateDataLine(CSPriceCheckHandling);
-                                    //CreateDataLine(CSPriceCheckHandling2);
-                                    //RecRef.GETTABLE(CSPriceCheckHandling2);
                                     RecRef.GetTable(CSPriceCheckHandling);
                                     CSCommunication.SetRecRef(RecRef);
-
-                                    //CLEAR(CSPriceCheckHandling);
-                                    //CSPriceCheckHandling := CSPriceCheckHandling2;
 
                                     ActiveInputField := 1;
                                 end else
@@ -222,19 +211,8 @@ codeunit 6151391 "NPR CS UI Price Check Handl."
         RecId: RecordID;
         TableNo: Integer;
     begin
-        // XMLDOMMgt.FindNode(RootNode,'Header/Input',ReturnedNode);
-        //
-        // EVALUATE(TableNo,CSCommunication.GetNodeAttribute(ReturnedNode,'TableNo'));
-        // EVALUATE(RecId,CSCommunication.GetNodeAttribute(ReturnedNode,'RecordID'));
-        //
-        // RecRef.OPEN(TableNo);
-        // RecRef.GET(RecId);
-        // RecRef.SETTABLE(CSPriceCheckHandling);
-
         DeleteEmptyDataLines();
         CreateDataLine(CSPriceCheckHandling);
-
-        //RecRef.CLOSE;
 
         RecId := CSPriceCheckHandling.RecordId;
 
@@ -253,10 +231,6 @@ codeunit 6151391 "NPR CS UI Price Check Handl."
     begin
         CSCommunication.EncodeUI(CSUIHeader, StackCode, DOMxmlin, InputField, Remark, CSUserId);
         CSCommunication.GetReturnXML(DOMxmlin);
-
-        //IF AddSummarize(Records) THEN
-        //  DOMxmlin.DocumentElement.AppendChild(Records);
-
         CSMgt.SendXMLReply(DOMxmlin);
     end;
 
@@ -338,7 +312,6 @@ codeunit 6151391 "NPR CS UI Price Check Handl."
             CSPriceCheckHandling."Item No." := ItemNo;
             CSPriceCheckHandling."Variant Code" := VariantCode;
 
-            //-NPR5.48 [335606]
             if (ResolvingTable = DATABASE::"Item Cross Reference") then begin
                 with ItemCrossReference do begin
                     if (StrLen(CSPriceCheckHandling.Barcode) <= MaxStrLen("Cross-Reference No.")) then begin
@@ -350,18 +323,13 @@ codeunit 6151391 "NPR CS UI Price Check Handl."
                     end;
                 end;
             end;
-            //+NPR5.48 [335606]
-
         end else begin
             Remark := StrSubstNo(Text010, CSPriceCheckHandling.Barcode);
             ClearDataLines(CSPriceCheckHandling);
         end;
 
         if Remark = '' then
-            //-NPR5.48 [335606]
-            //GetItemPrices(CSPriceCheckHandling);
             GetItemPricesV2(CSPriceCheckHandling);
-        //+NPR5.48 [335606]
         CSPriceCheckHandling.Modify(true);
     end;
 
@@ -386,86 +354,6 @@ codeunit 6151391 "NPR CS UI Price Check Handl."
         CSPriceCheckHandling."Customer Unit Price ex. VAT" := 0;
         CSPriceCheckHandling."Customer Unit Price incl. VAT" := 0;
         CSPriceCheckHandling."Currency Code" := '';
-    end;
-
-    local procedure AddAttribute(var NewChild: DotNet NPRNetXmlNode; AttribName: Text[250]; AttribValue: Text[250])
-    begin
-        if XMLDOMMgt.AddAttribute(NewChild, AttribName, AttribValue) > 0 then
-            Error(Text002, AttribName);
-    end;
-
-    local procedure AddSummarize(var Records: DotNet NPRNetXmlElement): Boolean
-    var
-        "Record": DotNet NPRNetXmlElement;
-        Line: DotNet NPRNetXmlElement;
-        Indicator: Text;
-        LineType: Option TEXT,BUTTON;
-        CurrRecordID: RecordID;
-        TableNo: Integer;
-        CSPriceCheckHandling: Record "NPR CS Price Check Handl.";
-    begin
-        CSPriceCheckHandling.SetAscending("Line No.", false);
-        CSPriceCheckHandling.SetRange(Id, CSSessionId);
-        CSPriceCheckHandling.SetRange(Handled, true);
-        if CSPriceCheckHandling.FindSet then begin
-            Records := DOMxmlin.CreateElement('Records');
-            repeat
-                Record := DOMxmlin.CreateElement('Record');
-
-                CSPriceCheckHandling.CalcFields("Item Description", "Variant Description");
-
-                CurrRecordID := CSPriceCheckHandling.RecordId;
-                TableNo := CurrRecordID.TableNo;
-
-                if CSPriceCheckHandling."Item No." = '' then
-                    Indicator := 'minus'
-                else
-                    Indicator := 'ok';
-
-                Line := DOMxmlin.CreateElement('Line');
-                AddAttribute(Line, 'Descrip', 'Description');
-                AddAttribute(Line, 'Indicator', Indicator);
-                if (Indicator = 'ok') then
-                    Line.InnerText := StrSubstNo(Text015, CSPriceCheckHandling.Qty, CSPriceCheckHandling."Item No.", CSPriceCheckHandling."Item Description")
-                else
-                    Line.InnerText := StrSubstNo(Text016, CSPriceCheckHandling.Qty, CSPriceCheckHandling.Barcode);
-                Record.AppendChild(Line);
-
-                Line := DOMxmlin.CreateElement('Line');
-                AddAttribute(Line, 'Descrip', 'Delete..');
-                AddAttribute(Line, 'Type', Format(LineType::BUTTON));
-                AddAttribute(Line, 'TableNo', Format(TableNo));
-                AddAttribute(Line, 'RecordID', Format(CurrRecordID));
-                AddAttribute(Line, 'FuncName', 'DELETELINE');
-                Record.AppendChild(Line);
-
-                if (Indicator = 'ok') then begin
-                    Line := DOMxmlin.CreateElement('Line');
-                    AddAttribute(Line, 'Descrip', CSPriceCheckHandling.FieldCaption(Barcode));
-                    AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                    Line.InnerText := CSPriceCheckHandling.Barcode;
-                    Record.AppendChild(Line);
-                end;
-
-                if (CSPriceCheckHandling."Variant Code" <> '') then begin
-                    Line := DOMxmlin.CreateElement('Line');
-                    AddAttribute(Line, 'Descrip', CSPriceCheckHandling.FieldCaption("Variant Code"));
-                    AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                    Line.InnerText := CSPriceCheckHandling."Variant Code";
-                    Record.AppendChild(Line);
-
-                    Line := DOMxmlin.CreateElement('Line');
-                    AddAttribute(Line, 'Descrip', CSPriceCheckHandling.FieldCaption("Variant Description"));
-                    AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                    Line.InnerText := CSPriceCheckHandling."Variant Description";
-                    Record.AppendChild(Line);
-                end;
-
-                Records.AppendChild(Record);
-            until CSPriceCheckHandling.Next = 0;
-            exit(true);
-        end else
-            exit(false);
     end;
 
     local procedure Reset()
@@ -515,20 +403,12 @@ codeunit 6151391 "NPR CS UI Price Check Handl."
         if not VATPostingSetup.Get(Item."VAT Bus. Posting Gr. (Price)", Item."VAT Prod. Posting Group") then
             VATPostingSetup.Init;
 
-        //-NPR5.45 [323705]
         TempSaleLinePOS.Type := TempSaleLinePOS.Type::Item;
         TempSaleLinePOS."Currency Code" := CurrencyCode;
         TempSaleLinePOS."No." := Item."No.";
         TempSaleLinePOS."Variant Code" := CSPriceCheckHandling."Variant Code";
-        //-NPR5.48 [335606]
-        //IF CSPriceCheckHandling."Unit of Measure" <> '' THEN
-        //  TempSaleLinePOS."Unit of Measure Code" := CSPriceCheckHandling."Unit of Measure"
-        //ELSE
-        //  TempSaleLinePOS."Unit of Measure Code" := Item."Sales Unit of Measure";
-        //+NPR5.48 [335606]
         POSSalesPriceCalcMgt.InitTempPOSItemSale(TempSaleLinePOS, TempSalePOS);
 
-        //-NPR5.48 [335606]
         TempSalePOS."Register No." := RetailFormCode.FetchRegisterNumber;
 
         if not Register.Get(TempSalePOS."Register No.") then
@@ -543,12 +423,9 @@ codeunit 6151391 "NPR CS UI Price Check Handl."
             TempSalePOS."Customer Disc. Group" := Customer."Customer Disc. Group"
         else
             TempSalePOS."Customer Disc. Group" := Register."Customer Disc. Group";
-        //-NPR5.48 [335606]
 
         TempSaleLinePOS."Price Includes VAT" := Item."Price Includes VAT";
-
         TempSaleLinePOS."Customer Price Group" := TempSalePOS."Customer Price Group";
-
         TempSaleLinePOS."Item Disc. Group" := Item."Item Disc. Group";
         TempSaleLinePOS.Silent := true;
         TempSaleLinePOS.Date := TempSalePOS.Date;
@@ -556,23 +433,14 @@ codeunit 6151391 "NPR CS UI Price Check Handl."
         TempSaleLinePOS."Register No." := Register."Register No.";
 
         POSSalesPriceCalcMgt.FindItemPrice(TempSalePOS, TempSaleLinePOS);
-        //+NPR5.45 [323705]
 
         if Item."Price Includes VAT" then begin
             CSPriceCheckHandling."Unit Cost ex. VAT" := (Item."Unit Cost" / (1 + (VATPostingSetup."VAT %" / 100)));
             CSPriceCheckHandling."Unit Cost incl. VAT" := Item."Unit Cost";
             CSPriceCheckHandling."Unit Price ex. VAT" := (Item."Unit Price" / (1 + (VATPostingSetup."VAT %" / 100)));
             CSPriceCheckHandling."Unit Price incl. VAT" := Item."Unit Price";
-
-            //-NPR5.45 [323705]
-            //CSPriceCheckHandling."Customer Unit Price incl. VAT" := TMPSalesPrice."Unit Price";
-            //CSPriceCheckHandling."Customer Unit Price ex. VAT" :=  TMPSalesPrice."Unit Price" / (1 + (VATPostingSetup."VAT %" / 100));
-            //CSPriceCheckHandling."Customer Unit Price incl. VAT" := TempSaleLinePOS."Unit Price";
             CSPriceCheckHandling."Customer Unit Price incl. VAT" := (TempSaleLinePOS."Unit Price" * (1 + (VATPostingSetup."VAT %" / 100)));
-            //CSPriceCheckHandling."Customer Unit Price ex. VAT" :=  TempSaleLinePOS."Unit Price" / (1 + (VATPostingSetup."VAT %" / 100));
             CSPriceCheckHandling."Customer Unit Price ex. VAT" := TempSaleLinePOS."Unit Price";
-            //+NPR5.45 [323705]
-
             CSPriceCheckHandling."Total Cost ex. VAT" := CSPriceCheckHandling.Qty * CSPriceCheckHandling."Unit Cost ex. VAT";
             CSPriceCheckHandling."Total Cost incl. VAT" := CSPriceCheckHandling.Qty * CSPriceCheckHandling."Unit Cost incl. VAT";
             CSPriceCheckHandling."Total Price ex. VAT" := CSPriceCheckHandling.Qty * CSPriceCheckHandling."Unit Price ex. VAT";
@@ -584,14 +452,8 @@ codeunit 6151391 "NPR CS UI Price Check Handl."
             CSPriceCheckHandling."Unit Cost ex. VAT" := Item."Unit Cost";
             CSPriceCheckHandling."Unit Price incl. VAT" := (Item."Unit Price" * (1 + (VATPostingSetup."VAT %" / 100)));
             CSPriceCheckHandling."Unit Price ex. VAT" := Item."Unit Price";
-
-            //-NPR5.45 [323705]
-            //CSPriceCheckHandling."Customer Unit Price ex. VAT" := TMPSalesPrice."Unit Price";
-            //CSPriceCheckHandling."Customer Unit Price incl. VAT" :=  (TMPSalesPrice."Unit Price" * (1 + (VATPostingSetup."VAT %" / 100)));
             CSPriceCheckHandling."Customer Unit Price ex. VAT" := TempSaleLinePOS."Unit Price";
             CSPriceCheckHandling."Customer Unit Price incl. VAT" := (TempSaleLinePOS."Unit Price" * (1 + (VATPostingSetup."VAT %" / 100)));
-            //+NPR5.45 [323705]
-
             CSPriceCheckHandling."Total Cost incl. VAT" := CSPriceCheckHandling.Qty * CSPriceCheckHandling."Unit Cost incl. VAT";
             CSPriceCheckHandling."Total Cost ex. VAT" := CSPriceCheckHandling.Qty * CSPriceCheckHandling."Unit Cost ex. VAT";
             CSPriceCheckHandling."Total Price incl. VAT" := CSPriceCheckHandling.Qty * CSPriceCheckHandling."Unit Price incl. VAT";
@@ -623,7 +485,6 @@ codeunit 6151391 "NPR CS UI Price Check Handl."
         CSSetup.TestField("Price Calc. Customer No.");
         Customer.Get(CSSetup."Price Calc. Customer No.");
 
-        //clva
         Total := 0;
         Discount := 0;
 
@@ -647,7 +508,6 @@ codeunit 6151391 "NPR CS UI Price Check Handl."
         SalesLine."No." := Item."No.";
 
         SalesLine.Quantity := CSPriceCheckHandling.Qty;
-        //SalesLine."Qty. per Unit of Measure" := 1;
 
         VATPostingSetup.Get(Customer."VAT Bus. Posting Group", Item."VAT Prod. Posting Group");
         AllowLineDisc := Customer."Allow Line Disc.";
@@ -711,9 +571,6 @@ codeunit 6151391 "NPR CS UI Price Check Handl."
             CSPriceCheckHandling."Unit Price incl. VAT" := (Item."Unit Price" * (1 + (VATPostingSetup."VAT %" / 100)));
             CSPriceCheckHandling."Unit Price ex. VAT" := Item."Unit Price";
         end;
-
-        //CSPriceCheckHandling."Customer Unit Price incl. VAT" := SalesLine."Amount Including VAT" / SalesLine.Quantity;
-        //CSPriceCheckHandling."Customer Unit Price ex. VAT" := SalesLine.Amount / SalesLine.Quantity;
 
         if PricesInclVAT then begin
             CSPriceCheckHandling."Customer Unit Price incl. VAT" := SalesLine."Unit Price";//(TempSaleLinePOS."Unit Price" * (1 + (VATPostingSetup."VAT %" / 100)));
@@ -879,4 +736,3 @@ codeunit 6151391 "NPR CS UI Price Check Handl."
             UnitPrice := Round(UnitPrice, GLSetup."Unit-Amount Rounding Precision");
     end;
 }
-

@@ -1,9 +1,5 @@
 table 6151370 "NPR CS User"
 {
-    // NPR5.41/CLVA/20180313 CASE 306407 Object created - NP Capture Service
-    // NPR5.43/NPKNAV/20180629  CASE 304872 Transport NPR5.43 - 29 June 2018
-    // NPR5.48/CLVA  /20181109  CASE 335606 Added field "View All Documents"
-
     Caption = 'CS User';
     DataClassification = CustomerContent;
 
@@ -65,14 +61,10 @@ table 6151370 "NPR CS User"
 
     procedure CalculatePassword(Input: Text[30]) HashedValue: Text[250]
     var
-        Convert: DotNet NPRNetConvert;
-        CryptoProvider: DotNet NPRNetSHA512Managed;
-        Encoding: DotNet NPRNetEncoding;
+        CryptographyMgt: Codeunit "Cryptography Management";
+        HashAlgorithmType: Option MD5,SHA1,SHA256,SHA384,SHA512;
     begin
-        CryptoProvider := CryptoProvider.SHA512Managed;
-        HashedValue := Convert.ToBase64String(CryptoProvider.ComputeHash(Encoding.Unicode.GetBytes(Input + Name)));
-        CryptoProvider.Clear;
-        CryptoProvider.Dispose;
+        HashedValue := CryptographyMgt.GenerateHashAsBase64String(Input + Name, HashAlgorithmType::SHA512);
     end;
 }
 

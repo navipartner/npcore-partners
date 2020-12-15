@@ -1,8 +1,5 @@
 codeunit 6151351 "NPR CS UI Phys. Inv. Planned"
 {
-    // NPR5.53/SARA/20190930  CASE 375041 New object, ajustment for Location as Directed PutAway and Pick
-    // NPR5.53/SARA/20200123  CASE 383352 Issue with No Series
-
     TableNo = "NPR CS UI Header";
 
     trigger OnRun()
@@ -11,7 +8,7 @@ codeunit 6151351 "NPR CS UI Phys. Inv. Planned"
     begin
         MiniformMgmt.Initialize(
           CSUIHeader, Rec, DOMxmlin, ReturnedNode,
-          RootNode, XMLDOMMgt, CSCommunication, CSUserId,
+          RootNode, CSCommunication, CSUserId,
           CurrentCode, StackCode, WhseEmpId, LocationFilter, CSSessionId);
 
         if Code <> CurrentCode then
@@ -24,13 +21,12 @@ codeunit 6151351 "NPR CS UI Phys. Inv. Planned"
 
     var
         CSUIHeader: Record "NPR CS UI Header";
-        XMLDOMMgt: Codeunit "XML DOM Management";
         CSCommunication: Codeunit "NPR CS Communication";
         CSMgt: Codeunit "NPR CS Management";
         RecRef: RecordRef;
-        DOMxmlin: DotNet "NPRNetXmlDocument";
-        ReturnedNode: DotNet NPRNetXmlNode;
-        RootNode: DotNet NPRNetXmlNode;
+        DOMxmlin: XmlDocument;
+        ReturnedNode: XmlNode;
+        RootNode: XmlNode;
         CSUserId: Text[250];
         Remark: Text[250];
         WhseEmpId: Text[250];
@@ -82,14 +78,14 @@ codeunit 6151351 "NPR CS UI Phys. Inv. Planned"
         CSPhysInventoryHandling: Record "NPR CS Phys. Inv. Handl.";
         CSPhysInventoryHandling2: Record "NPR CS Phys. Inv. Handl.";
         CSFieldDefaults: Record "NPR CS Field Defaults";
-        CommaString: DotNet NPRNetString;
-        Values: DotNet NPRNetArray;
-        Separator: DotNet NPRNetString;
+        CommaString: Text;
+        Values: List of [Text];
+        Separator: Text;
         Value: Text;
         ItemJournalLine: Record "Item Journal Line";
     begin
-        if XMLDOMMgt.FindNode(RootNode, 'Header/Input', ReturnedNode) then
-            TextValue := ReturnedNode.InnerText
+        if RootNode.AsXmlAttribute().SelectSingleNode('Header/Input', ReturnedNode) then
+            TextValue := ReturnedNode.AsXmlElement().InnerText
         else
             Error(Text006);
 
@@ -164,7 +160,7 @@ codeunit 6151351 "NPR CS UI Phys. Inv. Planned"
 
                     CommaString := TextValue;
                     Separator := ',';
-                    Values := CommaString.Split(Separator.ToCharArray());
+                    Values := CommaString.Split(Separator);
 
                     foreach Value in Values do begin
 
@@ -221,7 +217,7 @@ codeunit 6151351 "NPR CS UI Phys. Inv. Planned"
         WhsePhyJournalBatch: Record "Warehouse Journal Batch";
         CSSetup: Record "NPR CS Setup";
     begin
-        XMLDOMMgt.FindNode(RootNode, 'Header/Input', ReturnedNode);
+        RootNode.AsXmlElement().SelectSingleNode('Header/Input', ReturnedNode);
 
         Evaluate(TableNo, CSCommunication.GetNodeAttribute(ReturnedNode, 'TableNo'));
         Evaluate(RecId, CSCommunication.GetNodeAttribute(ReturnedNode, 'RecordID'));
@@ -232,17 +228,6 @@ codeunit 6151351 "NPR CS UI Phys. Inv. Planned"
 
         CSSetup.Get;
         CSSetup.TestField("Phys. Inv Jour Temp Name");
-        //NPR5.53
-        /*
-        IF NOT ItemJournalBatch.GET(CSSetup."Phys. Inv Jour Temp Name",USERID) THEN BEGIN
-          ItemJournalBatch.INIT;
-          ItemJournalBatch.VALIDATE("Journal Template Name",CSSetup."Phys. Inv Jour Temp Name");
-          ItemJournalBatch.VALIDATE(Name,USERID);
-          ItemJournalBatch.Description := STRSUBSTNO(Text028,USERID);
-          ItemJournalBatch.VALIDATE("No. Series",CSSetup."Phys. Inv Jour No. Series");
-          ItemJournalBatch.INSERT(TRUE);
-        END;
-        */
         if not WhsePhyJournalBatch.Get(CSSetup."Phys. Inv Jour Temp Name", UserId, Bin."Location Code") then begin
             WhsePhyJournalBatch.Init;
             WhsePhyJournalBatch.Validate("Journal Template Name", CSSetup."Phys. Inv Jour Temp Name");
@@ -252,7 +237,6 @@ codeunit 6151351 "NPR CS UI Phys. Inv. Planned"
             WhsePhyJournalBatch.Validate("No. Series", CSSetup."Phys. Inv Jour No. Series");
             WhsePhyJournalBatch.Insert(true);
         end;
-        //NPR5.53
         DeleteEmptyDataLines();
         CreateDataLine(CSPhysInventoryHandling, Bin."Location Code", Bin.Code);
 
@@ -272,15 +256,17 @@ codeunit 6151351 "NPR CS UI Phys. Inv. Planned"
 
     local procedure SendForm(InputField: Integer; CSPhysInventoryHandling: Record "NPR CS Phys. Inv. Handl.")
     var
-        Records: DotNet NPRNetXmlElement;
+        Records: XmlElement;
+        RootElement: XmlElement;
         CSSetup: Record "NPR CS Setup";
     begin
         CSCommunication.EncodeUI(CSUIHeader, StackCode, DOMxmlin, InputField, Remark, CSUserId);
         CSCommunication.GetReturnXML(DOMxmlin);
 
-        if AddSummarize(Records, CSPhysInventoryHandling) then
-            DOMxmlin.DocumentElement.AppendChild(Records);
-
+        if AddSummarize(Records, CSPhysInventoryHandling) then begin
+            DOMxmlin.GetRoot(RootElement);
+            RootElement.Add(Records);
+        end;
         CSMgt.SendXMLReply(DOMxmlin);
     end;
 
@@ -448,15 +434,11 @@ codeunit 6151351 "NPR CS UI Phys. Inv. Planned"
         WhseJournalLine: Record "Warehouse Journal Line";
     begin
         WhseJnlTemplate.Get(CurrCSPhysInventoryHandling."Journal Template Name");
-        //WhseJnlTemplate.TESTFIELD("Force Posting Report",FALSE);
 
         Clear(WhseJournalLine);
         WhseJournalLine.SetRange("Journal Template Name", CurrCSPhysInventoryHandling."Journal Template Name");
         WhseJournalLine.SetRange("Journal Batch Name", CurrCSPhysInventoryHandling."Journal Batch Name");
         WhseJournalLine.SetRange("Location Code", CurrCSPhysInventoryHandling."Location Code");
-        //-NPR5.53 [383352]
-        //WhseJournalLine.SETRANGE("Whse. Document No.",FORMAT(TODAY));
-        //+NPR5.53 [383352]
         if WhseJournalLine.FindSet then begin
             WhseJnlPostBatch.Run(WhseJournalLine);
             WhseJournalLine.DeleteAll;
@@ -498,7 +480,6 @@ codeunit 6151351 "NPR CS UI Phys. Inv. Planned"
         WhseJournalLine."Source Code" := WhseJnlTemplate."Source Code";
         WhseJournalLine."Reason Code" := WhseJnlBatch."Reason Code";
         WhseJournalLine."Registering No. Series" := NoSeriesMgt.GetNextNo(WhseJnlBatch."No. Series", WhseJournalLine."Registering Date", false);
-        ;
 
         CalculateInventory(WhseJournalLine, Item, WorkDate, false, false);
     end;
@@ -566,10 +547,10 @@ codeunit 6151351 "NPR CS UI Phys. Inv. Planned"
         exit(true);
     end;
 
-    local procedure AddSummarize(var Records: DotNet NPRNetXmlElement; CSPhysInventoryHandling: Record "NPR CS Phys. Inv. Handl."): Boolean
+    local procedure AddSummarize(var Records: XmlElement; CSPhysInventoryHandling: Record "NPR CS Phys. Inv. Handl."): Boolean
     var
-        "Record": DotNet NPRNetXmlElement;
-        Line: DotNet NPRNetXmlElement;
+        RecordElement: XmlElement;
+        Line: XmlElement;
         Indicator: Text;
         LineType: Option TEXT,BUTTON;
         CurrRecordID: RecordID;
@@ -590,187 +571,165 @@ codeunit 6151351 "NPR CS UI Phys. Inv. Planned"
         WhseJournalLine.SetRange("Location Code", CSPhysInventoryHandling."Location Code");
         WhseJournalLine.SetRange("Bin Code", CSPhysInventoryHandling."Bin Code");
         if WhseJournalLine.FindSet then begin
-            Records := DOMxmlin.CreateElement('Records');
+            Records := XmlElement.Create('Records');
             repeat
-                Record := DOMxmlin.CreateElement('Record');
+                RecordElement := XmlElement.Create('Record');
 
                 CurrRecordID := WhseJournalLine.RecordId;
                 TableNo := CurrRecordID.TableNo;
 
-                //IF WhseJournalLine."Changed by User" THEN
-                //Indicator := 'ok'
-                //ELSE
                 Indicator := 'minus';
 
                 if Indicator = 'minus' then begin
                     if CSUIHeader."Expand Summary Items" then begin
                         //1
-                        Line := DOMxmlin.CreateElement('Line');
+                        Line := XmlElement.Create('Line', '', WhseJournalLine."Bin Code");
                         AddAttribute(Line, 'Descrip', WhseJournalLine.FieldCaption(Description));
                         AddAttribute(Line, 'Indicator', Indicator);
                         AddAttribute(Line, 'Type', Format(LineType::TEXT));
                         AddAttribute(Line, 'CollapsItems', 'FALSE');
-                        Line.InnerText := WhseJournalLine."Bin Code";
-                        Record.AppendChild(Line);
+                        RecordElement.Add(Line);
 
                         //2
-                        Line := DOMxmlin.CreateElement('Line');
+                        Line := XmlElement.Create('Line', '',
+                            StrSubstNo(Text030, WhseJournalLine."Qty. (Calculated)", WhseJournalLine."Qty. (Phys. Inventory)", WhseJournalLine.Quantity));
                         AddAttribute(Line, 'Descrip', WhseJournalLine.FieldCaption("Qty. (Calculated)"));
                         AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                        Line.InnerText := StrSubstNo(Text030, WhseJournalLine."Qty. (Calculated)", WhseJournalLine."Qty. (Phys. Inventory)", WhseJournalLine.Quantity);
-                        Record.AppendChild(Line);
+                        RecordElement.Add(Line);
 
                         //3
-                        Line := DOMxmlin.CreateElement('Line');
+                        if WhseJournalLine."Variant Code" <> '' then
+                            Line := XmlElement.Create('Line', '', StrSubstNo(Text027, WhseJournalLine."Item No.", WhseJournalLine."Variant Code"))
+                        else
+                            Line := XmlElement.Create('Line', '', WhseJournalLine."Item No.");
                         AddAttribute(Line, 'Descrip', WhseJournalLine.FieldCaption("Item No."));
                         AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                        if WhseJournalLine."Variant Code" <> '' then
-                            Line.InnerText := StrSubstNo(Text027, WhseJournalLine."Item No.", WhseJournalLine."Variant Code")
-                        else
-                            Line.InnerText := WhseJournalLine."Item No.";
-                        Record.AppendChild(Line);
+                        RecordElement.Add(Line);
 
                         //4
-                        Line := DOMxmlin.CreateElement('Line');
+                        Line := XmlElement.Create('Line', '', WhseJournalLine."Unit of Measure Code");
                         AddAttribute(Line, 'Descrip', WhseJournalLine.FieldCaption("Unit of Measure Code"));
                         AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                        Line.InnerText := WhseJournalLine."Unit of Measure Code";
-                        Record.AppendChild(Line);
+                        RecordElement.Add(Line);
 
                         //5
                         Item.Get(WhseJournalLine."Item No.");
-                        Line := DOMxmlin.CreateElement('Line');
+                        Line := XmlElement.Create('Line', '', Item.Description);
                         AddAttribute(Line, 'Descrip', WhseJournalLine.FieldCaption(Description));
                         AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                        Line.InnerText := Item.Description;
-                        Record.AppendChild(Line);
+                        RecordElement.Add(Line);
 
                         //6
-                        Line := DOMxmlin.CreateElement('Line');
+                        Line := XmlElement.Create('Line', '', '');
                         AddAttribute(Line, 'Descrip', '');
                         AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                        Line.InnerText := '';
-                        Record.AppendChild(Line);
+                        RecordElement.Add(Line);
                     end else begin
-                        Line := DOMxmlin.CreateElement('Line');
+                        Line := XmlElement.Create('Line', '',
+                            StrSubstNo(Text015, WhseJournalLine.Quantity, WhseJournalLine."Qty. (Calculated)", WhseJournalLine."Item No.", WhseJournalLine.Description));
                         AddAttribute(Line, 'Descrip', 'Description');
                         AddAttribute(Line, 'Indicator', Indicator);
-                        Line.InnerText := StrSubstNo(Text015, WhseJournalLine.Quantity, WhseJournalLine."Qty. (Calculated)", WhseJournalLine."Item No.", WhseJournalLine.Description);
-                        Record.AppendChild(Line);
+                        RecordElement.Add(Line);
 
-                        Line := DOMxmlin.CreateElement('Line');
+                        Line := XmlElement.Create('Line', '', WhseJournalLine."Item No.");
                         AddAttribute(Line, 'Descrip', WhseJournalLine.FieldCaption("Item No."));
                         AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                        Line.InnerText := WhseJournalLine."Item No.";
-                        Record.AppendChild(Line);
+                        RecordElement.Add(Line);
 
                         if (WhseJournalLine."Variant Code" <> '') then begin
-                            Line := DOMxmlin.CreateElement('Line');
+                            Line := XmlElement.Create('Line', '', WhseJournalLine."Variant Code");
                             AddAttribute(Line, 'Descrip', WhseJournalLine.FieldCaption("Variant Code"));
                             AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                            Line.InnerText := WhseJournalLine."Variant Code";
-                            Record.AppendChild(Line);
+                            RecordElement.Add(Line);
                         end;
 
-                        Line := DOMxmlin.CreateElement('Line');
+                        Line := XmlElement.Create('Line', '', WhseJournalLine."Bin Code");
                         AddAttribute(Line, 'Descrip', WhseJournalLine.FieldCaption("Bin Code"));
                         AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                        Line.InnerText := WhseJournalLine."Bin Code";
-                        Record.AppendChild(Line);
+                        RecordElement.Add(Line);
                     end;
-                    Records.AppendChild(Record);
+                    Records.Add(RecordElement);
                 end;
             until WhseJournalLine.Next = 0;
 
             if WhseJournalLine.FindSet then begin
                 repeat
-                    Record := DOMxmlin.CreateElement('Record');
+                    RecordElement := XmlElement.Create('Record');
 
                     CurrRecordID := WhseJournalLine.RecordId;
                     TableNo := CurrRecordID.TableNo;
 
-                    //IF WhseJournalLine."Changed by User" THEN
-                    //Indicator := 'ok'
-                    //ELSE
                     Indicator := 'minus';
 
                     if Indicator = 'ok' then begin
                         if CSUIHeader."Expand Summary Items" then begin
                             //1
-                            Line := DOMxmlin.CreateElement('Line');
+                            Line := XmlElement.Create('Line', '', WhseJournalLine."Bin Code");
                             AddAttribute(Line, 'Descrip', WhseJournalLine.FieldCaption(Description));
                             AddAttribute(Line, 'Indicator', Indicator);
                             AddAttribute(Line, 'Type', Format(LineType::TEXT));
                             AddAttribute(Line, 'CollapsItems', 'FALSE');
-                            Line.InnerText := WhseJournalLine."Bin Code";
-                            Record.AppendChild(Line);
+                            RecordElement.Add(Line);
 
                             //2
-                            Line := DOMxmlin.CreateElement('Line');
+                            Line := XmlElement.Create('Line', '',
+                                StrSubstNo(Text030, WhseJournalLine."Qty. (Calculated)", WhseJournalLine."Qty. (Phys. Inventory)", WhseJournalLine.Quantity));
                             AddAttribute(Line, 'Descrip', WhseJournalLine.FieldCaption("Qty. (Calculated)"));
                             AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                            Line.InnerText := StrSubstNo(Text030, WhseJournalLine."Qty. (Calculated)", WhseJournalLine."Qty. (Phys. Inventory)", WhseJournalLine.Quantity);
-                            Record.AppendChild(Line);
+                            RecordElement.Add(Line);
 
                             //3
-                            Line := DOMxmlin.CreateElement('Line');
+                            if WhseJournalLine."Variant Code" <> '' then
+                                Line := XmlElement.Create('Line', '', StrSubstNo(Text027, WhseJournalLine."Item No.", WhseJournalLine."Variant Code"))
+                            else
+                                Line := XmlElement.Create('Line', '', WhseJournalLine."Item No.");
                             AddAttribute(Line, 'Descrip', WhseJournalLine.FieldCaption("Item No."));
                             AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                            if WhseJournalLine."Variant Code" <> '' then
-                                Line.InnerText := StrSubstNo(Text027, WhseJournalLine."Item No.", WhseJournalLine."Variant Code")
-                            else
-                                Line.InnerText := WhseJournalLine."Item No.";
-                            Record.AppendChild(Line);
+                            RecordElement.Add(Line);
 
                             //4
-                            Line := DOMxmlin.CreateElement('Line');
+                            Line := XmlElement.Create('Line', '', WhseJournalLine."Unit of Measure Code");
                             AddAttribute(Line, 'Descrip', WhseJournalLine.FieldCaption("Unit of Measure Code"));
                             AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                            Line.InnerText := WhseJournalLine."Unit of Measure Code";
-                            Record.AppendChild(Line);
+                            RecordElement.Add(Line);
 
                             //5
                             Item.Get(WhseJournalLine."Item No.");
-                            Line := DOMxmlin.CreateElement('Line');
+                            Line := XmlElement.Create('Line', '', Item.Description);
                             AddAttribute(Line, 'Descrip', WhseJournalLine.FieldCaption(Description));
                             AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                            Line.InnerText := Item.Description;
-                            Record.AppendChild(Line);
+                            RecordElement.Add(Line);
 
                             //6
-                            Line := DOMxmlin.CreateElement('Line');
+                            Line := XmlElement.Create('Line', '', '');
                             AddAttribute(Line, 'Descrip', '');
                             AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                            Line.InnerText := '';
-                            Record.AppendChild(Line);
+                            RecordElement.Add(Line);
                         end else begin
-                            Line := DOMxmlin.CreateElement('Line');
+                            Line := XmlElement.Create('Line', '',
+                                StrSubstNo(Text015, WhseJournalLine.Quantity, WhseJournalLine."Qty. (Calculated)", WhseJournalLine."Item No.", WhseJournalLine.Description));
                             AddAttribute(Line, 'Descrip', 'Description');
                             AddAttribute(Line, 'Indicator', Indicator);
-                            Line.InnerText := StrSubstNo(Text015, WhseJournalLine.Quantity, WhseJournalLine."Qty. (Calculated)", WhseJournalLine."Item No.", WhseJournalLine.Description);
-                            Record.AppendChild(Line);
+                            RecordElement.Add(Line);
 
-                            Line := DOMxmlin.CreateElement('Line');
+                            Line := XmlElement.Create('Line', '', WhseJournalLine."Item No.");
                             AddAttribute(Line, 'Descrip', WhseJournalLine.FieldCaption("Item No."));
                             AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                            Line.InnerText := WhseJournalLine."Item No.";
-                            Record.AppendChild(Line);
+                            RecordElement.Add(Line);
 
                             if (WhseJournalLine."Variant Code" <> '') then begin
-                                Line := DOMxmlin.CreateElement('Line');
+                                Line := XmlElement.Create('Line', '', WhseJournalLine."Variant Code");
                                 AddAttribute(Line, 'Descrip', WhseJournalLine.FieldCaption("Variant Code"));
                                 AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                                Line.InnerText := WhseJournalLine."Variant Code";
-                                Record.AppendChild(Line);
+                                RecordElement.Add(Line);
                             end;
 
-                            Line := DOMxmlin.CreateElement('Line');
+                            Line := XmlElement.Create('Line', '', WhseJournalLine."Bin Code");
                             AddAttribute(Line, 'Descrip', WhseJournalLine.FieldCaption("Bin Code"));
                             AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                            Line.InnerText := WhseJournalLine."Bin Code";
-                            Record.AppendChild(Line);
+                            RecordElement.Add(Line);
                         end;
-                        Records.AppendChild(Record);
+                        Records.Add(RecordElement);
                     end;
                 until WhseJournalLine.Next = 0;
             end;
@@ -779,10 +738,9 @@ codeunit 6151351 "NPR CS UI Phys. Inv. Planned"
             exit(false);
     end;
 
-    local procedure AddAttribute(var NewChild: DotNet NPRNetXmlNode; AttribName: Text[250]; AttribValue: Text[250])
+    local procedure AddAttribute(var NewChild: XmlElement; AttribName: Text[250]; AttribValue: Text[250])
     begin
-        if XMLDOMMgt.AddAttribute(NewChild, AttribName, AttribValue) > 0 then
-            Error(Text002, AttribName);
+        NewChild.SetAttribute(AttribName, AttribValue);
     end;
 
     procedure CalculateInventory(BaseWhseJournalLine: Record "Warehouse Journal Line"; var Item: Record Item; PostingDate: Date; ItemsNotOnInvt: Boolean; InclItemWithNoTrans: Boolean)

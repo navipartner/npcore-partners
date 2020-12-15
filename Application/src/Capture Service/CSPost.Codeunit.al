@@ -1,16 +1,5 @@
 codeunit 6151357 "NPR CS Post"
 {
-    // NPR5.52/CLVA  /20190903  CASE 365967 Object created - NP Capture Service
-    // NPR5.52/CLVA  /20190904  CASE 367425 Customer specific customerization
-    // NPR5.52/CLVA  /20190925  CASE 370277 Changed "Document No." handling
-    // NPR5.52/CLVA  /20190927  CASE 370509 Added support for Item Reclass. Journal Posting
-    // NPR5.53/CLVA  /20191029  CASE 374331 Added support for Store Counting Approvel
-    // NPR5.53/CLVA  /20191119  CASE 377721 Added support for Unplanned Count
-    // NPR5.53/CLVA  /20191122  CASE 377462 Updating doument no. on Item Reclass. Journal
-    // NPR5.53/CLVA  /20191128  CASE 377467 Added check if journal exist
-    // NPR5.54/CLVA  /20200217  CASE 391080 Added qty check before updating journal. Changed functions PostItemJournal and PostStoreApprovel to Local = No
-    // NPR5.54/CLVA  /20200225  CASE Changed posting timing.
-
     TableNo = "NPR CS Posting Buffer";
 
     trigger OnRun()
@@ -24,34 +13,25 @@ codeunit 6151357 "NPR CS Post"
         RecRef.Get("Record Id");
 
         case "Table No." of
-            //-NPR5.53 [377721]
             83:
                 PostItemJournalLine(RecRef);
-            //+NPR5.53 [377721]
             233:
                 begin
-                    //-NPR5.52 [370509]
-                    //PostItemJournal(RecRef);
                     case "Job Type" of
                         "Job Type"::"Phy. Inv. Journal", "Job Type"::"Store Counting":
                             PostItemJournal(RecRef);
                         "Job Type"::"Item Reclass.":
                             PostItemReclassJournal(RecRef, Rec);
-                        //-NPR5.53 [377721]
                         "Job Type"::"Unplanned Count":
                             PostUnplannedCounting(RecRef, Rec);
-                    //+NPR5.53 [377721]
                     end;
-                    //-NPR5.52 [370509]
                 end;
             5740:
                 PostTransferOrder(RecRef);
             5766:
                 PostWhseActivity(RecRef, Rec);
-            //-NPR5.53 [374331]
             6151391:
                 PostStoreApprovel(RecRef);
-        //+NPR5.53 [374331]
         end;
     end;
 
@@ -140,7 +120,6 @@ codeunit 6151357 "NPR CS Post"
             until WhseActivityLine.Next = 0;
         end;
 
-        //-NPR5.52 [367425]
         if (CSPostingBuffer."Posting Index" = 2) and WhseActivityPosted and IsInvtPick then begin
             if SourceNo <> '' then begin
                 if TransferHeader.Get(SourceNo) then begin
@@ -160,7 +139,6 @@ codeunit 6151357 "NPR CS Post"
                 end;
             end;
         end;
-        //+NPR5.52 [367425]
     end;
 
     procedure PostItemJournal(var RecRef: RecordRef)
@@ -179,7 +157,6 @@ codeunit 6151357 "NPR CS Post"
         ItemJnlTemplate.Get(ItemJournalBatch."Journal Template Name");
         ItemJnlTemplate.TestField("Force Posting Report", false);
 
-        //-NPR5.52 [370277]
         if (ItemJournalBatch."No. Series" <> '') then begin
             DocumentNo := NoSeriesMgt.GetNextNo(ItemJournalBatch."No. Series", WorkDate, false);
             Clear(ItemJournalLine);
@@ -187,7 +164,6 @@ codeunit 6151357 "NPR CS Post"
             ItemJournalLine.SetRange("Journal Batch Name", ItemJournalBatch.Name);
             ItemJournalLine.ModifyAll("Document No.", DocumentNo, false);
         end;
-        //+NPR5.52 [370277]
 
         Clear(ItemJournalLine);
         ItemJournalLine.SetRange("Journal Template Name", ItemJournalBatch."Journal Template Name");
@@ -227,7 +203,6 @@ codeunit 6151357 "NPR CS Post"
         ItemJnlTemplate.Get(ItemJournalBatch."Journal Template Name");
         ItemJnlTemplate.TestField("Force Posting Report", false);
 
-        //-NPR5.53 [377462]
         if (ItemJournalBatch."No. Series" <> '') then begin
             DocumentNo := NoSeriesMgt.GetNextNo(ItemJournalBatch."No. Series", WorkDate, false);
             Clear(ItemJournalLine);
@@ -236,7 +211,6 @@ codeunit 6151357 "NPR CS Post"
             ItemJournalLine.SetRange("External Document No.", CSPostingBuffer."Session Id");
             ItemJournalLine.ModifyAll("Document No.", DocumentNo, false);
         end;
-        //+NPR5.53 [377462]
 
         Clear(ItemJournalLine);
         ItemJournalLine.SetRange("Journal Template Name", ItemJournalBatch."Journal Template Name");
@@ -271,17 +245,14 @@ codeunit 6151357 "NPR CS Post"
         RecRef.SetTable(CSStockTakes);
         CSStockTakes.Find;
 
-        //-NPR5.54 [392901]
         if CSStockTakes."Journal Posted" then
             exit;
-        //+NPR5.54 [392901]
 
         ItemJournalBatch.Get(CSStockTakes."Journal Template Name", CSStockTakes."Journal Batch Name");
         ItemJournalTemplate.Get(ItemJournalBatch."Journal Template Name");
 
         ItemJournalTemplate.TestField("Source Code");
 
-        //-NPR5.54 [391080]
         QtyCalculated := 0;
         Clear(CalcItemJournalLine);
         CalcItemJournalLine.SetRange("Journal Template Name", CSStockTakes."Journal Template Name");
@@ -295,7 +266,6 @@ codeunit 6151357 "NPR CS Post"
 
         if CSStockTakes."Predicted Qty." <> QtyCalculated then
             Error(Text025, CSStockTakes."Predicted Qty.", QtyCalculated);
-        //+NPR5.54 [391080]
 
         Clear(BaseItemJournalLine);
         BaseItemJournalLine.Init;
@@ -383,22 +353,16 @@ codeunit 6151357 "NPR CS Post"
             CSStockTakes.Modify(true);
         end;
 
-        //-NPR5.54 [391080]
         if not CSStockTakes."Manuel Posting" then begin
-            //+NPR5.54 [391080]
             PostingRecRef.GetTable(ItemJournalBatch);
             CSPostingBuffer.Init;
             CSPostingBuffer."Table No." := PostingRecRef.Number;
             CSPostingBuffer."Record Id" := PostingRecRef.RecordId;
             CSPostingBuffer."Job Type" := CSPostingBuffer."Job Type"::"Store Counting";
-            //-NPR5.53 [377462]
             CSPostingBuffer."Job Queue Priority for Post" := 2000;
-            //+NPR5.53 [377462]
             if CSPostingBuffer.Insert(true) then
                 CSPostEnqueue.Run(CSPostingBuffer);
-            //-NPR5.54 [391080]
         end;
-        //+NPR5.54 [391080]
     end;
 
     local procedure PostUnplannedCounting(var RecRef: RecordRef; var CSPostingBuffer: Record "NPR CS Posting Buffer")
@@ -409,11 +373,8 @@ codeunit 6151357 "NPR CS Post"
         ItemJournalLine: Record "Item Journal Line";
     begin
         RecRef.SetTable(ItemJournalBatch);
-        //-NPR5.53 [377467]
-        //ItemJournalBatch.FIND;
         if not ItemJournalBatch.Find then
             exit;
-        //+NPR5.53 [377467]
 
         ItemJnlTemplate.Get(ItemJournalBatch."Journal Template Name");
         ItemJnlTemplate.TestField("Force Posting Report", false);
@@ -534,4 +495,3 @@ codeunit 6151357 "NPR CS Post"
         exit(true);
     end;
 }
-
