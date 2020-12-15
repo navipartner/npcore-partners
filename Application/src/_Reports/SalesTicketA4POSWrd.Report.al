@@ -133,6 +133,16 @@ report 6150616 "NPR Sales Ticket A4 - POS Wrd"
             column(Name_SalespersonPurchaser; SalespersonPurchaser.Name)
             {
             }
+
+            column(CustomerNo_POSEntry; "Customer No.")
+            {
+            }
+
+            column(Customer_PhoneNo; Customer."Phone No.")
+            {
+            }
+
+
             dataitem(POS_Sales_Line; "NPR POS Sales Line")
             {
                 DataItemLink = "POS Entry No." = FIELD("Entry No.");
@@ -326,6 +336,7 @@ report 6150616 "NPR Sales Ticket A4 - POS Wrd"
                         if Contact."No." <> '' then
                             CustAddr[6] := ContactNoCaption + ': ' + Contact."No.";
                         CustAddr[7] := '';
+                        CustPhoneNo := Contact."Phone No.";
                     end;
                 end;
 
@@ -337,6 +348,7 @@ report 6150616 "NPR Sales Ticket A4 - POS Wrd"
                 if Customer."No." <> '' then
                     CustAddr[6] := CustomerNoCaption + ': ' + Customer."No.";
                 CustAddr[7] := '';
+                CustPhoneNo := Customer."Phone No.";
                 CompressArray(CustAddr);
 
                 if not SalespersonPurchaser.Get(POS_Entry."Salesperson Code") then
@@ -404,6 +416,8 @@ report 6150616 "NPR Sales Ticket A4 - POS Wrd"
         TotalTaxAmountCaptionBlank: Label 'VAT Amount';
         TotalAmountInclVATCaption: Label 'Total %1 Incl. VAT';
         ContactNoCaption: Label 'Contact No.';
+
+        CustPhoneNo : text [30];
 
     local procedure GetVATText(EntryNo: Integer): Text
     var
