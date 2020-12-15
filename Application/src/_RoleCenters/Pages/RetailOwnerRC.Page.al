@@ -666,25 +666,11 @@ page 6151259 "NPR Retail Owner RC"
                 {
                     Caption = 'Item & Prices';
 
-                    action("Price List")
-                    {
-                        Caption = 'Price List';
-                        Image = Report2;
-                        RunObject = Report "Price List";
-                        ApplicationArea = All;
-                    }
                     action("Item Sales Statistics")
                     {
                         Caption = 'Item Sales Statistics';
                         Image = Report2;
                         RunObject = Report "NPR Item Sales Stats/Provider";
-                        ApplicationArea = All;
-                    }
-                    action("Top 10 List")
-                    {
-                        Caption = 'Top 10 List';
-                        Image = Report2;
-                        RunObject = Report "Inventory - Top 10 List";
                         ApplicationArea = All;
                     }
                     action("Low Sales")
@@ -694,7 +680,6 @@ page 6151259 "NPR Retail Owner RC"
                         RunObject = Report "NPR Items With Low Sales";
                         ApplicationArea = All;
                     }
-
                 }
                 group(ReceivablesReport)
                 {
@@ -726,15 +711,6 @@ page 6151259 "NPR Retail Owner RC"
                         RunObject = Report "Customer - Top 10 List";
                         ToolTip = 'View which customers purchase the most or owe the most in a selected period. Only customers that have either purchases during the period or a balance at the end of the period will be included.';
                     }
-                    action("Customer/&Item Sales")
-                    {
-                        ApplicationArea = Basic, Suite;
-                        Caption = 'Customer/&Item Sales';
-                        Image = "Report";
-                        RunObject = Report "Customer/Item Sales";
-                        ToolTip = 'View a list of item sales for each customer during a selected time period. The report contains information on quantity, sales amount, profit, and possible discounts. It can be used, for example, to analyze a company''s customer groups.';
-                    }
-
                     action("Aged Ac&counts Receivable")
                     {
                         ApplicationArea = Basic, Suite;
@@ -743,22 +719,11 @@ page 6151259 "NPR Retail Owner RC"
                         RunObject = Report "Aged Accounts Receivable";
                         ToolTip = 'View an overview of when your receivables from customers are due or overdue (divided into four periods). You must specify the date you want aging calculated from and the length of the period that each column will contain data for.';
                     }
-
-
                 }
                 group(PayablesReport)
                 {
                     Caption = 'Payables';
 
-                    action("Top 10 Vendor List")
-                    {
-                        ApplicationArea = Basic, Suite;
-                        Caption = 'Top 10 Vendor List';
-                        Image = "Report";
-                        RunObject = Report "Vendor - Top 10 List";
-
-
-                    }
                     action("Aged Accounts Pa&yable")
                     {
                         ApplicationArea = Basic, Suite;
@@ -767,9 +732,6 @@ page 6151259 "NPR Retail Owner RC"
                         RunObject = Report "Aged Accounts Payable";
                         ToolTip = 'View an overview of when your payables to vendors are due or overdue (divided into four periods). You must specify the date you want aging calculated from and the length of the period that each column will contain data for.';
                     }
-
-
-
                 }
                 group(FinanceReport)
                 {
