@@ -1,26 +1,5 @@
 page 6059830 "NPR Event Group.Plan. Line Sub"
 {
-    // NPR5.29/NPKNAV/20170127  CASE 248723 Transport NPR5.29 - 27 januar 2017
-    // NPR5.31/TJ  /20170315 CASE 269162 "Planning Date" taken from header "Starting Date" if not empty
-    // NPR5.32/TJ  /20170525 CASE 278090 Checking if job exists before checking Starting Date
-    // NPR5.34/TJ  /20170726 CASE 285043 Added new action to Job Planning Line - Ticket button: Register
-    // NPR5.43/TJ  /20170817 CASE 262079 New field added: "Ticket Collect Status"
-    //                                   New actions: CollectTicket and ShowTicketPrintout
-    // NPR5.36/TJ  /20170920 CASE 290184 Added Image properties to actions without it
-    // NPR5.41/TS  /20180105 CASE 300893 Actions cannot have same caption as field( reserve -> reservation)
-    // NPR5.41/TJ  /20180417 CASE 310336 Added fields "Est. Unit Price Incl. VAT" and "Est. Line Amount Incl. VAT" as Visible=FALSE
-    // NPR5.45/TJ  /20180628 CASE 323386 Using new function for editing ticket reservation
-    //                                   Action EditReservation renamed to EditReservationAndIssue
-    // NPR5.48/TJ  /20181114 CASE 335824 Action Issued Tickets reworked
-    //                                   Revoking is not used anymore directly - refer to default revoking process from Ticket List page
-    // NPR5.49/TJ  /20190124 CASE 331208 Action Sales Invoices/Credit Memos renamed to Sales Documents and changed code
-    //                                   Action Job Task Lines renamed to Event Task Lines and changed page to run
-    //                                   Added code to Job Task No. - OnLookup
-    //                                   Object renamed to Event Planning Lines Subpage
-    // NPR5.49/TJ  /20190306 CASE 342305 Fields "Est. Unit Price Incl. VAT" and "Est. Line Amount Incl. VAT" made non-editable
-    // NPR5.49/TJ  /20190218 CASE 345047 Extended text support
-    // NPR5.55/JAKUBV/20200807  CASE 397741 Transport NPR5.55 - 31 July 2020
-
     AutoSplitKey = true;
     Caption = 'Grouped Planning Lines';
     DataCaptionExpression = Caption;
@@ -733,21 +712,6 @@ page 6059830 "NPR Event Group.Plan. Line Sub"
                         InsertExtendedText(true);
                         //+NPR5.49 [345047]
                     end;
-                }
-            }
-            group(Reports)
-            {
-                Caption = 'Reports';
-                Image = "Report";
-                action("Jobs - Transaction Detail")
-                {
-                    Caption = 'Jobs - Transaction Detail';
-                    Image = "Report";
-                    Promoted = false;
-                    //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                    //PromotedCategory = "Report";
-                    RunObject = Report "Job - Transaction Detail";
-                    ApplicationArea = All;
                 }
             }
             group(Navigate)

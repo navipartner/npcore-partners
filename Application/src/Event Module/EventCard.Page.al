@@ -1306,58 +1306,6 @@ page 6060150 "NPR Event Card"
                     end;
                 }
             }
-            group("&Prices")
-            {
-                Caption = '&Prices';
-                Image = Price;
-                Visible = not ExtendedPriceEnabled;
-                ObsoleteState = Pending;
-                ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
-                ObsoleteTag = '17.0';
-                action("&Resource")
-                {
-                    Caption = '&Resource';
-                    Image = Resource;
-                    Promoted = true;
-                    PromotedCategory = Category4;
-                    RunObject = Page "Job Resource Prices";
-                    RunPageLink = "Job No." = FIELD("No.");
-                    ApplicationArea = All;
-                    ToolTip = 'View this event''s resource prices.';
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
-                    ObsoleteTag = '17.0';
-                }
-                action("&Item")
-                {
-                    Caption = '&Item';
-                    Image = Item;
-                    Promoted = true;
-                    PromotedCategory = Category4;
-                    RunObject = Page "Job Item Prices";
-                    RunPageLink = "Job No." = FIELD("No.");
-                    ApplicationArea = All;
-                    ToolTip = 'View this event''s item prices.';
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
-                    ObsoleteTag = '17.0';
-                }
-                action("&G/L Account")
-                {
-                    Caption = '&G/L Account';
-                    Image = JobPrice;
-                    Promoted = true;
-                    PromotedCategory = Category4;
-                    PromotedIsBig = true;
-                    RunObject = Page "Job G/L Account Prices";
-                    RunPageLink = "Job No." = FIELD("No.");
-                    ApplicationArea = All;
-                    ToolTip = 'View this event''s G/L account prices.';
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
-                    ObsoleteTag = '17.0';
-                }
-            }
             group(Prices)
             {
                 Visible = ExtendedPriceEnabled;
@@ -1716,16 +1664,6 @@ page 6060150 "NPR Event Card"
         }
         area(reporting)
         {
-            action("Job Actual to Budget")
-            {
-                Caption = 'Job Actual to Budget';
-                Image = "Report";
-                Promoted = true;
-                PromotedCategory = "Report";
-                RunObject = Report "Job Actual To Budget";
-                ApplicationArea = All;
-                ToolTip = 'Compare budgeted and usage amounts for selected event. All lines of the selected event show quantity, total cost, and line amount.';
-            }
             action("Job Analysis")
             {
                 Caption = 'Job Analysis';
@@ -1745,16 +1683,6 @@ page 6060150 "NPR Event Card"
                 RunObject = Report "Job - Planning Lines";
                 ApplicationArea = All;
                 ToolTip = 'View all planning lines for the event. You use this window to plan what items, resources, and general ledger expenses that you expect to use on an event (budget) or you can specify what you actually agreed with your customer that he should pay for the event (billable).';
-            }
-            action("Job - Suggested Billing")
-            {
-                Caption = 'Job - Suggested Billing';
-                Image = "Report";
-                Promoted = true;
-                PromotedCategory = "Report";
-                RunObject = Report "Job Suggested Billing";
-                ApplicationArea = All;
-                ToolTip = 'View a list of all events, grouped by customer, how much the customer has already been invoiced, and how much remains to be invoiced, that is, the suggested billing.';
             }
         }
     }
