@@ -1,12 +1,5 @@
 codeunit 6151371 "NPR CS Communication"
 {
-    // NPR5.41/CLVA/20180313 CASE 306407 Object created - NP Capture Service
-    // NPR5.43/NPKNAV/20180629  CASE 304872 Transport NPR5.43 - 29 June 2018
-    // NPR5.48/CLVA  /20181109  CASE 335606 Added function SetDocumentFilter
-    // NPR5.48/CLVA  /20181207  CASE 336403 Added field Format
-    // NPR5.50/CLVA  /20190603  CASE 352719 Changed function AddAttribute to local = No
-
-
     trigger OnRun()
     begin
     end;
@@ -16,6 +9,7 @@ codeunit 6151371 "NPR CS Communication"
         XMLDOMMgt: Codeunit "XML DOM Management";
         RecRef: RecordRef;
         XMLDOM: DotNet "NPRNetXmlDocument";
+        NativeXMLDOM: XmlDocument;
         Comment: Text[250];
         TableNo: Text[250];
         RecID: Text[250];
@@ -33,41 +27,46 @@ codeunit 6151371 "NPR CS Communication"
         Text007: Label '<%1> not used.';
         Text008: Label 'Details';
 
-    procedure EncodeUI(MiniFormHdr: Record "NPR CS UI Header"; StackCode: Code[250]; var XMLDOMin: DotNet "NPRNetXmlDocument"; ActiveInputField: Integer; cMessage: Text[250]; CSUserId: Text[250])
+    procedure EncodeUI(MiniFormHdr: Record "NPR CS UI Header"; StackCode: Code[250]; var XMLDOMin: XmlDocument; ActiveInputField: Integer; cMessage: Text[250]; CSUserId: Text[250])
     var
-        CurrNode: DotNet NPRNetXmlNode;
-        NewChild: DotNet NPRNetXmlNode;
-        FunctionNode: DotNet NPRNetXmlNode;
-        ReturnedNode: DotNet NPRNetXmlNode;
-        oAttributes: DotNet NPRNetXmlNamedNodeMap;
-        AttributeNode: DotNet NPRNetXmlNode;
+        CurrNode: XmlNode;
+        NewChild: XmlNode;
+        FunctionNode: XmlNode;
+        ReturnedNode: XmlNode;
+        oAttributes: XmlAttributeCollection;
+        AttributeNode: XmlAttribute;
         iAttributeCounter: Integer;
         iCounter: Integer;
+        RootElement: XmlElement;
+        CurrElement: XmlElement;
+        ReturnedElement: XmlElement;
     begin
-        XMLDOM := XMLDOMin;
+        NativeXMLDOM := XMLDOMin;
         ActiveInput := ActiveInputField;
         InputCounter := 0;
         Comment := cMessage;
 
         // get the incoming header before we create the empty Container..
-        XMLDOMMgt.FindNode(XMLDOM.DocumentElement, 'Header', ReturnedNode);
+        NativeXMLDOM.GetRoot(RootElement);
+        RootElement.SelectSingleNode('Header', ReturnedNode);
 
         // Now create an empty root node... this must always be done before we use this object!!
-        XMLDOMMgt.LoadXMLDocumentFromText('<CS/>', XMLDOM);
+        XmlDocument.ReadFrom('<CS />', NativeXMLDOM);
 
         // Set the current node to the root node
-        CurrNode := XMLDOM.DocumentElement;
+        NativeXMLDOM.GetRoot(CurrElement);
+        CurrNode := CurrElement.AsXmlNode();
 
         // add a header node to the CS node
-        if XMLDOMMgt.AddElement(CurrNode, 'Header', '', '', NewChild) > 0 then
-            Error(Text000);
+        AddElement(CurrNode, 'Header', '', '', NewChild);
 
         // Add all the header fields from the incoming XMLDOM
-        oAttributes := ReturnedNode.Attributes;
+        ReturnedElement := ReturnedNode.AsXmlElement();
+        oAttributes := ReturnedElement.Attributes();
         iAttributeCounter := oAttributes.Count;
         iCounter := 0;
         while iCounter < iAttributeCounter do begin
-            AttributeNode := oAttributes.Item(iCounter);
+            oAttributes.Get(iCounter, AttributeNode);
             AddAttribute(NewChild, AttributeNode.Name, AttributeNode.Value);
 
             iCounter := iCounter + 1;
@@ -89,26 +88,27 @@ codeunit 6151371 "NPR CS Communication"
         AddAttribute(NewChild, 'InputIsHidden', '0');
         InputIsHidden := false;
 
-        XMLDOMMgt.AddElement(NewChild, 'Comment', Comment, '', FunctionNode);
+        AddElement(NewChild, 'Comment', Comment, '', FunctionNode);
 
         // add the Function List to the Mini Form
-        if XMLDOMMgt.AddElement(NewChild, 'Functions', '', '', FunctionNode) = 0 then
-            EncodeFunctions(MiniFormHdr, FunctionNode);
+        AddElement(NewChild, 'Functions', '', '', FunctionNode);
+        EncodeFunctions(MiniFormHdr, FunctionNode);
 
         EncodeLines(MiniFormHdr, CurrNode);
 
         if InputIsHidden then begin
-            XMLDOMMgt.FindNode(XMLDOM.DocumentElement, 'Header', ReturnedNode);
-            SetNodeAttribute(ReturnedNode, 'InputIsHidden', '1');
+            NativeXMLDOM.GetRoot(RootElement);
+            if RootElement.SelectSingleNode('Header', ReturnedNode) then
+                ReturnedNode.AsXmlElement().SetAttribute('InputIsHidden', '1');
         end;
 
-        XMLDOMin := XMLDOM;
+        XMLDOMin := NativeXMLDOM;
     end;
 
-    local procedure EncodeFunctions(MiniFormHdr: Record "NPR CS UI Header"; var CurrNode: DotNet NPRNetXmlNode)
+    local procedure EncodeFunctions(MiniFormHdr: Record "NPR CS UI Header"; var CurrNode: XmlNode)
     var
         FunctionLine: Record "NPR CS UI Function";
-        NewChild: DotNet NPRNetXmlNode;
+        NewChild: XmlNode;
     begin
         // Add the Function List to the XML Document
         FunctionLine.Reset;
@@ -116,23 +116,22 @@ codeunit 6151371 "NPR CS Communication"
 
         if FunctionLine.FindFirst then
             repeat
-                XMLDOMMgt.AddElement(CurrNode, 'Function', Format(FunctionLine."Function Code"), '', NewChild);
+                AddElement(CurrNode, 'Function', Format(FunctionLine."Function Code"), '', NewChild);
             until FunctionLine.Next = 0;
     end;
 
-    local procedure EncodeLines(MiniFormHdr: Record "NPR CS UI Header"; var CurrNode: DotNet NPRNetXmlNode)
+    local procedure EncodeLines(MiniFormHdr: Record "NPR CS UI Header"; var CurrNode: XmlNode)
     var
         MiniFormLine: Record "NPR CS UI Line";
         MiniFormLine2: Record "NPR CS UI Line";
-        LinesNode: DotNet NPRNetXmlNode;
-        AreaNode: DotNet NPRNetXmlNode;
-        DataLineNode: DotNet NPRNetXmlNode;
+        LinesNode: XmlNode;
+        AreaNode: XmlNode;
+        DataLineNode: XmlNode;
         CurrentOption: Integer;
         LineCounter: Integer;
     begin
         // add a lines node to the CS node
-        if XMLDOMMgt.AddElement(CurrNode, 'Lines', '', '', LinesNode) > 0 then
-            Error(Text000);
+        AddElement(CurrNode, 'Lines', '', '', LinesNode);
 
         CurrentOption := -1;
         LineCounter := 0;
@@ -144,8 +143,7 @@ codeunit 6151371 "NPR CS Communication"
             repeat
                 if CurrentOption <> MiniFormLine.Area then begin
                     CurrentOption := MiniFormLine.Area;
-                    if XMLDOMMgt.AddElement(LinesNode, Format(MiniFormLine.Area), '', '', AreaNode) > 0 then
-                        Error(Text000);
+                    AddElement(LinesNode, Format(MiniFormLine.Area), '', '', AreaNode);
                 end;
 
                 if MiniFormLine.Area = MiniFormLine.Area::Body then
@@ -185,9 +183,9 @@ codeunit 6151371 "NPR CS Communication"
             until MiniFormLine.Next = 0;
     end;
 
-    local procedure SendComposition(MiniFormHdr: Record "NPR CS UI Header"; MiniFormLine: Record "NPR CS UI Line"; var CurrNode: DotNet NPRNetXmlNode)
+    local procedure SendComposition(MiniFormHdr: Record "NPR CS UI Header"; MiniFormLine: Record "NPR CS UI Line"; var CurrNode: XmlNode)
     var
-        NewChild: DotNet NPRNetXmlNode;
+        NewChild: XmlNode;
         MiniformHeader: Record "NPR CS UI Header";
         MiniformHeaderDesc: Text;
         OptionValueInt: Integer;
@@ -231,9 +229,9 @@ codeunit 6151371 "NPR CS Communication"
         AddAttribute(NewChild, 'Placeholder', MiniFormLine.Placeholder);
     end;
 
-    local procedure SendLineNo(MiniFormLine: Record "NPR CS UI Line"; var CurrNode: DotNet NPRNetXmlNode; var RetNode: DotNet NPRNetXmlNode; LineNo: Integer)
+    local procedure SendLineNo(MiniFormLine: Record "NPR CS UI Line"; var CurrNode: XmlNode; var RetNode: XmlNode; LineNo: Integer)
     var
-        NewChild: DotNet NPRNetXmlNode;
+        NewChild: XmlNode;
     begin
         if MiniFormLine.Area = MiniFormLine.Area::Body then
             AddElement(CurrNode, 'Line', '', '', NewChild)
@@ -251,16 +249,18 @@ codeunit 6151371 "NPR CS Communication"
         RetNode := NewChild;
     end;
 
-    local procedure AddElement(var CurrNode: DotNet NPRNetXmlNode; ElemName: Text[30]; ElemValue: Text; NameSpace: Text[30]; var NewChild: DotNet NPRNetXmlNode)
+    local procedure AddElement(var CurrNode: XmlNode; ElemName: Text[30]; ElemValue: Text; NameSpace: Text[30]; var NewChild: XmlNode)
+    var
+        XmlElem: XmlElement;
     begin
-        if XMLDOMMgt.AddElement(CurrNode, ElemName, ElemValue, NameSpace, NewChild) > 0 then
-            Error(Text001, ElemName);
+        XmlElem := XmlElement.Create(ElemName, NameSpace, ElemValue);
+        CurrNode.AsXmlElement().Add(XmlElem);
+        NewChild := XmlElem.AsXmlNode();
     end;
 
-    procedure AddAttribute(var NewChild: DotNet NPRNetXmlNode; AttribName: Text[250]; AttribValue: Text[250])
+    procedure AddAttribute(var NewChild: XmlNode; AttribName: Text[250]; AttribValue: Text[250])
     begin
-        if XMLDOMMgt.AddAttribute(NewChild, AttribName, AttribValue) > 0 then
-            Error(Text002, AttribName);
+        NewChild.AsXmlElement().SetAttribute(AttribName, AttribValue);
     end;
 
     procedure SetRecRef(var NewRecRef: RecordRef)
@@ -311,15 +311,10 @@ codeunit 6151371 "NPR CS Communication"
         "Field": Record "Field";
         FldRef: FieldRef;
         TempBlob: Codeunit "Temp Blob";
-        BinaryReader: DotNet NPRNetBinaryReader;
-        MemoryStream: DotNet NPRNetMemoryStream;
-        Convert: DotNet NPRNetConvert;
         InStr: InStream;
-        Encoding: DotNet NPRNetEncoding;
-        Bytes: DotNet NPRNetArray;
         Base64String: Text;
-        XMLConvert: DotNet NPRNetXmlConvert;
         CSFieldDefaults: Record "NPR CS Field Defaults";
+        Base64Convert: Codeunit "Base64 Convert";
     begin
         if (MiniFormLine."Table No." = 0) or (MiniFormLine."Field No." = 0) then
             if MiniFormLine."Default Value" <> '' then
@@ -342,13 +337,10 @@ codeunit 6151371 "NPR CS Communication"
             end;
 
             if Field.Class = Field.Class::Normal then
-
-                //-NPR5.48 [336403]
                 if Field.Type = Field.Type::Decimal then begin
                     if MiniFormLine."Format Value" then
                         ReturnValue := Format(FldRef, 0, '<Precision,2:2><Standard Format,0>');
                 end;
-            //+NPR5.48 [336403]
 
             if Field.Type = Field.Type::BLOB then begin
                 FldRef.CalcField;
@@ -356,11 +348,7 @@ codeunit 6151371 "NPR CS Communication"
                 TempBlob.FromFieldRef(FldRef);
                 if TempBlob.HasValue then begin
                     TempBlob.CreateInStream(InStr);
-                    MemoryStream := InStr;
-                    BinaryReader := BinaryReader.BinaryReader(InStr);
-                    ReturnValue := Convert.ToBase64String(BinaryReader.ReadBytes(MemoryStream.Length));
-                    MemoryStream.Dispose;
-                    Clear(MemoryStream);
+                    ReturnValue := Base64Convert.ToBase64(InStr);
                 end;
             end;
 
@@ -509,38 +497,31 @@ codeunit 6151371 "NPR CS Communication"
         end;
     end;
 
-    procedure SetXMLDOMS(var oXMLDOM: DotNet "NPRNetXmlDocument")
+    procedure SetXMLDOMS(var oXMLDOM: XmlDocument)
     begin
-        XMLDOM := oXMLDOM;
+        NativeXMLDOM := oXMLDOM;
     end;
 
-    procedure GetReturnXML(var xmlout: DotNet "NPRNetXmlDocument")
+    procedure GetReturnXML(var xmlout: XmlDocument)
     begin
-        xmlout := XMLDOM;
+        xmlout := NativeXMLDOM;
     end;
 
-    procedure GetNodeAttribute(CurrNode: DotNet NPRNetXmlNode; AttributeName: Text[250]) AttribValue: Text[250]
+    procedure GetNodeAttribute(CurrNode: XmlNode; AttributeName: Text[250]) AttribValue: Text[250]
     var
-        oTempNode: DotNet NPRNetXmlNode;
-        NodeAttributes: DotNet NPRNetXmlNamedNodeMap;
+        oTempNode: XmlAttribute;
+        NodeAttributes: XmlAttributeCollection;
     begin
-        NodeAttributes := CurrNode.Attributes;
-        oTempNode := NodeAttributes.GetNamedItem(AttributeName);
-
-        if not IsNull(oTempNode) then
+        NodeAttributes := CurrNode.AsXmlElement().Attributes();
+        if NodeAttributes.Get(AttributeName, oTempNode) then
             AttribValue := oTempNode.Value
         else
             AttribValue := '';
     end;
 
-    procedure SetNodeAttribute(CurrNode: DotNet NPRNetXmlNode; AttributeName: Text[250]; AttribValue: Text[250])
-    var
-        oTempNode: DotNet NPRNetXmlNode;
-        NodeAttributes: DotNet NPRNetXmlNamedNodeMap;
+    procedure SetNodeAttribute(CurrNode: XmlNode; AttributeName: Text[250]; AttribValue: Text[250])
     begin
-        NodeAttributes := CurrNode.Attributes;
-        oTempNode := NodeAttributes.GetNamedItem(AttributeName);
-        oTempNode.Value := AttribValue;
+        CurrNode.AsXmlElement().SetAttribute(AttributeName, AttribValue);
     end;
 
     procedure SetUserNo(uNo: Text[250])
@@ -593,7 +574,7 @@ codeunit 6151371 "NPR CS Communication"
         MiniformHeader2.Get(MiniformLine."Call UI");
     end;
 
-    procedure RunPreviousUI(var DOMxmlin: DotNet "NPRNetXmlDocument")
+    procedure RunPreviousUI(var DOMxmlin: XmlDocument)
     var
         MiniformHeader2: Record "NPR CS UI Header";
         PreviousCode: Text[20];
@@ -604,15 +585,15 @@ codeunit 6151371 "NPR CS Communication"
         CODEUNIT.Run(MiniformHeader2."Handling Codeunit", MiniformHeader2);
     end;
 
-    procedure IncreaseStack(var DOMxmlin: DotNet "NPRNetXmlDocument"; NextElement: Text[250])
+    procedure IncreaseStack(var DOMxmlin: XmlDocument; NextElement: Text[250])
     var
-        ReturnedNode: DotNet NPRNetXmlNode;
-        RootNode: DotNet NPRNetXmlNode;
+        ReturnedNode: XmlNode;
+        RootElement: XmlElement;
         StackCode: Text[250];
     begin
-        RootNode := DOMxmlin.DocumentElement;
-        XMLDOMMgt.FindNode(RootNode, 'Header', ReturnedNode);
-        StackCode := GetNodeAttribute(ReturnedNode, 'StackCode');
+        DOMxmlin.GetRoot(RootElement);
+        if RootElement.SelectSingleNode('Header', ReturnedNode) then
+            StackCode := GetNodeAttribute(ReturnedNode, 'StackCode');
 
         if StackCode = '' then
             StackCode := NextElement
@@ -623,17 +604,17 @@ codeunit 6151371 "NPR CS Communication"
         SetNodeAttribute(ReturnedNode, 'RunReturn', '0');
     end;
 
-    procedure DecreaseStack(var DOMxmlin: DotNet "NPRNetXmlDocument"; var PreviousElement: Text[250])
+    procedure DecreaseStack(var DOMxmlin: XmlDocument; var PreviousElement: Text[250])
     var
-        ReturnedNode: DotNet NPRNetXmlNode;
-        RootNode: DotNet NPRNetXmlNode;
+        ReturnedNode: XmlNode;
+        RootElement: XmlElement;
         StackCode: Text[250];
         P: Integer;
         Pos: Integer;
     begin
-        RootNode := DOMxmlin.DocumentElement;
-        XMLDOMMgt.FindNode(RootNode, 'Header', ReturnedNode);
-        StackCode := GetNodeAttribute(ReturnedNode, 'StackCode');
+        DOMxmlin.GetRoot(RootElement);
+        if RootElement.SelectSingleNode('Header', ReturnedNode) then
+            StackCode := GetNodeAttribute(ReturnedNode, 'StackCode');
 
         if StackCode = '' then begin
             PreviousElement := GetNodeAttribute(ReturnedNode, 'UseCaseCode');
@@ -658,18 +639,18 @@ codeunit 6151371 "NPR CS Communication"
         SetNodeAttribute(ReturnedNode, 'RunReturn', '1');
     end;
 
-    local procedure GetPreviousCode(var DOMxmlin: DotNet "NPRNetXmlDocument"): Text[250]
+    local procedure GetPreviousCode(var DOMxmlin: XmlDocument): Text[250]
     var
-        ReturnedNode: DotNet NPRNetXmlNode;
-        RootNode: DotNet NPRNetXmlNode;
+        ReturnedNode: XmlNode;
+        RootElement: XmlElement;
         StackCode: Text[250];
         PreviousElement: Text[250];
         P: Integer;
         Pos: Integer;
     begin
-        RootNode := DOMxmlin.DocumentElement;
-        XMLDOMMgt.FindNode(RootNode, 'Header', ReturnedNode);
-        StackCode := GetNodeAttribute(ReturnedNode, 'StackCode');
+        DOMxmlin.GetRoot(RootElement);
+        if RootElement.SelectSingleNode('Header', ReturnedNode) then
+            StackCode := GetNodeAttribute(ReturnedNode, 'StackCode');
 
         if StackCode = '' then
             exit('');

@@ -1,7 +1,5 @@
 codeunit 6151344 "NPR CS Rfid Transfer Handl."
 {
-    // NPR5.55/CLVA/20200507  CASE 379709 Object created - NP Capture Service
-
     TableNo = "NPR CS UI Header";
 
     trigger OnRun()
@@ -10,7 +8,7 @@ codeunit 6151344 "NPR CS Rfid Transfer Handl."
     begin
         MiniformMgmt.Initialize(
           CSUIHeader, Rec, DOMxmlin, ReturnedNode,
-          RootNode, XMLDOMMgt, CSCommunication, CSUserId,
+          RootNode, CSCommunication, CSUserId,
           CurrentCode, StackCode, WhseEmpId, LocationFilter, CSSessionId);
 
         if Code <> CurrentCode then
@@ -24,12 +22,11 @@ codeunit 6151344 "NPR CS Rfid Transfer Handl."
     var
         CSUIHeader: Record "NPR CS UI Header";
         CSUIHeader2: Record "NPR CS UI Header";
-        XMLDOMMgt: Codeunit "XML DOM Management";
         CSCommunication: Codeunit "NPR CS Communication";
         CSManagement: Codeunit "NPR CS Management";
-        ReturnedNode: DotNet NPRNetXmlNode;
-        DOMxmlin: DotNet "NPRNetXmlDocument";
-        RootNode: DotNet NPRNetXmlNode;
+        ReturnedNode: XmlNode;
+        DOMxmlin: XmlDocument;
+        RootNode: XmlNode;
         TextValue: Text[250];
         CSUserId: Text[250];
         WhseEmpId: Text[250];
@@ -64,8 +61,8 @@ codeunit 6151344 "NPR CS Rfid Transfer Handl."
         WhseEmployee: Record "Warehouse Employee";
         CSRfidHeader: Record "NPR CS Rfid Header";
     begin
-        if XMLDOMMgt.FindNode(RootNode, 'Header/Input', ReturnedNode) then
-            TextValue := ReturnedNode.InnerText
+        if RootNode.AsXmlElement().SelectSingleNode('Header/Input', ReturnedNode) then
+            TextValue := ReturnedNode.AsXmlElement().InnerText
         else
             Error(Text006);
 
@@ -117,7 +114,7 @@ codeunit 6151344 "NPR CS Rfid Transfer Handl."
         TableNo: Integer;
         CSRfidHeader: Record "NPR CS Rfid Header";
     begin
-        XMLDOMMgt.FindNode(RootNode, 'Header/Input', ReturnedNode);
+        RootNode.AsXmlElement().SelectSingleNode('Header/Input', ReturnedNode);
 
         Evaluate(TableNo, CSCommunication.GetNodeAttribute(ReturnedNode, 'TableNo'));
         RecRef.Open(TableNo);
@@ -133,7 +130,8 @@ codeunit 6151344 "NPR CS Rfid Transfer Handl."
 
     local procedure SendForm(InputField: Integer; CSRfidHeader: Record "NPR CS Rfid Header")
     var
-        Records: DotNet NPRNetXmlElement;
+        Records: XmlElement;
+        RootElement: XmlElement;
         CSSetup: Record "NPR CS Setup";
     begin
         CSCommunication.EncodeUI(CSUIHeader, StackCode, DOMxmlin, InputField, Remark, CSUserId);
@@ -141,11 +139,14 @@ codeunit 6151344 "NPR CS Rfid Transfer Handl."
 
         CSSetup.Get;
         if CSSetup."Use Whse. Receipt" and (CSRfidHeader."Warehouse Receipt No." <> '') then begin
-            if AddWhseReceiptSummarize(Records, CSRfidHeader) then
-                DOMxmlin.DocumentElement.AppendChild(Records);
+            if AddWhseReceiptSummarize(Records, CSRfidHeader) then begin
+                //DOMxmlin.DocumentElement.AppendChild(Records);
+            end
         end else begin
-            if AddSummarize(Records, CSRfidHeader) then
-                DOMxmlin.DocumentElement.AppendChild(Records);
+            if AddSummarize(Records, CSRfidHeader) then begin
+                DOMxmlin.GetRoot(RootElement);
+                RootElement.Add(Records);
+            end
         end;
 
         CSManagement.SendXMLReply(DOMxmlin);
@@ -176,18 +177,6 @@ codeunit 6151344 "NPR CS Rfid Transfer Handl."
             CSRfidLines.SetRange(Match, true);
             CSRfidHeader."Total Tags Received" := CSRfidLines.Count;
             CSRfidHeader.Modify(true);
-
-            //  CSSetup.GET;
-            //  IF CSSetup."Use Whse. Receipt" THEN BEGIN
-            //    WhseReceiptHeader.GET(CSRfidHeader."Warehouse Receipt No.");
-            //    WhseReceiptLine.SETRANGE("No.",WhseReceiptHeader."No.");
-            //    IF WhseReceiptLine.FINDSET THEN BEGIN
-            //      WhsePostReceipt.RUN(WhseReceiptLine);
-            //      WhsePostReceipt.GetResultMessage;
-            //      CLEAR(WhsePostReceipt);
-            //    END
-            //  END;
-
         end;
     end;
 
@@ -222,10 +211,10 @@ codeunit 6151344 "NPR CS Rfid Transfer Handl."
         end;
     end;
 
-    local procedure AddSummarize(var Records: DotNet NPRNetXmlElement; CSRfidHeader: Record "NPR CS Rfid Header") NotEmptyResult: Boolean
+    local procedure AddSummarize(var Records: XmlElement; CSRfidHeader: Record "NPR CS Rfid Header") NotEmptyResult: Boolean
     var
-        "Record": DotNet NPRNetXmlElement;
-        Line: DotNet NPRNetXmlElement;
+        RecordElement: XmlElement;
+        Line: XmlElement;
         Indicator: Text;
         LineType: Option TEXT,BUTTON;
         CurrRecordID: RecordID;
@@ -234,15 +223,14 @@ codeunit 6151344 "NPR CS Rfid Transfer Handl."
     begin
         SelectLatestVersion;
 
-        Records := DOMxmlin.CreateElement('Records');
+        Records := XmlElement.Create('Records');
 
         CSRfidLinesQy.SetRange(Id, CSRfidHeader.Id);
-        //CSRfidLinesQy.SETFILTER(Item_No_Filter,'<>%1','');
         CSRfidLinesQy.Open;
         while CSRfidLinesQy.Read do begin
             NotEmptyResult := true;
 
-            Record := DOMxmlin.CreateElement('Record');
+            RecordElement := XmlElement.Create('Record');
 
             if CSRfidHeader."To Document No." = '' then begin
                 Indicator := 'ok'
@@ -253,51 +241,46 @@ codeunit 6151344 "NPR CS Rfid Transfer Handl."
                     Indicator := 'minus';
             end;
 
-            Line := DOMxmlin.CreateElement('Line');
+            Line := XmlElement.Create('Line', '', CSRfidLinesQy.Item_No);
             AddAttribute(Line, 'Descrip', 'No.');
             AddAttribute(Line, 'Indicator', Indicator);
             AddAttribute(Line, 'Type', Format(LineType::TEXT));
             AddAttribute(Line, 'CollapsItems', 'FALSE');
-            Line.InnerText := CSRfidLinesQy.Item_No;
-            Record.AppendChild(Line);
+            RecordElement.Add(Line);
 
-            Line := DOMxmlin.CreateElement('Line');
+            Line := XmlElement.Create('Line', '', Format(CSRfidLinesQy.Count_));
             AddAttribute(Line, 'Descrip', 'Count');
             AddAttribute(Line, 'Type', Format(LineType::TEXT));
-            Line.InnerText := Format(CSRfidLinesQy.Count_);
-            Record.AppendChild(Line);
+            RecordElement.Add(Line);
 
-            Line := DOMxmlin.CreateElement('Line');
+            Line := XmlElement.Create('Line', '', CSRfidLinesQy.Variant_Code);
             AddAttribute(Line, 'Descrip', 'Variant');
             AddAttribute(Line, 'Type', Format(LineType::TEXT));
-            Line.InnerText := CSRfidLinesQy.Variant_Code;
-            Record.AppendChild(Line);
+            RecordElement.Add(Line);
 
-            Line := DOMxmlin.CreateElement('Line');
+            Line := XmlElement.Create('Line', '', CSRfidLinesQy.Variant_Description);
             AddAttribute(Line, 'Descrip', 'VariantDesc');
             AddAttribute(Line, 'Type', Format(LineType::TEXT));
-            Line.InnerText := CSRfidLinesQy.Variant_Description;
-            Record.AppendChild(Line);
+            RecordElement.Add(Line);
 
-            Line := DOMxmlin.CreateElement('Line');
+            if CSRfidLinesQy.Item_Description <> '' then
+                Line := XmlElement.Create('Line', '', CSRfidLinesQy.Item_Description)
+            else
+                Line := XmlElement.Create('Line', '', 'UNKNOWN ITEM');
             AddAttribute(Line, 'Descrip', 'ItemDesc');
             AddAttribute(Line, 'Type', Format(LineType::TEXT));
-            if CSRfidLinesQy.Item_Description <> '' then
-                Line.InnerText := CSRfidLinesQy.Item_Description
-            else
-                Line.InnerText := 'UNKNOWN ITEM';
-            Record.AppendChild(Line);
+            RecordElement.Add(Line);
 
-            Records.AppendChild(Record);
+            Records.Add(RecordElement);
         end;
 
         exit(NotEmptyResult);
     end;
 
-    local procedure AddWhseReceiptSummarize(var Records: DotNet NPRNetXmlElement; CSRfidHeader: Record "NPR CS Rfid Header"): Boolean
+    local procedure AddWhseReceiptSummarize(var Records: XmlElement; CSRfidHeader: Record "NPR CS Rfid Header"): Boolean
     var
-        "Record": DotNet NPRNetXmlElement;
-        Line: DotNet NPRNetXmlElement;
+        RecordElement: XmlElement;
+        Line: XmlElement;
         Indicator: Text;
         WhseReceiptLine: Record "Warehouse Receipt Line";
         LineType: Option TEXT,BUTTON;
@@ -311,9 +294,10 @@ codeunit 6151344 "NPR CS Rfid Transfer Handl."
         WhseReceiptHeader.Get(CSRfidHeader."Warehouse Receipt No.");
         WhseReceiptLine.SetRange("No.", WhseReceiptHeader."No.");
         if WhseReceiptLine.FindSet then begin
-            Records := DOMxmlin.CreateElement('Records');
+            Records := XmlElement.Create('Records');
+
             repeat
-                Record := DOMxmlin.CreateElement('Record');
+                RecordElement := XmlElement.Create('Record');
 
                 CurrRecordID := WhseReceiptLine.RecordId;
                 TableNo := CurrRecordID.TableNo;
@@ -328,70 +312,65 @@ codeunit 6151344 "NPR CS Rfid Transfer Handl."
 
                 if Indicator = 'minus' then begin
                     //1
-                    Line := DOMxmlin.CreateElement('Line');
+                    Line := XmlElement.Create('Line', '', WhseReceiptLine."Bin Code");
                     AddAttribute(Line, 'Descrip', WhseReceiptLine.FieldCaption(Description));
                     AddAttribute(Line, 'Indicator', Indicator);
                     AddAttribute(Line, 'Type', Format(LineType::TEXT));
                     AddAttribute(Line, 'CollapsItems', 'FALSE');
-                    Line.InnerText := WhseReceiptLine."Bin Code";
-                    Record.AppendChild(Line);
+                    RecordElement.Add(Line);
 
                     //2
-                    Line := DOMxmlin.CreateElement('Line');
+                    Line := XmlElement.Create('Line', '',
+                        StrSubstNo(Text026, WhseReceiptLine."Qty. to Receive", WhseReceiptLine."Qty. Outstanding"));
                     AddAttribute(Line, 'Descrip', WhseReceiptLine.FieldCaption("Qty. Outstanding"));
                     AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                    Line.InnerText := StrSubstNo(Text026, WhseReceiptLine."Qty. to Receive", WhseReceiptLine."Qty. Outstanding");
-                    Record.AppendChild(Line);
+                    RecordElement.Add(Line);
 
                     //3
-                    Line := DOMxmlin.CreateElement('Line');
+                    if WhseReceiptLine."Variant Code" <> '' then
+                        Line := XmlElement.Create('Line', '', StrSubstNo(Text027, WhseReceiptLine."Item No.", WhseReceiptLine."Variant Code"))
+                    else
+                        Line := XmlElement.Create('Line', '', WhseReceiptLine."Item No.");
                     AddAttribute(Line, 'Descrip', WhseReceiptLine.FieldCaption("Item No."));
                     AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                    if WhseReceiptLine."Variant Code" <> '' then
-                        Line.InnerText := StrSubstNo(Text027, WhseReceiptLine."Item No.", WhseReceiptLine."Variant Code")
-                    else
-                        Line.InnerText := WhseReceiptLine."Item No.";
-                    Record.AppendChild(Line);
+                    RecordElement.Add(Line);
 
                     //4
-                    Line := DOMxmlin.CreateElement('Line');
+                    Line := XmlElement.Create('Line', '', WhseReceiptLine."Unit of Measure Code");
                     AddAttribute(Line, 'Descrip', WhseReceiptLine.FieldCaption("Unit of Measure Code"));
                     AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                    Line.InnerText := WhseReceiptLine."Unit of Measure Code";
-                    Record.AppendChild(Line);
+                    RecordElement.Add(Line);
 
                     //5
-                    Line := DOMxmlin.CreateElement('Line');
+                    Line := XmlElement.Create('Line', '', WhseReceiptLine.Description);
                     AddAttribute(Line, 'Descrip', WhseReceiptLine.FieldCaption(Description));
                     AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                    Line.InnerText := WhseReceiptLine.Description;
-                    Record.AppendChild(Line);
+                    RecordElement.Add(Line);
 
                     //6
-                    Line := DOMxmlin.CreateElement('Line');
+                    Line := XmlElement.Create('Line', '', '');
                     AddAttribute(Line, 'Descrip', '');
                     AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                    Line.InnerText := '';
-                    Record.AppendChild(Line);
+                    RecordElement.Add(Line);
 
                     if Location.Get(WhseReceiptLine."Location Code") then
                         if Location."Bin Mandatory" then begin
-                            Line := DOMxmlin.CreateElement('Line');
+                            Line := XmlElement.Create('Line');
                             AddAttribute(Line, 'Descrip', 'Split Line..');
                             AddAttribute(Line, 'Type', Format(LineType::BUTTON));
                             AddAttribute(Line, 'TableNo', Format(TableNo));
                             AddAttribute(Line, 'RecordID', Format(CurrRecordID));
                             AddAttribute(Line, 'FuncName', 'SPLITLINE');
-                            Record.AppendChild(Line);
+                            RecordElement.Add(Line);
                         end;
 
-                    Records.AppendChild(Record);
+                    Records.Add(RecordElement);
                 end;
             until WhseReceiptLine.Next = 0;
 
             if WhseReceiptLine.FindSet then begin
                 repeat
-                    Record := DOMxmlin.CreateElement('Record');
+                    RecordElement := XmlElement.Create('Record');
 
                     CurrRecordID := WhseReceiptLine.RecordId;
                     TableNo := CurrRecordID.TableNo;
@@ -406,64 +385,59 @@ codeunit 6151344 "NPR CS Rfid Transfer Handl."
 
                     if Indicator <> 'minus' then begin
                         //1
-                        Line := DOMxmlin.CreateElement('Line');
+                        Line := XmlElement.Create('Line', '', WhseReceiptLine."Bin Code");
                         AddAttribute(Line, 'Descrip', WhseReceiptLine.FieldCaption(Description));
                         AddAttribute(Line, 'Indicator', Indicator);
                         AddAttribute(Line, 'Type', Format(LineType::TEXT));
                         AddAttribute(Line, 'CollapsItems', 'FALSE');
-                        Line.InnerText := WhseReceiptLine."Bin Code";
-                        Record.AppendChild(Line);
+                        RecordElement.Add(Line);
 
                         //2
-                        Line := DOMxmlin.CreateElement('Line');
+                        Line := XmlElement.Create('Line', '',
+                            StrSubstNo(Text026, WhseReceiptLine."Qty. to Receive", WhseReceiptLine."Qty. Outstanding"));
                         AddAttribute(Line, 'Descrip', WhseReceiptLine.FieldCaption("Qty. Outstanding"));
                         AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                        Line.InnerText := StrSubstNo(Text026, WhseReceiptLine."Qty. to Receive", WhseReceiptLine."Qty. Outstanding");
-                        Record.AppendChild(Line);
+                        RecordElement.Add(Line);
 
                         //3
-                        Line := DOMxmlin.CreateElement('Line');
+                        if WhseReceiptLine."Variant Code" <> '' then
+                            Line := XmlElement.Create('Line', '', StrSubstNo(Text027, WhseReceiptLine."Item No.", WhseReceiptLine."Variant Code"))
+                        else
+                            Line := XmlElement.Create('Line', '', WhseReceiptLine."Item No.");
                         AddAttribute(Line, 'Descrip', WhseReceiptLine.FieldCaption("Item No."));
                         AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                        if WhseReceiptLine."Variant Code" <> '' then
-                            Line.InnerText := StrSubstNo(Text027, WhseReceiptLine."Item No.", WhseReceiptLine."Variant Code")
-                        else
-                            Line.InnerText := WhseReceiptLine."Item No.";
-                        Record.AppendChild(Line);
+                        RecordElement.Add(Line);
 
                         //4
-                        Line := DOMxmlin.CreateElement('Line');
+                        Line := XmlElement.Create('Line', '', WhseReceiptLine."Unit of Measure Code");
                         AddAttribute(Line, 'Descrip', WhseReceiptLine.FieldCaption("Unit of Measure Code"));
                         AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                        Line.InnerText := WhseReceiptLine."Unit of Measure Code";
-                        Record.AppendChild(Line);
+                        RecordElement.Add(Line);
 
                         //5
-                        Line := DOMxmlin.CreateElement('Line');
+                        Line := XmlElement.Create('Line', '', WhseReceiptLine.Description);
                         AddAttribute(Line, 'Descrip', WhseReceiptLine.FieldCaption(Description));
                         AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                        Line.InnerText := WhseReceiptLine.Description;
-                        Record.AppendChild(Line);
+                        RecordElement.Add(Line);
 
                         //6
-                        Line := DOMxmlin.CreateElement('Line');
+                        Line := XmlElement.Create('Line', '', '');
                         AddAttribute(Line, 'Descrip', '');
                         AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                        Line.InnerText := '';
-                        Record.AppendChild(Line);
+                        RecordElement.Add(Line);
 
                         if Location.Get(WhseReceiptLine."Location Code") then
                             if Location."Bin Mandatory" then begin
-                                Line := DOMxmlin.CreateElement('Line');
+                                Line := XmlElement.Create('Line');
                                 AddAttribute(Line, 'Descrip', 'Split Line..');
                                 AddAttribute(Line, 'Type', Format(LineType::BUTTON));
                                 AddAttribute(Line, 'TableNo', Format(TableNo));
                                 AddAttribute(Line, 'RecordID', Format(CurrRecordID));
                                 AddAttribute(Line, 'FuncName', 'SPLITLINE');
-                                Record.AppendChild(Line);
+                                RecordElement.Add(Line);
                             end;
 
-                        Records.AppendChild(Record);
+                        Records.Add(RecordElement);
                     end;
                 until WhseReceiptLine.Next = 0;
             end;
@@ -472,11 +446,8 @@ codeunit 6151344 "NPR CS Rfid Transfer Handl."
             exit(false);
     end;
 
-    local procedure AddAttribute(var NewChild: DotNet NPRNetXmlNode; AttribName: Text[250]; AttribValue: Text[250])
+    local procedure AddAttribute(var NewChild: XmlElement; AttribName: Text[250]; AttribValue: Text[250])
     begin
-        if XMLDOMMgt.AddAttribute(NewChild, AttribName, AttribValue) > 0 then
-            Error(Text002, AttribName);
+        NewChild.SetAttribute(AttribName, AttribValue);
     end;
-
 }
-

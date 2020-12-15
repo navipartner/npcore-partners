@@ -12,7 +12,7 @@ codeunit 6151385 "NPR CS UI Stock-Take WorkSheet"
     begin
         MiniformMgmt.Initialize(
           MiniformHeader, Rec, DOMxmlin, ReturnedNode,
-          RootNode, XMLDOMMgt, CSCommunication, CSUserId,
+          RootNode, CSCommunication, CSUserId,
           CurrentCode, StackCode, WhseEmpId, LocationFilter, CSSessionId);
 
         if Code <> CurrentCode then
@@ -25,13 +25,12 @@ codeunit 6151385 "NPR CS UI Stock-Take WorkSheet"
 
     var
         MiniformHeader: Record "NPR CS UI Header";
-        XMLDOMMgt: Codeunit "XML DOM Management";
         CSCommunication: Codeunit "NPR CS Communication";
         CSManagement: Codeunit "NPR CS Management";
         RecRef: RecordRef;
-        DOMxmlin: DotNet "NPRNetXmlDocument";
-        ReturnedNode: DotNet NPRNetXmlNode;
-        RootNode: DotNet NPRNetXmlNode;
+        DOMxmlin: XmlDocument;
+        ReturnedNode: XmlNode;
+        RootNode: XmlNode;
         CSUserId: Text[250];
         Remark: Text[250];
         WhseEmpId: Text[250];
@@ -83,8 +82,8 @@ codeunit 6151385 "NPR CS UI Stock-Take WorkSheet"
         NewStockTakeWorksheetLine: Record "NPR Stock-Take Worksheet Line";
         LineNo: Integer;
     begin
-        if XMLDOMMgt.FindNode(RootNode, 'Header/Input', ReturnedNode) then
-            TextValue := ReturnedNode.InnerText
+        if RootNode.AsXmlAttribute().SelectSingleNode('Header/Input', ReturnedNode) then
+            TextValue := ReturnedNode.AsXmlElement().InnerText
         else
             Error(Text006);
 
@@ -102,9 +101,7 @@ codeunit 6151385 "NPR CS UI Stock-Take WorkSheet"
         FuncGroup.KeyDef := CSCommunication.GetFunctionKey(MiniformHeader.Code, TextValue);
         ActiveInputField := 1;
 
-        //-NPR5.43
         CSSetup.Get;
-        //+NPR5.43
 
         case FuncGroup.KeyDef of
             FuncGroup.KeyDef::Esc:
@@ -117,7 +114,6 @@ codeunit 6151385 "NPR CS UI Stock-Take WorkSheet"
                     if FuncRecRef.Get(FuncRecId) then begin
                         FuncRecRef.SetTable(StockTakeWorkSheetLine);
                         StockTakeWorkSheetLine.Delete(true);
-                        //WhseActivityLine.SplitLine(WhseActivityLine);
                     end;
                 end;
             FuncGroup.KeyDef::Input:
@@ -130,21 +126,11 @@ codeunit 6151385 "NPR CS UI Stock-Take WorkSheet"
                             if QtyVal > 0 then
                                 Qty := QtyVal;
 
-                    //IF TextValue = '' THEN BEGIN
-                    //  Remark := Text011;
-                    //END ELSE BEGIN
-                    if StrLen(TextValue) <= MaxStrLen(Item."No.") then //BEGIN
+                    if StrLen(TextValue) <= MaxStrLen(Item."No.") then
                         if BarcodeLibrary.TranslateBarcodeToItemVariant(TextValue, ItemNo2, VariantCode, ResolvingTable, true) then// BEGIN
                             if not Item.Get(ItemNo2) then
-                                //-NPR5.43
                                 if CSSetup."Error On Invalid Barcode" then
-                                    //+NPR5.43
                                     Remark := StrSubstNo(Text014, TextValue);
-                    //END ELSE
-                    //Remark := STRSUBSTNO(Text013,TextValue);
-                    //END ELSE
-                    //Remark := STRSUBSTNO(Text010,TextValue);
-                    //END;
 
                     if Remark = '' then begin
 
@@ -166,7 +152,6 @@ codeunit 6151385 "NPR CS UI Stock-Take WorkSheet"
                         StockTakeWorkSheetLine."Worksheet Name" := StockTakeWorksheet.Name;
                         StockTakeWorkSheetLine."Line No." := LineNo;
                         StockTakeWorkSheetLine.Validate(Barcode, TextValue);
-                        //StockTakeWorkSheetLine."Shelf  No." := Shelf;
                         StockTakeWorkSheetLine."Qty. (Counted)" := Qty;
                         StockTakeWorkSheetLine."Session Name" := SessionName;
                         StockTakeWorkSheetLine."Date of Inventory" := WorkDate;
@@ -195,7 +180,7 @@ codeunit 6151385 "NPR CS UI Stock-Take WorkSheet"
         TableNo: Integer;
         Lookup: Integer;
     begin
-        XMLDOMMgt.FindNode(RootNode, 'Header/Input', ReturnedNode);
+        RootNode.AsXmlElement().SelectSingleNode('Header/Input', ReturnedNode);
 
         Evaluate(TableNo, CSCommunication.GetNodeAttribute(ReturnedNode, 'TableNo'));
         RecRef.Open(TableNo);
@@ -211,31 +196,29 @@ codeunit 6151385 "NPR CS UI Stock-Take WorkSheet"
 
     local procedure SendForm(InputField: Integer)
     var
-        Records: DotNet NPRNetXmlElement;
+        Records: XmlElement;
+        RootElement: XmlElement;
     begin
-        // Prepare Miniform
         CSCommunication.EncodeUI(MiniformHeader, StackCode, DOMxmlin, InputField, Remark, CSUserId);
-
-        //DebugTxt := DOMxmlin.OuterXml;
 
         CSCommunication.GetReturnXML(DOMxmlin);
 
+        DOMxmlin.GetRoot(RootElement);
         if AddSummarize(Records) then
-            DOMxmlin.DocumentElement.AppendChild(Records);
+            RootElement.Add(Records);
 
         CSManagement.SendXMLReply(DOMxmlin);
     end;
 
-    local procedure AddAttribute(var NewChild: DotNet NPRNetXmlNode; AttribName: Text[250]; AttribValue: Text[250])
+    local procedure AddAttribute(var NewChild: XmlElement; AttribName: Text[250]; AttribValue: Text[250])
     begin
-        if XMLDOMMgt.AddAttribute(NewChild, AttribName, AttribValue) > 0 then
-            Error(Text002, AttribName);
+        NewChild.SetAttribute(AttribName, AttribValue);
     end;
 
-    local procedure AddSummarize(var Records: DotNet NPRNetXmlElement): Boolean
+    local procedure AddSummarize(var Records: XmlElement): Boolean
     var
-        "Record": DotNet NPRNetXmlElement;
-        Line: DotNet NPRNetXmlElement;
+        RecordElement: XmlElement;
+        Line: XmlElement;
         Indicator: Text;
         LineType: Option TEXT,BUTTON;
         CurrRecordID: RecordID;
@@ -247,9 +230,9 @@ codeunit 6151385 "NPR CS UI Stock-Take WorkSheet"
         StockTakeWorkSheetLine.SetRange("Stock-Take Config Code", StockTakeWorksheet."Stock-Take Config Code");
         StockTakeWorkSheetLine.SetRange("Worksheet Name", StockTakeWorksheet.Name);
         if StockTakeWorkSheetLine.FindSet then begin
-            Records := DOMxmlin.CreateElement('Records');
+            Records := XmlElement.Create('Records');
             repeat
-                Record := DOMxmlin.CreateElement('Record');
+                RecordElement := XmlElement.Create('Record');
 
                 StockTakeWorkSheetLine.CalcFields("Item Description", "Variant Description");
 
@@ -261,51 +244,45 @@ codeunit 6151385 "NPR CS UI Stock-Take WorkSheet"
                 else
                     Indicator := 'ok';
 
-                Line := DOMxmlin.CreateElement('Line');
+                if (Indicator = 'ok') then
+                    Line := XmlElement.Create('Line', '',
+                        StrSubstNo(Text015, StockTakeWorkSheetLine."Qty. (Counted)", StockTakeWorkSheetLine."Item No.", StockTakeWorkSheetLine."Item Description"))
+                else
+                    Line := XmlElement.Create('Line', '',
+                        StrSubstNo(Text016, StockTakeWorkSheetLine."Qty. (Counted)", StockTakeWorkSheetLine.Barcode));
                 AddAttribute(Line, 'Descrip', 'Description');
                 AddAttribute(Line, 'Indicator', Indicator);
-                if (Indicator = 'ok') then
-                    Line.InnerText := StrSubstNo(Text015, StockTakeWorkSheetLine."Qty. (Counted)", StockTakeWorkSheetLine."Item No.", StockTakeWorkSheetLine."Item Description")
-                else
-                    Line.InnerText := StrSubstNo(Text016, StockTakeWorkSheetLine."Qty. (Counted)", StockTakeWorkSheetLine.Barcode);
-                Record.AppendChild(Line);
+                RecordElement.Add(Line);
 
-                Line := DOMxmlin.CreateElement('Line');
+                Line := XmlElement.Create('Line');
                 AddAttribute(Line, 'Descrip', 'Delete..');
                 AddAttribute(Line, 'Type', Format(LineType::BUTTON));
                 AddAttribute(Line, 'TableNo', Format(TableNo));
                 AddAttribute(Line, 'RecordID', Format(CurrRecordID));
-                Record.AppendChild(Line);
+                RecordElement.Add(Line);
 
-                Line := DOMxmlin.CreateElement('Line');
+                Line := XmlElement.Create('Line', '', StockTakeWorkSheetLine.Barcode);
                 AddAttribute(Line, 'Descrip', StockTakeWorkSheetLine.FieldCaption(Barcode));
                 AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                Line.InnerText := StockTakeWorkSheetLine.Barcode;
-                Record.AppendChild(Line);
+                RecordElement.Add(Line);
 
                 if (Indicator = 'ok') then begin
-                    Line := DOMxmlin.CreateElement('Line');
+                    Line := XmlElement.Create('Line', '', StockTakeWorkSheetLine."Variant Code");
                     AddAttribute(Line, 'Descrip', StockTakeWorkSheetLine.FieldCaption("Variant Code"));
                     AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                    Line.InnerText := StockTakeWorkSheetLine."Variant Code";
-                    Record.AppendChild(Line);
+                    RecordElement.Add(Line);
 
-                    Line := DOMxmlin.CreateElement('Line');
+                    Line := XmlElement.Create('Line', '', StockTakeWorkSheetLine."Variant Description");
                     AddAttribute(Line, 'Descrip', StockTakeWorkSheetLine.FieldCaption("Variant Description"));
                     AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                    Line.InnerText := StockTakeWorkSheetLine."Variant Description";
-                    Record.AppendChild(Line);
+                    RecordElement.Add(Line);
                 end;
 
-                Records.AppendChild(Record);
+                Records.Add(RecordElement);
             until StockTakeWorkSheetLine.Next = 0;
             exit(true);
         end else
             exit(false);
     end;
-
-
-
-
 }
 

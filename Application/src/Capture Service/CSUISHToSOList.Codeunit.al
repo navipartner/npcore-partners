@@ -1,7 +1,5 @@
 codeunit 6151366 "NPR CS UI SH To SO List"
 {
-    // NPR5.50/CLVA  /20190514  CASE 352719 Object created - NP Capture Service
-
     TableNo = "NPR CS UI Header";
 
     trigger OnRun()
@@ -10,7 +8,7 @@ codeunit 6151366 "NPR CS UI SH To SO List"
     begin
         MiniformMgmt.Initialize(
           MiniformHeader, Rec, DOMxmlin, ReturnedNode,
-          RootNode, XMLDOMMgt, CSCommunication, CSUserId,
+          RootNode, CSCommunication, CSUserId,
           CurrentCode, StackCode, WhseEmpId, LocationFilter, CSSessionId);
 
         if Code <> CurrentCode then
@@ -24,12 +22,11 @@ codeunit 6151366 "NPR CS UI SH To SO List"
     var
         MiniformHeader: Record "NPR CS UI Header";
         MiniformHeader2: Record "NPR CS UI Header";
-        XMLDOMMgt: Codeunit "XML DOM Management";
         CSCommunication: Codeunit "NPR CS Communication";
         CSManagement: Codeunit "NPR CS Management";
-        ReturnedNode: DotNet NPRNetXmlNode;
-        DOMxmlin: DotNet "NPRNetXmlDocument";
-        RootNode: DotNet NPRNetXmlNode;
+        ReturnedNode: XmlNode;
+        DOMxmlin: XmlDocument;
+        RootNode: XmlNode;
         TextValue: Text[250];
         CSUserId: Text[250];
         WhseEmpId: Text[250];
@@ -62,8 +59,8 @@ codeunit 6151366 "NPR CS UI SH To SO List"
         WarehouseShipmentLine: Record "Warehouse Shipment Line";
         SalesHeader: Record "Sales Header";
     begin
-        if XMLDOMMgt.FindNode(RootNode, 'Header/Input', ReturnedNode) then
-            TextValue := ReturnedNode.InnerText
+        if RootNode.AsXmlAttribute().SelectSingleNode('Header/Input', ReturnedNode) then
+            TextValue := ReturnedNode.AsXmlElement().InnerText
         else
             Error(Text006);
 

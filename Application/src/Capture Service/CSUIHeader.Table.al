@@ -158,7 +158,8 @@ table 6151373 "NPR CS UI Header"
         Text001: Label '%1 must not be %2.';
         Text002: Label 'There can only be one login form.';
 
-    procedure SaveXMLin(DOMxmlin: DotNet "NPRNetXmlDocument")
+    [Obsolete('Use native Business Central objects instead of dotnet classes.', '')]
+    internal procedure SaveXMLin(DOMxmlin: DotNet "NPRNetXmlDocument")
     var
         InStrm: InStream;
     begin
@@ -166,7 +167,16 @@ table 6151373 "NPR CS UI Header"
         DOMxmlin.Save(InStrm);
     end;
 
-    procedure LoadXMLin(var DOMxmlin: DotNet "NPRNetXmlDocument")
+    procedure SaveXMLin(DOMxmlin: XmlDocument)
+    var
+        OutStrm: OutStream;
+    begin
+        XMLin.CreateOutStream(OutStrm);
+        DOMxmlin.WriteTo(OutStrm);
+    end;
+
+    [Obsolete('Use native Business Central objects instead of dotnet classes.', '')]
+    internal procedure LoadXMLin(var DOMxmlin: DotNet "NPRNetXmlDocument")
     var
         XMLDOMManagement: Codeunit "XML DOM Management";
         OutStrm: OutStream;
@@ -175,16 +185,22 @@ table 6151373 "NPR CS UI Header"
         XMLDOMManagement.LoadXMLDocumentFromOutStream(OutStrm, DOMxmlin);
     end;
 
+    procedure LoadXMLin(var DOMxmlin: XmlDocument)
+    var
+        InStrm: InStream;
+    begin
+        XMLin.CreateInStream(InStrm);
+        XmlDocument.ReadFrom(InStrm, DOMxmlin);
+    end;
+
     local procedure DeleteCSUILines()
     var
         CSUILine: Record "NPR CS UI Line";
     begin
-        //-NPR5.53 [375024]
         CSUILine.Reset;
         CSUILine.SetRange("UI Code", Code);
         if CSUILine.FindSet then
             CSUILine.DeleteAll;
-        //+NPR5.53 [375024]
     end;
 }
 

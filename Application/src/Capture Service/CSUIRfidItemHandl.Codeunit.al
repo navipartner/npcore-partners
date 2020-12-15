@@ -1,8 +1,5 @@
 codeunit 6151369 "NPR CS UI Rfid Item Handl."
 {
-    // NPR5.47/CLVA/20181012 CASE 318296 Object created
-    // NPR5.48/CLVA/20181227 CASE 335051 Added media lib check
-
     TableNo = "NPR CS UI Header";
 
     trigger OnRun()
@@ -11,7 +8,7 @@ codeunit 6151369 "NPR CS UI Rfid Item Handl."
     begin
         MiniformMgmt.Initialize(
           CSUIHeader, Rec, DOMxmlin, ReturnedNode,
-          RootNode, XMLDOMMgt, CSCommunication, CSUserId,
+          RootNode, CSCommunication, CSUserId,
           CurrentCode, StackCode, WhseEmpId, LocationFilter, CSSessionId);
 
         if Code <> CurrentCode then
@@ -24,13 +21,12 @@ codeunit 6151369 "NPR CS UI Rfid Item Handl."
 
     var
         CSUIHeader: Record "NPR CS UI Header";
-        XMLDOMMgt: Codeunit "XML DOM Management";
         CSCommunication: Codeunit "NPR CS Communication";
         CSMgt: Codeunit "NPR CS Management";
         RecRef: RecordRef;
-        DOMxmlin: DotNet "NPRNetXmlDocument";
-        ReturnedNode: DotNet NPRNetXmlNode;
-        RootNode: DotNet NPRNetXmlNode;
+        DOMxmlin: XmlDocument;
+        ReturnedNode: XmlNode;
+        RootNode: XmlNode;
         CSUserId: Text[250];
         Remark: Text[250];
         WhseEmpId: Text[250];
@@ -78,17 +74,17 @@ codeunit 6151369 "NPR CS UI Rfid Item Handl."
         FuncValue: Text;
         CSRfidItemHandling: Record "NPR CS Rfid Item Handl.";
         CSRfidItemHandling2: Record "NPR CS Rfid Item Handl.";
-        CommaString: DotNet NPRNetString;
-        Values: DotNet NPRNetArray;
-        Separator: DotNet NPRNetString;
+        CommaString: Text;
+        Values: List of [Text];
+        Separator: Text;
         Value: Text;
         SetDefaults: Boolean;
         i: Integer;
         ItemNo: Code[20];
         DuplicateIndicator: Boolean;
     begin
-        if XMLDOMMgt.FindNode(RootNode, 'Header/Input', ReturnedNode) then
-            TextValue := ReturnedNode.InnerText
+        if RootNode.AsXmlAttribute().SelectSingleNode('Header/Input', ReturnedNode) then
+            TextValue := ReturnedNode.AsXmlElement().InnerText
         else
             Error(Text006);
 
@@ -166,17 +162,14 @@ codeunit 6151369 "NPR CS UI Rfid Item Handl."
 
                     CommaString := TextValue;
                     Separator := ',';
-                    Values := CommaString.Split(Separator.ToCharArray());
-
-                    //SetDefaults := (Values.Length > 1);
+                    Values := CommaString.Split(Separator);
 
                     foreach Value in Values do begin
 
                         i += 1;
-                        SetDefaults := (i < Values.Length);
+                        SetDefaults := (i < Values.Count);
 
                         if Value <> '' then begin
-
                             case FldNo of
                                 CSRfidItemHandling.FieldNo(Barcode):
                                     CheckBarcode(CSRfidItemHandling, Value);
@@ -196,20 +189,7 @@ codeunit 6151369 "NPR CS UI Rfid Item Handl."
                                 if CSCommunication.LastEntryField(CurrentCode, FldNo) then begin
 
                                     UpdateDataLine(CSRfidItemHandling);
-                                    //IF TransferDataLine(CSRfidItemHandling) THEN BEGIN
-                                    //  CSRfidItemHandling."Transferred to Item Cross Ref." := TRUE;
-                                    //  CSRfidItemHandling.MODIFY(TRUE);
-                                    //END;
                                     CreateDataLine(CSRfidItemHandling2, CSRfidItemHandling, SetDefaults);
-
-                                    //              IF (i = Values.Length) THEN BEGIN
-                                    //                CSRfidItemHandling2.Barcode := '';
-                                    //                CSRfidItemHandling2."Item No." := '';
-                                    //                CSRfidItemHandling2."Variant Code" := '';
-                                    //                CSRfidItemHandling2."Rfid Id" := '';
-                                    //                CSRfidItemHandling2.MODIFY(TRUE);
-                                    //              END;
-
                                     RecRef.GetTable(CSRfidItemHandling2);
                                     CSCommunication.SetRecRef(RecRef);
 
@@ -257,17 +237,20 @@ codeunit 6151369 "NPR CS UI Rfid Item Handl."
 
     local procedure SendForm(InputField: Integer)
     var
-        Records: DotNet NPRNetXmlElement;
+        Records: XmlElement;
+        RootElement: XmlElement;
     begin
         CSCommunication.EncodeUI(CSUIHeader, StackCode, DOMxmlin, InputField, Remark, CSUserId);
         CSCommunication.GetReturnXML(DOMxmlin);
 
+        DOMxmlin.GetRoot(RootElement);
+
         if AddKey then
             if AddKeyObject(Records) then
-                DOMxmlin.DocumentElement.AppendChild(Records);
+                RootElement.Add(Records);
 
         if AddSummarize(Records) then
-            DOMxmlin.DocumentElement.AppendChild(Records);
+            RootElement.Add(Records);
 
         CSMgt.SendXMLReply(DOMxmlin);
     end;
@@ -413,15 +396,6 @@ codeunit 6151369 "NPR CS UI Rfid Item Handl."
         ResolvingTable: Integer;
         CSSetup: Record "NPR CS Setup";
     begin
-        // IF BarcodeLibrary.TranslateBarcodeToItemVariant(CSRfidItemHandling.Barcode, ItemNo, VariantCode, ResolvingTable, TRUE) THEN BEGIN
-        //  CSRfidItemHandling."Item No." := ItemNo;
-        //  CSRfidItemHandling."Variant Code" := VariantCode;
-        // END ELSE BEGIN
-        //  CSSetup.GET;
-        //  IF CSSetup."Error On Invalid Barcode" THEN
-        //    Remark := STRSUBSTNO(Text010,CSRfidItemHandling.Barcode);
-        // END;
-
         if CSRfidItemHandling."Rfid Id" <> '' then
             CSRfidItemHandling.Handled := true;
         CSRfidItemHandling.Modify(true);
@@ -437,23 +411,22 @@ codeunit 6151369 "NPR CS UI Rfid Item Handl."
         CSRfidItemHandling.DeleteAll(true);
     end;
 
-    local procedure AddAttribute(var NewChild: DotNet NPRNetXmlNode; AttribName: Text[250]; AttribValue: Text[250])
+    local procedure AddAttribute(var NewChild: XmlElement; AttribName: Text[250]; AttribValue: Text[250])
     begin
-        if XMLDOMMgt.AddAttribute(NewChild, AttribName, AttribValue) > 0 then
-            Error(Text002, AttribName);
+        NewChild.SetAttribute(AttribName, AttribValue);
     end;
 
-    local procedure AddSummarize(var Records: DotNet NPRNetXmlElement) NotEmptyResult: Boolean
+    local procedure AddSummarize(var Records: XmlElement) NotEmptyResult: Boolean
     var
-        "Record": DotNet NPRNetXmlElement;
-        Line: DotNet NPRNetXmlElement;
+        RecordElement: XmlElement;
+        Line: XmlElement;
         Indicator: Text;
         LineType: Option TEXT,BUTTON;
         CurrRecordID: Code[20];
         TableNo: Integer;
         SummarizeCounting: Query "NPR CS Rfid Item Totals";
     begin
-        Records := DOMxmlin.CreateElement('Records');
+        Records := XmlElement.Create('Records');
 
         SummarizeCounting.SetRange(Id, CSSessionId);
         SummarizeCounting.SetRange(Handled, true);
@@ -461,85 +434,72 @@ codeunit 6151369 "NPR CS UI Rfid Item Handl."
         SummarizeCounting.Open;
         while SummarizeCounting.Read do begin
             NotEmptyResult := true;
-            Record := DOMxmlin.CreateElement('Record');
-
-            //CurrRecordID := SummarizeCounting.Item_No;
-            //TableNo := CurrRecordID.TABLENO;
+            RecordElement := XmlElement.Create('Record');
 
             if SummarizeCounting.Duplicate_Tag_Id then
                 Indicator := 'minus'
             else
                 Indicator := 'ok';
 
-            Line := DOMxmlin.CreateElement('Line');
+            if (Indicator = 'ok') then
+                Line := XmlElement.Create('Line', '',
+                    StrSubstNo(Text015, SummarizeCounting.Count_, SummarizeCounting.Item_No, SummarizeCounting.Item_Description))
+            else
+                Line := XmlElement.Create('Line', '', StrSubstNo(Text016, SummarizeCounting.Count_, 'Duplicated Rfid Ids'));
             AddAttribute(Line, 'Descrip', 'Description');
             AddAttribute(Line, 'Indicator', Indicator);
-            if (Indicator = 'ok') then
-                Line.InnerText := StrSubstNo(Text015, SummarizeCounting.Count_, SummarizeCounting.Item_No, SummarizeCounting.Item_Description)
-            else
-                Line.InnerText := StrSubstNo(Text016, SummarizeCounting.Count_, 'Duplicated Rfid Ids');
-            Record.AppendChild(Line);
+            RecordElement.Add(Line);
 
             if (SummarizeCounting.Variant_Code <> '') then begin
-                Line := DOMxmlin.CreateElement('Line');
+                Line := XmlElement.Create('Line', '', SummarizeCounting.Variant_Code + ' - ' + SummarizeCounting.Variant_Description);
                 AddAttribute(Line, 'Descrip', 'Variant');
                 AddAttribute(Line, 'Type', Format(LineType::TEXT));
-                Line.InnerText := SummarizeCounting.Variant_Code + ' - ' + SummarizeCounting.Variant_Description;
-                Record.AppendChild(Line);
+                RecordElement.Add(Line);
             end;
 
-            Line := DOMxmlin.CreateElement('Line');
+            Line := XmlElement.Create('Line');
             AddAttribute(Line, 'Descrip', 'Delete..');
             AddAttribute(Line, 'Type', Format(LineType::BUTTON));
             AddAttribute(Line, 'TableNo', Indicator);
             AddAttribute(Line, 'RecordID', SummarizeCounting.Item_No);
             AddAttribute(Line, 'FuncName', 'DELETELINE');
-            Record.AppendChild(Line);
+            RecordElement.Add(Line);
 
-            Records.AppendChild(Record);
+            Records.Add(RecordElement);
         end;
         SummarizeCounting.Close;
-
         exit(NotEmptyResult);
     end;
 
-    local procedure AddKeyObject(var Records: DotNet NPRNetXmlElement) NotEmptyResult: Boolean
+    local procedure AddKeyObject(var Records: XmlElement) NotEmptyResult: Boolean
     var
-        "Record": DotNet NPRNetXmlElement;
-        Line: DotNet NPRNetXmlElement;
+        RecordElement: XmlElement;
+        Line: XmlElement;
         ImageUrl: Text;
         MagentoPicture: Record "NPR Magento Picture";
         MagentoPictureLink: Record "NPR Magento Picture Link";
         CSSetup: Record "NPR CS Setup";
     begin
         CSSetup.Get;
-        Records := DOMxmlin.CreateElement('KeyObjects');
-        Record := DOMxmlin.CreateElement('Record');
+        Records := XmlElement.Create('KeyObjects');
+        RecordElement := XmlElement.Create('Record');
 
         NotEmptyResult := true;
-        Line := DOMxmlin.CreateElement('Line');
+        Line := XmlElement.Create('Line');
         AddAttribute(Line, 'Key', ItemKeyRef."No.");
         AddAttribute(Line, 'Title', ItemKeyRef.Description);
 
-        //-NPR5.48 [335051]
         if CSSetup."Media Library" = CSSetup."Media Library"::Magento then begin
-            //+NPR5.48 [335051]
             MagentoPictureLink.SetRange("Item No.", ItemKeyRef."No.");
             MagentoPictureLink.SetRange("Base Image", true);
             if MagentoPictureLink.FindFirst then
                 if MagentoPicture.Get(MagentoPicture.Type::Item, MagentoPictureLink."Picture Name") then
                     ImageUrl := MagentoPicture.GetMagentoUrl;
-            //-NPR5.48 [335051]
         end;
-        //+NPR5.48 [335051]
-
         AddAttribute(Line, 'ImageUrl', ImageUrl);
-
-        Record.AppendChild(Line);
-
+        RecordElement.Add(Line);
         AddKey := false;
-        Records.AppendChild(Record);
-
+        Records.Add(RecordElement);
         exit(NotEmptyResult);
     end;
 
