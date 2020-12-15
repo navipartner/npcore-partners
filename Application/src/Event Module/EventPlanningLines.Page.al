@@ -1,12 +1,5 @@
 page 6014549 "NPR Event Planning Lines"
 {
-    // NPR5.49/TJ  /20190124 CASE 331208 Action Sales Invoices/Credit Memos renamed to Sales Documents and changed code
-    //                                   Action Job Task Lines renamed to Event Task Lines and changed page to run
-    //                                   Added code to Job Task No. - OnLookup
-    //                                   Object renamed to Event Planning Lines Subpage
-    // NPR5.49/TJ  /20190306 CASE 342305 Fields "Est. Unit Price Incl. VAT" and "Est. Line Amount Incl. VAT" made non-editable
-    // NPR5.49/TJ  /20190218 CASE 345047 Extended text support
-
     AutoSplitKey = true;
     Caption = 'Event Planning Lines';
     DataCaptionExpression = Caption;
@@ -31,7 +24,6 @@ page 6014549 "NPR Event Planning Lines"
                         EventTaskLines: Page "NPR Event Task Lines";
                         JobTask: Record "Job Task";
                     begin
-                        //-NPR5.49 [331208]
                         JobTask.SetRange("Job No.", Rec."Job No.");
                         if "Job Task No." <> '' then
                             JobTask.Get("Job No.", "Job Task No.");
@@ -41,7 +33,6 @@ page 6014549 "NPR Event Planning Lines"
                             EventTaskLines.GetRecord(JobTask);
                             Validate("Job Task No.", JobTask."Job Task No.");
                         end;
-                        //+NPR5.49 [331208]
                     end;
                 }
                 field("Line Type"; "Line Type")
@@ -863,21 +854,6 @@ page 6014549 "NPR Event Planning Lines"
                         InsertExtendedText(true);
                         //+NPR5.49 [345047]
                     end;
-                }
-            }
-            group(Reports)
-            {
-                Caption = 'Reports';
-                Image = "Report";
-                action("Jobs - Transaction Detail")
-                {
-                    Caption = 'Jobs - Transaction Detail';
-                    Image = "Report";
-                    Promoted = false;
-                    //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                    //PromotedCategory = "Report";
-                    RunObject = Report "Job - Transaction Detail";
-                    ApplicationArea = All;
                 }
             }
             group(Navigate)

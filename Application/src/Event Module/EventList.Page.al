@@ -323,51 +323,6 @@ page 6060152 "NPR Event List"
                     end;
                 }
             }
-            group("&Prices")
-            {
-                Caption = '&Prices';
-                Image = Price;
-                Visible = not ExtendedPriceEnabled;
-                ObsoleteState = Pending;
-                ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
-                ObsoleteTag = '17.0';
-                action("&Resource")
-                {
-                    Caption = '&Resource';
-                    Image = Resource;
-                    RunObject = Page "Job Resource Prices";
-                    RunPageLink = "Job No." = FIELD("No.");
-                    ApplicationArea = All;
-                    ToolTip = 'View this event''s resource prices.';
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
-                    ObsoleteTag = '17.0';
-                }
-                action("&Item")
-                {
-                    Caption = '&Item';
-                    Image = Item;
-                    RunObject = Page "Job Item Prices";
-                    RunPageLink = "Job No." = FIELD("No.");
-                    ApplicationArea = All;
-                    ToolTip = 'View this event''s item prices.';
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
-                    ObsoleteTag = '17.0';
-                }
-                action("&G/L Account")
-                {
-                    Caption = '&G/L Account';
-                    Image = JobPrice;
-                    RunObject = Page "Job G/L Account Prices";
-                    RunPageLink = "Job No." = FIELD("No.");
-                    ApplicationArea = All;
-                    ToolTip = 'View this event''s G/L account prices.';
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
-                    ObsoleteTag = '17.0';
-                }
-            }
             group(Prices)
             {
                 Caption = '&Prices';
@@ -658,55 +613,6 @@ page 6060152 "NPR Event List"
         }
         area(reporting)
         {
-            action("Job Actual to Budget")
-            {
-                Caption = 'Job Actual to Budget';
-                Image = "Report";
-                Promoted = true;
-                PromotedCategory = "Report";
-                RunObject = Report "Job Actual To Budget";
-                ApplicationArea = All;
-                ToolTip = 'Compare budgeted and usage amounts for selected event. All lines of the selected event show quantity, total cost, and line amount.';
-            }
-            action("Job Analysis")
-            {
-                Caption = 'Job Analysis';
-                Image = "Report";
-                Promoted = true;
-                PromotedCategory = "Report";
-                RunObject = Report "Job Analysis";
-                ApplicationArea = All;
-                ToolTip = 'Analyze the event, such as the budgeted prices, usage prices, and contract prices, and then compares the three sets of prices.';
-            }
-            action("Job - Planning Lines")
-            {
-                Caption = 'Job - Planning Lines';
-                Image = "Report";
-                Promoted = true;
-                PromotedCategory = "Report";
-                RunObject = Report "Job - Planning Lines";
-                ApplicationArea = All;
-                ToolTip = 'View all planning lines for the event. You use this window to plan what items, resources, and general ledger expenses that you expect to use on an event (budget) or you can specify what you actually agreed with your customer that he should pay for the event (billable).';
-            }
-            action("Job - Suggested Billing")
-            {
-                Caption = 'Job - Suggested Billing';
-                Image = "Report";
-                Promoted = true;
-                PromotedCategory = "Report";
-                RunObject = Report "Job Suggested Billing";
-                ApplicationArea = All;
-                ToolTip = 'View a list of all events, grouped by customer, how much the customer has already been invoiced, and how much remains to be invoiced, that is, the suggested billing.';
-            }
-            action("Jobs per Customer")
-            {
-                Caption = 'Jobs per Customer';
-                Image = "Report";
-                Promoted = false;
-                RunObject = Report "Jobs per Customer";
-                ApplicationArea = All;
-                ToolTip = 'Run the Jobs per Customer report.';
-            }
             action("Items per Job")
             {
                 Caption = 'Items per Job';
@@ -743,15 +649,6 @@ page 6060152 "NPR Event List"
             {
                 Caption = 'History';
                 Image = "Report";
-                action("Jobs - Transaction Detail")
-                {
-                    Caption = 'Jobs - Transaction Detail';
-                    Image = "Report";
-                    Promoted = false;
-                    RunObject = Report "Job - Transaction Detail";
-                    ApplicationArea = All;
-                    ToolTip = 'View all postings with entries for a selected event for a selected period, which have been charged to a certain event. At the end of each event list, the amounts are totaled separately for the Sales and Usage entry types.';
-                }
                 action("Job Register")
                 {
                     Caption = 'Job Register';

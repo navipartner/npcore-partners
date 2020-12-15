@@ -1,7 +1,5 @@
 page 6151589 "NPR Event Task Lines"
 {
-    // NPR5.49/TJ  /20190124 CASE 331208 New object created as a copy from page 1002
-
     Caption = 'Event Task Lines';
     DataCaptionFields = "Job No.";
     PageType = List;
@@ -547,55 +545,6 @@ page 6151589 "NPR Event Task Lines"
                         end;
                     }
                 }
-            }
-        }
-        area(reporting)
-        {
-            action("Job Actual to Budget")
-            {
-                Caption = 'Job Actual to Budget';
-                Image = "Report";
-                Promoted = true;
-                PromotedCategory = "Report";
-                RunObject = Report "Job Actual To Budget";
-                ApplicationArea = All;
-            }
-            action("Job Analysis")
-            {
-                Caption = 'Job Analysis';
-                Image = "Report";
-                Promoted = true;
-                PromotedCategory = "Report";
-                RunObject = Report "Job Analysis";
-                ApplicationArea = All;
-            }
-            action("Job - Planning Lines")
-            {
-                Caption = 'Job - Planning Lines';
-                Image = "Report";
-                Promoted = true;
-                PromotedCategory = "Report";
-                RunObject = Report "Job - Planning Lines";
-                ApplicationArea = All;
-            }
-            action("Job - Suggested Billing")
-            {
-                Caption = 'Job - Suggested Billing';
-                Image = "Report";
-                Promoted = true;
-                PromotedCategory = "Report";
-                RunObject = Report "Job Suggested Billing";
-                ApplicationArea = All;
-            }
-            action("Jobs - Transaction Detail")
-            {
-                Caption = 'Jobs - Transaction Detail';
-                Image = "Report";
-                Promoted = false;
-                //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                //PromotedCategory = "Report";
-                RunObject = Report "Job - Transaction Detail";
-                ApplicationArea = All;
             }
         }
     }
