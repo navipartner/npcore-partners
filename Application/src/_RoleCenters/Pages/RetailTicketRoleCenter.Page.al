@@ -1,12 +1,5 @@
 page 6151263 "NPR Retail Ticket Role Center"
 {
-    // TM1.16/TSA/20160816  CASE 233430 Transport TM1.16 - 19 July 2016
-    // NPR5.29/TSA /20161121  CASE 258974 Page Navigation enhancements - Switched to Retail Item List
-    // NPR5.29/TS  /20170127  CASE 264733 Added My reports
-    // MM1.26/TSA /20180222 CASE 304705 Added button for setup actions in ticket and member module
-    // MM1.29/TSA /20180509 CASE 313795 Added GDPR actions
-    // TM1.39/TS  /20181206 CASE 343939 Added Missing Picture to Action
-
     Caption = 'Role Center';
     PageType = RoleCenter;
     UsageCategory = Administration;
@@ -55,20 +48,6 @@ page 6151263 "NPR Retail Ticket Role Center"
     {
         area(reporting)
         {
-            action("S&ales Statistics")
-            {
-                Caption = 'S&ales Statistics';
-                Image = "Report";
-                RunObject = Report "Sales Statistics";
-                ApplicationArea = All;
-            }
-            action("Salesperson - Sales &Statistics")
-            {
-                Caption = 'Salesperson - Sales &Statistics';
-                Image = "Report";
-                RunObject = Report "Salesperson - Sales Statistics";
-                ApplicationArea = All;
-            }
             action("Campaign - &Details")
             {
                 Caption = 'Campaign - &Details';

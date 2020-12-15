@@ -1,14 +1,5 @@
 page 6060149 "NPR RC Member Mgr RoleCenter"
 {
-    // TM1.16/TSA/20160816  CASE 233430 Transport TM1.16 - 19 July 2016
-    // NPR5.29/TSA /20161121  CASE 258974 Page Navigation enhancements - Switched to Retail Item List
-    // NPR5.29/TS  /20170127  CASE 264733 Added My reports
-    // MM1.26/TSA /20180222 CASE 304705 Added button for setup actions in ticket and member module
-    // MM1.29/TSA /20180509 CASE 313795 Added GDPR actions
-    // TM1.39/TS  /20181206 CASE 343939 Added Missing Picture to Action
-    // TM1.46/TSA /20200323 CASE 397084 Added ticket wizard
-    // TM1.48/TSA /20200703 CASE 409741 Added Admission Forecast
-
     Caption = 'Role Center';
     PageType = RoleCenter;
     UsageCategory = Administration;
@@ -61,20 +52,6 @@ page 6060149 "NPR RC Member Mgr RoleCenter"
     {
         area(reporting)
         {
-            action("S&ales Statistics")
-            {
-                Caption = 'S&ales Statistics';
-                Image = "Report";
-                RunObject = Report "Sales Statistics";
-                ApplicationArea = All;
-            }
-            action("Salesperson - Sales &Statistics")
-            {
-                Caption = 'Salesperson - Sales &Statistics';
-                Image = "Report";
-                RunObject = Report "Salesperson - Sales Statistics";
-                ApplicationArea = All;
-            }
             action("Campaign - &Details")
             {
                 Caption = 'Campaign - &Details';
