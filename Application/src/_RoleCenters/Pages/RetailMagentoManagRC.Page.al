@@ -25,14 +25,14 @@ page 6151244 "NPR Retail Magento Manag. RC"
 
             part("NP Retail SO Processor Act"; "NPR SO Processor Act")
             {
-                  ApplicationArea = All;
+                ApplicationArea = All;
 
             }
 
 
             part(NPRETAILACTIVITIES; "NPR Activities")
             {
-                    ApplicationArea = All;
+                ApplicationArea = All;
             }
 
 
@@ -54,14 +54,14 @@ page 6151244 "NPR Retail Magento Manag. RC"
 
             part(Control6014400; "NPR My Reports")
             {
-                    ApplicationArea = All;
+                ApplicationArea = All;
             }
 
 
             part(Control6150616; "NPR Web Manager Activ.")
             {
                 Visible = false;
-                    ApplicationArea = All;
+                ApplicationArea = All;
 
             }
 
@@ -72,7 +72,7 @@ page 6151244 "NPR Retail Magento Manag. RC"
 
             part(PowerBi; "Power BI Report Spinner Part")
             {
-                  ApplicationArea = All;
+                ApplicationArea = All;
 
             }
 
@@ -174,7 +174,7 @@ page 6151244 "NPR Retail Magento Manag. RC"
                     Caption = 'Payment Method Mapping';
                     Image = Setup;
                     RunObject = page "NPR Magento Payment Mapping";
-                      ApplicationArea = All;
+                    ApplicationArea = All;
                 }
 
                 action("Payment Gateways")
@@ -182,7 +182,7 @@ page 6151244 "NPR Retail Magento Manag. RC"
                     Caption = 'Payment Gateways';
                     Image = Setup;
                     RunObject = page "NPR Magento Payment Gateways";
-                      ApplicationArea = All;
+                    ApplicationArea = All;
                 }
 
                 action("VAT Business Posting Groups")
@@ -190,7 +190,7 @@ page 6151244 "NPR Retail Magento Manag. RC"
                     Caption = 'VAT Business Posting Groups';
                     Image = Setup;
                     RunObject = page "VAT Business Posting Groups";
-                      ApplicationArea = All;
+                    ApplicationArea = All;
                 }
                 action("VAT Product Posting Groups")
                 {
@@ -212,7 +212,7 @@ page 6151244 "NPR Retail Magento Manag. RC"
                     Caption = 'Webshops';
                     Image = List;
                     RunObject = page "NPR Magento Store List";
-                      ApplicationArea = All;
+                    ApplicationArea = All;
                 }
 
                 action("Customer Mapping")
@@ -220,7 +220,7 @@ page 6151244 "NPR Retail Magento Manag. RC"
                     Caption = 'Magento Customer Mapping';
                     Image = List;
                     RunObject = page "NPR Magento Customer Mapping";
-                      ApplicationArea = All;
+                    ApplicationArea = All;
                 }
             }
 
@@ -247,49 +247,49 @@ page 6151244 "NPR Retail Magento Manag. RC"
                     {
                         Caption = 'Items';
                         Image = List;
-                        RunObject = page "NPR Retail Item List";
+                        RunObject = page "Item List";
                         ApplicationArea = All;
                     }
                     action(ItemGroups)
                     {
                         Caption = 'Items Groups';
                         Image = List;
-                        RunObject = page "NPR Retail Item List";
+                        RunObject = page "Item List";
                         ApplicationArea = All;
                     }
                     action(Brands)
                     {
                         Caption = 'Brands';
                         Image = List;
-                        RunObject = page "NPR Retail Item List";
+                        RunObject = page "Item List";
                         ApplicationArea = All;
                     }
                     action(CustomOptions)
                     {
                         Caption = 'Customer Options';
                         Image = List;
-                        RunObject = page "NPR Retail Item List";
+                        RunObject = page "Item List";
                         ApplicationArea = All;
                     }
                     action(AttributeSets)
                     {
                         Caption = 'Attribute Sets';
                         Image = List;
-                        RunObject = page "NPR Retail Item List";
+                        RunObject = page "Item List";
                         ApplicationArea = All;
                     }
                     action(AttributeGroup)
                     {
                         Caption = 'Attribute Group';
                         Image = List;
-                        RunObject = page "NPR Retail Item List";
+                        RunObject = page "Item List";
                         ApplicationArea = All;
                     }
                     action(Attributes)
                     {
                         Caption = 'Attributes';
                         Image = List;
-                        RunObject = page "NPR Retail Item List";
+                        RunObject = page "Item List";
                         ApplicationArea = All;
                     }
                 }
@@ -301,14 +301,14 @@ page 6151244 "NPR Retail Magento Manag. RC"
                     {
                         Caption = 'Display Group';
                         Image = List;
-                        RunObject = page "NPR Retail Item List";
+                        RunObject = page "Item List";
                         ApplicationArea = All;
                     }
                     action(DisplayConfig)
                     {
                         Caption = 'Display Config';
                         Image = List;
-                        RunObject = page "NPR Retail Item List";
+                        RunObject = page "Item List";
                         ApplicationArea = All;
                     }
                 }
@@ -405,7 +405,7 @@ page 6151244 "NPR Retail Magento Manag. RC"
                         Caption = 'Task List';
                         Image = List;
                         RunObject = page "Task List";
-                          ApplicationArea = All;
+                        ApplicationArea = All;
                     }
 
                     action(UnProcessedImportList)
@@ -415,7 +415,7 @@ page 6151244 "NPR Retail Magento Manag. RC"
 
                         RunObject = page "NPR Nc Import List";
                         RunPageView = WHERE("Runtime Error" = const(true));
-                          ApplicationArea = All;
+                        ApplicationArea = All;
                     }
 
                     action("UnProcessedTask List")
@@ -424,7 +424,7 @@ page 6151244 "NPR Retail Magento Manag. RC"
                         Image = List;
                         RunObject = page "NPR Nc Task List";
                         RunPageView = WHERE("Process Error" = const(true));
-                          ApplicationArea = All;
+                        ApplicationArea = All;
                     }
 
 
@@ -473,7 +473,7 @@ page 6151244 "NPR Retail Magento Manag. RC"
                     Caption = 'Task Processors';
                     Image = List;
                     RunObject = page "NPR Nc Task Proces. List";
-                      ApplicationArea = All;
+                    ApplicationArea = All;
                 }
 
                 action(TaskSetup)
@@ -481,7 +481,7 @@ page 6151244 "NPR Retail Magento Manag. RC"
                     Caption = 'Task Setup';
                     Image = List;
                     RunObject = page "NPR NpXml Setup";
-                      ApplicationArea = All;
+                    ApplicationArea = All;
                 }
                 action(ImportTypes)
                 {
@@ -500,7 +500,7 @@ page 6151244 "NPR Retail Magento Manag. RC"
             action("Item List")
             {
                 Caption = 'Item List';
-                RunObject = Page "NPR Retail Item List";
+                RunObject = Page "Item List";
                 ApplicationArea = All;
             }
             action("Item Groups")
@@ -521,7 +521,7 @@ page 6151244 "NPR Retail Magento Manag. RC"
             {
                 Caption = 'POS Entry List';
                 RunObject = Page "NPR POS Entry List";
-                    ApplicationArea = All;
+                ApplicationArea = All;
             }
             action("Contacts ")
             {
@@ -540,7 +540,7 @@ page 6151244 "NPR Retail Magento Manag. RC"
             {
                 Caption = 'Xml Templates';
                 RunObject = Page "NPR NpXml Template List";
-                  ApplicationArea = All;
+                ApplicationArea = All;
             }
         }
         area(sections)

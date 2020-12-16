@@ -160,7 +160,7 @@ page 6060125 "NPR MM Membership Sales Setup"
             {
                 Caption = 'Item List';
                 Image = List;
-                RunObject = Page "NPR Retail Item List";
+                RunObject = Page "Item List";
                 ApplicationArea = All;
             }
             action(Memberships)

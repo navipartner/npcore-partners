@@ -70,20 +70,8 @@ codeunit 6150635 "NPR POS Page Navigation"
         OpenPOSSalesLineListFromItem(Rec);
     end;
 
-    [EventSubscriber(ObjectType::Page, 31, 'OnAfterActionEvent', 'NPR POSSalesEntries', true, true)]
+    [EventSubscriber(ObjectType::Page, 31, 'OnAfterActionEvent', 'NPR POS Sales Entries', true, true)]
     local procedure Page31OnAfterActionPOSSalesLines(var Rec: Record Item)
-    begin
-        OpenPOSSalesLineListFromItem(Rec);
-    end;
-
-    [EventSubscriber(ObjectType::Page, 6014425, 'OnAfterActionEvent', 'POSSalesEntries', true, true)]
-    local procedure Page6014425OnAfterActionPOSSalesLines(var Rec: Record Item)
-    begin
-        OpenPOSSalesLineListFromItem(Rec);
-    end;
-
-    [EventSubscriber(ObjectType::Page, 6014511, 'OnAfterActionEvent', 'POSSalesEntries', true, true)]
-    local procedure Page6014511OnAfterActionPOSSalesLines(var Rec: Record Item)
     begin
         OpenPOSSalesLineListFromItem(Rec);
     end;

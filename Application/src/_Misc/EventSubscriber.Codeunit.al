@@ -254,7 +254,7 @@ codeunit 6014404 "NPR Event Subscriber"
     [EventSubscriber(ObjectType::Page, 42, 'OnAfterActionEvent', 'NPR InsertLineItem ', true, true)]
     local procedure P42OnAfterActionInsertLinewithItem(var Rec: Record "Sales Header")
     var
-        RetailItemList: Page "NPR Retail Item List";
+        RetailItemList: Page "Item List";
         Item: Record Item;
         SalesLine: Record "Sales Line";
         LastSalesLine: Record "Sales Line";
@@ -334,7 +334,7 @@ codeunit 6014404 "NPR Event Subscriber"
     [EventSubscriber(ObjectType::Page, 50, 'OnAfterActionEvent', 'NPR InsertLineVendorItem', false, false)]
     local procedure P50OnAfterActionEventInsertLinewithVendorItem(var Rec: Record "Purchase Header")
     var
-        RetailItemList: Page "NPR Retail Item List";
+        RetailItemList: Page "Item List";
         Item: Record Item;
         PurchaseLine: Record "Purchase Line";
         LastPurchaseLine: Record "Purchase Line";

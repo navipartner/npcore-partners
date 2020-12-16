@@ -54,11 +54,8 @@ page 6151256 "NPR Retail Top10 Selling Items"
 
                         trigger OnDrillDown()
                         begin
-                            //-NC1.22
-                            //PAGE.RUN(PAGE::"Retail Item Card",Rec);
                             Item.Get("No.");
-                            PAGE.Run(PAGE::"NPR Retail Item Card", Item);
-                            //+NC1.22
+                            PAGE.Run(PAGE::"Item Card", Item);
                         end;
                     }
                     field(Description; Description)

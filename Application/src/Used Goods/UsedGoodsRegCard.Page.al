@@ -332,8 +332,7 @@ page 6014506 "NPR Used Goods Reg. Card"
 
                         TestField("Item No. Created");
                         Item.Get("Item No. Created");
-                        //FORM.RUNMODAL(FORM::"Item card - Retail",Vare);
-                        PAGE.RunModal(PAGE::"NPR Retail Item Card", Item);
+                        PAGE.RunModal(PAGE::"Item Card", Item);
                     end;
                 }
                 action("Item Entry")

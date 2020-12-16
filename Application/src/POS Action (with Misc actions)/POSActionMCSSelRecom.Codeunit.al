@@ -110,7 +110,7 @@ codeunit 6060083 "NPR POS Action: MCS Sel.Recom"
         SaleLinePOS: Record "NPR Sale Line POS";
         MCSRecommendationsHandler: Codeunit "NPR MCS Recomm. Handler";
         POSSale: Codeunit "NPR POS Sale";
-        RetailItemList: Page "NPR Retail Item List";
+        RetailItemList: Page "Item List";
         ItemFilter: Text;
     begin
 
@@ -122,7 +122,7 @@ codeunit 6060083 "NPR POS Action: MCS Sel.Recom"
         MCSRecommendationsHandler.GetRecommendationsLinesFromSalePOS(SalePOS, TempMCSRecommendationsLine);
         MCSRecommendationsHandler.GetItemListFromRecommendations(TempItem, TempMCSRecommendationsLine, NumberOfRecommendations);
 
-        if PAGE.RunModal(PAGE::"NPR Retail Item List", TempItem) = ACTION::LookupOK then begin
+        if PAGE.RunModal(PAGE::"Item List", TempItem) = ACTION::LookupOK then begin
             TempMCSRecommendationsLine.SetRange("Item No.", TempItem."No.");
             if TempMCSRecommendationsLine.FindFirst then
                 TempMCSRecommendationsLine.LogSelectRecommendedItem;

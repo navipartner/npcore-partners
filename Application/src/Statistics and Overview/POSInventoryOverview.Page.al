@@ -282,7 +282,7 @@ page 6060059 "NPR POS Inventory Overview"
         ItemVariant: Record "Item Variant";
         VarietyValue: Record "NPR Variety Value";
         VarietyValuePage: Page "NPR Variety Value";
-        RetailItemList: Page "NPR Retail Item List";
+        RetailItemList: Page "Item List";
         ItemVariants: Page "Item Variants";
     begin
         case FieldType of

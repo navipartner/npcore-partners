@@ -113,7 +113,7 @@ page 6059981 "NPR Store Manager Role Center"
             action("Item List")
             {
                 Caption = 'Item List';
-                RunObject = Page "NPR Retail Item List";
+                RunObject = Page "Item List";
                 ApplicationArea = All;
             }
             action("Item Groups")

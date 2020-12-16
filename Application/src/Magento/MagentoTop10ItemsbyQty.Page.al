@@ -30,11 +30,8 @@ page 6151484 "NPR Magento Top10 Items by Qty"
 
                     trigger OnDrillDown()
                     begin
-                        //-MAG1.22
-                        //PAGE.RUN(PAGE::"Retail Item Card",Rec);
                         Item.Get("No.");
-                        PAGE.Run(PAGE::"NPR Retail Item Card", Item);
-                        //+MAG1.22
+                        PAGE.Run(PAGE::"Item Card", Item);
                     end;
                 }
                 field(Description; Description)

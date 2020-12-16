@@ -96,7 +96,7 @@ page 6151434 "NPR Magento Attribute Sets"
                 TempItem := Item;
                 TempItem.Insert;
             until Item.Next = 0;
-        PAGE.Run(PAGE::"NPR Retail Item List", TempItem);
+        PAGE.Run(PAGE::"Item List", TempItem);
         //+MAG1.02
     end;
 }

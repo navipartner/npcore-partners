@@ -373,14 +373,9 @@ page 6014450 "NPR Mixed Discount"
                         Item: Record Item;
                         MixDiscLine: Record "NPR Mixed Discount Line";
                     begin
-                        //-VRT1.00
-                        //CurrPage.SubForm.PAGE.GETRECORD("Periode MixedDiscountLine");
-                        //Item.SETRANGE("No.","Periode MixedDiscountLine"."Item No.");
-                        //PAGE.RUN( 6014425, Vare, Item."No.");
                         CurrPage.SubForm.PAGE.GetRecord(MixDiscLine);
                         Item.Get(MixDiscLine."No.");
-                        PAGE.Run(PAGE::"NPR Retail Item Card", Item);
-                        //+VRT1.00
+                        PAGE.Run(PAGE::"Item Card", Item);
                     end;
                 }
             }

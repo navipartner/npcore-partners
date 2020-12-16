@@ -224,7 +224,7 @@ page 6151411 "NPR Magento Pictures"
                                     //+MAG2.22 [361234]
                                 end;
                             until MagentoPictureLink.Next = 0;
-                        PAGE.Run(PAGE::"NPR Retail Item List", TempItem);
+                        PAGE.Run(PAGE::"Item List", TempItem);
                     end;
                 Type::"Item Group":
                     begin

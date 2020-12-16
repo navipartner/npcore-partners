@@ -310,7 +310,7 @@ page 6060124 "NPR MM Membership Setup"
             {
                 Caption = 'Item List';
                 Image = List;
-                RunObject = Page "NPR Retail Item List";
+                RunObject = Page "Item List";
                 ApplicationArea = All;
             }
             separator(Separator6014416)

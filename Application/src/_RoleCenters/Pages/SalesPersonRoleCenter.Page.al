@@ -73,7 +73,7 @@ page 6059980 "NPR Sales Person Role Center"
             action("Item List")
             {
                 Caption = 'Item List';
-                RunObject = Page "NPR Retail Item List";
+                RunObject = Page "Item List";
                 ApplicationArea = All;
             }
             action("Item Group")

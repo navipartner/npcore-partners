@@ -180,7 +180,7 @@ codeunit 6150813 "NPR POS Action: Item Lookup"
         if SaleLinePOS.Type = SaleLinePOS.Type::Item then
             if Item.Get(SaleLinePOS."No.") then;
 
-        if PAGE.RunModal(PAGE::"NPR Retail Item List", Item) = ACTION::LookupOK then
+        if PAGE.RunModal(PAGE::"Item List", Item) = ACTION::LookupOK then
             ItemNo := Item."No.";
         //+NPR5.46 [329616]
 
@@ -198,7 +198,7 @@ codeunit 6150813 "NPR POS Action: Item Lookup"
     local procedure CompleteLookup(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; Context: JsonObject)
     var
         JSON: Codeunit "NPR POS JSON Management";
-        ItemList: Page "NPR Retail Item List";
+        ItemList: Page "Item List";
         Item: Record Item;
         ItemNo: Code[20];
         ItemView: Text;

@@ -1015,7 +1015,7 @@ codeunit 6150723 "NPR POS Action: Insert Item"
     local procedure GetItemFromItemSearch(var ItemIdentifierString: Text) ItemFound: Boolean
     var
         Item: Record Item;
-        ItemList: Page "NPR Retail Item List";
+        ItemList: Page "Item List";
         ItemNo: Code[20];
     begin
         //-NPR5.45 [319706]
