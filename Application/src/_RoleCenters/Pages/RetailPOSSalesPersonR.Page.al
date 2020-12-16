@@ -288,7 +288,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                 action(Action6014418)
                 {
                     Caption = 'Retail Item List';
-                    RunObject = Page "NPR Retail Item List";
+                    RunObject = Page "Item List";
                     ApplicationArea = All;
                 }
                 action("Item Group Tree")
@@ -650,7 +650,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                                 {
                                     Caption = 'Retail Item';
                                     Image = ListPage;
-                                    RunObject = page "NPR Retail Item List";
+                                    RunObject = page "Item List";
                                     ApplicationArea = All;
                                 }
                                 action(Items)

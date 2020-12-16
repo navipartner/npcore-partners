@@ -129,13 +129,13 @@ page 6014619 "NPR Retail - Sales RC MyReport"
             action("Item List")
             {
                 Caption = 'Item List';
-                RunObject = Page "NPR Retail Item List";
+                RunObject = Page "Item List";
                 ApplicationArea = All;
             }
             action("Magento Item List")
             {
                 Caption = '  Magento Items';
-                RunObject = Page "NPR Retail Item List";
+                RunObject = Page "Item List";
                 RunPageLink = "NPR Magento Item" = CONST(true);
                 ApplicationArea = All;
             }

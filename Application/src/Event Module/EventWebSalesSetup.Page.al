@@ -24,7 +24,7 @@ page 6060158 "NPR Event Web Sales Setup"
                     trigger OnLookup(var Text: Text): Boolean
                     var
                         Item: Record Item;
-                        RetailItemList: Page "NPR Retail Item List";
+                        RetailItemList: Page "Item List";
                         GLAccount: Record "G/L Account";
                     begin
                         case Type of

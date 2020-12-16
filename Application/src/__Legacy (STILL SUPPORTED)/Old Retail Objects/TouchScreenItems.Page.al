@@ -1,10 +1,7 @@
 page 6014525 "NPR Touch Screen - Items"
 {
-    // NPR4.14/TS/20150805 CASE 219343 Added Field Vendor Item No.
-    // NPR4.15/RMT/20150909 CASE 221106 Added field "Unit Cost"
-
     Caption = 'Touch Screen - Select item';
-    CardPageID = "NPR Retail Item Card";
+    CardPageID = "Item Card";
     Editable = false;
     PageType = List;
     UsageCategory = Administration;

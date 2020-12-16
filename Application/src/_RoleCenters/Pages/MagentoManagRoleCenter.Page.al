@@ -70,13 +70,13 @@ page 6151480 "NPR Magento Manag. Role Center"
             action("Item List")
             {
                 Caption = 'Item List';
-                RunObject = Page "NPR Retail Item List";
+                RunObject = Page "Item List";
                 ApplicationArea = All;
             }
             action("Internet Item List")
             {
                 Caption = 'Internet Items';
-                RunObject = Page "NPR Retail Item List";
+                RunObject = Page "Item List";
                 RunPageLink = "NPR Magento Item" = CONST(true);
                 ApplicationArea = All;
             }

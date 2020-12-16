@@ -554,7 +554,7 @@ page 6060042 "NPR Item Worksheet Page"
             {
                 Caption = 'Existing Item';
                 Image = Item;
-                RunObject = Page "NPR Retail Item Card";
+                RunObject = Page "Item Card";
                 RunPageLink = "No." = FIELD("Existing Item No.");
                 RunPageView = SORTING("No.")
                               ORDER(Ascending);

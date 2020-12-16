@@ -248,7 +248,7 @@ page 6151259 "NPR Retail Owner RC"
                     ApplicationArea = Basic, Suite;
                     Caption = 'Retail Item List';
                     Image = Item;
-                    RunObject = Page "NPR Retail Item List";
+                    RunObject = Page "Item List";
                     ToolTip = 'View or edit detailed information for the products that you trade in. The item card can be of type Inventory or Service to specify if the item is a physical unit or a labor time unit. Here you also define if items in inventory or on incoming orders are automatically reserved for outbound documents and whether order tracking links are created between demand and supply to reflect planning actions.';
                 }
                 action("Salespeople/Purchasers")

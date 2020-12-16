@@ -90,7 +90,7 @@ page 6151263 "NPR Retail Ticket Role Center"
             {
                 Caption = 'Items';
                 Image = Item;
-                RunObject = Page "NPR Retail Item List";
+                RunObject = Page "Item List";
                 ApplicationArea = All;
             }
             action(Contacts)
@@ -162,7 +162,7 @@ page 6151263 "NPR Retail Ticket Role Center"
             {
                 Caption = 'Item List';
                 Image = List;
-                RunObject = Page "NPR Retail Item List";
+                RunObject = Page "Item List";
                 ApplicationArea = All;
             }
             action("Sales Price &Worksheet")

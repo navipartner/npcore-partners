@@ -94,7 +94,7 @@ page 6060149 "NPR RC Member Mgr RoleCenter"
             {
                 Caption = 'Items';
                 Image = Item;
-                RunObject = Page "NPR Retail Item List";
+                RunObject = Page "Item List";
                 ApplicationArea = All;
             }
             action(Contacts)
@@ -166,7 +166,7 @@ page 6060149 "NPR RC Member Mgr RoleCenter"
             {
                 Caption = 'Item List';
                 Image = List;
-                RunObject = Page "NPR Retail Item List";
+                RunObject = Page "Item List";
                 ApplicationArea = All;
             }
             action("Sales Price &Worksheet")

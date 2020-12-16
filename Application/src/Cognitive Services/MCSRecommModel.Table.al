@@ -192,7 +192,7 @@ table 6060081 "NPR MCS Recomm. Model"
     local procedure LookupItemView()
     var
         Item: Record Item;
-        RetailItemList: Page "NPR Retail Item List";
+        RetailItemList: Page "Item List";
     begin
         if "Item View" <> '' then begin
             Item.SetView("Item View");

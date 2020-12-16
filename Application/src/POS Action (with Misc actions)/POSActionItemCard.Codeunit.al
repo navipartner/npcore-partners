@@ -57,7 +57,7 @@ codeunit 6150827 "NPR POS Action: Item Card"
         LinePOS: Record "NPR Sale Line POS";
         Item: Record Item;
         CurrentView: Codeunit "NPR POS View";
-        RetailItemCard: Page "NPR Retail Item Card";
+        RetailItemCard: Page "Item Card";
     begin
         JSON.InitializeJObjectParser(Context, FrontEnd);
         POSSession.GetCurrentView(CurrentView);
