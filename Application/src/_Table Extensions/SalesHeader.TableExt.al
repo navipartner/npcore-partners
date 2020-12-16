@@ -36,7 +36,7 @@ tableextension 6014432 "NPR Sales Header" extends "Sales Header"
         }
         field(6014402; "NPR Sale Total"; Decimal)
         {
-            CalcFormula = Sum ("Sales Line"."Outstanding Amount" WHERE("Document Type" = FIELD("Document Type"),
+            CalcFormula = Sum("Sales Line"."Outstanding Amount" WHERE("Document Type" = FIELD("Document Type"),
                                                                        "Document No." = FIELD("No.")));
             Caption = 'Sale Total';
             Description = 'NPR7.100.000';
@@ -101,7 +101,7 @@ tableextension 6014432 "NPR Sales Header" extends "Sales Header"
         }
         field(6151400; "NPR Magento Payment Amount"; Decimal)
         {
-            CalcFormula = Sum ("NPR Magento Payment Line".Amount WHERE("Document Table No." = CONST(36),
+            CalcFormula = Sum("NPR Magento Payment Line".Amount WHERE("Document Table No." = CONST(36),
                                                                    "Document Type" = FIELD("Document Type"),
                                                                    "Document No." = FIELD("No.")));
             Caption = 'Payment Amount';
@@ -121,6 +121,13 @@ tableextension 6014432 "NPR Sales Header" extends "Sales Header"
             DataClassification = CustomerContent;
             Description = 'MAG2.00';
         }
+
+        field(6151420; "NPR Magento Coupon"; Text[20])
+        {
+            Caption = 'Magento Coupon';
+            DataClassification = CustomerContent;
+        }
+
     }
 }
 
