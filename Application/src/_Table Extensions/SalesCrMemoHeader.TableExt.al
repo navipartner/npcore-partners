@@ -89,6 +89,12 @@ tableextension 6014407 "NPR Sales Cr.Memo Header" extends "Sales Cr.Memo Header"
             Description = 'MAG2.12';
             DataClassification = CustomerContent;
         }
+
+        field(6151420; "NPR Magento Coupon"; Text[20])
+        {
+            Caption = 'Magento Coupon';
+            DataClassification = CustomerContent;           
+        }
     }
 }
 
