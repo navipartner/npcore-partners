@@ -18,7 +18,7 @@ codeunit 6060085 "NPR MCS Select Recom. Sales"
         TempItem: Record Item temporary;
         SalesLine: Record "Sales Line";
         MCSRecommendationsHandler: Codeunit "NPR MCS Recomm. Handler";
-        RetailItemList: Page "NPR Retail Item List";
+        RetailItemList: Page "Item List";
         ItemFilter: Text;
     begin
         MCSRecommendationsSetup.Get;
@@ -30,7 +30,7 @@ codeunit 6060085 "NPR MCS Select Recom. Sales"
         MCSRecommendationsHandler.GetRecommendationsLinesFromSales(SalesHeader, TempMCSRecommendationsLine);
         MCSRecommendationsHandler.GetItemListFromRecommendations(TempItem, TempMCSRecommendationsLine, MCSRecommendationsSetup."Max. Rec. per Sales Document");
 
-        if PAGE.RunModal(PAGE::"NPR Retail Item List", TempItem) = ACTION::LookupOK then begin
+        if PAGE.RunModal(PAGE::"Item List", TempItem) = ACTION::LookupOK then begin
             TempMCSRecommendationsLine.SetRange("Item No.", TempItem."No.");
             if TempMCSRecommendationsLine.FindFirst then
                 TempMCSRecommendationsLine.LogSelectRecommendedItem;

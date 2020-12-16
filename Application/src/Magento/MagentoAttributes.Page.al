@@ -176,7 +176,7 @@ page 6151431 "NPR Magento Attributes"
                     end;
                 end;
             until MagentoItemAttribute.Next = 0;
-        PAGE.Run(PAGE::"NPR Retail Item List", TempItem);
+        PAGE.Run(PAGE::"Item List", TempItem);
         //+MAG1.02
     end;
 

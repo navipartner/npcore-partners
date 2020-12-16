@@ -107,7 +107,7 @@ page 6059982 "NPR Web Processor Role Center"
             action("Item List")
             {
                 Caption = 'Item List';
-                RunObject = Page "NPR Retail Item List";
+                RunObject = Page "Item List";
                 ApplicationArea = All;
             }
             action("Item Groups")

@@ -206,7 +206,7 @@
                 Image = ItemLines;
                 Promoted = true;
                 PromotedCategory = Process;
-                RunObject = Page "NPR Retail Item List";
+                RunObject = Page "Item List";
                 RunPageLink = "NPR Ticket Type" = FIELD(Code);
 
             }

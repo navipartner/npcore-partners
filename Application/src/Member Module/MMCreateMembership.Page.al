@@ -92,7 +92,7 @@ page 6060139 "NPR MM Create Membership"
             {
                 Caption = 'Item List';
                 Image = List;
-                RunObject = Page "NPR Retail Item List";
+                RunObject = Page "Item List";
                 ApplicationArea = All;
             }
             action(Memberships)

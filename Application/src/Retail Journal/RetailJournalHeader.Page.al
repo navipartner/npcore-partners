@@ -657,7 +657,7 @@ page 6014490 "NPR Retail Journal Header"
 
                     trigger OnAction()
                     var
-                        ItemCard: Page "NPR Retail Item Card";
+                        ItemCard: Page "Item Card";
                         "Retail Journal Line": Record "NPR Retail Journal Line";
                         Item: Record Item;
                     begin

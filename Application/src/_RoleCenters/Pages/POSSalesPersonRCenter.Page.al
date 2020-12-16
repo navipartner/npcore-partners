@@ -93,7 +93,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
             action("Retail Item List")
             {
                 Caption = 'Retail Item List';
-                RunObject = Page "NPR Retail Item List";
+                RunObject = Page "Item List";
                 ApplicationArea = All;
             }
         }
@@ -374,7 +374,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                 action(Action6014418)
                 {
                     Caption = 'Retail Item List';
-                    RunObject = Page "NPR Retail Item List";
+                    RunObject = Page "Item List";
                     ApplicationArea = All;
                 }
                 action("Item Group Tree")
@@ -446,7 +446,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                 action(Items)
                 {
                     Caption = 'Items';
-                    RunObject = Page "NPR Retail Item List";
+                    RunObject = Page "Item List";
                     RunPageView = WHERE("NPR Magento Item" = CONST(true));
                     ApplicationArea = All;
                 }

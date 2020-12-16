@@ -290,10 +290,7 @@ page 6060052 "NPR Item Worksh. Attr. FactBox"
 
     procedure ShowDetails()
     begin
-        //-NPR [224751]
-        //PAGE.RUN(PAGE::"Item Card",Rec);
-        PAGE.Run(PAGE::"NPR Retail Item Card", Rec);
-        //+NPR [224751]
+        PAGE.Run(PAGE::"Item Card", Rec);
     end;
 }
 

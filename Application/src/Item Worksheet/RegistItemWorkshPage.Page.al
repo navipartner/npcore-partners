@@ -306,7 +306,7 @@ page 6060047 "NPR Regist. Item Worksh. Page"
             {
                 Caption = 'Item';
                 Image = Item;
-                RunObject = Page "NPR Retail Item Card";
+                RunObject = Page "Item Card";
                 RunPageLink = "No." = FIELD("Item No.");
                 RunPageView = SORTING("No.")
                               ORDER(Ascending);

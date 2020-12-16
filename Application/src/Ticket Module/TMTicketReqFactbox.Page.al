@@ -325,10 +325,7 @@
 
     procedure ShowDetails()
     begin
-        //-NPR4.21
-        //PAGE.RUN(PAGE::"Item Card",Rec);
-        PAGE.Run(PAGE::"NPR Retail Item Card", Rec);
-        //+NPR4.21
+        PAGE.Run(PAGE::"Item Card", Rec);
     end;
 }
 

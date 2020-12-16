@@ -1,12 +1,7 @@
 tableextension 6014427 "NPR Item" extends Item
 {
-    // NPR5.51/BHR /20190730  CASE 361929 Increase size of fiels season from 3 to 10
-    // NPR5.51/BHR /20190801  CASE 363493 Set property Width of Field Description to 50
-    // NPR5.51/ZESO/20190828  CASE 365796 Added field 6014642 Shelf Label Type
-    // NPR5.55/ALPO/20200708  CASE 382428 Added field 6014514 Rest. Item Routing Profile
-
-    LookupPageID = "NPR Retail Item List";
-    DrillDownPageID = "NPR Retail Item List";
+    LookupPageID = "Item List";
+    DrillDownPageID = "Item List";
     fields
     {
         modify(Description)
@@ -34,7 +29,7 @@ tableextension 6014427 "NPR Item" extends Item
         }
         field(6014409; "NPR Create Alt. No. Automatic"; Boolean)
         {
-            CalcFormula = Lookup ("NPR Variety Setup"."Create Alt. No. automatic");
+            CalcFormula = Lookup("NPR Variety Setup"."Create Alt. No. automatic");
             Caption = 'Create Alt. No. Automatic';
             Description = 'NPR5.30';
             Editable = false;
@@ -121,7 +116,7 @@ tableextension 6014427 "NPR Item" extends Item
         }
         field(6014506; "NPR Has Accessories"; Boolean)
         {
-            CalcFormula = Exist ("NPR Accessory/Spare Part" WHERE(Code = FIELD("No.")));
+            CalcFormula = Exist("NPR Accessory/Spare Part" WHERE(Code = FIELD("No.")));
             Caption = 'Has Accessories';
             Description = 'NPR5.40';
             FieldClass = FlowField;
@@ -159,7 +154,7 @@ tableextension 6014427 "NPR Item" extends Item
         }
         field(6014609; "NPR Has Variants"; Boolean)
         {
-            CalcFormula = Exist ("Item Variant" WHERE("Item No." = FIELD("No.")));
+            CalcFormula = Exist("Item Variant" WHERE("Item No." = FIELD("No.")));
             Caption = 'Has Variants';
             Description = 'NPR7.100.000';
             FieldClass = FlowField;
@@ -414,12 +409,34 @@ tableextension 6014427 "NPR Item" extends Item
         }
         field(6151495; "NPR Custom Options"; Integer)
         {
-            CalcFormula = Count ("NPR Magento Item Custom Option" WHERE("Item No." = FIELD("No."),
+            CalcFormula = Count("NPR Magento Item Custom Option" WHERE("Item No." = FIELD("No."),
                                                                     Enabled = CONST(true)));
             Caption = 'Custom Options';
             Description = 'MAG2.00';
             Editable = false;
             FieldClass = FlowField;
+        }
+
+        field(6151496; "NPR Has Mixed Discount"; Boolean)
+        {
+            Caption = 'Has Mixed Discount';
+            FieldClass = FlowField;
+            CalcFormula = Exist("NPR Mixed Discount Line" where("No." = field("No.")));
+            Editable = false;
+        }
+        field(6151497; "NPR Has Quantity Discount"; Boolean)
+        {
+            Caption = 'Has Quantity Discount';
+            FieldClass = FlowField;
+            CalcFormula = Exist("NPR Quantity Discount Line" where("Item No." = field("No.")));
+            Editable = false;
+        }
+        field(6151498; "NPR Has Period Discount"; Boolean)
+        {
+            Caption = 'Has Period Discount';
+            FieldClass = FlowField;
+            CalcFormula = Exist("NPR Period Discount Line" where("Item No." = field("No.")));
+            Editable = false;
         }
         field(6151500; "NPR Magento Pict. Variety Type"; Option)
         {
