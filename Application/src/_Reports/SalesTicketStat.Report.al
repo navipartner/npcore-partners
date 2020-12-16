@@ -17,7 +17,7 @@ report 6014409 "NPR Sales Ticket Stat."
     // NPR5.55/ZESO/20200505 CASE 398134 Calculate Click and Collect Sales + Remove from Debit Sale Value
     // NPR5.55/ANPA/20200505 CASE 402923 Removed ':' from ProfitExcVat_Caption
     DefaultLayout = RDLC;
-    RDLCLayout = './src/_Reports/layouts/Sales Ticket Statistics.rdlc';
+    RDLCLayout = './src/_Reports/layouts/NPR Sales Ticket Statistics.rdlc';
 
     Caption = 'Sale Statistics';
     UsageCategory = ReportsAndAnalysis;
@@ -581,8 +581,80 @@ report 6014409 "NPR Sales Ticket Stat."
                 SetRange("Processing Type", "Processing Type"::"Manual Card");
             end;
         }
-    }
 
+        dataitem(ForeignCreditVoucher; "NPR Payment Type POS")
+        {
+            CalcFields = "Amount in Audit Roll";
+            DataItemTableView = SORTING("No.", "Register No.") ORDER(Ascending);
+            column(No_ForeignCreditVoucher; ForeignCreditVoucher."No.")
+            {
+            }
+            column(RegisterNo_ForeignCreditVoucher; ForeignCreditVoucher."Register No.")
+            {
+            }
+            column(Description_ForeignCreditVoucher; ForeignCreditVoucher.Description)
+            {
+            }
+            column(Amountinauditroll_ForeignCreditVoucher; ForeignCreditVoucher."Amount in Audit Roll")
+            {
+            }
+
+            trigger OnPreDataItem()
+            begin
+                PaymentTypePeriod.CopyFilter("Date Filter", ForeignCreditVoucher."Date Filter");
+                PaymentTypePeriod.CopyFilter("Register Filter", ForeignCreditVoucher."Register Filter");
+                SetRange("Processing Type", "Processing Type"::"Foreign Credit Voucher");
+            end;
+        }
+        dataitem(ElectronicFundsTransfer; "NPR Payment Type POS")
+        {
+            CalcFields = "Amount in Audit Roll";
+            DataItemTableView = SORTING("No.", "Register No.") ORDER(Ascending);
+            column(No_ElectronicFundsTransfer; ElectronicFundsTransfer."No.")
+            {
+            }
+            column(RegisterNo_ElectronicFundsTransfer; ElectronicFundsTransfer."Register No.")
+            {
+            }
+            column(Description_ElectronicFundsTransfer; ElectronicFundsTransfer.Description)
+            {
+            }
+            column(Amountinauditroll_ElectronicFundsTransfer; ElectronicFundsTransfer."Amount in Audit Roll")
+            {
+            }
+
+            trigger OnPreDataItem()
+            begin
+                PaymentTypePeriod.CopyFilter("Date Filter", ElectronicFundsTransfer."Date Filter");
+                PaymentTypePeriod.CopyFilter("Register Filter", ElectronicFundsTransfer."Register Filter");
+                SetRange("Processing Type", "Processing Type"::"EFT");
+            end;
+        }
+         dataitem(CashPayment; "NPR Payment Type POS")
+        {
+            CalcFields = "Amount in Audit Roll";
+            DataItemTableView = SORTING("No.", "Register No.") ORDER(Ascending);
+            column(No_CashPayment; CashPayment."No.")
+            {
+            }
+            column(RegisterNo_CashPayment; CashPayment."Register No.")
+            {
+            }
+            column(Description_CashPayment; CashPayment.Description)
+            {
+            }
+            column(Amountinauditroll_CashPayment; CashPayment."Amount in Audit Roll")
+            {
+            }
+
+            trigger OnPreDataItem()
+            begin
+                PaymentTypePeriod.CopyFilter("Date Filter", CashPayment."Date Filter");
+                PaymentTypePeriod.CopyFilter("Register Filter", CashPayment."Register Filter");
+                SetRange("Processing Type", "Processing Type"::"Cash");
+            end;
+        }
+    }
     requestpage
     {
 
@@ -641,16 +713,20 @@ report 6014409 "NPR Sales Ticket Stat."
         Avg_Caption = 'Avg.';
         Debit_Caption = 'Credit';
         Credit_Caption = 'Credit';
-        Total_Caption = 'Total';
+        Total_Caption = 'Total (rounded)';
         PaymentType_Caption = 'Payment Type:';
         RegisterFilter_Caption = 'Register Filter';
         DateFilter_Caption = 'Date Filter';
         DateFilter_LY_Caption = 'Date Filter last year';
+        Betalt_med_Cash = 'Payment Type:';
         Betalt_med_Caption = 'Payment Type:';
         Betalt_med_Gavekort = 'Payment Type:';
         Betalt_med_Tilgod = 'Payment Type:';
         Betalt_med_Dankort = 'Payment Type:';
+        Betalt_med_gammelt_gavekort = 'Payment Type:';
+        Betalt_med_MobilePay = 'Payment Type:';
         Betalt_med_Teleterminal = 'Payment Type:';
+        Total_payment_type = 'Total';
         Manuelle_kort_ = 'Payment Type:';
         ProfitExcVat_Caption = 'Profit Excl. VAT';
         AdjustedCost_Caption = 'Adjusted Cost Details:';
