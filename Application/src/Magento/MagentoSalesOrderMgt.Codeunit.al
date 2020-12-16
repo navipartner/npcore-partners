@@ -617,6 +617,9 @@ codeunit 6151413 "NPR Magento Sales Order Mgt."
         SalesHeader."Sell-to Country/Region Code" := NpXmlDomMgt.GetElementCode(XmlElement2, 'country_code', MaxStrLen(SalesHeader."Sell-to Country/Region Code"), false);
         SalesHeader."Sell-to Contact" := NpXmlDomMgt.GetElementText(XmlElement2, 'contact', MaxStrLen(SalesHeader."Sell-to Contact"), false);
 
+        SalesHeader."NPR Magento Coupon" := NpXmlDomMgt.GetXmlText(XmlElement, 'magento_coupon', MAXSTRLEN(SalesHeader."NPR Magento Coupon"), FALSE);
+
+
         RecRef.GetTable(SalesHeader);
         SetFieldText(RecRef, 171, NpXmlDomMgt.GetXmlText(XmlElement2, 'phone', MaxStrLen(Customer."Phone No."), false));
         SetFieldText(RecRef, 13605, NpXmlDomMgt.GetXmlText(XmlElement2, 'phone', MaxStrLen(Customer."Phone No."), false));
