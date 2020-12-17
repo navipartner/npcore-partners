@@ -1,12 +1,5 @@
 table 6150628 "NPR POS Payment Bin Checkp."
 {
-    // NPR5.36/NPKNAV/20171003  CASE 282251 Transport NPR5.36 - 3 October 2017
-    // NPR5.43/TSA /20180605 CASE 311964 Added Type, "Transfer In Amount", "Transfer Out Amount"
-    // NPR5.45/TSA /20180726 CASE 322769 Added field "Include In Counting"Option
-    // NPR5.46/TSA /20181002 CASE 322769 Added open Auto to field "Include In Counting"
-    // NPR5.47/TSA /20181018 CASE 322769 Added lookup filters to "Bank Deposit Bin Code", "Move to Bin Code"
-    // NPR5.49/TSA /20190315 CASE 348458 Added "POS Unit No. Filter" to be used in the "Payment Bin Entry Amount" "Payment Bin Entry Amount (LCY)" flowfields
-
     Caption = 'POS Payment Bin Checkpoint';
     DataClassification = CustomerContent;
     DataCaptionFields = "Payment Bin No.", "Payment Type No.", Description;
@@ -133,7 +126,7 @@ table 6150628 "NPR POS Payment Bin Checkp."
         }
         field(100; "Payment Bin Entry Amount"; Decimal)
         {
-            CalcFormula = Sum ("NPR POS Bin Entry"."Transaction Amount" WHERE("Entry No." = FIELD(UPPERLIMIT("Payment Bin Entry No. Filter")),
+            CalcFormula = Sum("NPR POS Bin Entry"."Transaction Amount" WHERE("Entry No." = FIELD(UPPERLIMIT("Payment Bin Entry No. Filter")),
                                                                           "Payment Bin No." = FIELD("Payment Bin No."),
                                                                           "Payment Type Code" = FIELD("Payment Type No."),
                                                                           "POS Unit No." = FIELD("POS Unit No. Filter")));
@@ -143,7 +136,7 @@ table 6150628 "NPR POS Payment Bin Checkp."
         }
         field(101; "Payment Bin Entry Amount (LCY)"; Decimal)
         {
-            CalcFormula = Sum ("NPR POS Bin Entry"."Transaction Amount (LCY)" WHERE("Entry No." = FIELD(UPPERLIMIT("Payment Bin Entry No. Filter")),
+            CalcFormula = Sum("NPR POS Bin Entry"."Transaction Amount (LCY)" WHERE("Entry No." = FIELD(UPPERLIMIT("Payment Bin Entry No. Filter")),
                                                                                 "Payment Bin No." = FIELD("Payment Bin No."),
                                                                                 "Payment Type Code" = FIELD("Payment Type No."),
                                                                                 "POS Unit No." = FIELD("POS Unit No. Filter")));
@@ -204,6 +197,9 @@ table 6150628 "NPR POS Payment Bin Checkp."
     keys
     {
         key(Key1; "Entry No.")
+        {
+        }
+        key(Key2; "Workshift Checkpoint Entry No.")
         {
         }
     }

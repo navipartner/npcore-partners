@@ -1,28 +1,5 @@
 table 6150627 "NPR POS Workshift Checkpoint"
 {
-    // NPR5.36/TSA/20170627  CASE 282251 Refactoring balancing functionality
-    // NPR5.40/TSA /20180216 CASE 282251 Added 4xx, 5xx fields
-    // NPR5.43/TSA /20180427 CASE 311964 Added option field Type
-    // NPR5.43/TSA /20180607 CASE 318028 Added "Perpetual Sales (LCY)", "Perpetual Return Sales (LCY)",
-    //                                         "POS Unit No. Filter", "POS Entry No. Filter", "Type Filter"
-    //                                         "FF Total Sales (LCY)", "FF Total Return Sale (LCY)"
-    // NPR5.45/TSA /20180719 CASE 322769 Refactoring Renamed fields
-    // NPR5.48/MMV /20181029 CASE 318028 Renamed sale types: Cash Sale -> Direct Sale, Debtor/Debit Sale -> Credit Sale
-    //                                   Added new sum fields for auditing purposes.
-    // NPR5.48/TSA /20190111 CASE 339571 Added new fields 170-173: "Credit Real. Sale Amt. (LCY)", "Credit Unreal. Sale Amt. (LCY)", "Credit Real. Return Amt. (LCY)", "Credit Unreal. Ret. Amt. (LCY)"
-    // NPR5.48/TSA /20190111 CASE 339571 Renamed 160, 165, to include the word Direct
-    // NPR5.48/TSA /20190111 CASE 339571 Added 180,181 "Credit Turnover (LCY)", "Credit Net Turnover (LCY)"
-    // NPR5.48/TSA /20190111 CASE 339571 Added 134, "Direct Net Turnover (LCY)"
-    // NPR5.48/TSA /20190111 CASE 339571 Renamed 30 to "Credit Item Sales (LCY)", 37 from Invoice Sales (LCY) -> "Credit Net Sales Amount (LCY)"
-    // NPR5.48/TSA /20190111 CASE 339571 Added 39 Credit Sales Amount (LCY)
-    // NPR5.48/TSA /20190111 CASE 339571 Added 201 Total Net Discount (LCY), 121 Direct Net Sales (LCY)
-    // NPR5.49/TSA /20190312 CASE 347324 Changed "Credit Item Quantity Sum" from Integer To Decimal
-    // NPR5.49/TSA /20190312 CASE 348458 Added type Type::WORKSHIFT_CLOSE
-    // NPR5.49/TSA /20190315 CASE 348458 Added field "Consolidated With Entry No."
-    // NPR5.51/MMV /20190611 CASE 356076 Added field 11. Blanked option "YREPORT" on field 8.
-    //                                   Renamed a bunch of fields to better signal intent and align with POS entry totalling fields.
-    // NPR5.51/SARA/20190807 CASE 363578 Added page 'POS Workshift Checkpoints' as LookupPageID and DrillDownPageID
-
     Caption = 'POS Workshift Checkpoint';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR POS Workshift Checkpoints";
@@ -470,7 +447,7 @@ table 6150627 "NPR POS Workshift Checkpoint"
         }
         field(3120; "FF Total Dir. Item Sales (LCY)"; Decimal)
         {
-            CalcFormula = Sum ("NPR POS Workshift Checkpoint"."Direct Item Sales (LCY)" WHERE("POS Unit No." = FIELD("POS Unit No. Filter"),
+            CalcFormula = Sum("NPR POS Workshift Checkpoint"."Direct Item Sales (LCY)" WHERE("POS Unit No." = FIELD("POS Unit No. Filter"),
                                                                                           Type = FIELD("Type Filter"),
                                                                                           "POS Entry No." = FIELD("POS Entry No. Filter"),
                                                                                           Open = FIELD("Open Filter")));
@@ -479,7 +456,7 @@ table 6150627 "NPR POS Workshift Checkpoint"
         }
         field(3160; "FF Total Dir. Item Return(LCY)"; Decimal)
         {
-            CalcFormula = Sum ("NPR POS Workshift Checkpoint"."Direct Item Returns (LCY)" WHERE("POS Unit No." = FIELD("POS Unit No. Filter"),
+            CalcFormula = Sum("NPR POS Workshift Checkpoint"."Direct Item Returns (LCY)" WHERE("POS Unit No." = FIELD("POS Unit No. Filter"),
                                                                                             Type = FIELD("Type Filter"),
                                                                                             "POS Entry No." = FIELD("POS Entry No. Filter"),
                                                                                             Open = FIELD("Open Filter")));
@@ -488,7 +465,7 @@ table 6150627 "NPR POS Workshift Checkpoint"
         }
         field(3170; "FF Total Dir. Turnover (LCY)"; Decimal)
         {
-            CalcFormula = Sum ("NPR POS Workshift Checkpoint"."Direct Turnover (LCY)" WHERE("POS Unit No." = FIELD("POS Unit No. Filter"),
+            CalcFormula = Sum("NPR POS Workshift Checkpoint"."Direct Turnover (LCY)" WHERE("POS Unit No." = FIELD("POS Unit No. Filter"),
                                                                                         Type = FIELD("Type Filter"),
                                                                                         "POS Entry No." = FIELD("POS Entry No. Filter"),
                                                                                         Open = FIELD("Open Filter")));
@@ -497,7 +474,7 @@ table 6150627 "NPR POS Workshift Checkpoint"
         }
         field(3180; "FF Total Dir. Neg. Turn. (LCY)"; Decimal)
         {
-            CalcFormula = Sum ("NPR POS Workshift Checkpoint"."Direct Negative Turnover (LCY)" WHERE("POS Unit No." = FIELD("POS Unit No. Filter"),
+            CalcFormula = Sum("NPR POS Workshift Checkpoint"."Direct Negative Turnover (LCY)" WHERE("POS Unit No." = FIELD("POS Unit No. Filter"),
                                                                                                  Type = FIELD("Type Filter"),
                                                                                                  "POS Entry No." = FIELD("POS Entry No. Filter"),
                                                                                                  Open = FIELD("Open Filter")));
@@ -506,7 +483,7 @@ table 6150627 "NPR POS Workshift Checkpoint"
         }
         field(3190; "FF Total Rounding Amt. (LCY)"; Decimal)
         {
-            CalcFormula = Sum ("NPR POS Workshift Checkpoint"."Rounding (LCY)" WHERE("POS Unit No." = FIELD("POS Unit No. Filter"),
+            CalcFormula = Sum("NPR POS Workshift Checkpoint"."Rounding (LCY)" WHERE("POS Unit No." = FIELD("POS Unit No. Filter"),
                                                                                  Type = FIELD("Type Filter"),
                                                                                  "POS Entry No." = FIELD("POS Entry No. Filter"),
                                                                                  Open = FIELD("Open Filter")));
@@ -518,6 +495,15 @@ table 6150627 "NPR POS Workshift Checkpoint"
     keys
     {
         key(Key1; "Entry No.")
+        {
+        }
+        key(Key2; "Consolidated With Entry No.")
+        {
+        }
+        key(Key3; "POS Unit No.", Open, "Type")
+        {
+        }
+        key(Key4; "POS Entry No.")
         {
         }
     }

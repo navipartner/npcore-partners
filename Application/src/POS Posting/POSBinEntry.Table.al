@@ -1,11 +1,5 @@
 table 6150625 "NPR POS Bin Entry"
 {
-    // NPR5.36/NPKNAV/20171003  CASE 282251 Transport NPR5.36 - 3 October 2017
-    // NPR5.40/TSA /20180301 CASE 306858 Added POS Store Code and POS Unit No.
-    // NPR5.40/TSA /20180301 CASE 306858 Added referece to pos payment line, unit and store fields
-    // NPR5.40/TSA /20180301 CASE 306858 Added key Payment Bin No.,POS Unit No.,Payment Method Code
-    // NPR5.43/TSA /20180604 CASE 311964 Added 4 Transfer Type, to be able to determine the directions of transfers.
-
     Caption = 'POS Bin Entry';
     DataClassification = CustomerContent;
 
@@ -148,7 +142,14 @@ table 6150625 "NPR POS Bin Entry"
         key(Key1; "Entry No.")
         {
         }
-        key(Key2; "Payment Bin No.", "POS Unit No.", "Payment Method Code")
+        key(Key2; "Payment Bin No.", "POS Unit No.", "Payment Method Code", "Type")
+        {
+        }
+        key(Key3; "Payment Bin No.", "POS Unit No.", "Payment Type Code")
+        {
+            SumIndexFields = "Transaction Amount", "Transaction Amount (LCY)";
+        }
+        key(Key4; "Bin Checkpoint Entry No.")
         {
         }
     }
