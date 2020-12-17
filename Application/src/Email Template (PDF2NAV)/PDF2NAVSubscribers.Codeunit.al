@@ -239,26 +239,6 @@ codeunit 6014473 "NPR PDF2NAV Subscribers"
         //+NPR5.42 [308179]
     end;
 
-    [EventSubscriber(ObjectType::Page, 138, 'OnAfterActionEvent', 'NPR SendAsPDF', true, true)]
-    local procedure Page138OnActionSendAsPDF(var Rec: Record "Purch. Inv. Header")
-    var
-        EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
-    begin
-        //-NPR5.42 [308179]
-        EmailDocMgt.SendReport(Rec, false);
-        //+NPR5.42 [308179]
-    end;
-
-    [EventSubscriber(ObjectType::Page, 138, 'OnAfterActionEvent', 'NPR EmailLog', true, true)]
-    local procedure Page138OnActionEmailLog(var Rec: Record "Purch. Inv. Header")
-    var
-        EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
-    begin
-        //-NPR5.42 [308179]
-        EmailDocMgt.RunEmailLog(Rec);
-        //+NPR5.42 [308179]
-    end;
-
     [EventSubscriber(ObjectType::Page, 140, 'OnAfterActionEvent', 'NPR SendAsPDF', true, true)]
     local procedure Page140OnActionSendAsPDF(var Rec: Record "Purch. Cr. Memo Hdr.")
     var
@@ -321,26 +301,6 @@ codeunit 6014473 "NPR PDF2NAV Subscribers"
 
     [EventSubscriber(ObjectType::Page, 438, 'OnAfterActionEvent', 'NPR EmailLog', true, true)]
     local procedure Page438OnActionEmailLog(var Rec: Record "Issued Reminder Header")
-    var
-        EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
-    begin
-        //-NPR5.42 [308179]
-        EmailDocMgt.RunEmailLog(Rec);
-        //+NPR5.42 [308179]
-    end;
-
-    [EventSubscriber(ObjectType::Page, 450, 'OnAfterActionEvent', 'NPR SendAsPDF', true, true)]
-    local procedure Page450OnActionSendAsPDF(var Rec: Record "Issued Fin. Charge Memo Header")
-    var
-        EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
-    begin
-        //-NPR5.42 [308179]
-        EmailDocMgt.SendReport(Rec, false);
-        //+NPR5.42 [308179]
-    end;
-
-    [EventSubscriber(ObjectType::Page, 450, 'OnAfterActionEvent', 'NPR EmailLog', true, true)]
-    local procedure Page450OnActionEmailLog(var Rec: Record "Issued Fin. Charge Memo Header")
     var
         EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
     begin

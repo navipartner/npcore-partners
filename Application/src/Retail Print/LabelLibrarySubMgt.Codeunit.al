@@ -65,24 +65,6 @@ codeunit 6014447 "NPR Label Library Sub. Mgt."
         PrintLabel(Rec, ReportSelectionRetail."Report Type"::"Price Label");
     end;
 
-    [EventSubscriber(ObjectType::Page, 138, 'OnAfterActionEvent', 'NPR RetailPrint', false, false)]
-    local procedure PostedPurchaseInvoiceOnAfterActionEventRetailPrint(var Rec: Record "Purch. Inv. Header")
-    begin
-        //-NPR5.51 [358287]
-        ChooseLabel(Rec);
-        //+NPR5.51 [358287]
-    end;
-
-    [EventSubscriber(ObjectType::Page, 138, 'OnAfterActionEvent', 'NPR PriceLabel', false, false)]
-    local procedure PostedPurchaseInvoiceOnAfterActionEventPriceLabel(var Rec: Record "Purch. Inv. Header")
-    var
-        ReportSelectionRetail: Record "NPR Report Selection Retail";
-    begin
-        //-NPR5.51 [358287]
-        PrintLabel(Rec, ReportSelectionRetail."Report Type"::"Price Label");
-        //+NPR5.51 [358287]
-    end;
-
     [EventSubscriber(ObjectType::Page, 40, 'OnAfterActionEvent', 'NPR PriceLabel', false, false)]
     local procedure ItemJournalOnAfterActionEventPriceLabel(var Rec: Record "Item Journal Line")
     var
