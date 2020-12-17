@@ -1,22 +1,5 @@
 codeunit 6150628 "NPR POS Payment Bin Checkpoint"
 {
-    // NPR5.36/TSA /20170705 CASE 282251 Code to fill new entities with legacy data
-    // NPR5.40/TSA /20180302 CASE 282251 Adapted for POS Entry as source CreatePosEntryBinCheckpoint()
-    // NPR5.45/TSA /20180726 CASE 322769 Included assignment of "include in counting" on record to make display selection on view
-    // NPR5.45/TSA /20180727 CASE 311964 Handling of transfered amount
-    // NPR5.48/TSA /20181219 CASE 339139 Checking if a zero calculated amount is due to zero transactions or a zero total
-    // NPR5.48/TSA /20190114 CASE 339571 Virtal counting is incorrectly detected as a transfer-out in next counting.
-    // NPR5.49/TSA /20190313 CASE 347324 Missing Store on checkpoint
-    // NPR5.49/TSA /20190315 CASE 348458 Same payment method over multiple bins on same unit was skipped.
-    // NPR5.49/TSA /20190315 CASE 348458 Added POS Unit no to filters to handle shared bins
-    // NPR5.53/TSA /20191219 CASE 383012 Added support for keeping entries with zero bin movement
-
-
-    trigger OnRun()
-    begin
-        // Test
-        // CreateAuditRollBinCheckpoint ('1', '4', 0);
-    end;
 
     var
         t001: Label 'Opening receipt is missing!';
@@ -47,10 +30,6 @@ codeunit 6150628 "NPR POS Payment Bin Checkpoint"
     var
         POSPaymentMethod: Record "NPR POS Payment Method";
     begin
-
-        //-NPR5.45 [322769]
-        //POSPaymentMethod.SETFILTER ("Include In Counting", '<>%1', POSPaymentMethod."Include In Counting"::NO);
-        //+NPR5.45 [322769]
 
         POSPaymentMethod.FindSet();
         repeat
@@ -96,10 +75,8 @@ codeunit 6150628 "NPR POS Payment Bin Checkpoint"
             exit;
 
         /* CALCULATIONS */
-
         /* SET INITIAL FILTERS */
         AuditRoll.SetFilter("Sales Ticket No.", G_ReceiptFilter);
-
 
         AuditRoll.SetRange(Type, AuditRoll.Type::Payment);
         AuditRoll.SetRange("Sale Type", AuditRoll."Sale Type"::Payment);
@@ -247,20 +224,15 @@ codeunit 6150628 "NPR POS Payment Bin Checkpoint"
         LastCheckpointEntryNo: Integer;
     begin
 
-        //-NPR5.49 [347324]
         POSUnit.Get(UnitNo);
-        //+NPR5.49 [347324]
 
         PaymentBinCheckpoint.SetFilter("Workshift Checkpoint Entry No.", '=%1', WorkshiftCheckpointEntryNo);
         PaymentBinCheckpoint.SetFilter("Payment Method No.", '=%1', PaymentMethodCode);
-        //-NPR5.49 [348458]
         PaymentBinCheckpoint.SetFilter("Payment Bin No.", '=%1', BinNo);
-        //+NPR5.49 [348458]
 
         if (not PaymentBinCheckpoint.IsEmpty()) then
             exit; // no need to create it again
 
-        // PaymentTypeNo := GetCountAsPaymentTypeCode (PaymentTypeNo);
         PaymentTypePOS.SetFilter("No.", '=%1', PaymentMethodCode);
         if (PaymentTypePOS.FindFirst()) then;
 
@@ -280,12 +252,7 @@ codeunit 6150628 "NPR POS Payment Bin Checkpoint"
 
         BinEntry."Register No." := UnitNo;
         BinEntry."POS Unit No." := UnitNo;
-
-        //-NPR5.49 [347324]
-        // BinEntry."POS Store Code" := ''; // TODO
         BinEntry."POS Store Code" := POSUnit."POS Store Code";
-        //+NPR5.49 [347324]
-
         BinEntry."Payment Type Code" := PaymentTypePOS."No.";
         BinEntry."Payment Method Code" := PaymentMethodCode;
         BinEntry.Insert();
@@ -295,79 +262,39 @@ codeunit 6150628 "NPR POS Payment Bin Checkpoint"
         PaymentBinCheckpoint."Payment Method No." := BinEntry."Payment Method Code";
         PaymentBinCheckpoint."Currency Code" := POSPaymentMethod."Currency Code";
         PaymentBinCheckpoint."Payment Bin No." := BinNo;
-        //-NPR5.45 [322769]
         PaymentBinCheckpoint."Include In Counting" := POSPaymentMethod."Include In Counting";
-        //+NPR5.45 [322769]
-
         PaymentBinCheckpoint."Created On" := CurrentDateTime();
         PaymentBinCheckpoint."Checkpoint Date" := Today;
         PaymentBinCheckpoint."Checkpoint Time" := Time;
         PaymentBinCheckpoint."Checkpoint Bin Entry No." := BinEntry."Entry No.";
         PaymentBinCheckpoint.Comment := BinEntry.Comment;
-
-        //-NPR5.49 [348458]
-        //PaymentBinCheckpoint.Description := PaymentTypePOS.Description;
         PaymentBinCheckpoint.Description := CopyStr(StrSubstNo('[%1] %2', BinNo, PaymentTypePOS.Description), 1, MaxStrLen(PaymentBinCheckpoint.Description));
-        //+NPR5.49 [348458]
-
         PaymentBinCheckpoint."Workshift Checkpoint Entry No." := WorkshiftCheckpointEntryNo;
         PaymentBinCheckpoint.Insert();
 
         PaymentBinCheckpoint."Payment Bin Entry No. Filter" := BinEntry."Entry No.";
-
-        //-NPR5.49 [348458]
         PaymentBinCheckpoint."POS Unit No. Filter" := UnitNo;
         PaymentBinCheckpoint.SetFilter("POS Unit No. Filter", '=%1', UnitNo);
-        //+NPR5.49 [348458]
 
         PaymentBinCheckpoint.CalcFields("Payment Bin Entry Amount", "Payment Bin Entry Amount (LCY)");
         PaymentBinCheckpoint."Calculated Amount Incl. Float" := PaymentBinCheckpoint."Payment Bin Entry Amount";
         PaymentBinCheckpoint."New Float Amount" := PaymentBinCheckpoint."Payment Bin Entry Amount";
 
-        //-NPR5.45 [311964]
-        // // Find previous checkpoint outbound float
-        // PreviousFloat.SETFILTER ("Entry No.", '<%1', PaymentBinCheckpoint."Entry No.");
-        // PreviousFloat.SETFILTER ("Payment Bin No.", '=%1', BinNo);
-        // PreviousFloat.SETFILTER ("Payment Method No.", '=%1', PaymentBinCheckpoint."Payment Method No.");
-        //
-        // IF (PreviousFloat.FINDLAST ()) THEN
-        //  PaymentBinCheckpoint."Float Amount" := PreviousFloat."New Float Amount";
-
         if (PaymentMethodCode = 'K') then begin
             LastCheckpointEntryNo := LastCheckpointEntryNo; // debug stop
         end;
 
-        //-NPR5.49 [348458]
-        //PreviousZReport.SETFILTER (Type, '=%1', PreviousZReport.Type::ZREPORT);
-        // PreviousZReport.SETFILTER ("POS Entry No.", '>%1', 0);
-
+        PreviousZReport.SetCurrentKey("POS Unit No.", Open, "Type");
         PreviousZReport.SetFilter(Type, '=%1|=%2', PreviousZReport.Type::ZREPORT, PreviousZReport.Type::WORKSHIFT_CLOSE);
         PreviousZReport.SetFilter(Open, '=%1', false);
-        //+NPR5.49 [348458]
-
         PreviousZReport.SetFilter("POS Unit No.", '=%1', UnitNo);
         if (PreviousZReport.FindLast()) then begin
-
-
-
-            //-NPR5.49 [348458]
-            //  PreviousBinCheckpoint.RESET ();
-            // PreviousBinCheckpoint.SETFILTER ("Workshift Checkpoint Entry No.", '=%1', PreviousZReport."Entry No.");
-            //  PreviousBinCheckpoint.SETFILTER ("Workshift Checkpoint Entry No.", '=%1', PreviousZReport."Entry No.");
-            //  PreviousBinCheckpoint.SETFILTER ("Payment Method No.", '=%1', PaymentBinCheckpoint."Payment Method No.");
-            //  PreviousBinCheckpoint.SETFILTER ("Payment Bin No.", '=%1', PaymentBinCheckpoint."Payment Bin No.");
-            //  IF (PreviousBinCheckpoint.FINDFIRST ()) THEN BEGIN
-            //
-            //    PaymentBinCheckpoint."Float Amount" := PreviousBinCheckpoint."New Float Amount";
-            //
-            //    //-NPR5.48 [339571]
-            //    POSBinEntry.SETFILTER ("Bin Checkpoint Entry No.", '=%1', PreviousBinCheckpoint."Entry No.");
-            //    IF (POSBinEntry.FINDLAST ()) THEN
-            //      LastCheckpointEntryNo := POSBinEntry."Entry No."; // Get last bin entry for checkpoint
 
             LastCheckpointEntryNo := -1;
 
             PreviousBinCheckpoint.Reset();
+            PreviousBinCheckpoint.SetCurrentKey("Workshift Checkpoint Entry No.");
+
             case PreviousZReport.Type of
                 PreviousZReport.Type::ZREPORT:
                     PreviousBinCheckpoint.SetFilter("Workshift Checkpoint Entry No.", '=%1', PreviousZReport."Entry No.");
@@ -381,7 +308,7 @@ codeunit 6150628 "NPR POS Payment Bin Checkpoint"
 
                 PaymentBinCheckpoint."Float Amount" := PreviousBinCheckpoint."New Float Amount";
 
-                //-NPR5.48 [339571]
+                POSBinEntry.SetCurrentKey("Bin Checkpoint Entry No.");
                 POSBinEntry.SetFilter("Bin Checkpoint Entry No.", '=%1', PreviousBinCheckpoint."Entry No.");
                 if (POSBinEntry.FindLast()) then
                     LastCheckpointEntryNo := POSBinEntry."Entry No."; // Get last bin entry for previous checkpoint
@@ -389,24 +316,15 @@ codeunit 6150628 "NPR POS Payment Bin Checkpoint"
 
             // Aggregate the transfers from between this checkpoint and previous
             if (LastCheckpointEntryNo >= 0) then begin
-                //-NPR5.49 [348458]
-
                 POSBinEntry.Reset();
+                POSBinEntry.SetCurrentKey("Payment Bin No.", "POS Unit No.", "Payment Method Code", "Type");
                 POSBinEntry.SetFilter("Entry No.", '>%1', LastCheckpointEntryNo);
-                // POSBinEntry.SETFILTER ("Bin Checkpoint Entry No.", '>=%1', PreviousBinCheckpoint."Entry No.");
-                //+NPR5.48 [339571]
-
                 POSBinEntry.SetFilter("Payment Bin No.", '=%1', PaymentBinCheckpoint."Payment Bin No.");
                 POSBinEntry.SetFilter("Payment Method Code", '=%1', PaymentBinCheckpoint."Payment Method No.");
-                //-NPR5.49 [348458]
                 POSBinEntry.SetFilter("POS Unit No.", '=%1', UnitNo);
-                //+NPR5.49 [348458]
-
                 POSBinEntry.SetFilter(Type, '=%1|=%2', POSBinEntry.Type::BIN_TRANSFER_IN, POSBinEntry.Type::BIN_TRANSFER_OUT);
                 if (POSBinEntry.FindSet()) then begin
-                    //-NPR5.48 [339139]
                     POSBinMovement := true;
-                    //+NPR5.48 [339139]
                     repeat
                         case POSBinEntry.Type of
                             POSBinEntry.Type::BIN_TRANSFER_IN:
@@ -417,12 +335,12 @@ codeunit 6150628 "NPR POS Payment Bin Checkpoint"
                     until (POSBinEntry.Next() = 0);
                 end;
 
-                //-NPR5.48 [339139]
                 // Check if the 0 float amount is a sum of transactions or result of zero transactions
                 if ((not POSBinMovement) and (PaymentBinCheckpoint."Calculated Amount Incl. Float" = 0)) then begin
                     POSBinEntry.SetFilter(Type, '=%1', POSBinEntry.Type::CHECKPOINT);
                     if (POSBinEntry.FindFirst()) then begin
                         POSBinEntry.Reset();
+                        POSBinEntry.SetCurrentKey("Payment Bin No.", "POS Unit No.", "Payment Method Code", "Type");
                         POSBinEntry.SetFilter("Entry No.", '%1..', POSBinEntry."Entry No.");
                         POSBinEntry.SetFilter("Payment Bin No.", '=%1', PaymentBinCheckpoint."Payment Bin No.");
                         POSBinEntry.SetFilter("Payment Method Code", '=%1', PaymentBinCheckpoint."Payment Method No.");
@@ -430,28 +348,16 @@ codeunit 6150628 "NPR POS Payment Bin Checkpoint"
                         POSBinMovement := (not POSBinEntry.IsEmpty());
                     end;
                 end;
-                //+NPR5.48 [339139]
 
             end;
         end;
-        //+NPR5.45 [311964]
 
         PaymentBinCheckpoint.Modify();
 
         BinEntry."Bin Checkpoint Entry No." := PaymentBinCheckpoint."Entry No.";
         BinEntry.Modify();
 
-        //-NPR5.48 [339139]
-        // IF (PaymentBinCheckpoint."Calculated Amount Incl. Float" = 0) THEN BEGIN
-        //  BinEntry.DELETE();
-        //  PaymentBinCheckpoint.DELETE();
-        // END;
-
         if ((not POSBinMovement) and (PaymentBinCheckpoint."Calculated Amount Incl. Float" = 0)) then begin
-
-            //-NPR5.53 [383012]
-            // BinEntry.DELETE();
-            // PaymentBinCheckpoint.DELETE();
             POSEndofDayProfile.Init();
             if (POSUnit."POS End of Day Profile" <> '') then begin
                 if (not POSEndofDayProfile.Get(POSUnit."POS End of Day Profile")) then
@@ -462,10 +368,8 @@ codeunit 6150628 "NPR POS Payment Bin Checkpoint"
                 BinEntry.Delete();
                 PaymentBinCheckpoint.Delete();
             end;
-            //-NPR5.53 [383012]
-
         end;
-        //+NPR5.48 [339139]
+
     end;
 
     procedure GetCountAsPaymentTypeCode(PaymentTypeNo: Code[10]) CountAsPaymentTypeCode: Code[10]
@@ -512,16 +416,17 @@ codeunit 6150628 "NPR POS Payment Bin Checkpoint"
         TargetPaymentbin: Code[10];
     begin
 
-        //-NPR5.49 [348458]
         ToPOSUnit.Get(ToUnitNo);
         FromPOSUnit.Get(FromUnitNo);
 
+        POSPaymentBinCheckpoint.SetCurrentKey("Workshift Checkpoint Entry No.");
         POSPaymentBinCheckpoint.SetFilter("Workshift Checkpoint Entry No.", '=%1', FromWorkshiftCheckpointEntryNo);
         if (POSPaymentBinCheckpoint.FindSet()) then begin
             repeat
                 POSPaymentBinCheckpoint.SetFilter("POS Unit No. Filter", '=%1', FromUnitNo);
                 POSPaymentBinCheckpoint.CalcFields("Payment Bin Entry Amount", "Payment Bin Entry Amount (LCY)");
-                // Get Source bin entry from (the checkpoint)
+
+                POSBinEntry.SetCurrentKey("Bin Checkpoint Entry No.");
                 POSBinEntry.SetFilter("Bin Checkpoint Entry No.", '=%1', POSPaymentBinCheckpoint."Entry No.");
                 if (POSBinEntry.FindFirst()) then begin
 
