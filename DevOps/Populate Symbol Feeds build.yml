@@ -204,13 +204,13 @@ jobs:
         packageId: $(packageId).Base_Application.nz #Country
       feed: $(feed)
 
-    - name: ru #Country
-      url: $(url)/ru #Country
-      appPackages:
-      - sourcePath: \Applications\BaseApp\Source\Base Application.Source.zip
-        appPath: \Applications\BaseApp\Source\Microsoft_Base Application.app
-        packageId: $(packageId).Base_Application.ru #Country
-      feed: $(feed)
+    # - name: ru #Country
+    #   url: $(url)/ru #Country
+    #   appPackages:
+    #   - sourcePath: \Applications\BaseApp\Source\Base Application.Source.zip
+    #     appPath: \Applications\BaseApp\Source\Microsoft_Base Application.app
+    #     packageId: $(packageId).Base_Application.ru #Country
+    #   feed: $(feed)
      
     - name: se #Country
       url: $(url)/se #Country
