@@ -1,11 +1,5 @@
 table 6151126 "NPR NpIa Item AddOn Line"
 {
-    // NPR5.44/MHA /20180629  CASE 286547 Object created - Item AddOn
-    // NPR5.48/MHA /20181109  CASE 334922 Extended type with Quantity and Select
-    // NPR5.52/ALPO/20190912  CASE 354309 Possibility to fix the quantity so user would not be able to change it on sale line
-    //                                    Set whether or not specified quantity is per unit of main item
-    // NPR5.55/ALPO/20200506  CASE 402585 Define whether "Unit Price" should always be applied or only when it is not equal 0
-
     Caption = 'Item AddOn Line';
     DataClassification = CustomerContent;
 
@@ -33,12 +27,10 @@ table 6151126 "NPR NpIa Item AddOn Line"
 
             trigger OnValidate()
             begin
-                //-NPR5.48 [334922]
                 if Type = Type::Select then begin
                     "Item No." := '';
                     "Variant Code" := '';
                 end;
-                //+NPR5.48 [334922]
             end;
         }
         field(15; "Item No."; Code[20])
@@ -52,34 +44,15 @@ table 6151126 "NPR NpIa Item AddOn Line"
             var
                 Item: Record Item;
             begin
-                //-NPR5.48 [334922]
-                // CASE Type OF
-                //  Type::Item:
-                //    BEGIN
-                //      IF "Item No." <> '' THEN
-                //        Item.GET("Item No.");
-                //
-                //      "Unit Price" := Item."Unit Price";
-                //      Description := Item.Description;
-                //      VALIDATE("Variant Code");
-                //    END;
-                // END;
-                //-NPR5.52 [354309]-revoked
-                //IF "Item No." = '' THEN
-                //  EXIT;
-                //+NPR5.52 [354309]-revoked
-                //-NPR5.52 [354309]
                 if "Item No." = '' then begin
-                    Init;
+                    Init();
                     exit;
                 end;
-                //+NPR5.52 [354309]
                 Item.Get("Item No.");
 
                 "Unit Price" := Item."Unit Price";
                 Description := Item.Description;
                 Validate("Variant Code");
-                //+NPR5.48 [334922]
             end;
         }
         field(20; "Variant Code"; Code[10])
@@ -92,22 +65,10 @@ table 6151126 "NPR NpIa Item AddOn Line"
             var
                 ItemVariant: Record "Item Variant";
             begin
-                //-NPR5.48 [334922]
-                // IF "Variant Code" <> '' THEN
-                //  ItemVariant.GET("Item No.","Variant Code");
-                //-NPR5.52 [354309]-revoked
-                //IF "Variant Code" = '' THEN
-                //  EXIT;
-
-                //ItemVariant.GET("Item No.","Variant Code");
-                //+NPR5.52 [354309]-revoked
-                //+NPR5.48 [334922]
-                //-NPR5.52 [354309]
                 if "Variant Code" <> '' then
                     ItemVariant.Get("Item No.", "Variant Code")
                 else
                     Clear(ItemVariant);
-                //+NPR5.52 [354309]
                 "Description 2" := ItemVariant.Description;
             end;
         }
@@ -165,10 +126,8 @@ table 6151126 "NPR NpIa Item AddOn Line"
 
             trigger OnValidate()
             begin
-                //-NPR5.52 [354309]
                 if Quantity = 0 then
                     TestField("Fixed Quantity", false);
-                //+NPR5.52 [354309]
             end;
         }
         field(110; "Fixed Quantity"; Boolean)
@@ -179,10 +138,8 @@ table 6151126 "NPR NpIa Item AddOn Line"
 
             trigger OnValidate()
             begin
-                //-NPR5.52 [354309]
                 if "Fixed Quantity" then
                     TestField(Quantity);
-                //+NPR5.52 [354309]
             end;
         }
         field(120; "Per Unit"; Boolean)
@@ -202,7 +159,6 @@ table 6151126 "NPR NpIa Item AddOn Line"
             var
                 EventSubscription: Record "Event Subscription";
             begin
-                //-NPR5.48 [334922]
                 EventSubscription.SetRange("Publisher Object Type", EventSubscription."Publisher Object Type"::Codeunit);
                 EventSubscription.SetRange("Publisher Object ID", CODEUNIT::"NPR NpIa Item AddOn Mgt.");
                 EventSubscription.SetRange("Published Function", 'OnSetupGenericParentTable');
@@ -211,14 +167,12 @@ table 6151126 "NPR NpIa Item AddOn Line"
 
                 "Before Insert Codeunit ID" := EventSubscription."Subscriber Codeunit ID";
                 "Before Insert Function" := EventSubscription."Subscriber Function";
-                //+NPR5.48 [334922]
             end;
 
             trigger OnValidate()
             var
                 EventSubscription: Record "Event Subscription";
             begin
-                //-NPR5.48 [334922]
                 if "Before Insert Codeunit ID" = 0 then begin
                     "Before Insert Function" := '';
                     exit;
@@ -230,13 +184,12 @@ table 6151126 "NPR NpIa Item AddOn Line"
                 EventSubscription.SetRange("Subscriber Codeunit ID", "Before Insert Codeunit ID");
                 if "Before Insert Function" <> '' then
                     EventSubscription.SetRange("Subscriber Function", "Before Insert Function");
-                EventSubscription.FindFirst;
-                //+NPR5.48 [334922]
+                EventSubscription.FindFirst();
             end;
         }
         field(205; "Before Insert Codeunit Name"; Text[30])
         {
-            CalcFormula = Lookup (AllObj."Object Name" WHERE("Object Type" = CONST(Codeunit),
+            CalcFormula = Lookup(AllObj."Object Name" WHERE("Object Type" = CONST(Codeunit),
                                                              "Object ID" = FIELD("Before Insert Codeunit ID")));
             Caption = 'Before Insert Codeunit Name';
             Description = 'NPR5.48';
@@ -253,7 +206,6 @@ table 6151126 "NPR NpIa Item AddOn Line"
             var
                 EventSubscription: Record "Event Subscription";
             begin
-                //-NPR5.48 [334922]
                 EventSubscription.SetRange("Publisher Object Type", EventSubscription."Publisher Object Type"::Codeunit);
                 EventSubscription.SetRange("Publisher Object ID", CODEUNIT::"NPR NpIa Item AddOn Mgt.");
                 EventSubscription.SetRange("Published Function", 'BeforeInsertPOSAddOnLine');
@@ -262,14 +214,12 @@ table 6151126 "NPR NpIa Item AddOn Line"
 
                 "Before Insert Codeunit ID" := EventSubscription."Subscriber Codeunit ID";
                 "Before Insert Function" := EventSubscription."Subscriber Function";
-                //+NPR5.48 [334922]
             end;
 
             trigger OnValidate()
             var
                 EventSubscription: Record "Event Subscription";
             begin
-                //-NPR5.48 [334922]
                 if "Before Insert Function" = '' then begin
                     "Before Insert Codeunit ID" := 0;
                     exit;
@@ -285,7 +235,6 @@ table 6151126 "NPR NpIa Item AddOn Line"
 
                 EventSubscription.FindFirst;
                 "Before Insert Codeunit ID" := EventSubscription."Subscriber Codeunit ID";
-                //+NPR5.48 [334922]
             end;
         }
     }
@@ -305,30 +254,22 @@ table 6151126 "NPR NpIa Item AddOn Line"
     var
         NpIaItemAddOnLineOption: Record "NPR NpIa ItemAddOn Line Opt.";
     begin
-        //-NPR5.48 [334922]
         NpIaItemAddOnLineOption.SetRange("AddOn No.", "AddOn No.");
         NpIaItemAddOnLineOption.SetRange("AddOn Line No.", "Line No.");
         if NpIaItemAddOnLineOption.FindFirst then
-            NpIaItemAddOnLineOption.DeleteAll;
-        //+NPR5.48 [334922]
+            NpIaItemAddOnLineOption.DeleteAll();
     end;
 
     trigger OnInsert()
     begin
-        //-NPR5.48 [334922]
-        //TESTFIELD("Item No.");
         if Type = Quantity then
             TestField("Item No.");
-        //+NPR5.48 [334922]
     end;
 
     trigger OnModify()
     begin
-        //+NPR5.48 [334922]
-        //TESTFIELD("Item No.");
         if Type = Quantity then
             TestField("Item No.");
-        //+NPR5.48 [334922]
     end;
 }
 

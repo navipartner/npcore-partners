@@ -1,7 +1,5 @@
 page 6151119 "NPR NpIa ItemAddOn Sel. Vars."
 {
-    // NPR5.54/JAKUBV/20200408  CASE 374666 Transport NPR5.54 - 8 April 2020
-
     Caption = 'Select Variants';
     DeleteAllowed = false;
     InsertAllowed = false;
@@ -23,35 +21,36 @@ page 6151119 "NPR NpIa ItemAddOn Sel. Vars."
             }
             repeater(Group)
             {
-                field("Item No."; "Item No.")
+                field("Item No."; Rec."Item No.")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the number of an item.';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies a description of the entry of the product transferred from item add-on line option.';
                 }
-                field("Variant Code"; "Variant Code")
+                field("Variant Code"; Rec."Variant Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the variant of the item on the line.';
                 }
-                field("Description 2"; "Description 2")
+                field("Description 2"; Rec."Description 2")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies an additional description of the entry of the product.';
                 }
-                field(Quantity; Quantity)
+                field(Quantity; Rec.Quantity)
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies how many units are being sold.';
                 }
             }
         }
-    }
-
-    actions
-    {
     }
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
@@ -59,11 +58,11 @@ page 6151119 "NPR NpIa ItemAddOn Sel. Vars."
         Ok: Boolean;
     begin
         if CloseAction = ACTION::LookupOK then begin
-            SetRange("Variant Code", '');
-            Ok := IsEmpty;
-            SetRange("Variant Code", '');
+            Rec.SetRange("Variant Code", '');
+            Ok := Rec.IsEmpty();
+            Rec.SetRange("Variant Code", '');
             if not Ok then
-                Message(VariantIsRequiredTxt);
+                Message(VariantIsRequiredMsg);
         end else
             Ok := true;
         exit(Ok);
@@ -71,7 +70,7 @@ page 6151119 "NPR NpIa ItemAddOn Sel. Vars."
 
     var
         InstructionTxt: Label 'Some of the Item Add-Ons require a variant code to be specified. Please fill in the variant codes in each of the following lines';
-        VariantIsRequiredTxt: Label 'Variant Code must be specified in all lines.';
+        VariantIsRequiredMsg: Label 'Variant Code must be specified in all lines.';
 
     local procedure GenerateInstructions(): Text
     begin

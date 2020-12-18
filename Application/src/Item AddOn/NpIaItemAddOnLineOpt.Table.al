@@ -1,14 +1,8 @@
 table 6151128 "NPR NpIa ItemAddOn Line Opt."
 {
-    // NPR5.48/MHA /20181109  CASE 334922 Object created - Option for Item AddOn Line Type Select
-    // NPR5.52/ALPO/20190912  CASE 354309 Possibility to fix the quantity so user would not be able to change it on sale line
-    //                                    Possibility to predefine unit price and line discount % for Item AddOn entries set as select options
-    //                                    Set whether or not specified quantity is per unit of main item
-    // NPR5.55/ALPO/20200506  CASE 402585 Define whether "Unit Price" should always be applied or only when it is not equal 0
-
     Caption = 'Item AddOn Line Option';
     DataClassification = CustomerContent;
-
+    
     fields
     {
         field(1; "AddOn No."; Code[20])
@@ -38,19 +32,13 @@ table 6151128 "NPR NpIa ItemAddOn Line Opt."
             var
                 Item: Record Item;
             begin
-                //-NPR5.52 [354309]-revoked
-                //IF "Item No." <> '' THEN
-                //  Item.GET("Item No.");
-                //+NPR5.52 [354309]-revoked
-                //-NPR5.52 [354309]
                 if "Item No." = '' then begin
-                    Init;
+                    Init();
                     exit;
                 end;
                 Item.Get("Item No.");
 
                 "Unit Price" := Item."Unit Price";
-                //+NPR5.52 [354309]
                 Description := Item.Description;
                 Validate("Variant Code");
             end;
@@ -67,10 +55,8 @@ table 6151128 "NPR NpIa ItemAddOn Line Opt."
             begin
                 if "Variant Code" <> '' then
                     ItemVariant.Get("Item No.", "Variant Code")
-                //-NPR5.52 [354309]
                 else
                     Clear(ItemVariant);
-                //+NPR5.52 [354309]
 
                 "Description 2" := ItemVariant.Description;
             end;
@@ -94,10 +80,8 @@ table 6151128 "NPR NpIa ItemAddOn Line Opt."
 
             trigger OnValidate()
             begin
-                //-NPR5.52 [354309]
                 if Quantity = 0 then
                     TestField("Fixed Quantity", false);
-                //+NPR5.52 [354309]
             end;
         }
         field(40; "Fixed Quantity"; Boolean)
@@ -108,10 +92,8 @@ table 6151128 "NPR NpIa ItemAddOn Line Opt."
 
             trigger OnValidate()
             begin
-                //-NPR5.52 [354309]
                 if "Fixed Quantity" then
                     TestField(Quantity);
-                //+NPR5.52 [354309]
             end;
         }
         field(49; "Use Unit Price"; Option)

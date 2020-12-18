@@ -131,10 +131,10 @@ codeunit 6151128 "NPR POS Action: Run Item AddOn"
         POSSession: Codeunit "NPR POS Session";
         NpIaItemAddOnMgt: Codeunit "NPR NpIa Item AddOn Mgt.";
         POSJavaScriptInterface: Codeunit "NPR POS JavaScript Interface";
-        AddOnLines: DotNet JToken;
+        AddOnLines: JsonToken;
         AppliesToLineNo: Integer;
     begin
-        AddOnLines := AddOnLines.Parse(JsonText);
+        AddOnLines.ReadFrom(JsonText);
         FrontEnd.GetSession(POSSession);
         POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);

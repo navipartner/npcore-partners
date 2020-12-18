@@ -1,11 +1,7 @@
 page 6151126 "NPR NpIa Item AddOn Card"
 {
-    // NPR5.44/MHA /20180629  CASE 286547 Object created - Item AddOn
-    // NPR5.48/MHA /20181206  CASE 334922 Added field "Comment POS Info Code"
-
     Caption = 'Item AddOn Card';
     PageType = Card;
-    UsageCategory = Administration;
     SourceTable = "NPR NpIa Item AddOn";
 
     layout
@@ -14,21 +10,25 @@ page 6151126 "NPR NpIa Item AddOn Card"
         {
             group(General)
             {
-                field("No."; "No.")
+                field("No."; Rec."No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the number of the involved entry or record.';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies a description of the item add-on.';
                 }
-                field(Enabled; Enabled)
+                field(Enabled; Rec.Enabled)
                 {
                     ApplicationArea = All;
+                    ToolTIp = 'Specifies if the current item add-on is enabled.';
                 }
-                field("Comment POS Info Code"; "Comment POS Info Code")
+                field("Comment POS Info Code"; Rec."Comment POS Info Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies POS Info Code which will be set in POS info transaction.';
                 }
             }
             part(Control6014405; "NPR NpIa Item AddOn Subform")
@@ -37,10 +37,6 @@ page 6151126 "NPR NpIa Item AddOn Card"
                 ApplicationArea = All;
             }
         }
-    }
-
-    actions
-    {
     }
 }
 
