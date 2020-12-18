@@ -1,7 +1,5 @@
 table 6151129 "NPR NpIa ItemAddOn Line Setup"
 {
-    // NPR5.48/MHA /20181109  CASE 334922 Object created - Before Insert Setup
-
     Caption = 'Item AddOn Line Option';
     DataClassification = CustomerContent;
 

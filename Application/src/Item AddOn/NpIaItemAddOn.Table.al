@@ -1,8 +1,5 @@
 table 6151125 "NPR NpIa Item AddOn"
 {
-    // NPR5.44/MHA /20180629  CASE 286547 Object created - Item AddOn
-    // NPR5.48/MHA /20181109  CASE 334922 Removed TableRelation on field 1 "No."
-
     Caption = 'Item AddOn';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR NpIa Item AddOns";
@@ -50,15 +47,13 @@ table 6151125 "NPR NpIa Item AddOn"
         NpIaItemAddOnLine: Record "NPR NpIa Item AddOn Line";
         NpIaItemAddOnLineOption: Record "NPR NpIa ItemAddOn Line Opt.";
     begin
-        //-NPR5.48 [334922]
         NpIaItemAddOnLineOption.SetRange("AddOn No.", "No.");
         if NpIaItemAddOnLineOption.FindFirst then
-            NpIaItemAddOnLineOption.DeleteAll;
+            NpIaItemAddOnLineOption.DeleteAll();
 
         NpIaItemAddOnLine.SetRange("AddOn No.", "No.");
         if NpIaItemAddOnLine.FindFirst then
-            NpIaItemAddOnLine.DeleteAll;
-        //+NPR5.48 [334922]
+            NpIaItemAddOnLine.DeleteAll();
     end;
 
     trigger OnInsert()
@@ -66,11 +61,6 @@ table 6151125 "NPR NpIa Item AddOn"
         NpIaItemAddOn: Record "NPR NpIa Item AddOn";
         IntBuffer: Integer;
     begin
-        //-NPR5.48 [334922]
-        // IF Description = '' THEN BEGIN
-        //  Item.GET("No.");
-        //  Description := Item.Description;
-        // END;
         if "No." = '' then begin
             if not NpIaItemAddOn.FindLast then
                 "No." := '000001'
@@ -79,7 +69,6 @@ table 6151125 "NPR NpIa Item AddOn"
                     "No." := IncStr(NpIaItemAddOn."No.");
         end;
         TestField("No.");
-        //+NPR5.48 [334922]
     end;
 }
 

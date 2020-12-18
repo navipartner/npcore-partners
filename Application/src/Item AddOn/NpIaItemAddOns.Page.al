@@ -1,7 +1,5 @@
 page 6151125 "NPR NpIa Item AddOns"
 {
-    // NPR5.44/MHA /20180629  CASE 286547 Object created - Item AddOn
-
     Caption = 'Item AddOns';
     CardPageID = "NPR NpIa Item AddOn Card";
     Editable = false;
@@ -15,24 +13,23 @@ page 6151125 "NPR NpIa Item AddOns"
         {
             repeater(Group)
             {
-                field("No."; "No.")
+                field("No."; Rec."No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the number of the involved entry or record.';                    
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies a description of the item.';                    
                 }
-                field(Enabled; Enabled)
+                field(Enabled; Rec.Enabled)
                 {
                     ApplicationArea = All;
+                    ToolTIp = 'Specifies if the current Item AddOn is enabled.';                    
                 }
             }
         }
-    }
-
-    actions
-    {
     }
 }
 
