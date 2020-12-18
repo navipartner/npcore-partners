@@ -1,102 +1,105 @@
 page 6151127 "NPR NpIa Item AddOn Subform"
 {
-    // NPR5.44/MHA /20180629  CASE 286547 Object created - Item AddOn
-    // NPR5.48/MHA /20181109  CASE 334922 Extended type with Quantity and Selection
-    // NPR5.52/ALPO/20190912  CASE 354309 Possibility to fix the quantity so user would not be able to change it on sale line
-    //                                    Set whether or not specified quantity is per unit of main item
-    //                                    (new controls: Quantity, "Fixed Quantity", "Per Unit")
-    // NPR5.55/ALPO/20200506  CASE 402585 Define whether "Unit Price" should always be applied or only when it is not equal 0
-
     AutoSplitKey = true;
     Caption = 'Lines';
     DelayedInsert = true;
     PageType = ListPart;
     UsageCategory = Administration;
     SourceTable = "NPR NpIa Item AddOn Line";
-
     layout
     {
         area(content)
         {
             repeater(Group)
             {
-                field(Type; Type)
+                field(Type; Rec.Type)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the type of entity that will be sold for this line.';
                 }
-                field("Item No."; "Item No.")
+                field("Item No."; Rec."Item No.")
                 {
                     ApplicationArea = All;
-                    Enabled = (Type = 0);
+                    Enabled = (Rec.Type = 0);
+                    ToolTip = 'Specifies the number of an item.';
                 }
-                field("Variant Code"; "Variant Code")
+                field("Variant Code"; Rec."Variant Code")
                 {
                     ApplicationArea = All;
-                    Enabled = (Type = 0);
+                    Enabled = (Rec.Type = 0);
+                    ToolTip = 'Specifies the variant of the item on the line.';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies a description of the entry of the product to be sold.';
                 }
-                field("Description 2"; "Description 2")
+                field("Description 2"; Rec."Description 2")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies an additional description of the entry of the product to be sold.';
                 }
-                field(Quantity; Quantity)
+                field(Quantity; Rec.Quantity)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies how many units are being sold.';
                 }
-                field("Per Unit"; "Per Unit")
+                field("Per Unit"; Rec."Per Unit")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies how many units are being sold in base unit of measure.';
                 }
-                field("Fixed Quantity"; "Fixed Quantity")
+                field("Fixed Quantity"; Rec."Fixed Quantity")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies if quantity can be changed on POS unit. If it''s current entry have a flag fixed quantity, then POS entry will be created with predefined Quantity.';
                 }
-                field("Unit Price"; "Unit Price")
+                field("Unit Price"; Rec."Unit Price")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the price of one unit of the item.';
                 }
-                field("Use Unit Price"; "Use Unit Price")
+                field("Use Unit Price"; Rec."Use Unit Price")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies if the price of one unit of the item should be used for sold item.';
                 }
-                field("Discount %"; "Discount %")
+                field("Discount %"; Rec."Discount %")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the discount percentage that is granted for the item on the line.';
                 }
-                field("Comment Enabled"; "Comment Enabled")
+                field("Comment Enabled"; Rec."Comment Enabled")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies if the comment is enabled for the item on the line.';
                 }
-                field("Before Insert Function"; "Before Insert Function")
+                field("Before Insert Function"; Rec."Before Insert Function")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies processing unit which will be executed before POS add-on line is created.';
 
                     trigger OnValidate()
                     begin
-                        //-NPR5.48 [334922]
                         CurrPage.Update(true);
-                        //+NPR5.48 [334922]
                     end;
                 }
-                field("Before Insert Codeunit ID"; "Before Insert Codeunit ID")
+                field("Before Insert Codeunit ID"; Rec."Before Insert Codeunit ID")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies id of the processing unit for recalculating unit price on current entry by appling unit price % from add-on line setup table to the ratio of Total Amount and Quantity sold on POS.';
 
                     trigger OnValidate()
                     begin
-                        //-NPR5.48 [334922]
                         CurrPage.Update(true);
-                        //+NPR5.48 [334922]
                     end;
                 }
-                field("Before Insert Codeunit Name"; "Before Insert Codeunit Name")
+                field("Before Insert Codeunit Name"; Rec."Before Insert Codeunit Name")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies name of the processing unit for recalculating unit price on current entry by appling unit price % from add-on line setup table to the ratio of Total Amount and Quantity sold on POS.';
                 }
             }
         }
@@ -117,8 +120,9 @@ page 6151127 "NPR NpIa Item AddOn Subform"
                 RunPageLink = "AddOn No." = FIELD("AddOn No."),
                               "AddOn Line No." = FIELD("Line No.");
                 ShortCutKey = 'Ctrl+F7';
-                Visible = (Type = 1);
+                Visible = (Rec.Type = 1);
                 ApplicationArea = All;
+                ToolTip = 'View or edit list of different add-on line options which could be as a template applied to add-on line.';
             }
             action("Before Insert Setup")
             {
@@ -128,15 +132,14 @@ page 6151127 "NPR NpIa Item AddOn Subform"
                 PromotedIsBig = true;
                 Visible = HasBeforeInsertSetup;
                 ApplicationArea = All;
+                ToolTip = 'View or edit setup for current add-on line. If setup doesn''t exist for current line, then this action will create setup entry';
 
                 trigger OnAction()
                 var
                     NpIaItemAddOnMgt: Codeunit "NPR NpIa Item AddOn Mgt.";
                     Handled: Boolean;
                 begin
-                    //-NPR5.48 [334922]
                     NpIaItemAddOnMgt.RunBeforeInsertSetup(Rec, Handled);
-                    //+NPR5.48 [334922]
                 end;
             }
         }
@@ -144,9 +147,7 @@ page 6151127 "NPR NpIa Item AddOn Subform"
 
     trigger OnAfterGetCurrRecord()
     begin
-        //-NPR5.48 [334922]
         SetHasBeforeInsertSetup();
-        //+NPR5.48 [334922]
     end;
 
     var
@@ -156,10 +157,8 @@ page 6151127 "NPR NpIa Item AddOn Subform"
     var
         NpIaItemAddOnMgt: Codeunit "NPR NpIa Item AddOn Mgt.";
     begin
-        //-NPR5.48 [334922]
         HasBeforeInsertSetup := false;
         NpIaItemAddOnMgt.HasBeforeInsertSetup(Rec, HasBeforeInsertSetup);
-        //+NPR5.48 [334922]
     end;
 }
 

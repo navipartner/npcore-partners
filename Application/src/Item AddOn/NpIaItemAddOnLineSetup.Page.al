@@ -1,10 +1,7 @@
 page 6151129 "NPR NpIa ItemAddOn Line Setup"
 {
-    // NPR5.48/MHA /20181109  CASE 334922 Object created - Before Insert Setup
-
     Caption = 'Item AddOn Line Setup';
     PageType = Card;
-    UsageCategory = Administration;
     SourceTable = "NPR NpIa ItemAddOn Line Setup";
 
     layout
@@ -13,16 +10,13 @@ page 6151129 "NPR NpIa ItemAddOn Line Setup"
         {
             group(General)
             {
-                field("Unit Price % from Master"; "Unit Price % from Master")
+                field("Unit Price % from Master"; Rec."Unit Price % from Master")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the percentage which will be applied to the ratio of total amount and quantity before creating POS entry.';
                 }
             }
         }
-    }
-
-    actions
-    {
     }
 }
 

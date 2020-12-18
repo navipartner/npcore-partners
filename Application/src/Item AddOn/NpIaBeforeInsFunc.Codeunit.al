@@ -1,16 +1,5 @@
 codeunit 6151129 "NPR NpIa Before Ins. Func."
 {
-    // NPR5.48/MHA /20181113  CASE 334922 Object created - Before Insert functions for Item AddOns POS Lines
-
-
-    trigger OnRun()
-    begin
-    end;
-
-    local procedure "--- Unit Price From Master"()
-    begin
-    end;
-
     [EventSubscriber(ObjectType::Codeunit, 6151125, 'BeforeInsertPOSAddOnLine', '', true, true)]
     local procedure UnitPriceFromMaster(SalePOS: Record "NPR Sale POS"; AppliesToLineNo: Integer; var NpIaItemAddOnLine: Record "NPR NpIa Item AddOn Line")
     var
@@ -63,10 +52,10 @@ codeunit 6151129 "NPR NpIa Before Ins. Func."
         NpIaItemAddOnLineSetup.SetRange("AddOn Line No.", NpIaItemAddOnLine."Line No.");
         NpIaItemAddOnLineSetup.FilterGroup(0);
         if not NpIaItemAddOnLineSetup.Get(NpIaItemAddOnLine."AddOn No.", NpIaItemAddOnLine."Line No.") then begin
-            NpIaItemAddOnLineSetup.Init;
+            NpIaItemAddOnLineSetup.Init();
             NpIaItemAddOnLineSetup."AddOn No." := NpIaItemAddOnLine."AddOn No.";
             NpIaItemAddOnLineSetup."AddOn Line No." := NpIaItemAddOnLine."Line No.";
-            NpIaItemAddOnLineSetup.Insert;
+            NpIaItemAddOnLineSetup.Insert();
         end;
         PAGE.Run(PAGE::"NPR NpIa ItemAddOn Line Setup", NpIaItemAddOnLineSetup);
     end;
@@ -76,15 +65,11 @@ codeunit 6151129 "NPR NpIa Before Ins. Func."
     var
         NpIaItemAddOnLineSetup: Record "NPR NpIa ItemAddOn Line Setup";
     begin
-        if Rec.IsTemporary then
+        if Rec.IsTemporary() then
             exit;
 
         if NpIaItemAddOnLineSetup.Get(Rec."AddOn No.", Rec."Line No.") then
-            NpIaItemAddOnLineSetup.Delete;
-    end;
-
-    local procedure "--- Aux"()
-    begin
+            NpIaItemAddOnLineSetup.Delete();
     end;
 
     local procedure CurrCodeunitId(): Integer
