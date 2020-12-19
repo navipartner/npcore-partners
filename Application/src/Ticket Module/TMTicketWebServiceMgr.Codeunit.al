@@ -321,7 +321,7 @@ codeunit 6060116 "NPR TM Ticket WebService Mgr"
         MemberTicketManager.PreValidateMemberGuestTicketRequest(TmpTicketReservationRequest, true);
 
         Commit();
-        if (TicketAttempCreate.RevalidateRequestForTicketReuse(TmpTicketReservationRequest, ReusedToken, ResponseMessage)) then begin
+        if (TicketAttempCreate.AttemptValidateRequestForTicketReuse(TmpTicketReservationRequest, ReusedToken, ResponseMessage)) then begin
             // duplicate the previous response so SOAP Service gets a valid response
             TicketReservationResponse.SetFilter("Session Token ID", '=%1', ReusedToken);
             if (TicketReservationResponse.FindSet()) then begin
@@ -338,6 +338,7 @@ codeunit 6060116 "NPR TM Ticket WebService Mgr"
             exit;
         end;
 
+        // Make new tickets
         TmpTicketReservationRequest.Reset();
         TmpTicketReservationRequest.FindSet();
         repeat
@@ -362,8 +363,6 @@ codeunit 6060116 "NPR TM Ticket WebService Mgr"
 
             until ((TicketReservationRequest.Next() = 0));
         end;
-
-        // MemberTicketManager.ValidateMemberAssignedTickets (Token, true);
 
         TicketRequestManager.ConfirmReservationRequestWithValidate(Token);
         TicketRequestManager.RegisterArrivalRequest(Token);
@@ -574,7 +573,7 @@ codeunit 6060116 "NPR TM Ticket WebService Mgr"
                 TickeChangeRequest.SetFilter("Session Token ID", '=%1', DocumentID);
                 TickeChangeRequest.FindSet();
                 repeat
-                    TicketManagement.RescheduleTicketAdmission(true, Ticket."No.", TickeChangeRequest."External Adm. Sch. Entry No.", true, TickeChangeRequest."Request Status Date Time", ResponseMessage);
+                    TicketManagement.RescheduleTicketAdmission(Ticket."No.", TickeChangeRequest."External Adm. Sch. Entry No.", true, TickeChangeRequest."Request Status Date Time");
                 until (TickeChangeRequest.NEXT() = 0);
             until (Ticket.NEXT() = 0);
 
@@ -629,6 +628,7 @@ codeunit 6060116 "NPR TM Ticket WebService Mgr"
     local procedure CreateTicket(var TicketReservationRequest: Record "NPR TM Ticket Reservation Req."; var TicketReservationResponse: Record "NPR TM Ticket Reserv. Resp."): Boolean
     var
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
+        TicketAttemptAction: Codeunit "NPR Ticket Attempt Create";
         ResponseMessage: Text;
         ResponseCode: Integer;
     begin
@@ -639,11 +639,8 @@ codeunit 6060116 "NPR TM Ticket WebService Mgr"
 
         // commit is required when/if IssueTicket throws an error, or the reservation and response will be rolled back as well
         Commit();
-        TicketRequestManager.LockResources();
 
-        ResponseCode := TicketRequestManager.IssueTicketFromReservation(TicketReservationRequest, false, ResponseMessage);
-
-        if (ResponseCode <> 0) then begin
+        if (not TicketAttemptAction.AttemptIssueTicketFromReservation(TicketReservationRequest, ResponseMessage)) then begin
             TicketReservationResponse."Response Message" := CopyStr(ResponseMessage, 1, MaxStrLen(TicketReservationResponse."Response Message"));
             TicketRequestManager.DeleteReservationRequest(TicketReservationRequest."Session Token ID", false);
             TicketReservationResponse.Status := false;

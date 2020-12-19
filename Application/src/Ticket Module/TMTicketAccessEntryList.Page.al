@@ -1,11 +1,5 @@
 ﻿page 6059786 "NPR TM Ticket AccessEntry List"
 {
-    // TM1.00/TSA/20151217  CASE 219658-01 NaviPartner Ticket Management
-    // TM1.12/TSA/20160407  CASE 230600 Added DAN Captions
-    // TM1.17/NPKNAV/20161026  CASE 256152 Transport TM1.17
-    // TM1.21/TSA/20170504  CASE 274843 Added ToggleBlockUnblock() function
-    // TM1.27/TSA /20180125 CASE 301140 Refactored
-
     Caption = 'Ticket access Entry List';
     Editable = false;
     PageType = List;
@@ -74,8 +68,6 @@
                 Image = LedgerEntries;
                 Promoted = true;
                 PromotedCategory = Process;
-                //RunObject = Page "NPR TM Det. Ticket AccessEntry";
-                //RunPageLink = "Ticket Access Entry No." = FIELD("Entry No.");
 
                 trigger OnAction()
                 var
@@ -101,16 +93,8 @@
                 trigger OnAction()
                 var
                     TicketManagement: Codeunit "NPR TM Ticket Management";
-                    MessageId: Integer;
-                    MessageText: Text;
-                    NoValue: Integer;
                 begin
-
-                    //-TM1.27 [301140]
-                    NoValue := -1;
-                    MessageId := TicketManagement.ValidateTicketForArrival(0, "Ticket No.", "Admission Code", NoValue, true, MessageText);
-                    //MessageId := TicketManagement.ValidateTicketForArrival (0, "Ticket No.", "Admission Code", -1, TRUE, MessageText);
-                    //+TM1.27 [301140]
+                    TicketManagement.ValidateTicketForArrival(0, Rec."Ticket No.", Rec."Admission Code", -1);
                 end;
             }
             action("Register Departure")
@@ -124,11 +108,9 @@
                 trigger OnAction()
                 var
                     TicketManagement: Codeunit "NPR TM Ticket Management";
-                    MessageId: Integer;
-                    MessageText: Text;
                 begin
 
-                    MessageId := TicketManagement.ValidateTicketForDeparture(0, "Ticket No.", "Admission Code", true, MessageText);
+                    TicketManagement.ValidateTicketForDeparture(0, Rec."Ticket No.", Rec."Admission Code");
                 end;
             }
             action("Block/Unblock")

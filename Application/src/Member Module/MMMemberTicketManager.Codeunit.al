@@ -200,7 +200,7 @@ codeunit 6060130 "NPR MM Member Ticket Manager"
         //**
 
         Commit();
-        if (TicketAttempCreate.RevalidateRequestForTicketReuse(TmpTicketReservationRequest, ReusedToken, ResponseMessage)) then begin
+        if (TicketAttempCreate.AttemptValidateRequestForTicketReuse(TmpTicketReservationRequest, ReusedToken, ResponseMessage)) then begin
             TicketToken := ReusedToken;
             Commit();
 
@@ -242,7 +242,7 @@ codeunit 6060130 "NPR MM Member Ticket Manager"
         ResponseMessage := '';
 
         // Issue the tickets, validate, confirm and register arrival.
-        if (not TicketRetailManagement.IssueTicket(Token, Member."External Member No.", false, ResponseCode, ResponseMessage, SaleLinePOS, false)) then begin
+        if (not TicketRetailManagement.IssueTicket(Token, Member."External Member No.", ResponseCode, ResponseMessage, SaleLinePOS, false)) then begin
             TicketRequestManager.DeleteReservationRequest(Token, false);
             Error(ResponseMessage);
         end;
@@ -278,7 +278,7 @@ codeunit 6060130 "NPR MM Member Ticket Manager"
         ItemNo: Code[20];
         VariantCode: Code[10];
         ResolvingTable: Integer;
-        ResponseCode: Integer;
+        TicketIsReused: Boolean;
         MembershipEntryNo: Integer;
     begin
 
@@ -299,7 +299,7 @@ codeunit 6060130 "NPR MM Member Ticket Manager"
         Ticket.SetFilter("Document Date", '=%', Today);
         Ticket.SetFilter("External Member Card No.", '=%1', Member."External Member No.");
         Ticket.SetFilter(Blocked, '=%1', false);
-        ResponseCode := -1;
+        TicketIsReused := false;
 
         if (Ticket.FindSet()) then begin
             repeat
@@ -310,20 +310,20 @@ codeunit 6060130 "NPR MM Member Ticket Manager"
                             TicketReservationRequest.SetFilter("Session Token ID", '=%1', TicketReservationRequest."Session Token ID");
                             TicketReservationRequest.SetFilter("Request Status", '=%1', TicketReservationRequest."Request Status"::CONFIRMED);
                             if (TicketReservationRequest.Count() = 1) then
-                                ResponseCode := TicketManagement.ValidateTicketForArrival(0, Ticket."No.", AdmissionCode, -1, false, ErrorReason); // Reuse existing ticket (if possible)
+                                TicketIsReused := TicketManagement.AttemptValidateTicketForArrival(0, Ticket."No.", AdmissionCode, -1, ErrorReason); // Reuse existing ticket (if possible)
                         end;
-            until ((Ticket.Next() = 0) or (ResponseCode = 0));
+            until ((Ticket.Next() = 0) or (TicketIsReused));
 
-            if (ResponseCode = 0) then
+            if (TicketIsReused) then
                 TicketToPrint.Get(Ticket."No.");
             TicketToPrint.SetRecFilter();
 
         end;
 
         // Create new ticket
-        if (ResponseCode <> 0) then begin
+        if (not TicketIsReused) then begin
             MemberRetailIntegration.IssueTicketFromMemberScan(true, ItemNo, VariantCode, Member, TicketNo, ErrorReason);
-            TicketManagement.ValidateTicketForArrival(0, TicketNo, AdmissionCode, -1, true, ErrorReason);
+            TicketManagement.ValidateTicketForArrival(0, TicketNo, AdmissionCode, -1);
 
             TicketToPrint.Get(TicketNo);
             TicketToPrint.SetRecFilter();
