@@ -1,20 +1,5 @@
 ﻿page 6060112 "NPR TM Ticket Select Schedule"
 {
-    // TM80.1.09/TSA/20160301  CASE 235860 Sell event tickets in POS
-    // TM1.12/TSA/20160407  CASE 230600 Added DAN Captions
-    // TM1.17/TSA/20161024  CASE Sorting and filtering of schedule entreies, changed to temp record, added AddRecord function
-    // TM1.17/NPKNAV/20161026  CASE 256205 Transport TM1.17
-    // TM1.20/TSA/20170324  CASE 269171 The remaining ticket qty calculations refined
-    // TM1.28/TSA /20180220 CASE 305707 Changed signature on FillPage()
-    // TM1.37/TSA /20180926 CASE 327324 Retactored to use new field "Event Arrival From Time"
-    // TM1.38/TSA /20181018 CASE 331917 Changed pagetype StandardDialog
-    // NPR5.48/TSA /20181207 CASE 331917 Changed fields to non-editable
-    // TM1.39/TSA /20181211 CASE 339259 Fixed 327324
-    // #322432/TSA /20191121 CASE 322432 Added Remaining calculation for seating
-    // TM1.45/TSA /20191121 CASE 378212 Added Sales cut-off date handling and cleaned green code
-    // TM1.45/TSA /20191203 CASE 380754 Added waiting list caption
-    // TM1.48/TSA /20200629 CASE 411704 Changed from GetAdmissionCapacity() to GetTicketCapacity()
-
     Caption = 'Ticket Select Schedule';
     DataCaptionFields = "Admission Code";
     DeleteAllowed = false;
@@ -110,44 +95,40 @@
         MaxCapacity: Integer;
         CapacityControl: Option;
         Admission: Record "NPR TM Admission";
+        NonWorking: Boolean;
     begin
 
         LocalDateTimeText := StrSubstNo('%1 %2', Format(Today), Format(Time));
 
-        CalcFields("Open Reservations", "Open Admitted", "Initial Entry");
+        Rec.CalcFields("Open Reservations", "Open Admitted", "Initial Entry");
 
-        //-TM1.48 [411704]
-        //TicketManagement.GetAdmissionCapacity ("Admission Code", "Schedule Code", "Entry No.", MaxCapacity, CapacityControl);
-        TicketManagement.GetTicketCapacity(gTicketItemNo, gTicketVariantCode, "Admission Code", "Schedule Code", "Entry No.", MaxCapacity, CapacityControl);
-        //+TM1.48 [411704]
+        TicketManagement.GetTicketCapacity(gTicketItemNo, gTicketVariantCode, Rec."Admission Code", Rec."Schedule Code", Rec."Entry No.", MaxCapacity, CapacityControl);
 
-        RemainingReservations := MaxCapacity - "Open Reservations";
-        RemainingAdmitted := MaxCapacity - "Open Admitted";
+        RemainingReservations := MaxCapacity - Rec."Open Reservations";
+        RemainingAdmitted := MaxCapacity - Rec."Open Admitted";
 
         case CapacityControl of
             Admission."Capacity Control"::ADMITTED:
-                Remaining := MaxCapacity - "Open Admitted" - "Open Reservations";
+                Remaining := MaxCapacity - Rec."Open Admitted" - Rec."Open Reservations";
             Admission."Capacity Control"::FULL:
-                Remaining := MaxCapacity - "Open Admitted" - "Open Reservations";
+                Remaining := MaxCapacity - Rec."Open Admitted" - Rec."Open Reservations";
             Admission."Capacity Control"::NONE:
                 Remaining := MaxCapacity;
             Admission."Capacity Control"::SALES:
-                Remaining := MaxCapacity - "Initial Entry";
+                Remaining := MaxCapacity - Rec."Initial Entry";
             Admission."Capacity Control"::SEATING:
-                Remaining := MaxCapacity - "Open Admitted" - "Open Reservations"; //-+#322432 [322432]
+                Remaining := MaxCapacity - Rec."Open Admitted" - Rec."Open Reservations";
         end;
 
-        //-TM1.45 [380754]
         RemainingText := Format(Remaining);
         if (Rec."Allocation By" = Rec."Allocation By"::WAITINGLIST) then begin
-            CalcFields("Waiting List Queue");
+            Rec.CalcFields("Waiting List Queue");
             RemainingText := StrSubstNo('%1', WAITING_LIST);
-            if ("Waiting List Queue" > 0) then
-                RemainingText := StrSubstNo('%1 (%2)', WAITING_LIST, "Waiting List Queue");
+            if (Rec."Waiting List Queue" > 0) then
+                RemainingText := StrSubstNo('%1 (%2)', WAITING_LIST, Rec."Waiting List Queue");
         end;
-        //+TM1.45 [380754]
 
-        TicketManagement.CheckTicketBaseCalendar(false, Rec."Admission Code", gTicketItemNo, gTicketVariantCode, Rec."Admission Start Date", CalendarExceptionText);
+        TicketManagement.CheckTicketBaseCalendar(Rec."Admission Code", gTicketItemNo, gTicketVariantCode, Rec."Admission Start Date", NonWorking, CalendarExceptionText);
     end;
 
     trigger OnInit()
@@ -158,11 +139,9 @@
     trigger OnOpenPage()
     begin
 
-        //-TM1.45 [378212]
-        // FINDFIRST ();
-        if (not FindFirst()) then
+        if (not Rec.FindFirst()) then
             Error(NO_TIMESLOTS);
-        //+TM1.45 [378212]
+
     end;
 
     var
@@ -189,10 +168,7 @@
 
         if (AdmissionScheduleEntry.FindSet()) then begin
             repeat
-                //-TM1.45 [378339]
-                // AddToTempRecord (AdmissionScheduleEntry, TicketQty);
                 AddToTempRecord(AdmissionScheduleEntry, TicketQty, TicketItemNo, TicketVariantCode);
-            //+TM1.45 [378339]
             until (AdmissionScheduleEntry.Next() = 0);
         end;
 
@@ -213,13 +189,11 @@
         AdmitOnSales: Boolean;
     begin
 
-        //-TM1.45 [378212] // refactored, moved code to function
         if (TicketManagement.ValidateAdmSchEntryForSales(AdmissionScheduleEntry, TicketItemNo, TicketVariantCode, Today, Time, Remaining)) then begin
 
             Rec.TransferFields(AdmissionScheduleEntry, true);
             if (Rec.Insert()) then;
         end;
-        //+TM1.45 [378212]
     end;
 }
 

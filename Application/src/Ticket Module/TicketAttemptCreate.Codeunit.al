@@ -5,30 +5,114 @@ codeunit 6014491 "NPR Ticket Attempt Create"
     trigger OnRun()
     begin
         case _AttemptFunction of
-            _AttemptFunction::TICKET_REUSE:
-                DoRevalidateRequestForTicketReuse(_TmpTicketReservationRequest, _ReusedTokenId, _ResponseMessage);
+            _AttemptFunction::REUSE:
+                DoRevalidateRequestForTicketReuse(_TmpTicketReservationRequest, _ReusedTokenId);
+
+            _AttemptFunction::VALIDATE_ARRIVAL:
+                DoValidateTicketForArrival(_TicketIdentifierType, _TicketIdentifier, _AdmissionCode, _AdmissionScheduleEntryNo);
+
+            _AttemptFunction::ISSUE_FROM_TOKEN:
+                DoIssueTicketFromReservationToken(_Token);
+
+            _AttemptFunction::ISSUE_FROM_RESERVATION:
+                DoIssueTicketFromReservation(_TicketReservationRequest);
+
+            _AttemptFunction::CHANGE_RESERVED_QTY:
+                DoChangeConfirmedTicketQuantity(_TicketNo, _AdmissionCode, _NewTicketQuantity);
+
+            else
+                Error('No handler for %1.', _AttemptFunction);
         end;
     end;
 
     var
+        _TicketAttemptCreate: Codeunit "NPR Ticket Attempt Create";
         _TmpTicketReservationRequest: Record "NPR TM Ticket Reservation Req." temporary;
+        _TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         _ReusedTokenId: Text;
-        _ResponseMessage: Text;
-        _AttemptFunction: Option NA,TICKET_REUSE;
+        _TicketNo: Code[20];
+        _TicketIdentifierType: Option;
+        _TicketIdentifier: Text[50];
+        _AdmissionCode: Code[20];
+        _AdmissionScheduleEntryNo: Integer;
+        _NewTicketQuantity: Integer;
+        _Token: Text[100];
 
-    procedure RevalidateRequestForTicketReuse(var TmpTicketReservationRequest: Record "NPR TM Ticket Reservation Req." temporary; var ReusedTokenId: Text; var ResponseMessage: Text): Boolean
+        _AttemptFunction: Option NA,REUSE,VALIDATE_ARRIVAL,ISSUE_FROM_TOKEN,ISSUE_FROM_RESERVATION,CHANGE_RESERVED_QTY;
+
+    #region External Functions
+
+    local procedure InvokeAttemptAction(var ResponseMessage: Text): Boolean
     var
-        TicketAttemptCreate: Codeunit "NPR Ticket Attempt Create";
+        IsSuccess: Boolean;
+    begin
+
+        Commit();
+        ClearLastError();
+
+        IsSuccess := _TicketAttemptCreate.Run();
+        if (not IsSuccess) then
+            ResponseMessage := GetLastErrorText();
+
+        Commit();
+        exit(IsSuccess);
+    end;
+
+    procedure AttemptValidateRequestForTicketReuse(var TmpTicketReservationRequest: Record "NPR TM Ticket Reservation Req." temporary; var ReusedTokenId: Text; var ResponseMessage: Text): Boolean
     begin
 
         _TmpTicketReservationRequest.Copy(TmpTicketReservationRequest, true);
-        _AttemptFunction := _AttemptFunction::TICKET_REUSE;
+        _AttemptFunction := _AttemptFunction::REUSE;
 
-        exit(TicketAttemptCreate.Run());
-
+        exit(InvokeAttemptAction(ResponseMessage));
     end;
 
-    local procedure DoRevalidateRequestForTicketReuse(var TmpTicketReservationRequest: Record "NPR TM Ticket Reservation Req." temporary; var ReusedTokenId: Text; var ResponseMessage: Text)
+    procedure AttemptValidateTicketForArrival(TicketIdentifierType: Option INTERNAL_TICKET_NO,EXTERNAL_TICKET_NO,PRINTED_TICKET_NO; TicketIdentifier: Text[50]; AdmissionCode: Code[20]; AdmissionScheduleEntryNo: Integer; var ResponseMessage: Text): Boolean
+    begin
+
+        _AttemptFunction := _AttemptFunction::VALIDATE_ARRIVAL;
+
+        _TicketIdentifierType := TicketIdentifierType;
+        _TicketIdentifier := TicketIdentifier;
+        _AdmissionCode := AdmissionCode;
+        _AdmissionScheduleEntryNo := AdmissionScheduleEntryNo;
+
+        exit(InvokeAttemptAction(ResponseMessage));
+    end;
+
+    procedure AttemptIssueTicketFromReservationToken(Token: Text[100]; var ResponseMessage: Text): Boolean
+    begin
+
+        _AttemptFunction := _AttemptFunction::ISSUE_FROM_TOKEN;
+        _Token := Token;
+
+        exit(InvokeAttemptAction(ResponseMessage));
+    end;
+
+    procedure AttemptIssueTicketFromReservation(var TicketReservationRequest: Record "NPR TM Ticket Reservation Req."; var ResponseMessage: Text): Boolean
+    begin
+
+        _AttemptFunction := _AttemptFunction::ISSUE_FROM_RESERVATION;
+        _TicketReservationRequest := TicketReservationRequest;
+
+        exit(InvokeAttemptAction(ResponseMessage));
+    end;
+
+    procedure AttemptChangeConfirmedTicketQuantity(TicketNo: Code[20]; AdmissionCode: Code[20]; NewTicketQuantity: Integer; var ResponseMessage: Text): Boolean
+    begin
+
+        _AttemptFunction := _AttemptFunction::CHANGE_RESERVED_QTY;
+
+        _TicketNo := TicketNo;
+        _AdmissionCode := AdmissionCode;
+        _NewTicketQuantity := NewTicketQuantity;
+
+        exit(InvokeAttemptAction(ResponseMessage));
+    end;
+    #endregion
+
+    #region Internal Worker Functions
+    local procedure DoRevalidateRequestForTicketReuse(var TmpTicketReservationRequest: Record "NPR TM Ticket Reservation Req." temporary; var ReusedTokenId: Text)
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         Ticket: Record "NPR TM Ticket";
@@ -72,15 +156,13 @@ codeunit 6014491 "NPR Ticket Attempt Create"
                     Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketReservationRequest."Entry No.");
                     if (Ticket.FindSet()) then begin
                         repeat
-                            AbortTicketRevalidate := (0 <> TicketManagement.ValidateTicketForArrival(0, Ticket."No.", '', 0, true, ResponseMessage));
-                        until ((Ticket.Next() = 0) or (AbortTicketRevalidate));
+                            TicketManagement.ValidateTicketForArrival(0, Ticket."No.", '', 0);
+                        until (Ticket.Next() = 0);
                     end;
-                until ((TicketReservationRequest.Next() = 0) or (AbortTicketRevalidate));
+                until (TicketReservationRequest.Next() = 0);
 
-                if (not AbortTicketRevalidate) then begin
-                    ReusedTokenId := TicketReservationRequest."Session Token ID";
-                    exit; // Arrival was successfully registered on tickets previously created - we are done
-                end;
+                ReusedTokenId := TicketReservationRequest."Session Token ID";
+                exit; // Arrival was successfully registered on tickets previously created - we are done
 
             end;
         end;
@@ -90,4 +172,49 @@ codeunit 6014491 "NPR Ticket Attempt Create"
     end;
 
 
+    local procedure DoValidateTicketForArrival(TicketIdentifierType: Option INTERNAL_TICKET_NO,EXTERNAL_TICKET_NO,PRINTED_TICKET_NO; TicketIdentifier: Text[50]; AdmissionCode: Code[20]; AdmissionScheduleEntryNo: Integer)
+    var
+        TicketManagement: Codeunit "NPR TM Ticket Management";
+    begin
+        TicketManagement.ValidateTicketForArrival(TicketIdentifierType, TicketIdentifier, AdmissionCode, AdmissionScheduleEntryNo);
+    end;
+
+    local procedure DoIssueTicketFromReservationToken(Token: Text[100])
+    var
+        TicketRequest: Codeunit "NPR TM Ticket Request Manager";
+        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+        AttemptTicket: Codeunit "NPR Ticket Attempt Create";
+    begin
+
+        TicketReservationRequest.SetCurrentKey("Session Token ID");
+        TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
+        TicketReservationRequest.FindSet();
+
+        repeat
+            TicketRequest.IssueTicketFromReservation(TicketReservationRequest);
+        until (TicketReservationRequest.Next() = 0);
+
+    end;
+
+
+    local procedure DoIssueTicketFromReservation(var TicketReservationRequest: Record "NPR TM Ticket Reservation Req.")
+    var
+        TicketRequest: Codeunit "NPR TM Ticket Request Manager";
+    begin
+
+        TicketRequest.LockResources();
+        TicketRequest.IssueTicketFromReservation(TicketReservationRequest);
+
+    end;
+
+    local procedure DoChangeConfirmedTicketQuantity(TicketNo: Code[20]; AdmissionCode: Code[20]; NewTicketQuantity: Integer)
+    var
+        TicketManagement: Codeunit "NPR TM Ticket Management";
+    begin
+
+        TicketManagement.ChangeConfirmedTicketQuantity(TicketNo, AdmissionCode, NewTicketQuantity);
+
+    end;
+
+    #endregion
 }

@@ -1,22 +1,5 @@
 ﻿page 6059785 "NPR TM Ticket List"
 {
-    // TM1.00/TSA/20151217  CASE 219658-01 NaviPartner Ticket Management
-    // TM1.12/TSA/20160407  CASE 230600 Added DAN Captions
-    // TM1.16/TSA/20160816  CASE 245004 Transport TM1.16 - 19 July 2016
-    // TM1.17/TSA/20160913  CASE 251883 Added SMS as Notification Method
-    // TM1.17/JLK/20161024  CASE 251883 Added Issued Ticket Print button
-    // TM1.18/TSA/20161220  CASE 261564 Added related information page ticket request, put visible false on some more fields
-    // TM1.19/TSA/20170220  CASE 266768 Added default filter to not show blocked entries
-    // TM1.20/TSA/20170222  CASE 266835 Removed the redundant print button and fixed the "Print Selected Tickets" to print the selected tickets
-    // TM1.21/TSA/20170504  CASE 274843 Added ToggleBlockUnblock() function
-    // TM1.21/TSA/20170525  CASE 278049 Fixing issues report by OMA
-    // TM1.26/TSA /20171103 CASE 285601 Added action View Ticket
-    // TM1.26/TSA /20171120 CASE 296731 Added function RevokeTicket() and the button to go with it
-    // NPR5.43/TS  20180626 CASE 317161 Promoted Action Print Selected Tickets
-    // TM1.38/TSA /20181023 CASE 332109 Added eTicket support
-    // TM1.39/NPKNAV/20190125  CASE 310057 Transport TM1.39 - 25 January 2019
-    // TM90.1.46/TSA /20200129 CASE 387138 Refactored ChangeTicketholder();
-
     Caption = 'Ticket List';
     DeleteAllowed = false;
     Editable = false;
@@ -27,6 +10,7 @@
     SourceTableView = ORDER(Descending);
     UsageCategory = Lists;
     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+    AdditionalSearchTerms = 'Issued Tickets';
 
     layout
     {
@@ -34,76 +18,76 @@
         {
             repeater(Group)
             {
-                field("No."; "No.")
+                field("No."; Rec."No.")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
-                field("External Ticket No."; "External Ticket No.")
+                field("External Ticket No."; Rec."External Ticket No.")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
-                field("Ticket Type Code"; "Ticket Type Code")
+                field("Ticket Type Code"; Rec."Ticket Type Code")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
-                field("Valid From Date"; "Valid From Date")
+                field("Valid From Date"; Rec."Valid From Date")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
-                field("Valid From Time"; "Valid From Time")
+                field("Valid From Time"; Rec."Valid From Time")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
-                field("Valid To Date"; "Valid To Date")
+                field("Valid To Date"; Rec."Valid To Date")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
-                field("Valid To Time"; "Valid To Time")
+                field("Valid To Time"; Rec."Valid To Time")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
-                field(Blocked; Blocked)
+                field(Blocked; Rec.Blocked)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
-                field("Blocked Date"; "Blocked Date")
+                field("Blocked Date"; Rec."Blocked Date")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
-                field("Printed Date"; "Printed Date")
-                {
-                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                    Visible = false;
-                }
-                field("Salesperson Code"; "Salesperson Code")
-                {
-                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                }
-                field("Document Date"; "Document Date")
-                {
-                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                }
-                field("Source Code"; "Source Code")
+                field("Printed Date"; Rec."Printed Date")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Visible = false;
                 }
-                field("Customer No."; "Customer No.")
+                field("Salesperson Code"; Rec."Salesperson Code")
+                {
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                }
+                field("Document Date"; Rec."Document Date")
+                {
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                }
+                field("Source Code"; Rec."Source Code")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Visible = false;
                 }
-                field("Sales Header Type"; "Sales Header Type")
+                field("Customer No."; Rec."Customer No.")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Visible = false;
                 }
-                field("Sales Header No."; "Sales Header No.")
+                field("Sales Header Type"; Rec."Sales Header Type")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Visible = false;
                 }
-                field("Sales Receipt No."; "Sales Receipt No.")
+                field("Sales Header No."; Rec."Sales Header No.")
+                {
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    Visible = false;
+                }
+                field("Sales Receipt No."; Rec."Sales Receipt No.")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
@@ -111,24 +95,24 @@
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
-                field("External Member Card No."; "External Member Card No.")
+                field("External Member Card No."; Rec."External Member Card No.")
                 {
                     ApplicationArea = NPRTicketAdvanced;
                 }
-                field("No. Of Access"; "No. Of Access")
+                field("No. Of Access"; Rec."No. Of Access")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Visible = false;
                 }
-                field("Item No."; "Item No.")
+                field("Item No."; Rec."Item No.")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
-                field("Variant Code"; "Variant Code")
+                field("Variant Code"; Rec."Variant Code")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
-                field("Last Date Modified"; "Last Date Modified")
+                field("Last Date Modified"; Rec."Last Date Modified")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
@@ -244,7 +228,7 @@
 
                 trigger OnAction()
                 begin
-                    DisplayTicketRequest("Ticket Reservation Entry No.");
+                    DisplayTicketRequest(Rec."Ticket Reservation Entry No.");
                 end;
 
 
@@ -323,8 +307,6 @@
 
     trigger OnOpenPage()
     begin
-
-        //-+TM1.19 [266768]
         Rec.SetFilter(Blocked, '=%1', false);
     end;
 
@@ -341,22 +323,9 @@
         SuggestNotificationMethod: Option NA,EMAIL,SMS;
     begin
 
-        TicketReservationRequest.Get("Ticket Reservation Entry No.");
-
-
-        //-TM90.1.46 [387138]
-        // CASE TicketReservationRequest."Notification Method" OF
-        //  TicketReservationRequest."Notification Method"::EMAIL : SuggestNotificationMethod := SuggestNotificationMethod::EMAIL;
-        //  TicketReservationRequest."Notification Method"::SMS : SuggestNotificationMethod := SuggestNotificationMethod::SMS;
-        //  ELSE begin
-        //    SuggestNotificationMethod := SuggestNotificationMethod::NA;
-        //    TicketReservationRequest."Notification Address" := '';
-        //  end;
-        // end;
-
-        //TicketNotifyParticipant.AquireTicketParticipant (TicketReservationRequest."Session Token ID", TicketReservationRequest."Notification Method", TicketReservationRequest."Notification Address");
+        TicketReservationRequest.Get(Rec."Ticket Reservation Entry No.");
         TicketNotifyParticipant.AquireTicketParticipantForce(TicketReservationRequest."Session Token ID", TicketReservationRequest."Notification Method", TicketReservationRequest."Notification Address", true);
-        //+TM90.1.46 [387138]
+
     end;
 
     local procedure ToggleTicketBlock()
@@ -379,12 +348,10 @@
 
                 Ticket2.Modify();
 
-                //-TM1.38 [332109]
                 if (Ticket2.Blocked) then
                     TicketRequestManager.OnAfterBlockTicketPublisher(Ticket."No.");
                 if (not Ticket2.Blocked) then
                     TicketRequestManager.OnAfterUnblockTicketPublisher(Ticket."No.");
-            //+TM1.38 [332109]
 
             until (Ticket.Next() = 0);
         end;
@@ -401,7 +368,6 @@
         Token: Text[100];
     begin
 
-        //-TM1.26 [296731]
         CurrPage.SetSelectionFilter(Ticket);
         TicketCount := Ticket.Count();
 
@@ -415,9 +381,8 @@
                 QtyToReverse := 0;
                 TicketRequestManager.POS_CreateRevokeRequest(Token, Ticket."No.", UserId, 0, AmountToReverse, QtyToReverse);
             until (Ticket.Next() = 0);
-            TicketRequestManager.RevokeReservationTokenRequest(Token, false, true, ResponseMessage);
+            TicketRequestManager.RevokeReservationTokenRequest(Token, false);
         end;
-        //+TM1.26 [296731]
     end;
 
     local procedure CreateETicket()
@@ -456,7 +421,6 @@
         PageAction: Action;
     begin
 
-        //-#417417 [417417]
         CurrPage.SETSELECTIONFILTER(Ticket);
         Ticket.FINDFIRST();
 
@@ -476,7 +440,6 @@
             TicketMakeReservationPage.FinalizeChangeRequest(TRUE, ResponseMessage);
         end;
 
-        //+#417417 [417417]
     end;
 
     local procedure DisplayTicketRequest(RequestEntryNo: Integer);
@@ -485,7 +448,6 @@
         TmpTicketReservationRequest: Record "NPR TM Ticket Reservation Req." temporary;
     begin
 
-        //-#417417 [417417]
         TicketReservationRequest.GET(RequestEntryNo);
         AddRequestToTmp(TicketReservationRequest."Session Token ID", TmpTicketReservationRequest);
 
@@ -509,7 +471,6 @@
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
     begin
 
-        //-#417417 [417417]
         TicketReservationRequest.SETFILTER("Session Token ID", '=%1', Token);
         if (TicketReservationRequest.FINDSET()) then begin
             repeat

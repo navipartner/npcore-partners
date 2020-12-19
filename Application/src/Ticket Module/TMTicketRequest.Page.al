@@ -1,16 +1,5 @@
 ﻿page 6060103 "NPR TM Ticket Request"
 {
-    // TM1.18/TSA/20161220  CASE 261564 Show ticket request
-    // TM1.21/NPKNAV/20170525  CASE 278049 Transport T0006 - 25 May 2017
-    // TM1.22/TSA/20170526   CASE 278142 Added fields Payment Option, Customer No
-    // TM1.23/TSA/20170706  CASE 283007 Reinstated External Order No. field that disappeared.
-    // TM1.26/TSA /20171120 CASE 296731 Added function RevokeTicketRequest() and the button to go with it
-    // TM1.38/TSA /20181023 CASE 332109 Added eTicket button
-    // NPR5.48/TSA /20181109 CASE 332109 removed eTicket button
-    // NPR5.48/JDH /20181109 CASE 334163 Added Caption to Actions
-    // TM1.39/NPKNAV/20190125  CASE 310057 Transport TM1.39 - 25 January 2019
-    // TM1.43/TSA /20190910 CASE 368043 Refactored usage of "External Item Code"
-
     Caption = 'Ticket Request';
     CardPageID = "NPR TM Ticket Res. Req. Page";
     Editable = false;
@@ -307,7 +296,6 @@
         Token: Text[100];
     begin
 
-        //-TM1.26 [296731]
         CurrPage.SetSelectionFilter(TicketReservationRequest);
         RequestCount := TicketReservationRequest.Count();
         if (RequestCount < 1) then
@@ -335,14 +323,14 @@
                     QtyToRevoke := 0;
                     TicketRequestManager.POS_CreateRevokeRequest(Token, Ticket."No.", UserId, 0, AmountToReverse, QtyToRevoke);
                 until (Ticket.Next() = 0);
-                TicketRequestManager.RevokeReservationTokenRequest(Token, false, true, ResponseMessage);
+                TicketRequestManager.RevokeReservationTokenRequest(Token, false);
             end;
 
             TicketReservationRequest."Request Status" := TicketReservationRequest."Request Status"::CANCELED;
             TicketReservationRequest.Modify();
 
         until (TicketReservationRequest.Next() = 0);
-        //+TM1.26 [296731]
+
     end;
 }
 

@@ -30,7 +30,7 @@ codeunit 6060117 "NPR TM Ticket Retail Mgt."
         ABORTED: Label 'Aborted.';
         SCHEDULE_ERROR: Label 'There was an error changing the reservation \\%1\\Do you want to try again?';
 
-    procedure IssueTicket(Token: Text[100]; ExternalMemberNo: Code[20]; FailWithError: Boolean; ResponseCode: Integer; ResponseMessage: Text; SaleLinePOS: Record "NPR Sale Line POS"; UpdateSalesLine: Boolean) Success: Boolean
+    procedure IssueTicket(Token: Text[100]; ExternalMemberNo: Code[20]; ResponseCode: Integer; ResponseMessage: Text; SaleLinePOS: Record "NPR Sale Line POS"; UpdateSalesLine: Boolean) Success: Boolean
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
