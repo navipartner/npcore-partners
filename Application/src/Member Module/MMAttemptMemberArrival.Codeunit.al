@@ -108,15 +108,15 @@ codeunit 6014492 "NPR MM Attempt Member Arrival"
 
         Ticket.SetFilter("External Member Card No.", '=%1', Member."External Member No.");
         if (Ticket.FindLast()) then begin
-            ResponseCode := TicketMgr.ValidateTicketForArrival(0, Ticket."No.", AdmissionCode, -1, false, ResponseMessage);
-            if (ResponseCode = 0) then begin
+
+            if (TicketMgr.AttemptValidateTicketForArrival(0, Ticket."No.", AdmissionCode, -1, ResponseMessage)) then begin
 
                 if (AdmissionCode = '') then
                     AdmissionCode := '-default-';
 
                 ResponseMessage := StrSubstNo(MEMBER_TICKET, Ticket."No.", AdmissionCode, Member."External Member No.");
 
-                exit(ResponseCode);
+                exit(0);
             end;
         end;
 
@@ -127,15 +127,14 @@ codeunit 6014492 "NPR MM Attempt Member Arrival"
             exit(-1);
 
         Ticket.Get(TicketNo);
-        ResponseCode := TicketMgr.ValidateTicketForArrival(0, TicketNo, AdmissionCode, -1, true, ResponseMessage);
+        TicketMgr.ValidateTicketForArrival(0, TicketNo, AdmissionCode, -1);
 
-        if (ResponseCode = 0) then begin
-            if (AdmissionCode = '') then
-                AdmissionCode := '-default-';
-            ResponseMessage := StrSubstNo(NEW_MEMBER_TICKET, TicketNo, AdmissionCode, Member."External Member No.");
-        end;
+        if (AdmissionCode = '') then
+            AdmissionCode := '-default-';
 
+        ResponseMessage := StrSubstNo(NEW_MEMBER_TICKET, TicketNo, AdmissionCode, Member."External Member No.");
         exit(ResponseCode);
+
     end;
 
     local procedure TicketMakeReservation(ExternalItemNumber: Code[20]; AdmissionCode: Code[20]; MemberReference: Code[20]; ScannerStation: Code[20]; var Token: Text[100]; var ResponseMessage: Text) ReservationStatus: Boolean

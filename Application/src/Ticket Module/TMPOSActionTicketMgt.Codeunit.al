@@ -853,8 +853,7 @@ codeunit 6060123 "NPR TM POS Action: Ticket Mgt."
         TicketRequestManager.LockResources();
         //+TM1.23 [285079]
 
-        if (TicketManagement.ValidateTicketForArrival(1, ExternalTicketNumber, AdmissionCode, -1, false, ResponseMessage) <> 0) then
-            Error(ResponseMessage);
+        TicketManagement.ValidateTicketForArrival(1, ExternalTicketNumber, AdmissionCode, -1);
 
         //-TM1.47 [356582]
         if (WithPrint) then begin
@@ -876,17 +875,13 @@ codeunit 6060123 "NPR TM POS Action: Ticket Mgt."
         ResponseMessage: Text;
     begin
 
-        //-TM1.47 [408018]
         if (AdmissionCode <> '') then
             if (not Admission.Get(AdmissionCode)) then
                 Error(StrSubstNo(INVALID_ADMISSION, 'Admission Code', AdmissionCode));
 
         TicketRequestManager.LockResources();
+        TicketManagement.ValidateTicketForDeparture(1, ExternalTicketNumber, AdmissionCode);
 
-        if (TicketManagement.ValidateTicketForDeparture(1, ExternalTicketNumber, AdmissionCode, false, ResponseMessage) <> 0) then
-            Error(ResponseMessage);
-
-        //+TM1.47 [408018]
     end;
 
     local procedure ShowQuickStatistics(AdmissionCode: Code[20])
@@ -930,7 +925,7 @@ codeunit 6060123 "NPR TM POS Action: Ticket Mgt."
 
         POSSession.GetSaleLine(POSSaleLine);
 
-        TicketManagement.VerifyTicketReference(1, ExternalTicketNumber, '', TicketAccessEntryNo, true, ResponseMessage);
+        TicketManagement.ValidateTicketReference(1, ExternalTicketNumber, '', TicketAccessEntryNo);
         TicketAccessEntry.Get(TicketAccessEntryNo);
         Ticket.Get(TicketAccessEntry."Ticket No.");
 
@@ -1122,7 +1117,7 @@ codeunit 6060123 "NPR TM POS Action: Ticket Mgt."
         Ticket: Record "NPR TM Ticket";
         ResponseMessage: Text;
         NewTicketQty: Integer;
-        ResultCode: Integer;
+        QtyChanged: Boolean;
     begin
 
         Ticket.SetFilter("External Ticket No.", '=%1', CopyStr(ExternalTicketNumber, 1, MaxStrLen(Ticket."External Ticket No.")));
@@ -1135,13 +1130,13 @@ codeunit 6060123 "NPR TM POS Action: Ticket Mgt."
         if (NewTicketQty = 0) then
             exit;
 
-        ResultCode := TicketManagement.ChangeConfirmedTicketQuantity(false, Ticket."No.", AdmissionCode, NewTicketQty, ResponseMessage);
+        QtyChanged := TicketManagement.AttemptChangeConfirmedTicketQuantity(Ticket."No.", AdmissionCode, NewTicketQty, ResponseMessage);
 
         JSON.SetScope('/', true);
-        JSON.SetContext('Verbose', (ResultCode < 0));
-
-        if (ResultCode < 0) then
+        JSON.SetContext('Verbose', (not QtyChanged));
+        if (not QtyChanged) then
             JSON.SetContext('VerboseMessage', ResponseMessage);
+
     end;
 
     local procedure PickupPreConfirmedTicket(POSSession: Codeunit "NPR POS Session"; TicketReference: Code[30])
@@ -1244,13 +1239,15 @@ codeunit 6060123 "NPR TM POS Action: Ticket Mgt."
         TicketType.Get(Ticket."Ticket Type Code");
         TicketType.TestField("Membership Sales Item No.");
 
-        TicketManagement.CheckIfConsumed(true, Ticket."No.", AdmissionCode, TicketType."Membership Sales Item No.", ReasonText);
+        if (not TicketManagement.CheckIfCanBeConsumed(Ticket."No.", AdmissionCode, TicketType."Membership Sales Item No.", ReasonText)) then
+            Error(ReasonText);
         //-TM1.36 [319706]
         //POSActionTextEnter.ScanBarcode (Context, POSSession, FrontEnd, TicketType."Membership Sales Item No.");
         EanBoxEventHandler.InvokeEanBox(TicketType."Membership Sales Item No.", Context, POSSession, FrontEnd);
         //+TM1.36 [319706]
 
-        TicketManagement.ConsumeItem(true, Ticket."No.", AdmissionCode, TicketType."Membership Sales Item No.", ReasonText);
+        if (not TicketManagement.CheckAndConsumeItem(Ticket."No.", AdmissionCode, TicketType."Membership Sales Item No.", ReasonText)) then
+            Error(ReasonText);
     end;
 
     local procedure GetTicketUnitPrice(Token: Text[100]; OriginalUnitPrice: Decimal; PriceIncludesVAT: Boolean; VatPercentage: Decimal; var NewTicketPrice: Decimal): Boolean

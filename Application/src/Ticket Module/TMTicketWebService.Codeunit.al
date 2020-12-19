@@ -12,21 +12,16 @@ codeunit 6060115 "NPR TM Ticket WebService"
     procedure ValidateTicketArrival(AdmissionCode: Code[20]; ExternalTicketNo: Text[50]; ScannerStationId: Code[10]; var MessageText: Text): Boolean
     var
         TicketManagement: Codeunit "NPR TM Ticket Management";
-        MessageId: Integer;
     begin
-
-        MessageId := TicketManagement.ValidateTicketForArrival(TicketIdentifierType::EXTERNAL_TICKET_NO, ExternalTicketNo, AdmissionCode, -1, false, MessageText);
-        exit(MessageId = 0);
+        exit(TicketManagement.AttemptValidateTicketForArrival(TicketIdentifierType::EXTERNAL_TICKET_NO, ExternalTicketNo, AdmissionCode, -1, MessageText));
     end;
 
     procedure ValidateTicketDeparture(AdmissionCode: Code[20]; ExternalTicketNo: Text[50]; ScannerStationId: Code[10]; var MessageText: Text): Boolean
     var
         TicketManagement: Codeunit "NPR TM Ticket Management";
-        MessageId: Integer;
     begin
-
-        MessageId := TicketManagement.ValidateTicketForDeparture(TicketIdentifierType::EXTERNAL_TICKET_NO, ExternalTicketNo, AdmissionCode, false, MessageText);
-        exit(MessageId = 0);
+        TicketManagement.ValidateTicketForDeparture(TicketIdentifierType::EXTERNAL_TICKET_NO, ExternalTicketNo, AdmissionCode);
+        exit(true);
     end;
 
     procedure MakeTicketReservation(var Reservation: XMLport "NPR TM Ticket Reservation"; ScannerStationId: Code[10])
@@ -315,7 +310,7 @@ codeunit 6060115 "NPR TM Ticket WebService"
             ComplementaryItemNo := TicketType."Membership Sales Item No.";
         end;
 
-        if (TicketManagement.CheckIfConsumed(false, Ticket."No.", '', ComplementaryItemNo, ReasonText)) then begin
+        if (not TicketManagement.CheckIfCanBeConsumed(Ticket."No.", '', ComplementaryItemNo, ReasonText)) then begin
             ComplementaryItemNo := '';
             exit(-20);
         end;
@@ -349,7 +344,7 @@ codeunit 6060115 "NPR TM Ticket WebService"
 
         end;
 
-        TicketManagement.ConsumeItem(false, Ticket."No.", '', ComplementaryItemNo, ReasonText);
+        TicketManagement.CheckAndConsumeItem(Ticket."No.", '', ComplementaryItemNo, ReasonText);
         exit(1);
 
     end;
