@@ -13,11 +13,6 @@
             "justification": "TEMPORARY! Remove after rename!"
         },
         {
-            "id": "AS0058",
-            "action":"Warning",
-            "justification": "We need to find a better solution for code that is using AssertError!"
-        },
-        {
             "id": "AW0007",
             "action":"Warning",
             "justification": "The Web client does not support displaying Repeater controls that contain FlowFilter fields!"
