@@ -590,9 +590,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
         end;
     end;
 
-    //--- NC ---
-
-    procedure SetMagentoEnabled()
+    procedure NPR_SetMagentoEnabled()
     var
         MagentoSetup: Record "NPR Magento Setup";
     begin
@@ -603,22 +601,22 @@ pageextension 6014433 "NPR Item List" extends "Item List"
         MagentoEnabledDisplayConfig := MagentoSetup."Customers Enabled";
     end;
 
-    procedure SetVendorNo(VendorNo: Code[20])
+    procedure NPR_SetVendorNo(VendorNo: Code[20])
     begin
         SetFilter("Vendor No.", VendorNo);
     end;
 
-    procedure SetVariantCode(VariantCode: Code[20])
+    procedure NPR_SetVariantCode(VariantCode: Code[20])
     begin
         SetFilter("Variant Filter", "Variant Filter");
     end;
 
-    procedure SetLocationCode(LocationCode: Code[20])
+    procedure NPR_SetLocationCode(LocationCode: Code[20])
     begin
         SetFilter("Location Filter", LocationCode);
     end;
 
-    procedure SetBlocked(OptBlocked: Option All,OnlyBlocked,OnlyUnblocked)
+    procedure NPR_SetBlocked(OptBlocked: Option All,OnlyBlocked,OnlyUnblocked)
     begin
         case OptBlocked of
             OptBlocked::All:
@@ -630,7 +628,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
         end;
     end;
 
-    procedure GetViewText(): Text
+    procedure NPR_GetViewText(): Text
     begin
         exit(Rec.GetView(false));
     end;

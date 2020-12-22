@@ -267,12 +267,8 @@ page 6014463 "NPR Item List"
     trigger OnAfterGetCurrRecord()
     var
         CRMCouplingManagement: Codeunit "CRM Coupling Management";
-        SocialListeningMgt: Codeunit "Social Listening Management";
         WorkflowWebhookManagement: Codeunit "Workflow Webhook Management";
     begin
-        if SocialListeningSetupVisible then
-            SocialListeningMgt.GetItemFactboxVisibility(Rec, SocialListeningSetupVisible, SocialListeningVisible);
-
         if CRMIntegrationEnabled then
             CRMIsCoupledToRecord := CRMCouplingManagement.IsRecordCoupledToCRM(RecordId);
 
@@ -320,13 +316,10 @@ page 6014463 "NPR Item List"
 
     trigger OnOpenPage()
     var
-        SocialListeningSetup: Record "Social Listening Setup";
         CRMIntegrationManagement: Codeunit "CRM Integration Management";
         ClientTypeManagement: Codeunit "Client Type Management";
     begin
         CRMIntegrationEnabled := CRMIntegrationManagement.IsCRMIntegrationEnabled;
-        with SocialListeningSetup do
-            SocialListeningSetupVisible := Get and "Show on Customers" and "Accept License Agreement" and ("Solution ID" <> '');
         IsFoundationEnabled := ApplicationAreaMgmtFacade.IsFoundationEnabled;
         SetWorkflowManagementEnabledState;
         IsOnPhone := ClientTypeManagement.GetCurrentClientType = CLIENTTYPE::Phone;
@@ -343,10 +336,6 @@ page 6014463 "NPR Item List"
         ClientTypeManagement: Codeunit "Client Type Management";
         SkilledResourceList: Page "Skilled Resource List";
         IsFoundationEnabled: Boolean;
-        [InDataSet]
-        SocialListeningSetupVisible: Boolean;
-        [InDataSet]
-        SocialListeningVisible: Boolean;
         CRMIntegrationEnabled: Boolean;
         CRMIsCoupledToRecord: Boolean;
         OpenApprovalEntriesExist: Boolean;
