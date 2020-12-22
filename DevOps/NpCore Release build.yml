@@ -68,7 +68,7 @@ jobs:
             additionalFiles:
             - '$(Build.ArtifactStagingDirectory)\releasenotes.html'
         versionVariableName: 'LastUsedVerNo'
-        versionRevisionSeed: 8900
+        versionRevisionSeed: 0
         runtimePackage: TRUE
     # - task: PowerShell@2
     #   inputs:
