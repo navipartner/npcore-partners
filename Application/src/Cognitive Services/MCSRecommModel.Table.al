@@ -1,7 +1,5 @@
 table 6060081 "NPR MCS Recomm. Model"
 {
-    // NPR5.30/BR  /20170215  CASE 252646 Object Created
-
     Caption = 'MCS Recommendations Model';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR MCS Recomm. Model Card";
@@ -110,11 +108,6 @@ table 6060081 "NPR MCS Recomm. Model"
         {
             Caption = 'Item Ledger Entry View';
             DataClassification = CustomerContent;
-
-            trigger OnLookup()
-            begin
-                //SetItemLedgerEntryView
-            end;
         }
         field(200; Categories; Option)
         {
@@ -201,7 +194,7 @@ table 6060081 "NPR MCS Recomm. Model"
         RetailItemList.LookupMode := true;
         if RetailItemList.RunModal <> ACTION::LookupOK then
             exit;
-        "Item View" := RetailItemList.GetViewText;
+        "Item View" := RetailItemList.NPR_GetViewText;
     end;
 
     local procedure LookupAttributeView()
@@ -246,7 +239,6 @@ table 6060081 "NPR MCS Recomm. Model"
         ItemLedgerEntries.LookupMode := true;
         if ItemLedgerEntries.RunModal <> ACTION::LookupOK then
             exit;
-        //"Item Ledger Entry View" := ItemLedgerEntries.GetViewText;
     end;
 
     local procedure CheckCatalogChanges()

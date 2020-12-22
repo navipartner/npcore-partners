@@ -110,7 +110,7 @@ pageextension 6014430 "NPR Item Card Extension" extends "Item Card"
                 ApplicationArea = All;
                 trigger OnValidate()
                 begin
-                    CheckItemGroup();
+                    NPR_CheckItemGroup();
                 end;
             }
 
@@ -137,7 +137,7 @@ pageextension 6014430 "NPR Item Card Extension" extends "Item Card"
         {
             trigger OnAfterValidate()
             begin
-                CheckItemGroup();
+                NPR_CheckItemGroup();
             end;
         }
 
@@ -145,7 +145,7 @@ pageextension 6014430 "NPR Item Card Extension" extends "Item Card"
         {
             trigger OnAfterValidate()
             begin
-                CheckItemGroup();
+                NPR_CheckItemGroup();
             end;
         }
 
@@ -153,7 +153,7 @@ pageextension 6014430 "NPR Item Card Extension" extends "Item Card"
         {
             trigger OnAfterValidate()
             begin
-                CheckItemGroup();
+                NPR_CheckItemGroup();
             end;
         }
 
@@ -161,7 +161,7 @@ pageextension 6014430 "NPR Item Card Extension" extends "Item Card"
         {
             trigger OnAfterValidate()
             begin
-                CheckItemGroup();
+                NPR_CheckItemGroup();
             end;
         }
 
@@ -169,7 +169,7 @@ pageextension 6014430 "NPR Item Card Extension" extends "Item Card"
         {
             trigger OnAfterValidate()
             begin
-                CheckItemGroup();
+                NPR_CheckItemGroup();
             end;
         }
 
@@ -177,7 +177,7 @@ pageextension 6014430 "NPR Item Card Extension" extends "Item Card"
         {
             trigger OnAfterValidate()
             begin
-                CheckItemGroup();
+                NPR_CheckItemGroup();
             end;
         }
 
@@ -185,7 +185,7 @@ pageextension 6014430 "NPR Item Card Extension" extends "Item Card"
         {
             trigger OnAfterValidate()
             begin
-                CheckItemGroup();
+                NPR_CheckItemGroup();
             end;
         }
 
@@ -193,7 +193,7 @@ pageextension 6014430 "NPR Item Card Extension" extends "Item Card"
         {
             trigger OnAfterValidate()
             begin
-                CheckItemGroup();
+                NPR_CheckItemGroup();
             end;
         }
 
@@ -201,7 +201,7 @@ pageextension 6014430 "NPR Item Card Extension" extends "Item Card"
         {
             trigger OnAfterValidate()
             begin
-                CheckItemGroup();
+                NPR_CheckItemGroup();
             end;
         }
 
@@ -209,7 +209,7 @@ pageextension 6014430 "NPR Item Card Extension" extends "Item Card"
         {
             trigger OnAfterValidate()
             begin
-                CheckItemGroup();
+                NPR_CheckItemGroup();
             end;
         }
 
@@ -217,7 +217,7 @@ pageextension 6014430 "NPR Item Card Extension" extends "Item Card"
         {
             trigger OnAfterValidate()
             begin
-                CheckItemGroup();
+                NPR_CheckItemGroup();
             end;
         }
 
@@ -225,7 +225,7 @@ pageextension 6014430 "NPR Item Card Extension" extends "Item Card"
         {
             trigger OnAfterValidate()
             begin
-                CheckItemGroup();
+                NPR_CheckItemGroup();
             end;
         }
 
@@ -234,7 +234,7 @@ pageextension 6014430 "NPR Item Card Extension" extends "Item Card"
         {
             trigger OnAfterValidate()
             begin
-                CheckItemGroup();
+                NPR_CheckItemGroup();
             end;
         }
 
@@ -242,7 +242,7 @@ pageextension 6014430 "NPR Item Card Extension" extends "Item Card"
         {
             trigger OnAfterValidate()
             begin
-                CheckItemGroup();
+                NPR_CheckItemGroup();
             end;
         }
 
@@ -502,7 +502,7 @@ pageextension 6014430 "NPR Item Card Extension" extends "Item Card"
                         Importance = Promoted;
                         trigger OnValidate()
                         begin
-                            SetMagentoEnabled();
+                            NPR_SetMagentoEnabled();
                         end;
                     }
                     field("NPR Magento Status"; "NPR Magento Status")
@@ -613,11 +613,9 @@ pageextension 6014430 "NPR Item Card Extension" extends "Item Card"
                             MagentoFunctions: Codeunit "NPR Magento Functions";
                             MagentoItemCustomOptions: Page "NPR Magento Item Cstm Options";
                         begin
-                            //-MAG1.22
                             Clear(MagentoItemCustomOptions);
                             MagentoItemCustomOptions.SetItemNo("No.");
                             MagentoItemCustomOptions.Run;
-                            //+MAG1.22
                         end;
                     }
                     field("NPR Backorder"; "NPR Backorder")
@@ -921,7 +919,7 @@ pageextension 6014430 "NPR Item Card Extension" extends "Item Card"
 
                 trigger OnAction()
                 begin
-                    ReplicateItem();
+                    NPR_ReplicateItem();
                 end;
 
             }
@@ -1304,7 +1302,7 @@ pageextension 6014430 "NPR Item Card Extension" extends "Item Card"
 
     trigger OnOpenPage()
     begin
-        SetMagentoEnabled();
+        NPR_SetMagentoEnabled();
         CurrPage.NPRMagentoPictureDragDropAddin.Page.SetAutoOverwrite(true);
         NPRAttrManagement.GetAttributeVisibility(DATABASE::Item, NPRAttrVisibleArray);
         NPRAttrVisible01 := NPRAttrVisibleArray[1];
@@ -1366,11 +1364,10 @@ pageextension 6014430 "NPR Item Card Extension" extends "Item Card"
     end;
 
 
-    procedure SetMagentoEnabled()
+    procedure NPR_SetMagentoEnabled()
     var
         MagentoSetup: Record "NPR Magento Setup";
     begin
-        //-MAG1.21
         if not (MagentoSetup.Get and MagentoSetup."Magento Enabled") then
             exit;
 
@@ -1380,34 +1377,20 @@ pageextension 6014430 "NPR Item Card Extension" extends "Item Card"
         MagentoEnabledSpecialPrices := MagentoSetup."Special Prices Enabled";
         MagentoEnabledMultistore := MagentoSetup."Multistore Enabled";
         MagentoEnabledDisplayConfig := MagentoSetup."Customers Enabled";
-        //+MAG1.21
-        //-MAG1.22
         MagentoEnabledProductRelations := MagentoSetup."Product Relations Enabled";
         MagentoEnabledCustomOptions := MagentoSetup."Custom Options Enabled";
-        //+MAG1.22
-        //-MAG2.22 [359285]
         MagentoPictureVarietyTypeVisible :=
           (MagentoSetup."Variant System" = MagentoSetup."Variant System"::Variety) and
           (MagentoSetup."Picture Variety Type" = MagentoSetup."Picture Variety Type"::"Select on Item");
-        //+MAG2.22 [359285]
     end;
 
-
-    procedure CheckItemGroup()
+    procedure NPR_CheckItemGroup()
     begin
         IF ("NPR Item Group" = '') THEN
             FIELDERROR("NPR Item Group");
     end;
 
-
-
-
-
-
-
-
-
-    procedure ReplicateItem()
+    procedure NPR_ReplicateItem()
     var
         InputDialog: Page "NPR Input Dialog";
         NewItemNo: Code[20];
@@ -1433,12 +1416,10 @@ pageextension 6014430 "NPR Item Card Extension" extends "Item Card"
         ItemCopy."Maximum Inventory" := 0;
         ItemCopy."Units per Parcel" := 0;
         ItemCopy."Search Description" := Description;
-        //-NPR5.43
         ItemCopy."NPR Label Barcode" := '';
         ItemCopy."Net Weight" := 0;
         CalcFields("NPR Magento Description");
         ItemCopy."NPR Magento Description" := "NPR Magento Description";
-        //+NPR5.43
         ItemCopy.Insert(true);
 
         ItemUnitofMeasure.SetRange("Item No.", "No.");
@@ -1451,57 +1432,7 @@ pageextension 6014430 "NPR Item Card Extension" extends "Item Card"
         end;
 
         Get(ItemCopy."No.");
-        //+TS
-        //CurrForm.UPDATE(FALSE);
         CurrPage.Update(false);
-        //-TS
     end;
-    //Unsupported feature: Code Insertion on "OnAfterGetRecord".
-
-    //trigger OnAfterGetRecord()
-    //begin
-    /*
-    //-NPR4.11
-    NPRAttrManagement.GetMasterDataAttributeValue (NPRAttrTextArray, DATABASE::Item, "No.");
-    NPRAttrEditable := CurrPage.Editable ();
-    //+NPR4.11
-    */
-    //end;
-
-
-    //Unsupported feature: Code Modification on "OnOpenPage".
-
-    //trigger OnOpenPage()
-    //>>>> ORIGINAL CODE:
-    //begin
-    /*
-    IsFoundationEnabled := ApplicationAreaMgmtFacade.IsFoundationEnabled;
-    EnableControls;
-    SetNoFieldVisible;
-    IsSaaS := PermissionManager.SoftwareAsAService;
-    */
-    //end;
-    //>>>> MODIFIED CODE:
-    //begin
-    /*
-    //-NPR4.11
-    NPRAttrManagement.GetAttributeVisibility (DATABASE::Item, NPRAttrVisibleArray);
-    NPRAttrVisible01 := NPRAttrVisibleArray[1];
-    NPRAttrVisible02 := NPRAttrVisibleArray[2];
-    NPRAttrVisible03 := NPRAttrVisibleArray[3];
-    NPRAttrVisible04 := NPRAttrVisibleArray[4];
-    NPRAttrVisible05 := NPRAttrVisibleArray[5];
-    NPRAttrVisible06 := NPRAttrVisibleArray[6];
-    NPRAttrVisible07 := NPRAttrVisibleArray[7];
-    NPRAttrVisible08 := NPRAttrVisibleArray[8];
-    NPRAttrVisible09 := NPRAttrVisibleArray[9];
-    NPRAttrVisible10 := NPRAttrVisibleArray[10];
-
-    NPRAttrEditable := CurrPage.Editable ();
-    //+NPR4.11
-
-    #1..4
-    */
-    //end;
 }
 

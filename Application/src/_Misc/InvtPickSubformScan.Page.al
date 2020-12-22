@@ -1,7 +1,5 @@
 page 6014461 "NPR Invt. Pick Subform Scan"
 {
-    // NPR5.33/NPKNAV/20170630  CASE 268412 Transport NPR5.33 - 30 June 2017
-
     Caption = 'Lines';
     Editable = false;
     InsertAllowed = false;
@@ -23,12 +21,12 @@ page 6014461 "NPR Invt. Pick Subform Scan"
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the action type.';
                 }
                 field("Source Document"; "Source Document")
                 {
                     ApplicationArea = All;
                     BlankZero = true;
-                    OptionCaption = ' ,Sales Order,,,,,,,Purchase Return Order,,Outbound Transfer,Prod. Consumption';
                     Visible = false;
                 }
                 field("Source No."; "Source No.")
