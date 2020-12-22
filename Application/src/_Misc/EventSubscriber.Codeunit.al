@@ -1,14 +1,9 @@
 codeunit 6014404 "NPR Event Subscriber"
 {
-    trigger OnRun()
-    begin
-    end;
-
     var
         RegisterCodeAlreadyUsed: Label 'Register Code %1 already exists.';
         SalesPersonDeleteError: Label 'you cannot delete Salesperson/purchaser %1 before the sale is posted in the Audit roll!';
 
-    //--- Table 13 Salesperson/Purchaser ---
 
     [EventSubscriber(ObjectType::Table, 13, 'OnAfterDeleteEvent', '', true, false)]
     local procedure T13OnAfterDeleteEvent(var Rec: Record "Salesperson/Purchaser"; RunTrigger: Boolean)
@@ -35,8 +30,6 @@ codeunit 6014404 "NPR Event Subscriber"
         end;
     end;
 
-    //--- Table 83 Item Journal Line ---
-
     [EventSubscriber(ObjectType::Table, 83, 'OnAfterValidateEvent', 'Cross-Reference No.', false, false)]
     local procedure T83OnAfterValidateEventCrossReferenceNo(var Rec: Record "Item Journal Line"; var xRec: Record "Item Journal Line"; CurrFieldNo: Integer)
     var
@@ -44,8 +37,6 @@ codeunit 6014404 "NPR Event Subscriber"
     begin
         StdTableCode.ItemJnlLineCrossReferenceOV(Rec, xRec);
     end;
-
-    //--- Table 352 Default Dimension ---
 
     [EventSubscriber(ObjectType::Table, 352, 'OnAfterInsertEvent', '', false, false)]
     local procedure T352OnAfterInsertEvent(var Rec: Record "Default Dimension"; RunTrigger: Boolean)
@@ -92,8 +83,6 @@ codeunit 6014404 "NPR Event Subscriber"
         end;
     end;
 
-    //--- Codeunit 1 ApplicationManagement ---
-
     [EventSubscriber(ObjectType::Codeunit, Codeunit::LogInManagement, 'OnBeforeLogInStart', '', true, false)]
     local procedure OnBeforeLogInStart()
     var
@@ -110,8 +99,6 @@ codeunit 6014404 "NPR Event Subscriber"
 
         if ServiceTierUserManagement.Run() then;
     end;
-
-    //--- Codeunit 22 Item Jnl.-Post Line ---
 
     [EventSubscriber(ObjectType::Codeunit, 22, 'OnBeforeInsertTransferEntry', '', true, false)]
     local procedure C22OnBeforeInsertTransferEntry(var NewItemLedgerEntry: Record "Item Ledger Entry"; var OldItemLedgerEntry: Record "Item Ledger Entry"; var ItemJournalLine: Record "Item Journal Line")
@@ -182,8 +169,6 @@ codeunit 6014404 "NPR Event Subscriber"
         end;
     end;
 
-    //--- Codeunit 80 Sales-Post ---
-
     [EventSubscriber(ObjectType::Codeunit, 80, 'OnBeforePostSalesDoc', '', true, false)]
     local procedure C80OnBeforePostSalesDoc(var SalesHeader: Record "Sales Header")
     var
@@ -221,8 +206,6 @@ codeunit 6014404 "NPR Event Subscriber"
                 end;
     end;
 
-    //--- Page 30 Item Card ---
-
     [EventSubscriber(ObjectType::Page, 30, 'OnAfterActionEvent', 'NPR AttributeValues', false, false)]
     local procedure P30OnAfterActionEventNPRAttributeValues(var Rec: Record Item)
     var
@@ -230,8 +213,6 @@ codeunit 6014404 "NPR Event Subscriber"
     begin
         NPRAttrManagement.ShowMasterDataAttributeValues(DATABASE::Item, Rec."No.");
     end;
-
-    //--- Page42 Sales Order ---
 
     [EventSubscriber(ObjectType::Page, 42, 'OnAfterActionEvent', 'NPR Consignor Label', false, false)]
     local procedure P42OnAfterActionEventConsignorLabel(var Rec: Record "Sales Header")
@@ -265,8 +246,8 @@ codeunit 6014404 "NPR Event Subscriber"
     begin
         Rec.TestField(Status, Rec.Status::Open);
         Rec.TestField("Sell-to Customer No.");
-        RetailItemList.SetLocationCode(Rec."Location Code");
-        RetailItemList.SetBlocked(2);
+        RetailItemList.NPR_SetLocationCode(Rec."Location Code");
+        RetailItemList.NPR_SetBlocked(2);
         RetailItemList.LookupMode := true;
         while RetailItemList.RunModal = ACTION::LookupOK do begin
             RetailItemList.GetRecord(Item);
@@ -294,18 +275,16 @@ codeunit 6014404 "NPR Event Subscriber"
             SalesLine.Validate(Quantity, InputQuantity);
             SalesLine.Modify(true);
             Commit;
-            ViewText := RetailItemList.GetViewText;
+            ViewText := RetailItemList.NPR_GetViewText;
             Clear(RetailItemList);
-            RetailItemList.SetLocationCode(Rec."Location Code");
-            RetailItemList.SetVendorNo(Rec."NPR Buy-From Vendor No.");
+            RetailItemList.NPR_SetLocationCode(Rec."Location Code");
+            RetailItemList.NPR_SetVendorNo(Rec."NPR Buy-From Vendor No.");
             Item.SetView(ViewText);
             RetailItemList.SetTableView(Item);
             RetailItemList.SetRecord(Item);
             RetailItemList.LookupMode := true;
         end;
     end;
-
-    //--- Page 43 Sales Invoice ---
 
     [EventSubscriber(ObjectType::Page, 43, 'OnAfterActionEvent', 'NPR ImportFromScanner', false, false)]
     local procedure P43OnAfterActionEventImportFromScannerFile(var Rec: Record "Sales Header")
@@ -317,8 +296,6 @@ codeunit 6014404 "NPR Event Subscriber"
         ImportfromScannerFileSO.Run;
     end;
 
-    //--- Page 44 Sales Credit Memo ---
-
     [EventSubscriber(ObjectType::Page, 44, 'OnAfterActionEvent', 'NPR ImportFromScanner', false, false)]
     local procedure P44OnAfterActionEventImportFromScannerFile(var Rec: Record "Sales Header")
     var
@@ -328,8 +305,6 @@ codeunit 6014404 "NPR Event Subscriber"
         ImportfromScannerFileSO.SetTableView(Rec);
         ImportfromScannerFileSO.Run;
     end;
-
-    //--- Page 50 Purchase Order ---
 
     [EventSubscriber(ObjectType::Page, 50, 'OnAfterActionEvent', 'NPR InsertLineVendorItem', false, false)]
     local procedure P50OnAfterActionEventInsertLinewithVendorItem(var Rec: Record "Purchase Header")
@@ -345,8 +320,8 @@ codeunit 6014404 "NPR Event Subscriber"
     begin
         Rec.TestField(Status, Rec.Status::Open);
         Rec.TestField("Buy-from Vendor No.");
-        RetailItemList.SetLocationCode(Rec."Location Code");
-        RetailItemList.SetVendorNo(Rec."Buy-from Vendor No.");
+        RetailItemList.NPR_SetLocationCode(Rec."Location Code");
+        RetailItemList.NPR_SetVendorNo(Rec."Buy-from Vendor No.");
         RetailItemList.LookupMode := true;
         while RetailItemList.RunModal = ACTION::LookupOK do begin
             RetailItemList.GetRecord(Item);
@@ -373,10 +348,10 @@ codeunit 6014404 "NPR Event Subscriber"
             PurchaseLine.Validate(Quantity, InputQuantity);
             PurchaseLine.Modify(true);
             Commit;
-            ViewText := RetailItemList.GetViewText;
+            ViewText := RetailItemList.NPR_GetViewText;
             Clear(RetailItemList);
-            RetailItemList.SetLocationCode(Rec."Location Code");
-            RetailItemList.SetVendorNo(Rec."Buy-from Vendor No.");
+            RetailItemList.NPR_SetLocationCode(Rec."Location Code");
+            RetailItemList.NPR_SetVendorNo(Rec."Buy-from Vendor No.");
             Item.SetView(ViewText);
             RetailItemList.SetTableView(Item);
             RetailItemList.SetRecord(Item);
@@ -394,8 +369,6 @@ codeunit 6014404 "NPR Event Subscriber"
         ImportfromScannerFilePO.Run;
     end;
 
-    //--- Page 49 Purchase Quote ---
-
     [EventSubscriber(ObjectType::Page, 49, 'OnAfterActionEvent', 'NPR ImportFromScanner', false, false)]
     local procedure P49OnAfterActionEventImportFromScannerFile(var Rec: Record "Purchase Header")
     var
@@ -406,8 +379,6 @@ codeunit 6014404 "NPR Event Subscriber"
         ImportfromScannerFilePO.Run;
     end;
 
-    //--- Page 52 Purchase Credit Memo ---
-
     [EventSubscriber(ObjectType::Page, 52, 'OnAfterActionEvent', 'NPR Import From Scanner File', false, false)]
     local procedure P52OnAfterActionEventImportFromScannerFile(var Rec: Record "Purchase Header")
     var
@@ -417,8 +388,6 @@ codeunit 6014404 "NPR Event Subscriber"
         ImportfromScannerFilePO.SetTableView(Rec);
         ImportfromScannerFilePO.Run;
     end;
-
-    //--- Page 130 Posted Sales Shipment ---
 
     [EventSubscriber(ObjectType::Page, 130, 'OnAfterActionEvent', 'NPR CreatePacsoftDocument', false, false)]
     local procedure P130OnAfterActionEventCreatePacsoftDocument(var Rec: Record "Sales Shipment Header")
@@ -438,8 +407,6 @@ codeunit 6014404 "NPR Event Subscriber"
         ConsignorEntry.InsertFromShipmentHeader(Rec."No.");
     end;
 
-    //--- Page132 Posted Sales Invoice ---
-
     [EventSubscriber(ObjectType::Page, 132, 'OnAfterActionEvent', 'NPR Consignor Label', false, false)]
     local procedure P132OnAfterActionEventConsignorLabel(var Rec: Record "Sales Invoice Header")
     var
@@ -448,8 +415,6 @@ codeunit 6014404 "NPR Event Subscriber"
         ConsignorEntry.InsertFromPostedInvoiceHeader(Rec."No.");
     end;
 
-    //--- Page 291 Req. Worksheet ---
-
     [EventSubscriber(ObjectType::Page, 291, 'OnAfterActionEvent', 'NPR &ReadFromScanner', false, false)]
     local procedure P291OnAfterActionEventReadFromScanner(var Rec: Record "Requisition Line")
     var
@@ -457,8 +422,6 @@ codeunit 6014404 "NPR Event Subscriber"
     begin
         ScannerFunctions.initPurchJnl(Rec);
     end;
-
-    //--- Page 5740 Transfer Order ---
 
     [EventSubscriber(ObjectType::Page, 5740, 'OnAfterActionEvent', 'NPR Import From Scanner File', false, false)]
     local procedure P5740OnAfterActionEventImportFromScannerFile(var Rec: Record "Transfer Header")
@@ -478,8 +441,6 @@ codeunit 6014404 "NPR Event Subscriber"
         ScannerFunctions.initTransfer(Rec);
     end;
 
-    //--- Page 9506 Session List ---
-
     [EventSubscriber(ObjectType::Page, Page::"Concurrent Session List", 'OnAfterActionEvent', 'NPR Kill Session', false, false)]
     local procedure P956OnAfterActionEventKillSession(var Rec: Record "Active Session")
     var
@@ -488,8 +449,6 @@ codeunit 6014404 "NPR Event Subscriber"
         if Confirm(Text6014400, false) then
             StopSession(Rec."Session ID");
     end;
-
-    //--- Page 6014453 Campaign Discount ---
 
     [EventSubscriber(ObjectType::Page, 6014453, 'OnAfterActionEvent', 'Transfer from Period Discount', false, false)]
     local procedure P6014453OnAfterActionEventTransferFromPeriodDiscount(var Rec: Record "NPR Period Discount")
