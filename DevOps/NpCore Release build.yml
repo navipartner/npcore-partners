@@ -39,6 +39,14 @@ jobs:
     licenseSecureFileName: 'DEV_BC OP 17.flf'
     scriptsRepo: ScriptsRepo
     stepList:
+    - task: XplatGenerateReleaseNotes@3
+      inputs: 
+        outputfile: '$(Build.ArtifactStagingDirectory)\releasenotes.html'
+        templatefile: '$(ScriptsRootFolder)/ReleaseNotesTemplates/build-handlebars-template.html'
+        replaceFile: true
+        showOnlyPrimary: true
+        getIndirectPullRequests: false
+      displayName: Generate Release Notes    
     - template: YAML/Templates/Step/BuildALApp.yml@scriptsRepo
       parameters:
         containerName: $(containerName)
@@ -52,11 +60,19 @@ jobs:
         - package:
             source: 'https://api.nuget.org/v3/index.json;https://pkgs.dev.azure.com/navipartner/_packaging/NprAddIns/nuget/v3/index.json'
             id: NaviPartner.NPRetail.AddIns.BC #CASE SENSITIVE!
-            destinationPath: '$(ServiceTierFolder)/Add-Ins'            
+            destinationPath: '$(ServiceTierFolder)/Add-Ins'
         appNuGetSource: 
             source: 'https://pkgs.dev.azure.com/navipartner/_packaging/NpCore/nuget/v3/index.json'
-            id: NaviPartner.NPCore.BC170            
+            id: NaviPartner.NPCore.BC170
             tags: $(artifactURL)
+            additionalFiles:
+            - '$(Build.ArtifactStagingDirectory)\releasenotes.html'
         versionVariableName: 'LastUsedVerNo'
-        versionRevisionSeed: 0
+        versionRevisionSeed: 8900
         runtimePackage: TRUE
+    # - task: PowerShell@2
+    #   inputs:
+    #     targetType: inline
+    #     script: >
+    #       Write-Host "##vso[task.uploadsummary]$(Build.ArtifactStagingDirectory)\releasenotes.html" 
+    #   displayName: Publish Release Notes
