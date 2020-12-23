@@ -1,8 +1,5 @@
 page 6150638 "NPR POS Posting Profiles"
 {
-    // NPR5.52/ALPO/20190923 CASE 365326 Posting related fields moved here (POS Posting Profiles) from NP Retail Setup
-    // NPR5.52/SARA/20191003 CASE 371385 Removed note section
-
     Caption = 'POS Posting Profiles';
     CardPageID = "NPR POS Post. Profile Card";
     Editable = false;
@@ -25,16 +22,6 @@ page 6150638 "NPR POS Posting Profiles"
                     ApplicationArea = All;
                 }
                 field("Automatic Item Posting"; "Automatic Item Posting")
-                {
-                    ApplicationArea = All;
-                    Visible = false;
-                }
-                field("Adj. Cost after Item Posting"; "Adj. Cost after Item Posting")
-                {
-                    ApplicationArea = All;
-                    Visible = false;
-                }
-                field("Post to G/L after Item Posting"; "Post to G/L after Item Posting")
                 {
                     ApplicationArea = All;
                     Visible = false;

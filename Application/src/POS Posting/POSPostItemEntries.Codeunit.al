@@ -52,32 +52,9 @@ codeunit 6150616 "NPR POS Post Item Entries"
 
                     CheckAndCreateServiceItemPos(POSEntry, POSSalesLine);
 
-                    if POSPostingProfile."Adj. Cost after Item Posting" then begin
-                        if not TempItemToAdjust.Get(POSSalesLine."No.") then begin
-                            TempItemToAdjust."No." := POSSalesLine."No.";
-                            TempItemToAdjust.Insert;
-                        end;
-                    end;
-
                     if (POSSalesLine."Retail Serial No." <> '') then
                         HandleRetailSerialNo(POSSalesLine);
                 until POSSalesLine.Next = 0;
-        end;
-
-        if POSPostingProfile."Adj. Cost after Item Posting" then begin
-            if TempItemToAdjust.FindSet then
-                repeat
-                    AdjustCostItemEntries.UseRequestPage(false);
-                    AdjustCostItemEntries.InitializeRequest(TempItemToAdjust."No.", '');
-                    AdjustCostItemEntries.Run;
-                    Clear(AdjustCostItemEntries);
-                until TempItemToAdjust.Next = 0;
-        end;
-        if POSPostingProfile."Post to G/L after Item Posting" then begin
-            PostInventoryCosttoGL.UseRequestPage(false);
-            PostInventoryCosttoGL.InitializeRequest(1, '', true);
-            PostInventoryCosttoGL.SaveAsXml(FileManagement.ServerTempFileName('.xml'));
-            Clear(PostInventoryCosttoGL);
         end;
 
         OnAfterPostPOSEntry(Rec);
