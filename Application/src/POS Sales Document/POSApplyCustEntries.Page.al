@@ -387,32 +387,6 @@ page 6014493 "NPR POS Apply Cust. Entries"
                         SetCustApplId;
                     end;
                 }
-                action("Post Application")
-                {
-                    Caption = 'Post Application';
-                    Ellipsis = true;
-                    Image = PostApplication;
-                    Promoted = true;
-                    PromotedCategory = Process;
-                    ShortCutKey = 'F9';
-                    ApplicationArea = All;
-
-                    trigger OnAction()
-                    begin
-                        PostDirectApplication(false);
-                    end;
-                }
-                action("Preview")
-                {
-                    Caption = 'Preview Posting';
-                    Image = ViewPostedOrder;
-                    ApplicationArea = All;
-
-                    trigger OnAction()
-                    begin
-                        PostDirectApplication(true);
-                    end;
-                }
                 separator("-")
                 {
                     Caption = '-';
@@ -1150,43 +1124,6 @@ page 6014493 "NPR POS Apply Cust. Entries"
     local procedure LookupOKOnPush()
     begin
         OK := true;
-    end;
-
-    local procedure PostDirectApplication(PreviewMode: Boolean)
-    var
-        CustEntryApplyPostedEntries: Codeunit "CustEntry-Apply Posted Entries";
-        PostApplication: Page "Post Application";
-        ApplicationDate: Date;
-        NewApplicationDate: Date;
-        NewDocumentNo: Code[20];
-    begin
-        if CalcType = CalcType::Direct then begin
-            if ApplyingCustLedgEntry."Entry No." <> 0 then begin
-                Rec := ApplyingCustLedgEntry;
-                ApplicationDate := CustEntryApplyPostedEntries.GetApplicationDate(Rec);
-
-                PostApplication.SetValues("Document No.", ApplicationDate);
-                if ACTION::OK = PostApplication.RunModal then begin
-                    PostApplication.GetValues(NewDocumentNo, NewApplicationDate);
-                    if NewApplicationDate < ApplicationDate then
-                        Error(Text013, FieldCaption("Posting Date"), TableCaption);
-                end else
-                    Error(Text019);
-
-                if PreviewMode then
-                    CustEntryApplyPostedEntries.PreviewApply(Rec, NewDocumentNo, NewApplicationDate)
-                else
-                    CustEntryApplyPostedEntries.Apply(Rec, NewDocumentNo, NewApplicationDate);
-
-                if not PreviewMode then begin
-                    Message(Text012);
-                    PostingDone := true;
-                    CurrPage.Close;
-                end;
-            end else
-                Error(Text002);
-        end else
-            Error(Text003);
     end;
 
     procedure SetSalesLine(NewGenJnlLine: Record "NPR Sale Line POS"; ApplnTypeSelect: Integer)

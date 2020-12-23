@@ -1,13 +1,5 @@
 codeunit 6150814 "NPR POS Action: Sal.Doc.Exp."
 {
-    // NPR5.32/ANEN /20170314  CASE 268218 POS Action for exporting from POS to NAV Sales Document (wraps around CU[Retail Sales Doc. Mgt.])
-    // NPR5.32.10/BR   /20170523  CASE 277092 Added Parameters to overwrite data from POS Sale Line
-    // NPR5.34/ANEN  /20170713  CASE 283669 Added parameter. SetAutoReserveSalesLine and support for it.
-    // NPR5.40/THRO/20180326 CASE 302617 Added parameter SetSendPdf2Nav - Send posted document with pdf2nav
-    // NPR5.45/THRO/20180823 CASE 313966 Added parameters AskExtDocNo and AskAttention
-    // NPR5.45/THRO/20180823 CASE 325216 Added Document Type::Quote
-
-
     trigger OnRun()
     begin
     end;
@@ -30,9 +22,7 @@ codeunit 6150814 "NPR POS Action: Sal.Doc.Exp."
 
     local procedure ActionVersion(): Text
     begin
-        //-NPR5.45 [313966]
         exit('1.4');
-        //+NPR5.45 [313966]
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
@@ -46,16 +36,10 @@ codeunit 6150814 "NPR POS Action: Sal.Doc.Exp."
               Sender.Type::Generic,
               Sender."Subscriber Instances Allowed"::Multiple) then begin
 
-                //-NPR5.45 [313966]
                 RegisterWorkflowStep('extdocno', '(param.AskExtDocNo) && input (labels.ExtDocNo).cancel (abort);');
                 RegisterWorkflowStep('attention', '(param.AskAttention) && input (labels.Attention).cancel (abort);');
-                //+NPR5.45 [313966]
-                //RegisterWorkflowStep('setCustomer','if (param.SetCustomer == true) { respond(); }');
                 RegisterWorkflowStep('startDocumentManager', 'respond();');
-                //RegisterWorkflowStep('doneDocumentManager','');
                 RegisterWorkflow(true);
-
-                //Parameter for exteral workflow call
                 RegisterBooleanParameter('SetCustomer', false);
 
                 //Reset
@@ -68,43 +52,28 @@ codeunit 6150814 "NPR POS Action: Sal.Doc.Exp."
                 RegisterBooleanParameter('SetPost', false);
                 RegisterBooleanParameter('SetReceive', false);
                 RegisterBooleanParameter('SetShip', false);
-                //-NPR5.45 [325216]
                 RegisterOptionParameter('SetDocumentType', 'Order,Invoice,ReturnOrder,CreditMemo,Quote', 'Order');
-                //+NPR5.45 [325216]
                 RegisterOptionParameter('SetOrderType', 'NotSet,Order,Lending', 'NotSet');
                 RegisterBooleanParameter('SetWriteInAuditRoll', false);
                 RegisterBooleanParameter('SetShowCreationMessage', false);
                 RegisterBooleanParameter('SetFinishSale', false);
                 RegisterBooleanParameter('SetShowDepositDialog', false);
-
                 RegisterDecimalParameter('SetReturnAmountPercentage', 100);
                 RegisterIntegerParameter('SetOutputCodeunit', 0);
-
-                //-NPR5.32.10 [277092]
                 RegisterBooleanParameter('SetTransferSalesperson', false);
                 RegisterBooleanParameter('SetTransferPostingSetup', true);
                 RegisterBooleanParameter('SetTransferDimensions', false);
                 RegisterBooleanParameter('SetTransferPaymentMethod', false);
                 RegisterBooleanParameter('SetTransferTaxSetup', false);
                 RegisterBooleanParameter('SetTransferTransactiondata', false);
-                //+NPR5.32.10 [277092]
-
                 RegisterBooleanParameter('InitNewSaleOnDone', false);
-                //Do parameters
                 RegisterBooleanParameter('TestSalePOS', false);
                 RegisterBooleanParameter('ProcessPOSSale', false);
                 RegisterBooleanParameter('OpenSalesDoc', false);
-                //-NPR5.34 [283669]
                 RegisterBooleanParameter('SetAutoReserveSalesLine', false);
-                //+NPR5.34 [283669]
-                //-NPR5.40 [302617]
                 RegisterBooleanParameter('SetSendPdf2Nav', false);
-                //+NPR5.40 [302617]
-                //-NPR5.45 [313966]
                 RegisterBooleanParameter('AskExtDocNo', false);
                 RegisterBooleanParameter('AskAttention', false);
-                //+NPR5.45 [313966]
-
             end;
         end;
     end;
@@ -114,10 +83,8 @@ codeunit 6150814 "NPR POS Action: Sal.Doc.Exp."
     var
         UI: Codeunit "NPR POS UI Management";
     begin
-        //-NPR5.45 [313966]
         Captions.AddActionCaption(ActionCode, 'ExtDocNo', TextExtDocNoLabel);
         Captions.AddActionCaption(ActionCode, 'Attention', TextAttentionLabel);
-        //+NPR5.45 [313966]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
@@ -128,7 +95,6 @@ codeunit 6150814 "NPR POS Action: Sal.Doc.Exp."
 
 
         case WorkflowStep of
-            //'setCustomer' : OnSetCustomer(Context, POSSession,FrontEnd);
             'startDocumentManager':
                 OnStartDocumentManager(Context, POSSession, FrontEnd);
         end;
@@ -153,13 +119,6 @@ codeunit 6150814 "NPR POS Action: Sal.Doc.Exp."
     begin
     end;
 
-    local procedure OnSetCustomer(Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
-    var
-        POSActionReceivables: Codeunit "NPR POS Action: Receivables";
-    begin
-        //POSActionReceivables.SelectCustomerWorkFlow(Context, POSSession, FrontEnd);
-    end;
-
     local procedure OnStartDocumentManager(Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         JSON: Codeunit "NPR POS JSON Management";
@@ -172,17 +131,12 @@ codeunit 6150814 "NPR POS Action: Sal.Doc.Exp."
         SetDocumentType: Option "Order",Invoice,ReturnOrder,CreditMemo,Quote;
         SetOrderType: Option NotSet,"Order",Lending;
         Register: Record "NPR Register";
-        POSActionReceivables: Codeunit "NPR POS Action: Receivables";
         Customer: Record Customer;
     begin
-
-        //FrontEnd.PauseWorkflow;
-
         //Handling the wrap-connect to [Retail Sales Doc. Mgt.]
         POSSession.GetSetup(Setup);
         Setup.GetRegisterRecord(Register);
 
-        //MESSAGE(FORMAT(Register));
         POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
 
@@ -192,10 +146,8 @@ codeunit 6150814 "NPR POS Action: Sal.Doc.Exp."
 
 
         if not SaleLinesExists(SalePOS) then Error(ERRNOSALELINES);
-        //-NPR5.45 [313966]
         JSON.InitializeJObjectParser(Context, FrontEnd);
         SetReference(SalePOS, GetInput(JSON, 'extdocno'), GetInput(JSON, 'attention'));
-        //+NPR5.45 [313966]
 
         //Collect parameter and set to [Retail Sales Doc. Mgt.]
         JSON.InitializeJObjectParser(Context, FrontEnd);
@@ -203,7 +155,6 @@ codeunit 6150814 "NPR POS Action: Sal.Doc.Exp."
 
         //Set customer
         if JSON.GetBoolean('SetCustomer', true) then begin
-            //POSActionReceivables.SelectCustomerWorkFlow(Context, POSSession, FrontEnd);
             if (ACTION::LookupOK = PAGE.RunModal(0, Customer)) then SalePOS."Customer No." := Customer."No.";
         end;
 
@@ -219,24 +170,14 @@ codeunit 6150814 "NPR POS Action: Sal.Doc.Exp."
         RetailSalesDocMgt.SetPost(JSON.GetBoolean('SetPost', true));
         RetailSalesDocMgt.SetReceive(JSON.GetBoolean('SetReceive', true));
         RetailSalesDocMgt.SetShip(JSON.GetBoolean('SetShip', true));
-        //-NPR5.40 [302617]
         RetailSalesDocMgt.SetSendPostedPdf2Nav(JSON.GetBoolean('SetSendPdf2Nav', true));
-        //+NPR5.40 [302617]
-
-        //-NPR5.34 [283669]
         RetailSalesDocMgt.SetAutoReserveSalesLine(JSON.GetBoolean('SetAutoReserveSalesLine', true));
-        //+NPR5.34 [283669]
-
-        //-NPR5.32.10 [277092]
         RetailSalesDocMgt.SetTransferSalesPerson(JSON.GetBoolean('SetTransferSalesperson', true));
         RetailSalesDocMgt.SetTransferPostingsetup(JSON.GetBoolean('SetTransferPostingSetup', true));
         RetailSalesDocMgt.SetTransferDimensions(JSON.GetBoolean('SetTransferDimensions', true));
         RetailSalesDocMgt.SetTransferPaymentMethod(JSON.GetBoolean('SetTransferPaymentMethod', true));
         RetailSalesDocMgt.SetTransferTaxSetup(JSON.GetBoolean('SetTransferTaxSetup', true));
         RetailSalesDocMgt.SetTransferTransactionData(JSON.GetBoolean('SetTransferTransactiondata', true));
-        //+NPR5.32.10 [277092]
-
-
 
         SetDocumentType := JSON.GetIntegerParameter('SetDocumentType', true);
         case SetDocumentType of
@@ -256,14 +197,12 @@ codeunit 6150814 "NPR POS Action: Sal.Doc.Exp."
                 begin
                     RetailSalesDocMgt.SetDocumentTypeReturnOrder();
                 end;
-            //-NPR5.45 [325216]
             SetDocumentType::Quote:
                 begin
                     RetailSalesDocMgt.SetDocumentTypeQuote();
                 end;
             else
                 Error(ERRDOCTYPE, Format(SetDocumentType), Format(SetDocumentType::Order), Format(SetDocumentType::Invoice), Format(SetDocumentType::CreditMemo), Format(SetDocumentType::ReturnOrder), Format(SetDocumentType::Quote));
-        //+NPR5.45 [325216]
         end;
 
         RetailSalesDocMgt.SetWriteInAuditRoll(JSON.GetBoolean('SetWriteInAuditRoll', true));
@@ -318,24 +257,19 @@ codeunit 6150814 "NPR POS Action: Sal.Doc.Exp."
     var
         CustomerNo: Code[20];
     begin
-        //-NPR5.45 [313966]
         if (ExtDocNo <> '') then
             SalePOS.Validate(Reference, CopyStr(ExtDocNo, 1, MaxStrLen(SalePOS.Reference)));
 
         if (Attention <> '') then
             SalePOS.Validate("Contact No.", CopyStr(Attention, 1, MaxStrLen(SalePOS."Contact No.")));
-        //+NPR5.45 [313966]
     end;
 
     local procedure GetInput(JSON: Codeunit "NPR POS JSON Management"; Path: Text): Text
     begin
-        //-NPR5.45 [313966]
         JSON.SetScope('/', true);
         if (not JSON.SetScope('$' + Path, false)) then
             exit('');
 
         exit(JSON.GetString('input', true));
-        //+NPR5.45 [313966]
     end;
 }
-
