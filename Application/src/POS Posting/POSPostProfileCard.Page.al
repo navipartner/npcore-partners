@@ -1,8 +1,5 @@
 page 6150639 "NPR POS Post. Profile Card"
 {
-    // NPR5.52/ALPO/20190923 CASE 365326 Posting related fields moved here (POS Posting Profiles) from NP Retail Setup
-    // NPR5.53/ALPO/20191017 CASE 371955 New group 'Rounding' with fields "POS Sales Rounding Account", "POS Sales Amt. Rndng Precision", "Rounding Type"
-
     Caption = 'POS Posting Profile Card';
     PageType = Card;
     UsageCategory = Administration;
@@ -24,14 +21,6 @@ page 6150639 "NPR POS Post. Profile Card"
                     ApplicationArea = All;
                 }
                 field("Automatic Item Posting"; "Automatic Item Posting")
-                {
-                    ApplicationArea = All;
-                }
-                field("Adj. Cost after Item Posting"; "Adj. Cost after Item Posting")
-                {
-                    ApplicationArea = All;
-                }
-                field("Post to G/L after Item Posting"; "Post to G/L after Item Posting")
                 {
                     ApplicationArea = All;
                 }
