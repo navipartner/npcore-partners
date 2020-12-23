@@ -1,14 +1,5 @@
 page 6151205 "NPR NpCs Coll. Store Orders"
 {
-    // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
-    // NPR5.51/MHA /20190717  CASE 344264 Added Last Log fields and changed name and logic for field 240 to "From Store Stock"
-    // NPR5.51/MHA /20190719  CASE 362443 Added "Inserted at" changed Visible on some fields
-    // NPR5.51/MHA /20190819  CASE 364557 Removed InsertAllowed
-    // NPR5.53/MHA /20191105  CASE 374049 Promoted Action "Send Notification to Customer" and added UsageCategory = Lists
-    // NPR5.53/MHA /20192811  CASE 379742 Added Action Print Confirmation
-    // NPR5.53/MHA /20191128  CASE 378895 Removed Sorting Key
-    // NPR5.54/MHA /20200212  CASE 390479 Changed visibility for Action "Confirm Order" and "Reject Order" to also include #blank Processing Status
-
     Caption = 'Collect in Store Orders';
     CardPageID = "NPR NpCs Coll. StoreOrder Card";
     Editable = false;
@@ -207,9 +198,7 @@ page 6151205 "NPR NpCs Coll. Store Orders"
                     var
                         NpCsCollectMgt: Codeunit "NPR NpCs Collect Mgt.";
                     begin
-                        //-NPR5.51 [364557]
                         NpCsCollectMgt.PrintOrder(Rec);
-                        //+NPR5.51 [364557]
                     end;
                 }
                 action("Print Confirmation")
@@ -230,10 +219,8 @@ page 6151205 "NPR NpCs Coll. Store Orders"
                         DocPrint: Codeunit "Document-Print";
                         Usage: Option "Order Confirmation","Work Order","Pick Instruction";
                     begin
-                        //-NPR5.53 [379742]
                         SalesHeader.Get("Document Type", "Document No.");
                         DocPrint.PrintSalesOrder(SalesHeader, Usage::"Order Confirmation");
-                        //+NPR5.53 [379742]
                     end;
                 }
                 action("Print Delivery")
@@ -309,9 +296,15 @@ page 6151205 "NPR NpCs Coll. Store Orders"
 
                     trigger OnAction()
                     var
+                        NpCsDocument: Record "NPR NpCs Document";
                         NpCsWorkflowMgt: Codeunit "NPR NpCs Workflow Mgt.";
                     begin
-                        NpCsWorkflowMgt.SendNotificationToCustomer(Rec);
+                        CurrPage.SetSelectionFilter(NpCsDocument);
+                        if NpCsDocument.FindSet(true) then
+                            repeat
+                                NpCsWorkflowMgt.SendNotificationToCustomer(NpCsDocument);
+                                Commit();
+                            until NpCsDocument.Next() = 0;
                     end;
                 }
                 action(Archive)
@@ -330,9 +323,7 @@ page 6151205 "NPR NpCs Coll. Store Orders"
                             if not Confirm(Text002, false, "Document Type", "Document No.") then
                                 exit;
                         end;
-                        //-NPR5.51 [344264]
                         if NpCsArchCollectMgt.ArchiveCollectDocument(Rec) then
-                            //+NPR5.51 [344264]
                             Message(Text003, "Document Type", "Reference No.")
                         else
                             Message(Text004, "Document Type", "Reference No.", GetLastErrorText);
