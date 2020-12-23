@@ -216,18 +216,11 @@ page 6014406 "NPR Register Card"
                 group(Control6150705)
                 {
                     ShowCaption = false;
-                    field(Account; '')
+                    field(Account; Account)
                     {
-                        ApplicationArea = All;
-                        Caption = 'Account';
-                        ShowCaption = false;
                         Style = Strong;
                         StyleExpr = TRUE;
-                    }
-                    field(Control6150706; Account)
-                    {
                         ApplicationArea = All;
-                        ShowCaption = false;
                     }
                     field("Gift Voucher Account"; "Gift Voucher Account")
                     {
