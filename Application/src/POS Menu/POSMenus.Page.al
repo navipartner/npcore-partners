@@ -107,6 +107,13 @@ page 6150701 "NPR POS Menus"
                     POSPackageHandler.ImportPOSMenuPackageFromFile();
                 end;
             }
+            action(DeployPackageFromAzureBlob)
+            {
+                Caption = 'Deploy Package From Azure';
+                Image = ImportDatabase;
+                ApplicationArea = All;
+                RunObject = page "NPR POS Menu Deploy from Azure";
+            }
         }
     }
 }
