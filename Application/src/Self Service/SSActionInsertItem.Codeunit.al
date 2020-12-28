@@ -1,16 +1,5 @@
 codeunit 6151289 "NPR SS Action: Insert Item"
 {
-    // NPR5.54/TSA /20200220 CASE 387912 Initial Version of SS-ITEM for Self Service. Starts out as a copy if ITEM
-    // NPR5.55/TSA /20200420 CASE 364420 Added implementation for +/- button
-    // NPR5.55/MMV /20200420 CASE 386254 Set blocking UI to false.
-    // NPR5.55/TSA /20200508 CASE 403784 Added feature to specify quantity in dialog after threshold has been reached
-    // NPR5.55/TSA /20200520 CASE 405186 Added/reworked localization
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         ActionDescription: Label 'This is a built-in action for self-service, inserting an item line into the current transaction';
         TEXTitemTracking_title: Label 'Enter Serial Number';
@@ -83,7 +72,6 @@ codeunit 6151289 "NPR SS Action: Insert Item"
                   '}' +
 
                   'await (workflow.respond (workflowstep));'
-                  // 'await (workflowList = workflow.respond("getExtraItemWorkflows"));'
                   );
 
                 RegisterOptionParameter('itemIdentifyerType', 'ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference', 'ItemNo');
@@ -92,9 +80,7 @@ codeunit 6151289 "NPR SS Action: Insert Item"
                 RegisterBooleanParameter('descriptionEdit', false);
                 RegisterBooleanParameter('usePreSetUnitPrice', false);
                 RegisterDecimalParameter('preSetUnitPrice', 0);
-                //-NPR5.55 [386254]
                 RegisterBlockingUI(false);
-                //+NPR5.55 [386254]
                 SetWorkflowTypeUnattended();
             end;
     end;
@@ -113,12 +99,11 @@ codeunit 6151289 "NPR SS Action: Insert Item"
             'AddSalesLine':
                 Step_AddSalesLine(Context, POSSession, FrontEnd);
             'IncreaseQuantity':
-                Step_IncreaseQuantity(Context, POSSession, FrontEnd); //-+NPR5.55 [364420]
+                Step_IncreaseQuantity(Context, POSSession, FrontEnd);
             'DecreaseQuantity':
-                Step_DecreaseQuantity(Context, POSSession, FrontEnd); //-+NPR5.55 [364420]
+                Step_DecreaseQuantity(Context, POSSession, FrontEnd);
             'SetSpecificQuantity':
-                Step_SetQuantity(Context, POSSession, FrontEnd); //-+NPR5.55 [403784]
-                                                                 //'getExtraItemWorkflows': Step_GetWorkflowList (Contex, POSSession, FrontEnd);
+                Step_SetQuantity(Context, POSSession, FrontEnd);
         end;
 
 
@@ -130,17 +115,8 @@ codeunit 6151289 "NPR SS Action: Insert Item"
     var
         UI: Codeunit "NPR POS UI Management";
     begin
-        //-NPR5.55 [405186]
-        // Captions.AddActionCaption (ActionCode, 'itemTracking_title', TEXTitemTracking_title);
-        // Captions.AddActionCaption (ActionCode, 'itemTracking_lead', TEXTitemTracking_lead);
-        // Captions.AddActionCaption (ActionCode, 'UnitpriceTitle', UnitPriceTitle);
-        // Captions.AddActionCaption (ActionCode, 'UnitpriceCaption', UnitPriceCaption);
-        // Captions.AddActionCaption (ActionCode, 'editDesc_title', TEXTeditDesc_title);
-        // Captions.AddActionCaption (ActionCode, 'editDesc_lead', TEXTeditDesc_title);
-
         Captions.AddActionCaption(ActionCode, 'EnterQuantityCaption', EnterQuantityCaption);
         Captions.AddActionCaption(ActionCode, 'ValidRangeText', ValidRangeText);
-        //+NPR5.55 [405186]
     end;
 
     local procedure Step_AddSalesLine(JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
@@ -159,7 +135,6 @@ codeunit 6151289 "NPR SS Action: Insert Item"
         DialogContext: Codeunit "NPR POS JSON Management";
         DialogPrompt: Boolean;
     begin
-        //-NPR5.40 [294655]
 
 
         HasPrompted := JSON.GetBoolean('promptPrice', false) or JSON.GetBoolean('promptSerial', false);
@@ -175,31 +150,7 @@ codeunit 6151289 "NPR SS Action: Insert Item"
             ItemIdentifierType := 0;
 
         GetItem(Item, ItemCrossReference, ItemIdentifier, ItemIdentifierType);
-
-        //-NPR5.55 [364420]
-        // IF NOT HasPrompted THEN BEGIN
-        //  IF Item."Group sale" AND (NOT UsePresetUnitPrice)THEN BEGIN
-        //    DialogContext.SetContext('promptPrice', TRUE);
-        //    DialogPrompt := TRUE;
-        //  END;
-        //
-        //  IF ItemRequiresSerialNumberOnSale(Item, UseSpecificTracking) THEN BEGIN
-        //    DialogContext.SetContext('promptSerial', TRUE);
-        //    DialogContext.SetContext('itemTracking_instructions',TEXTitemTracking_instructions);
-        //    DialogContext.SetContext('useSpecificTracking', UseSpecificTracking);
-        //    DialogPrompt := TRUE;
-        //  END;
-        //
-        //  IF DialogPrompt THEN BEGIN
-        //    FrontEnd.SetActionContext(ActionCode, DialogContext);
-        //    FrontEnd.ContinueAtStep('promptContextDialogs');
-        //    EXIT;
-        //  END;
-        // END;
-        //+NPR5.55 [364420]
-
         AddItemLine(Item, ItemCrossReference, ItemIdentifierType, ItemQuantity, UsePresetUnitPrice, PresetUnitPrice, JSON, POSSession, FrontEnd);
-        //+NPR5.40 [294655]
     end;
 
     local procedure Step_ItemTracking(JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
@@ -226,12 +177,9 @@ codeunit 6151289 "NPR SS Action: Insert Item"
             //Serial number is not valid, lets reask
             JSON.SetScope('/', true);
             JSON.SetContext('itemTracking_instructions', UserInformationErrorWarning);
-            //-NPR5.40 [294655]
+
             FrontEnd.SetActionContext(ActionCode, JSON);
             FrontEnd.ContinueAtStep('itemTrackingForce');
-            //  JSON.SetContext('reask',TRUE);
-            //  FrontEnd.SetActionContext (ActionCode, JSON);
-            //+NPR5.40 [294655]
             exit;
         end;
 
@@ -254,7 +202,6 @@ codeunit 6151289 "NPR SS Action: Insert Item"
         ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch;
         ItemQuantity: Decimal;
     begin
-        //-NPR5.55 [364420]õ
         JSON.SetScope('parameters', true);
         ItemIdentifier := JSON.GetString('itemNo', true);
         ItemIdentifierType := JSON.GetInteger('itemIdentifyerType', false);
@@ -265,8 +212,6 @@ codeunit 6151289 "NPR SS Action: Insert Item"
 
         GetItem(Item, ItemCrossReference, ItemIdentifier, ItemIdentifierType);
         RemoveQuantityFromItemLine(Item, ItemCrossReference, ItemIdentifierType, ItemQuantity, JSON, POSSession, FrontEnd);
-
-        //+NPR5.55 [364420]
     end;
 
     local procedure Step_IncreaseQuantity(JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
@@ -278,7 +223,6 @@ codeunit 6151289 "NPR SS Action: Insert Item"
         ItemQuantity: Decimal;
     begin
 
-        //-NPR5.55 [364420]õ
         JSON.SetScope('parameters', true);
         ItemIdentifier := JSON.GetString('itemNo', true);
         ItemIdentifierType := JSON.GetInteger('itemIdentifyerType', false);
@@ -292,7 +236,6 @@ codeunit 6151289 "NPR SS Action: Insert Item"
         if (not AddQuantityToItemLine(Item, ItemCrossReference, ItemIdentifierType, ItemQuantity, JSON, POSSession, FrontEnd)) then
             Step_AddSalesLine(JSON, POSSession, FrontEnd);
 
-        //+NPR5.55 [364420]
     end;
 
     local procedure Step_SetQuantity(JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
@@ -304,7 +247,6 @@ codeunit 6151289 "NPR SS Action: Insert Item"
         ItemQuantity: Decimal;
     begin
 
-        //-NPR5.55 [403784]
         JSON.SetScope('parameters', true);
         ItemIdentifier := JSON.GetString('itemNo', true);
         ItemIdentifierType := JSON.GetInteger('itemIdentifyerType', false);
@@ -318,7 +260,6 @@ codeunit 6151289 "NPR SS Action: Insert Item"
         if (not SetQuantityToItemLine(Item, ItemCrossReference, ItemIdentifierType, ItemQuantity, JSON, POSSession, FrontEnd)) then
             Step_AddSalesLine(JSON, POSSession, FrontEnd);
 
-        //+NPR5.55 [403784]
     end;
 
     local procedure "-- Various support functions"()
@@ -330,7 +271,6 @@ codeunit 6151289 "NPR SS Action: Insert Item"
         FirstRec: Text;
         TagId: Code[20];
     begin
-        //-NPR5.40 [294655]
         case ItemIdentifierType of
             ItemIdentifierType::ItemNo:
                 Item.Get(ItemIdentifier);
@@ -341,14 +281,12 @@ codeunit 6151289 "NPR SS Action: Insert Item"
                     ItemCrossReference.SetFilter("Cross-Reference Type", '=%1', ItemCrossReference."Cross-Reference Type"::"Bar Code");
                     ItemCrossReference.SetFilter("Discontinue Bar Code", '=%1', false);
                     ItemCrossReference.FindFirst;
-                    //-NPR5.48 [334329]
                     FirstRec := Format(ItemCrossReference);
                     ItemCrossReference.FindLast;
                     if FirstRec <> Format(ItemCrossReference) then begin
                         if PAGE.RunModal(0, ItemCrossReference) <> ACTION::LookupOK then
                             Error('');
                     end;
-                    //+NPR5.48 [334329]
                     Item.Get(ItemCrossReference."Item No.");
                 end;
 
@@ -358,7 +296,6 @@ codeunit 6151289 "NPR SS Action: Insert Item"
                 else
                     Error(ERROR_ITEMSEARCH, ItemIdentifier);
 
-            //-NPR5.52 [369231]
             ItemIdentifierType::SerialNoItemCrossReference:
                 begin
 
@@ -378,9 +315,7 @@ codeunit 6151289 "NPR SS Action: Insert Item"
 
                     Item.Get(ItemCrossReference."Item No.");
                 end;
-        //+NPR5.52 [369231]
         end;
-        //+NPR5.40 [294655]
     end;
 
     local procedure AddItemLine(Item: Record Item; ItemCrossReference: Record "Item Cross Reference"; ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference; ItemQuantity: Decimal; UsePresetUnitPrice: Boolean; PresetUnitPrice: Decimal; JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
@@ -395,7 +330,6 @@ codeunit 6151289 "NPR SS Action: Insert Item"
         SetUnitPrice: Boolean;
         SaleLinePOS: Record "NPR Sale Line POS";
     begin
-        //-NPR5.40 [294655]
 
         JSON.SetScope('/', true);
         UseSpecificTracking := JSON.GetBoolean('useSpecificTracking', false);
@@ -439,24 +373,13 @@ codeunit 6151289 "NPR SS Action: Insert Item"
                         "No." := ItemCrossReference."Item No.";
                         "Variant Code" := ItemCrossReference."Variant Code";
                         "Unit of Measure Code" := ItemCrossReference."Unit of Measure";
-                        //-NPR5.52 [369231]
                         if (ItemCrossReference."NPR Is Retail Serial No.") then
                             "Serial No. not Created" := ItemCrossReference."Cross-Reference No.";
-                        //+NPR5.52 [369231]
-
-                        //-NPR5.49 [350410]
-                        // //-NPR5.48 [335967]
-                        // Description := ItemCrossReference.Description;
-                        // //+NPR5.48 [335967]
-                        //+NPR5.49 [350410]
-
                     end;
-                //-NPR5.52 [369231]
+
                 ItemIdentifierType::SerialNoItemCrossReference:
                     begin
-
                         SaleLinePOS.Reset;
-                        //SaleLinePOS.SETCURRENTKEY("Serial No.");
                         SaleLinePOS.SetFilter(Type, '=%1', SaleLinePOS.Type::Item);
                         SaleLinePOS.SetFilter("Serial No. not Created", '=%1', ItemCrossReference."Cross-Reference No.");
                         if not SaleLinePOS.IsEmpty then
@@ -468,7 +391,6 @@ codeunit 6151289 "NPR SS Action: Insert Item"
                         if (ItemCrossReference."NPR Is Retail Serial No.") then
                             "Serial No. not Created" := ItemCrossReference."Cross-Reference No.";
                     end;
-            //+NPR5.52 [369231]
             end;
 
             if (UseSpecificTracking and (ValidatedSerialNumber <> '')) then
@@ -490,13 +412,10 @@ codeunit 6151289 "NPR SS Action: Insert Item"
         POSSession.GetSaleLine(SaleLine);
         SaleLine.InsertLine(Line);
         AddAccessories(Item, SaleLine);
-        //-NPR5.45 [324395]
         AutoExplodeBOM(Item, SaleLine);
-        //+NPR5.45 [324395]
         AddItemAddOns(FrontEnd, Item, Line."Line No.");  //NPR5.54 [388951]
 
         POSSession.RequestRefreshData();
-        //+NPR5.40 [294655]
     end;
 
     procedure AddQuantityToItemLine(Item: Record Item; ItemCrossReference: Record "Item Cross Reference"; ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference; ItemQuantity: Decimal; JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"): Boolean
@@ -508,7 +427,6 @@ codeunit 6151289 "NPR SS Action: Insert Item"
         SSActionQtyIncrease: Codeunit "NPR SS Action - Qty Increase";
     begin
 
-        //-NPR5.55 [364420]
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
 
@@ -526,7 +444,6 @@ codeunit 6151289 "NPR SS Action: Insert Item"
         POSSession.RequestRefreshData();
         exit(true);
 
-        //+NPR5.55 [364420]
     end;
 
     procedure RemoveQuantityFromItemLine(Item: Record Item; ItemCrossReference: Record "Item Cross Reference"; ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference; ItemQuantity: Decimal; JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
@@ -539,7 +456,6 @@ codeunit 6151289 "NPR SS Action: Insert Item"
         SSActionDeletePOSLine: Codeunit "NPR SS Action: Delete POS Line";
     begin
 
-        //-NPR5.55 [364420]
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
 
@@ -559,7 +475,6 @@ codeunit 6151289 "NPR SS Action: Insert Item"
         end;
 
         POSSession.RequestRefreshData();
-        //+NPR5.55 [364420]
     end;
 
     procedure SetQuantityToItemLine(Item: Record Item; ItemCrossReference: Record "Item Cross Reference"; ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference; ItemQuantity: Decimal; JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"): Boolean
@@ -571,7 +486,6 @@ codeunit 6151289 "NPR SS Action: Insert Item"
         SSActionQtyIncrease: Codeunit "NPR SS Action - Qty Increase";
     begin
 
-        //-NPR5.55 [403784]
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
 
@@ -591,7 +505,6 @@ codeunit 6151289 "NPR SS Action: Insert Item"
         POSSession.RequestRefreshData();
         exit(true);
 
-        //+NPR5.55 [403784]
     end;
 
     local procedure AutoExplodeBOM(Item: Record Item; POSSaleLine: Codeunit "NPR POS Sale Line")
@@ -600,7 +513,6 @@ codeunit 6151289 "NPR SS Action: Insert Item"
         SaleLinePOS: Record "NPR Sale Line POS";
         Level: Integer;
     begin
-        //-NPR5.45 [324395]
         if not Item."NPR Explode BOM auto" then
             exit;
         Item.CalcFields("Assembly BOM");
@@ -616,7 +528,6 @@ codeunit 6151289 "NPR SS Action: Insert Item"
         SaleLinePOS.Modify(true);
 
         SaleLinePOS.ExplodeBOM(SaleLinePOS."No.", 0, 0, Level, 0, 0);
-        //+NPR5.45 [324395]
     end;
 
     local procedure AddAccessories(Item: Record Item; POSSaleLine: Codeunit "NPR POS Sale Line")
@@ -625,7 +536,6 @@ codeunit 6151289 "NPR SS Action: Insert Item"
     begin
         // This is an adoption of the original function UdpakTilbeh¢r in 6014418
 
-        //-NPR5.40 [294655]
         AccessorySparePart.SetFilter(Type, '=%1', AccessorySparePart.Type::Accessory);
         AccessorySparePart.SetFilter(Code, '=%1', Item."No.");
         AccessorySparePart.SetFilter("Add Extra Line Automatically", '=%1', true);
@@ -636,24 +546,6 @@ codeunit 6151289 "NPR SS Action: Insert Item"
                 AddAccessoryForItem(Item, true, POSSaleLine);
         end else
             AddAccessoryForItem(Item, false, POSSaleLine);
-
-        // IF (NOT Item.GET (AccessoryToItem)) THEN
-        //  EXIT;
-        //
-        // AccessorySparePart.SETFILTER (Type, '=%1', AccessorySparePart.Type::Accessory);
-        // AccessorySparePart.SETFILTER (Code, '=%1', AccessoryToItem);
-        // AccessorySparePart.SETFILTER ("Add Extra Line Automatically", '=%1', TRUE);
-        // IF (AccessorySparePart.ISEMPTY ()) THEN BEGIN
-        //  // Item Group Accessory
-        //  AccessorySparePart.SETFILTER (Code, '=%1', Item."Item Group");
-        //  IF (NOT AccessorySparePart.ISEMPTY ()) THEN
-        //    AddAccessoryForItem (AccessoryToItem, TRUE, POSSaleLine);
-        //
-        // END ELSE BEGIN
-        //  AddAccessoryForItem (AccessoryToItem, FALSE, POSSaleLine);
-        //
-        // END;
-        //+NPR5.40 [294655]
     end;
 
     local procedure AddAccessoryForItem(Item: Record Item; GroupAccessory: Boolean; POSSaleLine: Codeunit "NPR POS Sale Line")
@@ -662,29 +554,19 @@ codeunit 6151289 "NPR SS Action: Insert Item"
         AccessorySaleLinePOS: Record "NPR Sale Line POS";
         AccessorySparePart: Record "NPR Accessory/Spare Part";
     begin
-
         AccessorySparePart.SetFilter(Type, '=%1', AccessorySparePart.Type::Accessory);
-        //-NPR5.40 [294655]
         AccessorySparePart.SetFilter(Code, '=%1', Item."No.");
-        //AccessorySparePart.SETFILTER (Code, '=%1', ItemNo);
-        //+NPR5.40 [294655]
+
         if (not AccessorySparePart.FindSet()) then
             exit;
 
-        //-NPR5.40 [294655]
-        //Item.GET (ItemNo);
-        //+NPR5.40 [294655]
         POSSaleLine.GetCurrentSaleLine(MainSaleLinePOS);
 
         repeat
             POSSaleLine.GetNewSaleLine(AccessorySaleLinePOS);
 
             AccessorySaleLinePOS.Accessory := true;
-            //-NPR5.40 [294655]
-            //  AccessorySaleLinePOS."Main Item No." := ItemNo;
             AccessorySaleLinePOS."Main Item No." := Item."No.";
-            //+NPR5.40 [294655]
-
             AccessorySaleLinePOS."Item group accessory" := GroupAccessory;
             if (GroupAccessory) then
                 AccessorySaleLinePOS."Accessories Item Group No." := Item."NPR Item Group";
@@ -702,7 +584,6 @@ codeunit 6151289 "NPR SS Action: Insert Item"
 
             POSSaleLine.InsertLine(AccessorySaleLinePOS);
 
-            //-NPR5.52 [370961]
             if AccessorySparePart."Use Alt. Price" then begin
                 if (AccessorySaleLinePOS."Price Includes VAT") and (not Item."Price Includes VAT") then
                     AccessorySparePart."Alt. Price" := AccessorySparePart."Alt. Price" * (1 + (AccessorySaleLinePOS."VAT %" / 100))
@@ -715,9 +596,7 @@ codeunit 6151289 "NPR SS Action: Insert Item"
                 else
                     AccessorySaleLinePOS.Validate("Unit Price", AccessorySparePart."Alt. Price");
             end;
-            //+NPR5.52 [370961]
 
-            //-NPR5.40 [305045]
             AccessorySaleLinePOS."Item group accessory" := GroupAccessory;
             if (GroupAccessory) then
                 AccessorySaleLinePOS."Accessories Item Group No." := Item."NPR Item Group";
@@ -728,12 +607,6 @@ codeunit 6151289 "NPR SS Action: Insert Item"
 
             AccessorySaleLinePOS.Modify();
             POSSaleLine.RefreshCurrent();
-
-        //   AccessorySaleLinePOS.MODIFY ();
-        //   POSSaleLine.RefreshCurrent ();
-        // END;
-        //+NPR5.40 [305045]
-
         until (AccessorySparePart.Next() = 0);
     end;
 
@@ -741,15 +614,11 @@ codeunit 6151289 "NPR SS Action: Insert Item"
     var
         POSAction: Record "NPR POS Action";
     begin
-        //-NPR5.54 [388951]
         if Item."NPR Item AddOn No." = '' then
             exit;
 
         POSAction.Get('SS-ITEM-ADDON');
-
-        //POSAction.SetWorkflowInvocationParameter('BaseLineNo',BaseLineNo,POSFrontEnd);
         POSFrontEnd.InvokeWorkflow(POSAction);
-        //+NPR5.54 [388951]
     end;
 
     local procedure "-- Serial number support functions"()
@@ -760,11 +629,6 @@ codeunit 6151289 "NPR SS Action: Insert Item"
     var
         ItemTrackingCode: Record "Item Tracking Code";
     begin
-        //Global
-        //-NPR5.40 [294655]
-        // IF ItemNo = '' THEN EXIT(FALSE);
-        // IF NOT Item.GET(ItemNo) THEN EXIT(FALSE);
-        //+NPR5.40 [294655]
         if Item."Item Tracking Code" = '' then exit(false);
         if not ItemTrackingCode.Get(Item."Item Tracking Code") then exit(false);
         ItemTrackingCode.TestField("Lot Specific Tracking", false);
@@ -834,25 +698,18 @@ codeunit 6151289 "NPR SS Action: Insert Item"
         exit(CanBeUsed);
     end;
 
-    local procedure "--- Ean Box Event Handling"()
-    begin
-    end;
-
+    #region Ean Box Event Handling
     [EventSubscriber(ObjectType::Codeunit, 6060105, 'DiscoverEanBoxEvents', '', true, true)]
     local procedure DiscoverEanBoxEvents(var EanBoxEvent: Record "NPR Ean Box Event")
     var
         Item: Record Item;
         ItemCrossReference: Record "Item Cross Reference";
     begin
-        //-NPR5.45 [319706]
         if not EanBoxEvent.Get(EventCodeItemNo()) then begin
             EanBoxEvent.Init;
             EanBoxEvent.Code := EventCodeItemNo();
             EanBoxEvent."Module Name" := Item.TableCaption;
-            //-NPR5.49 [350374]
-            //EanBoxEvent.Description := ItemCrossReference.FIELDCAPTION("Item No.");
             EanBoxEvent.Description := CopyStr(ItemCrossReference.FieldCaption("Item No."), 1, MaxStrLen(EanBoxEvent.Description));
-            //+NPR5.49 [350374]
             EanBoxEvent."Action Code" := ActionCode();
             EanBoxEvent."POS View" := EanBoxEvent."POS View"::Sale;
             EanBoxEvent."Event Codeunit" := CurrCodeunitId();
@@ -863,10 +720,7 @@ codeunit 6151289 "NPR SS Action: Insert Item"
             EanBoxEvent.Init;
             EanBoxEvent.Code := EventCodeItemCrossRef();
             EanBoxEvent."Module Name" := Item.TableCaption;
-            //-NPR5.49 [350374]
-            //EanBoxEvent.Description := ItemCrossReference.TABLECAPTION;
             EanBoxEvent.Description := CopyStr(ItemCrossReference.TableCaption, 1, MaxStrLen(EanBoxEvent.Description));
-            //+NPR5.49 [350374]
             EanBoxEvent."Action Code" := ActionCode();
             EanBoxEvent."POS View" := EanBoxEvent."POS View"::Sale;
             EanBoxEvent."Event Codeunit" := CurrCodeunitId();
@@ -877,18 +731,13 @@ codeunit 6151289 "NPR SS Action: Insert Item"
             EanBoxEvent.Init;
             EanBoxEvent.Code := EventCodeItemSearch();
             EanBoxEvent."Module Name" := Item.TableCaption;
-            //-NPR5.49 [350374]
-            //EanBoxEvent.Description := Item.FIELDCAPTION("Search Description");
             EanBoxEvent.Description := CopyStr(Item.FieldCaption("Search Description"), 1, MaxStrLen(EanBoxEvent.Description));
-            //+NPR5.49 [350374]
             EanBoxEvent."Action Code" := ActionCode();
             EanBoxEvent."POS View" := EanBoxEvent."POS View"::Sale;
             EanBoxEvent."Event Codeunit" := CurrCodeunitId();
             EanBoxEvent.Insert(true);
         end;
-        //+NPR5.45 [319706]
 
-        //-NPR5.52 [369231]
         if not EanBoxEvent.Get(EventCodeSerialNoItemCrossRef()) then begin
             EanBoxEvent.Init;
             EanBoxEvent.Code := EventCodeSerialNoItemCrossRef();
@@ -899,13 +748,11 @@ codeunit 6151289 "NPR SS Action: Insert Item"
             EanBoxEvent."Event Codeunit" := CurrCodeunitId();
             EanBoxEvent.Insert(true);
         end;
-        //+NPR5.52 [369231]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6060105, 'OnInitEanBoxParameters', '', true, true)]
     local procedure OnInitEanBoxParameters(var Sender: Codeunit "NPR Ean Box Setup Mgt."; EanBoxEvent: Record "NPR Ean Box Event")
     begin
-        //-NPR5.45 [319706]
         case EanBoxEvent.Code of
             EventCodeItemNo():
                 begin
@@ -922,15 +769,12 @@ codeunit 6151289 "NPR SS Action: Insert Item"
                     Sender.SetNonEditableParameterValues(EanBoxEvent, 'itemNo', true, '');
                     Sender.SetNonEditableParameterValues(EanBoxEvent, 'itemIdentifyerType', false, 'ItemSearch');
                 end;
-            //-NPR5.52 [369231]
             EventCodeSerialNoItemCrossRef():
                 begin
                     Sender.SetNonEditableParameterValues(EanBoxEvent, 'itemNo', true, '');
                     Sender.SetNonEditableParameterValues(EanBoxEvent, 'itemIdentifyerType', false, 'SerialNoItemCrossReference');
                 end;
-        //+NPR5.52 [369231]
         end;
-        //+NPR5.45 [319706]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6060107, 'SetEanBoxEventInScope', '', true, true)]
@@ -938,7 +782,6 @@ codeunit 6151289 "NPR SS Action: Insert Item"
     var
         Item: Record Item;
     begin
-        //-NPR5.45 [319706]
         if EanBoxSetupEvent."Event Code" <> EventCodeItemNo() then
             exit;
         if StrLen(EanBoxValue) > MaxStrLen(Item."No.") then
@@ -946,7 +789,6 @@ codeunit 6151289 "NPR SS Action: Insert Item"
 
         if Item.Get(UpperCase(EanBoxValue)) then
             InScope := true;
-        //+NPR5.45 [319706]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6060107, 'SetEanBoxEventInScope', '', true, true)]
@@ -954,22 +796,17 @@ codeunit 6151289 "NPR SS Action: Insert Item"
     var
         ItemCrossReference: Record "Item Cross Reference";
     begin
-        //-NPR5.45 [319706]
         if EanBoxSetupEvent."Event Code" <> EventCodeItemCrossRef() then
             exit;
-        //-NPR5.49 [344084]
-        // IF STRLEN(ItemCrossReference."Cross-Reference No.") > MAXSTRLEN(ItemCrossReference."Cross-Reference No.") THEN
-        //  EXIT;
+
         if StrLen(EanBoxValue) > MaxStrLen(ItemCrossReference."Cross-Reference No.") then
             exit;
-        //+NPR5.49 [344084]
 
         ItemCrossReference.SetRange("Cross-Reference No.", UpperCase(EanBoxValue));
         ItemCrossReference.SetRange("Cross-Reference Type", ItemCrossReference."Cross-Reference Type"::"Bar Code");
         ItemCrossReference.SetRange("Discontinue Bar Code", false);
         if ItemCrossReference.FindFirst then
             InScope := true;
-        //+NPR5.45 [319706]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6060107, 'SetEanBoxEventInScope', '', true, true)]
@@ -977,115 +814,49 @@ codeunit 6151289 "NPR SS Action: Insert Item"
     var
         Item: Record Item;
     begin
-        //-NPR5.45 [319706]
         if EanBoxSetupEvent."Event Code" <> EventCodeItemSearch() then
             exit;
 
         SetItemSearchFilter(EanBoxValue, Item);
         if Item.FindFirst then
             InScope := true;
-        //+NPR5.45 [319706]
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6060107, 'SetEanBoxEventInScope', '', true, true)]
-    local procedure SetEanBoxEventInScopeSerialNoItemCrossRef(EanBoxSetupEvent: Record "NPR Ean Box Setup Event"; EanBoxValue: Text; var InScope: Boolean)
-    var
-        ItemCrossReference: Record "Item Cross Reference";
-        CSRfidTagModels: Record "NPR CS Rfid Tag Models";
-        CSRfidData: Record "NPR CS Rfid Data";
-        TagFamily: Code[10];
-        TagModel: Code[10];
-        TagId: Code[20];
-    begin
-        //-NPR5.52 [369231]
-        if EanBoxSetupEvent."Event Code" <> EventCodeSerialNoItemCrossRef() then
-            exit;
 
-        if not CSRfidTagModels.FindFirst then
-            exit;
-
-        if (StrLen(EanBoxValue) > MaxStrLen(CSRfidData.Key)) or (StrLen(EanBoxValue) < MaxStrLen(CSRfidTagModels.Family)) then
-            exit;
-
-        TagFamily := CopyStr(EanBoxValue, 1, 4);
-        TagModel := CopyStr(EanBoxValue, 5, 4);
-        TagId := CopyStr(EanBoxValue, 5);
-
-        if not CSRfidTagModels.Get(TagFamily, TagModel) then
-            exit;
-
-        if (StrLen(TagId) > MaxStrLen(ItemCrossReference."Cross-Reference No.")) then
-            exit;
-
-        ItemCrossReference.SetRange("Cross-Reference No.", UpperCase(TagId));
-        ItemCrossReference.SetRange("Cross-Reference Type", ItemCrossReference."Cross-Reference Type"::"Bar Code");
-        ItemCrossReference.SetRange("NPR Is Retail Serial No.", true);
-        ItemCrossReference.SetRange("Discontinue Bar Code", false);
-        if ItemCrossReference.FindFirst then
-            InScope := true;
-        //+NPR5.52 [369231]
-    end;
 
     local procedure CurrCodeunitId(): Integer
     begin
-        //-NPR5.45 [319706]
         exit(CODEUNIT::"NPR POS Action: Insert Item");
-        //+NPR5.45 [319706]
     end;
 
     local procedure EventCodeItemNo(): Code[20]
     begin
-        //-NPR5.45 [319706]
         exit('SS_ITEMNO');
-        //+NPR5.45 [319706]
     end;
 
     local procedure EventCodeItemCrossRef(): Code[20]
     begin
-        //-NPR5.45 [319706]
         exit('SS_ITEM_X_REF_NO');
-        //+NPR5.45 [319706]
     end;
 
     local procedure EventCodeItemSearch(): Code[20]
     begin
-        //-NPR5.45 [319706]
         exit('SS_ITEM_SEARCH');
-        //+NPR5.45 [319706]
     end;
 
-    local procedure EventCodeSerialNoItemCrossRef(): Code[20]
+    procedure EventCodeSerialNoItemCrossRef(): Code[20]
     begin
-        //-NPR5.52 [369231]
         exit('SS_SERIALNO_X_REF');
-        //+NPR5.52 [369231]
     end;
+    #endregion
 
-    local procedure "--- Item Search"()
-    begin
-    end;
-
+    #region Item Search
     local procedure GetItemFromItemSearch(var ItemIdentifierString: Text) ItemFound: Boolean
     var
         Item: Record Item;
         ItemList: Page "Item List";
         ItemNo: Code[20];
     begin
-        //-NPR5.45 [319706]
-        // SearchString := COPYSTR (ItemIdentifierString, 1, MAXSTRLEN (Item."Search Description"));
-        // SearchString := UPPERCASE(SearchString);
-        // SearchFilter := '*'+SearchString+'*';
-        //
-        // Item.SETCURRENTKEY("Search Description");
-        // Item.SETFILTER("Search Description", SearchFilter);
-        // Item.SETFILTER(Blocked, '=%1', FALSE);
-        // Item.SETFILTER("Blocked on Pos", '=%1', FALSE);
-        // IF NOT Item.FIND('-') THEN
-        //  EXIT(FALSE);
-        //
-        // ItemIdentifierString := Item."No.";
-        // IF Item.NEXT = 0 THEN
-        //  EXIT(TRUE);
         SetItemSearchFilter(ItemIdentifierString, Item);
         if not Item.FindFirst then
             exit(false);
@@ -1093,11 +864,8 @@ codeunit 6151289 "NPR SS Action: Insert Item"
         ItemIdentifierString := Item."No.";
         Item.FindLast;
         if ItemIdentifierString = Item."No." then
-            //-NPR5.48 [345847]
-            //EXIT;
             exit(true);
-        //+NPR5.48 [345847]
-        //+NPR5.45 [319706]
+
         ItemList.Editable(false);
         ItemList.LookupMode(true);
         ItemList.SetTableView(Item);
@@ -1115,7 +883,6 @@ codeunit 6151289 "NPR SS Action: Insert Item"
         SearchFilter: Text;
         SearchString: Text;
     begin
-        //-NPR5.45 [319706]
         Clear(Item);
 
         SearchString := CopyStr(ItemIdentifierString, 1, MaxStrLen(Item."Search Description"));
@@ -1128,7 +895,6 @@ codeunit 6151289 "NPR SS Action: Insert Item"
         Item.SetFilter("Search Description", SearchFilter);
         Item.SetRange(Blocked, false);
         Item.SetRange("NPR Blocked on Pos", false);
-        //+NPR5.45 [319706]
     end;
+    #endregion
 }
-

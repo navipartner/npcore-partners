@@ -730,12 +730,7 @@ page 6151245 "NPR NP Retail Admin Setup RC"
             {
                 Caption = 'Setup';
 
-                action("CS Setup1")
-                {
-                    Caption = 'CS Setup';
-                    RunObject = page "NPR CS Setup";
-                    ApplicationArea = All;
-                }
+
                 action("AF Setup")
                 {
                     Caption = 'AF Setup';

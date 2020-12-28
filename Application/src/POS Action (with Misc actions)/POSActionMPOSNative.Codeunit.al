@@ -1,46 +1,18 @@
 codeunit 6150825 "NPR POS Action - MPOS Native"
 {
-    // NPR5.34/CLVA/20170703 CASE 280444 Upgrading MPOS functionality to transcendence
-    // NPR5.39/CLVA/20170703 CASE 301776 Adding Scandit/barcode functionality to IOS
-    // NPR5.50/CLVA/20190304 CASE 332844 Added parameters COUNTSALESFLOOR,COUNTSTOCKROOM,ASSIGNTAG,LOCATETAG and REFILL
-    //                                   Added function BuildJSONGenericParams
-    // NPR5.51/CLVA/20190408 CASE 351364 Added support for Android
-    // NPR5.51/CLVA/20190605 CASE 357532 Added parameters APPROVE and SCANDITSCAN
-    // NPR5.51/CLVA/20190819 CASE 364011 Added "Register No." to action
-    // NPR5.52/CLVA/20190919 CASE 364011 Added the use of Text Con. JSfunction to Variable JSString
-    // NPR5.52/JAKUBV/20191022  CASE 351364-01 Transport NPR5.52 - 22 October 2019
-    // NPR5.53/CLVA/20191204 CASE 379042 Added support for IOS 13
-
     SingleInstance = true;
-
-    trigger OnRun()
-    begin
-    end;
 
     var
         ActionDescription: Label 'This is a built-in action for running a report';
-        POSSetup: Codeunit "NPR POS Setup";
         Err_AdmissionFailed: Label 'Error opening the admission webpage';
         Err_EODFailed: Label 'Error running EndOfDay on the terminal';
-        Err_LFRFailed: Label 'Error printing last receipt on the terminal';
         Err_ScanditFailed: Label 'Error running the Scandit Barcode Reader';
         Model: DotNet NPRNetModel;
         ProtocolError: Label 'An unexpected error ocurred in the %1 protocol:\%2';
         ERROR_SESSION: Label 'Critical Error: Session object could not be retrieved for %1. ';
+        Err_ExternalActionNotHandled: Label 'External Action %1 not handled.';
         ActiveModelID: Guid;
         TransactionDone: Boolean;
-        LOADER: Label 'Handling data...';
-        Err_RFIDStockTake: Label 'Error running the RFID Stock-Take';
-        Err_CSStockTakes: Label 'There are no active counting sheets for store %1';
-        Err_SalesfloorClosed: Label 'Sales floor is already counted';
-        Err_StockroomClosed: Label 'Stockroom is already counted';
-        Err_Refill: Label 'Both Salesfloor and Stockroom needs to be counted before Refill';
-        Err_RFIDRefill: Label 'Error running the RFID Refill';
-        Err_StockroomNotClosed: Label 'Stockroom needs to be counted before the Sales floor';
-        Err_NotApproved: Label 'Counting has not been approved';
-        Err_Approved: Label 'Counting is already approved';
-        Err_RefillClosed: Label 'Refill is already closed';
-        JSfunction: Label 'function CallNativeFunction(jsonobject) {debugger; var userAgent = navigator.userAgent || navigator.vendor || window.opera; if (/android/i.test(userAgent)) { window.top.mpos.handleBackendMessage(jsonobject); } if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) { window.webkit.messageHandlers.invokeAction.postMessage(jsonobject);}}';
 
     local procedure ActionCode(): Text
     begin
@@ -54,6 +26,10 @@ codeunit 6150825 "NPR POS Action - MPOS Native"
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
+    var
+        NativeActionSetting: Enum "NPR POS Native Action Setting";
+        ActionSettingName: Text;
+        Options: Text;
     begin
         with Sender do
             if DiscoverAction(
@@ -65,9 +41,13 @@ codeunit 6150825 "NPR POS Action - MPOS Native"
             then begin
                 RegisterWorkflowStep('1', 'respond();');
                 RegisterWorkflow(false);
-                //-NPR5.51 [357532]
-                RegisterOptionParameter('NativeAction', 'ADMISSION,EOD,PRINTLASTRECEIPT,SCANDITITEMINFO,SCANDITFINDITEM,COUNTSALESFLOOR,COUNTSTOCKROOM,ASSIGNTAG,LOCATETAG,REFILL,APPROVE,SCANDITSCAN', 'ADMISSION');
-                //+NPR5.51 [357532]
+
+                foreach ActionSettingName in NativeActionSetting.Names do begin
+                    if Options <> '' then
+                        Options += ';';
+                    Options += ActionSettingName;
+                end;
+                RegisterOptionParameter('NativeAction', Options, 'ADMISSION');
             end;
     end;
 
@@ -75,7 +55,8 @@ codeunit 6150825 "NPR POS Action - MPOS Native"
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         JSON: Codeunit "NPR POS JSON Management";
-        NativeActionSetting: Option ADMISSION,EOD,PRINTLASTRECEIPT,SCANDITITEMINFO,SCANDITFINDITEM,COUNTSALESFLOOR,COUNTSTOCKROOM,ASSIGNTAG,LOCATETAG,REFILL,APPROVE,SCANDITSCAN;
+        NativeActionSetting: Enum "NPR POS Native Action Setting";
+        actiontype: Enum "NPR Action Type";
         MPOSAppSetup: Record "NPR MPOS App Setup";
         POSSale: Codeunit "NPR POS Sale";
         SalePOS: Record "NPR Sale POS";
@@ -84,25 +65,15 @@ codeunit 6150825 "NPR POS Action - MPOS Native"
         POSSaleLine: Codeunit "NPR POS Sale Line";
         SaleLinePOS: Record "NPR Sale Line POS";
         Barcode: Text;
-        Register: Record "NPR Register";
-        StockTakeWorksheet: Record "NPR Stock-Take Worksheet";
-        CSStockTakes: Record "NPR CS Stock-Takes";
-        CSHelperFunctions: Codeunit "NPR CS Helper Functions";
-        CSTotalItemsbyLocations: Query "NPR CS Total Items by Loc.";
-        SumInventory: Decimal;
-        SumInventoryInt: Integer;
-        CSStockTakesData: Record "NPR CS Stock-Takes Data";
-        CSRefillData: Record "NPR CS Refill Data";
+        ExternalActionHandled: Boolean;
     begin
         if not Action.IsThisAction(ActionCode) then
             exit;
 
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
-        //-NPR5.39
         POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
-        //+NPR5.39
         if not MPOSAppSetup.Get(SalePOS."Register No.") then
             exit;
 
@@ -114,7 +85,7 @@ codeunit 6150825 "NPR POS Action - MPOS Native"
         JSON.InitializeJObjectParser(Context, FrontEnd);
         JSON.SetScope('parameters', true);
 
-        NativeActionSetting := JSON.GetInteger('NativeAction', true);
+        NativeActionSetting := Enum::"NPR POS Native Action Setting".FromInteger(JSON.GetInteger('NativeAction', true));
 
         case NativeActionSetting of
             NativeActionSetting::ADMISSION:
@@ -127,10 +98,7 @@ codeunit 6150825 "NPR POS Action - MPOS Native"
                     MPOSAppSetup.TestField("Payment Gateway");
                     MPOSPaymentGateway.Get(MPOSAppSetup."Payment Gateway");
                     MPOSPaymentGateway.TestField("Merchant Id");
-                    //-NPR5.52 [364011]
-                    //JSONString := BuildJSONParams(FORMAT(NativeActionSetting),MPOSPaymentGateway."Merchant Id", '', '', '', Err_EODFailed);
                     JSONString := BuildJSONParams(Format(NativeActionSetting), MPOSPaymentGateway."Merchant Id", SalePOS."Register No.", '', '', Err_EODFailed);
-                    //+NPR5.52 [364011]
                 end;
             NativeActionSetting::PRINTLASTRECEIPT:
                 begin
@@ -139,7 +107,6 @@ codeunit 6150825 "NPR POS Action - MPOS Native"
                     MPOSPaymentGateway.TestField("Merchant Id");
                     JSONString := BuildJSONParams(Format(NativeActionSetting), MPOSPaymentGateway."Merchant Id", '', '', '', Err_EODFailed);
                 end;
-            //-NPR5.39
             NativeActionSetting::SCANDITITEMINFO:
                 begin
                     JSONString := BuildJSONParams(Format(NativeActionSetting), '-1', '10', '', '10', Err_ScanditFailed);
@@ -150,123 +117,26 @@ codeunit 6150825 "NPR POS Action - MPOS Native"
                     if Barcode <> '' then
                         JSONString := BuildJSONParams(Format(NativeActionSetting), '0', '10', Barcode, '10', Err_ScanditFailed)
                 end;
-            //-NPR5.51 [357532]
             NativeActionSetting::SCANDITSCAN:
                 begin
                     JSONString := BuildJSONParams(Format(NativeActionSetting), '0', '0', '0', '0', Err_ScanditFailed)
                 end;
-            //+NPR5.51 [357532]
-            //+NPR5.39
-            //-NPR5.50 [332844]
-            NativeActionSetting::COUNTSTOCKROOM:
-                begin
-                    SelectLatestVersion;
-                    Register.Get(SalePOS."Register No.");
-                    Register.TestField("Location Code");
-                    CSStockTakes.SetRange(Location, Register."Location Code");
-                    CSStockTakes.SetRange(Closed, 0DT);
-                    if CSStockTakes.FindFirst then begin
-                        if CSStockTakes."Stockroom Closed" <> 0DT then
-                            Error(Err_StockroomClosed);
-                        if CSStockTakes."Stockroom Started" = 0DT then begin
-                            CSStockTakes."Stockroom Started" := CurrentDateTime;
-                            CSStockTakes."Stockroom Started By" := UserId;
-                            CSStockTakes.Modify(true);
-                        end;
-                        CSTotalItemsbyLocations.SetFilter(Location_Filter, Register."Location Code");
-                        CSTotalItemsbyLocations.Open;
-                        while CSTotalItemsbyLocations.Read do begin
-                            SumInventory := CSTotalItemsbyLocations.Sum_Inventory;
-                        end;
-                        Evaluate(SumInventoryInt, Format(SumInventory));
-                        CSTotalItemsbyLocations.Close;
-                        CSHelperFunctions.CreateStockTakeWorksheet(Register."Location Code", 'STOCKROOM', StockTakeWorksheet);
-                        JSONString := BuildJSONGenericParams(Format(NativeActionSetting), CSStockTakes."Stock-Take Id", Register."Location Code", StockTakeWorksheet.Name, Format(SumInventoryInt), '', Err_RFIDStockTake);
-                    end else
-                        Error(Err_CSStockTakes, Register."Location Code");
+            else begin
+                    OnExternalAction(SalePOS, SaleLinePOS, NativeActionSetting, JSONString, ExternalActionHandled);
+                    if not ExternalActionHandled then
+                        Error(Err_ExternalActionNotHandled, NativeActionSetting);
                 end;
-            NativeActionSetting::COUNTSALESFLOOR:
-                begin
-                    SelectLatestVersion;
-                    Register.Get(SalePOS."Register No.");
-                    Register.TestField("Location Code");
-                    CSStockTakes.SetRange(Location, Register."Location Code");
-                    CSStockTakes.SetRange(Closed, 0DT);
-                    if CSStockTakes.FindFirst then begin
 
-                        if CSStockTakes."Stockroom Closed" = 0DT then
-                            Error(Err_StockroomNotClosed);
-
-                        if CSStockTakes."Salesfloor Closed" <> 0DT then
-                            Error(Err_SalesfloorClosed);
-
-                        if CSStockTakes."Salesfloor Started" = 0DT then begin
-                            CSStockTakes."Salesfloor Started" := CurrentDateTime;
-                            CSStockTakes."Salesfloor Started By" := UserId;
-                            CSStockTakes.Modify(true);
-                        end;
-
-                        CSTotalItemsbyLocations.SetFilter(Location_Filter, Register."Location Code");
-                        CSTotalItemsbyLocations.Open;
-                        while CSTotalItemsbyLocations.Read do begin
-                            SumInventory := CSTotalItemsbyLocations.Sum_Inventory;
-                        end;
-                        CSTotalItemsbyLocations.Close;
-
-                        CSStockTakesData.SetRange("Stock-Take Id", CSStockTakes."Stock-Take Id");
-                        CSStockTakesData.SetRange("Worksheet Name", 'STOCKROOM');
-                        if SumInventory > CSStockTakesData.Count then
-                            SumInventory := SumInventory - CSStockTakesData.Count;
-
-                        Evaluate(SumInventoryInt, Format(SumInventory));
-
-                        CSHelperFunctions.CreateStockTakeWorksheet(Register."Location Code", 'SALESFLOOR', StockTakeWorksheet);
-                        JSONString := BuildJSONGenericParams(Format(NativeActionSetting), CSStockTakes."Stock-Take Id", Register."Location Code", StockTakeWorksheet.Name, Format(SumInventoryInt), '', Err_RFIDStockTake);
-                    end else
-                        Error(Err_CSStockTakes, Register."Location Code");
-                end;
-            NativeActionSetting::REFILL:
-                begin
-                    SelectLatestVersion;
-                    Register.Get(SalePOS."Register No.");
-                    Register.TestField("Location Code");
-                    CSStockTakes.SetRange(Location, Register."Location Code");
-                    CSStockTakes.SetRange(Closed, 0DT);
-                    if CSStockTakes.FindFirst then begin
-                        if (CSStockTakes."Refill Closed" <> 0DT) then
-                            Error(Err_RefillClosed);
-                        if (CSStockTakes."Stockroom Closed" = 0DT) or (CSStockTakes."Salesfloor Closed" = 0DT) then
-                            Error(Err_Refill);
-                        if CSStockTakes."Refill Started" = 0DT then begin
-                            CSStockTakes."Refill Started" := CurrentDateTime;
-                            CSStockTakes."Refill Started By" := UserId;
-                            CSStockTakes.Modify(true);
-                        end;
-                        JSONString := BuildJSONGenericParams(Format(NativeActionSetting), CSStockTakes."Stock-Take Id", '', '', '', '0', Err_RFIDRefill);
-                    end else
-                        Error(Err_CSStockTakes, Register."Location Code");
-                end;
-            NativeActionSetting::APPROVE:
-                begin
-                    SelectLatestVersion;
-                    Register.Get(SalePOS."Register No.");
-                    Register.TestField("Location Code");
-                    CSStockTakes.SetRange(Location, Register."Location Code");
-                    CSStockTakes.SetRange(Closed, 0DT);
-                    if CSStockTakes.FindFirst then begin
-                        if (CSStockTakes.Approved <> 0DT) then
-                            Error(Err_Approved);
-                        CSRefillData.SetRange("Stock-Take Id", CSStockTakes."Stock-Take Id");
-                        JSONString := BuildJSONGenericParams(Format(NativeActionSetting), CSStockTakes."Stock-Take Id", '', '', '', '1', Err_RFIDRefill);
-                    end else
-                        Error(Err_CSStockTakes, Register."Location Code");
-                end;
-        //-NPR5.50 [332844]
         end;
 
         if JSONString <> '' then
             ExecuteNativeAction(Format(NativeActionSetting), JSONString);
         Handled := true;
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnExternalAction(SalePOS: Record "NPR Sale POS"; SaleLinePOS: Record "NPR Sale Line POS"; NativeActionSetting: Enum "NPR POS Native Action Setting"; var JSONString: Text; var Handled: Boolean)
+    begin
     end;
 
     local procedure BuildJSONParams(RequestMethod: Text; BaseAddress: Text; Endpoint: Text; PrintJob: Text; RequestType: Text; ErrorCaption: Text) JSON: Text
@@ -281,7 +151,7 @@ codeunit 6150825 "NPR POS Action - MPOS Native"
         JSON += '}';
     end;
 
-    local procedure BuildJSONGenericParams(RequestMethod: Text; Value1: Text; Value2: Text; Value3: Text; Value4: Text; Value5: Text; ErrorCaption: Text) JSON: Text
+    procedure BuildJSONGenericParams(RequestMethod: Text; Value1: Text; Value2: Text; Value3: Text; Value4: Text; Value5: Text; ErrorCaption: Text) JSON: Text
     begin
         JSON := '{';
         JSON += '"RequestMethod": "' + RequestMethod + '",';
@@ -300,16 +170,12 @@ codeunit 6150825 "NPR POS Action - MPOS Native"
         POSFrontEnd: Codeunit "NPR POS Front End Management";
         POSSession: Codeunit "NPR POS Session";
     begin
-        //-NPR5.50 [332844]
-        //JSBridge.SetParameters(RequestMethod, JSON, '');
-        //JSBridge.RUNMODAL;
         if not POSSession.IsActiveSession(POSFrontEnd) then
             Error(ERROR_SESSION, 'MPOSNATIVE');
 
         CreateUserInterface(JSON);
         ActiveModelID := POSFrontEnd.ShowModel(Model);
         RequestClose(POSFrontEnd);
-        //+NPR5.50 [332844]
     end;
 
     local procedure FindItemBarcode(SaleLinePOS: Record "NPR Sale Line POS"; var Barcode: Text): Boolean
@@ -331,23 +197,13 @@ codeunit 6150825 "NPR POS Action - MPOS Native"
         JSString: Text;
     begin
         Model := Model.Model();
-        //-NPR5.52 [351364]
-        //Model.AddScript('function CallNativeFunction(jsonObject) {console.log(jsonObject); window.webkit.messageHandlers.invokeAction.postMessage(jsonObject);}');
-        //Model.AddScript('window.androidObject = function AndroidClass(){};');
-        //-#362731
-        //Model.AddScript(JSfunction);
         JSString := 'function CallNativeFunction(jsonobject) { ';
         JSString += 'debugger; ';
         JSString += 'var userAgent = navigator.userAgent || navigator.vendor || window.opera; if (/android/i.test(userAgent)) { ';
         JSString += 'window.top.mpos.handleBackendMessage(jsonobject); } ';
-        //-NPR5.53 [379042]
-        //JSString += 'if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) { ';
         JSString += 'if (/iPad|iPhone|iPod|Macintosh/.test(userAgent) && !window.MSStream) { ';
-        //+NPR5.53 [379042]
         JSString += 'window.webkit.messageHandlers.invokeAction.postMessage(jsonobject);}}';
         Model.AddScript(JSString);
-        //+#362731
-        //+NPR5.52 [351364]
         Model.AddScript('CallNativeFunction(' + JsonObject + ');');
     end;
 
@@ -404,4 +260,3 @@ codeunit 6150825 "NPR POS Action - MPOS Native"
         Message(ErrorText);
     end;
 }
-
