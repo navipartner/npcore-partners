@@ -1,69 +1,5 @@
 page 6150613 "NPR NP Retail Setup"
 {
-    // NPR5.29/AP  /20170126  CASE 261728 Recreated ENU-captions
-    // NPR5.31/MMV /20170404  CASE 263473 Added environment fields.
-    // NPR5.32/AP  /20170501  CASE 274285 Possible to re-run Build Steps. Better visibilty for log entries.
-    // NPR5.32/AP  /20170518  CASE 262628 Added field "Poseidon POS Entries Activated"
-    // NPR5.34/KENU/20170623  CASE 281051 Added Navigate button and added retails setups, added Configuration menu
-    // NPR5.34/KENU/20170623  CASE 282010 Added Menu Groups to Navigate
-    // NPR5.34/KENU/20170630  CASE 282645 Added Variety Group
-    // NPR5.34/KENU/20170630  CASE 282654 Added E-mail Group
-    // NPR5.34/KENU/20170630  CASE 282653 Added Import/Export Group
-    // NPR5.34/KENU/20170630  CASE 282651 Added Doc. Exchange Group
-    // NPR5.34/KENU/20170630  CASE 282650 Added Pacsoft Group
-    // NPR5.34/KENU/20170630  CASE 282643 Added Page Manager Group
-    // NPR5.34/KENU/20170630  CASE 282649 Added NaviConnect Group
-    // NPR5.34/KENU/20170707  CASE 283393 Added POS Info List under POS
-    // NPR5.34/KENU/20170707  CASE 283391 Added Hospitality sub menu
-    // NPR5.36/MHA /20170803  CASE 285800 Added ActionGroup: DiscountCoupon
-    // NPR5.36/KENU/20170807  CASE 285965 Added Page "NPH Flow Status" under "Hospitality"
-    // NPR5.36/KENU/20170810  CASE 286363 Added "POS List" drop down
-    // NPR5.36/BR  /20170907  CASE 277103 Added Group "Posting", fields "Default POS Entry No. Series", "Max. POS Posting Diff. (LCY)" and "POS Posting Diff. Account"
-    // NPR5.36/CLVA/20170915  CASE 283587 Added "Azure Functions" drop down
-    // NPR5.36/BR  /20170918  CASE 277103 Added field Poseidon Posting Activated
-    // NPR5.36/CLVA/20170919  CASE 283587 Added "Trigger Permission Set Mgt." to the Configuration drop down
-    // NPR5.37/VB  /20171002  CASE 292193 Added "POS Stargate Packages" action to the Configuration drop down
-    // NPR5.37/BR  /20170910  CASE 292364 Changed "Poseidon" names and Captions to Advanced Posting
-    // NPR5.38/TS  /20171122  CASE 295501 Added Action Magento Setup
-    // NPR5.38/BR  /20171214  CASE 299888 Changed ENU Caption from POS Ledger Register to POS Period Register No.
-    // NPR5.38/BR  /20180105  CASE 294723 Added Fields Automatic Item Posting, Automatic POS Posting, Automatic Posting Method, "Adj. Cost after Item Posting", "Post to G/L after Item Posting"
-    // NPR5.38/TS  /20180105  CASE 300893 Action Containers cannot have caption
-    // NPR5.38/TS  /20180111  CASE 302005 Added Action Hotkeys
-    // NPR5.38/TS  /20180123  CASE 299999 Added Action Dynamic Modules
-    // NPR5.38/CLVA/20180124  CASE 293179 Added field Enable Client Diagnostics
-    // NPR5.38.01 /JKL /20180205  CASE 289017 Added Group Distribution And replenishmen + action retail replenishMent setup
-    // NPR5.39/MHA /20180205  CASE 302779 Added Action POS Sales Workflows
-    // NPR5.39/BR  /20180215  CASE 305016 Added field Fiscal No. Series
-    // NPR5.40/MMV /20180309  CASE 307817 Removed action for opening rp template setup.
-    // NPR5.40/MMV /20180316  CASE 308457 New fiscal no. fields
-    // NPR5.40/TS  /20180227  CASE 306550 Added Report Selection under Print.
-    // NPR5.40/TS  /20180306  CASE 292365 Retire Action and Regroup
-    // NPR5.40/MHA /20180328  CASE 308907 Added Action ClientDiagnostics
-    // NPR5.41/THRO/20180425  CASE 311567 Added action NPR Version history
-    // NPR5.42/CLVA/20180329  CASE 306407 Added button "Capture Service" to the Accessories group
-    // NPR5.42/TSA /20180502  CASE 312104 Added field "Allow Zero Amount Sales"
-    // NPR5.45/MHA /20180803  CASE 323705 Added fields 300, 305, 310 to enable overload of Item Price functionality
-    // NPR5.46/MHA /20180911  CASE 327708 Updated caption on Ean Box Event actions
-    // NPR5.46/TS  /20180918  CASE 327709 Added Vouchers
-    // NPR5.47/BHR /20181010  CASE 331858 Move Pos store action
-    // NPR5.47/BHR /20181011  CASE 331857 Remove "NPR POS" action group
-    // NPR5.48/LS  /20181121  CASE 334335 Added Action "UpgradeBalV3Setup" when upgrading to Balancing V3
-    // NPR5.48/MMV /20181206  CASE 327107 Added action RFIDSetup
-    // NPR5.48/MMV /20181026  CASE 318028 French certification
-    // NPR5.50/MHA /20190422  CASE 337539 Added field 400 "Global Sales Setup"
-    // NPR5.50/MMV /20190521  CASE 355848 Added action LastErrorCallstack
-    // NPR5.51/CLVA/20190710  CASE 355871 Added Action Raptor
-    // NPR5.51/MHA /20190816  CASE 365332 Removed Page Manager actions
-    // NPR5.52/ALPO/20190923  CASE 365326 The following fields moved to POS Posting Profiles and deleted from this table/page:
-    //                                       Default POS Entry No. Series, Max. POS Posting Diff. (LCY), POS Posting Diff. AccountCode, Automatic Item Posting,
-    //                                       Automatic POS Posting, Automatic Posting Method, Adj. Cost after Item Posting, Post to G/L after Item Posting
-    //                                    New field added: "Default POS Posting Profile"
-    // NPR5.52/BHR /20190925  CASE 368143 Moved the Action RFID setup to "Navigate and other configuration"
-    // NPR5.52/BHR /20191002  CASE 370447 remove Actions Step 1 to step 5 and rename action 'Upgrade to Balancing V3 Setups' to 'Upgrade Audit Roll to POS Entry '
-    // NPR5.52/MHA /20191016  CASE 371388 Field 400 "Global POS Sales Setup" moved from Np Retail Setup to POS Unit
-    // NPR5.55/BHR /20200408  CASE 399443 Removed Fields300Item Price Codeunit ID,305Item Price Codeunit ,310Item Price Function
-    // NPR5.55/YAHA/20200227  CASE 393297 Moved transaction types,Transaction subtype & Result code into pepper group
-    // NPR5.55/CLVA/20200804  CASE 416793 Added action "MCS API Setup"
 
     Caption = 'NP Retail Setup';
     SourceTable = "NPR NP Retail Setup";
@@ -1047,13 +983,7 @@ page 6150613 "NPR NP Retail Setup"
                     RunObject = Page "NPR Scanner - List";
                     ApplicationArea = All;
                 }
-                action("Capture Service")
-                {
-                    Caption = 'Capture Service';
-                    Image = BarCode;
-                    RunObject = Page "NPR CS Setup";
-                    ApplicationArea = All;
-                }
+
                 group(Print)
                 {
                     Caption = 'Print';

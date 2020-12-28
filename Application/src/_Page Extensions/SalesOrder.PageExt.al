@@ -97,20 +97,6 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
                 Image = Entry;
                 ApplicationArea = All;
             }
-            action("NPR RFID Document")
-            {
-                Caption = 'RFID Document';
-                Image = Delivery;
-                Visible = ShowCaptureService;
-                ApplicationArea = All;
-
-                trigger OnAction()
-                var
-                    CSRfidHeader: Record "NPR CS Rfid Header";
-                begin
-                    CSRfidHeader.OpenRfidSalesDoc(0, "No.", "Sell-to Customer No.", '');
-                end;
-            }
         }
         addafter(History)
         {
@@ -259,19 +245,10 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
 
     var
         HasRetailVouchers: Boolean;
-        ShowCaptureService: Boolean;
-        CSHelperFunctions: Codeunit "NPR CS Helper Functions";
-
 
     trigger OnAfterGetCurrRecord()
     begin
         SetHasRetailVouchers();
-    end;
-
-
-    trigger OnOpenPage()
-    begin
-        ShowCaptureService := CSHelperFunctions.CaptureServiceStatus();
     end;
 
     local procedure SetHasRetailVouchers()
