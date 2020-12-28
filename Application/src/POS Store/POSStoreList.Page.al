@@ -1,14 +1,5 @@
 page 6150614 "NPR POS Store List"
 {
-    // NPR5.29/AP/20170126 CASE 261728 Recreated ENU-captions
-    // NPR5.34/KENU/20170623 CASE 282023 Added page POS Unit List in Navigate Tab
-    // NPR5.36/KENU/20170807 CASE 285988 Added page "NP Retail Setup" in Navigate Tab
-    // NPR5.36/BR  /20170810 CASE 277096 Added Actions to navigate to Entries, Ledger Registers and Posting Setup
-    // NPR5.38/BR  /20171214  CASE 299888 Changed ENU Caption from POS Ledger Register to POS Period Register No.
-    // NPR5.48/TS  /20181213  CASE 339803 Added field Store Group Code
-    // NPR5.50/CLVA/20190304 CASE 332844 Added Action Group "Stock-Take"
-    // NPR5.53/ALPO/20191021 CASE 371956 Dimensions: POS Store & POS Unit integration
-    // NPR5.54/SARA/20200301 CASE 395944 Added 'Location Code','VAT Bus. Posting Group',Gen. Bus. Posting Group'
 
     Caption = 'POS Store List';
     CardPageID = "NPR POS Store Card";
@@ -164,37 +155,9 @@ page 6150614 "NPR POS Store List"
                     ApplicationArea = All;
                 }
             }
-            group("Stock-Take")
-            {
-                Caption = 'Stock-Take';
-                Visible = StockTakeVisible;
-                action(Countings)
-                {
-                    Caption = 'Countings';
-                    Image = LedgerEntries;
-                    Promoted = false;
-                    //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                    //PromotedCategory = Process;
-                    //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
-                    //PromotedIsBig = false;
-                    RunObject = Page "NPR CS Stock-Takes List";
-                    RunPageLink = Location = FIELD("Location Code");
-                    ApplicationArea = All;
-                }
-            }
+
         }
     }
 
-    trigger OnOpenPage()
-    begin
-        //-NPR5.50
-        if CSSetup.Get then
-            StockTakeVisible := CSSetup."Enable Capture Service";
-        //+NPR5.50
-    end;
 
-    var
-        CSSetup: Record "NPR CS Setup";
-        StockTakeVisible: Boolean;
 }
-

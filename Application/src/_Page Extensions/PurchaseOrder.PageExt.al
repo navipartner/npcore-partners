@@ -101,23 +101,7 @@ pageextension 6014451 "NPR Purchase Order" extends "Purchase Order"
                 end;
             }
         }
-        addafter("Create Inventor&y Put-away/Pick")
-        {
-            action("NPR RFID Document")
-            {
-                Caption = 'RFID Document';
-                Image = Delivery;
-                Visible = ShowCaptureService;
-                ApplicationArea = All;
 
-                trigger OnAction()
-                var
-                    CSRfidHeader: Record "NPR CS Rfid Header";
-                begin
-                    CSRfidHeader.OpenRfidSalesDoc(1, "Vendor Order No.", "Sell-to Customer No.", "No.");
-                end;
-            }
-        }
         addafter("&Print")
         {
             action("NPR RetailPrint")
@@ -158,14 +142,6 @@ pageextension 6014451 "NPR Purchase Order" extends "Purchase Order"
         }
     }
 
-    var
-        ShowCaptureService: Boolean;
-        CSHelperFunctions: Codeunit "NPR CS Helper Functions";
 
-
-    trigger OnOpenPage()
-    begin
-        ShowCaptureService := CSHelperFunctions.CaptureServiceStatus();
-    end;
 }
 
