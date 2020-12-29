@@ -1,7 +1,5 @@
 page 6151169 "NPR NpGp POS Sales Lines"
 {
-    // NPR5.50/MHA /20190422  CASE 337539 Object created - [NpGp] NaviPartner Global POS Sales
-
     Caption = 'Global POS Sales Lines';
     Editable = false;
     PageType = List;
