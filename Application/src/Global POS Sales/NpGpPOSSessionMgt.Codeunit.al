@@ -1,9 +1,5 @@
 codeunit 6151165 "NPR NpGp POS Session Mgt."
 {
-    // NPR5.50/MHA /20190422  CASE 337539 Object created - [NpGp] NaviPartner Global POS Sales
-    // NPR5.52/MHA /20191016  CASE 371388 "Global POS Sales Setup" moved from Np Retail Setup to POS Unit
-    // NPR5.53/MHA /20191120  CASE 378375 Added function OnAfterDebitSalePostEvent() to include Credit Sales
-
     TableNo = "NPR Nc Task";
 
     trigger OnRun()
@@ -29,14 +25,12 @@ codeunit 6151165 "NPR NpGp POS Session Mgt."
         if not NPRetailSetup."Advanced POS Entries Activated" then
             exit;
 
-        //-NPR5.52 [371388]
         if not POSUnit.Get(SalePOS."Register No.") then
             exit;
         if POSUnit."Global POS Sales Setup" = '' then
             exit;
         if not NpGpPOSSalesSetup.Get(POSUnit."Global POS Sales Setup") then
             exit;
-        //+NPR5.52 [371388]
         if not FindPosEntry(SalePOS, POSEntry) then
             exit;
 
@@ -59,7 +53,6 @@ codeunit 6151165 "NPR NpGp POS Session Mgt."
         NpGpPOSSalesInitMgt: Codeunit "NPR NpGp POS Sales Init Mgt.";
         TaskProcessorCode: Text;
     begin
-        //-NPR5.53 [378375]
         if not NPRetailSetup.Get then
             exit;
         if not NPRetailSetup."Advanced POS Entries Activated" then
@@ -80,7 +73,6 @@ codeunit 6151165 "NPR NpGp POS Session Mgt."
 
         if NpGpPOSSalesSetup."Sync POS Sales Immediately" then
             ScheduleTaskProcessing(NcTask);
-        //+NPR5.53 [378375]
     end;
 
     local procedure FindPosEntry(SalePOS: Record "NPR Sale POS"; var POSEntry: Record "NPR POS Entry"): Boolean

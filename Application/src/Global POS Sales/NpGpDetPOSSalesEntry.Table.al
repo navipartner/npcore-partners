@@ -1,7 +1,5 @@
 table 6151169 "NPR NpGp Det. POS Sales Entry"
 {
-    // NPR5.50/MHA /20190422  CASE 337539 Object created - [NpGp] NaviPartner Global POS Sales
-
     Caption = 'Global Detailed Pos Sales Entry';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR NpGp Det. POS S. Entries";

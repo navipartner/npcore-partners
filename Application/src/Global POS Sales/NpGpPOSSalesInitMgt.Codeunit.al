@@ -1,14 +1,5 @@
 codeunit 6151167 "NPR NpGp POS Sales Init Mgt."
 {
-    // NPR5.50/MHA /20190422  CASE 337539 Object created - [NpGp] NaviPartner Global POS Sales
-    // NPR5.51/MHA /20190711  CASE 361618 Added Explicit DataLogMgt.OnDatabaseInsert() in InsertPosSalesEntry() to catch log of Autoincrement integer
-    // NPR5.54/MMV /20200220 CASE 391871 Moved GUID creation from table subscribers to table trigger to have everything centralized.
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         Text000: Label '[PS] ~ POS Store Code\[PU] ~ POS Unit No.\[S] ~ Sales Ticket No.\[N] ~ Random Number\[N*3] ~ 3 Random Numbers\[AN] ~ Random Char\[AN*3] ~ 3 Random Chars';
         Text001: Label '[PS] ~ POS Store Code\[PU] ~ POS Unit No.\[S] ~ Sales Ticket No.\[N] ~ Random Number\[N*3] ~ 3 Random Numbers\[AN] ~ Random Char\[AN*3] ~ 3 Random Chars\[NL] ~ Natural Line No.\[L] ~ Line No.';
@@ -59,15 +50,11 @@ codeunit 6151167 "NPR NpGp POS Sales Init Mgt."
         NpGpPOSSalesEntry.Init;
         NpGpPOSSalesEntry := TempNpGpPOSSalesEntry;
         NpGpPOSSalesEntry."Entry No." := 0;
-        //-NPR5.51 [361618]
         DataLogMgt.DisableDataLog(true);
-        //+NPR5.51 [361618]
         NpGpPOSSalesEntry.Insert(true);
-        //-NPR5.51 [361618]
         DataLogMgt.DisableDataLog(false);
         RecRef.GetTable(NpGpPOSSalesEntry);
         DataLogMgt.OnDatabaseInsert(RecRef);
-        //+NPR5.51 [361618]
 
         TempNpGpPOSSalesLine2.Copy(TempNpGpPOSSalesLine, true);
         Clear(TempNpGpPOSSalesLine2);

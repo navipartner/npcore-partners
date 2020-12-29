@@ -1,7 +1,5 @@
 page 6151175 "NPR NpGp Cross Companies Setup"
 {
-    // NPR5.51/ALST/20190422 CASE 337539 New object
-
     Caption = 'Cross Companies Setup';
     PageType = List;
     SourceTable = "NPR NpGp Cross Company Setup";

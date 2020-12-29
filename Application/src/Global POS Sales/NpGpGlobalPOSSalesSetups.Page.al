@@ -1,7 +1,5 @@
 page 6151171 "NPR NpGp Global POSSalesSetups"
 {
-    // NPR5.50/MHA /20190422  CASE 337539 Object created - [NpGp] NaviPartner Global POS Sales
-
     Caption = 'Global POS Sales Setups';
     CardPageID = "NPR NpGp POS Sales Setup Card";
     Editable = false;

@@ -1,9 +1,5 @@
 table 6151170 "NPR NpGp POS Sales Setup"
 {
-    // NPR5.50/MHA /20190422  CASE 337539 Object created - [NpGp] NaviPartner Global POS Sales
-    // NPR5.51/ALST/20190904  CASE 337539 obscured password
-    // NPR5.52/ALST/20191009  CASE 372010 added permissions to service password
-
     Caption = 'Global POS Sales Setup';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR NpGp Global POSSalesSetups";
