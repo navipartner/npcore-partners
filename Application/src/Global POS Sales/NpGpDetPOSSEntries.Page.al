@@ -1,7 +1,5 @@
 page 6151170 "NPR NpGp Det. POS S. Entries"
 {
-    // NPR5.50/MHA /20190422  CASE 337539 Object created - [NpGp] NaviPartner Global POS Sales
-
     Caption = 'Detailed Global POS Sales Entries';
     Editable = false;
     PageType = List;

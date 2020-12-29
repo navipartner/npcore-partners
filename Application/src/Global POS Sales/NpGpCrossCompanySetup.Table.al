@@ -1,8 +1,5 @@
 table 6151172 "NPR NpGp Cross Company Setup"
 {
-    // NPR5.51/ALST/20190422 CASE 337539 New object
-    // NPR5.53/ALST/20191106 CASE 372895 allow general Cross company setup entry
-
     Caption = 'Cross Company Setup';
     DataClassification = CustomerContent;
 

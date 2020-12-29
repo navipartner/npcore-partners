@@ -1,8 +1,5 @@
 table 6151168 "NPR NpGp POS Sales Line"
 {
-    // NPR5.50/MHA /20190422  CASE 337539 Object created - [NpGp] NaviPartner Global POS Sales
-    // NPR5.51/ALST/20190904  CASE 337539 added field "Global reference"
-
     Caption = 'Global Pos Sales Line';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR NpGp POS Sales Lines";

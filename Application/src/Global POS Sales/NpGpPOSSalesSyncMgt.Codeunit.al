@@ -1,12 +1,5 @@
 codeunit 6151168 "NPR NpGp POS Sales Sync Mgt."
 {
-    // NPR5.50/MHA /20190422  CASE 337539 Object created - [NpGp] NaviPartner Global POS Sales
-    // NPR5.51/ALST/20190711  CASE 337539 modified the web request message
-    // NPR5.52/ALST/20191009  CASE 372010 added permissions to service password
-    // NPR5.52/MHA /20191016 CASE 371388 "Global POS Sales Setup" moved from Np Retail Setup to POS Unit
-    // NPR5.52/MHA /20191017  CASE 373420 Added function XmlEscape()
-    // NPR5.53/THRO/20191206  CASE 381416 Added extension_fields in xml and publisher OnInitReqBody
-
     TableNo = "NPR Nc Task";
 
     trigger OnRun()
@@ -30,15 +23,18 @@ codeunit 6151168 "NPR NpGp POS Sales Sync Mgt."
         ServicePassword: Text;
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
         NpGpPOSSalesSetupCard: Page "NPR NpGp POS Sales Setup Card";
-        Credential: DotNet NPRNetNetworkCredential;
-        HttpWebRequest: DotNet NPRNetHttpWebRequest;
-        HttpWebResponse: DotNet NPRNetHttpWebResponse;
-        XmlDoc: DotNet "NPRNetXmlDocument";
-        WebException: DotNet NPRNetWebException;
+        WebRequest: HttpRequestMessage;
+        WebResponse: HttpResponseMessage;
+        WebClient: HttpClient;
+        Headers: HttpHeaders;
+        XmlDoc: XmlDocument;
         OutStr: OutStream;
-        ErrorMessage: Text;
         Response: Text;
         ServiceName: Text;
+        Base64Convert: Codeunit "Base64 Convert";
+        AuthText: Text;
+        InStrm: InStream;
+        TempBlob: Codeunit "Temp Blob";
     begin
         if NcTask.Type <> NcTask.Type::Insert then
             exit;
@@ -47,14 +43,13 @@ codeunit 6151168 "NPR NpGp POS Sales Sync Mgt."
         if not POSEntry.Find then
             exit;
 
-        //-NPR5.52 [371388]
         if not POSUnit.Get(POSEntry."POS Unit No.") then
             exit;
         if POSUnit."Global POS Sales Setup" = '' then
             exit;
         if not NpGpGlobalSalesSetup.Get(POSUnit."Global POS Sales Setup") then
             exit;
-        //+NPR5.52 [371388]
+
         NpGpGlobalSalesSetup.TestField("Service Url");
 
         ServiceName := GetServiceName(NpGpGlobalSalesSetup."Service Url");
@@ -62,41 +57,45 @@ codeunit 6151168 "NPR NpGp POS Sales Sync Mgt."
         Clear(NcTask."Data Output");
         Clear(NcTask.Response);
         NcTask."Data Output".CreateOutStream(OutStr, TEXTENCODING::UTF8);
-        XmlDoc.Save(OutStr);
+        XmlDoc.WriteTo(OutStr);
+
         NcTask.Modify;
+
         Commit;
 
         if not IsolatedStorage.Get(NpGpGlobalSalesSetup."Service Password", DataScope::Company, ServicePassword) then
             Error(ServicePasswordErr, NpGpPOSSalesSetupCard.Caption);
 
-        HttpWebRequest := HttpWebRequest.Create(NpGpGlobalSalesSetup."Service Url");
-        HttpWebRequest.UseDefaultCredentials(false);
-        Credential := Credential.NetworkCredential(NpGpGlobalSalesSetup."Service Username", ServicePassword);
-        HttpWebRequest.Credentials(Credential);
-        HttpWebRequest.Method := 'POST';
-        HttpWebRequest.ContentType := 'text/xml; charset=utf-8';
-        HttpWebRequest.Headers.Add('SOAPAction', 'InsertPosSalesEntries');
-        NpXmlDomMgt.SetTrustedCertificateValidation(HttpWebRequest);
+        WebRequest.SetRequestUri(NpGpGlobalSalesSetup."Service Url");
+        WebRequest.Method := 'POST';
+        WebRequest.GetHeaders(Headers);
+        Headers.Clear();
+        Headers.Add('Content-Type', 'text/xml; charset=utf-8');
+        Headers.Add('SOAPAction', 'InsertPosSalesEntries');
+        // Basic Authorization?
+        //AuthText := StrSubstNo('%1:%2', NpGpGlobalSalesSetup."Service Username", ServicePassword);
+        //AuthText := Base64Convert.ToBase64(AuthText);
+        //Headers.Add('Authorization', StrSubstNo('Basic %1', AuthText));
+        WebClient.UseWindowsAuthentication(NpGpGlobalSalesSetup."Service Username", ServicePassword);
 
-        if not NpXmlDomMgt.SendWebRequest(XmlDoc, HttpWebRequest, HttpWebResponse, WebException) then begin
-            ErrorMessage := NpXmlDomMgt.GetWebExceptionMessage(WebException);
-            Error(NpXmlDomMgt.PrettyPrintXml(ErrorMessage));
-        end;
+        WebClient.Send(WebRequest, WebResponse);
+        if not WebResponse.IsSuccessStatusCode then
+            Error(WebResponse.ReasonPhrase);
 
-        Response := NpXmlDomMgt.GetWebResponseText(HttpWebResponse);
+        WebResponse.Content.ReadAs(Response);
+
         NcTask.Response.CreateOutStream(OutStr, TEXTENCODING::UTF8);
         OutStr.WriteText(NpXmlDomMgt.PrettyPrintXml(Response));
         NcTask.Modify;
     end;
 
-    local procedure InitReqBody(POSEntry: Record "NPR POS Entry"; ServiceName: Text; var XmlDoc: DotNet "NPRNetXmlDocument")
+    local procedure InitReqBody(POSEntry: Record "NPR POS Entry"; ServiceName: Text; var XmlDoc: XmlDocument)
     var
         POSSalesLine: Record "NPR POS Sales Line";
         POSInfoPOSEntry: Record "NPR POS Info POS Entry";
         RetailCrossReference: Record "NPR Retail Cross Reference";
         Xml: Text;
     begin
-        XmlDoc := XmlDoc.XmlDocument;
         Xml :=
           '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">' +
              '<soapenv:Body>' +
@@ -106,9 +105,7 @@ codeunit 6151168 "NPR NpGp POS Sales Sync Mgt."
                    '  pos_store_code="' + POSEntry."POS Store Code" + '"' +
                    '  pos_unit_no="' + POSEntry."POS Unit No." + '"' +
                    '  document_no="' + POSEntry."Document No." + '"' +
-                   //-NPR5.52 [373420]
                    '  company="' + XmlEscape(CompanyName) + '">' +
-                     //-NPR5.52 [373420]
                      '<entry_time>' + Format(CreateDateTime(POSEntry."Entry Date", POSEntry."Ending Time"), 0, 9) + '</entry_time>' +
                      '<entry_type>' + Format(POSEntry."Entry Type", 0, 2) + '</entry_type>' +
                      '<retail_id>' + Format(POSEntry."Retail ID") + '</retail_id>' +
@@ -157,9 +154,7 @@ codeunit 6151168 "NPR NpGp POS Sales Sync Mgt."
                               '<amount_excl_vat_lcy>' + Format(POSSalesLine."Amount Excl. VAT (LCY)", 0, 9) + '</amount_excl_vat_lcy>' +
                               '<amount_incl_vat_lcy>' + Format(POSSalesLine."Amount Incl. VAT (LCY)", 0, 9) + '</amount_incl_vat_lcy>' +
                               '<global_reference>' + RetailCrossReference."Reference No." + '</global_reference>' +
-                              //-NPR5.53 [381416]
                               '<extension_fields/>' +
-                            //+NPR5.53 [381416]
                             '</sales_line>';
             until POSSalesLine.Next = 0;
         Xml +=
@@ -187,10 +182,9 @@ codeunit 6151168 "NPR NpGp POS Sales Sync Mgt."
             '</soapenv:Body>' +
           '</soapenv:Envelope>';
 
-        XmlDoc.LoadXml(Xml);
-        //-NPR5.53 [381416]
+        XmlDocument.ReadFrom(Xml, XmlDoc);
+
         OnInitReqBody(POSEntry, XmlDoc);
-        //+NPR5.53 [381416]
     end;
 
     procedure InitGlobalPosSalesService()
@@ -254,60 +248,36 @@ codeunit 6151168 "NPR NpGp POS Sales Sync Mgt."
     var
         ServicePassword: Text;
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
-        Credential: DotNet NPRNetNetworkCredential;
-        HttpWebRequest: DotNet NPRNetHttpWebRequest;
-        HttpWebResponse: DotNet NPRNetHttpWebResponse;
-        XmlDoc: DotNet "NPRNetXmlDocument";
-        XmlElement: DotNet NPRNetXmlElement;
-        WebException: DotNet NPRNetWebException;
-        ErrorMessage: Text;
+        WebRequest: HttpRequestMessage;
+        WebResponse: HttpResponseMessage;
+        WebClient: HttpClient;
+        Headers: HttpHeaders;
     begin
         NpGpPOSSalesSetup.TestField("Service Url");
 
-        HttpWebRequest := HttpWebRequest.Create(NpGpPOSSalesSetup."Service Url");
-        HttpWebRequest.UseDefaultCredentials(false);
-
         IsolatedStorage.Get(NpGpPOSSalesSetup."Service Password", DataScope::Company, ServicePassword);
 
-        Credential := Credential.NetworkCredential(NpGpPOSSalesSetup."Service Username", ServicePassword);
-        HttpWebRequest.Credentials(Credential);
-        HttpWebRequest.Method := 'GET';
-        NpXmlDomMgt.SetTrustedCertificateValidation(HttpWebRequest);
+        WebRequest.SetRequestUri(NpGpPOSSalesSetup."Service Url");
+        WebRequest.Method := 'GET';
+        WebClient.UseWindowsAuthentication(NpGpPOSSalesSetup."Service Username", ServicePassword);
 
-        if TryGetWebResponse(HttpWebRequest, HttpWebResponse) then
-            exit;
-
-        WebException := GetLastErrorObject;
-        ErrorMessage := NpXmlDomMgt.GetWebExceptionMessage(WebException);
-        if NpXmlDomMgt.TryLoadXml(ErrorMessage, XmlDoc) then begin
-            NpXmlDomMgt.RemoveNameSpaces(XmlDoc);
-            if NpXmlDomMgt.FindNode(XmlDoc.DocumentElement, '//faultstring', XmlElement) then begin
-                ErrorMessage := XmlElement.InnerText;
-                Error(ErrorMessage);
-            end;
-        end;
-
-        Error(ErrorMessage);
-    end;
-
-    [TryFunction]
-    local procedure TryGetWebResponse(HttpWebRequest: DotNet NPRNetHttpWebRequest; var HttpWebResponse: DotNet NPRNetHttpWebResponse)
-    begin
-        HttpWebResponse := HttpWebRequest.GetResponse;
+        WebClient.Send(WebRequest, WebResponse);
+        if WebResponse.IsSuccessStatusCode then
+            exit
+        else
+            Error(WebResponse.ReasonPhrase);
     end;
 
     local procedure XmlEscape(Input: Text) Output: Text
     var
-        SecurityElement: DotNet NPRNetSecurityElement;
+        TypeHelper: Codeunit "Type Helper";
     begin
-        //-NPR5.52 [373420]
-        Output := SecurityElement.Escape(Input);
+        Output := TypeHelper.HtmlEncode(Input);
         exit(Output);
-        //+NPR5.52 [373420]
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnInitReqBody(POSEntry: Record "NPR POS Entry"; var XmlDoc: DotNet "NPRNetXmlDocument")
+    local procedure OnInitReqBody(POSEntry: Record "NPR POS Entry"; var XmlDoc: XmlDocument)
     begin
     end;
 }

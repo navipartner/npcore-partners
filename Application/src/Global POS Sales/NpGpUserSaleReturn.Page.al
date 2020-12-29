@@ -1,7 +1,5 @@
 page 6151174 "NPR NpGp User Sale Return"
 {
-    // NPR5.51/ALST/20190422 CASE 337539 New object
-
     Caption = 'Choose return quantities';
     DeleteAllowed = false;
     InsertAllowed = false;

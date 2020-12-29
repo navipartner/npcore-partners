@@ -1,13 +1,5 @@
 codeunit 6151166 "NPR NpGp POS Sales WS"
 {
-    // NPR5.50/MHA /20190422  CASE 337539 Object created - [NpGp] NaviPartner Global POS Sales
-    // NPR5.51/ALST/20190711  CASE 337539 added GetGlobalSale
-
-
-    trigger OnRun()
-    begin
-    end;
-
     procedure InsertPosSalesEntries(var sales_entries: XMLport "NPR NpGp POS Entries")
     var
         TempNpGpPOSSalesEntry: Record "NPR NpGp POS Sales Entry" temporary;
@@ -31,7 +23,6 @@ codeunit 6151166 "NPR NpGp POS Sales WS"
         NpGpPOSSalesLine: Record "NPR NpGp POS Sales Line";
         NpGpPOSInfoPOSEntry: Record "NPR NpGp POS Info POS Entry";
     begin
-        //-NPR5.51
         NpGpPOSSalesLine.SetRange("Global Reference", referenceNumber);
         NpGpPOSSalesLine.SetFilter(Quantity, '>0');
         if not NpGpPOSSalesLine.FindFirst then
@@ -75,7 +66,6 @@ codeunit 6151166 "NPR NpGp POS Sales WS"
         end;
 
         npGpPOSEntries.SetSourceTables(TempNpGpPOSSalesEntry, TempNpGpPOSSalesLine, TempNpGpPOSInfoPOSEntry);
-        //+NPR5.51
     end;
 }
 

@@ -1,9 +1,5 @@
 page 6151172 "NPR NpGp POS Sales Setup Card"
 {
-    // NPR5.50/MHA /20190422  CASE 337539 Object created - [NpGp] NaviPartner Global POS Sales
-    // NPR5.51/ALST/20190711  CASE 337539 obscured password
-    // NPR5.52/ALST/20191009  CASE 372010 added permissions to service password
-
     Caption = 'Global POS Sales Setup Card';
     PageType = Card;
     UsageCategory = Administration;

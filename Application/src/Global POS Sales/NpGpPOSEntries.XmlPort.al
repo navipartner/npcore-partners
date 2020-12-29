@@ -1,9 +1,5 @@
 xmlport 6151167 "NPR NpGp POS Entries"
 {
-    // NPR5.50/MHA /20190422  CASE 337539 Object created - [NpGp] NaviPartner Global POS Sales
-    // NPR5.51/ALST/20190711  CASE 337539 added fields
-    // NPR5.53/THRO/20191206  CASE 381416 Added extension_fields section in sales_line
-
     Caption = 'Global POS Sales Entries';
     DefaultNamespace = 'urn:microsoft-dynamics-nav/xmlports/global_pos_sales';
     Encoding = UTF8;
