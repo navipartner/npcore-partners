@@ -89,10 +89,10 @@ jobs:
           - source: 'https://pkgs.dev.azure.com/navipartner/_packaging/BCSymbols/nuget/v3/index.json'
             id: Microsoft.BC.170.Base_Application.dk
           ISOcountryCode: DK
-        - packages:
-          - source: 'https://pkgs.dev.azure.com/navipartner/_packaging/BCSymbols/nuget/v3/index.json'
-            id: Microsoft.BC.170.Base_Application.es
-          ISOcountryCode: ES
+        # - packages:
+        #   - source: 'https://pkgs.dev.azure.com/navipartner/_packaging/BCSymbols/nuget/v3/index.json'
+        #     id: Microsoft.BC.170.Base_Application.es
+        #   ISOcountryCode: ES
         - packages:
           - source: 'https://pkgs.dev.azure.com/navipartner/_packaging/BCSymbols/nuget/v3/index.json'
             id: Microsoft.BC.170.Base_Application.fi
