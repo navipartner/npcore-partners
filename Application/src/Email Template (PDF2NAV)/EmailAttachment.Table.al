@@ -1,11 +1,5 @@
 table 6014458 "NPR E-mail Attachment"
 {
-    // PN1.00/MH/20140730  NAV-AddOn: PDF2NAV
-    //   - Refactored module from the "Mail And Document Handler" Module.
-    //   - This Table contains fixed Attachments connected to E-mail Templates.
-    // PN1.08/MHA/20151214  CASE 228859 Pdf2Nav (New Version List)
-    // NPR5.46/BHR /20180824  CASE 322752 Replace record Object to Allobj -field 1
-
     Caption = 'E-mail Attachment';
     DataClassification = CustomerContent;
 

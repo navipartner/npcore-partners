@@ -1,13 +1,5 @@
 codeunit 6014463 "NPR Sales-Post and Pdf2Nav"
 {
-    // NPR5.36/THRO/20170908 CASE 285645 Codeunit 82 copy with Pdf2Nav
-    // NPR5.39/THRO/20171222 CASE 299380 Option to skip handling of Print (Used from POS). Removed the "Download queston"-popup if not printing
-    // NPR5.39/TS  /20180221 CASE 294224 Global Variable SalesHeader is not initialised.
-    // NPR5.49/BHR /20190118 CASE 341617 Correction to print report based on setup
-    // NPR5.51/BHR /20190513 CASE 353687 Reverted changes to case 341617
-    // NPR5.51/THRO/20190818 CASE 365016 Commit before sending email - to allow popup with email confirmation
-    // NPR5.52/MMV /20191004 CASE 352473 Added support for handling prepayment documents.
-
     TableNo = "Sales Header";
 
     trigger OnRun()
@@ -70,9 +62,7 @@ codeunit 6014463 "NPR Sales-Post and Pdf2Nav"
                 SalesPostViaJobQueue.EnqueueSalesDoc(SalesHeader)
             else begin
                 CODEUNIT.Run(CODEUNIT::"Sales-Post", SalesHeader);
-                //-NPR5.52 [352473]
                 Mode := Mode::Standard;
-                //+NPR5.52 [352473]
                 GetReport(SalesHeader);
             end;
             Commit;
@@ -88,10 +78,8 @@ codeunit 6014463 "NPR Sales-Post and Pdf2Nav"
 
         Commit;
 
-
         SalesHeader.Copy(SalesHeader2);
 
-        //-NPR5.52 [352473]
         case Mode of
             Mode::PrepaymentInvoice:
                 begin
@@ -107,7 +95,6 @@ codeunit 6014463 "NPR Sales-Post and Pdf2Nav"
                 end;
             Mode::Standard:
                 begin
-                    //+NPR5.52 [352473]
                     with SalesHeader do
                         case "Document Type" of
                             "Document Type"::Order:
@@ -188,16 +175,9 @@ codeunit 6014463 "NPR Sales-Post and Pdf2Nav"
             EmailReport(ReportUsage);
 
         if (SalesHeader."NPR Document Processing" in
-        //-NPR5.51 [353687]
-        //[SalesHeader."Document Processing"::Print,SalesHeader."Document Processing"::PrintAndEmail]) THEN BEGIN
-        //// -NPR5.49 [341617]
-        ////DoPrint := TRUE;
-        ////IF (NOT DoPrint) THEN BEGIN
-        //// +NPR5.49 [341617]
-        [SalesHeader."NPR Document Processing"::Print, SalesHeader."NPR Document Processing"::PrintAndEmail]) then
+            [SalesHeader."NPR Document Processing"::Print, SalesHeader."NPR Document Processing"::PrintAndEmail]) then
             DoPrint := true;
         if (not DoPrint) then begin
-            //-NPR5.51 [353687]
             if not SalesPostandPdf2NavSetup.Get then
                 SalesPostandPdf2NavSetup.Init;
             if (ReportUsage = ReportSelection.Usage::"S.Shipment") and SalesPostandPdf2NavSetup."Always Print Ship" then
@@ -207,9 +187,7 @@ codeunit 6014463 "NPR Sales-Post and Pdf2Nav"
         end;
 
         if DoPrint then
-            //-NPR5.39 [299380]
             Printed := PrintReport(ReportUsage);
-        //+NPR5.39 [299380]
 
         if SalesHeader."NPR Document Processing" = SalesHeader."NPR Document Processing"::OIO then
             OIOReport(ReportUsage);
@@ -217,10 +195,8 @@ codeunit 6014463 "NPR Sales-Post and Pdf2Nav"
 
     local procedure PrintReport(ReportUsage: Enum "Report Selection Usage") Printed: Boolean
     begin
-        //-NPR5.39 [299380]
         if SkipPrintHandling then
             exit(false);
-        //+NPR5.39 [299380]
 
         ReportSelection.Reset;
         ReportSelection.SetRange(Usage, ReportUsage);
@@ -241,9 +217,7 @@ codeunit 6014463 "NPR Sales-Post and Pdf2Nav"
                 ReportSelection.Usage::"S.Ret.Rcpt.":
                     REPORT.Run(ReportSelection."Report ID", false, false, ReturnRcptHeader);
             end;
-            //-NPR5.39 [299380]
             Printed := true;
-        //+NPR5.39 [299380]
         until ReportSelection.Next = 0;
     end;
 
@@ -251,9 +225,7 @@ codeunit 6014463 "NPR Sales-Post and Pdf2Nav"
     var
         EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
     begin
-        //-NPR5.51 [365016]
         Commit;
-        //+NPR5.51 [365016]
         case ReportUsage of
             ReportSelection.Usage::"S.Cr.Memo":
                 begin
@@ -288,16 +260,12 @@ codeunit 6014463 "NPR Sales-Post and Pdf2Nav"
 
     procedure DontHandlePrint()
     begin
-        //-NPR5.39 [299380]
         SkipPrintHandling := true;
-        //+NPR5.39 [299380]
     end;
 
     procedure SetMode(NewMode: Integer)
     begin
-        //-NPR5.52 [352473]
         Mode := NewMode;
-        //+NPR5.52 [352473]
     end;
 }
 

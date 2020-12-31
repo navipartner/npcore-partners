@@ -1,7 +1,5 @@
 page 6059790 "NPR Pdf2Nav Posting Setup"
 {
-    // NPR5.36/THRO/20170908 CASE 285645 Setup for Pdf2Nav Posting
-
     Caption = 'Pdf2Nav Posting Setup';
     PageType = Card;
     SourceTable = "NPR SalesPost Pdf2Nav Setup";

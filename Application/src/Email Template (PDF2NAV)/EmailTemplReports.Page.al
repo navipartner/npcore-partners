@@ -1,10 +1,5 @@
 page 6059798 "NPR E-mail Templ. Reports"
 {
-    // PN1.01/MH/20140731  NAV-AddOn: PDF2NAV
-    //   - Refactored module from the "Mail And Document Handler" Module.
-    //   - This Page contains a additional Reports to be saved and attached as PDF in connection to sending E-mail Template.
-    // PN1.08/MHA/20151214  CASE 228859 Pdf2Nav (New Version List)
-
     Caption = 'Additional E-mail Template Reports';
     DelayedInsert = true;
     PageType = List;

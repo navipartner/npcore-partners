@@ -1,14 +1,5 @@
 codeunit 6014462 "NPR Sales-Post Action Mgt"
 {
-    // NPR5.36/THRO/20170908 CASE 285645 Subscribers for Pdf2Nav Posting
-    // NPR5.51/THRO/20190718 CASE 361514 EventPublisherElement changed in Page6014518OnBeforeActionEventPostAndPrint and Page6014518OnBeforeActionEventPostAndEmail. Action renamed on Page 6014518
-    // NPR5.51/THRO/20190718 CASE 361514 Removed subscribers for actions that no longer exists
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         StdActionDisabledMsg: Label 'This Action is disabled by setup. Please use ''Post and Pdf2Nav''';
         Pdf2NavActionDisabledMsg1: Label 'This Action is disabled by setup. Please use ''Post and Print'' or ''Post and Email ''';
