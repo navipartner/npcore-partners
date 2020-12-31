@@ -1,7 +1,5 @@
 table 6184861 "NPR Azure Storage Overview"
 {
-    // NPR5.54/ALST/20200212 CASE 383718 Object created
-
     Caption = 'Azure Storage Overview';
     DataClassification = CustomerContent;
 

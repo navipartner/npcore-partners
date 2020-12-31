@@ -1,7 +1,5 @@
 page 6184892 "NPR Storage Types"
 {
-    // NPR5.54/ALST/20200311 CASE 394895 Object created
-
     Caption = 'Storage Types';
     Editable = false;
     PageType = List;

@@ -1,34 +1,19 @@
 codeunit 6184863 "NPR Request Management"
 {
-    // NPR5.54/ALST/20200212 CASE 383718 Object created
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         WrongPathErr: Label 'Could not resolve web request, please make sure the format of the request is correct (look for missing ''/'' charracters in the request URL)';
         JSONValueDefErr: Label 'This a programming error: JSON value type not yet defined';
         NullInputlXMLErr: Label 'Imput XML document must not be null';
         NoElementsErr: Label 'InputXML has 0 elements';
 
-    procedure HMACCryptography(var StringToSign: Text; "Key": Text; HMAC: Option HMACMD5,HMACSHA1,HMACSHA256,HMACSHA384,HMACSHA512)
+    procedure HMACCryptography(var StringToSign: Text; HashKey: Text; HMAC: Option HMACMD5,HMACSHA1,HMACSHA256,HMACSHA384,HMACSHA512)
     var
-        KeyedHashAlgorithm: DotNet NPRNetKeyedHashAlgorithm;
-        Encoding: DotNet NPRNetEncoding;
-        HashBytes: DotNet NPRNetArray;
-        Convert: DotNet NPRNetConvert;
+        CryptographyMgt: Codeunit "Cryptography Management";
     begin
-        //function obsolete in versions 14 and above
-        KeyedHashAlgorithm := KeyedHashAlgorithm.Create(Format(HMAC));
-        KeyedHashAlgorithm.Key(Convert.FromBase64String(Key));
-        HashBytes := KeyedHashAlgorithm.ComputeHash(Encoding.UTF8.GetBytes(StringToSign));
-        KeyedHashAlgorithm.Dispose();
-
-        StringToSign := Convert.ToBase64String(HashBytes);
+        StringToSign := CryptographyMgt.GenerateHashAsBase64String(StringToSign, HashKey, HMAC);
     end;
 
+    [Obsolete('Use native Business Central objects instead of dotnet.')]
     procedure HandleHttpRequest(HttpWebRequest: DotNet NPRNetHttpWebRequest; var Response: Text; Silent: Boolean): Boolean
     var
         MockRequest: Codeunit "NPR Mock Request";
@@ -136,6 +121,7 @@ codeunit 6184863 "NPR Request Management"
     end;
 
     [TryFunction]
+    [Obsolete('Use native Business Central objects instead of dotnet.')]
     procedure TrySendHttpRequest(var HttpWebRequest: DotNet NPRNetHttpWebRequest; var HttpWebResponse: DotNet NPRNetHttpWebResponse)
     begin
         HttpWebResponse := HttpWebRequest.GetResponse();
@@ -161,6 +147,7 @@ codeunit 6184863 "NPR Request Management"
         until Bytes = 0;
     end;
 
+    [Obsolete('Use native Business Central objects instead of dotnet.')]
     procedure StreamToHttpRequest(var HttpWebRequest: DotNet NPRNetHttpWebRequest; var TempBlob: Codeunit "Temp Blob"; ContentLenght: BigInteger)
     var
         InStr: InStream;
@@ -214,72 +201,35 @@ codeunit 6184863 "NPR Request Management"
         exit(DateTimeOffset.ToString(Format, CultureInfo));
     end;
 
+    [Obsolete('This method is for compatibility only. Please use standard JsonObject instead.')]
     procedure JsonAdd(var Json: Text; Property: Text; Value: Variant; JString: Boolean)
     var
-        CR: Char;
-        LF: Char;
-        Quotes: Text;
-        TextValue: Text;
-        JObject: DotNet NPRNetJObject;
-        JToken: DotNet NPRNetJToken;
-        JSONTextReader: DotNet NPRNetJsonTextReader;
-        StringReader: DotNet NPRNetStringReader;
-        TextReader: DotNet NPRNetTextReader;
-        JArray: DotNet NPRNetJArray;
+        JObject: JsonObject;
     begin
-        JObject := JObject.JObject();
-
         if Json > '' then begin
-            TextReader := StringReader.StringReader(Json);
-            JSONTextReader := JSONTextReader.JsonTextReader(TextReader);
-            JObject := JToken.ReadFrom(JSONTextReader);
+            JObject.ReadFrom(Json);
         end;
 
-        JObject.Add(Property, JToken);
-
-        case true of
-            Value.IsBoolean:
-                ReplaceSubstringAnyLength(JObject.ToString(), TextValue, 'null', Format(Value, 0, 9));
-            Value.IsText, Value.IsCode:
-                begin
-                    if not JString then
-                        Quotes := '"';
-
-                    ReplaceSubstringAnyLength(JObject.ToString(), TextValue, 'null', Quotes + Format(Value) + Quotes);
-                end;
-            Value.IsDecimal, Value.IsBigInteger, Value.IsInteger:
-                ReplaceSubstringAnyLength(JObject.ToString(), TextValue, 'null', Format(Value, 0, 2));
-            else
-                Error(JSONValueDefErr);
-        end;
-
-        Json := TextValue;
-
-        //carriage return and line feed created by the JObject object are sometimes not accepted by WebHeaderCollection class, cannot discern why
-        CR := 13;
-        LF := 10;
-        Json := DelChr(Json, '=', Format(CR) + Format(LF));
+        JObject.Add(Property, FORMAT(Value));
+        JObject.WriteTo(Json);
     end;
 
     procedure GetJsonValueByPropertyNameSingleNode(JsonText: Text; PropertyName: Text): Text
     var
-        JObject: DotNet NPRNetJObject;
-        JToken: DotNet NPRNetJToken;
-        JSONTextReader: DotNet NPRNetJsonTextReader;
-        StringReader: DotNet NPRNetStringReader;
-        TextReader: DotNet NPRNetTextReader;
+        JObject: JsonObject;
+        JToken: JsonToken;
     begin
-        //if more than one property share the name the method will fail
-        TextReader := StringReader.StringReader(JsonText);
-        JSONTextReader := JSONTextReader.JsonTextReader(TextReader);
-
-        JObject := JToken.ReadFrom(JSONTextReader);
-
-        JToken := JObject.SelectToken(PropertyName);
-
-        exit(JToken.ToString);
+        JObject.ReadFrom(JsonText);
+        if JObject.Get(PropertyName, JToken) then
+            if JToken.IsValue then
+                exit(JToken.AsValue().AsText())
+            else
+                exit('')
+        else
+            exit('');
     end;
 
+    [Obsolete('Use native Business Central objects')]
     procedure GetXMLFromJsonArray(JsonText: Text; var XMLList: DotNet "NPRNetXmlDocument"; ArrayPropertyName: Text; ExtractFromProperty: Text; CheckProperty: Text; CheckPropertyValue: Text): Boolean
     var
         XMLElement: DotNet NPRNetXmlElement;
@@ -315,12 +265,53 @@ codeunit 6184863 "NPR Request Management"
         exit(XMLRoot.ChildNodes.Count() > 0);
     end;
 
+    procedure GetXMLFromJsonArray(JsonText: Text; var XMLList: XmlDocument; ArrayPropertyName: Text;
+        ExtractFromProperty: Text; CheckProperty: Text; CheckPropertyValue: Text): Boolean
+    var
+        XmlElem: XmlElement;
+        XMLRoot: XmlElement;
+        JObject: JsonObject;
+        JToken: JsonToken;
+        JToken1: JsonToken;
+        SelectedToken: JsonToken;
+        Jarray: JsonArray;
+        ElementName: Text;
+        ElementValue: Text;
+        JValue: JsonValue;
+    begin
+        XmlDocument.ReadFrom('<root />', XMLList);
+        XMLList.GetRoot(XMLRoot);
+
+        JObject.ReadFrom(JsonText);
+        JObject.SelectToken(ArrayPropertyName, JToken);
+        Jarray := JToken.AsArray();
+
+        foreach JToken in Jarray do begin
+            Clear(JValue);
+            if JToken.AsObject().Contains(CheckProperty) then begin
+                JToken.AsObject().Get(CheckProperty, JToken1);
+                JValue := JToken1.AsValue();
+            end;
+            if (CheckProperty = '') or
+              (JValue.AsText() = CheckPropertyValue)
+            then begin
+                ElementName := Format(DelChr(CreateGuid, '=', '{-}'));
+                JToken.SelectToken(ExtractFromProperty, SelectedToken);
+                ElementValue := ConvertStr(SelectedToken.AsValue().AsText(), '+', '');
+                XmlElem := XmlElement.Create(ElementName, '', ElementValue);
+                XMLRoot.Add(XmlElem);
+            end;
+        end;
+
+        exit(XMLRoot.HasElements());
+    end;
+
     [TryFunction]
     procedure TryGetMIMEType(FileName: Text; var MIMEType: Text)
     var
-        MimeMapping: DotNet NPRNetMimeMapping;
+        FileMgt: Codeunit "File Management";
     begin
-        MIMEType := MimeMapping.GetMimeMapping(FileName);
+        MIMEType := FileMgt.GetFileNameMimeType(FileName);
     end;
 
     procedure ReplaceSubstringAnyLength(Original: Text; var New: Text; FromStr: Text; ToStr: Text)
@@ -343,6 +334,7 @@ codeunit 6184863 "NPR Request Management"
         ReplaceSubstringAnyLength(SubStr, New, FromStr, ToStr);
     end;
 
+    [Obsolete('Use native Business Central objects')]
     procedure HandleURLWebException()
     var
         Exception: DotNet NPRNetException;
@@ -377,6 +369,7 @@ codeunit 6184863 "NPR Request Management"
     end;
 
     [TryFunction]
+    [Obsolete('Use native Business Central objects')]
     procedure GetNodesFromXmlText(XMLText: Text; XPath: Text; var XMLNodeList: DotNet NPRNetXmlNodeList)
     var
         XMLDocument: DotNet "NPRNetXmlDocument";
@@ -386,6 +379,18 @@ codeunit 6184863 "NPR Request Management"
         XMLNodeList := XMLDocument.SelectNodes(XPath);
     end;
 
+    procedure GetNodesFromXmlText(XMLText: Text; XPath: Text; var XMLNodeList: XmlNodeList): Boolean
+    var
+        XmlDoc: XmlDocument;
+    begin
+        XmlDocument.ReadFrom(XMLText, XmlDoc);
+        if not XmlDoc.SelectNodes(XPath, XMLNodeList) then
+            exit(true)
+        else
+            exit(false);
+    end;
+
+    [Obsolete('Use native Business Central objects')]
     procedure AppendXML(InputXML: DotNet "NPRNetXmlDocument"; ParentNodeName: Text; var OutputXML: DotNet "NPRNetXmlDocument")
     var
         XMLNode: DotNet NPRNetXmlNode;
@@ -415,5 +420,73 @@ codeunit 6184863 "NPR Request Management"
         foreach XMLNode in InputXML.FirstChild.ChildNodes do
             XMLRoot.AppendChild(XMLRoot.OwnerDocument.ImportNode(XMLNode, true));
     end;
-}
 
+    procedure AppendXML(InputXML: XmlDocument; ParentNodeName: Text; var OutputXML: XmlDocument)
+    var
+        Node: XmlNode;
+        XmlRoot: XmlElement;
+        XmlRootNode: XmlNode;
+        InputXmlRoot: XmlElement;
+    begin
+        case true of
+            not InputXML.GetRoot(InputXmlRoot):
+                Error(NullInputlXMLErr);
+            not OutputXML.GetRoot(XmlRoot):
+                begin
+                    if ParentNodeName = '' then
+                        ParentNodeName := 'root';
+                    XmlDocument.ReadFrom(StrSubstNo('<%1 />', ParentNodeName), OutputXML);
+                end;
+        end;
+
+        if ParentNodeName = '' then
+            OutputXML.GetRoot(XmlRoot)
+        else begin
+            OutputXML.AsXmlNode().AsXmlElement().SelectSingleNode(ParentNodeName, XmlRootNode);
+            XmlRoot := XmlRootNode.AsXmlElement();
+        end;
+
+        InputXml.GetRoot(InputXmlRoot);
+        foreach Node in InputXmlRoot.GetChildElements() do begin
+            XmlRoot.Add(Node.AsXmlElement());
+        end;
+    end;
+
+    procedure AddOrReplaceRequestHeader(var WebRequest: HttpRequestMessage; HeaderName: Text; HeaderValue: Text);
+    var
+        Headers: HttpHeaders;
+    begin
+        WebRequest.GetHeaders(Headers);
+        if Headers.Contains(HeaderName) then
+            Headers.Remove(HeaderName);
+        Headers.Add(HeaderName, HeaderValue);
+    end;
+
+    procedure AddOrReplaceContentHeader(var WebRequest: HttpRequestMessage; HeaderName: Text; HeaderValue: Text);
+    var
+        Headers: HttpHeaders;
+    begin
+        WebRequest.Content.GetHeaders(Headers);
+        if Headers.Contains(HeaderName) then
+            Headers.Remove(HeaderName);
+        Headers.Add(HeaderName, HeaderValue);
+    end;
+
+    procedure RemoveRequestHeader(var WebRequest: HttpRequestMessage; HeaderName: Text);
+    var
+        Headers: HttpHeaders;
+    begin
+        WebRequest.GetHeaders(Headers);
+        if Headers.Contains(HeaderName) then
+            Headers.Remove(HeaderName);
+    end;
+
+    procedure RemoveContentHeader(var WebRequest: HttpRequestMessage; HeaderName: Text);
+    var
+        Headers: HttpHeaders;
+    begin
+        WebRequest.Content.GetHeaders(Headers);
+        if Headers.Contains(HeaderName) then
+            Headers.Remove(HeaderName);
+    end;
+}

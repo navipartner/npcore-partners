@@ -1,7 +1,5 @@
 table 6184891 "NPR Storage Operation Type"
 {
-    // NPR5.54/ALST/20200311 CASE 394895 Object created
-
     Caption = 'Storage Operations';
     DataClassification = CustomerContent;
     LookupPageID = "NPR Storage Operation Types";
