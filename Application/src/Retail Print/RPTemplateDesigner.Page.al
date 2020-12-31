@@ -1,11 +1,5 @@
 page 6014560 "NPR RP Template Designer"
 {
-    // NPR4.12/MMV/20150702 CASE 217872 Removed unused fields "Codeunit" and "Codeunit Name" from page
-    // NPR5.30/MMV /20170309 CASE 266049 Added new processing object fields.
-    // NPR5.32/MMV /20170425 CASE 241995 Retail Print 2.0
-    // NPR5.33/MMV /20170629 CASE 282372 Get filterpagebuilder view without field names.
-    // NPR5.33/MMV /20170629 CASE 281552 Set deleteallowed to false.
-
     AutoSplitKey = true;
     Caption = 'Template Designer';
     DeleteAllowed = false;
@@ -23,7 +17,7 @@ page 6014560 "NPR RP Template Designer"
                 Caption = 'Matrix Designer';
                 ShowFilter = false;
                 SubPageLink = "Template Code" = FIELD(Code);
-                Visible = "Printer Type" = "Printer Type"::Matrix;
+                Visible = MatrixVisible;
                 ApplicationArea = All;
             }
             part(LineDesigner; "NPR RP Templ. Line Designer")
@@ -31,7 +25,7 @@ page 6014560 "NPR RP Template Designer"
                 Caption = 'Line Designer';
                 ShowFilter = false;
                 SubPageLink = "Template Code" = FIELD(Code);
-                Visible = "Printer Type" = "Printer Type"::Line;
+                Visible = LineVisible;
                 ApplicationArea = All;
             }
         }
@@ -48,7 +42,7 @@ page 6014560 "NPR RP Template Designer"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                Visible = "Printer Type" = "Printer Type"::Line;
+                Visible = Rec."Printer Type" = Rec."Printer Type"::Line;
                 ApplicationArea = All;
 
                 trigger OnAction()
@@ -63,7 +57,7 @@ page 6014560 "NPR RP Template Designer"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                Visible = "Printer Type" = "Printer Type"::Line;
+                Visible = Rec."Printer Type" = Rec."Printer Type"::Line;
                 ApplicationArea = All;
 
                 trigger OnAction()
@@ -89,7 +83,7 @@ page 6014560 "NPR RP Template Designer"
                     CurrPage.Update(true);
                     Clear(RecRef);
 
-                    DataItem.SetRange(Code, Code);
+                    DataItem.SetRange(Code, Rec.Code);
                     DataItem.SetRange(Level, 0);
                     DataItem.FindFirst;
 
@@ -102,7 +96,7 @@ page 6014560 "NPR RP Template Designer"
                         RecRef.SetRecFilter;
                     end;
 
-                    TemplateMgt.PrintTemplate(Code, RecRef, 0);
+                    TemplateMgt.PrintTemplate(Rec.Code, RecRef, 0);
                 end;
             }
             action("Set Test Print Filter")
@@ -120,7 +114,7 @@ page 6014560 "NPR RP Template Designer"
                     FilterPageBuilder: FilterPageBuilder;
                     DataItem: Record "NPR RP Data Items";
                 begin
-                    DataItem.SetRange(Code, Code);
+                    DataItem.SetRange(Code, Rec.Code);
                     DataItem.SetRange(Level, 0);
                     DataItem.FindFirst;
 
@@ -129,10 +123,7 @@ page 6014560 "NPR RP Template Designer"
                         FilterPageBuilder.SetView(DataItem."Data Source", RecordView); //Reapply previously set filter
 
                     if FilterPageBuilder.RunModal then begin
-                        //-NPR5.33 [282372]
-                        //  RecordView    := FilterPageBuilder.GETVIEW(DataItem."Data Source");
                         RecordView := FilterPageBuilder.GetView(DataItem."Data Source", false);
-                        //+NPR5.33 [282372]
                         RecordTableNo := DataItem."Table ID";
                     end;
                 end;
@@ -140,9 +131,20 @@ page 6014560 "NPR RP Template Designer"
         }
     }
 
+    trigger OnOpenPage()
+    var
+        TemplateHeader: Record "NPR RP Template Header";
+    begin
+        TemplateHeader.Get(Rec.Code);
+        MatrixVisible := TemplateHeader."Printer Type" = TemplateHeader."Printer Type"::Matrix;
+        LineVisible := TemplateHeader."Printer Type" = TemplateHeader."Printer Type"::Line;
+    end;
+
     var
         RecordView: Text;
         RecordTableNo: Integer;
         RecRef: RecordRef;
+        MatrixVisible: Boolean;
+        LineVisible: Boolean;
 }
 

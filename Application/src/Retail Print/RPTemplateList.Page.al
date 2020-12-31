@@ -1,12 +1,6 @@
 page 6014639 "NPR RP Template List"
 {
-    // NPR4.10/MMV/20150506 CASE 167059 Removed field "Label Type" - It was deprecated a long time ago.
-    // NPR4.12/MMV/20150702 CASE 217872 Moved actions from "RelatedInformation" (Navigation) to "ActionItems" (Handlinger) subtype
-    // NPR5.29/MMV /20170110 CASE 241995 Added package module support instead of table export/import.
-    // NPR5.32/MMV /20170424 CASE 241995 Retail Print 2.0
-    // NPR5.55/MMV /20200615 CASE 409573 Moved deployment of retail print templates from npdeploy to azure blob storage.
-
-    Caption = 'Template List';
+    Caption = 'Print Template List';
     CardPageID = "NPR RP Template Card";
     Editable = false;
     PageType = List;
@@ -92,10 +86,8 @@ page 6014639 "NPR RP Template List"
                     TemplateHeader: Record "NPR RP Template Header";
                     PackageHandler: Codeunit "NPR RP Package Handler";
                 begin
-                    //-NPR5.29 [241995]
                     CurrPage.SetSelectionFilter(TemplateHeader);
                     PackageHandler.ExportPackageToFile(TemplateHeader);
-                    //+NPR5.29 [241995]
                 end;
             }
             action(ExportPackageAll)
@@ -112,10 +104,8 @@ page 6014639 "NPR RP Template List"
                     PackageHandler: Codeunit "NPR RP Package Handler";
                     TemplateHeader: Record "NPR RP Template Header";
                 begin
-                    //-NPR5.29 [241995]
                     TemplateHeader.Copy(Rec);
                     PackageHandler.ExportPackageToFile(TemplateHeader);
-                    //+NPR5.29 [241995]
                 end;
             }
             action(ImportPackage)
@@ -131,9 +121,7 @@ page 6014639 "NPR RP Template List"
                 var
                     PackageHandler: Codeunit "NPR RP Package Handler";
                 begin
-                    //-NPR5.29 [241995]
                     PackageHandler.ImportPackageFromFile();
-                    //+NPR5.29 [241995]
                 end;
             }
             action(DeployPackage)
@@ -149,16 +137,10 @@ page 6014639 "NPR RP Template List"
                 var
                     PackageHandler: Codeunit "NPR RP Package Handler";
                 begin
-                    //-NPR5.55 [409573]
                     PackageHandler.DeployPackageFromBlobStorage();
-                    //+NPR5.55 [409573]
                 end;
             }
         }
     }
-
-    var
-        Text00001: Label 'Overwrite All,Update All,Add Only';
-        Text00002: Label 'Choose Method';
 }
 
