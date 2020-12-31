@@ -1,9 +1,5 @@
 table 6151195 "NPR NpCs Store"
 {
-    // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
-    // NPR5.51/MHA /20190719  CASE 362443 Added field 15 "Opening Hour Set"
-    // NPR5.52/MHA /20191002  CASE 369476 Added fields 140 "Requested Qty.", 150 "Fulfilled Qty."
-
     Caption = 'Collect Store';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR NpCs Stores";
@@ -66,11 +62,9 @@ table 6151195 "NPR NpCs Store"
             var
                 NpCsOpenHourSet: Record "NPR NpCs Open. Hour Set";
             begin
-                //-NPR5.51 [362443]
                 if NpCsOpenHourSet.ChangeCompany("Company Name") then;
                 if PAGE.RunModal(0, NpCsOpenHourSet) = ACTION::LookupOK then
                     Validate("Opening Hour Set", NpCsOpenHourSet.Code);
-                //+NPR5.51 [362443]
             end;
         }
         field(105; "Service Url"; Text[250])
@@ -295,10 +289,6 @@ table 6151195 "NPR NpCs Store"
         key(Key2; "Distance (km)")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 
     trigger OnDelete()

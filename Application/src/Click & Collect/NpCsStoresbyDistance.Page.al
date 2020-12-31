@@ -1,8 +1,5 @@
 page 6151208 "NPR NpCs Stores by Distance"
 {
-    // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
-    // NPR5.52/MHA /20191002  CASE 369476 PageType changed from Worksheet to List to enabled RunModal from Phone
-
     Caption = 'Collect Stores by Distance';
     DeleteAllowed = false;
     InsertAllowed = false;
@@ -209,9 +206,7 @@ page 6151208 "NPR NpCs Stores by Distance"
             FromStoreCode := NpCsStore.Code;
         end;
 
-        //-NPR5.52 [369476]
         InitSourceTable();
-        //+NPR5.52 [369476]
     end;
 
     var
@@ -234,12 +229,10 @@ page 6151208 "NPR NpCs Stores by Distance"
         if not IsTemporary then
             exit;
 
-        //-NPR5.52 [369476]
         if TempNpCsStore.FindFirst then begin
             Copy(TempNpCsStore, true);
             exit;
         end;
-        //+NPR5.52 [369476]
 
         DeleteAll;
 
@@ -251,9 +244,7 @@ page 6151208 "NPR NpCs Stores by Distance"
 
     procedure SetSourceTables(var TempNpCsStore2: Record "NPR NpCs Store" temporary; var NpCsStoreInventoryBuffer: Record "NPR NpCs Store Inv. Buffer" temporary)
     begin
-        //-NPR5.52 [369476]
         TempNpCsStore.Copy(TempNpCsStore2, true);
-        //+NPR5.52 [369476]
         CurrPage.Lines.PAGE.SetSourceTable(NpCsStoreInventoryBuffer);
     end;
 

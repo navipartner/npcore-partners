@@ -96,9 +96,7 @@ codeunit 6151202 "NPR NpCs POSAction Proc. Order"
                 begin
                     JSON.InitializeJObjectParser(Context, FrontEnd);
                     LocationFilter := GetLocationFilter(JSON, POSSession);
-                    //-NPR5.53 [378895]
                     RunCollectInStoreOrders(LocationFilter, JSON);
-                    //+NPR5.53 [378895]
                     POSSession.GetSale(POSSale);
                     POSSale.RefreshCurrent();
                     POSSession.RequestRefreshData();
@@ -148,10 +146,6 @@ codeunit 6151202 "NPR NpCs POSAction Proc. Order"
         end;
 
         exit(LocationFilter);
-    end;
-
-    local procedure "--- POS Data Source"()
-    begin
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnDiscoverDataSourceExtensions', '', false, false)]

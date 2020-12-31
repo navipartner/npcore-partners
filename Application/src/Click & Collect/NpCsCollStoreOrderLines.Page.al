@@ -1,8 +1,5 @@
 page 6151207 "NPR NpCs Coll. StoreOrderLines"
 {
-    // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
-    // NPR5.53/MHA /20191106  CASE 376104 Replaced "No." with Text function GetNo() to increase column width a bit
-
     Caption = 'Lines';
     Editable = false;
     PageType = ListPart;
@@ -58,15 +55,9 @@ page 6151207 "NPR NpCs Coll. StoreOrderLines"
         }
     }
 
-    actions
-    {
-    }
-
     local procedure GetNo(): Text
     begin
-        //-NPR5.53 [376104]
         exit("No.");
-        //+NPR5.53 [376104]
     end;
 }
 

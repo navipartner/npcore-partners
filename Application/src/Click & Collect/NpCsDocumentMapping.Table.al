@@ -1,7 +1,5 @@
 table 6151201 "NPR NpCs Document Mapping"
 {
-    // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
-
     Caption = 'Collect Document Mapping';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR NpCs Document Mapping";
@@ -99,10 +97,6 @@ table 6151201 "NPR NpCs Document Mapping"
         key(Key1; Type, "From Store Code", "From No.")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 

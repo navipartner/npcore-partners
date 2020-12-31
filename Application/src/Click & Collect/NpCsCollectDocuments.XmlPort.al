@@ -1,8 +1,5 @@
 xmlport 6151196 "NPR NpCs Collect Documents"
 {
-    // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
-    // NPR5.53/MHA /20191204  CASE 378216 Added function RefreshSourceTable() to separate Import and refresh
-
     Caption = 'Collect Documents';
     DefaultNamespace = 'urn:microsoft-dynamics-nav/xmlports/collect_document';
     Encoding = UTF8;
@@ -119,7 +116,6 @@ xmlport 6151196 "NPR NpCs Collect Documents"
                     NpCsDocument: Record "NPR NpCs Document";
                     NpCsArchDocument: Record "NPR NpCs Arch. Document";
                 begin
-                    //-NPR5.53 [378216]
                     if FindNpCsDocument(NpCsDocument) then begin
                         EntryNo += 1;
                         TempNpCsDocument."Entry No." := EntryNo;
@@ -133,23 +129,10 @@ xmlport 6151196 "NPR NpCs Collect Documents"
 
                         exit;
                     end;
-                    //+NPR5.53 [378216]
 
                     currXMLport.Skip;
                 end;
             }
-        }
-    }
-
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
         }
     }
 
@@ -260,7 +243,6 @@ xmlport 6151196 "NPR NpCs Collect Documents"
 
     procedure RefreshSourceTable()
     begin
-        //-NPR5.53 [378216]
         Clear(TempNpCsDocumentLogEntry);
         TempNpCsDocumentLogEntry.DeleteAll;
         LogEntryNo := 0;
@@ -272,7 +254,6 @@ xmlport 6151196 "NPR NpCs Collect Documents"
         repeat
             RefreshDocument();
         until TempNpCsDocument.Next = 0;
-        //+NPR5.53 [378216]
     end;
 
     local procedure RefreshDocument()
@@ -283,7 +264,6 @@ xmlport 6151196 "NPR NpCs Collect Documents"
         NpCsArchDocumentLogEntry: Record "NPR NpCs Arch. Doc. Log Entry";
         NpCsExpirationMgt: Codeunit "NPR NpCs Expiration Mgt.";
     begin
-        //-NPR5.53 [378216]
         if FindNpCsDocument(NpCsDocument) then begin
             NpCsExpirationMgt.UpdateExpirationStatus(NpCsDocument, true);
 
@@ -330,7 +310,6 @@ xmlport 6151196 "NPR NpCs Collect Documents"
 
             exit;
         end;
-        //+NPR5.53 [378216]
     end;
 }
 

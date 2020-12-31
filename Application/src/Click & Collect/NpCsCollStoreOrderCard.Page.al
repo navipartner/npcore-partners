@@ -1,14 +1,5 @@
 page 6151206 "NPR NpCs Coll. StoreOrder Card"
 {
-    // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
-    // NPR5.51/MHA /20190717  CASE 344264 Changed name and logic for field 240 from "Delivery Only (Non Stock)" to "From Store Stock"
-    // NPR5.51/MHA /20190719  CASE 362443 Added "Opening Hour Set"
-    // NPR5.51/MHA /20190819  CASE 364557 Added Posting fields 250 "Post on", 255 "Posting Document Type", 260 "Posting Document No."
-    // NPR5.53/MHA /20191105  CASE 374049 Promoted Action "Send Notification to Customer"
-    // NPR5.53/MHA /20192811  CASE 379742 Added Action Print Confirmation
-    // NPR5.54/MHA /20200212  CASE 390479 Changed visibility for Action "Confirm Order" and "Reject Order" to also include #blank Processing Status
-    // NPR5.54/MHA /20200130  CASE 378956 Added Store Notification Fields
-
     Caption = 'Collect in Store Order Card';
     SourceTable = "NPR NpCs Document";
     SourceTableView = WHERE(Type = CONST("Collect in Store"));
@@ -356,9 +347,7 @@ page 6151206 "NPR NpCs Coll. StoreOrder Card"
                     var
                         NpCsCollectMgt: Codeunit "NPR NpCs Collect Mgt.";
                     begin
-                        //-NPR5.51 [364557]
                         NpCsCollectMgt.PrintOrder(Rec);
-                        //+NPR5.51 [364557]
                     end;
                 }
                 action("Print Confirmation")
@@ -378,10 +367,8 @@ page 6151206 "NPR NpCs Coll. StoreOrder Card"
                         DocPrint: Codeunit "Document-Print";
                         Usage: Option "Order Confirmation","Work Order","Pick Instruction";
                     begin
-                        //-NPR5.53 [379742]
                         SalesHeader.Get("Document Type", "Document No.");
                         DocPrint.PrintSalesOrder(SalesHeader, Usage::"Order Confirmation");
-                        //+NPR5.53 [379742]
                     end;
                 }
                 action("Print Delivery")

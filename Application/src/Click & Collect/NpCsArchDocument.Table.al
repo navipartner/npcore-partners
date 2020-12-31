@@ -1,10 +1,5 @@
 table 6151202 "NPR NpCs Arch. Document"
 {
-    // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
-    // NPR5.51/MHA /20190717  CASE 344264 Added fields 300, 305, 310 and changed name and logic for field 240
-    // NPR5.51/MHA /20190719  CASE 362443 "To Store Code" may now refer to Local Store and added fields 13 "Inserted at", 5000 "Archived at"
-    // NPR5.51/MHA /20190819  CASE 364557 Added options "Posted Invoice", "Posted Credit Memo" to field 5 "Document Type"
-
     Caption = 'Collect Document';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR NpCs Arch. Doc. List";
@@ -362,10 +357,6 @@ table 6151202 "NPR NpCs Arch. Document"
         key(Key1; "Entry No.")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 
     trigger OnDelete()

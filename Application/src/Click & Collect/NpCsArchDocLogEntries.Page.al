@@ -1,7 +1,5 @@
 page 6151212 "NPR NpCs Arch.Doc.Log Entries"
 {
-    // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
-
     Caption = 'Archived Collect Document Log Entries';
     Editable = false;
     PageType = List;
@@ -107,12 +105,6 @@ page 6151212 "NPR NpCs Arch.Doc.Log Entries"
             exit;
 
         CurrPage.PingPong.Ping(1000);
-    end;
-
-    procedure SetAutoUpdate(NewAutoUpdate: Boolean)
-    begin
-        AutoUpdate := NewAutoUpdate;
-        Ping();
     end;
 }
 

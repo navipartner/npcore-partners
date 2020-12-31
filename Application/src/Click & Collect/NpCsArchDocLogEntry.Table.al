@@ -1,8 +1,5 @@
 table 6151203 "NPR NpCs Arch. Doc. Log Entry"
 {
-    // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
-    // NPR5.51/MHA /20190717  CASE 344264 Removed Set of "Log Date" from OnInsert()
-
     Caption = 'Collect Document Log Entry';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR NpCs Arch.Doc.Log Entries";
@@ -87,14 +84,10 @@ table 6151203 "NPR NpCs Arch. Doc. Log Entry"
         }
     }
 
-    fieldgroups
-    {
-    }
-
     procedure GetErrorMessage() FullLogMessage: Text
     var
-        StreamReader: DotNet NPRNetStreamReader;
         InStr: InStream;
+        TextBuffer: Text;
     begin
         FullLogMessage := '';
         if not "Error Message".HasValue then
@@ -102,8 +95,10 @@ table 6151203 "NPR NpCs Arch. Doc. Log Entry"
 
         CalcFields("Error Message");
         "Error Message".CreateInStream(InStr, TEXTENCODING::UTF8);
-        StreamReader := StreamReader.StreamReader(InStr);
-        FullLogMessage := StreamReader.ReadToEnd();
+        while not InStr.EOS do begin
+            InStr.Read(TextBuffer);
+            FullLogMessage += TextBuffer;
+        end;
         exit(FullLogMessage);
     end;
 }

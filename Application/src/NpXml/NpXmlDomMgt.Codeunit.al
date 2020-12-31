@@ -102,6 +102,7 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
         CreatedXmlElement := NewChildXmlElement;
     end;
 
+    [Obsolete('Use native Business Central objects instead of DotNet classes', '')]
     procedure FindNode(XmlNode: DotNet NPRNetXmlNode; NodePath: Text[250]; var XmlNodeChild: DotNet NPRNetXmlNode): Boolean
     begin
         if IsNull(XmlNode) then
@@ -110,6 +111,14 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
         XmlNodeChild := XmlNode.SelectSingleNode(NodePath);
 
         exit(not IsNull(XmlNodeChild));
+    end;
+
+    procedure FindNode(Node: XmlNode; NodePath: Text[250]; var NodeChild: XmlNode): Boolean
+    begin
+        if not Node.SelectSingleNode(NodePath, NodeChild) then
+            exit(false);
+
+        exit(not NodeChild.AsXmlElement.IsEmpty());
     end;
 
     procedure FindNodes(XmlNode: DotNet NPRNetXmlNode; NodePath: Text[250]; var XmlNodeList: DotNet NPRNetXmlNodeList): Boolean
@@ -148,6 +157,7 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
         exit(true);
     end;
 
+    [Obsolete('Use native Business Central objects instead of DotNet classes', '')]
     procedure GetXmlText(XmlElement: DotNet NPRNetXmlElement; NodePath: Text; MaxLength: Integer; Required: Boolean): Text
     var
         XmlElement2: DotNet NPRNetXmlElement;
@@ -169,6 +179,31 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
             exit(CopyStr(XmlElement2.InnerText, 1, MaxLength));
 
         exit(XmlElement2.InnerText);
+    end;
+
+    procedure GetXmlText(Element: XmlElement; NodePath: Text; MaxLength: Integer; Required: Boolean): Text
+    var
+        Element2: XmlElement;
+        Node: XmlNode;
+    begin
+        if Element.IsEmpty() then begin
+            if Required then
+                Error(Error003, NodePath, '');
+            exit('');
+        end;
+
+        Element.SelectSingleNode(NodePath, Node);
+        Element2 := Node.AsXmlElement();
+        if Element2.IsEmpty then begin
+            if Required then
+                Error(Error003, NodePath, Element.Name);
+            exit('');
+        end;
+
+        if MaxLength > 0 then
+            exit(CopyStr(Element2.InnerText, 1, MaxLength));
+
+        exit(Element2.InnerText);
     end;
 
     procedure GetXmlTextNamespace(XmlElement: DotNet NPRNetXmlElement; NodePath: Text; XmlNsManager: DotNet NPRNetXmlNamespaceManager; MaxLength: Integer; Required: Boolean): Text
@@ -194,21 +229,22 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
         exit(XmlElement2.InnerText);
     end;
 
+    [Obsolete('Use native Business Central objects instead of DotNet classes', '')]
     procedure GetXmlAttributeText(XmlElement: DotNet NPRNetXmlElement; AttributeName: Text; Required: Boolean) AttributeText: Text
     begin
         AttributeText := XmlElement.GetAttribute(AttributeName);
-        if Required and (AttributeText = '') then
+        if (Required) and (AttributeText = '') then
             Error(Error004, AttributeName, XmlElement.Name);
     end;
 
-    procedure LoadXml(var MemoryStream: DotNet NPRNetMemoryStream; var XmlDoc: DotNet "NPRNetXmlDocument") XmlLoaded: Boolean
+    procedure GetXmlAttributeText(Element: XmlElement; AttributeName: Text; Required: Boolean) AttributeText: Text
+    var
+        Attribute: XmlAttribute;
     begin
-        XmlLoaded := TryLoadXmlStream(MemoryStream, XmlDoc);
-        MemoryStream.Flush;
-        MemoryStream.Close;
-        Clear(MemoryStream);
-
-        exit(XmlLoaded);
+        GetAttributeFromElement(Element, AttributeName, Attribute);
+        AttributeText := Attribute.Value;
+        if Required and (AttributeText = '') then
+            Error(Error004, AttributeName, Element.Name);
     end;
 
     [TryFunction]
@@ -298,6 +334,7 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
     begin
     end;
 
+    [Obsolete('Use native Business Central objects instead of DotNet classes', '')]
     procedure FindElement(XmlElement: DotNet NPRNetXmlElement; Path: Text; Required: Boolean; var XmlElement2: DotNet NPRNetXmlElement): Boolean
     begin
         if IsNull(XmlElement) then begin
@@ -312,6 +349,25 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
             Error(Text000, XmlElement.Name + '/' + Path);
 
         exit(not IsNull(XmlElement2));
+    end;
+
+    procedure FindElement(Element: XmlElement; Path: Text; Required: Boolean; var Element2: XmlElement): Boolean
+    var
+        Node: XmlNode;
+    begin
+        if Element.IsEmpty() then begin
+            if not Required then
+                exit(false);
+
+            Error(Text000, Element.Name + '/' + Path);
+        end;
+
+        Element.SelectSingleNode(Path, Node);
+        Element2 := Node.AsXmlElement();
+        if Element2.IsEmpty() and Required then
+            Error(Text000, Element.Name + '/' + Path);
+
+        exit(not Element2.IsEmpty());
     end;
 
     procedure GetElementBigInt(XmlElement: DotNet NPRNetXmlElement; Path: Text; Required: Boolean) Value: BigInteger
@@ -334,6 +390,7 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
         exit(Value);
     end;
 
+    [Obsolete('Use native Business Central objects instead of DotNet classes', '')]
     procedure GetElementBoolean(XmlElement: DotNet NPRNetXmlElement; Path: Text; Required: Boolean) Value: Boolean
     var
         XmlElement2: DotNet NPRNetXmlElement;
@@ -354,6 +411,27 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
         exit(Value);
     end;
 
+    procedure GetElementBoolean(Element: XmlElement; Path: Text; Required: Boolean) ReturnValue: Boolean
+    var
+        Element2: XmlElement;
+    begin
+        Element2 := Element;
+        if Path <> '' then begin
+            if (not FindElement(Element, Path, Required, Element2)) then
+                exit(false);
+        end;
+
+        if not Evaluate(ReturnValue, Element2.InnerText, 9) then begin
+            if not Required then
+                exit(false);
+
+            Error(Text001, Element2.InnerText, GetDotNetType(ReturnValue), Element.Name + '/' + Path);
+        end;
+
+        exit(ReturnValue);
+    end;
+
+    [Obsolete('Use native Business Central objects instead of DotNet classes', '')]
     procedure GetElementCode(XmlElement: DotNet NPRNetXmlElement; Path: Text; MaxLength: Integer; Required: Boolean) Value: Code[1024]
     var
         XmlElement2: DotNet NPRNetXmlElement;
@@ -374,6 +452,27 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
         exit(Value);
     end;
 
+    procedure GetElementCode(Element: XmlElement; Path: Text; MaxLength: Integer; Required: Boolean) ReturnValue: Code[1024]
+    var
+        Element2: XmlElement;
+        TextValue: Text;
+    begin
+        Element2 := Element;
+        if Path <> '' then begin
+            if (not FindElement(Element, Path, Required, Element2)) then
+                exit('');
+        end;
+
+        TextValue := Element2.InnerText;
+        if MaxLength > 0 then
+            TextValue := CopyStr(TextValue, 1, MaxLength);
+
+        ReturnValue := UpperCase(CopyStr(TextValue, 1, MaxStrLen(ReturnValue)));
+
+        exit(ReturnValue);
+    end;
+
+    [Obsolete('Use native Business Central objects instead of DotNet classes', '')]
     procedure GetElementDate(XmlElement: DotNet NPRNetXmlElement; Path: Text; Required: Boolean) Value: Date
     var
         XmlElement2: DotNet NPRNetXmlElement;
@@ -394,6 +493,27 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
         exit(Value);
     end;
 
+    procedure GetElementDate(Element: XmlElement; Path: Text; Required: Boolean) ReturnValue: Date
+    var
+        Element2: XmlElement;
+    begin
+        Element2 := Element;
+        if Path <> '' then begin
+            if (not FindElement(Element, Path, Required, Element2)) then
+                exit(0D);
+        end;
+
+        if not Evaluate(ReturnValue, Element2.InnerText, 9) then begin
+            if not Required then
+                exit(0D);
+
+            Error(Text001, Element2.InnerText, GetDotNetType(ReturnValue), Element.Name + '/' + Path);
+        end;
+
+        exit(ReturnValue);
+    end;
+
+    [Obsolete('Use native Business Central objects instead of DotNet classes', '')]
     procedure GetElementDec(XmlElement: DotNet NPRNetXmlElement; Path: Text; Required: Boolean) Value: Decimal
     var
         XmlElement2: DotNet NPRNetXmlElement;
@@ -414,6 +534,28 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
         exit(Value);
     end;
 
+    procedure GetElementDec(Element: XmlElement; Path: Text; Required: Boolean) ReturnValue: Decimal
+    var
+        Element2: XmlElement;
+    begin
+        Element2 := Element;
+        if Path <> '' then begin
+            if (not FindElement(Element, Path, Required, Element2)) then
+                exit(0);
+        end;
+
+        if not Evaluate(ReturnValue, Element2.InnerText, 9) then begin
+            if not Required then
+                exit(0);
+
+            Error(Text001, Element2.InnerText, GetDotNetType(ReturnValue), Element.Name + '/' + Path);
+        end;
+
+        exit(ReturnValue);
+    end;
+
+    [Obsolete('Use native Business Central objects instead of DotNet classes', '')]
+
     procedure GetElementDT(XmlElement: DotNet NPRNetXmlElement; Path: Text; Required: Boolean) Value: DateTime
     var
         XmlElement2: DotNet NPRNetXmlElement;
@@ -432,6 +574,26 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
         end;
 
         exit(Value);
+    end;
+
+    procedure GetElementDT(Element: XmlElement; Path: Text; Required: Boolean) ReturnValue: DateTime
+    var
+        Element2: XmlElement;
+    begin
+        Element2 := Element;
+        if Path <> '' then begin
+            if (not FindElement(Element, Path, Required, Element2)) then
+                exit(0DT);
+        end;
+
+        if not Evaluate(ReturnValue, Element2.InnerText, 9) then begin
+            if not Required then
+                exit(0DT);
+
+            Error(Text001, Element2.InnerText, GetDotNetType(ReturnValue), Element.Name + '/' + Path);
+        end;
+
+        exit(ReturnValue);
     end;
 
     procedure GetElementGuid(XmlElement: DotNet NPRNetXmlElement; Path: Text; Required: Boolean) Value: Guid
@@ -454,6 +616,7 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
         exit(Value);
     end;
 
+    [Obsolete('Use native Business Central objects instead of DotNet classes', '')]
     procedure GetElementInt(XmlElement: DotNet NPRNetXmlElement; Path: Text; Required: Boolean) Value: Integer
     var
         XmlElement2: DotNet NPRNetXmlElement;
@@ -474,6 +637,27 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
         exit(Value);
     end;
 
+    procedure GetElementInt(Element: XmlElement; Path: Text; Required: Boolean) ReturnValue: Integer
+    var
+        Element2: XmlElement;
+    begin
+        Element2 := Element;
+        if Path <> '' then begin
+            if (not FindElement(Element, Path, Required, Element2)) then
+                exit(0);
+        end;
+
+        if not Evaluate(ReturnValue, Element2.InnerText, 9) then begin
+            if not Required then
+                exit(0);
+
+            Error(Text001, Element2.InnerText, GetDotNetType(ReturnValue), Element.Name + '/' + Path);
+        end;
+
+        exit(ReturnValue);
+    end;
+
+    [Obsolete('Use native Business Central objects instead of DotNet classes', '')]
     procedure GetElementText(XmlElement: DotNet NPRNetXmlElement; Path: Text; MaxLength: Integer; Required: Boolean) Value: Text
     var
         XmlElement2: DotNet NPRNetXmlElement;
@@ -489,6 +673,23 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
             Value := CopyStr(Value, 1, MaxLength);
 
         exit(Value);
+    end;
+
+    procedure GetElementText(Element: XmlElement; Path: Text; MaxLength: Integer; Required: Boolean) ReturnValue: Text
+    var
+        Element2: XmlElement;
+    begin
+        Element2 := Element;
+        if Path <> '' then begin
+            if (not FindElement(Element, Path, Required, Element2)) then
+                exit('');
+        end;
+
+        ReturnValue := Element2.InnerText;
+        if MaxLength > 0 then
+            ReturnValue := CopyStr(ReturnValue, 1, MaxLength);
+
+        exit(ReturnValue);
     end;
 
     procedure GetElementTime(XmlElement: DotNet NPRNetXmlElement; Path: Text; Required: Boolean) Value: Time
@@ -511,51 +712,53 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
         exit(Value);
     end;
 
-    procedure GetElementDuration(XmlElement: DotNet NPRNetXmlElement; Path: Text; Required: Boolean) Value: Duration
+    procedure GetElementDuration(Element: XmlElement; Path: Text; Required: Boolean) ReturnValue: Duration
     var
-        XmlElement2: DotNet NPRNetXmlElement;
+        Element2: XmlElement;
     begin
-        XmlElement2 := XmlElement;
+        Element2 := Element;
         if Path <> '' then begin
-            if (not FindElement(XmlElement, Path, Required, XmlElement2)) then
+            if (not FindElement(Element, Path, Required, Element2)) then
                 exit(0);
         end;
 
-        if not Evaluate(Value, XmlElement2.InnerText, 9) then begin
+        if not Evaluate(ReturnValue, Element2.InnerText, 9) then begin
             if not Required then
                 exit(0);
 
-            Error(Text001, XmlElement2.InnerText, GetDotNetType(Value), XmlElement.Name + '/' + Path);
+            Error(Text001, Element2.InnerText, GetDotNetType(ReturnValue), Element.Name + '/' + Path);
         end;
 
-        exit(Value);
+        exit(ReturnValue);
     end;
 
-    procedure GetAttributeBigInt(XmlElement: DotNet NPRNetXmlElement; Path: Text; Name: Text; Required: Boolean) Value: BigInteger
+    procedure GetAttributeBigInt(Element: XmlElement; Path: Text; Name: Text; Required: Boolean) ReturnValue: BigInteger
     var
-        XmlElement2: DotNet NPRNetXmlElement;
+        Element2: XmlElement;
+        Attribute: XmlAttribute;
         TextValue: Text;
         FullPath: Text;
     begin
-        XmlElement2 := XmlElement;
+        Element2 := Element;
         if Path <> '' then begin
-            if (not FindElement(XmlElement, Path, Required, XmlElement2)) then
+            if (not FindElement(Element, Path, Required, Element2)) then
                 exit(0);
         end;
 
-        TextValue := XmlElement2.GetAttribute(Name);
-        if not Evaluate(Value, TextValue, 9) then begin
+        GetAttributeFromElement(Element2, Name, Attribute);
+        TextValue := Attribute.Value;
+        if not Evaluate(ReturnValue, TextValue, 9) then begin
             if not Required then
                 exit(0);
 
-            FullPath := XmlElement.Name;
+            FullPath := Element.Name;
             if Path <> '' then
                 FullPath += '/' + Path;
             FullPath += '@' + Name;
-            Error(Text001, TextValue, GetDotNetType(Value), FullPath);
+            Error(Text001, TextValue, GetDotNetType(ReturnValue), FullPath);
         end;
 
-        exit(Value);
+        exit(ReturnValue);
     end;
 
     procedure GetAttributeBoolean(XmlElement: DotNet NPRNetXmlElement; Path: Text; Name: Text; Required: Boolean) Value: Boolean
@@ -585,6 +788,7 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
         exit(Value);
     end;
 
+    [Obsolete('Use native Business Central objects instead of DotNet classes', '')]
     procedure GetAttributeCode(XmlElement: DotNet NPRNetXmlElement; Path: Text; Name: Text; MaxLength: Integer; Required: Boolean) Value: Code[1024]
     var
         XmlElement2: DotNet NPRNetXmlElement;
@@ -603,6 +807,28 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
         Value := UpperCase(CopyStr(TextValue, 1, MaxStrLen(Value)));
 
         exit(Value);
+    end;
+
+    procedure GetAttributeCode(Element: XmlElement; Path: Text; Name: Text; MaxLength: Integer; Required: Boolean) ReturnValue: Code[1024]
+    var
+        Element2: XmlElement;
+        TextValue: Text;
+        Attribute: XmlAttribute;
+    begin
+        Element2 := Element;
+        if Path <> '' then begin
+            if (not FindElement(Element, Path, Required, Element2)) then
+                exit('');
+        end;
+
+        GetAttributeFromElement(Element2, Name, Attribute);
+        TextValue := Attribute.Value;
+        if MaxLength > 0 then
+            TextValue := CopyStr(TextValue, 1, MaxLength);
+
+        ReturnValue := UpperCase(CopyStr(TextValue, 1, MaxStrLen(ReturnValue)));
+
+        exit(ReturnValue);
     end;
 
     procedure GetAttributeDate(XmlElement: DotNet NPRNetXmlElement; Path: Text; Name: Text; Required: Boolean) Value: Date
@@ -713,6 +939,7 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
         exit(Value);
     end;
 
+    [Obsolete('Use native Business Central objects instead of DotNet classes', '')]
     procedure GetAttributeInt(XmlElement: DotNet NPRNetXmlElement; Path: Text; Name: Text; Required: Boolean) Value: Integer
     var
         XmlElement2: DotNet NPRNetXmlElement;
@@ -740,6 +967,36 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
         exit(Value);
     end;
 
+    procedure GetAttributeInt(Element: XmlElement; Path: Text; Name: Text; Required: Boolean) ReturnValue: Integer
+    var
+        Element2: XmlElement;
+        Attribute: XmlAttribute;
+        TextValue: Text;
+        FullPath: Text;
+    begin
+        Element2 := Element;
+        if Path <> '' then begin
+            if (not FindElement(Element, Path, Required, Element2)) then
+                exit(0);
+        end;
+
+        GetAttributeFromElement(Element2, Name, Attribute);
+        TextValue := Attribute.Value;
+        if not Evaluate(ReturnValue, TextValue, 9) then begin
+            if not Required then
+                exit(0);
+
+            FullPath := Element.Name;
+            if Path <> '' then
+                FullPath += '/' + Path;
+            FullPath += '@' + Name;
+            Error(Text001, TextValue, GetDotNetType(ReturnValue), FullPath);
+        end;
+
+        exit(ReturnValue);
+    end;
+
+    [Obsolete('Use native Business Central objects instead of DotNet classes', '')]
     procedure GetAttributeText(XmlElement: DotNet NPRNetXmlElement; Path: Text; Name: Text; MaxLength: Integer; Required: Boolean) Value: Text
     var
         XmlElement2: DotNet NPRNetXmlElement;
@@ -755,6 +1012,25 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
             Value := CopyStr(Value, 1, MaxLength);
 
         exit(Value);
+    end;
+
+    procedure GetAttributeText(Element: XmlElement; Path: Text; Name: Text; MaxLength: Integer; Required: Boolean) ReturnValue: Text
+    var
+        Element2: XmlElement;
+        Attribute: XmlAttribute;
+    begin
+        Element2 := Element;
+        if Path <> '' then begin
+            if (not FindElement(Element, Path, Required, Element2)) then
+                exit('');
+        end;
+
+        GetAttributeFromElement(Element2, Name, Attribute);
+        ReturnValue := Attribute.Value;
+        if MaxLength > 0 then
+            ReturnValue := CopyStr(ReturnValue, 1, MaxLength);
+
+        exit(ReturnValue);
     end;
 
     procedure GetAttributeTime(XmlElement: DotNet NPRNetXmlElement; Path: Text; Name: Text; Required: Boolean) Value: Time
@@ -996,6 +1272,14 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
         Stream.Flush;
         Stream.Close;
         Clear(Stream);
+    end;
+
+    local procedure GetAttributeFromElement(Element: XmlElement; AttributeName: Text; var Attribute: XmlAttribute);
+    var
+        AttributeCollection: XmlAttributeCollection;
+    begin
+        AttributeCollection := Element.Attributes();
+        AttributeCollection.Get(AttributeName, Attribute);
     end;
 }
 

@@ -1,10 +1,5 @@
 table 6151196 "NPR NpCs Workflow"
 {
-    // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
-    // NPR5.51/MHA /20190723  CASE 362443 Removed unused field 205 "Auto Post Order on"
-    // NPR5.51/MHA /20190819  CASE 364557 Added fields 350 "Store Stock", 360 "Post on", 380 "Bill via"
-    // NPR5.54/MHA /20200130  CASE 378956 Added Store Notification Fields
-
     Caption = 'Collect Workflow';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR NpCs Workflows";
@@ -201,9 +196,7 @@ table 6151196 "NPR NpCs Workflow"
 
             trigger OnValidate()
             begin
-                //-NPR5.51 [364557]
                 "Bill via" := "Bill via"::"Sales Document";
-                //+NPR5.51 [364557]
             end;
         }
         field(380; "Bill via"; Option)
@@ -216,14 +209,12 @@ table 6151196 "NPR NpCs Workflow"
 
             trigger OnValidate()
             begin
-                //-NPR5.51 [364557]
                 case "Bill via" of
                     "Bill via"::POS:
                         begin
                             TestField("Post on", "Post on"::Delivery);
                         end;
                 end;
-                //+NPR5.51 [364557]
             end;
         }
         field(400; "Processing Print Template"; Code[20])
@@ -254,10 +245,6 @@ table 6151196 "NPR NpCs Workflow"
         key(Key1; "Code")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 

@@ -1,13 +1,5 @@
 codeunit 6151205 "NPR NpCs POSSession Mgt."
 {
-    // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
-    // NPR5.51/MHA /20190821  CASE 364557 Delivery should also be possible from Posted Invoice
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         Text000: Label 'Deliver and Print Collect in Store Document';
 

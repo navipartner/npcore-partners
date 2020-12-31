@@ -1,7 +1,5 @@
 page 6151215 "NPR NpCs Open. Hour Sets"
 {
-    // NPR5.51/MHA /20190719  CASE 362443 Object created - Collect Store Opening Hour Sets
-
     Caption = 'Collect Store Opening Hour Sets';
     CardPageID = "NPR NpCs Open. Hour Set Card";
     Editable = false;

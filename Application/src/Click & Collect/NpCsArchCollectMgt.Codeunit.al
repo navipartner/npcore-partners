@@ -1,15 +1,7 @@
 codeunit 6151209 "NPR NpCs Arch. Collect Mgt."
 {
-    trigger OnRun()
-    begin
-    end;
-
     var
-        Text001: Label 'Processing Status updated to %1';
-        Text002: Label 'Delivery Status updated to %1';
         Text003: Label 'Document Archived';
-        Text004: Label 'Sales %1 %2 posted';
-        Text005: Label 'Delivery printed: %1';
 
     //--- Archive ---
 

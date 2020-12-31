@@ -1,7 +1,5 @@
 table 6151209 "NPR NpCs Open. Hour Set"
 {
-    // NPR5.51/MHA /20190719  CASE 362443 Object created - Collect Store Opening Hour Sets
-
     Caption = 'Collect Store Opening Hour Set';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR NpCs Open. Hour Sets";
@@ -27,10 +25,6 @@ table 6151209 "NPR NpCs Open. Hour Set"
         key(Key1; "Code")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 

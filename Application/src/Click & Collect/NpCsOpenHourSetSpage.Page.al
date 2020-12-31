@@ -1,9 +1,5 @@
 page 6151217 "NPR NpCs Open.Hour Set S.page"
 {
-    // NPR5.51/MHA /20190719  CASE 362443 Object created - Collect Store Opening Hour Sets
-    // NPR5.52/MHA /20191021  CASE 362443 Adjusted caption of Period Group to signal intentional spaces to control width
-    // NPR5.55/MHA /20200731  CASE 417003 Updated layout for better BC WebClient experience
-
     AutoSplitKey = true;
     Caption = 'Opening Hours';
     DelayedInsert = true;
@@ -92,10 +88,6 @@ page 6151217 "NPR NpCs Open.Hour Set S.page"
                 }
             }
         }
-    }
-
-    actions
-    {
     }
 }
 

@@ -1,17 +1,6 @@
+//One DotNet variable left. Can be easy removed after upgrade to BC 17.2 Described in function CalcDistance (after that delete this comment)
 codeunit 6151204 "NPR NpCs Store Mgt."
 {
-    // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
-    // NPR5.51/MHA /20190821  CASE 364557 FindLocalStore() now considers more than one local store
-
-
-    trigger OnRun()
-    begin
-    end;
-
-    local procedure "--- Init"()
-    begin
-    end;
-
     procedure InitLocalStore(var NpCsStore: Record "NPR NpCs Store")
     begin
         if NpCsStore."Company Name" = '' then
@@ -53,18 +42,21 @@ codeunit 6151204 "NPR NpCs Store Mgt."
     procedure UpdateContactInfo(var NpCsStore: Record "NPR NpCs Store")
     var
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
-        Credential: DotNet NPRNetNetworkCredential;
-        HttpWebRequest: DotNet NPRNetHttpWebRequest;
-        HttpWebResponse: DotNet NPRNetHttpWebResponse;
-        XmlDoc: DotNet "NPRNetXmlDocument";
-        XmlElement: DotNet NPRNetXmlElement;
-        WebException: DotNet NPRNetWebException;
+        XmlDomManagement: Codeunit "XML DOM Management";
+        Document: XmlDocument;
+        Node: XmlNode;
+        Client: HttpClient;
+        RequestContent: HttpContent;
+        ContentHeader: HttpHeaders;
+        Request: HttpRequestMessage;
+        RequestHeaders: HttpHeaders;
+        Response: HttpResponseMessage;
+        ContentText: Text;
         ErrorMessage: Text;
-        Response: Text;
+        ResponseText: Text;
         PrevRec: Text;
     begin
-        XmlDoc := XmlDoc.XmlDocument;
-        XmlDoc.LoadXml(
+        ContentText :=
           '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"  >' +
             '<soapenv:Body>' +
               '<GetCollectStores xmlns="urn:microsoft-dynamics-schemas/codeunit/' + GetServiceName(NpCsStore) + '">' +
@@ -75,46 +67,56 @@ codeunit 6151204 "NPR NpCs Store Mgt."
                 '</stores>' +
               '</GetCollectStores>' +
             '</soapenv:Body>' +
-          '</soapenv:Envelope>'
-        );
+          '</soapenv:Envelope>';
 
-        HttpWebRequest := HttpWebRequest.Create(NpCsStore."Service Url");
-        HttpWebRequest.UseDefaultCredentials(false);
-        Credential := Credential.NetworkCredential(NpCsStore."Service Username", NpCsStore."Service Password");
-        HttpWebRequest.Credentials(Credential);
-        HttpWebRequest.Method := 'POST';
-        HttpWebRequest.ContentType('application/xml; charset=utf-8');
-        HttpWebRequest.Headers.Add('SOAPAction', 'GetCollectStores');
-        NpXmlDomMgt.SetTrustedCertificateValidation(HttpWebRequest);
+        Request.GetHeaders(RequestHeaders);
+        RequestHeaders.Remove('Connection');
 
-        if not NpXmlDomMgt.SendWebRequest(XmlDoc, HttpWebRequest, HttpWebResponse, WebException) then begin
-            ErrorMessage := NpXmlDomMgt.GetWebExceptionMessage(WebException);
-            if NpXmlDomMgt.TryLoadXml(ErrorMessage, XmlDoc) then begin
-                NpXmlDomMgt.RemoveNameSpaces(XmlDoc);
-                if NpXmlDomMgt.FindNode(XmlDoc.DocumentElement, '//faultstring', XmlElement) then
-                    ErrorMessage := XmlElement.InnerText;
+        Request.Method('POST');
+        Request.SetRequestUri(NpCsStore."Service Url");
+
+        RequestContent.WriteFrom(ContentText);
+        RequestContent.GetHeaders(ContentHeader);
+
+        ContentHeader.Clear();
+        ContentHeader.Remove('Content-Type');
+        ContentHeader.Add('Content-Type', 'application/xml; charset=utf-8');
+        ContentHeader.Add('SOAPAction', 'GetCollectStores');
+        ContentHeader := Client.DefaultRequestHeaders();
+
+        Client.UseWindowsAuthentication(NpCsStore."Service Username", NpCsStore."Service Password");
+        Request.Content := RequestContent;
+        Client.Send(Request, Response);
+
+        if not Response.IsSuccessStatusCode then begin
+            ErrorMessage := Response.ReasonPhrase;
+            if XmlDocument.ReadFrom(ErrorMessage, Document) then begin
+                if NpXmlDomMgt.FindNode(Document.AsXmlNode(), '//faultstring', Node) then
+                    ErrorMessage := Node.AsXmlElement.InnerText();
             end;
             Error(ErrorMessage);
         end;
 
-        Response := NpXmlDomMgt.GetWebResponseText(HttpWebResponse);
-        if not NpXmlDomMgt.TryLoadXml(Response, XmlDoc) then
-            Error(Response);
+        Response.Content.ReadAs(ResponseText);
+        if not XmlDocument.ReadFrom(ResponseText, Document) then
+            Error(ResponseText);
 
-        NpXmlDomMgt.RemoveNameSpaces(XmlDoc);
-        NpXmlDomMgt.FindElement(XmlDoc.DocumentElement, 'Body/GetCollectStores_Result/stores/store[@store_code = "' + NpCsStore.Code + '"]', true, XmlElement);
+        ResponseText := XmlDomManagement.RemoveNamespaces(ResponseText);
+        XmlDocument.ReadFrom(ResponseText, Document);
+
+        Document.SelectSingleNode('//Body/GetCollectStores_Result/stores/store[@store_code = "' + NpCsStore.Code + '"]', Node);
 
         PrevRec := Format(NpCsStore);
 
-        NpCsStore."Contact Name" := NpXmlDomMgt.GetElementText(XmlElement, 'contact_name', MaxStrLen(NpCsStore."Contact Name"), false);
-        NpCsStore."Contact Name 2" := NpXmlDomMgt.GetElementText(XmlElement, 'contact_name_2', MaxStrLen(NpCsStore."Contact Name 2"), false);
-        NpCsStore."Contact Address" := NpXmlDomMgt.GetElementText(XmlElement, 'contact_address', MaxStrLen(NpCsStore."Contact Address"), false);
-        NpCsStore."Contact Address 2" := NpXmlDomMgt.GetElementText(XmlElement, 'contact_address_2', MaxStrLen(NpCsStore."Contact Address 2"), false);
-        NpCsStore."Contact Post Code" := NpXmlDomMgt.GetElementCode(XmlElement, 'contact_post_code', MaxStrLen(NpCsStore."Contact Post Code"), false);
-        NpCsStore."Contact Country/Region Code" := NpXmlDomMgt.GetElementText(XmlElement, 'contact_country_code', MaxStrLen(NpCsStore."Contact Country/Region Code"), false);
-        NpCsStore."Contact County" := NpXmlDomMgt.GetElementText(XmlElement, 'contact_county', MaxStrLen(NpCsStore."Contact County"), false);
-        NpCsStore."Contact Phone No." := NpXmlDomMgt.GetElementText(XmlElement, 'contact_phone_no', MaxStrLen(NpCsStore."Contact Phone No."), false);
-        NpCsStore."Contact E-mail" := NpXmlDomMgt.GetElementText(XmlElement, 'contact_email', MaxStrLen(NpCsStore."Contact E-mail"), false);
+        NpCsStore."Contact Name" := NpXmlDomMgt.GetElementText(Node.AsXmlElement(), 'contact_name', MaxStrLen(NpCsStore."Contact Name"), false);
+        NpCsStore."Contact Name 2" := NpXmlDomMgt.GetElementText(Node.AsXmlElement(), 'contact_name_2', MaxStrLen(NpCsStore."Contact Name 2"), false);
+        NpCsStore."Contact Address" := NpXmlDomMgt.GetElementText(Node.AsXmlElement(), 'contact_address', MaxStrLen(NpCsStore."Contact Address"), false);
+        NpCsStore."Contact Address 2" := NpXmlDomMgt.GetElementText(Node.AsXmlElement(), 'contact_address_2', MaxStrLen(NpCsStore."Contact Address 2"), false);
+        NpCsStore."Contact Post Code" := NpXmlDomMgt.GetElementCode(Node.AsXmlElement(), 'contact_post_code', MaxStrLen(NpCsStore."Contact Post Code"), false);
+        NpCsStore."Contact Country/Region Code" := NpXmlDomMgt.GetElementText(Node.AsXmlElement(), 'contact_country_code', MaxStrLen(NpCsStore."Contact Country/Region Code"), false);
+        NpCsStore."Contact County" := NpXmlDomMgt.GetElementText(Node.AsXmlElement(), 'contact_county', MaxStrLen(NpCsStore."Contact County"), false);
+        NpCsStore."Contact Phone No." := NpXmlDomMgt.GetElementText(Node.AsXmlElement(), 'contact_phone_no', MaxStrLen(NpCsStore."Contact Phone No."), false);
+        NpCsStore."Contact E-mail" := NpXmlDomMgt.GetElementText(Node.AsXmlElement(), 'contact_email', MaxStrLen(NpCsStore."Contact E-mail"), false);
 
         if PrevRec <> Format(NpCsStore) then
             NpCsStore.Modify(true);
@@ -123,44 +125,28 @@ codeunit 6151204 "NPR NpCs Store Mgt."
     [TryFunction]
     procedure TryGetCollectService(NpCsStore: Record "NPR NpCs Store")
     var
-        NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
-        Credential: DotNet NPRNetNetworkCredential;
-        HttpWebRequest: DotNet NPRNetHttpWebRequest;
-        HttpWebResponse: DotNet NPRNetHttpWebResponse;
-        XmlDoc: DotNet "NPRNetXmlDocument";
-        XmlElement: DotNet NPRNetXmlElement;
-        WebException: DotNet NPRNetWebException;
+        XmlDomManagement: codeunit "XML DOM Management";
+        Client: HttpClient;
+        Request: HttpRequestMessage;
+        Response: HttpResponseMessage;
+        RequestHeaders: HttpHeaders;
+        Document: XmlDocument;
+        Node: XmlNode;
         ErrorMessage: Text;
     begin
         NpCsStore.TestField("Service Url");
 
-        HttpWebRequest := HttpWebRequest.Create(NpCsStore."Service Url");
-        HttpWebRequest.UseDefaultCredentials(false);
-        Credential := Credential.NetworkCredential(NpCsStore."Service Username", NpCsStore."Service Password");
-        HttpWebRequest.Credentials(Credential);
-        HttpWebRequest.Method := 'GET';
-        NpXmlDomMgt.SetTrustedCertificateValidation(HttpWebRequest);
-
-        if TryGetWebResponse(HttpWebRequest, HttpWebResponse) then
+        Client.UseWindowsAuthentication(NpCsStore."Service Username", NpCsStore."Service Password");
+        if Client.Get(NpCsStore."Service Url", Response) then
             exit;
 
-        WebException := GetLastErrorObject;
-        ErrorMessage := NpXmlDomMgt.GetWebExceptionMessage(WebException);
-        if NpXmlDomMgt.TryLoadXml(ErrorMessage, XmlDoc) then begin
-            NpXmlDomMgt.RemoveNameSpaces(XmlDoc);
-            if NpXmlDomMgt.FindNode(XmlDoc.DocumentElement, '//faultstring', XmlElement) then begin
-                ErrorMessage := XmlElement.InnerText;
-                Error(ErrorMessage);
-            end;
-        end;
+        ErrorMessage := Response.ReasonPhrase;
+        ErrorMessage := XmlDomManagement.RemoveNamespaces(ErrorMessage);
+        if XmlDocument.ReadFrom(ErrorMessage, Document) then
+            if Document.SelectSingleNode('//faultstring', Node) then
+                Error(Node.AsXmlElement.InnerText());
 
         Error(ErrorMessage);
-    end;
-
-    [TryFunction]
-    local procedure TryGetWebResponse(HttpWebRequest: DotNet NPRNetHttpWebRequest; var HttpWebResponse: DotNet NPRNetHttpWebResponse)
-    begin
-        HttpWebResponse := HttpWebRequest.GetResponse;
     end;
 
     procedure InitStoresWithDistance(FromNpCsStore: Record "NPR NpCs Store"; var TempNpCsStore: Record "NPR NpCs Store" temporary)
@@ -177,10 +163,6 @@ codeunit 6151204 "NPR NpCs Store Mgt."
             TempNpCsStore."Distance (km)" := CalcDistance(FromNpCsStore, TempNpCsStore);
             TempNpCsStore.Insert;
         until NpCsStore.Next = 0;
-    end;
-
-    local procedure "--- Get/Find"()
-    begin
     end;
 
     procedure GetCollectWSUrl(ServiceCompanyName: Text) Url: Text
@@ -216,10 +198,8 @@ codeunit 6151204 "NPR NpCs Store Mgt."
     var
         LastCode: Text;
     begin
-        //-NPR5.51 [364557]
         Clear(NpCsStore);
         NpCsStore.SetRange("Local Store", true);
-        //-NPR5.51 [364557]
         NpCsStore.FindLast;
         LastCode := NpCsStore.Code;
         NpCsStore.FindFirst;
@@ -231,11 +211,6 @@ codeunit 6151204 "NPR NpCs Store Mgt."
             exit(true);
 
         exit(false);
-        //+NPR5.51 [364557]
-    end;
-
-    local procedure "--- Store Inventory"()
-    begin
     end;
 
     procedure CalcDistance(FromNpCsStore: Record "NPR NpCs Store"; ToNpCsStore: Record "NPR NpCs Store") Distance: Decimal
@@ -247,6 +222,9 @@ codeunit 6151204 "NPR NpCs Store Mgt."
         Lon1: Decimal;
         Lon2: Decimal;
     begin
+        //DotNet from this function can be easy removed after upgrade to BC 17.2 because Microsoft added theese functions to Codeunit Math (currently it has procedure "Abs" only.)
+        //https://github.com/microsoft/ALAppExtensions/tree/master/Modules/System/Math
+        //I have tried with our function 'StreetDistance' from Codeunit "NPR MathLib" but it does not return same result as this function. Close, but not the same. DotNet: 60.82725957 StreetDistance: 54.902801393
         if not Evaluate(Lat1, FromNpCsStore."Geolocation Latitude", 9) then
             if Evaluate(Lat1, FromNpCsStore."Geolocation Latitude") then;
         if not Evaluate(Lon1, FromNpCsStore."Geolocation Longitude", 9) then
@@ -285,15 +263,15 @@ codeunit 6151204 "NPR NpCs Store Mgt."
     local procedure SetBufferInventoryStore(StoreCode: Code[20]; var NpCsStoreInventoryBuffer: Record "NPR NpCs Store Inv. Buffer" temporary)
     var
         NpCsStore: Record "NPR NpCs Store";
-        NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
-        Credential: DotNet NPRNetNetworkCredential;
-        HttpWebRequest: DotNet NPRNetHttpWebRequest;
-        HttpWebResponse: DotNet NPRNetHttpWebResponse;
-        XmlDoc: DotNet "NPRNetXmlDocument";
-        XmlElement: DotNet NPRNetXmlElement;
-        WebException: DotNet NPRNetWebException;
+        XmlDomManagement: Codeunit "XML DOM Management";
+        Document: XmlDocument;
+        Node: XmlNode;
+        Client: HttpClient;
+        RequestContent: HttpContent;
+        ContentHeader: HttpHeaders;
+        Response: HttpResponseMessage;
         ReqBody: Text;
-        Response: Text;
+        ResponseText: Text;
     begin
         if not NpCsStore.Get(StoreCode) then
             exit;
@@ -323,35 +301,35 @@ codeunit 6151204 "NPR NpCs Store Mgt."
               '</GetLocalInventory>' +
             '</soapenv:Body>' +
           '</soapenv:Envelope>';
-        XmlDoc := XmlDoc.XmlDocument;
-        XmlDoc.LoadXml(ReqBody);
 
-        HttpWebRequest := HttpWebRequest.CreateHttp(NpCsStore."Service Url");
-        HttpWebRequest.ContentType := 'text/xml;charset=UTF-8';
-        HttpWebRequest.Headers.Add('SOAPAction', 'GetLocalInventory');
-        HttpWebRequest.Method := 'POST';
-        HttpWebRequest.UseDefaultCredentials(false);
-        Credential := Credential.NetworkCredential(NpCsStore."Service Username", NpCsStore."Service Password");
-        HttpWebRequest.Credentials(Credential);
-        if not NpXmlDomMgt.SendWebRequest(XmlDoc, HttpWebRequest, HttpWebResponse, WebException) then
-            Error(NpXmlDomMgt.GetWebExceptionMessage(WebException));
+        RequestContent.WriteFrom(ReqBody);
+        RequestContent.GetHeaders(ContentHeader);
 
-        Response := NpXmlDomMgt.GetWebResponseText(HttpWebResponse);
-        if not NpXmlDomMgt.TryLoadXml(Response, XmlDoc) then
+        ContentHeader.Clear();
+        ContentHeader.Remove('Content-Type');
+        ContentHeader.Add('Content-Type', 'text/xml;charset=UTF-8');
+        ContentHeader.Add('SOAPAction', 'GetLocalInventory');
+        ContentHeader.Remove('Connection');
+        ContentHeader := Client.DefaultRequestHeaders();
+
+        Client.UseWindowsAuthentication(NpCsStore."Service Username", NpCsStore."Service Password");
+        Client.Post(NpCsStore."Service Url", RequestContent, Response);
+
+        if not Response.IsSuccessStatusCode then
+            Error(Response.ReasonPhrase);
+
+        Response.Content.ReadAs(ResponseText);
+        ResponseText := XmlDomManagement.RemoveNamespaces(ResponseText);
+        if not XmlDocument.ReadFrom(ResponseText, Document) then
             exit;
 
-        NpXmlDomMgt.RemoveNameSpaces(XmlDoc);
-        XmlElement := XmlDoc.DocumentElement;
-        if IsNull(XmlElement) then
-            exit;
-
-        XmlElement := XmlElement.SelectSingleNode('Body/GetLocalInventory_Result/local_inventory/products');
-        if IsNull(XmlElement) then
+        Document.SelectSingleNode('//Body/GetLocalInventory_Result/local_inventory/products', Node);
+        if Node.AsXmlElement.IsEmpty() then
             exit;
 
         NpCsStoreInventoryBuffer.FindSet;
         repeat
-            NpCsStoreInventoryBuffer.Inventory := GetElementDecimal(XmlElement, 'product[@sku="' + NpCsStoreInventoryBuffer.Sku + '"]/inventory');
+            NpCsStoreInventoryBuffer.Inventory := GetElementDecimal(Node.AsXmlElement(), 'product[@sku="' + NpCsStoreInventoryBuffer.Sku + '"]/inventory');
             NpCsStoreInventoryBuffer."In Stock" := NpCsStoreInventoryBuffer.Quantity <= NpCsStoreInventoryBuffer.Inventory;
             NpCsStoreInventoryBuffer.Modify;
         until NpCsStoreInventoryBuffer.Next = 0;
@@ -384,25 +362,23 @@ codeunit 6151204 "NPR NpCs Store Mgt."
         exit(TempNpCsStore.FindFirst);
     end;
 
-    local procedure GetElementDecimal(XmlElement: DotNet NPRNetXmlElement; Path: Text) Value: Decimal
+    local procedure GetElementDecimal(Element: XmlElement; Path: Text) Value: Decimal
     var
-        XmlElement2: DotNet NPRNetXmlElement;
+        Element2: XmlElement;
+        Node: XmlNode;
     begin
-        if IsNull(XmlElement) then
+        if Element.IsEmpty() then
             exit(0);
 
-        XmlElement2 := XmlElement.SelectSingleNode(Path);
-        if IsNull(XmlElement2) then
+        Element.SelectSingleNode(Path, Node);
+        Element2 := Node.AsXmlElement();
+        if Element2.IsEmpty() then
             exit(0);
 
-        if not Evaluate(Value, XmlElement2.InnerText, 9) then
+        if not Evaluate(Value, Element2.InnerText, 9) then
             exit(0);
 
         exit(Value);
-    end;
-
-    local procedure "--- UI"()
-    begin
     end;
 
     procedure ShowAddress(NpCsStore: Record "NPR NpCs Store")
@@ -429,10 +405,6 @@ codeunit 6151204 "NPR NpCs Store Mgt."
     begin
         Url := StrSubstNo('http://maps.google.com/maps?q=%1,%2', NpCsStore."Geolocation Latitude", NpCsStore."Geolocation Longitude");
         HyperLink(Url);
-    end;
-
-    local procedure "--- Aux"()
-    begin
     end;
 
     local procedure CollectWsCodeunitId(): Integer

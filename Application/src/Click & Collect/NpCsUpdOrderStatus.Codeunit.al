@@ -1,21 +1,10 @@
 codeunit 6151198 "NPR NpCs Upd. Order Status"
 {
-    // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
-    // NPR5.55/MHA /20200701  CASE 411513 Removed unused references to SalesHeader and Customer in InitReqBody()
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         Text000: Label 'Collect in Store Document is first Processed by Store and then Delivered';
         Text001: Label 'Update Order Status';
         Text002: Label 'Collect Document has been deleted in Store';
 
-    local procedure "--- Init"()
-    begin
-    end;
 
     [EventSubscriber(ObjectType::Codeunit, 6151196, 'OnInitWorkflowModules', '', true, true)]
     local procedure OnInitWorkflowModules(var NpCsWorkflowModule: Record "NPR NpCs Workflow Module")
@@ -39,15 +28,18 @@ codeunit 6151198 "NPR NpCs Upd. Order Status"
     var
         NpCsStore: Record "NPR NpCs Store";
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
-        Credential: DotNet NPRNetNetworkCredential;
-        HttpWebRequest: DotNet NPRNetHttpWebRequest;
-        HttpWebResponse: DotNet NPRNetHttpWebResponse;
-        XmlDoc: DotNet "NPRNetXmlDocument";
-        XmlElement: DotNet NPRNetXmlElement;
-        XmlElement2: DotNet NPRNetXmlElement;
-        WebException: DotNet NPRNetWebException;
+        XmlDomManagement: Codeunit "XML DOM Management";
+        Document: XmlDocument;
+        Node2: XmlNode;
+        Node: XmlNode;
+        NodeList: XmlNodeList;
+        Client: HttpClient;
+        RequestContent: HttpContent;
+        ContentHeader: HttpHeaders;
+        Response: HttpResponseMessage;
         ExceptionMessage: Text;
-        Response: Text;
+        ReqBody: Text;
+        ResponseText: Text;
         XPath: Text;
         Status: Integer;
         PrevRec: Text;
@@ -57,56 +49,62 @@ codeunit 6151198 "NPR NpCs Upd. Order Status"
 
         LogMessage := '';
 
-        InitReqBody(NpCsDocument, XmlDoc);
+        ReqBody := InitReqBody(NpCsDocument);
 
         NpCsStore.Get(NpCsDocument."To Store Code");
-        HttpWebRequest := HttpWebRequest.CreateHttp(NpCsStore."Service Url");
-        HttpWebRequest.ContentType := 'text/xml;charset=UTF-8';
-        HttpWebRequest.Headers.Add('SOAPAction', 'GetCollectDocuments');
-        HttpWebRequest.Method := 'POST';
-        HttpWebRequest.UseDefaultCredentials(false);
-        Credential := Credential.NetworkCredential(NpCsStore."Service Username", NpCsStore."Service Password");
-        HttpWebRequest.Credentials(Credential);
-        if not NpXmlDomMgt.SendWebRequest(XmlDoc, HttpWebRequest, HttpWebResponse, WebException) then begin
-            ExceptionMessage := NpXmlDomMgt.GetWebExceptionMessage(WebException);
-            if NpXmlDomMgt.TryLoadXml(ExceptionMessage, XmlDoc) then begin
-                if NpXmlDomMgt.FindNode(XmlDoc.DocumentElement, '//faultstring', XmlElement) then
-                    ExceptionMessage := XmlElement.InnerText;
+        RequestContent.WriteFrom(ReqBody);
+        RequestContent.GetHeaders(ContentHeader);
+
+        ContentHeader.Clear();
+        ContentHeader.Remove('Content-Type');
+        ContentHeader.Add('Content-Type', 'text/xml;charset=UTF-8');
+        ContentHeader.Add('SOAPAction', 'GetCollectDocuments');
+        ContentHeader.Remove('Connection');
+        ContentHeader := Client.DefaultRequestHeaders();
+
+        Client.UseWindowsAuthentication(NpCsStore."Service Username", NpCsStore."Service Password");
+        Client.Post(NpCsStore."Service Url", RequestContent, Response);
+
+        if not Response.IsSuccessStatusCode then begin
+            ExceptionMessage := Response.ReasonPhrase;
+            if XmlDocument.ReadFrom(ExceptionMessage, Document) then begin
+                if NpXmlDomMgt.FindNode(Document.AsXmlNode(), '//faultstring', Node) then
+                    ExceptionMessage := Node.AsXmlElement.InnerText();
             end;
 
             LogMessage := Text001;
             Error(CopyStr(ExceptionMessage, 1, 1020));
         end;
 
-        Response := NpXmlDomMgt.GetWebResponseText(HttpWebResponse);
-        if not NpXmlDomMgt.TryLoadXml(Response, XmlDoc) then begin
+        Response.Content.ReadAs(ResponseText);
+        ResponseText := XmlDomManagement.RemoveNamespaces(ResponseText);
+        if not XmlDocument.ReadFrom(ResponseText, Document) then begin
             LogMessage := Text001;
-            Error(Response);
+            Error(ResponseText);
         end;
 
-        NpXmlDomMgt.RemoveNameSpaces(XmlDoc);
-        XPath := 'Body/GetCollectDocuments_Result/collect_documents/collect_document';
+        XPath := '//Body/GetCollectDocuments_Result/collect_documents/collect_document';
         XPath += '[@type="' + Format(NpCsDocument.Type::"Collect in Store", 0, 2) + '" ';
         XPath += 'and @from_document_type="' + Format(NpCsDocument."Document Type", 0, 2) + '" ';
         XPath += 'and @from_document_no="' + NpCsDocument."Document No." + '"]';
-        if not NpXmlDomMgt.FindElement(XmlDoc.DocumentElement, XPath, false, XmlElement) then
+        if not Document.SelectSingleNode(XPath, Node) then
             Error(Text002);
 
         NpCsDocument.Find;
         PrevRec := Format(NpCsDocument);
 
-        Status := NpXmlDomMgt.GetElementInt(XmlElement, 'processing_status', true);
+        Status := NpXmlDomMgt.GetElementInt(Node.AsXmlElement(), 'processing_status', true);
         if NpCsDocument."Processing Status" <> Status then begin
             NpCsDocument."Processing Status" := Status;
-            NpCsDocument."Processing updated at" := NpXmlDomMgt.GetElementDT(XmlElement, 'processing_updated_at', true);
-            NpCsDocument."Processing updated by" := NpXmlDomMgt.GetElementText(XmlElement, 'processing_updated_by', MaxStrLen(NpCsDocument."Processing updated by"), true);
+            NpCsDocument."Processing updated at" := NpXmlDomMgt.GetElementDT(Node.AsXmlElement(), 'processing_updated_at', true);
+            NpCsDocument."Processing updated by" := NpXmlDomMgt.GetElementText(Node.AsXmlElement(), 'processing_updated_by', MaxStrLen(NpCsDocument."Processing updated by"), true);
         end;
 
-        Status := NpXmlDomMgt.GetElementInt(XmlElement, 'delivery_status', true);
+        Status := NpXmlDomMgt.GetElementInt(Node.AsXmlElement(), 'delivery_status', true);
         if NpCsDocument."Delivery Status" <> Status then begin
             NpCsDocument."Delivery Status" := Status;
-            NpCsDocument."Delivery updated at" := NpXmlDomMgt.GetElementDT(XmlElement, 'delivery_updated_at', true);
-            NpCsDocument."Delivery updated by" := NpXmlDomMgt.GetElementText(XmlElement, 'delivery_updated_by', MaxStrLen(NpCsDocument."Delivery updated by"), true);
+            NpCsDocument."Delivery updated at" := NpXmlDomMgt.GetElementDT(Node.AsXmlElement(), 'delivery_updated_at', true);
+            NpCsDocument."Delivery updated by" := NpXmlDomMgt.GetElementText(Node.AsXmlElement(), 'delivery_updated_by', MaxStrLen(NpCsDocument."Delivery updated by"), true);
         end;
 
         if OrderProcessingComplete(NpCsDocument) then
@@ -115,18 +113,19 @@ codeunit 6151198 "NPR NpCs Upd. Order Status"
         if PrevRec <> Format(NpCsDocument) then
             NpCsDocument.Modify(true);
 
-        foreach XmlElement2 in XmlElement.SelectNodes('log_entries/log_entry') do
-            InsertLogEntry(NpCsStore, NpCsDocument, XmlElement2);
+        Node.AsXmlElement.SelectNodes('//log_entries/log_entry', NodeList);
+        foreach Node2 in NodeList do
+            InsertLogEntry(NpCsStore, NpCsDocument, Node2.AsXmlElement());
     end;
 
-    local procedure InsertLogEntry(NpCsStore: Record "NPR NpCs Store"; NpCsDocument: Record "NPR NpCs Document"; XmlElement: DotNet NPRNetXmlElement)
+    local procedure InsertLogEntry(NpCsStore: Record "NPR NpCs Store"; NpCsDocument: Record "NPR NpCs Document"; Element: XmlElement)
     var
         NpCsDocumentLogEntry: Record "NPR NpCs Document Log Entry";
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
         EntryNo: BigInteger;
         OutStr: OutStream;
     begin
-        EntryNo := NpXmlDomMgt.GetAttributeBigInt(XmlElement, '', 'entry_no', false);
+        EntryNo := NpXmlDomMgt.GetAttributeBigInt(Element, '', 'entry_no', false);
         if EntryNo <= 0 then
             exit;
 
@@ -141,24 +140,23 @@ codeunit 6151198 "NPR NpCs Upd. Order Status"
         NpCsDocumentLogEntry."Document Entry No." := NpCsDocument."Entry No.";
         NpCsDocumentLogEntry."Store Log Entry No." := EntryNo;
         NpCsDocumentLogEntry."Store Code" := NpCsStore.Code;
-        NpCsDocumentLogEntry."Log Date" := NpXmlDomMgt.GetElementDT(XmlElement, 'log_date', true);
-        NpCsDocumentLogEntry."Workflow Type" := NpXmlDomMgt.GetElementInt(XmlElement, 'workflow_type', true);
-        NpCsDocumentLogEntry."Workflow Module" := NpXmlDomMgt.GetElementCode(XmlElement, 'workflow_module', MaxStrLen(NpCsDocumentLogEntry."Workflow Module"), true);
-        NpCsDocumentLogEntry."Log Message" := NpXmlDomMgt.GetElementText(XmlElement, 'log_message', MaxStrLen(NpCsDocumentLogEntry."Log Message"), true);
+        NpCsDocumentLogEntry."Log Date" := NpXmlDomMgt.GetElementDT(Element, 'log_date', true);
+        NpCsDocumentLogEntry."Workflow Type" := NpXmlDomMgt.GetElementInt(Element, 'workflow_type', true);
+        NpCsDocumentLogEntry."Workflow Module" := NpXmlDomMgt.GetElementCode(Element, 'workflow_module', MaxStrLen(NpCsDocumentLogEntry."Workflow Module"), true);
+        NpCsDocumentLogEntry."Log Message" := NpXmlDomMgt.GetElementText(Element, 'log_message', MaxStrLen(NpCsDocumentLogEntry."Log Message"), true);
         NpCsDocumentLogEntry."Error Message".CreateOutStream(OutStr, TEXTENCODING::UTF8);
-        OutStr.WriteText(NpXmlDomMgt.GetElementText(XmlElement, 'error_message', 0, true));
-        NpCsDocumentLogEntry."Error Entry" := NpXmlDomMgt.GetElementBoolean(XmlElement, 'error_entry', true);
-        NpCsDocumentLogEntry."User ID" := NpXmlDomMgt.GetElementCode(XmlElement, 'user_id', MaxStrLen(NpCsDocumentLogEntry."User ID"), true);
+        OutStr.WriteText(NpXmlDomMgt.GetElementText(Element, 'error_message', 0, true));
+        NpCsDocumentLogEntry."Error Entry" := NpXmlDomMgt.GetElementBoolean(Element, 'error_entry', true);
+        NpCsDocumentLogEntry."User ID" := NpXmlDomMgt.GetElementCode(Element, 'user_id', MaxStrLen(NpCsDocumentLogEntry."User ID"), true);
         NpCsDocumentLogEntry.Insert(true);
     end;
 
-    local procedure InitReqBody(NpCsDocument: Record "NPR NpCs Document"; var XmlDoc: DotNet "NPRNetXmlDocument")
+    local procedure InitReqBody(NpCsDocument: Record "NPR NpCs Document") Content: Text
     var
         NpCsStore: Record "NPR NpCs Store";
         NpCsStoreLocal: Record "NPR NpCs Store";
         NpCsWorkflow: Record "NPR NpCs Workflow";
         ServiceName: Text;
-        Content: Text;
     begin
         NpCsStore.Get(NpCsDocument."To Store Code");
         ServiceName := NpCsStore.GetServiceName();
@@ -181,13 +179,6 @@ codeunit 6151198 "NPR NpCs Upd. Order Status"
               '</GetCollectDocuments>' +
             '</soapenv:Body>' +
           '</soapenv:Envelope>';
-
-        XmlDoc := XmlDoc.XmlDocument;
-        XmlDoc.LoadXml(Content);
-    end;
-
-    local procedure "--- Aux"()
-    begin
     end;
 
     local procedure CurrCodeunitId(): Integer

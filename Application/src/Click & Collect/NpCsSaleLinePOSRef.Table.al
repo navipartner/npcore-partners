@@ -1,7 +1,5 @@
 table 6151204 "NPR NpCs Sale Line POS Ref."
 {
-    // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
-
     Caption = 'Collect Sale Line POS Reference';
     DataClassification = CustomerContent;
 
@@ -71,10 +69,6 @@ table 6151204 "NPR NpCs Sale Line POS Ref."
         key(Key1; "Register No.", "Sales Ticket No.", "Sale Type", "Sale Date", "Sale Line No.")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 

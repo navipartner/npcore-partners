@@ -1,7 +1,5 @@
 table 6151206 "NPR NpCs Store POS Relation"
 {
-    // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
-
     Caption = 'Collect Store POS Relation';
     DataClassification = CustomerContent;
 
@@ -66,10 +64,6 @@ table 6151206 "NPR NpCs Store POS Relation"
         key(Key1; "Store Code", Type, "No.")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 

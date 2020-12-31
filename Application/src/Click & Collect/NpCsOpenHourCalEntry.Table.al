@@ -1,7 +1,5 @@
 table 6151211 "NPR NpCs Open. Hour Cal. Entry"
 {
-    // NPR5.51/MHA /20190719  CASE 362443 Object created - Collect Store Opening Hour Sets
-
     Caption = 'Collect Store Opening Hour Date';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR NpCs Open. Hour Calendar";
@@ -26,7 +24,7 @@ table 6151211 "NPR NpCs Open. Hour Cal. Entry"
         }
         field(1000; Weekday; Text[30])
         {
-            CalcFormula = Lookup (Date."Period Name" WHERE("Period Type" = CONST(Date),
+            CalcFormula = Lookup(Date."Period Name" WHERE("Period Type" = CONST(Date),
                                                            "Period Start" = FIELD("Calendar Date")));
             Caption = 'Weekday';
             Editable = false;
@@ -39,10 +37,6 @@ table 6151211 "NPR NpCs Open. Hour Cal. Entry"
         key(Key1; "Calendar Date", "Start Time", "End Time")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 

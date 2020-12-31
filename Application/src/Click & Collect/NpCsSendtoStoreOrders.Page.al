@@ -1,9 +1,5 @@
 page 6151204 "NPR NpCs Send to Store Orders"
 {
-    // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
-    // NPR5.51/MHA /20190627  CASE 344264 Added Last Log fields
-    // NPR5.55/MHA /20200804  CASE 406591 Added Page Action "Archive"
-
     Caption = 'Send to Store Orders';
     InsertAllowed = false;
     PageType = List;
@@ -264,7 +260,6 @@ page 6151204 "NPR NpCs Send to Store Orders"
                     var
                         NpCsArchCollectMgt: Codeunit "NPR NpCs Arch. Collect Mgt.";
                     begin
-                        //-NPR5.55 [406591]
                         if ("Processing Status" in ["Processing Status"::" ", "Processing Status"::Pending, "Processing Status"::Confirmed]) and
                           ("Delivery Status" in ["Delivery Status"::" ", "Delivery Status"::Ready])
                         then begin
@@ -277,7 +272,6 @@ page 6151204 "NPR NpCs Send to Store Orders"
                             Message(Text004, "Document Type", "Reference No.", GetLastErrorText);
 
                         CurrPage.Update(false);
-                        //+NPR5.55 [406591]
                     end;
                 }
             }

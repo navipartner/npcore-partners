@@ -1,9 +1,5 @@
 table 6151200 "NPR NpCs Store Workflow Rel."
 {
-    // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
-    // NPR5.51/MHA /20190822  CASE 364557 Added field 300 "Processing Print Template"
-    // NPR5.54/MHA /20200130  CASE 378956 Added Store Notification Fields
-
     Caption = 'Collect Workflow Relation';
     DataClassification = CustomerContent;
 
@@ -42,19 +38,17 @@ table 6151200 "NPR NpCs Store Workflow Rel."
                 "Sms Template (Confirmed)" := NpCsWorkflow."Sms Template (Confirmed)";
                 "Sms Template (Rejected)" := NpCsWorkflow."Sms Template (Rejected)";
                 "Sms Template (Expired)" := NpCsWorkflow."Sms Template (Expired)";
-                //-NPR5.54 [378956]
                 "Notify Store via E-mail" := NpCsWorkflow."Notify Store via E-mail";
                 "Store E-mail Temp. (Pending)" := NpCsWorkflow."Store E-mail Temp. (Pending)";
                 "Store E-mail Temp. (Expired)" := NpCsWorkflow."Store E-mail Temp. (Expired)";
                 "Notify Store via Sms" := NpCsWorkflow."Notify Store via Sms";
                 "Store Sms Template (Pending)" := NpCsWorkflow."Store Sms Template (Pending)";
                 "Store Sms Template (Expired)" := NpCsWorkflow."Store Sms Template (Expired)";
-                //+NPR5.54 [378956]
             end;
         }
         field(10; "Workflow Description"; Text[50])
         {
-            CalcFormula = Lookup ("NPR NpCs Workflow".Description WHERE(Code = FIELD("Workflow Code")));
+            CalcFormula = Lookup("NPR NpCs Workflow".Description WHERE(Code = FIELD("Workflow Code")));
             Caption = 'Workflow Description';
             Editable = false;
             FieldClass = FlowField;
@@ -273,7 +267,6 @@ table 6151200 "NPR NpCs Store Workflow Rel."
                 NpCsStore: Record "NPR NpCs Store";
                 RPTemplateHeader: Record "NPR RP Template Header";
             begin
-                //-NPR5.51 [364557]
                 NpCsStore.Get("Store Code");
                 if RPTemplateHeader.ChangeCompany(NpCsStore."Company Name") then;
 
@@ -281,7 +274,6 @@ table 6151200 "NPR NpCs Store Workflow Rel."
                 RPTemplateHeader.SetRange("Table ID", DATABASE::"NPR NpCs Document");
                 if PAGE.RunModal(0, RPTemplateHeader) = ACTION::LookupOK then
                     Validate("Processing Print Template", RPTemplateHeader.Code);
-                //+NPR5.51 [364557]
             end;
         }
         field(305; "Delivery Print Template (POS)"; Code[20])
@@ -351,7 +343,6 @@ table 6151200 "NPR NpCs Store Workflow Rel."
                 EmailTemplateHeader: Record "NPR E-mail Template Header";
                 NpCsStore: Record "NPR NpCs Store";
             begin
-                //-NPR5.54 [378956]
                 NpCsStore.Get("Store Code");
                 if EmailTemplateHeader.ChangeCompany(NpCsStore."Company Name") then;
 
@@ -359,7 +350,6 @@ table 6151200 "NPR NpCs Store Workflow Rel."
                 EmailTemplateHeader.SetRange("Table No.", DATABASE::"NPR NpCs Document");
                 if PAGE.RunModal(0, EmailTemplateHeader) = ACTION::LookupOK then
                     Validate("Store E-mail Temp. (Pending)", EmailTemplateHeader.Code);
-                //+NPR5.54 [378956]
             end;
         }
         field(420; "Store E-mail Temp. (Expired)"; Code[20])
@@ -377,7 +367,6 @@ table 6151200 "NPR NpCs Store Workflow Rel."
                 EmailTemplateHeader: Record "NPR E-mail Template Header";
                 NpCsStore: Record "NPR NpCs Store";
             begin
-                //-NPR5.54 [378956]
                 NpCsStore.Get("Store Code");
                 if EmailTemplateHeader.ChangeCompany(NpCsStore."Company Name") then;
 
@@ -385,7 +374,6 @@ table 6151200 "NPR NpCs Store Workflow Rel."
                 EmailTemplateHeader.SetRange("Table No.", DATABASE::"NPR NpCs Document");
                 if PAGE.RunModal(0, EmailTemplateHeader) = ACTION::LookupOK then
                     Validate("Store E-mail Temp. (Expired)", EmailTemplateHeader.Code);
-                //+NPR5.54 [378956]
             end;
         }
         field(430; "Notify Store via Sms"; Boolean)
@@ -409,7 +397,6 @@ table 6151200 "NPR NpCs Store Workflow Rel."
                 NpCsStore: Record "NPR NpCs Store";
                 SMSTemplateHeader: Record "NPR SMS Template Header";
             begin
-                //-NPR5.54 [378956]
                 NpCsStore.Get("Store Code");
                 if SMSTemplateHeader.ChangeCompany(NpCsStore."Company Name") then;
 
@@ -417,7 +404,6 @@ table 6151200 "NPR NpCs Store Workflow Rel."
                 SMSTemplateHeader.SetRange("Table No.", DATABASE::"NPR NpCs Document");
                 if PAGE.RunModal(0, SMSTemplateHeader) = ACTION::LookupOK then
                     Validate("Store Sms Template (Pending)", SMSTemplateHeader.Code);
-                //+NPR5.54 [378956]
             end;
         }
         field(450; "Store Sms Template (Expired)"; Code[10])
@@ -435,7 +421,6 @@ table 6151200 "NPR NpCs Store Workflow Rel."
                 NpCsStore: Record "NPR NpCs Store";
                 SMSTemplateHeader: Record "NPR SMS Template Header";
             begin
-                //-NPR5.54 [378956]
                 NpCsStore.Get("Store Code");
                 if SMSTemplateHeader.ChangeCompany(NpCsStore."Company Name") then;
 
@@ -453,10 +438,6 @@ table 6151200 "NPR NpCs Store Workflow Rel."
         key(Key1; "Store Code", "Workflow Code")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 
