@@ -1,7 +1,5 @@
 table 6014469 "NPR SalesPost Pdf2Nav Setup"
 {
-    // NPR5.36/THRO/20170908 CASE 285645 Setup for Pdf2Nav Posting
-
     Caption = 'Sales-Post and Pdf2Nav Setup';
     DataClassification = CustomerContent;
 

@@ -1,8 +1,5 @@
 table 6014521 "NPR Mail Text Line"
 {
-    // NPR3.0c, NPK, DL, 26-03-07, Tilf¢jet k¢bstilbud som option
-    // NPR5.39/TJ  /20180212 CASE 302634 Renamed OptionString property of field 1 "Mail Type" to english
-
     Caption = 'Mail Text Line';
     DataClassification = CustomerContent;
 

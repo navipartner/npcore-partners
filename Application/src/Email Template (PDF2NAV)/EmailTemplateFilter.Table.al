@@ -1,11 +1,5 @@
 table 6014464 "NPR E-mail Template Filter"
 {
-    // PN1.00/MH/20140730  NAV-AddOn: PDF2NAV
-    //   - Refactored module from the "Mail And Document Handler" Module.
-    //   - This Table contains Field Filters for defining detailed Link with Table Records.
-    // PN1.07/TTH/20151001  CASE 222376 PDF2NAV Changes. Added the field "Field Name".
-    // PN1.08/MHA/20151214  CASE 228859 Changed Field 10 "Field Name" to Flowfield and removed retail reference
-
     Caption = 'E-mail Template Filter';
     DataClassification = CustomerContent;
 

@@ -1,9 +1,5 @@
 codeunit 6014464 "NPR E-mail Doc. Mgt."
 {
-    trigger OnRun()
-    begin
-    end;
-
     var
         EmailMgt: Codeunit "NPR E-mail Management";
         SalesQuoteLbl: Label 'Sales Quote';
