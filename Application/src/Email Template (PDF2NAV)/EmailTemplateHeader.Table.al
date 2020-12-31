@@ -1,18 +1,5 @@
 table 6014462 "NPR E-mail Template Header"
 {
-    // PN1.00/MH/20140725  NAV-AddOn: PDF2NAV
-    //   - Refactored module from the "Mail And Document Handler" Module.
-    //   - This Table Contains E-mail Templates used for sending E-mail using PDF2NAV.
-    // PN1.06/LS/20150525  CASE 205029 Added fields 101 & 102
-    // NPR4.16/TTH/20151001  CASE 222376 PDF2NAV Changes. Added a field for document format (PDF/Word).
-    // PN1.08/MHA/20151214  CASE 228859 Pdf2Nav (New Version List)
-    // PN1.10/MHA/20160314 CASE 236653 "Report Format" (Word) deleted
-    // NPR5.36/THRO/20170913 CASE 289216 Added Group (field 70). Used to filter which templates to use for default sending
-    // NPR5.38/MHA /20180104  CASE 301054 Deleted blank Global Text Constant ErrorExistingLines
-    // NPR5.38/THRO/20180108  CASE 286713 Added Transactional E-mail setup fields (field 80 + 82)
-    // NPR5.43/THRO/20180626  CASE 318935 Added field 90 + 92 "Fieldnumber Start Tag" and "Fieldnumber End Tag"
-    // NPR5.55/THRO/20200511  CASE 343266 Renamed option values for Transactional E-mail
-
     Caption = 'E-mail Template Header';
     DrillDownPageID = "NPR E-mail Templates";
     LookupPageID = "NPR E-mail Templates";
@@ -36,16 +23,6 @@ table 6014462 "NPR E-mail Template Header"
             Caption = 'Table No.';
             TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            begin
-                //-NPR5.38 [301054]
-                //"Mail And Document Field".SETRANGE("E-mail Template Code",Code);
-                //"Mail And Document Field".SETRANGE("Table No.",xRec."Table No.");
-                //IF "Mail And Document Field".FIND('-') THEN
-                //  ERROR(ErrorExistingLines);
-                //+NPR5.38 [301054]
-            end;
         }
         field(20; "HTML Template"; BLOB)
         {
@@ -96,7 +73,7 @@ table 6014462 "NPR E-mail Template Header"
         }
         field(65; "Report Name"; Text[249])
         {
-            CalcFormula = Lookup (AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Report),
+            CalcFormula = Lookup(AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Report),
                                                                            "Object ID" = FIELD("Report ID")));
             Caption = 'Report Name';
             Editable = false;
@@ -116,10 +93,8 @@ table 6014462 "NPR E-mail Template Header"
 
             trigger OnValidate()
             begin
-                //-NPR5.38 [2867139]
                 if "Transactional E-mail" = 0 then
                     "Transactional E-mail Code" := '';
-                //+NPR5.38 [2867139]
             end;
         }
         field(82; "Transactional E-mail Code"; Code[20])

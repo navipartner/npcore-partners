@@ -1,25 +1,14 @@
 codeunit 6014473 "NPR PDF2NAV Subscribers"
 {
-    // NPR5.39/THRO/20180222 CASE 304256 Added Subscriber for "Pay-to Vendor No."
-    // NPR5.42/THRO/20180516 CASE 308179 Added subscribers for Pdf2Nav Page actions
-    // NPR5.46/TS  /20180918  CASE 302770 Added Subscirber Action for Page POS Entry List
-
-
-    trigger OnRun()
-    begin
-    end;
-
     [EventSubscriber(ObjectType::Table, 36, 'OnAfterValidateEvent', 'Bill-to Customer No.', true, true)]
     local procedure OnAfterValidateEventBillToCustomerNo(var Rec: Record "Sales Header"; var xRec: Record "Sales Header"; CurrFieldNo: Integer)
     var
         Customer: Record Customer;
     begin
-        //-NPR5.39 [304256]
         if Customer.Get(Rec."Bill-to Customer No.") then begin
             Rec."NPR Bill-to E-mail" := Customer."E-Mail";
             Rec."NPR Document Processing" := Customer."NPR Document Processing";
         end;
-        //+NPR5.39 [304256]
     end;
 
     [EventSubscriber(ObjectType::Table, 38, 'OnAfterValidateEvent', 'Pay-to Vendor No.', true, true)]
@@ -27,12 +16,10 @@ codeunit 6014473 "NPR PDF2NAV Subscribers"
     var
         Vendor: Record Vendor;
     begin
-        //-NPR5.39 [304256]
         if Vendor.Get(Rec."Pay-to Vendor No.") then begin
             Rec."NPR Pay-to E-mail" := Vendor."E-Mail";
             Rec."NPR Document Processing" := Vendor."NPR Document Processing";
         end;
-        //+NPR5.39 [304256]
     end;
 
     local procedure "-- Page Subscribers"()
@@ -44,9 +31,7 @@ codeunit 6014473 "NPR PDF2NAV Subscribers"
     var
         EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
     begin
-        //-NPR5.42 [308179]
         EmailDocMgt.SendReport(Rec, false);
-        //+NPR5.42 [308179]
     end;
 
     [EventSubscriber(ObjectType::Page, 21, 'OnAfterActionEvent', 'NPR EmailLog', true, true)]
@@ -54,9 +39,7 @@ codeunit 6014473 "NPR PDF2NAV Subscribers"
     var
         EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
     begin
-        //-NPR5.42 [308179]
         EmailDocMgt.RunEmailLog(Rec);
-        //+NPR5.42 [308179]
     end;
 
     [EventSubscriber(ObjectType::Page, 22, 'OnAfterActionEvent', 'NPR SendAsPDF', true, true)]
@@ -64,9 +47,7 @@ codeunit 6014473 "NPR PDF2NAV Subscribers"
     var
         EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
     begin
-        //-NPR5.42 [308179]
         EmailDocMgt.SendReport(Rec, false);
-        //+NPR5.42 [308179]
     end;
 
     [EventSubscriber(ObjectType::Page, 22, 'OnAfterActionEvent', 'NPR EmailLog', true, true)]
@@ -74,9 +55,7 @@ codeunit 6014473 "NPR PDF2NAV Subscribers"
     var
         EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
     begin
-        //-NPR5.42 [308179]
         EmailDocMgt.RunEmailLog(Rec);
-        //+NPR5.42 [308179]
     end;
 
     [EventSubscriber(ObjectType::Page, 41, 'OnAfterActionEvent', 'NPR SendAsPDF', true, true)]
@@ -84,9 +63,7 @@ codeunit 6014473 "NPR PDF2NAV Subscribers"
     var
         EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
     begin
-        //-NPR5.42 [308179]
         EmailDocMgt.SendReport(Rec, false);
-        //+NPR5.42 [308179]
     end;
 
     [EventSubscriber(ObjectType::Page, 41, 'OnAfterActionEvent', 'NPR EmailLog', true, true)]
@@ -94,9 +71,7 @@ codeunit 6014473 "NPR PDF2NAV Subscribers"
     var
         EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
     begin
-        //-NPR5.42 [308179]
         EmailDocMgt.RunEmailLog(Rec);
-        //+NPR5.42 [308179]
     end;
 
     [EventSubscriber(ObjectType::Page, 42, 'OnAfterActionEvent', 'NPR SendAsPDF', true, true)]
@@ -104,9 +79,7 @@ codeunit 6014473 "NPR PDF2NAV Subscribers"
     var
         EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
     begin
-        //-NPR5.42 [308179]
         EmailDocMgt.SendReport(Rec, false);
-        //+NPR5.42 [308179]
     end;
 
     [EventSubscriber(ObjectType::Page, 42, 'OnAfterActionEvent', 'NPR EmailLog', true, true)]
@@ -114,9 +87,7 @@ codeunit 6014473 "NPR PDF2NAV Subscribers"
     var
         EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
     begin
-        //-NPR5.42 [308179]
         EmailDocMgt.RunEmailLog(Rec);
-        //+NPR5.42 [308179]
     end;
 
     [EventSubscriber(ObjectType::Page, 49, 'OnAfterActionEvent', 'NPR SendAsPDF', true, true)]
@@ -124,9 +95,7 @@ codeunit 6014473 "NPR PDF2NAV Subscribers"
     var
         EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
     begin
-        //-NPR5.42 [308179]
         EmailDocMgt.SendReport(Rec, false);
-        //+NPR5.42 [308179]
     end;
 
     [EventSubscriber(ObjectType::Page, 49, 'OnAfterActionEvent', 'NPR EmailLog', true, true)]
@@ -134,9 +103,7 @@ codeunit 6014473 "NPR PDF2NAV Subscribers"
     var
         EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
     begin
-        //-NPR5.42 [308179]
         EmailDocMgt.RunEmailLog(Rec);
-        //+NPR5.42 [308179]
     end;
 
     [EventSubscriber(ObjectType::Page, 50, 'OnAfterActionEvent', 'NPR SendAsPDF', true, true)]
@@ -144,9 +111,7 @@ codeunit 6014473 "NPR PDF2NAV Subscribers"
     var
         EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
     begin
-        //-NPR5.42 [308179]
         EmailDocMgt.SendReport(Rec, false);
-        //+NPR5.42 [308179]
     end;
 
     [EventSubscriber(ObjectType::Page, 50, 'OnAfterActionEvent', 'NPR EmailLog', true, true)]
@@ -154,9 +119,7 @@ codeunit 6014473 "NPR PDF2NAV Subscribers"
     var
         EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
     begin
-        //-NPR5.42 [308179]
         EmailDocMgt.RunEmailLog(Rec);
-        //+NPR5.42 [308179]
     end;
 
     [EventSubscriber(ObjectType::Page, 130, 'OnAfterActionEvent', 'NPR SendAsPDF', true, true)]
@@ -164,9 +127,7 @@ codeunit 6014473 "NPR PDF2NAV Subscribers"
     var
         EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
     begin
-        //-NPR5.42 [308179]
         EmailDocMgt.SendReport(Rec, false);
-        //+NPR5.42 [308179]
     end;
 
     [EventSubscriber(ObjectType::Page, 130, 'OnAfterActionEvent', 'NPR EmailLog', true, true)]
@@ -174,9 +135,7 @@ codeunit 6014473 "NPR PDF2NAV Subscribers"
     var
         EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
     begin
-        //-NPR5.42 [308179]
         EmailDocMgt.RunEmailLog(Rec);
-        //+NPR5.42 [308179]
     end;
 
     [EventSubscriber(ObjectType::Page, 132, 'OnAfterActionEvent', 'NPR SendAsPDF', true, true)]
@@ -184,9 +143,7 @@ codeunit 6014473 "NPR PDF2NAV Subscribers"
     var
         EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
     begin
-        //-NPR5.42 [308179]
         EmailDocMgt.SendReport(Rec, false);
-        //+NPR5.42 [308179]
     end;
 
     [EventSubscriber(ObjectType::Page, 132, 'OnAfterActionEvent', 'NPR EmailLog', true, true)]
@@ -194,9 +151,7 @@ codeunit 6014473 "NPR PDF2NAV Subscribers"
     var
         EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
     begin
-        //-NPR5.42 [308179]
         EmailDocMgt.RunEmailLog(Rec);
-        //+NPR5.42 [308179]
     end;
 
     [EventSubscriber(ObjectType::Page, 134, 'OnAfterActionEvent', 'NPR SendAsPDF', true, true)]
@@ -204,9 +159,7 @@ codeunit 6014473 "NPR PDF2NAV Subscribers"
     var
         EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
     begin
-        //-NPR5.42 [308179]
         EmailDocMgt.SendReport(Rec, false);
-        //+NPR5.42 [308179]
     end;
 
     [EventSubscriber(ObjectType::Page, 134, 'OnAfterActionEvent', 'NPR EmailLog', true, true)]
@@ -214,9 +167,7 @@ codeunit 6014473 "NPR PDF2NAV Subscribers"
     var
         EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
     begin
-        //-NPR5.42 [308179]
         EmailDocMgt.RunEmailLog(Rec);
-        //+NPR5.42 [308179]
     end;
 
     [EventSubscriber(ObjectType::Page, 136, 'OnAfterActionEvent', 'NPR SendAsPDF', true, true)]
@@ -224,9 +175,7 @@ codeunit 6014473 "NPR PDF2NAV Subscribers"
     var
         EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
     begin
-        //-NPR5.42 [308179]
         EmailDocMgt.SendReport(Rec, false);
-        //+NPR5.42 [308179]
     end;
 
     [EventSubscriber(ObjectType::Page, 136, 'OnAfterActionEvent', 'NPR EmailLog', true, true)]
@@ -234,9 +183,7 @@ codeunit 6014473 "NPR PDF2NAV Subscribers"
     var
         EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
     begin
-        //-NPR5.42 [308179]
         EmailDocMgt.RunEmailLog(Rec);
-        //+NPR5.42 [308179]
     end;
 
     [EventSubscriber(ObjectType::Page, 140, 'OnAfterActionEvent', 'NPR SendAsPDF', true, true)]
@@ -244,9 +191,7 @@ codeunit 6014473 "NPR PDF2NAV Subscribers"
     var
         EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
     begin
-        //-NPR5.42 [308179]
         EmailDocMgt.SendReport(Rec, false);
-        //+NPR5.42 [308179]
     end;
 
     [EventSubscriber(ObjectType::Page, 140, 'OnAfterActionEvent', 'NPR EmailLog', true, true)]
@@ -254,9 +199,7 @@ codeunit 6014473 "NPR PDF2NAV Subscribers"
     var
         EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
     begin
-        //-NPR5.42 [308179]
         EmailDocMgt.RunEmailLog(Rec);
-        //+NPR5.42 [308179]
     end;
 
     [EventSubscriber(ObjectType::Page, 143, 'OnAfterActionEvent', 'NPR EmailLog', true, true)]
@@ -264,9 +207,7 @@ codeunit 6014473 "NPR PDF2NAV Subscribers"
     var
         EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
     begin
-        //-NPR5.42 [308179]
         EmailDocMgt.RunEmailLog(Rec);
-        //+NPR5.42 [308179]
     end;
 
     [EventSubscriber(ObjectType::Page, 144, 'OnAfterActionEvent', 'NPR SendAsPDF', true, true)]
@@ -274,9 +215,7 @@ codeunit 6014473 "NPR PDF2NAV Subscribers"
     var
         EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
     begin
-        //-NPR5.42 [308179]
         EmailDocMgt.SendReport(Rec, false);
-        //+NPR5.42 [308179]
     end;
 
     [EventSubscriber(ObjectType::Page, 144, 'OnAfterActionEvent', 'NPR EmailLog', true, true)]
@@ -284,9 +223,7 @@ codeunit 6014473 "NPR PDF2NAV Subscribers"
     var
         EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
     begin
-        //-NPR5.42 [308179]
         EmailDocMgt.RunEmailLog(Rec);
-        //+NPR5.42 [308179]
     end;
 
     [EventSubscriber(ObjectType::Page, 438, 'OnAfterActionEvent', 'NPR SendAsPDF', true, true)]
@@ -294,9 +231,7 @@ codeunit 6014473 "NPR PDF2NAV Subscribers"
     var
         EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
     begin
-        //-NPR5.42 [308179]
         EmailDocMgt.SendReport(Rec, false);
-        //+NPR5.42 [308179]
     end;
 
     [EventSubscriber(ObjectType::Page, 438, 'OnAfterActionEvent', 'NPR EmailLog', true, true)]
@@ -304,9 +239,7 @@ codeunit 6014473 "NPR PDF2NAV Subscribers"
     var
         EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
     begin
-        //-NPR5.42 [308179]
         EmailDocMgt.RunEmailLog(Rec);
-        //+NPR5.42 [308179]
     end;
 
     [EventSubscriber(ObjectType::Page, 5900, 'OnAfterActionEvent', 'NPR SendAsPDF', true, true)]
@@ -314,9 +247,7 @@ codeunit 6014473 "NPR PDF2NAV Subscribers"
     var
         EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
     begin
-        //-NPR5.42 [308179]
         EmailDocMgt.SendReport(Rec, false);
-        //+NPR5.42 [308179]
     end;
 
     [EventSubscriber(ObjectType::Page, 5900, 'OnAfterActionEvent', 'NPR EmailLog', true, true)]
@@ -324,9 +255,7 @@ codeunit 6014473 "NPR PDF2NAV Subscribers"
     var
         EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
     begin
-        //-NPR5.42 [308179]
         EmailDocMgt.RunEmailLog(Rec);
-        //+NPR5.42 [308179]
     end;
 
     [EventSubscriber(ObjectType::Page, 5964, 'OnAfterActionEvent', 'NPR SendAsPDF', true, true)]
@@ -334,9 +263,7 @@ codeunit 6014473 "NPR PDF2NAV Subscribers"
     var
         EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
     begin
-        //-NPR5.42 [308179]
         EmailDocMgt.SendReport(Rec, false);
-        //+NPR5.42 [308179]
     end;
 
     [EventSubscriber(ObjectType::Page, 5964, 'OnAfterActionEvent', 'NPR EmailLog', true, true)]
@@ -344,9 +271,7 @@ codeunit 6014473 "NPR PDF2NAV Subscribers"
     var
         EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
     begin
-        //-NPR5.42 [308179]
         EmailDocMgt.RunEmailLog(Rec);
-        //+NPR5.42 [308179]
     end;
 
     [EventSubscriber(ObjectType::Page, 5975, 'OnAfterActionEvent', 'NPR SendAsPDF', true, true)]
@@ -354,9 +279,7 @@ codeunit 6014473 "NPR PDF2NAV Subscribers"
     var
         EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
     begin
-        //-NPR5.42 [308179]
         EmailDocMgt.SendReport(Rec, false);
-        //+NPR5.42 [308179]
     end;
 
     [EventSubscriber(ObjectType::Page, 5975, 'OnAfterActionEvent', 'NPR EmailLog', true, true)]
@@ -364,9 +287,7 @@ codeunit 6014473 "NPR PDF2NAV Subscribers"
     var
         EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
     begin
-        //-NPR5.42 [308179]
         EmailDocMgt.RunEmailLog(Rec);
-        //+NPR5.42 [308179]
     end;
 
     [EventSubscriber(ObjectType::Page, 5978, 'OnAfterActionEvent', 'NPR SendAsPDF', true, true)]
@@ -374,9 +295,7 @@ codeunit 6014473 "NPR PDF2NAV Subscribers"
     var
         EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
     begin
-        //-NPR5.42 [308179]
         EmailDocMgt.SendReport(Rec, false);
-        //+NPR5.42 [308179]
     end;
 
     [EventSubscriber(ObjectType::Page, 5978, 'OnAfterActionEvent', 'NPR EmailLog', true, true)]
@@ -384,9 +303,7 @@ codeunit 6014473 "NPR PDF2NAV Subscribers"
     var
         EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
     begin
-        //-NPR5.42 [308179]
         EmailDocMgt.RunEmailLog(Rec);
-        //+NPR5.42 [308179]
     end;
 
     [EventSubscriber(ObjectType::Page, 6630, 'OnAfterActionEvent', 'NPR SendAsPDF', true, true)]
@@ -394,9 +311,7 @@ codeunit 6014473 "NPR PDF2NAV Subscribers"
     var
         EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
     begin
-        //-NPR5.42 [308179]
         EmailDocMgt.SendReport(Rec, false);
-        //+NPR5.42 [308179]
     end;
 
     [EventSubscriber(ObjectType::Page, 6630, 'OnAfterActionEvent', 'NPR EmailLog', true, true)]
@@ -404,9 +319,7 @@ codeunit 6014473 "NPR PDF2NAV Subscribers"
     var
         EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
     begin
-        //-NPR5.42 [308179]
         EmailDocMgt.RunEmailLog(Rec);
-        //+NPR5.42 [308179]
     end;
 
     [EventSubscriber(ObjectType::Page, 6640, 'OnAfterActionEvent', 'NPR SendAsPDF', true, true)]
@@ -414,9 +327,7 @@ codeunit 6014473 "NPR PDF2NAV Subscribers"
     var
         EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
     begin
-        //-NPR5.42 [308179]
         EmailDocMgt.SendReport(Rec, false);
-        //+NPR5.42 [308179]
     end;
 
     [EventSubscriber(ObjectType::Page, 6640, 'OnAfterActionEvent', 'NPR EmailLog', true, true)]
@@ -424,9 +335,7 @@ codeunit 6014473 "NPR PDF2NAV Subscribers"
     var
         EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
     begin
-        //-NPR5.42 [308179]
         EmailDocMgt.RunEmailLog(Rec);
-        //+NPR5.42 [308179]
     end;
 
     [EventSubscriber(ObjectType::Page, 6014432, 'OnAfterActionEvent', 'SendAsPDF', true, true)]
@@ -434,9 +343,7 @@ codeunit 6014473 "NPR PDF2NAV Subscribers"
     var
         EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
     begin
-        //-NPR5.42 [308179]
         EmailDocMgt.SendReport(Rec, false);
-        //+NPR5.42 [308179]
     end;
 
     [EventSubscriber(ObjectType::Page, 6014432, 'OnAfterActionEvent', 'EmailLog', true, true)]
@@ -444,9 +351,7 @@ codeunit 6014473 "NPR PDF2NAV Subscribers"
     var
         EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
     begin
-        //-NPR5.42 [308179]
         EmailDocMgt.RunEmailLog(Rec);
-        //+NPR5.42 [308179]
     end;
 
     [EventSubscriber(ObjectType::Page, 6150652, 'OnAfterActionEvent', 'SendAsPDF', true, true)]
@@ -454,9 +359,7 @@ codeunit 6014473 "NPR PDF2NAV Subscribers"
     var
         EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
     begin
-        //-NPR5.46 [302770]
         EmailDocMgt.SendReport(Rec, false);
-        //+NPR5.46 [302770]
     end;
 
     [EventSubscriber(ObjectType::Page, 6150652, 'OnAfterActionEvent', 'EmailLog', true, true)]
@@ -464,9 +367,7 @@ codeunit 6014473 "NPR PDF2NAV Subscribers"
     var
         EmailDocMgt: Codeunit "NPR E-mail Doc. Mgt.";
     begin
-        //-NPR5.46 [302770]
         EmailDocMgt.RunEmailLog(Rec);
-        //+NPR5.46 [302770]
     end;
 }
 

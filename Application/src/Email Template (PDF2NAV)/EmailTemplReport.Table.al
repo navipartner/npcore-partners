@@ -1,10 +1,5 @@
 table 6014461 "NPR E-mail Templ. Report"
 {
-    // PN1.01/MH/20140731  NAV-AddOn: PDF2NAV
-    //   - Refactored module from the "Mail And Document Handler" Module.
-    //   - This Table contains a additional Reports to be saved and attached as PDF in connection to sending E-mail Template.
-    // PN1.08/MHA/20151214  CASE 228859 Pdf2Nav (New Version List)
-
     Caption = 'Report Selections - E-mail';
     DataClassification = CustomerContent;
 
@@ -34,7 +29,7 @@ table 6014461 "NPR E-mail Templ. Report"
         }
         field(100; "Report Name"; Text[80])
         {
-            CalcFormula = Lookup (AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Report),
+            CalcFormula = Lookup(AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Report),
                                                                            "Object ID" = FIELD("Report ID")));
             Caption = 'Report Name';
             Editable = false;

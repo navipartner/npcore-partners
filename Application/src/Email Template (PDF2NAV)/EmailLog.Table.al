@@ -1,11 +1,5 @@
 table 6014460 "NPR E-mail Log"
 {
-    // NPR6.000.000, 19-01-11, Job 93865, MH - Created.
-    // PN1.00/MH/20140730  NAV-AddOn: PDF2NAV
-    //   - Refactored module from the "Mail And Document Handler" Module.
-    //   - This Table contains a Log of every E-mail send by PDF2NAV.
-    // PN1.08/MHA/20151214  CASE 228859 Pdf2Nav (New Version List)
-
     Caption = 'E-mail Log';
     DataClassification = CustomerContent;
 

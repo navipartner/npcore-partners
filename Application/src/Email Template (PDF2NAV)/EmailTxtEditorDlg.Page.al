@@ -1,9 +1,5 @@
 page 6059804 "NPR E-mail Txt Editor Dlg"
 {
-    // NC1.14/MH/20150508  CASE 208941 Updated TextEditor Addin to JavaScript version
-    // NC1.19/HSK/20150720 CASE 217576 TextEditor 1.01 update
-    // NPR5.23.03/MHA/20160726  CASE 242557 Object renamed and re-versioned from NC1.19 to PN1.10.01
-
     Caption = 'NaviConnect Text Editor Dialog';
     PageType = StandardDialog;
     UsageCategory = Administration;

@@ -1,10 +1,5 @@
 table 6014463 "NPR E-mail Templ. Line"
 {
-    // PN1.00/MH/20140730  NAV-AddOn: PDF2NAV
-    //   - Refactored module from the "Mail And Document Handler" Module.
-    //   - This Table contains the e-mail body lines connected to the PDF2NAV E-mail Template.
-    // PN1.08/MHA/20151214  CASE 228859 Pdf2Nav (New Version List)
-
     Caption = 'E-mail Template Line';
     DataClassification = CustomerContent;
 
