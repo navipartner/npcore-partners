@@ -1,7 +1,5 @@
 page 6184870 "NPR DropBox Setup"
 {
-    // NPR5.54/ALST/20200212 CASE 383718 Object created
-
     Caption = 'DropBox Setup';
     PageType = List;
     UsageCategory = Administration;
