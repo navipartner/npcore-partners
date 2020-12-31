@@ -1,16 +1,5 @@
 codeunit 6151197 "NPR NpCs Send Order"
 {
-    // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
-    // NPR5.51/MHA /20190717  CASE 344264 Added <store_stock> to InitReqBody()
-    // NPR5.51/MHA /20190719  CASE 342443 Added <opening_hour_set>
-    // NPR5.51/MHA /20190719  CASE 362197 Added <to_store>
-    // NPR5.51/MHA /20190821  CASE 364557 Added <post_on>
-    // NPR5.53/MHA /20191204  CASE 378216 Added <processing_status>
-
-
-    trigger OnRun()
-    begin
-    end;
 
     var
         Text000: Label 'Create Collect Sales Order in Store';
@@ -21,12 +10,14 @@ codeunit 6151197 "NPR NpCs Send Order"
     var
         NpCsStore: Record "NPR NpCs Store";
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
-        Credential: DotNet NPRNetNetworkCredential;
-        HttpWebRequest: DotNet NPRNetHttpWebRequest;
-        HttpWebResponse: DotNet NPRNetHttpWebResponse;
-        XmlDoc: DotNet "NPRNetXmlDocument";
-        XmlElement: DotNet NPRNetXmlElement;
-        WebException: DotNet NPRNetWebException;
+        Client: HttpClient;
+        RequestContent: HttpContent;
+        ContentHeader: HttpHeaders;
+        ContentText: Text;
+        Response: HttpResponseMessage;
+        Document: XmlDocument;
+        Element: XmlElement;
+        Node: XmlNode;
         ExceptionMessage: Text;
     begin
         if not (NpCsDocument."Send Order Module" in ['', WorkflowCode()]) then
@@ -34,27 +25,34 @@ codeunit 6151197 "NPR NpCs Send Order"
 
         LogMessage := StrSubstNo(Text001, NpCsDocument."Document No.", NpCsDocument."To Store Code");
 
-        InitReqBody(NpCsDocument, XmlDoc);
+        InitReqBody(NpCsDocument, ContentText);
         NpCsStore.Get(NpCsDocument."To Store Code");
-        HttpWebRequest := HttpWebRequest.CreateHttp(NpCsStore."Service Url");
-        HttpWebRequest.ContentType := 'text/xml;charset=UTF-8';
-        HttpWebRequest.Headers.Add('SOAPAction', 'ImportSalesDocuments');
-        HttpWebRequest.Method := 'POST';
-        HttpWebRequest.UseDefaultCredentials(false);
-        Credential := Credential.NetworkCredential(NpCsStore."Service Username", NpCsStore."Service Password");
-        HttpWebRequest.Credentials(Credential);
-        if not NpXmlDomMgt.SendWebRequest(XmlDoc, HttpWebRequest, HttpWebResponse, WebException) then begin
-            ExceptionMessage := NpXmlDomMgt.GetWebExceptionMessage(WebException);
-            if NpXmlDomMgt.TryLoadXml(ExceptionMessage, XmlDoc) then begin
-                if NpXmlDomMgt.FindNode(XmlDoc.DocumentElement, '//faultstring', XmlElement) then
-                    ExceptionMessage := XmlElement.InnerText;
+
+        RequestContent.WriteFrom(ContentText);
+        RequestContent.GetHeaders(ContentHeader);
+
+        ContentHeader.Clear();
+        ContentHeader.Remove('Content-Type');
+        ContentHeader.Add('Content-Type', 'text/xml;charset=UTF-8');
+        ContentHeader.Add('SOAPAction', 'ImportSalesDocuments');
+        ContentHeader.Remove('Connection');
+        ContentHeader := Client.DefaultRequestHeaders();
+
+        Client.UseWindowsAuthentication(NpCsStore."Service Username", NpCsStore."Service Password");
+        Client.Post(NpCsStore."Service Url", RequestContent, Response);
+
+        if not Response.IsSuccessStatusCode then begin
+            ExceptionMessage := Response.ReasonPhrase;
+            if XmlDocument.ReadFrom(ExceptionMessage, Document) then begin
+                if NpXmlDomMgt.FindNode(Document.AsXmlNode(), '//faultstring', Node) then
+                    ExceptionMessage := Node.AsXmlElement.InnerText();
             end;
 
             Error(CopyStr(ExceptionMessage, 1, 1020));
         end;
     end;
 
-    local procedure InitReqBody(NpCsDocument: Record "NPR NpCs Document"; var XmlDoc: DotNet "NPRNetXmlDocument")
+    local procedure InitReqBody(NpCsDocument: Record "NPR NpCs Document"; var Content: Text)
     var
         Customer: Record Customer;
         NpCsStore: Record "NPR NpCs Store";
@@ -63,7 +61,6 @@ codeunit 6151197 "NPR NpCs Send Order"
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
         ServiceName: Text;
-        Content: Text;
         CustNo: Text;
     begin
         SalesHeader.Get(SalesHeader."Document Type"::Order, NpCsDocument."Document No.");
@@ -99,12 +96,8 @@ codeunit 6151197 "NPR NpCs Send Order"
                       '<mobile_phone_no>' + NpCsStoreLocal."Mobile Phone No." + '</mobile_phone_no>' +
                       '<callback encoding="base64">' + InitCallback(NpCsDocument) + '</callback>' +
                     '</from_store>' +
-                    //-NPR5.51 [362197]
                     '<to_store store_code="' + NpCsDocument."To Store Code" + '" />' +
-                    //+NPR5.51 [362197]
-                    //-NPR5.53 [378216]
                     '<processing_status>' + Format(NpCsDocument."Processing Status"::Pending, 0, 2) + '</processing_status>' +
-                    //+NPR5.53 [378216]
                     '<order_date>' + Format(SalesHeader."Order Date", 0, 9) + '</order_date>' +
                     '<posting_date>' + Format(SalesHeader."Posting Date", 0, 9) + '</posting_date>' +
                     '<due_date>' + Format(SalesHeader."Due Date", 0, 9) + '</due_date>' +
@@ -132,24 +125,16 @@ codeunit 6151197 "NPR NpCs Send Order"
                       '<sms_template_confirmed>' + NpCsDocument."Sms Template (Confirmed)" + '</sms_template_confirmed>' +
                       '<sms_template_rejected>' + NpCsDocument."Sms Template (Rejected)" + '</sms_template_rejected>' +
                       '<sms_template_expired>' + NpCsDocument."Sms Template (Expired)" + '</sms_template_expired>' +
-                      //-NPR5.51 [362443]
                       '<opening_hour_set>' + NpCsDocument."Opening Hour Set" + '</opening_hour_set>' +
-                      //+NPR5.51 [362443]
                       '<processing_expiry_duration>' + Format(NpCsDocument."Processing Expiry Duration", 0, 9) + '</processing_expiry_duration>' +
                       '<delivery_expiry_days_qty>' + Format(NpCsDocument."Delivery Expiry Days (Qty.)", 0, 9) + '</delivery_expiry_days_qty>' +
                     '</notification>' +
                     '<bill_to_customer_no>' + NpCsStore."Bill-to Customer No." + '</bill_to_customer_no>' +
                     '<archive_on_delivery>' + Format(NpCsDocument."Archive on Delivery", 0, 9) + '</archive_on_delivery>' +
-                    //-NPR5.51 [344264]
                     '<store_stock>' + Format(NpCsDocument."Store Stock", 0, 9) + '</store_stock>' +
-                    //+NPR5.51 [344264]
-                    //-NPR5.51 [364557]
                     '<post_on>' + Format(NpCsDocument."Post on", 0, 2) + '</post_on>' +
-                    //+NPR5.51 [364557]
                     '<bill_via>' + Format(NpCsDocument."Bill via", 0, 2) + '</bill_via>' +
-                    //-NPR5.51 [364557]
                     '<processing_print_template>' + NpCsDocument."Processing Print Template" + '</processing_print_template>' +
-                    //+NPR5.51 [364557]
                     '<delivery_print_template_pos>' + NpCsDocument."Delivery Print Template (POS)" + '</delivery_print_template_pos>' +
                     '<delivery_print_template_sales_doc>' + NpCsDocument."Delivery Print Template (S.)" + '</delivery_print_template_sales_doc>' +
                     '<prepaid_amount>' + Format(NpCsDocument."Prepaid Amount", 0, 9) + '</prepaid_amount>' +
@@ -191,15 +176,12 @@ codeunit 6151197 "NPR NpCs Send Order"
             '</soapenv:Body>' +
           '</soapenv:Envelope>';
 
-        XmlDoc := XmlDoc.XmlDocument;
-        XmlDoc.LoadXml(Content);
     end;
 
     local procedure InitCallback(NpCsDocument: Record "NPR NpCs Document") Callback: Text
     var
         NpCsStore: Record "NPR NpCs Store";
-        Encoding: DotNet NPRNetEncoding;
-        Convert: DotNet NPRNetConvert;
+        Base64Convert: Codeunit "Base64 Convert";
     begin
         NpCsStore.Get(NpCsDocument."From Store Code");
         if NpCsStore."Service Url" = '' then
@@ -232,12 +214,9 @@ codeunit 6151197 "NPR NpCs Send Order"
             ']]></request_body>' +
           '</callback>';
 
-        Callback := Convert.ToBase64String(Encoding.UTF8.GetBytes(Callback));
-        exit(Callback);
-    end;
+        Callback := Base64Convert.ToBase64(Callback, TextEncoding::UTF8);
 
-    local procedure "--- Init"()
-    begin
+        exit(Callback);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6151196, 'OnInitWorkflowModules', '', true, true)]
@@ -255,10 +234,6 @@ codeunit 6151197 "NPR NpCs Send Order"
         NpCsWorkflowModule.Description := CopyStr(Text000, 1, MaxStrLen(NpCsWorkflowModule.Description));
         NpCsWorkflowModule."Event Codeunit ID" := CurrCodeunitId();
         NpCsWorkflowModule.Insert(true);
-    end;
-
-    local procedure "--- Aux"()
-    begin
     end;
 
     local procedure CurrCodeunitId(): Integer

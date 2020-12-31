@@ -1,22 +1,10 @@
 codeunit 6151208 "NPR NpCs Store Open.Hours Mgt."
 {
-    // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
-    // NPR5.51/MHA /20190719  CASE 362443 Introduced Opening Hour Set
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         TempNpCsOpenHourCalendarEntry: Record "NPR NpCs Open. Hour Cal. Entry" temporary;
         Initialized: Boolean;
         StartDate: Date;
         EndDate: Date;
-
-    local procedure "--- Calc"()
-    begin
-    end;
 
     procedure CalcNextClosingDTDaysQty(SetCode: Code[20]; StartDT: DateTime; DaysQty: Integer) ClosingDT: DateTime
     var
@@ -108,10 +96,6 @@ codeunit 6151208 "NPR NpCs Store Open.Hours Mgt."
         exit(OpeningDT);
     end;
 
-    local procedure "--- Check/Find/Get"()
-    begin
-    end;
-
     local procedure IsOpeningHours(SetCode: Code[20]; CheckDT: DateTime): Boolean
     var
         CheckDate: Date;
@@ -195,18 +179,10 @@ codeunit 6151208 "NPR NpCs Store Open.Hours Mgt."
         exit(CreateDateTime(TempNpCsOpenHourCalendarEntry."Calendar Date", TempNpCsOpenHourCalendarEntry."End Time"));
     end;
 
-    local procedure "--- GUI"()
-    begin
-    end;
-
     procedure ShowOpeningHours(SetCode: Code[20])
     begin
         Initialize(SetCode, 0D, 0D);
         PAGE.Run(0, TempNpCsOpenHourCalendarEntry);
-    end;
-
-    local procedure "--- Setup"()
-    begin
     end;
 
     local procedure SetupOpeningHourEntries(SetCode: Code[20])

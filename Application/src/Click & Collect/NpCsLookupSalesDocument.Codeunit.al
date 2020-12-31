@@ -1,30 +1,26 @@
 codeunit 6151201 "NPR NpCs Lookup Sales Document"
 {
-    // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
-
     TableNo = "NPR Nc Import Entry";
 
     trigger OnRun()
     var
         NpCsDocument: Record "NPR NpCs Document";
         NpCsDocumentMapping: Record "NPR NpCs Document Mapping";
-        XmlDoc: DotNet "NPRNetXmlDocument";
-        XmlElement: DotNet NPRNetXmlElement;
+        Document: XmlDocument;
+        Node: XmlNode;
     begin
-        if not Rec.LoadXmlDoc(XmlDoc) then
+        if not Rec.LoadXmlDoc(Document) then
             Error(Text000);
 
-        NpXmlDomMgt.RemoveNameSpaces(XmlDoc);
-        if IsNull(XmlDoc.DocumentElement) then
+        if not Document.SelectSingleNode('//sales_document', Node) then
             Error(Text000);
 
-        XmlElement := XmlDoc.DocumentElement.SelectSingleNode('sales_document');
-        if FindNpCsDocuments(XmlElement, NpCsDocument) then begin
+        if FindNpCsDocuments(Node.AsXmlElement(), NpCsDocument) then begin
             PAGE.Run(PAGE::"NPR NpCs Coll. Store Orders", NpCsDocument);
             exit;
         end;
 
-        MarkOrderMappings(XmlElement, NpCsDocumentMapping);
+        MarkOrderMappings(Node.AsXmlElement(), NpCsDocumentMapping);
         NpCsDocumentMapping.MarkedOnly(true);
         if NpCsDocumentMapping.FindFirst then begin
             PAGE.Run(0, NpCsDocumentMapping);
@@ -38,23 +34,27 @@ codeunit 6151201 "NPR NpCs Lookup Sales Document"
         Text000: Label 'Invalid Xml data';
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
 
-    local procedure MarkOrderMappings(XmlElement: DotNet NPRNetXmlElement; var NpCsDocumentMapping: Record "NPR NpCs Document Mapping")
+    local procedure MarkOrderMappings(Element: XmlElement; var NpCsDocumentMapping: Record "NPR NpCs Document Mapping")
     var
-        XmlElement2: DotNet NPRNetXmlElement;
+        Element2: XmlElement;
+        Node: XmlNode;
+        NodeList: XmlNodeList;
         FromStore: Code[20];
         FromNo: Code[20];
     begin
-        if IsNull(XmlElement) then
+        if Element.IsEmpty() then
             exit;
 
-        FromStore := GetFromStoreCode(XmlElement);
+        FromStore := GetFromStoreCode(Element);
 
-        XmlElement2 := XmlElement.SelectSingleNode('sell_to_customer');
-        FromNo := CopyStr(NpXmlDomMgt.GetXmlAttributeText(XmlElement2, 'customer_no', true), 1, MaxStrLen(NpCsDocumentMapping."From No."));
+        Element.SelectSingleNode('sell_to_customer', Node);
+        Element2 := Node.AsXmlElement();
+        FromNo := CopyStr(NpXmlDomMgt.GetXmlAttributeText(Element2, 'customer_no', true), 1, MaxStrLen(NpCsDocumentMapping."From No."));
         MarkOrderMapping(NpCsDocumentMapping.Type::"Customer No.", FromStore, FromNo, NpCsDocumentMapping);
 
-        foreach XmlElement2 in XmlElement.SelectNodes('sales_lines/sales_line [type=2 and cross_reference_no!=""]') do begin
-            FromNo := NpXmlDomMgt.GetXmlText(XmlElement2, 'cross_reference_no', MaxStrLen(NpCsDocumentMapping."From No."), true);
+        Element.SelectNodes('sales_lines/sales_line [type=2 and cross_reference_no!=""]', NodeList);
+        foreach Node in NodeList do begin
+            FromNo := NpXmlDomMgt.GetXmlText(Element2, 'cross_reference_no', MaxStrLen(NpCsDocumentMapping."From No."), true);
             MarkOrderMapping(NpCsDocumentMapping.Type::"Item Cross Reference No.", FromStore, FromNo, NpCsDocumentMapping);
         end;
     end;
@@ -70,18 +70,18 @@ codeunit 6151201 "NPR NpCs Lookup Sales Document"
             NpCsDocumentMapping.Mark(true);
     end;
 
-    local procedure FindNpCsDocuments(XmlElement: DotNet NPRNetXmlElement; var NpCsDocument: Record "NPR NpCs Document"): Boolean
+    local procedure FindNpCsDocuments(Element: XmlElement; var NpCsDocument: Record "NPR NpCs Document"): Boolean
     var
         DocType: Integer;
         DocNo: Text;
         StoreCode: Code[20];
     begin
-        DocType := NpXmlDomMgt.GetAttributeInt(XmlElement, '', 'document_type', true);
-        DocNo := UpperCase(NpXmlDomMgt.GetAttributeText(XmlElement, '', 'document_no', MaxStrLen(NpCsDocument."From Document No."), true));
+        DocType := NpXmlDomMgt.GetAttributeInt(Element, '', 'document_type', true);
+        DocNo := UpperCase(NpXmlDomMgt.GetAttributeText(Element, '', 'document_no', MaxStrLen(NpCsDocument."From Document No."), true));
         if DocNo = '' then
             exit(false);
 
-        StoreCode := GetFromStoreCode(XmlElement);
+        StoreCode := GetFromStoreCode(Element);
         if StoreCode = '' then
             exit(false);
 
@@ -93,9 +93,9 @@ codeunit 6151201 "NPR NpCs Lookup Sales Document"
         exit(NpCsDocument.FindFirst);
     end;
 
-    local procedure GetFromStoreCode(XmlElement: DotNet NPRNetXmlElement) StoreCode: Code[20]
+    local procedure GetFromStoreCode(Element: XmlElement) StoreCode: Code[20]
     begin
-        StoreCode := UpperCase(NpXmlDomMgt.GetAttributeText(XmlElement, '/*/sales_document/from_store', 'store_code', MaxStrLen(StoreCode), true));
+        StoreCode := UpperCase(NpXmlDomMgt.GetAttributeText(Element, '/*/sales_document/from_store', 'store_code', MaxStrLen(StoreCode), true));
         exit(StoreCode);
     end;
 }

@@ -1,36 +1,24 @@
 codeunit 6151200 "NPR NpCs Imp. Sales Doc."
 {
-    // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
-    // NPR5.51/MHA /20190717  CASE 344264 Added import of <config_template> in UpsertCustomer() and changed <delivery_only> to <pick_from_warehouse>
-    // NPR5.51/MHA /20190719  CASE 342443 Added <opening_hour_set>
-    // NPR5.51/MHA /20190719  CASE 362197 Added functions InsertToStore(), GetToStoreCode()
-    // NPR5.51/MHA /20190821  CASE 364557 Added <post_on>
-    // NPR5.53/MHA /20191024  CASE 364714 Item Cross Reference should be considered when finding Item
-    // NPR5.53/MHA /20191024  CASE 374282 "Unit Price" should be validated after Quantity to avoid Price recalculation
-    // NPR5.53/MHA /20191118  CASE 377915 "External Order No." is no longer set as it is only used by M2 integration
-    // NPR5.53/MHA /20191129  CASE 378895 Added Comment Type in InsertSalesLine()
-    // NPR5.53/MHA /20191204  CASE 378216 Added import of <processing_status> if occurs
-    // NPR5.53/MHA /20191209  CASE 381524 Added Nav Publisher OnFindItemVariant()
-    // NPR5.55/MHA /20200701  CASE 411513 Sales Documents from another Local Store should be updated rather than re-inserted
-
     TableNo = "NPR Nc Import Entry";
 
     trigger OnRun()
     var
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
-        XmlDoc: DotNet "NPRNetXmlDocument";
-        XmlElement: DotNet NPRNetXmlElement;
+        Document: XmlDocument;
+        Element: XmlElement;
+        Element2: XmlElement;
     begin
-        if not Rec.LoadXmlDoc(XmlDoc) then
+        if not Rec.LoadXmlDoc(Document) then
             Error(Text000);
 
-        NpXmlDomMgt.RemoveNameSpaces(XmlDoc);
-        if IsNull(XmlDoc.DocumentElement) then
+        Document.GetRoot(Element);
+        if Element.IsEmpty() then
             Error(Text000);
 
-        NpXmlDomMgt.FindElement(XmlDoc.DocumentElement, 'sales_document', true, XmlElement);
+        NpXmlDomMgt.FindElement(Element, '//sales_document', true, Element2);
 
-        ImportSalesDoc(XmlElement);
+        ImportSalesDoc(Element2);
     end;
 
     var
@@ -40,7 +28,7 @@ codeunit 6151200 "NPR NpCs Imp. Sales Doc."
         Text005: Label 'Order received from Store %1';
         Text006: Label 'Order updated from Store %1 to Store %2';
 
-    local procedure ImportSalesDoc(XmlElement: DotNet NPRNetXmlElement)
+    local procedure ImportSalesDoc(Element: XmlElement)
     var
         Customer: Record Customer;
         NpCsStoreFrom: Record "NPR NpCs Store";
@@ -49,22 +37,23 @@ codeunit 6151200 "NPR NpCs Imp. Sales Doc."
         SalesHeader: Record "Sales Header";
         NpCsExpirationMgt: Codeunit "NPR NpCs Expiration Mgt.";
         NpCsWorkflowMgt: Codeunit "NPR NpCs Workflow Mgt.";
-        XmlElement2: DotNet NPRNetXmlElement;
+        Element2: XmlElement;
+        NodeList: XmlNodeList;
+        Node: XmlNode;
         LogMessage: Text;
     begin
-        if FindNpCsDocument(XmlElement, NpCsDocument) then
+        if FindNpCsDocument(Element, NpCsDocument) then
             exit;
 
         InitPOSSalesWorkflow();
 
-        //-NPR5.55 [411513]
-        UpsertFromStore(XmlElement, NpCsStoreFrom);
-        InsertToStore(XmlElement);
+        UpsertFromStore(Element, NpCsStoreFrom);
+        InsertToStore(Element);
 
         if NpCsStoreFrom."Local Store" then begin
-            FindSalesHeader(XmlElement, SalesHeader);
-            UpdateSalesHeader(XmlElement, SalesHeader);
-            InsertCollectDocument(XmlElement, SalesHeader, NpCsDocument);
+            FindSalesHeader(Element, SalesHeader);
+            UpdateSalesHeader(Element, SalesHeader);
+            InsertCollectDocument(Element, SalesHeader, NpCsDocument);
 
             LogMessage := StrSubstNo(Text006, NpCsDocument."From Store Code", NpCsDocument."To Store Code");
             NpCsWorkflowModule.Type := NpCsWorkflowModule.Type::"Send Order";
@@ -77,18 +66,16 @@ codeunit 6151200 "NPR NpCs Imp. Sales Doc."
 
             exit;
         end;
-        //+NPR5.55 [411513]
-        InsertDocumentMappings(XmlElement);
+        InsertDocumentMappings(Element);
         Commit;
 
-        UpsertCustomer(XmlElement, Customer);
-        //-NPR5.51 [344264]
-        InsertSalesHeader(XmlElement, Customer, SalesHeader);
-        InsertCollectDocument(XmlElement, SalesHeader, NpCsDocument);
-        //+NPR5.51 [344264]
+        UpsertCustomer(Element, Customer);
+        InsertSalesHeader(Element, Customer, SalesHeader);
+        InsertCollectDocument(Element, SalesHeader, NpCsDocument);
 
-        foreach XmlElement2 in XmlElement.SelectNodes('sales_lines/sales_line') do
-            InsertSalesLine(XmlElement2, SalesHeader);
+        Element.SelectNodes('//sales_lines/sales_line', NodeList);
+        foreach Node in NodeList do
+            InsertSalesLine(Node.AsXmlElement(), SalesHeader);
 
         LogMessage := StrSubstNo(Text005, NpCsDocument."From Store Code");
         NpCsWorkflowModule.Type := NpCsWorkflowModule.Type::"Send Order";
@@ -100,13 +87,13 @@ codeunit 6151200 "NPR NpCs Imp. Sales Doc."
             NpCsExpirationMgt.ScheduleUpdateExpirationStatus(NpCsDocument, NpCsDocument."Processing expires at");
     end;
 
-    local procedure UpsertFromStore(XmlElement: DotNet NPRNetXmlElement; var NpCsStore: Record "NPR NpCs Store")
+    local procedure UpsertFromStore(Element: XmlElement; var NpCsStore: Record "NPR NpCs Store")
     var
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
         StoreCode: Code[20];
         PrevRec: Text;
     begin
-        StoreCode := GetFromStoreCode(XmlElement);
+        StoreCode := GetFromStoreCode(Element);
 
         if not NpCsStore.Get(StoreCode) then begin
             NpCsStore.Init;
@@ -116,27 +103,24 @@ codeunit 6151200 "NPR NpCs Imp. Sales Doc."
 
         PrevRec := Format(NpCsStore);
 
-        //-NPR5.55 [411513]
-        NpCsStore.Validate("Company Name", NpXmlDomMgt.GetElementText(XmlElement, 'from_store/company_name', MaxStrLen(NpCsStore."Company Name"), true));
-        //+NPR5.55 [411513]
-        NpCsStore.Name := NpXmlDomMgt.GetElementText(XmlElement, 'from_store/name', MaxStrLen(NpCsStore.Name), true);
-        NpCsStore."Service Url" := NpXmlDomMgt.GetElementText(XmlElement, 'from_store/service_url', MaxStrLen(NpCsStore."Service Url"), true);
-        NpCsStore."Service Username" := NpXmlDomMgt.GetElementText(XmlElement, 'from_store/service_username', MaxStrLen(NpCsStore."Service Username"), true);
-        NpCsStore."Service Password" := NpXmlDomMgt.GetElementText(XmlElement, 'from_store/service_password', MaxStrLen(NpCsStore."Service Password"), true);
-        NpCsStore."E-mail" := NpXmlDomMgt.GetElementText(XmlElement, 'from_store/email', MaxStrLen(NpCsStore."E-mail"), true);
-        NpCsStore."Mobile Phone No." := NpXmlDomMgt.GetElementText(XmlElement, 'from_store/mobile_phone_no', MaxStrLen(NpCsStore."Mobile Phone No."), true);
+        NpCsStore.Validate("Company Name", NpXmlDomMgt.GetElementText(Element, 'from_store/company_name', MaxStrLen(NpCsStore."Company Name"), true));
+        NpCsStore.Name := NpXmlDomMgt.GetElementText(Element, 'from_store/name', MaxStrLen(NpCsStore.Name), true);
+        NpCsStore."Service Url" := NpXmlDomMgt.GetElementText(Element, 'from_store/service_url', MaxStrLen(NpCsStore."Service Url"), true);
+        NpCsStore."Service Username" := NpXmlDomMgt.GetElementText(Element, 'from_store/service_username', MaxStrLen(NpCsStore."Service Username"), true);
+        NpCsStore."Service Password" := NpXmlDomMgt.GetElementText(Element, 'from_store/service_password', MaxStrLen(NpCsStore."Service Password"), true);
+        NpCsStore."E-mail" := NpXmlDomMgt.GetElementText(Element, 'from_store/email', MaxStrLen(NpCsStore."E-mail"), true);
+        NpCsStore."Mobile Phone No." := NpXmlDomMgt.GetElementText(Element, 'from_store/mobile_phone_no', MaxStrLen(NpCsStore."Mobile Phone No."), true);
 
         if PrevRec <> Format(NpCsStore) then
             NpCsStore.Modify(true);
     end;
 
-    local procedure InsertToStore(XmlElement: DotNet NPRNetXmlElement)
+    local procedure InsertToStore(Element: XmlElement)
     var
         NpCsStore: Record "NPR NpCs Store";
         StoreCode: Code[20];
     begin
-        //-NPR5.51 [362197]
-        StoreCode := GetToStoreCode(XmlElement);
+        StoreCode := GetToStoreCode(Element);
         if StoreCode = '' then
             exit;
 
@@ -147,39 +131,40 @@ codeunit 6151200 "NPR NpCs Imp. Sales Doc."
             NpCsStore.Validate("Company Name", CompanyName);
             NpCsStore.Insert(true);
         end;
-        //+NPR5.51 [362197]
     end;
 
-    local procedure InsertDocumentMappings(XmlElement: DotNet NPRNetXmlElement)
+    local procedure InsertDocumentMappings(Element: XmlElement)
     var
         Customer: Record Customer;
         ItemVariant: Record "Item Variant";
         NpCsDocumentMapping: Record "NPR NpCs Document Mapping";
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
-        XmlElement2: DotNet NPRNetXmlElement;
+        NodeList: XmlNodeList;
+        Node: XmlNode;
         FromStore: Code[20];
         FromNo: Code[20];
         Description: Text;
         Description2: Text;
     begin
-        FromStore := GetFromStoreCode(XmlElement);
+        FromStore := GetFromStoreCode(Element);
 
-        FromNo := NpXmlDomMgt.GetAttributeCode(XmlElement, 'sell_to_customer', 'customer_no', MaxStrLen(NpCsDocumentMapping."From No."), true);
-        Description := NpXmlDomMgt.GetElementText(XmlElement, 'sell_to_customer/name', 0, true);
-        Description2 := NpXmlDomMgt.GetElementText(XmlElement, 'sell_to_customer/name_2', 0, false);
+        FromNo := NpXmlDomMgt.GetAttributeCode(Element, 'sell_to_customer', 'customer_no', MaxStrLen(NpCsDocumentMapping."From No."), true);
+        Description := NpXmlDomMgt.GetElementText(Element, 'sell_to_customer/name', 0, true);
+        Description2 := NpXmlDomMgt.GetElementText(Element, 'sell_to_customer/name_2', 0, false);
         InsertDocumentMapping(NpCsDocumentMapping.Type::"Customer No.", FromStore, FromNo, Description, Description2);
-        if FindCustomer(XmlElement, Customer) then begin
+        if FindCustomer(Element, Customer) then begin
             NpCsDocumentMapping.Get(NpCsDocumentMapping.Type::"Customer No.", FromStore, FromNo);
             NpCsDocumentMapping.Validate("To No.", Customer."No.");
             NpCsDocumentMapping.Modify(true);
         end;
 
-        foreach XmlElement2 in XmlElement.SelectNodes('sales_lines/sales_line[type=2 and cross_reference_no!=""]') do begin
-            FromNo := NpXmlDomMgt.GetElementCode(XmlElement2, 'cross_reference_no', MaxStrLen(NpCsDocumentMapping."From No."), true);
-            Description := NpXmlDomMgt.GetElementText(XmlElement2, 'description', 0, true);
-            Description2 := NpXmlDomMgt.GetElementText(XmlElement2, 'description_2', 0, false);
+        Element.SelectNodes('//sales_lines/sales_line[type=2 and cross_reference_no!=""]', NodeList);
+        foreach Node in NodeList do begin
+            FromNo := NpXmlDomMgt.GetElementCode(Node.AsXmlElement(), 'cross_reference_no', MaxStrLen(NpCsDocumentMapping."From No."), true);
+            Description := NpXmlDomMgt.GetElementText(Node.AsXmlElement(), 'description', 0, true);
+            Description2 := NpXmlDomMgt.GetElementText(Node.AsXmlElement(), 'description_2', 0, false);
             InsertDocumentMapping(NpCsDocumentMapping.Type::"Item Cross Reference No.", FromStore, FromNo, Description, Description2);
-            FindItemVariant(XmlElement2, ItemVariant);
+            FindItemVariant(Node.AsXmlElement(), ItemVariant);
         end;
     end;
 
@@ -210,7 +195,7 @@ codeunit 6151200 "NPR NpCs Imp. Sales Doc."
             NpCsDocumentMapping.Modify(true);
     end;
 
-    local procedure UpsertCustomer(XmlElement: DotNet NPRNetXmlElement; var Customer: Record Customer)
+    local procedure UpsertCustomer(Element: XmlElement; var Customer: Record Customer)
     var
         ConfigTemplateHeader: Record "Config. Template Header";
         NpCsDocumentMapping: Record "NPR NpCs Document Mapping";
@@ -222,14 +207,14 @@ codeunit 6151200 "NPR NpCs Imp. Sales Doc."
         ConfigTemplateCode: Code[10];
         PrevRec: Text;
     begin
-        if not FindCustomer(XmlElement, Customer) then begin
+        if not FindCustomer(Element, Customer) then begin
             Customer.Init;
             Customer."No." := '';
             Customer.Insert(true);
         end;
 
-        StoreCode := GetFromStoreCode(XmlElement);
-        CustNo := NpXmlDomMgt.GetAttributeCode(XmlElement, 'sell_to_customer', 'customer_no', MaxStrLen(NpCsDocumentMapping."From No."), true);
+        StoreCode := GetFromStoreCode(Element);
+        CustNo := NpXmlDomMgt.GetAttributeCode(Element, 'sell_to_customer', 'customer_no', MaxStrLen(NpCsDocumentMapping."From No."), true);
         NpCsDocumentMapping.Get(NpCsDocumentMapping.Type::"Customer No.", StoreCode, CustNo);
         if NpCsDocumentMapping."To No." <> Customer."No." then begin
             NpCsDocumentMapping.Validate("To No.", Customer."No.");
@@ -238,31 +223,29 @@ codeunit 6151200 "NPR NpCs Imp. Sales Doc."
 
         PrevRec := Format(Customer);
 
-        //-NPR5.51 [344264]
-        ConfigTemplateCode := NpXmlDomMgt.GetElementCode(XmlElement, 'sell_to_customer/config_template', MaxStrLen(ConfigTemplateHeader.Code), false);
+        ConfigTemplateCode := NpXmlDomMgt.GetElementCode(Element, 'sell_to_customer/config_template', MaxStrLen(ConfigTemplateHeader.Code), false);
         if (ConfigTemplateCode <> '') and ConfigTemplateHeader.Get(ConfigTemplateCode) then begin
             RecRef.GetTable(Customer);
             ConfigTemplateMgt.UpdateRecord(ConfigTemplateHeader, RecRef);
             RecRef.SetTable(Customer);
         end;
-        //+NPR5.51 [344264]
 
-        Customer.Validate(Name, NpXmlDomMgt.GetElementText(XmlElement, 'sell_to_customer/name', MaxStrLen(Customer.Name), true));
-        Customer."Name 2" := NpXmlDomMgt.GetElementText(XmlElement, 'sell_to_customer/name_2', MaxStrLen(Customer."Name 2"), true);
-        Customer.Address := NpXmlDomMgt.GetElementText(XmlElement, 'sell_to_customer/address', MaxStrLen(Customer.Address), true);
-        Customer."Address 2" := NpXmlDomMgt.GetElementText(XmlElement, 'sell_to_customer/address_2', MaxStrLen(Customer."Address 2"), true);
-        Customer."Post Code" := NpXmlDomMgt.GetElementCode(XmlElement, 'sell_to_customer/post_code', MaxStrLen(Customer."Post Code"), true);
-        Customer.City := NpXmlDomMgt.GetElementText(XmlElement, 'sell_to_customer/city', MaxStrLen(Customer.City), true);
-        Customer.Validate("Country/Region Code", NpXmlDomMgt.GetElementCode(XmlElement, 'sell_to_customer/country_code', MaxStrLen(Customer."Country/Region Code"), true));
-        Customer.Contact := NpXmlDomMgt.GetElementText(XmlElement, 'sell_to_customer/contact', MaxStrLen(Customer.Contact), true);
-        Customer."Phone No." := NpXmlDomMgt.GetElementText(XmlElement, 'sell_to_customer/phone_no', MaxStrLen(Customer."Phone No."), true);
-        Customer."E-Mail" := NpXmlDomMgt.GetElementText(XmlElement, 'sell_to_customer/email', MaxStrLen(Customer."E-Mail"), true);
+        Customer.Validate(Name, NpXmlDomMgt.GetElementText(Element, 'sell_to_customer/name', MaxStrLen(Customer.Name), true));
+        Customer."Name 2" := NpXmlDomMgt.GetElementText(Element, 'sell_to_customer/name_2', MaxStrLen(Customer."Name 2"), true);
+        Customer.Address := NpXmlDomMgt.GetElementText(Element, 'sell_to_customer/address', MaxStrLen(Customer.Address), true);
+        Customer."Address 2" := NpXmlDomMgt.GetElementText(Element, 'sell_to_customer/address_2', MaxStrLen(Customer."Address 2"), true);
+        Customer."Post Code" := NpXmlDomMgt.GetElementCode(Element, 'sell_to_customer/post_code', MaxStrLen(Customer."Post Code"), true);
+        Customer.City := NpXmlDomMgt.GetElementText(Element, 'sell_to_customer/city', MaxStrLen(Customer.City), true);
+        Customer.Validate("Country/Region Code", NpXmlDomMgt.GetElementCode(Element, 'sell_to_customer/country_code', MaxStrLen(Customer."Country/Region Code"), true));
+        Customer.Contact := NpXmlDomMgt.GetElementText(Element, 'sell_to_customer/contact', MaxStrLen(Customer.Contact), true);
+        Customer."Phone No." := NpXmlDomMgt.GetElementText(Element, 'sell_to_customer/phone_no', MaxStrLen(Customer."Phone No."), true);
+        Customer."E-Mail" := NpXmlDomMgt.GetElementText(Element, 'sell_to_customer/email', MaxStrLen(Customer."E-Mail"), true);
 
         if PrevRec <> Format(Customer) then
             Customer.Modify(true);
     end;
 
-    local procedure UpdateSalesHeader(XmlElement: DotNet NPRNetXmlElement; var SalesHeader: Record "Sales Header")
+    local procedure UpdateSalesHeader(Element: XmlElement; var SalesHeader: Record "Sales Header")
     var
         xSalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
@@ -271,11 +254,10 @@ codeunit 6151200 "NPR NpCs Imp. Sales Doc."
         ToStoreCode: Code[10];
         PrevRec: Text;
     begin
-        //-NPR5.55 [411513]
         xSalesHeader := SalesHeader;
 
         SalesHeader.SetHideValidationDialog(true);
-        ToStoreCode := GetToStoreCode(XmlElement);
+        ToStoreCode := GetToStoreCode(Element);
         NpCsStore.Get(ToStoreCode);
 
         if SalesHeader.Status = SalesHeader.Status::Released then
@@ -301,42 +283,38 @@ codeunit 6151200 "NPR NpCs Imp. Sales Doc."
 
         if xSalesHeader.Status = xSalesHeader.Status::Released then
             ReleaseSalesDoc.PerformManualRelease(SalesHeader);
-        //+NPR5.55 [411513]
     end;
 
-    local procedure InsertSalesHeader(XmlElement: DotNet NPRNetXmlElement; Customer: Record Customer; var SalesHeader: Record "Sales Header")
+    local procedure InsertSalesHeader(Element: XmlElement; Customer: Record Customer; var SalesHeader: Record "Sales Header")
     var
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
         DocNo: Text;
         BillToCustNo: Code[20];
     begin
-        DocNo := NpXmlDomMgt.GetAttributeCode(XmlElement, '', 'document_no', MaxStrLen(SalesHeader."No."), true);
+        DocNo := NpXmlDomMgt.GetAttributeCode(Element, '', 'document_no', MaxStrLen(SalesHeader."No."), true);
 
         SalesHeader.SetHideValidationDialog(true);
         SalesHeader.Init;
-        SalesHeader."Document Type" := Enum::"Sales Document Type".FromInteger(NpXmlDomMgt.GetElementInt(XmlElement, 'to_document_type', true));
+        SalesHeader."Document Type" := Enum::"Sales Document Type".FromInteger(NpXmlDomMgt.GetElementInt(Element, 'to_document_type', true));
         SalesHeader."No." := '';
-        //-NPR5.53 [377915]
-        //SalesHeader."External Order No." := COPYSTR(DocNo,1,MAXSTRLEN(SalesHeader."External Order No."));
-        //+NPR5.53 [377915]
         SalesHeader."External Document No." := CopyStr(DocNo, 1, MaxStrLen(SalesHeader."External Document No."));
         SalesHeader.Insert(true);
 
         SalesHeader.Validate("Sell-to Customer No.", Customer."No.");
-        SalesHeader.Validate("Posting Date", NpXmlDomMgt.GetElementDate(XmlElement, 'posting_date', true));
-        SalesHeader.Validate("Order Date", NpXmlDomMgt.GetElementDate(XmlElement, 'posting_date', true));
-        SalesHeader.Validate("Due Date", NpXmlDomMgt.GetElementDate(XmlElement, 'due_date', true));
-        BillToCustNo := NpXmlDomMgt.GetElementCode(XmlElement, 'bill_to_customer_no', MaxStrLen(SalesHeader."Bill-to Customer No."), false);
+        SalesHeader.Validate("Posting Date", NpXmlDomMgt.GetElementDate(Element, 'posting_date', true));
+        SalesHeader.Validate("Order Date", NpXmlDomMgt.GetElementDate(Element, 'posting_date', true));
+        SalesHeader.Validate("Due Date", NpXmlDomMgt.GetElementDate(Element, 'due_date', true));
+        BillToCustNo := NpXmlDomMgt.GetElementCode(Element, 'bill_to_customer_no', MaxStrLen(SalesHeader."Bill-to Customer No."), false);
         if BillToCustNo <> '' then
             SalesHeader.Validate("Bill-to Customer No.", BillToCustNo);
-        SalesHeader.Validate("Location Code", NpXmlDomMgt.GetElementCode(XmlElement, 'location_code', MaxStrLen(SalesHeader."Location Code"), true));
-        SalesHeader.Validate("Salesperson Code", NpXmlDomMgt.GetElementCode(XmlElement, 'salesperson_code', MaxStrLen(SalesHeader."Salesperson Code"), true));
-        SalesHeader.Validate("Payment Method Code", NpXmlDomMgt.GetElementCode(XmlElement, 'payment_method_code', MaxStrLen(SalesHeader."Payment Method Code"), true));
-        SalesHeader.Validate("Shipment Method Code", NpXmlDomMgt.GetElementCode(XmlElement, 'shipment_method_code', MaxStrLen(SalesHeader."Shipment Method Code"), true));
+        SalesHeader.Validate("Location Code", NpXmlDomMgt.GetElementCode(Element, 'location_code', MaxStrLen(SalesHeader."Location Code"), true));
+        SalesHeader.Validate("Salesperson Code", NpXmlDomMgt.GetElementCode(Element, 'salesperson_code', MaxStrLen(SalesHeader."Salesperson Code"), true));
+        SalesHeader.Validate("Payment Method Code", NpXmlDomMgt.GetElementCode(Element, 'payment_method_code', MaxStrLen(SalesHeader."Payment Method Code"), true));
+        SalesHeader.Validate("Shipment Method Code", NpXmlDomMgt.GetElementCode(Element, 'shipment_method_code', MaxStrLen(SalesHeader."Shipment Method Code"), true));
         SalesHeader.Modify(true);
     end;
 
-    local procedure InsertCollectDocument(XmlElement: DotNet NPRNetXmlElement; SalesHeader: Record "Sales Header"; var NpCsDocument: Record "NPR NpCs Document")
+    local procedure InsertCollectDocument(Element: XmlElement; SalesHeader: Record "Sales Header"; var NpCsDocument: Record "NPR NpCs Document")
     var
         NpCsExpirationMgt: Codeunit "NPR NpCs Expiration Mgt.";
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
@@ -348,78 +326,64 @@ codeunit 6151200 "NPR NpCs Imp. Sales Doc."
         OutStr: OutStream;
         ProcessingStatus: Integer;
     begin
-        //-NPR5.51 [344264]
-        DocType := NpXmlDomMgt.GetAttributeInt(XmlElement, '', 'document_type', true);
-        DocNo := NpXmlDomMgt.GetAttributeCode(XmlElement, '', 'document_no', MaxStrLen(SalesHeader."No."), true);
-        StoreCode := GetFromStoreCode(XmlElement);
+        DocType := NpXmlDomMgt.GetAttributeInt(Element, '', 'document_type', true);
+        DocNo := NpXmlDomMgt.GetAttributeCode(Element, '', 'document_no', MaxStrLen(SalesHeader."No."), true);
+        StoreCode := GetFromStoreCode(Element);
 
-        Callback := GetCallback(XmlElement);
+        Callback := GetCallback(Element);
         NpCsDocument.Init;
         NpCsDocument.Type := NpCsDocument.Type::"Collect in Store";
         NpCsDocument."Document Type" := SalesHeader."Document Type";
         NpCsDocument."Document No." := SalesHeader."No.";
-        //-NPR5.51 [364557]
         NpCsDocument.Validate("Document No.");
-        //+NPR5.51 [364557]
-        NpCsDocument."Reference No." := NpXmlDomMgt.GetElementCode(XmlElement, 'reference_no', MaxStrLen(NpCsDocument."Reference No."), true);
+        NpCsDocument."Reference No." := NpXmlDomMgt.GetElementCode(Element, 'reference_no', MaxStrLen(NpCsDocument."Reference No."), true);
         NpCsDocument."From Document Type" := DocType;
         NpCsDocument."From Document No." := CopyStr(DocNo, 1, MaxStrLen(NpCsDocument."From Document No."));
         NpCsDocument."From Store Code" := StoreCode;
-        //-NPR5.51 [362197]
-        NpCsDocument."To Store Code" := GetToStoreCode(XmlElement);
-        //+NPR5.51 [362197]
+        NpCsDocument."To Store Code" := GetToStoreCode(Element);
         NpCsDocument."Next Workflow Step" := NpCsDocument."Next Workflow Step"::"Order Status";
         NpCsDocument."Processing Status" := NpCsDocument."Processing Status"::Pending;
-        //-NPR5.53 [378216]
-        if Evaluate(ProcessingStatus, NpXmlDomMgt.GetElementText(XmlElement, 'processing_status', 0, false), 9) then begin
+        if Evaluate(ProcessingStatus, NpXmlDomMgt.GetElementText(Element, 'processing_status', 0, false), 9) then begin
             if ProcessingStatus in [NpCsDocument."Processing Status"::" ", NpCsDocument."Processing Status"::Pending] then
                 NpCsDocument."Processing Status" := ProcessingStatus;
         end;
-        //+NPR5.53 [378216]
         NpCsDocument."Processing updated at" := CurrentDateTime;
-        NpCsDocument."Customer No." := NpXmlDomMgt.GetAttributeCode(XmlElement, 'sell_to_customer', 'customer_no', MaxStrLen(NpCsDocument."Customer No."), false);
-        NpCsDocument."Customer E-mail" := NpXmlDomMgt.GetElementText(XmlElement, 'sell_to_customer/email', MaxStrLen(NpCsDocument."Customer E-mail"), false);
-        NpCsDocument."Customer Phone No." := NpXmlDomMgt.GetElementText(XmlElement, 'sell_to_customer/phone_no', MaxStrLen(NpCsDocument."Customer Phone No."), false);
-        NpCsDocument."Send Notification from Store" := NpXmlDomMgt.GetElementBoolean(XmlElement, 'notification/send_notification_from_store', false);
-        NpCsDocument."Notify Customer via E-mail" := NpXmlDomMgt.GetElementBoolean(XmlElement, 'notification/notify_customer_via_email', false);
-        NpCsDocument."E-mail Template (Pending)" := NpXmlDomMgt.GetElementCode(XmlElement, 'notification/email_template_pending', MaxStrLen(NpCsDocument."E-mail Template (Pending)"), false);
-        NpCsDocument."E-mail Template (Confirmed)" := NpXmlDomMgt.GetElementCode(XmlElement, 'notification/email_template_confirmed', MaxStrLen(NpCsDocument."E-mail Template (Confirmed)"), false);
-        NpCsDocument."E-mail Template (Rejected)" := NpXmlDomMgt.GetElementCode(XmlElement, 'notification/email_template_rejected', MaxStrLen(NpCsDocument."E-mail Template (Rejected)"), false);
-        NpCsDocument."E-mail Template (Expired)" := NpXmlDomMgt.GetElementCode(XmlElement, 'notification/email_template_expired', MaxStrLen(NpCsDocument."E-mail Template (Expired)"), false);
-        NpCsDocument."Notify Customer via Sms" := NpXmlDomMgt.GetElementBoolean(XmlElement, 'notification/notify_customer_via_sms', false);
-        NpCsDocument."Sms Template (Pending)" := NpXmlDomMgt.GetElementCode(XmlElement, 'notification/sms_template_pending', MaxStrLen(NpCsDocument."Sms Template (Pending)"), false);
-        NpCsDocument."Sms Template (Confirmed)" := NpXmlDomMgt.GetElementCode(XmlElement, 'notification/sms_template_confirmed', MaxStrLen(NpCsDocument."Sms Template (Confirmed)"), false);
-        NpCsDocument."Sms Template (Rejected)" := NpXmlDomMgt.GetElementCode(XmlElement, 'notification/sms_template_rejected', MaxStrLen(NpCsDocument."Sms Template (Rejected)"), false);
-        NpCsDocument."Sms Template (Expired)" := NpXmlDomMgt.GetElementCode(XmlElement, 'notification/sms_template_expired', MaxStrLen(NpCsDocument."Sms Template (Expired)"), false);
-        //-NPR5.51 [362443]
-        NpCsDocument."Opening Hour Set" := NpXmlDomMgt.GetElementCode(XmlElement, 'notification/opening_hour_set', MaxStrLen(NpCsDocument."Opening Hour Set"), false);
-        //+NPR5.51 [362443]
-        NpCsDocument."Processing Expiry Duration" := NpXmlDomMgt.GetElementDuration(XmlElement, 'notification/processing_expiry_duration', false);
-        NpCsDocument."Delivery Expiry Days (Qty.)" := NpXmlDomMgt.GetElementInt(XmlElement, 'notification/delivery_expiry_days_qty', false);
-        NpCsDocument."Archive on Delivery" := NpXmlDomMgt.GetElementBoolean(XmlElement, 'archive_on_delivery', false);
-        NpCsDocument."Store Stock" := NpXmlDomMgt.GetElementBoolean(XmlElement, 'store_stock', false);
-        //-NPR5.51 [364557]
-        NpCsDocument."Post on" := NpXmlDomMgt.GetElementInt(XmlElement, 'post_on', false);
-        //+NPR5.51 [364557]
-        NpCsDocument."Bill via" := NpXmlDomMgt.GetElementInt(XmlElement, 'bill_via', false);
-        //-NPR5.51 [364557]
-        NpCsDocument."Processing Print Template" := NpXmlDomMgt.GetElementCode(XmlElement, 'processing_print_template', MaxStrLen(NpCsDocument."Processing Print Template"), false);
-        //+NPR5.51 [364557]
-        NpCsDocument."Delivery Print Template (POS)" := NpXmlDomMgt.GetElementCode(XmlElement, 'delivery_print_template_pos', MaxStrLen(NpCsDocument."Delivery Print Template (POS)"), false);
-        NpCsDocument."Delivery Print Template (S.)" := NpXmlDomMgt.GetElementCode(XmlElement, 'delivery_print_template_sales_doc', MaxStrLen(NpCsDocument."Delivery Print Template (S.)"), false);
-        NpCsDocument."Salesperson Code" := NpXmlDomMgt.GetElementCode(XmlElement, 'salesperson_code', MaxStrLen(NpCsDocument."Salesperson Code"), false);
-        NpCsDocument."Prepaid Amount" := NpXmlDomMgt.GetElementDec(XmlElement, 'prepaid_amount', false);
-        NpCsDocument."Prepayment Account No." := NpXmlDomMgt.GetElementCode(XmlElement, 'prepayment_account_no', MaxStrLen(NpCsDocument."Prepayment Account No."), NpCsDocument."Prepaid Amount" <> 0);
+        NpCsDocument."Customer No." := NpXmlDomMgt.GetAttributeCode(Element, 'sell_to_customer', 'customer_no', MaxStrLen(NpCsDocument."Customer No."), false);
+        NpCsDocument."Customer E-mail" := NpXmlDomMgt.GetElementText(Element, 'sell_to_customer/email', MaxStrLen(NpCsDocument."Customer E-mail"), false);
+        NpCsDocument."Customer Phone No." := NpXmlDomMgt.GetElementText(Element, 'sell_to_customer/phone_no', MaxStrLen(NpCsDocument."Customer Phone No."), false);
+        NpCsDocument."Send Notification from Store" := NpXmlDomMgt.GetElementBoolean(Element, 'notification/send_notification_from_store', false);
+        NpCsDocument."Notify Customer via E-mail" := NpXmlDomMgt.GetElementBoolean(Element, 'notification/notify_customer_via_email', false);
+        NpCsDocument."E-mail Template (Pending)" := NpXmlDomMgt.GetElementCode(Element, 'notification/email_template_pending', MaxStrLen(NpCsDocument."E-mail Template (Pending)"), false);
+        NpCsDocument."E-mail Template (Confirmed)" := NpXmlDomMgt.GetElementCode(Element, 'notification/email_template_confirmed', MaxStrLen(NpCsDocument."E-mail Template (Confirmed)"), false);
+        NpCsDocument."E-mail Template (Rejected)" := NpXmlDomMgt.GetElementCode(Element, 'notification/email_template_rejected', MaxStrLen(NpCsDocument."E-mail Template (Rejected)"), false);
+        NpCsDocument."E-mail Template (Expired)" := NpXmlDomMgt.GetElementCode(Element, 'notification/email_template_expired', MaxStrLen(NpCsDocument."E-mail Template (Expired)"), false);
+        NpCsDocument."Notify Customer via Sms" := NpXmlDomMgt.GetElementBoolean(Element, 'notification/notify_customer_via_sms', false);
+        NpCsDocument."Sms Template (Pending)" := NpXmlDomMgt.GetElementCode(Element, 'notification/sms_template_pending', MaxStrLen(NpCsDocument."Sms Template (Pending)"), false);
+        NpCsDocument."Sms Template (Confirmed)" := NpXmlDomMgt.GetElementCode(Element, 'notification/sms_template_confirmed', MaxStrLen(NpCsDocument."Sms Template (Confirmed)"), false);
+        NpCsDocument."Sms Template (Rejected)" := NpXmlDomMgt.GetElementCode(Element, 'notification/sms_template_rejected', MaxStrLen(NpCsDocument."Sms Template (Rejected)"), false);
+        NpCsDocument."Sms Template (Expired)" := NpXmlDomMgt.GetElementCode(Element, 'notification/sms_template_expired', MaxStrLen(NpCsDocument."Sms Template (Expired)"), false);
+        NpCsDocument."Opening Hour Set" := NpXmlDomMgt.GetElementCode(Element, 'notification/opening_hour_set', MaxStrLen(NpCsDocument."Opening Hour Set"), false);
+        NpCsDocument."Processing Expiry Duration" := NpXmlDomMgt.GetElementDuration(Element, 'notification/processing_expiry_duration', false);
+        NpCsDocument."Delivery Expiry Days (Qty.)" := NpXmlDomMgt.GetElementInt(Element, 'notification/delivery_expiry_days_qty', false);
+        NpCsDocument."Archive on Delivery" := NpXmlDomMgt.GetElementBoolean(Element, 'archive_on_delivery', false);
+        NpCsDocument."Store Stock" := NpXmlDomMgt.GetElementBoolean(Element, 'store_stock', false);
+        NpCsDocument."Post on" := NpXmlDomMgt.GetElementInt(Element, 'post_on', false);
+        NpCsDocument."Bill via" := NpXmlDomMgt.GetElementInt(Element, 'bill_via', false);
+        NpCsDocument."Processing Print Template" := NpXmlDomMgt.GetElementCode(Element, 'processing_print_template', MaxStrLen(NpCsDocument."Processing Print Template"), false);
+        NpCsDocument."Delivery Print Template (POS)" := NpXmlDomMgt.GetElementCode(Element, 'delivery_print_template_pos', MaxStrLen(NpCsDocument."Delivery Print Template (POS)"), false);
+        NpCsDocument."Delivery Print Template (S.)" := NpXmlDomMgt.GetElementCode(Element, 'delivery_print_template_sales_doc', MaxStrLen(NpCsDocument."Delivery Print Template (S.)"), false);
+        NpCsDocument."Salesperson Code" := NpXmlDomMgt.GetElementCode(Element, 'salesperson_code', MaxStrLen(NpCsDocument."Salesperson Code"), false);
+        NpCsDocument."Prepaid Amount" := NpXmlDomMgt.GetElementDec(Element, 'prepaid_amount', false);
+        NpCsDocument."Prepayment Account No." := NpXmlDomMgt.GetElementCode(Element, 'prepayment_account_no', MaxStrLen(NpCsDocument."Prepayment Account No."), NpCsDocument."Prepaid Amount" <> 0);
         if Callback <> '' then begin
             NpCsDocument."Callback Data".CreateOutStream(OutStr, TEXTENCODING::UTF8);
             OutStr.WriteText(Callback);
         end;
         NpCsExpirationMgt.SetExpiresAt(NpCsDocument);
         NpCsDocument.Insert(true);
-        //+NPR5.51 [344264]
     end;
 
-    local procedure InsertSalesLine(XmlElement: DotNet NPRNetXmlElement; SalesHeader: Record "Sales Header")
+    local procedure InsertSalesLine(Element: XmlElement; SalesHeader: Record "Sales Header")
     var
         ItemVariant: Record "Item Variant";
         SalesLine: Record "Sales Line";
@@ -429,39 +393,35 @@ codeunit 6151200 "NPR NpCs Imp. Sales Doc."
         SalesLine.Init;
         SalesLine."Document Type" := SalesHeader."Document Type";
         SalesLine."Document No." := SalesHeader."No.";
-        SalesLine."Line No." := NpXmlDomMgt.GetAttributeInt(XmlElement, '', 'line_no', true);
+        SalesLine."Line No." := NpXmlDomMgt.GetAttributeInt(Element, '', 'line_no', true);
         SalesLine.Insert(true);
 
-        SalesLine.Validate(Type, NpXmlDomMgt.GetElementInt(XmlElement, 'type', true));
+        SalesLine.Validate(Type, NpXmlDomMgt.GetElementInt(Element, 'type', true));
         case SalesLine.Type of
             SalesLine.Type::Item:
                 begin
-                    FindItemVariant(XmlElement, ItemVariant);
+                    FindItemVariant(Element, ItemVariant);
                     if ItemVariant."Item No." = '' then
-                        Error(Text004, NpXmlDomMgt.GetElementText(XmlElement, 'no', 0, true), SalesLine."Line No.");
+                        Error(Text004, NpXmlDomMgt.GetElementText(Element, 'no', 0, true), SalesLine."Line No.");
 
                     SalesLine.Validate("No.", ItemVariant."Item No.");
                     if ItemVariant.Code <> '' then
                         SalesLine.Validate("Variant Code", ItemVariant.Code);
-                    SalesLine.Validate("Unit of Measure Code", NpXmlDomMgt.GetElementCode(XmlElement, 'unit_of_measure_code', MaxStrLen(SalesLine."Unit of Measure Code"), true));
-                    SalesLine.Description := NpXmlDomMgt.GetElementText(XmlElement, 'description', MaxStrLen(SalesLine.Description), true);
-                    SalesLine."Description 2" := NpXmlDomMgt.GetElementText(XmlElement, 'description_2', MaxStrLen(SalesLine."Description 2"), false);
-                    //-NPR5.53 [374282]
-                    SalesLine.Validate(Quantity, NpXmlDomMgt.GetElementDec(XmlElement, 'quantity', true));
-                    SalesLine.Validate("Unit Price", NpXmlDomMgt.GetElementDec(XmlElement, 'unit_price', true));
-                    //+NPR5.53 [374282]
-                    SalesLine.Validate("VAT %", NpXmlDomMgt.GetElementDec(XmlElement, 'vat_pct', true));
-                    SalesLine.Validate("Amount Including VAT", NpXmlDomMgt.GetElementDec(XmlElement, 'line_amount', true));
+                    SalesLine.Validate("Unit of Measure Code", NpXmlDomMgt.GetElementCode(Element, 'unit_of_measure_code', MaxStrLen(SalesLine."Unit of Measure Code"), true));
+                    SalesLine.Description := NpXmlDomMgt.GetElementText(Element, 'description', MaxStrLen(SalesLine.Description), true);
+                    SalesLine."Description 2" := NpXmlDomMgt.GetElementText(Element, 'description_2', MaxStrLen(SalesLine."Description 2"), false);
+                    SalesLine.Validate(Quantity, NpXmlDomMgt.GetElementDec(Element, 'quantity', true));
+                    SalesLine.Validate("Unit Price", NpXmlDomMgt.GetElementDec(Element, 'unit_price', true));
+                    SalesLine.Validate("VAT %", NpXmlDomMgt.GetElementDec(Element, 'vat_pct', true));
+                    SalesLine.Validate("Amount Including VAT", NpXmlDomMgt.GetElementDec(Element, 'line_amount', true));
                     SalesLine.Modify(true);
                 end;
-            //-NPR5.53 [378895]
             SalesLine.Type::" ":
                 begin
-                    SalesLine.Description := NpXmlDomMgt.GetElementText(XmlElement, 'description', MaxStrLen(SalesLine.Description), true);
-                    SalesLine."Description 2" := NpXmlDomMgt.GetElementText(XmlElement, 'description_2', MaxStrLen(SalesLine."Description 2"), false);
+                    SalesLine.Description := NpXmlDomMgt.GetElementText(Element, 'description', MaxStrLen(SalesLine.Description), true);
+                    SalesLine."Description 2" := NpXmlDomMgt.GetElementText(Element, 'description_2', MaxStrLen(SalesLine."Description 2"), false);
                     SalesLine.Modify(true);
                 end;
-        //+NPR5.53 [378895]
         end;
         SalesLine.Modify(true);
     end;
@@ -485,7 +445,7 @@ codeunit 6151200 "NPR NpCs Imp. Sales Doc."
     begin
     end;
 
-    local procedure FindCustomer(XmlElement: DotNet NPRNetXmlElement; var Customer: Record Customer): Boolean
+    local procedure FindCustomer(Element: XmlElement; var Customer: Record Customer): Boolean
     var
         NpCsWorkflow: Record "NPR NpCs Workflow";
         NpCsDocumentMapping: Record "NPR NpCs Document Mapping";
@@ -496,11 +456,11 @@ codeunit 6151200 "NPR NpCs Imp. Sales Doc."
         CustNo: Code[20];
         CustomerMapping: Integer;
     begin
-        StoreCode := GetFromStoreCode(XmlElement);
+        StoreCode := GetFromStoreCode(Element);
         if StoreCode = '' then
             exit(false);
 
-        CustNo := NpXmlDomMgt.GetAttributeCode(XmlElement, 'sell_to_customer', 'customer_no', MaxStrLen(NpCsDocumentMapping."From No."), true);
+        CustNo := NpXmlDomMgt.GetAttributeCode(Element, 'sell_to_customer', 'customer_no', MaxStrLen(NpCsDocumentMapping."From No."), true);
         if CustNo = '' then
             exit(false);
 
@@ -510,7 +470,7 @@ codeunit 6151200 "NPR NpCs Imp. Sales Doc."
         if Customer.Get(NpCsDocumentMapping."To No.") and (Customer."No." <> '') then
             exit(true);
 
-        CustomerMapping := NpXmlDomMgt.GetAttributeInt(XmlElement, 'sell_to_customer', 'customer_mapping', false);
+        CustomerMapping := NpXmlDomMgt.GetAttributeInt(Element, 'sell_to_customer', 'customer_mapping', false);
 
         Clear(Customer);
         case CustomerMapping of
@@ -520,39 +480,39 @@ codeunit 6151200 "NPR NpCs Imp. Sales Doc."
                 end;
             NpCsWorkflow."Customer Mapping"::"E-mail":
                 begin
-                    Email := NpXmlDomMgt.GetElementText(XmlElement, 'sell_to_customer/email', MaxStrLen(Customer."E-Mail"), false);
+                    Email := NpXmlDomMgt.GetElementText(Element, 'sell_to_customer/email', MaxStrLen(Customer."E-Mail"), false);
                     Customer.SetFilter("E-Mail", '%1&<>%2', Email, '');
                     exit(Customer.FindFirst);
                 end;
             NpCsWorkflow."Customer Mapping"::"Phone No.":
                 begin
-                    PhoneNo := NpXmlDomMgt.GetElementText(XmlElement, 'sell_to_customer/phone_no', MaxStrLen(Customer."Phone No."), false);
+                    PhoneNo := NpXmlDomMgt.GetElementText(Element, 'sell_to_customer/phone_no', MaxStrLen(Customer."Phone No."), false);
                     Customer.SetFilter("Phone No.", '%1&<>%2', PhoneNo, '');
                     exit(Customer.FindFirst);
                 end;
             NpCsWorkflow."Customer Mapping"::"E-mail AND Phone No.":
                 begin
-                    Email := NpXmlDomMgt.GetElementText(XmlElement, 'sell_to_customer/email', MaxStrLen(Customer."E-Mail"), false);
-                    PhoneNo := NpXmlDomMgt.GetElementText(XmlElement, 'sell_to_customer/phone_no', MaxStrLen(Customer."Phone No."), false);
+                    Email := NpXmlDomMgt.GetElementText(Element, 'sell_to_customer/email', MaxStrLen(Customer."E-Mail"), false);
+                    PhoneNo := NpXmlDomMgt.GetElementText(Element, 'sell_to_customer/phone_no', MaxStrLen(Customer."Phone No."), false);
                     Customer.SetFilter("E-Mail", '%1&<>%2', Email, '');
                     Customer.SetFilter("Phone No.", '%1&<>%2', PhoneNo, '');
                     exit(Customer.FindFirst);
                 end;
             NpCsWorkflow."Customer Mapping"::"E-mail OR Phone No.":
                 begin
-                    Email := NpXmlDomMgt.GetElementText(XmlElement, 'sell_to_customer/email', MaxStrLen(Customer."E-Mail"), false);
+                    Email := NpXmlDomMgt.GetElementText(Element, 'sell_to_customer/email', MaxStrLen(Customer."E-Mail"), false);
                     Customer.SetFilter("E-Mail", '%1&<>%2', Email, '');
                     if Customer.FindFirst then
                         exit(true);
 
-                    PhoneNo := NpXmlDomMgt.GetElementText(XmlElement, 'sell_to_customer/phone_no', MaxStrLen(Customer."Phone No."), false);
+                    PhoneNo := NpXmlDomMgt.GetElementText(Element, 'sell_to_customer/phone_no', MaxStrLen(Customer."Phone No."), false);
                     Clear(Customer);
                     Customer.SetFilter("Phone No.", '%1&<>%2', PhoneNo, '');
                     exit(Customer.FindFirst);
                 end;
             NpCsWorkflow."Customer Mapping"::"Fixed Customer No.", NpCsWorkflow."Customer Mapping"::"Customer No. from Source":
                 begin
-                    CustNo := NpXmlDomMgt.GetAttributeCode(XmlElement, 'sell_to_customer', 'customer_no', MaxStrLen(Customer."No."), true);
+                    CustNo := NpXmlDomMgt.GetAttributeCode(Element, 'sell_to_customer', 'customer_no', MaxStrLen(Customer."No."), true);
                     Customer.Get(CustNo);
                     exit(true);
                 end;
@@ -561,16 +521,16 @@ codeunit 6151200 "NPR NpCs Imp. Sales Doc."
         exit(false);
     end;
 
-    local procedure FindNpCsDocument(XmlElement: DotNet NPRNetXmlElement; var NpCsDocument: Record "NPR NpCs Document"): Boolean
+    local procedure FindNpCsDocument(Element: XmlElement; var NpCsDocument: Record "NPR NpCs Document"): Boolean
     var
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
         DocType: Integer;
         DocNo: Text;
         StoreCode: Code[20];
     begin
-        DocType := NpXmlDomMgt.GetAttributeInt(XmlElement, '', 'document_type', true);
-        DocNo := NpXmlDomMgt.GetAttributeCode(XmlElement, '', 'document_no', MaxStrLen(NpCsDocument."Document No."), true);
-        StoreCode := GetFromStoreCode(XmlElement);
+        DocType := NpXmlDomMgt.GetAttributeInt(Element, '', 'document_type', true);
+        DocNo := NpXmlDomMgt.GetAttributeCode(Element, '', 'document_no', MaxStrLen(NpCsDocument."Document No."), true);
+        StoreCode := GetFromStoreCode(Element);
 
         Clear(NpCsDocument);
         NpCsDocument.SetRange(Type, NpCsDocument.Type::"Collect in Store");
@@ -580,22 +540,20 @@ codeunit 6151200 "NPR NpCs Imp. Sales Doc."
         exit(NpCsDocument.FindFirst);
     end;
 
-    local procedure FindSalesHeader(XmlElement: DotNet NPRNetXmlElement; var SalesHeader: Record "Sales Header")
+    local procedure FindSalesHeader(Element: XmlElement; var SalesHeader: Record "Sales Header")
     var
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
         DocType: Integer;
         DocNo: Text;
         StoreCode: Code[20];
     begin
-        //-NPR5.55 [411513]
         Clear(SalesHeader);
-        DocType := NpXmlDomMgt.GetAttributeInt(XmlElement, '', 'document_type', true);
-        DocNo := NpXmlDomMgt.GetAttributeCode(XmlElement, '', 'document_no', MaxStrLen(SalesHeader."No."), true);
+        DocType := NpXmlDomMgt.GetAttributeInt(Element, '', 'document_type', true);
+        DocNo := NpXmlDomMgt.GetAttributeCode(Element, '', 'document_no', MaxStrLen(SalesHeader."No."), true);
         SalesHeader.Get(DocType, DocNo);
-        //+NPR5.55 [411513]
     end;
 
-    local procedure FindItemVariant(XmlElement: DotNet NPRNetXmlElement; var ItemVariant: Record "Item Variant")
+    local procedure FindItemVariant(Element: XmlElement; var ItemVariant: Record "Item Variant")
     var
         Item: Record Item;
         ItemCrossRef: Record "Item Cross Reference";
@@ -608,16 +566,14 @@ codeunit 6151200 "NPR NpCs Imp. Sales Doc."
         Found: Boolean;
     begin
         Clear(ItemVariant);
-        //-NPR5.53 [381524]
-        OnFindItemVariant(XmlElement, ItemVariant, Found);
+        OnFindItemVariant(Element, ItemVariant, Found);
         if Found then
             exit;
 
         Clear(ItemVariant);
-        //+NPR5.53 [381524]
 
-        StoreCode := GetFromStoreCode(XmlElement);
-        FromCrossRefNo := NpXmlDomMgt.GetElementCode(XmlElement, 'cross_reference_no', MaxStrLen(ItemVariant."Item No."), false);
+        StoreCode := GetFromStoreCode(Element);
+        FromCrossRefNo := NpXmlDomMgt.GetElementCode(Element, 'cross_reference_no', MaxStrLen(ItemVariant."Item No."), false);
         if NpCsDocumentMapping.Get(NpCsDocumentMapping.Type::"Item Cross Reference No.", StoreCode, FromCrossRefNo) and (NpCsDocumentMapping."To No." <> '') then begin
             ItemCrossRef.SetRange("Cross-Reference No.", NpCsDocumentMapping."To No.");
             ItemCrossRef.SetRange("Discontinue Bar Code", false);
@@ -631,11 +587,11 @@ codeunit 6151200 "NPR NpCs Imp. Sales Doc."
             end;
         end;
 
-        FromItemNo := NpXmlDomMgt.GetElementCode(XmlElement, 'no', MaxStrLen(ItemVariant."Item No."), true);
+        FromItemNo := NpXmlDomMgt.GetElementCode(Element, 'no', MaxStrLen(ItemVariant."Item No."), true);
         if FromItemNo = '' then
-            Error(Text002, '<no>', XmlElement.Name);
+            Error(Text002, '<no>', Element.Name);
 
-        FromVariantCode := NpXmlDomMgt.GetElementCode(XmlElement, 'variant_code', MaxStrLen(ItemVariant.Code), false);
+        FromVariantCode := NpXmlDomMgt.GetElementCode(Element, 'variant_code', MaxStrLen(ItemVariant.Code), false);
         if (FromVariantCode <> '') and ItemVariant.Get(FromItemNo, FromVariantCode) then begin
             if NpCsDocumentMapping."From No." <> '' then begin
                 NpCsDocumentMapping.Validate("To No.", GetCrossRefNo(ItemVariant));
@@ -658,7 +614,6 @@ codeunit 6151200 "NPR NpCs Imp. Sales Doc."
             exit;
         end;
 
-        //-NPR5.53 [364714]
         Clear(ItemCrossRef);
         ItemCrossRef.SetRange("Cross-Reference No.", FromItemNo);
         ItemCrossRef.SetRange("Discontinue Bar Code", false);
@@ -676,14 +631,11 @@ codeunit 6151200 "NPR NpCs Imp. Sales Doc."
 
             exit;
         end;
-        //+NPR5.53 [364714]
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnFindItemVariant(XmlElement: DotNet NPRNetXmlElement; var ItemVariant: Record "Item Variant"; var Found: Boolean)
+    local procedure OnFindItemVariant(Element: XmlElement; var ItemVariant: Record "Item Variant"; var Found: Boolean)
     begin
-        //-NPR5.53 [381524]
-        //+NPR5.53 [381524]
     end;
 
     local procedure GetCrossRefNo(ItemVariant: Record "Item Variant") CrossRefNo: Code[20]
@@ -703,45 +655,40 @@ codeunit 6151200 "NPR NpCs Imp. Sales Doc."
         exit('');
     end;
 
-    local procedure GetFromStoreCode(XmlElement: DotNet NPRNetXmlElement) StoreCode: Code[20]
+    local procedure GetFromStoreCode(Element: XmlElement) StoreCode: Code[20]
     var
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
     begin
-        if IsNull(XmlElement) then
+        if Element.IsEmpty() then
             exit('');
 
-        StoreCode := NpXmlDomMgt.GetAttributeCode(XmlElement, '/*/sales_document/from_store', 'store_code', MaxStrLen(StoreCode), true);
+        StoreCode := NpXmlDomMgt.GetAttributeCode(Element, '/*/sales_document/from_store', 'store_code', MaxStrLen(StoreCode), true);
         exit(StoreCode);
     end;
 
-    local procedure GetToStoreCode(XmlElement: DotNet NPRNetXmlElement) StoreCode: Code[20]
+    local procedure GetToStoreCode(Element: XmlElement) StoreCode: Code[20]
     var
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
     begin
-        //-NPR5.51 [362197]
-        if IsNull(XmlElement) then
+        if Element.IsEmpty() then
             exit('');
 
-        StoreCode := NpXmlDomMgt.GetAttributeCode(XmlElement, '/*/sales_document/to_store', 'store_code', MaxStrLen(StoreCode), false);
+        StoreCode := NpXmlDomMgt.GetAttributeCode(Element, '/*/sales_document/to_store', 'store_code', MaxStrLen(StoreCode), false);
         exit(StoreCode);
-        //+NPR5.51 [362197]
     end;
 
-    local procedure GetCallback(XmlElement: DotNet NPRNetXmlElement) Callback: Text
+    local procedure GetCallback(Element: XmlElement) Callback: Text
     var
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
-        Encoding: DotNet NPRNetEncoding;
-        Convert: DotNet NPRNetConvert;
+        Base64Convert: Codeunit "Base64 Convert";
     begin
-        Callback := NpXmlDomMgt.GetElementText(XmlElement, '/*/sales_document/from_store/callback', 0, false);
+        Callback := NpXmlDomMgt.GetElementText(Element, '/*/sales_document/from_store/callback', 0, false);
         if Callback = '' then
             exit('');
 
-        case LowerCase(NpXmlDomMgt.GetAttributeCode(XmlElement, '/*/sales_document/from_store/callback', 'encoding', 0, false)) of
+        case LowerCase(NpXmlDomMgt.GetAttributeCode(Element, '/*/sales_document/from_store/callback', 'encoding', 0, false)) of
             'base64':
-                begin
-                    Callback := Encoding.UTF8.GetString(Convert.FromBase64String(Callback));
-                end;
+                Callback := Base64Convert.FromBase64(Callback, TextEncoding::UTF8);
         end;
 
         exit(Callback);

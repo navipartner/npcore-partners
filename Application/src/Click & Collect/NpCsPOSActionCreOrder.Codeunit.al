@@ -1,9 +1,5 @@
 codeunit 6151206 "NPR NpCs POSAction Cre. Order"
 {
-    trigger OnRun()
-    begin
-    end;
-
     var
         Text000: Label 'Create Collect in Store Order';
         Text001: Label 'All Items might not be in stock in %1\\Do you still wish to continue?';
@@ -491,7 +487,6 @@ codeunit 6151206 "NPR NpCs POSAction Cre. Order"
         NpCsWorkflowMgt.ScheduleRunWorkflow(NpCsDocument);
 
         Commit;
-        //PrepaymentPct := GetPrepaymentPct(JSON);
         if PrepaymentPct > 0 then begin
             //End sale, auto start new sale, and insert prepayment line.
             POSSession.GetSale(POSSale);

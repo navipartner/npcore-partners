@@ -1,13 +1,5 @@
 codeunit 6151199 "NPR NpCs Collect WS"
 {
-    // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
-    // NPR5.53/MHA /20191129  CASE 378216 Added functions UpdateProcessingStatus(), FindNpCsDocument(), TestProcessingStatusChange()
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         Text000: Label 'Import Collect in Store Sales Document';
         Text001: Label 'Collect %1 %2 not found';
@@ -48,9 +40,7 @@ codeunit 6151199 "NPR NpCs Collect WS"
     procedure GetCollectDocuments(var collect_documents: XMLport "NPR NpCs Collect Documents")
     begin
         collect_documents.Import;
-        //-NPR5.53 [378216]
         collect_documents.RefreshSourceTable();
-        //+NPR5.53 [378216]
     end;
 
     procedure GetCollectStores(var stores: XMLport "NPR NpCs Collect Store")
@@ -65,9 +55,7 @@ codeunit 6151199 "NPR NpCs Collect WS"
         NpCsWorkflowMgt: Codeunit "NPR NpCs Workflow Mgt.";
     begin
         collect_documents.Import;
-        //-NPR5.53 [378216]
         collect_documents.RefreshSourceTable();
-        //+NPR5.53 [378216]
         collect_documents.GetSourceTable(TempNpCsDocument);
         if TempNpCsDocument.FindSet then
             repeat
@@ -97,7 +85,6 @@ codeunit 6151199 "NPR NpCs Collect WS"
         TempNpCsDocument: Record "NPR NpCs Document" temporary;
         NpCsCollectMgt: Codeunit "NPR NpCs Collect Mgt.";
     begin
-        //-NPR5.53 [378216]
         collect_documents.Import;
         collect_documents.GetSourceTable(TempNpCsDocument);
         if not TempNpCsDocument.FindSet then
@@ -134,7 +121,6 @@ codeunit 6151199 "NPR NpCs Collect WS"
         until TempNpCsDocument.Next = 0;
 
         collect_documents.RefreshSourceTable();
-        //+NPR5.53 [378216]
     end;
 
     local procedure "--- Aux"()
@@ -144,7 +130,6 @@ codeunit 6151199 "NPR NpCs Collect WS"
     [TryFunction]
     local procedure FindNpCsDocument(TempNpCsDocument: Record "NPR NpCs Document" temporary; var NpCsDocument: Record "NPR NpCs Document")
     begin
-        //-NPR5.53 [378216]
         NpCsDocument.SetRange(Type, TempNpCsDocument.Type);
         case TempNpCsDocument.Type of
             TempNpCsDocument.Type::"Send to Store":
@@ -160,12 +145,10 @@ codeunit 6151199 "NPR NpCs Collect WS"
         end;
         NpCsDocument.SetRange("From Store Code", TempNpCsDocument."From Store Code");
         NpCsDocument.FindFirst;
-        //+NPR5.53 [378216]
     end;
 
     local procedure TestProcessingStatusChange(NpCsDocumentFrom: Record "NPR NpCs Document"; NpCsDocumentTo: Record "NPR NpCs Document")
     begin
-        //-NPR5.53 [378216]
         if NpCsDocumentFrom."Processing Status" = NpCsDocumentTo."Processing Status" then
             exit;
 
@@ -201,7 +184,6 @@ codeunit 6151199 "NPR NpCs Collect WS"
 
         Error(Text002, NpCsDocumentFrom."Processing Status", NpCsDocumentTo."Processing Status",
           NpCsDocumentTo."From Document Type", NpCsDocumentTo."From Document No.");
-        //+NPR5.53 [378216]
     end;
 
     local procedure InitSalesDocImportType(var NcImportType: Record "NPR Nc Import Type")

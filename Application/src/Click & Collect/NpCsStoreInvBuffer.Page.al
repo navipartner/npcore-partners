@@ -1,7 +1,5 @@
 page 6151210 "NPR NpCs Store Inv. Buffer"
 {
-    // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
-
     Caption = 'Collect Store Inventory List';
     Editable = false;
     PageType = ListPart;
@@ -49,10 +47,6 @@ page 6151210 "NPR NpCs Store Inv. Buffer"
                 }
             }
         }
-    }
-
-    actions
-    {
     }
 
     procedure SetSourceTable(var NpCsStoreInventoryBuffer: Record "NPR NpCs Store Inv. Buffer" temporary)

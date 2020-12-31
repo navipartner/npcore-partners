@@ -1,7 +1,5 @@
 xmlport 6151197 "NPR NpCs Collect Store"
 {
-    // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
-
     Caption = 'Collect Store';
     DefaultNamespace = 'urn:microsoft-dynamics-nav/xmlports/collect_store';
     Encoding = UTF8;
@@ -72,18 +70,6 @@ xmlport 6151197 "NPR NpCs Collect Store"
                     SetContactInfo();
                 end;
             }
-        }
-    }
-
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
         }
     }
 
