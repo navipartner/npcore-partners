@@ -1,12 +1,5 @@
 xmlport 6151195 "NPR NpCs Sales Document"
 {
-    // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
-    // NPR5.51/MHA /20190717  CASE 344264 Added <config_template> under <sell_to_customer> and changed <delivery_only> to <from_store_stock>
-    // NPR5.51/MHA /20190719  CASE 342443 Added <opening_hour_set>
-    // NPR5.51/MHA /20190719  CASE 362197 Added <to_store>
-    // NPR5.51/MHA /20190821  CASE 364557 Added <post_on>
-    // NPR5.53/MHA /20191204  CASE 378216 Added <processing_status>
-
     Caption = 'Collect Sales Document';
     DefaultNamespace = 'urn:microsoft-dynamics-nav/xmlports/collect_in_store_sales_document';
     Encoding = UTF8;

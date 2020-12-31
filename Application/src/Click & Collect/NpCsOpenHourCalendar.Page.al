@@ -1,7 +1,5 @@
 page 6151218 "NPR NpCs Open. Hour Calendar"
 {
-    // NPR5.51/MHA /20190719  CASE 362443 Object created - Collect Store Opening Hour Sets
-
     Caption = 'Collect Store Opening Hour Calendar';
     PageType = List;
     UsageCategory = Administration;
@@ -31,10 +29,6 @@ page 6151218 "NPR NpCs Open. Hour Calendar"
                 }
             }
         }
-    }
-
-    actions
-    {
     }
 }
 

@@ -1,7 +1,5 @@
 xmlport 6151199 "NPR NpCs Local Inventory"
 {
-    // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
-
     Caption = 'Collect Local Inventory';
     DefaultNamespace = 'urn:microsoft-dynamics-nav/xmlports/collect_local_inventory';
     Encoding = UTF8;
@@ -51,18 +49,6 @@ xmlport 6151199 "NPR NpCs Local Inventory"
                     end;
                 }
             }
-        }
-    }
-
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
         }
     }
 

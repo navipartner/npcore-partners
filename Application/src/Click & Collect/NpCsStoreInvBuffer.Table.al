@@ -1,8 +1,5 @@
 table 6151205 "NPR NpCs Store Inv. Buffer"
 {
-    // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
-    // NPR5.52/MHA /20191002  CASE 369476 Added DecimalPlaces 0:5 to field 10 Quantity
-
     Caption = 'Collect Store Inventory Buffer';
     DataClassification = CustomerContent;
 
@@ -54,10 +51,6 @@ table 6151205 "NPR NpCs Store Inv. Buffer"
         key(Key1; "Store Code", Sku)
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 

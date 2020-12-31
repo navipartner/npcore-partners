@@ -1,10 +1,5 @@
 page 6151202 "NPR NpCs Store Card Workflows"
 {
-    // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
-    // NPR5.51/MHA /20190822  CASE 364557 Added field 300 "Processing Print Template"
-    // NPR5.54/MHA /20200130  CASE 378956 Added Store Notification Fields
-    // NPR5.55/MHA /20200526  CASE 406591 Added function SetStoreCodeVisible() to enable Page to be used from Magento Setup
-
     Caption = 'Store Workflow Relations';
     DelayedInsert = true;
     PageType = ListPart;
@@ -116,10 +111,6 @@ page 6151202 "NPR NpCs Store Card Workflows"
         }
     }
 
-    actions
-    {
-    }
-
     var
         StoreCodeVisible: Boolean;
 
@@ -127,9 +118,7 @@ page 6151202 "NPR NpCs Store Card Workflows"
     var
         i: Integer;
     begin
-        //-NPR5.55 [406591]
         StoreCodeVisible := NewStoreCodeVisible;
-        //+NPR5.55 [406591]
     end;
 }
 

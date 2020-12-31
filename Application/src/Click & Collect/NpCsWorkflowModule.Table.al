@@ -1,7 +1,5 @@
 table 6151197 "NPR NpCs Workflow Module"
 {
-    // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
-
     Caption = 'Collect Workflow Module';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR NpCs Workflow Modules";
@@ -35,7 +33,7 @@ table 6151197 "NPR NpCs Workflow Module"
         }
         field(55; "Event Codeunit Name"; Text[30])
         {
-            CalcFormula = Lookup (AllObj."Object Name" WHERE("Object Type" = CONST(Codeunit),
+            CalcFormula = Lookup(AllObj."Object Name" WHERE("Object Type" = CONST(Codeunit),
                                                              "Object ID" = FIELD("Event Codeunit ID")));
             Caption = 'Event Codeunit Name';
             Editable = false;
@@ -48,10 +46,6 @@ table 6151197 "NPR NpCs Workflow Module"
         key(Key1; Type, "Code")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 

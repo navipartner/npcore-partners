@@ -1,7 +1,5 @@
 page 6151203 "NPR NpCs Document Mapping"
 {
-    // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
-
     Caption = 'Collect Document Mapping';
     DelayedInsert = true;
     PageType = List;
@@ -48,10 +46,6 @@ page 6151203 "NPR NpCs Document Mapping"
                 }
             }
         }
-    }
-
-    actions
-    {
     }
 }
 

@@ -1,7 +1,5 @@
 table 6151199 "NPR NpCs Document Log Entry"
 {
-    // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
-
     Caption = 'Collect Document Log Entry';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR NpCs Document Log Entries";
@@ -84,10 +82,6 @@ table 6151199 "NPR NpCs Document Log Entry"
         }
     }
 
-    fieldgroups
-    {
-    }
-
     trigger OnInsert()
     begin
         if "Log Date" = 0DT then
@@ -98,8 +92,8 @@ table 6151199 "NPR NpCs Document Log Entry"
 
     procedure GetErrorMessage() FullLogMessage: Text
     var
-        StreamReader: DotNet NPRNetStreamReader;
         InStr: InStream;
+        TextBuffer: Text;
     begin
         FullLogMessage := '';
         if not "Error Message".HasValue then
@@ -107,8 +101,10 @@ table 6151199 "NPR NpCs Document Log Entry"
 
         CalcFields("Error Message");
         "Error Message".CreateInStream(InStr, TEXTENCODING::UTF8);
-        StreamReader := StreamReader.StreamReader(InStr);
-        FullLogMessage := StreamReader.ReadToEnd();
+        while not InStr.EOS do begin
+            InStr.Read(TextBuffer);
+            FullLogMessage += TextBuffer;
+        end;
         exit(FullLogMessage);
     end;
 }

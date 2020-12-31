@@ -221,16 +221,22 @@ codeunit 6151196 "NPR NpCs Workflow Mgt."
         NpCsStore: Record "NPR NpCs Store";
         NpCsArchDocument: Record "NPR NpCs Arch. Document";
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
-        Credential: DotNet NPRNetNetworkCredential;
-        HttpWebRequest: DotNet NPRNetHttpWebRequest;
-        HttpWebResponse: DotNet NPRNetHttpWebResponse;
-        XmlDoc: DotNet "NPRNetXmlDocument";
-        XmlElement: DotNet NPRNetXmlElement;
-        XmlElement2: DotNet NPRNetXmlElement;
-        WebException: DotNet NPRNetWebException;
+        Document: XmlDocument;
+        NodeList: XmlNodeList;
+        Node: XmlNode;
+        Element: XmlElement;
+        AttributeCollection: XmlAttributeCollection;
+        Attribute: XmlAttribute;
+        Client: HttpClient;
+        RequestMessage: HttpRequestMessage;
+        Content: HttpContent;
+        Headers: HttpHeaders;
+        Response: HttpResponseMessage;
         InStr: InStream;
         ExceptionMessage: Text;
         ReqBody: Text;
+        ContentType: Text;
+        Method: Text;
     begin
         if not NpCsStore.Get(NpCsDocument."From Store Code") then
             exit;
@@ -263,27 +269,36 @@ codeunit 6151196 "NPR NpCs Workflow Mgt."
             exit;
         NpCsDocument.CalcFields("Callback Data");
         NpCsDocument."Callback Data".CreateInStream(InStr, TEXTENCODING::UTF8);
-        XmlDoc := XmlDoc.XmlDocument;
-        XmlDoc.Load(InStr);
-        XmlElement := XmlDoc.DocumentElement;
+        XmlDocument.ReadFrom(InStr, Document);
+        Document.GetRoot(Element);
 
-        HttpWebRequest := HttpWebRequest.CreateHttp(NpCsStore."Service Url");
-        HttpWebRequest.ContentType := NpXmlDomMgt.GetElementText(XmlElement, 'content_type', 0, true);
-        foreach XmlElement2 in XmlElement.SelectNodes('headers/header') do
-            HttpWebRequest.Headers.Add(XmlElement2.GetAttribute('name'), XmlElement2.InnerText);
+        ReqBody := NpXmlDomMgt.GetElementText(Element, '//request_body', 0, true);
+        ContentType := NpXmlDomMgt.GetElementText(Element, '//content_type', 0, true);
+        Method := NpXmlDomMgt.GetElementText(Element, '//method', 0, true);
 
-        HttpWebRequest.Method := NpXmlDomMgt.GetElementText(XmlElement, 'method', 0, true);
-        HttpWebRequest.UseDefaultCredentials(false);
-        Credential := Credential.NetworkCredential(NpCsStore."Service Username", NpCsStore."Service Password");
-        HttpWebRequest.Credentials(Credential);
+        Content.WriteFrom(ReqBody);
+        Content.GetHeaders(Headers);
+        Headers.Remove('Content-Type');
+        Headers.Add('Content-Type', ContentType);
 
-        ReqBody := NpXmlDomMgt.GetElementText(XmlElement, 'request_body', 0, true);
+        Document.SelectNodes('//headers/header', NodeList);
+        foreach Node in NodeList do begin
+            AttributeCollection := Node.AsXmlElement.Attributes();
+            AttributeCollection.Get('name', Attribute);
+            Headers.Add(Attribute.Value, Node.AsXmlElement.InnerText);
+        end;
 
-        if not NpXmlDomMgt.SendWebRequestText(ReqBody, HttpWebRequest, HttpWebResponse, WebException) then begin
-            ExceptionMessage := NpXmlDomMgt.GetWebExceptionMessage(WebException);
-            if NpXmlDomMgt.TryLoadXml(ExceptionMessage, XmlDoc) then begin
-                if NpXmlDomMgt.FindNode(XmlDoc.DocumentElement, '//faultstring', XmlElement) then
-                    ExceptionMessage := XmlElement.InnerText;
+        RequestMessage.Content(Content);
+        RequestMessage.Method(Method);
+        RequestMessage.SetRequestUri(NpCsStore."Service Url");
+        Client.UseWindowsAuthentication(NpCsStore."Service Username", NpCsStore."Service Password");
+        Client.Send(RequestMessage, Response);
+
+        if not Response.IsSuccessStatusCode then begin
+            ExceptionMessage := Response.ReasonPhrase;
+            if XmlDocument.ReadFrom(ExceptionMessage, Document) then begin
+                if NpXmlDomMgt.FindNode(Document.AsXmlNode(), '//faultstring', Node) then
+                    ExceptionMessage := Node.AsXmlElement.InnerText();
             end;
 
             Error(CopyStr(ExceptionMessage, 1, 1020));
