@@ -1,13 +1,5 @@
 codeunit 6184861 "NPR Azure Storage API Mgt."
 {
-    // NPR5.54/ALST/20200212 CASE 383718 Object created
-    // NPR5.55/ALST/20200609 CASE 387570 added incoming document boolean parameter
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         StorageDescriptionCaption: Label 'Azure blob storage';
         UploadDescriptionCaption: Label 'Upload a file to Azure Storage from server';
@@ -185,7 +177,6 @@ codeunit 6184861 "NPR Azure Storage API Mgt."
             Description := DataExchTypeDescCaption;
             if Insert then;
 
-            //-NPR5.55 [387570]
             Init;
             "Storage Type" := StorageType();
             "Operation Code" := DownloadCaption;
@@ -193,7 +184,6 @@ codeunit 6184861 "NPR Azure Storage API Mgt."
             "Parameter Name" := IncomingDocumentCaption;
             Description := IncDocumentDescCaption;
             if Insert then;
-            //+NPR5.55 [387570]
 
             Init;
             "Storage Type" := StorageType();
@@ -244,9 +234,13 @@ codeunit 6184861 "NPR Azure Storage API Mgt."
         LF: Char;
         HMAC: Option HMACMD5,HMACSHA1,HMACSHA256,HMACSHA384,HMACSHA512;
         OutStr: OutStream;
-        HttpWebRequest: DotNet NPRNetHttpWebRequest;
-        XMLNodeList: DotNet NPRNetXmlNodeList;
-        XMLNode: DotNet NPRNetXmlNode;
+        WebRequest: HttpRequestMessage;
+        WebResponse: HttpResponseMessage;
+        WebClient: HttpClient;
+        XMLNodeList: XmlNodeList;
+        XMLNode: XmlNode;
+        ResponseXmlDoc: XmlDocument;
+        ResponseRootNode: XmlNode;
     begin
         if StorageAccountName = '' then
             Error(MissingStorageAccNameErr);
@@ -265,33 +259,35 @@ codeunit 6184861 "NPR Azure Storage API Mgt."
         if StoregeServiceVersion = '' then
             StoregeServiceVersion := '2019-02-02';
 
-        HttpWebRequest := HttpWebRequest.Create('https://' + StorageAccountName + '.blob.core.windows.net/' + StorageConatainerName + UriParameter);
-        HttpWebRequest.Timeout := AzureStorageAPISetup.Timeout;
-        HttpWebRequest.KeepAlive := false;
-        HttpWebRequest.Method := 'GET';
+        WebClient.Timeout := AzureStorageAPISetup.Timeout;
+        WebRequest.SetRequestUri('https://' + StorageAccountName + '.blob.core.windows.net/' + StorageConatainerName + UriParameter);
+        WebRequest.Method := 'GET';
+        RequestManagement.RemoveRequestHeader(WebRequest, 'Connection');
+        RequestManagement.RemoveRequestHeader(WebRequest, 'Keep-Alive');
 
-        StringToSign := HttpWebRequest.Method +
-                        LineFeed + LineFeed + LineFeed +
-                        LineFeed + LineFeed +
-                        LineFeed + LineFeed + LineFeed + LineFeed + LineFeed + LineFeed + LineFeed +
-                        'x-ms-date:' + UTCNow +
-                        LineFeed +
-                        'x-ms-version:' + StoregeServiceVersion +
-                        LineFeed +
-                        '/' + StorageAccountName + '/' + StorageConatainerName +
-                        LineFeed +
-                        'comp:list' +
-                        RestType;
+        StringToSign := WebRequest.Method +
+            LineFeed + LineFeed + LineFeed +
+            LineFeed + LineFeed +
+            LineFeed + LineFeed + LineFeed + LineFeed + LineFeed + LineFeed + LineFeed +
+            'x-ms-date:' + UTCNow +
+            LineFeed +
+            'x-ms-version:' + StoregeServiceVersion +
+            LineFeed +
+            '/' + StorageAccountName + '/' + StorageConatainerName +
+            LineFeed +
+            'comp:list' +
+            RestType;
 
         RequestManagement.HMACCryptography(StringToSign, AzureStorageAPISetup.GetAccessKey(), HMAC::HMACSHA256);
 
-        HttpWebRequest.Headers.Add('Authorization', StrSubstNo('%1 %2:%3', 'SharedKey', StorageAccountName, StringToSign));
-        HttpWebRequest.Headers.Add('x-ms-date', UTCNow);
-        HttpWebRequest.Headers.Add('x-ms-version', StoregeServiceVersion);
+        RequestManagement.AddOrReplaceRequestHeader(WebRequest, 'Authorization', StrSubstNo('%1 %2:%3', 'SharedKey', StorageAccountName, StringToSign));
+        RequestManagement.AddOrReplaceRequestHeader(WebRequest, 'x-ms-date', UTCNow);
+        RequestManagement.AddOrReplaceRequestHeader(WebRequest, 'x-ms-version', StoregeServiceVersion);
 
-        if not RequestManagement.HandleHttpRequest(HttpWebRequest, Response, Silent) then
+        if not WebClient.Send(WebRequest, WebResponse) then
             exit;
 
+        WebResponse.Content().ReadAs(Response);
         AppendResponse(Response, ResponseXMLStack);
 
         if StorageConatainerName = '' then begin
@@ -309,7 +305,8 @@ codeunit 6184861 "NPR Azure Storage API Mgt."
             end;
 
             foreach XMLNode in XMLNodeList do
-                ListAzureStorage(AzureStorageAPISetup."Account Name", XMLNode.InnerText, '', FullRefresh, DBInsert, Silent, ResponseXMLStack);
+                ListAzureStorage(AzureStorageAPISetup."Account Name", XMLNode.AsXmlElement().InnerText,
+                    '', FullRefresh, DBInsert, Silent, ResponseXMLStack);
 
             exit(true);
         end;
@@ -320,7 +317,27 @@ codeunit 6184861 "NPR Azure Storage API Mgt."
         exit(true);
     end;
 
-    procedure SearchAzureStorage(var Paths: DotNet "NPRNetXmlDocument"; StorageAccountName: Text; StorageServiceName: Text; StoregeApiVersion: Text; IndexName: Text; FolderOrFileName: Text; Silent: Boolean): Boolean
+    [Obsolete('Use native Business Central objects.')]
+    procedure SearchAzureStorage(var Paths: DotNet "NPRNetXmlDocument"; StorageAccountName: Text;
+        StorageServiceName: Text; StoregeApiVersion: Text; IndexName: Text;
+        FolderOrFileName: Text; Silent: Boolean): Boolean
+    var
+        XmlDoc: XmlDocument;
+        Result: Boolean;
+        XmlText: Text;
+    begin
+        XmlDocument.ReadFrom(Paths.OuterXml, XmlDoc);
+        SearchAzureStorage(XmlDoc, StorageAccountName, StorageServiceName, StoregeApiVersion,
+            IndexName, FolderOrFileName, Silent);
+        XmlDoc.WriteTo(XmlText);
+
+        Paths := Paths.XmlDocument();
+        Paths.LoadXml(XmlText);
+
+        exit(Result);
+    end;
+
+    procedure SearchAzureStorage(var Paths: XmlDocument; StorageAccountName: Text; StorageServiceName: Text; StoregeApiVersion: Text; IndexName: Text; FolderOrFileName: Text; Silent: Boolean): Boolean
     var
         AzureStorageAPISetup: Record "NPR Azure Storage API Setup";
         TempBlob: Codeunit "Temp Blob";
@@ -328,13 +345,16 @@ codeunit 6184861 "NPR Azure Storage API Mgt."
         Response: Text;
         Arguments: Text;
         OutStr: OutStream;
-        HttpWebRequest: DotNet NPRNetHttpWebRequest;
-        Convert: DotNet NPRNetConvert;
-        MemoryStream: DotNet NPRNetMemoryStream;
-        StreamReader: DotNet NPRNetStreamReader;
+        ArgumentsObject: JsonObject;
+        WebRequest: HttpRequestMessage;
+        WebResponse: HttpResponseMessage;
+        WebClient: HttpClient;
+        InStrm: InStream;
+        ResponseJson: JsonObject;
+        ResponseText: Text;
+        Base64Convert: Codeunit "Base64 Convert";
     begin
         //FolderOrFileName has to be the full name of the file or folder, not a partial string
-
         case '' of
             StorageServiceName:
                 Error(MissingStorageAccServiceErr);
@@ -342,31 +362,35 @@ codeunit 6184861 "NPR Azure Storage API Mgt."
                 Error(MissingIndexErr);
         end;
 
-        with RequestManagement do begin
-            JsonAdd(Arguments, 'search', '*', false);
-            JsonAdd(Arguments, 'filter', 'search.ismatch(''' + FolderOrFileName + ''')', false);
-            JsonAdd(Arguments, 'select', 'path', false);
-        end;
+        ArgumentsObject.Add('search', '*');
+        ArgumentsObject.Add('filter', 'search.ismatch(''' + FolderOrFileName + ''')');
+        ArgumentsObject.Add('select', 'path');
+        ArgumentsObject.WriteTo(Arguments);
 
         AzureStorageAPISetup.Get(StorageAccountName);
         if StoregeApiVersion = '' then
             StoregeApiVersion := '2019-05-06';
 
-        HttpWebRequest := HttpWebRequest.Create('https://' + StorageServiceName + '.search.windows.net/indexes/' + IndexName + '/docs/search?api-version=' + StoregeApiVersion);
-        HttpWebRequest.Timeout := AzureStorageAPISetup.Timeout;
-        HttpWebRequest.Method := 'POST';
-        HttpWebRequest.ContentType('application/json');
-        HttpWebRequest.Headers.Add('api-key', AzureStorageAPISetup.GetAdminKey());
+        WebRequest.SetRequestUri('https://' + StorageServiceName + '.search.windows.net/indexes/' + IndexName + '/docs/search?api-version=' + StoregeApiVersion);
+        WebRequest.Method := 'POST';
+        RequestManagement.AddOrReplaceContentHeader(WebRequest, 'Content-Type', 'application/json');
+        RequestManagement.AddOrReplaceRequestHeader(WebRequest, 'api-key', AzureStorageAPISetup.GetAdminKey());
 
         TempBlob.CreateOutStream(OutStr);
         OutStr.Write(Arguments);
 
-        RequestManagement.StreamToHttpRequest(HttpWebRequest, TempBlob, StrLen(Arguments));
+        CopyStream(OutStr, InStrm);
+        WebRequest.Content.WriteFrom(InStrm);
 
-        if not RequestManagement.HandleHttpRequest(HttpWebRequest, Response, Silent) then
+        if not WebClient.Send(WebRequest, WebResponse) then
             exit;
 
-        exit(RequestManagement.GetXMLFromJsonArray(StreamReader.StreamReader(MemoryStream.MemoryStream(Convert.FromBase64String(Response))).ReadToEnd(), Paths, 'value', '$..path', '', ''));
+        WebResponse.Content.ReadAs(ResponseText);
+        ResponseJson.ReadFrom(ResponseText);
+
+        exit(RequestManagement.GetXMLFromJsonArray(
+            Base64Convert.FromBase64(ResponseText),
+            Paths, 'value', '$..path', '', ''));
     end;
 
     procedure UploadToAzureStorage(var TempBlob: Codeunit "Temp Blob"; StorageAccountName: Text; StoregeServiceVersion: Text; StorageConatainerName: Text; FileName: Text; MIMEType: Text; Silent: Boolean): Boolean
@@ -380,8 +404,11 @@ codeunit 6184861 "NPR Azure Storage API Mgt."
         Response: Text;
         LF: Char;
         HMAC: Option HMACMD5,HMACSHA1,HMACSHA256,HMACSHA384,HMACSHA512;
-        HttpWebRequest: DotNet NPRNetHttpWebRequest;
-        Uri: DotNet NPRNetUri;
+        WebRequest: HttpRequestMessage;
+        WebResponse: HttpResponseMessage;
+        WebClient: HttpClient;
+        InStrm: InStream;
+        TypeHelper: Codeunit "Type Helper";
     begin
         if MIMEType = '' then
             if RequestManagement.TryGetMIMEType(FileName, MIMEType) then;
@@ -397,7 +424,7 @@ codeunit 6184861 "NPR Azure Storage API Mgt."
                 Error(MissingMIMETypeErr);
         end;
 
-        FileName := Uri.EscapeUriString(FileName);
+        FileName := TypeHelper.UriEscapeDataString(FileName);
 
         if StoregeServiceVersion = '' then
             StoregeServiceVersion := '2019-02-02';
@@ -407,39 +434,41 @@ codeunit 6184861 "NPR Azure Storage API Mgt."
         LineFeed := Format(LF);
         UTCNow := RequestManagement.UTCDateTimeNowText('R');
 
-        HttpWebRequest := HttpWebRequest.Create('https://' + StorageAccountName + '.blob.core.windows.net/' + StorageConatainerName + '/' + FileName);
-        HttpWebRequest.Timeout := AzureStorageAPISetup.Timeout;
-        HttpWebRequest.Method := 'PUT';
-        HttpWebRequest.ContentType := MIMEType;
-        HttpWebRequest.ContentLength := RequestManagement.BlobLenght(TempBlob);
+        WebRequest.SetRequestUri('https://' + StorageAccountName + '.blob.core.windows.net/' + StorageConatainerName + '/' + FileName);
+        WebRequest.Method := 'PUT';
 
-        StringToSign := HttpWebRequest.Method +
-                        LineFeed + LineFeed + LineFeed +
-                        Format(HttpWebRequest.ContentLength) +
-                        LineFeed + LineFeed +
-                        HttpWebRequest.ContentType +
-                        LineFeed + LineFeed + LineFeed + LineFeed + LineFeed + LineFeed + LineFeed +
-                        'x-ms-blob-type:BlockBlob' +
-                        LineFeed +
-                        'x-ms-date:' + UTCNow +
-                        LineFeed +
-                        'x-ms-version:' + StoregeServiceVersion +
-                        LineFeed +
-                        '/' + StorageAccountName + '/' + StorageConatainerName + '/' + FileName;
+        RequestManagement.AddOrReplaceContentHeader(WebRequest, 'Content-Type', MIMEType);
+        RequestManagement.AddOrReplaceContentHeader(WebRequest, 'Content-Length', Format(RequestManagement.BlobLenght(TempBlob)));
+
+        StringToSign := WebRequest.Method +
+            LineFeed + LineFeed + LineFeed +
+            Format(RequestManagement.BlobLenght(TempBlob)) +
+            LineFeed + LineFeed +
+            MIMEType +
+            LineFeed + LineFeed + LineFeed + LineFeed + LineFeed + LineFeed + LineFeed +
+            'x-ms-blob-type:BlockBlob' +
+            LineFeed +
+            'x-ms-date:' + UTCNow +
+            LineFeed +
+            'x-ms-version:' + StoregeServiceVersion +
+            LineFeed +
+            '/' + StorageAccountName + '/' + StorageConatainerName + '/' + FileName;
 
         RequestManagement.HMACCryptography(StringToSign, AzureStorageAPISetup.GetAccessKey(), HMAC::HMACSHA256);
 
-        HttpWebRequest.Headers.Add('Authorization', StrSubstNo('%1 %2:%3', 'SharedKey', StorageAccountName, StringToSign));
-        HttpWebRequest.Headers.Add('x-ms-blob-type', 'BlockBlob');
-        HttpWebRequest.Headers.Add('x-ms-date', UTCNow);
-        HttpWebRequest.Headers.Add('x-ms-version', StoregeServiceVersion);
+        RequestManagement.AddOrReplaceRequestHeader(WebRequest, 'Authorization', StrSubstNo('%1 %2:%3', 'SharedKey', StorageAccountName, StringToSign));
+        RequestManagement.AddOrReplaceRequestHeader(WebRequest, 'x-ms-blob-type', 'BlockBlob');
+        RequestManagement.AddOrReplaceRequestHeader(WebRequest, 'x-ms-date', UTCNow);
+        RequestManagement.AddOrReplaceRequestHeader(WebRequest, 'x-ms-version', StoregeServiceVersion);
 
-        RequestManagement.StreamToHttpRequest(HttpWebRequest, TempBlob, HttpWebRequest.ContentLength);
+        TempBlob.CreateInStream(InStrm);
+        WebRequest.Content.WriteFrom(InStrm);
 
-        if not RequestManagement.HandleHttpRequest(HttpWebRequest, Response, Silent) then
+        if not WebClient.Send(WebRequest, WebResponse) then
             exit;
 
-        exit(InsertAzureStorageOverview(StorageAccountName, StorageConatainerName, Uri.UnescapeDataString(FileName)));
+        FileName := TypeHelper.UriEscapeDataString(FileName);
+        exit(InsertAzureStorageOverview(StorageAccountName, StorageConatainerName, FileName));
     end;
 
     procedure CreateContainerAzureStorage(StorageAccountName: Text; StoregeServiceVersion: Text; StorageConatainerName: Text; Silent: Boolean): Boolean
@@ -453,9 +482,10 @@ codeunit 6184861 "NPR Azure Storage API Mgt."
         Response: Text;
         LF: Char;
         HMAC: Option HMACMD5,HMACSHA1,HMACSHA256,HMACSHA384,HMACSHA512;
-        OutStr: OutStream;
-        HttpWebRequest: DotNet NPRNetHttpWebRequest;
-        Stream: DotNet NPRNetStream;
+        WebRequest: HttpRequestMessage;
+        WebResponse: HttpResponseMessage;
+        WebClient: HttpClient;
+        InStrm: InStream;
     begin
         case '' of
             StorageAccountName:
@@ -472,36 +502,32 @@ codeunit 6184861 "NPR Azure Storage API Mgt."
         LineFeed := Format(LF);
         UTCNow := RequestManagement.UTCDateTimeNowText('R');
 
-        HttpWebRequest := HttpWebRequest.Create('https://' + StorageAccountName + '.blob.core.windows.net/' + StorageConatainerName + '?restype=container');
-        HttpWebRequest.Timeout := AzureStorageAPISetup.Timeout;
-        HttpWebRequest.Method := 'PUT';
-        HttpWebRequest.ContentLength := 1; //lenght may not be skipped because of the nature of the method's prototype, also cannot be 0 because of signature issues (api problem)
-
-        StringToSign := HttpWebRequest.Method +
-                        LineFeed + LineFeed + LineFeed +
-                        Format(HttpWebRequest.ContentLength) +
-                        LineFeed + LineFeed +
-                        LineFeed + LineFeed + LineFeed + LineFeed + LineFeed + LineFeed + LineFeed +
-                        'x-ms-date:' + UTCNow +
-                        LineFeed +
-                        'x-ms-version:' + StoregeServiceVersion +
-                        LineFeed +
-                        '/' + StorageAccountName + '/' + StorageConatainerName +
-                        LineFeed +
-                        'restype:container';
+        WebRequest.SetRequestUri('https://' + StorageAccountName + '.blob.core.windows.net/' +
+            StorageConatainerName + '?restype=container');
+        WebRequest.Method := 'PUT';
+        StringToSign := WebRequest.Method +
+            LineFeed + LineFeed + LineFeed +
+            Format(1) +
+            LineFeed + LineFeed +
+            LineFeed + LineFeed + LineFeed + LineFeed + LineFeed + LineFeed + LineFeed +
+            'x-ms-date:' + UTCNow +
+            LineFeed +
+            'x-ms-version:' + StoregeServiceVersion +
+            LineFeed +
+            '/' + StorageAccountName + '/' + StorageConatainerName +
+            LineFeed +
+            'restype:container';
 
         RequestManagement.HMACCryptography(StringToSign, AzureStorageAPISetup.GetAccessKey(), HMAC::HMACSHA256);
 
-        HttpWebRequest.Headers.Add('Authorization', StrSubstNo('%1 %2:%3', 'SharedKey', StorageAccountName, StringToSign));
-        HttpWebRequest.Headers.Add('x-ms-date', UTCNow);
-        HttpWebRequest.Headers.Add('x-ms-version', StoregeServiceVersion);
+        RequestManagement.AddOrReplaceRequestHeader(WebRequest, 'Authorization', StrSubstNo('%1 %2:%3', 'SharedKey', StorageAccountName, StringToSign));
+        RequestManagement.AddOrReplaceRequestHeader(WebRequest, 'x-ms-date', UTCNow);
+        RequestManagement.AddOrReplaceRequestHeader(WebRequest, 'x-ms-version', StoregeServiceVersion);
 
-        TempBlob.CreateOutStream(OutStr);
-        OutStr.Write('');
+        TempBlob.CreateInStream(InStrm);
+        WebRequest.Content.WriteFrom(InStrm);
 
-        RequestManagement.StreamToHttpRequest(HttpWebRequest, TempBlob, HttpWebRequest.ContentLength); // request must be chunked for this call
-
-        exit(RequestManagement.HandleHttpRequest(HttpWebRequest, Response, Silent));
+        exit(WebClient.Send(WebRequest, WebResponse));
     end;
 
     procedure DownloadFromAzureStorage(var TempBlob: Codeunit "Temp Blob"; StorageAccountName: Text; StoregeServiceVersion: Text; StorageConatainerName: Text; FileName: Text; Silent: Boolean): Boolean
@@ -514,11 +540,15 @@ codeunit 6184861 "NPR Azure Storage API Mgt."
         Response: Text;
         LF: Char;
         HMAC: Option HMACMD5,HMACSHA1,HMACSHA256,HMACSHA384,HMACSHA512;
-        OutStr: OutStream;
-        HttpWebRequest: DotNet NPRNetHttpWebRequest;
-        Convert: DotNet NPRNetConvert;
-        MemoryStream: DotNet NPRNetMemoryStream;
-        Uri: DotNet NPRNetUri;
+        WebRequest: HttpRequestMessage;
+        WebResponse: HttpResponseMessage;
+        WebClient: HttpClient;
+        Base64Convert: Codeunit "Base64 Convert";
+        WebContent: HttpContent;
+        InStrm: InStream;
+        OutStrm: OutStream;
+        TempBlob1: Codeunit "Temp Blob";
+        TypeHelper: Codeunit "Type Helper";
     begin
         case '' of
             StorageAccountName:
@@ -527,7 +557,7 @@ codeunit 6184861 "NPR Azure Storage API Mgt."
                 Error(MissingStorageConatainerNameErr);
         end;
 
-        FileName := Uri.EscapeUriString(FileName);
+        FileName := TypeHelper.UriEscapeDataString(FileName);
 
         AzureStorageAPISetup.Get(StorageAccountName);
         if StoregeServiceVersion = '' then
@@ -537,34 +567,39 @@ codeunit 6184861 "NPR Azure Storage API Mgt."
         LineFeed := Format(LF);
         UTCNow := RequestManagement.UTCDateTimeNowText('R');
 
-        HttpWebRequest := HttpWebRequest.Create('https://' + StorageAccountName + '.blob.core.windows.net/' + StorageConatainerName + '/' + FileName);
-        HttpWebRequest.Timeout := AzureStorageAPISetup.Timeout;
-        HttpWebRequest.Method := 'GET';
+        WebRequest.SetRequestUri('https://' + StorageAccountName + '.blob.core.windows.net/' +
+            StorageConatainerName + '/' + FileName);
+        WebRequest.Method := 'GET';
+        WebClient.Timeout := AzureStorageAPISetup.Timeout;
 
-        StringToSign := HttpWebRequest.Method +
-                        LineFeed + LineFeed + LineFeed +
-                        LineFeed + LineFeed +
-                        LineFeed + LineFeed + LineFeed + LineFeed + LineFeed + LineFeed + LineFeed +
-                        'x-ms-date:' + UTCNow +
-                        LineFeed +
-                        'x-ms-version:' + StoregeServiceVersion +
-                        LineFeed +
-                        '/' + StorageAccountName + '/' + StorageConatainerName + '/' + FileName;
+        StringToSign := WebRequest.Method +
+            LineFeed + LineFeed + LineFeed +
+            LineFeed + LineFeed +
+            LineFeed + LineFeed + LineFeed + LineFeed + LineFeed + LineFeed + LineFeed +
+            'x-ms-date:' + UTCNow +
+            LineFeed +
+            'x-ms-version:' + StoregeServiceVersion +
+            LineFeed +
+            '/' + StorageAccountName + '/' + StorageConatainerName + '/' + FileName;
 
         RequestManagement.HMACCryptography(StringToSign, AzureStorageAPISetup.GetAccessKey(), HMAC::HMACSHA256);
 
-        HttpWebRequest.Headers.Add('Authorization', StrSubstNo('%1 %2:%3', 'SharedKey', StorageAccountName, StringToSign));
-        HttpWebRequest.Headers.Add('x-ms-date', UTCNow);
-        HttpWebRequest.Headers.Add('x-ms-version', StoregeServiceVersion);
+        RequestManagement.AddOrReplaceRequestHeader(WebRequest, 'Authorization', StrSubstNo('%1 %2:%3', 'SharedKey', StorageAccountName, StringToSign));
+        RequestManagement.AddOrReplaceRequestHeader(WebRequest, 'x-ms-date', UTCNow);
+        RequestManagement.AddOrReplaceRequestHeader(WebRequest, 'x-ms-version', StoregeServiceVersion);
 
-        if not RequestManagement.HandleHttpRequest(HttpWebRequest, Response, Silent) then
-            exit;
+        WebClient.Send(WebRequest, WebResponse);
+        if not WebResponse.IsSuccessStatusCode() then
+            if Silent then
+                exit
+            else
+                Error(WebResponse.ReasonPhrase);
 
-        MemoryStream := MemoryStream.MemoryStream(Convert.FromBase64String(Response));
-
-        TempBlob.CreateOutStream(OutStr);
-        MemoryStream.CopyTo(OutStr);
-
+        WebContent := WebResponse.Content();
+        TempBlob1.CreateInStream(InStrm);
+        WebContent.ReadAs(InStrm);
+        TempBlob.CreateOutStream(OutStrm);
+        CopyStream(OutStrm, InStrm);
         exit(TempBlob.HasValue);
     end;
 
@@ -579,8 +614,10 @@ codeunit 6184861 "NPR Azure Storage API Mgt."
         LineFeed: Text;
         LF: Char;
         HMAC: Option HMACMD5,HMACSHA1,HMACSHA256,HMACSHA384,HMACSHA512;
-        HttpWebRequest: DotNet NPRNetHttpWebRequest;
-        Uri: DotNet NPRNetUri;
+        WebRequest: HttpRequestMessage;
+        WebResponse: HttpResponseMessage;
+        WebClient: HttpClient;
+        TypeHelper: Codeunit "Type Helper";
     begin
         case '' of
             StorageAccountName:
@@ -593,36 +630,39 @@ codeunit 6184861 "NPR Azure Storage API Mgt."
         if StoregeServiceVersion = '' then
             StoregeServiceVersion := '2019-02-02';
 
-        FileName := Uri.EscapeUriString(FileName);
+        FileName := TypeHelper.UriEscapeDataString(FileName);
 
         LF := 10;
         LineFeed := Format(LF);
         UTCNow := RequestManagement.UTCDateTimeNowText('R');
 
-        HttpWebRequest := HttpWebRequest.Create('https://' + StorageAccountName + '.blob.core.windows.net/' + StorageConatainerName + '/' + FileName);
-        HttpWebRequest.Timeout := AzureStorageAPISetup.Timeout;
-        HttpWebRequest.Method := 'DELETE';
-
-        StringToSign := HttpWebRequest.Method +
-                        LineFeed + LineFeed + LineFeed +
-                        LineFeed + LineFeed +
-                        LineFeed + LineFeed + LineFeed + LineFeed + LineFeed + LineFeed + LineFeed +
-                        'x-ms-date:' + UTCNow +
-                        LineFeed +
-                        'x-ms-version:' + StoregeServiceVersion +
-                        LineFeed +
-                        '/' + StorageAccountName + '/' + StorageConatainerName + '/' + FileName;
+        WebRequest.SetRequestUri('https://' + StorageAccountName + '.blob.core.windows.net/' + StorageConatainerName + '/' + FileName);
+        WebRequest.Method := 'DELETE';
+        StringToSign := WebRequest.Method +
+            LineFeed + LineFeed + LineFeed +
+            LineFeed + LineFeed +
+            LineFeed + LineFeed + LineFeed + LineFeed + LineFeed + LineFeed + LineFeed +
+            'x-ms-date:' + UTCNow +
+            LineFeed +
+            'x-ms-version:' + StoregeServiceVersion +
+            LineFeed +
+            '/' + StorageAccountName + '/' + StorageConatainerName + '/' + FileName;
 
         RequestManagement.HMACCryptography(StringToSign, AzureStorageAPISetup.GetAccessKey(), HMAC::HMACSHA256);
 
-        HttpWebRequest.Headers.Add('Authorization', StrSubstNo('%1 %2:%3', 'SharedKey', StorageAccountName, StringToSign));
-        HttpWebRequest.Headers.Add('x-ms-date', UTCNow);
-        HttpWebRequest.Headers.Add('x-ms-version', StoregeServiceVersion);
+        RequestManagement.AddOrReplaceRequestHeader(WebRequest, 'Authorization', StrSubstNo('%1 %2:%3', 'SharedKey', StorageAccountName, StringToSign));
+        RequestManagement.AddOrReplaceRequestHeader(WebRequest, 'x-ms-date', UTCNow);
+        RequestManagement.AddOrReplaceRequestHeader(WebRequest, 'x-ms-version', StoregeServiceVersion);
 
-        if not RequestManagement.HandleHttpRequest(HttpWebRequest, Response, Silent) then
-            exit;
+        WebClient.Send(WebRequest, WebResponse);
+        if not WebResponse.IsSuccessStatusCode then
+            if Silent then
+                exit
+            else
+                Error(WebResponse.ReasonPhrase);
 
-        DeleteAzureStorageOverview(StorageAccountName, StorageConatainerName, Uri.UnescapeDataString(FileName));
+        FileName := FileName.Replace('+', ' ');
+        DeleteAzureStorageOverview(StorageAccountName, StorageConatainerName, FileName);
 
         exit(true);
     end;
@@ -638,9 +678,10 @@ codeunit 6184861 "NPR Azure Storage API Mgt."
         Response: Text;
         LF: Char;
         HMAC: Option HMACMD5,HMACSHA1,HMACSHA256,HMACSHA384,HMACSHA512;
-        Outstr: OutStream;
-        HttpWebRequest: DotNet NPRNetHttpWebRequest;
-        Uri: DotNet NPRNetUri;
+        WebRequest: HttpRequestMessage;
+        WebResponse: HttpResponseMessage;
+        WebClient: HttpClient;
+        TypeHelper: Codeunit "Type Helper";
     begin
         case '' of
             StorageAccountName:
@@ -654,48 +695,49 @@ codeunit 6184861 "NPR Azure Storage API Mgt."
         if StorageApiVersion = '' then
             StorageApiVersion := '2019-02-02';
 
-        ToFileName := Uri.EscapeUriString(ToFileName);
-        FromFileName := Uri.EscapeUriString(FromFileName);
+        ToFileName := TypeHelper.UriEscapeDataString(ToFileName);
+        FromFileName := TypeHelper.UriEscapeDataString(FromFileName);
 
         AzureStorageAPISetup.Get(StorageAccountName);
         LF := 10;
         LineFeed := Format(LF);
         UTCNow := RequestManagement.UTCDateTimeNowText('R');
 
-        HttpWebRequest := HttpWebRequest.Create('https://' + StorageAccountName + '.blob.core.windows.net/' + ContainerTo + '/' + ToFileName);
-        HttpWebRequest.Timeout := AzureStorageAPISetup.Timeout;
-        HttpWebRequest.Method := 'PUT';
-        HttpWebRequest.ContentLength := 1; //lenght may not be skipped because of the nature of the method's prototype, also cannot be 0 because of signature issues (api problem)
+        WebRequest.SetRequestUri('https://' + StorageAccountName + '.blob.core.windows.net/' + ContainerTo + '/' + ToFileName);
+        WebRequest.Method := 'PUT';
+        WebClient.Timeout := AzureStorageAPISetup.Timeout;
 
-        StringToSign := HttpWebRequest.Method +
-                        LineFeed + LineFeed + LineFeed +
-                        Format(HttpWebRequest.ContentLength) +
-                        LineFeed + LineFeed +
-                        LineFeed + LineFeed + LineFeed + LineFeed + LineFeed + LineFeed + LineFeed +
-                        'x-ms-copy-source:' + 'https://' + StorageAccountName + '.blob.core.windows.net/' + ContainerFrom + '/' + FromFileName +
-                        LineFeed +
-                        'x-ms-date:' + UTCNow +
-                        LineFeed +
-                        'x-ms-version:' + StorageApiVersion +
-                        LineFeed +
-                        '/' + StorageAccountName + '/' + ContainerTo + '/' + ToFileName;
+        StringToSign := WebRequest.Method +
+            LineFeed + LineFeed + LineFeed +
+            '1' + //Format(HttpWebRequest.ContentLength) +
+            LineFeed + LineFeed +
+            LineFeed + LineFeed + LineFeed + LineFeed + LineFeed + LineFeed + LineFeed +
+            'x-ms-copy-source:' + 'https://' + StorageAccountName + '.blob.core.windows.net/' + ContainerFrom + '/' + FromFileName +
+            LineFeed +
+            'x-ms-date:' + UTCNow +
+            LineFeed +
+            'x-ms-version:' + StorageApiVersion +
+            LineFeed +
+            '/' + StorageAccountName + '/' + ContainerTo + '/' + ToFileName;
 
         RequestManagement.HMACCryptography(StringToSign, AzureStorageAPISetup.GetAccessKey(), HMAC::HMACSHA256);
 
-        HttpWebRequest.Headers.Add('Authorization', StrSubstNo('%1 %2:%3', 'SharedKey', StorageAccountName, StringToSign));
-        HttpWebRequest.Headers.Add('x-ms-date', UTCNow);
-        HttpWebRequest.Headers.Add('x-ms-version', StorageApiVersion);
-        HttpWebRequest.Headers.Add('x-ms-copy-source', 'https://' + StorageAccountName + '.blob.core.windows.net/' + ContainerFrom + '/' + FromFileName);
+        RequestManagement.AddOrReplaceRequestHeader(WebRequest, 'Authorization', StrSubstNo('%1 %2:%3', 'SharedKey', StorageAccountName, StringToSign));
+        RequestManagement.AddOrReplaceRequestHeader(WebRequest, 'x-ms-date', UTCNow);
+        RequestManagement.AddOrReplaceRequestHeader(WebRequest, 'x-ms-version', StorageApiVersion);
+        RequestManagement.AddOrReplaceRequestHeader(WebRequest, 'x-ms-copy-source', 'https://' + StorageAccountName + '.blob.core.windows.net/' + ContainerFrom + '/' + FromFileName);
 
-        TempBlob.CreateOutStream(Outstr);
-        Outstr.Write('');
+        WebRequest.Content.WriteFrom('');
 
-        RequestManagement.StreamToHttpRequest(HttpWebRequest, TempBlob, HttpWebRequest.ContentLength); // request must be chunked for this call
+        WebClient.Send(WebRequest, WebResponse);
+        if not WebResponse.IsSuccessStatusCode then
+            if Silent then
+                exit
+            else
+                Error(WebResponse.ReasonPhrase);
 
-        if not RequestManagement.HandleHttpRequest(HttpWebRequest, Response, Silent) then
-            exit;
-
-        exit(InsertAzureStorageOverview(StorageAccountName, ContainerTo, Uri.UnescapeDataString(ToFileName)));
+        ToFileName := ToFileName.Replace('+', ' ');
+        exit(InsertAzureStorageOverview(StorageAccountName, ContainerTo, ToFileName));
     end;
 
     procedure InitializeAzureDataSource(StorageContainerName: Text; StorageAccountName: Text; StorageServiceName: Text; StoregeApiVersion: Text; DataSourceName: Text; Silent: Boolean): Boolean
@@ -707,8 +749,9 @@ codeunit 6184861 "NPR Azure Storage API Mgt."
         Creds: Text;
         Response: Text;
         Container: Text;
-        OutStr: OutStream;
-        HttpWebRequest: DotNet NPRNetHttpWebRequest;
+        WebRequest: HttpRequestMessage;
+        WebResponse: HttpResponseMessage;
+        WebClient: HttpClient;
     begin
         case '' of
             StorageAccountName:
@@ -734,18 +777,17 @@ codeunit 6184861 "NPR Azure Storage API Mgt."
             JsonAdd(Arguments, 'container', Container, true);
         end;
 
-        HttpWebRequest := HttpWebRequest.Create('https://' + StorageServiceName + '.search.windows.net/datasources/' + DataSourceName + '?api-version=' + StoregeApiVersion);
-        HttpWebRequest.Timeout := AzureStorageAPISetup.Timeout;
-        HttpWebRequest.Method := 'PUT';
-        HttpWebRequest.ContentType := 'application/json';
-        HttpWebRequest.Headers.Add('api-key', AzureStorageAPISetup.GetAdminKey());
+        WebRequest.SetRequestUri('https://' + StorageServiceName + '.search.windows.net/datasources/' + DataSourceName + '?api-version=' + StoregeApiVersion);
+        WebRequest.Method := 'PUT';
+        WebClient.Timeout := AzureStorageAPISetup.Timeout;
+        RequestManagement.AddOrReplaceContentHeader(WebRequest, 'Content-Type', 'application/json');
+        RequestManagement.AddOrReplaceRequestHeader(WebRequest, 'api-key', AzureStorageAPISetup.GetAdminKey());
 
-        TempBlob.CreateOutStream(OutStr);
-        OutStr.Write(Arguments);
+        WebRequest.Content.WriteFrom(Arguments);
 
-        RequestManagement.StreamToHttpRequest(HttpWebRequest, TempBlob, StrLen(Arguments));
+        WebClient.Send(WebRequest, WebResponse);
 
-        exit(RequestManagement.HandleHttpRequest(HttpWebRequest, Response, Silent));
+        exit(WebResponse.IsSuccessStatusCode());
     end;
 
     procedure InitializeAzureIndex(StorageAccountName: Text; StorageServiceName: Text; StoregeApiVersion: Text; StorageIndexName: Text; Reinitialize: Boolean; Silent: Boolean): Boolean
@@ -758,8 +800,9 @@ codeunit 6184861 "NPR Azure Storage API Mgt."
         Arguments: Text;
         IndexID: Text;
         IndexContent: Text;
-        OutStr: OutStream;
-        HttpWebRequest: DotNet NPRNetHttpWebRequest;
+        WebRequest: HttpRequestMessage;
+        WebResponse: HttpResponseMessage;
+        WebClient: HttpClient;
     begin
         // indexer must run a reload cycle for a new index to be in effect
 
@@ -794,19 +837,20 @@ codeunit 6184861 "NPR Azure Storage API Mgt."
             JsonAdd(Arguments, 'fields', '[' + IndexID + ',' + IndexContent + ']', true);
         end;
 
-        HttpWebRequest := HttpWebRequest.Create('https://' + StorageServiceName + '.search.windows.net/indexes/' + StorageIndexName + '?api-version=' + StoregeApiVersion);
-        HttpWebRequest.Timeout := AzureStorageAPISetup.Timeout;
-        HttpWebRequest.Method := 'PUT';
-        HttpWebRequest.ContentType := 'application/json';
-        HttpWebRequest.Headers.Add('api-key', AzureStorageAPISetup.GetAdminKey());
+        WebRequest.SetRequestUri('https://' + StorageServiceName + '.search.windows.net/indexes/' + StorageIndexName + '?api-version=' + StoregeApiVersion);
+        WebRequest.Method := 'PUT';
+        WebClient.Timeout := AzureStorageAPISetup.Timeout;
+        RequestManagement.AddOrReplaceContentHeader(WebRequest, 'Content-Type', 'application/json');
+        RequestManagement.AddOrReplaceRequestHeader(WebRequest, 'api-key', AzureStorageAPISetup.GetAdminKey());
 
-        TempBlob.CreateOutStream(OutStr);
-        OutStr.Write(Arguments);
+        WebRequest.Content.WriteFrom(Arguments);
 
-        RequestManagement.StreamToHttpRequest(HttpWebRequest, TempBlob, StrLen(Arguments));
-
-        if not RequestManagement.HandleHttpRequest(HttpWebRequest, Response, Silent) then
-            exit;
+        WebClient.Send(WebRequest, WebResponse);
+        if not WebResponse.IsSuccessStatusCode then
+            if Silent then
+                exit
+            else
+                Error(WebResponse.ReasonPhrase);
 
         AzureStorageCognitiveSearch."Account Name" := StorageAccountName;
         AzureStorageCognitiveSearch."Search Service Name" := StorageServiceName;
@@ -825,7 +869,9 @@ codeunit 6184861 "NPR Azure Storage API Mgt."
         AzureStorageAPISetup: Record "NPR Azure Storage API Setup";
         RequestManagement: Codeunit "NPR Request Management";
         Response: Text;
-        HttpWebRequest: DotNet NPRNetHttpWebRequest;
+        WebRequest: HttpRequestMessage;
+        WebResponse: HttpResponseMessage;
+        WebClient: HttpClient;
     begin
         case '' of
             StorageServiceName:
@@ -843,14 +889,18 @@ codeunit 6184861 "NPR Azure Storage API Mgt."
         if StoregeApiVersion = '' then
             StoregeApiVersion := '2019-05-06';
 
-        HttpWebRequest := HttpWebRequest.Create('https://' + StorageServiceName + '.search.windows.net/indexes/' + StorageIndexName + '?api-version=' + StoregeApiVersion);
-        HttpWebRequest.Timeout := AzureStorageAPISetup.Timeout;
-        HttpWebRequest.Method := 'DELETE';
-        HttpWebRequest.ContentType := 'application/json';
-        HttpWebRequest.Headers.Add('api-key', AzureStorageAPISetup.GetAdminKey());
+        WebRequest.SetRequestUri('https://' + StorageServiceName + '.search.windows.net/indexes/' + StorageIndexName + '?api-version=' + StoregeApiVersion);
+        WebRequest.Method := 'DELETE';
+        WebClient.Timeout := AzureStorageAPISetup.Timeout;
+        RequestManagement.AddOrReplaceContentHeader(WebRequest, 'Content-Type', 'application/json');
+        RequestManagement.AddOrReplaceRequestHeader(WebRequest, 'api-key', AzureStorageAPISetup.GetAdminKey());
 
-        if not RequestManagement.HandleHttpRequest(HttpWebRequest, Response, Silent) then
-            exit;
+        WebClient.Send(WebRequest, WebResponse);
+        if not WebResponse.IsSuccessStatusCode then
+            if Silent then
+                exit
+            else
+                Error(WebResponse.ReasonPhrase);
 
         AzureStorageCognitiveSearch.SetRange("Account Name", StorageAccountName);
         AzureStorageCognitiveSearch.SetRange("Search Service Name", StorageServiceName);
@@ -871,8 +921,10 @@ codeunit 6184861 "NPR Azure Storage API Mgt."
         Schedule: Text;
         Mappings: Text;
         Response: Text;
-        OutStr: OutStream;
-        HttpWebRequest: DotNet NPRNetHttpWebRequest;
+        OutStrm: OutStream;
+        WebRequest: HttpRequestMessage;
+        WebResponse: HttpResponseMessage;
+        WebClient: HttpClient;
     begin
         //API call may take a long time (timeout does not necessarily mean failure for this call)
 
@@ -901,25 +953,24 @@ codeunit 6184861 "NPR Azure Storage API Mgt."
             JsonAdd(Arguments, 'fieldMappings', '[' + Mappings + ']', true);
         end;
 
-        HttpWebRequest := HttpWebRequest.Create('https://' + StorageServiceName + '.search.windows.net/indexers/' + StorageIndexerName + '?api-version=' + StoregeApiVersion);
-        HttpWebRequest.Timeout := AzureStorageAPISetup.Timeout;
-        HttpWebRequest.Method := 'PUT';
-        HttpWebRequest.ContentType := 'application/json';
-        HttpWebRequest.Headers.Add('api-key', AzureStorageAPISetup.GetAdminKey());
+        WebRequest.SetRequestUri('https://' + StorageServiceName + '.search.windows.net/indexers/' +
+            StorageIndexerName + '?api-version=' + StoregeApiVersion);
+        WebRequest.Method := 'PUT';
+        WebClient.Timeout := AzureStorageAPISetup.Timeout;
+        RequestManagement.AddOrReplaceContentHeader(WebRequest, 'Content-Type', 'application/json');
+        RequestManagement.AddOrReplaceRequestHeader(WebRequest, 'api-key', AzureStorageAPISetup.GetAdminKey());
 
-        TempBlob.CreateOutStream(OutStr);
-        OutStr.Write(Arguments);
+        WebRequest.Content.WriteFrom(Arguments);
 
-        RequestManagement.StreamToHttpRequest(HttpWebRequest, TempBlob, StrLen(Arguments));
-
-        exit(RequestManagement.HandleHttpRequest(HttpWebRequest, Response, Silent));
+        WebClient.Send(WebRequest, WebResponse);
+        exit(WebResponse.IsSuccessStatusCode);
     end;
 
     local procedure ImportStorageList(StorageAccountName: Text; StorageConatainerName: Text; ListXML: Text; FullRefresh: Boolean)
     var
         RequestManagement: Codeunit "NPR Request Management";
-        XMLNodeList: DotNet NPRNetXmlNodeList;
-        XMLNode: DotNet NPRNetXmlNode;
+        XMLNodeList: XmlNodeList;
+        XMLNode: XmlNode;
     begin
         RequestManagement.GetNodesFromXmlText(ListXML, '//Blobs/Blob/Name', XMLNodeList);
 
@@ -927,7 +978,7 @@ codeunit 6184861 "NPR Azure Storage API Mgt."
             DeleteAzureStorageOverview(StorageAccountName, StorageConatainerName, '');
 
         foreach XMLNode in XMLNodeList do
-            InsertAzureStorageOverview(StorageAccountName, StorageConatainerName, XMLNode.InnerText);
+            InsertAzureStorageOverview(StorageAccountName, StorageConatainerName, XMLNode.AsXmlElement().InnerText);
     end;
 
     local procedure InsertAzureStorageOverview(StorageAccountName: Text; StorageConatainerName: Text; FileName: Text): Boolean
@@ -966,48 +1017,53 @@ codeunit 6184861 "NPR Azure Storage API Mgt."
     local procedure AppendResponse(Input: Text; var Response: Text)
     var
         RequestManagement: Codeunit "NPR Request Management";
-        XMLNodeList: DotNet NPRNetXmlNodeList;
-        XMLNode: DotNet NPRNetXmlNode;
-        ResponseXMLDocument: DotNet "NPRNetXmlDocument";
-        InputXMLDocument: DotNet "NPRNetXmlDocument";
-        XMLNodeParent: DotNet NPRNetXmlNode;
+        XMLNodeList: XmlNodeList;
+        XMLNode: XmlNode;
+        ResponseXMLDocument: XmlDocument;
+        InputXMLDocument: XmlDocument;
+        XMLNodeParent: XmlNode;
     begin
         if Response = '' then begin
             Response := Input;
-
             exit;
         end;
 
-        ResponseXMLDocument := ResponseXMLDocument.XmlDocument();
-        ResponseXMLDocument.LoadXml(Response);
-        XMLNodeParent := ResponseXMLDocument.SelectSingleNode('EnumerationResults');
+        XmlDocument.ReadFrom(Response, ResponseXMLDocument);
+        ResponseXMLDocument.AsXmlNode().SelectSingleNode('EnumerationResults', XMLNodeParent);
 
-        InputXMLDocument := InputXMLDocument.XmlDocument();
-        InputXMLDocument.LoadXml(Input);
-        XMLNode := InputXMLDocument.SelectSingleNode('EnumerationResults');
-        XMLNodeParent.AppendChild(XMLNodeParent.OwnerDocument.ImportNode(XMLNode, true));
+        XmlDocument.ReadFrom(Input, InputXMLDocument);
+        InputXMLDocument.AsXmlNode().SelectSingleNode('EnumerationResults', XMLNode);
+        XMLNodeParent.AsXmlElement().Add(XMLNode);
 
-        Response := ResponseXMLDocument.OuterXml();
+        ResponseXMLDocument.WriteTo(Response);
     end;
 
-    procedure GetAzureStorageFromXml(var TempAzureStorageOverview: Record "NPR Azure Storage Overview" temporary; XmlNodeList: DotNet NPRNetXmlNodeList; IsContainerList: Boolean)
+    procedure GetAzureStorageFromXml(var TempAzureStorageOverview: Record "NPR Azure Storage Overview" temporary;
+        NodeList: XmlNodeList; IsContainerList: Boolean)
     var
         RequestManagement: Codeunit "NPR Request Management";
         AzureDirectory: Text;
         ContainerName: Text;
         SlashChar: Char;
-        XMLNode: DotNet NPRNetXmlNode;
-        XMLElement: DotNet NPRNetXmlElement;
+        Node: XmlNode;
+        ParentNode: XmlElement;
+        ParentNode1: XmlElement;
+        Element: XmlElement;
+        Attribute: XmlAttribute;
     begin
         SlashChar := 47;
 
-        foreach XMLNode in XmlNodeList do begin
+        foreach Node in NodeList do begin
             if IsContainerList then
-                ContainerName := XMLNode.InnerXml
+                ContainerName := Node.AsXmlElement().InnerXml
             else begin
-                AzureDirectory := DelStr(XMLNode.InnerText, RequestManagement.FindLastOccuranceInString(XMLNode.InnerText, SlashChar));
-                XMLElement := XMLNode.ParentNode().ParentNode().ParentNode();
-                ContainerName := XMLElement.GetAttribute('ContainerName');
+                AzureDirectory := DelStr(Node.AsXmlElement().InnerText,
+                    RequestManagement.FindLastOccuranceInString(Node.AsXmlElement().InnerText, SlashChar));
+                Node.GetParent(ParentNode);
+                ParentNode.GetParent(ParentNode1);
+                ParentNode1.GetParent(Element);
+                Element.Attributes().Get('ContainerName', Attribute);
+                ContainerName := Attribute.Value;
             end;
 
             TempAzureStorageOverview.SetRange("File Name", AzureDirectory);
@@ -1020,18 +1076,19 @@ codeunit 6184861 "NPR Azure Storage API Mgt."
         end;
     end;
 
-    local procedure CleanResidueContainers(StorageAccountName: Text; XMLNodeList: DotNet NPRNetXmlNodeList)
+    local procedure CleanResidueContainers(StorageAccountName: Text; XMLNodeList: XmlNodeList)
     var
         AzureStorageOverview: Record "NPR Azure Storage Overview";
         NodeValues: Text;
-        XMLNode: DotNet NPRNetXmlNode;
+        XMLNode: XmlNode;
     begin
         AzureStorageOverview.SetRange("Account name", StorageAccountName);
         if not AzureStorageOverview.FindFirst then
             exit;
 
         foreach XMLNode in XMLNodeList do
-            NodeValues += XMLNode.InnerText + ' '; //API does not allow space characters in container names
+            //API does not allow space characters in container names
+            NodeValues += XMLNode.AsXmlElement().InnerText + ' ';
 
         repeat
             AzureStorageOverview.SetRange("Container Name", AzureStorageOverview."Container Name");

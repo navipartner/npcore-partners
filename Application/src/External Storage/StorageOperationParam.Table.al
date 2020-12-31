@@ -1,7 +1,5 @@
 table 6184893 "NPR Storage Operation Param."
 {
-    // NPR5.54/ALST/20200311 CASE 394895 Object created
-
     Caption = 'Storage Operation Parameters';
     DataClassification = CustomerContent;
 

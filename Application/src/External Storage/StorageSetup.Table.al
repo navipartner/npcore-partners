@@ -1,7 +1,5 @@
 table 6184892 "NPR Storage Setup"
 {
-    // NPR5.54/ALST/20200311 CASE 394895 Object created
-
     Caption = 'External Storage Setup';
     DataClassification = CustomerContent;
     LookupPageID = "NPR Storage Setup";

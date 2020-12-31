@@ -1,15 +1,5 @@
 codeunit 6184866 "NPR External Storage Interface"
 {
-    // NPR5.54/ALST/20200311 CASE 394895 Object created
-    // NPR5.55/ALST/20200603 CASE 402502 integrated SFTP download
-    // NPR5.55/AlST/20200609 CASE 387570 added parameter to send file to incoming document
-    // NPR5.55/ALST/20200710 CASE 408285 add new directory if none exists when uploading
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         ProcessingCaption: Label 'Processing...';
         DirectoryListCaption: Label 'Fetching directory list...';
@@ -132,7 +122,7 @@ codeunit 6184866 "NPR External Storage Interface"
         Dialog: Dialog;
         Refresh: Boolean;
         Cursor: Text;
-        Paths: DotNet "NPRNetXmlDocument";
+        Paths: XmlDocument;
     begin
         //TempStorageOperationParameter: boolean used to call refresh or simply to update
 
@@ -164,10 +154,11 @@ codeunit 6184866 "NPR External Storage Interface"
         ServerFileName: Text;
         Cursor: Text;
         Dialog: Dialog;
-        Paths: DotNet "NPRNetXmlDocument";
-        Path: DotNet NPRNetXmlNode;
+        Paths: XmlDocument;
+        Path: XmlNode;
         i: Integer;
         TempBlobMgt: Codeunit "NPR Temp Blob Management";
+        PathsNodeList: XmlNodeList;
     begin
         //TempStorageOperationParameter[first]:   file path and name on NAV server
         //TempStorageOperationParameter[second]:  directory path on DropBox server
@@ -221,12 +212,12 @@ codeunit 6184866 "NPR External Storage Interface"
 
             DropboxAPIMgt.ListFolderFilesDropBox(DropBoxAPISetup."Account Code", '', Cursor, Paths, false, false, false);
 
-            foreach Path in Paths.SelectNodes('/root/*') do begin
-                TempDropBoxOverview.SetRange("File Name", Path.InnerText);
+            Paths.SelectNodes('/root/*', PathsNodeList);
+            foreach Path in PathsNodeList do begin
+                TempDropBoxOverview.SetRange("File Name", Path.AsXmlElement().InnerText);
                 if TempDropBoxOverview.IsEmpty then begin
                     TempDropBoxOverview."Account Code" := DropBoxAPISetup."Account Code";
-                    TempDropBoxOverview."File Name" := Path.InnerText;
-
+                    TempDropBoxOverview."File Name" := Path.AsXmlElement().InnerText;
                     TempDropBoxOverview.Insert;
                 end;
             end;
@@ -435,8 +426,8 @@ codeunit 6184866 "NPR External Storage Interface"
         DirectoryName: Text;
         ServerFileName: Text;
         StorageMappingXML: Text;
-        XMLFolderList: DotNet NPRNetXmlNodeList;
-        XMLContainerList: DotNet NPRNetXmlNodeList;
+        XMLFolderList: XmlNodeList;
+        XMLContainerList: XmlNodeList;
         Dialog: Dialog;
         i: Integer;
         TempBlobMgt: Codeunit "NPR Temp Blob Management";

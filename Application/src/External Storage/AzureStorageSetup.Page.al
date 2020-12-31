@@ -1,7 +1,5 @@
 page 6184860 "NPR Azure Storage Setup"
 {
-    // NPR5.54/ALST/20200212 CASE 383718 Object created
-
     Caption = 'Azure Storage Setup';
     PageType = List;
     UsageCategory = Administration;

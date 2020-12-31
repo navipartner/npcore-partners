@@ -1,13 +1,5 @@
 codeunit 6184860 "NPR Dropbox API Mgt."
 {
-    // NPR5.54/ALST/20200212 CASE 383718 Object created
-    // NPR5.55/ALST/20200609 CASE 387570 added incoming document boolean parameter
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         StorageDescriptionCaption: Label 'DropBox storage';
         UploadDescriptionCaption: Label 'Upload file to DropBox from server';
@@ -182,7 +174,7 @@ codeunit 6184860 "NPR Dropbox API Mgt."
         StorageSetup.Description := DropBoxAPISetup.Description;
     end;
 
-    procedure ListFolderFilesContinueDropBox(AccountCode: Code[10]; var Cursor: Text; var Paths: DotNet "NPRNetXmlDocument"; File: Boolean; Silent: Boolean)
+    procedure ListFolderFilesContinueDropBox(AccountCode: Code[10]; var Cursor: Text; var Paths: XmlDocument; File: Boolean; Silent: Boolean)
     var
         DropBoxSetup: Record "NPR DropBox API Setup";
         TempBlob: Codeunit "Temp Blob";
@@ -192,29 +184,33 @@ codeunit 6184860 "NPR Dropbox API Mgt."
         Response: Text;
         HasMore: Text;
         PropertyValue: Text;
-        OutStr: OutStream;
-        HttpWebRequest: DotNet NPRNetHttpWebRequest;
-        NewPaths: DotNet "NPRNetXmlDocument";
-        Path: DotNet NPRNetXmlElement;
-        Convert: DotNet NPRNetConvert;
+        NewPaths: XmlDocument;
+        Path: XmlNode;
+        WebRequest: HttpRequestMessage;
+        WebResponse: HttpResponseMessage;
+        WebClient: HttpClient;
+        ArgumentsJson: JsonObject;
+        NewPathsNodes: XmlNodeList;
     begin
         DropBoxSetup.Get(AccountCode);
 
-        RequestManagement.JsonAdd(Arguments, 'cursor', Cursor, false);
+        ArgumentsJson.Add('cursor', Cursor);
 
-        HttpWebRequest := HttpWebRequest.Create('https://api.dropboxapi.com/2/files/list_folder/continue');
-        HttpWebRequest.Timeout := DropBoxSetup.Timeout;
-        HttpWebRequest.Method := 'POST';
-        HttpWebRequest.ContentType('application/json');
-        HttpWebRequest.Headers.Add('Authorization', 'Bearer ' + DropBoxSetup.GetToken());
+        WebRequest.SetRequestUri('https://api.dropboxapi.com/2/files/list_folder/continue');
+        WebRequest.Method := 'POST';
+        WebClient.Timeout := DropBoxSetup.Timeout;
+        RequestManagement.AddOrReplaceContentHeader(WebRequest, 'Content-Type', 'application/json');
+        RequestManagement.AddOrReplaceRequestHeader(WebRequest, 'Authorization', 'Bearer ' + DropBoxSetup.GetToken());
 
-        TempBlob.CreateOutStream(OutStr);
-        OutStr.Write(Arguments);
+        ArgumentsJson.WriteTo(Arguments);
+        WebRequest.Content.WriteFrom(Arguments);
 
-        RequestManagement.StreamToHttpRequest(HttpWebRequest, TempBlob, StrLen(Arguments));
-
-        if not RequestManagement.HandleHttpRequest(HttpWebRequest, Response, Silent) then
-            exit;
+        WebClient.Send(WebRequest, WebResponse);
+        if not WebResponse.IsSuccessStatusCode then
+            if Silent then
+                exit
+            else
+                Error(WebResponse.ReasonPhrase);
 
         if File then
             PropertyValue := 'file'
@@ -224,22 +220,24 @@ codeunit 6184860 "NPR Dropbox API Mgt."
         RequestManagement.ReplaceSubstringAnyLength(Response, CustomResponse, '".tag"', '"tag"');
         RequestManagement.GetXMLFromJsonArray(Response, NewPaths, 'entries', 'path_display', 'tag', PropertyValue);
 
-        if File then
-            foreach Path in NewPaths.SelectNodes('/root/*') do
-                InsertDropBoxOverview(AccountCode, Path.InnerText);
+        if File then begin
+            NewPaths.AsXmlNode().SelectNodes('/root/*', NewPathsNodes);
+            foreach Path in NewPathsNodes do
+                InsertDropBoxOverview(AccountCode, Path.AsXmlElement().InnerText);
+        end;
 
         HasMore := RequestManagement.GetJsonValueByPropertyNameSingleNode(Response, 'has_more');
         RequestManagement.AppendXML(NewPaths, '', Paths);
 
         if HasMore > '' then
-            if Convert.ToBoolean(HasMore) then begin
+            if HasMore.ToLower() = 'true' then
                 Cursor := RequestManagement.GetJsonValueByPropertyNameSingleNode(Response, 'cursor');
 
-                ListFolderFilesContinueDropBox(AccountCode, Cursor, Paths, File, Silent);
-            end;
+        ListFolderFilesContinueDropBox(AccountCode, Cursor, Paths, File, Silent);
     end;
 
-    procedure ListFolderFilesDropBox(AccountCode: Code[10]; DirectoryPath: Text; var Cursor: Text; var Paths: DotNet "NPRNetXmlDocument"; FullRefresh: Boolean; File: Boolean; Silent: Boolean): Boolean
+    procedure ListFolderFilesDropBox(AccountCode: Code[10]; DirectoryPath: Text; var Cursor: Text;
+        var Paths: XmlDocument; FullRefresh: Boolean; File: Boolean; Silent: Boolean): Boolean
     var
         DropBoxSetup: Record "NPR DropBox API Setup";
         TempBlob: Codeunit "Temp Blob";
@@ -249,35 +247,40 @@ codeunit 6184860 "NPR Dropbox API Mgt."
         Arguments: Text;
         HasMore: Text;
         PropertyValue: Text;
-        OutStr: OutStream;
-        HttpWebRequest: DotNet NPRNetHttpWebRequest;
-        Path: DotNet NPRNetXmlNode;
-        Convert: DotNet NPRNetConvert;
+        WebRequest: HttpRequestMessage;
+        WebResponse: HttpResponseMessage;
+        WebClient: HttpClient;
+        Path: XmlNode;
+        ArgumentsJson: JsonObject;
+        PathsNodeList: XmlNodeList;
+        ChildNodes: XmlNodeList;
     begin
         DropBoxSetup.Get(AccountCode);
         if FullRefresh then
             RemoveDropBoxOverview(AccountCode, '');
 
-        RequestManagement.JsonAdd(Arguments, 'path', DirectoryPath, false);
-        RequestManagement.JsonAdd(Arguments, 'recursive', true, false);
-        RequestManagement.JsonAdd(Arguments, 'include_deleted', false, false);
-        RequestManagement.JsonAdd(Arguments, 'include_has_explicit_shared_members', false, false);
-        RequestManagement.JsonAdd(Arguments, 'include_mounted_folders', true, false);
-        RequestManagement.JsonAdd(Arguments, 'include_non_downloadable_files', true, false);
+        ArgumentsJson.Add('path', DirectoryPath);
+        ArgumentsJson.Add('recursive', true);
+        ArgumentsJson.Add('include_deleted', false);
+        ArgumentsJson.Add('include_has_explicit_shared_members', false);
+        ArgumentsJson.Add('include_mounted_folders', true);
+        ArgumentsJson.Add('include_non_downloadable_files', true);
+        ArgumentsJson.WriteTo(Arguments);
 
-        HttpWebRequest := HttpWebRequest.Create('https://api.dropboxapi.com/2/files/list_folder');
-        HttpWebRequest.Timeout := DropBoxSetup.Timeout;
-        HttpWebRequest.Method := 'POST';
-        HttpWebRequest.ContentType('application/json');
-        HttpWebRequest.Headers.Add('Authorization', 'Bearer ' + DropBoxSetup.GetToken());
+        WebRequest.SetRequestUri('https://api.dropboxapi.com/2/files/list_folder');
+        WebRequest.Method := 'POST';
+        WebClient.Timeout := DropBoxSetup.Timeout;
+        RequestManagement.AddOrReplaceContentHeader(WebRequest, 'Content-Type', 'application/json');
+        RequestManagement.AddOrReplaceRequestHeader(WebRequest, 'Authorization', 'Bearer ' + DropBoxSetup.GetToken());
 
-        TempBlob.CreateOutStream(OutStr);
-        OutStr.Write(Arguments);
+        WebRequest.Content.WriteFrom(Arguments);
 
-        RequestManagement.StreamToHttpRequest(HttpWebRequest, TempBlob, StrLen(Arguments));
-
-        if not RequestManagement.HandleHttpRequest(HttpWebRequest, Response, Silent) then
-            exit;
+        WebClient.Send(WebRequest, WebResponse);
+        if not WebResponse.IsSuccessStatusCode then
+            if Silent then
+                exit
+            else
+                Error(WebResponse.ReasonPhrase);
 
         if File then
             PropertyValue := 'file'
@@ -287,23 +290,26 @@ codeunit 6184860 "NPR Dropbox API Mgt."
         RequestManagement.ReplaceSubstringAnyLength(Response, CustomResponse, '".tag"', '"tag"');
         RequestManagement.GetXMLFromJsonArray(CustomResponse, Paths, 'entries', 'path_display', 'tag', PropertyValue);
 
-        if File then
-            foreach Path in Paths.SelectNodes('/root/*') do
-                InsertDropBoxOverview(AccountCode, Path.InnerText);
+        if File then begin
+            Paths.AsXmlNode().SelectNodes('/root/*', PathsNodeList);
+            foreach Path in PathsNodeList do
+                InsertDropBoxOverview(AccountCode, Path.AsXmlElement().InnerText);
+        end;
 
         HasMore := RequestManagement.GetJsonValueByPropertyNameSingleNode(Response, 'has_more');
 
         if HasMore > '' then
-            if Convert.ToBoolean(HasMore) then begin
+            if HasMore.ToLower() = 'true' then begin
                 Cursor := RequestManagement.GetJsonValueByPropertyNameSingleNode(Response, 'cursor');
 
                 ListFolderFilesContinueDropBox(AccountCode, Cursor, Paths, File, Silent);
             end;
 
-        exit(Paths.FirstChild.ChildNodes.Count() > 0);
+        ChildNodes := Paths.GetChildElements();
+        exit(ChildNodes.Count > 0);
     end;
 
-    procedure FindOnDropbox(var Paths: DotNet "NPRNetXmlDocument"; AccountCode: Code[10]; SearchText: Text; Silent: Boolean): Boolean
+    procedure FindOnDropbox(var Paths: XmlDocument; AccountCode: Code[10]; SearchText: Text; Silent: Boolean): Boolean
     var
         DropBoxSetup: Record "NPR DropBox API Setup";
         TempBlob: Codeunit "Temp Blob";
@@ -311,32 +317,38 @@ codeunit 6184860 "NPR Dropbox API Mgt."
         Arguments: Text;
         Response: Text;
         Value: Text;
-        OutStr: OutStream;
-        HttpWebRequest: DotNet NPRNetHttpWebRequest;
+        WebRequest: HttpRequestMessage;
+        WebResponse: HttpResponseMessage;
+        WebClient: HttpClient;
+        ArgumentsJson: JsonObject;
+        ChildNodes: XmlNodeList;
     begin
         DropBoxSetup.Get(AccountCode);
 
-        RequestManagement.JsonAdd(Arguments, 'query', SearchText, false);
-        RequestManagement.JsonAdd(Arguments, 'include_highlights', false, false);
+        ArgumentsJson.Add('query', SearchText);
+        ArgumentsJson.Add('include_highlights', false);
+        ArgumentsJson.WriteTo(Arguments);
 
-        HttpWebRequest := HttpWebRequest.Create('https://api.dropboxapi.com/2/files/search_v2');
-        HttpWebRequest.Timeout := DropBoxSetup.Timeout;
-        HttpWebRequest.Method := 'POST';
-        HttpWebRequest.ContentType('application/json');
-        HttpWebRequest.UserAgent := 'api-explorer-client';
-        HttpWebRequest.Headers.Add('Authorization', 'Bearer ' + DropBoxSetup.GetToken());
+        WebRequest.SetRequestUri('https://api.dropboxapi.com/2/files/search_v2');
+        WebRequest.Method := 'POST';
+        WebClient.Timeout := DropBoxSetup.Timeout;
+        RequestManagement.AddOrReplaceContentHeader(WebRequest, 'Content-Type', 'application/json');
+        RequestManagement.AddOrReplaceRequestHeader(WebRequest, 'User-Agent', 'api-explorer-client');
+        RequestManagement.AddOrReplaceRequestHeader(WebRequest, 'Authorization', 'Bearer ' + DropBoxSetup.GetToken());
 
-        TempBlob.CreateOutStream(OutStr);
-        OutStr.Write(Arguments);
+        WebRequest.Content.WriteFrom(Arguments);
 
-        RequestManagement.StreamToHttpRequest(HttpWebRequest, TempBlob, StrLen(Arguments));
-
-        if not RequestManagement.HandleHttpRequest(HttpWebRequest, Response, Silent) then
-            exit;
+        WebClient.Send(WebRequest, WebResponse);
+        if not WebResponse.IsSuccessStatusCode then
+            if Silent then
+                exit
+            else
+                Error(WebResponse.ReasonPhrase);
 
         RequestManagement.GetXMLFromJsonArray(Response, Paths, 'matches', '$..path_display', '', '');
 
-        exit(Paths.FirstChild.ChildNodes.Count() > 0);
+        ChildNodes := Paths.GetChildElements();
+        exit(ChildNodes.Count > 0);
     end;
 
     procedure UploadToDropbox(var TempBlob: Codeunit "Temp Blob"; AccountCode: Code[10]; FileName: Text; Replace: Boolean; Silent: Boolean): Boolean
@@ -349,7 +361,11 @@ codeunit 6184860 "NPR Dropbox API Mgt."
         Success: Boolean;
         CR: Char;
         LF: Char;
-        HttpWebRequest: DotNet NPRNetHttpWebRequest;
+        WebRequest: HttpRequestMessage;
+        WebResponse: HttpResponseMessage;
+        WebClient: HttpClient;
+        ArgumentsJson: JsonObject;
+        InStrm: InStream;
     begin
         DropBoxSetup.Get(AccountCode);
 
@@ -360,27 +376,31 @@ codeunit 6184860 "NPR Dropbox API Mgt."
         if Replace then
             Mode := Mode::overwrite;
 
-        with RequestManagement do begin
-            JsonAdd(Arguments, 'path', FileName, false);
-            JsonAdd(Arguments, 'mode', Format(Mode), false);
-            JsonAdd(Arguments, 'autorename', true, false);
-            JsonAdd(Arguments, 'mute', false, false);
-            JsonAdd(Arguments, 'strict_conflict', false, false);
-        end;
+        ArgumentsJson.Add('path', FileName);
+        ArgumentsJson.Add('mode', Format(Mode));
+        ArgumentsJson.Add('autorename', true);
+        ArgumentsJson.Add('mute', false);
+        ArgumentsJson.Add('strict_conflict', false);
+        ArgumentsJson.WriteTo(Arguments);
 
-        HttpWebRequest := HttpWebRequest.Create('https://content.dropboxapi.com/2/files/upload');
-        HttpWebRequest.Timeout := DropBoxSetup.Timeout;
-        HttpWebRequest.Method := 'POST';
-        HttpWebRequest.ContentLength := RequestManagement.BlobLenght(TempBlob);
-        HttpWebRequest.ContentType('application/octet-stream');
-        HttpWebRequest.Headers.Add('Authorization', 'Bearer ' + DropBoxSetup.GetToken());
-        HttpWebRequest.UserAgent := 'api-explorer-client';
-        HttpWebRequest.Headers.Add('Dropbox-API-Arg', Arguments);
+        WebRequest.SetRequestUri('https://content.dropboxapi.com/2/files/upload');
+        WebRequest.Method := 'POST';
+        WebClient.Timeout := DropBoxSetup.Timeout;
+        RequestManagement.AddOrReplaceContentHeader(WebRequest, 'Content-Type', 'application/octet-stream');
+        RequestManagement.AddOrReplaceContentHeader(WebRequest, 'Content-Length', FORMAT(RequestManagement.BlobLenght(TempBlob)));
+        RequestManagement.AddOrReplaceRequestHeader(WebRequest, 'User-Agent', 'api-explorer-client');
+        RequestManagement.AddOrReplaceRequestHeader(WebRequest, 'Authorization', 'Bearer ' + DropBoxSetup.GetToken());
+        RequestManagement.AddOrReplaceRequestHeader(WebRequest, 'Dropbox-API-Arg', Arguments);
 
-        RequestManagement.StreamToHttpRequest(HttpWebRequest, TempBlob, HttpWebRequest.ContentLength);
+        TempBlob.CreateInStream(InStrm);
+        WebRequest.Content.WriteFrom(InStrm);
 
-        if not RequestManagement.HandleHttpRequest(HttpWebRequest, Response, Silent) then
-            exit;
+        WebClient.Send(WebRequest, WebResponse);
+        if not WebResponse.IsSuccessStatusCode then
+            if Silent then
+                exit
+            else
+                Error(WebResponse.ReasonPhrase);
 
         InsertDropBoxOverview(AccountCode, FileName);
 
@@ -392,11 +412,13 @@ codeunit 6184860 "NPR Dropbox API Mgt."
         DropBoxSetup: Record "NPR DropBox API Setup";
         RequestManagement: Codeunit "NPR Request Management";
         Arguments: Text;
-        Response: Text;
-        OutStr: OutStream;
-        HttpWebRequest: DotNet NPRNetHttpWebRequest;
-        Convert: DotNet NPRNetConvert;
-        MemoryStream: DotNet NPRNetMemoryStream;
+        WebRequest: HttpRequestMessage;
+        WebResponse: HttpResponseMessage;
+        WebClient: HttpClient;
+        ArgumentsJson: JsonObject;
+        InStrm: InStream;
+        OutStrm: OutStream;
+        WebResponseTempBlob: Codeunit "Temp Blob";
     begin
         DropBoxSetup.Get(AccountCode);
 
@@ -404,23 +426,29 @@ codeunit 6184860 "NPR Dropbox API Mgt."
         if CopyStr(FileName, 1, 1) <> '/' then
             FileName := '/' + FileName;
 
-        RequestManagement.JsonAdd(Arguments, 'path', FileName, false);
+        ArgumentsJson.Add('path', FileName);
+        ArgumentsJson.WriteTo(Arguments);
 
-        HttpWebRequest := HttpWebRequest.Create('https://content.dropboxapi.com/2/files/download');
-        HttpWebRequest.Timeout := DropBoxSetup.Timeout;
-        HttpWebRequest.Method := 'GET';
-        HttpWebRequest.UserAgent := 'api-explorer-client';
-        HttpWebRequest.Headers.Add('Authorization', 'Bearer ' + DropBoxSetup.GetToken());
-        HttpWebRequest.Headers.Add('Dropbox-API-Arg', Arguments);
+        WebRequest.SetRequestUri('https://content.dropboxapi.com/2/files/download');
+        WebRequest.Method := 'GET';
+        WebClient.Timeout := DropBoxSetup.Timeout;
+        RequestManagement.AddOrReplaceRequestHeader(WebRequest, 'User-Agent', 'api-explorer-client');
+        RequestManagement.AddOrReplaceRequestHeader(WebRequest, 'Authorization', 'Bearer ' + DropBoxSetup.GetToken());
+        RequestManagement.AddOrReplaceRequestHeader(WebRequest, 'Dropbox-API-Arg', Arguments);
 
-        if not RequestManagement.HandleHttpRequest(HttpWebRequest, Response, Silent) then
-            exit;
+        WebClient.Send(WebRequest, WebResponse);
+        if not WebResponse.IsSuccessStatusCode then
+            if Silent then
+                exit
+            else
+                Error(WebResponse.ReasonPhrase);
 
-        MemoryStream := MemoryStream.MemoryStream(Convert.FromBase64String(Response));
+        TempBlob.CreateOutStream(OutStrm);
 
-        TempBlob.CreateOutStream(OutStr);
-        MemoryStream.CopyTo(OutStr);
+        WebResponseTempBlob.CreateInStream(InStrm);
+        WebResponse.Content.ReadAs(InStrm);
 
+        CopyStream(OutStrm, InStrm);
         exit(TempBlob.HasValue);
     end;
 
@@ -430,9 +458,10 @@ codeunit 6184860 "NPR Dropbox API Mgt."
         TempBlob: Codeunit "Temp Blob";
         RequestManagement: Codeunit "NPR Request Management";
         Arguments: Text;
-        Response: Text;
-        OutStr: OutStream;
-        HttpWebRequest: DotNet NPRNetHttpWebRequest;
+        WebRequest: HttpRequestMessage;
+        WebResponse: HttpResponseMessage;
+        WebClient: HttpClient;
+        ArgumentsJson: JsonObject;
     begin
         DropBoxSetup.Get(AccountCode);
 
@@ -440,21 +469,23 @@ codeunit 6184860 "NPR Dropbox API Mgt."
         if CopyStr(FileName, 1, 1) <> '/' then
             FileName := '/' + FileName;
 
-        RequestManagement.JsonAdd(Arguments, 'path', FileName, false);
+        ArgumentsJson.Add('path', FileName);
+        ArgumentsJson.WriteTo(Arguments);
 
-        HttpWebRequest := HttpWebRequest.Create('https://api.dropboxapi.com/2/files/delete_v2');
-        HttpWebRequest.Timeout := DropBoxSetup.Timeout;
-        HttpWebRequest.Method := 'POST';
-        HttpWebRequest.ContentType := 'application/json';
-        HttpWebRequest.Headers.Add('Authorization', 'Bearer ' + DropBoxSetup.GetToken());
+        WebRequest.SetRequestUri('https://api.dropboxapi.com/2/files/delete_v2');
+        WebRequest.Method := 'POST';
+        WebClient.Timeout := DropBoxSetup.Timeout;
+        RequestManagement.AddOrReplaceContentHeader(WebRequest, 'Content-Type', 'application/json');
+        RequestManagement.AddOrReplaceRequestHeader(WebRequest, 'Authorization', 'Bearer ' + DropBoxSetup.GetToken());
 
-        TempBlob.CreateOutStream(OutStr);
-        OutStr.Write(Arguments);
+        WebRequest.Content.WriteFrom(Arguments);
 
-        RequestManagement.StreamToHttpRequest(HttpWebRequest, TempBlob, StrLen(Arguments));
-
-        if not RequestManagement.HandleHttpRequest(HttpWebRequest, Response, Silent) then
-            exit;
+        WebClient.Send(WebRequest, WebResponse);
+        if not WebResponse.IsSuccessStatusCode then
+            if Silent then
+                exit
+            else
+                Error(WebResponse.ReasonPhrase);
 
         RemoveDropBoxOverview(AccountCode, FileName);
 
@@ -467,9 +498,10 @@ codeunit 6184860 "NPR Dropbox API Mgt."
         TempBlob: Codeunit "Temp Blob";
         RequestManagement: Codeunit "NPR Request Management";
         Arguments: Text;
-        Response: Text;
-        OutStr: OutStream;
-        HttpWebRequest: DotNet NPRNetHttpWebRequest;
+        WebRequest: HttpRequestMessage;
+        WebResponse: HttpResponseMessage;
+        WebClient: HttpClient;
+        ArgumentsJson: JsonObject;
     begin
         DropBoxSetup.Get(AccountCode);
 
@@ -480,27 +512,27 @@ codeunit 6184860 "NPR Dropbox API Mgt."
         if CopyStr(FileTo, 1, 1) <> '/' then
             FileTo := '/' + FileTo;
 
-        with RequestManagement do begin
-            JsonAdd(Arguments, 'from_path', FileFrom, false);
-            JsonAdd(Arguments, 'to_path', FileTo, false);
-            JsonAdd(Arguments, 'allow_shared_folder', false, false);
-            JsonAdd(Arguments, 'autorename', false, false);
-            JsonAdd(Arguments, 'allow_ownership_transfer', false, false);
-        end;
+        ArgumentsJson.Add('from_path', FileFrom);
+        ArgumentsJson.Add('to_path', FileTo);
+        ArgumentsJson.Add('allow_shared_folder', false);
+        ArgumentsJson.Add('autorename', false);
+        ArgumentsJson.Add('allow_ownership_transfer', false);
+        ArgumentsJson.WriteTo(Arguments);
 
-        HttpWebRequest := HttpWebRequest.Create('https://api.dropboxapi.com/2/files/copy_v2');
-        HttpWebRequest.Timeout := DropBoxSetup.Timeout;
-        HttpWebRequest.Method := 'POST';
-        HttpWebRequest.ContentType := 'application/json';
-        HttpWebRequest.Headers.Add('Authorization', 'Bearer ' + DropBoxSetup.GetToken());
+        WebRequest.SetRequestUri('https://api.dropboxapi.com/2/files/copy_v2');
+        WebRequest.Method := 'POST';
+        WebClient.Timeout := DropBoxSetup.Timeout;
+        RequestManagement.AddOrReplaceContentHeader(WebRequest, 'Content-Type', 'application/json');
+        RequestManagement.AddOrReplaceRequestHeader(WebRequest, 'Authorization', 'Bearer ' + DropBoxSetup.GetToken());
 
-        TempBlob.CreateOutStream(OutStr);
-        OutStr.Write(Arguments);
+        WebRequest.Content.WriteFrom(Arguments);
 
-        RequestManagement.StreamToHttpRequest(HttpWebRequest, TempBlob, StrLen(Arguments));
-
-        if not RequestManagement.HandleHttpRequest(HttpWebRequest, Response, Silent) then
-            exit;
+        WebClient.Send(WebRequest, WebResponse);
+        if not WebResponse.IsSuccessStatusCode then
+            if Silent then
+                exit
+            else
+                Error(WebResponse.ReasonPhrase);
 
         InsertDropBoxOverview(AccountCode, FileTo);
 
