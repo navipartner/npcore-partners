@@ -17,6 +17,15 @@ pageextension 6014487 "NPR Sales Order List" extends "Sales Order List"
                 ApplicationArea = All;
             }
         }
+        addafter("External Document No.")
+        {
+            field("NPR Magento Coupon";"NPR Magento Coupon")
+            {
+                ApplicationArea = All;
+                Editable = false;
+                Visible = false;
+            }
+        }
     }
     actions
     {
