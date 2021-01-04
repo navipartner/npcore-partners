@@ -18,6 +18,7 @@ page 6014552 "NPR Brands WP"
                 {
                     ApplicationArea = All;
                     ShowMandatory = true;
+                    ToolTip = 'Specifies the value of the Id field';
 
                     trigger OnValidate()
                     begin
@@ -27,14 +28,17 @@ page 6014552 "NPR Brands WP"
                 field(Name; Name)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Name field';
                 }
                 field(Picture; Picture)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Picture field';
                 }
                 field("Sorting"; Sorting)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Sorting field';
                 }
             }
         }

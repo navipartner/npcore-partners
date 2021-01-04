@@ -19,29 +19,35 @@ page 6150696 "NPR NPRE Kitchen Order Card"
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Order ID field';
                 }
                 field("Restaurant Code"; "Restaurant Code")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Restaurant Code field';
                 }
                 field("Created Date-Time"; "Created Date-Time")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Created Date-Time field';
                 }
                 field(Status; Status)
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Status field';
                 }
                 field(Priority; Priority)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Priority field';
                 }
                 field("On Hold"; "On Hold")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the On Hold field';
                 }
             }
         }
@@ -75,6 +81,7 @@ page 6150696 "NPR NPRE Kitchen Order Card"
                 RunPageLink = "Order ID" = FIELD("Order ID");
                 RunPageView = SORTING("Order ID");
                 ApplicationArea = All;
+                ToolTip = 'Executes the Show Requests action';
             }
         }
     }

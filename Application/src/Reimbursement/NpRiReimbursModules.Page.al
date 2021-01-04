@@ -18,24 +18,29 @@ page 6151100 "NPR NpRi Reimburs. Modules"
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field(Type; Type)
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Type field';
                 }
                 field("Subscriber Codeunit ID"; "Subscriber Codeunit ID")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Subscriber Codeunit ID field';
                 }
                 field("Subscriber Codeunit Name"; "Subscriber Codeunit Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Subscriber Codeunit Name field';
                 }
             }
         }

@@ -15,10 +15,12 @@ page 6014539 "NPR Insurance Category"
                 field(Kategori; Kategori)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Category field';
                 }
                 field("Calculation Type"; "Calculation Type")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Calculation Type field';
                 }
             }
         }

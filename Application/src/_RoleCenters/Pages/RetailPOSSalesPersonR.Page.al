@@ -90,6 +90,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                     Image = "Report";
                     RunObject = Report Statement;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the S&tatement action';
                 }
                 separator(Separator6150667)
                 {
@@ -100,6 +101,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                     Image = "Report";
                     RunObject = Report "Customer - Order Summary";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Customer - Order Su&mmary action';
                 }
                 action("Customer - T&op 10 List")
                 {
@@ -107,6 +109,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                     Image = "Report";
                     RunObject = Report "Customer - Top 10 List";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Customer - T&op 10 List action';
                 }
                 separator(Separator6150663)
                 {
@@ -120,6 +123,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                     Image = "Report";
                     RunObject = Report "Inventory - Sales Back Orders";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Inventory - Sales &Back Orders action';
                 }
                 separator(Separator6150658)
                 {
@@ -130,6 +134,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                     Image = "Report";
                     RunObject = Report "Trial Balance";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the &G/L Trial Balance action';
                 }
                 action("Trial Balance by &Period")
                 {
@@ -137,6 +142,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                     Image = "Report";
                     RunObject = Report "Trial Balance by Period";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Trial Balance by &Period action';
                 }
                 action("Closing T&rial Balance")
                 {
@@ -144,6 +150,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                     Image = "Report";
                     RunObject = Report "Closing Trial Balance";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Closing T&rial Balance action';
                 }
                 separator(Separator6150654)
                 {
@@ -154,6 +161,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                     Image = "Report";
                     RunObject = Report "Aged Accounts Receivable";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Aged Ac&counts Receivable action';
                 }
                 action("Aged Accounts Pa&yable")
                 {
@@ -161,6 +169,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                     Image = "Report";
                     RunObject = Report "Aged Accounts Payable";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Aged Accounts Pa&yable action';
                 }
                 action("Reconcile Cust. and &Vend. Accs")
                 {
@@ -168,6 +177,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                     Image = "Report";
                     RunObject = Report "Reconcile Cust. and Vend. Accs";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Reconcile Cust. and &Vend. Accs action';
                 }
                 separator(Separator6150650)
                 {
@@ -178,6 +188,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                     Image = "Report";
                     RunObject = Report "VAT Registration No. Check";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the VAT Registration No. Chec&k action';
                 }
                 action("VAT E&xceptions")
                 {
@@ -185,6 +196,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                     Image = "Report";
                     RunObject = Report "VAT Exceptions";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the VAT E&xceptions action';
                 }
                 action("V&AT Statement")
                 {
@@ -192,6 +204,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                     Image = "Report";
                     RunObject = Report "VAT Statement";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the V&AT Statement action';
                 }
                 action("VAT-VIES Declaration Tax A&uth")
                 {
@@ -199,6 +212,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                     Image = "Report";
                     RunObject = Report "VAT- VIES Declaration Tax Auth";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the VAT - VIES Declaration Tax A&uth action';
                 }
                 action("VAT - VIES Declaration &Disk")
                 {
@@ -206,6 +220,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                     Image = "Report";
                     RunObject = Report "VAT- VIES Declaration Disk";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the VAT - VIES Declaration &Disk action';
                 }
                 action("EC Sal&es List")
                 {
@@ -213,6 +228,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                     Image = "Report";
                     RunObject = Report "EC Sales List";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the EC Sal&es List action';
                 }
             }
 
@@ -290,18 +306,21 @@ page 6151241 "NPR Retail POS- Sales Person R"
                     Caption = 'Retail Item List';
                     RunObject = Page "Item List";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Retail Item List action';
                 }
                 action("Item Group Tree")
                 {
                     Caption = 'Item Group Tree';
                     RunObject = Page "NPR Item Group Tree";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Item Group Tree action';
                 }
                 action("Stockkeeping Unit List")
                 {
                     Caption = 'Stockkeeping Unit List';
                     RunObject = Page "Stockkeeping Unit List";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Stockkeeping Unit List action';
                 }
 
             }
@@ -318,6 +337,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                     Caption = 'Item Journal List';
                     RunObject = page "Item Journal Batches";
                     RunPageView = WHERE("Template Type" = CONST(Item));
+                    ToolTip = 'Executes the Item Journal List action';
                 }
 
                 action("Physical Inventory Journals")
@@ -327,6 +347,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                     RunPageView = WHERE("Template Type" = CONST("Phys. Inventory"),
                                          Recurring = CONST(false));
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Physical Inventory Journals action';
                 }
 
                 action("Retail Journal List")
@@ -334,12 +355,14 @@ page 6151241 "NPR Retail POS- Sales Person R"
                     Caption = 'Retail Journal List';
                     RunObject = page "NPR Retail Journal List";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Retail Journal List action';
                 }
                 action(ItemWorksheets)
                 {
                     ApplicationArea = Warehouse;
                     Caption = 'Item Worksheets';
                     RunObject = page "NPR Item Worksheets";
+                    ToolTip = 'Executes the Item Worksheets action';
                 }
 
             }
@@ -416,6 +439,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                     Caption = 'Campaign Discount List';
                     RunObject = page "NPR Campaign Discount List";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Campaign Discount List action';
                 }
 
                 action("Mixed Discount List")
@@ -423,18 +447,21 @@ page 6151241 "NPR Retail POS- Sales Person R"
                     Caption = 'Mixed Discount List';
                     RunObject = page "NPR Mixed Discount List";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Mixed Discount List action';
                 }
                 action("Coupon List")
                 {
                     Caption = 'Coupon List';
                     RunObject = page "NPR NpDc Coupons";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Coupon List action';
                 }
                 action("Voucher List")
                 {
                     Caption = 'Voucher List';
                     RunObject = page "NPR NpRv Vouchers";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Voucher List action';
                 }
             }
 
@@ -451,6 +478,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                 RunObject = Page "Sales Order";
                 RunPageMode = Create;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Sales &Order action';
             }
             action("Sales &Return Order")
             {
@@ -459,6 +487,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                 RunObject = Page "Sales Return Order";
                 RunPageMode = Create;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Sales &Return Order action';
             }
 
             action("Sales Credit &Memo")
@@ -469,6 +498,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                 RunObject = Page "Sales Credit Memo";
                 RunPageMode = Create;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Sales Credit &Memo action';
             }
             action("&Transfer Order")
             {
@@ -477,6 +507,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                 RunObject = Page "Transfer Order";
                 RunPageMode = Create;
                 ApplicationArea = All;
+                ToolTip = 'Executes the &Transfer Order action';
             }
             action("&Purchase Order")
             {
@@ -486,6 +517,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                 RunObject = Page "Purchase Order";
                 RunPageMode = Create;
                 ApplicationArea = All;
+                ToolTip = 'Executes the &Purchase Order action';
             }
 
             action("Purchase Credit Memo")
@@ -494,6 +526,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                 Image = PurchaseTaxStatement;
                 RunObject = Page "Purchase Credit Memo";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Purchase Credit Memo action';
             }
 
             action("Purchase Return Order")
@@ -502,6 +535,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                 Image = Document;
                 RunObject = Page "Purchase Return Order";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Purchase Return Order action';
             }
 
 
@@ -527,6 +561,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                                 Image = Report2;
                                 RunObject = Report "NPR Sales Person Top 20";
                                 ApplicationArea = All;
+                                ToolTip = 'Executes the NPR Sales Person Top 20 action';
                             }
                             action("NPR Sales code/Item group top")
                             {
@@ -534,6 +569,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                                 Image = Report2;
                                 RunObject = Report "NPR Salesperson/Item Group Top";
                                 ApplicationArea = All;
+                                ToolTip = 'Executes the NPR  Sales code/Item group top action';
                             }
                             action("NPR Sale Statistics per Vendor")
                             {
@@ -541,6 +577,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                                 Image = Report2;
                                 RunObject = Report "NPR Sale Statistics per Vendor";
                                 ApplicationArea = All;
+                                ToolTip = 'Executes the NPR Sale Statistics per Vendor action';
                             }
 
 
@@ -555,6 +592,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                                 Image = Report2;
                                 RunObject = Report "NPR List of Sales Invoices";
                                 ApplicationArea = All;
+                                ToolTip = 'Executes the NPR List of Sales Invoices action';
                             }
                             action("NPR Item Wise Sales Figures")
                             {
@@ -562,6 +600,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                                 Image = Report2;
                                 RunObject = Report "NPR Item Wise Sales Figures";
                                 ApplicationArea = All;
+                                ToolTip = 'Executes the NPR Item Wise Sales Figures action';
                             }
 
 
@@ -581,6 +620,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                                     Image = Report2;
                                     RunObject = page "NPR Sales Ticket Statistics";
                                     ApplicationArea = All;
+                                    ToolTip = 'Executes the Sales Ticket Statistics action';
                                 }
                                 action("Advanced Sales Statistics")
                                 {
@@ -588,12 +628,14 @@ page 6151241 "NPR Retail POS- Sales Person R"
                                     Image = ListPage;
                                     RunObject = page "NPR Advanced Sales Stats";
                                     ApplicationArea = All;
+                                    ToolTip = 'Executes the Advanced Sales Statistics action';
                                 }
                                 action("Sales Statistics by Date Time")
                                 {
                                     Caption = 'Sales Statistics by Date Time';
                                     Image = ListPage;
                                     ApplicationArea = All;
+                                    ToolTip = 'Executes the Sales Statistics by Date Time action';
                                     //RunObject = page sales st
                                 }
                                 action(Periods)
@@ -602,6 +644,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                                     Image = ListPage;
                                     RunObject = page "NPR Periods";
                                     ApplicationArea = All;
+                                    ToolTip = 'Executes the Periods action';
                                 }
 
                             }
@@ -614,6 +657,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                                     Image = Report2;
                                     RunObject = Report "NPR Sales per week year/Last";
                                     ApplicationArea = All;
+                                    ToolTip = 'Executes the NPR Sales per week year/Last year action';
                                 }
 
 
@@ -623,6 +667,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                                     Image = Report2;
                                     RunObject = Report "NPR Discount Statistics";
                                     ApplicationArea = All;
+                                    ToolTip = 'Executes the NPR Discount Statistics action';
                                 }
                                 action("NPR Sales Ticket Statistics/Date")
                                 {
@@ -630,6 +675,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                                     Image = Report2;
                                     RunObject = Report "NPR Sales Ticket Stats/Date";
                                     ApplicationArea = All;
+                                    ToolTip = 'Executes the NPR Sales Ticket Statistics/Date action';
                                 }
                             }
                         }
@@ -652,6 +698,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                                     Image = ListPage;
                                     RunObject = page "Item List";
                                     ApplicationArea = All;
+                                    ToolTip = 'Executes the Retail Item action';
                                 }
                                 action(Items)
                                 {
@@ -659,6 +706,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                                     Image = ListPage;
                                     RunObject = page "Item List";
                                     ApplicationArea = All;
+                                    ToolTip = 'Executes the Items action';
                                 }
                                 action("Item AddOns")
                                 {
@@ -666,6 +714,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                                     Image = ListPage;
                                     RunObject = page "NPR NpIa Item AddOns";
                                     ApplicationArea = All;
+                                    ToolTip = 'Executes the Item AddOns action';
                                 }
                             }
 
@@ -678,6 +727,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                                     Image = Report;
                                     RunObject = report "NPR Inventory by age";
                                     ApplicationArea = All;
+                                    ToolTip = 'Executes the NPR Inventory by age action';
                                 }
                                 action("NPR Inv. Sales Statistics")
                                 {
@@ -685,6 +735,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                                     Image = Report;
                                     RunObject = report "NPR Item Sales Stats/Provider";
                                     ApplicationArea = All;
+                                    ToolTip = 'Executes the NPR Inv. Sales Statistics action';
                                 }
                                 action("NPR Inventory per Date")
                                 {
@@ -692,6 +743,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                                     Image = Report;
                                     RunObject = report "NPR Inventory per Date";
                                     ApplicationArea = All;
+                                    ToolTip = 'Executes the NPR Inventory per Date action';
                                 }
                                 action("NPR Item Group Inventory Value")
                                 {
@@ -699,6 +751,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                                     Image = Report;
                                     RunObject = report "NPR Item Group Inv. Value";
                                     ApplicationArea = All;
+                                    ToolTip = 'Executes the NPR Item Group Inventory Value action';
                                 }
 
                                 action("NPR Statistic - Sales")
@@ -707,6 +760,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                                     Image = Report;
                                     RunObject = report "NPR Item Sales Postings";
                                     ApplicationArea = All;
+                                    ToolTip = 'Executes the NPR Statistic - Sales action';
                                 }
 
                                 action("NPR Low Sales")
@@ -715,6 +769,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                                     Image = Report;
                                     RunObject = report "NPR Items With Low Sales";
                                     ApplicationArea = All;
+                                    ToolTip = 'Executes the NPR Low Sales action';
                                 }
 
                                 action("NPR Shrinkage")
@@ -723,6 +778,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                                     Image = Report;
                                     RunObject = report "NPR Item - Loss";
                                     ApplicationArea = All;
+                                    ToolTip = 'Executes the NPR Shrinkage action';
                                 }
 
                                 action("NPR Item Loss - Return Reason")
@@ -731,6 +787,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                                     Image = Report;
                                     RunObject = report "NPR Item Loss - Ret. Reason";
                                     ApplicationArea = All;
+                                    ToolTip = 'Executes the NPR Item Loss - Return Reason action';
                                 }
                                 action("NPR Sales Statistics Variant")
                                 {
@@ -738,6 +795,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                                     Image = Report;
                                     RunObject = report "NPR Sales Stats Per Variety";
                                     ApplicationArea = All;
+                                    ToolTip = 'Executes the NPR Sales Statistics Variant action';
                                 }
                                 action("NPR Inventory per Variant at date")
                                 {
@@ -745,6 +803,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                                     Image = Report;
                                     RunObject = report "NPR Inventory per Variant/date";
                                     ApplicationArea = All;
+                                    ToolTip = 'Executes the NPR Inventory per Variant at date action';
                                 }
                                 action("NPR Item Group Statistic M/Y")
                                 {
@@ -752,6 +811,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                                     Image = Report;
                                     RunObject = report "NPR Item Group Stat M/Y";
                                     ApplicationArea = All;
+                                    ToolTip = 'Executes the NPR Item Group Statistic M/Y action';
                                 }
 
                                 action("NPR Item Group Listing M/Y")
@@ -760,6 +820,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                                     Image = Report;
                                     RunObject = report "NPR Item Group Listing M/Y";
                                     ApplicationArea = All;
+                                    ToolTip = 'Executes the NPR Item Group Listing M/Y action';
                                 }
 
                                 action("NPR Item Barcode Sheet")
@@ -768,6 +829,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                                     Image = Report;
                                     RunObject = report "NPR Item Barcode Status Sheet";
                                     ApplicationArea = All;
+                                    ToolTip = 'Executes the NPR Item Barcode Sheet action';
                                 }
                                 action("NPR Return Reason Code Statistics")
                                 {
@@ -775,6 +837,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                                     Image = Report;
                                     RunObject = report "NPR Return Reason Code Stat.";
                                     ApplicationArea = All;
+                                    ToolTip = 'Executes the NPR Return Reason Code Statistics action';
                                 }
 
                                 action("NPR Adjust Cost - Item Entries")
@@ -783,6 +846,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                                     Image = Report;
                                     RunObject = report "NPR Adjust Cost: ItemEntriesTQ";
                                     ApplicationArea = All;
+                                    ToolTip = 'Executes the NPR Adjust Cost - Item Entries action';
                                 }
 
                                 action("NPR Item Sales Statistics")
@@ -791,6 +855,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                                     Image = Report;
                                     RunObject = report "NPR Item Sales Statistics";
                                     ApplicationArea = All;
+                                    ToolTip = 'Executes the NPR Item Sales Statistics action';
                                 }
                                 action("NPR Item Group Top")
                                 {
@@ -798,6 +863,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                                     Image = Report;
                                     RunObject = report "NPR Item Group Top";
                                     ApplicationArea = All;
+                                    ToolTip = 'Executes the NPR Item Group Top action';
                                 }
 
 
@@ -817,6 +883,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                                     Image = ListPage;
                                     RunObject = page "NPR NpIa Item AddOns";
                                     ApplicationArea = All;
+                                    ToolTip = 'Executes the Item AddOns action';
                                 }
 
                                 action("Sales Price Maintenance Setup")
@@ -825,6 +892,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                                     Image = ListPage;
                                     RunObject = page "NPR Sales Price Maint. Setup";
                                     ApplicationArea = All;
+                                    ToolTip = 'Executes the Sales Price Maintenance Setup action';
                                 }
 
                                 action("Retail Price Log Entries")
@@ -833,6 +901,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                                     Image = ListPage;
                                     RunObject = page "NPR Retail Price Log Entries";
                                     ApplicationArea = All;
+                                    ToolTip = 'Executes the Retail Price Log Entries action';
                                 }
                             }
                             group(LineReports)
@@ -845,6 +914,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                                     Image = Report;
                                     RunObject = Report "NPR Item Group Overview";
                                     ApplicationArea = All;
+                                    ToolTip = 'Executes the NPR Item Group Overview action';
                                 }
 
                                 action("NPR Vendor sales per line")
@@ -853,6 +923,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                                     Image = Report;
                                     RunObject = report "NPR Vendor trx by Item group";
                                     ApplicationArea = All;
+                                    ToolTip = 'Executes the NPR Vendor sales per line action';
                                 }
 
                                 action("NPR Sales Person Trn. by Item Gr.")
@@ -861,6 +932,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                                     Image = Report;
                                     RunObject = Report "NPR S.Person Trx by Item Gr.";
                                     ApplicationArea = All;
+                                    ToolTip = 'Executes the NPR Sales Person Trn. by Item Gr. action';
                                 }
                                 action("NPR Sales Stat/Analysis")
                                 {
@@ -868,6 +940,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                                     Image = Report;
                                     RunObject = Report "NPR Sales Stat/Analysis";
                                     ApplicationArea = All;
+                                    ToolTip = 'Executes the NPR Sales Stat/Analysis action';
                                 }
                             }
 
@@ -886,6 +959,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                                     Image = ListPage;
                                     RunObject = page "NPR Mixed Discount List";
                                     ApplicationArea = All;
+                                    ToolTip = 'Executes the Mix Discounts action';
                                 }
                                 action("Period Discounts")
                                 {
@@ -893,6 +967,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                                     Image = ListPage;
                                     RunObject = page "NPR Campaign Discount List";
                                     ApplicationArea = All;
+                                    ToolTip = 'Executes the Period Discounts action';
                                 }
                                 action("Retail Campaigns")
                                 {
@@ -900,6 +975,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                                     Image = ListPage;
                                     RunObject = page "NPR Retail Campaigns";
                                     ApplicationArea = All;
+                                    ToolTip = 'Executes the Retail Campaigns action';
                                 }
 
                             }
@@ -913,6 +989,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                                     Image = Report;
                                     RunObject = Report "NPR Inventory Campaign Stat.";
                                     ApplicationArea = All;
+                                    ToolTip = 'Executes the NPR Stock Campaign stat. action';
                                 }
 
                                 action("NPR Period Discount Statistics")
@@ -921,6 +998,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                                     Image = Report;
                                     RunObject = report "NPR Period Discount Stat.";
                                     ApplicationArea = All;
+                                    ToolTip = 'Executes the NPR Period Discount Statistics action';
                                 }
 
                                 action("Inventory Campaign Stat.")
@@ -929,6 +1007,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                                     Image = Report;
                                     RunObject = Report "NPR Inventory Campaign Stat.";
                                     ApplicationArea = All;
+                                    ToolTip = 'Executes the Inventory Campaign Stat. action';
                                 }
                             }
 
@@ -988,6 +1067,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                     Image = Report2;
                     RunObject = Report "NPR Vendor Top/Sale";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the NPR Vendor Top/Sale action';
                 }
                 action("NPR Vendor/Item Group")
                 {
@@ -995,6 +1075,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                     Image = Report2;
                     RunObject = Report "NPR Vendor/Item Group";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the NPR Vendor/Item Group action';
                 }
                 action("NPR Vendor/Salesperson")
                 {
@@ -1002,6 +1083,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                     Image = Report2;
                     RunObject = Report "NPR Vendor/Salesperson";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the NPR Vendor/Salesperson action';
                 }
 
                 action("NPR Vendor Sales Stat")
@@ -1010,6 +1092,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                     Image = Report2;
                     RunObject = Report "NPR Vendor Sales Stat";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the NPR Vendor Sales Stat action';
                 }
 
             }
@@ -1024,6 +1107,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                     Image = Report2;
                     RunObject = Report "NPR Sales Ticket Stat.";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the NPR Sales Statistics action';
                 }
                 action("NPR Salesperson Statistics")
                 {
@@ -1031,6 +1115,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                     Image = Report2;
                     RunObject = Report "NPR Salesperson Stats";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the NPR Salesperson Statistics action';
                 }
                 action("NPR Sales Time")
                 {
@@ -1038,6 +1123,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                     Image = Report2;
                     RunObject = Report "NPR Sale Time Report";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the NPR  Sales Time action';
                 }
 
                 action("NPR Sales Statistics By Department")
@@ -1046,12 +1132,14 @@ page 6151241 "NPR Retail POS- Sales Person R"
                     Image = Report2;
                     RunObject = Report "NPR Sales Statistics By Dept.";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the NPR Sales Statistics By Department action';
                 }
                 action("POS Item Sales with Dimensions")
                 {
                     Caption = 'POS Item Sales with Dimensions';
                     Image = Report2;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the POS Item Sales with Dimensions action';
                     //RunObject = Report "pos item with dimension";
                 }
             }

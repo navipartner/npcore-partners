@@ -18,38 +18,47 @@ page 6059911 "NPR Task Output Log"
                 field("Entry No."; "Entry No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Entry No. field';
                 }
                 field("Task Log Entry No."; "Task Log Entry No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Task Log Entry No. field';
                 }
                 field("Journal Template Name"; "Journal Template Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Journal Template Name field';
                 }
                 field("Journal Batch Name"; "Journal Batch Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Journal Batch Name field';
                 }
                 field("Journal Line No."; "Journal Line No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Journal Line No. field';
                 }
                 field("File"; File)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the File field';
                 }
                 field("File Name"; "File Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the File Name field';
                 }
                 field("Import DateTime"; "Import DateTime")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Import DateTime field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
             }
         }
@@ -64,6 +73,7 @@ page 6059911 "NPR Task Output Log"
                 Caption = 'Show Document';
                 Image = ShowSelected;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Show Document action';
 
                 trigger OnAction()
                 var

@@ -17,6 +17,7 @@ page 6014627 "NPR Hardware Connector"
                 ApplicationArea = All;
                 Style = Strong;
                 StyleExpr = TRUE;
+                ToolTip = 'Specifies the value of the PageCaption field';
             }
             usercontrol(Bridge; "NPR Bridge")
             {

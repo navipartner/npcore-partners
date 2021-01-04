@@ -20,66 +20,82 @@ page 6060126 "NPR MM Members"
                 field("External Member No."; "External Member No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the External Member No. field';
                 }
                 field("First Name"; "First Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the First Name field';
                 }
                 field("Middle Name"; "Middle Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Middle Name field';
                 }
                 field("Last Name"; "Last Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Last Name field';
                 }
                 field(Blocked; Blocked)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Blocked field';
                 }
                 field(Gender; Gender)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Gender field';
                 }
                 field(Birthday; Birthday)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Birthday field';
                 }
                 field("Contact No."; "Contact No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Contact No. field';
                 }
                 field("E-Mail News Letter"; "E-Mail News Letter")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the E-Mail News Letter field';
                 }
                 field("E-Mail Address"; "E-Mail Address")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the E-Mail Address field';
                 }
                 field("Phone No."; "Phone No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Phone No. field';
                 }
                 field(Address; Address)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Address field';
                 }
                 field("Post Code Code"; "Post Code Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the ZIP Code field';
                 }
                 field(City; City)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the City field';
                 }
                 field(Country; Country)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Country field';
                 }
                 field("Display Name"; "Display Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Display Name field';
                 }
                 field(NPRAttrTextArray_01; NPRAttrTextArray[1])
                 {
@@ -87,6 +103,7 @@ page 6060126 "NPR MM Members"
                     CaptionClass = GetAttributeCaptionClass(1);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible01;
+                    ToolTip = 'Specifies the value of the NPRAttrTextArray[1] field';
 
                     trigger OnValidate()
                     begin
@@ -101,6 +118,7 @@ page 6060126 "NPR MM Members"
                     CaptionClass = GetAttributeCaptionClass(2);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible02;
+                    ToolTip = 'Specifies the value of the NPRAttrTextArray[2] field';
 
                     trigger OnValidate()
                     begin
@@ -115,6 +133,7 @@ page 6060126 "NPR MM Members"
                     CaptionClass = GetAttributeCaptionClass(3);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible03;
+                    ToolTip = 'Specifies the value of the NPRAttrTextArray[3] field';
 
                     trigger OnValidate()
                     begin
@@ -129,6 +148,7 @@ page 6060126 "NPR MM Members"
                     CaptionClass = GetAttributeCaptionClass(4);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible04;
+                    ToolTip = 'Specifies the value of the NPRAttrTextArray[4] field';
 
                     trigger OnValidate()
                     begin
@@ -143,6 +163,7 @@ page 6060126 "NPR MM Members"
                     CaptionClass = GetAttributeCaptionClass(5);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible05;
+                    ToolTip = 'Specifies the value of the NPRAttrTextArray[5] field';
 
                     trigger OnValidate()
                     begin
@@ -157,6 +178,7 @@ page 6060126 "NPR MM Members"
                     CaptionClass = GetAttributeCaptionClass(6);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible06;
+                    ToolTip = 'Specifies the value of the NPRAttrTextArray[6] field';
 
                     trigger OnValidate()
                     begin
@@ -171,6 +193,7 @@ page 6060126 "NPR MM Members"
                     CaptionClass = GetAttributeCaptionClass(7);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible07;
+                    ToolTip = 'Specifies the value of the NPRAttrTextArray[7] field';
 
                     trigger OnValidate()
                     begin
@@ -185,6 +208,7 @@ page 6060126 "NPR MM Members"
                     CaptionClass = GetAttributeCaptionClass(8);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible08;
+                    ToolTip = 'Specifies the value of the NPRAttrTextArray[8] field';
 
                     trigger OnValidate()
                     begin
@@ -199,6 +223,7 @@ page 6060126 "NPR MM Members"
                     CaptionClass = GetAttributeCaptionClass(9);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible09;
+                    ToolTip = 'Specifies the value of the NPRAttrTextArray[9] field';
 
                     trigger OnValidate()
                     begin
@@ -213,6 +238,7 @@ page 6060126 "NPR MM Members"
                     CaptionClass = GetAttributeCaptionClass(10);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible10;
+                    ToolTip = 'Specifies the value of the NPRAttrTextArray[10] field';
 
                     trigger OnValidate()
                     begin
@@ -237,6 +263,7 @@ page 6060126 "NPR MM Members"
                 Promoted = true;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Create Membership action';
 
                 trigger OnAction()
                 var
@@ -265,6 +292,7 @@ page 6060126 "NPR MM Members"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Register Arrival action';
 
                 trigger OnAction()
                 var
@@ -284,6 +312,7 @@ page 6060126 "NPR MM Members"
                 Caption = 'Synchronize Contact';
                 Image = CreateInteraction;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Synchronize Contact action';
 
                 trigger OnAction()
                 begin
@@ -301,6 +330,7 @@ page 6060126 "NPR MM Members"
                 PromotedIsBig = true;
                 Visible = NPRAttrVisible01 OR NPRAttrVisible02 OR NPRAttrVisible03 OR NPRAttrVisible04 OR NPRAttrVisible05 OR NPRAttrVisible06 OR NPRAttrVisible07 OR NPRAttrVisible08 OR NPRAttrVisible09 OR NPRAttrVisible10;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Set Client Attribute Filter action';
 
                 trigger OnAction()
                 var
@@ -323,6 +353,7 @@ page 6060126 "NPR MM Members"
                     Caption = 'Import Face Image';
                     ApplicationArea = All;
                     Image = Picture;
+                    ToolTip = 'Executes the Import Face Image action';
 
                     trigger OnAction()
                     var
@@ -388,6 +419,7 @@ page 6060126 "NPR MM Members"
                     Caption = 'Identify Person';
                     ApplicationArea = All;
                     Image = AnalysisView;
+                    ToolTip = 'Executes the Identify Person action';
 
                     trigger OnAction()
                     var
@@ -419,6 +451,7 @@ page 6060126 "NPR MM Members"
                 RunObject = Page "NPR MM Member Communication";
                 RunPageLink = "Member Entry No." = FIELD("Entry No.");
                 ApplicationArea = All;
+                ToolTip = 'Executes the Preferred Com. Methods action';
             }
             action("Arrival Log")
             {
@@ -431,6 +464,7 @@ page 6060126 "NPR MM Members"
                 RunObject = Page "NPR MM Member Arrival Log";
                 RunPageLink = "External Member No." = FIELD("External Member No.");
                 ApplicationArea = All;
+                ToolTip = 'Executes the Arrival Log action';
             }
             group("Raptor Integration")
             {
@@ -444,6 +478,7 @@ page 6060126 "NPR MM Members"
                     PromotedCategory = Category5;
                     Visible = RaptorEnabled;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Browsing History action';
 
                     trigger OnAction()
                     var
@@ -467,6 +502,7 @@ page 6060126 "NPR MM Members"
                     PromotedCategory = Category5;
                     Visible = RaptorEnabled;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Recommendations action';
 
                     trigger OnAction()
                     var

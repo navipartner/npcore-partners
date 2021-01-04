@@ -25,66 +25,81 @@ page 6151454 "NPR Magento Payment Line List"
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Document Table No. field';
                 }
                 field("Document No."; "Document No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Document No. field';
                 }
                 field("Payment Type"; "Payment Type")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Payment Type field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Account Type"; "Account Type")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Account Type field';
                 }
                 field("Account No."; "Account No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Account No. field';
                 }
                 field("No."; "No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the No. field';
                 }
                 field(Amount; Amount)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Amount field';
                 }
                 field("Allow Adjust Amount"; "Allow Adjust Amount")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Allow Adjust Amount field';
                 }
                 field("Posting Date"; "Posting Date")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Posting Date field';
                 }
                 field(Posted; Posted)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Posted field';
                 }
                 field("Payment Gateway Code"; "Payment Gateway Code")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Payment Gateway Code field';
                 }
                 field("External Reference No."; "External Reference No.")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the External Reference No. field';
                 }
                 field("Date Captured"; "Date Captured")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Date Captured field';
                 }
                 field("Date Refunded"; "Date Refunded")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Date Refunded field';
                 }
             }
         }
@@ -110,6 +125,7 @@ page 6151454 "NPR Magento Payment Line List"
                 PromotedIsBig = true;
                 Visible = CaptureEnabled;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Capture Payment action';
 
                 trigger OnAction()
                 var
@@ -147,6 +163,7 @@ page 6151454 "NPR Magento Payment Line List"
                 PromotedIsBig = true;
                 Visible = RefundEnabled;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Refund Payment action';
 
                 trigger OnAction()
                 var
@@ -179,6 +196,7 @@ page 6151454 "NPR Magento Payment Line List"
                 PromotedIsBig = true;
                 Visible = ("Document Table No." = 112) AND ("Account No." <> '') AND (NOT Posted);
                 ApplicationArea = All;
+                ToolTip = 'Executes the Post Payment action';
 
                 trigger OnAction()
                 var
@@ -203,6 +221,7 @@ page 6151454 "NPR Magento Payment Line List"
                 PromotedIsBig = true;
                 Visible = ("Document Table No." = 112) OR ("Document Table No." = 114);
                 ApplicationArea = All;
+                ToolTip = 'Executes the &Navigate action';
 
                 trigger OnAction()
                 var
@@ -220,6 +239,7 @@ page 6151454 "NPR Magento Payment Line List"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Document Card action';
 
                 trigger OnAction()
                 var

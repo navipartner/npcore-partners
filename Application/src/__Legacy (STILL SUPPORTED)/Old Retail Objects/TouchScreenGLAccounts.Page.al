@@ -25,10 +25,12 @@ page 6014527 "NPR TouchScreen: G/L Accounts"
                 field(Name; Name)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Name field';
                 }
                 field("No."; "No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the No. field';
                 }
             }
         }

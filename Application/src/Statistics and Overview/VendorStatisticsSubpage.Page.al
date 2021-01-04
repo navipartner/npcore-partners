@@ -20,15 +20,18 @@ page 6014590 "NPR Vendor Statistics Subpage"
                 field("No."; "No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the No. field';
                 }
                 field(Name; Name)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Name field';
                 }
                 field("-""Sale Quantity"""; -"Sale Quantity")
                 {
                     ApplicationArea = All;
                     Caption = 'Sale (QTY)';
+                    ToolTip = 'Specifies the value of the Sale (QTY) field';
 
                     trigger OnDrillDown()
                     var
@@ -47,11 +50,13 @@ page 6014590 "NPR Vendor Statistics Subpage"
                     ApplicationArea = All;
                     Caption = '-> Last year';
                     Visible = LSQTY;
+                    ToolTip = 'Specifies the value of the -> Last year field';
                 }
                 field("Sale Amount"; "Sale Amount")
                 {
                     ApplicationArea = All;
                     Caption = 'Sale (LCY)';
+                    ToolTip = 'Specifies the value of the Sale (LCY) field';
 
                     trigger OnDrillDown()
                     var
@@ -70,28 +75,33 @@ page 6014590 "NPR Vendor Statistics Subpage"
                     ApplicationArea = All;
                     Caption = '-> Last year';
                     Visible = LSAmount;
+                    ToolTip = 'Specifies the value of the -> Last year field';
                 }
                 field("Profit Amount"; "Profit Amount")
                 {
                     ApplicationArea = All;
                     Caption = 'Profit (LCY)';
+                    ToolTip = 'Specifies the value of the Profit (LCY) field';
                 }
                 field("-""LastYear Profit Amount"""; -"LastYear Profit Amount")
                 {
                     ApplicationArea = All;
                     Caption = '-> Last year';
                     Visible = LPA;
+                    ToolTip = 'Specifies the value of the -> Last year field';
                 }
                 field("<Control61506221>"; "Profit %")
                 {
                     ApplicationArea = All;
                     Caption = 'Profit %';
+                    ToolTip = 'Specifies the value of the Profit % field';
                 }
                 field("LastYear Profit %"; "LastYear Profit %")
                 {
                     ApplicationArea = All;
                     Caption = 'Code';
                     Visible = "LP%";
+                    ToolTip = 'Specifies the value of the Code field';
                 }
             }
         }

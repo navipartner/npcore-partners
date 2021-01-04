@@ -44,10 +44,12 @@ report 6060044 "NPR Map Excel Item Worksh."
                 field("Header Row"; HeaderRow)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the HeaderRow field';
                 }
                 field("Try to match fields automatically"; BoolTryMatch)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the BoolTryMatch field';
                 }
             }
         }

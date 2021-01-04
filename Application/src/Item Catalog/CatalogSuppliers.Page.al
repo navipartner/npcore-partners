@@ -17,18 +17,22 @@ page 6060061 "NPR Catalog Suppliers"
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field("Vendor No."; "Vendor No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Vendor No. field';
                 }
                 field("Send Sales Statistics"; "Send Sales Statistics")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Send Sales Statistics field';
                 }
                 field("Trade Number"; "Trade Number")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Trade Number field';
                 }
             }
         }

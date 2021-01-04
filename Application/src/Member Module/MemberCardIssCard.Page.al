@@ -19,34 +19,42 @@ page 6059774 "NPR Member Card Iss. Card"
                     {
                         ApplicationArea = All;
                         Editable = false;
+                        ToolTip = 'Specifies the value of the No. field';
                     }
                     field("Customer No"; "Customer No")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Customer No. field';
                     }
                     field(Name; Name)
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Name field';
                     }
                     field(Address; Address)
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Address field';
                     }
                     field("ZIP Code"; "ZIP Code")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the ZIP Code field';
                     }
                     field(City; City)
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the City field';
                     }
                     field(Status; Status)
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Status field';
                     }
                     field(Reference; Reference)
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Reference field';
                     }
                 }
                 group(Control6150624)
@@ -56,34 +64,41 @@ page 6059774 "NPR Member Card Iss. Card"
                     {
                         ApplicationArea = All;
                         Caption = 'Valid Until';
+                        ToolTip = 'Specifies the value of the Valid Until field';
                     }
                     field("Points (Total)"; "Points (Total)")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Points (Total) field';
                     }
                     field("Canceling Salesperson"; "Canceling Salesperson")
                     {
                         ApplicationArea = All;
                         Editable = false;
+                        ToolTip = 'Specifies the value of the Canceling Salesperson field';
                     }
                     field("Created in Company"; "Created in Company")
                     {
                         ApplicationArea = All;
                         Editable = false;
+                        ToolTip = 'Specifies the value of the Created in Company field';
                     }
                     field("Card Type"; "Card Type")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Point card type field';
                     }
                     field("Issue Date"; "Issue Date")
                     {
                         ApplicationArea = All;
                         Editable = false;
+                        ToolTip = 'Specifies the value of the Issue Date field';
                     }
                     field(Salesperson; Salesperson)
                     {
                         ApplicationArea = All;
                         Editable = false;
+                        ToolTip = 'Specifies the value of the Salesperson field';
                     }
                 }
             }
@@ -100,6 +115,7 @@ page 6059774 "NPR Member Card Iss. Card"
                 Image = List;
                 RunObject = Page "NPR Member Card Issued Cards";
                 ApplicationArea = All;
+                ToolTip = 'Executes the List action';
             }
         }
     }

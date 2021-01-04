@@ -17,10 +17,12 @@ page 6059996 "NPR Scanner Service Setup"
                 field("Log Request"; "Log Request")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Log Request field';
                 }
                 field("Stock-Take Config Code"; "Stock-Take Config Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Stock-Take Conf. Code field';
                 }
             }
         }
@@ -41,6 +43,7 @@ page 6059996 "NPR Scanner Service Setup"
                 PromotedCategory = Process;
                 RunObject = Codeunit "NPR Scanner Service WS";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Setup Webservice action';
             }
         }
     }

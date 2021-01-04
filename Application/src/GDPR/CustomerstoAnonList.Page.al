@@ -16,10 +16,12 @@ page 6151152 "NPR Customers to Anon. List"
                 field("Customer No"; "Customer No")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Customer No field';
                 }
                 field("Customer Name"; "Customer Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Customer Name field';
                 }
             }
         }

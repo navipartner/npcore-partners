@@ -53,41 +53,49 @@ page 6151504 "NPR Nc Import List"
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Date field';
                 }
                 field("<Filter Import Type>"; "Import Type")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Import Type field';
                 }
                 field("Document ID"; "Document ID")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Document ID field';
                 }
                 field("Sequence No."; "Sequence No.")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Sequence No. field';
                 }
                 field("Document Name"; "Document Name")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Document Name field';
                 }
                 field(Imported; Imported)
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Imported field';
                 }
                 field("Runtime Error"; "Runtime Error")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Runtime Error field';
                 }
                 field("Error Message"; "Error Message")
                 {
                     ApplicationArea = All;
                     DrillDown = true;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Error Message field';
 
                     trigger OnDrillDown()
                     var
@@ -102,52 +110,63 @@ page 6151504 "NPR Nc Import List"
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Last Error E-mail Sent at field';
                 }
                 field("Last Error E-mail Sent to"; "Last Error E-mail Sent to")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Last Error E-mail Sent to field';
                 }
                 field("Import Started at"; "Import Started at")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Import Started at field';
                 }
                 field("Import Completed at"; "Import Completed at")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Import Completed at field';
                 }
                 field("Import Duration"; "Import Duration")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Import Duration (sec.) field';
                 }
                 field("Import Count"; "Import Count")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Import Count field';
                 }
                 field("Import Started by"; "Import Started by")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Import Started by field';
                 }
                 field("Server Instance Id"; "Server Instance Id")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Server Instance Id field';
                 }
                 field("Session Id"; "Session Id")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Session Id field';
                 }
                 field("Earliest Import Datetime"; "Earliest Import Datetime")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Earliest Import Datetime field';
                 }
                 field("Entry No."; "Entry No.")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Entry No. field';
                 }
             }
             group(Control6014407)
@@ -158,6 +177,7 @@ page 6151504 "NPR Nc Import List"
                     ApplicationArea = All;
                     Caption = 'Quantity';
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Quantity field';
                 }
             }
         }
@@ -176,6 +196,7 @@ page 6151504 "NPR Nc Import List"
                 PromotedIsBig = true;
                 ShortCutKey = 'Ctrl+F9';
                 ApplicationArea = All;
+                ToolTip = 'Executes the Import Selected action';
 
                 trigger OnAction()
                 begin
@@ -192,6 +213,7 @@ page 6151504 "NPR Nc Import List"
                 //PromotedIsBig = true;
                 ShortCutKey = 'F9';
                 ApplicationArea = All;
+                ToolTip = 'Executes the Reschedule Selected for Import action';
 
                 trigger OnAction()
                 begin
@@ -203,6 +225,7 @@ page 6151504 "NPR Nc Import List"
                 Caption = 'Add File';
                 Image = Save;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Add File action';
 
                 trigger OnAction()
                 begin
@@ -218,6 +241,7 @@ page 6151504 "NPR Nc Import List"
                 Promoted = true;
                 PromotedCategory = Process;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Show Document Source action';
 
                 trigger OnAction()
                 begin
@@ -234,6 +258,7 @@ page 6151504 "NPR Nc Import List"
                 Promoted = true;
                 PromotedCategory = Process;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Show Formatted Source action';
 
                 trigger OnAction()
                 begin
@@ -250,6 +275,7 @@ page 6151504 "NPR Nc Import List"
                 //PromotedCategory = Process;
                 Visible = NOT WebClient;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Edit File action';
 
                 trigger OnAction()
                 begin
@@ -266,6 +292,7 @@ page 6151504 "NPR Nc Import List"
                 //PromotedCategory = Process;
                 Visible = WebClient;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Export File action';
 
                 trigger OnAction()
                 var
@@ -290,6 +317,7 @@ page 6151504 "NPR Nc Import List"
                 //PromotedCategory = Process;
                 Visible = WebClient;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Import File action';
 
                 trigger OnAction()
                 var
@@ -331,6 +359,7 @@ page 6151504 "NPR Nc Import List"
                 PromotedCategory = Process;
                 ShortCutKey = 'Shift+F7';
                 ApplicationArea = All;
+                ToolTip = 'Executes the Documents action';
 
                 trigger OnAction()
                 begin

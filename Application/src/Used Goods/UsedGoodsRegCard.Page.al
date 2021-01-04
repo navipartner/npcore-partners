@@ -24,10 +24,12 @@ page 6014506 "NPR Used Goods Reg. Card"
                         ApplicationArea = All;
                         Editable = false;
                         OptionCaption = 'MainPost,,SubPost';
+                        ToolTip = 'Specifies the value of the Status field';
                     }
                     field("No."; "No.")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the No. field';
 
                         trigger OnAssistEdit()
                         begin
@@ -41,30 +43,37 @@ page 6014506 "NPR Used Goods Reg. Card"
                     field("Location Code"; "Location Code")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Location Code field';
                     }
                     field("Salesperson Code"; "Salesperson Code")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Salesperson Code field';
                     }
                     field(Subject; Subject)
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Subject field';
                     }
                     field("Search Name"; "Search Name")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Search Name field';
                     }
                     field(Serienummer; Serienummer)
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Serial No. field';
                     }
                     field(Puljemomsordning; Puljemomsordning)
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Pool  VAT System field';
                     }
                     field("Item No. Created"; "Item No. Created")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Generated Item No. field';
 
                         trigger OnValidate()
                         var
@@ -109,6 +118,7 @@ page 6014506 "NPR Used Goods Reg. Card"
                     {
                         ApplicationArea = All;
                         Editable = false;
+                        ToolTip = 'Specifies the value of the Link field';
                     }
                 }
                 group(Control6150625)
@@ -117,32 +127,39 @@ page 6014506 "NPR Used Goods Reg. Card"
                     field("Purchase Date"; "Purchase Date")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Purchase Date field';
                     }
                     field(Beholdning; Beholdning)
                     {
                         ApplicationArea = All;
                         Editable = false;
+                        ToolTip = 'Specifies the value of the Inventory field';
                     }
                     field("Unit Cost"; "Unit Cost")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Unit Cost field';
                     }
                     field(Paid; Paid)
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Paid field';
                     }
                     field("Salgspris inkl. Moms"; "Salgspris inkl. Moms")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Unit Price Including VAT field';
                     }
                     field("Item Group No."; "Item Group No.")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Belongs in Item Group No. field';
                     }
                     field(Stand; Stand)
                     {
                         ApplicationArea = All;
                         Caption = 'Condition';
+                        ToolTip = 'Specifies the value of the Condition field';
                     }
                 }
             }
@@ -152,38 +169,47 @@ page 6014506 "NPR Used Goods Reg. Card"
                 field("Purchased By Customer No."; "Purchased By Customer No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Purchase Customer No. field';
                 }
                 field(Name; Name)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Name field';
                 }
                 field(Address; Address)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Address field';
                 }
                 field("Address 2"; "Address 2")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Address 2 field';
                 }
                 field("Post Code"; "Post Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Post Code field';
                 }
                 field(By; By)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the City field';
                 }
                 field(Identification; Identification)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the ID Card field';
                 }
                 field("Identification Number"; "Identification Number")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Legitimation No. field';
                 }
                 field(Blocked; Blocked)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Blocked field';
                 }
             }
         }
@@ -198,6 +224,7 @@ page 6014506 "NPR Used Goods Reg. Card"
                 Caption = 'Copy from Main Card';
                 Image = Copy;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Copy from Main Card action';
 
                 trigger OnAction()
                 var
@@ -246,6 +273,7 @@ page 6014506 "NPR Used Goods Reg. Card"
                     Image = List;
                     ShortCutKey = 'F9';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Associated Registration Card action';
 
                     trigger OnAction()
                     var
@@ -286,6 +314,7 @@ page 6014506 "NPR Used Goods Reg. Card"
                     Caption = 'Create Used Item';
                     Image = ElectronicNumber;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Create Used Item action';
 
                     trigger OnAction()
                     begin
@@ -307,6 +336,7 @@ page 6014506 "NPR Used Goods Reg. Card"
                     Caption = 'Create Sales Credit Memo';
                     Image = CreateCreditMemo;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Create Sales Credit Memo action';
 
                     trigger OnAction()
                     var
@@ -324,6 +354,7 @@ page 6014506 "NPR Used Goods Reg. Card"
                     Caption = '&Item Card';
                     Image = Card;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the &Item Card action';
 
                     trigger OnAction()
                     var
@@ -340,6 +371,7 @@ page 6014506 "NPR Used Goods Reg. Card"
                     Caption = 'Item &Entry';
                     Image = Entries;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Item &Entry action';
 
                     trigger OnAction()
                     var
@@ -359,6 +391,7 @@ page 6014506 "NPR Used Goods Reg. Card"
                     Caption = 'Print Registration Card';
                     Image = PrintDocument;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Print Registration Card action';
                     //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                     //PromotedCategory = "Report";
 
@@ -390,6 +423,7 @@ page 6014506 "NPR Used Goods Reg. Card"
                     Image = ElectronicNumber;
                     Visible = false;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Create Used Item and Print Label action';
 
                     trigger OnAction()
                     var

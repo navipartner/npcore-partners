@@ -14,11 +14,13 @@ page 6151040 "NPR Notification Dialog"
             {
                 ApplicationArea = All;
                 Caption = 'Title';
+                ToolTip = 'Specifies the value of the Title field';
             }
             field(MessageTxt; MessageTxt)
             {
                 ApplicationArea = All;
                 Caption = 'Message';
+                ToolTip = 'Specifies the value of the Message field';
             }
             group(Options)
             {
@@ -28,16 +30,19 @@ page 6151040 "NPR Notification Dialog"
                 {
                     ApplicationArea = All;
                     Caption = 'Notification Color';
+                    ToolTip = 'Specifies the value of the Notification Color field';
                 }
                 field(ActionType; ActionType)
                 {
                     ApplicationArea = All;
                     Caption = 'Action Type';
+                    ToolTip = 'Specifies the value of the Action Type field';
                 }
                 field(ActionValue; ActionValue)
                 {
                     ApplicationArea = All;
                     Caption = 'Action Value';
+                    ToolTip = 'Specifies the value of the Action Value field';
                 }
             }
         }

@@ -21,6 +21,7 @@ page 6014660 "NPR Close Navision"
                     Style = StrongAccent;
                     StyleExpr = TRUE;
                     Width = 200;
+                    ToolTip = 'Specifies the value of the errorMessage field';
                 }
             }
         }

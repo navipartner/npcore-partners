@@ -22,6 +22,7 @@ page 6151256 "NPR Retail Top10 Selling Items"
                 {
                     Caption = 'Start Date';
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Start Date field';
 
                     trigger OnValidate()
                     begin
@@ -34,6 +35,7 @@ page 6151256 "NPR Retail Top10 Selling Items"
                 {
                     Caption = 'End date';
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the End date field';
 
                     trigger OnValidate()
                     begin
@@ -51,6 +53,7 @@ page 6151256 "NPR Retail Top10 Selling Items"
                     field("No."; "No.")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the No. field';
 
                         trigger OnDrillDown()
                         begin
@@ -61,12 +64,14 @@ page 6151256 "NPR Retail Top10 Selling Items"
                     field(Description; Description)
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Description field';
                     }
                     field("Sales (Qty.)"; "Sales (Qty.)")
                     {
                         BlankZero = true;
                         Caption = 'Sales (Qty.)';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Sales (Qty.) field';
                     }
                 }
             }
@@ -86,6 +91,7 @@ page 6151256 "NPR Retail Top10 Selling Items"
                 {
                     Caption = 'Day';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Day action';
 
                     trigger OnAction()
                     begin
@@ -97,6 +103,7 @@ page 6151256 "NPR Retail Top10 Selling Items"
                 {
                     Caption = 'Week';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Week action';
 
                     trigger OnAction()
                     begin
@@ -108,6 +115,7 @@ page 6151256 "NPR Retail Top10 Selling Items"
                 {
                     Caption = 'Month';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Month action';
 
                     trigger OnAction()
                     begin
@@ -119,6 +127,7 @@ page 6151256 "NPR Retail Top10 Selling Items"
                 {
                     Caption = 'Quarter';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Quarter action';
 
                     trigger OnAction()
                     begin
@@ -130,6 +139,7 @@ page 6151256 "NPR Retail Top10 Selling Items"
                 {
                     Caption = 'Year';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Year action';
 
                     trigger OnAction()
                     begin

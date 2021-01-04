@@ -20,222 +20,269 @@ page 6059991 "NPR Item Repair"
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Item No. field';
                 }
                 field("Variant Code"; "Variant Code")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Variant Code field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Item Ledger Entry Qty."; "Item Ledger Entry Qty.")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Item Ledger Entry Qty. field';
                 }
                 field("Item Ledger Entry Exist"; "Item Ledger Entry Exist")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Item Ledger Entry Exist field';
                 }
                 field("Item Ledger Entry Open"; "Item Ledger Entry Open")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Item Ledger Entry Open field';
                 }
                 field("No. Of tests"; "No. Of tests")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the No. Of tests field';
                 }
                 field("No.Of Errors"; "No.Of Errors")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the No.Of Errors field';
                 }
                 field("Errors Exists"; "Errors Exists")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Errors Exists field';
                 }
                 field("No. Of Item Actions"; "No. Of Item Actions")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     Enabled = false;
+                    ToolTip = 'Specifies the value of the No. Of Item Actions field';
                 }
                 field("No. Of Variant Actions"; "No. Of Variant Actions")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     Enabled = false;
+                    ToolTip = 'Specifies the value of the No. Of Variant Actions field';
                 }
                 field("Variant Action"; "Variant Action")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Variant Action field';
                 }
                 field("Variety 1 Action"; "Variety 1 Action")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Variety 1 Action field';
                 }
                 field("Variety 2 Action"; "Variety 2 Action")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Variety 2 Action field';
                 }
                 field("Variety 3 Action"; "Variety 3 Action")
                 {
                     ApplicationArea = All;
                     Visible = ShowVariety3;
+                    ToolTip = 'Specifies the value of the Variety 3 Action field';
                 }
                 field("Variety 4 Action"; "Variety 4 Action")
                 {
                     ApplicationArea = All;
                     Visible = ShowVariety4;
+                    ToolTip = 'Specifies the value of the Variety 4 Action field';
                 }
                 field("Variety 1 Used"; "Variety 1 Used")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Variety 1 Used field';
                 }
                 field("Variety 2 Used"; "Variety 2 Used")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Variety 2 Used field';
                 }
                 field("Variety 3 Used"; "Variety 3 Used")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     Visible = ShowVariety3;
+                    ToolTip = 'Specifies the value of the Variety 3 Used field';
                 }
                 field("Variety 4 Used"; "Variety 4 Used")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     Visible = ShowVariety4;
+                    ToolTip = 'Specifies the value of the Variety 4 Used field';
                 }
                 field("Blocked (Var)"; "Blocked (Var)")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Blocked (Var) field';
                 }
                 field("Variety 1 (Item)"; "Variety 1 (Item)")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Variety 1 (Item) field';
                 }
                 field("Variety 1 Table (Item)"; "Variety 1 Table (Item)")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Variety 1 Table (Item) field';
                 }
                 field("Variety 1 (Var)"; "Variety 1 (Var)")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Variety 1 (Var) field';
                 }
                 field("Variety 1 Table (Var)"; "Variety 1 Table (Var)")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Variety 1 Table (Var) field';
                 }
                 field("Variety 1 Value (Var)"; "Variety 1 Value (Var)")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Variety 1 Value (Var) field';
                 }
                 field("Variety 1 Value (Var) (NEW)"; "Variety 1 Value (Var) (NEW)")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Variety 1 Value (Var) (NEW) field';
                 }
                 field("Variety 2 (Item)"; "Variety 2 (Item)")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Variety 2 (Item) field';
                 }
                 field("Variety 2 Table (Item)"; "Variety 2 Table (Item)")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Variety 2 Table (Item) field';
                 }
                 field("Variety 2 (Var)"; "Variety 2 (Var)")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Variety 2 (Var) field';
                 }
                 field("Variety 2 Table (Var)"; "Variety 2 Table (Var)")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Variety 2 Table (Var) field';
                 }
                 field("Variety 2 Value (Var)"; "Variety 2 Value (Var)")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Variety 2 Value (Var) field';
                 }
                 field("Variety 2 Value (Var) (NEW)"; "Variety 2 Value (Var) (NEW)")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Variety 2 Value (Var) (NEW) field';
                 }
                 field("Variety 3 (Item)"; "Variety 3 (Item)")
                 {
                     ApplicationArea = All;
                     Visible = ShowVariety3;
+                    ToolTip = 'Specifies the value of the Variety 3 (Item) field';
                 }
                 field("Variety 3 Table (Item)"; "Variety 3 Table (Item)")
                 {
                     ApplicationArea = All;
                     Visible = ShowVariety3;
+                    ToolTip = 'Specifies the value of the Variety 3 Table (Item) field';
                 }
                 field("Variety 3 (Var)"; "Variety 3 (Var)")
                 {
                     ApplicationArea = All;
                     Visible = ShowVariety3;
+                    ToolTip = 'Specifies the value of the Variety 3 (Var) field';
                 }
                 field("Variety 3 Table (Var)"; "Variety 3 Table (Var)")
                 {
                     ApplicationArea = All;
                     Visible = ShowVariety3;
+                    ToolTip = 'Specifies the value of the Variety 3 Table (Var) field';
                 }
                 field("Variety 3 Value (Var)"; "Variety 3 Value (Var)")
                 {
                     ApplicationArea = All;
                     Visible = ShowVariety3;
+                    ToolTip = 'Specifies the value of the Variety 3 Value (Var) field';
                 }
                 field("Variety 3 Value (Var) (NEW)"; "Variety 3 Value (Var) (NEW)")
                 {
                     ApplicationArea = All;
                     Visible = ShowVariety3;
+                    ToolTip = 'Specifies the value of the Variety 3 Value (Var) (NEW) field';
                 }
                 field("Variety 4 (Item)"; "Variety 4 (Item)")
                 {
                     ApplicationArea = All;
                     Visible = ShowVariety4;
+                    ToolTip = 'Specifies the value of the Variety 4 (Item) field';
                 }
                 field("Variety 4 Table (Item)"; "Variety 4 Table (Item)")
                 {
                     ApplicationArea = All;
                     Visible = ShowVariety4;
+                    ToolTip = 'Specifies the value of the Variety 4 Table (Item) field';
                 }
                 field("Variety 4 (Var)"; "Variety 4 (Var)")
                 {
                     ApplicationArea = All;
                     Visible = ShowVariety4;
+                    ToolTip = 'Specifies the value of the Variety 4 (Var) field';
                 }
                 field("Variety 4 Table (Var)"; "Variety 4 Table (Var)")
                 {
                     ApplicationArea = All;
                     Visible = ShowVariety4;
+                    ToolTip = 'Specifies the value of the Variety 4 Table (Var) field';
                 }
                 field("Variety 4 Value (Var)"; "Variety 4 Value (Var)")
                 {
                     ApplicationArea = All;
                     Visible = ShowVariety4;
+                    ToolTip = 'Specifies the value of the Variety 4 Value (Var) field';
                 }
                 field("Variety 4 Value (Var) (NEW)"; "Variety 4 Value (Var) (NEW)")
                 {
                     ApplicationArea = All;
                     Visible = ShowVariety4;
+                    ToolTip = 'Specifies the value of the Variety 4 Value (Var) (NEW) field';
                 }
                 field("Cross Variety No."; "Cross Variety No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Cross Variety No. field';
                 }
                 field("Variety Group"; "Variety Group")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Variety Group field';
                 }
             }
         }
@@ -256,6 +303,7 @@ page 6059991 "NPR Item Repair"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Delete Test Data action';
 
                     trigger OnAction()
                     begin
@@ -270,6 +318,7 @@ page 6059991 "NPR Item Repair"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Insert Test Data action';
 
                     trigger OnAction()
                     begin
@@ -284,6 +333,7 @@ page 6059991 "NPR Item Repair"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Test Data (All) action';
 
                     trigger OnAction()
                     begin
@@ -295,6 +345,7 @@ page 6059991 "NPR Item Repair"
                     Caption = 'Test Data (Selection)';
                     Image = "Action";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Test Data (Selection) action';
 
                     trigger OnAction()
                     var
@@ -312,6 +363,7 @@ page 6059991 "NPR Item Repair"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Suggest Actions (All) action';
 
                     trigger OnAction()
                     begin
@@ -323,6 +375,7 @@ page 6059991 "NPR Item Repair"
                     Caption = 'Suggest Actions (Selected)';
                     Image = Suggest;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Suggest Actions (Selected) action';
 
                     trigger OnAction()
                     var
@@ -341,6 +394,7 @@ page 6059991 "NPR Item Repair"
                     Caption = 'Show Variety 3';
                     Image = ShowSelected;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Show Variety 3 action';
 
                     trigger OnAction()
                     begin
@@ -353,6 +407,7 @@ page 6059991 "NPR Item Repair"
                     Caption = 'Show Variety 4';
                     Image = ShowSelected;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Show Variety 4 action';
 
                     trigger OnAction()
                     begin
@@ -365,6 +420,7 @@ page 6059991 "NPR Item Repair"
                     Caption = 'Item Card';
                     Image = Card;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Item Card action';
 
                     trigger OnAction()
                     var
@@ -379,6 +435,7 @@ page 6059991 "NPR Item Repair"
                     Caption = 'Varient List';
                     Image = ItemVariant;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Varient List action';
 
                     trigger OnAction()
                     var
@@ -401,6 +458,7 @@ page 6059991 "NPR Item Repair"
                     Caption = 'Block Variant';
                     Image = "Action";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Block Variant action';
 
                     trigger OnAction()
                     begin
@@ -412,6 +470,7 @@ page 6059991 "NPR Item Repair"
                     Caption = 'Delete Variant';
                     Image = "Action";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Delete Variant action';
 
                     trigger OnAction()
                     begin
@@ -424,6 +483,7 @@ page 6059991 "NPR Item Repair"
                     Caption = 'Force New Variety Value (Var)';
                     Image = Forecast;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Force New Variety Value (Var) action';
 
                     trigger OnAction()
                     begin
@@ -435,6 +495,7 @@ page 6059991 "NPR Item Repair"
                     Caption = 'Block Selected Variant(s)';
                     Image = "Action";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Block Selected Variant(s) action';
 
                     trigger OnAction()
                     var
@@ -449,6 +510,7 @@ page 6059991 "NPR Item Repair"
                     Caption = 'Delete Selected Variant(s)';
                     Image = "Action";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Delete Selected Variant(s) action';
 
                     trigger OnAction()
                     var
@@ -463,6 +525,7 @@ page 6059991 "NPR Item Repair"
                     Caption = 'Force New Variety Value(s) (Var)';
                     Image = Forecast;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Force New Variety Value(s) (Var) action';
 
                     trigger OnAction()
                     var

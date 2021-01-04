@@ -16,11 +16,13 @@ page 6014488 "NPR Credit Card Prefix"
                 {
                     ApplicationArea = All;
                     Visible = Prefixvi;
+                    ToolTip = 'Specifies the value of the Prefix field';
                 }
                 field(Weight; Weight)
                 {
                     ApplicationArea = All;
                     Visible = weightvi;
+                    ToolTip = 'Specifies the value of the Weight field';
                 }
             }
         }

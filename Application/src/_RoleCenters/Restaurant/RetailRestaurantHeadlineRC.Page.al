@@ -18,6 +18,7 @@ page 6151337 "NPR Restaurant Headline RC"
                     ApplicationArea = Basic, Suite;
                     Caption = 'Greeting headline';
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Greeting headline field';
                 }
             }
             group(Control2)
@@ -30,6 +31,7 @@ page 6151337 "NPR Restaurant Headline RC"
                     Caption = 'Documentation headline';
                     DrillDown = true;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Documentation headline field';
 
                     trigger OnDrillDown()
                     begin

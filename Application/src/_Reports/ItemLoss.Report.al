@@ -119,6 +119,7 @@ report 6014542 "NPR Item - Loss"
                         Caption = 'Source Code Filter';
                         TableRelation = "Source Code";
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Source Code Filter field';
                     }
                 }
             }

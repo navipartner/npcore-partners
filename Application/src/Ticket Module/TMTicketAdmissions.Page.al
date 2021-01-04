@@ -1,4 +1,4 @@
-﻿page 6060120 "NPR TM Ticket Admissions"
+page 6060120 "NPR TM Ticket Admissions"
 {
     // TM1.00/TSA/20151217  CASE 228982 NaviPartner Ticket Management
     // TM1.08/TSA/20160262  CASE 232262 Dependant admission objects
@@ -31,79 +31,97 @@
                 field("Admission Code"; "Admission Code")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Admission Code field';
                 }
                 field(Type; Type)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Type field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Location Admission Code"; "Location Admission Code")
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Location Admission Code field';
                 }
                 field("Capacity Limits By"; "Capacity Limits By")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Capacity Limits By field';
                 }
                 field("Default Schedule"; "Default Schedule")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Default Schedule field';
                 }
                 field("Prebook Is Required"; "Prebook Is Required")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Prebook Is Required field';
                 }
                 field("Max Capacity Per Sch. Entry"; "Max Capacity Per Sch. Entry")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Max Capacity Per Sch. Entry field';
                 }
                 field("Reserved For Web"; "Reserved For Web")
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Reserved For Web field';
                 }
                 field("Reserved For Members"; "Reserved For Members")
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Reserved For Members field';
                 }
                 field("Capacity Control"; "Capacity Control")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Capacity Control field';
                 }
                 field("Prebook From"; "Prebook From")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Prebook From field';
                 }
                 field("Ticketholder Notification Type"; "Ticketholder Notification Type")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Ticketholder Notification Type field';
                 }
                 field("Stakeholder (E-Mail/Phone No.)"; "Stakeholder (E-Mail/Phone No.)")
                 {
                     ApplicationArea = NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Stakeholder (E-Mail/Phone No.) field';
                 }
                 field("Dependency Code"; "Dependency Code")
                 {
                     ApplicationArea = NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Admission Dependency Code field';
                 }
                 field("POS Schedule Selection Date F."; "POS Schedule Selection Date F.")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the POS Admission Schedule Entry Selection Date Filter field';
                 }
                 field("Admission Base Calendar Code"; "Admission Base Calendar Code")
                 {
                     ApplicationArea = NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Admission Base Calendar Code field';
                 }
                 field("AdmissionCustomized Calendar"; CalendarMgmt.CustomizedChangesExist(CustomizedCalendarChangeAdmissionTemp))
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     Caption = 'Admission Customized Calendar';
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Admission Customized Calendar field';
 
                     trigger OnDrillDown()
                     begin
@@ -115,12 +133,14 @@
                 field("Ticket Base Calendar Code"; "Ticket Base Calendar Code")
                 {
                     ApplicationArea = NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Ticket Base Calendar Code field';
                 }
                 field("TicketCustomized Calendar"; CalendarMgmt.CustomizedChangesExist(CustomizedCalendarChangeTicketTemp))
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     Caption = 'Ticket Customized Calendar';
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Ticket Customized Calendar field';
 
                     trigger OnDrillDown()
                     begin
@@ -133,10 +153,12 @@
                 {
                     ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the eTicket Type Code field';
                 }
                 field("Waiting List Setup Code"; "Waiting List Setup Code")
                 {
                     ApplicationArea = NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Waiting List Setup Code field';
                 }
             }
         }

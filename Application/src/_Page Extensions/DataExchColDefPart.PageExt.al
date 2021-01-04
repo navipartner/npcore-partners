@@ -8,11 +8,13 @@ pageextension 6014402 "NPR Data Exch Col Def Part" extends "Data Exch Col Def Pa
             field("NPR Split File"; "NPR Split File")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the NPR Split File field';
             }
             field("NPR Split Value"; "NPR Split Value")
             {
                 ApplicationArea = All;
                 Editable = "NPR Split File" = "NPR Split File"::NewFileOnSplitVAlue;
+                ToolTip = 'Specifies the value of the NPR Split Value field';
             }
         }
     }

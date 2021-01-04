@@ -23,10 +23,12 @@ page 6184474 "NPR EFT Auxiliary Operations"
                 field("Auxiliary ID"; "Auxiliary ID")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Auxiliary ID field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
             }
         }

@@ -17,14 +17,17 @@ page 6151003 "NPR POS Quote Card"
                     field("Sales Ticket No."; "Sales Ticket No.")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Sales Ticket No. field';
                     }
                     field("Register No."; "Register No.")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Cash Register No. field';
                     }
                     field("Entry No."; "Entry No.")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Entry No. field';
                     }
                 }
                 group(Control6014408)
@@ -33,22 +36,27 @@ page 6151003 "NPR POS Quote Card"
                     field("Created at"; "Created at")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Created at field';
                     }
                     field("Salesperson Code"; "Salesperson Code")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Salesperson Code field';
                     }
                     field(Amount; Amount)
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Amount field';
                     }
                     field("Amount Including VAT"; "Amount Including VAT")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Amount Including VAT field';
                     }
                     field("Contains EFT Approval"; "Contains EFT Approval")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Contains EFT Approval field';
                     }
                 }
                 group(Control6014409)
@@ -57,26 +65,32 @@ page 6151003 "NPR POS Quote Card"
                     field("Customer Type"; "Customer Type")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Customer Type field';
                     }
                     field("Customer No."; "Customer No.")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Customer No. field';
                     }
                     field("Customer Price Group"; "Customer Price Group")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Customer Price Group field';
                     }
                     field("Customer Disc. Group"; "Customer Disc. Group")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Customer Disc. Group field';
                     }
                     field(Attention; Attention)
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Attention field';
                     }
                     field(Reference; Reference)
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Reference field';
                     }
                 }
             }
@@ -98,6 +112,7 @@ page 6151003 "NPR POS Quote Card"
                 Caption = 'View POS Sales Data';
                 Image = XMLFile;
                 ApplicationArea = All;
+                ToolTip = 'Executes the View POS Sales Data action';
 
                 trigger OnAction()
                 var

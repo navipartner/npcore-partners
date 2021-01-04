@@ -17,18 +17,22 @@ page 6150686 "NPR NPRE Kitchen Station Card"
                 field("Restaurant Code"; "Restaurant Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Restaurant Code field';
                 }
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Description 2"; "Description 2")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description 2 field';
                 }
             }
         }
@@ -61,6 +65,7 @@ page 6150686 "NPR NPRE Kitchen Station Card"
                 RunPageLink = "Restaurant Code" = FIELD("Restaurant Code"),
                               "Kitchen Station" = FIELD(Code);
                 ApplicationArea = All;
+                ToolTip = 'Executes the Station Selection Setup action';
             }
             action(ShowKitchenRequests)
             {
@@ -71,6 +76,7 @@ page 6150686 "NPR NPRE Kitchen Station Card"
                 PromotedIsBig = true;
                 Scope = Repeater;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Kitchen Requests action';
 
                 trigger OnAction()
                 var

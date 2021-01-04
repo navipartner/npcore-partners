@@ -20,6 +20,7 @@ page 6151257 "NPR Retail Headline EFT RC"
                     Caption = 'Greeting headline';
                     Editable = false;
                     Visible = UserGreetingVisible;
+                    ToolTip = 'Specifies the value of the Greeting headline field';
                 }
             }
 
@@ -34,6 +35,7 @@ page 6151257 "NPR Retail Headline EFT RC"
                     DrillDown = true;
                     Editable = false;
                     Visible = DefaultFieldsVisible;
+                    ToolTip = 'Specifies the value of the Documentation headline field';
 
                     trigger OnDrillDown()
                     begin
@@ -51,6 +53,7 @@ page 6151257 "NPR Retail Headline EFT RC"
                     ApplicationArea = All;
                     Caption = 'My Pick Text';
                     Editable = false;
+                    ToolTip = 'Specifies the value of the My Pick Text field';
                 }
             }
             group(Control3)
@@ -61,6 +64,7 @@ page 6151257 "NPR Retail Headline EFT RC"
                     ApplicationArea = All;
                     Caption = 'Away Pick Text';
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Away Pick Text field';
                 }
             }
 

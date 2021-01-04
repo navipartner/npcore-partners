@@ -18,14 +18,17 @@ page 6151251 "NPR Retail Enter. Act: Others"
                 field(Items; Items)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Items field';
                 }
                 field(Contacts; Contacts)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Contacts field';
                 }
                 field(Customers; Customers)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Customers field';
                 }
             }
         }

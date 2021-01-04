@@ -18,6 +18,7 @@ page 6059995 "NPR RSS Reader Activ."
             {
                 ApplicationArea = All;
                 ShowCaption = false;
+                ToolTip = 'Specifies the value of the RssFeedChannelSub.Feed Code field';
             }
             repeater(Group)
             {
@@ -26,6 +27,7 @@ page 6059995 "NPR RSS Reader Activ."
                     ApplicationArea = All;
                     Style = Attention;
                     StyleExpr = Highlight;
+                    ToolTip = 'Specifies the value of the Title field';
                 }
                 field(Link; Link)
                 {
@@ -33,18 +35,21 @@ page 6059995 "NPR RSS Reader Activ."
                     ExtendedDatatype = URL;
                     Style = Attention;
                     StyleExpr = Highlight;
+                    ToolTip = 'Specifies the value of the Link field';
                 }
                 field("Published At"; "Published At")
                 {
                     ApplicationArea = All;
                     Style = Attention;
                     StyleExpr = Highlight;
+                    ToolTip = 'Specifies the value of the Published At field';
                 }
                 field(Status; Status)
                 {
                     ApplicationArea = All;
                     Style = Attention;
                     StyleExpr = Highlight;
+                    ToolTip = 'Specifies the value of the Status field';
                 }
             }
         }
@@ -60,6 +65,7 @@ page 6059995 "NPR RSS Reader Activ."
                 Image = Change;
                 ShortCutKey = 'Return';
                 ApplicationArea = All;
+                ToolTip = 'Executes the Change action';
 
                 trigger OnAction()
                 begin

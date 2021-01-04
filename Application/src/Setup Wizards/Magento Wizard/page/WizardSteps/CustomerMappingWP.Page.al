@@ -16,6 +16,7 @@ page 6014523 "NPR Customer Mapping WP"
                 field("Country/Region Code"; "Country/Region Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Country/Region Code field';
                     trigger OnLookup(var Text: Text): Boolean
                     var
                         CountryRegion: Record "Country/Region";
@@ -41,6 +42,7 @@ page 6014523 "NPR Customer Mapping WP"
                 field("Post Code"; "Post Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Post Code field';
                     trigger OnLookup(var Text: Text): Boolean
                     var
                         PostCode: Record "Post Code";
@@ -70,16 +72,19 @@ page 6014523 "NPR Customer Mapping WP"
                     ApplicationArea = All;
                     Caption = 'Country/Region';
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Country/Region field';
                 }
                 field(CityName; CityName)
                 {
                     ApplicationArea = All;
                     Caption = 'City';
                     Editable = false;
+                    ToolTip = 'Specifies the value of the City field';
                 }
                 field("Customer Template Code"; "Customer Template Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Customer Template Code field';
                     trigger OnLookup(var Text: Text): Boolean
                     var
                         CustomerTemplate: Record "Customer Template";
@@ -100,6 +105,7 @@ page 6014523 "NPR Customer Mapping WP"
                 field("Config. Template Code"; "Config. Template Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Config. Template Code field';
                     trigger OnLookup(var Text: Text): Boolean
                     var
                         ConfigTemplateHdr: Record "Config. Template Header";

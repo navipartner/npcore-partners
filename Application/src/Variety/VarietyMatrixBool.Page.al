@@ -30,6 +30,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     ApplicationArea = All;
                     Caption = 'Show Field';
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Show Field field';
 
                     trigger OnDrillDown()
                     begin
@@ -44,6 +45,7 @@ page 6059978 "NPR Variety Matrix Bool"
                 {
                     ApplicationArea = All;
                     Caption = 'Show Horisontal';
+                    ToolTip = 'Specifies the value of the Show Horisontal field';
 
                     trigger OnValidate()
                     begin
@@ -58,6 +60,7 @@ page 6059978 "NPR Variety Matrix Bool"
                 {
                     ApplicationArea = All;
                     Caption = 'Hide Inactive Values';
+                    ToolTip = 'Specifies the value of the Hide Inactive Values field';
 
                     trigger OnValidate()
                     begin
@@ -78,6 +81,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     ApplicationArea = All;
                     Editable = false;
                     StyleExpr = 'Strong';
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Variety 1 Value"; "Variety 1 Value")
                 {
@@ -86,6 +90,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     Editable = false;
                     StyleExpr = 'Strong';
                     Visible = showvariety1;
+                    ToolTip = 'Specifies the value of the Variety 1 Value field';
                 }
                 field("Variety 2 Value"; "Variety 2 Value")
                 {
@@ -94,6 +99,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     Editable = false;
                     StyleExpr = 'Strong';
                     Visible = showvariety2;
+                    ToolTip = 'Specifies the value of the Variety 2 Value field';
                 }
                 field("Variety 3 Value"; "Variety 3 Value")
                 {
@@ -102,6 +108,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     Editable = false;
                     StyleExpr = 'Strong';
                     Visible = showvariety3;
+                    ToolTip = 'Specifies the value of the Variety 3 Value field';
                 }
                 field("Variety 4 Value"; "Variety 4 Value")
                 {
@@ -109,6 +116,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     CaptionClass = '3,' + Item."NPR Variety 4";
                     Editable = false;
                     Visible = showvariety4;
+                    ToolTip = 'Specifies the value of the Variety 4 Value field';
                 }
                 field(Field1; MATRIX_CellData[1])
                 {
@@ -116,6 +124,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[1];
                     Visible = visible1;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[1] field';
 
                     trigger OnValidate()
                     begin
@@ -128,6 +137,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[2];
                     Visible = visible2;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[2] field';
 
                     trigger OnValidate()
                     begin
@@ -140,6 +150,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[3];
                     Visible = Visible3;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[3] field';
 
                     trigger OnValidate()
                     begin
@@ -152,6 +163,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[4];
                     Visible = Visible4;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[4] field';
 
                     trigger OnValidate()
                     begin
@@ -164,6 +176,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[5];
                     Visible = Visible5;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[5] field';
 
                     trigger OnValidate()
                     begin
@@ -176,6 +189,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[6];
                     Visible = Visible6;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[6] field';
 
                     trigger OnValidate()
                     begin
@@ -188,6 +202,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[7];
                     Visible = Visible7;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[7] field';
 
                     trigger OnValidate()
                     begin
@@ -200,6 +215,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[8];
                     Visible = Visible8;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[8] field';
 
                     trigger OnValidate()
                     begin
@@ -212,6 +228,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[9];
                     Visible = Visible9;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[9] field';
 
                     trigger OnValidate()
                     begin
@@ -224,6 +241,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[10];
                     Visible = Visible10;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[10] field';
 
                     trigger OnValidate()
                     begin
@@ -236,6 +254,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[11];
                     Visible = Visible11;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[11] field';
 
                     trigger OnValidate()
                     begin
@@ -248,6 +267,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[12];
                     Visible = Visible12;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[12] field';
 
                     trigger OnValidate()
                     begin
@@ -260,6 +280,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[13];
                     Visible = Visible13;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[13] field';
 
                     trigger OnValidate()
                     begin
@@ -272,6 +293,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[14];
                     Visible = Visible14;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[14] field';
 
                     trigger OnValidate()
                     begin
@@ -284,6 +306,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[15];
                     Visible = Visible15;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[15] field';
 
                     trigger OnValidate()
                     begin
@@ -296,6 +319,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[16];
                     Visible = Visible16;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[16] field';
 
                     trigger OnValidate()
                     begin
@@ -308,6 +332,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[17];
                     Visible = Visible17;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[17] field';
 
                     trigger OnValidate()
                     begin
@@ -320,6 +345,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[18];
                     Visible = Visible18;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[18] field';
 
                     trigger OnValidate()
                     begin
@@ -332,6 +358,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[19];
                     Visible = Visible19;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[19] field';
 
                     trigger OnValidate()
                     begin
@@ -344,6 +371,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[20];
                     Visible = Visible20;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[20] field';
 
                     trigger OnValidate()
                     begin
@@ -356,6 +384,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[21];
                     Visible = Visible21;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[21] field';
 
                     trigger OnValidate()
                     begin
@@ -368,6 +397,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[22];
                     Visible = Visible22;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[22] field';
 
                     trigger OnValidate()
                     begin
@@ -380,6 +410,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[23];
                     Visible = Visible23;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[23] field';
 
                     trigger OnValidate()
                     begin
@@ -392,6 +423,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[24];
                     Visible = Visible24;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[24] field';
 
                     trigger OnValidate()
                     begin
@@ -404,6 +436,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[25];
                     Visible = Visible25;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[25] field';
 
                     trigger OnValidate()
                     begin
@@ -416,6 +449,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[26];
                     Visible = Visible26;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[26] field';
 
                     trigger OnValidate()
                     begin
@@ -428,6 +462,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[27];
                     Visible = Visible27;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[27] field';
 
                     trigger OnValidate()
                     begin
@@ -440,6 +475,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[28];
                     Visible = Visible28;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[28] field';
 
                     trigger OnValidate()
                     begin
@@ -452,6 +488,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[29];
                     Visible = Visible29;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[29] field';
 
                     trigger OnValidate()
                     begin
@@ -464,6 +501,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[30];
                     Visible = Visible30;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[30] field';
 
                     trigger OnValidate()
                     begin
@@ -476,6 +514,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[31];
                     Visible = Visible31;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[31] field';
 
                     trigger OnValidate()
                     begin
@@ -488,6 +527,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[32];
                     Visible = Visible32;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[32] field';
 
                     trigger OnValidate()
                     begin
@@ -500,6 +540,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[33];
                     Visible = Visible33;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[33] field';
 
                     trigger OnValidate()
                     begin
@@ -512,6 +553,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[34];
                     Visible = Visible34;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[34] field';
 
                     trigger OnValidate()
                     begin
@@ -524,6 +566,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[35];
                     Visible = Visible35;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[35] field';
 
                     trigger OnValidate()
                     begin
@@ -536,6 +579,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[36];
                     Visible = Visible36;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[36] field';
 
                     trigger OnValidate()
                     begin
@@ -548,6 +592,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[37];
                     Visible = Visible37;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[37] field';
 
                     trigger OnValidate()
                     begin
@@ -560,6 +605,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[38];
                     Visible = Visible38;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[38] field';
 
                     trigger OnValidate()
                     begin
@@ -572,6 +618,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[39];
                     Visible = Visible39;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[39] field';
 
                     trigger OnValidate()
                     begin
@@ -584,6 +631,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[40];
                     Visible = Visible40;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[40] field';
 
                     trigger OnValidate()
                     begin
@@ -596,6 +644,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[41];
                     Visible = Visible41;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[41] field';
 
                     trigger OnValidate()
                     begin
@@ -608,6 +657,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[42];
                     Visible = Visible42;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[42] field';
 
                     trigger OnValidate()
                     begin
@@ -620,6 +670,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[43];
                     Visible = Visible43;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[43] field';
 
                     trigger OnValidate()
                     begin
@@ -632,6 +683,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[44];
                     Visible = Visible44;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[44] field';
 
                     trigger OnValidate()
                     begin
@@ -644,6 +696,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[45];
                     Visible = Visible45;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[45] field';
 
                     trigger OnValidate()
                     begin
@@ -656,6 +709,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[46];
                     Visible = Visible46;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[46] field';
 
                     trigger OnValidate()
                     begin
@@ -668,6 +722,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[47];
                     Visible = Visible47;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[47] field';
 
                     trigger OnValidate()
                     begin
@@ -680,6 +735,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[48];
                     Visible = Visible48;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[48] field';
 
                     trigger OnValidate()
                     begin
@@ -692,6 +748,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[49];
                     Visible = Visible49;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[49] field';
 
                     trigger OnValidate()
                     begin
@@ -704,6 +761,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[50];
                     Visible = Visible50;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[50] field';
 
                     trigger OnValidate()
                     begin
@@ -716,6 +774,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[51];
                     Visible = Visible51;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[51] field';
 
                     trigger OnValidate()
                     begin
@@ -728,6 +787,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[52];
                     Visible = Visible52;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[52] field';
 
                     trigger OnValidate()
                     begin
@@ -740,6 +800,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[53];
                     Visible = Visible53;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[53] field';
 
                     trigger OnValidate()
                     begin
@@ -752,6 +813,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[54];
                     Visible = Visible54;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[54] field';
 
                     trigger OnValidate()
                     begin
@@ -764,6 +826,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[55];
                     Visible = Visible55;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[55] field';
 
                     trigger OnValidate()
                     begin
@@ -776,6 +839,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[56];
                     Visible = Visible56;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[56] field';
 
                     trigger OnValidate()
                     begin
@@ -788,6 +852,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[57];
                     Visible = Visible57;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[57] field';
 
                     trigger OnValidate()
                     begin
@@ -800,6 +865,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[58];
                     Visible = Visible58;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[58] field';
 
                     trigger OnValidate()
                     begin
@@ -812,6 +878,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[59];
                     Visible = Visible59;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[59] field';
 
                     trigger OnValidate()
                     begin
@@ -824,6 +891,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[60];
                     Visible = Visible60;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[60] field';
 
                     trigger OnValidate()
                     begin
@@ -836,6 +904,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[61];
                     Visible = Visible61;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[61] field';
 
                     trigger OnValidate()
                     begin
@@ -848,6 +917,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[62];
                     Visible = Visible62;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[62] field';
 
                     trigger OnValidate()
                     begin
@@ -860,6 +930,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[63];
                     Visible = Visible63;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[63] field';
 
                     trigger OnValidate()
                     begin
@@ -872,6 +943,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[64];
                     Visible = Visible64;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[64] field';
 
                     trigger OnValidate()
                     begin
@@ -884,6 +956,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[65];
                     Visible = Visible65;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[65] field';
 
                     trigger OnValidate()
                     begin
@@ -896,6 +969,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[66];
                     Visible = Visible66;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[66] field';
 
                     trigger OnValidate()
                     begin
@@ -908,6 +982,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[67];
                     Visible = Visible67;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[67] field';
 
                     trigger OnValidate()
                     begin
@@ -920,6 +995,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[68];
                     Visible = Visible68;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[68] field';
 
                     trigger OnValidate()
                     begin
@@ -932,6 +1008,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[69];
                     Visible = Visible69;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[69] field';
 
                     trigger OnValidate()
                     begin
@@ -944,6 +1021,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[70];
                     Visible = Visible70;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[70] field';
 
                     trigger OnValidate()
                     begin
@@ -956,6 +1034,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[71];
                     Visible = Visible71;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[71] field';
 
                     trigger OnValidate()
                     begin
@@ -968,6 +1047,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[72];
                     Visible = Visible72;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[72] field';
 
                     trigger OnValidate()
                     begin
@@ -980,6 +1060,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[73];
                     Visible = Visible73;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[73] field';
 
                     trigger OnValidate()
                     begin
@@ -992,6 +1073,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[74];
                     Visible = Visible74;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[74] field';
 
                     trigger OnValidate()
                     begin
@@ -1004,6 +1086,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[75];
                     Visible = Visible75;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[75] field';
 
                     trigger OnValidate()
                     begin
@@ -1016,6 +1099,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[76];
                     Visible = Visible76;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[76] field';
 
                     trigger OnValidate()
                     begin
@@ -1028,6 +1112,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[77];
                     Visible = Visible77;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[77] field';
 
                     trigger OnValidate()
                     begin
@@ -1040,6 +1125,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[78];
                     Visible = Visible78;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[78] field';
 
                     trigger OnValidate()
                     begin
@@ -1052,6 +1138,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[79];
                     Visible = Visible79;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[79] field';
 
                     trigger OnValidate()
                     begin
@@ -1064,6 +1151,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[80];
                     Visible = Visible80;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[80] field';
 
                     trigger OnValidate()
                     begin
@@ -1076,6 +1164,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[81];
                     Visible = Visible81;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[81] field';
 
                     trigger OnValidate()
                     begin
@@ -1088,6 +1177,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[82];
                     Visible = Visible82;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[82] field';
 
                     trigger OnValidate()
                     begin
@@ -1100,6 +1190,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[83];
                     Visible = Visible83;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[83] field';
 
                     trigger OnValidate()
                     begin
@@ -1112,6 +1203,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[84];
                     Visible = Visible84;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[84] field';
 
                     trigger OnValidate()
                     begin
@@ -1124,6 +1216,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[85];
                     Visible = Visible85;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[85] field';
 
                     trigger OnValidate()
                     begin
@@ -1136,6 +1229,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[86];
                     Visible = Visible86;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[86] field';
 
                     trigger OnValidate()
                     begin
@@ -1148,6 +1242,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[87];
                     Visible = Visible87;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[87] field';
 
                     trigger OnValidate()
                     begin
@@ -1160,6 +1255,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[88];
                     Visible = Visible88;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[88] field';
 
                     trigger OnValidate()
                     begin
@@ -1172,6 +1268,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[89];
                     Visible = Visible89;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[89] field';
 
                     trigger OnValidate()
                     begin
@@ -1184,6 +1281,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[90];
                     Visible = Visible90;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[90] field';
 
                     trigger OnValidate()
                     begin
@@ -1196,6 +1294,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[91];
                     Visible = Visible91;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[91] field';
 
                     trigger OnValidate()
                     begin
@@ -1208,6 +1307,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[92];
                     Visible = Visible92;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[92] field';
 
                     trigger OnValidate()
                     begin
@@ -1220,6 +1320,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[93];
                     Visible = Visible93;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[93] field';
 
                     trigger OnValidate()
                     begin
@@ -1232,6 +1333,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[94];
                     Visible = Visible94;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[94] field';
 
                     trigger OnValidate()
                     begin
@@ -1244,6 +1346,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[95];
                     Visible = Visible95;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[95] field';
 
                     trigger OnValidate()
                     begin
@@ -1256,6 +1359,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[96];
                     Visible = Visible96;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[96] field';
 
                     trigger OnValidate()
                     begin
@@ -1268,6 +1372,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[97];
                     Visible = Visible97;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[97] field';
 
                     trigger OnValidate()
                     begin
@@ -1280,6 +1385,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[98];
                     Visible = Visible98;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[98] field';
 
                     trigger OnValidate()
                     begin
@@ -1292,6 +1398,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[99];
                     Visible = Visible99;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[99] field';
 
                     trigger OnValidate()
                     begin
@@ -1304,6 +1411,7 @@ page 6059978 "NPR Variety Matrix Bool"
                     BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[100];
                     Visible = Visible100;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[100] field';
 
                     trigger OnValidate()
                     begin
@@ -1325,6 +1433,7 @@ page 6059978 "NPR Variety Matrix Bool"
                         {
                             ApplicationArea = All;
                             Caption = 'Currently Showing';
+                            ToolTip = 'Specifies the value of the Currently Showing field';
                         }
                     }
                     group("Variety 1")
@@ -1334,11 +1443,13 @@ page 6059978 "NPR Variety Matrix Bool"
                         {
                             ApplicationArea = All;
                             ShowCaption = false;
+                            ToolTip = 'Specifies the value of the Item.NPR Variety 1 field';
                         }
                         field("Item.""Variety 1 Table"""; Item."NPR Variety 1 Table")
                         {
                             ApplicationArea = All;
                             ShowCaption = false;
+                            ToolTip = 'Specifies the value of the Item.NPR Variety 1 Table field';
 
                             trigger OnDrillDown()
                             var
@@ -1365,11 +1476,13 @@ page 6059978 "NPR Variety Matrix Bool"
                         {
                             ApplicationArea = All;
                             ShowCaption = false;
+                            ToolTip = 'Specifies the value of the Item.NPR Variety 2 field';
                         }
                         field("Item.""Variety 2 Table"""; Item."NPR Variety 2 Table")
                         {
                             ApplicationArea = All;
                             ShowCaption = false;
+                            ToolTip = 'Specifies the value of the Item.NPR Variety 2 Table field';
 
                             trigger OnDrillDown()
                             var
@@ -1392,11 +1505,13 @@ page 6059978 "NPR Variety Matrix Bool"
                         {
                             ApplicationArea = All;
                             ShowCaption = false;
+                            ToolTip = 'Specifies the value of the Item.NPR Variety 3 field';
                         }
                         field("Item.""Variety 3 Table"""; Item."NPR Variety 3 Table")
                         {
                             ApplicationArea = All;
                             ShowCaption = false;
+                            ToolTip = 'Specifies the value of the Item.NPR Variety 3 Table field';
 
                             trigger OnDrillDown()
                             var
@@ -1419,11 +1534,13 @@ page 6059978 "NPR Variety Matrix Bool"
                         {
                             ApplicationArea = All;
                             ShowCaption = false;
+                            ToolTip = 'Specifies the value of the Item.NPR Variety 4 field';
                         }
                         field("Item.""Variety 4 Table"""; Item."NPR Variety 4 Table")
                         {
                             ApplicationArea = All;
                             ShowCaption = false;
+                            ToolTip = 'Specifies the value of the Item.NPR Variety 4 Table field';
 
                             trigger OnDrillDown()
                             var
@@ -1456,6 +1573,7 @@ page 6059978 "NPR Variety Matrix Bool"
                 PromotedCategory = New;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Create Table Copy action';
 
                 trigger OnAction()
                 var
@@ -1509,6 +1627,7 @@ page 6059978 "NPR Variety Matrix Bool"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Select All action';
 
                 trigger OnAction()
                 begin
@@ -1526,6 +1645,7 @@ page 6059978 "NPR Variety Matrix Bool"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Select Active Row action';
 
                 trigger OnAction()
                 begin

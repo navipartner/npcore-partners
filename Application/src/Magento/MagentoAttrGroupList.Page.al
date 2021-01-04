@@ -19,18 +19,22 @@ page 6151458 "NPR Magento Attr. Group List"
                 field("Attribute Group ID"; "Attribute Group ID")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Attribute Group ID field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Attribute Set ID"; "Attribute Set ID")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Attribute Set ID field';
                 }
                 field("Sort Order"; "Sort Order")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Sort Order field';
                 }
             }
         }

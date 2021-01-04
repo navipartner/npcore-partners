@@ -17,22 +17,27 @@ page 6059955 "NPR MCS API Setup"
                 field(API; API)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the API field';
                 }
                 field("Key 1"; "Key 1")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Key 1 field';
                 }
                 field("Key 2"; "Key 2")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Key 2 field';
                 }
                 field("Image Orientation"; "Image Orientation")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Image Orientation field';
                 }
                 field("Use Cognitive Services"; "Use Cognitive Services")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Use Cognitive Services field';
                 }
             }
         }

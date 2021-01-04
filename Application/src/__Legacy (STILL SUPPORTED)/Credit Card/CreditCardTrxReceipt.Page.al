@@ -16,11 +16,13 @@ page 6014409 "NPR Credit Card Trx Receipt"
                 field("Transaction Time"; "Transaction Time")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Transaction Time field';
                 }
                 field("Text"; Text)
                 {
                     ApplicationArea = All;
                     Width = 250;
+                    ToolTip = 'Specifies the value of the Text field';
                 }
             }
         }

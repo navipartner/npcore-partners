@@ -19,18 +19,22 @@ page 6059941 "NPR SMS Template Card"
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Alt. Sender"; "Alt. Sender")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Alt. Sender field';
                 }
                 field("Table No."; "Table No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Table No. field';
 
                     trigger OnValidate()
                     var
@@ -46,22 +50,26 @@ page 6059941 "NPR SMS Template Card"
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Table Caption field';
                 }
                 field(Recipient; Recipient)
                 {
                     ApplicationArea = All;
                     Lookup = true;
+                    ToolTip = 'Specifies the value of the Recipient field';
                 }
                 field("""Table Filters"".HASVALUE"; "Table Filters".HasValue)
                 {
                     ApplicationArea = All;
                     Caption = 'Filters on Table';
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Filters on Table field';
                 }
                 field("Report ID"; "Report ID")
                 {
                     ApplicationArea = All;
                     Importance = Additional;
+                    ToolTip = 'Specifies the value of the Report ID field';
 
                     trigger OnValidate()
                     begin
@@ -108,6 +116,7 @@ page 6059941 "NPR SMS Template Card"
                     Promoted = true;
                     PromotedCategory = Category4;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Send SMS action';
 
                     trigger OnAction()
                     var
@@ -121,6 +130,7 @@ page 6059941 "NPR SMS Template Card"
                     Caption = 'Send batch SMS';
                     Image = SendToMultiple;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Send batch SMS action';
 
                     trigger OnAction()
                     var
@@ -143,6 +153,7 @@ page 6059941 "NPR SMS Template Card"
                     Promoted = true;
                     PromotedCategory = Category4;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Table Filters action';
 
                     trigger OnAction()
                     begin

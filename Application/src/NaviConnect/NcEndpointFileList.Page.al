@@ -22,26 +22,32 @@ page 6151526 "NPR Nc Endpoint File List"
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field(Enabled; Enabled)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Enabled field';
                 }
                 field(Path; Path)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Path field';
                 }
                 field("Client Path"; "Client Path")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Client Path field';
                 }
                 field(Filename; Filename)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Filename field';
                 }
             }
         }
@@ -56,6 +62,7 @@ page 6151526 "NPR Nc Endpoint File List"
                 Caption = 'Trigger Links';
                 Image = Link;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Trigger Links action';
 
                 trigger OnAction()
                 begin

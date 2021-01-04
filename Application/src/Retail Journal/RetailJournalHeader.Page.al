@@ -45,6 +45,7 @@ page 6014490 "NPR Retail Journal Header"
                     field("No."; "No.")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Code field';
 
                         trigger OnAssistEdit()
                         begin
@@ -56,6 +57,7 @@ page 6014490 "NPR Retail Journal Header"
                     {
                         ApplicationArea = All;
                         Importance = Promoted;
+                        ToolTip = 'Specifies the value of the Description field';
                     }
                 }
                 group(Control6150619)
@@ -64,14 +66,17 @@ page 6014490 "NPR Retail Journal Header"
                     field("Date of creation"; "Date of creation")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Date field';
                     }
                     field("Salesperson Code"; "Salesperson Code")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Salesperson field';
                     }
                     field("Location Code"; "Location Code")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Location Code field';
 
                         trigger OnValidate()
                         begin
@@ -81,14 +86,17 @@ page 6014490 "NPR Retail Journal Header"
                     field("Register No."; "Register No.")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Cash Register No. field';
                     }
                     field("Customer Price Group"; "Customer Price Group")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Customer Price Group field';
                     }
                     field("Customer Disc. Group"; "Customer Disc. Group")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Customer Disc. Group field';
                     }
                 }
             }
@@ -101,10 +109,12 @@ page 6014490 "NPR Retail Journal Header"
                     field("Shortcut Dimension 1 Code"; "Shortcut Dimension 1 Code")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Global Dimension 1 Code field';
                     }
                     field("Shortcut Dimension 2 Code"; "Shortcut Dimension 2 Code")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Global Dimension 2 Code field';
                     }
                 }
             }
@@ -125,6 +135,7 @@ page 6014490 "NPR Retail Journal Header"
                             ApplicationArea = All;
                             ShowCaption = false;
                             TableRelation = Vendor;
+                            ToolTip = 'Specifies the value of the VendorFilter field';
 
                             trigger OnValidate()
                             begin
@@ -144,6 +155,7 @@ page 6014490 "NPR Retail Journal Header"
                             Caption = 'Item Group';
                             ShowCaption = false;
                             TableRelation = "NPR Item Group";
+                            ToolTip = 'Specifies the value of the Item Group field';
 
                             trigger OnValidate()
                             begin
@@ -163,6 +175,7 @@ page 6014490 "NPR Retail Journal Header"
                             Caption = 'Unknown Item No.';
                             OptionCaption = 'All,Only existing items,Only unknown items';
                             ShowCaption = false;
+                            ToolTip = 'Specifies the value of the Unknown Item No. field';
 
                             trigger OnValidate()
                             begin
@@ -181,6 +194,7 @@ page 6014490 "NPR Retail Journal Header"
                             Caption = 'New Item';
                             OptionCaption = 'All,Only existing items,Only new items';
                             ShowCaption = false;
+                            ToolTip = 'Specifies the value of the New Item field';
 
                             trigger OnValidate()
                             begin
@@ -199,6 +213,7 @@ page 6014490 "NPR Retail Journal Header"
                             Caption = 'Inventory Status';
                             OptionCaption = 'All,In stock,Not in stock';
                             ShowCaption = false;
+                            ToolTip = 'Specifies the value of the Inventory Status field';
 
                             trigger OnValidate()
                             begin
@@ -249,6 +264,7 @@ page 6014490 "NPR Retail Journal Header"
                     Promoted = true;
                     PromotedCategory = "Report";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Shelf Label action';
 
                     trigger OnAction()
                     var
@@ -265,6 +281,7 @@ page 6014490 "NPR Retail Journal Header"
                     PromotedCategory = "Report";
                     ShortCutKey = 'Ctrl+Alt+L';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Price Label action';
 
                     trigger OnAction()
                     var
@@ -280,6 +297,7 @@ page 6014490 "NPR Retail Journal Header"
                     Promoted = true;
                     PromotedCategory = "Report";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Sign Print action';
 
                     trigger OnAction()
                     var
@@ -295,6 +313,7 @@ page 6014490 "NPR Retail Journal Header"
                     Promoted = true;
                     PromotedCategory = "Report";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Invert selection action';
 
                     trigger OnAction()
                     begin
@@ -306,6 +325,7 @@ page 6014490 "NPR Retail Journal Header"
                     Caption = 'Set Print Qty to Inventory';
                     Image = AddAction;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Set Print Qty to Inventory action';
 
                     trigger OnAction()
                     begin
@@ -324,6 +344,7 @@ page 6014490 "NPR Retail Journal Header"
                     Promoted = true;
                     PromotedCategory = "Report";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the List action';
 
                     trigger OnAction()
                     begin
@@ -342,6 +363,7 @@ page 6014490 "NPR Retail Journal Header"
                     Caption = 'Get from Item Card';
                     Image = Card;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Get from Item Card action';
 
                     trigger OnAction()
                     var
@@ -370,6 +392,7 @@ page 6014490 "NPR Retail Journal Header"
                     Caption = 'Items';
                     Image = ItemLines;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Items action';
 
                     trigger OnAction()
                     var
@@ -384,6 +407,7 @@ page 6014490 "NPR Retail Journal Header"
                     Caption = 'Scanner';
                     Image = MiniForm;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Scanner action';
 
                     trigger OnAction()
                     var
@@ -401,6 +425,7 @@ page 6014490 "NPR Retail Journal Header"
                     Caption = 'Period Discounts';
                     Image = PeriodEntries;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Period Discounts action';
 
                     trigger OnAction()
                     var
@@ -424,6 +449,7 @@ page 6014490 "NPR Retail Journal Header"
                     Image = Discount;
                     Visible = false;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Mixed Discounts action';
 
                     trigger OnAction()
                     begin
@@ -443,6 +469,7 @@ page 6014490 "NPR Retail Journal Header"
                     Image = ReturnReceipt;
                     Visible = true;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Return Sales action';
 
                     trigger OnAction()
                     begin
@@ -463,6 +490,7 @@ page 6014490 "NPR Retail Journal Header"
                     Caption = 'Transfer Order';
                     Image = PeriodEntries;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Transfer Order action';
 
                     trigger OnAction()
                     var
@@ -479,6 +507,7 @@ page 6014490 "NPR Retail Journal Header"
                     Caption = 'Transfer Shipment';
                     Image = PeriodEntries;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Transfer Shipment action';
 
                     trigger OnAction()
                     var
@@ -495,6 +524,7 @@ page 6014490 "NPR Retail Journal Header"
                     Caption = 'Transfer Receipt';
                     Image = PeriodEntries;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Transfer Receipt action';
 
                     trigger OnAction()
                     var
@@ -511,6 +541,7 @@ page 6014490 "NPR Retail Journal Header"
                     Caption = 'Retail Price Log';
                     Image = ImportLog;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Retail Price Log action';
 
                     trigger OnAction()
                     var
@@ -533,6 +564,7 @@ page 6014490 "NPR Retail Journal Header"
                     Image = Card;
                     Visible = false;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Export to Item Card action';
 
                     trigger OnAction()
                     begin
@@ -547,6 +579,7 @@ page 6014490 "NPR Retail Journal Header"
                     Caption = 'Scanner';
                     Image = MiniForm;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Scanner action';
 
                     trigger OnAction()
                     var
@@ -562,6 +595,7 @@ page 6014490 "NPR Retail Journal Header"
                     Caption = 'Other Retail Journal';
                     Image = Journal;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Other Retail Journal action';
 
                     trigger OnAction()
                     var
@@ -576,6 +610,7 @@ page 6014490 "NPR Retail Journal Header"
                     Caption = 'Period Discount';
                     Image = Campaign;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Period Discount action';
 
                     trigger OnAction()
                     var
@@ -590,6 +625,7 @@ page 6014490 "NPR Retail Journal Header"
                     Caption = 'Item Journal';
                     Image = ItemLines;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Item Journal action';
 
                     trigger OnAction()
                     var
@@ -604,6 +640,7 @@ page 6014490 "NPR Retail Journal Header"
                     Caption = 'Requisition Worksheet';
                     Image = Worksheet;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Requisition Worksheet action';
 
                     trigger OnAction()
                     var
@@ -618,6 +655,7 @@ page 6014490 "NPR Retail Journal Header"
                     Caption = 'File';
                     Image = MakeDiskette;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the File action';
 
                     trigger OnAction()
                     var
@@ -637,6 +675,7 @@ page 6014490 "NPR Retail Journal Header"
                     Image = Find;
                     ShortCutKey = 'Ctrl+F';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Find Item action';
 
                     trigger OnAction()
                     var
@@ -654,6 +693,7 @@ page 6014490 "NPR Retail Journal Header"
                     Image = Card;
                     ShortCutKey = 'Shift+F5';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Item Card action';
 
                     trigger OnAction()
                     var
@@ -677,6 +717,7 @@ page 6014490 "NPR Retail Journal Header"
                     Caption = 'Validate Lines';
                     Image = CheckList;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Validate Lines action';
 
                     trigger OnAction()
                     var
@@ -713,6 +754,7 @@ page 6014490 "NPR Retail Journal Header"
                     Caption = 'Change Price on Selected Items';
                     Image = PriceAdjustment;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Change Price on Selected Items action';
                 }
             }
             group(Create)
@@ -726,6 +768,7 @@ page 6014490 "NPR Retail Journal Header"
                     Caption = 'Update Count Code/Type';
                     Image = Discount;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Update Count Code/Type action';
 
                     trigger OnAction()
                     begin
@@ -742,6 +785,7 @@ page 6014490 "NPR Retail Journal Header"
                 Image = Log;
                 RunObject = Page "NPR Retail Price Log Entries";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Retail Price Log Entries action';
             }
         }
     }

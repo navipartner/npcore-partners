@@ -28,31 +28,38 @@ page 6151403 "NPR Magento Websites"
                     field("Code"; Code)
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Code field';
                     }
                     field(Name; Name)
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Name field';
                     }
                     field("Default Website"; "Default Website")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Std. Website field';
                     }
                     field("Global Dimension 1 Code"; "Global Dimension 1 Code")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Global Dimension 1 Code field';
                     }
                     field("Global Dimension 2 Code"; "Global Dimension 2 Code")
                     {
                         ApplicationArea = All;
                         Visible = false;
+                        ToolTip = 'Specifies the value of the Global Dimension 2 Code field';
                     }
                     field("Location Code"; "Location Code")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Location Code field';
                     }
                     field("Sales Order No. Series"; "Sales Order No. Series")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Sales Order No. Series field';
                     }
                 }
                 group(Control6150620)
@@ -81,6 +88,7 @@ page 6151403 "NPR Magento Websites"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Setup Websites action';
 
                 trigger OnAction()
                 begin

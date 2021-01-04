@@ -19,30 +19,37 @@ page 6151091 "NPR Nc RapidConnect Setup"
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Package Code"; "Package Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Package Code field';
                 }
                 field("Export Enabled"; "Export Enabled")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Export Enabled field';
                 }
                 field("Task Processor Code"; "Task Processor Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Task Processor Code field';
                 }
                 field("Import Enabled"; "Import Enabled")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Import Enabled field';
                 }
                 field("Import Type"; "Import Type")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Import Type field';
                 }
             }
         }
@@ -61,6 +68,7 @@ page 6151091 "NPR Nc RapidConnect Setup"
                     Image = Delegate;
                     Visible = "Import Enabled";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Download Ftp action';
 
                     trigger OnAction()
                     var

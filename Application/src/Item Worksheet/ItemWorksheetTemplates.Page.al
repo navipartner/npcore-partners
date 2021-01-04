@@ -26,82 +26,102 @@ page 6060040 "NPR Item Worksheet Templates"
                 field(Name; Name)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Name field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Item No. Creation by"; "Item No. Creation by")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Item No. Creation by field';
                 }
                 field("Item No. Prefix"; "Item No. Prefix")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Item No. Prefix field';
                 }
                 field("Prefix Code"; "Prefix Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Prefix Code field';
                 }
                 field("No. Series"; "No. Series")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the No. Series field';
                 }
                 field("Error Handling"; "Error Handling")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Error Handling field';
                 }
                 field("Test Validation"; "Test Validation")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Test Validation field';
                 }
                 field("Create Internal Barcodes"; "Create Internal Barcodes")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Create Internal Barcodes field';
                 }
                 field("Create Vendor  Barcodes"; "Create Vendor  Barcodes")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Create Vendor  Barcodes field';
                 }
                 field("Sales Price Handling"; "Sales Price Handling")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Sales Price Handling field';
                 }
                 field("Purchase Price Handling"; "Purchase Price Handling")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Purchase Price Handling field';
                 }
                 field("Combine Variants to Item by"; "Combine Variants to Item by")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Combine Variants to Item by field';
                 }
                 field("Register Lines"; "Register Lines")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Register Lines field';
                 }
                 field("Delete Processed Lines"; "Delete Processed Lines")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Delete Processed Lines field';
                 }
                 field("Delete Unvalidated Duplicates"; "Delete Unvalidated Duplicates")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Delete Unvalidated Duplicates field';
                 }
                 field("Allow Web Service Update"; "Allow Web Service Update")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Allow Web Service Update field';
                 }
                 field("Item Info Query Name"; "Item Info Query Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Item Info Query Name field';
                 }
                 field("Item Info Query Type"; "Item Info Query Type")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Item Info Query Type field';
                 }
                 field("Item Info Query By"; "Item Info Query By")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Item Info Query By field';
                 }
             }
         }
@@ -123,12 +143,14 @@ page 6060040 "NPR Item Worksheet Templates"
                 RunPageView = SORTING("Item Template Name", Name)
                               ORDER(Ascending);
                 ApplicationArea = All;
+                ToolTip = 'Executes the Worksheets action';
             }
             action("Field Setup")
             {
                 Caption = 'Field Setup';
                 Image = MapAccounts;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Field Setup action';
 
                 trigger OnAction()
                 var

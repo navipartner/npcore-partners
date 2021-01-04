@@ -47,12 +47,14 @@ page 6151502 "NPR Nc Task List"
                         ApplicationArea = All;
                         Caption = 'Quantity';
                         Editable = false;
+                        ToolTip = 'Specifies the value of the Quantity field';
                     }
                     field(TaskProcessorFilter; TaskProcessorFilter)
                     {
                         ApplicationArea = All;
                         Caption = 'Task Processor';
                         TableRelation = "NPR Nc Task Processor";
+                        ToolTip = 'Specifies the value of the Task Processor field';
 
                         trigger OnValidate()
                         begin
@@ -63,6 +65,7 @@ page 6151502 "NPR Nc Task List"
                     {
                         ApplicationArea = All;
                         Caption = 'Show Processed';
+                        ToolTip = 'Specifies the value of the Show Processed field';
 
                         trigger OnValidate()
                         begin
@@ -79,6 +82,7 @@ page 6151502 "NPR Nc Task List"
                         Caption = 'Response:                                                                                                                                                                                                                                                                               _';
                         HideValue = true;
                         ShowCaption = false;
+                        ToolTip = 'Specifies the value of the Response:                                                                                                                                                                                                                                                                               _ field';
                     }
                     field(ResponseText; ResponseText)
                     {
@@ -86,6 +90,7 @@ page 6151502 "NPR Nc Task List"
                         Editable = false;
                         MultiLine = true;
                         ShowCaption = false;
+                        ToolTip = 'Specifies the value of the ResponseText field';
                     }
                 }
             }
@@ -95,67 +100,81 @@ page 6151502 "NPR Nc Task List"
                 field("Task Processor Code"; "Task Processor Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Task Processor Code field';
                 }
                 field(Processed; Processed)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Processed field';
                 }
                 field("Process Error"; "Process Error")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Error field';
                 }
                 field("Company Name"; "Company Name")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Company Name field';
                 }
                 field(Type; Type)
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Type field';
                 }
                 field("Table No."; "Table No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Table No. field';
                 }
                 field("Table Name"; "Table Name")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Table Name field';
                 }
                 field("Record Value"; "Record Value")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Record Value field';
                 }
                 field("Record Position"; "Record Position")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Record Position field';
                 }
                 field("Log Date"; "Log Date")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Log Date field';
                 }
                 field("Last Checked1"; "Last Processing Started at")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Last Processing Started at field';
                 }
                 field("Last Processing Completed at"; "Last Processing Completed at")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Last Processing Completed at field';
                 }
                 field("Last Processing Duration"; "Last Processing Duration")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Last Processing Duration (sec.) field';
                 }
                 field("Process Count"; "Process Count")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Process Count field';
                 }
             }
         }
@@ -174,6 +193,7 @@ page 6151502 "NPR Nc Task List"
                 PromotedIsBig = true;
                 ShortCutKey = 'Ctrl+F5';
                 ApplicationArea = All;
+                ToolTip = 'Executes the Import new Tasks action';
 
                 trigger OnAction()
                 begin
@@ -189,6 +209,7 @@ page 6151502 "NPR Nc Task List"
                 PromotedIsBig = true;
                 ShortCutKey = 'Ctrl+F9';
                 ApplicationArea = All;
+                ToolTip = 'Executes the Process Manually action';
 
                 trigger OnAction()
                 begin
@@ -205,6 +226,7 @@ page 6151502 "NPR Nc Task List"
                 //PromotedIsBig = true;
                 ShortCutKey = 'F9';
                 ApplicationArea = All;
+                ToolTip = 'Executes the Reschedule for Processing action';
 
                 trigger OnAction()
                 begin
@@ -221,6 +243,7 @@ page 6151502 "NPR Nc Task List"
                 RunObject = Page "NPR Nc Task Fields";
                 RunPageLink = "Task Entry No." = FIELD("Entry No.");
                 ApplicationArea = All;
+                ToolTip = 'Executes the Fields action';
             }
             action("Show Output")
             {
@@ -230,6 +253,7 @@ page 6151502 "NPR Nc Task List"
                 PromotedCategory = Category4;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Show Output action';
 
                 trigger OnAction()
                 begin
@@ -245,6 +269,7 @@ page 6151502 "NPR Nc Task List"
                 PromotedIsBig = true;
                 ShortCutKey = 'Shift+F7';
                 ApplicationArea = All;
+                ToolTip = 'Executes the Source Card action';
 
                 trigger OnAction()
                 begin
@@ -264,6 +289,7 @@ page 6151502 "NPR Nc Task List"
                 RunObject = Page "NPR Nc Task Output List";
                 RunPageLink = "Task Entry No." = FIELD("Entry No.");
                 ApplicationArea = All;
+                ToolTip = 'Executes the Output action';
             }
         }
     }

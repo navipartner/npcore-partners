@@ -20,36 +20,43 @@ page 6059979 "NPR Variety Fields Lookup"
                 field(Type; Type)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Type field';
                 }
                 field("Table No."; "Table No.")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Table No. field';
                 }
                 field("Field No."; "Field No.")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Field No. field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Secondary Type"; "Secondary Type")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Secondary Type field';
                 }
                 field("Secondary Field No."; "Secondary Field No.")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Secondary Field No. field';
                 }
                 field("Secondary Description"; "Secondary Description")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Secondary Field Description field';
                 }
             }
         }

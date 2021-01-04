@@ -21,14 +21,17 @@ page 6014686 "NPR Create Out. Endpoint Query"
                 field(Name; Name)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Name field';
                 }
                 field("Table No."; "Table No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Table No. field';
                 }
                 field("Table View"; "Table View")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Table View field';
                 }
             }
         }
@@ -43,6 +46,7 @@ page 6014686 "NPR Create Out. Endpoint Query"
                 Caption = 'Create Request';
                 Image = Create;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Create Request action';
 
                 trigger OnAction()
                 begin

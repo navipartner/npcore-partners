@@ -18,18 +18,22 @@ page 6184495 "NPR Pepper Terminal Types"
                 field(ID; ID)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the ID field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field(Active; Active)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Active field';
                 }
                 field(Deprecated; Deprecated)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Deprecated field';
                 }
             }
         }

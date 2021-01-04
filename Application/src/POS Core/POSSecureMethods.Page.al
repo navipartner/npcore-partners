@@ -17,14 +17,17 @@ page 6150731 "NPR POS Secure Methods"
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field(Type; Type)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Type field';
                 }
             }
         }

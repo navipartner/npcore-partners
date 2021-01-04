@@ -14,10 +14,12 @@ page 6150711 "NPR POS View Card"
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
             }
             usercontrol(Editor; "NPR JsonEditor")

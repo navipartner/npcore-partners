@@ -17,21 +17,25 @@ page 6014513 "NPR RP Template Output Log"
             repeater(RepeaterGroup)
             {
                 field("Entry No.";
-                    "Entry No.")
+                "Entry No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Entry No. field';
                 }
-                field("Template Name";"Template Name")
+                field("Template Name"; "Template Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Template Name field';
                 }
                 field("User ID"; "User ID")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the User ID field';
                 }
-                field("Printed At";"Printed At")
+                field("Printed At"; "Printed At")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Printed At field';
                 }
             }
         }
@@ -48,10 +52,11 @@ page 6014513 "NPR RP Template Output Log"
                 PromotedCategory = Process;
                 PromotedOnly = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Download Output action';
                 trigger OnAction()
-                var 
-                    IStream:InStream;
-                    ToFileName:Text;
+                var
+                    IStream: InStream;
+                    ToFileName: Text;
                 begin
                     Rec.CALCFIELDS(Output);
                     Rec.Output.CREATEINSTREAM(IStream);

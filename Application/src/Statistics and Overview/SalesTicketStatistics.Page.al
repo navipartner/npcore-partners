@@ -22,15 +22,18 @@ page 6014468 "NPR Sales Ticket Statistics"
                 field("Period Start"; "Period Start")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Period Start field';
                 }
                 field("Period Name"; "Period Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Period Name field';
                 }
                 field("Kassedata.""All Normal Sales in Audit Roll"""; Kassedata."All Normal Sales in Audit Roll")
                 {
                     ApplicationArea = All;
                     Caption = 'Balance Due (LCY)';
+                    ToolTip = 'Specifies the value of the Balance Due (LCY) field';
 
                     trigger OnDrillDown()
                     var
@@ -50,6 +53,7 @@ page 6014468 "NPR Sales Ticket Statistics"
                 {
                     ApplicationArea = All;
                     Caption = 'Purchases (LCY)';
+                    ToolTip = 'Specifies the value of the Purchases (LCY) field';
 
                     trigger OnDrillDown()
                     var
@@ -71,16 +75,19 @@ page 6014468 "NPR Sales Ticket Statistics"
                 {
                     ApplicationArea = All;
                     Caption = 'Total';
+                    ToolTip = 'Specifies the value of the Total field';
                 }
                 field(totalCount; totalCount)
                 {
                     ApplicationArea = All;
                     Caption = 'Number of Exp.';
+                    ToolTip = 'Specifies the value of the Number of Exp. field';
                 }
                 field(CalculatedAverage; CalcAverage)
                 {
                     ApplicationArea = All;
                     Caption = 'Stay Expedition';
+                    ToolTip = 'Specifies the value of the Stay Expedition field';
                 }
             }
             group(Control6150623)
@@ -92,6 +99,7 @@ page 6014468 "NPR Sales Ticket Statistics"
                     CaptionClass = '1,2,1';
                     Caption = 'Dept. Code';
                     TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+                    ToolTip = 'Specifies the value of the Dept. Code field';
                 }
                 field(Dim2Filter; Dim2Filter)
                 {
@@ -99,12 +107,14 @@ page 6014468 "NPR Sales Ticket Statistics"
                     CaptionClass = '1,2,2';
                     Caption = 'Project Code';
                     TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
+                    ToolTip = 'Specifies the value of the Project Code field';
                 }
                 field(PeriodType; PeriodType)
                 {
                     ApplicationArea = All;
                     Caption = 'Period Type';
                     OptionCaption = 'Day,Week,Month,Year';
+                    ToolTip = 'Specifies the value of the Period Type field';
 
                     trigger OnValidate()
                     begin

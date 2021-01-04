@@ -17,6 +17,7 @@ page 6014615 "NPR RapidStart Base Data Imp."
             {
                 ApplicationArea = All;
                 Lookup = true;
+                ToolTip = 'Specifies the value of the package field';
                 trigger OnLookup(var value: Text): Boolean
                 var
                     rapidstartBaseDataMgt: Codeunit "NPR RapidStart Base Data Mgt.";
@@ -56,6 +57,7 @@ page 6014615 "NPR RapidStart Base Data Imp."
             action(ActionName)
             {
                 ApplicationArea = All;
+                ToolTip = 'Executes the ActionName action';
 
                 trigger OnAction()
                 begin
@@ -68,6 +70,7 @@ page 6014615 "NPR RapidStart Base Data Imp."
                 ApplicationArea = All;
                 Caption = 'Back';
                 InFooterBar = true;
+                ToolTip = 'Executes the Back action';
             }
 
             action(ActionNext)
@@ -75,6 +78,7 @@ page 6014615 "NPR RapidStart Base Data Imp."
                 ApplicationArea = All;
                 Caption = 'Next';
                 InFooterBar = true;
+                ToolTip = 'Executes the Next action';
             }
 
             action(ActionFinish)
@@ -82,6 +86,7 @@ page 6014615 "NPR RapidStart Base Data Imp."
                 ApplicationArea = All;
                 Caption = 'Finish';
                 InFooterBar = true;
+                ToolTip = 'Executes the Finish action';
 
                 trigger OnAction()
                 var

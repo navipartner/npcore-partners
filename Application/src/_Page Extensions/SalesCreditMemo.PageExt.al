@@ -7,6 +7,7 @@ pageextension 6014444 "NPR Sales Credit Memo" extends "Sales Credit Memo"
             field("NPR NPRPostingDescription1"; "Posting Description")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the Posting Description field';
             }
         }
         addafter("EU 3-Party Trade")
@@ -14,6 +15,7 @@ pageextension 6014444 "NPR Sales Credit Memo" extends "Sales Credit Memo"
             field("NPR Magento Payment Amount"; "NPR Magento Payment Amount")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the NPR Magento Payment Amount field';
             }
         }
     }
@@ -26,6 +28,7 @@ pageextension 6014444 "NPR Sales Credit Memo" extends "Sales Credit Memo"
                 Caption = 'POS Entry';
                 Image = Entry;
                 ApplicationArea = All;
+                ToolTip = 'Executes the POS Entry action';
             }
         }
         addafter("Move Negative Lines")
@@ -36,6 +39,7 @@ pageextension 6014444 "NPR Sales Credit Memo" extends "Sales Credit Memo"
                 Image = Import;
                 Promoted = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Import from scanner action';
 
                 trigger OnAction()
                 begin

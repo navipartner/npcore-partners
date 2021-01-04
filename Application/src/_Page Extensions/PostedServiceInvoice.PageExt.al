@@ -17,12 +17,14 @@ pageextension 6014471 "NPR Posted Service Invoice" extends "Posted Service Invoi
                     Caption = 'E-mail Log';
                     Image = Email;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the E-mail Log action';
                 }
                 action("NPR SendAsPDF")
                 {
                     Caption = 'Send as PDF';
                     Image = SendEmailPDF;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Send as PDF action';
                 }
             }
         }

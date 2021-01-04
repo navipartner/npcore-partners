@@ -24,6 +24,7 @@ page 6151597 "NPR NpDc Coupon List Items"
                     DecimalPlaces = 0 : 5;
                     Importance = Promoted;
                     Visible = (NOT ValidationView);
+                    ToolTip = 'Specifies the value of the Max. Quantity per Coupon field';
 
                     trigger OnValidate()
                     begin
@@ -37,6 +38,7 @@ page 6151597 "NPR NpDc Coupon List Items"
                     ApplicationArea = All;
                     Caption = 'Lot Validation';
                     Visible = ValidationView;
+                    ToolTip = 'Specifies the value of the Lot Validation field';
 
                     trigger OnValidate()
                     begin
@@ -55,6 +57,7 @@ page 6151597 "NPR NpDc Coupon List Items"
                         BlankZero = true;
                         Caption = 'Validation Quantity';
                         Visible = (ValidationView);
+                        ToolTip = 'Specifies the value of the Validation Quantity field';
 
                         trigger OnValidate()
                         begin
@@ -70,44 +73,53 @@ page 6151597 "NPR NpDc Coupon List Items"
                 field(Type; Type)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Type field';
                 }
                 field("No."; "No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the No. field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Item Description field';
                 }
                 field("Unit Price"; "Unit Price")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Unit Price field';
                 }
                 field("Profit %"; "Profit %")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Profit % field';
                 }
                 field("Max. Discount Amount"; "Max. Discount Amount")
                 {
                     ApplicationArea = All;
                     Visible = (NOT ValidationView);
+                    ToolTip = 'Specifies the value of the Max. Discount Amount per Coupon field';
                 }
                 field("Max. Quantity"; "Max. Quantity")
                 {
                     ApplicationArea = All;
                     Visible = (NOT ValidationView);
+                    ToolTip = 'Specifies the value of the Max. Quantity per Coupon field';
                 }
                 field("Validation Quantity"; "Validation Quantity")
                 {
                     ApplicationArea = All;
                     Visible = (LotValidation);
+                    ToolTip = 'Specifies the value of the Validation Quantity field';
                 }
                 field(Priority; Priority)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Priority field';
                 }
             }
         }
@@ -125,6 +137,7 @@ page 6151597 "NPR NpDc Coupon List Items"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Add Items action';
 
                 trigger OnAction()
                 begin
@@ -141,6 +154,7 @@ page 6151597 "NPR NpDc Coupon List Items"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Set Priorities action';
 
                 trigger OnAction()
                 begin

@@ -18,10 +18,12 @@ page 6151507 "NPR Nc Task Proces. Card"
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
             }
             part(Control6150618; "NPR Nc Task Proces. Lines")

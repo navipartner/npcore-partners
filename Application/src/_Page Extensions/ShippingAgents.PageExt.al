@@ -12,14 +12,17 @@ pageextension 6014441 "NPR Shipping Agents" extends "Shipping Agents"
             field("NPR Shipping Method"; "NPR Shipping Method")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the NPR Shipping Method field';
             }
             field("NPR Ship to Contact Mandatory"; "NPR Ship to Contact Mandatory")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the NPR Ship to Contact Mandatory field';
             }
             field("NPR Drop Point Service"; "NPR Drop Point Service")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the NPR Drop Point Service field';
             }
         }
         addafter("Account No.")
@@ -27,18 +30,22 @@ pageextension 6014441 "NPR Shipping Agents" extends "Shipping Agents"
             field("NPR Shipping Agent Demand"; "NPR Shipping Agent Demand")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the NPR Shipping Agent Demand field';
             }
             field("NPR Pacsoft Product"; "NPR Pacsoft Product")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the NPR Pacsoft Product field';
             }
             field("NPR Custom Print Layout"; "NPR Custom Print Layout")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the NPR Custom Print Layout field';
             }
             field("NPR Return Shipping agent"; "NPR Return Shipping agent")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the NPR Return Shipping agent field';
             }
         }
     }

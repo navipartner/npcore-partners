@@ -17,30 +17,37 @@ page 6014644 "NPR Tax Free POS Units"
                 field("POS Unit No."; "POS Unit No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the POS Unit No. field';
                 }
                 field("Handler ID"; "Handler ID")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Handler ID field';
                 }
                 field(Mode; Mode)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Mode field';
                 }
                 field("Log Level"; "Log Level")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Log Level field';
                 }
                 field("Check POS Terminal IIN"; "Check POS Terminal IIN")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Check POS Terminal IIN field';
                 }
                 field("Request Timeout (ms)"; "Request Timeout (ms)")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Request Timeout (ms) field';
                 }
                 field("Store Voucher Prints"; "Store Voucher Prints")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Store Voucher Prints field';
                 }
             }
         }
@@ -58,6 +65,7 @@ page 6014644 "NPR Tax Free POS Units"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Set Parameters action';
 
                 trigger OnAction()
                 var
@@ -75,6 +83,7 @@ page 6014644 "NPR Tax Free POS Units"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Test Connection action';
 
                 trigger OnAction()
                 var
@@ -91,6 +100,7 @@ page 6014644 "NPR Tax Free POS Units"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Auto Configure action';
 
                 trigger OnAction()
                 var
@@ -109,6 +119,7 @@ page 6014644 "NPR Tax Free POS Units"
                 RunObject = Page "NPR Tax Free Requests";
                 RunPageLink = "POS Unit No." = FIELD("POS Unit No.");
                 ApplicationArea = All;
+                ToolTip = 'Executes the View Log action';
             }
         }
     }

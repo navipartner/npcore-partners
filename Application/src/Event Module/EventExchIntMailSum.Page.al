@@ -21,15 +21,18 @@ page 6151584 "NPR Event Exch. Int. Mail Sum."
                 {
                     ApplicationArea = All;
                     StyleExpr = ColorStyle;
+                    ToolTip = 'Specifies the value of the Exchange Item field';
                 }
                 field("E-mail Account"; "E-mail Account")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the E-mail Account field';
                 }
                 field(Source; Source)
                 {
                     ApplicationArea = All;
                     StyleExpr = ColorStyle;
+                    ToolTip = 'Specifies the value of the Source field';
                 }
             }
         }

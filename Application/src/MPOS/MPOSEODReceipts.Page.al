@@ -17,26 +17,32 @@ page 6059962 "NPR MPOS EOD Receipts"
                 field("No."; "No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the No. field';
                 }
                 field("Created By"; "Created By")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Created By field';
                 }
                 field(Created; Created)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Created field';
                 }
                 field("Callback Timestamp"; "Callback Timestamp")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Callback Timestamp field';
                 }
                 field("Callback Device Id"; "Callback Device Id")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Callback Device Id field';
                 }
                 field("Callback Register No."; "Callback Register No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Callback Register No. field';
                 }
             }
         }
@@ -54,6 +60,7 @@ page 6059962 "NPR MPOS EOD Receipts"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Receipt action';
 
                 trigger OnAction()
                 begin
@@ -76,6 +83,7 @@ page 6059962 "NPR MPOS EOD Receipts"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Response action';
 
                 trigger OnAction()
                 begin

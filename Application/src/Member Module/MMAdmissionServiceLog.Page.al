@@ -16,74 +16,92 @@ page 6060092 "NPR MM Admission Service Log"
                 field("Entry No."; "Entry No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Entry No. field';
                 }
                 field("No."; "No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the No. field';
                 }
                 field("Action"; Action)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Action field';
                 }
                 field("Created Date"; "Created Date")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Created Date field';
                 }
                 field(Token; Token)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Token field';
                 }
                 field("Key"; Key)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Key field';
                 }
                 field("Scanner Station Id"; "Scanner Station Id")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Scanner Station Id field';
                 }
                 field("Request Barcode"; "Request Barcode")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Request Barcode field';
                 }
                 field("Request Scanner Station Id"; "Request Scanner Station Id")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Request Scanner Station Id field';
                 }
                 field("Request No"; "Request No")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Request No field';
                 }
                 field("Request Token"; "Request Token")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Request Token field';
                 }
                 field("Response No"; "Response No")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Response No field';
                 }
                 field("Response Token"; "Response Token")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Response Token field';
                 }
                 field("Response Name"; "Response Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Response Name field';
                 }
                 field("Response PictureBase64"; "Response PictureBase64")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Response PictureBase64 field';
                 }
                 field("Error Number"; "Error Number")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Error Number field';
                 }
                 field("Error Description"; "Error Description")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Error Description field';
                 }
                 field("Return Value"; "Return Value")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Return Value field';
                 }
             }
         }
@@ -101,6 +119,7 @@ page 6060092 "NPR MM Admission Service Log"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Test action';
 
                 trigger OnAction()
                 var

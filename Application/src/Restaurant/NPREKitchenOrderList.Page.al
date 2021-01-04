@@ -19,22 +19,27 @@ page 6150688 "NPR NPRE Kitchen Order List"
                 field("Order ID"; "Order ID")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Order ID field';
                 }
                 field("Restaurant Code"; "Restaurant Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Restaurant Code field';
                 }
                 field(Status; Status)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Status field';
                 }
                 field(Priority; Priority)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Priority field';
                 }
                 field("Created Date-Time"; "Created Date-Time")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Created Date-Time field';
                 }
             }
         }
@@ -68,6 +73,7 @@ page 6150688 "NPR NPRE Kitchen Order List"
                 RunPageLink = "Order ID" = FIELD("Order ID");
                 RunPageView = SORTING("Order ID");
                 ApplicationArea = All;
+                ToolTip = 'Executes the Show Requests action';
             }
         }
     }

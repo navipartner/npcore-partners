@@ -18,6 +18,7 @@ page 6060154 "NPR Event Standard Dialog"
                 ApplicationArea = All;
                 Caption = 'Message';
                 Visible = ShowMessage;
+                ToolTip = 'Specifies the value of the Message field';
             }
             field(Password; Password)
             {
@@ -25,6 +26,7 @@ page 6060154 "NPR Event Standard Dialog"
                 Caption = 'Password';
                 ExtendedDatatype = Masked;
                 Visible = ShowPassword;
+                ToolTip = 'Specifies the value of the Password field';
             }
             field(ConfirmPassword; ConfirmPassword)
             {
@@ -32,6 +34,7 @@ page 6060154 "NPR Event Standard Dialog"
                 Caption = 'Confirm Password';
                 ExtendedDatatype = Masked;
                 Visible = ShowPassword;
+                ToolTip = 'Specifies the value of the Confirm Password field';
             }
         }
     }

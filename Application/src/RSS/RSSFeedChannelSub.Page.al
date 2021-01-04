@@ -16,18 +16,22 @@ page 6059937 "NPR RSS Feed Channel Sub."
                 field("Feed Code"; "Feed Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Feed Code field';
                 }
                 field(Url; Url)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Url field';
                 }
                 field("Show as New Within"; "Show as New Within")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Show as New Within field';
                 }
                 field(Default; Default)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Default field';
                 }
             }
         }

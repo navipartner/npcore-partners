@@ -801,51 +801,61 @@ report 6014460 "NPR Balancing Report A4"
                     {
                         Caption = 'Print TurnOver';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Print TurnOver field';
                     }
                     field(PrintDiscount; PrintDiscount)
                     {
                         Caption = 'Print Discount';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Print Discount field';
                     }
                     field(PrintVAT; PrintVAT)
                     {
                         Caption = 'Print VAT';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Print VAT field';
                     }
                     field(PrintEFT; PrintEFT)
                     {
                         Caption = 'Print EFT';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Print EFT field';
                     }
                     field(PrintVouchers; PrintVouchers)
                     {
                         Caption = 'Print Vouchers';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Print Vouchers field';
                     }
                     field(PrintCounting; PrintCounting)
                     {
                         Caption = 'Print Counting';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Print Counting field';
                     }
                     field(PrintCountedAmtInclFloat; PrintCountedAmtInclFloat)
                     {
                         Caption = 'Print Counted Amt Incl Float';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Print Counted Amt Incl Float field';
                     }
                     field("Print Closing"; PrintClosing)
                     {
                         Caption = 'Print Closing';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Print Closing field';
                     }
                     field(PrintAttachedBins; PrintAttachedBins)
                     {
                         Caption = 'Print Attached Bins';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Print Attached Bins field';
                     }
                     field(PrintEmptyLines; PrintEmptyLines)
                     {
                         Caption = 'Print Lines where Value is Zero.';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Print Lines where Value is Zero. field';
                     }
                 }
             }

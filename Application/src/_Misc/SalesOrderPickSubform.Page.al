@@ -22,6 +22,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                     ApplicationArea = All;
                     Style = Favorable;
                     StyleExpr = QtyToShipColor;
+                    ToolTip = 'Specifies the value of the Type field';
 
                     trigger OnValidate()
                     begin
@@ -40,6 +41,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                     ShowMandatory = TypeChosen;
                     Style = Favorable;
                     StyleExpr = QtyToShipColor;
+                    ToolTip = 'Specifies the value of the No. field';
 
                     trigger OnValidate()
                     begin
@@ -54,6 +56,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Cross-Reference No. field';
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -72,20 +75,24 @@ page 6014519 "NPR Sales Order Pick Subform"
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the IC Partner Code field';
                 }
                 field("IC Partner Ref. Type"; "IC Partner Ref. Type")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the IC Partner Ref. Type field';
                 }
                 field("IC Partner Reference"; "IC Partner Reference")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the IC Partner Reference field';
                 }
                 field("Variant Code"; "Variant Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Variant Code field';
 
                     trigger OnValidate()
                     begin
@@ -96,21 +103,25 @@ page 6014519 "NPR Sales Order Pick Subform"
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Substitution Available field';
                 }
                 field("Purchasing Code"; "Purchasing Code")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Purchasing Code field';
                 }
                 field(Nonstock; Nonstock)
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Nonstock field';
                 }
                 field("VAT Prod. Posting Group"; "VAT Prod. Posting Group")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the VAT Prod. Posting Group field';
 
                     trigger OnValidate()
                     begin
@@ -123,27 +134,32 @@ page 6014519 "NPR Sales Order Pick Subform"
                     QuickEntry = false;
                     Style = Favorable;
                     StyleExpr = QtyToShipColor;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Drop Shipment"; "Drop Shipment")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Drop Shipment field';
                 }
                 field("Special Order"; "Special Order")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Special Order field';
                 }
                 field("Return Reason Code"; "Return Reason Code")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Return Reason Code field';
                 }
                 field("Location Code"; "Location Code")
                 {
                     ApplicationArea = All;
                     QuickEntry = false;
                     ShowMandatory = LocationCodeMandatory;
+                    ToolTip = 'Specifies the value of the Location Code field';
 
                     trigger OnValidate()
                     begin
@@ -154,11 +170,13 @@ page 6014519 "NPR Sales Order Pick Subform"
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Bin Code field';
                 }
                 field(Reserve; Reserve)
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Reserve field';
 
                     trigger OnValidate()
                     begin
@@ -172,6 +190,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                     ShowMandatory = TypeChosen;
                     Style = Favorable;
                     StyleExpr = QtyToShipColor;
+                    ToolTip = 'Specifies the value of the Quantity field';
 
                     trigger OnValidate()
                     begin
@@ -184,6 +203,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                     ApplicationArea = All;
                     BlankZero = true;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Qty. to Assemble to Order field';
 
                     trigger OnDrillDown()
                     begin
@@ -200,11 +220,13 @@ page 6014519 "NPR Sales Order Pick Subform"
                     ApplicationArea = All;
                     BlankZero = true;
                     QuickEntry = false;
+                    ToolTip = 'Specifies the value of the Reserved Quantity field';
                 }
                 field("Unit of Measure Code"; "Unit of Measure Code")
                 {
                     ApplicationArea = All;
                     QuickEntry = false;
+                    ToolTip = 'Specifies the value of the Unit of Measure Code field';
 
                     trigger OnValidate()
                     begin
@@ -216,11 +238,13 @@ page 6014519 "NPR Sales Order Pick Subform"
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Unit of Measure field';
                 }
                 field("Unit Cost (LCY)"; "Unit Cost (LCY)")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Unit Cost (LCY) field';
                 }
                 field(SalesPriceExist; PriceExists)
                 {
@@ -228,12 +252,14 @@ page 6014519 "NPR Sales Order Pick Subform"
                     Caption = 'Sales Price Exists';
                     Editable = false;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Sales Price Exists field';
                 }
                 field("Unit Price"; "Unit Price")
                 {
                     ApplicationArea = All;
                     BlankZero = true;
                     ShowMandatory = TypeChosen;
+                    ToolTip = 'Specifies the value of the Unit Price field';
 
                     trigger OnValidate()
                     begin
@@ -244,6 +270,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                 {
                     ApplicationArea = All;
                     BlankZero = true;
+                    ToolTip = 'Specifies the value of the Line Amount field';
 
                     trigger OnValidate()
                     begin
@@ -253,6 +280,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                 field("Amount Including VAT"; "Amount Including VAT")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Amount Including VAT field';
                 }
                 field(SalesLineDiscExists; LineDiscExists)
                 {
@@ -260,11 +288,13 @@ page 6014519 "NPR Sales Order Pick Subform"
                     Caption = 'Sales Line Disc. Exists';
                     Editable = false;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Sales Line Disc. Exists field';
                 }
                 field("Line Discount %"; "Line Discount %")
                 {
                     ApplicationArea = All;
                     BlankZero = true;
+                    ToolTip = 'Specifies the value of the Line Discount % field';
 
                     trigger OnValidate()
                     begin
@@ -275,6 +305,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Line Discount Amount field';
 
                     trigger OnValidate()
                     begin
@@ -285,6 +316,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Prepayment % field';
 
                     trigger OnValidate()
                     begin
@@ -295,6 +327,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Prepmt. Line Amount field';
 
                     trigger OnValidate()
                     begin
@@ -305,6 +338,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Prepmt. Amt. Inv. field';
 
                     trigger OnValidate()
                     begin
@@ -315,11 +349,13 @@ page 6014519 "NPR Sales Order Pick Subform"
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Allow Invoice Disc. field';
                 }
                 field("Inv. Discount Amount"; "Inv. Discount Amount")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Inv. Discount Amount field';
                 }
                 field("Qty. to Ship"; "Qty. to Ship")
                 {
@@ -327,6 +363,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                     BlankZero = true;
                     Style = Favorable;
                     StyleExpr = QtyToShipColor;
+                    ToolTip = 'Specifies the value of the Qty. to Ship field';
 
                     trigger OnValidate()
                     begin
@@ -341,37 +378,44 @@ page 6014519 "NPR Sales Order Pick Subform"
                     ApplicationArea = All;
                     BlankZero = true;
                     QuickEntry = false;
+                    ToolTip = 'Specifies the value of the Quantity Shipped field';
                 }
                 field("Qty. to Invoice"; "Qty. to Invoice")
                 {
                     ApplicationArea = All;
                     BlankZero = true;
+                    ToolTip = 'Specifies the value of the Qty. to Invoice field';
                 }
                 field("Quantity Invoiced"; "Quantity Invoiced")
                 {
                     ApplicationArea = All;
                     BlankZero = true;
+                    ToolTip = 'Specifies the value of the Quantity Invoiced field';
                 }
                 field("Prepmt Amt to Deduct"; "Prepmt Amt to Deduct")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Prepmt Amt to Deduct field';
                 }
                 field("Prepmt Amt Deducted"; "Prepmt Amt Deducted")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Prepmt Amt Deducted field';
                 }
                 field("Allow Item Charge Assignment"; "Allow Item Charge Assignment")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Allow Item Charge Assignment field';
                 }
                 field("Qty. to Assign"; "Qty. to Assign")
                 {
                     ApplicationArea = All;
                     BlankZero = true;
                     QuickEntry = false;
+                    ToolTip = 'Specifies the value of the Qty. to Assign field';
 
                     trigger OnDrillDown()
                     begin
@@ -385,6 +429,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                     ApplicationArea = All;
                     BlankZero = true;
                     QuickEntry = false;
+                    ToolTip = 'Specifies the value of the Qty. Assigned field';
 
                     trigger OnDrillDown()
                     begin
@@ -397,25 +442,30 @@ page 6014519 "NPR Sales Order Pick Subform"
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Requested Delivery Date field';
                 }
                 field("Promised Delivery Date"; "Promised Delivery Date")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Promised Delivery Date field';
                 }
                 field("Planned Delivery Date"; "Planned Delivery Date")
                 {
                     ApplicationArea = All;
                     QuickEntry = false;
+                    ToolTip = 'Specifies the value of the Planned Delivery Date field';
                 }
                 field("Planned Shipment Date"; "Planned Shipment Date")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Planned Shipment Date field';
                 }
                 field("Shipment Date"; "Shipment Date")
                 {
                     ApplicationArea = All;
                     QuickEntry = false;
+                    ToolTip = 'Specifies the value of the Shipment Date field';
 
                     trigger OnValidate()
                     begin
@@ -426,101 +476,121 @@ page 6014519 "NPR Sales Order Pick Subform"
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Shipping Agent Code field';
                 }
                 field("Shipping Agent Service Code"; "Shipping Agent Service Code")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Shipping Agent Service Code field';
                 }
                 field("Shipping Time"; "Shipping Time")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Shipping Time field';
                 }
                 field("Work Type Code"; "Work Type Code")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Work Type Code field';
                 }
                 field("Whse. Outstanding Qty."; "Whse. Outstanding Qty.")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Whse. Outstanding Qty. field';
                 }
                 field("Whse. Outstanding Qty. (Base)"; "Whse. Outstanding Qty. (Base)")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Whse. Outstanding Qty. (Base) field';
                 }
                 field("ATO Whse. Outstanding Qty."; "ATO Whse. Outstanding Qty.")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the ATO Whse. Outstanding Qty. field';
                 }
                 field("ATO Whse. Outstd. Qty. (Base)"; "ATO Whse. Outstd. Qty. (Base)")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the ATO Whse. Outstd. Qty. (Base) field';
                 }
                 field("Outbound Whse. Handling Time"; "Outbound Whse. Handling Time")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Outbound Whse. Handling Time field';
                 }
                 field("Blanket Order No."; "Blanket Order No.")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Blanket Order No. field';
                 }
                 field("Blanket Order Line No."; "Blanket Order Line No.")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Blanket Order Line No. field';
                 }
                 field("FA Posting Date"; "FA Posting Date")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the FA Posting Date field';
                 }
                 field("Depr. until FA Posting Date"; "Depr. until FA Posting Date")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Depr. until FA Posting Date field';
                 }
                 field("Depreciation Book Code"; "Depreciation Book Code")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Depreciation Book Code field';
                 }
                 field("Use Duplication List"; "Use Duplication List")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Use Duplication List field';
                 }
                 field("Duplicate in Depreciation Book"; "Duplicate in Depreciation Book")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Duplicate in Depreciation Book field';
                 }
                 field("Appl.-from Item Entry"; "Appl.-from Item Entry")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Appl.-from Item Entry field';
                 }
                 field("Appl.-to Item Entry"; "Appl.-to Item Entry")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Appl.-to Item Entry field';
                 }
                 field("Shortcut Dimension 1 Code"; "Shortcut Dimension 1 Code")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Shortcut Dimension 1 Code field';
                 }
                 field("Shortcut Dimension 2 Code"; "Shortcut Dimension 2 Code")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Shortcut Dimension 2 Code field';
                 }
                 field("ShortcutDimCode[3]"; ShortcutDimCode[3])
                 {
@@ -528,6 +598,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                     CaptionClass = '1,2,3';
                     ShowCaption = false;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the ShortcutDimCode[3] field';
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -545,6 +616,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                     CaptionClass = '1,2,4';
                     ShowCaption = false;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the ShortcutDimCode[4] field';
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -562,6 +634,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                     CaptionClass = '1,2,5';
                     ShowCaption = false;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the ShortcutDimCode[5] field';
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -579,6 +652,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                     CaptionClass = '1,2,6';
                     ShowCaption = false;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the ShortcutDimCode[6] field';
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -596,6 +670,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                     CaptionClass = '1,2,7';
                     ShowCaption = false;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the ShortcutDimCode[7] field';
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -613,6 +688,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                     CaptionClass = '1,2,8';
                     ShowCaption = false;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the ShortcutDimCode[8] field';
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -629,12 +705,14 @@ page 6014519 "NPR Sales Order Pick Subform"
                     ApplicationArea = All;
                     Editable = false;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Document No. field';
                 }
                 field("Line No."; "Line No.")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Line No. field';
                 }
             }
             group(Control51)
@@ -651,6 +729,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                         Editable = InvDiscAmountEditable;
                         Style = Subordinate;
                         StyleExpr = RefreshMessageEnabled;
+                        ToolTip = 'Specifies the value of the Invoice Discount Amount field';
 
                         trigger OnValidate()
                         var
@@ -670,6 +749,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                         Style = Subordinate;
                         StyleExpr = RefreshMessageEnabled;
                         Visible = true;
+                        ToolTip = 'Specifies the value of the Invoice Discount % field';
                     }
                 }
                 group(Control28)
@@ -685,6 +765,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                         Editable = false;
                         Style = Subordinate;
                         StyleExpr = RefreshMessageEnabled;
+                        ToolTip = 'Specifies the value of the Total Amount Excl. VAT field';
                     }
                     field("Total VAT Amount"; VATAmount)
                     {
@@ -695,6 +776,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                         Editable = false;
                         Style = Subordinate;
                         StyleExpr = RefreshMessageEnabled;
+                        ToolTip = 'Specifies the value of the Total VAT field';
                     }
                     field("Total Amount Incl. VAT"; TotalSalesLine."Amount Including VAT")
                     {
@@ -704,6 +786,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                         Caption = 'Total Amount Incl. VAT';
                         Editable = false;
                         StyleExpr = TotalAmountStyle;
+                        ToolTip = 'Specifies the value of the Total Amount Incl. VAT field';
                     }
                     field(RefreshTotals; RefreshMessageText)
                     {
@@ -712,6 +795,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                         Editable = false;
                         Enabled = RefreshMessageEnabled;
                         ShowCaption = false;
+                        ToolTip = 'Specifies the value of the RefreshMessageText field';
 
                         trigger OnDrillDown()
                         begin
@@ -741,6 +825,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                         Caption = 'Event';
                         Image = "Event";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Event action';
 
                         trigger OnAction()
                         begin
@@ -752,6 +837,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                         Caption = 'Period';
                         Image = Period;
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Period action';
 
                         trigger OnAction()
                         begin
@@ -763,6 +849,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                         Caption = 'Variant';
                         Image = ItemVariant;
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Variant action';
 
                         trigger OnAction()
                         begin
@@ -775,6 +862,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                         Caption = 'Location';
                         Image = Warehouse;
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Location action';
 
                         trigger OnAction()
                         begin
@@ -786,6 +874,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                         Caption = 'BOM Level';
                         Image = BOMLevel;
                         ApplicationArea = All;
+                        ToolTip = 'Executes the BOM Level action';
 
                         trigger OnAction()
                         begin
@@ -799,6 +888,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                     Caption = 'Reservation Entries';
                     Image = ReservationLedger;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Reservation Entries action';
 
                     trigger OnAction()
                     begin
@@ -811,6 +901,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                     Image = ItemTrackingLines;
                     ShortCutKey = 'Shift+Ctrl+I';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Item &Tracking Lines action';
 
                     trigger OnAction()
                     begin
@@ -823,6 +914,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                     Caption = 'Select Item Substitution';
                     Image = SelectItemSubstitution;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Select Item Substitution action';
 
                     trigger OnAction()
                     begin
@@ -836,6 +928,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                     Image = Dimensions;
                     ShortCutKey = 'Shift+Ctrl+D';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Dimensions action';
 
                     trigger OnAction()
                     begin
@@ -847,6 +940,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Co&mments action';
 
                     trigger OnAction()
                     begin
@@ -858,6 +952,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                     AccessByPermission = TableData "Item Charge" = R;
                     Caption = 'Item Charge &Assignment';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Item Charge &Assignment action';
 
                     trigger OnAction()
                     begin
@@ -870,6 +965,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                     Caption = 'Order &Promising';
                     Image = OrderPromising;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Order &Promising action';
 
                     trigger OnAction()
                     begin
@@ -885,6 +981,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                         AccessByPermission = TableData "BOM Component" = R;
                         Caption = 'Assemble-to-Order Lines';
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Assemble-to-Order Lines action';
 
                         trigger OnAction()
                         begin
@@ -897,6 +994,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                         Caption = 'Roll Up &Price';
                         Ellipsis = true;
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Roll Up &Price action';
 
                         trigger OnAction()
                         begin
@@ -909,6 +1007,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                         Caption = 'Roll Up &Cost';
                         Ellipsis = true;
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Roll Up &Cost action';
 
                         trigger OnAction()
                         begin
@@ -928,6 +1027,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                     Ellipsis = true;
                     Image = Price;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Get Price action';
 
                     trigger OnAction()
                     begin
@@ -941,6 +1041,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                     Ellipsis = true;
                     Image = LineDiscount;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Get Li&ne Discount action';
 
                     trigger OnAction()
                     begin
@@ -953,6 +1054,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                     Caption = 'E&xplode BOM';
                     Image = ExplodeBOM;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the E&xplode BOM action';
 
                     trigger OnAction()
                     begin
@@ -965,6 +1067,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                     Caption = 'Insert &Ext. Texts';
                     Image = Text;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Insert &Ext. Texts action';
 
                     trigger OnAction()
                     begin
@@ -977,6 +1080,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                     Ellipsis = true;
                     Image = Reserve;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the &Reserve action';
 
                     trigger OnAction()
                     begin
@@ -989,6 +1093,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                     Caption = 'Order &Tracking';
                     Image = OrderTracking;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Order &Tracking action';
 
                     trigger OnAction()
                     begin
@@ -1001,6 +1106,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                     Caption = 'Nonstoc&k Items';
                     Image = NonStockItem;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Nonstoc&k Items action';
 
                     trigger OnAction()
                     begin
@@ -1022,6 +1128,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                         Caption = 'Purchase &Order';
                         Image = Document;
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Purchase &Order action';
 
                         trigger OnAction()
                         begin
@@ -1039,6 +1146,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                         Caption = 'Purchase &Order';
                         Image = Document;
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Purchase &Order action';
 
                         trigger OnAction()
                         begin

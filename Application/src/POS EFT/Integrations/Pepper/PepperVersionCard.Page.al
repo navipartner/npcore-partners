@@ -20,24 +20,29 @@ page 6184497 "NPR Pepper Version Card"
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Install Directory"; "Install Directory")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Install Directory field';
                 }
                 field("Pepper DLL Version"; "Pepper DLL Version")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Pepper DLL Version field';
                 }
                 field("Zip File"; HasZipFile)
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the HasZipFile field';
                 }
             }
             group(XMLports)
@@ -48,6 +53,7 @@ page 6184497 "NPR Pepper Version Card"
                     {
                         ApplicationArea = All;
                         ShowCaption = false;
+                        ToolTip = 'Specifies the value of the XMLport Configuration field';
 
                         trigger OnValidate()
                         begin
@@ -58,6 +64,7 @@ page 6184497 "NPR Pepper Version Card"
                     {
                         ApplicationArea = All;
                         ShowCaption = false;
+                        ToolTip = 'Specifies the value of the XMLport Configuration Name field';
                     }
                 }
             }
@@ -69,6 +76,7 @@ page 6184497 "NPR Pepper Version Card"
                     {
                         ApplicationArea = All;
                         ShowCaption = false;
+                        ToolTip = 'Specifies the value of the Codeunit Begin Workshift field';
 
                         trigger OnValidate()
                         begin
@@ -79,6 +87,7 @@ page 6184497 "NPR Pepper Version Card"
                     {
                         ApplicationArea = All;
                         ShowCaption = false;
+                        ToolTip = 'Specifies the value of the Codeunit Begin Workshift Name field';
                     }
                 }
                 group(Transaction)
@@ -87,6 +96,7 @@ page 6184497 "NPR Pepper Version Card"
                     {
                         ApplicationArea = All;
                         ShowCaption = false;
+                        ToolTip = 'Specifies the value of the Codeunit Transaction field';
 
                         trigger OnValidate()
                         begin
@@ -97,6 +107,7 @@ page 6184497 "NPR Pepper Version Card"
                     {
                         ApplicationArea = All;
                         ShowCaption = false;
+                        ToolTip = 'Specifies the value of the Codeunit Transaction Name field';
                     }
                 }
                 group("End Workshift")
@@ -105,6 +116,7 @@ page 6184497 "NPR Pepper Version Card"
                     {
                         ApplicationArea = All;
                         ShowCaption = false;
+                        ToolTip = 'Specifies the value of the Codeunit End Workshift field';
 
                         trigger OnValidate()
                         begin
@@ -115,6 +127,7 @@ page 6184497 "NPR Pepper Version Card"
                     {
                         ApplicationArea = All;
                         ShowCaption = false;
+                        ToolTip = 'Specifies the value of the Codeunit End Workshift Name field';
                     }
                 }
                 group(Auxiliary)
@@ -123,6 +136,7 @@ page 6184497 "NPR Pepper Version Card"
                     {
                         ApplicationArea = All;
                         ShowCaption = false;
+                        ToolTip = 'Specifies the value of the Codeunit Auxiliary Functions field';
 
                         trigger OnValidate()
                         begin
@@ -133,6 +147,7 @@ page 6184497 "NPR Pepper Version Card"
                     {
                         ApplicationArea = All;
                         ShowCaption = false;
+                        ToolTip = 'Specifies the value of the Codeunit Auxiliary Name field';
                     }
                 }
                 group(Install)
@@ -141,11 +156,13 @@ page 6184497 "NPR Pepper Version Card"
                     {
                         ApplicationArea = All;
                         ShowCaption = false;
+                        ToolTip = 'Specifies the value of the Codeunit Install field';
                     }
                     field("Codeunit Install Name"; "Codeunit Install Name")
                     {
                         ApplicationArea = All;
                         ShowCaption = false;
+                        ToolTip = 'Specifies the value of the Codeunit Install Name field';
                     }
                 }
             }
@@ -162,6 +179,7 @@ page 6184497 "NPR Pepper Version Card"
                 Image = Setup;
                 RunObject = Page "NPR Pepper Config. List";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Configurations action';
             }
         }
         area(processing)
@@ -174,6 +192,7 @@ page 6184497 "NPR Pepper Version Card"
                     Caption = 'Zip';
                     Image = Import;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Zip action';
 
                     trigger OnAction()
                     begin
@@ -190,6 +209,7 @@ page 6184497 "NPR Pepper Version Card"
                     Caption = 'Zip';
                     Image = DeleteQtyToHandle;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Zip action';
 
                     trigger OnAction()
                     begin
@@ -206,6 +226,7 @@ page 6184497 "NPR Pepper Version Card"
                     Caption = 'Zip';
                     Image = Export;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Zip action';
 
                     trigger OnAction()
                     begin

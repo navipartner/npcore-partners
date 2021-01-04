@@ -15,18 +15,22 @@ page 6184861 "NPR Azure Storage Overview"
                 field("Account name"; "Account name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Azure Account Name field';
                 }
                 field("Container Name"; "Container Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Container Name field';
                 }
                 field("File Name"; "File Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the File Name field';
                 }
                 field(Name; Name)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Name field';
                 }
             }
         }

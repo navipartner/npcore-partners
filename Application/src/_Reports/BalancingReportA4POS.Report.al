@@ -699,26 +699,31 @@ report 6014459 "NPR Balancing Report A4 POS"
                     {
                         Caption = 'Print Sales';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Print Sales field';
                     }
                     field(PrintReceipts; PrintReceipts)
                     {
                         Caption = 'Print Receipts';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Print Receipts field';
                     }
                     field(PrintTerminals; PrintTerminals)
                     {
                         Caption = 'Print Terminals';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Print Terminals field';
                     }
                     field(PrintVouchers; PrintVouchers)
                     {
                         Caption = 'Print Vouchers';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Print Vouchers field';
                     }
                     field(PrintTurnOver; PrintTurnOver)
                     {
                         Caption = 'Print TurnOver';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Print TurnOver field';
                     }
                     group(PrintDiscount)
                     {
@@ -727,6 +732,7 @@ report 6014459 "NPR Balancing Report A4 POS"
                         {
                             Caption = '        Print Discount Amount';
                             ApplicationArea = All;
+                            ToolTip = 'Specifies the value of the         Print Discount Amount field';
 
                             trigger OnValidate()
                             begin
@@ -738,6 +744,7 @@ report 6014459 "NPR Balancing Report A4 POS"
                         {
                             Caption = '        Print Discount %';
                             ApplicationArea = All;
+                            ToolTip = 'Specifies the value of the         Print Discount % field';
 
                             trigger OnValidate()
                             begin
@@ -749,6 +756,7 @@ report 6014459 "NPR Balancing Report A4 POS"
                         {
                             Caption = '        Print Discount Total';
                             ApplicationArea = All;
+                            ToolTip = 'Specifies the value of the         Print Discount Total field';
 
                             trigger OnValidate()
                             begin
@@ -761,26 +769,31 @@ report 6014459 "NPR Balancing Report A4 POS"
                     {
                         Caption = 'Print Counting';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Print Counting field';
                     }
                     field("Print Closing"; PrintClosing)
                     {
                         Caption = 'Print Closing';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Print Closing field';
                     }
                     field(PrintVAT; PrintVAT)
                     {
                         Caption = 'Print VAT';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Print VAT field';
                     }
                     field(PrintAttachedBins; PrintAttachedBins)
                     {
                         Caption = 'Print Attached Bins';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Print Attached Bins field';
                     }
                     field(PrintEmptyLines; PrintEmptyLines)
                     {
                         Caption = 'Print Lines where Value is Zero.';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Print Lines where Value is Zero. field';
                     }
                 }
             }

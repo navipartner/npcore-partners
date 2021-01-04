@@ -27,58 +27,72 @@ page 6014443 "NPR Customer Repair List"
                 field("No."; "No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the No. field';
                 }
                 field(Status; Status)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Status field';
                 }
                 field("Customer No."; "Customer No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Customer No. field';
                 }
                 field(Name; Name)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Name field';
                 }
                 field("Handed In Date"; "Handed In Date")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Handed In Date field';
                 }
                 field("Item No."; "Item No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Item No. field';
                 }
                 field(Worranty; Worranty)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Guarantee field';
                 }
                 field("Serial No."; "Serial No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Serial No. field';
                 }
                 field(Brand; Brand)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Brand field';
                 }
                 field("Global Dimension 1 Code"; "Global Dimension 1 Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Global Dimension 1 Code field';
                 }
                 field("Prices Including VAT"; "Prices Including VAT")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Prices Including VAT field';
                 }
                 field("Expected Completion Date"; "Expected Completion Date")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Expected Completion Date field';
                 }
                 field("Phone No."; "Phone No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Phone No. field';
                 }
                 field("Price when Not Accepted"; "Price when Not Accepted")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Price when Not Accepted field';
                 }
             }
         }

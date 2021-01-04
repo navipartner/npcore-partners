@@ -37,6 +37,7 @@ page 6014585 "NPR Advanced Sales Stats"
                     ApplicationArea = All;
                     Caption = 'Period Type';
                     OptionCaption = 'Day,Week,Month,Quarter,Year,Period';
+                    ToolTip = 'Specifies the value of the Period Type field';
 
                     trigger OnValidate()
                     begin
@@ -66,17 +67,20 @@ page 6014585 "NPR Advanced Sales Stats"
                 {
                     ApplicationArea = All;
                     Caption = 'Period';
+                    ToolTip = 'Specifies the value of the Period field';
                 }
                 field(DateFilterLastYear; DateFilterLastYear)
                 {
                     ApplicationArea = All;
                     Caption = 'Period (Last Year)';
+                    ToolTip = 'Specifies the value of the Period (Last Year) field';
                 }
                 field(HideItemGroup; HideItemGroup)
                 {
                     ApplicationArea = All;
                     Caption = 'Hide Empty Lines';
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Hide Empty Lines field';
 
                     trigger OnValidate()
                     begin
@@ -100,6 +104,7 @@ page 6014585 "NPR Advanced Sales Stats"
                     ApplicationArea = All;
                     Caption = 'Item No. Filter';
                     TableRelation = Item."No.";
+                    ToolTip = 'Specifies the value of the Item No. Filter field';
 
                     trigger OnValidate()
                     begin
@@ -118,12 +123,14 @@ page 6014585 "NPR Advanced Sales Stats"
                     ApplicationArea = All;
                     Caption = 'Item Group Filter';
                     TableRelation = "NPR Item Group" WHERE(Blocked = CONST(false));
+                    ToolTip = 'Specifies the value of the Item Group Filter field';
                 }
                 field(ItemCategoryCodeFilter; ItemCategoryCodeFilter)
                 {
                     ApplicationArea = All;
                     Caption = 'Item Category Code';
                     TableRelation = "Item Category";
+                    ToolTip = 'Specifies the value of the Item Category Code field';
                 }
             }
             group(Control6150631)
@@ -134,6 +141,7 @@ page 6014585 "NPR Advanced Sales Stats"
                     ApplicationArea = All;
                     Caption = 'Dept. Code';
                     TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+                    ToolTip = 'Specifies the value of the Dept. Code field';
 
                     trigger OnValidate()
                     begin
@@ -150,6 +158,7 @@ page 6014585 "NPR Advanced Sales Stats"
                     ApplicationArea = All;
                     Caption = 'Project Code';
                     TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
+                    ToolTip = 'Specifies the value of the Project Code field';
 
                     trigger OnValidate()
                     begin
@@ -165,6 +174,7 @@ page 6014585 "NPR Advanced Sales Stats"
                 {
                     ApplicationArea = All;
                     Caption = 'Show last year';
+                    ToolTip = 'Specifies the value of the Show last year field';
 
                     trigger OnValidate()
                     begin
@@ -202,6 +212,7 @@ page 6014585 "NPR Advanced Sales Stats"
                 {
                     ApplicationArea = All;
                     Caption = 'Show same weekday last year';
+                    ToolTip = 'Specifies the value of the Show same weekday last year field';
 
                     trigger OnValidate()
                     begin
@@ -215,6 +226,7 @@ page 6014585 "NPR Advanced Sales Stats"
                 field("Period Name"; "Period Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Period Name field';
 
                     trigger OnValidate()
                     begin
@@ -224,11 +236,13 @@ page 6014585 "NPR Advanced Sales Stats"
                 field("Period Start"; "Period Start")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Period Start field';
                 }
                 field("-""Sale (QTY)"""; -"Sale (QTY)")
                 {
                     ApplicationArea = All;
                     Caption = 'Sale (QTY)';
+                    ToolTip = 'Specifies the value of the Sale (QTY) field';
 
                     trigger OnDrillDown()
                     var
@@ -247,11 +261,13 @@ page 6014585 "NPR Advanced Sales Stats"
                     ApplicationArea = All;
                     Caption = '-> Last Year';
                     Visible = PLYSaleQty;
+                    ToolTip = 'Specifies the value of the -> Last Year field';
                 }
                 field("Sale (LCY)"; "Sale (LCY)")
                 {
                     ApplicationArea = All;
                     Caption = 'Sale(LCY)';
+                    ToolTip = 'Specifies the value of the Sale(LCY) field';
 
                     trigger OnDrillDown()
                     var
@@ -270,28 +286,33 @@ page 6014585 "NPR Advanced Sales Stats"
                     ApplicationArea = All;
                     Caption = 'LastYear Sale (LCY)';
                     Visible = PLYSale;
+                    ToolTip = 'Specifies the value of the LastYear Sale (LCY) field';
                 }
                 field("Profit (LCY)"; "Profit (LCY)")
                 {
                     ApplicationArea = All;
                     Caption = 'Profit (LCY)';
+                    ToolTip = 'Specifies the value of the Profit (LCY) field';
                 }
                 field("LastYear Profit (LCY)"; "LastYear Profit (LCY)")
                 {
                     ApplicationArea = All;
                     Caption = 'Last Year Profit(LCY)';
                     Visible = PLYProfit;
+                    ToolTip = 'Specifies the value of the Last Year Profit(LCY) field';
                 }
                 field("Profit %"; "Profit %")
                 {
                     ApplicationArea = All;
                     Caption = 'Profit %';
+                    ToolTip = 'Specifies the value of the Profit % field';
                 }
                 field("LastYear Profit %"; "LastYear Profit %")
                 {
                     ApplicationArea = All;
                     Caption = 'LastYear Profit %';
                     Visible = "PLYProfit%";
+                    ToolTip = 'Specifies the value of the LastYear Profit % field';
                 }
             }
         }
@@ -308,6 +329,7 @@ page 6014585 "NPR Advanced Sales Stats"
                     Caption = 'Advanced Sales Statistics';
                     Image = Statistics;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Advanced Sales Statistics action';
 
                     trigger OnAction()
                     var
@@ -339,6 +361,7 @@ page 6014585 "NPR Advanced Sales Stats"
                     Image = SalesPerson;
                     Promoted = true;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Salesperson Statisticts action';
 
                     trigger OnAction()
                     var
@@ -361,6 +384,7 @@ page 6014585 "NPR Advanced Sales Stats"
                     Image = ItemGroup;
                     Promoted = true;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Item Group action';
 
                     trigger OnAction()
                     var
@@ -388,6 +412,7 @@ page 6014585 "NPR Advanced Sales Stats"
                     Image = Item;
                     Promoted = true;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Item Statistics action';
 
                     trigger OnAction()
                     var
@@ -412,6 +437,7 @@ page 6014585 "NPR Advanced Sales Stats"
                     Image = Customer;
                     Promoted = true;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Customer Statistics action';
 
                     trigger OnAction()
                     var
@@ -434,6 +460,7 @@ page 6014585 "NPR Advanced Sales Stats"
                     Image = Vendor;
                     Promoted = true;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Vendor Statistics action';
 
                     trigger OnAction()
                     var
@@ -456,6 +483,7 @@ page 6014585 "NPR Advanced Sales Stats"
                     Image = ItemLines;
                     Promoted = true;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Item Category Code Statistics action';
 
                     trigger OnAction()
                     var
@@ -478,6 +506,7 @@ page 6014585 "NPR Advanced Sales Stats"
                     Image = ProductionSetup;
                     Promoted = true;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Product Group Code Statistics action';
 
                     trigger OnAction()
                     var

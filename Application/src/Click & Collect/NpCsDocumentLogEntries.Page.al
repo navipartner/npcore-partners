@@ -34,39 +34,48 @@ page 6151201 "NPR NpCs Document Log Entries"
                 field("Log Date"; "Log Date")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Log Date field';
                 }
                 field("Workflow Type"; "Workflow Type")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Workflow Type field';
                 }
                 field("Workflow Module"; "Workflow Module")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Workflow Module field';
                 }
                 field("Store Code"; "Store Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Store Code field';
                 }
                 field("Log Message"; "Log Message")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Log Message field';
                 }
                 field("Error Entry"; "Error Entry")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Error Entry field';
                 }
                 field("GetErrorMessage()"; GetErrorMessage())
                 {
                     ApplicationArea = All;
                     Caption = 'Error Message';
+                    ToolTip = 'Specifies the value of the Error Message field';
                 }
                 field("User ID"; "User ID")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the User ID field';
                 }
                 field("Entry No."; "Entry No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Entry No. field';
                 }
             }
         }
@@ -81,6 +90,7 @@ page 6151201 "NPR NpCs Document Log Entries"
                 Caption = 'View Error Message';
                 Image = Log;
                 ApplicationArea = All;
+                ToolTip = 'Executes the View Error Message action';
 
                 trigger OnAction()
                 var

@@ -171,6 +171,7 @@ report 6014474 "NPR Item/Sales Person Top"
                     {
                         Caption = 'Sorting';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Sorting field';
 
                         trigger OnValidate()
                         begin
@@ -186,6 +187,7 @@ report 6014474 "NPR Item/Sales Person Top"
                         Enabled = ShowSort;
                         OptionCaption = 'Qty.,Turnover';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Sort By field';
                     }
                     field("Key"; Key)
                     {
@@ -193,12 +195,14 @@ report 6014474 "NPR Item/Sales Person Top"
                         Enabled = ShowSort;
                         OptionCaption = 'Biggest,Smallest';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Key field';
                     }
                     field(ShowQty; ShowQty)
                     {
                         Caption = 'Show Qty.';
                         Enabled = ShowSort;
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Show Qty. field';
                     }
                 }
             }

@@ -26,6 +26,7 @@ pageextension 6014457 "NPR Purchase Order Subform" extends "Purchase Order Subfo
             {
                 ApplicationArea = All;
                 Visible = false;
+                ToolTip = 'Specifies the value of the Vendor Item No. field';
             }
         }
         addafter(Description)
@@ -33,6 +34,7 @@ pageextension 6014457 "NPR Purchase Order Subform" extends "Purchase Order Subfo
             field("NPR Description 2"; "Description 2")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the Description 2 field';
             }
         }
         addafter("Line No.")
@@ -41,6 +43,7 @@ pageextension 6014457 "NPR Purchase Order Subform" extends "Purchase Order Subfo
             {
                 ApplicationArea = All;
                 Visible = false;
+                ToolTip = 'Specifies the value of the NPR Exchange Label field';
 
                 trigger OnValidate()
                 var
@@ -115,6 +118,7 @@ pageextension 6014457 "NPR Purchase Order Subform" extends "Purchase Order Subfo
                 Image = ItemVariant;
                 ShortCutKey = 'Ctrl+Alt+V';
                 ApplicationArea = All;
+                ToolTip = 'Executes the Variety action';
             }
         }
         addafter(OrderTracking)
@@ -125,6 +129,7 @@ pageextension 6014457 "NPR Purchase Order Subform" extends "Purchase Order Subfo
                 Caption = 'Nonstoc&k Items';
                 Image = NonStockItem;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Nonstoc&k Items action';
             }
         }
     }

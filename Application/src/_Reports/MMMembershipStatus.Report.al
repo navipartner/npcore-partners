@@ -241,23 +241,27 @@ report 6060132 "NPR MM Membership Status"
                     {
                         Caption = 'Reference Date';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Reference Date field';
                     }
                     field(MembershipStatus; MembershipStatus)
                     {
                         Caption = 'Membership Status On Reference Date';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Membership Status On Reference Date field';
                     }
                     field(ExpiresWithinDateformula; ExpiresWithinDateformula)
                     {
                         Caption = 'Expires Within (Active)';
                         Editable = (MembershipStatus < 3);
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Expires Within (Active) field';
                     }
                     field(RenewedWithin; RenewedWithin)
                     {
                         Caption = 'Renewed Within (Active)';
                         Editable = (MembershipStatus < 3);
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Renewed Within (Active) field';
                     }
                 }
             }

@@ -9,6 +9,7 @@ pageextension 6014432 "NPR Ship-to Address List" extends "Ship-to Address List"
             {
                 ApplicationArea = All;
                 Visible = false;
+                ToolTip = 'Specifies the value of the Name 2 field';
             }
         }
     }

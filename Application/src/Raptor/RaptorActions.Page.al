@@ -18,40 +18,49 @@ page 6151493 "NPR Raptor Actions"
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field("Raptor Module Code"; "Raptor Module Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Raptor Module Code field';
                 }
                 field("Raptor Module API Req. String"; "Raptor Module API Req. String")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Raptor Module API Req. String field';
                 }
                 field("Data Type Description"; "Data Type Description")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Data Type Description field';
                 }
                 field("Number of Entries to Return"; "Number of Entries to Return")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Number of Entries to Return field';
                 }
                 field(Comment; Comment)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Comment field';
                 }
                 field("User Identifier Param. Name"; "User Identifier Param. Name")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the User Identifier Param. Name field';
                 }
                 field("Show Date-Time Created"; "Show Date-Time Created")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Show Date-Time Created field';
                 }
                 field("Show Priority"; "Show Priority")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Show Priority field';
                 }
             }
         }
@@ -76,6 +85,7 @@ page 6151493 "NPR Raptor Actions"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Add Default Actions action';
 
                 trigger OnAction()
                 var

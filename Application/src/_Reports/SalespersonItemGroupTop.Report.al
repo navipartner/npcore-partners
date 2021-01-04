@@ -348,6 +348,7 @@ report 6014405 "NPR Salesperson/Item Group Top"
                         Caption = 'Show Only Mainfigures';
                         Visible = ShowMainTotalVisible;
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Show Only Mainfigures field';
 
                         trigger OnValidate()
                         begin
@@ -362,6 +363,7 @@ report 6014405 "NPR Salesperson/Item Group Top"
                         Caption = 'Sort Salespersons';
                         Visible = SortSalesPersonVisible;
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Sort Salespersons field';
 
                         trigger OnValidate()
                         begin
@@ -381,6 +383,7 @@ report 6014405 "NPR Salesperson/Item Group Top"
                         Caption = 'Show Amounts';
                         Visible = ShowQtyVisible;
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Show Amounts field';
                     }
                 }
             }

@@ -20,51 +20,63 @@ page 6060127 "NPR MM Memberships"
                 field("External Membership No."; "External Membership No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the External Membership No. field';
                 }
                 field("Community Code"; "Community Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Community Code field';
                 }
                 field("Customer No."; "Customer No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Customer No. field';
                 }
                 field("Company Name"; "Company Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Company Name field';
                 }
                 field("Membership Code"; "Membership Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Membership Code field';
                 }
                 field("Issued Date"; "Issued Date")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Issued Date field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field(Blocked; Blocked)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Blocked field';
                 }
                 field("Blocked At"; "Blocked At")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Blocked At field';
                 }
                 field("Auto-Renew"; "Auto-Renew")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Auto-Renew field';
                 }
                 field("Auto-Renew Payment Method Code"; "Auto-Renew Payment Method Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Auto-Renew Payment Method Code field';
                 }
                 field(DisplayName; DisplayName)
                 {
                     ApplicationArea = All;
                     Caption = 'Member Display Name';
+                    ToolTip = 'Specifies the value of the Member Display Name field';
                 }
                 field(NPRAttrTextArray_01; NPRAttrTextArray[1])
                 {
@@ -72,6 +84,7 @@ page 6060127 "NPR MM Memberships"
                     CaptionClass = GetAttributeCaptionClass(1);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible01;
+                    ToolTip = 'Specifies the value of the NPRAttrTextArray[1] field';
 
                     trigger OnValidate()
                     begin
@@ -86,6 +99,7 @@ page 6060127 "NPR MM Memberships"
                     CaptionClass = GetAttributeCaptionClass(2);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible02;
+                    ToolTip = 'Specifies the value of the NPRAttrTextArray[2] field';
 
                     trigger OnValidate()
                     begin
@@ -100,6 +114,7 @@ page 6060127 "NPR MM Memberships"
                     CaptionClass = GetAttributeCaptionClass(3);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible03;
+                    ToolTip = 'Specifies the value of the NPRAttrTextArray[3] field';
 
                     trigger OnValidate()
                     begin
@@ -114,6 +129,7 @@ page 6060127 "NPR MM Memberships"
                     CaptionClass = GetAttributeCaptionClass(4);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible04;
+                    ToolTip = 'Specifies the value of the NPRAttrTextArray[4] field';
 
                     trigger OnValidate()
                     begin
@@ -128,6 +144,7 @@ page 6060127 "NPR MM Memberships"
                     CaptionClass = GetAttributeCaptionClass(5);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible05;
+                    ToolTip = 'Specifies the value of the NPRAttrTextArray[5] field';
 
                     trigger OnValidate()
                     begin
@@ -142,6 +159,7 @@ page 6060127 "NPR MM Memberships"
                     CaptionClass = GetAttributeCaptionClass(6);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible06;
+                    ToolTip = 'Specifies the value of the NPRAttrTextArray[6] field';
 
                     trigger OnValidate()
                     begin
@@ -156,6 +174,7 @@ page 6060127 "NPR MM Memberships"
                     CaptionClass = GetAttributeCaptionClass(7);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible07;
+                    ToolTip = 'Specifies the value of the NPRAttrTextArray[7] field';
 
                     trigger OnValidate()
                     begin
@@ -170,6 +189,7 @@ page 6060127 "NPR MM Memberships"
                     CaptionClass = GetAttributeCaptionClass(8);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible08;
+                    ToolTip = 'Specifies the value of the NPRAttrTextArray[8] field';
 
                     trigger OnValidate()
                     begin
@@ -184,6 +204,7 @@ page 6060127 "NPR MM Memberships"
                     CaptionClass = GetAttributeCaptionClass(9);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible09;
+                    ToolTip = 'Specifies the value of the NPRAttrTextArray[9] field';
 
                     trigger OnValidate()
                     begin
@@ -198,6 +219,7 @@ page 6060127 "NPR MM Memberships"
                     CaptionClass = GetAttributeCaptionClass(10);
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible10;
+                    ToolTip = 'Specifies the value of the NPRAttrTextArray[10] field';
 
                     trigger OnValidate()
                     begin
@@ -225,6 +247,7 @@ page 6060127 "NPR MM Memberships"
                 RunObject = Page "NPR MM Membership Card";
                 RunPageLink = "Entry No." = FIELD("Entry No.");
                 ApplicationArea = All;
+                ToolTip = 'Executes the Membership action';
             }
             action(Notifications)
             {
@@ -234,6 +257,7 @@ page 6060127 "NPR MM Memberships"
                 RunPageLink = "Membership Entry No." = FIELD("Entry No.");
                 RunPageView = SORTING("Membership Entry No.");
                 ApplicationArea = All;
+                ToolTip = 'Executes the Notifications action';
             }
             action("Arrival Log")
             {
@@ -246,6 +270,7 @@ page 6060127 "NPR MM Memberships"
                 RunObject = Page "NPR MM Member Arrival Log";
                 RunPageLink = "External Membership No." = FIELD("External Membership No.");
                 ApplicationArea = All;
+                ToolTip = 'Executes the Arrival Log action';
             }
             action("Open Coupons")
             {
@@ -257,6 +282,7 @@ page 6060127 "NPR MM Memberships"
                 RunObject = Page "NPR NpDc Coupons";
                 RunPageLink = "Customer No." = FIELD("Customer No.");
                 ApplicationArea = All;
+                ToolTip = 'Executes the Open Coupons action';
             }
             group("Raptor Integration")
             {
@@ -270,6 +296,7 @@ page 6060127 "NPR MM Memberships"
                     PromotedCategory = Category5;
                     Visible = RaptorEnabled;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Browsing History action';
 
                     trigger OnAction()
                     var
@@ -292,6 +319,7 @@ page 6060127 "NPR MM Memberships"
                     PromotedCategory = Category5;
                     Visible = RaptorEnabled;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Recommendations action';
 
                     trigger OnAction()
                     var
@@ -314,6 +342,7 @@ page 6060127 "NPR MM Memberships"
                 Caption = 'Update Customer Information';
                 Image = CreateInteraction;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Update Customer Information action';
                 //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedIsBig = true;
 
@@ -330,6 +359,7 @@ page 6060127 "NPR MM Memberships"
                     Image = CreditCard;
                     RunObject = Report "NPR MM Membersh. Points Summ.";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Loyalty Point Summary action';
                 }
                 action("Loyalty Point Value")
                 {
@@ -337,6 +367,7 @@ page 6060127 "NPR MM Memberships"
                     Image = LimitedCredit;
                     RunObject = Report "NPR MM Membership Points Value";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Loyalty Point Value action';
                 }
                 action("Loyalty Point Details")
                 {
@@ -344,6 +375,7 @@ page 6060127 "NPR MM Memberships"
                     Image = CreditCardLog;
                     RunObject = Report "NPR MM Membership Points Det.";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Loyalty Point Details action';
                 }
             }
             action(SetNPRAttributeFilter)
@@ -355,6 +387,7 @@ page 6060127 "NPR MM Memberships"
                 PromotedIsBig = true;
                 Visible = NPRAttrVisible01 OR NPRAttrVisible02 OR NPRAttrVisible03 OR NPRAttrVisible04 OR NPRAttrVisible05 OR NPRAttrVisible06 OR NPRAttrVisible07 OR NPRAttrVisible08 OR NPRAttrVisible09 OR NPRAttrVisible10;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Set Client Attribute Filter action';
 
                 trigger OnAction()
                 var

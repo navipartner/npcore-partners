@@ -16,18 +16,22 @@ page 6060082 "NPR MCS Recomm. Model Card"
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field("Build Status"; "Build Status")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Build Status field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field(Enabled; Enabled)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Enabled field';
                 }
             }
             group(MCS)
@@ -35,22 +39,27 @@ page 6060082 "NPR MCS Recomm. Model Card"
                 field("Model ID"; "Model ID")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Model ID field';
                 }
                 field("Last Build ID"; "Last Build ID")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Last Build ID field';
                 }
                 field("Last Build Date Time"; "Last Build Date Time")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Last Build Date Time field';
                 }
                 field("Last Catalog Export Date Time"; "Last Catalog Export Date Time")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Last Catalog Export Date Time field';
                 }
                 field("Last Item Ledger Entry No."; "Last Item Ledger Entry No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Last Item Ledger Entry No. field';
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -64,30 +73,37 @@ page 6060082 "NPR MCS Recomm. Model Card"
                 field("Item View"; "Item View")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Item View field';
                 }
                 field("Attribute View"; "Attribute View")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Attribute View field';
                 }
                 field("Customer View"; "Customer View")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Customer View field';
                 }
                 field("Item Ledger Entry View"; "Item Ledger Entry View")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Item Ledger Entry View field';
                 }
                 field(Categories; Categories)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Categories field';
                 }
                 field("Language Code"; "Language Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Language Code field';
                 }
                 field("Recommendations per Seed"; "Recommendations per Seed")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Recommendations per Seed field';
                 }
             }
         }
@@ -107,6 +123,7 @@ page 6060082 "NPR MCS Recomm. Model Card"
                     Promoted = true;
                     PromotedCategory = "Report";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Catalog action';
 
                     trigger OnAction()
                     var
@@ -123,6 +140,7 @@ page 6060082 "NPR MCS Recomm. Model Card"
                     PromotedCategory = "Report";
                     PromotedIsBig = true;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Sales History action';
 
                     trigger OnAction()
                     var
@@ -140,6 +158,7 @@ page 6060082 "NPR MCS Recomm. Model Card"
                     Caption = 'Create Azure Model';
                     Image = CreateXMLFile;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Create Azure Model action';
                     //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                     //PromotedCategory = Process;
                     //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
@@ -157,6 +176,7 @@ page 6060082 "NPR MCS Recomm. Model Card"
                     Caption = 'Upload Sales History';
                     Image = Server;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Upload Sales History action';
                     //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                     //PromotedCategory = Process;
 
@@ -172,6 +192,7 @@ page 6060082 "NPR MCS Recomm. Model Card"
                     Caption = 'Test Get Recommendations';
                     Image = Task;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Test Get Recommendations action';
                     //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                     //PromotedCategory = Process;
                     //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
@@ -189,6 +210,7 @@ page 6060082 "NPR MCS Recomm. Model Card"
                     Caption = 'Refresh All Recommendations';
                     Image = RefreshLines;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Refresh All Recommendations action';
 
                     trigger OnAction()
                     var
@@ -202,6 +224,7 @@ page 6060082 "NPR MCS Recomm. Model Card"
                     Caption = 'Delete Azure Model';
                     Image = Delete;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Delete Azure Model action';
                     //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                     //PromotedCategory = Process;
                     //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
@@ -229,6 +252,7 @@ page 6060082 "NPR MCS Recomm. Model Card"
                 RunPageView = SORTING("Model No.", "Rule No.")
                               ORDER(Ascending);
                 ApplicationArea = All;
+                ToolTip = 'Executes the Business Rules action';
             }
             action(RecommendationsLines)
             {
@@ -237,6 +261,7 @@ page 6060082 "NPR MCS Recomm. Model Card"
                 RunObject = Page "NPR MCS Recomm. Lines";
                 RunPageLink = "Model No." = FIELD(Code);
                 ApplicationArea = All;
+                ToolTip = 'Executes the RecommendationsLines action';
             }
             action(Log)
             {
@@ -245,6 +270,7 @@ page 6060082 "NPR MCS Recomm. Model Card"
                 RunObject = Page "NPR MCS Recommendations Log";
                 RunPageLink = "Model No." = FIELD(Code);
                 ApplicationArea = All;
+                ToolTip = 'Executes the Log action';
             }
         }
     }

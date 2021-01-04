@@ -14,10 +14,12 @@ page 6151216 "NPR NpCs Open. Hour Set Card"
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
             }
             part("Opening Hours"; "NPR NpCs Open.Hour Set S.page")
@@ -39,6 +41,7 @@ page 6151216 "NPR NpCs Open. Hour Set Card"
                 Image = Calendar;
                 ShortCutKey = 'Ctrl+F7';
                 ApplicationArea = All;
+                ToolTip = 'Executes the Opening Hour Calendar action';
 
                 trigger OnAction()
                 var

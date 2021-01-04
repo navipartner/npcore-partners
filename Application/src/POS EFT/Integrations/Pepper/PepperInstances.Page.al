@@ -16,14 +16,17 @@ page 6184492 "NPR Pepper Instances"
                 field(ID; ID)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the ID field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Configuration Code"; "Configuration Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Configuration Code field';
                 }
             }
         }
@@ -42,6 +45,7 @@ page 6184492 "NPR Pepper Instances"
                 RunPageView = SORTING(Code)
                               ORDER(Ascending);
                 ApplicationArea = All;
+                ToolTip = 'Executes the Terminals action';
             }
         }
     }

@@ -21,22 +21,27 @@ page 6150665 "NPR NPRE Seating"
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Seating Location"; "Seating Location")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Seating Location field';
                 }
                 field(Blocked; Blocked)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Blocked field';
                 }
                 field("Blocking Reason"; "Blocking Reason")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Blocking Reason field';
                 }
             }
             group("Capasity Tab")
@@ -45,10 +50,12 @@ page 6150665 "NPR NPRE Seating"
                 field("Fixed Capasity"; "Fixed Capasity")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Fixed Capasity field';
                 }
                 field(Capacity; Capacity)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Capacity field';
                 }
             }
             group(StatusGr)
@@ -57,11 +64,13 @@ page 6150665 "NPR NPRE Seating"
                 field(Status; Status)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Status field';
                 }
                 field("Status Description FF"; "Status Description FF")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Status Description field';
                 }
             }
             group("Current Acvtivity")
@@ -71,11 +80,13 @@ page 6150665 "NPR NPRE Seating"
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Current Waiter Pad field';
                 }
                 field("Multiple Waiter Pad FF"; "Multiple Waiter Pad FF")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Multiple Waiter Pad field';
                 }
             }
         }
@@ -97,6 +108,7 @@ page 6150665 "NPR NPRE Seating"
                                   "No." = FIELD(Code);
                     ShortCutKey = 'Shift+Ctrl+D';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Dimensions action';
                 }
             }
         }

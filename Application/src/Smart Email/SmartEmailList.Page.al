@@ -19,27 +19,33 @@ page 6059821 "NPR Smart Email List"
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field(Provider; Provider)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Provider field';
                 }
                 field("Merge Table ID"; "Merge Table ID")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Merge Table ID field';
                 }
                 field("Table Caption"; "Table Caption")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Table Caption field';
                 }
                 field("Smart Email Name"; "Smart Email Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Smart Email Name field';
                 }
             }
         }

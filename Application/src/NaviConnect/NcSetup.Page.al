@@ -34,6 +34,7 @@ page 6151500 "NPR Nc Setup"
             field("Keep Tasks for"; "Keep Tasks for")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the Keep Tasks for field';
             }
             group(General)
             {
@@ -41,6 +42,7 @@ page 6151500 "NPR Nc Setup"
                 field("Max Task Count per Batch"; "Max Task Count per Batch")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Max Task Count per batch field';
                 }
             }
             group("Task Queue")
@@ -49,10 +51,12 @@ page 6151500 "NPR Nc Setup"
                 field("Task Queue Enabled"; "Task Queue Enabled")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Task Queue Enabled field';
                 }
                 field("Task Worker Group"; "Task Worker Group")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Task Worker Group field';
                 }
             }
         }
@@ -70,6 +74,7 @@ page 6151500 "NPR Nc Setup"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Setup Task Queue action';
 
                 trigger OnAction()
                 var

@@ -19,28 +19,34 @@ page 6151586 "NPR Event Exch. Int. E-Mails"
                 field("E-Mail"; "E-Mail")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the E-Mail field';
                 }
                 field("Password.HASVALUE"; Password.HasValue)
                 {
                     ApplicationArea = All;
                     Caption = 'Password Set';
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Password Set field';
                 }
                 field("Default Organizer E-Mail"; "Default Organizer E-Mail")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Default Organizer E-Mail field';
                 }
                 field("Time Zone No."; "Time Zone No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Time Zone No. field';
                 }
                 field("Time Zone Display Name"; "Time Zone Display Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Time Zone Display Name field';
                 }
                 field("Time Zone Custom Offset (Min)"; "Time Zone Custom Offset (Min)")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Time Zone Custom Offset (Min) field';
                 }
             }
         }
@@ -59,6 +65,7 @@ page 6151586 "NPR Event Exch. Int. E-Mails"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Set Password action';
 
                 trigger OnAction()
                 begin
@@ -73,6 +80,7 @@ page 6151586 "NPR Event Exch. Int. E-Mails"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Test Server Connection action';
 
                 trigger OnAction()
                 begin

@@ -22,6 +22,7 @@ page 6150707 "NPR POS Setup"
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
             }
             group("Actions")
@@ -32,6 +33,7 @@ page 6150707 "NPR POS Setup"
                     AssistEdit = true;
                     Style = Unfavorable;
                     StyleExpr = LoginActionRefreshNeeded;
+                    ToolTip = 'Specifies the value of the Login Action Code field';
 
                     trigger OnAssistEdit()
                     begin
@@ -55,6 +57,7 @@ page 6150707 "NPR POS Setup"
                     AssistEdit = true;
                     Style = Unfavorable;
                     StyleExpr = TextEnterActionRefreshNeeded;
+                    ToolTip = 'Specifies the value of the Text Enter Action Code field';
 
                     trigger OnAssistEdit()
                     begin
@@ -78,6 +81,7 @@ page 6150707 "NPR POS Setup"
                     AssistEdit = true;
                     Style = Unfavorable;
                     StyleExpr = ItemInsertActionRefreshNeeded;
+                    ToolTip = 'Specifies the value of the Item Insert Action Code field';
 
                     trigger OnAssistEdit()
                     begin
@@ -101,6 +105,7 @@ page 6150707 "NPR POS Setup"
                     AssistEdit = true;
                     Style = Unfavorable;
                     StyleExpr = PaymentActionRefreshNeeded;
+                    ToolTip = 'Specifies the value of the Payment Action Code field';
 
                     trigger OnAssistEdit()
                     begin
@@ -124,6 +129,7 @@ page 6150707 "NPR POS Setup"
                     AssistEdit = true;
                     Style = Unfavorable;
                     StyleExpr = CustomerActionRefreshNeeded;
+                    ToolTip = 'Specifies the value of the Customer Action Code field';
 
                     trigger OnAssistEdit()
                     begin
@@ -146,6 +152,7 @@ page 6150707 "NPR POS Setup"
                     ApplicationArea = All;
                     Style = Unfavorable;
                     StyleExpr = LockActionRefreshNeeded;
+                    ToolTip = 'Specifies the value of the Lock POS Action Code field';
 
                     trigger OnAssistEdit()
                     begin
@@ -161,6 +168,7 @@ page 6150707 "NPR POS Setup"
                     ApplicationArea = All;
                     Style = Unfavorable;
                     StyleExpr = UnlockActionRefreshNeeded;
+                    ToolTip = 'Specifies the value of the Unlock POS Action Code field';
 
                     trigger OnAssistEdit()
                     begin
@@ -176,6 +184,7 @@ page 6150707 "NPR POS Setup"
                     ApplicationArea = All;
                     Style = Unfavorable;
                     StyleExpr = OnBeforePaymentViewActionRefreshNeeded;
+                    ToolTip = 'Specifies the value of the On Before Payment View Action Code field';
 
                     trigger OnAssistEdit()
                     begin
@@ -196,6 +205,7 @@ page 6150707 "NPR POS Setup"
                 field("Idle Timeout Action Code"; "Idle Timeout Action Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Idle Timeout Action Code field';
 
                     trigger OnAssistEdit()
                     begin
@@ -208,6 +218,7 @@ page 6150707 "NPR POS Setup"
                 field("Admin Menu Action Code"; "Admin Menu Action Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Admin Menu Action Code field';
 
                     trigger OnAssistEdit()
                     begin
@@ -234,6 +245,7 @@ page 6150707 "NPR POS Setup"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Refresh Invalid Action Parameters action';
 
                 trigger OnAction()
                 begin

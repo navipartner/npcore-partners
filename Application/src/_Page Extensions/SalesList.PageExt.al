@@ -12,10 +12,12 @@ pageextension 6014445 "NPR Sales List" extends "Sales List"
             {
                 ApplicationArea = All;
                 Visible = false;
+                ToolTip = 'Specifies the value of the Amount field';
             }
             field("NPR Amount Including VAT"; "Amount Including VAT")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the Amount Including VAT field';
             }
             field("NPR PrepmtAmtInclVAT"; PrepmtAmtInclVAT)
             {
@@ -23,6 +25,7 @@ pageextension 6014445 "NPR Sales List" extends "Sales List"
                 AutoFormatExpression = "Currency Code";
                 AutoFormatType = 1;
                 Caption = 'Invoiced Prepmt. Amt. Incl. VAT';
+                ToolTip = 'Specifies the value of the Invoiced Prepmt. Amt. Incl. VAT field';
 
                 trigger OnDrillDown()
                 begin
@@ -39,6 +42,7 @@ pageextension 6014445 "NPR Sales List" extends "Sales List"
                 AutoFormatType = 1;
                 Caption = 'Remaining Amount Incl. VAT';
                 Editable = false;
+                ToolTip = 'Specifies the value of the Remaining Amount Incl. VAT field';
             }
         }
     }

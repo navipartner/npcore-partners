@@ -17,30 +17,37 @@ page 6014665 "NPR Stock-Take Configs"
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Location Code"; "Location Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Location Code field';
                 }
                 field("Inventory Calc. Date"; "Inventory Calc. Date")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Stock-Take Calc. Date field';
                 }
                 field("Stock-Take Template Code"; "Stock-Take Template Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Stock-Take Template Code field';
                 }
                 field("Allow User Modification"; "Allow User Modification")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Allow User Modification field';
                 }
                 field("Allow Unit Cost Change"; "Allow Unit Cost Change")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Allow Unit Cost Change field';
                 }
             }
         }
@@ -64,6 +71,7 @@ page 6014665 "NPR Stock-Take Configs"
                               "No." = FIELD(Code);
                 ShortCutKey = 'Shift+Ctrl+D';
                 ApplicationArea = All;
+                ToolTip = 'Executes the &Dimensions action';
 
                 trigger OnAction()
                 var
@@ -81,6 +89,7 @@ page 6014665 "NPR Stock-Take Configs"
                 RunPageLink = Code = FIELD(Code);
                 ShortCutKey = 'Shift+F5';
                 ApplicationArea = All;
+                ToolTip = 'Executes the Card action';
             }
             action("&Worksheets")
             {
@@ -89,6 +98,7 @@ page 6014665 "NPR Stock-Take Configs"
                 RunObject = Page "NPR Stock-Take Worksheet";
                 RunPageLink = "Stock-Take Config Code" = FIELD(Code);
                 ApplicationArea = All;
+                ToolTip = 'Executes the &Worksheets action';
             }
             action(Integration)
             {
@@ -99,6 +109,7 @@ page 6014665 "NPR Stock-Take Configs"
                 RunObject = Page "NPR Scanner Service Setup";
                 RunPageMode = View;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Integration action';
             }
         }
     }

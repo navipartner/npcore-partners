@@ -12,6 +12,7 @@ pageextension 6014418 "NPR Posted Purchase Invoices" extends "Posted Purchase In
                 Promoted = true;
                 PromotedCategory = Process;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Show Imported File action';
 
                 trigger OnAction()
                 var

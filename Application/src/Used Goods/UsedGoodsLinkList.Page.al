@@ -18,18 +18,22 @@ page 6014508 "NPR Used Goods Link List"
                 field("No."; "No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the No. field';
                 }
                 field(Subject; Subject)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Subject field';
                 }
                 field("Unit Cost"; "Unit Cost")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Unit Cost field';
                 }
                 field(Blocked; Blocked)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Blocked field';
                 }
             }
             group(Control6150621)
@@ -39,10 +43,12 @@ page 6014508 "NPR Used Goods Link List"
                 {
                     ApplicationArea = All;
                     Caption = 'Total costprice';
+                    ToolTip = 'Specifies the value of the Total costprice field';
                 }
                 field(Name; Name)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Name field';
                 }
             }
         }

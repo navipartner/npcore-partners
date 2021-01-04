@@ -20,32 +20,38 @@ page 6060099 "NPR Ean Box Parameters"
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Event Code field';
                 }
                 field("Action Code"; "Action Code")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Action Code field';
                 }
                 field(Name; Name)
                 {
                     ApplicationArea = All;
                     Style = Subordinate;
                     StyleExpr = "Non Editable";
+                    ToolTip = 'Specifies the value of the Name field';
                 }
                 field("Ean Box Value"; "Ean Box Value")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Ean Box Value field';
                 }
                 field("Non Editable"; "Non Editable")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Non Editable field';
                 }
                 field("Data Type"; "Data Type")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Data Type field';
                 }
                 field(Value; Value)
                 {
@@ -54,11 +60,13 @@ page 6060099 "NPR Ean Box Parameters"
                     HideValue = "Ean Box Value";
                     Style = Subordinate;
                     StyleExpr = "Non Editable";
+                    ToolTip = 'Specifies the value of the Value field';
                 }
                 field(OptionValueInteger; OptionValueInteger)
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the OptionValueInteger field';
                 }
             }
         }

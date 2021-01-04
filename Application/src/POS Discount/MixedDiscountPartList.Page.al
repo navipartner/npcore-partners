@@ -22,33 +22,40 @@ page 6014447 "NPR Mixed Discount Part List"
                 {
                     ApplicationArea = All;
                     Caption = 'Mix No.';
+                    ToolTip = 'Specifies the value of the Mix No. field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field(Lot; Lot)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Lot field';
                 }
                 field("Min. Quantity"; "Min. Quantity")
                 {
                     ApplicationArea = All;
                     BlankZero = true;
+                    ToolTip = 'Specifies the value of the Min. Quantity field';
                 }
                 field("Max. Quantity"; "Max. Quantity")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Max. Quantity field';
                 }
                 field("Created the"; "Created the")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Created Date field';
                 }
                 field("Last Date Modified"; "Last Date Modified")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Last Date Modified field';
                 }
             }
         }

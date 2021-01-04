@@ -19,28 +19,34 @@ page 6014566 "NPR Retail Logo Setup"
                 field(Sequence; Sequence)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Sequence field';
                 }
                 field(Keyword; Keyword)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Keyword field';
                 }
                 field("Register No."; "Register No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Cash Register No. field';
                 }
                 field("Start Date"; "Start Date")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Start Date field';
                 }
                 field("End Date"; "End Date")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the End Date field';
                 }
                 field("OneBitLogo.HASVALUE"; OneBitLogo.HasValue)
                 {
                     ApplicationArea = All;
                     Caption = 'Boca Compatible';
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Boca Compatible field';
                 }
             }
         }
@@ -66,6 +72,7 @@ page 6014566 "NPR Retail Logo Setup"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Import Logo action';
 
                 trigger OnAction()
                 var
@@ -83,6 +90,7 @@ page 6014566 "NPR Retail Logo Setup"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Export Logo action';
 
                 trigger OnAction()
                 var

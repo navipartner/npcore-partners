@@ -26,14 +26,17 @@ page 6014480 "NPR Object List"
                 field("Object Type"; "Object Type")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Object Type field';
                 }
                 field("Object ID"; "Object ID")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Object ID field';
                 }
                 field("Object Name"; "Object Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Object Name field';
                 }
             }
         }
@@ -53,6 +56,7 @@ page 6014480 "NPR Object List"
                     Promoted = true;
                     ShortCutKey = 'Ctrl+Alt+b';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Table action';
 
                     trigger OnAction()
                     begin
@@ -66,6 +70,7 @@ page 6014480 "NPR Object List"
                     Promoted = true;
                     ShortCutKey = 'Ctrl+Alt+c';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the CodeUnit action';
 
                     trigger OnAction()
                     begin
@@ -79,6 +84,7 @@ page 6014480 "NPR Object List"
                     Promoted = true;
                     ShortCutKey = 'Ctrl+Alt+p';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Report action';
 
                     trigger OnAction()
                     begin
@@ -92,6 +98,7 @@ page 6014480 "NPR Object List"
                     Promoted = true;
                     ShortCutKey = 'Ctrl+Alt+g';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Page action';
 
                     trigger OnAction()
                     begin
@@ -105,6 +112,7 @@ page 6014480 "NPR Object List"
                     Promoted = true;
                     ShortCutKey = 'Ctrl+Alt+x';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the XMLPort action';
 
                     trigger OnAction()
                     begin
@@ -118,6 +126,7 @@ page 6014480 "NPR Object List"
                     Promoted = true;
                     ShortCutKey = 'Ctrl+Alt+a';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the All action';
 
                     trigger OnAction()
                     begin
@@ -134,6 +143,7 @@ page 6014480 "NPR Object List"
                 PromotedIsBig = true;
                 ShortCutKey = 'Ctrl+r';
                 ApplicationArea = All;
+                ToolTip = 'Executes the Run action';
 
                 trigger OnAction()
                 begin

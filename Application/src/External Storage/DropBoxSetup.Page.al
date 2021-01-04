@@ -14,10 +14,12 @@ page 6184870 "NPR DropBox Setup"
                 field("Account Code"; "Account Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the DropBox Account Code field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field(DropBoxToken; DropBoxToken)
                 {
@@ -39,6 +41,7 @@ page 6184870 "NPR DropBox Setup"
                 field("Storage On Server"; "Storage On Server")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Server files location field';
                 }
             }
         }

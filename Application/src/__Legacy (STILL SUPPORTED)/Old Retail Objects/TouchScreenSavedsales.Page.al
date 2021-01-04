@@ -34,31 +34,38 @@ page 6014532 "NPR TouchScreen: Saved sales"
                 field("Register No."; "Register No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Cash Register No. field';
                 }
                 field("Sales Ticket No."; "Sales Ticket No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Sales Ticket No. field';
                 }
                 field("Salesperson Code"; "Salesperson Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Salesperson Code field';
                 }
                 field("Date"; Date)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Date field';
                 }
                 field("Start Time"; "Start Time")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Start Time field';
                 }
                 field("Customer Location No."; "Customer Location No.")
                 {
                     ApplicationArea = All;
                     Importance = Additional;
+                    ToolTip = 'Specifies the value of the Customer Location No. field';
                 }
                 field("Customer Name"; "Customer Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Customer Name field';
                 }
             }
             group(Control6150620)

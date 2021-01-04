@@ -23,26 +23,32 @@ page 6150620 "NPR POS Payment Bins"
                 field("No."; "No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the No. field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("POS Store Code"; "POS Store Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the POS Store Code field';
                 }
                 field("Attached to POS Unit No."; "Attached to POS Unit No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Attached to POS Unit No. field';
                 }
                 field("Eject Method"; "Eject Method")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Eject Method field';
                 }
                 field("Bin Type"; "Bin Type")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Bin Type field';
                 }
             }
         }
@@ -62,6 +68,7 @@ page 6150620 "NPR POS Payment Bins"
                 RunObject = Page "NPR POS Posting Setup";
                 RunPageLink = "POS Payment Bin Code" = FIELD("No.");
                 ApplicationArea = All;
+                ToolTip = 'Executes the POS Posting Setup action';
             }
             action(EjectMethodParameters)
             {
@@ -71,6 +78,7 @@ page 6150620 "NPR POS Payment Bins"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Eject Method Parameters action';
 
                 trigger OnAction()
                 var
@@ -93,6 +101,7 @@ page 6150620 "NPR POS Payment Bins"
                 PromotedCategory = Process;
                 Visible = false;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Transfer Out From Bin action';
 
                 trigger OnAction()
                 begin
@@ -107,6 +116,7 @@ page 6150620 "NPR POS Payment Bins"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Insert Initial Float action';
 
                 trigger OnAction()
                 begin

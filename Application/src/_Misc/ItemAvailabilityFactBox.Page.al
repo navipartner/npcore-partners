@@ -20,6 +20,7 @@ page 6014601 "NPR Item Availability FactBox"
                 ApplicationArea = All;
                 Caption = 'Item No.';
                 Lookup = false;
+                ToolTip = 'Specifies the value of the Item No. field';
 
                 trigger OnDrillDown()
                 begin
@@ -32,6 +33,7 @@ page 6014601 "NPR Item Availability FactBox"
                 Caption = 'Availability';
                 DrillDown = true;
                 Editable = true;
+                ToolTip = 'Specifies the value of the Availability field';
 
                 trigger OnDrillDown()
                 begin
@@ -42,18 +44,22 @@ page 6014601 "NPR Item Availability FactBox"
             field(Inventory; Inventory)
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the Inventory field';
             }
             field("Qty. on Sales Order"; "Qty. on Sales Order")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the Qty. on Sales Order field';
             }
             field("Qty. on Purch. Order"; "Qty. on Purch. Order")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the Qty. on Purch. Order field';
             }
             field("Sales (Qty.)"; "Sales (Qty.)")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the Sales (Qty.) field';
             }
         }
     }

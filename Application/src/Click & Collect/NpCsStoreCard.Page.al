@@ -19,18 +19,22 @@ page 6151196 "NPR NpCs Store Card"
                     {
                         ApplicationArea = All;
                         ShowMandatory = true;
+                        ToolTip = 'Specifies the value of the Code field';
                     }
                     field("Company Name"; "Company Name")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Company Name field';
                     }
                     field(Name; Name)
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Name field';
                     }
                     field("Local Store"; "Local Store")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Local Store field';
 
                         trigger OnValidate()
                         begin
@@ -40,6 +44,7 @@ page 6151196 "NPR NpCs Store Card"
                     field("Opening Hour Set"; "Opening Hour Set")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Opening Hour Set field';
                     }
                 }
                 group(Control6014405)
@@ -48,22 +53,27 @@ page 6151196 "NPR NpCs Store Card"
                     field("Service Url"; "Service Url")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Service Url field';
                     }
                     field("Service Username"; "Service Username")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Service Username field';
                     }
                     field("Service Password"; "Service Password")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Service Password field';
                     }
                     field("Geolocation Latitude"; "Geolocation Latitude")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Geolocation Latitude field';
                     }
                     field("Geolocation Longitude"; "Geolocation Longitude")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Geolocation Longitude field';
                     }
                 }
             }
@@ -73,18 +83,22 @@ page 6151196 "NPR NpCs Store Card"
                 field("Salesperson Code"; "Salesperson Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Salesperson Code field';
                 }
                 field("Location Code"; "Location Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Location Code field';
                 }
                 field("Bill-to Customer No."; "Bill-to Customer No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Bill-to Customer No. field';
                 }
                 field("Prepayment Account No."; "Prepayment Account No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Prepayment Account No. field';
                 }
             }
             group("Store Notification")
@@ -93,10 +107,12 @@ page 6151196 "NPR NpCs Store Card"
                 field("E-mail"; "E-mail")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the E-mail field';
                 }
                 field("Mobile Phone No."; "Mobile Phone No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Mobile Phone No. field';
                 }
             }
             group(Contact)
@@ -105,42 +121,52 @@ page 6151196 "NPR NpCs Store Card"
                 field("Contact Name"; "Contact Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Contact Name field';
                 }
                 field("Contact Name 2"; "Contact Name 2")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Contact Name 2 field';
                 }
                 field("Contact Address"; "Contact Address")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Contact Address field';
                 }
                 field("Contact Address 2"; "Contact Address 2")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Contact Address 2 field';
                 }
                 field("Contact Post Code"; "Contact Post Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Contact Post Code field';
                 }
                 field("Contact City"; "Contact City")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Contact City field';
                 }
                 field("Contact Country/Region Code"; "Contact Country/Region Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Contact Country/Region Code field';
                 }
                 field("Contact County"; "Contact County")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Contact County field';
                 }
                 field("Contact Phone No."; "Contact Phone No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Contact Phone No. field';
                 }
                 field("Contact E-mail"; "Contact E-mail")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Contact E-mail field';
                 }
             }
             part(Workflows; "NPR NpCs Store Card Workflows")
@@ -171,6 +197,7 @@ page 6151196 "NPR NpCs Store Card"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Validate Store Setup action';
 
                 trigger OnAction()
                 var
@@ -190,6 +217,7 @@ page 6151196 "NPR NpCs Store Card"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Update Contact Information action';
 
                 trigger OnAction()
                 var
@@ -207,6 +235,7 @@ page 6151196 "NPR NpCs Store Card"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Show Address action';
 
                 trigger OnAction()
                 var
@@ -223,6 +252,7 @@ page 6151196 "NPR NpCs Store Card"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Show Geolocation action';
 
                 trigger OnAction()
                 var
@@ -239,6 +269,7 @@ page 6151196 "NPR NpCs Store Card"
                 Caption = 'Stores by Distance';
                 Image = List;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Stores by Distance action';
 
                 trigger OnAction()
                 var

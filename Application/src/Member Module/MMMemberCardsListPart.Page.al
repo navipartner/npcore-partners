@@ -19,49 +19,60 @@ page 6060131 "NPR MM Member Cards ListPart"
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Entry No. field';
                 }
                 field("External Membership No."; "External Membership No.")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the External Membership No. field';
                 }
                 field("External Card No."; "External Card No.")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the External Card No. field';
                 }
                 field("External Card No. Last 4"; "External Card No. Last 4")
                 {
                     ApplicationArea = All;
                     Enabled = false;
+                    ToolTip = 'Specifies the value of the External Card No. Last 4 field';
                 }
                 field("Pin Code"; "Pin Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Pin Code field';
                 }
                 field("Valid Until"; "Valid Until")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Valid Until field';
                 }
                 field("Card Is Temporary"; "Card Is Temporary")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Card Is Temporary field';
                 }
                 field(Blocked; Blocked)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Blocked field';
                 }
                 field("Blocked At"; "Blocked At")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Blocked At field';
                 }
                 field("Block Reason"; "Block Reason")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Block Reason field';
                 }
                 field("Document ID"; "Document ID")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Document ID field';
                 }
             }
         }
@@ -77,6 +88,7 @@ page 6060131 "NPR MM Member Cards ListPart"
                 Image = PrintVoucher;
                 Promoted = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Print Card action';
 
                 trigger OnAction()
                 var
@@ -94,6 +106,7 @@ page 6060131 "NPR MM Member Cards ListPart"
                 RunPageLink = "Entry No." = FIELD("Entry No.");
                 RunPageView = SORTING("Entry No.");
                 ApplicationArea = All;
+                ToolTip = 'Executes the Card Card action';
             }
         }
     }

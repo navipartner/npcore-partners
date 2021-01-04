@@ -18,22 +18,27 @@ page 6059899 "NPR Data Log Records Subform"
                 field("Field No."; "Field No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Field No. field';
                 }
                 field("Field Name"; "Field Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Field Name field';
                 }
                 field("Previous Field Value"; "Previous Field Value")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Previous Field Value field';
                 }
                 field("Field Value Changed"; "Field Value Changed")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Field Value Changed field';
                 }
                 field("Field Value"; "Field Value")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Field Value field';
                 }
             }
         }

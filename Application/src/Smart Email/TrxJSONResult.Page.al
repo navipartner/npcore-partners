@@ -19,22 +19,27 @@ page 6059829 "NPR Trx JSON Result"
                 field(Name; Rec.Name)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Name field';
                 }
                 field(Status; Rec.Status)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Status field';
                 }
                 field(Created; Rec.Created)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Created field';
                 }
                 field(ID; Rec.ID)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the ID field';
                 }
                 field("Entry No"; Rec."Entry No")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Entry No field';
                 }
             }
         }

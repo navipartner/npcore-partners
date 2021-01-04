@@ -15,14 +15,17 @@ page 6059794 "NPR E-mail Templ. Filters"
                 field("Field No."; "Field No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Field No. field';
                 }
                 field("Field Name"; "Field Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Field Name field';
                 }
                 field(Value; Value)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Value field';
                 }
             }
         }

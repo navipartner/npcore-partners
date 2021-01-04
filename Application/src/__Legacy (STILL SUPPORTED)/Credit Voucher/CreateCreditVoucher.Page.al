@@ -16,22 +16,27 @@ page 6014445 "NPR Create Credit Voucher"
                     field(Amount; Amount)
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Amount field';
                     }
                     field(Name; Name)
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Name field';
                     }
                     field(Address; Address)
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Address field';
                     }
                     field("Post Code"; "Post Code")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Post Code field';
                     }
                     field(City; City)
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the City field';
                     }
                 }
                 group(Control6150621)
@@ -40,18 +45,22 @@ page 6014445 "NPR Create Credit Voucher"
                     field("No."; "No.")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the No. field';
                     }
                     field("Sales Ticket No."; "Sales Ticket No.")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Sales Ticket No. field';
                     }
                     field("Issue Date"; "Issue Date")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Issue Date field';
                     }
                     field("Salesperson Code"; "Salesperson Code")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Salesperson Code field';
                     }
                 }
             }

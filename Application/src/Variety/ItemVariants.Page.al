@@ -20,31 +20,37 @@ page 6014602 "NPR Item Variants"
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Item No. field';
                 }
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Description 2"; "Description 2")
                 {
                     ApplicationArea = All;
                     Visible = true;
+                    ToolTip = 'Specifies the value of the Description 2 field';
                 }
                 field(Inventory; Inventory)
                 {
                     ApplicationArea = All;
                     Caption = 'Inventory';
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Inventory field';
                 }
                 field(NetChange; NetChange)
                 {
                     ApplicationArea = All;
                     Caption = 'Net Change';
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Net Change field';
                 }
             }
         }
@@ -79,6 +85,7 @@ page 6014602 "NPR Item Variants"
                     RunPageLink = "Item No." = FIELD("Item No."),
                                   "Variant Code" = FIELD(Code);
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Translations action';
                 }
             }
         }

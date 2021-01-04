@@ -17,14 +17,17 @@ page 6184880 "NPR FTP Setup"
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field("FTP Host"; "FTP Host")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the FTP Host URI field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field(Timeout; Timeout)
                 {
@@ -34,12 +37,14 @@ page 6184880 "NPR FTP Setup"
                 field(User; User)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the User Name field';
                 }
                 field(Password; Password)
                 {
                     ApplicationArea = All;
                     Caption = 'Password';
                     ExtendedDatatype = Masked;
+                    ToolTip = 'Specifies the value of the Password field';
 
                     trigger OnValidate()
                     begin
@@ -49,10 +54,12 @@ page 6184880 "NPR FTP Setup"
                 field("Port Number"; "Port Number")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Port Number field';
                 }
                 field("Storage On Server"; "Storage On Server")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Server files location field';
                 }
             }
         }

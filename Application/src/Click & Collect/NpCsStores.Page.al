@@ -16,19 +16,23 @@ page 6151195 "NPR NpCs Stores"
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Name; Name)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Name field';
                 }
                 field("Company Name"; "Company Name")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Company Name field';
                 }
                 field("Local Store"; "Local Store")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Local Store field';
                 }
             }
         }
@@ -46,6 +50,7 @@ page 6151195 "NPR NpCs Stores"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Show Address action';
 
                 trigger OnAction()
                 var
@@ -62,6 +67,7 @@ page 6151195 "NPR NpCs Stores"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Show Geolocation action';
 
                 trigger OnAction()
                 var
@@ -78,6 +84,7 @@ page 6151195 "NPR NpCs Stores"
                 Caption = 'Stores by Distance';
                 Image = List;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Stores by Distance action';
 
                 trigger OnAction()
                 var

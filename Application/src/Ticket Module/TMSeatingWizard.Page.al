@@ -1,4 +1,4 @@
-﻿page 6151132 "NPR TM Seating Wizard"
+page 6151132 "NPR TM Seating Wizard"
 {
     // TM1.45/TSA/20200122  CASE 322432-01 Transport TM1.45 - 22 January 2020
 
@@ -18,11 +18,13 @@
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Selected Sections';
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Selected Sections field';
                 }
                 field(SpanSections; SpanSections)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Numbering Spans Sections';
+                    ToolTip = 'Specifies the value of the Numbering Spans Sections field';
                 }
             }
             group(Structure)
@@ -32,21 +34,25 @@
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Row Label';
+                    ToolTip = 'Specifies the value of the Row Label field';
                 }
                 field(Rows; Rows)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Rows to Create';
+                    ToolTip = 'Specifies the value of the Rows to Create field';
                 }
                 field(SeatLabel; SeatLabel)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Seat Label';
+                    ToolTip = 'Specifies the value of the Seat Label field';
                 }
                 field(SeatsPerRow; SeatsPerRow)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Seats per Row';
+                    ToolTip = 'Specifies the value of the Seats per Row field';
                 }
             }
             group(Numbering)
@@ -59,17 +65,20 @@
                     {
                         ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                         Caption = 'Start with Number (Row)';
+                        ToolTip = 'Specifies the value of the Start with Number (Row) field';
                     }
                     field("SeatingSetup.""Row Numbering"""; SeatingSetup."Row Numbering")
                     {
                         ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                         Caption = 'Numbering (Row)';
+                        ToolTip = 'Specifies the value of the Numbering (Row) field';
                     }
                     field(RowNumberLayout; RowNumberLayout)
                     {
                         ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                         Caption = 'Section Numbering Layout';
                         OptionCaption = 'Across Sections,Section by Section';
+                        ToolTip = 'Specifies the value of the Section Numbering Layout field';
                     }
                 }
                 group(Seat)
@@ -79,22 +88,26 @@
                     {
                         ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                         Caption = 'Start with Number (Seat)';
+                        ToolTip = 'Specifies the value of the Start with Number (Seat) field';
                     }
                     field("SeatingSetup.""Seat Numbering"""; SeatingSetup."Seat Numbering")
                     {
                         ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                         Caption = 'Numbering (Seat)';
+                        ToolTip = 'Specifies the value of the Numbering (Seat) field';
                     }
                     field(SeatingIncrement; SeatingIncrement)
                     {
                         ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                         Caption = 'Increment Style';
                         OptionCaption = 'Consecutive,Odd,Even';
+                        ToolTip = 'Specifies the value of the Increment Style field';
                     }
                     field(ContinuousNumbering; ContinuousNumbering)
                     {
                         ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                         Caption = 'Continuous Numbering';
+                        ToolTip = 'Specifies the value of the Continuous Numbering field';
                     }
                 }
             }
@@ -104,11 +117,13 @@
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Horizontal,Vertical,Diagonal (Left to Right),Diagonal (Right to Left)';
+                    ToolTip = 'Specifies the value of the Horizontal,Vertical,Diagonal (Left to Right),Diagonal (Right to Left) field';
                 }
                 field(SplitList; SplitList)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Split On';
+                    ToolTip = 'Specifies the value of the Split On field';
                 }
             }
         }

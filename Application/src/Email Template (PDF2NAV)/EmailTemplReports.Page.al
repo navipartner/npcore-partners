@@ -15,14 +15,17 @@ page 6059798 "NPR E-mail Templ. Reports"
                 field("Report ID"; "Report ID")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Report ID field';
                 }
                 field(Filename; Filename)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Filename field';
                 }
                 field("Report Name"; "Report Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Report Name field';
                 }
             }
         }

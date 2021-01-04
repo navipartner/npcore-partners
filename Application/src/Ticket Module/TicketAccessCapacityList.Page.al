@@ -1,4 +1,4 @@
-﻿page 6059787 "NPR Ticket AccessCapacity List"
+page 6059787 "NPR Ticket AccessCapacity List"
 {
     Caption = 'Access Capacity';
     SourceTable = "NPR Ticket Access Cap. Slots";
@@ -11,6 +11,7 @@
             {
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Type';
+                ToolTip = 'Specifies the value of the Type field';
 
                 trigger OnLookup(var Text: Text): Boolean
                 begin
@@ -29,6 +30,7 @@
             {
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Date';
+                ToolTip = 'Specifies the value of the Date field';
 
                 trigger OnValidate()
                 begin
@@ -44,30 +46,37 @@
                 field("Ticket Type Code"; "Ticket Type Code")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Ticket Type Code field';
                 }
                 field("Access Date"; "Access Date")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Access Date field';
                 }
                 field("Access Start"; "Access Start")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Access Time field';
                 }
                 field("Access End"; "Access End")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Access End field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field(Quantity; Quantity)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Point Card - Issued Cards field';
                 }
                 field("Quantity Reserved"; "Quantity Reserved")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Access Reservatation field';
                 }
             }
         }

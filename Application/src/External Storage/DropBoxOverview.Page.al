@@ -15,14 +15,17 @@ page 6184871 "NPR DropBox Overview"
                 field("Account Code"; "Account Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the DropBox Account Code field';
                 }
                 field("File Name"; "File Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the File Name field';
                 }
                 field(Name; Name)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Name field';
                 }
             }
         }

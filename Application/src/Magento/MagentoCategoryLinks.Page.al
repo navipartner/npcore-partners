@@ -24,6 +24,7 @@ page 6151418 "NPR Magento Category Links"
                 field("Category Id"; "Category Id")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Category Id field';
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -49,10 +50,12 @@ page 6151418 "NPR Magento Category Links"
                 field("Category Name"; "Category Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Category Name field';
                 }
                 field(Position; Position)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Position field';
                 }
             }
         }

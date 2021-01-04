@@ -21,11 +21,13 @@ page 6059952 "NPR Display Content Lines"
                 {
                     ApplicationArea = All;
                     Visible = UrlIsVisible;
+                    ToolTip = 'Specifies the value of the Url field';
                 }
                 field(Image; Image)
                 {
                     ApplicationArea = All;
                     Visible = ImageIsVisible;
+                    ToolTip = 'Specifies the value of the Image field';
                 }
             }
             part(Control6014404; "NPR Disp. Content Lines Img")

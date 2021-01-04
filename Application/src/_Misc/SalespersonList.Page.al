@@ -22,6 +22,7 @@ page 6151490 "NPR Salesperson List"
                     Caption = 'Selected';
                     Editable = true;
                     Visible = IsMultiSelectionMode;
+                    ToolTip = 'Specifies the value of the Selected field';
 
                     trigger OnValidate()
                     begin
@@ -32,11 +33,13 @@ page 6151490 "NPR Salesperson List"
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Name; Name)
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Name field';
                 }
             }
         }

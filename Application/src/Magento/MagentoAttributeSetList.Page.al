@@ -21,10 +21,12 @@ page 6151433 "NPR Magento Attribute Set List"
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Used by Items"; "Used by Items")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Used by Items field';
                 }
             }
         }

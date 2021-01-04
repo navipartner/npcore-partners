@@ -17,6 +17,7 @@ page 6150736 "NPR POS Theme Dependencies"
                 field("Target Type"; "Target Type")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Target Type field';
 
                     trigger OnValidate()
                     begin
@@ -27,23 +28,28 @@ page 6150736 "NPR POS Theme Dependencies"
                 {
                     ApplicationArea = All;
                     Enabled = TargetCodeEditable;
+                    ToolTip = 'Specifies the value of the Target Code field';
                 }
                 field("Target View Type"; "Target View Type")
                 {
                     ApplicationArea = All;
                     Enabled = TargetViewTypeEditable;
+                    ToolTip = 'Specifies the value of the Target View Type field';
                 }
                 field("Dependency Type"; "Dependency Type")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Dependency Type field';
                 }
                 field("Dependency Code"; "Dependency Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Dependency Code field';
                 }
                 field(Blocked; Blocked)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Blocked field';
                 }
             }
         }

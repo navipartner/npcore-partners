@@ -16,14 +16,17 @@ page 6014537 "NPR Scanner - List"
                 field(ID; ID)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Scanner ID field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field(Port; Port)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Connected on port field';
                 }
             }
         }

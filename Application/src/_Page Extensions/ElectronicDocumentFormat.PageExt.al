@@ -8,6 +8,7 @@ pageextension 6014434 "NPR Electronic Document Format" extends "Electronic Docum
             field("NPR Delivery Endpoint"; "NPR Delivery Endpoint")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the NPR Delivery Endpoint field';
             }
         }
     }

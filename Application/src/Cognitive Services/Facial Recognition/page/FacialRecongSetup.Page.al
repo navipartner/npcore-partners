@@ -17,6 +17,7 @@ page 6059915 "NPR Facial Recong. Setup"
                 field(Activate; Active)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Activate field';
                 }
             }
             group(GeneralSetup)
@@ -25,11 +26,13 @@ page 6059915 "NPR Facial Recong. Setup"
                 field(BaseURL; BaseURL)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Base URL field';
                 }
                 field(APIKey; APIKey)
                 {
                     ApplicationArea = All;
                     ExtendedDatatype = Masked;
+                    ToolTip = 'Specifies the value of the API Key field';
                 }
             }
             group(SpecificURIs)
@@ -38,26 +41,32 @@ page 6059915 "NPR Facial Recong. Setup"
                 field(PersonGroupURI; PersonGroupURI)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Person Group URI field';
                 }
                 field(PersonURI; PersonURI)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Person URI field';
                 }
                 field(DetectFaceURI; DetectFaceURI)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Detect Face URI field';
                 }
                 field(PersonFaceURI; PersonFaceURI)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Add Person Face URI field';
                 }
                 field(TrainPersonGroupURI; TrainPersonGroupURI)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Train Person Group URI field';
                 }
                 field(IdentifyPersonURI; IdentifyPersonURI)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Identify Person URI field';
                 }
             }
         }
@@ -72,6 +81,7 @@ page 6059915 "NPR Facial Recong. Setup"
                 ApplicationArea = All;
                 Caption = 'Clear all FR Data';
                 Image = Delete;
+                ToolTip = 'Executes the Clear all FR Data action';
 
                 trigger OnAction()
                 var

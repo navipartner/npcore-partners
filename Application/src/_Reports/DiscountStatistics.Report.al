@@ -225,6 +225,7 @@ report 6014402 "NPR Discount Statistics"
                     {
                         Caption = 'Show Value Entries';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Show Value Entries field';
                     }
                 }
             }

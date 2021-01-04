@@ -22,15 +22,18 @@ page 6014611 "NPR Retail Campaign"
                     field("Code"; Code)
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Code field';
                     }
                     field(Description; Description)
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Description field';
                     }
                     field("Magento Category Id"; "Magento Category Id")
                     {
                         ApplicationArea = All;
                         Visible = MagentoEnabled;
+                        ToolTip = 'Specifies the value of the Magento Category Id field';
                     }
                 }
                 group(Control6014410)
@@ -40,6 +43,7 @@ page 6014611 "NPR Retail Campaign"
                     {
                         ApplicationArea = All;
                         Caption = 'Sales Amount';
+                        ToolTip = 'Specifies the value of the Sales Amount field';
 
                         trigger OnDrillDown()
                         begin
@@ -50,6 +54,7 @@ page 6014611 "NPR Retail Campaign"
                     {
                         ApplicationArea = All;
                         Caption = 'Cost Amount';
+                        ToolTip = 'Specifies the value of the Cost Amount field';
 
                         trigger OnDrillDown()
                         begin
@@ -60,6 +65,7 @@ page 6014611 "NPR Retail Campaign"
                     {
                         ApplicationArea = All;
                         Caption = 'Profit';
+                        ToolTip = 'Specifies the value of the Profit field';
 
                         trigger OnDrillDown()
                         begin
@@ -70,6 +76,7 @@ page 6014611 "NPR Retail Campaign"
                     {
                         ApplicationArea = All;
                         Caption = 'Profit %';
+                        ToolTip = 'Specifies the value of the Profit % field';
 
                         trigger OnDrillDown()
                         begin
@@ -102,6 +109,7 @@ page 6014611 "NPR Retail Campaign"
                 Image = ItemLines;
                 Promoted = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Planning Items action';
 
                 trigger OnAction()
                 var
@@ -122,6 +130,7 @@ page 6014611 "NPR Retail Campaign"
                 RunObject = Page "NPR Item Hierarchy Card";
                 RunPageLink = "Hierarchy Code" = FIELD(Code);
                 ApplicationArea = All;
+                ToolTip = 'Executes the View Planning Items action';
             }
             action("View Demand Lines")
             {
@@ -132,6 +141,7 @@ page 6014611 "NPR Retail Campaign"
                 RunPageLink = "Item Hierachy" = FIELD(Code),
                               "Distribution Group" = FIELD("Distribution Group");
                 ApplicationArea = All;
+                ToolTip = 'Executes the View Demand Lines action';
             }
             action("View Distribution Lines")
             {
@@ -141,6 +151,7 @@ page 6014611 "NPR Retail Campaign"
                 RunObject = Page "NPR Distribution Lines";
                 RunPageLink = "Item Hiearachy" = FIELD(Code);
                 ApplicationArea = All;
+                ToolTip = 'Executes the View Distribution Lines action';
             }
             action("Distribution Setup")
             {
@@ -150,6 +161,7 @@ page 6014611 "NPR Retail Campaign"
                 RunObject = Page "NPR Distribution Setup";
                 RunPageLink = "Item Hiearachy" = FIELD(Code);
                 ApplicationArea = All;
+                ToolTip = 'Executes the Distribution Setup action';
             }
         }
         area(reporting)
@@ -160,6 +172,7 @@ page 6014611 "NPR Retail Campaign"
                 Image = Campaign;
                 RunObject = Report "NPR Retail Campaign Items";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Campaign Items action';
             }
         }
     }

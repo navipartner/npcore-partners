@@ -17,6 +17,7 @@ page 6151455 "NPR Magento Video Links"
                 field("Video Url"; "Video Url")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Video Url field';
 
                     trigger OnValidate()
                     var
@@ -31,10 +32,12 @@ page 6151455 "NPR Magento Video Links"
                 field("Sorting"; Sorting)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Sorting field';
                 }
                 field("Short Text"; "Short Text")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Short Text field';
                 }
             }
         }

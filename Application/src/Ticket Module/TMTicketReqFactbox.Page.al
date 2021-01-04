@@ -1,4 +1,4 @@
-﻿page 6060089 "NPR TM Ticket Req. Factbox"
+page 6060089 "NPR TM Ticket Req. Factbox"
 {
     // TM1.23/TSA /20170724 CASE 284752 Initial Version
     // TM1.43/TSA /20190910 CASE 368043 Refactored usage of "External Item Code"
@@ -15,143 +15,173 @@
             field("Entry No."; "Entry No.")
             {
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                ToolTip = 'Specifies the value of the Entry No. field';
             }
 
             field("Entry Type"; "Entry Type")
             {
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                ToolTip = 'Specifies the value of the Entry Type field';
             }
 
             field("Superseeds Entry No."; "Superseeds Entry No.")
             {
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Visible = false;
+                ToolTip = 'Specifies the value of the Superseeds Entry No. field';
             }
             field("Session Token ID"; "Session Token ID")
             {
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Visible = false;
+                ToolTip = 'Specifies the value of the Session Token ID field';
             }
 
             field("Authorization Code"; "Authorization Code")
             {
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                ToolTip = 'Specifies the value of the Authorization Code field';
             }
 
             field("Created Date Time"; "Created Date Time")
             {
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                ToolTip = 'Specifies the value of the Created Date Time field';
             }
             field("Request Status"; "Request Status")
             {
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Visible = false;
+                ToolTip = 'Specifies the value of the Request Status field';
             }
             field("Request Status Date Time"; "Request Status Date Time")
             {
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Visible = false;
+                ToolTip = 'Specifies the value of the Request Status Date Time field';
             }
             field("Revoke Ticket Request"; "Revoke Ticket Request")
             {
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Visible = false;
+                ToolTip = 'Specifies the value of the Revoke Ticket Request field';
             }
             field("Revoke Access Entry No."; "Revoke Access Entry No.")
             {
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Visible = false;
+                ToolTip = 'Specifies the value of the Revoke Access Entry No. field';
             }
             field("External Item Code"; "External Item Code")
             {
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                ToolTip = 'Specifies the value of the External Item Code field';
             }
             field("Item No."; "Item No.")
             {
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                ToolTip = 'Specifies the value of the Item No. field';
             }
             field("Variant Code"; "Variant Code")
             {
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                ToolTip = 'Specifies the value of the Variant Code field';
             }
             field(Quantity; Quantity)
             {
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                ToolTip = 'Specifies the value of the Quantity field';
             }
             field("External Adm. Sch. Entry No."; "External Adm. Sch. Entry No.")
             {
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Visible = false;
+                ToolTip = 'Specifies the value of the External Adm. Sch. Entry No. field';
             }
             field("Ext. Line Reference No."; "Ext. Line Reference No.")
             {
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Visible = false;
+                ToolTip = 'Specifies the value of the Line Reference No. field';
             }
             field("External Member No."; "External Member No.")
             {
                 ApplicationArea = NPRTicketAdvanced;
+                ToolTip = 'Specifies the value of the External Member No. field';
             }
             field("Admission Code"; "Admission Code")
             {
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                ToolTip = 'Specifies the value of the Admission Code field';
             }
             field("Expires Date Time"; "Expires Date Time")
             {
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Visible = false;
+                ToolTip = 'Specifies the value of the Expires Date Time field';
             }
             field("External Ticket Number"; "External Ticket Number")
             {
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Visible = false;
+                ToolTip = 'Specifies the value of the External Ticket Number field';
             }
             field("Admission Description"; "Admission Description")
             {
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Visible = false;
+                ToolTip = 'Specifies the value of the Admission Description field';
             }
             field("Scheduled Time Description"; "Scheduled Time Description")
             {
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Visible = false;
+                ToolTip = 'Specifies the value of the Scheduled Time Description field';
             }
             field("Notification Method"; "Notification Method")
             {
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Visible = false;
+                ToolTip = 'Specifies the value of the Notification Method field';
             }
             field("Notification Address"; "Notification Address")
             {
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Visible = false;
+                ToolTip = 'Specifies the value of the Notification Address field';
             }
             field("External Order No."; "External Order No.")
             {
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Visible = false;
+                ToolTip = 'Specifies the value of the External Order No. field';
             }
             field("Admission Created"; "Admission Created")
             {
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Visible = false;
+                ToolTip = 'Specifies the value of the Admission Created field';
             }
             field("Payment Option"; "Payment Option")
             {
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                ToolTip = 'Specifies the value of the Payment Option field';
             }
             field("Customer No."; "Customer No.")
             {
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                ToolTip = 'Specifies the value of the Customer No. field';
             }
             field("Receipt No."; "Receipt No.")
             {
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                ToolTip = 'Specifies the value of the Receipt No. field';
             }
             field("Line No."; "Line No.")
             {
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Visible = false;
+                ToolTip = 'Specifies the value of the Line No. field';
             }
             field(NPRAttrTextArray_01; NPRAttrTextArray[1])
             {
@@ -159,6 +189,7 @@
                 CaptionClass = '6014555,6060116,1,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible01;
+                ToolTip = 'Specifies the value of the NPRAttrTextArray[1] field';
 
                 trigger OnValidate()
                 begin
@@ -171,6 +202,7 @@
                 CaptionClass = '6014555,6060116,2,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible02;
+                ToolTip = 'Specifies the value of the NPRAttrTextArray[2] field';
 
                 trigger OnValidate()
                 begin
@@ -183,6 +215,7 @@
                 CaptionClass = '6014555,6060116,3,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible03;
+                ToolTip = 'Specifies the value of the NPRAttrTextArray[3] field';
 
                 trigger OnValidate()
                 begin
@@ -195,6 +228,7 @@
                 CaptionClass = '6014555,6060116,4,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible04;
+                ToolTip = 'Specifies the value of the NPRAttrTextArray[4] field';
 
                 trigger OnValidate()
                 begin
@@ -207,6 +241,7 @@
                 CaptionClass = '6014555,6060116,5,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible05;
+                ToolTip = 'Specifies the value of the NPRAttrTextArray[5] field';
 
                 trigger OnValidate()
                 begin
@@ -219,6 +254,7 @@
                 CaptionClass = '6014555,6060116,6,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible06;
+                ToolTip = 'Specifies the value of the NPRAttrTextArray[6] field';
 
                 trigger OnValidate()
                 begin
@@ -231,6 +267,7 @@
                 CaptionClass = '6014555,6060116,7,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible07;
+                ToolTip = 'Specifies the value of the NPRAttrTextArray[7] field';
 
                 trigger OnValidate()
                 begin
@@ -243,6 +280,7 @@
                 CaptionClass = '6014555,6060116,8,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible08;
+                ToolTip = 'Specifies the value of the NPRAttrTextArray[8] field';
 
                 trigger OnValidate()
                 begin
@@ -255,6 +293,7 @@
                 CaptionClass = '6014555,6060116,9,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible09;
+                ToolTip = 'Specifies the value of the NPRAttrTextArray[9] field';
 
                 trigger OnValidate()
                 begin
@@ -267,6 +306,7 @@
                 CaptionClass = '6014555,6060116,10,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible10;
+                ToolTip = 'Specifies the value of the NPRAttrTextArray[10] field';
 
                 trigger OnValidate()
                 begin

@@ -293,26 +293,31 @@ report 6014430 "NPR Item Sales Stats/Provider"
                     {
                         Caption = 'Value Date';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Value Date field';
                     }
                     field(ShowItemWithSales; ShowItemWithSales)
                     {
                         Caption = 'Only Items With Sale';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Only Items With Sale field';
                     }
                     field(ShowItem; ShowItem)
                     {
                         Caption = 'View Items';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the View Items field';
                     }
                     field(ShowItemGroup; ShowItemGroup)
                     {
                         Caption = 'Show Item Groups';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Show Item Groups field';
                     }
                     field(InventoryValueIsBasedOn; ValueMethod)
                     {
                         Caption = 'Inventory Value Is Based On:';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Inventory Value Is Based On: field';
                     }
                 }
             }

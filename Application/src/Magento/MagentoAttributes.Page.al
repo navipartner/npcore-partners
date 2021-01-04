@@ -32,27 +32,33 @@ page 6151431 "NPR Magento Attributes"
                         field(Description; Description)
                         {
                             ApplicationArea = All;
+                            ToolTip = 'Specifies the value of the Description field';
                         }
                         field(Type; Type)
                         {
                             ApplicationArea = All;
                             Editable = TypeEditable;
+                            ToolTip = 'Specifies the value of the Type field';
                         }
                         field(Position; Position)
                         {
                             ApplicationArea = All;
+                            ToolTip = 'Specifies the value of the Position field';
                         }
                         field(Filterable; Filterable)
                         {
                             ApplicationArea = All;
+                            ToolTip = 'Specifies the value of the Filterable field';
                         }
                         field("Use in Product Listing"; "Use in Product Listing")
                         {
                             ApplicationArea = All;
+                            ToolTip = 'Specifies the value of the Use in Product Listing field';
                         }
                         field("Used by Attribute Set"; "Used by Attribute Set")
                         {
                             ApplicationArea = All;
+                            ToolTip = 'Specifies the value of the Used by Attribute Set field';
 
                             trigger OnDrillDown()
                             begin
@@ -64,6 +70,7 @@ page 6151431 "NPR Magento Attributes"
                         field("Used by Items"; "Used by Items")
                         {
                             ApplicationArea = All;
+                            ToolTip = 'Specifies the value of the Used by Items field';
 
                             trigger OnDrillDown()
                             begin
@@ -75,12 +82,14 @@ page 6151431 "NPR Magento Attributes"
                         field(Visible; Visible)
                         {
                             ApplicationArea = All;
+                            ToolTip = 'Specifies the value of the Visible field';
                         }
                     }
                     field(WidthControl; '')
                     {
                         ApplicationArea = All;
                         Caption = '                                                                                                                                                             ';
+                        ToolTip = 'Specifies the value of the '''' field';
                     }
                 }
                 group(Control6150623)

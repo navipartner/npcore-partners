@@ -17,6 +17,7 @@ page 6059963 "NPR MPOS QR Code FactBox"
             {
                 ApplicationArea = All;
                 ShowCaption = false;
+                ToolTip = 'Specifies the value of the QR code field';
             }
         }
     }
@@ -30,6 +31,7 @@ page 6059963 "NPR MPOS QR Code FactBox"
                 Caption = 'Save To Disk';
                 ShortCutKey = 'Return';
                 ApplicationArea = All;
+                ToolTip = 'Executes the Save To Disk action';
 
                 trigger OnAction()
                 var

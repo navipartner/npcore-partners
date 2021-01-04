@@ -17,36 +17,43 @@ page 6014491 "NPR Receipt Stats"
                 field("Period Start"; "Period Start")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Period Start field';
                 }
                 field("Period Name"; "Period Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Period Name field';
                 }
                 field("Kassedata.""All Normal Sales in Audit Roll"""; Kassedata."All Normal Sales in Audit Roll")
                 {
                     ApplicationArea = All;
                     Caption = 'Balance Due (LCY)';
+                    ToolTip = 'Specifies the value of the Balance Due (LCY) field';
                 }
                 field("Kassedata.""All Debit Sales in Audit Roll"""; Kassedata."All Debit Sales in Audit Roll")
                 {
                     ApplicationArea = All;
                     Caption = 'Purchases (LCY)';
+                    ToolTip = 'Specifies the value of the Purchases (LCY) field';
                 }
                 field("Kassedata.""Normal Sales in Audit Roll""+Kassedata.""Debit Sales in Audit Roll"""; Kassedata."Normal Sales in Audit Roll" + Kassedata."Debit Sales in Audit Roll")
                 {
                     ApplicationArea = All;
                     Caption = 'Total';
+                    ToolTip = 'Specifies the value of the Total field';
                 }
                 field("Kassedata.""Attendance Count in Audit Roll""+Kassedata.""Item Count in Audit Roll Debit"""; Kassedata."Attendance Count in Audit Roll" + Kassedata."Item Count in Audit Roll Debit")
                 {
                     ApplicationArea = All;
                     Caption = 'No. of servings';
+                    ToolTip = 'Specifies the value of the No. of servings field';
                 }
             }
             field(PeriodType; PeriodType)
             {
                 ApplicationArea = All;
                 Caption = 'Select a Period';
+                ToolTip = 'Specifies the value of the Select a Period field';
 
                 trigger OnValidate()
                 begin

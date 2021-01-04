@@ -22,50 +22,61 @@ page 6151589 "NPR Event Task Lines"
                     Style = Strong;
                     StyleExpr = StyleIsStrong;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Job No. field';
                 }
                 field("Job Task No."; "Job Task No.")
                 {
                     ApplicationArea = All;
                     Style = Strong;
                     StyleExpr = StyleIsStrong;
+                    ToolTip = 'Specifies the value of the Job Task No. field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
                     Style = Strong;
                     StyleExpr = StyleIsStrong;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Job Task Type"; "Job Task Type")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Job Task Type field';
                 }
                 field(Totaling; Totaling)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Totaling field';
                 }
                 field("Job Posting Group"; "Job Posting Group")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Job Posting Group field';
                 }
                 field("WIP-Total"; "WIP-Total")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the WIP-Total field';
                 }
                 field("WIP Method"; "WIP Method")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the WIP Method field';
                 }
                 field("Start Date"; "Start Date")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Start Date field';
                 }
                 field("End Date"; "End Date")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the End Date field';
                 }
                 field("Schedule (Total Cost)"; "Schedule (Total Cost)")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Schedule (Total Cost) field';
 
                     trigger OnDrillDown()
                     var
@@ -78,6 +89,7 @@ page 6151589 "NPR Event Task Lines"
                 field("Schedule (Total Price)"; "Schedule (Total Price)")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Schedule (Total Price) field';
 
                     trigger OnDrillDown()
                     var
@@ -90,14 +102,17 @@ page 6151589 "NPR Event Task Lines"
                 field("Usage (Total Cost)"; "Usage (Total Cost)")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Usage (Total Cost) field';
                 }
                 field("Usage (Total Price)"; "Usage (Total Price)")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Usage (Total Price) field';
                 }
                 field("Contract (Total Cost)"; "Contract (Total Cost)")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Contract (Total Cost) field';
 
                     trigger OnDrillDown()
                     var
@@ -110,6 +125,7 @@ page 6151589 "NPR Event Task Lines"
                 field("Contract (Total Price)"; "Contract (Total Price)")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Contract (Total Price) field';
 
                     trigger OnDrillDown()
                     var
@@ -122,14 +138,17 @@ page 6151589 "NPR Event Task Lines"
                 field("Contract (Invoiced Cost)"; "Contract (Invoiced Cost)")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Contract (Invoiced Cost) field';
                 }
                 field("Contract (Invoiced Price)"; "Contract (Invoiced Price)")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Contract (Invoiced Price) field';
                 }
                 field("Remaining (Total Cost)"; "Remaining (Total Cost)")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Remaining (Total Cost) field';
 
                     trigger OnDrillDown()
                     var
@@ -142,6 +161,7 @@ page 6151589 "NPR Event Task Lines"
                 field("Remaining (Total Price)"; "Remaining (Total Price)")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Remaining (Total Price) field';
 
                     trigger OnDrillDown()
                     var
@@ -155,27 +175,32 @@ page 6151589 "NPR Event Task Lines"
                 {
                     ApplicationArea = All;
                     Caption = 'EAC (Total Cost)';
+                    ToolTip = 'Specifies the value of the EAC (Total Cost) field';
                 }
                 field("EAC (Total Price)"; CalcEACTotalPrice)
                 {
                     ApplicationArea = All;
                     Caption = 'EAC (Total Price)';
+                    ToolTip = 'Specifies the value of the EAC (Total Price) field';
                 }
                 field("Global Dimension 1 Code"; "Global Dimension 1 Code")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Global Dimension 1 Code field';
                 }
                 field("Global Dimension 2 Code"; "Global Dimension 2 Code")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Global Dimension 2 Code field';
                 }
                 field("Outstanding Orders"; "Outstanding Orders")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Outstanding Orders field';
 
                     trigger OnDrillDown()
                     var
@@ -191,6 +216,7 @@ page 6151589 "NPR Event Task Lines"
                     ApplicationArea = All;
                     Editable = false;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Amt. Rcd. Not Invoiced field';
 
                     trigger OnDrillDown()
                     var
@@ -235,6 +261,7 @@ page 6151589 "NPR Event Task Lines"
                     PromotedIsBig = true;
                     ShortCutKey = 'Shift+Ctrl+P';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Event &Planning Lines action';
 
                     trigger OnAction()
                     var
@@ -263,6 +290,7 @@ page 6151589 "NPR Event Task Lines"
                                   "Job Task No." = FIELD("Job Task No.");
                     ShortCutKey = 'F7';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Job Task &Statistics action';
                 }
                 action("Job &Task Card")
                 {
@@ -273,6 +301,7 @@ page 6151589 "NPR Event Task Lines"
                                   "Job Task No." = FIELD("Job Task No.");
                     ShortCutKey = 'Shift+F7';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Job &Task Card action';
                 }
                 separator("-")
                 {
@@ -291,6 +320,7 @@ page 6151589 "NPR Event Task Lines"
                                       "Job Task No." = FIELD("Job Task No.");
                         ShortCutKey = 'Shift+Ctrl+D';
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Dimensions-&Single action';
                     }
                     action("Dimensions-&Multiple")
                     {
@@ -298,6 +328,7 @@ page 6151589 "NPR Event Task Lines"
                         Caption = 'Dimensions-&Multiple';
                         Image = DimensionSets;
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Dimensions-&Multiple action';
 
                         trigger OnAction()
                         var
@@ -322,6 +353,7 @@ page 6151589 "NPR Event Task Lines"
                     Promoted = true;
                     PromotedCategory = Process;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Sales &Documents action';
 
                     trigger OnAction()
                     var
@@ -344,6 +376,7 @@ page 6151589 "NPR Event Task Lines"
                     RunPageLink = "Job No." = FIELD("Job No.");
                     RunPageView = SORTING("Job No.", "Job Posting Group", "WIP Posting Date");
                     ApplicationArea = All;
+                    ToolTip = 'Executes the &WIP Entries action';
                 }
                 action("WIP &G/L Entries")
                 {
@@ -353,6 +386,7 @@ page 6151589 "NPR Event Task Lines"
                     RunPageLink = "Job No." = FIELD("Job No.");
                     RunPageView = SORTING("Job No.");
                     ApplicationArea = All;
+                    ToolTip = 'Executes the WIP &G/L Entries action';
                 }
             }
             group(History)
@@ -369,6 +403,7 @@ page 6151589 "NPR Event Task Lines"
                     RunPageView = SORTING("Job No.", "Job Task No.");
                     ShortCutKey = 'Ctrl+F7';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Job Ledger E&ntries action';
                 }
             }
         }
@@ -384,6 +419,7 @@ page 6151589 "NPR Event Task Lines"
                     Ellipsis = true;
                     Image = Invoice;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Create &Sales Invoice action';
 
                     trigger OnAction()
                     var
@@ -415,6 +451,7 @@ page 6151589 "NPR Event Task Lines"
                     Promoted = true;
                     PromotedCategory = Process;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Split &Planning Lines action';
 
                     trigger OnAction()
                     var
@@ -439,6 +476,7 @@ page 6151589 "NPR Event Task Lines"
                     Ellipsis = true;
                     Image = ChangeDate;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Change &Dates action';
 
                     trigger OnAction()
                     var
@@ -463,6 +501,7 @@ page 6151589 "NPR Event Task Lines"
                     Image = Indent;
                     RunObject = Codeunit "Job Task-Indent";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the I&ndent Job Tasks action';
                 }
                 group("&Copy")
                 {
@@ -476,6 +515,7 @@ page 6151589 "NPR Event Task Lines"
                         Promoted = true;
                         PromotedCategory = Process;
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Copy Job Planning Lines &from... action';
 
                         trigger OnAction()
                         var
@@ -494,6 +534,7 @@ page 6151589 "NPR Event Task Lines"
                         Promoted = true;
                         PromotedCategory = Process;
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Copy Job Planning Lines &to... action';
 
                         trigger OnAction()
                         var
@@ -515,6 +556,7 @@ page 6151589 "NPR Event Task Lines"
                         Ellipsis = true;
                         Image = CalculateWIP;
                         ApplicationArea = All;
+                        ToolTip = 'Executes the &Calculate WIP action';
 
                         trigger OnAction()
                         var
@@ -533,6 +575,7 @@ page 6151589 "NPR Event Task Lines"
                         Image = PostOrder;
                         ShortCutKey = 'F9';
                         ApplicationArea = All;
+                        ToolTip = 'Executes the &Post WIP to G/L action';
 
                         trigger OnAction()
                         var

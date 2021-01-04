@@ -17,26 +17,32 @@ page 6059994 "NPR MPOS Payment Gateway"
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Provider; Provider)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Provider field';
                 }
                 field(Decription; Decription)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Decription field';
                 }
                 field("Merchant Id"; "Merchant Id")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Merchant Id field';
                 }
                 field(User; User)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the User field';
                 }
                 field(Password; Password)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Password field';
                 }
             }
         }
@@ -54,6 +60,7 @@ page 6059994 "NPR MPOS Payment Gateway"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Transactions action';
 
                 trigger OnAction()
                 begin

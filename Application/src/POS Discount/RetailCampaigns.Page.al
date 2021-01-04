@@ -19,15 +19,18 @@ page 6014610 "NPR Retail Campaigns"
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Magento Category Id"; "Magento Category Id")
                 {
                     ApplicationArea = All;
                     Visible = MagentoEnabled;
+                    ToolTip = 'Specifies the value of the Magento Category Id field';
                 }
             }
         }

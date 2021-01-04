@@ -25,6 +25,7 @@ page 6151447 "NPR Magento Item Pict. Factbox"
             {
                 ApplicationArea = All;
                 ShowCaption = false;
+                ToolTip = 'Specifies the value of the TempMagentoPicture.Picture field';
             }
         }
     }

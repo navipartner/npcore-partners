@@ -27,11 +27,13 @@ page 6059944 "NPR SMS Send Message"
                     {
                         ApplicationArea = All;
                         Caption = 'Phone No';
+                        ToolTip = 'Specifies the value of the Phone No field';
                     }
                     field(SenderText; SenderText)
                     {
                         ApplicationArea = All;
                         Caption = 'Sender';
+                        ToolTip = 'Specifies the value of the Sender field';
                     }
                 }
                 group("Merge Template with")
@@ -43,6 +45,7 @@ page 6059944 "NPR SMS Send Message"
                         ApplicationArea = All;
                         Caption = 'Record';
                         Visible = ShowRecordSelection;
+                        ToolTip = 'Specifies the value of the Record field';
 
                         trigger OnLookup(var Text: Text): Boolean
                         begin
@@ -70,6 +73,7 @@ page 6059944 "NPR SMS Send Message"
                         ShowCaption = false;
                         Style = Strong;
                         StyleExpr = TRUE;
+                        ToolTip = 'Specifies the value of the InfoText field';
                     }
                 }
                 group("Message")
@@ -80,6 +84,7 @@ page 6059944 "NPR SMS Send Message"
                         ApplicationArea = All;
                         MultiLine = true;
                         ShowCaption = false;
+                        ToolTip = 'Specifies the value of the SMSMessageText field';
                     }
                 }
                 group(Control6150621)
@@ -89,6 +94,7 @@ page 6059944 "NPR SMS Send Message"
                     {
                         ApplicationArea = All;
                         Caption = 'Sending Option';
+                        ToolTip = 'Specifies the value of the Sending Option field';
 
                         trigger OnValidate()
                         var
@@ -108,6 +114,7 @@ page 6059944 "NPR SMS Send Message"
                         {
                             ApplicationArea = All;
                             Caption = 'Delay Until';
+                            ToolTip = 'Specifies the value of the Delay Until field';
                         }
                     }
                 }

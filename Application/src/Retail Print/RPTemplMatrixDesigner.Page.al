@@ -31,6 +31,7 @@ page 6014637 "NPR RP Templ. Matrix Designer"
                     Enabled = NOT ("Prefix Next Line" OR ("Type" = 1));
                     Style = Subordinate;
                     StyleExpr = "Prefix Next Line" OR ("Type" = 1);
+                    ToolTip = 'Specifies the value of the Type Option field';
                 }
                 field(X; X)
                 {
@@ -39,6 +40,7 @@ page 6014637 "NPR RP Templ. Matrix Designer"
                     Style = Subordinate;
                     StyleExpr = "Prefix Next Line" OR ("Type" = 1);
                     Width = 4;
+                    ToolTip = 'Specifies the value of the X field';
                 }
                 field(Y; Y)
                 {
@@ -47,6 +49,7 @@ page 6014637 "NPR RP Templ. Matrix Designer"
                     Style = Subordinate;
                     StyleExpr = "Prefix Next Line" OR ("Type" = 1);
                     Width = 4;
+                    ToolTip = 'Specifies the value of the Y field';
                 }
                 field("Prefix Next Line"; "Prefix Next Line")
                 {
@@ -54,12 +57,14 @@ page 6014637 "NPR RP Templ. Matrix Designer"
                     Enabled = NOT ("Type" = 1);
                     Style = Subordinate;
                     StyleExpr = "Type" = 1;
+                    ToolTip = 'Specifies the value of the Prefix Next Line field';
                 }
                 field("Data Item Name"; "Data Item Name")
                 {
                     ApplicationArea = All;
                     Style = Strong;
                     StyleExpr = "Type" = 1;
+                    ToolTip = 'Specifies the value of the Table Name field';
                 }
                 field("Field Name"; "Field Name")
                 {
@@ -67,6 +72,7 @@ page 6014637 "NPR RP Templ. Matrix Designer"
                     Enabled = NOT ("Type" = 1);
                     Style = Subordinate;
                     StyleExpr = "Type" = 1;
+                    ToolTip = 'Specifies the value of the Field Name field';
                 }
                 field(Operator; Operator)
                 {
@@ -74,6 +80,7 @@ page 6014637 "NPR RP Templ. Matrix Designer"
                     Enabled = NOT ("Type" = 1);
                     Style = Subordinate;
                     StyleExpr = "Type" = 1;
+                    ToolTip = 'Specifies the value of the Operator field';
                 }
                 field("Field 2 Name"; "Field 2 Name")
                 {
@@ -81,6 +88,7 @@ page 6014637 "NPR RP Templ. Matrix Designer"
                     Enabled = NOT ("Type" = 1);
                     Style = Subordinate;
                     StyleExpr = "Type" = 1;
+                    ToolTip = 'Specifies the value of the Field 2 Name field';
                 }
                 field(Attribute; Attribute)
                 {
@@ -88,6 +96,7 @@ page 6014637 "NPR RP Templ. Matrix Designer"
                     Enabled = NOT ("Type" = 1);
                     Style = Subordinate;
                     StyleExpr = "Type" = 1;
+                    ToolTip = 'Specifies the value of the Attribute field';
                 }
                 field(Prefix; Prefix)
                 {
@@ -95,6 +104,7 @@ page 6014637 "NPR RP Templ. Matrix Designer"
                     Enabled = NOT ("Type" = 1);
                     Style = Subordinate;
                     StyleExpr = "Type" = 1;
+                    ToolTip = 'Specifies the value of the Prefix field';
                 }
                 field(Postfix; Postfix)
                 {
@@ -102,6 +112,7 @@ page 6014637 "NPR RP Templ. Matrix Designer"
                     Enabled = NOT ("Type" = 1);
                     Style = Subordinate;
                     StyleExpr = "Type" = 1;
+                    ToolTip = 'Specifies the value of the Postfix field';
                 }
                 field("Default Value"; "Default Value")
                 {
@@ -109,10 +120,12 @@ page 6014637 "NPR RP Templ. Matrix Designer"
                     Enabled = NOT ("Type" = 1);
                     Style = Subordinate;
                     StyleExpr = "Type" = 1;
+                    ToolTip = 'Specifies the value of the Default Value field';
                 }
                 field("Default Value Record Required"; "Default Value Record Required")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Only Fill Default Value On Data field';
                 }
                 field(Align; Align)
                 {
@@ -120,6 +133,7 @@ page 6014637 "NPR RP Templ. Matrix Designer"
                     Enabled = NOT ("Prefix Next Line" OR ("Type" = 1));
                     Style = Subordinate;
                     StyleExpr = "Prefix Next Line" OR ("Type" = 1);
+                    ToolTip = 'Specifies the value of the Align field';
                 }
                 field(Rotation; Rotation)
                 {
@@ -127,6 +141,7 @@ page 6014637 "NPR RP Templ. Matrix Designer"
                     Enabled = NOT ("Prefix Next Line" OR ("Type" = 1));
                     Style = Subordinate;
                     StyleExpr = "Prefix Next Line" OR ("Type" = 1);
+                    ToolTip = 'Specifies the value of the Rotation field';
                 }
                 field(Width; Width)
                 {
@@ -134,6 +149,7 @@ page 6014637 "NPR RP Templ. Matrix Designer"
                     Enabled = NOT ("Prefix Next Line" OR ("Type" = 1));
                     Style = Subordinate;
                     StyleExpr = "Prefix Next Line" OR ("Type" = 1);
+                    ToolTip = 'Specifies the value of the Barcode Size/Width field';
                 }
                 field(Height; Height)
                 {
@@ -141,6 +157,7 @@ page 6014637 "NPR RP Templ. Matrix Designer"
                     Enabled = NOT ("Prefix Next Line" OR ("Type" = 1));
                     Style = Subordinate;
                     StyleExpr = "Prefix Next Line" OR ("Type" = 1);
+                    ToolTip = 'Specifies the value of the Height field';
                 }
                 field("Start Char"; "Start Char")
                 {
@@ -148,6 +165,7 @@ page 6014637 "NPR RP Templ. Matrix Designer"
                     Enabled = NOT ("Type" = 1);
                     Style = Subordinate;
                     StyleExpr = "Type" = 1;
+                    ToolTip = 'Specifies the value of the Start Char field';
                 }
                 field("Max Length"; "Max Length")
                 {
@@ -155,6 +173,7 @@ page 6014637 "NPR RP Templ. Matrix Designer"
                     Enabled = NOT ("Type" = 1);
                     Style = Subordinate;
                     StyleExpr = "Type" = 1;
+                    ToolTip = 'Specifies the value of the Max Length field';
                 }
                 field("Blank Zero"; "Blank Zero")
                 {
@@ -162,6 +181,7 @@ page 6014637 "NPR RP Templ. Matrix Designer"
                     Enabled = NOT ("Type" = 1);
                     Style = Subordinate;
                     StyleExpr = "Type" = 1;
+                    ToolTip = 'Specifies the value of the Blank Zero field';
                 }
                 field("Skip If Empty"; "Skip If Empty")
                 {
@@ -169,32 +189,39 @@ page 6014637 "NPR RP Templ. Matrix Designer"
                     Enabled = NOT ("Type" = 1);
                     Style = Subordinate;
                     StyleExpr = "Type" = 1;
+                    ToolTip = 'Specifies the value of the Skip If Empty field';
                 }
                 field("Root Record No."; "Root Record No.")
                 {
                     ApplicationArea = All;
                     BlankZero = true;
+                    ToolTip = 'Specifies the value of the Root Record No. field';
                 }
                 field("Data Item Record No."; "Data Item Record No.")
                 {
                     ApplicationArea = All;
                     BlankZero = true;
+                    ToolTip = 'Specifies the value of the Data Item Record No. field';
                 }
                 field(Comments; Comments)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Comments field';
                 }
                 field("Processing Codeunit"; "Processing Codeunit")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Processing Codeunit field';
                 }
                 field("Processing Function ID"; "Processing Function ID")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Processing Function ID field';
                 }
                 field("Processing Function Parameter"; "Processing Function Parameter")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Processing Function Parameter field';
                 }
             }
         }

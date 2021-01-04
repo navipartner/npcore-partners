@@ -18,40 +18,49 @@ page 6151188 "NPR MM Member Communication"
                     ApplicationArea = All;
                     Editable = false;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Member Entry No. field';
                 }
                 field("Membership Entry No."; "Membership Entry No.")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Membership Entry No. field';
                 }
                 field("Membership Code"; "Membership Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Membership Code field';
                 }
                 field("Display Name"; "Display Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Display Name field';
                 }
                 field("External Member No."; "External Member No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the External Member No. field';
                 }
                 field("External Membership No."; "External Membership No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the External Membership No. field';
                 }
                 field("Message Type"; "Message Type")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Message Type field';
                 }
                 field("Preferred Method"; "Preferred Method")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Preferred Method field';
                 }
                 field("Accepted Communication"; "Accepted Communication")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Accepted Communication field';
                 }
             }
         }
@@ -68,6 +77,7 @@ page 6151188 "NPR MM Member Communication"
                 Promoted = true;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Create Defaults action';
 
                 trigger OnAction()
                 var

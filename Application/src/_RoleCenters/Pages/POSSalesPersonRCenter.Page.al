@@ -71,30 +71,35 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                 Caption = 'Customer';
                 RunObject = Page "Customer List";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Customer action';
             }
             action(Action6014569)
             {
                 Caption = 'Vendor';
                 RunObject = Page "Vendor List";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Vendor action';
             }
             action("Audit Roll")
             {
                 Caption = 'Audit Roll';
                 RunObject = Page "NPR Audit Roll";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Audit Roll action';
             }
             action("POS Entry List")
             {
                 Caption = 'POS Entry List';
                 RunObject = Page "NPR POS Entry List";
                 ApplicationArea = All;
+                ToolTip = 'Executes the POS Entry List action';
             }
             action("Retail Item List")
             {
                 Caption = 'Retail Item List';
                 RunObject = Page "Item List";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Retail Item List action';
             }
         }
         area(reporting)
@@ -108,6 +113,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     Image = "Report";
                     RunObject = Report Statement;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the S&tatement action';
                 }
                 separator(Separator6150667)
                 {
@@ -118,6 +124,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     Image = "Report";
                     RunObject = Report "Customer - Order Summary";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Customer - Order Su&mmary action';
                 }
                 action("Customer - T&op 10 List")
                 {
@@ -125,6 +132,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     Image = "Report";
                     RunObject = Report "Customer - Top 10 List";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Customer - T&op 10 List action';
                 }
                 separator(Separator6150663)
                 {
@@ -138,6 +146,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     Image = "Report";
                     RunObject = Report "Inventory - Sales Back Orders";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Inventory - Sales &Back Orders action';
                 }
                 separator(Separator6150658)
                 {
@@ -148,6 +157,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     Image = "Report";
                     RunObject = Report "Trial Balance";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the &G/L Trial Balance action';
                 }
                 action("Trial Balance by &Period")
                 {
@@ -155,6 +165,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     Image = "Report";
                     RunObject = Report "Trial Balance by Period";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Trial Balance by &Period action';
                 }
                 action("Closing T&rial Balance")
                 {
@@ -162,6 +173,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     Image = "Report";
                     RunObject = Report "Closing Trial Balance";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Closing T&rial Balance action';
                 }
                 separator(Separator6150654)
                 {
@@ -172,6 +184,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     Image = "Report";
                     RunObject = Report "Aged Accounts Receivable";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Aged Ac&counts Receivable action';
                 }
                 action("Aged Accounts Pa&yable")
                 {
@@ -179,6 +192,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     Image = "Report";
                     RunObject = Report "Aged Accounts Payable";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Aged Accounts Pa&yable action';
                 }
                 action("Reconcile Cust. and &Vend. Accs")
                 {
@@ -186,6 +200,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     Image = "Report";
                     RunObject = Report "Reconcile Cust. and Vend. Accs";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Reconcile Cust. and &Vend. Accs action';
                 }
                 separator(Separator6150650)
                 {
@@ -196,6 +211,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     Image = "Report";
                     RunObject = Report "VAT Registration No. Check";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the VAT Registration No. Chec&k action';
                 }
                 action("VAT E&xceptions")
                 {
@@ -203,6 +219,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     Image = "Report";
                     RunObject = Report "VAT Exceptions";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the VAT E&xceptions action';
                 }
                 action("V&AT Statement")
                 {
@@ -210,6 +227,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     Image = "Report";
                     RunObject = Report "VAT Statement";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the V&AT Statement action';
                 }
                 action("VAT-VIES Declaration Tax A&uth")
                 {
@@ -217,6 +235,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     Image = "Report";
                     RunObject = Report "VAT- VIES Declaration Tax Auth";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the VAT-VIES Declaration Tax A&uth action';
                 }
                 action("VAT - VIES Declaration &Disk")
                 {
@@ -224,6 +243,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     Image = "Report";
                     RunObject = Report "VAT- VIES Declaration Disk";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the VAT - VIES Declaration &Disk action';
                 }
                 action("EC Sal&es List")
                 {
@@ -231,6 +251,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     Image = "Report";
                     RunObject = Report "EC Sales List";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the EC Sal&es List action';
                 }
             }
             group(ActionGroup6014408)
@@ -242,6 +263,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     Image = Report2;
                     RunObject = Report "NPR Sales Ticket Stat.";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Sales Statistics action';
                 }
                 action("Sale Report")
                 {
@@ -249,6 +271,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     Image = Report2;
                     RunObject = Report "NPR Sale Time Report";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Sale Report action';
                 }
                 separator(Separator6014423)
                 {
@@ -259,6 +282,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     Image = Report2;
                     RunObject = Report "NPR Sales Person Top 20";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Sales Person Top 20 action';
                 }
                 action("Salesperson/Item Group Top")
                 {
@@ -266,6 +290,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     Image = Report2;
                     RunObject = Report "NPR Salesperson/Item Group Top";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Salesperson/Item Group Top action';
                 }
                 separator(Separator6014432)
                 {
@@ -276,6 +301,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     Image = Report2;
                     RunObject = Report "NPR Item Wise Sales Figures";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Item Wise Sales Figures action';
                 }
                 separator(Separator6014462)
                 {
@@ -286,6 +312,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     Image = Report2;
                     RunObject = Report "NPR Discount Statistics";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Discount Statistics action';
                 }
             }
             group("Item & Prices")
@@ -297,6 +324,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     Image = Report2;
                     RunObject = Report "NPR Item Sales Stats/Provider";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Item Sales Statistics action';
                 }
             }
         }
@@ -311,60 +339,70 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     Caption = 'Audit Roll';
                     RunObject = Page "NPR Audit Roll";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Audit Roll action';
                 }
                 action("Credit Vouchers")
                 {
                     Caption = 'Credit Vouchers';
                     RunObject = Page "NPR Credit Voucher List";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Credit Vouchers action';
                 }
                 action("Gift Vouchers")
                 {
                     Caption = 'Gift Vouchers';
                     RunObject = Page "NPR Gift Voucher List";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Gift Vouchers action';
                 }
                 action("Exchange Labels")
                 {
                     Caption = 'Exchange Labels';
                     RunObject = Page "NPR Exchange Label";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Exchange Labels action';
                 }
                 action("Tax Free Voucher")
                 {
                     Caption = 'Tax Free Voucher';
                     RunObject = Page "NPR Tax Free Voucher";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Tax Free Voucher action';
                 }
                 action("Retail Document List")
                 {
                     Caption = 'Retail Document List';
                     RunObject = Page "NPR Retail Document List";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Retail Document List action';
                 }
                 action("Customer Repairs List")
                 {
                     Caption = 'Customer Repairs List';
                     RunObject = Page "NPR Customer Repair List";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Customer Repairs List action';
                 }
                 action("Warranty Catalog List")
                 {
                     Caption = 'Warranty Catalog List';
                     RunObject = Page "NPR Warranty Catalog List";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Warranty Catalog List action';
                 }
                 action(Coupons)
                 {
                     Caption = 'Coupons';
                     RunObject = Page "NPR NpDc Coupons";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Coupons action';
                 }
                 action("Coupon Types")
                 {
                     Caption = 'Coupon Types';
                     RunObject = Page "NPR NpDc Coupon Types";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Coupon Types action';
                 }
             }
             group(ActionGroup6014513)
@@ -376,30 +414,35 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     Caption = 'Retail Item List';
                     RunObject = Page "Item List";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Retail Item List action';
                 }
                 action("Item Group Tree")
                 {
                     Caption = 'Item Group Tree';
                     RunObject = Page "NPR Item Group Tree";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Item Group Tree action';
                 }
                 action("Item Worksheets")
                 {
                     Caption = 'Item Worksheets';
                     RunObject = Page "NPR Item Worksheets";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Item Worksheets action';
                 }
                 action("Campaign Discount List")
                 {
                     Caption = 'Campaign Discount List';
                     RunObject = Page "NPR Campaign Discount List";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Campaign Discount List action';
                 }
                 action("Mixed Discount List")
                 {
                     Caption = 'Mixed Discount List';
                     RunObject = Page "NPR Mixed Discount List";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Mixed Discount List action';
                 }
                 action("Item Journals")
                 {
@@ -408,6 +451,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     RunPageView = WHERE("Template Type" = CONST(Item),
                                         Recurring = CONST(false));
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Item Journals action';
                 }
                 action("Physical Inventory Journals")
                 {
@@ -416,6 +460,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     RunPageView = WHERE("Template Type" = CONST("Phys. Inventory"),
                                         Recurring = CONST(false));
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Physical Inventory Journals action';
                 }
                 action("Revaluation Journals")
                 {
@@ -424,6 +469,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     RunPageView = WHERE("Template Type" = CONST(Revaluation),
                                         Recurring = CONST(false));
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Revaluation Journals action';
                 }
                 action("Retail Journal List")
                 {
@@ -431,6 +477,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     Image = ResourceJournal;
                     RunObject = Page "NPR Retail Journal List";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Retail Journal List action';
                 }
             }
             group(Magento)
@@ -442,6 +489,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     Caption = 'Sales Orders';
                     RunObject = Page "Sales Order List";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Sales Orders action';
                 }
                 action(Items)
                 {
@@ -449,54 +497,63 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     RunObject = Page "Item List";
                     RunPageView = WHERE("NPR Magento Item" = CONST(true));
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Items action';
                 }
                 action("Item Groups")
                 {
                     Caption = 'Item Groups';
                     RunObject = Page "NPR Magento Categories";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Item Groups action';
                 }
                 action(Brands)
                 {
                     Caption = 'Brands';
                     RunObject = Page "NPR Magento Brands";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Brands action';
                 }
                 action("Custom Options")
                 {
                     Caption = 'Custom Options';
                     RunObject = Page "NPR Magento Custom Option List";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Custom Options action';
                 }
                 action(Attributes)
                 {
                     Caption = 'Attributes';
                     RunObject = Page "NPR Magento Attributes";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Attributes action';
                 }
                 action("Attribute Sets")
                 {
                     Caption = 'Attribute Sets';
                     RunObject = Page "NPR Magento Attribute Sets";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Attribute Sets action';
                 }
                 action("Payment Lines")
                 {
                     Caption = 'Payment Lines';
                     RunObject = Page "NPR Magento Payment Line List";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Payment Lines action';
                 }
                 action("Shipment Method Mapping")
                 {
                     Caption = 'Shipment Method Mapping';
                     RunObject = Page "NPR Magento Shipment Mapping";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Shipment Method Mapping action';
                 }
                 action("Payment Method Mapping")
                 {
                     Caption = 'Payment Method Mapping';
                     RunObject = Page "NPR Magento Payment Mapping";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Payment Method Mapping action';
                 }
 
                 action("NaviDocs Document List")
@@ -504,6 +561,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     Caption = 'NaviDocs Document List';
                     RunObject = Page "NPR NaviDocs Document List";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the NaviDocs Document List action';
                 }
             }
             group(Member)
@@ -515,24 +573,28 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     Caption = 'Members';
                     RunObject = Page "NPR MM Members";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Members action';
                 }
                 action(Memberships)
                 {
                     Caption = 'Memberships';
                     RunObject = Page "NPR MM Memberships";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Memberships action';
                 }
                 action("Member Card List")
                 {
                     Caption = 'Member Card List';
                     RunObject = Page "NPR MM Member Card List";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Member Card List action';
                 }
                 action("MCS Faces")
                 {
                     Caption = 'MCS Faces';
                     RunObject = Page "NPR MCS Faces";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the MCS Faces action';
                 }
             }
             group(Ticket)
@@ -544,42 +606,49 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     Caption = 'Ticket List';
                     RunObject = Page "NPR TM Ticket List";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Ticket List action';
                 }
                 action("Ticket Request")
                 {
                     Caption = 'Ticket Request';
                     RunObject = Page "NPR TM Ticket Request";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Ticket Request action';
                 }
                 action("Ticket Type")
                 {
                     Caption = 'Ticket Type';
                     RunObject = Page "NPR TM Ticket Type";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Ticket Type action';
                 }
                 action("Ticket BOM")
                 {
                     Caption = 'Ticket BOM';
                     RunObject = Page "NPR TM Ticket BOM";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Ticket BOM action';
                 }
                 action("Ticket Admissions")
                 {
                     Caption = 'Ticket Admissions';
                     RunObject = Page "NPR TM Ticket Admissions";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Ticket Admissions action';
                 }
                 action("<Page TM Ticket Access Entry List>")
                 {
                     Caption = 'Ticket Access Entry List';
                     RunObject = Page "NPR TM Ticket AccessEntry List";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Ticket Access Entry List action';
                 }
                 action("Event List")
                 {
                     Caption = 'Event List';
                     RunObject = Page "NPR Event List";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Event List action';
                 }
             }
             group(Finance)
@@ -591,12 +660,14 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     Caption = 'Chart of Accounts';
                     RunObject = Page "Chart of Accounts";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Chart of Accounts action';
                 }
                 action("VAT Statements")
                 {
                     Caption = 'VAT Statements';
                     RunObject = Page "VAT Statement Names";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the VAT Statements action';
                 }
                 action("Bank Accounts")
                 {
@@ -604,6 +675,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     Image = BankAccount;
                     RunObject = Page "Bank Account List";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Bank Accounts action';
                 }
                 action(Currencies)
                 {
@@ -611,6 +683,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     Image = Currency;
                     RunObject = Page Currencies;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Currencies action';
                 }
                 action("Accounting Periods")
                 {
@@ -618,6 +691,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     Image = AccountingPeriods;
                     RunObject = Page "Accounting Periods";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Accounting Periods action';
                 }
                 action(Dimensions)
                 {
@@ -625,6 +699,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     Image = Dimensions;
                     RunObject = Page Dimensions;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Dimensions action';
                 }
                 action("Issued Reminders")
                 {
@@ -632,6 +707,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     Image = OrderReminder;
                     RunObject = Page "Issued Reminder List";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Issued Reminders action';
                 }
                 action("Issued Fin. Charge Memos")
                 {
@@ -639,6 +715,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     Image = PostedMemo;
                     RunObject = Page "Issued Fin. Charge Memo List";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Issued Fin. Charge Memos action';
                 }
                 action("Resource Journals")
                 {
@@ -646,6 +723,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     RunObject = Page "Resource Jnl. Batches";
                     RunPageView = WHERE(Recurring = CONST(false));
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Resource Journals action';
                 }
                 action("FA Journals")
                 {
@@ -653,6 +731,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     RunObject = Page "FA Journal Batches";
                     RunPageView = WHERE(Recurring = CONST(false));
                     ApplicationArea = All;
+                    ToolTip = 'Executes the FA Journals action';
                 }
                 action("Cash Receipt Journals")
                 {
@@ -662,6 +741,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     RunPageView = WHERE("Template Type" = CONST("Cash Receipts"),
                                         Recurring = CONST(false));
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Cash Receipt Journals action';
                 }
                 action("Payment Journals")
                 {
@@ -671,6 +751,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     RunPageView = WHERE("Template Type" = CONST(Payments),
                                         Recurring = CONST(false));
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Payment Journals action';
                 }
                 action("General Journals")
                 {
@@ -680,6 +761,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     RunPageView = WHERE("Template Type" = CONST(General),
                                         Recurring = CONST(false));
                     ApplicationArea = All;
+                    ToolTip = 'Executes the General Journals action';
                 }
                 action("Recurring Journals")
                 {
@@ -688,6 +770,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     RunPageView = WHERE("Template Type" = CONST(General),
                                         Recurring = CONST(true));
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Recurring Journals action';
                 }
             }
             group(ActionGroup6014529)
@@ -699,48 +782,56 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     Caption = 'Customers';
                     RunObject = Page "Customer List";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Customers action';
                 }
                 action("Salespeople/Purchasers")
                 {
                     Caption = 'Salespeople/Purchasers';
                     RunObject = Page "Salespersons/Purchasers";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Salespeople/Purchasers action';
                 }
                 action("Contact List ")
                 {
                     Caption = 'Contact List';
                     RunObject = Page "Contact List";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Contact List action';
                 }
                 action(Orders)
                 {
                     Caption = 'Orders';
                     RunObject = Page "Sales Order List";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Orders action';
                 }
                 action(Invoices)
                 {
                     Caption = 'Invoices';
                     RunObject = Page "Sales Invoice List";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Invoices action';
                 }
                 action("Return Orders")
                 {
                     Caption = 'Return Orders';
                     RunObject = Page "Sales Return Order List";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Return Orders action';
                 }
                 action("Credit Memos")
                 {
                     Caption = 'Credit Memos';
                     RunObject = Page "Sales Credit Memos";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Credit Memos action';
                 }
                 action("Customer Invoice Discount")
                 {
                     Caption = 'Customer Invoice Discount';
                     RunObject = Page "Cust. Invoice Discounts";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Customer Invoice Discount action';
                 }
                 action("Posted Sales Shipments")
                 {
@@ -748,6 +839,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     Image = PostedShipment;
                     RunObject = Page "Posted Sales Shipments";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Posted Sales Shipments action';
                 }
                 action("Posted Sales Invoices")
                 {
@@ -755,12 +847,14 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     Image = PostedOrder;
                     RunObject = Page "Posted Sales Invoices";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Posted Sales Invoices action';
                 }
                 action("Posted Sales Return Orders")
                 {
                     Caption = 'Posted Sales Return Orders';
                     RunObject = Page "Posted Return Receipts";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Posted Sales Return Orders action';
                 }
                 action("Posted Sales Credit Memos")
                 {
@@ -768,6 +862,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     Image = PostedOrder;
                     RunObject = Page "Posted Sales Credit Memos";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Posted Sales Credit Memos action';
                 }
             }
             group(Purchase)
@@ -779,54 +874,63 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     Caption = 'Vendor List';
                     RunObject = Page "Vendor List";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Vendor List action';
                 }
                 action("Purchase Orders")
                 {
                     Caption = 'Purchase Orders';
                     RunObject = Page "Purchase Order List";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Purchase Orders action';
                 }
                 action("Purchase Return Orders")
                 {
                     Caption = 'Purchase Return Orders';
                     RunObject = Page "Purchase Return Order List";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Purchase Return Orders action';
                 }
                 action("Purchase Invoices")
                 {
                     Caption = 'Purchase Invoices';
                     RunObject = Page "Purchase Invoices";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Purchase Invoices action';
                 }
                 action("Purchase Credit Memos")
                 {
                     Caption = 'Purchase Credit Memos';
                     RunObject = Page "Purchase Credit Memos";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Purchase Credit Memos action';
                 }
                 action("Posted Purchase Receipts")
                 {
                     Caption = 'Posted Purchase Receipts';
                     RunObject = Page "Posted Purchase Receipts";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Posted Purchase Receipts action';
                 }
                 action("Posted Purchase Invoices")
                 {
                     Caption = 'Posted Purchase Invoices';
                     RunObject = Page "Posted Purchase Invoices";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Posted Purchase Invoices action';
                 }
                 action("Posted Return Shipments")
                 {
                     Caption = 'Posted Return Shipments';
                     RunObject = Page "Posted Return Shipments";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Posted Return Shipments action';
                 }
                 action("Posted Purchase Credit Memos")
                 {
                     Caption = 'Posted Purchase Credit Memos';
                     RunObject = Page "Posted Purchase Credit Memos";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Posted Purchase Credit Memos action';
                 }
             }
             group(Administration)
@@ -839,24 +943,28 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     Image = UserSetup;
                     RunObject = Page "User Setup";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the User Setup action';
                 }
                 action("Membership Setup")
                 {
                     Caption = 'Membership Setup';
                     RunObject = Page "NPR MM Membership Setup";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Membership Setup action';
                 }
                 action("Data Templates List")
                 {
                     Caption = 'Data Templates List';
                     RunObject = Page "Config. Template List";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Data Templates List action';
                 }
                 action("Reason Codes")
                 {
                     Caption = 'Reason Codes';
                     RunObject = Page "Reason Codes";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Reason Codes action';
                 }
                 action("Extended Texts")
                 {
@@ -864,24 +972,28 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     Image = Text;
                     RunObject = Page "Extended Text List";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Extended Texts action';
                 }
                 action("POS Stores")
                 {
                     Caption = 'POS Stores';
                     RunObject = Page "NPR POS Store List";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the POS Stores action';
                 }
                 action("POS Units")
                 {
                     Caption = 'POS Units';
                     RunObject = Page "NPR POS Unit List";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the POS Units action';
                 }
                 action("Stock-Take Configurations")
                 {
                     Caption = 'Stock-Take Configurations';
                     RunObject = Page "NPR Stock-Take Configs";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Stock-Take Configurations action';
                 }
             }
         }
@@ -897,6 +1009,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                 RunObject = Page "Sales Order";
                 RunPageMode = Create;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Sales &Order action';
             }
             action("Sales &Return Order")
             {
@@ -905,6 +1018,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                 RunObject = Page "Sales Return Order";
                 RunPageMode = Create;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Sales &Return Order action';
             }
             action("Sales Credit &Memo")
             {
@@ -916,6 +1030,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                 RunObject = Page "Sales Credit Memo";
                 RunPageMode = Create;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Sales Credit &Memo action';
             }
             action("&Transfer Order")
             {
@@ -926,6 +1041,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                 RunObject = Page "Transfer Order";
                 RunPageMode = Create;
                 ApplicationArea = All;
+                ToolTip = 'Executes the &Transfer Order action';
             }
             separator(Separator6014494)
             {
@@ -940,6 +1056,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                 RunObject = Page "Purchase Order";
                 RunPageMode = Create;
                 ApplicationArea = All;
+                ToolTip = 'Executes the &Purchase Order action';
             }
             action("Purchase Credit Memo")
             {
@@ -947,6 +1064,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                 Image = PurchaseTaxStatement;
                 RunObject = Page "Purchase Credit Memo";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Purchase Credit Memo action';
             }
             action("Purchase Return Order")
             {
@@ -954,6 +1072,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                 Image = Document;
                 RunObject = Page "Purchase Return Order";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Purchase Return Order action';
             }
         }
         area(processing)
@@ -964,6 +1083,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                 Image = AdjustItemCost;
                 RunObject = Report "Adjust Item Costs/Prices";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Adjust &Item Costs/Prices action';
             }
             action("Adjust &Cost - Item Entries")
             {
@@ -971,6 +1091,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                 Image = AdjustEntries;
                 RunObject = Report "Adjust Cost - Item Entries";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Adjust &Cost - Item Entries action';
             }
             action("Application Worksheet")
             {
@@ -979,6 +1100,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                 RunObject = Page "Application Worksheet";
                 Visible = false;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Application Worksheet action';
             }
             separator(Separator6014441)
             {
@@ -992,6 +1114,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                 RunObject = Page "General Ledger Setup";
                 Visible = false;
                 ApplicationArea = All;
+                ToolTip = 'Executes the General Le&dger Setup action';
             }
             action("S&ales && Receivables Setup")
             {
@@ -1000,6 +1123,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                 RunObject = Page "Sales & Receivables Setup";
                 Visible = false;
                 ApplicationArea = All;
+                ToolTip = 'Executes the S&ales && Receivables Setup action';
             }
             action("Company Information")
             {
@@ -1008,6 +1132,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                 RunObject = Page "Company Information";
                 Visible = false;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Company Information action';
             }
             separator(History)
             {
@@ -1020,6 +1145,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                 Image = Navigate;
                 RunObject = Page Navigate;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Navi&gate action';
             }
             action("NP Retail Setup")
             {
@@ -1027,6 +1153,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                 Image = Setup;
                 RunObject = Page "NPR NP Retail Setup";
                 ApplicationArea = All;
+                ToolTip = 'Executes the NP Retail Setup action';
             }
             action(Action6014574)
             {
@@ -1034,6 +1161,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                 Image = CompanyInformation;
                 RunObject = Page "Company Information";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Company Information action';
             }
             group(Retail)
             {
@@ -1045,6 +1173,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     Image = Setup;
                     RunObject = Page "NPR NP Retail Setup";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the NP Retail Setup action';
                 }
             }
             group(Sales)
@@ -1057,6 +1186,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     Image = "Report";
                     RunObject = Report "Standard Sales - Invoice";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Sales - Invoice action';
                 }
                 action("Period Discount Statistics")
                 {
@@ -1064,6 +1194,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     Image = "Report";
                     RunObject = Report "NPR Period Discount Stat.";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Period Discount Statistics action';
                 }
                 action("Sales per week year/Last year")
                 {
@@ -1071,6 +1202,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     Image = "Report";
                     RunObject = Report "NPR Sales per week year/Last";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Sales per week year/Last year action';
                 }
                 action("Sales Stat/Analysis")
                 {
@@ -1078,6 +1210,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     Image = "Report";
                     RunObject = Report "NPR Sales Stat/Analysis";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Sales Stat/Analysis action';
                 }
                 action("Sales Statistics Per Variety")
                 {
@@ -1085,6 +1218,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     Image = "Report";
                     RunObject = Report "NPR Sales Stats Per Variety";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Sales Statistics Per Variety action';
                 }
                 action("Return Reason Code Statistics")
                 {
@@ -1092,6 +1226,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     Image = "Report";
                     RunObject = Report "NPR Return Reason Code Stat.";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Return Reason Code Statistics action';
                 }
             }
             group(Item)
@@ -1104,6 +1239,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     Image = "Report";
                     RunObject = Report "NPR Inventory by age";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Inventory by age action';
                 }
                 action("Item Group Overview")
                 {
@@ -1111,6 +1247,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     Image = "Report";
                     RunObject = Report "NPR Item Group Overview";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Item Group Overview action';
                 }
                 action("Inventory per Date")
                 {
@@ -1118,6 +1255,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     Image = "Report";
                     RunObject = Report "NPR Inventory per Date";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Inventory per Date action';
                 }
                 action("Item Group Stat M/Y")
                 {
@@ -1125,6 +1263,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     Image = "Report";
                     RunObject = Report "NPR Item Group Stat M/Y";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Item Group Stat M/Y action';
                 }
                 action("Sales Person Trn. by Item Gr.")
                 {
@@ -1132,6 +1271,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     Image = "Report";
                     RunObject = Report "NPR S.Person Trx by Item Gr.";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Sales Person Trn. by Item Gr. action';
                 }
                 action("Item Group Inventory Value")
                 {
@@ -1139,6 +1279,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     Image = "Report";
                     RunObject = Report "NPR Item Group Inv. Value";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Item Group Inventory Value action';
                 }
                 action("Item Barcode Status Sheet")
                 {
@@ -1146,6 +1287,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     Image = "Report";
                     RunObject = Report "NPR Item Barcode Status Sheet";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Item Barcode Status Sheet action';
                 }
                 action("Item Replenishment by Store")
                 {
@@ -1153,6 +1295,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     Image = "Report";
                     RunObject = Report "NPR Item Replenish. by Store";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Item Replenishment by Store action';
                 }
                 action("Lager Kampagnestat")
                 {
@@ -1160,6 +1303,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     Image = "Report";
                     RunObject = Report "NPR Inventory Campaign Stat.";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Lager Kampagnestat action';
                 }
                 action("Item - Loss")
                 {
@@ -1167,6 +1311,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     Image = "Report";
                     RunObject = Report "NPR Item - Loss";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Item - Loss action';
                 }
                 action("Item Loss - Return Reason")
                 {
@@ -1174,6 +1319,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     Image = "Report";
                     RunObject = Report "NPR Item Loss - Ret. Reason";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Item Loss - Return Reason action';
                 }
                 action("Inventory per Variant at date")
                 {
@@ -1181,6 +1327,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     Image = "Report";
                     RunObject = Report "NPR Inventory per Variant/date";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Inventory per Variant at date action';
                 }
                 action("Adjust Cost - Item Entries TQ")
                 {
@@ -1188,6 +1335,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     Image = "Report";
                     RunObject = Report "NPR Adjust Cost: ItemEntriesTQ";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Adjust Cost - Item Entries TQ action';
                 }
             }
             group(Vendor)
@@ -1200,6 +1348,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     Image = "Report";
                     RunObject = Report "NPR Sale Statistics per Vendor";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Sales Statistics per Vendor action';
                 }
                 action("Vendor Sales Stat")
                 {
@@ -1207,6 +1356,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     Image = "Report";
                     RunObject = Report "NPR Vendor Sales Stat";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Vendor Sales Stat action';
                 }
                 action("Vendor Top/Sale")
                 {
@@ -1214,6 +1364,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     Image = "Report";
                     RunObject = Report "NPR Vendor Top/Sale";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Vendor Top/Sale action';
                 }
                 action("Vendor/Item Group")
                 {
@@ -1221,6 +1372,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     Image = "Report";
                     RunObject = Report "NPR Vendor/Item Group";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Vendor/Item Group action';
                 }
                 action("Vendor trn. by Item group")
                 {
@@ -1228,6 +1380,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     Image = "Report";
                     RunObject = Report "NPR Vendor trx by Item group";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Vendor trn. by Item group action';
                 }
                 action("Vendor/Salesperson")
                 {
@@ -1235,6 +1388,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     Image = "Report";
                     RunObject = Report "NPR Vendor/Salesperson";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Vendor/Salesperson action';
                 }
             }
         }

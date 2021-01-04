@@ -683,12 +683,14 @@ report 6014545 "NPR Acc. Statement w FIK-Card"
                     {
                         Caption = 'Show Overdue Entries';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Show Overdue Entries field';
                     }
                     field(PrintAllHavingEntry; PrintAllHavingEntry)
                     {
                         Caption = 'Include All Customers with Ledger Entries';
                         MultiLine = true;
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Include All Customers with Ledger Entries field';
 
                         trigger OnValidate()
                         begin
@@ -701,6 +703,7 @@ report 6014545 "NPR Acc. Statement w FIK-Card"
                         Caption = 'Include All Customers with a Balance';
                         MultiLine = true;
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Include All Customers with a Balance field';
 
                         trigger OnValidate()
                         begin
@@ -712,33 +715,39 @@ report 6014545 "NPR Acc. Statement w FIK-Card"
                     {
                         Caption = 'Include Reversed Entries';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Include Reversed Entries field';
                     }
                     field(PrintUnappliedEntries; PrintUnappliedEntries)
                     {
                         Caption = 'Include Unapplied Entries';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Include Unapplied Entries field';
                     }
                     field(IncludeAgingBand; IncludeAgingBand)
                     {
                         Caption = 'Include Aging Band';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Include Aging Band field';
                     }
                     field(PeriodLength; PeriodLength)
                     {
                         Caption = 'Aging Band Period Length';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Aging Band Period Length field';
                     }
                     field(DateChoice; DateChoice)
                     {
                         Caption = 'Aging Band by';
                         OptionCaption = 'Due Date,Posting Date';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Aging Band by field';
                     }
                     field(LogInteraction; LogInteraction)
                     {
                         Caption = 'Log Interaction';
                         Enabled = LogInteractionEnable;
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Log Interaction field';
                     }
                 }
                 group("Output Options")
@@ -749,6 +758,7 @@ report 6014545 "NPR Acc. Statement w FIK-Card"
                         Caption = 'Report Output';
                         OptionCaption = 'Print,Preview,PDF,Email,Excel,XML';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Report Output field';
 
                         trigger OnValidate()
                         var
@@ -777,6 +787,7 @@ report 6014545 "NPR Acc. Statement w FIK-Card"
                         Caption = 'Chosen Output';
                         Visible = false;
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Chosen Output field';
                     }
                     group(EmailOptions)
                     {
@@ -786,6 +797,7 @@ report 6014545 "NPR Acc. Statement w FIK-Card"
                         {
                             Caption = 'Print remaining statements';
                             ApplicationArea = All;
+                            ToolTip = 'Specifies the value of the Print remaining statements field';
                         }
                     }
                 }

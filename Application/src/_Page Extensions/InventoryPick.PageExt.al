@@ -9,6 +9,7 @@ pageextension 6014480 "NPR Inventory Pick" extends "Inventory Pick"
             field("NPR Assigned User ID"; "Assigned User ID")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the Assigned User ID field';
             }
         }
     }
@@ -27,6 +28,7 @@ pageextension 6014480 "NPR Inventory Pick" extends "Inventory Pick"
                 RunPageLink = Type = FIELD(Type),
                               "No." = FIELD("No.");
                 ApplicationArea = All;
+                ToolTip = 'Executes the Scan action';
             }
         }
     }

@@ -1,4 +1,4 @@
-﻿page 6059784 "NPR TM Ticket Type"
+page 6059784 "NPR TM Ticket Type"
 {
 
     Caption = 'Ticket Type';
@@ -16,84 +16,104 @@
                 field("Code"; Code)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Related Ticket Type"; "Related Ticket Type")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Related Ticket Type field';
                 }
                 field("Print Ticket"; "Print Ticket")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Print Ticket field';
                 }
                 field("Print Object Type"; "Print Object Type")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Print Objekt Type field';
                 }
                 field("RP Template Code"; "RP Template Code")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the RP Template Code field';
                 }
                 field("Print Object ID"; "Print Object ID")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Print Object ID field';
                 }
                 field("Admission Registration"; "Admission Registration")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Admission Registration field';
                 }
                 field("No. Series"; "No. Series")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the No. Series field';
                 }
                 field("External Ticket Pattern"; "External Ticket Pattern")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the External Ticket Pattern field';
                 }
                 field("Activation Method"; "Activation Method")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Activation Method field';
                 }
                 field("Ticket Configuration Source"; "Ticket Configuration Source")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Ticket Configuration Source field';
                 }
                 field("Duration Formula"; "Duration Formula")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Duration Formula field';
                 }
                 field("Ticket Entry Validation"; "Ticket Entry Validation")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Ticket Entry Validation field';
                 }
                 field("Max No. Of Entries"; "Max No. Of Entries")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Max No. Of Entries field';
                 }
                 field("Is Ticket"; "Is Ticket")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Ticket field';
                 }
                 field("Membership Sales Item No."; "Membership Sales Item No.")
                 {
                     ApplicationArea = NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Membership Sales Item No. field';
                 }
                 field("DIY Print Layout Code"; "DIY Print Layout Code")
                 {
                     ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Ticket Layout Code field';
                 }
                 field("eTicket Activated"; "eTicket Activated")
                 {
                     ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the eTicket Activated field';
                 }
                 field("eTicket Type Code"; "eTicket Type Code")
                 {
                     ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the eTicket Type Code field';
                 }
             }
         }

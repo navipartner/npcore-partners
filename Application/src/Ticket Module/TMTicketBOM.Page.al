@@ -1,4 +1,4 @@
-﻿page 6060121 "NPR TM Ticket BOM"
+page 6060121 "NPR TM Ticket BOM"
 {
     // TM1.00/TSA/20151217  CASE 228982 NaviPartner Ticket Management
     // TM1.07/TSA/20160125  CASE 232495 Added field Default for auto selection for admission code
@@ -38,107 +38,132 @@
                 field("Item No."; "Item No.")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Item No. field';
                 }
                 field("Variant Code"; "Variant Code")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Variant Code field';
                 }
                 field("Admission Code"; "Admission Code")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Admission Code field';
                 }
                 field(Default; Default)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Default field';
                 }
                 field("Sales From Date"; "Sales From Date")
                 {
                     ApplicationArea = NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Sales From Date field';
                 }
                 field("Sales Until Date"; "Sales Until Date")
                 {
                     ApplicationArea = NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Sales Until Date field';
                 }
                 field("Enforce Schedule Sales Limits"; "Enforce Schedule Sales Limits")
                 {
                     ApplicationArea = NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Enforce Schedule Sales Limits field';
                 }
                 field("Admission Entry Validation"; "Admission Entry Validation")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Admission Entry Validation field';
                 }
                 field("Activation Method"; "Activation Method")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Activation Method field';
                 }
                 field("Percentage of Adm. Capacity"; "Percentage of Adm. Capacity")
                 {
                     ApplicationArea = NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Percentage of Adm. Capacity field';
                 }
                 field("Max No. Of Entries"; "Max No. Of Entries")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Max No. Of Entries field';
                 }
                 field("Admission Dependency Code"; "Admission Dependency Code")
                 {
                     ApplicationArea = NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Admission Dependency Code field';
                 }
                 field("Revisit Condition (Statistics)"; "Revisit Condition (Statistics)")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Revisit Condition (Statistics) field';
                 }
                 field("Duration Formula"; "Duration Formula")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Duration Formula field';
                 }
                 field("Allow Rescan Within (Sec.)"; "Allow Rescan Within (Sec.)")
                 {
                     ApplicationArea = NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Allow Rescan Within (Sec.) field';
                 }
                 field("Prefered Sales Display Method"; "Prefered Sales Display Method")
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Prefered Sales Display Method field';
                 }
                 field(Quantity; Quantity)
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Quantity field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Admission Description"; "Admission Description")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Admission Description field';
                 }
                 field("Reschedule Policy"; "Reschedule Policy")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Reschedule Policy field';
                 }
                 field("Reschedule Cut-Off (Hours)"; "Reschedule Cut-Off (Hours)")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Reschedule Cut-Off (Hours) field';
                 }
                 field("Revoke Policy"; "Revoke Policy")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Revoke Policy field';
                 }
                 field("Refund Price %"; "Refund Price %")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Refund Price % field';
                 }
                 field("Ticket Base Calendar Code"; "Ticket Base Calendar Code")
                 {
                     ApplicationArea = NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Ticket Base Calendar Code field';
                 }
                 field("Ticket Customized Calendar"; CalendarMgmt.CustomizedChangesExist(CustomizedCalendarChangeTemp))
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     Caption = 'Customized Calendar';
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Customized Calendar field';
 
                     trigger OnDrillDown()
                     begin
@@ -150,14 +175,17 @@
                 field("Publish As eTicket"; "Publish As eTicket")
                 {
                     ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Publish As eTicket field';
                 }
                 field("eTicket Type Code"; "eTicket Type Code")
                 {
                     ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the eTicket Type Code field';
                 }
                 field("Publish Ticket URL"; "Publish Ticket URL")
                 {
                     ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Publish Ticket URL field';
                 }
             }
         }

@@ -16,25 +16,30 @@ page 6014608 "NPR Attribute Values"
                 field("Attribute Code"; "Attribute Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Attribute Code field';
                 }
                 field("Text Value"; "Text Value")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Text Value field';
                 }
                 field("Datetime Value"; "Datetime Value")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Datetime Value field';
                 }
                 field("Numeric Value"; "Numeric Value")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Numeric Value field';
                 }
                 field("Boolean Value"; "Boolean Value")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Boolean Value field';
                 }
             }
         }

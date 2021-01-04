@@ -17,6 +17,7 @@ page 6059831 "NPR Event Period Distr. Dialog"
                 {
                     ApplicationArea = All;
                     Caption = 'Starting Date';
+                    ToolTip = 'Specifies the value of the Starting Date field';
 
                     trigger OnValidate()
                     begin
@@ -29,6 +30,7 @@ page 6059831 "NPR Event Period Distr. Dialog"
                 {
                     ApplicationArea = All;
                     Caption = 'Ending Date';
+                    ToolTip = 'Specifies the value of the Ending Date field';
 
                     trigger OnValidate()
                     begin
@@ -41,6 +43,7 @@ page 6059831 "NPR Event Period Distr. Dialog"
                 {
                     ApplicationArea = All;
                     Caption = 'Starting Time';
+                    ToolTip = 'Specifies the value of the Starting Time field';
 
                     trigger OnValidate()
                     begin
@@ -52,6 +55,7 @@ page 6059831 "NPR Event Period Distr. Dialog"
                 {
                     ApplicationArea = All;
                     Caption = 'Ending Time';
+                    ToolTip = 'Specifies the value of the Ending Time field';
 
                     trigger OnValidate()
                     begin
@@ -63,16 +67,19 @@ page 6059831 "NPR Event Period Distr. Dialog"
                 {
                     ApplicationArea = All;
                     Caption = 'Unit of Measure';
+                    ToolTip = 'Specifies the value of the Unit of Measure field';
                 }
                 field(Quantity; JobPlanningLineTemp.Quantity)
                 {
                     ApplicationArea = All;
                     Caption = 'Quantity';
+                    ToolTip = 'Specifies the value of the Quantity field';
                 }
                 field(DaysOfTheWeek; DaysOfWeekOption)
                 {
                     ApplicationArea = All;
                     Caption = 'Days Of The Week';
+                    ToolTip = 'Specifies the value of the Days Of The Week field';
 
                     trigger OnValidate()
                     var
@@ -91,42 +98,49 @@ page 6059831 "NPR Event Period Distr. Dialog"
                     ApplicationArea = All;
                     Caption = 'Monday';
                     Enabled = DaysArrayEnabled;
+                    ToolTip = 'Specifies the value of the Monday field';
                 }
                 field(Tuesday; DaysOfWeek[2])
                 {
                     ApplicationArea = All;
                     Caption = 'Tuesday';
                     Enabled = DaysArrayEnabled;
+                    ToolTip = 'Specifies the value of the Tuesday field';
                 }
                 field(Wednesday; DaysOfWeek[3])
                 {
                     ApplicationArea = All;
                     Caption = 'Wednesday';
                     Enabled = DaysArrayEnabled;
+                    ToolTip = 'Specifies the value of the Wednesday field';
                 }
                 field(Thursday; DaysOfWeek[4])
                 {
                     ApplicationArea = All;
                     Caption = 'Thursday';
                     Enabled = DaysArrayEnabled;
+                    ToolTip = 'Specifies the value of the Thursday field';
                 }
                 field(Friday; DaysOfWeek[5])
                 {
                     ApplicationArea = All;
                     Caption = 'Friday';
                     Enabled = DaysArrayEnabled;
+                    ToolTip = 'Specifies the value of the Friday field';
                 }
                 field(Saturday; DaysOfWeek[6])
                 {
                     ApplicationArea = All;
                     Caption = 'Saturday';
                     Enabled = DaysArrayEnabled;
+                    ToolTip = 'Specifies the value of the Saturday field';
                 }
                 field(Sunday; DaysOfWeek[7])
                 {
                     ApplicationArea = All;
                     Caption = 'Sunday';
                     Enabled = DaysArrayEnabled;
+                    ToolTip = 'Specifies the value of the Sunday field';
                 }
             }
         }

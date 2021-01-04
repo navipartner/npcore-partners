@@ -18,31 +18,37 @@ page 6151607 "NPR NpDc ExtraItemQty. Subform"
                 field(Type; Type)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Type field';
                 }
                 field("No."; "No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the No. field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Item Description field';
                 }
                 field("Unit Price"; "Unit Price")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Unit Price field';
                 }
                 field("Profit %"; "Profit %")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Profit % field';
                 }
                 field("Qty. per Lot"; "Validation Quantity")
                 {
                     ApplicationArea = All;
                     Caption = 'Qty. per Lot';
                     Visible = (LotValidation);
+                    ToolTip = 'Specifies the value of the Qty. per Lot field';
                 }
             }
         }
@@ -60,6 +66,7 @@ page 6151607 "NPR NpDc ExtraItemQty. Subform"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Add Items action';
 
                 trigger OnAction()
                 begin

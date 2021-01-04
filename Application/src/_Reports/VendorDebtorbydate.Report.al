@@ -144,21 +144,25 @@ report 6014434 "NPR Vendor/Debtor by date"
                     {
                         Caption = 'To Date';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the To Date field';
                     }
                     field(Kunmedsaldo; Kunmedsaldo)
                     {
                         Caption = 'Only With Balance';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Only With Balance field';
                     }
                     field(PrintKreditor; PrintKreditor)
                     {
                         Caption = 'Creditor';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Creditor field';
                     }
                     field(PrintDebitor; PrintDebitor)
                     {
                         Caption = 'Customer';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Customer field';
                     }
                 }
             }

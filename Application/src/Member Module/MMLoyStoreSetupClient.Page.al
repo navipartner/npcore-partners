@@ -16,34 +16,42 @@ page 6151162 "NPR MM Loy. Store Setup Client"
                 field("Store Code"; "Store Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Store Code field';
                 }
                 field("Unit Code"; "Unit Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Unit Code field';
                 }
                 field(Setup; Setup)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Setup field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Authorization Code"; "Authorization Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Authorization Code field';
                 }
                 field("Accept Client Transactions"; "Accept Client Transactions")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Accept Client Transactions field';
                 }
                 field("POS Payment Method Code"; "POS Payment Method Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the POS Payment Method Code field';
                 }
                 field("Store Endpoint Code"; "Store Endpoint Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Store Endpoint Code field';
                 }
             }
         }
@@ -64,6 +72,7 @@ page 6151162 "NPR MM Loy. Store Setup Client"
                 RunObject = Page "NPR MM Loyalty Server Trx Log";
                 RunPageLink = "POS Store Code" = FIELD("Store Code");
                 ApplicationArea = All;
+                ToolTip = 'Executes the Transaction Log action';
             }
         }
     }

@@ -1,4 +1,4 @@
-﻿page 6151135 "NPR TM Admis. Forecast Matrix"
+page 6151135 "NPR TM Admis. Forecast Matrix"
 {
     // TM1.48/TSA /20200625 CASE 409741 Initial Version
 
@@ -19,6 +19,7 @@
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Admission Code';
                     TableRelation = "NPR TM Admission";
+                    ToolTip = 'Specifies the value of the Admission Code field';
 
                     trigger OnValidate()
                     begin
@@ -35,6 +36,7 @@
                         ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                         Caption = 'Display Option';
                         OptionCaption = 'Sales,Reservations,Utilization Pct.,Capacity Pct.';
+                        ToolTip = 'Specifies the value of the Display Option field';
 
                         trigger OnValidate()
                         begin
@@ -47,6 +49,7 @@
                         ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                         Caption = 'Periodtype';
                         OptionCaption = 'Actual,Day,Week,Month,Quarter,Year';
+                        ToolTip = 'Specifies the value of the Periodtype field';
 
                         trigger OnValidate()
                         begin

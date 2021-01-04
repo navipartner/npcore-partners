@@ -15,18 +15,22 @@ page 6151187 "NPR MM Member Comm. Setup"
                 field("Membership Code"; "Membership Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Membership Code field';
                 }
                 field("Message Type"; "Message Type")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Message Type field';
                 }
                 field("Preferred Method"; "Preferred Method")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Preferred Method field';
                 }
                 field("Notification Engine"; "Notification Engine")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Notification Engine field';
                 }
             }
         }

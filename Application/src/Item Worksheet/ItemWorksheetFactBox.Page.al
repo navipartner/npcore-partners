@@ -16,18 +16,22 @@ page 6060051 "NPR Item Worksheet FactBox"
             field("Item No."; "Item No.")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the Item No. field';
             }
             field("Existing Item No."; "Existing Item No.")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the Existing Item No. field';
             }
             field(Inventory; RecExItem.Inventory)
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the RecExItem.Inventory field';
             }
             field(Description; Description)
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the Description field';
             }
             field(ItemDescription; RecTempItem.Description)
             {
@@ -35,10 +39,12 @@ page 6060051 "NPR Item Worksheet FactBox"
                 CaptionClass = ExItemDescription;
                 Style = Attention;
                 StyleExpr = TRUE;
+                ToolTip = 'Specifies the value of the RecTempItem.Description field';
             }
             field("Sales Price"; "Sales Price")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the Unit Price field';
             }
             field("RecTempItem.""Unit Price"""; RecTempItem."Unit Price")
             {
@@ -48,10 +54,12 @@ page 6060051 "NPR Item Worksheet FactBox"
                 ShowCaption = false;
                 Style = Attention;
                 StyleExpr = TRUE;
+                ToolTip = 'Specifies the value of the RecTempItem.Unit Price field';
             }
             field("Direct Unit Cost"; "Direct Unit Cost")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the Direct Unit Cost field';
             }
             field("Last unit cost"; RecTempItem."Last Direct Cost")
             {
@@ -60,24 +68,29 @@ page 6060051 "NPR Item Worksheet FactBox"
                 CaptionClass = ExItemUnitCost;
                 Style = Attention;
                 StyleExpr = TRUE;
+                ToolTip = 'Specifies the value of the RecTempItem.Last Direct Cost field';
             }
             field("Variety Lines to Skip"; "Variety Lines to Skip")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the Variety Lines to Skip field';
             }
             field("Variety Lines to Update"; "Variety Lines to Update")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the Variety Lines to Update field';
             }
             field("Variety Lines to Create"; "Variety Lines to Create")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the Variety Lines to Create field';
             }
             field("No. of Changes"; "No. of Changes")
             {
                 ApplicationArea = All;
                 BlankZero = true;
                 CaptionClass = ExNoOfChanges;
+                ToolTip = 'Specifies the value of the No. of Changes field';
             }
             field("No. of Warnings"; "No. of Warnings")
             {
@@ -86,6 +99,7 @@ page 6060051 "NPR Item Worksheet FactBox"
                 CaptionClass = ExNoOfWarnings;
                 Style = Attention;
                 StyleExpr = TRUE;
+                ToolTip = 'Specifies the value of the No. of Warnings field';
             }
         }
     }

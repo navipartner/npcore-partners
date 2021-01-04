@@ -17,15 +17,18 @@ page 6151462 "NPR Magento Setup PostOnImport"
                 field(Type; Type)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Type field';
                 }
                 field("No."; "No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the No. field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
             }
         }

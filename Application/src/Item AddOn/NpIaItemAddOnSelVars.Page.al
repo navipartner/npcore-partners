@@ -18,6 +18,7 @@ page 6151119 "NPR NpIa ItemAddOn Sel. Vars."
                 Editable = false;
                 MultiLine = true;
                 ShowCaption = false;
+                ToolTip = 'Specifies the value of the '''' field';
             }
             repeater(Group)
             {

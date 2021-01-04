@@ -14,34 +14,41 @@ page 6014622 "NPR POS Web Fonts"
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field("Company Name"; "Company Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Company Name field';
                 }
                 field(Name; Name)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Name field';
                 }
                 field("Font Face"; "Font Face")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Font Face field';
                 }
                 field(Prefix; Prefix)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Prefix field';
                 }
                 field("FORMAT(WoffHasValue)"; Format(WoffHasValue))
                 {
                     ApplicationArea = All;
                     Caption = 'Woff Exists';
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Woff Exists field';
                 }
                 field("FORMAT(CssHasValue)"; Format(CssHasValue))
                 {
                     ApplicationArea = All;
                     Caption = 'Css Exists';
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Css Exists field';
                 }
             }
         }
@@ -62,6 +69,7 @@ page 6014622 "NPR POS Web Fonts"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Import Font action';
 
                     trigger OnAction()
                     begin
@@ -77,6 +85,7 @@ page 6014622 "NPR POS Web Fonts"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Export Font action';
 
                     trigger OnAction()
                     begin
@@ -92,6 +101,7 @@ page 6014622 "NPR POS Web Fonts"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Remove Font action';
 
                     trigger OnAction()
                     begin
@@ -110,6 +120,7 @@ page 6014622 "NPR POS Web Fonts"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Import Stylesheet action';
 
                     trigger OnAction()
                     begin
@@ -125,6 +136,7 @@ page 6014622 "NPR POS Web Fonts"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Export Stylesheet action';
 
                     trigger OnAction()
                     begin
@@ -140,6 +152,7 @@ page 6014622 "NPR POS Web Fonts"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Remove Stylesheet action';
 
                     trigger OnAction()
                     begin
@@ -155,6 +168,7 @@ page 6014622 "NPR POS Web Fonts"
                     Caption = 'Export Font Configuration';
                     Image = Export;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Export Font Configuration action';
                     //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                     //PromotedCategory = Process;
                     //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
@@ -170,6 +184,7 @@ page 6014622 "NPR POS Web Fonts"
                     Caption = 'Import Font Configuration';
                     Image = Import;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Import Font Configuration action';
                     //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                     //PromotedCategory = Process;
                     //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
@@ -188,6 +203,7 @@ page 6014622 "NPR POS Web Fonts"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Export Managed Dependency Manifest action';
 
                     trigger OnAction()
                     var

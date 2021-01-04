@@ -19,22 +19,27 @@ page 6150741 "NPR POS Admin. Template List"
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Id field';
                 }
                 field(Name; Name)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Name field';
                 }
                 field(Version; Version)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Version field';
                 }
                 field(Status; Status)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Status field';
                 }
                 field("Persist on Client"; "Persist on Client")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Persist on Client field';
                 }
             }
         }
@@ -54,6 +59,7 @@ page 6150741 "NPR POS Admin. Template List"
                 RunObject = Page "NPR POS Admin. Template Scopes";
                 RunPageLink = "POS Admin. Template Id" = FIELD(Id);
                 ApplicationArea = All;
+                ToolTip = 'Executes the Scopes action';
             }
         }
     }

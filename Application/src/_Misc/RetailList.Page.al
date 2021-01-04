@@ -26,6 +26,7 @@ page 6014579 "NPR Retail List"
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Choice field';
                 }
                 field(Chosen; Chosen)
                 {
@@ -33,6 +34,7 @@ page 6014579 "NPR Retail List"
                     ColumnSpan = 2;
                     Enabled = MultipleChoice;
                     Visible = MultipleChoice;
+                    ToolTip = 'Specifies the value of the Chosen field';
                 }
                 field(Value; Value)
                 {
@@ -40,6 +42,7 @@ page 6014579 "NPR Retail List"
                     Editable = false;
                     Enabled = ShowValue;
                     Visible = ShowValue;
+                    ToolTip = 'Specifies the value of the Value field';
                 }
             }
         }

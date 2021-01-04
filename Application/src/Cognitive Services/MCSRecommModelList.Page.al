@@ -17,10 +17,12 @@ page 6060081 "NPR MCS Recomm. Model List"
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Enabled; Enabled)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Enabled field';
                 }
             }
         }

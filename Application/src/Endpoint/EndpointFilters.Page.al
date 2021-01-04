@@ -19,14 +19,17 @@ page 6014676 "NPR Endpoint Filters"
                 field("Field No."; "Field No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Field No. field';
                 }
                 field("Field Name"; "Field Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Field Name field';
                 }
                 field("Filter Text"; "Filter Text")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Filter Text field';
                 }
             }
         }

@@ -26,6 +26,7 @@ page 6059932 "NPR Doc. Exchange Activities"
                         action("Import Files Now")
                         {
                             ApplicationArea = All;
+                            ToolTip = 'Executes the Import Files Now action';
 
                             trigger OnAction()
                             var
@@ -45,11 +46,13 @@ page 6059932 "NPR Doc. Exchange Activities"
                     {
                         ApplicationArea = All;
                         Caption = 'Total';
+                        ToolTip = 'Specifies the value of the Total field';
                     }
                     field("Incoming Documents Created"; "Incoming Documents Created")
                     {
                         ApplicationArea = All;
                         Caption = 'Created';
+                        ToolTip = 'Specifies the value of the Created field';
                     }
                 }
                 cuegroup("In Process")
@@ -59,16 +62,19 @@ page 6059932 "NPR Doc. Exchange Activities"
                     {
                         ApplicationArea = All;
                         Caption = 'New';
+                        ToolTip = 'Specifies the value of the New field';
                     }
                     field("Incoming Documents Released"; "Incoming Documents Released")
                     {
                         ApplicationArea = All;
                         Caption = 'Released';
+                        ToolTip = 'Specifies the value of the Released field';
                     }
                     field("Incoming Documents Pending Ap."; "Incoming Documents Pending Ap.")
                     {
                         ApplicationArea = All;
                         Caption = 'Pending Approval';
+                        ToolTip = 'Specifies the value of the Pending Approval field';
                     }
                 }
                 cuegroup(Attention)
@@ -80,6 +86,7 @@ page 6059932 "NPR Doc. Exchange Activities"
                         Caption = 'Failed';
                         Style = Unfavorable;
                         StyleExpr = HasFailedIncoming;
+                        ToolTip = 'Specifies the value of the Failed field';
                     }
                     field("Incoming Documents Rejected"; "Incoming Documents Rejected")
                     {
@@ -87,6 +94,7 @@ page 6059932 "NPR Doc. Exchange Activities"
                         Caption = 'Rejected';
                         Style = Unfavorable;
                         StyleExpr = HasRejectedIncoming;
+                        ToolTip = 'Specifies the value of the Rejected field';
                     }
                 }
             }
@@ -100,16 +108,19 @@ page 6059932 "NPR Doc. Exchange Activities"
                     {
                         ApplicationArea = All;
                         Caption = 'Purchase Invoices';
+                        ToolTip = 'Specifies the value of the Purchase Invoices field';
                     }
                     field("Ongoing Sales Invoices"; "Ongoing Sales Invoices")
                     {
                         ApplicationArea = All;
                         Caption = 'Sales Invoices';
                         DrillDownPageID = "Sales Invoice List";
+                        ToolTip = 'Specifies the value of the Sales Invoices field';
                     }
                     field("Requests to Approve"; "Requests to Approve")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Requests to Approve field';
                     }
                 }
             }

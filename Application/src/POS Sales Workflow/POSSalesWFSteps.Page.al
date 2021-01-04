@@ -21,37 +21,45 @@ page 6150730 "NPR POS Sales WF Steps"
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Set Code field';
                 }
                 field("Workflow Code"; "Workflow Code")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Workflow Code field';
                 }
                 field("Subscriber Codeunit ID"; "Subscriber Codeunit ID")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Subscriber Codeunit ID field';
                 }
                 field("Subscriber Codeunit Name"; "Subscriber Codeunit Name")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Subscriber Codeunit Name field';
                 }
                 field("Subscriber Function"; "Subscriber Function")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Subscriber Function field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Sequence No."; "Sequence No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Sequence No. field';
                 }
                 field(Enabled; Enabled)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Enabled field';
                 }
             }
         }

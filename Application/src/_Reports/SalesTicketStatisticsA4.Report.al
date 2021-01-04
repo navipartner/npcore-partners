@@ -472,11 +472,13 @@ report 6014407 "NPR Sales Ticket Statistics A4"
                     {
                         Caption = 'Compare to day';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Compare to day field';
                     }
                     field(compareNearestDate; CompareNearestDate)
                     {
                         Caption = 'Compare nearest date';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Compare nearest date field';
                     }
                 }
             }

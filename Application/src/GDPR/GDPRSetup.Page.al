@@ -16,6 +16,7 @@ page 6151120 "NPR GDPR Setup"
                 field("Agreement Nos."; "Agreement Nos.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Agreement Nos. field';
                 }
             }
         }

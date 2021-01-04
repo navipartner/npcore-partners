@@ -24,6 +24,7 @@ page 6014530 "NPR Touch Screen - Info"
                     ShowCaption = false;
                     StyleExpr = Description1Style;
                     Visible = Col1Visible;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Description 2"; "Description 2")
                 {
@@ -31,6 +32,7 @@ page 6014530 "NPR Touch Screen - Info"
                     ShowCaption = false;
                     StyleExpr = Description2Style;
                     Visible = Col1Visible;
+                    ToolTip = 'Specifies the value of the Description 2 field';
                 }
                 field("Description 3"; "Description 3")
                 {
@@ -38,6 +40,7 @@ page 6014530 "NPR Touch Screen - Info"
                     ShowCaption = false;
                     StyleExpr = Description3Style;
                     Visible = Col1Visible;
+                    ToolTip = 'Specifies the value of the Description 3 field';
                 }
                 field("Description 4"; "Description 4")
                 {
@@ -45,6 +48,7 @@ page 6014530 "NPR Touch Screen - Info"
                     ShowCaption = false;
                     StyleExpr = Description3Style;
                     Visible = Col1Visible;
+                    ToolTip = 'Specifies the value of the Description 4 field';
                 }
             }
         }

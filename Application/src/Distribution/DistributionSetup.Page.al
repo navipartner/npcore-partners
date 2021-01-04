@@ -14,31 +14,38 @@ page 6151062 "NPR Distribution Setup"
                 field("Distribution Group"; "Distribution Group")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Distribution Group field';
                 }
                 field("Item Hiearachy"; "Item Hiearachy")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Item Hiearachy field';
                 }
                 field("Distribution Type"; "Distribution Type")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Distribution Type field';
                 }
                 field("Required Delivery Date"; "Required Delivery Date")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Required Delivery Date field';
                 }
                 field("Replenishment Grace Period"; "Replenishment Grace Period")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Replenishment Grace Period field';
                 }
                 field("Create SKU Per Location"; "Create SKU Per Location")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Create SKU Per Location field';
                 }
                 field("Default SKU Repl. Setup"; "Default SKU Repl. Setup")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Default SKU Repl. Setup field';
                 }
             }
         }
@@ -54,6 +61,7 @@ page 6151062 "NPR Distribution Setup"
                 Image = SKU;
                 Promoted = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Create SKUs action';
             }
             action("Create Demands")
             {
@@ -61,6 +69,7 @@ page 6151062 "NPR Distribution Setup"
                 Image = CreateLinesFromJob;
                 Promoted = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Create Demands action';
 
                 trigger OnAction()
                 var
@@ -79,6 +88,7 @@ page 6151062 "NPR Distribution Setup"
                 RunPageLink = "Item Hierachy" = FIELD("Item Hiearachy"),
                               "Distribution Group" = FIELD("Distribution Group");
                 ApplicationArea = All;
+                ToolTip = 'Executes the Demand Lines action';
             }
         }
     }

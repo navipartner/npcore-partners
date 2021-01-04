@@ -18,22 +18,27 @@ page 6151528 "NPR Nc Collector List"
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Table No."; "Table No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Table No. field';
                 }
                 field("Table Name"; "Table Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Table Name field';
                 }
                 field(Active; Active)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Active field';
                 }
             }
         }
@@ -50,6 +55,7 @@ page 6151528 "NPR Nc Collector List"
                 RunObject = Page "NPR Nc Collection Lines";
                 RunPageLink = "Collector Code" = FIELD(Code);
                 ApplicationArea = All;
+                ToolTip = 'Executes the Collection Lines action';
             }
             action(Collections)
             {
@@ -58,6 +64,7 @@ page 6151528 "NPR Nc Collector List"
                 RunObject = Page "NPR Nc Collection List";
                 RunPageLink = "Collector Code" = FIELD(Code);
                 ApplicationArea = All;
+                ToolTip = 'Executes the Collections action';
             }
         }
     }

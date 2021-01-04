@@ -20,30 +20,35 @@ page 6151174 "NPR NpGp User Sale Return"
                     ApplicationArea = All;
                     Caption = 'Original Company Name';
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Original Company Name field';
                 }
                 field("TempNpGpPOSSalesEntry.""POS Store Code"""; TempNpGpPOSSalesEntry."POS Store Code")
                 {
                     ApplicationArea = All;
                     Caption = 'POS Store Code';
                     Editable = false;
+                    ToolTip = 'Specifies the value of the POS Store Code field';
                 }
                 field("TempNpGpPOSSalesEntry.""POS Unit No."""; TempNpGpPOSSalesEntry."POS Unit No.")
                 {
                     ApplicationArea = All;
                     Caption = 'POS Unit No.';
                     Editable = false;
+                    ToolTip = 'Specifies the value of the POS Unit No. field';
                 }
                 field("TempNpGpPOSSalesEntry.""Document No."""; TempNpGpPOSSalesEntry."Document No.")
                 {
                     ApplicationArea = All;
                     Caption = 'Document No.';
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Document No. field';
                 }
                 field("TempNpGpPOSSalesEntry.""Posting Date"""; TempNpGpPOSSalesEntry."Posting Date")
                 {
                     ApplicationArea = All;
                     Caption = ' Posting Date';
                     Editable = false;
+                    ToolTip = 'Specifies the value of the  Posting Date field';
                 }
             }
             repeater(Group)
@@ -52,23 +57,27 @@ page 6151174 "NPR NpGp User Sale Return"
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the No. field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field(OriginalQuantity; OriginalQuantity)
                 {
                     ApplicationArea = All;
                     Caption = 'Original Quantity';
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Original Quantity field';
                 }
                 field(QuantityReturned; QuantityReturned)
                 {
                     ApplicationArea = All;
                     Caption = 'Quantity Already Returned';
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Quantity Already Returned field';
                 }
                 field(QuantityToReturn; QuantityToReturn)
                 {
@@ -76,6 +85,7 @@ page 6151174 "NPR NpGp User Sale Return"
                     Caption = 'Quantity to Return';
                     Importance = Promoted;
                     MinValue = 0;
+                    ToolTip = 'Specifies the value of the Quantity to Return field';
 
                     trigger OnValidate()
                     begin
@@ -89,6 +99,7 @@ page 6151174 "NPR NpGp User Sale Return"
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Currency Code field';
                 }
             }
         }

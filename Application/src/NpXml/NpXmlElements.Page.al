@@ -42,23 +42,28 @@ page 6151553 "NPR NpXml Elements"
                     ApplicationArea = All;
                     Style = Strong;
                     StyleExpr = ContainerElement;
+                    ToolTip = 'Specifies the value of the Element Name field';
                 }
                 field(Namespace; Namespace)
                 {
                     ApplicationArea = All;
                     Visible = NamespacesEnabled;
+                    ToolTip = 'Specifies the value of the Namespace field';
                 }
                 field(Active; Active)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Active field';
                 }
                 field(Hidden; Hidden)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Hidden field';
                 }
                 field("Table No."; "Table No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Table No. field';
 
                     trigger OnValidate()
                     begin
@@ -73,108 +78,133 @@ page 6151553 "NPR NpXml Elements"
                 field("Table Name"; "Table Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Table Name field';
                 }
                 field("Field No."; "Field No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Field No. field';
                 }
                 field("Field Name"; "Field Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Field Name field';
                 }
                 field("Template Version No."; "Template Version No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Template Version No. field';
                 }
                 field(Comment; Comment)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Comment field';
                 }
                 field("Default Value"; "Default Value")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Default Value field';
                 }
                 field(Prefix; Prefix)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Prefix field';
                 }
                 field(CDATA; CDATA)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the CDATA field';
                 }
                 field("Field Type"; "Field Type")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Field Type field';
                 }
                 field("Enum List (,)"; "Enum List (,)")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Enum List field';
                 }
                 field("Custom Codeunit ID"; "Custom Codeunit ID")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Custom Codeunit ID field';
                 }
                 field("Custom Codeunit Name"; "Custom Codeunit Name")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Custom Codeunit Name field';
                 }
                 field("Xml Value Function"; "Xml Value Function")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Xml Value Function field';
                 }
                 field("Xml Value Codeunit ID"; "Xml Value Codeunit ID")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Xml Value Codeunit ID field';
                 }
                 field("Xml Value Codeunit Name"; "Xml Value Codeunit Name")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Xml Value Codeunit Name field';
                 }
                 field("Generic Child Function"; "Generic Child Function")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Generic Child Function field';
                 }
                 field("Generic Child Codeunit ID"; "Generic Child Codeunit ID")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Generic Child Codeunit ID field';
                 }
                 field("Generic Child Codeunit Name"; "Generic Child Codeunit Name")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Generic Child Codeunit Name field';
                 }
                 field("Only with Value"; "Only with Value")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Only with Value field';
                 }
                 field("Iteration Type"; "Iteration Type")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Iteration Type field';
                 }
                 field("Reverse Sign"; "Reverse Sign")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Reverse Sign field';
                 }
                 field("Lower Case"; "Lower Case")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Lower Case field';
                 }
                 field("Blank Zero"; "Blank Zero")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Blank Zero field';
                 }
                 field("Has Filter"; "Has Filter")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Has Filter field';
                 }
                 field("Has Attribute"; "Has Attribute")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Has Attribute field';
                 }
             }
             part(PagePartMappingFilter; "NPR NpXml Filters")
@@ -208,6 +238,7 @@ page 6151553 "NPR NpXml Elements"
                     PromotedIsBig = true;
                     ShortCutKey = 'Ctrl+Insert';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the New Element (Sibling) action';
 
                     trigger OnAction()
                     begin
@@ -224,6 +255,7 @@ page 6151553 "NPR NpXml Elements"
                     PromotedIsBig = true;
                     ShortCutKey = 'Shift+Ctrl+Insert';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the New Element (Child) action';
 
                     trigger OnAction()
                     begin
@@ -240,6 +272,7 @@ page 6151553 "NPR NpXml Elements"
                     PromotedIsBig = true;
                     ShortCutKey = 'Alt+Insert';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the New Element (Parent) action';
 
                     trigger OnAction()
                     begin
@@ -257,6 +290,7 @@ page 6151553 "NPR NpXml Elements"
                     PromotedIsBig = true;
                     ShortCutKey = 'Ctrl+Delete';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Delete action';
 
                     trigger OnAction()
                     var
@@ -279,6 +313,7 @@ page 6151553 "NPR NpXml Elements"
                     Caption = 'Copy from Xml Template';
                     Image = CopyWorksheet;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Copy from Xml Template action';
                     //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                     //PromotedCategory = Process;
 
@@ -299,6 +334,7 @@ page 6151553 "NPR NpXml Elements"
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Preview Xml action';
 
                     trigger OnAction()
                     begin
@@ -312,6 +348,7 @@ page 6151553 "NPR NpXml Elements"
                     Caption = 'Normalize';
                     Image = ExchProdBOMItem;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Normalize action';
                     //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                     //PromotedCategory = Process;
 
@@ -337,6 +374,7 @@ page 6151553 "NPR NpXml Elements"
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Move Up action';
 
                     trigger OnAction()
                     begin
@@ -353,6 +391,7 @@ page 6151553 "NPR NpXml Elements"
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Move Down action';
 
                     trigger OnAction()
                     begin
@@ -369,6 +408,7 @@ page 6151553 "NPR NpXml Elements"
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Decrement Level action';
 
                     trigger OnAction()
                     begin
@@ -383,6 +423,7 @@ page 6151553 "NPR NpXml Elements"
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Increment Level action';
 
                     trigger OnAction()
                     begin

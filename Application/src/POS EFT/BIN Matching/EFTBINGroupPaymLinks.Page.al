@@ -16,10 +16,12 @@ page 6184512 "NPR EFT BIN Group Paym. Links"
                 field("Location Code"; "Location Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Location Code field';
                 }
                 field("Payment Type POS"; "Payment Type POS")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Payment Type POS field';
                 }
             }
         }

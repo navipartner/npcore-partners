@@ -20,66 +20,81 @@ page 6060074 "NPR MM Membership Print Jnl"
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Entry No. field';
                 }
                 field("Member Entry No"; "Member Entry No")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Member Entry No field';
                 }
                 field("Membership Entry No."; "Membership Entry No.")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Membership Entry No. field';
                 }
                 field("Card Entry No."; "Card Entry No.")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Card Entry No. field';
                 }
                 field("Information Context"; "Information Context")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Information Context field';
                 }
                 field("External Membership No."; "External Membership No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the External Membership No. field';
                 }
                 field("Membership Code"; "Membership Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Membership Code field';
                 }
                 field("External Member No"; "External Member No")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the External Member No. field';
                 }
                 field("First Name"; "First Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the First Name field';
                 }
                 field("Last Name"; "Last Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Last Name field';
                 }
                 field("E-Mail Address"; "E-Mail Address")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the E-Mail Address field';
                 }
                 field("Phone No."; "Phone No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Phone No. field';
                 }
                 field("External Card No."; "External Card No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the External Card No. field';
                 }
                 field("External Card No. Last 4"; "External Card No. Last 4")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the External Card No. Last 4 field';
                 }
                 field("Document No."; "Document No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Document No. field';
                 }
             }
         }
@@ -97,6 +112,7 @@ page 6060074 "NPR MM Membership Print Jnl"
                 Promoted = true;
                 PromotedCategory = "Report";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Member Account Card action';
 
                 trigger OnAction()
                 var
@@ -120,6 +136,7 @@ page 6060074 "NPR MM Membership Print Jnl"
                 PromotedCategory = "Report";
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Member Card action';
 
                 trigger OnAction()
                 var
@@ -142,6 +159,7 @@ page 6060074 "NPR MM Membership Print Jnl"
                 PromotedCategory = "Report";
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Card Owner action';
 
                 trigger OnAction()
                 var
@@ -170,6 +188,7 @@ page 6060074 "NPR MM Membership Print Jnl"
                 RunObject = Page "NPR MM Membership Card";
                 RunPageLink = "Entry No." = FIELD("Membership Entry No.");
                 ApplicationArea = All;
+                ToolTip = 'Executes the Membership action';
             }
             action(MembershipSetup)
             {
@@ -179,6 +198,7 @@ page 6060074 "NPR MM Membership Print Jnl"
                 //PromotedCategory = Process;
                 RunObject = Page "NPR MM Membership Setup";
                 ApplicationArea = All;
+                ToolTip = 'Executes the MembershipSetup action';
             }
             action(Shipment)
             {
@@ -188,6 +208,7 @@ page 6060074 "NPR MM Membership Print Jnl"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Shipment action';
 
                 trigger OnAction()
                 var

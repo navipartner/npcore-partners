@@ -23,11 +23,13 @@ page 6014500 "NPR Dynamic Module Settings"
                     Caption = 'Setting Name';
                     Style = Strong;
                     StyleExpr = "Setting ID" = 0;
+                    ToolTip = 'Specifies the value of the Setting Name field';
                 }
                 field("Formatted Value"; "Formatted Value")
                 {
                     ApplicationArea = All;
                     Caption = 'Setting Value';
+                    ToolTip = 'Specifies the value of the Setting Value field';
 
                     trigger OnAssistEdit()
                     begin
@@ -50,6 +52,7 @@ page 6014500 "NPR Dynamic Module Settings"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Edit Setting action';
 
                 trigger OnAction()
                 begin
@@ -65,6 +68,7 @@ page 6014500 "NPR Dynamic Module Settings"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Restore Setting action';
 
                 trigger OnAction()
                 begin

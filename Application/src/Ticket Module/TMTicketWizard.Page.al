@@ -1,4 +1,4 @@
-﻿page 6151133 "NPR TM Ticket Wizard"
+page 6151133 "NPR TM Ticket Wizard"
 {
     // TM90.1.46/TSA /20200320 CASE 397084 Initial Version
 
@@ -26,6 +26,7 @@
                     Caption = 'Code';
                     ShowMandatory = true;
                     TableRelation = "NPR TM Ticket Type".Code;
+                    ToolTip = 'Specifies the value of the Code field';
 
                     trigger OnValidate()
                     begin
@@ -37,6 +38,7 @@
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'No.';
                     TableRelation = Item;
+                    ToolTip = 'Specifies the value of the No. field';
 
                     trigger OnValidate()
                     begin
@@ -49,6 +51,7 @@
                     Caption = 'Description';
                     Editable = NOT (ItemNumberValid);
                     ShowMandatory = true;
+                    ToolTip = 'Specifies the value of the Description field';
 
                     trigger OnValidate()
                     begin
@@ -66,11 +69,13 @@
                     Editable = NOT (ItemNumberValid);
                     ShowMandatory = true;
                     TableRelation = "NPR Item Group";
+                    ToolTip = 'Specifies the value of the Item Group field';
                 }
                 field(UnitPrice; TmpUnitPrice)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Unit Price';
+                    ToolTip = 'Specifies the value of the Unit Price field';
                 }
                 group(Control6014409)
                 {
@@ -79,11 +84,13 @@
                     {
                         ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                         Caption = 'Start Date';
+                        ToolTip = 'Specifies the value of the Start Date field';
                     }
                     field(UntilDate; TmpUntilDate)
                     {
                         ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                         Caption = 'Until Date';
+                        ToolTip = 'Specifies the value of the Until Date field';
                     }
                 }
             }
@@ -103,6 +110,7 @@
                         ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                         Caption = 'Description';
                         Editable = NOT (TicketTypeCodeValid);
+                        ToolTip = 'Specifies the value of the Description field';
                     }
                     field(TmpTicketTypeTemplate; TmpTicketTypeTemplate)
                     {
@@ -110,6 +118,7 @@
                         Caption = 'Ticket Type Template Code';
                         Importance = Additional;
                         TableRelation = "Config. Template Header" WHERE("Table ID" = CONST(6059784));
+                        ToolTip = 'Specifies the value of the Ticket Type Template Code field';
                     }
                 }
                 group(Admission)
@@ -120,6 +129,7 @@
                         ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                         Caption = 'Code';
                         TableRelation = "NPR TM Admission"."Admission Code";
+                        ToolTip = 'Specifies the value of the Code field';
 
                         trigger OnValidate()
                         begin
@@ -131,6 +141,7 @@
                         ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                         Caption = 'Description';
                         Editable = NOT (AdmissionCodeValid);
+                        ToolTip = 'Specifies the value of the Description field';
                     }
                     field(TmpAdmissionTemplate; TmpAdmissionTemplate)
                     {
@@ -138,6 +149,7 @@
                         Caption = 'Admission Template Code';
                         Importance = Additional;
                         TableRelation = "Config. Template Header" WHERE("Table ID" = CONST(6060120));
+                        ToolTip = 'Specifies the value of the Admission Template Code field';
                     }
                 }
                 group(TicketBom)
@@ -149,6 +161,7 @@
                         Caption = 'Ticket BOM Template Code';
                         Importance = Additional;
                         TableRelation = "Config. Template Header" WHERE("Table ID" = CONST(6060121));
+                        ToolTip = 'Specifies the value of the Ticket BOM Template Code field';
                     }
                 }
             }

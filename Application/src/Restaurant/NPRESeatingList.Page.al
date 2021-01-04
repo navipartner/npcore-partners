@@ -22,42 +22,52 @@ page 6150664 "NPR NPRE Seating List"
                 field(Status; Status)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Status field';
                 }
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field(Blocked; Blocked)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Blocked field';
                 }
                 field("Seating Location"; "Seating Location")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Seating Location field';
                 }
                 field(Capacity; Capacity)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Capacity field';
                 }
                 field("Fixed Capasity"; "Fixed Capasity")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Fixed Capasity field';
                 }
                 field("Current Waiter Pad FF"; "Current Waiter Pad FF")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Current Waiter Pad field';
                 }
                 field("Current Waiter Pad Description"; "Current Waiter Pad Description")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Waiter Pad Description field';
                 }
                 field("Multiple Waiter Pad FF"; "Multiple Waiter Pad FF")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Multiple Waiter Pad field';
                 }
             }
         }
@@ -83,6 +93,7 @@ page 6150664 "NPR NPRE Seating List"
                                       "No." = FIELD(Code);
                         ShortCutKey = 'Shift+Ctrl+D';
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Dimensions-Single action';
                     }
                     action("Dimensions-&Multiple")
                     {
@@ -90,6 +101,7 @@ page 6150664 "NPR NPRE Seating List"
                         Caption = 'Dimensions-&Multiple';
                         Image = DimensionSets;
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Dimensions-&Multiple action';
 
                         trigger OnAction()
                         var

@@ -1,4 +1,4 @@
-﻿page 6151130 "NPR TM Seating Setup"
+page 6151130 "NPR TM Seating Setup"
 {
     // TM1.45/TSA /20191113 CASE 322432 Initial Version
 
@@ -17,18 +17,22 @@
                 field("Admission Code"; "Admission Code")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Admission Code field';
                 }
                 field("Seat Numbering"; "Seat Numbering")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Seat Numbering field';
                 }
                 field("Row Numbering"; "Row Numbering")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Row Numbering field';
                 }
                 field("Template Cache"; "Template Cache")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Template Cache field';
                 }
             }
         }

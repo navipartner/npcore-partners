@@ -7,6 +7,7 @@ pageextension 6014451 "NPR Purchase Order" extends "Purchase Order"
             field("NPR PostingDescription"; "Posting Description")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the Posting Description field';
             }
         }
         addafter(Control71)
@@ -14,45 +15,54 @@ pageextension 6014451 "NPR Purchase Order" extends "Purchase Order"
             field("NPR Pay-to E-mail"; "NPR Pay-to E-mail")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the NPR Pay-to E-mail field';
             }
             field("NPR Document Processing"; "NPR Document Processing")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the NPR Document Processing field';
             }
             field("NPR Sell-to Customer Name"; "NPR Sell-to Customer Name")
             {
                 ApplicationArea = All;
                 Editable = false;
+                ToolTip = 'Specifies the value of the NPR Sell-to Customer Name field';
             }
             field("NPR Sell-to Customer Name 2"; "NPR Sell-to Customer Name 2")
             {
                 ApplicationArea = All;
                 Editable = false;
+                ToolTip = 'Specifies the value of the NPR Sell-to Customer Name 2 field';
             }
             field("NPR Sell-to Address"; "NPR Sell-to Address")
             {
                 ApplicationArea = All;
                 Editable = false;
+                ToolTip = 'Specifies the value of the NPR Sell-to Address field';
             }
             field("NPR Sell-to Address 2"; "NPR Sell-to Address 2")
             {
                 ApplicationArea = All;
                 Editable = false;
+                ToolTip = 'Specifies the value of the NPR Sell-to Address 2 field';
             }
             field("NPR Sell-to City"; "NPR Sell-to City")
             {
                 ApplicationArea = All;
                 Editable = false;
+                ToolTip = 'Specifies the value of the NPR Sell-to City field';
             }
             field("NPR Sell-to Post Code"; "NPR Sell-to Post Code")
             {
                 ApplicationArea = All;
                 Editable = false;
+                ToolTip = 'Specifies the value of the NPR Sell-to Post Code field';
             }
             field("NPR Sell-to Phone No."; "NPR Sell-to Phone No.")
             {
                 ApplicationArea = All;
                 Editable = false;
+                ToolTip = 'Specifies the value of the NPR Sell-to Phone No. field';
             }
         }
         addafter(Control3)
@@ -86,6 +96,7 @@ pageextension 6014451 "NPR Purchase Order" extends "Purchase Order"
                 Image = CoupledOrderList;
                 ShortCutKey = 'Ctrl+I';
                 ApplicationArea = All;
+                ToolTip = 'Executes the Insert Line with Vendor Item action';
             }
             action("NPR ImportFromScanner")
             {
@@ -93,6 +104,7 @@ pageextension 6014451 "NPR Purchase Order" extends "Purchase Order"
                 Image = Import;
                 Promoted = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Import from scanner action';
 
                 trigger OnAction()
                 begin
@@ -112,6 +124,7 @@ pageextension 6014451 "NPR Purchase Order" extends "Purchase Order"
                 Promoted = true;
                 PromotedCategory = Process;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Retail Print action';
             }
             action("NPR PriceLabel")
             {
@@ -122,6 +135,7 @@ pageextension 6014451 "NPR Purchase Order" extends "Purchase Order"
                 PromotedIsBig = true;
                 ShortCutKey = 'Shift+Ctrl+L';
                 ApplicationArea = All;
+                ToolTip = 'Executes the Price Label action';
             }
             group("NPR PDF2NAV")
             {
@@ -131,12 +145,14 @@ pageextension 6014451 "NPR Purchase Order" extends "Purchase Order"
                     Caption = 'E-mail Log';
                     Image = Email;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the E-mail Log action';
                 }
                 action("NPR SendAsPDF")
                 {
                     Caption = 'Send as PDF';
                     Image = SendEmailPDF;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Send as PDF action';
                 }
             }
         }

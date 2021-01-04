@@ -151,6 +151,7 @@ report 6014455 "NPR Item Barcode Status Sheet"
                 {
                     Caption = 'Show Inventory';
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Show Inventory field';
                 }
             }
         }

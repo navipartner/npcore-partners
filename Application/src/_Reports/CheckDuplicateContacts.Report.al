@@ -115,16 +115,19 @@ report 6060112 "NPR Check Duplicate Contacts"
                 {
                     Caption = 'Name';
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Name field';
                 }
                 field(CheckAddr; CheckAddr)
                 {
                     Caption = 'Address';
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Address field';
                 }
                 field(CheckPhone; CheckPhone)
                 {
                     Caption = 'Phone No.';
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Phone No. field';
                 }
             }
         }

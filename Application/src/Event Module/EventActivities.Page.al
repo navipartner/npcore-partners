@@ -24,6 +24,7 @@ page 6060153 "NPR Event Activities"
                         RunObject = Page "NPR Event Card";
                         RunPageMode = Create;
                         ApplicationArea = All;
+                        ToolTip = 'Executes the New Event action';
                     }
                     action("New Customer")
                     {
@@ -31,6 +32,7 @@ page 6060153 "NPR Event Activities"
                         RunObject = Page "Customer Card";
                         RunPageMode = Create;
                         ApplicationArea = All;
+                        ToolTip = 'Executes the New Customer action';
                     }
                 }
             }
@@ -40,6 +42,7 @@ page 6060153 "NPR Event Activities"
                 field("Upcoming Events"; "Upcoming Events")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Upcoming Events field';
 
                     trigger OnDrillDown()
                     begin
@@ -49,6 +52,7 @@ page 6060153 "NPR Event Activities"
                 field("Completed Events"; "Completed Events")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Completed Events field';
 
                     trigger OnDrillDown()
                     begin
@@ -58,6 +62,7 @@ page 6060153 "NPR Event Activities"
                 field("Cancelled Events"; "Cancelled Events")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Cancelled Events field';
 
                     trigger OnDrillDown()
                     begin

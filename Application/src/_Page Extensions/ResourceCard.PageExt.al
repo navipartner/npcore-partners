@@ -11,6 +11,7 @@ pageextension 6014481 "NPR Resource Card" extends "Resource Card"
             field("NPR Over Capacitate Resource"; "NPR Over Capacitate Resource")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the NPR Over Capacitate Resource field';
             }
         }
         addafter("Employment Date")
@@ -18,6 +19,7 @@ pageextension 6014481 "NPR Resource Card" extends "Resource Card"
             field("NPR E-Mail"; "NPR E-Mail")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the NPR E-Mail field';
             }
         }
     }

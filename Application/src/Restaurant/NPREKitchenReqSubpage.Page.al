@@ -20,39 +20,48 @@ page 6150690 "NPR NPRE Kitchen Req. Subpage"
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Request No. field';
                 }
                 field("Line No."; "Line No.")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Line No. field';
                 }
                 field("Production Restaurant Code"; "Production Restaurant Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Production Restaurant Code field';
                 }
                 field("Kitchen Station"; "Kitchen Station")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Kitchen Station field';
                 }
                 field("Production Status"; "Production Status")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Production Status field';
                 }
                 field("Start Date-Time"; "Start Date-Time")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Start Date-Time field';
                 }
                 field("End Date-Time"; "End Date-Time")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the End Date-Time field';
                 }
                 field("Qty. Change Not Accepted"; "Qty. Change Not Accepted")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Qty. Change Not Accepted field';
                 }
                 field("Last Qty. Change Accepted"; "Last Qty. Change Accepted")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Last Qty. Change Accepted field';
                 }
             }
         }
@@ -68,6 +77,7 @@ page 6150690 "NPR NPRE Kitchen Req. Subpage"
                 Image = Start;
                 Visible = NOT IsExpediteMode;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Start Production action';
 
                 trigger OnAction()
                 begin
@@ -81,6 +91,7 @@ page 6150690 "NPR NPRE Kitchen Req. Subpage"
                 Image = Stop;
                 Visible = NOT IsExpediteMode;
                 ApplicationArea = All;
+                ToolTip = 'Executes the End Production action';
 
                 trigger OnAction()
                 begin
@@ -94,6 +105,7 @@ page 6150690 "NPR NPRE Kitchen Req. Subpage"
                 Image = Approve;
                 Visible = NOT IsExpediteMode;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Accept Qty. Change action';
 
                 trigger OnAction()
                 begin

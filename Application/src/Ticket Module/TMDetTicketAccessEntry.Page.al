@@ -1,4 +1,4 @@
-﻿page 6060123 "NPR TM Det. Ticket AccessEntry"
+page 6060123 "NPR TM Det. Ticket AccessEntry"
 {
     // TM1.00/TSA/20151217  CASE 228982 NaviPartner Ticket Management
     // TM1.09/TSA/20160311  CASE 236742 UX Improvemets
@@ -25,57 +25,70 @@
                 field("Entry No."; "Entry No.")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Entry No. field';
                 }
                 field("Posting Date"; "Posting Date")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Posting Date field';
                 }
                 field("Ticket No."; "Ticket No.")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Ticket No. field';
                 }
                 field("Ticket Access Entry No."; "Ticket Access Entry No.")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Ticket Access Entry No. field';
                 }
                 field(Type; Type)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Type field';
                 }
                 field("External Adm. Sch. Entry No."; "External Adm. Sch. Entry No.")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the External Adm. Sch. Entry No. field';
                 }
                 field("Scheduled Time"; ScheduledTime)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Scheduled Time';
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Scheduled Time field';
                 }
                 field(Quantity; Quantity)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Quantity field';
                 }
                 field("Closed By Entry No."; "Closed By Entry No.")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Closed By Entry No. field';
                 }
                 field(Open; Open)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Open field';
                 }
                 field("Sales Channel No."; "Sales Channel No.")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Sales Channel No. field';
                 }
                 field("Created Datetime"; "Created Datetime")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Created Datetime field';
                 }
                 field("User ID"; "User ID")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the User ID field';
                 }
             }
         }

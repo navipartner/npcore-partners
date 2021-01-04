@@ -26,6 +26,7 @@ page 6150668 "NPR NPRE Slct Prnt Cat."
                     Caption = 'Selected';
                     Editable = true;
                     Visible = IsMultiSelectionMode;
+                    ToolTip = 'Specifies the value of the Selected field';
 
                     trigger OnValidate()
                     begin
@@ -36,17 +37,20 @@ page 6150668 "NPR NPRE Slct Prnt Cat."
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Print Tag"; "Print Tag")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     Visible = ShowPrintTags;
+                    ToolTip = 'Specifies the value of the Print Tag field';
                 }
                 field(AssignedServingSteps; AssignedServingStepsAsString())
                 {
@@ -54,6 +58,7 @@ page 6150668 "NPR NPRE Slct Prnt Cat."
                     Caption = 'Appl. Only for Serving Steps';
                     Editable = false;
                     Visible = ShowApplOnServingStep;
+                    ToolTip = 'Specifies the value of the Appl. Only for Serving Steps field';
 
                     trigger OnDrillDown()
                     begin

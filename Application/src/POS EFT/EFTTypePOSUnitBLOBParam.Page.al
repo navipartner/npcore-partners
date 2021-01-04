@@ -22,11 +22,13 @@ page 6184477 "NPR EFTType POSUnit BLOB Param"
                     ApplicationArea = All;
                     Caption = 'Name';
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Name field';
                 }
                 field(ParameterDescription; ParameterDescription)
                 {
                     ApplicationArea = All;
                     Caption = 'Description';
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("FORMAT(Value.HASVALUE)"; Format(Value.HasValue))
                 {
@@ -34,6 +36,7 @@ page 6184477 "NPR EFTType POSUnit BLOB Param"
                     AssistEdit = true;
                     Caption = 'Value';
                     Editable = "User Configurable";
+                    ToolTip = 'Specifies the value of the Value field';
 
                     trigger OnAssistEdit()
                     begin

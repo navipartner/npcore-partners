@@ -19,18 +19,22 @@ page 6151107 "NPR NpRi Purch.Doc.Disc. Setup"
                     field("Discount %"; "Discount %")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Discount % field';
                     }
                     field("Bal. Account No."; "Bal. Account No.")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Bal. Account No. field';
                     }
                     field("Bal. Gen. Prod. Posting Group"; "Bal. Gen. Prod. Posting Group")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Bal. Gen. Prod. Posting Group field';
                     }
                     field("Bal. VAT Prod. Posting Group"; "Bal. VAT Prod. Posting Group")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Bal. VAT Prod. Posting Group field';
                     }
                 }
             }

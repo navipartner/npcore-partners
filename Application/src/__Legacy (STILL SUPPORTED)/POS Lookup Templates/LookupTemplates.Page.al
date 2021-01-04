@@ -14,39 +14,48 @@ page 6014671 "NPR Lookup Templates"
                 field("Table No."; "Table No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Table No. field';
                 }
                 field("Table Caption"; "Table Caption")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Table Caption field';
                 }
                 field(Class; Class)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Class field';
                 }
                 field("Value Field No."; "Value Field No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Value Field No. field';
                 }
                 field("Preemptive Push"; "Preemptive Push")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Preemptive Push field';
                 }
                 field("Value Field Name"; "Value Field Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Value Field Name field';
                 }
                 field("Sort By Field No."; "Sort By Field No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Sort By Field No. field';
                 }
                 field("Sorting Order"; "Sorting Order")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Sorting Order field';
                 }
                 field("Has Lines"; "Has Lines")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Has Lines field';
                 }
             }
         }
@@ -66,6 +75,7 @@ page 6014671 "NPR Lookup Templates"
                 RunObject = Page "NPR Lookup Template Lines";
                 RunPageLink = "Lookup Template Table No." = FIELD("Table No.");
                 ApplicationArea = All;
+                ToolTip = 'Executes the Fields action';
             }
             action("Export Managed Dependency Manifest")
             {
@@ -75,6 +85,7 @@ page 6014671 "NPR Lookup Templates"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Export Managed Dependency Manifest action';
 
                 trigger OnAction()
                 var

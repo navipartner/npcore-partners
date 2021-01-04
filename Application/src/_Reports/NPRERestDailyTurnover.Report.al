@@ -229,6 +229,7 @@ report 6150660 "NPR NPRE: Rest. Daily Turnover"
                         Caption = 'Show Dimensions';
                         Editable = false;
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Show Dimensions field';
 
                         trigger OnAssistEdit()
                         begin
@@ -239,6 +240,7 @@ report 6150660 "NPR NPRE: Rest. Daily Turnover"
                     {
                         Caption = 'Show Seating Code';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Show Seating Code field';
                     }
                 }
             }
