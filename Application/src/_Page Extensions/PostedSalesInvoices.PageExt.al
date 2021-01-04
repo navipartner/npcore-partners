@@ -27,6 +27,13 @@ pageextension 6014416 "NPR Posted Sales Invoices" extends "Posted Sales Invoices
                 Editable = false;
                 Visible = false;
             }
+            field("NPR Magento Coupon"; "NPR Magento Coupon")
+            {
+                ApplicationArea = All;
+                Editable = false;
+                Visible = false;
+            }
+
         }
     }
     actions
