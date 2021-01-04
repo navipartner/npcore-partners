@@ -1,7 +1,5 @@
 page 6151608 "NPR NpDc Ext. Coupon Reserv."
 {
-    // NPR5.51/MHA /20190724  CASE 343352 Object Created
-
     Caption = 'External Coupon Reservations';
     PageType = List;
     UsageCategory = Administration;
@@ -47,10 +45,6 @@ page 6151608 "NPR NpDc Ext. Coupon Reserv."
                 }
             }
         }
-    }
-
-    actions
-    {
     }
 }
 

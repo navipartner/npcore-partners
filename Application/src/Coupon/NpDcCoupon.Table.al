@@ -1,9 +1,5 @@
 table 6151591 "NPR NpDc Coupon"
 {
-    // NPR5.34/MHA /20170720  CASE 282799 Object created - NpDc: NaviPartner Discount Coupon
-    // NPR5.37/MHA /20171023  CASE 293232 Renamed field 43 "Posting No." to "Arch. No."
-    // NPR5.51/MHA /20190724 CASE 343352 Added field 85 "In-use Quantity (External)" and function CalcInUseQty()
-
     Caption = 'Coupon';
     DataClassification = CustomerContent;
     DataCaptionFields = "No.", "Coupon Type", Description;
@@ -120,14 +116,14 @@ table 6151591 "NPR NpDc Coupon"
         }
         field(70; Open; Boolean)
         {
-            CalcFormula = Max ("NPR NpDc Coupon Entry".Open WHERE("Coupon No." = FIELD("No.")));
+            CalcFormula = Max("NPR NpDc Coupon Entry".Open WHERE("Coupon No." = FIELD("No.")));
             Caption = 'Open';
             Editable = false;
             FieldClass = FlowField;
         }
         field(75; "Remaining Quantity"; Decimal)
         {
-            CalcFormula = Sum ("NPR NpDc Coupon Entry"."Remaining Quantity" WHERE("Coupon No." = FIELD("No.")));
+            CalcFormula = Sum("NPR NpDc Coupon Entry"."Remaining Quantity" WHERE("Coupon No." = FIELD("No.")));
             Caption = 'Remaining Quantity';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -135,7 +131,7 @@ table 6151591 "NPR NpDc Coupon"
         }
         field(80; "In-use Quantity"; Integer)
         {
-            CalcFormula = Count ("NPR NpDc SaleLinePOS Coupon" WHERE(Type = CONST(Coupon),
+            CalcFormula = Count("NPR NpDc SaleLinePOS Coupon" WHERE(Type = CONST(Coupon),
                                                                    "Coupon No." = FIELD("No.")));
             Caption = 'In-use Quantity';
             Editable = false;
@@ -143,7 +139,7 @@ table 6151591 "NPR NpDc Coupon"
         }
         field(85; "In-use Quantity (External)"; Integer)
         {
-            CalcFormula = Count ("NPR NpDc Ext. Coupon Reserv." WHERE("Coupon No." = FIELD("No.")));
+            CalcFormula = Count("NPR NpDc Ext. Coupon Reserv." WHERE("Coupon No." = FIELD("No.")));
             Caption = 'In-use Quantity (External)';
             Description = 'NPR5.51';
             Editable = false;
@@ -151,21 +147,21 @@ table 6151591 "NPR NpDc Coupon"
         }
         field(100; "Issue Coupon Module"; Code[20])
         {
-            CalcFormula = Lookup ("NPR NpDc Coupon Type"."Issue Coupon Module" WHERE(Code = FIELD("Coupon Type")));
+            CalcFormula = Lookup("NPR NpDc Coupon Type"."Issue Coupon Module" WHERE(Code = FIELD("Coupon Type")));
             Caption = 'Issue Coupon Module';
             Editable = false;
             FieldClass = FlowField;
         }
         field(110; "Validate Coupon Module"; Code[20])
         {
-            CalcFormula = Lookup ("NPR NpDc Coupon Type"."Validate Coupon Module" WHERE(Code = FIELD("Coupon Type")));
+            CalcFormula = Lookup("NPR NpDc Coupon Type"."Validate Coupon Module" WHERE(Code = FIELD("Coupon Type")));
             Caption = 'Validate Coupon Module';
             Editable = false;
             FieldClass = FlowField;
         }
         field(120; "Apply Discount Module"; Code[20])
         {
-            CalcFormula = Lookup ("NPR NpDc Coupon Type"."Apply Discount Module" WHERE(Code = FIELD("Coupon Type")));
+            CalcFormula = Lookup("NPR NpDc Coupon Type"."Apply Discount Module" WHERE(Code = FIELD("Coupon Type")));
             Caption = 'Apply Discount Module';
             Editable = false;
             FieldClass = FlowField;
@@ -201,7 +197,6 @@ table 6151591 "NPR NpDc Coupon"
         CouponEntry.SetRange("Coupon No.", "No.");
         CouponEntry.DeleteAll;
 
-        //-NPR5.51 [343352]
         SaleLinePOSCoupon.SetRange("Coupon No.", "No.");
         if SaleLinePOSCoupon.FindFirst then
             SaleLinePOSCoupon.DeleteAll;
@@ -209,7 +204,6 @@ table 6151591 "NPR NpDc Coupon"
         NpDcExtCouponSalesLine.SetRange("Coupon No.", "No.");
         if NpDcExtCouponSalesLine.FindFirst then
             NpDcExtCouponSalesLine.DeleteAll;
-        //+NPR5.51 [343352]
     end;
 
     trigger OnInsert()
@@ -259,10 +253,8 @@ table 6151591 "NPR NpDc Coupon"
 
     procedure CalcInUseQty() InUseQty: Integer
     begin
-        //-NPR5.51 [343352]
         CalcFields("In-use Quantity", "In-use Quantity (External)");
         exit("In-use Quantity" + "In-use Quantity (External)");
-        //+NPR5.51 [343352]
     end;
 }
 

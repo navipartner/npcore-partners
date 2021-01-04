@@ -1,7 +1,5 @@
 table 6151595 "NPR NpDc Extra Coupon Item"
 {
-    // NPR5.34/MHA /20170720  CASE 282799 Object created - NpDc: NaviPartner Discount Coupon
-
     Caption = 'Extra Coupon Item';
     DataClassification = CustomerContent;
 
@@ -53,21 +51,21 @@ table 6151595 "NPR NpDc Extra Coupon Item"
         }
         field(100; "Item Description"; Text[50])
         {
-            CalcFormula = Lookup (Item.Description WHERE("No." = FIELD("Item No.")));
+            CalcFormula = Lookup(Item.Description WHERE("No." = FIELD("Item No.")));
             Caption = 'Item Description';
             Editable = false;
             FieldClass = FlowField;
         }
         field(105; "Unit Price"; Decimal)
         {
-            CalcFormula = Lookup (Item."Unit Price" WHERE("No." = FIELD("Item No.")));
+            CalcFormula = Lookup(Item."Unit Price" WHERE("No." = FIELD("Item No.")));
             Caption = 'Unit Price';
             Editable = false;
             FieldClass = FlowField;
         }
         field(115; "Profit %"; Decimal)
         {
-            CalcFormula = Lookup (Item."Profit %" WHERE("No." = FIELD("Item No.")));
+            CalcFormula = Lookup(Item."Profit %" WHERE("No." = FIELD("Item No.")));
             Caption = 'Profit %';
             Editable = false;
             FieldClass = FlowField;
@@ -79,10 +77,6 @@ table 6151595 "NPR NpDc Extra Coupon Item"
         key(Key1; "Coupon Type", "Line No.")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 

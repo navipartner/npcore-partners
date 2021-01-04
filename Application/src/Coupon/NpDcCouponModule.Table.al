@@ -1,7 +1,5 @@
 table 6151594 "NPR NpDc Coupon Module"
 {
-    // NPR5.34/MHA /20170720  CASE 282799 Object created - NpDc: NaviPartner Discount Coupon
-
     Caption = 'Coupon Module';
     DataClassification = CustomerContent;
     DataCaptionFields = "Code", Description;
@@ -34,7 +32,7 @@ table 6151594 "NPR NpDc Coupon Module"
         }
         field(55; "Event Codeunit Name"; Text[50])
         {
-            CalcFormula = Lookup (AllObj."Object Name" WHERE("Object Type" = CONST(Codeunit),
+            CalcFormula = Lookup(AllObj."Object Name" WHERE("Object Type" = CONST(Codeunit),
                                                              "Object ID" = FIELD("Event Codeunit ID")));
             Caption = 'Event Codeunit Name';
             Editable = false;

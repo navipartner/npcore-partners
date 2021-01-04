@@ -1,8 +1,5 @@
 xmlport 6151591 "NPR NpDc Ext. Coupon"
 {
-    // NPR5.51/MHA /20190724  CASE 343352 Object created
-    // NPR5.53/MHA /20200115  CASE 343352 Fixed typo of <in_use_quanity> to <in_use_quantity>
-
     Caption = 'NpDc Coupon';
     DefaultNamespace = 'urn:microsoft-dynamics-nav/xmlports/discount_coupon';
     Encoding = UTF8;
@@ -61,18 +58,6 @@ xmlport 6151591 "NPR NpDc Ext. Coupon"
                     TempNpDcExtCouponBuffer."Line No." := LineNo;
                 end;
             }
-        }
-    }
-
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
         }
     }
 

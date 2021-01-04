@@ -1,9 +1,5 @@
 table 6151596 "NPR NpDc Coupon List Item"
 {
-    // NPR5.34/MHA /20170720  CASE 282799 Object created - NpDc: NaviPartner Discount Coupon
-    // NPR5.45/MHA /20180820  CASE 312991 Added field 25 "Max. Quantity"
-    // NPR5.46/MHA /20180925  CASE 327366 Added fields 30 "Validation Quantity", 35 "Lot Validation"
-
     Caption = 'Coupon List Item';
     DataClassification = CustomerContent;
 
@@ -127,10 +123,6 @@ table 6151596 "NPR NpDc Coupon List Item"
         key(Key2; Priority)
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 

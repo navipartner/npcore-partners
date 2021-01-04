@@ -1,7 +1,5 @@
 table 6151606 "NPR NpDc Ext. Coupon Buffer"
 {
-    // NPR5.51/MHA /20190724  CASE 343352 Object Created
-
     Caption = 'NpDc Ext. Coupon Buffer';
     DataClassification = CustomerContent;
 
@@ -67,9 +65,5 @@ table 6151606 "NPR NpDc Ext. Coupon Buffer"
         key(Key1; "Document No.", "Line No.")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }

@@ -1,14 +1,5 @@
 codeunit 6151593 "NPR NpDc ModuleValid.: Defa."
 {
-    // NPR5.34/MHA /20170720  CASE 282799 Object created - NpDc: NaviPartner Discount Coupon
-    // NPR5.47/MHA /20181022  CASE 333113 Max Use per Sale should only consider within same POS Sale
-    // NPR5.51/MHA /20190724  CASE 343352 Added CalcInUseQty() to include "In-Use Quantity (External)"
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         Text000: Label 'Coupon is not Valid';
         Text001: Label 'Coupon is being used';
@@ -35,7 +26,6 @@ codeunit 6151593 "NPR NpDc ModuleValid.: Defa."
 
         Coupon.CalcFields("Remaining Quantity");
 
-        //-NPR5.51 [343352]
         if Coupon.CalcInUseQty() >= Coupon."Remaining Quantity" then
             Error(Text001);
 
@@ -56,11 +46,6 @@ codeunit 6151593 "NPR NpDc ModuleValid.: Defa."
             Coupon."Max Use per Sale" := 1;
         if CurrSaleCouponCount >= Coupon."Max Use per Sale" then
             Error(Text002, Coupon."Max Use per Sale");
-        //+NPR5.51 [343352]
-    end;
-
-    local procedure "--- Coupon Interface"()
-    begin
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6151591, 'OnInitCouponModules', '', true, true)]
@@ -104,10 +89,6 @@ codeunit 6151593 "NPR NpDc ModuleValid.: Defa."
         Handled := true;
 
         ValidateCoupon(SalePOS, Coupon);
-    end;
-
-    local procedure "--- Aux"()
-    begin
     end;
 
     local procedure CurrCodeunitId(): Integer
