@@ -18,18 +18,22 @@ page 6151041 "NPR Notification List"
                 field(Id; Id)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Id field';
                 }
                 field(Title; Title)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Title field';
                 }
                 field(Handled; Handled)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Handled field';
                 }
                 field("Handled By"; "Handled By")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Handled By field';
                 }
             }
         }
@@ -47,6 +51,7 @@ page 6151041 "NPR Notification List"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Complete action';
 
                 trigger OnAction()
                 begin
@@ -62,6 +67,7 @@ page 6151041 "NPR Notification List"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Cancel action';
 
                 trigger OnAction()
                 begin

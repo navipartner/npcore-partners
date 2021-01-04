@@ -18,6 +18,7 @@ pageextension 6151337 "NPR Retail RC Order Processor" extends "Headline RC Order
                 {
                     ApplicationArea = All;
                     ShowCaption = false;
+                    ToolTip = 'Specifies the value of the ''Highest POS Sales for today is '' + Format(highestPOSSales) + '' !'' field';
                 }
             }
 
@@ -29,6 +30,7 @@ pageextension 6151337 "NPR Retail RC Order Processor" extends "Headline RC Order
                 {
                     ApplicationArea = All;
                     ShowCaption = false;
+                    ToolTip = 'Specifies the value of the ''Highest Sales Invoice for today is '' + Format(highestSalesInv) + '' !'' field';
                 }
             }
             group("NPR TopSalesPerson")
@@ -39,6 +41,7 @@ pageextension 6151337 "NPR Retail RC Order Processor" extends "Headline RC Order
                 {
                     ApplicationArea = All;
                     ShowCaption = false;
+                    ToolTip = 'Specifies the value of the ''Top Sales Person for today is '' + TopSalesPerson + '' !'' field';
                 }
             }
 
@@ -50,6 +53,7 @@ pageextension 6151337 "NPR Retail RC Order Processor" extends "Headline RC Order
                 {
                     ApplicationArea = All;
                     ShowCaption = false;
+                    ToolTip = 'Specifies the value of the ''Average Basket is '' + FORMAT(AverageBasket, 0, ''<Precision,2><sign><Integer Thousand><Decimals,3>'') + '' !'' field';
                 }
             }
         }

@@ -21,6 +21,7 @@ page 6014578 "NPR Tax Free GB Countries"
                 field(Name; Name)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Name field';
                 }
             }
         }

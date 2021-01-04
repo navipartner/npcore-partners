@@ -13,6 +13,7 @@ pageextension 6014437 "NPR Item Reclass. Journal" extends "Item Reclass. Journal
                 PromotedIsBig = true;
                 ShortCutKey = 'Ctrl+Alt+V';
                 ApplicationArea = All;
+                ToolTip = 'Executes the Variety action';
             }
         }
     }

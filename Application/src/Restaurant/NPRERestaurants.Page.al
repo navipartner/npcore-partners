@@ -19,15 +19,18 @@ page 6150683 "NPR NPRE Restaurants"
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Name; Name)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Name field';
                 }
                 field("Name 2"; "Name 2")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Name 2 field';
                 }
             }
         }
@@ -60,6 +63,7 @@ page 6150683 "NPR NPRE Restaurants"
                     RunObject = Page "NPR NPRE Kitchen Stations";
                     RunPageLink = "Restaurant Code" = FIELD(Code);
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Stations action';
                 }
                 action(KitchenStationSelection)
                 {
@@ -68,6 +72,7 @@ page 6150683 "NPR NPRE Restaurants"
                     RunObject = Page "NPR NPRE Kitchen Station Slct.";
                     RunPageLink = "Restaurant Code" = FIELD(Code);
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Station Selection Setup action';
                 }
                 action(ShowKitchenRequests)
                 {
@@ -79,6 +84,7 @@ page 6150683 "NPR NPRE Restaurants"
                     Scope = Repeater;
                     Visible = ShowRequests;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Kitchen Requests (Expedite View) action';
 
                     trigger OnAction()
                     var
@@ -99,12 +105,14 @@ page 6150683 "NPR NPRE Restaurants"
                     RunObject = Page "NPR NPRE Seating Location";
                     RunPageLink = "Restaurant Code" = FIELD(Code);
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Locations action';
                 }
                 action(Seatings)
                 {
                     Caption = 'Seatings';
                     Image = Lot;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Seatings action';
 
                     trigger OnAction()
                     var

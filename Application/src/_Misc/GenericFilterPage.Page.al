@@ -28,6 +28,7 @@ page 6014649 "NPR Generic Filter Page"
                         Caption = 'Key';
                         Editable = false;
                         Lookup = true;
+                        ToolTip = 'Specifies the value of the Key field';
 
                         trigger OnLookup(var Text: Text): Boolean
                         var
@@ -49,6 +50,7 @@ page 6014649 "NPR Generic Filter Page"
                     {
                         ApplicationArea = All;
                         Caption = 'Descending';
+                        ToolTip = 'Specifies the value of the Descending field';
                     }
                 }
             }
@@ -58,17 +60,20 @@ page 6014649 "NPR Generic Filter Page"
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the No. field';
                 }
                 field("Field Caption"; "Field Caption")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Field Caption field';
                 }
                 field("Filter"; FilterText)
                 {
                     ApplicationArea = All;
                     Caption = 'Filter';
                     Lookup = true;
+                    ToolTip = 'Specifies the value of the Filter field';
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -127,6 +132,7 @@ page 6014649 "NPR Generic Filter Page"
                 {
                     ApplicationArea = All;
                     Caption = 'Include';
+                    ToolTip = 'Specifies the value of the Include field';
 
                     trigger OnValidate()
                     begin
@@ -150,6 +156,7 @@ page 6014649 "NPR Generic Filter Page"
                 {
                     ApplicationArea = All;
                     Caption = 'Static';
+                    ToolTip = 'Specifies the value of the Static field';
 
                     trigger OnValidate()
                     var
@@ -188,6 +195,7 @@ page 6014649 "NPR Generic Filter Page"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Show All Fields action';
 
                 trigger OnAction()
                 begin
@@ -202,6 +210,7 @@ page 6014649 "NPR Generic Filter Page"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Show Filtered Fields action';
 
                 trigger OnAction()
                 begin
@@ -216,6 +225,7 @@ page 6014649 "NPR Generic Filter Page"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Remove All Filters action';
 
                 trigger OnAction()
                 begin

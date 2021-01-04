@@ -1,4 +1,4 @@
-﻿page 6059788 "NPR Ticket Access Reserv. List"
+page 6059788 "NPR Ticket Access Reserv. List"
 {
     Caption = 'Ticket Access Reservation';
     PageType = List;
@@ -14,26 +14,31 @@
                 field(Description; Description)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field(StartTime; StartTime)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'From Time';
                     Editable = false;
+                    ToolTip = 'Specifies the value of the From Time field';
                 }
                 field(EndTime; EndTime)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'To Time';
                     Editable = false;
+                    ToolTip = 'Specifies the value of the To Time field';
                 }
                 field("Customer No."; "Customer No.")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Customer No. field';
                 }
                 field(Quantity; Quantity)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Point Card - Issued Cards field';
                 }
             }
         }

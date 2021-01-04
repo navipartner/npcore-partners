@@ -19,36 +19,43 @@ page 6059769 "NPR NaviDocs Document List"
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Document Description field';
                 }
                 field("Posting Date"; "Posting Date")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Posting Date field';
                 }
                 field("No."; "No.")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the No. field';
                 }
                 field("Order No."; "Order No.")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Order No. field';
                 }
                 field("External Document No."; "External Document No.")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the External Document No. field';
                 }
                 field("No. (Recipient)"; "No. (Recipient)")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the No. (Recipient) field';
                 }
                 field("Name (Recipient)"; "Name (Recipient)")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Name (Recipient) field';
                 }
                 field(StatusText; StatusText)
                 {
@@ -56,42 +63,51 @@ page 6059769 "NPR NaviDocs Document List"
                     Caption = 'Status';
                     Editable = false;
                     OptionCaption = 'Unhandled,Error,Handled';
+                    ToolTip = 'Specifies the value of the Status field';
                 }
                 field("Document Handling Profile"; "Document Handling Profile")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Document Handling Profile field';
                 }
                 field("Document Handling"; "Document Handling")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Document Handling field';
                 }
                 field("Report No."; "Report No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Report No. field';
                 }
                 field("E-mail (Recipient)"; "E-mail (Recipient)")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the E-mail (Recipient) field';
                 }
                 field("Template Code"; "Template Code")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Template Code field';
                 }
                 field("Printed Qty."; "Printed Qty.")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Printed Qty. field';
                 }
                 field("Processed Qty."; "Processed Qty.")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Processed Qty. field';
                 }
                 field("Delay sending until"; "Delay sending until")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Delay sending until field';
                 }
             }
             part(NaviDocsCommentSubpage; "NPR NaviDocs Comment Subpage")
@@ -128,6 +144,7 @@ page 6059769 "NPR NaviDocs Document List"
                     PromotedIsBig = true;
                     ShortCutKey = 'F9';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Handle action';
 
                     trigger OnAction()
                     begin
@@ -144,6 +161,7 @@ page 6059769 "NPR NaviDocs Document List"
                     PromotedIsBig = true;
                     ShortCutKey = 'Shift+F9';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Handle marked action';
 
                     trigger OnAction()
                     begin
@@ -164,6 +182,7 @@ page 6059769 "NPR NaviDocs Document List"
                     PromotedIsBig = true;
                     ShortCutKey = 'Ctrl+U';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Show unhandled action';
 
                     trigger OnAction()
                     begin
@@ -183,6 +202,7 @@ page 6059769 "NPR NaviDocs Document List"
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Update Status of Marked action';
 
                     trigger OnAction()
                     begin
@@ -199,6 +219,7 @@ page 6059769 "NPR NaviDocs Document List"
                     Promoted = true;
                     PromotedCategory = Category6;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Set Status = Unhandled action';
 
                     trigger OnAction()
                     begin
@@ -214,6 +235,7 @@ page 6059769 "NPR NaviDocs Document List"
                     Promoted = true;
                     PromotedCategory = Category6;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Set Status = Error action';
 
                     trigger OnAction()
                     begin
@@ -229,6 +251,7 @@ page 6059769 "NPR NaviDocs Document List"
                     Promoted = true;
                     PromotedCategory = Category6;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Set Status = Handled action';
 
                     trigger OnAction()
                     begin
@@ -246,6 +269,7 @@ page 6059769 "NPR NaviDocs Document List"
                     Caption = 'Change Handling Profile';
                     Image = SendToMultiple;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Change Handling Profile action';
 
                     trigger OnAction()
                     begin
@@ -266,6 +290,7 @@ page 6059769 "NPR NaviDocs Document List"
                 PromotedCategory = Category4;
                 ShortCutKey = 'Shift+F5';
                 ApplicationArea = All;
+                ToolTip = 'Executes the Document Card action';
 
                 trigger OnAction()
                 begin
@@ -280,6 +305,7 @@ page 6059769 "NPR NaviDocs Document List"
                 PromotedCategory = Category4;
                 ShortCutKey = 'Ctrl+F5';
                 ApplicationArea = All;
+                ToolTip = 'Executes the Master Card action';
 
                 trigger OnAction()
                 begin
@@ -294,6 +320,7 @@ page 6059769 "NPR NaviDocs Document List"
                 PromotedCategory = Category4;
                 ShortCutKey = 'Ctrl+M';
                 ApplicationArea = All;
+                ToolTip = 'Executes the Template action';
 
                 trigger OnAction()
                 begin

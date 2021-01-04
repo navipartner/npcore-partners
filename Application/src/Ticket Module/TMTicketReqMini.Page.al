@@ -1,4 +1,4 @@
-﻿page 6060101 "NPR TM Ticket Req. Mini"
+page 6060101 "NPR TM Ticket Req. Mini"
 {
     // TM1.19/NPKNAV/20170309  CASE 266372 Transport TM1.19 - 8 March 2017
     // TM90.1.46/TSA /20200304 CASE 399138 Added a currpage update as changes did not "stick"
@@ -21,10 +21,12 @@
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the External Item Code field';
                 }
                 field(Quantity; Quantity)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Quantity field';
 
                     trigger OnValidate()
                     begin
@@ -38,19 +40,23 @@
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Admission Code field';
                 }
                 field("Admission Description"; "Admission Description")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Admission Description field';
                 }
                 field("Notification Method"; "Notification Method")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Notification Method field';
                 }
                 field("Notification Address"; "Notification Address")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Notification Address field';
                 }
             }
         }

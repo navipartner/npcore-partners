@@ -21,28 +21,34 @@ page 6151492 "NPR Raptor Data Buffer Entries"
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Entry No. field';
                 }
                 field("Date-Time Created"; "Date-Time Created")
                 {
                     ApplicationArea = All;
                     Visible = ShowCreatedDateTime;
+                    ToolTip = 'Specifies the value of the Date-Time Created field';
                 }
                 field("Item No."; "Item No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Item No. field';
                 }
                 field("Variant Code"; "Variant Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Variant Code field';
                 }
                 field("Item Description"; "Item Description")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Item Description field';
                 }
                 field(Priority; Priority)
                 {
                     ApplicationArea = All;
                     Visible = ShowPriority;
+                    ToolTip = 'Specifies the value of the Priority field';
                 }
             }
         }
@@ -61,6 +67,7 @@ page 6151492 "NPR Raptor Data Buffer Entries"
                 RunObject = Page "Item Card";
                 RunPageLink = "No." = FIELD("Item No.");
                 ApplicationArea = All;
+                ToolTip = 'Executes the Show Item Card action';
             }
         }
     }

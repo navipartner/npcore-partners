@@ -630,7 +630,7 @@ report 6014409 "NPR Sales Ticket Stat."
                 SetRange("Processing Type", "Processing Type"::"EFT");
             end;
         }
-         dataitem(CashPayment; "NPR Payment Type POS")
+        dataitem(CashPayment; "NPR Payment Type POS")
         {
             CalcFields = "Amount in Audit Roll";
             DataItemTableView = SORTING("No.", "Register No.") ORDER(Ascending);
@@ -669,15 +669,18 @@ report 6014409 "NPR Sales Ticket Stat."
                     {
                         Caption = 'Compare To Day';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Compare To Day field';
                     }
                     field(compareNearestDate; CompareNearestDate)
                     {
                         Caption = 'Compare Nearest Date';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Compare Nearest Date field';
                     }
                     field("Show Adjusted Cost"; ShowAdj)
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the ShowAdj field';
                     }
                 }
             }

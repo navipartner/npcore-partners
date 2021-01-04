@@ -11,6 +11,7 @@ pageextension 6014404 "NPR Posted Sales Shpt. Subform" extends "Posted Sales Shp
                 Image = ItemVariant;
                 ShortCutKey = 'Ctrl+Alt+V';
                 ApplicationArea = All;
+                ToolTip = 'Executes the Variety action';
             }
         }
     }

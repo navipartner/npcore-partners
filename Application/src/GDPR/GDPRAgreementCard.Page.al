@@ -18,10 +18,12 @@ page 6151123 "NPR GDPR Agreement Card"
                 field("No."; "No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the No. field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
             }
             group(Control6014407)
@@ -30,6 +32,7 @@ page 6151123 "NPR GDPR Agreement Card"
                 field("Anonymize After"; "Anonymize After")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Anonymize After field';
                 }
             }
             part(Control6014404; "NPR GDPR Agreement Versions")
@@ -52,6 +55,7 @@ page 6151123 "NPR GDPR Agreement Card"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Push Consent Request action';
 
                 trigger OnAction()
                 begin

@@ -130,21 +130,25 @@ report 6151598 "NPR Open/Archive Coupon Stat."
                 {
                     Caption = 'Start Date';
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Start Date field';
                 }
                 field("End Date"; EndDate)
                 {
                     Caption = 'End Date';
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the End Date field';
                 }
                 field("Blank CouponTypes"; RemoveBlankCouponTypes)
                 {
                     Caption = 'Remove Blank Coupon Types';
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Remove Blank Coupon Types field';
                 }
                 field("Customer No"; CustomerFilter)
                 {
                     Caption = 'Customer No';
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Customer No field';
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin

@@ -27,51 +27,61 @@ page 6014455 "NPR Campaign Discount List"
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field(Status; Status)
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Status field';
                 }
                 field("Starting Date"; "Starting Date")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Starting Date field';
                 }
                 field("Ending Date"; "Ending Date")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Closing Date field';
                 }
                 field("Period Type"; "Period Type")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Period Type field';
                 }
                 field("Period Description"; "Period Description")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Period Description field';
                 }
                 field(Comment; Comment)
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Comment field';
                 }
                 field("Created Date"; "Created Date")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Created Date field';
                 }
                 field("Last Date Modified"; "Last Date Modified")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Modified Date field';
                 }
             }
         }
@@ -90,6 +100,7 @@ page 6014455 "NPR Campaign Discount List"
                               "No." = FIELD(Code);
                 ShortCutKey = 'Shift+Ctrl+D';
                 ApplicationArea = All;
+                ToolTip = 'Executes the Dimensions action';
             }
         }
     }

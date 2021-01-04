@@ -23,24 +23,28 @@ page 6150666 "NPR NPRE Tmp POSWaiterPadLines"
                 field(Marked; Marked)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Marked field';
                 }
                 field("Waiter Pad No."; "Waiter Pad No.")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Waiter Pad No. field';
                 }
                 field("Line No."; "Line No.")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Line No. field';
                 }
                 field(Type; Type)
                 {
                     ApplicationArea = All;
                     Editable = false;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Type field';
                 }
                 field("No."; "No.")
                 {
@@ -48,12 +52,14 @@ page 6150666 "NPR NPRE Tmp POSWaiterPadLines"
                     Editable = false;
                     StyleExpr = StyleTxt;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the No. field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
                     Editable = false;
                     StyleExpr = StyleTxt;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field(Quanity; RemainingQtyToBill)
                 {
@@ -61,17 +67,20 @@ page 6150666 "NPR NPRE Tmp POSWaiterPadLines"
                     Caption = 'Quantity';
                     DecimalPlaces = 0 : 5;
                     StyleExpr = StyleTxt;
+                    ToolTip = 'Specifies the value of the Quantity field';
                 }
                 field("Marked Qty"; "Marked Qty")
                 {
                     ApplicationArea = All;
                     StyleExpr = StyleTxt;
+                    ToolTip = 'Specifies the value of the Qty. to ticket field';
                 }
                 field("Variant Code"; "Variant Code")
                 {
                     ApplicationArea = All;
                     StyleExpr = StyleTxt;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Variant Code field';
                 }
             }
         }
@@ -92,6 +101,7 @@ page 6150666 "NPR NPRE Tmp POSWaiterPadLines"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the OK action';
 
                     trigger OnAction()
                     begin

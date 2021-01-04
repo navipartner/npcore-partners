@@ -16,10 +16,12 @@ page 6151534 "NPR Nc Collector Req.Filt.Subf"
                 field("Field Name"; "Field Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Field Name field';
                 }
                 field("Filter Text"; "Filter Text")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Filter Text field';
                 }
             }
         }

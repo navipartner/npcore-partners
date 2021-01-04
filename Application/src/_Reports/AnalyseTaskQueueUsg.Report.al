@@ -329,16 +329,19 @@ report 6059900 "NPR Analyse Task Queue Usg."
                 {
                     Caption = 'Group By:';
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Group By: field';
                 }
                 field(ShowLines; ShowLines)
                 {
                     Caption = 'Show Lines';
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Show Lines field';
                 }
                 field(WarningLevel; WarningLevel)
                 {
                     Caption = 'Show Warning';
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Show Warning field';
                 }
             }
         }

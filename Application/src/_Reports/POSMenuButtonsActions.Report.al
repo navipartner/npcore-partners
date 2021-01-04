@@ -110,6 +110,7 @@ report 6014421 "NPR POS Menu Buttons/Actions"
                     {
                         Caption = 'Show Parameters';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Show Parameters field';
                     }
                 }
             }

@@ -23,6 +23,7 @@ report 6150699 "NPR Re-run Data Upg. Steps"
                     MinValue = 1;
                     ShowMandatory = true;
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the From Build Step field';
 
                     trigger OnValidate()
                     begin
@@ -37,6 +38,7 @@ report 6150699 "NPR Re-run Data Upg. Steps"
                     MinValue = 1;
                     ShowMandatory = true;
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the To Build Step field';
 
                     trigger OnValidate()
                     begin

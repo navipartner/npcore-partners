@@ -22,6 +22,7 @@ pageextension 6014459 "NPR Purch. Invoice Subform" extends "Purch. Invoice Subfo
             field("NPR Vendor Item No."; "Vendor Item No.")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the Vendor Item No. field';
             }
         }
         addafter("Line No.")
@@ -30,6 +31,7 @@ pageextension 6014459 "NPR Purch. Invoice Subform" extends "Purch. Invoice Subfo
             {
                 ApplicationArea = All;
                 Visible = false;
+                ToolTip = 'Specifies the value of the NPR Exchange Label field';
             }
         }
     }
@@ -43,6 +45,7 @@ pageextension 6014459 "NPR Purch. Invoice Subform" extends "Purch. Invoice Subfo
                 Image = ItemVariant;
                 ShortCutKey = 'Ctrl+Alt+V';
                 ApplicationArea = All;
+                ToolTip = 'Executes the Variety action';
             }
         }
     }

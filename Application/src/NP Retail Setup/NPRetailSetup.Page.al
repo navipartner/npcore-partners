@@ -15,6 +15,7 @@ page 6150613 "NPR NP Retail Setup"
                 field("Source Code"; "Source Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Source Code field';
                 }
             }
             group("System")
@@ -25,33 +26,40 @@ page 6150613 "NPR NP Retail Setup"
                     ApplicationArea = All;
                     DrillDownPageID = "NPR Retail Data Model Upg.Log";
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Data Model Build field';
                 }
                 field("Last Data Model Build Upgrade"; "Last Data Model Build Upgrade")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Last Data Model Build Upgrade field';
                 }
                 field("Last Data Model Build User ID"; "Last Data Model Build User ID")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Last Data Model Build User ID field';
                 }
                 field("Prev. Data Model Build"; "Prev. Data Model Build")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Prev. Data Model Build field';
                 }
                 field("Advanced POS Entries Activated"; "Advanced POS Entries Activated")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Advanced POS Entries Activated field';
                 }
                 field("Advanced Posting Activated"; "Advanced Posting Activated")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Advanced Posting Activated field';
                 }
                 field("Default POS Posting Profile"; "Default POS Posting Profile")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Default POS Posting Profile field';
                 }
             }
             group(Environment)
@@ -70,12 +78,14 @@ page 6150613 "NPR NP Retail Setup"
                             ApplicationArea = All;
                             Caption = 'Stored';
                             Editable = false;
+                            ToolTip = 'Specifies the value of the Stored field';
                         }
                         field("ActiveSession.""Database Name"""; ActiveSession."Database Name")
                         {
                             ApplicationArea = All;
                             Caption = 'Current';
                             Editable = false;
+                            ToolTip = 'Specifies the value of the Current field';
                         }
                     }
                     group("Company Name")
@@ -87,6 +97,7 @@ page 6150613 "NPR NP Retail Setup"
                             Caption = 'Stored';
                             Editable = false;
                             ShowCaption = false;
+                            ToolTip = 'Specifies the value of the Stored field';
                         }
                         field(CURRENTCOMPANY; CurrentCompany)
                         {
@@ -94,6 +105,7 @@ page 6150613 "NPR NP Retail Setup"
                             Caption = 'Current';
                             Editable = false;
                             ShowCaption = false;
+                            ToolTip = 'Specifies the value of the Current field';
                         }
                     }
                     group("Tenant Name")
@@ -105,6 +117,7 @@ page 6150613 "NPR NP Retail Setup"
                             Caption = 'Stored';
                             Editable = false;
                             ShowCaption = false;
+                            ToolTip = 'Specifies the value of the Stored field';
                         }
                         field(TENANTID; TenantId)
                         {
@@ -112,6 +125,7 @@ page 6150613 "NPR NP Retail Setup"
                             Caption = 'Current';
                             Editable = false;
                             ShowCaption = false;
+                            ToolTip = 'Specifies the value of the Current field';
                         }
                     }
                 }
@@ -121,19 +135,23 @@ page 6150613 "NPR NP Retail Setup"
                     field("Environment Type"; "Environment Type")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Environment Type field';
                     }
                     field("Environment Verified"; "Environment Verified")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Environment Verified field';
                     }
                     field("Environment Template"; "Environment Template")
                     {
                         ApplicationArea = All;
                         Importance = Additional;
+                        ToolTip = 'Specifies the value of the Environment Template field';
                     }
                     field("Enable Client Diagnostics"; "Enable Client Diagnostics")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Enable Client Diagnostics field';
                     }
                 }
             }
@@ -142,14 +160,17 @@ page 6150613 "NPR NP Retail Setup"
                 field("Standard Conditions"; "Standard Conditions")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Standard Conditions field';
                 }
                 field(Privacy; Privacy)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Privacy field';
                 }
                 field("License Agreement"; "License Agreement")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the License Agreement field';
                 }
             }
         }
@@ -173,6 +194,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = PaymentJournal;
                         RunObject = Page "NPR POS Menus";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Menus action';
                     }
                     action("Default Views")
                     {
@@ -180,6 +202,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = View;
                         RunObject = Page "NPR POS Default Views";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Default Views action';
                     }
                     action("Actions")
                     {
@@ -187,6 +210,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = "Action";
                         RunObject = Page "NPR POS Actions";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Actions action';
                     }
                     action(Action6014556)
                     {
@@ -194,6 +218,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = SetupPayment;
                         RunObject = Page "NPR POS Setup";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Setup action';
                     }
                     action("View List")
                     {
@@ -201,6 +226,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = ViewDocumentLine;
                         RunObject = Page "NPR POS View List";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the View List action';
                     }
                     action("Menu Filter")
                     {
@@ -208,6 +234,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = "Filter";
                         RunObject = Page "NPR POS Menu Filter";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Menu Filter action';
                     }
                     action("POS Sales Workflows")
                     {
@@ -215,6 +242,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = Allocate;
                         RunObject = Page "NPR POS Sales Workflows";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the POS Sales Workflows action';
                     }
                 }
                 group("Ean Box Events")
@@ -227,6 +255,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = List;
                         RunObject = Page "NPR Ean Box Events";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Ean Box Events action';
                     }
                     action("Ean Box Setups")
                     {
@@ -234,6 +263,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = List;
                         RunObject = Page "NPR Ean Box Setups";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Ean Box Setups action';
                     }
                 }
             }
@@ -250,6 +280,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = Warehouse;
                         RunObject = Page "NPR POS Store List";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the POS Stores action';
                     }
                     action("POS Units")
                     {
@@ -257,6 +288,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = MiniForm;
                         RunObject = Page "NPR POS Unit List";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the POS Units action';
                     }
                     action("POS Payment Bins")
                     {
@@ -264,6 +296,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = Bin;
                         RunObject = Page "NPR POS Payment Bins";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the POS Payment Bins action';
                     }
                     action("POS Posting Setup")
                     {
@@ -271,6 +304,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = GeneralPostingSetup;
                         RunObject = Page "NPR POS Posting Setup";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the POS Posting Setup action';
                     }
                     action("POS Payment Method")
                     {
@@ -278,6 +312,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = SetupPayment;
                         RunObject = Page "NPR POS Payment Method List";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the POS Payment Method action';
                     }
                     action("Unit Identity")
                     {
@@ -285,6 +320,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = UnitConversions;
                         RunObject = Page "NPR POS Unit Identity List";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Unit Identity action';
                     }
                 }
                 group(Transactions)
@@ -297,6 +333,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = Register;
                         RunObject = Page "NPR POS Period Register List";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the POS Period Registers action';
                     }
                     action("POS Entries")
                     {
@@ -304,6 +341,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = LedgerEntries;
                         RunObject = Page "NPR POS Entries";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the POS Entries action';
                     }
                     action("POS Entries (Detailed)")
                     {
@@ -311,6 +349,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = EntriesList;
                         RunObject = Page "NPR POS Entry List";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the POS Entries (Detailed) action';
                     }
                     action("POS Posting Log")
                     {
@@ -318,6 +357,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = Log;
                         RunObject = Page "NPR POS Posting Log";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the POS Posting Log action';
                     }
                 }
                 group(Upgrade)
@@ -328,6 +368,7 @@ page 6150613 "NPR NP Retail Setup"
                     {
                         Caption = 'Upgrade Audit Roll to POS Entry';
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Upgrade Audit Roll to POS Entry action';
 
                         trigger OnAction()
                         var
@@ -349,6 +390,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = List;
                         RunObject = Page "NPR POS Web Fonts";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the POS Web Fonts action';
                     }
                     action("POS Stargate Packages")
                     {
@@ -356,6 +398,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = MachineCenter;
                         RunObject = Page "NPR POS Stargate Packages";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the POS Stargate Packages action';
                     }
                     action("Dependency Management Setup")
                     {
@@ -363,6 +406,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = Setup;
                         RunObject = Page "NPR Dependency Mgt. Setup";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Dependency Management Setup action';
                     }
                     action("RFID Setup")
                     {
@@ -370,6 +414,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = Setup;
                         RunObject = Page "NPR RFID Setup";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the RFID Setup action';
                     }
                     action("MCS API Setup")
                     {
@@ -377,6 +422,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = Setup;
                         RunObject = Page "NPR MCS API Setup";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the MCS API Setup action';
                     }
                     action("Lookup Templates")
                     {
@@ -384,6 +430,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = List;
                         RunObject = Page "NPR Lookup Templates";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Lookup Templates action';
                     }
                 }
                 action("Client Diagnostics")
@@ -392,6 +439,7 @@ page 6150613 "NPR NP Retail Setup"
                     Image = AnalysisView;
                     RunObject = Page "NPR Client Diagnostics";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Client Diagnostics action';
                 }
             }
             group(PaymentCard)
@@ -403,6 +451,7 @@ page 6150613 "NPR NP Retail Setup"
                     Image = Payment;
                     RunObject = Page "NPR Payment Type - List";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Types action';
                 }
             }
             group(ModuleSection)
@@ -419,6 +468,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = List;
                         RunObject = Page "NPR Variety";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Variety action';
                     }
                     action("Variety Setup")
                     {
@@ -426,6 +476,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = List;
                         RunObject = Page "NPR Variety Setup";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Variety Setup action';
                     }
                     action("Variety Fields Setup")
                     {
@@ -433,6 +484,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = List;
                         RunObject = Page "NPR Variety Fields Setup";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Variety Fields Setup action';
                     }
                     action("Variety Group")
                     {
@@ -440,6 +492,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = List;
                         RunObject = Page "NPR Variety Group";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Variety Group action';
                     }
                 }
                 group("E-mail")
@@ -452,6 +505,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = List;
                         RunObject = Page "NPR E-mail Templates";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the E-mail Templates action';
                     }
                     action("E-mail Setup")
                     {
@@ -459,6 +513,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = List;
                         RunObject = Page "NPR E-mail Setup";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the E-mail Setup action';
                     }
                 }
                 group(ImportExport)
@@ -471,6 +526,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = List;
                         RunObject = Page "NPR Table Export Wizard";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Table Export action';
                     }
                     action("Table Import")
                     {
@@ -478,6 +534,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = List;
                         RunObject = Page "NPR Table Import Wizard";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Table Import action';
                     }
                     action("Object List")
                     {
@@ -485,6 +542,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = List;
                         RunObject = Page "NPR Object List";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Object List action';
                     }
                 }
                 group(Hospitality)
@@ -497,6 +555,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = List;
                         RunObject = Page "NPR NPRE Seating List";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Seating List action';
                     }
                     action("Hospitality Setup")
                     {
@@ -504,6 +563,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = List;
                         RunObject = Page "NPR NPRE Restaurant Setup";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Hospitality Setup action';
                     }
                     action("Seating Locations")
                     {
@@ -511,6 +571,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = List;
                         RunObject = Page "NPR NPRE Seating Location";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Seating Locations action';
                     }
                 }
                 group(DiscountCoupon)
@@ -523,6 +584,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = List;
                         RunObject = Page "NPR NpDc Coupons";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Coupons action';
                     }
                     action("Coupon Types")
                     {
@@ -530,6 +592,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = List;
                         RunObject = Page "NPR NpDc Coupon Types";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Coupon Types action';
                     }
                     action("Posted Coupons")
                     {
@@ -537,6 +600,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = List;
                         RunObject = Page "NPR NpDc Arch. Coupons";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Posted Coupons action';
                     }
                     action("Coupon Setup")
                     {
@@ -544,6 +608,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = List;
                         RunObject = Page "NPR NpDc Coupon Setup";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Coupon Setup action';
                     }
                 }
                 group(Voucher)
@@ -556,6 +621,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = List;
                         RunObject = Page "NPR NpRv Vouchers";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Vouchers action';
                     }
                     action("Voucher Types")
                     {
@@ -563,6 +629,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = List;
                         RunObject = Page "NPR NpRv Voucher Types";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Voucher Types action';
                     }
                     action("Posted Vouchers")
                     {
@@ -570,6 +637,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = List;
                         RunObject = Page "NPR NpRv Arch. Vouchers";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Posted Vouchers action';
                     }
                     action("Voucher Setup")
                     {
@@ -577,6 +645,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = List;
                         RunObject = Page "NPR NpRv Global Voucher Setup";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Voucher Setup action';
                     }
                 }
                 group("Azure Functions")
@@ -589,6 +658,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = List;
                         RunObject = Page "NPR AF Setup";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Setup action';
                     }
                     action("Spire Barcode")
                     {
@@ -596,6 +666,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = List;
                         RunObject = Page "NPR AF Test Services";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Spire Barcode action';
                     }
                     action(Notifications)
                     {
@@ -603,6 +674,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = List;
                         RunObject = Page "NPR AF Notification Hub List";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Notifications action';
                     }
                 }
                 group(Raptor)
@@ -615,6 +687,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = List;
                         RunObject = Page "NPR Raptor Setup";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Setup action';
                     }
                 }
                 group(SalesTax)
@@ -627,6 +700,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = List;
                         RunObject = Page "Tax Groups";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Tax Groups action';
                     }
                     action("Tax Jurisdictions")
                     {
@@ -634,6 +708,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = List;
                         RunObject = Page "Tax Jurisdictions";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Tax Jurisdictions action';
                     }
                     action("Tax Areas")
                     {
@@ -641,6 +716,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = List;
                         RunObject = Page "Tax Area List";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Tax Areas action';
                     }
                     action("Tax Details")
                     {
@@ -648,6 +724,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = List;
                         RunObject = Page "Tax Details";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Tax Details action';
                     }
                     action("Copy Tax Setup")
                     {
@@ -655,6 +732,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = List;
                         RunObject = Page "Copy Tax Setup";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Copy Tax Setup action';
                     }
                 }
                 action("POS Info list")
@@ -663,6 +741,7 @@ page 6150613 "NPR NP Retail Setup"
                     Image = Planning;
                     RunObject = Page "NPR POS Info List";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the POS Info list action';
                 }
                 group("Dynamic Modules")
                 {
@@ -674,6 +753,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = Skills;
                         RunObject = Page "NPR Dynamic Modules";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Dynamic Module action';
                     }
                 }
                 group(DistributionReplenishment)
@@ -686,6 +766,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = Replan;
                         RunObject = Page "NPR Retail Replenishment Setup";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Retail Replenishment Setup action';
                     }
                 }
                 group("Other Functions")
@@ -697,6 +778,7 @@ page 6150613 "NPR NP Retail Setup"
                         Caption = 'Show Last Error';
                         Image = ErrorLog;
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Show Last Error action';
 
                         trigger OnAction()
                         var
@@ -719,6 +801,7 @@ page 6150613 "NPR NP Retail Setup"
                     Image = Setup;
                     RunObject = Page "NPR Magento Setup";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Magento Setup action';
                 }
             }
             group(NaviConnect)
@@ -739,6 +822,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = Setup;
                         RunObject = Page "NPR NpXml Template List";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the NpXml Templates action';
                     }
                 }
                 group(NaviConnectTriggers)
@@ -755,6 +839,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = List;
                         RunObject = Page "NPR Nc Triggers";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Triggers action';
                     }
                     separator(Separator6014497)
                     {
@@ -766,6 +851,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = Setup;
                         RunObject = Page "NPR Nc Trigger Setup";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Trigger Setup action';
                     }
                 }
                 group(NaviConnectEndpoints)
@@ -778,6 +864,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = List;
                         RunObject = Page "NPR Nc Endpoint Types";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Types action';
                     }
                     action(List)
                     {
@@ -785,6 +872,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = List;
                         RunObject = Page "NPR Nc Endpoints";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the List action';
                     }
                 }
                 group(NaviConnectCollectors)
@@ -797,6 +885,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = List;
                         RunObject = Page "NPR Nc Collector List";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Collectors action';
                     }
                     action(Collections)
                     {
@@ -804,6 +893,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = List;
                         RunObject = Page "NPR Nc Collection List";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Collections action';
                     }
                     action("Collection Lines")
                     {
@@ -811,6 +901,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = List;
                         RunObject = Page "NPR Nc Collection Lines";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Collection Lines action';
                     }
                     action("Create Outgoing Collector Req.")
                     {
@@ -818,6 +909,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = List;
                         RunObject = Page "NPR Nc Coll. Create Outg. Req.";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Create Outgoing Collector Req. action';
                     }
                     action("Collector Request Lines")
                     {
@@ -825,6 +917,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = List;
                         RunObject = Page "NPR Nc Collector Req. Lines";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Collector Request Lines action';
                     }
                 }
                 group(NaviConnectTaskQueue)
@@ -841,6 +934,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = List;
                         RunObject = Page "NPR Task Journal";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Tasks action';
                     }
                     separator(History)
                     {
@@ -852,6 +946,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = List;
                         RunObject = Page "NPR Task Worker";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Task Workers action';
                     }
                     action("Task Queue")
                     {
@@ -859,6 +954,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = List;
                         RunObject = Page "NPR Task Queue";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Task Queue action';
                     }
                     action("Task Log")
                     {
@@ -866,6 +962,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = List;
                         RunObject = Page "NPR Task Log (Task)";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Task Log action';
                     }
                     separator(Separator6014479)
                     {
@@ -877,6 +974,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = List;
                         RunObject = Page "NPR Task Worker Group";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Task Worker Groups action';
                     }
                 }
                 group(NaviConnectDataLog)
@@ -889,6 +987,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = Setup;
                         RunObject = Page "NPR Data Log Setup";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Data Log Setup action';
                     }
                     action("Data Log Subscribers")
                     {
@@ -896,6 +995,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = List;
                         RunObject = Page "NPR Data Log Subscribers";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Data Log Subscribers action';
                     }
                 }
                 group(NaviConnectPeriodicActivities)
@@ -908,6 +1008,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = Task;
                         RunObject = Page "NPR Nc Task List";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Task List action';
                     }
                     action("Import List")
                     {
@@ -915,6 +1016,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = Task;
                         RunObject = Page "NPR Nc Import List";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Import List action';
                     }
                 }
                 group(NaviConnectSetup)
@@ -927,6 +1029,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = Setup;
                         RunObject = Page "NPR Nc Setup";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the NaviConnect Setup action';
                     }
                     action("Task Processors")
                     {
@@ -934,6 +1037,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = Setup;
                         RunObject = Page "NPR Nc Task Proces. List";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Task Processors action';
                     }
                     action("Task Setup")
                     {
@@ -941,6 +1045,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = Setup;
                         RunObject = Page "NPR Nc Task Setup";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Task Setup action';
                     }
                     action("Import Types")
                     {
@@ -948,6 +1053,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = Setup;
                         RunObject = Page "NPR Nc Import Types";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Import Types action';
                     }
                 }
             }
@@ -960,6 +1066,7 @@ page 6150613 "NPR NP Retail Setup"
                     Image = History;
                     RunObject = Page "NPR Upgrade History";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the History action';
                 }
             }
         }
@@ -975,6 +1082,7 @@ page 6150613 "NPR NP Retail Setup"
                     Image = SetupList;
                     RunObject = Page "NPR Display Setup";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Display Setup action';
                 }
                 action("Scanner Setups")
                 {
@@ -982,6 +1090,7 @@ page 6150613 "NPR NP Retail Setup"
                     Image = BarCode;
                     RunObject = Page "NPR Scanner - List";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Scanner Setups action';
                 }
 
                 group(Print)
@@ -994,6 +1103,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = Setup;
                         RunObject = Page "Printer Selections";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Printer Selections action';
                     }
                     action("Retail Print Template List")
                     {
@@ -1001,6 +1111,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = Setup;
                         RunObject = Page "NPR RP Template List";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Retail Print Template List action';
                     }
                     action("Object Output Selection")
                     {
@@ -1008,6 +1119,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = Setup;
                         RunObject = Page "NPR Object Output Selection";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Object Output Selection action';
                     }
                     action("Retail Logo Setup")
                     {
@@ -1015,6 +1127,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = Setup;
                         RunObject = Page "NPR Retail Logo Setup";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Retail Logo Setup action';
                     }
                     action("Google Cloud Print Setup")
                     {
@@ -1022,6 +1135,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = Setup;
                         RunObject = Page "NPR GCP Setup";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Google Cloud Print Setup action';
                     }
                     action("Retail Print Template Setup")
                     {
@@ -1029,6 +1143,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = Setup;
                         RunObject = Page "NPR RP Template Setup";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Retail Print Template Setup action';
                     }
                     action("Report Selection Retail")
                     {
@@ -1036,6 +1151,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = Print;
                         RunObject = Page "NPR Report Selection: Retail";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Report Selection Retail action';
                     }
                     action("Report Selection Contract")
                     {
@@ -1043,6 +1159,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = Print;
                         RunObject = Page "NPR Report Selection: Contract";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Report Selection Contract action';
                     }
                 }
                 group(EFTIntegration)
@@ -1055,6 +1172,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = Setup;
                         RunObject = Page "NPR EFT Integration Types";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Integration Types action';
                     }
                 }
                 group(Pepper)
@@ -1067,6 +1185,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = Setup;
                         RunObject = Page "NPR Pepper EFT Trans. Types";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Transaction Types action';
                     }
                     action("Transaction Subtypes")
                     {
@@ -1074,6 +1193,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = Setup;
                         RunObject = Page "NPR Pepper EFT Trx Subtype";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Transaction Subtypes action';
                     }
                     action("Result Codes")
                     {
@@ -1081,6 +1201,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = Setup;
                         RunObject = Page "NPR Pepper EFT Result Codes";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Result Codes action';
                     }
                     action("Terminal Types")
                     {
@@ -1088,6 +1209,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = Setup;
                         RunObject = Page "NPR Pepper Terminal Types";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Terminal Types action';
                     }
                     action(Terminals)
                     {
@@ -1095,6 +1217,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = Setup;
                         RunObject = Page "NPR Pepper Terminal List";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Terminals action';
                     }
                     action(Versions)
                     {
@@ -1102,6 +1225,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = Setup;
                         RunObject = Page "NPR Pepper Version List";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Versions action';
                     }
                     action(Instances)
                     {
@@ -1109,6 +1233,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = Setup;
                         RunObject = Page "NPR Pepper Instances";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Instances action';
                     }
                     action(Configurations)
                     {
@@ -1116,6 +1241,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = Setup;
                         RunObject = Page "NPR Pepper Config. List";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Configurations action';
                     }
                     action("Card Types")
                     {
@@ -1123,6 +1249,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = Setup;
                         RunObject = Page "NPR Pepper Card Types";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Card Types action';
                     }
                     action("Card Type Group")
                     {
@@ -1130,6 +1257,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = Setup;
                         RunObject = Page "NPR Pepper Card Type Group";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Card Type Group action';
                     }
                 }
                 group(CleanCash)
@@ -1142,6 +1270,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = Setup;
                         RunObject = Page "NPR CleanCash Setup List";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Setup List action';
                     }
                     action("Audit Roll List")
                     {
@@ -1149,6 +1278,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = List;
                         RunObject = Page "NPR CleanCash Audit Roll List";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Audit Roll List action';
                     }
                     action("Register List")
                     {
@@ -1156,6 +1286,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = Setup;
                         RunObject = Page "NPR CleanCash Register List";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Register List action';
                     }
                     action("Error List")
                     {
@@ -1163,6 +1294,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = List;
                         RunObject = Page "NPR CleanCash Error List";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Error List action';
                     }
                 }
             }
@@ -1184,6 +1316,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = List;
                         RunObject = Page "NPR Pacsoft Package Codes";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Pacsoft Package Codes action';
                     }
                     action("Pacsoft Shipment Document Services")
                     {
@@ -1191,6 +1324,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = List;
                         RunObject = Page "NPR Pacsoft Shipm. Doc. Serv.";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Pacsoft Shipment Document Services action';
                     }
                     separator(Documents)
                     {
@@ -1202,6 +1336,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = List;
                         RunObject = Page "NPR Pacsoft Shipment Documents";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Pacsoft Shipment Documents action';
                     }
                     separator(Separator6014434)
                     {
@@ -1213,6 +1348,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = Setup;
                         RunObject = Page "NPR Pacsoft Setup";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Pacsoft Setup action';
                     }
                 }
                 group(Packages)
@@ -1225,6 +1361,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = List;
                         RunObject = Page "NPR Package Module Admin";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Package Module Admin action';
                     }
                 }
                 group(DocExchange)
@@ -1237,6 +1374,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = Setup;
                         RunObject = Page "NPR Doc. Exch. Setup";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Setup action';
                     }
                     action(Paths)
                     {
@@ -1244,6 +1382,7 @@ page 6150613 "NPR NP Retail Setup"
                         Image = List;
                         RunObject = Page "NPR Doc. Exchange Paths";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Paths action';
                     }
                 }
             }

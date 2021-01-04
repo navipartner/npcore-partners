@@ -26,82 +26,102 @@ page 6014440 "NPR Pacsoft Shipment Documents"
                 field("Entry No."; "Entry No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Entry No. field';
                 }
                 field("RecordID"; RecordID)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the RecordID field';
                 }
                 field("Creation Time"; "Creation Time")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Creation Time field';
                 }
                 field("Export Time"; "Export Time")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Export Time field';
                 }
                 field(Status; Status)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Status field';
                 }
                 field("Return Message"; "Return Message")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Return Message field';
                 }
                 field(Session; Session)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Session field';
                 }
                 field(Name; Name)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Name field';
                 }
                 field("Shipping Agent Code"; "Shipping Agent Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Shipping Agent Code field';
                 }
                 field("Package Code"; "Package Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Package Code field';
                 }
                 field(Reference; Reference)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Reference field';
                 }
                 field("Shipment Date"; "Shipment Date")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Shipment Date field';
                 }
                 field("Shipping Method Code"; "Shipping Method Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Shipping Method Code field';
                 }
                 field("Shipping Agent Service Code"; "Shipping Agent Service Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Shipping Agent Service Code field';
                 }
                 field("Response Shipment ID"; "Response Shipment ID")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Response Shipment ID field';
                 }
                 field("Response Package No."; "Response Package No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Response Package No. field';
                 }
                 field("Print Return Label"; "Print Return Label")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Print Return Label field';
                 }
                 field("Return Response Shipment ID"; "Return Response Shipment ID")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Return Response Shipment ID field';
                 }
                 field("Return Response Package No."; "Return Response Package No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Return Response Package No. field';
                 }
                 field("Return Shipping Agent Code"; "Return Shipping Agent Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Return Shipping Agent Code field';
                 }
             }
         }
@@ -118,6 +138,7 @@ page 6014440 "NPR Pacsoft Shipment Documents"
                 ShortCutKey = 'Shift+F5';
                 Visible = false;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Card action';
 
                 trigger OnAction()
                 var
@@ -135,6 +156,7 @@ page 6014440 "NPR Pacsoft Shipment Documents"
                 Image = Track;
                 ShortCutKey = 'Ctrl+F9';
                 ApplicationArea = All;
+                ToolTip = 'Executes the Track''n''Trace action';
 
                 trigger OnAction()
                 begin
@@ -147,6 +169,7 @@ page 6014440 "NPR Pacsoft Shipment Documents"
                 Image = SendTo;
                 ShortCutKey = 'F9';
                 ApplicationArea = All;
+                ToolTip = 'Executes the Send Document action';
 
                 trigger OnAction()
                 var
@@ -179,12 +202,14 @@ page 6014440 "NPR Pacsoft Shipment Documents"
                 Image = Setup;
                 RunObject = Page "NPR Pacsoft Setup";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Setup action';
             }
             action(PrintDocument)
             {
                 Caption = 'Print Document';
                 Image = PrintDocument;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Print Document action';
 
                 trigger OnAction()
                 begin

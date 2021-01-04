@@ -17,26 +17,32 @@ page 6151539 "NPR Nc Endpoints"
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field("Endpoint Type"; "Endpoint Type")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Endpoint Type field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Setup Summary"; "Setup Summary")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Setup Summary field';
                 }
                 field(Enabled; Enabled)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Enabled field';
                 }
                 field("Linked Endpoints"; "Linked Endpoints")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Linked Endpoints field';
                 }
             }
         }
@@ -54,6 +60,7 @@ page 6151539 "NPR Nc Endpoints"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Setup action';
 
                 trigger OnAction()
                 begin
@@ -72,6 +79,7 @@ page 6151539 "NPR Nc Endpoints"
                 RunPageView = SORTING("Endpoint Code", "Trigger Code")
                               ORDER(Ascending);
                 ApplicationArea = All;
+                ToolTip = 'Executes the Trigger Links action';
             }
             action("Init Endpoint")
             {
@@ -82,6 +90,7 @@ page 6151539 "NPR Nc Endpoints"
                 PromotedIsBig = true;
                 Visible = EndpointHasInit;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Init Endpoint action';
 
                 trigger OnAction()
                 var

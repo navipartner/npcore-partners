@@ -21,20 +21,24 @@ page 6184496 "NPR Pepper Version List"
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Zip File"; HasInstallFile)
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the HasInstallFile field';
                 }
                 field("Pepper DLL Version"; "Pepper DLL Version")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Pepper DLL Version field';
                 }
             }
         }
@@ -50,6 +54,7 @@ page 6184496 "NPR Pepper Version List"
                 Image = Setup;
                 RunObject = Page "NPR Pepper Config. List";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Configurations action';
             }
         }
         area(processing)
@@ -61,6 +66,7 @@ page 6184496 "NPR Pepper Version List"
                     Caption = 'Zip';
                     Image = Import;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Zip action';
 
                     trigger OnAction()
                     begin
@@ -76,6 +82,7 @@ page 6184496 "NPR Pepper Version List"
                     Caption = 'Zip';
                     Image = DeleteQtyToHandle;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Zip action';
 
                     trigger OnAction()
                     begin
@@ -91,6 +98,7 @@ page 6184496 "NPR Pepper Version List"
                     Caption = 'Zip';
                     Image = Export;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Zip action';
 
                     trigger OnAction()
                     begin

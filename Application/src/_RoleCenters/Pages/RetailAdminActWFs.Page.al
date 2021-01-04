@@ -21,6 +21,7 @@ page 6151247 "NPR Retail Admin Act - WFs"
                     ApplicationArea = All;
                     Caption = 'POS Sales Workflows';
                     ShowCaption = true;
+                    ToolTip = 'Specifies the value of the POS Sales Workflows field';
                 }
 
                 field("EAN SETUPr"; "EAN SETUP")
@@ -28,6 +29,7 @@ page 6151247 "NPR Retail Admin Act - WFs"
                     ApplicationArea = All;
                     Caption = 'EAN BOX SETUP';
                     ShowCaption = true;
+                    ToolTip = 'Specifies the value of the EAN BOX SETUP field';
                 }
 
             }

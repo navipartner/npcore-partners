@@ -21,30 +21,37 @@ page 6014580 "NPR Object Output Selection"
                 field("User ID"; "User ID")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the User ID field';
                 }
                 field("Object Type"; "Object Type")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Object Type field';
                 }
                 field("Object ID"; "Object ID")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Object ID field';
                 }
                 field("Object Name"; "Object Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Object Name field';
                 }
                 field("Print Template"; "Print Template")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Print Template field';
                 }
                 field("Output Type"; "Output Type")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Output Type field';
                 }
                 field("Output Path"; "Output Path")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Output Path field';
                 }
             }
         }

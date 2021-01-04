@@ -1119,16 +1119,19 @@ report 6014617 "NPR Purchase Order"
                     {
                         Caption = 'No. of Copies';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the No. of Copies field';
                     }
                     field(ShowInternalInformation; ShowInternalInfo)
                     {
                         Caption = 'Show Internal Information';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Show Internal Information field';
                     }
                     field(ArchiveDocument; ArchiveDocument)
                     {
                         Caption = 'Archive Document';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Archive Document field';
 
                         trigger OnValidate()
                         begin
@@ -1141,6 +1144,7 @@ report 6014617 "NPR Purchase Order"
                         Caption = 'Log Interaction';
                         Enabled = LogInteractionEnable;
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Log Interaction field';
 
                         trigger OnValidate()
                         begin

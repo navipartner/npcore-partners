@@ -369,21 +369,25 @@ report 6014533 "NPR Inventory - flow"
                     {
                         Caption = 'Hide Items With No Sales';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Hide Items With No Sales field';
                     }
                     field(SkipWithoutPortfolio; SkipWithoutPortfolio)
                     {
                         Caption = 'Hide Items With No Inventory';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Hide Items With No Inventory field';
                     }
                     field(OnlyTotal; OnlyTotal)
                     {
                         Caption = 'Show Only Total';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Show Only Total field';
                     }
                     field(ShowGroups; ShowGroups)
                     {
                         Caption = 'Show Groups';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Show Groups field';
                     }
                 }
             }

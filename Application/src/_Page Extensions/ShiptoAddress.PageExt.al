@@ -9,6 +9,7 @@ pageextension 6014431 "NPR Ship-to Address" extends "Ship-to Address"
             {
                 ApplicationArea = All;
                 Importance = Additional;
+                ToolTip = 'Specifies the value of the Name 2 field';
             }
         }
     }

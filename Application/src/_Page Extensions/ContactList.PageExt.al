@@ -12,6 +12,7 @@ pageextension 6014453 "NPR Contact List" extends "Contact List"
                 Caption = 'POS Entries';
                 Image = Entries;
                 ApplicationArea = All;
+                ToolTip = 'Executes the POS Entries action';
             }
         }
         addafter(NewSalesQuote)
@@ -21,6 +22,7 @@ pageextension 6014453 "NPR Contact List" extends "Contact List"
                 Caption = 'PhoneLookup';
                 Image = ImportLog;
                 ApplicationArea = All;
+                ToolTip = 'Executes the PhoneLookup action';
             }
         }
 
@@ -35,6 +37,7 @@ pageextension 6014453 "NPR Contact List" extends "Contact List"
                     Caption = 'Import Face Image';
                     ApplicationArea = All;
                     Image = Picture;
+                    ToolTip = 'Executes the Import Face Image action';
 
                     trigger OnAction()
                     var
@@ -96,6 +99,7 @@ pageextension 6014453 "NPR Contact List" extends "Contact List"
                     Caption = 'Identify Person';
                     ApplicationArea = All;
                     Image = AnalysisView;
+                    ToolTip = 'Executes the Identify Person action';
 
                     trigger OnAction()
                     var

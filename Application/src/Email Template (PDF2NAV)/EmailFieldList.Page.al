@@ -22,11 +22,13 @@ page 6059792 "NPR E-mail Field List"
                 {
                     ApplicationArea = All;
                     Caption = 'No.';
+                    ToolTip = 'Specifies the value of the No. field';
                 }
                 field("Field Caption"; "Field Caption")
                 {
                     ApplicationArea = All;
                     Caption = 'Field Name';
+                    ToolTip = 'Specifies the value of the Field Name field';
                 }
             }
         }

@@ -99,6 +99,7 @@ report 6014403 "NPR Cashed Gift Vouchers"
                     {
                         Caption = 'ShowDetails';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the ShowDetails field';
                     }
                 }
                 group("Created In Company")
@@ -116,42 +117,50 @@ report 6014403 "NPR Cashed Gift Vouchers"
                                 ShowCaption = false;
                                 Visible = CompanyVisible1;
                                 ApplicationArea = All;
+                                ToolTip = 'Specifies the value of the CompanyList[1] field';
                             }
                             field("CompanyList[2]"; CompanyList[2])
                             {
                                 ShowCaption = false;
                                 Visible = CompanyVisible2;
                                 ApplicationArea = All;
+                                ToolTip = 'Specifies the value of the CompanyList[2] field';
                             }
                             field("CompanyList[3]"; CompanyList[3])
                             {
                                 Visible = CompanyVisible3;
                                 ApplicationArea = All;
+                                ToolTip = 'Specifies the value of the CompanyList[3] field';
                             }
                             field("CompanyList[4]"; CompanyList[4])
                             {
                                 Visible = CompanyVisible4;
                                 ApplicationArea = All;
+                                ToolTip = 'Specifies the value of the CompanyList[4] field';
                             }
                             field("CompanyList[5]"; CompanyList[5])
                             {
                                 Visible = CompanyVisible5;
                                 ApplicationArea = All;
+                                ToolTip = 'Specifies the value of the CompanyList[5] field';
                             }
                             field("CompanyList[6]"; CompanyList[6])
                             {
                                 Visible = CompanyVisible6;
                                 ApplicationArea = All;
+                                ToolTip = 'Specifies the value of the CompanyList[6] field';
                             }
                             field("CompanyList[7]"; CompanyList[7])
                             {
                                 Visible = CompanyVisible7;
                                 ApplicationArea = All;
+                                ToolTip = 'Specifies the value of the CompanyList[7] field';
                             }
                             field("CompanyList[8]"; CompanyList[8])
                             {
                                 Visible = CompanyVisible8;
                                 ApplicationArea = All;
+                                ToolTip = 'Specifies the value of the CompanyList[8] field';
                             }
                         }
                         group(Control6150625)
@@ -163,6 +172,7 @@ report 6014403 "NPR Cashed Gift Vouchers"
                                 ShowCaption = false;
                                 Visible = CompanyVisible1;
                                 ApplicationArea = All;
+                                ToolTip = 'Specifies the value of the CompanyListName[1] field';
                             }
                             field("CompanyListName[2]"; CompanyListName[2])
                             {
@@ -170,42 +180,49 @@ report 6014403 "NPR Cashed Gift Vouchers"
                                 ShowCaption = false;
                                 Visible = CompanyVisible2;
                                 ApplicationArea = All;
+                                ToolTip = 'Specifies the value of the CompanyListName[2] field';
                             }
                             field("CompanyListName[3]"; CompanyListName[3])
                             {
                                 Editable = false;
                                 Visible = CompanyVisible3;
                                 ApplicationArea = All;
+                                ToolTip = 'Specifies the value of the CompanyListName[3] field';
                             }
                             field("CompanyListName[4]"; CompanyListName[4])
                             {
                                 Editable = false;
                                 Visible = CompanyVisible4;
                                 ApplicationArea = All;
+                                ToolTip = 'Specifies the value of the CompanyListName[4] field';
                             }
                             field("CompanyListName[5]"; CompanyListName[5])
                             {
                                 Editable = false;
                                 Visible = CompanyVisible5;
                                 ApplicationArea = All;
+                                ToolTip = 'Specifies the value of the CompanyListName[5] field';
                             }
                             field("CompanyListName[6]"; CompanyListName[6])
                             {
                                 Editable = false;
                                 Visible = CompanyVisible6;
                                 ApplicationArea = All;
+                                ToolTip = 'Specifies the value of the CompanyListName[6] field';
                             }
                             field("CompanyListName[7]"; CompanyListName[7])
                             {
                                 Editable = false;
                                 Visible = CompanyVisible7;
                                 ApplicationArea = All;
+                                ToolTip = 'Specifies the value of the CompanyListName[7] field';
                             }
                             field("CompanyListName[8]"; CompanyListName[8])
                             {
                                 Editable = false;
                                 Visible = CompanyVisible8;
                                 ApplicationArea = All;
+                                ToolTip = 'Specifies the value of the CompanyListName[8] field';
                             }
                         }
                     }
@@ -225,42 +242,50 @@ report 6014403 "NPR Cashed Gift Vouchers"
                                 ShowCaption = false;
                                 Visible = CompanyVisible1;
                                 ApplicationArea = All;
+                                ToolTip = 'Specifies the value of the CompanyList2[1] field';
                             }
                             field("CompanyList2[2]"; CompanyList2[2])
                             {
                                 ShowCaption = false;
                                 Visible = CompanyVisible2;
                                 ApplicationArea = All;
+                                ToolTip = 'Specifies the value of the CompanyList2[2] field';
                             }
                             field("CompanyList2[3]"; CompanyList2[3])
                             {
                                 Visible = CompanyVisible3;
                                 ApplicationArea = All;
+                                ToolTip = 'Specifies the value of the CompanyList2[3] field';
                             }
                             field("CompanyList2[4]"; CompanyList2[4])
                             {
                                 Visible = CompanyVisible4;
                                 ApplicationArea = All;
+                                ToolTip = 'Specifies the value of the CompanyList2[4] field';
                             }
                             field("CompanyList2[5]"; CompanyList2[5])
                             {
                                 Visible = CompanyVisible5;
                                 ApplicationArea = All;
+                                ToolTip = 'Specifies the value of the CompanyList2[5] field';
                             }
                             field("CompanyList2[6]"; CompanyList2[6])
                             {
                                 Visible = CompanyVisible6;
                                 ApplicationArea = All;
+                                ToolTip = 'Specifies the value of the CompanyList2[6] field';
                             }
                             field("CompanyList2[7]"; CompanyList2[7])
                             {
                                 Visible = CompanyVisible7;
                                 ApplicationArea = All;
+                                ToolTip = 'Specifies the value of the CompanyList2[7] field';
                             }
                             field("CompanyList2[8]"; CompanyList2[8])
                             {
                                 Visible = CompanyVisible8;
                                 ApplicationArea = All;
+                                ToolTip = 'Specifies the value of the CompanyList2[8] field';
                             }
                         }
                         group(Control6150645)
@@ -272,6 +297,7 @@ report 6014403 "NPR Cashed Gift Vouchers"
                                 ShowCaption = false;
                                 Visible = CompanyVisible1;
                                 ApplicationArea = All;
+                                ToolTip = 'Specifies the value of the CompanyListName[1] field';
                             }
                             field(Control6150643; CompanyListName[2])
                             {
@@ -279,6 +305,7 @@ report 6014403 "NPR Cashed Gift Vouchers"
                                 ShowCaption = false;
                                 Visible = CompanyVisible2;
                                 ApplicationArea = All;
+                                ToolTip = 'Specifies the value of the CompanyListName[2] field';
                             }
                             field(Control6150642; CompanyListName[3])
                             {
@@ -286,6 +313,7 @@ report 6014403 "NPR Cashed Gift Vouchers"
                                 ShowCaption = false;
                                 Visible = CompanyVisible3;
                                 ApplicationArea = All;
+                                ToolTip = 'Specifies the value of the CompanyListName[3] field';
                             }
                             field(Control6150641; CompanyListName[4])
                             {
@@ -293,6 +321,7 @@ report 6014403 "NPR Cashed Gift Vouchers"
                                 ShowCaption = false;
                                 Visible = CompanyVisible4;
                                 ApplicationArea = All;
+                                ToolTip = 'Specifies the value of the CompanyListName[4] field';
                             }
                             field(Control6150640; CompanyListName[5])
                             {
@@ -300,6 +329,7 @@ report 6014403 "NPR Cashed Gift Vouchers"
                                 ShowCaption = false;
                                 Visible = CompanyVisible5;
                                 ApplicationArea = All;
+                                ToolTip = 'Specifies the value of the CompanyListName[5] field';
                             }
                             field(Control6150621; CompanyListName[6])
                             {
@@ -307,6 +337,7 @@ report 6014403 "NPR Cashed Gift Vouchers"
                                 ShowCaption = false;
                                 Visible = CompanyVisible6;
                                 ApplicationArea = All;
+                                ToolTip = 'Specifies the value of the CompanyListName[6] field';
                             }
                             field(Control6150620; CompanyListName[7])
                             {
@@ -314,6 +345,7 @@ report 6014403 "NPR Cashed Gift Vouchers"
                                 ShowCaption = false;
                                 Visible = CompanyVisible7;
                                 ApplicationArea = All;
+                                ToolTip = 'Specifies the value of the CompanyListName[7] field';
                             }
                             field(Control6150619; CompanyListName[8])
                             {
@@ -321,6 +353,7 @@ report 6014403 "NPR Cashed Gift Vouchers"
                                 ShowCaption = false;
                                 Visible = CompanyVisible8;
                                 ApplicationArea = All;
+                                ToolTip = 'Specifies the value of the CompanyListName[8] field';
                             }
                         }
                     }

@@ -15,6 +15,7 @@ pageextension 6014447 "NPR Sales Order Subform" extends "Sales Order Subform"
             {
                 ApplicationArea = All;
                 Visible = false;
+                ToolTip = 'Specifies the value of the Description 2 field';
             }
         }
         addafter("Unit Cost (LCY)")
@@ -23,6 +24,7 @@ pageextension 6014447 "NPR Sales Order Subform" extends "Sales Order Subform"
             {
                 ApplicationArea = All;
                 Visible = false;
+                ToolTip = 'Specifies the value of the Units per Parcel field';
             }
         }
         addafter("Inv. Discount Amount")
@@ -31,6 +33,7 @@ pageextension 6014447 "NPR Sales Order Subform" extends "Sales Order Subform"
             {
                 ApplicationArea = All;
                 Importance = Additional;
+                ToolTip = 'Specifies the value of the Net Weight field';
             }
         }
     }
@@ -46,6 +49,7 @@ pageextension 6014447 "NPR Sales Order Subform" extends "Sales Order Subform"
                 PromotedIsBig = true;
                 ShortCutKey = 'Ctrl+Alt+V';
                 ApplicationArea = All;
+                ToolTip = 'Executes the Variety action';
             }
         }
     }

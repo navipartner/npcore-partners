@@ -18,10 +18,12 @@ page 6151441 "NPR Magento Cont.Pmt.Methods"
                 field("External Payment Method Code"; "External Payment Method Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the External Payment Method Code field';
                 }
                 field("Payment Method Code"; "Payment Method Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Payment Method Code field';
                 }
             }
         }

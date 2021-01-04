@@ -19,30 +19,37 @@ page 6059972 "NPR Variety Table"
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Type field';
                 }
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Use in Variant Description"; "Use in Variant Description")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Use in Variant Description field';
                 }
                 field("Pre tag In Variant Description"; "Pre tag In Variant Description")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Pre tag In Variant Description field';
                 }
                 field("Use Description field"; "Use Description field")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Use Description field field';
                 }
                 field("Lock Table"; "Lock Table")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Lock Table field';
                 }
             }
         }
@@ -64,6 +71,7 @@ page 6059972 "NPR Variety Table"
                               Table = FIELD(Code);
                 RunPageView = SORTING(Type, Table, Value);
                 ApplicationArea = All;
+                ToolTip = 'Executes the Values action';
             }
         }
     }

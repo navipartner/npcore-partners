@@ -31,6 +31,7 @@ page 6059814 "NPR Retail Top 10 Customers"
                 {
                     ApplicationArea = All;
                     Caption = 'Start Date';
+                    ToolTip = 'Specifies the value of the Start Date field';
 
                     trigger OnValidate()
                     begin
@@ -43,6 +44,7 @@ page 6059814 "NPR Retail Top 10 Customers"
                 {
                     ApplicationArea = All;
                     Caption = 'End date';
+                    ToolTip = 'Specifies the value of the End date field';
 
                     trigger OnValidate()
                     begin
@@ -61,6 +63,7 @@ page 6059814 "NPR Retail Top 10 Customers"
                     {
                         ApplicationArea = All;
                         Editable = false;
+                        ToolTip = 'Specifies the value of the No. field';
 
                         trigger OnDrillDown()
                         begin
@@ -74,11 +77,13 @@ page 6059814 "NPR Retail Top 10 Customers"
                     {
                         ApplicationArea = All;
                         Editable = false;
+                        ToolTip = 'Specifies the value of the Name field';
                     }
                     field("Phone No."; "Phone No.")
                     {
                         ApplicationArea = All;
                         Editable = false;
+                        ToolTip = 'Specifies the value of the Phone No. field';
                     }
                     field("Sales (LCY)"; "Sales (LCY)")
                     {
@@ -86,6 +91,7 @@ page 6059814 "NPR Retail Top 10 Customers"
                         BlankZero = true;
                         Caption = 'Sales Amount (Actual)';
                         Editable = false;
+                        ToolTip = 'Specifies the value of the Sales Amount (Actual) field';
                     }
                 }
             }
@@ -105,6 +111,7 @@ page 6059814 "NPR Retail Top 10 Customers"
                 {
                     Caption = 'Day';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Day action';
 
                     trigger OnAction()
                     begin
@@ -116,6 +123,7 @@ page 6059814 "NPR Retail Top 10 Customers"
                 {
                     Caption = 'Week';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Week action';
 
                     trigger OnAction()
                     begin
@@ -127,6 +135,7 @@ page 6059814 "NPR Retail Top 10 Customers"
                 {
                     Caption = 'Month';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Month action';
 
                     trigger OnAction()
                     begin
@@ -138,6 +147,7 @@ page 6059814 "NPR Retail Top 10 Customers"
                 {
                     Caption = 'Quarter';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Quarter action';
 
                     trigger OnAction()
                     begin
@@ -149,6 +159,7 @@ page 6059814 "NPR Retail Top 10 Customers"
                 {
                     Caption = 'Year';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Year action';
 
                     trigger OnAction()
                     begin

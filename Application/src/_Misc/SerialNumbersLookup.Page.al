@@ -16,6 +16,7 @@ page 6014498 "NPR Serial Numbers Lookup"
                 field("Serial No."; "Serial No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Serial No. field';
                 }
             }
         }

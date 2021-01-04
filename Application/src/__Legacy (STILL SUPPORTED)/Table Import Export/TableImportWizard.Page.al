@@ -37,6 +37,7 @@ page 6014485 "NPR Table Import Wizard"
                         {
                             ApplicationArea = All;
                             Editable = false;
+                            ToolTip = 'Specifies the value of the Object ID field';
 
                             trigger OnLookup(var Text: Text): Boolean
                             var
@@ -64,6 +65,7 @@ page 6014485 "NPR Table Import Wizard"
                         {
                             ApplicationArea = All;
                             Editable = false;
+                            ToolTip = 'Specifies the value of the Object Name field';
 
                             trigger OnValidate()
                             var
@@ -77,6 +79,7 @@ page 6014485 "NPR Table Import Wizard"
                         {
                             ApplicationArea = All;
                             Caption = 'Rows Imported';
+                            ToolTip = 'Specifies the value of the Rows Imported field';
                         }
                     }
                 }
@@ -87,36 +90,43 @@ page 6014485 "NPR Table Import Wizard"
                     {
                         ApplicationArea = All;
                         Caption = 'Field Start Delimeter';
+                        ToolTip = 'Specifies the value of the Field Start Delimeter field';
                     }
                     field(FieldEndDelimeter; FieldEndDelimeter)
                     {
                         ApplicationArea = All;
                         Caption = 'Field End Delimeter';
+                        ToolTip = 'Specifies the value of the Field End Delimeter field';
                     }
                     field(FieldSeparator; FieldSeparator)
                     {
                         ApplicationArea = All;
                         Caption = 'Field Separator';
+                        ToolTip = 'Specifies the value of the Field Separator field';
                     }
                     field(RecordSeparator; RecordSeparator)
                     {
                         ApplicationArea = All;
                         Caption = 'Record Separator';
+                        ToolTip = 'Specifies the value of the Record Separator field';
                     }
                     field(DataItemSeparator; DataItemSeparator)
                     {
                         ApplicationArea = All;
                         Caption = 'Data Item Separator';
+                        ToolTip = 'Specifies the value of the Data Item Separator field';
                     }
                     field(EscapeCharacter; EscapeCharacter)
                     {
                         ApplicationArea = All;
                         Caption = 'Escape Character';
+                        ToolTip = 'Specifies the value of the Escape Character field';
                     }
                     field(ImportDataInXmlFormat; ImportDataInXmlFormat)
                     {
                         ApplicationArea = All;
                         Caption = 'Use Xml-Format';
+                        ToolTip = 'Specifies the value of the Use Xml-Format field';
                     }
                 }
                 group("Data Settings")
@@ -126,36 +136,43 @@ page 6014485 "NPR Table Import Wizard"
                     {
                         ApplicationArea = All;
                         Caption = 'File Encoding';
+                        ToolTip = 'Specifies the value of the File Encoding field';
                     }
                     field(FileMode; FileMode)
                     {
                         ApplicationArea = All;
                         Caption = 'File Mode';
+                        ToolTip = 'Specifies the value of the File Mode field';
                     }
                     field(ErrorOnMissingFields; ErrorOnMissingFields)
                     {
                         ApplicationArea = All;
                         Caption = 'Error On Missing Fields';
+                        ToolTip = 'Specifies the value of the Error On Missing Fields field';
                     }
                     field(ErrorOnDataMismatch; ErrorOnDataMismatch)
                     {
                         ApplicationArea = All;
                         Caption = 'Error On Data Mismatch';
+                        ToolTip = 'Specifies the value of the Error On Data Mismatch field';
                     }
                     field(AutoSave; AutoSave)
                     {
                         ApplicationArea = All;
                         Caption = 'AutoSave';
+                        ToolTip = 'Specifies the value of the AutoSave field';
                     }
                     field(AutoUpdate; AutoUpdate)
                     {
                         ApplicationArea = All;
                         Caption = 'AutoUpdate';
+                        ToolTip = 'Specifies the value of the AutoUpdate field';
                     }
                     field(AutoReplace; AutoReplace)
                     {
                         ApplicationArea = All;
                         Caption = 'AutoReplace';
+                        ToolTip = 'Specifies the value of the AutoReplace field';
                     }
                 }
             }
@@ -173,6 +190,7 @@ page 6014485 "NPR Table Import Wizard"
                 Promoted = true;
                 PromotedCategory = Category4;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Run action';
 
                 trigger OnAction()
                 begin
@@ -186,6 +204,7 @@ page 6014485 "NPR Table Import Wizard"
                 Promoted = true;
                 PromotedCategory = Category5;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Delete All action';
 
                 trigger OnAction()
                 begin

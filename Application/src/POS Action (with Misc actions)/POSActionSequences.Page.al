@@ -19,6 +19,7 @@ page 6150726 "NPR POS Action Sequences"
                     Editable = "Source Type" = "Source Type"::Manual;
                     Style = Subordinate;
                     StyleExpr = "Source Type" = "Source Type"::Discovery;
+                    ToolTip = 'Specifies the value of the Reference Type field';
                 }
                 field("Reference POS Action Code"; "Reference POS Action Code")
                 {
@@ -26,6 +27,7 @@ page 6150726 "NPR POS Action Sequences"
                     Editable = "Source Type" = "Source Type"::Manual;
                     Style = Subordinate;
                     StyleExpr = "Source Type" = "Source Type"::Discovery;
+                    ToolTip = 'Specifies the value of the Reference POS Action Code field';
                 }
                 field("POS Action Code"; "POS Action Code")
                 {
@@ -33,12 +35,14 @@ page 6150726 "NPR POS Action Sequences"
                     Editable = "Source Type" = "Source Type"::Manual;
                     Style = Subordinate;
                     StyleExpr = "Source Type" = "Source Type"::Discovery;
+                    ToolTip = 'Specifies the value of the POS Action Code field';
                 }
                 field("Source Type"; "Source Type")
                 {
                     ApplicationArea = All;
                     Style = Subordinate;
                     StyleExpr = "Source Type" = "Source Type"::Discovery;
+                    ToolTip = 'Specifies the value of the Source Type field';
                 }
                 field("Sequence No."; "Sequence No.")
                 {
@@ -46,6 +50,7 @@ page 6150726 "NPR POS Action Sequences"
                     Editable = "Source Type" = "Source Type"::Manual;
                     Style = Subordinate;
                     StyleExpr = "Source Type" = "Source Type"::Discovery;
+                    ToolTip = 'Specifies the value of the Sequence No. field';
                 }
                 field(Description; Description)
                 {
@@ -53,6 +58,7 @@ page 6150726 "NPR POS Action Sequences"
                     Editable = "Source Type" = "Source Type"::Manual;
                     Style = Subordinate;
                     StyleExpr = "Source Type" = "Source Type"::Discovery;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
             }
         }
@@ -70,6 +76,7 @@ page 6150726 "NPR POS Action Sequences"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Discover Sequences action';
 
                 trigger OnAction()
                 begin

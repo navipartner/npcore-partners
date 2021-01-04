@@ -7,16 +7,19 @@ pageextension 6014426 "NPR Customer List" extends "Customer List"
             field("NPR E-Mail"; "E-Mail")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the E-Mail field';
             }
             field("NPR Address"; Address)
             {
                 ApplicationArea = All;
                 Visible = false;
+                ToolTip = 'Specifies the value of the Address field';
             }
             field("NPR Address 2"; "Address 2")
             {
                 ApplicationArea = All;
                 Visible = false;
+                ToolTip = 'Specifies the value of the Address 2 field';
             }
         }
         addafter("Post Code")
@@ -25,6 +28,7 @@ pageextension 6014426 "NPR Customer List" extends "Customer List"
             {
                 ApplicationArea = All;
                 Visible = false;
+                ToolTip = 'Specifies the value of the City field';
             }
         }
         addafter(Contact)
@@ -33,11 +37,13 @@ pageextension 6014426 "NPR Customer List" extends "Customer List"
             {
                 ApplicationArea = All;
                 Visible = false;
+                ToolTip = 'Specifies the value of the Global Dimension 1 Code field';
             }
             field("NPR Global Dimension 2 Code"; "Global Dimension 2 Code")
             {
                 ApplicationArea = All;
                 Visible = false;
+                ToolTip = 'Specifies the value of the Global Dimension 2 Code field';
             }
         }
         addafter("Base Calendar Code")
@@ -48,6 +54,7 @@ pageextension 6014426 "NPR Customer List" extends "Customer List"
                 CaptionClass = '6014555,18,1,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible01;
+                ToolTip = 'Specifies the value of the NPRAttrTextArray[1] field';
 
                 trigger OnValidate()
                 begin
@@ -60,6 +67,7 @@ pageextension 6014426 "NPR Customer List" extends "Customer List"
                 CaptionClass = '6014555,18,2,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible02;
+                ToolTip = 'Specifies the value of the NPRAttrTextArray[2] field';
 
                 trigger OnValidate()
                 begin
@@ -72,6 +80,7 @@ pageextension 6014426 "NPR Customer List" extends "Customer List"
                 CaptionClass = '6014555,18,3,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible03;
+                ToolTip = 'Specifies the value of the NPRAttrTextArray[3] field';
 
                 trigger OnValidate()
                 begin
@@ -84,6 +93,7 @@ pageextension 6014426 "NPR Customer List" extends "Customer List"
                 CaptionClass = '6014555,18,4,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible04;
+                ToolTip = 'Specifies the value of the NPRAttrTextArray[4] field';
 
                 trigger OnValidate()
                 begin
@@ -96,6 +106,7 @@ pageextension 6014426 "NPR Customer List" extends "Customer List"
                 CaptionClass = '6014555,18,5,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible05;
+                ToolTip = 'Specifies the value of the NPRAttrTextArray[5] field';
 
                 trigger OnValidate()
                 begin
@@ -108,6 +119,7 @@ pageextension 6014426 "NPR Customer List" extends "Customer List"
                 CaptionClass = '6014555,18,6,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible06;
+                ToolTip = 'Specifies the value of the NPRAttrTextArray[6] field';
 
                 trigger OnValidate()
                 begin
@@ -120,6 +132,7 @@ pageextension 6014426 "NPR Customer List" extends "Customer List"
                 CaptionClass = '6014555,18,7,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible07;
+                ToolTip = 'Specifies the value of the NPRAttrTextArray[7] field';
 
                 trigger OnValidate()
                 begin
@@ -132,6 +145,7 @@ pageextension 6014426 "NPR Customer List" extends "Customer List"
                 CaptionClass = '6014555,18,8,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible08;
+                ToolTip = 'Specifies the value of the NPRAttrTextArray[8] field';
 
                 trigger OnValidate()
                 begin
@@ -144,6 +158,7 @@ pageextension 6014426 "NPR Customer List" extends "Customer List"
                 CaptionClass = '6014555,18,9,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible09;
+                ToolTip = 'Specifies the value of the NPRAttrTextArray[9] field';
 
                 trigger OnValidate()
                 begin
@@ -156,6 +171,7 @@ pageextension 6014426 "NPR Customer List" extends "Customer List"
                 CaptionClass = '6014555,18,10,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible10;
+                ToolTip = 'Specifies the value of the NPRAttrTextArray[10] field';
 
                 trigger OnValidate()
                 begin
@@ -176,12 +192,14 @@ pageextension 6014426 "NPR Customer List" extends "Customer List"
                     Caption = 'E-mail Log';
                     Image = Email;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the E-mail Log action';
                 }
                 action("NPR SendAsPDF")
                 {
                     Caption = 'Send Statement as PDF';
                     Image = SendEmailPDF;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Send Statement as PDF action';
                 }
             }
         }
@@ -192,12 +210,14 @@ pageextension 6014426 "NPR Customer List" extends "Customer List"
                 Caption = 'Audit Roll';
                 Image = ListPage;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Audit Roll action';
             }
             action("NPR POS Entries")
             {
                 Caption = 'POS Entries';
                 Image = Entries;
                 ApplicationArea = All;
+                ToolTip = 'Executes the POS Entries action';
             }
             action("NPR ItemLedgerEntries")
             {
@@ -205,6 +225,7 @@ pageextension 6014426 "NPR Customer List" extends "Customer List"
                 Image = ItemLedger;
                 Promoted = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Item Ledger Entries action';
             }
         }
         addfirst(Creation)
@@ -217,6 +238,7 @@ pageextension 6014426 "NPR Customer List" extends "Customer List"
                 RunObject = Page "Customer Card";
                 RunPageMode = Create;
                 ApplicationArea = All;
+                ToolTip = 'Executes the New Customer action';
             }
         }
         addafter("Sales Journal")
@@ -226,12 +248,14 @@ pageextension 6014426 "NPR Customer List" extends "Customer List"
                 Caption = 'PhoneLookup';
                 Image = ImportLog;
                 ApplicationArea = All;
+                ToolTip = 'Executes the PhoneLookup action';
             }
             action("NPR Customer Anonymization")
             {
                 Caption = 'Customer Anonymization';
                 Image = AbsenceCategory;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Customer Anonymization action';
 
                 trigger OnAction()
                 var

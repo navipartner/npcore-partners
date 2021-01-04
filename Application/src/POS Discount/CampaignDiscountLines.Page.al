@@ -30,10 +30,12 @@ page 6014454 "NPR Campaign Discount Lines"
                 field("Cross-Reference No."; "Cross-Reference No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Cross-Reference No. field';
                 }
                 field("Item No."; "Item No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Item No. field';
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -57,85 +59,103 @@ page 6014454 "NPR Campaign Discount Lines"
                 field("Variant Code"; "Variant Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Variant Code field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Unit Price"; "Unit Price")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Unit Price field';
                 }
                 field("Campaign Unit Price"; "Campaign Unit Price")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Period Price field';
                 }
                 field("Campaign Profit"; "Campaign Profit")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Campaign Profit field';
                 }
                 field(Control1160330002; Comment)
                 {
                     ApplicationArea = All;
                     Caption = 'Comment';
+                    ToolTip = 'Specifies the value of the Comment field';
                 }
                 field(Inventory; Inventory)
                 {
                     ApplicationArea = All;
                     Caption = 'Inventory';
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Inventory field';
                 }
                 field("Quantity On Purchase Order"; "Quantity On Purchase Order")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Quantity in Purchase Order field';
                 }
                 field("Campaign Unit Cost"; "Campaign Unit Cost")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Period Cost field';
                 }
                 field(Profit; Profit)
                 {
                     ApplicationArea = All;
                     Caption = 'Revenue of period';
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Revenue of period field';
                 }
                 field("Vendor No."; "Vendor No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Vendor No. field';
                 }
                 field("Starting Date"; "Starting Date")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Starting Date field';
                 }
                 field("Ending Date"; "Ending Date")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Closing Date field';
                 }
                 field("Unit Price Incl. VAT"; "Unit Price Incl. VAT")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Price Includes VAT field';
                 }
                 field("Page no. in advert"; "Page no. in advert")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Page no. in advert field';
                 }
                 field(Priority; Priority)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Priority field';
                 }
                 field("Pagenumber in paper"; "Pagenumber in paper")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Pagenumber in paper field';
                 }
                 field(Photo; Photo)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Photo field';
                 }
             }
         }
@@ -154,6 +174,7 @@ page 6014454 "NPR Campaign Discount Lines"
                               "No." = FIELD(Code),
                               "No. 2" = FIELD("Item No.");
                 ApplicationArea = All;
+                ToolTip = 'Executes the Comment action';
             }
         }
     }

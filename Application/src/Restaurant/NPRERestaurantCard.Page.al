@@ -20,18 +20,22 @@ page 6150684 "NPR NPRE Restaurant Card"
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Name; Name)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Name field';
                 }
                 field("Name 2"; "Name 2")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Name 2 field';
                 }
                 field("Service Flow Profile"; "Service Flow Profile")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Service Flow Profile field';
                 }
             }
             group("Kitchen Integration")
@@ -40,10 +44,12 @@ page 6150684 "NPR NPRE Restaurant Card"
                 field("Auto Send Kitchen Order"; "Auto Send Kitchen Order")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Auto Send Kitchen Order field';
                 }
                 field("Resend All On New Lines"; "Resend All On New Lines")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Resend All On New Lines field';
                 }
                 group(Print)
                 {
@@ -51,6 +57,7 @@ page 6150684 "NPR NPRE Restaurant Card"
                     field("Kitchen Printing Active"; "Kitchen Printing Active")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Kitchen Printing Active field';
                     }
                 }
                 group(KDS)
@@ -60,10 +67,12 @@ page 6150684 "NPR NPRE Restaurant Card"
                     field("KDS Active"; "KDS Active")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the KDS Active field';
                     }
                     field("Order ID Assign. Method"; "Order ID Assign. Method")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Order ID Assign. Method field';
                     }
                 }
             }
@@ -99,6 +108,7 @@ page 6150684 "NPR NPRE Restaurant Card"
                     RunObject = Page "NPR NPRE Kitchen Stations";
                     RunPageLink = "Restaurant Code" = FIELD(Code);
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Stations action';
                 }
                 action(KitchenStationSelection)
                 {
@@ -110,6 +120,7 @@ page 6150684 "NPR NPRE Restaurant Card"
                     RunObject = Page "NPR NPRE Kitchen Station Slct.";
                     RunPageLink = "Restaurant Code" = FIELD(Code);
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Station Selection Setup action';
                 }
                 action(ShowKitchenRequests)
                 {
@@ -120,6 +131,7 @@ page 6150684 "NPR NPRE Restaurant Card"
                     PromotedIsBig = true;
                     Scope = Repeater;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Kitchen Requests (Expedite View) action';
 
                     trigger OnAction()
                     var
@@ -143,6 +155,7 @@ page 6150684 "NPR NPRE Restaurant Card"
                     RunObject = Page "NPR NPRE Seating Location";
                     RunPageLink = "Restaurant Code" = FIELD(Code);
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Locations action';
                 }
                 action(Seatings)
                 {
@@ -153,6 +166,7 @@ page 6150684 "NPR NPRE Restaurant Card"
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Seatings action';
 
                     trigger OnAction()
                     var

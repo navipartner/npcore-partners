@@ -18,18 +18,22 @@ page 6060062 "NPR Item Category Mapping"
                 field("Item Category Code"; "Item Category Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Item Category Code field';
                 }
                 field("Item Material"; "Item Material")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Item Material field';
                 }
                 field("Item Material Density"; "Item Material Density")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Item Material Density field';
                 }
                 field("Item Group"; "Item Group")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Item Group field';
                 }
             }
         }

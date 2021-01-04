@@ -17,18 +17,22 @@ page 6014625 "NPR Brands Select"
                 field(Id; Id)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Id field';
                 }
                 field(Name; Name)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Name field';
                 }
                 field(Picture; Picture)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Picture field';
                 }
                 field("Sorting"; Sorting)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Sorting field';
                 }
             }
         }

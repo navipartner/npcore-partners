@@ -18,10 +18,12 @@ page 6014479 "NPR Comment Line - Retail"
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Comment; Comment)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Comment field';
                 }
             }
         }

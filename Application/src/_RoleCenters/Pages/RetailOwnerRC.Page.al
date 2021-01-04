@@ -322,6 +322,7 @@ page 6151259 "NPR Retail Owner RC"
                     Image = Customer;
                     RunObject = Page "Customer Ledger Entries";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Customer Ledger Entries action';
                 }
                 action("Vendor Ledger Entries")
                 {
@@ -329,6 +330,7 @@ page 6151259 "NPR Retail Owner RC"
                     Image = Vendor;
                     RunObject = Page "Vendor Ledger Entries";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Vendor Ledger Entries action';
                 }
             }
             group("Posted Documents")
@@ -394,6 +396,7 @@ page 6151259 "NPR Retail Owner RC"
                     Caption = 'Retail Document List';
                     Image = Document;
                     RunObject = Page "NPR Retail Document List";
+                    ToolTip = 'Executes the Retail Document List action';
                 }
                 action("Repair Document List")
                 {
@@ -401,6 +404,7 @@ page 6151259 "NPR Retail Owner RC"
                     Image = List;
                     RunObject = Page "NPR Customer Repair List";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Repair Document List action';
                 }
                 action("Warranty Catalog List")
                 {
@@ -408,6 +412,7 @@ page 6151259 "NPR Retail Owner RC"
                     Image = List;
                     RunObject = Page "NPR Warranty Catalog List";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Warranty Catalog List action';
                 }
             }
             group("Discount, Coupons & Vouchers")
@@ -418,36 +423,42 @@ page 6151259 "NPR Retail Owner RC"
                     Caption = 'Campaign Discount List';
                     RunObject = Page "NPR Campaign Discount List";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Campaign Discount List action';
                 }
                 action("Mixed Discount List")
                 {
                     Caption = 'Mixed Discount List';
                     RunObject = Page "NPR Mixed Discount List";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Mixed Discount List action';
                 }
                 action("Coupon Types")
                 {
                     Caption = 'Coupon Types';
                     RunObject = Page "NPR NpDc Coupon Types";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Coupon Types action';
                 }
                 action("Coupon List")
                 {
                     Caption = 'Coupon List';
                     RunObject = Page "NPR NpDc Coupons";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Coupon List action';
                 }
                 action("Voucher Types")
                 {
                     Caption = 'Voucher Types';
                     RunObject = Page "NPR NpRv Voucher Types";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Voucher Types action';
                 }
                 action("Voucher List")
                 {
                     Caption = 'Voucher List';
                     RunObject = Page "NPR NpRv Vouchers";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Voucher List action';
                 }
             }
         }
@@ -467,6 +478,7 @@ page 6151259 "NPR Retail Owner RC"
                     Image = Customer;
                     RunObject = Page "Customer List";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Customer action';
                 }
                 action("Cash Receipt Journal")
                 {
@@ -516,6 +528,7 @@ page 6151259 "NPR Retail Owner RC"
                     ApplicationArea = Basic, Suite;
                     Image = Vendor;
                     RunObject = Page "Vendor List";
+                    ToolTip = 'Executes the Vendor action';
 
                 }
                 action("Vendor Payment Journal")
@@ -615,6 +628,7 @@ page 6151259 "NPR Retail Owner RC"
                         Image = Report2;
                         RunObject = Report "NPR Sales Ticket Stat.";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Sales Statistics action';
                     }
                     action("Sale Report")
                     {
@@ -622,6 +636,7 @@ page 6151259 "NPR Retail Owner RC"
                         Image = Report2;
                         RunObject = Report "NPR Sale Time Report";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Sale Report action';
                     }
                     separator(Separator6014423)
                     {
@@ -632,6 +647,7 @@ page 6151259 "NPR Retail Owner RC"
                         Image = Report2;
                         RunObject = Report "NPR Sales Person Top 20";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Sales Person Top 20 action';
                     }
                     action("Salesperson/Item Group Top")
                     {
@@ -639,6 +655,7 @@ page 6151259 "NPR Retail Owner RC"
                         Image = Report2;
                         RunObject = Report "NPR Salesperson/Item Group Top";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Salesperson/Item Group Top action';
                     }
                     separator(Separator6014432)
                     {
@@ -649,6 +666,7 @@ page 6151259 "NPR Retail Owner RC"
                         Image = Report2;
                         RunObject = Report "NPR Item Wise Sales Figures";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Item Wise Sales Figures action';
                     }
                     separator(Separator6014462)
                     {
@@ -659,6 +677,7 @@ page 6151259 "NPR Retail Owner RC"
                         Image = Report2;
                         RunObject = Report "NPR Discount Statistics";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Discount Statistics action';
                     }
                 }
 
@@ -672,6 +691,7 @@ page 6151259 "NPR Retail Owner RC"
                         Image = Report2;
                         RunObject = Report "NPR Item Sales Stats/Provider";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Item Sales Statistics action';
                     }
                     action("Low Sales")
                     {
@@ -679,6 +699,7 @@ page 6151259 "NPR Retail Owner RC"
                         Image = Report2;
                         RunObject = Report "NPR Items With Low Sales";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Low Sales action';
                     }
                 }
                 group(ReceivablesReport)
@@ -795,6 +816,7 @@ page 6151259 "NPR Retail Owner RC"
                         Caption = 'Reconcile Cust. and Vend. Accs';
                         Image = "Report";
                         RunObject = Report "Reconcile Cust. and Vend. Accs";
+                        ToolTip = 'Executes the Reconcile Cust. and Vend. Accs action';
 
                     }
 

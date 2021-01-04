@@ -65,11 +65,13 @@ report 6014601 "NPR Update Barcodes"
                     {
                         Caption = 'Insert missing barcode';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Insert missing barcode field';
                     }
                     field(IgnoreAltNo; IgnoreAltNo)
                     {
                         Caption = 'Ignore Alt. No.';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Ignore Alt. No. field';
                     }
                 }
             }

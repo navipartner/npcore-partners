@@ -8,6 +8,7 @@ pageextension 6014458 "NPR Item Variants" extends "Item Variants"
             field("NPR Blocked"; "NPR Blocked")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the NPR Blocked field';
             }
         }
     }

@@ -26,11 +26,13 @@ report 6014515 "NPR Delete EFT Receipt"
                     {
                         Caption = 'EFT Receipt Date Formula';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the EFT Receipt Date Formula field';
                     }
                     field(MaxSizeToDelete; MaxSizeToDelete)
                     {
                         Caption = 'Max. Size of Data to Delete';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Max. Size of Data to Delete field';
                     }
                 }
             }

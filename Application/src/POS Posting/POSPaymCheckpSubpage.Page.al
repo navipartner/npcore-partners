@@ -19,28 +19,34 @@ page 6150631 "NPR POS Paym. Checkp. Subpage"
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Entry No. field';
                 }
                 field("Payment Method No."; "Payment Method No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Payment Method No. field';
                 }
                 field("Payment Bin No."; "Payment Bin No.")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Payment Bin No. field';
                 }
                 field("Calculated Amount Incl. Float"; "Calculated Amount Incl. Float")
                 {
                     ApplicationArea = All;
                     Visible = IsBlindCount = FALSE;
+                    ToolTip = 'Specifies the value of the Calculated Amount Incl. Float field';
                 }
                 field("Counted Amount Incl. Float"; "Counted Amount Incl. Float")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Counted Amount Incl. Float field';
                 }
                 field(Comment; Comment)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Comment field';
                 }
             }
         }

@@ -28,6 +28,7 @@ page 6060059 "NPR POS Inventory Overview"
                 {
                     ApplicationArea = All;
                     Caption = 'Item No.';
+                    ToolTip = 'Specifies the value of the Item No. field';
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -44,6 +45,7 @@ page 6060059 "NPR POS Inventory Overview"
                     ApplicationArea = All;
                     Caption = 'Variant Code';
                     Visible = VariantVisible;
+                    ToolTip = 'Specifies the value of the Variant Code field';
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -60,6 +62,7 @@ page 6060059 "NPR POS Inventory Overview"
                     ApplicationArea = All;
                     Caption = 'Variety 1';
                     Visible = Variety1ValueVisible;
+                    ToolTip = 'Specifies the value of the Variety 1 field';
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -76,6 +79,7 @@ page 6060059 "NPR POS Inventory Overview"
                     ApplicationArea = All;
                     Caption = 'Variety 2';
                     Visible = Variety2ValueVisible;
+                    ToolTip = 'Specifies the value of the Variety 2 field';
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -92,6 +96,7 @@ page 6060059 "NPR POS Inventory Overview"
                     ApplicationArea = All;
                     Caption = 'Variety 3';
                     Visible = Variety3ValueVisible;
+                    ToolTip = 'Specifies the value of the Variety 3 field';
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -108,6 +113,7 @@ page 6060059 "NPR POS Inventory Overview"
                     ApplicationArea = All;
                     Caption = 'Variety 4';
                     Visible = Variety4ValueVisible;
+                    ToolTip = 'Specifies the value of the Variety 4 field';
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -126,25 +132,30 @@ page 6060059 "NPR POS Inventory Overview"
                 field("Variant Code"; "Variant Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Variant Code field';
                 }
                 field("Variant Description"; "Variant Description")
                 {
                     ApplicationArea = All;
                     Visible = VariantVisible;
+                    ToolTip = 'Specifies the value of the Variant Description field';
                 }
                 field("Location Name"; "Location Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Location Name field';
                 }
                 field(Quantity; Quantity)
                 {
                     ApplicationArea = All;
                     DecimalPlaces = 0 : 2;
+                    ToolTip = 'Specifies the value of the Quantity field';
                 }
                 field("Item Description"; "Item Description")
                 {
                     ApplicationArea = All;
                     Caption = 'Description 2';
+                    ToolTip = 'Specifies the value of the Description 2 field';
                 }
             }
         }

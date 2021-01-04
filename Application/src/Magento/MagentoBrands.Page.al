@@ -25,18 +25,22 @@ page 6151420 "NPR Magento Brands"
                 field(Id; Id)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Id field';
                 }
                 field(Name; Name)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Name field';
                 }
                 field(Picture; Picture)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Picture field';
                 }
                 field("Sorting"; Sorting)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Sorting field';
                 }
             }
         }
@@ -55,6 +59,7 @@ page 6151420 "NPR Magento Brands"
                 PromotedIsBig = true;
                 Visible = HasSetupBrands;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Setup Brands action';
 
                 trigger OnAction()
                 var
@@ -76,6 +81,7 @@ page 6151420 "NPR Magento Brands"
                 RunObject = Page "NPR Magento Brand Card";
                 ShortCutKey = 'Shift+F5';
                 ApplicationArea = All;
+                ToolTip = 'Executes the Card action';
             }
             action("Display Config")
             {
@@ -83,6 +89,7 @@ page 6151420 "NPR Magento Brands"
                 Image = ViewPage;
                 Visible = DisplayConfigVisible;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Display Config action';
 
                 trigger OnAction()
                 var

@@ -21,18 +21,22 @@ page 6151522 "NPR Nc Endpoint FTP List"
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field(Enabled; Enabled)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Enabled field';
                 }
                 field(Server; Server)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the FTP Server field';
                 }
             }
         }
@@ -47,6 +51,7 @@ page 6151522 "NPR Nc Endpoint FTP List"
                 Caption = 'Trigger Links';
                 Image = Link;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Trigger Links action';
 
                 trigger OnAction()
                 begin

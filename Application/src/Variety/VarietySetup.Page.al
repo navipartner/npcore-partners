@@ -22,22 +22,27 @@ page 6059970 "NPR Variety Setup"
                 field("Variety Enabled"; "Variety Enabled")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Variety Enabled field';
                 }
                 field("Item Journal Blocking"; "Item Journal Blocking")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Item Journal Blocking field';
                 }
                 field("Variant Description"; "Variant Description")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Variant Description field';
                 }
                 field("Variant Description 2"; "Variant Description 2")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Variant Description 2 field';
                 }
                 field("Create Variant Code From"; "Create Variant Code From")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Create Variant Code From field';
                 }
             }
             group("Barcode (Alternative No.)")
@@ -46,16 +51,19 @@ page 6059970 "NPR Variety Setup"
                 field("Create Alt. No. automatic"; "Create Alt. No. automatic")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Create Alt. No. automatic field';
                 }
                 field("Barcode Type (Alt. No.)"; "Barcode Type (Alt. No.)")
                 {
                     ApplicationArea = All;
                     Editable = "Create Alt. No. automatic";
+                    ToolTip = 'Specifies the value of the Barcode Type (Alt. No.) field';
                 }
                 field("Alt. No. No. Series (I)"; "Alt. No. No. Series (I)")
                 {
                     ApplicationArea = All;
                     Editable = "Create Alt. No. automatic";
+                    ToolTip = 'Specifies the value of the Alt. No. No. Series (Item) field';
 
                     trigger OnValidate()
                     begin
@@ -69,6 +77,7 @@ page 6059970 "NPR Variety Setup"
                 {
                     ApplicationArea = All;
                     Editable = "Create Alt. No. automatic";
+                    ToolTip = 'Specifies the value of the Alt. No. No. Series (Variant) field';
                 }
             }
             group("Barcode (Item Cross Ref.)")
@@ -77,16 +86,19 @@ page 6059970 "NPR Variety Setup"
                 field("Create Item Cross Ref. auto."; "Create Item Cross Ref. auto.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Create Item Cross Ref. auto. field';
                 }
                 field("Barcode Type (Item Cross Ref.)"; "Barcode Type (Item Cross Ref.)")
                 {
                     ApplicationArea = All;
                     Editable = "Create Item Cross Ref. auto.";
+                    ToolTip = 'Specifies the value of the Barcode Type (Item Cross Ref.) field';
                 }
                 field("Item Cross Ref. No. Series (I)"; "Item Cross Ref. No. Series (I)")
                 {
                     ApplicationArea = All;
                     Editable = "Create Item Cross Ref. auto.";
+                    ToolTip = 'Specifies the value of the Item Cross Ref. No. Series (Item) field';
 
                     trigger OnValidate()
                     begin
@@ -100,14 +112,17 @@ page 6059970 "NPR Variety Setup"
                 {
                     ApplicationArea = All;
                     Editable = "Create Item Cross Ref. auto.";
+                    ToolTip = 'Specifies the value of the Item Cross Ref. No. Series (Variant) field';
                 }
                 field("Item Cross Ref. Description(I)"; "Item Cross Ref. Description(I)")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Item Cross Ref. Description (Item) field';
                 }
                 field("Item Cross Ref. Description(V)"; "Item Cross Ref. Description(V)")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Item Cross Ref. Description (Variant) field';
                 }
             }
             group(View)
@@ -137,6 +152,7 @@ page 6059970 "NPR Variety Setup"
                     PromotedCategory = New;
                     PromotedIsBig = true;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the EAN13 Internal action';
 
                     trigger OnAction()
                     var
@@ -153,6 +169,7 @@ page 6059970 "NPR Variety Setup"
                     PromotedCategory = New;
                     PromotedIsBig = true;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the EAN13 External action';
 
                     trigger OnAction()
                     var
@@ -170,6 +187,7 @@ page 6059970 "NPR Variety Setup"
                     Caption = 'Show Original Setup';
                     Image = History;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Show Original Setup action';
 
                     trigger OnAction()
                     var
@@ -185,6 +203,7 @@ page 6059970 "NPR Variety Setup"
                     Caption = 'Disable Original Setup';
                     Image = InactivityDescription;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Disable Original Setup action';
 
                     trigger OnAction()
                     var
@@ -204,6 +223,7 @@ page 6059970 "NPR Variety Setup"
                     RunObject = Page "NPR Alternative Number";
                     RunPageView = SORTING("Alt. No.", Type);
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Alternative No. action';
                 }
                 action("Item Cross Reference")
                 {
@@ -214,6 +234,7 @@ page 6059970 "NPR Variety Setup"
                     RunObject = Page "Item Cross Reference Entries";
                     RunPageView = SORTING("Cross-Reference Type", "Cross-Reference No.");
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Item Cross Reference action';
                 }
             }
             group("Update")
@@ -227,6 +248,7 @@ page 6059970 "NPR Variety Setup"
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Item Variant Descriptions action';
 
                     trigger OnAction()
                     var
@@ -245,6 +267,7 @@ page 6059970 "NPR Variety Setup"
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Item Cross Reference Descriptions action';
 
                     trigger OnAction()
                     var
@@ -264,6 +287,7 @@ page 6059970 "NPR Variety Setup"
                     PromotedIsBig = true;
                     RunObject = Report "NPR Update Barcodes";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Barcodes action';
                 }
             }
             group(Convert)
@@ -278,6 +302,7 @@ page 6059970 "NPR Variety Setup"
                     PromotedIsBig = true;
                     RunObject = Report "NPR Alt. No. to ICR barcodes";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Alt. No. to Item Cross Reference action';
                 }
                 action("Item Cross Reference to Alt. No.")
                 {
@@ -288,6 +313,7 @@ page 6059970 "NPR Variety Setup"
                     PromotedIsBig = true;
                     RunObject = Report "NPR ICR to Alt. No. barcodes";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Item Cross Reference to Alt. No. action';
                 }
             }
         }
@@ -305,6 +331,7 @@ page 6059970 "NPR Variety Setup"
                     PromotedCategory = Process;
                     RunObject = Page "NPR Variety";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Variety action';
                 }
                 action("Field Setup")
                 {
@@ -314,6 +341,7 @@ page 6059970 "NPR Variety Setup"
                     PromotedCategory = Process;
                     RunObject = Page "NPR Variety Fields Setup";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Field Setup action';
                 }
                 action(Groups)
                 {
@@ -323,6 +351,7 @@ page 6059970 "NPR Variety Setup"
                     PromotedCategory = Process;
                     RunObject = Page "NPR Variety Group";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Groups action';
                 }
             }
             group(Wizard)
@@ -332,6 +361,7 @@ page 6059970 "NPR Variety Setup"
                     Caption = 'Setup Wizard';
                     Image = Setup;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Setup Wizard action';
 
                     trigger OnAction()
                     var

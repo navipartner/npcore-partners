@@ -25,6 +25,7 @@ page 6014592 "NPR Item Repl. by Store Matrix"
                 {
                     ApplicationArea = All;
                     Caption = 'Show Field';
+                    ToolTip = 'Specifies the value of the Show Field field';
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -57,6 +58,7 @@ page 6014592 "NPR Item Repl. by Store Matrix"
                     ApplicationArea = All;
                     Editable = false;
                     ShowCaption = false;
+                    ToolTip = 'Specifies the value of the FieldCap field';
                 }
             }
             repeater(Group)
@@ -65,19 +67,23 @@ page 6014592 "NPR Item Repl. by Store Matrix"
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Item No. field';
                 }
                 field("Item Description"; "Item Description")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Item Description field';
                 }
                 field("Variant Code"; "Variant Code")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Variant Code field';
                 }
                 field("Variant Description"; "Variant Description")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Variant Description field';
                 }
                 field(Field1; MatrixData[1])
                 {
@@ -87,6 +93,7 @@ page 6014592 "NPR Item Repl. by Store Matrix"
                     Style = Strong;
                     StyleExpr = Emphasize1;
                     Visible = Field1Visible;
+                    ToolTip = 'Specifies the value of the MatrixData[1] field';
 
                     trigger OnAssistEdit()
                     begin
@@ -106,6 +113,7 @@ page 6014592 "NPR Item Repl. by Store Matrix"
                     Style = Strong;
                     StyleExpr = Emphasize2;
                     Visible = Field2Visible;
+                    ToolTip = 'Specifies the value of the MatrixData[2] field';
 
                     trigger OnAssistEdit()
                     begin
@@ -125,6 +133,7 @@ page 6014592 "NPR Item Repl. by Store Matrix"
                     Style = Strong;
                     StyleExpr = Emphasize3;
                     Visible = Field3Visible;
+                    ToolTip = 'Specifies the value of the MatrixData[3] field';
 
                     trigger OnAssistEdit()
                     begin
@@ -144,6 +153,7 @@ page 6014592 "NPR Item Repl. by Store Matrix"
                     Style = Strong;
                     StyleExpr = Emphasize4;
                     Visible = Field4Visible;
+                    ToolTip = 'Specifies the value of the MatrixData[4] field';
 
                     trigger OnAssistEdit()
                     begin
@@ -163,6 +173,7 @@ page 6014592 "NPR Item Repl. by Store Matrix"
                     Style = Strong;
                     StyleExpr = Emphasize5;
                     Visible = Field5Visible;
+                    ToolTip = 'Specifies the value of the MatrixData[5] field';
 
                     trigger OnAssistEdit()
                     begin
@@ -182,6 +193,7 @@ page 6014592 "NPR Item Repl. by Store Matrix"
                     Style = Strong;
                     StyleExpr = Emphasize6;
                     Visible = Field6Visible;
+                    ToolTip = 'Specifies the value of the MatrixData[6] field';
 
                     trigger OnAssistEdit()
                     begin
@@ -201,6 +213,7 @@ page 6014592 "NPR Item Repl. by Store Matrix"
                     Style = Strong;
                     StyleExpr = Emphasize7;
                     Visible = Field7Visible;
+                    ToolTip = 'Specifies the value of the MatrixData[7] field';
 
                     trigger OnAssistEdit()
                     begin
@@ -220,6 +233,7 @@ page 6014592 "NPR Item Repl. by Store Matrix"
                     Style = Strong;
                     StyleExpr = Emphasize8;
                     Visible = Field8Visible;
+                    ToolTip = 'Specifies the value of the MatrixData[8] field';
 
                     trigger OnAssistEdit()
                     begin
@@ -239,6 +253,7 @@ page 6014592 "NPR Item Repl. by Store Matrix"
                     Style = Strong;
                     StyleExpr = Emphasize9;
                     Visible = Field9Visible;
+                    ToolTip = 'Specifies the value of the MatrixData[9] field';
 
                     trigger OnAssistEdit()
                     begin
@@ -258,6 +273,7 @@ page 6014592 "NPR Item Repl. by Store Matrix"
                     Style = Strong;
                     StyleExpr = Emphasize10;
                     Visible = Field10Visible;
+                    ToolTip = 'Specifies the value of the MatrixData[10] field';
 
                     trigger OnAssistEdit()
                     begin
@@ -287,6 +303,7 @@ page 6014592 "NPR Item Repl. by Store Matrix"
                 ShortCutKey = 'Ctrl+Alt+V';
                 Visible = false;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Variety action';
 
                 trigger OnAction()
                 begin

@@ -18,22 +18,27 @@ page 6151111 "NPR NpRi S. Inv. SetupSubpage"
                 field(Type; Type)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Type field';
                 }
                 field("No."; "No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the No. field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field(Quantity; Quantity)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Quantity field';
                 }
                 field("Invoice %"; "Invoice %")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Invoice % field';
                 }
             }
         }

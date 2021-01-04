@@ -21,34 +21,42 @@ page 6059961 "NPR CashKeeper Overview"
                 field("Transaction No."; "Transaction No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Transaction No. field';
                 }
                 field("Register No."; "Register No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Cash Register No. field';
                 }
                 field("Total Amount"; "Total Amount")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Amount field';
                 }
                 field("Value In Cents"; "Value In Cents")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Value In Cents field';
                 }
                 field(Salesperson; Salesperson)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Salesperson field';
                 }
                 field("User Id"; "User Id")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the User Id field';
                 }
                 field("Lookup Timestamp"; "Lookup Timestamp")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Lookup Timestamp field';
                 }
                 field("CashKeeper IP"; "CashKeeper IP")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the CashKeeper IP field';
                 }
             }
         }

@@ -15,38 +15,47 @@ page 6150748 "NPR POS Sale Lines Subpage"
                 field("Sale Type"; "Sale Type")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Sale Type field';
                 }
                 field("Line No."; "Line No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Line No. field';
                 }
                 field(Type; Type)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Type field';
                 }
                 field("No."; "No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the No. field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field(Quantity; Quantity)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Quantity field';
                 }
                 field("Unit Price"; "Unit Price")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Unit Price field';
                 }
                 field(Amount; Amount)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Amount field';
                 }
                 field("Amount Including VAT"; "Amount Including VAT")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Amount Including VAT field';
                 }
             }
         }
@@ -64,6 +73,7 @@ page 6150748 "NPR POS Sale Lines Subpage"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Show Document action';
 
                 trigger OnAction()
                 var

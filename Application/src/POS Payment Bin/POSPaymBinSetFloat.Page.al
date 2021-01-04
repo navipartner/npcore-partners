@@ -19,27 +19,32 @@ page 6150623 "NPR POS Paym.Bin Set Float"
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field("Processing Type"; "Processing Type")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Processing Type field';
                 }
                 field("Currency Code"; "Currency Code")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Currency Code field';
                 }
                 field("Include In Counting"; "Include In Counting")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Include In Counting field';
                 }
                 field(Amount; Amount)
                 {
                     ApplicationArea = All;
                     Caption = 'Amount';
                     DecimalPlaces = 2 : 2;
+                    ToolTip = 'Specifies the value of the Amount field';
 
                     trigger OnValidate()
                     var

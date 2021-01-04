@@ -22,14 +22,17 @@ page 6184483 "NPR EFT Integration Types"
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Codeunit ID"; "Codeunit ID")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Codeunit ID field';
                 }
             }
         }

@@ -21,6 +21,7 @@ page 6060086 "NPR MCS Recom. Sales Factbox"
                 {
                     ApplicationArea = All;
                     ShowCaption = false;
+                    ToolTip = 'Specifies the value of the RecDescr field';
                 }
             }
         }

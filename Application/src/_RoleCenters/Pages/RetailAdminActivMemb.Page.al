@@ -18,18 +18,22 @@ page 6014691 "NPR Retail Admin Activ. - Memb"
                 field("Membership Setup"; "Membership Setup")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Membership Setup field';
                 }
                 field("Membership Sales Setup"; "Membership Sales Setup")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Membership Sales Setup field';
                 }
                 field("Member Alteration"; "Member Alteration")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Member Alteration field';
                 }
                 field("Member Community"; "Member Community")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Member Community field';
                 }
             }
         }

@@ -20,22 +20,27 @@ page 6151072 "NPR Purchase Price Factbox"
                 field("Minimum Quantity"; "Minimum Quantity")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Minimum Quantity field';
                 }
                 field("Direct Unit Cost"; "Direct Unit Cost")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Direct Unit Cost field';
                 }
                 field("Starting Date"; "Starting Date")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Starting Date field';
                 }
                 field("Ending Date"; "Ending Date")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Ending Date field';
                 }
                 field("Currency Code"; "Currency Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Currency Code field';
                 }
             }
         }

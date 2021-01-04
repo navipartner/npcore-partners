@@ -1,4 +1,4 @@
-﻿page 6059785 "NPR TM Ticket List"
+page 6059785 "NPR TM Ticket List"
 {
     Caption = 'Ticket List';
     DeleteAllowed = false;
@@ -21,100 +21,123 @@
                 field("No."; Rec."No.")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the No. field';
                 }
                 field("External Ticket No."; Rec."External Ticket No.")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the External Ticket No. field';
                 }
                 field("Ticket Type Code"; Rec."Ticket Type Code")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Ticket Type Code field';
                 }
                 field("Valid From Date"; Rec."Valid From Date")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Valid From Date field';
                 }
                 field("Valid From Time"; Rec."Valid From Time")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Valid From Time field';
                 }
                 field("Valid To Date"; Rec."Valid To Date")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Valid To Date field';
                 }
                 field("Valid To Time"; Rec."Valid To Time")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Valid To Time field';
                 }
                 field(Blocked; Rec.Blocked)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Blocked field';
                 }
                 field("Blocked Date"; Rec."Blocked Date")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Blocked Date field';
                 }
                 field("Printed Date"; Rec."Printed Date")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Printed Date field';
                 }
                 field("Salesperson Code"; Rec."Salesperson Code")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Salesperson Code field';
                 }
                 field("Document Date"; Rec."Document Date")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Document Date field';
                 }
                 field("Source Code"; Rec."Source Code")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Source Code field';
                 }
                 field("Customer No."; Rec."Customer No.")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Customer No. field';
                 }
                 field("Sales Header Type"; Rec."Sales Header Type")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Sales Header Type field';
                 }
                 field("Sales Header No."; Rec."Sales Header No.")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Sales Header No. field';
                 }
                 field("Sales Receipt No."; Rec."Sales Receipt No.")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the POS Reciept No. field';
                 }
                 field("Line No."; "Line No.")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Line No. field';
                 }
                 field("External Member Card No."; Rec."External Member Card No.")
                 {
                     ApplicationArea = NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the External Member Card No. field';
                 }
                 field("No. Of Access"; Rec."No. Of Access")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the No. Of Access field';
                 }
                 field("Item No."; Rec."Item No.")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Item No. field';
                 }
                 field("Variant Code"; Rec."Variant Code")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Variant Code field';
                 }
                 field("Last Date Modified"; Rec."Last Date Modified")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Last Date Modified field';
                 }
             }
         }

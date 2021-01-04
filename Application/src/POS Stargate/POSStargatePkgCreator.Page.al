@@ -25,6 +25,7 @@ page 6150720 "NPR POS Stargate Pkg Creator"
                         AssistEdit = true;
                         Caption = 'Select Assembly';
                         Editable = false;
+                        ToolTip = 'Specifies the value of the Select Assembly field';
 
                         trigger OnAssistEdit()
                         begin
@@ -35,16 +36,19 @@ page 6150720 "NPR POS Stargate Pkg Creator"
                     {
                         ApplicationArea = All;
                         ShowCaption = false;
+                        ToolTip = 'Specifies the value of the '''' field';
                     }
                     field(PackageName; PackageName)
                     {
                         ApplicationArea = All;
                         Caption = 'Package Name';
+                        ToolTip = 'Specifies the value of the Package Name field';
                     }
                     field(PackageVersion; PackageVersion)
                     {
                         ApplicationArea = All;
                         Caption = 'Package Version';
+                        ToolTip = 'Specifies the value of the Package Version field';
                     }
                 }
             }
@@ -56,6 +60,7 @@ page 6150720 "NPR POS Stargate Pkg Creator"
                 {
                     ApplicationArea = All;
                     StyleExpr = Style;
+                    ToolTip = 'Specifies the value of the Assembly Name field';
                 }
                 field(Path; Path)
                 {
@@ -63,6 +68,7 @@ page 6150720 "NPR POS Stargate Pkg Creator"
                     AssistEdit = true;
                     Editable = false;
                     StyleExpr = Style;
+                    ToolTip = 'Specifies the value of the Path field';
 
                     trigger OnAssistEdit()
                     begin
@@ -73,6 +79,7 @@ page 6150720 "NPR POS Stargate Pkg Creator"
                 {
                     ApplicationArea = All;
                     StyleExpr = Style;
+                    ToolTip = 'Specifies the value of the Status field';
                 }
             }
         }
@@ -91,6 +98,7 @@ page 6150720 "NPR POS Stargate Pkg Creator"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the &Map Assembly action';
 
                 trigger OnAction()
                 begin
@@ -106,6 +114,7 @@ page 6150720 "NPR POS Stargate Pkg Creator"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the &Add Assembly action';
 
                 trigger OnAction()
                 begin
@@ -121,6 +130,7 @@ page 6150720 "NPR POS Stargate Pkg Creator"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Create &Package action';
 
                 trigger OnAction()
                 begin

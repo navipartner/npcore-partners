@@ -14,6 +14,7 @@ page 6059790 "NPR Pdf2Nav Posting Setup"
                 field("Post and Send"; "Post and Send")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Post and Send field';
                 }
                 group("When posting with Pdf2Nav:")
                 {
@@ -21,10 +22,12 @@ page 6059790 "NPR Pdf2Nav Posting Setup"
                     field("Always Print Ship"; "Always Print Ship")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Always Print Sales Shipment field';
                     }
                     field("Always Print Receive"; "Always Print Receive")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Always Print Sales Return Receipt field';
                     }
                 }
             }

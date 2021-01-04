@@ -29,30 +29,37 @@ page 6014526 "NPR Touch Screen: Customers"
                 field(Name; Name)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Name field';
                 }
                 field("No."; "No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the No. field';
                 }
                 field(Address; Address)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Address field';
                 }
                 field("Address 2"; "Address 2")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Address 2 field';
                 }
                 field(City; City)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the City field';
                 }
                 field("Phone No."; "Phone No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Phone No. field';
                 }
                 field(Balance; Balance)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Balance field';
                 }
             }
         }
@@ -69,6 +76,7 @@ page 6014526 "NPR Touch Screen: Customers"
                 Promoted = true;
                 PromotedCategory = New;
                 ApplicationArea = All;
+                ToolTip = 'Executes the New action';
 
                 trigger OnAction()
                 var

@@ -20,18 +20,22 @@ page 6060049 "NPR Item Worksh. Missing Setup"
                 field("Field Name"; "Field Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Field Name field';
                 }
                 field("Related Table Name"; "Related Table Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Related Table Name field';
                 }
                 field("Missing Records"; "Missing Records")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Missing Records field';
                 }
                 field("Create New"; "Create New")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Create New field';
                 }
             }
             part(Control6150620; "NPR Item Worksh. Setup Subpage")
@@ -54,6 +58,7 @@ page 6060049 "NPR Item Worksh. Missing Setup"
                 Caption = 'Create Records';
                 Image = Create;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Create Records action';
 
                 trigger OnAction()
                 begin

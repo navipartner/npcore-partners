@@ -17,6 +17,7 @@ page 6184882 "NPR FTP Dir. Select"
                 field("File Name"; "File Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the File Name field';
                 }
             }
         }

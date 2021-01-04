@@ -20,30 +20,37 @@ page 6060041 "NPR Item Worksheets"
                 field("Item Template Name"; "Item Template Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Item Template Name field';
                 }
                 field(Name; Name)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Name field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Vendor No."; "Vendor No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Vendor No. field';
                 }
                 field("Prefix Code"; "Prefix Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Prefix Code field';
                 }
                 field("No. Series"; "No. Series")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the No. Series field';
                 }
                 field("Item Group"; "Item Group")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Item Group field';
                 }
             }
         }
@@ -61,6 +68,7 @@ page 6060041 "NPR Item Worksheets"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Edit Item Worksheet action';
 
                 trigger OnAction()
                 begin
@@ -77,6 +85,7 @@ page 6060041 "NPR Item Worksheets"
                 RunPageView = SORTING("No.")
                               ORDER(Ascending);
                 ApplicationArea = All;
+                ToolTip = 'Executes the Registered Worksheets action';
             }
         }
         area(processing)
@@ -86,6 +95,7 @@ page 6060041 "NPR Item Worksheets"
                 Caption = 'Field Setup';
                 Image = MapAccounts;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Field Setup action';
 
                 trigger OnAction()
                 var

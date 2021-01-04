@@ -17,10 +17,12 @@ page 6150742 "NPR POS Admin. Template Scopes"
                 field("Applies To"; "Applies To")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Applies To field';
                 }
                 field("Applies To Code"; "Applies To Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Applies To Code field';
                 }
             }
         }

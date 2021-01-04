@@ -19,10 +19,12 @@ page 6151000 "NPR Upgrade History"
                 field("Upgrade Time"; "Upgrade Time")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Upgrade Time field';
                 }
                 field(Version; Version)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Version field';
                 }
             }
         }

@@ -18,10 +18,12 @@ page 6151596 "NPR NpDc Extra Coupon Item"
                     field("Item No."; "Item No.")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Item No. field';
                     }
                     field("Discount Type"; "Discount Type")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Discount Type field';
                     }
                     group(Control6014411)
                     {
@@ -31,6 +33,7 @@ page 6151596 "NPR NpDc Extra Coupon Item"
                         {
                             ApplicationArea = All;
                             ShowMandatory = true;
+                            ToolTip = 'Specifies the value of the Discount Amount field';
                         }
                     }
                     group(Control6014409)
@@ -41,6 +44,7 @@ page 6151596 "NPR NpDc Extra Coupon Item"
                         {
                             ApplicationArea = All;
                             ShowMandatory = true;
+                            ToolTip = 'Specifies the value of the Discount % field';
                         }
                         field("Max. Discount Amount"; "Max. Discount Amount")
                         {
@@ -55,14 +59,17 @@ page 6151596 "NPR NpDc Extra Coupon Item"
                     field("Item Description"; "Item Description")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Item Description field';
                     }
                     field("Unit Price"; "Unit Price")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Unit Price field';
                     }
                     field("Profit %"; "Profit %")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Profit % field';
                     }
                 }
             }

@@ -21,46 +21,57 @@ page 6059825 "NPR Trx Email Log"
                 field("Entry No."; "Entry No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Entry No. field';
                 }
                 field(Provider; Provider)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Provider field';
                 }
                 field("Message ID"; "Message ID")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Message ID field';
                 }
                 field(Status; Status)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Status field';
                 }
                 field("Status Message"; "Status Message")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Status Message field';
                 }
                 field(Recipient; Recipient)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Recipient field';
                 }
                 field(Subject; Subject)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Subject field';
                 }
                 field("Smart Email ID"; "Smart Email ID")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Smart Email ID field';
                 }
                 field("Sent At"; "Sent At")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Sent At field';
                 }
                 field("Total Opens"; "Total Opens")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Total Opens field';
                 }
                 field("Total Clicks"; "Total Clicks")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Total Clicks field';
                 }
             }
         }
@@ -76,6 +87,7 @@ page 6059825 "NPR Trx Email Log"
                 Image = Process;
                 Promoted = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Update Details action';
 
                 trigger OnAction()
                 var

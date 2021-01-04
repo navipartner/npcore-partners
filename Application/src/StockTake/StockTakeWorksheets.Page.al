@@ -19,26 +19,32 @@ page 6014662 "NPR Stock-Take Worksheets"
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Stock-Take Conf. Code field';
                 }
                 field(Name; Name)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Name field';
                 }
                 field(Status; Status)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Status field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Item Group Filter"; "Item Group Filter")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Item Group Filter field';
                 }
                 field("Vendor Code Filter"; "Vendor Code Filter")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Vendor Code Filter field';
                 }
                 field(Metrics; LineTypeCountText)
                 {
@@ -47,6 +53,7 @@ page 6014662 "NPR Stock-Take Worksheets"
                     Editable = false;
                     Style = Favorable;
                     StyleExpr = TRUE;
+                    ToolTip = 'Specifies the value of the Metrics field';
                 }
             }
         }

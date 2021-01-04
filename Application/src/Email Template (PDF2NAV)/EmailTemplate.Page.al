@@ -15,54 +15,67 @@ page 6059791 "NPR E-mail Template"
                     ApplicationArea = All;
                     Style = Standard;
                     StyleExpr = TRUE;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Table No."; "Table No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Table No. field';
                 }
                 field(Filename; Filename)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Filename field';
                 }
                 field(Subject; Subject)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Subject field';
                 }
                 field("Verify Recipient"; "Verify Recipient")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Verify Recipient field';
                 }
                 field("Sender as bcc"; "Sender as bcc")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Sender as bcc field';
                 }
                 field("From E-mail Name"; "From E-mail Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the From E-mail Name field';
                 }
                 field("From E-mail Address"; "From E-mail Address")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the From E-mail Address field';
                 }
                 field("Default Recipient Address"; "Default Recipient Address")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Default recipient e-mail address field';
                 }
                 field("Default Recipient Address CC"; "Default Recipient Address CC")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Default recipient e-mail address (CC) field';
                 }
                 field("Default Recipient Address BCC"; "Default Recipient Address BCC")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Default recipient e-mail address (BCC) field';
                 }
                 field("Report ID"; "Report ID")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Report ID field';
                 }
                 group(Control6150644)
                 {
@@ -71,12 +84,14 @@ page 6059791 "NPR E-mail Template"
                     field("Use HTML Template"; "Use HTML Template")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Use HTML Template field';
                     }
                     field("FORMAT(""HTML Template"".HASVALUE)"; Format("HTML Template".HasValue))
                     {
                         ApplicationArea = All;
                         AssistEdit = true;
                         Caption = 'HTML Template';
+                        ToolTip = 'Specifies the value of the HTML Template field';
 
                         trigger OnAssistEdit()
                         var
@@ -104,21 +119,25 @@ page 6059791 "NPR E-mail Template"
                 {
                     ApplicationArea = All;
                     Importance = Additional;
+                    ToolTip = 'Specifies the value of the Fieldnumber Start Tag field';
                 }
                 field("Fieldnumber End Tag"; "Fieldnumber End Tag")
                 {
                     ApplicationArea = All;
                     Importance = Additional;
+                    ToolTip = 'Specifies the value of the Fieldnumber End Tag field';
                 }
                 field(Group; Group)
                 {
                     ApplicationArea = All;
                     Importance = Additional;
+                    ToolTip = 'Specifies the value of the Group field';
                 }
                 field("Transactional E-mail"; "Transactional E-mail")
                 {
                     ApplicationArea = All;
                     Importance = Additional;
+                    ToolTip = 'Specifies the value of the Transactional E-mail field';
                 }
                 group(Control6150643)
                 {
@@ -128,6 +147,7 @@ page 6059791 "NPR E-mail Template"
                     {
                         ApplicationArea = All;
                         Importance = Additional;
+                        ToolTip = 'Specifies the value of the Transactional E-mail Code field';
                     }
                 }
             }
@@ -164,6 +184,7 @@ page 6059791 "NPR E-mail Template"
                 Image = View;
                 Visible = ("Transactional E-mail" = 0) OR ("Transactional E-mail Code" = '');
                 ApplicationArea = All;
+                ToolTip = 'Executes the View HTML Template action';
 
                 trigger OnAction()
                 var
@@ -178,6 +199,7 @@ page 6059791 "NPR E-mail Template"
                 Image = Import;
                 Visible = ("Transactional E-mail" = 0) OR ("Transactional E-mail Code" = '');
                 ApplicationArea = All;
+                ToolTip = 'Executes the Import HTML Template action';
 
                 trigger OnAction()
                 var
@@ -193,6 +215,7 @@ page 6059791 "NPR E-mail Template"
                 Image = Export;
                 Visible = ("Transactional E-mail" = 0) OR ("Transactional E-mail Code" = '');
                 ApplicationArea = All;
+                ToolTip = 'Executes the Export HTML Template action';
 
                 trigger OnAction()
                 var
@@ -207,6 +230,7 @@ page 6059791 "NPR E-mail Template"
                 Image = Copy;
                 Visible = ("Transactional E-mail" = 0) OR ("Transactional E-mail Code" = '');
                 ApplicationArea = All;
+                ToolTip = 'Executes the Copy From E-Mail Template action';
 
                 trigger OnAction()
                 var
@@ -221,6 +245,7 @@ page 6059791 "NPR E-mail Template"
                 Image = Delete;
                 Visible = ("Transactional E-mail" = 0) OR ("Transactional E-mail Code" = '');
                 ApplicationArea = All;
+                ToolTip = 'Executes the Delete HTML Template action';
 
                 trigger OnAction()
                 var
@@ -240,6 +265,7 @@ page 6059791 "NPR E-mail Template"
                 RunPageLink = "Table No." = FIELD("Table No.");
                 RunPageView = SORTING("Entry No.");
                 ApplicationArea = All;
+                ToolTip = 'Executes the E-mail Log action';
             }
             action(EmailTemplateFilters)
             {
@@ -250,12 +276,14 @@ page 6059791 "NPR E-mail Template"
                               "Table No." = FIELD("Table No.");
                 RunPageView = SORTING("E-mail Template Code", "Table No.", "Line No.");
                 ApplicationArea = All;
+                ToolTip = 'Executes the Email Template Filters action';
             }
             action(AttachedFiles)
             {
                 Caption = 'Attached Files';
                 Image = MailAttachment;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Attached Files action';
 
                 trigger OnAction()
                 var
@@ -276,6 +304,7 @@ page 6059791 "NPR E-mail Template"
                 RunObject = Page "NPR E-mail Templ. Reports";
                 RunPageLink = "E-mail Template Code" = FIELD(Code);
                 ApplicationArea = All;
+                ToolTip = 'Executes the Additional Reports action';
             }
         }
     }

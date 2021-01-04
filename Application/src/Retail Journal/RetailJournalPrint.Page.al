@@ -18,27 +18,33 @@ page 6014473 "NPR Retail Journal Print"
                 field("Item No."; "Item No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Item No. field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Description 2"; "Description 2")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description 2 field';
                 }
                 field("Variant Code"; "Variant Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Variant Code field';
                 }
                 field("Quantity to Print"; "Quantity to Print")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Quantity to Print field';
                 }
                 field(Print; Print)
                 {
                     ApplicationArea = All;
                     Caption = 'Print';
+                    ToolTip = 'Specifies the value of the Print field';
 
                     trigger OnValidate()
                     var
@@ -51,21 +57,25 @@ page 6014473 "NPR Retail Journal Print"
                 field(Barcode; Barcode)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Barcode field';
                 }
                 field("Discount Price Incl. Vat"; "Discount Price Incl. Vat")
                 {
                     ApplicationArea = All;
                     Caption = 'Unit Price';
+                    ToolTip = 'Specifies the value of the Unit Price field';
                 }
                 field("Vendor No."; "Vendor No.")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Vendor No. field';
                 }
                 field("Vendor Item No."; "Vendor Item No.")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Vendor Item No. field';
                 }
             }
         }
@@ -84,6 +94,7 @@ page 6014473 "NPR Retail Journal Print"
                     Promoted = true;
                     PromotedIsBig = true;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Invert Selection action';
 
                     trigger OnAction()
                     begin
@@ -97,6 +108,7 @@ page 6014473 "NPR Retail Journal Print"
                     Promoted = true;
                     PromotedIsBig = true;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Price Label action';
 
                     trigger OnAction()
                     var
@@ -112,6 +124,7 @@ page 6014473 "NPR Retail Journal Print"
                     Promoted = true;
                     PromotedIsBig = true;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Shelf Label action';
 
                     trigger OnAction()
                     var
@@ -127,6 +140,7 @@ page 6014473 "NPR Retail Journal Print"
                     Promoted = true;
                     PromotedIsBig = true;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Sign action';
 
                     trigger OnAction()
                     var

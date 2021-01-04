@@ -204,11 +204,13 @@ report 6014463 "NPR Doc. Processing Status"
                     {
                         Caption = 'Show Only Not Sent Documents';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Show Only Not Sent Documents field';
                     }
                     field(DocType; IncludeCrMemo)
                     {
                         Caption = 'Include Credit Memos';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Include Credit Memos field';
                     }
                 }
             }

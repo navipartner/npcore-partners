@@ -16,14 +16,17 @@ page 6151101 "NPR NpRi Reimbursement Templ."
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Data Collection Module"; "Data Collection Module")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Data Collection Module field';
 
                     trigger OnValidate()
                     begin
@@ -33,15 +36,18 @@ page 6151101 "NPR NpRi Reimbursement Templ."
                 field("Data Collection Description"; "Data Collection Description")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Data Collection Description field';
                 }
                 field("Data Collection Summary"; "Data Collection Summary")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Data Collection Summary field';
                 }
                 field("Reimbursement Module"; "Reimbursement Module")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Reimbursement Module field';
 
                     trigger OnValidate()
                     begin
@@ -51,15 +57,18 @@ page 6151101 "NPR NpRi Reimbursement Templ."
                 field("Reimbursement Description"; "Reimbursement Description")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Reimbursement Description field';
                 }
                 field("Reimbursement Summary"; "Reimbursement Summary")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Reimbursement Summary field';
                 }
                 field("Posting Description"; "Posting Description")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Posting Description field';
                 }
             }
         }
@@ -78,6 +87,7 @@ page 6151101 "NPR NpRi Reimbursement Templ."
                 PromotedIsBig = true;
                 Visible = HasDataCollectionFilters;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Data Collection Filters action';
 
                 trigger OnAction()
                 var
@@ -95,6 +105,7 @@ page 6151101 "NPR NpRi Reimbursement Templ."
                 PromotedIsBig = true;
                 Visible = HasReimbursementParameters;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Reimbursement Parameters action';
 
                 trigger OnAction()
                 var

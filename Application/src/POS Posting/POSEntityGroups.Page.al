@@ -17,14 +17,17 @@ page 6150649 "NPR POS Entity Groups"
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Sorting"; Sorting)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Sorting field';
                 }
             }
         }

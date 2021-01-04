@@ -16,11 +16,13 @@ page 6014417 "NPR Print Tags"
                 field("Print Tag"; "Print Tag")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Print Tag field';
                 }
                 field(Pick; Pick)
                 {
                     ApplicationArea = All;
                     ShowCaption = false;
+                    ToolTip = 'Specifies the value of the Pick field';
 
                     trigger OnValidate()
                     begin

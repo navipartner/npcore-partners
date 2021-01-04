@@ -26,71 +26,86 @@ page 6060048 "NPR Reg. ItemWsht Var.Subpage"
                     AutoFormatType = 2;
                     Editable = false;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Level field';
                 }
                 field("Heading Text"; "Heading Text")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Heading Text field';
                 }
                 field("Variety 1 Value"; "Variety 1 Value")
                 {
                     ApplicationArea = All;
                     CaptionClass = '3,' + FieldCaptionNew[1];
                     Visible = Variety1InUse;
+                    ToolTip = 'Specifies the value of the Variety 1 Value field';
                 }
                 field("Variety 2 Value"; "Variety 2 Value")
                 {
                     ApplicationArea = All;
                     CaptionClass = '3,' + FieldCaptionNew[2];
                     Visible = Variety2InUse;
+                    ToolTip = 'Specifies the value of the Variety 2 Value field';
                 }
                 field("Variety 3 Value"; "Variety 3 Value")
                 {
                     ApplicationArea = All;
                     CaptionClass = '3,' + FieldCaptionNew[3];
                     Visible = Variety3InUse;
+                    ToolTip = 'Specifies the value of the Variety 3 Value field';
                 }
                 field("Variety 4 Value"; "Variety 4 Value")
                 {
                     ApplicationArea = All;
                     CaptionClass = '3,' + FieldCaptionNew[4];
                     Visible = Variety4InUse;
+                    ToolTip = 'Specifies the value of the Variety 4 Value field';
                 }
                 field("Action"; Action)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Action field';
                 }
                 field("Variant Code"; "Variant Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Variant Code field';
                 }
                 field("Existing Variant Code"; "Existing Variant Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Existing Variant Code field';
                 }
                 field("Existing Variant Blocked"; "Existing Variant Blocked")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Existing Variant Blocked field';
                 }
                 field("Internal Bar Code"; "Internal Bar Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Internal Bar Code field';
                 }
                 field("Vendors Bar Code"; "Vendors Bar Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Vendors Bar Code field';
                 }
                 field("Sales Price"; "Sales Price")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Sales Price field';
                 }
                 field("Direct Unit Cost"; "Direct Unit Cost")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Direct Unit Cost field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
             }
         }

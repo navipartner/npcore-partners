@@ -18,6 +18,7 @@ page 6014541 "NPR Report Selection: Contract"
             {
                 ApplicationArea = All;
                 Caption = 'Report Type';
+                ToolTip = 'Specifies the value of the Report Type field';
 
                 trigger OnValidate()
                 begin
@@ -34,38 +35,47 @@ page 6014541 "NPR Report Selection: Contract"
                 field(Sequence; Sequence)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Sequence field';
                 }
                 field("Report ID"; "Report ID")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Report ID field';
                 }
                 field("Register No."; "Register No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Cash Register No. field';
                 }
                 field("XML Port ID"; "XML Port ID")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the XML Port ID field';
                 }
                 field("XML Port Name"; "XML Port Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the XML Port Name field';
                 }
                 field("Report Name"; "Report Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Report Name field';
                 }
                 field("Codeunit ID"; "Codeunit ID")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Codeunit ID field';
                 }
                 field("Codeunit Name"; "Codeunit Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Codeunit Name field';
                 }
                 field("Print Template"; "Print Template")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Print Template field';
                 }
             }
         }
@@ -81,6 +91,7 @@ page 6014541 "NPR Report Selection: Contract"
                 Image = List;
                 RunObject = Page "NPR Retail Report Select. List";
                 ApplicationArea = All;
+                ToolTip = 'Executes the List action';
             }
         }
     }

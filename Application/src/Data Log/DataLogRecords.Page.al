@@ -18,32 +18,39 @@ page 6059898 "NPR Data Log Records"
                 field("Log Date"; "Log Date")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Log Date field';
                 }
                 field("Table ID"; "Table ID")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Table ID field';
                 }
                 field("Table Name"; "Table Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Table Name field';
                 }
                 field("FORMAT(""Record ID"")"; Format("Record ID"))
                 {
                     ApplicationArea = All;
                     Caption = 'Record ID';
+                    ToolTip = 'Specifies the value of the Record ID field';
                 }
                 field("Old Record ID"; "Old Record ID")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Old Record ID field';
                 }
                 field("Type of Change"; "Type of Change")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Type of Change field';
                 }
                 field("User ID"; "User ID")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the User ID field';
                 }
             }
             part(Control6150622; "NPR Data Log Records Subform")

@@ -22,42 +22,52 @@ page 6014648 "NPR Package Module Admin"
                     field("Normal No. Series"; "Normal No. Series")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Normal package label numbers field';
                     }
                     field("DHL No. Series"; "DHL No. Series")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the DHL package label numbers field';
                     }
                     field("DHL AWB No. Series"; "DHL AWB No. Series")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the DHL AWB package label numbers field';
                     }
                     field("DHL Customer No"; "DHL Customer No")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the DHL Customer No field';
                     }
                     field("COD No. Series"; "COD No. Series")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Cash on delivery package numbers field';
                     }
                     field("CV No. Series"; "CV No. Series")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Recipient receipt package numbers field';
                     }
                     field("Barcode39 Path"; "Barcode39 Path")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Path to Barcode39 field';
                     }
                     field("Has EDI contract"; "Has EDI contract")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Has EDI contract field';
                     }
                     field("Business Service Code"; "Business Service Code")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Business shipping agent service code field';
                     }
                     field("Private Service Code"; "Private Service Code")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Private shipping agent service code field';
                     }
                 }
                 group(Control6150626)
@@ -66,14 +76,17 @@ page 6014648 "NPR Package Module Admin"
                     field("DHL ftp address"; "DHL ftp address")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the DHL FTP Address field';
                     }
                     field("DHL ftp username"; "DHL ftp username")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the DHL FTP Username field';
                     }
                     field("DHL ftp password"; "DHL ftp password")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the DHL FTP Password field';
                     }
                 }
             }
@@ -86,30 +99,37 @@ page 6014648 "NPR Package Module Admin"
                     field("EDI Sender Identifier"; "EDI Sender Identifier")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Package EDI sender identification field';
                     }
                     field("EDI Sender SMS"; "EDI Sender SMS")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the SMS to sender field';
                     }
                     field("EDI Recipient SMS"; "EDI Recipient SMS")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the SMS to recipient field';
                     }
                     field("EDI Sender Email"; "EDI Sender Email")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Email to sender field';
                     }
                     field("EDI Recipient Email"; "EDI Recipient Email")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Email to recipient field';
                     }
                     field("EDI FTP username"; "EDI FTP username")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the EDI FTP Username field';
                     }
                     field("EDI FTP password"; "EDI FTP password")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the EDI FTP Password field';
                     }
                 }
             }

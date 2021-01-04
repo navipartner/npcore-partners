@@ -19,14 +19,17 @@ page 6151506 "NPR Nc Task Proces. Lines"
                 field(Type; Type)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Type field';
                 }
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Value; Value)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Value field';
                 }
             }
         }

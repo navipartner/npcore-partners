@@ -13,6 +13,7 @@ pageextension 6014417 "NPR Posted S.Credit Memos" extends "Posted Sales Credit M
                 ApplicationArea = All;
                 Editable = false;
                 Visible = false;
+                ToolTip = 'Specifies the value of the NPR Magento Coupon field';
             }
         }
     }
@@ -29,12 +30,14 @@ pageextension 6014417 "NPR Posted S.Credit Memos" extends "Posted Sales Credit M
                     Caption = 'Export';
                     Image = ExportFile;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Export action';
                 }
                 action("NPR UpdateStatus")
                 {
                     Caption = 'Update Status';
                     Image = ChangeStatus;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Update Status action';
                 }
             }
         }
@@ -48,12 +51,14 @@ pageextension 6014417 "NPR Posted S.Credit Memos" extends "Posted Sales Credit M
                     Caption = 'E-mail Log';
                     Image = Email;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the E-mail Log action';
                 }
                 action("NPR SendAsPDF")
                 {
                     Caption = 'Send as PDF';
                     Image = SendEmailPDF;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Send as PDF action';
                 }
             }
         }

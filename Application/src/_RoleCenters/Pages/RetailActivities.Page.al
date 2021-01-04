@@ -17,18 +17,21 @@ page 6059812 "NPR Retail Activities"
                     ApplicationArea = All;
                     DrillDownPageID = "Sales Order List";
                     Image = "Document";
+                    ToolTip = 'Specifies the value of the Sales Orders field';
                 }
                 field("Daily Sales Orders"; "Daily Sales Orders")
                 {
                     ApplicationArea = All;
                     DrillDownPageID = "Sales Order List";
                     Image = "Document";
+                    ToolTip = 'Specifies the value of the Daily Sales Orders field';
                 }
                 field("Import Pending"; "Import Pending")
                 {
                     ApplicationArea = All;
                     DrillDownPageID = "NPR Nc Import List";
                     Image = "Document";
+                    ToolTip = 'Specifies the value of the Import Unprocessed field';
                 }
 
                 actions
@@ -39,6 +42,7 @@ page 6059812 "NPR Retail Activities"
                         RunObject = Page "Sales Order";
                         RunPageMode = Create;
                         ApplicationArea = All;
+                        ToolTip = 'Executes the New Sales Order action';
                     }
                     action("New Sales Quote")
                     {
@@ -46,6 +50,7 @@ page 6059812 "NPR Retail Activities"
                         RunObject = Page "Sales Quote";
                         RunPageMode = Create;
                         ApplicationArea = All;
+                        ToolTip = 'Executes the New Sales Quote action';
                     }
                 }
             }
@@ -56,18 +61,21 @@ page 6059812 "NPR Retail Activities"
                 {
                     ApplicationArea = All;
                     Image = "Document";
+                    ToolTip = 'Specifies the value of the Pending Inc. Documents field';
                 }
                 field("Processed Error Tasks"; "Processed Error Tasks")
                 {
                     ApplicationArea = All;
                     DrillDownPageID = "NPR Nc Task List";
                     Image = "Document";
+                    ToolTip = 'Specifies the value of the Processed Error Tasks field';
                 }
                 field("Failed Webshop Payments"; "Failed Webshop Payments")
                 {
                     ApplicationArea = All;
                     DrillDownPageID = "NPR Magento Payment Line List";
                     Image = "Document";
+                    ToolTip = 'Specifies the value of the Failed Webshop Payments field';
                 }
             }
             cuegroup(Depreciated)
@@ -80,6 +88,7 @@ page 6059812 "NPR Retail Activities"
                     DrillDownPageID = "Sales Quotes";
                     Image = "Document";
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Sales Quotes field';
                 }
                 field("Sales Return Orders"; "Sales Return Orders")
                 {
@@ -87,6 +96,7 @@ page 6059812 "NPR Retail Activities"
                     DrillDownPageID = "Sales Return Order List";
                     Image = "Document";
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Sales Return Orders field';
                 }
                 field("Magento Orders"; "Magento Orders")
                 {
@@ -94,6 +104,7 @@ page 6059812 "NPR Retail Activities"
                     DrillDownPageID = "Sales Order List";
                     Image = "Document";
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Magento Orders field';
                 }
                 field("Daily Sales Invoices"; "Daily Sales Invoices")
                 {
@@ -102,6 +113,7 @@ page 6059812 "NPR Retail Activities"
                     DrillDownPageID = "Posted Sales Invoices";
                     Image = "Document";
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Daily Sales Invoices field';
                 }
                 field("Tasks Unprocessed"; "Tasks Unprocessed")
                 {
@@ -109,6 +121,7 @@ page 6059812 "NPR Retail Activities"
                     DrillDownPageID = "NPR Nc Task List";
                     Image = "Document";
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Tasks Unprocessed field';
                 }
             }
             usercontrol(Bridge; "NPR Bridge")
@@ -136,6 +149,7 @@ page 6059812 "NPR Retail Activities"
             {
                 Caption = 'Action Items';
                 ApplicationArea = All;
+                ToolTip = 'Executes the Action Items action';
             }
         }
     }

@@ -70,6 +70,7 @@ page 6014559 "NPR Retail - Owner Role Center"
                 Caption = 'Item List';
                 RunObject = Page "Item List";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Item List action';
             }
             action("Magento Item List")
             {
@@ -77,78 +78,91 @@ page 6014559 "NPR Retail - Owner Role Center"
                 RunObject = Page "Item List";
                 RunPageLink = "NPR Magento Item" = CONST(true);
                 ApplicationArea = All;
+                ToolTip = 'Executes the Magento Items action';
             }
             action("Item Groups")
             {
                 Caption = 'Item Groups';
                 RunObject = Page "NPR Item Group Tree";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Item Groups action';
             }
             action("Retail Journal")
             {
                 Caption = 'Retail Journal';
                 RunObject = Page "NPR Retail Journal List";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Retail Journal action';
             }
             action("Retail Documents")
             {
                 Caption = 'Retail Documents';
                 RunObject = Page "NPR Retail Document List";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Retail Documents action';
             }
             action("Audit Roll")
             {
                 Caption = 'Audit Roll';
                 RunObject = Page "NPR Audit Roll";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Audit Roll action';
             }
             action("POS Entry List")
             {
                 Caption = 'POS Entry List';
                 RunObject = Page "NPR POS Entry List";
                 ApplicationArea = All;
+                ToolTip = 'Executes the POS Entry List action';
             }
             action("Gift Vouchers")
             {
                 Caption = 'Gift Vouchers';
                 RunObject = Page "NPR Gift Voucher List";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Gift Vouchers action';
             }
             action("Credit Vouchers")
             {
                 Caption = 'Credit Vouchers';
                 RunObject = Page "NPR Credit Voucher List";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Credit Vouchers action';
             }
             action("Sales Ticket Statistics")
             {
                 Caption = 'Sales Ticket Statistics';
                 RunObject = Page "NPR Sales Ticket Statistics";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Sales Ticket Statistics action';
             }
             action(Contacts)
             {
                 Caption = 'Contact List';
                 RunObject = Page "Contact List";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Contact List action';
             }
             action(Customers)
             {
                 Caption = 'Customer List';
                 RunObject = Page "Customer List";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Customer List action';
             }
             action(MixedDiscounts)
             {
                 Caption = 'Mixed Discounts';
                 RunObject = Page "NPR Mixed Discount List";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Mixed Discounts action';
             }
             action(PeriodDiscounts)
             {
                 Caption = 'Period Discounts';
                 RunObject = Page "NPR Campaign Discount List";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Period Discounts action';
             }
             action("Magento Item Groups")
             {
@@ -156,6 +170,7 @@ page 6014559 "NPR Retail - Owner Role Center"
                 RunObject = Page "NPR Magento Categories";
                 Visible = false;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Magento Item Groups action';
             }
             action(Brands)
             {
@@ -163,6 +178,7 @@ page 6014559 "NPR Retail - Owner Role Center"
                 RunObject = Page "NPR Magento Brands";
                 Visible = false;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Brands action';
             }
             action(Attributes)
             {
@@ -170,6 +186,7 @@ page 6014559 "NPR Retail - Owner Role Center"
                 RunObject = Page "NPR Magento Attributes";
                 Visible = false;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Attributes action';
             }
             action("Attribute Sets")
             {
@@ -177,6 +194,7 @@ page 6014559 "NPR Retail - Owner Role Center"
                 RunObject = Page "NPR Magento Attribute Sets";
                 Visible = false;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Attribute Sets action';
             }
             action(Pictures)
             {
@@ -184,6 +202,7 @@ page 6014559 "NPR Retail - Owner Role Center"
                 RunObject = Page "NPR Magento Pictures";
                 Visible = false;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Pictures action';
             }
         }
     }

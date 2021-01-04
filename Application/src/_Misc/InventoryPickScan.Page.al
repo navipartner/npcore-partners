@@ -18,6 +18,7 @@ page 6014460 "NPR Inventory Pick Scan"
                 {
                     ApplicationArea = All;
                     QuickEntry = false;
+                    ToolTip = 'Specifies the value of the No. field';
 
                     trigger OnAssistEdit()
                     begin
@@ -29,6 +30,7 @@ page 6014460 "NPR Inventory Pick Scan"
                 {
                     ApplicationArea = All;
                     QuickEntry = false;
+                    ToolTip = 'Specifies the value of the Location Code field';
                 }
                 field("Source Document"; "Source Document")
                 {
@@ -36,11 +38,13 @@ page 6014460 "NPR Inventory Pick Scan"
                     DrillDown = false;
                     Lookup = false;
                     QuickEntry = false;
+                    ToolTip = 'Specifies the value of the Source Document field';
                 }
                 field("Source No."; "Source No.")
                 {
                     ApplicationArea = All;
                     QuickEntry = false;
+                    ToolTip = 'Specifies the value of the Source No. field';
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -62,6 +66,7 @@ page 6014460 "NPR Inventory Pick Scan"
                     CaptionClass = Format(WMSMgt.GetCaption("Destination Type".AsInteger(), "Source Document".AsInteger(), 0));
                     Editable = false;
                     QuickEntry = false;
+                    ToolTip = 'Specifies the value of the Destination No. field';
                 }
                 field("WMSMgt.GetDestinationName(""Destination Type"",""Destination No."")"; WMSMgt.GetDestinationEntityName("Destination Type", "Destination No."))
                 {
@@ -69,29 +74,34 @@ page 6014460 "NPR Inventory Pick Scan"
                     CaptionClass = Format(WMSMgt.GetCaption("Destination Type".AsInteger(), "Source Document".AsInteger(), 1));
                     Caption = 'Name';
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Name field';
                 }
                 field("Posting Date"; "Posting Date")
                 {
                     ApplicationArea = All;
                     QuickEntry = false;
+                    ToolTip = 'Specifies the value of the Posting Date field';
                 }
                 field("Shipment Date"; "Shipment Date")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     QuickEntry = false;
+                    ToolTip = 'Specifies the value of the Shipment Date field';
                 }
                 field("External Document No."; "External Document No.")
                 {
                     ApplicationArea = All;
                     CaptionClass = Format(WMSMgt.GetCaption("Destination Type".AsInteger(), "Source Document".AsInteger(), 2));
                     QuickEntry = false;
+                    ToolTip = 'Specifies the value of the External Document No. field';
                 }
                 field("External Document No.2"; "External Document No.2")
                 {
                     ApplicationArea = All;
                     CaptionClass = Format(WMSMgt.GetCaption("Destination Type".AsInteger(), "Source Document".AsInteger(), 3));
                     QuickEntry = false;
+                    ToolTip = 'Specifies the value of the External Document No.2 field';
                 }
             }
             group(Scan)
@@ -102,11 +112,13 @@ page 6014460 "NPR Inventory Pick Scan"
                     ApplicationArea = All;
                     CaptionClass = QtyToHandleCaption;
                     QuickEntry = false;
+                    ToolTip = 'Specifies the value of the QtyToHandleGlobal field';
                 }
                 field(Barcode; Barcode)
                 {
                     ApplicationArea = All;
                     Caption = 'Barcode';
+                    ToolTip = 'Specifies the value of the Barcode field';
 
                     trigger OnValidate()
                     var
@@ -154,6 +166,7 @@ page 6014460 "NPR Inventory Pick Scan"
                     ApplicationArea = All;
                     CaptionClass = SerialNoCaption;
                     QuickEntry = false;
+                    ToolTip = 'Specifies the value of the SerialNo field';
 
                     trigger OnValidate()
                     begin
@@ -165,6 +178,7 @@ page 6014460 "NPR Inventory Pick Scan"
                     ApplicationArea = All;
                     CaptionClass = LotNoCaption;
                     QuickEntry = false;
+                    ToolTip = 'Specifies the value of the LotNo field';
 
                     trigger OnValidate()
                     begin
@@ -228,6 +242,7 @@ page 6014460 "NPR Inventory Pick Scan"
                     Image = OpportunitiesList;
                     ShortCutKey = 'Shift+Ctrl+L';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the List action';
 
                     trigger OnAction()
                     begin
@@ -243,6 +258,7 @@ page 6014460 "NPR Inventory Pick Scan"
                                   Type = FIELD(Type),
                                   "No." = FIELD("No.");
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Co&mments action';
                 }
                 action("Posted Picks")
                 {
@@ -252,12 +268,14 @@ page 6014460 "NPR Inventory Pick Scan"
                     RunPageLink = "Invt Pick No." = FIELD("No.");
                     RunPageView = SORTING("Invt Pick No.");
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Posted Picks action';
                 }
                 action("Source Documents")
                 {
                     Caption = 'Source Documents';
                     Image = "Order";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Source Documents action';
 
                     trigger OnAction()
                     var
@@ -283,6 +301,7 @@ page 6014460 "NPR Inventory Pick Scan"
                     PromotedCategory = Process;
                     ShortCutKey = 'Ctrl+F7';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the &Get Source Document action';
 
                     trigger OnAction()
                     var
@@ -297,6 +316,7 @@ page 6014460 "NPR Inventory Pick Scan"
                     Caption = 'Autofill Qty. to Handle';
                     Image = AutofillQtyToHandle;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Autofill Qty. to Handle action';
 
                     trigger OnAction()
                     begin
@@ -308,6 +328,7 @@ page 6014460 "NPR Inventory Pick Scan"
                     Caption = 'Delete Qty. to Handle';
                     Image = DeleteQtyToHandle;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Delete Qty. to Handle action';
 
                     trigger OnAction()
                     begin
@@ -329,6 +350,7 @@ page 6014460 "NPR Inventory Pick Scan"
                     PromotedIsBig = true;
                     ShortCutKey = 'F9';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the P&ost action';
 
                     trigger OnAction()
                     begin
@@ -345,6 +367,7 @@ page 6014460 "NPR Inventory Pick Scan"
                     PromotedIsBig = true;
                     ShortCutKey = 'Shift+F9';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Post and &Print action';
 
                     trigger OnAction()
                     begin
@@ -360,6 +383,7 @@ page 6014460 "NPR Inventory Pick Scan"
                 Promoted = true;
                 PromotedCategory = Process;
                 ApplicationArea = All;
+                ToolTip = 'Executes the &Print action';
 
                 trigger OnAction()
                 begin
@@ -376,6 +400,7 @@ page 6014460 "NPR Inventory Pick Scan"
                 Promoted = false;
                 RunObject = Report "Picking List";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Picking List action';
             }
         }
     }

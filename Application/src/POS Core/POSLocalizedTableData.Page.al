@@ -24,6 +24,7 @@ page 6150724 "NPR POS Localized Table Data"
                     Editable = false;
                     Style = Subordinate;
                     StyleExpr = "From Original Table";
+                    ToolTip = 'Specifies the value of the Field field';
                 }
                 field("Language Code"; "Language Code")
                 {
@@ -31,6 +32,7 @@ page 6150724 "NPR POS Localized Table Data"
                     Editable = false;
                     Style = Subordinate;
                     StyleExpr = "From Original Table";
+                    ToolTip = 'Specifies the value of the Language Code field';
                 }
                 field("<Language Code>"; Caption)
                 {
@@ -38,6 +40,7 @@ page 6150724 "NPR POS Localized Table Data"
                     Editable = NOT "From Original Table";
                     Style = Subordinate;
                     StyleExpr = "From Original Table";
+                    ToolTip = 'Specifies the value of the Caption field';
                 }
             }
         }
@@ -55,6 +58,7 @@ page 6150724 "NPR POS Localized Table Data"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Insert Language action';
 
                 trigger OnAction()
                 begin
@@ -69,6 +73,7 @@ page 6150724 "NPR POS Localized Table Data"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Delete Localization action';
 
                 trigger OnAction()
                 begin
@@ -83,6 +88,7 @@ page 6150724 "NPR POS Localized Table Data"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Apply Localization action';
 
                 trigger OnAction()
                 begin

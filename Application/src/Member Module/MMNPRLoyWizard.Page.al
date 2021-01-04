@@ -16,27 +16,32 @@ page 6151164 "NPR MM NPR Loy. Wizard"
                     ApplicationArea = All;
                     Caption = 'Community Code';
                     Editable = IsEditable;
+                    ToolTip = 'Specifies the value of the Community Code field';
                 }
                 field("FS_Prefix"; FS_Prefix)
                 {
                     ApplicationArea = All;
                     Caption = 'System Prefix';
                     Editable = IsEditable;
+                    ToolTip = 'Specifies the value of the System Prefix field';
                 }
                 field(PaymentMethodCode; PaymentMethodCode)
                 {
                     ApplicationArea = All;
                     Caption = 'Payment Method Code';
+                    ToolTip = 'Specifies the value of the Payment Method Code field';
                 }
                 field(GLAccount; GLAccount)
                 {
                     ApplicationArea = All;
                     Caption = 'Payment G/L Account';
+                    ToolTip = 'Specifies the value of the Payment G/L Account field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
                     Caption = 'Description';
+                    ToolTip = 'Specifies the value of the Description field';
                 }
             }
             group("Server Communication")
@@ -46,16 +51,19 @@ page 6151164 "NPR MM NPR Loy. Wizard"
                 {
                     ApplicationArea = All;
                     Caption = 'Username';
+                    ToolTip = 'Specifies the value of the Username field';
                 }
                 field(ServicePassword; ServicePassword)
                 {
                     ApplicationArea = All;
                     Caption = 'Password';
+                    ToolTip = 'Specifies the value of the Password field';
                 }
                 field(ServiceBaseURL; ServiceBaseURL)
                 {
                     ApplicationArea = All;
                     Caption = 'Base URL';
+                    ToolTip = 'Specifies the value of the Base URL field';
 
                     trigger OnValidate()
                     begin
@@ -75,11 +83,13 @@ page 6151164 "NPR MM NPR Loy. Wizard"
                 {
                     ApplicationArea = All;
                     Caption = 'Tenant';
+                    ToolTip = 'Specifies the value of the Tenant field';
                 }
                 field(MembershipCode; MembershipCode)
                 {
                     ApplicationArea = All;
                     Caption = 'Membership Code';
+                    ToolTip = 'Specifies the value of the Membership Code field';
                 }
             }
             group(Setup)
@@ -90,11 +100,13 @@ page 6151164 "NPR MM NPR Loy. Wizard"
                     ApplicationArea = All;
                     Caption = 'Server Company Name';
                     TableRelation = Company;
+                    ToolTip = 'Specifies the value of the Server Company Name field';
                 }
                 field(LoyaltyAuth; LoyaltyAuth)
                 {
                     ApplicationArea = All;
                     Caption = 'Loyalty Authorization Code';
+                    ToolTip = 'Specifies the value of the Loyalty Authorization Code field';
                 }
                 field(EarnFactor; EarnRatio)
                 {
@@ -102,6 +114,7 @@ page 6151164 "NPR MM NPR Loy. Wizard"
                     Caption = 'Earn Factor';
                     DecimalPlaces = 2 : 5;
                     MinValue = 0;
+                    ToolTip = 'Specifies the value of the Earn Factor field';
                 }
                 field(BurnFactor; BurnRation)
                 {
@@ -109,6 +122,7 @@ page 6151164 "NPR MM NPR Loy. Wizard"
                     Caption = 'Burn Factor';
                     DecimalPlaces = 2 : 5;
                     MinValue = 0;
+                    ToolTip = 'Specifies the value of the Burn Factor field';
                 }
             }
         }

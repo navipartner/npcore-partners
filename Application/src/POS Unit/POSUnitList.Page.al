@@ -28,54 +28,66 @@ page 6150616 "NPR POS Unit List"
                 field("No."; "No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the No. field';
                 }
                 field(Name; Name)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Name field';
                 }
                 field("POS Store Code"; "POS Store Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the POS Store Code field';
                 }
                 field("Global Dimension 1 Code"; "Global Dimension 1 Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Global Dimension 1 Code field';
                 }
                 field("Global Dimension 2 Code"; "Global Dimension 2 Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Global Dimension 2 Code field';
                 }
                 field(Status; Status)
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Status field';
                 }
                 field("Ean Box Sales Setup"; "Ean Box Sales Setup")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Ean Box Sales Setup field';
                 }
                 field("POS Sales Workflow Set"; "POS Sales Workflow Set")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the POS Sales Workflow Set field';
                 }
                 field("Item Price Codeunit ID"; "Item Price Codeunit ID")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Item Price Codeunit ID field';
                 }
                 field("Item Price Codeunit Name"; "Item Price Codeunit Name")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Item Price Codeunit Name field';
                 }
                 field("Item Price Function"; "Item Price Function")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Item Price Function field';
                 }
                 field("POS Type"; "POS Type")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the POS Type field';
                 }
             }
         }
@@ -101,6 +113,7 @@ page 6150616 "NPR POS Unit List"
                                       "No." = FIELD("No.");
                         ShortCutKey = 'Shift+Ctrl+D';
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Dimensions-Single action';
                     }
                     action("Dimensions-&Multiple")
                     {
@@ -108,6 +121,7 @@ page 6150616 "NPR POS Unit List"
                         Caption = 'Dimensions-&Multiple';
                         Image = DimensionSets;
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Dimensions-&Multiple action';
 
                         trigger OnAction()
                         var
@@ -128,6 +142,7 @@ page 6150616 "NPR POS Unit List"
                     Image = List;
                     RunObject = Page "NPR POS Unit Identity List";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the POS Unit Identity List action';
                 }
                 action("POS Period Registers")
                 {
@@ -139,6 +154,7 @@ page 6150616 "NPR POS Unit List"
                     RunObject = Page "NPR POS Period Register List";
                     RunPageLink = "POS Unit No." = FIELD("No.");
                     ApplicationArea = All;
+                    ToolTip = 'Executes the POS Period Registers action';
                 }
                 action("POS Entries")
                 {
@@ -150,6 +166,7 @@ page 6150616 "NPR POS Unit List"
                     RunObject = Page "NPR POS Entry List";
                     RunPageLink = "POS Unit No." = FIELD("No.");
                     ApplicationArea = All;
+                    ToolTip = 'Executes the POS Entries action';
                 }
                 action("POS Unit Bins")
                 {
@@ -158,6 +175,7 @@ page 6150616 "NPR POS Unit List"
                     RunObject = Page "NPR POS Unit to Bin Relation";
                     RunPageLink = "POS Unit No." = FIELD("No.");
                     ApplicationArea = All;
+                    ToolTip = 'Executes the POS Unit Bins action';
                 }
                 action(Workshifts)
                 {
@@ -170,6 +188,7 @@ page 6150616 "NPR POS Unit List"
                     RunObject = Page "NPR POS Workshift Checkpoints";
                     RunPageLink = "POS Unit No." = FIELD("No.");
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Workshifts action';
                 }
             }
         }
@@ -183,6 +202,7 @@ page 6150616 "NPR POS Unit List"
                 Promoted = true;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the End Workshift (Prel) action';
 
                 trigger OnAction()
                 begin

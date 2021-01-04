@@ -18,6 +18,7 @@ page 6151425 "NPR Magento Custom Option Card"
                 field("No."; "No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the No. field';
 
                     trigger OnAssistEdit()
                     begin
@@ -27,10 +28,12 @@ page 6151425 "NPR Magento Custom Option Card"
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field(Type; Type)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Type field';
 
                     trigger OnValidate()
                     begin
@@ -40,44 +43,53 @@ page 6151425 "NPR Magento Custom Option Card"
                 field(Required; Required)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Required field';
                 }
                 field(Position; Position)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Position field';
                 }
                 field("Max Length"; "Max Length")
                 {
                     ApplicationArea = All;
                     Editable = MaxLengthEditable;
+                    ToolTip = 'Specifies the value of the Max Length field';
                 }
                 field(Price; Price)
                 {
                     ApplicationArea = All;
                     Caption = 'Price';
                     Editable = PriceEditable;
+                    ToolTip = 'Specifies the value of the Price field';
                 }
                 field("Price Type"; "Price Type")
                 {
                     ApplicationArea = All;
                     Editable = PriceTypeEditable;
+                    ToolTip = 'Specifies the value of the Price Type field';
                 }
                 field("Sales Type"; "Sales Type")
                 {
                     ApplicationArea = All;
                     Editable = SalesTypeEditable;
+                    ToolTip = 'Specifies the value of the Sales Type field';
                 }
                 field("Sales No."; "Sales No.")
                 {
                     ApplicationArea = All;
                     Editable = SalesNoEditable;
+                    ToolTip = 'Specifies the value of the Sales No. field';
                 }
                 field("Item Count"; "Item Count")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Item Count field';
                 }
                 field("Price Includes VAT"; "Price Includes VAT")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Price Includes VAT field';
                 }
             }
             part(Control6150628; "NPR Magento Custom Opt.Subform")

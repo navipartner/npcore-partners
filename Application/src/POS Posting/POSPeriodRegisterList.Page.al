@@ -21,34 +21,42 @@ page 6150651 "NPR POS Period Register List"
                 field("No."; "No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Entry No. field';
                 }
                 field("POS Store Code"; "POS Store Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the POS Store Code field';
                 }
                 field("POS Unit No."; "POS Unit No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the POS Unit No. field';
                 }
                 field("Document No."; "Document No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Document No. field';
                 }
                 field("Opening Entry No."; "Opening Entry No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the From Entry No. field';
                 }
                 field("Closing Entry No."; "Closing Entry No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the To Entry No. field';
                 }
                 field(Status; Status)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Status field';
                 }
                 field("Posting Compression"; "Posting Compression")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Posting Compression field';
                 }
             }
         }
@@ -70,6 +78,7 @@ page 6150651 "NPR POS Period Register List"
                 RunPageView = SORTING("Entry No.")
                               ORDER(Ascending);
                 ApplicationArea = All;
+                ToolTip = 'Executes the POS Entries action';
             }
             action("Sales Lines")
             {
@@ -78,6 +87,7 @@ page 6150651 "NPR POS Period Register List"
                 RunObject = Page "NPR POS Sales Line List";
                 RunPageLink = "POS Period Register No." = FIELD("No.");
                 ApplicationArea = All;
+                ToolTip = 'Executes the Sales Lines action';
             }
             action("Payment Lines")
             {
@@ -86,6 +96,7 @@ page 6150651 "NPR POS Period Register List"
                 RunObject = Page "NPR POS Payment Line List";
                 RunPageLink = "POS Period Register No." = FIELD("No.");
                 ApplicationArea = All;
+                ToolTip = 'Executes the Payment Lines action';
             }
             action("Balancing Line")
             {
@@ -94,6 +105,7 @@ page 6150651 "NPR POS Period Register List"
                 RunObject = Page "NPR POS Balancing Line";
                 RunPageLink = "POS Period Register No." = FIELD("No.");
                 ApplicationArea = All;
+                ToolTip = 'Executes the Balancing Line action';
             }
         }
         area(processing)
@@ -106,6 +118,7 @@ page 6150651 "NPR POS Period Register List"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Post Ledger Register action';
 
                 trigger OnAction()
                 var
@@ -126,6 +139,7 @@ page 6150651 "NPR POS Period Register List"
                 Caption = 'Preview Post Ledger Register';
                 Image = ViewPostedOrder;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Preview Post Ledger Register action';
 
                 trigger OnAction()
                 var
@@ -146,6 +160,7 @@ page 6150651 "NPR POS Period Register List"
                 Caption = 'Compare Preview Ledger Register to Audit Roll Posting';
                 Image = CompareCOA;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Compare Preview Ledger Register to Audit Roll Posting action';
 
                 trigger OnAction()
                 var
@@ -168,6 +183,7 @@ page 6150651 "NPR POS Period Register List"
                 Promoted = true;
                 PromotedCategory = Process;
                 ApplicationArea = All;
+                ToolTip = 'Executes the &Navigate action';
 
                 trigger OnAction()
                 var

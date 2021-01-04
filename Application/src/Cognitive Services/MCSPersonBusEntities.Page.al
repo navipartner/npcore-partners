@@ -16,15 +16,18 @@ page 6059960 "NPR MCS Person Bus. Entities"
                 field(PersonId; PersonId)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Person Id field';
                 }
                 field("Table Id"; "Table Id")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Table Id field';
                 }
                 field(KeyText; KeyText)
                 {
                     ApplicationArea = All;
                     ShowCaption = false;
+                    ToolTip = 'Specifies the value of the KeyText field';
                 }
             }
         }

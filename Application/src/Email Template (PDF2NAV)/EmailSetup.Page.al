@@ -17,31 +17,38 @@ page 6059789 "NPR E-mail Setup"
                 {
                     ApplicationArea = All;
                     ShowMandatory = true;
+                    ToolTip = 'Specifies the value of the Mail Server field';
                 }
                 field("Mail Server Port"; Rec."Mail Server Port")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Mail Server Port field';
                 }
                 field("Enable Ssl"; Rec."Enable Ssl")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Enable Ssl field';
                 }
                 field(Username; Rec.Username)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Username field';
                 }
                 field(Password; Rec.Password)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Password field';
                 }
                 field("From E-mail Address"; Rec."From E-mail Address")
                 {
                     ApplicationArea = All;
                     ShowMandatory = true;
+                    ToolTip = 'Specifies the value of the From E-mail Address field';
                 }
                 field("From Name"; Rec."From Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the From Name field';
                 }
             }
             group(NAS)
@@ -49,6 +56,7 @@ page 6059789 "NPR E-mail Setup"
                 field("NAS Folder"; Rec."NAS Folder")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the NAS Folder field';
                 }
             }
         }
@@ -63,6 +71,7 @@ page 6059789 "NPR E-mail Setup"
                 Caption = 'Create E-mail Templates';
                 Image = New;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Create E-mail Templates action';
 
                 trigger OnAction()
                 var
@@ -82,6 +91,7 @@ page 6059789 "NPR E-mail Setup"
                     Caption = 'Sales Quote';
                     Image = NewOrder;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Sales Quote action';
 
                     trigger OnAction()
                     var
@@ -97,6 +107,7 @@ page 6059789 "NPR E-mail Setup"
                     Caption = 'Sales Order';
                     Image = NewOrder;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Sales Order action';
 
                     trigger OnAction()
                     var
@@ -112,6 +123,7 @@ page 6059789 "NPR E-mail Setup"
                     Caption = 'Sales Shipment';
                     Image = NewOrder;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Sales Shipment action';
 
                     trigger OnAction()
                     var
@@ -127,6 +139,7 @@ page 6059789 "NPR E-mail Setup"
                     Caption = 'Sales Invoice';
                     Image = NewOrder;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Sales Invoice action';
 
                     trigger OnAction()
                     var
@@ -142,6 +155,7 @@ page 6059789 "NPR E-mail Setup"
                     Caption = 'Sales Credit Memo';
                     Image = NewOrder;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Sales Credit Memo action';
 
                     trigger OnAction()
                     var
@@ -157,6 +171,7 @@ page 6059789 "NPR E-mail Setup"
                     Caption = 'Purchase Quote';
                     Image = NewOrder;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Purchase Quote action';
 
                     trigger OnAction()
                     var
@@ -172,6 +187,7 @@ page 6059789 "NPR E-mail Setup"
                     Caption = 'Purchase Order';
                     Image = NewOrder;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Purchase Order action';
 
                     trigger OnAction()
                     var
@@ -187,6 +203,7 @@ page 6059789 "NPR E-mail Setup"
                     Caption = 'Purchase Receipt';
                     Image = NewOrder;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Purchase Receipt action';
 
                     trigger OnAction()
                     var
@@ -202,6 +219,7 @@ page 6059789 "NPR E-mail Setup"
                     Caption = 'Purchase Invoice';
                     Image = NewOrder;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Purchase Invoice action';
 
                     trigger OnAction()
                     var
@@ -217,6 +235,7 @@ page 6059789 "NPR E-mail Setup"
                     Caption = 'Purchase Credit Memo';
                     Image = NewOrder;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Purchase Credit Memo action';
 
                     trigger OnAction()
                     var
@@ -232,6 +251,7 @@ page 6059789 "NPR E-mail Setup"
                     Caption = 'Reminder';
                     Image = NewOrder;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Reminder action';
 
                     trigger OnAction()
                     var
@@ -247,6 +267,7 @@ page 6059789 "NPR E-mail Setup"
                     Caption = 'Charge Memo';
                     Image = NewOrder;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Charge Memo action';
 
                     trigger OnAction()
                     var
@@ -262,6 +283,7 @@ page 6059789 "NPR E-mail Setup"
                     Caption = 'Statement';
                     Image = NewOrder;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Statement action';
 
                     trigger OnAction()
                     var
@@ -277,6 +299,7 @@ page 6059789 "NPR E-mail Setup"
                     Caption = 'Service Quote';
                     Image = NewOrder;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Service Quote action';
 
                     trigger OnAction()
                     var
@@ -292,6 +315,7 @@ page 6059789 "NPR E-mail Setup"
                     Caption = 'Service Order';
                     Image = NewOrder;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Service Order action';
 
                     trigger OnAction()
                     var
@@ -307,6 +331,7 @@ page 6059789 "NPR E-mail Setup"
                     Caption = 'Service Shipment';
                     Image = NewOrder;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Service Shipment action';
 
                     trigger OnAction()
                     var
@@ -322,6 +347,7 @@ page 6059789 "NPR E-mail Setup"
                     Caption = 'Service Invoice';
                     Image = NewOrder;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Service Invoice action';
 
                     trigger OnAction()
                     var
@@ -338,6 +364,7 @@ page 6059789 "NPR E-mail Setup"
                     Image = NewOrder;
                     Visible = POSEntryExists;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Sales Ticket action';
 
                     trigger OnAction()
                     var
@@ -354,6 +381,7 @@ page 6059789 "NPR E-mail Setup"
                     Image = NewOrder;
                     Visible = CreditVoucherExists;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Credit Voucher action';
 
                     trigger OnAction()
                     var
@@ -370,6 +398,7 @@ page 6059789 "NPR E-mail Setup"
                     Image = NewOrder;
                     Visible = GiftVoucherExists;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Gift Voucher action';
 
                     trigger OnAction()
                     var

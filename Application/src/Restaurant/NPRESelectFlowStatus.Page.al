@@ -27,6 +27,7 @@ page 6150633 "NPR NPRE Select Flow Status"
                     Caption = 'Selected';
                     Editable = true;
                     Visible = IsMultiSelectionMode;
+                    ToolTip = 'Specifies the value of the Selected field';
 
                     trigger OnValidate()
                     begin
@@ -37,6 +38,7 @@ page 6150633 "NPR NPRE Select Flow Status"
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field("Status Object"; "Status Object")
                 {
@@ -44,16 +46,19 @@ page 6150633 "NPR NPRE Select Flow Status"
                     Editable = false;
                     Enabled = StatusObjectVisible;
                     Visible = StatusObjectVisible;
+                    ToolTip = 'Specifies the value of the Status Object field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Flow Order"; "Flow Order")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Flow Order field';
                 }
                 field(AssignedPrintCategories; AssignedPrintCategoriesAsFilterString())
                 {
@@ -61,6 +66,7 @@ page 6150633 "NPR NPRE Select Flow Status"
                     Caption = 'Print/Prod. Categories';
                     Editable = false;
                     Visible = ShowPrintCategories;
+                    ToolTip = 'Specifies the value of the Print/Prod. Categories field';
 
                     trigger OnDrillDown()
                     begin
@@ -96,6 +102,7 @@ page 6150633 "NPR NPRE Select Flow Status"
                     PromotedIsBig = true;
                     Visible = ShowPrintCategories;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Print/Prod. Categories action';
 
                     trigger OnAction()
                     begin

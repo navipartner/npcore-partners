@@ -114,16 +114,19 @@ report 6060102 "NPR Data Cleanup Process"
                 {
                     Caption = 'Cleanup Action';
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Cleanup Action field';
                 }
                 field(TableOption; TableOption)
                 {
                     Caption = 'Table Option';
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Table Option field';
                 }
                 field(NoFilter; NoFilter)
                 {
                     Caption = 'No. Filter';
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the No. Filter field';
                 }
             }
         }

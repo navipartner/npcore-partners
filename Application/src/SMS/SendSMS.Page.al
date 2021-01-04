@@ -18,11 +18,13 @@ page 6014636 "NPR Send SMS"
                     {
                         ApplicationArea = All;
                         Caption = 'Sender';
+                        ToolTip = 'Specifies the value of the Sender field';
                     }
                     field(txtNum; ToSMS)
                     {
                         ApplicationArea = All;
                         Caption = 'Mobile Number';
+                        ToolTip = 'Specifies the value of the Mobile Number field';
                     }
                 }
                 group(Control6150618)
@@ -31,12 +33,14 @@ page 6014636 "NPR Send SMS"
                     field("FORMAT(LettersLeft) + ' tegn tilbage'"; Format(LettersLeft) + ' tegn tilbage')
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Format(LettersLeft) + '' tegn tilbage'' field';
                     }
                     field("SMS text (max. 160 characters)"; '')
                     {
                         ApplicationArea = All;
                         Caption = 'SMS text (max. 160 characters)';
                         ShowCaption = false;
+                        ToolTip = 'Specifies the value of the SMS text (max. 160 characters) field';
                     }
                 }
             }
@@ -44,21 +48,25 @@ page 6014636 "NPR Send SMS"
             {
                 ApplicationArea = All;
                 ShowCaption = false;
+                ToolTip = 'Specifies the value of the SMStekst[1] field';
             }
             field("SMStekst[2]"; SMStekst[2])
             {
                 ApplicationArea = All;
                 ShowCaption = false;
+                ToolTip = 'Specifies the value of the SMStekst[2] field';
             }
             field("SMStekst[3]"; SMStekst[3])
             {
                 ApplicationArea = All;
                 ShowCaption = false;
+                ToolTip = 'Specifies the value of the SMStekst[3] field';
             }
             field("SMStekst[4]"; SMStekst[4])
             {
                 ApplicationArea = All;
                 ShowCaption = false;
+                ToolTip = 'Specifies the value of the SMStekst[4] field';
             }
         }
     }
@@ -74,6 +82,7 @@ page 6014636 "NPR Send SMS"
                 Promoted = true;
                 PromotedIsBig = false;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Reset action';
 
                 trigger OnAction()
                 begin
@@ -92,6 +101,7 @@ page 6014636 "NPR Send SMS"
                 Promoted = true;
                 PromotedIsBig = false;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Close action';
 
                 trigger OnAction()
                 begin
@@ -105,6 +115,7 @@ page 6014636 "NPR Send SMS"
                 Promoted = true;
                 PromotedIsBig = false;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Send action';
 
                 trigger OnAction()
                 var

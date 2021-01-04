@@ -1,4 +1,4 @@
-﻿page 6059786 "NPR TM Ticket AccessEntry List"
+page 6059786 "NPR TM Ticket AccessEntry List"
 {
     Caption = 'Ticket access Entry List';
     Editable = false;
@@ -15,42 +15,52 @@
                 field("Entry No."; "Entry No.")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Entry No. field';
                 }
                 field("Ticket No."; "Ticket No.")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Ticket No. field';
                 }
                 field("Ticket Type Code"; "Ticket Type Code")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Ticket Type Code field';
                 }
                 field("Admission Code"; "Admission Code")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Admission Code field';
                 }
                 field("Access Date"; "Access Date")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Access Date field';
                 }
                 field("Access Time"; "Access Time")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Access Time field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Member Card Code"; "Member Card Code")
                 {
                     ApplicationArea = NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Member Card Code field';
                 }
                 field(Status; Status)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Status field';
                 }
                 field(Quantity; Quantity)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Qty. field';
                 }
             }
         }

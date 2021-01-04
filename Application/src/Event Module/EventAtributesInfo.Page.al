@@ -20,12 +20,14 @@ page 6151588 "NPR Event Atributes Info"
                     ApplicationArea = All;
                     Style = Attention;
                     StyleExpr = UseAttributeMatrix;
+                    ToolTip = 'Specifies the value of the Template Name field';
                 }
                 field(Promote; Promote)
                 {
                     ApplicationArea = All;
                     Style = Attention;
                     StyleExpr = UseAttributeMatrix;
+                    ToolTip = 'Specifies the value of the Promote field';
                 }
                 field(UseAttributeMatrix; UseAttributeMatrix)
                 {
@@ -33,6 +35,7 @@ page 6151588 "NPR Event Atributes Info"
                     Caption = 'Attribute Matrix Suggested';
                     Style = Attention;
                     StyleExpr = UseAttributeMatrix;
+                    ToolTip = 'Specifies the value of the Attribute Matrix Suggested field';
                 }
             }
         }
@@ -47,6 +50,7 @@ page 6151588 "NPR Event Atributes Info"
                 Caption = 'Matrix';
                 Image = ShowMatrix;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Matrix action';
 
                 trigger OnAction()
                 var

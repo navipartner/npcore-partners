@@ -17,26 +17,32 @@ page 6151531 "NPR Nc Collection List"
                 field("No."; "No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the No. field';
                 }
                 field("Collector Code"; "Collector Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Collector Code field';
                 }
                 field(Status; Status)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Status field';
                 }
                 field("Creation Date"; "Creation Date")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Creation Date field';
                 }
                 field("Table No."; "Table No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Table No. field';
                 }
                 field("No. of Lines"; "No. of Lines")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the No. of Lines field';
                 }
             }
         }
@@ -53,6 +59,7 @@ page 6151531 "NPR Nc Collection List"
                 RunObject = Page "NPR Nc Collection Lines";
                 RunPageLink = "Collection No." = FIELD("No.");
                 ApplicationArea = All;
+                ToolTip = 'Executes the Lines action';
             }
         }
         area(processing)
@@ -64,6 +71,7 @@ page 6151531 "NPR Nc Collection List"
                     Caption = 'Set to Collecting';
                     Image = Add;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Set to Collecting action';
 
                     trigger OnAction()
                     begin
@@ -76,6 +84,7 @@ page 6151531 "NPR Nc Collection List"
                     Caption = 'Set to Ready to Send';
                     Image = Approve;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Set to Ready to Send action';
 
                     trigger OnAction()
                     begin
@@ -88,6 +97,7 @@ page 6151531 "NPR Nc Collection List"
                     Caption = 'Set to Sent';
                     Image = SendApprovalRequest;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Set to Sent action';
 
                     trigger OnAction()
                     begin

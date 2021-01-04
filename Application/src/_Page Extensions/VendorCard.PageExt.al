@@ -10,6 +10,7 @@ pageextension 6014427 "NPR Vendor Card" extends "Vendor Card"
                 CaptionClass = '6014555,23,1,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible01;
+                ToolTip = 'Specifies the value of the NPRAttrTextArray[1] field';
 
                 trigger OnValidate()
                 begin
@@ -22,6 +23,7 @@ pageextension 6014427 "NPR Vendor Card" extends "Vendor Card"
                 CaptionClass = '6014555,23,2,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible02;
+                ToolTip = 'Specifies the value of the NPRAttrTextArray[2] field';
 
                 trigger OnValidate()
                 begin
@@ -34,6 +36,7 @@ pageextension 6014427 "NPR Vendor Card" extends "Vendor Card"
                 CaptionClass = '6014555,23,3,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible03;
+                ToolTip = 'Specifies the value of the NPRAttrTextArray[3] field';
 
                 trigger OnValidate()
                 begin
@@ -46,6 +49,7 @@ pageextension 6014427 "NPR Vendor Card" extends "Vendor Card"
                 CaptionClass = '6014555,23,4,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible04;
+                ToolTip = 'Specifies the value of the NPRAttrTextArray[4] field';
 
                 trigger OnValidate()
                 begin
@@ -58,6 +62,7 @@ pageextension 6014427 "NPR Vendor Card" extends "Vendor Card"
                 CaptionClass = '6014555,23,5,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible05;
+                ToolTip = 'Specifies the value of the NPRAttrTextArray[5] field';
 
                 trigger OnValidate()
                 begin
@@ -76,6 +81,7 @@ pageextension 6014427 "NPR Vendor Card" extends "Vendor Card"
                     CaptionClass = '6014555,23,6,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible06;
+                    ToolTip = 'Specifies the value of the NPRAttrTextArray[6] field';
 
                     trigger OnValidate()
                     begin
@@ -88,6 +94,7 @@ pageextension 6014427 "NPR Vendor Card" extends "Vendor Card"
                     CaptionClass = '6014555,23,7,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible07;
+                    ToolTip = 'Specifies the value of the NPRAttrTextArray[7] field';
 
                     trigger OnValidate()
                     begin
@@ -100,6 +107,7 @@ pageextension 6014427 "NPR Vendor Card" extends "Vendor Card"
                     CaptionClass = '6014555,23,8,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible08;
+                    ToolTip = 'Specifies the value of the NPRAttrTextArray[8] field';
 
                     trigger OnValidate()
                     begin
@@ -112,6 +120,7 @@ pageextension 6014427 "NPR Vendor Card" extends "Vendor Card"
                     CaptionClass = '6014555,23,9,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible09;
+                    ToolTip = 'Specifies the value of the NPRAttrTextArray[9] field';
 
                     trigger OnValidate()
                     begin
@@ -124,6 +133,7 @@ pageextension 6014427 "NPR Vendor Card" extends "Vendor Card"
                     CaptionClass = '6014555,23,10,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible10;
+                    ToolTip = 'Specifies the value of the NPRAttrTextArray[10] field';
 
                     trigger OnValidate()
                     begin
@@ -137,6 +147,7 @@ pageextension 6014427 "NPR Vendor Card" extends "Vendor Card"
             field("NPR Document Processing"; "NPR Document Processing")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the NPR Document Processing field';
             }
         }
     }

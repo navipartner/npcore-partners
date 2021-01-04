@@ -17,6 +17,7 @@ page 6014617 "NPR Display Config WP"
                 field(Type; Type)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Type field';
                     trigger OnValidate()
                     begin
                         "No." := '';
@@ -25,6 +26,7 @@ page 6014617 "NPR Display Config WP"
                 field("No."; "No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the No. field';
                     trigger OnLookup(var Text: Text): Boolean
                     var
                         Item: Record Item;
@@ -80,6 +82,7 @@ page 6014617 "NPR Display Config WP"
                 field("Sales Type"; "Sales Type")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Sales Type field';
                     trigger OnValidate()
                     begin
                         "Sales Code" := '';
@@ -88,6 +91,7 @@ page 6014617 "NPR Display Config WP"
                 field("Sales Code"; "Sales Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Sales Code field';
                     trigger OnLookup(var Text: Text): Boolean
                     var
                         Customer: Record Customer;
@@ -128,22 +132,27 @@ page 6014617 "NPR Display Config WP"
                 field("Is Visible"; "Is Visible")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Is Visible field';
                 }
                 field("Starting Date"; "Starting Date")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Starting Date field';
                 }
                 field("Starting Time"; "Starting Time")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Starting Time field';
                 }
                 field("Ending Date"; "Ending Date")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Ending Date field';
                 }
                 field("Ending Time"; "Ending Time")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Ending Time field';
                 }
             }
         }

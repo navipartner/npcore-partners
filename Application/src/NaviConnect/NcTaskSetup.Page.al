@@ -20,22 +20,27 @@ page 6151501 "NPR Nc Task Setup"
                 field("Task Processor Code"; "Task Processor Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Task Processor Code field';
                 }
                 field("Table No."; "Table No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Table No. field';
                 }
                 field("Table Name"; "Table Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Table Name field';
                 }
                 field("Codeunit ID"; "Codeunit ID")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Codeunit ID field';
                 }
                 field("Codeunit Name"; "Codeunit Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Codeunit Name field';
                 }
             }
         }

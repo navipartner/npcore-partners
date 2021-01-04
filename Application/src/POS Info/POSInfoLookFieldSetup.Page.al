@@ -17,6 +17,7 @@ page 6150645 "NPR POS Info Look. Field Setup"
                 field("Map To"; "Map To")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Map To field';
                 }
                 field("Field No."; "Field No.")
                 {
@@ -24,6 +25,7 @@ page 6150645 "NPR POS Info Look. Field Setup"
                     AssistEdit = true;
                     DrillDown = false;
                     Lookup = false;
+                    ToolTip = 'Specifies the value of the Field No. field';
 
                     trigger OnAssistEdit()
                     begin
@@ -33,6 +35,7 @@ page 6150645 "NPR POS Info Look. Field Setup"
                 field("Field Name"; "Field Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Field Name field';
                 }
             }
         }

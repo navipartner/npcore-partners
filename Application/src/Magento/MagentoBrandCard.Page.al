@@ -26,10 +26,12 @@ page 6151419 "NPR Magento Brand Card"
                 field(Id; Id)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Id field';
                 }
                 field(Name; Name)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Name field';
 
                     trigger OnValidate()
                     begin
@@ -45,6 +47,7 @@ page 6151419 "NPR Magento Brand Card"
                     ApplicationArea = All;
                     Caption = 'Description';
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Description field';
 
                     trigger OnAssistEdit()
                     var
@@ -64,6 +67,7 @@ page 6151419 "NPR Magento Brand Card"
                     ApplicationArea = All;
                     Caption = 'Short Description';
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Short Description field';
 
                     trigger OnAssistEdit()
                     var
@@ -81,26 +85,32 @@ page 6151419 "NPR Magento Brand Card"
                 field("Seo Link"; "Seo Link")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Seo Link field';
                 }
                 field("Meta Title"; "Meta Title")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Meta Title field';
                 }
                 field("Meta Description"; "Meta Description")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Meta Description field';
                 }
                 field(Picture; Picture)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Picture field';
                 }
                 field("Logo Picture"; "Logo Picture")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Logo field';
                 }
                 field("Sorting"; Sorting)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Sorting field';
                 }
             }
         }
@@ -138,6 +148,7 @@ page 6151419 "NPR Magento Brand Card"
                 RunObject = Page "NPR Magento Brands";
                 ShortCutKey = 'F5';
                 ApplicationArea = All;
+                ToolTip = 'Executes the List action';
             }
             action("Display Config")
             {
@@ -145,6 +156,7 @@ page 6151419 "NPR Magento Brand Card"
                 Image = ViewPage;
                 Visible = DisplayConfigVisible;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Display Config action';
 
                 trigger OnAction()
                 var

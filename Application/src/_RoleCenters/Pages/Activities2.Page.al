@@ -18,16 +18,19 @@ page 6151253 "NPR Activities 2"
                 field("Pending Inc. Documents"; "Pending Inc. Documents")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Pending Inc. Documents field';
                 }
                 field("Processed Error Tasks"; "Processed Error Tasks")
                 {
                     ApplicationArea = All;
                     DrillDownPageID = "NPR Nc Task List";
+                    ToolTip = 'Specifies the value of the Processed Error Tasks field';
                 }
                 field("Failed Webshop Payments"; "Failed Webshop Payments")
                 {
                     ApplicationArea = All;
                     DrillDownPageID = "NPR Magento Payment Line List";
+                    ToolTip = 'Specifies the value of the Failed Webshop Payments field';
                 }
 
             }
@@ -42,6 +45,7 @@ page 6151253 "NPR Activities 2"
             {
                 Caption = 'Action Items';
                 ApplicationArea = All;
+                ToolTip = 'Executes the Action Items action';
             }
         }
     }

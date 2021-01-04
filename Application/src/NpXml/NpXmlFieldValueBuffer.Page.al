@@ -17,6 +17,7 @@ page 6151561 "NPR NpXml Field Value Buffer"
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
             }
         }

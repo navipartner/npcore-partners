@@ -17,10 +17,12 @@ page 6150643 "NPR POS Info Links"
                 field("POS Info Code"; "POS Info Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the POS Info Code field';
                 }
                 field("When to Use"; "When to Use")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the When to Use field';
                 }
             }
         }

@@ -25,6 +25,7 @@ page 6059931 "NPR Doc. Exch. Setup"
                 field("File Import Enabled"; "File Import Enabled")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the File Import Enabled field';
                 }
                 group(ImportFileSettings)
                 {
@@ -32,22 +33,27 @@ page 6059931 "NPR Doc. Exch. Setup"
                     field("Import File Location"; "Import File Location")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Import File Location field';
                     }
                     field("Import Local"; "Import Local")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Import Local field';
                     }
                     field("Archive File Location"; "Archive File Location")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Archive File Location field';
                     }
                     field("Archive Local"; "Archive Local")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Archive Local field';
                     }
                     field("Create Document"; "Create Document")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Create Document field';
                     }
                 }
             }
@@ -57,6 +63,7 @@ page 6059931 "NPR Doc. Exch. Setup"
                 field("FTP Import Enabled"; "FTP Import Enabled")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the FTP Import Enabled field';
                 }
                 group(ImportFTPSettings)
                 {
@@ -64,31 +71,38 @@ page 6059931 "NPR Doc. Exch. Setup"
                     field("Import FTP Server"; "Import FTP Server")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Import FTP Server field';
                     }
                     field("Import FTP Using Passive"; "Import FTP Using Passive")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Import FTP Using Passive field';
                     }
                     field("Import FTP Username"; "Import FTP Username")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Import FTP Username field';
                     }
                     field("Import FTP Password"; "Import FTP Password")
                     {
                         ApplicationArea = All;
                         ExtendedDatatype = Masked;
+                        ToolTip = 'Specifies the value of the Import FTP Password field';
                     }
                     field("Import FTP Folder"; "Import FTP Folder")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Import FTP Folder field';
                     }
                     field("Import FTP File Mask"; "Import FTP File Mask")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Import FTP File Mask field';
                     }
                     field("Archive FTP Folder"; "Archive FTP Folder")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Archive FTP Folder field';
                     }
                 }
             }
@@ -98,6 +112,7 @@ page 6059931 "NPR Doc. Exch. Setup"
                 field("File Export Enabled"; "File Export Enabled")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the File Export Enabled field';
                 }
                 group(ExportFileSettings)
                 {
@@ -105,10 +120,12 @@ page 6059931 "NPR Doc. Exch. Setup"
                     field("Export File Location"; "Export File Location")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Export File Location field';
                     }
                     field("Export Local"; "Export Local")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Export Local field';
                     }
                 }
             }
@@ -118,6 +135,7 @@ page 6059931 "NPR Doc. Exch. Setup"
                 field("FTP Export Enabled"; "FTP Export Enabled")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the FTP Export Enabled field';
                 }
                 group(ExportFTPSettings)
                 {
@@ -125,23 +143,28 @@ page 6059931 "NPR Doc. Exch. Setup"
                     field("Export FTP Server"; "Export FTP Server")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Export FTP Server field';
                     }
                     field("Export FTP Username"; "Export FTP Username")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Export FTP Username field';
                     }
                     field("Export FTP Password"; "Export FTP Password")
                     {
                         ApplicationArea = All;
                         ExtendedDatatype = Masked;
+                        ToolTip = 'Specifies the value of the Export FTP Password field';
                     }
                     field("Export FTP Folder"; "Export FTP Folder")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Export FTP Folder field';
                     }
                     field("Export FTP Using Passive"; "Export FTP Using Passive")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Export FTP Using Passive field';
                     }
                 }
             }
@@ -151,18 +174,22 @@ page 6059931 "NPR Doc. Exch. Setup"
                 field("Unmatched Items Wsht. Template"; "Unmatched Items Wsht. Template")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Unmatched Items Wsht. Template field';
                 }
                 field("Unmatched Items Wsht. Name"; "Unmatched Items Wsht. Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Unmatched Items Wsht. Name field';
                 }
                 field("Autom. Create Unmatched Items"; "Autom. Create Unmatched Items")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Autom. Create Unmatched Items field';
                 }
                 field("Autom. Query Item Information"; "Autom. Query Item Information")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Autom. Query Item Information field';
                 }
             }
         }
@@ -178,6 +205,7 @@ page 6059931 "NPR Doc. Exch. Setup"
                 Image = CopyBOMVersion;
                 RunObject = Page "NPR Doc. Exchange Paths";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Doc. Exchange Paths action';
             }
             action("Run Document Exchange")
             {
@@ -187,6 +215,7 @@ page 6059931 "NPR Doc. Exch. Setup"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Run Document Exchange action';
 
                 trigger OnAction()
                 begin

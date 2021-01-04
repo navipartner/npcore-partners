@@ -25,14 +25,17 @@ page 6014435 "NPR Payment Type - Register"
                 field("No."; "No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the No. field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Processing Type"; "Processing Type")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Processing Type field';
                 }
             }
         }
@@ -55,6 +58,7 @@ page 6014435 "NPR Payment Type - Register"
                                   "No." = FIELD("No.");
                     ShortCutKey = 'Shift+Ctrl+D';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Dimensions-Single action';
                 }
                 action("Dimensions-Mulitple")
                 {
@@ -62,6 +66,7 @@ page 6014435 "NPR Payment Type - Register"
                     Image = DimensionSets;
                     Visible = false;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Dimensions-Mulitple action';
 
                     trigger OnAction()
                     var

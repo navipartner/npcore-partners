@@ -17,10 +17,12 @@ page 6151172 "NPR NpGp POS Sales Setup Card"
                     field("Code"; Code)
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Code field';
                     }
                     field("Company Name"; "Company Name")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Company Name field';
                     }
                 }
                 group(Control6014408)
@@ -29,16 +31,19 @@ page 6151172 "NPR NpGp POS Sales Setup Card"
                     field("Service Url"; "Service Url")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Service Url field';
                     }
                     field("Service Username"; "Service Username")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Service Username field';
                     }
                     field(Password; Password)
                     {
                         ApplicationArea = All;
                         Caption = 'Service Password';
                         ExtendedDatatype = Masked;
+                        ToolTip = 'Specifies the value of the Service Password field';
 
                         trigger OnValidate()
                         begin
@@ -50,6 +55,7 @@ page 6151172 "NPR NpGp POS Sales Setup Card"
                     field("Sync POS Sales Immediately"; "Sync POS Sales Immediately")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Sync POS Sales Immediately field';
                     }
                 }
             }
@@ -68,6 +74,7 @@ page 6151172 "NPR NpGp POS Sales Setup Card"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Validate Global POS Sales Setup action';
 
                 trigger OnAction()
                 var

@@ -18,18 +18,22 @@ page 6151121 "NPR GDPR Agreement List"
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the No. field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Latest Version"; "Latest Version")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Latest Version field';
                 }
                 field("Current Version"; "Current Version")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Current Version field';
                 }
             }
         }

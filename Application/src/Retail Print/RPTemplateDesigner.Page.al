@@ -44,6 +44,7 @@ page 6014560 "NPR RP Template Designer"
                 PromotedIsBig = true;
                 Visible = Rec."Printer Type" = Rec."Printer Type"::Line;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Unindent action';
 
                 trigger OnAction()
                 begin
@@ -59,6 +60,7 @@ page 6014560 "NPR RP Template Designer"
                 PromotedIsBig = true;
                 Visible = Rec."Printer Type" = Rec."Printer Type"::Line;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Indent action';
 
                 trigger OnAction()
                 begin
@@ -74,6 +76,7 @@ page 6014560 "NPR RP Template Designer"
                 PromotedIsBig = true;
                 ShortCutKey = 'Shift+F8';
                 ApplicationArea = All;
+                ToolTip = 'Executes the Test Print action';
 
                 trigger OnAction()
                 var
@@ -108,6 +111,7 @@ page 6014560 "NPR RP Template Designer"
                 PromotedIsBig = true;
                 ShortCutKey = 'Shift+F7';
                 ApplicationArea = All;
+                ToolTip = 'Executes the Set Test Print Filter action';
 
                 trigger OnAction()
                 var

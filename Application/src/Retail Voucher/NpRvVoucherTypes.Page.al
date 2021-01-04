@@ -19,26 +19,32 @@ page 6151013 "NPR NpRv Voucher Types"
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("No. Series"; "No. Series")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the No. Series field';
                 }
                 field("Valid Period"; "Valid Period")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Valid Period field';
                 }
                 field("Voucher Qty. (Open)"; "Voucher Qty. (Open)")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Voucher Qty. (Open) field';
                 }
                 field("Arch. Voucher Qty."; "Arch. Voucher Qty.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Archived Voucher Qty. field';
                 }
             }
         }
@@ -56,6 +62,7 @@ page 6151013 "NPR NpRv Voucher Types"
                 RunPageLink = "Voucher Type" = FIELD(Code);
                 ShortCutKey = 'Ctrl+F7';
                 ApplicationArea = All;
+                ToolTip = 'Executes the Vouchers action';
             }
             action("Partner Relations")
             {
@@ -64,6 +71,7 @@ page 6151013 "NPR NpRv Voucher Types"
                 RunObject = Page "NPR NpRv Partner Relations";
                 RunPageLink = "Voucher Type" = FIELD(Code);
                 ApplicationArea = All;
+                ToolTip = 'Executes the Partner Relations action';
             }
         }
     }

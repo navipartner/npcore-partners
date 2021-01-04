@@ -15,14 +15,17 @@ page 6150625 "NPR POS NPRE Restaur. Profiles"
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Restaurant Code"; "Restaurant Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Restaurant Code field';
                 }
             }
         }

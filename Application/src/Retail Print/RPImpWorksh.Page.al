@@ -24,15 +24,18 @@ page 6014632 "NPR RP Imp. Worksh."
                     Editable = false;
                     StyleExpr = Style;
                     Width = 80;
+                    ToolTip = 'Specifies the value of the Template field';
                 }
                 field("New Template"; "New Template")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the New Template field';
                 }
                 field("Action"; Action)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Action field';
 
                     trigger OnValidate()
                     begin
@@ -43,31 +46,37 @@ page 6014632 "NPR RP Imp. Worksh."
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Existing Version field';
                 }
                 field("Existing Description"; "Existing Description")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Existing Description field';
                 }
                 field("Existing Last Modified At"; "Existing Last Modified At")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Existing Last Modified At field';
                 }
                 field("New Version"; "New Version")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the New Version field';
                 }
                 field("New Description"; "New Description")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the New Description field';
                 }
                 field("New Last Modified At"; "New Last Modified At")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the New Last Modified At field';
                 }
             }
         }

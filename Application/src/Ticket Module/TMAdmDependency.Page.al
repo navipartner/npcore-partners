@@ -17,11 +17,13 @@ page 6014471 "NPR TM Adm. Dependency"
                 field("Dependency Code"; "Dependency Code")
                 {
                     ApplicationArea = NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Dependency Code field';
                 }
 
                 field(Description; Description)
                 {
                     ApplicationArea = NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
             }
         }

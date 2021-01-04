@@ -16,10 +16,12 @@ page 6151150 "NPR Customer GDPR Setup"
                 field("Anonymize After"; "Anonymize After")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Anonymize After field';
                 }
                 field("Customer Posting Group Filter"; "Customer Posting Group Filter")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Customer Posting Group Filter field';
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -30,6 +32,7 @@ page 6151150 "NPR Customer GDPR Setup"
                 field("Gen. Bus. Posting Group Filter"; "Gen. Bus. Posting Group Filter")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Gen. Bus. Posting Group Filter field';
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -40,6 +43,7 @@ page 6151150 "NPR Customer GDPR Setup"
                 field("No of Customers"; "No of Customers")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the No of Customers field';
                 }
 
                 field(EnableJobQueue; "Enable Job Queue")
@@ -63,6 +67,7 @@ page 6151150 "NPR Customer GDPR Setup"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Extract Customers action';
 
                 trigger OnAction()
                 var
@@ -173,12 +178,14 @@ page 6151150 "NPR Customer GDPR Setup"
                 PromotedCategory = Process;
                 RunObject = Page "NPR GDPR Anonymization Req.";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Web Requests action';
             }
             action(JobQueueEntries)
             {
                 ApplicationArea = All;
                 Caption = 'Job Queue Entries';
                 Image = JobLines;
+                ToolTip = 'Executes the Job Queue Entries action';
 
                 trigger OnAction()
                 var

@@ -16,18 +16,22 @@ page 6184485 "NPR Pepper Card Types"
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Payment Type POS"; "Payment Type POS")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Payment Type POS field';
                 }
                 field("Card Type Group Code"; "Card Type Group Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Card Type Group Code field';
                 }
             }
         }
@@ -46,6 +50,7 @@ page 6184485 "NPR Pepper Card Types"
                 RunPageView = SORTING("Card Type Code", "Minimum Amount")
                               ORDER(Ascending);
                 ApplicationArea = All;
+                ToolTip = 'Executes the Fees action';
             }
         }
     }

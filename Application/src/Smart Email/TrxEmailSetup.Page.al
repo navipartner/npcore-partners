@@ -19,22 +19,27 @@ page 6059820 "NPR Trx Email Setup"
                 field(Provider; Provider)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Provider field';
                 }
                 field(Default; Default)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Default field';
                 }
                 field("Client ID"; "Client ID")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Client ID field';
                 }
                 field("API Key"; "API Key")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the API Key field';
                 }
                 field("<API Key>"; "API URL")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the API URL field';
                 }
             }
         }
@@ -51,6 +56,7 @@ page 6059820 "NPR Trx Email Setup"
                 Promoted = true;
                 PromotedCategory = Process;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Test Connection action';
 
                 trigger OnAction()
                 var

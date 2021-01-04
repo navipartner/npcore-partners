@@ -19,6 +19,7 @@ page 6059818 "NPR Retail Sales Chart by Shop"
                 ShowCaption = true;
                 Style = Strong;
                 StyleExpr = TRUE;
+                ToolTip = 'Specifies the value of the StatusText field';
             }
             usercontrol(chart; "Microsoft.Dynamics.Nav.Client.BusinessChart")
             {
@@ -44,6 +45,7 @@ page 6059818 "NPR Retail Sales Chart by Shop"
                 {
                     Caption = 'Day';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Day action';
 
                     trigger OnAction()
                     begin
@@ -56,6 +58,7 @@ page 6059818 "NPR Retail Sales Chart by Shop"
                 {
                     Caption = 'Week';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Week action';
 
                     trigger OnAction()
                     begin
@@ -68,6 +71,7 @@ page 6059818 "NPR Retail Sales Chart by Shop"
                 {
                     Caption = 'Month';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Month action';
 
                     trigger OnAction()
                     begin
@@ -80,6 +84,7 @@ page 6059818 "NPR Retail Sales Chart by Shop"
                 {
                     Caption = 'Quarter';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Quarter action';
 
                     trigger OnAction()
                     begin
@@ -92,6 +97,7 @@ page 6059818 "NPR Retail Sales Chart by Shop"
                 {
                     Caption = 'Year';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Year action';
 
                     trigger OnAction()
                     begin
@@ -106,6 +112,7 @@ page 6059818 "NPR Retail Sales Chart by Shop"
                 Caption = 'Previous';
                 Image = PreviousRecord;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Previous action';
 
                 trigger OnAction()
                 begin
@@ -118,6 +125,7 @@ page 6059818 "NPR Retail Sales Chart by Shop"
                 Caption = 'Next';
                 Image = NextRecord;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Next action';
 
                 trigger OnAction()
                 begin

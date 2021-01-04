@@ -25,58 +25,72 @@ page 6150615 "NPR POS Store Card"
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Name; Name)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Name field';
                 }
                 field("Name 2"; "Name 2")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Name 2 field';
                 }
                 field(Address; Address)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Address field';
                 }
                 field("Address 2"; "Address 2")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Address 2 field';
                 }
                 field("Post Code"; "Post Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Post Code field';
                 }
                 field(City; City)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the City field';
                 }
                 field(Contact; Contact)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Contact field';
                 }
                 field(County; County)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the County field';
                 }
                 field("Country/Region Code"; "Country/Region Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Country/Region Code field';
                 }
                 field("Location Code"; "Location Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Location Code field';
                 }
                 field("Language Code"; "Language Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Language Code field';
                 }
                 field("VAT Registration No."; "VAT Registration No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the VAT Registration No. field';
                 }
                 field("Registration No."; "Registration No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Registration No. field';
                 }
             }
             group(Communication)
@@ -85,18 +99,22 @@ page 6150615 "NPR POS Store Card"
                 field("Phone No."; "Phone No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Phone No. field';
                 }
                 field("Fax No."; "Fax No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Fax No. field';
                 }
                 field("E-Mail"; "E-Mail")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the E-Mail field';
                 }
                 field("Home Page"; "Home Page")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Home Page field';
                 }
             }
             group(Posting)
@@ -105,34 +123,42 @@ page 6150615 "NPR POS Store Card"
                 field("Gen. Bus. Posting Group"; "Gen. Bus. Posting Group")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Gen. Bus. Posting Group field';
                 }
                 field("VAT Bus. Posting Group"; "VAT Bus. Posting Group")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the VAT Bus. Posting Group field';
                 }
                 field("VAT Customer No."; "VAT Customer No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the VAT Customer No. field';
                 }
                 field("Default POS Posting Setup"; "Default POS Posting Setup")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Default POS Posting Setup field';
                 }
                 field("Tax Area Code"; "Tax Area Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Tax Area Code field';
                 }
                 field("Tax Liable"; "Tax Liable")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Tax Liable field';
                 }
                 field("Posting Compression"; "Posting Compression")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Posting Compression field';
                 }
                 field("POS Period Register No. Series"; "POS Period Register No. Series")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the POS Period Register No. Series field';
                 }
             }
             group(Profiles)
@@ -141,6 +167,7 @@ page 6150615 "NPR POS Store Card"
                 field("POS Restaurant Profile"; "POS Restaurant Profile")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the POS Restaurant Profile field';
                 }
             }
             group(Reporting)
@@ -149,38 +176,47 @@ page 6150615 "NPR POS Store Card"
                 field("Global Dimension 1 Code"; "Global Dimension 1 Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Global Dimension 1 Code field';
                 }
                 field("Global Dimension 2 Code"; "Global Dimension 2 Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Global Dimension 2 Code field';
                 }
                 field("Store Group Code"; "Store Group Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Store Group Code field';
                 }
                 field("Store Category Code"; "Store Category Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Store Category Code field';
                 }
                 field("Store Locality Code"; "Store Locality Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Store Locality Code field';
                 }
                 field("Store Size"; "Store Size")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Store Size field';
                 }
                 field("Opening Date"; "Opening Date")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Opening Date field';
                 }
                 field("Geolocation Latitude"; "Geolocation Latitude")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Geolocation Latitude field';
                 }
                 field("Geolocation Longitude"; "Geolocation Longitude")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Geolocation Longitude field';
                 }
             }
         }
@@ -199,6 +235,7 @@ page 6150615 "NPR POS Store Card"
                               "No." = FIELD(Code);
                 ShortCutKey = 'Shift+Ctrl+D';
                 ApplicationArea = All;
+                ToolTip = 'Executes the Dimensions action';
             }
             action("POS Unit List")
             {
@@ -206,6 +243,7 @@ page 6150615 "NPR POS Store Card"
                 Image = List;
                 RunObject = Page "NPR POS Unit List";
                 ApplicationArea = All;
+                ToolTip = 'Executes the POS Unit List action';
             }
             action("NP Retail Setup")
             {
@@ -213,6 +251,7 @@ page 6150615 "NPR POS Store Card"
                 Image = Setup;
                 RunObject = Page "NPR NP Retail Setup";
                 ApplicationArea = All;
+                ToolTip = 'Executes the NP Retail Setup action';
             }
             action("POS Posting Setup")
             {
@@ -224,6 +263,7 @@ page 6150615 "NPR POS Store Card"
                 RunObject = Page "NPR POS Posting Setup";
                 RunPageLink = "POS Store Code" = FIELD(Code);
                 ApplicationArea = All;
+                ToolTip = 'Executes the POS Posting Setup action';
             }
             action("POS Period Registers")
             {
@@ -235,6 +275,7 @@ page 6150615 "NPR POS Store Card"
                 RunObject = Page "NPR POS Period Register List";
                 RunPageLink = "POS Store Code" = FIELD(Code);
                 ApplicationArea = All;
+                ToolTip = 'Executes the POS Period Registers action';
             }
             action("POS Entries")
             {
@@ -246,6 +287,7 @@ page 6150615 "NPR POS Store Card"
                 RunObject = Page "NPR POS Entry List";
                 RunPageLink = "POS Store Code" = FIELD(Code);
                 ApplicationArea = All;
+                ToolTip = 'Executes the POS Entries action';
             }
         }
     }

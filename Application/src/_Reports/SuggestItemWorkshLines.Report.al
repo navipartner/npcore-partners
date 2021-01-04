@@ -91,10 +91,12 @@ report 6060040 "NPR Suggest Item Worksh. Lines"
                 field(Variants; OptVariants)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the OptVariants field';
                 }
                 field(Defaults; OptDefaultAction)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the OptDefaultAction field';
                 }
             }
         }

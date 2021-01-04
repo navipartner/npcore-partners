@@ -17,37 +17,45 @@ page 6014525 "NPR Touch Screen - Items"
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field(ItemGroupName; ItemGroupName)
                 {
                     ApplicationArea = All;
                     Caption = 'Item Group';
+                    ToolTip = 'Specifies the value of the Item Group field';
                 }
                 field("No."; "No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the No. field';
                 }
                 field("Vendor Item No."; "Vendor Item No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Vendor Item No. field';
                 }
                 field(VendorName; VendorName)
                 {
                     ApplicationArea = All;
                     Caption = 'Vendor';
+                    ToolTip = 'Specifies the value of the Vendor field';
                 }
                 field("Unit Price"; "Unit Price")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Unit Price field';
                 }
                 field(Inventory; Inventory)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Inventory field';
                 }
                 field("Unit Cost"; "Unit Cost")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Unit Cost field';
                 }
             }
         }
@@ -66,6 +74,7 @@ page 6014525 "NPR Touch Screen - Items"
                     Caption = 'Items b&y Location';
                     Image = ItemAvailbyLoc;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Items b&y Location action';
 
                     trigger OnAction()
                     var
@@ -84,6 +93,7 @@ page 6014525 "NPR Touch Screen - Items"
                         Caption = 'Event';
                         Image = "Event";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Event action';
 
                         trigger OnAction()
                         begin
@@ -102,6 +112,7 @@ page 6014525 "NPR Touch Screen - Items"
                                       "Drop Shipment Filter" = FIELD("Drop Shipment Filter"),
                                       "Variant Filter" = FIELD("Variant Filter");
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Period action';
                     }
                     action("Variant")
                     {
@@ -115,6 +126,7 @@ page 6014525 "NPR Touch Screen - Items"
                                       "Drop Shipment Filter" = FIELD("Drop Shipment Filter"),
                                       "Variant Filter" = FIELD("Variant Filter");
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Variant action';
                     }
                     action(Location)
                     {
@@ -128,12 +140,14 @@ page 6014525 "NPR Touch Screen - Items"
                                       "Drop Shipment Filter" = FIELD("Drop Shipment Filter"),
                                       "Variant Filter" = FIELD("Variant Filter");
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Location action';
                     }
                     action("BOM Level")
                     {
                         Caption = 'BOM Level';
                         Image = BOMLevel;
                         ApplicationArea = All;
+                        ToolTip = 'Executes the BOM Level action';
 
                         trigger OnAction()
                         begin
@@ -145,6 +159,7 @@ page 6014525 "NPR Touch Screen - Items"
                         Caption = 'Timeline';
                         Image = Timeline;
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Timeline action';
 
                         trigger OnAction()
                         begin

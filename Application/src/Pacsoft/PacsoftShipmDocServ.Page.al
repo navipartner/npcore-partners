@@ -18,10 +18,12 @@ page 6014414 "NPR Pacsoft Shipm. Doc. Serv."
                 field("Shipping Agent Service Code"; "Shipping Agent Service Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Shipping Agent Service Code field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
             }
         }

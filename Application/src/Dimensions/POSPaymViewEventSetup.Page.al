@@ -17,38 +17,47 @@ page 6151054 "NPR POS Paym. View Event Setup"
                 field("Dimension Popup Enabled"; "Dimension Popup Enabled")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Dimension Popup Enabled field';
                 }
                 field("Dimension Code"; "Dimension Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Dimension Code field';
                 }
                 field("Popup per"; "Popup per")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Popup per field';
                 }
                 field("Popup every"; "Popup every")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Popup every field';
                 }
                 field("Popup Start Time"; "Popup Start Time")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Popup Start Time field';
                 }
                 field("Popup End Time"; "Popup End Time")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Popup End Time field';
                 }
                 field("Popup Mode"; "Popup Mode")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Dimension Popup Mode field';
                 }
                 field("Create New Dimension Values"; "Create New Dimension Values")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Create New Dimension Values field';
                 }
                 field("Skip Popup on Dimension Value"; "Skip Popup on Dimension Value")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Skip Popup on Dimension Value field';
                 }
             }
         }
@@ -64,6 +73,7 @@ page 6151054 "NPR POS Paym. View Event Setup"
                 Image = History;
                 RunObject = Page "NPR POS Paym. View Log Entries";
                 ApplicationArea = All;
+                ToolTip = 'Executes the POS Payment View Log Entries action';
             }
             action("POS Sales Workflows")
             {
@@ -71,6 +81,7 @@ page 6151054 "NPR POS Paym. View Event Setup"
                 Image = Setup;
                 RunObject = Page "NPR POS Sales Workflows";
                 ApplicationArea = All;
+                ToolTip = 'Executes the POS Sales Workflows action';
             }
         }
     }

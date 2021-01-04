@@ -12,6 +12,7 @@ pageextension 6014469 "NPR Service Quote" extends "Service Quote"
             field("NPR Posting Date"; "Posting Date")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the Posting Date field';
             }
         }
     }
@@ -27,12 +28,14 @@ pageextension 6014469 "NPR Service Quote" extends "Service Quote"
                     Caption = 'E-mail Log';
                     Image = Email;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the E-mail Log action';
                 }
                 action("NPR SendAsPDF")
                 {
                     Caption = 'Send as PDF';
                     Image = SendEmailPDF;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Send as PDF action';
                 }
             }
         }

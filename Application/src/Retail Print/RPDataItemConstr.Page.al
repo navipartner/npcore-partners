@@ -16,15 +16,18 @@ page 6014642 "NPR RP Data Item Constr."
                 field("Constraint Type"; "Constraint Type")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Constraint Type field';
                 }
                 field("Table ID"; "Table ID")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Table ID field';
                 }
                 field("Table Name"; "Table Name")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Table Name field';
                 }
             }
             part(Control6014405; "NPR RP Data Item Constr. Links")

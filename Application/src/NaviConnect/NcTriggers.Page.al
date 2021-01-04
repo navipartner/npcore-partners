@@ -18,38 +18,47 @@ page 6151520 "NPR Nc Triggers"
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Split Trigger and Endpoint"; "Split Trigger and Endpoint")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Split Trigger and Endpoint field';
                 }
                 field(Enabled; Enabled)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Enabled field';
                 }
                 field("Error on Empty Output"; "Error on Empty Output")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Error on Empty Output field';
                 }
                 field("Task Processor"; "Task Processor")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Task Processor field';
                 }
                 field("Linked Endpoints"; "Linked Endpoints")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Linked Endpoints field';
                 }
                 field("Subscriber Codeunit ID"; "Subscriber Codeunit ID")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Subscriber Codeunit ID field';
                 }
                 field("Subscriber Codeunit Name"; "Subscriber Codeunit Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Subscriber Codeunit Name field';
                 }
             }
         }
@@ -64,6 +73,7 @@ page 6151520 "NPR Nc Triggers"
                 Caption = 'Task Queue Entry';
                 Image = JobTimeSheet;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Task Queue Entry action';
 
                 trigger OnAction()
                 begin
@@ -79,6 +89,7 @@ page 6151520 "NPR Nc Triggers"
                 RunPageView = SORTING("Trigger Code")
                               ORDER(Ascending);
                 ApplicationArea = All;
+                ToolTip = 'Executes the Endpoint Links action';
             }
             action("Task List")
             {
@@ -92,6 +103,7 @@ page 6151520 "NPR Nc Triggers"
                 RunPageView = WHERE(Type = CONST(Insert),
                                     "Table No." = CONST(6151520));
                 ApplicationArea = All;
+                ToolTip = 'Executes the Task List action';
             }
         }
     }

@@ -17,18 +17,22 @@ page 6060160 "NPR Event Attribute Templ."
                 field(Name; Name)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Name field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Row Template Name"; "Row Template Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Row Template Name field';
                 }
                 field("Column Template Name"; "Column Template Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Column Template Name field';
                 }
             }
         }
@@ -46,6 +50,7 @@ page 6060160 "NPR Event Attribute Templ."
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Default Values action';
 
                 trigger OnAction()
                 var
@@ -65,6 +70,7 @@ page 6060160 "NPR Event Attribute Templ."
                 RunObject = Page "NPR Event Attr. Temp. Filters";
                 RunPageLink = "Template Name" = FIELD(Name);
                 ApplicationArea = All;
+                ToolTip = 'Executes the Template Filters action';
             }
         }
     }

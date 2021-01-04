@@ -20,32 +20,39 @@ page 6060097 "NPR Ean Box Events"
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field("Module Name"; "Module Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Module Name field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Action Code"; "Action Code")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Action Code field';
                 }
                 field("Action Description"; "Action Description")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Action Description field';
                 }
                 field("POS View"; "POS View")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the POS View field';
                 }
                 field("Event Codeunit"; "Event Codeunit")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Event Codeunit field';
                 }
             }
         }
@@ -60,6 +67,7 @@ page 6060097 "NPR Ean Box Events"
                 Caption = 'Parameters';
                 Image = List;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Parameters action';
 
                 trigger OnAction()
                 var

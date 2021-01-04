@@ -21,6 +21,7 @@ page 6151482 "NPR Magento Sales Chart"
                 ShowCaption = true;
                 Style = Strong;
                 StyleExpr = TRUE;
+                ToolTip = 'Specifies the value of the StatusText field';
             }
             usercontrol(chart; "Microsoft.Dynamics.Nav.Client.BusinessChart")
             {
@@ -50,6 +51,7 @@ page 6151482 "NPR Magento Sales Chart"
                 {
                     Caption = 'Day';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Day action';
 
                     trigger OnAction()
                     begin
@@ -62,6 +64,7 @@ page 6151482 "NPR Magento Sales Chart"
                 {
                     Caption = 'Week';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Week action';
 
                     trigger OnAction()
                     begin
@@ -74,6 +77,7 @@ page 6151482 "NPR Magento Sales Chart"
                 {
                     Caption = 'Month';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Month action';
 
                     trigger OnAction()
                     begin
@@ -86,6 +90,7 @@ page 6151482 "NPR Magento Sales Chart"
                 {
                     Caption = 'Quarter';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Quarter action';
 
                     trigger OnAction()
                     begin
@@ -98,6 +103,7 @@ page 6151482 "NPR Magento Sales Chart"
                 {
                     Caption = 'Year';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Year action';
 
                     trigger OnAction()
                     begin
@@ -112,6 +118,7 @@ page 6151482 "NPR Magento Sales Chart"
                 Caption = 'Previous';
                 Image = PreviousRecord;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Previous action';
 
                 trigger OnAction()
                 begin
@@ -124,6 +131,7 @@ page 6151482 "NPR Magento Sales Chart"
                 Caption = 'Next';
                 Image = NextRecord;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Next action';
 
                 trigger OnAction()
                 begin

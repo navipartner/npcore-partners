@@ -19,6 +19,7 @@ page 6014457 "NPR Table Exp. Wizard Fields"
                 field("No."; "No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the No. field';
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -47,21 +48,25 @@ page 6014457 "NPR Table Exp. Wizard Fields"
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the FieldName field';
                 }
                 field(Type; Type)
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Type field';
                 }
                 field(Len; Len)
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Len field';
                 }
                 field(Class; Class)
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Class field';
                 }
             }
         }

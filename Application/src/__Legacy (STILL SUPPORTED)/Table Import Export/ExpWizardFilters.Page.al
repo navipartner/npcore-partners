@@ -19,6 +19,7 @@ page 6014569 "NPR Exp. Wizard Filters"
                 field("Field Number"; "Field Number")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Field Number field';
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -50,15 +51,18 @@ page 6014569 "NPR Exp. Wizard Filters"
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Field Name field';
                 }
                 field("Field Caption"; "Field Caption")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Field Caption field';
                 }
                 field("Field Filter"; "Field Filter")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Field Filter field';
 
                     trigger OnValidate()
                     begin

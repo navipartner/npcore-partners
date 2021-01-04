@@ -21,48 +21,56 @@ page 6014493 "NPR POS Apply Cust. Entries"
                     ApplicationArea = All;
                     Caption = 'Posting Date';
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Posting Date field';
                 }
                 field("ApplyingCustLedgEntry.""Document Type"""; ApplyingCustLedgEntry."Document Type")
                 {
                     ApplicationArea = All;
                     Caption = 'Document Type';
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Document Type field';
                 }
                 field("ApplyingCustLedgEntry.""Document No."""; ApplyingCustLedgEntry."Document No.")
                 {
                     ApplicationArea = All;
                     Caption = 'Document No.';
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Document No. field';
                 }
                 field(ApplyingCustomerNo; ApplyingCustLedgEntry."Customer No.")
                 {
                     ApplicationArea = All;
                     Caption = 'Customer No.';
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Customer No. field';
                 }
                 field(ApplyingDescription; ApplyingCustLedgEntry.Description)
                 {
                     ApplicationArea = All;
                     Caption = 'Description';
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("ApplyingCustLedgEntry.""Currency Code"""; ApplyingCustLedgEntry."Currency Code")
                 {
                     ApplicationArea = All;
                     Caption = 'Currency Code';
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Currency Code field';
                 }
                 field("ApplyingCustLedgEntry.Amount"; ApplyingCustLedgEntry.Amount)
                 {
                     ApplicationArea = All;
                     Caption = 'Amount';
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Amount field';
                 }
                 field("ApplyingCustLedgEntry.""Remaining Amount"""; ApplyingCustLedgEntry."Remaining Amount")
                 {
                     ApplicationArea = All;
                     Caption = 'Remaining Amount';
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Remaining Amount field';
                 }
             }
             repeater(Control1)
@@ -72,54 +80,64 @@ page 6014493 "NPR POS Apply Cust. Entries"
                 {
                     ApplicationArea = All;
                     Visible = "Applies-to IDVisible";
+                    ToolTip = 'Specifies the value of the Applies-to ID field';
                 }
                 field("Posting Date"; "Posting Date")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Posting Date field';
                 }
                 field("Document Type"; "Document Type")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     StyleExpr = StyleTxt;
+                    ToolTip = 'Specifies the value of the Document Type field';
                 }
                 field("Document No."; "Document No.")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     StyleExpr = StyleTxt;
+                    ToolTip = 'Specifies the value of the Document No. field';
                 }
                 field("Customer No."; "Customer No.")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Customer No. field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Currency Code"; "Currency Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Currency Code field';
                 }
                 field("Original Amount"; "Original Amount")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Original Amount field';
                 }
                 field(Amount; Amount)
                 {
                     ApplicationArea = All;
                     Editable = false;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Amount field';
                 }
                 field("Remaining Amount"; "Remaining Amount")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Remaining Amount field';
                 }
                 field("CalcApplnRemainingAmount(""Remaining Amount"")"; CalcApplnRemainingAmount("Remaining Amount"))
                 {
@@ -127,10 +145,12 @@ page 6014493 "NPR POS Apply Cust. Entries"
                     AutoFormatExpression = ApplnCurrencyCode;
                     AutoFormatType = 1;
                     Caption = 'Appln. Remaining Amount';
+                    ToolTip = 'Specifies the value of the Appln. Remaining Amount field';
                 }
                 field("Amount to Apply"; "Amount to Apply")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Amount to Apply field';
 
                     trigger OnValidate()
                     begin
@@ -150,15 +170,18 @@ page 6014493 "NPR POS Apply Cust. Entries"
                     AutoFormatExpression = ApplnCurrencyCode;
                     AutoFormatType = 1;
                     Caption = 'Appln. Amount to Apply';
+                    ToolTip = 'Specifies the value of the Appln. Amount to Apply field';
                 }
                 field("Due Date"; "Due Date")
                 {
                     ApplicationArea = All;
                     StyleExpr = StyleTxt;
+                    ToolTip = 'Specifies the value of the Due Date field';
                 }
                 field("Pmt. Discount Date"; "Pmt. Discount Date")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Pmt. Discount Date field';
 
                     trigger OnValidate()
                     begin
@@ -168,15 +191,18 @@ page 6014493 "NPR POS Apply Cust. Entries"
                 field("Pmt. Disc. Tolerance Date"; "Pmt. Disc. Tolerance Date")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Pmt. Disc. Tolerance Date field';
                 }
                 field("Original Pmt. Disc. Possible"; "Original Pmt. Disc. Possible")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Original Pmt. Disc. Possible field';
                 }
                 field("Remaining Pmt. Disc. Possible"; "Remaining Pmt. Disc. Possible")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Remaining Pmt. Disc. Possible field';
 
                     trigger OnValidate()
                     begin
@@ -189,28 +215,34 @@ page 6014493 "NPR POS Apply Cust. Entries"
                     AutoFormatExpression = ApplnCurrencyCode;
                     AutoFormatType = 1;
                     Caption = 'Appln. Pmt. Disc. Possible';
+                    ToolTip = 'Specifies the value of the Appln. Pmt. Disc. Possible field';
                 }
                 field("Max. Payment Tolerance"; "Max. Payment Tolerance")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Max. Payment Tolerance field';
                 }
                 field(Open; Open)
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Open field';
                 }
                 field(Positive; Positive)
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Positive field';
                 }
                 field("Global Dimension 1 Code"; "Global Dimension 1 Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Global Dimension 1 Code field';
                 }
                 field("Global Dimension 2 Code"; "Global Dimension 2 Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Global Dimension 2 Code field';
                 }
             }
             group(Control41)
@@ -228,6 +260,7 @@ page 6014493 "NPR POS Apply Cust. Entries"
                             Editable = false;
                             ShowCaption = false;
                             TableRelation = Currency;
+                            ToolTip = 'Specifies the value of the ApplnCurrencyCode field';
                         }
                     }
                     group(Control1903098801)
@@ -240,6 +273,7 @@ page 6014493 "NPR POS Apply Cust. Entries"
                             AutoFormatType = 1;
                             Caption = 'Amount to Apply';
                             Editable = false;
+                            ToolTip = 'Specifies the value of the Amount to Apply field';
                         }
                     }
                     group("Pmt. Disc. Amount")
@@ -252,6 +286,7 @@ page 6014493 "NPR POS Apply Cust. Entries"
                             AutoFormatType = 1;
                             Caption = 'Pmt. Disc. Amount';
                             Editable = false;
+                            ToolTip = 'Specifies the value of the Pmt. Disc. Amount field';
                         }
                     }
                     group(Rounding)
@@ -264,6 +299,7 @@ page 6014493 "NPR POS Apply Cust. Entries"
                             AutoFormatType = 1;
                             Caption = 'Rounding';
                             Editable = false;
+                            ToolTip = 'Specifies the value of the Rounding field';
                         }
                     }
                     group("Applied Amount")
@@ -276,6 +312,7 @@ page 6014493 "NPR POS Apply Cust. Entries"
                             AutoFormatType = 1;
                             Caption = 'Applied Amount';
                             Editable = false;
+                            ToolTip = 'Specifies the value of the Applied Amount field';
                         }
                     }
                     group("Available Amount")
@@ -288,6 +325,7 @@ page 6014493 "NPR POS Apply Cust. Entries"
                             AutoFormatType = 1;
                             Caption = 'Available Amount';
                             Editable = false;
+                            ToolTip = 'Specifies the value of the Available Amount field';
                         }
                     }
                     group(Balance)
@@ -300,6 +338,7 @@ page 6014493 "NPR POS Apply Cust. Entries"
                             AutoFormatType = 1;
                             Caption = 'Balance';
                             Editable = false;
+                            ToolTip = 'Specifies the value of the Balance field';
                         }
                     }
                 }
@@ -332,6 +371,7 @@ page 6014493 "NPR POS Apply Cust. Entries"
                     RunPageLink = "Customer Entry No." = FIELD("Entry No.");
                     RunPageView = SORTING("Customer Entry No.");
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Reminder/Fin. Charge Entries action';
                 }
                 action("Applied E&ntries")
                 {
@@ -340,6 +380,7 @@ page 6014493 "NPR POS Apply Cust. Entries"
                     RunObject = Page "Applied Customer Entries";
                     RunPageOnRec = true;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Applied E&ntries action';
                 }
                 action(Dimensions)
                 {
@@ -348,6 +389,7 @@ page 6014493 "NPR POS Apply Cust. Entries"
                     Image = Dimensions;
                     ShortCutKey = 'Shift+Ctrl+D';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Dimensions action';
 
                     trigger OnAction()
                     begin
@@ -363,6 +405,7 @@ page 6014493 "NPR POS Apply Cust. Entries"
                     RunPageView = SORTING("Cust. Ledger Entry No.", "Posting Date");
                     ShortCutKey = 'Ctrl+F7';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Detailed &Ledger Entries action';
                 }
             }
             group("&Application")
@@ -378,6 +421,7 @@ page 6014493 "NPR POS Apply Cust. Entries"
                     PromotedIsBig = true;
                     ShortCutKey = 'Shift+F11';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Set Applies-to ID action';
 
                     trigger OnAction()
                     begin
@@ -396,6 +440,7 @@ page 6014493 "NPR POS Apply Cust. Entries"
                     Caption = 'Show Only Selected Entries to Be Applied';
                     Image = ShowSelected;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Show Only Selected Entries to Be Applied action';
 
                     trigger OnAction()
                     begin
@@ -424,6 +469,7 @@ page 6014493 "NPR POS Apply Cust. Entries"
                 Promoted = true;
                 PromotedCategory = Process;
                 ApplicationArea = All;
+                ToolTip = 'Executes the &Navigate action';
 
                 trigger OnAction()
                 begin

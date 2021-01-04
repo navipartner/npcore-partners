@@ -27,26 +27,32 @@ page 6014421 "NPR Item Group Page"
                 field("No."; "No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the No. field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field(Type; Type)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Type field';
                 }
                 field("Webshop Picture"; "Webshop Picture")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Webshop Picture field';
                 }
                 field("Search Description"; "Search Description")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Search Description field';
                 }
                 field(Blocked; Blocked)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Blocked field';
 
                     trigger OnValidate()
                     begin
@@ -60,6 +66,7 @@ page 6014421 "NPR Item Group Page"
                 field("Parent Item Group No."; "Parent Item Group No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Parent Item Group No. field';
 
                     trigger OnValidate()
                     begin
@@ -69,19 +76,23 @@ page 6014421 "NPR Item Group Page"
                 field("Used Goods Group"; "Used Goods Group")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Used Goods Group field';
                 }
                 field("No. Series"; "No. Series")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the No. Series field';
                 }
                 field("Item Discount Group"; "Item Discount Group")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Item Discount Group field';
                 }
                 field(Warranty; Warranty)
                 {
                     ApplicationArea = All;
                     Caption = 'Warranty certificate';
+                    ToolTip = 'Specifies the value of the Warranty certificate field';
 
                     trigger OnValidate()
                     begin
@@ -91,6 +102,7 @@ page 6014421 "NPR Item Group Page"
                 field("Warranty File"; "Warranty File")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Warranty File field';
 
                     trigger OnValidate()
                     begin
@@ -100,6 +112,7 @@ page 6014421 "NPR Item Group Page"
                 field("Insurance Category"; "Insurance Category")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Insurance Category field';
 
                     trigger OnValidate()
                     begin
@@ -109,45 +122,55 @@ page 6014421 "NPR Item Group Page"
                 field("Tarif No."; "Tarif No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Tarif No. field';
                 }
                 field(Level; Level)
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Level field';
                 }
                 field("Belongs In Main Item Group"; "Belongs In Main Item Group")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Belongs in Main Item Group field';
                 }
                 field("Last Date Modified"; "Last Date Modified")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Last Date Modified field';
                 }
                 field("Base Unit of Measure"; "Base Unit of Measure")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Base Unit of Measure field';
                 }
                 field("Sales Unit of Measure"; "Sales Unit of Measure")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Sales Unit of Measure field';
                 }
                 field("Purch. Unit of Measure"; "Purch. Unit of Measure")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Purch. Unit of Measure field';
                 }
                 field(Internet; Internet)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Internet field';
                 }
                 field("Variety Group"; "Variety Group")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Variety Group field';
                 }
                 field("Config. Template Header"; "Config. Template Header")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Config. Template Header field';
                 }
             }
             group(Posting)
@@ -161,47 +184,55 @@ page 6014421 "NPR Item Group Page"
                         ApplicationArea = All;
                         Caption = 'VAT %';
                         Editable = false;
+                        ToolTip = 'Specifies the value of the VAT % field';
                     }
                     field("GLAccountSale.""No."""; GLAccountSale."No.")
                     {
                         ApplicationArea = All;
                         Caption = 'Account Sales VAT';
                         Editable = false;
+                        ToolTip = 'Specifies the value of the Account Sales VAT field';
                     }
                     field("GLAccountSale.Name"; GLAccountSale.Name)
                     {
                         ApplicationArea = All;
                         Caption = 'Account Name';
                         Editable = false;
+                        ToolTip = 'Specifies the value of the Account Name field';
                     }
                     field("GLAccountPurch.""No."""; GLAccountPurch."No.")
                     {
                         ApplicationArea = All;
                         Caption = 'Account Purchase VAT';
                         Editable = false;
+                        ToolTip = 'Specifies the value of the Account Purchase VAT field';
                     }
                     field("GLAccountPurch.Name"; GLAccountPurch.Name)
                     {
                         ApplicationArea = All;
                         Caption = 'Account Name';
                         Editable = false;
+                        ToolTip = 'Specifies the value of the Account Name field';
                     }
                     field("GLAccountReverse.""No."""; GLAccountReverse."No.")
                     {
                         ApplicationArea = All;
                         Caption = 'Account Recipient';
                         Editable = false;
+                        ToolTip = 'Specifies the value of the Account Recipient field';
                     }
                     field("GLAccountReverse.Name"; GLAccountReverse.Name)
                     {
                         ApplicationArea = All;
                         Caption = 'Account Name';
                         Editable = false;
+                        ToolTip = 'Specifies the value of the Account Name field';
                     }
                 }
                 field("Gen. Prod. Posting Group"; "Gen. Prod. Posting Group")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Gen. Prod. Posting Group field';
 
                     trigger OnValidate()
                     begin
@@ -214,6 +245,7 @@ page 6014421 "NPR Item Group Page"
                 field("Gen. Bus. Posting Group"; "Gen. Bus. Posting Group")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Gen. Bus. Posting Group field';
 
                     trigger OnValidate()
                     begin
@@ -229,22 +261,27 @@ page 6014421 "NPR Item Group Page"
                 field("Inventory Posting Group"; "Inventory Posting Group")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Inventory Posting Group field';
                 }
                 field("VAT Prod. Posting Group"; "VAT Prod. Posting Group")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the VAT Prod. Posting Group field';
                 }
                 field("Tax Group Code"; "Tax Group Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Tax Group Code field';
                 }
                 field("VAT Bus. Posting Group"; "VAT Bus. Posting Group")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the VAT Bus. Posting Group field';
                 }
                 field("Costing Method"; "Costing Method")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Costing Method field';
                 }
             }
             group(Pictures)
@@ -254,6 +291,7 @@ page 6014421 "NPR Item Group Page"
                 {
                     ApplicationArea = All;
                     ShowCaption = false;
+                    ToolTip = 'Specifies the value of the Picture field';
                 }
             }
             part(SubForm; "NPR Item Group Subpage")
@@ -279,6 +317,7 @@ page 6014421 "NPR Item Group Page"
                     Caption = 'Insert picture';
                     Image = Picture;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Insert picture action';
 
                     trigger OnAction()
                     var
@@ -322,6 +361,7 @@ page 6014421 "NPR Item Group Page"
                     Caption = 'Delete Picture';
                     Image = Delete;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Delete Picture action';
 
                     trigger OnAction()
                     var
@@ -348,6 +388,7 @@ page 6014421 "NPR Item Group Page"
                                   "No." = FIELD("No.");
                     ShortCutKey = 'Shift+Ctrl+D';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Dimensions action';
                 }
             }
             group("&Function")
@@ -358,6 +399,7 @@ page 6014421 "NPR Item Group Page"
                     Caption = 'Create Number Series';
                     Image = CreateSerialNo;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Create Number Series action';
 
                     trigger OnAction()
                     begin
@@ -369,6 +411,7 @@ page 6014421 "NPR Item Group Page"
                     Caption = 'Create Number Series to All Item Groups';
                     Image = CreateSerialNo;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Create Number Series to All Item Groups action';
 
                     trigger OnAction()
                     var
@@ -392,6 +435,7 @@ page 6014421 "NPR Item Group Page"
                     Caption = 'Create Item(s) From Item Group';
                     Image = ItemGroup;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Create Item(s) From Item Group action';
 
                     trigger OnAction()
                     var
@@ -433,12 +477,14 @@ page 6014421 "NPR Item Group Page"
                     RunPageLink = "NPR Item Group No." = FIELD("No.");
                     ShortCutKey = 'Shift+Ctrl+N';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the &Item Ledger Entries action';
                 }
                 action("&VAT Posting Grups")
                 {
                     Caption = '&VAT Posting Grups';
                     Image = Form;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the &VAT Posting Grups action';
 
                     trigger OnAction()
                     var
@@ -457,6 +503,7 @@ page 6014421 "NPR Item Group Page"
                     RunObject = Page "Item List";
                     RunPageLink = "NPR Item Group" = FIELD("No.");
                     ApplicationArea = All;
+                    ToolTip = 'Executes the &Item List action';
                 }
             }
         }

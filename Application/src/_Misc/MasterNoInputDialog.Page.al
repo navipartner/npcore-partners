@@ -15,6 +15,7 @@ page 6014420 "NPR Master No. Input Dialog"
                 ApplicationArea = All;
                 CaptionClass = Captions;
                 Caption = 'Input No.';
+                ToolTip = 'Specifies the value of the Input No. field';
 
                 trigger OnValidate()
                 begin

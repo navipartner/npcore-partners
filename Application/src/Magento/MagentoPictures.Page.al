@@ -35,19 +35,23 @@ page 6151411 "NPR Magento Pictures"
                         Caption = 'Miniature';
                         Editable = false;
                         Visible = MiniatureLinePicture;
+                        ToolTip = 'Specifies the value of the Miniature field';
                     }
                     field(Type; Type)
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Type field';
                     }
                     field(Name; Name)
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Name field';
                     }
                     field("Count"; Counter)
                     {
                         ApplicationArea = All;
                         Caption = 'Count';
+                        ToolTip = 'Specifies the value of the Count field';
 
                         trigger OnDrillDown()
                         begin
@@ -57,15 +61,18 @@ page 6151411 "NPR Magento Pictures"
                     field("Last Date Modified"; "Last Date Modified")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Last Date Modified field';
                     }
                     field("Last Time Modified"; "Last Time Modified")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Last Time Modified field';
                     }
                     field("Size (kb)"; "Size (kb)")
                     {
                         ApplicationArea = All;
                         Visible = false;
+                        ToolTip = 'Specifies the value of the Size (kb) field';
                     }
                 }
             }
@@ -95,6 +102,7 @@ page 6151411 "NPR Magento Pictures"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Show Invalid Pictures action';
 
                 trigger OnAction()
                 var

@@ -18,11 +18,13 @@ pageextension 6014409 "NPR Posted Purchase Receipt" extends "Posted Purchase Rec
             field("NPR Pay-to E-mail"; "NPR Pay-to E-mail")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the NPR Pay-to E-mail field';
             }
             field("NPR Document Processing"; "NPR Document Processing")
             {
                 ApplicationArea = All;
                 Editable = false;
+                ToolTip = 'Specifies the value of the NPR Document Processing field';
             }
         }
     }
@@ -38,12 +40,14 @@ pageextension 6014409 "NPR Posted Purchase Receipt" extends "Posted Purchase Rec
                     Caption = 'E-mail Log';
                     Image = Email;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the E-mail Log action';
                 }
                 action("NPR SendAsPDF")
                 {
                     Caption = 'Send as PDF';
                     Image = SendEmailPDF;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Send as PDF action';
                 }
             }
             action("NPR RetailPrint")
@@ -54,6 +58,7 @@ pageextension 6014409 "NPR Posted Purchase Receipt" extends "Posted Purchase Rec
                 Promoted = true;
                 PromotedCategory = Process;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Retail Print action';
                 trigger OnAction()
                 var
                     LabelLibrarySubMgt: Codeunit "NPR Label Library Sub. Mgt.";
@@ -70,6 +75,7 @@ pageextension 6014409 "NPR Posted Purchase Receipt" extends "Posted Purchase Rec
                 PromotedIsBig = true;
                 ShortCutKey = 'Shift+Ctrl+L';
                 ApplicationArea = All;
+                ToolTip = 'Executes the Price Label action';
                 trigger OnAction()
                 var
                     LabelLibrarySubMgt: Codeunit "NPR Label Library Sub. Mgt.";

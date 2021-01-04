@@ -20,14 +20,17 @@ page 6151408 "NPR Magento Store Subform"
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Name; Name)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Name field';
                 }
                 field("Language Code"; "Language Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Language Code field';
                 }
             }
         }

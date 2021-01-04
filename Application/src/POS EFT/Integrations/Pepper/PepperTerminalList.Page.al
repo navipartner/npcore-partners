@@ -20,30 +20,37 @@ page 6184494 "NPR Pepper Terminal List"
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Terminal Type Code"; "Terminal Type Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Terminal Type Code field';
                 }
                 field("Instance ID"; "Instance ID")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Instance ID field';
                 }
                 field("Configuration Code"; "Configuration Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Configuration Code field';
                 }
                 field("Register No."; "Register No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Cash Register No. field';
                 }
                 field("License ID"; "License ID")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the License ID field';
                 }
             }
         }
@@ -61,6 +68,7 @@ page 6184494 "NPR Pepper Terminal List"
                     Caption = 'License';
                     Image = ImportCodes;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the License action';
 
                     trigger OnAction()
                     begin
@@ -72,6 +80,7 @@ page 6184494 "NPR Pepper Terminal List"
                     Caption = 'Import';
                     Image = Import;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Import action';
 
                     trigger OnAction()
                     begin
@@ -87,6 +96,7 @@ page 6184494 "NPR Pepper Terminal List"
                     Caption = 'Show';
                     Image = ElectronicNumber;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Show action';
 
                     trigger OnAction()
                     begin
@@ -98,6 +108,7 @@ page 6184494 "NPR Pepper Terminal List"
                     Caption = 'Additonal Parameters';
                     Image = ElectronicDoc;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Additonal Parameters action';
 
                     trigger OnAction()
                     begin
@@ -113,6 +124,7 @@ page 6184494 "NPR Pepper Terminal List"
                     Caption = 'Additional parameters';
                     Image = DeleteQtyToHandle;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Additional parameters action';
 
                     trigger OnAction()
                     begin
@@ -124,6 +136,7 @@ page 6184494 "NPR Pepper Terminal List"
                     Caption = 'Export';
                     Image = DeleteXML;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Export action';
 
                     trigger OnAction()
                     begin
@@ -139,6 +152,7 @@ page 6184494 "NPR Pepper Terminal List"
                     Caption = 'License';
                     Image = Export;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the License action';
 
                     trigger OnAction()
                     begin
@@ -150,6 +164,7 @@ page 6184494 "NPR Pepper Terminal List"
                     Caption = 'Additional Parameters';
                     Image = TransmitElectronicDoc;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Additional Parameters action';
 
                     trigger OnAction()
                     begin
@@ -169,6 +184,7 @@ page 6184494 "NPR Pepper Terminal List"
                 RunPageView = SORTING("Entry No.")
                               ORDER(Ascending);
                 ApplicationArea = All;
+                ToolTip = 'Executes the Transaction Requests action';
             }
         }
     }

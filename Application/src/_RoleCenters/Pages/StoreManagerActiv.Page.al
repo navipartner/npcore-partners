@@ -18,11 +18,13 @@ page 6059983 "NPR Store Manager Activ."
                 {
                     ApplicationArea = All;
                     DrillDownPageID = "Sales Orders";
+                    ToolTip = 'Specifies the value of the Open Sales Orders field';
                 }
                 field("Open Purchase Orders"; "Open Purchase Orders")
                 {
                     ApplicationArea = All;
                     DrillDownPageID = "Purchase Orders";
+                    ToolTip = 'Specifies the value of the Open Purchase Orders field';
                 }
 
                 actions
@@ -33,6 +35,7 @@ page 6059983 "NPR Store Manager Activ."
                         RunObject = Page "Sales Order";
                         RunPageMode = Create;
                         ApplicationArea = All;
+                        ToolTip = 'Executes the New Salesorder action';
                     }
                     action("New Purchase Order")
                     {
@@ -40,6 +43,7 @@ page 6059983 "NPR Store Manager Activ."
                         RunObject = Page "Purchase Order";
                         RunPageMode = Create;
                         ApplicationArea = All;
+                        ToolTip = 'Executes the New Purchase Order action';
                     }
                 }
             }
@@ -49,11 +53,13 @@ page 6059983 "NPR Store Manager Activ."
                 {
                     ApplicationArea = All;
                     DrillDownPageID = "Posted Sales Invoices";
+                    ToolTip = 'Specifies the value of the Posted Sales Invoices field';
                 }
                 field("Posted Purchase Orders"; "Posted Purchase Orders")
                 {
                     ApplicationArea = All;
                     DrillDownPageID = "Posted Purchase Invoices";
+                    ToolTip = 'Specifies the value of the Posted Purchase Orders field';
                 }
             }
         }

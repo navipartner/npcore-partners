@@ -16,27 +16,33 @@ page 6151221 "NPR PrintNode Printer List"
                 field(Id; Rec.Id)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Id field';
                 }
                 field("Object Type"; Rec."Object Type")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Object Type field';
                 }
                 field("Object ID"; Rec."Object ID")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Object ID field';
                 }
                 field(Name; Rec.Name)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Name field';
                 }
                 field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field(Settings; Rec.Settings.HasValue)
                 {
                     Caption = 'Settings Stored';
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Settings Stored field';
                 }
             }
         }
@@ -54,6 +60,7 @@ page 6151221 "NPR PrintNode Printer List"
                 Image = PrintAttachment;
                 Promoted = true;
                 PromotedCategory = Process;
+                ToolTip = 'Executes the Change Print Settings action';
                 trigger OnAction()
                 var
                     PrintNodeMgt: Codeunit "NPR PrintNode Mgt.";
@@ -67,6 +74,7 @@ page 6151221 "NPR PrintNode Printer List"
                 Caption = 'View Printer Info';
                 ApplicationArea = All;
                 Image = PrintCheck;
+                ToolTip = 'Executes the View Printer Info action';
                 trigger OnAction()
                 var
                     PrintNodeMgt: Codeunit "NPR PrintNode Mgt.";
@@ -83,6 +91,7 @@ page 6151221 "NPR PrintNode Printer List"
                 ApplicationArea = All;
                 Image = PrintAcknowledgement;
                 RunObject = Page "NPR PrintNode Setup";
+                ToolTip = 'Executes the Setup Account action';
             }
 
         }

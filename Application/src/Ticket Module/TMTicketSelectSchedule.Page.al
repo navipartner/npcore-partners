@@ -1,4 +1,4 @@
-﻿page 6060112 "NPR TM Ticket Select Schedule"
+page 6060112 "NPR TM Ticket Select Schedule"
 {
     Caption = 'Ticket Select Schedule';
     DataCaptionFields = "Admission Code";
@@ -22,12 +22,14 @@
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Schedule Code field';
                 }
                 field("Admission Code"; "Admission Code")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Editable = false;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Admission Code field';
                 }
                 field("Admission Start Date"; "Admission Start Date")
                 {
@@ -35,11 +37,13 @@
                     Editable = false;
                     Style = Favorable;
                     StyleExpr = CalendarExceptionText = '';
+                    ToolTip = 'Specifies the value of the Admission Start Date field';
                 }
                 field("Admission Start Time"; "Admission Start Time")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Admission Start Time field';
                 }
                 field("Remaining Reservation"; RemainingReservations)
                 {
@@ -47,6 +51,7 @@
                     Caption = 'Remaining Reservation';
                     Editable = false;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Remaining Reservation field';
                 }
                 field(RemainingAdmitted; RemainingAdmitted)
                 {
@@ -54,6 +59,7 @@
                     Caption = 'Remaining Admitted';
                     Editable = false;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Remaining Admitted field';
                 }
                 field(Remaining; RemainingText)
                 {
@@ -62,6 +68,7 @@
                     Editable = false;
                     Style = Unfavorable;
                     StyleExpr = Remaining <= 0;
+                    ToolTip = 'Specifies the value of the Remaining field';
                 }
                 field(CalendarException; CalendarExceptionText)
                 {
@@ -71,6 +78,7 @@
                     Style = Unfavorable;
                     StyleExpr = CalendarExceptionText <> '';
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Calendar Exception field';
                 }
             }
             group(Control6014401)
@@ -81,6 +89,7 @@
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Time:';
                     Enabled = false;
+                    ToolTip = 'Specifies the value of the Time: field';
                 }
             }
         }

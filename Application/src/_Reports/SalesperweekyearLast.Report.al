@@ -192,22 +192,26 @@ report 6014456 "NPR Sales per week year/Last"
                     {
                         Caption = 'Month';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Month field';
                     }
                     field(Year; Year)
                     {
                         Caption = 'Year';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Year field';
                     }
                     field(Department; "Dimension Value".Code)
                     {
                         Caption = 'Department';
                         TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Department field';
                     }
                     field(DateComparison; DateComparison)
                     {
                         Caption = 'Date Comparison';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Date Comparison field';
 
                         trigger OnValidate()
                         begin
@@ -219,6 +223,7 @@ report 6014456 "NPR Sales per week year/Last"
                     {
                         Caption = 'Compare To Closest Week';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Compare To Closest Week field';
 
                         trigger OnValidate()
                         begin
@@ -230,6 +235,7 @@ report 6014456 "NPR Sales per week year/Last"
                     {
                         Caption = 'Multiply With';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Multiply With field';
                     }
                 }
             }

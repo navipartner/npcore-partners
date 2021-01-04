@@ -18,22 +18,27 @@ page 6014606 "NPR Attribute Translations"
                     ApplicationArea = All;
                     Editable = false;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Attribute Code field';
                 }
                 field("Language ID"; "Language ID")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Language ID field';
                 }
                 field(Name; Name)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Name field';
                 }
                 field("Code Caption"; "Code Caption")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code Caption field';
                 }
                 field("Filter Caption"; "Filter Caption")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Filter Caption field';
                 }
             }
         }

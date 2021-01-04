@@ -19,20 +19,24 @@ page 6014669 "NPR StockTake Calc.Inv.Transf."
                 field("Stock-Take Config Code"; "Stock-Take Config Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Stock-Take Conf. Code field';
                 }
                 field(PostingDate; PostingDate)
                 {
                     ApplicationArea = All;
                     Caption = 'Posting Date';
+                    ToolTip = 'Specifies the value of the Posting Date field';
                 }
                 field("Conf Calc. Date"; "Conf Calc. Date")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Inventory Calc. Date field';
                 }
                 field(TransferAction; TransferAction)
                 {
                     ApplicationArea = All;
                     Caption = 'Transfer Action';
+                    ToolTip = 'Specifies the value of the Transfer Action field';
                 }
             }
         }

@@ -1,4 +1,4 @@
-﻿page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
+page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
 {
     // NPR4.14/TSA/20150803 CASE214262 - Initial Version
     // TM1.00/TSA /20151217 CASE 219658-01 NaviPartner Ticket Management
@@ -39,6 +39,7 @@
                         Caption = 'Show as Lines';
                         Importance = Promoted;
                         OptionCaption = 'Item,Ticket Type,Admission Date,Admission Hour,Period,Admission Code,Variant Code';
+                        ToolTip = 'Specifies the value of the Show as Lines field';
 
                         trigger OnLookup(var Text: Text): Boolean
                         var
@@ -58,6 +59,7 @@
                         Caption = 'Show as Columns';
                         Importance = Promoted;
                         OptionCaption = 'Item,Ticket Type,Admission Date,Admission Hour,Period,Admission Code,Variant Code';
+                        ToolTip = 'Specifies the value of the Show as Columns field';
 
                         trigger OnLookup(var Text: Text): Boolean
                         var
@@ -82,6 +84,7 @@
                         ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                         Caption = 'Fact Name As Column Heading';
                         Importance = Additional;
+                        ToolTip = 'Specifies the value of the Fact Name As Column Heading field';
 
                         trigger OnValidate()
                         begin
@@ -94,6 +97,7 @@
                         ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                         Caption = 'Hide Lines having Zero Admitted';
                         Importance = Additional;
+                        ToolTip = 'Specifies the value of the Hide Lines having Zero Admitted field';
 
                         trigger OnValidate()
                         begin
@@ -113,6 +117,7 @@
                         Caption = 'Matrix Total';
                         Editable = false;
                         Importance = Promoted;
+                        ToolTip = 'Specifies the value of the Matrix Total field';
                     }
                     field(AdmissionDefinition; AdmissionDefinition)
                     {
@@ -120,6 +125,7 @@
                         Caption = 'Admission Count Def.';
                         Importance = Additional;
                         OptionCaption = 'Admitted Count,Admitted minus Revoked,Admitted incl. Revisits';
+                        ToolTip = 'Specifies the value of the Admission Count Def. field';
 
                         trigger OnValidate()
                         begin
@@ -133,6 +139,7 @@
                         Caption = 'Show Value As';
                         Importance = Promoted;
                         OptionCaption = 'Admission Count,Count & Trend,Trend';
+                        ToolTip = 'Specifies the value of the Show Value As field';
 
                         trigger OnValidate()
                         begin
@@ -146,6 +153,7 @@
                         Caption = 'View by';
                         Importance = Additional;
                         OptionCaption = 'Day,Week,Month,Quarter,Year,Accounting Period';
+                        ToolTip = 'Specifies the value of the View by field';
 
                         trigger OnValidate()
                         begin
@@ -161,6 +169,7 @@
                         Caption = 'Trend Period Type';
                         Importance = Additional;
                         OptionCaption = 'Period,Year';
+                        ToolTip = 'Specifies the value of the Trend Period Type field';
 
                         trigger OnValidate()
                         begin
@@ -182,6 +191,7 @@
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Item Filter';
+                    ToolTip = 'Specifies the value of the Item Filter field';
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -201,6 +211,7 @@
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Ticket Type Filter';
+                    ToolTip = 'Specifies the value of the Ticket Type Filter field';
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -220,6 +231,7 @@
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Date Filter';
+                    ToolTip = 'Specifies the value of the Date Filter field';
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -256,6 +268,7 @@
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Hour Filter';
+                    ToolTip = 'Specifies the value of the Hour Filter field';
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -273,6 +286,7 @@
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Admission Code Filter';
+                    ToolTip = 'Specifies the value of the Admission Code Filter field';
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -290,6 +304,7 @@
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Variant Code Filter';
+                    ToolTip = 'Specifies the value of the Variant Code Filter field';
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -312,30 +327,35 @@
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Blocked Item Filter';
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Blocked Item Filter field';
                 }
                 field(BlockedTicketTypeFactFilter; BlockedTicketTypeFactFilter)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Blocked Ticket Type Filter';
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Blocked Ticket Type Filter field';
                 }
                 field(BlockedHourFactFilter; BlockedHourFactFilter)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Blocked Hour Filter';
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Blocked Hour Filter field';
                 }
                 field(BlockedAdmissionFactFilter; BlockedAdmissionFactFilter)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Blocked Admisson Filter';
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Blocked Admisson Filter field';
                 }
                 field(BlockedVariantFactFilter; BlockedVariantFactFilter)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Blocked Variant Code Filter';
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Blocked Variant Code Filter field';
                 }
             }
         }

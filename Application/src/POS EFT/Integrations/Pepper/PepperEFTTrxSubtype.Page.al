@@ -17,18 +17,22 @@ page 6184482 "NPR Pepper EFT Trx Subtype"
                 field("Integration Type Code"; "Integration Type Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Integration Type Code field';
                 }
                 field("Transaction Type Code"; "Transaction Type Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Transaction Type Code field';
                 }
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
             }
         }

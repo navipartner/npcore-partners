@@ -54,6 +54,7 @@ page 6151263 "NPR Retail Ticket Role Center"
                 Image = "Report";
                 RunObject = Report "Campaign - Details";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Campaign - &Details action';
             }
         }
         area(embedding)
@@ -64,6 +65,7 @@ page 6151263 "NPR Retail Ticket Role Center"
                 Image = List;
                 RunObject = Page "NPR TM Ticket List";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Ticket List action';
             }
             action(Memberships)
             {
@@ -71,6 +73,7 @@ page 6151263 "NPR Retail Ticket Role Center"
                 Image = CustomerList;
                 RunObject = Page "NPR MM Memberships";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Memberships action';
             }
             action(Action6150625)
             {
@@ -78,6 +81,7 @@ page 6151263 "NPR Retail Ticket Role Center"
                 Image = Customer;
                 RunObject = Page "NPR MM Members";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Members action';
             }
             action(Membercards)
             {
@@ -85,6 +89,7 @@ page 6151263 "NPR Retail Ticket Role Center"
                 Image = CreditCard;
                 RunObject = Page "NPR MM Member Card List";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Membercards action';
             }
             action(Items)
             {
@@ -92,6 +97,7 @@ page 6151263 "NPR Retail Ticket Role Center"
                 Image = Item;
                 RunObject = Page "Item List";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Items action';
             }
             action(Contacts)
             {
@@ -99,6 +105,7 @@ page 6151263 "NPR Retail Ticket Role Center"
                 Image = CustomerContact;
                 RunObject = Page "Contact List";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Contacts action';
             }
             action(Customers)
             {
@@ -106,6 +113,7 @@ page 6151263 "NPR Retail Ticket Role Center"
                 Image = Customer;
                 RunObject = Page "Customer List";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Customers action';
             }
             action(Campaigns)
             {
@@ -113,6 +121,7 @@ page 6151263 "NPR Retail Ticket Role Center"
                 Image = Campaign;
                 RunObject = Page "Campaign List";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Campaigns action';
             }
             action(Segments)
             {
@@ -120,6 +129,7 @@ page 6151263 "NPR Retail Ticket Role Center"
                 Image = Segment;
                 RunObject = Page "Segment List";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Segments action';
             }
             action("To-dos")
             {
@@ -127,6 +137,7 @@ page 6151263 "NPR Retail Ticket Role Center"
                 Image = TaskList;
                 RunObject = Page "Task List";
                 ApplicationArea = All;
+                ToolTip = 'Executes the To-dos action';
             }
             action(Teams)
             {
@@ -134,6 +145,7 @@ page 6151263 "NPR Retail Ticket Role Center"
                 Image = TeamSales;
                 RunObject = Page Teams;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Teams action';
             }
         }
         area(sections)
@@ -147,12 +159,14 @@ page 6151263 "NPR Retail Ticket Role Center"
                     Caption = 'Salespeople/Purchasers';
                     RunObject = Page "Salespersons/Purchasers";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Salespeople/Purchasers action';
                 }
                 action("Item Disc. Groups")
                 {
                     Caption = 'Item Disc. Groups';
                     RunObject = Page "Item Disc. Groups";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Item Disc. Groups action';
                 }
             }
         }
@@ -164,6 +178,7 @@ page 6151263 "NPR Retail Ticket Role Center"
                 Image = List;
                 RunObject = Page "Item List";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Item List action';
             }
             action("Sales Price &Worksheet")
             {
@@ -171,6 +186,7 @@ page 6151263 "NPR Retail Ticket Role Center"
                 Image = PriceWorksheet;
                 RunObject = Page "Sales Price Worksheet";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Sales Price &Worksheet action';
             }
             action("Sales &Prices")
             {
@@ -178,6 +194,7 @@ page 6151263 "NPR Retail Ticket Role Center"
                 Image = SalesPrices;
                 RunObject = Page "Sales Prices";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Sales &Prices action';
             }
             action("Sales Line &Discounts")
             {
@@ -185,6 +202,7 @@ page 6151263 "NPR Retail Ticket Role Center"
                 Image = SalesLineDisc;
                 RunObject = Page "Sales Line Discounts";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Sales Line &Discounts action';
             }
             group(Membership)
             {
@@ -194,6 +212,7 @@ page 6151263 "NPR Retail Ticket Role Center"
                     Image = Group;
                     RunObject = Page "NPR MM Member Community";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Community action';
                 }
                 action("Membership Setup")
                 {
@@ -202,6 +221,7 @@ page 6151263 "NPR Retail Ticket Role Center"
                     RunObject = Page "NPR MM Membership Setup";
                     RunPageMode = View;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Membership Setup action';
                 }
                 action("Membership Sales Setup")
                 {
@@ -209,6 +229,7 @@ page 6151263 "NPR Retail Ticket Role Center"
                     Image = SetupList;
                     RunObject = Page "NPR MM Membership Sales Setup";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Membership Sales Setup action';
                 }
                 action("Membership Alteration")
                 {
@@ -216,6 +237,7 @@ page 6151263 "NPR Retail Ticket Role Center"
                     Image = SetupList;
                     RunObject = Page "NPR MM Membership Alter.";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Membership Alteration action';
                 }
                 separator(Separator6014409)
                 {
@@ -226,6 +248,7 @@ page 6151263 "NPR Retail Ticket Role Center"
                     Image = SetupLines;
                     RunObject = Page "NPR MM Members. Admis. Setup";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Membership Admission Setup action';
                 }
                 action("Membership Limitation Setup")
                 {
@@ -235,6 +258,7 @@ page 6151263 "NPR Retail Ticket Role Center"
                     Promoted = true;
                     RunObject = Page "NPR MM Membership Lim. Setup";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Membership Limitation Setup action';
                 }
                 action("Loyalty Setup")
                 {
@@ -243,6 +267,7 @@ page 6151263 "NPR Retail Ticket Role Center"
                     Promoted = true;
                     RunObject = Page "NPR MM Loyalty Setup";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Membership Loyalty Setup action';
                 }
                 action(Notifications)
                 {
@@ -250,6 +275,7 @@ page 6151263 "NPR Retail Ticket Role Center"
                     Image = InteractionTemplateSetup;
                     RunObject = Page "NPR MM Member Notific. Setup";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Membership Notification Setup action';
                 }
                 action("Foreign Membership Setup")
                 {
@@ -262,6 +288,7 @@ page 6151263 "NPR Retail Ticket Role Center"
                     //PromotedIsBig = true;
                     RunObject = Page "NPR MM Foreign Members. Setup";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Foreign Membership Setup action';
                 }
             }
             group(Tickets)
@@ -275,6 +302,7 @@ page 6151263 "NPR Retail Ticket Role Center"
                     PromotedIsBig = true;
                     RunObject = Page "NPR TM Ticket Setup";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Ticket Setup action';
                 }
                 action("Ticket Type")
                 {
@@ -282,6 +310,7 @@ page 6151263 "NPR Retail Ticket Role Center"
                     Image = Group;
                     RunObject = Page "NPR TM Ticket Type";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Ticket Types action';
                 }
                 action(Admission)
                 {
@@ -289,6 +318,7 @@ page 6151263 "NPR Retail Ticket Role Center"
                     Image = WorkCenter;
                     RunObject = Page "NPR TM Ticket Admissions";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Ticket Admission Setup action';
                 }
                 action(Schedule)
                 {
@@ -296,6 +326,7 @@ page 6151263 "NPR Retail Ticket Role Center"
                     Image = Workdays;
                     RunObject = Page "NPR TM Ticket Schedules";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Ticket Schedule Setup action';
                 }
                 action("Admission Schedules")
                 {
@@ -303,6 +334,7 @@ page 6151263 "NPR Retail Ticket Role Center"
                     Image = CalendarWorkcenter;
                     RunObject = Page "NPR TM Admis. Schedule Lines";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Ticket Admission Schedules action';
                 }
                 action("Ticket BOM")
                 {
@@ -310,6 +342,7 @@ page 6151263 "NPR Retail Ticket Role Center"
                     Image = BOM;
                     RunObject = Page "NPR TM Ticket BOM";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Ticket Bill-of-Material action';
                 }
                 action(Statistics)
                 {
@@ -317,6 +350,7 @@ page 6151263 "NPR Retail Ticket Role Center"
                     Image = Statistics;
                     RunObject = Page "NPR TM Ticket Acc. Stat. Mtrx";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Ticket Statistics action';
                 }
             }
             group(GDPR)
@@ -327,6 +361,7 @@ page 6151263 "NPR Retail Ticket Role Center"
                     Image = Setup;
                     RunObject = Page "NPR GDPR Setup";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the GDPR Setup action';
                 }
                 action("GDPR Agreement List")
                 {
@@ -334,6 +369,7 @@ page 6151263 "NPR Retail Ticket Role Center"
                     Image = SetupLines;
                     RunObject = Page "NPR GDPR Agreement List";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the GDPR Agreement List action';
                 }
             }
         }

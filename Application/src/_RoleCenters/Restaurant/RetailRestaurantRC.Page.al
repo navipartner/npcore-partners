@@ -154,6 +154,7 @@ page 6151334 "NPR Restaurant RC"
                     Caption = 'POS Item Sales by Dims';
                     Image = "Report";
                     RunObject = report "NPR POS Item Sales with Dim.";
+                    ToolTip = 'Executes the POS Item Sales by Dims action';
                 }
                 action(RestDailyTurnover)
                 {
@@ -161,6 +162,7 @@ page 6151334 "NPR Restaurant RC"
                     Caption = 'Restaurant Daily Turnover';
                     Image = Report;
                     RunObject = report "NPR NPRE: Rest. Daily Turnover";
+                    ToolTip = 'Executes the Restaurant Daily Turnover action';
                 }
             }
             group(Setup)

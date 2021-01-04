@@ -16,10 +16,12 @@ page 6151521 "NPR Nc Trigger Setup"
                 field("Task Template Name"; "Task Template Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Task Template Name field';
                 }
                 field("Task Batch Name"; "Task Batch Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Task Batch Name field';
                 }
             }
         }

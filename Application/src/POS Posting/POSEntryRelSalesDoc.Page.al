@@ -26,10 +26,12 @@ page 6151006 "NPR POS Entry Rel. Sales Doc."
                 field("Sales Document Type"; "Sales Document Type")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Sales Document Type field';
                 }
                 field("Sales Document No"; "Sales Document No")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Sales Document No field';
 
                     trigger OnAssistEdit()
                     begin
@@ -52,6 +54,7 @@ page 6151006 "NPR POS Entry Rel. Sales Doc."
                 field("POS Entry Reference Type"; "POS Entry Reference Type")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the POS Entry Reference Type field';
                 }
             }
         }

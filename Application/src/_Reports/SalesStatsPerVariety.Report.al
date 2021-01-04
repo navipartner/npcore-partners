@@ -219,11 +219,13 @@ report 6014615 "NPR Sales Stats Per Variety"
                 {
                     Caption = 'Include Items Not Sold';
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Include Items Not Sold field';
                 }
                 field(PrintTotals; PrintTotal)
                 {
                     Caption = 'Print Totals';
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Print Totals field';
                 }
             }
         }

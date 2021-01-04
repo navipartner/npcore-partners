@@ -21,22 +21,27 @@ page 6014598 "NPR Managed Package Lookup"
                 field(Name; Name)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Name field';
                 }
                 field(Version; Version)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Version field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field(Status; Status)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Status field';
                 }
                 field(Tags; Tags)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Tags field';
                 }
             }
         }

@@ -17,6 +17,7 @@ page 6014616 "NPR Display Groups WP"
                 {
                     ApplicationArea = All;
                     ShowMandatory = true;
+                    ToolTip = 'Specifies the value of the Code field';
 
                     trigger OnValidate()
                     begin
@@ -26,6 +27,7 @@ page 6014616 "NPR Display Groups WP"
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
             }
         }

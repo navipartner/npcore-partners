@@ -19,21 +19,25 @@ page 6060163 "NPR Event Attr. Row Values"
                     ApplicationArea = All;
                     Editable = false;
                     Visible = FormulaLookupMode;
+                    ToolTip = 'Specifies the value of the Line No. field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field(Type; Type)
                 {
                     ApplicationArea = All;
                     Visible = NOT FormulaLookupMode;
+                    ToolTip = 'Specifies the value of the Type field';
                 }
                 field(Formula; Formula)
                 {
                     ApplicationArea = All;
                     AssistEdit = true;
                     Visible = NOT FormulaLookupMode;
+                    ToolTip = 'Specifies the value of the Formula field';
 
                     trigger OnAssistEdit()
                     begin
@@ -44,6 +48,7 @@ page 6060163 "NPR Event Attr. Row Values"
                 {
                     ApplicationArea = All;
                     Visible = NOT FormulaLookupMode;
+                    ToolTip = 'Specifies the value of the Promote field';
                 }
             }
         }

@@ -19,6 +19,7 @@ page 6151565 "NPR NpXml Wsdl Input Dlg"
                     ApplicationArea = All;
                     Caption = 'WSDL (url or file path)';
                     ExtendedDatatype = URL;
+                    ToolTip = 'Specifies the value of the WSDL (url or file path) field';
                 }
                 group("When using NTLM username and password are reqired.")
                 {
@@ -27,12 +28,14 @@ page 6151565 "NPR NpXml Wsdl Input Dlg"
                     {
                         ApplicationArea = All;
                         Caption = 'Username';
+                        ToolTip = 'Specifies the value of the Username field';
                     }
                     field(Password; Password)
                     {
                         ApplicationArea = All;
                         Caption = 'Password';
                         ExtendedDatatype = Masked;
+                        ToolTip = 'Specifies the value of the Password field';
                     }
                 }
             }

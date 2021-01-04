@@ -18,55 +18,68 @@ page 6151081 "NPR ExRv Vouchers"
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Voucher Type field';
                 }
                 field("No."; "No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the No. field';
                 }
                 field("Issued at"; "Issued at")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Issued at field';
                 }
                 field(Amount; Amount)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Amount field';
                 }
                 field("Posting Date"; "Posting Date")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Posting Date field';
                 }
                 field(Posted; Posted)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Posted field';
                 }
                 field(Open; Open)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Open field';
                 }
                 field("Remaining Amount"; "Remaining Amount")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Remaining Amount field';
                 }
                 field("Source Type"; "Source Type")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Source Table No. field';
                 }
                 field("Source No."; "Source No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Source No. field';
                 }
                 field("Reference No."; "Reference No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Reference No. field';
                 }
                 field("Online Reference No."; "Online Reference No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Online Reference No. field';
                 }
                 field("Shortcut Dimension 1 Code"; "Shortcut Dimension 1 Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Shortcut Dimension 1 Code field';
 
                     trigger OnValidate()
                     begin
@@ -76,6 +89,7 @@ page 6151081 "NPR ExRv Vouchers"
                 field("Shortcut Dimension 2 Code"; "Shortcut Dimension 2 Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Shortcut Dimension 2 Code field';
 
                     trigger OnValidate()
                     begin
@@ -95,6 +109,7 @@ page 6151081 "NPR ExRv Vouchers"
                 Caption = 'Post Selected';
                 Image = Post;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Post Selected action';
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = Process;
 
@@ -123,6 +138,7 @@ page 6151081 "NPR ExRv Vouchers"
                 Promoted = true;
                 PromotedCategory = Process;
                 ApplicationArea = All;
+                ToolTip = 'Executes the &Navigate action';
 
                 trigger OnAction()
                 begin
@@ -137,6 +153,7 @@ page 6151081 "NPR ExRv Vouchers"
                 Image = Dimensions;
                 ShortCutKey = 'Shift+Ctrl+D';
                 ApplicationArea = All;
+                ToolTip = 'Executes the Dimensions action';
 
                 trigger OnAction()
                 begin

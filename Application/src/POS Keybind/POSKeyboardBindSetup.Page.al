@@ -19,24 +19,29 @@ page 6150721 "NPR POS Keyboard Bind. Setup"
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Action Code field';
                 }
                 field("Key Bind"; "Key Bind")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Key Bind field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field(Enabled; Enabled)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Enabled field';
                 }
                 field("Default Key Bind"; "Default Key Bind")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Default Key Bind field';
                 }
             }
         }
@@ -55,6 +60,7 @@ page 6150721 "NPR POS Keyboard Bind. Setup"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Restore Default Key Bind action';
 
                 trigger OnAction()
                 begin

@@ -14,18 +14,22 @@ page 6184862 "NPR Azr. Storage Cogn. Search"
                 field("Account Name"; "Account Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Azure Account Name field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Search Service Name"; "Search Service Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Search Service Name field';
                 }
                 field(Index; Index)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Search Index field';
                 }
             }
         }

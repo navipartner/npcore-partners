@@ -21,6 +21,7 @@ page 6150727 "NPR POS Param. Values Temp."
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Name field';
                 }
                 field("Data Type"; "Data Type")
                 {
@@ -28,12 +29,14 @@ page 6150727 "NPR POS Param. Values Temp."
                     Editable = false;
                     Style = StandardAccent;
                     StyleExpr = ParameterIsNotDefault;
+                    ToolTip = 'Specifies the value of the Data Type field';
                 }
                 field(Value; Value)
                 {
                     ApplicationArea = All;
                     Style = StandardAccent;
                     StyleExpr = ParameterIsNotDefault;
+                    ToolTip = 'Specifies the value of the Value field';
                 }
             }
         }
@@ -51,6 +54,7 @@ page 6150727 "NPR POS Param. Values Temp."
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Reset Values action';
             }
         }
     }

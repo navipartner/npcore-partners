@@ -17,10 +17,12 @@ page 6059957 "NPR MCS Person Groups"
                 field(Name; Name)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Name field';
                 }
                 field(PersonGroupId; PersonGroupId)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Person Group Id field';
                 }
             }
         }
@@ -35,6 +37,7 @@ page 6059957 "NPR MCS Person Groups"
                 Caption = 'Get Person Groups';
                 Image = Refresh;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Get Person Groups action';
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = Process;
 
