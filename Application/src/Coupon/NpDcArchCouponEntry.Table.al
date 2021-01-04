@@ -1,10 +1,5 @@
 table 6151598 "NPR NpDc Arch.Coupon Entry"
 {
-    // NPR5.34/MHA /20170720  CASE 282799 Object created - NpDc: NaviPartner Discount Coupon
-    // NPR5.37/MHA /20171012  CASE 293232 Object renamed from "NpDc Posted Coupon Entry" to "NpDc Arch. Coupon Entry" and updated OptionString of Field 10 "Entry Type"
-    // NPR5.51/MHA /20190724  CASE 343352 Added field 70 "Document Type" and changed field 55 "Sales Ticket No." to "Document No."
-    // NPR5.52/MHA /20191021  CASE 343352 Added Caption to field 70 "Document Type"
-
     Caption = 'Archived Coupon Entry';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR NpDc Arch.Coupon Entries";
@@ -135,10 +130,6 @@ table 6151598 "NPR NpDc Arch.Coupon Entry"
         {
             SumIndexFields = Amount, Quantity;
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 

@@ -1,7 +1,5 @@
 page 6151605 "NPR NpDc Iss.OnSale Subform"
 {
-    // NPR5.36/MHA /20170831  CASE 286812 Object created - Discount Coupon Issue Module
-
     AutoSplitKey = true;
     Caption = 'Issue On-Sale Subform';
     DelayedInsert = true;
@@ -49,10 +47,6 @@ page 6151605 "NPR NpDc Iss.OnSale Subform"
                 }
             }
         }
-    }
-
-    actions
-    {
     }
 
     var

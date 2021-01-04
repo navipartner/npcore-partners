@@ -1,8 +1,5 @@
 page 6151594 "NPR NpDc Coupon Entries"
 {
-    // NPR5.34/MHA /20170720  CASE 282799 Object created - NpDc: NaviPartner Discount Coupon
-    // NPR5.51/MHA /20190724  CASE 343352 Added "Document Type"
-
     Caption = 'Coupon Entries';
     Editable = false;
     PageType = List;
@@ -70,10 +67,6 @@ page 6151594 "NPR NpDc Coupon Entries"
                 }
             }
         }
-    }
-
-    actions
-    {
     }
 }
 

@@ -986,8 +986,10 @@ codeunit 6151590 "NPR NpDc Coupon Mgt."
 
     local procedure RegExReplaceAN(Input: Text) Output: Text
     var
-        Match: DotNet NPRNetMatch;
-        RegEx: DotNet NPRNetRegex;
+        Match: Codeunit DotNet_Match;
+        Regex: Codeunit DotNet_Regex;
+        GroupCollection: Codeunit DotNet_GroupCollection;
+        DotNetGroup: Codeunit DotNet_Group;
         Pattern: Text;
         ReplaceString: Text;
         RandomQty: Integer;
@@ -996,18 +998,20 @@ codeunit 6151590 "NPR NpDc Coupon Mgt."
         Pattern := '(?<RandomStart>\[AN\*?)' +
                    '(?<RandomQty>\d?)' +
                    '(?<RandomEnd>\])';
-        RegEx := RegEx.Regex(Pattern);
+        Regex.Regex(Pattern);
 
-        Match := RegEx.Match(Input);
+        Regex.Match(Input, Match);
         while Match.Success do begin
             ReplaceString := '';
             RandomQty := 1;
-            if Evaluate(RandomQty, Format(Match.Groups.Item('RandomQty'))) then;
+            Match.Groups(GroupCollection);
+            GroupCollection.ItemGroupName('RandomQty', DotNetGroup);
+            if Evaluate(RandomQty, Format(DotNetGroup.Value())) then;
             for i := 1 to RandomQty do
                 ReplaceString += Format(GenerateRandomChar());
-            Input := RegEx.Replace(Input, ReplaceString, 1);
+            Input := Regex.Replace(Input, ReplaceString, 1);
 
-            Match := RegEx.Match(Input);
+            Regex.Match(Input, Match);
         end;
 
         Output := Input;

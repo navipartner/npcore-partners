@@ -1,14 +1,5 @@
 codeunit 6151594 "NPR NpDc Module Apply: Default"
 {
-    // NPR5.34/MHA /20170720  CASE 282799 Object created - NpDc: NaviPartner Discount Coupon
-    // NPR5.51/MHA /20190725  CASE 355406 Applied Discount Amount cannot be more than 100%
-    // NPR5.55/TSA /20200414 CASE 390697 Added "simple" support for VAT based discount amount
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         Text000: Label 'Apply Discount - Default';
 
@@ -37,19 +28,15 @@ codeunit 6151594 "NPR NpDc Module Apply: Default"
 
         SaleLinePOS.FindSet;
         repeat
-            //-NPR5.51 [355406]
             ApplyDiscountLine(SaleLinePOSCoupon, DiscountAmt, TotalAmt, SaleLinePOS, AppliedDiscountAmt);
-        //+NPR5.51 [355406]
         until SaleLinePOS.Next = 0;
 
-        //-NPR5.51 [355406]
         if AppliedDiscountAmt < DiscountAmt then begin
             SaleLinePOS.FindSet;
             repeat
                 ApplyDiscountAdjustment(SaleLinePOSCoupon, DiscountAmt, SaleLinePOS, AppliedDiscountAmt);
             until (SaleLinePOS.Next = 0) or (AppliedDiscountAmt = DiscountAmt);
         end;
-        //+NPR5.51 [355406]
     end;
 
     procedure ApplyDiscountLine(SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon"; DiscountAmt: Decimal; TotalAmt: Decimal; SaleLinePOS: Record "NPR Sale Line POS"; var AppliedDiscountAmt: Decimal)
@@ -65,18 +52,12 @@ codeunit 6151594 "NPR NpDc Module Apply: Default"
         if LineDiscountAmt <= 0 then
             exit;
 
-        //-NPR5.55 [390697]
-        // //-NPR5.51 [355406]
-        // IF LineDiscountAmt > SaleLinePOS."Amount Including VAT" THEN
-        //   LineDiscountAmt := SaleLinePOS."Amount Including VAT";
-        // //+NPR5.51 [355406]
         LineDiscountBaseAmt := SaleLinePOS."Amount Including VAT";
         if (not SaleLinePOS."Price Includes VAT") then
             LineDiscountBaseAmt := SaleLinePOS.Amount;
 
         if LineDiscountAmt > LineDiscountBaseAmt then
             LineDiscountAmt := LineDiscountBaseAmt;
-        //+NPR5.55 [390697]
 
         LineNo := GetNextLineNo(SaleLinePOS);
         SaleLinePOSCouponApply.Init;
@@ -95,9 +76,7 @@ codeunit 6151594 "NPR NpDc Module Apply: Default"
         SaleLinePOSCouponApply."Discount Amount" := LineDiscountAmt;
         SaleLinePOSCouponApply.Insert(true);
 
-        //-NPR5.51 [355406]
         AppliedDiscountAmt += LineDiscountAmt;
-        //+NPR5.51 [355406]
     end;
 
     local procedure ApplyDiscountAdjustment(SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon"; DiscountAmt: Decimal; SaleLinePOS: Record "NPR Sale Line POS"; var AppliedDiscountAmt: Decimal)
@@ -106,7 +85,6 @@ codeunit 6151594 "NPR NpDc Module Apply: Default"
         AdjustmentAmount: Decimal;
         LineDiscountBaseAmt: Decimal;
     begin
-        //-NPR5.51 [355406]
         AdjustmentAmount := DiscountAmt - AppliedDiscountAmt;
         if AdjustmentAmount <= 0 then
             exit;
@@ -114,16 +92,12 @@ codeunit 6151594 "NPR NpDc Module Apply: Default"
         if not FindSaleLinePOSCouponApply2(SaleLinePOSCoupon, SaleLinePOS, SaleLinePOSCouponApply) then
             exit;
 
-        //-NPR5.55 [390697]
-        // IF AdjustmentAmount > SaleLinePOS."Amount Including VAT" - SaleLinePOSCouponApply."Discount Amount" THEN
-        //   AdjustmentAmount := SaleLinePOS."Amount Including VAT" - SaleLinePOSCouponApply."Discount Amount";
         LineDiscountBaseAmt := SaleLinePOS."Amount Including VAT";
         if (not SaleLinePOS."Price Includes VAT") then
             LineDiscountBaseAmt := SaleLinePOS.Amount;
 
         if AdjustmentAmount > LineDiscountBaseAmt - SaleLinePOSCouponApply."Discount Amount" then
             AdjustmentAmount := LineDiscountBaseAmt - SaleLinePOSCouponApply."Discount Amount";
-        //+NPR5.55 [390697]
 
         if AdjustmentAmount <= 0 then
             exit;
@@ -132,11 +106,6 @@ codeunit 6151594 "NPR NpDc Module Apply: Default"
 
         SaleLinePOSCouponApply."Discount Amount" += AdjustmentAmount;
         SaleLinePOSCouponApply.Modify;
-        //+NPR5.51 [355406]
-    end;
-
-    local procedure "--- Calc"()
-    begin
     end;
 
     local procedure CalcAppliedDiscountTotal(SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon"): Decimal
@@ -194,10 +163,6 @@ codeunit 6151594 "NPR NpDc Module Apply: Default"
         exit(0);
     end;
 
-    local procedure "--- Find"()
-    begin
-    end;
-
     local procedure FindSaleLinePOSItems(SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon"; var SaleLinePOS: Record "NPR Sale Line POS"): Boolean
     begin
         Clear(SaleLinePOS);
@@ -228,7 +193,6 @@ codeunit 6151594 "NPR NpDc Module Apply: Default"
 
     local procedure FindSaleLinePOSCouponApply2(SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon"; SaleLinePOS: Record "NPR Sale Line POS"; var SaleLinePOSCouponApply: Record "NPR NpDc SaleLinePOS Coupon"): Boolean
     begin
-        //-NPR5.51 [355406]
         Clear(SaleLinePOSCouponApply);
         SaleLinePOSCouponApply.SetRange("Register No.", SaleLinePOS."Register No.");
         SaleLinePOSCouponApply.SetRange("Sales Ticket No.", SaleLinePOS."Sales Ticket No.");
@@ -242,7 +206,6 @@ codeunit 6151594 "NPR NpDc Module Apply: Default"
         SaleLinePOSCouponApply.SetRange("Coupon No.", SaleLinePOSCoupon."Coupon No.");
 
         exit(SaleLinePOSCouponApply.FindFirst);
-        //+NPR5.51 [355406]
     end;
 
     local procedure GetNextLineNo(SaleLinePOS: Record "NPR Sale Line POS"): Integer
@@ -257,10 +220,6 @@ codeunit 6151594 "NPR NpDc Module Apply: Default"
         if SaleLinePOSCoupon.FindLast then;
 
         exit(SaleLinePOSCoupon."Line No." + 10000);
-    end;
-
-    local procedure "--- Coupon Interface"()
-    begin
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6151591, 'OnInitCouponModules', '', true, true)]
@@ -304,10 +263,6 @@ codeunit 6151594 "NPR NpDc Module Apply: Default"
         Handled := true;
 
         ApplyDiscount(SaleLinePOSCoupon);
-    end;
-
-    local procedure "--- Aux"()
-    begin
     end;
 
     local procedure CurrCodeunitId(): Integer

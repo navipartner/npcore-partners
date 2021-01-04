@@ -1,7 +1,5 @@
 table 6151604 "NPR NpDc Item Buffer"
 {
-    // NPR5.38/MHA /20171204  CASE 298276 Object created
-
     Caption = 'Discount Item Buffer';
     DataClassification = CustomerContent;
 
@@ -70,10 +68,6 @@ table 6151604 "NPR NpDc Item Buffer"
         key(Key1; "Item No.", "Variant Code", "Item Group", "Item Disc. Group", "Unit Price", "Discount Type", "Discount Code", "Discount %")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 

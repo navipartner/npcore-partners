@@ -1,7 +1,5 @@
 page 6151606 "NPR NpDc Extra Item Qty."
 {
-    // NPR5.47/MHA /20181026  CASE 332655 Object created
-
     AutoSplitKey = true;
     Caption = 'Extra Coupon Item';
     PageType = Card;
@@ -110,10 +108,6 @@ page 6151606 "NPR NpDc Extra Item Qty."
                 ApplicationArea = All;
             }
         }
-    }
-
-    actions
-    {
     }
 
     trigger OnOpenPage()

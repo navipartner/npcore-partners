@@ -1,7 +1,5 @@
 page 6151595 "NPR NpDc Coupon Modules"
 {
-    // NPR5.34/MHA /20170720  CASE 282799 Object created - NpDc: NaviPartner Discount Coupon
-
     Caption = 'Coupon Modules';
     Editable = false;
     PageType = List;
@@ -37,10 +35,6 @@ page 6151595 "NPR NpDc Coupon Modules"
                 }
             }
         }
-    }
-
-    actions
-    {
     }
 
     trigger OnOpenPage()

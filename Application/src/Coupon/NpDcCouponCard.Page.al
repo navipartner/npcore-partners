@@ -1,9 +1,5 @@
 page 6151592 "NPR NpDc Coupon Card"
 {
-    // NPR5.34/MHA /20170720  CASE 282799 Object created - NpDc: NaviPartner Discount Coupon
-    // NPR5.37/MHA /20171012  CASE 293232 Renamed Action "Manual Post Coupon" to "Archive Coupon"
-    // NPR5.51/MHA /20190724  CASE 343352 Added field 85 "In-use Quantity (External)"
-
     Caption = 'Coupon Card';
     DeleteAllowed = false;
     InsertAllowed = false;

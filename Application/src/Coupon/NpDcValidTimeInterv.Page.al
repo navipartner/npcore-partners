@@ -1,8 +1,5 @@
 page 6151603 "NPR NpDc Valid Time Interv."
 {
-    // NPR5.35/MHA /20170809  CASE 286355 Object created
-    // NPR5.37/MHA /20171010  CASE 292171 Added Period Type and Weekday fields
-
     AutoSplitKey = true;
     Caption = 'Valid Time Intervals';
     DelayedInsert = true;
@@ -80,10 +77,6 @@ page 6151603 "NPR NpDc Valid Time Interv."
                 }
             }
         }
-    }
-
-    actions
-    {
     }
 }
 

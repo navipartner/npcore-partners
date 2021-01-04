@@ -1,12 +1,5 @@
 page 6151590 "NPR NpDc Coupon Type Card"
 {
-    // NPR5.34/MHA /20170720  CASE 282799 Object created - NpDc: NaviPartner Discount Coupon
-    // NPR5.37/MHA /20171012  CASE 293232 Deleted field 1010 "Coupon Qty. (Closed)" and renamed field 1020 "Posted Coupon Qty." to "Arch. Coupon Qty."
-    // NPR5.39/MHA /20180214  CASE 305146 Added field 70 "Enabled"
-    // NPR5.40/MHA /20180308  CASE 305859 Added Action "Comments" and InitCouponType() in OnNewRecord()
-    // NPR5.42/MHA /20180521  CASE 305859 Added field 67 Print on Issue
-    // NPR5.55/ALPO/20200518  CASE 387376 Possibility to define sequence in which discount coupons are applied
-
     Caption = 'Coupon Type Card';
     PageType = Card;
     UsageCategory = Administration;
@@ -303,9 +296,7 @@ page 6151590 "NPR NpDc Coupon Type Card"
     var
         NpDcCouponMgt: Codeunit "NPR NpDc Coupon Mgt.";
     begin
-        //-NPR5.40 [305859]
         NpDcCouponMgt.InitCouponType(Rec);
-        //+NPR5.40 [305859]
     end;
 
     var

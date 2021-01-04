@@ -1,16 +1,11 @@
 codeunit 6151592 "NPR NpDc Module Issue: Default"
 {
-    trigger OnRun()
-    begin
-    end;
-
     var
         Text000: Label 'Issue Coupon - Default';
         CouponIssuedTxt: Label 'Coupon No. %1 has been issued.';
         CouponPrintedText: Label 'Coupon No. %1 has been printed.';
         CouponsIssuedTxt: Label '%1 coupons (No. %2 - %3) have been issued.';
         CouponsPrintedText: Label '%1 coupons (No. %2 - %3) have been printed.';
-
 
     procedure IssueCoupons(CouponType: Record "NPR NpDc Coupon Type"; IssueCouponsQty: Integer)
     var
@@ -83,8 +78,6 @@ codeunit 6151592 "NPR NpDc Module Issue: Default"
         until TempCoupon.Next = 0;
     end;
 
-    //--- Coupon Interface ---
-
     [EventSubscriber(ObjectType::Codeunit, 6151591, 'OnInitCouponModules', '', true, true)]
     local procedure OnInitCouponModules(var CouponModule: Record "NPR NpDc Coupon Module")
     begin
@@ -132,8 +125,6 @@ codeunit 6151592 "NPR NpDc Module Issue: Default"
         Handled := true;
         IssueCoupons(CouponType, 0);
     end;
-
-    //--- Aux ---
 
     local procedure CurrCodeunitId(): Integer
     begin

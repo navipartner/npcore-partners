@@ -1,8 +1,5 @@
 page 6151593 "NPR NpDc Coupons"
 {
-    // NPR5.34/MHA /20170720  CASE 282799 Object created - NpDc: NaviPartner Discount Coupon
-    // NPR5.37/MHA /20171012  CASE 293232 Renamed Action "Manual Post Coupons" to "Archive Coupons" and added Action "Show Expired Coupons"
-
     Caption = 'Coupons';
     CardPageID = "NPR NpDc Coupon Card";
     Editable = false;
@@ -119,9 +116,7 @@ page 6151593 "NPR NpDc Coupons"
 
                     trigger OnAction()
                     begin
-                        //-NPR5.37 [293232]
                         SetFilter("Ending Date", '>%1&<%2', 0DT, CurrentDateTime);
-                        //+NPR5.37 [293232]
                     end;
                 }
             }

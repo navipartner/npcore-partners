@@ -1,18 +1,5 @@
 codeunit 6151595 "NPR NpDc ModuleApply: Xtr Item"
 {
-    // NPR5.34/MHA /20170720  CASE 282799 Object created - NpDc: NaviPartner Discount Coupon
-    // NPR5.42/MHA /20180409  CASE 310148 Changed ResendAllOnAfterInsertPOSSaleLine() to single OnAfterInsertPOSSaleLine() in ApplyDiscount()
-    // NPR5.43/MHA /20180629  CASE 319425 Updated Insert Line Event to use new InvokeOnBeforeInsertSaleLineWorkflow() in ApplyDiscount()
-    // NPR5.47/MHA /20181022  CASE 332655 Discount should be calculated based on SaleLinePOS."Unit Price" instead of Item."Unit Price"
-    // NPR5.50/TSA /20190507 CASE 345348 Added the OnAfterInsertPOSSaleLine() again, moved InvokeOnBeforeInsertSaleLineWorkflow() to before insert
-    // NPR5.51/MHA /20190724  CASE 343352 Added initiation of POSSession without GUI in ApplyDiscount()
-    // NPR5.51/MHA /20190725  CASE 355406 Applied Discount Amount cannot be more than 100%
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         Text000: Label 'Extra Coupon Item has not been defined for Coupon %1 (%2)';
         Text001: Label 'Apply Discount - Extra Item';
@@ -36,23 +23,10 @@ codeunit 6151595 "NPR NpDc ModuleApply: Xtr Item"
         if not FindExtraCouponItem(CouponType, ExtraCouponItem) then
             Error(Text000, SaleLinePOSCoupon."Coupon No.", SaleLinePOSCoupon."Coupon Type");
 
-        //-NPR5.47 [332655]
-        // DiscountAmt := CalcDiscountAmount(SaleLinePOSCoupon);
-        //
-        // IF FindSaleLinePOSCouponApply(SaleLinePOSCoupon,SaleLinePOSCouponApply) THEN BEGIN
-        //  IF SaleLinePOSCouponApply."Discount Amount" <> DiscountAmt THEN BEGIN
-        //    SaleLinePOSCouponApply."Discount Amount" := DiscountAmt;
-        //    SaleLinePOSCouponApply.MODIFY;
-        //  END;
-        //
-        //  EXIT;
-        // END;
         if FindSaleLinePOSCouponApply(SaleLinePOSCoupon, SaleLinePOSCouponApply, SaleLinePOS) then begin
             DiscountAmt := CalcDiscountAmount(SaleLinePOS, SaleLinePOSCoupon);
-            //-NPR5.51 [355406]
             if DiscountAmt > SaleLinePOS."Amount Including VAT" then
                 DiscountAmt := SaleLinePOS."Amount Including VAT";
-            //+NPR5.51 [355406]
 
             if SaleLinePOSCouponApply."Discount Amount" <> DiscountAmt then begin
                 SaleLinePOSCouponApply."Discount Amount" := DiscountAmt;
@@ -61,9 +35,7 @@ codeunit 6151595 "NPR NpDc ModuleApply: Xtr Item"
 
             exit;
         end;
-        //+NPR5.47 [332655]
 
-        //-NPR5.51 [343352]
         if POSSession.IsActiveSession(FrontEndMgt) then begin
             FrontEndMgt.GetSession(POSSession);
             POSSession.GetSaleLine(SaleLineOut);
@@ -74,7 +46,6 @@ codeunit 6151595 "NPR NpDc ModuleApply: Xtr Item"
             POSSession.GetSaleLine(SaleLineOut);
             SaleLineOut.Init(SalePOS."Register No.", SalePOS."Sales Ticket No.", POSSale, POSSetup, FrontEndMgt);
         end;
-        //+NPR5.51 [343352]
 
         LineNo := GetNextLineNo(SaleLinePOSCoupon);
         SaleLinePOS.SetSkipCalcDiscount(true);
@@ -88,21 +59,14 @@ codeunit 6151595 "NPR NpDc ModuleApply: Xtr Item"
         SaleLinePOS.Validate("No.", ExtraCouponItem."Item No.");
         SaleLinePOS.Validate(Quantity, 1);
 
-        //-NPR5.50 [345348]
-        // SaleLinePOS.INSERT(TRUE);
         SaleLineOut.InvokeOnBeforeInsertSaleLineWorkflow(SaleLinePOS);
         SaleLinePOS.Insert(true);
         SaleLineOut.InvokeOnAfterInsertSaleLineWorkflow(SaleLinePOS);
-        //+NPR5.50 [345348]
 
-        //-NPR5.47 [332655]
         DiscountAmt := CalcDiscountAmount(SaleLinePOS, SaleLinePOSCoupon);
-        //+NPR5.47 [332655]
 
-        //-NPR5.51 [355406]
         if DiscountAmt > SaleLinePOS."Amount Including VAT" then
             DiscountAmt := SaleLinePOS."Amount Including VAT";
-        //+NPR5.51 [355406]
 
         SaleLinePOSCouponApply.Init;
         SaleLinePOSCouponApply."Register No." := SaleLinePOS."Register No.";
@@ -118,23 +82,6 @@ codeunit 6151595 "NPR NpDc ModuleApply: Xtr Item"
         SaleLinePOSCouponApply."Coupon No." := SaleLinePOSCoupon."Coupon No.";
         SaleLinePOSCouponApply."Discount Amount" := DiscountAmt;
         SaleLinePOSCouponApply.Insert;
-
-        //-NPR5.50 [345348]
-        // POSSession.IsActiveSession(FrontEndMgt);
-        // FrontEndMgt.GetSession(POSSession);
-        // POSSession.GetSaleLine(SaleLineOut);
-        // //-NPR5.43 [319425]
-        // //-NPR5.42 [310148]
-        // ////SaleLineOut.ResendAllOnAfterInsertPOSSaleLine();
-        // //SaleLineOut.OnAfterInsertPOSSaleLine(SaleLinePOS);
-        // ////+NPR5.42 [310148]
-        // SaleLineOut.InvokeOnBeforeInsertSaleLineWorkflow(SaleLinePOS);
-        // //+NPR5.43 [319425]
-        //+NPR5.50 [345348]
-    end;
-
-    local procedure "--- Calc"()
-    begin
     end;
 
     procedure CalcDiscountAmount(SaleLinePOS: Record "NPR Sale Line POS"; SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon") DiscountAmount: Decimal
@@ -152,12 +99,7 @@ codeunit 6151595 "NPR NpDc ModuleApply: Xtr Item"
                         exit(0);
                     if not FindExtraCouponItem(CouponType, ExtraCouponItem) then
                         exit(0);
-                    //-NPR5.47 [332655]
-                    // IF NOT Item.GET(ExtraCouponItem."Item No.") THEN
-                    //   EXIT(0);
-                    // DiscountAmount := Item."Unit Price" * (Coupon."Discount %" / 100);
                     DiscountAmount := SaleLinePOS."Unit Price" * (Coupon."Discount %" / 100);
-                    //+NPR5.47 [332655]
                     if (Coupon."Max. Discount Amount" > 0) and (DiscountAmount > Coupon."Max. Discount Amount") then
                         DiscountAmount := Coupon."Max. Discount Amount";
                     exit(DiscountAmount);
@@ -169,10 +111,6 @@ codeunit 6151595 "NPR NpDc ModuleApply: Xtr Item"
         end;
 
         exit(0);
-    end;
-
-    local procedure "--- Coupon Interface"()
-    begin
     end;
 
     [EventSubscriber(ObjectType::Table, 6151590, 'OnBeforeDeleteEvent', '', true, true)]
@@ -259,10 +197,6 @@ codeunit 6151595 "NPR NpDc ModuleApply: Xtr Item"
         ApplyDiscount(SaleLinePOSCoupon);
     end;
 
-    local procedure "--- Aux"()
-    begin
-    end;
-
     local procedure CurrCodeunitId(): Integer
     begin
         exit(CODEUNIT::"NPR NpDc ModuleApply: Xtr Item");
@@ -285,15 +219,12 @@ codeunit 6151595 "NPR NpDc ModuleApply: Xtr Item"
         SaleLinePOSCouponApply.SetRange("Applies-to Coupon Line No.", SaleLinePOSCoupon."Line No.");
         SaleLinePOSCouponApply.SetRange("Coupon Type", SaleLinePOSCoupon."Coupon Type");
         SaleLinePOSCouponApply.SetRange("Coupon No.", SaleLinePOSCoupon."Coupon No.");
-        //-NPR5.47 [332655]
-        // EXIT(SaleLinePOSCouponApply.FINDFIRST);
         if not SaleLinePOSCouponApply.FindFirst then
             exit(false);
 
         exit(SaleLinePOS.Get(
           SaleLinePOSCouponApply."Register No.", SaleLinePOSCouponApply."Sales Ticket No.", SaleLinePOSCouponApply."Sale Date",
           SaleLinePOSCouponApply."Sale Type", SaleLinePOSCouponApply."Sale Line No."));
-        //+NPR5.47 [332655]
     end;
 
     local procedure GetNextLineNo(SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon"): Integer

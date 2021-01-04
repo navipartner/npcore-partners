@@ -1,7 +1,5 @@
 page 6151598 "NPR NpDc SaleLinePOS Coupons"
 {
-    // NPR5.34/MHA /20170724  CASE 282799 Object created - NpDc: NaviPartner Discount Coupon
-
     Caption = 'Sale Line POS Coupons';
     Editable = false;
     PageType = List;
@@ -53,10 +51,6 @@ page 6151598 "NPR NpDc SaleLinePOS Coupons"
                 }
             }
         }
-    }
-
-    actions
-    {
     }
 }
 

@@ -1,9 +1,5 @@
 codeunit 6151600 "NPR NpDc Module Issue: OnSale"
 {
-    trigger OnRun()
-    begin
-    end;
-
     var
         Text000: Label 'Issue Coupon - Default';
         Text001: Label 'On-Sale Coupons can only be issued through POS Sale';
@@ -12,8 +8,6 @@ codeunit 6151600 "NPR NpDc Module Issue: OnSale"
         Text004: Label 'Issue Discount Coupons';
         Text005: Label 'Enter Quantity:';
         Text006: Label 'Checks On-Sale Discount Coupons on Sale Line Insert';
-
-    //--- Issue Coupon ---
 
     [EventSubscriber(ObjectType::Codeunit, 6150705, 'OnAfterEndSale', '', true, true)]
     local procedure OnAfterEndSale(SalePOS: Record "NPR Sale POS")
@@ -213,8 +207,6 @@ codeunit 6151600 "NPR NpDc Module Issue: OnSale"
         NpDcSaleLinePOSNewCoupon.DeleteAll;
     end;
 
-    //--- POS Issue ---
-
     local procedure IssueCouponActionCode(): Text
     begin
         exit('ISSUE_COUPON');
@@ -332,8 +324,6 @@ codeunit 6151600 "NPR NpDc Module Issue: OnSale"
         CouponTypeCode := CouponType.Code;
         exit(true);
     end;
-
-    //--- Find ---
 
     local procedure CountCouponQty(SalePOS: Record "NPR Sale POS"; CouponType: Record "NPR NpDc Coupon Type"): Integer
     var
@@ -499,8 +489,6 @@ codeunit 6151600 "NPR NpDc Module Issue: OnSale"
         until SaleLinePOS.Next = 0;
     end;
 
-    //--- Coupon Interface ---
-
     [EventSubscriber(ObjectType::Codeunit, 6151591, 'OnInitCouponModules', '', true, true)]
     local procedure OnInitCouponModules(var CouponModule: Record "NPR NpDc Coupon Module")
     begin
@@ -554,8 +542,6 @@ codeunit 6151600 "NPR NpDc Module Issue: OnSale"
         Error(Text001);
     end;
 
-    //--- Aux ---
-
     local procedure TriggerOnSaleCoupon(SaleLinePOS: Record "NPR Sale Line POS"; var SalePOS: Record "NPR Sale POS"): Boolean
     begin
         if SaleLinePOS.IsTemporary then
@@ -579,10 +565,6 @@ codeunit 6151600 "NPR NpDc Module Issue: OnSale"
     local procedure ModuleCode(): Code[20]
     begin
         exit('ON-SALE');
-    end;
-
-    local procedure "--- OnAfterInsertSaleLine Workflow"()
-    begin
     end;
 
     [EventSubscriber(ObjectType::Table, 6150730, 'OnBeforeInsertEvent', '', true, true)]

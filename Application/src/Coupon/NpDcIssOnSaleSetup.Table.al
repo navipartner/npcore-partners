@@ -1,7 +1,5 @@
 table 6151601 "NPR NpDc Iss.OnSale Setup"
 {
-    // NPR5.36/MHA /20170831  CASE 286812 Object created - Discount Coupon Issue Module
-
     Caption = 'Issue On-Sale Setup';
     DataClassification = CustomerContent;
 
@@ -47,10 +45,6 @@ table 6151601 "NPR NpDc Iss.OnSale Setup"
         key(Key1; "Coupon Type")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 

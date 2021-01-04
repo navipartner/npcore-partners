@@ -1,10 +1,5 @@
 page 6151597 "NPR NpDc Coupon List Items"
 {
-    // NPR5.34/MHA /20170724  CASE 282799 Object created - NpDc: NaviPartner Discount Coupon
-    // NPR5.36/MHA /20170921  CASE 291016 Added Actions; Add Items, Set Priorities
-    // NPR5.45/MHA /20180820  CASE 312991 Added field 25 "Max. Quantity"
-    // NPR5.46/MHA /20180925  CASE 327366 Added ValidationView
-
     AutoSplitKey = true;
     Caption = 'Coupon List Items';
     DelayedInsert = true;

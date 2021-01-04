@@ -1,7 +1,5 @@
 xmlport 6151590 "NPR NpDc Ext. Coupon Appl."
 {
-    // NPR5.51/MHA /20190724  CASE 343352 Object created
-
     Caption = 'NpDc Coupon Application';
     DefaultNamespace = 'urn:microsoft-dynamics-nav/xmlports/discount_coupon';
     Encoding = UTF8;
@@ -200,18 +198,6 @@ xmlport 6151590 "NPR NpDc Ext. Coupon Appl."
                     currXMLport.Break;
                 end;
             }
-        }
-    }
-
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
         }
     }
 

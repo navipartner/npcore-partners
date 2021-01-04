@@ -1,8 +1,5 @@
 page 6151599 "NPR NpDc Arch. Coupons"
 {
-    // NPR5.34/MHA /20170720  CASE 282799 Object created - NpDc: NaviPartner Discount Coupon
-    // NPR5.37/MHA /20171012  CASE 293232 Object renamed from "NpDc Posted Coupons" to "NpDc Arch. Coupons"
-
     Caption = 'Archived Coupons';
     CardPageID = "NPR NpDc Arch. Coupon Card";
     Editable = false;
