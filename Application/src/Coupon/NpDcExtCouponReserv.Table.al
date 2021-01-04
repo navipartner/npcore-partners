@@ -1,7 +1,5 @@
 table 6151605 "NPR NpDc Ext. Coupon Reserv."
 {
-    // NPR5.51/MHA /20190724  CASE 343352 Object Created
-
     Caption = 'NpDc Ext. Coupon Reservation';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR NpDc Ext. Coupon Reserv.";
@@ -69,10 +67,6 @@ table 6151605 "NPR NpDc Ext. Coupon Reserv."
         key(Key2; "Document Type", "Document No.")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 
     trigger OnInsert()

@@ -1,7 +1,5 @@
 page 6151596 "NPR NpDc Extra Coupon Item"
 {
-    // NPR5.34/MHA /20170724  CASE 282799 Object created - NpDc: NaviPartner Discount Coupon
-
     AutoSplitKey = true;
     Caption = 'Extra Coupon Item';
     PageType = Card;
@@ -69,10 +67,6 @@ page 6151596 "NPR NpDc Extra Coupon Item"
                 }
             }
         }
-    }
-
-    actions
-    {
     }
 }
 

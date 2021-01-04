@@ -1,9 +1,5 @@
 codeunit 6151602 "NPR NpDc Non-POS Coupon WS"
 {
-    trigger OnRun()
-    begin
-    end;
-
     procedure ApplyCouponDiscount(var coupon_application: XMLport "NPR NpDc Ext. Coupon Appl.")
     var
         TempSalePOS: Record "NPR Sale POS" temporary;

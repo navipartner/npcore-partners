@@ -1,12 +1,5 @@
 table 6151590 "NPR NpDc Coupon Type"
 {
-    // NPR5.34/MHA /20170720  CASE 282799 Object created - NpDc: NaviPartner Discount Coupon
-    // NPR5.37/MHA /20171012  CASE 293232 Deleted field 1010 "Coupon Qty. (Closed)" and renamed field 1020 "Posted Coupon Qty." to "Arch. Coupon Qty."
-    // NPR5.39/MHA /20180214  CASE 305146 Added field 70 "Enabled"
-    // NPR5.42/MHA /20180521  CASE 305859 Added field 67 Print on Issue
-    // NPR5.51/MHA /20190724  CASE 343352 Added cleanup of External Coupon Sales Lines in OnDelete()
-    // NPR5.55/ALPO/20200518  CASE 387376 Possibility to define sequence in which discount coupons are applied
-
     Caption = 'Coupon Type';
     DataClassification = CustomerContent;
     DataCaptionFields = "Code", Description;
@@ -142,7 +135,7 @@ table 6151590 "NPR NpDc Coupon Type"
         }
         field(1000; "Coupon Qty. (Open)"; Integer)
         {
-            CalcFormula = Count ("NPR NpDc Coupon" WHERE("Coupon Type" = FIELD(Code),
+            CalcFormula = Count("NPR NpDc Coupon" WHERE("Coupon Type" = FIELD(Code),
                                                      Open = CONST(true)));
             Caption = 'Coupon Qty. (Open)';
             Editable = false;
@@ -150,7 +143,7 @@ table 6151590 "NPR NpDc Coupon Type"
         }
         field(1020; "Arch. Coupon Qty."; Integer)
         {
-            CalcFormula = Count ("NPR NpDc Arch. Coupon" WHERE("Coupon Type" = FIELD(Code)));
+            CalcFormula = Count("NPR NpDc Arch. Coupon" WHERE("Coupon Type" = FIELD(Code)));
             Caption = 'Arch. Coupon Qty.';
             Description = 'NPR5.37';
             Editable = false;
@@ -192,11 +185,9 @@ table 6151590 "NPR NpDc Coupon Type"
         SaleLinePOSCoupon.SetRange("Coupon Type", Code);
         SaleLinePOSCoupon.DeleteAll;
 
-        //-NPR5.51 [343352]
         NpDcExtCouponSalesLine.SetRange("Coupon Type", Code);
         if NpDcExtCouponSalesLine.FindFirst then
             NpDcExtCouponSalesLine.DeleteAll;
-        //+NPR5.51 [343352]
     end;
 
     trigger OnInsert()

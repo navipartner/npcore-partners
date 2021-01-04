@@ -1,16 +1,5 @@
 codeunit 6151601 "NPR NpDc Apply: Extra ItemQty."
 {
-    // NPR5.47/MHA /20181026  CASE 332655 Object created - gives Extra Item per Item List Validation Qty.
-    // NPR5.50/TSA /20190507  CASE 345348 Added triggers for OnBeforeDeletePOSSaleLine, OnAfterDeletePOSSaleLine, OnBeforeSetQuantity, OnAfterSetQuantity, InvokeOnAfterInsertSaleLineWorkflow() trigger for the added item
-    // NPR5.51/MHA /20190724  CASE 343352 Added initiation of POSSession without GUI in ApplyDiscount()
-    // NPR5.51/MHA /20190725  CASE 355406 Applied Discount Amount cannot be more than 100%
-    // NPR5.53/MHA /20200120  CASE 384640 Check on Applied Discount Amount more than 100% should compare with future Qty.
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         Text000: Label 'Extra Coupon Item has not been defined for Coupon %1 (%2)';
         Text001: Label 'Extra Item per Validation Qty.';
@@ -31,7 +20,6 @@ codeunit 6151601 "NPR NpDc Apply: Extra ItemQty."
         DiscountAmt: Decimal;
         ExtraItemQty: Decimal;
     begin
-        //-NPR5.51 [343352]
         if POSSession.IsActiveSession(FrontEndMgt) then begin
             FrontEndMgt.GetSession(POSSession);
             POSSession.GetSaleLine(SaleLineOut);
@@ -42,7 +30,6 @@ codeunit 6151601 "NPR NpDc Apply: Extra ItemQty."
             POSSession.GetSaleLine(SaleLineOut);
             SaleLineOut.Init(SalePOS."Register No.", SalePOS."Sales Ticket No.", POSSale, POSSetup, FrontEndMgt);
         end;
-        //+NPR5.51 [343352]
 
         CouponType.Get(SaleLinePOSCoupon."Coupon Type");
         if not FindExtraCouponItem(CouponType, ExtraCouponItem) then
@@ -52,32 +39,24 @@ codeunit 6151601 "NPR NpDc Apply: Extra ItemQty."
         if FindSaleLinePOSCouponApply(SaleLinePOSCoupon, SaleLinePOSCouponApply, SaleLinePOS) then begin
             if ExtraItemQty <= 0 then begin
                 SaleLinePOSCouponApply.Delete;
-                //-NPR5.50 [345348]
-                // SaleLinePOS.DELETE;
                 SaleLineOut.OnBeforeDeletePOSSaleLine(SaleLinePOS);
                 SaleLinePOS.Delete;
                 SaleLineOut.OnAfterDeletePOSSaleLine(SaleLinePOS);
-                //-NPR5.50 [345348]
                 exit;
             end;
 
             DiscountAmt := CalcDiscountAmount(SaleLinePOS, SaleLinePOSCoupon, ExtraItemQty);
-            //-NPR5.53 [384640]
             if DiscountAmt > SaleLinePOS."Unit Price" * ExtraItemQty then
                 DiscountAmt := SaleLinePOS."Unit Price" * ExtraItemQty;
-            //+NPR5.53 [384640]
 
             if SaleLinePOSCouponApply."Discount Amount" <> DiscountAmt then begin
                 SaleLinePOSCouponApply."Discount Amount" := DiscountAmt;
                 SaleLinePOSCouponApply.Modify;
             end;
             if SaleLinePOS.Quantity <> ExtraItemQty then begin
-                //-NPR5.50 [345348]
-                //SaleLinePOS.VALIDATE(Quantity,ExtraItemQty);
                 SaleLineOut.OnBeforeSetQuantity(SaleLinePOS, ExtraItemQty);
                 SaleLinePOS.Validate(Quantity, ExtraItemQty);
                 SaleLineOut.OnAfterSetQuantity(SaleLinePOS);
-                //+NPR5.50 [345348]
 
                 SaleLinePOS.UpdateAmounts(SaleLinePOS);
                 SaleLinePOS.Modify;
@@ -101,18 +80,13 @@ codeunit 6151601 "NPR NpDc Apply: Extra ItemQty."
         SaleLinePOS.Validate("No.", ExtraCouponItem."Item No.");
         SaleLinePOS.Validate(Quantity, ExtraItemQty);
 
-        //-NPR5.50 [345348]
-        // SaleLinePOS.INSERT(TRUE);
         SaleLineOut.InvokeOnBeforeInsertSaleLineWorkflow(SaleLinePOS);
         SaleLinePOS.Insert(true);
         SaleLineOut.InvokeOnAfterInsertSaleLineWorkflow(SaleLinePOS);
-        //+NPR5.50 [345348]
 
         DiscountAmt := CalcDiscountAmount(SaleLinePOS, SaleLinePOSCoupon, ExtraItemQty);
-        //-NPR5.51 [355433]
         if DiscountAmt > SaleLinePOS."Amount Including VAT" then
             DiscountAmt := SaleLinePOS."Amount Including VAT";
-        //+NPR5.51 [355433]
 
         SaleLinePOSCouponApply.Init;
         SaleLinePOSCouponApply."Register No." := SaleLinePOS."Register No.";
@@ -128,17 +102,6 @@ codeunit 6151601 "NPR NpDc Apply: Extra ItemQty."
         SaleLinePOSCouponApply."Coupon No." := SaleLinePOSCoupon."Coupon No.";
         SaleLinePOSCouponApply."Discount Amount" := DiscountAmt;
         SaleLinePOSCouponApply.Insert;
-
-        //-NPR5.50 [345348]
-        // POSSession.IsActiveSession(FrontEndMgt);
-        // FrontEndMgt.GetSession(POSSession);
-        // POSSession.GetSaleLine(SaleLineOut);
-        // SaleLineOut.InvokeOnBeforeInsertSaleLineWorkflow(SaleLinePOS);
-        //+NPR5.50 [345348]
-    end;
-
-    local procedure "--- Calc"()
-    begin
     end;
 
     procedure CalcDiscountAmount(SaleLinePOS: Record "NPR Sale Line POS"; SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon"; ExtraItemQty: Decimal) DiscountAmount: Decimal
@@ -275,10 +238,6 @@ codeunit 6151601 "NPR NpDc Apply: Extra ItemQty."
         exit(NpDcCouponListItem.FindFirst);
     end;
 
-    local procedure "--- Coupon Interface"()
-    begin
-    end;
-
     [EventSubscriber(ObjectType::Table, 6151590, 'OnBeforeDeleteEvent', '', true, true)]
     local procedure OnBeforeDeleteCouponType(var Rec: Record "NPR NpDc Coupon Type"; RunTrigger: Boolean)
     var
@@ -361,10 +320,6 @@ codeunit 6151601 "NPR NpDc Apply: Extra ItemQty."
         Handled := true;
 
         ApplyDiscount(SaleLinePOSCoupon);
-    end;
-
-    local procedure "--- Aux"()
-    begin
     end;
 
     local procedure CurrCodeunitId(): Integer

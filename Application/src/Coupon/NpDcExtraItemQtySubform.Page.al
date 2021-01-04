@@ -1,7 +1,5 @@
 page 6151607 "NPR NpDc ExtraItemQty. Subform"
 {
-    // NPR5.47/MHA /20181026  CASE 332655 Object created
-
     AutoSplitKey = true;
     Caption = 'Coupon List Items';
     DelayedInsert = true;

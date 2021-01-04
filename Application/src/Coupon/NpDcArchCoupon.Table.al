@@ -1,9 +1,5 @@
 table 6151597 "NPR NpDc Arch. Coupon"
 {
-    // NPR5.34/MHA /20170720  CASE 282799 Object created - NpDc: NaviPartner Discount Coupon
-    // NPR5.37/MHA /20171012  CASE 293232 Object renamed from "NpDc Posted Coupon" to "NpDc Arch. Coupon"
-    // NPR5.51/MHA /20190724  CASE 343352 Removed field 80 "In-use Quantity"
-
     Caption = 'Archived Coupon';
     DataClassification = CustomerContent;
     DataCaptionFields = "No.", "Coupon Type", Description;
@@ -97,14 +93,14 @@ table 6151597 "NPR NpDc Arch. Coupon"
         }
         field(70; Open; Boolean)
         {
-            CalcFormula = Max ("NPR NpDc Arch.Coupon Entry".Open WHERE("Arch. Coupon No." = FIELD("No.")));
+            CalcFormula = Max("NPR NpDc Arch.Coupon Entry".Open WHERE("Arch. Coupon No." = FIELD("No.")));
             Caption = 'Open';
             Editable = false;
             FieldClass = FlowField;
         }
         field(75; "Remaining Quantity"; Decimal)
         {
-            CalcFormula = Sum ("NPR NpDc Arch.Coupon Entry"."Remaining Quantity" WHERE("Arch. Coupon No." = FIELD("No.")));
+            CalcFormula = Sum("NPR NpDc Arch.Coupon Entry"."Remaining Quantity" WHERE("Arch. Coupon No." = FIELD("No.")));
             Caption = 'Remaining Quantity';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -112,21 +108,21 @@ table 6151597 "NPR NpDc Arch. Coupon"
         }
         field(100; "Issue Coupon Module"; Code[20])
         {
-            CalcFormula = Lookup ("NPR NpDc Coupon Type"."Issue Coupon Module" WHERE(Code = FIELD("Coupon Type")));
+            CalcFormula = Lookup("NPR NpDc Coupon Type"."Issue Coupon Module" WHERE(Code = FIELD("Coupon Type")));
             Caption = 'Issue Coupon Module';
             Editable = false;
             FieldClass = FlowField;
         }
         field(110; "Validate Coupon Module"; Code[20])
         {
-            CalcFormula = Lookup ("NPR NpDc Coupon Type"."Validate Coupon Module" WHERE(Code = FIELD("Coupon Type")));
+            CalcFormula = Lookup("NPR NpDc Coupon Type"."Validate Coupon Module" WHERE(Code = FIELD("Coupon Type")));
             Caption = 'Validate Coupon Module';
             Editable = false;
             FieldClass = FlowField;
         }
         field(120; "Apply Discount Module"; Code[20])
         {
-            CalcFormula = Lookup ("NPR NpDc Coupon Type"."Apply Discount Module" WHERE(Code = FIELD("Coupon Type")));
+            CalcFormula = Lookup("NPR NpDc Coupon Type"."Apply Discount Module" WHERE(Code = FIELD("Coupon Type")));
             Caption = 'Apply Discount Module';
             Editable = false;
             FieldClass = FlowField;
