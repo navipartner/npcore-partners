@@ -9,6 +9,7 @@ pageextension 6014424 "NPR General Ledger Entries" extends "General Ledger Entri
             {
                 ApplicationArea = All;
                 Visible = false;
+                ToolTip = 'Specifies the value of the VAT Bus. Posting Group field';
             }
         }
     }

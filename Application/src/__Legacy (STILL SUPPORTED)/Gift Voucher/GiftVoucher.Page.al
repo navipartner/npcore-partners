@@ -28,71 +28,85 @@ page 6014419 "NPR Gift Voucher"
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the No. field';
                 }
                 field(Name; Name)
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Name field';
                 }
                 field(Address; Address)
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Address field';
                 }
                 field("ZIP Code"; "ZIP Code")
                 {
                     ApplicationArea = All;
                     Caption = 'Post Code/City';
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Post Code/City field';
                 }
                 field(City; City)
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the City field';
                 }
                 field(Amount; Amount)
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Amount field';
                 }
                 field("No. Printed"; "No. Printed")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the No. Printed field';
                 }
                 field("Shortcut Dimension 1 Code"; "Shortcut Dimension 1 Code")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Shortcut Dimension 1 Code field';
                 }
                 field("Shortcut Dimension 2 Code"; "Shortcut Dimension 2 Code")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Shortcut Dimension 2 Code field';
                 }
                 field("Register No."; "Register No.")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Cash Register No. field';
                 }
                 field("Sales Ticket No."; "Sales Ticket No.")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Sales Ticket No. field';
                 }
                 field("Salesperson Code"; "Salesperson Code")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Salesperson Code field';
                 }
                 field("Issue Date"; "Issue Date")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Issue Date field';
                 }
                 field(Status; Status)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Status field';
 
                     trigger OnValidate()
                     begin
@@ -105,11 +119,13 @@ page 6014419 "NPR Gift Voucher"
                 field(Blocked; Blocked)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Blocked field';
                 }
                 field("FORMAT(""Gift Voucher Message"".HASVALUE)"; Format("Gift Voucher Message".HasValue))
                 {
                     ApplicationArea = All;
                     Caption = 'Message';
+                    ToolTip = 'Specifies the value of the Message field';
 
                     trigger OnAssistEdit()
                     var
@@ -135,61 +151,74 @@ page 6014419 "NPR Gift Voucher"
                 {
                     ApplicationArea = All;
                     Importance = Promoted;
+                    ToolTip = 'Specifies the value of the Cashed on Cash Register No. field';
                 }
                 field("Cashed on Sales Ticket No."; "Cashed on Sales Ticket No.")
                 {
                     ApplicationArea = All;
                     Importance = Promoted;
+                    ToolTip = 'Specifies the value of the Cashed on Sales Ticket No. field';
                 }
                 field("Cashed Date"; "Cashed Date")
                 {
                     ApplicationArea = All;
                     Importance = Promoted;
+                    ToolTip = 'Specifies the value of the Cashed Date field';
                 }
                 field("Cashed Salesperson"; "Cashed Salesperson")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Cashed Salesperson field';
                 }
                 field("Cashed in Global Dim 1 Code"; "Cashed in Global Dim 1 Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Cashed in Department Code field';
                 }
                 field("Cashed in Global Dim 2 Code"; "Cashed in Global Dim 2 Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Cashed in Department Code field';
                 }
                 field("Cashed in Location Code"; "Cashed in Location Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Cashed in Location Code field';
                 }
                 field(Invoiced; Invoiced)
                 {
                     ApplicationArea = All;
                     Caption = 'Invoiced';
+                    ToolTip = 'Specifies the value of the Invoiced field';
                 }
                 field("Invoiced by Document Type"; "Invoiced by Document Type")
                 {
                     ApplicationArea = All;
                     Caption = 'Inv. on doc. type';
+                    ToolTip = 'Specifies the value of the Inv. on doc. type field';
                 }
                 field("Invoiced by Document No."; "Invoiced by Document No.")
                 {
                     ApplicationArea = All;
                     Caption = 'Inv. on doc. no.';
+                    ToolTip = 'Specifies the value of the Inv. on doc. no. field';
                 }
                 field("Customer No."; "Customer No.")
                 {
                     ApplicationArea = All;
                     Caption = 'Customer no.';
                     LookupPageID = "Customer List";
+                    ToolTip = 'Specifies the value of the Customer no. field';
                 }
                 field(Reference; Reference)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Reference field';
                 }
                 field("Cashed External"; "Cashed External")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Cashed External field';
                 }
             }
             group(Magento)
@@ -199,26 +228,31 @@ page 6014419 "NPR Gift Voucher"
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the External Credit Voucher No. field';
                 }
                 field("External Reference No."; "External Reference No.")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the External Reference No. field';
                 }
                 field("Expire Date"; "Expire Date")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Expire Date field';
                 }
                 field("Currency Code"; "Currency Code")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Currency Code field';
                 }
                 field("Sales Order No."; "Sales Order No.")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Sales Order No. field';
                 }
             }
         }
@@ -236,6 +270,7 @@ page 6014419 "NPR Gift Voucher"
                     Caption = 'Cashed';
                     Image = "Action";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Cashed action';
 
                     trigger OnAction()
                     begin
@@ -247,6 +282,7 @@ page 6014419 "NPR Gift Voucher"
                     Caption = 'Create Invoice';
                     Image = AddAction;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Create Invoice action';
 
                     trigger OnAction()
                     begin
@@ -262,6 +298,7 @@ page 6014419 "NPR Gift Voucher"
                     Caption = 'Issued';
                     Image = Addresses;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Issued action';
 
                     trigger OnAction()
                     begin
@@ -273,6 +310,7 @@ page 6014419 "NPR Gift Voucher"
                     Caption = 'Cashed';
                     Image = Bank;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Cashed action';
 
                     trigger OnAction()
                     begin
@@ -289,6 +327,7 @@ page 6014419 "NPR Gift Voucher"
                     Image = PrintVoucher;
                     Promoted = true;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Copy action';
 
                     trigger OnAction()
                     var
@@ -306,6 +345,7 @@ page 6014419 "NPR Gift Voucher"
                     Caption = 'Send as PDF';
                     Image = SendEmailPDF;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Send as PDF action';
 
                     trigger OnAction()
                     var

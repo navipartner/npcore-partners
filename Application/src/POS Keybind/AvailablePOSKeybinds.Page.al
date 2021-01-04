@@ -17,6 +17,7 @@ page 6150737 "NPR Available POS Keybinds"
                 field("Key Name"; "Key Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Key Name field';
                 }
             }
         }

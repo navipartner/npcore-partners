@@ -16,6 +16,7 @@ page 6059953 "NPR Disp. Content Lines Img"
             field(Image; Image)
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the Image field';
             }
         }
     }

@@ -16,10 +16,12 @@ page 6151086 "NPR RIS Retail Inv. Set Card"
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
             }
             part(Control6014404; "NPR RIS Retail Inv. Set Sub.")
@@ -42,6 +44,7 @@ page 6151086 "NPR RIS Retail Inv. Set Card"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Test Retail Inventory action';
 
                 trigger OnAction()
                 var

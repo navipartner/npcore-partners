@@ -17,19 +17,23 @@ page 6184510 "NPR EFT BIN Range SubPage"
                 field("BIN from"; "BIN from")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the BIN from field';
                 }
                 field("BIN to"; "BIN to")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the BIN to field';
                 }
                 field("BIN Group Code"; "BIN Group Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the BIN Group Code field';
                 }
                 field("BIN Group Priority"; "BIN Group Priority")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the BIN Group Priority field';
                 }
             }
         }

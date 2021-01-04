@@ -162,6 +162,7 @@ report 6014429 "NPR Posting Overview Audit"
                 {
                     Caption = 'Include Dankort';
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Include Dankort field';
                 }
             }
         }

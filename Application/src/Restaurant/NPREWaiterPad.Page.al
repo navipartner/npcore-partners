@@ -26,36 +26,43 @@ page 6150660 "NPR NPRE Waiter Pad"
                     ApplicationArea = All;
                     Caption = 'Opened';
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Opened field';
                 }
                 field("Current Seating FF"; "Current Seating FF")
                 {
                     ApplicationArea = All;
                     Caption = 'Seating';
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Seating field';
                 }
                 field("Current Seating Description"; "Current Seating Description")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Seating Description field';
                 }
                 field("Number of Guests"; "Number of Guests")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Number of Guests field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field(Status; Status)
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Status field';
                 }
                 field("Status Description FF"; "Status Description FF")
                 {
                     ApplicationArea = All;
                     Caption = 'Waiter Pad Status';
                     DrillDown = false;
+                    ToolTip = 'Specifies the value of the Waiter Pad Status field';
 
                     trigger OnAssistEdit()
                     var
@@ -75,12 +82,14 @@ page 6150660 "NPR NPRE Waiter Pad"
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Serving Step Code field';
                 }
                 field("Serving Step Description"; "Serving Step Description")
                 {
                     ApplicationArea = All;
                     Caption = 'Serving Step';
                     DrillDown = false;
+                    ToolTip = 'Specifies the value of the Serving Step field';
 
                     trigger OnAssistEdit()
                     var
@@ -100,6 +109,7 @@ page 6150660 "NPR NPRE Waiter Pad"
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Pre-receipt Printed field';
                 }
             }
             part(WaiterPadLinesSubpage; "NPR NPRE Waiter Pad Subform")
@@ -116,16 +126,19 @@ page 6150660 "NPR NPRE Waiter Pad"
                 {
                     ApplicationArea = All;
                     Importance = Promoted;
+                    ToolTip = 'Specifies the value of the Closed field';
                 }
                 field("Close Date"; "Close Date")
                 {
                     ApplicationArea = All;
                     Importance = Promoted;
+                    ToolTip = 'Specifies the value of the Close Date field';
                 }
                 field("Close Time"; "Close Time")
                 {
                     ApplicationArea = All;
                     Importance = Promoted;
+                    ToolTip = 'Specifies the value of the Close Time field';
                 }
             }
         }
@@ -224,6 +237,7 @@ page 6150660 "NPR NPRE Waiter Pad"
                     PromotedCategory = "Report";
                     PromotedIsBig = true;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Print Pre Receipt action';
 
                     trigger OnAction()
                     begin
@@ -245,6 +259,7 @@ page 6150660 "NPR NPRE Waiter Pad"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Move seating action';
 
                     trigger OnAction()
                     begin
@@ -259,6 +274,7 @@ page 6150660 "NPR NPRE Waiter Pad"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Merge waiter pad action';
 
                     trigger OnAction()
                     var

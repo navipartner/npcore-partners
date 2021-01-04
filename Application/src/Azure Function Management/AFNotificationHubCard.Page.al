@@ -19,62 +19,77 @@ page 6151574 "NPR AF Notification Hub Card"
                 field(Id; Id)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Id field';
                 }
                 field(Title; Title)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Title field';
                 }
                 field(Body; Body)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Body field';
                 }
                 field(Platform; Platform)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Platform field';
                 }
                 field("Notification Color"; "Notification Color")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Notification Color field';
                 }
                 field("From Register No."; "From Register No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the From Register No. field';
                 }
                 field("To Register No."; "To Register No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the To Register No. field';
                 }
                 field("Action Type"; "Action Type")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Action Type field';
                 }
                 field("Action Value"; "Action Value")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Action Value field';
                 }
                 field(Created; Created)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Created field';
                 }
                 field("Created By"; "Created By")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Created By field';
                 }
                 field("Notification Delivered to Hub"; "Notification Delivered to Hub")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Notification Delivered to Hub field';
                 }
                 field(Handled; Handled)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Handled field';
                 }
                 field("Handled By"; "Handled By")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Handled By field';
                 }
                 field("Handled Register"; "Handled Register")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Handled Register field';
                 }
             }
             group(Data)
@@ -86,6 +101,7 @@ page 6151574 "NPR AF Notification Hub Card"
                     Caption = 'Request';
                     Editable = false;
                     MultiLine = true;
+                    ToolTip = 'Specifies the value of the Request field';
                 }
                 field(Response; ResponseData)
                 {
@@ -93,6 +109,7 @@ page 6151574 "NPR AF Notification Hub Card"
                     Caption = 'Response';
                     Editable = false;
                     MultiLine = true;
+                    ToolTip = 'Specifies the value of the Response field';
                 }
             }
         }
@@ -110,6 +127,7 @@ page 6151574 "NPR AF Notification Hub Card"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Re-Send Messages action';
 
                 trigger OnAction()
                 var

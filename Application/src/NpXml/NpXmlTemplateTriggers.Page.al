@@ -26,44 +26,53 @@ page 6151558 "NPR NpXml Template Triggers"
                     ApplicationArea = All;
                     Style = Attention;
                     StyleExpr = HasNoLinks;
+                    ToolTip = 'Specifies the value of the Table No. field';
                 }
                 field("Table Name"; "Table Name")
                 {
                     ApplicationArea = All;
                     Style = Attention;
                     StyleExpr = HasNoLinks;
+                    ToolTip = 'Specifies the value of the Table Name field';
                 }
                 field("Insert Trigger"; "Insert Trigger")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Insert Trigger field';
                 }
                 field("Modify Trigger"; "Modify Trigger")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Modify Trigger field';
                 }
                 field("Delete Trigger"; "Delete Trigger")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Delete Trigger field';
                 }
                 field(Comment; Comment)
                 {
                     ApplicationArea = All;
                     Style = Attention;
                     StyleExpr = HasNoLinks;
+                    ToolTip = 'Specifies the value of the Comment field';
                 }
                 field("Generic Parent Function"; "Generic Parent Function")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Generic Parent Function field';
                 }
                 field("Generic Parent Codeunit ID"; "Generic Parent Codeunit ID")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Generic Parent Codeunit ID field';
                 }
                 field("Generic Parent Codeunit Name"; "Generic Parent Codeunit Name")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Generic Parent Codeunit Name field';
                 }
             }
         }
@@ -78,6 +87,7 @@ page 6151558 "NPR NpXml Template Triggers"
                 Caption = 'Trigger Links';
                 Image = Links;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Trigger Links action';
 
                 trigger OnAction()
                 var
@@ -93,6 +103,7 @@ page 6151558 "NPR NpXml Template Triggers"
                 Caption = 'Move Up';
                 Image = MoveUp;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Move Up action';
 
                 trigger OnAction()
                 begin
@@ -106,6 +117,7 @@ page 6151558 "NPR NpXml Template Triggers"
                 Caption = 'Move Down';
                 Image = MoveDown;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Move Down action';
 
                 trigger OnAction()
                 begin
@@ -122,6 +134,7 @@ page 6151558 "NPR NpXml Template Triggers"
                     Caption = 'Decrement Level';
                     Image = PreviousRecord;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Decrement Level action';
 
                     trigger OnAction()
                     begin
@@ -133,6 +146,7 @@ page 6151558 "NPR NpXml Template Triggers"
                     Caption = 'Increment Level';
                     Image = NextRecord;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Increment Level action';
 
                     trigger OnAction()
                     begin

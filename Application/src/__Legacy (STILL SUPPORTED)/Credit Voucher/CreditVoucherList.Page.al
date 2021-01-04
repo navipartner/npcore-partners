@@ -29,82 +29,102 @@ page 6014430 "NPR Credit Voucher List"
                 field("No."; "No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the No. field';
                 }
                 field(Name; Name)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Name field';
                 }
                 field("Register No."; "Register No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Cash Register No. field';
                 }
                 field("Sales Ticket No."; "Sales Ticket No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Sales Ticket No. field';
                 }
                 field("Issue Date"; "Issue Date")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Issue Date field';
                 }
                 field("Issuing POS Entry No"; "Issuing POS Entry No")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Issuing POS Entry No field';
                 }
                 field("Issuing POS Sale Line No."; "Issuing POS Sale Line No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Issuing POS Sale Line No. field';
                 }
                 field("Issuing POS Unit No."; "Issuing POS Unit No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Issuing POS Unit No. field';
                 }
                 field("Salesperson Code"; "Salesperson Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Salesperson Code field';
                 }
                 field("Location Code"; "Location Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Location Code field';
                 }
                 field(Amount; Amount)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Amount field';
                 }
                 field(Status; Status)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Status field';
                 }
                 field("Cashed Date"; "Cashed Date")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Cashed Date field';
                 }
                 field("Cashed on Sales Ticket No."; "Cashed on Sales Ticket No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Cashed on Sales Ticket No. field';
                 }
                 field("Cashed Salesperson"; "Cashed Salesperson")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Cashed Salesperson field';
                 }
                 field("Cashed POS Entry No."; "Cashed POS Entry No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Cashed POS Entry No. field';
                 }
                 field("Cashed POS Payment Line No."; "Cashed POS Payment Line No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Cashed POS Payment Line No. field';
                 }
                 field("Cashed POS Unit No."; "Cashed POS Unit No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Cashed POS Unit No. field';
                 }
                 field(Reference; Reference)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Reference field';
                 }
                 field("External Credit Voucher"; "External Credit Voucher")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the External Gift Voucher field';
                 }
             }
             grid(Control6150629)
@@ -113,6 +133,7 @@ page 6014430 "NPR Credit Voucher List"
                 field("find"; FindNo)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the FindNo field';
 
                     trigger OnValidate()
                     begin
@@ -132,6 +153,7 @@ page 6014430 "NPR Credit Voucher List"
                 Caption = 'Cash In';
                 Image = CashFlow;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Cash In action';
 
                 trigger OnAction()
                 begin
@@ -149,6 +171,7 @@ page 6014430 "NPR Credit Voucher List"
                     PromotedCategory = "Report";
                     PromotedIsBig = true;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Copy action';
 
                     trigger OnAction()
                     var
@@ -172,6 +195,7 @@ page 6014430 "NPR Credit Voucher List"
                 Caption = 'Credit Voucher A5';
                 Image = "Report";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Credit Voucher A5 action';
 
                 trigger OnAction()
                 begin
@@ -186,12 +210,14 @@ page 6014430 "NPR Credit Voucher List"
                 Image = "Report";
                 RunObject = Report "NPR Magento Credit Voucher";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Magento Credit Voucher action';
             }
             action("Gift Voucher/Credit Voucher")
             {
                 Caption = 'Gift Voucher/Credit Voucher';
                 Image = "Report";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Gift Voucher/Credit Voucher action';
 
                 trigger OnAction()
                 begin

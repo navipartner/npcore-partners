@@ -14,22 +14,27 @@ page 6151602 "NPR NpDc Coupon Setup"
                 field("Coupon No. Series"; "Coupon No. Series")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Coupon No. Series field';
                 }
                 field("Arch. Coupon No. Series"; "Arch. Coupon No. Series")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Posted Coupon No. Series field';
                 }
                 field("Reference No. Pattern"; "Reference No. Pattern")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Reference No. Pattern field';
                 }
                 field("Print Template Code"; "Print Template Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Print Template Code field';
                 }
                 field("Print on Issue"; "Print on Issue")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Print on Issue field';
                 }
             }
         }
@@ -44,6 +49,7 @@ page 6151602 "NPR NpDc Coupon Setup"
                 Caption = 'How-to Videos';
                 Image = UserInterface;
                 ApplicationArea = All;
+                ToolTip = 'Executes the How-to Videos action';
 
                 trigger OnAction()
                 var

@@ -48,6 +48,7 @@ page 6184480 "NPR EFT POSUnit Param. Setup"
                     Caption = 'Register PoS';
                     Image = Add;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Register PoS action';
 
                     trigger OnAction()
                     var
@@ -61,6 +62,7 @@ page 6184480 "NPR EFT POSUnit Param. Setup"
                     Caption = 'Update PoS Description';
                     Image = UpdateDescription;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Update PoS Description action';
 
                     trigger OnAction()
                     var
@@ -74,6 +76,7 @@ page 6184480 "NPR EFT POSUnit Param. Setup"
                     Caption = 'Unregister PoS';
                     Image = UnApply;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Unregister PoS action';
 
                     trigger OnAction()
                     var
@@ -87,6 +90,7 @@ page 6184480 "NPR EFT POSUnit Param. Setup"
                     Caption = 'Assign PoS Unit';
                     Image = AddAction;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Assign PoS Unit action';
 
                     trigger OnAction()
                     var
@@ -100,6 +104,7 @@ page 6184480 "NPR EFT POSUnit Param. Setup"
                     Caption = 'Unassign PoS Unit';
                     Image = Cancel;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Unassign PoS Unit action';
 
                     trigger OnAction()
                     var
@@ -113,6 +118,7 @@ page 6184480 "NPR EFT POSUnit Param. Setup"
                     Caption = 'Scan PoS Unit';
                     Image = MiniForm;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Scan PoS Unit action';
 
                     trigger OnAction()
                     var

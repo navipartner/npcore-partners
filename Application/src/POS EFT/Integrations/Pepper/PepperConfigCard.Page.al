@@ -22,22 +22,27 @@ page 6184490 "NPR Pepper Config. Card"
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field(Version; Version)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Version field';
                 }
                 field("Recovery Retry Attempts"; "Recovery Retry Attempts")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Recovery Retry Attempts field';
                 }
                 field(Mode; Mode)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Mode field';
 
                     trigger OnValidate()
                     begin
@@ -47,44 +52,54 @@ page 6184490 "NPR Pepper Config. Card"
                 field("Header and Footer Handling"; "Header and Footer Handling")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Header and Footer Handling field';
                 }
                 field(License; HasLicense)
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the HasLicense field';
                 }
                 field("Additional Parameters"; HasAdditionalParameters)
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the HasAdditionalParameters field';
                 }
                 field("Default POS Timeout (Seconds)"; "Default POS Timeout (Seconds)")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Default POS Timeout (Seconds) field';
                 }
                 field("Show Detailed Error Messages"; "Show Detailed Error Messages")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Show Detailed Error Messages field';
                 }
                 field("Offline mode"; "Offline mode")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Offline mode field';
                 }
                 field("Min. Length Authorisation No."; "Min. Length Authorisation No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Min. Length Authorisation No. field';
                 }
                 field("Max. Length Authorisation No."; "Max. Length Authorisation No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Max. Length Authorisation No. field';
                 }
                 field("Customer ID"; "Customer ID")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Customer ID field';
                 }
                 field("License ID"; "License ID")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the License ID field';
                 }
             }
             group(Logging)
@@ -92,26 +107,32 @@ page 6184490 "NPR Pepper Config. Card"
                 field("Logging Target"; "Logging Target")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Logging Target field';
                 }
                 field("Logging Level"; "Logging Level")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Logging Level field';
                 }
                 field("Logging Max. File Size (MB)"; "Logging Max. File Size (MB)")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Logging Max. File Size (MB) field';
                 }
                 field("Logging Directory"; "Logging Directory")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Logging Directory field';
                 }
                 field("Logging Archive Directory"; "Logging Archive Directory")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Logging Archive Directory field';
                 }
                 field("Logging Archive Max. Age Days"; "Logging Archive Max. Age Days")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Logging Archive Max. Age Days field';
                 }
             }
             group(Files)
@@ -119,10 +140,12 @@ page 6184490 "NPR Pepper Config. Card"
                 field("Card Type File Full Path"; "Card Type File Full Path")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Card Type File Full Path field';
                 }
                 field("License File Full Path"; "License File Full Path")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the License File Full Path field';
                 }
             }
             group(Directories)
@@ -130,26 +153,32 @@ page 6184490 "NPR Pepper Config. Card"
                 field("Ticket Directory"; "Ticket Directory")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Ticket Directory field';
                 }
                 field("Journal Directory"; "Journal Directory")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Journal Directory field';
                 }
                 field("Matchbox Directory"; "Matchbox Directory")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Matchbox Directory field';
                 }
                 field("Messages Directory"; "Messages Directory")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Messages Directory field';
                 }
                 field("Persistance Directory"; "Persistance Directory")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Persistance Directory field';
                 }
                 field("Working Directory"; "Working Directory")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Working Directory field';
                 }
             }
             group("Transaction Types")
@@ -157,30 +186,37 @@ page 6184490 "NPR Pepper Config. Card"
                 field(Open; "Transaction Type Open Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Transaction Type Open Code field';
                 }
                 field(Payment; "Transaction Type Payment Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Transaction Type Payment Code field';
                 }
                 field(Close; "Transaction Type Close Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Transaction Type Close Code field';
                 }
                 field(Refund; "Transaction Type Refund Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Transaction Type Refund Code field';
                 }
                 field(Recover; "Transaction Type Recover Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Transaction Type Recover Code field';
                 }
                 field("Transaction Type Auxilary Code"; "Transaction Type Auxilary Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Transaction Type Auxilary Code field';
                 }
                 field("Transaction Type Install Code"; "Transaction Type Install Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Transaction Type Install Code field';
                 }
             }
             group(Closing)
@@ -188,14 +224,17 @@ page 6184490 "NPR Pepper Config. Card"
                 field("End of Day on Close"; "End of Day on Close")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the End of Day on Close field';
                 }
                 field("Unload Library on Close"; "Unload Library on Close")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Unload Library on Close field';
                 }
                 field("End of Day Receipt Mandatory"; "End of Day Receipt Mandatory")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the End of Day Receipt Mandatory field';
                 }
             }
         }
@@ -214,6 +253,7 @@ page 6184490 "NPR Pepper Config. Card"
                 RunPageView = SORTING(ID)
                               ORDER(Ascending);
                 ApplicationArea = All;
+                ToolTip = 'Executes the Instances action';
             }
         }
         area(processing)
@@ -226,6 +266,7 @@ page 6184490 "NPR Pepper Config. Card"
                     Caption = 'License';
                     Image = ImportCodes;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the License action';
 
                     trigger OnAction()
                     begin
@@ -238,6 +279,7 @@ page 6184490 "NPR Pepper Config. Card"
                     Caption = 'Additional Parameters';
                     Image = Import;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Additional Parameters action';
 
                     trigger OnAction()
                     begin
@@ -254,6 +296,7 @@ page 6184490 "NPR Pepper Config. Card"
                     Caption = 'License';
                     Image = ElectronicNumber;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the License action';
 
                     trigger OnAction()
                     begin
@@ -266,6 +309,7 @@ page 6184490 "NPR Pepper Config. Card"
                     Caption = 'Configuration XML';
                     Image = CreateXMLFile;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Configuration XML action';
 
                     trigger OnAction()
                     begin
@@ -278,6 +322,7 @@ page 6184490 "NPR Pepper Config. Card"
                     Caption = 'Additional Parameters';
                     Image = ElectronicDoc;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Additional Parameters action';
 
                     trigger OnAction()
                     begin
@@ -293,6 +338,7 @@ page 6184490 "NPR Pepper Config. Card"
                     Caption = 'License';
                     Image = DeleteQtyToHandle;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the License action';
 
                     trigger OnAction()
                     begin
@@ -305,6 +351,7 @@ page 6184490 "NPR Pepper Config. Card"
                     Caption = 'Additional parameters';
                     Image = DeleteXML;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Additional parameters action';
 
                     trigger OnAction()
                     begin
@@ -321,6 +368,7 @@ page 6184490 "NPR Pepper Config. Card"
                     Caption = 'License';
                     Image = Export;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the License action';
 
                     trigger OnAction()
                     begin
@@ -332,6 +380,7 @@ page 6184490 "NPR Pepper Config. Card"
                     Caption = 'Configuration XML';
                     Image = ExportElectronicDocument;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Configuration XML action';
 
                     trigger OnAction()
                     begin
@@ -343,6 +392,7 @@ page 6184490 "NPR Pepper Config. Card"
                     Caption = 'Additional Parameters';
                     Image = TransmitElectronicDoc;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Additional Parameters action';
 
                     trigger OnAction()
                     begin

@@ -1,4 +1,4 @@
-﻿page 6060103 "NPR TM Ticket Request"
+page 6060103 "NPR TM Ticket Request"
 {
     Caption = 'Ticket Request';
     CardPageID = "NPR TM Ticket Res. Req. Page";
@@ -17,133 +17,163 @@
                 field("Entry No."; "Entry No.")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Entry No. field';
                 }
                 field("Entry Type"; "Entry Type")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Entry Type field';
                 }
                 field("Superseeds Entry No."; "Superseeds Entry No.")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Superseeds Entry No. field';
                 }
                 field("Session Token ID"; "Session Token ID")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Session Token ID field';
                 }
                 field("Authorization Code"; "Authorization Code")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Authorization Code field';
                 }
                 field("Request Status"; "Request Status")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Request Status field';
                 }
                 field("Admission Created"; "Admission Created")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Admission Created field';
                 }
                 field(Control6014407; "Revoke Ticket Request")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ShowCaption = false;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Revoke Ticket Request field';
                 }
                 field("Created Date Time"; "Created Date Time")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Created Date Time field';
                 }
                 field("External Item Code"; "External Item Code")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the External Item Code field';
                 }
                 field("Item No."; "Item No.")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Item No. field';
                 }
                 field("Variant Code"; "Variant Code")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Variant Code field';
                 }
                 field("Payment Option"; "Payment Option")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Payment Option field';
                 }
                 field(Quantity; Quantity)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Quantity field';
                 }
                 field("Admission Code"; "Admission Code")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Admission Code field';
                 }
                 field("Ext. Line Reference No."; "Ext. Line Reference No.")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Line Reference No. field';
                 }
                 field("External Ticket Number"; "External Ticket Number")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the External Ticket Number field';
                 }
                 field("Customer No."; "Customer No.")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Customer No. field';
                 }
                 field("Receipt No."; "Receipt No.")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Receipt No. field';
                 }
                 field("Notification Address"; "Notification Address")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Notification Address field';
                 }
                 field("External Member No."; "External Member No.")
                 {
                     ApplicationArea = NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the External Member No. field';
                 }
                 field("Admission Description"; "Admission Description")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Admission Description field';
                 }
                 field("External Adm. Sch. Entry No."; "External Adm. Sch. Entry No.")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the External Adm. Sch. Entry No. field';
                 }
                 field("Scheduled Time Description"; "Scheduled Time Description")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Scheduled Time Description field';
                 }
                 field("Notification Method"; "Notification Method")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Notification Method field';
                 }
                 field("Line No."; "Line No.")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Line No. field';
                 }
                 field("Expires Date Time"; "Expires Date Time")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Expires Date Time field';
                 }
                 field("Request Status Date Time"; "Request Status Date Time")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Request Status Date Time field';
                 }
                 field("Revoke Access Entry No."; "Revoke Access Entry No.")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Revoke Access Entry No. field';
                 }
                 field("External Order No."; "External Order No.")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the External Order No. field';
                 }
             }
         }

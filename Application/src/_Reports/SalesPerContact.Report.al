@@ -171,11 +171,13 @@ report 6014597 "NPR Sales Per Contact"
                     {
                         Caption = 'Sort By';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Sort By field';
                     }
                     field(ShowQuantity; ShowQuantity)
                     {
                         Caption = 'Quantity';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Quantity field';
                     }
                 }
             }

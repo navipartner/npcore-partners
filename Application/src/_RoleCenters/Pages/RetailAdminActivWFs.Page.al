@@ -18,10 +18,12 @@ page 6014693 "NPR Retail Admin Activ. - WFs"
                 field("Workflow Steps Enabled"; "Workflow Steps Enabled")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Workflow Steps Enabled field';
                 }
                 field("Workflow Steps Not Enabled"; "Workflow Steps Not Enabled")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Workflow Steps Not Enabled field';
                 }
             }
         }

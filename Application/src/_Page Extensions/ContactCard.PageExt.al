@@ -8,6 +8,7 @@ pageextension 6014452 "NPR Contact Card" extends "Contact Card"
             {
                 ApplicationArea = All;
                 Importance = Additional;
+                ToolTip = 'Specifies the value of the Name 2 field';
             }
         }
         addafter("Foreign Trade")
@@ -18,26 +19,32 @@ pageextension 6014452 "NPR Contact Card" extends "Contact Card"
                 field("NPR Magento Contact"; "NPR Magento Contact")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the NPR Magento Contact field';
                 }
                 field("NPR Magento Customer Group"; "NPR Magento Customer Group")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the NPR Magento Customer Group field';
                 }
                 field("NPR Magento Payment Methods"; "NPR Magento Payment Methods")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the NPR Magento Payment Methods field';
                 }
                 field("NPR Magento Shipment Methods"; "NPR Magento Shipment Methods")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the NPR Magento Shipment Methods field';
                 }
                 field("NPR Magento Account Status"; "NPR Magento Account Status")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the NPR Magento Account Status field';
                 }
                 field("NPR Magento Price Visibility"; "NPR Magento Price Visibility")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the NPR Magento Price Visibility field';
                 }
             }
         }
@@ -59,6 +66,7 @@ pageextension 6014452 "NPR Contact Card" extends "Contact Card"
                 Caption = 'POS Entries';
                 Image = Entries;
                 ApplicationArea = All;
+                ToolTip = 'Executes the POS Entries action';
             }
         }
         addafter("Create &Interaction")
@@ -71,6 +79,7 @@ pageextension 6014452 "NPR Contact Card" extends "Contact Card"
                     Caption = 'Send SMS';
                     Image = SendConfirmation;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Send SMS action';
                 }
             }
             group("NPR ResetPassword")
@@ -81,6 +90,7 @@ pageextension 6014452 "NPR Contact Card" extends "Contact Card"
                     Caption = 'Reset Magento Password';
                     Image = UserCertificate;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Reset Magento Password action';
                 }
             }
         }
@@ -95,6 +105,7 @@ pageextension 6014452 "NPR Contact Card" extends "Contact Card"
                     Caption = 'Import Face Image';
                     ApplicationArea = All;
                     Image = Picture;
+                    ToolTip = 'Executes the Import Face Image action';
 
                     trigger OnAction()
                     var

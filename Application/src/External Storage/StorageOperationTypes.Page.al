@@ -16,14 +16,17 @@ page 6184893 "NPR Storage Operation Types"
                 field("Storage Type"; "Storage Type")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Storage Type field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Operation Code"; "Operation Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Operation Code field';
                 }
             }
         }
@@ -41,6 +44,7 @@ page 6184893 "NPR Storage Operation Types"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Run action';
 
                 trigger OnAction()
                 var
@@ -64,6 +68,7 @@ page 6184893 "NPR Storage Operation Types"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Parameters action';
 
                 trigger OnAction()
                 var
@@ -87,6 +92,7 @@ page 6184893 "NPR Storage Operation Types"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Create & Copy Job Parameter action';
 
                 trigger OnAction()
                 var

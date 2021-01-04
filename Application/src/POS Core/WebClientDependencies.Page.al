@@ -14,19 +14,23 @@ page 6014659 "NPR Web Client Dependencies"
                 field(Type; Rec.Type)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Type field';
                 }
                 field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("BLOB.HASVALUE"; Rec.BLOB.HasValue())
                 {
                     ApplicationArea = All;
                     Caption = 'BLOB Imported';
+                    ToolTip = 'Specifies the value of the BLOB Imported field';
                 }
             }
         }
@@ -44,6 +48,7 @@ page 6014659 "NPR Web Client Dependencies"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Import File... action';
 
                 trigger OnAction()
                 begin
@@ -58,6 +63,7 @@ page 6014659 "NPR Web Client Dependencies"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Export Managed Dependency Manifest action';
 
                 trigger OnAction()
                 var
@@ -75,6 +81,7 @@ page 6014659 "NPR Web Client Dependencies"
                 Caption = 'Export File';
                 Image = ExportFile;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Export File action';
 
                 trigger OnAction()
                 begin

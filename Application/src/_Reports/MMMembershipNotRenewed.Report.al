@@ -258,21 +258,25 @@ report 6060136 "NPR MM Membership Not Renewed"
                     {
                         Caption = 'Reference Date 1';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Reference Date 1 field';
                     }
                     field(MembershipStatus; MembershipStatus)
                     {
                         Caption = 'Membership Status (Reference Date 1)';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Membership Status (Reference Date 1) field';
                     }
                     field(ReferenceDate2; ReferenceDate2)
                     {
                         Caption = 'Reference Date 2';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Reference Date 2 field';
                     }
                     field(MembershipStatus2; MembershipStatus2)
                     {
                         Caption = 'Membership Status (Reference Date 2)';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Membership Status (Reference Date 2) field';
                     }
                 }
             }

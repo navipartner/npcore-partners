@@ -16,26 +16,32 @@ page 6151068 "NPR Distrib. Group Member Card"
                 field("Distribution Member Id"; "Distribution Member Id")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Distribution Member Id field';
                 }
                 field("Distribution Group"; "Distribution Group")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Distribution Group field';
                 }
                 field(Location; Location)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Location field';
                 }
                 field(Store; Store)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Store field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Distribution Share Pct."; "Distribution Share Pct.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Distribution Share Pct. field';
                 }
             }
             part(Control9; "NPR Distribution Setup")

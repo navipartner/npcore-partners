@@ -16,14 +16,17 @@ page 6151571 "NPR AF Test Objects"
                 field("Object Type"; "Object Type")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Object Type field';
                 }
                 field("Object ID"; "Object ID")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Object ID field';
                 }
                 field("Object Name"; "Object Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Object Name field';
                 }
             }
         }
@@ -41,6 +44,7 @@ page 6151571 "NPR AF Test Objects"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Run Test action';
 
                 trigger OnAction()
                 begin

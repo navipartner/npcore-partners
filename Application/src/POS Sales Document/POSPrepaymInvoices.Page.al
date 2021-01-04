@@ -20,6 +20,7 @@ page 6150674 "NPR POS Prepaym. Invoices"
                 field("No."; "No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the No. field';
 
                     trigger OnDrillDown()
                     var
@@ -32,20 +33,24 @@ page 6150674 "NPR POS Prepaym. Invoices"
                 field("Due Date"; "Due Date")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Due Date field';
                 }
                 field("Amount Including VAT"; "Amount Including VAT")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Amount Including VAT field';
                 }
                 field(FullyPaid; FullyPaid)
                 {
                     ApplicationArea = All;
                     Caption = 'Fully Paid';
+                    ToolTip = 'Specifies the value of the Fully Paid field';
                 }
                 field(RemainingAmount; RemainingAmount)
                 {
                     ApplicationArea = All;
                     Caption = 'Remaining Payment';
+                    ToolTip = 'Specifies the value of the Remaining Payment field';
                 }
             }
         }

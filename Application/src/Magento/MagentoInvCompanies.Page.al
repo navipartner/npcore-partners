@@ -19,28 +19,34 @@ page 6151402 "NPR Magento Inv. Companies"
                 field("Company Name"; "Company Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Company Name field';
                 }
                 field("Location Filter"; "Location Filter")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Location Filter field';
                 }
                 field("Api Username"; "Api Username")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Api Username field';
                 }
                 field("Api Password"; "Api Password")
                 {
                     ApplicationArea = All;
                     ExtendedDatatype = Masked;
+                    ToolTip = 'Specifies the value of the Api Password field';
                 }
                 field("Api Url"; "Api Url")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Api Url field';
                 }
                 field("Api Domain"; "Api Domain")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Api Domain field';
                 }
             }
         }
@@ -57,6 +63,7 @@ page 6151402 "NPR Magento Inv. Companies"
                 Promoted = true;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Test Api Url action';
 
                 trigger OnAction()
                 begin

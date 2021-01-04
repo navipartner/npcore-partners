@@ -83,16 +83,19 @@ report 6060101 "NPR Data Cleanup Test"
                 {
                     Caption = 'Cleanup Action';
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Cleanup Action field';
                 }
                 field(TableOption; TableOption)
                 {
                     Caption = 'Table Option';
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Table Option field';
                 }
                 field(NoFilter; NoFilter)
                 {
                     Caption = 'No. Filter';
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the No. Filter field';
                 }
             }
         }

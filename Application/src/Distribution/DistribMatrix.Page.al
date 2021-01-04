@@ -21,23 +21,28 @@ page 6151061 "NPR Distrib. Matrix"
                 field("Item Hierachy Description"; "Item Hierachy Description")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Item Hierachy Description field';
                 }
                 field("Item Hierarchy Level"; "Item Hierarchy Level")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Item Hierarchy Level field';
                 }
                 field("Item No."; "Item No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Item No. field';
                 }
                 field("Item Desc."; "Item Desc.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Item Desciption field';
                 }
                 field(Total; TotalToDistribuate)
                 {
                     ApplicationArea = All;
                     Caption = 'Total';
+                    ToolTip = 'Specifies the value of the Total field';
                 }
                 field(Field1; MATRIX_CellData[1])
                 {
@@ -46,6 +51,7 @@ page 6151061 "NPR Distrib. Matrix"
                     CaptionClass = '3,' + MATRIX_CaptionSetShown[1];
                     Style = Strong;
                     Visible = true;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[1] field';
 
                     trigger OnDrillDown()
                     begin
@@ -59,6 +65,7 @@ page 6151061 "NPR Distrib. Matrix"
                     CaptionClass = '3,' + MATRIX_CaptionSetShown[2];
                     Style = Strong;
                     Visible = true;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[2] field';
 
                     trigger OnDrillDown()
                     begin
@@ -72,6 +79,7 @@ page 6151061 "NPR Distrib. Matrix"
                     CaptionClass = '3,' + MATRIX_CaptionSetShown[3];
                     Style = Strong;
                     Visible = true;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[3] field';
 
                     trigger OnDrillDown()
                     begin
@@ -85,6 +93,7 @@ page 6151061 "NPR Distrib. Matrix"
                     CaptionClass = '3,' + MATRIX_CaptionSetShown[4];
                     Style = Strong;
                     Visible = true;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[4] field';
 
                     trigger OnDrillDown()
                     begin
@@ -98,6 +107,7 @@ page 6151061 "NPR Distrib. Matrix"
                     CaptionClass = '3,' + MATRIX_CaptionSetShown[5];
                     Style = Strong;
                     Visible = true;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[5] field';
 
                     trigger OnDrillDown()
                     begin
@@ -111,6 +121,7 @@ page 6151061 "NPR Distrib. Matrix"
                     CaptionClass = '3,' + MATRIX_CaptionSetShown[6];
                     Style = Strong;
                     Visible = true;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[6] field';
 
                     trigger OnDrillDown()
                     begin
@@ -129,6 +140,7 @@ page 6151061 "NPR Distrib. Matrix"
                     CaptionClass = '3,' + MATRIX_CaptionSetShown[7];
                     Style = Strong;
                     Visible = true;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[7] field';
 
                     trigger OnDrillDown()
                     begin
@@ -142,6 +154,7 @@ page 6151061 "NPR Distrib. Matrix"
                     CaptionClass = '3,' + MATRIX_CaptionSetShown[8];
                     Style = Strong;
                     Visible = true;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[8] field';
 
                     trigger OnDrillDown()
                     begin
@@ -155,6 +168,7 @@ page 6151061 "NPR Distrib. Matrix"
                     CaptionClass = '3,' + MATRIX_CaptionSetShown[9];
                     Style = Strong;
                     Visible = true;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[9] field';
 
                     trigger OnDrillDown()
                     begin
@@ -168,6 +182,7 @@ page 6151061 "NPR Distrib. Matrix"
                     CaptionClass = '3,' + MATRIX_CaptionSetShown[10];
                     Style = Strong;
                     Visible = true;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[10] field';
 
                     trigger OnDrillDown()
                     begin
@@ -181,6 +196,7 @@ page 6151061 "NPR Distrib. Matrix"
                     CaptionClass = '3,' + MATRIX_CaptionSetShown[11];
                     Style = Strong;
                     Visible = true;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[11] field';
 
                     trigger OnDrillDown()
                     begin
@@ -194,6 +210,7 @@ page 6151061 "NPR Distrib. Matrix"
                     CaptionClass = '3,' + MATRIX_CaptionSetShown[12];
                     Style = Strong;
                     Visible = true;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[12] field';
 
                     trigger OnDrillDown()
                     begin

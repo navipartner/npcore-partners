@@ -15,15 +15,18 @@ page 6014629 "NPR RP Template Media Factbox"
             {
                 ApplicationArea = All;
                 ShowCaption = false;
+                ToolTip = 'Specifies the value of the Picture field';
             }
             field(URL; URL)
             {
                 ApplicationArea = All;
                 ExtendedDatatype = URL;
+                ToolTip = 'Specifies the value of the URL field';
             }
             field(Description; Description)
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the Description field';
             }
         }
     }

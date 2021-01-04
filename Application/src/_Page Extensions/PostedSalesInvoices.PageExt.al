@@ -20,18 +20,21 @@ pageextension 6014416 "NPR Posted Sales Invoices" extends "Posted Sales Invoices
             {
                 ApplicationArea = All;
                 Visible = false;
+                ToolTip = 'Specifies the value of the NPR Bill-to E-mail field';
             }
             field("NPR Document Processing"; "NPR Document Processing")
             {
                 ApplicationArea = All;
                 Editable = false;
                 Visible = false;
+                ToolTip = 'Specifies the value of the NPR Document Processing field';
             }
             field("NPR Magento Coupon"; "NPR Magento Coupon")
             {
                 ApplicationArea = All;
                 Editable = false;
                 Visible = false;
+                ToolTip = 'Specifies the value of the NPR Magento Coupon field';
             }
 
         }
@@ -48,6 +51,7 @@ pageextension 6014416 "NPR Posted Sales Invoices" extends "Posted Sales Invoices
                     Caption = 'E-mail Log';
                     Image = Email;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the E-mail Log action';
                 }
                 action("NPR SendSelectedAsPDF")
                 {
@@ -83,12 +87,14 @@ pageextension 6014416 "NPR Posted Sales Invoices" extends "Posted Sales Invoices
                     Caption = 'Export';
                     Image = ExportFile;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Export action';
                 }
                 action("NPR UpdateStatus")
                 {
                     Caption = 'Update Status';
                     Image = ChangeStatus;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Update Status action';
                 }
             }
         }

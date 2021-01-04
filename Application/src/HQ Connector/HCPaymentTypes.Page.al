@@ -17,38 +17,47 @@ page 6150904 "NPR HC Payment Types"
                 field("No."; "No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the No. field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Account Type"; "Account Type")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Account Type field';
                 }
                 field("G/L Account No."; "G/L Account No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the G/L Account field';
                 }
                 field("Bank Acc. No."; "Bank Acc. No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Bank field';
                 }
                 field("HQ Processing"; "HQ Processing")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the HQ Processing field';
                 }
                 field("HQ Post Sales Document"; "HQ Post Sales Document")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the HQ Post Sales Document field';
                 }
                 field("HQ Post Payment"; "HQ Post Payment")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the HQ Post Payment field';
                 }
                 field("Payment Method Code"; "Payment Method Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Payment Method Code field';
                 }
             }
         }

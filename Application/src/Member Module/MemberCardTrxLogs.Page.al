@@ -16,30 +16,37 @@ page 6059773 "NPR Member Card Trx Logs"
                 field("Posting Date"; "Posting Date")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Posting Date field';
                 }
                 field("Transaction No."; "Transaction No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Transaction No. field';
                 }
                 field("Card Code"; "Card Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Card Code field';
                 }
                 field("Remaining Points"; "Remaining Points")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Remaining points field';
                 }
                 field(Points; Points)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Points field';
                 }
                 field("Document No."; "Document No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Document No. field';
                 }
                 field("Value Entry No."; "Value Entry No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Value Entry No. field';
                 }
             }
         }
@@ -55,6 +62,7 @@ page 6059773 "NPR Member Card Trx Logs"
                 Image = Edit;
                 ShortCutKey = 'F2';
                 ApplicationArea = All;
+                ToolTip = 'Executes the Edit action';
 
                 trigger OnAction()
                 begin

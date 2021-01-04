@@ -21,14 +21,17 @@ page 6151409 "NPR Magento VAT Bus. Groups"
                 field("VAT Business Posting Group"; "VAT Business Posting Group")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the VAT Product Posting Group field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Magento Tax Class"; "Magento Tax Class")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Magento Tax Class field';
                 }
             }
         }
@@ -46,6 +49,7 @@ page 6151409 "NPR Magento VAT Bus. Groups"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Setup VAT Business Posting Groups action';
 
                 trigger OnAction()
                 begin

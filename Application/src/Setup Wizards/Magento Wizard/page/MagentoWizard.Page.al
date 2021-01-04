@@ -18,6 +18,7 @@ page 6014400 "NPR Magento Wizard"
                     ApplicationArea = All;
                     Editable = false;
                     ShowCaption = false;
+                    ToolTip = 'Specifies the value of the MediaResourcesStandard.Media Reference field';
                 }
             }
             group(FinishedBanner)
@@ -30,6 +31,7 @@ page 6014400 "NPR Magento Wizard"
                     ApplicationArea = All;
                     Editable = false;
                     ShowCaption = false;
+                    ToolTip = 'Specifies the value of the MediaResourcesDone.Media Reference field';
                 }
             }
 
@@ -206,6 +208,7 @@ page 6014400 "NPR Magento Wizard"
                             {
                                 ApplicationArea = All;
                                 Caption = '';
+                                ToolTip = 'Specifies the value of the MagentoStoreLabel field';
                             }
                         }
                         group(MagentoWebsiteMissing)
@@ -216,6 +219,7 @@ page 6014400 "NPR Magento Wizard"
                             {
                                 ApplicationArea = All;
                                 Caption = '';
+                                ToolTip = 'Specifies the value of the MagentoWebsiteLabel field';
                             }
                         }
                         group(MagentoCustomerMappingMissing)
@@ -226,6 +230,7 @@ page 6014400 "NPR Magento Wizard"
                             {
                                 ApplicationArea = All;
                                 Caption = '';
+                                ToolTip = 'Specifies the value of the MagentoCustomerMappingLabel field';
                             }
                         }
                         group(MagentoPaymentGatewaygMissing)
@@ -236,6 +241,7 @@ page 6014400 "NPR Magento Wizard"
                             {
                                 ApplicationArea = All;
                                 Caption = '';
+                                ToolTip = 'Specifies the value of the MagentoPaymentGatewayLabel field';
                             }
                         }
                         group(MagentoPaymentMappingMissing)
@@ -246,6 +252,7 @@ page 6014400 "NPR Magento Wizard"
                             {
                                 ApplicationArea = All;
                                 Caption = '';
+                                ToolTip = 'Specifies the value of the MagentoPaymentMappingLabel field';
                             }
                         }
                         group(MagentoShippmentMappingMissing)
@@ -256,6 +263,7 @@ page 6014400 "NPR Magento Wizard"
                             {
                                 ApplicationArea = All;
                                 Caption = '';
+                                ToolTip = 'Specifies the value of the MagentoShippmentMappingLabel field';
                             }
                         }
                         group(MagentoBrandMissing)
@@ -266,6 +274,7 @@ page 6014400 "NPR Magento Wizard"
                             {
                                 ApplicationArea = All;
                                 Caption = '';
+                                ToolTip = 'Specifies the value of the MagentoBrandLabel field';
                             }
                         }
                         group(MagentoDisplayGroupMissing)
@@ -276,6 +285,7 @@ page 6014400 "NPR Magento Wizard"
                             {
                                 ApplicationArea = All;
                                 Caption = '';
+                                ToolTip = 'Specifies the value of the MagentoDisplayGroupLabel field';
                             }
                         }
                         group(MagentoDisplayConfigMissing)
@@ -286,6 +296,7 @@ page 6014400 "NPR Magento Wizard"
                             {
                                 ApplicationArea = All;
                                 Caption = '';
+                                ToolTip = 'Specifies the value of the MagentoDisplayConfigLabel field';
                             }
                         }
                     }
@@ -309,6 +320,7 @@ page 6014400 "NPR Magento Wizard"
                         {
                             ApplicationArea = All;
                             Caption = '';
+                            ToolTip = 'Specifies the value of the MagentoStoreLabel field';
                         }
                     }
                     group(MagentoWebsiteExists)
@@ -319,6 +331,7 @@ page 6014400 "NPR Magento Wizard"
                         {
                             ApplicationArea = All;
                             Caption = '';
+                            ToolTip = 'Specifies the value of the MagentoWebsiteLabel field';
                         }
                     }
                     group(MagentoCustomerMappingExists)
@@ -329,6 +342,7 @@ page 6014400 "NPR Magento Wizard"
                         {
                             ApplicationArea = All;
                             Caption = '';
+                            ToolTip = 'Specifies the value of the MagentoCustomerMappingLabel field';
                         }
                     }
                     group(MagentoPaymentGatewaygExists)
@@ -339,6 +353,7 @@ page 6014400 "NPR Magento Wizard"
                         {
                             ApplicationArea = All;
                             Caption = '';
+                            ToolTip = 'Specifies the value of the MagentoPaymentGatewayLabel field';
                         }
                     }
                     group(MagentoPaymentMappingExists)
@@ -349,6 +364,7 @@ page 6014400 "NPR Magento Wizard"
                         {
                             ApplicationArea = All;
                             Caption = '';
+                            ToolTip = 'Specifies the value of the MagentoPaymentMappingLabel field';
                         }
                     }
                     group(MagentoShippmentMappingExists)
@@ -359,6 +375,7 @@ page 6014400 "NPR Magento Wizard"
                         {
                             ApplicationArea = All;
                             Caption = '';
+                            ToolTip = 'Specifies the value of the MagentoShippmentMappingLabel field';
                         }
                     }
                     group(MagentoBrandsExists)
@@ -369,6 +386,7 @@ page 6014400 "NPR Magento Wizard"
                         {
                             ApplicationArea = All;
                             Caption = '';
+                            ToolTip = 'Specifies the value of the MagentoBrandLabel field';
                         }
                     }
                     group(MagentoDisplayGroupExists)
@@ -379,6 +397,7 @@ page 6014400 "NPR Magento Wizard"
                         {
                             ApplicationArea = All;
                             Caption = '';
+                            ToolTip = 'Specifies the value of the MagentoDisplayGroupLabel field';
                         }
                     }
                     group(MagentoDisplayConfigExists)
@@ -389,6 +408,7 @@ page 6014400 "NPR Magento Wizard"
                         {
                             ApplicationArea = All;
                             Caption = '';
+                            ToolTip = 'Specifies the value of the MagentoDisplayConfigLabel field';
                         }
                     }
                 }
@@ -412,6 +432,7 @@ page 6014400 "NPR Magento Wizard"
                 Enabled = BackActionEnabled;
                 Image = PreviousRecord;
                 InFooterBar = true;
+                ToolTip = 'Executes the Back action';
 
                 trigger OnAction();
                 begin
@@ -425,6 +446,7 @@ page 6014400 "NPR Magento Wizard"
                 Enabled = NextActionEnabled;
                 Image = NextRecord;
                 InFooterBar = true;
+                ToolTip = 'Executes the Next action';
 
                 trigger OnAction();
                 begin
@@ -438,6 +460,7 @@ page 6014400 "NPR Magento Wizard"
                 Enabled = FinishActionEnabled;
                 Image = Approve;
                 InFooterBar = true;
+                ToolTip = 'Executes the Finish action';
 
                 trigger OnAction();
                 begin

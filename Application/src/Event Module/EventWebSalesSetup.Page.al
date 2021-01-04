@@ -16,10 +16,12 @@ page 6060158 "NPR Event Web Sales Setup"
                 field(Type; Type)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Type field';
                 }
                 field("No."; "No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the No. field';
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -54,6 +56,7 @@ page 6060158 "NPR Event Web Sales Setup"
                 field("Event No."; "Event No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Event No. field';
 
                     trigger OnLookup(var Text: Text): Boolean
                     var

@@ -16,10 +16,12 @@ page 6151581 "NPR Event Attr. Temp. Filters"
                 field("Filter Name"; "Filter Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Filter Name field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
             }
         }
@@ -36,6 +38,7 @@ page 6151581 "NPR Event Attr. Temp. Filters"
                 Promoted = true;
                 PromotedCategory = Process;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Values action';
 
                 trigger OnAction()
                 var
@@ -54,6 +57,7 @@ page 6151581 "NPR Event Attr. Temp. Filters"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Show Events in Attribute Filter action';
 
                 trigger OnAction()
                 begin

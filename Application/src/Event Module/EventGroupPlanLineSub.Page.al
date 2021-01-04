@@ -23,16 +23,19 @@ page 6059830 "NPR Event Group.Plan. Line Sub"
                     Editable = DescriptionEditable;
                     Style = Strong;
                     StyleExpr = ShowAsBold;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Group Source Line No."; "NPR Group Source Line No.")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the NPR Group Source Line No. field';
                 }
                 field("Job Task No."; "Job Task No.")
                 {
                     ApplicationArea = All;
                     Visible = "Job Task No.Visible";
+                    ToolTip = 'Specifies the value of the Job Task No. field';
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -55,11 +58,13 @@ page 6059830 "NPR Event Group.Plan. Line Sub"
                 field("Line Type"; "Line Type")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Line Type field';
                 }
                 field("Usage Link"; "Usage Link")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Usage Link field';
 
                     trigger OnValidate()
                     begin
@@ -70,6 +75,7 @@ page 6059830 "NPR Event Group.Plan. Line Sub"
                 {
                     ApplicationArea = All;
                     Editable = "Planning DateEditable";
+                    ToolTip = 'Specifies the value of the Planning Date field';
 
                     trigger OnValidate()
                     begin
@@ -79,10 +85,12 @@ page 6059830 "NPR Event Group.Plan. Line Sub"
                 field("Starting Time"; "NPR Starting Time")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the NPR Starting Time field';
                 }
                 field("Ending Time"; "NPR Ending Time")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the NPR Ending Time field';
                 }
                 field("""Calendar Item ID"" <> ''"; "NPR Calendar Item ID" <> '')
                 {
@@ -90,65 +98,77 @@ page 6059830 "NPR Event Group.Plan. Line Sub"
                     Caption = 'Meeting Req. Exists';
                     Editable = false;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Meeting Req. Exists field';
                 }
                 field("Calendar Item Status"; "NPR Calendar Item Status")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the NPR Calendar Item Status field';
                 }
                 field("Meeting Request Response"; "NPR Meeting Request Response")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the NPR Meeting Request Response field';
                 }
                 field("Mail Item Status"; "NPR Mail Item Status")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the NPR Mail Item Status field';
                 }
                 field("Planned Delivery Date"; "Planned Delivery Date")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Planned Delivery Date field';
                 }
                 field("Currency Date"; "Currency Date")
                 {
                     ApplicationArea = All;
                     Editable = "Currency DateEditable";
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Currency Date field';
                 }
                 field("Document No."; "Document No.")
                 {
                     ApplicationArea = All;
                     Editable = "Document No.Editable";
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Document No. field';
                 }
                 field("Line No."; "Line No.")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Line No. field';
                 }
                 field("Resource E-Mail"; "NPR Resource E-Mail")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the NPR Resource E-Mail field';
                 }
                 field("Gen. Bus. Posting Group"; "Gen. Bus. Posting Group")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Gen. Bus. Posting Group field';
                 }
                 field("Gen. Prod. Posting Group"; "Gen. Prod. Posting Group")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Gen. Prod. Posting Group field';
                 }
                 field("Variant Code"; "Variant Code")
                 {
                     ApplicationArea = All;
                     Editable = "Variant CodeEditable";
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Variant Code field';
 
                     trigger OnValidate()
                     begin
@@ -159,6 +179,7 @@ page 6059830 "NPR Event Group.Plan. Line Sub"
                 {
                     ApplicationArea = All;
                     Editable = "Location CodeEditable";
+                    ToolTip = 'Specifies the value of the Location Code field';
 
                     trigger OnValidate()
                     begin
@@ -170,11 +191,13 @@ page 6059830 "NPR Event Group.Plan. Line Sub"
                     ApplicationArea = All;
                     Editable = "Work Type CodeEditable";
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Work Type Code field';
                 }
                 field("Unit of Measure Code"; "Unit of Measure Code")
                 {
                     ApplicationArea = All;
                     Editable = "Unit of Measure CodeEditable";
+                    ToolTip = 'Specifies the value of the Unit of Measure Code field';
 
                     trigger OnValidate()
                     begin
@@ -186,6 +209,7 @@ page 6059830 "NPR Event Group.Plan. Line Sub"
                     ApplicationArea = All;
                     ShowCaption = false;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Reserve field';
 
                     trigger OnValidate()
                     begin
@@ -195,6 +219,7 @@ page 6059830 "NPR Event Group.Plan. Line Sub"
                 field(Quantity; Quantity)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Quantity field';
 
                     trigger OnValidate()
                     begin
@@ -204,132 +229,159 @@ page 6059830 "NPR Event Group.Plan. Line Sub"
                 field("Reserved Quantity"; "Reserved Quantity")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Reserved Quantity field';
                 }
                 field("Quantity (Base)"; "Quantity (Base)")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Quantity (Base) field';
                 }
                 field("Remaining Qty."; "Remaining Qty.")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Remaining Qty. field';
                 }
                 field("Direct Unit Cost (LCY)"; "Direct Unit Cost (LCY)")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Direct Unit Cost (LCY) field';
                 }
                 field("Unit Cost"; "Unit Cost")
                 {
                     ApplicationArea = All;
                     Editable = "Unit CostEditable";
+                    ToolTip = 'Specifies the value of the Unit Cost field';
                 }
                 field("Unit Cost (LCY)"; "Unit Cost (LCY)")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Unit Cost (LCY) field';
                 }
                 field("Total Cost"; "Total Cost")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Total Cost field';
                 }
                 field("Remaining Total Cost"; "Remaining Total Cost")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Remaining Total Cost field';
                 }
                 field("Total Cost (LCY)"; "Total Cost (LCY)")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Total Cost (LCY) field';
                 }
                 field("Remaining Total Cost (LCY)"; "Remaining Total Cost (LCY)")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Remaining Total Cost (LCY) field';
                 }
                 field("Unit Price"; "Unit Price")
                 {
                     ApplicationArea = All;
                     Editable = "Unit PriceEditable";
+                    ToolTip = 'Specifies the value of the Unit Price field';
                 }
                 field("Unit Price (LCY)"; "Unit Price (LCY)")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Unit Price (LCY) field';
                 }
                 field("Line Amount"; "Line Amount")
                 {
                     ApplicationArea = All;
                     Editable = "Line AmountEditable";
+                    ToolTip = 'Specifies the value of the Line Amount field';
                 }
                 field("Remaining Line Amount"; "Remaining Line Amount")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Remaining Line Amount field';
                 }
                 field("Line Amount (LCY)"; "Line Amount (LCY)")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Line Amount (LCY) field';
                 }
                 field("Remaining Line Amount (LCY)"; "Remaining Line Amount (LCY)")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Remaining Line Amount (LCY) field';
                 }
                 field("Line Discount Amount"; "Line Discount Amount")
                 {
                     ApplicationArea = All;
                     Editable = "Line Discount AmountEditable";
+                    ToolTip = 'Specifies the value of the Line Discount Amount field';
                 }
                 field("Line Discount %"; "Line Discount %")
                 {
                     ApplicationArea = All;
                     Editable = "Line Discount %Editable";
+                    ToolTip = 'Specifies the value of the Line Discount % field';
                 }
                 field("Total Price"; "Total Price")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Total Price field';
                 }
                 field("Total Price (LCY)"; "Total Price (LCY)")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Total Price (LCY) field';
                 }
                 field("Qty. Posted"; "Qty. Posted")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Qty. Posted field';
                 }
                 field("Qty. to Transfer to Journal"; "Qty. to Transfer to Journal")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Qty. to Transfer to Journal field';
                 }
                 field("Posted Total Cost"; "Posted Total Cost")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Posted Total Cost field';
                 }
                 field("Posted Total Cost (LCY)"; "Posted Total Cost (LCY)")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Posted Total Cost (LCY) field';
                 }
                 field("Posted Line Amount"; "Posted Line Amount")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Posted Line Amount field';
                 }
                 field("Posted Line Amount (LCY)"; "Posted Line Amount (LCY)")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Posted Line Amount (LCY) field';
                 }
                 field("Qty. Transferred to Invoice"; "Qty. Transferred to Invoice")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Qty. Transferred to Invoice field';
 
                     trigger OnDrillDown()
                     begin
@@ -339,10 +391,12 @@ page 6059830 "NPR Event Group.Plan. Line Sub"
                 field("Qty. to Transfer to Invoice"; "Qty. to Transfer to Invoice")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Qty. to Transfer to Invoice field';
                 }
                 field("Qty. Invoiced"; "Qty. Invoiced")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Qty. Invoiced field';
 
                     trigger OnDrillDown()
                     begin
@@ -352,11 +406,13 @@ page 6059830 "NPR Event Group.Plan. Line Sub"
                 field("Qty. to Invoice"; "Qty. to Invoice")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Qty. to Invoice field';
                 }
                 field("Invoiced Amount (LCY)"; "Invoiced Amount (LCY)")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Invoiced Amount (LCY) field';
 
                     trigger OnDrillDown()
                     begin
@@ -367,6 +423,7 @@ page 6059830 "NPR Event Group.Plan. Line Sub"
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Invoiced Cost Amount (LCY) field';
 
                     trigger OnDrillDown()
                     begin
@@ -377,36 +434,43 @@ page 6059830 "NPR Event Group.Plan. Line Sub"
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the User ID field';
                 }
                 field("Serial No."; "Serial No.")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Serial No. field';
                 }
                 field("Lot No."; "Lot No.")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Lot No. field';
                 }
                 field("Job Contract Entry No."; "Job Contract Entry No.")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Job Contract Entry No. field';
                 }
                 field("Ledger Entry Type"; "Ledger Entry Type")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Ledger Entry Type field';
                 }
                 field("Ledger Entry No."; "Ledger Entry No.")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Ledger Entry No. field';
                 }
                 field("System-Created Entry"; "System-Created Entry")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the System-Created Entry field';
                 }
                 field(Overdue; Overdue)
                 {
@@ -414,16 +478,19 @@ page 6059830 "NPR Event Group.Plan. Line Sub"
                     Caption = 'Overdue';
                     Editable = false;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Overdue field';
                 }
                 field("Est. Unit Price Incl. VAT"; "NPR Est. Unit Price Incl. VAT")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the NPR Est. Unit Price Incl. VAT field';
                 }
                 field("Est. Line Amount Incl. VAT"; "NPR Est. Line Amount Incl. VAT")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the NPR Est. Line Amount Incl. VAT field';
                 }
             }
         }
@@ -449,6 +516,7 @@ page 6059830 "NPR Event Group.Plan. Line Sub"
                                   "Job Task No." = FIELD("Job Task No.");
                     ShortCutKey = 'Shift+Ctrl+T';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Event &Task Lines action';
                 }
                 separator(Separator6014408)
                 {
@@ -459,6 +527,7 @@ page 6059830 "NPR Event Group.Plan. Line Sub"
                     Image = JobLedger;
                     ShortCutKey = 'Ctrl+F7';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Linked Job Ledger E&ntries action';
 
                     trigger OnAction()
                     var
@@ -485,6 +554,7 @@ page 6059830 "NPR Event Group.Plan. Line Sub"
                     Caption = '&Reservation Entries';
                     Image = ReservationLedger;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the &Reservation Entries action';
 
                     trigger OnAction()
                     begin
@@ -499,6 +569,7 @@ page 6059830 "NPR Event Group.Plan. Line Sub"
                     Caption = 'Order &Promising';
                     Image = OrderPromising;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Order &Promising action';
 
                     trigger OnAction()
                     begin
@@ -513,6 +584,7 @@ page 6059830 "NPR Event Group.Plan. Line Sub"
                         Caption = 'Send';
                         Image = Calendar;
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Send action';
 
                         trigger OnAction()
                         begin
@@ -525,6 +597,7 @@ page 6059830 "NPR Event Group.Plan. Line Sub"
                         Caption = 'Remove';
                         Image = RemoveContacts;
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Remove action';
 
                         trigger OnAction()
                         begin
@@ -537,6 +610,7 @@ page 6059830 "NPR Event Group.Plan. Line Sub"
                         Caption = 'Get Attendee Response';
                         Image = Answers;
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Get Attendee Response action';
 
                         trigger OnAction()
                         begin
@@ -550,6 +624,7 @@ page 6059830 "NPR Event Group.Plan. Line Sub"
                     Caption = 'Send E-Mail';
                     Image = SendMail;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Send E-Mail action';
 
                     trigger OnAction()
                     begin
@@ -570,6 +645,7 @@ page 6059830 "NPR Event Group.Plan. Line Sub"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Create Job &Journal Lines action';
 
                     trigger OnAction()
                     var
@@ -604,6 +680,7 @@ page 6059830 "NPR Event Group.Plan. Line Sub"
                     RunPageLink = "Job No." = FIELD("Job No."),
                                   "Job Task No." = FIELD("Job Task No.");
                     ApplicationArea = All;
+                    ToolTip = 'Executes the &Open Job Journal action';
                 }
                 separator(Separator16)
                 {
@@ -617,6 +694,7 @@ page 6059830 "NPR Event Group.Plan. Line Sub"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Create &Sales Invoice action';
 
                     trigger OnAction()
                     begin
@@ -631,6 +709,7 @@ page 6059830 "NPR Event Group.Plan. Line Sub"
                     Promoted = true;
                     PromotedCategory = Process;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Create Sales &Credit Memo action';
 
                     trigger OnAction()
                     begin
@@ -645,6 +724,7 @@ page 6059830 "NPR Event Group.Plan. Line Sub"
                     Promoted = true;
                     PromotedCategory = Process;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Sales &Documents action';
 
                     trigger OnAction()
                     begin
@@ -663,6 +743,7 @@ page 6059830 "NPR Event Group.Plan. Line Sub"
                     Ellipsis = true;
                     Image = Reserve;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the &Reservation action';
 
                     trigger OnAction()
                     begin
@@ -674,6 +755,7 @@ page 6059830 "NPR Event Group.Plan. Line Sub"
                     Caption = 'Order &Tracking';
                     Image = OrderTracking;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Order &Tracking action';
 
                     trigger OnAction()
                     begin
@@ -688,6 +770,7 @@ page 6059830 "NPR Event Group.Plan. Line Sub"
                     Caption = '&Demand Overview';
                     Image = Forecast;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the &Demand Overview action';
 
                     trigger OnAction()
                     var
@@ -705,6 +788,7 @@ page 6059830 "NPR Event Group.Plan. Line Sub"
                     Caption = 'Insert &Ext. Texts';
                     Image = Text;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Insert &Ext. Texts action';
 
                     trigger OnAction()
                     begin
@@ -722,6 +806,7 @@ page 6059830 "NPR Event Group.Plan. Line Sub"
                     Caption = 'Activity Log';
                     Image = Log;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Activity Log action';
 
                     trigger OnAction()
                     var

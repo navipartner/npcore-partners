@@ -16,6 +16,7 @@ page 6059897 "NPR Data Log Setup"
                 field("Table ID"; "Table ID")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Table ID field';
 
                     trigger OnValidate()
                     begin
@@ -39,19 +40,23 @@ page 6059897 "NPR Data Log Setup"
                 field("Table Name"; "Table Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Table Name field';
                 }
                 field("Log Insertion"; "Log Insertion")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Log Insertion field';
                 }
                 field("Log Modification"; "Log Modification")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Log Modification field';
                 }
                 field("Ignored Fields"; "Ignored Fields")
                 {
                     ApplicationArea = All;
                     BlankZero = true;
+                    ToolTip = 'Specifies the value of the Ignored Fields field';
 
                     trigger OnAssistEdit()
                     begin
@@ -62,18 +67,22 @@ page 6059897 "NPR Data Log Setup"
                 field("Log Deletion"; "Log Deletion")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Log Deletion field';
                 }
                 field("Keep Log for"; "Keep Log for")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Keep Log For field';
                 }
                 field("User ID"; "User ID")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the User ID field';
                 }
                 field("Last Date Modified"; "Last Date Modified")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Last Date Modified field';
                 }
             }
         }
@@ -90,6 +99,7 @@ page 6059897 "NPR Data Log Setup"
                 Promoted = true;
                 PromotedCategory = Process;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Clean Data Log action';
 
                 trigger OnAction()
                 begin
@@ -104,6 +114,7 @@ page 6059897 "NPR Data Log Setup"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Add Records to Data Log action';
 
                 trigger OnAction()
                 begin
@@ -118,6 +129,7 @@ page 6059897 "NPR Data Log Setup"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Set Ignored Fields action';
 
                 trigger OnAction()
                 begin
@@ -137,6 +149,7 @@ page 6059897 "NPR Data Log Setup"
                 RunObject = Page "NPR Data Log Subscribers";
                 RunPageLink = "Table ID" = FIELD("Table ID");
                 ApplicationArea = All;
+                ToolTip = 'Executes the Data Log Subscribers action';
             }
             action(DataLog)
             {
@@ -149,6 +162,7 @@ page 6059897 "NPR Data Log Setup"
                 RunPageLink = "Table ID" = FIELD("Table ID");
                 ShortCutKey = 'Ctrl+F7';
                 ApplicationArea = All;
+                ToolTip = 'Executes the Data Log action';
             }
         }
     }

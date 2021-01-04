@@ -22,11 +22,13 @@ page 6151436 "NPR Magento Item Attr."
                 field("Attribute Description"; "Attribute Description")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Attribute field';
                 }
                 field("GetValue()"; GetValue())
                 {
                     ApplicationArea = All;
                     Caption = 'Value';
+                    ToolTip = 'Specifies the value of the Value field';
                 }
             }
             part(Control6150617; "NPR Magento Item Attr. Values")

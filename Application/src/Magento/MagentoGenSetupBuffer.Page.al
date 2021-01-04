@@ -30,16 +30,19 @@ page 6151400 "NPR Magento Gen. Setup Buffer"
                     Enabled = false;
                     Style = Strong;
                     StyleExpr = Container;
+                    ToolTip = 'Specifies the value of the Field Name field';
                 }
                 field(Value; Value)
                 {
                     ApplicationArea = All;
                     Enabled = NOT Container;
+                    ToolTip = 'Specifies the value of the Value field';
                 }
                 field("Data Type"; "Data Type")
                 {
                     ApplicationArea = All;
                     Enabled = false;
+                    ToolTip = 'Specifies the value of the Data Type field';
                 }
             }
         }

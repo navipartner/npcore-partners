@@ -19,42 +19,52 @@ page 6014604 "NPR Attribute Card"
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field(Name; Name)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Name field';
                 }
                 field("Code Caption"; "Code Caption")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code Caption field';
                 }
                 field("Filter Caption"; "Filter Caption")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Filter Caption field';
                 }
                 field(Blocked; Blocked)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Blocked field';
                 }
                 field(Global; Global)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Global field';
                 }
                 field("Value Datatype"; "Value Datatype")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Value Datatype field';
                 }
                 field("On Validate"; "On Validate")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the On Validate field';
                 }
                 field("On Format"; "On Format")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the On Format field';
                 }
                 field("LookUp Table"; "LookUp Table")
                 {
@@ -64,32 +74,39 @@ page 6014604 "NPR Attribute Card"
                 field("LookUp Table Id"; "LookUp Table Id")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the LookUp Table Id field';
                 }
                 field("LookUp Table Name"; "LookUp Table Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the LookUp Table Name field';
                 }
                 field("LookUp Value Field Id"; "LookUp Value Field Id")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the LookUp Value Field Id field';
                 }
                 field("LookUp Value Field Name"; "LookUp Value Field Name")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the LookUp Value Field Name field';
                 }
                 field("LookUp Description Field Id"; "LookUp Description Field Id")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the LookUp Description Field Id field';
                 }
                 field("LookUp Description Field Name"; "LookUp Description Field Name")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the LookUp Description Field Name field';
                 }
                 field("Import File Column No."; "Import File Column No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Import File Column No. field';
                 }
             }
         }
@@ -108,6 +125,7 @@ page 6014604 "NPR Attribute Card"
                 RunPageView = SORTING("Attribute Code")
                               ORDER(Ascending);
                 ApplicationArea = All;
+                ToolTip = 'Executes the Attribute ID action';
             }
             action(Translations)
             {
@@ -117,6 +135,7 @@ page 6014604 "NPR Attribute Card"
                 RunPageLink = "Attribute Code" = FIELD(Code);
                 RunPageView = SORTING("Attribute Code", "Language ID");
                 ApplicationArea = All;
+                ToolTip = 'Executes the Translations action';
             }
             action(Values)
             {
@@ -126,6 +145,7 @@ page 6014604 "NPR Attribute Card"
                 RunPageLink = "Attribute Code" = FIELD(Code);
                 RunPageView = SORTING("Attribute Code");
                 ApplicationArea = All;
+                ToolTip = 'Executes the Values action';
             }
         }
     }

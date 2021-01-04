@@ -22,28 +22,33 @@ page 6150628 "NPR POS Payment Bin Checkpoint"
                     {
                         ApplicationArea = All;
                         Editable = false;
+                        ToolTip = 'Specifies the value of the Payment Type No. field';
                     }
                     field(Description; Description)
                     {
                         ApplicationArea = All;
                         Editable = false;
+                        ToolTip = 'Specifies the value of the Description field';
                     }
                     field(PaymentBinNo; "Payment Bin No.")
                     {
                         ApplicationArea = All;
                         Editable = false;
                         Visible = false;
+                        ToolTip = 'Specifies the value of the Payment Bin No. field';
                     }
                     field(PaymentMethodNo; "Payment Method No.")
                     {
                         ApplicationArea = All;
                         Editable = false;
                         Visible = false;
+                        ToolTip = 'Specifies the value of the Payment Method No. field';
                     }
                     field(CountedAmountInclFloat; "Counted Amount Incl. Float")
                     {
                         ApplicationArea = All;
                         MinValue = 0;
+                        ToolTip = 'Specifies the value of the Counted Amount Incl. Float field';
 
                         trigger OnAssistEdit()
                         begin
@@ -64,6 +69,7 @@ page 6150628 "NPR POS Payment Bin Checkpoint"
                         ApplicationArea = All;
                         Editable = false;
                         Visible = NOT IsBlindCount;
+                        ToolTip = 'Specifies the value of the Calculated Amount Incl. Float field';
                     }
                     field(CountingDifference; CountingDifference)
                     {
@@ -72,6 +78,7 @@ page 6150628 "NPR POS Payment Bin Checkpoint"
                         Style = Unfavorable;
                         StyleExpr = CountingDifference <> 0;
                         Visible = NOT IsBlindCount;
+                        ToolTip = 'Specifies the value of the Difference field';
 
                         trigger OnValidate()
                         begin
@@ -86,6 +93,7 @@ page 6150628 "NPR POS Payment Bin Checkpoint"
                     {
                         ApplicationArea = All;
                         Visible = NOT IsBlindCount;
+                        ToolTip = 'Specifies the value of the Comment field';
                     }
                 }
             }
@@ -100,29 +108,34 @@ page 6150628 "NPR POS Payment Bin Checkpoint"
                     {
                         ApplicationArea = All;
                         Editable = false;
+                        ToolTip = 'Specifies the value of the Payment Type No. field';
                     }
                     field("Payment Method No."; "Payment Method No.")
                     {
                         ApplicationArea = All;
                         Editable = false;
                         Visible = false;
+                        ToolTip = 'Specifies the value of the Payment Method No. field';
                     }
                     field("Payment Bin No."; "Payment Bin No.")
                     {
                         ApplicationArea = All;
                         Editable = false;
                         Visible = false;
+                        ToolTip = 'Specifies the value of the Payment Bin No. field';
                     }
                     field("Float Amount"; "Float Amount")
                     {
                         ApplicationArea = All;
                         Editable = false;
+                        ToolTip = 'Specifies the value of the Float Amount field';
                     }
                     field("Counted Amount Incl. Float"; "Counted Amount Incl. Float")
                     {
                         ApplicationArea = All;
                         MinValue = 0;
                         Visible = false;
+                        ToolTip = 'Specifies the value of the Counted Amount Incl. Float field';
 
                         trigger OnAssistEdit()
                         begin
@@ -142,24 +155,28 @@ page 6150628 "NPR POS Payment Bin Checkpoint"
                         ApplicationArea = All;
                         Editable = false;
                         Visible = false;
+                        ToolTip = 'Specifies the value of the Transfer In Amount field';
                     }
                     field("Transfer Out Amount"; "Transfer Out Amount")
                     {
                         ApplicationArea = All;
                         Editable = false;
                         Visible = false;
+                        ToolTip = 'Specifies the value of the Transfer Out Amount field';
                     }
                     field(NetTransfer; NetTransfer)
                     {
                         ApplicationArea = All;
                         Caption = 'Transfered Amount';
                         Editable = false;
+                        ToolTip = 'Specifies the value of the Transfered Amount field';
                     }
                     field("Calculated Amount Incl. Float"; "Calculated Amount Incl. Float")
                     {
                         ApplicationArea = All;
                         Editable = false;
                         Visible = NOT IsBlindCount;
+                        ToolTip = 'Specifies the value of the Calculated Amount Incl. Float field';
                     }
                     field("New Float Amount"; "New Float Amount")
                     {
@@ -168,6 +185,7 @@ page 6150628 "NPR POS Payment Bin Checkpoint"
                         MinValue = 0;
                         Style = Strong;
                         StyleExpr = TRUE;
+                        ToolTip = 'Specifies the value of the New Float Amount field';
 
                         trigger OnValidate()
                         begin
@@ -187,6 +205,7 @@ page 6150628 "NPR POS Payment Bin Checkpoint"
                         ApplicationArea = All;
                         Style = Unfavorable;
                         StyleExpr = InvalidDistribution;
+                        ToolTip = 'Specifies the value of the Bank Deposit Amount field';
 
                         trigger OnValidate()
                         begin
@@ -200,17 +219,20 @@ page 6150628 "NPR POS Payment Bin Checkpoint"
                     {
                         ApplicationArea = All;
                         ShowMandatory = "Bank Deposit Amount" <> 0;
+                        ToolTip = 'Specifies the value of the Bank Deposit Bin Code field';
                     }
                     field("Bank Deposit Reference"; "Bank Deposit Reference")
                     {
                         ApplicationArea = All;
                         ShowMandatory = "Bank Deposit Amount" <> 0;
+                        ToolTip = 'Specifies the value of the Bank Deposit Reference field';
                     }
                     field("Move to Bin Amount"; "Move to Bin Amount")
                     {
                         ApplicationArea = All;
                         Style = Unfavorable;
                         StyleExpr = InvalidDistribution;
+                        ToolTip = 'Specifies the value of the Move to Bin Amount field';
 
                         trigger OnValidate()
                         begin
@@ -229,33 +251,39 @@ page 6150628 "NPR POS Payment Bin Checkpoint"
                     {
                         ApplicationArea = All;
                         ShowMandatory = "Move to bin amount" <> 0;
+                        ToolTip = 'Specifies the value of the Move to Bin No. field';
                     }
                     field("Move to Bin Reference"; "Move to Bin Reference")
                     {
                         ApplicationArea = All;
                         ShowMandatory = "Move to bin amount" <> 0;
+                        ToolTip = 'Specifies the value of the Move to Bin Trans. ID field';
                     }
                     field(Status; Status)
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Status field';
                     }
                     field("Checkpoint Bin Entry No."; "Checkpoint Bin Entry No.")
                     {
                         ApplicationArea = All;
                         Editable = false;
                         Visible = false;
+                        ToolTip = 'Specifies the value of the Checkpoint Bin Entry No. field';
                     }
                     field("Payment Bin Entry Amount"; "Payment Bin Entry Amount")
                     {
                         ApplicationArea = All;
                         Editable = false;
                         Visible = false;
+                        ToolTip = 'Specifies the value of the Payment Bin Entry Amount field';
                     }
                     field("Payment Bin Entry Amount (LCY)"; "Payment Bin Entry Amount (LCY)")
                     {
                         ApplicationArea = All;
                         Editable = false;
                         Visible = false;
+                        ToolTip = 'Specifies the value of the Payment Bin Entry Amount (LCY) field';
                     }
                 }
             }
@@ -275,6 +303,7 @@ page 6150628 "NPR POS Payment Bin Checkpoint"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Count action';
             }
         }
     }

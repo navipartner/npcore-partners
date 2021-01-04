@@ -285,6 +285,7 @@ page 6060150 "NPR Event Card"
                             ApplicationArea = All;
                             Enabled = RowEditable1Set1 AND ColumnEditable1Set1;
                             ShowCaption = false;
+                            ToolTip = 'Specifies the value of the AttributeValue[1] [1] [1] field';
 
                             trigger OnValidate()
                             begin
@@ -296,6 +297,7 @@ page 6060150 "NPR Event Card"
                             ApplicationArea = All;
                             Enabled = RowEditable2Set1 AND ColumnEditable1Set1;
                             ShowCaption = false;
+                            ToolTip = 'Specifies the value of the AttributeValue[2] [1] [1] field';
 
                             trigger OnValidate()
                             begin
@@ -307,6 +309,7 @@ page 6060150 "NPR Event Card"
                             ApplicationArea = All;
                             Enabled = RowEditable3Set1 AND ColumnEditable1Set1;
                             ShowCaption = false;
+                            ToolTip = 'Specifies the value of the AttributeValue[3] [1] [1] field';
 
                             trigger OnValidate()
                             begin
@@ -318,6 +321,7 @@ page 6060150 "NPR Event Card"
                             ApplicationArea = All;
                             Enabled = RowEditable4Set1 AND ColumnEditable1Set1;
                             ShowCaption = false;
+                            ToolTip = 'Specifies the value of the AttributeValue[4] [1] [1] field';
 
                             trigger OnValidate()
                             begin
@@ -329,6 +333,7 @@ page 6060150 "NPR Event Card"
                             ApplicationArea = All;
                             Enabled = RowEditable5Set1 AND ColumnEditable1Set1;
                             ShowCaption = false;
+                            ToolTip = 'Specifies the value of the AttributeValue[5] [1] [1] field';
 
                             trigger OnValidate()
                             begin
@@ -353,6 +358,7 @@ page 6060150 "NPR Event Card"
                             ApplicationArea = All;
                             Enabled = RowEditable1Set1 AND ColumnEditable2Set1;
                             ShowCaption = false;
+                            ToolTip = 'Specifies the value of the AttributeValue[1] [2] [1] field';
 
                             trigger OnValidate()
                             begin
@@ -364,6 +370,7 @@ page 6060150 "NPR Event Card"
                             ApplicationArea = All;
                             Enabled = RowEditable2Set1 AND ColumnEditable2Set1;
                             ShowCaption = false;
+                            ToolTip = 'Specifies the value of the AttributeValue[2] [2] [1] field';
 
                             trigger OnValidate()
                             begin
@@ -375,6 +382,7 @@ page 6060150 "NPR Event Card"
                             ApplicationArea = All;
                             Enabled = RowEditable3Set1 AND ColumnEditable2Set1;
                             ShowCaption = false;
+                            ToolTip = 'Specifies the value of the AttributeValue[3] [2] [1] field';
 
                             trigger OnValidate()
                             begin
@@ -386,6 +394,7 @@ page 6060150 "NPR Event Card"
                             ApplicationArea = All;
                             Enabled = RowEditable4Set1 AND ColumnEditable2Set1;
                             ShowCaption = false;
+                            ToolTip = 'Specifies the value of the AttributeValue[4] [2] [1] field';
 
                             trigger OnValidate()
                             begin
@@ -397,6 +406,7 @@ page 6060150 "NPR Event Card"
                             ApplicationArea = All;
                             Enabled = RowEditable5Set1 AND ColumnEditable2Set1;
                             ShowCaption = false;
+                            ToolTip = 'Specifies the value of the AttributeValue[5] [2] [1] field';
 
                             trigger OnValidate()
                             begin
@@ -421,6 +431,7 @@ page 6060150 "NPR Event Card"
                             ApplicationArea = All;
                             Enabled = RowEditable1Set1 AND ColumnEditable3Set1;
                             ShowCaption = false;
+                            ToolTip = 'Specifies the value of the AttributeValue[1] [3] [1] field';
 
                             trigger OnValidate()
                             begin
@@ -432,6 +443,7 @@ page 6060150 "NPR Event Card"
                             ApplicationArea = All;
                             Enabled = RowEditable2Set1 AND ColumnEditable3Set1;
                             ShowCaption = false;
+                            ToolTip = 'Specifies the value of the AttributeValue[2] [3] [1] field';
 
                             trigger OnValidate()
                             begin
@@ -443,6 +455,7 @@ page 6060150 "NPR Event Card"
                             ApplicationArea = All;
                             Enabled = RowEditable3Set1 AND ColumnEditable3Set1;
                             ShowCaption = false;
+                            ToolTip = 'Specifies the value of the AttributeValue[3] [3] [1] field';
 
                             trigger OnValidate()
                             begin
@@ -454,6 +467,7 @@ page 6060150 "NPR Event Card"
                             ApplicationArea = All;
                             Enabled = RowEditable4Set1 AND ColumnEditable3Set1;
                             ShowCaption = false;
+                            ToolTip = 'Specifies the value of the AttributeValue[4] [3] [1] field';
 
                             trigger OnValidate()
                             begin
@@ -465,6 +479,7 @@ page 6060150 "NPR Event Card"
                             ApplicationArea = All;
                             Enabled = RowEditable5Set1 AND ColumnEditable3Set1;
                             ShowCaption = false;
+                            ToolTip = 'Specifies the value of the AttributeValue[5] [3] [1] field';
 
                             trigger OnValidate()
                             begin
@@ -489,6 +504,7 @@ page 6060150 "NPR Event Card"
                             ApplicationArea = All;
                             Enabled = RowEditable1Set1 AND ColumnEditable4Set1;
                             ShowCaption = false;
+                            ToolTip = 'Specifies the value of the AttributeValue[1] [4] [1] field';
 
                             trigger OnValidate()
                             begin
@@ -500,6 +516,7 @@ page 6060150 "NPR Event Card"
                             ApplicationArea = All;
                             Enabled = RowEditable2Set1 AND ColumnEditable4Set1;
                             ShowCaption = false;
+                            ToolTip = 'Specifies the value of the AttributeValue[2] [4] [1] field';
 
                             trigger OnValidate()
                             begin
@@ -511,6 +528,7 @@ page 6060150 "NPR Event Card"
                             ApplicationArea = All;
                             Enabled = RowEditable3Set1 AND ColumnEditable4Set1;
                             ShowCaption = false;
+                            ToolTip = 'Specifies the value of the AttributeValue[3] [4] [1] field';
 
                             trigger OnValidate()
                             begin
@@ -522,6 +540,7 @@ page 6060150 "NPR Event Card"
                             ApplicationArea = All;
                             Enabled = RowEditable4Set1 AND ColumnEditable4Set1;
                             ShowCaption = false;
+                            ToolTip = 'Specifies the value of the AttributeValue[4] [4] [1] field';
 
                             trigger OnValidate()
                             begin
@@ -533,6 +552,7 @@ page 6060150 "NPR Event Card"
                             ApplicationArea = All;
                             Enabled = RowEditable5Set1 AND ColumnEditable4Set1;
                             ShowCaption = false;
+                            ToolTip = 'Specifies the value of the AttributeValue[5] [4] [1] field';
 
                             trigger OnValidate()
                             begin
@@ -557,6 +577,7 @@ page 6060150 "NPR Event Card"
                             ApplicationArea = All;
                             Enabled = RowEditable1Set1 AND ColumnEditable5Set1;
                             ShowCaption = false;
+                            ToolTip = 'Specifies the value of the AttributeValue[1] [5] [1] field';
 
                             trigger OnValidate()
                             begin
@@ -568,6 +589,7 @@ page 6060150 "NPR Event Card"
                             ApplicationArea = All;
                             Enabled = RowEditable2Set1 AND ColumnEditable5Set1;
                             ShowCaption = false;
+                            ToolTip = 'Specifies the value of the AttributeValue[2] [5] [1] field';
 
                             trigger OnValidate()
                             begin
@@ -579,6 +601,7 @@ page 6060150 "NPR Event Card"
                             ApplicationArea = All;
                             Enabled = RowEditable3Set1 AND ColumnEditable5Set1;
                             ShowCaption = false;
+                            ToolTip = 'Specifies the value of the AttributeValue[3] [5] [1] field';
 
                             trigger OnValidate()
                             begin
@@ -590,6 +613,7 @@ page 6060150 "NPR Event Card"
                             ApplicationArea = All;
                             Enabled = RowEditable4Set1 AND ColumnEditable5Set1;
                             ShowCaption = false;
+                            ToolTip = 'Specifies the value of the AttributeValue[4] [5] [1] field';
 
                             trigger OnValidate()
                             begin
@@ -601,6 +625,7 @@ page 6060150 "NPR Event Card"
                             ApplicationArea = All;
                             Enabled = RowEditable5Set1 AND ColumnEditable5Set1;
                             ShowCaption = false;
+                            ToolTip = 'Specifies the value of the AttributeValue[5] [5] [1] field';
 
                             trigger OnValidate()
                             begin
@@ -684,6 +709,7 @@ page 6060150 "NPR Event Card"
                             ApplicationArea = All;
                             Enabled = RowEditable1Set2 AND ColumnEditable1Set2;
                             ShowCaption = false;
+                            ToolTip = 'Specifies the value of the AttributeValue[1] [1] [2] field';
 
                             trigger OnValidate()
                             begin
@@ -695,6 +721,7 @@ page 6060150 "NPR Event Card"
                             ApplicationArea = All;
                             Enabled = RowEditable2Set2 AND ColumnEditable1Set2;
                             ShowCaption = false;
+                            ToolTip = 'Specifies the value of the AttributeValue[2] [1] [2] field';
 
                             trigger OnValidate()
                             begin
@@ -706,6 +733,7 @@ page 6060150 "NPR Event Card"
                             ApplicationArea = All;
                             Enabled = RowEditable3Set2 AND ColumnEditable1Set2;
                             ShowCaption = false;
+                            ToolTip = 'Specifies the value of the AttributeValue[3] [1] [2] field';
 
                             trigger OnValidate()
                             begin
@@ -717,6 +745,7 @@ page 6060150 "NPR Event Card"
                             ApplicationArea = All;
                             Enabled = RowEditable4Set2 AND ColumnEditable1Set2;
                             ShowCaption = false;
+                            ToolTip = 'Specifies the value of the AttributeValue[4] [1] [2] field';
 
                             trigger OnValidate()
                             begin
@@ -728,6 +757,7 @@ page 6060150 "NPR Event Card"
                             ApplicationArea = All;
                             Enabled = RowEditable5Set2 AND ColumnEditable1Set2;
                             ShowCaption = false;
+                            ToolTip = 'Specifies the value of the AttributeValue[5] [1] [2] field';
 
                             trigger OnValidate()
                             begin
@@ -752,6 +782,7 @@ page 6060150 "NPR Event Card"
                             ApplicationArea = All;
                             Enabled = RowEditable1Set2 AND ColumnEditable2Set2;
                             ShowCaption = false;
+                            ToolTip = 'Specifies the value of the AttributeValue[1] [2] [2] field';
 
                             trigger OnValidate()
                             begin
@@ -763,6 +794,7 @@ page 6060150 "NPR Event Card"
                             ApplicationArea = All;
                             Enabled = RowEditable2Set2 AND ColumnEditable2Set2;
                             ShowCaption = false;
+                            ToolTip = 'Specifies the value of the AttributeValue[2] [2] [2] field';
 
                             trigger OnValidate()
                             begin
@@ -774,6 +806,7 @@ page 6060150 "NPR Event Card"
                             ApplicationArea = All;
                             Enabled = RowEditable3Set2 AND ColumnEditable2Set2;
                             ShowCaption = false;
+                            ToolTip = 'Specifies the value of the AttributeValue[3] [2] [2] field';
 
                             trigger OnValidate()
                             begin
@@ -785,6 +818,7 @@ page 6060150 "NPR Event Card"
                             ApplicationArea = All;
                             Enabled = RowEditable4Set2 AND ColumnEditable2Set2;
                             ShowCaption = false;
+                            ToolTip = 'Specifies the value of the AttributeValue[4] [2] [2] field';
 
                             trigger OnValidate()
                             begin
@@ -796,6 +830,7 @@ page 6060150 "NPR Event Card"
                             ApplicationArea = All;
                             Enabled = RowEditable5Set2 AND ColumnEditable2Set2;
                             ShowCaption = false;
+                            ToolTip = 'Specifies the value of the AttributeValue[5] [2] [2] field';
 
                             trigger OnValidate()
                             begin
@@ -820,6 +855,7 @@ page 6060150 "NPR Event Card"
                             ApplicationArea = All;
                             Enabled = RowEditable1Set2 AND ColumnEditable3Set2;
                             ShowCaption = false;
+                            ToolTip = 'Specifies the value of the AttributeValue[1] [3] [2] field';
 
                             trigger OnValidate()
                             begin
@@ -831,6 +867,7 @@ page 6060150 "NPR Event Card"
                             ApplicationArea = All;
                             Enabled = RowEditable2Set2 AND ColumnEditable3Set2;
                             ShowCaption = false;
+                            ToolTip = 'Specifies the value of the AttributeValue[2] [3] [2] field';
 
                             trigger OnValidate()
                             begin
@@ -842,6 +879,7 @@ page 6060150 "NPR Event Card"
                             ApplicationArea = All;
                             Enabled = RowEditable3Set2 AND ColumnEditable3Set2;
                             ShowCaption = false;
+                            ToolTip = 'Specifies the value of the AttributeValue[3] [3] [2] field';
 
                             trigger OnValidate()
                             begin
@@ -853,6 +891,7 @@ page 6060150 "NPR Event Card"
                             ApplicationArea = All;
                             Enabled = RowEditable4Set2 AND ColumnEditable3Set2;
                             ShowCaption = false;
+                            ToolTip = 'Specifies the value of the AttributeValue[4] [3] [2] field';
 
                             trigger OnValidate()
                             begin
@@ -864,6 +903,7 @@ page 6060150 "NPR Event Card"
                             ApplicationArea = All;
                             Enabled = RowEditable5Set2 AND ColumnEditable3Set2;
                             ShowCaption = false;
+                            ToolTip = 'Specifies the value of the AttributeValue[5] [3] [2] field';
 
                             trigger OnValidate()
                             begin
@@ -888,6 +928,7 @@ page 6060150 "NPR Event Card"
                             ApplicationArea = All;
                             Enabled = RowEditable1Set2 AND ColumnEditable4Set2;
                             ShowCaption = false;
+                            ToolTip = 'Specifies the value of the AttributeValue[1] [4] [2] field';
 
                             trigger OnValidate()
                             begin
@@ -899,6 +940,7 @@ page 6060150 "NPR Event Card"
                             ApplicationArea = All;
                             Enabled = RowEditable2Set2 AND ColumnEditable4Set2;
                             ShowCaption = false;
+                            ToolTip = 'Specifies the value of the AttributeValue[2] [4] [2] field';
 
                             trigger OnValidate()
                             begin
@@ -910,6 +952,7 @@ page 6060150 "NPR Event Card"
                             ApplicationArea = All;
                             Enabled = RowEditable3Set2 AND ColumnEditable4Set2;
                             ShowCaption = false;
+                            ToolTip = 'Specifies the value of the AttributeValue[3] [4] [2] field';
 
                             trigger OnValidate()
                             begin
@@ -921,6 +964,7 @@ page 6060150 "NPR Event Card"
                             ApplicationArea = All;
                             Enabled = RowEditable4Set2 AND ColumnEditable4Set2;
                             ShowCaption = false;
+                            ToolTip = 'Specifies the value of the AttributeValue[4] [4] [2] field';
 
                             trigger OnValidate()
                             begin
@@ -932,6 +976,7 @@ page 6060150 "NPR Event Card"
                             ApplicationArea = All;
                             Enabled = RowEditable5Set2 AND ColumnEditable4Set2;
                             ShowCaption = false;
+                            ToolTip = 'Specifies the value of the AttributeValue[5] [4] [2] field';
 
                             trigger OnValidate()
                             begin
@@ -956,6 +1001,7 @@ page 6060150 "NPR Event Card"
                             ApplicationArea = All;
                             Enabled = RowEditable1Set2 AND ColumnEditable5Set2;
                             ShowCaption = false;
+                            ToolTip = 'Specifies the value of the AttributeValue[1] [5] [2] field';
 
                             trigger OnValidate()
                             begin
@@ -967,6 +1013,7 @@ page 6060150 "NPR Event Card"
                             ApplicationArea = All;
                             Enabled = RowEditable2Set2 AND ColumnEditable5Set2;
                             ShowCaption = false;
+                            ToolTip = 'Specifies the value of the AttributeValue[2] [5] [2] field';
 
                             trigger OnValidate()
                             begin
@@ -978,6 +1025,7 @@ page 6060150 "NPR Event Card"
                             ApplicationArea = All;
                             Enabled = RowEditable3Set2 AND ColumnEditable5Set2;
                             ShowCaption = false;
+                            ToolTip = 'Specifies the value of the AttributeValue[3] [5] [2] field';
 
                             trigger OnValidate()
                             begin
@@ -989,6 +1037,7 @@ page 6060150 "NPR Event Card"
                             ApplicationArea = All;
                             Enabled = RowEditable4Set2 AND ColumnEditable5Set2;
                             ShowCaption = false;
+                            ToolTip = 'Specifies the value of the AttributeValue[4] [5] [2] field';
 
                             trigger OnValidate()
                             begin
@@ -1000,6 +1049,7 @@ page 6060150 "NPR Event Card"
                             ApplicationArea = All;
                             Enabled = RowEditable5Set2 AND ColumnEditable5Set2;
                             ShowCaption = false;
+                            ToolTip = 'Specifies the value of the AttributeValue[5] [5] [2] field';
 
                             trigger OnValidate()
                             begin

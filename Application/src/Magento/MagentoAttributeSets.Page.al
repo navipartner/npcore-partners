@@ -28,10 +28,12 @@ page 6151434 "NPR Magento Attribute Sets"
                         field(Description; Description)
                         {
                             ApplicationArea = All;
+                            ToolTip = 'Specifies the value of the Description field';
                         }
                         field("Used by Items"; "Used by Items")
                         {
                             ApplicationArea = All;
+                            ToolTip = 'Specifies the value of the Used by Items field';
 
                             trigger OnDrillDown()
                             begin
@@ -45,6 +47,7 @@ page 6151434 "NPR Magento Attribute Sets"
                     {
                         ApplicationArea = All;
                         Caption = '                                                                                                                                                             ';
+                        ToolTip = 'Specifies the value of the '''' field';
                     }
                 }
                 group(Control6151400)

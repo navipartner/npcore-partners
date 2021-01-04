@@ -18,10 +18,12 @@ page 6151085 "NPR RIS Retail Inv. Sets"
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
             }
         }
@@ -39,6 +41,7 @@ page 6151085 "NPR RIS Retail Inv. Sets"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Test Retail Inventory action';
 
                 trigger OnAction()
                 var

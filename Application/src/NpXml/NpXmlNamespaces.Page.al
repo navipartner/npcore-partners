@@ -19,10 +19,12 @@ page 6151564 "NPR NpXml Namespaces"
                 field(Alias; Alias)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Alias field';
                 }
                 field(Namespace; Namespace)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Namespace field';
                 }
             }
         }

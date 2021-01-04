@@ -21,14 +21,17 @@ page 6150723 "NPR POS Entry Comments"
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the POS Entry No. field';
                 }
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Comment; Comment)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Comment field';
                 }
             }
         }

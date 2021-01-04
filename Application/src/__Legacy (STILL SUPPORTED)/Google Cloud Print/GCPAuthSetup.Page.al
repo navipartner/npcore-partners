@@ -24,11 +24,13 @@ page 6014635 "NPR GCP Auth Setup"
                     Editable = false;
                     Enabled = true;
                     ExtendedDatatype = URL;
+                    ToolTip = 'Specifies the value of the URL field';
                 }
                 field(AuthCode; AuthCode)
                 {
                     ApplicationArea = All;
                     Caption = 'Code';
+                    ToolTip = 'Specifies the value of the Code field';
                 }
             }
         }

@@ -16,18 +16,22 @@ page 6014520 "NPR Website List WP"
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Name; Name)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Name field';
                 }
                 field("Default Website"; "Default Website")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Std. Website field';
                 }
                 field("Global Dimension 1 Code"; "Global Dimension 1 Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Global Dimension 1 Code field';
                     trigger OnLookup(var Text: Text): Boolean
                     var
                         GlobalDimension1: Record "Dimension Value";
@@ -52,6 +56,7 @@ page 6014520 "NPR Website List WP"
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Global Dimension 2 Code field';
 
                     trigger OnLookup(var Text: Text): Boolean
                     var

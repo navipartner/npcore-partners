@@ -23,6 +23,7 @@ page 6014432 "NPR Audit Roll"
                 Style = Unfavorable;
                 StyleExpr = TRUE;
                 Visible = AdvancedPosting;
+                ToolTip = 'Specifies the value of the Advanced Posting Warning field';
             }
             field(ClicktoSeePOSEntries; ClicktoSeePOSEntries)
             {
@@ -31,6 +32,7 @@ page 6014432 "NPR Audit Roll"
                 LookupPageID = "NPR POS Entries";
                 ShowCaption = false;
                 Visible = AdvancedPosting;
+                ToolTip = 'Specifies the value of the Click to See POS Entriies field';
 
                 trigger OnAssistEdit()
                 begin
@@ -43,6 +45,7 @@ page 6014432 "NPR Audit Roll"
                 ApplicationArea = All;
                 Caption = 'Type Filter';
                 Visible = false;
+                ToolTip = 'Specifies the value of the Type Filter field';
 
                 trigger OnValidate()
                 begin
@@ -64,6 +67,7 @@ page 6014432 "NPR Audit Roll"
                 Caption = 'Counter No.Filter';
                 TableRelation = "NPR Register"."Register No.";
                 Visible = false;
+                ToolTip = 'Specifies the value of the Counter No.Filter field';
 
                 trigger OnValidate()
                 begin
@@ -84,6 +88,7 @@ page 6014432 "NPR Audit Roll"
                 Caption = 'Sales Person Code Filter';
                 TableRelation = "Salesperson/Purchaser".Code;
                 Visible = false;
+                ToolTip = 'Specifies the value of the Sales Person Code Filter field';
 
                 trigger OnValidate()
                 begin
@@ -100,6 +105,7 @@ page 6014432 "NPR Audit Roll"
                 ApplicationArea = All;
                 Caption = 'Customer No. Filter';
                 Visible = false;
+                ToolTip = 'Specifies the value of the Customer No. Filter field';
 
                 trigger OnValidate()
                 begin
@@ -115,6 +121,7 @@ page 6014432 "NPR Audit Roll"
                 ApplicationArea = All;
                 Caption = 'Sales Date Filter';
                 Visible = false;
+                ToolTip = 'Specifies the value of the Sales Date Filter field';
 
                 trigger OnValidate()
                 begin
@@ -132,6 +139,7 @@ page 6014432 "NPR Audit Roll"
                 ApplicationArea = All;
                 Caption = 'Hide Cancelled';
                 Visible = false;
+                ToolTip = 'Specifies the value of the Hide Cancelled field';
 
                 trigger OnValidate()
                 begin
@@ -151,6 +159,7 @@ page 6014432 "NPR Audit Roll"
                 Caption = 'Posted Filter';
                 OptionCaption = ' ,No,Yes';
                 Visible = false;
+                ToolTip = 'Specifies the value of the Posted Filter field';
 
                 trigger OnValidate()
                 begin
@@ -177,6 +186,7 @@ page 6014432 "NPR Audit Roll"
                 {
                     ApplicationArea = All;
                     StyleExpr = StyleExpr;
+                    ToolTip = 'Specifies the value of the Sales Ticket No. field';
                 }
                 field("Register No."; "Register No.")
                 {
@@ -184,45 +194,53 @@ page 6014432 "NPR Audit Roll"
                     Editable = false;
                     Enabled = FieldRegisterNo;
                     StyleExpr = StyleExpr;
+                    ToolTip = 'Specifies the value of the Cash Register No. field';
                 }
                 field("Sale Type"; "Sale Type")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Sale Type field';
                 }
                 field(Type; Type)
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Type field';
                 }
                 field("Sale Date"; "Sale Date")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     StyleExpr = StyleExpr;
+                    ToolTip = 'Specifies the value of the Sale Date field';
                 }
                 field("Starting Time"; "Starting Time")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     StyleExpr = StyleExpr;
+                    ToolTip = 'Specifies the value of the Starting Time field';
                 }
                 field("Closing Time"; "Closing Time")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     StyleExpr = StyleExpr;
+                    ToolTip = 'Specifies the value of the Closing Time field';
                 }
                 field("No."; "No.")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     StyleExpr = StyleExpr;
+                    ToolTip = 'Specifies the value of the No. field';
                 }
                 field("Gift voucher ref."; "Gift voucher ref.")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Gift voucher ref. field';
                 }
                 field(Amount; Amount)
                 {
@@ -230,100 +248,118 @@ page 6014432 "NPR Audit Roll"
                     Editable = false;
                     StyleExpr = StyleExpr;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Amount field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
                     Editable = false;
                     StyleExpr = StyleExpr;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Description 2"; "Description 2")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description 2 field';
                 }
                 field("Customer No."; "Customer No.")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     StyleExpr = StyleExpr;
+                    ToolTip = 'Specifies the value of the Customer No. field';
                 }
                 field(Posted; Posted)
                 {
                     ApplicationArea = All;
                     Editable = false;
                     StyleExpr = StyleExpr;
+                    ToolTip = 'Specifies the value of the Posted field';
                 }
                 field("Item Entry Posted"; "Item Entry Posted")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     StyleExpr = StyleExpr;
+                    ToolTip = 'Specifies the value of the Item Entry Posted field';
                 }
                 field(Quantity; Quantity)
                 {
                     ApplicationArea = All;
                     Editable = false;
                     StyleExpr = StyleExpr;
+                    ToolTip = 'Specifies the value of the Quantity field';
                 }
                 field("Unit of Measure Code"; "Unit of Measure Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Unit of Measure Code field';
                 }
                 field("Amount Including VAT"; "Amount Including VAT")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     StyleExpr = StyleExpr;
+                    ToolTip = 'Specifies the value of the Amount Including VAT field';
                 }
                 field("Line Discount %"; "Line Discount %")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     StyleExpr = StyleExpr;
+                    ToolTip = 'Specifies the value of the Line Discount % field';
                 }
                 field("Line Discount Amount"; "Line Discount Amount")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     StyleExpr = StyleExpr;
+                    ToolTip = 'Specifies the value of the Line Discount Amount field';
                 }
                 field("VAT %"; "VAT %")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     StyleExpr = StyleExpr;
+                    ToolTip = 'Specifies the value of the VAT % field';
                 }
                 field("Salesperson Code"; "Salesperson Code")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     StyleExpr = StyleExpr;
+                    ToolTip = 'Specifies the value of the Salesperson Code field';
                 }
                 field("<Item Entry Posted1>"; "Item Entry Posted")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     StyleExpr = StyleExpr;
+                    ToolTip = 'Specifies the value of the Item Entry Posted field';
                 }
                 field(Offline; Offline)
                 {
                     ApplicationArea = All;
                     Editable = false;
                     StyleExpr = StyleExpr;
+                    ToolTip = 'Specifies the value of the Offline field';
                 }
                 field("Gen. Bus. Posting Group"; "Gen. Bus. Posting Group")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Gen. Bus. Posting Group field';
                 }
                 field("Discount Authorised by"; "Discount Authorised by")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Discount Authorised by field';
                 }
                 field("Reason Code"; "Reason Code")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Reason Code field';
                 }
             }
             usercontrol(PingPong; "NPRMicrosoft.Dynamics.Nav.Client.PingPong")
@@ -358,6 +394,7 @@ page 6014432 "NPR Audit Roll"
                     PromotedCategory = "Report";
                     PromotedIsBig = false;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Receipt action';
 
                     trigger OnAction()
                     var
@@ -384,6 +421,7 @@ page 6014432 "NPR Audit Roll"
                     Promoted = true;
                     PromotedCategory = "Report";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the A4 Sales Ticket action';
 
                     trigger OnAction()
                     var
@@ -407,6 +445,7 @@ page 6014432 "NPR Audit Roll"
                     Caption = 'Invoice';
                     Image = Invoice;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Invoice action';
 
                     trigger OnAction()
                     var
@@ -431,6 +470,7 @@ page 6014432 "NPR Audit Roll"
                     Promoted = true;
                     PromotedCategory = "Report";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Debit Receipt action';
 
                     trigger OnAction()
                     var
@@ -453,6 +493,7 @@ page 6014432 "NPR Audit Roll"
                     Caption = 'Insurranceoffer';
                     Image = Insurance;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Insurranceoffer action';
 
                     trigger OnAction()
                     begin
@@ -464,6 +505,7 @@ page 6014432 "NPR Audit Roll"
                     Caption = 'Retail order';
                     Image = "Action";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Retail order action';
 
                     trigger OnAction()
                     var
@@ -487,6 +529,7 @@ page 6014432 "NPR Audit Roll"
                     PromotedCategory = "Report";
                     PromotedIsBig = false;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Register Report action';
 
                     trigger OnAction()
                     var
@@ -504,6 +547,7 @@ page 6014432 "NPR Audit Roll"
                     PromotedIsBig = false;
                     Visible = true;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Tax Free action';
 
                     trigger OnAction()
                     var
@@ -534,6 +578,7 @@ page 6014432 "NPR Audit Roll"
                     Image = "Action";
                     RunObject = Page "NPR Credit card Trx List";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Credit Card Transaction List action';
                 }
                 action("EFT Receipt")
                 {
@@ -542,6 +587,7 @@ page 6014432 "NPR Audit Roll"
                     Promoted = true;
                     PromotedCategory = "Report";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the EFT Receipt action';
 
                     trigger OnAction()
                     var
@@ -560,6 +606,7 @@ page 6014432 "NPR Audit Roll"
                     Caption = 'Show Credit Card Transaction';
                     Image = "Action";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Show Credit Card Transaction action';
 
                     trigger OnAction()
                     begin
@@ -583,6 +630,7 @@ page 6014432 "NPR Audit Roll"
                     RunObject = Page "NPR EFT Transaction Requests";
                     RunPageLink = "Sales Ticket No." = FIELD("Sales Ticket No.");
                     ApplicationArea = All;
+                    ToolTip = 'Executes the EFT Transaction Requests action';
                 }
             }
             group(Functions)
@@ -594,6 +642,7 @@ page 6014432 "NPR Audit Roll"
                     Image = Post;
                     ShortCutKey = 'F5';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Post Payments action';
 
                     trigger OnAction()
                     begin
@@ -606,6 +655,7 @@ page 6014432 "NPR Audit Roll"
                     Image = Post;
                     ShortCutKey = 'F11';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Post action';
 
                     trigger OnAction()
                     var
@@ -624,6 +674,7 @@ page 6014432 "NPR Audit Roll"
                     PromotedCategory = Category4;
                     ShortCutKey = 'Shift+F11';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Post Sales Ticket action';
 
                     trigger OnAction()
                     begin
@@ -636,6 +687,7 @@ page 6014432 "NPR Audit Roll"
                     Image = Post;
                     ShortCutKey = 'Ctrl+F11';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Posting of Range action';
 
                     trigger OnAction()
                     var
@@ -650,6 +702,7 @@ page 6014432 "NPR Audit Roll"
                     Caption = 'Move Sales Ticket to Warranty';
                     Image = MovementWorksheet;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Move Sales Ticket to Warranty action';
 
                     trigger OnAction()
                     var
@@ -666,6 +719,7 @@ page 6014432 "NPR Audit Roll"
                     Caption = 'Show Documents';
                     Image = "Action";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Show Documents action';
 
                     trigger OnAction()
                     var
@@ -707,12 +761,14 @@ page 6014432 "NPR Audit Roll"
                     RunPageLink = "Sales Ticket No." = FIELD("Sales Ticket No."),
                                   "Register No." = FIELD("Register No.");
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Show Period action';
                 }
                 action("&Navigate")
                 {
                     Caption = 'Naviger';
                     Image = Navigate;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Naviger action';
 
                     trigger OnAction()
                     var
@@ -728,6 +784,7 @@ page 6014432 "NPR Audit Roll"
                     Image = Dimensions;
                     ShortCutKey = 'Shift+Ctrl+D';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Dimensions action';
 
                     trigger OnAction()
                     begin
@@ -739,6 +796,7 @@ page 6014432 "NPR Audit Roll"
                     Caption = 'Change Dimensions';
                     Image = ChangeDimensions;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Change Dimensions action';
 
                     trigger OnAction()
                     begin
@@ -750,6 +808,7 @@ page 6014432 "NPR Audit Roll"
                     Caption = 'Comments';
                     Image = Comment;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Comments action';
 
                     trigger OnAction()
                     var
@@ -772,12 +831,14 @@ page 6014432 "NPR Audit Roll"
                     RunPageLink = "Register No." = FIELD("Register No."),
                                   "Sales Ticket No." = FIELD("Sales Ticket No.");
                     ApplicationArea = All;
+                    ToolTip = 'Executes the POS Info action';
                 }
                 action("POS Entry")
                 {
                     Caption = 'POS Entry';
                     Image = Entries;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the POS Entry action';
 
                     trigger OnAction()
                     var
@@ -799,6 +860,7 @@ page 6014432 "NPR Audit Roll"
                     Caption = 'Advanced Filter';
                     Image = "Filter";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Advanced Filter action';
                 }
                 separator(Separator6150674)
                 {
@@ -808,6 +870,7 @@ page 6014432 "NPR Audit Roll"
                     Caption = 'Calculate';
                     Image = Calculate;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Calculate action';
                 }
                 action(Sum)
                 {
@@ -815,6 +878,7 @@ page 6014432 "NPR Audit Roll"
                     Image = Totals;
                     ShortCutKey = 'Ctrl+S';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Sum action';
 
                     trigger OnAction()
                     var
@@ -839,6 +903,7 @@ page 6014432 "NPR Audit Roll"
                     Image = Statistics;
                     ShortCutKey = 'F9';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Sales Ticket Statistics action';
 
                     trigger OnAction()
                     begin
@@ -859,12 +924,14 @@ page 6014432 "NPR Audit Roll"
                     Image = Statistics;
                     RunObject = Page "NPR Advanced Sales Stats";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Advanced Sales Statistics action';
                 }
                 action("Day Report")
                 {
                     Caption = 'Day Report';
                     Image = "Report";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Day Report action';
 
                     trigger OnAction()
                     begin
@@ -888,6 +955,7 @@ page 6014432 "NPR Audit Roll"
                     Caption = 'E-mail Log';
                     Image = Email;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the E-mail Log action';
                 }
                 action(SendAsPDF)
                 {
@@ -895,6 +963,7 @@ page 6014432 "NPR Audit Roll"
                     Image = SendEmailPDF;
                     Promoted = true;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Send as PDF action';
                 }
             }
         }

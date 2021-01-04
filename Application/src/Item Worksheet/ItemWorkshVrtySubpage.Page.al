@@ -28,11 +28,13 @@ page 6060043 "NPR Item Worksh. Vrty. Subpage"
                     AutoFormatType = 2;
                     BlankNumbers = BlankZeroAndPos;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Level field';
                 }
                 field("Heading Text"; "Heading Text")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Heading Text field';
                 }
                 field("Variety 1 Value"; "Variety 1 Value")
                 {
@@ -40,6 +42,7 @@ page 6060043 "NPR Item Worksh. Vrty. Subpage"
                     CaptionClass = '3,' + FieldCaptionNew[1];
                     Editable = true;
                     Visible = Variety1InUse;
+                    ToolTip = 'Specifies the value of the Variety 1 Value field';
 
                     trigger OnValidate()
                     begin
@@ -56,6 +59,7 @@ page 6060043 "NPR Item Worksh. Vrty. Subpage"
                     CaptionClass = '3,' + FieldCaptionNew[2];
                     Editable = true;
                     Visible = Variety2InUse;
+                    ToolTip = 'Specifies the value of the Variety 2 Value field';
 
                     trigger OnValidate()
                     begin
@@ -72,6 +76,7 @@ page 6060043 "NPR Item Worksh. Vrty. Subpage"
                     CaptionClass = '3,' + FieldCaptionNew[3];
                     Editable = true;
                     Visible = Variety3InUse;
+                    ToolTip = 'Specifies the value of the Variety 3 Value field';
 
                     trigger OnValidate()
                     begin
@@ -88,6 +93,7 @@ page 6060043 "NPR Item Worksh. Vrty. Subpage"
                     CaptionClass = '3,' + FieldCaptionNew[4];
                     Editable = true;
                     Visible = Variety4InUse;
+                    ToolTip = 'Specifies the value of the Variety 4 Value field';
 
                     trigger OnValidate()
                     begin
@@ -101,6 +107,7 @@ page 6060043 "NPR Item Worksh. Vrty. Subpage"
                 field("Action"; Action)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Action field';
 
                     trigger OnValidate()
                     begin
@@ -115,6 +122,7 @@ page 6060043 "NPR Item Worksh. Vrty. Subpage"
                 field("Variant Code"; "Variant Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Variant Code field';
 
                     trigger OnValidate()
                     begin
@@ -126,6 +134,7 @@ page 6060043 "NPR Item Worksh. Vrty. Subpage"
                 field("Existing Variant Code"; "Existing Variant Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Existing Variant Code field';
 
                     trigger OnValidate()
                     begin
@@ -137,11 +146,13 @@ page 6060043 "NPR Item Worksh. Vrty. Subpage"
                 field("Existing Variant Blocked"; "Existing Variant Blocked")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Existing Variant Blocked field';
                 }
                 field("Internal Bar Code"; "Internal Bar Code")
                 {
                     ApplicationArea = All;
                     Editable = AltNoEditable;
+                    ToolTip = 'Specifies the value of the Internal Bar Code field';
 
                     trigger OnValidate()
                     begin
@@ -154,6 +165,7 @@ page 6060043 "NPR Item Worksh. Vrty. Subpage"
                 {
                     ApplicationArea = All;
                     Editable = CrossRefEditable;
+                    ToolTip = 'Specifies the value of the Vendors Bar Code field';
 
                     trigger OnValidate()
                     begin
@@ -167,6 +179,7 @@ page 6060043 "NPR Item Worksh. Vrty. Subpage"
                     ApplicationArea = All;
                     Enabled = false;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Recommended Retail Price field';
 
                     trigger OnValidate()
                     begin
@@ -184,6 +197,7 @@ page 6060043 "NPR Item Worksh. Vrty. Subpage"
                     Caption = 'Recommended Retail Price';
                     Style = StandardAccent;
                     StyleExpr = RecommendedRetailPriceBold;
+                    ToolTip = 'Specifies the value of the Recommended Retail Price field';
 
                     trigger OnValidate()
                     begin
@@ -206,6 +220,7 @@ page 6060043 "NPR Item Worksh. Vrty. Subpage"
                     ApplicationArea = All;
                     Enabled = false;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Sales Price field';
 
                     trigger OnValidate()
                     begin
@@ -220,6 +235,7 @@ page 6060043 "NPR Item Worksh. Vrty. Subpage"
                     ApplicationArea = All;
                     Style = StandardAccent;
                     StyleExpr = SalesPriceBold;
+                    ToolTip = 'Specifies the value of the SalesPriceText field';
 
                     trigger OnValidate()
                     begin
@@ -240,6 +256,7 @@ page 6060043 "NPR Item Worksh. Vrty. Subpage"
                     ApplicationArea = All;
                     Enabled = false;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Direct Unit Cost field';
 
                     trigger OnValidate()
                     begin
@@ -254,6 +271,7 @@ page 6060043 "NPR Item Worksh. Vrty. Subpage"
                     ApplicationArea = All;
                     Style = StandardAccent;
                     StyleExpr = PurchasePriceBold;
+                    ToolTip = 'Specifies the value of the PurchasePriceText field';
 
                     trigger OnValidate()
                     begin
@@ -272,6 +290,7 @@ page 6060043 "NPR Item Worksh. Vrty. Subpage"
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
 
                     trigger OnValidate()
                     begin
@@ -283,6 +302,7 @@ page 6060043 "NPR Item Worksh. Vrty. Subpage"
                 field(Blocked; Blocked)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Blocked field';
 
                     trigger OnValidate()
                     begin

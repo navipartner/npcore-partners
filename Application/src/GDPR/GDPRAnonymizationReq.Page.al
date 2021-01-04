@@ -15,34 +15,42 @@ page 6151153 "NPR GDPR Anonymization Req."
                 field("Entry No."; "Entry No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Entry No. field';
                 }
                 field("Customer No."; "Customer No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Customer No. field';
                 }
                 field("Contact No."; "Contact No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Contact No. field';
                 }
                 field(Status; Status)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Status field';
                 }
                 field("Request Received"; "Request Received")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Request Received field';
                 }
                 field("Processed At"; "Processed At")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Processed At field';
                 }
                 field("Log Count"; "Log Count")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Log Count field';
                 }
                 field(Reason; Reason)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Reason field';
                 }
             }
         }
@@ -62,6 +70,7 @@ page 6151153 "NPR GDPR Anonymization Req."
                 RunObject = Page "NPR Customer GDPR Log Entries";
                 RunPageLink = "Customer No" = FIELD("Customer No.");
                 ApplicationArea = All;
+                ToolTip = 'Executes the Anonymization Log action';
             }
         }
         area(processing)
@@ -73,6 +82,7 @@ page 6151153 "NPR GDPR Anonymization Req."
                 Promoted = true;
                 PromotedCategory = Process;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Anonymize action';
 
                 trigger OnAction()
                 var

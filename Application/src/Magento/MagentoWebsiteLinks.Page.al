@@ -22,10 +22,12 @@ page 6151405 "NPR Magento Website Links"
                 field("Website Code"; "Website Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Website Code field';
                 }
                 field("Website Name"; "Website Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Website Name field';
                 }
             }
         }

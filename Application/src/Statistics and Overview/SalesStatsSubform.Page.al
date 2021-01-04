@@ -23,14 +23,17 @@ page 6014594 "NPR Sales Stats Subform"
                 field("No."; "No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the No. field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Sales (Qty)"; "Sales (Qty)")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Sales (Qty) field';
 
                     trigger OnDrillDown()
                     var
@@ -46,6 +49,7 @@ page 6014594 "NPR Sales Stats Subform"
                 field("Sales (LCY)"; "Sales (LCY)")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Sales (LCY) field';
 
                     trigger OnDrillDown()
                     var

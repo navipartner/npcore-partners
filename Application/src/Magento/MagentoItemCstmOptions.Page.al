@@ -20,6 +20,7 @@ page 6151428 "NPR Magento Item Cstm Options"
             {
                 ApplicationArea = All;
                 Caption = 'Item No.';
+                ToolTip = 'Specifies the value of the Item No. field';
             }
             group("Custom Options")
             {
@@ -30,38 +31,47 @@ page 6151428 "NPR Magento Item Cstm Options"
                     field(Enabled; Enabled)
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Enabled field';
                     }
                     field("Custom Option No."; "Custom Option No.")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Custom Option No. field';
                     }
                     field(Description; Description)
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Description field';
                     }
                     field(Type; Type)
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Type field';
                     }
                     field(Required; Required)
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Required field';
                     }
                     field("Max Length"; "Max Length")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Max Length field';
                     }
                     field(Position; Position)
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Position field';
                     }
                     field(Price; Price)
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Price field';
                     }
                     field("Price Type"; "Price Type")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Price Type field';
                     }
                 }
             }

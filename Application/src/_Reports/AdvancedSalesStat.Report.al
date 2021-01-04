@@ -228,16 +228,19 @@ report 6014490 "NPR Advanced Sales Stat."
                 {
                     Caption = 'Period Start';
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Period Start field';
                 }
                 field(SortBy; SortBy)
                 {
                     Caption = 'Sort by';
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Sort by field';
                 }
                 field(Lines; Lines)
                 {
                     Caption = 'Lines';
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Lines field';
                 }
             }
         }

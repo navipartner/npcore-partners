@@ -16,15 +16,18 @@ page 6150713 "NPR POS Stargate Packages"
                 field(Name; Rec.Name)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Name field';
                 }
                 field(Version; Rec.Version)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Version field';
                 }
                 field(Control6150619; Rec.Methods)
                 {
                     ApplicationArea = All;
                     ShowCaption = false;
+                    ToolTip = 'Specifies the value of the Methods field';
                 }
             }
         }
@@ -42,6 +45,7 @@ page 6150713 "NPR POS Stargate Packages"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Import Package action';
 
                 trigger OnAction()
                 begin
@@ -56,6 +60,7 @@ page 6150713 "NPR POS Stargate Packages"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Export Managed Dependency Manifest action';
 
                 trigger OnAction()
                 var
@@ -88,6 +93,7 @@ page 6150713 "NPR POS Stargate Packages"
                 RunObject = Page "NPR POS Stargate Pckg Method";
                 RunPageLink = "Package Name" = FIELD(Name);
                 ApplicationArea = All;
+                ToolTip = 'Executes the Methods action';
             }
         }
     }

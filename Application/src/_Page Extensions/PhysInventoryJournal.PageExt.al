@@ -8,6 +8,7 @@ pageextension 6014436 "NPR Phys. Inventory Journal" extends "Phys. Inventory Jou
             field("NPR Vendor No."; "NPR Vendor No.")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the NPR Vendor No. field';
             }
         }
     }

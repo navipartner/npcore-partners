@@ -38,26 +38,32 @@ page 6151412 "NPR Magento Pict. Link Subform"
                     Caption = 'Miniature';
                     Editable = false;
                     Visible = MiniatureLinePicture;
+                    ToolTip = 'Specifies the value of the Miniature field';
                 }
                 field("Picture Name"; "Picture Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Picture Name field';
                 }
                 field("Base Image"; "Base Image")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Base Image field';
                 }
                 field("Small Image"; "Small Image")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Small Image field';
                 }
                 field(Thumbnail; Thumbnail)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Thumbnail field';
                 }
                 field("Short Text"; "Short Text")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Short Text field';
 
                     trigger OnValidate()
                     begin
@@ -69,6 +75,7 @@ page 6151412 "NPR Magento Pict. Link Subform"
                 field("Sorting"; Sorting)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Sorting field';
                 }
             }
             field(MiniatureSingle; TempMagentoPicture.Picture)
@@ -78,6 +85,7 @@ page 6151412 "NPR Magento Pict. Link Subform"
                 Editable = false;
                 Enabled = false;
                 Visible = MiniatureSinglePicture;
+                ToolTip = 'Specifies the value of the Miniature field';
             }
         }
     }

@@ -19,14 +19,17 @@ page 6014474 "NPR Retail Price Log Setup"
                 field("Price Log Activated"; "Price Log Activated")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Price Log Activated field';
                 }
                 field("Task Queue Activated"; "Task Queue Activated")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Task Queue Activated field';
                 }
                 field("Delete Price Log Entries after"; "Delete Price Log Entries after")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Delete Price Log Entries after field';
                 }
             }
             group(Logging)
@@ -34,18 +37,22 @@ page 6014474 "NPR Retail Price Log Setup"
                 field("Item Unit Price"; "Item Unit Price")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Item Unit Price field';
                 }
                 field("Sales Price"; "Sales Price")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Sales Price field';
                 }
                 field("Sales Line Discount"; "Sales Line Discount")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Sales Line Discount field';
                 }
                 field("Period Discount"; "Period Discount")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Period Discount field';
                 }
             }
         }
@@ -64,6 +71,7 @@ page 6014474 "NPR Retail Price Log Setup"
                 PromotedIsBig = true;
                 Visible = "Price Log Activated";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Activate Price Log action';
 
                 trigger OnAction()
                 var

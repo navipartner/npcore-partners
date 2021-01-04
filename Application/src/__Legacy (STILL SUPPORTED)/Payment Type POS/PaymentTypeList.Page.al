@@ -31,18 +31,22 @@ page 6014434 "NPR Payment Type - List"
                 field("No."; "No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the No. field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Processing Type"; "Processing Type")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Processing Type field';
                 }
                 field("G/L Account No."; "G/L Account No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the G/L Account field';
 
                     trigger OnValidate()
                     begin
@@ -53,33 +57,40 @@ page 6014434 "NPR Payment Type - List"
                 field(Status; Status)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Status field';
                 }
                 field(Prefix; Prefix)
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Prefix field';
                 }
                 field("Cost Account No."; "Cost Account No.")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Cost Account field';
                 }
                 field("Location Code"; "Location Code")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Location Code field';
                 }
                 field("Fee G/L Acc. No."; "Fee G/L Acc. No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Fee field';
                 }
                 field("Fee Pct."; "Fee Pct.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Fee Pct field';
                 }
                 field("Fee Item No."; "Fee Item No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Fee item field';
                 }
             }
         }
@@ -103,6 +114,7 @@ page 6014434 "NPR Payment Type - List"
                                   "No." = FIELD("No.");
                     ShortCutKey = 'Shift+Ctrl+D';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Dimensions action';
                 }
             }
         }

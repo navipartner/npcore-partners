@@ -20,22 +20,26 @@ page 6059976 "NPR Variant per Location"
                 field("Item No."; "Item No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Item No. field';
                 }
                 field("Variant Code"; "Variant Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Variant Code field';
                 }
                 field(Quantity; Quantity)
                 {
                     ApplicationArea = All;
                     AssistEdit = false;
                     Lookup = false;
+                    ToolTip = 'Specifies the value of the Quantity field';
                 }
                 field("Location Code"; "Location Code")
                 {
                     ApplicationArea = All;
                     AssistEdit = false;
                     Lookup = false;
+                    ToolTip = 'Specifies the value of the Location Code field';
                 }
             }
         }

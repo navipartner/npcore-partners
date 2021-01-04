@@ -25,6 +25,7 @@ pageextension 6014403 "NPR Posted Sales Shipment" extends "Posted Sales Shipment
             field("NPR Sell-to Customer Name 2"; "Sell-to Customer Name 2")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the Sell-to Customer Name 2 field';
             }
         }
         addafter("Ship-to Name")
@@ -32,6 +33,7 @@ pageextension 6014403 "NPR Posted Sales Shipment" extends "Posted Sales Shipment
             field("NPR Ship-to Name 2"; "Ship-to Name 2")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the Ship-to Name 2 field';
             }
         }
         addafter("Ship-to Contact")
@@ -41,6 +43,7 @@ pageextension 6014403 "NPR Posted Sales Shipment" extends "Posted Sales Shipment
                 ApplicationArea = All;
                 Editable = false;
                 Importance = Promoted;
+                ToolTip = 'Specifies the value of the NPR Kolli field';
             }
         }
         addafter("Shipment Date")
@@ -49,6 +52,7 @@ pageextension 6014403 "NPR Posted Sales Shipment" extends "Posted Sales Shipment
             {
                 ApplicationArea = All;
                 Editable = false;
+                ToolTip = 'Specifies the value of the NPR Delivery Location field';
             }
         }
         addafter("Bill-to Name")
@@ -56,6 +60,7 @@ pageextension 6014403 "NPR Posted Sales Shipment" extends "Posted Sales Shipment
             field("NPR Bill-to Name 2"; "Bill-to Name 2")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the Bill-to Name 2 field';
             }
         }
         addafter("Bill-to Contact")
@@ -63,11 +68,13 @@ pageextension 6014403 "NPR Posted Sales Shipment" extends "Posted Sales Shipment
             field("NPR Bill-to E-mail"; "NPR Bill-to E-mail")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the NPR Bill-to E-mail field';
             }
             field("NPR Document Processing"; "NPR Document Processing")
             {
                 ApplicationArea = All;
                 Editable = false;
+                ToolTip = 'Specifies the value of the NPR Document Processing field';
             }
         }
     }
@@ -79,6 +86,7 @@ pageextension 6014403 "NPR Posted Sales Shipment" extends "Posted Sales Shipment
             {
                 Caption = 'Consignor Label';
                 ApplicationArea = All;
+                ToolTip = 'Executes the Consignor Label action';
             }
             group("NPR PDF2NAV")
             {
@@ -88,12 +96,14 @@ pageextension 6014403 "NPR Posted Sales Shipment" extends "Posted Sales Shipment
                     Caption = 'E-mail Log';
                     Image = Email;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the E-mail Log action';
                 }
                 action("NPR SendAsPDF")
                 {
                     Caption = 'Send as PDF';
                     Image = SendEmailPDF;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Send as PDF action';
                 }
             }
             group("NPR Pacsoft")
@@ -103,11 +113,13 @@ pageextension 6014403 "NPR Posted Sales Shipment" extends "Posted Sales Shipment
                 {
                     Caption = 'Create Pacsoft Shipment Document';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Create Pacsoft Shipment Document action';
                 }
                 action("NPR PrintShipmentDocument")
                 {
                     Caption = 'Print Shipment Document';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Print Shipment Document action';
                 }
             }
         }

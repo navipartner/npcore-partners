@@ -19,11 +19,13 @@ page 6014591 "NPR Sales Stats Time Period"
                     ApplicationArea = All;
                     Caption = 'Start Date';
                     ShowCaption = true;
+                    ToolTip = 'Specifies the value of the Start Date field';
                 }
                 field(StartTime; StartTime)
                 {
                     ApplicationArea = All;
                     Caption = 'Start Time';
+                    ToolTip = 'Specifies the value of the Start Time field';
                 }
             }
             group("End Date & Time")
@@ -33,11 +35,13 @@ page 6014591 "NPR Sales Stats Time Period"
                 {
                     ApplicationArea = All;
                     Caption = 'End Date';
+                    ToolTip = 'Specifies the value of the End Date field';
                 }
                 field(EndTime; EndTime)
                 {
                     ApplicationArea = All;
                     Caption = 'End Time';
+                    ToolTip = 'Specifies the value of the End Time field';
                 }
             }
             group("Filtering Options")
@@ -48,24 +52,28 @@ page 6014591 "NPR Sales Stats Time Period"
                     ApplicationArea = All;
                     BlankZero = true;
                     Caption = 'Statistics By';
+                    ToolTip = 'Specifies the value of the Statistics By field';
                 }
                 field(ItemNoFilter; ItemNoFilter)
                 {
                     ApplicationArea = All;
                     Caption = 'Item No Filter';
                     TableRelation = Item."No.";
+                    ToolTip = 'Specifies the value of the Item No Filter field';
                 }
                 field(ItemGroupFilter; ItemGroupFilter)
                 {
                     ApplicationArea = All;
                     Caption = 'Item Group Filter';
                     TableRelation = "NPR Item Group" WHERE(Blocked = CONST(false));
+                    ToolTip = 'Specifies the value of the Item Group Filter field';
                 }
                 field(ItemCategoryCodeFilter; ItemCategoryCodeFilter)
                 {
                     ApplicationArea = All;
                     Caption = 'Item Category Code Filter';
                     TableRelation = "Item Category";
+                    ToolTip = 'Specifies the value of the Item Category Code Filter field';
                 }
             }
             part(SaleStatisticsSubform; "NPR Sales Stats Subform")
@@ -88,6 +96,7 @@ page 6014591 "NPR Sales Stats Time Period"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Get Data action';
 
                 trigger OnAction()
                 begin

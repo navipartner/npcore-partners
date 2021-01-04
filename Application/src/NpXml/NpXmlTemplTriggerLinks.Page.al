@@ -21,6 +21,7 @@ page 6151560 "NPR NpXml Templ. Trigger Links"
                 field("Link Type"; "Link Type")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Link Type field';
 
                     trigger OnValidate()
                     begin
@@ -35,10 +36,12 @@ page 6151560 "NPR NpXml Templ. Trigger Links"
                     Enabled = XmlTemplateFieldNoEnabled;
                     Style = Subordinate;
                     StyleExpr = NOT XmlTemplateFieldNoEnabled;
+                    ToolTip = 'Specifies the value of the Parent Field No. field';
                 }
                 field("Parent Field Name"; "Parent Field Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Parent Field Name field';
                 }
                 field("Parent Filter Value"; "Parent Filter Value")
                 {
@@ -46,6 +49,7 @@ page 6151560 "NPR NpXml Templ. Trigger Links"
                     Enabled = XmlTemplateFilterValueEnabled;
                     Style = Subordinate;
                     StyleExpr = NOT XmlTemplateFilterValueEnabled;
+                    ToolTip = 'Specifies the value of the Parent Filter Value field';
                 }
                 field("Field No."; "Field No.")
                 {
@@ -53,10 +57,12 @@ page 6151560 "NPR NpXml Templ. Trigger Links"
                     Enabled = FieldNoEnabled;
                     Style = Subordinate;
                     StyleExpr = NOT FieldNoEnabled;
+                    ToolTip = 'Specifies the value of the Field No. field';
                 }
                 field("Field Name"; "Field Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Field Name field';
                 }
                 field("Filter Value"; "Filter Value")
                 {
@@ -64,6 +70,7 @@ page 6151560 "NPR NpXml Templ. Trigger Links"
                     Enabled = FilterValueEnabled;
                     Style = Subordinate;
                     StyleExpr = NOT FilterValueEnabled;
+                    ToolTip = 'Specifies the value of the Filter Value field';
                 }
                 field("Previous Filter Value"; "Previous Filter Value")
                 {
@@ -71,6 +78,7 @@ page 6151560 "NPR NpXml Templ. Trigger Links"
                     Enabled = PreviousFilterValueEnabled;
                     Style = Subordinate;
                     StyleExpr = NOT PreviousFilterValueEnabled;
+                    ToolTip = 'Specifies the value of the Previous Filter Value field';
                 }
             }
         }

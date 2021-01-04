@@ -57,6 +57,7 @@ page 6014456 "NPR Table Export Wizard"
                 field("Object ID"; "Object ID")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Object ID field';
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -98,6 +99,7 @@ page 6014456 "NPR Table Export Wizard"
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Object Name field';
                 }
             }
             group(Control6014410)
@@ -126,36 +128,43 @@ page 6014456 "NPR Table Export Wizard"
                     {
                         ApplicationArea = All;
                         Caption = 'Field Start Delimeter';
+                        ToolTip = 'Specifies the value of the Field Start Delimeter field';
                     }
                     field(FieldEndDelimeter; FieldEndDelimeter)
                     {
                         ApplicationArea = All;
                         Caption = 'Field End Delimeter';
+                        ToolTip = 'Specifies the value of the Field End Delimeter field';
                     }
                     field(FieldSeparator; FieldSeparator)
                     {
                         ApplicationArea = All;
                         Caption = 'Field Separator';
+                        ToolTip = 'Specifies the value of the Field Separator field';
                     }
                     field(RecordSeparator; RecordSeparator)
                     {
                         ApplicationArea = All;
                         Caption = 'Record Separator';
+                        ToolTip = 'Specifies the value of the Record Separator field';
                     }
                     field(DataItemSeparator; DataItemSeparator)
                     {
                         ApplicationArea = All;
                         Caption = 'Data Item Separator';
+                        ToolTip = 'Specifies the value of the Data Item Separator field';
                     }
                     field(EscapeCharacter; EscapeCharacter)
                     {
                         ApplicationArea = All;
                         Caption = 'Escape Character';
+                        ToolTip = 'Specifies the value of the Escape Character field';
                     }
                     field(ExportDataInXmlFormat; ExportDataInXmlFormat)
                     {
                         ApplicationArea = All;
                         Caption = 'Use Xml-Format';
+                        ToolTip = 'Specifies the value of the Use Xml-Format field';
                     }
                 }
                 group("Data Settings")
@@ -165,21 +174,25 @@ page 6014456 "NPR Table Export Wizard"
                     {
                         ApplicationArea = All;
                         Caption = 'Company';
+                        ToolTip = 'Specifies the value of the Company field';
                     }
                     field(OutFileEncoding; OutFileEncoding)
                     {
                         ApplicationArea = All;
                         Caption = 'File Encoding';
+                        ToolTip = 'Specifies the value of the File Encoding field';
                     }
                     field(FileMode; FileMode)
                     {
                         ApplicationArea = All;
                         Caption = 'File Mode';
+                        ToolTip = 'Specifies the value of the File Mode field';
                     }
                     field(SkipFlowFields; SkipFlowFields)
                     {
                         ApplicationArea = All;
                         Caption = 'Skip Flow Fields';
+                        ToolTip = 'Specifies the value of the Skip Flow Fields field';
                     }
                 }
                 group("Export Settings")
@@ -189,6 +202,7 @@ page 6014456 "NPR Table Export Wizard"
                     {
                         ApplicationArea = All;
                         Caption = 'Raise Errors';
+                        ToolTip = 'Specifies the value of the Raise Errors field';
                     }
                 }
             }
@@ -206,6 +220,7 @@ page 6014456 "NPR Table Export Wizard"
                 Promoted = true;
                 PromotedCategory = Category4;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Run action';
 
                 trigger OnAction()
                 begin
@@ -219,6 +234,7 @@ page 6014456 "NPR Table Export Wizard"
                 Promoted = true;
                 PromotedCategory = Category6;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Delete All action';
 
                 trigger OnAction()
                 begin
@@ -238,6 +254,7 @@ page 6014456 "NPR Table Export Wizard"
                     Promoted = true;
                     PromotedCategory = Category7;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Save action';
 
                     trigger OnAction()
                     begin
@@ -253,6 +270,7 @@ page 6014456 "NPR Table Export Wizard"
                     Promoted = true;
                     PromotedCategory = Category7;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Load action';
 
                     trigger OnAction()
                     begin
@@ -270,6 +288,7 @@ page 6014456 "NPR Table Export Wizard"
                     Caption = 'Add Retail Setup';
                     Image = Default;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Add Retail Setup action';
 
                     trigger OnAction()
                     begin
@@ -284,6 +303,7 @@ page 6014456 "NPR Table Export Wizard"
                     Caption = 'Add Std. Nav. Master & Setup';
                     Image = Default;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Add Std. Nav. Master & Setup action';
 
                     trigger OnAction()
                     begin
@@ -298,6 +318,7 @@ page 6014456 "NPR Table Export Wizard"
                     Caption = 'Add Std Nav. and Retail Master & Setup';
                     Image = Default;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Add Std Nav. and Retail Master & Setup action';
 
                     trigger OnAction()
                     begin
@@ -312,6 +333,7 @@ page 6014456 "NPR Table Export Wizard"
                     Caption = 'Add All Tables Excl. Ticketing/Membership';
                     Image = Default;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Add All Tables Excl. Ticketing/Membership action';
 
                     trigger OnAction()
                     begin
@@ -326,6 +348,7 @@ page 6014456 "NPR Table Export Wizard"
                     Caption = 'Add Ticketing Master and Setup Tables';
                     Image = Default;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Add Ticketing Master and Setup Tables action';
 
                     trigger OnAction()
                     begin
@@ -339,6 +362,7 @@ page 6014456 "NPR Table Export Wizard"
                     Caption = 'Add Membership Master and Setup Tables';
                     Image = Default;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Add Membership Master and Setup Tables action';
 
                     trigger OnAction()
                     begin
@@ -357,6 +381,7 @@ page 6014456 "NPR Table Export Wizard"
                     Caption = 'Add Std and Retail Data Incl. Transactions';
                     Image = Default;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Add Std and Retail Data Incl. Transactions action';
 
                     trigger OnAction()
                     begin
@@ -371,6 +396,7 @@ page 6014456 "NPR Table Export Wizard"
                     Caption = 'Add Std. Nav. Tables Incl. Transactions';
                     Image = Default;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Add Std. Nav. Tables Incl. Transactions action';
 
                     trigger OnAction()
                     begin
@@ -385,6 +411,7 @@ page 6014456 "NPR Table Export Wizard"
                     Caption = 'Add All Trans. Tables Excl. Ticket';
                     Image = Default;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Add All Trans. Tables Excl. Ticket action';
 
                     trigger OnAction()
                     begin
@@ -400,6 +427,7 @@ page 6014456 "NPR Table Export Wizard"
                     Image = Default;
                     Visible = false;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Add NP Add-On Tables Incl. Transactions action';
 
                     trigger OnAction()
                     begin
@@ -415,6 +443,7 @@ page 6014456 "NPR Table Export Wizard"
                     Image = Default;
                     Visible = false;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Add Retail Tables Incl.Transactions action';
 
                     trigger OnAction()
                     begin
@@ -429,6 +458,7 @@ page 6014456 "NPR Table Export Wizard"
                     Caption = 'Add Ticketing Tables Incl. Transaction';
                     Image = Default;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Add Ticketing Tables Incl. Transaction action';
 
                     trigger OnAction()
                     begin
@@ -446,6 +476,7 @@ page 6014456 "NPR Table Export Wizard"
                     Caption = 'Standard';
                     Image = Default;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Standard action';
 
                     trigger OnAction()
                     var
@@ -496,6 +527,7 @@ page 6014456 "NPR Table Export Wizard"
                     Caption = 'Add Pepper';
                     Image = Add;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Add Pepper action';
 
                     trigger OnAction()
                     var
@@ -543,6 +575,7 @@ page 6014456 "NPR Table Export Wizard"
                     Enabled = false;
                     Image = DataEntry;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Include Offline Master Data Template action';
 
                     trigger OnAction()
                     begin
@@ -555,6 +588,7 @@ page 6014456 "NPR Table Export Wizard"
                     Enabled = false;
                     Image = Web;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Insert Webshop Base Setup action';
 
                     trigger OnAction()
                     begin
@@ -566,6 +600,7 @@ page 6014456 "NPR Table Export Wizard"
                     Caption = 'Include Base Setup';
                     Image = Default;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Include Base Setup action';
 
                     trigger OnAction()
                     begin

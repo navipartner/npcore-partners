@@ -25,6 +25,7 @@ page 6151485 "NPR Magento Top 10 S.Person"
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
 
                     trigger OnDrillDown()
                     begin
@@ -38,20 +39,24 @@ page 6151485 "NPR Magento Top 10 S.Person"
                 field(Name; Name)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Name field';
                 }
                 field("Sales (LCY)"; "NPR Sales (LCY)")
                 {
                     ApplicationArea = All;
                     BlankZero = true;
                     Caption = 'Sales Amount (Actual)';
+                    ToolTip = 'Specifies the value of the Sales Amount (Actual) field';
                 }
                 field("Sales (Qty.)"; "NPR Sales (Qty.)")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the NPR Sales (Qty.) field';
                 }
                 field("Search E-Mail"; "Search E-Mail")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Search E-Mail field';
                 }
             }
         }
@@ -70,6 +75,7 @@ page 6151485 "NPR Magento Top 10 S.Person"
                 {
                     Caption = 'Day';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Day action';
 
                     trigger OnAction()
                     begin
@@ -81,6 +87,7 @@ page 6151485 "NPR Magento Top 10 S.Person"
                 {
                     Caption = 'Week';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Week action';
 
                     trigger OnAction()
                     begin
@@ -92,6 +99,7 @@ page 6151485 "NPR Magento Top 10 S.Person"
                 {
                     Caption = 'Month';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Month action';
 
                     trigger OnAction()
                     begin
@@ -103,6 +111,7 @@ page 6151485 "NPR Magento Top 10 S.Person"
                 {
                     Caption = 'Quarter';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Quarter action';
 
                     trigger OnAction()
                     begin
@@ -114,6 +123,7 @@ page 6151485 "NPR Magento Top 10 S.Person"
                 {
                     Caption = 'Year';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Year action';
 
                     trigger OnAction()
                     begin

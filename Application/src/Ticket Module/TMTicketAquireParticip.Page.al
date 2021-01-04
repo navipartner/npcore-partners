@@ -1,4 +1,4 @@
-﻿page 6060110 "NPR TM Ticket Aquire Particip."
+page 6060110 "NPR TM Ticket Aquire Particip."
 {
     // TM1.16/TSA/20160816  CASE 245004 Transport TM1.16 - 19 July 2016
     // TM1.17/TSA/20160913  CASE 251883 Added SMS as Notification Method
@@ -28,12 +28,14 @@
                     field("Notification Method"; "Notification Method")
                     {
                         ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                        ToolTip = 'Specifies the value of the Notification Method field';
                     }
                     field("Notification Address"; "Notification Address")
                     {
                         ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                         ShowMandatory = RequireNotificationAddress;
                         Width = 40;
+                        ToolTip = 'Specifies the value of the Notification Address field';
 
                         trigger OnValidate()
                         begin
@@ -51,6 +53,7 @@
                     CaptionClass = '6014555,6060116,1,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible01;
+                    ToolTip = 'Specifies the value of the NPRAttrTextArray[1] field';
 
                     trigger OnValidate()
                     begin
@@ -63,6 +66,7 @@
                     CaptionClass = '6014555,6060116,2,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible02;
+                    ToolTip = 'Specifies the value of the NPRAttrTextArray[2] field';
 
                     trigger OnValidate()
                     begin
@@ -75,6 +79,7 @@
                     CaptionClass = '6014555,6060116,3,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible03;
+                    ToolTip = 'Specifies the value of the NPRAttrTextArray[3] field';
 
                     trigger OnValidate()
                     begin
@@ -87,6 +92,7 @@
                     CaptionClass = '6014555,6060116,4,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible04;
+                    ToolTip = 'Specifies the value of the NPRAttrTextArray[4] field';
 
                     trigger OnValidate()
                     begin
@@ -99,6 +105,7 @@
                     CaptionClass = '6014555,6060116,5,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible05;
+                    ToolTip = 'Specifies the value of the NPRAttrTextArray[5] field';
 
                     trigger OnValidate()
                     begin
@@ -111,6 +118,7 @@
                     CaptionClass = '6014555,6060116,6,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible06;
+                    ToolTip = 'Specifies the value of the NPRAttrTextArray[6] field';
 
                     trigger OnValidate()
                     begin
@@ -123,6 +131,7 @@
                     CaptionClass = '6014555,6060116,7,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible07;
+                    ToolTip = 'Specifies the value of the NPRAttrTextArray[7] field';
 
                     trigger OnValidate()
                     begin
@@ -135,6 +144,7 @@
                     CaptionClass = '6014555,6060116,8,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible08;
+                    ToolTip = 'Specifies the value of the NPRAttrTextArray[8] field';
 
                     trigger OnValidate()
                     begin
@@ -147,6 +157,7 @@
                     CaptionClass = '6014555,6060116,9,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible09;
+                    ToolTip = 'Specifies the value of the NPRAttrTextArray[9] field';
 
                     trigger OnValidate()
                     begin
@@ -159,6 +170,7 @@
                     CaptionClass = '6014555,6060116,10,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible10;
+                    ToolTip = 'Specifies the value of the NPRAttrTextArray[10] field';
 
                     trigger OnValidate()
                     begin

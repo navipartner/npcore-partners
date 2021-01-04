@@ -22,6 +22,7 @@ page 6014573 "NPR Tax Free GB I2 Info Capt."
                     Editable = PassportNumberEditable;
                     ShowMandatory = PassportNumberMandatory;
                     Visible = PassportNumberMode <> PassportNumberMode::Hide;
+                    ToolTip = 'Specifies the value of the Passport Number field';
                 }
                 field("First Name"; "First Name")
                 {
@@ -29,6 +30,7 @@ page 6014573 "NPR Tax Free GB I2 Info Capt."
                     Editable = FirstNameEditable;
                     ShowMandatory = FirstNameMandatory;
                     Visible = FirstNameMode <> FirstNameMode::Hide;
+                    ToolTip = 'Specifies the value of the First Name field';
                 }
                 field("Last Name"; "Last Name")
                 {
@@ -36,6 +38,7 @@ page 6014573 "NPR Tax Free GB I2 Info Capt."
                     Editable = LastNameEditable;
                     ShowMandatory = LastNameMandatory;
                     Visible = LastNameMode <> LastNameMode::Hide;
+                    ToolTip = 'Specifies the value of the Last Name field';
                 }
                 field(Street; Street)
                 {
@@ -43,6 +46,7 @@ page 6014573 "NPR Tax Free GB I2 Info Capt."
                     Editable = StreetEditable;
                     ShowMandatory = StreetMandatory;
                     Visible = StreetMode <> StreetMode::Hide;
+                    ToolTip = 'Specifies the value of the Street field';
                 }
                 field("Postal Code"; "Postal Code")
                 {
@@ -50,6 +54,7 @@ page 6014573 "NPR Tax Free GB I2 Info Capt."
                     Editable = PostalCodeEditable;
                     ShowMandatory = PostalCodeMandatory;
                     Visible = PostalCodeMode <> PostalCodeMode::Hide;
+                    ToolTip = 'Specifies the value of the Postal Code field';
                 }
                 field(Town; Town)
                 {
@@ -57,6 +62,7 @@ page 6014573 "NPR Tax Free GB I2 Info Capt."
                     Editable = TownEditable;
                     ShowMandatory = TownMandatory;
                     Visible = TownMode <> TownMode::Hide;
+                    ToolTip = 'Specifies the value of the Town field';
                 }
                 field("E-mail"; "E-mail")
                 {
@@ -64,6 +70,7 @@ page 6014573 "NPR Tax Free GB I2 Info Capt."
                     Editable = EmailEditable;
                     ShowMandatory = EmailMandatory;
                     Visible = EmailMode <> EmailMode::Hide;
+                    ToolTip = 'Specifies the value of the E-mail field';
                 }
                 field("Country Of Residence"; "Country Of Residence")
                 {
@@ -71,6 +78,7 @@ page 6014573 "NPR Tax Free GB I2 Info Capt."
                     Editable = CountryCodeEditable;
                     ShowMandatory = CountryCodeMandatory;
                     Visible = CountryCodeMode <> CountryCodeMode::Hide;
+                    ToolTip = 'Specifies the value of the Country Of Residence field';
                 }
                 field("Passport Country"; "Passport Country")
                 {
@@ -78,6 +86,7 @@ page 6014573 "NPR Tax Free GB I2 Info Capt."
                     Editable = PassportCountryCodeEditable;
                     ShowMandatory = PassportCountryCodeMandatory;
                     Visible = PassportCountryCodeMode <> PassportCountryCodeMode::Hide;
+                    ToolTip = 'Specifies the value of the Passport Country field';
                 }
                 field("Date Of Birth"; "Date Of Birth")
                 {
@@ -85,6 +94,7 @@ page 6014573 "NPR Tax Free GB I2 Info Capt."
                     Editable = DateOfBirthEditable;
                     ShowMandatory = DateOfBirthMandatory;
                     Visible = DateOfBirthMode <> DateOfBirthMode::Hide;
+                    ToolTip = 'Specifies the value of the Date Of Birth field';
                 }
                 field("Departure Date"; "Departure Date")
                 {
@@ -92,6 +102,7 @@ page 6014573 "NPR Tax Free GB I2 Info Capt."
                     Editable = DepartureEditable;
                     ShowMandatory = DepartureMandatory;
                     Visible = DepartureDateMode <> DepartureDateMode::Hide;
+                    ToolTip = 'Specifies the value of the Departure Date field';
                 }
                 field("Arrival Date"; "Arrival Date")
                 {
@@ -99,6 +110,7 @@ page 6014573 "NPR Tax Free GB I2 Info Capt."
                     Editable = ArrivalEditable;
                     ShowMandatory = ArrivalMandatory;
                     Visible = ArrivalDateMode <> ArrivalDateMode::Hide;
+                    ToolTip = 'Specifies the value of the Arrival Date field';
                 }
                 field("Final Destination Country"; "Final Destination Country")
                 {
@@ -106,6 +118,7 @@ page 6014573 "NPR Tax Free GB I2 Info Capt."
                     Editable = FinalDestinationCountryCodeEditable;
                     ShowMandatory = FinalDestinationCountryCodeMandatory;
                     Visible = FinalDestinationCountryCodeMode <> FinalDestinationCountryCodeMode::Hide;
+                    ToolTip = 'Specifies the value of the Final Destination Country field';
                 }
             }
             group("Mobile Phone")
@@ -117,6 +130,7 @@ page 6014573 "NPR Tax Free GB I2 Info Capt."
                     ApplicationArea = All;
                     Editable = MobileNumberEditable;
                     Visible = MobileNumberMode <> MobileNumberMode::Hide;
+                    ToolTip = 'Specifies the value of the Mobile No. Country field';
                 }
                 field("Mobile No. Prefix Formatted"; "Mobile No. Prefix Formatted")
                 {
@@ -124,6 +138,7 @@ page 6014573 "NPR Tax Free GB I2 Info Capt."
                     Caption = 'Phone Prefix';
                     Editable = false;
                     Visible = MobileNumberMode <> MobileNumberMode::Hide;
+                    ToolTip = 'Specifies the value of the Phone Prefix field';
                 }
                 field("Mobile No."; "Mobile No.")
                 {
@@ -131,6 +146,7 @@ page 6014573 "NPR Tax Free GB I2 Info Capt."
                     Editable = MobileNumberEditable;
                     ShowMandatory = MobileNumberMandatory;
                     Visible = MobileNumberMode <> MobileNumberMode::Hide;
+                    ToolTip = 'Specifies the value of the Mobile No. field';
                 }
             }
         }

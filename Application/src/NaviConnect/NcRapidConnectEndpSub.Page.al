@@ -17,18 +17,22 @@ page 6151093 "NPR Nc RapidConnect Endp. Sub."
                 field("Endpoint Code"; "Endpoint Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Endpoint Code field';
                 }
                 field("Endpoint Type"; "Endpoint Type")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Endpoint Type field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Setup Summary"; "Setup Summary")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Setup Summary field';
                 }
             }
         }

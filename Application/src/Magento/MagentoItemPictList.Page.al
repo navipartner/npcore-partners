@@ -36,11 +36,13 @@ page 6151413 "NPR Magento Item Pict. List"
                         {
                             ApplicationArea = All;
                             Editable = false;
+                            ToolTip = 'Specifies the value of the Item No. field';
                         }
                         field(Description; Description)
                         {
                             ApplicationArea = All;
                             Editable = false;
+                            ToolTip = 'Specifies the value of the Description field';
                         }
                     }
                 }

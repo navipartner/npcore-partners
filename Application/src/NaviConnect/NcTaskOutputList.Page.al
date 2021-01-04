@@ -18,18 +18,22 @@ page 6151510 "NPR Nc Task Output List"
                 field(Name; Name)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Name field';
                 }
                 field("Last Modified at"; "Last Modified at")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Last Modified at field';
                 }
                 field("Process Count"; "Process Count")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Process Count field';
                 }
                 field("Entry No."; "Entry No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Entry No. field';
                 }
             }
             grid(Control6151411)
@@ -45,6 +49,7 @@ page 6151510 "NPR Nc Task Output List"
                         Enabled = false;
                         HideValue = true;
                         ShowCaption = false;
+                        ToolTip = 'Specifies the value of the '''' field';
                     }
                     field(Control6151420; '')
                     {
@@ -53,6 +58,7 @@ page 6151510 "NPR Nc Task Output List"
                         Enabled = false;
                         HideValue = true;
                         ShowCaption = false;
+                        ToolTip = 'Specifies the value of the '''' field';
                     }
                     field(Control6151419; '')
                     {
@@ -61,6 +67,7 @@ page 6151510 "NPR Nc Task Output List"
                         Enabled = false;
                         HideValue = true;
                         ShowCaption = false;
+                        ToolTip = 'Specifies the value of the '''' field';
                     }
                     field(Control6151418; '')
                     {
@@ -69,6 +76,7 @@ page 6151510 "NPR Nc Task Output List"
                         Enabled = false;
                         HideValue = true;
                         ShowCaption = false;
+                        ToolTip = 'Specifies the value of the '''' field';
                     }
                     field(Control6151417; '')
                     {
@@ -77,6 +85,7 @@ page 6151510 "NPR Nc Task Output List"
                         Enabled = false;
                         HideValue = true;
                         ShowCaption = false;
+                        ToolTip = 'Specifies the value of the '''' field';
                     }
                     field(Control6151416; '')
                     {
@@ -85,6 +94,7 @@ page 6151510 "NPR Nc Task Output List"
                         Enabled = false;
                         HideValue = true;
                         ShowCaption = false;
+                        ToolTip = 'Specifies the value of the '''' field';
                     }
                     field(Control6151415; '')
                     {
@@ -93,6 +103,7 @@ page 6151510 "NPR Nc Task Output List"
                         Enabled = false;
                         HideValue = true;
                         ShowCaption = false;
+                        ToolTip = 'Specifies the value of the '''' field';
                     }
                     field(Control6151414; '')
                     {
@@ -101,6 +112,7 @@ page 6151510 "NPR Nc Task Output List"
                         Enabled = false;
                         HideValue = true;
                         ShowCaption = false;
+                        ToolTip = 'Specifies the value of the '''' field';
                     }
                     field(Control6151413; '')
                     {
@@ -109,6 +121,7 @@ page 6151510 "NPR Nc Task Output List"
                         Enabled = false;
                         HideValue = true;
                         ShowCaption = false;
+                        ToolTip = 'Specifies the value of the '''' field';
                     }
                 }
                 group(Control6151410)
@@ -120,6 +133,7 @@ page 6151510 "NPR Nc Task Output List"
                         Caption = 'Response:                                                                                                                                                                                                                                                                                ';
                         HideValue = true;
                         ShowCaption = false;
+                        ToolTip = 'Specifies the value of the Response:                                                                                                                                                                                                                                                                                 field';
                     }
                     field(ResponseText; ResponseText)
                     {
@@ -127,6 +141,7 @@ page 6151510 "NPR Nc Task Output List"
                         Editable = false;
                         MultiLine = true;
                         ShowCaption = false;
+                        ToolTip = 'Specifies the value of the ResponseText field';
                     }
                 }
             }
@@ -145,6 +160,7 @@ page 6151510 "NPR Nc Task Output List"
                 PromotedCategory = Category4;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Show Output action';
 
                 trigger OnAction()
                 begin

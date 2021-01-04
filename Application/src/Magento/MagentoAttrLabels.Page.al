@@ -22,6 +22,7 @@ page 6151432 "NPR Magento Attr. Labels"
                 field(Value; Value)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Value field';
                 }
                 field("FORMAT(""Text Field"".HASVALUE)"; Format("Text Field".HasValue))
                 {
@@ -29,6 +30,7 @@ page 6151432 "NPR Magento Attr. Labels"
                     AssistEdit = true;
                     Caption = 'Text Field';
                     Visible = TextFieldVisible;
+                    ToolTip = 'Specifies the value of the Text Field field';
 
                     trigger OnAssistEdit()
                     var
@@ -46,6 +48,7 @@ page 6151432 "NPR Magento Attr. Labels"
                 field("Sorting"; Sorting)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Sorting field';
                 }
             }
         }

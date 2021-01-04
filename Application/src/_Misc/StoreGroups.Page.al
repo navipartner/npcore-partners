@@ -16,14 +16,17 @@ page 6014582 "NPR Store Groups"
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Blank Location"; "Blank Location")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Blank Location field';
                 }
             }
         }

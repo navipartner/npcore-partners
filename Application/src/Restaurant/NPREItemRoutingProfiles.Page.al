@@ -19,16 +19,19 @@ page 6150681 "NPR NPRE Item Routing Profiles"
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field(AssignedFlowStatuses; AssignedFlowStatusesAsString(FlowStatus."Status Object"::WaiterPadLineMealFlow))
                 {
                     ApplicationArea = All;
                     Caption = 'Serving Steps';
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Serving Steps field';
 
                     trigger OnDrillDown()
                     begin
@@ -40,6 +43,7 @@ page 6150681 "NPR NPRE Item Routing Profiles"
                     ApplicationArea = All;
                     Caption = 'Print/Prod. Categories';
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Print/Prod. Categories field';
 
                     trigger OnDrillDown()
                     begin
@@ -65,6 +69,7 @@ page 6150681 "NPR NPRE Item Routing Profiles"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Serving Steps action';
 
                     trigger OnAction()
                     var
@@ -82,6 +87,7 @@ page 6150681 "NPR NPRE Item Routing Profiles"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Print/Prod. Categories action';
 
                     trigger OnAction()
                     begin

@@ -18,6 +18,7 @@ page 6060052 "NPR Item Worksh. Attr. FactBox"
                 CaptionClass = '6014555,27,1,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible01;
+                ToolTip = 'Specifies the value of the NPRAttrTextArray[1] field';
 
                 trigger OnValidate()
                 begin
@@ -32,6 +33,7 @@ page 6060052 "NPR Item Worksh. Attr. FactBox"
                 Style = Attention;
                 StyleExpr = TRUE;
                 Visible = NPRAttrVisible01;
+                ToolTip = 'Specifies the value of the NPRExItemAttrTextArray[1] field';
             }
             field(NPRAttrTextArray_02; NPRAttrTextArray[2])
             {
@@ -39,6 +41,7 @@ page 6060052 "NPR Item Worksh. Attr. FactBox"
                 CaptionClass = '6014555,27,2,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible02;
+                ToolTip = 'Specifies the value of the NPRAttrTextArray[2] field';
 
                 trigger OnValidate()
                 begin
@@ -53,6 +56,7 @@ page 6060052 "NPR Item Worksh. Attr. FactBox"
                 Style = Attention;
                 StyleExpr = TRUE;
                 Visible = NPRAttrVisible02;
+                ToolTip = 'Specifies the value of the NPRExItemAttrTextArray[2] field';
             }
             field(NPRAttrTextArray_03; NPRAttrTextArray[3])
             {
@@ -60,6 +64,7 @@ page 6060052 "NPR Item Worksh. Attr. FactBox"
                 CaptionClass = '6014555,27,3,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible03;
+                ToolTip = 'Specifies the value of the NPRAttrTextArray[3] field';
 
                 trigger OnValidate()
                 begin
@@ -74,6 +79,7 @@ page 6060052 "NPR Item Worksh. Attr. FactBox"
                 Style = Attention;
                 StyleExpr = TRUE;
                 Visible = NPRAttrVisible03;
+                ToolTip = 'Specifies the value of the NPRExItemAttrTextArray[3] field';
             }
             field(NPRAttrTextArray_04; NPRAttrTextArray[4])
             {
@@ -81,6 +87,7 @@ page 6060052 "NPR Item Worksh. Attr. FactBox"
                 CaptionClass = '6014555,27,4,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible04;
+                ToolTip = 'Specifies the value of the NPRAttrTextArray[4] field';
 
                 trigger OnValidate()
                 begin
@@ -95,6 +102,7 @@ page 6060052 "NPR Item Worksh. Attr. FactBox"
                 Style = Attention;
                 StyleExpr = TRUE;
                 Visible = NPRAttrVisible04;
+                ToolTip = 'Specifies the value of the NPRExItemAttrTextArray[4] field';
             }
             field(NPRAttrTextArray_05; NPRAttrTextArray[5])
             {
@@ -102,6 +110,7 @@ page 6060052 "NPR Item Worksh. Attr. FactBox"
                 CaptionClass = '6014555,27,5,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible05;
+                ToolTip = 'Specifies the value of the NPRAttrTextArray[5] field';
 
                 trigger OnValidate()
                 begin
@@ -116,6 +125,7 @@ page 6060052 "NPR Item Worksh. Attr. FactBox"
                 Style = Attention;
                 StyleExpr = TRUE;
                 Visible = NPRAttrVisible05;
+                ToolTip = 'Specifies the value of the NPRExItemAttrTextArray[5] field';
             }
             field(NPRAttrTextArray_06; NPRAttrTextArray[6])
             {
@@ -123,6 +133,7 @@ page 6060052 "NPR Item Worksh. Attr. FactBox"
                 CaptionClass = '6014555,27,6,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible06;
+                ToolTip = 'Specifies the value of the NPRAttrTextArray[6] field';
 
                 trigger OnValidate()
                 begin
@@ -137,6 +148,7 @@ page 6060052 "NPR Item Worksh. Attr. FactBox"
                 Style = Attention;
                 StyleExpr = TRUE;
                 Visible = NPRAttrVisible06;
+                ToolTip = 'Specifies the value of the NPRExItemAttrTextArray[6] field';
             }
             field(NPRAttrTextArray_07; NPRAttrTextArray[7])
             {
@@ -144,6 +156,7 @@ page 6060052 "NPR Item Worksh. Attr. FactBox"
                 CaptionClass = '6014555,27,7,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible07;
+                ToolTip = 'Specifies the value of the NPRAttrTextArray[7] field';
 
                 trigger OnValidate()
                 begin
@@ -158,6 +171,7 @@ page 6060052 "NPR Item Worksh. Attr. FactBox"
                 Style = Attention;
                 StyleExpr = TRUE;
                 Visible = NPRAttrVisible07;
+                ToolTip = 'Specifies the value of the NPRExItemAttrTextArray[7] field';
             }
             field(NPRAttrTextArray_08; NPRAttrTextArray[8])
             {
@@ -165,6 +179,7 @@ page 6060052 "NPR Item Worksh. Attr. FactBox"
                 CaptionClass = '6014555,27,8,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible08;
+                ToolTip = 'Specifies the value of the NPRAttrTextArray[8] field';
 
                 trigger OnValidate()
                 begin
@@ -179,6 +194,7 @@ page 6060052 "NPR Item Worksh. Attr. FactBox"
                 Style = Attention;
                 StyleExpr = TRUE;
                 Visible = NPRAttrVisible08;
+                ToolTip = 'Specifies the value of the NPRExItemAttrTextArray[8] field';
             }
             field(NPRAttrTextArray_09; NPRAttrTextArray[9])
             {
@@ -186,6 +202,7 @@ page 6060052 "NPR Item Worksh. Attr. FactBox"
                 CaptionClass = '6014555,27,9,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible09;
+                ToolTip = 'Specifies the value of the NPRAttrTextArray[9] field';
 
                 trigger OnValidate()
                 begin
@@ -200,6 +217,7 @@ page 6060052 "NPR Item Worksh. Attr. FactBox"
                 Style = Attention;
                 StyleExpr = TRUE;
                 Visible = NPRAttrVisible09;
+                ToolTip = 'Specifies the value of the NPRExItemAttrTextArray[9] field';
             }
             field(NPRAttrTextArray_10; NPRAttrTextArray[10])
             {
@@ -207,6 +225,7 @@ page 6060052 "NPR Item Worksh. Attr. FactBox"
                 CaptionClass = '6014555,27,10,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible10;
+                ToolTip = 'Specifies the value of the NPRAttrTextArray[10] field';
 
                 trigger OnValidate()
                 begin
@@ -221,6 +240,7 @@ page 6060052 "NPR Item Worksh. Attr. FactBox"
                 Style = Attention;
                 StyleExpr = TRUE;
                 Visible = NPRAttrVisible10;
+                ToolTip = 'Specifies the value of the NPRExItemAttrTextArray[10] field';
             }
         }
     }

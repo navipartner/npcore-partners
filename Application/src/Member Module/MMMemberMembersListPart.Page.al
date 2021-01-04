@@ -18,10 +18,12 @@ page 6060138 "NPR MM Member Members.ListPart"
                     ApplicationArea = All;
                     DrillDownPageID = "NPR MM Membership Card";
                     LookupPageID = "NPR MM Membership Card";
+                    ToolTip = 'Specifies the value of the External Membership No. field';
                 }
                 field("GDPR Approval"; "GDPR Approval")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the GDPR Approval field';
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -42,34 +44,41 @@ page 6060138 "NPR MM Member Members.ListPart"
                     DrillDownPageID = "NPR MM Membership Setup";
                     LookupPageID = "NPR MM Membership Setup";
                     TableRelation = "NPR MM Membership Setup".Code;
+                    ToolTip = 'Specifies the value of the Membership Code field';
                 }
                 field("User Logon ID"; "User Logon ID")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the User Logon ID field';
                 }
                 field("Password Hash"; "Password Hash")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Password field';
                 }
                 field(Blocked; Blocked)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Blocked field';
                 }
                 field("Blocked At"; "Blocked At")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Blocked At field';
                 }
                 field("GDPR Agreement No."; "GDPR Agreement No.")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the GDPR Agreement No. field';
                 }
                 field("GDPR Data Subject Id"; "GDPR Data Subject Id")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the GDPR Data Subject Id field';
                 }
             }
         }

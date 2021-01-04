@@ -21,30 +21,37 @@ page 6151429 "NPR Magento Itm Cstm Opt.Value"
                 field("Item No."; "Item No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Item No. field';
                 }
                 field("Custom Option No."; "Custom Option No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Custom Option No. field';
                 }
                 field("Custom Option Value Line No."; "Custom Option Value Line No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Custom Option Value Line No. field';
                 }
                 field(Enabled; Enabled)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Enabled field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field(Price; Price)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Price field';
                 }
                 field("Price Type"; "Price Type")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Price Type field';
                 }
             }
         }

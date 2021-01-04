@@ -15,14 +15,17 @@ page 6184891 "NPR Storage Setup"
                 field("Storage Type"; "Storage Type")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Storage Type field';
                 }
                 field("Storage ID"; "Storage ID")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Storage ID field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
             }
         }
@@ -40,6 +43,7 @@ page 6184891 "NPR Storage Setup"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Operations action';
 
                 trigger OnAction()
                 var

@@ -17,10 +17,12 @@ page 6150641 "NPR POS Info Subform"
                 field(Subcode; Subcode)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Subcode field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
             }
         }

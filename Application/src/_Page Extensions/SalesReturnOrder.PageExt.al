@@ -15,6 +15,7 @@ pageextension 6014472 "NPR Sales Return Order" extends "Sales Return Order"
             field("NPR Sell-to Customer Name 2"; "Sell-to Customer Name 2")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the Sell-to Customer Name 2 field';
             }
         }
         addafter("VAT Bus. Posting Group")
@@ -22,6 +23,7 @@ pageextension 6014472 "NPR Sales Return Order" extends "Sales Return Order"
             field("NPR Magento Payment Amount"; "NPR Magento Payment Amount")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the NPR Magento Payment Amount field';
             }
         }
         addafter("Shipment Date")
@@ -29,6 +31,7 @@ pageextension 6014472 "NPR Sales Return Order" extends "Sales Return Order"
             field("NPR Document Processing"; "NPR Document Processing")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the NPR Document Processing field';
             }
         }
         addafter("Ship-to Name")
@@ -36,6 +39,7 @@ pageextension 6014472 "NPR Sales Return Order" extends "Sales Return Order"
             field("NPR Ship-to Name 2"; "Ship-to Name 2")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the Ship-to Name 2 field';
             }
         }
         addafter("Ship-to Contact")
@@ -43,6 +47,7 @@ pageextension 6014472 "NPR Sales Return Order" extends "Sales Return Order"
             field("NPR Shipment Method Code"; "Shipment Method Code")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the Shipment Method Code field';
             }
         }
         addafter("Bill-to Name")
@@ -50,6 +55,7 @@ pageextension 6014472 "NPR Sales Return Order" extends "Sales Return Order"
             field("NPR Bill-to Name 2"; "Bill-to Name 2")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the Bill-to Name 2 field';
             }
         }
     }
@@ -78,12 +84,14 @@ pageextension 6014472 "NPR Sales Return Order" extends "Sales Return Order"
                     Caption = 'E-mail Log';
                     Image = Email;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the E-mail Log action';
                 }
                 action("NPR SendAsPDF")
                 {
                     Caption = 'Send as PDF';
                     Image = SendEmailPDF;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Send as PDF action';
                 }
             }
         }

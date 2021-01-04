@@ -25,51 +25,63 @@ page 6151505 "NPR Nc Import Types"
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Keep Import Entries for"; "Keep Import Entries for")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Keep Import Entries for field';
                 }
                 field("Import Codeunit ID"; "Import Codeunit ID")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Import Codeunit ID field';
                 }
                 field("Lookup Codeunit ID"; "Lookup Codeunit ID")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Lookup Codeunit ID field';
                 }
                 field("Webservice Enabled"; "Webservice Enabled")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Webservice Enabled field';
                 }
                 field("Webservice Codeunit ID"; "Webservice Codeunit ID")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Webservice Codeunit ID field';
                 }
                 field("Ftp Enabled"; "Ftp Enabled")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Ftp Enabled field';
                 }
                 field(Sftp; Sftp)
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Sftp field';
                 }
                 field("Ftp Host"; "Ftp Host")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Ftp Host field';
                 }
                 field("Server File Enabled"; "Server File Enabled")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Server File Enabled field';
                 }
                 field("Server File Path"; "Server File Path")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Server File Path field';
                 }
             }
         }
@@ -88,6 +100,7 @@ page 6151505 "NPR Nc Import Types"
                 PromotedIsBig = true;
                 Visible = "Ftp Enabled";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Download Ftp action';
 
                 trigger OnAction()
                 var
@@ -107,6 +120,7 @@ page 6151505 "NPR Nc Import Types"
                 PromotedIsBig = true;
                 Visible = "Server File Enabled";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Download Server File action';
 
                 trigger OnAction()
                 var
@@ -126,6 +140,7 @@ page 6151505 "NPR Nc Import Types"
                 PromotedIsBig = true;
                 Visible = ("Send E-mail on Error");
                 ApplicationArea = All;
+                ToolTip = 'Executes the Send Test Error E-mail action';
 
                 trigger OnAction()
                 var

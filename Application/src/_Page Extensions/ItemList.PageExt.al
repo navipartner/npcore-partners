@@ -40,6 +40,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
             field("NPR Description 2"; "Description 2")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the Description 2 field';
             }
         }
 
@@ -48,17 +49,20 @@ pageextension 6014433 "NPR Item List" extends "Item List"
             field("NPR Item Group"; "NPR Item Group")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the NPR Item Group field';
             }
 
             field(NPR_ItemGroupDesc; ItemGroupDesc)
             {
                 Caption = 'Item Group Description';
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the Item Group Description field';
             }
 
             field("NPR Ticket Type"; "NPR Ticket Type")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the NPR Ticket Type field';
             }
         }
 
@@ -67,11 +71,13 @@ pageextension 6014433 "NPR Item List" extends "Item List"
             field("NPR Magento Item"; "NPR Magento Item")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the NPR Magento Item field';
             }
 
             field("NPR Item Status"; "NPR Item Status")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the NPR Item Status field';
             }
         }
 
@@ -80,6 +86,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
             field("NPR Unit List Price"; "Unit List Price")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the Unit List Price field';
             }
         }
 
@@ -88,6 +95,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
             field(NPR_Inventory; Inventory)
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the Inventory field';
             }
 
             field(NPR_ItemAvlByLocation; ItemAvlByLocation)
@@ -95,6 +103,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
                 Caption = 'Inv availability by location';
                 ApplicationArea = All;
                 DecimalPlaces = 2 : 2;
+                ToolTip = 'Specifies the value of the Inv availability by location field';
 
                 trigger OnDrillDown()
                 begin
@@ -124,18 +133,21 @@ pageextension 6014433 "NPR Item List" extends "Item List"
             {
                 ApplicationArea = All;
                 Visible = false;
+                ToolTip = 'Specifies the value of the NPR Label Barcode field';
             }
 
             field("NPR Season"; "NPR Season")
             {
                 ApplicationArea = All;
                 Visible = false;
+                ToolTip = 'Specifies the value of the NPR Season field';
             }
 
             field("NPR Item Brand"; "NPR Item Brand")
             {
                 ApplicationArea = All;
                 Visible = false;
+                ToolTip = 'Specifies the value of the NPR Item Brand field';
             }
 
         }
@@ -146,17 +158,20 @@ pageextension 6014433 "NPR Item List" extends "Item List"
             {
                 ApplicationArea = All;
                 Visible = false;
+                ToolTip = 'Specifies the value of the Global Dimension 1 Code field';
             }
             field("NPR Global Dimension 2 Code"; "Global Dimension 2 Code")
             {
                 ApplicationArea = all;
                 Visible = false;
+                ToolTip = 'Specifies the value of the Global Dimension 2 Code field';
             }
 
             field("NPR Units per Parcel"; "Units per Parcel")
             {
                 ApplicationArea = all;
                 Visible = false;
+                ToolTip = 'Specifies the value of the Units per Parcel field';
             }
 
             field(NPRAttrTextArray_01; NPRAttrTextArray[1])
@@ -165,6 +180,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
                 CaptionClass = '6014555,27,1,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible01;
+                ToolTip = 'Specifies the value of the NPRAttrTextArray[1] field';
 
                 trigger OnValidate()
                 begin
@@ -177,6 +193,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
                 CaptionClass = '6014555,27,2,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible02;
+                ToolTip = 'Specifies the value of the NPRAttrTextArray[2] field';
 
                 trigger OnValidate()
                 begin
@@ -190,6 +207,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
                 CaptionClass = '6014555,27,3,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible03;
+                ToolTip = 'Specifies the value of the NPRAttrTextArray[3] field';
 
                 trigger OnValidate()
                 begin
@@ -203,6 +221,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
                 CaptionClass = '6014555,27,4,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible04;
+                ToolTip = 'Specifies the value of the NPRAttrTextArray[4] field';
 
                 trigger OnValidate()
                 begin
@@ -216,6 +235,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
                 CaptionClass = '6014555,27,5,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible05;
+                ToolTip = 'Specifies the value of the NPRAttrTextArray[5] field';
 
                 trigger OnValidate()
                 begin
@@ -229,6 +249,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
                 CaptionClass = '6014555,27,6,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible06;
+                ToolTip = 'Specifies the value of the NPRAttrTextArray[6] field';
 
                 trigger OnValidate()
                 begin
@@ -242,6 +263,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
                 CaptionClass = '6014555,27,7,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible07;
+                ToolTip = 'Specifies the value of the NPRAttrTextArray[7] field';
 
                 trigger OnValidate()
                 begin
@@ -255,6 +277,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
                 CaptionClass = '6014555,27,8,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible08;
+                ToolTip = 'Specifies the value of the NPRAttrTextArray[8] field';
 
                 trigger OnValidate()
                 begin
@@ -268,6 +291,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
                 CaptionClass = '6014555,27,9,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible09;
+                ToolTip = 'Specifies the value of the NPRAttrTextArray[9] field';
 
                 trigger OnValidate()
                 begin
@@ -281,6 +305,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
                 CaptionClass = '6014555,27,10,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible10;
+                ToolTip = 'Specifies the value of the NPRAttrTextArray[10] field';
 
                 trigger OnValidate()
                 begin
@@ -299,6 +324,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
                 Caption = 'POS Sales Entries';
                 Image = Entries;
                 ApplicationArea = All;
+                ToolTip = 'Executes the POS Sales Entries action';
             }
             action("NPR Retail Price Log Entries")
             {
@@ -307,6 +333,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
                 RunObject = Page "NPR Retail Price Log Entries";
                 RunPageLink = "Item No." = FIELD("No.");
                 ApplicationArea = All;
+                ToolTip = 'Executes the Retail Price Log Entries action';
             }
         }
 
@@ -323,6 +350,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
                     PromotedCategory = Category6;
                     Visible = MagentoEnabled;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Pictures action';
 
                     trigger OnAction()
                     var
@@ -344,6 +372,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
                     PromotedCategory = Category6;
                     Visible = MagentoEnabled AND MagentoEnabledMultistore;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Webshops action';
 
                     trigger OnAction()
                     var
@@ -365,6 +394,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
                     PromotedCategory = Category6;
                     Visible = MagentoEnabled AND MagentoEnabledDisplayConfig;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Display Config action';
 
                     trigger OnAction()
                     var
@@ -394,6 +424,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
                     PromotedCategory = Category5;
                     ShortCutKey = 'Ctrl+Alt+L';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Price Label action';
 
                     trigger OnAction()
                     var
@@ -414,6 +445,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
                     PromotedCategory = Category5;
                     ShortCutKey = 'Ctrl+Alt+L';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Shelf Label action';
 
                     trigger OnAction()
                     var
@@ -436,6 +468,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
                 Caption = 'Timeline';
                 Image = Timeline;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Timeline action';
 
                 trigger OnAction()
                 begin
@@ -448,6 +481,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
                 Image = Intercompany;
                 Visible = RetailInventoryEnabled;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Retail Inventory Set action';
 
                 trigger OnAction()
                 var
@@ -468,6 +502,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
                 RunPageLink = "Seed Item No." = FIELD("No."),
                                   "Table No." = CONST(27);
                 ApplicationArea = All;
+                ToolTip = 'Executes the Recommended Items action';
             }
         }
 
@@ -479,6 +514,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
                 Image = Find;
                 ShortCutKey = 'Shift+Ctrl+S';
                 ApplicationArea = All;
+                ToolTip = 'Executes the Search Item action';
 
                 trigger OnAction()
                 var
@@ -509,6 +545,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
                 Caption = 'Filter Search Items';
                 Image = "Filter";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Filter Search Items action';
 
                 trigger OnAction()
                 var
@@ -540,6 +577,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
                 PromotedIsBig = true;
                 Visible = NPRAttrVisible01 OR NPRAttrVisible02 OR NPRAttrVisible03 OR NPRAttrVisible04 OR NPRAttrVisible05 OR NPRAttrVisible06 OR NPRAttrVisible07 OR NPRAttrVisible08 OR NPRAttrVisible09 OR NPRAttrVisible10;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Set Client Attribute Filter action';
 
                 trigger OnAction()
                 var

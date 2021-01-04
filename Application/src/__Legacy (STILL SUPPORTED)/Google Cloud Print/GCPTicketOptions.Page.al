@@ -15,6 +15,7 @@ page 6014633 "NPR GCP Ticket Options"
             {
                 ApplicationArea = All;
                 Editable = false;
+                ToolTip = 'Specifies the value of the color field';
 
                 trigger OnAssistEdit()
                 var
@@ -31,6 +32,7 @@ page 6014633 "NPR GCP Ticket Options"
             {
                 ApplicationArea = All;
                 Editable = false;
+                ToolTip = 'Specifies the value of the page_orientation field';
 
                 trigger OnAssistEdit()
                 var
@@ -47,6 +49,7 @@ page 6014633 "NPR GCP Ticket Options"
             {
                 ApplicationArea = All;
                 Editable = false;
+                ToolTip = 'Specifies the value of the duplex field';
 
                 trigger OnAssistEdit()
                 var
@@ -63,6 +66,7 @@ page 6014633 "NPR GCP Ticket Options"
             {
                 ApplicationArea = All;
                 Editable = false;
+                ToolTip = 'Specifies the value of the media_size field';
 
                 trigger OnAssistEdit()
                 var

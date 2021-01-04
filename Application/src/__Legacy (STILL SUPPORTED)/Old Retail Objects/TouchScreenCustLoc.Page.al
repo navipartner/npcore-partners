@@ -21,14 +21,17 @@ page 6014555 "NPR Touch Screen - Cust Loc."
                 field("No."; "No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the No. field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Total Amount"; "Total Amount")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Total Amount field';
                 }
             }
             group(Control6150617)

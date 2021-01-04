@@ -16,10 +16,12 @@ page 6150733 "NPR POS Sales WF Set Card"
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
             }
             part(Control6014404; "NPR POS Sales WF Set Entries")

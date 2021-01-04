@@ -16,10 +16,12 @@ page 6059947 "NPR Sales Price Maint. Groups"
                 field("Item Group"; "Item Group")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Item Group field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
             }
         }

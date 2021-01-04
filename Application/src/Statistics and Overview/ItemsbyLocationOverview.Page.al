@@ -20,11 +20,13 @@ page 6060066 "NPR Items by Location Overview"
                     Caption = 'Show Items';
                     OptionCaption = 'On Inventory,Not on Inventory,All';
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Show Items field';
                 }
                 field(ShowInTransit; ShowInTransit)
                 {
                     ApplicationArea = All;
                     Caption = 'Show Items in Transit';
+                    ToolTip = 'Specifies the value of the Show Items in Transit field';
 
                     trigger OnValidate()
                     begin
@@ -35,6 +37,7 @@ page 6060066 "NPR Items by Location Overview"
                 {
                     ApplicationArea = All;
                     Caption = 'Show Column Name';
+                    ToolTip = 'Specifies the value of the Show Column Name field';
 
                     trigger OnValidate()
                     begin
@@ -53,6 +56,7 @@ page 6060066 "NPR Items by Location Overview"
                 {
                     ApplicationArea = All;
                     Caption = 'Item Filter';
+                    ToolTip = 'Specifies the value of the Item Filter field';
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -84,6 +88,7 @@ page 6060066 "NPR Items by Location Overview"
                 {
                     ApplicationArea = All;
                     Caption = 'Variant Filter';
+                    ToolTip = 'Specifies the value of the Variant Filter field';
 
                     trigger OnValidate()
                     begin
@@ -94,6 +99,7 @@ page 6060066 "NPR Items by Location Overview"
                 {
                     ApplicationArea = All;
                     Caption = 'Variety 1 Value Filter';
+                    ToolTip = 'Specifies the value of the Variety 1 Value Filter field';
 
                     trigger OnValidate()
                     begin
@@ -104,6 +110,7 @@ page 6060066 "NPR Items by Location Overview"
                 {
                     ApplicationArea = All;
                     Caption = 'Variety 2 Value Filter';
+                    ToolTip = 'Specifies the value of the Variety 2 Value Filter field';
 
                     trigger OnValidate()
                     begin
@@ -114,6 +121,7 @@ page 6060066 "NPR Items by Location Overview"
                 {
                     ApplicationArea = All;
                     Caption = 'Variety 3 Value Filter';
+                    ToolTip = 'Specifies the value of the Variety 3 Value Filter field';
 
                     trigger OnValidate()
                     begin
@@ -124,6 +132,7 @@ page 6060066 "NPR Items by Location Overview"
                 {
                     ApplicationArea = All;
                     Caption = 'Variety 4 Value Filter';
+                    ToolTip = 'Specifies the value of the Variety 4 Value Filter field';
 
                     trigger OnValidate()
                     begin

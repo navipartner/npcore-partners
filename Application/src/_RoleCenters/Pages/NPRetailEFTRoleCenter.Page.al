@@ -53,6 +53,7 @@ page 6059835 "NPR NP Retail EFT Role Center"
                 Image = "Report";
                 RunObject = Report "Warehouse Bin List";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Warehouse &Bin List action';
             }
             action("Warehouse A&djustment Bin")
             {
@@ -60,6 +61,7 @@ page 6059835 "NPR NP Retail EFT Role Center"
                 Image = "Report";
                 RunObject = Report "Whse. Adjustment Bin";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Warehouse A&djustment Bin action';
             }
             separator(Separator51)
             {
@@ -70,6 +72,7 @@ page 6059835 "NPR NP Retail EFT Role Center"
                 Image = "Report";
                 RunObject = Report "Whse. Phys. Inventory List";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Whse. P&hys. Inventory List action';
             }
             separator(Separator19)
             {
@@ -80,6 +83,7 @@ page 6059835 "NPR NP Retail EFT Role Center"
                 Image = "Report";
                 RunObject = Report "Prod. Order - Picking List";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Prod. &Order Picking List action';
             }
             separator(Separator54)
             {
@@ -90,6 +94,7 @@ page 6059835 "NPR NP Retail EFT Role Center"
                 Image = "Report";
                 RunObject = Report "Customer - Labels";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Customer &Labels action';
             }
         }
         area(embedding)
@@ -99,24 +104,28 @@ page 6059835 "NPR NP Retail EFT Role Center"
                 Caption = 'Picks';
                 RunObject = Page "Warehouse Picks";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Picks action';
             }
             action(Action36)
             {
                 Caption = 'Put-aways';
                 RunObject = Page "Warehouse Put-aways";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Put-aways action';
             }
             action(Action41)
             {
                 Caption = 'Movements';
                 RunObject = Page "Warehouse Movements";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Movements action';
             }
             action(WhseShpt)
             {
                 Caption = 'Warehouse Shipments';
                 RunObject = Page "Warehouse Shipment List";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Warehouse Shipments action';
             }
             action(WhseShptReleased)
             {
@@ -125,6 +134,7 @@ page 6059835 "NPR NP Retail EFT Role Center"
                 RunPageView = SORTING("No.")
                               WHERE(Status = FILTER(Released));
                 ApplicationArea = All;
+                ToolTip = 'Executes the Released action';
             }
             action(WhseShptPartPicked)
             {
@@ -132,6 +142,7 @@ page 6059835 "NPR NP Retail EFT Role Center"
                 RunObject = Page "Warehouse Shipment List";
                 RunPageView = WHERE("Document Status" = FILTER("Partially Picked"));
                 ApplicationArea = All;
+                ToolTip = 'Executes the Partially Picked action';
             }
             action(WhseShptComplPicked)
             {
@@ -139,6 +150,7 @@ page 6059835 "NPR NP Retail EFT Role Center"
                 RunObject = Page "Warehouse Shipment List";
                 RunPageView = WHERE("Document Status" = FILTER("Completely Picked"));
                 ApplicationArea = All;
+                ToolTip = 'Executes the Completely Picked action';
             }
             action(WhseShptPartShipped)
             {
@@ -146,12 +158,14 @@ page 6059835 "NPR NP Retail EFT Role Center"
                 RunObject = Page "Warehouse Shipment List";
                 RunPageView = WHERE("Document Status" = FILTER("Partially Shipped"));
                 ApplicationArea = All;
+                ToolTip = 'Executes the Partially Shipped action';
             }
             action(WhseReceipts)
             {
                 Caption = 'Warehouse Receipts';
                 RunObject = Page "Warehouse Receipts";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Warehouse Receipts action';
             }
             action(WhseReceiptsPartReceived)
             {
@@ -159,6 +173,7 @@ page 6059835 "NPR NP Retail EFT Role Center"
                 RunObject = Page "Warehouse Receipts";
                 RunPageView = WHERE("Document Status" = FILTER("Partially Received"));
                 ApplicationArea = All;
+                ToolTip = 'Executes the Partially Received action';
             }
             action(Action83)
             {
@@ -166,12 +181,14 @@ page 6059835 "NPR NP Retail EFT Role Center"
                 Image = Document;
                 RunObject = Page "Transfer Orders";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Transfer Orders action';
             }
             action(Action1)
             {
                 Caption = 'Assembly Orders';
                 RunObject = Page "Assembly Orders";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Assembly Orders action';
             }
             action(Action46)
             {
@@ -179,6 +196,7 @@ page 6059835 "NPR NP Retail EFT Role Center"
                 Image = BinContent;
                 RunObject = Page "Bin Contents List";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Bin Contents action';
             }
             action(Action47)
             {
@@ -186,6 +204,7 @@ page 6059835 "NPR NP Retail EFT Role Center"
                 Image = Item;
                 RunObject = Page "Item List";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Items action';
             }
             action(Customers)
             {
@@ -193,6 +212,7 @@ page 6059835 "NPR NP Retail EFT Role Center"
                 Image = Customer;
                 RunObject = Page "Customer List";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Customers action';
             }
             action(Action52)
             {
@@ -200,18 +220,21 @@ page 6059835 "NPR NP Retail EFT Role Center"
                 Image = Vendor;
                 RunObject = Page "Vendor List";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Vendors action';
             }
             action(Action53)
             {
                 Caption = 'Shipping Agents';
                 RunObject = Page "Shipping Agents";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Shipping Agents action';
             }
             action("Warehouse Employees")
             {
                 Caption = 'Warehouse Employees';
                 RunObject = Page "Warehouse Employee List";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Warehouse Employees action';
             }
         }
         area(sections)
@@ -226,6 +249,7 @@ page 6059835 "NPR NP Retail EFT Role Center"
                     Image = RegisteredDocs;
                     RunObject = Page "Registered Whse. Picks";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Registered Picks action';
                 }
                 action(Action44)
                 {
@@ -233,6 +257,7 @@ page 6059835 "NPR NP Retail EFT Role Center"
                     Image = RegisteredDocs;
                     RunObject = Page "Registered Whse. Put-aways";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Registered Put-aways action';
                 }
                 action(Action45)
                 {
@@ -240,6 +265,7 @@ page 6059835 "NPR NP Retail EFT Role Center"
                     Image = RegisteredDocs;
                     RunObject = Page "Registered Whse. Movements";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Registered Movements action';
                 }
                 action(Action59)
                 {
@@ -247,6 +273,7 @@ page 6059835 "NPR NP Retail EFT Role Center"
                     Image = PostedReceipts;
                     RunObject = Page "Posted Whse. Receipt List";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Posted Whse. Receipts action';
                 }
             }
         }
@@ -305,6 +332,7 @@ page 6059835 "NPR NP Retail EFT Role Center"
                     Image = List;
                     RunObject = Page "Warehouse Receipts";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Warehouse Receipts action';
                 }
                 action("Partially Received")
                 {
@@ -313,6 +341,7 @@ page 6059835 "NPR NP Retail EFT Role Center"
                     RunObject = Page "Warehouse Receipts";
                     RunPageView = WHERE("Document Status" = CONST("Partially Received"));
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Partially Received action';
                 }
                 action("Warehouse Shipments")
                 {
@@ -320,6 +349,7 @@ page 6059835 "NPR NP Retail EFT Role Center"
                     Image = List;
                     RunObject = Page "Warehouse Shipment List";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Warehouse Shipments action';
                 }
                 action(Release)
                 {
@@ -330,6 +360,7 @@ page 6059835 "NPR NP Retail EFT Role Center"
                                   ORDER(Ascending)
                                   WHERE(Status = FILTER(Released));
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Release action';
                 }
                 action("Partially Picked")
                 {
@@ -338,6 +369,7 @@ page 6059835 "NPR NP Retail EFT Role Center"
                     RunObject = Page "Warehouse Shipment List";
                     RunPageView = WHERE("Document Status" = FILTER("Completely Picked"));
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Partially Picked action';
                 }
                 action("Completely Picked")
                 {
@@ -346,6 +378,7 @@ page 6059835 "NPR NP Retail EFT Role Center"
                     RunObject = Page "Warehouse Shipment List";
                     RunPageView = WHERE("Document Status" = FILTER("Completely Picked"));
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Completely Picked action';
                 }
                 action("Partially Shipped")
                 {
@@ -354,6 +387,7 @@ page 6059835 "NPR NP Retail EFT Role Center"
                     RunObject = Page "Warehouse Shipment List";
                     RunPageView = WHERE("Document Status" = FILTER("Partially Shipped"));
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Partially Shipped action';
                 }
                 action("Inventory Put-aways")
                 {
@@ -361,6 +395,7 @@ page 6059835 "NPR NP Retail EFT Role Center"
                     Image = List;
                     RunObject = Page "Inventory Put-aways";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Inventory Put-aways action';
                 }
                 action("Put-aways")
                 {
@@ -368,6 +403,7 @@ page 6059835 "NPR NP Retail EFT Role Center"
                     Image = List;
                     RunObject = Page "Inventory Picks";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Put-aways action';
                 }
                 action(Picks)
                 {
@@ -375,6 +411,7 @@ page 6059835 "NPR NP Retail EFT Role Center"
                     Image = List;
                     RunObject = Page "Warehouse Picks";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Picks action';
                 }
                 action(Movements)
                 {
@@ -382,6 +419,7 @@ page 6059835 "NPR NP Retail EFT Role Center"
                     Image = List;
                     RunObject = Page "Warehouse Movements";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Movements action';
                 }
                 action("Transfer Orders")
                 {
@@ -389,6 +427,7 @@ page 6059835 "NPR NP Retail EFT Role Center"
                     Image = List;
                     RunObject = Page "Transfer Orders";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Transfer Orders action';
                 }
                 action("Assembly Orders")
                 {
@@ -396,6 +435,7 @@ page 6059835 "NPR NP Retail EFT Role Center"
                     Image = List;
                     RunObject = Page "Assembly Orders";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Assembly Orders action';
                 }
                 action("Bin Contents")
                 {
@@ -403,6 +443,7 @@ page 6059835 "NPR NP Retail EFT Role Center"
                     Image = List;
                     RunObject = Page "Bin Contents List";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Bin Contents action';
                 }
             }
             group("Reference Data")
@@ -414,6 +455,7 @@ page 6059835 "NPR NP Retail EFT Role Center"
                     Image = List;
                     RunObject = Page "Item List";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Items action';
                 }
                 action(Customer)
                 {
@@ -421,6 +463,7 @@ page 6059835 "NPR NP Retail EFT Role Center"
                     Image = List;
                     RunObject = Page "Customer List";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Customer action';
                 }
                 action(Vendors)
                 {
@@ -428,6 +471,7 @@ page 6059835 "NPR NP Retail EFT Role Center"
                     Image = List;
                     RunObject = Page "Vendor List";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Vendors action';
                 }
                 action("Shipping Agents")
                 {
@@ -435,6 +479,7 @@ page 6059835 "NPR NP Retail EFT Role Center"
                     Image = List;
                     RunObject = Page "Shipping Agents";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Shipping Agents action';
                 }
             }
             group(Journal)
@@ -499,6 +544,7 @@ page 6059835 "NPR NP Retail EFT Role Center"
                     Image = List;
                     RunObject = Page "Registered Whse. Picks";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Registered Picks action';
                 }
                 action("Registered Put-aways")
                 {
@@ -506,6 +552,7 @@ page 6059835 "NPR NP Retail EFT Role Center"
                     Image = List;
                     RunObject = Page "Registered Whse. Put-aways";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Registered Put-aways action';
                 }
                 action("Registered Movements")
                 {
@@ -513,6 +560,7 @@ page 6059835 "NPR NP Retail EFT Role Center"
                     Image = List;
                     RunObject = Page "Registered Whse. Movements";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Registered Movements action';
                 }
                 action("Posted Whse. Receipts")
                 {
@@ -520,6 +568,7 @@ page 6059835 "NPR NP Retail EFT Role Center"
                     Image = List;
                     RunObject = Page "Posted Whse. Receipt List";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Posted Whse. Receipts action';
                 }
             }
         }

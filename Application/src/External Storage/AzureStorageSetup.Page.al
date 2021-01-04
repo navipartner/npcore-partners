@@ -14,10 +14,12 @@ page 6184860 "NPR Azure Storage Setup"
                 field("Account Name"; "Account Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Azure Account Name field';
                 }
                 field("Account Description"; "Account Description")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Azure Account Description field';
                 }
                 field(AccessKey; AccessKey)
                 {
@@ -51,6 +53,7 @@ page 6184860 "NPR Azure Storage Setup"
                 field("Storage On Server"; "Storage On Server")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Server files location field';
                 }
             }
         }

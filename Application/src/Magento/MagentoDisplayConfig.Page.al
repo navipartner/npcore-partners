@@ -26,6 +26,7 @@ page 6151443 "NPR Magento Display Config"
                 {
                     ApplicationArea = All;
                     Caption = 'Type Filter';
+                    ToolTip = 'Specifies the value of the Type Filter field';
 
                     trigger OnValidate()
                     begin
@@ -40,6 +41,7 @@ page 6151443 "NPR Magento Display Config"
                     Caption = 'Code Filter';
                     Editable = NumberFilterCtrlEnabled;
                     Enabled = NumberFilterCtrlEnabled;
+                    ToolTip = 'Specifies the value of the Code Filter field';
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -90,38 +92,47 @@ page 6151443 "NPR Magento Display Config"
                 field("No."; "No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the No. field';
                 }
                 field(Type; Type)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Type field';
                 }
                 field("Sales Type"; "Sales Type")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Sales Type field';
                 }
                 field("Sales Code"; "Sales Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Sales Code field';
                 }
                 field("Is Visible"; "Is Visible")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Is Visible field';
                 }
                 field("Starting Date"; "Starting Date")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Starting Date field';
                 }
                 field("Starting Time"; "Starting Time")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Starting Time field';
                 }
                 field("Ending Date"; "Ending Date")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Ending Date field';
                 }
                 field("Ending Time"; "Ending Time")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Ending Time field';
                 }
             }
         }

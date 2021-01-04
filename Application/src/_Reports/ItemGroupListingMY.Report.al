@@ -178,22 +178,26 @@ report 6014437 "NPR Item Group Listing M/Y"
                     {
                         Caption = 'Show Sub Item Groups';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Show Sub Item Groups field';
                     }
                     field(StartDate; StartDate)
                     {
                         Caption = 'Start Date';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Start Date field';
                     }
                     field(EndDate; EndDate)
                     {
                         Caption = 'End Date';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the End Date field';
                     }
                     field("Salesperson.Code"; Salesperson.Code)
                     {
                         Caption = 'Salesperson Code';
                         TableRelation = "Salesperson/Purchaser";
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Salesperson Code field';
                     }
                 }
             }

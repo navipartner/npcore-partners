@@ -18,6 +18,7 @@ page 6014623 "NPR Generic Key List"
                 {
                     ApplicationArea = All;
                     Caption = 'Sorting Key';
+                    ToolTip = 'Specifies the value of the Sorting Key field';
                 }
             }
         }

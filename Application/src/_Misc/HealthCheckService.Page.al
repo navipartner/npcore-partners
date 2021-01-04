@@ -20,6 +20,7 @@ page 6014600 "NPR Health Check Service"
             field(Number; Number)
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the Number field';
             }
         }
     }

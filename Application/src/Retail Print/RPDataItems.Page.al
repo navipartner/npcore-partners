@@ -25,38 +25,47 @@ page 6014561 "NPR RP Data Items"
                     ApplicationArea = All;
                     Style = Strong;
                     StyleExpr = Level = 0;
+                    ToolTip = 'Specifies the value of the Data Source field';
                 }
                 field(Name; Name)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Name field';
                 }
                 field("Iteration Type"; "Iteration Type")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Iteration Type field';
                 }
                 field("Key ID"; "Key ID")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Key ID field';
                 }
                 field("Sort Order"; "Sort Order")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Sort Order field';
                 }
                 field("Total Fields"; "Total Fields")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Total Fields field';
                 }
                 field("Field ID"; "Field ID")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Field ID field';
                 }
                 field("Skip Template If Empty"; "Skip Template If Empty")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Skip Template If Empty field';
                 }
                 field("Skip Template If Not Empty"; "Skip Template If Not Empty")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Skip Template If Not Empty field';
                 }
             }
             part(Control6014404; "NPR RP Data Item Links")
@@ -84,6 +93,7 @@ page 6014561 "NPR RP Data Items"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Unindent action';
 
                 trigger OnAction()
                 begin
@@ -98,6 +108,7 @@ page 6014561 "NPR RP Data Items"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Indent action';
 
                 trigger OnAction()
                 begin
@@ -115,6 +126,7 @@ page 6014561 "NPR RP Data Items"
                 RunPageLink = "Data Item Code" = FIELD(Code),
                               "Data Item Line No." = FIELD("Line No.");
                 ApplicationArea = All;
+                ToolTip = 'Executes the Constraints action';
             }
         }
     }

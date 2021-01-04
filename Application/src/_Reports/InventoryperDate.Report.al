@@ -198,47 +198,56 @@ report 6014417 "NPR Inventory per Date"
                 {
                     Caption = 'Date';
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Date field';
                 }
                 field(IncludeItemStock; IncludeItemStock)
                 {
                     Caption = 'Show only products with inventory';
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Show only products with inventory field';
                 }
                 field(NotUnitPrice; NotUnitPrice)
                 {
                     Caption = 'Do not display prices';
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Do not display prices field';
                 }
                 field(ShowItemNegativeInventory; ShowItemNegativeInventory)
                 {
                     Caption = 'Do not display items with negative inventory';
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Do not display items with negative inventory field';
                 }
                 field(NegativVolumeShow; NegativVolumeShow)
                 {
                     Caption = 'Show only items with negativ volume';
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Show only items with negativ volume field';
                 }
                 field(ShowNoInventory; ShowNoInventory)
                 {
                     Caption = 'Do not show inventory';
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Do not show inventory field';
                 }
                 field(ShowZeroInventory; ShowZeroInventory)
                 {
                     Caption = 'Show only 0 quantity inventory';
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Show only 0 quantity inventory field';
                 }
                 field("Choose Calc. Method"; SelectCalcMethod)
                 {
                     Caption = 'Choose Calc. Method';
                     OptionCaption = 'Last Direct Cost Price,Cost Price';
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Choose Calc. Method field';
                 }
                 field(GroupByItemGroup; GroupByItemGroup)
                 {
                     Caption = 'Sort items by item group';
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Sort items by item group field';
                 }
             }
         }

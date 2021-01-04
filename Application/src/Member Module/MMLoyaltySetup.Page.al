@@ -15,14 +15,17 @@ page 6060105 "NPR MM Loyalty Setup"
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Collection Period"; "Collection Period")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Collection Period field';
 
                     trigger OnValidate()
                     begin
@@ -36,6 +39,7 @@ page 6060105 "NPR MM Loyalty Setup"
                     ApplicationArea = All;
                     Style = Attention;
                     StyleExpr = PeriodCalculationIssue;
+                    ToolTip = 'Specifies the value of the Fixed Period Start field';
 
                     trigger OnValidate()
                     begin
@@ -49,6 +53,7 @@ page 6060105 "NPR MM Loyalty Setup"
                     ApplicationArea = All;
                     Style = Attention;
                     StyleExpr = PeriodCalculationIssue;
+                    ToolTip = 'Specifies the value of the Collection Period Length field';
 
                     trigger OnValidate()
                     begin
@@ -60,6 +65,7 @@ page 6060105 "NPR MM Loyalty Setup"
                 field("Expire Uncollected Points"; "Expire Uncollected Points")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Expire Uncollected Points field';
 
                     trigger OnValidate()
                     begin
@@ -71,6 +77,7 @@ page 6060105 "NPR MM Loyalty Setup"
                 field("Expire Uncollected After"; "Expire Uncollected After")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Expire Uncollected After field';
 
                     trigger OnValidate()
                     begin
@@ -84,6 +91,7 @@ page 6060105 "NPR MM Loyalty Setup"
                     ApplicationArea = All;
                     Caption = 'Period Test Date';
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Period Test Date field';
 
                     trigger OnValidate()
                     var
@@ -100,54 +108,66 @@ page 6060105 "NPR MM Loyalty Setup"
                     ApplicationArea = All;
                     Caption = 'Earn Period Start';
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Earn Period Start field';
                 }
                 field(CollectionPeriodEnd; CollectionPeriodEnd)
                 {
                     ApplicationArea = All;
                     Caption = 'Earn Period End';
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Earn Period End field';
                 }
                 field(ExpirePointsAt; ExpirePointsAt)
                 {
                     ApplicationArea = All;
                     Caption = 'Expire Points At';
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Expire Points At field';
                 }
                 field("Voucher Point Source"; "Voucher Point Source")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Voucher Point Source field';
                 }
                 field("Voucher Point Threshold"; "Voucher Point Threshold")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Voucher Point Threshold field';
                 }
                 field("Voucher Creation"; "Voucher Creation")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Voucher Creation field';
                 }
                 field("Point Base"; "Point Base")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Point Base field';
                 }
                 field("Amount Base"; "Amount Base")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Amount Base field';
                 }
                 field("Points On Discounted Sales"; "Points On Discounted Sales")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Points On Discounted Sales field';
                 }
                 field("Amount Factor"; "Amount Factor")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Amount Factor field';
                 }
                 field("Point Rate"; "Point Rate")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Point Rate field';
                 }
                 field("Auto Upgrade Point Source"; "Auto Upgrade Point Source")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Auto Upgrade Point Source field';
                 }
                 field(ReasonText; ReasonText)
                 {
@@ -157,6 +177,7 @@ page 6060105 "NPR MM Loyalty Setup"
                     Style = Attention;
                     StyleExpr = PeriodCalculationIssue;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the ReasonText field';
                 }
             }
         }
@@ -176,6 +197,7 @@ page 6060105 "NPR MM Loyalty Setup"
                 RunObject = Page "NPR MM Loyalty Point Setup";
                 RunPageLink = Code = FIELD(Code);
                 ApplicationArea = All;
+                ToolTip = 'Executes the Points to Amount Setup action';
             }
             action("Item Points Setup")
             {
@@ -187,6 +209,7 @@ page 6060105 "NPR MM Loyalty Setup"
                 RunObject = Page "NPR MM Loy. Item Point Setup";
                 RunPageLink = Code = FIELD(Code);
                 ApplicationArea = All;
+                ToolTip = 'Executes the Item Points Setup action';
             }
             separator(Separator6014432)
             {
@@ -200,6 +223,7 @@ page 6060105 "NPR MM Loyalty Setup"
                 RunObject = Page "NPR MM Loyalty Alter Members.";
                 RunPageLink = "Loyalty Code" = FIELD(Code);
                 ApplicationArea = All;
+                ToolTip = 'Executes the Auto Upgrade Threshold action';
             }
             group("Cross Company Loyalty")
             {
@@ -210,6 +234,7 @@ page 6060105 "NPR MM Loyalty Setup"
                     Image = Server;
                     RunObject = Page "NPR MM Loy. Store Setup Server";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the (Server) Loyalty Server - Store Setup action';
                 }
                 action("(Client) Loyalty Server Endpoints")
                 {
@@ -217,6 +242,7 @@ page 6060105 "NPR MM Loyalty Setup"
                     Image = Server;
                     RunObject = Page "NPR MM NPR Endpoint Setup";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the (Client) Loyalty Server Endpoints action';
                 }
                 action("(Client) Loyalty Server - Store Setup")
                 {
@@ -224,6 +250,7 @@ page 6060105 "NPR MM Loyalty Setup"
                     Image = NumberSetup;
                     RunObject = Page "NPR MM Loy. Store Setup Client";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the (Client) Loyalty Server - Store Setup action';
                 }
             }
         }
@@ -235,6 +262,7 @@ page 6060105 "NPR MM Loyalty Setup"
                 Ellipsis = true;
                 Image = Excise;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Expire Points action';
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = Process;
                 //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'

@@ -21,26 +21,32 @@ page 6151427 "NPR Magento Custom Opt.Subform"
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field(Price; Price)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Price field';
                 }
                 field("Price Type"; "Price Type")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Price Type field';
                 }
                 field("Sales Type"; "Sales Type")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Sales Type field';
                 }
                 field("Sales No."; "Sales No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Sales No. field';
                 }
                 field("Price Includes VAT"; "Price Includes VAT")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Price Includes VAT field';
                 }
             }
         }

@@ -17,26 +17,32 @@ page 6014639 "NPR RP Template List"
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field("Printer Type"; "Printer Type")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Printer Type field';
                 }
                 field("Printer Device"; "Printer Device")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Printer Device field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Comments field';
                 }
                 field(Version; Version)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Version field';
                 }
                 field("Last Modified At"; "Last Modified At")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Last Modified At field';
                 }
             }
         }
@@ -62,6 +68,7 @@ page 6014639 "NPR RP Template List"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Create Copy action';
 
                 trigger OnAction()
                 var
@@ -80,6 +87,7 @@ page 6014639 "NPR RP Template List"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Export Package (Selected) action';
 
                 trigger OnAction()
                 var
@@ -98,6 +106,7 @@ page 6014639 "NPR RP Template List"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Export Package (All) action';
 
                 trigger OnAction()
                 var
@@ -116,6 +125,7 @@ page 6014639 "NPR RP Template List"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Import Package File action';
 
                 trigger OnAction()
                 var
@@ -132,6 +142,7 @@ page 6014639 "NPR RP Template List"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Deploy Package action';
 
                 trigger OnAction()
                 var

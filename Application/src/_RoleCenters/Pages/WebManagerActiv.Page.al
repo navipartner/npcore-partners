@@ -18,16 +18,19 @@ page 6059984 "NPR Web Manager Activ."
                 {
                     ApplicationArea = All;
                     DrillDownPageID = "Sales Order List";
+                    ToolTip = 'Specifies the value of the Open Web Sales Orders field';
                 }
                 field("Open Credit Memos"; "Open Credit Memos")
                 {
                     ApplicationArea = All;
                     DrillDownPageID = "Sales Credit Memos";
+                    ToolTip = 'Specifies the value of the Open Credit Memos field';
                 }
                 field("Open Purchase Orders"; "Open Purchase Orders")
                 {
                     ApplicationArea = All;
                     DrillDownPageID = "Purchase Order List";
+                    ToolTip = 'Specifies the value of the Open Purchase Orders field';
                 }
             }
             cuegroup("Processed Orders")
@@ -37,16 +40,19 @@ page 6059984 "NPR Web Manager Activ."
                 {
                     ApplicationArea = All;
                     DrillDownPageID = "Sales Invoice List";
+                    ToolTip = 'Specifies the value of the Posted Web Sales Orders field';
                 }
                 field("Posted Credit Memos"; "Posted Credit Memos")
                 {
                     ApplicationArea = All;
                     DrillDownPageID = "Posted Sales Credit Memos";
+                    ToolTip = 'Specifies the value of the Posted Credit Memos field';
                 }
                 field("Posted Purchase Orders"; "Posted Purchase Orders")
                 {
                     ApplicationArea = All;
                     DrillDownPageID = "Posted Purchase Invoices";
+                    ToolTip = 'Specifies the value of the Posted Purchase Orders field';
                 }
             }
         }
@@ -62,12 +68,14 @@ page 6059984 "NPR Web Manager Activ."
                 RunObject = Page "Sales Credit Memo";
                 RunPageMode = Create;
                 ApplicationArea = All;
+                ToolTip = 'Executes the New Credit Memo action';
             }
             action("New Purchase Order")
             {
                 Caption = 'New Purchase Order';
                 RunObject = Page "Purchase Order";
                 ApplicationArea = All;
+                ToolTip = 'Executes the New Purchase Order action';
             }
         }
     }

@@ -19,26 +19,31 @@ page 6150679 "NPR NPRE Flow Statuses"
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field("Status Object"; "Status Object")
                 {
                     ApplicationArea = All;
                     Enabled = StatusObjectVisible;
                     Visible = StatusObjectVisible;
+                    ToolTip = 'Specifies the value of the Status Object field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Flow Order"; "Flow Order")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Flow Order field';
                 }
                 field(AssignedPrintCategories; AssignedPrintCategoriesAsFilterString())
                 {
                     ApplicationArea = All;
                     Caption = 'Print/Prod. Categories';
                     Visible = ShowPrintCategories;
+                    ToolTip = 'Specifies the value of the Print/Prod. Categories field';
 
                     trigger OnDrillDown()
                     begin
@@ -65,6 +70,7 @@ page 6150679 "NPR NPRE Flow Statuses"
                     PromotedIsBig = true;
                     Visible = ShowPrintCategories;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Print/Prod. Categories action';
 
                     trigger OnAction()
                     begin

@@ -27,42 +27,52 @@ page 6014428 "NPR Salesperson Card"
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Name; Name)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Name field';
                 }
                 field("Job Title"; "Job Title")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Job Title field';
                 }
                 field("E-Mail"; "E-Mail")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the E-Mail field';
                 }
                 field("Phone No."; "Phone No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Phone No. field';
                 }
                 field("Global Dimension 1 Code"; "Global Dimension 1 Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Global Dimension 1 Code field';
                 }
                 field("Global Dimension 2 Code"; "Global Dimension 2 Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Global Dimension 2 Code field';
                 }
                 field("Commission %"; "Commission %")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Commission % field';
                 }
                 field("Maximum Cash Returnsale"; "NPR Maximum Cash Returnsale")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the NPR Maximum Cash Returnsale field';
                 }
                 field(Picture; "NPR Picture")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the NPR Picture field';
                 }
             }
             group(Security)
@@ -72,14 +82,17 @@ page 6014428 "NPR Salesperson Card"
                 {
                     ApplicationArea = All;
                     ExtendedDatatype = Masked;
+                    ToolTip = 'Specifies the value of the NPR Register Password field';
                 }
                 field("Reverse Sales Ticket"; "NPR Reverse Sales Ticket")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the NPR Reverse Sales Ticket field';
                 }
                 field("Locked-to Register No."; "NPR Locked-to Register No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the NPR Locked-to Register No. field';
                 }
             }
             group(Retail)
@@ -88,26 +101,32 @@ page 6014428 "NPR Salesperson Card"
                 field("Hide Register Imbalance"; "NPR Hide Register Imbalance")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the NPR Hide Register Imbalance field';
                 }
                 field("Sales (Qty.)"; "NPR Sales (Qty.)")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the NPR Sales (Qty.) field';
                 }
                 field("Discount Amount"; "NPR Discount Amount")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the NPR Discount Amount field';
                 }
                 field("Item Group Sales (LCY)"; "NPR Item Group Sales (LCY)")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the NPR Item Group Sales (LCY) field';
                 }
                 field("Sales (LCY)"; "NPR Sales (LCY)")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the NPR Sales (LCY) field';
                 }
                 field("COGS (LCY)"; "NPR COGS (LCY)")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the NPR COGS (LCY) field';
                 }
             }
         }
@@ -124,6 +143,7 @@ page 6014428 "NPR Salesperson Card"
                 RunObject = Page "Salespersons/Purchasers";
                 ShortCutKey = 'F5';
                 ApplicationArea = All;
+                ToolTip = 'Executes the List action';
             }
             action("&Statistics")
             {
@@ -133,6 +153,7 @@ page 6014428 "NPR Salesperson Card"
                 RunPageLink = Code = FIELD(Code);
                 ShortCutKey = 'F9';
                 ApplicationArea = All;
+                ToolTip = 'Executes the &Statistics action';
             }
             action("Sales Person report")
             {
@@ -140,6 +161,7 @@ page 6014428 "NPR Salesperson Card"
                 Image = SalesPerson;
                 ShortCutKey = 'Ctrl+F9';
                 ApplicationArea = All;
+                ToolTip = 'Executes the Sales Person report action';
             }
             action(Kassekoder)
             {
@@ -151,12 +173,14 @@ page 6014428 "NPR Salesperson Card"
                 RunPageView = SORTING(Type, Code, "Alt. No.");
                 ShortCutKey = 'Ctrl+A';
                 ApplicationArea = All;
+                ToolTip = 'Executes the Cash Codes action';
             }
             action("Remove from staff Sale")
             {
                 Caption = 'Remove from Staff Sale';
                 Image = RemoveContacts;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Remove from Staff Sale action';
             }
         }
     }

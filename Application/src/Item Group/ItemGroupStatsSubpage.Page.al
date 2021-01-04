@@ -66,15 +66,18 @@ page 6014587 "NPR Item Group Stats Subpage"
                 field("No."; "No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the No. field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("-""Sale Quantity"""; -"Sale Quantity")
                 {
                     ApplicationArea = All;
                     Caption = 'Sale (QTY)';
+                    ToolTip = 'Specifies the value of the Sale (QTY) field';
 
                     trigger OnAssistEdit()
                     var
@@ -93,11 +96,13 @@ page 6014587 "NPR Item Group Stats Subpage"
                     ApplicationArea = All;
                     Caption = 'No.';
                     Visible = LSQTY;
+                    ToolTip = 'Specifies the value of the No. field';
                 }
                 field("Sale Amount"; "Sale Amount")
                 {
                     ApplicationArea = All;
                     Caption = 'Sale (LCY)';
+                    ToolTip = 'Specifies the value of the Sale (LCY) field';
 
                     trigger OnDrillDown()
                     var
@@ -116,39 +121,46 @@ page 6014587 "NPR Item Group Stats Subpage"
                     ApplicationArea = All;
                     Caption = 'No.';
                     Visible = LSAmount;
+                    ToolTip = 'Specifies the value of the No. field';
                 }
                 field("-CostAmt"; -CostAmt)
                 {
                     ApplicationArea = All;
                     Caption = 'Cost (LCY)';
+                    ToolTip = 'Specifies the value of the Cost (LCY) field';
                 }
                 field("-""Last Year CostAmt"""; -"Last Year CostAmt")
                 {
                     ApplicationArea = All;
                     Caption = 'Last year Cost Amount';
                     Visible = LSAmount;
+                    ToolTip = 'Specifies the value of the Last year Cost Amount field';
                 }
                 field("Profit Amount"; "Profit Amount")
                 {
                     ApplicationArea = All;
                     Caption = 'Profit (LCY)';
+                    ToolTip = 'Specifies the value of the Profit (LCY) field';
                 }
                 field("LastYear Profit Amount"; "LastYear Profit Amount")
                 {
                     ApplicationArea = All;
                     Caption = 'Last Year Proifit Amount';
                     Visible = LPA;
+                    ToolTip = 'Specifies the value of the Last Year Proifit Amount field';
                 }
                 field("Profit %"; "Profit %")
                 {
                     ApplicationArea = All;
                     Caption = 'Profit %';
+                    ToolTip = 'Specifies the value of the Profit % field';
                 }
                 field("LastYear Profit %"; "LastYear Profit %")
                 {
                     ApplicationArea = All;
                     Caption = '-> Last year';
                     Visible = "LP%";
+                    ToolTip = 'Specifies the value of the -> Last year field';
                 }
             }
         }

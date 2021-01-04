@@ -17,10 +17,12 @@ page 6014680 "NPR Endpoint QueryFilt. S.form"
                 field("Field Name"; "Field Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Field Name field';
                 }
                 field("Filter Text"; "Filter Text")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Filter Text field';
                 }
             }
         }

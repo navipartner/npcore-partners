@@ -18,15 +18,18 @@ page 6060073 "NPR MM Members. Alteration Jnl"
                     ApplicationArea = All;
                     Editable = false;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Entry No. field';
                 }
                 field(Type; AlterationOption)
                 {
                     ApplicationArea = All;
                     OptionCaption = ' ,Regret,Renew,Upgrade,Extend,Cancel';
+                    ToolTip = 'Specifies the value of the AlterationOption field';
                 }
                 field("External Membership No."; "External Membership No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the External Membership No. field';
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -44,10 +47,12 @@ page 6060073 "NPR MM Members. Alteration Jnl"
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Membership Code field';
                 }
                 field("Item No."; "Item No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Item No. field';
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -64,14 +69,17 @@ page 6060073 "NPR MM Members. Alteration Jnl"
                 field("Document Date"; "Document Date")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Document Date field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Response Status"; "Response Status")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Response Status field';
 
                     trigger OnValidate()
                     begin
@@ -83,6 +91,7 @@ page 6060073 "NPR MM Members. Alteration Jnl"
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Response Message field';
                 }
             }
         }
@@ -100,6 +109,7 @@ page 6060073 "NPR MM Members. Alteration Jnl"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Check action';
 
                 trigger OnAction()
                 begin
@@ -116,6 +126,7 @@ page 6060073 "NPR MM Members. Alteration Jnl"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Check and Execute action';
 
                 trigger OnAction()
                 begin
@@ -129,6 +140,7 @@ page 6060073 "NPR MM Members. Alteration Jnl"
                 Ellipsis = true;
                 Image = CalculatePlan;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Batch Renew action';
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = Process;
                 //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
@@ -150,6 +162,7 @@ page 6060073 "NPR MM Members. Alteration Jnl"
                 Ellipsis = true;
                 Image = Import;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Import From File action';
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = Process;
                 //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
@@ -178,6 +191,7 @@ page 6060073 "NPR MM Members. Alteration Jnl"
                 RunObject = Page "NPR MM Membership Setup";
                 RunPageLink = Code = FIELD("Membership Code");
                 ApplicationArea = All;
+                ToolTip = 'Executes the Membership Setup action';
             }
             action("Membership Card")
             {
@@ -188,6 +202,7 @@ page 6060073 "NPR MM Members. Alteration Jnl"
                 RunObject = Page "NPR MM Membership Card";
                 RunPageLink = "Entry No." = FIELD("Membership Entry No.");
                 ApplicationArea = All;
+                ToolTip = 'Executes the Membership Card action';
             }
         }
     }

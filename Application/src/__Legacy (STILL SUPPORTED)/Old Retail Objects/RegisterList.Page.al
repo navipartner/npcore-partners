@@ -30,42 +30,52 @@ page 6014405 "NPR Register List"
                 field("Register No."; "Register No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the No. field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field(Status; Status)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Status field';
                 }
                 field("Global Dimension 1 Code"; "Global Dimension 1 Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Global Dimension 1 Code field';
                 }
                 field("Global Dimension 2 Code"; "Global Dimension 2 Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Global Dimension 2 Code field';
                 }
                 field("Location Code"; "Location Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Location Code field';
                 }
                 field("Opening Cash"; "Opening Cash")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Opening Cash field';
                 }
                 field("Closing Cash"; "Closing Cash")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Closing Cash field';
                 }
                 field(Balanced; Balanced)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Balanced field';
                 }
                 field("Customer Display"; "Customer Display")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Customer Display field';
                 }
             }
         }
@@ -86,6 +96,7 @@ page 6014405 "NPR Register List"
                     ShortCutKey = 'Shift+Ctrl+D';
                     Visible = false;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Dimensions-Single action';
 
                     trigger OnAction()
                     begin
@@ -98,6 +109,7 @@ page 6014405 "NPR Register List"
                     Image = DimensionSets;
                     Visible = false;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Dimensions-Mulitple action';
 
                     trigger OnAction()
                     var
@@ -122,6 +134,7 @@ page 6014405 "NPR Register List"
                     RunObject = Page "NPR CashKeeper Setup";
                     RunPageLink = "Register No." = FIELD("Register No.");
                     ApplicationArea = All;
+                    ToolTip = 'Executes the CashKeeper Setup action';
                 }
                 action("2nd Display Setup")
                 {
@@ -130,6 +143,7 @@ page 6014405 "NPR Register List"
                     RunObject = Page "NPR Display Setup";
                     RunPageLink = "Register No." = FIELD("Register No.");
                     ApplicationArea = All;
+                    ToolTip = 'Executes the 2nd Display Setup action';
                 }
                 action("mPos Setup")
                 {
@@ -138,6 +152,7 @@ page 6014405 "NPR Register List"
                     RunObject = Page "NPR MPOS App Setup Card";
                     RunPageLink = "Register No." = FIELD("Register No.");
                     ApplicationArea = All;
+                    ToolTip = 'Executes the mPos Setup action';
                 }
             }
         }

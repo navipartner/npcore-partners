@@ -729,16 +729,19 @@ report 6014457 "NPR Sales Stat/Analysis"
                     {
                         Caption = 'Print Items';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Print Items field';
                     }
                     field(OnlySales; OnlySales)
                     {
                         Caption = 'Only Sales';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Only Sales field';
                     }
                     field(LevelsCount; LevelsCount)
                     {
                         Caption = 'Levels';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Levels field';
                     }
                 }
             }

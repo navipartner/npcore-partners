@@ -16,30 +16,37 @@ page 6060090 "NPR MM Admission Service Setup"
                 field("Validate Members"; "Validate Members")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Validate Members field';
                 }
                 field("Validate Tickes"; "Validate Tickes")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Validate Tickes field';
                 }
                 field("Validate Re-Scan"; "Validate Re-Scan")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Validate Re-Scan field';
                 }
                 field("Validate Scanner Station"; "Validate Scanner Station")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Validate Scanner Station field';
                 }
                 field("Allowed Re-Scan Interval"; "Allowed Re-Scan Interval")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Allowed Re-Scan Interval field';
                 }
                 field("Web Service Is Published"; "Web Service Is Published")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Web Service Is Published field';
                 }
                 field("Guest Avatar"; "Guest Avatar")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Guest Avatar field';
                 }
             }
             group(Turnstile)
@@ -48,10 +55,12 @@ page 6060090 "NPR MM Admission Service Setup"
                 field("Turnstile Default Image"; "Turnstile Default Image")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Turnstile Default Image field';
                 }
                 field("Turnstile Error Image"; "Turnstile Error Image")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Turnstile Error Image field';
                 }
             }
             part(Turnstiles; "NPR MM Admis. Scanner Stations")
@@ -78,6 +87,7 @@ page 6060090 "NPR MM Admission Service Setup"
                 PromotedCategory = Process;
                 RunObject = Codeunit "NPR MM Admission Service WS";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Published Webservice action';
             }
             action(Entries)
             {
@@ -87,6 +97,7 @@ page 6060090 "NPR MM Admission Service Setup"
                 PromotedCategory = Process;
                 RunObject = Page "NPR MM Admis. Service Entries";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Entries action';
             }
         }
     }

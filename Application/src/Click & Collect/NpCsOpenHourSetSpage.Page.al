@@ -19,25 +19,30 @@ page 6151217 "NPR NpCs Open.Hour Set S.page"
                     field("Entry Type"; "Entry Type")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Opening Type field';
                     }
                     field("Start Time"; "Start Time")
                     {
                         ApplicationArea = All;
                         Editable = "Entry Type" = 0;
+                        ToolTip = 'Specifies the value of the Start Time field';
                     }
                     field("End Time"; "End Time")
                     {
                         ApplicationArea = All;
                         Editable = "Entry Type" = 0;
+                        ToolTip = 'Specifies the value of the End Time field';
                     }
                     field("Period Type"; "Period Type")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Period Type field';
                     }
                     field("Period Description"; "Period Description")
                     {
                         ApplicationArea = All;
                         Editable = false;
+                        ToolTip = 'Specifies the value of the Period Description field';
                     }
                 }
                 group(Period)
@@ -50,30 +55,37 @@ page 6151217 "NPR NpCs Open.Hour Set S.page"
                         field(Monday; Monday)
                         {
                             ApplicationArea = All;
+                            ToolTip = 'Specifies the value of the Monday field';
                         }
                         field(Tuesday; Tuesday)
                         {
                             ApplicationArea = All;
+                            ToolTip = 'Specifies the value of the Tuesday field';
                         }
                         field(Wednesday; Wednesday)
                         {
                             ApplicationArea = All;
+                            ToolTip = 'Specifies the value of the Wednesday field';
                         }
                         field(Thursday; Thursday)
                         {
                             ApplicationArea = All;
+                            ToolTip = 'Specifies the value of the Thursday field';
                         }
                         field(Friday; Friday)
                         {
                             ApplicationArea = All;
+                            ToolTip = 'Specifies the value of the Friday field';
                         }
                         field(Saturday; Saturday)
                         {
                             ApplicationArea = All;
+                            ToolTip = 'Specifies the value of the Saturday field';
                         }
                         field(Sunday; Sunday)
                         {
                             ApplicationArea = All;
+                            ToolTip = 'Specifies the value of the Sunday field';
                         }
                     }
                     group(Control6014420)
@@ -83,6 +95,7 @@ page 6151217 "NPR NpCs Open.Hour Set S.page"
                         field("Entry Date"; "Entry Date")
                         {
                             ApplicationArea = All;
+                            ToolTip = 'Specifies the value of the Entry Date field';
                         }
                     }
                 }

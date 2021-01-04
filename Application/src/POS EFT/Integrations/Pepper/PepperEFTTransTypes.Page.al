@@ -19,30 +19,37 @@ page 6184488 "NPR Pepper EFT Trans. Types"
                 field("Integration Type"; "Integration Type")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Integration Type field';
                 }
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Processing Type"; "Processing Type")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Processing Type field';
                 }
                 field("POS Timeout (Seconds)"; "POS Timeout (Seconds)")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the POS Timeout (Seconds) field';
                 }
                 field("Allow Test Modes"; "Allow Test Modes")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Allow Test Modes field';
                 }
                 field("Suppress Receipt Print"; "Suppress Receipt Print")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Suppress Receipt Print field';
                 }
             }
         }
@@ -61,6 +68,7 @@ page 6184488 "NPR Pepper EFT Trans. Types"
                 RunPageView = SORTING("Transaction Type Code")
                               ORDER(Ascending);
                 ApplicationArea = All;
+                ToolTip = 'Executes the Result Codes action';
             }
         }
     }

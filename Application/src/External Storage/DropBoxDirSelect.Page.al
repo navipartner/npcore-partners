@@ -15,6 +15,7 @@ page 6184872 "NPR DropBox Dir. Select"
                 field("File Name"; "File Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the File Name field';
                 }
             }
         }

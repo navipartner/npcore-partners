@@ -18,10 +18,12 @@ page 6151606 "NPR NpDc Extra Item Qty."
                     field("Item No."; "Item No.")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Item No. field';
                     }
                     field("Discount Type"; "Discount Type")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Discount Type field';
                     }
                     group(Control6014411)
                     {
@@ -32,6 +34,7 @@ page 6151606 "NPR NpDc Extra Item Qty."
                             ApplicationArea = All;
                             Caption = 'Discount Amount per Item';
                             ShowMandatory = true;
+                            ToolTip = 'Specifies the value of the Discount Amount per Item field';
                         }
                     }
                     group(Control6014409)
@@ -42,12 +45,14 @@ page 6151606 "NPR NpDc Extra Item Qty."
                         {
                             ApplicationArea = All;
                             ShowMandatory = true;
+                            ToolTip = 'Specifies the value of the Discount % field';
                         }
                     }
                     field(LotValidation; LotValidation)
                     {
                         ApplicationArea = All;
                         Caption = 'Extra Item per Lot';
+                        ToolTip = 'Specifies the value of the Extra Item per Lot field';
 
                         trigger OnValidate()
                         begin
@@ -64,6 +69,7 @@ page 6151606 "NPR NpDc Extra Item Qty."
                             ApplicationArea = All;
                             BlankZero = true;
                             Caption = 'Extra Item per Qty.';
+                            ToolTip = 'Specifies the value of the Extra Item per Qty. field';
 
                             trigger OnValidate()
                             begin
@@ -78,6 +84,7 @@ page 6151606 "NPR NpDc Extra Item Qty."
                         Caption = 'Max. Extra Item Qty. per Coupon';
                         DecimalPlaces = 0 : 5;
                         Importance = Promoted;
+                        ToolTip = 'Specifies the value of the Max. Extra Item Qty. per Coupon field';
 
                         trigger OnValidate()
                         begin
@@ -91,14 +98,17 @@ page 6151606 "NPR NpDc Extra Item Qty."
                     field("Item Description"; "Item Description")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Item Description field';
                     }
                     field("Unit Price"; "Unit Price")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Unit Price field';
                     }
                     field("Profit %"; "Profit %")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Profit % field';
                     }
                 }
             }

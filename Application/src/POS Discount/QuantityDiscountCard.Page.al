@@ -12,27 +12,33 @@ page 6014466 "NPR Quantity Discount Card"
                 field("Main No."; "Main No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Main no. field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field(Status; Status)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Status field';
                 }
                 field("Last Date Modified"; "Last Date Modified")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Modified Date field';
                 }
                 field("Block Custom Discount"; "Block Custom Discount")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Block Custom Discount field';
                 }
                 field("Item Description"; "Item Description")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Item Description field';
                 }
             }
             group(Conditions)
@@ -40,18 +46,22 @@ page 6014466 "NPR Quantity Discount Card"
                 field("Starting Date"; "Starting Date")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Starting date field';
                 }
                 field("Closing Date"; "Closing Date")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Closing Date field';
                 }
                 field("Starting Time"; "Starting Time")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Starting Time field';
                 }
                 field("Closing Time"; "Closing Time")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Closing Time field';
                 }
                 grid(Control6150629)
                 {
@@ -60,10 +70,12 @@ page 6014466 "NPR Quantity Discount Card"
                 field("Global Dimension 1 Code"; "Global Dimension 1 Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Shortcut Dimension 1 Code field';
                 }
                 field("Global Dimension 2 Code"; "Global Dimension 2 Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Global Dimension 2 Code field';
                 }
             }
             part(QuantityDiscountLine1; "NPR Quantity Discount Line")
@@ -99,6 +111,7 @@ page 6014466 "NPR Quantity Discount Card"
                               "No." = FIELD("Main No.");
                 ShortCutKey = 'Shift+Ctrl+D';
                 ApplicationArea = All;
+                ToolTip = 'Executes the Dimensions action';
             }
         }
         area(processing)
@@ -114,6 +127,7 @@ page 6014466 "NPR Quantity Discount Card"
                 RunObject = Page "NPR Quantity Discount List";
                 RunPageLink = "Item No." = field("Item No.");
                 ApplicationArea = All;
+                ToolTip = 'Executes the List action';
             }
             separator(Separator6150623)
             {
@@ -123,6 +137,7 @@ page 6014466 "NPR Quantity Discount Card"
                 Caption = 'Send to Retail Journal';
                 Image = SendTo;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Send to Retail Journal action';
 
                 trigger OnAction()
                 var
@@ -136,6 +151,7 @@ page 6014466 "NPR Quantity Discount Card"
                 Caption = 'Copy Multiple Price Discount';
                 Image = CopyDocument;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Copy Multiple Price Discount action';
 
                 trigger OnAction()
                 var

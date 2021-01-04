@@ -17,11 +17,13 @@ page 6014547 "NPR Field Lookup"
                 {
                     ApplicationArea = All;
                     Caption = 'No.';
+                    ToolTip = 'Specifies the value of the No. field';
                 }
                 field("Field Caption"; "Field Caption")
                 {
                     ApplicationArea = All;
                     Caption = 'Field Caption';
+                    ToolTip = 'Specifies the value of the Field Caption field';
                 }
             }
         }

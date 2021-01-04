@@ -18,26 +18,32 @@ page 6150634 "NPR NPRE Print Templ. Subpage"
                 field("Print Type"; "Print Type")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Print Type field';
                 }
                 field("Restaurant Code"; "Restaurant Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Restaurant Code field';
                 }
                 field("Seating Location"; "Seating Location")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Seating Location field';
                 }
                 field("Serving Step"; "Serving Step")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Serving Step field';
                 }
                 field("Print Category Code"; "Print Category Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Print Category Code field';
                 }
                 field("Template Code"; "Template Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Template Code field';
                 }
             }
         }

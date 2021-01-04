@@ -17,10 +17,12 @@ page 6150671 "NPR POS Entry Factbox"
             field("Currency Code"; "Currency Code")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the Currency Code field';
             }
             field("Item Sales (LCY)"; "Item Sales (LCY)")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the Item Sales (LCY) field';
 
                 trigger OnDrillDown()
                 begin
@@ -32,27 +34,33 @@ page 6150671 "NPR POS Entry Factbox"
             field("Customer Sales (LCY)"; "Customer Sales (LCY)")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the Customer Sales (LCY) field';
             }
             field("G/L Sales (LCY)"; "G/L Sales (LCY)")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the G/L Sales (LCY) field';
             }
             field("Discount Amount"; "Discount Amount")
             {
                 ApplicationArea = All;
                 Caption = 'Disc. Amt Excl. VAT';
+                ToolTip = 'Specifies the value of the Disc. Amt Excl. VAT field';
             }
             field("Amount Incl. Tax"; "Amount Incl. Tax")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the Amount Incl. Tax field';
             }
             field("Amount Excl. Tax"; "Amount Excl. Tax")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the Amount Excl. Tax field';
             }
             field("Tax Amount"; "Tax Amount")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the Tax Amount field';
 
                 trigger OnDrillDown()
                 begin
@@ -64,36 +72,44 @@ page 6150671 "NPR POS Entry Factbox"
             field("Rounding Amount (LCY)"; "Rounding Amount (LCY)")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the Rounding Amount (LCY) field';
             }
             field("Payment Amount"; "Payment Amount")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the Payment Amount field';
             }
             field("Sales Quantity"; "Sales Quantity")
             {
                 ApplicationArea = All;
                 DecimalPlaces = 0 : 2;
+                ToolTip = 'Specifies the value of the Sales Quantity field';
             }
             field("Return Sales Quantity"; "Return Sales Quantity")
             {
                 ApplicationArea = All;
                 DecimalPlaces = 0 : 2;
+                ToolTip = 'Specifies the value of the Return Sales Quantity field';
             }
             field("Sale Lines"; "Sale Lines")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the Sale Lines field';
             }
             field("Payment Lines"; "Payment Lines")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the Payment Lines field';
             }
             field("Tax Lines"; "Tax Lines")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the Tax Lines field';
             }
             field("No. of Print Output Entries"; "No. of Print Output Entries")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the No. of Print Output Entries field';
             }
         }
     }

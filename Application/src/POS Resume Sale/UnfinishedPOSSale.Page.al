@@ -19,40 +19,49 @@ page 6150746 "NPR Unfinished POS Sale"
                 CaptionClass = Format(GenerateInstructions());
                 MultiLine = true;
                 ShowCaption = false;
+                ToolTip = 'Specifies the value of the '''' field';
             }
             group(Details)
             {
                 field("Register No."; "Register No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Cash Register No. field';
                 }
                 field("Sales Ticket No."; "Sales Ticket No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Sales Ticket No. field';
                 }
                 field("Salesperson Code"; "Salesperson Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Salesperson Code field';
                 }
                 field("Date"; Date)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Date field';
                 }
                 field("Start Time"; "Start Time")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Start Time field';
                 }
                 field("Customer No."; "Customer No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Customer No. field';
                 }
                 field("Customer Name"; "Customer Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Customer Name field';
                 }
                 field(Amount; Amount)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Amount field';
 
                     trigger OnDrillDown()
                     begin
@@ -62,6 +71,7 @@ page 6150746 "NPR Unfinished POS Sale"
                 field("Amount Including VAT"; "Amount Including VAT")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Amount Including VAT field';
 
                     trigger OnDrillDown()
                     begin
@@ -71,6 +81,7 @@ page 6150746 "NPR Unfinished POS Sale"
                 field("Payment Amount"; "Payment Amount")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Payment Amount field';
 
                     trigger OnDrillDown()
                     begin

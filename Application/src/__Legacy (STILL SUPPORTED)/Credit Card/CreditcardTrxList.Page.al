@@ -22,34 +22,42 @@ page 6014408 "NPR Credit card Trx List"
                 field("Date"; Date)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Date field';
                 }
                 field("Text"; Text)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Text field';
                 }
                 field(Type; Type)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Type field';
                 }
                 field("Transaction Time"; "Transaction Time")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Transaction Time field';
                 }
                 field("Register No."; "Register No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Cash Register No. field';
                 }
                 field("Sales Ticket No."; "Sales Ticket No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Sales Ticket No. field';
                 }
                 field("Salesperson Code"; "Salesperson Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Salesperson Code field';
                 }
                 field("Sales Ticket amount"; "Sales Ticket amount")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Sales Ticket amount field';
                 }
             }
         }
@@ -67,6 +75,7 @@ page 6014408 "NPR Credit card Trx List"
                     Caption = 'Print';
                     Image = Print;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Print action';
 
                     trigger OnAction()
                     var

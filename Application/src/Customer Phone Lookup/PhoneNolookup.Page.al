@@ -18,6 +18,7 @@ page 6014412 "NPR Phone No lookup"
                 {
                     ApplicationArea = All;
                     ShowCaption = false;
+                    ToolTip = 'Specifies the value of the PhoneNo field';
 
                     trigger OnValidate()
                     begin
@@ -28,35 +29,43 @@ page 6014412 "NPR Phone No lookup"
                 field(ID; ID)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the ID field';
                 }
                 field(Name; Name)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Name field';
                 }
                 field("Post Code"; "Post Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Post Code field';
                 }
                 field(City; City)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the City field';
                 }
                 field(Address; Address)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Address field';
                 }
                 field("E-Mail"; "E-Mail")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the E-Mail field';
                 }
                 field("Home Page"; "Home Page")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Home Page field';
                 }
                 field(NewContact; NewContact)
                 {
                     ApplicationArea = All;
                     Caption = 'Create Contact';
+                    ToolTip = 'Specifies the value of the Create Contact field';
 
                     trigger OnDrillDown()
                     begin
@@ -73,6 +82,7 @@ page 6014412 "NPR Phone No lookup"
                 {
                     ApplicationArea = All;
                     Caption = 'Create Customer';
+                    ToolTip = 'Specifies the value of the Create Customer field';
 
                     trigger OnDrillDown()
                     begin
@@ -89,6 +99,7 @@ page 6014412 "NPR Phone No lookup"
                 {
                     ApplicationArea = All;
                     Caption = 'Create Vendor';
+                    ToolTip = 'Specifies the value of the Create Vendor field';
 
                     trigger OnDrillDown()
                     begin
@@ -118,6 +129,7 @@ page 6014412 "NPR Phone No lookup"
                 PromotedIsBig = true;
                 ShortCutKey = 'Shift+F6';
                 ApplicationArea = All;
+                ToolTip = 'Executes the Lookup Phone action';
 
                 trigger OnAction()
                 begin
@@ -133,6 +145,7 @@ page 6014412 "NPR Phone No lookup"
                 PromotedIsBig = true;
                 ShortCutKey = 'Shift+F3';
                 ApplicationArea = All;
+                ToolTip = 'Executes the Create action';
 
                 trigger OnAction()
                 begin

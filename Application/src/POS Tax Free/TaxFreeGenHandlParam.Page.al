@@ -22,15 +22,18 @@ page 6014646 "NPR Tax Free Gen. Handl. Param"
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Parameter field';
                 }
                 field("Data Type"; "Data Type")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Data Type field';
                 }
                 field(Value; Value)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Value field';
                 }
             }
         }

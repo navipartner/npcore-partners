@@ -22,6 +22,7 @@ page 6014572 "NPR Tax Free Vouch. Sale Links"
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Sales Ticket No. field';
                 }
                 field("Voucher External No."; "Voucher External No.")
                 {
@@ -29,6 +30,7 @@ page 6014572 "NPR Tax Free Vouch. Sale Links"
                     Caption = 'Linked to Voucher';
                     Editable = false;
                     Enabled = false;
+                    ToolTip = 'Specifies the value of the Linked to Voucher field';
                 }
             }
         }

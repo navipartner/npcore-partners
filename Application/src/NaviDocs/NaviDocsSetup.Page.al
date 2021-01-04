@@ -22,6 +22,7 @@ page 6059767 "NPR NaviDocs Setup"
                 field("Enable NaviDocs"; "Enable NaviDocs")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Enable NaviDocs field';
                 }
             }
             group(Processing)
@@ -30,14 +31,17 @@ page 6059767 "NPR NaviDocs Setup"
                 field("Max Retry Qty"; "Max Retry Qty")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Max Retry Qty field';
                 }
                 field("Send Warming E-mail"; "Send Warming E-mail")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Send Warming E-mail field';
                 }
                 field("Warning E-mail"; "Warning E-mail")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Warning E-mail field';
                 }
             }
             group(Integration)
@@ -46,11 +50,13 @@ page 6059767 "NPR NaviDocs Setup"
                 {
                     ApplicationArea = All;
                     Caption = 'Pdf2Nav send via NaviDocs';
+                    ToolTip = 'Specifies the value of the Pdf2Nav send via NaviDocs field';
                 }
                 field("Pdf2Nav Table Filter"; "Pdf2Nav Table Filter")
                 {
                     ApplicationArea = All;
                     Caption = 'Tablefilter';
+                    ToolTip = 'Specifies the value of the Tablefilter field';
                 }
             }
             group(Logging)
@@ -61,10 +67,12 @@ page 6059767 "NPR NaviDocs Setup"
                     ApplicationArea = All;
                     Editable = ShowLogToActivityLog;
                     Visible = ShowLogToActivityLog;
+                    ToolTip = 'Specifies the value of the Log to Activity Log field';
                 }
                 field("Keep Log for"; "Keep Log for")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Keep Log for field';
                 }
             }
         }

@@ -12,14 +12,17 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
             {
                 ApplicationArea = All;
                 Editable = ToAnonymizeEditable;
+                ToolTip = 'Specifies the value of the NPR To Anonymize On field';
             }
             field("NPR Anonymized"; "NPR Anonymized")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the NPR Anonymized field';
             }
             field("NPR Anonymized Date"; "NPR Anonymized Date")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the NPR Anonymized Date field';
             }
         }
         addafter("Disable Search by Name")
@@ -30,6 +33,7 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
                 CaptionClass = '6014555,18,1,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible01;
+                ToolTip = 'Specifies the value of the NPRAttrTextArray[1] field';
 
                 trigger OnValidate()
                 begin
@@ -42,6 +46,7 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
                 CaptionClass = '6014555,18,2,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible02;
+                ToolTip = 'Specifies the value of the NPRAttrTextArray[2] field';
 
                 trigger OnValidate()
                 begin
@@ -54,6 +59,7 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
                 CaptionClass = '6014555,18,3,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible03;
+                ToolTip = 'Specifies the value of the NPRAttrTextArray[3] field';
 
                 trigger OnValidate()
                 begin
@@ -66,6 +72,7 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
                 CaptionClass = '6014555,18,4,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible04;
+                ToolTip = 'Specifies the value of the NPRAttrTextArray[4] field';
 
                 trigger OnValidate()
                 begin
@@ -78,6 +85,7 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
                 CaptionClass = '6014555,18,5,2';
                 Editable = NPRAttrEditable;
                 Visible = NPRAttrVisible05;
+                ToolTip = 'Specifies the value of the NPRAttrTextArray[5] field';
 
                 trigger OnValidate()
                 begin
@@ -93,21 +101,25 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
                 field("NPR Magento Display Group"; "NPR Magento Display Group")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the NPR Magento Display Group field';
                 }
                 field("NPR Magento Store Code"; "NPR Magento Store Code")
                 {
                     ApplicationArea = All;
                     Visible = (MagentoVersion >= 2);
+                    ToolTip = 'Specifies the value of the NPR Magento Store Code field';
                 }
                 field("NPR Magento Shipping Group"; "NPR Magento Shipping Group")
                 {
                     ApplicationArea = All;
                     Visible = (MagentoVersion >= 2);
+                    ToolTip = 'Specifies the value of the NPR Magento Shipping Group field';
                 }
                 field("NPR Magento Payment Group"; "NPR Magento Payment Group")
                 {
                     ApplicationArea = All;
                     Visible = (MagentoVersion >= 2);
+                    ToolTip = 'Specifies the value of the NPR Magento Payment Group field';
                 }
             }
             group("NPR Extra Fields")
@@ -119,6 +131,7 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
                     CaptionClass = '6014555,18,6,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible06;
+                    ToolTip = 'Specifies the value of the NPRAttrTextArray[6] field';
 
                     trigger OnValidate()
                     begin
@@ -131,6 +144,7 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
                     CaptionClass = '6014555,18,7,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible07;
+                    ToolTip = 'Specifies the value of the NPRAttrTextArray[7] field';
 
                     trigger OnValidate()
                     begin
@@ -143,6 +157,7 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
                     CaptionClass = '6014555,18,8,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible08;
+                    ToolTip = 'Specifies the value of the NPRAttrTextArray[8] field';
 
                     trigger OnValidate()
                     begin
@@ -155,6 +170,7 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
                     CaptionClass = '6014555,18,9,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible09;
+                    ToolTip = 'Specifies the value of the NPRAttrTextArray[9] field';
 
                     trigger OnValidate()
                     begin
@@ -167,6 +183,7 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
                     CaptionClass = '6014555,18,10,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible10;
+                    ToolTip = 'Specifies the value of the NPRAttrTextArray[10] field';
 
                     trigger OnValidate()
                     begin
@@ -182,6 +199,7 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
             field("NPR Document Processing"; "NPR Document Processing")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the NPR Document Processing field';
             }
         }
     }
@@ -201,6 +219,7 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
                                   "Customer No." = FIELD("No."),
                                   "Customer Type" = CONST(Alm);
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Selections contracts action';
                 }
             }
             group("NPR Retail")
@@ -213,18 +232,21 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
                     RunObject = Page "NPR Used Goods Reg. Card";
                     RunPageLink = "Purchased By Customer No." = FIELD("No.");
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Used Goods action';
                 }
                 action("NPR ItemLedgerEntries")
                 {
                     Caption = 'Item Ledger Entries';
                     Image = ItemLedger;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Item Ledger Entries action';
                 }
                 action("NPR AuditRoll")
                 {
                     Caption = 'Audit Roll';
                     Image = ListPage;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Audit Roll action';
                 }
                 action("NPR AlternativeNo")
                 {
@@ -232,6 +254,7 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
                     Image = "Action";
                     Promoted = true;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Alternative No. action';
                 }
                 action("NPR Reparation")
                 {
@@ -241,6 +264,7 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
                     RunPageLink = "Customer No." = FIELD("No."),
                                   "Customer Type" = CONST(Ordinary);
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Reparation action';
                 }
                 action("NPR Member Cards")
                 {
@@ -249,12 +273,14 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
                     RunObject = Page "NPR Member Card Issued Cards";
                     RunPageLink = "Customer No" = FIELD("No.");
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Member Cards action';
                 }
                 action("NPR PrintShippingLabel")
                 {
                     Caption = 'Shipping Label';
                     Image = PrintCheck;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Shipping Label action';
                 }
             }
             group("NPR PDF2NAV")
@@ -265,12 +291,14 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
                     Caption = 'E-mail Log';
                     Image = Email;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the E-mail Log action';
                 }
                 action("NPR SendAsPDF")
                 {
                     Caption = 'Send Statement as PDF';
                     Image = SendEmailPDF;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Send Statement as PDF action';
                 }
             }
         }
@@ -284,6 +312,7 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
                 RunPageLink = "Table ID" = CONST(18),
                               "Primary Key" = FIELD("No.");
                 ApplicationArea = All;
+                ToolTip = 'Executes the POS Info action';
             }
         }
         addafter("Item &Tracking Entries")
@@ -293,6 +322,7 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
                 Caption = 'POS Entries';
                 Image = Entries;
                 ApplicationArea = All;
+                ToolTip = 'Executes the POS Entries action';
             }
         }
         addafter(Documents)
@@ -305,6 +335,7 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
                     Caption = 'Send SMS';
                     Image = SendConfirmation;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Send SMS action';
                 }
             }
         }
@@ -316,6 +347,7 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
                 Ellipsis = true;
                 Image = AbsenceCategory;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Customer Anonymization action';
 
                 trigger OnAction()
                 var

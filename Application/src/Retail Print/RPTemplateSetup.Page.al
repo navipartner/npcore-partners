@@ -14,10 +14,12 @@ page 6014640 "NPR RP Template Setup"
                 field("Version Major Number"; "Version Major Number")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Version Major Number field';
                 }
                 field("Version Prefix"; "Version Prefix")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Version Prefix field';
                 }
             }
         }

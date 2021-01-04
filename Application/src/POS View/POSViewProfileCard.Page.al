@@ -14,27 +14,33 @@ page 6150636 "NPR POS View Profile Card"
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Control6014403; Picture)
                 {
                     ApplicationArea = All;
                     ShowCaption = false;
+                    ToolTip = 'Specifies the value of the Picture field';
                 }
                 field("POS Theme Code"; "POS Theme Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the POS Theme Code field';
                 }
                 field("Line Order on Screen"; "Line Order on Screen")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Line Order on Screen field';
                 }
                 field("Initial Sales View"; "Initial Sales View")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Initial Sales View field';
                 }
                 field("After End-of-Sale View"; "After End-of-Sale View")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the After End-of-Sale View field';
                 }
             }
             group("Number and Date Formatting")
@@ -42,18 +48,22 @@ page 6150636 "NPR POS View Profile Card"
                 field("Client Formatting Culture ID"; "Client Formatting Culture ID")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Client Formatting Culture ID field';
                 }
                 field("Client Decimal Separator"; "Client Decimal Separator")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Client Decimal Separator field';
                 }
                 field("Client Thousands Separator"; "Client Thousands Separator")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Client Thousands Separator field';
                 }
                 field("Client Date Separator"; "Client Date Separator")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Client Date Separator field';
                 }
             }
         }
@@ -74,6 +84,7 @@ page 6150636 "NPR POS View Profile Card"
                     Promoted = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
+                    ToolTip = 'Executes the Detect Decimal and Thousands Separators action';
 
                     trigger OnAction()
                     begin
@@ -90,6 +101,7 @@ page 6150636 "NPR POS View Profile Card"
                     Caption = 'Import';
                     Image = Import;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Import action';
 
                     trigger OnAction()
                     var
@@ -124,6 +136,7 @@ page 6150636 "NPR POS View Profile Card"
                     Caption = 'Export';
                     Image = Export;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Export action';
 
                     trigger OnAction()
                     var
@@ -142,6 +155,7 @@ page 6150636 "NPR POS View Profile Card"
                     Caption = 'Delete';
                     Image = Delete;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Delete action';
 
                     trigger OnAction()
                     var

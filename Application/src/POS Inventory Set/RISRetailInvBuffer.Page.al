@@ -22,21 +22,25 @@ page 6151088 "NPR RIS Retail Inv. Buffer"
                     ApplicationArea = All;
                     Style = Attention;
                     StyleExpr = "Processing Error";
+                    ToolTip = 'Specifies the value of the Inventory field';
                 }
                 field("Company Name"; "Company Name")
                 {
                     ApplicationArea = All;
                     Style = Attention;
                     StyleExpr = "Processing Error";
+                    ToolTip = 'Specifies the value of the Company Name field';
                 }
                 field("Location Filter"; "Location Filter")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Location Filter field';
                 }
                 field("Processing Error Message"; "Processing Error Message")
                 {
                     ApplicationArea = All;
                     Visible = ProcessingErrorExists;
+                    ToolTip = 'Specifies the value of the Processing Error Message field';
                 }
             }
         }

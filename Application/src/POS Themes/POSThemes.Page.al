@@ -16,14 +16,17 @@ page 6150735 "NPR POS Themes"
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field(Blocked; Blocked)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Blocked field';
                 }
             }
         }
@@ -43,6 +46,7 @@ page 6150735 "NPR POS Themes"
                 RunObject = Page "NPR POS Theme Dependencies";
                 RunPageLink = "POS Theme Code" = FIELD(Code);
                 ApplicationArea = All;
+                ToolTip = 'Executes the Theme Dependencies action';
             }
         }
     }

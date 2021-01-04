@@ -16,6 +16,7 @@ page 6150725 "NPR POS Select Lang. Dialog"
                 ApplicationArea = All;
                 Caption = 'Select Language';
                 TableRelation = Language;
+                ToolTip = 'Specifies the value of the Select Language field';
 
                 trigger OnValidate()
                 var

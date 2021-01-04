@@ -20,6 +20,7 @@ page 6151537 "NPR Nc Endpoint Types"
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
             }
         }
@@ -41,6 +42,7 @@ page 6151537 "NPR Nc Endpoint Types"
                 RunPageView = SORTING(Code)
                               ORDER(Ascending);
                 ApplicationArea = All;
+                ToolTip = 'Executes the Endpoints action';
             }
         }
     }

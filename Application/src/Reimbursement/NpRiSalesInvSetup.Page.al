@@ -19,10 +19,12 @@ page 6151110 "NPR NpRi Sales Inv. Setup"
                     field("Customer No."; "Customer No.")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Customer No. field';
                     }
                     field("Salesperson Code"; "Salesperson Code")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Salesperson Code field';
                     }
                 }
                 group(Control6014408)
@@ -31,6 +33,7 @@ page 6151110 "NPR NpRi Sales Inv. Setup"
                     field("Invoice per"; "Invoice per")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Invoice per field';
                     }
                     group(Control6014406)
                     {
@@ -39,11 +42,13 @@ page 6151110 "NPR NpRi Sales Inv. Setup"
                         field("Invoice Posting Date"; "Invoice Posting Date")
                         {
                             ApplicationArea = All;
+                            ToolTip = 'Specifies the value of the Invoice Posting Date field';
                         }
                     }
                     field("Post Immediately"; "Post Immediately")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Post Immediately field';
                     }
                 }
             }

@@ -8,6 +8,7 @@ pageextension 6014474 "NPR Posted Return Shipment" extends "Posted Return Shipme
             field("NPR Buy-from Vendor Name 2"; "Buy-from Vendor Name 2")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the Buy-from Vendor Name 2 field';
             }
         }
         addafter("Pay-to Name")
@@ -15,6 +16,7 @@ pageextension 6014474 "NPR Posted Return Shipment" extends "Posted Return Shipme
             field("NPR Pay-to Name 2"; "Pay-to Name 2")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the Pay-to Name 2 field';
             }
         }
         addafter("Ship-to Name")
@@ -22,6 +24,7 @@ pageextension 6014474 "NPR Posted Return Shipment" extends "Posted Return Shipme
             field("NPR Ship-to Name 2"; "Ship-to Name 2")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the Ship-to Name 2 field';
             }
         }
     }

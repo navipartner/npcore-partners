@@ -22,66 +22,82 @@ page 6014565 "NPR Tax Free Voucher"
                 field("External Voucher No."; "External Voucher No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the External Voucher No. field';
                 }
                 field("External Voucher Barcode"; "External Voucher Barcode")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the External Voucher Barcode field';
                 }
                 field("Issued Date"; "Issued Date")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Created Date field';
                 }
                 field("Issued Time"; "Issued Time")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Created Time field';
                 }
                 field("Salesperson Code"; "Salesperson Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Salesperson Code field';
                 }
                 field("Issued By User"; "Issued By User")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Issued By User field';
                 }
                 field("Total Amount Incl. VAT"; "Total Amount Incl. VAT")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Amount Including VAT field';
                 }
                 field("Refund Amount"; "Refund Amount")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Refund Amount field';
                 }
                 field("POS Unit No."; "POS Unit No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the POS Unit No. field';
                 }
                 field("Handler ID"; "Handler ID")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Handler ID field';
                 }
                 field("Service ID"; "Service ID")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Service ID field';
                 }
                 field(Mode; Mode)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Mode field';
                 }
                 field(Void; Void)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Voided field';
                 }
                 field("Voided By User"; "Voided By User")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Voided By User field';
                 }
                 field("Voided Date"; "Voided Date")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Voided Date field';
                 }
                 field("Voided Time"; "Voided Time")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Voided Time field';
                 }
             }
         }
@@ -99,6 +115,7 @@ page 6014565 "NPR Tax Free Voucher"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Void Voucher action';
 
                 trigger OnAction()
                 var
@@ -118,6 +135,7 @@ page 6014565 "NPR Tax Free Voucher"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Print Voucher action';
 
                 trigger OnAction()
                 var
@@ -137,6 +155,7 @@ page 6014565 "NPR Tax Free Voucher"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Reissue Voucher action';
 
                 trigger OnAction()
                 var
@@ -156,6 +175,7 @@ page 6014565 "NPR Tax Free Voucher"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Search Sale Links action';
 
                 trigger OnAction()
                 var

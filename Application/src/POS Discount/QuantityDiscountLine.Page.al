@@ -14,14 +14,17 @@ page 6014444 "NPR Quantity Discount Line"
                 field(Quantity; Quantity)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Quantity field';
                 }
                 field("Unit Price"; "Unit Price")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Unit Price field';
                 }
                 field(Total; Total)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Total field';
                 }
             }
         }

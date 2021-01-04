@@ -582,11 +582,13 @@ report 6014447 "NPR Sales Invoice A4 (Retail)"
                 {
                     Caption = 'Copy Qty.';
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Copy Qty. field';
                 }
                 field(Sprog; Sprog)
                 {
                     Caption = 'Language';
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Language field';
                 }
             }
         }

@@ -16,22 +16,27 @@ page 6151056 "NPR Distrib. Group"
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field(Type; Type)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Type field';
                 }
                 field("Warehouse Location"; "Warehouse Location")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Warehouse Location field';
                 }
                 field("Warehouse Overhead Pct."; "Warehouse Overhead Pct.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Warehouse Overhead Pct. field';
                 }
             }
             part(Control10; "NPR Distrib. Grp Memb Listpart")
@@ -54,6 +59,7 @@ page 6151056 "NPR Distrib. Group"
                 RunObject = Page "NPR Distribution Setup";
                 RunPageLink = "Distribution Group" = FIELD(Code);
                 ApplicationArea = All;
+                ToolTip = 'Executes the Distribution setup action';
             }
         }
     }

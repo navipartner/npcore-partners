@@ -19,10 +19,12 @@ page 6014605 "NPR Attributes"
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Name; Name)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Name field';
                 }
             }
         }
@@ -41,6 +43,7 @@ page 6014605 "NPR Attributes"
                 RunPageView = SORTING("Attribute Code")
                               ORDER(Ascending);
                 ApplicationArea = All;
+                ToolTip = 'Executes the Attribute ID action';
             }
             action(Translations)
             {
@@ -50,6 +53,7 @@ page 6014605 "NPR Attributes"
                 RunPageLink = "Attribute Code" = FIELD(Code);
                 RunPageView = SORTING("Attribute Code", "Language ID");
                 ApplicationArea = All;
+                ToolTip = 'Executes the Translations action';
             }
             action(Values)
             {
@@ -59,6 +63,7 @@ page 6014605 "NPR Attributes"
                 RunPageLink = "Attribute Code" = FIELD(Code);
                 RunPageView = SORTING("Attribute Code");
                 ApplicationArea = All;
+                ToolTip = 'Executes the Values action';
             }
         }
     }

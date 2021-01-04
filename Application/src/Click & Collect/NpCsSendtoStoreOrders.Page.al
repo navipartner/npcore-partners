@@ -18,55 +18,68 @@ page 6151204 "NPR NpCs Send to Store Orders"
                 field("Document No."; "Document No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Document No. field';
                 }
                 field("Reference No."; "Reference No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Reference No. field';
                 }
                 field("Sell-to Customer Name"; "Sell-to Customer Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Sell-to Customer Name field';
                 }
                 field("Workflow Code"; "Workflow Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Workflow Code field';
                 }
                 field("Next Workflow Step"; "Next Workflow Step")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Next Workflow Step field';
                 }
                 field("From Store Code"; "From Store Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the From Store Code field';
                 }
                 field("To Document Type"; "To Document Type")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the To Document Type field';
                 }
                 field("To Document No."; "To Document No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the To Document No. field';
                 }
                 field("To Store Code"; "To Store Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the To Store Code field';
                 }
                 field("Store Stock"; "Store Stock")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Store Stock field';
                 }
                 field("Prepaid Amount"; "Prepaid Amount")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Prepaid Amount field';
                 }
                 field("Prepayment Account No."; "Prepayment Account No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Prepayment Account No. field';
                 }
                 field(LastLogMessage; GetLastLogMessage())
                 {
                     ApplicationArea = All;
                     Caption = 'Last Log Message';
+                    ToolTip = 'Specifies the value of the Last Log Message field';
                 }
                 field(LastLogErrorMessage; GetLastLogErrorMessage())
                 {
@@ -74,62 +87,77 @@ page 6151204 "NPR NpCs Send to Store Orders"
                     Caption = 'Last Log Error Message';
                     Style = Attention;
                     StyleExpr = TRUE;
+                    ToolTip = 'Specifies the value of the Last Log Error Message field';
                 }
                 field("Processing Status"; "Processing Status")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Processing Status field';
                 }
                 field("Processing updated at"; "Processing updated at")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Processing updated at field';
                 }
                 field("Processing updated by"; "Processing updated by")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Processing updated by field';
                 }
                 field("Customer E-mail"; "Customer E-mail")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Customer E-mail field';
                 }
                 field("Customer Phone No."; "Customer Phone No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Customer Phone No. field';
                 }
                 field("Send Notification from Store"; "Send Notification from Store")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Send Notification from Store field';
                 }
                 field("Notify Customer via E-mail"; "Notify Customer via E-mail")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Notify Customer via E-mail field';
                 }
                 field("Notify Customer via Sms"; "Notify Customer via Sms")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Notify Customer via Sms field';
                 }
                 field("Delivery Status"; "Delivery Status")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Delivery Status field';
                 }
                 field("Delivery updated at"; "Delivery updated at")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Delivery updated at field';
                 }
                 field("Delivery updated by"; "Delivery updated by")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Delivery updated by field';
                 }
                 field("Send Order Module"; "Send Order Module")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Send Order Module field';
                 }
                 field("Order Status Module"; "Order Status Module")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Order Status Module field';
                 }
                 field("Post Processing Module"; "Post Processing Module")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Post Processing Module field';
                 }
             }
         }
@@ -162,6 +190,7 @@ page 6151204 "NPR NpCs Send to Store Orders"
                 Caption = 'Run Next Workflow Step';
                 Image = Start;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Run Next Workflow Step action';
 
                 trigger OnAction()
                 var
@@ -181,6 +210,7 @@ page 6151204 "NPR NpCs Send to Store Orders"
                     Caption = 'Send Order to Store';
                     Image = Approve;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Send Order to Store action';
 
                     trigger OnAction()
                     var
@@ -194,6 +224,7 @@ page 6151204 "NPR NpCs Send to Store Orders"
                     Caption = 'Send Notification to Store';
                     Image = SendTo;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Send Notification to Store action';
 
                     trigger OnAction()
                     var
@@ -211,6 +242,7 @@ page 6151204 "NPR NpCs Send to Store Orders"
                     Caption = 'Update Order Status';
                     Image = ChangeStatus;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Update Order Status action';
 
                     trigger OnAction()
                     var
@@ -225,6 +257,7 @@ page 6151204 "NPR NpCs Send to Store Orders"
                     Image = SendTo;
                     Visible = NOT "Send Notification from Store";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Send Notification to Customer action';
 
                     trigger OnAction()
                     var
@@ -242,6 +275,7 @@ page 6151204 "NPR NpCs Send to Store Orders"
                     Caption = 'Perform Post Processing';
                     Image = Intercompany;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Perform Post Processing action';
 
                     trigger OnAction()
                     var
@@ -255,6 +289,7 @@ page 6151204 "NPR NpCs Send to Store Orders"
                     Caption = 'Archive';
                     Image = Archive;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Archive action';
 
                     trigger OnAction()
                     var
@@ -284,6 +319,7 @@ page 6151204 "NPR NpCs Send to Store Orders"
                 Image = Document;
                 ShortCutKey = 'Shift+F7';
                 ApplicationArea = All;
+                ToolTip = 'Executes the Document action';
 
                 trigger OnAction()
                 var
@@ -298,6 +334,7 @@ page 6151204 "NPR NpCs Send to Store Orders"
                 Image = Log;
                 ShortCutKey = 'Ctrl+F7';
                 ApplicationArea = All;
+                ToolTip = 'Executes the Log Entries action';
 
                 trigger OnAction()
                 var

@@ -22,22 +22,27 @@ page 6151417 "NPR Magento Child Categories"
                 field(Id; Id)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Id field';
                 }
                 field(Name; Name)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Name field';
                 }
                 field(Picture; Picture)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Picture field';
                 }
                 field("Sorting"; Sorting)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Sorting field';
                 }
                 field("Item Count"; "Item Count")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Item Count field';
 
                     trigger OnDrillDown()
                     begin

@@ -19,14 +19,17 @@ page 6014478 "NPR RFID Setup"
                 field("RFID Value No. Series"; "RFID Value No. Series")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the RFID Value No. Series field';
                 }
                 field("RFID Hex Value Length"; "RFID Hex Value Length")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the RFID Hex Value Length field';
                 }
                 field("RFID Hex Value Prefix"; "RFID Hex Value Prefix")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the RFID Hex Value Prefix field';
                 }
             }
         }

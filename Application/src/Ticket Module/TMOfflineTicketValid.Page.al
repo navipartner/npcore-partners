@@ -1,4 +1,4 @@
-﻿page 6060093 "NPR TM Offline Ticket Valid."
+page 6060093 "NPR TM Offline Ticket Valid."
 {
     // TM1.22/NPKNAV/20170612  CASE 278142 Transport T0007 - 12 June 2017
     // TM90.1.46/TSA /20200203 CASE 383196 Added mass modify on event date and event time
@@ -19,37 +19,45 @@
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Entry No. field';
                 }
                 field("Ticket Reference Type"; "Ticket Reference Type")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Ticket Reference Type field';
                 }
                 field("Ticket Reference No."; "Ticket Reference No.")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Ticket Reference No. field';
                 }
                 field("Admission Code"; "Admission Code")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Admission Code field';
                 }
                 field("Member Reference Type"; "Member Reference Type")
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Member Reference Type field';
                 }
                 field("Member Reference No."; "Member Reference No.")
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Member Reference No. field';
                 }
                 field("Event Type"; "Event Type")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Event Type field';
                 }
                 field("Event Date"; "Event Date")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Event Date field';
 
                     trigger OnValidate()
                     begin
@@ -70,6 +78,7 @@
                 field("Event Time"; "Event Time")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Event Time field';
 
                     trigger OnValidate()
                     begin
@@ -90,6 +99,7 @@
                 field("Process Status"; "Process Status")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Process Status field';
 
                     trigger OnValidate()
                     begin
@@ -109,18 +119,22 @@
                 field("Process Response Text"; "Process Response Text")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Process Response Text field';
                 }
                 field("Import Reference No."; "Import Reference No.")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Import Reference No. field';
                 }
                 field("Imported At"; "Imported At")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Imported At field';
                 }
                 field("Import Reference Name"; "Import Reference Name")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Import Reference Name field';
                 }
             }
         }

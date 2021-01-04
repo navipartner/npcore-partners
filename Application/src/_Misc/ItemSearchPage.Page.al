@@ -14,23 +14,27 @@ page 6060045 "NPR Item Search Page"
                 {
                     ApplicationArea = All;
                     Caption = 'External Item No';
+                    ToolTip = 'Specifies the value of the External Item No field';
                 }
                 field(ExternalType; ExternalType)
                 {
                     ApplicationArea = All;
                     Caption = 'External Type';
+                    ToolTip = 'Specifies the value of the External Type field';
                 }
                 field(VendorNo; VendorNo)
                 {
                     ApplicationArea = All;
                     Caption = 'Vendor No.';
                     TableRelation = Vendor."No.";
+                    ToolTip = 'Specifies the value of the Vendor No. field';
                 }
                 field(UnitOfMeasure; UnitOfMeasure)
                 {
                     ApplicationArea = All;
                     Caption = 'Unit Of Measure';
                     TableRelation = "Unit of Measure";
+                    ToolTip = 'Specifies the value of the Unit Of Measure field';
                 }
                 field(ItemNo; ItemNo)
                 {
@@ -38,24 +42,28 @@ page 6060045 "NPR Item Search Page"
                     Caption = 'Item No.';
                     Editable = false;
                     TableRelation = Item."No.";
+                    ToolTip = 'Specifies the value of the Item No. field';
                 }
                 field(VariantCode; VariantCode)
                 {
                     ApplicationArea = All;
                     Caption = 'Variant Code';
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Variant Code field';
                 }
                 field(FoundItem; FoundItem)
                 {
                     ApplicationArea = All;
                     Caption = 'Found Item';
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Found Item field';
                 }
                 field(SearchTime; Searchtime)
                 {
                     ApplicationArea = All;
                     Caption = 'Search time (seconds)';
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Search time (seconds) field';
                 }
             }
         }
@@ -73,6 +81,7 @@ page 6060045 "NPR Item Search Page"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Search action';
 
                 trigger OnAction()
                 begin

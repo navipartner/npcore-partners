@@ -18,10 +18,12 @@ page 6151073 "NPR Retail Replenishment Setup"
                 {
                     ApplicationArea = All;
                     TableRelation = AllObj."Object ID" WHERE("Object Type" = FILTER(Codeunit));
+                    ToolTip = 'Specifies the value of the Item Demand Calc. Codeunit field';
                 }
                 field("Default Transit Location"; "Default Transit Location")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Default Transit Location field';
                 }
             }
         }

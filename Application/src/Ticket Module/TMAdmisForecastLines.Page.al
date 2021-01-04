@@ -1,4 +1,4 @@
-﻿page 6151139 "NPR TM Admis. Forecast Lines"
+page 6151139 "NPR TM Admis. Forecast Lines"
 {
     // TM1.48/TSA /20200625 CASE 409741 Initial Version
 
@@ -20,22 +20,26 @@
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Code';
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Description; LINE_Description)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Description';
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field(StartTime; LINE_StartTime)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Start Time';
+                    ToolTip = 'Specifies the value of the Start Time field';
                 }
                 field(Field1; MATRIX_CellData[1])
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     CaptionClass = '3,' + MATRIX_CaptionSet[1];
                     StyleExpr = 'Strong';
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[1] field';
 
                     trigger OnDrillDown()
                     begin
@@ -47,6 +51,7 @@
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     CaptionClass = '3,' + MATRIX_CaptionSet[2];
                     StyleExpr = 'Strong';
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[2] field';
 
                     trigger OnDrillDown()
                     begin
@@ -58,6 +63,7 @@
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     CaptionClass = '3,' + MATRIX_CaptionSet[3];
                     StyleExpr = 'Strong';
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[3] field';
 
                     trigger OnDrillDown()
                     begin
@@ -69,6 +75,7 @@
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     CaptionClass = '3,' + MATRIX_CaptionSet[4];
                     StyleExpr = 'Strong';
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[4] field';
 
                     trigger OnDrillDown()
                     begin
@@ -80,6 +87,7 @@
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     CaptionClass = '3,' + MATRIX_CaptionSet[5];
                     StyleExpr = 'Strong';
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[5] field';
 
                     trigger OnDrillDown()
                     begin
@@ -91,6 +99,7 @@
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     CaptionClass = '3,' + MATRIX_CaptionSet[6];
                     StyleExpr = 'Strong';
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[6] field';
 
                     trigger OnDrillDown()
                     begin
@@ -102,6 +111,7 @@
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     CaptionClass = '3,' + MATRIX_CaptionSet[7];
                     StyleExpr = 'Strong';
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[7] field';
 
                     trigger OnDrillDown()
                     begin
@@ -113,6 +123,7 @@
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     CaptionClass = '3,' + MATRIX_CaptionSet[8];
                     StyleExpr = 'Strong';
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[8] field';
 
                     trigger OnDrillDown()
                     begin
@@ -124,6 +135,7 @@
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     CaptionClass = '3,' + MATRIX_CaptionSet[9];
                     StyleExpr = 'Strong';
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[9] field';
 
                     trigger OnDrillDown()
                     begin
@@ -135,6 +147,7 @@
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     CaptionClass = '3,' + MATRIX_CaptionSet[10];
                     StyleExpr = 'Strong';
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[10] field';
 
                     trigger OnDrillDown()
                     begin
@@ -146,6 +159,7 @@
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     CaptionClass = '3,' + MATRIX_CaptionSet[11];
                     StyleExpr = 'Strong';
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[11] field';
 
                     trigger OnDrillDown()
                     begin
@@ -157,6 +171,7 @@
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     CaptionClass = '3,' + MATRIX_CaptionSet[12];
                     StyleExpr = 'Strong';
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[12] field';
 
                     trigger OnDrillDown()
                     begin

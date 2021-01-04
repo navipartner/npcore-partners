@@ -25,6 +25,7 @@ page 6060155 "NPR Event Attribute Matrix"
                     Caption = 'Template Name';
                     Editable = false;
                     TableRelation = "NPR Event Attribute Template".Name;
+                    ToolTip = 'Specifies the value of the Template Name field';
 
                     trigger OnValidate()
                     begin
@@ -38,6 +39,7 @@ page 6060155 "NPR Event Attribute Matrix"
                     Editable = false;
                     TableRelation = Job."No." WHERE("NPR Event" = CONST(true));
                     Visible = JobNoVisible;
+                    ToolTip = 'Specifies the value of the Event No. field';
                 }
             }
             repeater(Group)
@@ -47,21 +49,25 @@ page 6060155 "NPR Event Attribute Matrix"
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Line No. field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field(Type; Type)
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Type field';
                 }
                 field(Formula; Formula)
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Formula field';
                 }
                 field(AttrColumnValue1; AttrColumnValue[1])
                 {
@@ -69,6 +75,7 @@ page 6060155 "NPR Event Attribute Matrix"
                     CaptionClass = AttrColumnCaption1;
                     Editable = AttrColumnEditable;
                     Visible = AttrColumnVisible1;
+                    ToolTip = 'Specifies the value of the AttrColumnValue[1] field';
 
                     trigger OnValidate()
                     begin
@@ -81,6 +88,7 @@ page 6060155 "NPR Event Attribute Matrix"
                     CaptionClass = AttrColumnCaption2;
                     Editable = AttrColumnEditable;
                     Visible = AttrColumnVisible2;
+                    ToolTip = 'Specifies the value of the AttrColumnValue[2] field';
 
                     trigger OnValidate()
                     begin
@@ -93,6 +101,7 @@ page 6060155 "NPR Event Attribute Matrix"
                     CaptionClass = AttrColumnCaption3;
                     Editable = AttrColumnEditable;
                     Visible = AttrColumnVisible3;
+                    ToolTip = 'Specifies the value of the AttrColumnValue[3] field';
 
                     trigger OnValidate()
                     begin
@@ -105,6 +114,7 @@ page 6060155 "NPR Event Attribute Matrix"
                     CaptionClass = AttrColumnCaption4;
                     Editable = AttrColumnEditable;
                     Visible = AttrColumnVisible4;
+                    ToolTip = 'Specifies the value of the AttrColumnValue[4] field';
 
                     trigger OnValidate()
                     begin
@@ -117,6 +127,7 @@ page 6060155 "NPR Event Attribute Matrix"
                     CaptionClass = AttrColumnCaption5;
                     Editable = AttrColumnEditable;
                     Visible = AttrColumnVisible5;
+                    ToolTip = 'Specifies the value of the AttrColumnValue[5] field';
 
                     trigger OnValidate()
                     begin
@@ -140,6 +151,7 @@ page 6060155 "NPR Event Attribute Matrix"
                     Enabled = PreviousColumnSetExists;
                     Image = PreviousSet;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Previous Set action';
 
                     trigger OnAction()
                     begin
@@ -152,6 +164,7 @@ page 6060155 "NPR Event Attribute Matrix"
                     Enabled = NextColumnSetExists;
                     Image = NextSet;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Next Set action';
 
                     trigger OnAction()
                     begin
@@ -165,6 +178,7 @@ page 6060155 "NPR Event Attribute Matrix"
                     Promoted = true;
                     Visible = FilterMode;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Show Events In Filter action';
 
                     trigger OnAction()
                     begin

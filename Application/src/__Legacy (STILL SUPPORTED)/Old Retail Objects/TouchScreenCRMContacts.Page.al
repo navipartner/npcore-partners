@@ -22,30 +22,37 @@ page 6014524 "NPR Touch Screen: CRM Contacts"
                 field(Name; Name)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Name field';
                 }
                 field("Phone No."; "Phone No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Phone No. field';
                 }
                 field("Mobile Phone No."; "Mobile Phone No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Mobile Phone No. field';
                 }
                 field("No."; "No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the No. field';
                 }
                 field(Address; Address)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Address field';
                 }
                 field("Post Code"; "Post Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Post Code field';
                 }
                 field(City; City)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the City field';
                 }
             }
         }
@@ -62,6 +69,7 @@ page 6014524 "NPR Touch Screen: CRM Contacts"
                 Promoted = true;
                 PromotedCategory = New;
                 ApplicationArea = All;
+                ToolTip = 'Executes the New action';
 
                 trigger OnAction()
                 var

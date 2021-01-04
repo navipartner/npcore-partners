@@ -19,44 +19,54 @@ page 6060060 "NPR Item Worksh. Vrty. Mapping"
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Worksheet Template Name field';
                 }
                 field("Worksheet Name"; "Worksheet Name")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Worksheet Name field';
                 }
                 field("Vendor No."; "Vendor No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Vendor No. field';
                 }
                 field("Item Wksh. Maping Field"; "Item Wksh. Maping Field")
                 {
                     ApplicationArea = All;
                     LookupPageID = "NPR Item Worksh. Field Setup";
+                    ToolTip = 'Specifies the value of the Item Worksheet Mapipng Field field';
                 }
                 field("Item Wksh. Maping Field Name"; "Item Wksh. Maping Field Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Item Worksheet Mapping Field Name field';
                 }
                 field("Item Wksh. Maping Field Value"; "Item Wksh. Maping Field Value")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Item Worksheet Mapping Field Value field';
                 }
                 field("Vendor Variety Value"; "Vendor Variety Value")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Vendor Variey Value field';
                 }
                 field(Variety; Variety)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Variety field';
                 }
                 field("Variety Table"; "Variety Table")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Variety Table field';
                 }
                 field("Variety Value"; "Variety Value")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Variety Value field';
 
                     trigger OnValidate()
                     begin
@@ -68,6 +78,7 @@ page 6060060 "NPR Item Worksh. Vrty. Mapping"
                 field("Variety Value Description"; "Variety Value Description")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Variety Value Description field';
                 }
             }
         }

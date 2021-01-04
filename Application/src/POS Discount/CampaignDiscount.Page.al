@@ -49,6 +49,7 @@ page 6014453 "NPR Campaign Discount"
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
 
                     trigger OnAssistEdit()
                     begin
@@ -60,31 +61,37 @@ page 6014453 "NPR Campaign Discount"
                 {
                     ApplicationArea = All;
                     Importance = Promoted;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Created Date"; "Created Date")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Created Date field';
                 }
                 field("Last Date Modified"; "Last Date Modified")
                 {
                     ApplicationArea = All;
                     Caption = 'Last Changed';
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Last Changed field';
                 }
                 field(Status; Status)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Status field';
                 }
                 field("Block Custom Disc."; "Block Custom Disc.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Block Custom Discount field';
                 }
                 field("CommentBoolean"; Comment)
                 {
                     Caption = 'Comment';
                     ApplicationArea = All;
                     ShowCaption = false;
+                    ToolTip = 'Specifies the value of the Comment field';
                 }
             }
             group(Conditions)
@@ -95,23 +102,28 @@ page 6014453 "NPR Campaign Discount"
                     ApplicationArea = All;
                     Importance = Promoted;
                     Lookup = false;
+                    ToolTip = 'Specifies the value of the Starting Date field';
                 }
                 field("Ending date 2"; "Ending Date")
                 {
                     ApplicationArea = All;
                     Importance = Promoted;
+                    ToolTip = 'Specifies the value of the Closing Date field';
                 }
                 field("Starting Time"; "Starting Time")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Starting Time field';
                 }
                 field("Ending Time"; "Ending Time")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Closing Time field';
                 }
                 field("Period Type"; "Period Type")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Period Type field';
                 }
                 group(Period)
                 {
@@ -121,39 +133,48 @@ page 6014453 "NPR Campaign Discount"
                     {
                         ApplicationArea = All;
                         Editable = false;
+                        ToolTip = 'Specifies the value of the Period Description field';
                     }
                     field(Monday; Monday)
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Monday field';
                     }
                     field(Tuesday; Tuesday)
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Tuesday field';
                     }
                     field(Wednesday; Wednesday)
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Wednesday field';
                     }
                     field(Thursday; Thursday)
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Thursday field';
                     }
                     field(Friday; Friday)
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Friday field';
                     }
                     field(Saturday; Saturday)
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Saturday field';
                     }
                     field(Sunday; Sunday)
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Sunday field';
                     }
                 }
                 field("Customer Disc. Group Filter"; "Customer Disc. Group Filter")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Customer Disc. Group Filter field';
 
                     trigger OnAssistEdit()
                     begin
@@ -185,6 +206,7 @@ page 6014453 "NPR Campaign Discount"
                               "No." = FIELD(Code);
                 ShortCutKey = 'Shift+Ctrl+D';
                 ApplicationArea = All;
+                ToolTip = 'Executes the Dimensions action';
 
                 trigger OnAction()
                 var
@@ -209,6 +231,7 @@ page 6014453 "NPR Campaign Discount"
                     RunPageLink = "Table ID" = CONST(6014413),
                                   "No." = FIELD(Code);
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Comment action';
                 }
                 action("Item Card")
                 {
@@ -216,6 +239,7 @@ page 6014453 "NPR Campaign Discount"
                     Image = Item;
                     ShortCutKey = 'Shift+Ctrl+C';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Item Card action';
 
                     trigger OnAction()
                     var
@@ -241,6 +265,7 @@ page 6014453 "NPR Campaign Discount"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Retail Print action';
                 }
                 action(PriceLabel)
                 {
@@ -250,6 +275,7 @@ page 6014453 "NPR Campaign Discount"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Price Label action';
                 }
             }
             group("&Functions")
@@ -264,6 +290,7 @@ page 6014453 "NPR Campaign Discount"
                         Caption = 'Transfer Item';
                         Image = TransferToLines;
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Transfer Item action';
 
                         trigger OnAction()
                         var
@@ -287,6 +314,7 @@ page 6014453 "NPR Campaign Discount"
                         Caption = 'Transfer from Item Group';
                         Image = TransferToLines;
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Transfer from Item Group action';
 
                         trigger OnAction()
                         var
@@ -309,6 +337,7 @@ page 6014453 "NPR Campaign Discount"
                         Caption = 'Transfer from Vendor';
                         Image = TransferToLines;
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Transfer from Vendor action';
 
                         trigger OnAction()
                         var
@@ -331,12 +360,14 @@ page 6014453 "NPR Campaign Discount"
                         Caption = 'Transfer from Period Discount';
                         Image = TransferToLines;
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Transfer from Period Discount action';
                     }
                     action("Transfer all Items")
                     {
                         Caption = 'Transfer all Items';
                         Image = TransferToLines;
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Transfer all Items action';
 
                         trigger OnAction()
                         var
@@ -357,6 +388,7 @@ page 6014453 "NPR Campaign Discount"
                     Caption = '&Read from scanner';
                     Image = "Action";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the &Read from scanner action';
 
                     trigger OnAction()
                     var
@@ -370,6 +402,7 @@ page 6014453 "NPR Campaign Discount"
                     Caption = 'Copy to all companies';
                     Image = Copy;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Copy to all companies action';
 
                     trigger OnAction()
                     begin
@@ -386,6 +419,7 @@ page 6014453 "NPR Campaign Discount"
                     Caption = 'Send to Retail Journal';
                     Image = SendTo;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Send to Retail Journal action';
 
                     trigger OnAction()
                     var
@@ -426,6 +460,7 @@ page 6014453 "NPR Campaign Discount"
                     Caption = 'Copy Campaign Discount';
                     Image = CopyDocument;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Copy Campaign Discount action';
 
                     trigger OnAction()
                     var
@@ -463,6 +498,7 @@ page 6014453 "NPR Campaign Discount"
                 Image = "Report";
                 RunObject = Report "NPR Inventory Campaign Stat.";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Inventory Campaign Stat. action';
             }
         }
     }

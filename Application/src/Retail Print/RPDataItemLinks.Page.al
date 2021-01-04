@@ -21,6 +21,7 @@ page 6014562 "NPR RP Data Item Links"
                     Enabled = "Filter Type" = 0;
                     Style = Subordinate;
                     StyleExpr = "Filter Type" <> 0;
+                    ToolTip = 'Specifies the value of the Parent Field ID field';
                 }
                 field("Parent Field Name"; "Parent Field Name")
                 {
@@ -28,23 +29,28 @@ page 6014562 "NPR RP Data Item Links"
                     Enabled = "Filter Type" = 0;
                     Style = Subordinate;
                     StyleExpr = "Filter Type" <> 0;
+                    ToolTip = 'Specifies the value of the Parent Field Name field';
                 }
                 field("Filter Type"; "Filter Type")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Filter Type field';
                 }
                 field("Field ID"; "Field ID")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Field ID field';
                 }
                 field("Field Name"; "Field Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Field Name field';
                 }
                 field("Filter Value"; "Filter Value")
                 {
                     ApplicationArea = All;
                     Enabled = "Filter Type" <> 0;
+                    ToolTip = 'Specifies the value of the Filter Value field';
                 }
                 field("Link Type"; "Link Type")
                 {
@@ -52,6 +58,7 @@ page 6014562 "NPR RP Data Item Links"
                     Enabled = "Filter Type" = 0;
                     Style = Subordinate;
                     StyleExpr = "Filter Type" <> 0;
+                    ToolTip = 'Specifies the value of the Link Type field';
                 }
             }
         }

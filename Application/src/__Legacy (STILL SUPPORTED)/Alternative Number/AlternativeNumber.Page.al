@@ -20,32 +20,39 @@ page 6014458 "NPR Alternative Number"
                     ApplicationArea = All;
                     Editable = FieldCodeed;
                     Visible = FieldCode;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field("Alt. No."; "Alt. No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Alternative No. field';
                 }
                 field("Variant Code"; "Variant Code")
                 {
                     ApplicationArea = All;
                     Editable = fieldvarianted;
                     Visible = FieldVariant;
+                    ToolTip = 'Specifies the value of the Variant Code field';
                 }
                 field("Base Unit of Measure"; "Base Unit of Measure")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Base Unit of Measure field';
                 }
                 field("Sales Unit of Measure"; "Sales Unit of Measure")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Sales Unit of Measure field';
                 }
                 field("Purch. Unit of Measure"; "Purch. Unit of Measure")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Purch. Unit of Measure field';
                 }
                 field("Created the"; "Created the")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Created Date field';
                 }
             }
         }

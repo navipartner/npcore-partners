@@ -18,22 +18,27 @@ page 6151026 "NPR NpRv Partners"
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Name; Name)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Name field';
                 }
                 field("Service Url"; "Service Url")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Service Url field';
                 }
                 field("Service Username"; "Service Username")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Service Username field';
                 }
                 field("Service Password"; "Service Password")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Service Password field';
                 }
             }
         }
@@ -50,6 +55,7 @@ page 6151026 "NPR NpRv Partners"
                 RunObject = Page "NPR NpRv Partner Relations";
                 RunPageLink = "Partner Code" = FIELD(Code);
                 ApplicationArea = All;
+                ToolTip = 'Executes the Partner Relations action';
             }
         }
     }

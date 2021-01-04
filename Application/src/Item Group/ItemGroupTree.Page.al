@@ -26,62 +26,76 @@ page 6014427 "NPR Item Group Tree"
                 field("No."; "No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the No. field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field(Type; Type)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Type field';
                 }
                 field(Picture; Picture)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Picture field';
                 }
                 field("Parent Item Group No."; "Parent Item Group No.")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Parent Item Group No. field';
                 }
                 field("No. Series"; "No. Series")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the No. Series field';
                 }
                 field("Global Dimension 1 Code"; "Global Dimension 1 Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Global Dimension 1 Code field';
                 }
                 field("Global Dimension 2 Code"; "Global Dimension 2 Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Global Dimension 2 Code field';
                 }
                 field("Inventory Posting Group"; "Inventory Posting Group")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Inventory Posting Group field';
                 }
                 field("Gen. Bus. Posting Group"; "Gen. Bus. Posting Group")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Gen. Bus. Posting Group field';
                 }
                 field("Gen. Prod. Posting Group"; "Gen. Prod. Posting Group")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Gen. Prod. Posting Group field';
                 }
                 field(Blocked; Blocked)
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Blocked field';
                 }
                 field(Level; Level)
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Level field';
                 }
                 field("Sorting-Key"; "Sorting-Key")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Sorting Key field';
                 }
             }
         }
@@ -104,6 +118,7 @@ page 6014427 "NPR Item Group Tree"
                                   "No." = FIELD("No.");
                     ShortCutKey = 'Shift+Ctrl+D';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Dimensions-Single action';
                 }
                 action("Dimensions-Mulitple")
                 {
@@ -111,6 +126,7 @@ page 6014427 "NPR Item Group Tree"
                     Image = DimensionSets;
                     Visible = false;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Dimensions-Mulitple action';
 
                     trigger OnAction()
                     var
@@ -139,6 +155,7 @@ page 6014427 "NPR Item Group Tree"
                     Caption = 'Load Image';
                     Image = Picture;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Load Image action';
 
                     trigger OnAction()
                     var
@@ -168,6 +185,7 @@ page 6014427 "NPR Item Group Tree"
                     Caption = 'Create Item(s) From Item Group';
                     Image = ItemGroup;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Create Item(s) From Item Group action';
 
                     trigger OnAction()
                     var
@@ -193,6 +211,7 @@ page 6014427 "NPR Item Group Tree"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Indent Item Groups action';
 
                     trigger OnAction()
                     var

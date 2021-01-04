@@ -19,17 +19,20 @@ page 6151255 "NPR Activities"
                 {
                     ApplicationArea = All;
                     DrillDownPageID = "Sales Order List";
+                    ToolTip = 'Specifies the value of the Daily Sales Orders field';
                 }
 
                 field("Sales Orders"; "Sales Orders")
                 {
                     ApplicationArea = All;
                     DrillDownPageID = "Sales Order List";
+                    ToolTip = 'Specifies the value of the Sales Orders field';
                 }
                 field("Sales Return Orders"; "Sales Return Orders")
                 {
                     ApplicationArea = All;
                     DrillDownPageID = "Sales Return Order List";
+                    ToolTip = 'Specifies the value of the Sales Return Orders field';
                 }
 
                 field("Shipped Sales Orders"; "Shipped Sales Orders")
@@ -38,6 +41,7 @@ page 6151255 "NPR Activities"
                     Caption = 'Shipped Sales Orders';
                     ShowCaption = true;
                     DrillDownPageId = "Sales Order List";
+                    ToolTip = 'Specifies the value of the Shipped Sales Orders field';
 
                 }
 
@@ -46,6 +50,7 @@ page 6151255 "NPR Activities"
                     ApplicationArea = All;
                     Caption = 'Import Unprocessed';
                     DrillDownPageID = "NPR Nc Import List";
+                    ToolTip = 'Specifies the value of the Import Unprocessed field';
 
                 }
                 field("Task List"; "Task List")
@@ -53,6 +58,7 @@ page 6151255 "NPR Activities"
                     ApplicationArea = All;
                     Caption = 'Task List';
                     DrillDownPageId = "NPR Nc Task List";
+                    ToolTip = 'Specifies the value of the Task List field';
                 }
 
 

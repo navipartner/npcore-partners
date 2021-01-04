@@ -17,30 +17,37 @@ page 6060046 "NPR Registered Item Worksh."
                 field("No."; "No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the No. field';
                 }
                 field("Worksheet Name"; "Worksheet Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Name field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Vendor No."; "Vendor No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Vendor No. field';
                 }
                 field("Item Worksheet Template"; "Item Worksheet Template")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Item Worksheet Template field';
                 }
                 field("Registered Date Time"; "Registered Date Time")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Registered Date Time field';
                 }
                 field("Registered by User ID"; "Registered by User ID")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Registered by User ID field';
                 }
             }
         }
@@ -62,6 +69,7 @@ page 6060046 "NPR Registered Item Worksh."
                 RunPageView = SORTING("Registered Worksheet No.", "Line No.")
                               ORDER(Ascending);
                 ApplicationArea = All;
+                ToolTip = 'Executes the View Registered Item Worksheet action';
             }
         }
     }

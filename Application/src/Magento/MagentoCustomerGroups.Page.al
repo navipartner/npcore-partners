@@ -19,10 +19,12 @@ page 6151440 "NPR Magento Customer Groups"
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field("Magento Tax Class"; "Magento Tax Class")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Magento Tax Class field';
                 }
             }
         }
@@ -40,6 +42,7 @@ page 6151440 "NPR Magento Customer Groups"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Setup Customer Groups action';
 
                 trigger OnAction()
                 begin

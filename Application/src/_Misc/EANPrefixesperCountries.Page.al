@@ -18,14 +18,17 @@ page 6060064 "NPR EAN Prefixes per Countries"
                 field("Country Code"; "Country Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Country Code field';
                 }
                 field("Country Name"; "Country Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Country Name field';
                 }
                 field(Prefix; Prefix)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Prefix field';
                 }
             }
         }

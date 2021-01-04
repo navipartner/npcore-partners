@@ -126,6 +126,7 @@ report 6014414 "NPR Item Sales Statistics"
                     {
                         Caption = 'Item Posting Group Filter:';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Item Posting Group Filter: field';
 
                         trigger OnLookup(var Text: Text): Boolean
                         var
@@ -139,6 +140,7 @@ report 6014414 "NPR Item Sales Statistics"
                     {
                         Caption = 'Vendor Item No. Filter:';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Vendor Item No. Filter: field';
                     }
                 }
             }

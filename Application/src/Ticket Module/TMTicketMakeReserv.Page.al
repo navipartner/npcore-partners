@@ -1,4 +1,4 @@
-﻿page 6060113 "NPR TM Ticket Make Reserv."
+page 6060113 "NPR TM Ticket Make Reserv."
 {
     Caption = 'Make your reservation';
     DataCaptionExpression = StrSubstNo('%1  - %2', Today, Time);
@@ -22,6 +22,7 @@
                     Editable = false;
                     Style = Unfavorable;
                     StyleExpr = gVisualQueueUnfavorable;
+                    ToolTip = 'Specifies the value of the Item No. field';
 
                     trigger OnValidate()
                     begin
@@ -34,6 +35,7 @@
                     Editable = false;
                     Style = Unfavorable;
                     StyleExpr = gVisualQueueUnfavorable;
+                    ToolTip = 'Specifies the value of the Admission Code field';
 
                     trigger OnDrillDown()
                     begin
@@ -48,6 +50,7 @@
                     Style = Unfavorable;
                     StyleExpr = gVisualQueueUnfavorable;
                     Visible = gPrimaryRequestMode;
+                    ToolTip = 'Specifies the value of the Scheduled Time Description field';
 
                     trigger OnDrillDown()
                     begin
@@ -68,6 +71,7 @@
                     Style = Subordinate;
                     StyleExpr = gDisallowReschedule;
                     Visible = gChangeRequestMode;
+                    ToolTip = 'Specifies the value of the Scheduled Time Description field';
 
                     trigger OnDrillDown()
                     begin
@@ -88,6 +92,7 @@
                     Editable = false;
                     Style = Unfavorable;
                     StyleExpr = gVisualQueueUnfavorable;
+                    ToolTip = 'Specifies the value of the Admission Description field';
 
                     trigger OnDrillDown()
                     begin
@@ -101,6 +106,7 @@
                     Editable = gAllowQuantityChange;
                     Style = Unfavorable;
                     StyleExpr = gVisualQueueUnfavorable;
+                    ToolTip = 'Specifies the value of the Quantity field';
 
                     trigger OnValidate()
                     var
@@ -124,6 +130,7 @@
                 field("Admission Inclusion"; Rec."Admission Inclusion")
                 {
                     ApplicationArea = NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Admission Inclusion field';
 
                     trigger OnValidate()
                     var
@@ -166,6 +173,7 @@
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Visible = gBatchTicketCreateMode;
+                    ToolTip = 'Specifies the value of the Customer No. field';
 
                     trigger OnValidate()
                     begin
@@ -181,6 +189,7 @@
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Visible = gBatchTicketCreateMode;
+                    ToolTip = 'Specifies the value of the External Order No. field';
 
                     trigger OnValidate()
                     begin
@@ -196,6 +205,7 @@
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Payment Option field';
 
                     trigger OnValidate()
                     begin
@@ -209,6 +219,7 @@
                 field("Waiting List Reference Code"; Rec."Waiting List Reference Code")
                 {
                     ApplicationArea = NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Waiting List Reference Code field';
 
                     trigger OnValidate()
                     var
@@ -263,6 +274,7 @@
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Deliver eTicket To';
+                    ToolTip = 'Specifies the value of the Deliver eTicket To field';
                 }
             }
             group(Control6014400)
@@ -275,6 +287,7 @@
                     Enabled = false;
                     Style = Favorable;
                     StyleExpr = gConfirmStatusStyleFavorable;
+                    ToolTip = 'Specifies the value of the Reservation Confirm Status field';
                 }
             }
         }

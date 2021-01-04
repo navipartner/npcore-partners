@@ -22,60 +22,74 @@ page 6014475 "NPR Retail Price Log Entries"
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Date and Time field';
                 }
                 field("Date"; Date)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Date field';
                 }
                 field("Time"; Time)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Time field';
                 }
                 field("User ID"; "User ID")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the User ID field';
                 }
                 field("Change Log Entry No."; "Change Log Entry No.")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Change Log Entry No. field';
                 }
                 field("Table No."; "Table No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Table No. field';
                 }
                 field("Table Caption"; "Table Caption")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Table Caption field';
                 }
                 field("Field No."; "Field No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Field No. field';
                 }
                 field("Field Caption"; "Field Caption")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Field Caption field';
                 }
                 field("Item No."; "Item No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Item No. field';
                 }
                 field("Variant Code"; "Variant Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Variant Code field';
                 }
                 field("Old Value"; "Old Value")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Old Value field';
                 }
                 field("New Value"; "New Value")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the New Value field';
                 }
                 field("Entry No."; "Entry No.")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Entry No. field';
                 }
             }
         }
@@ -94,6 +108,7 @@ page 6014475 "NPR Retail Price Log Entries"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Update Price Log action';
 
                 trigger OnAction()
                 var

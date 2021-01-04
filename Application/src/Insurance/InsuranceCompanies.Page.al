@@ -15,6 +15,7 @@ page 6014538 "NPR Insurance Companies"
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
             }
         }

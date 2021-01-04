@@ -16,10 +16,12 @@ page 6151538 "NPR Nc Endpoint Trigger Links"
                 field("Endpoint Code"; "Endpoint Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Endpoint Code field';
                 }
                 field("Trigger Code"; "Trigger Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Trigger Code field';
                 }
             }
         }
@@ -34,6 +36,7 @@ page 6151538 "NPR Nc Endpoint Trigger Links"
                 Caption = 'Endpoint Setup';
                 Image = InteractionTemplateSetup;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Endpoint Setup action';
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = Process;
                 //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'

@@ -32,6 +32,7 @@ page 6151481 "NPR Magento Retail Activities"
                         RunObject = Page "Sales Order";
                         RunPageMode = Create;
                         ApplicationArea = All;
+                        ToolTip = 'Executes the New Sales Order action';
                     }
                     action("New Sales Quote")
                     {
@@ -39,6 +40,7 @@ page 6151481 "NPR Magento Retail Activities"
                         RunObject = Page "Sales Quote";
                         RunPageMode = Create;
                         ApplicationArea = All;
+                        ToolTip = 'Executes the New Sales Quote action';
                     }
                     action("New Sales Return Order")
                     {
@@ -46,6 +48,7 @@ page 6151481 "NPR Magento Retail Activities"
                         RunObject = Page "Sales Return Order";
                         RunPageMode = Create;
                         ApplicationArea = All;
+                        ToolTip = 'Executes the New Sales Return Order action';
                     }
                 }
             }
@@ -62,17 +65,20 @@ page 6151481 "NPR Magento Retail Activities"
                         {
                             ApplicationArea = All;
                             DrillDownPageID = "Sales Order List";
+                            ToolTip = 'Specifies the value of the Sales Orders field';
                         }
                         field("Sales Quotes"; "Sales Quotes")
                         {
                             ApplicationArea = All;
                             DrillDownPageID = "Sales Quotes";
                             Visible = false;
+                            ToolTip = 'Specifies the value of the Sales Quotes field';
                         }
                         field("Sales Return Orders"; "Sales Return Orders")
                         {
                             ApplicationArea = All;
                             DrillDownPageID = "Sales Return Order List";
+                            ToolTip = 'Specifies the value of the Sales Return Orders field';
                         }
                     }
                 }
@@ -91,6 +97,7 @@ page 6151481 "NPR Magento Retail Activities"
                             ApplicationArea = All;
                             DrillDownPageID = "Sales Order List";
                             Visible = false;
+                            ToolTip = 'Specifies the value of the Magento Orders field';
                         }
                         field("Daily Sales Invoices"; "Daily Sales Invoices")
                         {
@@ -98,6 +105,7 @@ page 6151481 "NPR Magento Retail Activities"
                             Caption = 'Daily Sales Invoices';
                             DrillDownPageID = "Posted Sales Invoices";
                             Visible = false;
+                            ToolTip = 'Specifies the value of the Daily Sales Invoices field';
                         }
                     }
                 }
@@ -115,17 +123,20 @@ page 6151481 "NPR Magento Retail Activities"
                         {
                             ApplicationArea = All;
                             DrillDownPageID = "NPR Nc Import List";
+                            ToolTip = 'Specifies the value of the Import Unprocessed field';
                         }
                         field("Tasks Unprocessed"; "Tasks Unprocessed")
                         {
                             ApplicationArea = All;
                             DrillDownPageID = "NPR Nc Task List";
                             Visible = false;
+                            ToolTip = 'Specifies the value of the Tasks Unprocessed field';
                         }
                         field("Daily Sales Orders"; "Daily Sales Orders")
                         {
                             ApplicationArea = All;
                             DrillDownPageID = "Sales Order List";
+                            ToolTip = 'Specifies the value of the Daily Sales Orders field';
                         }
                     }
                 }
@@ -140,6 +151,7 @@ page 6151481 "NPR Magento Retail Activities"
             action("Action Items")
             {
                 ApplicationArea = All;
+                ToolTip = 'Executes the Action Items action';
             }
         }
     }

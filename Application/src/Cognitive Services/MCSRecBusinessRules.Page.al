@@ -18,34 +18,42 @@ page 6060083 "NPR MCS Rec. Business Rules"
                     ApplicationArea = All;
                     Editable = false;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Model No. field';
                 }
                 field("Rule No."; "Rule No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Rule No. field';
                 }
                 field(Active; Active)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Active field';
                 }
                 field("Rule Type"; "Rule Type")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Rule Type field';
                 }
                 field(Type; Type)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Type field';
                 }
                 field("No."; "No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the No. field';
                 }
                 field("Block Seed Item No."; "Block Seed Item No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Block Seed Item No. field';
                 }
                 field("Last Sent Date Time"; "Last Sent Date Time")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Last Sent Date Time field';
                 }
             }
         }
@@ -63,6 +71,7 @@ page 6060083 "NPR MCS Rec. Business Rules"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Batch insert rules for items action';
 
                 trigger OnAction()
                 begin

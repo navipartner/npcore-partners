@@ -20,50 +20,61 @@ page 6150663 "NPR NPRE Waiter Pad List"
                 field("No."; "No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the No. field';
                 }
                 field("Start Date"; "Start Date")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Start Date field';
                 }
                 field("Start Time"; "Start Time")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Start Time field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Current Seating Description"; "Current Seating Description")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Seating Description field';
                 }
                 field("Current Seating FF"; "Current Seating FF")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Current Seating field';
                 }
                 field("Multiple Seating FF"; "Multiple Seating FF")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Multiple Seating field';
                 }
                 field("Pre-receipt Printed"; "Pre-receipt Printed")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Pre-receipt Printed field';
                 }
                 field(Closed; Closed)
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Closed field';
                 }
                 field("Close Date"; "Close Date")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Close Date field';
                 }
                 field("Close Time"; "Close Time")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Close Time field';
                 }
             }
         }
@@ -83,6 +94,7 @@ page 6150663 "NPR NPRE Waiter Pad List"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Print Pre Receipt action';
 
                     trigger OnAction()
                     begin

@@ -17,22 +17,27 @@ page 6151422 "NPR Magento Setup Event Subs."
                 field(Type; Type)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Type field';
                 }
                 field("Codeunit ID"; "Codeunit ID")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Codeunit ID field';
                 }
                 field("Function Name"; "Function Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Function Name field';
                 }
                 field(Enabled; Enabled)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Enabled field';
                 }
                 field("Codeunit Name"; "Codeunit Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Codeunit Name field';
                 }
             }
         }

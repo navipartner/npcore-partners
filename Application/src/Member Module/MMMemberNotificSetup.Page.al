@@ -15,88 +15,109 @@ page 6060142 "NPR MM Member Notific. Setup"
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field(Type; Type)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Type field';
                 }
                 field("Days Before"; "Days Before")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Days Before field';
                 }
                 field("Days Past"; "Days Past")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Days Past field';
                 }
                 field("Cancel Overdue Notif. (Days)"; "Cancel Overdue Notif. (Days)")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Cancel Overdue Notif. (Days) field';
                 }
                 field("Processing Method"; "Processing Method")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Processing Method field';
                 }
                 field("Template Filter Value"; "Template Filter Value")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Template Filter Value field';
                 }
                 field("Community Code"; "Community Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Community Code field';
                 }
                 field("Membership Code"; "Membership Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Membership Code field';
                 }
                 field("Next Notification Code"; "Next Notification Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Next Notification Code field';
                 }
                 field("Target Member Role"; "Target Member Role")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Target Member Role field';
                 }
                 field("Include NP Pass"; "Include NP Pass")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Include NP Pass field';
                 }
                 field("NP Pass Server Base URL"; "NP Pass Server Base URL")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the NP Pass Server Base URL field';
                 }
                 field("Pass Notification Method"; "Pass Notification Method")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Pass Notification Method field';
                 }
                 field("Passes API"; "Passes API")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Passes API field';
                 }
                 field("""PUT Passes Template"".HASVALUE()"; "PUT Passes Template".HasValue())
                 {
                     ApplicationArea = All;
                     Caption = 'Have Template';
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Have Template field';
                 }
                 field("Pass Token"; "Pass Token")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Pass Token field';
                 }
                 field("Pass Type Code"; "Pass Type Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Pass Type Code field';
                 }
                 field("Generate Magento PW URL"; "Generate Magento PW URL")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Generate Magento PW URL field';
                 }
                 field("Fallback Magento PW URL"; "Fallback Magento PW URL")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Fallback Magento PW URL field';
                 }
             }
         }
@@ -116,6 +137,7 @@ page 6060142 "NPR MM Member Notific. Setup"
                 RunObject = Page "NPR E-mail Templates";
                 RunPageView = WHERE("Table No." = CONST(6060139));
                 ApplicationArea = All;
+                ToolTip = 'Executes the E-Mail Templates action';
             }
             action(SMSTemplate)
             {
@@ -126,6 +148,7 @@ page 6060142 "NPR MM Member Notific. Setup"
                 RunObject = Page "NPR SMS Template List";
                 RunPageView = WHERE("Table No." = CONST(6060139));
                 ApplicationArea = All;
+                ToolTip = 'Executes the SMS Template action';
             }
 
             action(RenewNotificationsList)
@@ -138,6 +161,7 @@ page 6060142 "NPR MM Member Notific. Setup"
                 RunObject = Page "NPR MM Membership Notific.";
                 RunPageLink = "Notification Trigger" = CONST(RENEWAL);
                 ApplicationArea = All;
+                ToolTip = 'Executes the Renewal Notification List action';
             }
         }
         area(processing)
@@ -212,6 +236,7 @@ page 6060142 "NPR MM Member Notific. Setup"
                 Promoted = true;
                 PromotedCategory = Process;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Refresh Renew Notification action';
 
                 trigger OnAction()
                 var

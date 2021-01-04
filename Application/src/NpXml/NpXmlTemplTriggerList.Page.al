@@ -30,30 +30,36 @@ page 6151559 "NPR NpXml Templ. Trigger List"
                     ApplicationArea = All;
                     Style = Attention;
                     StyleExpr = HasNoLinks;
+                    ToolTip = 'Specifies the value of the Table No. field';
                 }
                 field("Table Name"; "Table Name")
                 {
                     ApplicationArea = All;
                     Style = Attention;
                     StyleExpr = HasNoLinks;
+                    ToolTip = 'Specifies the value of the Table Name field';
                 }
                 field("Insert Trigger"; "Insert Trigger")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Insert Trigger field';
                 }
                 field("Modify Trigger"; "Modify Trigger")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Modify Trigger field';
                 }
                 field("Delete Trigger"; "Delete Trigger")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Delete Trigger field';
                 }
                 field(Comment; Comment)
                 {
                     ApplicationArea = All;
                     Style = Attention;
                     StyleExpr = HasNoLinks;
+                    ToolTip = 'Specifies the value of the Comment field';
                 }
             }
         }

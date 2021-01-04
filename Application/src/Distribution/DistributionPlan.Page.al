@@ -17,28 +17,34 @@ page 6151060 "NPR Distribution Plan"
                 field("Distribution Group"; "Distribution Group")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Distribution Group field';
                 }
                 field("Item Hiearachy"; "Item Hiearachy")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Item Hiearachy field';
                 }
                 field("Distribution Type"; "Distribution Type")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Distribution Type field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field(View; View)
                 {
                     ApplicationArea = All;
                     Caption = 'View';
                     Visible = false;
+                    ToolTip = 'Specifies the value of the View field';
                 }
                 field("Required Date"; "Required Date")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Required Date field';
                 }
             }
             part(DistMatrix; "NPR Distrib. Matrix")
@@ -59,6 +65,7 @@ page 6151060 "NPR Distribution Plan"
                 Image = CalculateInventory;
                 Promoted = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Create Distribution action';
 
                 trigger OnAction()
                 var
@@ -77,6 +84,7 @@ page 6151060 "NPR Distribution Plan"
                 Image = CreateDocument;
                 Promoted = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Create Distribution Orders action';
 
                 trigger OnAction()
                 var
@@ -101,6 +109,7 @@ page 6151060 "NPR Distribution Plan"
                               "Distribution Item" = CONST('<>'''),
                               "Distribution Quantity" = FILTER(> 0);
                 ApplicationArea = All;
+                ToolTip = 'Executes the View Documents action';
             }
             action("Import Demands")
             {
@@ -109,6 +118,7 @@ page 6151060 "NPR Distribution Plan"
                 Promoted = true;
                 Visible = false;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Import Demands action';
 
                 trigger OnAction()
                 var

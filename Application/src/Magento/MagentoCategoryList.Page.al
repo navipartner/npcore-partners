@@ -27,14 +27,17 @@ page 6151415 "NPR Magento Category List"
                 field(Id; Id)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Id field';
                 }
                 field(Name; Name)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Name field';
                 }
                 field("Sorting"; Sorting)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Sorting field';
                 }
             }
         }
@@ -53,6 +56,7 @@ page 6151415 "NPR Magento Category List"
                 PromotedIsBig = true;
                 Visible = HasSetupCategories;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Setup Categories action';
 
                 trigger OnAction()
                 var

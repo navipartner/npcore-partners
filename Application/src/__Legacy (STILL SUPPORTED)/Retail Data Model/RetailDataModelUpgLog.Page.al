@@ -20,24 +20,29 @@ page 6150699 "NPR Retail Data Model Upg.Log"
                 field("Data Model Build"; "Data Model Build")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Data Model Build field';
                 }
                 field(Type; Type)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Type field';
                 }
                 field("Text"; Text)
                 {
                     ApplicationArea = All;
                     Style = Strong;
                     StyleExpr = TextEmphasize;
+                    ToolTip = 'Specifies the value of the Text field';
                 }
                 field("User ID"; "User ID")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the User ID field';
                 }
                 field("Date and Time"; "Date and Time")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Date and Time field';
                 }
             }
         }
@@ -59,6 +64,7 @@ page 6150699 "NPR Retail Data Model Upg.Log"
                     PromotedCategory = Process;
                     RunPageMode = View;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Re-run Build Step action';
 
                     trigger OnAction()
                     var
@@ -74,6 +80,7 @@ page 6150699 "NPR Retail Data Model Upg.Log"
                     Image = "Action";
                     RunObject = Report "NPR Re-run Data Upg. Steps";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Re-run Build Steps action';
                 }
             }
         }

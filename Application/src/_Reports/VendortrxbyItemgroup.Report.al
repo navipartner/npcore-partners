@@ -244,6 +244,7 @@ report 6014449 "NPR Vendor trx by Item group"
                     {
                         Caption = 'Display Item Groups With No Sales';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Display Item Groups With No Sales field';
                     }
                 }
             }

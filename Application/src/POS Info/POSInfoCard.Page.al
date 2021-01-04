@@ -20,46 +20,57 @@ page 6150640 "NPR POS Info Card"
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Message"; Message)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Message field';
                 }
                 field("Once per Transaction"; "Once per Transaction")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Once per Transaction field';
                 }
                 field("Copy from Header"; "Copy from Header")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Copy from Header field';
                 }
                 field("Available in Front-End"; "Available in Front-End")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Available in Front-End field';
                 }
                 field("Set POS Sale Line Color to Red"; "Set POS Sale Line Color to Red")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Set POS Sale Line Color to Red field';
                 }
                 field(Type; Type)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Type field';
                 }
                 field("Input Mandatory"; "Input Mandatory")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Input Mandatory field';
                 }
                 field("Input Type"; "Input Type")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Input Type field';
                 }
                 field("Table No."; "Table No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Table No. field';
                 }
             }
             part("POS Info Subform"; "NPR POS Info Subform")
@@ -80,6 +91,7 @@ page 6150640 "NPR POS Info Card"
                 Caption = 'Field Mapping';
                 Image = "Action";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Field Mapping action';
 
                 trigger OnAction()
                 var

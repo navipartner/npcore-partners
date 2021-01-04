@@ -21,14 +21,17 @@ page 6151410 "NPR Magento VAT Prod. Groups"
                 field("VAT Product Posting Group"; "VAT Product Posting Group")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the VAT Product Posting Group field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Magento Tax Class"; "Magento Tax Class")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Magento Tax Class field';
                 }
             }
         }
@@ -46,6 +49,7 @@ page 6151410 "NPR Magento VAT Prod. Groups"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Setup VAT Product Posting Groups action';
 
                 trigger OnAction()
                 begin

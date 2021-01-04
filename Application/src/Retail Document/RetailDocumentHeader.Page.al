@@ -48,91 +48,113 @@ page 6014469 "NPR Retail Document Header"
                 {
                     ApplicationArea = All;
                     OptionCaption = ' ,Selection,Retail Order,Wish,Customization,Delivery,Rental contract,Purchase contract,Quote';
+                    ToolTip = 'Specifies the value of the Document Type field';
                 }
                 field("No."; "No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the No. field';
                 }
                 field("Customer Type"; "Customer Type")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Customer Type field';
                 }
                 field("Customer No."; "Customer No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Customer No. field';
                 }
                 field(Name; Name)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Name field';
                 }
                 field("First Name"; "First Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the First Name field';
                 }
                 field(Address; Address)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Address field';
                 }
                 field("Address 2"; "Address 2")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Address 2 field';
                 }
                 field("Post Code"; "Post Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Post Code field';
                 }
                 field(City; City)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the City field';
                 }
                 field("Location Code"; "Location Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Location Code field';
                 }
                 field("Country Code"; "Country Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Country Code field';
                 }
                 field("Document Date"; "Document Date")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Date Created field';
                 }
                 field("Last Date Modified"; "Last Date Modified")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Last Date Modified field';
                 }
                 field("Time of Day"; "Time of Day")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Time field';
                 }
                 field(Phone; Phone)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Phone field';
                 }
                 field(Mobile; Mobile)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Cell No. field';
                 }
                 field("E-mail"; "E-mail")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the E-mail field';
                 }
                 field(Reference; Reference)
                 {
                     ApplicationArea = All;
                     Caption = 'Reference';
+                    ToolTip = 'Specifies the value of the Reference field';
                 }
                 field("Contract Status"; "Contract Status")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Contract Status field';
                 }
                 field(Cashed; Cashed)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Cashed field';
                 }
                 field("POS Entry No."; "POS Entry No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the POS Entry No. field';
                 }
             }
             group(Delivery1)
@@ -144,26 +166,32 @@ page 6014469 "NPR Retail Document Header"
                     field("Ship-to Name"; "Ship-to Name")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Ship-to Name field';
                     }
                     field("Ship-to Address"; "Ship-to Address")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Ship-to Address field';
                     }
                     field("Ship-to Address 2"; "Ship-to Address 2")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Ship-to Address 2 field';
                     }
                     field("Ship-to Post Code"; "Ship-to Post Code")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Ship-to Post Code field';
                     }
                     field("Ship-to City"; "Ship-to City")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Ship-to City field';
                     }
                     field("Ship-to Attention"; "Ship-to Attention")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Ship-to Attention field';
                     }
                 }
                 group(Control6150655)
@@ -172,56 +200,69 @@ page 6014469 "NPR Retail Document Header"
                     field(Delivery; Delivery)
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Delivery field';
                     }
                     field("Shipping Type"; "Shipping Type")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Shipping Method field';
                     }
                     field("Delivery by Vendor"; "Delivery by Vendor")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Delivery by Vendor field';
                     }
                     field("Resource Ship-by n Persons"; "Resource Ship-by n Persons")
                     {
                         ApplicationArea = All;
                         Caption = 'Persons';
+                        ToolTip = 'Specifies the value of the Persons field';
                     }
                     field("Estimated Time Use"; "Estimated Time Use")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Estimated Time Use field';
                     }
                     field("Resource Ship-by Car"; "Resource Ship-by Car")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Resource Ship-by Car field';
                     }
                     field("Resource.Name"; Resource.Name)
                     {
                         ApplicationArea = All;
                         Caption = 'Resource Name';
+                        ToolTip = 'Specifies the value of the Resource Name field';
                     }
                     field("Return Date"; "Return Date")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Return Date field';
                     }
                     field("Delivery Date"; "Delivery Date")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Delivery Date field';
                     }
                     field("Delivery Time 1"; "Delivery Time 1")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Delivery Time 1 field';
                     }
                     field("Delivery Time 2"; "Delivery Time 2")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Delivery Time 2 field';
                     }
                     field("Ship-to Resource Date"; "Ship-to Resource Date")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Ship-to Resource Date field';
                     }
                     field("Ship-to Resource Time"; "Ship-to Resource Time")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Ship-to Resource Time field';
                     }
                 }
             }
@@ -234,18 +275,22 @@ page 6014469 "NPR Retail Document Header"
                     field(Via; Via)
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Via field';
                     }
                     field("Rent Register"; "Rent Register")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Rent Cash Register No. field';
                     }
                     field("Rent Sales Ticket"; "Rent Sales Ticket")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Rent Sales Ticket field';
                     }
                     field("Rent Salesperson"; "Rent Salesperson")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Rent Salesperson field';
                     }
                 }
                 group(Control6150676)
@@ -255,15 +300,18 @@ page 6014469 "NPR Retail Document Header"
                     {
                         ApplicationArea = All;
                         Caption = 'Shortcut Dimension 1 Code';
+                        ToolTip = 'Specifies the value of the Shortcut Dimension 1 Code field';
                     }
                     field("Shortcut Dimension 2 Code"; "Shortcut Dimension 2 Code")
                     {
                         ApplicationArea = All;
                         Caption = 'Shortcut Dimension 2 Code';
+                        ToolTip = 'Specifies the value of the Shortcut Dimension 2 Code field';
                     }
                     field("ID Card"; "ID Card")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the ID card field';
                     }
                 }
             }
@@ -273,18 +321,22 @@ page 6014469 "NPR Retail Document Header"
                 field("Vendor Index"; "Vendor Index")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Vendor Index field';
                 }
                 field("Purchase Order No."; "Purchase Order No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Purchase Quote field';
                 }
                 field("Order No."; "Order No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Order No. field';
                 }
                 field("Notify Customer"; "Notify Customer")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Notify Customer field';
                 }
             }
             group("Customer Letter")
@@ -296,14 +348,17 @@ page 6014469 "NPR Retail Document Header"
                     field(Status; Status)
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Status field';
                     }
                     field("Letter Printed"; "Letter Printed")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Letter Printed field';
                     }
                     field("Invoice No."; "Invoice No.")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Invoice No. field';
                     }
                 }
             }
@@ -316,23 +371,28 @@ page 6014469 "NPR Retail Document Header"
                     field(Deposit; Deposit)
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Deposit field';
                     }
                     field("Prices Including VAT"; "Prices Including VAT")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Prices Including VAT field';
                     }
                     field("Payment Method Code"; "Payment Method Code")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Payment Method Code field';
                     }
                     field("Invoice No.1"; "Invoice No.")
                     {
                         ApplicationArea = All;
                         Caption = 'Invoice No.';
+                        ToolTip = 'Specifies the value of the Invoice No. field';
                     }
                     field("Req. Return Date"; "Req. Return Date")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Req. Return Date field';
                     }
                 }
             }
@@ -355,6 +415,7 @@ page 6014469 "NPR Retail Document Header"
                 Caption = 'OK';
                 Image = Confirm;
                 ApplicationArea = All;
+                ToolTip = 'Executes the OK action';
 
                 trigger OnAction()
                 begin
@@ -369,6 +430,7 @@ page 6014469 "NPR Retail Document Header"
                 Caption = ' Cancel';
                 Image = Cancel;
                 ApplicationArea = All;
+                ToolTip = 'Executes the  Cancel action';
 
                 trigger OnAction()
                 begin
@@ -383,6 +445,7 @@ page 6014469 "NPR Retail Document Header"
                     Caption = 'Print Order Note';
                     Image = PrintDocument;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Print Order Note action';
 
                     trigger OnAction()
                     var
@@ -411,6 +474,7 @@ page 6014469 "NPR Retail Document Header"
                     Caption = 'Label';
                     Image = DepositSlip;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Label action';
 
                     trigger OnAction()
                     begin
@@ -425,6 +489,7 @@ page 6014469 "NPR Retail Document Header"
                     Caption = 'Customer Letter';
                     Image = CustomerLedger;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Customer Letter action';
 
                     trigger OnAction()
                     begin
@@ -440,6 +505,7 @@ page 6014469 "NPR Retail Document Header"
                     Caption = 'Purchase Contract';
                     Image = Documents;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Purchase Contract action';
 
                     trigger OnAction()
                     var
@@ -457,6 +523,7 @@ page 6014469 "NPR Retail Document Header"
                     Caption = 'Lease';
                     Image = "Action";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Lease action';
 
                     trigger OnAction()
                     var
@@ -477,6 +544,7 @@ page 6014469 "NPR Retail Document Header"
                     Caption = 'Detail Trial Bal.';
                     Image = BankAccountLedger;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Detail Trial Bal. action';
 
                     trigger OnAction()
                     var
@@ -519,12 +587,14 @@ page 6014469 "NPR Retail Document Header"
                     ShortCutKey = 'F5';
                     Visible = false;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Selection List action';
                 }
                 action("Create Invoice")
                 {
                     Caption = 'Create Invoice';
                     Image = Invoice;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Create Invoice action';
 
                     trigger OnAction()
                     begin
@@ -538,6 +608,7 @@ page 6014469 "NPR Retail Document Header"
                     Caption = 'Create purchaseorder';
                     Image = "Order";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Create purchaseorder action';
 
                     trigger OnAction()
                     begin
@@ -549,6 +620,7 @@ page 6014469 "NPR Retail Document Header"
                     Caption = 'Send Status SMS';
                     Image = SendMail;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Send Status SMS action';
 
                     trigger OnAction()
                     begin

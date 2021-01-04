@@ -21,39 +21,47 @@ page 6151053 "NPR Item Hierarchy Lines"
                 {
                     ApplicationArea = All;
                     Caption = 'Hierachy';
+                    ToolTip = 'Specifies the value of the Hierachy field';
                 }
                 field("Item Hierarchy Level"; "Item Hierarchy Level")
                 {
                     ApplicationArea = All;
                     Caption = 'Level';
+                    ToolTip = 'Specifies the value of the Level field';
                 }
                 field("Item Hierachy Description"; "Item Hierachy Description")
                 {
                     ApplicationArea = All;
                     Caption = 'Description';
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Item No."; "Item No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Item No. field';
                 }
                 field(Description; "Item Desc.")
                 {
                     ApplicationArea = All;
                     Caption = 'Item Description';
+                    ToolTip = 'Specifies the value of the Item Description field';
                 }
                 field("Variant Code"; "Variant Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Variant Code field';
                 }
                 field("Linked Table Key Value"; "Linked Table Key Value")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Linked Table Key Value field';
                 }
                 field("Related Table Key Field Value"; "Related Table Key Field Value")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Related Table Key Field Value field';
                 }
             }
         }
@@ -68,6 +76,7 @@ page 6151053 "NPR Item Hierarchy Lines"
                 Caption = 'Create Hierachy Lines';
                 Image = Item;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Create Hierachy Lines action';
 
                 trigger OnAction()
                 var
@@ -84,6 +93,7 @@ page 6151053 "NPR Item Hierarchy Lines"
                 Image = NewItem;
                 Promoted = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Add Hierachy Item action';
 
                 trigger OnAction()
                 begin

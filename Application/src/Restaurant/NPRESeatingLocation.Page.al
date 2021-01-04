@@ -21,33 +21,40 @@ page 6150667 "NPR NPRE Seating Location"
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Restaurant Code"; "Restaurant Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Restaurant Code field';
                 }
                 field(Control6014404; Seatings)
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ShowCaption = false;
+                    ToolTip = 'Specifies the value of the Seatings field';
                 }
                 field(Seats; Seats)
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Seats field';
                 }
                 field("POS Store"; "POS Store")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the POS Store field';
                 }
                 field("Auto Send Kitchen Order"; "Auto Send Kitchen Order")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Auto Send Kitchen Order field';
                 }
             }
         }
@@ -70,6 +77,7 @@ page 6150667 "NPR NPRE Seating Location"
                     RunObject = Page "NPR NPRE Seating List";
                     RunPageLink = "Seating Location" = FIELD(Code);
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Seatings action';
                 }
             }
         }

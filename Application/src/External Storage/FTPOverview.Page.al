@@ -16,14 +16,17 @@ page 6184881 "NPR FTP Overview"
                 field("Host Code"; "Host Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the FTP Host Code field';
                 }
                 field("File Name"; "File Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the File Name field';
                 }
                 field(Name; Name)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Name field';
                 }
             }
         }

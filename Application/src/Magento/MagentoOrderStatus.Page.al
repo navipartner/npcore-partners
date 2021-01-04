@@ -18,18 +18,22 @@ page 6151452 "NPR Magento Order Status"
                 field("Order No."; "Order No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Order No. field';
                 }
                 field("External Order No."; "External Order No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the External Order No. field';
                 }
                 field(Status; Status)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Status field';
                 }
                 field("Last Modified Date"; "Last Modified Date")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Last Modified Date field';
                 }
             }
         }

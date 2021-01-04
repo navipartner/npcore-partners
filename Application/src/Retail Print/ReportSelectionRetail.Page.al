@@ -40,6 +40,7 @@ page 6014423 "NPR Report Selection: Retail"
                     ApplicationArea = All;
                     OptionCaption = 'Sales Receipt,Register Balancing,Price Label,Signature Receipt,Gift Voucher,,Credit Voucher,,Terminal Receipt,Large Sales Receipt,,,Exchange Label,,Customer Sales Receipt,Rental,Tailor,Order,Photo Label,,,,Warranty Certificate,Shelf Label,,,,,CustomerLocationOnSave,CustomerLocationOnTrigger,Sign,Bin Label,Sales Receipt (POS Entry),Large Sales Receipt (POS Entry),Balancing (POS Entry),Sales Doc. Confirmation (POS Entry),Large Balancing (POS Entry),Begin Workshift (POS Entry),Transfer Order,Inv.PutAway Label';
                     ShowCaption = false;
+                    ToolTip = 'Specifies the value of the ReportType2 field';
 
                     trigger OnValidate()
                     begin
@@ -54,50 +55,61 @@ page 6014423 "NPR Report Selection: Retail"
                 field(Sequence; Sequence)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Sequence field';
                 }
                 field("Register No."; "Register No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Cash Register No. field';
                 }
                 field("Report ID"; "Report ID")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Report ID field';
                 }
                 field("Report Name"; "Report Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Report Name field';
                 }
                 field("XML Port ID"; "XML Port ID")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the XML Port ID field';
                 }
                 field("XML Port Name"; "XML Port Name")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the XML Port Name field';
                 }
                 field("Codeunit ID"; "Codeunit ID")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Codeunit ID field';
                 }
                 field("Codeunit Name"; "Codeunit Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Codeunit Name field';
                 }
                 field("Print Template"; "Print Template")
                 {
                     ApplicationArea = All;
                     Width = 20;
+                    ToolTip = 'Specifies the value of the Print Template field';
                 }
                 field("Filter Object ID"; "Filter Object ID")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Filter Object ID field';
                 }
                 field("Record Filter"; "Record Filter")
                 {
                     ApplicationArea = All;
                     AssistEdit = true;
+                    ToolTip = 'Specifies the value of the Record Filter field';
 
                     trigger OnAssistEdit()
                     var
@@ -126,6 +138,7 @@ page 6014423 "NPR Report Selection: Retail"
                 field(Optional; Optional)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Optional field';
                 }
             }
         }
@@ -148,6 +161,7 @@ page 6014423 "NPR Report Selection: Retail"
                     RunObject = Page "NPR Retail Report Select. List";
                     ShortCutKey = 'F5';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the &List action';
                 }
             }
         }

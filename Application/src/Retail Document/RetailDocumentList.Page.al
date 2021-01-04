@@ -28,6 +28,7 @@ page 6014476 "NPR Retail Document List"
                 {
                     ApplicationArea = All;
                     Caption = 'Document Type';
+                    ToolTip = 'Specifies the value of the Document Type field';
 
                     trigger OnValidate()
                     begin
@@ -41,21 +42,25 @@ page 6014476 "NPR Retail Document List"
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Customer No. field';
                 }
                 field("No."; "No.")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the No. field';
                 }
                 field(Name; Name)
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Name field';
                 }
                 field("First Name"; "First Name")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the First Name field';
                 }
                 field("Ship-to Name"; "Ship-to Name")
                 {
@@ -63,26 +68,31 @@ page 6014476 "NPR Retail Document List"
                     Editable = false;
                     Importance = Additional;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Ship-to Name field';
                 }
                 field("Document Date"; "Document Date")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Date Created field';
                 }
                 field(Status; Status)
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Status field';
                 }
                 field(Cashed; Cashed)
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Cashed field';
                 }
                 field("Vendor Index"; "Vendor Index")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Vendor Index field';
                 }
                 field(Address; Address)
                 {
@@ -90,6 +100,7 @@ page 6014476 "NPR Retail Document List"
                     Editable = false;
                     Importance = Additional;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Address field';
                 }
                 field("Address 2"; "Address 2")
                 {
@@ -97,6 +108,7 @@ page 6014476 "NPR Retail Document List"
                     Editable = false;
                     Importance = Additional;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Address 2 field';
                 }
                 field(City; City)
                 {
@@ -104,22 +116,26 @@ page 6014476 "NPR Retail Document List"
                     Editable = false;
                     Importance = Additional;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the City field';
                 }
                 field(ID; ID)
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the ID field';
                 }
                 field("Date"; Date)
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Date field';
                 }
                 field("Salesperson Code"; "Salesperson Code")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Salesperson Code field';
                 }
                 field("Post Code"; "Post Code")
                 {
@@ -127,16 +143,19 @@ page 6014476 "NPR Retail Document List"
                     Editable = false;
                     Importance = Additional;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Post Code field';
                 }
                 field(Deposit; Deposit)
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Deposit field';
                 }
                 field(Amount; Amount)
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Total amount field';
                 }
                 field("Time of Day"; "Time of Day")
                 {
@@ -144,6 +163,7 @@ page 6014476 "NPR Retail Document List"
                     Editable = false;
                     Importance = Additional;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Time field';
                 }
                 field("Rent Salesperson"; "Rent Salesperson")
                 {
@@ -151,6 +171,7 @@ page 6014476 "NPR Retail Document List"
                     Editable = false;
                     Importance = Additional;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Rent Salesperson field';
                 }
                 field("Rent Register"; "Rent Register")
                 {
@@ -158,6 +179,7 @@ page 6014476 "NPR Retail Document List"
                     Editable = false;
                     Importance = Additional;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Rent Cash Register No. field';
                 }
                 field("Rent Sales Ticket"; "Rent Sales Ticket")
                 {
@@ -165,6 +187,7 @@ page 6014476 "NPR Retail Document List"
                     Editable = false;
                     Importance = Additional;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Rent Sales Ticket field';
                 }
                 field("Return Date"; "Return Date")
                 {
@@ -172,6 +195,7 @@ page 6014476 "NPR Retail Document List"
                     Editable = false;
                     Importance = Additional;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Return Date field';
                 }
                 field("Return Time"; "Return Time")
                 {
@@ -179,6 +203,7 @@ page 6014476 "NPR Retail Document List"
                     Editable = false;
                     Importance = Additional;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Return Time field';
                 }
                 field("Return Salesperson"; "Return Salesperson")
                 {
@@ -186,6 +211,7 @@ page 6014476 "NPR Retail Document List"
                     Editable = false;
                     Importance = Additional;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Return Salesperson field';
                 }
                 field("Return Register"; "Return Register")
                 {
@@ -193,6 +219,7 @@ page 6014476 "NPR Retail Document List"
                     Editable = false;
                     Importance = Additional;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Return Cash Register No. field';
                 }
                 field("Return Sales Ticket"; "Return Sales Ticket")
                 {
@@ -200,6 +227,7 @@ page 6014476 "NPR Retail Document List"
                     Editable = false;
                     Importance = Additional;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Return Sales Ticket field';
                 }
                 field("Shortcut Dimension 1 Code"; "Shortcut Dimension 1 Code")
                 {
@@ -207,6 +235,7 @@ page 6014476 "NPR Retail Document List"
                     Editable = false;
                     Importance = Additional;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Shortcut Dimension 1 Code field';
                 }
                 field("Return Department"; "Return Department")
                 {
@@ -214,6 +243,7 @@ page 6014476 "NPR Retail Document List"
                     Editable = false;
                     Importance = Additional;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Return Department field';
                 }
                 field(Phone; Phone)
                 {
@@ -221,6 +251,7 @@ page 6014476 "NPR Retail Document List"
                     Editable = false;
                     Importance = Additional;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Phone field';
                 }
                 field(Mobile; Mobile)
                 {
@@ -228,6 +259,7 @@ page 6014476 "NPR Retail Document List"
                     Editable = false;
                     Importance = Additional;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Cell No. field';
                 }
                 field("Return Date 2"; "Return Date 2")
                 {
@@ -235,6 +267,7 @@ page 6014476 "NPR Retail Document List"
                     Editable = false;
                     Importance = Additional;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Return Date 2 field';
                 }
                 field("Return Time 2"; "Return Time 2")
                 {
@@ -242,6 +275,7 @@ page 6014476 "NPR Retail Document List"
                     Editable = false;
                     Importance = Additional;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Return Time 2 field';
                 }
                 field("Rent Date"; "Rent Date")
                 {
@@ -249,6 +283,7 @@ page 6014476 "NPR Retail Document List"
                     Editable = false;
                     Importance = Additional;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Rent Date field';
                 }
                 field("Rent Time"; "Rent Time")
                 {
@@ -256,6 +291,7 @@ page 6014476 "NPR Retail Document List"
                     Editable = false;
                     Importance = Additional;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Rent Time field';
                 }
                 field("No. Series"; "No. Series")
                 {
@@ -263,6 +299,7 @@ page 6014476 "NPR Retail Document List"
                     Editable = false;
                     Importance = Additional;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the No. Series field';
                 }
                 field(Comment; Comment)
                 {
@@ -270,6 +307,7 @@ page 6014476 "NPR Retail Document List"
                     Editable = false;
                     Importance = Additional;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Comment field';
                 }
             }
             grid(Control6150652)
@@ -295,6 +333,7 @@ page 6014476 "NPR Retail Document List"
                 Caption = 'Change Outstanding / Redeemed';
                 Image = ChangePaymentTolerance;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Change Outstanding / Redeemed action';
 
                 trigger OnAction()
                 begin
@@ -311,6 +350,7 @@ page 6014476 "NPR Retail Document List"
                 Caption = 'View All';
                 Image = View;
                 ApplicationArea = All;
+                ToolTip = 'Executes the View All action';
 
                 trigger OnAction()
                 begin

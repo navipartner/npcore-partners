@@ -19,48 +19,59 @@ page 6184850 "NPR FR Audit Setup"
                 field("Certification No."; "Certification No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Certification No. field';
                 }
                 field("Certification Category"; "Certification Category")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Certification Category field';
                 }
                 field("Signing Certificate Password"; "Signing Certificate Password")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Signing Certificate Password field';
                 }
                 field("Signing Certificate Thumbprint"; "Signing Certificate Thumbprint")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Signing Certificate Thumbprint field';
                 }
                 field("Monthly Workshift Duration"; "Monthly Workshift Duration")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Monthly Workshift Duration field';
                 }
                 field("Yearly Workshift Duration"; "Yearly Workshift Duration")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Yearly Workshift Duration field';
                 }
                 field("Last Auto Archived Workshift"; "Last Auto Archived Workshift")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Last Auto Archived Workshift field';
                 }
                 field("Auto Archive URL"; "Auto Archive URL")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Auto Archive URL field';
                 }
                 field("Auto Archive API Key"; "Auto Archive API Key")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Auto Archive API Key field';
                 }
                 field("Auto Archive SAS"; "Auto Archive SAS")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Auto Archive SAS field';
                 }
                 field("Item VAT Identifier Filter"; "Item VAT Identifier Filter")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Item VAT Identifier Filter field';
 
                     trigger OnAssistEdit()
                     var
@@ -88,6 +99,7 @@ page 6184850 "NPR FR Audit Setup"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Upload Certificate action';
 
                 trigger OnAction()
                 var
@@ -104,6 +116,7 @@ page 6184850 "NPR FR Audit Setup"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Initialize JET action';
 
                 trigger OnAction()
                 var
@@ -126,6 +139,7 @@ page 6184850 "NPR FR Audit Setup"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Log Partner Modification action';
 
                 trigger OnAction()
                 var
@@ -165,6 +179,7 @@ page 6184850 "NPR FR Audit Setup"
                 PromotedIsBig = true;
                 RunObject = Page "NPR FR Audit No. Series";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Unit No. Series Setup action';
             }
             action(POSEntryRelatedInfo)
             {
@@ -175,6 +190,7 @@ page 6184850 "NPR FR Audit Setup"
                 PromotedIsBig = true;
                 RunObject = Page "NPR FR POS Audit Log Aux. Info";
                 ApplicationArea = All;
+                ToolTip = 'Executes the POS Entry Related Info List action';
             }
         }
     }

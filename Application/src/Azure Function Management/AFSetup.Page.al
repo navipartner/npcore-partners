@@ -19,18 +19,22 @@ page 6151570 "NPR AF Setup"
                 field("Enable Azure Functions"; "Enable Azure Functions")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Enable Azure Functions field';
                 }
                 field("Customer Tag"; "Customer Tag")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Customer Tag field';
                 }
                 field("Web Service Is Published"; "Web Service Is Published")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Web Service Is Published field';
                 }
                 field("Web Service Url"; "Web Service Url")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Web Service Url field';
                 }
             }
             group("Spire Barcode")
@@ -39,14 +43,17 @@ page 6151570 "NPR AF Setup"
                 field("Spire Barcode - API Key"; "Spire Barcode - API Key")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Spire Barcode - API Key field';
                 }
                 field("Spire Barcode - Base Url"; "Spire Barcode - Base Url")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Spire Barcode - Base Url field';
                 }
                 field("Spire Barcode - API Routing"; "Spire Barcode - API Routing")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Spire Barcode - API Routing field';
                 }
             }
             group(Control6014405)
@@ -55,22 +62,27 @@ page 6151570 "NPR AF Setup"
                 field("Notification - API Key"; "Notification - API Key")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Notification - API Key field';
                 }
                 field("Notification - Base Url"; "Notification - Base Url")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Notification - Base Url field';
                 }
                 field("Notification - API Routing"; "Notification - API Routing")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Notification - API Routing field';
                 }
                 field("Notification - Conn. String"; "Notification - Conn. String")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Notification - Conn. String field';
                 }
                 field("Notification - Hub Path"; "Notification - Hub Path")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Notification - Hub Path field';
                 }
             }
             group("Msg Service")
@@ -79,34 +91,42 @@ page 6151570 "NPR AF Setup"
                 field("Msg Service - Site Created"; "Msg Service - Site Created")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Msg Service - Site Created field';
                 }
                 field("Msg Service - API Key"; "Msg Service - API Key")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Msg Service - API Key field';
                 }
                 field("Msg Service - Base Url"; "Msg Service - Base Url")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Msg Service - Base Url field';
                 }
                 field("Msg Service - Base Web Url"; "Msg Service - Base Web Url")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Msg Service - Base Web Url field';
                 }
                 field("Msg Service - API Routing"; "Msg Service - API Routing")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Msg Service - API Routing field';
                 }
                 field("Msg Service - Name"; "Msg Service - Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Msg Service - Name field';
                 }
                 field("Msg Service - Title"; "Msg Service - Title")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Msg Service - Title field';
                 }
                 field("Msg Service - Description"; "Msg Service - Description")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Msg Service - Description field';
                 }
                 field(WebsiteUrl; WebsiteUrl)
                 {
@@ -114,38 +134,47 @@ page 6151570 "NPR AF Setup"
                     Caption = 'Msg Service - Website Url';
                     Editable = false;
                     ExtendedDatatype = URL;
+                    ToolTip = 'Specifies the value of the Msg Service - Website Url field';
                 }
                 field("Msg Service - Report ID"; "Msg Service - Report ID")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Msg Service - Report ID field';
                 }
                 field("Msg Service - Report Caption"; "Msg Service - Report Caption")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Msg Service - Report Caption field';
                 }
                 field("Msg Service - Source Type"; "Msg Service - Source Type")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Msg Service - Source Type field';
                 }
                 field("Msg Service - Encryption Key"; "Msg Service - Encryption Key")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Msg Service - Encryption Key field';
                 }
                 field("Msg Service - NAV WS User"; "Msg Service - NAV WS User")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Msg Service - NAV WS User field';
                 }
                 field("Msg Service - NAV WS Password"; "Msg Service - NAV WS Password")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Msg Service - NAV WS Password field';
                 }
                 field("Msg Service - Image"; "Msg Service - Image")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Msg Service - Image field';
                 }
                 field("Msg Service - Icon"; "Msg Service - Icon")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Msg Service - Icon field';
                 }
             }
             group("OIO Validation")
@@ -154,18 +183,22 @@ page 6151570 "NPR AF Setup"
                 field("OIO Validation - Enable"; "OIO Validation - Enable")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the OIO Validation - Enable field';
                 }
                 field("OIO Validation - API Key"; "OIO Validation - API Key")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the OIO Validation - API Key field';
                 }
                 field("OIO Validation - Base Url"; "OIO Validation - Base Url")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the OIO Validation - Base Url field';
                 }
                 field("OIO Validation - API Routing"; "OIO Validation - API Routing")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the OIO Validation - API Routing field';
                 }
             }
         }
@@ -184,6 +217,7 @@ page 6151570 "NPR AF Setup"
                 PromotedIsBig = true;
                 RunObject = Page "NPR AF Test Services";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Test action';
             }
             action("Enable Webservice")
             {
@@ -194,6 +228,7 @@ page 6151570 "NPR AF Setup"
                 PromotedIsBig = true;
                 RunObject = Codeunit "NPR AF API WebService";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Enable Webservice action';
 
                 trigger OnAction()
                 var
@@ -210,6 +245,7 @@ page 6151570 "NPR AF Setup"
                     Caption = 'Clear Customer Tag';
                     Image = Delete;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Clear Customer Tag action';
 
                     trigger OnAction()
                     var
@@ -228,6 +264,7 @@ page 6151570 "NPR AF Setup"
                     Image = "Action";
                     RunObject = Codeunit "NPR AF API WebService";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Create Site action';
 
                     trigger OnAction()
                     var
@@ -241,6 +278,7 @@ page 6151570 "NPR AF Setup"
                     Caption = 'Update Site';
                     Image = UpdateXML;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Update Site action';
 
                     trigger OnAction()
                     var
@@ -254,6 +292,7 @@ page 6151570 "NPR AF Setup"
                     Caption = 'Delete Site';
                     Image = Delete;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Delete Site action';
 
                     trigger OnAction()
                     var

@@ -15,6 +15,7 @@ pageextension 6014454 "NPR Purchase Invoice" extends "Purchase Invoice"
             field("NPR PostingDescription"; "Posting Description")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the Posting Description field';
             }
         }
         addafter(Control1906949207)
@@ -35,6 +36,7 @@ pageextension 6014454 "NPR Purchase Invoice" extends "Purchase Invoice"
             {
                 Caption = 'Show Imported File';
                 ApplicationArea = All;
+                ToolTip = 'Executes the Show Imported File action';
 
                 trigger OnAction()
                 var
@@ -60,6 +62,7 @@ pageextension 6014454 "NPR Purchase Invoice" extends "Purchase Invoice"
                     Promoted = true;
                     PromotedCategory = Process;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Retail Print action';
                 }
                 action("NPR PriceLabel")
                 {
@@ -69,6 +72,7 @@ pageextension 6014454 "NPR Purchase Invoice" extends "Purchase Invoice"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Price Label action';
                 }
             }
         }

@@ -15,10 +15,12 @@ page 6151551 "NPR NpXml Template Card"
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field("Xml Root Name"; "Xml Root Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Xml Root Name field';
                 }
                 group(Control6151403)
                 {
@@ -27,11 +29,13 @@ page 6151551 "NPR NpXml Template Card"
                     field("Xml Root Namespace"; "Xml Root Namespace")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Xml Root Namespace field';
                     }
                 }
                 field("Table No."; "Table No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Table No. field';
 
                     trigger OnValidate()
                     begin
@@ -44,12 +48,14 @@ page 6151551 "NPR NpXml Template Card"
                     field(Archived; Archived)
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Archived field';
                     }
                     field("Template Version"; "Template Version")
                     {
                         ApplicationArea = All;
                         AssistEdit = true;
                         Editable = false;
+                        ToolTip = 'Specifies the value of the Version field';
 
                         trigger OnAssistEdit()
                         var
@@ -68,10 +74,12 @@ page 6151551 "NPR NpXml Template Card"
                     {
                         ApplicationArea = All;
                         Editable = false;
+                        ToolTip = 'Specifies the value of the Last Modified at field';
                     }
                     field("Version Description"; "Version Description")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Version Description field';
 
                         trigger OnValidate()
                         begin
@@ -85,6 +93,7 @@ page 6151551 "NPR NpXml Template Card"
                     field("Namespaces Enabled"; "Namespaces Enabled")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Namespaces Enabled field';
                     }
                     part(Namespaces; "NPR NpXml Namespaces")
                     {
@@ -101,15 +110,18 @@ page 6151551 "NPR NpXml Template Card"
                 {
                     ApplicationArea = All;
                     Importance = Promoted;
+                    ToolTip = 'Specifies the value of the Transaction Task field';
                 }
                 field("Task Processor Code"; "Task Processor Code")
                 {
                     ApplicationArea = All;
                     Importance = Promoted;
+                    ToolTip = 'Specifies the value of the Task Processor Code field';
                 }
                 field("Disable Auto Task Setup"; "Disable Auto Task Setup")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Disable Auto Task Setup field';
                 }
                 part(NpXmlTemplateTriggers; "NPR NpXml Template Triggers")
                 {
@@ -126,25 +138,30 @@ page 6151551 "NPR NpXml Template Card"
                 {
                     ApplicationArea = All;
                     Importance = Promoted;
+                    ToolTip = 'Specifies the value of the Batch Task field';
                 }
                 field("Max Records per File"; "Max Records per File")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Max qty. records per XML File field';
                 }
                 field("Batch Last Run"; "Batch Last Run")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Batch Last Run field';
                 }
                 field("Runtime Error"; "Runtime Error")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Runtime Error field';
                 }
                 field("Last Error Message"; "Last Error Message")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Last Error Message field';
                 }
                 part(NpXmlBatchFilters; "NPR NpXml Batch Filters")
                 {
@@ -163,17 +180,20 @@ page 6151551 "NPR NpXml Template Card"
                     ApplicationArea = All;
                     Importance = Additional;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Before Transfer Codeunit ID field';
                 }
                 field("Before Transfer Codeunit Name"; "Before Transfer Codeunit Name")
                 {
                     ApplicationArea = All;
                     Importance = Additional;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Before Transfer Codeunit Name field';
                 }
                 field("Before Transfer Function"; "Before Transfer Function")
                 {
                     ApplicationArea = All;
                     Importance = Additional;
+                    ToolTip = 'Specifies the value of the Before Transfer Function field';
                 }
                 group("File")
                 {
@@ -182,10 +202,12 @@ page 6151551 "NPR NpXml Template Card"
                     {
                         ApplicationArea = All;
                         Importance = Promoted;
+                        ToolTip = 'Specifies the value of the File Transfer field';
                     }
                     field("File Path"; "File Path")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the File Path field';
                     }
                 }
                 group(FTP)
@@ -194,36 +216,44 @@ page 6151551 "NPR NpXml Template Card"
                     {
                         ApplicationArea = All;
                         Importance = Promoted;
+                        ToolTip = 'Specifies the value of the FTP Transfer field';
                     }
                     field("FTP Server"; "FTP Server")
                     {
                         ApplicationArea = All;
                         Importance = Promoted;
+                        ToolTip = 'Specifies the value of the FTP Server field';
                     }
                     field("FTP Username"; "FTP Username")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the FTP Username field';
                     }
                     field("FTP Password"; "FTP Password")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the FTP Password field';
                     }
                     field("FTP Port"; "FTP Port")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the FTP Port field';
                     }
                     field("FTP Passive"; "FTP Passive")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the FTP Passive field';
                     }
                     field("FTP Directory"; "FTP Directory")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the FTP Directory field';
                     }
                     field("FTP Filename (Fixed)"; "FTP Filename (Fixed)")
                     {
                         ApplicationArea = All;
                         Importance = Additional;
+                        ToolTip = 'Specifies the value of the FTP Filename (Fixed) field';
                     }
                 }
                 group(API)
@@ -232,15 +262,18 @@ page 6151551 "NPR NpXml Template Card"
                     {
                         ApplicationArea = All;
                         Importance = Promoted;
+                        ToolTip = 'Specifies the value of the API Transfer field';
                     }
                     field("API Type"; "API Type")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the API Type field';
                     }
                     field("API Url"; "API Url")
                     {
                         ApplicationArea = All;
                         Importance = Promoted;
+                        ToolTip = 'Specifies the value of the API Url field';
                     }
                     group(Control6151411)
                     {
@@ -250,6 +283,7 @@ page 6151551 "NPR NpXml Template Card"
                         {
                             ApplicationArea = All;
                             Importance = Promoted;
+                            ToolTip = 'Specifies the value of the API Method field';
                         }
                     }
                     group(Control6150679)
@@ -260,35 +294,42 @@ page 6151551 "NPR NpXml Template Card"
                         {
                             ApplicationArea = All;
                             ShowMandatory = true;
+                            ToolTip = 'Specifies the value of the API SOAP Action field';
                         }
                     }
                     field("API Username Type"; "API Username Type")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the API Username Type field';
                     }
                     field("API Username"; "API Username")
                     {
                         ApplicationArea = All;
                         Enabled = "API Username Type" = "API Username Type"::Custom;
+                        ToolTip = 'Specifies the value of the API Username field';
                     }
                     field("API Password"; "API Password")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the API Password field';
                     }
                     field("API Content-Type"; "API Content-Type")
                     {
                         ApplicationArea = All;
                         Importance = Additional;
+                        ToolTip = 'Specifies the value of the API Content-Type field';
                     }
                     field("API Authorization"; "API Authorization")
                     {
                         ApplicationArea = All;
                         Importance = Additional;
+                        ToolTip = 'Specifies the value of the API Authorization field';
                     }
                     field("API Accept"; "API Accept")
                     {
                         ApplicationArea = All;
                         Importance = Additional;
+                        ToolTip = 'Specifies the value of the API Accept field';
                     }
                     part("Api Headers"; "NPR NpXml Api Headers")
                     {
@@ -305,17 +346,20 @@ page 6151551 "NPR NpXml Template Card"
                         {
                             ApplicationArea = All;
                             Importance = Additional;
+                            ToolTip = 'Specifies the value of the API Response Path field';
                         }
                     }
                     field("API Response Success Path"; "API Response Success Path")
                     {
                         ApplicationArea = All;
                         Importance = Additional;
+                        ToolTip = 'Specifies the value of the API Response Success Path field';
                     }
                     field("API Response Success Value"; "API Response Success Value")
                     {
                         ApplicationArea = All;
                         Importance = Additional;
+                        ToolTip = 'Specifies the value of the API Response Success Value field';
                     }
                     group(Control6150623)
                     {
@@ -325,10 +369,12 @@ page 6151551 "NPR NpXml Template Card"
                         {
                             ApplicationArea = All;
                             Importance = Additional;
+                            ToolTip = 'Specifies the value of the JSON Root is Array field';
                         }
                         field("Use JSON Numbers"; "Use JSON Numbers")
                         {
                             ApplicationArea = All;
+                            ToolTip = 'Specifies the value of the Use JSON Numbers field';
                         }
                     }
                 }
@@ -351,6 +397,7 @@ page 6151551 "NPR NpXml Template Card"
                 RunObject = Page "NPR NpXml Elements";
                 RunPageLink = "Xml Template Code" = FIELD(Code);
                 ApplicationArea = All;
+                ToolTip = 'Executes the Edit Field Mapping action';
             }
             action("Preview Xml")
             {
@@ -360,6 +407,7 @@ page 6151551 "NPR NpXml Template Card"
                 PromotedCategory = Category4;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Preview Xml action';
 
                 trigger OnAction()
                 var
@@ -378,6 +426,7 @@ page 6151551 "NPR NpXml Template Card"
                 RunObject = Page "NPR NpXml Templ. Chng. History";
                 RunPageLink = "Template Code" = FIELD(Code);
                 ApplicationArea = All;
+                ToolTip = 'Executes the Template History action';
             }
             action("Archived Versions")
             {
@@ -389,6 +438,7 @@ page 6151551 "NPR NpXml Template Card"
                 RunObject = Page "NPR NpXml Templ. Arch. List";
                 RunPageLink = Code = FIELD(Code);
                 ApplicationArea = All;
+                ToolTip = 'Executes the Archived Versions action';
             }
         }
         area(processing)
@@ -401,6 +451,7 @@ page 6151551 "NPR NpXml Template Card"
                 PromotedCategory = Category5;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Init New Version action';
 
                 trigger OnAction()
                 begin
@@ -412,6 +463,7 @@ page 6151551 "NPR NpXml Template Card"
                 Caption = 'Export Xml Template';
                 Image = Export;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Export Xml Template action';
 
                 trigger OnAction()
                 begin
@@ -423,6 +475,7 @@ page 6151551 "NPR NpXml Template Card"
                 Caption = 'Import Template';
                 Image = Import;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Import Template action';
 
                 trigger OnAction()
                 begin
@@ -436,6 +489,7 @@ page 6151551 "NPR NpXml Template Card"
                 Promoted = true;
                 PromotedCategory = Process;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Run Batch action';
 
                 trigger OnAction()
                 begin
@@ -447,6 +501,7 @@ page 6151551 "NPR NpXml Template Card"
                 Caption = 'Schedule Batch Task';
                 Image = NewToDo;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Schedule Batch Task action';
 
                 trigger OnAction()
                 var
@@ -469,6 +524,7 @@ page 6151551 "NPR NpXml Template Card"
                 PromotedCategory = Category5;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Archive Template action';
 
                 trigger OnAction()
                 var

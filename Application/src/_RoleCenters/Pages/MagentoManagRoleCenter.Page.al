@@ -72,6 +72,7 @@ page 6151480 "NPR Magento Manag. Role Center"
                 Caption = 'Item List';
                 RunObject = Page "Item List";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Item List action';
             }
             action("Internet Item List")
             {
@@ -79,6 +80,7 @@ page 6151480 "NPR Magento Manag. Role Center"
                 RunObject = Page "Item List";
                 RunPageLink = "NPR Magento Item" = CONST(true);
                 ApplicationArea = All;
+                ToolTip = 'Executes the Internet Items action';
             }
             action("Magento Item Groups")
             {
@@ -86,6 +88,7 @@ page 6151480 "NPR Magento Manag. Role Center"
                 RunObject = Page "NPR Magento Categories";
                 Visible = false;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Magento Item Groups action';
             }
             action(Brands)
             {
@@ -93,6 +96,7 @@ page 6151480 "NPR Magento Manag. Role Center"
                 RunObject = Page "NPR Magento Brands";
                 Visible = false;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Brands action';
             }
             action(Attributes)
             {
@@ -100,6 +104,7 @@ page 6151480 "NPR Magento Manag. Role Center"
                 RunObject = Page "NPR Magento Attributes";
                 Visible = false;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Attributes action';
             }
             action("Attribute Sets")
             {
@@ -107,6 +112,7 @@ page 6151480 "NPR Magento Manag. Role Center"
                 RunObject = Page "NPR Magento Attribute Sets";
                 Visible = false;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Attribute Sets action';
             }
             action(Pictures)
             {
@@ -114,6 +120,7 @@ page 6151480 "NPR Magento Manag. Role Center"
                 RunObject = Page "NPR Magento Pictures";
                 Visible = false;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Pictures action';
             }
         }
     }

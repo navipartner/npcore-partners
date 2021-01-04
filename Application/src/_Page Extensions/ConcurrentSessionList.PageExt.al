@@ -13,6 +13,7 @@ pageextension 6014490 "NPR Concurrent Session List" extends "Concurrent Session 
                 Promoted = true;
                 PromotedCategory = Category4;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Kill Session action';
             }
         }
     }

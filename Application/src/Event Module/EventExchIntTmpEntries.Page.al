@@ -16,14 +16,17 @@ page 6151579 "NPR Event Exch.Int.Tmp.Entries"
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field(Active; Active)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Active field';
                 }
             }
         }

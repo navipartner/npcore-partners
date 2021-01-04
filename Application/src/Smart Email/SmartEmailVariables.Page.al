@@ -16,15 +16,18 @@ page 6059823 "NPR Smart Email Variables"
                 field("Variable Name"; "Variable Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Variable Name field';
                 }
                 field("Variable Type"; "Variable Type")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Variable Type field';
                 }
                 field("Field No."; "Field No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Field No. field';
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -45,10 +48,12 @@ page 6059823 "NPR Smart Email Variables"
                 field("Field Name"; "Field Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Field Name field';
                 }
                 field("Const Value"; "Const Value")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Const Value field';
                 }
             }
         }

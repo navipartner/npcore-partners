@@ -25,26 +25,31 @@ page 6059833 "NPR Event Res. Avail. Overview"
                     ApplicationArea = All;
                     Caption = 'Resource No. Filter';
                     TableRelation = Resource;
+                    ToolTip = 'Specifies the value of the Resource No. Filter field';
                 }
                 field(StartingDate; StartingDate)
                 {
                     ApplicationArea = All;
                     Caption = 'Starting Date';
+                    ToolTip = 'Specifies the value of the Starting Date field';
                 }
                 field(EndingDate; EndingDate)
                 {
                     ApplicationArea = All;
                     Caption = 'Ending Date';
+                    ToolTip = 'Specifies the value of the Ending Date field';
                 }
                 field(StartingTime; StartingTime)
                 {
                     ApplicationArea = All;
                     Caption = 'Starting Time';
+                    ToolTip = 'Specifies the value of the Starting Time field';
                 }
                 field(EndingTime; EndingTime)
                 {
                     ApplicationArea = All;
                     Caption = 'Ending Time';
+                    ToolTip = 'Specifies the value of the Ending Time field';
                 }
                 field(TimeInterval; TimeInterval)
                 {
@@ -65,14 +70,17 @@ page 6059833 "NPR Event Res. Avail. Overview"
                 {
                     ApplicationArea = All;
                     Caption = 'No.';
+                    ToolTip = 'Specifies the value of the No. field';
                 }
                 field("Starting Time"; "Starting Time")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Starting Time field';
                 }
                 field("Ending Time"; "Ending Time")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Ending Time field';
                 }
                 field("MatrixDataHolder[1]"; MatrixDataHolder[1])
                 {
@@ -80,6 +88,7 @@ page 6059833 "NPR Event Res. Avail. Overview"
                     CaptionClass = '3,' + DateColumnCaption[1];
                     ShowCaption = false;
                     StyleExpr = StyleExpr1;
+                    ToolTip = 'Specifies the value of the MatrixDataHolder[1] field';
                 }
                 field("MatrixDataHolder[2]"; MatrixDataHolder[2])
                 {
@@ -87,6 +96,7 @@ page 6059833 "NPR Event Res. Avail. Overview"
                     CaptionClass = '3,' + DateColumnCaption[2];
                     ShowCaption = false;
                     StyleExpr = StyleExpr2;
+                    ToolTip = 'Specifies the value of the MatrixDataHolder[2] field';
                 }
                 field("MatrixDataHolder[3]"; MatrixDataHolder[3])
                 {
@@ -94,6 +104,7 @@ page 6059833 "NPR Event Res. Avail. Overview"
                     CaptionClass = '3,' + DateColumnCaption[3];
                     ShowCaption = false;
                     StyleExpr = StyleExpr3;
+                    ToolTip = 'Specifies the value of the MatrixDataHolder[3] field';
                 }
                 field("MatrixDataHolder[4]"; MatrixDataHolder[4])
                 {
@@ -101,6 +112,7 @@ page 6059833 "NPR Event Res. Avail. Overview"
                     CaptionClass = '3,' + DateColumnCaption[4];
                     ShowCaption = false;
                     StyleExpr = StyleExpr4;
+                    ToolTip = 'Specifies the value of the MatrixDataHolder[4] field';
                 }
                 field("MatrixDataHolder[5]"; MatrixDataHolder[5])
                 {
@@ -108,6 +120,7 @@ page 6059833 "NPR Event Res. Avail. Overview"
                     CaptionClass = '3,' + DateColumnCaption[5];
                     ShowCaption = false;
                     StyleExpr = StyleExpr5;
+                    ToolTip = 'Specifies the value of the MatrixDataHolder[5] field';
                 }
                 field("MatrixDataHolder[6]"; MatrixDataHolder[6])
                 {
@@ -115,6 +128,7 @@ page 6059833 "NPR Event Res. Avail. Overview"
                     CaptionClass = '3,' + DateColumnCaption[6];
                     ShowCaption = false;
                     StyleExpr = StyleExpr6;
+                    ToolTip = 'Specifies the value of the MatrixDataHolder[6] field';
                 }
                 field("MatrixDataHolder[7]"; MatrixDataHolder[7])
                 {
@@ -122,6 +136,7 @@ page 6059833 "NPR Event Res. Avail. Overview"
                     CaptionClass = '3,' + DateColumnCaption[7];
                     ShowCaption = false;
                     StyleExpr = StyleExpr7;
+                    ToolTip = 'Specifies the value of the MatrixDataHolder[7] field';
                 }
                 field("MatrixDataHolder[8]"; MatrixDataHolder[8])
                 {
@@ -129,6 +144,7 @@ page 6059833 "NPR Event Res. Avail. Overview"
                     CaptionClass = '3,' + DateColumnCaption[8];
                     ShowCaption = false;
                     StyleExpr = StyleExpr8;
+                    ToolTip = 'Specifies the value of the MatrixDataHolder[8] field';
                 }
                 field("MatrixDataHolder[9]"; MatrixDataHolder[9])
                 {
@@ -136,6 +152,7 @@ page 6059833 "NPR Event Res. Avail. Overview"
                     CaptionClass = '3,' + DateColumnCaption[9];
                     ShowCaption = false;
                     StyleExpr = StyleExpr9;
+                    ToolTip = 'Specifies the value of the MatrixDataHolder[9] field';
                 }
                 field("MatrixDataHolder[10]"; MatrixDataHolder[10])
                 {
@@ -143,6 +160,7 @@ page 6059833 "NPR Event Res. Avail. Overview"
                     CaptionClass = '3,' + DateColumnCaption[10];
                     ShowCaption = false;
                     StyleExpr = StyleExpr10;
+                    ToolTip = 'Specifies the value of the MatrixDataHolder[10] field';
                 }
                 field("MatrixDataHolder[11]"; MatrixDataHolder[11])
                 {
@@ -150,6 +168,7 @@ page 6059833 "NPR Event Res. Avail. Overview"
                     CaptionClass = '3,' + DateColumnCaption[11];
                     ShowCaption = false;
                     StyleExpr = StyleExpr11;
+                    ToolTip = 'Specifies the value of the MatrixDataHolder[11] field';
                 }
                 field("MatrixDataHolder[12]"; MatrixDataHolder[12])
                 {
@@ -157,6 +176,7 @@ page 6059833 "NPR Event Res. Avail. Overview"
                     CaptionClass = '3,' + DateColumnCaption[12];
                     ShowCaption = false;
                     StyleExpr = StyleExpr12;
+                    ToolTip = 'Specifies the value of the MatrixDataHolder[12] field';
                 }
             }
         }
@@ -174,6 +194,7 @@ page 6059833 "NPR Event Res. Avail. Overview"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Show action';
 
                 trigger OnAction()
                 begin
@@ -189,6 +210,7 @@ page 6059833 "NPR Event Res. Avail. Overview"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Previous Set action';
 
                 trigger OnAction()
                 begin
@@ -204,6 +226,7 @@ page 6059833 "NPR Event Res. Avail. Overview"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Next Set action';
 
                 trigger OnAction()
                 begin

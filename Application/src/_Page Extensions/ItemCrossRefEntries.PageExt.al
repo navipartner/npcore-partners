@@ -8,6 +8,7 @@ pageextension 6014461 "NPR Item Cross Ref. Entries" extends "Item Cross Referenc
             field("NPR Is Retail Serial No."; "NPR Is Retail Serial No.")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the NPR Is Retail Serial No. field';
             }
         }
     }

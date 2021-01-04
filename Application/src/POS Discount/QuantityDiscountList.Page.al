@@ -21,35 +21,43 @@ page 6014467 "NPR Quantity Discount List"
                 field("Main No."; "Main No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Main no. field';
                 }
                 field("Item No."; "Item No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Item no. field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Starting Date"; "Starting Date")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Starting date field';
                 }
                 field("Closing Date"; "Closing Date")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Closing Date field';
                 }
                 field(Status; Status)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Status field';
                 }
                 field("Global Dimension 1 Code"; "Global Dimension 1 Code")
                 {
                     ApplicationArea = All;
                     Caption = 'Shortcut Dimension 1 Code';
+                    ToolTip = 'Specifies the value of the Shortcut Dimension 1 Code field';
                 }
                 field("Global Dimension 2 Code"; "Global Dimension 2 Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Global Dimension 2 Code field';
                 }
             }
         }
@@ -68,6 +76,7 @@ page 6014467 "NPR Quantity Discount List"
                               "No." = FIELD("Main No.");
                 ShortCutKey = 'Shift+Ctrl+D';
                 ApplicationArea = All;
+                ToolTip = 'Executes the Dimensions action';
             }
         }
     }

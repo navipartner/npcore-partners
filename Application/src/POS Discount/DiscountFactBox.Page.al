@@ -18,6 +18,7 @@ page 6014614 "NPR Discount FactBox"
             {
                 ApplicationArea = All;
                 Caption = 'Mix Discount';
+                ToolTip = 'Specifies the value of the Mix Discount field';
 
                 trigger OnAssistEdit()
                 var
@@ -35,6 +36,7 @@ page 6014614 "NPR Discount FactBox"
             {
                 ApplicationArea = All;
                 Caption = 'Period Discount';
+                ToolTip = 'Specifies the value of the Period Discount field';
 
                 trigger OnDrillDown()
                 var
@@ -52,6 +54,7 @@ page 6014614 "NPR Discount FactBox"
             {
                 ApplicationArea = All;
                 Caption = 'Multiple Unit Price';
+                ToolTip = 'Specifies the value of the Multiple Unit Price field';
 
                 trigger OnAssistEdit()
                 var

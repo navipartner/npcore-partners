@@ -21,6 +21,7 @@ page 6151020 "NPR NpRv Sales Line Ref."
                 field("Reference No."; "Reference No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Reference No. field';
                 }
             }
         }

@@ -158,6 +158,7 @@ report 6059904 "NPR Adjust Item Cost/Price TQ"
                         Caption = 'Adjust';
                         OptionCaption = 'Item Card,Stockkeeping Unit Card';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Adjust field';
 
                         trigger OnValidate()
                         begin
@@ -169,6 +170,7 @@ report 6059904 "NPR Adjust Item Cost/Price TQ"
                         Caption = 'Adjust Field';
                         OptionCaption = 'Unit Price,Profit %,Indirect Cost %,Last Direct Cost,Standard Cost';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Adjust Field field';
 
                         trigger OnValidate()
                         begin
@@ -186,12 +188,14 @@ report 6059904 "NPR Adjust Item Cost/Price TQ"
                         DecimalPlaces = 0 : 5;
                         MinValue = 0;
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Adjustment Factor field';
                     }
                     field("Rounding_Method"; RoundingMethod.Code)
                     {
                         Caption = 'Rounding Method';
                         TableRelation = "Rounding Method";
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Rounding Method field';
                     }
                 }
             }

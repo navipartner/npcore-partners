@@ -18,15 +18,18 @@ page 6150680 "NPR NPRE Print/Prod. Categ."
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Print Tag"; "Print Tag")
                 {
                     ApplicationArea = All;
                     Visible = ShowPrintTags;
+                    ToolTip = 'Specifies the value of the Print Tag field';
                 }
             }
         }

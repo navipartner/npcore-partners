@@ -26,14 +26,17 @@ page 6014529 "NPR Touch Screen: Balanc.Line"
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Type field';
                 }
                 field(Quantity; Quantity)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Quantity field';
                 }
                 field(Amount; Amount)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Amount field';
                 }
             }
             group(Control6150621)
@@ -44,6 +47,7 @@ page 6014529 "NPR Touch Screen: Balanc.Line"
                     ApplicationArea = All;
                     Caption = 'Total';
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Total field';
                 }
             }
         }
@@ -59,6 +63,7 @@ page 6014529 "NPR Touch Screen: Balanc.Line"
                 Image = Totals;
                 Promoted = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Or set total action';
 
                 trigger OnAction()
                 var

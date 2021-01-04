@@ -144,12 +144,14 @@ report 6014550 "NPR Statement E-Mail"
                     {
                         Caption = 'Show Overdue Entries';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Show Overdue Entries field';
                     }
                     field(IncludeAllCustomerswithLE; PrintAllHavingEntry)
                     {
                         Caption = 'Include All Customers with Ledger Entries';
                         MultiLine = true;
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Include All Customers with Ledger Entries field';
 
                         trigger OnValidate()
                         begin
@@ -162,6 +164,7 @@ report 6014550 "NPR Statement E-Mail"
                         Caption = 'Include All Customers with a Balance';
                         MultiLine = true;
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Include All Customers with a Balance field';
 
                         trigger OnValidate()
                         begin
@@ -173,43 +176,51 @@ report 6014550 "NPR Statement E-Mail"
                     {
                         Caption = 'Include Reversed Entries';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Include Reversed Entries field';
                     }
                     field(IncludeUnappliedEntries; PrintUnappliedEntries)
                     {
                         Caption = 'Include Unapplied Entries';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Include Unapplied Entries field';
                     }
                     field(IncludeAgingBand; IncludeAgingBand)
                     {
                         Caption = 'Include Aging Band';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Include Aging Band field';
                     }
                     field(AgingBandPeriodLengt; PeriodLength)
                     {
                         Caption = 'Aging Band Period Length';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Aging Band Period Length field';
                     }
                     field(AgingBandby; DateChoice)
                     {
                         Caption = 'Aging Band by';
                         OptionCaption = 'Due Date,Posting Date';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Aging Band by field';
                     }
                     field(LogInteraction; LogInteraction)
                     {
                         Caption = 'Log Interaction';
                         Enabled = LogInteractionEnable;
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Log Interaction field';
                     }
                     field(StartDate; StartDate)
                     {
                         Caption = 'Start Date';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Start Date field';
                     }
                     field(EndDate; EndDate)
                     {
                         Caption = 'End Date';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the End Date field';
                     }
                 }
                 group("Output Options")
@@ -220,6 +231,7 @@ report 6014550 "NPR Statement E-Mail"
                         Caption = 'Report Output';
                         OptionCaption = 'Send now,Send through NaviDocs';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Report Output field';
 
                         trigger OnValidate()
                         begin
@@ -243,6 +255,7 @@ report 6014550 "NPR Statement E-Mail"
                         field("Delay sending until"; NaviDocsDelayUntil)
                         {
                             ApplicationArea = All;
+                            ToolTip = 'Specifies the value of the NaviDocsDelayUntil field';
                         }
                     }
                 }

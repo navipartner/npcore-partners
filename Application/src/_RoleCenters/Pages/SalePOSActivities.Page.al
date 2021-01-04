@@ -19,6 +19,7 @@ page 6059986 "NPR Sale POS Activities"
                 {
                     ApplicationArea = All;
                     DrillDownPageID = "NPR TouchScreen: Saved sales";
+                    ToolTip = 'Specifies the value of the Saved Sales field';
                 }
             }
         }

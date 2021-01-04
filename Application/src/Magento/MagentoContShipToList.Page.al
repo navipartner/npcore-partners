@@ -19,23 +19,28 @@ page 6151459 "NPR Magento Cont. ShipTo List"
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Customer No. field';
                 }
                 field("Created By Contact No."; "Created By Contact No.")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Created By Contact No. field';
                 }
                 field("Ship-to Code"; "Ship-to Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Ship-to Code field';
                 }
                 field("Created At"; "Created At")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Created At field';
                 }
                 field(Visibility; Visibility)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Visibility field';
                 }
             }
         }

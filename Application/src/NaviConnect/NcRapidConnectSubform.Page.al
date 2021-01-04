@@ -19,24 +19,29 @@ page 6151092 "NPR Nc RapidConnect Subform"
                 field("Table ID"; "Table ID")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Table ID field';
                 }
                 field("Table Name"; "Table Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Table Name field';
                 }
                 field("Insert Trigger"; "Insert Trigger")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Insert Trigger field';
                 }
                 field("Modify Trigger"; "Modify Trigger")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Modify Trigger field';
                 }
                 field(Control6151408; "Trigger Fields")
                 {
                     ApplicationArea = All;
                     HideValue = ("Modify Trigger" <> 2);
                     ShowCaption = false;
+                    ToolTip = 'Specifies the value of the Trigger Fields field';
                 }
             }
         }
@@ -54,6 +59,7 @@ page 6151092 "NPR Nc RapidConnect Subform"
                               "Table ID" = FIELD("Table ID");
                 Visible = ("Modify Trigger" = 2);
                 ApplicationArea = All;
+                ToolTip = 'Executes the Trigger Fields action';
             }
         }
     }

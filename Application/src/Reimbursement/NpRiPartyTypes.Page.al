@@ -17,27 +17,33 @@ page 6151104 "NPR NpRi Party Types"
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Table No."; "Table No.")
                 {
                     ApplicationArea = All;
                     ShowMandatory = true;
+                    ToolTip = 'Specifies the value of the Table No. field';
                 }
                 field("Table Name"; "Table Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Table Name field';
                 }
                 field("Reimburse every"; "Reimburse every")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Reimburse every field';
                 }
                 field("Next Posting Date Calculation"; "Next Posting Date Calculation")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Next Posting Date Calculation field';
                 }
             }
         }

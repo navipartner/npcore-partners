@@ -32,10 +32,12 @@ page 6151414 "NPR Magento Category Card"
                     field(Id; Id)
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Id field';
                     }
                     field(Name; Name)
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Name field';
 
                         trigger OnValidate()
                         begin
@@ -55,6 +57,7 @@ page 6151414 "NPR Magento Category Card"
                         ApplicationArea = All;
                         AssistEdit = true;
                         Caption = 'Description';
+                        ToolTip = 'Specifies the value of the Description field';
 
                         trigger OnAssistEdit()
                         var
@@ -73,6 +76,7 @@ page 6151414 "NPR Magento Category Card"
                     {
                         ApplicationArea = All;
                         Caption = 'Short Description';
+                        ToolTip = 'Specifies the value of the Short Description field';
 
                         trigger OnAssistEdit()
                         var
@@ -92,6 +96,7 @@ page 6151414 "NPR Magento Category Card"
                     field(Picture; Picture)
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Picture field';
                     }
                 }
                 group(Control6150620)
@@ -101,38 +106,47 @@ page 6151414 "NPR Magento Category Card"
                     field("Is Active"; "Is Active")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Is Active field';
                     }
                     field("Is Anchor"; "Is Anchor")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Is Anchor field';
                     }
                     field("Show In Navigation Menu"; "Show In Navigation Menu")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Show In Navigation Menu field';
                     }
                     field("Seo Link"; "Seo Link")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Seo Link field';
                     }
                     field("Meta Title"; "Meta Title")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Meta Title field';
                     }
                     field("Meta Keywords"; "Meta Keywords")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Meta Keywords field';
                     }
                     field("Meta Description"; "Meta Description")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Meta Description field';
                     }
                     field("Sorting"; Sorting)
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Sorting field';
                     }
                     field(Icon; Icon)
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Icon field';
                     }
                 }
             }
@@ -177,6 +191,7 @@ page 6151414 "NPR Magento Category Card"
                 Image = ViewPage;
                 Visible = DisplayConfigVisible;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Display Config action';
 
                 trigger OnAction()
                 var

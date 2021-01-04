@@ -19,16 +19,19 @@ page 6151535 "NPR Nc Coll. Create Outg. Req."
                 field(Name; Name)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Name field';
                 }
                 field("Table No."; "Table No.")
                 {
                     ApplicationArea = All;
                     Lookup = true;
                     TableRelation = Object.ID WHERE(Type = CONST(Table));
+                    ToolTip = 'Specifies the value of the Table No. field';
                 }
                 field("Table View"; "Table View")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Table View field';
                 }
             }
         }
@@ -43,6 +46,7 @@ page 6151535 "NPR Nc Coll. Create Outg. Req."
                 Caption = 'Create Request';
                 Image = "SelectEntries";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Create Request action';
 
                 trigger OnAction()
                 begin

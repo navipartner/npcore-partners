@@ -17,66 +17,82 @@ page 6059967 "NPR MPOS Nets Trans. Card"
                 field("Transaction No."; "Transaction No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Transaction No. field';
                 }
                 field("Register No."; "Register No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Cash Register No. field';
                 }
                 field("Sales Ticket No."; "Sales Ticket No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Sales Ticket No. field';
                 }
                 field("Sales Line No."; "Sales Line No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Sales Line No. field';
                 }
                 field("Session Id"; "Session Id")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Session Id field';
                 }
                 field("Merchant Reference"; "Merchant Reference")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Merchant Reference field';
                 }
                 field("Payment Amount In Cents"; "Payment Amount In Cents")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Payment Amount In Cents field';
                 }
                 field("Currency Code"; "Currency Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Currency Code field';
                 }
                 field("Created Date"; "Created Date")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Created Date field';
                 }
                 field("Modify Date"; "Modify Date")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Modify Date field';
                 }
                 field(Amount; Amount)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Amount field';
                 }
                 field(Handled; Handled)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Handled field';
                 }
                 field("Transaction Type"; "Transaction Type")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Transaction Type field';
                 }
                 field("Payment Gateway"; "Payment Gateway")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Payment Gateway field';
                 }
                 field("Merchant Id"; "Merchant Id")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Merchant Id field';
                 }
                 field("EFT Transaction Entry No."; "EFT Transaction Entry No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the EFT Transaction Entry No. field';
                 }
             }
             group("Callback Data")
@@ -85,130 +101,162 @@ page 6059967 "NPR MPOS Nets Trans. Card"
                 field("Callback Result"; "Callback Result")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Callback Result field';
                 }
                 field("Callback AccumulatorUpdate"; "Callback AccumulatorUpdate")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Callback AccumulatorUpdate field';
                 }
                 field("Callback IssuerId"; "Callback IssuerId")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Callback IssuerId field';
                 }
                 field("Callback TruncatedPan"; "Callback TruncatedPan")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Callback TruncatedPan field';
                 }
                 field("Callback EncryptedPan"; "Callback EncryptedPan")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Callback EncryptedPan field';
                 }
                 field("Callback Timestamp"; "Callback Timestamp")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Callback Timestamp field';
                 }
                 field("Callback VerificationMethod"; "Callback VerificationMethod")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Callback VerificationMethod field';
                 }
                 field("Callback SessionNumber"; "Callback SessionNumber")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Callback SessionNumber field';
                 }
                 field("Callback StanAuth"; "Callback StanAuth")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Callback StanAuth field';
                 }
                 field("Callback SequenceNumber"; "Callback SequenceNumber")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Callback SequenceNumber field';
                 }
                 field("Callback TotalAmount"; "Callback TotalAmount")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Callback TotalAmount field';
                 }
                 field("Callback TipAmount"; "Callback TipAmount")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Callback TipAmount field';
                 }
                 field("Callback SurchargeAmount"; "Callback SurchargeAmount")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Callback SurchargeAmount field';
                 }
                 field("Callback TerminalID"; "Callback TerminalID")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Callback TerminalID field';
                 }
                 field("Callback AcquiereMerchantID"; "Callback AcquiereMerchantID")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Callback AcquiereMerchantID field';
                 }
                 field("Callback CardIssuerName"; "Callback CardIssuerName")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Callback CardIssuerName field';
                 }
                 field("Callback TCC"; "Callback TCC")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Callback TCC field';
                 }
                 field("Callback AID"; "Callback AID")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Callback AID field';
                 }
                 field("Callback TVR"; "Callback TVR")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Callback TVR field';
                 }
                 field("Callback TSI"; "Callback TSI")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Callback TSI field';
                 }
                 field("Callback ATC"; "Callback ATC")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Callback ATC field';
                 }
                 field("Callback AED"; "Callback AED")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Callback AED field';
                 }
                 field("Callback IAC"; "Callback IAC")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Callback IAC field';
                 }
                 field("Callback OrganisationNumber"; "Callback OrganisationNumber")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Callback OrganisationNumber field';
                 }
                 field("Callback BankAgent"; "Callback BankAgent")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Callback BankAgent field';
                 }
                 field("Callback AccountType"; "Callback AccountType")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Callback AccountType field';
                 }
                 field("Callback OptionalData"; "Callback OptionalData")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Callback OptionalData field';
                 }
                 field("Callback ResponseCode"; "Callback ResponseCode")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Callback ResponseCode field';
                 }
                 field("Callback RejectionSource"; "Callback RejectionSource")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Callback RejectionSource field';
                 }
                 field("Callback RejectionReason"; "Callback RejectionReason")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Callback RejectionReason field';
                 }
                 field("Callback MerchantReference"; "Callback MerchantReference")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Callback MerchantReference field';
                 }
                 field("Callback StatusDescription"; "Callback StatusDescription")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Callback StatusDescription field';
                 }
             }
             group(Data)
@@ -220,6 +268,7 @@ page 6059967 "NPR MPOS Nets Trans. Card"
                     Caption = 'Request';
                     Editable = false;
                     MultiLine = true;
+                    ToolTip = 'Specifies the value of the Request field';
                 }
                 field(ResponseData; ResponseData)
                 {
@@ -227,6 +276,7 @@ page 6059967 "NPR MPOS Nets Trans. Card"
                     Caption = 'Response';
                     Editable = false;
                     MultiLine = true;
+                    ToolTip = 'Specifies the value of the Response field';
                 }
             }
             group(Receipt)
@@ -238,6 +288,7 @@ page 6059967 "NPR MPOS Nets Trans. Card"
                     Caption = 'ReceiptData1';
                     Editable = false;
                     MultiLine = true;
+                    ToolTip = 'Specifies the value of the ReceiptData1 field';
                 }
                 field(ReceiptData2; ReceiptData2)
                 {
@@ -245,6 +296,7 @@ page 6059967 "NPR MPOS Nets Trans. Card"
                     Caption = 'ReceiptData2';
                     Editable = false;
                     MultiLine = true;
+                    ToolTip = 'Specifies the value of the ReceiptData2 field';
                 }
             }
         }

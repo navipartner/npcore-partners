@@ -20,6 +20,7 @@ page 6151330 "NPR Voucher Cue"
                 {
                     ApplicationArea = All;
                     DrillDownPageId = "NPR NpRv Vouchers";
+                    ToolTip = 'Specifies the value of the Retail Vouchers field';
                     //Visible = VisibilityRetailVoucher;
 
                 }
@@ -28,6 +29,7 @@ page 6151330 "NPR Voucher Cue"
                 {
                     ApplicationArea = All;
                     DrillDownPageId = "NPR Gift Voucher List";
+                    ToolTip = 'Specifies the value of the Gift Vouchers field';
                     //Visible = VisibilityGiftVoucher;
                 }
 
@@ -36,6 +38,7 @@ page 6151330 "NPR Voucher Cue"
                     ApplicationArea = All;
                     DrillDownPageId = "NPR Credit Voucher List";
                     Visible = VisibilityCreditVoucher;
+                    ToolTip = 'Specifies the value of the Credit Vouchers field';
                     //Visible = false;
                 }
 

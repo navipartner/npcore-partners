@@ -15,10 +15,12 @@ page 6014584 "NPR TouchScreen: Valid. Ticket"
                 HideValue = true;
                 Style = Strong;
                 StyleExpr = TRUE;
+                ToolTip = 'Specifies the value of the Scan Ticket field';
             }
             field(Input; Validering)
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the Validering field';
 
                 trigger OnValidate()
                 begin
@@ -30,6 +32,7 @@ page 6014584 "NPR TouchScreen: Valid. Ticket"
                 ApplicationArea = All;
                 Editable = false;
                 MultiLine = true;
+                ToolTip = 'Specifies the value of the MessageText field';
             }
         }
     }
@@ -47,6 +50,7 @@ page 6014584 "NPR TouchScreen: Valid. Ticket"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Close action';
 
                 trigger OnAction()
                 begin

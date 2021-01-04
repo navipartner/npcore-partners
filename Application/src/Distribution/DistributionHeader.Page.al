@@ -17,18 +17,22 @@ page 6151057 "NPR Distribution Header"
                 field("Distribution Group"; "Distribution Group")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Distribution Group field';
                 }
                 field("Item Hiearachy"; "Item Hiearachy")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Item Hiearachy field';
                 }
                 field("Distribution Type"; "Distribution Type")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Distribution Type field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
             }
         }
@@ -46,6 +50,7 @@ page 6151057 "NPR Distribution Header"
                 RunObject = Page "NPR Distribution Lines";
                 RunPageLink = "Distribution Id" = FIELD("Distribution Id");
                 ApplicationArea = All;
+                ToolTip = 'Executes the Distribution Lines action';
             }
         }
     }

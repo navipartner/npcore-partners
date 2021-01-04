@@ -18,30 +18,37 @@ page 6059998 "NPR Scanner Service Log Card"
                 field(Id; Id)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Id field';
                 }
                 field("Request Start"; "Request Start")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Request Start field';
                 }
                 field("Request End"; "Request End")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Request End field';
                 }
                 field("Request Function"; "Request Function")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Request Function field';
                 }
                 field("Internal Request"; "Internal Request")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Internal Request field';
                 }
                 field("Internal Log No."; "Internal Log No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Internal Log No. field';
                 }
                 field("Current User"; "Current User")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Current User field';
                 }
             }
             group(XML)
@@ -53,6 +60,7 @@ page 6059998 "NPR Scanner Service Log Card"
                     Editable = false;
                     MultiLine = true;
                     ShowCaption = false;
+                    ToolTip = 'Specifies the value of the RequestData field';
                 }
                 field(ResponseData; ResponseData)
                 {
@@ -60,6 +68,7 @@ page 6059998 "NPR Scanner Service Log Card"
                     Editable = false;
                     MultiLine = true;
                     ShowCaption = false;
+                    ToolTip = 'Specifies the value of the ResponseData field';
                 }
             }
             group("XML Debug")
@@ -69,6 +78,7 @@ page 6059998 "NPR Scanner Service Log Card"
                 field("Debug Request Data"; "Debug Request Data")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Debug Request Data field';
                 }
                 field(ResponseDataDebug; ResponseDataDebug)
                 {
@@ -76,6 +86,7 @@ page 6059998 "NPR Scanner Service Log Card"
                     Editable = false;
                     MultiLine = true;
                     ShowCaption = false;
+                    ToolTip = 'Specifies the value of the ResponseDataDebug field';
                 }
             }
         }
@@ -93,6 +104,7 @@ page 6059998 "NPR Scanner Service Log Card"
                     Caption = 'Run Request';
                     Image = Return;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Run Request action';
 
                     trigger OnAction()
                     begin

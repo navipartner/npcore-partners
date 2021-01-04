@@ -12,6 +12,7 @@ page 6151222 "NPR PrintNode Printer Settings"
                 {
                     Caption = 'Tray';
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Tray field';
 
                     trigger OnAssistEdit()
                     var
@@ -28,6 +29,7 @@ page 6151222 "NPR PrintNode Printer Settings"
                 {
                     Caption = 'Color';
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Color field';
                     trigger OnAssistEdit()
                     var
                         Value: Text;
@@ -43,6 +45,7 @@ page 6151222 "NPR PrintNode Printer Settings"
                 {
                     Caption = 'Page Orientation';
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Page Orientation field';
                     trigger OnAssistEdit()
                     var
                         Value: Text;
@@ -59,6 +62,7 @@ page 6151222 "NPR PrintNode Printer Settings"
                 {
                     Caption = 'Duplex';
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Duplex field';
                     trigger OnAssistEdit()
                     var
                         Value: Text;
@@ -75,6 +79,7 @@ page 6151222 "NPR PrintNode Printer Settings"
                 {
                     Caption = 'Paper';
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Paper field';
                     trigger OnAssistEdit()
                     var
                         Value: Text;
@@ -98,6 +103,7 @@ page 6151222 "NPR PrintNode Printer Settings"
             action(ActionName)
             {
                 ApplicationArea = All;
+                ToolTip = 'Executes the ActionName action';
 
                 trigger OnAction()
                 begin

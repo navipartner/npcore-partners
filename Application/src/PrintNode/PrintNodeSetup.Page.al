@@ -14,6 +14,7 @@ page 6151220 "NPR PrintNode Setup"
                 field("API Key"; "API Key")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the API Key field';
                 }
             }
         }
@@ -31,6 +32,7 @@ page 6151220 "NPR PrintNode Setup"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedOnly = true;
+                ToolTip = 'Executes the Test Connection action';
 
                 trigger OnAction()
                 var

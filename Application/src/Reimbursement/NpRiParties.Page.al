@@ -17,22 +17,27 @@ page 6151105 "NPR NpRi Parties"
                 field("Party Type"; "Party Type")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Party Type field';
                 }
                 field("No."; "No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the No. field';
                 }
                 field(Name; Name)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Name field';
                 }
                 field("Reimburse every"; "Reimburse every")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Reimburse every field';
                 }
                 field("Next Posting Date Calculation"; "Next Posting Date Calculation")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Next Posting Date Calculation field';
                 }
             }
         }
@@ -50,6 +55,7 @@ page 6151105 "NPR NpRi Parties"
                 RunPageLink = "Party Type" = FIELD("Party Type"),
                               "Party No." = FIELD("No.");
                 ApplicationArea = All;
+                ToolTip = 'Executes the Reimbursements action';
             }
         }
     }

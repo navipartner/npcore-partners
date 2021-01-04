@@ -22,6 +22,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                 ApplicationArea = All;
                 Caption = 'Batch Name';
                 Lookup = true;
+                ToolTip = 'Specifies the value of the Batch Name field';
 
                 trigger OnLookup(var Text: Text): Boolean
                 begin
@@ -42,19 +43,23 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                 field("Posting Date"; "Posting Date")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Posting Date field';
                 }
                 field("Document Date"; "Document Date")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Document Date field';
                 }
                 field("Document No."; "Document No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Document No. field';
                 }
                 field("Item No."; "Item No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Item No. field';
 
                     trigger OnValidate()
                     begin
@@ -70,35 +75,42 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Variant Code field';
                 }
                 field("Cross-Reference No."; "Cross-Reference No.")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Cross-Reference No. field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Shortcut Dimension 1 Code"; "Shortcut Dimension 1 Code")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Shortcut Dimension 1 Code field';
                 }
                 field("New Shortcut Dimension 1 Code"; "New Shortcut Dimension 1 Code")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the New Shortcut Dimension 1 Code field';
                 }
                 field("Shortcut Dimension 2 Code"; "Shortcut Dimension 2 Code")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Shortcut Dimension 2 Code field';
                 }
                 field("New Shortcut Dimension 2 Code"; "New Shortcut Dimension 2 Code")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the New Shortcut Dimension 2 Code field';
                 }
                 field("ShortcutDimCode[3]"; ShortcutDimCode[3])
                 {
@@ -109,6 +121,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                                                                   "Dimension Value Type" = CONST(Standard),
                                                                   Blocked = CONST(false));
                     Visible = false;
+                    ToolTip = 'Specifies the value of the ShortcutDimCode[3] field';
 
                     trigger OnValidate()
                     begin
@@ -121,6 +134,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                     CaptionClass = Text000;
                     ShowCaption = false;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the NewShortcutDimCode[3] field';
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -142,6 +156,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                                                                   "Dimension Value Type" = CONST(Standard),
                                                                   Blocked = CONST(false));
                     Visible = false;
+                    ToolTip = 'Specifies the value of the ShortcutDimCode[4] field';
 
                     trigger OnValidate()
                     begin
@@ -154,6 +169,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                     CaptionClass = Text001;
                     ShowCaption = false;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the NewShortcutDimCode[4] field';
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -175,6 +191,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                                                                   "Dimension Value Type" = CONST(Standard),
                                                                   Blocked = CONST(false));
                     Visible = false;
+                    ToolTip = 'Specifies the value of the ShortcutDimCode[5] field';
 
                     trigger OnValidate()
                     begin
@@ -187,6 +204,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                     CaptionClass = Text002;
                     ShowCaption = false;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the NewShortcutDimCode[5] field';
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -208,6 +226,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                                                                   "Dimension Value Type" = CONST(Standard),
                                                                   Blocked = CONST(false));
                     Visible = false;
+                    ToolTip = 'Specifies the value of the ShortcutDimCode[6] field';
 
                     trigger OnValidate()
                     begin
@@ -220,6 +239,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                     CaptionClass = Text003;
                     ShowCaption = false;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the NewShortcutDimCode[6] field';
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -241,6 +261,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                                                                   "Dimension Value Type" = CONST(Standard),
                                                                   Blocked = CONST(false));
                     Visible = false;
+                    ToolTip = 'Specifies the value of the ShortcutDimCode[7] field';
 
                     trigger OnValidate()
                     begin
@@ -253,6 +274,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                     CaptionClass = Text004;
                     ShowCaption = false;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the NewShortcutDimCode[7] field';
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -274,6 +296,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                                                                   "Dimension Value Type" = CONST(Standard),
                                                                   Blocked = CONST(false));
                     Visible = false;
+                    ToolTip = 'Specifies the value of the ShortcutDimCode[8] field';
 
                     trigger OnValidate()
                     begin
@@ -286,6 +309,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                     CaptionClass = Text005;
                     ShowCaption = false;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the NewShortcutDimCode[8] field';
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -302,6 +326,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                 {
                     ApplicationArea = All;
                     Visible = true;
+                    ToolTip = 'Specifies the value of the Location Code field';
 
                     trigger OnValidate()
                     var
@@ -314,11 +339,13 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Bin Code field';
                 }
                 field("New Location Code"; "New Location Code")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the New Location Code field';
 
                     trigger OnValidate()
                     var
@@ -331,58 +358,70 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the New Bin Code field';
                 }
                 field("Salespers./Purch. Code"; "Salespers./Purch. Code")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Salespers./Purch. Code field';
                 }
                 field("Gen. Bus. Posting Group"; "Gen. Bus. Posting Group")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Gen. Bus. Posting Group field';
                 }
                 field("Gen. Prod. Posting Group"; "Gen. Prod. Posting Group")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Gen. Prod. Posting Group field';
                 }
                 field(Quantity; Quantity)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Quantity field';
                 }
                 field("Unit of Measure Code"; "Unit of Measure Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Unit of Measure Code field';
                 }
                 field("Unit Amount"; "Unit Amount")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Unit Amount field';
                 }
                 field(Amount; Amount)
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Amount field';
                 }
                 field("Indirect Cost %"; "Indirect Cost %")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Indirect Cost % field';
                 }
                 field("Unit Cost"; "Unit Cost")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Unit Cost field';
                 }
                 field("Applies-to Entry"; "Applies-to Entry")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Applies-to Entry field';
                 }
                 field("Reason Code"; "Reason Code")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Reason Code field';
                 }
             }
             group(Control22)
@@ -399,6 +438,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                             ApplicationArea = All;
                             Editable = false;
                             ShowCaption = false;
+                            ToolTip = 'Specifies the value of the ItemDescription field';
                         }
                     }
                 }
@@ -434,6 +474,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                     Image = Dimensions;
                     ShortCutKey = 'Shift+Ctrl+D';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Dimensions action';
 
                     trigger OnAction()
                     begin
@@ -447,6 +488,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                     Image = ItemTrackingLines;
                     ShortCutKey = 'Shift+Ctrl+I';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Item &Tracking Lines action';
 
                     trigger OnAction()
                     begin
@@ -463,6 +505,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                                   "Variant Code" = FIELD("Variant Code");
                     RunPageView = SORTING("Location Code", "Item No.", "Variant Code");
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Bin Contents action';
                 }
             }
             group("&Item")
@@ -477,6 +520,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                     RunPageLink = "No." = FIELD("Item No.");
                     ShortCutKey = 'Shift+F7';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Card action';
                 }
                 action("Ledger E&ntries")
                 {
@@ -490,6 +534,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                     RunPageView = SORTING("Item No.");
                     ShortCutKey = 'Ctrl+F7';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Ledger E&ntries action';
                 }
                 group("Item Availability by")
                 {
@@ -500,6 +545,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                         Caption = 'Event';
                         Image = "Event";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Event action';
 
                         trigger OnAction()
                         begin
@@ -511,6 +557,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                         Caption = 'Period';
                         Image = Period;
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Period action';
 
                         trigger OnAction()
                         begin
@@ -522,6 +569,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                         Caption = 'Variant';
                         Image = ItemVariant;
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Variant action';
 
                         trigger OnAction()
                         begin
@@ -534,6 +582,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                         Caption = 'Location';
                         Image = Warehouse;
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Location action';
 
                         trigger OnAction()
                         begin
@@ -545,6 +594,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                         Caption = 'BOM Level';
                         Image = BOMLevel;
                         ApplicationArea = All;
+                        ToolTip = 'Executes the BOM Level action';
 
                         trigger OnAction()
                         begin
@@ -566,6 +616,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                     Image = ExplodeBOM;
                     RunObject = Codeunit "Item Jnl.-Explode BOM";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the E&xplode BOM action';
                 }
                 separator(Separator52)
                 {
@@ -577,6 +628,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                     Ellipsis = true;
                     Image = GetBinContent;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Get Bin Content action';
 
                     trigger OnAction()
                     var
@@ -601,6 +653,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                     Ellipsis = true;
                     Image = TestReport;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Test Report action';
 
                     trigger OnAction()
                     begin
@@ -616,6 +669,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                     PromotedIsBig = true;
                     ShortCutKey = 'F9';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the P&ost action';
 
                     trigger OnAction()
                     begin
@@ -633,6 +687,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                     PromotedIsBig = true;
                     ShortCutKey = 'Shift+F9';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Post and &Print action';
 
                     trigger OnAction()
                     begin
@@ -650,6 +705,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                 Promoted = true;
                 PromotedCategory = Process;
                 ApplicationArea = All;
+                ToolTip = 'Executes the &Print action';
 
                 trigger OnAction()
                 var

@@ -20,10 +20,12 @@ page 6151027 "NPR NpRv Partner Card"
                     {
                         ApplicationArea = All;
                         ShowMandatory = true;
+                        ToolTip = 'Specifies the value of the Code field';
                     }
                     field(Name; Name)
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Name field';
                     }
                 }
                 group(Control6014408)
@@ -33,16 +35,19 @@ page 6151027 "NPR NpRv Partner Card"
                     {
                         ApplicationArea = All;
                         ShowMandatory = true;
+                        ToolTip = 'Specifies the value of the Service Url field';
                     }
                     field("Service Username"; "Service Username")
                     {
                         ApplicationArea = All;
                         ShowMandatory = true;
+                        ToolTip = 'Specifies the value of the Service Username field';
                     }
                     field("Service Password"; "Service Password")
                     {
                         ApplicationArea = All;
                         ShowMandatory = true;
+                        ToolTip = 'Specifies the value of the Service Password field';
                     }
                 }
             }
@@ -61,6 +66,7 @@ page 6151027 "NPR NpRv Partner Card"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Validate Partner Setup action';
 
                 trigger OnAction()
                 var

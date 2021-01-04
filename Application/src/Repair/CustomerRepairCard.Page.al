@@ -33,6 +33,7 @@ page 6014503 "NPR Customer Repair Card"
                 field("No."; "No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the No. field';
 
                     trigger OnAssistEdit()
                     begin
@@ -44,10 +45,12 @@ page 6014503 "NPR Customer Repair Card"
                 {
                     ApplicationArea = All;
                     Caption = 'Customer Type';
+                    ToolTip = 'Specifies the value of the Customer Type field';
                 }
                 field("Customer No."; "Customer No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Customer No. field';
 
                     trigger OnDrillDown()
                     begin
@@ -64,60 +67,74 @@ page 6014503 "NPR Customer Repair Card"
                 field(Name; Name)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Name field';
                 }
                 field(Address; Address)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Address field';
                 }
                 field("Address 2"; "Address 2")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Address 2 field';
                 }
                 field("Post Code"; "Post Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Post Code field';
                 }
                 field(City; City)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the City field';
                 }
                 field("Contact Person"; "Contact Person")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Contact Person field';
                 }
                 field("Phone No."; "Phone No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Phone No. field';
                 }
                 field("Mobile Phone No."; "Mobile Phone No.")
                 {
                     ApplicationArea = All;
                     ShowMandatory = true;
+                    ToolTip = 'Specifies the value of the Mobile Phone No. field';
                 }
                 field("E-mail"; "E-mail")
                 {
                     ApplicationArea = All;
                     ShowMandatory = true;
+                    ToolTip = 'Specifies the value of the E-mail field';
                 }
                 field(Location; Location)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Location field';
                 }
                 field("Bag No"; "Bag No")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Bag No field';
                 }
                 field("Contact after"; "Contact after")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Contact After field';
                 }
                 field("Delivery reff."; "Delivery reff.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Delivery Reff. field';
                 }
                 field(Finalized; Finalized)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Finalized field';
                 }
             }
             group("Repairer Details")
@@ -126,6 +143,7 @@ page 6014503 "NPR Customer Repair Card"
                 field("In-house Repairer"; "In-house Repairer")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the In-house Repairer field';
 
                     trigger OnValidate()
                     begin
@@ -139,35 +157,42 @@ page 6014503 "NPR Customer Repair Card"
                 {
                     ApplicationArea = All;
                     Enabled = RepairedNoEnabled;
+                    ToolTip = 'Specifies the value of the Repairer No. field';
                 }
                 field("Repairer Name"; "Repairer Name")
                 {
                     ApplicationArea = All;
                     Enabled = RepairNameEnabled;
+                    ToolTip = 'Specifies the value of the Repairer Name field';
                 }
                 field("Repairer Address"; "Repairer Address")
                 {
                     ApplicationArea = All;
                     Enabled = RepairAddressEnabled;
+                    ToolTip = 'Specifies the value of the Repairer Address field';
                 }
                 field("Repairer Address2"; "Repairer Address2")
                 {
                     ApplicationArea = All;
                     Enabled = RepairAddress2Enabled;
+                    ToolTip = 'Specifies the value of the Repairer Address2 field';
                 }
                 field("Repairer Post Code"; "Repairer Post Code")
                 {
                     ApplicationArea = All;
                     Enabled = RepairPostCodeEnabled;
+                    ToolTip = 'Specifies the value of the Repairer Post Code field';
                 }
                 field("Repairer City"; "Repairer City")
                 {
                     ApplicationArea = All;
                     Enabled = RepairCityEnabled;
+                    ToolTip = 'Specifies the value of the Repairer City field';
                 }
                 field("Global Dimension 1 Code"; "Global Dimension 1 Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Global Dimension 1 Code field';
                 }
             }
             group(Registration)
@@ -180,6 +205,7 @@ page 6014503 "NPR Customer Repair Card"
                     {
                         ApplicationArea = All;
                         ShowMandatory = true;
+                        ToolTip = 'Specifies the value of the Item No. field';
 
                         trigger OnValidate()
                         begin
@@ -196,19 +222,23 @@ page 6014503 "NPR Customer Repair Card"
                     field("Item Description"; "Item Description")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Item Description field';
                     }
                     field("Unit Cost"; "Unit Cost")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Unit Cost field';
                     }
                     field("Variant Code"; "Variant Code")
                     {
                         ApplicationArea = All;
                         Caption = 'Variant code';
+                        ToolTip = 'Specifies the value of the Variant code field';
                     }
                     field(Worranty; Worranty)
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Guarantee field';
 
                         trigger OnValidate()
                         begin
@@ -221,36 +251,44 @@ page 6014503 "NPR Customer Repair Card"
                     {
                         ApplicationArea = All;
                         Enabled = WarantyTextEnabled;
+                        ToolTip = 'Specifies the value of the Warranty Text field';
                     }
                     field(Status; Status)
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Status field';
                     }
                     field(Brand; Brand)
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Brand field';
                     }
                     field("Serial No."; "Serial No.")
                     {
                         ApplicationArea = All;
                         ShowMandatory = true;
+                        ToolTip = 'Specifies the value of the Serial No. field';
                     }
                     field("Alt. Serial No."; "Alt. Serial No.")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Alt. Serial No. field';
                     }
                     field(Accessories; Accessories)
                     {
                         ApplicationArea = All;
                         ShowMandatory = true;
+                        ToolTip = 'Specifies the value of the Accessories field';
                     }
                     field("Accessories 1"; "Accessories 1")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Accessories 1 field';
                     }
                     field("Costs Paid by Offer"; "Costs Paid by Offer")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Costs Paid by Offer field';
                     }
                 }
                 group(Control6150658)
@@ -259,39 +297,47 @@ page 6014503 "NPR Customer Repair Card"
                     field("Prices Including VAT"; "Prices Including VAT")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Prices Including VAT field';
                     }
                     field("To Ship"; "To Ship")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the To Ship field';
                     }
                     field("Handed In Date"; "Handed In Date")
                     {
                         ApplicationArea = All;
                         ShowMandatory = true;
+                        ToolTip = 'Specifies the value of the Handed In Date field';
                     }
                     field("Expected Completion Date"; "Expected Completion Date")
                     {
                         ApplicationArea = All;
                         ShowMandatory = true;
+                        ToolTip = 'Specifies the value of the Expected Completion Date field';
                     }
                     field("Salesperson Code"; "Salesperson Code")
                     {
                         ApplicationArea = All;
                         ShowMandatory = true;
+                        ToolTip = 'Specifies the value of the Salesperson Code field';
                     }
                     field("Date Delivered"; "Date Delivered")
                     {
                         ApplicationArea = All;
                         ShowMandatory = true;
+                        ToolTip = 'Specifies the value of the Date Delivered field';
                     }
                     field("Delivering Salespers."; "Delivering Salespers.")
                     {
                         ApplicationArea = All;
                         ShowMandatory = true;
+                        ToolTip = 'Specifies the value of the Delivering Salespers. field';
                     }
                     field("Delivering Sales Ticket No."; "Delivering Sales Ticket No.")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Delivering Sales Ticket No. field';
                     }
                 }
             }
@@ -304,26 +350,32 @@ page 6014503 "NPR Customer Repair Card"
                     field("Invoice To"; "Invoice To")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Invoice To field';
                     }
                     field("Customer Name"; "Customer Name")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Customer Name field';
                     }
                     field("Customer Address"; "Customer Address")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Customer Address field';
                     }
                     field("Customer Address 2"; "Customer Address 2")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Customer Address 2 field';
                     }
                     field("Customer Post Code"; "Customer Post Code")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Customer Post Code field';
                     }
                     field("Customer City"; "Customer City")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Customer City field';
                     }
                 }
             }
@@ -336,22 +388,27 @@ page 6014503 "NPR Customer Repair Card"
                     field("Price when Not Accepted"; "Price when Not Accepted")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Price when Not Accepted field';
                     }
                     field(Delivered; Delivered)
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Delivered field';
                     }
                     field("Service nr."; "Service nr.")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Service No. field';
                     }
                     field(Type; Type)
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Type field';
                     }
                     field("Customer Answer"; "Customer Answer")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Customer Answer field';
                     }
                 }
                 group(Control6150685)
@@ -360,26 +417,32 @@ page 6014503 "NPR Customer Repair Card"
                     field("Requested Returned, No Repair"; "Requested Returned, No Repair")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Requested Returned, No Repair field';
                     }
                     field("Approved by repairer"; "Approved by repairer")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Approved by Repairer field';
                     }
                     field("Return from Repair"; "Return from Repair")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Return from Repair field';
                     }
                     field(Claimed; Claimed)
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Claimed field';
                     }
                     field("Offer Sent"; "Offer Sent")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Offer Sent field';
                     }
                     field("Reported Ready and Sent"; "Reported Ready and Sent")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Reported Ready and Sent field';
                     }
                 }
             }
@@ -409,10 +472,12 @@ page 6014503 "NPR Customer Repair Card"
                 field("Picture Documentation1"; "Picture Documentation1")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Picture Documentation1 field';
                 }
                 field("Picture Documentation2"; "Picture Documentation2")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Picture Documentation2 field';
                 }
             }
         }
@@ -439,6 +504,7 @@ page 6014503 "NPR Customer Repair Card"
                     Promoted = true;
                     PromotedCategory = "Report";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Repair Label action';
 
                     trigger OnAction()
                     var
@@ -467,6 +533,7 @@ page 6014503 "NPR Customer Repair Card"
                     Promoted = true;
                     PromotedCategory = "Report";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the &Repair Offer action';
 
                     trigger OnAction()
                     var
@@ -511,6 +578,7 @@ page 6014503 "NPR Customer Repair Card"
                     Promoted = true;
                     PromotedCategory = "Report";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Repair Do&ne action';
 
                     trigger OnAction()
                     var
@@ -554,6 +622,7 @@ page 6014503 "NPR Customer Repair Card"
                     Promoted = true;
                     PromotedCategory = "Report";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Repair &Guarantee action';
 
                     trigger OnAction()
                     var
@@ -597,6 +666,7 @@ page 6014503 "NPR Customer Repair Card"
                     Promoted = true;
                     PromotedCategory = "Report";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Customernote action';
 
                     trigger OnAction()
                     var
@@ -639,6 +709,7 @@ page 6014503 "NPR Customer Repair Card"
                     Promoted = true;
                     PromotedCategory = "Report";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the De&livery Note action';
 
                     trigger OnAction()
                     var
@@ -688,6 +759,7 @@ page 6014503 "NPR Customer Repair Card"
                         Promoted = true;
                         PromotedCategory = Category4;
                         ApplicationArea = All;
+                        ToolTip = 'Executes the &Input action';
 
                         trigger OnAction()
                         var
@@ -724,6 +796,7 @@ page 6014503 "NPR Customer Repair Card"
                         Promoted = true;
                         PromotedCategory = Category4;
                         ApplicationArea = All;
+                        ToolTip = 'Executes the O&utput action';
 
                         trigger OnAction()
                         var
@@ -753,6 +826,7 @@ page 6014503 "NPR Customer Repair Card"
                         Promoted = true;
                         PromotedCategory = Category4;
                         ApplicationArea = All;
+                        ToolTip = 'Executes the &Delete action';
 
                         trigger OnAction()
                         begin
@@ -775,6 +849,7 @@ page 6014503 "NPR Customer Repair Card"
                         Promoted = true;
                         PromotedCategory = Category4;
                         ApplicationArea = All;
+                        ToolTip = 'Executes the O&utput action';
 
                         trigger OnAction()
                         var
@@ -813,6 +888,7 @@ page 6014503 "NPR Customer Repair Card"
                     RunPageView = WHERE(Status = FILTER(<> Claimed));
                     ShortCutKey = 'F5';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the List action';
                 }
                 action("Repair Closed/Claimed List")
                 {
@@ -822,6 +898,7 @@ page 6014503 "NPR Customer Repair Card"
                     RunPageView = WHERE(Status = FILTER(Claimed));
                     ShortCutKey = 'F5';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Repair Closed/Claimed List action';
                 }
                 action("Finalize Repair")
                 {
@@ -830,6 +907,7 @@ page 6014503 "NPR Customer Repair Card"
                     Promoted = true;
                     PromotedCategory = Category5;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Finalize Repair action';
 
                     trigger OnAction()
                     begin
@@ -845,6 +923,7 @@ page 6014503 "NPR Customer Repair Card"
                     Image = Post;
                     Promoted = true;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Post Items action';
 
                     trigger OnAction()
                     begin
@@ -860,6 +939,7 @@ page 6014503 "NPR Customer Repair Card"
                     Promoted = true;
                     PromotedCategory = Category5;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Finalize Repair and Print action';
 
                     trigger OnAction()
                     begin
@@ -880,6 +960,7 @@ page 6014503 "NPR Customer Repair Card"
                     Promoted = true;
                     PromotedCategory = Category5;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Send Status Sms action';
 
                     trigger OnAction()
                     var
@@ -897,6 +978,7 @@ page 6014503 "NPR Customer Repair Card"
                     Image = SendTo;
                     RunObject = Page "NPR Send SMS";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Send Custom Sms action';
                 }
                 action("Create Invoice")
                 {
@@ -905,6 +987,7 @@ page 6014503 "NPR Customer Repair Card"
                     Promoted = true;
                     PromotedCategory = Category5;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Create Invoice action';
 
                     trigger OnAction()
                     begin
@@ -918,6 +1001,7 @@ page 6014503 "NPR Customer Repair Card"
                     Promoted = true;
                     PromotedCategory = Category5;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Create Sales Order action';
 
                     trigger OnAction()
                     begin
@@ -933,6 +1017,7 @@ page 6014503 "NPR Customer Repair Card"
                     Caption = 'Email Repair Offer';
                     Image = Email;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Email Repair Offer action';
 
                     trigger OnAction()
                     var
@@ -964,6 +1049,7 @@ page 6014503 "NPR Customer Repair Card"
                     Caption = 'Email Repair Done';
                     Image = Email;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Email Repair Done action';
 
                     trigger OnAction()
                     var
@@ -995,6 +1081,7 @@ page 6014503 "NPR Customer Repair Card"
                     Caption = 'Email Repair Guarantee';
                     Image = Email;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Email Repair Guarantee action';
 
                     trigger OnAction()
                     var
@@ -1026,6 +1113,7 @@ page 6014503 "NPR Customer Repair Card"
                     Caption = 'Email Customer Note';
                     Image = Email;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Email Customer Note action';
 
                     trigger OnAction()
                     var
@@ -1060,6 +1148,7 @@ page 6014503 "NPR Customer Repair Card"
                     Image = Navigate;
                     Promoted = false;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the &Navigate action';
 
                     trigger OnAction()
                     begin

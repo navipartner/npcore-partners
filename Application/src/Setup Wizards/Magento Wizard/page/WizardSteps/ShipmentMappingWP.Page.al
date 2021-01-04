@@ -17,10 +17,12 @@ page 6014551 "NPR Shipment Mapping WP"
                 {
                     ApplicationArea = All;
                     ShowMandatory = true;
+                    ToolTip = 'Specifies the value of the External Shipment Method Code field';
                 }
                 field("Shipment Method Code"; "Shipment Method Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Shipment Method Code field';
                     trigger OnLookup(var Text: Text): Boolean
                     var
                         ShipmentMethod: Record "Shipment Method";
@@ -41,6 +43,7 @@ page 6014551 "NPR Shipment Mapping WP"
                 field("Shipping Agent Code"; "Shipping Agent Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Shipping Agent Code field';
                     trigger OnLookup(var Text: Text): Boolean
                     var
                         ShippingAgent: Record "Shipping Agent";
@@ -61,6 +64,7 @@ page 6014551 "NPR Shipment Mapping WP"
                 field("Shipping Agent Service Code"; "Shipping Agent Service Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Shipping Agent Service Code field';
                     trigger OnLookup(var Text: Text): Boolean
                     var
                         ShippingAgentServices: Record "Shipping Agent Services";
@@ -83,6 +87,7 @@ page 6014551 "NPR Shipment Mapping WP"
                 field("Shipment Fee Type"; "Shipment Fee Type")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Shipment Fee Type field';
                     trigger OnValidate()
                     begin
                         "Shipment Fee No." := '';
@@ -91,6 +96,7 @@ page 6014551 "NPR Shipment Mapping WP"
                 field("Shipment Fee No."; "Shipment Fee No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Shipment Fee No. field';
                     trigger OnLookup(var Text: Text): Boolean
                     var
                         GLAccount: Record "G/L Account";

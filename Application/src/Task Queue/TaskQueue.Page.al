@@ -33,56 +33,68 @@ page 6059905 "NPR Task Queue"
                 {
                     ApplicationArea = All;
                     Editable = SetEditable;
+                    ToolTip = 'Specifies the value of the Company field';
                 }
                 field("Task Template"; "Task Template")
                 {
                     ApplicationArea = All;
                     Editable = SetEditable;
+                    ToolTip = 'Specifies the value of the Task Template field';
                 }
                 field("Task Batch"; "Task Batch")
                 {
                     ApplicationArea = All;
                     Editable = SetEditable;
+                    ToolTip = 'Specifies the value of the Task Batch field';
                 }
                 field("Task Line No."; "Task Line No.")
                 {
                     ApplicationArea = All;
                     Editable = SetEditable;
+                    ToolTip = 'Specifies the value of the Task Line No. field';
                 }
                 field("Next Run time"; "Next Run time")
                 {
                     ApplicationArea = All;
                     Editable = SetEditable;
+                    ToolTip = 'Specifies the value of the Next Run time field';
                 }
                 field("Task Worker Group"; "Task Worker Group")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Task Worker Group field';
                 }
                 field(Status; Status)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Status field';
                 }
                 field("Assigned To User"; "Assigned To User")
                 {
                     ApplicationArea = All;
                     DrillDown = false;
                     Lookup = false;
+                    ToolTip = 'Specifies the value of the Assigned To User field';
                 }
                 field("Assigned Time"; "Assigned Time")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Assigned Time field';
                 }
                 field("Started Time"; "Started Time")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Started Time field';
                 }
                 field(Enabled; Enabled)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Enabled field';
                 }
                 field("Estimated Duration"; "Estimated Duration")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Estimated Duration field';
                 }
             }
         }

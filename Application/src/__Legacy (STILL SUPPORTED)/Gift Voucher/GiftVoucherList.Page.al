@@ -29,105 +29,127 @@ page 6014431 "NPR Gift Voucher List"
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the No. field';
                 }
                 field("Offline - No."; "Offline - No.")
                 {
                     ApplicationArea = All;
                     Caption = 'Offline-No.';
+                    ToolTip = 'Specifies the value of the Offline-No. field';
                 }
                 field(Name; Name)
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Name field';
                 }
                 field("Register No."; "Register No.")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Cash Register No. field';
                 }
                 field("Sales Ticket No."; "Sales Ticket No.")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Sales Ticket No. field';
                 }
                 field("Issue Date"; "Issue Date")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Issue Date field';
                 }
                 field("Issuing POS Entry No"; "Issuing POS Entry No")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Issuing POS Entry No field';
                 }
                 field("Issuing POS Sale Line No."; "Issuing POS Sale Line No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Issuing POS Sale Line No. field';
                 }
                 field("Issuing POS Unit No."; "Issuing POS Unit No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Issuing POS Unit No. field';
                 }
                 field(Amount; Amount)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Amount field';
                 }
                 field("Salesperson Code"; "Salesperson Code")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Salesperson Code field';
                 }
                 field("Shortcut Dimension 1 Code"; "Shortcut Dimension 1 Code")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Shortcut Dimension 1 Code field';
                 }
                 field("Location Code"; "Location Code")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Location Code field';
                 }
                 field(Status; Status)
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Status field';
                 }
                 field("Customer No."; "Customer No.")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Customer No. field';
                 }
                 field("Cashed Date"; "Cashed Date")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Cashed Date field';
                 }
                 field("Cashed Salesperson"; "Cashed Salesperson")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Cashed Salesperson field';
                 }
                 field("Cashed on Sales Ticket No."; "Cashed on Sales Ticket No.")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Cashed on Sales Ticket No. field';
                 }
                 field("Cashed in Store"; "Cashed in Store")
                 {
                     ApplicationArea = All;
                     Caption = '<Cashed in Store';
                     Editable = false;
+                    ToolTip = 'Specifies the value of the <Cashed in Store field';
                 }
                 field("Cashed POS Entry No."; "Cashed POS Entry No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Cashed POS Entry No. field';
                 }
                 field("Cashed POS Payment Line No."; "Cashed POS Payment Line No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Cashed POS Payment Line No. field';
                 }
                 field("Cashed POS Unit No."; "Cashed POS Unit No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Cashed POS Unit No. field';
                 }
             }
         }
@@ -142,6 +164,7 @@ page 6014431 "NPR Gift Voucher List"
                 Caption = 'Cash In';
                 Image = CashFlow;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Cash In action';
 
                 trigger OnAction()
                 begin
@@ -159,6 +182,7 @@ page 6014431 "NPR Gift Voucher List"
                     PromotedCategory = "Report";
                     PromotedIsBig = true;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Copy action';
 
                     trigger OnAction()
                     var
@@ -179,6 +203,7 @@ page 6014431 "NPR Gift Voucher List"
                 Caption = 'Send as PDF';
                 Image = SendEmailPDF;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Send as PDF action';
 
                 trigger OnAction()
                 var
@@ -201,6 +226,7 @@ page 6014431 "NPR Gift Voucher List"
                 Caption = 'Gift Voucher A5';
                 Image = "Report";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Gift Voucher A5 action';
 
                 trigger OnAction()
                 begin
@@ -214,6 +240,7 @@ page 6014431 "NPR Gift Voucher List"
                 Caption = 'Gift Voucher A5 Right';
                 Image = "Report";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Gift Voucher A5 Right action';
 
                 trigger OnAction()
                 begin
@@ -227,6 +254,7 @@ page 6014431 "NPR Gift Voucher List"
                 Caption = 'Gift Voucher/Credit Voucher';
                 Image = "Report";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Gift Voucher/Credit Voucher action';
 
                 trigger OnAction()
                 begin
@@ -240,6 +268,7 @@ page 6014431 "NPR Gift Voucher List"
                 Caption = 'Cashed Gift Vouchers';
                 Image = "Report";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Cashed Gift Vouchers action';
 
                 trigger OnAction()
                 begin
@@ -253,6 +282,7 @@ page 6014431 "NPR Gift Voucher List"
                 Caption = 'Magento Gift Voucher';
                 Image = "Report";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Magento Gift Voucher action';
 
                 trigger OnAction()
                 begin

@@ -19,39 +19,48 @@ page 6059964 "NPR MPOS QR Code List"
                 field("User ID"; "User ID")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the User ID field';
                 }
                 field(Password; Password)
                 {
                     ApplicationArea = All;
                     ExtendedDatatype = Masked;
+                    ToolTip = 'Specifies the value of the Password field';
                 }
                 field("Client Type"; "Client Type")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Client Type field';
                 }
                 field(Company; Company)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Company field';
                 }
                 field(Tenant; Tenant)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Tenant field';
                 }
                 field("Payment Gateway"; "Payment Gateway")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Payment Gateway field';
                 }
                 field("Cash Register Id"; "Cash Register Id")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Cash Register Id field';
                 }
                 field(Url; Url)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Url field';
                 }
                 field("Webservice Url"; "Webservice Url")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Webservice Url field';
                 }
             }
         }
@@ -79,6 +88,7 @@ page 6059964 "NPR MPOS QR Code List"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Set Defaults action';
 
                 trigger OnAction()
                 begin
@@ -93,6 +103,7 @@ page 6059964 "NPR MPOS QR Code List"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Create QR Code action';
 
                 trigger OnAction()
                 begin

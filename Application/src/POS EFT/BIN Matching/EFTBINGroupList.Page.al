@@ -21,14 +21,17 @@ page 6184511 "NPR EFT BIN Group List"
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field(Priority; Priority)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Priority field';
                 }
             }
         }
@@ -47,6 +50,7 @@ page 6184511 "NPR EFT BIN Group List"
                 PromotedIsBig = true;
                 RunObject = XMLport "NPR EFT BIN Import";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Import File action';
             }
             action(ShowAllRanges)
             {
@@ -54,6 +58,7 @@ page 6184511 "NPR EFT BIN Group List"
                 Image = List;
                 RunObject = Page "NPR EFT BIN Ranges";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Show All Ranges action';
             }
         }
     }

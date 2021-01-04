@@ -21,18 +21,22 @@ page 6059968 "NPR MPOS App Setup Card"
                 field(Enable; Enable)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Enable field';
                 }
                 field("Register No."; "Register No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Cash Register No. field';
                 }
                 field("Web Service Is Published"; "Web Service Is Published")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Web Service Is Published field';
                 }
                 field("Custom Web Service URL"; "Custom Web Service URL")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Custom Web Service URL field';
                 }
             }
             group(Payment)
@@ -41,6 +45,7 @@ page 6059968 "NPR MPOS App Setup Card"
                 field("Payment Gateway"; "Payment Gateway")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Payment Gateway field';
                 }
             }
             group(Admission)
@@ -49,6 +54,7 @@ page 6059968 "NPR MPOS App Setup Card"
                 field("Ticket Admission Web Url"; "Ticket Admission Web Url")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Ticket Admission Web Url field';
                 }
             }
         }
@@ -66,6 +72,7 @@ page 6059968 "NPR MPOS App Setup Card"
                 //PromotedCategory = Process;
                 RunObject = Codeunit "NPR MPOS Webservice";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Publish Webservice action';
 
                 trigger OnAction()
                 begin
@@ -83,6 +90,7 @@ page 6059968 "NPR MPOS App Setup Card"
                 //PromotedCategory = Process;
                 RunObject = Page "NPR MPOS QR Code List";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Create QR Codes action';
             }
             action(Transactions)
             {
@@ -92,6 +100,7 @@ page 6059968 "NPR MPOS App Setup Card"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Transactions action';
 
                 trigger OnAction()
                 var
@@ -118,6 +127,7 @@ page 6059968 "NPR MPOS App Setup Card"
                 //PromotedCategory = Process;
                 RunObject = Page "NPR MPOS EOD Receipts";
                 ApplicationArea = All;
+                ToolTip = 'Executes the EOD Receipts action';
             }
         }
     }

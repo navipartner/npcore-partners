@@ -23,6 +23,7 @@ page 6151582 "NPR Event Events by Attributes"
                     ApplicationArea = All;
                     Caption = 'Attributes Filter';
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Attributes Filter field';
                 }
             }
             repeater(Group)
@@ -30,26 +31,32 @@ page 6151582 "NPR Event Events by Attributes"
                 field("No."; "No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the No. field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Bill-to Customer No."; "Bill-to Customer No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Bill-to Customer No. field';
                 }
                 field("Event Status"; "NPR Event Status")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the NPR Event Status field';
                 }
                 field("Starting Date"; "Starting Date")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Starting Date field';
                 }
                 field("Total Amount"; "NPR Total Amount")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the NPR Total Amount field';
                 }
             }
         }
@@ -67,12 +74,14 @@ page 6151582 "NPR Event Events by Attributes"
                 RunPageLink = "No." = FIELD("No.");
                 RunPageMode = View;
                 ApplicationArea = All;
+                ToolTip = 'Executes the View action';
             }
             action(SelectAttributeFilter)
             {
                 Caption = 'Select Attribute Filter';
                 Image = "Filter";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Select Attribute Filter action';
 
                 trigger OnAction()
                 var
@@ -101,6 +110,7 @@ page 6151582 "NPR Event Events by Attributes"
                 Caption = 'Clear Filter';
                 Image = ClearFilter;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Clear Filter action';
 
                 trigger OnAction()
                 begin

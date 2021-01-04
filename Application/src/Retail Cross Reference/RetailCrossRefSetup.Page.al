@@ -24,6 +24,7 @@ page 6151181 "NPR Retail Cross Ref. Setup"
                         Caption = 'Pattern Guide:                                                                                                                                                                                                                                                                                ';
                         HideValue = true;
                         ShowCaption = false;
+                        ToolTip = 'Specifies the value of the Pattern Guide:                                                                                                                                                                                                                                                                                 field';
                     }
                     field("Pattern Guide"; "Pattern Guide")
                     {
@@ -31,6 +32,7 @@ page 6151181 "NPR Retail Cross Ref. Setup"
                         Editable = false;
                         MultiLine = true;
                         ShowCaption = false;
+                        ToolTip = 'Specifies the value of the Pattern Guide field';
                     }
                 }
             }
@@ -39,11 +41,13 @@ page 6151181 "NPR Retail Cross Ref. Setup"
                 field("Table ID"; "Table ID")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Table ID field';
                 }
                 field("Reference No. Pattern"; "Reference No. Pattern")
                 {
                     ApplicationArea = All;
                     ShowMandatory = true;
+                    ToolTip = 'Specifies the value of the Reference No. Pattern field';
                 }
             }
         }

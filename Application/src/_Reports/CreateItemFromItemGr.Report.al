@@ -54,6 +54,7 @@ report 6014610 "NPR Create Item From ItemGr."
                 {
                     Caption = 'Standard Profit % On The Item Groups';
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Standard Profit % On The Item Groups field';
                 }
             }
         }

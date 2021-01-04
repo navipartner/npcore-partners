@@ -22,6 +22,7 @@ page 6060166 "NPR Event Next 10 Events"
                 {
                     ApplicationArea = All;
                     Caption = 'Filters';
+                    ToolTip = 'Specifies the value of the Filters field';
                 }
             }
             repeater(Group)
@@ -29,26 +30,32 @@ page 6060166 "NPR Event Next 10 Events"
                 field("No."; "No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the No. field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Bill-to Customer No."; "Bill-to Customer No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Bill-to Customer No. field';
                 }
                 field("Event Status"; "NPR Event Status")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the NPR Event Status field';
                 }
                 field("Starting Date"; "Starting Date")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Starting Date field';
                 }
                 field("Total Amount"; "NPR Total Amount")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the NPR Total Amount field';
                 }
             }
         }
@@ -66,6 +73,7 @@ page 6060166 "NPR Event Next 10 Events"
                 RunPageLink = "No." = FIELD("No.");
                 RunPageMode = View;
                 ApplicationArea = All;
+                ToolTip = 'Executes the View action';
             }
             group("Select Filter")
             {
@@ -76,6 +84,7 @@ page 6060166 "NPR Event Next 10 Events"
                     Caption = 'Select Responsible Person';
                     Image = JobResponsibility;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Select Responsible Person action';
 
                     trigger OnAction()
                     var
@@ -97,6 +106,7 @@ page 6060166 "NPR Event Next 10 Events"
                 Caption = 'Clear Filter';
                 Image = ClearFilter;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Clear Filter action';
 
                 trigger OnAction()
                 begin

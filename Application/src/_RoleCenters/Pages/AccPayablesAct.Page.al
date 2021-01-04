@@ -38,12 +38,14 @@ page 6151254 "NPR Acc. Payables Act"
                 {
                     ApplicationArea = All;
                     DrillDownPageId = "Incoming Documents";
+                    ToolTip = 'Specifies the value of the NPR Pending Inc. Documents field';
                 }
                 field("Posted Purchase order"; "NPR Posted Purchase order")
                 {
                     ApplicationArea = All;
                     Caption = 'Posted Purchase Invoices';
                     DrillDownPageId = "Posted Purchase Invoices";
+                    ToolTip = 'Specifies the value of the Posted Purchase Invoices field';
                 }
 
                 actions

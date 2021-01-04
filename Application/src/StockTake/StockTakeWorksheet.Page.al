@@ -26,6 +26,7 @@ page 6014663 "NPR Stock-Take Worksheet"
                 {
                     ApplicationArea = All;
                     Caption = 'Stock-Take Code';
+                    ToolTip = 'Specifies the value of the Stock-Take Code field';
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -51,26 +52,32 @@ page 6014663 "NPR Stock-Take Worksheet"
                 field("Conf Item Group Filter"; "Conf Item Group Filter")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Item Group Filter field';
                 }
                 field("Conf Vendor Code Filter"; "Conf Vendor Code Filter")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Vendor Code Filter field';
                 }
                 field("Conf Calc. Date"; "Conf Calc. Date")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Inventory Calc. Date field';
                 }
                 field("Conf Location Code"; "Conf Location Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Location Code field';
                 }
                 field("Conf Stock Take Method"; "Conf Stock Take Method")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Stock Take Method field';
                 }
                 field("Conf Adjustment Method"; "Conf Adjustment Method")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Adjustment Method field';
                 }
             }
             group(Control6150649)
@@ -80,6 +87,7 @@ page 6014663 "NPR Stock-Take Worksheet"
                 {
                     ApplicationArea = All;
                     Caption = 'Worksheet Name';
+                    ToolTip = 'Specifies the value of the Worksheet Name field';
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -101,22 +109,27 @@ page 6014663 "NPR Stock-Take Worksheet"
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Item Group Filter"; "Item Group Filter")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Item Group Filter field';
                 }
                 field("Vendor Code Filter"; "Vendor Code Filter")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Vendor Code Filter field';
                 }
                 field("Topup Worksheet"; "Topup Worksheet")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Topup Worksheet field';
                 }
                 field(Status; Status)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Status field';
                 }
             }
             part(SubPage; "NPR StockTake Worksh. Line")
@@ -132,6 +145,7 @@ page 6014663 "NPR Stock-Take Worksheet"
                 ShowCaption = false;
                 Style = Favorable;
                 StyleExpr = TRUE;
+                ToolTip = 'Specifies the value of the LineTypeCountText field';
             }
         }
     }
@@ -148,6 +162,7 @@ page 6014663 "NPR Stock-Take Worksheet"
                     Caption = 'Import from &File';
                     Image = Import;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Import from &File action';
 
                     trigger OnAction()
                     var
@@ -175,6 +190,7 @@ page 6014663 "NPR Stock-Take Worksheet"
                     Caption = '&Import from Scanner';
                     Image = Import;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the &Import from Scanner action';
 
                     trigger OnAction()
                     begin
@@ -188,6 +204,7 @@ page 6014663 "NPR Stock-Take Worksheet"
                     Caption = 'Import Worksheets & Lines';
                     Image = Import;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Import Worksheets & Lines action';
 
                     trigger OnAction()
                     var
@@ -221,6 +238,7 @@ page 6014663 "NPR Stock-Take Worksheet"
                     Caption = '&Aggregate';
                     Image = Compress;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the &Aggregate action';
 
                     trigger OnAction()
                     begin
@@ -237,6 +255,7 @@ page 6014663 "NPR Stock-Take Worksheet"
                     Image = Calculate;
                     ShortCutKey = 'F11';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Calc. Inventory and Transfer action';
 
                     trigger OnAction()
                     var
@@ -260,6 +279,7 @@ page 6014663 "NPR Stock-Take Worksheet"
                     Caption = 'Top-Up Area';
                     Image = CalculatePlan;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Top-Up Area action';
 
                     trigger OnAction()
                     begin
@@ -280,6 +300,7 @@ page 6014663 "NPR Stock-Take Worksheet"
                 RunObject = Page "NPR Stock-Take Config. Card";
                 RunPageLink = Code = FIELD("Stock-Take Config Code");
                 ApplicationArea = All;
+                ToolTip = 'Executes the Configuration Card action';
             }
         }
     }

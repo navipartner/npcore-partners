@@ -18,33 +18,40 @@ page 6060053 "NPR Item Works. Excel Column"
                 field("Excel Column"; "Excel Column")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Excel Column field';
                 }
                 field("Excel Header Text"; "Excel Header Text")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Excel Header Text field';
                 }
                 field("Sample Data Row 1"; "Sample Data Row 1")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Sample Data Row 1 field';
                 }
                 field("Sample Data Row 2"; "Sample Data Row 2")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Sample Data Row 2 field';
                 }
                 field("Sample Data Row 3"; "Sample Data Row 3")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Sample Data Row 3 field';
                 }
                 field("Process as"; "Process as")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Process as field';
                 }
                 field("Map to Caption"; "Map to Caption")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Map to Caption field';
                 }
             }
         }
@@ -62,6 +69,7 @@ page 6060053 "NPR Item Works. Excel Column"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Select Excel to Map action';
 
                 trigger OnAction()
                 begin
@@ -74,6 +82,7 @@ page 6060053 "NPR Item Works. Excel Column"
                 Caption = 'Insert all Mapped fields in Excel Mapping';
                 Image = Add;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Insert all Mapped fields in Excel Mapping action';
 
                 trigger OnAction()
                 var

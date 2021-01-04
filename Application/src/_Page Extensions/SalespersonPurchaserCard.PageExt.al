@@ -14,18 +14,22 @@ pageextension 6014455 "NPR Salesperson/Purchaser Card" extends "Salesperson/Purc
                 {
                     ApplicationArea = All;
                     ExtendedDatatype = Masked;
+                    ToolTip = 'Specifies the value of the NPR Register Password field';
                 }
                 field("NPR Supervisor POS"; "NPR Supervisor POS")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the NPR Supervisor POS field';
                 }
                 field("NPR Reverse Sales Ticket"; "NPR Reverse Sales Ticket")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the NPR Reverse Sales Ticket field';
                 }
                 field("NPR Locked-to Register No."; "NPR Locked-to Register No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the NPR Locked-to Register No. field';
                 }
             }
         }
@@ -44,6 +48,7 @@ pageextension 6014455 "NPR Salesperson/Purchaser Card" extends "Salesperson/Purc
                 RunPageView = SORTING(Type, Code, "Alt. No.");
                 ShortCutKey = 'Ctrl+A';
                 ApplicationArea = All;
+                ToolTip = 'Executes the Cash Codes action';
             }
         }
     }

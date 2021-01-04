@@ -20,6 +20,7 @@ page 6014618 "NPR My Reports"
                 {
                     ApplicationArea = All;
                     AssistEdit = true;
+                    ToolTip = 'Specifies the value of the Report No. field';
 
                     trigger OnAssistEdit()
                     begin
@@ -36,6 +37,7 @@ page 6014618 "NPR My Reports"
                     ApplicationArea = All;
                     AssistEdit = true;
                     Caption = 'Name';
+                    ToolTip = 'Specifies the value of the Name field';
 
                     trigger OnAssistEdit()
                     begin
@@ -55,6 +57,7 @@ page 6014618 "NPR My Reports"
                 Caption = 'Run Report';
                 Image = Report2;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Run Report action';
 
                 trigger OnAction()
                 begin

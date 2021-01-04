@@ -17,30 +17,37 @@ page 6151080 "NPR ExRv Voucher Types"
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Customer No."; "Customer No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Customer No. field';
                 }
                 field("Account No."; "Account No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Account No. field';
                 }
                 field("Source Type"; "Source Type")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Source Table No. field';
                 }
                 field("Direct Posting"; "Direct Posting")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Direct Posting field';
                 }
                 field("Shortcut Dimension 1 Code"; "Shortcut Dimension 1 Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Shortcut Dimension 1 Code field';
 
                     trigger OnValidate()
                     begin
@@ -50,6 +57,7 @@ page 6151080 "NPR ExRv Voucher Types"
                 field("Shortcut Dimension 2 Code"; "Shortcut Dimension 2 Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Shortcut Dimension 2 Code field';
 
                     trigger OnValidate()
                     begin
@@ -59,10 +67,12 @@ page 6151080 "NPR ExRv Voucher Types"
                 field(Amount; Amount)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Amount field';
                 }
                 field("Remaining Amount"; "Remaining Amount")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Remaining Amount field';
                 }
             }
         }
@@ -77,6 +87,7 @@ page 6151080 "NPR ExRv Voucher Types"
                 Caption = 'Update Voucher Status';
                 Image = RefreshVoucher;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Update Voucher Status action';
 
                 trigger OnAction()
                 var
@@ -99,6 +110,7 @@ page 6151080 "NPR ExRv Voucher Types"
                 RunPageLink = "Voucher Type" = FIELD(Code);
                 ShortCutKey = 'Ctrl+F7';
                 ApplicationArea = All;
+                ToolTip = 'Executes the Vouchers action';
             }
             action(Dimensions)
             {
@@ -107,6 +119,7 @@ page 6151080 "NPR ExRv Voucher Types"
                 Image = Dimensions;
                 ShortCutKey = 'Shift+Ctrl+D';
                 ApplicationArea = All;
+                ToolTip = 'Executes the Dimensions action';
 
                 trigger OnAction()
                 begin

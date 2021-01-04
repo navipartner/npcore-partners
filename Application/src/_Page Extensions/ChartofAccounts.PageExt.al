@@ -7,6 +7,7 @@ pageextension 6014421 "NPR Chart of Accounts" extends "Chart of Accounts"
             field("NPR Retail Payment"; "NPR Retail Payment")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the NPR Retail Payment field';
             }
         }
     }

@@ -17,14 +17,17 @@ page 6059951 "NPR Display Content"
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Type; Type)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Type field';
                 }
                 field("Content Lines"; "Content Lines")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Content Lines field';
                 }
             }
         }

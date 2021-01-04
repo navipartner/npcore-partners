@@ -20,6 +20,7 @@ page 6014449 "NPR Input Dialog"
                 ApplicationArea = All;
                 CaptionClass = Captions[1];
                 Visible = ControlCount >= 1;
+                ToolTip = 'Specifies the value of the TextInputs[1] field';
 
                 trigger OnValidate()
                 begin
@@ -31,6 +32,7 @@ page 6014449 "NPR Input Dialog"
                 ApplicationArea = All;
                 CaptionClass = Captions[2];
                 Visible = ControlCount >= 2;
+                ToolTip = 'Specifies the value of the TextInputs[2] field';
 
                 trigger OnValidate()
                 begin
@@ -42,6 +44,7 @@ page 6014449 "NPR Input Dialog"
                 ApplicationArea = All;
                 CaptionClass = Captions[3];
                 Visible = ControlCount >= 3;
+                ToolTip = 'Specifies the value of the TextInputs[3] field';
 
                 trigger OnValidate()
                 begin
@@ -53,6 +56,7 @@ page 6014449 "NPR Input Dialog"
                 ApplicationArea = All;
                 CaptionClass = Captions[4];
                 Visible = ControlCount >= 4;
+                ToolTip = 'Specifies the value of the TextInputs[4] field';
 
                 trigger OnValidate()
                 begin
@@ -64,6 +68,7 @@ page 6014449 "NPR Input Dialog"
                 ApplicationArea = All;
                 CaptionClass = Captions[5];
                 Visible = ControlCount >= 5;
+                ToolTip = 'Specifies the value of the TextInputs[5] field';
 
                 trigger OnValidate()
                 begin
@@ -75,6 +80,7 @@ page 6014449 "NPR Input Dialog"
                 ApplicationArea = All;
                 CaptionClass = Captions[6];
                 Visible = ControlCount >= 6;
+                ToolTip = 'Specifies the value of the TextInputs[6] field';
 
                 trigger OnValidate()
                 begin
@@ -86,6 +92,7 @@ page 6014449 "NPR Input Dialog"
                 ApplicationArea = All;
                 CaptionClass = Captions[7];
                 Visible = ControlCount >= 7;
+                ToolTip = 'Specifies the value of the TextInputs[7] field';
 
                 trigger OnValidate()
                 begin
@@ -97,6 +104,7 @@ page 6014449 "NPR Input Dialog"
                 ApplicationArea = All;
                 CaptionClass = Captions[8];
                 Visible = ControlCount >= 8;
+                ToolTip = 'Specifies the value of the TextInputs[8] field';
 
                 trigger OnValidate()
                 begin
@@ -108,6 +116,7 @@ page 6014449 "NPR Input Dialog"
                 ApplicationArea = All;
                 CaptionClass = Captions[9];
                 Visible = ControlCount >= 9;
+                ToolTip = 'Specifies the value of the TextInputs[9] field';
 
                 trigger OnValidate()
                 begin
@@ -119,6 +128,7 @@ page 6014449 "NPR Input Dialog"
                 ApplicationArea = All;
                 CaptionClass = Captions[10];
                 Visible = ControlCount >= 10;
+                ToolTip = 'Specifies the value of the TextInputs[10] field';
 
                 trigger OnValidate()
                 begin

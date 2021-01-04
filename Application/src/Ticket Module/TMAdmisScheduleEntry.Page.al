@@ -1,4 +1,4 @@
-﻿page 6060122 "NPR TM Admis. Schedule Entry"
+page 6060122 "NPR TM Admis. Schedule Entry"
 {
     // TM1.00/TSA/20151217  CASE 228982 NaviPartner Ticket Management
     // TM1.09/TSA/20160310  CASE 236742 UX improvements
@@ -35,132 +35,160 @@
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Entry No. field';
                 }
                 field("External Schedule Entry No."; "External Schedule Entry No.")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the External Schedule Entry No. field';
                 }
                 field("Admission Code"; "Admission Code")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Admission Code field';
                 }
                 field("Schedule Code"; "Schedule Code")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Schedule Code field';
                 }
                 field(Cancelled; Cancelled)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Editable = false;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Cancelled field';
                 }
                 field("Admission Start Date"; "Admission Start Date")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Admission Start Date field';
                 }
                 field("Admission Start Time"; "Admission Start Time")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Admission Start Time field';
                 }
                 field("Event Duration"; "Event Duration")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Event Duration field';
                 }
                 field("Admission End Date"; "Admission End Date")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Admission End Date field';
                 }
                 field("Admission End Time"; "Admission End Time")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Admission End Time field';
                 }
                 field("Admission Is"; "Admission Is")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Admission Is field';
                 }
                 field("Visibility On Web"; "Visibility On Web")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Visibility On Web field';
                 }
                 field("Regenerate With"; "Regenerate With")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Regenerate With field';
                 }
                 field("Reason Code"; "Reason Code")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Reason Code field';
                 }
                 field("Initial Entry"; "Initial Entry")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Initial Entry field';
                 }
                 field("Open Reservations"; "Open Reservations")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Open Reservations field';
                 }
                 field("Open Admitted"; "Open Admitted")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Open Admitted field';
                 }
                 field(Departed; Departed)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Departed field';
                 }
                 field("Max Capacity Per Sch. Entry"; "Max Capacity Per Sch. Entry")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Max Capacity Per Sch. Entry field';
                 }
                 field(ConcurrentCapacityText; ConcurrentCapacityText)
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     Caption = 'Concurrent Capacity';
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Concurrent Capacity field';
                 }
                 field("Event Arrival From Time"; "Event Arrival From Time")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Event Arrival From Time field';
                 }
                 field("Event Arrival Until Time"; "Event Arrival Until Time")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Event Arrival Until Time field';
                 }
                 field("Sales From Date"; "Sales From Date")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Sales From Date field';
                 }
                 field("Sales From Time"; "Sales From Time")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Sales From Time field';
                 }
                 field("Sales Until Date"; "Sales Until Date")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Sales Until Date field';
                 }
                 field("Sales Until Time"; "Sales Until Time")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Sales Until Time field';
                 }
                 field("Allocation By"; "Allocation By")
                 {
                     ApplicationArea = NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Allocation By field';
                 }
                 field("Waiting List Queue"; "Waiting List Queue")
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Waiting List Queue field';
                 }
             }
         }

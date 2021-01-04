@@ -17,19 +17,23 @@ page 6014634 "NPR GCP Setup"
                 field("Printer ID"; "Printer ID")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Printer ID field';
                 }
                 field("Object Type"; "Object Type")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Object Type field';
                 }
                 field("Object ID"; "Object ID")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Object ID field';
                 }
                 field("""Cloud Job Ticket"".HASVALUE()"; "Cloud Job Ticket".HasValue())
                 {
                     ApplicationArea = All;
                     Caption = 'Settings Stored';
+                    ToolTip = 'Specifies the value of the Settings Stored field';
                 }
             }
         }
@@ -47,6 +51,7 @@ page 6014634 "NPR GCP Setup"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Change Print Settings action';
 
                 trigger OnAction()
                 var
@@ -65,6 +70,7 @@ page 6014634 "NPR GCP Setup"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Setup Account action';
 
                 trigger OnAction()
                 var
@@ -84,6 +90,7 @@ page 6014634 "NPR GCP Setup"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the View Printer Info action';
 
                 trigger OnAction()
                 var

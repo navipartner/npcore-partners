@@ -25,6 +25,7 @@ page 6014483 "NPR Turnover Stats"
                 ApplicationArea = All;
                 Caption = 'Depertment Filter';
                 TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+                ToolTip = 'Specifies the value of the Depertment Filter field';
 
                 trigger OnValidate()
                 var
@@ -44,6 +45,7 @@ page 6014483 "NPR Turnover Stats"
             field("Start Date"; StartDate)
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the StartDate field';
 
                 trigger OnValidate()
                 var
@@ -62,6 +64,7 @@ page 6014483 "NPR Turnover Stats"
             field("End Date"; EndDate)
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the EndDate field';
 
                 trigger OnValidate()
                 var
@@ -90,6 +93,7 @@ page 6014483 "NPR Turnover Stats"
                         {
                             ApplicationArea = All;
                             Caption = 'Register No.';
+                            ToolTip = 'Specifies the value of the Register No. field';
 
                             trigger OnValidate()
                             begin
@@ -107,46 +111,55 @@ page 6014483 "NPR Turnover Stats"
                         {
                             ApplicationArea = All;
                             Caption = 'Cash Sale';
+                            ToolTip = 'Specifies the value of the Cash Sale field';
                         }
                         field(DebitSaleAmt; DebitSaleAmt)
                         {
                             ApplicationArea = All;
                             Caption = 'Debit Sale';
+                            ToolTip = 'Specifies the value of the Debit Sale field';
                         }
                         field(CreditedSaleAmount; CreditedSaleAmount)
                         {
                             ApplicationArea = All;
                             Caption = 'Credited Sale';
+                            ToolTip = 'Specifies the value of the Credited Sale field';
                         }
                         field(GiftVoucherAmount; GiftVoucherAmount)
                         {
                             ApplicationArea = All;
                             Caption = 'Gift Voucher';
+                            ToolTip = 'Specifies the value of the Gift Voucher field';
                         }
                         field(CreditVoucherAmount; CreditVoucherAmount)
                         {
                             ApplicationArea = All;
                             Caption = 'Credit Voucher';
+                            ToolTip = 'Specifies the value of the Credit Voucher field';
                         }
                         field(TotalAmount; TotalAmount)
                         {
                             ApplicationArea = All;
                             Caption = 'Total';
+                            ToolTip = 'Specifies the value of the Total field';
                         }
                         field("SaleAmount + CreditedSaleAmount + DebitSaleAmt"; SaleAmount + CreditedSaleAmount + DebitSaleAmt)
                         {
                             ApplicationArea = All;
                             Caption = 'Revenue';
+                            ToolTip = 'Specifies the value of the Revenue field';
                         }
                         field(AuditRollNoOfSales; AuditRollNoOfSales)
                         {
                             ApplicationArea = All;
                             Caption = 'No. of Sales';
+                            ToolTip = 'Specifies the value of the No. of Sales field';
                         }
                         field(AuditRollAverageSaleAmt; AuditRollAverageSaleAmt)
                         {
                             ApplicationArea = All;
                             Caption = 'Average Sales';
+                            ToolTip = 'Specifies the value of the Average Sales field';
                         }
                     }
                 }
@@ -157,31 +170,37 @@ page 6014483 "NPR Turnover Stats"
                     {
                         ApplicationArea = All;
                         Caption = 'Debit Sale CM';
+                        ToolTip = 'Specifies the value of the Debit Sale CM field';
                     }
                     field(DebitProfitPct; DebitProfitPct)
                     {
                         ApplicationArea = All;
                         Caption = 'Debit CM %';
+                        ToolTip = 'Specifies the value of the Debit CM % field';
                     }
                     field(PaymentAmount; PaymentAmount)
                     {
                         ApplicationArea = All;
                         Caption = 'Payment';
+                        ToolTip = 'Specifies the value of the Payment field';
                     }
                     field(PayoutAmount; PayoutAmount)
                     {
                         ApplicationArea = All;
                         Caption = 'Payout';
+                        ToolTip = 'Specifies the value of the Payout field';
                     }
                     field(ProfitAmount; ProfitAmount)
                     {
                         ApplicationArea = All;
                         Caption = 'Profit (LCY)';
+                        ToolTip = 'Specifies the value of the Profit (LCY) field';
                     }
                     field(ProfitPct; ProfitPct)
                     {
                         ApplicationArea = All;
                         Caption = 'Profit (%)';
+                        ToolTip = 'Specifies the value of the Profit (%) field';
                     }
                 }
             }
@@ -207,6 +226,7 @@ page 6014483 "NPR Turnover Stats"
                     Promoted = true;
                     PromotedCategory = Process;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the &Local Cash Register action';
 
                     trigger OnAction()
                     var
@@ -228,6 +248,7 @@ page 6014483 "NPR Turnover Stats"
                     PromotedCategory = Process;
                     ShortCutKey = 'Shift+F9';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Select Cash Register action';
 
                     trigger OnAction()
                     var
@@ -252,6 +273,7 @@ page 6014483 "NPR Turnover Stats"
                     PromotedCategory = Process;
                     ShortCutKey = 'Shift+F8';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the All Cash Registers action';
 
                     trigger OnAction()
                     begin

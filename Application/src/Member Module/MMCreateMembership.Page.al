@@ -19,42 +19,52 @@ page 6060139 "NPR MM Create Membership"
                 field(Type; Type)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Type field';
                 }
                 field("No."; "No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the No. field';
                 }
                 field("Membership Code"; "Membership Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Membership Code field';
                 }
                 field(Blocked; Blocked)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Blocked field';
                 }
                 field("Blocked At"; "Blocked At")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Blocked At field';
                 }
                 field("Valid From Base"; "Valid From Base")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Valid From Base field';
                 }
                 field("Sales Cut-Off Date Calculation"; "Sales Cut-Off Date Calculation")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Sales Cut-Off Date Calculation field';
                 }
                 field("Valid From Date Calculation"; "Valid From Date Calculation")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Valid From Date Calculation field';
                 }
                 field("Valid Until Calculation"; "Valid Until Calculation")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Valid Until Calculation field';
                 }
                 field("Duration Formula"; "Duration Formula")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Duration Formula field';
                 }
             }
         }
@@ -72,6 +82,7 @@ page 6060139 "NPR MM Create Membership"
                 Promoted = true;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Create Membership action';
 
                 trigger OnAction()
                 begin
@@ -87,6 +98,7 @@ page 6060139 "NPR MM Create Membership"
                 Image = SetupList;
                 RunObject = Page "NPR MM Membership Setup";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Membership Setup action';
             }
             action("Item List")
             {
@@ -94,6 +106,7 @@ page 6060139 "NPR MM Create Membership"
                 Image = List;
                 RunObject = Page "Item List";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Item List action';
             }
             action(Memberships)
             {
@@ -102,6 +115,7 @@ page 6060139 "NPR MM Create Membership"
                 RunObject = Page "NPR MM Memberships";
                 RunPageLink = "Membership Code" = FIELD("Membership Code");
                 ApplicationArea = All;
+                ToolTip = 'Executes the Memberships action';
             }
             action("Community Setup")
             {
@@ -109,6 +123,7 @@ page 6060139 "NPR MM Create Membership"
                 Image = Group;
                 RunObject = Page "NPR MM Member Community";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Community Setup action';
             }
         }
     }

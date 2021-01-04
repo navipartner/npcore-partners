@@ -14,18 +14,22 @@ page 6151218 "NPR NpCs Open. Hour Calendar"
                 field("Calendar Date"; "Calendar Date")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Date field';
                 }
                 field("Start Time"; "Start Time")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Start Time field';
                 }
                 field("End Time"; "End Time")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the End Time field';
                 }
                 field(Weekday; Weekday)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Weekday field';
                 }
             }
         }

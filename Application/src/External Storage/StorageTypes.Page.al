@@ -16,14 +16,17 @@ page 6184892 "NPR Storage Types"
                 field("Storage Type"; "Storage Type")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Storage Type field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Codeunit"; Codeunit)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Codeunit ID field';
                 }
             }
         }

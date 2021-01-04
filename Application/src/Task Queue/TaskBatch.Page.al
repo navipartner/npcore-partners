@@ -17,42 +17,52 @@ page 6059901 "NPR Task Batch"
                 field("Journal Template Name"; "Journal Template Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Journal Template Name field';
                 }
                 field(Name; Name)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Name field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Task Worker Group"; "Task Worker Group")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Task Worker Group field';
                 }
                 field("Common Companies"; "Common Companies")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Common Companies field';
                 }
                 field("Master Company"; "Master Company")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Master Company field';
                 }
                 field("Mail From Address"; "Mail From Address")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Mail From Address field';
                 }
                 field("Mail From Name"; "Mail From Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Mail From Name field';
                 }
                 field("Template Type"; "Template Type")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Template Type field';
                 }
                 field("Delete Log After"; "Delete Log After")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Delete Log After field';
                 }
             }
         }

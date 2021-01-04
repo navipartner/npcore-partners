@@ -20,18 +20,22 @@ page 6151438 "NPR Magento Store List"
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Name; Name)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Name field';
                 }
                 field("Website Code"; "Website Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Website Code field';
                 }
                 field("Language Code"; "Language Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Language Code field';
                 }
             }
         }
@@ -52,6 +56,7 @@ page 6151438 "NPR Magento Store List"
                 RunPageLink = "Store Code" = FIELD(Code);
                 Visible = MultiStore;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Items action';
             }
         }
     }

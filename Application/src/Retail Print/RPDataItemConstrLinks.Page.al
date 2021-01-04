@@ -23,6 +23,7 @@ page 6014643 "NPR RP Data Item Constr. Links"
                     Style = Subordinate;
                     StyleExpr = "Filter Type" <> 0;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Data Item Name field';
                 }
                 field("Data Item Field ID"; "Data Item Field ID")
                 {
@@ -30,6 +31,7 @@ page 6014643 "NPR RP Data Item Constr. Links"
                     Enabled = "Filter Type" = 0;
                     Style = Subordinate;
                     StyleExpr = "Filter Type" <> 0;
+                    ToolTip = 'Specifies the value of the Data Item Field ID field';
                 }
                 field("Data Item Field Name"; "Data Item Field Name")
                 {
@@ -37,23 +39,28 @@ page 6014643 "NPR RP Data Item Constr. Links"
                     Enabled = "Filter Type" = 0;
                     Style = Subordinate;
                     StyleExpr = "Filter Type" <> 0;
+                    ToolTip = 'Specifies the value of the Data Item Field Name field';
                 }
                 field("Filter Type"; "Filter Type")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Filter Type field';
                 }
                 field("Field ID"; "Field ID")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Field ID field';
                 }
                 field("Field Name"; "Field Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Field Name field';
                 }
                 field("Filter Value"; "Filter Value")
                 {
                     ApplicationArea = All;
                     Enabled = "Filter Type" <> 0;
+                    ToolTip = 'Specifies the value of the Filter Value field';
                 }
                 field("Link Type"; "Link Type")
                 {
@@ -61,6 +68,7 @@ page 6014643 "NPR RP Data Item Constr. Links"
                     Enabled = "Filter Type" = 0;
                     Style = Subordinate;
                     StyleExpr = "Filter Type" <> 0;
+                    ToolTip = 'Specifies the value of the Link Type field';
                 }
             }
         }

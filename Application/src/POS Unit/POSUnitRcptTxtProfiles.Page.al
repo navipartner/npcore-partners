@@ -18,10 +18,12 @@ page 6151264 "NPR POS Unit Rcpt.Txt Profiles"
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field("Sales Ticket Line Text off"; "Sales Ticket Line Text off")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Sales Ticket Line Text off field';
 
                     trigger OnAssistEdit()
                     var
@@ -38,38 +40,47 @@ page 6151264 "NPR POS Unit Rcpt.Txt Profiles"
                 field("Sales Ticket Line Text1"; "Sales Ticket Line Text1")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Sales Ticket Line Text1 field';
                 }
                 field("Sales Ticket Line Text2"; "Sales Ticket Line Text2")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Sales Ticket Line Text2 field';
                 }
                 field("Sales Ticket Line Text3"; "Sales Ticket Line Text3")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Sales Ticket Line Text3 field';
                 }
                 field("Sales Ticket Line Text4"; "Sales Ticket Line Text4")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Sales Ticket Line Text 4 field';
                 }
                 field("Sales Ticket Line Text5"; "Sales Ticket Line Text5")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Sales Ticket Line Text 5 field';
                 }
                 field("Sales Ticket Line Text6"; "Sales Ticket Line Text6")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Sales Ticket Line Text6 field';
                 }
                 field("Sales Ticket Line Text7"; "Sales Ticket Line Text7")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Sales Ticket Line Text7 field';
                 }
                 field("Sales Ticket Line Text8"; "Sales Ticket Line Text8")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Sales Ticket Line Text8 field';
                 }
                 field("Sales Ticket Line Text9"; "Sales Ticket Line Text9")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Sales Ticket Line Text9 field';
                 }
             }
         }

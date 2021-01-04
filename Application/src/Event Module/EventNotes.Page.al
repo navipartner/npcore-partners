@@ -21,21 +21,25 @@ page 6151575 "NPR Event Notes"
                 {
                     ApplicationArea = All;
                     Caption = 'No.';
+                    ToolTip = 'Specifies the value of the No. field';
                 }
                 field("User ID"; "User ID")
                 {
                     ApplicationArea = All;
                     Caption = 'From User';
+                    ToolTip = 'Specifies the value of the From User field';
                 }
                 field("To User ID"; "To User ID")
                 {
                     ApplicationArea = All;
                     Caption = 'To User';
+                    ToolTip = 'Specifies the value of the To User field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
                     Caption = 'Note';
+                    ToolTip = 'Specifies the value of the Note field';
                 }
             }
         }
@@ -51,6 +55,7 @@ page 6151575 "NPR Event Notes"
                 Image = View;
                 RunPageMode = View;
                 ApplicationArea = All;
+                ToolTip = 'Executes the View Event action';
 
                 trigger OnAction()
                 var

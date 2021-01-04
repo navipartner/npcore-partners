@@ -20,14 +20,17 @@ page 6151503 "NPR Nc Task Fields"
                 field("Field Name"; "Field Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Field Name field';
                 }
                 field("Previous Value"; "Previous Value")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Previous Value field';
                 }
                 field("New Value"; "New Value")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the New Value field';
                 }
             }
         }

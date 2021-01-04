@@ -14,10 +14,12 @@ page 6059916 "NPR Person Statistics"
                 field(age; age)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the age field';
                 }
                 field(gender; gender)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the gender field';
                 }
             }
         }

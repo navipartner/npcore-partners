@@ -205,11 +205,13 @@ report 6014419 "NPR Vendor Sales Stat"
                 {
                     Caption = 'Start Date';
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Start Date field';
                 }
                 field("End Date"; EndDate)
                 {
                     Caption = 'End Date';
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the End Date field';
                 }
             }
         }

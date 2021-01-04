@@ -20,22 +20,26 @@ page 6059985 "NPR Retail Document Activities"
                 {
                     ApplicationArea = All;
                     DrillDownPageID = "NPR Retail Document List";
+                    ToolTip = 'Specifies the value of the Selection Contracts Open field';
                 }
                 field("Customizations Open"; "Customizations Open")
                 {
                     ApplicationArea = All;
                     DrillDownPageID = "NPR Retail Document List";
+                    ToolTip = 'Specifies the value of the Customizations Open field';
                 }
                 field("Retail Orders Open"; "Retail Orders Open")
                 {
                     ApplicationArea = All;
                     DrillDownPageID = "NPR Retail Document List";
                     Visible = NOT UseStandardOrderDocument;
+                    ToolTip = 'Specifies the value of the Retail Orders Open field';
                 }
                 field("Number of Open Orders"; "Number of Open Orders")
                 {
                     ApplicationArea = All;
                     Visible = UseStandardOrderDocument;
+                    ToolTip = 'Specifies the value of the Open Orders field';
                 }
 
                 actions
@@ -48,6 +52,7 @@ page 6059985 "NPR Retail Document Activities"
                         RunPageView = SORTING("Document Type", "No.")
                                       WHERE("Document Type" = CONST("Selection Contract"));
                         ApplicationArea = All;
+                        ToolTip = 'Executes the New Selection Contract action';
                     }
                     action("New Customization")
                     {
@@ -57,6 +62,7 @@ page 6059985 "NPR Retail Document Activities"
                         RunPageView = SORTING("Document Type", "No.")
                                       WHERE("Document Type" = CONST("Selection Contract"));
                         ApplicationArea = All;
+                        ToolTip = 'Executes the New Customization action';
                     }
                     action("New Retail Order")
                     {
@@ -66,6 +72,7 @@ page 6059985 "NPR Retail Document Activities"
                         RunPageView = SORTING("Document Type", "No.")
                                       WHERE("Document Type" = CONST("Selection Contract"));
                         ApplicationArea = All;
+                        ToolTip = 'Executes the New Retail Order action';
                     }
                 }
             }
@@ -76,22 +83,26 @@ page 6059985 "NPR Retail Document Activities"
                 {
                     ApplicationArea = All;
                     DrillDownPageID = "NPR Retail Document List";
+                    ToolTip = 'Specifies the value of the Selection Contracts Cashed field';
                 }
                 field("Customizations Cashed"; "Customizations Cashed")
                 {
                     ApplicationArea = All;
                     DrillDownPageID = "NPR Retail Document List";
+                    ToolTip = 'Specifies the value of the Customizations Cashed field';
                 }
                 field("Retail Orders Cashed"; "Retail Orders Cashed")
                 {
                     ApplicationArea = All;
                     DrillDownPageID = "NPR Retail Document List";
                     Visible = NOT UseStandardOrderDocument;
+                    ToolTip = 'Specifies the value of the Retail Orders Cashed field';
                 }
                 field("Number of Posted Orders"; "Number of Posted Orders")
                 {
                     ApplicationArea = All;
                     Visible = UseStandardOrderDocument;
+                    ToolTip = 'Specifies the value of the Posted Orders field';
                 }
             }
         }

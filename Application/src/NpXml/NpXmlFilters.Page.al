@@ -21,6 +21,7 @@ page 6151556 "NPR NpXml Filters"
                 field("Filter Type"; "Filter Type")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Filter Type field';
 
                     trigger OnValidate()
                     begin
@@ -35,18 +36,22 @@ page 6151556 "NPR NpXml Filters"
                     Enabled = ParentFieldNoEnabled;
                     Style = Subordinate;
                     StyleExpr = NOT ParentFieldNoEnabled;
+                    ToolTip = 'Specifies the value of the Parent Field No. field';
                 }
                 field("Parent Field Name"; "Parent Field Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Parent Field Name field';
                 }
                 field("Field No."; "Field No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Field No. field';
                 }
                 field("Field Name"; "Field Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Field Name field';
                 }
                 field("Filter Value"; "Filter Value")
                 {
@@ -54,6 +59,7 @@ page 6151556 "NPR NpXml Filters"
                     Enabled = FilterValueEnabled;
                     Style = Subordinate;
                     StyleExpr = NOT FilterValueEnabled;
+                    ToolTip = 'Specifies the value of the Filter Value field';
                 }
             }
         }

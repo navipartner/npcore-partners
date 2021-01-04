@@ -22,23 +22,27 @@ page 6184479 "NPR EFTType POSUnit Gen.Param."
                     ApplicationArea = All;
                     Caption = 'Name';
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Name field';
                 }
                 field(ParameterDescription; ParameterDescription)
                 {
                     ApplicationArea = All;
                     Caption = 'Description';
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Data Type"; "Data Type")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Data Type field';
                 }
                 field(ParameterValue; ParameterValue)
                 {
                     ApplicationArea = All;
                     Caption = 'Value';
                     Editable = "User Configurable";
+                    ToolTip = 'Specifies the value of the Value field';
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin

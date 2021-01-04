@@ -22,42 +22,51 @@ page 6151587 "NPR Event Invoices"
                 field("Document Type"; "Document Type")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Document Type field';
                 }
                 field("Document No."; "Document No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Document No. field';
                 }
                 field("Line No."; "Line No.")
                 {
                     ApplicationArea = All;
                     Visible = ShowDetails;
+                    ToolTip = 'Specifies the value of the Line No. field';
                 }
                 field("Quantity Transferred"; "Quantity Transferred")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Quantity Transferred field';
                 }
                 field("Transferred Date"; "Transferred Date")
                 {
                     ApplicationArea = All;
                     Visible = ShowDetails;
+                    ToolTip = 'Specifies the value of the Transferred Date field';
                 }
                 field("Invoiced Date"; "Invoiced Date")
                 {
                     ApplicationArea = All;
                     Visible = ShowDetails;
+                    ToolTip = 'Specifies the value of the Invoiced Date field';
                 }
                 field("Invoiced Amount (LCY)"; "Invoiced Amount (LCY)")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Invoiced Amount (LCY) field';
                 }
                 field("Invoiced Cost Amount (LCY)"; "Invoiced Cost Amount (LCY)")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Invoiced Cost Amount (LCY) field';
                 }
                 field("Job Ledger Entry No."; "Job Ledger Entry No.")
                 {
                     ApplicationArea = All;
                     Visible = ShowDetails;
+                    ToolTip = 'Specifies the value of the Job Ledger Entry No. field';
                 }
             }
         }
@@ -80,6 +89,7 @@ page 6151587 "NPR Event Invoices"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Open Sales Document action';
 
                     trigger OnAction()
                     var

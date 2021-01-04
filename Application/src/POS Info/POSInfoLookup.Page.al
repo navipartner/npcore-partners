@@ -17,31 +17,37 @@ page 6150646 "NPR POS Info Lookup"
                 {
                     ApplicationArea = All;
                     CaptionClass = Field1Caption;
+                    ToolTip = 'Specifies the value of the Field 1 field';
                 }
                 field("Field 2"; "Field 2")
                 {
                     ApplicationArea = All;
                     CaptionClass = Field2Caption;
+                    ToolTip = 'Specifies the value of the Field 2 field';
                 }
                 field("Field 3"; "Field 3")
                 {
                     ApplicationArea = All;
                     CaptionClass = Field3Caption;
+                    ToolTip = 'Specifies the value of the Field 3 field';
                 }
                 field("Field 4"; "Field 4")
                 {
                     ApplicationArea = All;
                     CaptionClass = Field4Caption;
+                    ToolTip = 'Specifies the value of the Field 4 field';
                 }
                 field("Field 5"; "Field 5")
                 {
                     ApplicationArea = All;
                     CaptionClass = Field5Caption;
+                    ToolTip = 'Specifies the value of the Field 5 field';
                 }
                 field("Field 6"; "Field 6")
                 {
                     ApplicationArea = All;
                     CaptionClass = Field6Caption;
+                    ToolTip = 'Specifies the value of the Field 6 field';
                 }
             }
         }

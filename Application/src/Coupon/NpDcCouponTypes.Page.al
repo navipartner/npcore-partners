@@ -17,48 +17,59 @@ page 6151591 "NPR NpDc Coupon Types"
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Discount Type"; "Discount Type")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Discount Type field';
                 }
                 field("Discount %"; "Discount %")
                 {
                     ApplicationArea = All;
                     BlankZero = true;
+                    ToolTip = 'Specifies the value of the Discount % field';
                 }
                 field("Discount Amount"; "Discount Amount")
                 {
                     ApplicationArea = All;
                     BlankZero = true;
+                    ToolTip = 'Specifies the value of the Discount Amount field';
                 }
                 field(Enabled; Enabled)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Enabled field';
                 }
                 field("Starting Date"; "Starting Date")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Starting Date field';
                 }
                 field("Ending Date"; "Ending Date")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Ending Date field';
                 }
                 field("Application Sequence No."; "Application Sequence No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Application Sequence No. field';
                 }
                 field("Coupon Qty. (Open)"; "Coupon Qty. (Open)")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Coupon Qty. (Open) field';
                 }
                 field("Arch. Coupon Qty."; "Arch. Coupon Qty.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Arch. Coupon Qty. field';
                 }
             }
         }
@@ -73,6 +84,7 @@ page 6151591 "NPR NpDc Coupon Types"
                 Caption = 'Issue Coupons';
                 Image = PostedVoucherGroup;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Issue Coupons action';
 
                 trigger OnAction()
                 var
@@ -92,6 +104,7 @@ page 6151591 "NPR NpDc Coupon Types"
                 RunPageLink = "Coupon Type" = FIELD(Code);
                 ShortCutKey = 'Ctrl+F7';
                 ApplicationArea = All;
+                ToolTip = 'Executes the Coupons action';
             }
             action(Comments)
             {
@@ -106,12 +119,14 @@ page 6151591 "NPR NpDc Coupon Types"
                               Integer = CONST(0),
                               "Integer 2" = CONST(0);
                 ApplicationArea = All;
+                ToolTip = 'Executes the Co&mments action';
             }
             action("How-to Videos")
             {
                 Caption = 'How-to Videos';
                 Image = UserInterface;
                 ApplicationArea = All;
+                ToolTip = 'Executes the How-to Videos action';
 
                 trigger OnAction()
                 var

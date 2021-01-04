@@ -19,10 +19,12 @@ page 6014499 "NPR Dynamic Modules"
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Module Name field';
                 }
                 field(Enabled; Enabled)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Enabled field';
                 }
             }
         }
@@ -40,6 +42,7 @@ page 6014499 "NPR Dynamic Modules"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Load Modules action';
 
                 trigger OnAction()
                 begin
@@ -55,6 +58,7 @@ page 6014499 "NPR Dynamic Modules"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Show Module Settings action';
 
                 trigger OnAction()
                 begin
@@ -69,6 +73,7 @@ page 6014499 "NPR Dynamic Modules"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Show All Settings action';
 
                 trigger OnAction()
                 begin

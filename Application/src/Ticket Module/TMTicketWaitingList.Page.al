@@ -1,4 +1,4 @@
-﻿page 6151138 "NPR TM Ticket Waiting List"
+page 6151138 "NPR TM Ticket Waiting List"
 {
     // TM1.45/TSA/20200122  CASE 380754 Transport TM1.45 - 22 January 2020
 
@@ -20,62 +20,75 @@
                     ApplicationArea = NPRTicketAdvanced;
                     Editable = false;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Entry No. field';
                 }
                 field("External Schedule Entry No."; "External Schedule Entry No.")
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     Editable = false;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the External Schedule Entry No. field';
                 }
                 field("Admission Code"; "Admission Code")
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Admission Code field';
                 }
                 field("Schedule Entry Description"; "Schedule Entry Description")
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Schedule Entry Description field';
                 }
                 field("Notification Address"; "Notification Address")
                 {
                     ApplicationArea = NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Notification Address field';
                 }
                 field("Created At"; "Created At")
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Created At field';
                 }
                 field(Token; Token)
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Token field';
                 }
                 field("Item No."; "Item No.")
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Item No. field';
                 }
                 field("Variant Code"; "Variant Code")
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Variant Code field';
                 }
                 field(Status; Status)
                 {
                     ApplicationArea = NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Status field';
                 }
                 field("Notification Count"; "Notification Count")
                 {
                     ApplicationArea = NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Notification Count field';
                 }
                 field("Notified At"; "Notified At")
                 {
                     ApplicationArea = NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Notified At field';
                 }
                 field("Notification Expires At"; "Notification Expires At")
                 {
                     ApplicationArea = NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Notification Expires At field';
                 }
             }
         }

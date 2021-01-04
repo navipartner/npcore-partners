@@ -15,38 +15,47 @@ page 6060146 "NPR MM Foreign Members. Setup"
                 field("Community Code"; "Community Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Community Code field';
                 }
                 field("Manager Code"; "Manager Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Manager Code field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Invokation Priority"; "Invokation Priority")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Invokation Priority field';
                 }
                 field(Disabled; Disabled)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Disabled field';
                 }
                 field("Append Local Prefix"; "Append Local Prefix")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Append Local Prefix field';
                 }
                 field("Remove Local Prefix"; "Remove Local Prefix")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Remove Local Prefix field';
                 }
                 field("Append Local Suffix"; "Append Local Suffix")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Append Local Suffix field';
                 }
                 field("Remove Local Suffix"; "Remove Local Suffix")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Remove Local Suffix field';
                 }
             }
         }
@@ -64,6 +73,7 @@ page 6060146 "NPR MM Foreign Members. Setup"
                 Promoted = true;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Show Setup action';
 
                 trigger OnAction()
                 begin
@@ -79,6 +89,7 @@ page 6060146 "NPR MM Foreign Members. Setup"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Show Dashboard action';
 
                 trigger OnAction()
                 begin

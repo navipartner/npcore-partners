@@ -21,45 +21,55 @@ page 6150703 "NPR POS Actions"
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field(Version; Version)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Version field';
                 }
                 field(Blocked; Blocked)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Blocked field';
                 }
                 field(Type; Type)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Type field';
                 }
                 field("Workflow.HASVALUE()"; Workflow.HasValue())
                 {
                     ApplicationArea = All;
                     Caption = 'Workflow Defined';
+                    ToolTip = 'Specifies the value of the Workflow Defined field';
                 }
                 field("Data Source Name"; "Data Source Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Data Source Name field';
                 }
                 field("Blocking UI"; "Blocking UI")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Blocking UI field';
                 }
                 field("<Blocking UI>"; "Codeunit ID")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Codeunit ID field';
                 }
                 field("Secure Method Code"; "Secure Method Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Secure Method Code field';
                 }
             }
         }
@@ -77,6 +87,7 @@ page 6150703 "NPR POS Actions"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Refresh Workflow action';
 
                 trigger OnAction()
                 begin
@@ -96,6 +107,7 @@ page 6150703 "NPR POS Actions"
                 RunObject = Page "NPR POS Action Param.";
                 RunPageLink = "POS Action Code" = FIELD(Code);
                 ApplicationArea = All;
+                ToolTip = 'Executes the Parameters action';
             }
             action(Workflow)
             {
@@ -108,6 +120,7 @@ page 6150703 "NPR POS Actions"
                 RunObject = Page "NPR POS Action Workflow";
                 RunPageLink = "POS Action Code" = FIELD(Code);
                 ApplicationArea = All;
+                ToolTip = 'Executes the Workflow action';
             }
         }
     }

@@ -18,22 +18,27 @@ page 6014442 "NPR Item - Series Number"
                 field("Serial No."; "Serial No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Serial No. field';
                 }
                 field("Variant Code"; "Variant Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Variant Code field';
                 }
                 field("Expiration Date"; "Expiration Date")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Expiration Date field';
                 }
                 field("Document No."; "Document No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Document No. field';
                 }
                 field("Global Dimension 1 Code"; "Global Dimension 1 Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Global Dimension 1 Code field';
                 }
             }
         }

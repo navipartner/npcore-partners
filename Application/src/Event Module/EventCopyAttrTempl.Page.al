@@ -23,12 +23,14 @@ page 6060156 "NPR Event Copy Attr./Templ."
                     ApplicationArea = All;
                     Caption = 'From Event No.';
                     TableRelation = Job."No." WHERE("NPR Event" = CONST(true));
+                    ToolTip = 'Specifies the value of the From Event No. field';
                 }
                 field(ToEventNo; ToEventNo)
                 {
                     ApplicationArea = All;
                     Caption = 'To Event No.';
                     TableRelation = Job."No." WHERE("NPR Event" = CONST(true));
+                    ToolTip = 'Specifies the value of the To Event No. field';
                 }
             }
         }

@@ -21,18 +21,22 @@ page 6151524 "NPR Nc Endpoint E-mail List"
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field(Enabled; Enabled)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Enabled field';
                 }
                 field("Recipient E-Mail Address"; "Recipient E-Mail Address")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Recipient E-Mail Address field';
                 }
             }
         }
@@ -47,6 +51,7 @@ page 6151524 "NPR Nc Endpoint E-mail List"
                 Caption = 'Trigger Links';
                 Image = Link;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Trigger Links action';
 
                 trigger OnAction()
                 begin

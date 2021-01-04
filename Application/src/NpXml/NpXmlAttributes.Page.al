@@ -21,31 +21,38 @@ page 6151555 "NPR NpXml Attributes"
                 field("Attribute Name"; "Attribute Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Attribute Name field';
                 }
                 field(Namespace; Namespace)
                 {
                     ApplicationArea = All;
                     Visible = NamespacesEnabled;
+                    ToolTip = 'Specifies the value of the Namespace field';
                 }
                 field("Attribute Field No."; "Attribute Field No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Attribute Field No. field';
                 }
                 field("Attribute Field Name"; "Attribute Field Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Attribute Field Name field';
                 }
                 field("Default Value"; "Default Value")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Default Value field';
                 }
                 field("Only with Value"; "Only with Value")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Only with Value field';
                 }
                 field("Default Field Type"; "Default Field Type")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Default Field Type field';
                 }
             }
         }

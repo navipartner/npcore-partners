@@ -230,6 +230,7 @@ report 6014441 "NPR POS Item Sales with Dim."
                         Caption = 'Show Dimensions';
                         Editable = false;
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Show Dimensions field';
 
                         trigger OnAssistEdit()
                         begin

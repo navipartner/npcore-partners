@@ -17,30 +17,37 @@ page 6059993 "NPR Item Repair Log"
                 field("Entry No."; "Entry No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Entry No. field';
                 }
                 field("Item No."; "Item No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Item No. field';
                 }
                 field("Variant Code"; "Variant Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Variant Code field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("From value"; "From value")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the From value field';
                 }
                 field("To Value"; "To Value")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the To Value field';
                 }
                 field("Changed By"; "Changed By")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Changed By field';
                 }
             }
         }

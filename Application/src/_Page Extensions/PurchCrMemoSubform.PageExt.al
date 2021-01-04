@@ -17,6 +17,7 @@ pageextension 6014492 "NPR Purch. Cr. Memo Subform" extends "Purch. Cr. Memo Sub
                 Image = ItemVariant;
                 ShortCutKey = 'Ctrl+Alt+V';
                 ApplicationArea = All;
+                ToolTip = 'Executes the Variety action';
             }
         }
     }

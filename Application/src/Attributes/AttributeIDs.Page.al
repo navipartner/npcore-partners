@@ -16,18 +16,22 @@ page 6014607 "NPR Attribute IDs"
                 field("Table ID"; "Table ID")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Table ID field';
                 }
                 field("Attribute Code"; "Attribute Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Attribute Code field';
                 }
                 field("Shortcut Attribute ID"; "Shortcut Attribute ID")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Shortcut Attribute ID field';
                 }
                 field("Entity Attribute ID"; "Entity Attribute ID")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Entity Attribute ID field';
                 }
             }
         }

@@ -20,6 +20,7 @@ page 6151332 "NPR Retail Ent Headline"
                     ApplicationArea = Basic, Suite;
                     Caption = 'Greeting headline';
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Greeting headline field';
 
                 }
             }
@@ -33,6 +34,7 @@ page 6151332 "NPR Retail Ent Headline"
                     ApplicationArea = All;
 
                     Editable = false;
+                    ToolTip = 'Specifies the value of the IssuedTicketText field';
                 }
             }
             group(Control3)
@@ -43,6 +45,7 @@ page 6151332 "NPR Retail Ent Headline"
                     ApplicationArea = All;
 
                     Editable = false;
+                    ToolTip = 'Specifies the value of the TicketAdmission field';
                 }
             }
             group(Control6)
@@ -53,6 +56,7 @@ page 6151332 "NPR Retail Ent Headline"
                     ApplicationArea = All;
 
                     Editable = false;
+                    ToolTip = 'Specifies the value of the MembersCreated field';
                 }
             }
 

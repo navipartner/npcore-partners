@@ -275,22 +275,27 @@ report 6014505 "NPR Delivery Note"
                     field("LetterText[1]"; LetterText[1])
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the LetterText[1] field';
                     }
                     field("LetterText[2]"; LetterText[2])
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the LetterText[2] field';
                     }
                     field("LetterText[3]"; LetterText[3])
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the LetterText[3] field';
                     }
                     field("LetterText[4]"; LetterText[4])
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the LetterText[4] field';
                     }
                     field("LetterText[5]"; LetterText[5])
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the LetterText[5] field';
                     }
                 }
             }

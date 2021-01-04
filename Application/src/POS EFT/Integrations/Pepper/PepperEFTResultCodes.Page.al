@@ -19,34 +19,42 @@ page 6184489 "NPR Pepper EFT Result Codes"
                 field("Integration Type"; "Integration Type")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Integration Type field';
                 }
                 field("Transaction Type Code"; "Transaction Type Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Transaction Type Code field';
                 }
                 field("Transaction Subtype Code"; "Transaction Subtype Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Transaction Subtype Code field';
                 }
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field(Successful; Successful)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Successful field';
                 }
                 field("Long Description"; "Long Description")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Long Description field';
                 }
                 field("Open Terminal and Retry"; "Open Terminal and Retry")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Open Terminal and Retry field';
                 }
             }
         }

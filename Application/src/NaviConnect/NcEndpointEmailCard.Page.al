@@ -18,14 +18,17 @@ page 6151525 "NPR Nc Endpoint E-mail Card"
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field(Enabled; Enabled)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Enabled field';
                 }
             }
             group("E-Mail")
@@ -33,34 +36,42 @@ page 6151525 "NPR Nc Endpoint E-mail Card"
                 field("Recipient E-Mail Address"; "Recipient E-Mail Address")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Recipient E-Mail Address field';
                 }
                 field("CC E-Mail Address"; "CC E-Mail Address")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the CC E-Mail Address field';
                 }
                 field("BCC E-Mail Address"; "BCC E-Mail Address")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the BCC E-Mail Address field';
                 }
                 field("Subject Text"; "Subject Text")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Subject Text field';
                 }
                 field("Body Text"; "Body Text")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Body Text field';
                 }
                 field("Filename Attachment"; "Filename Attachment")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Filename Attachment field';
                 }
                 field("Sender Name"; "Sender Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Sender Name field';
                 }
                 field("Sender E-Mail Address"; "Sender E-Mail Address")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Sender E-Mail Address field';
                 }
             }
         }
@@ -75,6 +86,7 @@ page 6151525 "NPR Nc Endpoint E-mail Card"
                 Caption = 'Trigger Links';
                 Image = Link;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Trigger Links action';
 
                 trigger OnAction()
                 begin

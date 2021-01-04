@@ -15,26 +15,32 @@ page 6151042 "NPR Notification Card"
                 field(Id; Id)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Id field';
                 }
                 field(Title; Title)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Title field';
                 }
                 field(Body; Body)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Body field';
                 }
                 field(Handled; Handled)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Handled field';
                 }
                 field("Handled By"; "Handled By")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Handled By field';
                 }
                 field("Handled Register"; "Handled Register")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Handled Register field';
                 }
             }
         }
@@ -52,6 +58,7 @@ page 6151042 "NPR Notification Card"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Complete action';
 
                 trigger OnAction()
                 begin
@@ -67,6 +74,7 @@ page 6151042 "NPR Notification Card"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Cancel action';
 
                 trigger OnAction()
                 begin

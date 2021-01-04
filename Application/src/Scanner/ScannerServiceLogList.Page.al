@@ -21,30 +21,37 @@ page 6059997 "NPR Scanner Service Log List"
                 field(Id; Id)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Id field';
                 }
                 field("Request Start"; "Request Start")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Request Start field';
                 }
                 field("Request End"; "Request End")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Request End field';
                 }
                 field("Request Function"; "Request Function")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Request Function field';
                 }
                 field("Internal Request"; "Internal Request")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Internal Request field';
                 }
                 field("Internal Log No."; "Internal Log No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Internal Log No. field';
                 }
                 field("Current User"; "Current User")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Current User field';
                 }
             }
         }

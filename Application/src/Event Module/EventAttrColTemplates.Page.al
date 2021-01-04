@@ -17,10 +17,12 @@ page 6060162 "NPR Event Attr. Col. Templates"
                 field(Name; Name)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Name field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
             }
         }
@@ -40,6 +42,7 @@ page 6060162 "NPR Event Attr. Col. Templates"
                 RunObject = Page "NPR Event Attr. Column Values";
                 RunPageLink = "Template Name" = FIELD(Name);
                 ApplicationArea = All;
+                ToolTip = 'Executes the Values action';
             }
         }
     }

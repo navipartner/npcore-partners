@@ -21,6 +21,7 @@ page 6184499 "NPR EFT Tr.Rq.Comment Subform"
                 DrillDown = true;
                 Editable = false;
                 ShowCaption = false;
+                ToolTip = 'Specifies the value of the Receipt1Text field';
 
                 trigger OnDrillDown()
                 var
@@ -38,6 +39,7 @@ page 6184499 "NPR EFT Tr.Rq.Comment Subform"
                 DrillDown = true;
                 Editable = false;
                 ShowCaption = false;
+                ToolTip = 'Specifies the value of the Receipt2Text field';
 
                 trigger OnDrillDown()
                 var
@@ -54,6 +56,7 @@ page 6184499 "NPR EFT Tr.Rq.Comment Subform"
                 field(Comment; Comment)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Comment field';
                 }
             }
         }

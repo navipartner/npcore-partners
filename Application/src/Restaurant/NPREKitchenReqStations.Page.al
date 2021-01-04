@@ -18,31 +18,38 @@ page 6150692 "NPR NPRE Kitchen Req. Stations"
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Request No. field';
                 }
                 field("Line No."; "Line No.")
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Line No. field';
                 }
                 field("Production Restaurant Code"; "Production Restaurant Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Production Restaurant Code field';
                 }
                 field("Kitchen Station"; "Kitchen Station")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Kitchen Station field';
                 }
                 field("Production Status"; "Production Status")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Production Status field';
                 }
                 field("Start Date-Time"; "Start Date-Time")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Start Date-Time field';
                 }
                 field("End Date-Time"; "End Date-Time")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the End Date-Time field';
                 }
             }
         }

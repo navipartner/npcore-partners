@@ -18,18 +18,22 @@ page 6014692 "NPR Retail Admin Activ. - Tick"
                 field("Ticket Types"; "Ticket Types")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Ticket Types field';
                 }
                 field("Ticket Admission BOMs"; "Ticket Admission BOMs")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Ticket Admission BOMs field';
                 }
                 field("Ticket Schedules"; "Ticket Schedules")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Ticket Schedules field';
                 }
                 field("Ticket Admissions"; "Ticket Admissions")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Ticket Admissions field';
                 }
             }
         }

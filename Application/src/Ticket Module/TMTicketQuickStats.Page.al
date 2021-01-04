@@ -1,4 +1,4 @@
-﻿page 6060111 "NPR TM Ticket Quick Stats"
+page 6060111 "NPR TM Ticket Quick Stats"
 {
     // TM1.15/TSA/20160512  CASE 240863 POS Quick Statistics
     // TM1.19/TSA/20170202  CASE 265061 To be able to expose the page as a webservice and give the webserivce the ability to filter, GUIALLOWED was added in the OnOpenPage where default filter is set
@@ -26,35 +26,43 @@
                 field("Admission Code"; "Admission Code")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Admission Code field';
                 }
                 field("Admission Start Date"; "Admission Start Date")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Admission Start Date field';
                 }
                 field("Admission Start Time"; "Admission Start Time")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Admission Start Time field';
                 }
                 field("Admission End Time"; "Admission End Time")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Admission End Time field';
                 }
                 field("Open Reservations"; "Open Reservations")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Open Reservations field';
                 }
                 field("Open Admitted"; "Open Admitted")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Open Admitted field';
                 }
                 field(Departed; Departed)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Departed field';
                 }
                 field(AdmittedCount; AdmittedCount)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Admitted Today';
+                    ToolTip = 'Specifies the value of the Admitted Today field';
                 }
             }
         }

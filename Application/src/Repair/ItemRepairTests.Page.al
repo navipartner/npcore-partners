@@ -18,26 +18,32 @@ page 6059992 "NPR Item Repair Tests"
                 field("Item No."; "Item No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Item No. field';
                 }
                 field("Variant Code"; "Variant Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Variant Code field';
                 }
                 field("Test No."; "Test No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Test No. field';
                 }
                 field("Test Group"; "Test Group")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Test Group field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field(Success; Success)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Success field';
                 }
             }
         }

@@ -19,6 +19,7 @@ pageextension 6014463 "NPR Transfer Order Subform" extends "Transfer Order Subfo
             field("NPR Cross-Reference No."; "NPR Cross-Reference No.")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the NPR Cross-Reference No. field';
             }
         }
         addafter("Variant Code")
@@ -27,6 +28,7 @@ pageextension 6014463 "NPR Transfer Order Subform" extends "Transfer Order Subfo
             {
                 ApplicationArea = All;
                 Visible = false;
+                ToolTip = 'Specifies the value of the NPR Vendor Item No. field';
             }
         }
         addafter(Description)
@@ -34,6 +36,7 @@ pageextension 6014463 "NPR Transfer Order Subform" extends "Transfer Order Subfo
             field("NPR Description 2"; "Description 2")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the Description 2 field';
             }
         }
     }
@@ -47,6 +50,7 @@ pageextension 6014463 "NPR Transfer Order Subform" extends "Transfer Order Subfo
                 Image = ItemVariant;
                 ShortCutKey = 'Ctrl+Alt+V';
                 ApplicationArea = All;
+                ToolTip = 'Executes the Variety action';
             }
         }
     }

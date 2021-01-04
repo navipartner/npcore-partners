@@ -19,6 +19,7 @@ page 6014599 "NPR CleanCash Transaction VAT"
                     ApplicationArea = All;
                     Editable = false;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Entry No. field';
                 }
                 field("VAT Class"; Rec."VAT Class")
                 {

@@ -19,14 +19,17 @@ page 6151590 "NPR NpDc Coupon Type Card"
                     {
                         ApplicationArea = All;
                         ShowMandatory = true;
+                        ToolTip = 'Specifies the value of the Code field';
                     }
                     field(Description; Description)
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Description field';
                     }
                     field("Discount Type"; "Discount Type")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Discount Type field';
                     }
                     group(Control6014439)
                     {
@@ -36,6 +39,7 @@ page 6151590 "NPR NpDc Coupon Type Card"
                         {
                             ApplicationArea = All;
                             ShowMandatory = true;
+                            ToolTip = 'Specifies the value of the Discount Amount field';
                         }
                     }
                     group(Control6014440)
@@ -46,6 +50,7 @@ page 6151590 "NPR NpDc Coupon Type Card"
                         {
                             ApplicationArea = All;
                             ShowMandatory = true;
+                            ToolTip = 'Specifies the value of the Discount % field';
                         }
                         field("Max. Discount Amount"; "Max. Discount Amount")
                         {
@@ -56,6 +61,7 @@ page 6151590 "NPR NpDc Coupon Type Card"
                     field(Enabled; Enabled)
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Enabled field';
                     }
                 }
                 group(Control6014443)
@@ -64,10 +70,12 @@ page 6151590 "NPR NpDc Coupon Type Card"
                     field("Coupon Qty. (Open)"; "Coupon Qty. (Open)")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Coupon Qty. (Open) field';
                     }
                     field("Arch. Coupon Qty."; "Arch. Coupon Qty.")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Arch. Coupon Qty. field';
                     }
                 }
             }
@@ -80,6 +88,7 @@ page 6151590 "NPR NpDc Coupon Type Card"
                     field("Issue Coupon Module"; "Issue Coupon Module")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Issue Coupon Module field';
 
                         trigger OnValidate()
                         begin
@@ -100,14 +109,17 @@ page 6151590 "NPR NpDc Coupon Type Card"
                     {
                         ApplicationArea = All;
                         Caption = 'Customer No.';
+                        ToolTip = 'Specifies the value of the Customer No. field';
                     }
                     field("Print Template Code"; "Print Template Code")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Print Template Code field';
                     }
                     field("Print on Issue"; "Print on Issue")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Print on Issue field';
                     }
                 }
             }
@@ -120,6 +132,7 @@ page 6151590 "NPR NpDc Coupon Type Card"
                     field("Validate Coupon Module"; "Validate Coupon Module")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Validate Coupon Module field';
 
                         trigger OnValidate()
                         begin
@@ -133,10 +146,12 @@ page 6151590 "NPR NpDc Coupon Type Card"
                     field("Starting Date"; "Starting Date")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Starting Date field';
                     }
                     field("Ending Date"; "Ending Date")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Ending Date field';
                     }
                 }
             }
@@ -149,6 +164,7 @@ page 6151590 "NPR NpDc Coupon Type Card"
                     field("Apply Discount Module"; "Apply Discount Module")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Apply Discount Module field';
 
                         trigger OnValidate()
                         begin
@@ -158,6 +174,7 @@ page 6151590 "NPR NpDc Coupon Type Card"
                     field("Application Sequence No."; "Application Sequence No.")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Application Sequence No. field';
                     }
                 }
                 group(Control6014433)
@@ -166,15 +183,18 @@ page 6151590 "NPR NpDc Coupon Type Card"
                     field("Max Use per Sale"; "Max Use per Sale")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Max Use per Sale field';
                     }
                     field("Multi-Use Coupon"; "Multi-Use Coupon")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Multi-Use Coupon field';
                     }
                     field("Multi-Use Qty."; "Multi-Use Qty.")
                     {
                         ApplicationArea = All;
                         Caption = 'Multi-Use Qty.';
+                        ToolTip = 'Specifies the value of the Multi-Use Qty. field';
                     }
                 }
             }
@@ -193,6 +213,7 @@ page 6151590 "NPR NpDc Coupon Type Card"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Issue Coupons action';
 
                 trigger OnAction()
                 var
@@ -215,6 +236,7 @@ page 6151590 "NPR NpDc Coupon Type Card"
                     PromotedIsBig = true;
                     Visible = HasIssueCouponSetup;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Setup Issue Coupon action';
 
                     trigger OnAction()
                     var
@@ -232,6 +254,7 @@ page 6151590 "NPR NpDc Coupon Type Card"
                     PromotedIsBig = true;
                     Visible = HasValidateCouponSetup;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Setup Validate Coupon action';
 
                     trigger OnAction()
                     var
@@ -249,6 +272,7 @@ page 6151590 "NPR NpDc Coupon Type Card"
                     PromotedIsBig = true;
                     Visible = HasApplyDiscountSetup;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Setup Apply Discount action';
 
                     trigger OnAction()
                     var
@@ -269,6 +293,7 @@ page 6151590 "NPR NpDc Coupon Type Card"
                 RunPageLink = "Coupon Type" = FIELD(Code);
                 ShortCutKey = 'Ctrl+F7';
                 ApplicationArea = All;
+                ToolTip = 'Executes the Coupons action';
             }
             action(Comments)
             {
@@ -283,6 +308,7 @@ page 6151590 "NPR NpDc Coupon Type Card"
                               Integer = CONST(0),
                               "Integer 2" = CONST(0);
                 ApplicationArea = All;
+                ToolTip = 'Executes the Co&mments action';
             }
         }
     }

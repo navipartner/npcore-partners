@@ -119,16 +119,19 @@ report 6060111 "NPR Check Duplicate Cust."
                     {
                         Caption = 'Name';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Name field';
                     }
                     field(CheckAddr; CheckAddr)
                     {
                         Caption = 'Address';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Address field';
                     }
                     field(CheckPhone; CheckPhone)
                     {
                         Caption = 'Phone No.';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Phone No. field';
                     }
                 }
             }

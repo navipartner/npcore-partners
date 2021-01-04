@@ -31,102 +31,126 @@ page 6014470 "NPR Retail Document Lines"
                 field(Type; Type)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Type field';
                 }
                 field("No."; "No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the No. field';
                 }
                 field("Serial No."; "Serial No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Serial No. field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Variant Code"; "Variant Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Variant Code field';
                 }
                 field(Size; Size)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Size field';
                 }
                 field("Lock Code"; "Lock Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Lock Code field';
                 }
                 field("Serial No. not Created"; "Serial No. not Created")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Serial No. not Created field';
                 }
                 field(Quantity; Quantity)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Quantity field';
                 }
                 field("Quantity in order"; "Quantity in order")
                 {
                     ApplicationArea = All;
                     Visible = FieldQtyInOrder;
+                    ToolTip = 'Specifies the value of the Quantity in order field';
                 }
                 field("Quantity received"; "Quantity received")
                 {
                     ApplicationArea = All;
                     Visible = FieldQuantityReceived;
+                    ToolTip = 'Specifies the value of the Quantity received field';
                 }
                 field("Qty. to Ship"; "Qty. to Ship")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Qty. to Ship field';
                 }
                 field("Quantity Shipped"; "Quantity Shipped")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Quantity Shipped field';
                 }
                 field("Location Code"; "Location Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Location Code field';
                 }
                 field("Received last"; "Received last")
                 {
                     ApplicationArea = All;
                     Visible = FieldReceivedLast;
+                    ToolTip = 'Specifies the value of the Received last field';
                 }
                 field("Letter printed"; "Letter printed")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Letter printed field';
                 }
                 field("Return Reason Code"; "Return Reason Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Return Reason Code field';
                 }
                 field("Reason Code"; "Reason Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Reason Code field';
                 }
                 field("Rental Amount incl. VAT"; "Rental Amount incl. VAT")
                 {
                     ApplicationArea = All;
                     Visible = FieldRentIncVat;
+                    ToolTip = 'Specifies the value of the Rental Amount incl. VAT field';
                 }
                 field("Unit price"; "Unit price")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Unit Price field';
                 }
                 field("Line discount %"; "Line discount %")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Line Discount % field';
                 }
                 field("Line discount amount"; "Line discount amount")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Line Discount Amount field';
                 }
                 field("Amount Including VAT"; "Amount Including VAT")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Amount Including VAT field';
                 }
                 field("Package quantity"; "Package quantity")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Package quantity field';
                 }
             }
         }

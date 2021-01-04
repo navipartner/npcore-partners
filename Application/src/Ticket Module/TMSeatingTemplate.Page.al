@@ -1,4 +1,4 @@
-﻿page 6151131 "NPR TM Seating Template"
+page 6151131 "NPR TM Seating Template"
 {
     // TM1.45/TSA/20200122  CASE 322432-01 Transport TM1.45 - 22 January 2020
 
@@ -23,27 +23,33 @@
                 field(Description; Description)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Seating Code"; "Seating Code")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Seating Code field';
                 }
                 field("Admission Code"; "Admission Code")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Admission Code field';
                 }
                 field("Entry Type"; "Entry Type")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Entry Type field';
                 }
                 field(Capacity; Capacity)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Capacity field';
                 }
                 field("Reservation Category"; "Reservation Category")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Reservation Category field';
                 }
                 field("Unit Price"; "Unit Price")
                 {
@@ -51,6 +57,7 @@
                     Style = StandardAccent;
                     StyleExpr = AccentuatedPrice;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Unit Price field';
 
                     trigger OnValidate()
                     var
@@ -72,6 +79,7 @@
                     Caption = 'Unit Price';
                     Style = StandardAccent;
                     StyleExpr = AccentuatedPrice;
+                    ToolTip = 'Specifies the value of the Unit Price field';
 
                     trigger OnValidate()
                     var
@@ -89,14 +97,17 @@
                 field(Ordinal; Ordinal)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Ordinal field';
                 }
                 field(Path; Path)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Path field';
                 }
                 field("Indent Level"; "Indent Level")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Indent Level field';
                 }
             }
         }

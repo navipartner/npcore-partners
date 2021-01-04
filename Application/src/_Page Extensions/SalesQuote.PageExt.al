@@ -19,10 +19,12 @@ pageextension 6014439 "NPR Sales Quote" extends "Sales Quote"
             field("NPR Bill-to E-mail"; "NPR Bill-to E-mail")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the NPR Bill-to E-mail field';
             }
             field("NPR Document Processing"; "NPR Document Processing")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the NPR Document Processing field';
             }
         }
     }
@@ -38,12 +40,14 @@ pageextension 6014439 "NPR Sales Quote" extends "Sales Quote"
                     Caption = 'E-mail Log';
                     Image = Email;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the E-mail Log action';
                 }
                 action("NPR SendAsPDF")
                 {
                     Caption = 'Send as PDF';
                     Image = SendEmailPDF;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Send as PDF action';
                 }
             }
             group("NPR SMS")
@@ -54,6 +58,7 @@ pageextension 6014439 "NPR Sales Quote" extends "Sales Quote"
                     Caption = 'Send SMS';
                     Image = SendConfirmation;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Send SMS action';
                 }
             }
         }

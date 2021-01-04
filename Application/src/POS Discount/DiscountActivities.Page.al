@@ -16,11 +16,13 @@ page 6059987 "NPR Discount Activities"
                 {
                     ApplicationArea = All;
                     DrillDownPageID = "NPR Mixed Discount List";
+                    ToolTip = 'Specifies the value of the Mixed Discounts Active field';
                 }
                 field("Period Discounts Active"; "Period Discounts Active")
                 {
                     ApplicationArea = All;
                     DrillDownPageID = "NPR Campaign Discount List";
+                    ToolTip = 'Specifies the value of the Period Discounts Active field';
                 }
 
                 actions
@@ -31,6 +33,7 @@ page 6059987 "NPR Discount Activities"
                         RunObject = Page "NPR Mixed Discount";
                         RunPageMode = Create;
                         ApplicationArea = All;
+                        ToolTip = 'Executes the New Mixed Discount action';
                     }
                     action("New Period Discount")
                     {
@@ -38,6 +41,7 @@ page 6059987 "NPR Discount Activities"
                         RunObject = Page "NPR Campaign Discount";
                         RunPageMode = Create;
                         ApplicationArea = All;
+                        ToolTip = 'Executes the New Perioddiscount action';
                     }
                 }
             }

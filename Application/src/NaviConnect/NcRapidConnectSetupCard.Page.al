@@ -16,16 +16,19 @@ page 6151090 "NPR Nc RapidConnect Setup Card"
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Package Code"; "Package Code")
                 {
                     ApplicationArea = All;
                     Importance = Promoted;
                     ShowMandatory = true;
+                    ToolTip = 'Specifies the value of the Package Code field';
                 }
             }
             group(Export)
@@ -38,15 +41,18 @@ page 6151090 "NPR Nc RapidConnect Setup Card"
                     {
                         ApplicationArea = All;
                         Importance = Promoted;
+                        ToolTip = 'Specifies the value of the Export Enabled field';
                     }
                     field("Task Processor Code"; "Task Processor Code")
                     {
                         ApplicationArea = All;
                         Importance = Promoted;
+                        ToolTip = 'Specifies the value of the Task Processor Code field';
                     }
                     field("Export File Type"; "Export File Type")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Export File Type field';
                     }
                 }
                 group(Control6151414)
@@ -71,22 +77,27 @@ page 6151090 "NPR Nc RapidConnect Setup Card"
                 {
                     ApplicationArea = All;
                     Importance = Promoted;
+                    ToolTip = 'Specifies the value of the Import Enabled field';
                 }
                 field("Import Type"; "Import Type")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Import Type field';
                 }
                 field("Validate Package"; "Validate Package")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Validate Package field';
                 }
                 field("Apply Package"; "Apply Package")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Apply Package field';
                 }
                 field("Disable Data Log on Import"; "Disable Data Log on Import")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Disable Data Log on Import field';
                 }
                 group("Download from")
                 {
@@ -95,34 +106,42 @@ page 6151090 "NPR Nc RapidConnect Setup Card"
                     {
                         ApplicationArea = All;
                         Importance = Promoted;
+                        ToolTip = 'Specifies the value of the Ftp Host field';
                     }
                     field("Ftp Port"; "Ftp Port")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Ftp Port field';
                     }
                     field("Ftp User"; "Ftp User")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Ftp User field';
                     }
                     field("Ftp Password"; "Ftp Password")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Ftp Password field';
                     }
                     field("Ftp Passive"; "Ftp Passive")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Ftp Passive field';
                     }
                     field("Ftp Binary"; "Ftp Binary")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Ftp Binary field';
                     }
                     field("Ftp Path"; "Ftp Path")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Ftp Path field';
                     }
                     field("Ftp Backup Path"; "Ftp Backup Path")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Ftp Backup Path field';
                     }
                 }
             }
@@ -141,6 +160,7 @@ page 6151090 "NPR Nc RapidConnect Setup Card"
                     Caption = 'Init Export Triggers';
                     Image = "Action";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Init Export Triggers action';
 
                     trigger OnAction()
                     var
@@ -159,6 +179,7 @@ page 6151090 "NPR Nc RapidConnect Setup Card"
                     Image = Delegate;
                     Visible = "Import Enabled";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Download Ftp action';
 
                     trigger OnAction()
                     var

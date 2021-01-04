@@ -19,27 +19,33 @@ page 6150729 "NPR POS Sales Workflows"
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Publisher Codeunit ID"; "Publisher Codeunit ID")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Publisher Codeunit ID field';
                 }
                 field("Publisher Codeunit Name"; "Publisher Codeunit Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Publisher Codeunit Name field';
                 }
                 field("Publisher Function"; "Publisher Function")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Publisher Function field';
                 }
                 field(Control6014410; "Workflow Steps")
                 {
                     ApplicationArea = All;
                     ShowCaption = false;
+                    ToolTip = 'Specifies the value of the Workflow Steps field';
                 }
             }
         }
@@ -60,6 +66,7 @@ page 6150729 "NPR POS Sales Workflows"
                 RunPageLink = "Set Code" = CONST(''),
                               "Workflow Code" = FIELD(Code);
                 ApplicationArea = All;
+                ToolTip = 'Executes the Workflow Steps action';
             }
             action("Initiate Workflow Steps")
             {
@@ -70,6 +77,7 @@ page 6150729 "NPR POS Sales Workflows"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Initiate Workflow Steps action';
 
                 trigger OnAction()
                 var

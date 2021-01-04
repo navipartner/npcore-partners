@@ -22,49 +22,59 @@ page 6151552 "NPR NpXml Template List"
                     {
                         ApplicationArea = All;
                         Editable = false;
+                        ToolTip = 'Specifies the value of the Code field';
                     }
                     field("Task Processor Code"; "Task Processor Code")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Task Processor Code field';
                     }
                     field("Xml Root Name"; "Xml Root Name")
                     {
                         ApplicationArea = All;
                         Editable = false;
+                        ToolTip = 'Specifies the value of the Xml Root Name field';
                     }
                     field("Table No."; "Table No.")
                     {
                         ApplicationArea = All;
                         Editable = false;
+                        ToolTip = 'Specifies the value of the Table No. field';
                     }
                     field("Template Version"; "Template Version")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Version field';
                     }
                     field("Transaction Task"; "Transaction Task")
                     {
                         ApplicationArea = All;
                         Editable = false;
+                        ToolTip = 'Specifies the value of the Transaction Task field';
                     }
                     field("Batch Task"; "Batch Task")
                     {
                         ApplicationArea = All;
                         Editable = false;
+                        ToolTip = 'Specifies the value of the Batch Task field';
                     }
                     field("File Transfer"; "File Transfer")
                     {
                         ApplicationArea = All;
                         Editable = false;
+                        ToolTip = 'Specifies the value of the File Transfer field';
                     }
                     field("FTP Transfer"; "FTP Transfer")
                     {
                         ApplicationArea = All;
                         Editable = false;
+                        ToolTip = 'Specifies the value of the FTP Transfer field';
                     }
                     field("API Transfer"; "API Transfer")
                     {
                         ApplicationArea = All;
                         Editable = false;
+                        ToolTip = 'Specifies the value of the API Transfer field';
                     }
                 }
                 part(Control6150623; "NPR NpXml Templ. Trigger List")
@@ -93,6 +103,7 @@ page 6151552 "NPR NpXml Template List"
                 RunPageLink = "Xml Template Code" = FIELD(Code);
                 Visible = false;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Edit Field Mapping action';
             }
             action("View Field Mapping")
             {
@@ -105,6 +116,7 @@ page 6151552 "NPR NpXml Template List"
                 RunPageLink = "Xml Template Code" = FIELD(Code);
                 Visible = false;
                 ApplicationArea = All;
+                ToolTip = 'Executes the View Field Mapping action';
             }
         }
         area(processing)
@@ -116,6 +128,7 @@ page 6151552 "NPR NpXml Template List"
                 Promoted = true;
                 PromotedCategory = Process;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Run Batch action';
 
                 trigger OnAction()
                 begin
@@ -127,6 +140,7 @@ page 6151552 "NPR NpXml Template List"
                 Caption = 'Export Xml Template';
                 Image = Export;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Export Xml Template action';
 
                 trigger OnAction()
                 begin
@@ -138,6 +152,7 @@ page 6151552 "NPR NpXml Template List"
                 Caption = 'Import Template';
                 Image = Import;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Import Template action';
 
                 trigger OnAction()
                 begin
@@ -149,6 +164,7 @@ page 6151552 "NPR NpXml Template List"
                 Caption = 'Delete Selected Templates';
                 Image = DeleteXML;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Delete Selected Templates action';
 
                 trigger OnAction()
                 var

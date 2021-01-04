@@ -15,10 +15,12 @@ page 6151401 "NPR Magento Setup"
                 field("Magento Enabled"; "Magento Enabled")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Magento Enabled field';
                 }
                 field("Magento Version"; "Magento Version")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Magento Version field';
 
                     trigger OnValidate()
                     begin
@@ -28,6 +30,7 @@ page 6151401 "NPR Magento Setup"
                 field("Magento Url"; "Magento Url")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Magento Url field';
                 }
                 group("Magento Api")
                 {
@@ -37,26 +40,31 @@ page 6151401 "NPR Magento Setup"
                     {
                         ApplicationArea = All;
                         Importance = Additional;
+                        ToolTip = 'Specifies the value of the Api Url field';
                     }
                     field("Api Username Type"; "Api Username Type")
                     {
                         ApplicationArea = All;
                         Importance = Additional;
+                        ToolTip = 'Specifies the value of the Api Username Type field';
                     }
                     field("Api Username"; "Api Username")
                     {
                         ApplicationArea = All;
                         Enabled = "Api Username Type" = "Api Username Type"::Custom;
                         Importance = Additional;
+                        ToolTip = 'Specifies the value of the Api Username field';
                     }
                     field("Api Password"; "Api Password")
                     {
                         ApplicationArea = All;
                         Importance = Additional;
+                        ToolTip = 'Specifies the value of the Api Password field';
                     }
                     field("Api Authorization"; "Api Authorization")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Api Authorization field';
                     }
                 }
                 field("FORMAT(""Generic Setup"".HASVALUE)"; Format("Generic Setup".HasValue))
@@ -64,6 +72,7 @@ page 6151401 "NPR Magento Setup"
                     ApplicationArea = All;
                     Caption = 'NpXml Setup';
                     Importance = Additional;
+                    ToolTip = 'Specifies the value of the NpXml Setup field';
 
                     trigger OnAssistEdit()
                     var
@@ -80,29 +89,35 @@ page 6151401 "NPR Magento Setup"
                     {
                         ApplicationArea = All;
                         Importance = Additional;
+                        ToolTip = 'Specifies the value of the Managed Nav Modules Enabled field';
                     }
                     field("Managed Nav Api Url"; "Managed Nav Api Url")
                     {
                         ApplicationArea = All;
                         Importance = Additional;
+                        ToolTip = 'Specifies the value of the Managed Nav Api Url field';
                     }
                     field("Managed Nav Api Username"; "Managed Nav Api Username")
                     {
                         ApplicationArea = All;
                         Importance = Additional;
+                        ToolTip = 'Specifies the value of the Managed Nav api brugernavn field';
                     }
                     field("Managed Nav Api Password"; "Managed Nav Api Password")
                     {
                         ApplicationArea = All;
                         Importance = Additional;
+                        ToolTip = 'Specifies the value of the Managed Nav Api Password field';
                     }
                     field("Version No."; "Version No.")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Version No. field';
                     }
                     field("Version Coverage"; "Version Coverage")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Version Coverage field';
 
                         trigger OnDrillDown()
                         var
@@ -118,6 +133,7 @@ page 6151401 "NPR Magento Setup"
                 field("Variant System"; "Variant System")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Variant System field';
 
                     trigger OnValidate()
                     begin
@@ -152,11 +168,13 @@ page 6151401 "NPR Magento Setup"
                 field("Max. Picture Size"; "Max. Picture Size")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Max. Picture Size (kb) field';
                 }
                 field("Auto Seo Link Disabled"; "Auto Seo Link Disabled")
                 {
                     ApplicationArea = All;
                     Importance = Additional;
+                    ToolTip = 'Specifies the value of the Auto Seo Link Disabled field';
                 }
                 group("B2C Modules")
                 {
@@ -164,38 +182,47 @@ page 6151401 "NPR Magento Setup"
                     field("Multistore Enabled"; "Multistore Enabled")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Multistore Enabled field';
                     }
                     field("Brands Enabled"; "Brands Enabled")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Brands Enabled field';
                     }
                     field("Attributes Enabled"; "Attributes Enabled")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Attributes Enabled field';
                     }
                     field("Product Relations Enabled"; "Product Relations Enabled")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Product Relations Enabled field';
                     }
                     field("Special Prices Enabled"; "Special Prices Enabled")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Special Prices Enabled field';
                     }
                     field("Tier Prices Enabled"; "Tier Prices Enabled")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Tier Prices Enabled field';
                     }
                     field("Customer Group Prices Enabled"; "Customer Group Prices Enabled")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Customer Group Prices Enabled field';
                     }
                     field("Gift Voucher Enabled"; "Gift Voucher Enabled")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Gift Voucher Enabled field';
                     }
                     field("Custom Options Enabled"; "Custom Options Enabled")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Custom Options Enabled field';
 
                         trigger OnValidate()
                         var
@@ -208,6 +235,7 @@ page 6151401 "NPR Magento Setup"
                     field("Bundled Products Enabled"; "Bundled Products Enabled")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Bundled Products Enabled field';
                     }
                     group(Control6150658)
                     {
@@ -216,11 +244,13 @@ page 6151401 "NPR Magento Setup"
                         field("Custom Options No. Series"; "Custom Options No. Series")
                         {
                             ApplicationArea = All;
+                            ToolTip = 'Specifies the value of the Custom Options Nos. field';
                         }
                     }
                     field("Tickets Enabled"; "Tickets Enabled")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Tickets Enabled field';
                     }
                     group(Control6151449)
                     {
@@ -229,6 +259,7 @@ page 6151401 "NPR Magento Setup"
                         field("Collect in Store Enabled"; "Collect in Store Enabled")
                         {
                             ApplicationArea = All;
+                            ToolTip = 'Specifies the value of the Collect in Store Enabled field';
                         }
                     }
                 }
@@ -239,18 +270,22 @@ page 6151401 "NPR Magento Setup"
                     field("Customers Enabled"; "Customers Enabled")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Customers Enabled field';
                     }
                     field("Sales Prices Enabled"; "Sales Prices Enabled")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Sales Prices Enabled field';
                     }
                     field("Sales Line Discounts Enabled"; "Sales Line Discounts Enabled")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Sales Line Discounts Enabled field';
                     }
                     field("Item Disc. Group Enabled"; "Item Disc. Group Enabled")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Item Disc. Group Enabled field';
                     }
                 }
             }
@@ -262,11 +297,13 @@ page 6151401 "NPR Magento Setup"
                 {
                     ApplicationArea = All;
                     ShowMandatory = true;
+                    ToolTip = 'Specifies the value of the From Collect Store Code field';
                 }
                 field("NpCs Workflow Code"; "NpCs Workflow Code")
                 {
                     ApplicationArea = All;
                     ShowMandatory = true;
+                    ToolTip = 'Specifies the value of the Collect in Store Workflow Code field';
                 }
             }
             part(NpCsStoreCardWorkflows; "NPR NpCs Store Card Workflows")
@@ -284,30 +321,37 @@ page 6151401 "NPR Magento Setup"
                 field("Gift Voucher Activation"; "Gift Voucher Activation")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Activate Gift Voucher field';
                 }
                 field("Gift Voucher Item No."; "Gift Voucher Item No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Gift Voucher Item No. field';
                 }
                 field("Gift Voucher Account No."; "Gift Voucher Account No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Gift Voucher Account No. field';
                 }
                 field("Gift Voucher Report"; "Gift Voucher Report")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Gift Voucher Report field';
                 }
                 field("Gift Voucher Language Code"; "Gift Voucher Language Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Gift Voucher Language Code field';
                 }
                 field("Gift Voucher Valid Period"; "Gift Voucher Valid Period")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Gift Voucher Validity field';
                 }
                 field("Gift Voucher Code Pattern"; "Gift Voucher Code Pattern")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Gift Voucher Code Pattern field';
                 }
             }
             group(CreditVoucher)
@@ -317,22 +361,27 @@ page 6151401 "NPR Magento Setup"
                 field("Credit Voucher Account No."; "Credit Voucher Account No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Credit Voucher Account No. field';
                 }
                 field("Credit Voucher Report"; "Credit Voucher Report")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Credit Voucher Report field';
                 }
                 field("Credit Voucher Language Code"; "Credit Voucher Language Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Credit Voucher Language Code field';
                 }
                 field("Credit Voucher Valid Period"; "Credit Voucher Valid Period")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Credit Voucher Valid Period field';
                 }
                 field("Credit Voucher Code Pattern"; "Credit Voucher Code Pattern")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Credit Voucher Code Pattern field';
                 }
             }
             group("Replicate Special Price")
@@ -342,6 +391,7 @@ page 6151401 "NPR Magento Setup"
                 field("Replicate to Sales Prices"; "Replicate to Sales Prices")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Replicate to Sales Prices field';
                 }
                 group(Control6151429)
                 {
@@ -350,6 +400,7 @@ page 6151401 "NPR Magento Setup"
                     field("Replicate to Sales Type"; "Replicate to Sales Type")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Replicate to Sales Type field';
                     }
                     group(Control6151427)
                     {
@@ -359,6 +410,7 @@ page 6151401 "NPR Magento Setup"
                         {
                             ApplicationArea = All;
                             ShowMandatory = true;
+                            ToolTip = 'Specifies the value of the Replicate to Sales Code field';
                         }
                     }
                 }
@@ -369,6 +421,7 @@ page 6151401 "NPR Magento Setup"
                 field("Stock Calculation Method"; "Stock Calculation Method")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Stock Calculation Method field';
 
                     trigger OnValidate()
                     begin
@@ -383,6 +436,7 @@ page 6151401 "NPR Magento Setup"
                     {
                         ApplicationArea = All;
                         ShowMandatory = true;
+                        ToolTip = 'Specifies the value of the Stock Function Name field';
 
                         trigger OnValidate()
                         begin
@@ -393,15 +447,18 @@ page 6151401 "NPR Magento Setup"
                     {
                         ApplicationArea = All;
                         Editable = false;
+                        ToolTip = 'Specifies the value of the Stock Codeunit Id field';
                     }
                     field("Stock Codeunit Name"; "Stock Codeunit Name")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Stock Codeunit Name field';
                     }
                 }
                 field("Stock NpXml Template"; "Stock NpXml Template")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Stock NpXml Template field';
 
                     trigger OnValidate()
                     begin
@@ -415,11 +472,13 @@ page 6151401 "NPR Magento Setup"
                     field("Inventory Location Filter"; "Inventory Location Filter")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Inventory Location Filter field';
                     }
                 }
                 field("Intercompany Inventory Enabled"; "Intercompany Inventory Enabled")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Intercompany Inventory Enabled field';
                 }
                 part("Inventory Companies"; "NPR Magento Inv. Companies")
                 {
@@ -434,6 +493,7 @@ page 6151401 "NPR Magento Setup"
                 field("Customer Update Mode"; "Customer Update Mode")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Customer Update Mode field';
                 }
                 group(Control6151460)
                 {
@@ -443,11 +503,13 @@ page 6151401 "NPR Magento Setup"
                     {
                         ApplicationArea = All;
                         ShowMandatory = true;
+                        ToolTip = 'Specifies the value of the Fixed Customer No. field';
                     }
                 }
                 field("Customer Mapping"; "Customer Mapping")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Customer Mapping field';
                 }
                 group(Control6151428)
                 {
@@ -456,19 +518,23 @@ page 6151401 "NPR Magento Setup"
                     field("Customer Posting Group"; "Customer Posting Group")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Customer Posting Group field';
                     }
                     field("Payment Terms Code"; "Payment Terms Code")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Payment Terms Code field';
                     }
                 }
                 field("Customer Template Code"; "Customer Template Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Customer Template Code field';
                 }
                 field("Customer Config. Template Code"; "Customer Config. Template Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Customer Config. Template Code field';
                 }
             }
             group("Order Import")
@@ -477,30 +543,37 @@ page 6151401 "NPR Magento Setup"
                 field("Payment Fee Account No."; "Payment Fee Account No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Payment Fee Account No. field';
                 }
                 field("Salesperson Code"; "Salesperson Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Salesperson Code field';
                 }
                 field("Release Order on Import"; "Release Order on Import")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Release Order on Import field';
                 }
                 field("Send Order Confirmation"; "Send Order Confirmation")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Send Order Confirmation field';
                 }
                 field("E-mail Template (Order Conf.)"; "E-mail Template (Order Conf.)")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the E-mail Template (Order Confirmation) field';
                 }
                 field("Use Blank Code for LCY"; "Use Blank Code for LCY")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Use Blank Code for LCY field';
                 }
                 field("E-mail Retail Vouchers to"; "E-mail Retail Vouchers to")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the E-mail Retail Vouchers to field';
                 }
                 group("Post On Import")
                 {
@@ -513,10 +586,12 @@ page 6151401 "NPR Magento Setup"
                     field("Post Tickets on Import"; "Post Tickets on Import")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Post Tickets on Import field';
                     }
                     field("Post Memberships on Import"; "Post Memberships on Import")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Post Memberships on Import field';
                     }
                 }
             }
@@ -543,6 +618,7 @@ page 6151401 "NPR Magento Setup"
                         Caption = 'Setup NpXml Templates';
                         Image = Setup;
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Setup NpXml Templates action';
 
                         trigger OnAction()
                         var
@@ -557,6 +633,7 @@ page 6151401 "NPR Magento Setup"
                         Caption = 'Setup Magento Api Credentials';
                         Image = Setup;
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Setup Magento Api Credentials action';
 
                         trigger OnAction()
                         var
@@ -571,6 +648,7 @@ page 6151401 "NPR Magento Setup"
                         Caption = 'Setup Magento Websites';
                         Image = Setup;
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Setup Magento Websites action';
 
                         trigger OnAction()
                         var
@@ -585,6 +663,7 @@ page 6151401 "NPR Magento Setup"
                         Caption = 'Setup Magento Customer Groups';
                         Image = Setup;
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Setup Magento Customer Groups action';
 
                         trigger OnAction()
                         var
@@ -603,6 +682,7 @@ page 6151401 "NPR Magento Setup"
                         PromotedIsBig = true;
                         Visible = HasSetupCategories;
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Setup Categories action';
 
                         trigger OnAction()
                         var
@@ -621,6 +701,7 @@ page 6151401 "NPR Magento Setup"
                         PromotedIsBig = true;
                         Visible = HasSetupBrands;
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Setup Brands action';
 
                         trigger OnAction()
                         var
@@ -640,6 +721,7 @@ page 6151401 "NPR Magento Setup"
                         Caption = 'Setup Magento Tax Classes';
                         Image = Setup;
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Setup Magento Tax Classes action';
 
                         trigger OnAction()
                         var
@@ -654,6 +736,7 @@ page 6151401 "NPR Magento Setup"
                         Caption = 'Setup VAT Business Posting Groups';
                         Image = Setup;
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Setup VAT Business Posting Groups action';
 
                         trigger OnAction()
                         var
@@ -669,6 +752,7 @@ page 6151401 "NPR Magento Setup"
                         Caption = 'Setup VAT Product Posting Groups';
                         Image = Setup;
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Setup VAT Product Posting Groups action';
 
                         trigger OnAction()
                         var
@@ -689,6 +773,7 @@ page 6151401 "NPR Magento Setup"
                         Caption = 'Setup Payment Method Mapping';
                         Image = Setup;
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Setup Payment Method Mapping action';
 
                         trigger OnAction()
                         var
@@ -704,6 +789,7 @@ page 6151401 "NPR Magento Setup"
                         Caption = 'Setup Shipment Method Mapping';
                         Image = Setup;
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Setup Shipment Method Mapping action';
 
                         trigger OnAction()
                         var
@@ -725,6 +811,7 @@ page 6151401 "NPR Magento Setup"
                     Caption = 'Update Version No.';
                     Image = UpdateXML;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Update Version No. action';
 
                     trigger OnAction()
                     var
@@ -743,6 +830,7 @@ page 6151401 "NPR Magento Setup"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Setup Import Types action';
 
                 trigger OnAction()
                 var
@@ -759,6 +847,7 @@ page 6151401 "NPR Magento Setup"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Setup Control Add-ins action';
 
                 trigger OnAction()
                 var
@@ -777,6 +866,7 @@ page 6151401 "NPR Magento Setup"
                     Image = AddAction;
                     Visible = "Magento Enabled";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Resync Internet Items action';
 
                     trigger OnAction()
                     var
@@ -796,6 +886,7 @@ page 6151401 "NPR Magento Setup"
                     Image = SuggestSalesPrice;
                     Visible = "Replicate to Sales Prices" AND (("Replicate to Sales Type" = "Replicate to Sales Type"::"All Customers") OR ("Replicate to Sales Code" <> ''));
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Replicate Special Prices to Sales Prices action';
 
                     trigger OnAction()
                     var
@@ -814,6 +905,7 @@ page 6151401 "NPR Magento Setup"
                 Image = "Where-Used";
                 RunObject = Page "NPR Magento Setup Event Subs.";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Event Subscriptions action';
             }
         }
     }

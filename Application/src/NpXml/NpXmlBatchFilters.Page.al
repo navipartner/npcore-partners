@@ -22,18 +22,22 @@ page 6151557 "NPR NpXml Batch Filters"
                 {
                     ApplicationArea = All;
                     OptionCaption = ',Constant,Filter';
+                    ToolTip = 'Specifies the value of the Filter Type field';
                 }
                 field("Parent Field No."; "Parent Field No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Parent Field No. field';
                 }
                 field("Parent Field Name"; "Parent Field Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Parent Field Name field';
                 }
                 field("Filter Value"; "Filter Value")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Filter Value field';
                 }
             }
         }

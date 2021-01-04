@@ -21,6 +21,7 @@ page 6014670 "NPR Dependency Mgt. Setup"
                     field("OData URL"; "OData URL")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Managed Dependency OData URL field';
 
                         trigger OnValidate()
                         begin
@@ -30,6 +31,7 @@ page 6014670 "NPR Dependency Mgt. Setup"
                     field(Username; Username)
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Managed Dependency Username field';
 
                         trigger OnValidate()
                         begin
@@ -41,6 +43,7 @@ page 6014670 "NPR Dependency Mgt. Setup"
                         ApplicationArea = All;
                         Editable = PasswordEditable;
                         ExtendedDatatype = Masked;
+                        ToolTip = 'Specifies the value of the ManagedDependencyPassword field';
 
                         trigger OnValidate()
                         begin
@@ -53,10 +56,12 @@ page 6014670 "NPR Dependency Mgt. Setup"
                     {
                         ApplicationArea = All;
                         Editable = false;
+                        ToolTip = 'Specifies the value of the Managed Dependency Configured field';
                     }
                     field("Disable Deployment"; "Disable Deployment")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Disable Deployment field';
                     }
                 }
                 group(Filtering)
@@ -65,15 +70,18 @@ page 6014670 "NPR Dependency Mgt. Setup"
                     field("Accept Statuses"; "Accept Statuses")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Accept Dependency Statuses field';
                     }
                     field("Tag Filter"; "Tag Filter")
                     {
                         ApplicationArea = All;
                         Caption = 'Tag Filter (Comma Separated)';
+                        ToolTip = 'Specifies the value of the Tag Filter (Comma Separated) field';
                     }
                     field("Tag Filter Comparison Operator"; "Tag Filter Comparison Operator")
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Tag Filter Comparison Operator field';
                     }
                 }
             }
@@ -92,6 +100,7 @@ page 6014670 "NPR Dependency Mgt. Setup"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Validate Managed Dependencies action';
 
                 trigger OnAction()
                 begin
@@ -107,6 +116,7 @@ page 6014670 "NPR Dependency Mgt. Setup"
                 Promoted = true;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Setup Managed Dependecy action';
 
                 trigger OnAction()
                 var
@@ -124,6 +134,7 @@ page 6014670 "NPR Dependency Mgt. Setup"
                 Promoted = true;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Download Managed Dependencies action';
 
                 trigger OnAction()
                 var

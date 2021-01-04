@@ -20,19 +20,23 @@ page 6060067 "NPR Items by Loc.Overv. Matrix"
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Item No. field';
                 }
                 field("Variant Code"; "Variant Code")
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Variant Code field';
                 }
                 field("Item Description"; "Item Description")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Item Description field';
                 }
                 field("Variant Description"; "Variant Description")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Variant Description field';
                 }
                 field(Inventory; Quantity)
                 {
@@ -40,6 +44,7 @@ page 6060067 "NPR Items by Loc.Overv. Matrix"
                     Caption = 'Total Inventory';
                     DecimalPlaces = 0 : 5;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Total Inventory field';
 
                     trigger OnDrillDown()
                     begin
@@ -54,6 +59,7 @@ page 6060067 "NPR Items by Loc.Overv. Matrix"
                     DecimalPlaces = 0 : 5;
                     Editable = false;
                     Visible = Field1Visible;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[1] field';
 
                     trigger OnDrillDown()
                     begin
@@ -68,6 +74,7 @@ page 6060067 "NPR Items by Loc.Overv. Matrix"
                     DecimalPlaces = 0 : 5;
                     Editable = false;
                     Visible = Field2Visible;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[2] field';
 
                     trigger OnDrillDown()
                     begin
@@ -82,6 +89,7 @@ page 6060067 "NPR Items by Loc.Overv. Matrix"
                     DecimalPlaces = 0 : 5;
                     Editable = false;
                     Visible = Field3Visible;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[3] field';
 
                     trigger OnDrillDown()
                     begin
@@ -96,6 +104,7 @@ page 6060067 "NPR Items by Loc.Overv. Matrix"
                     DecimalPlaces = 0 : 5;
                     Editable = false;
                     Visible = Field4Visible;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[4] field';
 
                     trigger OnDrillDown()
                     begin
@@ -110,6 +119,7 @@ page 6060067 "NPR Items by Loc.Overv. Matrix"
                     DecimalPlaces = 0 : 5;
                     Editable = false;
                     Visible = Field5Visible;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[5] field';
 
                     trigger OnDrillDown()
                     begin
@@ -124,6 +134,7 @@ page 6060067 "NPR Items by Loc.Overv. Matrix"
                     DecimalPlaces = 0 : 5;
                     Editable = false;
                     Visible = Field6Visible;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[6] field';
 
                     trigger OnDrillDown()
                     begin
@@ -138,6 +149,7 @@ page 6060067 "NPR Items by Loc.Overv. Matrix"
                     DecimalPlaces = 0 : 5;
                     Editable = false;
                     Visible = Field7Visible;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[7] field';
 
                     trigger OnDrillDown()
                     begin
@@ -152,6 +164,7 @@ page 6060067 "NPR Items by Loc.Overv. Matrix"
                     DecimalPlaces = 0 : 5;
                     Editable = false;
                     Visible = Field8Visible;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[8] field';
 
                     trigger OnDrillDown()
                     begin
@@ -166,6 +179,7 @@ page 6060067 "NPR Items by Loc.Overv. Matrix"
                     DecimalPlaces = 0 : 5;
                     Editable = false;
                     Visible = Field9Visible;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[9] field';
 
                     trigger OnDrillDown()
                     begin
@@ -180,6 +194,7 @@ page 6060067 "NPR Items by Loc.Overv. Matrix"
                     DecimalPlaces = 0 : 5;
                     Editable = false;
                     Visible = Field10Visible;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[10] field';
 
                     trigger OnDrillDown()
                     begin
@@ -194,6 +209,7 @@ page 6060067 "NPR Items by Loc.Overv. Matrix"
                     DecimalPlaces = 0 : 5;
                     Editable = false;
                     Visible = Field11Visible;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[11] field';
 
                     trigger OnDrillDown()
                     begin
@@ -208,6 +224,7 @@ page 6060067 "NPR Items by Loc.Overv. Matrix"
                     DecimalPlaces = 0 : 5;
                     Editable = false;
                     Visible = Field12Visible;
+                    ToolTip = 'Specifies the value of the MATRIX_CellData[12] field';
 
                     trigger OnDrillDown()
                     begin

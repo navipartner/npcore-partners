@@ -24,18 +24,22 @@ page 6151491 "NPR Raptor Setup"
                 field("Enable Raptor Functions"; "Enable Raptor Functions")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Enable Raptor Functions field';
                 }
                 field("Base Url"; "Base Url")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Base Url field';
                 }
                 field("Customer ID"; "Customer ID")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Customer ID field';
                 }
                 field("API Key"; "API Key")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the API Key field';
                 }
             }
             group(Tracking)
@@ -45,23 +49,28 @@ page 6151491 "NPR Raptor Setup"
                 {
                     ApplicationArea = All;
                     Enabled = "Enable Raptor Functions";
+                    ToolTip = 'Specifies the value of the Send Data to Raptor field';
                 }
                 field("Tracking Service Url"; "Tracking Service Url")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Tracking Service Url field';
                 }
                 field("Tracking Service Type"; "Tracking Service Type")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Tracking Service Type field';
                 }
                 field("Exclude Webshop Sales"; "Exclude Webshop Sales")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Exclude Webshop Sales field';
                 }
                 field("Webshop Salesperson Filter"; "Webshop Salesperson Filter")
                 {
                     ApplicationArea = All;
                     Enabled = "Exclude Webshop Sales";
+                    ToolTip = 'Specifies the value of the Webshop Salesperson Filter field';
 
                     trigger OnAssistEdit()
                     var
@@ -87,12 +96,14 @@ page 6151491 "NPR Raptor Setup"
                 PromotedIsBig = true;
                 RunObject = Page "NPR Raptor Actions";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Set up Raptor Actions action';
             }
             action(RaptorUrls)
             {
                 Caption = 'Reset Urls';
                 Image = LinkWeb;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Reset Urls action';
 
                 trigger OnAction()
                 begin

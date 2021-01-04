@@ -9,6 +9,7 @@ pageextension 6014479 "NPR Inventory Put-away" extends "Inventory Put-away"
             field("NPR Assigned User ID"; "Assigned User ID")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the Assigned User ID field';
             }
         }
     }
@@ -24,6 +25,7 @@ pageextension 6014479 "NPR Inventory Put-away" extends "Inventory Put-away"
                 Promoted = true;
                 PromotedCategory = Process;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Retail Print action';
 
                 trigger OnAction()
                 begin
@@ -39,6 +41,7 @@ pageextension 6014479 "NPR Inventory Put-away" extends "Inventory Put-away"
                 PromotedIsBig = true;
                 ShortCutKey = 'Shift+Ctrl+L';
                 ApplicationArea = All;
+                ToolTip = 'Executes the Price Label action';
 
                 trigger OnAction()
                 begin

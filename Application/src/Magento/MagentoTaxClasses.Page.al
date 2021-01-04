@@ -20,15 +20,18 @@ page 6151407 "NPR Magento Tax Classes"
                 field(Name; Name)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Name field';
                 }
                 field(Type; Type)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Type field';
                 }
                 field("Customer Config. Template Code"; "Customer Config. Template Code")
                 {
                     ApplicationArea = All;
                     Enabled = "Type" = 1;
+                    ToolTip = 'Specifies the value of the Customer Config. Template Code field';
                 }
             }
         }
@@ -46,6 +49,7 @@ page 6151407 "NPR Magento Tax Classes"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Setup Tax Classes action';
 
                 trigger OnAction()
                 begin

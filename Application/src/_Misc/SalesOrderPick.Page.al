@@ -21,6 +21,7 @@ page 6014518 "NPR Sales Order Pick"
             field("Sales Order No."; SalesOrderNoSearch)
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the SalesOrderNoSearch field';
 
                 trigger OnValidate()
                 var
@@ -43,6 +44,7 @@ page 6014518 "NPR Sales Order Pick"
             field("Item Barcode"; ItemBarcodeInput)
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the ItemBarcodeInput field';
 
                 trigger OnValidate()
                 var
@@ -78,11 +80,13 @@ page 6014518 "NPR Sales Order Pick"
             {
                 ApplicationArea = All;
                 Editable = false;
+                ToolTip = 'Specifies the value of the ItemBarcode.No. field';
             }
             field("Item Found on SalesLines"; ItemFoundonLines)
             {
                 ApplicationArea = All;
                 Editable = false;
+                ToolTip = 'Specifies the value of the ItemFoundonLines field';
             }
             group(General)
             {
@@ -92,6 +96,7 @@ page 6014518 "NPR Sales Order Pick"
                     ApplicationArea = All;
                     Importance = Promoted;
                     Visible = DocNoVisible;
+                    ToolTip = 'Specifies the value of the No. field';
 
                     trigger OnAssistEdit()
                     begin
@@ -104,6 +109,7 @@ page 6014518 "NPR Sales Order Pick"
                     ApplicationArea = All;
                     Importance = Promoted;
                     ShowMandatory = true;
+                    ToolTip = 'Specifies the value of the Sell-to Customer No. field';
 
                     trigger OnValidate()
                     begin
@@ -114,6 +120,7 @@ page 6014518 "NPR Sales Order Pick"
                 {
                     ApplicationArea = All;
                     Importance = Additional;
+                    ToolTip = 'Specifies the value of the Sell-to Contact No. field';
 
                     trigger OnValidate()
                     begin
@@ -126,83 +133,100 @@ page 6014518 "NPR Sales Order Pick"
                 {
                     ApplicationArea = All;
                     QuickEntry = false;
+                    ToolTip = 'Specifies the value of the Sell-to Customer Name field';
                 }
                 field("Sell-to Customer Name 2"; "Sell-to Customer Name 2")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Sell-to Customer Name 2 field';
                 }
                 field("Sell-to Address"; "Sell-to Address")
                 {
                     ApplicationArea = All;
                     Importance = Additional;
+                    ToolTip = 'Specifies the value of the Sell-to Address field';
                 }
                 field("Sell-to Address 2"; "Sell-to Address 2")
                 {
                     ApplicationArea = All;
                     Importance = Additional;
+                    ToolTip = 'Specifies the value of the Sell-to Address 2 field';
                 }
                 field("Sell-to Post Code"; "Sell-to Post Code")
                 {
                     ApplicationArea = All;
                     Importance = Additional;
+                    ToolTip = 'Specifies the value of the Sell-to Post Code field';
                 }
                 field("Sell-to City"; "Sell-to City")
                 {
                     ApplicationArea = All;
                     QuickEntry = false;
+                    ToolTip = 'Specifies the value of the Sell-to City field';
                 }
                 field("Sell-to Contact"; "Sell-to Contact")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Sell-to Contact field';
                 }
                 field("No. of Archived Versions"; "No. of Archived Versions")
                 {
                     ApplicationArea = All;
                     Importance = Additional;
+                    ToolTip = 'Specifies the value of the No. of Archived Versions field';
                 }
                 field("Posting Date"; "Posting Date")
                 {
                     ApplicationArea = All;
                     QuickEntry = false;
+                    ToolTip = 'Specifies the value of the Posting Date field';
                 }
                 field("Order Date"; "Order Date")
                 {
                     ApplicationArea = All;
                     Importance = Promoted;
                     QuickEntry = false;
+                    ToolTip = 'Specifies the value of the Order Date field';
                 }
                 field("Document Date"; "Document Date")
                 {
                     ApplicationArea = All;
                     QuickEntry = false;
+                    ToolTip = 'Specifies the value of the Document Date field';
                 }
                 field("Requested Delivery Date"; "Requested Delivery Date")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Requested Delivery Date field';
                 }
                 field("Promised Delivery Date"; "Promised Delivery Date")
                 {
                     ApplicationArea = All;
                     Importance = Additional;
+                    ToolTip = 'Specifies the value of the Promised Delivery Date field';
                 }
                 field("Quote No."; "Quote No.")
                 {
                     ApplicationArea = All;
                     Importance = Additional;
+                    ToolTip = 'Specifies the value of the Quote No. field';
                 }
                 field("External Document No."; "External Document No.")
                 {
                     ApplicationArea = All;
                     Importance = Promoted;
+                    ToolTip = 'Specifies the value of the External Document No. field';
                 }
                 field("Your Reference"; "Your Reference")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Your Reference field';
                 }
                 field("Salesperson Code"; "Salesperson Code")
                 {
                     ApplicationArea = All;
                     QuickEntry = false;
+                    ToolTip = 'Specifies the value of the Salesperson Code field';
 
                     trigger OnValidate()
                     begin
@@ -213,32 +237,38 @@ page 6014518 "NPR Sales Order Pick"
                 {
                     ApplicationArea = All;
                     Importance = Additional;
+                    ToolTip = 'Specifies the value of the Campaign No. field';
                 }
                 field("Opportunity No."; "Opportunity No.")
                 {
                     ApplicationArea = All;
                     Importance = Additional;
+                    ToolTip = 'Specifies the value of the Opportunity No. field';
                 }
                 field("Responsibility Center"; "Responsibility Center")
                 {
                     ApplicationArea = All;
                     Importance = Additional;
+                    ToolTip = 'Specifies the value of the Responsibility Center field';
                 }
                 field("Assigned User ID"; "Assigned User ID")
                 {
                     ApplicationArea = All;
                     Importance = Additional;
+                    ToolTip = 'Specifies the value of the Assigned User ID field';
                 }
                 field("Job Queue Status"; "Job Queue Status")
                 {
                     ApplicationArea = All;
                     Importance = Additional;
+                    ToolTip = 'Specifies the value of the Job Queue Status field';
                 }
                 field(Status; Status)
                 {
                     ApplicationArea = All;
                     Importance = Promoted;
                     QuickEntry = false;
+                    ToolTip = 'Specifies the value of the Status field';
                 }
             }
             part(SalesLines; "NPR Sales Order Pick Subform")
@@ -254,6 +284,7 @@ page 6014518 "NPR Sales Order Pick"
                 {
                     ApplicationArea = All;
                     Importance = Promoted;
+                    ToolTip = 'Specifies the value of the Bill-to Customer No. field';
 
                     trigger OnValidate()
                     begin
@@ -264,58 +295,71 @@ page 6014518 "NPR Sales Order Pick"
                 {
                     ApplicationArea = All;
                     Importance = Additional;
+                    ToolTip = 'Specifies the value of the Bill-to Contact No. field';
                 }
                 field("Bill-to Name"; "Bill-to Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Bill-to Name field';
                 }
                 field("Bill-to Name 2"; "Bill-to Name 2")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Bill-to Name 2 field';
                 }
                 field("Bill-to Address"; "Bill-to Address")
                 {
                     ApplicationArea = All;
                     Importance = Additional;
+                    ToolTip = 'Specifies the value of the Bill-to Address field';
                 }
                 field("Bill-to Address 2"; "Bill-to Address 2")
                 {
                     ApplicationArea = All;
                     Importance = Additional;
+                    ToolTip = 'Specifies the value of the Bill-to Address 2 field';
                 }
                 field("Bill-to Post Code"; "Bill-to Post Code")
                 {
                     ApplicationArea = All;
                     Importance = Additional;
+                    ToolTip = 'Specifies the value of the Bill-to Post Code field';
                 }
                 field("Bill-to City"; "Bill-to City")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Bill-to City field';
                 }
                 field("Bill-to Contact"; "Bill-to Contact")
                 {
                     ApplicationArea = All;
                     Importance = Additional;
+                    ToolTip = 'Specifies the value of the Bill-to Contact field';
                 }
                 field("Bill-to Company"; "NPR Bill-to Company")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the NPR Bill-to Company field';
                 }
                 field("Bill-To Vendor No."; "NPR Bill-To Vendor No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the NPR Bill-To Vendor No. field';
                 }
                 field("Bill-to E-mail"; "NPR Bill-to E-mail")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the NPR Bill-to E-mail field';
                 }
                 field("Document Processing"; "NPR Document Processing")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the NPR Document Processing field';
                 }
                 field("Shortcut Dimension 1 Code"; "Shortcut Dimension 1 Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Shortcut Dimension 1 Code field';
 
                     trigger OnValidate()
                     begin
@@ -325,6 +369,7 @@ page 6014518 "NPR Sales Order Pick"
                 field("Shortcut Dimension 2 Code"; "Shortcut Dimension 2 Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Shortcut Dimension 2 Code field';
 
                     trigger OnValidate()
                     begin
@@ -335,31 +380,38 @@ page 6014518 "NPR Sales Order Pick"
                 {
                     ApplicationArea = All;
                     Importance = Promoted;
+                    ToolTip = 'Specifies the value of the Payment Terms Code field';
                 }
                 field("Due Date"; "Due Date")
                 {
                     ApplicationArea = All;
                     Importance = Promoted;
+                    ToolTip = 'Specifies the value of the Due Date field';
                 }
                 field("Payment Discount %"; "Payment Discount %")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Payment Discount % field';
                 }
                 field("Pmt. Discount Date"; "Pmt. Discount Date")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Pmt. Discount Date field';
                 }
                 field("Payment Method Code"; "Payment Method Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Payment Method Code field';
                 }
                 field("Direct Debit Mandate ID"; "Direct Debit Mandate ID")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Direct Debit Mandate ID field';
                 }
                 field("Prices Including VAT"; "Prices Including VAT")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Prices Including VAT field';
 
                     trigger OnValidate()
                     begin
@@ -369,10 +421,12 @@ page 6014518 "NPR Sales Order Pick"
                 field("VAT Bus. Posting Group"; "VAT Bus. Posting Group")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the VAT Bus. Posting Group field';
                 }
                 field("Magento Payment Amount"; "NPR Magento Payment Amount")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the NPR Magento Payment Amount field';
                 }
             }
             group(Shipping)
@@ -382,85 +436,103 @@ page 6014518 "NPR Sales Order Pick"
                 {
                     ApplicationArea = All;
                     Importance = Promoted;
+                    ToolTip = 'Specifies the value of the Ship-to Code field';
                 }
                 field("Ship-to Name"; "Ship-to Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Ship-to Name field';
                 }
                 field("Ship-to Name 2"; "Ship-to Name 2")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Ship-to Name 2 field';
                 }
                 field("Ship-to Address"; "Ship-to Address")
                 {
                     ApplicationArea = All;
                     Importance = Additional;
+                    ToolTip = 'Specifies the value of the Ship-to Address field';
                 }
                 field("Ship-to Address 2"; "Ship-to Address 2")
                 {
                     ApplicationArea = All;
                     Importance = Additional;
+                    ToolTip = 'Specifies the value of the Ship-to Address 2 field';
                 }
                 field("Ship-to Post Code"; "Ship-to Post Code")
                 {
                     ApplicationArea = All;
                     Importance = Promoted;
+                    ToolTip = 'Specifies the value of the Ship-to Post Code field';
                 }
                 field("Ship-to City"; "Ship-to City")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Ship-to City field';
                 }
                 field("Ship-to Contact"; "Ship-to Contact")
                 {
                     ApplicationArea = All;
                     Importance = Additional;
+                    ToolTip = 'Specifies the value of the Ship-to Contact field';
                 }
                 field("Location Code"; "Location Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Location Code field';
                 }
                 field("Outbound Whse. Handling Time"; "Outbound Whse. Handling Time")
                 {
                     ApplicationArea = All;
                     Importance = Additional;
+                    ToolTip = 'Specifies the value of the Outbound Whse. Handling Time field';
                 }
                 field("Shipment Method Code"; "Shipment Method Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Shipment Method Code field';
                 }
                 field("Shipping Agent Code"; "Shipping Agent Code")
                 {
                     ApplicationArea = All;
                     Importance = Additional;
+                    ToolTip = 'Specifies the value of the Shipping Agent Code field';
                 }
                 field("Shipping Agent Service Code"; "Shipping Agent Service Code")
                 {
                     ApplicationArea = All;
                     Importance = Additional;
+                    ToolTip = 'Specifies the value of the Shipping Agent Service Code field';
                 }
                 field("Shipping Time"; "Shipping Time")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Shipping Time field';
                 }
                 field("Late Order Shipping"; "Late Order Shipping")
                 {
                     ApplicationArea = All;
                     Importance = Additional;
+                    ToolTip = 'Specifies the value of the Late Order Shipping field';
                 }
                 field("Package Tracking No."; "Package Tracking No.")
                 {
                     ApplicationArea = All;
                     Importance = Additional;
+                    ToolTip = 'Specifies the value of the Package Tracking No. field';
                 }
                 field("Shipment Date"; "Shipment Date")
                 {
                     ApplicationArea = All;
                     Importance = Promoted;
+                    ToolTip = 'Specifies the value of the Shipment Date field';
                 }
                 field("Shipping Advice"; "Shipping Advice")
                 {
                     ApplicationArea = All;
                     Importance = Promoted;
+                    ToolTip = 'Specifies the value of the Shipping Advice field';
 
                     trigger OnValidate()
                     begin
@@ -472,6 +544,7 @@ page 6014518 "NPR Sales Order Pick"
                 field("Delivery Location"; "NPR Delivery Location")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the NPR Delivery Location field';
                 }
             }
         }
@@ -493,6 +566,7 @@ page 6014518 "NPR Sales Order Pick"
                     PromotedCategory = Process;
                     ShortCutKey = 'Ctrl+F9';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Re&lease action';
 
                     trigger OnAction()
                     var
@@ -508,6 +582,7 @@ page 6014518 "NPR Sales Order Pick"
                     Promoted = true;
                     PromotedCategory = Process;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Re&open action';
 
                     trigger OnAction()
                     var
@@ -529,6 +604,7 @@ page 6014518 "NPR Sales Order Pick"
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Quantity to Ship 0 action';
 
                     trigger OnAction()
                     begin
@@ -546,6 +622,7 @@ page 6014518 "NPR Sales Order Pick"
                     PromotedIsBig = true;
                     ShortCutKey = 'F9';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the P&ost Order action';
 
                     trigger OnAction()
                     begin
@@ -562,6 +639,7 @@ page 6014518 "NPR Sales Order Pick"
                     PromotedIsBig = true;
                     ShortCutKey = 'Shift+F9';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Post and &Print action';
 
                     trigger OnAction()
                     begin
@@ -574,6 +652,7 @@ page 6014518 "NPR Sales Order Pick"
                     Ellipsis = true;
                     Image = PostMail;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Post and Email action';
 
                     trigger OnAction()
                     var
@@ -598,6 +677,7 @@ page 6014518 "NPR Sales Order Pick"
                     Ellipsis = true;
                     Image = TestReport;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Test Report action';
 
                     trigger OnAction()
                     begin
@@ -610,6 +690,7 @@ page 6014518 "NPR Sales Order Pick"
                     Ellipsis = true;
                     Image = PostBatch;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Post &Batch action';
 
                     trigger OnAction()
                     begin

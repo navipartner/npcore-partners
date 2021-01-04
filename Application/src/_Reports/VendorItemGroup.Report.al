@@ -486,11 +486,13 @@ report 6014435 "NPR Vendor/Item Group"
                     {
                         Caption = 'Show Only Main Figures';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Show Only Main Figures field';
                     }
                     field(sortervaregruppe; Sortervaregruppe)
                     {
                         Caption = 'Sort Item Groups';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Sort Item Groups field';
 
                         trigger OnValidate()
                         begin
@@ -506,6 +508,7 @@ report 6014435 "NPR Vendor/Item Group"
                         Enabled = ShowBool;
                         OptionCaption = 'Amount,Turnover,DR';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Show field';
                     }
                     field(sorter; Sorter)
                     {
@@ -513,6 +516,7 @@ report 6014435 "NPR Vendor/Item Group"
                         Enabled = ShowBool;
                         OptionCaption = 'Most,Least';
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Show Largest/Smallest field';
                     }
                 }
             }

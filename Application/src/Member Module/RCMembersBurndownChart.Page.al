@@ -15,6 +15,7 @@ page 6060148 "NPR RC Members. Burndown Chart"
                 ApplicationArea = All;
                 Caption = 'Status Text';
                 ShowCaption = false;
+                ToolTip = 'Specifies the value of the Status Text field';
             }
             usercontrol(BusinessChart; "Microsoft.Dynamics.Nav.Client.BusinessChart")
             {
@@ -44,6 +45,7 @@ page 6060148 "NPR RC Members. Burndown Chart"
                     Caption = 'Membership Sales Type';
                     Enabled = TypeOfSales;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Membership Sales Type action';
 
                     trigger OnAction()
                     begin
@@ -57,6 +59,7 @@ page 6060148 "NPR RC Members. Burndown Chart"
                     Enabled = OrdersUntilTodayEnabled;
                     Visible = false;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Orders Until Today action';
 
                     trigger OnAction()
                     begin
@@ -70,6 +73,7 @@ page 6060148 "NPR RC Members. Burndown Chart"
                     Enabled = DelayedOrdersEnabled;
                     Visible = false;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Delayed Orders action';
 
                     trigger OnAction()
                     begin
@@ -87,6 +91,7 @@ page 6060148 "NPR RC Members. Burndown Chart"
                     Caption = 'Month';
                     Enabled = MonthEnabled;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Month action';
 
                     trigger OnAction()
                     begin
@@ -99,6 +104,7 @@ page 6060148 "NPR RC Members. Burndown Chart"
                     Caption = 'Quarter';
                     Enabled = QuarterEnabled;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Quarter action';
 
                     trigger OnAction()
                     begin
@@ -120,6 +126,7 @@ page 6060148 "NPR RC Members. Burndown Chart"
                         Caption = 'Amount';
                         Enabled = MembershipValueEnabled;
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Amount action';
 
                         trigger OnAction()
                         begin
@@ -132,6 +139,7 @@ page 6060148 "NPR RC Members. Burndown Chart"
                         Caption = 'Membership Count';
                         Enabled = MembershipCountEnabled;
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Membership Count action';
 
                         trigger OnAction()
                         begin
@@ -147,6 +155,7 @@ page 6060148 "NPR RC Members. Burndown Chart"
                         Caption = 'Accumulate';
                         Enabled = AccumulatePeriodValue;
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Accumulate action';
 
                         trigger OnAction()
                         begin
@@ -159,6 +168,7 @@ page 6060148 "NPR RC Members. Burndown Chart"
                         Caption = 'Net Change';
                         Enabled = NetChangePeriodValue;
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Net Change action';
 
                         trigger OnAction()
                         begin
@@ -176,6 +186,7 @@ page 6060148 "NPR RC Members. Burndown Chart"
                         Caption = 'Stacked Area';
                         Enabled = StackedAreaEnabled;
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Stacked Area action';
 
                         trigger OnAction()
                         begin
@@ -188,6 +199,7 @@ page 6060148 "NPR RC Members. Burndown Chart"
                         Caption = 'Stacked Area (%)';
                         Enabled = StackedAreaPctEnabled;
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Stacked Area (%) action';
 
                         trigger OnAction()
                         begin
@@ -200,6 +212,7 @@ page 6060148 "NPR RC Members. Burndown Chart"
                         Caption = 'Stacked Column';
                         Enabled = StackedColumnEnabled;
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Stacked Column action';
 
                         trigger OnAction()
                         begin
@@ -212,6 +225,7 @@ page 6060148 "NPR RC Members. Burndown Chart"
                         Caption = 'Stacked Column (%)';
                         Enabled = StackedColumnPctEnabled;
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Stacked Column (%) action';
 
                         trigger OnAction()
                         begin
@@ -229,6 +243,7 @@ page 6060148 "NPR RC Members. Burndown Chart"
                 Caption = 'Refresh';
                 Image = Refresh;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Refresh action';
 
                 trigger OnAction()
                 begin
@@ -244,6 +259,7 @@ page 6060148 "NPR RC Members. Burndown Chart"
                 Caption = 'Setup';
                 Image = Setup;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Setup action';
 
                 trigger OnAction()
                 begin

@@ -231,6 +231,7 @@ report 6014544 "NPR Item Loss - Ret. Reason"
                         Caption = 'Source Code Filter';
                         TableRelation = "Source Code";
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Source Code Filter field';
                     }
                 }
             }

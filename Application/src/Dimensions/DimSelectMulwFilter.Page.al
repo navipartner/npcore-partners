@@ -20,20 +20,24 @@ page 6014546 "NPR Dim. Select.Mul.w.Filter"
                 field(Selected; Selected)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Selected field';
                 }
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Dimension Value Filter"; "Dimension Value Filter")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Dimension Value Filter field';
                 }
             }
         }

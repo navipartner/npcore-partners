@@ -32,6 +32,7 @@ page 6014450 "NPR Mixed Discount"
                     field("Code"; Code)
                     {
                         ApplicationArea = All;
+                        ToolTip = 'Specifies the value of the Code field';
 
                         trigger OnAssistEdit()
                         begin
@@ -43,6 +44,7 @@ page 6014450 "NPR Mixed Discount"
                     {
                         ApplicationArea = All;
                         Importance = Promoted;
+                        ToolTip = 'Specifies the value of the Description field';
                     }
                     group(Control6014409)
                     {
@@ -52,6 +54,7 @@ page 6014450 "NPR Mixed Discount"
                         {
                             ApplicationArea = All;
                             OptionCaption = 'Standard,Combination';
+                            ToolTip = 'Specifies the value of the Mix Type field';
 
                             trigger OnValidate()
                             begin
@@ -87,6 +90,7 @@ page 6014450 "NPR Mixed Discount"
                             field("Min. Quantity"; "Min. Quantity")
                             {
                                 ApplicationArea = All;
+                                ToolTip = 'Specifies the value of the Min. Quantity field';
 
                                 trigger OnValidate()
                                 begin
@@ -96,6 +100,7 @@ page 6014450 "NPR Mixed Discount"
                             field("Max. Quantity"; "Max. Quantity")
                             {
                                 ApplicationArea = All;
+                                ToolTip = 'Specifies the value of the Max. Quantity field';
                             }
                         }
                     }
@@ -108,6 +113,7 @@ page 6014450 "NPR Mixed Discount"
                             ApplicationArea = All;
                             Caption = 'Item Qty. per Lot';
                             DecimalPlaces = 0 : 5;
+                            ToolTip = 'Specifies the value of the Item Qty. per Lot field';
 
                             trigger OnValidate()
                             begin
@@ -122,6 +128,7 @@ page 6014450 "NPR Mixed Discount"
                         field("Discount Type"; "Discount Type")
                         {
                             ApplicationArea = All;
+                            ToolTip = 'Specifies the value of the Discount Type field';
 
                             trigger OnValidate()
                             begin
@@ -136,6 +143,7 @@ page 6014450 "NPR Mixed Discount"
                             field("Total Amount"; "Total Amount")
                             {
                                 ApplicationArea = All;
+                                ToolTip = 'Specifies the value of the Total Amount field';
 
                                 trigger OnValidate()
                                 begin
@@ -145,6 +153,7 @@ page 6014450 "NPR Mixed Discount"
                             field("Total Amount Excl. VAT"; "Total Amount Excl. VAT")
                             {
                                 ApplicationArea = All;
+                                ToolTip = 'Specifies the value of the Total Amount Excl. VAT field';
                             }
                         }
                         group(Control6014426)
@@ -155,6 +164,7 @@ page 6014450 "NPR Mixed Discount"
                             {
                                 ApplicationArea = All;
                                 Caption = 'Discount Amount Excl. VAT';
+                                ToolTip = 'Specifies the value of the Discount Amount Excl. VAT field';
 
                                 trigger OnValidate()
                                 begin
@@ -169,6 +179,7 @@ page 6014450 "NPR Mixed Discount"
                             field("Total Discount %"; "Total Discount %")
                             {
                                 ApplicationArea = All;
+                                ToolTip = 'Specifies the value of the Total Discount % field';
 
                                 trigger OnValidate()
                                 begin
@@ -183,6 +194,7 @@ page 6014450 "NPR Mixed Discount"
                             field("Total Discount Amount"; "Total Discount Amount")
                             {
                                 ApplicationArea = All;
+                                ToolTip = 'Specifies the value of the Total Discount Amount field';
 
                                 trigger OnValidate()
                                 begin
@@ -197,6 +209,7 @@ page 6014450 "NPR Mixed Discount"
                             field("Item Discount Qty."; "Item Discount Qty.")
                             {
                                 ApplicationArea = All;
+                                ToolTip = 'Specifies the value of the Item Discount Quantity field';
 
                                 trigger OnValidate()
                                 begin
@@ -206,6 +219,7 @@ page 6014450 "NPR Mixed Discount"
                             field("Item Discount %"; "Item Discount %")
                             {
                                 ApplicationArea = All;
+                                ToolTip = 'Specifies the value of the Item Discount % field';
 
                                 trigger OnValidate()
                                 begin
@@ -221,12 +235,14 @@ page 6014450 "NPR Mixed Discount"
                             {
                                 ApplicationArea = All;
                                 Caption = 'Min. Discount Amount';
+                                ToolTip = 'Specifies the value of the Min. Discount Amount field';
                             }
                             field(MaximumDiscount; MixedDiscountMgt.CalcExpectedDiscAmount(Rec, true))
                             {
                                 ApplicationArea = All;
                                 Caption = 'Max. Discount Amount';
                                 Editable = false;
+                                ToolTip = 'Specifies the value of the Max. Discount Amount field';
                             }
                         }
                         group(Control6014417)
@@ -238,6 +254,7 @@ page 6014450 "NPR Mixed Discount"
                                 ApplicationArea = All;
                                 Caption = 'Discount Amount';
                                 Editable = false;
+                                ToolTip = 'Specifies the value of the Discount Amount field';
                             }
                         }
                     }
@@ -249,11 +266,13 @@ page 6014450 "NPR Mixed Discount"
                     {
                         ApplicationArea = All;
                         Editable = false;
+                        ToolTip = 'Specifies the value of the Created Date field';
                     }
                     field("Last Date Modified"; "Last Date Modified")
                     {
                         ApplicationArea = All;
                         Editable = false;
+                        ToolTip = 'Specifies the value of the Last Date Modified field';
                     }
                     group(Control6014411)
                     {
@@ -262,10 +281,12 @@ page 6014450 "NPR Mixed Discount"
                         field("Block Custom Discount"; "Block Custom Discount")
                         {
                             ApplicationArea = All;
+                            ToolTip = 'Specifies the value of the Block Custom Discount field';
                         }
                         field(Status; Status)
                         {
                             ApplicationArea = All;
+                            ToolTip = 'Specifies the value of the Status field';
                         }
                     }
                 }
@@ -281,26 +302,31 @@ page 6014450 "NPR Mixed Discount"
                     {
                         ApplicationArea = All;
                         Importance = Promoted;
+                        ToolTip = 'Specifies the value of the Start Date field';
                     }
                     field("Ending date"; "Ending date")
                     {
                         ApplicationArea = All;
                         Importance = Promoted;
+                        ToolTip = 'Specifies the value of the End Date field';
                     }
                     field("Starting time"; "Starting time")
                     {
                         ApplicationArea = All;
                         Visible = false;
+                        ToolTip = 'Specifies the value of the Start Time field';
                     }
                     field("Ending time"; "Ending time")
                     {
                         ApplicationArea = All;
                         Visible = false;
+                        ToolTip = 'Specifies the value of the End Time field';
                     }
                     field("Customer Disc. Group Filter"; "Customer Disc. Group Filter")
                     {
                         ApplicationArea = All;
                         AssistEdit = false;
+                        ToolTip = 'Specifies the value of the Customer Disc. Group Filter field';
 
                         trigger OnAssistEdit()
                         begin
@@ -347,6 +373,7 @@ page 6014450 "NPR Mixed Discount"
                               "No." = FIELD(Code);
                 ShortCutKey = 'Shift+Ctrl+D';
                 ApplicationArea = All;
+                ToolTip = 'Executes the Dimensions action';
 
                 trigger OnAction()
                 var
@@ -367,6 +394,7 @@ page 6014450 "NPR Mixed Discount"
                     Image = Item;
                     ShortCutKey = 'Shift+Ctrl+C';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Item Card action';
 
                     trigger OnAction()
                     var
@@ -391,6 +419,7 @@ page 6014450 "NPR Mixed Discount"
                         Caption = 'Transfer Item';
                         Image = TransferToLines;
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Transfer Item action';
 
                         trigger OnAction()
                         var
@@ -411,6 +440,7 @@ page 6014450 "NPR Mixed Discount"
                         Caption = 'Transfer Item Group';
                         Image = TransferToLines;
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Transfer Item Group action';
 
                         trigger OnAction()
                         var
@@ -432,6 +462,7 @@ page 6014450 "NPR Mixed Discount"
                         Caption = 'Transfer Vendor';
                         Image = TransferToLines;
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Transfer Vendor action';
 
                         trigger OnAction()
                         var
@@ -453,6 +484,7 @@ page 6014450 "NPR Mixed Discount"
                         Caption = 'Transfer All Items';
                         Image = TransferToLines;
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Transfer All Items action';
 
                         trigger OnAction()
                         var
@@ -468,6 +500,7 @@ page 6014450 "NPR Mixed Discount"
                         Caption = 'Compress to Item Disc. Group';
                         Image = "Action";
                         ApplicationArea = All;
+                        ToolTip = 'Executes the Compress to Item Disc. Group action';
 
                         trigger OnAction()
                         begin
@@ -483,6 +516,7 @@ page 6014450 "NPR Mixed Discount"
                     Caption = '&Read from scanner';
                     Image = "Action";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the &Read from scanner action';
 
                     trigger OnAction()
                     var
@@ -500,6 +534,7 @@ page 6014450 "NPR Mixed Discount"
                     Caption = 'Send to Retail Journal';
                     Image = SendTo;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Send to Retail Journal action';
 
                     trigger OnAction()
                     var
@@ -538,12 +573,14 @@ page 6014450 "NPR Mixed Discount"
                     Caption = 'Copy campaign to Department Code';
                     Image = "Action";
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Copy campaign to Department Code action';
                 }
                 action("Copy Mixed Discount")
                 {
                     Caption = 'Copy Mixed Discount';
                     Image = CopyDocument;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Copy Mixed Discount action';
 
                     trigger OnAction()
                     var

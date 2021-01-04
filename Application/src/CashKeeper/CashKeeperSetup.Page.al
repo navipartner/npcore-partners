@@ -18,18 +18,22 @@ page 6059945 "NPR CashKeeper Setup"
                 field("Register No."; "Register No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Cash Register No. field';
                 }
                 field("Payment Type"; "Payment Type")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Payment Type field';
                 }
                 field("CashKeeper IP"; "CashKeeper IP")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the CashKeeper IP field';
                 }
                 field("Debug Mode"; "Debug Mode")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Debug Mode field';
                 }
             }
         }
@@ -46,6 +50,7 @@ page 6059945 "NPR CashKeeper Setup"
                 RunObject = Page "NPR CashKeeper Transaction";
                 RunPageLink = "Register No." = FIELD("Register No.");
                 ApplicationArea = All;
+                ToolTip = 'Executes the CashKeeper Transaction action';
             }
             action("CashKeeper Overview")
             {
@@ -54,6 +59,7 @@ page 6059945 "NPR CashKeeper Setup"
                 RunObject = Page "NPR CashKeeper Overview";
                 RunPageLink = "Register No." = FIELD("Register No.");
                 ApplicationArea = All;
+                ToolTip = 'Executes the CashKeeper Overview action';
             }
         }
     }

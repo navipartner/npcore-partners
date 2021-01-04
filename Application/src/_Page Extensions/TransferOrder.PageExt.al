@@ -15,7 +15,8 @@ pageextension 6014462 "NPR Transfer Order" extends "Transfer Order"
                 Image = BinContent;
                 Promoted = true;
                 PromotedCategory = Process;
-                ApplicationArea=All;
+                ApplicationArea = All;
+                ToolTip = 'Executes the Retail Print action';
             }
             action("NPR PriceLabel")
             {
@@ -24,7 +25,8 @@ pageextension 6014462 "NPR Transfer Order" extends "Transfer Order"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
+                ToolTip = 'Executes the Price Label action';
             }
         }
         addfirst("F&unctions")
@@ -34,7 +36,8 @@ pageextension 6014462 "NPR Transfer Order" extends "Transfer Order"
                 Caption = 'Import From Scanner File';
                 Image = Import;
                 Promoted = true;
-                ApplicationArea=All;
+                ApplicationArea = All;
+                ToolTip = 'Executes the Import From Scanner File action';
             }
         }
         addafter("Get Bin Content")
@@ -44,7 +47,8 @@ pageextension 6014462 "NPR Transfer Order" extends "Transfer Order"
                 Caption = '&Read from scanner';
                 Promoted = true;
                 PromotedCategory = Process;
-                ApplicationArea=All;
+                ApplicationArea = All;
+                ToolTip = 'Executes the &Read from scanner action';
             }
         }
         addafter(PostAndPrint)
@@ -58,7 +62,8 @@ pageextension 6014462 "NPR Transfer Order" extends "Transfer Order"
                 PromotedIsBig = true;
                 ShortCutKey = 'Shift+F9';
                 Visible = PostingVisibilityPOS;
-                ApplicationArea=All;
+                ApplicationArea = All;
+                ToolTip = 'Executes the POS Post and &Print action';
 
                 trigger OnAction()
                 var

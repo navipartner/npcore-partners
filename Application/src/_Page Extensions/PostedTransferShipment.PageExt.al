@@ -14,6 +14,7 @@ pageextension 6014465 "NPR Posted Transfer Shipment" extends "Posted Transfer Sh
                 Promoted = true;
                 PromotedCategory = Process;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Retail Print action';
             }
             action("NPR PriceLabel")
             {
@@ -23,6 +24,7 @@ pageextension 6014465 "NPR Posted Transfer Shipment" extends "Posted Transfer Sh
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Price Label action';
             }
         }
     }

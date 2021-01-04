@@ -16,6 +16,7 @@ page 6014487 "NPR Report Usage Setup"
                 field(Enabled; Enabled)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Enabled field';
                 }
             }
         }

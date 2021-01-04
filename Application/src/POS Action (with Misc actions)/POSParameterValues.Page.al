@@ -25,12 +25,14 @@ page 6150705 "NPR POS Parameter Values"
                     ApplicationArea = All;
                     Caption = 'Name';
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Name field';
                 }
                 field(ParameterDescription; ParameterDescription)
                 {
                     ApplicationArea = All;
                     Caption = 'Description';
                     Editable = false;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Data Type"; "Data Type")
                 {
@@ -38,6 +40,7 @@ page 6150705 "NPR POS Parameter Values"
                     Editable = false;
                     Style = StandardAccent;
                     StyleExpr = ParameterIsNotDefault;
+                    ToolTip = 'Specifies the value of the Data Type field';
                 }
                 field(ParameterValue; ParameterValue)
                 {
@@ -45,6 +48,7 @@ page 6150705 "NPR POS Parameter Values"
                     Caption = 'Value';
                     Style = StandardAccent;
                     StyleExpr = ParameterIsNotDefault;
+                    ToolTip = 'Specifies the value of the Value field';
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -80,6 +84,7 @@ page 6150705 "NPR POS Parameter Values"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Reset Values action';
             }
         }
     }

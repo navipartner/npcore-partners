@@ -118,33 +118,39 @@ report 6014452 "NPR Sales Ticket Stats/Date"
                 {
                     Caption = 'Period Type';
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Period Type field';
                 }
                 field(FromDate; FromDate)
                 {
                     Caption = 'From Date';
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the From Date field';
                 }
                 field(ToDate; ToDate)
                 {
                     Caption = 'To Date';
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the To Date field';
                 }
                 field(AmountType; AmountType)
                 {
                     Caption = 'Amount Type';
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Amount Type field';
                 }
                 field(Dim1Filter; Dim1Filter)
                 {
                     CaptionClass = '1,2,1';
                     TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Dim1Filter field';
                 }
                 field(Dim2Filter; Dim2Filter)
                 {
                     CaptionClass = '1,2,2';
                     TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Dim2Filter field';
                 }
             }
         }

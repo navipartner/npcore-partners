@@ -15,86 +15,107 @@ page 6060125 "NPR MM Membership Sales Setup"
                 field(Type; Type)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Type field';
                 }
                 field("No."; "No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the No. field';
                 }
                 field("Business Flow Type"; "Business Flow Type")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Business Flow Type field';
                 }
                 field("Membership Code"; "Membership Code")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Membership Code field';
                 }
                 field(Blocked; Blocked)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Blocked field';
                 }
                 field("Blocked At"; "Blocked At")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Blocked At field';
                 }
                 field("Valid From Base"; "Valid From Base")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Valid From Base field';
                 }
                 field("Sales Cut-Off Date Calculation"; "Sales Cut-Off Date Calculation")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Sales Cut-Off Date Calculation field';
                 }
                 field("Valid From Date Calculation"; "Valid From Date Calculation")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Valid From Date Calculation field';
                 }
                 field("Valid Until Calculation"; "Valid Until Calculation")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Valid Until Calculation field';
                 }
                 field("Duration Formula"; "Duration Formula")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Duration Formula field';
                 }
                 field("Suggested Membercount In Sales"; "Suggested Membercount In Sales")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Suggested Membercount In Sales field';
                 }
                 field("Assign Loyalty Points On Sale"; "Assign Loyalty Points On Sale")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Assign Loyalty Points On Sale field';
                 }
                 field("Auto-Renew To"; "Auto-Renew To")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Auto-Renew To field';
                 }
                 field("Auto-Admit Member On Sale"; "Auto-Admit Member On Sale")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Auto-Admit Member On Sale field';
                 }
                 field("Member Card Type Selection"; "Member Card Type Selection")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Member Card Type Selection field';
                 }
                 field("Member Card Type"; "Member Card Type")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Member Card Type field';
                 }
                 field("Magento M2 Membership Sign-up"; "Magento M2 Membership Sign-up")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Magento M2 Membership Sign-up field';
                 }
                 field("Age Constraint Type"; "Age Constraint Type")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Age Constraint Type field';
                 }
                 field("Age Constraint (Years)"; "Age Constraint (Years)")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Age Constraint (Years) field';
                 }
                 field("Requires Guardian"; "Requires Guardian")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Requires Guardian field';
                 }
             }
         }
@@ -112,6 +133,7 @@ page 6060125 "NPR MM Membership Sales Setup"
                 Promoted = true;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Create Membership action';
 
                 trigger OnAction()
                 begin
@@ -127,12 +149,14 @@ page 6060125 "NPR MM Membership Sales Setup"
                 Image = Import;
                 RunObject = Codeunit "NPR MM Import Members";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Import Members From File action';
             }
             action("Failed Import Worksheet")
             {
                 Caption = 'Failed Import Worksheet';
                 Image = ImportLog;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Failed Import Worksheet action';
 
                 trigger OnAction()
                 var
@@ -155,6 +179,7 @@ page 6060125 "NPR MM Membership Sales Setup"
                 Image = SetupList;
                 RunObject = Page "NPR MM Membership Setup";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Membership Setup action';
             }
             action("Item List")
             {
@@ -162,6 +187,7 @@ page 6060125 "NPR MM Membership Sales Setup"
                 Image = List;
                 RunObject = Page "Item List";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Item List action';
             }
             action(Memberships)
             {
@@ -170,6 +196,7 @@ page 6060125 "NPR MM Membership Sales Setup"
                 RunObject = Page "NPR MM Memberships";
                 RunPageLink = "Membership Code" = FIELD("Membership Code");
                 ApplicationArea = All;
+                ToolTip = 'Executes the Memberships action';
             }
             action("Community Setup")
             {
@@ -177,6 +204,7 @@ page 6060125 "NPR MM Membership Sales Setup"
                 Image = Group;
                 RunObject = Page "NPR MM Member Community";
                 ApplicationArea = All;
+                ToolTip = 'Executes the Community Setup action';
             }
         }
     }

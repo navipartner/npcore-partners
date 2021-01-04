@@ -20,6 +20,7 @@ pageextension 6014407 "NPR Posted Sales Credit Memo" extends "Posted Sales Credi
             field("NPR Sell-to Customer Name 2"; "Sell-to Customer Name 2")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the Sell-to Customer Name 2 field';
             }
         }
         addafter("EU 3-Party Trade")
@@ -27,6 +28,7 @@ pageextension 6014407 "NPR Posted Sales Credit Memo" extends "Posted Sales Credi
             field("NPR Magento Payment Amount"; "NPR Magento Payment Amount")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the NPR Magento Payment Amount field';
             }
         }
         addafter("Ship-to Name")
@@ -34,6 +36,7 @@ pageextension 6014407 "NPR Posted Sales Credit Memo" extends "Posted Sales Credi
             field("NPR Ship-to Name 2"; "Ship-to Name 2")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the Ship-to Name 2 field';
             }
         }
         addafter("Bill-to Name")
@@ -41,6 +44,7 @@ pageextension 6014407 "NPR Posted Sales Credit Memo" extends "Posted Sales Credi
             field("NPR Bill-to Name 2"; "Bill-to Name 2")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the Bill-to Name 2 field';
             }
         }
         addafter("Bill-to Contact")
@@ -48,11 +52,13 @@ pageextension 6014407 "NPR Posted Sales Credit Memo" extends "Posted Sales Credi
             field("NPR Bill-to E-mail"; "NPR Bill-to E-mail")
             {
                 ApplicationArea = All;
+                ToolTip = 'Specifies the value of the NPR Bill-to E-mail field';
             }
             field("NPR Document Processing"; "NPR Document Processing")
             {
                 ApplicationArea = All;
                 Editable = false;
+                ToolTip = 'Specifies the value of the NPR Document Processing field';
             }
         }
     }
@@ -68,12 +74,14 @@ pageextension 6014407 "NPR Posted Sales Credit Memo" extends "Posted Sales Credi
                     Caption = 'E-mail Log';
                     Image = Email;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the E-mail Log action';
                 }
                 action("NPR SendAsPDF")
                 {
                     Caption = 'Send as PDF';
                     Image = SendEmailPDF;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Send as PDF action';
                 }
             }
             group("NPR DocExchFramework")
@@ -84,12 +92,14 @@ pageextension 6014407 "NPR Posted Sales Credit Memo" extends "Posted Sales Credi
                     Caption = 'Export';
                     Image = ExportFile;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Export action';
                 }
                 action("NPR UpdateStatus")
                 {
                     Caption = 'Update Status';
                     Image = ChangeStatus;
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Update Status action';
                 }
             }
         }

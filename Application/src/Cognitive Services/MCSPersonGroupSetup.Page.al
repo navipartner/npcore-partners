@@ -16,14 +16,17 @@ page 6059956 "NPR MCS Person Group Setup"
                 field("Table Id"; "Table Id")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Table Id field';
                 }
                 field("Person Groups Id"; "Person Groups Id")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Person Groups Id field';
                 }
                 field("Person Groups Name"; "Person Groups Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Person Groups Name field';
                 }
             }
         }

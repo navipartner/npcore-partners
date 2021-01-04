@@ -16,18 +16,22 @@ page 6150905 "NPR HC Paym.Types Post. Setup"
                 field("BC Payment Type POS No."; "BC Payment Type POS No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the BC Payment Type POS No. field';
                 }
                 field("BC Register No."; "BC Register No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the BC Register No. field';
                 }
                 field("G/L Account No."; "G/L Account No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the G/L Account No. field';
                 }
                 field("Bank Account No."; "Bank Account No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Bank Account No. field';
                 }
             }
         }

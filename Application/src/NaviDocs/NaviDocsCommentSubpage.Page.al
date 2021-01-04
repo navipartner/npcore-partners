@@ -22,23 +22,28 @@ page 6059770 "NPR NaviDocs Comment Subpage"
                 field("Activity Date"; "Activity Date")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Activity Date field';
                 }
                 field(Status; Status)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Status field';
                 }
                 field("Activity Message"; "Activity Message")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Activity Message field';
                 }
                 field("User ID"; "User ID")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the User ID field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
                     Visible = false;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
             }
         }

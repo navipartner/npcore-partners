@@ -15,6 +15,7 @@ page 6014501 "NPR Dynamic Module Sett. Dlg."
                 ApplicationArea = All;
                 CaptionClass = '3,' + SettingName;
                 Visible = BooleanVisible;
+                ToolTip = 'Specifies the value of the BooleanValue field';
 
                 trigger OnValidate()
                 begin
@@ -27,6 +28,7 @@ page 6014501 "NPR Dynamic Module Sett. Dlg."
                 ApplicationArea = All;
                 CaptionClass = '3,' + SettingName;
                 Visible = TextVisible;
+                ToolTip = 'Specifies the value of the TextValue field';
 
                 trigger OnValidate()
                 begin
@@ -39,6 +41,7 @@ page 6014501 "NPR Dynamic Module Sett. Dlg."
                 ApplicationArea = All;
                 CaptionClass = '3,' + SettingName;
                 Visible = CodeVisible;
+                ToolTip = 'Specifies the value of the CodeValue field';
 
                 trigger OnValidate()
                 begin
@@ -51,6 +54,7 @@ page 6014501 "NPR Dynamic Module Sett. Dlg."
                 ApplicationArea = All;
                 CaptionClass = '3,' + SettingName;
                 Visible = DateVisible;
+                ToolTip = 'Specifies the value of the DateValue field';
 
                 trigger OnValidate()
                 begin
@@ -63,6 +67,7 @@ page 6014501 "NPR Dynamic Module Sett. Dlg."
                 ApplicationArea = All;
                 CaptionClass = '3,' + SettingName;
                 Visible = DateFormulaVisible;
+                ToolTip = 'Specifies the value of the DateFormulaValue field';
 
                 trigger OnValidate()
                 begin
@@ -75,6 +80,7 @@ page 6014501 "NPR Dynamic Module Sett. Dlg."
                 ApplicationArea = All;
                 CaptionClass = '3,' + SettingName;
                 Visible = DateTimeVisible;
+                ToolTip = 'Specifies the value of the DateTimeValue field';
 
                 trigger OnValidate()
                 begin
@@ -88,6 +94,7 @@ page 6014501 "NPR Dynamic Module Sett. Dlg."
                 CaptionClass = '3,' + SettingName;
                 DecimalPlaces = 2 : 5;
                 Visible = DecimalVisible;
+                ToolTip = 'Specifies the value of the DecimalValue field';
 
                 trigger OnValidate()
                 begin
@@ -100,6 +107,7 @@ page 6014501 "NPR Dynamic Module Sett. Dlg."
                 ApplicationArea = All;
                 CaptionClass = '3,' + SettingName;
                 Visible = DurationVisible;
+                ToolTip = 'Specifies the value of the DurationValue field';
 
                 trigger OnValidate()
                 begin
@@ -112,6 +120,7 @@ page 6014501 "NPR Dynamic Module Sett. Dlg."
                 ApplicationArea = All;
                 CaptionClass = '3,' + SettingName;
                 Visible = IntegerVisible;
+                ToolTip = 'Specifies the value of the IntegerValue field';
 
                 trigger OnValidate()
                 begin
@@ -124,6 +133,7 @@ page 6014501 "NPR Dynamic Module Sett. Dlg."
                 ApplicationArea = All;
                 CaptionClass = '3,' + SettingName;
                 Visible = TimeVisible;
+                ToolTip = 'Specifies the value of the TimeValue field';
 
                 trigger OnValidate()
                 begin

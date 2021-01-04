@@ -1,4 +1,4 @@
-﻿page 6060095 "NPR TM Pick-Up Reserv. Tickets"
+page 6060095 "NPR TM Pick-Up Reserv. Tickets"
 {
     // TM1.23/TSA /20170717 CASE 284248 Initial Version
     // TM1.25/TSA /20171003 CASE 286397 Added Client Attributes to list
@@ -24,50 +24,62 @@
                 field("Created Date Time"; "Created Date Time")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Created Date Time field';
                 }
                 field("External Member No."; "External Member No.")
                 {
                     ApplicationArea = NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the External Member No. field';
                 }
                 field("External Order No."; "External Order No.")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the External Order No. field';
                 }
                 field("Request Status"; "Request Status")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Request Status field';
                 }
                 field("Payment Option"; "Payment Option")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Payment Option field';
                 }
                 field("Notification Method"; "Notification Method")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Notification Method field';
                 }
                 field("Notification Address"; "Notification Address")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Notification Address field';
                 }
                 field("Admission Code"; "Admission Code")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Admission Code field';
                 }
                 field("Scheduled Time Description"; "Scheduled Time Description")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Scheduled Time Description field';
                 }
                 field("Customer No."; "Customer No.")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Customer No. field';
                 }
                 field("External Ticket Number"; "External Ticket Number")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the External Ticket Number field';
                 }
                 field(Quantity; Quantity)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Quantity field';
                 }
                 field(NPRAttrTextArray_01; NPRAttrTextArray[1])
                 {
@@ -75,6 +87,7 @@
                     CaptionClass = '6014555,6060116,1,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible01;
+                    ToolTip = 'Specifies the value of the NPRAttrTextArray[1] field';
 
                     trigger OnValidate()
                     begin
@@ -87,6 +100,7 @@
                     CaptionClass = '6014555,6060116,2,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible02;
+                    ToolTip = 'Specifies the value of the NPRAttrTextArray[2] field';
 
                     trigger OnValidate()
                     begin
@@ -99,6 +113,7 @@
                     CaptionClass = '6014555,6060116,3,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible03;
+                    ToolTip = 'Specifies the value of the NPRAttrTextArray[3] field';
 
                     trigger OnValidate()
                     begin
@@ -111,6 +126,7 @@
                     CaptionClass = '6014555,6060116,4,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible04;
+                    ToolTip = 'Specifies the value of the NPRAttrTextArray[4] field';
 
                     trigger OnValidate()
                     begin
@@ -123,6 +139,7 @@
                     CaptionClass = '6014555,6060116,5,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible05;
+                    ToolTip = 'Specifies the value of the NPRAttrTextArray[5] field';
 
                     trigger OnValidate()
                     begin
@@ -135,6 +152,7 @@
                     CaptionClass = '6014555,6060116,6,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible06;
+                    ToolTip = 'Specifies the value of the NPRAttrTextArray[6] field';
 
                     trigger OnValidate()
                     begin
@@ -147,6 +165,7 @@
                     CaptionClass = '6014555,6060116,7,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible07;
+                    ToolTip = 'Specifies the value of the NPRAttrTextArray[7] field';
 
                     trigger OnValidate()
                     begin
@@ -159,6 +178,7 @@
                     CaptionClass = '6014555,6060116,8,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible08;
+                    ToolTip = 'Specifies the value of the NPRAttrTextArray[8] field';
 
                     trigger OnValidate()
                     begin
@@ -171,6 +191,7 @@
                     CaptionClass = '6014555,6060116,9,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible09;
+                    ToolTip = 'Specifies the value of the NPRAttrTextArray[9] field';
 
                     trigger OnValidate()
                     begin
@@ -183,6 +204,7 @@
                     CaptionClass = '6014555,6060116,10,2';
                     Editable = NPRAttrEditable;
                     Visible = NPRAttrVisible10;
+                    ToolTip = 'Specifies the value of the NPRAttrTextArray[10] field';
 
                     trigger OnValidate()
                     begin

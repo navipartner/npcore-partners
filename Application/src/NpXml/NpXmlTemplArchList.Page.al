@@ -20,19 +20,23 @@ page 6151562 "NPR NpXml Templ. Arch. List"
                 field("Template Version No."; "Template Version No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Template Version No. field';
                 }
                 field("Version Description"; "Version Description")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Version Description field';
                 }
                 field("Archived by"; "Archived by")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Archived by field';
                 }
                 field("Archived at"; "Archived at")
                 {
                     ApplicationArea = All;
                     Caption = 'Archived At';
+                    ToolTip = 'Specifies the value of the Archived At field';
                 }
             }
         }
@@ -50,6 +54,7 @@ page 6151562 "NPR NpXml Templ. Arch. List"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Restore Template Version action';
 
                 trigger OnAction()
                 var
@@ -76,6 +81,7 @@ page 6151562 "NPR NpXml Templ. Arch. List"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
+                ToolTip = 'Executes the Export Template Version action';
 
                 trigger OnAction()
                 var

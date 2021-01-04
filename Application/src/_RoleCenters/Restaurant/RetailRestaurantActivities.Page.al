@@ -17,15 +17,18 @@ page 6151335 "NPR Restaurant Activities"
                 field("Waiter Pads - Open"; "Waiter Pads - Open")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Waiter Pads - Open field';
                 }
                 field("Kitchen Requests - Open"; "Kitchen Requests - Open")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Kitchen Requests - Open field';
                 }
                 field("Pending Reservations"; "Pending Reservations")
                 {
                     ApplicationArea = All;
                     Caption = 'Pending Reservations';
+                    ToolTip = 'Specifies the value of the Pending Reservations field';
                     trigger OnDrillDown()
                     begin
                         DrillDownPendingReservations();
@@ -38,18 +41,22 @@ page 6151335 "NPR Restaurant Activities"
                 field("Seatings: Ready"; "Seatings: Ready")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Available field';
                 }
                 field("Seatings: Occupied"; "Seatings: Occupied")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Occupied field';
                 }
                 field("Seatings: Reserved"; "Seatings: Reserved")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Reserved field';
                 }
                 field("Seatings: Cleaning Required"; "Seatings: Cleaning Required")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Cleaning Required field';
                 }
             }
             cuegroup(SeatStatus)
@@ -58,10 +65,12 @@ page 6151335 "NPR Restaurant Activities"
                 field("Available seats"; "Available seats")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Available Seats field';
                 }
                 field("Inhouse Guests"; "Inhouse Guests")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Inhouse Guests field';
                 }
             }
             cuegroup("My User Tasks")
@@ -89,6 +98,7 @@ page 6151335 "NPR Restaurant Activities"
                 field("Turnover (LCY)"; "Turnover (LCY)")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Turnover field';
 
                     trigger OnDrillDown()
                     begin
@@ -98,6 +108,7 @@ page 6151335 "NPR Restaurant Activities"
                 field("No. of Sales"; "No. of Sales")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the No. of Sales field';
 
                     trigger OnDrillDown()
                     begin
@@ -107,14 +118,17 @@ page 6151335 "NPR Restaurant Activities"
                 field("Total No. of Guests"; "Total No. of Guests")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Total No. of Guests field';
                 }
                 field("Average per Sale (LCY)"; "Average per Sale (LCY)")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Average per Sale field';
                 }
                 field("Average per Guest (LCY)"; "Average per Guest (LCY)")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Average per Guest field';
                 }
             }
             cuegroup(Reservations)
@@ -123,14 +137,17 @@ page 6151335 "NPR Restaurant Activities"
                 field("Completed Reservations"; "Completed Reservations")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Completed field';
                 }
                 field("No-Shows"; "No-Shows")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the No-Shows field';
                 }
                 field("Cancelled Reservations"; "Cancelled Reservations")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Cancelled field';
                 }
             }
         }

@@ -27,6 +27,7 @@ page 6151484 "NPR Magento Top10 Items by Qty"
                 field("No."; "No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the No. field';
 
                     trigger OnDrillDown()
                     begin
@@ -37,12 +38,14 @@ page 6151484 "NPR Magento Top10 Items by Qty"
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("Sales (Qty.)"; "Sales (Qty.)")
                 {
                     ApplicationArea = All;
                     BlankZero = true;
                     Caption = 'Sales (Qty.)';
+                    ToolTip = 'Specifies the value of the Sales (Qty.) field';
                 }
             }
         }
@@ -61,6 +64,7 @@ page 6151484 "NPR Magento Top10 Items by Qty"
                 {
                     Caption = 'Day';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Day action';
 
                     trigger OnAction()
                     begin
@@ -72,6 +76,7 @@ page 6151484 "NPR Magento Top10 Items by Qty"
                 {
                     Caption = 'Week';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Week action';
 
                     trigger OnAction()
                     begin
@@ -83,6 +88,7 @@ page 6151484 "NPR Magento Top10 Items by Qty"
                 {
                     Caption = 'Month';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Month action';
 
                     trigger OnAction()
                     begin
@@ -94,6 +100,7 @@ page 6151484 "NPR Magento Top10 Items by Qty"
                 {
                     Caption = 'Quarter';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Quarter action';
 
                     trigger OnAction()
                     begin
@@ -105,6 +112,7 @@ page 6151484 "NPR Magento Top10 Items by Qty"
                 {
                     Caption = 'Year';
                     ApplicationArea = All;
+                    ToolTip = 'Executes the Year action';
 
                     trigger OnAction()
                     begin

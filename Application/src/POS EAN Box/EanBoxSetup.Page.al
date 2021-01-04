@@ -17,14 +17,17 @@ page 6060100 "NPR Ean Box Setup"
                 field("Code"; Code)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field(Description; Description)
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Description field';
                 }
                 field("POS View"; "POS View")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the POS View field';
                 }
             }
             part(Control6014402; "NPR Ean Box Setup Events")
