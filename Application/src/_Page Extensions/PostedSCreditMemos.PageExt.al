@@ -3,6 +3,20 @@ pageextension 6014417 "NPR Posted S.Credit Memos" extends "Posted Sales Credit M
     // NPR5.29/JC/20161205 CASE 259025 Added PDF2NAV Action group
     // NPR5.33/BR /20170323  CASE 266527 Added Doc. Exchange Actions
     // NPR5.42/THRO/20180518 CASE 308179 Removed code from Action SendAsPdf and EmailLog
+
+    layout
+    {
+        addafter(Paid)
+        {
+            field("NPR Magento Coupon"; "NPR Magento Coupon")
+            {
+                ApplicationArea = All;
+                Editable = false;
+                Visible = false;
+            }
+        }
+    }
+
     actions
     {
         addafter("&Credit Memo")
