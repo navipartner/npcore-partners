@@ -1,18 +1,5 @@
 table 6151505 "NPR Nc Import Type"
 {
-    // NC1.21/TTH /20151117  CASE 227358 New object
-    // NC1.22/MHA /20151202  CASE 227358 Added field 110 "Webservice Function"
-    // NC2.00/MHA /20160525  CASE 240005 NaviConnect
-    // NC2.01/MHA /20161012  CASE 242552 Added field 235 "Ftp Backup Path"
-    // NC2.01/MHA /20161014  CASE 255397 Added field 7 "Keep Import Entries for"
-    // NC2.02/MHA /20170223  CASE 262318 Added fields 300 "Send e-mail on Error" and 305 "E-mail address on Error"
-    // NC2.08/BR  /20171221  CASE 295322 Added Fields 240 "Ftp Binary" and 245 "Ftp Filename"
-    // NC2.12/MHA /20180418  CASE 308107 Length of field 1 "Code" extended from 10 to 20 and caption added to fields 10,20
-    // NC2.12/MHA /20180502  CASE 313362 Added fields 400 "Server File Enabled", 405 "Server File Path"
-    // NC2.16/MHA /20180917  CASE 328432 Added field 203 "Sftp"
-    // NPR5.54/CLVA/20200127 CASE 366790 Added field "XML Stylesheet"
-    // NPR5.55/MHA /20200604  CASE 408100 Added fields 520 "Max. Retry Count", 530 "Delay between Retries"
-
     Caption = 'Nc Import Type';
     DataClassification = CustomerContent;
     LookupPageID = "NPR Nc Import Types";
@@ -43,8 +30,6 @@ table 6151505 "NPR Nc Import Type"
             DataClassification = CustomerContent;
             Description = 'NC2.12';
             TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Codeunit));
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(20; "Import Codeunit ID"; Integer)
@@ -53,8 +38,6 @@ table 6151505 "NPR Nc Import Type"
             DataClassification = CustomerContent;
             Description = 'NC2.12';
             TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Codeunit));
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(100; "Webservice Enabled"; Boolean)
@@ -174,6 +157,19 @@ table 6151505 "NPR Nc Import Type"
             DataClassification = CustomerContent;
             Description = 'NPR5.55';
         }
+        field(600; "Import List Update Handler"; Enum "NPR Nc IL Update Handler")
+        {
+            Caption = 'Import List Update Handler';
+            DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            begin
+                if "Import List Update Handler" <> "Import List Update Handler"::Default then begin
+                    "Ftp Enabled" := false;
+                    "Server File Enabled" := false;
+                end;
+            end;
+        }
     }
 
     keys
@@ -225,4 +221,3 @@ table 6151505 "NPR Nc Import Type"
         WebService.Insert(true);
     end;
 }
-
