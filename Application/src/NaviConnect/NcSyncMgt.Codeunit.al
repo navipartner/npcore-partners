@@ -4,7 +4,6 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
 
     trigger OnRun()
     var
-        ImportType: Record "NPR Nc Import Type";
         TaskProcessor: Record "NPR Nc Task Processor";
         NaviConnectTaskMgt: Codeunit "NPR Nc Task Mgt.";
         NcImportMgt: Codeunit "NPR Nc Import Mgt.";
@@ -20,22 +19,9 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
         end;
         UpdateTaskProcessor(TaskProcessor);
         Commit;
-        ImportTypeCode := CopyStr(UpperCase(GetParameterText("Parameter.DownloadType")), 1, MaxStrLen(ImportType.Code));
-        if GetParameterBool("Parameter.DownloadFtp") then begin
-            if ImportTypeCode = '' then
-                DownloadFtp()
-            else
-                if ImportType.Get(ImportTypeCode) then
-                    DownloadFtpType(ImportType);
-        end;
 
-        if GetParameterBool("Parameter.DownloadServerFile") then begin
-            if ImportTypeCode = '' then
-                DownloadServerFiles()
-            else
-                if ImportType.Get(ImportTypeCode) then
-                    DownloadServerFile(ImportType);
-        end;
+        ImportTypeCode := CopyStr(UpperCase(GetParameterText("Parameter.DownloadType")), 1, MaxStrLen(ImportTypeCode));
+        UpdateImportList(Rec, ImportTypeCode);
 
         if GetParameterBool("Parameter.ProcessImport") then
             ProcessImportEntries();
@@ -53,6 +39,21 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
 
         if GetParameterBool("Parameter.CleanupImport") then
             NcImportMgt.CleanupImportTypes();
+    end;
+
+    procedure UpdateImportList(TaskLine: Record "NPR Task Line"; ImportTypeCode: Code[20])
+    var
+        ImportType: Record "NPR Nc Import Type";
+        NcDependencyFactory: Codeunit "NPR Nc Dependency Factory";
+        ImportListUpdater: Interface "NPR Nc Import List IUpdate";
+    begin
+        if ImportTypeCode <> '' then
+            ImportType.SetRange("Code", ImportTypeCode);
+        if ImportType.FindSet() then
+            repeat
+                if NcDependencyFactory.CreateNcImportListUpdater(ImportListUpdater, ImportType) then
+                    ImportListUpdater.Update(TaskLine, ImportType);
+            until ImportType.Next() = 0;
     end;
 
     var
@@ -82,43 +83,51 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
 
     procedure DownloadFtpType(ImportType: Record "NPR Nc Import Type"): Boolean
     var
+        ImportEntryTmp: Record "NPR Nc Import Entry" temporary;
         FileList: DotNet NPRNetIList;
         LsEntry: DotNet NPRNetChannelSftp_LsEntry;
         Filename: Text;
         ListDirectory: Text;
     begin
-        if ImportType."Ftp Filename" <> '' then begin
-            InsertImportEntry(ImportType, ImportType."Ftp Filename");
-            exit(true);
-        end;
+        case true of
+            ImportType."Ftp Filename" <> '':
+                if TryImportNewEntry(ImportEntryTmp, ImportType, ImportType."Ftp Filename") then
+                    SaveNewEntry(ImportEntryTmp);
 
-        if ImportType.Sftp then begin
-            if DownloadSftpFilenames(ImportType, ListDirectory) then begin
+            ImportType.Sftp:
+                if DownloadSftpFilenames(ImportType, ListDirectory) then begin
+                    while CutNextFilename(ListDirectory, Filename) do
+                        if TryImportNewEntrySftp(ImportEntryTmp, ImportType, Filename) then
+                            SaveNewEntry(ImportEntryTmp);
+                end;
+
+            DownloadFtpListDirectory(ImportType, ListDirectory):
                 while CutNextFilename(ListDirectory, Filename) do
-                    InsertImportEntrySftp(ImportType, Filename);
-            end;
-            exit(true);
+                    if TryImportNewEntry(ImportEntryTmp, ImportType, Filename) then
+                        SaveNewEntry(ImportEntryTmp);
+
+            DownloadFtpListDirectoryDetails(ImportType, ListDirectory):
+                while CutNextFilenameDetailed(ListDirectory, Filename) do
+                    if TryImportNewEntry(ImportEntryTmp, ImportType, Filename) then
+                        SaveNewEntry(ImportEntryTmp);
+
+            else
+                exit(false);
         end;
 
-        if DownloadFtpListDirectory(ImportType, ListDirectory) then begin
-            while CutNextFilename(ListDirectory, Filename) do
-                InsertImportEntry(ImportType, Filename);
-            exit(true);
-        end;
+        exit(true);
+    end;
 
-        if DownloadFtpListDirectoryDetails(ImportType, ListDirectory) then begin
-            while CutNextFilenameDetailed(ListDirectory, Filename) do
-                InsertImportEntry(ImportType, Filename);
-            exit(true);
-        end;
-
-        exit(false);
+    local procedure SaveNewEntry(var ImportEntryTmp: Record "NPR Nc Import Entry" temporary)
+    begin
+        ImportEntryTmp.Insert();
+        StoreImportEntries(ImportEntryTmp);
+        Commit();
     end;
 
     [TryFunction]
-    procedure InsertImportEntry(ImportType: Record "NPR Nc Import Type"; Filename: Text)
+    procedure TryImportNewEntry(var ImportEntry: Record "NPR Nc Import Entry"; ImportType: Record "NPR Nc Import Type"; Filename: Text)
     var
-        ImportEntry: Record "NPR Nc Import Entry";
         FileMgt: Codeunit "File Management";
         Credential: DotNet NPRNetNetworkCredential;
         FtpWebRequest: DotNet NPRNetFtpWebRequest;
@@ -141,7 +150,7 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
         FtpWebResponse := FtpWebRequest.GetResponse;
         MemoryStream := FtpWebResponse.GetResponseStream();
 
-        ImportEntry."Entry No." := 0;
+        Clear(ImportEntry);
         ImportEntry."Import Type" := ImportType.Code;
         ImportEntry.Date := CurrentDateTime;
         ImportEntry."Document Name" := GetDocName(Filename, MaxStrLen(ImportEntry."Document Name"));
@@ -153,8 +162,6 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
         MemoryStream.Flush;
         MemoryStream.Close;
         Clear(MemoryStream);
-
-        ImportEntry.Insert(true);
 
         if ImportType."Ftp Backup Path" = '' then begin
             if not DeleteFtpFile(SourceUri.AbsoluteUri + Filename, ImportType."Ftp User", ImportType."Ftp Password") then
@@ -170,13 +177,11 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
             if not RenameFtpFile(SourceUri.AbsoluteUri + Filename, ImportType."Ftp User", ImportType."Ftp Password", ImportType."Ftp Backup Path" + '/' + Filename) then
                 Error(CopyStr(StrSubstNo(Text001, Filename, GetLastErrorText), 1, 1000));
         end;
-        Commit;
     end;
 
     [TryFunction]
-    procedure InsertImportEntrySftp(ImportType: Record "NPR Nc Import Type"; Filename: Text)
+    procedure TryImportNewEntrySftp(var ImportEntry: Record "NPR Nc Import Entry"; ImportType: Record "NPR Nc Import Type"; Filename: Text)
     var
-        ImportEntry: Record "NPR Nc Import Entry";
         SharpSFtp: DotNet NPRNetSftp0;
         IOStream: DotNet NPRNetStream;
         OutStream: OutStream;
@@ -195,7 +200,7 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
                 RemotePath += '/';
         end;
 
-        ImportEntry."Entry No." := 0;
+        Clear(ImportEntry);
         ImportEntry."Import Type" := ImportType.Code;
         ImportEntry.Date := CurrentDateTime;
         ImportEntry."Document Name" := GetDocName(Filename, MaxStrLen(ImportEntry."Document Name"));
@@ -204,8 +209,6 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
         ImportEntry."Document Source".CreateOutStream(OutStream);
         IOStream := OutStream;
         SharpSFtp.Get(RemotePath + Filename, IOStream);
-
-        ImportEntry.Insert(true);
 
         if ImportType."Ftp Backup Path" = '' then
             SharpSFtp.DeleteFile(RemotePath + Filename)
@@ -217,7 +220,6 @@ codeunit 6151505 "NPR Nc Sync. Mgt."
             SharpSFtp.RenameFile(RemotePath + Filename, NewRemotePath + Filename);
         end;
 
-        Commit;
         SharpSFtp.Close;
     end;
     #endregion "Download Ftp"

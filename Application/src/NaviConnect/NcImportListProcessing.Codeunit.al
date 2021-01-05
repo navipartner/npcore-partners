@@ -1,8 +1,5 @@
 codeunit 6151509 "NPR Nc Import List Processing"
 {
-    // NC2.23/MHA /20191018  CASE 358499 Object created - Process Nc Import List via Job Queue
-    // NPR5.55/MHA /20200604  CASE 408100 Added filter on Earliest Import Datetime
-
     TableNo = "Job Queue Entry";
 
     trigger OnRun()
@@ -11,21 +8,7 @@ codeunit 6151509 "NPR Nc Import List Processing"
         NcSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
     begin
         FindImportType(Rec, NcImportType);
-        if HasParameter(Rec, ParamDownloadFtp()) then begin
-            if NcImportType.Code <> '' then
-                NcSyncMgt.DownloadFtpType(NcImportType)
-            else
-                NcSyncMgt.DownloadFtp();
-            Commit;
-        end;
-
-        if HasParameter(Rec, ParamDownloadServerFile()) then begin
-            if NcImportType.Code <> '' then
-                NcSyncMgt.DownloadServerFile(NcImportType)
-            else
-                NcSyncMgt.DownloadServerFiles();
-            Commit;
-        end;
+        UpdateImportList(Rec, NcImportType.Code);
 
         if HasParameter(Rec, ParamProcessImport()) then
             ProcessImportEntries(NcImportType);
@@ -37,6 +20,21 @@ codeunit 6151509 "NPR Nc Import List Processing"
         Text002: Label 'Process Import List';
         Text003: Label 'All';
 
+    local procedure UpdateImportList(JobQueueEntry: Record "Job Queue Entry"; ImportTypeCode: Code[20])
+    var
+        ImportType: Record "NPR Nc Import Type";
+        NcDependencyFactory: Codeunit "NPR Nc Dependency Factory";
+        ImportListUpdater: Interface "NPR Nc Import List IUpdate";
+    begin
+        if ImportTypeCode <> '' then
+            ImportType.SetRange("Code", ImportTypeCode);
+        if ImportType.FindSet() then
+            repeat
+                if NcDependencyFactory.CreateNcImportListUpdater(ImportListUpdater, ImportType) then
+                    ImportListUpdater.Update(JobQueueEntry, ImportType);
+            until ImportType.Next() = 0;
+    end;
+
     procedure ProcessImportEntries(NcImportType: Record "NPR Nc Import Type")
     var
         NcSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
@@ -45,9 +43,7 @@ codeunit 6151509 "NPR Nc Import List Processing"
         NcImportEntry.SetFilter("Import Type", NcImportType.Code);
         NcImportEntry.SetRange(Imported, false);
         NcImportEntry.SetRange("Runtime Error", false);
-        //-NPR5.55 [408100]
         NcImportEntry.SetFilter("Earliest Import Datetime", '<=%1', CurrentDateTime);
-        //+NPR5.55 [408100]
         if NcImportEntry.FindSet then
             repeat
                 NcSyncMgt.ProcessImportEntry(NcImportEntry);
@@ -95,7 +91,7 @@ codeunit 6151509 "NPR Nc Import List Processing"
         exit(ParameterValue);
     end;
 
-    local procedure HasParameter(JobQueueEntry: Record "Job Queue Entry"; ParameterName: Text): Boolean
+    procedure HasParameter(JobQueueEntry: Record "Job Queue Entry"; ParameterName: Text): Boolean
     var
         Position: Integer;
     begin
@@ -182,12 +178,12 @@ codeunit 6151509 "NPR Nc Import List Processing"
         exit('import_type');
     end;
 
-    local procedure ParamDownloadFtp(): Text
+    procedure ParamDownloadFtp(): Text
     begin
         exit('download_ftp');
     end;
 
-    local procedure ParamDownloadServerFile(): Text
+    procedure ParamDownloadServerFile(): Text
     begin
         exit('download_server_file');
     end;
@@ -197,4 +193,3 @@ codeunit 6151509 "NPR Nc Import List Processing"
         exit('process_import_list');
     end;
 }
-

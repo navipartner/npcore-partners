@@ -1,13 +1,5 @@
 page 6151505 "NPR Nc Import Types"
 {
-    // NC1.21/TTH /20151118  CASE 227358 New object
-    // NC2.00/MHA /20160525  CASE 240005 NaviConnect
-    // NC2.01/MHA /20161005  CASE 242552 Added action: Download Ftp
-    // NC2.01/MHA /20161014  CASE 255397 Added field 7 "Keep Import Entries for"
-    // NC2.02/MHA /20170223  CASE 262318 Added action: Action: SendTestErrorMail and fields 300 "Send e-mail on Error" and 305 "E-mail address on Error"
-    // NC2.12/MHA /20180502  CASE 313362 Added fields 200 "Ftp Enabled", 205 "Ftp Host", 400 "Server File Enabled", 405 "Server File Path"
-    // NC2.16/MHA /20180917  CASE 328432 Added field 203 "Sftp"
-
     Caption = 'NaviConnect Import Types';
     CardPageID = "NPR Nc Import Type Card";
     Editable = false;
@@ -31,6 +23,11 @@ page 6151505 "NPR Nc Import Types"
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
+                }
+                field("Import List Update Handler"; "Import List Update Handler")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the update handler, which will be used for getting new entries into import list';
                 }
                 field("Keep Import Entries for"; "Keep Import Entries for")
                 {
@@ -106,9 +103,7 @@ page 6151505 "NPR Nc Import Types"
                 var
                     NcSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
                 begin
-                    //-NC2.01 [242552]
                     NcSyncMgt.DownloadFtpType(Rec);
-                    //+NC2.01 [242552]
                 end;
             }
             action("Download Server File")
@@ -126,9 +121,7 @@ page 6151505 "NPR Nc Import Types"
                 var
                     NcSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
                 begin
-                    //-NC2.12 [313362]
                     NcSyncMgt.DownloadServerFile(Rec);
-                    //+NC2.12 [313362]
                 end;
             }
             action(SendTestErrorMail)
@@ -147,12 +140,29 @@ page 6151505 "NPR Nc Import Types"
                     TempNcImportEntry: Record "NPR Nc Import Entry" temporary;
                     NcImportMgt: Codeunit "NPR Nc Import Mgt.";
                 begin
-                    //-NC2.02 [262318]
                     NcImportMgt.SendTestErrorMail(Rec);
-                    //+NC2.02 [262318]
+                end;
+            }
+            action(ShowSetup)
+            {
+                Caption = 'Show Setup Page';
+                Image = Setup;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+                PromotedOnly = true;
+                ApplicationArea = All;
+                ToolTip = 'Shows setup page for the update handler, which will be used for getting new entries into import list';
+
+                trigger OnAction()
+                var
+                    NcDependencyFactory: Codeunit "NPR Nc Dependency Factory";
+                    ImportListUpdater: Interface "NPR Nc Import List IUpdate";
+                begin
+                    if NcDependencyFactory.CreateNcImportListUpdater(ImportListUpdater, Rec) then
+                        ImportListUpdater.ShowSetup(Rec);
                 end;
             }
         }
     }
 }
-

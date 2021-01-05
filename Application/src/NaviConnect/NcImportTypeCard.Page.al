@@ -1,15 +1,5 @@
 page 6151509 "NPR Nc Import Type Card"
 {
-    // NC2.00/MHA /20160525  CASE 240005 NaviConnect
-    // NC2.01/MHA /20161012  CASE 242552 Added action: Download Ftp and field 235 "Ftp Backup Path"
-    // NC2.01/MHA /20161014  CASE 255397 Added field 7 "Keep Import Entries for"
-    // NC2.02/MHA /20170223  CASE 262318 Added action: Action: SendTestErrorMail and fields 300 "Send e-mail on Error" and 305 "E-mail address on Error"
-    // NC2.08/BR  /20171221  CASE 295322 Added Field 240 "Ftp Binary"
-    // NC2.12/MHA /20180502  CASE 313362 Added fields 400 "Server File Enabled", 405 "Server File Path" and Action "Download Server File"
-    // NC2.16/MHA /20180917  CASE 328432 Added field 203 "Sftp"
-    // NPR5.55/CLVA/20200506 CASE 366790 Added Group XML Stylesheet
-    // NPR5.55/MHA /20200604  CASE 408100 Added fields 520 "Max. Retry Count", 530 "Delay between Retries"
-
     Caption = 'Import Type Card';
     PageType = Card;
     UsageCategory = Administration;
@@ -31,6 +21,11 @@ page 6151509 "NPR Nc Import Type Card"
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
+                }
+                field("Import List Update Handler"; "Import List Update Handler")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the update handler, which will be used for getting new entries into import list';
                 }
                 field("Keep Import Entries for"; "Keep Import Entries for")
                 {
@@ -93,6 +88,9 @@ page 6151509 "NPR Nc Import Type Card"
                 group(Ftp)
                 {
                     Caption = 'Ftp';
+                    Enabled = "Import List Update Handler" = "Import List Update Handler"::Default;
+                    Visible = "Import List Update Handler" = "Import List Update Handler"::Default;
+
                     field("Ftp Enabled"; "Ftp Enabled")
                     {
                         ApplicationArea = All;
@@ -152,6 +150,9 @@ page 6151509 "NPR Nc Import Type Card"
                 group("File")
                 {
                     Caption = 'File';
+                    Enabled = "Import List Update Handler" = "Import List Update Handler"::Default;
+                    Visible = "Import List Update Handler" = "Import List Update Handler"::Default;
+
                     field("Server File Enabled"; "Server File Enabled")
                     {
                         ApplicationArea = All;
@@ -176,7 +177,6 @@ page 6151509 "NPR Nc Import Type Card"
 
                     trigger OnValidate()
                     begin
-                        //-NPR5.55 [366790]
                         if "XML Stylesheet".HasValue then begin
                             CalcFields("XML Stylesheet");
                             Clear("XML Stylesheet");
@@ -189,7 +189,6 @@ page 6151509 "NPR Nc Import Type Card"
                             Request.Write(OStream);
                             Modify(false);
                         end;
-                        //+NPR5.55 [366790]
                     end;
                 }
             }
@@ -200,6 +199,26 @@ page 6151509 "NPR Nc Import Type Card"
     {
         area(processing)
         {
+            action(ShowSetup)
+            {
+                Caption = 'Show Setup Page';
+                Image = Setup;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+                PromotedOnly = true;
+                ApplicationArea = All;
+                ToolTip = 'Shows setup page for the update handler, which will be used for getting new entries into import list';
+
+                trigger OnAction()
+                var
+                    NcDependencyFactory: Codeunit "NPR Nc Dependency Factory";
+                    ImportListUpdater: Interface "NPR Nc Import List IUpdate";
+                begin
+                    if NcDependencyFactory.CreateNcImportListUpdater(ImportListUpdater, Rec) then
+                        ImportListUpdater.ShowSetup(Rec);
+                end;
+            }
             action("Download Ftp")
             {
                 Caption = 'Download Ftp';
@@ -215,9 +234,7 @@ page 6151509 "NPR Nc Import Type Card"
                 var
                     NcSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
                 begin
-                    //-NC2.01 [242552]
                     NcSyncMgt.DownloadFtpType(Rec);
-                    //+NC2.01 [242552]
                 end;
             }
             action("Download Server File")
@@ -235,9 +252,7 @@ page 6151509 "NPR Nc Import Type Card"
                 var
                     NcSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
                 begin
-                    //-NC2.12 [313362]
                     NcSyncMgt.DownloadServerFile(Rec);
-                    //+NC2.12 [313362]
                 end;
             }
             action(SendTestErrorMail)
@@ -256,9 +271,7 @@ page 6151509 "NPR Nc Import Type Card"
                     TempNcImportEntry: Record "NPR Nc Import Entry" temporary;
                     NcImportMgt: Codeunit "NPR Nc Import Mgt.";
                 begin
-                    //-NC2.02 [262318]
                     NcImportMgt.SendTestErrorMail(Rec);
-                    //+NC2.02 [262318]
                 end;
             }
         }
@@ -266,7 +279,6 @@ page 6151509 "NPR Nc Import Type Card"
 
     trigger OnAfterGetRecord()
     begin
-        //-NPR5.55 [366790]
         CalcFields("XML Stylesheet");
 
         if not "XML Stylesheet".HasValue then
@@ -275,7 +287,6 @@ page 6151509 "NPR Nc Import Type Card"
             "XML Stylesheet".CreateInStream(IStream);
             IStream.Read(XMLStylesheetData, MaxStrLen(XMLStylesheetData));
         end;
-        //+NPR5.55 [366790]
     end;
 
     var
@@ -284,4 +295,3 @@ page 6151509 "NPR Nc Import Type Card"
         OStream: OutStream;
         Request: BigText;
 }
-
