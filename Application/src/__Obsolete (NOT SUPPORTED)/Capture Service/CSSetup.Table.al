@@ -3,7 +3,7 @@ table 6151371 "NPR CS Setup"
     Caption = 'CS Setup';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
-    ObsoleteReason = 'Object moved to NP Warehouse App.'; 
+    ObsoleteReason = 'Object moved to NP Warehouse App.';
 
 
     fields
@@ -17,8 +17,6 @@ table 6151371 "NPR CS Setup"
         {
             Caption = 'Enable Capture Service';
             DataClassification = CustomerContent;
-
-            
         }
         field(12; "Log Communication"; Boolean)
         {
@@ -60,8 +58,6 @@ table 6151371 "NPR CS Setup"
             DataClassification = CustomerContent;
             OptionCaption = 'Basic,Advanced,Advanced (Bins)';
             OptionMembers = Basic," Advanced"," Advanced (Bins)";
-
-            
         }
         field(20; "Media Library"; Option)
         {
@@ -74,7 +70,6 @@ table 6151371 "NPR CS Setup"
         {
             Caption = 'Stock-Take Template';
             DataClassification = CustomerContent;
-            TableRelation = "NPR Stock-Take Template";
         }
         field(23; "Zero Def. Qty. to Handle"; Boolean)
         {
@@ -188,6 +183,4 @@ table 6151371 "NPR CS Setup"
     fieldgroups
     {
     }
-
-    
 }

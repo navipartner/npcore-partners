@@ -2,7 +2,7 @@ table 6059780 "NPR Companies in Profile"
 {
     Caption = 'Companies in Profile';
     DataPerCompany = false;
-    LookupPageID = "NPR Stock-Take Config. Card";
+    //LookupPageID = "NPR Stock-Take Config. Card";
     DataClassification = CustomerContent;
 
     fields

@@ -1,28 +1,5 @@
 codeunit 6014438 "NPR Scanner - Functions"
 {
-    // NPR-Scanner1.1t, NPK, DL, 17-01-08, Added an InsertLine when line type is record in GoGet
-    //                                     Changed code in insertline on rec 83
-    //                                     Added code in initTransfer to get it to work
-    // 
-    // NPR-Scanner1.1u, NPK, DL, 11-03-08, Changed faulty code.
-    //                                     Inserts variant code on relevant records (function insertline)
-    // 
-    // //Issues.
-    // CU412 deprecated
-    // Used in filenameCreate(FilenameType : 'GUID,DATETIME,Prefix,Fixed,fixedask';Direction : 'Load,Save') : Text[250]
-    // 
-    // NPR4.16/TSA/20150317 CASE 213313  Implemented new status module
-    // NPR5.23/JDH /20160517 CASE 240916 Removed old VariaX Solution
-    // NPR5.29/CLVA/20161122 CASE 252352 Added ftp functionality
-    // NPR5.38/CLVA/20171115 CASE 296307 Added support for Webclient
-    // NPR5.38/MHA /20171222 CASE 299271 Added functions CopyClientFile(), EraseClientFile() and GetBackupFilename()
-    // NPR5.38/MHA /20180105 CASE 301053 Removed references to Utility
-    // NPR5.44/TS  /20180723 CASE 321232 Check for Item in Cross Reference in GetItems, restructured getitem function to use barcode library
-    // NPR5.50/BHR /20190508 CASE 348372 Validate Barcode
-    // NPR5.51/THRO/20190822 CASE 366006 Check string lenght before padding in GoSend(). Remove leading Zeroes if string longer than Lenght for Padding::"Pre Zeroes"
-    // NPR5.53/THRO/20191220 CASE 383414 getItem() didn't return found Item No.
-
-
     trigger OnRun()
     begin
     end;
@@ -66,8 +43,8 @@ codeunit 6014438 "NPR Scanner - Functions"
         dato: Date;
         tidspunkt: Time;
         Variantkode: Code[20];
-        StockTakeWorkSheet: Record "NPR Stock-Take Worksheet";
-        StockTakeWorksheetLine: Record "NPR Stock-Take Worksheet Line";
+        //StockTakeWorkSheet: Record "NPR Stock-Take Worksheet";
+        //StockTakeWorksheetLine: Record "NPR Stock-Take Worksheet Line";
         t001: Label 'Item number %1 doesn''t exist';
         t002: Label 'is blocked';
         t003: Label 'Vendor';
@@ -181,28 +158,7 @@ codeunit 6014438 "NPR Scanner - Functions"
                         end;
                         TL.Insert;
                     end;
-                //-NPR5.27 [252676]
-                //    6014420 :  { INVENTORY BALANCING }
-                //      BEGIN
-                //        StatusLin.INIT;
-                //        StatusLin.VALIDATE(Code, Status.Code);
-                //        //StatusLin.VALIDATE(line_itemno);
-                //        StatusLin.VALIDATE("Line No.", nextRecNo);
-                //        getItem(Line_ItemNo, param, param2,Variantkode);
-                //        IF Line_ItemNo <> '' THEN BEGIN
-                //          StatusLin.VALIDATE("Item No.", Line_ItemNo);
-                //          StatusLin.VALIDATE("Quantity counted", Line_Quantity);
-                //        END ELSE BEGIN
-                //          StatusLin.VALIDATE("Item No.", param2);
-                //          StatusLin."Quantity counted" := Line_Quantity;
-                //        END;
-                //        StatusLin."Variant Code"     := Variantkode;
-                //        StatusLin.Placement          := Placering;
-                //        StatusLin."Dept."            := Status."Dept. code";
-                //        StatusLin.Location           := Status."Loc. Code";
-                //        StatusLin.INSERT;
-                //      END;
-                //+NPR5.27 [252676]
+
                 6014422:  /* LABELS */
                     begin
                         getItem(Line_ItemNo, param, param2, Variantkode);
@@ -268,25 +224,18 @@ codeunit 6014438 "NPR Scanner - Functions"
                         MiksrabatLinie.Validate(Quantity, Line_Quantity);
                         MiksrabatLinie.Insert;
                     end;
-                //-NPR4.16
                 6014664:   /* Stock take */
                     begin
-                        StockTakeWorksheetLine.Init;
-                        StockTakeWorksheetLine."Stock-Take Config Code" := StockTakeWorkSheet."Stock-Take Config Code";
-                        StockTakeWorksheetLine."Worksheet Name" := StockTakeWorkSheet.Name;
-                        StockTakeWorksheetLine."Line No." := nextRecNo;
-
-                        //-NPR5.50 [348372]
-                        //StockTakeWorksheetLine.Barcode := Line_ItemNo;
-                        StockTakeWorksheetLine.Validate(Barcode, Line_ItemNo);
-                        //+NPR5.50 [348372]
-                        StockTakeWorksheetLine."Qty. (Counted)" := Line_Quantity;
-                        StockTakeWorksheetLine."Shelf  No." := Placering;
-
-                        StockTakeWorksheetLine.Insert();
+                        //REFACTORING NEEDED - STOCKTAKE MOVED TO NP Warehouse!
+                        // StockTakeWorksheetLine.Init;
+                        // StockTakeWorksheetLine."Stock-Take Config Code" := StockTakeWorkSheet."Stock-Take Config Code";
+                        // StockTakeWorksheetLine."Worksheet Name" := StockTakeWorkSheet.Name;
+                        // StockTakeWorksheetLine."Line No." := nextRecNo;
+                        // StockTakeWorksheetLine.Validate(Barcode, Line_ItemNo);
+                        // StockTakeWorksheetLine."Qty. (Counted)" := Line_Quantity;
+                        // StockTakeWorksheetLine."Shelf  No." := Placering;
+                        // StockTakeWorksheetLine.Insert();
                     end;
-                //+NPR4.16
-
                 else
                     Error(t001, RecNo);
             end;
@@ -389,26 +338,20 @@ codeunit 6014438 "NPR Scanner - Functions"
         else
             nextRecNo := 10000;
 
-        //-Scanner1.1t
         Code20 := "Transfer Header"."No.";
-        //+Scanner1.1t
-
         GoGet;
     end;
 
-    procedure initStockTake(var initStatus: Record "NPR Stock-Take Worksheet")
-    begin
-        //initStocktake
-        //-NPR4.16
-        StockTakeWorkSheet.Reset;
-        StockTakeWorkSheet.SetFilter("Stock-Take Config Code", initStatus."Stock-Take Config Code");
-        StockTakeWorkSheet.SetRange(Name, initStatus.Name);
-        StockTakeWorkSheet.Find('-');
-        RecNo := 6014664;  /*Stock Take*/
-        GoGet;
-        //+NPR4.16
-
-    end;
+    // procedure initStockTake(var initStatus: Record "NPR Stock-Take Worksheet")
+    // begin
+    //     //initStocktake
+    //     // StockTakeWorkSheet.Reset;
+    //     // StockTakeWorkSheet.SetFilter("Stock-Take Config Code", initStatus."Stock-Take Config Code");
+    //     // StockTakeWorkSheet.SetRange(Name, initStatus.Name);
+    //     // StockTakeWorkSheet.Find('-');
+    //     RecNo := 6014664;  /*Stock Take*/
+    //     GoGet;
+    // end;
 
     local procedure GoGet(): Boolean
     var
@@ -493,17 +436,7 @@ codeunit 6014438 "NPR Scanner - Functions"
                 begin
 
                 end;
-            //-NPR5.27 [252676]
-            //  6014420 :
-            //    BEGIN
-            //      StatusLin.SETCURRENTKEY(Code);   // ,line_itemno - fjernet
-            //      StatusLin.SETRANGE(Code, Status.Code);
-            //      IF StatusLin.FIND('+') THEN
-            //        nextRecNo := StatusLin."Line No." + 10000
-            //      ELSE
-            //        nextRecNo := 10000;
-            //    END;
-            //+NPR5.27 [252676]
+
             6014422:
                 begin
                     if "Retail Journal Line".Find('+') then
@@ -522,19 +455,18 @@ codeunit 6014438 "NPR Scanner - Functions"
                 ;
             6014412: /*tom*/
                 ;
-            //-NPR4.16
             6014664:
                 begin
-                    StockTakeWorksheetLine.Reset();
-                    StockTakeWorksheetLine.SetCurrentKey("Stock-Take Config Code", "Worksheet Name");
-                    StockTakeWorksheetLine.SetRange("Stock-Take Config Code", StockTakeWorkSheet."Stock-Take Config Code");
-                    StockTakeWorksheetLine.SetRange("Worksheet Name", StockTakeWorkSheet.Name);
-                    if StockTakeWorksheetLine.Find('+') then
-                        nextRecNo := StockTakeWorksheetLine."Line No." + 10000
-                    else
-                        nextRecNo := 10000;
+                    //REFACTORING NEEDED - STOCKTAKE MOVED TO NP Warehouse!
+                    // StockTakeWorksheetLine.Reset();
+                    // StockTakeWorksheetLine.SetCurrentKey("Stock-Take Config Code", "Worksheet Name");
+                    // StockTakeWorksheetLine.SetRange("Stock-Take Config Code", StockTakeWorkSheet."Stock-Take Config Code");
+                    // StockTakeWorksheetLine.SetRange("Worksheet Name", StockTakeWorkSheet.Name);
+                    // if StockTakeWorksheetLine.Find('+') then
+                    //     nextRecNo := StockTakeWorksheetLine."Line No." + 10000
+                    // else
+                    //     nextRecNo := 10000;
                 end;
-        //+NPR4.16
         end;
 
         Line_ItemNo := '';
@@ -569,25 +501,16 @@ codeunit 6014438 "NPR Scanner - Functions"
                 begin
                     Filename := '';
                     if ScannerSetup."Import to Server Folder First" <> '' then begin
-                        //-NPR5.38 [301053]
-                        //Utility.CopyFilesDir(ScannerSetup."Local Client Scanner Folder", ScannerSetup."Path - Pickup Directory");
                         CopyClientDir2ServerDir(ScannerSetup."Local Client Scanner Folder", ScannerSetup."Path - Pickup Directory");
-                        //+NPR5.38 [301053]
                     end;
 
-                    //-NPR5.29
                     if ScannerSetup."FTP Download to Server Folder" then begin
                         ScannerSetup.TestField("FTP Site address");
                         ScannerSetup.TestField("FTP Filename");
                         ScannerSetup.TestField("Path - Pickup Directory");
-                        //-NPR5.38 [301053]
-                        //IF Utility.FTPDownloadFile(ScannerSetup."FTP Site address",ScannerSetup."Path - Pickup Directory",ScannerSetup."File - Name/Prefix",ScannerSetup."FTP Filename",ScannerSetup."FTP Username",ScannerSetup."FTP Password",FALSE) THEN
-                        //  Utility.FTPDeleteFile(ScannerSetup."FTP Site address",ScannerSetup."FTP Filename",ScannerSetup."FTP Username",ScannerSetup."FTP Password",FALSE);
                         if FTPDownloadFile(ScannerSetup) then
                             FTPDeleteFile(ScannerSetup);
-                        //+NPR5.38 [301053]
                     end;
-                    //+NPR5.29
 
                     case ScannerSetup."File - Name Type" of
                         ScannerSetup."File - Name Type"::GUID:
@@ -608,10 +531,7 @@ codeunit 6014438 "NPR Scanner - Functions"
                         ScannerSetup."File - Name Type"::FixedAsk:
 
                             begin
-                                //-NPR5.38 [299271]
-                                //Filename := filenameCreate(4,0);
                                 Filename := filenameCreate(4, 1);
-                                //+NPR5.38 [299271]
                             end;
                     end;
                     case ScannerSetup.Port of
@@ -628,38 +548,17 @@ codeunit 6014438 "NPR Scanner - Functions"
                     Filepath := ScannerSetup."Path - Pickup Directory" + '\';
 
                     if ScannerSetup."EXE - In" <> '' then begin
-                        //-NPR5.38 [301053]
-                        // WindowStyle := 1;
-                        // WaitOnReturn := TRUE;
-                        // {
-                        // CREATE(Wsh);
-                        // CMDID := Wsh.Run(ScannerSetup."Sti - EXE / DLL dir" + '\' +
-                        //                  ScannerSetup."EXE - In" + ' ' +
-                        //                  '"' + Filepath + Filename + '" ' + ParamStr,
-                        //                  WindowStyle,
-                        //                  WaitOnReturn);
-                        // }
-                        //
-                        // CMDID := Utility.RunCmdModal('"' + ScannerSetup."Path - EXE / DLL Directory" + '\' +
-                        //                  ScannerSetup."EXE - In" + '"'+''+
-                        //                  '"' + Filepath + Filename + '"'+''+ ParamStr);
-                        // CLEAR(Wsh);
                         RunProcess(ScannerSetup."Path - EXE / DLL Directory" + '\' + ScannerSetup."EXE - In", '"' + Filepath + Filename + '"' + '' + ParamStr, true);
-                        //+NPR5.38 [301053]
                     end;
 
                     if ScannerSetup."File - Name Type" = ScannerSetup."File - Name Type"::FixedAsk then begin
-                        //-NPR5.38 [299271]
-                        //Filepath := '';
                         Filepath := FileManagement.GetDirectoryName(Filename) + '\';
                         Filename := FileManagement.GetFileName(Filename);
-                        //+NPR5.38 [299271]
                     end;
 
                     //TS
                     if Files.Find('-') or (Filename <> '') then
                         repeat
-                            //-NPR5.38 [296307]
                             if (CurrentClientType in [CLIENTTYPE::Web, CLIENTTYPE::Phone, CLIENTTYPE::Tablet]) then begin
                                 Fname := FileManagement.BLOBImport(TempBlob, SavePath);
                                 if TempBlob.HasValue then begin
@@ -750,7 +649,6 @@ codeunit 6014438 "NPR Scanner - Functions"
                         Len1 := StrLen(DataInput);
                         Len2 := StrLen(ScannerSetupFields.Postfix);
                         Len3 := StrLen(ScannerSetup."Scanning End String");
-                        //        IF UPPERCASE(COPYSTR(DataInput, len1-len2+1, len3)) <> ScannerSetup."Scanning End String" THEN
                         DataInput := DelStr(DataInput, Len1 - Len2 + 1);
                         if ScannerSetup.Debug then
                             if not Confirm(t013, true, DataInput) then Error('');
@@ -804,9 +702,7 @@ codeunit 6014438 "NPR Scanner - Functions"
                         if (Code250 <> ScannerSetup."Scanning End String") then begin //OR (ScannerSetup."Scanning End String" = '') THEN BEGIN
                             ScannerSetupFields.SetCurrentKey(Order);
                             ScannerSetupFields.SetRange(ID, ScannerSetup.ID);
-                            //-NPR-Scanner1.1u
                             DataInput := tempIL.Description;
-                            //+NPR-Scanner1.1u
                             if ScannerSetupFields.Find('-') then
                                 repeat
                                     Code250 := UpperCase(DataInput);
@@ -860,9 +756,7 @@ codeunit 6014438 "NPR Scanner - Functions"
                                     end;
                                 until ScannerSetupFields.Next = 0;
                         end;
-                        //-Scanner1.1t
                         InsertLine;
-                        //+Scanner1.1t
                     end;  /*"line type"::record*/
             end;
         until (tempIL.Next = 0);
@@ -884,7 +778,6 @@ codeunit 6014438 "NPR Scanner - Functions"
         Item2: Record Item;
         ItemNo: Code[20];
     begin
-        //-NPR5.44 [321232]
         ItemNo := vnr;
         if not BarcodeLibrary.TranslateBarcodeToItemVariant(vnr, ItemNo, Varkode, ResTable, false) then begin
             vnr := '';
@@ -906,104 +799,13 @@ codeunit 6014438 "NPR Scanner - Functions"
                 begin
                     beskr := CopyStr('--->' + t003 + Item2."Vendor No." + ' ' + t004, 1, MaxStrLen(beskr));
                     beskr2 := vnr;
-                    //-NPR5.53 [383414]
                     vnr := ItemNo;
-                    //+NPR5.53 [383414]
                     exit;
                 end;
         end;
         beskr := CopyStr(Item2.Description, 1, MaxStrLen(beskr));
         beskr2 := CopyStr(Item2."Description 2", 1, MaxStrLen(beskr2));
-        //-NPR5.53 [383414]
         vnr := ItemNo;
-        //+NPR5.53 [383414]
-
-        // vnr_orig := vnr;
-        //
-        // FindesVare := FALSE;
-        //
-        // Vare.SETRANGE("No.", vnr);
-        // IF Vare.FIND('-') THEN BEGIN
-        //  IF Vare.Blocked THEN BEGIN
-        //    beskr := '---> ' + vnr + ' ' + t002;
-        //    beskr2 := vnr_orig;
-        //    vnr := '';
-        //    FindesVare := FALSE;
-        //  END ELSE BEGIN
-        //    IF (NOT Vend.GET(Vare."Vendor No.")) AND (Vare."Vendor No." <> '') THEN BEGIN
-        //      beskr  := '--->' + t003 + Vare."Vendor No." + ' ' + t004;
-        //      beskr2 := vnr_orig;
-        //      FindesVare := TRUE;
-        //    END ELSE BEGIN
-        //      beskr := COPYSTR(Vare.Description,1,30);
-        //      beskr2 := COPYSTR(Vare."Description 2",1,30);
-        //      FindesVare := TRUE;
-        //    END;
-        //  END;
-        // END ELSE BEGIN
-        //  AltVare.SETCURRENTKEY("Alt. No.");
-        //  AltVare.SETRANGE("Alt. No.", vnr);
-        //  IF AltVare.FIND('-') THEN BEGIN
-        //    IF Vare.GET(AltVare.Code) THEN BEGIN
-        //      vnr      := AltVare.Code;
-        //      Varkode  := AltVare."Variant Code";
-        //      IF Vare.Blocked THEN BEGIN
-        //        beskr  := '--->' + vnr + ' '+ t002;
-        //        beskr2 := vnr_orig;
-        //        vnr := '';
-        //        FindesVare := FALSE;
-        //      END ELSE BEGIN
-        //        IF (NOT Vend.GET(Vare."Vendor No.")) AND (Vare."Vendor No." <> '') THEN BEGIN
-        //          beskr  := '>' + t003 + Vare."Vendor No." + ' ' + t004;
-        //          beskr2 := vnr_orig;
-        //          FindesVare := TRUE;
-        //        END ELSE BEGIN
-        //          beskr := COPYSTR(Vare.Description,1,30);
-        //          beskr2 := COPYSTR(Vare."Description 2",1,30);
-        //          FindesVare := TRUE;
-        //        END;
-        //      END;
-        //    END ELSE BEGIN
-        //      FindesVare := FALSE;
-        //      beskr   := t001;
-        //      beskr2 := vnr_orig;
-        //      vnr  := '';
-        //    END;
-        //  END ELSE BEGIN
-        //    //-NPR5.23 [240916]
-        // //    variation.SETCURRENTKEY("EAN Code");
-        // //    variation.SETRANGE("EAN Code", vnr);
-        // //    IF variation.FIND('-') THEN BEGIN
-        // //      beskr    := variation.Description;
-        // //      beskr2   := vnr;
-        // //      Varkode  := variation."EAN Code";
-        // //      FindesVare := TRUE;
-        // //    END ELSE BEGIN
-        // //+NPR5.23 [240916]
-        //    //-NPR5.44 [321232]
-        //    ItemCrossReference.SETRANGE("Cross-Reference No.",vnr);
-        //    IF ItemCrossReference.FINDFIRST THEN BEGIN
-        //      IF item.GET(ItemCrossReference."Item No.") THEN BEGIN
-        //        FindesVare := TRUE;
-        //        vnr := item."No.";
-        //        beskr := COPYSTR(item.Description,1,30);
-        //        beskr2 := COPYSTR(item."Description 2",1,30);
-        //      END;
-        //    END ELSE BEGIN
-        //    //+NPR5.44 [321232]
-        //      FindesVare := FALSE;
-        //      beskr   := t001;
-        //      beskr2 := vnr_orig;
-        //      vnr  := '';
-        //    //-NPR5.44 [321232]
-        //    END;
-        //    //+NPR5.44 [321232]
-        // //-NPR5.23 [240916]
-        // //    END;
-        // //+NPR5.23 [240916]
-        //  END;
-        // END;
-        //+NPR5.44 [321232]
     end;
 
     local procedure askScanner(var ScannerSetup: Record "NPR Scanner - Setup" temporary)
@@ -1111,10 +913,7 @@ codeunit 6014438 "NPR Scanner - Functions"
                                                     Str := '0';
                                             end;
                                         ScannerSetupFields.Type::"Item Description":
-                                            //-NPR5.38 [301053]
-                                            //Str := Utility.Ascii2Ansi(COPYSTR("Retail Journal Line".Description,1,ScannerSetupFields.Length));
                                             Str := CopyStr("Retail Journal Line".Description, 1, ScannerSetupFields.Length);
-                                        //+NPR5.38 [301053]
                                         ScannerSetupFields.Type::Sign:
                                             begin
                                                 "Retail Journal Line".CalcFields(Inventory);
@@ -1160,31 +959,23 @@ codeunit 6014438 "NPR Scanner - Functions"
                                             Str := ScannerSetupFields.Prefix + ScannerSetupFields.Postfix;
                                     end;
 
-                                    //-NPR5.51 [366006]
                                     if ScannerSetupFields.Length > 0 then begin
-                                        //+NPR5.51 [366006]
                                         case ScannerSetupFields.Padding of
                                             ScannerSetupFields.Padding::" ":
                                                 ;
                                             ScannerSetupFields.Padding::"Pre Zeroes":
-                                                //-NPR5.51 [366006]
                                                 begin
                                                     Str := DelChr(Str, '<', '0');
                                                     if StrLen(Str) < ScannerSetupFields.Length then
                                                         Str := PadStr('', ScannerSetupFields.Length - StrLen(Str), '0') + Str;
                                                 end;
-                                            //-NPR5.51 [366006]
                                             ScannerSetupFields.Padding::"Leading Spaces":
-                                                //-NPR5.51 [366006]
                                                 if StrLen(Str) < ScannerSetupFields.Length then
                                                     Str := Str + PadStr('', ScannerSetupFields.Length - StrLen(Str), ' ');
-                                        //+NPR5.51 [366006]
                                         end;
 
                                         Str := CopyStr(Str, 1, ScannerSetupFields.Length);
-                                        //-NPR5.51 [366006]
                                     end;
-                                    //+NPR5.51 [366006]
                                     case ScannerSetup."Field Type" of
                                         ScannerSetup."Field Type"::Fixed:
                                             begin
@@ -1224,19 +1015,9 @@ codeunit 6014438 "NPR Scanner - Functions"
                             PortStr := '';
                     end;
                     ParamStr += ' ' + PortStr;
-                    //-NPR5.38 [301053]
-                    // CMDID := Utility.RunCmdModal(ScannerSetup."Path - EXE / DLL Directory" + '\' +
-                    //                  ScannerSetup."EXE - Out"+''+ '"' + Filepath + Filename + '"' + ' ' + ParamStr);
-                    //
-                    // IF CMDID <> 0 THEN
-                    //   MESSAGE(t003, CMDID, Str);
                     RunProcess(ScannerSetup."Path - EXE / DLL Directory" + '\' + ScannerSetup."EXE - Out", '"' + Filepath + Filename + '"' + ' ' + ParamStr, true);
-                    //+NPR5.38 [301053]
-                    //-NPR5.38 [296307]
-                    //fileGo(Filepath+Filename, ScannerSetup."File - Backup Directory" + '\' + Filename, ScannerSetup."File - After");
                     BackupFilename := GetBackupFilename(Filename, ScannerSetup);
                     FileGo(Filepath + Filename, ScannerSetup."File - Backup Directory" + '\' + BackupFilename, ScannerSetup."File - After");
-                    //+NPR5.38 [296307]
                 end;
             ScannerSetup.Type::WiFi:
                 Error('ikke supporteret');
@@ -1247,17 +1028,6 @@ codeunit 6014438 "NPR Scanner - Functions"
     begin
         //fileGo
 
-        //-NPR5.38 [299271]
-        // CASE Function1 OF
-        //  Function1::" " : ;
-        //  Function1::Backup : COPY(Filename1, Filename2);
-        //  Function1::Delete : ERASE(Filename1);
-        //  Function1::"Backup+Delete" :
-        //    BEGIN
-        //      COPY(Filename1, Filename2);
-        //      ERASE(Filename1);
-        //    END;
-        // END;
         case Function1 of
             Function1::Backup:
                 CopyClientFile(Filename1, Filename2);
@@ -1269,35 +1039,28 @@ codeunit 6014438 "NPR Scanner - Functions"
                     EraseClientFile(Filename1);
                 end;
         end;
-        //+NPR5.38 [299271]
     end;
 
     local procedure GetBackupFilename(Filename: Text; ScannerSetup: Record "NPR Scanner - Setup") BackupFilename: Text
     begin
-        //-NPR5.38 [299271]
         BackupFilename := Filename;
         if ScannerSetup."Backup Filename" <> '' then
             BackupFilename := StrSubstNo(ScannerSetup."Backup Filename", ConvertStr(DelChr(Format(CurrentDateTime, 19, 9), '=', ',:Z'), 'T', ' '));
         exit(BackupFilename);
-        //+NPR5.38 [299271]
     end;
 
     local procedure CopyClientFile(ClientFilenameFrom: Text; ClientFilenameTo: Text)
     var
         FileMgt: Codeunit "File Management";
     begin
-        //-NPR5.38 [299271]
         FileMgt.CopyClientFile(ClientFilenameFrom, ClientFilenameTo, true);
-        //+NPR5.38 [299271]
     end;
 
     local procedure EraseClientFile(ClientFilename: Text)
     var
         FileMgt: Codeunit "File Management";
     begin
-        //-NPR5.38 [299271]
         FileMgt.DeleteClientFile(ClientFilename);
-        //+NPR5.38 [299271]
     end;
 
     local procedure formatDecimal(Dec1: Decimal; nDec: Integer): Text[30]
@@ -1307,7 +1070,6 @@ codeunit 6014438 "NPR Scanner - Functions"
         //formatDecimal
 
         decp := Format(nDec + 1);
-
         exit(Format(Round(Dec1, 1 / Power(10, nDec)), 0, '<Integer><Decimal,' + decp + '>'));
     end;
 
@@ -1376,10 +1138,7 @@ codeunit 6014438 "NPR Scanner - Functions"
     procedure UploadProgram2Scanner("Scanner Setup": Record "NPR Scanner - Setup")
     begin
         //UploadProgram2Scanner
-        //-NPR5.38 [301053]
-        //Utility.RunCmdModal('"' + "Scanner Setup"."EXE - Update Scanner" + '"'+''+ "Scanner Setup"."EXE - Update Scanner Param.");
         RunProcess("Scanner Setup"."EXE - Update Scanner", "Scanner Setup"."EXE - Update Scanner Param.", true);
-        //+NPR5.38 [301053]
     end;
 
     local procedure CopyClientDir2ServerDir(ClientDir: Text; ServerDir: Text)
@@ -1388,7 +1147,6 @@ codeunit 6014438 "NPR Scanner - Functions"
         FileMgt: Codeunit "File Management";
         Filename: Text;
     begin
-        //-NPR5.38 [301053]
         if not FileMgt.ServerDirectoryExists(ServerDir) then
             FileMgt.ServerCreateDirectory(ServerDir);
 
@@ -1398,7 +1156,6 @@ codeunit 6014438 "NPR Scanner - Functions"
                 Filename := FileMgt.GetFileName(NameValueBuffer.Name);
                 FileMgt.UploadFileSilentToServerPath(NameValueBuffer.Name, ServerDir + '\' + Filename);
             until NameValueBuffer.Next = 0;
-        //+NPR5.38 [301053]
     end;
 
     local procedure Endswith(var String: Text; EndsWith: Text; AddEndsWith: Boolean): Boolean
@@ -1406,7 +1163,6 @@ codeunit 6014438 "NPR Scanner - Functions"
         // NetString has been converted from DotNet
         NetString: Text;
     begin
-        //-NPR5.38 [301053]
         NetString := String;
         if NetString.EndsWith(EndsWith) then
             exit(true);
@@ -1415,7 +1171,6 @@ codeunit 6014438 "NPR Scanner - Functions"
             String := String + EndsWith;
 
         exit(false);
-        //+NPR5.38 [301053]
     end;
 
     local procedure FTPDownloadFile(ScannerSetup2: Record "NPR Scanner - Setup"): Boolean
@@ -1428,7 +1183,6 @@ codeunit 6014438 "NPR Scanner - Functions"
         SIOFile: DotNet NPRNetFile;
         ServerFile: Text;
     begin
-        //-NPR5.38 [301053]
         FtpWebRequest := FtpWebRequest.Create(ScannerSetup2."FTP Site address" + '/' + ScannerSetup2."FTP Filename");
         FtpWebRequest.Credentials := NetworkCredential.NetworkCredential(ScannerSetup2."FTP Username", ScannerSetup2."FTP Password");
 
@@ -1452,7 +1206,6 @@ codeunit 6014438 "NPR Scanner - Functions"
         Stream.Close;
 
         exit(Exists(ServerFile));
-        //+NPR5.38 [301053]
     end;
 
     local procedure FTPDeleteFile(ScannerSetup2: Record "NPR Scanner - Setup")
@@ -1461,7 +1214,6 @@ codeunit 6014438 "NPR Scanner - Functions"
         FtpWebResponse: DotNet NPRNetFtpWebResponse;
         NetworkCredential: DotNet NPRNetNetworkCredential;
     begin
-        //-NPR5.38 [301053]
         FtpWebRequest := FtpWebRequest.Create(ScannerSetup2."FTP Site address" + '/' + ScannerSetup2."FTP Filename");
         FtpWebRequest.Credentials := NetworkCredential.NetworkCredential(ScannerSetup2."FTP Username", ScannerSetup2."FTP Password");
 
@@ -1470,7 +1222,6 @@ codeunit 6014438 "NPR Scanner - Functions"
         FtpWebRequest.UseBinary := true;
 
         FtpWebResponse := FtpWebRequest.GetResponse;
-        //+NPR5.38 [301053]
     end;
 
     local procedure RunProcess(Filename: Text; Arguments: Text; Modal: Boolean)
@@ -1480,12 +1231,9 @@ codeunit 6014438 "NPR Scanner - Functions"
         [RunOnClient]
         ProcessStartInfo: DotNet NPRNetProcessStartInfo;
     begin
-        //-NPR5.38 [301053]
         ProcessStartInfo := ProcessStartInfo.ProcessStartInfo(Filename, Arguments);
         Process := Process.Start(ProcessStartInfo);
         if Modal then
             Process.WaitForExit();
-        //+NPR5.38 [301053]
     end;
 }
-

@@ -1,8 +1,5 @@
 xmlport 6014413 "NPR ImportFromScannerFile TO"
 {
-    // NPR5.33/TS  /20151109  CASE 222241 Created
-    // NPR5.33/JLK /20170906  CASE 279955 Added first get to Item
-
     Caption = 'Import from Scanner File TO';
     Direction = Import;
     FieldDelimiter = '"';
@@ -53,18 +50,6 @@ xmlport 6014413 "NPR ImportFromScannerFile TO"
         }
     }
 
-    trigger OnPostXmlPort()
-    var
-        StockTakeWorksheetLine: Record "NPR Stock-Take Worksheet Line";
-    begin
-    end;
-
-    trigger OnPreXmlPort()
-    var
-        StockTakeWorksheetLine: Record "NPR Stock-Take Worksheet Line";
-    begin
-    end;
-
     var
         TransferOrderHeader: Record "Transfer Header";
 
@@ -92,13 +77,10 @@ xmlport 6014413 "NPR ImportFromScannerFile TO"
         TransferLine."Line No." := LineNo;
         TransferLine."Item No." := '';
         Evaluate(TransferLine.Quantity, quantity);
-        //-NPR5.33
         if Item.Get(scanned_item_code) then
             TransferLine.Validate("Item No.", Item."No.")
         else
-            //+NPR5.33
             TransferLine.Validate("NPR Cross-Reference No.", scanned_item_code);
         TransferLine.Insert;
     end;
 }
-
