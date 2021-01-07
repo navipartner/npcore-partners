@@ -1,14 +1,9 @@
 table 6014666 "NPR Stock-Take Template"
 {
-    // NPR4.16/TS/20150518  CASE 213313 Created Table
-    // NPR5.31/JLK /20170331  CASE 268274 Changed ENU Caption
-    // NPR5.40/TS  /20170331  CASE 307818 Changed ENU Caption
-
     Caption = 'Stock-Take Template';
-    DrillDownPageID = "NPR Stock-Take Templates";
-    LookupPageID = "NPR Stock-Take Templates";
     DataClassification = CustomerContent;
-
+    ObsoleteState = Removed;
+    ObsoleteReason = 'Object moved to NP Warehouse App.';
     fields
     {
         field(1; "Code"; Code[10])
@@ -24,37 +19,26 @@ table 6014666 "NPR Stock-Take Template"
         field(211; "Location Code"; Code[20])
         {
             Caption = 'Location Code';
-            TableRelation = Location.Code;
             DataClassification = CustomerContent;
         }
         field(212; "Item Group Filter"; Text[200])
         {
             Caption = 'Item Group Filter';
-            TableRelation = "NPR Item Group"."No.";
-            ValidateTableRelation = false;
             DataClassification = CustomerContent;
         }
         field(213; "Vendor Code Filter"; Text[200])
         {
             Caption = 'Vendor Code Filter';
-            TableRelation = Vendor;
-            ValidateTableRelation = false;
             DataClassification = CustomerContent;
         }
         field(214; "Global Dimension 1 Code"; Code[20])
         {
-            CaptionClass = '1,1,1';
             Caption = 'Global Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
-            ValidateTableRelation = true;
             DataClassification = CustomerContent;
         }
         field(215; "Global Dimension 2 Code"; Code[20])
         {
-            CaptionClass = '1,1,2';
             Caption = 'Global Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
-            ValidateTableRelation = true;
             DataClassification = CustomerContent;
         }
         field(220; "Session Based Loading"; Option)
@@ -146,30 +130,12 @@ table 6014666 "NPR Stock-Take Template"
         {
             Caption = 'Item Journal Template Name';
             NotBlank = true;
-            TableRelation = IF ("Adjustment Method" = CONST(STOCKTAKE)) "Item Journal Template" WHERE(Type = CONST("Phys. Inventory"))
-            ELSE
-            IF ("Adjustment Method" = CONST(ADJUSTMENT)) "Item Journal Template" WHERE(Type = CONST(Item))
-            ELSE
-            IF ("Adjustment Method" = CONST(PURCHASE)) "Item Journal Template" WHERE(Type = CONST(Item));
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            begin
-                if ("Item Journal Template Name" <> xRec."Item Journal Template Name") then
-                    "Item Journal Batch Name" := '';
-            end;
         }
         field(234; "Item Journal Batch Name"; Code[20])
         {
             Caption = 'Item Journal Batch Name';
-            TableRelation = "Item Journal Batch".Name WHERE("Journal Template Name" = FIELD("Item Journal Template Name"));
             DataClassification = CustomerContent;
-
-            trigger OnLookup()
-            begin
-                TestField("Item Journal Template Name");
-                "Item Journal Batch Name" := StockTakeMgr.SelectItemJournalBatchName("Item Journal Template Name");
-            end;
         }
         field(235; "Item Journal Batch Usage"; Option)
         {
@@ -217,7 +183,4 @@ table 6014666 "NPR Stock-Take Template"
     {
     }
 
-    var
-        StockTakeMgr: Codeunit "NPR Stock-Take Manager";
 }
-

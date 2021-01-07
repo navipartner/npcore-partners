@@ -988,13 +988,6 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                     ApplicationArea = All;
                     ToolTip = 'Executes the POS Units action';
                 }
-                action("Stock-Take Configurations")
-                {
-                    Caption = 'Stock-Take Configurations';
-                    RunObject = Page "NPR Stock-Take Configs";
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Stock-Take Configurations action';
-                }
             }
         }
         area(creation)

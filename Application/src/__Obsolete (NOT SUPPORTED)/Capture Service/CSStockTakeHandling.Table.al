@@ -1,10 +1,10 @@
 table 6151377 "NPR CS Stock-Take Handling"
 {
-    
+
     Caption = 'CS Stock-Take Handling';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
-    ObsoleteReason = 'Object moved to NP Warehouse App.'; 
+    ObsoleteReason = 'Object moved to NP Warehouse App.';
 
     fields
     {
@@ -33,13 +33,11 @@ table 6151377 "NPR CS Stock-Take Handling"
         {
             Caption = 'Stock-Take Conf. Code';
             DataClassification = CustomerContent;
-            TableRelation = "NPR Stock-Take Configuration".Code;
         }
         field(13; "Worksheet Name"; Code[10])
         {
             Caption = 'Worksheet Name';
             DataClassification = CustomerContent;
-            TableRelation = "NPR Stock-Take Worksheet".Name WHERE("Stock-Take Config Code" = FIELD("Stock-Take Config Code"));
         }
         field(14; "Shelf  No."; Code[10])
         {
@@ -51,8 +49,6 @@ table 6151377 "NPR CS Stock-Take Handling"
             Caption = 'Item No.';
             DataClassification = CustomerContent;
             TableRelation = Item."No.";
-
-            
         }
         field(16; "Variant Code"; Code[10])
         {
@@ -102,7 +98,4 @@ table 6151377 "NPR CS Stock-Take Handling"
     fieldgroups
     {
     }
-
-    
 }
-

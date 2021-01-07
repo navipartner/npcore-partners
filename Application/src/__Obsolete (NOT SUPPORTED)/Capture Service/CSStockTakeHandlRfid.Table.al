@@ -1,12 +1,10 @@
 table 6151390 "NPR CS Stock-Take Handl. Rfid"
 {
-    
+
     Caption = 'CS Stock-Take Handling Rfid';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
-    ObsoleteReason = 'Object moved to NP Warehouse App.'; 
-    
-
+    ObsoleteReason = 'Object moved to NP Warehouse App.';
     fields
     {
         field(1; Id; Guid)
@@ -54,13 +52,11 @@ table 6151390 "NPR CS Stock-Take Handl. Rfid"
         {
             Caption = 'Stock-Take Conf. Code';
             DataClassification = CustomerContent;
-            TableRelation = "NPR Stock-Take Configuration".Code;
         }
         field(18; "Worksheet Name"; Code[10])
         {
             Caption = 'Worksheet Name';
             DataClassification = CustomerContent;
-            TableRelation = "NPR Stock-Take Worksheet".Name WHERE("Stock-Take Config Code" = FIELD("Stock-Take Config Code"));
         }
         field(19; Tags; Integer)
         {

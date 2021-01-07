@@ -1,12 +1,5 @@
 codeunit 6059996 "NPR Scanner Service WS"
 {
-    // NPR5.29/NPKNAV/20170127  CASE 252352 Transport NPR5.29 - 27 januar 2017
-    // NPR5.32/CLVA/20170508 CASE 252352 Change barcode verification
-    // NPR5.38/CLVA/20171009 CASE 292601 Added Item Picture
-    // NPR5.40/THRO/20180309 CASE 307571 Set Variant filter when calculating Inventory in GetItem()
-    // NPR5.40/MHA /20180316 CASE 308377 Deleted unused Automation variables in Get_BoolFromNode() and Get_DecimalFromNode()
-
-
     trigger OnRun()
     var
         webservices: Record "Web Service";
@@ -87,14 +80,13 @@ codeunit 6059996 "NPR Scanner Service WS"
         XMLNewChild: DotNet NPRNetXmlNode;
         XMLdocOut: DotNet "NPRNetXmlDocument";
         XMLRootNode: DotNet NPRNetXmlNode;
-        StockTakeWorkSheetName: Record "NPR Stock-Take Worksheet";
-        StockTakeMgr: Codeunit "NPR Stock-Take Manager";
-        StockTakeWorksheet: Record "NPR Stock-Take Worksheet";
+        //StockTakeMgr: Codeunit "NPR Stock-Take Manager";
+        //StockTakeWorksheet: Record "NPR Stock-Take Worksheet";
         JournalCode: Code[20];
         BatchName: Code[20];
         LineNo: Integer;
-        StockTakeWorkSheetLine: Record "NPR Stock-Take Worksheet Line";
-        NewStockTakeWorksheetLine: Record "NPR Stock-Take Worksheet Line";
+        //StockTakeWorkSheetLine: Record "NPR Stock-Take Worksheet Line";
+        //NewStockTakeWorksheetLine: Record "NPR Stock-Take Worksheet Line";
         ScannedItemCode: Text[30];
         Quantity: Text[10];
         Shelf: Code[10];
@@ -131,10 +123,11 @@ codeunit 6059996 "NPR Scanner Service WS"
                     Add_Element(XMLCurrNode, 'error', JournalIsMissingError, '', XMLNewChild, '');
                     DataError := true;
                 end else begin
-                    if not StockTakeWorksheet.Get(JournalCode, BatchName) then begin
-                        Add_Element(XMLCurrNode, 'error', StrSubstNo(JournalNotFoundError, BatchName), '', XMLNewChild, '');
-                        DataError := true;
-                    end;
+                    //REFACTORING NEEDED - STOCKTAKE MOVED TO NP Warehouse!
+                    // if not StockTakeWorksheet.Get(JournalCode, BatchName) then begin
+                    //     Add_Element(XMLCurrNode, 'error', StrSubstNo(JournalNotFoundError, BatchName), '', XMLNewChild, '');
+                    //     DataError := true;
+                    // end;
                 end;
 
                 ScannedItemCode := Get_TextFromNode(XMLNode, 'itemnumber');
@@ -142,7 +135,6 @@ codeunit 6059996 "NPR Scanner Service WS"
                     Add_Element(XMLCurrNode, 'error', ItemNoIsMissingError, '', XMLNewChild, '');
                     DataError := true;
                 end else begin
-                    //-NPR5.32
                     if BarcodeLibrary.TranslateBarcodeToItemVariant(ScannedItemCode, ItemNo, VariantCode, ResolvingTable, true) then begin
                         if not Item.Get(ItemNo) then begin
                             Add_Element(XMLCurrNode, 'error', StrSubstNo(ItemNotFoundError, ScannedItemCode), '', XMLNewChild, '');
@@ -152,7 +144,6 @@ codeunit 6059996 "NPR Scanner Service WS"
                         Add_Element(XMLCurrNode, 'error', StrSubstNo(BarcodeNotFoundError, ScannedItemCode), '', XMLNewChild, '');
                         DataError := true;
                     end;
-                    //+NPR5.32
                 end;
 
                 Quantity := Get_TextFromNode(XMLNode, 'quantity');
@@ -171,36 +162,36 @@ codeunit 6059996 "NPR Scanner Service WS"
                     Add_Element(XMLCurrNode, 'error', StrSubstNo(InvalidDatetimeError, Timestamp), '', XMLNewChild, '');
                     DataError := true;
                 end;
-
+                //REFACTORING NEEDED - STOCKTAKE MOVED TO NP Warehouse!
                 if not DataError then begin
 
-                    StockTakeWorksheet.Get(JournalCode, BatchName);
+                    // StockTakeWorksheet.Get(JournalCode, BatchName);
 
-                    SessionName := Format(CurrentDateTime(), 0, 9);
+                    // SessionName := Format(CurrentDateTime(), 0, 9);
 
-                    StockTakeMgr.ImportPreHandler(StockTakeWorksheet);
+                    // StockTakeMgr.ImportPreHandler(StockTakeWorksheet);
 
-                    Clear(NewStockTakeWorksheetLine);
-                    NewStockTakeWorksheetLine.SetRange("Stock-Take Config Code", JournalCode);
-                    NewStockTakeWorksheetLine.SetRange("Worksheet Name", BatchName);
-                    LineNo := 0;
-                    if NewStockTakeWorksheetLine.FindLast then
-                        LineNo := NewStockTakeWorksheetLine."Line No." + 1000
-                    else
-                        LineNo := 1000;
+                    // Clear(NewStockTakeWorksheetLine);
+                    // NewStockTakeWorksheetLine.SetRange("Stock-Take Config Code", JournalCode);
+                    // NewStockTakeWorksheetLine.SetRange("Worksheet Name", BatchName);
+                    // LineNo := 0;
+                    // if NewStockTakeWorksheetLine.FindLast then
+                    //     LineNo := NewStockTakeWorksheetLine."Line No." + 1000
+                    // else
+                    //     LineNo := 1000;
 
-                    Clear(StockTakeWorkSheetLine);
-                    StockTakeWorkSheetLine."Stock-Take Config Code" := JournalCode;
-                    StockTakeWorkSheetLine."Worksheet Name" := BatchName;
-                    StockTakeWorkSheetLine."Line No." := LineNo;
-                    StockTakeWorkSheetLine.Validate(Barcode, ScannedItemCode);
-                    StockTakeWorkSheetLine."Shelf  No." := Shelf;
-                    Evaluate(StockTakeWorkSheetLine."Qty. (Counted)", Quantity);
-                    StockTakeWorkSheetLine."Session Name" := SessionName;
-                    StockTakeWorkSheetLine."Date of Inventory" := TimestampDate;
-                    StockTakeWorkSheetLine.Insert(true);
+                    // Clear(StockTakeWorkSheetLine);
+                    // StockTakeWorkSheetLine."Stock-Take Config Code" := JournalCode;
+                    // StockTakeWorkSheetLine."Worksheet Name" := BatchName;
+                    // StockTakeWorkSheetLine."Line No." := LineNo;
+                    // StockTakeWorkSheetLine.Validate(Barcode, ScannedItemCode);
+                    // StockTakeWorkSheetLine."Shelf  No." := Shelf;
+                    // Evaluate(StockTakeWorkSheetLine."Qty. (Counted)", Quantity);
+                    // StockTakeWorkSheetLine."Session Name" := SessionName;
+                    // StockTakeWorkSheetLine."Date of Inventory" := TimestampDate;
+                    // StockTakeWorkSheetLine.Insert(true);
 
-                    StockTakeMgr.ImportPostHandler(StockTakeWorksheet);
+                    // StockTakeMgr.ImportPostHandler(StockTakeWorksheet);
 
                     Add_Element(XMLCurrNode, 'error', '', '', XMLNewChild, '');
                 end;
@@ -220,7 +211,7 @@ codeunit 6059996 "NPR Scanner Service WS"
         XMLNewChild: DotNet NPRNetXmlNode;
         XMLdocOut: DotNet "NPRNetXmlDocument";
         Item: Record Item;
-        StockTakeWorksheet: Record "NPR Stock-Take Worksheet";
+        //StockTakeWorksheet: Record "NPR Stock-Take Worksheet";
         BarcodeLibrary: Codeunit "NPR Barcode Library";
         ItemNo: Code[20];
         VariantCode: Code[10];
@@ -243,14 +234,10 @@ codeunit 6059996 "NPR Scanner Service WS"
                     if (XMLRecID = '') then
                         exit;
 
-                    //-NPR5.32
                     if BarcodeLibrary.TranslateBarcodeToItemVariant(XMLRecID, ItemNo, VariantCode, ResolvingTable, true) then begin
-                        //MESSAGE(ItemNo);
                         if Item.Get(ItemNo) then begin
-                            //-NPR5.40 [307571]
                             if VariantCode <> '' then
                                 Item.SetFilter("Variant Filter", VariantCode);
-                            //+NPR5.40 [307571]
                             Item.CalcFields(Inventory);
                             Add_Element(XMLCurrNode, 'itemnumber', ScannerServiceFunctions.RemoveInvalidXmlChars(Item."No."), '', XMLNewChild, '');
                             Add_Element(XMLCurrNode, 'description', ScannerServiceFunctions.RemoveInvalidXmlChars(Item.Description), '', XMLNewChild, '');
@@ -268,28 +255,25 @@ codeunit 6059996 "NPR Scanner Service WS"
                         Add_Element(XMLCurrNode, 'inventory', '', '', XMLNewChild, '');
                         Add_Element(XMLCurrNode, 'error', StrSubstNo(ItemNotFoundError, XMLRecID), '', XMLNewChild, '');
                     end;
-                    //+NPR5.32
                 end;
             1:
                 begin
-                    StockTakeWorksheet.SetRange(Status, StockTakeWorksheet.Status::OPEN);
-                    if StockTakeWorksheet.FindSet then begin
-                        repeat
-                            Add_Element(XMLCurrNode, 'name', ScannerServiceFunctions.RemoveInvalidXmlChars(StockTakeWorksheet.Name), '', XMLNewChild, '');
-                        until StockTakeWorksheet.Next = 0;
-                    end;
+                    //REFACTORING NEEDED - STOCKTAKE MOVED TO NP Warehouse!                    
+                    // StockTakeWorksheet.SetRange(Status, StockTakeWorksheet.Status::OPEN);
+                    // if StockTakeWorksheet.FindSet then begin
+                    //     repeat
+                    //         Add_Element(XMLCurrNode, 'name', ScannerServiceFunctions.RemoveInvalidXmlChars(StockTakeWorksheet.Name), '', XMLNewChild, '');
+                    //     until StockTakeWorksheet.Next = 0;
+                    // end;
                 end;
             2:
                 begin
-                    //NPR5.38-
-
                     XMLRecID := Get_TextFromNode(XMLdocIn, '/showscanneditemimage/scannedcode');
 
                     if (XMLRecID = '') then
                         exit;
 
                     if BarcodeLibrary.TranslateBarcodeToItemVariant(XMLRecID, ItemNo, VariantCode, ResolvingTable, true) then begin
-                        //  MESSAGE(ItemNo);
                         if Item.Get(ItemNo) then begin
                             Base64String := GetItemImageCropped(Item);
                             Add_Element(XMLCurrNode, 'imagebase64', Base64String, '', XMLNewChild, '');
@@ -306,7 +290,6 @@ codeunit 6059996 "NPR Scanner Service WS"
                         Add_Element(XMLCurrNode, 'error', StrSubstNo(ItemNotFoundError, XMLRecID), '', XMLNewChild, '');
                     end;
                 end;
-        //NPR5.38+
         end;
 
         ConvertXmlToBigText(XMLdocOut, Request);
@@ -448,28 +431,7 @@ codeunit 6059996 "NPR Scanner Service WS"
         Convert: DotNet NPRNetConvert;
         InStr: InStream;
     begin
-        //-NPR5.38
         Error('Function Discontinued in NAV 2017');
-        /*
-        //+NPR5.38
-        
-        Item.CALCFIELDS(Picture);
-        
-        IF NOT Item.Picture.HASVALUE THEN
-          EXIT(Base64String);
-        
-        Item.Picture.CREATEINSTREAM(InStr);
-        MemoryStream := InStr;
-        BinaryReader := BinaryReader.BinaryReader(InStr);
-        
-        Base64String := Convert.ToBase64String(BinaryReader.ReadBytes(MemoryStream.Length));
-        
-        MemoryStream.Dispose;
-        CLEAR(MemoryStream);
-        
-        EXIT(Base64String);
-        */ //NPR5.38
-
     end;
 
     local procedure GetItemImageCropped(var Item: Record Item) Base64String: Text
@@ -503,70 +465,6 @@ codeunit 6059996 "NPR Scanner Service WS"
         Bytes: DotNet NPRNetArray;
         OutStr: OutStream;
     begin
-        //-NPR5.38
         Error('Function Discontinued in NAV 2017');
-        /*
-        
-        Item.CALCFIELDS(Picture);
-        
-        IF NOT Item.Picture.HASVALUE THEN
-          EXIT(Base64String);
-        
-        Item.Picture.CREATEINSTREAM(InStr);
-        MemoryStream := InStr;
-        
-        imgToResize := Image.FromStream(MemoryStream);
-        
-        originalWidth := imgToResize.Width;
-        originalHeight := imgToResize.Height;
-        
-        destinationSize := destinationSize.Size(240,300);
-        hRatio := originalHeight / destinationSize.Height;
-        wRatio := originalWidth / destinationSize.Width;
-        
-        ratio := Math.Min(hRatio, wRatio);
-        
-        hScale := Convert.ToInt32(destinationSize.Height * ratio);
-        wScale := Convert.ToInt32(destinationSize.Width * ratio);
-        
-        startX := Convert.ToInt32((originalWidth - wScale) / 2);
-        startY := Convert.ToInt32((originalHeight - hScale) / 2);
-        
-        sourceRectangle := sourceRectangle.Rectangle(startX, startY, wScale, hScale);
-        
-        bitmap := bitmap.Bitmap(destinationSize.Width, destinationSize.Height);
-        
-        destinationRectangle := destinationRectangle.Rectangle(0, 0, bitmap.Width, bitmap.Height);
-        
-        g := Graphics.FromImage(bitmap);
-        g.InterpolationMode := InterpolationModeENUM.HighQualityBicubic;
-        g.DrawImage(imgToResize, destinationRectangle, sourceRectangle, GraphicsUnitENUM.Pixel);
-        
-        ms := ms.MemoryStream();
-        bitmap.Save(ms, ImageFormatENUM.Jpeg);
-        
-        Base64String := Convert.ToBase64String(ms.GetBuffer());
-        
-        MemoryStream.Dispose;
-        CLEAR(MemoryStream);
-        
-        ms.Dispose;
-        CLEAR(ms);
-        
-        //Debug>>
-        // Bytes := Convert.FromBase64String(Base64String);
-        // Item.Picture.CREATEOUTSTREAM(OutStr);
-        // MemoryStream := MemoryStream.MemoryStream(Bytes);
-        // MemoryStream.WriteTo(OutStr);
-        // Item.MODIFY(TRUE);
-        //
-        // MemoryStream.Dispose;
-        // CLEAR(MemoryStream);
-        //Debug<<
-        
-        EXIT(Base64String);
-        */ //NPR5.38
-
     end;
 }
-
