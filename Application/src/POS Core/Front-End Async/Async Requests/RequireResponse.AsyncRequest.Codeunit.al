@@ -26,7 +26,7 @@ codeunit 6150764 "NPR Front-End: RequireResponse" implements "NPR Front-End Asyn
 
     procedure GetJson() Json: JsonObject
     begin
-        Json.Add('Method', 'SetOption');
+        Json.Add('Method', 'RequireResponse');
         Json.Add('Content', _content);
         _content.Add('id', _id);
         case _valueType of
