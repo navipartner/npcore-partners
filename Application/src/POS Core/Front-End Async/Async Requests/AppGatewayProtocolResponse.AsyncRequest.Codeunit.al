@@ -13,7 +13,7 @@ codeunit 6150768 "NPR Front-End: AppGWResp." implements "NPR Front-End Async Req
 
     procedure GetJson() Json: JsonObject
     begin
-        Json.Add('Method', 'ConfigureSecureMethodsClientPasswords');
+        Json.Add('Method', 'AppGatewayProtocolResponse');
         Json.Add('Content', _content);
         Json.Add('Event', _event);
         Json.Add('Data', _data);
