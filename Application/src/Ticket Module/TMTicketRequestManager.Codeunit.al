@@ -321,7 +321,7 @@ codeunit 6060119 "NPR TM Ticket Request Manager"
             TicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
             if (TicketAccessEntry.FindSet()) then begin
                 repeat
-                    TicketManagement.GetTicketAccessEntryValidDateBoundery(Ticket, LowDate, HighDate);
+                    TicketManagement.GetTicketAccessEntryValidDateBoundary(Ticket, LowDate, HighDate);
                     Ticket."Valid From Date" := LowDate;
                     Ticket."Valid To Date" := HighDate;
                     Ticket.Modify();
@@ -567,7 +567,7 @@ codeunit 6060119 "NPR TM Ticket Request Manager"
         TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
         TicketReservationRequest.FindSet();
         repeat
-            TicketReservationRequest."Request Status Date Time" := CURRENTDATETIME();
+            TicketReservationRequest."Request Status Date Time" := CurrentDateTime();
             TicketReservationRequest."Request Status" := TicketReservationRequest."Request Status"::CONFIRMED;
             TicketReservationRequest."Admission Created" := (TicketReservationRequest."Admission Inclusion" <> TicketReservationRequest."Admission Inclusion"::NOT_SELECTED);
             TicketReservationRequest."Scheduled Time Description" := '';
@@ -1725,7 +1725,7 @@ codeunit 6060119 "NPR TM Ticket Request Manager"
         TicketNotificationEntry.Init;
         TicketReservationRequest.Get(Ticket."Ticket Reservation Entry No.");
 
-        // If this is an update, duplicate the lines (one per admisson code) and set status pending
+        // If this is an update, duplicate the lines (one per admission code) and set status pending
         TicketNotificationEntry.SetFilter("Ticket Token", '=%1', TicketReservationRequest."Session Token ID");
         if (TicketNotificationEntry.FindLast()) then begin
 
@@ -1914,7 +1914,7 @@ codeunit 6060119 "NPR TM Ticket Request Manager"
                     TicketNotificationEntry."Event Start Time" := AdmissionScheduleEntry."Admission Start Time";
                     TicketNotificationEntry."Relevant Date" := AdmissionScheduleEntry."Admission Start Date";
                     TicketNotificationEntry."Relevant Time" := AdmissionScheduleEntry."Event Arrival From Time";
-                    TicketNotificationEntry."Relevant Datetime" := CREATEDATETIME(TicketNotificationEntry."Relevant Date", TicketNotificationEntry."Relevant Time");
+                    TicketNotificationEntry."Relevant Datetime" := CreateDateTime(TicketNotificationEntry."Relevant Date", TicketNotificationEntry."Relevant Time");
                     TicketNotificationEntry."Admission Schedule Entry No." := AdmissionScheduleEntry."Entry No.";
                     TicketNotificationEntry."Det. Ticket Access Entry No." := DetTicketAccessEntry."Entry No.";
                 end;
@@ -1996,7 +1996,7 @@ codeunit 6060119 "NPR TM Ticket Request Manager"
     var
         TicketType: Record "NPR TM Ticket Type";
         RecRef: RecordRef;
-        instream: InStream;
+        TemplateInStream: InStream;
         templateText: Text;
     begin
 
@@ -2008,9 +2008,9 @@ codeunit 6060119 "NPR TM Ticket Request Manager"
 
         TicketType.CalcFields("eTicket Template");
         if (TicketType."eTicket Template".HasValue()) then begin
-            TicketType."eTicket Template".CreateInStream(instream);
-            while (not instream.EOS()) do begin
-                instream.ReadText(templateText);
+            TicketType."eTicket Template".CreateInStream(TemplateInStream);
+            while (not TemplateInStream.EOS()) do begin
+                TemplateInStream.ReadText(templateText);
                 PassData += AssignDataToPassTemplate(RecRef, templateText);
             end;
 
@@ -2304,7 +2304,7 @@ codeunit 6060119 "NPR TM Ticket Request Manager"
 
         ResponseXml := '';
 
-        // No respone body on time out
+        // No response body on time out
         if (WebException.Status.Equals(WebExceptionStatus.Timeout)) then begin
             DotNetType := GetDotNetType(StatusCodeInt);
             StatusCodeInt := SystemConvert.ChangeType(WebExceptionStatus.Timeout, DotNetType);

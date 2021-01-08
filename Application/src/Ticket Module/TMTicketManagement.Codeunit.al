@@ -14,7 +14,7 @@ codeunit 6059784 "NPR TM Ticket Management"
         RESERVATION_NOT_FOUND: Label 'The required reservation for ticket %1 and %2 was not found.';
         NOT_VALID: Label 'Ticket %1 is not valid for %2.';
         CAPACITY_EXCEEDED: Label 'The capacity for %1 has been exceeded. Entry is not allowed.';
-        CONCURRENT_CAPACITY_EXCEEDED: Label 'The cuncurrent capacity for group %1 has been exceeded. Entry is not allowed.';
+        CONCURRENT_CAPACITY_EXCEEDED: Label 'The concurrent capacity for group %1 has been exceeded. Entry is not allowed.';
         RESERVATION_MISMATCH: Label 'Your reservation is not for the current event.';
         RESERVATION_NOT_FOR_TODAY: Label 'Your reservation seem not to be valid for the current %1 event. Reservation entry is for %2 %3. ';
         CONF_RES_NOT_FOR_TODAY: Label 'Your reservation seem not to be valid for the current %1 event. Reservation entry is for %2 %3.\\Do you want to proceed with the current action anyway? ';
@@ -29,9 +29,6 @@ codeunit 6059784 "NPR TM Ticket Management"
         ADMISSION_MISMATCH: Label 'The Schedule Entry %1 is for admission to %2, but the Ticket Access Entry requires %3.';
         NO_SCHEDULE_FOR_ADM: Label 'There is no valid admission schedule available for %1 today.';
         NO_ADMISSION_CODE: Label 'No admission code was specified and no admission code was marked as default for item %1.';
-        EXCLUDE_ADMISSION: Label 'Admission not allowed. The ticket does allow access to both %1 and %2.';
-        NOT_WITHIN_TIMEFRAME: Label 'Admission not allowed. Admission to %1 expired on %2.';
-        DEPENDENT_ADMISSION: Label 'Admission not allowed. Ticket need to be validated for %1 first.';
         SCHEDULE_REQUIRED: Label 'Admission %1 requires a valid schedule entry to register arrival.';
         TICKET_NOT_VALID_YET: Label 'Ticket %1 is not valid until %2.';
         TICKET_EXPIRED: Label 'Ticket %1 expired on %2.';
@@ -42,7 +39,7 @@ codeunit 6059784 "NPR TM Ticket Management"
         ITEM_CONSUMED: Label '%1 is marked as consumed for ticket %2.';
         TICKET_CALENDAR: Label 'Ticket calendar defined for %1 %2 %3 states that ticket is not valid for %4.';
         RESERVATION_NOT_FOR_NOW: Label 'The ticket reservation for %4 allows admission from %1 until %2 on %3.\\Current time is: %5';
-        EVENT_SOLD_OUT: Label 'This event is sold out. Sign-up on the waiting list to get notified if ticket cancelations.';
+        EVENT_SOLD_OUT: Label 'This event is sold out. Sign-up on the waiting list to get notified if ticket cancellations.';
         RESCHEDULE_NOT_ALLOWED: Label 'The ticket reschedule policy for %1 and %2, prevents changes at this time.';
         SUCCESS: Label '0';
         UNEXPECTED_NO: Label '-1000';
@@ -80,7 +77,7 @@ codeunit 6059784 "NPR TM Ticket Management"
         INVOICE_TEXT1: Label 'Admission on %1 {%2}';
         INVOICE_TEXT2: Label 'Admission on %1 {%2,...}';
         POSTPAID_RESULT: Label 'Number of postpaid tickets: %1\\Number of invoices: %2\\Invoices created: %3';
-        gAccesEntryPaymentType: Option PAYMENT,PREPAID,POSTPAID;
+        gAccessEntryPaymentType: Option PAYMENT,PREPAID,POSTPAID;
         HANDLE_POSTPAID: Label 'Do you want to generate invoices for postpaid ticket?';
         HANDLE_POSTPAID_STATUS: Label '#1#################\@2@@@@@@@@@@@@@@@@@@';
         gWindow: Dialog;
@@ -88,7 +85,7 @@ codeunit 6059784 "NPR TM Ticket Management"
         POSTPAID_AGGREGATE: Label 'Aggregating...';
         POSTPAID_INVOICE: Label 'Creating invoices...';
         POSTPAID_UPDATING: Label 'Closing prepaid payments...';
-        NO_DEFAULT_SCHEDULE: Label 'The ticket request did not specify a valid timeslot for admission %1 and the ticket rule is to get the default schedule. But there are currently no timeslots that matches %2 "%3".';
+        NO_DEFAULT_SCHEDULE: Label 'The ticket request did not specify a valid time-slot for admission %1 and the ticket rule is to get the default schedule. But there are currently no time-slots that matches %2 "%3".';
         WORKFLOW_DESC: Label 'Print Ticket';
 
         _TicketExecutionContext: Option SALES,ADMISSION;
@@ -226,7 +223,7 @@ codeunit 6059784 "NPR TM Ticket Management"
         until (Ticket.Next() = 0);
     end;
 
-    local procedure PrintTicketUsingFormater(var Ticket: Record "NPR TM Ticket"; PrintObjectType: Option; PrintObjectId: Integer; PrintTemplateCode: Code[20]) Printed: Boolean
+    local procedure PrintTicketUsingFormatter(var Ticket: Record "NPR TM Ticket"; PrintObjectType: Option; PrintObjectId: Integer; PrintTemplateCode: Code[20]) Printed: Boolean
     var
         TicketType: Record "NPR TM Ticket Type";
         StdCodeunitCode: Codeunit "NPR Std. Codeunit Code";
@@ -274,7 +271,7 @@ codeunit 6059784 "NPR TM Ticket Management"
         if (not TicketType."Print Ticket") then
             exit(false);
 
-        Printed := PrintTicketUsingFormater(Ticket, TicketType."Print Object Type", TicketType."Print Object ID", TicketType."RP Template Code");
+        Printed := PrintTicketUsingFormatter(Ticket, TicketType."Print Object Type", TicketType."Print Object ID", TicketType."RP Template Code");
         if (Printed) then begin
             Ticket."Printed Date" := Today;
             Ticket.Modify();
@@ -285,7 +282,7 @@ codeunit 6059784 "NPR TM Ticket Management"
     local procedure OnBeforeInsertWorkflowStep(var Rec: Record "NPR POS Sales Workflow Step"; RunTrigger: Boolean)
     begin
 
-        if (Rec."Subscriber Codeunit ID" <> CurrCodeunitId()) then
+        if (Rec."Subscriber Codeunit ID" <> CurrentCodeunitId()) then
             exit;
         if (Rec."Subscriber Function" <> 'PrintTicketsOnSale') then
             exit;
@@ -294,7 +291,7 @@ codeunit 6059784 "NPR TM Ticket Management"
         Rec."Sequence No." := 120;
     end;
 
-    local procedure CurrCodeunitId(): Integer
+    local procedure CurrentCodeunitId(): Integer
     begin
         exit(CODEUNIT::"NPR TM Ticket Management");
     end;
@@ -302,7 +299,7 @@ codeunit 6059784 "NPR TM Ticket Management"
     [EventSubscriber(ObjectType::Codeunit, 6150705, 'OnFinishSale', '', true, true)]
     local procedure PrintTicketsOnSale(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR Sale POS")
     begin
-        if (POSSalesWorkflowStep."Subscriber Codeunit ID" <> CurrCodeunitId()) then
+        if (POSSalesWorkflowStep."Subscriber Codeunit ID" <> CurrentCodeunitId()) then
             exit;
         if (POSSalesWorkflowStep."Subscriber Function" <> 'PrintTicketsOnSale') then
             exit;
@@ -417,7 +414,7 @@ codeunit 6059784 "NPR TM Ticket Management"
         end;
     end;
 
-    procedure GetTicketAccessEntryValidDateBoundery(Ticket: Record "NPR TM Ticket"; var LowDate: Date; var HighDate: Date)
+    procedure GetTicketAccessEntryValidDateBoundary(Ticket: Record "NPR TM Ticket"; var LowDate: Date; var HighDate: Date)
     var
         TicketBom: Record "NPR TM Ticket Admission BOM";
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
@@ -523,7 +520,7 @@ codeunit 6059784 "NPR TM Ticket Management"
 
     end;
 
-    procedure RescheduleTicketAdmission(TicketNo: Code[20]; NewExtSheduleEntryNo: Integer; EnforceReschedulePolicy: Boolean; ReferenceDateTime: DateTime)
+    procedure RescheduleTicketAdmission(TicketNo: Code[20]; NewExtScheduleEntryNo: Integer; EnforceReschedulePolicy: Boolean; ReferenceDateTime: DateTime)
     var
         Ticket: Record "NPR TM Ticket";
         Admission: Record "NPR TM Admission";
@@ -537,7 +534,7 @@ codeunit 6059784 "NPR TM Ticket Management"
 
         Ticket.Get(TicketNo);
 
-        NewAdmissionScheduleEntry.SetFilter("External Schedule Entry No.", '=%1', NewExtSheduleEntryNo);
+        NewAdmissionScheduleEntry.SetFilter("External Schedule Entry No.", '=%1', NewExtScheduleEntryNo);
         NewAdmissionScheduleEntry.SetFilter(Cancelled, '=%1', false);
         if (not NewAdmissionScheduleEntry.FindFirst()) then
             RaiseError(StrSubstNo(INVALID_REFERENCE, NewAdmissionScheduleEntry.TABLECAPTION, NewAdmissionScheduleEntry), '-2002');
@@ -552,7 +549,7 @@ codeunit 6059784 "NPR TM Ticket Management"
         OldDetTicketAccessEntry.SetFilter(Quantity, '>%1', 0);
         OldDetTicketAccessEntry.FindLast();
 
-        if (NewExtSheduleEntryNo = OldDetTicketAccessEntry."External Adm. Sch. Entry No.") then
+        if (NewExtScheduleEntryNo = OldDetTicketAccessEntry."External Adm. Sch. Entry No.") then
             exit;
 
         if (EnforceReschedulePolicy) then
@@ -563,7 +560,7 @@ codeunit 6059784 "NPR TM Ticket Management"
 
         // create a new initial entry for the new time
         NewDetTicketAccessEntry."Entry No." := 0;
-        NewDetTicketAccessEntry."External Adm. Sch. Entry No." := NewExtSheduleEntryNo;
+        NewDetTicketAccessEntry."External Adm. Sch. Entry No." := NewExtScheduleEntryNo;
         NewDetTicketAccessEntry."Created Datetime" := CurrentDateTime();
         NewDetTicketAccessEntry.Insert();
 
@@ -703,12 +700,12 @@ codeunit 6059784 "NPR TM Ticket Management"
         TicketType: Record "NPR TM Ticket Type";
         Admission: Record "NPR TM Admission";
         DetailedTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
-        PaymentType: Option PAYMENT,PREPAID,POSPAID;
+        PaymentType: Option PAYMENT,PREPAID,POSTPAID;
     begin
         CreatePaymentEntryType(Ticket, PaymentType::PAYMENT, 'POS', '');
     end;
 
-    procedure CreatePaymentEntryType(Ticket: Record "NPR TM Ticket"; PaymentType: Option PAYMENT,PREPAID,POSPAID; PaymentReferenceNo: Code[20]; CustomerNo: Code[20])
+    procedure CreatePaymentEntryType(Ticket: Record "NPR TM Ticket"; PaymentType: Option PAYMENT,PREPAID,POSTPAID; PaymentReferenceNo: Code[20]; CustomerNo: Code[20])
     var
         AdmissionBOM: Record "NPR TM Ticket Admission BOM";
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
@@ -1195,7 +1192,19 @@ codeunit 6059784 "NPR TM Ticket Management"
     local procedure CheckDependencyRule(SourceAccessEntry: Record "NPR TM Ticket Access Entry"; AdmissionDependencyLine: Record "NPR TM Adm. Dependency Line"; var StopRuleChecking: Boolean; var ResponseMessage: Text): Boolean
     var
         DependentAccessEntry: Record "NPR TM Ticket Access Entry";
+        DetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
+        Ticket: Record "NPR TM Ticket";
+        TicketBom: Record "NPR TM Ticket Admission BOM";
         AllowUntilDate: Date;
+        AdmittedCount: Integer;
+        IsValid: Boolean;
+        AdmissionDateTime: DateTime;
+        EXCLUDE_ADMISSION: Label 'Admission not allowed. The ticket does allow access to both %1 and %2.';
+        NOT_WITHIN_TIMEFRAME: Label 'Admission not allowed. Admission to %1 expired on %2.';
+        DEPENDENT_ADMISSION: Label 'Admission not allowed. Ticket need to be validated for %1 first.';
+        ADM_SCAN_LIMIT: Label 'Admission to %1 is limited to %2 visits.';
+        ADM_DAILY_SCAN_LIMIT: Label 'Admission to %1 has a daily limited of %2 visits.';
+        ADM_SCAN_FREQUENCY: Label 'Admission to %1 is limited to once per %2 minutes, previous admission was %3 minute(s) ago.';
     begin
         DependentAccessEntry.SetFilter("Ticket No.", '=%1', SourceAccessEntry."Ticket No.");
         DependentAccessEntry.SetFilter("Admission Code", '=%1', AdmissionDependencyLine."Admission Code");
@@ -1204,51 +1213,119 @@ codeunit 6059784 "NPR TM Ticket Management"
             exit(true);
         end;
 
-        StopRuleChecking := (AdmissionDependencyLine."Rule Type" = AdmissionDependencyLine."Rule Type"::STOP_ON_ADMISSION) and (SourceAccessEntry."Admission Code" = DependentAccessEntry."Admission Code");
-        if (StopRuleChecking) then
-            exit(true);
+        IsValid := true;
+        case AdmissionDependencyLine."Rule Type" of
+            AdmissionDependencyLine."Rule Type"::STOP_ON_ADMISSION:
+                StopRuleChecking := (SourceAccessEntry."Admission Code" = DependentAccessEntry."Admission Code");
 
-        if (DependentAccessEntry."Access Date" = 0D) and (AdmissionDependencyLine."Rule Type" = AdmissionDependencyLine."Rule Type"::REQUIRED) then begin
-            ResponseMessage := StrSubstNo(DEPENDENT_ADMISSION, AdmissionDependencyLine."Admission Code");
+            AdmissionDependencyLine."Rule Type"::REQUIRED:
+                begin
+                    if (DependentAccessEntry."Access Date" = 0D) then begin
+                        ResponseMessage := StrSubstNo(DEPENDENT_ADMISSION, AdmissionDependencyLine."Admission Code");
+                        IsValid := false;
+                    end;
+                end;
+
+            AdmissionDependencyLine."Rule Type"::EXCLUDE_OTHER:
+                begin
+                    if ((DependentAccessEntry."Access Date" <> 0D) and (SourceAccessEntry."Admission Code" <> DependentAccessEntry."Admission Code")) then begin
+                        ResponseMessage := StrSubstNo(EXCLUDE_ADMISSION, SourceAccessEntry."Admission Code", AdmissionDependencyLine."Admission Code");
+                        IsValid := false;
+                    end;
+                end;
+
+            AdmissionDependencyLine."Rule Type"::EXCLUDE_SELF:
+                begin
+                    if ((DependentAccessEntry."Access Date" <> 0D) and (SourceAccessEntry."Admission Code" = DependentAccessEntry."Admission Code")) then begin
+                        ResponseMessage := StrSubstNo(EXCLUDE_ADMISSION, SourceAccessEntry."Admission Code", AdmissionDependencyLine."Admission Code");
+                        IsValid := false;
+                    end;
+                end;
+
+            AdmissionDependencyLine."Rule Type"::TIMEFRAME:
+                begin
+                    if ((DependentAccessEntry."Access Date" <> 0D) and (SourceAccessEntry."Admission Code" <> DependentAccessEntry."Admission Code")) then begin
+
+                        if (Format(AdmissionDependencyLine.Timeframe) = '') then
+                            Evaluate(AdmissionDependencyLine.Timeframe, '<0D>');
+
+                        AllowUntilDate := CalcDate(AdmissionDependencyLine.Timeframe, DependentAccessEntry."Access Date");
+
+                        if (SourceAccessEntry."Access Date" > AllowUntilDate) then begin
+                            ResponseMessage := StrSubstNo(NOT_WITHIN_TIMEFRAME, SourceAccessEntry."Admission Code", AllowUntilDate);
+                            IsValid := false;
+                        end;
+                    end;
+                end;
+
+            AdmissionDependencyLine."Rule Type"::DAILY_ADM_SCAN_COUNT:
+                begin
+                    if (SourceAccessEntry."Admission Code" = DependentAccessEntry."Admission Code") then begin
+                        DetTicketAccessEntry.SetCurrentKey("Ticket Access Entry No.");
+                        DetTicketAccessEntry.SetFilter("Ticket Access Entry No.", '=%1', SourceAccessEntry."Entry No.");
+                        DetTicketAccessEntry.SetFilter("Created Datetime", '%1..%2', CreateDateTime(Today, 0T), CreateDateTime(Today, 235959.999T));
+                        DetTicketAccessEntry.SetFilter(Type, '=%1', DetTicketAccessEntry.Type::ADMITTED);
+                        AdmittedCount := DetTicketAccessEntry.Count();
+
+                        DetTicketAccessEntry.SetFilter(Type, '=%1', DetTicketAccessEntry.Type::CANCELED_ADMISSION);
+                        AdmittedCount -= DetTicketAccessEntry.Count();
+
+                        if (AdmittedCount > AdmissionDependencyLine.Limit) then begin
+                            ResponseMessage := StrSubstNo(ADM_DAILY_SCAN_LIMIT, SourceAccessEntry."Admission Code", AdmissionDependencyLine.Limit);
+                            IsValid := false;
+                        end;
+                    end
+                end;
+
+            AdmissionDependencyLine."Rule Type"::ADM_SCAN_FREQUENCY:
+                begin
+                    if (SourceAccessEntry."Admission Code" = DependentAccessEntry."Admission Code") then begin
+                        DetTicketAccessEntry.SetCurrentKey("Ticket Access Entry No.");
+                        DetTicketAccessEntry.SetFilter("Ticket Access Entry No.", '=%1', SourceAccessEntry."Entry No.");
+                        DetTicketAccessEntry.SetFilter(Type, '=%1', DetTicketAccessEntry.Type::ADMITTED);
+                        if (DetTicketAccessEntry.FindLast()) then begin
+                            AdmissionDateTime := DetTicketAccessEntry."Created Datetime";
+                            // Find the previous admission entry
+                            if (DetTicketAccessEntry.Next(-1) <> 0) then begin
+                                if ((AdmissionDateTime - DetTicketAccessEntry."Created Datetime") < AdmissionDependencyLine.Limit * 1000 * 60) then begin
+                                    ResponseMessage := StrSubstNo(ADM_SCAN_FREQUENCY, SourceAccessEntry."Admission Code", AdmissionDependencyLine.Limit, round((AdmissionDateTime - DetTicketAccessEntry."Created Datetime") / 1000 / 60, 0.1));
+                                    IsValid := false;
+                                end;
+
+                                // The speed gate vs a mom and a run-away kid ... 
+                                if (not IsValid) then begin
+                                    Ticket.get(SourceAccessEntry."Ticket No.");
+                                    TicketBom.Get(Ticket."Item No.", Ticket."Variant Code", SourceAccessEntry."Admission Code");
+                                    case TicketBOM."Allow Rescan Within (Sec.)" of
+                                        TicketBom."Allow Rescan Within (Sec.)"::SINGLE_ENTRY_ONLY:
+                                            IsValid := false;
+
+                                        TicketBom."Allow Rescan Within (Sec.)"::"15":
+                                            IsValid := ((AdmissionDateTime - DetTicketAccessEntry."Created Datetime") < 15 * 1000);
+
+                                        TicketBom."Allow Rescan Within (Sec.)"::"30":
+                                            IsValid := ((AdmissionDateTime - DetTicketAccessEntry."Created Datetime") < 30 * 1000);
+
+                                        TicketBom."Allow Rescan Within (Sec.)"::"60":
+                                            IsValid := ((AdmissionDateTime - DetTicketAccessEntry."Created Datetime") < 60 * 1000);
+
+                                        TicketBom."Allow Rescan Within (Sec.)"::"120":
+                                            IsValid := ((AdmissionDateTime - DetTicketAccessEntry."Created Datetime") < 120 * 1000);
+
+                                    end;
+
+                                end;
+                            end;
+                        end;
+                    end;
+                end;
+        end;
+
+        if (not IsValid) then
             if (AdmissionDependencyLine."Response Message" <> '') then
                 ResponseMessage := StrSubstNo(AdmissionDependencyLine."Response Message");
-            exit(false);
-        end;
 
-        if ((DependentAccessEntry."Access Date" <> 0D) and (AdmissionDependencyLine."Rule Type" = AdmissionDependencyLine."Rule Type"::EXCLUDE_OTHER) and
-            (SourceAccessEntry."Admission Code" <> DependentAccessEntry."Admission Code")) then begin
-            ResponseMessage := StrSubstNo(EXCLUDE_ADMISSION, SourceAccessEntry."Admission Code", AdmissionDependencyLine."Admission Code");
-            if (AdmissionDependencyLine."Response Message" <> '') then
-                ResponseMessage := StrSubstNo(AdmissionDependencyLine."Response Message");
-            exit(false);
-        end;
-
-        if ((DependentAccessEntry."Access Date" <> 0D) and (AdmissionDependencyLine."Rule Type" = AdmissionDependencyLine."Rule Type"::EXCLUDE_SELF) and
-            (SourceAccessEntry."Admission Code" = DependentAccessEntry."Admission Code")) then begin
-            ResponseMessage := StrSubstNo(EXCLUDE_ADMISSION, SourceAccessEntry."Admission Code", AdmissionDependencyLine."Admission Code");
-            if (AdmissionDependencyLine."Response Message" <> '') then
-                ResponseMessage := StrSubstNo(AdmissionDependencyLine."Response Message");
-            exit(false);
-        end;
-
-        if ((DependentAccessEntry."Access Date" <> 0D) and
-            (AdmissionDependencyLine."Rule Type" = AdmissionDependencyLine."Rule Type"::TIMEFRAME) and
-            (SourceAccessEntry."Admission Code" <> DependentAccessEntry."Admission Code")) then begin
-
-            if (Format(AdmissionDependencyLine.Timeframe) = '') then
-                Evaluate(AdmissionDependencyLine.Timeframe, '<0D>');
-
-            AllowUntilDate := CalcDate(AdmissionDependencyLine.Timeframe, DependentAccessEntry."Access Date");
-
-            if (SourceAccessEntry."Access Date" > AllowUntilDate) then begin
-                ResponseMessage := StrSubstNo(NOT_WITHIN_TIMEFRAME, SourceAccessEntry."Admission Code", AllowUntilDate);
-                if (AdmissionDependencyLine."Response Message" <> '') then
-                    ResponseMessage := StrSubstNo(AdmissionDependencyLine."Response Message");
-                exit(false);
-            end;
-        end;
-
-        exit(true);
+        exit(IsValid);
 
     end;
 
@@ -1304,8 +1381,8 @@ codeunit 6059784 "NPR TM Ticket Management"
             Error(ErrPattern, GeneratePattern);
 
         while (StrLen(GeneratePattern) > 0) do begin
-            PosStartClause := STRPOS(GeneratePattern, '[');
-            PosEndClause := STRPOS(GeneratePattern, ']');
+            PosStartClause := StrPos(GeneratePattern, '[');
+            PosEndClause := StrPos(GeneratePattern, ']');
             PatternLength := PosEndClause - PosStartClause - 1;
 
             Pattern := '';
@@ -1534,11 +1611,11 @@ codeunit 6059784 "NPR TM Ticket Management"
         PaymentTicketAccessEntry."Sales Channel No." := PaymentReferenceNo;
 
         case PaymentType of
-            gAccesEntryPaymentType::PAYMENT:
+            gAccessEntryPaymentType::PAYMENT:
                 PaymentTicketAccessEntry.Type := PaymentTicketAccessEntry.Type::PAYMENT;
-            gAccesEntryPaymentType::PREPAID:
+            gAccessEntryPaymentType::PREPAID:
                 PaymentTicketAccessEntry.Type := PaymentTicketAccessEntry.Type::PREPAID;
-            gAccesEntryPaymentType::POSTPAID:
+            gAccessEntryPaymentType::POSTPAID:
                 begin
                     PaymentTicketAccessEntry.Type := PaymentTicketAccessEntry.Type::POSTPAID;
                     PaymentTicketAccessEntry.Open := true;
@@ -2031,7 +2108,7 @@ codeunit 6059784 "NPR TM Ticket Management"
             // if ticket will be admitted automatically, we also need to check valid admission time
             if (ActivateOnSales) then begin
                 if ("Admission Start Date" <> ReferenceDate) then
-                    exit(false); // When ticket is activated on sales, and its a reservation for another date than the reference date, it cant be sold now, dont validate the time slot
+                    exit(false); // When ticket is activated on sales, and its a reservation for another date than the reference date, it cant be sold now, don't validate the time slot
 
                 if (ReferenceTime < "Event Arrival From Time") then
                     exit(false);
@@ -2327,6 +2404,12 @@ codeunit 6059784 "NPR TM Ticket Management"
                     DetailedTicketAccessEntry.FindLast();
                     LastAccessDate := DT2Date(DetailedTicketAccessEntry."Created Datetime");
                     CapacityExceeded := (FirstAccessDate <> LastAccessDate);
+
+                    if (not CapacityExceeded) then begin
+                        AdmittedCount := DetailedTicketAccessEntry.Count();
+                        CapacityExceeded := (AdmittedCount > MaxNoOfEntries);
+                    end;
+
                 end;
 
             EntryValidation::MULTIPLE:

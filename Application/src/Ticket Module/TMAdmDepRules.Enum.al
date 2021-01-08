@@ -8,7 +8,7 @@ enum 6014400 "NPR TM Adm. Dep. Rules"
     }
     value(1; TIMEFRAME)
     {
-        Caption = 'Timeframe';
+        Caption = 'Visit Within Timeframe';
     }
 
     value(2; EXCLUDE_OTHER)
@@ -25,5 +25,16 @@ enum 6014400 "NPR TM Adm. Dep. Rules"
     {
         Caption = 'Exclude (Self)';
     }
+
+    value(5; ADM_SCAN_FREQUENCY)
+    {
+        Caption = 'Adm. Scan Frequency (Minutes)';
+    }
+
+    value(8; DAILY_ADM_SCAN_COUNT)
+    {
+        Caption = 'Max Daily Admission Scans (Count)';
+    }
+
 
 }
