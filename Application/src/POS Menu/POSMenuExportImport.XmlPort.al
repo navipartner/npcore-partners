@@ -1,7 +1,5 @@
 xmlport 6150701 "NPR POS Menu Export/Import"
 {
-    // NPR5.40/VB  /20180228 CASE 306347 Replacing BLOB-based temporary-table parameters with physical-table parameters
-
     Caption = 'POS Menu Export/Import';
     Encoding = UTF8;
     FormatEvaluate = Xml;

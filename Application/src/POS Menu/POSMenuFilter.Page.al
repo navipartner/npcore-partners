@@ -1,10 +1,5 @@
 page 6150718 "NPR POS Menu Filter"
 {
-    // NPR5.33/ANEN  /20170607 CASE 270854 Object created to support function for filtererd menu buttons in transcendance pos.
-    // NPR5.41/TSA /20180417 CASE 310137 Added Implied filter group and the current register / unit as option.
-    // NPR5.48/TJ  /20181108 CASE 318531 New action GenericFilter and DisplayFilter
-    //                                   Hid Table Filter action
-
     Caption = 'POS Menu Filter';
     DelayedInsert = true;
     PageType = Card;

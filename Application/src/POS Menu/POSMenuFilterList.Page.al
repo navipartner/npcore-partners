@@ -1,7 +1,5 @@
 page 6150719 "NPR POS Menu Filter List"
 {
-    // NPR5.33/ANEN  /20170607 CASE 270854 Object created to support function for filtererd menu buttons in transcendance pos.
-
     Caption = 'POS Menu Filter List';
     CardPageID = "NPR POS Menu Filter";
     InsertAllowed = false;

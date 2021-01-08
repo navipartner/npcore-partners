@@ -1,13 +1,5 @@
 codeunit 6150644 "NPR POS Menu Button Mgt."
 {
-    // NPR5.40/MMV /20180307 CASE 307453 Created object
-    // NPR5.44/MMV /20180627 CASE 320850 Handle parameters when menus are renamed
-
-
-    trigger OnRun()
-    begin
-    end;
-
     [EventSubscriber(ObjectType::Table, 6150703, 'OnAfterActionUpdated', '', false, false)]
     local procedure OnAfterActionUpdated("Action": Record "NPR POS Action")
     var
@@ -27,7 +19,6 @@ codeunit 6150644 "NPR POS Menu Button Mgt."
     var
         POSParameterValue: Record "NPR POS Parameter Value";
     begin
-        //-NPR5.44 [320850]
         if Rec.IsTemporary then
             exit;
         if not RunTrigger then
@@ -40,7 +31,6 @@ codeunit 6150644 "NPR POS Menu Button Mgt."
                     Rename("Table No.", Code, ID, Rec.RecordId, Name);
                 until POSParameterValue.Next = 0;
         end;
-        //+NPR5.44 [320850]
     end;
 }
 

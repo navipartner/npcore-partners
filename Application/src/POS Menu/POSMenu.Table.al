@@ -1,8 +1,5 @@
 table 6150700 "NPR POS Menu"
 {
-    // NPR5.30/TJ  /20170215  CASE 265504 Changed ENU captions on fields with word Register in their name
-    // NPR5.45/MHA /20180813  CASE 324677 Added cleanup to OnDelete()
-
     Caption = 'POS Menu';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR POS Menus";

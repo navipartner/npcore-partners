@@ -1,11 +1,5 @@
 table 6150717 "NPR POS Menu Filter"
 {
-    // NPR5.33/ANEN  /20170607 CASE 270854 Object created to support function for filtererd menu buttons in transcendance pos.
-    // NPR5.41/TSA /20180417 CASE 310137 Added field "Current Register / POS Unit", function SetPOSUnitFilter()
-    // NPR5.46/BHR /20180824  CASE 322752 Replace record Object to Allobj -fields 5,10,11
-    // NPR5.48/TJ  /20181112  CASE 335629 Fixed the issue with wrong Object Name display
-    // NPR5.51/ALPO/20190805 CASE 362878 Predefined in "POS Menu Filter" View was lost while setting POS unit filter
-
     Caption = 'POS Menu Filter';
     DataClassification = CustomerContent;
     LookupPageID = "NPR POS Menu Filter List";
@@ -32,7 +26,7 @@ table 6150717 "NPR POS Menu Filter"
         }
         field(5; "Object Name"; Text[30])
         {
-            CalcFormula = Lookup (AllObj."Object Name" WHERE("Object Type" = FIELD("Object Type"),
+            CalcFormula = Lookup(AllObj."Object Name" WHERE("Object Type" = FIELD("Object Type"),
                                                              "Object ID" = FIELD("Object Id")));
             Caption = 'Object Name';
             FieldClass = FlowField;
@@ -87,7 +81,7 @@ table 6150717 "NPR POS Menu Filter"
         }
         field(11; "Table Name"; Text[30])
         {
-            CalcFormula = Lookup (AllObj."Object Name" WHERE("Object Type" = CONST(Table),
+            CalcFormula = Lookup(AllObj."Object Name" WHERE("Object Type" = CONST(Table),
                                                              "Object ID" = FIELD("Table No.")));
             Caption = 'Table Name';
             FieldClass = FlowField;
@@ -219,14 +213,12 @@ table 6150717 "NPR POS Menu Filter"
                     INS.Read(FilterStringText);
                 end;
 
-                //-NPR5.41 [310137]
                 if ("Current POS Register / Unit") then
                     SetPOSUnitFilter("Table No.", FilterStringText);
-                //+NPR5.41 [310137]
 
                 if FilterStringText <> '' then begin
                     FilterRecRef.SetView(FilterStringText);
-                    if FilterRecRef.FindFirst then;  //-+NPR5.51 [362878] (otherwise you are positioned at the end of the list, if DESCENDING order is used)
+                    if FilterRecRef.FindFirst then;
                 end;
                 FilterRecVariant := FilterRecRef;
 
@@ -296,14 +288,14 @@ table 6150717 "NPR POS Menu Filter"
         case TableNo of
             DATABASE::"NPR Audit Roll":
                 begin
-                    AuditRoll.SetView(FilterRecRef.GetView);  //-+NPR5.51 [362878]
+                    AuditRoll.SetView(FilterRecRef.GetView);
                     AuditRoll.CopyFilters(FilterRecVariant);
                     AuditRoll.SetFilter("Register No.", '=%1', GetRegisterNo());
                     FilterStringText := AuditRoll.GetView();
                 end;
             DATABASE::"NPR POS Entry":
                 begin
-                    POSEntry.SetView(FilterRecRef.GetView);  //-+NPR5.51 [362878]
+                    POSEntry.SetView(FilterRecRef.GetView);
                     POSEntry.CopyFilters(FilterRecVariant);
                     POSEntry.SetFilter("POS Unit No.", '=%1', GetPosUnitNo());
                     FilterStringText := POSEntry.GetView();
@@ -363,4 +355,3 @@ table 6150717 "NPR POS Menu Filter"
         exit('');
     end;
 }
-
