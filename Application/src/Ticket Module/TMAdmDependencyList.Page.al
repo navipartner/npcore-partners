@@ -14,54 +14,59 @@ page 6014512 "NPR TM Adm. Dependency List"
         {
             repeater(GroupName)
             {
-                field("Dependency Code"; "Dependency Code")
+                field("Dependency Code"; Rec."Dependency Code")
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Dependency Code field';
+                    ToolTip = 'Specifies the dependency code for this rule.';
                 }
-                field("Line No."; "Line No.")
+                field("Line No."; Rec."Line No.")
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Line No. field';
+                    ToolTip = 'Specifies the line number for this dependency rule.';
                 }
-                field("Rule Sequence"; "Rule Sequence")
+                field("Rule Sequence"; Rec."Rule Sequence")
                 {
                     ApplicationArea = NPRTicketAdvanced;
-                    ToolTip = 'Specifies the value of the Rule Sequence field';
+                    ToolTip = 'Specifies the order in which rules are evaluated.';
                 }
-                field("Admission Code"; "Admission Code")
+                field("Admission Code"; Rec."Admission Code")
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     ShowMandatory = true;
-                    ToolTip = 'Specifies the value of the Admission Code field';
+                    ToolTip = 'Specifies the admission code this rule applies to.';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = NPRTicketAdvanced;
-                    ToolTip = 'Specifies the value of the Description field';
+                    ToolTip = 'Specifies a description.';
                 }
-                field(Disabled; Disabled)
+                field(Disabled; Rec.Disabled)
                 {
                     ApplicationArea = NPRTicketAdvanced;
-                    ToolTip = 'Specifies the value of the Disabled field';
+                    ToolTip = 'Specifies if this rule is active or not.';
                 }
-                field("Rule Type"; "Rule Type")
+                field("Rule Type"; Rec."Rule Type")
                 {
                     ApplicationArea = NPRTicketAdvanced;
-                    ToolTip = 'Specifies the value of the Rule Type field';
+                    ToolTip = 'Specifies which type of rule this is.';
                 }
-                field(Timeframe; Timeframe)
+                field(Timeframe; Rec.Timeframe)
                 {
                     ApplicationArea = NPRTicketAdvanced;
-                    ToolTip = 'Specifies the value of the Timeframe field';
+                    ToolTip = 'Specifies the date formula that will be used to evaluate the dependency rule.';
                 }
-                field("Response Message"; "Response Message")
+                field(Limit; Rec.Limit)
                 {
-                    ApplicationArea = All;
+                    ApplicationArea = NPRTickedAdvanced;
+                    ToolTip = 'Specifies the limit that will be used to evaluate the dependency rule.';
+                }
+                field("Response Message"; Rec."Response Message")
+                {
+                    ApplicationArea = NPRTickedAdvanced;
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Response Message field';
+                    ToolTip = 'Specifies a custom response message that will be shown when the rule is violated.';
                 }
             }
 

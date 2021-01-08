@@ -42,6 +42,11 @@ table 6014436 "NPR TM Adm. Dependency Line"
             DataClassification = CustomerContent;
         }
 
+        field(31; Limit; Integer)
+        {
+            Caption = 'Limit';
+            DataClassification = CustomerContent;
+        }
         field(40; "Admission Code"; Code[20])
         {
             Caption = 'Admission Code';
@@ -68,7 +73,7 @@ table 6014436 "NPR TM Adm. Dependency Line"
         {
             Clustered = true;
         }
-        key(rulesequence; "Dependency Code", "Rule Sequence")
+        key(RuleSequence; "Dependency Code", "Rule Sequence")
         {
 
         }
