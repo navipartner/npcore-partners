@@ -1,18 +1,5 @@
 page 6150702 "NPR POS Menu Buttons"
 {
-    // NPR5.32.11/TSA/20170614  CASE 280806 Added Refresh Action Code button
-    // NPR5.32.11/VB /20170621  CASE 281618 Added "Blocking UI" field and corresponding business logic
-    // NPR5.32.11/VB /20170627  CASE 282223 Added "Update Tooltips" action and corresponding business logic.
-    // NPR5.36/VB /20170912  CASE 289132 Added fields "Background Image Url" and "Caption Position" to support binding specific images to button backgrounds
-    // NPR5.37/VB /20171013  CASE 290485 Providing localization support for button captions (and other data)
-    // NPR5.37/TSA /20171025 CASE 292656 Changed Action caption to "Refresh Action Code Parameters", and unfavorable styling when params are out of sync
-    // NPR5.39/MHA /20180208 CASE 303968 Parameters enabled for "Action Type"::PaymentType
-    // NPR5.40/VB  /20180228 CASE 306347 Replacing BLOB-based parameters with physical-table parameters
-    // NPR5.42.01/MMV /20180627  CASE 320622 Filter parameters correctly.
-    // NPR5.43/VB  /20180611  CASE 314603 Implemented secure method behavior functionality.
-    // NPR5.51/THRO/20190718 CASE 361514 Action "Refresh Action Code Parameters" named RefreshActionCodeParameters (for AL Conversion)
-    // NPR5.54/VB  /20200408 CASE 399736 Added "Show Plus/Minus Buttons" field.
-
     Caption = 'POS Menu Buttons';
     PageType = List;
     UsageCategory = Administration;
@@ -295,13 +282,11 @@ page 6150702 "NPR POS Menu Buttons"
                 var
                     POSParameterValue: Record "NPR POS Parameter Value";
                 begin
-                    //-NPR5.42.01 [320622]
                     POSParameterValue.SetRange("Table No.", 6150701);
                     POSParameterValue.SetRange(Code, "Menu Code");
                     POSParameterValue.SetRange("Record ID", RecordId);
                     POSParameterValue.SetRange(ID, ID);
                     PAGE.RunModal(PAGE::"NPR POS Parameter Values", POSParameterValue);
-                    //+NPR5.42.01 [320622]
                 end;
             }
             action("Popup Menu")
@@ -332,9 +317,7 @@ page 6150702 "NPR POS Menu Buttons"
 
                 trigger OnAction()
                 begin
-                    //-290485 [290485]
                     LocalizeData();
-                    //+290485 [290485]
                 end;
             }
         }
@@ -350,12 +333,6 @@ page 6150702 "NPR POS Menu Buttons"
     begin
         SetActionEnabledAttributes();
         GetRowStyle();
-
-        //-NPR5.40 [306347]
-        ////-NPR5.37 [292656]
-        //NeedParameterRefresh := Rec.NeedRefreshActionCode ();
-        ////+NPR5.37 [292656]
-        //+NPR5.40 [306347]
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
@@ -370,9 +347,7 @@ page 6150702 "NPR POS Menu Buttons"
     begin
         SetColumnVisibleAttributes();
         CurrPage.Caption := StrSubstNo(Text001, "Menu Code");
-        //-NPR5.40 [306347]
         POSAction.DiscoverActions();
-        //+NPR5.40 [306347]
     end;
 
     var
@@ -421,7 +396,6 @@ page 6150702 "NPR POS Menu Buttons"
         MenuButton: Record "NPR POS Menu Button";
         Modified: Boolean;
     begin
-        //-NPR5.32.11 [282223]
         MenuButton.Copy(Rec);
         MenuButton.SetRange("Action Type", MenuButton."Action Type"::Action);
         MenuButton.SetRange(Tooltip, '');
@@ -436,7 +410,6 @@ page 6150702 "NPR POS Menu Buttons"
 
         if Modified then
             CurrPage.Update(false);
-        //+NPR5.32.11 [282223]
     end;
 
     local procedure ShowPopup()
@@ -454,9 +427,7 @@ page 6150702 "NPR POS Menu Buttons"
         if HasSubMenus then
             RowStyle := 'Strong';
 
-        //-NPR5.40 [306347]
         NeedParameterRefresh := Rec.RefreshParametersRequired();
-        //+NPR5.40 [306347]
     end;
 
     local procedure SetColumnVisibleAttributes()
@@ -486,32 +457,21 @@ page 6150702 "NPR POS Menu Buttons"
     local procedure SetActionCodeEditable()
     begin
         ActionCodeEnabled := ActionTypeEnabled and ("Action Type" <> "Action Type"::Submenu);
-        //-NPR5.39 [303968]
-        //IsParametersEnabled := "Action Type" IN ["Action Type"::Action,"Action Type"::Item,"Action Type"::PopupMenu];
         IsParametersEnabled := "Action Type" in ["Action Type"::Action, "Action Type"::Item, "Action Type"::PopupMenu, "Action Type"::PaymentType];
-        //+NPR5.39 [303968]
         IsPopupEnabled := "Action Type" = "Action Type"::PopupMenu;
-        //-NPR5.32.11 [281618]
         IsBlockingUIEnabled := "Action Type" <> "Action Type"::Action;
-        //+NPR5.32.11 [281618]
     end;
 
     local procedure DoRefreshActionCode()
     var
         POSMenuButton: Record "NPR POS Menu Button";
     begin
-
-        //-NPR5.37 [292656]
         CurrPage.SetSelectionFilter(POSMenuButton);
         if (POSMenuButton.FindSet()) then begin
             repeat
-                //-NPR5.40 [306347]
-                //POSMenuButton.RefreshActionCode ();
                 POSMenuButton.RefreshParameters();
-            //+NPR5.40 [306347]
             until (POSMenuButton.Next() = 0);
         end;
-        //+NPR5.37 [292656]
     end;
 }
 

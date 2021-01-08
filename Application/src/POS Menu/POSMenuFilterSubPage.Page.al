@@ -1,7 +1,5 @@
 page 6150717 "NPR POS Menu Filter SubPage"
 {
-    // NPR5.32/NPKNAV/20170526  CASE 270854 Transport NPR5.32 - 26 May 2017
-
     AutoSplitKey = true;
     Caption = 'Filter Line';
     PageType = ListPart;

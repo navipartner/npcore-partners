@@ -1,8 +1,5 @@
 page 6150701 "NPR POS Menus"
 {
-    // NPR5.35.01/JDH /20170905 CASE        Added action to convert POS Touchscreen to transcendence
-    // NPR5.48/BHR /20181206 CASE 338656 Added Missing Picture to Action
-
     Caption = 'POS Menus';
     PageType = List;
     SourceTable = "NPR POS Menu";

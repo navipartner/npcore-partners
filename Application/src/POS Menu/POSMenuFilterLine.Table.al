@@ -1,8 +1,5 @@
 table 6150716 "NPR POS Menu Filter Line"
 {
-    // NPR5.32/NPKNAV/20170526  CASE 270854 Transport NPR5.32 - 26 May 2017
-    // NPR5.46/BHR /20180824  CASE 322752 Replace record Object to Allobj -fields 2,6,9
-
     Caption = 'POS Menu Filter';
     DataClassification = CustomerContent;
 
@@ -34,7 +31,7 @@ table 6150716 "NPR POS Menu Filter Line"
         }
         field(5; "Object Name"; Text[30])
         {
-            CalcFormula = Lookup (AllObj."Object Name" WHERE("Object Type" = CONST(Table),
+            CalcFormula = Lookup(AllObj."Object Name" WHERE("Object Type" = CONST(Table),
                                                              "Object ID" = FIELD("Object Id")));
             Caption = 'Object Name';
             FieldClass = FlowField;
@@ -64,14 +61,14 @@ table 6150716 "NPR POS Menu Filter Line"
         }
         field(9; "Table Name"; Text[30])
         {
-            CalcFormula = Lookup (AllObj."Object Name" WHERE("Object Type" = CONST(Table),
+            CalcFormula = Lookup(AllObj."Object Name" WHERE("Object Type" = CONST(Table),
                                                              "Object ID" = FIELD("Table No.")));
             Caption = 'Table Name';
             FieldClass = FlowField;
         }
         field(10; "Field Name"; Text[30])
         {
-            CalcFormula = Lookup (Field.FieldName WHERE(TableNo = FIELD("Table No."),
+            CalcFormula = Lookup(Field.FieldName WHERE(TableNo = FIELD("Table No."),
                                                         "No." = FIELD("Field No.")));
             Caption = 'Field Name';
             FieldClass = FlowField;
@@ -130,14 +127,14 @@ table 6150716 "NPR POS Menu Filter Line"
         }
         field(13; "Filter Sale POS Field Name"; Text[30])
         {
-            CalcFormula = Lookup (Field.FieldName WHERE(TableNo = CONST(6014405),
+            CalcFormula = Lookup(Field.FieldName WHERE(TableNo = CONST(6014405),
                                                         "No." = FIELD("Filter Sale POS Field Id")));
             Caption = 'Filter Sale POS Field Name';
             FieldClass = FlowField;
         }
         field(14; "Filter Sale Line POS Field Nam"; Text[30])
         {
-            CalcFormula = Lookup (Field.FieldName WHERE(TableNo = CONST(6014407),
+            CalcFormula = Lookup(Field.FieldName WHERE(TableNo = CONST(6014407),
                                                         "No." = FIELD("Filter Sale Line POS Field Id")));
             Caption = 'Filter Sale Line POS Field Name';
             FieldClass = FlowField;

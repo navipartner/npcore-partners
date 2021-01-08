@@ -1108,15 +1108,15 @@ table 6150701 "NPR POS Menu Button"
     local procedure LookupBackgroundColor()
     var
         TempRetailList: Record "NPR Retail List" temporary;
-        ColorArray: DotNet NPRNetArray;
-        String: DotNet NPRNetString;
-        Separator: DotNet NPRNetString;
+        String: Text;
+        Separator: Text;
+        ColorList: List of [Text];
     begin
         Separator := ',';
         String := 'default,green,red,dark-red,gray,purple,indigo,yellow,orange,white';
-        ColorArray := String.Split(Separator.ToCharArray());
+        ColorList := String.Split(Separator);
 
-        foreach String in ColorArray do begin
+        foreach String in ColorList do begin
             TempRetailList.Number += 1;
             TempRetailList.Choice := String;
             TempRetailList.Insert;
