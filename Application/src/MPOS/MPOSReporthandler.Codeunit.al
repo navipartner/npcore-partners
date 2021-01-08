@@ -47,18 +47,16 @@ codeunit 6059976 "NPR MPOS Report handler"
     var
         ReportBlob: Codeunit "Temp Blob";
         AllObjWithCaption: Record AllObjWithCaption;
-        MemStream: DotNet NPRNetMemoryStream;
         RecRef: RecordRef;
         OutStr: OutStream;
         InStr: InStream;
         Result: Text;
         XmlParameters: Text;
         Filename: Text;
-        Bytes: DotNet NPRNetArray;
-        Convert: DotNet NPRNetConvert;
         Base64String: Text;
         JSON: Text;
         JSBridge: Page "NPR JS Bridge";
+        Base64Convert: Codeunit "Base64 Convert";
     begin
         AllObjWithCaption.Get(AllObjWithCaption."Object Type"::Report, ReportId);
 
@@ -80,11 +78,7 @@ codeunit 6059976 "NPR MPOS Report handler"
             REPORT.SaveAs(ReportId, XmlParameters, REPORTFORMAT::Pdf, OutStr);
 
         ReportBlob.CreateInStream(InStr);
-        MemStream := MemStream.MemoryStream();
-        CopyStream(MemStream, InStr);
-
-        Bytes := MemStream.GetBuffer();
-        Base64String := Convert.ToBase64String(Bytes, 0, Bytes.Length);
+        Base64String := Base64Convert.ToBase64(InStr);
 
         JSON := BuildJSONParams(Filename, '', Base64String, '', Err_CreatePDFFailed);
 
@@ -96,22 +90,24 @@ codeunit 6059976 "NPR MPOS Report handler"
 
     local procedure GetXmlParameters(RecRef: RecordRef): Text
     var
-        XMLDOMMgt: Codeunit "XML DOM Management";
-        DataItemXmlNode: DotNet NPRNetXmlNode;
-        DataItemsXmlNode: DotNet NPRNetXmlNode;
-        XmlDoc: DotNet "NPRNetXmlDocument";
-        ReportParametersXmlNode: DotNet NPRNetXmlNode;
+        XmlDoc: XmlDocument;
+        XmlText: Text;
+        RootElement: XmlElement;
+        DataItemsNode: XmlElement;
+        DataItemNode: XmlElement;
     begin
-        XmlDoc := XmlDoc.XmlDocument;
+        XmlDocument.ReadFrom('<?xml version="1.0" encoding="utf-8" standalone="yes"?><ReportParameters />', XmlDoc);
+        XmlDoc.GetRoot(RootElement);
+        DataItemsNode := XmlElement.Create('DataItems');
+        RootElement.Add(DataItemsNode);
 
-        XMLDOMMgt.AddRootElement(XmlDoc, 'ReportParameters', ReportParametersXmlNode);
-        XMLDOMMgt.AddDeclaration(XmlDoc, '1.0', 'utf-8', 'yes');
+        DataItemNode := XmlElement.Create('DataItem', '', RecRef.GetView(false));
+        DataItemNode.SetAttribute('name', RecRef.Caption);
+        DataItemsNode.Add(DataItemNode);
 
-        XMLDOMMgt.AddElement(ReportParametersXmlNode, 'DataItems', '', '', DataItemsXmlNode);
-        XMLDOMMgt.AddElement(DataItemsXmlNode, 'DataItem', RecRef.GetView(false), '', DataItemXmlNode);
-        XMLDOMMgt.AddAttribute(DataItemXmlNode, 'name', RecRef.Caption);
+        XmlDoc.WriteTo(XmlText);
 
-        exit(XmlDoc.InnerXml);
+        exit(XmlText);
     end;
 
     local procedure BuildJSONParams(BaseAddress: Text; Endpoint: Text; PrintJob: Text; RequestType: Text; ErrorCaption: Text) JSON: Text
