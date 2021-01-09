@@ -1,20 +1,5 @@
 table 6150620 "NPR POS Period Register"
 {
-    // NPR5.29/AP /20170126 CASE 262628 Recreated ENU-captions
-    // NPR5.30/AP /20170209 CASE 261728 Renamed field "Store Code" -> "POS Store Code"
-    //                                  Renamed field "POS No." -> "POS Unit No."
-    // NPR5.32/AP /20172504 CASE 262628 Renamed table "POS Posting Register" -> "POS Ledger Register"
-    //                                  Renamed field "From Entry No." -> "Opening Entry No."
-    //                                  Renamed field "To Entry No." -> "Closing Entry No."
-    // NPR5.36/TSA/20170630 CASE 282251 Added field Status to capture the state if register entries within the open/close range
-    // NPR5.36/AP /20170717 CASE 262628 Renamed field "Entry No." -> "No."
-    // NPR5.36/BR /20170718 CASE 279552 Generate Document No. from No. Series
-    // NPR5.36/AP /20170725 CASE 279547 Added key POS Unit No.
-    // NPR5.37/BR /20171012 CASE 293227 Changed Compression option
-    // NPR5.38/BR /20171214 CASE 299888 Renamed from POS Ledger Register to POS Period Register (incl. Captions)
-    // NPR5.38/BR /20180125 CASE 302803 Get Posting Compression from POS Store
-    // NPR5.39/BR /20180214 CASE 295007 Added Fields "From External Source","External Source Name","External Source Entry No."
-
     Caption = 'POS Period Register';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR POS Period Register List";
@@ -38,12 +23,10 @@ table 6150620 "NPR POS Period Register"
             var
                 POSStore: Record "NPR POS Store";
             begin
-                //-NPR5.38 [302803]
                 if "POS Store Code" <> '' then begin
                     POSStore.Get("POS Store Code");
                     Validate("Posting Compression", POSStore."Posting Compression");
                 end;
-                //+NPR5.38 [302803]
             end;
         }
         field(3; "POS Unit No."; Code[10])
@@ -180,4 +163,3 @@ table 6150620 "NPR POS Period Register"
         end;
     end;
 }
-

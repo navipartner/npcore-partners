@@ -1,9 +1,5 @@
 table 6150635 "NPR POS Posting Log"
 {
-    // NPR5.36/BR  /20170718  CASE 279551 Object Created
-    // NPR5.36/BR  /20170814  CASE 277096 Added LookupPageID and DrillDownPageID
-    // NPR5.38/BR  /20180119  CASE 302791 Added field Posting Duration
-
     Caption = 'POS Posting Log';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR POS Posting Log";

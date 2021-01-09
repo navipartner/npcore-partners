@@ -1,8 +1,5 @@
 page 6150656 "NPR POS Payment Line List"
 {
-    // NPR5.36/BR  /20170810  CASE  277096 Object created
-    // NPR5.53/SARA/20191024 CASE 373672 Addde Action button POS Entry Card
-
     Caption = 'POS Payment Line List';
     Editable = false;
     PageType = List;

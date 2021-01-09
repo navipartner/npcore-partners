@@ -1,8 +1,5 @@
 page 6150658 "NPR POS Posting Log"
 {
-    // NPR5.36/BR  /20170814  CASE  277096 Object created
-    // NPR5.38/BR  /20180119  CASE 302791 Added field Posting Duration
-
     Caption = 'POS Posting Log';
     Editable = false;
     PageType = List;

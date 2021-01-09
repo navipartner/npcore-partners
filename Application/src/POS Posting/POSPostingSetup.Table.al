@@ -1,9 +1,5 @@
 table 6150618 "NPR POS Posting Setup"
 {
-    // NPR5.29/AP/20170126 CASE 262628 Recreated ENU-captions
-    // NPR5.36/BR/20170704 CASE 279551 Restructured recalculation functions
-    // NPR5.38/BR/20180123 CASE 302777 "POS Payment Method Code" and "POS Store Code" mandatory if "POS Payment Bin Code" is filled
-
     Caption = 'POS Posting Setup';
     DataClassification = CustomerContent;
 
@@ -108,22 +104,18 @@ table 6150618 "NPR POS Posting Setup"
 
     trigger OnInsert()
     begin
-        //-NPR5.38 [302777]
         if "POS Payment Bin Code" <> '' then begin
             TestField("POS Payment Method Code");
             TestField("POS Store Code");
         end;
-        //+NPR5.38 [302777]
     end;
 
     trigger OnRename()
     begin
-        //-NPR5.38 [302777]
         if "POS Payment Bin Code" <> '' then begin
             TestField("POS Payment Method Code");
             TestField("POS Store Code");
         end;
-        //+NPR5.38 [302777]
     end;
 }
 

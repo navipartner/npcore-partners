@@ -1,8 +1,5 @@
 table 6150649 "NPR POS Entity Group"
 {
-    // NPR5.31/AP/20170418  CASE 272321  New table for multi-purpose grouping of POS Entities like POS Store, POS Unit, POS Payment Method etc.
-    //                                   Grouping may be for either functional (e.g. POS Layout grouping) or for BI/Reporting purpose.
-
     Caption = 'POS Entity Group';
     DataClassification = CustomerContent;
     LookupPageID = "NPR POS Entity Groups";

@@ -1,13 +1,5 @@
 page 6150650 "NPR POS Entries"
 {
-    // NPR5.36/NPKNAV/20171003  CASE 262628-04 Transport NPR5.36 - 3 October 2017
-    // NPR5.37/NPKNAV/20171030  CASE 294294 Transport NPR5.37 - 27 October 2017
-    // NPR5.38/BR  /20180115  CASE 302311 Added warning if Posting is switched off
-    // NPR5.39/BR  /20180212  CASE 302687 Added 'Print' Group Promoted Actions for Major Tom use
-    // NPR5.40/TSA /20180308  CASE 307267 Refactored print for balancing
-    // NPR5.46/MMV /20181001 CASE 290734 EFT Framework refactoring
-    // NPR5.53/SARA/20191024 CASE 373672 Add Post and Post Range actions
-
     Caption = 'POS Entries';
     Editable = false;
     PageType = List;
@@ -41,10 +33,8 @@ page 6150650 "NPR POS Entries"
 
                 trigger OnAssistEdit()
                 begin
-                    //-NPR5.38 [301600]
                     PAGE.Run(PAGE::"NPR Audit Roll");
                     CurrPage.Close;
-                    //+NPR5.38 [301600]
                 end;
             }
             repeater(Group)
@@ -218,7 +208,6 @@ page 6150650 "NPR POS Entries"
                     POSPostEntries: Codeunit "NPR POS Post Entries";
                     POSEntryToPost: Record "NPR POS Entry";
                 begin
-                    //-NPR5.53 [373672]
                     POSEntryToPost.SetRange("Entry No.", "Entry No.");
                     if Rec."Post Item Entry Status" < "Post Item Entry Status"::Posted then
                         POSPostEntries.SetPostItemEntries(true);
@@ -228,7 +217,6 @@ page 6150650 "NPR POS Entries"
                     POSPostEntries.SetPostCompressed(false);
                     POSPostEntries.Run(POSEntryToPost);
                     CurrPage.Update(false);
-                    //+NPR5.53 [373672]
                 end;
             }
             action("Post Range")
@@ -249,7 +237,6 @@ page 6150650 "NPR POS Entries"
                     ItemPosting: Boolean;
                     POSPosting: Boolean;
                 begin
-                    //-NPR5.53 [373672]
                     ItemPosting := Confirm(TextPostItemEntries);
                     POSPosting := Confirm(TextPostPosEntries);
 
@@ -297,7 +284,6 @@ page 6150650 "NPR POS Entries"
                     end;
 
                     CurrPage.Update(false);
-                    //+NPR5.53 [373672]
                 end;
             }
             group(Print)
@@ -320,7 +306,6 @@ page 6150650 "NPR POS Entries"
                         ReportSelectionRetail: Record "NPR Report Selection Retail";
                         RecRef: RecordRef;
                     begin
-                        //-NPR5.39 [302687]
                         RecRef.GetTable(Rec);
                         RetailReportSelectionMgt.SetRegisterNo("POS Unit No.");
                         case "Entry Type" of
@@ -329,7 +314,6 @@ page 6150650 "NPR POS Entries"
                             "Entry Type"::"Credit Sale":
                                 RetailReportSelectionMgt.RunObjects(RecRef, ReportSelectionRetail."Report Type"::"Sales Doc. Confirmation (POS Entry)");
                         end;
-                        //+NPR5.39 [302687]
                     end;
                 }
                 action("Large Sales Receipt")
@@ -348,12 +332,10 @@ page 6150650 "NPR POS Entries"
                         ReportSelectionRetail: Record "NPR Report Selection Retail";
                         RecRef: RecordRef;
                     begin
-                        //-NPR5.39 [302687]
                         RecRef.GetTable(Rec);
                         RetailReportSelectionMgt.SetRegisterNo("POS Unit No.");
                         if "Entry Type" = "Entry Type"::"Direct Sale" then
                             RetailReportSelectionMgt.RunObjects(RecRef, ReportSelectionRetail."Report Type"::"Large Sales Receipt (POS Entry)");
-                        //+NPR5.39 [302687]
                     end;
                 }
                 action("Balancing ")
@@ -373,7 +355,6 @@ page 6150650 "NPR POS Entries"
                         ReportSelectionRetail: Record "NPR Report Selection Retail";
                         RecRef: RecordRef;
                     begin
-                        //-NPR5.46 [307267]
                         TestField("Entry Type", "Entry Type"::Balancing);
 
                         POSWorkshiftCheckpoint.SetFilter("POS Entry No.", '=%1', "Entry No.");
@@ -382,7 +363,6 @@ page 6150650 "NPR POS Entries"
 
                         RetailReportSelectionMgt.SetRegisterNo("POS Unit No.");
                         RetailReportSelectionMgt.RunObjects(RecRef, ReportSelectionRetail."Report Type"::"Balancing (POS Entry)");
-                        //+NPR5.46 [307267]
                     end;
                 }
                 action("EFT Receipt")
@@ -399,29 +379,12 @@ page 6150650 "NPR POS Entries"
                     var
                         EFTTransactionRequest: Record "NPR EFT Transaction Request";
                     begin
-                        //-NPR5.46 [290734]
-                        //-NPR5.39 [302687]
-                        // CreditCardTransaction.RESET;
-                        // CreditCardTransaction.SETCURRENTKEY("Register No.","Sales Ticket No.",Type);
-                        // CreditCardTransaction.FILTERGROUP := 2;
-                        // CreditCardTransaction.SETRANGE("Register No.","POS Unit No.");
-                        // CreditCardTransaction.SETRANGE("Sales Ticket No.","Document No.");
-                        // CreditCardTransaction.SETRANGE(Type,0);
-                        //
-                        // CreditCardTransaction.FILTERGROUP := 0;
-                        // IF CreditCardTransaction.FIND('-') THEN
-                        //  CreditCardTransaction.PrintTerminalReceipt(FALSE)
-                        // ELSE
-                        //  MESSAGE(Text10600006,"Document No.","POS Unit No.");
-                        //+NPR5.39[302687]
-
                         EFTTransactionRequest.SetRange("Sales Ticket No.", "Document No.");
                         EFTTransactionRequest.SetRange("Register No.", "POS Unit No.");
                         if EFTTransactionRequest.FindSet then
                             repeat
                                 EFTTransactionRequest.PrintReceipts(true);
                             until EFTTransactionRequest.Next = 0;
-                        //+NPR5.46 [290734]
                     end;
                 }
                 action("Print Log")
@@ -441,10 +404,8 @@ page 6150650 "NPR POS Entries"
     var
         NPRetailSetup: Record "NPR NP Retail Setup";
     begin
-        //-NPR5.38 [301600]
         if NPRetailSetup.Get then
             AdvancedPostingOff := (not NPRetailSetup."Advanced Posting Activated");
-        //+NPR5.38 [301600]
     end;
 
     var

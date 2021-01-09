@@ -1,9 +1,5 @@
 table 6150629 "NPR POS Tax Amount Line"
 {
-    // NPR5.36/NPKNAV/20171003  CASE 279552 Transport NPR5.36 - 3 October 2017
-    // NPR5.48/BHR /20190122 CASE 341968 Increase length of field 10030 from text30 to text 50
-    // NPR5.53/SARA/20191024 CASE 373672 Added Page 'POS Tax Line List' as LookupPageID + Added Field 600..620
-
     Caption = 'POS Tax Amount Line';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR POS Tax Line List";
@@ -128,15 +124,6 @@ table 6150629 "NPR POS Tax Amount Line"
         {
             Caption = 'Tax Amount';
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            begin
-                // TESTFIELD("Tax %");
-                // TESTFIELD("Tax Base Amount");
-                // IF "Tax Amount" / "Tax Base Amount" < 0 THEN
-                //  ERROR(Text002,FIELDCAPTION("Tax Amount"));
-                // "Tax Difference" := "Tax Difference" + "Tax Amount" - xRec."Tax Amount";
-            end;
         }
         field(34; "Amount Including Tax"; Decimal)
         {
@@ -154,7 +141,7 @@ table 6150629 "NPR POS Tax Amount Line"
         }
         field(600; "Entry Date"; Date)
         {
-            CalcFormula = Lookup ("NPR POS Entry"."Entry Date" WHERE("Entry No." = FIELD("POS Entry No.")));
+            CalcFormula = Lookup("NPR POS Entry"."Entry Date" WHERE("Entry No." = FIELD("POS Entry No.")));
             Caption = 'Entry Date';
             Description = 'NPR5.53';
             Editable = false;
@@ -162,7 +149,7 @@ table 6150629 "NPR POS Tax Amount Line"
         }
         field(610; "Starting Time"; Time)
         {
-            CalcFormula = Lookup ("NPR POS Entry"."Starting Time" WHERE("Entry No." = FIELD("POS Entry No.")));
+            CalcFormula = Lookup("NPR POS Entry"."Starting Time" WHERE("Entry No." = FIELD("POS Entry No.")));
             Caption = 'Starting Time';
             Description = 'NPR5.53';
             Editable = false;
@@ -170,7 +157,7 @@ table 6150629 "NPR POS Tax Amount Line"
         }
         field(620; "Ending Time"; Time)
         {
-            CalcFormula = Lookup ("NPR POS Entry"."Ending Time" WHERE("Entry No." = FIELD("POS Entry No.")));
+            CalcFormula = Lookup("NPR POS Entry"."Ending Time" WHERE("Entry No." = FIELD("POS Entry No.")));
             Caption = 'Ending Time';
             Description = 'NPR5.53';
             Editable = false;

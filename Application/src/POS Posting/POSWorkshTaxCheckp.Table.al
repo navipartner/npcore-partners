@@ -1,11 +1,5 @@
 table 6150630 "NPR POS Worksh. Tax Checkp."
 {
-    // NPR5.40/TSA /20180227 CASE 282251 Initial Version
-    // NPR5.48/JDH /20181109 CASE 334163 Added captions to fields and object
-    // NPR5.49/TSA /20190315 CASE 348458 Added "Consolidated With Entry No."
-    // NPR5.55/TSA /20200511 CASE 401889 Added Tax Jurisdiction Code, Tax Group Code
-    // NPR5.55/JAKUBV/20200807  CASE 400098 Transport NPR5.55 - 31 July 2020
-
     Caption = 'POS Workshift Tax Checkpoint';
     DataClassification = CustomerContent;
 
@@ -78,15 +72,6 @@ table 6150630 "NPR POS Worksh. Tax Checkp."
         {
             Caption = 'Tax Amount';
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            begin
-                // TESTFIELD("Tax %");
-                // TESTFIELD("Tax Base Amount");
-                // IF "Tax Amount" / "Tax Base Amount" < 0 THEN
-                //  ERROR(Text002,FIELDCAPTION("Tax Amount"));
-                // "Tax Difference" := "Tax Difference" + "Tax Amount" - xRec."Tax Amount";
-            end;
         }
         field(34; "Amount Including Tax"; Decimal)
         {

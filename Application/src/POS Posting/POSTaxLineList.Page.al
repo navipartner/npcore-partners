@@ -1,7 +1,5 @@
 page 6150676 "NPR POS Tax Line List"
 {
-    // NPR5.53/SARA/20191024 CASE 373672 Object create
-
     Caption = 'POS Tax Line List';
     Editable = false;
     PageType = List;

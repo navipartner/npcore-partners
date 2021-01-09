@@ -1,55 +1,5 @@
 page 6150652 "NPR POS Entry List"
 {
-    // NPR5.36/BR  /20170808  CASE 277096 Object created
-    // NPR5.37/BR  /20171011  CASE 293133 Compare with Audit Roll
-    // NPR5.37/BR  /20171024  CASE 294294 Added Navigate Action
-    // NPR5.37/BR  /20171024  CASE 294311 Changed sorting and always go to last transaction OnOpenPage
-    // NPR5.37/BR  /20171024  CASE 294362 Added Entry Type option Debitsale, added fields Sales Document Type, Sales Document No.
-    // NPR5.38/BR  /20171108  CASE 294747 Added Action ShowDimensions
-    // NPR5.38/BR  /20171127  CASE 297087 Added Field System Entry
-    // NPR5.38/BR  /20180105  CASE 285957 Added Confirmation to posting item and POS entries
-    // NPR5.38/BR  /20180115  CASE 302311 Added warning if Posting is switched off
-    // NPR5.38/BR  /20180118  CASE 302685 Added links to Credit Card and EFT Transactions
-    // NPR5.38/BR  /20180119  CASE 302818 Added field Reason Code ( Visible = False);
-    // NPR5.38/BR  /20180122  CASE 302690 Added Action Sales Document
-    // NPR5.38/BR  /20180122  CASE 302809 POS Posting Log - OnAction()
-    // NPR5.38/BR  /20180123  CASE 302809 Added Global Dimension 1 + 2, Non-visible
-    // NPR5.38/BR  /20180123  CASE 302813 Added Tax fields, Non-visible
-    // NPR5.38/BR  /20180123  CASE 302815 Added field Salesperson Code
-    // NPR5.38/TSA /20180122  CASE 302690 Added Action Balancing Line
-    // NPR5.38/BR  /20180124  CASE 302764 Added Voucher Actions to RelatedInformation
-    // NPR5.39/BR  /20180129  CASE 302696 Added POS Entry Factbox, set filter System Entries = No
-    // NPR5.39/MMV /20180207  CASE 304165 Added print actions
-    // NPR5.39/BR  /20180208  CASE 304165 Added link to print log
-    // NPR5.39/BR  /20180215  CASE 305016 Added Fiscal No., Enabled if Active
-    // NPR5.40/MMV /20180306  CASE 284505 Filter before print
-    // NPR5.40/TSA /20180308  CASE 307267 Printing of balancing
-    // NPR5.40/THRO/20180314  CASE 304312 Added Action SendSMS
-    // NPR5.40/JLK /20180315  CASE 307437 Added Action Entry Overview
-    // NPR5.40/MMV /20180319  CASE 308457 Updated fiscal condition
-    // NPR5.40/MMV /20180328  CASE 276562 Unified print actions. Removed deprecated credit card action.
-    // NPR5.41/THRO/20180424  CASE 312185 Added action POS Info
-    // NPR5.42/TS  /20180511  CASE 312186 Added Action POS Info Audit Roll
-    // NPR5.42/ZESO/20180517  CASE 312186 Print Entry Large - OnAction()
-    // NPR5.46/TS  /20180918  CASE 302770 Added Action Group PDF2NAV on POSEntry List
-    // NPR5.46/MMV /20181001 CASE 290734 EFT Framework refactoring
-    // NPR5.48/MMV /20181026 CASE 318028 French certification
-    // NPR5.48/TS  /20181206 CASE 338656 Added Missing Picture to Action
-    // NPR5.50/MMV /20190328 CASE 300557 Refactored sales doc. handling
-    // NPR5.50/TSA /20190424 CASE 352319 Added navigation to workshifts
-    // NPR5.51/TSA /20190623 CASE 359403 Refactored Post Range action
-    // NPR5.51/TSA /20190624 CASE 359508 Changed navigate to consider the period document no
-    // NPR5.53/SARA/20191024 CASE 373672 Refactore POS Entry List
-    // NPR5.53/SARA/20200124 CASE 387227 Move Navigate action to Navigate Ribbon
-    // NPR5.53/SARA/20200129 CASE 387885 Apply 'Entry Type' is NOT "Cancelled" as default filter
-    // NPR5.53/SARA/20200205 CASE 389242 Remove shortcut 'POS Info Audit Roll'
-    // NPR5.54/SARA/20200218 CASE 391360 Remove Shortcut 'POS Audit Log'
-    // NPR5.54/SARA/20200228 CASE 393492 Remove Delete button
-    // NPR5.55/SARA/20200511 CASE 401547 Add shortcut 'POS Period Register List'
-    // NPR5.55/YAHA/20200218 CASE 391361 Remove groupaction EFT.
-    // NPR5.55/MMV /20200623 CASE 391360 Re-actived action 'POS Audit Log'.
-    // NPR5.55/SARA/20200706 CASE 412905 Related Sales Document Button: Filter only by Entry No.
-
     Caption = 'POS Entry List';
     CardPageID = "NPR POS Entry Card";
     DeleteAllowed = false;
@@ -88,10 +38,8 @@ page 6150652 "NPR POS Entry List"
 
                 trigger OnAssistEdit()
                 begin
-                    //-NPR5.38 [301600]
                     PAGE.Run(PAGE::"NPR Audit Roll");
                     CurrPage.Close;
-                    //+NPR5.38 [301600]
                 end;
             }
             repeater(Group)
@@ -195,12 +143,10 @@ page 6150652 "NPR POS Entry List"
                         POSEntrySalesDocLink: Record "NPR POS Entry Sales Doc. Link";
                         RecordVariant: Variant;
                     begin
-                        //-NPR5.50 [300557]
                         if TryGetLastOpenSalesDoc(POSEntrySalesDocLink) then begin
                             POSEntrySalesDocLink.GetDocumentRecord(RecordVariant);
                             PAGE.RunModal(POSEntrySalesDocLink.GetCardpageID(), RecordVariant);
                         end;
-                        //+NPR5.50 [300557]
                     end;
                 }
                 field(LastPostedSalesDocumentNo; LastPostedSalesDocumentNo)
@@ -215,12 +161,10 @@ page 6150652 "NPR POS Entry List"
                         POSEntrySalesDocLink: Record "NPR POS Entry Sales Doc. Link";
                         RecordVariant: Variant;
                     begin
-                        //-NPR5.50 [300557]
                         if TryGetLastPostedSalesDoc(POSEntrySalesDocLink) then begin
                             POSEntrySalesDocLink.GetDocumentRecord(RecordVariant);
                             PAGE.RunModal(POSEntrySalesDocLink.GetCardpageID(), RecordVariant);
                         end;
-                        //+NPR5.50 [300557]
                     end;
                 }
                 field("No. of Print Output Entries"; "No. of Print Output Entries")
@@ -423,9 +367,7 @@ page 6150652 "NPR POS Entry List"
 
                 trigger OnAction()
                 begin
-                    //-NPR5.38 [294717]
                     ShowDimensions;
-                    //+NPR5.38 [294717]
                 end;
             }
             action("Sales Document")
@@ -440,10 +382,8 @@ page 6150652 "NPR POS Entry List"
                 var
                     POSEntryManagement: Codeunit "NPR POS Entry Management";
                 begin
-                    //-NPR5.38 [302690]
                     if not POSEntryManagement.ShowSalesDocument(Rec) then
                         Error(TextSalesDocNotFound, "Sales Document Type", "Sales Document No.");
-                    //+NPR5.38 [302690]
                 end;
             }
             action("POS Info POS Entry")
@@ -477,9 +417,7 @@ page 6150652 "NPR POS Entry List"
                 var
                     POSAuditLogMgt: Codeunit "NPR POS Audit Log Mgt.";
                 begin
-                    //-NPR5.48 [318028]
                     POSAuditLogMgt.ShowAuditLogForPOSEntry(Rec);
-                    //+NPR5.48 [318028]
                 end;
             }
             action("Related Sales Documents")
@@ -493,14 +431,8 @@ page 6150652 "NPR POS Entry List"
                 var
                     POSEntrySalesDocLink: Record "NPR POS Entry Sales Doc. Link";
                 begin
-                    //-NPR5.50 [300557]
                     POSEntrySalesDocLink.SetRange("POS Entry No.", "Entry No.");
-                    //-NPR5.55 [412905]
-                    //POSEntrySalesDocLink.SETRANGE("POS Entry Reference Type", POSEntrySalesDocLink."POS Entry Reference Type"::HEADER);
-                    //POSEntrySalesDocLink.SETRANGE("POS Entry Reference Line No.", 0);
-                    //+NPR5.55 [412905]
                     PAGE.RunModal(PAGE::"NPR POS Entry Rel. Sales Doc.", POSEntrySalesDocLink);
-                    //+NPR5.50 [300557]
                 end;
             }
             action(Workshift)
@@ -512,10 +444,7 @@ page 6150652 "NPR POS Entry List"
 
                 trigger OnAction()
                 begin
-
-                    //-NPR5.50 [345376]
                     ShowWorkshift(Rec);
-                    //+NPR5.50 [345376]
                 end;
             }
             action("EFT Transaction Requests")
@@ -601,10 +530,8 @@ page 6150652 "NPR POS Entry List"
                         var
                             TaxFree: Codeunit "NPR Tax Free Handler Mgt.";
                         begin
-                            //-NPR5.39 [304165]
                             if "Entry Type" = "Entry Type"::"Direct Sale" then
                                 TaxFree.VoucherIssueFromPOSSale("Document No.");
-                            //+NPR5.39 [304165]
                         end;
                     }
                     action(IssuedTaxFreeVouchers)
@@ -791,10 +718,6 @@ page 6150652 "NPR POS Entry List"
                         POSPeriodRegister: Record "NPR POS Period Register";
                         Navigate: Page Navigate;
                     begin
-                        //-NPR5.51 [359508]
-                        // Navigate.SetDoc("Posting Date","Document No.");
-                        // Navigate.RUN;
-
                         Navigate.SetDoc("Posting Date", "Document No.");
                         if ("Entry Type" <> "Entry Type"::Balancing) then
                             if (POSPeriodRegister.Get("POS Period Register No.")) then
@@ -802,7 +725,6 @@ page 6150652 "NPR POS Entry List"
                                     Navigate.SetDoc("Posting Date", POSPeriodRegister."Document No.");
 
                         Navigate.Run;
-                        //+NPR5.51 [359508]
                     end;
                 }
             }
@@ -853,19 +775,6 @@ page 6150652 "NPR POS Entry List"
                     ItemPosting: Boolean;
                     POSPosting: Boolean;
                 begin
-
-                    //-NPR5.51 [359403]
-                    // POSEntryToPost.COPYFILTERS(Rec);
-                    // //-NPR5.38 [285957]
-                    // //POSPostEntries.SetPostItemEntries(TRUE);
-                    // //POSPostEntries.SetPostPOSEntries(TRUE);
-                    // POSPostEntries.SetPostItemEntries(CONFIRM(TextPostItemEntries));
-                    // POSPostEntries.SetPostPOSEntries(CONFIRM(TextPostPosEntries));
-                    // //+NPR5.38 [285957]
-                    // POSPostEntries.SetStopOnError(TRUE);
-                    // POSPostEntries.SetPostCompressed(CONFIRM(TextPostCompressed));
-                    // POSPostEntries.RUN(POSEntryToPost);
-
                     ItemPosting := Confirm(TextPostItemEntries);
                     POSPosting := Confirm(TextPostPosEntries);
 
@@ -911,8 +820,6 @@ page 6150652 "NPR POS Entry List"
 
                         until (ErrorDuringPosting or POSEntryToPost.IsEmpty());
                     end;
-                    //+NPR5.51 [359403]
-
                     CurrPage.Update(false);
                 end;
             }
@@ -954,12 +861,8 @@ page 6150652 "NPR POS Entry List"
                     POSPostEntries: Codeunit "NPR POS Post Entries";
                 begin
                     POSEntryToPost.CopyFilters(Rec);
-                    //-NPR5.38 [285957]
-                    //POSPostEntries.SetPostItemEntries(TRUE);
-                    //POSPostEntries.SetPostPOSEntries(TRUE);
                     POSPostEntries.SetPostItemEntries(Confirm(TextPostItemEntries));
                     POSPostEntries.SetPostPOSEntries(Confirm(TextPostPosEntries));
-                    //+NPR5.38 [285957]
                     POSPostEntries.SetStopOnError(true);
                     POSPostEntries.SetPostCompressed(Confirm(TextPostCompressed));
                     POSPostEntries.Preview(POSEntryToPost);
@@ -979,7 +882,6 @@ page 6150652 "NPR POS Entry List"
                     POSEntryToPost: Record "NPR POS Entry";
                     POSPostEntries: Codeunit "NPR POS Post Entries";
                 begin
-                    //-NPR5.37 [293133]
                     POSEntryToPost.SetRange("Entry No.", "Entry No.");
                     if Rec."Post Item Entry Status" < "Post Item Entry Status"::Posted then
                         POSPostEntries.SetPostItemEntries(true);
@@ -989,7 +891,6 @@ page 6150652 "NPR POS Entry List"
                     POSPostEntries.SetPostCompressed(false);
                     POSPostEntries.CompareToAuditRoll(POSEntryToPost);
                     CurrPage.Update(false);
-                    //+NPR5.37 [293133]
                 end;
             }
             action(Action6014435)
@@ -1008,10 +909,6 @@ page 6150652 "NPR POS Entry List"
                     POSPeriodRegister: Record "NPR POS Period Register";
                     Navigate: Page Navigate;
                 begin
-                    //-NPR5.51 [359508]
-                    // Navigate.SetDoc("Posting Date","Document No.");
-                    // Navigate.RUN;
-
                     Navigate.SetDoc("Posting Date", "Document No.");
                     if ("Entry Type" <> "Entry Type"::Balancing) then
                         if (POSPeriodRegister.Get("POS Period Register No.")) then
@@ -1019,7 +916,6 @@ page 6150652 "NPR POS Entry List"
                                 Navigate.SetDoc("Posting Date", POSPeriodRegister."Document No.");
 
                     Navigate.Run;
-                    //+NPR5.51 [359508]
                 end;
             }
             group(Print)
@@ -1040,25 +936,7 @@ page 6150652 "NPR POS Entry List"
                     var
                         POSEntryManagement: Codeunit "NPR POS Entry Management";
                     begin
-                        //-NPR5.48 [318028]
-                        // POSEntry := Rec;
-                        // POSEntry.SETRECFILTER;
-                        //
-                        // RecRef.GETTABLE(POSEntry);
-                        // RetailReportSelectionMgt.SetRegisterNo("POS Unit No.");
-                        // CASE "Entry Type" OF
-                        //  "Entry Type"::"Direct Sale" : RetailReportSelectionMgt.RunObjects(RecRef, ReportSelectionRetail."Report Type"::"Sales Receipt (POS Entry)");
-                        //  "Entry Type"::"Credit Sale" : RetailReportSelectionMgt.RunObjects(RecRef, ReportSelectionRetail."Report Type"::"Sales Doc. Confirmation (POS Entry)");
-                        //  "Entry Type"::Balancing :
-                        //    BEGIN
-                        //      POSWorkshiftCheckpoint.SETFILTER ("POS Entry No.", '=%1', "Entry No.");
-                        //      POSWorkshiftCheckpoint.FINDFIRST ();
-                        //      RecRef.GETTABLE(POSWorkshiftCheckpoint);
-                        //      RetailReportSelectionMgt.RunObjects(RecRef, ReportSelectionRetail."Report Type"::"Balancing (POS Entry)");
-                        //    END;
-                        // END;
                         POSEntryManagement.PrintEntry(Rec, false);
-                        //+NPR5.48 [318028]
                     end;
                 }
                 action("Print Entry Large")
@@ -1075,27 +953,7 @@ page 6150652 "NPR POS Entry List"
                     var
                         POSEntryManagement: Codeunit "NPR POS Entry Management";
                     begin
-                        //-NPR5.48 [318028]
-                        // POSEntry := Rec;
-                        // POSEntry.SETRECFILTER;
-                        //
-                        // RecRef.GETTABLE(POSEntry);
-                        // RetailReportSelectionMgt.SetRegisterNo("POS Unit No.");
-                        //
-                        // CASE "Entry Type" OF
-                        //  "Entry Type"::"Direct Sale" :RetailReportSelectionMgt.RunObjects(RecRef, ReportSelectionRetail."Report Type"::"Large Sales Receipt (POS Entry)");
-                        //
-                        //  "Entry Type"::Balancing :
-                        //  BEGIN
-                        //    POSWorkshiftCheckpoint.SETFILTER ("POS Entry No.", '=%1', "Entry No.");
-                        //    POSWorkshiftCheckpoint.FINDFIRST ();
-                        //    RecRef.GETTABLE(POSWorkshiftCheckpoint);
-                        //    RetailReportSelectionMgt.SetRequestWindow(TRUE);
-                        //    RetailReportSelectionMgt.RunObjects(RecRef, ReportSelectionRetail."Report Type"::"Large Balancing (POS Entry)");
-                        //  END;
-                        // END;
                         POSEntryManagement.PrintEntry(Rec, true);
-                        //+NPR5.48 [318028]
                     end;
                 }
                 action("EFT Receipt")
@@ -1112,29 +970,12 @@ page 6150652 "NPR POS Entry List"
                     var
                         EFTTransactionRequest: Record "NPR EFT Transaction Request";
                     begin
-                        //-NPR5.46 [290734]
-                        //-NPR5.38 [294717]
-                        // CreditCardTransaction.RESET;
-                        // CreditCardTransaction.SETCURRENTKEY("Register No.","Sales Ticket No.",Type);
-                        // CreditCardTransaction.FILTERGROUP := 2;
-                        // CreditCardTransaction.SETRANGE("Register No.","POS Unit No.");
-                        // CreditCardTransaction.SETRANGE("Sales Ticket No.","Document No.");
-                        // CreditCardTransaction.SETRANGE(Type,0);
-                        //
-                        // CreditCardTransaction.FILTERGROUP := 0;
-                        // IF CreditCardTransaction.FIND('-') THEN
-                        //  CreditCardTransaction.PrintTerminalReceipt(FALSE)
-                        // ELSE
-                        //  MESSAGE(Text10600006,"Document No.","POS Unit No.");
-                        //+NPR5.38 [294717]
-
                         EFTTransactionRequest.SetRange("Sales Ticket No.", "Document No.");
                         EFTTransactionRequest.SetRange("Register No.", "POS Unit No.");
                         if EFTTransactionRequest.FindSet then
                             repeat
                                 EFTTransactionRequest.PrintReceipts(true);
                             until EFTTransactionRequest.Next = 0;
-                        //+NPR5.46 [290734]
                     end;
                 }
                 action("Print Log")
@@ -1152,18 +993,14 @@ page 6150652 "NPR POS Entry List"
                     Image = PrintCheck;
                     ApplicationArea = All;
                     ToolTip = 'Executes the Entry Overview action';
-                    //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                    //PromotedCategory = "Report";
 
                     trigger OnAction()
                     var
                         POSEntry: Record "NPR POS Entry";
                     begin
-                        //-NPR5.40
                         Clear(POSEntry);
                         POSEntry.SetRange("POS Store Code", Rec."POS Store Code");
                         REPORT.Run(REPORT::"NPR Posting Overview POS", true, true, POSEntry);
-                        //+NPR5.40
                     end;
                 }
             }
@@ -1204,7 +1041,6 @@ page 6150652 "NPR POS Entry List"
     var
         POSEntrySalesDocLink: Record "NPR POS Entry Sales Doc. Link";
     begin
-        //-NPR5.50 [300557]
         LastOpenSalesDocumentNo := '';
         if TryGetLastOpenSalesDoc(POSEntrySalesDocLink) then
             LastOpenSalesDocumentNo := POSEntrySalesDocLink."Sales Document No";
@@ -1213,7 +1049,6 @@ page 6150652 "NPR POS Entry List"
         LastPostedSalesDocumentNo := '';
         if TryGetLastPostedSalesDoc(POSEntrySalesDocLink) then
             LastPostedSalesDocumentNo := POSEntrySalesDocLink."Sales Document No";
-        //+NPR5.50 [300557]
     end;
 
     trigger OnOpenPage()
@@ -1223,15 +1058,10 @@ page 6150652 "NPR POS Entry List"
         NPRetailSetup.Get;
         TestMode := (NPRetailSetup."Environment Type" in [NPRetailSetup."Environment Type"::DEV, NPRetailSetup."Environment Type"::TEST]);
         AdvancedPostingOff := (not NPRetailSetup."Advanced Posting Activated");
-        //-NPR5.48 [318028]
-        //FiscalNoSet := (NPRetailSetup."Sale Fiscal No. Series" <> '') OR (NPRetailSetup."Balancing Fiscal No. Series" <> '');
-        //+NPR5.48 [318028]
 
         SetRange("System Entry", false);
-        //-NPR5.53 [387885]
         if GetFilter("Entry Type") = '' then
             SetFilter("Entry Type", '<>%1', "Entry Type"::"Cancelled Sale");
-        //+NPR5.53 [387885]
         if FindFirst then;
     end;
 
@@ -1250,38 +1080,32 @@ page 6150652 "NPR POS Entry List"
 
     local procedure TryGetLastOpenSalesDoc(var POSEntrySalesDocLinkOut: Record "NPR POS Entry Sales Doc. Link"): Boolean
     begin
-        //-NPR5.50 [300557]
         POSEntrySalesDocLinkOut.SetRange("POS Entry No.", "Entry No.");
         POSEntrySalesDocLinkOut.SetRange("POS Entry Reference Type", POSEntrySalesDocLinkOut."POS Entry Reference Type"::HEADER);
         POSEntrySalesDocLinkOut.SetRange("POS Entry Reference Line No.", 0);
         POSEntrySalesDocLinkOut.SetFilter("Sales Document Type", '%1|%2|%3|%4',
-                                          POSEntrySalesDocLinkOut."Sales Document Type"::INVOICE,
-                                          POSEntrySalesDocLinkOut."Sales Document Type"::ORDER,
-                                          POSEntrySalesDocLinkOut."Sales Document Type"::CREDIT_MEMO,
-                                          POSEntrySalesDocLinkOut."Sales Document Type"::RETURN_ORDER);
+            POSEntrySalesDocLinkOut."Sales Document Type"::INVOICE,
+            POSEntrySalesDocLinkOut."Sales Document Type"::ORDER,
+            POSEntrySalesDocLinkOut."Sales Document Type"::CREDIT_MEMO,
+            POSEntrySalesDocLinkOut."Sales Document Type"::RETURN_ORDER);
         exit(POSEntrySalesDocLinkOut.FindLast);
-        //+NPR5.50 [300557]
     end;
 
     local procedure TryGetLastPostedSalesDoc(var POSEntrySalesDocLinkOut: Record "NPR POS Entry Sales Doc. Link"): Boolean
     begin
-        //-NPR5.50 [300557]
         POSEntrySalesDocLinkOut.SetRange("POS Entry No.", "Entry No.");
         POSEntrySalesDocLinkOut.SetRange("POS Entry Reference Type", POSEntrySalesDocLinkOut."POS Entry Reference Type"::HEADER);
         POSEntrySalesDocLinkOut.SetRange("POS Entry Reference Line No.", 0);
         POSEntrySalesDocLinkOut.SetFilter("Sales Document Type", '%1|%2',
-                                          POSEntrySalesDocLinkOut."Sales Document Type"::POSTED_INVOICE,
-                                          POSEntrySalesDocLinkOut."Sales Document Type"::POSTED_CREDIT_MEMO);
+            POSEntrySalesDocLinkOut."Sales Document Type"::POSTED_INVOICE,
+            POSEntrySalesDocLinkOut."Sales Document Type"::POSTED_CREDIT_MEMO);
         exit(POSEntrySalesDocLinkOut.FindLast);
-        //+NPR5.50 [300557]
     end;
 
     local procedure ShowWorkshift(POSEntry: Record "NPR POS Entry")
     var
         POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint";
     begin
-
-        //-NPR5.50 [352319]
         if (POSEntry."Entry No." <> 0) then begin
             POSWorkshiftCheckpoint.SetFilter("POS Entry No.", '=%1', POSEntry."Entry No.");
             if (POSWorkshiftCheckpoint.FindLast()) then begin
@@ -1299,7 +1123,6 @@ page 6150652 "NPR POS Entry List"
             POSWorkshiftCheckpoint.SetFilter(Type, '=%1', POSWorkshiftCheckpoint.Type::ZREPORT);
             PAGE.Run(PAGE::"NPR POS Workshift Checkpoints", POSWorkshiftCheckpoint);
         end;
-        //+NPR5.50 [352319]
     end;
 }
 

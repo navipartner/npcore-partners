@@ -1,12 +1,5 @@
 table 6150616 "NPR POS Payment Method"
 {
-    // NPR5.29/AP  /20170126  CASE 261728 Recreated ENU-captions
-    // NPR5.36/BR  /20170925  CASE 289641 Delete related records
-    // NPR5.38/BR  /20171024  CASE 294311 Set TableRelation Currency Code
-    // NPR5.38/BR  /20171109  CASE 294722 Added field Condensed Posting Description
-    // NPR5.46/TSA /20181002 CASE 322769 Added option "Auto" for field "Include In Counting" and field "Bin for Auto-Count"
-    // NPR5.47/TSA /20181018 CASE 322769 Changed name on "Auto" option and field to Virtual, add lookup filter to only virtual bins
-
     Caption = 'POS Payment Method';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR POS Payment Method List";
@@ -118,10 +111,8 @@ table 6150616 "NPR POS Payment Method"
     var
         POSPostingSetup: Record "NPR POS Posting Setup";
     begin
-        //-NPR5.36 [289641]
         POSPostingSetup.SetRange("POS Payment Method Code", Code);
         POSPostingSetup.DeleteAll(true);
-        //+NPR5.36 [289641]
     end;
 }
 

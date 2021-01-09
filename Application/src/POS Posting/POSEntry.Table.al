@@ -1,37 +1,5 @@
 table 6150621 "NPR POS Entry"
 {
-    // NPR5.29/AP/20170126 CASE 262628 Recreated ENU-captions
-    // NPR5.30/AP/20170209 CASE 261728 Renamed field "Store Code" -> "POS Store Code"
-    // NPR5.32/AP/20170220 CASE 262628 Renamed field "Receipt No." -> "Document No."
-    // NPR5.36/BR/20170609 CASE 279551 Added fields for Item Ledger Entry Posting
-    // NPR5.36/BR/20170704 CASE 279551 Added recalculation functions
-    // NPR5.36/AP/20170713 CASE 262628 Added statics facts (Amounts) and "POS Ledg. Register No."
-    //                                 Changes to Entry Type
-    // NPR5.36/AP/20170725 CASE 279547 Removed "Posted" and "Item Entries Posted"
-    //                                 Refactored Posted marking
-    //                                 Added Description
-    // NPR5.36/BR/20170810 CASE 277096 Filled LookupPageID and DrillDownPageID
-    // NPR5.37/BR/20171024 CASE 294362 Added Entry Type option Debitsale, added fields Sales Document Type, Sales Document No.
-    // NPR5.38/BR/20171108 CASE 294747 Added function ShowDimensions
-    // NPR5.38/TSA /20171127  CASE 297087 Added Entry Type, System Entry
-    // NPR5.38/BR  /20171214  CASE 299888 Renamed from POS Ledg. Register No. to POS Period Register No. (incl. Captions)
-    // NPR5.38/BR  /20180123  CASE 303213 Added fields From External Source, External Source Name, External Source Entry No.
-    // NPR5.39/BR  /20180124  CASE 302696 Changed "VAT" in field names to "Tax"
-    // NPR5.39/BR  /20180208  CASE 304165 Added No. of Print Log Entries Flowfield
-    // NPR5.39/BR  /20180215  CASE 305016 Added Fiscal No.
-    // NPR5.40/TSA /20180228 CASE 306581 Reinstated Entry Type 4 -> Balancing
-    // NPR5.40/MMV /20180319 CASE 304639 Renamed field 230
-    // NPR5.42/TSA /20180511 CASE 314834 Dimensions are editable when entry is unposted
-    // NPR5.48/MMV /20180606 CASE 318028 Added fields 107, 108, 240. Renamed field 230. Added "Entry Type" option: Cancelled.
-    // NPR5.50/MHA /20190422 CASE 337539 Added field 170 "Retail ID"
-    // NPR5.51/MMV /20190624 CASE 356076 Added field 109,111 and renamed the other totalling fields to align more with workshift total field naming.
-    //                            Removed 107 that ended up being useless.
-    // NPR5.53/SARA/20191024 CASE 373672 Added Field 600..650
-    // NPR5.53/ALPO/20191105 CASE 376035 Added field 180 "Event No." to save info about event used on sale
-    // NPR5.53/ALPO/20200108 CASE 380918 Post Seating Code and Number of Guests to POS Entries (for further sales analysis breakedown)
-    // NPR5.54/ALPO/20200324 CASE 397063 Global dimensions were not updated on assigned dimension change through ShowDimensions() function ("Dimensions" button)
-    // NPR5.55/MMV /20200701 CASE 412426 Added index for "Document No."
-
     Caption = 'POS Entry';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR POS Entries";
@@ -339,7 +307,7 @@ table 6150621 "NPR POS Entry"
         }
         field(230; "No. of Print Output Entries"; Integer)
         {
-            CalcFormula = Count ("NPR POS Entry Output Log" WHERE("POS Entry No." = FIELD("Entry No."),
+            CalcFormula = Count("NPR POS Entry Output Log" WHERE("POS Entry No." = FIELD("Entry No."),
                                                               "Output Method" = CONST(Print)));
             Caption = 'No. of Print Output Entries';
             Editable = false;
@@ -359,9 +327,7 @@ table 6150621 "NPR POS Entry"
 
             trigger OnLookup()
             begin
-                //-NPR5.38 [294717]
                 ShowDimensions;
-                //+NPR5.38 [294717]
             end;
         }
         field(500; "Sales Document Type"; Enum "Sales Document Type")
@@ -377,7 +343,7 @@ table 6150621 "NPR POS Entry"
         }
         field(600; "Sale Lines"; Integer)
         {
-            CalcFormula = Count ("NPR POS Sales Line" WHERE("POS Entry No." = FIELD("Entry No.")));
+            CalcFormula = Count("NPR POS Sales Line" WHERE("POS Entry No." = FIELD("Entry No.")));
             Caption = 'Sale Lines';
             Description = 'NPR5.53';
             Editable = false;
@@ -385,7 +351,7 @@ table 6150621 "NPR POS Entry"
         }
         field(610; "Payment Lines"; Integer)
         {
-            CalcFormula = Count ("NPR POS Payment Line" WHERE("POS Entry No." = FIELD("Entry No.")));
+            CalcFormula = Count("NPR POS Payment Line" WHERE("POS Entry No." = FIELD("Entry No.")));
             Caption = 'Payment Lines';
             Description = 'NPR5.53';
             Editable = false;
@@ -393,7 +359,7 @@ table 6150621 "NPR POS Entry"
         }
         field(620; "Tax Lines"; Integer)
         {
-            CalcFormula = Count ("NPR POS Tax Amount Line" WHERE("POS Entry No." = FIELD("Entry No.")));
+            CalcFormula = Count("NPR POS Tax Amount Line" WHERE("POS Entry No." = FIELD("Entry No.")));
             Caption = 'Tax Lines';
             Description = 'NPR5.53';
             Editable = false;
@@ -401,7 +367,7 @@ table 6150621 "NPR POS Entry"
         }
         field(630; "Customer Sales (LCY)"; Decimal)
         {
-            CalcFormula = Sum ("NPR POS Sales Line"."Amount Incl. VAT" WHERE("POS Entry No." = FIELD("Entry No."),
+            CalcFormula = Sum("NPR POS Sales Line"."Amount Incl. VAT" WHERE("POS Entry No." = FIELD("Entry No."),
                                                                          Type = FILTER(Customer)));
             Caption = 'Customer Sales (LCY)';
             Description = 'NPR5.53';
@@ -410,7 +376,7 @@ table 6150621 "NPR POS Entry"
         }
         field(640; "G/L Sales (LCY)"; Decimal)
         {
-            CalcFormula = Sum ("NPR POS Sales Line"."Amount Incl. VAT" WHERE("POS Entry No." = FIELD("Entry No."),
+            CalcFormula = Sum("NPR POS Sales Line"."Amount Incl. VAT" WHERE("POS Entry No." = FIELD("Entry No."),
                                                                          Type = FILTER("G/L Account")));
             Caption = 'G/L Sales (LCY)';
             Description = 'NPR5.53';
@@ -419,7 +385,7 @@ table 6150621 "NPR POS Entry"
         }
         field(650; "Payment Amount"; Decimal)
         {
-            CalcFormula = Sum ("NPR POS Payment Line".Amount WHERE("POS Entry No." = FIELD("Entry No.")));
+            CalcFormula = Sum("NPR POS Payment Line".Amount WHERE("POS Entry No." = FIELD("Entry No.")));
             Caption = 'Payment Amount';
             Description = 'NPR5.53';
             Editable = false;
@@ -484,40 +450,25 @@ table 6150621 "NPR POS Entry"
         POSEntryManagement: Codeunit "NPR POS Entry Management";
         EntryModified: Boolean;
     begin
-        //-NPR5.36 [279551]
         EntryModified := false;
         POSEntryManagement.RecalculatePOSEntry(Rec, EntryModified);
         OnAfterRecalculate(EntryModified);
         if EntryModified then
             Modify(true);
-        //+NPR5.36 [279551]
     end;
 
     procedure ShowDimensions()
     var
         DimMgt: Codeunit DimensionManagement;
     begin
-        //-NPR5.42 [314834]
-        //-NPR5.38 [294717]
-        //DimMgt.ShowDimensionSet("Dimension Set ID",STRSUBSTNO('%1 %2',TABLECAPTION,"Entry No."));
-        //+NPR5.38 [294717]
-
         if (("Post Entry Status" = "Post Entry Status"::Posted) and ("Post Item Entry Status" = "Post Item Entry Status"::Posted)) then begin
             DimMgt.ShowDimensionSet("Dimension Set ID", StrSubstNo('%1 %2', TableCaption, "Entry No."));
         end else begin
-            //"Dimension Set ID" := DimMgt.EditDimensionSet ("Dimension Set ID",STRSUBSTNO('%1 %2',TABLECAPTION,"Entry No."));  //NPR5.54 [397063]-revoked
-            //-NPR5.54 [397063]
             "Dimension Set ID" :=
               DimMgt.EditDimensionSet(
                 "Dimension Set ID", StrSubstNo('%1 %2', TableCaption, "Entry No."), "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code");
-            //+NPR5.54 [397063]
             Modify();
         end;
-        //+NPR5.42 [314834]
-    end;
-
-    local procedure "---Publishers"()
-    begin
     end;
 
     [IntegrationEvent(TRUE, false)]

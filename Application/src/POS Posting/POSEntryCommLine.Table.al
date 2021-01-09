@@ -1,9 +1,5 @@
 table 6150626 "NPR POS Entry Comm. Line"
 {
-    // NPR5.36/AP/20170210 CASE 262628 Created Object.
-    //                                 Use this to hold any comment to be stored, printed ect. from the POS Sale.
-    //                                 Use field "Code" to distinguish source and usage (e.g. comments stored and printed for special purposes like Peyment Terminal Reciepts)
-
     Caption = 'POS Entry Comment Line';
     DataClassification = CustomerContent;
 

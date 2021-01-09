@@ -1,13 +1,5 @@
 table 6150624 "NPR POS Balancing Line"
 {
-    // NPR5.29/AP/20170126 CASE 262628 Recreated ENU-captions
-    // NPR5.30/AP/20170209 CASE 261728 Renamed field "Store Code" -> "POS Store Code"
-    // NPR5.32/AP/20170220 CASE 262628 Renamed field "Receipt No." -> "Document No."
-    //                                 Added the fields 160 Orig. POS Sale ID and 161 Orig. POS Line No.
-    // NPR5.36/AP/20170717 CASE 262628 Added "POS Ledg. Register No."
-    // NPR5.38/BR/20171214 CASE 299888 Renamed from POS Ledg. Register No. to POS Period Register No. (incl. Captions)
-    // NPR5.53/SARA/20191024 CASE 373672 Added Field 600..620
-
     Caption = 'POS Balancing Line';
     DataClassification = CustomerContent;
 
@@ -190,15 +182,10 @@ table 6150624 "NPR POS Balancing Line"
             DataClassification = CustomerContent;
             Editable = false;
             TableRelation = "Dimension Set Entry";
-
-            trigger OnLookup()
-            begin
-                //ShowDimensions;
-            end;
         }
         field(600; "Entry Date"; Date)
         {
-            CalcFormula = Lookup ("NPR POS Entry"."Entry Date" WHERE("Entry No." = FIELD("POS Entry No.")));
+            CalcFormula = Lookup("NPR POS Entry"."Entry Date" WHERE("Entry No." = FIELD("POS Entry No.")));
             Caption = 'Entry Date';
             Description = 'NPR5.53';
             Editable = false;
@@ -206,7 +193,7 @@ table 6150624 "NPR POS Balancing Line"
         }
         field(610; "Starting Time"; Time)
         {
-            CalcFormula = Lookup ("NPR POS Entry"."Starting Time" WHERE("Entry No." = FIELD("POS Entry No.")));
+            CalcFormula = Lookup("NPR POS Entry"."Starting Time" WHERE("Entry No." = FIELD("POS Entry No.")));
             Caption = 'Starting Time';
             Description = 'NPR5.53';
             Editable = false;
@@ -214,7 +201,7 @@ table 6150624 "NPR POS Balancing Line"
         }
         field(620; "Ending Time"; Time)
         {
-            CalcFormula = Lookup ("NPR POS Entry"."Ending Time" WHERE("Entry No." = FIELD("POS Entry No.")));
+            CalcFormula = Lookup("NPR POS Entry"."Ending Time" WHERE("Entry No." = FIELD("POS Entry No.")));
             Caption = 'Ending Time';
             Description = 'NPR5.53';
             Editable = false;

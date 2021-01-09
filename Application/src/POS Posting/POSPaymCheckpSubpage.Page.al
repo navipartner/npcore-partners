@@ -1,8 +1,5 @@
 page 6150631 "NPR POS Paym. Checkp. Subpage"
 {
-    // NPR5.45/TSA /20180727 CASE 322769 Initial Version
-    // NPR5.49/TSA /20190314 CASE 348458 Blind count
-
     Caption = 'POS Payment Bin Checkpoint';
     Editable = false;
     PageType = ListPart;
@@ -61,10 +58,7 @@ page 6150631 "NPR POS Paym. Checkp. Subpage"
 
     trigger OnInit()
     begin
-
-        //-NPR5.49 [348458]
         IsBlindCount := false;
-        //+NPR5.49 [348458]
     end;
 
     trigger OnOpenPage()
@@ -79,12 +73,7 @@ page 6150631 "NPR POS Paym. Checkp. Subpage"
 
     procedure SetBlindCount(HideFields: Boolean)
     begin
-
-        //-NPR5.49 [348458]
-
         IsBlindCount := HideFields;
-
-        //+NPR5.49 [348458]
     end;
 }
 
