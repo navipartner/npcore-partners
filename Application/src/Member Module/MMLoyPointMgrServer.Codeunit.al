@@ -1,10 +1,5 @@
 codeunit 6151161 "NPR MM Loy. Point Mgr (Server)"
 {
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         E1101_SETUP_MISSING: Label 'The requested store and unit has not beed setup.';
         AUTHORIZATION_MISSING: Label 'The authorization request is empty.';

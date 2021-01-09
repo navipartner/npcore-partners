@@ -498,10 +498,8 @@ codeunit 6060127 "NPR MM Membership Mgt."
     procedure GetMemberImage(MemberEntryNo: Integer; var Base64StringImage: Text) Success: Boolean
     var
         Member: Record "NPR MM Member";
-        BinaryReader: DotNet NPRNetBinaryReader;
-        MemoryStream: DotNet NPRNetMemoryStream;
-        Convert: DotNet NPRNetConvert;
         InStr: InStream;
+        Base64Convert: Codeunit "Base64 Convert";
     begin
 
         if (not Member.Get(MemberEntryNo)) then
@@ -512,14 +510,7 @@ codeunit 6060127 "NPR MM Membership Mgt."
 
         Member.CalcFields(Picture);
         Member.Picture.CreateInStream(InStr);
-        MemoryStream := InStr;
-        BinaryReader := BinaryReader.BinaryReader(InStr);
-
-        Base64StringImage := Convert.ToBase64String(BinaryReader.ReadBytes(MemoryStream.Length));
-
-        MemoryStream.Dispose;
-        Clear(MemoryStream);
-
+        Base64StringImage := Base64Convert.ToBase64(InStr);
         exit(true);
     end;
 
@@ -553,22 +544,15 @@ codeunit 6060127 "NPR MM Membership Mgt."
 
     procedure UpdateMemberImage(MemberEntryNo: Integer; Base64StringImage: Text) Success: Boolean
     var
-        MemoryStream: DotNet NPRNetMemoryStream;
-        Convert: DotNet NPRNetConvert;
         OutStr: OutStream;
         Member: Record "NPR MM Member";
+        Base64Convert: Codeunit "Base64 Convert";
     begin
-
         if (not Member.Get(MemberEntryNo)) then
             exit(false);
 
         Member.Picture.CreateOutStream(OutStr);
-        MemoryStream := MemoryStream.MemoryStream(Convert.FromBase64String(Base64StringImage));
-
-        MemoryStream.WriteTo(OutStr);
-        MemoryStream.Close();
-        MemoryStream.Dispose();
-
+        Base64Convert.FromBase64(Base64StringImage, OutStr);
         exit(Member.Modify());
     end;
 
@@ -4672,24 +4656,13 @@ codeunit 6060127 "NPR MM Membership Mgt."
 
     local procedure GetBase64StringFromBinaryFile(Filename: Text) Value: Text
     var
-        BinaryReader: DotNet NPRNetBinaryReader;
-        MemoryStream: DotNet NPRNetMemoryStream;
-        Convert: DotNet NPRNetConvert;
         InStr: InStream;
         f: File;
+        Base64Convert: Codeunit "Base64 Convert";
     begin
-
-        Value := '';
-
         f.Open(Filename);
         f.CreateInStream(InStr);
-        MemoryStream := InStr;
-        BinaryReader := BinaryReader.BinaryReader(InStr);
-
-        Value := Convert.ToBase64String(BinaryReader.ReadBytes(MemoryStream.Length));
-
-        MemoryStream.Dispose;
-        Clear(MemoryStream);
+        Value := Base64Convert.ToBase64(InStr);
         f.Close;
         exit(Value);
     end;

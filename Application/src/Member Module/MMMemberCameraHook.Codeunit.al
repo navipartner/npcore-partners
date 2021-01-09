@@ -1,37 +1,18 @@
 codeunit 6060137 "NPR MM Member Camera Hook"
 {
-
-    trigger OnRun()
-    begin
-    end;
-
     var
-        Convert: DotNet NPRNetConvert;
-        Bytes: DotNet NPRNetArray;
-        Encoding: DotNet NPRNetEncoding;
         Txt001: Label 'data:image/jpeg;base64,';
 
     procedure OpenCameraMMMemberInfoCapture(var MMMemberInfoCapture: Record "NPR MM Member Info Capture")
     var
         MMMemberInfoCaptureCamera: Page "NPR MM Member Info Cap. Camera";
         InS: InStream;
-        StreamReader: DotNet NPRNetStreamReader;
         Txt: Text;
-        StreamWriter: DotNet NPRNetStreamWriter;
-        MemoryStream: DotNet NPRNetMemoryStream;
+        Base64Convert: Codeunit "Base64 Convert";
     begin
         if MMMemberInfoCapture.Picture.HasValue then begin
             MMMemberInfoCapture.Picture.CreateInStream(InS);
-
-            MemoryStream := MemoryStream.MemoryStream();
-            CopyStream(MemoryStream, InS);
-            Bytes := MemoryStream.ToArray();
-            Txt := Txt001 + Convert.ToBase64String(Bytes);
-
-            //    StreamReader := StreamReader.StreamReader(InS);
-            //    Txt := StreamReader.ReadToEnd();
-            //    StreamReader.Close();
-
+            Txt := Txt001 + Base64Convert.ToBase64(InS);
         end;
 
         MMMemberInfoCaptureCamera.SetText(Txt);
@@ -40,15 +21,17 @@ codeunit 6060137 "NPR MM Member Camera Hook"
     end;
 
     procedure Base64Encode(plainText: Text): Text
+    var
+        Base64Convert: Codeunit "Base64 Convert";
     begin
-        Bytes := Encoding.UTF8.GetBytes(plainText);
-        exit(Convert.ToBase64String(Bytes));
+        exit(Base64Convert.ToBase64(plainText));
     end;
 
     procedure Base64Decode(base64EncodedData: Text): Text
+    var
+        Base64Convert: Codeunit "Base64 Convert";
     begin
-        Bytes := Convert.FromBase64String(base64EncodedData);
-        exit(Encoding.UTF8.GetString(Bytes));
+        exit(Base64Convert.FromBase64(base64EncodedData));
     end;
 }
 

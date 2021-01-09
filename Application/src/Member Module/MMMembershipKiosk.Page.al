@@ -40,26 +40,20 @@ page 6060078 "NPR MM Membership Kiosk"
     {
     }
 
-    trigger OnInit()
-    begin
-
-        MemberInfoJObject := MemberInfoJObject.JObject();
-    end;
-
     var
         BridgeMgt: Codeunit "NPR JavaScript Bridge Mgt.";
         MembershipKiosk: Codeunit "NPR MM Membership Kiosk";
         PageId: Option WELCOME,SCANTICKET,MEMBERINFO,TAKEPICTURE,PREVIEW,PRINT,SHOWERROR;
         StateMachinePageId: Integer;
-        MemberInfoJObject: DotNet JObject;
+        MemberInfoJObject: JsonObject;
         INVALID_DATE: Label 'The date %1 specified for field %2 does not conform to the expected date format %3.';
         DATE_MASK_ERROR: Label 'Date format mask %1 is not supported.';
         VALUE_REQUIRED: Label 'A value is required for field %1.';
 
     procedure GotoPage(CurrentPageId: Integer; DestinationPageId: Integer; EventContents: Text): Integer
     var
-        JToken: DotNet JToken;
-        JObject: DotNet JObject;
+        JToken: JsonToken;
+        JObject: JsonObject;
         ScanCode: Text;
         TicketWebService: Codeunit "NPR TM Ticket WebService";
         Status: Integer;
@@ -68,10 +62,8 @@ page 6060078 "NPR MM Membership Kiosk"
         ReturnDate: Date;
         ErrorMessage: Text;
     begin
-
-        //MESSAGE ('from: %1, to: %2, params %3', FromPageId, ToPage, EventContents);
         if (EventContents <> '') then
-            JObject := JObject.Parse(EventContents);
+            JObject.ReadFrom(EventContents);
 
         if (DestinationPageId <> PageId::WELCOME) then begin
             case CurrentPageId of
@@ -123,7 +115,7 @@ page 6060078 "NPR MM Membership Kiosk"
 
         case DestinationPageId of
             PageId::WELCOME:
-                MemberInfoJObject := MemberInfoJObject.JObject();
+                Clear(MemberInfoJObject);
         end;
 
         BridgeMgt.RegisterAdHocModule('MembershipSelfService', MembershipKiosk.GetHtml(DestinationPageId, MemberInfoJObject), MembershipKiosk.GetCss(DestinationPageId), MembershipKiosk.GetScript(DestinationPageId));
@@ -193,68 +185,50 @@ page 6060078 "NPR MM Membership Kiosk"
         end;
     end;
 
-    local procedure "--JsonHelpers"()
+    local procedure GetJToken(JObject: JsonObject; KeyName: Text; var JToken: JsonToken) KeyFound: Boolean
     begin
-    end;
-
-    local procedure GetJToken(JObject: DotNet JObject; "Key": Text; var JToken: DotNet JToken) KeyFound: Boolean
-    begin
-
         KeyFound := true;
-        JToken := JObject.GetValue(Key);
-        if (IsNull(JToken)) then begin
-            JToken.Parse(StrSubstNo('{%1: ""}', Key));
+        if not JObject.SelectToken(KeyName, JToken) then begin
+            JToken.ReadFrom(StrSubstNo('{%1: ""}', KeyName));
             KeyFound := false;
         end;
-
         exit(KeyFound);
     end;
 
-    local procedure CopyKeyValue(SourceJObject: DotNet JObject; SourceKey: Text; TargetJObject: DotNet JObject; TargetKey: Text) KeyFound: Boolean
+    local procedure CopyKeyValue(SourceJObject: JsonObject; SourceKey: Text; TargetJObject: JsonObject; TargetKey: Text) KeyFound: Boolean
     var
-        SourceJToken: DotNet JToken;
+        SourceJToken: JsonToken;
     begin
-
         KeyFound := (GetStringValue(SourceJObject, SourceKey) <> '');
-
         GetJToken(SourceJObject, SourceKey, SourceJToken);
         TargetJObject.Remove(TargetKey);
         TargetJObject.Add(TargetKey, SourceJToken);
-
         exit(KeyFound);
     end;
 
-    local procedure GetStringValue(JObject: DotNet JObject; "Key": Text): Text
+    local procedure GetStringValue(JObject: JsonObject; KeyName: Text): Text
     var
-        JToken: DotNet JToken;
+        JToken: JsonToken;
     begin
-
-        JToken := JObject.GetValue(Key);
-        if (IsNull(JToken)) then
+        if not JObject.SelectToken(KeyName, JToken) then
             exit('');
-
-        exit(JToken.ToString());
+        exit(JToken.AsValue().AsText());
     end;
 
-    local procedure GetDateValue(JObject: DotNet JObject; "Key": Text; DateMask: Code[20]; IsOptional: Boolean) ReturnDate: Date
+    local procedure GetDateValue(JObject: JsonObject; KeyName: Text; DateMask: Code[20]; IsOptional: Boolean) ReturnDate: Date
     var
         ErrorMessage: Text;
     begin
-
-        if (not (TextToDate(GetStringValue(JObject, Key), DateMask, IsOptional, Key, ReturnDate, ErrorMessage))) then
+        if (not (TextToDate(GetStringValue(JObject, KeyName), DateMask, IsOptional, KeyName, ReturnDate, ErrorMessage))) then
             Error(ErrorMessage);
     end;
 
     local procedure TextToDate(FieldValue: Text; DateMask: Code[20]; FieldValueIsOptional: Boolean; FieldCaptionName: Text; var ReturnDate: Date; var ErrorMessage: Text) IsValid: Boolean
     begin
-
         ReturnDate := 0D;
-
         if (FieldValue = '') then begin
-
             if (FieldValueIsOptional) then
                 exit(true);
-
             ErrorMessage := StrSubstNo(VALUE_REQUIRED, FieldCaptionName);
             exit;
         end;
@@ -281,30 +255,25 @@ page 6060078 "NPR MM Membership Kiosk"
         exit(IsValid);
     end;
 
-    local procedure PutStringValue(var JObject: DotNet JObject; "Key": Text; Value: Text)
+    local procedure PutStringValue(var JObject: JsonObject; KeyName: Text; Value: Text)
     var
-        JToken: DotNet JToken;
+        JToken: JsonToken;
     begin
-
-        JToken := JToken.Parse(StrSubstNo('{%1: "%2"}', Key, Value));
-        JObject.Remove(Key);
-        JObject.Add(Key, JToken.Item(Key));
+        if JObject.Contains(KeyName) then
+            JObject.Replace(KeyName, Value)
+        else
+            JObject.Add(KeyName, Value);
     end;
 
-    local procedure ShowErrorMessage(var JObject: DotNet JObject; ErrorMessage: Text): Integer
+    local procedure ShowErrorMessage(var JObject: JsonObject; ErrorMessage: Text): Integer
     var
-        "Key": Text;
+        KeyName: Text;
     begin
-
         PutStringValue(JObject, 'ErrorMessage', ErrorMessage);
         exit(PageId::SHOWERROR);
     end;
 
-    local procedure "--MM interactions"()
-    begin
-    end;
-
-    local procedure CreateMembership(JObject: DotNet JObject)
+    local procedure CreateMembership(JObject: JsonObject)
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         MembershipSalesSetup: Record "NPR MM Members. Sales Setup";

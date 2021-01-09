@@ -1,10 +1,5 @@
 codeunit 6060147 "NPR MM NPR Membership"
 {
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         NotSupportedVersion: Label 'A request for %1 was made for %2, %3 with message version %4. That version is not handled in %5 %6.';
         InvalidXml: Label 'An invalid XML was returned:\%1';
@@ -13,7 +8,6 @@ codeunit 6060147 "NPR MM NPR Membership"
     [EventSubscriber(ObjectType::Codeunit, 6060145, 'OnDiscoverExternalMembershipMgr', '', true, true)]
     local procedure OnDiscover(var Sender: Record "NPR MM Foreign Members. Setup")
     begin
-
         Sender.RegisterManager(GetManagerCode(), 'NaviPartner Foreign NPR Membership Management');
     end;
 
@@ -22,21 +16,14 @@ codeunit 6060147 "NPR MM NPR Membership"
         exit('NPR_MEMBER');
     end;
 
-    local procedure "--Subscribers"()
-    begin
-    end;
-
     [EventSubscriber(ObjectType::Codeunit, 6060145, 'OnDispatchToReplicateForeignMemberCard', '', true, true)]
-    local procedure OnValidateAndReplicateForeignMemberCardSubscriber(CommunityCode: Code[20]; ManagerCode: Code[20]; ForeignMembercardNumber: Text[100]; var IsValid: Boolean; var NotValidReason: Text; var IsHandled: Boolean)
+    local procedure OnValidateAndReplicateForeignMemberCardSubscriber(CommunityCode: Code[20]; ManagerCode: Code[20];
+        ForeignMembercardNumber: Text[100]; var IsValid: Boolean; var NotValidReason: Text; var IsHandled: Boolean)
     var
         ForeignMembershipSetup: Record "NPR MM Foreign Members. Setup";
         NPRRemoteEndpointSetup: Record "NPR MM NPR Remote Endp. Setup";
-        SoapAction: Text;
         NoPrefixForeignMembercardNumber: Text[100];
-        XmlDocRequest: DotNet "NPRNetXmlDocument";
-        XmlDocResponse: DotNet "NPRNetXmlDocument";
     begin
-
         if (ManagerCode <> GetManagerCode()) then
             exit;
 
@@ -63,11 +50,11 @@ codeunit 6060147 "NPR MM NPR Membership"
 
         if (IsValid) then
             NotValidReason := '';
-
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6060145, 'OnFormatForeignCardnumberFromScan', '', true, true)]
-    local procedure OnFormatScannedCardnumberSubscriber(CommunityCode: Code[20]; ManagerCode: Code[20]; ScannedCardNumber: Text[100]; var FormattedCardNumber: Text[50]; var IsHandled: Boolean)
+    local procedure OnFormatScannedCardnumberSubscriber(CommunityCode: Code[20]; ManagerCode: Code[20]; ScannedCardNumber: Text[100];
+        var FormattedCardNumber: Text[50]; var IsHandled: Boolean)
     var
         ForeignMembershipSetup: Record "NPR MM Foreign Members. Setup";
     begin
@@ -144,9 +131,6 @@ codeunit 6060147 "NPR MM NPR Membership"
     var
         ForeignMembershipSetup: Record "NPR MM Foreign Members. Setup";
         NPRRemoteEndpointSetup: Record "NPR MM NPR Remote Endp. Setup";
-        SoapAction: Text;
-        XmlDocRequest: DotNet "NPRNetXmlDocument";
-        XmlDocResponse: DotNet "NPRNetXmlDocument";
         CustomerNumber: Text[30];
         CardNumber: Text[30];
         CustomerName: Text[50];
@@ -161,8 +145,8 @@ codeunit 6060147 "NPR MM NPR Membership"
         ForeignMembershipSetup.Get(CommunityCode, GetManagerCode());
         ForeignMembercardNumber := RemoveLocalPrefix(ForeignMembershipSetup."Remove Local Prefix", ForeignMembercardNumber);
 
-        IsValid := UpdateLocalMembershipPoints(NPRRemoteEndpointSetup, MembershipEntryNo, ForeignMembershipSetup."Append Local Prefix", ForeignMembercardNumber, NotValidReason);
-
+        IsValid := UpdateLocalMembershipPoints(NPRRemoteEndpointSetup, MembershipEntryNo, ForeignMembershipSetup."Append Local Prefix",
+            ForeignMembercardNumber, NotValidReason);
     end;
 
     procedure IsForeignMembershipCommunity(MembershipCode: Code[20]): Boolean
@@ -301,8 +285,8 @@ codeunit 6060147 "NPR MM NPR Membership"
     local procedure ValidateRemoteCardNumber(NPRRemoteEndpointSetup: Record "NPR MM NPR Remote Endp. Setup"; Prefix: Code[10]; ForeignMembercardNumber: Text[50]; var RemoteInfoCapture: Record "NPR MM Member Info Capture"; var NotValidReason: Text) IsValid: Boolean
     var
         SoapAction: Text;
-        XmlDocRequest: DotNet "NPRNetXmlDocument";
-        XmlDocResponse: DotNet "NPRNetXmlDocument";
+        XmlDocRequest: XmlDocument;
+        XmlDocResponse: XmlDocument;
     begin
 
         MemberCardNumberValidationRequest(ForeignMembercardNumber, '', SoapAction, XmlDocRequest);
@@ -318,13 +302,14 @@ codeunit 6060147 "NPR MM NPR Membership"
         exit(IsValid);
     end;
 
-    local procedure GetRemoteMembership(NPRRemoteEndpointSetup: Record "NPR MM NPR Remote Endp. Setup"; Prefix: Code[10]; ForeignMembercardNumber: Text[50]; var ForeignMembershipNumber: Code[20]; var RemoteInfoCapture: Record "NPR MM Member Info Capture"; var NotValidReason: Text) IsValid: Boolean
+    local procedure GetRemoteMembership(NPRRemoteEndpointSetup: Record "NPR MM NPR Remote Endp. Setup";
+        Prefix: Code[10]; ForeignMembercardNumber: Text[50]; var ForeignMembershipNumber: Code[20];
+        var RemoteInfoCapture: Record "NPR MM Member Info Capture"; var NotValidReason: Text) IsValid: Boolean
     var
         SoapAction: Text;
-        XmlDocRequest: DotNet "NPRNetXmlDocument";
-        XmlDocResponse: DotNet "NPRNetXmlDocument";
+        XmlDocRequest: XmlDocument;
+        XmlDocResponse: XmlDocument;
     begin
-
         GetMembershipRequest(ForeignMembercardNumber, '', SoapAction, XmlDocRequest);
         if (not WebServiceApi(NPRRemoteEndpointSetup, SoapAction, NotValidReason, XmlDocRequest, XmlDocResponse)) then
             exit(false);
@@ -337,13 +322,14 @@ codeunit 6060147 "NPR MM NPR Membership"
         exit(IsValid);
     end;
 
-    local procedure GetRemoteMember(NPRRemoteEndpointSetup: Record "NPR MM NPR Remote Endp. Setup"; Prefix: Code[10]; ForeignMembercardNumber: Text[50]; ForeignMembershipNumber: Code[20]; var RemoteInfoCapture: Record "NPR MM Member Info Capture"; var NotValidReason: Text) IsValid: Boolean
+    local procedure GetRemoteMember(NPRRemoteEndpointSetup: Record "NPR MM NPR Remote Endp. Setup"; Prefix: Code[10];
+        ForeignMembercardNumber: Text[50]; ForeignMembershipNumber: Code[20];
+        var RemoteInfoCapture: Record "NPR MM Member Info Capture"; var NotValidReason: Text) IsValid: Boolean
     var
         SoapAction: Text;
-        XmlDocRequest: DotNet "NPRNetXmlDocument";
-        XmlDocResponse: DotNet "NPRNetXmlDocument";
+        XmlDocRequest: XmlDocument;
+        XmlDocResponse: XmlDocument;
     begin
-
         GetMembershipMemberRequest(ForeignMembershipNumber, ForeignMembercardNumber, '', SoapAction, XmlDocRequest);
         if (not WebServiceApi(NPRRemoteEndpointSetup, SoapAction, NotValidReason, XmlDocRequest, XmlDocResponse)) then
             exit(false);
@@ -371,11 +357,12 @@ codeunit 6060147 "NPR MM NPR Membership"
         exit(0 <> MembershipManagement.CreateMembershipAll(MembershipSalesSetup, MemberInfoCapture, true));
     end;
 
-    local procedure UpdateLocalMembershipPoints(NPRRemoteEndpointSetup: Record "NPR MM NPR Remote Endp. Setup"; MembershipEntryNo: Integer; Prefix: Code[10]; ForeignMembercardNumber: Text[50]; var NotValidReason: Text) IsValid: Boolean
+    local procedure UpdateLocalMembershipPoints(NPRRemoteEndpointSetup: Record "NPR MM NPR Remote Endp. Setup";
+        MembershipEntryNo: Integer; Prefix: Code[10]; ForeignMembercardNumber: Text[50]; var NotValidReason: Text) IsValid: Boolean
     var
         SoapAction: Text;
-        XmlDocRequest: DotNet "NPRNetXmlDocument";
-        XmlDocResponse: DotNet "NPRNetXmlDocument";
+        XmlDocRequest: XmlDocument;
+        XmlDocResponse: XmlDocument;
         ForeignMembershipNumber: Code[20];
         RemoteInfoCapture: Record "NPR MM Member Info Capture";
         LoyaltyPointManagement: Codeunit "NPR MM Loyalty Point Mgt.";
@@ -396,12 +383,13 @@ codeunit 6060147 "NPR MM NPR Membership"
         exit(IsValid);
     end;
 
-    local procedure CreateRemoteMembershipWorker(NPRRemoteEndpointSetup: Record "NPR MM NPR Remote Endp. Setup"; var MembershipInfo: Record "NPR MM Member Info Capture"; var NotValidReason: Text) IsValid: Boolean
+    local procedure CreateRemoteMembershipWorker(NPRRemoteEndpointSetup: Record "NPR MM NPR Remote Endp. Setup";
+        var MembershipInfo: Record "NPR MM Member Info Capture"; var NotValidReason: Text) IsValid: Boolean
     var
         ScannerStationId: Text;
         SoapAction: Text;
-        XmlDocRequest: DotNet "NPRNetXmlDocument";
-        XmlDocResponse: DotNet "NPRNetXmlDocument";
+        XmlDocRequest: XmlDocument;
+        XmlDocResponse: XmlDocument;
     begin
 
         ScannerStationId := '';
@@ -415,16 +403,15 @@ codeunit 6060147 "NPR MM NPR Membership"
 
     end;
 
-    local procedure CreateRemoteMemberWorker(NPRRemoteEndpointSetup: Record "NPR MM NPR Remote Endp. Setup"; var MembershipInfo: Record "NPR MM Member Info Capture"; var NotValidReason: Text) IsValid: Boolean
+    local procedure CreateRemoteMemberWorker(NPRRemoteEndpointSetup: Record "NPR MM NPR Remote Endp. Setup";
+        var MembershipInfo: Record "NPR MM Member Info Capture"; var NotValidReason: Text) IsValid: Boolean
     var
         ScannerStationId: Text;
         SoapAction: Text;
-        XmlDocRequest: DotNet "NPRNetXmlDocument";
-        XmlDocResponse: DotNet "NPRNetXmlDocument";
+        XmlDocRequest: XmlDocument;
+        XmlDocResponse: XmlDocument;
     begin
-
         ScannerStationId := '';
-
         CreateMemberSoapXmlRequest(MembershipInfo, ScannerStationId, SoapAction, XmlDocRequest);
         if (not WebServiceApi(NPRRemoteEndpointSetup, SoapAction, NotValidReason, XmlDocRequest, XmlDocResponse)) then
             exit(false);
@@ -434,117 +421,70 @@ codeunit 6060147 "NPR MM NPR Membership"
 
     end;
 
-    local procedure "--WSSupport"()
-    begin
-    end;
-
-    procedure WebServiceApi(NPRRemoteEndpointSetup: Record "NPR MM NPR Remote Endp. Setup"; SoapAction: Text; var ReasonText: Text; var XmlDocIn: DotNet "NPRNetXmlDocument"; var XmlDocOut: DotNet "NPRNetXmlDocument"): Boolean
+    procedure WebServiceApi(NPRRemoteEndpointSetup: Record "NPR MM NPR Remote Endp. Setup"; SoapAction: Text;
+        var ReasonText: Text; var XmlDocIn: XmlDocument; var XmlDocOut: XmlDocument): Boolean
     var
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
-        Credential: DotNet NPRNetNetworkCredential;
-        HttpWebRequest: DotNet NPRNetHttpWebRequest;
-        HttpWebResponse: DotNet NPRNetHttpWebResponse;
-        WebException: DotNet NPRNetWebException;
-        WebInnerException: DotNet NPRNetWebException;
+        WebRequest: HttpRequestMessage;
+        WebResponse: HttpResponseMessage;
+        WebClient: HttpClient;
+        Headers: HttpHeaders;
+
         Url: Text;
         ErrorMessage: Text;
         ResponseText: Text;
-        Exception: DotNet NPRNetException;
         StatusCode: Code[10];
         StatusDescription: Text[50];
         B64Credential: Text;
+        Base64Convert: Codeunit "Base64 Convert";
     begin
-
         ReasonText := '';
-        HttpWebRequest := HttpWebRequest.Create(NPRRemoteEndpointSetup."Endpoint URI");
-        HttpWebRequest.Timeout := NPRRemoteEndpointSetup."Connection Timeout (ms)";
+        WebRequest.SetRequestUri(NPRRemoteEndpointSetup."Endpoint URI");
+        WebClient.Timeout := NPRRemoteEndpointSetup."Connection Timeout (ms)";
+        WebRequest.GetHeaders(Headers);
 
         case NPRRemoteEndpointSetup."Credentials Type" of
             NPRRemoteEndpointSetup."Credentials Type"::NAMED:
                 begin
-                    HttpWebRequest.UseDefaultCredentials(false);
                     if (NPRRemoteEndpointSetup."User Domain" <> '') then
-                        Credential := Credential.NetworkCredential(StrSubstNo('%1/%2', NPRRemoteEndpointSetup."User Domain", NPRRemoteEndpointSetup."User Account"), NPRRemoteEndpointSetup."User Password")
+                        WebClient.UseWindowsAuthentication(NPRRemoteEndpointSetup."User Account", NPRRemoteEndpointSetup."User Password", NPRRemoteEndpointSetup."User Domain")
                     else
-                        Credential := Credential.NetworkCredential(NPRRemoteEndpointSetup."User Account", NPRRemoteEndpointSetup."User Password");
-
-                    HttpWebRequest.Credentials(Credential);
+                        WebClient.UseWindowsAuthentication(NPRRemoteEndpointSetup."User Account", NPRRemoteEndpointSetup."User Password");
                 end;
 
             NPRRemoteEndpointSetup."Credentials Type"::BASIC:
                 begin
-                    B64Credential := ToBase64(StrSubstNo('%1:%2', NPRRemoteEndpointSetup."User Account", NPRRemoteEndpointSetup."User Password"));
-                    HttpWebRequest.Headers.Add('Authorization', StrSubstNo('Basic %1', B64Credential));
+                    B64Credential := Base64Convert.ToBase64(StrSubstNo('%1:%2', NPRRemoteEndpointSetup."User Account", NPRRemoteEndpointSetup."User Password"));
+                    if Headers.Contains('Authorization') then
+                        Headers.Remove('Authorization');
+                    Headers.Add('Authorization', StrSubstNo('Basic %1', B64Credential));
                 end;
-
-            else
-                HttpWebRequest.UseDefaultCredentials(true);
         end;
 
-        HttpWebRequest.Method := 'POST';
-        HttpWebRequest.ContentType := 'text/xml; charset=utf-8';
-        HttpWebRequest.Headers.Add('SOAPAction', SoapAction);
+        WebRequest.Method := 'POST';
+        if Headers.Contains('Content-Type') then
+            Headers.Remove('Content-Type');
+        Headers.Add('Content-Type', 'text/xml; charset=utf-8');
+        if Headers.Contains('SOAPAction') then
+            Headers.Remove('SOAPAction');
+        Headers.Add('SOAPAction', SoapAction);
 
-        NpXmlDomMgt.SetTrustedCertificateValidation(HttpWebRequest);
-
-        if (TrySendWebRequest(XmlDocIn, HttpWebRequest, HttpWebResponse)) then begin
-            TryReadResponseText(HttpWebResponse, ResponseText);
-
-            // XmlDocOut := XmlDocOut.XmlDocument;
-            // XmlDocOut.LoadXml (ResponseText);
-            // EXIT (TRUE);
-            if (TryParseResponseText(ResponseText)) then begin
-                XmlDocOut := XmlDocOut.XmlDocument;
-                XmlDocOut.LoadXml(ResponseText);
-                exit(true);
-            end;
-
+        WebClient.Send(WebRequest, WebResponse);
+        if WebResponse.IsSuccessStatusCode then begin
+            WebResponse.Content.ReadAs(ResponseText);
+            XmlDocument.ReadFrom(ResponseText, XmlDocOut);
+            exit(true);
         end;
 
-        XmlDocOut := XmlDocOut.XmlDocument;
-        GetExceptionDescription(XmlDocOut, SoapAction, NPRRemoteEndpointSetup."Endpoint URI");
-
-        ReasonText := NpXmlDomMgt.PrettyPrintXml(XmlDocOut.InnerXml());
-
+        ReasonText := WebResponse.ReasonPhrase;
         exit(false);
-
-        // Exception := GETLASTERROROBJECT();
-        // ReasonText := StrSubstNo ('Error from WebServiceApi %1\\%2\\%3', GETLASTERRORTEXT, SoapAction, Exception.ToString());
-        //
-        // IF (FORMAT (GETDOTNETTYPE (Exception.GetBaseException ())) <> 'System.Net.WebException') THEN
-        //  ERROR (ReasonText);
-        //
-        // WebException := Exception.GetBaseException ();
-        // TryReadExceptionResponseText (WebException, StatusCode, StatusDescription, ResponseText);
-        //
-        // XmlDocOut := XmlDocOut.XmlDocument;
-        // IF (STRLEN (ResponseText) > 0) THEN
-        //  XmlDocOut.LoadXml (ResponseText);
-        //
-        // IF (STRLEN (ResponseText) = 0) THEN
-        //  XmlDocOut.LoadXml (StrSubstNo (
-        //    '<Fault>'+
-        //      '<faultstatus>%1</faultstatus>'+
-        //      '<faultstring>%2</faultstring>'+
-        //    '</Fault>',
-        //    StatusCode,
-        //    StatusDescription));
-        //
-        // MESSAGE ('Remote service %4 returned:\\%1 %2 %3', StatusCode, StatusDescription, ResponseText, NPRRemoteEndpointSetup."Endpoint URI");
-        // EXIT (FALSE);
-
     end;
 
-    local procedure "--SoapRequest and Response"()
-    begin
-    end;
-
-    procedure MemberCardNumberValidationRequest(ExternalMembercardNumber: Text[100]; ScannerStationId: Text; var SoapAction: Text[50]; var XmlDoc: DotNet "NPRNetXmlDocument")
+    procedure MemberCardNumberValidationRequest(ExternalMembercardNumber: Text[100]; ScannerStationId: Text; var SoapAction: Text[50];
+        var XmlDoc: XmlDocument)
     var
         XmlRequest: Text;
-        NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
     begin
-
         SoapAction := 'MemberCardNumberValidation';
         XmlRequest :=
           '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:mem="urn:microsoft-dynamics-schemas/codeunit/member_services">' +
@@ -556,29 +496,30 @@ codeunit 6060147 "NPR MM NPR Membership"
           '      </mem:MemberCardNumberValidation>' +
           '   </soapenv:Body>' +
           '</soapenv:Envelope>';
-
         XmlRequest := StrSubstNo(XmlRequest, ExternalMembercardNumber, ScannerStationId);
-
-        XmlDoc := XmlDoc.XmlDocument;
-        XmlDoc.LoadXml(XmlRequest);
+        XmlDocument.ReadFrom(XmlRequest, XmlDoc);
     end;
 
-    local procedure MemberCardNumberValidationResponse(Prefix: Code[10]; ForeignMembercardNumber: Text[50]; var XmlDoc: DotNet "NPRNetXmlDocument"; var ResponseText: Text; var MemberInfoCapture: Record "NPR MM Member Info Capture") ValidResponse: Boolean
+    local procedure MemberCardNumberValidationResponse(Prefix: Code[10]; ForeignMembercardNumber: Text[50];
+        var XmlDoc: XmlDocument; var ResponseText: Text; var MemberInfoCapture: Record "NPR MM Member Info Capture") ValidResponse: Boolean
     var
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
-        XmlElement: DotNet NPRNetXmlElement;
+        Element: XmlElement;
         PayloadBody: Text;
         TextOk: Text;
+        XmlText: Text;
+        XmlDomMgt: Codeunit "XML DOM Management";
     begin
+        XmlDoc.WriteTo(XmlText);
+        XmlDomMgt.RemoveNameSpaces(XmlText);
+        XmlDocument.ReadFrom(XmlText, XmlDoc);
 
-        NpXmlDomMgt.RemoveNameSpaces(XmlDoc);
-        XmlElement := XmlDoc.DocumentElement;
-        if (IsNull(XmlElement)) then begin
-            ResponseText := StrSubstNo(InvalidXml, NpXmlDomMgt.PrettyPrintXml(XmlDoc.InnerXml()));
+        if not XmlDoc.GetRoot(Element) then begin
+            ResponseText := StrSubstNo(InvalidXml, NpXmlDomMgt.PrettyPrintXml(XmlText));
             exit(false);
         end;
 
-        TextOk := NpXmlDomMgt.GetXmlText(XmlElement, '//MemberCardNumberValidation_Result/return_value', 5, false);
+        TextOk := NpXmlDomMgt.GetXmlText(Element, '//MemberCardNumberValidation_Result/return_value', 5, false);
         MemberInfoCapture."External Card No." := Prefix + ForeignMembercardNumber;
         if (StrLen(ForeignMembercardNumber) >= 4) then
             MemberInfoCapture."External Card No. Last 4" := CopyStr(ForeignMembercardNumber, StrLen(ForeignMembercardNumber) - 4 + 1);
@@ -586,7 +527,8 @@ codeunit 6060147 "NPR MM NPR Membership"
         exit(UpperCase(TextOk) = 'TRUE');
     end;
 
-    local procedure GetMembershipRequest(ExternalMembercardNumber: Text[50]; ScannerStationId: Text; var SoapAction: Text[50]; var XmlDoc: DotNet "NPRNetXmlDocument")
+    local procedure GetMembershipRequest(ExternalMembercardNumber: Text[50]; ScannerStationId: Text; var SoapAction: Text[50];
+        var XmlDoc: XmlDocument)
     var
         XmlRequest: Text;
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
@@ -614,20 +556,20 @@ codeunit 6060147 "NPR MM NPR Membership"
          '      </mem:GetMembership>' +
          '   </soapenv:Body>' +
          '</soapenv:Envelope>';
-
         XmlRequest := StrSubstNo(XmlRequest, ExternalMembercardNumber, ScannerStationId);
-
-        XmlDoc := XmlDoc.XmlDocument;
-        XmlDoc.LoadXml(XmlRequest);
+        XmlDocument.ReadFrom(XmlRequest, XmlDoc);
     end;
 
-    local procedure GetMembershipResponse(Prefix: Code[10]; var ForeignMembershipNumber: Code[20]; var XmlDoc: DotNet "NPRNetXmlDocument"; var ResponseText: Text; var MemberInfoCapture: Record "NPR MM Member Info Capture") ValidResponse: Boolean
+    local procedure GetMembershipResponse(Prefix: Code[10]; var ForeignMembershipNumber: Code[20];
+        var XmlDoc: XmlDocument; var ResponseText: Text; var MemberInfoCapture: Record "NPR MM Member Info Capture") ValidResponse: Boolean
     var
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
-        XmlElement: DotNet NPRNetXmlElement;
+        Element: XmlElement;
         PayloadBody: Text;
         TextOk: Text;
         ElementPath: Text;
+        XmlText: Text;
+        XmlDomMgt: Codeunit "XML DOM Management";
     begin
 
         // <GetMembership_Result xmlns="urn:microsoft-dynamics-schemas/codeunit/member_services">
@@ -649,31 +591,34 @@ codeunit 6060147 "NPR MM NPR Membership"
         //  </membership>
         // </response>
 
-        NpXmlDomMgt.RemoveNameSpaces(XmlDoc);
-        XmlElement := XmlDoc.DocumentElement;
-        if (IsNull(XmlElement)) then begin
-            ResponseText := StrSubstNo(InvalidXml, NpXmlDomMgt.PrettyPrintXml(XmlDoc.InnerXml()));
+        XmlDoc.WriteTo(XmlText);
+        XmlDomMgt.RemoveNameSpaces(XmlText);
+        XmlDocument.ReadFrom(XmlText, XmlDoc);
+
+        if not XmlDoc.GetRoot(Element) then begin
+            ResponseText := StrSubstNo(InvalidXml, NpXmlDomMgt.PrettyPrintXml(XmlText));
             exit(false);
         end;
 
         ElementPath := '//GetMembership_Result/membership/getmembership/response/';
-        TextOk := NpXmlDomMgt.GetXmlText(XmlElement, ElementPath + 'status', 5, false);
-        ResponseText := NpXmlDomMgt.GetXmlText(XmlElement, ElementPath + 'errordescription', 1000, false);
+        TextOk := NpXmlDomMgt.GetXmlText(Element, ElementPath + 'status', 5, false);
+        ResponseText := NpXmlDomMgt.GetXmlText(Element, ElementPath + 'errordescription', 1000, false);
         if (TextOk = '0') then
             exit(false);
 
         ElementPath := '//GetMembership_Result/membership/getmembership/response/membership/';
 
-        with MemberInfoCapture do begin
-            "Membership Code" := Prefix + NpXmlDomMgt.GetXmlText(XmlElement, ElementPath + '/membershipcode', MaxStrLen("Membership Code"), false);
-            ForeignMembershipNumber := NpXmlDomMgt.GetXmlText(XmlElement, ElementPath + '/membershipnumber', MaxStrLen("External Membership No."), false);
-            "External Membership No." := Prefix + ForeignMembershipNumber;
-        end;
+        MemberInfoCapture."Membership Code" := Prefix + NpXmlDomMgt.GetXmlText(Element, ElementPath + '/membershipcode',
+            MaxStrLen(MemberInfoCapture."Membership Code"), false);
+        ForeignMembershipNumber := NpXmlDomMgt.GetXmlText(Element, ElementPath + '/membershipnumber',
+            MaxStrLen(MemberInfoCapture."External Membership No."), false);
+        MemberInfoCapture."External Membership No." := Prefix + ForeignMembershipNumber;
 
         exit(true);
     end;
 
-    local procedure GetMembershipMemberRequest(ExternalMembershipNumber: Code[20]; ExternalMembercardNumber: Text[50]; ScannerStationId: Text; var SoapAction: Text[50]; var XmlDoc: DotNet "NPRNetXmlDocument")
+    local procedure GetMembershipMemberRequest(ExternalMembershipNumber: Code[20]; ExternalMembercardNumber: Text[50];
+        ScannerStationId: Text; var SoapAction: Text[50]; var XmlDoc: XmlDocument)
     var
         XmlRequest: Text;
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
@@ -700,20 +645,20 @@ codeunit 6060147 "NPR MM NPR Membership"
          '</soapenv:Envelope>';
 
         XmlRequest := StrSubstNo(XmlRequest, ExternalMembershipNumber, ExternalMembercardNumber, ScannerStationId);
-
-        XmlDoc := XmlDoc.XmlDocument;
-        XmlDoc.LoadXml(XmlRequest);
+        XmlDocument.ReadFrom(XmlRequest, XmlDoc);
     end;
 
-    local procedure GetMembershipMemberResponse(Prefix: Code[10]; var XmlDoc: DotNet "NPRNetXmlDocument"; var ResponseText: Text; var MemberInfoCapture: Record "NPR MM Member Info Capture"): Boolean
+    local procedure GetMembershipMemberResponse(Prefix: Code[10]; var XmlDoc: XmlDocument; var ResponseText: Text;
+        var MemberInfoCapture: Record "NPR MM Member Info Capture"): Boolean
     var
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
-        XmlElement: DotNet NPRNetXmlElement;
+        Element: XmlElement;
         PayloadBody: Text;
         TextOk: Text;
         ElementPath: Text;
+        XmlText: Text;
+        XmlDomMgt: Codeunit "XML DOM Management";
     begin
-
         // <GetMembershipMembers_Result xmlns="urn:microsoft-dynamics-schemas/codeunit/member_services">
         //    <member>
         //      <getmembers xmlns="urn:microsoft-dynamics-nav/xmlports/x6060130">
@@ -739,79 +684,88 @@ codeunit 6060147 "NPR MM NPR Membership"
         //  </member>
         // </response>
 
-        NpXmlDomMgt.RemoveNameSpaces(XmlDoc);
-        XmlElement := XmlDoc.DocumentElement;
-        if (IsNull(XmlElement)) then begin
-            ResponseText := StrSubstNo(InvalidXml, NpXmlDomMgt.PrettyPrintXml(XmlDoc.InnerXml()));
+        XmlDoc.WriteTo(XmlText);
+        XmlDomMgt.RemoveNameSpaces(XmlText);
+        XmlDocument.ReadFrom(XmlText, XmlDoc);
+
+        if not XmlDoc.GetRoot(Element) then begin
+            ResponseText := StrSubstNo(InvalidXml, NpXmlDomMgt.PrettyPrintXml(XmlText));
             exit(false);
         end;
 
         ElementPath := '//GetMembershipMembers_Result/member/getmembers/response/';
-        TextOk := NpXmlDomMgt.GetXmlText(XmlElement, ElementPath + 'status', 5, false);
-        ResponseText := NpXmlDomMgt.GetXmlText(XmlElement, ElementPath + 'errordescription', 1000, false);
+        TextOk := NpXmlDomMgt.GetXmlText(Element, ElementPath + 'status', 5, false);
+        ResponseText := NpXmlDomMgt.GetXmlText(Element, ElementPath + 'errordescription', 1000, false);
         if (TextOk = '0') then
             exit(false);
 
         ElementPath := '//GetMembershipMembers_Result/member/getmembers/response/member/';
-        with MemberInfoCapture do begin
-            "First Name" := NpXmlDomMgt.GetXmlText(XmlElement, ElementPath + 'firstname', MaxStrLen("First Name"), false);
-            "Middle Name" := NpXmlDomMgt.GetXmlText(XmlElement, ElementPath + 'middlename', MaxStrLen("Middle Name"), false);
-            "Last Name" := NpXmlDomMgt.GetXmlText(XmlElement, ElementPath + 'lastname', MaxStrLen("Last Name"), false);
-            Address := NpXmlDomMgt.GetXmlText(XmlElement, ElementPath + 'address', MaxStrLen(Address), false);
-            "Post Code Code" := NpXmlDomMgt.GetXmlText(XmlElement, ElementPath + 'postcode', MaxStrLen("Post Code Code"), false);
-            City := NpXmlDomMgt.GetXmlText(XmlElement, ElementPath + 'city', MaxStrLen(City), false);
-            "Country Code" := NpXmlDomMgt.GetXmlText(XmlElement, ElementPath + 'country', MaxStrLen("Country Code"), false);
+        MemberInfoCapture."First Name" := NpXmlDomMgt.GetXmlText(Element, ElementPath + 'firstname',
+            MaxStrLen(MemberInfoCapture."First Name"), false);
+        MemberInfoCapture."Middle Name" := NpXmlDomMgt.GetXmlText(Element, ElementPath + 'middlename',
+            MaxStrLen(MemberInfoCapture."Middle Name"), false);
+        MemberInfoCapture."Last Name" := NpXmlDomMgt.GetXmlText(Element, ElementPath + 'lastname',
+            MaxStrLen(MemberInfoCapture."Last Name"), false);
+        MemberInfoCapture.Address := NpXmlDomMgt.GetXmlText(Element, ElementPath + 'address',
+            MaxStrLen(MemberInfoCapture.Address), false);
+        MemberInfoCapture."Post Code Code" := NpXmlDomMgt.GetXmlText(Element, ElementPath + 'postcode',
+            MaxStrLen(MemberInfoCapture."Post Code Code"), false);
+        MemberInfoCapture.City := NpXmlDomMgt.GetXmlText(Element, ElementPath + 'city',
+            MaxStrLen(MemberInfoCapture.City), false);
+        MemberInfoCapture."Country Code" := NpXmlDomMgt.GetXmlText(Element, ElementPath + 'country',
+            MaxStrLen(MemberInfoCapture."Country Code"), false);
 
-            if (Evaluate(Birthday, NpXmlDomMgt.GetXmlText(XmlElement, ElementPath + 'birthday', 10, false))) then;
-            if (Evaluate(Gender, NpXmlDomMgt.GetXmlText(XmlElement, ElementPath + 'gender', 1, false))) then;
-            if (Evaluate("News Letter", NpXmlDomMgt.GetXmlText(XmlElement, ElementPath + 'newsletter', 1, false))) then;
+        if (Evaluate(MemberInfoCapture.Birthday, NpXmlDomMgt.GetXmlText(Element, ElementPath + 'birthday', 10, false))) then;
+        if (Evaluate(MemberInfoCapture.Gender, NpXmlDomMgt.GetXmlText(Element, ElementPath + 'gender', 1, false))) then;
+        if (Evaluate(MemberInfoCapture."News Letter", NpXmlDomMgt.GetXmlText(Element, ElementPath + 'newsletter', 1, false))) then;
 
-            "Phone No." := NpXmlDomMgt.GetXmlText(XmlElement, ElementPath + 'phoneno', MaxStrLen("Phone No."), false);
-            "E-Mail Address" := NpXmlDomMgt.GetXmlText(XmlElement, ElementPath + 'email', MaxStrLen("E-Mail Address"), false);
-        end;
+        MemberInfoCapture."Phone No." := NpXmlDomMgt.GetXmlText(Element, ElementPath + 'phoneno',
+            MaxStrLen(MemberInfoCapture."Phone No."), false);
+        MemberInfoCapture."E-Mail Address" := NpXmlDomMgt.GetXmlText(Element, ElementPath + 'email',
+            MaxStrLen(MemberInfoCapture."E-Mail Address"), false);
 
         exit(true);
     end;
 
-    local procedure GetLoyaltyPointRequest(ExternalMembercardNumber: Text[50]; ScannerStationId: Text; var SoapAction: Text[50]; var XmlDoc: DotNet "NPRNetXmlDocument")
+    local procedure GetLoyaltyPointRequest(ExternalMembercardNumber: Text[50]; ScannerStationId: Text; var SoapAction: Text[50];
+        var XmlDoc: XmlDocument)
     var
         XmlRequest: Text;
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
     begin
-
         SoapAction := 'GetLoyaltyPoints';
         XmlRequest :=
-        '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:loy="urn:microsoft-dynamics-schemas/codeunit/loyalty_services" xmlns:x60="urn:microsoft-dynamics-nav/xmlports/x6060141">' +
-        '   <soapenv:Header/>' +
-        '   <soapenv:Body>' +
-        '      <loy:GetLoyaltyPoints>' +
-        '         <loy:getLoyaltyPoints>' +
-        '            <x60:getloyaltypoints>' +
-        '               <x60:request>' +
-        '                  <x60:cardnumber>%1</x60:cardnumber>' +
-        '                  <x60:membershipnumber></x60:membershipnumber>' +
-        '                  <x60:customernumber></x60:customernumber>' +
-        '               </x60:request>' +
-        '             </x60:getloyaltypoints>' +
-        '          </loy:getLoyaltyPoints>' +
-        '      </loy:GetLoyaltyPoints>' +
-        '   </soapenv:Body>' +
-        '</soapenv:Envelope>';
-
+            '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:loy="urn:microsoft-dynamics-schemas/codeunit/loyalty_services" xmlns:x60="urn:microsoft-dynamics-nav/xmlports/x6060141">' +
+            '   <soapenv:Header/>' +
+            '   <soapenv:Body>' +
+            '      <loy:GetLoyaltyPoints>' +
+            '         <loy:getLoyaltyPoints>' +
+            '            <x60:getloyaltypoints>' +
+            '               <x60:request>' +
+            '                  <x60:cardnumber>%1</x60:cardnumber>' +
+            '                  <x60:membershipnumber></x60:membershipnumber>' +
+            '                  <x60:customernumber></x60:customernumber>' +
+            '               </x60:request>' +
+            '             </x60:getloyaltypoints>' +
+            '          </loy:getLoyaltyPoints>' +
+            '      </loy:GetLoyaltyPoints>' +
+            '   </soapenv:Body>' +
+            '</soapenv:Envelope>';
         XmlRequest := StrSubstNo(XmlRequest, ExternalMembercardNumber);
-
-        XmlDoc := XmlDoc.XmlDocument;
-        XmlDoc.LoadXml(XmlRequest);
+        XmlDocument.ReadFrom(XmlRequest, XmlDoc);
     end;
 
-    local procedure GetLoyaltyPointResponse(Prefix: Code[10]; var ForeignMembershipNumber: Code[20]; var XmlDoc: DotNet "NPRNetXmlDocument"; var ResponseText: Text; var MemberInfoCapture: Record "NPR MM Member Info Capture") ValidResponse: Boolean
+    local procedure GetLoyaltyPointResponse(Prefix: Code[10]; var ForeignMembershipNumber: Code[20];
+        var XmlDoc: XmlDocument; var ResponseText: Text; var MemberInfoCapture: Record "NPR MM Member Info Capture") ValidResponse: Boolean
     var
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
-        XmlElement: DotNet NPRNetXmlElement;
+        Element: XmlElement;
         PayloadBody: Text;
         TextOk: Text;
         ElementPath: Text;
         Points: Text;
+        XmlText: Text;
+        XmlDomMgt: Codeunit "XML DOM Management";
     begin
 
         //  <GetLoyaltyPoints_Result xmlns="urn:microsoft-dynamics-schemas/codeunit/loyalty_services">
@@ -845,95 +799,91 @@ codeunit 6060147 "NPR MM NPR Membership"
         //  </membership>
         // </response>
 
-        NpXmlDomMgt.RemoveNameSpaces(XmlDoc);
-        XmlElement := XmlDoc.DocumentElement;
-        if (IsNull(XmlElement)) then begin
-            ResponseText := StrSubstNo(InvalidXml, NpXmlDomMgt.PrettyPrintXml(XmlDoc.InnerXml()));
+        XmlDoc.WriteTo(XmlText);
+        XmlDomMgt.RemoveNameSpaces(XmlText);
+        XmlDocument.ReadFrom(XmlText, XmlDoc);
+
+        if not XmlDoc.GetRoot(Element) then begin
+            ResponseText := StrSubstNo(InvalidXml, NpXmlDomMgt.PrettyPrintXml(XmlText));
             exit(false);
         end;
 
         ElementPath := '//GetLoyaltyPoints_Result/getLoyaltyPoints/getloyaltypoints/response/status/';
-        TextOk := NpXmlDomMgt.GetXmlText(XmlElement, ElementPath + 'responsecode', 5, false);
-        ResponseText := NpXmlDomMgt.GetXmlText(XmlElement, ElementPath + 'responsemessage', 1000, false);
+        TextOk := NpXmlDomMgt.GetXmlText(Element, ElementPath + 'responsecode', 5, false);
+        ResponseText := NpXmlDomMgt.GetXmlText(Element, ElementPath + 'responsemessage', 1000, false);
         if (TextOk = '0') then
             exit(false);
 
         ElementPath := '//GetLoyaltyPoints_Result/getLoyaltyPoints/getloyaltypoints/response/membership';
 
-        with MemberInfoCapture do begin
-            "Membership Code" := Prefix + NpXmlDomMgt.GetXmlText(XmlElement, ElementPath + '/membershipcode', MaxStrLen("Membership Code"), false);
-            ForeignMembershipNumber := NpXmlDomMgt.GetXmlText(XmlElement, ElementPath + '/membershipnumber', MaxStrLen("External Membership No."), false);
-            "External Membership No." := Prefix + ForeignMembershipNumber;
-            Points := NpXmlDomMgt.GetXmlText(XmlElement, ElementPath + '/pointsummary/remaining', 10, false);
-            if (not Evaluate("Initial Loyalty Point Count", Points)) then
-                "Initial Loyalty Point Count" := 0;
-        end;
+        MemberInfoCapture."Membership Code" := Prefix + NpXmlDomMgt.GetXmlText(Element, ElementPath + '/membershipcode',
+            MaxStrLen(MemberInfoCapture."Membership Code"), false);
+        ForeignMembershipNumber := NpXmlDomMgt.GetXmlText(Element, ElementPath + '/membershipnumber',
+            MaxStrLen(MemberInfoCapture."External Membership No."), false);
+        MemberInfoCapture."External Membership No." := Prefix + ForeignMembershipNumber;
+        Points := NpXmlDomMgt.GetXmlText(Element, ElementPath + '/pointsummary/remaining', 10, false);
+        if (not Evaluate(MemberInfoCapture."Initial Loyalty Point Count", Points)) then
+            MemberInfoCapture."Initial Loyalty Point Count" := 0;
 
         exit(true);
-
     end;
 
-    procedure CreateMembershipSoapXmlRequest(MemberInfoCapture: Record "NPR MM Member Info Capture"; var ScannerStationId: Text; var SoapAction: Text[50]; var XmlDoc: DotNet "NPRNetXmlDocument")
+    procedure CreateMembershipSoapXmlRequest(MemberInfoCapture: Record "NPR MM Member Info Capture";
+        var ScannerStationId: Text; var SoapAction: Text[50]; var XmlDoc: XmlDocument)
     var
         XmlText: Text;
     begin
-
         XmlText :=
-        '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:mem="urn:microsoft-dynamics-schemas/codeunit/member_services">' +
-           '<soapenv:Header/>' +
-           '<soapenv:Body>' +
-              '<mem:CreateMembership>' +
-                 '<mem:membership>' +
-                  CreateMembershipRequest(MemberInfoCapture) +
-                 '</mem:membership>' +
-                  StrSubstNo('<mem:scannerStationId>%1</mem:scannerStationId>', ScannerStationId) +
-              '</mem:CreateMembership>' +
-           '</soapenv:Body>' +
-        '</soapenv:Envelope>';
-
-        XmlDoc := XmlDoc.XmlDocument;
-        XmlDoc.LoadXml(XmlText);
-
+            '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:mem="urn:microsoft-dynamics-schemas/codeunit/member_services">' +
+            '<soapenv:Header/>' +
+            '<soapenv:Body>' +
+                '<mem:CreateMembership>' +
+                    '<mem:membership>' +
+                    CreateMembershipRequest(MemberInfoCapture) +
+                    '</mem:membership>' +
+                    StrSubstNo('<mem:scannerStationId>%1</mem:scannerStationId>', ScannerStationId) +
+                '</mem:CreateMembership>' +
+            '</soapenv:Body>' +
+            '</soapenv:Envelope>';
+        XmlDocument.ReadFrom(XmlText, XmlDoc);
         SoapAction := 'CreateMembership';
-
     end;
 
     procedure CreateMembershipXmlPortRequest(MemberInfoCapture: Record "NPR MM Member Info Capture") XmlText: Text
     begin
-
         XmlText :=
-        '<membership xmlns="urn:microsoft-dynamics-nav/xmlports/x6060127">' +
-        CreateMembershipRequest(MemberInfoCapture) +
-        '</membership>';
-
+            '<membership xmlns="urn:microsoft-dynamics-nav/xmlports/x6060127">' +
+            CreateMembershipRequest(MemberInfoCapture) +
+            '</membership>';
     end;
 
     local procedure CreateMembershipRequest(MemberInfoCapture: Record "NPR MM Member Info Capture") XmlText: Text
     var
         ActivationDateText: Text;
     begin
-
         ActivationDateText := '';
         if (MemberInfoCapture."Document Date" > 0D) then
             ActivationDateText := Format(MemberInfoCapture."Document Date", 0, 9);
 
         XmlText :=
-        '<createmembership>' +
-          '<request>' +
-            StrSubstNo('<membershipsalesitem>%1</membershipsalesitem>', MemberInfoCapture."Item No.") +
-            StrSubstNo('<activationdate>%1</activationdate>', ActivationDateText) +
-          '</request>' +
-        '</createmembership>';
-
+            '<createmembership>' +
+            '<request>' +
+                StrSubstNo('<membershipsalesitem>%1</membershipsalesitem>', MemberInfoCapture."Item No.") +
+                StrSubstNo('<activationdate>%1</activationdate>', ActivationDateText) +
+            '</request>' +
+            '</createmembership>';
     end;
 
-    local procedure EvaluateCreateMembershipSoapXmlResponse(var MemberInfoCapture: Record "NPR MM Member Info Capture"; var NotValidReason: Text; var XmlDoc: DotNet "NPRNetXmlDocument") IsValid: Boolean
+    local procedure EvaluateCreateMembershipSoapXmlResponse(var MemberInfoCapture: Record "NPR MM Member Info Capture";
+        var NotValidReason: Text; var XmlDoc: XmlDocument) IsValid: Boolean
     var
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
-        XmlElement: DotNet NPRNetXmlElement;
+        Element: XmlElement;
         ResponseText: Text;
         TextOk: Text;
         ElementPath: Text;
+        XmlText: Text;
+        XmlDomMgt: Codeunit "XML DOM Management";
     begin
 
         // <response>
@@ -950,54 +900,52 @@ codeunit 6060147 "NPR MM NPR Membership"
         //  </membership>
         // </response>
 
-        NpXmlDomMgt.RemoveNameSpaces(XmlDoc);
-        XmlElement := XmlDoc.DocumentElement;
-        if (IsNull(XmlElement)) then begin
-            ResponseText := StrSubstNo(InvalidXml, NpXmlDomMgt.PrettyPrintXml(XmlDoc.InnerXml()));
+        XmlDoc.WriteTo(XmlText);
+        XmlDomMgt.RemoveNameSpaces(XmlText);
+        XmlDocument.ReadFrom(XmlText, XmlDoc);
+
+        if not XmlDoc.GetRoot(Element) then begin
+            ResponseText := StrSubstNo(InvalidXml, NpXmlDomMgt.PrettyPrintXml(XmlText));
             exit(false);
         end;
 
         ElementPath := '//CreateMembership_Result/membership/createmembership/response/';
-        TextOk := NpXmlDomMgt.GetXmlText(XmlElement, ElementPath + 'status', 5, true);
-        NotValidReason := StrSubstNo('Message from Server: %1', NpXmlDomMgt.GetXmlText(XmlElement, ElementPath + 'errordescription', 1000, true));
+        TextOk := NpXmlDomMgt.GetXmlText(Element, ElementPath + 'status', 5, true);
+        NotValidReason := StrSubstNo('Message from Server: %1', NpXmlDomMgt.GetXmlText(Element, ElementPath + 'errordescription', 1000, true));
         if (TextOk = '0') then
             exit(false);
 
         ElementPath := '//CreateMembership_Result/membership/createmembership/response/membership/';
 
-        with MemberInfoCapture do begin
-            "Membership Code" := NpXmlDomMgt.GetXmlText(XmlElement, ElementPath + 'membershipcode', MaxStrLen("Membership Code"), false);
-            "External Membership No." := NpXmlDomMgt.GetXmlText(XmlElement, ElementPath + 'membershipnumber', MaxStrLen("External Membership No."), false);
-        end;
+        MemberInfoCapture."Membership Code" := NpXmlDomMgt.GetXmlText(Element, ElementPath + 'membershipcode',
+            MaxStrLen(MemberInfoCapture."Membership Code"), false);
+        MemberInfoCapture."External Membership No." := NpXmlDomMgt.GetXmlText(Element, ElementPath + 'membershipnumber',
+            MaxStrLen(MemberInfoCapture."External Membership No."), false);
 
         NotValidReason := '';
         exit(true);
-
     end;
 
-    local procedure CreateMemberSoapXmlRequest(MemberInfoCapture: Record "NPR MM Member Info Capture"; var ScannerStationId: Text; var SoapAction: Text[50]; var XmlDoc: DotNet "NPRNetXmlDocument")
+    local procedure CreateMemberSoapXmlRequest(MemberInfoCapture: Record "NPR MM Member Info Capture"; var ScannerStationId: Text;
+        var SoapAction: Text[50]; var XmlDoc: XmlDocument)
     var
         XmlText: Text;
     begin
-
         XmlText :=
-        '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:mem="urn:microsoft-dynamics-schemas/codeunit/member_services">' +
-           '<soapenv:Header/>' +
-           '<soapenv:Body>' +
-              '<mem:AddMembershipMember>' +
-                 '<mem:member>' +
-                    CreateMemberRequest(MemberInfoCapture) +
-                 '</mem:member>' +
-                 StrSubstNo('<mem:scannerStationId>%1</mem:scannerStationId>', ScannerStationId) +
-              '</mem:AddMembershipMember>' +
-           '</soapenv:Body>' +
-        '</soapenv:Envelope>';
+            '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:mem="urn:microsoft-dynamics-schemas/codeunit/member_services">' +
+            '<soapenv:Header/>' +
+            '<soapenv:Body>' +
+                '<mem:AddMembershipMember>' +
+                    '<mem:member>' +
+                        CreateMemberRequest(MemberInfoCapture) +
+                    '</mem:member>' +
+                    StrSubstNo('<mem:scannerStationId>%1</mem:scannerStationId>', ScannerStationId) +
+                '</mem:AddMembershipMember>' +
+            '</soapenv:Body>' +
+            '</soapenv:Envelope>';
 
         SoapAction := 'AddMembershipMember';
-
-        XmlDoc := XmlDoc.XmlDocument;
-        XmlDoc.LoadXml(XmlText);
-
+        XmlDocument.ReadFrom(XmlText, XmlDoc);
     end;
 
     local procedure CreateMemberRequest(MemberInfoCapture: Record "NPR MM Member Info Capture") XmlText: Text
@@ -1058,14 +1006,17 @@ codeunit 6060147 "NPR MM NPR Membership"
 
     end;
 
-    local procedure EvaluateCreateMemberSoapXmlResponse(var MemberInfoCapture: Record "NPR MM Member Info Capture"; var NotValidReason: Text; var XmlDoc: DotNet "NPRNetXmlDocument"): Boolean
+    local procedure EvaluateCreateMemberSoapXmlResponse(var MemberInfoCapture: Record "NPR MM Member Info Capture";
+        var NotValidReason: Text; var XmlDoc: XmlDocument): Boolean
     var
         DateText: Text;
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
-        XmlElement: DotNet NPRNetXmlElement;
+        Element: XmlElement;
         ResponseText: Text;
         TextOk: Text;
         ElementPath: Text;
+        XmlText: Text;
+        XmlDomMgt: Codeunit "XML DOM Management";
     begin
 
         // <AddMembershipMember_Result xmlns="urn:microsoft-dynamics-schemas/codeunit/member_services">
@@ -1085,210 +1036,37 @@ codeunit 6060147 "NPR MM NPR Membership"
         //   </member>
         // </response>
 
-        NpXmlDomMgt.RemoveNameSpaces(XmlDoc);
-        XmlElement := XmlDoc.DocumentElement;
-        if (IsNull(XmlElement)) then begin
-            ResponseText := StrSubstNo(InvalidXml, NpXmlDomMgt.PrettyPrintXml(XmlDoc.InnerXml()));
+        XmlDoc.WriteTo(XmlText);
+        XmlDomMgt.RemoveNameSpaces(XmlText);
+        XmlDocument.ReadFrom(XmlText, XmlDoc);
+
+        if not XmlDoc.GetRoot(Element) then begin
+            ResponseText := StrSubstNo(InvalidXml, NpXmlDomMgt.PrettyPrintXml(XmlText));
             exit(false);
         end;
 
         ElementPath := '//AddMembershipMember_Result/member/addmember/response/';
-        TextOk := NpXmlDomMgt.GetXmlText(XmlElement, ElementPath + 'status', 5, true);
-        NotValidReason := StrSubstNo('Message from Server: %1', NpXmlDomMgt.GetXmlText(XmlElement, ElementPath + 'errordescription', 1000, true));
+        TextOk := NpXmlDomMgt.GetXmlText(Element, ElementPath + 'status', 5, true);
+        NotValidReason := StrSubstNo('Message from Server: %1', NpXmlDomMgt.GetXmlText(Element, ElementPath + 'errordescription', 1000, true));
         if (TextOk = '0') then
             exit(false);
 
         ElementPath := '//AddMembershipMember_Result/member/addmember/response/member/';
-        with MemberInfoCapture do begin
-            "External Member No" := NpXmlDomMgt.GetXmlText(XmlElement, ElementPath + 'membernumber', MaxStrLen("External Member No"), false);
-            "External Card No." := NpXmlDomMgt.GetXmlText(XmlElement, ElementPath + 'cardnumber', MaxStrLen("External Card No."), false);
-            DateText := NpXmlDomMgt.GetXmlText(XmlElement, ElementPath + 'expirydate', 10, false);
-            if (not Evaluate("Valid Until", DateText, 9)) then
-                "Valid Until" := 0D;
-        end;
+        MemberInfoCapture."External Member No" := NpXmlDomMgt.GetXmlText(Element, ElementPath + 'membernumber',
+            MaxStrLen(MemberInfoCapture."External Member No"), false);
+        MemberInfoCapture."External Card No." := NpXmlDomMgt.GetXmlText(Element, ElementPath + 'cardnumber',
+            MaxStrLen(MemberInfoCapture."External Card No."), false);
+        DateText := NpXmlDomMgt.GetXmlText(Element, ElementPath + 'expirydate', 10, false);
+        if (not Evaluate(MemberInfoCapture."Valid Until", DateText, 9)) then
+            MemberInfoCapture."Valid Until" := 0D;
 
         NotValidReason := '';
         exit(true);
-
-    end;
-
-    local procedure "--"()
-    begin
-    end;
-
-    local procedure GetExceptionDescription(var XmlDocOut: DotNet "NPRNetXmlDocument"; SoapAction: Text; Endpoint: Text)
-    var
-        ReasonText: Text;
-        WebException: DotNet NPRNetWebException;
-        Url: Text;
-        ErrorMessage: Text;
-        ResponseText: Text;
-        Exception: DotNet NPRNetException;
-        StatusCode: Code[10];
-        StatusDescription: Text[50];
-    begin
-
-        ReasonText := StrSubstNo('Error from WebServiceApi %1\\%2', GetLastErrorText, SoapAction);
-
-        Exception := GetLastErrorObject();
-        if ((Format(GetDotNetType(Exception.GetBaseException()))) <> (Format(GetDotNetType(WebException)))) then begin
-            //ERROR (Exception.ToString ());
-            XmlDocOut.LoadXml(StrSubstNo(
-              '<Fault>' +
-                '<faultstatus>%1</faultstatus>' +
-                '<faultstring>%2 - %3</faultstring>' +
-              '</Fault>',
-              998,
-              ReasonText,
-              Endpoint));
-            exit;
-        end;
-
-        WebException := Exception.GetBaseException();
-        TryReadExceptionResponseText(WebException, StatusCode, StatusDescription, ResponseText);
-
-        if (StrLen(ResponseText) > 0) then
-            XmlDocOut.LoadXml(ResponseText);
-
-        if (StrLen(ResponseText) = 0) then
-            XmlDocOut.LoadXml(StrSubstNo(
-              '<Fault>' +
-                '<faultstatus>%1</faultstatus>' +
-                '<faultstring>%2 - %3</faultstring>' +
-              '</Fault>',
-              StatusCode,
-              StatusDescription,
-              Endpoint));
-    end;
-
-    [TryFunction]
-    local procedure TrySendWebRequest(var XmlDoc: DotNet "NPRNetXmlDocument"; HttpWebRequest: DotNet NPRNetHttpWebRequest; var HttpWebResponse: DotNet NPRNetHttpWebResponse)
-    var
-        MemoryStream: DotNet NPRNetMemoryStream;
-    begin
-
-        MemoryStream := HttpWebRequest.GetRequestStream;
-        XmlDoc.Save(MemoryStream);
-        MemoryStream.Flush;
-        MemoryStream.Close;
-        Clear(MemoryStream);
-        HttpWebResponse := HttpWebRequest.GetResponse;
-    end;
-
-    [TryFunction]
-    local procedure TryReadResponseText(var HttpWebResponse: DotNet NPRNetHttpWebResponse; var ResponseText: Text)
-    var
-        Stream: DotNet NPRNetStream;
-        StreamReader: DotNet NPRNetStreamReader;
-    begin
-
-        Stream := HttpWebResponse.GetResponseStream;
-        StreamReader := StreamReader.StreamReader(Stream);
-        ResponseText := StreamReader.ReadToEnd;
-        Stream.Flush;
-        Stream.Close;
-        Clear(Stream);
-    end;
-
-    [TryFunction]
-    local procedure TryReadExceptionResponseText(var WebException: DotNet NPRNetWebException; var StatusCode: Code[10]; var StatusDescription: Text; var ResponseXml: Text)
-    var
-        Stream: DotNet NPRNetStream;
-        StreamReader: DotNet NPRNetStreamReader;
-        WebResponse: DotNet NPRNetWebResponse;
-        HttpWebResponse: DotNet NPRNetHttpWebResponse;
-        WebExceptionStatus: DotNet NPRNetWebExceptionStatus;
-        SystemConvert: DotNet NPRNetConvert;
-        StatusCodeInt: Integer;
-        DotNetType: DotNet NPRNetType;
-    begin
-
-        ResponseXml := '';
-
-        // No respone body on time out
-        if (WebException.Status.Equals(WebExceptionStatus.Timeout)) then begin
-            DotNetType := GetDotNetType(StatusCodeInt);
-            StatusCodeInt := SystemConvert.ChangeType(WebExceptionStatus.Timeout, DotNetType);
-            StatusCode := Format(StatusCodeInt);
-            StatusDescription := WebExceptionStatus.Timeout.ToString();
-            exit;
-        end;
-
-        // This happens for unauthorized and server side faults (4xx and 5xx)
-        // The response stream in unauthorized fails in XML transformation later
-        if (WebException.Status.Equals(WebExceptionStatus.ProtocolError)) then begin
-            HttpWebResponse := WebException.Response();
-            DotNetType := GetDotNetType(StatusCodeInt);
-            StatusCodeInt := SystemConvert.ChangeType(HttpWebResponse.StatusCode, DotNetType);
-            StatusCode := Format(StatusCodeInt);
-            StatusDescription := HttpWebResponse.StatusDescription;
-            if (StatusCode[1] = '4') then // 4xx messages
-                exit;
-        end;
-
-        StreamReader := StreamReader.StreamReader(WebException.Response().GetResponseStream());
-        ResponseXml := StreamReader.ReadToEnd;
-
-        StreamReader.Close;
-        Clear(StreamReader);
-    end;
-
-    [TryFunction]
-    local procedure TryGetWebExceptionResponse(var WebException: DotNet NPRNetWebException; var HttpWebResponse: DotNet NPRNetHttpWebResponse)
-    begin
-
-        HttpWebResponse := WebException.Response;
-    end;
-
-    [TryFunction]
-    local procedure TryGetInnerWebException(var WebException: DotNet NPRNetWebException; var InnerWebException: DotNet NPRNetWebException)
-    begin
-
-        InnerWebException := WebException.InnerException;
-    end;
-
-    [TryFunction]
-    local procedure TryParseResponseText(XmlText: Text)
-    var
-        XmlDocOut: DotNet "NPRNetXmlDocument";
-    begin
-
-        XmlDocOut := XmlDocOut.XmlDocument;
-        XmlDocOut.LoadXml(XmlText);
-
-    end;
-
-    local procedure ToBase64(StringToEncode: Text) B64String: Text
-    var
-        TempBlob: Codeunit "Temp Blob";
-        BinaryReader: DotNet NPRNetBinaryReader;
-        MemoryStream: DotNet NPRNetMemoryStream;
-        Convert: DotNet NPRNetConvert;
-        InStr: InStream;
-        Outstr: OutStream;
-    begin
-
-        Clear(TempBlob);
-        TempBlob.CreateOutStream(Outstr);
-        Outstr.WriteText(StringToEncode);
-
-        TempBlob.CreateInStream(InStr);
-        MemoryStream := InStr;
-        BinaryReader := BinaryReader.BinaryReader(InStr);
-
-        B64String := Convert.ToBase64String(BinaryReader.ReadBytes(MemoryStream.Length));
-
-        MemoryStream.Flush;
-        MemoryStream.Close;
-        Clear(MemoryStream);
-
     end;
 
     procedure XmlSafe(InText: Text): Text
     begin
-
         exit(DelChr(InText, '<=>', '<>&/'));
-
     end;
 }
 

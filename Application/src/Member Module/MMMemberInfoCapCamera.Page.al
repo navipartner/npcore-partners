@@ -1,6 +1,5 @@
 page 6060145 "NPR MM Member Info Cap. Camera"
 {
-
     Caption = 'Member Info Capture Camera';
     SourceTable = "NPR MM Member Info Capture";
 
@@ -14,29 +13,9 @@ page 6060145 "NPR MM Member Info Cap. Camera"
                 trigger SaveCompleted(HTML: Text)
                 var
                     OutS: OutStream;
-                    StreamWriter: DotNet NPRNetStreamWriter;
-                    Convert: DotNet NPRNetConvert;
-                    Bytes: DotNet NPRNetArray;
-                    MemoryStream: DotNet NPRNetMemoryStream;
                 begin
                     if HTML <> Txt then begin
                         Error(HTML);
-                        //IF HTML <> '' THEN
-                        //  HTML := COPYSTR(HTML,24);
-                        Bytes := Convert.FromBase64String(HTML);
-                        MemoryStream := MemoryStream.MemoryStream(Bytes);
-                        Picture.CreateOutStream(OutS);
-                        MemoryStream.WriteTo(OutS);
-                        Modify();
-
-                        //  Picture.CREATEOUTSTREAM(OutS);
-                        //  StreamWriter := StreamWriter.StreamWriter(OutS);
-                        //  StreamWriter.Write(CameraHook.Base64Decode(HTML));
-                        //  StreamWriter.Write(HTML);
-                        //  StreamWriter.Flush();
-                        //  StreamWriter.Close();
-                        //  Modify();
-
                     end;
 
                     CurrPage.Close();

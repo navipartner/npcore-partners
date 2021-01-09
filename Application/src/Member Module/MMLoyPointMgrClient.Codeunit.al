@@ -1,10 +1,5 @@
 codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
 {
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         NO_STORE_SETUP: Label 'Store %1, unit %2 - Loyalty store setup not found.';
         INVALID_XML: Label 'The returned XML is invalid:\\%1';
@@ -53,8 +48,8 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
         SoapAction: Text;
         ResponseMessage: Text;
         XmlRequest: Text;
-        XmlRequestDoc: DotNet "NPRNetXmlDocument";
-        XmlResponseDoc: DotNet "NPRNetXmlDocument";
+        XmlRequestDoc: XmlDocument;
+        XmlResponseDoc: XmlDocument;
         Success: Boolean;
     begin
 
@@ -63,11 +58,9 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
         LoyaltyEndpointClient.TestField(Type, LoyaltyEndpointClient.Type::LoyaltyServices);
 
         if (TransformToSoapAction(EFTTransactionRequest, SoapAction, XmlRequest, ResponseMessage)) then begin
-            XmlRequestDoc := XmlRequestDoc.XmlDocument;
-            XmlRequestDoc.LoadXml(XmlRequest);
+            XmlDocument.ReadFrom(XmlRequest, XmlRequestDoc);
             Success := LoyaltyPointsWSClient.WebServiceApi(LoyaltyEndpointClient, SoapAction, ResponseMessage, XmlRequestDoc, XmlResponseDoc);
             HandleWebServiceResult(EFTTransactionRequest, Success, ResponseMessage, XmlRequestDoc, XmlResponseDoc);
-
         end else begin
             EFTTransactionRequest.Successful := false;
             EFTTransactionRequest."Result Code" := -199;
@@ -78,7 +71,8 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
         EFTTransactionRequest.Get(EFTTransactionRequest."Entry No.");
     end;
 
-    local procedure TransformToSoapAction(var EFTTransactionRequest: Record "NPR EFT Transaction Request"; var SoapAction: Text; var XmlText: Text; var ResponseText: Text) TransformOk: Boolean
+    local procedure TransformToSoapAction(var EFTTransactionRequest: Record "NPR EFT Transaction Request";
+        var SoapAction: Text; var XmlText: Text; var ResponseText: Text) TransformOk: Boolean
     var
         IStream: InStream;
         OStream: OutStream;
@@ -118,7 +112,9 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
         exit(TransformOk);
     end;
 
-    local procedure HandleWebServiceResult(EFTTransactionRequest: Record "NPR EFT Transaction Request"; ServiceSuccess: Boolean; ResponseMessage: Text; var XmlRequestDoc: DotNet "NPRNetXmlDocument"; var XmlResponseDoc: DotNet "NPRNetXmlDocument")
+    local procedure HandleWebServiceResult(EFTTransactionRequest: Record "NPR EFT Transaction Request";
+        ServiceSuccess: Boolean; ResponseMessage: Text;
+        var XmlRequestDoc: XmlDocument; var XmlResponseDoc: XmlDocument)
     var
         OStream: OutStream;
     begin
@@ -129,11 +125,11 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
             EFTTransactionRequest."Result Description" := 'Webservice fault.';
 
             EFTTransactionRequest."Receipt 1".CreateOutStream(OStream);
-            OStream.Write(XmlResponseDoc.InnerXml());
+            XmlResponseDoc.WriteTo(OStream);
+
             EFTTransactionRequest.Modify();
             EFTTransactionRequest."Receipt 2".CreateOutStream(OStream);
-            OStream.Write(XmlRequestDoc.InnerXml());
-
+            XmlResponseDoc.WriteTo(OStream);
             EFTTransactionRequest.Modify();
             exit;
         end;
@@ -184,29 +180,24 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
         exit(true);
     end;
 
-    local procedure "--RequestHandlers"()
+    local procedure GetAuthorization(var EFTTransactionRequest: Record "NPR EFT Transaction Request";
+        LoyaltyStoreSetup: Record "NPR MM Loyalty Store Setup"; var TmpTransactionAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary)
     begin
+        TmpTransactionAuthorization."Entry No." := 1;
+        TmpTransactionAuthorization."POS Store Code" := LoyaltyStoreSetup."Store Code";
+        TmpTransactionAuthorization."POS Unit Code" := LoyaltyStoreSetup."Unit Code";
+        TmpTransactionAuthorization."Authorization Code" := LoyaltyStoreSetup."Authorization Code";
+        TmpTransactionAuthorization."Card Number" := EFTTransactionRequest."Card Number";
+        TmpTransactionAuthorization."Reference Number" := EFTTransactionRequest."Sales Ticket No.";
+        TmpTransactionAuthorization."Foreign Transaction Id" := EFTTransactionRequest.Token;
+        TmpTransactionAuthorization."Transaction Date" := EFTTransactionRequest."Transaction Date";
+        TmpTransactionAuthorization."Transaction Time" := EFTTransactionRequest."Transaction Time";
+        TmpTransactionAuthorization."Company Name" := DATABASE.CompanyName;
+        TmpTransactionAuthorization.Insert();
     end;
 
-    local procedure GetAuthorization(var EFTTransactionRequest: Record "NPR EFT Transaction Request"; LoyaltyStoreSetup: Record "NPR MM Loyalty Store Setup"; var TmpTransactionAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary)
-    begin
-
-        with TmpTransactionAuthorization do begin
-            "Entry No." := 1;
-            "POS Store Code" := LoyaltyStoreSetup."Store Code";
-            "POS Unit Code" := LoyaltyStoreSetup."Unit Code";
-            "Authorization Code" := LoyaltyStoreSetup."Authorization Code";
-            "Card Number" := EFTTransactionRequest."Card Number";
-            "Reference Number" := EFTTransactionRequest."Sales Ticket No.";
-            "Foreign Transaction Id" := EFTTransactionRequest.Token;
-            "Transaction Date" := EFTTransactionRequest."Transaction Date";
-            "Transaction Time" := EFTTransactionRequest."Transaction Time";
-            "Company Name" := DATABASE.CompanyName;
-            Insert();
-        end;
-    end;
-
-    local procedure TransformToRegisterReceipt(EFTTransactionRequest: Record "NPR EFT Transaction Request"; var SoapAction: Text; var XmlText: Text; var ResponseText: Text): Boolean
+    local procedure TransformToRegisterReceipt(EFTTransactionRequest: Record "NPR EFT Transaction Request";
+        var SoapAction: Text; var XmlText: Text; var ResponseText: Text): Boolean
     var
         TmpTransactionAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary;
         TmpRegisterPaymentLines: Record "NPR MM Reg. Sales Buffer" temporary;
@@ -217,7 +208,6 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
         EFTTransactionRequest2: Record "NPR EFT Transaction Request";
         LoyaltyPointsPSPClient: Codeunit "NPR MM Loy. Point PSP (Client)";
     begin
-
         if (not GetStoreSetup(EFTTransactionRequest."Register No.", ResponseText, LoyaltyStoreSetup)) then
             exit(false);
 
@@ -320,16 +310,12 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
         exit(true);
     end;
 
-    local procedure "--ResulHandlers"()
-    begin
-    end;
-
-    local procedure HandleReservePointsResult(EFTTransactionRequest: Record "NPR EFT Transaction Request"; var XmlResponseDoc: DotNet "NPRNetXmlDocument")
+    local procedure HandleReservePointsResult(EFTTransactionRequest: Record "NPR EFT Transaction Request"; var XmlResponseDoc: XmlDocument)
     var
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
-        XmlElement: DotNet NPRNetXmlElement;
-        XmlPoints: DotNet NPRNetXmlElement;
-        XmlResponseMessage: DotNet NPRNetXmlElement;
+        Element: XmlElement;
+        Points: XmlNode;
+        XmlResponseMessage: XmlNode;
         OStream: OutStream;
         ResponseCode: Code[20];
         ResponseMessage: Text;
@@ -339,28 +325,34 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
         NewBalance: Text;
         ElementPath: Text;
         ReceiptText: Text;
+        XmlText: Text;
+        XmlDomMgt: Codeunit "XML DOM Management";
     begin
+        XmlResponseDoc.WriteTo(XmlText);
+        XmlDomMgt.RemoveNameSpaces(XmlText);
+        XmlDocument.ReadFrom(XmlText, XmlResponseDoc);
 
-        NpXmlDomMgt.RemoveNameSpaces(XmlResponseDoc);
-        XmlElement := XmlResponseDoc.DocumentElement;
-        if (IsNull(XmlElement)) then begin
-            Error(StrSubstNo(INVALID_XML, NpXmlDomMgt.PrettyPrintXml(XmlResponseDoc.InnerXml())));
+        XmlResponseDoc.GetRoot(Element);
+
+        if Element.IsEmpty then begin
+            XmlResponseDoc.WriteTo(XmlText);
+            Error(StrSubstNo(INVALID_XML, NpXmlDomMgt.PrettyPrintXml(XmlText)));
             exit;
         end;
 
         // Status
         ElementPath := '//Body/ReservePoints_Result/reservePoints/Response/';
-        ResponseCode := NpXmlDomMgt.GetXmlText(XmlElement, ElementPath + 'Status/ResponseCode', 10, true);
-        ResponseMessage := NpXmlDomMgt.GetXmlText(XmlElement, ElementPath + 'Status/ResponseMessage', 1000, true);
+        ResponseCode := NpXmlDomMgt.GetXmlText(Element, ElementPath + 'Status/ResponseCode', 10, true);
+        ResponseMessage := NpXmlDomMgt.GetXmlText(Element, ElementPath + 'Status/ResponseMessage', 1000, true);
 
-        NpXmlDomMgt.FindNode(XmlElement, '//Body/ReservePoints_Result/reservePoints/Response/Status/ResponseMessage', XmlResponseMessage);
+        NpXmlDomMgt.FindNode(Element.AsXmlNode(), '//Body/ReservePoints_Result/reservePoints/Response/Status/ResponseMessage', XmlResponseMessage);
         MessageCode := NpXmlDomMgt.GetXmlAttributeText(XmlResponseMessage, 'MessageCode', false);
 
         // Message payload
-        NpXmlDomMgt.FindNode(XmlElement, '//Body/ReservePoints_Result/reservePoints/Response/Points', XmlPoints);
-        ReferenceNumber := NpXmlDomMgt.GetXmlAttributeText(XmlPoints, 'ReferenceNumber', false);
-        AuthorizationCode := NpXmlDomMgt.GetXmlAttributeText(XmlPoints, 'AuthorizationNumber', false);
-        NewBalance := NpXmlDomMgt.GetXmlAttributeText(XmlPoints, 'NewPointBalance', false);
+        NpXmlDomMgt.FindNode(Element.AsXmlNode(), '//Body/ReservePoints_Result/reservePoints/Response/Points', Points);
+        ReferenceNumber := NpXmlDomMgt.GetXmlAttributeText(Points, 'ReferenceNumber', false);
+        AuthorizationCode := NpXmlDomMgt.GetXmlAttributeText(Points, 'AuthorizationNumber', false);
+        NewBalance := NpXmlDomMgt.GetXmlAttributeText(Points, 'NewPointBalance', false);
 
         EFTTransactionRequest.Successful := (ResponseCode = 'OK');
         FinalizeTransactionRequest(EFTTransactionRequest, MessageCode, ResponseMessage, AuthorizationCode, ReferenceNumber);
@@ -381,12 +373,12 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
         EFTTransactionRequest.Modify();
     end;
 
-    local procedure HandleRegisterSalesResult(EFTTransactionRequest: Record "NPR EFT Transaction Request"; var XmlResponseDoc: DotNet "NPRNetXmlDocument")
+    local procedure HandleRegisterSalesResult(EFTTransactionRequest: Record "NPR EFT Transaction Request"; var XmlResponseDoc: XmlDocument)
     var
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
-        XmlElement: DotNet NPRNetXmlElement;
-        XmlPoints: DotNet NPRNetXmlElement;
-        XmlResponseMessage: DotNet NPRNetXmlElement;
+        Element: XmlElement;
+        Points: XmlNode;
+        XmlResponseMessage: XmlNode;
         ResponseCode: Code[20];
         ResponseMessage: Text;
         MessageCode: Text;
@@ -399,40 +391,43 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
         PointsSpent: Integer;
         ReceiptText: Text;
         OStream: OutStream;
+        XmlText: Text;
+        XmlDomMgt: Codeunit "XML DOM Management";
     begin
+        XmlResponseDoc.WriteTo(XmlText);
+        XmlDomMgt.RemoveNameSpaces(XmlText);
+        XmlDocument.ReadFrom(XmlText, XmlResponseDoc);
 
-        NpXmlDomMgt.RemoveNameSpaces(XmlResponseDoc);
-        XmlElement := XmlResponseDoc.DocumentElement;
-        if (IsNull(XmlElement)) then begin
-            Error(StrSubstNo(INVALID_XML, NpXmlDomMgt.PrettyPrintXml(XmlResponseDoc.InnerXml())));
-            exit;
+        if not XmlResponseDoc.GetRoot(Element) then begin
+            Error(StrSubstNo(INVALID_XML, NpXmlDomMgt.PrettyPrintXml(XmlText)));
         end;
 
         // Status
         ElementPath := '//Body/RegisterSale_Result/registerSale/Response/';
-        ResponseCode := NpXmlDomMgt.GetXmlText(XmlElement, ElementPath + 'Status/ResponseCode', 10, true);
-        ResponseMessage := NpXmlDomMgt.GetXmlText(XmlElement, ElementPath + 'Status/ResponseMessage', 1000, true);
+        ResponseCode := NpXmlDomMgt.GetXmlText(Element, ElementPath + 'Status/ResponseCode', 10, true);
+        ResponseMessage := NpXmlDomMgt.GetXmlText(Element, ElementPath + 'Status/ResponseMessage', 1000, true);
 
-        NpXmlDomMgt.FindNode(XmlElement, '//Body/RegisterSale_Result/registerSale/Response/Status/ResponseMessage', XmlResponseMessage);
+        NpXmlDomMgt.FindNode(Element.AsXmlNode(), '//Body/RegisterSale_Result/registerSale/Response/Status/ResponseMessage',
+            XmlResponseMessage);
         MessageCode := NpXmlDomMgt.GetXmlAttributeText(XmlResponseMessage, 'MessageCode', false);
 
         // Message payload
-        NpXmlDomMgt.FindNode(XmlElement, '//Body/RegisterSale_Result/registerSale/Response/Points', XmlPoints);
-        ReferenceNumber := NpXmlDomMgt.GetXmlAttributeText(XmlPoints, 'ReferenceNumber', false);
-        AuthorizationCode := NpXmlDomMgt.GetXmlAttributeText(XmlPoints, 'AuthorizationNumber', false);
+        NpXmlDomMgt.FindNode(Element.AsXmlNode(), '//Body/RegisterSale_Result/registerSale/Response/Points', Points);
+        ReferenceNumber := NpXmlDomMgt.GetXmlAttributeText(Points, 'ReferenceNumber', false);
+        AuthorizationCode := NpXmlDomMgt.GetXmlAttributeText(Points, 'AuthorizationNumber', false);
 
         EFTTransactionRequest.Successful := (ResponseCode = 'OK');
         FinalizeTransactionRequest(EFTTransactionRequest, MessageCode, ResponseMessage, AuthorizationCode, ReferenceNumber);
         EFTTransactionRequest.Modify();
         Commit();
 
-        if (not EvaluateToInteger(PointsEarned, NpXmlDomMgt.GetXmlAttributeText(XmlPoints, 'PointsEarned', false))) then
+        if (not EvaluateToInteger(PointsEarned, NpXmlDomMgt.GetXmlAttributeText(Points, 'PointsEarned', false))) then
             PointsEarned := 0;
 
-        if (not EvaluateToInteger(PointsSpent, NpXmlDomMgt.GetXmlAttributeText(XmlPoints, 'PointsSpent', false))) then
+        if (not EvaluateToInteger(PointsSpent, NpXmlDomMgt.GetXmlAttributeText(Points, 'PointsSpent', false))) then
             PointsSpent := 0;
 
-        if (not EvaluateToInteger(NewBalance, NpXmlDomMgt.GetXmlAttributeText(XmlPoints, 'NewPointBalance', false))) then
+        if (not EvaluateToInteger(NewBalance, NpXmlDomMgt.GetXmlAttributeText(Points, 'NewPointBalance', false))) then
             NewBalance := 0;
 
         ReceiptText := CreateRegisterPointsSlip(EFTTransactionRequest, 0, PointsEarned, PointsSpent, NewBalance);
@@ -443,7 +438,8 @@ codeunit 6151160 "NPR MM Loy. Point Mgr (Client)"
         Commit();
     end;
 
-    local procedure FinalizeTransactionRequest(var EFTTransactionRequest: Record "NPR EFT Transaction Request"; MessageCode: Text; ResponseMessage: Text; AuthorizationCode: Text; ReferenceNumber: Text)
+    local procedure FinalizeTransactionRequest(var EFTTransactionRequest: Record "NPR EFT Transaction Request";
+        MessageCode: Text; ResponseMessage: Text; AuthorizationCode: Text; ReferenceNumber: Text)
     var
         OStream: OutStream;
         LoyaltyStoreSetup: Record "NPR MM Loyalty Store Setup";

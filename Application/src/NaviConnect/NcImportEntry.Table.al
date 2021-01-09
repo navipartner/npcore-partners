@@ -197,7 +197,6 @@ table 6151504 "NPR Nc Import Entry"
     var
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
 
-    [Obsolete('Use native Business Central objects instead of DotNet classes', '')]
     procedure LoadXmlDoc(var XmlDoc: DotNet "NPRNetXmlDocument"): Boolean
     var
         InStr: InStream;
@@ -218,27 +217,24 @@ table 6151504 "NPR Nc Import Entry"
         //+NC1.16
     end;
 
-    procedure LoadXmlDoc(var Document: XmlDocument): Boolean
+    procedure LoadXmlDoc(var XmlDoc: XmlDocument): Boolean
     var
-        XmlDomManagement: Codeunit "XML DOM Management";
         InStr: InStream;
-        BufferText: Text;
-        XML: Text;
+        XmlDomMgt: codeunit "XML DOM Management";
+        XmlText: Text;
     begin
         CalcFields("Document Source");
         if not "Document Source".HasValue then
             exit(false);
 
         "Document Source".CreateInStream(InStr);
-        clear(Document);
+        XmlDocument.ReadFrom(InStr, XmlDoc);
 
-        while not InStr.EOS do begin
-            InStr.Read(BufferText);
-            XML += BufferText;
-        end;
+        XmlDoc.WriteTo(XmlText);
+        XmlDomMgt.RemoveNamespaces(XmlText);
+        XmlDocument.ReadFrom(XmlText, XmlDoc);
 
-        XML := XmlDomManagement.RemoveNamespaces(XML);
-        XmlDocument.ReadFrom(XML, Document);
+        Clear(InStr);
         exit(true);
     end;
 
