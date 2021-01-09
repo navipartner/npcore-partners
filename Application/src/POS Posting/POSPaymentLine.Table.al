@@ -1,20 +1,5 @@
 table 6150623 "NPR POS Payment Line"
 {
-    // NPR5.29/AP/20170126 CASE 262628 Recreated ENU-captions
-    // NPR5.30/AP/20170209 CASE 261728 Renamed field "Store Code" -> "POS Store Code"
-    // NPR5.32/AP/20170220 CASE 262628 Renamed field "Receipt No." -> "Document No."
-    // NPR5.36/AP/20170717 CASE 262628 Added "POS Ledg. Register No."
-    // NPR5.36/BR/20170810 CASE 277096 Filled LookupPageID and DrillDownPageID
-    // NPR5.38/BR/20171108 CASE 294747 Added function ShowDimensions
-    // NPR5.38/BR/20171108 CASE 294718 Added fields Applies-to Doc. Type and Applies-to Doc. No.
-    // NPR5.38/BR/20171108 CASE 294720 Added External Document No.
-    // NPR5.38/BR/20171214 CASE 299888 Renamed from POS Ledg. Register No. to POS Period Register No. (incl. Captions)
-    // NPR5.42/TSA /20180511 CASE 314834 Dimensions are editable when entry is unposted
-    // NPR5.50/TSA /20190520 CASE 354832 Added VAT related fields 84-106 for reversing unrealized VAT when using a voucher with preliminary VAT
-    // NPR5.53/SARA/20191024 CASE 373672 Added Field 600..620
-    // NPR5.54/MMV /20200220 CASE 391871 Added field "Retail ID" for payment lines.
-    // NPR5.54/ALPO/20200324 CASE 397063 Global dimensions were not updated on assigned dimension change through ShowDimensions() function ("Dimensions" button)
-
     Caption = 'POS Payment Line';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR POS Payment Line List";
@@ -260,9 +245,7 @@ table 6150623 "NPR POS Payment Line"
 
             trigger OnLookup()
             begin
-                //-NPR5.38 [294747]
                 ShowDimensions;
-                //+NPR5.38 [294747]
             end;
         }
         field(500; EFT; Boolean)
@@ -282,7 +265,7 @@ table 6150623 "NPR POS Payment Line"
         }
         field(600; "Entry Date"; Date)
         {
-            CalcFormula = Lookup ("NPR POS Entry"."Entry Date" WHERE("Entry No." = FIELD("POS Entry No.")));
+            CalcFormula = Lookup("NPR POS Entry"."Entry Date" WHERE("Entry No." = FIELD("POS Entry No.")));
             Caption = 'Entry Date';
             Description = 'NPR5.53';
             Editable = false;
@@ -290,7 +273,7 @@ table 6150623 "NPR POS Payment Line"
         }
         field(610; "Starting Time"; Time)
         {
-            CalcFormula = Lookup ("NPR POS Entry"."Starting Time" WHERE("Entry No." = FIELD("POS Entry No.")));
+            CalcFormula = Lookup("NPR POS Entry"."Starting Time" WHERE("Entry No." = FIELD("POS Entry No.")));
             Caption = 'Starting Time';
             Description = 'NPR5.53';
             Editable = false;
@@ -298,7 +281,7 @@ table 6150623 "NPR POS Payment Line"
         }
         field(620; "Ending Time"; Time)
         {
-            CalcFormula = Lookup ("NPR POS Entry"."Ending Time" WHERE("Entry No." = FIELD("POS Entry No.")));
+            CalcFormula = Lookup("NPR POS Entry"."Ending Time" WHERE("Entry No." = FIELD("POS Entry No.")));
             Caption = 'Ending Time';
             Description = 'NPR5.53';
             Editable = false;
@@ -320,33 +303,20 @@ table 6150623 "NPR POS Payment Line"
     {
     }
 
-    var
-        showdim: Integer;
-
     procedure ShowDimensions()
     var
         DimMgt: Codeunit DimensionManagement;
         POSEntry: Record "NPR POS Entry";
     begin
-
-        //-NPR5.42 [314834]
-        //-NPR5.38 [294717]
-        // DimMgt.ShowDimensionSet("Dimension Set ID",STRSUBSTNO('%1 %2 - %3',TABLECAPTION,"POS Entry No.","Line No."));
-        //+NPR5.38 [294717]
-
         POSEntry.Get("POS Entry No.");
         if ((POSEntry."Post Entry Status" = POSEntry."Post Entry Status"::Posted) and (POSEntry."Post Item Entry Status" = POSEntry."Post Item Entry Status"::Posted)) then begin
             DimMgt.ShowDimensionSet("Dimension Set ID", StrSubstNo('%1 %2 %3', TableCaption, "POS Entry No.", "Line No."));
         end else begin
-            //"Dimension Set ID" := DimMgt.EditDimensionSet ("Dimension Set ID",STRSUBSTNO('%1 %2 %3',TABLECAPTION,"POS Entry No.", "Line No."));  //NPR5.54 [397063]-revoked
-            //-NPR5.54 [397063]
             "Dimension Set ID" :=
               DimMgt.EditDimensionSet(
                 "Dimension Set ID", StrSubstNo('%1 %2 %3', TableCaption, "POS Entry No.", "Line No."), "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code");
-            //+NPR5.54 [397063]
             Modify();
         end;
-        //+NPR5.42 [314834]
     end;
 }
 

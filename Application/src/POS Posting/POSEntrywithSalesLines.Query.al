@@ -1,7 +1,5 @@
 query 6014417 "NPR POS Entry with Sales Lines"
 {
-    // NPR5.53/ALPO/20191016 CASE 371478 Query for report 60144441 "POS Item Sales with Dimensions"
-
     Caption = 'POS Entry with Sales Lines';
 
     elements

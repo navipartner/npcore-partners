@@ -1,9 +1,5 @@
 page 6150670 "NPR POS Balancing Line"
 {
-    // NPR5.39/NPKNAV/20180223  CASE 302690-01 Transport NPR5.39 - 23 February 2018
-    // NPR5.48/JDH /20181109 CASE 334163 Added Caption to Object
-    // NPR5.53/SARA/20191024 CASE 373672 Addde Action button POS Entry Card
-
     Caption = 'POS Balancing Line';
     Editable = false;
     PageType = List;

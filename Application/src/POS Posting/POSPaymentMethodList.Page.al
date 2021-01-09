@@ -1,11 +1,5 @@
 page 6150618 "NPR POS Payment Method List"
 {
-    // NPR5.29/AP/20170126 CASE 261728 Recreated ENU-captions
-    // NPR5.36/BR/20170810 CASE 277096 Added Action to navigate to POS Posting Setup
-    // NPR5.38/BR/20171024 CASE 294311 Made Non-Editable, Set CardPageID
-    // NPR5.38/BR/20171117 CASE 295255 Added Action POS Payment Lines
-    // NPR5.45/TSA /20180808 CASE 324360 Added fields to pages
-
     Caption = 'POS Payment Method List';
     CardPageID = "NPR POS Payment Method Card";
     Editable = false;

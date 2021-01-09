@@ -1,7 +1,5 @@
 page 6150659 "NPR POS Posting Log Parameters"
 {
-    // NPR5.36/BR  /20170814  CASE  277096 Object created
-
     Caption = 'POS Posting Log Parameters';
     Editable = false;
     PageType = CardPart;

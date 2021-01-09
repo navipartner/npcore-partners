@@ -1,7 +1,5 @@
 page 6150723 "NPR POS Entry Comments"
 {
-    // NPR5.36/NPKNAV/20171003  CASE 277096 Transport NPR5.36 - 3 October 2017
-
     Caption = 'POS Entry Comments';
     DeleteAllowed = false;
     Editable = false;

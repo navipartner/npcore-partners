@@ -1,7 +1,5 @@
 codeunit 6150620 "NPR POS Post Item Transaction"
 {
-    // NPR5.53/TSA /20191106 CASE 376362 Fixed POS Item Entry posting commit scope error
-
     TableNo = "NPR POS Entry";
 
     trigger OnRun()

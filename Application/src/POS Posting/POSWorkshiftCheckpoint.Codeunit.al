@@ -13,13 +13,8 @@ codeunit 6150627 "NPR POS Workshift Checkpoint"
         EntrySourceMethodOption: Option NA,AUDITROLL,BINENTRY;
         POSTING_ERROR: Label 'While posting end-of-day, the following error occured:\\%1';
 
-    procedure BeginWorkshift(POSUnit: Code[10])
-    begin
-    end;
-
     procedure EndWorkshift(Mode: Option; UnitNo: Code[20]; DimensionSetId: Integer) PosEntryNo: Integer
     begin
-
         // Main function to end the workshift
         PosEntryNo := CloseWorkshiftWorker(Mode, UnitNo, DimensionSetId);
 
@@ -27,7 +22,6 @@ codeunit 6150627 "NPR POS Workshift Checkpoint"
         OnAfterEndWorkshift(Mode, UnitNo, (PosEntryNo <> 0), PosEntryNo);
 
         exit(PosEntryNo);
-
     end;
 
     [IntegrationEvent(false, false)]

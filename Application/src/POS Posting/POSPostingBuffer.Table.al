@@ -1,13 +1,5 @@
 table 6150634 "NPR POS Posting Buffer"
 {
-    // NPR5.36/BR  /20170712  CASE 279551 Object Created
-    // NPR5.37/BR  /20171012  CASE 293227 Changed Compressedion options: Added field POS Ledger Register and changed primary key (replaced POS Store and POS Unit with POS Ledger Register)
-    // NPR5.38/BR  /20171108  CASE 294718 Added fields Applies-to Doc. Type and Applies-to Doc. No., added Applies-to Doc. No. to Primary Key
-    // NPR5.38/BR  /20171108  CASE 294720 Added External Document No.
-    // NPR5.38/BR  /20171214  CASE 299888 Renamed from POS Ledg. Register No. to POS Period Register No. (incl. Captions)
-    // NPR5.38/BR  /20180105  CASE 301054 Removed Salesperson code, Reason code, POS Period Register, Payment Method Code POS from primary Key
-    // NPR5.38/BR  /20180122  CASE 302693 Added Type = Payout
-
     Caption = 'POS Posting Buffer';
     DataClassification = CustomerContent;
 

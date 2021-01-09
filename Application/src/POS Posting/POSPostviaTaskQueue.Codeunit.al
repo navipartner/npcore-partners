@@ -1,8 +1,5 @@
 codeunit 6150631 "NPR POS Post via Task Queue"
 {
-    // NPR5.38/BR  /20180105  CASE 294723 Object Created
-    // NPR5.51/TSA /20190605 CASE 310113 Only one POS Period may be posted at one time, corrected a parameter name
-
     TableNo = "NPR Task Line";
 
     trigger OnRun()
@@ -51,18 +48,13 @@ codeunit 6150631 "NPR POS Post via Task Queue"
 
         POSEntryNoFilter := Rec.GetParameterText('POSENTRYNOFILTER');
 
-        //-NPR5.51 [310113]
-        //POSPeriodRegisterNoFilter := Rec.GetParameterText('POSENTRYNOFILTER');
         POSPeriodRegisterNoFilter := Rec.GetParameterText('PERIODREGNOFILTER');
-        //+NPR5.51 [310113]
 
         if POSEntryNoFilter <> '' then
             POSEntry.SetFilter("Entry No.", POSEntryNoFilter);
         if POSPeriodRegisterNoFilter <> '' then
             POSEntry.SetFilter("POS Period Register No.", POSPeriodRegisterNoFilter);
 
-        //-NPR5.51 [310113] -- only one POS period can be posted at a time
-        // POSPostEntries.RUN(POSEntry);
         repeat
 
             if (POSEntry.FindLast()) then
@@ -78,7 +70,6 @@ codeunit 6150631 "NPR POS Post via Task Queue"
             Commit;
 
         until (ErrorDuringPosting or POSEntry.IsEmpty());
-        //+NPR5.51 [310113]
     end;
 
     var

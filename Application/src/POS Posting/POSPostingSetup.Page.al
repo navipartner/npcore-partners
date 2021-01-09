@@ -1,7 +1,5 @@
 page 6150657 "NPR POS Posting Setup"
 {
-    // NPR5.36/BR  /20170810  CASE  277096 Object created
-
     Caption = 'POS Posting Setup';
     PageType = List;
     SourceTable = "NPR POS Posting Setup";

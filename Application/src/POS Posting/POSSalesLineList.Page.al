@@ -1,9 +1,5 @@
 page 6150655 "NPR POS Sales Line List"
 {
-    // NPR5.36/BR  /20170808  CASE  277096 Object created
-    // NPR5.39/MHA /20180221 CASE 305139 Added field 405 "Discount Authorised by"
-    // NPR5.53/SARA/20191024 CASE 373672 Addde Action button POS Entry Card
-
     Caption = 'POS Sales Line List';
     Editable = false;
     PageType = List;

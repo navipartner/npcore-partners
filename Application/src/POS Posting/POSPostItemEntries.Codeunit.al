@@ -598,8 +598,6 @@ codeunit 6150616 "NPR POS Post Item Entries"
             exit(CashRegister."Location Code");
     end;
 
-    //--- Events ---
-
     [IntegrationEvent(false, false)]
     local procedure OnBeforePostPOSEntry(var POSEntry: Record "NPR POS Entry")
     begin

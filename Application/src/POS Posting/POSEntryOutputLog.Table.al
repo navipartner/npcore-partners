@@ -1,11 +1,5 @@
 table 6150636 "NPR POS Entry Output Log"
 {
-    // NPR5.39/BR  /20180207  CASE 304165 Object Created
-    // NPR5.40/MMV /20180319  CASE 304639 Renamed object and fields to be print independent.
-    //                                    Added field 40.
-    // NPR5.41/MMV /20180425  CASE 312782 Removed table relation on field 35 as it is no longer template specific.
-    // NPR5.48/MMV /20180619  CASe 318028 Added field 31
-
     Caption = 'POS Entry Output Log';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR POS Entry Output Log";

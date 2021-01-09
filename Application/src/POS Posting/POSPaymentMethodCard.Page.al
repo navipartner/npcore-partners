@@ -1,12 +1,5 @@
 page 6150619 "NPR POS Payment Method Card"
 {
-    // NPR5.29/AP/20170126 CASE 261728 Recreated ENU-captions
-    // NPR5.36/BR/20170810 CASE 277096 Added Action to navigate to POS Posting Setup
-    // NPR5.38/BR  /20171109  CASE 294722 Added field Condensed Posting Description
-    // NPR5.38/BR  /20171117  CASE 295255 Added Action POS Payment Lines
-    // NPR5.38/BR  /20171214  CASE 299888 Changed ENU ToolTip from POS Ledger Register to POS Period Register
-    // NPR5.46/TSA /20181002 CASE 322769 Added field "Bin for Auto-Count"
-
     Caption = 'POS Payment Method Card';
     SourceTable = "NPR POS Payment Method";
 

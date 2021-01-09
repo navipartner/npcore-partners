@@ -1,7 +1,5 @@
 page 6150649 "NPR POS Entity Groups"
 {
-    // NPR5.31/AP/20170418  CASE 272321  New list page for lookup and drill down of POS Entity Groups
-
     Caption = 'POS Entity Groups';
     DataCaptionExpression = GetFormCaption;
     PageType = List;

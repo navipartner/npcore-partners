@@ -1,10 +1,5 @@
 page 6150651 "NPR POS Period Register List"
 {
-    // NPR5.36/BR  /20170808  CASE 277096 Object created
-    // NPR5.37/BR  /20171012  CASE 293227 Added posting actions
-    // NPR5.38/BR /20171214 CASE 299888 Renamed from POS Ledger Register to POS Period Register (incl. Captions)
-    // NPR5.39/BR  /20180129  CASE 302696 Added POS Balancing Lines
-
     Caption = 'POS Period Register List';
     Editable = false;
     PageType = List;
