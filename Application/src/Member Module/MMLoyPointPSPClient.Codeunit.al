@@ -1,10 +1,5 @@
 codeunit 6151162 "NPR MM Loy. Point PSP (Client)"
 {
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         Description: Label 'Pay with member loyalty points';
         FailMessage: Label 'Transaction was declined with reason code %1 - %2. ';

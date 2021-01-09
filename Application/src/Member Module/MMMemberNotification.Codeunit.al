@@ -672,8 +672,8 @@ codeunit 6060136 "NPR MM Member Notification"
         TemplateText: Text;
         instream: InStream;
         RecRef: RecordRef;
-        MessageBody: DotNet NPRNetJToken;
-        MessageResponse: DotNet NPRNetJToken;
+        MessageBody: JsonToken;
+        MessageResponse: JsonToken;
     begin
 
         with MemberNotificationEntry do
@@ -701,7 +701,7 @@ codeunit 6060136 "NPR MM Member Notification"
             TemplateData += AssignDataToPassTemplate(RecRef, templateText);
         end;
 
-        MessageBody := MessageBody.Parse(TemplateData);
+        MessageBody.ReadFrom(TemplateData);
         if (not MagentoApiPost_membership('welcome-email', MessageBody, MessageResponse)) then begin
             ResponseMessage := CopyStr(StrSubstNo('%1 - %2', GetLASTERRORTEXT, MessageBody), 1, MaxStrLen(ResponseMessage));
             exit(ResponseMessage);
@@ -768,7 +768,7 @@ codeunit 6060136 "NPR MM Member Notification"
         MemberNotificationSetup: Record "NPR MM Member Notific. Setup";
         JSONResult: Text;
         FailReason: Text;
-        JObject: DotNet JObject;
+        JObject: JsonObject;
     begin
 
         if (not MemberNotificationSetup.Get(MemberNotificationEntry."Notification Code")) then
@@ -780,7 +780,7 @@ codeunit 6060136 "NPR MM Member Notification"
         if (JSONResult = '') then
             exit(false);
 
-        JObject := JObject.Parse(JSONResult);
+        JObject.ReadFrom(JSONResult);
         MemberNotificationEntry."Wallet Pass Default URL" := GetStringValue(JObject, 'public_url.default');
         MemberNotificationEntry."Wallet Pass Andriod URL" := GetStringValue(JObject, 'public_url.android');
         MemberNotificationEntry."Wallet Pass Landing URL" := GetStringValue(JObject, 'public_url.landing');
@@ -788,16 +788,14 @@ codeunit 6060136 "NPR MM Member Notification"
         exit(true);
     end;
 
-    local procedure GetStringValue(JObject: DotNet JObject; "Key": Text): Text
+    local procedure GetStringValue(JObject: JsonObject; KeyName: Text): Text
     var
-        JToken: DotNet JToken;
+        JToken: JsonToken;
     begin
-
-        JToken := JObject.SelectToken(Key, false);
-        if (IsNull(JToken)) then
+        if not JObject.SelectToken(KeyName, JToken) then
             exit('');
 
-        exit(JToken.ToString());
+        exit(JToken.AsValue().AsText());
     end;
 
     procedure AssignDataToPassTemplate(var RecRef: RecordRef; Line: Text) NewLine: Text
@@ -830,12 +828,12 @@ codeunit 6060136 "NPR MM Member Notification"
             if (RecRef.FieldExist(FieldNumber)) then begin
 
                 FieldRef := RecRef.Field(FieldNumber);
-                if (UpperCase(Format(FieldRef.Class)) = 'FLOWFIELD') then
+                if FieldRef.Class = FieldClass::FlowField then
                     FieldRef.CalcField;
 
                 NewLine := DelStr(NewLine, StartPos, EndPos - StartPos + SeparatorLength);
 
-                if (UpperCase(Format(Format(FieldRef.Type)))) = 'OPTION' then begin
+                if FieldRef.Type = FieldType::Option then begin
                     OptionCaption := Format(FieldRef.OptionMembers);
                     Evaluate(OptionInt, Format(FieldRef.Value));
                     for i := 1 to OptionInt do
@@ -903,17 +901,13 @@ codeunit 6060136 "NPR MM Member Notification"
         exit(template);
     end;
 
-    local procedure "---Magento"()
-    begin
-    end;
-
     local procedure RequestMagentoPasswordUrl(CustomerNo: Code[20]; ContactNo: Code[20]; EmailAddress: Text[200]; var ResponseUrl: Text[200]; var ReasonText: Text): Boolean
     var
         Customer: Record Customer;
         Contact: Record Contact;
         MessageText: Text;
-        Body: DotNet NPRNetJToken;
-        Response: DotNet NPRNetJToken;
+        Body: JsonToken;
+        Response: JsonToken;
         StartPos: Integer;
         EndPos: Integer;
         ResponseText: Text;
@@ -929,7 +923,7 @@ codeunit 6060136 "NPR MM Member Notification"
             exit;
 
         MessageText := StrSubstNo('{"id":"%1","storecode":"%2"}', ContactNo, Customer."NPR Magento Store Code");
-        Body := Body.Parse(StrSubstNo('{"account": {"email":"%1", "accounts":[%2]}}', EmailAddress, MessageText));
+        Body.ReadFrom(StrSubstNo('{"account": {"email":"%1", "accounts":[%2]}}', EmailAddress, MessageText));
 
         if (not MagentoApiPost_b2b_customer('password-reset-link', Body, Response)) then begin
             ReasonText := CopyStr(GetLastErrorText, 1, MaxStrLen(ReasonText));
@@ -944,68 +938,60 @@ codeunit 6060136 "NPR MM Member Notification"
         ResponseUrl := ResponseText;
 
         exit(true);
-
     end;
 
     [TryFunction]
-    local procedure GetMagentoMessageUrl(Json: DotNet NPRNetJToken; var Url: Text)
+    local procedure GetMagentoMessageUrl(Json: JsonToken; var Url: Text)
+    var
+        JToken: JsonToken;
     begin
-
-        Url := Json.Item('messages').Item('success').Item(0).Item('message').ToString();
-
+        if Json.SelectToken('messages.success[0].message', JToken) then
+            Url := JToken.AsValue().AsText();
     end;
 
-    procedure MagentoApiPost(ApiUrl: Text; Method: Text; var Body: DotNet NPRNetJToken; var Result: DotNet NPRNetJToken)
+    procedure MagentoApiPost(ApiUrl: Text; Method: Text; var Body: JsonToken; var Result: JsonToken)
     var
         MagentoSetup: Record "NPR Magento Setup";
         StatusCode: Code[10];
-        Exception: DotNet NPRNetException;
-        HttpWebRequest: DotNet NPRNetHttpWebRequest;
-        HttpWebResponse: DotNet NPRNetHttpWebResponse;
-        ReqStream: DotNet NPRNetStream;
-        StreamReader: DotNet NPRNetStreamReader;
-        ReqStreamWriter: DotNet NPRNetStreamWriter;
-        WebException: DotNet NPRNetWebException;
+        WebRequest: HttpRequestMessage;
+        WebResponse: HttpResponseMessage;
+        WebClient: HttpClient;
         ResponseText: Text;
         StatusDescription: Text;
+        BodyText: Text;
     begin
-
         if (Method = '') then
             exit;
 
         MagentoSetup.Get();
 
-        HttpWebRequest := HttpWebRequest.Create(ApiUrl + Method);
-        HttpWebRequest.Timeout := 1000 * 60;
+        WebRequest.SetRequestUri(ApiUrl + Method);
+        WebClient.Timeout := 1000 * 60;
+        WebRequest.Method := 'POST';
 
-        HttpWebRequest.Method := 'POST';
-        MagentoSetup.Get();
         if (MagentoSetup."Api Authorization" <> '') then
-            HttpWebRequest.Headers.Add('Authorization', MagentoSetup."Api Authorization")
+            AddOrReplaceRequestHeader(WebRequest, 'Authorization', MagentoSetup."Api Authorization")
         else
-            HttpWebRequest.Headers.Add('Authorization', 'Basic ' + MagentoSetup.GetBasicAuthInfo());
+            AddOrReplaceRequestHeader(WebRequest, 'Authorization', 'Basic ' + MagentoSetup.GetBasicAuthInfo());
 
-        HttpWebRequest.ContentType('naviconnect/json');
+        AddOrReplaceContentHeader(WebRequest, 'Content-Type', 'naviconnect/json');
+        Body.WriteTo(BodyText);
+        WebRequest.Content.WriteFrom(BodyText);
 
-        if (TrySendWebRequest(Body.ToString(), HttpWebRequest, HttpWebResponse)) then begin
+        WebClient.Send(WebRequest, WebResponse);
+
+        if WebResponse.IsSuccessStatusCode then begin
             ResponseText := '{}';
-            if (TryReadResponseText(HttpWebResponse, ResponseText)) then
-                Result := Result.Parse(ResponseText);
+            if WebResponse.Content.ReadAs(ResponseText) then
+                Result.ReadFrom(ResponseText);
             exit;
         end;
 
-        Exception := GetLASTERROROBJECT();
-        if ((Format(GETDOTNETTYPE(Exception.GetBaseException()))) <> (FORMAT(GETDOTNETTYPE(WebException)))) then
-            Error(Exception.ToString());
-
-        WebException := Exception.GetBaseException();
-        TryReadExceptionResponseText(WebException, StatusCode, StatusDescription, ResponseText);
-
-        Error('%1 - %2: %3', StatusCode, StatusDescription, ResponseText);
+        Error('%1 - %2', WebResponse.HttpStatusCode, WebResponse.ReasonPhrase);
     end;
 
     [TryFunction]
-    procedure MagentoApiPost_b2b_customer(Method: Text; var Body: DotNet NPRNetJToken; var Result: DotNet NPRNetJToken)
+    procedure MagentoApiPost_b2b_customer(Method: Text; var Body: JsonToken; var Result: JsonToken)
     var
         MagentoSetup: Record 6151401;
         ApiUrl: Text;
@@ -1020,11 +1006,10 @@ codeunit 6060136 "NPR MM Member Notification"
             ApiUrl := CopyStr(MagentoSetup."Api Url", 1, STRLEN(MagentoSetup."Api Url") - (STRLEN('naviconnect/'))) + 'b2b_customer/';
 
         MagentoApiPost(ApiUrl, Method, Body, Result)
-
     end;
 
     [TryFunction]
-    procedure MagentoApiPost_membership(Method: Text; var Body: DotNet NPRNetJToken; var Result: DotNet NPRNetJToken)
+    procedure MagentoApiPost_membership(Method: Text; var Body: JsonToken; var Result: JsonToken)
     var
         MagentoSetup: Record 6151401;
         ApiUrl: Text;
@@ -1038,7 +1023,6 @@ codeunit 6060136 "NPR MM Member Notification"
         ApiUrl := StrSubstNo('%1membership/', MagentoSetup."Api Url");
 
         MagentoApiPost(ApiUrl, Method, Body, Result)
-
     end;
 
     procedure GetDefaultM2WelcomeEmailTemplate() Template: Text;
@@ -1226,47 +1210,35 @@ codeunit 6060136 "NPR MM Member Notification"
     procedure NPPassServerInvokeApi(Method: Code[10]; MemberNotificationSetup: Record "NPR MM Member Notific. Setup"; PassID: Text; var ReasonText: Text; JSONIn: Text; var JSONOut: Text): Boolean
     var
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
-        HttpWebRequest: DotNet NPRNetHttpWebRequest;
-        HttpWebResponse: DotNet NPRNetHttpWebResponse;
-        WebException: DotNet NPRNetWebException;
+        WebRequest: HttpRequestMessage;
+        WebResponse: HttpResponseMessage;
+        WebClient: HttpClient;
         Url: Text;
         ResponseText: Text;
-        Exception: DotNet NPRNetException;
-        StatusCode: Code[10];
-        StatusDescription: Text[50];
     begin
-
         ReasonText := '';
         Url := StrSubstNo('%1%2?sync=%3', MemberNotificationSetup."NP Pass Server Base URL",
-                                           StrSubstNo(MemberNotificationSetup."Passes API", MemberNotificationSetup."Pass Type Code", PassID),
-                                           Format(MemberNotificationSetup."Pass Notification Method", 0, 9));
+            StrSubstNo(MemberNotificationSetup."Passes API", MemberNotificationSetup."Pass Type Code", PassID),
+            Format(MemberNotificationSetup."Pass Notification Method", 0, 9));
 
-        HttpWebRequest := HttpWebRequest.Create(Url);
-        HttpWebRequest.Timeout := 10000;
-        HttpWebRequest.KeepAlive(true);
+        WebRequest.SetRequestUri(Url);
+        WebClient.Timeout := 10000;
+        AddOrReplaceRequestHeader(WebRequest, 'Connection', 'Keep-Alive');
+        AddOrReplaceRequestHeader(WebRequest, 'Keep-Alive', 'timeout=5, max=1000');
+        WebRequest.Method := Method;
+        AddOrReplaceContentHeader(WebRequest, 'Content-Type', 'application/json');
+        AddOrReplaceContentHeader(WebRequest, 'Accept', 'application/json');
+        AddOrReplaceRequestHeader(WebRequest, 'Authorization', StrSubstNo('Bearer %1', MemberNotificationSetup."Pass Token"));
 
-        HttpWebRequest.Method := Method;
-        HttpWebRequest.ContentType := 'application/json';
-        HttpWebRequest.Accept := 'application/json';
-        HttpWebRequest.UseDefaultCredentials(false);
-        HttpWebRequest.Headers.Add('Authorization', StrSubstNo('Bearer %1', MemberNotificationSetup."Pass Token"));
+        WebRequest.Content.WriteFrom(JSONIn);
 
-        NpXmlDomMgt.SetTrustedCertificateValidation(HttpWebRequest);
+        WebClient.Send(WebRequest, WebResponse);
 
-        if (TrySendWebRequest(JSONIn, HttpWebRequest, HttpWebResponse)) then begin
-            TryReadResponseText(HttpWebResponse, ResponseText);
+        if WebResponse.IsSuccessStatusCode then begin
+            WebResponse.Content.ReadAs(ResponseText);
             JSONOut := ResponseText;
             exit(true);
         end;
-
-        ReasonText := StrSubstNo('Error from API %1\\%2', GetLastErrorText, Url);
-
-        Exception := GetLastErrorObject();
-        if ((Format(GetDotNetType(Exception.GetBaseException()))) <> (Format(GetDotNetType(WebException)))) then
-            Error(Exception.ToString());
-
-        WebException := Exception.GetBaseException();
-        TryReadExceptionResponseText(WebException, StatusCode, StatusDescription, ResponseText);
 
         if (StrLen(ResponseText) > 0) then
             Error(ResponseText);
@@ -1277,127 +1249,11 @@ codeunit 6060136 "NPR MM Member Notification"
                 '<faultstatus>%1</faultstatus>' +
                 '<faultstring>%2 - %3</faultstring>' +
               '</Fault>',
-              StatusCode,
-              StatusDescription,
+              WebResponse.HttpStatusCode,
+              WebResponse.ReasonPhrase,
               Url));
 
         exit(false);
-    end;
-
-    [TryFunction]
-    local procedure TrySendWebRequest(JSON: Text; HttpWebRequest: DotNet NPRNetHttpWebRequest; var HttpWebResponse: DotNet NPRNetHttpWebResponse)
-    var
-        MemoryStreamOut: DotNet NPRNetMemoryStream;
-        MemoryStreamIn: DotNet NPRNetMemoryStream;
-        Encoding: DotNet NPRNetEncoding;
-    begin
-
-        if (StrLen(JSON) > 0) then begin
-            MemoryStreamIn := MemoryStreamIn.MemoryStream(Encoding.UTF8.GetBytes(JSON));
-            MemoryStreamOut := HttpWebRequest.GetRequestStream();
-
-            MemoryStreamIn.WriteTo(MemoryStreamOut);
-
-            MemoryStreamOut.Flush;
-            MemoryStreamOut.Close;
-            Clear(MemoryStreamOut);
-
-            MemoryStreamIn.Close();
-            Clear(MemoryStreamIn);
-        end;
-        HttpWebResponse := HttpWebRequest.GetResponse;
-    end;
-
-    [TryFunction]
-    local procedure TryReadResponseText(var HttpWebResponse: DotNet NPRNetHttpWebResponse; var ResponseText: Text)
-    var
-        StreamReader: DotNet NPRNetStreamReader;
-    begin
-        StreamReader := StreamReader.StreamReader(HttpWebResponse.GetResponseStream());
-        ResponseText := StreamReader.ReadToEnd;
-        StreamReader.Close;
-        Clear(StreamReader);
-    end;
-
-    [TryFunction]
-    local procedure TryReadExceptionResponseText(var WebException: DotNet NPRNetWebException; var StatusCode: Code[10]; var StatusDescription: Text; var ResponseXml: Text)
-    var
-        StreamReader: DotNet NPRNetStreamReader;
-        HttpWebResponse: DotNet NPRNetHttpWebResponse;
-        WebExceptionStatus: DotNet NPRNetWebExceptionStatus;
-        SystemConvert: DotNet NPRNetConvert;
-        StatusCodeInt: Integer;
-        DotNetType: DotNet NPRNetType;
-    begin
-
-        ResponseXml := '';
-
-        // No respone body on time out
-        if (WebException.Status.Equals(WebExceptionStatus.Timeout)) then begin
-            DotNetType := GetDotNetType(StatusCodeInt);
-            StatusCodeInt := SystemConvert.ChangeType(WebExceptionStatus.Timeout, DotNetType);
-            StatusCode := Format(StatusCodeInt);
-            StatusDescription := WebExceptionStatus.Timeout.ToString();
-            exit;
-        end;
-
-        // This happens for unauthorized and server side faults (4xx and 5xx)
-        // The response stream in unauthorized fails in XML transformation later
-        if (WebException.Status.Equals(WebExceptionStatus.ProtocolError)) then begin
-            HttpWebResponse := WebException.Response();
-            DotNetType := GetDotNetType(StatusCodeInt);
-            StatusCodeInt := SystemConvert.ChangeType(HttpWebResponse.StatusCode, DotNetType);
-            StatusCode := Format(StatusCodeInt);
-            StatusDescription := HttpWebResponse.StatusDescription;
-            if (StatusCode[1] = '4') then // 4xx messages
-                exit;
-        end;
-
-        StreamReader := StreamReader.StreamReader(WebException.Response().GetResponseStream());
-        ResponseXml := StreamReader.ReadToEnd;
-
-        StreamReader.Close;
-        Clear(StreamReader);
-    end;
-
-    [TryFunction]
-    local procedure TryGetWebExceptionResponse(var WebException: DotNet NPRNetWebException; var HttpWebResponse: DotNet NPRNetHttpWebResponse)
-    begin
-        HttpWebResponse := WebException.Response;
-    end;
-
-    [TryFunction]
-    local procedure TryGetInnerWebException(var WebException: DotNet NPRNetWebException;
-    var
-        InnerWebException: DotNet NPRNetWebException)
-    begin
-
-        InnerWebException := WebException.InnerException;
-    end;
-
-    procedure ToBase64(StringToEncode: Text) B64String: Text
-    var
-        TempBlob: Codeunit "Temp Blob";
-        BinaryReader: DotNet NPRNetBinaryReader;
-        MemoryStream: DotNet NPRNetMemoryStream;
-        Convert: DotNet NPRNetConvert;
-        InStr: InStream;
-        Outstr: OutStream;
-    begin
-
-        Clear(TempBlob);
-        TempBlob.CreateOutStream(Outstr);
-        Outstr.WriteText(StringToEncode);
-
-        TempBlob.CreateInStream(InStr);
-        MemoryStream := InStr;
-        BinaryReader := BinaryReader.BinaryReader(InStr);
-
-        B64String := Convert.ToBase64String(BinaryReader.ReadBytes(MemoryStream.Length));
-
-        MemoryStream.Flush;
-        MemoryStream.Close;
-        Clear(MemoryStream);
     end;
 
     procedure XmlSafe(InText: Text): Text
@@ -1405,5 +1261,24 @@ codeunit 6060136 "NPR MM Member Notification"
 
         exit(DelChr(InText, '<=>', DelChr(InText, '<=>', '1234567890 abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-+*')));
     end;
-}
 
+    local procedure AddOrReplaceRequestHeader(var WebRequest: HttpRequestMessage; HeaderName: Text; HeaderValue: Text);
+    var
+        Headers: HttpHeaders;
+    begin
+        WebRequest.GetHeaders(Headers);
+        if Headers.Contains(HeaderName) then
+            Headers.Remove(HeaderName);
+        Headers.Add(HeaderName, HeaderValue);
+    end;
+
+    local procedure AddOrReplaceContentHeader(var WebRequest: HttpRequestMessage; HeaderName: Text; HeaderValue: Text);
+    var
+        Headers: HttpHeaders;
+    begin
+        WebRequest.Content.GetHeaders(Headers);
+        if Headers.Contains(HeaderName) then
+            Headers.Remove(HeaderName);
+        Headers.Add(HeaderName, HeaderValue);
+    end;
+}

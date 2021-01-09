@@ -787,6 +787,12 @@ End Function</Code>
         <Field Name="Name_SalespersonPurchaser">
           <DataField>Name_SalespersonPurchaser</DataField>
         </Field>
+        <Field Name="CustomerNo_POSEntry">
+          <DataField>CustomerNo_POSEntry</DataField>
+        </Field>
+        <Field Name="Customer_PhoneNo">
+          <DataField>Customer_PhoneNo</DataField>
+        </Field>
         <Field Name="PSL_POSEntryNo">
           <DataField>PSL_POSEntryNo</DataField>
         </Field>
