@@ -1,10 +1,5 @@
 page 6150654 "NPR POS Paym. Line Subpage"
 {
-    // NPR5.36/BR  /20170808  CASE  277096 Object created
-    // NPR5.38/BR  /20171108 CASE 294720 Added field External Doc. No.
-    // NPR5.41/TSA /20180425 CASE 312784 Added Page Action ShowDimensions
-    // NPR5.50/TSA /20190520 CASE 354832 Added VAT amount fields
-
     Caption = 'POS Payment Line Subpage';
     Editable = false;
     PageType = ListPart;
@@ -84,9 +79,7 @@ page 6150654 "NPR POS Paym. Line Subpage"
 
                 trigger OnAction()
                 begin
-                    //-NPR5.38 [294717]
                     ShowDimensions;
-                    //+NPR5.38 [294717]
                 end;
             }
         }

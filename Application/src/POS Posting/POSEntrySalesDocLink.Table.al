@@ -1,9 +1,5 @@
 table 6150680 "NPR POS Entry Sales Doc. Link"
 {
-    // NPR5.50/MMV /20190417 CASE 300557 Created object
-    // NPR5.50/TSA /20190531 CASE 355186 Added options for service items
-    // NPR5.52/TSA /20191014 CASE 372920 Added options for assembly order and posted assembly order
-
     Caption = 'POS Entry Sales Doc. Link';
     DataClassification = CustomerContent;
 
@@ -99,18 +95,12 @@ table 6150680 "NPR POS Entry Sales Doc. Link"
                 exit(PAGE::"Posted Return Receipt");
             "Sales Document Type"::SHIPMENT:
                 exit(PAGE::"Posted Sales Shipment");
-            //-NPR5.50 [355186]
             "Sales Document Type"::SERVICE_ITEM:
                 exit(PAGE::"Service Items");
-            //+NPR5.50 [355186]
-            //-NPR5.52 [372920]
             "Sales Document Type"::ASSEMBLY_ORDER:
                 exit(PAGE::"Assembly Order");
             "Sales Document Type"::POSTED_ASSEMBLY_ORDER:
                 exit(PAGE::"Posted Assembly Order");
-        //+NPR5.52 [372920]
-
-
         end;
     end;
 
@@ -176,15 +166,11 @@ table 6150680 "NPR POS Entry Sales Doc. Link"
                     SalesShipmentHeader.Get("Sales Document No");
                     RecordOut := SalesShipmentHeader;
                 end;
-            //-NPR5.50 [355186]
             "Sales Document Type"::SERVICE_ITEM:
                 begin
                     ServiceItem.Get("Sales Document No");
                     RecordOut := ServiceItem;
                 end;
-            //+NPR5.50 [355186]
-
-            //-NPR5.52 [372920]
             "Sales Document Type"::ASSEMBLY_ORDER:
                 begin
                     AssemblyHeader.Get(AssemblyHeader."Document Type"::Order, "Sales Document No");
@@ -197,8 +183,6 @@ table 6150680 "NPR POS Entry Sales Doc. Link"
                     PostedAssemblyHeader.FindFirst();
                     RecordOut := PostedAssemblyHeader;
                 end;
-        //+NPR5.52 [372920]
-
         end;
     end;
 }

@@ -1,7 +1,5 @@
 page 6150722 "NPR POS Tax Line Subpage"
 {
-    // NPR5.36/BR  /20170818  CASE  277096 Object created
-
     Caption = 'POS Tax Line Subpage';
     Editable = false;
     PageType = ListPart;

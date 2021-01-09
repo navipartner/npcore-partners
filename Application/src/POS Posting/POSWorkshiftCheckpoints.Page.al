@@ -1,10 +1,5 @@
 page 6150629 "NPR POS Workshift Checkpoints"
 {
-    // NPR5.41/TSA /20180417 CASE 311540 Added Entry No field visible false
-    // NPR5.48/MMV /20180606 CASE 318028 Added field 'Type' and action 'Archive'
-    // NPR5.50/TSA /20190424 CASE 352319 Made all fields visible
-    // NPR5.51/MMV /20190611 CASE 356076 Added field 11.
-
     Caption = 'Workshift Summary';
     DeleteAllowed = false;
     Editable = false;
@@ -494,9 +489,7 @@ page 6150629 "NPR POS Workshift Checkpoints"
                 var
                     POSAuditLogMgt: Codeunit "NPR POS Audit Log Mgt.";
                 begin
-                    //-NPR5.48 [318028]
                     POSAuditLogMgt.ArchiveWorkshiftPeriod(Rec);
-                    //+NPR5.48 [318028]
                 end;
             }
         }

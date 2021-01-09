@@ -1,31 +1,5 @@
 codeunit 6150633 "NPR POS Tax Calculation"
 {
-    // NPR5.36/BR  /20170727  CASE 279552  Object Created
-    // NPR5.38/BR  /20180125  CASE 302803  Extended Error handling
-    // NPR5.39/BR  /20180221  CASE 305795  Exception for non-prod environment
-    // NPR5.41/MMV /20180413  CASE 311309  Replaced pos entry line distribution with a warning on discrepancy.
-    //                                     Added support for tax calculation on active sale lines and rearranged functions.
-    //                                     Replaced UpdateTaxFields with ValidateTaxFields
-    //                                     Removed OnRun trigger.
-    //                                     NA specific functionality handled via recref & fieldref.
-    // NPR5.45/MHA /20180817  CASE 321875 DistTaxOverSaleLinePOS() should not trigger new discount calculation
-    // NPR5.48/JDH /20181206  CASE 335967  Changed Tax calculation
-    // NPR5.48/MMV /20190207  CASE 345317 Skip rounding line in new tax check
-    // NPR5.50/TJ  /20190508  CASE 354322 Testing voucher without 0% check
-    // NPR5.51/MHA /20190718  CASE 362329 Skip "Exclude from Posting" Sales Lines
-    // NPR5.51/MHA /20190722  CASE 358985 Added function OnGetVATPostingSetup()
-
-
-    trigger OnRun()
-    begin
-        //-NPR5.41 [311309]
-        // POSEntry.SETRANGE("Entry No.");
-        // IF POSEntry.FINDSET THEN REPEAT
-        //  RefreshPOSTaxLines(POSEntry);
-        // UNTIL POSEntry.NEXT = 0;
-        //+NPR5.41 [311309]
-    end;
-
     var
         TaxJurisdiction: Record "Tax Jurisdiction";
         TaxArea: Record "Tax Area";
@@ -51,10 +25,6 @@ codeunit 6150633 "NPR POS Tax Calculation"
         CalculationOrderViolation: Boolean;
         TextTaxError: Label 'There is an error in calculating the tax. The POS Entry will not be able to be posted. Do you wish to continue?';
 
-    local procedure "-- POS Entry Calculation"()
-    begin
-    end;
-
     procedure RefreshPOSTaxLines(var POSEntryIn: Record "NPR POS Entry")
     var
         PersistentPOSTaxAmountLine: Record "NPR POS Tax Amount Line";
@@ -65,10 +35,7 @@ codeunit 6150633 "NPR POS Tax Calculation"
         if POSEntryIn."Post Entry Status" >= POSEntryIn."Post Entry Status"::Posted then
             exit;
 
-        //-NPR5.41 [311309]
-        //UpdateTaxFields(POSEntryIn);
         ValidateTaxFields(POSEntryIn);
-        //+NPR5.41 [311309]
 
         GlobalTempPOSTaxAmountLine.DeleteAll;
         PersistentPOSTaxAmountLine.SetRange("POS Entry No.", POSEntryIn."Entry No.");
@@ -79,11 +46,7 @@ codeunit 6150633 "NPR POS Tax Calculation"
 
         if not HasSalesTaxLines(POSEntryIn."Entry No.") then begin
             CalcVATAmountLines(POSEntryIn, TempVATAmountLine);
-            //-NPR5.48 [335967]
-            //UpdateVATOnLines(POSEntryIn,TempVATAmountLine);
             TestVATOnLines(POSEntryIn, TempVATAmountLine);
-            //+NPR5.48 [335967]
-
             PersistVATAmountLines(POSEntryIn, TempVATAmountLine);
         end;
 
@@ -91,17 +54,10 @@ codeunit 6150633 "NPR POS Tax Calculation"
         if NPRetailSetup."Environment Type" <> NPRetailSetup."Environment Type"::PROD then begin
             if not POSPostEntries.CheckPOSTaxAmountLines(POSEntryIn, false) then
                 if not Confirm(TextTaxError) then
-                    //-NPR5.41 [311309]
-                    //      ERROR(TextErrorUpdating,TempPOSTaxAmountLine2.TABLECAPTION,POSEntryIn.TABLECAPTION,POSEntryIn."Entry No.");
                     Error(GetLastErrorText);
-            //+NPR5.41 [311309]
         end else
-            //-NPR5.41 [311309]
-            //  IF NOT POSPostEntries.CheckPOSTaxAmountLines(POSEntryIn,TRUE) THEN
-            //    ERROR(TextErrorUpdating,TempPOSTaxAmountLine2.TABLECAPTION,POSEntryIn.TABLECAPTION,POSEntryIn."Entry No.");
             if not POSPostEntries.CheckPOSTaxAmountLines(POSEntryIn, false) then
                 Message(GetLastErrorText);
-        //+NPR5.41 [311309]
 
         OnAfterRefreshTaxPOSEntry(POSEntryIn);
     end;
@@ -124,36 +80,23 @@ codeunit 6150633 "NPR POS Tax Calculation"
 
         with POSSalesLine do begin
             SetRange("POS Entry No.", POSEntry."Entry No.");
-            //-NPR5.41 [311309]
-            //SETFILTER("Tax Group Code",'<>%1','');
             SetFilter(Type, '<>%1', Type::Rounding);
             SetRange("VAT Calculation Type", "VAT Calculation Type"::"Sales Tax");
-            //+NPR5.41 [311309]
-            //-NPR5.51 [362329]
             SetRange("Exclude from Posting", false);
-            //+NPR5.51 [362329]
             if FindSet then
                 repeat
                     AddPOSSalesLine(POSSalesLine);
                 until Next = 0;
         end;
         EndSalesTaxCalculation(POSEntry."Posting Date");
-
-        //-NPR5.41 [311309]
-        // POSSalesLine2.COPYFILTERS(POSSalesLine);
-        // DistTaxOverPOSSalesLines(POSSalesLine);
-        // POSSalesLine.COPYFILTERS(POSSalesLine2);
-        //+NPR5.41 [311309]
     end;
 
     procedure AddPOSSalesLine(POSSalesLine: Record "NPR POS Sales Line")
     var
         RecRef: RecordRef;
     begin
-        //-NPR5.51 [362329]
         if POSSalesLine."Exclude from Posting" then
             exit;
-        //+NPR5.51 [362329]
         if not GetSalesTaxCountry(POSSalesLine."Tax Area Code") then
             exit;
 
@@ -188,11 +131,6 @@ codeunit 6150633 "NPR POS Tax Calculation"
                     "Tax Group Code" := POSSalesLine."Tax Group Code";
                     "Tax Area Code" := POSSalesLine."Tax Area Code";
                     "Tax Jurisdiction Code" := TaxAreaLine."Tax Jurisdiction Code";
-                    //-NPR5.41 [311309]
-                    //      IF TaxCountry = TaxCountry::US THEN BEGIN
-                    //        TaxJurisdiction.GET("Tax Jurisdiction Code");
-                    //        "Is Report-to Jurisdiction" := ("Tax Jurisdiction Code" = TaxJurisdiction."Report-to Jurisdiction");
-                    //      END;
                     TaxJurisdiction.Get("Tax Jurisdiction Code");
                     if TaxCountry = TaxCountry::US then begin
                         RecRef.GetTable(TaxArea);
@@ -206,7 +144,6 @@ codeunit 6150633 "NPR POS Tax Calculation"
                         "Print Order" := RecRef.Field(10020).Value; //TaxJurisdiction."Print Order" in NA localization
                         "Print Description" := RecRef.Field(10030).Value; //TaxJurisdiction."Print Description" in NA localization
                     end;
-                    //+NPR5.41 [311309]
                     SetTaxBaseAmount(
                       GlobalTempPOSTaxAmountLine, POSSalesLine."Amount Excl. VAT", ExchangeFactor, false);
                     "Line Amount" := POSSalesLine."Amount Excl. VAT" / ExchangeFactor;
@@ -233,150 +170,6 @@ codeunit 6150633 "NPR POS Tax Calculation"
         end;
     end;
 
-    procedure DistTaxOverPOSSalesLines(var POSSalesLine: Record "NPR POS Sales Line")
-    var
-        POSSalesLine2: Record "NPR POS Sales Line" temporary;
-        TaxAmount: Decimal;
-        Amount: Decimal;
-        ReturnTaxAmount: Decimal;
-    begin
-        //-NPR5.41 [311309]
-        // TotalTaxAmountRounding := 0;
-        //  SetUpCurrency(POSEntry."Currency Code");
-        //  IF POSEntry."Currency Factor" = 0 THEN
-        //    ExchangeFactor := 1
-        //  ELSE
-        //    ExchangeFactor := POSEntry."Currency Factor";
-        //
-        // WITH GlobalTempPOSTaxAmountLine DO BEGIN
-        //  RESET;
-        //  IF FINDSET THEN
-        //    REPEAT
-        //      IF ("Tax Jurisdiction Code" <> TempPOSTaxAmountLine2."Tax Jurisdiction Code") AND (TaxCountry = TaxCountry::CA) THEN BEGIN
-        //        TempPOSTaxAmountLine2."Tax Jurisdiction Code" := "Tax Jurisdiction Code";
-        //        TotalTaxAmountRounding := 0;
-        //      END;
-        //      IF TaxCountry = TaxCountry::US THEN
-        //        POSSalesLine.SETRANGE("Tax Area Code","Tax Area Code");
-        //      POSSalesLine.SETRANGE("Tax Group Code","Tax Group Code");
-        //      POSSalesLine.FINDSET(TRUE);
-        //      REPEAT
-        //        IF ((TaxCountry = TaxCountry::US) OR
-        //            ((TaxCountry = TaxCountry::CA) AND TaxAreaLine.GET(POSSalesLine."Tax Area Code","Tax Jurisdiction Code"))) AND
-        //           CheckTaxAmtLinePos(POSSalesLine."Amount Excl. VAT",
-        //             Positive)
-        //        THEN BEGIN
-        //          IF "Tax Type" = "Tax Type"::"Sales and Use Tax" THEN BEGIN
-        //            Amount := (POSSalesLine."Amount Excl. VAT");
-        //            IF "Tax Difference" <> 0 THEN
-        //              TaxAmount := Amount * "Tax Amount" / "Tax Base Amount"
-        //            ELSE
-        //              TaxAmount := Amount * "Tax %" / 100;
-        //          END ELSE BEGIN
-        //            IF (POSSalesLine."Quantity (Base)" = 0) OR (Quantity = 0) THEN
-        //              TaxAmount := 0
-        //            ELSE
-        //              TaxAmount := "Tax Amount" * ExchangeFactor * POSSalesLine."Quantity (Base)" / Quantity;
-        //          END;
-        //          IF TaxAmount = 0 THEN
-        //            ReturnTaxAmount := 0
-        //          ELSE BEGIN
-        //            ReturnTaxAmount := ROUND(TaxAmount + TotalTaxAmountRounding,Currency."Amount Rounding Precision");
-        //            TotalTaxAmountRounding := TaxAmount + TotalTaxAmountRounding - ReturnTaxAmount;
-        //          END;
-        //          IF POSSalesLine2.GET(POSSalesLine."POS Entry No.",POSSalesLine."Line No.") THEN BEGIN
-        //            POSSalesLine2."Amount Incl. VAT" := POSSalesLine2."Amount Incl. VAT" + ReturnTaxAmount;
-        //            POSSalesLine2.MODIFY;
-        //          END ELSE BEGIN
-        //            POSSalesLine2.COPY(POSSalesLine);
-        //            POSSalesLine2."Amount Incl. VAT" := POSSalesLine."Amount Excl. VAT" + ReturnTaxAmount;
-        //            POSSalesLine2.INSERT;
-        //          END;
-        //          IF  POSSalesLine."Tax Liable" THEN
-        //            POSSalesLine."Amount Incl. VAT" := POSSalesLine2."Amount Incl. VAT"
-        //          ELSE
-        //            POSSalesLine."Amount Incl. VAT" := POSSalesLine."Amount Excl. VAT";
-        //          IF POSSalesLine."Amount Excl. VAT"  <> 0 THEN
-        //            POSSalesLine."VAT %" :=
-        //              ROUND(100 * (POSSalesLine."Amount Incl. VAT" - POSSalesLine."Amount Excl. VAT") / POSSalesLine."Amount Excl. VAT",0.00001)
-        //          ELSE
-        //            POSSalesLine."VAT %" := 0;
-        //          POSSalesLine.MODIFY;
-        //        END;
-        //      UNTIL POSSalesLine.NEXT = 0;
-        //    UNTIL NEXT = 0;
-        //  POSSalesLine.SETRANGE("Tax Area Code");
-        //  POSSalesLine.SETRANGE("Tax Group Code");
-        //  POSSalesLine.SETRANGE("POS Entry No.",POSEntry."Entry No.");
-        //  IF POSSalesLine.FINDSET(TRUE) THEN
-        //    REPEAT
-        //      POSSalesLine."Amount Incl. VAT" := ROUND(POSSalesLine."Amount Incl. VAT",Currency."Amount Rounding Precision");
-        //      POSSalesLine."Amount Excl. VAT" :=
-        //        ROUND(POSSalesLine."Amount Excl. VAT",Currency."Amount Rounding Precision");
-        //      POSSalesLine."VAT Base Amount" := POSSalesLine."Amount Excl. VAT";
-        //      IF (((POSSalesLine."Tax Area Code" = '') AND ("Tax Area Code" <> '')) OR (POSSalesLine."Tax Group Code" = '')) OR
-        //        (POSSalesLine.Type = POSSalesLine.Type::Voucher) THEN //Vouchers always excluding VAT
-        //          POSSalesLine."Amount Incl. VAT" := POSSalesLine."Amount Excl. VAT";
-        //      POSSalesLine.MODIFY;
-        //    UNTIL POSSalesLine.NEXT = 0;
-        // END;
-        //+NPR5.41 [311309]
-    end;
-
-    local procedure UpdateTaxFields(var POSEntryIn: Record "NPR POS Entry")
-    var
-        POSSalesLine: Record "NPR POS Sales Line";
-        VATPostingSetup: Record "VAT Posting Setup";
-        Item: Record Item;
-        GLAccount: Record "G/L Account";
-    begin
-        //-NPR5.41 [311309]
-        // POSSalesLine.SETRANGE("POS Entry No.",POSEntryIn."Entry No.");
-        // IF POSSalesLine.FINDSET THEN REPEAT
-        //  IF (POSSalesLine."VAT Identifier" = '') THEN BEGIN
-        //    IF (POSSalesLine."VAT Prod. Posting Group" = '') THEN BEGIN
-        //      CASE POSSalesLine.Type OF
-        //        POSSalesLine.Type::Item :
-        //          BEGIN
-        //            IF Item.GET(POSSalesLine."No.") THEN
-        //               POSSalesLine."VAT Prod. Posting Group" := Item."VAT Prod. Posting Group";
-        //          END;
-        //        POSSalesLine.Type::"G/L Account",POSSalesLine.Type::Voucher:
-        //          BEGIN
-        //             IF GLAccount.GET(POSSalesLine."No.") THEN
-        //               POSSalesLine."VAT Prod. Posting Group" := GLAccount."VAT Prod. Posting Group";
-        //          END;
-        //      END;
-        //    END;
-        //    IF (POSSalesLine."VAT Prod. Posting Group" <> '') THEN BEGIN
-        //      VATPostingSetup.GET(POSSalesLine."VAT Bus. Posting Group",POSSalesLine."VAT Prod. Posting Group");
-        //      IF (POSSalesLine.Type = POSSalesLine.Type::Voucher) AND (VATPostingSetup."VAT %" <> 0) THEN BEGIN //Vouchers MUST have 0 VAT
-        //        VATPostingSetup.SETRANGE("VAT Bus. Posting Group",VATPostingSetup."VAT Bus. Posting Group");
-        //        VATPostingSetup.SETRANGE("VAT %",0);
-        //        VATPostingSetup.FINDFIRST;
-        //      END;
-        //      POSSalesLine."VAT Difference" := 0;
-        //      POSSalesLine."VAT %" := VATPostingSetup."VAT %";
-        //      POSSalesLine."VAT Calculation Type" := VATPostingSetup."VAT Calculation Type";
-        //      POSSalesLine."VAT Identifier" := VATPostingSetup."VAT Identifier";
-        //      CASE POSSalesLine."VAT Calculation Type" OF
-        //        POSSalesLine."VAT Calculation Type"::"Reverse Charge VAT",
-        //        POSSalesLine."VAT Calculation Type"::"Sales Tax":
-        //          POSSalesLine."VAT %" := 0;
-        //        POSSalesLine."VAT Calculation Type"::"Full VAT":
-        //          BEGIN
-        //            POSSalesLine.TESTFIELD(Type,POSSalesLine.Type::"G/L Account");
-        //            VATPostingSetup.TESTFIELD("Sales VAT Account");
-        //            POSSalesLine.TESTFIELD("No.",VATPostingSetup."Sales VAT Account");
-        //          END;
-        //      END;
-        //      POSSalesLine.MODIFY;
-        //    END;
-        //  END;
-        // UNTIL POSSalesLine.NEXT  = 0;
-        //+NPR5.41 [311309]
-    end;
-
     local procedure ValidateTaxFields(var POSEntryIn: Record "NPR POS Entry")
     var
         POSSalesLine: Record "NPR POS Sales Line";
@@ -384,18 +177,12 @@ codeunit 6150633 "NPR POS Tax Calculation"
         Item: Record Item;
         GLAccount: Record "G/L Account";
     begin
-        //-NPR5.41 [311309]
         POSSalesLine.SetRange("POS Entry No.", POSEntryIn."Entry No.");
-        //-NPR5.51 [362329]
         POSSalesLine.SetRange("Exclude from Posting", false);
-        //+NPR5.51 [362329]
         if POSSalesLine.FindSet then
             repeat
                 if POSSalesLine.Type = POSSalesLine.Type::Voucher then begin
                     VATPostingSetup.Get(POSSalesLine."VAT Bus. Posting Group", POSSalesLine."VAT Prod. Posting Group");
-                    //-NPR5.50 [354322]
-                    //VATPostingSetup.TESTFIELD("VAT %", 0);
-                    //+NPR5.50 [354322]
                 end;
                 if (POSSalesLine."VAT Calculation Type" = POSSalesLine."VAT Calculation Type"::"Full VAT") and (POSSalesLine."VAT Prod. Posting Group" <> '') then begin
                     VATPostingSetup.Get(POSSalesLine."VAT Bus. Posting Group", POSSalesLine."VAT Prod. Posting Group");
@@ -404,7 +191,6 @@ codeunit 6150633 "NPR POS Tax Calculation"
                     POSSalesLine.TestField("No.", VATPostingSetup."Sales VAT Account");
                 end;
             until POSSalesLine.Next = 0;
-        //+NPR5.41 [311309]
     end;
 
     local procedure PersistSalesTaxAmountLines(var POSEntryIn: Record "NPR POS Entry")
@@ -475,9 +261,7 @@ codeunit 6150633 "NPR POS Tax Calculation"
 
         with GlobalPOSSalesLine do begin
             SetRange("POS Entry No.", POSEntry."Entry No.");
-            //-NPR5.51 [362329]
             SetRange("Exclude from Posting", false);
-            //+NPR5.51 [362329]
             LockTable;
             if FindSet then
                 repeat
@@ -497,34 +281,6 @@ codeunit 6150633 "NPR POS Tax Calculation"
                             end;
 
                             LineAmountToInvoice := "Amount Excl. VAT";
-                            //        In the POS, the Line Amount is always excl. VAT
-                            //            IF POSEntry."Prices Including VAT" THEN BEGIN
-                            //              IF (VATAmountLine."Line Amount" - VATAmountLine."Invoice Discount Amount" = 0) OR
-                            //                 ("Amount Excl. VAT" = 0)
-                            //              THEN BEGIN
-                            //                VATAmount := 0;
-                            //                NewAmountIncludingVAT := 0;
-                            //              END ELSE BEGIN
-                            //                VATAmount :=
-                            //                  TempVATAmountLineRemainder."VAT Amount" +
-                            //                  VATAmountLine."VAT Amount" *
-                            //                  ("Amount Excl. VAT") /
-                            //                  (VATAmountLine."Line Amount" - VATAmountLine."Invoice Discount Amount");
-                            //                NewAmountIncludingVAT :=
-                            //                  TempVATAmountLineRemainder."Amount Including VAT" +
-                            //                  VATAmountLine."Amount Including VAT" *
-                            //                  ("Amount Excl. VAT") /
-                            //                  (VATAmountLine."Line Amount" - VATAmountLine."Invoice Discount Amount");
-                            //              END;
-                            //              NewAmount :=
-                            //                ROUND(NewAmountIncludingVAT,Currency."Amount Rounding Precision") -
-                            //                ROUND(VATAmount,Currency."Amount Rounding Precision");
-                            //              NewVATBaseAmount :=
-                            //                ROUND(
-                            //                  NewAmount,
-                            //                  Currency."Amount Rounding Precision");
-                            //            END ELSE BEGIN
-                            //
                             if "VAT Calculation Type" = "VAT Calculation Type"::"Full VAT" then begin
                                 VATAmount := "Amount Excl. VAT";
                                 NewAmount := 0;
@@ -544,8 +300,6 @@ codeunit 6150633 "NPR POS Tax Calculation"
                             end;
                             NewAmountIncludingVAT := NewAmount + Round(VATAmount, Currency."Amount Rounding Precision");
 
-                            //            END;
-
                             "Amount Excl. VAT" := NewAmount;
                             "Amount Incl. VAT" := Round(NewAmountIncludingVAT, Currency."Amount Rounding Precision");
                             "VAT Base Amount" := NewVATBaseAmount;
@@ -553,8 +307,6 @@ codeunit 6150633 "NPR POS Tax Calculation"
                             UpdateLCYAmounts;
 
                             Modify;
-                            //          IF ("Deferral Code" <> '') AND (DeferralAmount <> GetDeferralAmount) THEN
-                            //            UpdateDeferralAmounts;
 
                             TempVATAmountLineRemainder."Amount Including VAT" :=
                               NewAmountIncludingVAT - Round(NewAmountIncludingVAT, Currency."Amount Rounding Precision");
@@ -581,7 +333,6 @@ codeunit 6150633 "NPR POS Tax Calculation"
         DeferralAmount: Decimal;
         POSSalesLine: Record "NPR POS Sales Line";
     begin
-        //-NPR5.48 [335967]
         POSEntry := POSEntryIn;
         Posted := POSEntry."Post Entry Status" >= POSEntry."Post Entry Status"::Posted;
 
@@ -592,23 +343,18 @@ codeunit 6150633 "NPR POS Tax Calculation"
             POSSalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
             POSSalesLine.SetRange("VAT Identifier", VATAmountLine."VAT Identifier");
             POSSalesLine.SetRange("Tax Group Code", VATAmountLine."Tax Group Code");
-            //-NPR5.48 [345317]
             POSSalesLine.SetFilter(Type, '<>%1', POSSalesLine.Type::Rounding);
-            //+NPR5.48 [345317]
             if VATAmountLine.Positive then
                 POSSalesLine.SetFilter("Amount Excl. VAT", '>=%1', 0)
             else
                 POSSalesLine.SetFilter("Amount Excl. VAT", '<%1', 0);
-            //-NPR5.51 [362329]
             POSSalesLine.SetRange("Exclude from Posting", false);
-            //+NPR5.51 [362329]
             POSSalesLine.CalcSums("Line Amount", "Amount Excl. VAT", "Amount Incl. VAT");
 
             VATAmountLine.TestField("VAT Base", POSSalesLine."Amount Excl. VAT");
             VATAmountLine.TestField("Amount Including VAT", POSSalesLine."Amount Incl. VAT");
             VATAmountLine.TestField("VAT Amount", POSSalesLine."Amount Incl. VAT" - POSSalesLine."Amount Excl. VAT");
         until VATAmountLine.Next = 0;
-        //+NPR5.48 [335967]
     end;
 
     procedure CalcVATAmountLines(var POSEntryIn: Record "NPR POS Entry"; var VATAmountLine: Record "VAT Amount Line")
@@ -634,27 +380,17 @@ codeunit 6150633 "NPR POS Tax Calculation"
 
         with GlobalPOSSalesLine do begin
             SetRange("POS Entry No.", POSEntryIn."Entry No.");
-            //-NPR5.41 [311309]
             SetFilter(Type, '<>%1', Type::Rounding);
-            //+NPR5.41 [311309]
-            //-NPR5.51 [362329]
             SetRange("Exclude from Posting", false);
-            //+NPR5.51 [362329]
             if FindSet then
                 repeat
                     if (("Unit Price" <> 0) and (Quantity <> 0)) or ("Amount Excl. VAT" <> 0) then begin
                         if ("VAT Calculation Type" in
                            ["VAT Calculation Type"::"Reverse Charge VAT", "VAT Calculation Type"::"Sales Tax"])
-                        //-NPR5.50 [354322]
-                        //OR (Type = Type::Voucher) THEN //Vouchers exluded from VAT
                         then
-                            //+NPR5.50 [354322]
                             "VAT %" := 0;
                         if not VATAmountLine.Get(
-                             //-NPR5.48 [335967]
-                             //"VAT Identifier","VAT Calculation Type","Tax Group Code",FALSE,"Amount Excl. VAT" >= 0)
                              "VAT Identifier", "VAT Calculation Type", "Tax Group Code", false, "Line Amount" >= 0)
-                        //+NPR5.48 [335967]
                         then begin
                             VATAmountLine.Init;
                             VATAmountLine."VAT Identifier" := "VAT Identifier";
@@ -662,151 +398,16 @@ codeunit 6150633 "NPR POS Tax Calculation"
                             VATAmountLine."Tax Group Code" := "Tax Group Code";
                             VATAmountLine."VAT %" := "VAT %";
                             VATAmountLine.Modified := true;
-                            //-NPR5.48 [335967]
-                            //VATAmountLine.Positive := "Amount Excl. VAT" >= 0;
                             VATAmountLine.Positive := "Line Amount" >= 0;
-                            //+NPR5.48 [335967]
                             VATAmountLine.Insert;
                         end;
                         VATAmountLine.Quantity := VATAmountLine.Quantity + "Quantity (Base)";
-                        //-NPR5.48 [335967]
-                        //VATAmountLine."Line Amount" := VATAmountLine."Line Amount" + "Amount Excl. VAT";
-                        //VATAmountLine."VAT Difference" := VATAmountLine."VAT Difference" + "VAT Difference";
                         VATAmountLine."Line Amount" := VATAmountLine."Line Amount" + "Line Amount";
-                        //+NPR5.48 [335967]
-
                         VATAmountLine.Modify;
                         TotalVATAmount := TotalVATAmount + "Amount Incl. VAT" - "Amount Excl. VAT";
                     end;
                 until Next = 0;
         end;
-
-        //-NPR5.48 [335967]
-        //Copyed CalcVATAmountLines from T37, and commented previous version
-        // WITH VATAmountLine DO
-        //  IF FINDSET THEN
-        //    REPEAT
-        //      IF (PrevVatAmountLine."VAT Identifier" <> "VAT Identifier") OR
-        //         (PrevVatAmountLine."VAT Calculation Type" <> "VAT Calculation Type") OR
-        //         (PrevVatAmountLine."Tax Group Code" <> "Tax Group Code") OR
-        //         (PrevVatAmountLine."Use Tax" <> "Use Tax")
-        //      THEN
-        //        PrevVatAmountLine.INIT;
-        //     // VAT Calculation independendant of price (unlike in Sales Order
-        // //      IF POSEntry."Prices Including VAT" THEN BEGIN
-        // //        CASE "VAT Calculation Type" OF
-        // //          "VAT Calculation Type"::"Normal VAT",
-        // //          "VAT Calculation Type"::"Reverse Charge VAT":
-        // //            BEGIN
-        // //              "VAT Base" :=
-        // //                ROUND(
-        // //                  ("Line Amount" - "Invoice Discount Amount") / (1 + "VAT %" / 100),
-        // //                  Currency."Amount Rounding Precision") - "VAT Difference";
-        // //              "VAT Amount" :=
-        // //                "VAT Difference" +
-        // //                ROUND(
-        // //                  PrevVatAmountLine."VAT Amount" +
-        // //                  ("Line Amount" - "Invoice Discount Amount" - "VAT Base" - "VAT Difference"),
-        // //                  Currency."Amount Rounding Precision",Currency.VATRoundingDirection);
-        // //              "Amount Including VAT" := "VAT Base" + "VAT Amount";
-        // //              IF Positive THEN
-        // //                PrevVatAmountLine.INIT
-        // //              ELSE BEGIN
-        // //                PrevVatAmountLine := VATAmountLine;
-        // //                PrevVatAmountLine."VAT Amount" :=
-        // //                  ("Line Amount" - "Invoice Discount Amount" - "VAT Base" - "VAT Difference");
-        // //                PrevVatAmountLine."VAT Amount" :=
-        // //                  PrevVatAmountLine."VAT Amount" -
-        // //                  ROUND(PrevVatAmountLine."VAT Amount",Currency."Amount Rounding Precision",Currency.VATRoundingDirection);
-        // //              END;
-        // //            END;
-        // //          "VAT Calculation Type"::"Full VAT":
-        // //            BEGIN
-        // //              "VAT Base" := 0;
-        // //              "VAT Amount" := "VAT Difference" + "Line Amount" - "Invoice Discount Amount";
-        // //              "Amount Including VAT" := "VAT Amount";
-        // //            END;
-        // //          "VAT Calculation Type"::"Sales Tax":
-        // //            BEGIN
-        // //              "Amount Including VAT" := "Line Amount" - "Invoice Discount Amount";
-        // //              "VAT Base" :=
-        // //                ROUND(
-        // //                  SalesTaxCalculate.ReverseCalculateTax(
-        // //                    GlobalPOSSalesLine."Tax Area Code","Tax Group Code",GlobalPOSSalesLine."Tax Liable",
-        // //                    POSEntry."Posting Date","Amount Including VAT",Quantity,POSEntry."Currency Factor"),
-        // //                  Currency."Amount Rounding Precision");
-        // //              "VAT Amount" := "VAT Difference" + "Amount Including VAT" - "VAT Base";
-        // //              IF "VAT Base" = 0 THEN
-        // //                "VAT %" := 0
-        // //              ELSE
-        // //                "VAT %" := ROUND(100 * "VAT Amount" / "VAT Base",0.00001);
-        // //            END;
-        // //        END;
-        // //      END ELSE
-        //        CASE "VAT Calculation Type" OF
-        //          "VAT Calculation Type"::"Normal VAT",
-        //          "VAT Calculation Type"::"Reverse Charge VAT":
-        //            BEGIN
-        //              "VAT Base" := "Line Amount" - "Invoice Discount Amount";
-        //              "VAT Amount" :=
-        //                "VAT Difference" +
-        //                ROUND(
-        //                  PrevVatAmountLine."VAT Amount" +
-        //                  "VAT Base" * "VAT %" / 100,
-        //                  Currency."Amount Rounding Precision",Currency.VATRoundingDirection);
-        //              "Amount Including VAT" := "Line Amount" - "Invoice Discount Amount" + "VAT Amount";
-        //              IF Positive THEN
-        //                PrevVatAmountLine.INIT
-        //              ELSE
-        //                IF NOT "Includes Prepayment" THEN BEGIN
-        //                  PrevVatAmountLine := VATAmountLine;
-        //                  PrevVatAmountLine."VAT Amount" :=
-        //                    "VAT Base" * "VAT %" / 100 ;
-        //                  PrevVatAmountLine."VAT Amount" :=
-        //                    PrevVatAmountLine."VAT Amount" -
-        //                    ROUND(PrevVatAmountLine."VAT Amount",Currency."Amount Rounding Precision",Currency.VATRoundingDirection);
-        //                END;
-        //            END;
-        //          "VAT Calculation Type"::"Full VAT":
-        //            BEGIN
-        //              "VAT Base" := 0;
-        //              "VAT Amount" := "VAT Difference" + "Line Amount" - "Invoice Discount Amount";
-        //              "Amount Including VAT" := "VAT Amount";
-        //            END;
-        //          "VAT Calculation Type"::"Sales Tax":
-        //            BEGIN
-        //              "VAT Base" := "Line Amount" - "Invoice Discount Amount";
-        //              "VAT Amount" :=
-        //                SalesTaxCalculate.CalculateTax(
-        //                  GlobalPOSSalesLine."Tax Area Code","Tax Group Code",GlobalPOSSalesLine."Tax Liable",
-        //                  POSEntry."Posting Date","VAT Base",Quantity,POSEntry."Currency Factor");
-        //              IF "VAT Base" = 0 THEN
-        //                "VAT %" := 0
-        //              ELSE
-        //                "VAT %" := ROUND(100 * "VAT Amount" / "VAT Base",0.00001);
-        //              "VAT Amount" :=
-        //                "VAT Difference" +
-        //                ROUND("VAT Amount",Currency."Amount Rounding Precision",Currency.VATRoundingDirection);
-        //              "Amount Including VAT" := "VAT Base" + "VAT Amount";
-        //            END;
-        //        END;
-        //
-        //      IF RoundingLineInserted THEN
-        //        TotalVATAmount := TotalVATAmount - "VAT Amount";
-        //      "Calculated VAT Amount" := "VAT Amount" - "VAT Difference";
-        //      MODIFY;
-        //    UNTIL NEXT = 0;
-        //
-        // IF RoundingLineInserted AND (TotalVATAmount <> 0) THEN
-        //  IF VATAmountLine.GET(GlobalPOSSalesLine."VAT Identifier",GlobalPOSSalesLine."VAT Calculation Type",
-        //       GlobalPOSSalesLine."Tax Group Code",FALSE,GlobalPOSSalesLine."Amount Excl. VAT" >= 0)
-        //  THEN BEGIN
-        //    VATAmountLine."VAT Amount" := VATAmountLine."VAT Amount" + TotalVATAmount;
-        //    VATAmountLine."Amount Including VAT" := VATAmountLine."Amount Including VAT" + TotalVATAmount;
-        //    VATAmountLine."Calculated VAT Amount" := VATAmountLine."Calculated VAT Amount" + TotalVATAmount;
-        //    VATAmountLine.MODIFY;
-        //  END;
-
 
         with VATAmountLine do
             if FindSet then
@@ -918,7 +519,6 @@ codeunit 6150633 "NPR POS Tax Calculation"
                     "Calculated VAT Amount" := "VAT Amount" - "VAT Difference";
                     Modify;
                 until Next = 0;
-        //+NPR5.48 [335967]
     end;
 
     local procedure HasSalesTaxLines(POSEntryNo: Integer): Boolean
@@ -949,7 +549,6 @@ codeunit 6150633 "NPR POS Tax Calculation"
         TaxArea: Record "Tax Area";
         SalesTaxCalculate: Codeunit "Sales Tax Calculate";
     begin
-        //-NPR5.41 [311309]
         if SalePOS."Tax Area Code" = '' then
             exit;
         if SalePOS."Prices Including VAT" then
@@ -975,7 +574,6 @@ codeunit 6150633 "NPR POS Tax Calculation"
 
         EndSalesTaxCalculation(SalePOS.Date);
         DistTaxOverSaleLinePOS(SaleLinePOS);
-        //+NPR5.41 [311309]
     end;
 
     local procedure AddSaleLinePOS(SaleLinePOS: Record "NPR Sale Line POS")
@@ -983,11 +581,8 @@ codeunit 6150633 "NPR POS Tax Calculation"
         POSCreateEntry: Codeunit "NPR POS Create Entry";
         RecRef: RecordRef;
     begin
-        //-NPR5.51 [362329]
         if POSCreateEntry.ExcludeFromPosting(SaleLinePOS) then
             exit;
-        //+NPR5.51 [362329]
-        //-NPR5.41 [311309]
         if not GetSalesTaxCountry(SaleLinePOS."Tax Area Code") then
             exit;
 
@@ -1059,7 +654,6 @@ codeunit 6150633 "NPR POS Tax Calculation"
                 end;
             until TaxAreaLine.Next = 0;
         end;
-        //+NPR5.41 [311309]
     end;
 
     local procedure DistTaxOverSaleLinePOS(var SaleLinePOS: Record "NPR Sale Line POS")
@@ -1069,16 +663,13 @@ codeunit 6150633 "NPR POS Tax Calculation"
         TaxAmount: Decimal;
         ReturnTaxAmount: Decimal;
     begin
-        //+NPR5.41 [311309]
         TotalTaxAmountRounding := 0;
         SetUpCurrency(POSEntry."Currency Code");
         if POSEntry."Currency Factor" = 0 then
             ExchangeFactor := 1
         else
             ExchangeFactor := POSEntry."Currency Factor";
-        //-NPR5.45 [321875]
         SaleLinePOS.SetSkipCalcDiscount(true);
-        //+NPR5.45 [321875]
         with GlobalTempPOSTaxAmountLine do begin
             Reset;
             if FindSet then
@@ -1150,19 +741,10 @@ codeunit 6150633 "NPR POS Tax Calculation"
                     SaleLinePOS.Modify;
                 until SaleLinePOS.Next = 0;
         end;
-        //+NPR5.41 [311309]
-    end;
-
-    local procedure "-- Hooks"()
-    begin
     end;
 
     [IntegrationEvent(false, false)]
     procedure OnGetVATPostingSetup(var VATPostingSetup: Record "VAT Posting Setup"; var Handled: Boolean)
-    begin
-    end;
-
-    local procedure "-- Aux"()
     begin
     end;
 
@@ -1186,9 +768,6 @@ codeunit 6150633 "NPR POS Tax Calculation"
         if TaxAreaRead then begin
             if TaxAreaCode = TaxArea.Code then
                 exit(true);
-            //-NPR5.41 [311309]
-            //  IF TaxArea.GET(TaxAreaCode) THEN
-            //    EXIT(TRUE);
             if TaxArea.Get(TaxAreaCode) then begin
                 RecRef.GetTable(TaxArea);
                 NewTaxCountry := RecRef.Field(10010).Value; //TaxArea."Country/Region" in NA localization.
@@ -1197,14 +776,11 @@ codeunit 6150633 "NPR POS Tax Calculation"
                 else
                     exit(true);
             end;
-            //+NPR5.41 [311309]
         end else
             if TaxArea.Get(TaxAreaCode) then begin
                 TaxAreaRead := true;
-                //-NPR5.41 [311309]
                 RecRef.GetTable(TaxArea);
                 TaxCountry := RecRef.Field(10010).Value; //TaxArea."Country/Region" in NA localization.
-                                                         //+NPR5.41 [311309]
                 exit(true);
             end;
 
@@ -1267,22 +843,6 @@ codeunit 6150633 "NPR POS Tax Calculation"
                           FieldCaption("Tax Group Code"), "Tax Group Code",
                           TaxDetail.FieldCaption("Effective Date"), TaxDetail.GetFilter("Effective Date"));
                 until Next = 0;
-            Reset;
-            //TO-DO (If it turns out this is necessary for POS transactions)
-            //  IF FINDSET(TRUE) THEN
-            //    REPEAT
-            //      TempTaxAmountDifference.RESET;
-            //      TempTaxAmountDifference.SETRANGE("Tax Area Code","Tax Area Code for Key");
-            //      TempTaxAmountDifference.SETRANGE("Tax Jurisdiction Code","Tax Jurisdiction Code");
-            //      TempTaxAmountDifference.SETRANGE("Tax Group Code","Tax Group Code");
-            //      TempTaxAmountDifference.SETRANGE("Expense/Capitalize","Expense/Capitalize");
-            //      TempTaxAmountDifference.SETRANGE("Tax Type","Tax Type");
-            //      TempTaxAmountDifference.SETRANGE("Use Tax","Use Tax");
-            //      IF TempTaxAmountDifference.FINDFIRST THEN BEGIN
-            //        "Tax Difference" := TempTaxAmountDifference."Tax Difference";
-            //        MODIFY;
-            //      END;
-            //    UNTIL NEXT = 0;
             Reset;
             SetCurrentKey("Tax Area Code for Key", "Tax Group Code", "Tax Type", "Calculation Order");
             if FindLast then begin

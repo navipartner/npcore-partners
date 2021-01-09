@@ -1,18 +1,5 @@
 page 6150627 "NPR POS Workshift Checkp. Card"
 {
-    // NPR5.36/NPKNAV/20171003  CASE 282251 Transport NPR5.36 - 3 October 2017
-    // NPR5.37/TSA /20171026 CASE 282251 Removing some old debug code that is interfering
-    // NPR5.38/TSA /20171110 CASE 295549 Removing more old debug code that is interfering
-    // NPR5.40/TSA /20180228 CASE 282251 Add Tax Checkpoint button
-    // NPR5.40/TSA /20180228 CASE 306581 Add X-Report Printing
-    // NPR5.40/TSA /20180228 CASE 306581 Add NP Retail Setup check for new old source for bin entries
-    // NPR5.40/TSA /20180308 CASE 306581 Added function for Checkpoint mode (Preliminart | Final)
-    // NPR5.45/TSA /20180720 CASE 322769 Refactoring
-    // NPR5.46/TSA /20180913 CASE 328326 Adding a view mode (non editable) of the counting
-    // NPR5.48/TSA /20190111 CASE 339571 Changed layout due to new fields being added
-    // NPR5.49/TSA /20190314 CASE 348458 Forced blind count
-    // NPR5.50/TSA /20190424 CASE 352319 Removed "Delete" option
-
     Caption = 'Workshift Details';
     DataCaptionFields = "POS Unit No.";
     DeleteAllowed = false;
@@ -414,7 +401,6 @@ page 6150627 "NPR POS Workshift Checkp. Card"
                     POSCreateEntry: Codeunit "NPR POS Create Entry";
                     CheckpointEntryNo: Integer;
                 begin
-
                     //POSCheckpointMgr.CreateEndWorkshiftCheckpoint_AuditRoll ("POS Unit No.");
                     //FINDLAST();
                 end;
@@ -486,9 +472,7 @@ page 6150627 "NPR POS Workshift Checkp. Card"
 
     trigger OnInit()
     begin
-        //-NPR5.46 [328326]
         PageMode := PageMode::VIEW;
-        //+NPR5.46 [328326]
     end;
 
     trigger OnOpenPage()
@@ -508,10 +492,7 @@ page 6150627 "NPR POS Workshift Checkp. Card"
         PaymentBinCheckpointPage: Page "NPR POS Payment Bin Checkpoint";
         POSPaymentBinCheckpoint: Record "NPR POS Payment Bin Checkp.";
     begin
-
-        //-NPR5.45 [306157]
         POSWorkshiftCheckpoint.CreateBinCheckpoint(Rec."Entry No.");
-        //+NPR5.45 [306157]
         Commit;
 
         POSPaymentBinCheckpoint.Reset();
@@ -519,9 +500,7 @@ page 6150627 "NPR POS Workshift Checkp. Card"
         PaymentBinCheckpointPage.SetTableView(POSPaymentBinCheckpoint);
         PaymentBinCheckpointPage.SetCheckpointMode(PageMode);
 
-        //-NPR5.49 [348458]
         PaymentBinCheckpointPage.SetBlindCount(IsBlindCount);
-        //+NPR5.49 [348458]
 
         PaymentBinCheckpointPage.RunModal();
     end;
@@ -533,18 +512,13 @@ page 6150627 "NPR POS Workshift Checkp. Card"
         if (Mode = Mode::FINAL) then
             PageMode := PageMode::FINAL;
 
-        //-NPR5.46 [328326]
         if (Mode = Mode::VIEW) then
             PageMode := PageMode::VIEW;
-        //+NPR5.46 [328326]
     end;
 
     procedure SetBlindCount(HideFields: Boolean)
     begin
-
-        //-NPR5.49 [348458]
         IsBlindCount := HideFields;
-        //+NPR5.49 [348458]
     end;
 }
 
