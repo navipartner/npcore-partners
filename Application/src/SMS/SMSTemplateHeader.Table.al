@@ -1,10 +1,5 @@
 table 6059940 "NPR SMS Template Header"
 {
-    // NPR5.26/THRO/20160908 CASE 244114 SMS Module
-    // NPR5.30/THRO/20170203 CASE 263182 Added field 50 Recipient
-    // NPR5.40/THRO/20180314 CASE 304312 Added field 120 "Report ID"
-    // NPR5.46/BHR /20180824  CASE 322752 Replace record Object to Allobj -field 120
-
     Caption = 'SMS Template Header';
     DrillDownPageID = "NPR SMS Template List";
     LookupPageID = "NPR SMS Template List";
@@ -31,7 +26,7 @@ table 6059940 "NPR SMS Template Header"
         }
         field(25; "Table Caption"; Text[80])
         {
-            CalcFormula = Lookup ("Table Metadata".Caption WHERE(ID = FIELD("Table No.")));
+            CalcFormula = Lookup("Table Metadata".Caption WHERE(ID = FIELD("Table No.")));
             Caption = 'Table Caption';
             Editable = false;
             FieldClass = FlowField;
@@ -51,7 +46,6 @@ table 6059940 "NPR SMS Template Header"
                 "Field": Record "Field";
                 SMSFieldList: Page "NPR SMS Field List";
             begin
-                //-NPR5.30 [263182]
                 if "Table No." = 0 then
                     exit;
                 Field.SetRange(TableNo, "Table No.");
@@ -61,7 +55,6 @@ table 6059940 "NPR SMS Template Header"
                     SMSFieldList.GetRecord(Field);
                     Recipient := StrSubstNo('{%1}', Field."No.");
                 end;
-                //+NPR5.30 [263182]
             end;
         }
         field(100; "Table Filters"; BLOB)

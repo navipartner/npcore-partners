@@ -1,9 +1,5 @@
 codeunit 6059940 "NPR SMS Management"
 {
-    trigger OnRun()
-    begin
-    end;
-
     var
         DataTypeManagement: Codeunit "Data Type Management";
         AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
@@ -31,9 +27,6 @@ codeunit 6059940 "NPR SMS Management"
 
     procedure SendSMS(PhoneNo: Text; Sender: Text; SMSMessage: Text)
     var
-        HttpResponseMessage: DotNet NPRNetHttpResponseMessage;
-        StringContent: DotNet NPRNetStringContent;
-        Encoding: DotNet NPRNetEncoding;
         IComm: Record "NPR I-Comm";
         ServiceCalc: Codeunit "NPR Service Calculation";
         SMSHandled: Boolean;
@@ -318,38 +311,40 @@ codeunit 6059940 "NPR SMS Management"
 
     local procedure MakeSMSBody(PhoneNo: Text; Sender: Text; SMSMessage: Text): Text
     var
-        XmlDoc: DotNet "NPRNetXmlDocument";
-        XmlNode: DotNet NPRNetXmlNode;
-        XMLDOMManagement: Codeunit "XML DOM Management";
+        XmlDoc: XmlDocument;
+        Root: XmlElement;
+        Xml: Text;
     begin
-        XmlDoc := XmlDoc.XmlDocument;
-        XMLDOMManagement.AddRootElement(XmlDoc, 'message', XmlNode);
-        XMLDOMManagement.AddNode(XmlNode, 'recipients', PhoneNo);
-        XMLDOMManagement.AddNode(XmlNode, 'sender', Sender);
-        XMLDOMManagement.AddNode(XmlNode, 'message', SMSMessage);
-        exit(XmlDoc.InnerXml);
+        XmlDocument.ReadFrom('<?xml version="1.0" encoding="utf-8"?><message />', XmlDoc);
+        XmlDoc.GetRoot(Root);
+        Root.Add(XmlElement.Create('recipients', '', PhoneNo));
+        Root.Add(XmlElement.Create('sender', '', Sender));
+        Root.Add(XmlElement.Create('message', '', SMSMessage));
+        XmlDoc.WriteTo(Xml);
+        exit(Xml);
     end;
 
     [TryFunction]
-    local procedure CallRestWebService(BaseURL: Text; Method: Text; RestMethod: Text; var HttpContent: DotNet NPRNetHttpContent; var HttpResponseMessage: DotNet NPRNetHttpResponseMessage)
+    local procedure CallRestWebService(BaseURL: Text; Method: Text; RestMethod: Text;
+        var Content: HttpContent; var ResponseMessage: HttpResponseMessage)
     var
-        HttpClient: DotNet NPRNetHttpClient;
-        Uri: DotNet NPRNetUri;
+        WebClient: HttpClient;
+        ResponseText: Text;
     begin
-        HttpClient := HttpClient.HttpClient;
-        HttpClient.BaseAddress := Uri.Uri(BaseURL);
         case RestMethod of
             'GET':
-                HttpResponseMessage := HttpClient.GetAsync(Method).Result;
+                WebClient.Get(BaseURL, ResponseMessage);
             'POST':
-                HttpResponseMessage := HttpClient.PostAsync(Method, HttpContent).Result;
+                WebClient.Post(BaseURL, Content, ResponseMessage);
             'PUT':
-                HttpResponseMessage := HttpClient.PutAsync(Method, HttpContent).Result;
+                WebClient.Put(BaseURL, Content, ResponseMessage);
             'DELETE':
-                HttpResponseMessage := HttpClient.DeleteAsync(Method).Result;
+                WebClient.Delete(BaseURL, ResponseMessage);
         end;
-        if not HttpResponseMessage.IsSuccessStatusCode then
-            Error(HttpResponseMessage.Content.ReadAsStringAsync.Result);
+        if not ResponseMessage.IsSuccessStatusCode then begin
+            ResponseMessage.Content.ReadAs(ResponseText);
+            Error(ResponseText);
+        end;
     end;
 
     #region Template handling
@@ -830,12 +825,11 @@ codeunit 6059940 "NPR SMS Management"
     local procedure CallRestWebServiceNew(RequestURL: Text; Sender: Text; Destination: Text; SMSMessage: Text; var ResponseString: Text)
     var
         RequestString: Text;
-        HttpWebRequest: DotNet NPRNetHttpWebRequest;
-        ReqStream: DotNet NPRNetStream;
-        ReqStreamWriter: DotNet NPRNetStreamWriter;
-        HttpWebResponse: DotNet NPRNetHttpWebResponse;
-        ResponseStream: DotNet NPRNetStream;
-        ResponseStreamReader: DotNet NPRNetStreamReader;
+        RequestMessage: HttpRequestMessage;
+        ResponseMessage: HttpResponseMessage;
+        WebClient: HttpClient;
+        Headers: HttpHeaders;
+        ContentHeaders: HttpHeaders;
     begin
         RequestString := '{';
         RequestString += '"source":"' + Sender + '",';
@@ -845,35 +839,32 @@ codeunit 6059940 "NPR SMS Management"
         RequestString += '"platformPartnerId": "' + AzureKeyVaultMgt.GetSecret('SMSMgtPlatformPartnerId') + '",';
         RequestString += '"useDeliveryReport": false}';
 
+        RequestMessage.SetRequestUri(RequestURL);
+        RequestMessage.Method := 'POST';
+        RequestMessage.GetHeaders(Headers);
+        if Headers.Contains('Authorization') then
+            Headers.Remove('Authorization');
+        Headers.Add('Authorization', 'Basic ' + GetBasicAuthInfo(AzureKeyVaultMgt.GetSecret('SMSMgtUsername'), AzureKeyVaultMgt.GetSecret('SMSMgtPassword')));
 
-        HttpWebRequest := HttpWebRequest.Create(RequestURL);
-        HttpWebRequest.ContentType('application/json;charset=utf-8');
-        HttpWebRequest.Headers.Add('Authorization', 'Basic ' + GetBasicAuthInfo(AzureKeyVaultMgt.GetSecret('SMSMgtUsername'), AzureKeyVaultMgt.GetSecret('SMSMgtPassword')));
-        HttpWebRequest.Method('POST');
+        RequestMessage.Content.GetHeaders(ContentHeaders);
+        if ContentHeaders.Contains('Content-Type') then
+            ContentHeaders.Remove('Content-Type');
+        ContentHeaders.Add('Content-Type', 'application/json;charset=utf-8');
 
-        ReqStream := HttpWebRequest.GetRequestStream;
+        RequestMessage.Content.WriteFrom(RequestString);
 
-        ReqStreamWriter := ReqStreamWriter.StreamWriter(ReqStream);
-        ReqStreamWriter.Write(RequestString);
-        ReqStreamWriter.Flush;
-        ReqStreamWriter.Close;
-        Clear(ReqStreamWriter);
-        Clear(ReqStream);
+        WebClient.Send(RequestMessage, ResponseMessage);
 
-        HttpWebResponse := HttpWebRequest.GetResponse;
-        ResponseStream := HttpWebResponse.GetResponseStream;
-        ResponseStreamReader := ResponseStreamReader.StreamReader(ResponseStream);
-        ResponseString := ResponseStreamReader.ReadToEnd;
-        if HttpWebResponse.StatusCode <> 200 then
-            Error('%1 - %2 - %3', HttpWebResponse.StatusCode, HttpWebResponse.StatusDescription, ResponseString);
+        ResponseMessage.Content.ReadAs(ResponseString);
+        if not ResponseMessage.IsSuccessStatusCode then
+            Error('%1 - %2 - %3',
+                ResponseMessage.HttpStatusCode, ResponseMessage.ReasonPhrase, ResponseString);
     end;
 
     procedure GetBasicAuthInfo(Username: Text; Password: Text): Text
     var
-        Convert: DotNet NPRNetConvert;
-        Encoding: DotNet NPRNetEncoding;
+        Base64Convert: Codeunit "Base64 Convert";
     begin
-
-        exit(Convert.ToBase64String(Encoding.UTF8.GetBytes(Username + ':' + Password)));
+        exit(Base64Convert.ToBase64(StrSubstNo('%1:%2', Username, Password)))
     end;
 }

@@ -1,10 +1,5 @@
 page 6059944 "NPR SMS Send Message"
 {
-    // NPR5.26/THRO/20160908 CASE 244114 SMS Module
-    // NPR5.30/THRO/20170203 CASE 263182 Show sms message text
-    //                                   Changed Name and Caption of page
-    // NPR5.38/THRO/20180108 CASE 301396 Added option to send through NaviDocs with Delay Until
-
     Caption = 'SMS Send Message';
     DeleteAllowed = false;
     InsertAllowed = false;
@@ -53,9 +48,7 @@ page 6059944 "NPR SMS Send Message"
                                 SelectedRecordRef.Close;
                             if SelectRecord(Rec, SelectedRecordRef) then begin
                                 Text := Format(SelectedRecordRef.RecordId);
-                                //-NPR5.30 [263182]
                                 SMSMessageText := SMSManagement.MakeMessage(Rec, SelectedRecordRef);
-                                //+NPR5.30 [263182]
                                 exit(true);
                             end else
                                 Text := '';
@@ -100,10 +93,8 @@ page 6059944 "NPR SMS Send Message"
                         var
                             SMSManagement: Codeunit "NPR SMS Management";
                         begin
-                            //-NPR5.38 [301396]
                             if SendingOption = SendingOption::"Through NaviDocs" then
                                 SMSManagement.IsNaviDocsAvailable(true);
-                            //+NPR5.38 [301396]
                         end;
                     }
                     group(Control6150623)
@@ -128,12 +119,8 @@ page 6059944 "NPR SMS Send Message"
 
     trigger OnAfterGetCurrRecord()
     begin
-        //-NPR5.30 [263182]
-        //-NPR5.38 [301396]
         ShowRecordSelection := ("Table No." <> 0) and ShowRecordSelection and (Mode < Mode::Batch);
-        //+NPR5.38 [301396]
         SMSMessageText := SMSManagement.MakeMessage(Rec, SelectedRecordRef);
-        //+NPR5.30 [263182]
     end;
 
     trigger OnInit()
@@ -143,11 +130,7 @@ page 6059944 "NPR SMS Send Message"
 
     trigger OnOpenPage()
     begin
-        //-NPR5.30 [263182]
-        //-NPR5.38 [301396]
         ShowRecordSelection := IsRecRefEmpty(SelectedRecordRef) and (Mode < Mode::Batch);
-        //+NPR5.38 [301396]
-        //+NPR5.30 [263182]
     end;
 
     var
@@ -167,29 +150,21 @@ page 6059944 "NPR SMS Send Message"
 
     procedure SetData(ReceiverPhoneNo: Text; RecRef: RecordRef; Sender: Text; DialogMode: Option Test,SingleRecord,Batch; RecordSelectionText: Text)
     begin
-        //-NPR5.30 [263182]
         PhoneNo := ReceiverPhoneNo;
         SelectedRecordRef := RecRef;
         SenderText := Sender;
-        //+NPR5.30 [263182]
-        //-NPR5.38 [301396]
         Mode := DialogMode;
         InfoText := RecordSelectionText;
-        //+NPR5.38 [301396]
     end;
 
     procedure GetData(var ReceiverPhoneNo: Text; var RecRef: RecordRef; var SMSBodyText: Text; var Sender: Text; var SendOption: Option; var SendDelayUntil: DateTime)
     begin
         ReceiverPhoneNo := PhoneNo;
         RecRef := SelectedRecordRef;
-        //-NPR5.30 [263182]
         SMSBodyText := SMSMessageText;
         Sender := SenderText;
-        //+NPR5.30 [263182]
-        //-NPR5.38 [301396]
         SendOption := SendingOption;
         SendDelayUntil := DelayUntil;
-        //+NPR5.38 [301396]
     end;
 
     local procedure SelectRecord(Template: Record "NPR SMS Template Header"; var RecRef: RecordRef): Boolean
@@ -224,14 +199,12 @@ page 6059944 "NPR SMS Send Message"
     var
         EmptyRecRef: RecordRef;
     begin
-        //-NPR5.30 [263182]
         if RecRef.Number = 0 then
             exit(true);
         EmptyRecRef.Open(RecRef.Number);
         if RecRef.RecordId = EmptyRecRef.RecordId then
             exit(true);
         exit(RecRef.IsEmpty);
-        //+NPR5.30 [263182]
     end;
 }
 

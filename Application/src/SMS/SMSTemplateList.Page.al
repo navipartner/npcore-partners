@@ -1,8 +1,5 @@
 page 6059940 "NPR SMS Template List"
 {
-    // NPR5.26/THRO/20160908 CASE 244114 SMS Module
-    // NPR5.40/THRO/20180308 CASE 304312 Added "Report ID"
-
     Caption = 'SMS Template List';
     CardPageID = "NPR SMS Template Card";
     Editable = false;
