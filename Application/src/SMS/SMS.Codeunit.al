@@ -1,11 +1,5 @@
 codeunit 6014502 "NPR SMS"
 {
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         ServiceCalc: Codeunit "NPR Service Calculation";
         IComm: Record "NPR I-Comm";

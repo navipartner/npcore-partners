@@ -1,7 +1,5 @@
 page 6014636 "NPR Send SMS"
 {
-    // NPR5.27/MHA /20161025  CASE 255580 Sms changed to use new Sms Module (cu 6059940)
-
     Caption = 'Send SMS';
 
     layout

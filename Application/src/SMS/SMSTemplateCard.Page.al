@@ -1,11 +1,5 @@
 page 6059941 "NPR SMS Template Card"
 {
-    // NPR5.26/THRO/20160908 CASE 244114 SMS Module
-    // NPR5.30/THRO/20170203 CASE 263182 Added Recipient
-    // NPR5.38/THRO/20180108 CASE 301396 Added Action Send Batch SMS
-    // NPR5.40/THRO/20180302 CASE 304312 Added "Report ID" and Option to add report link via Azure function
-    // NPR5.55/LS/20200407  CASE 387142 Changed caption of Action "Send test SMS" from "Send test SMS" to "Send SMS"
-
     Caption = 'SMS Template Card';
     PromotedActionCategories = 'New,Process,Report,Functions';
     SourceTable = "NPR SMS Template Header";
@@ -41,9 +35,7 @@ page 6059941 "NPR SMS Template Card"
                         SMSManagement: Codeunit "NPR SMS Management";
                     begin
                         TableFiltersEnabled := "Table No." <> 0;
-                        //-NPR5.40 [304312]
                         CurrPage.SMSTemplateSubform.PAGE.SetReportLinkEnabled(CurrPage.Editable and ("Table No." <> 0) and ("Report ID" <> 0));
-                        //+NPR5.40 [304312]
                     end;
                 }
                 field("Table Caption"; "Table Caption")
@@ -73,9 +65,7 @@ page 6059941 "NPR SMS Template Card"
 
                     trigger OnValidate()
                     begin
-                        //-NPR5.40 [304312]
                         CurrPage.SMSTemplateSubform.PAGE.SetReportLinkEnabled(CurrPage.Editable and ("Table No." <> 0) and ("Report ID" <> 0));
-                        //+NPR5.40 [304312]
                     end;
                 }
             }
@@ -136,9 +126,7 @@ page 6059941 "NPR SMS Template Card"
                     var
                         SMSManagement: Codeunit "NPR SMS Management";
                     begin
-                        //-NPR5.38 [301396]
                         SMSManagement.SendBatchSMS(Rec);
-                        //+NPR5.38 [301396]
                     end;
                 }
             }
@@ -167,9 +155,7 @@ page 6059941 "NPR SMS Template Card"
     trigger OnAfterGetCurrRecord()
     begin
         TableFiltersEnabled := "Table No." <> 0;
-        //-NPR5.40 [304312]
         CurrPage.SMSTemplateSubform.PAGE.SetReportLinkEnabled(CurrPage.Editable and ("Table No." <> 0) and ("Report ID" <> 0));
-        //+NPR5.40 [304312]
     end;
 
     var

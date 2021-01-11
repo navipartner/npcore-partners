@@ -1,7 +1,5 @@
 table 6059941 "NPR SMS Template Line"
 {
-    // NPR5.26/THRO/20160908 CASE 244114 SMS Module
-
     Caption = 'SMS Template Line';
     DataClassification = CustomerContent;
 
