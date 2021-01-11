@@ -1,10 +1,5 @@
 table 6150905 "NPR HC Payment Type POS"
 {
-    // NPR5.37/BR  /20171027 CASE 267552 HQ Connector:  Created object based on Table 6014402
-    // NPR5.38/BR  /20171128 CASE 297946 Added field 600 HQ Processing
-    // NPR5.46/BHR /20180824  CASE 322752 Replace record Object to Allobj -field 329
-    // NPR5.48/TJ  /20190128 CASE 340446 Fixed dimension table relations
-
     Caption = 'HC Payment Type POS';
     DataClassification = CustomerContent;
     LookupPageID = "NPR HC Payment Types";
@@ -137,7 +132,7 @@ table 6150905 "NPR HC Payment Type POS"
         }
         field(27; "Amount in Audit Roll"; Decimal)
         {
-            CalcFormula = Sum ("NPR HC Audit Roll"."Amount Including VAT" WHERE("Register No." = FIELD("Register Filter"),
+            CalcFormula = Sum("NPR HC Audit Roll"."Amount Including VAT" WHERE("Register No." = FIELD("Register Filter"),
                                                                             "Sales Ticket No." = FIELD("Receipt Filter"),
                                                                             "Sale Date" = FIELD("Date Filter"),
                                                                             "Sale Type" = CONST(Payment),
@@ -231,7 +226,7 @@ table 6150905 "NPR HC Payment Type POS"
         }
         field(37; "No. of Sales in Audit Roll"; Integer)
         {
-            CalcFormula = Count ("NPR HC Audit Roll" WHERE("Register No." = FIELD("Register Filter"),
+            CalcFormula = Count("NPR HC Audit Roll" WHERE("Register No." = FIELD("Register Filter"),
                                                        "Sales Ticket No." = FIELD("Receipt Filter"),
                                                        Type = CONST(Item),
                                                        "Sale Type" = CONST(Sale),
@@ -247,7 +242,7 @@ table 6150905 "NPR HC Payment Type POS"
         }
         field(38; "Normal Sale in Audit Roll"; Decimal)
         {
-            CalcFormula = Sum ("NPR HC Audit Roll"."Amount Including VAT" WHERE("Sale Date" = FIELD("Date Filter"),
+            CalcFormula = Sum("NPR HC Audit Roll"."Amount Including VAT" WHERE("Sale Date" = FIELD("Date Filter"),
                                                                             "Register No." = FIELD("Register Filter"),
                                                                             "Sale Type" = CONST(Sale),
                                                                             Type = CONST(Item),
@@ -262,7 +257,7 @@ table 6150905 "NPR HC Payment Type POS"
         }
         field(39; "Debit Sale in Audit Roll"; Decimal)
         {
-            CalcFormula = Sum ("NPR HC Audit Roll"."Amount Including VAT" WHERE("Sale Date" = FIELD("Date Filter"),
+            CalcFormula = Sum("NPR HC Audit Roll"."Amount Including VAT" WHERE("Sale Date" = FIELD("Date Filter"),
                                                                             "Register No." = FIELD("Register Filter"),
                                                                             "Sale Type" = CONST("Debit Sale"),
                                                                             Type = CONST(Item),
@@ -278,7 +273,7 @@ table 6150905 "NPR HC Payment Type POS"
         }
         field(40; "No. of Items in Audit Roll"; Decimal)
         {
-            CalcFormula = Sum ("NPR HC Audit Roll".Quantity WHERE("Register No." = FIELD("Register Filter"),
+            CalcFormula = Sum("NPR HC Audit Roll".Quantity WHERE("Register No." = FIELD("Register Filter"),
                                                               "Sales Ticket No." = FIELD("Receipt Filter"),
                                                               "Sale Date" = FIELD("Date Filter"),
                                                               Type = CONST(Item),
@@ -292,7 +287,7 @@ table 6150905 "NPR HC Payment Type POS"
         }
         field(41; "Cost Amount in Audit Roll"; Decimal)
         {
-            CalcFormula = Sum ("NPR HC Audit Roll".Cost WHERE("Register No." = FIELD("Register Filter"),
+            CalcFormula = Sum("NPR HC Audit Roll".Cost WHERE("Register No." = FIELD("Register Filter"),
                                                           "Sales Ticket No." = FIELD("Receipt Filter"),
                                                           "Sale Date" = FIELD("Date Filter"),
                                                           Type = CONST(Item),
@@ -307,7 +302,7 @@ table 6150905 "NPR HC Payment Type POS"
         }
         field(42; "No. of Sale Lines in Aud. Roll"; Integer)
         {
-            CalcFormula = Count ("NPR HC Audit Roll" WHERE("Register No." = FIELD("Register Filter"),
+            CalcFormula = Count("NPR HC Audit Roll" WHERE("Register No." = FIELD("Register Filter"),
                                                        "Sales Ticket No." = FIELD("Receipt Filter"),
                                                        "Sale Date" = FIELD("Date Filter"),
                                                        Type = FILTER(<> Cancelled & <> "Open/Close"),
@@ -327,7 +322,7 @@ table 6150905 "NPR HC Payment Type POS"
         }
         field(44; "No. of Items in Audit Debit"; Decimal)
         {
-            CalcFormula = Sum ("NPR HC Audit Roll".Quantity WHERE("Register No." = FIELD("Register Filter"),
+            CalcFormula = Sum("NPR HC Audit Roll".Quantity WHERE("Register No." = FIELD("Register Filter"),
                                                               "Sales Ticket No." = FIELD("Receipt Filter"),
                                                               "Sale Date" = FIELD("Date Filter"),
                                                               Type = CONST("Debit Sale"),
@@ -342,7 +337,7 @@ table 6150905 "NPR HC Payment Type POS"
         }
         field(45; "No. of Item Lines in Aud. Deb."; Integer)
         {
-            CalcFormula = Count ("NPR HC Audit Roll" WHERE("Register No." = FIELD("Register Filter"),
+            CalcFormula = Count("NPR HC Audit Roll" WHERE("Register No." = FIELD("Register Filter"),
                                                        "Sales Ticket No." = FIELD("Receipt Filter"),
                                                        Type = CONST("Debit Sale"),
                                                        "No." = FILTER(<> ''),
@@ -358,7 +353,7 @@ table 6150905 "NPR HC Payment Type POS"
         }
         field(46; "No. of Deb. Sales in Aud. Roll"; Integer)
         {
-            CalcFormula = Count ("NPR HC Audit Roll" WHERE("Register No." = FIELD("Register Filter"),
+            CalcFormula = Count("NPR HC Audit Roll" WHERE("Register No." = FIELD("Register Filter"),
                                                        "Sales Ticket No." = FIELD("Receipt Filter"),
                                                        "Sale Type" = CONST("Debit Sale"),
                                                        "Line No." = CONST(10000),
@@ -418,7 +413,7 @@ table 6150905 "NPR HC Payment Type POS"
         }
         field(53; "Norm. Sales in Audit Excl. VAT"; Decimal)
         {
-            CalcFormula = Sum ("NPR HC Audit Roll".Amount WHERE("Sale Date" = FIELD("Date Filter"),
+            CalcFormula = Sum("NPR HC Audit Roll".Amount WHERE("Sale Date" = FIELD("Date Filter"),
                                                             "Register No." = FIELD("Register Filter"),
                                                             "Sale Type" = CONST(Sale),
                                                             Type = CONST(Item),
@@ -444,7 +439,7 @@ table 6150905 "NPR HC Payment Type POS"
         }
         field(56; "Debit Cost Amount Audit Roll"; Decimal)
         {
-            CalcFormula = Sum ("NPR HC Audit Roll".Cost WHERE("Sale Date" = FIELD("Date Filter"),
+            CalcFormula = Sum("NPR HC Audit Roll".Cost WHERE("Sale Date" = FIELD("Date Filter"),
                                                           "Register No." = FIELD("Register Filter"),
                                                           "Sale Type" = CONST("Debit Sale"),
                                                           Type = CONST(Item),
@@ -460,7 +455,7 @@ table 6150905 "NPR HC Payment Type POS"
         }
         field(57; "Debit Sales in Audit Excl. VAT"; Decimal)
         {
-            CalcFormula = Sum ("NPR HC Audit Roll".Amount WHERE("Sale Date" = FIELD("Date Filter"),
+            CalcFormula = Sum("NPR HC Audit Roll".Amount WHERE("Sale Date" = FIELD("Date Filter"),
                                                             "Register No." = FIELD("Register Filter"),
                                                             "Sale Type" = CONST("Debit Sale"),
                                                             Type = CONST(Item),
@@ -542,7 +537,7 @@ table 6150905 "NPR HC Payment Type POS"
         }
         field(71; "Balancing Total"; Decimal)
         {
-            CalcFormula = Sum ("NPR HC Audit Roll"."Line No." WHERE("Register No." = FIELD("No."),
+            CalcFormula = Sum("NPR HC Audit Roll"."Line No." WHERE("Register No." = FIELD("No."),
                                                                 "Sales Ticket No." = FIELD("Register Filter")));
             Caption = 'Counted';
             Editable = false;
@@ -785,10 +780,6 @@ table 6150905 "NPR HC Payment Type POS"
         }
     }
 
-    fieldgroups
-    {
-    }
-
     trigger OnDelete()
     var
         Trans0001: Label 'You cannot delete paymentmethod %1, since there non-posted postings in the audit roll';
@@ -802,18 +793,12 @@ table 6150905 "NPR HC Payment Type POS"
         if AuditRoll.Find('-') then
             Error(Trans0001, "No.");
 
-        //-NPR5.48 [340446]
-        //DimMgt.DeleteDefaultDim(DATABASE::"Payment Type POS","No.");
         DimMgt.DeleteDefaultDim(DATABASE::"NPR HC Payment Type POS", "No.");
-        //+NPR5.48 [340446]
     end;
 
     trigger OnInsert()
     begin
-        //-NPR5.48 [340446]
-        //DimMgt.UpdateDefaultDim(DATABASE::"Payment Type POS","No.",
         DimMgt.UpdateDefaultDim(DATABASE::"NPR HC Payment Type POS", "No.",
-        //+NPR5.48 [340446]
                                 "Global Dimension 1 Code", "Global Dimension 2 Code");
     end;
 
@@ -832,8 +817,6 @@ table 6150905 "NPR HC Payment Type POS"
     end;
 
     var
-        Register: Record "NPR HC Register";
-        PaymentTypePOS: Record "NPR HC Payment Type POS";
         RetailSetup: Record "NPR HC Retail Setup";
         GLAccount: Record "G/L Account";
         AuditRoll: Record "NPR HC Audit Roll";
@@ -843,10 +826,7 @@ table 6150905 "NPR HC Payment Type POS"
     procedure ValidateShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
     begin
         DimMgt.ValidateDimValueCode(FieldNumber, ShortcutDimCode);
-        //-NPR5.48 [340446]
-        //DimMgt.SaveDefaultDim(DATABASE::Customer,"No.",FieldNumber,ShortcutDimCode);
         DimMgt.SaveDefaultDim(DATABASE::"NPR HC Payment Type POS", "No.", FieldNumber, ShortcutDimCode);
-        //+NPR5.48 [340446]
         Modify;
     end;
 }

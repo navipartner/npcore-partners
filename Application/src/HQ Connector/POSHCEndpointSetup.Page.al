@@ -1,8 +1,5 @@
 page 6150906 "NPR POS HC Endpoint Setup"
 {
-    // NPR5.38/TSA /20171205 CASE 297946 Initial Version
-    // NPR5.38/NPKNAV/20180126  CASE 297859 Transport NPR5.38 - 26 January 2018
-
     Caption = 'Endpoint Setup';
     PageType = Card;
     UsageCategory = Administration;
@@ -67,10 +64,6 @@ page 6150906 "NPR POS HC Endpoint Setup"
                 }
             }
         }
-    }
-
-    actions
-    {
     }
 }
 

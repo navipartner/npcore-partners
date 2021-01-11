@@ -1,7 +1,5 @@
 page 6150901 "NPR HC Audit Roll Stats"
 {
-    // NPR5.37/BR  /20171027 CASE 267552 HQ Connector Created Object based on Page 6014429
-
     Caption = 'HC Audit Roll Statistics';
     Editable = false;
     PageType = Worksheet;
@@ -75,13 +73,8 @@ page 6150901 "NPR HC Audit Roll Stats"
         }
     }
 
-    actions
-    {
-    }
-
     trigger OnOpenPage()
     begin
-
         SetCurrentKey("Register No.", "Sales Ticket No.", "Sale Date", "Sale Type");
         CalcSums("Amount Including VAT", Cost, "Line Discount Amount", Amount);
         Salgspris := "Amount Including VAT";
@@ -95,14 +88,11 @@ page 6150901 "NPR HC Audit Roll Stats"
     end;
 
     var
-        Revisionsrulle1: Record "NPR HC Audit Roll";
         DG: Decimal;
         DB: Decimal;
         CalcKostpris: Decimal;
         Netto: Decimal;
         Salgspris: Decimal;
         Rabat: Decimal;
-        Rabatpct: Decimal;
-        Text10600000: Label '<Precision,2:2><Standard Format,0>';
 }
 

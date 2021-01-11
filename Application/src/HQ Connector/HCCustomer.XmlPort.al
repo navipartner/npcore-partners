@@ -1,8 +1,5 @@
 xmlport 6150904 "NPR HC Customer"
 {
-    // NPR5.38/BR  /20171128 CASE 297946 HQ Connector Created Object
-    // NPR5.44/MHA /20180702 CASE 321096 Added <pricesIncludesVat>
-
     Caption = 'HC Customer';
     FormatEvaluate = Xml;
     UseDefaultNamespace = true;
@@ -155,18 +152,6 @@ xmlport 6150904 "NPR HC Customer"
                     }
                 }
             }
-        }
-    }
-
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
         }
     }
 }

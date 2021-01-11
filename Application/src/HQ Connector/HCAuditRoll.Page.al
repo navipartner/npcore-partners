@@ -1,15 +1,5 @@
 page 6150900 "NPR HC Audit Roll"
 {
-    // NPR5.37/BR  /20171027 CASE 267552 HQ Connector Created Object based on Page 6014432
-    // NPR5.38/JDH /20180119 CASE 302570 Changed option String "filter" to english
-    // NPR5.39/TJ  /20180207 CASE 302634 Deleted unused variables and translated variables/functions to english
-    // NPR5.48/MHA /20182111 CASE 326055 Added field 5022 "Reference"
-    // NPR5.48/TJ  /20181115 CASE 331992 Added dimension fields
-    // NPR5.48/TJ  /20190129 CASE 340446 Changes for version 2018 - removed actions POS Info and Show Period
-    // NPR5.51/TJ  /20190123 CASE 343685 Fixed double posting doc. no. generation for same ticket
-    // NPR5.53/TJ  /20191114 CASE 377556 Actions "Show Documents" and Navigate are now hidden
-    //                                   New action "Show Documents Custom"
-
     Caption = 'HC Audit Roll';
     Editable = false;
     PageType = List;
@@ -32,7 +22,6 @@ page 6150900 "NPR HC Audit Roll"
 
                 trigger OnValidate()
                 begin
-                    // SalesColor := TRUE;
                     if Typefilter > Typefilter::" " then begin
                         SetRange(Type, Typefilter - 1);
                         boolCancelled := false;
@@ -149,16 +138,6 @@ page 6150900 "NPR HC Audit Roll"
 
                 trigger OnValidate()
                 begin
-                    /*
-                   CASE Bogf¢rtfilter OF
-                     Bogf¢rtfilter::" " :
-                       SETRANGE(Posted);
-                     Bogf¢rtfilter::No :
-                       SETRANGE(Posted,FALSE);
-                     Bogf¢rtfilter::Yes :
-                       SETRANGE(Posted,TRUE);
-                   END;
-                   */
                     if PostedFilter = PostedFilter::" " then begin
                         SetRange(Posted);
                     end else begin
@@ -170,9 +149,7 @@ page 6150900 "NPR HC Audit Roll"
                             end;
                         end;
                     end;
-
                     CurrPage.Update(true);
-
                 end;
             }
             repeater(Control6150622)
@@ -378,7 +355,6 @@ page 6150900 "NPR HC Audit Roll"
 
                     trigger OnAction()
                     begin
-
                         Filter[1] := PaymentEntries();
                     end;
                 }
@@ -394,7 +370,6 @@ page 6150900 "NPR HC Audit Roll"
                     var
                         BogfRevrulle: Codeunit "NPR HC Post Audit Roll";
                     begin
-
                         Clear(HCAuditRollGlobal);
                         BogfRevrulle.ShowProgress(true);
                         BogfRevrulle.RunCode(HCAuditRollGlobal);
@@ -456,23 +431,13 @@ page 6150900 "NPR HC Audit Roll"
                                     SalesInvoiceHeader.FilterGroup := 2;
                                     SalesInvoiceHeader.SetRange("Pre-Assigned No.", SalesTicketNo);
                                     SalesInvoiceHeader.FilterGroup := 0;
-                                    //FORM.RUNMODAL(FORM::"Posted Sales Invoice",Salgsfakturahoved);
                                     PAGE.RunModal(PAGE::"Posted Sales Invoice", SalesInvoiceHeader);
                                 end;
-                            //  "Document Type"::Ordre:
-                            //    BEGIN
-                            //      SalgsLevHoved.FILTERGROUP := 2;
-                            //      SalgsLevHoved.SETRANGE("Sales Ticket No.",SalesTicketNo);
-                            //      SalgsLevHoved.FILTERGROUP := 0;
-                            //      //FORM.RUNMODAL(FORM::"Posted Sales Shipment", SalgsLevHoved);
-                            //      PAGE.RUNMODAL(PAGE::"Posted Sales Shipment", SalgsLevHoved);
-                            //    END;
                             "Document Type"::Kreditnota:
                                 begin
                                     SalesCrMemoHeader.FilterGroup := 2;
                                     SalesCrMemoHeader.SetRange("Pre-Assigned No.", SalesTicketNo);
                                     SalesCrMemoHeader.FilterGroup := 0;
-                                    //FORM.RUNMODAL(FORM::"Posted Sales Credit Memo", SalgsKreditnotaHoved);
                                     PAGE.RunModal(PAGE::"Posted Sales Credit Memo", SalesCrMemoHeader);
                                 end;
                         end;
@@ -521,20 +486,20 @@ page 6150900 "NPR HC Audit Roll"
 
                     trigger OnAction()
                     var
-                        crev: Record "NPR HC Audit Roll";
-                        sum1: Decimal;
+                        HCAuditRoll: Record "NPR HC Audit Roll";
+                        Sum1: Decimal;
                     begin
 
-                        crev.CopyFilters(Rec);
+                        HCAuditRoll.CopyFilters(Rec);
 
-                        if crev.Find('-') then
+                        if HCAuditRoll.Find('-') then
                             repeat
-                                sum1 += crev."Amount Including VAT";
-                            until crev.Next = 0;
+                                Sum1 += HCAuditRoll."Amount Including VAT";
+                            until HCAuditRoll.Next = 0;
 
-                        Message(Format(sum1));
+                        Message(Format(Sum1));
 
-                        Rec.CopyFilters(crev);
+                        Rec.CopyFilters(HCAuditRoll);
                     end;
                 }
                 action("Sales Ticket Statistics")
@@ -547,7 +512,6 @@ page 6150900 "NPR HC Audit Roll"
 
                     trigger OnAction()
                     begin
-
                         HCAuditRollGlobal.Reset;
                         HCAuditRollGlobal.FilterGroup := 2;
 
@@ -580,7 +544,6 @@ page 6150900 "NPR HC Audit Roll"
 
                     trigger OnAction()
                     begin
-
                         HCAuditRollGlobal.Reset;
                         HCAuditRollGlobal.FilterGroup := 2;
                         HCAuditRollGlobal.SetCurrentKey("Sale Date", "Sale Type");
@@ -625,16 +588,13 @@ page 6150900 "NPR HC Audit Roll"
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
     begin
-
         if Filter[2] = Filter::Payment then begin
             Filter[1] := PaymentEntries();
             CurrPage.Update(false);
-            //CurrForm.UPDATE(FALSE);
             exit(false);
         end;
         if Filter[2] = Filter::Deposit then begin
             Filter[1] := DepositEntries();
-            //CurrForm.UPDATE(FALSE);
             CurrPage.Update(true);
             exit(false);
         end;
@@ -651,8 +611,6 @@ page 6150900 "NPR HC Audit Roll"
         "Filter": array[2] of Option " ",Payment,Deposit;
         Typefilter: Option " ","G/L",Item,Payment,"Open/Close",Customer,"Debit Sale",Cancelled,Comment;
         PostedFilter: Option " ",No,Yes;
-        FindLast: Option " ",No,Yes;
-        extFilters: Boolean;
         boolCancelled: Boolean;
         Text10600004: Label 'Wrong sales ticket line, document no. is missing!';
         [InDataSet]
@@ -670,31 +628,22 @@ page 6150900 "NPR HC Audit Roll"
         TX001: Label 'Posted ?';
         PostDocNo: Code[20];
     begin
-        //Bogf¢rBon
-
         HCAuditRoll4 := Rec;
         HCAuditRoll4.SetCurrentKey("Register No.", "Sales Ticket No.");
         HCAuditRoll4.SetRange("Register No.", "Register No.");
         HCAuditRoll4.SetRange("Sales Ticket No.", "Sales Ticket No.");
         if Confirm(TX001, true, HCAuditRoll4.GetFilters) then begin
-            /* FINANCES */
             HCAuditRollPosting.DeleteAll;
             HCAuditRollPosting.TransferFromRevSilent(HCAuditRoll4, HCAuditRollPosting);
-            //-NPR5.51 [343685]
-            //HCPostTempAuditRoll.setPostingNo(HCPostTempAuditRoll.getNewPostingNo(TRUE));
             PostDocNo := HCPostTempAuditRoll.getNewPostingNo(true);
             HCPostTempAuditRoll.setPostingNo(PostDocNo);
-            //+NPR5.51 [343685]
             HCPostTempAuditRoll.RunPost(HCAuditRollPosting);
             HCAuditRollPosting.UpdateChangesSilent;
 
             /* ITEM LEDGER ENTRIES */
             HCAuditRollPosting.DeleteAll;
             HCAuditRollPosting.TransferFromRevSilentItemLedg(HCAuditRoll4, HCAuditRollPosting);
-            //-NPR5.51 [343685]
-            //HCPostTempAuditRoll.setPostingNo(HCPostTempAuditRoll.getNewPostingNo(TRUE));
             HCPostTempAuditRoll.setPostingNo(PostDocNo);
-            //+NPR5.51 [343685]
             HCPostTempAuditRoll.RunPostItemLedger(HCAuditRollPosting);
             HCAuditRollPosting.UpdateChangesSilent;
         end;
@@ -717,18 +666,11 @@ page 6150900 "NPR HC Audit Roll"
 
     procedure PaymentEntries(): Integer
     begin
-        //CurrForm.Funktion.VISIBLE(Filter[2] = Filter::Payment);
-        //CurrForm.Udskriv.VISIBLE(Filter[2] = Filter::Payment);
-        //CurrForm.Dankort.VISIBLE(Filter[2] = Filter::Payment);
-        //CurrForm."Funktion - Udbetaling".VISIBLE(Filter[2] = Filter::" ");
-
         case Filter[2] of
             Filter::Payment:
                 begin
                     Filter[2] := Filter::" ";
                     Rec.CopyFilters(TempHCAuditRollArray[1]);
-                    //CurrForm."Register No.".ACTIVATE;
-                    //CurrForm.UPDATE(TRUE);
                     exit(Filter[2]);
                 end;
             Filter::" ":
@@ -742,8 +684,6 @@ page 6150900 "NPR HC Audit Roll"
                     SetRange(Posted, false);
                     SetRange("No.", '*');
                     FilterGroup(0);
-                    //CurrForm.UPDATE(TRUE);
-                    //CurrForm."No.".ACTIVATE;
                     exit(Filter[2]);
                 end;
         end;
@@ -751,18 +691,11 @@ page 6150900 "NPR HC Audit Roll"
 
     procedure DepositEntries(): Integer
     begin
-        //CurrForm.Funktion.VISIBLE(Filter[2] = Filter::Deposit);
-        //CurrForm.Udskriv.VISIBLE(Filter[2] = Filter::Deposit);
-        //CurrForm.Dankort.VISIBLE(Filter[2] = Filter::Deposit);
-        //CurrForm."Funktion - Udbetaling".VISIBLE(Filter[2] = Filter::" ");
-
         case Filter[2] of
             Filter::Deposit:
                 begin
                     Filter[2] := Filter::" ";
                     Rec.CopyFilters(TempHCAuditRollArray[1]);
-                    //CurrForm."Register No.".ACTIVATE;
-                    //CurrForm.UPDATE(TRUE);
                     exit(Filter[2]);
                 end;
             Filter::" ":
@@ -776,23 +709,10 @@ page 6150900 "NPR HC Audit Roll"
                     SetRange(Posted, false);
                     SetRange("No.", '*');
                     FilterGroup(0);
-                    //CurrForm.UPDATE(TRUE);
                     CurrPage.Update(true);
-                    //CurrForm."No.".ACTIVATE;
                     exit(Filter[2]);
                 end;
         end;
-    end;
-
-    procedure PrintAuditRoll()
-    begin
-        //PrintAuditRoll
-    end;
-
-    procedure setExtFilters(extFilters1: Boolean)
-    begin
-        //usingTS(isTouch1 : Boolean)
-        extFilters := extFilters1;
     end;
 
     procedure SetStyleExpression()
