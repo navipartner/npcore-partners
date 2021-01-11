@@ -1,12 +1,5 @@
 table 6151002 "NPR POS Quote Entry"
 {
-    // NPR5.47/MHA /20181011  CASE 302636 Object created - POS Quote (Saved POS Sale)
-    // NPR5.48/MHA /20181129  CASE 336498 Added Customer fields 25, 30, 35, 40, 45, 50
-    // NPR5.48/MHA /20181130  CASE 338208 Added 200 "POS Sales Data"
-    // NPR5.51/MMV /20190820  CASE 364694 Added field 1010
-    // NPR5.54/MMV /20200320 CASE 364340 Added field 60
-    // NPR5.54/ALPO/20200406 CASE 390414 Updated Amount and Amount Including VAT flow field calc.formulas to include only relevant amounts
-
     Caption = 'POS Quote Entry';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR POS Quotes";
@@ -100,7 +93,7 @@ table 6151002 "NPR POS Quote Entry"
         }
         field(1000; Amount; Decimal)
         {
-            CalcFormula = Sum ("NPR POS Quote Line".Amount WHERE("Quote Entry No." = FIELD("Entry No."),
+            CalcFormula = Sum("NPR POS Quote Line".Amount WHERE("Quote Entry No." = FIELD("Entry No."),
                                                              "Sale Type" = FILTER(Sale | "Debit Sale" | "Gift Voucher" | "Credit Voucher" | Deposit),
                                                              Type = FILTER(<> Comment & <> "Open/Close")));
             Caption = 'Amount';
@@ -110,7 +103,7 @@ table 6151002 "NPR POS Quote Entry"
         }
         field(1005; "Amount Including VAT"; Decimal)
         {
-            CalcFormula = Sum ("NPR POS Quote Line"."Amount Including VAT" WHERE("Quote Entry No." = FIELD("Entry No."),
+            CalcFormula = Sum("NPR POS Quote Line"."Amount Including VAT" WHERE("Quote Entry No." = FIELD("Entry No."),
                                                                              "Sale Type" = FILTER(Sale | "Debit Sale" | "Gift Voucher" | "Credit Voucher" | Deposit),
                                                                              Type = FILTER(<> Comment & <> "Open/Close")));
             Caption = 'Amount Including VAT';
@@ -119,7 +112,7 @@ table 6151002 "NPR POS Quote Entry"
         }
         field(1010; "Contains EFT Approval"; Boolean)
         {
-            CalcFormula = Exist ("NPR POS Quote Line" WHERE("Quote Entry No." = FIELD("Entry No."),
+            CalcFormula = Exist("NPR POS Quote Line" WHERE("Quote Entry No." = FIELD("Entry No."),
                                                         "EFT Approved" = CONST(true)));
             Caption = 'Contains EFT Approval';
             FieldClass = FlowField;
@@ -142,9 +135,7 @@ table 6151002 "NPR POS Quote Entry"
         POSQuoteLine: Record "NPR POS Quote Line";
     begin
         POSQuoteLine.SetRange("Quote Entry No.", "Entry No.");
-        //-NPR5.51 [364694]
         POSQuoteLine.DeleteAll(not SkipLineDeleteTriggerValue);
-        //+NPR5.51 [364694]
     end;
 
     var
@@ -152,9 +143,7 @@ table 6151002 "NPR POS Quote Entry"
 
     procedure SkipLineDeleteTrigger(Value: Boolean)
     begin
-        //-NPR5.51 [364694]
         SkipLineDeleteTriggerValue := Value;
-        //+NPR5.51 [364694]
     end;
 }
 
