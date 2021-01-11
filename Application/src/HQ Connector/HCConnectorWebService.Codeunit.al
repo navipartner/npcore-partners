@@ -1,9 +1,5 @@
 codeunit 6150903 "NPR HC Connector Web Service"
 {
-    trigger OnRun()
-    begin
-    end;
-
     procedure InsertAuditRoll(var auditrolllineimport: XMLport "NPR HC Audit Roll")
     var
         NaviConnectImportEntry: Record "NPR Nc Import Entry";

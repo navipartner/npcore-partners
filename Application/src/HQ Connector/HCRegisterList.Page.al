@@ -1,8 +1,5 @@
 page 6150903 "NPR HC Register List"
 {
-    // NPR5.37/BR  /20171027 CASE 267552 HQ Connector Created Object
-    // NPR5.48/TJ  /20181112 CASE 331992 New action Default Dimension
-
     Caption = 'HC Register List';
     PageType = List;
     SourceTable = "NPR HC Register";

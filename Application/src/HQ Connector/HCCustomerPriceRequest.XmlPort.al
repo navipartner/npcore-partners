@@ -1,7 +1,5 @@
 xmlport 6150903 "NPR HC Customer Price Request"
 {
-    // NPR5.38/TSA /20171127 CASE 297859 Initial Version
-
     Caption = 'Customer Price Request';
     Encoding = UTF8;
     FormatEvaluate = Xml;
@@ -147,21 +145,6 @@ xmlport 6150903 "NPR HC Customer Price Request"
         }
     }
 
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
-        }
-    }
-
-    var
-        LineNo: Integer;
-
     procedure GetRequest(var TmpSalesHeader: Record "Sales Header" temporary; var TmpSalesLine: Record "Sales Line" temporary)
     begin
         TmpSalesHeader.TransferFields(TmpSalesHeaderRequest, true);
@@ -191,13 +174,11 @@ xmlport 6150903 "NPR HC Customer Price Request"
 
             responseCode := 'OK';
             responseDescription := '';
-
         end;
     end;
 
     procedure SetErrorResponse(ErrorDescription: Text)
     begin
-
         responseCode := 'ERROR';
         responseDescription := ErrorDescription;
     end;

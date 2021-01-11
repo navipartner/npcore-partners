@@ -1,8 +1,5 @@
 page 6150902 "NPR HC Retail Setup"
 {
-    // NPR5.37/BR  /20171027 CASE 267552 HQ Connector Created Object
-    // NPR5.48/TJ  /20181114 CASE 331992 New field "Dimensions Posting Type"
-
     Caption = 'HC Retail Setup';
     DeleteAllowed = false;
     InsertAllowed = false;
@@ -88,10 +85,6 @@ page 6150902 "NPR HC Retail Setup"
                 }
             }
         }
-    }
-
-    actions
-    {
     }
 
     trigger OnOpenPage()

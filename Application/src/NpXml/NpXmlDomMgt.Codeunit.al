@@ -121,7 +121,7 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
         exit(not NodeChild.AsXmlElement.IsEmpty());
     end;
 
-    [Obsolete('Please use native Business Central objects instead of dotnet classes.')]
+    [Obsolete('Use native Business Central objects instead of DotNet classes', '')]
     procedure FindNodes(XmlNode: DotNet NPRNetXmlNode; NodePath: Text[250]; var XmlNodeList: DotNet NPRNetXmlNodeList): Boolean
     begin
         XmlNodeList := XmlNode.SelectNodes('//' + NodePath);
@@ -129,9 +129,11 @@ codeunit 6151554 "NPR NpXml Dom Mgt."
         exit(not IsNull(XmlNodeList));
     end;
 
-    procedure FindNodes(XmlNode: XmlNode; NodePath: Text[250]; var XmlNodeList: XmlNodeList): Boolean
+    procedure FindNodes(Node: XmlNode; NodePath: Text[250]; var NodeList: XmlNodeList): Boolean
     begin
-        exit(XmlNode.SelectNodes('//' + NodePath, XmlNodeList));
+        Node.SelectNodes('//' + NodePath, NodeList);
+
+        exit(not (NodeList.Count = 0));
     end;
 
     procedure InitDoc(var XmlDoc: DotNet "NPRNetXmlDocument"; var XmlDocNode: DotNet NPRNetXmlNode; NodeName: Text[1024])

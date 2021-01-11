@@ -1,8 +1,5 @@
 xmlport 6150905 "NPR HC Generic Request"
 {
-    // NPR5.38/TSA /20171205 CASE 297946 Initial Version
-    // NPR5.38/NPKNAV/20180126  CASE 297859 Transport NPR5.38 - 26 January 2018
-
     Caption = 'HC Generic Request';
     Encoding = UTF8;
     FormatEvaluate = Xml;
@@ -112,21 +109,6 @@ xmlport 6150905 "NPR HC Generic Request"
         }
     }
 
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
-        }
-    }
-
-    var
-        LineNo: Integer;
-
     procedure GetRequest(var TmpHCGenericWebRequest: Record "NPR HC Generic Web Request" temporary)
     begin
         TmpHCGenericWebRequest.TransferFields(TmpGenericWebRequest, true);
@@ -139,7 +121,6 @@ xmlport 6150905 "NPR HC Generic Request"
     procedure SetResponse(var TmpHCGenericWebRequest: Record "NPR HC Generic Web Request" temporary)
     begin
         TmpResponse.TransferFields(TmpHCGenericWebRequest, true);
-
         TmpResponse."Response User ID" := UserId;
         TmpResponse."Response Date" := CurrentDateTime;
         TmpResponse.Insert();
@@ -150,7 +131,6 @@ xmlport 6150905 "NPR HC Generic Request"
 
     procedure SetErrorResponse(ErrorDescription: Text)
     begin
-
         responseCode := 'ERROR';
         responseDescription := ErrorDescription;
     end;

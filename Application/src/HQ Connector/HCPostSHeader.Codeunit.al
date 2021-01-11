@@ -1,7 +1,5 @@
 codeunit 6150916 "NPR HC Post S.Header"
 {
-    // NPR5.47/JDH /20181015 CASE 325323 Posting of Sales Header From HC module
-
     TableNo = "Sales Header";
 
     trigger OnRun()

@@ -1,8 +1,5 @@
 xmlport 6150901 "NPR HC POS Entry"
 {
-    // NPR5.38/BR  /20171030  CASE 295007  Object Created
-    // NPR5.39/BR  /20180212  CASE 295007  Updated fields, Filled External Source No.'s
-
     Caption = 'HC POS Entry';
     FormatEvaluate = Xml;
     UseDefaultNamespace = true;
@@ -928,18 +925,6 @@ xmlport 6150901 "NPR HC POS Entry"
                     }
                 }
             }
-        }
-    }
-
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
         }
     }
 }

@@ -1,8 +1,5 @@
 codeunit 6150905 "NPR HC Process Unprocess. Imp."
 {
-    // NPR5.37/BR  /20171027 CASE 267552 HQ Connector Created Object
-
-
     trigger OnRun()
     var
         ImportEntry: Record "NPR Nc Import Entry";

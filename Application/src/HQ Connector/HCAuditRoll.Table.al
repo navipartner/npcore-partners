@@ -1,12 +1,5 @@
 table 6150901 "NPR HC Audit Roll"
 {
-    // NPR5.37/BR  /20171027 CASE 267552 HQ Connector: Created object based on Table 6014407
-    // NPR5.38/JDH /20180119 CASE 302570 Changed Option String on Field Sale Type to English
-    // NPR5.39/TJ  /20180206 CASE 302634 Removed unused variable HåndterFejlUnderBonUdskr
-    // NPR5.39/BR  /20180220 CASE 305744 Aligned Caption with OptionString
-    // NPR5.39/BR  /20180221 CASE 225415 Renumberd fields in 5xxxx range
-    // NPR5.48/MHA /20181121 CASE 326055 Added field 5022 "Reference"
-
     Caption = 'HC Audit Roll';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR HC Audit Roll";
@@ -689,42 +682,5 @@ table 6150901 "NPR HC Audit Roll"
         {
         }
     }
-
-    fieldgroups
-    {
-    }
-
-    var
-        Text1060000: Label 'Do you want sales ticket %1 on A4 print?';
-        Revisionsrec: Record "NPR HC Audit Roll";
-        RetailSetup: Record "NPR HC Retail Setup";
-        Finanskonto: Record "G/L Account";
-        DimMgt: Codeunit DimensionManagement;
-        Kasse: Record "NPR HC Register";
-        Text1060001: Label '%1 %2 has %3 %4. It is not possible to insert %5 with %6 %7.';
-        Text1060002: Label 'Error at insert into the audit roll. \Sales ticket no. %1 <> Sales Ticket No. of set register status %2. \Status = %3.';
-
-    procedure GetNoOfSales(): Integer
-    var
-        AuditRoll2: Record "NPR HC Audit Roll";
-        NoOfSales: Integer;
-        LastSalesTicketNo: Code[20];
-    begin
-        //-NPR4.10
-        AuditRoll2.CopyFilters(Rec);
-
-        //-NPR4.11
-        //AuditRoll2.SETRANGE("Sale Type", AuditRoll2."Sale Type"::Salg);
-        //+NPR4.11
-        if AuditRoll2.FindSet then
-            repeat
-                if (AuditRoll2."Sales Ticket No." <> LastSalesTicketNo) then
-                    NoOfSales += 1;
-                LastSalesTicketNo := AuditRoll2."Sales Ticket No.";
-            until AuditRoll2.Next = 0;
-
-        exit(NoOfSales);
-        //+NPR4.10
-    end;
 }
 
