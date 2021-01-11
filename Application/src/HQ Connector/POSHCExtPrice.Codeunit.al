@@ -1,20 +1,7 @@
 codeunit 6150910 "NPR POS HC Ext. Price"
 {
-    // NPR5.38/TSA /20171130 CASE 297859 Initial Version
-    // NPR5.44/MHA /20180704 CASE 321096 Added format 2 on Option field in BuildPriceRequest() to achieve Language neutrality
-    // NPR5.45/MHA /20180803 CASE 3237005 Added POS Item Price subcriber function FindHQConnectorPrice
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         InvalidXml: Label 'The response is not in valid XML format.\\%1';
-
-    local procedure "-- Client Side (POS)"()
-    begin
-    end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014453, 'OnFindItemPrice', '', true, true)]
     local procedure FindHQConnectorPrice(POSUnit: Record "NPR POS Unit"; SalePOS: Record "NPR Sale POS"; var SaleLinePOS: Record "NPR Sale Line POS"; var Handled: Boolean)
@@ -23,7 +10,6 @@ codeunit 6150910 "NPR POS HC Ext. Price"
         GeneralLedgerSetup: Record "General Ledger Setup";
         TmpSalesLine: Record "Sales Line" temporary;
     begin
-        //-NPR5.45 [323705]
         if POSUnit."Item Price Codeunit ID" <> CODEUNIT::"NPR POS HC Ext. Price" then
             exit;
         if POSUnit."Item Price Function" <> 'FindHQConnectorPrice' then
@@ -51,12 +37,10 @@ codeunit 6150910 "NPR POS HC Ext. Price"
             exit;
 
         UpdateSaleLinePOS(TmpSalesLine, SaleLinePOS);
-        //+NPR5.45 [323705]
     end;
 
     procedure UpdateSaleLinePOS(TmpSalesLine: Record "Sales Line" temporary; var SaleLinePOS: Record "NPR Sale Line POS")
     begin
-        //-NPR5.45 [323705]
         SaleLinePOS."Unit Price" := TmpSalesLine."Unit Price";
 
         if TmpSalesLine."Line Discount %" = 0 then
@@ -68,31 +52,30 @@ codeunit 6150910 "NPR POS HC Ext. Price"
         SaleLinePOS."Discount Code" := 'HC';
         SaleLinePOS."Discount %" := TmpSalesLine."Line Discount %";
         SaleLinePOS."Discount Amount" := 0;
-        //+NPR5.45 [323705]
     end;
 
     procedure GetCustomerPrice(EndpointCode: Code[10]; CustomerNumber: Code[20]; ExternalDocumentNumber: Code[20]; CurrencyCode: Code[10]; var TmpSalesLine: Record "Sales Line" temporary)
     var
         HCEndpointSetup: Record "NPR POS HC Endpoint Setup";
         SoapAction: Text;
-        RequestXmlDoc: DotNet "NPRNetXmlDocument";
-        ResponseXmlDoc: DotNet "NPRNetXmlDocument";
+        RequestXmlDocText: Text;
+        ResponseXmlElement: XmlElement;
         ResponseText: Text;
+        ResponseXmlText: Text;
     begin
 
         HCEndpointSetup.Get(EndpointCode);
 
-        BuildPriceRequest(CustomerNumber, ExternalDocumentNumber, CurrencyCode, TmpSalesLine, SoapAction, RequestXmlDoc);
-        if (not WebServiceApi(HCEndpointSetup, SoapAction, RequestXmlDoc, ResponseXmlDoc)) then
-            Error('Error from WebService:\\%1', ResponseXmlDoc.InnerXml());
+        BuildPriceRequest(CustomerNumber, ExternalDocumentNumber, CurrencyCode, TmpSalesLine, SoapAction, RequestXmlDocText);
+        if (not WebServiceApi(HCEndpointSetup, SoapAction, RequestXmlDocText, ResponseXmlElement, ResponseXmlText)) then
+            Error('Error from WebService:\\%1', ResponseXmlElement.InnerXml());
 
-        if (not ApplyPriceResponse(TmpSalesLine, ResponseXmlDoc, ResponseText)) then
+        if (not ApplyPriceResponse(TmpSalesLine, ResponseXmlElement, ResponseText, ResponseXmlText)) then
             Error(ResponseText);
     end;
 
-    local procedure BuildPriceRequest(CustomerNo: Code[20]; ExternalDocumentNumber: Code[20]; CurrencyCode: Code[10]; var TmpSaleLine: Record "Sales Line" temporary; var SoapAction: Text; var XmlDoc: DotNet "NPRNetXmlDocument"): Boolean
+    local procedure BuildPriceRequest(CustomerNo: Code[20]; ExternalDocumentNumber: Code[20]; CurrencyCode: Code[10]; var TmpSaleLine: Record "Sales Line" temporary; var SoapAction: Text; XmlRequest: Text): Boolean
     var
-        XmlRequest: Text;
         LineType: Option;
     begin
 
@@ -105,19 +88,13 @@ codeunit 6150910 "NPR POS HC Ext. Price"
          '         <hqc:customerPriceRequest>' +
          '            <x61:priceRequest>';
 
-        //'               <x61:customer number="D000230" currencyCode="">'+
         XmlRequest += StrSubstNo('<x61:customer number="%1" externalDocumentNumber="%2" currencyCode="%3">', CustomerNo, ExternalDocumentNumber, CurrencyCode);
 
-        //'                  <!--1 or more repetitions:-->'+
-        //'                  <x61:line type="ITEM" number="40001" quantity="10" unitOfMeasure="PCS"/>'+
         TmpSaleLine.FindSet();
         repeat
             XmlRequest += StrSubstNo('<x61:line lineNumber="%1" type="%2" number="%3" variantCode="%4" quantity="%5" unitOfMeasure="%6"/>',
               TmpSaleLine."Line No.",
-              //-NPR5.44 [321096]
-              //TmpSaleLine.Type::Item,
               Format(TmpSaleLine.Type::Item, 0, 2),
-              //+NPR5.44 [321096]
               TmpSaleLine."No.",
               TmpSaleLine."Variant Code",
               TmpSaleLine.Quantity,
@@ -132,67 +109,45 @@ codeunit 6150910 "NPR POS HC Ext. Price"
          '   </soapenv:Body>' +
          '</soapenv:Envelope>';
 
-        XmlDoc := XmlDoc.XmlDocument;
-        XmlDoc.LoadXml(XmlRequest);
-
         exit(true);
     end;
 
-    local procedure ApplyPriceResponse(var TmpSaleLine: Record "Sales Line" temporary; var XmlDoc: DotNet "NPRNetXmlDocument"; var ResponseText: Text): Boolean
+    local procedure ApplyPriceResponse(var TmpSaleLine: Record "Sales Line" temporary; var Element: XmlElement; var ResponseText: Text; ResponseXmlText: Text): Boolean
     var
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
-        XmlElement: DotNet NPRNetXmlElement;
-        XmlNodeElement: DotNet NPRNetXmlElement;
-        XmlNodeList: DotNet NPRNetXmlNodeList;
+        NodeList: XmlNodeList;
+        Node: XmlNode;
         TextOk: Text;
         ElementPath: Text;
         NumberText: Text[100];
         DecimalNumber: Decimal;
         IntegerNumber: Integer;
-        i: Integer;
         SaleLinePOS: Record "NPR Sale Line POS";
     begin
 
-        //  <GetCustomerPrice_Result xmlns="urn:microsoft-dynamics-schemas/codeunit/hqconnector">
-        //      <customerPriceRequest>
-        //        <priceResponse xmlns="urn:microsoft-dynamics-nav/xmlports/x6150903">
-        //            <responseStatus>
-        //              <responseCode>OK</responseCode>
-        //              <responseDescription/>
-        //            </responseStatus>
-        //            <customer number="D000230" externalDocumentNumber="ABC" currencyCode="EUR">
-        //              <line lineNumber="1" type="2" number="40001" quantity="10" unitOfMeasure="PCS" unitPrice="100.00" lineAmount="550.00" lineDiscountPercent="45" lineDiscountAmount="450.00" vatPct="25" vatBaseAmount="440.00"/>
-        //              <line lineNumber="3" type="2" number="40010" quantity="10" unitOfMeasure="" unitPrice="45.00" lineAmount="450.00" lineDiscountPercent="0" lineDiscountAmount="0.00" vatPct="25" vatBaseAmount="360.00"/>
-        //            </customer>
-        //        </priceResponse>
-
-        NpXmlDomMgt.RemoveNameSpaces(XmlDoc);
-        XmlElement := XmlDoc.DocumentElement;
-        if (IsNull(XmlElement)) then begin
-            ResponseText := StrSubstNo(InvalidXml, NpXmlDomMgt.PrettyPrintXml(XmlDoc.InnerXml()));
+        if Element.IsEmpty then begin
+            ResponseText := StrSubstNo(InvalidXml, NpXmlDomMgt.PrettyPrintXml(ResponseXmlText));
             exit(false);
         end;
 
         ElementPath := '//GetCustomerPrice_Result/customerPriceRequest/priceResponse/responseStatus/';
-        TextOk := NpXmlDomMgt.GetXmlText(XmlElement, ElementPath + 'responseCode', 10, true);
+        TextOk := NpXmlDomMgt.GetXmlText(Element, ElementPath + 'responseCode', 10, true);
 
         if (UpperCase(TextOk) <> 'OK') then begin
             ElementPath := '//GetCustomerPrice_Result/customerPriceRequest/priceResponse/responseStatus/';
-            ResponseText := NpXmlDomMgt.GetXmlText(XmlElement, ElementPath + 'responseDescription', 1000, true);
+            ResponseText := NpXmlDomMgt.GetXmlText(Element, ElementPath + 'responseDescription', 1000, true);
             exit(false);
         end;
 
         ElementPath := 'GetCustomerPrice_Result/customerPriceRequest/priceResponse/customer/line';
-        if (not NpXmlDomMgt.FindNodes(XmlElement, ElementPath, XmlNodeList)) then
-            Error('Find node [%1] failed in document \\%2', ElementPath, XmlElement.InnerXml);
+        if (not NpXmlDomMgt.FindNodes(Element.AsXmlNode(), ElementPath, NodeList)) then
+            Error('Find node [%1] failed in document \\%2', ElementPath, Element.InnerXml);
 
-        for i := 0 to XmlNodeList.Count - 1 do begin
-            XmlNodeElement := XmlNodeList.ItemOf(i);
-
-            TmpSaleLine.SetFilter("Line No.", '=%1', EvaluateToInteger(NpXmlDomMgt.GetXmlAttributeText(XmlNodeElement, 'lineNumber', true)));
+        foreach Node in NodeList do begin
+            TmpSaleLine.SetFilter("Line No.", '=%1', EvaluateToInteger(NpXmlDomMgt.GetXmlAttributeText(Node.AsXmlElement(), 'lineNumber', true)));
             if (TmpSaleLine.FindFirst()) then begin
-                TmpSaleLine."Unit Price" := EvaluateToDecimal(NpXmlDomMgt.GetXmlAttributeText(XmlNodeElement, 'unitPrice', true));
-                TmpSaleLine."Line Discount %" := EvaluateToDecimal(NpXmlDomMgt.GetXmlAttributeText(XmlNodeElement, 'lineDiscountPercent', true));
+                TmpSaleLine."Unit Price" := EvaluateToDecimal(NpXmlDomMgt.GetXmlAttributeText(Node.AsXmlElement(), 'unitPrice', true));
+                TmpSaleLine."Line Discount %" := EvaluateToDecimal(NpXmlDomMgt.GetXmlAttributeText(Node.AsXmlElement(), 'lineDiscountPercent', true));
                 TmpSaleLine.Modify();
             end;
         end;
@@ -200,173 +155,72 @@ codeunit 6150910 "NPR POS HC Ext. Price"
         exit(true);
     end;
 
-    local procedure "--WSSupport"()
-    begin
-    end;
-
-    procedure WebServiceApi(EndpointSetup: Record "NPR POS HC Endpoint Setup"; SoapAction: Text; var XmlDocIn: DotNet "NPRNetXmlDocument"; var XmlDocOut: DotNet "NPRNetXmlDocument"): Boolean
+    procedure WebServiceApi(EndpointSetup: Record "NPR POS HC Endpoint Setup"; SoapAction: Text; var XmlDocInText: Text; var XmlElementOut: XmlElement; var ResponseText: Text): Boolean
     var
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
-        Credential: DotNet NPRNetNetworkCredential;
-        Convert: DotNet NPRNetConvert;
+        XMLDomManagement: Codeunit "XML DOM Management";
+        Base64Convert: codeunit "Base64 Convert";
         B64Credential: Text[200];
-        HttpWebRequest: DotNet NPRNetHttpWebRequest;
-        HttpWebResponse: DotNet NPRNetHttpWebResponse;
-        WebException: DotNet NPRNetWebException;
-        WebInnerException: DotNet NPRNetWebException;
-        Url: Text;
-        ErrorMessage: Text;
-        ResponseText: Text;
-        Exception: DotNet NPRNetException;
-        StatusCode: Code[10];
-        StatusDescription: Text[50];
+        XmlDocOut: XmlDocument;
+        Client: HttpClient;
+        RequestContent: HttpContent;
+        ContentHeader: HttpHeaders;
+        Request: HttpRequestMessage;
+        RequestHeaders: HttpHeaders;
+        Response: HttpResponseMessage;
     begin
-
-        HttpWebRequest := HttpWebRequest.Create(EndpointSetup."Endpoint URI");
-        HttpWebRequest.Timeout := EndpointSetup."Connection Timeout (ms)";
-        HttpWebRequest.KeepAlive(false);
+        Request.GetHeaders(RequestHeaders);
+        RequestHeaders.Remove('Connection');
 
         case EndpointSetup."Credentials Type" of
             EndpointSetup."Credentials Type"::NAMED:
                 begin
-                    HttpWebRequest.UseDefaultCredentials(false);
-                    B64Credential := ToBase64(StrSubstNo('%1:%2', EndpointSetup."User Account", EndpointSetup."User Password"));
-                    HttpWebRequest.Headers.Add('Authorization', StrSubstNo('Basic %1', B64Credential));
+                    B64Credential := Base64Convert.ToBase64(StrSubstNo('%1:%2', EndpointSetup."User Account", EndpointSetup."User Password"));
+                    RequestHeaders.Add('Authorization', StrSubstNo('Basic %1', B64Credential));
                 end;
             else
-                HttpWebRequest.UseDefaultCredentials(true);
         end;
 
-        HttpWebRequest.Method := 'POST';
-        HttpWebRequest.ContentType := 'text/xml; charset=utf-8';
-        HttpWebRequest.Headers.Add('SOAPAction', StrSubstNo('"%1"', SoapAction));
+        Request.Method('POST');
+        Request.SetRequestUri(EndpointSetup."Endpoint URI");
 
-        NpXmlDomMgt.SetTrustedCertificateValidation(HttpWebRequest);
+        RequestContent.WriteFrom(XmlDocInText);
+        RequestContent.GetHeaders(ContentHeader);
 
-        if (TrySendWebRequest(XmlDocIn, HttpWebRequest, HttpWebResponse)) then begin
-            TryReadResponseText(HttpWebResponse, ResponseText);
-            XmlDocOut := XmlDocOut.XmlDocument;
-            XmlDocOut.LoadXml(ResponseText);
+        ContentHeader.Clear();
+        ContentHeader.Remove('Content-Type');
+        ContentHeader.Add('Content-Type', 'text/xml; charset=utf-8');
+        ContentHeader.Add('SOAPAction', StrSubstNo('"%1"', SoapAction));
+        ContentHeader := Client.DefaultRequestHeaders();
+
+        Request.Content(RequestContent);
+        Client.Timeout(EndpointSetup."Connection Timeout (ms)");
+        Client.Send(Request, Response);
+
+        if Response.IsSuccessStatusCode then begin
+            Response.Content.ReadAs(ResponseText);
+            ResponseText := XMLDomManagement.RemoveNamespaces(ResponseText);
+            XmlDocument.ReadFrom(ResponseText, XmlDocOut);
+            XmlDocOut.GetRoot(XmlElementOut);
             exit(true);
         end;
 
-        Exception := GetLastErrorObject();
-        if ((Format(GetDotNetType(Exception.GetBaseException()))) <> (Format(GetDotNetType(WebException)))) then
-            Error(Exception.ToString());
-
-        WebException := Exception.GetBaseException();
-        TryReadExceptionResponseText(WebException, StatusCode, StatusDescription, ResponseText);
-
-        XmlDocOut := XmlDocOut.XmlDocument;
+        ResponseText := Response.ReasonPhrase;
         if (StrLen(ResponseText) > 0) then
-            XmlDocOut.LoadXml(ResponseText);
-
-        if (StrLen(ResponseText) = 0) then
-            XmlDocOut.LoadXml(StrSubstNo(
+            XmlDocument.ReadFrom(ResponseText, XmlDocOut)
+        else
+            XmlDocument.ReadFrom(StrSubstNo(
               '<responseStatus>' +
                 '<responseCode>%1</responseCode>' +
                 '<responseDescription>%2 - %3</responseDescription>' +
               '</responseStatus>',
-              StatusCode,
-              StatusDescription,
-              EndpointSetup."Endpoint URI"));
+              Response.HttpStatusCode,
+              Response.ReasonPhrase,
+              EndpointSetup."Endpoint URI"), XmlDocOut);
+
+        XmlDocOut.GetRoot(XmlElementOut);
 
         exit(false);
-    end;
-
-    [TryFunction]
-    local procedure TrySendWebRequest(var XmlDoc: DotNet "NPRNetXmlDocument"; HttpWebRequest: DotNet NPRNetHttpWebRequest; var HttpWebResponse: DotNet NPRNetHttpWebResponse)
-    var
-        MemoryStream: DotNet NPRNetMemoryStream;
-    begin
-
-        MemoryStream := HttpWebRequest.GetRequestStream;
-        XmlDoc.Save(MemoryStream);
-        MemoryStream.Flush;
-        MemoryStream.Close;
-        Clear(MemoryStream);
-        HttpWebResponse := HttpWebRequest.GetResponse;
-    end;
-
-    [TryFunction]
-    local procedure TryReadResponseText(var HttpWebResponse: DotNet NPRNetHttpWebResponse; var ResponseText: Text)
-    var
-        Stream: DotNet NPRNetStream;
-        StreamReader: DotNet NPRNetStreamReader;
-    begin
-
-        StreamReader := StreamReader.StreamReader(HttpWebResponse.GetResponseStream());
-        ResponseText := StreamReader.ReadToEnd;
-        StreamReader.Close;
-        Clear(StreamReader);
-    end;
-
-    [TryFunction]
-    local procedure TryReadExceptionResponseText(var WebException: DotNet NPRNetWebException; var StatusCode: Code[10]; var StatusDescription: Text; var ResponseXml: Text)
-    var
-        Stream: DotNet NPRNetStream;
-        StreamReader: DotNet NPRNetStreamReader;
-        WebResponse: DotNet NPRNetWebResponse;
-        HttpWebResponse: DotNet NPRNetHttpWebResponse;
-        WebExceptionStatus: DotNet NPRNetWebExceptionStatus;
-        SystemConvert: DotNet NPRNetConvert;
-        StatusCodeInt: Integer;
-        DotNetType: DotNet NPRNetType;
-    begin
-
-        ResponseXml := '';
-
-        // No respone body on time out
-        if (WebException.Status.Equals(WebExceptionStatus.Timeout)) then begin
-            DotNetType := GetDotNetType(StatusCodeInt);
-            StatusCodeInt := SystemConvert.ChangeType(WebExceptionStatus.Timeout, DotNetType);
-            StatusCode := Format(StatusCodeInt);
-            StatusDescription := WebExceptionStatus.Timeout.ToString();
-            exit;
-        end;
-
-        // This happens for unauthorized and server side faults (4xx and 5xx)
-        // The response stream in unauthorized fails in XML transformation later
-        if (WebException.Status.Equals(WebExceptionStatus.ProtocolError)) then begin
-            HttpWebResponse := WebException.Response();
-            DotNetType := GetDotNetType(StatusCodeInt);
-            StatusCodeInt := SystemConvert.ChangeType(HttpWebResponse.StatusCode, DotNetType);
-            StatusCode := Format(StatusCodeInt);
-            StatusDescription := HttpWebResponse.StatusDescription;
-            if (StatusCode[1] = '4') then // 4xx messages
-                exit;
-        end;
-
-        StreamReader := StreamReader.StreamReader(WebException.Response().GetResponseStream());
-        ResponseXml := StreamReader.ReadToEnd;
-
-        StreamReader.Close;
-        Clear(StreamReader);
-    end;
-
-    local procedure ToBase64(StringToEncode: Text) B64String: Text
-    var
-        TempBlob: Codeunit "Temp Blob";
-        BinaryReader: DotNet NPRNetBinaryReader;
-        MemoryStream: DotNet NPRNetMemoryStream;
-        Convert: DotNet NPRNetConvert;
-        InStr: InStream;
-        Outstr: OutStream;
-    begin
-
-        Clear(TempBlob);
-        TempBlob.CreateOutStream(Outstr);
-        Outstr.WriteText(StringToEncode);
-
-        TempBlob.CreateInStream(InStr);
-        MemoryStream := InStr;
-        BinaryReader := BinaryReader.BinaryReader(InStr);
-
-        B64String := Convert.ToBase64String(BinaryReader.ReadBytes(MemoryStream.Length));
-
-        MemoryStream.Flush;
-        MemoryStream.Close;
-        Clear(MemoryStream);
     end;
 
     local procedure EvaluateToDecimal(NumberText: Text[30]): Decimal

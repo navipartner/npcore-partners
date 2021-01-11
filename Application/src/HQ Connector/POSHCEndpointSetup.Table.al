@@ -1,10 +1,5 @@
 table 6150907 "NPR POS HC Endpoint Setup"
 {
-    // NPR5.38/TSA /20171205 CASE 297946 Initial Version
-    // NPR5.38/NPKNAV/20180126  CASE 297859 Transport NPR5.38 - 26 January 2018
-    // NPR5.45/MHA /20180816  CASE 324963 Increased length of field 21,22,23
-    // NPR5.48/TS  /20180811  CASE 334198 Removed Page 89203 as DrillDown and Lookup
-
     Caption = 'Endpoint Setup';
     DataClassification = CustomerContent;
 
@@ -68,10 +63,6 @@ table 6150907 "NPR POS HC Endpoint Setup"
         key(Key1; "Code")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 

@@ -1,8 +1,5 @@
 table 6150902 "NPR HC Register"
 {
-    // NPR5.37/BR  /20171027 CASE 267552 HQ Connector: Created object based on Table 6014407
-    // NPR5.48/TJ  /20181113 CASE 331992 Using proper table ID for dimension validation
-
     Caption = 'HC Register';
     DataClassification = CustomerContent;
     LookupPageID = "NPR HC Register List";
@@ -121,15 +118,6 @@ table 6150902 "NPR HC Register"
             DataClassification = CustomerContent;
             Description = 'Kontonummer til ¢reafrunding.';
             TableRelation = "G/L Account"."No." WHERE(Blocked = CONST(false));
-
-            trigger OnValidate()
-            begin
-                /*Finanskonto.GET(Rounding);
-                Finanskonto.TESTFIELD(Blocked,FALSE);
-                Finanskonto.TESTFIELD("Direct Posting",TRUE);
-                */
-
-            end;
         }
         field(26; "Register Change Account"; Code[20])
         {
@@ -218,47 +206,23 @@ table 6150902 "NPR HC Register"
         }
     }
 
-    fieldgroups
-    {
-    }
-
-    trigger OnDelete()
-    var
-        AuditRoll: Record "NPR HC Audit Roll";
-    begin
-    end;
-
     trigger OnRename()
     begin
         Error(Text1060003, xRec."Register No.");
     end;
 
     var
-        Text1060000: Label 'You cannot enter register %1 manually!';
-        Text1060001: Label 'c:\npk.dll';
-        Text1060002: Label 'You must delete register %1 on the computer which the register is allocated to! Contact your Solution Center, if necessary.';
         Text1060003: Label 'Register %1 cannot be renamed!';
-        Text1060004: Label 'Register initialisation %1';
-        Text1060005: Label 'Open register through sales menu';
-        RetailSetup: Record "NPR HC Retail Setup";
         DimMgt: Codeunit DimensionManagement;
-        Decimal: Decimal;
-        PostCode: Record "Post Code";
         Text1060006: Label 'Acount No. %1 is used for  %2.';
-        Text1060007: Label 'You have to specify a no. series for the CleanCash, before is will work correctly!!!';
         ErrGavekort: Label 'Acount No. %1 is used for Gift Vouchers.';
         ErrTilgode: Label 'Acount No. %1 is used for Credit Vouchers!';
         ErrKasse: Label 'Acount No. %1 is used for Register Acount!';
-        Text1060008: Label 'Warning:\You are about to delete register %1\Last entry is registered on %2\Do you wish to delete it anyway?';
-        Text1060009: Label 'Warning:\You are about to delete register %1\Do you wish to delete it anyway?';
 
     procedure ValidateShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
     begin
         DimMgt.ValidateDimValueCode(FieldNumber, ShortcutDimCode);
-        //-NPR5.48 [331992]
-        //DimMgt.SaveDefaultDim(DATABASE::Register,"Register No.",FieldNumber,ShortcutDimCode);
         DimMgt.SaveDefaultDim(DATABASE::"NPR HC Register", "Register No.", FieldNumber, ShortcutDimCode);
-        //+NPR5.48 [331992]
         Modify;
     end;
 }

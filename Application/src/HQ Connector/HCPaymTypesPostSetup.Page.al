@@ -1,7 +1,5 @@
 page 6150905 "NPR HC Paym.Types Post. Setup"
 {
-    // NPR5.37/BR  /20171027 CASE 267552 HQ Connector Created Object
-
     Caption = 'HC Payment Types Posting Setup';
     PageType = List;
     SourceTable = "NPR HC Paym.Type Post.Setup";
@@ -35,10 +33,6 @@ page 6150905 "NPR HC Paym.Types Post. Setup"
                 }
             }
         }
-    }
-
-    actions
-    {
     }
 }
 

@@ -1,8 +1,5 @@
 page 6150904 "NPR HC Payment Types"
 {
-    // NPR5.37/BR  /20171027 CASE 267552 HQ Connector Created Object
-    // NPR5.38/BR  /20171128 CASE 297946 Added field 600 HQ Processing
-
     Caption = 'HC Payment Types';
     PageType = List;
     SourceTable = "NPR HC Payment Type POS";
@@ -61,10 +58,6 @@ page 6150904 "NPR HC Payment Types"
                 }
             }
         }
-    }
-
-    actions
-    {
     }
 }
 

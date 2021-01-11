@@ -1,13 +1,5 @@
 codeunit 6150917 "NPR HC Dimension Mgt."
 {
-    // NPR5.48/TJ  /20181113 CASE 331992 New object (have versioned with NPHC1.00 as well, as we need to recognize this object as part of HC module)
-    // NPR5.49/TJ  /20190321 CASE 349391 Fixed the issue with inserting object into temp table
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         DimensionMgt: Codeunit DimensionManagement;
 
@@ -58,19 +50,7 @@ codeunit 6150917 "NPR HC Dimension Mgt."
     var
         AllObjWithCaption: Record AllObjWithCaption;
     begin
-        //only in NAV2017+
-        //-NPR5.49 [349391]
-        /*
-        AllObjWithCaption.SETRANGE("Object Type",AllObjWithCaption."Object Type"::Table);
-        AllObjWithCaption.SETRANGE("Object ID",DATABASE::"HC Register");
-        IF AllObjWithCaption.FINDFIRST THEN BEGIN
-          TempAllObjWithCaption := AllObjWithCaption;
-          TempAllObjWithCaption.INSERT;
-        END;
-        */
         DimensionMgt.InsertObject(TempAllObjWithCaption, DATABASE::"NPR HC Register");
-        //+NPR5.49 [349391]
-
     end;
 
     procedure TypeToTable(Type: Option "G/L",Item,"Item Group",Repair,,Payment,"Open/Close",BOM,Customer,Comment): Integer

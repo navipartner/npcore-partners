@@ -1,10 +1,5 @@
 xmlport 6150900 "NPR HC Audit Roll"
 {
-    // NPR5.37/BR  /20171027 CASE 267552 HQ Connector Created Object
-    // NPR5.39/BR  /20180221 CASE 225415 Renumberd fields in 5xxxx range
-    // NPR5.44/MHA /20180704  CASE 318391 Added attribute @direct_posting
-    // NPR5.48/MHA /20181121 CASE 326055 Added field reference
-
     Caption = 'HC Audit Roll';
     FormatEvaluate = Xml;
     UseDefaultNamespace = true;
@@ -492,23 +487,9 @@ xmlport 6150900 "NPR HC Audit Roll"
         }
     }
 
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
-        }
-    }
-
     procedure GetSalesTicketNo(): Text
     begin
-        //-NPR5.44 [318391]
         exit(TempBCAuditRoll."Sales Ticket No.");
-        //+NPR5.44 [318391]
     end;
 }
 

@@ -1,11 +1,5 @@
 xmlport 6150902 "NPR HC Sales Document"
 {
-    // NPR5.38/BR  /20171031  CASE 295007  Object Created
-    // NPR5.38/TSA /20171031  CASE 295007  Set UseDefaultNamespace to yes
-    // NPR5.48/TJ  /20181221  CASE 336517  Added sales lines/tracking
-    //                                     Format/Evaluate property changed to XML Format/Evaluate (from default)
-    // NPR5.48/TJ  /20190129  CASE 340446  Field creditcardno changed to SourceType = Text (was Field)
-
     Caption = 'HC Sales Document';
     FormatEvaluate = Xml;
     UseDefaultNamespace = true;
@@ -904,18 +898,6 @@ xmlport 6150902 "NPR HC Sales Document"
                     }
                 }
             }
-        }
-    }
-
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
         }
     }
 }

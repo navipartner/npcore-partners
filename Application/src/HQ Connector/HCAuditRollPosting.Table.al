@@ -1,14 +1,5 @@
 table 6150903 "NPR HC Audit Roll Posting"
 {
-    // NPR5.37/BR  /20171027 CASE 267552 HQ Connector: Created object based on Table 6014424
-    // NPR5.39/TJ  /20180206 CASE 302634 Changed OptionString property of field 3 "Sale Type" to english version
-    // NPR5.39/BR  /20180220 CASE 305744 Aligned Caption with OptionString
-    // NPR5.39/BR  /20180221 CASE 225415 Renumberd fields in 5xxxx range
-    // NPR5.43/JDH /20180620 CASE 317453 Removed non existing table relation from Field 40 (ref to old Department table 11)
-    // NPR5.48/MHA /20181121 CASE 326055 Added field 5022 "Reference"
-    // NPR5.48/TJ  /20181114 CASE 331992 Applying dimensions
-    // NPR5.48/TJ  /20190128 CASE 340446 Fixed TableRelation property for field No. to properly point to table HC Payment Type POS
-
     Caption = 'HC Audit Roll Posting';
     DataClassification = CustomerContent;
 
@@ -654,10 +645,6 @@ table 6150903 "NPR HC Audit Roll Posting"
         }
     }
 
-    fieldgroups
-    {
-    }
-
     procedure TransferFromRev(var Revisionsrulle: Record "NPR HC Audit Roll"; var RevPost: Record "NPR HC Audit Roll Posting" temporary; var Dlg: Dialog): Integer
     var
         Total: Integer;
@@ -676,7 +663,6 @@ table 6150903 "NPR HC Audit Roll Posting"
 
     procedure TransferFromTemp(var Target: Record "NPR HC Audit Roll Posting" temporary; var Source: Record "NPR HC Audit Roll Posting" temporary)
     begin
-        //TransferFromTemp()
         Target.SetFilter("Register No.", Source.GetFilter("Register No."));
         Target.SetFilter("Sales Ticket No.", Source.GetFilter("Sales Ticket No."));
         Target.SetFilter("Sale Type", Source.GetFilter("Sale Type"));
@@ -706,8 +692,6 @@ table 6150903 "NPR HC Audit Roll Posting"
 
     procedure CopyAllFilters(var RevRulle: Record "NPR HC Audit Roll")
     begin
-        //CopyAllFilters
-
         RevRulle.SetFilter("Register No.", GetFilter("Register No."));
         RevRulle.SetFilter("Sales Ticket No.", GetFilter("Sales Ticket No."));
         RevRulle.SetFilter("Sale Date", GetFilter("Sale Date"));
@@ -772,9 +756,7 @@ table 6150903 "NPR HC Audit Roll Posting"
                 nCount += 1;
                 Revisionsrulle.Description := CopyStr(Revisionsrulle.Description, 1, 50);
                 RevPost.TransferFields(Revisionsrulle);
-                //-NPR5.48 [331992]
                 RevPost.ApplyDimensions();
-                //+NPR5.48 [331992]
                 RevPost.Insert;
                 if UpdateDialog then
                     Dlg.Update(100, Round(nCount / Total * 10000, 1));
@@ -811,9 +793,7 @@ table 6150903 "NPR HC Audit Roll Posting"
                 nCount += 1;
                 Revisionsrulle.Description := CopyStr(Revisionsrulle.Description, 1, 50);
                 RevPost.TransferFields(Revisionsrulle);
-                //-NPR5.48 [331992]
                 RevPost.ApplyDimensions();
-                //+NPR5.48 [331992]
                 RevPost.Insert;
                 if UpdateDialog then
                     Dlg.Update(100, Round(nCount / Total * 10000, 1));
@@ -830,7 +810,6 @@ table 6150903 "NPR HC Audit Roll Posting"
         Total: Integer;
         nCount: Integer;
     begin
-        //-NPR5.23
         if UpdateDialog then
             Total := Count;
         if Find('-') then
@@ -845,7 +824,6 @@ table 6150903 "NPR HC Audit Roll Posting"
             until Next = 0;
         if UpdateDialog then
             Dlg.Update(103, 10000);
-        //+NPR5.23
     end;
 
     procedure ApplyDimensions()
@@ -853,7 +831,6 @@ table 6150903 "NPR HC Audit Roll Posting"
         HCRetailSetup: Record "NPR HC Retail Setup";
         HCDimMgt: Codeunit "NPR HC Dimension Mgt.";
     begin
-        //-NPR5.48 [331992]
         HCRetailSetup.Get;
         case HCRetailSetup."Dimensions Posting Type" of
             HCRetailSetup."Dimensions Posting Type"::" ":
@@ -873,7 +850,6 @@ table 6150903 "NPR HC Audit Roll Posting"
             HCRetailSetup."Dimensions Posting Type"::Custom:
                 OnCustomApplyDimensions();
         end;
-        //+NPR5.48 [331992]
     end;
 
     procedure CreateDim(Type1: Integer; No1: Code[20]; Type2: Integer; No2: Code[20]; Type3: Integer; No3: Code[20]; Type4: Integer; No4: Code[20])
@@ -883,7 +859,6 @@ table 6150903 "NPR HC Audit Roll Posting"
         No: array[10] of Code[20];
         DimMgt: Codeunit DimensionManagement;
     begin
-        //-NPR5.48 [331992]
         HCRetailSetup.Get;
         TableID[1] := Type1;
         No[1] := No1;
@@ -897,7 +872,6 @@ table 6150903 "NPR HC Audit Roll Posting"
         "Shortcut Dimension 2 Code" := '';
         "Dimension Set ID" :=
           DimMgt.GetDefaultDimID(TableID, No, HCRetailSetup."Posting Source Code", "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", 0, 0);
-        //+NPR5.48 [331992]
     end;
 
     [IntegrationEvent(TRUE, false)]

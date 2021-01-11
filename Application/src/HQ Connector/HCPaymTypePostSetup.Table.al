@@ -1,8 +1,5 @@
 table 6150906 "NPR HC Paym.Type Post.Setup"
 {
-    // NPR5.37/BR  /20171027 CASE 267552 HQ Connector Created Object
-    // NPR5.48/JDH /20181109 CASE 334163 Added option Caption to field Transfer Account Type
-
     Caption = 'HC Payment Type Posting Setup';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR HC Paym.Types Post. Setup";
@@ -62,10 +59,6 @@ table 6150906 "NPR HC Paym.Type Post.Setup"
         key(Key1; "BC Payment Type POS No.", "BC Register No.")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 

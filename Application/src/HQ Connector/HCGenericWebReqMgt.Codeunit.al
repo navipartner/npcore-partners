@@ -1,19 +1,7 @@
 codeunit 6150911 "NPR HC Generic Web Req. Mgt."
 {
-    // NPR5.38/BR  /20171205  CASE 297946 Initial Version
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
-        InvalidXml: Label 'The response is not in valid XML format.\\%1';
         ResponseStringTooLong: Label 'Response string too long.';
-
-    local procedure "-- Server Side (HQ)"()
-    begin
-    end;
 
     [TryFunction]
     procedure TryProcessRequest(var TmpHCGenericWebRequest: Record "NPR HC Generic Web Request")

@@ -1,7 +1,5 @@
 table 6150908 "NPR HC Generic Web Request"
 {
-    // NPR5.38/BR  /20171205  CASE 297946 Created object
-
     Caption = 'Generic Web Request';
     DataClassification = CustomerContent;
 
@@ -115,10 +113,6 @@ table 6150908 "NPR HC Generic Web Request"
         key(Key1; "Entry No.")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 

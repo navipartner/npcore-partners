@@ -1,12 +1,5 @@
 codeunit 6150912 "NPR HC Handle Inv. Message"
 {
-    // NPR5.38/BR  /20171205  CASE 297946 Initial Version
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         TooLong: Label 'Parameter %1 has value %2, which is too long. Field %3 in table %4 can be max. %5 characters. ';
         DoesntExist: Label '%1 %2 cannot be found.';

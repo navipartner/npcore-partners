@@ -1,26 +1,11 @@
 codeunit 6150908 "NPR HC Customer Price Mgt."
 {
-    // NPR5.38/TSA /20171130 CASE 297859 Initial Version
-
-
-    trigger OnRun()
-    begin
-    end;
-
-    var
-        InvalidXml: Label 'The response is not in valid XML format.\\%1';
-
-    local procedure "-- Server Side (HQ)"()
-    begin
-    end;
-
     [TryFunction]
     procedure TryProcessRequest(var TmpSalesHeader: Record "Sales Header"; var TmpSalesLine: Record "Sales Line")
     var
         SalesHeader: Record "Sales Header";
         TmpSalesLinePriceCalc: Record "Sales Line" temporary;
     begin
-
         TmpSalesHeader.TestField("Sell-to Customer No.");
 
         SalesHeader."Document Type" := SalesHeader."Document Type"::Quote;
@@ -51,7 +36,6 @@ codeunit 6150908 "NPR HC Customer Price Mgt."
             // writeback of result
             TmpSalesLine.TransferFields(TmpSalesLinePriceCalc, false);
             TmpSalesLine.Modify();
-
         until (TmpSalesLine.Next() = 0);
     end;
 }

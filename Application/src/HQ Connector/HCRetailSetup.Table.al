@@ -1,8 +1,5 @@
 table 6150904 "NPR HC Retail Setup"
 {
-    // NPR5.37/BR  /20171027 CASE 267552 HQ Connector: Created object based on Table 6014400
-    // NPR5.48/TJ  /20181114 CASE 331992 New field "Dimensions Posting Type"
-
     Caption = 'HC Retail Setup';
     DataClassification = CustomerContent;
 
@@ -130,16 +127,8 @@ table 6150904 "NPR HC Retail Setup"
         }
     }
 
-    fieldgroups
-    {
-    }
-
     var
         Text1060006: Label 'Rounding precision must be divisible by 1.';
         Text1060007: Label 'Example: 0,25 * 4 = 1';
-        Text1060008: Label 'No. Series cannot be changed!';
-        Text1060009: Label 'The field cannot be modified when there is payment choise.';
-        Text1060017: Label 'Due to missing index, this option can delay the sales. Accept?';
-        Text1060018: Label 'Teh update was cancelled by the user.';
 }
 
