@@ -335,9 +335,6 @@ codeunit 6014627 "NPR Managed Dependency Mgt."
           SelectStr(DepMgtSetup."Accept Statuses" + 1, '(Status eq ''Released'') and ,(Status eq ''Staging'' or Status eq ''Released'') and ,') +
           'Service_Tier_Blank eq '''' and Service_Tier_Name eq ''' + TypeHelper.UriEscapeDataString(GetServerID()) + '''' +
           ' and Payload_Version le ' + Format(MaxSupportedPayloadVersion());
-
-        //Below types are deprecated starting with AL:
-        DependencyFilter += ' and Type ne ''Control Add-in''';
     end;
 
     local procedure GetTypeNameVersionFromRecordRef(RecRef: RecordRef; var FileType: Text; var Name: Text; var FileVersion: Text)
