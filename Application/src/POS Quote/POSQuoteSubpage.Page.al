@@ -1,9 +1,5 @@
 page 6151004 "NPR POS Quote Subpage"
 {
-    // NPR5.47/MHA /20181011  CASE 302636 Object created - POS Quote (Saved POS Sale)
-    // NPR5.48/MHA /20181129  CASE 336498 Added "Customer Price Group"
-    // NPR5.51/MMV /20190820  CASE 364694 Handle EFT approvals
-
     Caption = 'POS Quote Subpage';
     DelayedInsert = true;
     PageType = ListPart;
