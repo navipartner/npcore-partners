@@ -947,25 +947,6 @@ page 6014432 "NPR Audit Roll"
                     end;
                 }
             }
-            group(PDF2NAV)
-            {
-                Caption = 'PDF2NAV';
-                action(EmailLog)
-                {
-                    Caption = 'E-mail Log';
-                    Image = Email;
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the E-mail Log action';
-                }
-                action(SendAsPDF)
-                {
-                    Caption = 'Send as PDF';
-                    Image = SendEmailPDF;
-                    Promoted = true;
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Send as PDF action';
-                }
-            }
         }
     }
 
