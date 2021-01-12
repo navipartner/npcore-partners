@@ -51,6 +51,7 @@ jobs:
         serverInstanceName: $(serverInstanceName)
         alProjectRoot: $(Build.SourcesDirectory)/$(Build.Repository.Name)/Application
         translationsTargetRepoName: NpCore-Translations
+        translationsTargetRepoBranchName: master
         translationsRepo: translations
         dependancies:
         - package:
