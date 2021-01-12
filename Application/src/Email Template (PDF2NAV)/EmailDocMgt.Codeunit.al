@@ -897,22 +897,18 @@ codeunit 6014464 "NPR E-mail Doc. Mgt."
     local procedure EmailReceiptOnSale(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR Sale POS")
     var
         POSEntry: Record "NPR POS Entry";
-        Register: Record "NPR Register";
         EmailManagement: Codeunit "NPR E-mail Management";
         RecRef: RecordRef;
     begin
+        if not POSSalesWorkflowStep.Enabled then
+            exit;
         if POSSalesWorkflowStep."Subscriber Codeunit ID" <> CurrCodeunitId() then
             exit;
         if POSSalesWorkflowStep."Subscriber Function" <> 'EmailReceiptOnSale' then
             exit;
 
-        if not Register.Get(SalePOS."Register No.") then
-            exit;
-        if (not SalePOS."Send Receipt Email") and (Register."Sales Ticket Email Output" <> Register."Sales Ticket Email Output"::Auto) then
-            exit;
-
         POSEntry.SetRange("Document No.", SalePOS."Sales Ticket No.");
-        POSEntry.SetRange("Entry Type", POSEntry."Entry Type"::"Cancelled Sale");
+        POSEntry.SetFilter("Entry Type", '%1|%2', POSEntry."Entry Type"::"Direct Sale", POSEntry."Entry Type"::"Credit Sale");
         if not POSEntry.FindFirst() then
             exit;
 
