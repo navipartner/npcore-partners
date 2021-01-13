@@ -26,7 +26,6 @@ codeunit 6150704 "NPR POS Front End Management"
         Text012: Label 'A request was made to resume a workflow, while no workflow is currently in the paused state.';
         Text013: Label 'A method call was made on an uninitialized instance of the POS Front End Management codeunit, that requires an active and initialized instance to succeed.';
         Text015: Label 'A function that requires Workflow 2.0 engine to be initialized has been invoked from a Workflow 1.0 action.';
-        IsMock: Boolean;
 
     procedure Initialize(FrameworkIn: Interface "NPR Framework Interface"; SessionIn: Codeunit "NPR POS Session")
     begin
@@ -40,19 +39,6 @@ codeunit 6150704 "NPR POS Front End Management"
 
         // The following variable is used only in debugging sessions to indicate whether this instance of the codeunit has actually
         // been initialized. There is no other purpose to this variable, but it is absolutely indispensable for debugging purposes.
-        Initialized := true;
-    end;
-
-    procedure MockInitialize(SessionIn: Codeunit "NPR POS Session")
-    begin
-        POSSession := SessionIn;
-
-        Clear(RegisteredWorkflows);
-        Clear(WorkflowStack);
-        Clear(ActionStack);
-        Clear(QueuedWorkflows);
-
-        IsMock := true;
         Initialized := true;
     end;
 
@@ -166,9 +152,6 @@ codeunit 6150704 "NPR POS Front End Management"
 
     local procedure MakeSureFrameworkIsAvailable(WithError: Boolean): Boolean
     begin
-        if IsMock then
-            exit(true);
-
         if not Initialized then
             if IsActiveSession() then
                 exit(true);
@@ -184,9 +167,6 @@ codeunit 6150704 "NPR POS Front End Management"
 
     local procedure MakeSureFrameworkIsAvailableIn20(WithError: Boolean): Boolean
     begin
-        if IsMock then
-            exit(true);
-
         if WorkflowID = 0 then begin
             if WithError then
                 Error(GetBugErrorMessage(Text015))
@@ -199,9 +179,6 @@ codeunit 6150704 "NPR POS Front End Management"
 
     local procedure MakeSureFrameworkIsInitialized()
     begin
-        if IsMock then
-            exit;
-
         if (not Initialized) THEN
             ReportBug(Text013);
     end;
@@ -384,9 +361,6 @@ codeunit 6150704 "NPR POS Front End Management"
         DebugTrace: Text;
         ServerStopwatch: Text;
     begin
-        if IsMock then
-            exit;
-
         DebugTrace := POSSession.DebugFlush();
         if DebugTrace <> '' then
             Trace(Request, 'debug_trace', DebugTrace);

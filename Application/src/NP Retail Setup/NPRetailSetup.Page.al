@@ -433,14 +433,6 @@ page 6150613 "NPR NP Retail Setup"
                         ToolTip = 'Executes the Lookup Templates action';
                     }
                 }
-                action("Client Diagnostics")
-                {
-                    Caption = 'Client Diagnostics';
-                    Image = AnalysisView;
-                    RunObject = Page "NPR Client Diagnostics";
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Client Diagnostics action';
-                }
             }
             group(PaymentCard)
             {
@@ -1271,30 +1263,6 @@ page 6150613 "NPR NP Retail Setup"
                         RunObject = Page "NPR CleanCash Setup List";
                         ApplicationArea = All;
                         ToolTip = 'Executes the Setup List action';
-                    }
-                    action("Audit Roll List")
-                    {
-                        Caption = 'Audit Roll List';
-                        Image = List;
-                        RunObject = Page "NPR CleanCash Audit Roll List";
-                        ApplicationArea = All;
-                        ToolTip = 'Executes the Audit Roll List action';
-                    }
-                    action("Register List")
-                    {
-                        Caption = 'Register List';
-                        Image = Setup;
-                        RunObject = Page "NPR CleanCash Register List";
-                        ApplicationArea = All;
-                        ToolTip = 'Executes the Register List action';
-                    }
-                    action("Error List")
-                    {
-                        Caption = 'Error List';
-                        Image = List;
-                        RunObject = Page "NPR CleanCash Error List";
-                        ApplicationArea = All;
-                        ToolTip = 'Executes the Error List action';
                     }
                 }
             }
