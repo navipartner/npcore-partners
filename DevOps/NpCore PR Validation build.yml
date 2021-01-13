@@ -74,4 +74,4 @@ jobs:
         password: $(containerAdminPassword)
         testRunName: 'NPCore Tests'
         testApps:
-          - appPath: $(Build.SourcesDirectory)/$(Build.Repository.Name)/Test/Output/Test.app
+          - appPath: $(Build.SourcesDirectory)/$(Build.Repository.Name)/Test/Output/NP_Retail_Tests.app
