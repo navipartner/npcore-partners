@@ -576,7 +576,6 @@ report 6014617 "NPR Purchase Order"
                                 CurrReport.Break;
                             PurchLine.SetRange("Line No.", 0, PurchLine."Line No.");
                             SetRange(Number, 1, PurchLine.Count);
-                            CurrReport.CreateTotals(PurchLine."Line Amount", PurchLine."Inv. Discount Amount");
                         end;
                     }
                     dataitem(Totals; "Integer")
@@ -672,9 +671,6 @@ report 6014617 "NPR Purchase Order"
                             if VATAmount = 0 then
                                 CurrReport.Break;
                             SetRange(Number, 1, VATAmountLine.Count);
-                            CurrReport.CreateTotals(
-                              VATAmountLine."Line Amount", VATAmountLine."Inv. Disc. Base Amount",
-                              VATAmountLine."Invoice Discount Amount", VATAmountLine."VAT Base", VATAmountLine."VAT Amount");
                         end;
                     }
                     dataitem(VATCounterLCY; "Integer")
@@ -715,7 +711,6 @@ report 6014617 "NPR Purchase Order"
                                 CurrReport.Break;
 
                             SetRange(Number, 1, VATAmountLine.Count);
-                            CurrReport.CreateTotals(VALVATBaseLCY, VALVATAmountLCY);
 
                             if GLSetup."LCY Code" = '' then
                                 VALSpecLCYHeader := Text007 + Text008
@@ -913,15 +908,6 @@ report 6014617 "NPR Purchase Order"
                                 PrepmtLineAmount := PrepmtInvBuf."Amount Incl. VAT"
                             else
                                 PrepmtLineAmount := PrepmtInvBuf.Amount;
-                        end;
-
-                        trigger OnPreDataItem()
-                        begin
-                            CurrReport.CreateTotals(
-                              PrepmtInvBuf.Amount, PrepmtInvBuf."Amount Incl. VAT",
-                              PrepmtVATAmountLine."Line Amount", PrepmtVATAmountLine."VAT Base",
-                              PrepmtVATAmountLine."VAT Amount",
-                              PrepmtLineAmount);
                         end;
                     }
                     dataitem(PrepmtVATCounter; "Integer")

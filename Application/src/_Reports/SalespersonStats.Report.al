@@ -140,13 +140,6 @@ report 6014446 "NPR Salesperson Stats"
                     EndDate := CalcDate('<-1Y>', "Salesperson/Purchaser".GetRangeMax("Date Filter"));
                     SalespersonLastYear.SetRange("Date Filter", StartDate, EndDate);
                 end;
-
-                CurrReport.CreateTotals("Salesperson/Purchaser"."NPR Sales (LCY)",
-                                        "Salesperson/Purchaser"."NPR Discount Amount",
-                                        "Salesperson/Purchaser"."NPR COGS (LCY)",
-                                        SalespersonLastYear."NPR Sales (LCY)",
-                                        SalespersonLastYear."NPR Discount Amount",
-                                        SalespersonLastYear."NPR COGS (LCY)");
             end;
         }
         dataitem(DiscountStatistics; "Integer")

@@ -90,7 +90,6 @@ report 6014406 "NPR Sales Person Top 20"
                 SalesPersonTemp.DeleteAll;
                 I := 0;
                 SalespersonFilter := "Salesperson/Purchaser".GetFilter("Date Filter");
-                CurrReport.CreateTotals("Salesperson/Purchaser"."NPR Sales (LCY)", "Salesperson/Purchaser"."NPR COGS (LCY)");
             end;
         }
         dataitem("Integer"; "Integer")
@@ -194,11 +193,6 @@ report 6014406 "NPR Sales Person Top 20"
                     DiscountPct := "Salesperson/Purchaser"."NPR Discount Amount" / ("Salesperson/Purchaser"."NPR Sales (LCY)" + "Salesperson/Purchaser"."NPR Discount Amount") * 100
                 else
                     DiscountPct := 0;
-            end;
-
-            trigger OnPreDataItem()
-            begin
-                CurrReport.CreateTotals("Salesperson/Purchaser"."NPR Discount Amount", Db, SalesPct);
             end;
         }
     }
