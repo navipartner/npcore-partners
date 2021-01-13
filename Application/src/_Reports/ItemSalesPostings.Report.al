@@ -111,7 +111,6 @@ report 6014439 "NPR Item Sales Postings"
                 Item.SetFilter("Date Filter", GetFilter("Posting Date"));
                 Item.CalcFields(Inventory);
 
-                CurrReport.CreateTotals(Item."Sales (Qty.)", Item."Sales (LCY)", Profit, Item.Inventory);
 
                 Item.CalcFields("Sales (Qty.)", "Sales (LCY)", "COGS (LCY)", "Assembly BOM");
 
