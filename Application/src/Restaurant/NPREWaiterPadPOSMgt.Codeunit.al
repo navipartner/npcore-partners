@@ -1026,7 +1026,7 @@ codeunit 6150660 "NPR NPRE Waiter Pad POS Mgt."
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6151005, 'OnBeforeLoadFromPOSQuote', '', true, false)]
-    local procedure OnBeforeLoadPOSQuote(var SalePOS: Record "NPR Sale POS"; var POSQuoteEntry: Record "NPR POS Quote Entry"; var XmlDoc: DotNet "NPRNetXmlDocument")
+    local procedure OnBeforeLoadPOSQuote(var SalePOS: Record "NPR Sale POS"; var POSQuoteEntry: Record "NPR POS Quote Entry"; var XmlDoc: XmlDocument)
     begin
         //-NPR5.55 [399170]
         ClearSaleHdrNPREPresetFields(SalePOS, true);

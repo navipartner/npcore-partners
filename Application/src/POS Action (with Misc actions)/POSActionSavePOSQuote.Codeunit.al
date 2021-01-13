@@ -208,7 +208,7 @@ codeunit 6151004 "NPR POS Action: SavePOSQuote"
     var
         POSQuoteMgt: Codeunit "NPR POS Quote Mgt.";
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
-        XmlDoc: DotNet "NPRNetXmlDocument";
+        XmlDoc: XmlDocument;
         OutStr: OutStream;
     begin
         POSQuoteEntry.Init;
@@ -231,7 +231,7 @@ codeunit 6151004 "NPR POS Action: SavePOSQuote"
         //-NPR5.48 [338208]
         POSQuoteMgt.POSSale2Xml(SalePOS, XmlDoc);
         POSQuoteEntry."POS Sales Data".CreateOutStream(OutStr, TEXTENCODING::UTF8);
-        XmlDoc.Save(OutStr);
+        XmlDoc.WriteTo(OutStr);
         //+NPR5.48 [338208]
         POSQuoteEntry.Insert(true);
     end;

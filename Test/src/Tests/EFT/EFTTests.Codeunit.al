@@ -4,10 +4,6 @@ codeunit 50000 "NPR EFT Tests"
 
     Subtype = Test;
 
-    trigger OnRun()
-    begin
-    end;
-
     var
         _Initialized: Boolean;
         _POSUnit: Record "NPR POS Unit";
@@ -16,6 +12,7 @@ codeunit 50000 "NPR EFT Tests"
         _LastTrxEntryNo: Integer;
         _POSSession: Codeunit "NPR POS Session";
         _POSStore: Record "NPR POS Store";
+        _POSSetup: Record "NPR POS Setup";
 
     [Test]
     procedure PurchaseSuccess()
@@ -2818,6 +2815,7 @@ codeunit 50000 "NPR EFT Tests"
         end;
 
         if not _Initialized then begin
+            NPRLibraryPOSMasterData.CreatePOSSetup(_POSSetup);
             NPRLibraryPOSMasterData.CreateDefaultPostingSetup();
             NPRLibraryPOSMasterData.CreatePOSStore(_POSStore);
             NPRLibraryPOSMasterData.CreatePOSUnit(_POSUnit, _POSStore.Code);

@@ -36,7 +36,6 @@ codeunit 50001 "NPR Library - EFT"
         PaymentTypePOS.Get(POSPaymentMethod.Code);
         PaymentTypePOS."EFT Surcharge Service Item No." := SurchargeItem."No.";
         PaymentTypePOS."EFT Tip Service Item No." := TipItem."No.";
-        PaymentTypePOS."Auto End Sale" := true;
         PaymentTypePOS.Modify;
     end;
 }
