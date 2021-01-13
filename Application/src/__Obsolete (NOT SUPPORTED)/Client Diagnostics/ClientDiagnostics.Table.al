@@ -1,12 +1,9 @@
 table 6059999 "NPR Client Diagnostics"
 {
-    // NPR5.38/CLVA/20171109  CASE 293179 Collecting client-side information
-    // NPR5.40/MHA /20180328  CASE 308907 Added Login Info fields, -License Info fields, -Computer Info fields, POS Info fields, Logout Info fields
 
     Caption = 'Client Diagnostics';
     DataClassification = CustomerContent;
-    DrillDownPageID = "NPR Client Diagnostics";
-    LookupPageID = "NPR Client Diagnostics";
+    ObsoleteState = Removed;
 
     fields
     {

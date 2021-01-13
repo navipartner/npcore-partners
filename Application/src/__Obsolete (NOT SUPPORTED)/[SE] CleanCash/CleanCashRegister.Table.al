@@ -4,7 +4,7 @@ table 6184503 "NPR CleanCash Register"
     Caption = 'CleanCash Cash Register';
     DataClassification = CustomerContent;
     ObsoleteReason = 'This table is not used anymore';
-    ObsoleteState = Pending;
+    ObsoleteState = Removed;
     ObsoleteTag = 'CleanCash To AL';
     fields
     {
