@@ -172,7 +172,6 @@ report 6014533 "NPR Inventory - flow"
                     begin
                         ShowTotalGroup := false;
                         NewGroup := false;
-                        CurrReport.CreateTotals(Item2."Sales (Qty.)");
                     end;
                 }
 
@@ -188,7 +187,6 @@ report 6014533 "NPR Inventory - flow"
 
                     ItemNo := "No.";
 
-                    CurrReport.CreateTotals("Purchases (Qty.)", "Sales (Qty.)", "Purchases (LCY)", "Sales (LCY)", "COGS (LCY)");
 
                     // Stocks - calculates inventory at the beginning and end
                     Item1.CopyFilters(Item);
@@ -335,8 +333,6 @@ report 6014533 "NPR Inventory - flow"
 
                 trigger OnPreDataItem()
                 begin
-                    CurrReport.CreateTotals(Item."Purchases (Qty.)", Item."Sales (Qty.)", Item."Purchases (LCY)", Item."Sales (LCY)", Item."COGS (LCY)",
-                    StockInventoryStart, StockInventoryEnd, Regulatory);
 
                     Vendor.CopyFilter("Date Filter", Item."Date Filter");
                 end;
@@ -345,12 +341,6 @@ report 6014533 "NPR Inventory - flow"
             trigger OnAfterGetRecord()
             begin
                 ShowVendorSection := (not OnlyTotal);
-            end;
-
-            trigger OnPreDataItem()
-            begin
-                CurrReport.CreateTotals(Item."Purchases (Qty.)", Item."Sales (Qty.)", Item."Purchases (LCY)", Item."Sales (LCY)", Item."COGS (LCY)",
-                StockInventoryStart, StockInventoryEnd, Regulatory);
             end;
         }
     }

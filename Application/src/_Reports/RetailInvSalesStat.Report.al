@@ -108,11 +108,6 @@ report 6014662 "NPR Retail Inv.: Sales Stat."
                 if (SalesAmount = 0) and not PrintAlsoWithoutSale then
                     CurrReport.Skip;
             end;
-
-            trigger OnPreDataItem()
-            begin
-                CurrReport.CreateTotals(SalesQty, SalesAmount, COGSAmount, ItemProfit);
-            end;
         }
     }
 

@@ -10,7 +10,7 @@ report 6014545 "NPR Acc. Statement w FIK-Card"
     RDLCLayout = './src/_Reports/layouts/Acc. Statement w FIK-Card.rdlc';
 
     Caption = 'Acc. Statement w FIK-Card';
-
+    
     dataset
     {
         dataitem(Customer; Customer)
@@ -471,7 +471,6 @@ report 6014545 "NPR Acc. Statement w FIK-Card"
 
                         trigger OnPreDataItem()
                         begin
-                            CurrReport.CreateTotals("Remaining Amount");
                             if not IncludeAgingBand then begin
                                 SetRange("Due Date", 0D, EndDate - 1);
                                 SetRange(Positive, true);

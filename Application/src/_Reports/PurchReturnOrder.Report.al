@@ -470,7 +470,6 @@ report 6014510 "NPR Purch Return Order"
                                 CurrReport.Break;
                             PurchLine.SetRange("Line No.", 0, PurchLine."Line No.");
                             SetRange(Number, 1, PurchLine.Count);
-                            CurrReport.CreateTotals(PurchLine."Line Amount", PurchLine."Inv. Discount Amount");
                         end;
                     }
                     dataitem(VATCounter; "Integer")
@@ -546,9 +545,6 @@ report 6014510 "NPR Purch Return Order"
                             if VATAmount = 0 then
                                 CurrReport.Break;
                             SetRange(Number, 1, VATAmountLine.Count);
-                            CurrReport.CreateTotals(
-                              VATAmountLine."Line Amount", VATAmountLine."Inv. Disc. Base Amount",
-                              VATAmountLine."Invoice Discount Amount", VATAmountLine."VAT Base", VATAmountLine."VAT Amount");
                         end;
                     }
                     dataitem(VATCounterLCY; "Integer")
@@ -597,7 +593,6 @@ report 6014510 "NPR Purch Return Order"
                                 CurrReport.Break;
 
                             SetRange(Number, 1, VATAmountLine.Count);
-                            CurrReport.CreateTotals(VALVATBaseLCY, VALVATAmountLCY);
 
                             if GLSetup."LCY Code" = '' then
                                 VALSpecLCYHeader := Text007 + Text008

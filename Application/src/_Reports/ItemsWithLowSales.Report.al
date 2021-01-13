@@ -56,7 +56,6 @@ report 6014540 "NPR Items With Low Sales"
                 TempItemAmount.DeleteAll;
                 i := 0;
 
-                CurrReport.CreateTotals("Sales (LCY)", Item."Sales (Qty.)");
             end;
         }
         dataitem("Integer"; "Integer")
@@ -171,7 +170,6 @@ report 6014540 "NPR Items With Low Sales"
 
                 ItemSalesAmt := Item."Sales (LCY)";
 
-                CurrReport.CreateTotals(Item."Sales (LCY)", Item."Sales (Qty.)");
             end;
         }
     }
