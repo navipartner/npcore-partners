@@ -4,7 +4,7 @@ table 6184502 "NPR CleanCash Audit Roll"
     DataClassification = CustomerContent;
 
     ObsoleteReason = 'This table is not used anymore but kept for historical purposes.';
-    ObsoleteState = Pending;
+    ObsoleteState = Removed;
     ObsoleteTag = 'CleanCash To AL';
 
     fields

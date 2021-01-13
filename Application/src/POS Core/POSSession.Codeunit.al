@@ -44,7 +44,6 @@ codeunit 6150700 "NPR POS Session"
         Workflow20State: array[1000] of Codeunit "NPR POS WF 2.0: State";
         Workflow20StateIndex: DotNet NPRNetDictionary_Of_T_U;
         Workflow20Map: array[1000] of Boolean;
-        IsMock: Boolean;
 
     //#region Initialization
 
@@ -76,27 +75,6 @@ codeunit 6150700 "NPR POS Session"
             Message(Text001);
 
         Initialized := true;
-    end;
-
-    procedure MockConstructor(FrontEndIn: Codeunit "NPR POS Front End Management"; SetupIn: Codeunit "NPR POS Setup"; SessionIn: Codeunit "NPR POS Session")
-    var
-        NullObject: DotNet NPRNetObject;
-    begin
-        FrontEnd := FrontEndIn;
-        Setup := SetupIn;
-        This := SessionIn;
-
-        FrontEnd.MockInitialize(This);
-
-        IsMock := true;
-
-        FrontEndKeeper.Initialize(NullObject, FrontEnd, This);
-        BindSubscription(FrontEndKeeper);
-
-        OnInitialize(FrontEnd);
-        Initialized := true;
-
-        InitializeSession(false);
     end;
 
     procedure InitializeUI()
@@ -545,11 +523,6 @@ codeunit 6150700 "NPR POS Session"
     begin
         Result := ServerStopwatch;
         ServerStopwatch := '';
-    end;
-
-    procedure IsMockSession(): Boolean
-    begin
-        exit(IsMock);
     end;
 
     procedure SetDragonglassSession()

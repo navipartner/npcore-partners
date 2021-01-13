@@ -1,5 +1,7 @@
 codeunit 6014404 "NPR Event Subscriber"
 {
+    SingleInstance = true; //For performance, not state sharing. - TODO: Split up into smaller codeunits instead of one big and move page subscribers to pageextensions.
+
     var
         RegisterCodeAlreadyUsed: Label 'Register Code %1 already exists.';
         SalesPersonDeleteError: Label 'you cannot delete Salesperson/purchaser %1 before the sale is posted in the Audit roll!';
@@ -81,23 +83,6 @@ codeunit 6014404 "NPR Event Subscriber"
             if Rec."Dimension Code" = GLSetup."Global Dimension 2 Code" then
                 StdTableCode.UpdateGlobalDimCode(2, Rec."Table ID", Rec."No.", '');
         end;
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::LogInManagement, 'OnBeforeLogInStart', '', true, false)]
-    local procedure OnBeforeLogInStart()
-    var
-        ServiceTierUserManagement: Codeunit "NPR Service Tier User Mgt.";
-        NPRetailSetup: Record "NPR NP Retail Setup";
-    begin
-        if NavApp.IsInstalling() then
-            exit;
-
-        if not (CurrentClientType in [CLIENTTYPE::Windows, CLIENTTYPE::Web, CLIENTTYPE::Tablet, CLIENTTYPE::Phone, CLIENTTYPE::Desktop]) then
-            exit;
-
-        Commit();
-
-        if ServiceTierUserManagement.Run() then;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 22, 'OnBeforeInsertTransferEntry', '', true, false)]

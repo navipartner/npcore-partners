@@ -3,7 +3,7 @@ table 6184501 "NPR CleanCash Error List"
     Caption = 'CleanCash Error List';
     DataClassification = CustomerContent;
     ObsoleteReason = 'This table is not used anymore';
-    ObsoleteState = Pending;
+    ObsoleteState = Removed;
     ObsoleteTag = 'CleanCash To AL';
 
     fields
