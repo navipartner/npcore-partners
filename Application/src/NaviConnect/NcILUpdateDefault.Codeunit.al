@@ -36,4 +36,9 @@ codeunit 6151506 "NPR Nc IL Update Default" implements "NPR Nc Import List IUpda
         ImportType.SetRange(Code, ImportType.code);
         Page.Run(Page::"NPR Nc Import Type Card", ImportType);
     end;
+
+    procedure ShowErrorLog(ImportType: Record "NPR Nc Import Type")
+    begin
+
+    end;
 }
