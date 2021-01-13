@@ -69,6 +69,7 @@ codeunit 6014582 "NPR Print Method Mgt."
         exit(GoogleCloudPrintMgt.PrintFile(PrinterID, Stream, ContentType, GoogleCloudPrintMgt.GetCustomCJT(PrinterID, ObjectType, ObjectID), '', ''));
     end;
 
+    [Obsolete('Use the overload without DotNet. This method can be deleted when there are 0 references left')]
     procedure PrintViaEmail(PrinterName: Text; var Stream: DotNet NPRNetMemoryStream)
     var
         SmtpMail: Codeunit "SMTP Mail";
@@ -80,7 +81,23 @@ codeunit 6014582 "NPR Print Method Mgt."
         Separators.Add(';');
         Separators.Add(',');
 
-        SmtpMail.CreateMessage('NaviPartner', 'noreply@navipartner.dk', PrinterName.Split(Separators), 'Document Print', '', false);
+        SmtpMail.CreateMessage('NaviPartner', 'eprint@navipartner.dk', PrinterName.Split(Separators), 'Document Print', 'Document Print Body', false);
+        SmtpMail.AddAttachmentStream(Stream, 'Document.pdf');
+        SmtpMail.Send();
+    end;
+
+    procedure PrintViaEmail(PrinterName: Text; var Stream: InStream)
+    var
+        SmtpMail: Codeunit "SMTP Mail";
+        InStream: InStream;
+        Separators: List of [Text];
+    begin
+        if Stream.EOS then
+            exit;
+        Separators.Add(';');
+        Separators.Add(',');
+
+        SmtpMail.CreateMessage('NaviPartner', 'eprint@navipartner.dk', PrinterName.Split(Separators), 'Document Print', 'Document Print Body', false);
         SmtpMail.AddAttachmentStream(Stream, 'Document.pdf');
         SmtpMail.Send();
     end;
