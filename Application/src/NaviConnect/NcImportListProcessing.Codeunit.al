@@ -63,7 +63,7 @@ codeunit 6151509 "NPR Nc Import List Processing"
         if NcImportType.Get(UpperCase(ImportTypeCode)) then;
     end;
 
-    local procedure GetParameterValue(JobQueueEntry: Record "Job Queue Entry"; ParameterName: Text) ParameterValue: Text
+    procedure GetParameterValue(JobQueueEntry: Record "Job Queue Entry"; ParameterName: Text) ParameterValue: Text
     var
         Position: Integer;
     begin

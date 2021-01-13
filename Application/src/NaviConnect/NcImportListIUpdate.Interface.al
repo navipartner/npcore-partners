@@ -5,4 +5,6 @@ interface "NPR Nc Import List IUpdate"
     procedure Update(JobQueueEntry: Record "Job Queue Entry"; ImportType: Record "NPR Nc Import Type");
 
     procedure ShowSetup(ImportType: Record "NPR Nc Import Type");
+
+    procedure ShowErrorLog(ImportType: Record "NPR Nc Import Type");
 }
