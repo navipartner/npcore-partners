@@ -206,7 +206,7 @@ codeunit 6151005 "NPR POS Action: Load POS Quote"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeLoadFromPOSQuote(var SalePOS: Record "NPR Sale POS"; var POSQuoteEntry: Record "NPR POS Quote Entry"; var XmlDoc: DotNet "NPRNetXmlDocument")
+    local procedure OnBeforeLoadFromPOSQuote(var SalePOS: Record "NPR Sale POS"; var POSQuoteEntry: Record "NPR POS Quote Entry"; var XmlDoc: XmlDocument)
     begin
     end;
 
@@ -215,23 +215,26 @@ codeunit 6151005 "NPR POS Action: Load POS Quote"
     begin
     end;
 
-    local procedure UpdateDates(var XmlDoc: DotNet "NPRNetXmlDocument"; SalePOS: Record "NPR Sale POS")
+    local procedure UpdateDates(var XmlDoc: XmlDocument; SalePOS: Record "NPR Sale POS")
     var
         SaleLinePOS: Record "NPR Sale Line POS";
-        XmlElement: DotNet NPRNetXmlElement;
+        XmlNode: XmlNode;
+        XmlNodeList: XmlNodeList;
+        NewXmlNode: XmlNode;
     begin
-        XmlElement := XmlDoc.SelectSingleNode('/pos_sale/fields/field[@field_no=' + Format(SalePOS.FieldNo(Date)) + ']');
-        XmlElement.InnerText := Format(SalePOS.Date, 0, 9);
-        XmlElement := XmlDoc.SelectSingleNode('/pos_sale/fields/field[@field_no=' + Format(SalePOS.FieldNo("Start Time")) + ']');
-        XmlElement.InnerText := Format(SalePOS."Start Time", 0, 9);
-        foreach XmlElement in XmlDoc.SelectNodes('pos_sale/pos_sale_lines/pos_sale_line/fields/field[@field_no=' + Format(SaleLinePOS.FieldNo(Date)) + ']') do
-            XmlElement.InnerText := Format(SalePOS.Date, 0, 9);
+        XmlDoc.SelectSingleNode('/pos_sale/fields/field[@field_no=' + Format(SalePOS.FieldNo(Date)) + ']', XmlNode);
+        XmlNode.ReplaceWith(Format(SalePOS.Date, 0, 9));
+        XmlDoc.SelectSingleNode('/pos_sale/fields/field[@field_no=' + Format(SalePOS.FieldNo("Start Time")) + ']', XmlNode);
+        XmlNode.ReplaceWith(Format(SalePOS."Start Time", 0, 9));
+        XmlDoc.SelectNodes('pos_sale/pos_sale_lines/pos_sale_line/fields/field[@field_no=' + Format(SaleLinePOS.FieldNo(Date)) + ']', XmlNodeList);
+        foreach XmlNode in XmlNodeList do
+            XmlNode.ReplaceWith(Format(SalePOS.Date, 0, 9));
     end;
 
     procedure LoadFromQuote(var POSQuoteEntry: Record "NPR POS Quote Entry"; var SalePOS: Record "NPR Sale POS"): Boolean
     var
         POSQuoteMgt: Codeunit "NPR POS Quote Mgt.";
-        XmlDoc: DotNet "NPRNetXmlDocument";
+        XmlDoc: XmlDocument;
     begin
         POSQuoteEntry.SkipLineDeleteTrigger(true);
 

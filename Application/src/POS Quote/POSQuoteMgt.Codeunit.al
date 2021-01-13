@@ -66,18 +66,6 @@ codeunit 6151006 "NPR POS Quote Mgt."
         POSQuoteEntry.FilterGroup(0);
     end;
 
-    [Obsolete('Please use native Business Central objects instead of dotnet classes.')]
-    procedure POSSale2Xml(SalePOS: Record "NPR Sale POS"; var XmlDoc: DotNet "NPRNetXmlDocument")
-    var
-        BCXmlDoc: XmlDocument;
-        Xml: Text;
-    begin
-        POSSale2Xml(SalePOS, BCXmlDoc);
-        XmlDoc := XmlDoc.XmlDocument();
-        BCXmlDoc.WriteTo(Xml);
-        XmlDoc.Load(Xml);
-    end;
-
     procedure POSSale2Xml(SalePOS: Record "NPR Sale POS"; var XmlDoc: XmlDocument)
     var
         NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";

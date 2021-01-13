@@ -193,6 +193,15 @@ codeunit 50003 "NPR Library - POS Master Data"
         POSPostingSetup.Insert;
     end;
 
+    procedure CreatePOSSetup(var POSSetup: Record "NPR POS Setup")
+    begin
+        if POSSetup.FindFirst() then
+            exit;
+
+        POSSetup.Init;
+        POSSetup.Insert();
+    end;
+
     procedure CreateRegister(var Register: Record "NPR Register"; POSUnit: Record "NPR POS Unit"; PrimaryPaymentType: Code[10]; ReturnPaymentType: Code[10])
     begin
         if not Register.Get(POSUnit."No.") then begin
