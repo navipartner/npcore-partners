@@ -17,25 +17,24 @@ codeunit 6150801 "NPR POS Action - Customer"
 
     local procedure ActionVersion(): Text
     begin
-        exit('1.1');
+        exit('1.2');
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
-        with Sender do
-            if DiscoverAction(
-              ActionCode,
-              ActionDescription,
-              ActionVersion,
-              Type::Generic,
-              "Subscriber Instances Allowed"::Multiple)
-            then begin
-                RegisterWorkflowStep('1', 'respond();');
-                RegisterWorkflow(false);
+        if Sender.DiscoverAction(
+          ActionCode,
+          ActionDescription,
+          ActionVersion,
+          Sender.Type::Generic,
+          Sender."Subscriber Instances Allowed"::Multiple)
+        then begin
+            Sender.RegisterWorkflowStep('1', 'respond();');
+            Sender.RegisterWorkflow(false);
 
-                RegisterOptionParameter('CustomerType', 'CustomerSTD,CustomerInfo,DebitInfo,CustomerCRM,CustomerILE,CustomerRemove,RepairSend,NPOrderSend,NPOrderGet,CustomerPay,SamplingGet,SamplingSend', 'CustomerSTD');
-            end;
+            Sender.RegisterOptionParameter('CustomerType', 'CustomerSTD,CustomerInfo,DebitInfo,CustomerCRM,CustomerILE,CustomerRemove,RepairSend,NPOrderSend,NPOrderGet,CustomerPay,SamplingGet,SamplingSend,CustomerLedger', 'CustomerSTD');
+        end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnBeforeWorkflow', '', false, false)]
@@ -86,30 +85,32 @@ codeunit 6150801 "NPR POS Action - Customer"
         POSSession.GetCurrentView(View);
 
         case CustomerType of
-            0:
+            0:  //CustomerSTD
                 SetCustomer(SalePOS, POSSession, POSSale, View, FrontEnd);
-            1:
+            1:  //CustomerInfo
                 SetCustomerInfo(SalePOS);
-            2:
+            2:  //DebitInfo
                 SetDebitInfo(SalePOS, TempSalesHeader);
-            3:
+            3:  //CustomerCRM
                 SetContact(SalePOS, POSSession, POSSale, View);
-            4:
+            4:  //CustomerILE
                 SetCustomerILE(SalePOS);
-            5:
+            5:  //CustomerRemove
                 SetCustomerRemove(SalePOS, POSSale);
-            6:
+            6:  //RepairSend
                 SetRepairSend(SalePOS);
-            7:
+            7:  //NPOrderSend
                 SetNPOrderSend(SalePOS, POSSession, POSSale, FrontEnd);
-            8:
+            8:  //NPOrderGet
                 SetNPOrderGet(SalePOS, POSSession, POSSale, FrontEnd);
-            9:
+            9:  //CustomerPay
                 DebitSale(SalePOS, POSSale, FrontEnd);
-            10:
+            10:  //SamplingGet
                 SetSamplingGet(SalePOS, POSSession, POSSale, View, FrontEnd);
-            11:
+            11:  //SamplingSend
                 SetSamplingSend(SalePOS, POSSession, POSSale, FrontEnd);
+            12:  //CustomerLedger
+                ViewCustomerLedger(SalePOS);
         end;
 
         POSSession.RequestRefreshData();
@@ -117,9 +118,7 @@ codeunit 6150801 "NPR POS Action - Customer"
         Handled := true;
     end;
 
-    local procedure "-- Locals --"()
-    begin
-    end;
+    #region Locals
 
     procedure SetCustomer(var SalePOS: Record "NPR Sale POS"; POSSession: Codeunit "NPR POS Session"; POSSale: Codeunit "NPR POS Sale"; View: Codeunit "NPR POS View"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
@@ -134,50 +133,47 @@ codeunit 6150801 "NPR POS Action - Customer"
         TouchScreenFunctions: Codeunit "NPR Touch Screen - Func.";
         Validering: Code[10];
     begin
-        with SalePOS do begin
+        SalePOS.Validate("Customer No.", '');
+        SalePOS.Modify(true);
+        POSSale.Refresh(SalePOS);
+        POSSale.Modify(true, false);
 
-            Validate("Customer No.", '');
-            Modify(true);
-            POSSale.Refresh(SalePOS);
-            POSSale.Modify(true, false);
+        SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
+        SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
 
-            SaleLinePOS.SetRange("Register No.", "Register No.");
-            SaleLinePOS.SetRange("Sales Ticket No.", "Sales Ticket No.");
+        SaleLinePOS.SetRange(Type, SaleLinePOS.Type::Customer);
+        if SaleLinePOS.FindSet then
+            Error(CustDepositError);
 
-            SaleLinePOS.SetRange(Type, SaleLinePOS.Type::Customer);
-            if SaleLinePOS.FindSet then
-                Error(CustDepositError);
+        if not TouchScreenFunctions.SaleDebit(SalePOS, TempSalesHeader, Validering, false) then
+            exit;
 
-            if not TouchScreenFunctions.SaleDebit(SalePOS, TempSalesHeader, Validering, false) then
+        SalePOS.Validate("Customer No.");
+        SalePOS.Modify(true);
+        POSSale.Refresh(SalePOS);
+        POSSale.Modify(true, false);
+
+        RetailSetup.Get;
+        if (RetailSetup."Auto edit debit sale") and (SalePOS."Customer No." <> '') then begin
+            FormCode.CreateSalesHeader(SalePOS, TempSalesHeader);
+            SetDebitInfo(SalePOS, TempSalesHeader);
+        end;
+        Register.Get(SalePOS."Register No.");
+        if SalePOS."Customer No." <> '' then begin
+            if AutoDebit(SalePOS, POSSale, Register, FrontEnd) then
                 exit;
+        end;
 
-            Validate("Customer No.");
-            Modify(true);
-            POSSale.Refresh(SalePOS);
-            POSSale.Modify(true, false);
+        PaymentLinePOSObject.SetTableView(SalePOS."Register No.", SalePOS."Sales Ticket No.");
+        PaymentLinePOSObject.CalculateBalance(SalePOS.Amount);
 
-            RetailSetup.Get;
-            if (RetailSetup."Auto edit debit sale") and ("Customer No." <> '') then begin
-                FormCode.CreateSalesHeader(SalePOS, TempSalesHeader);
-                SetDebitInfo(SalePOS, TempSalesHeader);
-            end;
-            Register.Get("Register No.");
-            if "Customer No." <> '' then begin
-                if AutoDebit(SalePOS, POSSale, Register, FrontEnd) then
-                    exit;
-            end;
+        if (SalePOS.Amount < TouchScreenFunctions.CalcPaymentRounding(SalePOS."Register No.")) then
+            IsCashSale := false
+        else
+            IsCashSale := true;
 
-            PaymentLinePOSObject.SetTableView(SalePOS."Register No.", SalePOS."Sales Ticket No.");
-            PaymentLinePOSObject.CalculateBalance(Amount);
-
-            if (Amount < TouchScreenFunctions.CalcPaymentRounding("Register No.")) then
-                IsCashSale := false
-            else
-                IsCashSale := true;
-
-            if (View.Type = View.Type::Payment) and (not IsCashSale) then begin
-                POSSession.ChangeViewPayment();
-            end;
+        if (View.Type = View.Type::Payment) and (not IsCashSale) then begin
+            POSSession.ChangeViewPayment();
         end;
     end;
 
@@ -224,41 +220,64 @@ codeunit 6150801 "NPR POS Action - Customer"
         TempSalesHeader: Record "Sales Header" temporary;
         Validering: Code[10];
     begin
-        with SalePOS do begin
-            Register.Get("Register No.");
+        Register.Get(SalePOS."Register No.");
 
-            TouchScreenFunctions.SaleCashCustomer(SalePOS, TempSalesHeader, Validering);
-            POSSale.Refresh(SalePOS);
-            POSSale.Modify(true, false);
+        TouchScreenFunctions.SaleCashCustomer(SalePOS, TempSalesHeader, Validering);
+        POSSale.Refresh(SalePOS);
+        POSSale.Modify(true, false);
 
-            //Todo: MenuLines1."Filter No." := '';
+        //Todo: MenuLines1."Filter No." := '';
 
-            PaymentLinePOSObject.SetTableView(SalePOS."Register No.", SalePOS."Sales Ticket No.");
-            PaymentLinePOSObject.CalculateBalance(Amount);
+        PaymentLinePOSObject.SetTableView(SalePOS."Register No.", SalePOS."Sales Ticket No.");
+        PaymentLinePOSObject.CalculateBalance(SalePOS.Amount);
 
-            if (Amount < TouchScreenFunctions.CalcPaymentRounding("Register No.")) then
-                IsCashSale := false
-            else
-                IsCashSale := true;
+        if (SalePOS.Amount < TouchScreenFunctions.CalcPaymentRounding(SalePOS."Register No.")) then
+            IsCashSale := false
+        else
+            IsCashSale := true;
 
-            if (View.Type = View.Type::Payment) and (not IsCashSale) then begin
-                POSSession.ChangeViewPayment();
-            end;
+        if (View.Type = View.Type::Payment) and (not IsCashSale) then begin
+            POSSession.ChangeViewPayment();
         end;
     end;
 
     local procedure SetCustomerILE(var SalePOS: Record "NPR Sale POS")
     var
         TouchScreenFunctions: Codeunit "NPR Touch Screen - Func.";
-        DummyText: Text;
-        Buffer: Record "NPR TEMP Buffer" temporary;
+        CustomerNo: Code[20];
+        Handled: Boolean;
     begin
-        if SalePOS."Customer No." = '' then begin
+        OnIdentifyCustomer(SalePOS, CustomerNo, Handled);
+        if not Handled then
+            CustomerNo := SalePOS."Customer No.";
+
+        if CustomerNo = '' then begin
             Error(CustNoMissing);
             exit;
         end;
 
-        TouchScreenFunctions.ItemLedgerEntries(SalePOS."Customer Type", SalePOS."Customer No.");
+        TouchScreenFunctions.ItemLedgerEntries(SalePOS."Customer Type", CustomerNo);
+    end;
+
+    local procedure ViewCustomerLedger(var SalePOS: Record "NPR Sale POS")
+    var
+        CustLedgerEntry: Record "Cust. Ledger Entry";
+        CustomerNo: Code[20];
+        Handled: Boolean;
+    begin
+        OnIdentifyCustomer(SalePOS, CustomerNo, Handled);
+        if not Handled then
+            CustomerNo := SalePOS."Customer No.";
+
+        if CustomerNo = '' then begin
+            Error(CustNoMissing);
+            exit;
+        end;
+
+        CustLedgerEntry.FilterGroup(2);
+        CustLedgerEntry.SetRange("Customer No.", CustomerNo);
+        CustLedgerEntry.FilterGroup(0);
+        Page.Run(0, CustLedgerEntry);
     end;
 
     local procedure SetCustomerRemove(var SalePOS: Record "NPR Sale POS"; POSSale: Codeunit "NPR POS Sale")
@@ -287,23 +306,21 @@ codeunit 6150801 "NPR POS Action - Customer"
         TouchScreenFunctions: Codeunit "NPR Touch Screen - Func.";
         Register: Record "NPR Register";
     begin
-        with SalePOS do begin
-            Register.Get("Register No.");
-            "Retail Document Type" := "Retail Document Type"::"Retail Order";
-            if not RetailDocumentHandling.Sale2RetailDocument(SalePOS) then
-                Error(SerialNumberError);
+        Register.Get(SalePOS."Register No.");
+        SalePOS."Retail Document Type" := SalePOS."Retail Document Type"::"Retail Order";
+        if not RetailDocumentHandling.Sale2RetailDocument(SalePOS) then
+            Error(SerialNumberError);
 
-            Modify(true);
-            POSSale.Refresh(SalePOS);
-            POSSale.Modify(true, false);
+        SalePOS.Modify(true);
+        POSSale.Refresh(SalePOS);
+        POSSale.Modify(true, false);
 
-            if Deposit > 0 then begin
-                TouchScreenFunctions.TestRegisterRegistration(SalePOS);
-                POSSession.ChangeViewPayment();
-            end else begin
-                POSSale.SelectViewForEndOfSale(POSSession);
+        if SalePOS.Deposit > 0 then begin
+            TouchScreenFunctions.TestRegisterRegistration(SalePOS);
+            POSSession.ChangeViewPayment();
+        end else begin
+            POSSale.SelectViewForEndOfSale(POSSession);
 
-            end;
         end;
     end;
 
@@ -311,10 +328,8 @@ codeunit 6150801 "NPR POS Action - Customer"
     var
         RetailDocumentHandling: Codeunit "NPR Retail Document Handling";
     begin
-        with SalePOS do begin
-            "Retail Document Type" := "Retail Document Type"::"Retail Order";
-            RetailDocumentHandling.RetailDocument2Sale(SalePOS, "Salesperson Code");
-        end;
+        SalePOS."Retail Document Type" := SalePOS."Retail Document Type"::"Retail Order";
+        RetailDocumentHandling.RetailDocument2Sale(SalePOS, SalePOS."Salesperson Code");
 
         POSSale.Refresh(SalePOS);
         POSSale.Modify(true, false);
@@ -327,22 +342,20 @@ codeunit 6150801 "NPR POS Action - Customer"
         TouchScreenFunctions: Codeunit "NPR Touch Screen - Func.";
         Register: Record "NPR Register";
     begin
-        with SalePOS do begin
-            Register.Get("Register No.");
-            "Retail Document Type" := "Retail Document Type"::"Selection Contract";
-            if not RetailDocumentHandling.Sale2RetailDocument(SalePOS) then
-                Error(SerialNumberError);
+        Register.Get(SalePOS."Register No.");
+        SalePOS."Retail Document Type" := SalePOS."Retail Document Type"::"Selection Contract";
+        if not RetailDocumentHandling.Sale2RetailDocument(SalePOS) then
+            Error(SerialNumberError);
 
-            Modify(true);
-            POSSale.Refresh(SalePOS);
-            POSSale.Modify(true, false);
+        SalePOS.Modify(true);
+        POSSale.Refresh(SalePOS);
+        POSSale.Modify(true, false);
 
-            if Deposit > 0 then begin
-                TouchScreenFunctions.TestRegisterRegistration(SalePOS);
-                POSSession.ChangeViewPayment();
-            end else begin
-                POSSale.SelectViewForEndOfSale(POSSession);
-            end;
+        if SalePOS.Deposit > 0 then begin
+            TouchScreenFunctions.TestRegisterRegistration(SalePOS);
+            POSSession.ChangeViewPayment();
+        end else begin
+            POSSale.SelectViewForEndOfSale(POSSession);
         end;
     end;
 
@@ -355,16 +368,14 @@ codeunit 6150801 "NPR POS Action - Customer"
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
         SalePOS.Find;
-        with SalePOS do begin
-            "Retail Document Type" := "Retail Document Type"::"Selection Contract";
-            RetailDocumentHandling.RetailDocument2Sale(SalePOS, "Salesperson Code");
+        SalePOS."Retail Document Type" := SalePOS."Retail Document Type"::"Selection Contract";
+        RetailDocumentHandling.RetailDocument2Sale(SalePOS, SalePOS."Salesperson Code");
 
-            POSSale.Refresh(SalePOS);
-            POSSale.Modify(true, false);
-            POSSession.GetSaleLine(POSSaleLine);
-            if SalePOS.SalesLinesExist then
-                POSSaleLine.SetLast();
-        end;
+        POSSale.Refresh(SalePOS);
+        POSSale.Modify(true, false);
+        POSSession.GetSaleLine(POSSaleLine);
+        if SalePOS.SalesLinesExist then
+            POSSaleLine.SetLast();
     end;
 
     local procedure AutoDebit(var SalePOS: Record "NPR Sale POS"; POSSale: Codeunit "NPR POS Sale"; Register: Record "NPR Register"; FrontEnd: Codeunit "NPR POS Front End Management"): Boolean
@@ -393,48 +404,46 @@ codeunit 6150801 "NPR POS Action - Customer"
         Validering: Code[10];
         Register: Record "NPR Register";
     begin
-        with SalePOS do begin
-            SaleLinePOS.SetRange("Register No.", "Register No.");
-            SaleLinePOS.SetRange("Sales Ticket No.", "Sales Ticket No.");
-            SaleLinePOS.SetRange(Date, Today);
-            SaleLinePOS.SetRange("Sale Type", SaleLinePOS."Sale Type"::Deposit);
-            SaleLinePOS.SetRange(Type, SaleLinePOS.Type::Customer);
-            SaleLinePOS.DeleteAll(true);
-            if "Customer No." = '' then begin
-                if not TouchScreenFunctions.SaleDebit(SalePOS, TempSalesHeader, Validering, false) then
-                    Error('');
-                if ("Customer Type" = "Customer Type"::Ord) and ("Customer No." <> '') then begin
-                    if Confirm(ConfirmPosting, true) then begin
-                        FormCode.CreateSalesHeader(SalePOS, TempSalesHeader);
-                        if TransferToInvoice(SalePOS) then begin
-                            Register.Get("Register No.");
-                            POSSale.InitializeNewSale(Register, FrontEnd, POSSetup, POSSale);
-                        end;
-                        exit;
-                    end else begin
-                        "Customer No." := '';
-                        Modify;
-                        exit;
+        SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
+        SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
+        SaleLinePOS.SetRange(Date, Today);
+        SaleLinePOS.SetRange("Sale Type", SaleLinePOS."Sale Type"::Deposit);
+        SaleLinePOS.SetRange(Type, SaleLinePOS.Type::Customer);
+        SaleLinePOS.DeleteAll(true);
+        if SalePOS."Customer No." = '' then begin
+            if not TouchScreenFunctions.SaleDebit(SalePOS, TempSalesHeader, Validering, false) then
+                Error('');
+            if (SalePOS."Customer Type" = SalePOS."Customer Type"::Ord) and (SalePOS."Customer No." <> '') then begin
+                if Confirm(ConfirmPosting, true) then begin
+                    FormCode.CreateSalesHeader(SalePOS, TempSalesHeader);
+                    if TransferToInvoice(SalePOS) then begin
+                        Register.Get(SalePOS."Register No.");
+                        POSSale.InitializeNewSale(Register, FrontEnd, POSSetup, POSSale);
                     end;
-                end;
-                exit;
-            end else begin
-                if "Customer Type" = "Customer Type"::Ord then begin
-                    if Confirm(ConfirmPosting, false) then begin
-                        FormCode.CreateSalesHeader(SalePOS, TempSalesHeader);
-                        if TransferToInvoice(SalePOS) then begin
-                            Register.Get("Register No.");
-                            POSSale.InitializeNewSale(Register, FrontEnd, POSSetup, POSSale);
-                        end;
-                        exit;
-                    end else
-                        exit;
+                    exit;
+                end else begin
+                    SalePOS."Customer No." := '';
+                    SalePOS.Modify;
+                    exit;
                 end;
             end;
+            exit;
+        end else begin
+            if SalePOS."Customer Type" = SalePOS."Customer Type"::Ord then begin
+                if Confirm(ConfirmPosting, false) then begin
+                    FormCode.CreateSalesHeader(SalePOS, TempSalesHeader);
+                    if TransferToInvoice(SalePOS) then begin
+                        Register.Get(SalePOS."Register No.");
+                        POSSale.InitializeNewSale(Register, FrontEnd, POSSetup, POSSale);
+                    end;
+                    exit;
+                end else
+                    exit;
+            end;
+        end;
 
-            if ("Customer Type" <> "Customer Type"::Ord) then begin
-                exit;
-            end;
+        if (SalePOS."Customer Type" <> SalePOS."Customer Type"::Ord) then begin
+            exit;
         end;
     end;
 
@@ -445,5 +454,12 @@ codeunit 6150801 "NPR POS Action - Customer"
         if not RetailSalesDocMgt.ProcessPOSSale(SalePOS) then
             exit(false);
         exit(true);
+    end;
+
+    #endregion
+
+    [IntegrationEvent(false, false)]
+    local procedure OnIdentifyCustomer(SalePOS: Record "NPR Sale POS"; var CustomerNo: Code[20]; var Handled: Boolean)
+    begin
     end;
 }
