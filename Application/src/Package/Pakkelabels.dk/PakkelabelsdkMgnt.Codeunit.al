@@ -538,15 +538,11 @@ codeunit 6014490 "NPR Pakkelabels.dk Mgnt"
         Client: HttpClient;
     begin
         Clear(ReasonPhrase);
-        Headers.Add('Content-Type', 'application/json');
-        Headers.Add('Accept', 'application/json');
         if Method = 'POST' then begin
             Content.WriteFrom(RequestString);
             Content.GetHeaders(Headers);
             Headers.Remove('Content-Type');
-            Headers.Remove('Accept');
             Headers.Add('Content-Type', 'application/json');
-            Headers.Add('Accept', 'application/json');
             RequestMessage.Content(Content);
         end;
         RequestMessage.SetRequestUri(RequestURL);
