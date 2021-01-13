@@ -75,3 +75,4 @@ jobs:
         testRunName: 'NPCore Tests'
         testApps:
           - appPath: $(Build.SourcesDirectory)/$(Build.Repository.Name)/Test/Output/NP_Retail_Tests.app
+        azureDevOpsErrorHandling: error
