@@ -164,5 +164,24 @@ page 6151505 "NPR Nc Import Types"
                 end;
             }
         }
+        area(Navigation)
+        {
+            action(ShowErrorLog)
+            {
+                Caption = 'Show Error Log';
+                Image = ErrorLog;
+                ApplicationArea = All;
+                ToolTip = 'View error log entries for selected impor type entry.';
+
+                trigger OnAction()
+                var
+                    NcDependencyFactory: Codeunit "NPR Nc Dependency Factory";
+                    ImportListUpdater: Interface "NPR Nc Import List IUpdate";
+                begin
+                    if NcDependencyFactory.CreateNcImportListUpdater(ImportListUpdater, Rec) then
+                        ImportListUpdater.ShowErrorLog(Rec);
+                end;
+            }
+        }
     }
 }
