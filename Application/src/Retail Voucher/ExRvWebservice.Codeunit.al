@@ -1,15 +1,5 @@
 codeunit 6151081 "NPR ExRv Webservice"
 {
-    // NPR5.40/MHA /20180212  CASE 301346 Object created - External Retail Voucher
-
-
-    trigger OnRun()
-    begin
-    end;
-
-    var
-        Text000: Label 'Invalid voucher_type: %1';
-
     procedure IssueVouchers(var vouchers: XMLport "NPR ExRv Vouchers")
     var
         TempExRvVoucher: Record "NPR ExRv Voucher" temporary;

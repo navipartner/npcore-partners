@@ -1,8 +1,5 @@
 page 6151020 "NPR NpRv Sales Line Ref."
 {
-    // NPR5.37/MHA /20171023  CASE 267346 Object created - NaviPartner Retail Voucher
-    // NPR5.55/MHA /20200512  CASE 402015 Updated object name
-
     AutoSplitKey = true;
     Caption = 'Issue Retail Voucher References';
     DataCaptionExpression = Format(Quantity) + ' ' + VoucherType.Description;
@@ -27,15 +24,9 @@ page 6151020 "NPR NpRv Sales Line Ref."
         }
     }
 
-    actions
-    {
-    }
-
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        //-NPR5.55 [402015]
         "Sales Line Id" := NpRvSalesLine.Id;
-        //+NPR5.55 [402015]
     end;
 
     trigger OnOpenPage()

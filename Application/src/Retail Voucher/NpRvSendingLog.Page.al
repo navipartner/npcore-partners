@@ -1,7 +1,5 @@
 page 6151029 "NPR NpRv Sending Log"
 {
-    // NPR5.55/MHA /20200702  CASE 407070 Object created
-
     Caption = 'Retail Voucher Sending Log';
     Editable = false;
     PageType = List;
@@ -71,10 +69,6 @@ page 6151029 "NPR NpRv Sending Log"
                 }
             }
         }
-    }
-
-    actions
-    {
     }
 }
 

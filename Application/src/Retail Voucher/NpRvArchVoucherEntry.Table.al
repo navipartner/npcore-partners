@@ -1,12 +1,5 @@
 table 6151019 "NPR NpRv Arch. Voucher Entry"
 {
-    // NPR5.37/MHA /20171023  CASE 267346 Object created - NaviPartner Retail Voucher
-    // NPR5.48/MHA /20180921  CASE 302179 Renamed field 55 "Sales Ticket No." to "Document No." and added fields 53 "Document Type", 60 "External Document No."
-    // NPR5.49/MHA /20190228  CASE 342811 Added partner fields
-    // NPR5.50/MHA /20190426  CASE 353079 Added Option "Top Up" to field 10 "Entry Type"
-    // NPR5.50/MMV /20190528  CASE 356712 Added field 85
-    // NPR5.55/MHA /20200512  CASE 404116 Change Option [0] for field 53 "Document Type" from "Audit Roll" to "POS Entry"
-
     Caption = 'Archived Retail Voucher Entry';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR NpRv Arch. Voucher Entries";
@@ -148,10 +141,6 @@ table 6151019 "NPR NpRv Arch. Voucher Entry"
         key(Key3; "Entry Type", "Register No.", "Document No.")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 

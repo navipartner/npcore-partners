@@ -1,7 +1,5 @@
 table 6151081 "NPR ExRv Voucher"
 {
-    // NPR5.40/MHA /20180212  CASE 301346 Object created - External Retail Voucher
-
     Caption = 'External Retail Voucher';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR ExRv Vouchers";
@@ -125,10 +123,6 @@ table 6151081 "NPR ExRv Voucher"
         key(Key1; "Voucher Type", "No.")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 
     [IntegrationEvent(TRUE, false)]

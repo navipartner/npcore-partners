@@ -1,17 +1,5 @@
 table 6151015 "NPR NpRv Sales Line"
 {
-    // NPR5.37/MHA /20171023  CASE 267346 Object created - NaviPartner Retail Voucher
-    // NPR5.48/MHA /20190123  CASE 341711 Added field 103 "Send via Print", 105 "Send via E-mail", 107 "Send via SMS"
-    // NPR5.49/MHA /20190228  CASE 342811 Added field 60 "Reference No."
-    // NPR5.50/MHA /20190426  CASE 353079 Added Option "Top-up" to field 30 "Type"
-    // NPR5.50/MMV /20190527  CASE 356003 Added field 310,
-    //                                    Added Option "Partner Issue Voucher" to field 30, for "delayed" partner voucher posting through same flow as normal.
-    // NPR5.53/MHA /20200103  CASE 384055 Updated Name 2 reference in UpdateContactInfo()
-    // NPR5.54/ALPO/20200423 CASE 401611 5.54 upgrade performace optimization
-    // NPR5.55/ALPO/20200424 CASE 401611 Remove dummy fields needed for 5.54 upgrade performace optimization
-    // NPR5.55/MHA /20200427  CASE 402015 Changed Primary Key to field 100 "Id" and added Sales Document Fields
-    // NPR5.55/MHA /20200701  CASE 397527 Added field 270 "Language Code"
-
     Caption = 'Retail Voucher Sales Line';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR NpRv Sales Lines";
@@ -347,27 +335,19 @@ table 6151015 "NPR NpRv Sales Line"
         }
     }
 
-    fieldgroups
-    {
-    }
-
     trigger OnDelete()
     var
         NpRvSalesLineReference: Record "NPR NpRv Sales Line Ref.";
     begin
-        //-NPR5.55 [402015]
         NpRvSalesLineReference.SetRange("Sales Line Id", Id);
         if NpRvSalesLineReference.FindFirst then
             NpRvSalesLineReference.DeleteAll;
-        //+NPR5.55 [402015]
     end;
 
     trigger OnInsert()
     begin
-        //-NPR5.55 [402015]
         if IsNullGuid(Id) then
             Id := CreateGuid;
-        //+NPR5.55 [402015]
     end;
 
     local procedure UpdateContactInfo()
@@ -379,9 +359,7 @@ table 6151015 "NPR NpRv Sales Line"
         if "Contact No." <> '' then begin
             Cont.Get("Contact No.");
             Name := Cont.Name;
-            //-NPR5.53 [384055]
             "Name 2" := Cont."Name 2";
-            //+NPR5.53 [384055]
             Address := Cont.Address;
             "Address 2" := Cont."Address 2";
             City := Cont.City;
@@ -390,18 +368,14 @@ table 6151015 "NPR NpRv Sales Line"
             "Country/Region Code" := Cont."Country/Region Code";
             "E-mail" := Cont."E-Mail";
             "Phone No." := Cont."Phone No.";
-            //-NPR5.55 [397527]
             "Language Code" := Cont."Language Code";
-            //-NPR5.55 [397527]
             exit;
         end;
 
         if "Customer No." <> '' then begin
             Cust.Get("Customer No.");
             Name := Cust.Name;
-            //-NPR5.53 [384055]
             "Name 2" := Cust."Name 2";
-            //+NPR5.53 [384055]
             Address := Cust.Address;
             "Address 2" := Cust."Address 2";
             City := Cust.City;
@@ -410,9 +384,7 @@ table 6151015 "NPR NpRv Sales Line"
             "Country/Region Code" := Cust."Country/Region Code";
             "E-mail" := Cust."E-Mail";
             "Phone No." := Cust."Phone No.";
-            //-NPR5.55 [397527]
             "Language Code" := Cust."Language Code";
-            //-NPR5.55 [397527]
             exit;
         end;
     end;
