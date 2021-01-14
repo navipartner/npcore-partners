@@ -24,11 +24,6 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                 {
                     ApplicationArea = All;
                 }
-                part(Control6014405; "NPR RSS Reader Activ.")
-                {
-                    Visible = false;
-                    ApplicationArea = All;
-                }
                 part(Control6014403; "NPR Retail Sales Chart by Shop")
                 {
                     ApplicationArea = All;
