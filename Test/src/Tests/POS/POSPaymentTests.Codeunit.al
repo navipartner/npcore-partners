@@ -1,4 +1,4 @@
-codeunit 50006 "NPR POS Payment Tests"
+codeunit 85006 "NPR POS Payment Tests"
 {
     // // [Feature] POS Payment + end of sale test
 

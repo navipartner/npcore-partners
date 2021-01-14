@@ -1,4 +1,4 @@
-codeunit 50002 "NPR Library - Inventory"
+codeunit 85001 "NPR Library - Inventory"
 {
     trigger OnRun()
     begin

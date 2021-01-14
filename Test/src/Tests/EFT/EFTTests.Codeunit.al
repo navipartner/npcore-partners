@@ -1,4 +1,4 @@
-codeunit 50000 "NPR EFT Tests"
+codeunit 85004 "NPR EFT Tests"
 {
     // // [Feature] EFT Framework
 

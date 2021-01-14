@@ -1,4 +1,4 @@
-codeunit 50004 "NPR Library - POS Mock"
+codeunit 85003 "NPR Library - POS Mock"
 {
     trigger OnRun()
     begin
