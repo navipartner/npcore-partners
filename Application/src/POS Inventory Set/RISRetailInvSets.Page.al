@@ -1,13 +1,12 @@
 page 6151085 "NPR RIS Retail Inv. Sets"
 {
-    // NPR5.40/MHA /20180320  CASE 307025 Object created - POS Inventory Set
-
     Caption = 'Retail Inventory Sets';
     CardPageID = "NPR RIS Retail Inv. Set Card";
     Editable = false;
     PageType = List;
     SourceTable = "NPR RIS Retail Inv. Set";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {
@@ -15,12 +14,12 @@ page 6151085 "NPR RIS Retail Inv. Sets"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
@@ -53,4 +52,3 @@ page 6151085 "NPR RIS Retail Inv. Sets"
         }
     }
 }
-

@@ -1,7 +1,5 @@
 page 6151088 "NPR RIS Retail Inv. Buffer"
 {
-    // NPR5.40/MHA /20180320  CASE 307025 Object created - POS Inventory Set
-
     Caption = 'Retail Inventory';
     DeleteAllowed = false;
     Editable = false;
@@ -9,6 +7,7 @@ page 6151088 "NPR RIS Retail Inv. Buffer"
     ModifyAllowed = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR RIS Retail Inv. Buffer";
 
     layout
@@ -17,26 +16,26 @@ page 6151088 "NPR RIS Retail Inv. Buffer"
         {
             repeater(Group)
             {
-                field(Inventory; Inventory)
+                field(Inventory; Rec.Inventory)
                 {
                     ApplicationArea = All;
                     Style = Attention;
-                    StyleExpr = "Processing Error";
+                    StyleExpr = Rec."Processing Error";
                     ToolTip = 'Specifies the value of the Inventory field';
                 }
-                field("Company Name"; "Company Name")
+                field("Company Name"; Rec."Company Name")
                 {
                     ApplicationArea = All;
                     Style = Attention;
-                    StyleExpr = "Processing Error";
+                    StyleExpr = Rec."Processing Error";
                     ToolTip = 'Specifies the value of the Company Name field';
                 }
-                field("Location Filter"; "Location Filter")
+                field("Location Filter"; Rec."Location Filter")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Location Filter field';
                 }
-                field("Processing Error Message"; "Processing Error Message")
+                field("Processing Error Message"; Rec."Processing Error Message")
                 {
                     ApplicationArea = All;
                     Visible = ProcessingErrorExists;
@@ -46,15 +45,11 @@ page 6151088 "NPR RIS Retail Inv. Buffer"
         }
     }
 
-    actions
-    {
-    }
-
     trigger OnOpenPage()
     var
         RetailInventoryBuffer: Record "NPR RIS Retail Inv. Buffer" temporary;
     begin
-        if IsTemporary then
+        if Rec.IsTemporary then
             RetailInventoryBuffer.Copy(Rec, true)
         else
             RetailInventoryBuffer.Copy(Rec);
@@ -66,4 +61,3 @@ page 6151088 "NPR RIS Retail Inv. Buffer"
     var
         ProcessingErrorExists: Boolean;
 }
-

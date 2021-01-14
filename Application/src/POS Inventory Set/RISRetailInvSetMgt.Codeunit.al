@@ -1,30 +1,13 @@
 codeunit 6151085 "NPR RIS Retail Inv. Set Mgt."
 {
-    // NPR5.40/MHA /20180320  CASE 307025 Object created - Retail Inventory Set
-    // NPR5.49/MHA /20190226  CASE 335198 Url Parameters should be excluded from Service Namespace in TryRequestInventory()
-    // NPR5.51/MHA /20190705  CASE 361164 Updated Exception Message parsing in TryRequestInventory()
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         Text000: Label 'Error for Company %1: %2';
-
-    local procedure "--- Get"()
-    begin
-    end;
 
     procedure GetRetailInventoryEnabled(): Boolean
     var
         RetailInventorySet: Record "NPR RIS Retail Inv. Set";
     begin
         exit(RetailInventorySet.FindFirst);
-    end;
-
-    local procedure "--- Process"()
-    begin
     end;
 
     [IntegrationEvent(false, false)]
@@ -64,10 +47,6 @@ codeunit 6151085 "NPR RIS Retail Inv. Set Mgt."
         PAGE.Run(0, RetailInventoryBuffer);
     end;
 
-    local procedure "--- Processing Subscriber"()
-    begin
-    end;
-
     procedure ProcessInventorySet(RetailInventorySet: Record "NPR RIS Retail Inv. Set"; ItemFilter: Text; VariantFilter: Text; var RetailInventoryBuffer: Record "NPR RIS Retail Inv. Buffer" temporary)
     var
         RetailInventorySetEntry: Record "NPR RIS Retail Inv. Set Entry";
@@ -96,7 +75,7 @@ codeunit 6151085 "NPR RIS Retail Inv. Set Mgt."
             until RetailInventorySetEntry.Next = 0;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151085, 'OnProcessInventorySetEntry', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RIS Retail Inv. Set Mgt.", 'OnProcessInventorySetEntry', '', true, true)]
     local procedure ProcessInventorySetEntry(RetailInventorySetEntry: Record "NPR RIS Retail Inv. Set Entry"; var RetailInventoryBuffer: Record "NPR RIS Retail Inv. Buffer" temporary; var Handled: Boolean)
     var
         Inventory: Decimal;
@@ -124,41 +103,29 @@ codeunit 6151085 "NPR RIS Retail Inv. Set Mgt."
     [TryFunction]
     local procedure TryRequestInventory(RetailInventorySetEntry: Record "NPR RIS Retail Inv. Set Entry"; var RetailInventoryBuffer: Record "NPR RIS Retail Inv. Buffer" temporary; var TotalInventory: Decimal)
     var
-        NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
-        Credential: DotNet NPRNetNetworkCredential;
-        HttpWebRequest: DotNet NPRNetHttpWebRequest;
-        HttpWebResponse: DotNet NPRNetHttpWebResponse;
-        MemoryStream: DotNet NPRNetMemoryStream;
-        Stream: DotNet NPRNetStream;
-        StreamReader: DotNet NPRNetStreamReader;
-        WebException: DotNet NPRNetWebException;
-        XmlNamespaceManager: DotNet NPRNetXmlNamespaceManager;
-        XmlDoc: DotNet "NPRNetXmlDocument";
-        XmlElement: DotNet NPRNetXmlElement;
-        XmlElement2: DotNet NPRNetXmlElement;
-        XmlNodeList: DotNet NPRNetXmlNodeList;
+        Base64Convert: Codeunit "Base64 Convert";
+        TempBlob: Codeunit "Temp Blob";
+        HttpWebRequest: HttpRequestMessage;
+        HttpWebResponse: HttpResponseMessage;
+        Client: HttpClient;
+        Content: HttpContent;
+        Headers: HttpHeaders;
+        HeadersReq: HttpHeaders;
+        InStream: InStream;
+        OutStream: OutStream;
+        XmlDoc: XmlDocument;
+        XmlNodeList: XmlNodeList;
+        Node: XmlNode;
         i: Integer;
         Position: Integer;
         Inventory: Decimal;
-        ErrorMessage: Text;
-        LastErrorMessage: Text;
         Response: Text;
         WsNamespace: Text;
+        XmlString: Text;
+        AuthText: Text;
     begin
         TotalInventory := 0;
-
-        Clear(HttpWebRequest);
-        HttpWebRequest := HttpWebRequest.Create(RetailInventorySetEntry."Api Url");
-        HttpWebRequest.Timeout := 5 * 1000;
-        NpXmlDomMgt.SetTrustedCertificateValidation(HttpWebRequest);
-
-        if RetailInventorySetEntry."Api Username" = '' then
-            HttpWebRequest.UseDefaultCredentials(true)
-        else begin
-            HttpWebRequest.UseDefaultCredentials(false);
-            Credential := Credential.NetworkCredential(RetailInventorySetEntry."Api Username", RetailInventorySetEntry."Api Password");
-            HttpWebRequest.Credentials(Credential);
-        end;
+        TempBlob.CreateOutStream(OutStream, TEXTENCODING::UTF8);
 
         WsNamespace := RetailInventorySetEntry."Api Url";
         Position := StrPos(WsNamespace, '/');
@@ -166,16 +133,12 @@ codeunit 6151085 "NPR RIS Retail Inv. Set Mgt."
             WsNamespace := DelStr(WsNamespace, 1, Position);
             Position := StrPos(WsNamespace, '/');
         end;
-        //-NPR5.49 [335198]
         Position := StrPos(WsNamespace, '?');
         if Position > 0 then
             WsNamespace := DelStr(WsNamespace, Position);
-        //+NPR5.49 [335198]
         WsNamespace := 'urn:microsoft-dynamics-schemas/codeunit/' + WsNamespace;
 
-        Clear(XmlDoc);
-        XmlDoc := XmlDoc.XmlDocument;
-        XmlDoc.LoadXml('<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">' +
+        XmlString := '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">' +
                        '  <soapenv:Header />' +
                        '  <soapenv:Body>' +
                        '    <GetItemInventory xmlns="' + WsNamespace + '">' +
@@ -185,54 +148,59 @@ codeunit 6151085 "NPR RIS Retail Inv. Set Mgt."
                        '       <items />' +
                        '    </GetItemInventory>' +
                        '  </soapenv:Body>' +
-                       '</soapenv:Envelope>');
-        HttpWebRequest.Method := 'RetailT';
-        HttpWebRequest.ContentType := 'text/xml; charset=utf-8';
-        HttpWebRequest.Headers.Add('SOAPAction', 'GetItemInventory');
-        XmlElement := XmlDoc.DocumentElement.LastChild.LastChild;
+                       '</soapenv:Envelope>';
 
-        XmlNamespaceManager := XmlNamespaceManager.XmlNamespaceManager(XmlDoc.NameTable);
-        XmlNamespaceManager.AddNamespace('ms', WsNamespace);
+        XmlDocument.ReadFrom(XmlString, XmlDoc);
 
-        XmlElement2 := XmlElement.SelectSingleNode('ms:itemFilter', XmlNamespaceManager);
-        XmlElement2.InnerText := RetailInventoryBuffer."Item Filter";
-        XmlElement2 := XmlElement.SelectSingleNode('ms:variantFilter', XmlNamespaceManager);
-        XmlElement2.InnerText := RetailInventoryBuffer."Variant Filter";
-        XmlElement2 := XmlElement.SelectSingleNode('ms:locationFilter', XmlNamespaceManager);
-        XmlElement2.InnerText := RetailInventoryBuffer."Location Filter";
-        if not NpXmlDomMgt.SendWebRequest(XmlDoc, HttpWebRequest, HttpWebResponse, WebException) then begin
-            //-NPR5.51 [361164]
-            ErrorMessage := NpXmlDomMgt.GetWebExceptionMessage(WebException);
-            if NpXmlDomMgt.TryLoadXml(ErrorMessage, XmlDoc) then begin
-                NpXmlDomMgt.RemoveNameSpaces(XmlDoc);
-                if NpXmlDomMgt.FindNode(XmlDoc.DocumentElement, '//faultstring', XmlElement) then
-                    ErrorMessage := XmlElement.InnerText;
-            end;
-            Error(CopyStr(ErrorMessage, 1, 1000));
-            //+NPR5.51 [361164]
+        XmlDoc.SelectSingleNode('.//*[local-name()="itemFilter"]', Node);
+        Node.AsXmlElement().Add(RetailInventoryBuffer."Item Filter");
+        XmlDoc.SelectSingleNode('.//*[local-name()="variantFilter"]', Node);
+        Node.AsXmlElement().Add(RetailInventoryBuffer."Variant Filter");
+        XmlDoc.SelectSingleNode('.//*[local-name()="locationFilter"]', Node);
+        Node.AsXmlElement().Add(RetailInventoryBuffer."Location Filter");
+
+        XmlDoc.WriteTo(OutStream);
+        TempBlob.CreateInStream(InStream, TEXTENCODING::UTF8);
+        Content.WriteFrom(InStream);
+
+
+        Content.GetHeaders(Headers);
+        if Headers.Contains('Content-Type') then
+            Headers.Remove('Content-Type');
+        Headers.Add('Content-Type', 'text/xml; charset=utf-8');
+        Headers.Add('SOAPAction', 'GetItemInventory');
+
+        if RetailInventorySetEntry."Api Username" <> '' then begin
+            HttpWebRequest.GetHeaders(HeadersReq);
+            AuthText := StrSubstNo('%1:%2', RetailInventorySetEntry."Api Username", RetailInventorySetEntry."Api Password");
+            HeadersReq.Add('Authorization', StrSubstNo('Basic %1', Base64Convert.ToBase64(AuthText)));
         end;
 
-        Stream := HttpWebResponse.GetResponseStream;
-        StreamReader := StreamReader.StreamReader(Stream);
-        Response := StreamReader.ReadToEnd;
-        Stream.Flush;
-        Stream.Close;
-        Clear(Stream);
-        HttpWebResponse.Close;
+        HttpWebRequest.Content(Content);
+        HttpWebRequest.SetRequestUri(RetailInventorySetEntry."Api Url");
+        HttpWebRequest.Method := 'POST';
+
+        Client.Timeout(5000);
+        Client.Send(HttpWebRequest, HttpWebResponse);
 
         Clear(XmlDoc);
-        XmlDoc := XmlDoc.XmlDocument;
-        XmlDoc.LoadXml(Response);
-        NpXmlDomMgt.RemoveNameSpaces(XmlDoc);
-        if NpXmlDomMgt.FindNodes(XmlDoc.DocumentElement, 'item', XmlNodeList) then
-            for i := 0 to XmlNodeList.Count - 1 do begin
-                XmlElement := XmlNodeList.ItemOf(i);
-                if Evaluate(Inventory, XmlElement.InnerText, 9) then begin
-                    if Inventory < 0 then
-                        Inventory := 0;
-                    TotalInventory += Inventory;
-                end;
+        HttpWebResponse.Content.ReadAs(Response);
+        XmlDocument.ReadFrom(Response, XmlDoc);
+
+        if not HttpWebResponse.IsSuccessStatusCode then begin
+            XmlDoc.SelectSingleNode('.//*[local-name()="faultstring"]', Node);
+            Error(StrSubstNo('%1 - %2  \%3', HttpWebResponse.HttpStatusCode, HttpWebResponse.ReasonPhrase, Node.AsXmlElement().InnerText))
+        end;
+
+        XmlDoc.SelectNodes('.//*[local-name()="item"]', XmlNodeList);
+
+        for i := 1 to XmlNodeList.Count do begin
+            XmlNodeList.Get(i, Node);
+            if Evaluate(Inventory, Node.AsXmlElement().InnerText, 9) then begin
+                if Inventory < 0 then
+                    Inventory := 0;
+                TotalInventory += Inventory;
             end;
+        end;
     end;
 }
-
