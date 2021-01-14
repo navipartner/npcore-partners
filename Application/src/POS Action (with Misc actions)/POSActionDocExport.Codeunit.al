@@ -1,20 +1,5 @@
 codeunit 6150859 "NPR POS Action: Doc. Export"
 {
-    // NPR5.50/MMV /20180319 CASE 300557 New action, based on CU 6150814
-    // NPR5.51/MMV /20190605  CASE 357277 Added support for skipping line transfer to POS entry.
-    // NPR5.51/ALST/20190705  CASE 357848 function prototype changed
-    // NPR5.51/ALST/20190717  CASE 361811 added possibility to restrict amount sign for the action
-    // NPR5.52/MMV /20191004 CASE 352473 Added better pdf2nav & send support.
-    //                                   Fixed prepayment VAT.
-    //                                   Added prepayment amount option.
-    // NPR5.53/TJ  /20191126 CASE 313966 Using translated text constants for error messages
-    // NPR5.53/MMV /20191219 CASE 377510 Rolled back #357277.
-    //                                   Added new param for exporting with blank customer, selected manually later in card page.
-    //                                   Moved prompts for payment of exported document to after export.
-    // NPR5.54/ALPO/20200228 CASE 392239 Possibility to use location code from POS store, POS sale or specific location as an alternative to using location from Register
-    // NPR5.55/ALPO/20200423 CASE 401616 Added support for sending intercompany sales order confirmation
-
-
     trigger OnRun()
     begin
     end;
@@ -137,81 +122,72 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
 
     local procedure ActionVersion(): Text
     begin
-        exit('1.9'); //NPR5.55 [401616]
-        exit('1.8'); //NPR5.54 [392239]
-        exit('1.7'); //-+NPR5.53 [377510]
+        exit('1.9');
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
-        with Sender do begin
-            if DiscoverAction(
-              ActionCode(),
-              ActionDescription,
-              ActionVersion(),
-              Sender.Type::Generic,
-              Sender."Subscriber Instances Allowed"::Multiple) then begin
-                RegisterWorkflowStep('confirm', 'param.ConfirmExport && confirm(labels.confirmTitle, labels.confirmLead).no (abort);');
-                RegisterWorkflowStep('extdocno', 'param.AskExtDocNo && input (labels.ExtDocNo).cancel (abort);');
-                RegisterWorkflowStep('attention', 'param.AskAttention && input (labels.Attention).cancel (abort);');
+        if Sender.DiscoverAction(
+            ActionCode(),
+            ActionDescription,
+            ActionVersion(),
+            Sender.Type::Generic,
+            Sender."Subscriber Instances Allowed"::Multiple)
+        then begin
+            Sender.RegisterWorkflowStep('confirm', 'param.ConfirmExport && confirm(labels.confirmTitle, labels.confirmLead).no (abort);');
+            Sender.RegisterWorkflowStep('extdocno', 'param.AskExtDocNo && input (labels.ExtDocNo).cancel (abort);');
+            Sender.RegisterWorkflowStep('attention', 'param.AskAttention && input (labels.Attention).cancel (abort);');
 
-                RegisterWorkflowStep('exportDocument', 'respond();');
+            Sender.RegisterWorkflowStep('exportDocument', 'respond();');
 
-                //-NPR5.53 [377510]
-                RegisterWorkflowStep('endSaleAndDocumentPayment',
-                                                        'if (context.prompt_prepayment) {' +
-                                                           'context.prepayment_is_amount && numpad(labels.prepaymentDialogTitle, labels.prepaymentAmountLead, param.FixedPrepaymentValue);' +
-                                                           '!context.prepayment_is_amount && numpad(labels.prepaymentDialogTitle, labels.prepaymentPctLead, param.FixedPrepaymentValue);' +
-                                                        '}' +
-                                                        'respond();');
-                //+NPR5.53 [377510]
-                RegisterWorkflow(false);
+            Sender.RegisterWorkflowStep('endSaleAndDocumentPayment',
+                'if (context.prompt_prepayment) {' +
+                    'context.prepayment_is_amount && numpad(labels.prepaymentDialogTitle, labels.prepaymentAmountLead, param.FixedPrepaymentValue);' +
+                    '!context.prepayment_is_amount && numpad(labels.prepaymentDialogTitle, labels.prepaymentPctLead, param.FixedPrepaymentValue);' +
+                '}' +
+                'respond();');
+            Sender.RegisterWorkflow(false);
 
-                RegisterBooleanParameter('SetAsk', false);
-                RegisterBooleanParameter('SetPrint', false);
-                RegisterBooleanParameter('SetInvoice', false);
-                RegisterBooleanParameter('SetReceive', false);
-                RegisterBooleanParameter('SetShip', false);
-                RegisterOptionParameter('SetDocumentType', 'Order,Invoice,Quote,Restrict', 'Order');
-                RegisterOptionParameter('SetNegBalDocumentType', 'ReturnOrder,CreditMemo,Restrict', 'ReturnOrder');
-                RegisterBooleanParameter('SetShowCreationMessage', false);
-                RegisterBooleanParameter('SetTransferPostingSetup', true);
-                RegisterBooleanParameter('SetAutoReserveSalesLine', false);
-                RegisterBooleanParameter('SetSendPdf2Nav', false);
-                RegisterBooleanParameter('AskExtDocNo', false);
-                RegisterBooleanParameter('AskAttention', false);
-                RegisterBooleanParameter('SetTransferSalesperson', true);
-                RegisterBooleanParameter('SetTransferDimensions', true);
-                RegisterBooleanParameter('SetTransferPaymentMethod', true);
-                RegisterBooleanParameter('SetTransferTaxSetup', true);
-                RegisterBooleanParameter('ConfirmExport', true);
-                RegisterBooleanParameter('PrepaymentDialog', false);
-                RegisterDecimalParameter('FixedPrepaymentValue', 0);
-                RegisterBooleanParameter('PrintPrepaymentDocument', false);
-                RegisterBooleanParameter('PrintRetailConfirmation', true);
-                RegisterBooleanParameter('CheckCustomerCredit', true);
-                RegisterBooleanParameter('OpenDocumentAfterExport', false);
-                RegisterBooleanParameter('PayAndPostInNextSale', false);
-                RegisterBooleanParameter('PrintPayAndPostDocument', false);
-                RegisterBooleanParameter('ForcePricesInclVAT', false);
-                RegisterBooleanParameter('PrepaymentInputIsAmount', false);
-                RegisterBooleanParameter('SetSend', false);
-                RegisterBooleanParameter('SendPrepaymentDocument', false);
-                RegisterBooleanParameter('Pdf2NavPrepaymentDocument', false);
-                RegisterBooleanParameter('SendPayAndPostDocument', false);
-                RegisterBooleanParameter('Pdf2NavPayAndPostDocument', false);
-                //-NPR5.53 [377510]
-                RegisterBooleanParameter('SelectCustomer', true);
-                RegisterBooleanParameter('ShowDocumentPaymentMenu', false);
-                RegisterBooleanParameter('BlockEmptySale', true);
-                //+NPR5.53 [377510]
-                //-NPR5.54 [392239]
-                RegisterOptionParameter('UseLocationFrom', 'Register,POS Store,POS Sale,SpecificLocation', 'Register');
-                RegisterTextParameter('UseSpecLocationCode', '');
-                //+NPR5.54 [392239]
-                RegisterBooleanParameter('SendICOrderConfirmation', false);  //NPR5.55 [401616]
-            end;
+            Sender.RegisterBooleanParameter('SetAsk', false);
+            Sender.RegisterBooleanParameter('SetPrint', false);
+            Sender.RegisterBooleanParameter('SetInvoice', false);
+            Sender.RegisterBooleanParameter('SetReceive', false);
+            Sender.RegisterBooleanParameter('SetShip', false);
+            Sender.RegisterOptionParameter('SetDocumentType', 'Order,Invoice,Quote,Restrict', 'Order');
+            Sender.RegisterOptionParameter('SetNegBalDocumentType', 'ReturnOrder,CreditMemo,Restrict', 'ReturnOrder');
+            Sender.RegisterBooleanParameter('SetShowCreationMessage', false);
+            Sender.RegisterBooleanParameter('SetTransferPostingSetup', true);
+            Sender.RegisterBooleanParameter('SetAutoReserveSalesLine', false);
+            Sender.RegisterBooleanParameter('SetSendPdf2Nav', false);
+            Sender.RegisterBooleanParameter('AskExtDocNo', false);
+            Sender.RegisterBooleanParameter('AskAttention', false);
+            Sender.RegisterBooleanParameter('SetTransferSalesperson', true);
+            Sender.RegisterBooleanParameter('SetTransferDimensions', true);
+            Sender.RegisterBooleanParameter('SetTransferPaymentMethod', true);
+            Sender.RegisterBooleanParameter('SetTransferTaxSetup', true);
+            Sender.RegisterBooleanParameter('ConfirmExport', true);
+            Sender.RegisterBooleanParameter('PrepaymentDialog', false);
+            Sender.RegisterDecimalParameter('FixedPrepaymentValue', 0);
+            Sender.RegisterBooleanParameter('PrintPrepaymentDocument', false);
+            Sender.RegisterBooleanParameter('PrintRetailConfirmation', true);
+            Sender.RegisterBooleanParameter('CheckCustomerCredit', true);
+            Sender.RegisterBooleanParameter('OpenDocumentAfterExport', false);
+            Sender.RegisterBooleanParameter('PayAndPostInNextSale', false);
+            Sender.RegisterBooleanParameter('PrintPayAndPostDocument', false);
+            Sender.RegisterBooleanParameter('ForcePricesInclVAT', false);
+            Sender.RegisterBooleanParameter('PrepaymentInputIsAmount', false);
+            Sender.RegisterBooleanParameter('SetSend', false);
+            Sender.RegisterBooleanParameter('SendPrepaymentDocument', false);
+            Sender.RegisterBooleanParameter('Pdf2NavPrepaymentDocument', false);
+            Sender.RegisterBooleanParameter('SendPayAndPostDocument', false);
+            Sender.RegisterBooleanParameter('Pdf2NavPayAndPostDocument', false);
+            Sender.RegisterBooleanParameter('SelectCustomer', true);
+            Sender.RegisterBooleanParameter('ShowDocumentPaymentMenu', false);
+            Sender.RegisterBooleanParameter('BlockEmptySale', true);
+            Sender.RegisterOptionParameter('UseLocationFrom', 'Register,POS Store,POS Sale,SpecificLocation', 'Register');
+            Sender.RegisterTextParameter('UseSpecLocationCode', '');
+            Sender.RegisterBooleanParameter('SendICOrderConfirmation', false);
         end;
     end;
 
@@ -236,18 +212,12 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
             exit;
         Handled := true;
 
-        //-NPR5.53 [377510]
         case WorkflowStep of
             'exportDocument':
                 ExportToDocument(Context, POSSession, FrontEnd);
             'endSaleAndDocumentPayment':
                 DocumentPayment(Context, POSSession, FrontEnd);
         end;
-        //+NPR5.53 [377510]
-    end;
-
-    local procedure "--"()
-    begin
     end;
 
     local procedure ExportToDocument(Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
@@ -271,9 +241,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
 
         SalePOS.FindFirst;
 
-        //-NPR5.53 [377510]
         if (JSON.GetBooleanParameter('SelectCustomer', true)) then begin
-            //+NPR5.53 [377510]
             if not SelectCustomer(SalePOS, POSSale) then
                 SalePOS.TestField("Customer No.");
         end;
@@ -286,13 +254,11 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
 
         RetailSalesDocMgt.ProcessPOSSale(SalePOS);
 
-        //-NPR5.53 [377510]
         Commit;
 
         RetailSalesDocMgt.GetCreatedSalesHeader(SalesHeader);
         POSSession.StoreActionState('CreatedSalesHeader', SalesHeader);
         SetPaymentParameters(POSSession, JSON, FrontEnd, SalesHeader);
-        //+NPR5.53 [377510]
     end;
 
     local procedure DocumentPayment(Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
@@ -336,15 +302,16 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
             POSSession.StartTransaction();
             POSSession.ChangeViewSale();
             HandlePrepayment(POSSession, SalesHeader, PrepaymentValue, PrepaymentIsAmount, PrintPrepayment, PrepaymentSend, PrepaymentPdf2Nav);
-            //End sale, auto start new sale, and insert payment line.
-            POSSession.StartTransaction();
-            POSSession.ChangeViewSale();
-            HandlePayAndPost(POSSession, SalesHeader, PayAndPostPrint, PayAndPostPdf2Nav, PayAndPostSend, FullPosting);
-        end else begin
-            //End sale
-            POSSale.SelectViewForEndOfSale(POSSession);
-        end;
-        //+NPR5.53 [377510]
+        end else
+            if PayAndPost then begin
+                //End sale, auto start new sale, and insert payment line.
+                POSSession.StartTransaction();
+                POSSession.ChangeViewSale();
+                HandlePayAndPost(POSSession, SalesHeader, PayAndPostPrint, PayAndPostPdf2Nav, PayAndPostSend, FullPosting);
+            end else begin
+                //End sale
+                POSSale.SelectViewForEndOfSale(POSSession);
+            end;
     end;
 
     local procedure SetPaymentParameters(POSSession: Codeunit "NPR POS Session"; JSON: Codeunit "NPR POS JSON Management"; FrontEnd: Codeunit "NPR POS Front End Management"; SalesHeader: Record "Sales Header")
@@ -352,7 +319,6 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
         Choice: Integer;
         RetailSalesDocImpMgt: Codeunit "NPR Sales Doc. Imp. Mgt.";
     begin
-        //-NPR5.53 [377510]
         if SalesHeader.Get(SalesHeader."Document Type", SalesHeader."No.") then begin //If document has been posted/deleted, we cannot pay parts of it.
             if JSON.GetBooleanParameter('ShowDocumentPaymentMenu', true) then begin
                 if RetailSalesDocImpMgt.DocumentIsSetToFullPosting(SalesHeader) then
@@ -412,14 +378,11 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
         end;
 
         FrontEnd.SetActionContext(ActionCode(), JSON);
-        //+NPR5.53 [377510]
     end;
 
     local procedure ValidateSale(var SalePOS: Record "NPR Sale POS"; var RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt."; JSON: Codeunit "NPR POS JSON Management")
     begin
-        //-NPR5.53 [377510]
         if JSON.GetBooleanParameter('BlockEmptySale', true) then begin
-            //+NPR5.53 [377510]
             if not SaleLinesExists(SalePOS) then
                 Error(ERRNOSALELINES);
         end;
@@ -473,7 +436,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
         RetailSalesDocMgt.SetOpenSalesDocAfterExport(JSON.GetBooleanParameter('OpenDocumentAfterExport', true));
         RetailSalesDocMgt.SetSendDocument(JSON.GetBooleanParameter('SetSend', true));
         RetailSalesDocMgt.SetWriteInAuditRoll(true);
-        RetailSalesDocMgt.SetSendICOrderConf(JSON.GetBooleanParameter('SendICOrderConfirmation', false));  //NPR5.55 [401616]
+        RetailSalesDocMgt.SetSendICOrderConf(JSON.GetBooleanParameter('SendICOrderConfirmation', false));
 
         if JSON.GetBooleanParameter('SetShowCreationMessage', true) then
             RetailSalesDocMgt.SetShowCreationMessage();
@@ -492,10 +455,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
                 DocumentTypePozitive::Quote:
                     RetailSalesDocMgt.SetDocumentTypeQuote();
                 DocumentTypePozitive::Restrict:
-                    //-NPR5.53 [313966]
-                    //ERROR(WrongPozitiveSignErr,DocumentTypeNegative);
                     Error(WrongPozitiveSignErr, SelectStr(DocumentTypeNegative + 1, OptionDocTypeNegative));
-            //+NPR5.53 [313966]
             end
         else
             case DocumentTypeNegative of
@@ -504,28 +464,21 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
                 DocumentTypeNegative::ReturnOrder:
                     RetailSalesDocMgt.SetDocumentTypeReturnOrder();
                 DocumentTypeNegative::Restrict:
-                    //-NPR5.53 [313966]
-                    //ERROR(WrongNegativeSignErr,DocumentTypePozitive);
                     Error(WrongNegativeSignErr, SelectStr(DocumentTypePozitive + 1, OptionDocTypePozitive));
-            //+NPR5.53 [313966]
             end;
 
-        //-NPR5.54 [392239]
         LocationSource := JSON.GetIntegerParameter('UseLocationFrom', true);
         SpecificLocationCode := JSON.GetStringParameter('UseSpecLocationCode', false);
         if (LocationSource = LocationSource::SpecificLocation) and (SpecificLocationCode = '') then
             Error(SpecLocationCodeMustBeSpecified);
         RetailSalesDocMgt.SetLocationSource(LocationSource, SpecificLocationCode);
-        //+NPR5.54 [392239]
     end;
 
     local procedure GetPrepaymentValue(var JSON: Codeunit "NPR POS JSON Management"): Decimal
     begin
-        //-NPR5.53 [377510]
         if JSON.GetBoolean('prompt_prepayment', true) then begin
             exit(GetNumpad(JSON, 'endSaleAndDocumentPayment'));
         end else begin
-            //+NPR5.53 [377510]
             exit(JSON.GetDecimalParameter('FixedPrepaymentValue', true));
         end;
     end;
@@ -538,6 +491,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
         Commit;
         if not HandlePayment.HandlePrepaymentTransactional(POSSession, SalesHeader, PrepaymentValue, PrepaymentIsAmount, Print, Send, Pdf2Nav, HandlePayment) then
             Message(ERR_PREPAY, GetLastErrorText);
+        POSSession.RequestRefreshData();
     end;
 
     local procedure HandlePayAndPost(POSSession: Codeunit "NPR POS Session"; SalesHeader: Record "Sales Header"; Print: Boolean; Pdf2Nav: Boolean; Send: Boolean; FullPosting: Boolean)
@@ -548,6 +502,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
         Commit;
         if not HandlePayment.HandlePayAndPostTransactional(POSSession, SalesHeader, Print, Pdf2Nav, Send, FullPosting, HandlePayment) then
             Message(ERR_PAY, GetLastErrorText);
+        POSSession.RequestRefreshData();
     end;
 
     local procedure CheckCustCredit(SalePOS: Record "NPR Sale POS")
@@ -697,15 +652,12 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
                 Caption := CaptionDocPaymentMenu;
             'BlockEmptySale':
                 Caption := CaptionBlockEmptySale;
-            //+NPR5.53 [377510]
-            //-NPR5.54 [392239]
             'UseLocationFrom':
                 Caption := CaptionUseLocationFrom;
             'UseSpecLocationCode':
                 Caption := CaptionUseSpecLocationCode;
-            //+NPR5.54 [392239]
             'SendICOrderConfirmation':
-                Caption := CaptionSendICOrderConfirmation;  //NPR5.55 [401616]
+                Caption := CaptionSendICOrderConfirmation;
         end;
     end;
 
@@ -791,15 +743,12 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
                 Caption := DescDocPaymentMenu;
             'BlockEmptySale':
                 Caption := DescBlockEmptySale;
-            //+NPR5.53 [377510]
-            //-NPR5.54 [392239]
             'UseLocationFrom':
                 Caption := DescUseLocationFrom;
             'UseSpecLocationCode':
                 Caption := DescUseSpecLocationCode;
-            //+NPR5.54 [392239]
             'SendICOrderConfirmation':
-                Caption := DescSendICOrderConfirmation;  //NPR5.55 [401616]
+                Caption := DescSendICOrderConfirmation;
         end;
     end;
 
@@ -815,7 +764,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
             'SetNegBalDocumentType':
                 Caption := OptionDocTypeNegative;
             'UseLocationFrom':
-                Caption := OptionUseLocationFrom;  //NPR5.54 [392239]
+                Caption := OptionUseLocationFrom;
         end;
     end;
 
@@ -824,7 +773,6 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
     var
         Location: Record Location;
     begin
-        //-NPR5.54 [392239]
         if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
@@ -838,7 +786,6 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
                         POSParameterValue.Value := Location.Code;
                 end;
         end;
-        //+NPR5.54 [392239]
     end;
 
     [EventSubscriber(ObjectType::Table, 6150705, 'OnValidateValue', '', false, false)]
@@ -846,7 +793,6 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
     var
         Location: Record Location;
     begin
-        //-NPR5.54 [392239]
         if POSParameterValue."Action Code" <> ActionCode() then
             exit;
 
@@ -860,7 +806,5 @@ codeunit 6150859 "NPR POS Action: Doc. Export"
                     Location.Find;
                 end;
         end;
-        //+NPR5.54 [392239]
     end;
 }
-
