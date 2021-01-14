@@ -1,7 +1,5 @@
 page 6150721 "NPR POS Keyboard Bind. Setup"
 {
-    // NPR5.48/TJ  /20181204 CASE 323835 New object
-
     Caption = 'POS Keyboard Binding Setup';
     DeleteAllowed = false;
     InsertAllowed = false;
@@ -15,29 +13,29 @@ page 6150721 "NPR POS Keyboard Bind. Setup"
         {
             repeater(Group)
             {
-                field("Action Code"; "Action Code")
+                field("Action Code"; Rec."Action Code")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Action Code field';
                 }
-                field("Key Bind"; "Key Bind")
+                field("Key Bind"; Rec."Key Bind")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Key Bind field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field(Enabled; Enabled)
+                field(Enabled; Rec.Enabled)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Enabled field';
                 }
-                field("Default Key Bind"; "Default Key Bind")
+                field("Default Key Bind"; Rec."Default Key Bind")
                 {
                     ApplicationArea = All;
                     Editable = false;
@@ -73,4 +71,3 @@ page 6150721 "NPR POS Keyboard Bind. Setup"
     var
         POSKeyboardBindingMgt: Codeunit "NPR POS Keyboard Binding Mgt.";
 }
-

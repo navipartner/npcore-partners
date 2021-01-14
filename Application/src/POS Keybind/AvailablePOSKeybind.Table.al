@@ -1,7 +1,5 @@
 table 6150723 "NPR Available POS Keybind"
 {
-    // NPR5.48/JAVA/20190205  CASE 323835 Transport NPR5.48 - 5 February 2019
-
     Caption = 'Available POS Keybind';
     DataClassification = CustomerContent;
 
@@ -38,9 +36,4 @@ table 6150723 "NPR Available POS Keybind"
         {
         }
     }
-
-    fieldgroups
-    {
-    }
 }
-

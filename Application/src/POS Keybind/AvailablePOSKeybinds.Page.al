@@ -1,7 +1,5 @@
 page 6150737 "NPR Available POS Keybinds"
 {
-    // NPR5.48/TJ  /20181204 CASE 323835 New object
-
     Caption = 'Available POS Keybinds';
     Editable = false;
     PageType = List;
@@ -14,7 +12,7 @@ page 6150737 "NPR Available POS Keybinds"
         {
             repeater(Group)
             {
-                field("Key Name"; "Key Name")
+                field("Key Name"; Rec."Key Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Key Name field';
@@ -22,9 +20,4 @@ page 6150737 "NPR Available POS Keybinds"
             }
         }
     }
-
-    actions
-    {
-    }
 }
-

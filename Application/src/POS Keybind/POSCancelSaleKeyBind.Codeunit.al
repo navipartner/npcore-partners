@@ -34,11 +34,6 @@ codeunit 6150742 "NPR POS Cancel Sale Key Bind"
 
     local procedure CancelSale(FrontEnd: Codeunit "NPR POS Front End Management"; POSSession: Codeunit "NPR POS Session")
     var
-        SaleLinePOS: Record "NPR Sale Line POS";
-        POSSale: Codeunit "NPR POS Sale";
-        POSSaleLine: Codeunit "NPR POS Sale Line";
-        Context: DotNet JObject;
-        POSJavaScriptInterface: Codeunit "NPR POS JavaScript Interface";
         POSAction: Record "NPR POS Action";
     begin
         if not POSSession.RetrieveSessionAction('CANCEL_POS_SALE', POSAction) then
