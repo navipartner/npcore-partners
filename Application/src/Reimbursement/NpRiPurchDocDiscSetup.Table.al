@@ -1,6 +1,5 @@
 table 6151107 "NPR NpRi Purch.Doc.Disc. Setup"
 {
-    // NPR5.46/MHA /20181002  CASE 323942 Object Created - NaviPartner Reimbursement - Purchase Document Discount
 
     Caption = 'Purchase Document Discount Reimbursement Setup';
     DataClassification = CustomerContent;
@@ -57,10 +56,6 @@ table 6151107 "NPR NpRi Purch.Doc.Disc. Setup"
         key(Key1; "Template Code")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 

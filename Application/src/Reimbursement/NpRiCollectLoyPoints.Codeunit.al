@@ -1,21 +1,13 @@
 codeunit 6151108 "NPR NpRi Collect Loy. Points"
 {
-    // NPR5.53/TSA /20191024 CASE 374363 Initial Version
-
-
-    trigger OnRun()
-    begin
-    end;
 
     var
         Text000: Label 'Membership Point Entries';
         Text001: Label 'Collecting Point Entries: @1@@@@@@@@@@@@@@@@@@';
 
-    local procedure "--- Discover"()
-    begin
-    end;
+    //Discover
 
-    [EventSubscriber(ObjectType::Codeunit, 6151100, 'DiscoverModules', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRi Setup Mgt.", 'DiscoverModules', '', true, true)]
     local procedure DiscoverMemberLoyaltyPoints(var NpRiModule: Record "NPR NpRi Reimbursement Module")
     begin
         if NpRiModule.Get(MemberLoyaltyPointsCode()) then
@@ -34,11 +26,9 @@ codeunit 6151108 "NPR NpRi Collect Loy. Points"
         exit('POINT_ENTRIES');
     end;
 
-    local procedure "--- Setup Filters"()
-    begin
-    end;
+    //Setup Filters
 
-    [EventSubscriber(ObjectType::Codeunit, 6151101, 'HasTemplateFilters', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRi Data Collection Mgt.", 'HasTemplateFilters', '', true, true)]
     procedure HasTemplateFilters(NpRiReimbursementTemplate: Record "NPR NpRi Reimbursement Templ."; var HasFilters: Boolean)
     begin
         if NpRiReimbursementTemplate."Data Collection Module" <> MemberLoyaltyPointsCode() then
@@ -47,7 +37,7 @@ codeunit 6151108 "NPR NpRi Collect Loy. Points"
         HasFilters := true;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151101, 'SetupTemplateFilters', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRi Data Collection Mgt.", 'SetupTemplateFilters', '', true, true)]
     procedure SetupTemplateFilters(var NpRiReimbursementTemplate: Record "NPR NpRi Reimbursement Templ.")
     var
         MMMembershipPointsEntry: Record "NPR MM Members. Points Entry";
@@ -65,11 +55,8 @@ codeunit 6151108 "NPR NpRi Collect Loy. Points"
         NpRiDataCollectionMgt.RunRequestPage(NpRiReimbursementTemplate, RecRef, RecRef2, TempField);
     end;
 
-    local procedure "--- Party Mgt."()
-    begin
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, 6151100, 'SetupPartyTypeTableNoLookup', '', true, true)]
+    //Party Mgt.
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRi Setup Mgt.", 'SetupPartyTypeTableNoLookup', '', true, true)]
     local procedure OnSetupPartyTypeTableNoLookup(var TempTableMetadata: Record "Table Metadata" temporary)
     var
         TableMetadata: Record "Table Metadata";
@@ -84,11 +71,8 @@ codeunit 6151108 "NPR NpRi Collect Loy. Points"
         TempTableMetadata.Insert;
     end;
 
-    local procedure "--- Data Collect"()
-    begin
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, 6151101, 'OnRunDataCollection', '', true, true)]
+    //Data Collect
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRi Data Collection Mgt.", 'OnRunDataCollection', '', true, true)]
     local procedure OnRunDataCollection(var Sender: Codeunit "NPR NpRi Data Collection Mgt."; var NpRiReimbursement: Record "NPR NpRi Reimbursement"; var Handled: Boolean)
     begin
         if NpRiReimbursement."Data Collection Module" <> MemberLoyaltyPointsCode() then
@@ -156,10 +140,7 @@ codeunit 6151108 "NPR NpRi Collect Loy. Points"
         NpRiReimbursementEntry.Modify(true);
     end;
 
-    local procedure "--- Aux"()
-    begin
-    end;
-
+    //Aux
     local procedure CurrCodeunitId(): Integer
     begin
         exit(CODEUNIT::"NPR NpRi Collect Loy. Points");

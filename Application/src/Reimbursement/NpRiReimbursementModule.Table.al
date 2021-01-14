@@ -1,7 +1,5 @@
 table 6151100 "NPR NpRi Reimbursement Module"
 {
-    // NPR5.44/MHA /20180723  CASE 320133 Object Created - NaviPartner Reimbursement
-
     Caption = 'Reimbursement Module';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR NpRi Reimburs. Modules";
@@ -35,7 +33,7 @@ table 6151100 "NPR NpRi Reimbursement Module"
         }
         field(20; "Subscriber Codeunit Name"; Text[30])
         {
-            CalcFormula = Lookup (AllObj."Object Name" WHERE("Object Type" = CONST(Codeunit),
+            CalcFormula = Lookup(AllObj."Object Name" WHERE("Object Type" = CONST(Codeunit),
                                                              "Object ID" = FIELD("Subscriber Codeunit ID")));
             Caption = 'Subscriber Codeunit Name';
             Editable = false;
@@ -48,10 +46,6 @@ table 6151100 "NPR NpRi Reimbursement Module"
         key(Key1; "Code")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 

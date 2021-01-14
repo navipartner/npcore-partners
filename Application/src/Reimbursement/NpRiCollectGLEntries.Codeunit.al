@@ -1,21 +1,12 @@
 codeunit 6151109 "NPR NpRi Collect G/L Entries"
 {
-    // NPR5.53/MHA /20191104  CASE 364131 Object Created - NaviPartner Reimbursement
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         Text000: Label 'G/L Entries';
         Text001: Label 'Collecting G/L Entries: @1@@@@@@@@@@@@@@@@@@';
 
-    local procedure "--- Discover"()
-    begin
-    end;
+    //Discover
 
-    [EventSubscriber(ObjectType::Codeunit, 6151100, 'DiscoverModules', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRi Setup Mgt.", 'DiscoverModules', '', true, true)]
     local procedure DiscoverGLEntries(var NpRiModule: Record "NPR NpRi Reimbursement Module")
     begin
         if NpRiModule.Get(ModuleCode()) then
@@ -34,11 +25,9 @@ codeunit 6151109 "NPR NpRi Collect G/L Entries"
         exit('GL_ENTRIES');
     end;
 
-    local procedure "--- Setup Filters"()
-    begin
-    end;
+    //Setup Filters
 
-    [EventSubscriber(ObjectType::Codeunit, 6151101, 'HasTemplateFilters', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRi Data Collection Mgt.", 'HasTemplateFilters', '', true, true)]
     procedure HasTemplateFilters(NpRiReimbursementTemplate: Record "NPR NpRi Reimbursement Templ."; var HasFilters: Boolean)
     begin
         if NpRiReimbursementTemplate."Data Collection Module" <> ModuleCode() then
@@ -47,7 +36,7 @@ codeunit 6151109 "NPR NpRi Collect G/L Entries"
         HasFilters := true;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151101, 'SetupTemplateFilters', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRi Data Collection Mgt.", 'SetupTemplateFilters', '', true, true)]
     procedure SetupTemplateFilters(var NpRiReimbursementTemplate: Record "NPR NpRi Reimbursement Templ.")
     var
         GLEntry: Record "G/L Entry";
@@ -73,7 +62,7 @@ codeunit 6151109 "NPR NpRi Collect G/L Entries"
     begin
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151100, 'SetupPartyTypeTableNoLookup', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRi Setup Mgt.", 'SetupPartyTypeTableNoLookup', '', true, true)]
     local procedure OnSetupPartyTypeTableNoLookup(var TempTableMetadata: Record "Table Metadata" temporary)
     var
         TableMetadata: Record "Table Metadata";
@@ -95,11 +84,9 @@ codeunit 6151109 "NPR NpRi Collect G/L Entries"
         end;
     end;
 
-    local procedure "--- Data Collect"()
-    begin
-    end;
+    //Data Collect
 
-    [EventSubscriber(ObjectType::Codeunit, 6151101, 'OnRunDataCollection', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRi Data Collection Mgt.", 'OnRunDataCollection', '', true, true)]
     local procedure OnRunDataCollection(var Sender: Codeunit "NPR NpRi Data Collection Mgt."; var NpRiReimbursement: Record "NPR NpRi Reimbursement"; var Handled: Boolean)
     begin
         if NpRiReimbursement."Data Collection Module" <> ModuleCode() then
@@ -170,9 +157,7 @@ codeunit 6151109 "NPR NpRi Collect G/L Entries"
         NpRiReimbursementEntry.Modify(true);
     end;
 
-    local procedure "--- Aux"()
-    begin
-    end;
+    //Aux
 
     local procedure CurrCodeunitId(): Integer
     begin

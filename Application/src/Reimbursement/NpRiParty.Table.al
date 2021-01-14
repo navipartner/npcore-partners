@@ -1,6 +1,5 @@
 table 6151105 "NPR NpRi Party"
 {
-    // NPR5.44/MHA /20180723  CASE 320133 Object Created - NaviPartner Reimbursement
 
     Caption = 'Reimbursement Party';
     DataClassification = CustomerContent;
@@ -101,7 +100,7 @@ table 6151105 "NPR NpRi Party"
         field(10; "Table No."; Integer)
         {
             BlankZero = true;
-            CalcFormula = Lookup ("NPR NpRi Party Type"."Table No." WHERE(Code = FIELD("Party Type")));
+            CalcFormula = Lookup("NPR NpRi Party Type"."Table No." WHERE(Code = FIELD("Party Type")));
             Caption = 'Table No.';
             Editable = false;
             FieldClass = FlowField;
@@ -128,10 +127,6 @@ table 6151105 "NPR NpRi Party"
         key(Key1; "Party Type", "No.")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 
     trigger OnDelete()

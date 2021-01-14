@@ -1,7 +1,5 @@
 table 6151104 "NPR NpRi Party Type"
 {
-    // NPR5.44/MHA /20180723  CASE 320133 Object Created - NaviPartner Reimbursement
-
     Caption = 'Reimbursement Party Type';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR NpRi Party Types";
@@ -67,7 +65,7 @@ table 6151104 "NPR NpRi Party Type"
         }
         field(15; "Table Name"; Text[249])
         {
-            CalcFormula = Lookup (AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Table),
+            CalcFormula = Lookup(AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Table),
                                                                            "Object ID" = FIELD("Table No.")));
             Caption = 'Table Name';
             Editable = false;
@@ -90,10 +88,6 @@ table 6151104 "NPR NpRi Party Type"
         key(Key1; "Code")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 
     trigger OnDelete()
