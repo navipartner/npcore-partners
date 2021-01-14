@@ -1,7 +1,5 @@
 table 6151080 "NPR ExRv Voucher Type"
 {
-    // NPR5.40/MHA /20180212  CASE 301346 Object created - External Retail Voucher
-
     Caption = 'External Retail Voucher Type';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR ExRv Voucher Types";
@@ -89,7 +87,7 @@ table 6151080 "NPR ExRv Voucher Type"
         }
         field(1000; Amount; Decimal)
         {
-            CalcFormula = Sum ("NPR ExRv Voucher".Amount WHERE("Voucher Type" = FIELD(Code),
+            CalcFormula = Sum("NPR ExRv Voucher".Amount WHERE("Voucher Type" = FIELD(Code),
                                                            "Posting Date" = FIELD("Date Filter")));
             Caption = 'Amount';
             DecimalPlaces = 0 : 5;
@@ -98,7 +96,7 @@ table 6151080 "NPR ExRv Voucher Type"
         }
         field(1005; "Remaining Amount"; Decimal)
         {
-            CalcFormula = Sum ("NPR ExRv Voucher"."Remaining Amount" WHERE("Voucher Type" = FIELD(Code),
+            CalcFormula = Sum("NPR ExRv Voucher"."Remaining Amount" WHERE("Voucher Type" = FIELD(Code),
                                                                        "Posting Date" = FIELD("Date Filter")));
             Caption = 'Remaining Amount';
             DecimalPlaces = 0 : 5;
@@ -112,10 +110,6 @@ table 6151080 "NPR ExRv Voucher Type"
         key(Key1; "Code")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 
     procedure ShowDocDim()

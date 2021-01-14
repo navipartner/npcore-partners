@@ -1,18 +1,7 @@
 codeunit 6151080 "NPR ExRv Mgt."
 {
-    // NPR5.40/MHA /20180212  CASE 301346 Object created - External Retail Voucher
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         Text000: Label 'Amount must be greater than 0.';
-
-    local procedure "--- Issue Voucher"()
-    begin
-    end;
 
     procedure IssueVoucher(var TempExRvVoucher: Record "NPR ExRv Voucher"): Boolean
     var
@@ -85,10 +74,6 @@ codeunit 6151080 "NPR ExRv Mgt."
         TempExRvVoucher.Modify;
     end;
 
-    local procedure "--- Status"()
-    begin
-    end;
-
     procedure UpdateIsOpen(var ExRvVoucher: Record "NPR ExRv Voucher")
     var
         GiftVoucher: Record "NPR Gift Voucher";
@@ -125,10 +110,6 @@ codeunit 6151080 "NPR ExRv Mgt."
             if Format(ExRvVoucher) <> PrevVoucher then
                 ExRvVoucher.Modify;
         until ExRvVoucher.Next = 0;
-    end;
-
-    local procedure "--- Post"()
-    begin
     end;
 
     procedure PostVouchers(var ExRvVoucher: Record "NPR ExRv Voucher")

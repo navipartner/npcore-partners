@@ -1,9 +1,5 @@
 codeunit 6151016 "NPR NpRv Ret. POSAction Mgt."
 {
-    trigger OnRun()
-    begin
-    end;
-
     var
         Text000: Label 'This action Issues Return Retail Vouchers.';
         Text001: Label 'Select Voucher Type:';
@@ -173,8 +169,6 @@ codeunit 6151016 "NPR NpRv Ret. POSAction Mgt."
         Context.SetContext('voucher_amount', -ReturnAmount);
         FrontEnd.SetActionContext(ActionCode(), Context);
     end;
-
-    //--- POS Action ---
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', true, true)]
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
@@ -445,8 +439,6 @@ codeunit 6151016 "NPR NpRv Ret. POSAction Mgt."
         FrontEnd.SetActionContext(ActionCode(), JSON);
     end;
 
-    //--- Select ---
-
     local procedure SelectVoucherType(var VoucherTypeCode: Text): Boolean
     var
         VoucherType: Record "NPR NpRv Voucher Type";
@@ -506,8 +498,6 @@ codeunit 6151016 "NPR NpRv Ret. POSAction Mgt."
         JSON.SetContext('SendMethodSMS', Selection = VoucherType."Send Method via POS"::SMS);
         FrontEnd.SetActionContext(ActionCode(), JSON);
     end;
-
-    //--- Constants ---
 
     procedure ActionCode(): Text
     begin

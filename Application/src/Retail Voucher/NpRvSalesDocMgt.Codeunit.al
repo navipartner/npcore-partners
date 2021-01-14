@@ -1,12 +1,6 @@
 codeunit 6151024 "NPR NpRv Sales Doc. Mgt."
 {
-    trigger OnRun()
-    begin
-    end;
-
     var
-        Text000: Label 'Nothing to return';
-        Text001: Label 'Return Amount %1 issued under Payment Lines';
         Text002: Label 'Retail Voucher Payment Amount %1 is higher than Remaining Amount %2 on Retail Voucher %3';
         Text003: Label 'Order Amount %1 is lower than Payment Amount %2.\Issue Return Voucher on remaining amount.';
         Text004: Label 'Voucher %1 issued on new Sales Line';
@@ -86,7 +80,7 @@ codeunit 6151024 "NPR NpRv Sales Doc. Mgt."
         exit(TempNpRvVoucher."No.");
     end;
 
-    procedure InsertPayment(XmlElement: DotNet NPRNetXmlElement; var SalesHeader: Record "Sales Header"; var NpRvVoucher: Record "NPR NpRv Voucher"; Amount: Decimal): Boolean
+    procedure InsertPayment(Element: XmlElement; var SalesHeader: Record "Sales Header"; var NpRvVoucher: Record "NPR NpRv Voucher"; Amount: Decimal): Boolean
     var
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         NpRvGlobalVoucherWebservice: Codeunit "NPR NpRv Global Voucher WS";
@@ -160,10 +154,6 @@ codeunit 6151024 "NPR NpRv Sales Doc. Mgt."
             exit;
 
         NpRvModulePaymentDefault.ApplyPaymentSalesDoc(NpRvVoucherType, SalesHeader, NpRvSalesLine);
-    end;
-
-    local procedure "--- Sales Doc Subscribers"()
-    begin
     end;
 
     [EventSubscriber(ObjectType::Table, 37, 'OnBeforeDeleteEvent', '', true, true)]
@@ -327,10 +317,6 @@ codeunit 6151024 "NPR NpRv Sales Doc. Mgt."
         until NpRvVoucherEntry.Next = 0;
     end;
 
-    local procedure "--- Sales Doc Posting"()
-    begin
-    end;
-
     local procedure IssueNewVouchers(SalesHeader: Record "Sales Header")
     var
         NpRvSalesLine: Record "NPR NpRv Sales Line";
@@ -383,10 +369,6 @@ codeunit 6151024 "NPR NpRv Sales Doc. Mgt."
         until MagentoPaymentLine.Next = 0;
     end;
 
-    local procedure "--- Page Actions"()
-    begin
-    end;
-
     procedure IssueVoucherAction(SalesHeader: Record "Sales Header")
     var
         NpRvVoucherType: Record "NPR NpRv Voucher Type";
@@ -409,10 +391,6 @@ codeunit 6151024 "NPR NpRv Sales Doc. Mgt."
         NpRvSalesLine.SetRange("Document Type", SalesHeader."Document Type");
         NpRvSalesLine.SetRange("Document No.", SalesHeader."No.");
         PAGE.Run(0, NpRvSalesLine);
-    end;
-
-    local procedure "--- Aux"()
-    begin
     end;
 
     local procedure GetTotalAmtInclVat(SalesHeader: Record "Sales Header"): Decimal

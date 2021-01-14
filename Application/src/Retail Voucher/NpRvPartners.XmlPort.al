@@ -1,8 +1,5 @@
 xmlport 6151013 "NPR NpRv Partners"
 {
-    // NPR5.49/MHA /20190228  CASE 342811 Object created - Retail Voucher Partner used with Cross Company Vouchers
-    // NPR5.50/MHA /20190531  CASE 357025 Added Object Caption
-
     Caption = 'Retail Voucher Partners';
     DefaultNamespace = 'urn:microsoft-dynamics-schemas/codeunit/global_voucher_service';
     Encoding = UTF8;
@@ -56,18 +53,6 @@ xmlport 6151013 "NPR NpRv Partners"
                     }
                 }
             }
-        }
-    }
-
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
         }
     }
 

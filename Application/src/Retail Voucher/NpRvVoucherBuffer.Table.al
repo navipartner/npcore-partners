@@ -1,8 +1,5 @@
 table 6151021 "NPR NpRv Voucher Buffer"
 {
-    // NPR5.42/MHA /20180525  CASE 307022 Object created - Global Retail Voucher
-    // NPR5.49/MHA /20190228  CASE 342811 Renamed table from "NpRv Global Voucher Buffer" and added partner fields
-
     Caption = 'Voucher Buffer';
     DataClassification = CustomerContent;
 
@@ -190,10 +187,6 @@ table 6151021 "NPR NpRv Voucher Buffer"
         key(Key1; "Reference No.")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 

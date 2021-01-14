@@ -1,8 +1,5 @@
 table 6151024 "NPR NpRv Partner"
 {
-    // NPR5.49/MHA /20190228  CASE 342811 Object created - Retail Voucher Partner used with Cross Company vouchers
-    // NPR5.53/MHA /20191206  CASE 379761 Added Validation and loose Table Relation to field 5 "Name"
-
     Caption = 'Retail Voucher Partner';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR NpRv Partners";
@@ -37,12 +34,10 @@ table 6151024 "NPR NpRv Partner"
                 Company: Record Company;
                 NpRvPartnerMgt: Codeunit "NPR NpRv Partner Mgt.";
             begin
-                //-NPR5.53 [379761]
                 if StrLen(Name) <= MaxStrLen(Company.Name) then begin
                     if Company.Get(Name) then
                         "Service Url" := NpRvPartnerMgt.GetGlobalVoucherWSUrl(Company.Name);
                 end;
-                //+NPR5.53 [379761]
             end;
         }
         field(10; "Service Url"; Text[250])
@@ -76,10 +71,6 @@ table 6151024 "NPR NpRv Partner"
         key(Key1; "Code")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 

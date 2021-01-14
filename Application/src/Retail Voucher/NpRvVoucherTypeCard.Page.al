@@ -1,12 +1,5 @@
 page 6151012 "NPR NpRv Voucher Type Card"
 {
-    // NPR5.37/MHA /20171023  CASE 267346 Object created - NaviPartner Retail Voucher
-    // NPR5.48/MHA /20190123  CASE 341711 Added fields 75 "E-mail Template Code", 80 "SMS Template Code", 105 "Send Method via POS"
-    // NPR5.49/MHA /20190228  CASE 342811 Added field 60 "Partner Code"
-    // NPR5.50/MHA /20190426  CASE 353079 Added field 62 "Allow Top-up"
-    // NPR5.53/THRO/20191216  CASE 382232 Added "Minimum Amount Issue"
-    // NPR5.55/MHA /20200525  CASE 400120 Added field 1010 "Voucher Qty. (Closed)"
-
     Caption = 'Retail Voucher Type Card';
     PromotedActionCategories = 'New,Process,Reports,Manage,Setup';
     SourceTable = "NPR NpRv Voucher Type";

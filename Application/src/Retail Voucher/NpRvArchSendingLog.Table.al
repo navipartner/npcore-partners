@@ -1,7 +1,5 @@
 table 6151031 "NPR NpRv Arch. Sending Log"
 {
-    // NPR5.55/MHA /20200702  CASE 407070 Object created
-
     Caption = 'Retail Voucher Sending Log';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR NpRv Arch. Sending Log";
@@ -80,14 +78,10 @@ table 6151031 "NPR NpRv Arch. Sending Log"
         }
     }
 
-    fieldgroups
-    {
-    }
-
     procedure GetErrorMessage() FullLogMessage: Text
     var
-        StreamReader: DotNet NPRNetStreamReader;
         InStr: InStream;
+        BufferText: Text;
     begin
         FullLogMessage := '';
         if not "Error Message".HasValue then
@@ -95,8 +89,10 @@ table 6151031 "NPR NpRv Arch. Sending Log"
 
         CalcFields("Error Message");
         "Error Message".CreateInStream(InStr, TEXTENCODING::UTF8);
-        StreamReader := StreamReader.StreamReader(InStr);
-        FullLogMessage := StreamReader.ReadToEnd();
+        while not InStr.EOS do begin
+            InStr.ReadText(BufferText);
+            FullLogMessage += BufferText;
+        end;
         exit(FullLogMessage);
     end;
 }

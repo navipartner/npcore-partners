@@ -1,7 +1,5 @@
 table 6151011 "NPR NpRv Voucher Module"
 {
-    // NPR5.37/MHA /20171023  CASE 267346 Object created - NaviPartner Retail Voucher
-
     Caption = 'Retail Voucher Module';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR NpRv Voucher Modules";
@@ -35,7 +33,7 @@ table 6151011 "NPR NpRv Voucher Module"
         }
         field(55; "Event Codeunit Name"; Text[30])
         {
-            CalcFormula = Lookup (AllObj."Object Name" WHERE("Object Type" = CONST(Codeunit),
+            CalcFormula = Lookup(AllObj."Object Name" WHERE("Object Type" = CONST(Codeunit),
                                                              "Object ID" = FIELD("Event Codeunit ID")));
             Caption = 'Event Codeunit Name';
             Editable = false;
@@ -48,10 +46,6 @@ table 6151011 "NPR NpRv Voucher Module"
         key(Key1; Type, "Code")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 

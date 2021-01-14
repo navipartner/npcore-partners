@@ -1,7 +1,5 @@
 page 6151019 "NPR NpRv Ret. Vouch. Card"
 {
-    // NPR5.37/MHA /20171023  CASE 267346 Object created - NaviPartner Retail Voucher
-
     Caption = 'Return Retail Voucher Card';
     SourceTable = "NPR NpRv Ret. Vouch. Type";
 
@@ -23,10 +21,6 @@ page 6151019 "NPR NpRv Ret. Vouch. Card"
                 }
             }
         }
-    }
-
-    actions
-    {
     }
 }
 

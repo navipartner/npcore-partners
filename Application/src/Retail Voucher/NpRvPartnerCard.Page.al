@@ -1,7 +1,5 @@
 page 6151027 "NPR NpRv Partner Card"
 {
-    // NPR5.49/MHA /20190228  CASE 342811 Object created - Retail Voucher Partner used with Cross Company Vouchers
-
     Caption = 'Retail Voucher Partner';
     PageType = Card;
     UsageCategory = Administration;

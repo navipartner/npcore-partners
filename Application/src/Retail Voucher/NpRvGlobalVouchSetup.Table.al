@@ -1,8 +1,5 @@
 table 6151020 "NPR NpRv Global Vouch. Setup"
 {
-    // NPR5.42/MHA /20180525  CASE 307022 Object created - Global Retail Voucher
-    // NPR5.49/MHA /20190228  CASE 342811 Added field 3 "Service Company Name" and removed field 55 "Account No.", which is now Retail Voucher Partner
-
     Caption = 'Global Voucher Setup';
     DataClassification = CustomerContent;
 
@@ -30,13 +27,11 @@ table 6151020 "NPR NpRv Global Vouch. Setup"
                 Company: Record Company;
                 Url: Text;
             begin
-                //-NPR5.49 [342811]
                 if not Company.Get("Service Company Name") then
                     exit;
 
                 Url := GetUrl(CLIENTTYPE::SOAP, Company.Name, OBJECTTYPE::Codeunit, CODEUNIT::"NPR NpRv Global Voucher WS");
                 "Service Url" := CopyStr(Url, 1, MaxStrLen("Service Url"));
-                //+NPR5.49 [342811]
             end;
         }
         field(5; "Service Url"; Text[250])
@@ -61,10 +56,6 @@ table 6151020 "NPR NpRv Global Vouch. Setup"
         key(Key1; "Voucher Type")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 

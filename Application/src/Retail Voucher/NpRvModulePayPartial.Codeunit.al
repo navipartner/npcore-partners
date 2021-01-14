@@ -1,13 +1,5 @@
 codeunit 6151018 "NPR NpRv Module Pay. - Partial"
 {
-    // NPR5.37/MHA /20171023  CASE 267346 Object created - NaviPartner Retail Voucher
-    // NPR5.55/MHA /20200603  CASE 363864 Added interface for Sales Document Payments
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         Text000: Label 'Apply Payment - Partial';
 
@@ -42,7 +34,6 @@ codeunit 6151018 "NPR NpRv Module Pay. - Partial"
         MagentoPaymentLine: Record "NPR Magento Payment Line";
         ReturnAmount: Decimal;
     begin
-        //-NPR5.55 [363864]
         SalesHeader.CalcFields("NPR Magento Payment Amount");
         ReturnAmount := SalesHeader."NPR Magento Payment Amount" - GetTotalAmtInclVat(SalesHeader);
         if ReturnAmount <= 0 then
@@ -54,11 +45,6 @@ codeunit 6151018 "NPR NpRv Module Pay. - Partial"
 
         MagentoPaymentLine.Amount -= ReturnAmount;
         MagentoPaymentLine.Modify(true);
-        //+NPR5.55 [363864]
-    end;
-
-    local procedure "--- Voucher Interface"()
-    begin
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6151011, 'OnInitVoucherModules', '', true, true)]
@@ -107,7 +93,6 @@ codeunit 6151018 "NPR NpRv Module Pay. - Partial"
     [EventSubscriber(ObjectType::Codeunit, 6151011, 'OnRunApplyPaymentSalesDoc', '', true, true)]
     local procedure OnRunApplyPaymentSalesDoc(VoucherType: Record "NPR NpRv Voucher Type"; SalesHeader: Record "Sales Header"; var NpRvSalesLine: Record "NPR NpRv Sales Line"; var Handled: Boolean)
     begin
-        //-NPR5.55 [363864]
         if Handled then
             exit;
         if not IsSubscriber(VoucherType) then
@@ -116,11 +101,6 @@ codeunit 6151018 "NPR NpRv Module Pay. - Partial"
         Handled := true;
 
         ApplyPaymentSalesDoc(VoucherType, SalesHeader, NpRvSalesLine);
-        //+NPR5.55 [363864]
-    end;
-
-    local procedure "--- Aux"()
-    begin
     end;
 
     local procedure CurrCodeunitId(): Integer
@@ -144,12 +124,10 @@ codeunit 6151018 "NPR NpRv Module Pay. - Partial"
         VATAmountLineTemp: Record "VAT Amount Line" temporary;
         SalesPost: Codeunit "Sales-Post";
     begin
-        //-NPR5.55 [363864]
         SalesPost.GetSalesLines(SalesHeader, SalesLineTemp, 0);
         SalesLineTemp.CalcVATAmountLines(0, SalesHeader, SalesLineTemp, VATAmountLineTemp);
         SalesLineTemp.UpdateVATOnLines(0, SalesHeader, SalesLineTemp, VATAmountLineTemp);
         exit(VATAmountLineTemp.GetTotalAmountInclVAT());
-        //+NPR5.55 [363864]
     end;
 }
 
