@@ -1,9 +1,5 @@
 xmlport 6060124 "NPR TM Send eTicket"
 {
-    // 
-    // TM1.38/TSA /20181017 CASE 332109 Sending an eTicket
-    // TM1.39/NPKNAV/20190125  CASE 310057 Transport TM1.39 - 25 January 2019
-
     Caption = 'TM Send eTicket';
     Encoding = UTF8;
     FormatEvaluate = Xml;
@@ -141,13 +137,6 @@ xmlport 6060124 "NPR TM Send eTicket"
         end;
 
         repeat
-            //-TM1.39 [310057]
-            // IF (TicketRequestManager.IsETicket (Ticket."No.")) THEN
-            // IF NOT (TicketRequestManager.CreateAndSendETicket (Ticket."No.", ReasonText)) THEN BEGIN
-            //   CreateErrorResponse (COPYSTR (ReasonText, 1, MAXSTRLEN (tmpTicketReservationResponse."Response Message")));
-            //   EXIT;
-            // END;
-            // Ticket.GET (TicketNo);
 
             if (not TicketRequestManager.IsETicket(Ticket."No.")) then begin
                 CreateErrorResponse('Not eTicket.');
@@ -164,6 +153,16 @@ xmlport 6060124 "NPR TM Send eTicket"
             TmpTicketNotificationEntry.FindSet();
             repeat
 
+                if (tmpTicketReservationRequest."Notification Address" <> '') then begin
+                    TicketNotificationEntry.Get(TmpTicketNotificationEntry."Entry No.");
+                    TicketNotificationEntry."Notification Address" := tmpTicketReservationRequest."Notification Address";
+                    TicketNotificationEntry."Notification Trigger" := TicketNotificationEntry."Notification Trigger"::ETICKET_CREATE;
+                    TicketNotificationEntry."Notification Method" := TicketNotificationEntry."Notification Method"::SMS;
+                    if (StrPos(tmpTicketReservationRequest."Notification Address", '@') > 0) then
+                        TicketNotificationEntry."Notification Method" := TicketNotificationEntry."Notification Method"::EMAIL;
+                    TicketNotificationEntry.Modify();
+                end;
+
                 if (TmpTicketNotificationEntry."Notification Send Status" = TmpTicketNotificationEntry."Notification Send Status"::PENDING) then begin
                     if (not TicketRequestManager.SendETicketNotification(TmpTicketNotificationEntry."Entry No.", (tmpTicketReservationRequest."Notification Address" = ''), ReasonText)) then begin
                         CreateErrorResponse(ReasonText);
@@ -174,7 +173,6 @@ xmlport 6060124 "NPR TM Send eTicket"
                 end;
 
             until (TmpTicketNotificationEntry.Next() = 0);
-        //+TM1.39 [310057]
 
         until (Ticket.Next() = 0);
 
@@ -182,7 +180,6 @@ xmlport 6060124 "NPR TM Send eTicket"
         tmpTicketReservationResponse."Response Message" := 'OK';
         tmpTicketReservationResponse.Insert();
 
-        //-TM1.39 [310057]
         TmpTicketNotificationEntry.Reset();
         TmpTicketNotificationEntry.FindSet();
         repeat
@@ -190,7 +187,7 @@ xmlport 6060124 "NPR TM Send eTicket"
             TmpTicketNotificationResponse.TransferFields(TicketNotificationEntry, true);
             TmpTicketNotificationResponse.Insert();
         until (TmpTicketNotificationEntry.Next() = 0);
-        //+TM1.39 [310057]
+
     end;
 
     local procedure CreateErrorResponse(ResponseText: Text[250])

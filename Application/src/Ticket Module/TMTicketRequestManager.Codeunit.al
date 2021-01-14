@@ -1727,6 +1727,7 @@ codeunit 6060119 "NPR TM Ticket Request Manager"
 
         // If this is an update, duplicate the lines (one per admission code) and set status pending
         TicketNotificationEntry.SetFilter("Ticket Token", '=%1', TicketReservationRequest."Session Token ID");
+        TicketNotificationEntry.SetFilter("Notification Trigger", '=%1|=%2', TicketNotificationEntry."Notification Trigger"::ETICKET_UPDATE, TicketNotificationEntry."Notification Trigger"::ETICKET_CREATE);
         if (TicketNotificationEntry.FindLast()) then begin
 
             TicketNotificationEntry.SetFilter("Notification Group Id", '=%1', TicketNotificationEntry."Notification Group Id");
