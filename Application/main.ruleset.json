@@ -8,11 +8,6 @@
             "justification": "We want to use some of the AppSourceCop checks while we're OnPrem."
         },
         {
-            "id": "AS0054",
-            "action":"Warning",
-            "justification": "TEMPORARY! Remove after rename!"
-        },
-        {
             "id": "AW0007",
             "action":"Warning",
             "justification": "The Web client does not support displaying Repeater controls that contain FlowFilter fields!"
