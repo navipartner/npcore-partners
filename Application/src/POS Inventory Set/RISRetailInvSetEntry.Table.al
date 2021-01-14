@@ -1,7 +1,5 @@
 table 6151086 "NPR RIS Retail Inv. Set Entry"
 {
-    // NPR5.40/MHA /20180320  CASE 307025 Object created - Retail Inventory Set
-
     Caption = 'Retail Inventory Set Entry';
     DataClassification = CustomerContent;
 
@@ -116,7 +114,7 @@ table 6151086 "NPR RIS Retail Inv. Set Entry"
         }
         field(125; "Processing Codeunit Name"; Text[249])
         {
-            CalcFormula = Lookup (AllObj."Object Name" WHERE("Object Type" = CONST(Codeunit),
+            CalcFormula = Lookup(AllObj."Object Name" WHERE("Object Type" = CONST(Codeunit),
                                                              "Object ID" = FIELD("Processing Codeunit ID")));
             Caption = 'Processing Codeunit Name';
             Editable = false;
@@ -168,10 +166,6 @@ table 6151086 "NPR RIS Retail Inv. Set Entry"
         }
     }
 
-    fieldgroups
-    {
-    }
-
     trigger OnInsert()
     begin
         SetApiUrl();
@@ -191,4 +185,3 @@ table 6151086 "NPR RIS Retail Inv. Set Entry"
             "Api Url" := GetUrl(CLIENTTYPE::SOAP, "Company Name", OBJECTTYPE::Codeunit, CODEUNIT::"NPR Magento Webservice");
     end;
 }
-

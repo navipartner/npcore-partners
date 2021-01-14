@@ -1,7 +1,5 @@
 table 6151085 "NPR RIS Retail Inv. Set"
 {
-    // NPR5.40/MHA /20180320  CASE 307025 Object created - Retail Inventory Set
-
     Caption = 'Retail Inventory Set';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR RIS Retail Inv. Sets";
@@ -29,10 +27,6 @@ table 6151085 "NPR RIS Retail Inv. Set"
         }
     }
 
-    fieldgroups
-    {
-    }
-
     trigger OnDelete()
     var
         RetailInventorySetEntry: Record "NPR RIS Retail Inv. Set Entry";
@@ -42,4 +36,3 @@ table 6151085 "NPR RIS Retail Inv. Set"
             RetailInventorySetEntry.DeleteAll;
     end;
 }
-

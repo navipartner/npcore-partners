@@ -1,7 +1,5 @@
 table 6151087 "NPR RIS Retail Inv. Buffer"
 {
-    // NPR5.40/MHA /20180320  CASE 307025 Object created - Retail Inventory Set
-
     Caption = 'Retail Inventory Buffer';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR RIS Retail Inv. Buffer";
@@ -67,9 +65,4 @@ table 6151087 "NPR RIS Retail Inv. Buffer"
         {
         }
     }
-
-    fieldgroups
-    {
-    }
 }
-
