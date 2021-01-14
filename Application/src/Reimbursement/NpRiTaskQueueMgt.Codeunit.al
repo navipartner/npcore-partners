@@ -1,14 +1,12 @@
 codeunit 6151106 "NPR NpRi Task Queue Mgt."
 {
-    // NPR5.44/MHA /20180723  CASE 320133 Object Created - NaviPartner Reimbursement
-
     TableNo = "NPR Task Line";
 
     trigger OnRun()
     begin
-        if GetParameterBool('RUN_DATA_COLLECTIONS') then
+        if Rec.GetParameterBool('RUN_DATA_COLLECTIONS') then
             RunDataCollections();
-        if GetParameterBool('RUN_REIMBURSEMENTS') then
+        if Rec.GetParameterBool('RUN_REIMBURSEMENTS') then
             RunReimbursements();
     end;
 

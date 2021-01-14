@@ -1,12 +1,5 @@
 codeunit 6151100 "NPR NpRi Setup Mgt."
 {
-    // NPR5.44/MHA /20180723  CASE 320133 Object Created - NaviPartner Reimbursement
-
-
-    trigger OnRun()
-    begin
-    end;
-
     [IntegrationEvent(false, false)]
     procedure DiscoverModules(var NpRiModule: Record "NPR NpRi Reimbursement Module")
     begin

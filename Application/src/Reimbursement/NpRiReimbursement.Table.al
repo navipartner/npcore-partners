@@ -1,10 +1,5 @@
 table 6151102 "NPR NpRi Reimbursement"
 {
-    // NPR5.44/MHA /20180723  CASE 320133 Object Created - NaviPartner Reimbursement
-    // NPR5.54/JKL /20191213  CASE 382066 New field 310 Deactivated added
-    // NPR5.54/BHR /20200306  CASE 385924 Add fields 315, 316
-    // NPR5.54/JAKUBV/20200408  CASE 368254 Transport NPR5.54 - 8 April 2020
-
     Caption = 'Reimbursement';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR NpRi Reimbursements";
@@ -35,7 +30,7 @@ table 6151102 "NPR NpRi Reimbursement"
         }
         field(100; "Data Collection Module"; Code[20])
         {
-            CalcFormula = Lookup ("NPR NpRi Reimbursement Templ."."Data Collection Module" WHERE(Code = FIELD("Template Code")));
+            CalcFormula = Lookup("NPR NpRi Reimbursement Templ."."Data Collection Module" WHERE(Code = FIELD("Template Code")));
             Caption = 'Data Collection Module';
             Editable = false;
             FieldClass = FlowField;
@@ -48,7 +43,7 @@ table 6151102 "NPR NpRi Reimbursement"
         }
         field(110; "Data Collection Summary"; Text[250])
         {
-            CalcFormula = Lookup ("NPR NpRi Reimbursement Templ."."Data Collection Summary" WHERE(Code = FIELD("Template Code")));
+            CalcFormula = Lookup("NPR NpRi Reimbursement Templ."."Data Collection Summary" WHERE(Code = FIELD("Template Code")));
             Caption = 'Data Collection Summary';
             Editable = false;
             FieldClass = FlowField;
@@ -66,14 +61,14 @@ table 6151102 "NPR NpRi Reimbursement"
         }
         field(200; "Reimbursement Module"; Code[20])
         {
-            CalcFormula = Lookup ("NPR NpRi Reimbursement Templ."."Reimbursement Module" WHERE(Code = FIELD("Template Code")));
+            CalcFormula = Lookup("NPR NpRi Reimbursement Templ."."Reimbursement Module" WHERE(Code = FIELD("Template Code")));
             Caption = 'Reimbursement Module';
             Editable = false;
             FieldClass = FlowField;
         }
         field(210; "Reimbursement Summary"; Text[250])
         {
-            CalcFormula = Lookup ("NPR NpRi Reimbursement Templ."."Reimbursement Summary" WHERE(Code = FIELD("Template Code")));
+            CalcFormula = Lookup("NPR NpRi Reimbursement Templ."."Reimbursement Summary" WHERE(Code = FIELD("Template Code")));
             Caption = 'Reimbursement Summary';
             Editable = false;
             FieldClass = FlowField;
@@ -100,7 +95,7 @@ table 6151102 "NPR NpRi Reimbursement"
         }
         field(300; Balance; Decimal)
         {
-            CalcFormula = Sum ("NPR NpRi Reimbursement Entry".Amount WHERE("Party Type" = FIELD("Party Type"),
+            CalcFormula = Sum("NPR NpRi Reimbursement Entry".Amount WHERE("Party Type" = FIELD("Party Type"),
                                                                        "Party No." = FIELD("Party No."),
                                                                        "Template Code" = FIELD("Template Code"),
                                                                        "Posting Date" = FIELD("Date Filter")));
@@ -144,10 +139,6 @@ table 6151102 "NPR NpRi Reimbursement"
         key(Key1; "Party Type", "Party No.", "Template Code")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 
     trigger OnDelete()

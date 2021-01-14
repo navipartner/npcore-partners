@@ -1,140 +1,138 @@
 page 6151103 "NPR NpRi Reimburs. Entries"
 {
-    // NPR5.44/MHA /20180723  CASE 320133 Object Created - NaviPartner Reimbursement
-
     Caption = 'Reimbursement Entries';
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
     SourceTable = "NPR NpRi Reimbursement Entry";
-
+    ApplicationArea = All;
     layout
     {
         area(content)
         {
             repeater(Group)
             {
-                field("Party Type"; "Party Type")
+                field("Party Type"; Rec."Party Type")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Party Type field';
                 }
-                field("Party No."; "Party No.")
+                field("Party No."; Rec."Party No.")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Party No. field';
                 }
-                field("Template Code"; "Template Code")
+                field("Template Code"; Rec."Template Code")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Template Code field';
                 }
-                field("Posting Date"; "Posting Date")
+                field("Posting Date"; Rec."Posting Date")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Posting Date field';
                 }
-                field("Entry Type"; "Entry Type")
+                field("Entry Type"; Rec."Entry Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Entry Type field';
                 }
-                field("Source Company Name"; "Source Company Name")
+                field("Source Company Name"; Rec."Source Company Name")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Source Company Name field';
                 }
-                field("Source Table No."; "Source Table No.")
+                field("Source Table No."; Rec."Source Table No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Source Table No. field';
                 }
-                field("Source Table Name"; "Source Table Name")
+                field("Source Table Name"; Rec."Source Table Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Source Table Name field';
                 }
-                field("Source Record Position"; "Source Record Position")
+                field("Source Record Position"; Rec."Source Record Position")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Source Record Position field';
                 }
-                field("Source Entry No."; "Source Entry No.")
+                field("Source Entry No."; Rec."Source Entry No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Source Entry No. field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field(Amount; Amount)
+                field(Amount; Rec.Amount)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Amount field';
                 }
-                field(Positive; Positive)
+                field(Positive; Rec.Positive)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Positive field';
                 }
-                field(Open; Open)
+                field(Open; Rec.Open)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Open field';
                 }
-                field("Remaining Amount"; "Remaining Amount")
+                field("Remaining Amount"; Rec."Remaining Amount")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Remaining Amount field';
                 }
-                field("Closed by Entry No."; "Closed by Entry No.")
+                field("Closed by Entry No."; Rec."Closed by Entry No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Closed by Entry No. field';
                 }
-                field("Document Type"; "Document Type")
+                field("Document Type"; Rec."Document Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Document Type field';
                 }
-                field("Document No."; "Document No.")
+                field("Document No."; Rec."Document No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Document No. field';
                 }
-                field("Account Type"; "Account Type")
+                field("Account Type"; Rec."Account Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Account Type field';
                 }
-                field("Account No."; "Account No.")
+                field("Account No."; Rec."Account No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Account No. field';
                 }
-                field("Reimbursement Amount"; "Reimbursement Amount")
+                field("Reimbursement Amount"; Rec."Reimbursement Amount")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Reimbursement Amount field';
                 }
-                field("Last modified by"; "Last modified by")
+                field("Last modified by"; Rec."Last modified by")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Last modified by field';
                 }
-                field("Last modified at"; "Last modified at")
+                field("Last modified at"; Rec."Last modified at")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Last modified at field';
                 }
-                field("Entry No."; "Entry No.")
+                field("Entry No."; Rec."Entry No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Entry No. field';
@@ -220,7 +218,7 @@ page 6151103 "NPR NpRi Reimburs. Entries"
                 var
                     Navigate: Page Navigate;
                 begin
-                    Navigate.SetDoc("Posting Date", "Document No.");
+                    Navigate.SetDoc(Rec."Posting Date", Rec."Document No.");
                     Navigate.Run;
                 end;
             }

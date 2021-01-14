@@ -1,7 +1,5 @@
 table 6151103 "NPR NpRi Reimbursement Entry"
 {
-    // NPR5.44/MHA /20180723  CASE 320133 Object Created - NaviPartner Reimbursement
-    // NPR5.53/TSA /20191024 CASE 374363 Added "Account Type"::Membership
 
     Caption = 'Reimbursement Entry';
     DataClassification = CustomerContent;
@@ -63,7 +61,7 @@ table 6151103 "NPR NpRi Reimbursement Entry"
         }
         field(125; "Source Table Name"; Text[249])
         {
-            CalcFormula = Lookup (AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Table),
+            CalcFormula = Lookup(AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Table),
                                                                            "Object ID" = FIELD("Source Table No.")));
             Caption = 'Source Table Name';
             Editable = false;
@@ -174,10 +172,6 @@ table 6151103 "NPR NpRi Reimbursement Entry"
         key(Key4; "Party Type", "Party No.", "Template Code", "Entry Type", Open, "Posting Date")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 
     trigger OnInsert()

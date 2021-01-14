@@ -1,8 +1,5 @@
 codeunit 6151101 "NPR NpRi Data Collection Mgt."
 {
-    // NPR5.44/MHA /20180723  CASE 320133 Object Created - NaviPartner Reimbursement
-    // NPR5.54/JKL /20191213 CASE 382066  Added code to omit deactivated reinbursments
-
     TableNo = "NPR NpRi Reimbursement";
 
     trigger OnRun()
@@ -16,9 +13,7 @@ codeunit 6151101 "NPR NpRi Data Collection Mgt."
         Window: Dialog;
         WindowOpened: Boolean;
 
-    local procedure "--- Setup Filters"()
-    begin
-    end;
+    //Setup Filters
 
     [IntegrationEvent(false, false)]
     procedure HasTemplateFilters(NpRiReimbursementTemplate: Record "NPR NpRi Reimbursement Templ."; var HasFilters: Boolean)
@@ -119,86 +114,93 @@ codeunit 6151101 "NPR NpRi Data Collection Mgt."
 
     procedure GetTableView(TableViewName: Text; var NpRiReimbursementTemplate: Record "NPR NpRi Reimbursement Templ."; var TableView: Text): Boolean
     var
-        XMLDOMMgt: Codeunit "XML DOM Management";
         InStream: InStream;
-        XmlDoc: DotNet "NPRNetXmlDocument";
-        XmlElement: DotNet NPRNetXmlElement;
+        XMLDoc: XmlDocument;
+
+        XMLNode: XmlNode;
     begin
         if not NpRiReimbursementTemplate."Data Collection Filters".HasValue then
             exit(false);
 
         NpRiReimbursementTemplate.CalcFields("Data Collection Filters");
         NpRiReimbursementTemplate."Data Collection Filters".CreateInStream(InStream);
-        XmlDoc := XmlDoc.XmlDocument;
-        XmlDoc.Load(InStream);
+        XmlDocument.ReadFrom(InStream, XMLDoc);
 
-        if not XMLDOMMgt.FindNode(XmlDoc.DocumentElement, 'DataItems/DataItem[@name="' + TableViewName + '"]', XmlElement) then
-            exit(false);
-        TableView := XmlElement.InnerText;
+        IF not XMLDoc.SelectSingleNode('DataItems/DataItem[@name="' + TableViewName + '"]', XMLNode) then
+            exit;
+        TableView := XMLNode.AsXmlElement().InnerText;
 
         exit(true);
     end;
 
     local procedure SaveTableView(RecRef: RecordRef; RecRef2: RecordRef; var NpRiReimbursementTemplate: Record "NPR NpRi Reimbursement Templ."; var FilterPageBuilder: FilterPageBuilder)
     var
-        XMLDOMMgt: Codeunit "XML DOM Management";
-        DataItemXmlNode: DotNet NPRNetXmlNode;
-        DataItemsXmlNode: DotNet NPRNetXmlNode;
-        XmlDoc: DotNet "NPRNetXmlDocument";
-        ReportParametersXmlNode: DotNet NPRNetXmlNode;
+        XMLDoc: XmlDocument;
+        XMLDec: XmlDeclaration;
+        DataItemXmlElem: XmlElement;
+        DataItemsXmlElem: XmlElement;
+        ReportParametersXmlElem: XmlElement;
         OutStream: OutStream;
         TableViewName: Text;
         Summary: Text;
     begin
-        XmlDoc := XmlDoc.XmlDocument;
+        XMLDoc := XmlDocument.Create();
+        XMLDec := XmlDeclaration.Create('1.0', 'utf-8', 'yes');
+        XMLDoc.SetDeclaration(XMLDec);
 
-        XMLDOMMgt.AddRootElement(XmlDoc, 'ReportParameters', ReportParametersXmlNode);
-        XMLDOMMgt.AddDeclaration(XmlDoc, '1.0', 'utf-8', 'yes');
+        ReportParametersXmlElem := XmlElement.Create('ReportParameters');
 
-        XMLDOMMgt.AddElement(ReportParametersXmlNode, 'DataItems', '', '', DataItemsXmlNode);
+        DataItemsXmlElem := XmlElement.Create('DataItems');
+        ReportParametersXmlElem.Add(DataItemsXmlElem);
 
         if RecRef.Number > 0 then begin
             TableViewName := GetTableViewName(RecRef);
-            XMLDOMMgt.AddElement(DataItemsXmlNode, 'DataItem', FilterPageBuilder.GetView(TableViewName, false), '', DataItemXmlNode);
-            XMLDOMMgt.AddAttribute(DataItemXmlNode, 'name', TableViewName);
+
+            DataItemXmlElem := XmlElement.Create('DataItem');
+            DataItemXmlElem.Add(FilterPageBuilder.GetView(TableViewName, false));
+            DataItemXmlElem.SetAttribute('name', TableViewName);
 
             RecRef.SetView(FilterPageBuilder.GetView(TableViewName, false));
             Summary := RecRef.GetFilters;
+
+            DataItemsXmlElem.Add(DataItemXmlElem);
         end;
         if RecRef2.Number > 0 then begin
             TableViewName := GetTableViewName(RecRef2);
-            XMLDOMMgt.AddElement(DataItemsXmlNode, 'DataItem', FilterPageBuilder.GetView(TableViewName, false), '', DataItemXmlNode);
-            XMLDOMMgt.AddAttribute(DataItemXmlNode, 'name', TableViewName);
+
+            DataItemXmlElem := XmlElement.Create('DataItem');
+            DataItemXmlElem.Add(FilterPageBuilder.GetView(TableViewName, false));
+            DataItemXmlElem.SetAttribute('name', TableViewName);
 
             if Summary <> '' then
                 Summary += ', ';
             RecRef2.SetView(FilterPageBuilder.GetView(TableViewName, false));
             Summary += RecRef2.GetFilters;
+
+            DataItemsXmlElem.Add(DataItemXmlElem)
         end;
 
         Clear(NpRiReimbursementTemplate."Data Collection Filters");
+
         NpRiReimbursementTemplate."Data Collection Filters".CreateOutStream(OutStream);
-        XmlDoc.Save(OutStream);
+
+        XMLDoc.Add(ReportParametersXmlElem);
+        XMLDoc.WriteTo(OutStream);
+
         NpRiReimbursementTemplate."Data Collection Summary" := CopyStr(Summary, 1, MaxStrLen(NpRiReimbursementTemplate."Data Collection Summary"));
         NpRiReimbursementTemplate.Modify(true);
     end;
 
-    local procedure "--- Data Collect"()
-    begin
-    end;
+    //Data Collect
 
     procedure RunDataCollections(var NpRiReimbursement: Record "NPR NpRi Reimbursement")
     begin
         if NpRiReimbursement.FindSet then
             repeat
-                //-NPR5.54 [382066]
-                //RunDataCollection(NpRiReimbursement);
-                //COMMIT;
                 if not NpRiReimbursement.Deactivated then begin
                     RunDataCollection(NpRiReimbursement);
                     Commit;
                 end;
-            //+NPR5.54 [382066]
             until NpRiReimbursement.Next = 0;
     end;
 
@@ -301,9 +303,7 @@ codeunit 6151101 "NPR NpRi Data Collection Mgt."
         exit(NpRiReimbursementEntry2.FindFirst);
     end;
 
-    local procedure "--- Aux"()
-    begin
-    end;
+    //Aux
 
     procedure UseWindow(): Boolean
     begin

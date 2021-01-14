@@ -1,29 +1,28 @@
 page 6151101 "NPR NpRi Reimbursement Templ."
 {
-    // NPR5.44/MHA /20180723  CASE 320133 Object Created - NaviPartner Reimbursement
 
     Caption = 'Reimbursement Templates';
     PageType = List;
     SourceTable = "NPR NpRi Reimbursement Templ.";
     UsageCategory = Administration;
-
+    ApplicationArea = All;
     layout
     {
         area(content)
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Data Collection Module"; "Data Collection Module")
+                field("Data Collection Module"; Rec."Data Collection Module")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Data Collection Module field';
@@ -33,18 +32,18 @@ page 6151101 "NPR NpRi Reimbursement Templ."
                         SetHasDataCollectionFilters();
                     end;
                 }
-                field("Data Collection Description"; "Data Collection Description")
+                field("Data Collection Description"; Rec."Data Collection Description")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Data Collection Description field';
                 }
-                field("Data Collection Summary"; "Data Collection Summary")
+                field("Data Collection Summary"; Rec."Data Collection Summary")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Data Collection Summary field';
                 }
-                field("Reimbursement Module"; "Reimbursement Module")
+                field("Reimbursement Module"; Rec."Reimbursement Module")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Reimbursement Module field';
@@ -54,18 +53,18 @@ page 6151101 "NPR NpRi Reimbursement Templ."
                         SetHasReimbursementParameters();
                     end;
                 }
-                field("Reimbursement Description"; "Reimbursement Description")
+                field("Reimbursement Description"; Rec."Reimbursement Description")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Reimbursement Description field';
                 }
-                field("Reimbursement Summary"; "Reimbursement Summary")
+                field("Reimbursement Summary"; Rec."Reimbursement Summary")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Reimbursement Summary field';
                 }
-                field("Posting Description"; "Posting Description")
+                field("Posting Description"; Rec."Posting Description")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Posting Description field';

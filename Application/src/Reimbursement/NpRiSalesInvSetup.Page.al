@@ -1,12 +1,8 @@
 page 6151110 "NPR NpRi Sales Inv. Setup"
 {
-    // NPR5.53/MHA /20191104  CASE 364131 Object Created - NaviPartner Reimbursement - Sales Invoice
-
     Caption = 'Sales Invoice Reimbursement Setup';
     PageType = Card;
-    UsageCategory = Administration;
     SourceTable = "NPR NpRi Sales Inv. Setup";
-
     layout
     {
         area(content)
@@ -16,12 +12,12 @@ page 6151110 "NPR NpRi Sales Inv. Setup"
                 group(Control6014407)
                 {
                     ShowCaption = false;
-                    field("Customer No."; "Customer No.")
+                    field("Customer No."; Rec."Customer No.")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Customer No. field';
                     }
-                    field("Salesperson Code"; "Salesperson Code")
+                    field("Salesperson Code"; Rec."Salesperson Code")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Salesperson Code field';
@@ -30,7 +26,7 @@ page 6151110 "NPR NpRi Sales Inv. Setup"
                 group(Control6014408)
                 {
                     ShowCaption = false;
-                    field("Invoice per"; "Invoice per")
+                    field("Invoice per"; Rec."Invoice per")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Invoice per field';
@@ -38,14 +34,14 @@ page 6151110 "NPR NpRi Sales Inv. Setup"
                     group(Control6014406)
                     {
                         ShowCaption = false;
-                        Visible = "Invoice per" = "Invoice per"::Document;
-                        field("Invoice Posting Date"; "Invoice Posting Date")
+                        Visible = Rec."Invoice per" = Rec."Invoice per"::Document;
+                        field("Invoice Posting Date"; Rec."Invoice Posting Date")
                         {
                             ApplicationArea = All;
                             ToolTip = 'Specifies the value of the Invoice Posting Date field';
                         }
                     }
-                    field("Post Immediately"; "Post Immediately")
+                    field("Post Immediately"; Rec."Post Immediately")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Post Immediately field';
@@ -59,10 +55,6 @@ page 6151110 "NPR NpRi Sales Inv. Setup"
                 ApplicationArea = All;
             }
         }
-    }
-
-    actions
-    {
     }
 }
 

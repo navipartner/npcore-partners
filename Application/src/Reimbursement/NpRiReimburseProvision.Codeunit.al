@@ -1,20 +1,11 @@
 codeunit 6151105 "NPR NpRi Reimburse Provision"
 {
-    // NPR5.44/MHA /20180723  CASE 320133 Object Created - NaviPartner Reimbursement
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         Text000: Label 'Post percentage of Data Collection Amount to G/L';
 
-    local procedure "--- Discover"()
-    begin
-    end;
+    // Discover
 
-    [EventSubscriber(ObjectType::Codeunit, 6151100, 'DiscoverModules', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRi Setup Mgt.", 'DiscoverModules', '', true, true)]
     local procedure DiscoverProvision(var NpRiModule: Record "NPR NpRi Reimbursement Module")
     begin
         if NpRiModule.Get(ProvisionCode()) then
@@ -33,7 +24,7 @@ codeunit 6151105 "NPR NpRi Reimburse Provision"
         exit('PROVISION');
     end;
 
-    [EventSubscriber(ObjectType::Table, 6151101, 'OnBeforeDeleteEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Codeunit::"NPR NpRi Data Collection Mgt.", 'OnBeforeDeleteEvent', '', true, true)]
     local procedure OnBeforeDeleteTemplate(var Rec: Record "NPR NpRi Reimbursement Templ."; RunTrigger: Boolean)
     var
         NpRiProvisionSetup: Record "NPR NpRi Provision Setup";
@@ -45,11 +36,8 @@ codeunit 6151105 "NPR NpRi Reimburse Provision"
             NpRiProvisionSetup.Delete(RunTrigger);
     end;
 
-    local procedure "--- Setup Parameters"()
-    begin
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, 6151102, 'HasTemplateParameters', '', true, true)]
+    //Setup Parameters
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRi Reimbursement Mgt.", 'HasTemplateParameters', '', true, true)]
     procedure HasTemplateParameters(NpRiReimbursementTemplate: Record "NPR NpRi Reimbursement Templ."; var HasParameters: Boolean)
     begin
         if NpRiReimbursementTemplate."Reimbursement Module" <> ProvisionCode() then
@@ -58,7 +46,7 @@ codeunit 6151105 "NPR NpRi Reimburse Provision"
         HasParameters := true;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151102, 'SetupTemplateParameters', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRi Reimbursement Mgt.", 'SetupTemplateParameters', '', true, true)]
     procedure SetupTemplateParameters(var NpRiReimbursementTemplate: Record "NPR NpRi Reimbursement Templ.")
     var
         NpRiProvisionSetup: Record "NPR NpRi Provision Setup";
@@ -90,11 +78,9 @@ codeunit 6151105 "NPR NpRi Reimburse Provision"
         NpRiReimbursementTemplate.Modify(true);
     end;
 
-    local procedure "--- Reimbursement"()
-    begin
-    end;
+    //Reimbursement
 
-    [EventSubscriber(ObjectType::Codeunit, 6151102, 'OnRunReimbursement', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRi Reimbursement Mgt.", 'OnRunReimbursement', '', true, true)]
     local procedure OnRunReimbursement(var NpRiReimbursement: Record "NPR NpRi Reimbursement"; var NpRiReimbursementEntryApply: Record "NPR NpRi Reimbursement Entry"; var Handled: Boolean)
     begin
         if NpRiReimbursement."Reimbursement Module" <> ProvisionCode() then
@@ -229,10 +215,7 @@ codeunit 6151105 "NPR NpRi Reimburse Provision"
         NpRiReimbursementEntryApply.Modify(true);
     end;
 
-    local procedure "--- Aux"()
-    begin
-    end;
-
+    //Aux
     local procedure CurrCodeunitId(): Integer
     begin
         exit(CODEUNIT::"NPR NpRi Reimburse Provision");

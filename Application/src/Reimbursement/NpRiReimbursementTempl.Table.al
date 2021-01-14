@@ -1,6 +1,5 @@
 table 6151101 "NPR NpRi Reimbursement Templ."
 {
-    // NPR5.44/MHA /20180723  CASE 320133 Object Created - NaviPartner Reimbursement
 
     Caption = 'Reimbursement Template';
     DataClassification = CustomerContent;
@@ -28,7 +27,7 @@ table 6151101 "NPR NpRi Reimbursement Templ."
         }
         field(105; "Data Collection Description"; Text[50])
         {
-            CalcFormula = Lookup ("NPR NpRi Reimbursement Module".Description WHERE(Code = FIELD("Data Collection Module")));
+            CalcFormula = Lookup("NPR NpRi Reimbursement Module".Description WHERE(Code = FIELD("Data Collection Module")));
             Caption = 'Data Collection Description';
             Editable = false;
             FieldClass = FlowField;
@@ -51,7 +50,7 @@ table 6151101 "NPR NpRi Reimbursement Templ."
         }
         field(205; "Reimbursement Description"; Text[50])
         {
-            CalcFormula = Lookup ("NPR NpRi Reimbursement Module".Description WHERE(Code = FIELD("Reimbursement Module")));
+            CalcFormula = Lookup("NPR NpRi Reimbursement Module".Description WHERE(Code = FIELD("Reimbursement Module")));
             Caption = 'Reimbursement Description';
             Editable = false;
             FieldClass = FlowField;
@@ -73,10 +72,6 @@ table 6151101 "NPR NpRi Reimbursement Templ."
         key(Key1; "Code")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 
     trigger OnDelete()

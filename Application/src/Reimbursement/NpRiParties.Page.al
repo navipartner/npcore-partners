@@ -1,40 +1,39 @@
 page 6151105 "NPR NpRi Parties"
 {
-    // NPR5.44/MHA /20180723  CASE 320133 Object Created - NaviPartner Reimbursement
 
     Caption = 'Reimbursement Parties';
     DelayedInsert = true;
     PageType = List;
     SourceTable = "NPR NpRi Party";
     UsageCategory = Lists;
-
+    ApplicationArea = All;
     layout
     {
         area(content)
         {
             repeater(Group)
             {
-                field("Party Type"; "Party Type")
+                field("Party Type"; Rec."Party Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Party Type field';
                 }
-                field("No."; "No.")
+                field("No."; Rec."No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the No. field';
                 }
-                field(Name; Name)
+                field(Name; Rec.Name)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Name field';
                 }
-                field("Reimburse every"; "Reimburse every")
+                field("Reimburse every"; Rec."Reimburse every")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Reimburse every field';
                 }
-                field("Next Posting Date Calculation"; "Next Posting Date Calculation")
+                field("Next Posting Date Calculation"; Rec."Next Posting Date Calculation")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Next Posting Date Calculation field';

@@ -1,24 +1,16 @@
 codeunit 6151107 "NPR NpRi Reim. Purch.Doc.Disc."
 {
-    // NPR5.46/MHA /20181002  CASE 323942 Object Created - NaviPartner Reimbursement - Purchase Document Discount
-    // NPR5.47/MHA /20181011  CASE 323942 Added Read/Modify Permission to Vendor Ledger Entry
 
     Permissions = TableData "Vendor Ledger Entry" = rm;
-
-    trigger OnRun()
-    begin
-    end;
 
     var
         Text000: Label 'Purchase Document Discount';
         Text001: Label 'Purchase Document Discount may only be applied to Vendor Ledger Entries';
         GeneralLedgerSetup: Record "General Ledger Setup";
 
-    local procedure "--- Discover"()
-    begin
-    end;
+    //Discover
 
-    [EventSubscriber(ObjectType::Codeunit, 6151100, 'DiscoverModules', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRi Setup Mgt.", 'DiscoverModules', '', true, true)]
     local procedure DiscoverPurchDocDiscCode(var NpRiModule: Record "NPR NpRi Reimbursement Module")
     begin
         if NpRiModule.Get(PurchDocDiscCode()) then
@@ -37,7 +29,7 @@ codeunit 6151107 "NPR NpRi Reim. Purch.Doc.Disc."
         exit('PURCH_DOC_DISCOUNT');
     end;
 
-    [EventSubscriber(ObjectType::Table, 6151101, 'OnBeforeDeleteEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Codeunit::"NPR NpRi Data Collection Mgt.", 'OnBeforeDeleteEvent', '', true, true)]
     local procedure OnBeforeDeleteTemplate(var Rec: Record "NPR NpRi Reimbursement Templ."; RunTrigger: Boolean)
     var
         NpRiPurchDocDiscSetup: Record "NPR NpRi Purch.Doc.Disc. Setup";
@@ -49,11 +41,9 @@ codeunit 6151107 "NPR NpRi Reim. Purch.Doc.Disc."
             NpRiPurchDocDiscSetup.Delete(RunTrigger);
     end;
 
-    local procedure "--- Setup Parameters"()
-    begin
-    end;
+    //Setup Parameters
 
-    [EventSubscriber(ObjectType::Codeunit, 6151102, 'HasTemplateParameters', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRi Reimbursement Mgt.", 'HasTemplateParameters', '', true, true)]
     procedure HasTemplateParameters(NpRiReimbursementTemplate: Record "NPR NpRi Reimbursement Templ."; var HasParameters: Boolean)
     begin
         if NpRiReimbursementTemplate."Reimbursement Module" <> PurchDocDiscCode() then
@@ -62,7 +52,7 @@ codeunit 6151107 "NPR NpRi Reim. Purch.Doc.Disc."
         HasParameters := true;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151102, 'SetupTemplateParameters', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRi Reimbursement Mgt.", 'SetupTemplateParameters', '', true, true)]
     procedure SetupTemplateParameters(var NpRiReimbursementTemplate: Record "NPR NpRi Reimbursement Templ.")
     var
         NpRiPurchDocDiscSetup: Record "NPR NpRi Purch.Doc.Disc. Setup";
@@ -94,11 +84,9 @@ codeunit 6151107 "NPR NpRi Reim. Purch.Doc.Disc."
         NpRiReimbursementTemplate.Modify(true);
     end;
 
-    local procedure "--- Reimbursement"()
-    begin
-    end;
+    //Reimbursement
 
-    [EventSubscriber(ObjectType::Codeunit, 6151102, 'OnRunReimbursement', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRi Reimbursement Mgt.", 'OnRunReimbursement', '', true, true)]
     local procedure OnRunReimbursement(var NpRiReimbursement: Record "NPR NpRi Reimbursement"; var NpRiReimbursementEntryApply: Record "NPR NpRi Reimbursement Entry"; var Handled: Boolean)
     begin
         if NpRiReimbursement."Reimbursement Module" <> PurchDocDiscCode() then
@@ -278,9 +266,7 @@ codeunit 6151107 "NPR NpRi Reim. Purch.Doc.Disc."
         NpRiReimbursementEntryApply.Modify(true);
     end;
 
-    local procedure "--- Aux"()
-    begin
-    end;
+    //Aux
 
     local procedure CurrCodeunitId(): Integer
     begin

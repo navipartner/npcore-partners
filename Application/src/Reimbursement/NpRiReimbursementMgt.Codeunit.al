@@ -1,9 +1,5 @@
 codeunit 6151102 "NPR NpRi Reimbursement Mgt."
 {
-    // NPR5.44/MHA /20180723  CASE 320133 Object Created - NaviPartner Reimbursement
-    // NPR5.46/MHA /20181002  CASE 323942 Corrected Exit clause on "Reimbursement Date" in RunReimbursement()
-    // NPR5.53/MHA /20191105  CASE 364131 Next Reimbursement Date should still be calculated even when no open entries
-    // NPR5.54/JKL /20191213 CASE 382066  added code to omit deactivated reinbursments
 
     TableNo = "NPR NpRi Reimbursement";
 
@@ -17,9 +13,7 @@ codeunit 6151102 "NPR NpRi Reimbursement Mgt."
         Text001: Label 'Cancel Manual Application';
         Text002: Label 'Invalid Reimbursement module %1';
 
-    local procedure "--- Setup Parameters"()
-    begin
-    end;
+    //Setup Parameters
 
     [IntegrationEvent(false, false)]
     procedure HasTemplateParameters(NpRiReimbursementTemplate: Record "NPR NpRi Reimbursement Templ."; var HasParameters: Boolean)
@@ -31,9 +25,7 @@ codeunit 6151102 "NPR NpRi Reimbursement Mgt."
     begin
     end;
 
-    local procedure "--- Manual Apply"()
-    begin
-    end;
+    //Manual Apply
 
     procedure ManualApplyEntries(var NpRiReimbursementEntry: Record "NPR NpRi Reimbursement Entry")
     var
@@ -102,9 +94,7 @@ codeunit 6151102 "NPR NpRi Reimbursement Mgt."
         exit(xNpRiReimbursementEntry."Template Code" <> NpRiReimbursementEntry."Template Code");
     end;
 
-    local procedure "--- Cancel Manual Application"()
-    begin
-    end;
+    //Cancel Manual Application
 
     procedure CancelManualApplication(var NpRiReimbursementEntry: Record "NPR NpRi Reimbursement Entry")
     var
@@ -163,22 +153,15 @@ codeunit 6151102 "NPR NpRi Reimbursement Mgt."
         NpRiReimbursementEntryApply.Modify;
     end;
 
-    local procedure "--- Reimbursement"()
-    begin
-    end;
-
+    //Reimbursement
     procedure RunReimbursements(var NpRiReimbursement: Record "NPR NpRi Reimbursement")
     begin
         if NpRiReimbursement.FindSet then
             repeat
-                //-NPR5.54 [382066]
-                //RunReimbursement(NpRiReimbursement);
-                //COMMIT;
                 if not NpRiReimbursement.Deactivated then begin
                     RunReimbursement(NpRiReimbursement);
                     Commit;
                 end;
-            //+NPR5.54 [382066]
             until NpRiReimbursement.Next = 0;
     end;
 
@@ -192,7 +175,6 @@ codeunit 6151102 "NPR NpRi Reimbursement Mgt."
     begin
         if not NpRiParty.Get(NpRiReimbursement."Party Type", NpRiReimbursement."Party No.") then
             exit;
-        //-NPR5.53 [364131]
         if not FindOpenEntries(NpRiReimbursement, NpRiReimbursementEntry) then begin
             NpRiReimbursement."Last Posting Date" := NpRiReimbursement."Posting Date";
             NpRiReimbursement."Last Reimbursement at" := CurrentDateTime;
@@ -206,13 +188,10 @@ codeunit 6151102 "NPR NpRi Reimbursement Mgt."
 
             exit;
         end;
-        //+NPR5.53 [364131]
-        //-NPR5.46 [323942]
         if NpRiReimbursement."Reimbursement Date" = 0D then
             exit;
         if NpRiReimbursement."Reimbursement Date" > Today then
             exit;
-        //+NPR5.46 [323942]
 
         NpRiReimbursement.TestField("Posting Date");
         ReimburseApplyEntries(NpRiReimbursement, NpRiReimbursementEntry, NpRiReimbursementEntryApply);

@@ -1,116 +1,111 @@
 page 6151102 "NPR NpRi Reimbursements"
 {
-    // NPR5.44/MHA /20180723  CASE 320133 Object Created - NaviPartner Reimbursement
-    // NPR5.46/MHA /20181002  CASE 323942 Set DelayedInsert to Yes
-    // NPR5.54/JKL /20191213  CASE 382066 New field 310 Deactivated added
-    // NPR5.54/BHR /20200306  CASE 385924 Add fields 315, 316
-
     Caption = 'Reimbursements';
     DelayedInsert = true;
     PageType = List;
     RefreshOnActivate = true;
     SourceTable = "NPR NpRi Reimbursement";
     UsageCategory = Lists;
-
+    ApplicationArea = All;
     layout
     {
         area(content)
         {
             repeater(Group)
             {
-                field("Party Type"; "Party Type")
+                field("Party Type"; Rec."Party Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Party Type field';
                 }
-                field("Party No."; "Party No.")
+                field("Party No."; Rec."Party No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Party No. field';
                 }
-                field("Template Code"; "Template Code")
+                field("Template Code"; Rec."Template Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Template Code field';
                 }
-                field("Data Collection Module"; "Data Collection Module")
+                field("Data Collection Module"; Rec."Data Collection Module")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Data Collection Module field';
                 }
-                field("Data Collection Company"; "Data Collection Company")
+                field("Data Collection Company"; Rec."Data Collection Company")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Data Collection Company field';
                 }
-                field("Data Collection Summary"; "Data Collection Summary")
+                field("Data Collection Summary"; Rec."Data Collection Summary")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Data Collection Summary field';
                 }
-                field("From Date"; "From Date")
+                field("From Date"; Rec."From Date")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the From Date field';
                 }
-                field("To Date"; "To Date")
+                field("To Date"; Rec."To Date")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the To Date field';
                 }
-                field("Last Data Collect Entry No."; "Last Data Collect Entry No.")
+                field("Last Data Collect Entry No."; Rec."Last Data Collect Entry No.")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Last Data Collect Entry No. field';
                 }
-                field("Last Data Collection at"; "Last Data Collection at")
+                field("Last Data Collection at"; Rec."Last Data Collection at")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Last Data Collection at field';
                 }
-                field("Reimbursement Module"; "Reimbursement Module")
+                field("Reimbursement Module"; Rec."Reimbursement Module")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Reimbursement Module field';
                 }
-                field("Reimbursement Summary"; "Reimbursement Summary")
+                field("Reimbursement Summary"; Rec."Reimbursement Summary")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Reimbursement Summary field';
                 }
-                field("Last Posting Date"; "Last Posting Date")
+                field("Last Posting Date"; Rec."Last Posting Date")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Last Posting Date field';
                 }
-                field("Last Reimbursement at"; "Last Reimbursement at")
+                field("Last Reimbursement at"; Rec."Last Reimbursement at")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Last Reimbursement at field';
                 }
-                field("Reimbursement Date"; "Reimbursement Date")
+                field("Reimbursement Date"; Rec."Reimbursement Date")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Reimbursement Date field';
                 }
-                field("Posting Date"; "Posting Date")
+                field("Posting Date"; Rec."Posting Date")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Posting Date field';
                 }
-                field(Balance; Balance)
+                field(Balance; Rec.Balance)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Balance field';
                 }
-                field(Deactivated; Deactivated)
+                field(Deactivated; Rec.Deactivated)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Deactivated field';
