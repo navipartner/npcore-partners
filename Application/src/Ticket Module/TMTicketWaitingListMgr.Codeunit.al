@@ -1,9 +1,5 @@
 codeunit 6151139 "NPR TM Ticket WaitingList Mgr."
 {
-    // TM1.45/TSA /20191204 CASE 380754 Initial Version
-    // TM90.1.46/TSA /20200304 CASE 399138 Provided admission code from admission schedule entry when missing on request
-
-
     trigger OnRun()
     begin
 
@@ -81,10 +77,8 @@ codeunit 6151139 "NPR TM Ticket WaitingList Mgr."
         if (AdmissionScheduleEntry.FindFirst()) then
             TicketWaitingList."Schedule Entry Description" := StrSubstNo('%1 - %2', AdmissionScheduleEntry."Admission Start Date", AdmissionScheduleEntry."Admission Start Time");
 
-        //-TM90.1.46 [399138]
         if (TicketReservationRequest."Admission Code" = '') then
             TicketReservationRequest."Admission Code" := AdmissionScheduleEntry."Admission Code";
-        //-TM90.1.46 [399138]
 
         TicketWaitingList."External Schedule Entry No." := TicketReservationRequest."External Adm. Sch. Entry No.";
         TicketWaitingList."Admission Code" := TicketReservationRequest."Admission Code";
@@ -106,6 +100,9 @@ codeunit 6151139 "NPR TM Ticket WaitingList Mgr."
 
         TicketReservationRequestUpdate.Get(TicketReservationRequest."Entry No.");
         TicketReservationRequestUpdate."Request Status" := TicketReservationRequestUpdate."Request Status"::WAITINGLIST;
+        TicketReservationRequestUpdate."Receipt No." := '';
+        TicketReservationRequestUpdate."External Order No." := '';
+        TicketReservationRequestUpdate."Line No." := 0;
         TicketReservationRequestUpdate.Modify();
     end;
 
@@ -440,7 +437,7 @@ codeunit 6151139 "NPR TM Ticket WaitingList Mgr."
     begin
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6059784, 'OnDetailedTicketEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR TM Ticket Management", 'OnDetailedTicketEvent', '', true, true)]
     local procedure OnDetailedTicketEvent(DetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry")
     var
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
@@ -462,9 +459,9 @@ codeunit 6151139 "NPR TM Ticket WaitingList Mgr."
         if (not WaitingListSetup.Get(Admission."Waiting List Setup Code")) then
             exit;
 
-        // NOTE: this occures during posting, so sending should be false (sending SMS requires a commit)
+        // NOTE: this occurs during posting, so sending should be false (sending SMS requires a commit)
         if (DetTicketAccessEntry.Type = DetTicketAccessEntry.Type::CANCELED_ADMISSION) then begin
-            ; // Event is not needed as we are not tiggering notification directly by a revoke
+            ; // Event is not needed as we are not triggering notification directly by a revoke
         end;
     end;
 }
