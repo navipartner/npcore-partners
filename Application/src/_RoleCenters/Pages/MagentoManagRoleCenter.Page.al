@@ -55,10 +55,6 @@ page 6151480 "NPR Magento Manag. Role Center"
                 {
                     ApplicationArea = All;
                 }
-                part(Control6151409; "NPR RSS Reader Activ.")
-                {
-                    ApplicationArea = All;
-                }
             }
         }
     }

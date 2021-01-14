@@ -1,7 +1,7 @@
 table 6059995 "NPR RSS Reader Activity"
 {
-    // NPR5.25/TS/20160510  CASE 233762 Added Published At as secondary key
-
+    ObsoleteState = Removed;
+    ObsoleteReason = 'We dont use RSS Feed any more.';
     Caption = 'RSS Reader Activity';
     DataClassification = CustomerContent;
 
@@ -37,10 +37,6 @@ table 6059995 "NPR RSS Reader Activity"
         key(Key2; "Published At")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 

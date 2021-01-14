@@ -51,10 +51,6 @@ page 6059980 "NPR Sales Person Role Center"
                 {
                     ApplicationArea = All;
                 }
-                part(Control31; "NPR RSS Reader Activ.")
-                {
-                    ApplicationArea = All;
-                }
                 part(Control6014400; "NPR My Reports")
                 {
                     ApplicationArea = All;

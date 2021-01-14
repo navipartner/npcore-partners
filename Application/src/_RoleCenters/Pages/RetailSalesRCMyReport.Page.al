@@ -48,11 +48,7 @@ page 6014619 "NPR Retail - Sales RC MyReport"
                 {
                     ApplicationArea = All;
                 }
-                part(Control6014405; "NPR RSS Reader Activ.")
-                {
-                    Visible = false;
-                    ApplicationArea = All;
-                }
+
                 part(Control6014403; "NPR Retail Sales Chart by Shop")
                 {
                     ApplicationArea = All;
