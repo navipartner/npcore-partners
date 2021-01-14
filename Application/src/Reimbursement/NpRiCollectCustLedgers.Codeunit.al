@@ -1,22 +1,12 @@
 codeunit 6151104 "NPR NpRi Collect Cust. Ledgers"
 {
-    // NPR5.44/MHA /20180723  CASE 320133 Object Created - NaviPartner Reimbursement
-    // NPR5.54/BHR /20200306  CASE 385924 Added date filter
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         Text000: Label 'Customer Ledger Entries (Invoice and Credit Memo)';
         Text001: Label 'Collecting Customer Ledger Entries: @1@@@@@@@@@@@@@@@@@@';
 
-    local procedure "--- Discover"()
-    begin
-    end;
+    //Discover
 
-    [EventSubscriber(ObjectType::Codeunit, 6151100, 'DiscoverModules', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRi Setup Mgt.", 'DiscoverModules', '', true, true)]
     local procedure DiscoverCustomerLedgers(var NpRiModule: Record "NPR NpRi Reimbursement Module")
     begin
         if NpRiModule.Get(CustomerLedgerCode()) then
@@ -35,11 +25,9 @@ codeunit 6151104 "NPR NpRi Collect Cust. Ledgers"
         exit('CUST_LEDGERS');
     end;
 
-    local procedure "--- Setup Filters"()
-    begin
-    end;
+    //Setup Filters
 
-    [EventSubscriber(ObjectType::Codeunit, 6151101, 'HasTemplateFilters', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRi Data Collection Mgt.", 'HasTemplateFilters', '', true, true)]
     procedure HasTemplateFilters(NpRiReimbursementTemplate: Record "NPR NpRi Reimbursement Templ."; var HasFilters: Boolean)
     begin
         if NpRiReimbursementTemplate."Data Collection Module" <> CustomerLedgerCode() then
@@ -48,7 +36,7 @@ codeunit 6151104 "NPR NpRi Collect Cust. Ledgers"
         HasFilters := true;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151101, 'SetupTemplateFilters', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRi Data Collection Mgt.", 'SetupTemplateFilters', '', true, true)]
     procedure SetupTemplateFilters(var NpRiReimbursementTemplate: Record "NPR NpRi Reimbursement Templ.")
     var
         CustLedgEntry: Record "Cust. Ledger Entry";
@@ -66,11 +54,9 @@ codeunit 6151104 "NPR NpRi Collect Cust. Ledgers"
         NpRiDataCollectionMgt.RunRequestPage(NpRiReimbursementTemplate, RecRef, RecRef2, TempField);
     end;
 
-    local procedure "--- Party Mgt."()
-    begin
-    end;
+    //Party Mgt.
 
-    [EventSubscriber(ObjectType::Codeunit, 6151100, 'SetupPartyTypeTableNoLookup', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRi Setup Mgt.", 'SetupPartyTypeTableNoLookup', '', true, true)]
     local procedure OnSetupPartyTypeTableNoLookup(var TempTableMetadata: Record "Table Metadata" temporary)
     var
         TableMetadata: Record "Table Metadata";
@@ -85,11 +71,9 @@ codeunit 6151104 "NPR NpRi Collect Cust. Ledgers"
         TempTableMetadata.Insert;
     end;
 
-    local procedure "--- Data Collect"()
-    begin
-    end;
+    //Data Collect
 
-    [EventSubscriber(ObjectType::Codeunit, 6151101, 'OnRunDataCollection', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRi Data Collection Mgt.", 'OnRunDataCollection', '', true, true)]
     local procedure OnRunDataCollection(var Sender: Codeunit "NPR NpRi Data Collection Mgt."; var NpRiReimbursement: Record "NPR NpRi Reimbursement"; var Handled: Boolean)
     begin
         if NpRiReimbursement."Data Collection Module" <> CustomerLedgerCode() then
@@ -150,7 +134,6 @@ codeunit 6151104 "NPR NpRi Collect Cust. Ledgers"
         CustLedgEntry.SetFilter("Document Type", '%1|%2', CustLedgEntry."Document Type"::Invoice, CustLedgEntry."Document Type"::"Credit Memo");
         CustLedgEntry.FilterGroup(41);
         CustLedgEntry.SetFilter("Entry No.", '>%1', NpRiReimbursement."Last Data Collect Entry No.");
-        //-NPR5.54 [385924]
         if NpRiReimbursement."From Date" <> 0D then
             DataCollectionDatefilter := Format(NpRiReimbursement."From Date") + '..';
 
@@ -164,7 +147,6 @@ codeunit 6151104 "NPR NpRi Collect Cust. Ledgers"
         if DataCollectionDatefilter <> '' then
             CustLedgEntry.SetFilter("Posting Date", DataCollectionDatefilter);
 
-        //+NPR5.54 [385924]
         if NpRiParty.Get(NpRiReimbursement."Party Type", NpRiReimbursement."Party No.") then begin
             NpRiParty.CalcFields("Table No.");
             if NpRiParty."Table No." = DATABASE::Customer then begin
@@ -186,9 +168,7 @@ codeunit 6151104 "NPR NpRi Collect Cust. Ledgers"
         NpRiReimbursementEntry.Modify(true);
     end;
 
-    local procedure "--- Aux"()
-    begin
-    end;
+    //Aux
 
     local procedure CurrCodeunitId(): Integer
     begin

@@ -1,7 +1,5 @@
 table 6151111 "NPR NpRi Sales Inv. Setup Line"
 {
-    // NPR5.53/MHA /20191104  CASE 364131 Object Created - NaviPartner Reimbursement - Sales Invoice
-
     Caption = 'Sales Invoice Reimbursement Setup Line';
     DataClassification = CustomerContent;
 
@@ -143,10 +141,6 @@ table 6151111 "NPR NpRi Sales Inv. Setup Line"
         key(Key1; "Template Code", "Line No.")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 

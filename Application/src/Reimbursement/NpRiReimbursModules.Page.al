@@ -1,53 +1,47 @@
 page 6151100 "NPR NpRi Reimburs. Modules"
 {
-    // NPR5.44/MHA /20180723  CASE 320133 Object Created - NaviPartner Reimbursement
-
     Caption = 'Reimbursement Modules';
     InsertAllowed = false;
     PageType = List;
     SourceTable = "NPR NpRi Reimbursement Module";
     UsageCategory = Administration;
-
+    ApplicationArea = All;
     layout
     {
         area(content)
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field(Type; Type)
+                field(Type; Rec.Type)
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Type field';
                 }
-                field("Subscriber Codeunit ID"; "Subscriber Codeunit ID")
+                field("Subscriber Codeunit ID"; Rec."Subscriber Codeunit ID")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Subscriber Codeunit ID field';
                 }
-                field("Subscriber Codeunit Name"; "Subscriber Codeunit Name")
+                field("Subscriber Codeunit Name"; Rec."Subscriber Codeunit Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Subscriber Codeunit Name field';
                 }
             }
         }
-    }
-
-    actions
-    {
     }
 
     trigger OnOpenPage()

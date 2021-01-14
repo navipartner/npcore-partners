@@ -17,7 +17,7 @@ codeunit 6151110 "NPR NpRi Reim. Sales Inv."
 
     //--- Discover ---
 
-    [EventSubscriber(ObjectType::Codeunit, 6151100, 'DiscoverModules', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRi Setup Mgt.", 'DiscoverModules', '', true, true)]
     local procedure DiscoverSalesInv(var NpRiModule: Record "NPR NpRi Reimbursement Module")
     begin
         if NpRiModule.Get(ModuleCode()) then
@@ -36,7 +36,7 @@ codeunit 6151110 "NPR NpRi Reim. Sales Inv."
         exit('SALES_INVOICE');
     end;
 
-    [EventSubscriber(ObjectType::Table, 6151101, 'OnBeforeDeleteEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Codeunit::"NPR NpRi Data Collection Mgt.", 'OnBeforeDeleteEvent', '', true, true)]
     local procedure OnBeforeDeleteTemplate(var Rec: Record "NPR NpRi Reimbursement Templ."; RunTrigger: Boolean)
     var
         NpRiSalesInvSetup: Record "NPR NpRi Sales Inv. Setup";
@@ -50,7 +50,7 @@ codeunit 6151110 "NPR NpRi Reim. Sales Inv."
 
     //--- Setup Parameters ---
 
-    [EventSubscriber(ObjectType::Codeunit, 6151102, 'HasTemplateParameters', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRi Reimbursement Mgt.", 'HasTemplateParameters', '', true, true)]
     procedure HasTemplateParameters(NpRiReimbursementTemplate: Record "NPR NpRi Reimbursement Templ."; var HasParameters: Boolean)
     begin
         if NpRiReimbursementTemplate."Reimbursement Module" <> ModuleCode() then
@@ -59,7 +59,7 @@ codeunit 6151110 "NPR NpRi Reim. Sales Inv."
         HasParameters := true;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6151102, 'SetupTemplateParameters', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRi Reimbursement Mgt.", 'SetupTemplateParameters', '', true, true)]
     procedure SetupTemplateParameters(var NpRiReimbursementTemplate: Record "NPR NpRi Reimbursement Templ.")
     var
         NpRiSalesInvSetup: Record "NPR NpRi Sales Inv. Setup";
@@ -92,7 +92,7 @@ codeunit 6151110 "NPR NpRi Reim. Sales Inv."
 
     //--- Reimbursement ---
 
-    [EventSubscriber(ObjectType::Codeunit, 6151102, 'OnRunReimbursement', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRi Reimbursement Mgt.", 'OnRunReimbursement', '', true, true)]
     local procedure OnRunReimbursement(var NpRiReimbursement: Record "NPR NpRi Reimbursement"; var NpRiReimbursementEntryApply: Record "NPR NpRi Reimbursement Entry"; var Handled: Boolean)
     var
         NpRiSalesInvSetup: Record "NPR NpRi Sales Inv. Setup";
@@ -223,7 +223,7 @@ codeunit 6151110 "NPR NpRi Reim. Sales Inv."
         if NpRiReimbursementEntryApply.Find then;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 80, 'OnAfterPostSalesDoc', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnAfterPostSalesDoc', '', true, true)]
     local procedure OnAfterPostSalesInv(var SalesHeader: Record "Sales Header"; SalesInvHdrNo: Code[20]; CommitIsSuppressed: Boolean)
     var
         NpRiReimbursementTemplate: Record "NPR NpRi Reimbursement Templ.";
