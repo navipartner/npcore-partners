@@ -1,4 +1,4 @@
-codeunit 50003 "NPR Library - POS Master Data"
+codeunit 85002 "NPR Library - POS Master Data"
 {
     trigger OnRun()
     begin
