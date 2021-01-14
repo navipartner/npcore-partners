@@ -1,15 +1,5 @@
 codeunit 6151019 "NPR NpRv Module Valid.: Global"
 {
-    // NPR5.42/MHA /20180525  CASE 307022 Object created - Global Retail Voucher
-    // NPR5.48/MHA /20180921  CASE 302179 Replaced direct check on Voucher."In-Use Quantity" with CalcInUseQty
-    // NPR5.49/MHA /20190228  CASE 342811 Added Retail Voucher Partner functionality used with Cross Company Vouchers
-    // NPR5.51/MHA /20190705  CASE 361164 Updated Exception Message parsing
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         Text000: Label 'Validate Global Voucher';
         Text001: Label 'Voucher is being used';
@@ -18,17 +8,13 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
     [EventSubscriber(ObjectType::Table, 6151024, 'OnAfterInsertEvent', '', true, true)]
     local procedure OnInsertPartner(var Rec: Record "NPR NpRv Partner"; RunTrigger: Boolean)
     begin
-        //-NPR5.49 [342811]
         ValidateGlobalVoucherSetups(Rec);
-        //+NPR5.49 [342811]
     end;
 
     [EventSubscriber(ObjectType::Table, 6151024, 'OnAfterModifyEvent', '', true, true)]
     local procedure OnModifyPartner(var Rec: Record "NPR NpRv Partner"; var xRec: Record "NPR NpRv Partner"; RunTrigger: Boolean)
     begin
-        //-NPR5.49 [342811]
         ValidateGlobalVoucherSetups(Rec);
-        //+NPR5.49 [342811]
     end;
 
     local procedure ValidateGlobalVoucherSetups(NpRvPartner: Record "NPR NpRv Partner")
@@ -36,7 +22,6 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
         NpRvGlobalVoucherSetup: Record "NPR NpRv Global Vouch. Setup";
         NpRvVoucherType: Record "NPR NpRv Voucher Type";
     begin
-        //-NPR5.49 [342811]
         NpRvVoucherType.SetRange("Partner Code", NpRvPartner.Code);
         NpRvVoucherType.SetRange("Validate Voucher Module", ModuleCode());
         if not NpRvVoucherType.FindSet then
@@ -47,7 +32,6 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
                 if TryValidateGlobalVoucherSetup(NpRvGlobalVoucherSetup) then;
             end;
         until NpRvVoucherType.Next = 0;
-        //+NPR5.49 [342811]
     end;
 
     [TryFunction]
@@ -56,15 +40,16 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
         NpRvPartner: Record "NPR NpRv Partner";
         NpRvVoucherType: Record "NPR NpRv Voucher Type";
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
-        Credential: DotNet NPRNetNetworkCredential;
-        HttpWebRequest: DotNet NPRNetHttpWebRequest;
-        HttpWebResponse: DotNet NPRNetHttpWebResponse;
-        XmlDoc: DotNet "NPRNetXmlDocument";
-        XmlElement: DotNet NPRNetXmlElement;
-        WebException: DotNet NPRNetWebException;
+        XmlDomManagement: codeunit "XML DOM Management";
+        Client: HttpClient;
+        RequestContent: HttpContent;
+        ContentHeader: HttpHeaders;
+        Response: HttpResponseMessage;
+        Document: XmlDocument;
+        Node: XmlNode;
+        RequestXmlText: Text;
         ErrorMessage: Text;
     begin
-        //-NPR5.49 [342811]
         NpRvVoucherType.Get(NpRvGlobalVoucherSetup."Voucher Type");
         if NpRvVoucherType."Validate Voucher Module" <> ModuleCode() then
             exit;
@@ -72,8 +57,7 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
         NpRvPartner.Get(NpRvVoucherType."Partner Code");
         NpRvGlobalVoucherSetup.TestField("Service Url");
 
-        XmlDoc := XmlDoc.XmlDocument;
-        XmlDoc.LoadXml(
+        RequestXmlText :=
           '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">' +
              '<soapenv:Body>' +
                '<UpsertPartners xmlns="urn:microsoft-dynamics-schemas/codeunit/' + GetServiceName(NpRvGlobalVoucherSetup) + '">' +
@@ -90,41 +74,31 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
                  '</retail_voucher_partners>' +
                '</UpsertPartners>' +
             '</soapenv:Body>' +
-          '</soapenv:Envelope>'
-        );
+          '</soapenv:Envelope>';
 
-        HttpWebRequest := HttpWebRequest.Create(NpRvGlobalVoucherSetup."Service Url");
-        HttpWebRequest.UseDefaultCredentials(false);
-        Credential := Credential.NetworkCredential(NpRvGlobalVoucherSetup."Service Username", NpRvGlobalVoucherSetup."Service Password");
-        HttpWebRequest.Credentials(Credential);
-        HttpWebRequest.Method := 'POST';
-        HttpWebRequest.ContentType := 'text/xml; charset=utf-8';
-        HttpWebRequest.Headers.Add('SOAPAction', 'UpsertPartners');
-        NpXmlDomMgt.SetTrustedCertificateValidation(HttpWebRequest);
+        RequestContent.WriteFrom(RequestXmlText);
+        RequestContent.GetHeaders(ContentHeader);
 
-        if NpXmlDomMgt.SendWebRequest(XmlDoc, HttpWebRequest, HttpWebResponse, WebException) then
+        ContentHeader.Clear();
+        ContentHeader.Remove('Content-Type');
+        ContentHeader.Add('Content-Type', 'text/xml; charset=utf-8');
+        ContentHeader.Add('SOAPAction', 'UpsertPartners');
+        ContentHeader.Remove('Connection');
+        ContentHeader := Client.DefaultRequestHeaders();
+
+        Client.UseWindowsAuthentication(NpRvGlobalVoucherSetup."Service Username", NpRvGlobalVoucherSetup."Service Password");
+        Client.Post(NpRvGlobalVoucherSetup."Service Url", RequestContent, Response);
+
+        if Response.IsSuccessStatusCode then
             exit;
 
-        //-NPR5.51 [361164]
-        ErrorMessage := NpXmlDomMgt.GetWebExceptionMessage(WebException);
-        //+NPR5.51 [361164]
-        if NpXmlDomMgt.TryLoadXml(ErrorMessage, XmlDoc) then begin
-            NpXmlDomMgt.RemoveNameSpaces(XmlDoc);
-            if NpXmlDomMgt.FindNode(XmlDoc.DocumentElement, '//faultstring', XmlElement) then begin
-                ErrorMessage := XmlElement.InnerText;
-                //-NPR5.51 [361164]
-                Error(CopyStr(ErrorMessage, 1, 1000));
-                //+NPR5.51 [361164]
-            end;
+        ErrorMessage := XmlDomManagement.RemoveNamespaces(Response.ReasonPhrase);
+        if XmlDocument.ReadFrom(ErrorMessage, Document) then begin
+            if NpXmlDomMgt.FindNode(Document.AsXmlNode(), '//faultstring', Node) then
+                ErrorMessage := Node.AsXmlElement.InnerText();
+            Error(CopyStr(ErrorMessage, 1, 1000));
         end;
-        //-NPR5.51 [361164]
         Error(CopyStr(ErrorMessage, 1, 1000));
-        //+NPR5.51 [361164]
-        //+NPR5.49 [342811]
-    end;
-
-    local procedure "--- Voucher Interface"()
-    begin
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6151011, 'OnInitVoucherModules', '', true, true)]
@@ -158,16 +132,11 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
         if not IsSubscriber(VoucherType) then
             exit;
 
-        //-NPR5.49 [342811]
         VoucherType.TestField("Partner Code");
-        //+NPR5.49 [342811]
         if not NpRvGlobalVoucherSetup.Get(VoucherType.Code) then begin
             NpRvGlobalVoucherSetup.Init;
             NpRvGlobalVoucherSetup."Voucher Type" := VoucherType.Code;
-            //-NPR5.49 [342811]
-            //NpRvGlobalVoucherSetup.INSERT;
             NpRvGlobalVoucherSetup.Insert(true);
-            //+NPR5.49 [342811]
         end;
 
         NpRvGlobalVoucherSetup.FilterGroup(2);
@@ -181,31 +150,21 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
     begin
         if Handled then
             exit;
-        //-NPR5.49 [342811]
-        // IF NOT IsSubscriber(VoucherType) THEN
-        //  EXIT;
-        //
-        // Handled := TRUE;
-        //
-        // ValidateVoucher(SalePOS,VoucherType,Voucher);
         if NpRvVoucherBuffer."Validate Voucher Module" <> ModuleCode() then
             exit;
 
         Handled := true;
 
         ReserveVoucher(NpRvVoucherBuffer);
-        //+NPR5.49 [342811]
     end;
 
     [EventSubscriber(ObjectType::Table, 6151015, 'OnBeforeDeleteEvent', '', true, true)]
     local procedure OnBeforeDeletePOSVoucher(var Rec: Record "NPR NpRv Sales Line"; RunTrigger: Boolean)
     begin
-        //-NPR5.49 [342811]
         if Rec.IsTemporary then
             exit;
 
         if TryCancelReservation(Rec) then;
-        //+NPR5.49 [342811]
     end;
 
     [TryFunction]
@@ -215,15 +174,16 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
         NpRvVoucherType: Record "NPR NpRv Voucher Type";
         SaleLinePOSReference: Record "NPR NpRv Sales Line Ref.";
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
-        Credential: DotNet NPRNetNetworkCredential;
-        HttpWebRequest: DotNet NPRNetHttpWebRequest;
-        HttpWebResponse: DotNet NPRNetHttpWebResponse;
-        XmlDoc: DotNet "NPRNetXmlDocument";
-        XmlElement: DotNet NPRNetXmlElement;
-        WebException: DotNet NPRNetWebException;
+        XmlDomManagement: Codeunit "XML DOM Management";
+        Client: HttpClient;
+        RequestContent: HttpContent;
+        ContentHeader: HttpHeaders;
+        Response: HttpResponseMessage;
+        Document: XmlDocument;
+        Node: XmlNode;
+        RequestXmlText: Text;
         ErrorMessage: Text;
     begin
-        //-NPR5.49 [342811]
         if not NpRvVoucherType.Get(NpRvSaleLinePOSVoucher."Voucher Type") then
             exit;
         if NpRvVoucherType."Validate Voucher Module" <> ModuleCode() then
@@ -233,8 +193,7 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
         if NpRvGlobalVoucherSetup."Service Url" = '' then
             exit;
 
-        XmlDoc := XmlDoc.XmlDocument;
-        XmlDoc.LoadXml(
+        RequestXmlText :=
           '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">' +
             '<soapenv:Body>' +
               '<CancelReserveVouchers xmlns="urn:microsoft-dynamics-schemas/codeunit/' + GetServiceName(NpRvGlobalVoucherSetup) + '">' +
@@ -248,30 +207,28 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
                 '</vouchers>' +
               '</CancelReserveVouchers>' +
             '</soapenv:Body>' +
-          '</soapenv:Envelope>'
-        );
+          '</soapenv:Envelope>';
 
-        HttpWebRequest := HttpWebRequest.Create(NpRvGlobalVoucherSetup."Service Url");
-        HttpWebRequest.UseDefaultCredentials(false);
-        Credential := Credential.NetworkCredential(NpRvGlobalVoucherSetup."Service Username", NpRvGlobalVoucherSetup."Service Password");
-        HttpWebRequest.Credentials(Credential);
-        HttpWebRequest.Method := 'POST';
-        HttpWebRequest.ContentType := 'text/xml; charset=utf-8';
-        HttpWebRequest.Headers.Add('SOAPAction', 'CancelReserveVouchers');
-        NpXmlDomMgt.SetTrustedCertificateValidation(HttpWebRequest);
+        RequestContent.WriteFrom(RequestXmlText);
+        RequestContent.GetHeaders(ContentHeader);
 
-        if not NpXmlDomMgt.SendWebRequest(XmlDoc, HttpWebRequest, HttpWebResponse, WebException) then begin
-            //-NPR5.51 [361164]
-            ErrorMessage := NpXmlDomMgt.GetWebExceptionMessage(WebException);
-            //+NPR5.51 [361164]
-            if NpXmlDomMgt.TryLoadXml(ErrorMessage, XmlDoc) then begin
-                NpXmlDomMgt.RemoveNameSpaces(XmlDoc);
-                ErrorMessage := NpXmlDomMgt.GetXmlText(XmlDoc.DocumentElement, 'Body/Fault/faultstring', 1000, false);
-            end;
+        ContentHeader.Clear();
+        ContentHeader.Remove('Content-Type');
+        ContentHeader.Add('Content-Type', 'text/xml; charset=utf-8');
+        ContentHeader.Add('SOAPAction', 'CancelReserveVouchers');
+        ContentHeader.Remove('Connection');
+        ContentHeader := Client.DefaultRequestHeaders();
+
+        Client.UseWindowsAuthentication(NpRvGlobalVoucherSetup."Service Username", NpRvGlobalVoucherSetup."Service Password");
+        Client.Post(NpRvGlobalVoucherSetup."Service Url", RequestContent, Response);
+
+        if not Response.IsSuccessStatusCode then begin
+            ErrorMessage := XmlDomManagement.RemoveNamespaces(Response.ReasonPhrase);
+            if XmlDocument.ReadFrom(ErrorMessage, Document) then
+                ErrorMessage := NpXmlDomMgt.GetXmlText(Document.AsXmlNode.AsXmlElement(), '//Body/Fault/faultstring', 1000, false);
 
             Error(CopyStr(ErrorMessage, 1, 1000));
         end;
-        //+NPR5.49 [342811]
     end;
 
     [EventSubscriber(ObjectType::Table, 6151014, 'OnAfterInsertEvent', '', true, true)]
@@ -289,9 +246,6 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
         case Rec."Entry Type" of
             Rec."Entry Type"::"Issue Voucher":
                 CreateGlobalVoucher(Voucher);
-            //-NPR5.49 [342811]
-            // Rec."Entry Type"::Payment:
-            //  RedeemVoucher(Rec);
             Rec."Entry Type"::Payment:
                 begin
                     RedeemVoucher(Rec);
@@ -310,12 +264,7 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
                 begin
                     RedeemPartnerVouchers(Rec);
                 end;
-        //+NPR5.49 [342811]
         end;
-    end;
-
-    local procedure "--- Sync"()
-    begin
     end;
 
     local procedure CreateGlobalVoucher(Voucher: Record "NPR NpRv Voucher")
@@ -323,25 +272,25 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
         NpRvGlobalVoucherSetup: Record "NPR NpRv Global Vouch. Setup";
         NpRvVoucherType: Record "NPR NpRv Voucher Type";
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
-        Credential: DotNet NPRNetNetworkCredential;
-        HttpWebRequest: DotNet NPRNetHttpWebRequest;
-        HttpWebResponse: DotNet NPRNetHttpWebResponse;
-        XmlDoc: DotNet "NPRNetXmlDocument";
-        WebException: DotNet NPRNetWebException;
+        XmlDomManagement: Codeunit "XML DOM Management";
+        Client: HttpClient;
+        RequestContent: HttpContent;
+        ContentHeader: HttpHeaders;
+        Response: HttpResponseMessage;
+        Document: XmlDocument;
+        Node: XmlNode;
+        RequestXmlText: Text;
         ErrorMessage: Text;
     begin
         Voucher.CalcFields("Validate Voucher Module");
         if Voucher."Validate Voucher Module" <> ModuleCode() then
             exit;
-        //-NPR5.49 [342811]
         NpRvVoucherType.Get(Voucher."Voucher Type");
-        //+NPR5.49 [342811]
         NpRvGlobalVoucherSetup.Get(Voucher."Voucher Type");
         NpRvGlobalVoucherSetup.TestField("Service Url");
 
         Voucher.CalcFields(Amount, "Issue Date", "Issue Register No.", "Issue Document No.", "Issue User ID");
-        XmlDoc := XmlDoc.XmlDocument;
-        XmlDoc.LoadXml(
+        RequestXmlText :=
           '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">' +
             '<soapenv:Body>' +
               '<CreateVouchers xmlns="urn:microsoft-dynamics-schemas/codeunit/' + GetServiceName(NpRvGlobalVoucherSetup) + '">' +
@@ -350,10 +299,7 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
                     '<description>' + Voucher.Description + '</description>' +
                     '<starting_date>' + Format(Voucher."Starting Date", 0, 9) + '</starting_date>' +
                     '<ending_date>' + Format(Voucher."Ending Date", 0, 9) + '</ending_date>' +
-                    //-NPR5.49 [342811]
-                    //'<account_no>' + NpRvGlobalVoucherSetup."Issuer Id" + '</account_no>' +
                     '<account_no>' + Voucher."Account No." + '</account_no>' +
-                    //+NPR5.49 [342811]
                     '<amount>' + Format(Voucher.Amount, 0, 9) + '</amount>' +
                     '<name>' + Voucher.Name + '</name>' +
                     '<name_2>' + Voucher."Name 2" + '</name_2>' +
@@ -370,38 +316,34 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
                     '<issue_register_no>' + Voucher."Issue Register No." + '</issue_register_no>' +
                     '<issue_sales_ticket_no>' + Voucher."Issue Document No." + '</issue_sales_ticket_no>' +
                     '<issue_user_id>' + Voucher."Issue User ID" + '</issue_user_id>' +
-                    //-NPR5.49 [342811]
                     '<issue_partner_code>' + NpRvVoucherType."Partner Code" + '</issue_partner_code>' +
-                  //+NPR5.49 [342811]
                   '</voucher>' +
                 '</vouchers>' +
               '</CreateVouchers>' +
             '</soapenv:Body>' +
-          '</soapenv:Envelope>'
-        );
+          '</soapenv:Envelope>';
 
-        HttpWebRequest := HttpWebRequest.Create(NpRvGlobalVoucherSetup."Service Url");
-        HttpWebRequest.UseDefaultCredentials(false);
-        Credential := Credential.NetworkCredential(NpRvGlobalVoucherSetup."Service Username", NpRvGlobalVoucherSetup."Service Password");
-        HttpWebRequest.Credentials(Credential);
-        HttpWebRequest.Method := 'POST';
-        HttpWebRequest.ContentType := 'text/xml; charset=utf-8';
-        HttpWebRequest.Headers.Add('SOAPAction', 'CreateVouchers');
-        NpXmlDomMgt.SetTrustedCertificateValidation(HttpWebRequest);
+        RequestContent.WriteFrom(RequestXmlText);
+        RequestContent.GetHeaders(ContentHeader);
 
-        if NpXmlDomMgt.SendWebRequest(XmlDoc, HttpWebRequest, HttpWebResponse, WebException) then
+        ContentHeader.Clear();
+        ContentHeader.Remove('Content-Type');
+        ContentHeader.Add('Content-Type', 'text/xml; charset=utf-8');
+        ContentHeader.Add('SOAPAction', 'CreateVouchers');
+        ContentHeader.Remove('Connection');
+        ContentHeader := Client.DefaultRequestHeaders();
+
+        Client.UseWindowsAuthentication(NpRvGlobalVoucherSetup."Service Username", NpRvGlobalVoucherSetup."Service Password");
+        Client.Post(NpRvGlobalVoucherSetup."Service Url", RequestContent, Response);
+
+        if Response.IsSuccessStatusCode then
             exit;
 
-        //-NPR5.51 [361164]
-        ErrorMessage := NpXmlDomMgt.GetWebExceptionMessage(WebException);
-        //+NPR5.51 [361164]
-        if NpXmlDomMgt.TryLoadXml(ErrorMessage, XmlDoc) then begin
-            NpXmlDomMgt.RemoveNameSpaces(XmlDoc);
-            ErrorMessage := NpXmlDomMgt.GetXmlText(XmlDoc.DocumentElement, 'Body/Fault/faultstring', 1000, false);
-        end;
+        ErrorMessage := XmlDomManagement.RemoveNamespaces(Response.ReasonPhrase);
+        if XmlDocument.ReadFrom(ErrorMessage, Document) then
+            ErrorMessage := NpXmlDomMgt.GetXmlText(Document.AsXmlNode.AsXmlElement(), '//Body/Fault/faultstring', 1000, false);
 
         Error(CopyStr(ErrorMessage, 1, 1000));
-        //+NPR5.49 [342811]
     end;
 
     procedure ReserveVoucher(var NpRvVoucherBuffer: Record "NPR NpRv Voucher Buffer" temporary)
@@ -412,153 +354,125 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
         VoucherEntry: Record "NPR NpRv Voucher Entry";
         NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
-        Credential: DotNet NPRNetNetworkCredential;
-        HttpWebRequest: DotNet NPRNetHttpWebRequest;
-        HttpWebResponse: DotNet NPRNetHttpWebResponse;
-        XmlDoc: DotNet "NPRNetXmlDocument";
-        XmlElement: DotNet NPRNetXmlElement;
-        WebException: DotNet NPRNetWebException;
+        XmlDomManagement: codeunit "XML DOM Management";
+        Client: HttpClient;
+        RequestContent: HttpContent;
+        ContentHeader: HttpHeaders;
+        Response: HttpResponseMessage;
+        Document: XmlDocument;
+        Node: XmlNode;
+        RequestXmlText: Text;
         ErrorMessage: Text;
         ReferenceNo: Text;
-        Response: Text;
-        i: Integer;
+        ResponseText: Text;
     begin
-        //-NPR5.49 [342811]
-        // VoucherType.GET(VoucherTypeCode);
         ReferenceNo := NpRvVoucherBuffer."Reference No.";
         VoucherType.Get(NpRvVoucherBuffer."Voucher Type");
-        //+NPR5.49 [342811]
         if VoucherType."Validate Voucher Module" <> ModuleCode() then
             exit;
         NpRvGlobalVoucherSetup.Get(VoucherType.Code);
         NpRvGlobalVoucherSetup.TestField("Service Url");
 
         Clear(Voucher);
-        //-NPR5.49 [342811]
-        // Voucher.SETRANGE("Reference No.",ReferenceNo);
         Voucher.SetRange("Reference No.", NpRvVoucherBuffer."Reference No.");
-        //+NPR5.49 [342811]
         Voucher.SetRange("Voucher Type", VoucherType.Code);
         if Voucher.FindFirst then begin
-            //-NPR5.48 [302179]
-            // Voucher.CALCFIELDS("In-use Quantity");
-            // IF Voucher."In-use Quantity" > 0 THEN
-            //  ERROR(Text001);
             if Voucher.CalcInUseQty() > 0 then
                 Error(Text001);
-            //+NPR5.48 [302179]
         end;
-        XmlDoc := XmlDoc.XmlDocument;
-        XmlDoc.LoadXml(
+        RequestXmlText :=
           '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">' +
             '<soapenv:Body>' +
               '<ReserveVouchers xmlns="urn:microsoft-dynamics-schemas/codeunit/' + GetServiceName(NpRvGlobalVoucherSetup) + '">' +
                 '<vouchers>' +
-                  //-NPR5.49 [342811]
-                  // '<voucher reference_no="' + ReferenceNo + '" voucher_type="' + VoucherType.Code + '" xmlns="urn:microsoft-dynamics-schemas/codeunit/global_voucher_service">' +
-                  //   '<redeem_date>' + FORMAT(SalePOS.Date,0,9) + '</redeem_date>' +
-                  //   '<redeem_register_no>' + SalePOS."Register No." + '</redeem_register_no>' +
-                  //   '<redeem_sales_ticket_no>' + SalePOS."Sales Ticket No." + '</redeem_sales_ticket_no>' +
-                  //   '<redeem_user_id>' + SalePOS."Salesperson Code" + '</redeem_user_id>' +
-                  // '</voucher>' +
                   '<voucher reference_no="' + ReferenceNo + '" voucher_type="' + VoucherType.Code + '" xmlns="urn:microsoft-dynamics-schemas/codeunit/global_voucher_service">' +
                     '<redeem_date>' + Format(NpRvVoucherBuffer."Redeem Date", 0, 9) + '</redeem_date>' +
                     '<redeem_register_no>' + NpRvVoucherBuffer."Redeem Register No." + '</redeem_register_no>' +
                     '<redeem_sales_ticket_no>' + NpRvVoucherBuffer."Redeem Sales Ticket No." + '</redeem_sales_ticket_no>' +
                     '<redeem_user_id>' + NpRvVoucherBuffer."Redeem User ID" + '</redeem_user_id>' +
-                    //-NPR5.49 [342811]
                     '<redeem_partner_code>' + VoucherType."Partner Code" + '</redeem_partner_code>' +
-                  //+NPR5.49 [342811]
                   '</voucher>' +
-                //+NPR5.49 [342811]
                 '</vouchers>' +
               '</ReserveVouchers>' +
             '</soapenv:Body>' +
-          '</soapenv:Envelope>'
-        );
+          '</soapenv:Envelope>';
 
-        HttpWebRequest := HttpWebRequest.Create(NpRvGlobalVoucherSetup."Service Url");
-        HttpWebRequest.UseDefaultCredentials(false);
-        Credential := Credential.NetworkCredential(NpRvGlobalVoucherSetup."Service Username", NpRvGlobalVoucherSetup."Service Password");
-        HttpWebRequest.Credentials(Credential);
-        HttpWebRequest.Method := 'POST';
-        HttpWebRequest.ContentType := 'text/xml; charset=utf-8';
-        HttpWebRequest.Headers.Add('SOAPAction', 'ReserveVouchers');
-        NpXmlDomMgt.SetTrustedCertificateValidation(HttpWebRequest);
+        RequestContent.WriteFrom(RequestXmlText);
+        RequestContent.GetHeaders(ContentHeader);
 
-        if not NpXmlDomMgt.SendWebRequest(XmlDoc, HttpWebRequest, HttpWebResponse, WebException) then begin
-            //-NPR5.51 [361164]
-            ErrorMessage := NpXmlDomMgt.GetWebExceptionMessage(WebException);
-            //+NPR5.51 [361164]
-            if NpXmlDomMgt.TryLoadXml(ErrorMessage, XmlDoc) then begin
-                NpXmlDomMgt.RemoveNameSpaces(XmlDoc);
-                ErrorMessage := NpXmlDomMgt.GetXmlText(XmlDoc.DocumentElement, 'Body/Fault/faultstring', 1000, false);
+        ContentHeader.Clear();
+        ContentHeader.Remove('Content-Type');
+        ContentHeader.Add('Content-Type', 'text/xml; charset=utf-8');
+        ContentHeader.Add('SOAPAction', 'ReserveVouchers');
+        ContentHeader.Remove('Connection');
+        ContentHeader := Client.DefaultRequestHeaders();
+
+        Client.UseWindowsAuthentication(NpRvGlobalVoucherSetup."Service Username", NpRvGlobalVoucherSetup."Service Password");
+        Client.Post(NpRvGlobalVoucherSetup."Service Url", RequestContent, Response);
+
+        if not Response.IsSuccessStatusCode then begin
+            ErrorMessage := XmlDomManagement.RemoveNamespaces(Response.ReasonPhrase);
+            if XmlDocument.ReadFrom(ErrorMessage, Document) then begin
+                ErrorMessage := NpXmlDomMgt.GetXmlText(Document.AsXmlNode.AsXmlElement(), '//Body/Fault/faultstring', 1000, false);
+
+                Error(CopyStr(ErrorMessage, 1, 1000));
             end;
-            Error(CopyStr(ErrorMessage, 1, 1000));
+
+            Response.Content.ReadAs(ResponseText);
+            ResponseText := XmlDomManagement.RemoveNamespaces(ResponseText);
+            XmlDocument.ReadFrom(ResponseText, Document);
+            if not NpXmlDomMgt.FindNode(Document.AsXmlNode(), '//Body/ReserveVouchers_Result/vouchers/voucher', Node) then
+                Error(Text005, ReferenceNo);
+
+            Clear(Voucher);
+            Voucher.SetRange("Reference No.", ReferenceNo);
+            Voucher.SetRange("Voucher Type", VoucherType.Code);
+            if not Voucher.FindLast then begin
+                Voucher.Init;
+                Voucher."No." := '';
+                Voucher."Reference No." := ReferenceNo;
+                Voucher.Validate("Voucher Type", VoucherType.Code);
+                Voucher.Insert(true);
+
+                VoucherEntry.Init;
+                VoucherEntry."Entry No." := 0;
+                VoucherEntry."Voucher No." := Voucher."No.";
+                VoucherEntry."Entry Type" := VoucherEntry."Entry Type"::"Partner Issue Voucher";
+                VoucherEntry."Voucher Type" := Voucher."Voucher Type";
+                if Evaluate(VoucherEntry.Amount, NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'amount', 0, false), 9) then;
+                VoucherEntry."Remaining Amount" := VoucherEntry.Amount;
+                VoucherEntry.Positive := VoucherEntry.Amount > 0;
+                if Evaluate(VoucherEntry."Posting Date", NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'issue_date', 0, false), 9) then;
+                VoucherEntry.Open := VoucherEntry.Amount <> 0;
+                VoucherEntry."Register No." := NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'issue_register_no', MaxStrLen(VoucherEntry."Register No."), false);
+                VoucherEntry."Document No." := NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'issue_sales_ticket_no', MaxStrLen(VoucherEntry."Document No."), false);
+                VoucherEntry."User ID" := NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'issue_user_id', MaxStrLen(VoucherEntry."User ID"), false);
+                VoucherEntry."Closed by Entry No." := 0;
+                VoucherEntry."Partner Code" := UpperCase(NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'issue_partner_code', MaxStrLen(VoucherEntry."Partner Code"), false));
+                VoucherEntry.Insert;
+            end;
+
+            Voucher.Description := NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'description', MaxStrLen(Voucher.Description), false);
+            if Evaluate(Voucher."Starting Date", NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'starting_date', 0, false), 9) then;
+            if Evaluate(Voucher."Ending Date", NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'ending_date', 0, false), 9) then;
+            Voucher."Account No." := NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'account_no', MaxStrLen(Voucher."Account No."), false);
+
+            Voucher.Name := NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'name', MaxStrLen(Voucher.Name), false);
+            Voucher."Name 2" := NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'name_2', MaxStrLen(Voucher."Name 2"), false);
+            Voucher.Address := NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'address', MaxStrLen(Voucher.Address), false);
+            Voucher."Address 2" := NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'address_2', MaxStrLen(Voucher."Address 2"), false);
+            Voucher."Post Code" := NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'post_code', MaxStrLen(Voucher."Post Code"), false);
+            Voucher.City := NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'city', MaxStrLen(Voucher.City), false);
+            Voucher.County := NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'county', MaxStrLen(Voucher.County), false);
+            Voucher."Country/Region Code" := NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'country_code', MaxStrLen(Voucher."Country/Region Code"), false);
+            Voucher."E-mail" := NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'email', MaxStrLen(Voucher."E-mail"), false);
+            Voucher."Phone No." := NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'pohone_no', MaxStrLen(Voucher."Phone No."), false);
+            Voucher."Voucher Message" := NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'voucher_message', MaxStrLen(Voucher."Voucher Message"), false);
+            if Evaluate(Voucher."Issue Date", NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'issue_date', 0, false), 9) then;
+            Voucher.Modify(true);
+            Voucher.CalcFields(Amount);
+            NpRvVoucherMgt.Voucher2Buffer(Voucher, NpRvVoucherBuffer);
         end;
-
-        Response := NpXmlDomMgt.GetWebResponseText(HttpWebResponse);
-        XmlDoc := XmlDoc.XmlDocument;
-        XmlDoc.LoadXml(Response);
-        NpXmlDomMgt.RemoveNameSpaces(XmlDoc);
-        if not NpXmlDomMgt.FindNode(XmlDoc.DocumentElement, 'Body/ReserveVouchers_Result/vouchers/voucher', XmlElement) then
-            Error(Text005, ReferenceNo);
-
-        Clear(Voucher);
-        Voucher.SetRange("Reference No.", ReferenceNo);
-        Voucher.SetRange("Voucher Type", VoucherType.Code);
-        if not Voucher.FindLast then begin
-            Voucher.Init;
-            Voucher."No." := '';
-            Voucher."Reference No." := ReferenceNo;
-            Voucher.Validate("Voucher Type", VoucherType.Code);
-            Voucher.Insert(true);
-
-            VoucherEntry.Init;
-            VoucherEntry."Entry No." := 0;
-            VoucherEntry."Voucher No." := Voucher."No.";
-            //-NPR5.49 [342811]
-            // VoucherEntry."Entry Type" := VoucherEntry."Entry Type"::"Issue Voucher";
-            VoucherEntry."Entry Type" := VoucherEntry."Entry Type"::"Partner Issue Voucher";
-            //+NPR5.49 [342811]
-            VoucherEntry."Voucher Type" := Voucher."Voucher Type";
-            if Evaluate(VoucherEntry.Amount, NpXmlDomMgt.GetXmlText(XmlElement, 'amount', 0, false), 9) then;
-            VoucherEntry."Remaining Amount" := VoucherEntry.Amount;
-            VoucherEntry.Positive := VoucherEntry.Amount > 0;
-            if Evaluate(VoucherEntry."Posting Date", NpXmlDomMgt.GetXmlText(XmlElement, 'issue_date', 0, false), 9) then;
-            VoucherEntry.Open := VoucherEntry.Amount <> 0;
-            VoucherEntry."Register No." := NpXmlDomMgt.GetXmlText(XmlElement, 'issue_register_no', MaxStrLen(VoucherEntry."Register No."), false);
-            VoucherEntry."Document No." := NpXmlDomMgt.GetXmlText(XmlElement, 'issue_sales_ticket_no', MaxStrLen(VoucherEntry."Document No."), false);
-            VoucherEntry."User ID" := NpXmlDomMgt.GetXmlText(XmlElement, 'issue_user_id', MaxStrLen(VoucherEntry."User ID"), false);
-            VoucherEntry."Closed by Entry No." := 0;
-            //-NPR5.49 [342811]
-            VoucherEntry."Partner Code" := UpperCase(NpXmlDomMgt.GetXmlText(XmlElement, 'issue_partner_code', MaxStrLen(VoucherEntry."Partner Code"), false));
-            //+NPR5.49 [342811]
-            VoucherEntry.Insert;
-        end;
-
-        Voucher.Description := NpXmlDomMgt.GetXmlText(XmlElement, 'description', MaxStrLen(Voucher.Description), false);
-        if Evaluate(Voucher."Starting Date", NpXmlDomMgt.GetXmlText(XmlElement, 'starting_date', 0, false), 9) then;
-        if Evaluate(Voucher."Ending Date", NpXmlDomMgt.GetXmlText(XmlElement, 'ending_date', 0, false), 9) then;
-        Voucher."Account No." := NpXmlDomMgt.GetXmlText(XmlElement, 'account_no', MaxStrLen(Voucher."Account No."), false);
-
-        Voucher.Name := NpXmlDomMgt.GetXmlText(XmlElement, 'name', MaxStrLen(Voucher.Name), false);
-        Voucher."Name 2" := NpXmlDomMgt.GetXmlText(XmlElement, 'name_2', MaxStrLen(Voucher."Name 2"), false);
-        Voucher.Address := NpXmlDomMgt.GetXmlText(XmlElement, 'address', MaxStrLen(Voucher.Address), false);
-        Voucher."Address 2" := NpXmlDomMgt.GetXmlText(XmlElement, 'address_2', MaxStrLen(Voucher."Address 2"), false);
-        Voucher."Post Code" := NpXmlDomMgt.GetXmlText(XmlElement, 'post_code', MaxStrLen(Voucher."Post Code"), false);
-        Voucher.City := NpXmlDomMgt.GetXmlText(XmlElement, 'city', MaxStrLen(Voucher.City), false);
-        Voucher.County := NpXmlDomMgt.GetXmlText(XmlElement, 'county', MaxStrLen(Voucher.County), false);
-        Voucher."Country/Region Code" := NpXmlDomMgt.GetXmlText(XmlElement, 'country_code', MaxStrLen(Voucher."Country/Region Code"), false);
-        Voucher."E-mail" := NpXmlDomMgt.GetXmlText(XmlElement, 'email', MaxStrLen(Voucher."E-mail"), false);
-        Voucher."Phone No." := NpXmlDomMgt.GetXmlText(XmlElement, 'pohone_no', MaxStrLen(Voucher."Phone No."), false);
-        Voucher."Voucher Message" := NpXmlDomMgt.GetXmlText(XmlElement, 'voucher_message', MaxStrLen(Voucher."Voucher Message"), false);
-        if Evaluate(Voucher."Issue Date", NpXmlDomMgt.GetXmlText(XmlElement, 'issue_date', 0, false), 9) then;
-        Voucher.Modify(true);
-        Voucher.CalcFields(Amount);
-        //-NPR5.49 [342811]
-        NpRvVoucherMgt.Voucher2Buffer(Voucher, NpRvVoucherBuffer);
-        //+NPR5.49 [342811]
     end;
 
     procedure RedeemVoucher(VoucherEntry: Record "NPR NpRv Voucher Entry")
@@ -567,12 +481,14 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
         Voucher: Record "NPR NpRv Voucher";
         VoucherType: Record "NPR NpRv Voucher Type";
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
-        Credential: DotNet NPRNetNetworkCredential;
-        HttpWebRequest: DotNet NPRNetHttpWebRequest;
-        HttpWebResponse: DotNet NPRNetHttpWebResponse;
-        XmlDoc: DotNet "NPRNetXmlDocument";
-        XmlElement: DotNet NPRNetXmlElement;
-        WebException: DotNet NPRNetWebException;
+        XmlDomManagement: codeunit "XML DOM Management";
+        Client: HttpClient;
+        RequestContent: HttpContent;
+        ContentHeader: HttpHeaders;
+        Response: HttpResponseMessage;
+        Document: XmlDocument;
+        Node: XmlNode;
+        RequestXmlText: Text;
         ErrorMessage: Text;
     begin
         if VoucherEntry."Entry Type" <> VoucherEntry."Entry Type"::Payment then
@@ -585,8 +501,7 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
         NpRvGlobalVoucherSetup.TestField("Service Url");
 
         Voucher.Get(VoucherEntry."Voucher No.");
-        XmlDoc := XmlDoc.XmlDocument;
-        XmlDoc.LoadXml(
+        RequestXmlText :=
           '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">' +
             '<soapenv:Body>' +
               '<RedeemVouchers xmlns="urn:microsoft-dynamics-schemas/codeunit/' + GetServiceName(NpRvGlobalVoucherSetup) + '">' +
@@ -597,33 +512,31 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
                     '<redeem_register_no>' + VoucherEntry."Register No." + '</redeem_register_no>' +
                     '<redeem_sales_ticket_no>' + VoucherEntry."Document No." + '</redeem_sales_ticket_no>' +
                     '<redeem_user_id>' + VoucherEntry."User ID" + '</redeem_user_id>' +
-                    //-NPR5.49 [342811]
                     '<redeem_partner_code>' + VoucherType."Partner Code" + '</redeem_partner_code>' +
-                  //+NPR5.49 [342811]
                   '</voucher>' +
                 '</vouchers>' +
               '</RedeemVouchers>' +
             '</soapenv:Body>' +
-          '</soapenv:Envelope>'
-        );
+          '</soapenv:Envelope>';
 
-        HttpWebRequest := HttpWebRequest.Create(NpRvGlobalVoucherSetup."Service Url");
-        HttpWebRequest.UseDefaultCredentials(false);
-        Credential := Credential.NetworkCredential(NpRvGlobalVoucherSetup."Service Username", NpRvGlobalVoucherSetup."Service Password");
-        HttpWebRequest.Credentials(Credential);
-        HttpWebRequest.Method := 'POST';
-        HttpWebRequest.ContentType := 'text/xml; charset=utf-8';
-        HttpWebRequest.Headers.Add('SOAPAction', 'RedeemVouchers');
-        NpXmlDomMgt.SetTrustedCertificateValidation(HttpWebRequest);
+        RequestContent.WriteFrom(RequestXmlText);
+        RequestContent.GetHeaders(ContentHeader);
 
-        if not NpXmlDomMgt.SendWebRequest(XmlDoc, HttpWebRequest, HttpWebResponse, WebException) then begin
-            //-NPR5.51 [361164]
-            ErrorMessage := NpXmlDomMgt.GetWebExceptionMessage(WebException);
-            //+NPR5.51 [361164]
-            if NpXmlDomMgt.TryLoadXml(ErrorMessage, XmlDoc) then begin
-                NpXmlDomMgt.RemoveNameSpaces(XmlDoc);
-                ErrorMessage := NpXmlDomMgt.GetXmlText(XmlDoc.DocumentElement, 'Body/Fault/faultstring', 1000, false);
-            end;
+        ContentHeader.Clear();
+        ContentHeader.Remove('Content-Type');
+        ContentHeader.Add('Content-Type', 'text/xml; charset=utf-8');
+        ContentHeader.Add('SOAPAction', 'RedeemVouchers');
+        ContentHeader.Remove('Connection');
+        ContentHeader := Client.DefaultRequestHeaders();
+
+        Client.UseWindowsAuthentication(NpRvGlobalVoucherSetup."Service Username", NpRvGlobalVoucherSetup."Service Password");
+        Client.Post(NpRvGlobalVoucherSetup."Service Url", RequestContent, Response);
+
+        if not Response.IsSuccessStatusCode then begin
+            ErrorMessage := XmlDomManagement.RemoveNamespaces(Response.ReasonPhrase);
+            if XmlDocument.ReadFrom(ErrorMessage, Document) then
+                ErrorMessage := NpXmlDomMgt.GetXmlText(Document.AsXmlNode.AsXmlElement(), '//Body/Fault/faultstring', 1000, false);
+
             Error(CopyStr(ErrorMessage, 1, 1000));
         end;
     end;
@@ -637,15 +550,16 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
         NpRvVoucherType: Record "NPR NpRv Voucher Type";
         NpRvPartnerMgt: Codeunit "NPR NpRv Partner Mgt.";
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
-        Credential: DotNet NPRNetNetworkCredential;
-        HttpWebRequest: DotNet NPRNetHttpWebRequest;
-        HttpWebResponse: DotNet NPRNetHttpWebResponse;
-        XmlDoc: DotNet "NPRNetXmlDocument";
-        XmlElement: DotNet NPRNetXmlElement;
-        WebException: DotNet NPRNetWebException;
+        XmlDomManagement: codeunit "XML DOM Management";
+        Client: HttpClient;
+        RequestContent: HttpContent;
+        ContentHeader: HttpHeaders;
+        Response: HttpResponseMessage;
+        Document: XmlDocument;
+        Node: XmlNode;
+        RequestXmlText: Text;
         ErrorMessage: Text;
     begin
-        //-NPR5.49 [342811]
         if not (NpRvVoucherEntry."Entry Type" in [NpRvVoucherEntry."Entry Type"::Payment, NpRvVoucherEntry."Entry Type"::"Partner Payment"]) then
             exit;
 
@@ -664,8 +578,7 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
         if not NpRvPartnerRelation.Get(NpRvPartner.Code, NpRvVoucherType.Code) then
             exit;
 
-        XmlDoc := XmlDoc.XmlDocument;
-        XmlDoc.LoadXml(
+        RequestXmlText :=
           '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">' +
             '<soapenv:Body>' +
               '<RedeemPartnerVouchers xmlns="urn:microsoft-dynamics-schemas/codeunit/' + NpRvPartnerMgt.GetServiceName(NpRvPartner) + '">' +
@@ -682,33 +595,28 @@ codeunit 6151019 "NPR NpRv Module Valid.: Global"
                 '</vouchers>' +
               '</RedeemPartnerVouchers>' +
             '</soapenv:Body>' +
-          '</soapenv:Envelope>'
-        );
+          '</soapenv:Envelope>';
 
-        HttpWebRequest := HttpWebRequest.Create(NpRvPartner."Service Url");
-        HttpWebRequest.UseDefaultCredentials(false);
-        Credential := Credential.NetworkCredential(NpRvPartner."Service Username", NpRvPartner."Service Password");
-        HttpWebRequest.Credentials(Credential);
-        HttpWebRequest.Method := 'POST';
-        HttpWebRequest.ContentType := 'text/xml; charset=utf-8';
-        HttpWebRequest.Headers.Add('SOAPAction', 'RedeemPartnerVouchers');
-        NpXmlDomMgt.SetTrustedCertificateValidation(HttpWebRequest);
+        RequestContent.WriteFrom(RequestXmlText);
+        RequestContent.GetHeaders(ContentHeader);
 
-        if not NpXmlDomMgt.SendWebRequest(XmlDoc, HttpWebRequest, HttpWebResponse, WebException) then begin
-            //-NPR5.51 [361164]
-            ErrorMessage := NpXmlDomMgt.GetWebExceptionMessage(WebException);
-            //+NPR5.51 [361164]
-            if NpXmlDomMgt.TryLoadXml(ErrorMessage, XmlDoc) then begin
-                NpXmlDomMgt.RemoveNameSpaces(XmlDoc);
-                ErrorMessage := NpXmlDomMgt.GetXmlText(XmlDoc.DocumentElement, 'Body/Fault/faultstring', 1000, false);
-            end;
+        ContentHeader.Clear();
+        ContentHeader.Remove('Content-Type');
+        ContentHeader.Add('Content-Type', 'text/xml; charset=utf-8');
+        ContentHeader.Add('SOAPAction', 'RedeemPartnerVouchers');
+        ContentHeader.Remove('Connection');
+        ContentHeader := Client.DefaultRequestHeaders();
+
+        Client.UseWindowsAuthentication(NpRvPartner."Service Username", NpRvPartner."Service Password");
+        Client.Post(NpRvPartner."Service Url", RequestContent, Response);
+
+        if not Response.IsSuccessStatusCode then begin
+            ErrorMessage := XmlDomManagement.RemoveNamespaces(Response.ReasonPhrase);
+            if XmlDocument.ReadFrom(ErrorMessage, Document) then
+                ErrorMessage := NpXmlDomMgt.GetXmlText(Document.AsXmlNode.AsXmlElement(), '//Body/Fault/faultstring', 1000, false);
+
             Error(CopyStr(ErrorMessage, 1, 1000));
         end;
-        //+NPR5.49 [342811]
-    end;
-
-    local procedure "--- Aux"()
-    begin
     end;
 
     local procedure CurrCodeunitId(): Integer

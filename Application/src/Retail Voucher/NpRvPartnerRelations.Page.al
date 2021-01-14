@@ -1,7 +1,5 @@
 page 6151028 "NPR NpRv Partner Relations"
 {
-    // NPR5.49/MHA /20190228  CASE 342811 Object created - Retail Voucher Partner used with Cross Company Vouchers
-
     Caption = 'Retail Voucher Partner Relations';
     PageType = List;
     UsageCategory = Administration;
@@ -30,10 +28,6 @@ page 6151028 "NPR NpRv Partner Relations"
                 }
             }
         }
-    }
-
-    actions
-    {
     }
 }
 

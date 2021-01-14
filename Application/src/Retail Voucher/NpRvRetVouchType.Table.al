@@ -1,7 +1,5 @@
 table 6151016 "NPR NpRv Ret. Vouch. Type"
 {
-    // NPR5.37/MHA /20171023  CASE 267346 Object created - NaviPartner Retail Voucher
-
     Caption = 'Return Retail Voucher Type';
     DataClassification = CustomerContent;
 
@@ -22,22 +20,11 @@ table 6151016 "NPR NpRv Ret. Vouch. Type"
         }
         field(1000; "Return Voucher Description"; Text[50])
         {
-            CalcFormula = Lookup ("NPR NpRv Voucher Type".Description WHERE(Code = FIELD("Return Voucher Type")));
+            CalcFormula = Lookup("NPR NpRv Voucher Type".Description WHERE(Code = FIELD("Return Voucher Type")));
             Caption = 'Return Voucher Description';
             Editable = false;
             FieldClass = FlowField;
         }
-    }
-
-    keys
-    {
-        key(Key1; "Voucher Type")
-        {
-        }
-    }
-
-    fieldgroups
-    {
     }
 }
 

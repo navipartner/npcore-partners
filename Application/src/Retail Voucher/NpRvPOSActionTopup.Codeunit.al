@@ -1,13 +1,5 @@
 codeunit 6151023 "NPR NpRv POS Action Top-up"
 {
-    // NPR5.50/MHA /20190426  CASE 353079 Object created - Top-up functionality for NaviPartner Retail Vouchers
-    // NPR5.55/MHA /20200427  CASE 402015 New Primary Key on Sale Line POS Voucher
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         Text000: Label 'Apply Top-up (refill) on existing Retail Voucher.';
         Text001: Label 'Top-up Retail Voucher';
@@ -106,10 +98,6 @@ codeunit 6151023 "NPR NpRv POS Action Top-up"
         POSParameterValue.Value := UpperCase(POSParameterValue.Value);
         NpRvVoucherType.SetFilter(Code, POSParameterValue.Value);
         NpRvVoucherType.FindFirst;
-    end;
-
-    local procedure "--- POS Action"()
-    begin
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', true, true)]
@@ -224,7 +212,6 @@ codeunit 6151023 "NPR NpRv POS Action Top-up"
         POSSession.RequestRefreshData();
 
         NpRvSalesLine.Init;
-        //-NPR5.55 [402015]
         NpRvSalesLine.Id := CreateGuid;
         NpRvSalesLine."Document Source" := NpRvSalesLine."Document Source"::POS;
         NpRvSalesLine."Retail ID" := SaleLinePOS."Retail ID";
@@ -246,11 +233,6 @@ codeunit 6151023 "NPR NpRv POS Action Top-up"
         if NpRvVoucher."Send via SMS" then
             NpRvSalesLine."Phone No." := NpRvVoucher."Phone No.";
         NpRvSalesLine.Insert(true);
-        //+NPR5.55 [402015]
-    end;
-
-    local procedure "--- Constants"()
-    begin
     end;
 
     local procedure ActionCode(): Text

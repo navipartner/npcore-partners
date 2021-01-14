@@ -1,8 +1,5 @@
 page 6151013 "NPR NpRv Voucher Types"
 {
-    // NPR5.37/MHA /20171023  CASE 267346 Object created - NaviPartner Retail Voucher
-    // NPR5.49/MHA /20190228  CASE 342811 Added Action Partner Relations used with Cross Company Vouchers
-
     Caption = 'Retail Voucher Types';
     CardPageID = "NPR NpRv Voucher Type Card";
     Editable = false;

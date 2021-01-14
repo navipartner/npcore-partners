@@ -1,8 +1,5 @@
 page 6151017 "NPR NpRv Sales Lines"
 {
-    // NPR5.37/MHA /20171023  CASE 267346 Object created - NaviPartner Retail Voucher
-    // NPR5.55/MHA /20200512  CASE 402015 Updated object name and caption
-
     Caption = 'Retail Voucher Sales Lines';
     CardPageID = "NPR NpRv Sales Line Card";
     Editable = false;
@@ -129,7 +126,6 @@ page 6151017 "NPR NpRv Sales Lines"
                     NpRvSalesLineReferences: Page "NPR NpRv Sales Line Ref.";
                     Qty: Decimal;
                 begin
-                    //-NPR5.55 [402015]
                     Qty := 1;
                     case "Document Source" of
                         "Document Source"::POS:
@@ -147,7 +143,6 @@ page 6151017 "NPR NpRv Sales Lines"
 
                     NpRvSalesLineReferences.SetNpRvSalesLine(Rec, Qty);
                     NpRvSalesLineReferences.Run();
-                    //+NPR5.55 [402015]
                 end;
             }
         }

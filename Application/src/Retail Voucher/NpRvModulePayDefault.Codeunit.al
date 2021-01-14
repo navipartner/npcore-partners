@@ -1,9 +1,5 @@
 codeunit 6151017 "NPR NpRv Module Pay.: Default"
 {
-    trigger OnRun()
-    begin
-    end;
-
     var
         Text000: Label 'Apply Payment - Default (Full Payment)';
 
@@ -185,7 +181,6 @@ codeunit 6151017 "NPR NpRv Module Pay.: Default"
     end;
 
     //--- Voucher Interface ---
-
     [EventSubscriber(ObjectType::Codeunit, 6151011, 'OnInitVoucherModules', '', true, true)]
     local procedure OnInitVoucherModules(var VoucherModule: Record "NPR NpRv Voucher Module")
     begin
@@ -251,8 +246,6 @@ codeunit 6151017 "NPR NpRv Module Pay.: Default"
 
         ApplyPaymentSalesDoc(VoucherType, SalesHeader, NpRvSalesLine);
     end;
-
-    //--- Aux ---
 
     local procedure CurrCodeunitId(): Integer
     begin

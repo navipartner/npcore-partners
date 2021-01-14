@@ -9,9 +9,6 @@ codeunit 6151010 "NPR NpRv Voucher Mgt."
 
     var
         Text000: Label 'Invalid EAN13: %1.';
-        Text001: Label 'Invalid Reference No.';
-        Text002: Label 'Retail Voucher Payment Amount %1 is higher than Remaining Amount %2 on Retail Voucher %3';
-        Text003: Label 'Retail Voucher Payment Amount %1 must not be less than 0';
 
     procedure ResetInUseQty(Voucher: Record "NPR NpRv Voucher")
     var
@@ -21,10 +18,6 @@ codeunit 6151010 "NPR NpRv Voucher Mgt."
         NpRvSalesLine.SetRange(Type, NpRvSalesLine.Type::Payment);
         if NpRvSalesLine.FindFirst then
             NpRvSalesLine.DeleteAll;
-    end;
-
-    local procedure "--- POS Subscribers"()
-    begin
     end;
 
     [EventSubscriber(ObjectType::Table, 6014406, 'OnBeforeDeleteEvent', '', true, true)]
@@ -117,10 +110,6 @@ codeunit 6151010 "NPR NpRv Voucher Mgt."
             if Voucher.Get(VoucherEntry."Voucher No.") then
                 SendSingleVoucher(Voucher);
         until VoucherEntry.Next = 0;
-    end;
-
-    local procedure "--- Issue Voucher"()
-    begin
     end;
 
     procedure IssueVouchers(var NpRvSalesLine: Record "NPR NpRv Sales Line")
@@ -384,10 +373,6 @@ codeunit 6151010 "NPR NpRv Voucher Mgt."
         NpRvSendingLog.Insert(true);
     end;
 
-    local procedure "--- Voucher Payment"()
-    begin
-    end;
-
     procedure ApplyPayment(FrontEnd: Codeunit "NPR POS Front End Management"; POSSession: Codeunit "NPR POS Session"; NpRvSalesLine: Record "NPR NpRv Sales Line")
     var
         VoucherType: Record "NPR NpRv Voucher Type";
@@ -530,10 +515,6 @@ codeunit 6151010 "NPR NpRv Voucher Mgt."
             VoucherEntry.Modify;
             VoucherEntryApply.Modify;
         until (VoucherEntryApply.Next = 0) or not VoucherEntry.Open;
-    end;
-
-    local procedure "--- Archive"()
-    begin
     end;
 
     procedure ArchiveVouchers(var VoucherFilter: Record "NPR NpRv Voucher")
@@ -710,10 +691,6 @@ codeunit 6151010 "NPR NpRv Voucher Mgt."
         NpRvArchSendingLog.Insert;
     end;
 
-    procedure "--- Validation"()
-    begin
-    end;
-
     procedure FindVoucher(VoucherTypeCode: Text; ReferenceNo: Text; var Voucher: Record "NPR NpRv Voucher"): Boolean
     var
         VoucherType: Record "NPR NpRv Voucher Type";
@@ -770,10 +747,6 @@ codeunit 6151010 "NPR NpRv Voucher Mgt."
         NpRvGlobalVoucherBuffer."Issue Partner Code" := NpRvVoucher."Issue Partner Code";
     end;
 
-    procedure "--- Filter"()
-    begin
-    end;
-
     local procedure SetSalesLineFilter(SaleLinePOS: Record "NPR Sale Line POS"; var NpRvSalesLine: Record "NPR NpRv Sales Line")
     begin
         Clear(NpRvSalesLine);
@@ -784,10 +757,6 @@ codeunit 6151010 "NPR NpRv Voucher Mgt."
     procedure SetSalesLineReferenceFilter(NpRvSalesLine: Record "NPR NpRv Sales Line"; var NpRvSalesLineReference: Record "NPR NpRv Sales Line Ref.")
     begin
         NpRvSalesLineReference.SetRange("Sales Line Id", NpRvSalesLine.Id);
-    end;
-
-    local procedure "--- Generate Reference No"()
-    begin
     end;
 
     procedure GenerateTempVoucher(VoucherType: Record "NPR NpRv Voucher Type"; var TempVoucher: Record "NPR NpRv Voucher" temporary)
@@ -902,8 +871,10 @@ codeunit 6151010 "NPR NpRv Voucher Mgt."
 
     local procedure RegExReplaceAN(Input: Text) Output: Text
     var
-        Match: DotNet NPRNetMatch;
-        RegEx: DotNet NPRNetRegex;
+        Match: Codeunit DotNet_Match;
+        Regex: Codeunit DotNet_Regex;
+        GroupCollection: Codeunit DotNet_GroupCollection;
+        DotNetGroup: Codeunit DotNet_Group;
         Pattern: Text;
         ReplaceString: Text;
         RandomQty: Integer;
@@ -912,18 +883,20 @@ codeunit 6151010 "NPR NpRv Voucher Mgt."
         Pattern := '(?<RandomStart>\[AN\*?)' +
                    '(?<RandomQty>\d?)' +
                    '(?<RandomEnd>\])';
-        RegEx := RegEx.Regex(Pattern);
+        Regex.Regex(Pattern);
 
-        Match := RegEx.Match(Input);
+        Regex.Match(Input, Match);
         while Match.Success do begin
             ReplaceString := '';
             RandomQty := 1;
-            if Evaluate(RandomQty, Format(Match.Groups.Item('RandomQty'))) then;
+            Match.Groups(GroupCollection);
+            GroupCollection.ItemGroupName('RandomQty', DotNetGroup);
+            if Evaluate(RandomQty, Format(DotNetGroup.Value())) then;
             for i := 1 to RandomQty do
                 ReplaceString += Format(GenerateRandomChar());
-            Input := RegEx.Replace(Input, ReplaceString, 1);
+            Input := Regex.Replace(Input, ReplaceString, 1);
 
-            Match := RegEx.Match(Input);
+            Regex.Match(Input, Match);
         end;
 
         Output := Input;
@@ -932,8 +905,10 @@ codeunit 6151010 "NPR NpRv Voucher Mgt."
 
     local procedure RegExReplaceN(Input: Text) Output: Text
     var
-        Match: DotNet NPRNetMatch;
-        RegEx: DotNet NPRNetRegex;
+        Match: Codeunit DotNet_Match;
+        Regex: Codeunit DotNet_Regex;
+        GroupCollection: Codeunit DotNet_GroupCollection;
+        DotNetGroup: Codeunit DotNet_Group;
         Pattern: Text;
         ReplaceString: Text;
         RandomQty: Integer;
@@ -942,18 +917,20 @@ codeunit 6151010 "NPR NpRv Voucher Mgt."
         Pattern := '(?<RandomStart>\[N\*?)' +
                    '(?<RandomQty>\d?)' +
                    '(?<RandomEnd>\])';
-        RegEx := RegEx.Regex(Pattern);
+        Regex.Regex(Pattern);
 
-        Match := RegEx.Match(Input);
+        Regex.Match(Input, Match);
         while Match.Success do begin
             ReplaceString := '';
             RandomQty := 1;
-            if Evaluate(RandomQty, Format(Match.Groups.Item('RandomQty'))) then;
+            Match.Groups(GroupCollection);
+            GroupCollection.ItemGroupName('RandomQty', DotNetGroup);
+            if Evaluate(RandomQty, Format(DotNetGroup.Value())) then;
             for i := 1 to RandomQty do
                 ReplaceString += Format(Random(9));
-            Input := RegEx.Replace(Input, ReplaceString, 1);
+            Input := Regex.Replace(Input, ReplaceString, 1);
 
-            Match := RegEx.Match(Input);
+            Regex.Match(Input, Match);
         end;
 
         Output := Input;
@@ -962,13 +939,10 @@ codeunit 6151010 "NPR NpRv Voucher Mgt."
 
     local procedure RegExReplaceS(Input: Text; SerialNo: Text) Output: Text
     var
-        Match: DotNet NPRNetMatch;
-        RegEx: DotNet NPRNetRegex;
         Pattern: Text;
     begin
         Pattern := '(?<SerialNo>\[S\])';
-        RegEx := RegEx.Regex(Pattern);
-        Output := RegEx.Replace(Input, SerialNo);
+        Output := Pattern.Replace(Input, SerialNo);
         exit(Output);
     end;
 
@@ -989,10 +963,6 @@ codeunit 6151010 "NPR NpRv Voucher Mgt."
         RandomText := UpperCase(Format(RandomChar));
         RandomChar := RandomText[1];
         exit(RandomChar);
-    end;
-
-    local procedure "--- Events"()
-    begin
     end;
 
     [IntegrationEvent(false, false)]

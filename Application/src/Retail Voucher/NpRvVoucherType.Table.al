@@ -1,13 +1,5 @@
 table 6151012 "NPR NpRv Voucher Type"
 {
-    // NPR5.37/MHA /20171023  CASE 267346 Object created - NaviPartner Retail Voucher
-    // NPR5.48/MHA /20190123  CASE 341711 Added fields 75 "E-mail Template Code", 80 "SMS Template Code", 105 "Send Method via POS"
-    // NPR5.48/MHA /20190213  CASE 345739 No. Series length has been increased from 10 to 20 in NAV2018 and newer
-    // NPR5.49/MHA /20190228  CASE 342811 Added field 60 "Partner Code"
-    // NPR5.50/MHA /20190426  CASE 353079 Added field 62 "Allow Top-up"
-    // NPR5.53/THRO/20191216  CASE 382232 Added field 72 "Minimum Amount Issue"
-    // NPR5.55/MHA /20200525  CASE 400120 Added field 1010 "Voucher Qty. (Closed)"
-
     Caption = 'Retail Voucher Type';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR NpRv Voucher Types";
@@ -146,7 +138,7 @@ table 6151012 "NPR NpRv Voucher Type"
         }
         field(1000; "Voucher Qty. (Open)"; Integer)
         {
-            CalcFormula = Count ("NPR NpRv Voucher" WHERE("Voucher Type" = FIELD(Code),
+            CalcFormula = Count("NPR NpRv Voucher" WHERE("Voucher Type" = FIELD(Code),
                                                       Open = CONST(true)));
             Caption = 'Voucher Qty. (Open)';
             Editable = false;
@@ -154,7 +146,7 @@ table 6151012 "NPR NpRv Voucher Type"
         }
         field(1010; "Voucher Qty. (Closed)"; Integer)
         {
-            CalcFormula = Count ("NPR NpRv Voucher" WHERE("Voucher Type" = FIELD(Code),
+            CalcFormula = Count("NPR NpRv Voucher" WHERE("Voucher Type" = FIELD(Code),
                                                       Open = CONST(false)));
             Caption = 'Voucher Qty. (Closed)';
             Description = 'NPR5.55';
@@ -163,7 +155,7 @@ table 6151012 "NPR NpRv Voucher Type"
         }
         field(1020; "Arch. Voucher Qty."; Integer)
         {
-            CalcFormula = Count ("NPR NpRv Arch. Voucher" WHERE("Voucher Type" = FIELD(Code)));
+            CalcFormula = Count("NPR NpRv Arch. Voucher" WHERE("Voucher Type" = FIELD(Code)));
             Caption = 'Archived Voucher Qty.';
             Editable = false;
             FieldClass = FlowField;
@@ -175,10 +167,6 @@ table 6151012 "NPR NpRv Voucher Type"
         key(Key1; "Code")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 

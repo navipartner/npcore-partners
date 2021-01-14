@@ -1,7 +1,5 @@
 xmlport 6151080 "NPR ExRv Vouchers"
 {
-    // NPR5.40/MHA /20180212  CASE 301346 Object created - External Retail Voucher
-
     Caption = 'Vouchers';
     DefaultNamespace = 'urn:microsoft-dynamics-schemas/codeunit/voucher_service';
     Encoding = UTF8;
@@ -55,18 +53,6 @@ xmlport 6151080 "NPR ExRv Vouchers"
                     MinOccurs = Zero;
                 }
             }
-        }
-    }
-
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
         }
     }
 

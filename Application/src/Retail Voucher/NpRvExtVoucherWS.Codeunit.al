@@ -1,29 +1,13 @@
 codeunit 6151021 "NPR NpRv Ext. Voucher WS"
 {
-    // NPR5.48/MHA /20180920  CASE 302179 Object created
-    // NPR5.48/MHA /20190123  CASE 341711 Added "Send via E-mail" and "Send via SMS"
-    // NPR5.52/MHA /20191015  CASE 372315 Added functions GetVouchersByCustomerNo(), GetVouchersByEmail()
-    // NPR5.53/MHA /20191118  CASE 372315 Added "Allow Top-up" to Voucher2Buffer()
-    // NPR5.55/MHA /20200427  CASE 402015 Sale Line POS Voucher is now used instead of separate shadow table
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         Text000: Label 'Invalid Reference No. %1';
         Text001: Label 'Voucher %1 is already in use';
-        Text002: Label 'Insufficient Remaining Voucher Amount %1';
         Text003: Label 'Voucher %1 has already been used';
         Text004: Label 'Voucher %1 is not valid yet';
         Text005: Label 'Voucher %1 is not valid anymore';
         Text006: Label 'Voucher %1 is reserved on different document_no';
         Text007: Label 'Voucher %1 is being used on Sales Order %2';
-
-    local procedure "--- Check Voucher"()
-    begin
-    end;
 
     procedure CheckVouchers(var vouchers: XMLport "NPR NpRv Ext. Vouchers")
     var
@@ -59,7 +43,6 @@ codeunit 6151021 "NPR NpRv Ext. Voucher WS"
         DocNo: Text;
         LineNo: Integer;
     begin
-        //-NPR5.52 [372315]
         Clear(vouchers);
         if StrLen(CustomerNo) > MaxStrLen(NpRvVoucher."Customer No.") then
             exit;
@@ -78,7 +61,6 @@ codeunit 6151021 "NPR NpRv Ext. Voucher WS"
             until NpRvVoucher.Next = 0;
 
         vouchers.SetSourceTable(NpRvExtVoucherBuffer);
-        //+NPR5.52 [372315]
     end;
 
     procedure GetVouchersByEmail(Email: Text; var vouchers: XMLport "NPR NpRv Ext. Vouchers")
@@ -88,7 +70,6 @@ codeunit 6151021 "NPR NpRv Ext. Voucher WS"
         DocNo: Text;
         LineNo: Integer;
     begin
-        //-NPR5.52 [372315]
         Clear(vouchers);
         if StrLen(Email) > MaxStrLen(NpRvVoucher."E-mail") then
             exit;
@@ -107,11 +88,6 @@ codeunit 6151021 "NPR NpRv Ext. Voucher WS"
             until NpRvVoucher.Next = 0;
 
         vouchers.SetSourceTable(NpRvExtVoucherBuffer);
-        //+NPR5.52 [372315]
-    end;
-
-    local procedure "--- Create Voucher"()
-    begin
     end;
 
     procedure CreateVouchers(var vouchers: XMLport "NPR NpRv Ext. Vouchers")
@@ -141,7 +117,6 @@ codeunit 6151021 "NPR NpRv Ext. Voucher WS"
         NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
         Amount: Decimal;
     begin
-        //-NPR5.55 [402015]
         NpRvSalesLine.SetRange("External Document No.", NpRvExtVoucherBuffer."Document No.");
         NpRvSalesLine.SetRange("Reference No.", NpRvExtVoucherBuffer."Reference No.");
         if NpRvSalesLine.FindFirst then begin
@@ -200,11 +175,6 @@ codeunit 6151021 "NPR NpRv Ext. Voucher WS"
         NpRvSalesLineReference.Insert(true);
 
         VoucherSalesLine2Buffer(NpRvSalesLine, NpRvExtVoucherBuffer);
-        //+NPR5.55 [402015]
-    end;
-
-    local procedure "--- Reserve Voucher"()
-    begin
     end;
 
     procedure ReserveVouchers(var vouchers: XMLport "NPR NpRv Ext. Vouchers")
@@ -241,7 +211,6 @@ codeunit 6151021 "NPR NpRv Ext. Voucher WS"
 
         InUseQty := NpRvVoucher.CalcInUseQty();
         if InUseQty > 0 then begin
-            //-NPR5.55 [402015]
             NpRvSalesLine.SetRange("External Document No.", NpRvExtVoucherBuffer."Document No.");
             NpRvSalesLine.SetRange("Voucher Type", NpRvVoucher."Voucher Type");
             NpRvSalesLine.SetRange("Voucher No.", NpRvVoucher."No.");
@@ -249,7 +218,6 @@ codeunit 6151021 "NPR NpRv Ext. Voucher WS"
                 Voucher2Buffer(NpRvVoucher, NpRvExtVoucherBuffer);
                 exit;
             end;
-            //+NPR5.55 [402015]
 
             Error(Text001, NpRvExtVoucherBuffer."Reference No.");
         end;
@@ -261,7 +229,6 @@ codeunit 6151021 "NPR NpRv Ext. Voucher WS"
         if (NpRvVoucher."Ending Date" < Timestamp) and (NpRvVoucher."Ending Date" <> 0DT) then
             Error(Text005, NpRvExtVoucherBuffer."Reference No.");
 
-        //-NPR5.55 [402015]
         NpRvSalesLine.Init;
         NpRvSalesLine.Id := CreateGuid;
         NpRvSalesLine."Document Source" := NpRvSalesLine."Document Source"::"Sales Document";
@@ -272,13 +239,8 @@ codeunit 6151021 "NPR NpRv Ext. Voucher WS"
         NpRvSalesLine."Reference No." := NpRvExtVoucherBuffer."Reference No.";
         NpRvSalesLine.Description := NpRvVoucher.Description;
         NpRvSalesLine.Insert;
-        //+NPR5.55 [402015]
 
         Voucher2Buffer(NpRvVoucher, NpRvExtVoucherBuffer);
-    end;
-
-    local procedure "--- Cancel Voucher Reservation"()
-    begin
     end;
 
     procedure CancelVoucherReservations(var vouchers: XMLport "NPR NpRv Ext. Vouchers")
@@ -306,7 +268,6 @@ codeunit 6151021 "NPR NpRv Ext. Voucher WS"
         if not FindVoucher(NpRvExtVoucherBuffer."Voucher Type", NpRvExtVoucherBuffer."Reference No.", NpRvVoucher) then
             Error(Text000, NpRvExtVoucherBuffer."Reference No.");
 
-        //-NPR5.55 [402015]
         NpRvSalesLine.SetRange("Reference No.", NpRvExtVoucherBuffer."Reference No.");
         NpRvSalesLine.SetRange(Type, NpRvSalesLine.Type::Payment);
         if NpRvSalesLine.FindSet then
@@ -317,18 +278,12 @@ codeunit 6151021 "NPR NpRv Ext. Voucher WS"
                     Error(Text007, NpRvExtVoucherBuffer."Reference No.", NpRvSalesLine."Document No.");
                 NpRvSalesLine.Delete;
             until NpRvSalesLine.Next = 0;
-        //+NPR5.55 [402015]
 
         Voucher2Buffer(NpRvVoucher, NpRvExtVoucherBuffer);
     end;
 
-    local procedure "--- Aux"()
-    begin
-    end;
-
     procedure FindVoucher(VoucherTypeFilter: Text; ReferenceNo: Text[30]; var Voucher: Record "NPR NpRv Voucher"): Boolean
     begin
-        //-NPR5.55 [402015]
         if ReferenceNo = '' then
             exit(false);
 
@@ -339,17 +294,14 @@ codeunit 6151021 "NPR NpRv Ext. Voucher WS"
 
         Voucher.SetRange("Voucher Type");
         exit(Voucher.FindLast);
-        //+NPR5.55 [402015]
     end;
 
     procedure FindSalesVoucher(VoucherTypeFilter: Text; ReferenceNo: Text[30]; var NpRvSalesLine: Record "NPR NpRv Sales Line"): Boolean
     begin
-        //-NPR5.55 [402015]
         NpRvSalesLine.SetFilter("Voucher Type", UpperCase(VoucherTypeFilter));
         NpRvSalesLine.SetRange("Reference No.", ReferenceNo);
         NpRvSalesLine.SetRange("Document Source", NpRvSalesLine."Document Source"::"Sales Document");
         exit(NpRvSalesLine.FindLast);
-        //+NPR5.55 [402015]
     end;
 
     local procedure Voucher2Buffer(var NpRvVoucher: Record "NPR NpRv Voucher"; var NpRvExtVoucherBuffer: Record "NPR NpRv Ext. Voucher Buffer")
@@ -362,9 +314,7 @@ codeunit 6151021 "NPR NpRv Ext. Voucher WS"
         NpRvExtVoucherBuffer."Starting Date" := NpRvVoucher."Starting Date";
         NpRvExtVoucherBuffer."Ending Date" := NpRvVoucher."Ending Date";
         NpRvExtVoucherBuffer."Account No." := NpRvVoucher."Account No.";
-        //-NPR5.53 [372315]
         NpRvExtVoucherBuffer."Allow Top-up" := NpRvVoucher."Allow Top-up";
-        //+NPR5.53 [372315]
         NpRvExtVoucherBuffer.Open := NpRvVoucher.Open;
         NpRvExtVoucherBuffer."In-use Quantity" := NpRvVoucher.CalcInUseQty();
         NpRvExtVoucherBuffer.Amount := NpRvVoucher.Amount;
@@ -378,11 +328,9 @@ codeunit 6151021 "NPR NpRv Ext. Voucher WS"
         NpRvExtVoucherBuffer."Country/Region Code" := NpRvVoucher."Country/Region Code";
         NpRvExtVoucherBuffer."E-mail" := NpRvVoucher."E-mail";
         NpRvExtVoucherBuffer."Phone No." := NpRvVoucher."Phone No.";
-        //-NPR5.48 [341711]
         NpRvExtVoucherBuffer."Send via Print" := NpRvVoucher."Send via Print";
         NpRvExtVoucherBuffer."Send via E-mail" := NpRvVoucher."Send via E-mail";
         NpRvExtVoucherBuffer."Send via SMS" := NpRvVoucher."Send via SMS";
-        //+NPR5.48 [341711]
         NpRvExtVoucherBuffer."Voucher Message" := NpRvVoucher."Voucher Message";
         NpRvExtVoucherBuffer."Issue Date" := NpRvVoucher."Issue Date";
         NpRvExtVoucherBuffer."Issue Register No." := NpRvVoucher."Issue Register No.";
@@ -393,7 +341,6 @@ codeunit 6151021 "NPR NpRv Ext. Voucher WS"
 
     local procedure Buffer2VoucherSalesLine(var NpRvExtVoucherBuffer: Record "NPR NpRv Ext. Voucher Buffer"; var NpRvSalesLine: Record "NPR NpRv Sales Line")
     begin
-        //-NPR5.55 [402015]
         NpRvSalesLine.Name := NpRvExtVoucherBuffer.Name;
         NpRvSalesLine."Name 2" := NpRvExtVoucherBuffer."Name 2";
         NpRvSalesLine.Address := NpRvExtVoucherBuffer.Address;
@@ -411,14 +358,12 @@ codeunit 6151021 "NPR NpRv Ext. Voucher WS"
             NpRvSalesLine."Send via E-mail" := true;
         if NpRvExtVoucherBuffer."Voucher Message" <> '' then
             NpRvSalesLine."Voucher Message" := NpRvExtVoucherBuffer."Voucher Message";
-        //+NPR5.55 [402015]
     end;
 
     local procedure VoucherSalesLine2Buffer(var NpRvSalesLine: Record "NPR NpRv Sales Line"; var NpRvExtVoucherBuffer: Record "NPR NpRv Ext. Voucher Buffer")
     var
         NpRvVoucherType: Record "NPR NpRv Voucher Type";
     begin
-        //-NPR5.55 [402015]
         NpRvVoucherType.Get(NpRvSalesLine."Voucher Type");
 
         NpRvExtVoucherBuffer."Reference No." := NpRvSalesLine."Reference No.";
@@ -450,12 +395,10 @@ codeunit 6151021 "NPR NpRv Ext. Voucher WS"
         NpRvExtVoucherBuffer."Issue Sales Ticket No." := '';
         NpRvExtVoucherBuffer."Issue User ID" := '';
         NpRvExtVoucherBuffer.Modify;
-        //+NPR5.55 [402015]
     end;
 
     local procedure Buffer2Voucher(var NpRvExtVoucherBuffer: Record "NPR NpRv Ext. Voucher Buffer"; var NpRvVoucher: Record "NPR NpRv Voucher")
     begin
-        //-NPR5.55 [402015]
         NpRvVoucher.Name := NpRvExtVoucherBuffer.Name;
         NpRvVoucher."Name 2" := NpRvExtVoucherBuffer."Name 2";
         NpRvVoucher.Address := NpRvExtVoucherBuffer.Address;
@@ -473,7 +416,6 @@ codeunit 6151021 "NPR NpRv Ext. Voucher WS"
             NpRvVoucher."Send via E-mail" := true;
         if NpRvExtVoucherBuffer."Voucher Message" <> '' then
             NpRvVoucher."Voucher Message" := NpRvExtVoucherBuffer."Voucher Message";
-        //+NPR5.55 [402015]
     end;
 
     local procedure SetGlobalLanguage(LanguageUsername: Text)

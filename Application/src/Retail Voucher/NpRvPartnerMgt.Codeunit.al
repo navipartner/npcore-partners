@@ -1,20 +1,5 @@
 codeunit 6151022 "NPR NpRv Partner Mgt."
 {
-    // NPR5.49/MHA /20190228  CASE 342811 Object created - Retail Voucher Partner used with Cross Company Vouchers
-    // NPR5.51/MHA /20190705  CASE 361164 Updated Exception Message parsing in TryValidateGlobalVoucherService()
-
-
-    trigger OnRun()
-    begin
-    end;
-
-    var
-        Text000: Label 'Webservice User for (Global) Retail Voucher';
-
-    local procedure "--- Init"()
-    begin
-    end;
-
     procedure InitLocalPartner(var NpRvPartner: Record "NPR NpRv Partner")
     begin
         if NpRvPartner.Name = '' then
@@ -57,54 +42,48 @@ codeunit 6151022 "NPR NpRv Partner Mgt."
     procedure TryValidateGlobalVoucherService(NpRvPartner: Record "NPR NpRv Partner")
     var
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
-        Credential: DotNet NPRNetNetworkCredential;
-        HttpWebRequest: DotNet NPRNetHttpWebRequest;
-        HttpWebResponse: DotNet NPRNetHttpWebResponse;
-        XmlDoc: DotNet "NPRNetXmlDocument";
-        XmlElement: DotNet NPRNetXmlElement;
-        WebException: DotNet NPRNetWebException;
+        XmlDomManagement: codeunit "XML DOM Management";
+        Client: HttpClient;
+        RequestContent: HttpContent;
+        ContentHeader: HttpHeaders;
+        Response: HttpResponseMessage;
+        Document: XmlDocument;
+        Node: XmlNode;
+        RequestXmlText: Text;
         ErrorMessage: Text;
     begin
-        //-NPR5.49 [342811]
         NpRvPartner.TestField("Service Url");
 
-        XmlDoc := XmlDoc.XmlDocument;
-        XmlDoc.LoadXml(
+        RequestXmlText :=
           '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">' +
              '<soapenv:Body>' +
                '<UpsertPartners xmlns="urn:microsoft-dynamics-schemas/codeunit/' + GetServiceName(NpRvPartner) + '">' +
                  '<retail_voucher_partners />' +
                '</UpsertPartners>' +
             '</soapenv:Body>' +
-          '</soapenv:Envelope>'
-        );
+          '</soapenv:Envelope>';
 
-        HttpWebRequest := HttpWebRequest.Create(NpRvPartner."Service Url");
-        HttpWebRequest.UseDefaultCredentials(false);
-        Credential := Credential.NetworkCredential(NpRvPartner."Service Username", NpRvPartner."Service Password");
-        HttpWebRequest.Credentials(Credential);
-        HttpWebRequest.Method := 'POST';
-        HttpWebRequest.ContentType := 'text/xml; charset=utf-8';
-        HttpWebRequest.Headers.Add('SOAPAction', 'UpsertPartners');
-        NpXmlDomMgt.SetTrustedCertificateValidation(HttpWebRequest);
+        RequestContent.WriteFrom(RequestXmlText);
+        RequestContent.GetHeaders(ContentHeader);
 
-        if NpXmlDomMgt.SendWebRequest(XmlDoc, HttpWebRequest, HttpWebResponse, WebException) then
+        ContentHeader.Clear();
+        ContentHeader.Remove('Content-Type');
+        ContentHeader.Add('Content-Type', 'text/xml; charset=utf-8');
+        ContentHeader.Add('SOAPAction', 'UpsertPartners');
+        ContentHeader.Remove('Connection');
+        ContentHeader := Client.DefaultRequestHeaders();
+
+        Client.UseWindowsAuthentication(NpRvPartner."Service Username", NpRvPartner."Service Password");
+        Client.Post(NpRvPartner."Service Url", RequestContent, Response);
+
+        if Response.IsSuccessStatusCode then
             exit;
 
-        //-NPR5.51 [361164]
-        ErrorMessage := NpXmlDomMgt.GetWebExceptionMessage(WebException);
-        if NpXmlDomMgt.TryLoadXml(ErrorMessage, XmlDoc) then begin
-            NpXmlDomMgt.RemoveNameSpaces(XmlDoc);
-            if NpXmlDomMgt.FindNode(XmlDoc.DocumentElement, '//faultstring', XmlElement) then
-                ErrorMessage := XmlElement.InnerText;
-        end;
+        ErrorMessage := XmlDomManagement.RemoveNamespaces(Response.ReasonPhrase);
+        if XmlDocument.ReadFrom(ErrorMessage, Document) then
+            if NpXmlDomMgt.FindNode(Document.AsXmlNode(), '//faultstring', Node) then
+                ErrorMessage := Node.AsXmlElement.InnerText();
         Error(CopyStr(ErrorMessage, 1, 1000));
-        //+NPR5.51 [361164]
-        //+NPR5.49 [342811]
-    end;
-
-    local procedure "--- Get/Find"()
-    begin
     end;
 
     procedure GetGlobalVoucherWSUrl(ServiceCompanyName: Text) Url: Text
@@ -116,7 +95,6 @@ codeunit 6151022 "NPR NpRv Partner Mgt."
     var
         Position: Integer;
     begin
-        //-NPR5.49 [342811]
         ServiceName := NpRvPartner."Service Url";
         Position := StrPos(ServiceName, '?');
         if Position > 0 then
@@ -135,11 +113,6 @@ codeunit 6151022 "NPR NpRv Partner Mgt."
         end;
 
         exit(ServiceName);
-        //+NPR5.49 [342811]
-    end;
-
-    local procedure "--- Aux"()
-    begin
     end;
 
     local procedure GlobalVoucherWsCodeunitId(): Integer

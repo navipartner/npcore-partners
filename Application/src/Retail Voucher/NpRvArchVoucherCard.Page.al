@@ -1,12 +1,5 @@
 page 6151021 "NPR NpRv Arch. Voucher Card"
 {
-    // NPR5.37/MHA /20171023  CASE 267346 Object created - NaviPartner Retail Voucher
-    // NPR5.48/MHA /20180921  CASE 302179 Added fields 1005, 1007, 1010, 1013 and deleted field 80
-    // NPR5.49/MHA /20190228  CASE 342811 Added Retail Voucher Partner fields used with Cross Company Vouchers
-    // NPR5.53/MHA /20191211  CASE 380284 Added field 76 "Initial Amount"
-    // NPR5.55/MHA /20200701  CASE 397527 Added field 270 "Language Code"
-    // NPR5.55/MHA /20200702  CASE 407070 Added Sending Log
-
     Caption = 'Archived Retail Voucher Card';
     Editable = false;
     SourceTable = "NPR NpRv Arch. Voucher";
@@ -298,9 +291,5 @@ page 6151021 "NPR NpRv Arch. Voucher Card"
             }
         }
     }
-
-    var
-        Text000: Label 'Are you sure you want to delete Vouchers In-use?';
-        Text001: Label 'Manual Post Voucher?';
 }
 

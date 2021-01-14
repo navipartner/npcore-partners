@@ -1,8 +1,5 @@
 page 6151024 "NPR NpRv Global Voucher Setup"
 {
-    // NPR5.42/MHA /20180521  CASE 307022 Object created - Global Retail Voucher for tenant; guldsmeddirks
-    // NPR5.49/MHA /20190228  CASE 342811 Added Retail Voucher Partner functionality used with Cross Company Vouchers
-
     Caption = 'Global Voucher Setup';
     InsertAllowed = false;
     SourceTable = "NPR NpRv Global Vouch. Setup";
@@ -60,12 +57,10 @@ page 6151024 "NPR NpRv Global Voucher Setup"
                 var
                     NpRvModuleValidateGlobal: Codeunit "NPR NpRv Module Valid.: Global";
                 begin
-                    //-NPR5.49 [342811]
                     if NpRvModuleValidateGlobal.TryValidateGlobalVoucherSetup(Rec) then
                         Message(Text001)
                     else
                         Error(GetLastErrorText);
-                    //+NPR5.49 [342811]
                 end;
             }
         }
@@ -75,10 +70,8 @@ page 6151024 "NPR NpRv Global Voucher Setup"
     var
         NpRvModuleValidateGlobal: Codeunit "NPR NpRv Module Valid.: Global";
     begin
-        //-NPR5.49 [342811]
         if not NpRvModuleValidateGlobal.TryValidateGlobalVoucherSetup(Rec) then
             exit(Confirm(Text000, false));
-        //+NPR5.49 [342811]
     end;
 
     var

@@ -1,9 +1,5 @@
 table 6151017 "NPR NpRv Sales Line Ref."
 {
-    // NPR5.37/MHA /20171023  CASE 267346 Object created - NaviPartner Retail Voucher
-    // NPR5.54/MHA /20200310  CASE 372135 Added field 50 "Voucher No."
-    // NPR5.55/MHA /20200512  CASE 402015 Changed Primary key, Restructured fields and updated Object Name
-
     Caption = 'Retail Voucher Sales Line Reference';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR NpRv Sales Line Ref.";
@@ -49,10 +45,6 @@ table 6151017 "NPR NpRv Sales Line Ref."
         key(Key2; "Sales Line Id", "Voucher No.", "Reference No.")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 
     trigger OnInsert()

@@ -1,12 +1,5 @@
 table 6151018 "NPR NpRv Arch. Voucher"
 {
-    // NPR5.37/MHA /20171023  CASE 267346 Object created - NaviPartner Retail Voucher
-    // NPR5.48/MHA /20180921  CASE 302179 Deleted field 80 "In-use Quantity" and added field 1007 "Issue Document Type", 1013 "Issue External Document No."
-    // NPR5.48/MHA /20190213  CASE 345739 No. Series length has been increased from 10 to 20 in NAV2018 and newer
-    // NPR5.49/MHA /20190228  CASE 342811 Added partner fields
-    // NPR5.53/MHA /20191211  CASE 380284 Added field 76 "Initial Amount"
-    // NPR5.55/MHA /20200701  CASE 397527 Added field 270 "Language Code"
-
     Caption = 'Archived Retail Voucher';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR NpRv Arch. Vouchers";
@@ -92,7 +85,7 @@ table 6151018 "NPR NpRv Arch. Voucher"
         }
         field(75; Amount; Decimal)
         {
-            CalcFormula = Sum ("NPR NpRv Arch. Voucher Entry"."Remaining Amount" WHERE("Arch. Voucher No." = FIELD("No.")));
+            CalcFormula = Sum("NPR NpRv Arch. Voucher Entry"."Remaining Amount" WHERE("Arch. Voucher No." = FIELD("No.")));
             Caption = 'Amount';
             DecimalPlaces = 2 : 2;
             Editable = false;
@@ -100,7 +93,7 @@ table 6151018 "NPR NpRv Arch. Voucher"
         }
         field(76; "Initial Amount"; Decimal)
         {
-            CalcFormula = Sum ("NPR NpRv Arch. Voucher Entry".Amount WHERE("Arch. Voucher No." = FIELD("No."),
+            CalcFormula = Sum("NPR NpRv Arch. Voucher Entry".Amount WHERE("Arch. Voucher No." = FIELD("No."),
                                                                        "Entry Type" = FILTER("Issue Voucher" | "Partner Issue Voucher" | "Top-up")));
             Caption = 'Initial Amount';
             Description = 'NPR5.53';
@@ -123,7 +116,7 @@ table 6151018 "NPR NpRv Arch. Voucher"
         }
         field(100; "Send Voucher Module"; Code[20])
         {
-            CalcFormula = Lookup ("NPR NpRv Voucher Type"."Send Voucher Module" WHERE(Code = FIELD("Voucher Type")));
+            CalcFormula = Lookup("NPR NpRv Voucher Type"."Send Voucher Module" WHERE(Code = FIELD("Voucher Type")));
             Caption = 'Send Voucher Module';
             Editable = false;
             FieldClass = FlowField;
@@ -148,14 +141,14 @@ table 6151018 "NPR NpRv Arch. Voucher"
         }
         field(110; "Validate Voucher Module"; Code[20])
         {
-            CalcFormula = Lookup ("NPR NpRv Voucher Type"."Validate Voucher Module" WHERE(Code = FIELD("Voucher Type")));
+            CalcFormula = Lookup("NPR NpRv Voucher Type"."Validate Voucher Module" WHERE(Code = FIELD("Voucher Type")));
             Caption = 'Validate Voucher Module';
             Editable = false;
             FieldClass = FlowField;
         }
         field(120; "Apply Payment Module"; Code[20])
         {
-            CalcFormula = Lookup ("NPR NpRv Voucher Type"."Apply Payment Module" WHERE(Code = FIELD("Voucher Type")));
+            CalcFormula = Lookup("NPR NpRv Voucher Type"."Apply Payment Module" WHERE(Code = FIELD("Voucher Type")));
             Caption = 'Apply Payment Module';
             Editable = false;
             FieldClass = FlowField;
@@ -258,7 +251,7 @@ table 6151018 "NPR NpRv Arch. Voucher"
         }
         field(1000; "Issue Date"; Date)
         {
-            CalcFormula = Min ("NPR NpRv Arch. Voucher Entry"."Posting Date" WHERE("Arch. Voucher No." = FIELD("No."),
+            CalcFormula = Min("NPR NpRv Arch. Voucher Entry"."Posting Date" WHERE("Arch. Voucher No." = FIELD("No."),
                                                                                "Entry Type" = FILTER("Issue Voucher" | "Partner Issue Voucher")));
             Caption = 'Issue Date';
             Description = 'NPR5.49';
@@ -267,7 +260,7 @@ table 6151018 "NPR NpRv Arch. Voucher"
         }
         field(1005; "Issue Register No."; Code[10])
         {
-            CalcFormula = Max ("NPR NpRv Arch. Voucher Entry"."Register No." WHERE("Arch. Voucher No." = FIELD("No."),
+            CalcFormula = Max("NPR NpRv Arch. Voucher Entry"."Register No." WHERE("Arch. Voucher No." = FIELD("No."),
                                                                                "Entry Type" = FILTER("Issue Voucher" | "Partner Issue Voucher")));
             Caption = 'Issue Register No.';
             Description = 'NPR5.49';
@@ -276,7 +269,7 @@ table 6151018 "NPR NpRv Arch. Voucher"
         }
         field(1007; "Issue Document Type"; Option)
         {
-            CalcFormula = Max ("NPR NpRv Arch. Voucher Entry"."Document Type" WHERE("Arch. Voucher No." = FIELD("No."),
+            CalcFormula = Max("NPR NpRv Arch. Voucher Entry"."Document Type" WHERE("Arch. Voucher No." = FIELD("No."),
                                                                                 "Entry Type" = FILTER("Issue Voucher" | "Partner Issue Voucher")));
             Caption = 'Issue Document Type';
             Description = 'NPR5.48,NPR5.49';
@@ -287,7 +280,7 @@ table 6151018 "NPR NpRv Arch. Voucher"
         }
         field(1010; "Issue Document No."; Code[20])
         {
-            CalcFormula = Max ("NPR NpRv Arch. Voucher Entry"."Document No." WHERE("Arch. Voucher No." = FIELD("No."),
+            CalcFormula = Max("NPR NpRv Arch. Voucher Entry"."Document No." WHERE("Arch. Voucher No." = FIELD("No."),
                                                                                "Entry Type" = FILTER("Issue Voucher" | "Partner Issue Voucher")));
             Caption = 'Issue Document No.';
             Description = 'NPR5.48,NPR5.49';
@@ -296,7 +289,7 @@ table 6151018 "NPR NpRv Arch. Voucher"
         }
         field(1013; "Issue External Document No."; Code[20])
         {
-            CalcFormula = Max ("NPR NpRv Arch. Voucher Entry"."External Document No." WHERE("Arch. Voucher No." = FIELD("No."),
+            CalcFormula = Max("NPR NpRv Arch. Voucher Entry"."External Document No." WHERE("Arch. Voucher No." = FIELD("No."),
                                                                                         "Entry Type" = FILTER("Issue Voucher" | "Partner Issue Voucher")));
             Caption = 'Issue External Document No.';
             Description = 'NPR5.48,NPR5.49';
@@ -305,7 +298,7 @@ table 6151018 "NPR NpRv Arch. Voucher"
         }
         field(1015; "Issue User ID"; Code[50])
         {
-            CalcFormula = Max ("NPR NpRv Arch. Voucher Entry"."User ID" WHERE("Arch. Voucher No." = FIELD("No."),
+            CalcFormula = Max("NPR NpRv Arch. Voucher Entry"."User ID" WHERE("Arch. Voucher No." = FIELD("No."),
                                                                           "Entry Type" = FILTER("Issue Voucher" | "Partner Issue Voucher")));
             Caption = 'Issue User ID';
             Description = 'NPR5.49';
@@ -314,7 +307,7 @@ table 6151018 "NPR NpRv Arch. Voucher"
         }
         field(1020; "Issue Partner Code"; Code[20])
         {
-            CalcFormula = Max ("NPR NpRv Arch. Voucher Entry"."Partner Code" WHERE("Arch. Voucher No." = FIELD("No."),
+            CalcFormula = Max("NPR NpRv Arch. Voucher Entry"."Partner Code" WHERE("Arch. Voucher No." = FIELD("No."),
                                                                                "Entry Type" = FILTER("Issue Voucher" | "Partner Issue Voucher")));
             Caption = 'Issue Partner Code';
             Description = 'NPR5.49';
@@ -323,7 +316,7 @@ table 6151018 "NPR NpRv Arch. Voucher"
         }
         field(1025; "Partner Clearing"; Boolean)
         {
-            CalcFormula = Max ("NPR NpRv Arch. Voucher Entry"."Partner Clearing" WHERE("Arch. Voucher No." = FIELD("No.")));
+            CalcFormula = Max("NPR NpRv Arch. Voucher Entry"."Partner Clearing" WHERE("Arch. Voucher No." = FIELD("No.")));
             Caption = 'Partner Clearing';
             Description = 'NPR5.49';
             Editable = false;
@@ -331,7 +324,7 @@ table 6151018 "NPR NpRv Arch. Voucher"
         }
         field(1030; "No. Send"; Integer)
         {
-            CalcFormula = Count ("NPR NpRv Arch. Sending Log" WHERE("Arch. Voucher No." = FIELD("No."),
+            CalcFormula = Count("NPR NpRv Arch. Sending Log" WHERE("Arch. Voucher No." = FIELD("No."),
                                                                 "Error during Send" = CONST(false)));
             Caption = 'No. Send';
             Description = 'NPR5.55';
@@ -351,10 +344,6 @@ table 6151018 "NPR NpRv Arch. Voucher"
         key(Key3; "Reference No.")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 

@@ -178,10 +178,6 @@ codeunit 6151013 "NPR NpRv Module Send: Def."
         SMSManagement.SendSMS(Voucher."Phone No.", SMSTemplateHeader."Alt. Sender", SMSMessage);
     end;
 
-    local procedure "--- Voucher Interface"()
-    begin
-    end;
-
     [EventSubscriber(ObjectType::Codeunit, 6151011, 'OnInitVoucherModules', '', true, true)]
     local procedure OnInitVoucherModules(var VoucherModule: Record "NPR NpRv Voucher Module")
     begin
@@ -253,10 +249,6 @@ codeunit 6151013 "NPR NpRv Module Send: Def."
         Handled := true;
 
         SendVoucher(Voucher);
-    end;
-
-    local procedure "--- Aux"()
-    begin
     end;
 
     local procedure CurrCodeunitId(): Integer

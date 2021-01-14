@@ -1,7 +1,5 @@
 codeunit 6151082 "NPR ExRv Task Queue Mgt."
 {
-    // NPR5.40/MHA /20180226  CASE 301346 Object created - External Retail Voucher
-
     TableNo = "NPR Task Line";
 
     trigger OnRun()

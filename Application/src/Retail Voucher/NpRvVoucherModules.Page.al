@@ -1,7 +1,5 @@
 page 6151011 "NPR NpRv Voucher Modules"
 {
-    // NPR5.37/MHA /20171023  CASE 267346 Object created - NaviPartner Retail Voucher
-
     Caption = 'Retail Voucher Modules';
     PageType = List;
     SourceTable = "NPR NpRv Voucher Module";

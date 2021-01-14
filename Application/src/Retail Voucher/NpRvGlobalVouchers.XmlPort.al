@@ -1,8 +1,5 @@
 xmlport 6151010 "NPR NpRv Global Vouchers"
 {
-    // NPR5.42/MHA /20180521  CASE 307022 Object created - Global Retail Voucher for tenant; guldsmeddirks
-    // NPR5.49/MHA /20190228  CASE 342811 Added elements <issue_partner_code>, <redeem_partner_code>
-
     Caption = 'Global Vouchers';
     DefaultNamespace = 'urn:microsoft-dynamics-schemas/codeunit/global_voucher_service';
     Encoding = UTF8;
@@ -131,18 +128,6 @@ xmlport 6151010 "NPR NpRv Global Vouchers"
                     MinOccurs = Zero;
                 }
             }
-        }
-    }
-
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
         }
     }
 

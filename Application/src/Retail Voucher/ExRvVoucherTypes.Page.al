@@ -1,7 +1,5 @@
 page 6151080 "NPR ExRv Voucher Types"
 {
-    // NPR5.40/MHA /20180212  CASE 301346 Object created - External Retail Voucher
-
     Caption = 'External Retail Voucher Types';
     DelayedInsert = true;
     PageType = List;

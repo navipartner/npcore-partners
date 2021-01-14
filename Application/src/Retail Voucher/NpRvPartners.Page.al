@@ -1,7 +1,5 @@
 page 6151026 "NPR NpRv Partners"
 {
-    // NPR5.49/MHA /20190228  CASE 342811 Object created - Retail Voucher Partner used with Cross Company Vouchers
-
     Caption = 'Retail Voucher Partners';
     CardPageID = "NPR NpRv Partner Card";
     Editable = false;
@@ -59,11 +57,5 @@ page 6151026 "NPR NpRv Partners"
             }
         }
     }
-
-    trigger OnOpenPage()
-    var
-        NpRvPartnerMgt: Codeunit "NPR NpRv Partner Mgt.";
-    begin
-    end;
 }
 
