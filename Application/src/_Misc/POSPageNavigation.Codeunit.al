@@ -1,13 +1,5 @@
 codeunit 6150635 "NPR POS Page Navigation"
 {
-    // NPR5.38/BR  /20171116  CASE 295255 Object Added
-    // NPR5.38/NPKNAV/20180126  CASE 295255 Transport NPR5.38 - 26 January 2018
-    // NPR5.51/THRO/20190717  CASE 361514 EventPublisherElement changed in Page30OnAfterActionPOSSalesLines. Action renamed on Page 30
-    //                                    EventPublisherElement changed in Page31OnAfterActionPOSSalesLines. Action renamed on Page 31
-    //                                    EventPublisherElement changed in Page6014425OnAfterActionPOSSalesLines. Action renamed on Page 6014425
-    //                                    EventPublisherElement changed in Page6014511OnAfterActionPOSSalesLines. Action renamed on Page 6014511
-
-
     trigger OnRun()
     begin
     end;
@@ -60,10 +52,7 @@ codeunit 6150635 "NPR POS Page Navigation"
         POSEntryList.Run;
     end;
 
-    local procedure "---Subscribers"()
-    begin
-    end;
-
+    #region Subscribers
     [EventSubscriber(ObjectType::Page, 30, 'OnAfterActionEvent', 'NPR POSSalesEntries', true, true)]
     local procedure Page30OnAfterActionPOSSalesLines(var Rec: Record Item)
     begin
@@ -117,5 +106,5 @@ codeunit 6150635 "NPR POS Page Navigation"
     begin
         OpenPOSEntryListFromSalesDocument(Rec);
     end;
+    #endregion
 }
-

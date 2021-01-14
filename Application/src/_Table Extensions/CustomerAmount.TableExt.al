@@ -1,7 +1,5 @@
 tableextension 6014425 "NPR Customer Amount" extends "Customer Amount"
 {
-    // NPR7.100.000/LS/220114  : Retail Merge
-    //                                        Added Fields 6014401..6014402
     fields
     {
         field(6014400; "NPR Location"; Integer)
@@ -18,4 +16,3 @@ tableextension 6014425 "NPR Customer Amount" extends "Customer Amount"
         }
     }
 }
-
