@@ -186,7 +186,7 @@ codeunit 6184527 "NPR EFT Verifone Vim Prot."
             TransactionRequest.SoftwareManufacturer := 'NaviPartner ApS';
             TransactionRequest.SoftwareName := 'NP Retail';
             TransactionRequest.SoftwareVersion := Licenceinformation.GetRetailVersion();
-            TransactionRequest.SoftwareCertificationCode := 'pilot'; //TODO
+            TransactionRequest.SoftwareCertificationCode := 'prod';
             TransactionRequest.LogLocation := EFTVerifoneVimIntegration.GetLogLocation(EFTSetup);
             TransactionRequest.TerminalListeningPort := EFTVerifoneVimIntegration.GetListeningPort(EFTSetup);
             TransactionRequest.TerminalLANAddress := EFTVerifoneVimIntegration.GetTerminalLANAddress(EFTSetup);
@@ -261,7 +261,7 @@ codeunit 6184527 "NPR EFT Verifone Vim Prot."
         LoginRequest.SoftwareManufacturer := 'NaviPartner ApS';
         LoginRequest.SoftwareName := 'NP Retail';
         LoginRequest.SoftwareVersion := Licenceinformation.GetRetailVersion();
-        LoginRequest.SoftwareCertificationCode := 'pilot'; //TODO
+        LoginRequest.SoftwareCertificationCode := 'prod';
         LoginRequest.LogLocation := EFTVerifoneVimIntegration.GetLogLocation(EFTSetup);
         LoginRequest.TerminalListeningPort := EFTVerifoneVimIntegration.GetListeningPort(EFTSetup);
         LoginRequest.TerminalLANAddress := EFTVerifoneVimIntegration.GetTerminalLANAddress(EFTSetup);
