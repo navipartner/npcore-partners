@@ -1102,7 +1102,7 @@ codeunit 6184850 "NPR FR Audit Mgt."
         FRPOSEntryRelatedInfo: Record "NPR FR POS Audit Log Aux. Info";
         POSStore: Record "NPR POS Store";
         CompanyInformation: Record "Company Information";
-        Licenceinformation: Codeunit "NPR License Information";
+        Licenseinformation: Codeunit "NPR License Information";
         SalespersonPurchaser: Record "Salesperson/Purchaser";
         RecRef: RecordRef;
     begin
@@ -1113,7 +1113,7 @@ codeunit 6184850 "NPR FR Audit Mgt."
         with FRPOSEntryRelatedInfo do begin
             Init;
             "POS Entry No." := POSEntry."Entry No.";
-            "NPR Version" := Licenceinformation.GetRetailVersion();
+            "NPR Version" := CopyStr(Licenseinformation.GetRetailVersion(), 1, MaxStrLen("NPR Version"));
             "Store Name" := POSStore.Name;
             "Store Name 2" := POSStore."Name 2";
             "Store Address" := POSStore.Address;

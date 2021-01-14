@@ -633,6 +633,7 @@ codeunit 6150702 "NPR POS UI Management"
         Options: JsonObject;
         POSSetup: Record "NPR POS Setup";
         POSActionParameterMgt: Codeunit "NPR POS Action Param. Mgt.";
+        LicenseInformation: Codeunit "NPR License Information";
     begin
         Options.Add('itemWorkflow', Setup.ActionCode_Item);
         Options.Add('paymentWorkflow', Setup.ActionCode_Payment);
@@ -648,7 +649,7 @@ codeunit 6150702 "NPR POS UI Management"
         Options.Add('adminMenuWorkflow', Setup.ActionCode_AdminMenu());
         Setup.GetNamedActionSetup(POSSetup);
         Options.Add('adminMenuWorkflow_parameters', POSActionParameterMgt.GetParametersAsJson(POSSetup.RecordId, POSSetup.FieldNo("Admin Menu Action Code")));
-        Options.Add('nprVersion', GetNPRVersion());
+        Options.Add('nprVersion', LicenseInformation.GetRetailVersion());
 
         OnSetOptions(Setup, Options);
 
@@ -705,25 +706,6 @@ codeunit 6150702 "NPR POS UI Management"
                 TmpPOSParameterValue.Insert;
             until POSParameterValue.Next = 0;
         TmpPOSParameterValue.SetParamFilterIndicator();
-    end;
-
-    procedure GetNPRVersion(): Text
-    var
-        NPRUpgradeHistory: Record "NPR Upgrade History";
-        Npr: ModuleInfo;
-    begin
-        // First, let's try to retrieve the current module info
-        if NavApp.GetCurrentModuleInfo(Npr) then
-            exit(StrSubstNo('NPR %1', Npr.AppVersion()));
-        // ... and if that fails, fallback to previous logic
-
-        with NPRUpgradeHistory do begin
-            SetCurrentKey("Upgrade Time");
-            SetAscending("Upgrade Time", false);
-            if not FindFirst then
-                exit('');
-            exit(Version);
-        end;
     end;
 
     local procedure GetPOSUnitType(POSSetup: Codeunit "NPR POS Setup"): Integer
