@@ -1,12 +1,5 @@
 codeunit 6150744 "NPR POS Keyboard Binding Mgt."
 {
-    // NPR5.48/TJ  /20180806 CASE 323835 New object
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         Text000: Label 'Sale was canceled %1';
         SameKeyCodeErr: Label 'Can''t have same %1 for different %2. %1 %3 is already used on %2 %4.';
@@ -146,32 +139,32 @@ codeunit 6150744 "NPR POS Keyboard Binding Mgt."
     var
         AvailablePOSKeybindTemp: Record "NPR Available POS Keybind" temporary;
         AvailablePOSKeybind: Record "NPR Available POS Keybind";
-        "Keys": DotNet NPRNetKeys;
-        "Key": DotNet NPRNetKeys;
-        StringArray: DotNet NPRNetArray;
-        Type: DotNet NPRNetType;
         EntryNo: Integer;
+        DigitCount: Integer;
+        Letter: Char;
+        ListData: Text;
+        TextList: List of [Text];
     begin
-        Type := GetDotNetType(Keys);
-        StringArray := Keys.GetValues(Type);
-        foreach Key in StringArray do begin
-            if (Key.CompareTo(Key.D0) >= 0) and (Key.CompareTo(Key.D9) <= 0) then //numbers on the keyboard above letters
-                AddKey(AvailablePOSKeybindTemp, EntryNo, CopyStr(Key.ToString, 2), 0, true);
-            if (Key.CompareTo(Key.A) >= 0) and (Key.CompareTo(Key.Z) <= 0) then
-                AddKey(AvailablePOSKeybindTemp, EntryNo, Key.ToString, 0, true);
-            if (Key.CompareTo(Key.F1) >= 0) and (Key.CompareTo(Key.F12) <= 0) then
-                AddKey(AvailablePOSKeybindTemp, EntryNo, Key.ToString, 0, true);
-            if Key.CompareTo(Key.LWin) = 0 then
-                AddKey(AvailablePOSKeybindTemp, EntryNo, CopyStr(Key.ToString, 2), 1, true);
-            if Key.CompareTo(Key.LControlKey) = 0 then
-                AddKey(AvailablePOSKeybindTemp, EntryNo, 'Ctrl', 2, true);
-            if Key.CompareTo(Key.LShiftKey) = 0 then
-                AddKey(AvailablePOSKeybindTemp, EntryNo, 'Shift', 3, true);
-            if Key.CompareTo(Key.Alt) = 0 then
-                AddKey(AvailablePOSKeybindTemp, EntryNo, Key.ToString, 4, true);
-            if Key.CompareTo(Key.Escape) = 0 then
-                AddKey(AvailablePOSKeybindTemp, EntryNo, Key.ToString, 0, true);
+        TextList.AddRange('Escape', 'Win', 'Ctrl', 'Shift', 'Alt');
+
+        Letter := 'A';
+        repeat
+            AddKey(AvailablePOSKeybindTemp, EntryNo, Letter, 0, true);
+            Letter += 1;
+        until Letter = 'Z';
+        AddKey(AvailablePOSKeybindTemp, EntryNo, Letter, 0, true);
+
+        DigitCount := 0;
+        while DigitCount < 13 do begin
+            if DigitCount < 10 then
+                AddKey(AvailablePOSKeybindTemp, EntryNo, Format(DigitCount), 0, true);
+            if DigitCount > 0 then
+                AddKey(AvailablePOSKeybindTemp, EntryNo, ('F' + Format(DigitCount)), 0, true);
+            DigitCount += 1;
         end;
+
+        foreach ListData in TextList do
+            AddKey(AvailablePOSKeybindTemp, EntryNo, ListData, (TextList.IndexOf(ListData) - 1), true);
 
         EntryNo := 0;
         if AvailablePOSKeybind.FindSet then

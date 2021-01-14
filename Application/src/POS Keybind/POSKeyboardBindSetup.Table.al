@@ -1,7 +1,5 @@
 table 6150719 "NPR POS Keyboard Bind. Setup"
 {
-    // NPR5.48/JAVA/20190205  CASE 323835 Transport NPR5.48 - 5 February 2019
-
     Caption = 'POS Keyboard Binding Setup';
     DataClassification = CustomerContent;
 
@@ -67,11 +65,6 @@ table 6150719 "NPR POS Keyboard Bind. Setup"
         }
     }
 
-    fieldgroups
-    {
-    }
-
     var
         POSKeyboardBindingMgt: Codeunit "NPR POS Keyboard Binding Mgt.";
 }
-
