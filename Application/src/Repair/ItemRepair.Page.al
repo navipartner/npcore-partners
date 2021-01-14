@@ -427,7 +427,7 @@ page 6059991 "NPR Item Repair"
                         Item: Record Item;
                     begin
                         Item.Get("Item No.");
-                        PAGE.RunModal(6014425, Item);
+                        PAGE.RunModal(Page::"Item Card", Item);
                     end;
                 }
                 action("Varient List")

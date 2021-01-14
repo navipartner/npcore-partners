@@ -248,7 +248,7 @@ page 6014453 "NPR Campaign Discount"
                     begin
                         CurrPage.SubForm.PAGE.GetRecord(PeriodDiscountLine);
                         Item2.SetRange("No.", PeriodDiscountLine."Item No.");
-                        PAGE.Run(6014425, Item2, Item2."No.");
+                        PAGE.Run(Page::"Item Card", Item2, Item2."No.");
                     end;
                 }
             }
