@@ -335,8 +335,7 @@ page 6151014 "NPR NpRv Voucher Card"
                             exit;
 
                         Voucher.Get("No.");
-                        Voucher.SetRecFilter;
-                        NpRvVoucherMgt.ArchiveVouchers(Rec);
+                        NpRvVoucherMgt.ArchiveVouchers(Voucher);
                     end;
                 }
             }
