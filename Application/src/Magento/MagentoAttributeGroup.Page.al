@@ -6,7 +6,6 @@ page 6151457 "NPR Magento Attribute Group"
     DelayedInsert = true;
     Editable = false;
     PageType = CardPart;
-    UsageCategory = Administration;
     SourceTable = "NPR Magento Attribute Group";
     SourceTableView = SORTING("Attribute Group ID")
                       ORDER(Ascending);
