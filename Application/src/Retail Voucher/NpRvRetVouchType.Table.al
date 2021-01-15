@@ -26,5 +26,11 @@ table 6151016 "NPR NpRv Ret. Vouch. Type"
             FieldClass = FlowField;
         }
     }
+    keys
+    {
+        key(Key1; "Voucher Type")
+        {
+        }
+    }
 }
 
