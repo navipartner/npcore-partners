@@ -11,6 +11,7 @@ page 6151526 "NPR Nc Endpoint File List"
     ModifyAllowed = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Nc Endpoint File";
 
     layout

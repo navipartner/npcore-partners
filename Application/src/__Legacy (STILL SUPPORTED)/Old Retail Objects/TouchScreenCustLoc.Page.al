@@ -10,6 +10,7 @@ page 6014555 "NPR Touch Screen - Cust Loc."
     ModifyAllowed = false;
     PageType = StandardDialog;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR POS Customer Location";
 
     layout

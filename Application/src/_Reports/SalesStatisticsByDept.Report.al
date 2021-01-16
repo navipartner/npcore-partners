@@ -24,6 +24,7 @@ report 6014535 "NPR Sales Statistics By Dept."
 
     Caption = 'Sales Statistics By Department';
     UsageCategory = ReportsAndAnalysis;
+    ApplicationArea = All;
 
     dataset
     {

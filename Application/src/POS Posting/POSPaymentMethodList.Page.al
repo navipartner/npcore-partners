@@ -6,6 +6,7 @@ page 6150618 "NPR POS Payment Method List"
     PageType = List;
     SourceTable = "NPR POS Payment Method";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

@@ -1,6 +1,7 @@
 report 6060130 "NPR MM Membership Points Value"
 {
     // MM1.17/JLK /20170123  CASE 243075 Object created
+    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/MM Membership Points Value.rdlc';
 

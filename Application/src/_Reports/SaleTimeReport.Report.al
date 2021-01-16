@@ -26,6 +26,7 @@ report 6014411 "NPR Sale Time Report"
 
     Caption = 'Sale Time Report';
     UsageCategory = ReportsAndAnalysis;
+    ApplicationArea = All;
 
     dataset
     {

@@ -4,6 +4,7 @@ page 6014429 "NPR Audit Roll Statistics"
     Editable = false;
     PageType = Worksheet;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Audit Roll";
 
     layout

@@ -3,6 +3,7 @@ page 6150671 "NPR POS Entry Factbox"
     Caption = 'POS Entry Factbox';
     PageType = CardPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR POS Entry";
 
     layout

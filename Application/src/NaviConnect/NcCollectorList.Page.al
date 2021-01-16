@@ -8,6 +8,7 @@ page 6151528 "NPR Nc Collector List"
     PageType = List;
     SourceTable = "NPR Nc Collector";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

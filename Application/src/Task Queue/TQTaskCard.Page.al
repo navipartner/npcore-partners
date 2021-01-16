@@ -10,6 +10,7 @@ page 6059903 "NPR TQ Task Card"
     Caption = 'Task Card';
     PageType = Card;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Task Line";
 
     layout

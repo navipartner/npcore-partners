@@ -6,6 +6,7 @@ page 6059949 "NPR NaviDocs Entry Attachments"
     Editable = false;
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR NaviDocs Entry Attachment";
 
     layout

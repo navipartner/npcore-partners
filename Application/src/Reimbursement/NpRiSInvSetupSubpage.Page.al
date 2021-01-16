@@ -1,5 +1,6 @@
 page 6151111 "NPR NpRi S. Inv. SetupSubpage"
 {
+    UsageCategory = None;
     AutoSplitKey = true;
     Caption = 'Lines';
     DelayedInsert = true;

@@ -7,6 +7,7 @@ page 6151490 "NPR Salesperson List"
     InsertAllowed = false;
     PageType = ListPlus;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "Salesperson/Purchaser";
     SourceTableTemporary = true;
 

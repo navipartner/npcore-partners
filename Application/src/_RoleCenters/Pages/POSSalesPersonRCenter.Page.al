@@ -3,6 +3,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
     Caption = 'Retail Salesperson';
     PageType = RoleCenter;
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

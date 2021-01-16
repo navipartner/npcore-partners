@@ -5,6 +5,7 @@ page 6151167 "NPR NpGp POS Sales Entries"
     PageType = List;
     SourceTable = "NPR NpGp POS Sales Entry";
     UsageCategory = Lists;
+    ApplicationArea = All;
 
     layout
     {

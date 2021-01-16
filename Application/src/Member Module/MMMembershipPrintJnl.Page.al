@@ -9,6 +9,7 @@ page 6060074 "NPR MM Membership Print Jnl"
     SourceTableView = SORTING("Entry No.")
                       WHERE("Source Type" = CONST(PRINT_JNL));
     UsageCategory = Tasks;
+    ApplicationArea = All;
 
     layout
     {

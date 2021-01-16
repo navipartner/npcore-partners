@@ -11,6 +11,7 @@ report 6014419 "NPR Vendor Sales Stat"
     Caption = 'Vendor Sales Statistics';
     PreviewMode = PrintLayout;
     UsageCategory = ReportsAndAnalysis;
+    ApplicationArea = All;
 
     dataset
     {

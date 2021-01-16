@@ -12,6 +12,7 @@ page 6150707 "NPR POS Setup"
     PageType = Card;
     SourceTable = "NPR POS Setup";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

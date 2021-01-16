@@ -10,6 +10,7 @@ page 6014435 "NPR Payment Type - Register"
     ModifyAllowed = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Payment Type POS";
     SourceTableView = SORTING("No.")
                       ORDER(Ascending)

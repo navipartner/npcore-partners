@@ -2,6 +2,7 @@ report 6060127 "NPR MM Member Card Print QR"
 {
     // MM80.1.02/TSA/20151228  CASE 229684 Touch-up and enchancements
     // MM1.37/TJ  /20190201  CASE 350288 Using POS View Profile for register picture
+    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/MM Member Card Print QR.rdlc';
 

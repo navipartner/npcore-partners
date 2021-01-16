@@ -9,6 +9,7 @@ page 6060096 "NPR Ean Box Setups"
     PageType = List;
     SourceTable = "NPR Ean Box Setup";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

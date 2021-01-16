@@ -15,6 +15,7 @@ page 6014452 "NPR Mixed Discount List"
     SourceTableView = SORTING("Starting date", "Starting time", "Ending date", "Ending time")
                       WHERE("Mix Type" = FILTER(Standard | Combination));
     UsageCategory = Lists;
+    ApplicationArea = All;
 
     layout
     {

@@ -8,6 +8,7 @@ page 6151582 "NPR Event Events by Attributes"
     Editable = false;
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SaveValues = true;
     SourceTable = Job;
 

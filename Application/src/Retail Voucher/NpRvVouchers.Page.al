@@ -6,6 +6,7 @@ page 6151015 "NPR NpRv Vouchers"
     PageType = List;
     SourceTable = "NPR NpRv Voucher";
     UsageCategory = Lists;
+    ApplicationArea = All;
 
     layout
     {

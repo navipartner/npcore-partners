@@ -7,6 +7,7 @@ page 6151593 "NPR NpDc Coupons"
     PopulateAllFields = true;
     SourceTable = "NPR NpDc Coupon";
     UsageCategory = Lists;
+    ApplicationArea = All;
 
     layout
     {

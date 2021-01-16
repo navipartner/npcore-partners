@@ -7,6 +7,7 @@ report 6060052 "NPR Item Wise Sales Figures"
 
     Caption = 'Item Wise Sales Figures';
     UsageCategory = ReportsAndAnalysis;
+    ApplicationArea = All;
 
     dataset
     {

@@ -7,6 +7,7 @@ page 6014514 "NPR Warranty Catalog"
     // NPR5.23/TS/20160518  CASE 240748  Renamed Page and Added Actions
     // NPR5.41/TS  /20180105 CASE 300893 Removed Action History as Page 6014591 does not exist.
 
+    UsageCategory = None;
     Caption = 'Warranty';
     SourceTable = "NPR Warranty Directory";
 

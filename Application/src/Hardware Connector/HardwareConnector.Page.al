@@ -7,6 +7,7 @@ page 6014627 "NPR Hardware Connector"
     Editable = false;
     PageType = StandardDialog;
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

@@ -3,6 +3,7 @@ report 6014459 "NPR Balancing Report A4 POS"
     // NPR5.42/ZESO/20180518  CASE 310459 Object Created
     // NPR5.48/JDH /20181109 CASE 334163 Added Object Caption
     // NPR5.55/BHR /20200525 CASE 404681 Replace POSEntry."POS Store Code" with POSEntry."POS Unit No."
+    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Balancing Report -A4 - POS.rdlc';
 

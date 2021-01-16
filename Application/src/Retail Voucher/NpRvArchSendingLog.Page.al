@@ -4,6 +4,7 @@ page 6151030 "NPR NpRv Arch. Sending Log"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR NpRv Arch. Sending Log";
 
     layout

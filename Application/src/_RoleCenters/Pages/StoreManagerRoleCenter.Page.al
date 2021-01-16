@@ -7,6 +7,7 @@ page 6059981 "NPR Store Manager Role Center"
     Caption = 'Role Center';
     PageType = RoleCenter;
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

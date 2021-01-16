@@ -3,6 +3,7 @@ page 6151590 "NPR NpDc Coupon Type Card"
     Caption = 'Coupon Type Card';
     PageType = Card;
     UsageCategory = Administration;
+    ApplicationArea = All;
     PromotedActionCategories = 'New,Process,Reports,Manage,Setup';
     SourceTable = "NPR NpDc Coupon Type";
 

@@ -8,6 +8,7 @@ page 6014670 "NPR Dependency Mgt. Setup"
     PageType = Card;
     SourceTable = "NPR Dependency Mgt. Setup";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

@@ -5,6 +5,7 @@ page 6151579 "NPR Event Exch.Int.Tmp.Entries"
     Caption = 'Event Exch. Int. Temp. Entries';
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Event Exch.Int.Temp.Entry";
 
     layout

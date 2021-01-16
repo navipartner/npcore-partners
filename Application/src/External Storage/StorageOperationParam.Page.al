@@ -5,6 +5,7 @@ page 6184894 "NPR Storage Operation Param."
     InsertAllowed = false;
     PageType = ListPlus;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Storage Operation Param.";
     SourceTableTemporary = true;
 

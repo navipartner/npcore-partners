@@ -1,6 +1,7 @@
 report 6014514 "NPR Retail Journal List"
 {
     // NPR5.53/TJ  /20191118 CASE 375557 New report recreated from version 2009
+    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Retail Journal List.rdlc';
 

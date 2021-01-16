@@ -5,6 +5,7 @@ page 6014694 "NPR Retail Admin Activ. - POS"
     Caption = 'Retail Admin Activities - POS';
     PageType = CardPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     RefreshOnActivate = true;
     SourceTable = "NPR Retail Admin Cue";
 

@@ -6,6 +6,7 @@ page 6014553 "NPR Mixed Discount Levels"
     DelayedInsert = true;
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Mixed Discount Level";
 
     layout

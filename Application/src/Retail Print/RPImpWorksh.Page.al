@@ -9,6 +9,7 @@ page 6014632 "NPR RP Imp. Worksh."
     LinksAllowed = false;
     PageType = Worksheet;
     UsageCategory = Administration;
+    ApplicationArea = All;
     ShowFilter = false;
     SourceTable = "NPR RP Imp. Worksh.";
 

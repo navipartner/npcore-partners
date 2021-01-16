@@ -6,6 +6,7 @@ report 6014455 "NPR Item Barcode Status Sheet"
 
     Caption = 'Item Barcode Status Sheet';
     UsageCategory = ReportsAndAnalysis;
+    ApplicationArea = All;
 
     dataset
     {

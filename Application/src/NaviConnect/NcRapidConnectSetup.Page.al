@@ -9,6 +9,7 @@ page 6151091 "NPR Nc RapidConnect Setup"
     PageType = List;
     SourceTable = "NPR Nc RapidConnect Setup";
     UsageCategory = Lists;
+    ApplicationArea = All;
 
     layout
     {

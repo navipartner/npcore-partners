@@ -6,6 +6,7 @@ page 6151150 "NPR Customer GDPR Setup"
     PageType = Card;
     SourceTable = "NPR Customer GDPR SetUp";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

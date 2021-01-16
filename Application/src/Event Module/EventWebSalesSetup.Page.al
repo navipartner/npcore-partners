@@ -6,6 +6,7 @@ page 6060158 "NPR Event Web Sales Setup"
     PageType = List;
     SourceTable = "NPR Event Web Sales Setup";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

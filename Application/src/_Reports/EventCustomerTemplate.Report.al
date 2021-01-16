@@ -1,5 +1,6 @@
 report 6060150 "NPR Event Customer Template"
 {
+    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Event Customer Template.rdlc';
 

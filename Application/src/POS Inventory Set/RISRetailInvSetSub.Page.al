@@ -1,5 +1,6 @@
 page 6151087 "NPR RIS Retail Inv. Set Sub."
 {
+    UsageCategory = None;
     AutoSplitKey = true;
     Caption = 'Inventory Set Entries';
     DelayedInsert = true;

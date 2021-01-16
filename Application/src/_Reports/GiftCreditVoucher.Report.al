@@ -9,6 +9,7 @@ report 6014415 "NPR Gift/Credit Voucher"
 
     Caption = 'Gift Voucher/Credit Voucher';
     UsageCategory = ReportsAndAnalysis;
+    ApplicationArea = All;
 
     dataset
     {

@@ -14,6 +14,7 @@ page 6151454 "NPR Magento Payment Line List"
     PageType = List;
     SourceTable = "NPR Magento Payment Line";
     UsageCategory = Lists;
+    ApplicationArea = All;
 
     layout
     {

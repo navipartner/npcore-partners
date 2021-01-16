@@ -5,6 +5,7 @@ page 6151186 "NPR MM Sponsor. Ticket Entry"
     InsertAllowed = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR MM Sponsors. Ticket Entry";
 
     layout

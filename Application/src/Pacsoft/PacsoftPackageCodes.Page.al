@@ -6,6 +6,7 @@ page 6014415 "NPR Pacsoft Package Codes"
     PageType = Worksheet;
     SourceTable = "NPR Pacsoft Package Code";
     UsageCategory = Lists;
+    ApplicationArea = All;
 
     layout
     {

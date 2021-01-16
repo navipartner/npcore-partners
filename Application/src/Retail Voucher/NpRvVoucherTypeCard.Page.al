@@ -1,5 +1,6 @@
 page 6151012 "NPR NpRv Voucher Type Card"
 {
+    UsageCategory = None;
     Caption = 'Retail Voucher Type Card';
     PromotedActionCategories = 'New,Process,Reports,Manage,Setup';
     SourceTable = "NPR NpRv Voucher Type";

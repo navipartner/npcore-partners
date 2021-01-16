@@ -9,6 +9,7 @@ page 6014605 "NPR Attributes"
     PageType = List;
     SourceTable = "NPR Attribute";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

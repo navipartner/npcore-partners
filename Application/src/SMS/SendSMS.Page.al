@@ -1,5 +1,6 @@
 page 6014636 "NPR Send SMS"
 {
+    UsageCategory = None;
     Caption = 'Send SMS';
 
     layout

@@ -26,6 +26,7 @@ page 6151500 "NPR Nc Setup"
     InsertAllowed = false;
     SourceTable = "NPR Nc Setup";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

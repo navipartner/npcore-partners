@@ -13,6 +13,7 @@ page 6014421 "NPR Item Group Page"
     // NPR5.48/TS  /20181206 CASE 338656 Added Missing Picture to Action
     // NPR5.48/BHR /20190107 CASE 334217 Added Field Type
 
+    UsageCategory = None;
     Caption = 'Item Group';
     PromotedActionCategories = 'New,Process,Prints,History,Items,Test6,Test7,Test8';
     SourceTable = "NPR Item Group";

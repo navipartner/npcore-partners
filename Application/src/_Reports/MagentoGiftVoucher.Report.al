@@ -7,6 +7,7 @@ report 6151406 "NPR Magento Gift Voucher"
     // MAG14.00.2.22/MHA/20190717  CASE 362262 Removed DotNet Print functionality
     // MAG2.23/ZESO/20190911  CASE 365692 Display special danish characters correctly.
 
+    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Magento Gift Voucher.rdlc';
 

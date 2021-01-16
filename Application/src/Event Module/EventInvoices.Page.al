@@ -9,6 +9,7 @@ page 6151587 "NPR Event Invoices"
     ModifyAllowed = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     RefreshOnActivate = true;
     SourceTable = "Job Planning Line Invoice";
     SourceTableTemporary = true;

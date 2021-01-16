@@ -11,6 +11,7 @@ page 6150661 "NPR NPRE Waiter Pad Subform"
     InsertAllowed = false;
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR NPRE Waiter Pad Line";
 
     layout

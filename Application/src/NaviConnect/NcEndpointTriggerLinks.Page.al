@@ -5,6 +5,7 @@ page 6151538 "NPR Nc Endpoint Trigger Links"
     Caption = 'Nc Endpoint Trigger Links';
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Nc Endpoint Trigger Link";
 
     layout

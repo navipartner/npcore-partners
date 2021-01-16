@@ -6,6 +6,7 @@ page 6014509 "NPR Accessory List - Register"
     InsertAllowed = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Accessory/Spare Part";
 
     layout

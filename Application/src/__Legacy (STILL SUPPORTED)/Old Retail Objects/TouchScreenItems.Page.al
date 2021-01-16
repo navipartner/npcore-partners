@@ -5,6 +5,7 @@ page 6014525 "NPR Touch Screen - Items"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = Item;
 
     layout

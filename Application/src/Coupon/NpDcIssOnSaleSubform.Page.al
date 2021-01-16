@@ -5,6 +5,7 @@ page 6151605 "NPR NpDc Iss.OnSale Subform"
     DelayedInsert = true;
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR NpDc Iss.OnSale Setup Line";
 
     layout

@@ -1,5 +1,6 @@
 page 6059829 "NPR Trx JSON Result"
 {
+    UsageCategory = None;
     Caption = 'Transactional JSON Result';
     DeleteAllowed = false;
     Editable = false;

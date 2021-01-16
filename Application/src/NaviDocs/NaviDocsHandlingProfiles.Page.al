@@ -6,6 +6,7 @@ page 6059768 "NPR NaviDocs Handling Profiles"
     PageType = List;
     SourceTable = "NPR NaviDocs Handling Profile";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

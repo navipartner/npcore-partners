@@ -8,6 +8,7 @@ report 6014414 "NPR Item Sales Statistics"
     Caption = 'Item Sales Statistics';
     PreviewMode = PrintLayout;
     UsageCategory = ReportsAndAnalysis;
+    ApplicationArea = All;
 
     dataset
     {

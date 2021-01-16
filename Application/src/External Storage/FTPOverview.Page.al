@@ -5,6 +5,7 @@ page 6184881 "NPR FTP Overview"
     Caption = 'FTP Overview';
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR FTP Overview";
 
     layout

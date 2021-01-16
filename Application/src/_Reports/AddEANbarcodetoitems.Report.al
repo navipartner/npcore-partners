@@ -5,6 +5,7 @@ report 6060110 "NPR Add EAN barcode to items"
     // Report does not handle barcodes for any of our current variant systems at this moment!
     // NPR5.36/TJ /20170927 CASE 286283 Renamed variables into english and into proper naming terminology
 
+    UsageCategory = None;
     Caption = 'Add EAN barcode to all items';
     ProcessingOnly = true;
     UseRequestPage = false;

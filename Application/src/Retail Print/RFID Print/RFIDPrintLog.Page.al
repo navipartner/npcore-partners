@@ -10,6 +10,7 @@ page 6014550 "NPR RFID Print Log"
     ModifyAllowed = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR RFID Print Log";
 
     layout

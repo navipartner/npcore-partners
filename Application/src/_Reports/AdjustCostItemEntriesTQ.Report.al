@@ -11,6 +11,7 @@ report 6059905 "NPR Adjust Cost: ItemEntriesTQ"
                   TableData "Avg. Cost Adjmt. Entry Point" = rimd;
     ProcessingOnly = true;
     UsageCategory = Tasks;
+    ApplicationArea = All;
 
     dataset
     {

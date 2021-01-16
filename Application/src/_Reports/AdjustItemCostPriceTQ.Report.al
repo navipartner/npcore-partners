@@ -3,6 +3,7 @@ report 6059904 "NPR Adjust Item Cost/Price TQ"
     // TQ1.28.02/JDH/20161013 CASE 242568 Possible to run in 1.28 version (and before) of TQ
     // TQ1.31/MHA /20171218  CASE 271126 Data Log Disabled during Report Run
 
+    UsageCategory = None;
     Caption = 'Adjust Item Costs/Prices';
     ProcessingOnly = true;
 

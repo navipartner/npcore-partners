@@ -9,6 +9,7 @@ page 6014411 "NPR Turnover Statistics"
     Caption = 'Turnover Statistics';
     PageType = CardPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

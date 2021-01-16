@@ -8,6 +8,7 @@ page 6060124 "NPR MM Membership Setup"
     PageType = List;
     SourceTable = "NPR MM Membership Setup";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

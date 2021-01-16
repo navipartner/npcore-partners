@@ -6,6 +6,7 @@ page 6059977 "NPR Variety Group"
     PageType = List;
     SourceTable = "NPR Variety Group";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

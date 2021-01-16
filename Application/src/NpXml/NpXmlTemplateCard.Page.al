@@ -1,5 +1,6 @@
 page 6151551 "NPR NpXml Template Card"
 {
+    UsageCategory = None;
     Caption = 'Xml Template';
     DelayedInsert = true;
     PromotedActionCategories = 'New,Process,Report,Manage,Version';

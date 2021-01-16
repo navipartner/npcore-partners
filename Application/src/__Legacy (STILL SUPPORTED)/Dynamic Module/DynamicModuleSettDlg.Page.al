@@ -5,6 +5,7 @@ page 6014501 "NPR Dynamic Module Sett. Dlg."
     Caption = 'Dynamic Module Setting';
     PageType = StandardDialog;
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

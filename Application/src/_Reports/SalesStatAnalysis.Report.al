@@ -15,6 +15,7 @@ report 6014457 "NPR Sales Stat/Analysis"
     Caption = 'Sales Stat/Analysis';
     PreviewMode = Normal;
     UsageCategory = ReportsAndAnalysis;
+    ApplicationArea = All;
 
     dataset
     {

@@ -3,6 +3,7 @@ page 6150702 "NPR POS Menu Buttons"
     Caption = 'POS Menu Buttons';
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     PromotedActionCategories = 'New,Process,Reports,Level,Order';
     SourceTable = "NPR POS Menu Button";
     SourceTableView = SORTING("Menu Code");

@@ -8,6 +8,7 @@ page 6151461 "NPR Magento Customer Mapping"
     PageType = List;
     SourceTable = "NPR Magento Customer Mapping";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

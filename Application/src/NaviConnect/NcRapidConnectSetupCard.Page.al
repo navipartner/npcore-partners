@@ -4,6 +4,7 @@ page 6151090 "NPR Nc RapidConnect Setup Card"
     // NC2.17/MHA /20181122  CASE 335927 Added field 110 "Export File Type"
     // NC14.00.2.22/MHA /20190715  CASE 361941 Removed Action "Export to Excel"
 
+    UsageCategory = None;
     Caption = 'RapidConnect Setup';
     SourceTable = "NPR Nc RapidConnect Setup";
 

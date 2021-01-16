@@ -6,6 +6,7 @@ page 6059960 "NPR MCS Person Bus. Entities"
     PageType = List;
     SourceTable = "NPR MCS Person Bus. Entit.";
     UsageCategory = Lists;
+    ApplicationArea = All;
 
     layout
     {

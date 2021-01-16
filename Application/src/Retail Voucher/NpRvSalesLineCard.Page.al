@@ -1,5 +1,6 @@
 page 6151018 "NPR NpRv Sales Line Card"
 {
+    UsageCategory = None;
     Caption = 'Issue Retail Voucher Card';
     DataCaptionExpression = Description;
     DeleteAllowed = false;

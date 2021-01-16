@@ -1,6 +1,7 @@
 report 6060100 "NPR Data Cleanup Fill"
 {
     // NPR4.02/JC/20150318  CASE 207094 Data Cleanup for Customer, Vendor and Item
+    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Data Cleanup Fill.rdlc';
 

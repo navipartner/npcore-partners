@@ -9,6 +9,7 @@ page 6060086 "NPR MCS Recom. Sales Factbox"
     ModifyAllowed = false;
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR MCS Recommendations Line";
 
     layout

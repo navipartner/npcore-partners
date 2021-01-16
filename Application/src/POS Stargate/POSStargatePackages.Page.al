@@ -5,6 +5,7 @@ page 6150713 "NPR POS Stargate Packages"
     PageType = List;
     SourceTable = "NPR POS Stargate Package";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

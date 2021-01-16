@@ -8,6 +8,7 @@ page 6014499 "NPR Dynamic Modules"
     PageType = List;
     SourceTable = "NPR Dynamic Module";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

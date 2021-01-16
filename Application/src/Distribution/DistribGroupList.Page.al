@@ -7,6 +7,7 @@ page 6151055 "NPR Distrib. Group List"
     PageType = List;
     SourceTable = "NPR Distrib. Group";
     UsageCategory = Lists;
+    ApplicationArea = All;
 
     layout
     {

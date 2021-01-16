@@ -3,6 +3,7 @@ page 6184870 "NPR DropBox Setup"
     Caption = 'DropBox Setup';
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR DropBox API Setup";
 
     layout

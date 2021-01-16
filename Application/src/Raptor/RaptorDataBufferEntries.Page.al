@@ -2,12 +2,12 @@ page 6151492 "NPR Raptor Data Buffer Entries"
 {
     // NPR5.53/ALPO/20191125 CASE 377727 Raptor integration enhancements
 
+    UsageCategory = None;
     Caption = 'Raptor Data Entries';
     DataCaptionExpression = GetDataCaptionExpr;
     Editable = false;
     LinksAllowed = false;
     PageType = List;
-    UsageCategory = Administration;
     SourceTable = "NPR Raptor Data Buffer";
     SourceTableTemporary = true;
 

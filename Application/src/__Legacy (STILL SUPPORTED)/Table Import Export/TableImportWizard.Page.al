@@ -17,6 +17,7 @@ page 6014485 "NPR Table Import Wizard"
                       ORDER(Ascending)
                       WHERE("Object Type" = CONST(Table));
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

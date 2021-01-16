@@ -7,6 +7,7 @@ page 6151073 "NPR Retail Replenishment Setup"
     PageType = Card;
     SourceTable = "NPR Retail Replenishment Setup";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

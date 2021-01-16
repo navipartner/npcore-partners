@@ -9,6 +9,7 @@ page 6151405 "NPR Magento Website Links"
     Editable = true;
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     ShowFilter = false;
     SourceTable = "NPR Magento Website Link";
 

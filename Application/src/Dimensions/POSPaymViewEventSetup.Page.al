@@ -7,6 +7,7 @@ page 6151054 "NPR POS Paym. View Event Setup"
     PageType = Card;
     SourceTable = "NPR POS Paym. View Event Setup";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

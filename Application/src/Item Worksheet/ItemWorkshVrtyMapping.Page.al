@@ -7,6 +7,7 @@ page 6060060 "NPR Item Worksh. Vrty. Mapping"
     Caption = 'Item Worksheet Variety Mapping';
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Item Worksh. Vrty Mapping";
 
     layout

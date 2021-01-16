@@ -8,6 +8,7 @@ page 6014614 "NPR Discount FactBox"
     InsertAllowed = false;
     PageType = CardPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = Item;
 
     layout

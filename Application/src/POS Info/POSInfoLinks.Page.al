@@ -5,6 +5,7 @@ page 6150643 "NPR POS Info Links"
     Caption = 'POS Info Links';
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR POS Info Link Table";
 
     layout

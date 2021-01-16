@@ -6,6 +6,7 @@ page 6151505 "NPR Nc Import Types"
     PageType = List;
     SourceTable = "NPR Nc Import Type";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

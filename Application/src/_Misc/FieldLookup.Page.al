@@ -4,6 +4,7 @@ page 6014547 "NPR Field Lookup"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "Field";
 
     layout

@@ -4,6 +4,7 @@ page 6059793 "NPR E-mail Templ. Subform"
     Caption = 'E-mail Template Subform';
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR E-mail Templ. Line";
 
     layout

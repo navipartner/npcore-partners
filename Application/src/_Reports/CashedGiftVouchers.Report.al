@@ -8,6 +8,7 @@ report 6014403 "NPR Cashed Gift Vouchers"
 
     Caption = 'Cashed Gift Vouchers';
     UsageCategory = ReportsAndAnalysis;
+    ApplicationArea = All;
 
     dataset
     {

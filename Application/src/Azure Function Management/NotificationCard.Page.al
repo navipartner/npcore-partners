@@ -2,6 +2,7 @@ page 6151042 "NPR Notification Card"
 {
     // NPR5.38/NPKNAV/20180126  CASE 269792-01 Transport NPR5.38 - 26 January 2018
 
+    UsageCategory = None;
     Caption = 'Notification Card';
     Editable = false;
     SourceTable = "NPR AF Notification Hub";

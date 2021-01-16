@@ -6,6 +6,7 @@ page 6151462 "NPR Magento Setup PostOnImport"
     DelayedInsert = true;
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Magento PostOnImport Setup";
 
     layout

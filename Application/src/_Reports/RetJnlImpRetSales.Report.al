@@ -1,5 +1,6 @@
 report 6014574 "NPR Ret. Jnl.: Imp. Ret. Sales"
 {
+    UsageCategory = None;
     Caption = 'Import Return Sales';
     ProcessingOnly = true;
 

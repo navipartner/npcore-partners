@@ -62,6 +62,7 @@ page 6014424 "NPR Retail Setup"
     PageType = Card;
     SourceTable = "NPR Retail Setup";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

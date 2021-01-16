@@ -4,6 +4,7 @@ page 6060071 "NPR MM Members. AutoRenew Card"
     Caption = 'Membership Auto Renew Card';
     PageType = Card;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR MM Membership Auto Renew";
 
     layout

@@ -5,6 +5,7 @@ report 6151013 "NPR NpRv Voucher"
     // NPR5.54/BHR /20190612  CASE 357298 Add Formatted Date to be use on word format
     // NPR5.55/MHA /20200427  CASE 402015 Removed "In-use Quantity (External)"
     // NPR5.55/MHA /20200701  CASE 397527 Added "Language Code"
+    UsageCategory = None;
     RDLCLayout = './src/_Reports/layouts/NpRv Voucher.rdlc';
     WordLayout = './src/_Reports/layouts/NpRv Voucher.docx';
 

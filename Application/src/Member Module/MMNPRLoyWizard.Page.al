@@ -1,6 +1,6 @@
 page 6151164 "NPR MM NPR Loy. Wizard"
 {
-
+    UsageCategory = None;
     Caption = 'NPR Loyalty Wizard';
     SourceTable = "Integer";
 

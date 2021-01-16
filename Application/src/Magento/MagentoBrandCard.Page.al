@@ -12,6 +12,7 @@ page 6151419 "NPR Magento Brand Card"
     // MAG2.23/BHR /20190730  CASE 362728 Add Short Description
     // MAG2.26/MHA /20200601  CASE 404580 Magento Brands can now be managed externally
 
+    UsageCategory = None;
     Caption = 'Brand Card';
     DelayedInsert = true;
     SourceTable = "NPR Magento Brand";

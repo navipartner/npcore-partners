@@ -4,6 +4,7 @@ report 6060065 "NPR Sales Statistics"
     // NPR5.46/TJ  /20180912  CASE 327838 Using Nonstock Item as well when searching for barcode
     // NPR5.46/TJ  /20180912  CASE 327869 Datetime is now part of the file created
 
+    UsageCategory = None;
     Caption = 'Sales Statistic';
     ProcessingOnly = true;
 

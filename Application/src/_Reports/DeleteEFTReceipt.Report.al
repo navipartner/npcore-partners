@@ -2,6 +2,7 @@ report 6014515 "NPR Delete EFT Receipt"
 {
     // NPR5.55/TJ  /20200511 CASE 404177 New object
 
+    UsageCategory = None;
     Caption = 'Delete EFT Receipt';
     ProcessingOnly = true;
 

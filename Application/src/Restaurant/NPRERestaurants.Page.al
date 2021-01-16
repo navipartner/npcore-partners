@@ -9,6 +9,7 @@ page 6150683 "NPR NPRE Restaurants"
     PageType = List;
     SourceTable = "NPR NPRE Restaurant";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

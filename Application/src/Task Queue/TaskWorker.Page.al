@@ -4,6 +4,7 @@ page 6059907 "NPR Task Worker"
     PageType = List;
     SourceTable = "NPR Task Worker";
     UsageCategory = History;
+    ApplicationArea = All;
 
     layout
     {

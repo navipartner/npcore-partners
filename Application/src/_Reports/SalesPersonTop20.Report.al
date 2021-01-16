@@ -9,6 +9,7 @@ report 6014406 "NPR Sales Person Top 20"
 
     Caption = 'Sales Person Top 20';
     UsageCategory = ReportsAndAnalysis;
+    ApplicationArea = All;
     UseSystemPrinter = true;
 
     dataset

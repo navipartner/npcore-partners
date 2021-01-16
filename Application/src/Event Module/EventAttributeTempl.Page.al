@@ -7,6 +7,7 @@ page 6060160 "NPR Event Attribute Templ."
     PageType = List;
     SourceTable = "NPR Event Attribute Template";
     UsageCategory = Lists;
+    ApplicationArea = All;
 
     layout
     {

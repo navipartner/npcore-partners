@@ -8,6 +8,7 @@ page 6059769 "NPR NaviDocs Document List"
     PromotedActionCategories = 'New,Process,Report,Functions,Update,Change Status for Marked';
     SourceTable = "NPR NaviDocs Entry";
     UsageCategory = Lists;
+    ApplicationArea = All;
 
     layout
     {

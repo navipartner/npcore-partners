@@ -6,6 +6,7 @@ page 6151521 "NPR Nc Trigger Setup"
     PageType = Card;
     SourceTable = "NPR Nc Trigger Setup";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

@@ -7,6 +7,7 @@ page 6151576 "NPR Event Resource Overview"
     Editable = false;
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = Resource;
 
     layout

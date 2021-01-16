@@ -4,6 +4,7 @@ page 6151210 "NPR NpCs Store Inv. Buffer"
     Editable = false;
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR NpCs Store Inv. Buffer";
     SourceTableTemporary = true;
 

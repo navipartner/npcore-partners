@@ -10,6 +10,7 @@ page 6014649 "NPR Generic Filter Page"
     InsertAllowed = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "Field";
 
     layout

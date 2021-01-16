@@ -7,6 +7,7 @@ page 6151425 "NPR Magento Custom Option Card"
     Caption = 'Custom Option Card';
     PageType = Card;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Magento Custom Option";
 
     layout

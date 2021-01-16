@@ -7,6 +7,7 @@ page 6014478 "NPR RFID Setup"
     InsertAllowed = false;
     PageType = Card;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR RFID Setup";
 
     layout

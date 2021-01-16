@@ -8,6 +8,7 @@ page 6014414 "NPR Pacsoft Shipm. Doc. Serv."
     SourceTable = "NPR Pacsoft Shipm. Doc. Serv.";
     SourceTableView = SORTING("Entry No.", "Shipping Agent Code", "Shipping Agent Service Code");
     UsageCategory = Lists;
+    ApplicationArea = All;
 
     layout
     {

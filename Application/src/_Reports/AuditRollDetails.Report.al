@@ -10,6 +10,7 @@ report 6014458 "NPR Audit Roll Details"
     Caption = 'Audit Roll Details';
     PreviewMode = PrintLayout;
     UsageCategory = ReportsAndAnalysis;
+    ApplicationArea = All;
 
     dataset
     {

@@ -4,6 +4,7 @@ page 6014671 "NPR Lookup Templates"
     PageType = List;
     SourceTable = "NPR Lookup Template";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

@@ -8,6 +8,7 @@ page 6014504 "NPR Customer Repair Journal"
     Caption = 'Customer Repair Register';
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Customer Repair Journal";
 
     layout

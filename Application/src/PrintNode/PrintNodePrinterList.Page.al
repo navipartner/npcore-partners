@@ -5,6 +5,7 @@ page 6151221 "NPR PrintNode Printer List"
     Caption = 'PrintNode Printer List';
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR PrintNode Printer";
 
     layout

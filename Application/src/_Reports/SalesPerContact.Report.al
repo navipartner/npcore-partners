@@ -5,6 +5,7 @@ report 6014597 "NPR Sales Per Contact"
     // NPR5.30/JLK /20170202  CASE 253099  Added Calcfields before turnover and modified rdlc layout to display contacts only once
     //                                     Removed harcoded text with text constant NoDateFilter
     // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
+    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Sales Per Contact.rdlc';
 

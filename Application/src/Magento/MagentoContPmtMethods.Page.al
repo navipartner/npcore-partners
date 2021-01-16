@@ -7,6 +7,7 @@ page 6151441 "NPR Magento Cont.Pmt.Methods"
     DelayedInsert = true;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Magento Contact Pmt.Meth.";
 
     layout

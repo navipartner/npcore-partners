@@ -5,6 +5,7 @@ page 6060092 "NPR MM Admission Service Log"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR MM Admis. Service Log";
 
     layout

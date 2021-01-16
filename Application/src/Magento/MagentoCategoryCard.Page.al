@@ -13,6 +13,7 @@ page 6151414 "NPR Magento Category Card"
     // MAG2.20/BHR /20190409  CASE 346352 Field 130 "Short Description"
     // MAG2.26/MHA /20200601  CASE 404580 Magento "Item Group" renamed to "Category"
 
+    UsageCategory = None;
     Caption = 'Magento Category Card';
     DelayedInsert = true;
     InsertAllowed = false;

@@ -7,6 +7,7 @@ page 6150623 "NPR POS Paym.Bin Set Float"
     InsertAllowed = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR POS Payment Method";
 
     layout

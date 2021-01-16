@@ -12,6 +12,7 @@ page 6151448 "NPR Magento Payment Mapping"
     PageType = List;
     SourceTable = "NPR Magento Payment Mapping";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

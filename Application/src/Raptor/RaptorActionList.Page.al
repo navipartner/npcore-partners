@@ -6,6 +6,7 @@ page 6151494 "NPR Raptor Action List"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Raptor Action";
 
     layout

@@ -14,6 +14,7 @@ page 6151481 "NPR Magento Retail Activities"
     Caption = 'NaviConnect Activities';
     PageType = CardPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Magento Cue";
 
     layout

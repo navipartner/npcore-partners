@@ -8,6 +8,7 @@ page 6014590 "NPR Vendor Statistics Subpage"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = Vendor;
 
     layout

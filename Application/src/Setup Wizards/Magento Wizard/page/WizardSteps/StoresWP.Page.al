@@ -3,6 +3,7 @@ page 6014522 "NPR Stores WP"
     Caption = 'Stores';
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Magento Store";
     SourceTableTemporary = true;
     DelayedInsert = true;

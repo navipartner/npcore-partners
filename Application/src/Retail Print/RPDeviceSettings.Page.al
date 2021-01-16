@@ -4,6 +4,7 @@ page 6014628 "NPR RP Device Settings"
     DelayedInsert = true;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     ShowFilter = false;
     SourceTable = "NPR RP Device Settings";
 

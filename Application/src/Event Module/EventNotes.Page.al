@@ -8,6 +8,7 @@ page 6151575 "NPR Event Notes"
     Editable = false;
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "Record Link";
     SourceTableTemporary = true;
 

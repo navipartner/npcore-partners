@@ -9,6 +9,7 @@ page 6150666 "NPR NPRE Tmp POSWaiterPadLines"
     InsertAllowed = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     ShowFilter = false;
     SourceTable = "NPR NPRE Waiter Pad Line";
     SourceTableTemporary = true;

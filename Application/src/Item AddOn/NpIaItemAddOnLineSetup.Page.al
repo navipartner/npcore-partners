@@ -1,5 +1,6 @@
 page 6151129 "NPR NpIa ItemAddOn Line Setup"
 {
+    UsageCategory = None;
     Caption = 'Item AddOn Line Setup';
     PageType = Card;
     SourceTable = "NPR NpIa ItemAddOn Line Setup";

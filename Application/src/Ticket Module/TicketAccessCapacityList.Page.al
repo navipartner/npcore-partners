@@ -1,5 +1,6 @@
 page 6059787 "NPR Ticket AccessCapacity List"
 {
+    UsageCategory = None;
     Caption = 'Access Capacity';
     SourceTable = "NPR Ticket Access Cap. Slots";
 

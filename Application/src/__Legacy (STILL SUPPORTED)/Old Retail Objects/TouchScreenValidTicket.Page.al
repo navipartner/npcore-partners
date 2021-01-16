@@ -2,6 +2,7 @@ page 6014584 "NPR TouchScreen: Valid. Ticket"
 {
     // NPR70.00.00.00/TS/20141223 CASE 202667 Page Created
 
+    UsageCategory = None;
     Caption = 'Touch Screen - Validate Ticket';
 
     layout

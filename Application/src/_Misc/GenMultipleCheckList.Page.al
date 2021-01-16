@@ -2,6 +2,7 @@ page 6014650 "NPR Gen. Multiple Check List"
 {
     // NPR5.48/TJ  /20181129 CASE 318531 New object
 
+    UsageCategory = None;
     Caption = 'Select options';
     LinksAllowed = false;
     ShowFilter = false;

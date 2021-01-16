@@ -3,6 +3,7 @@ page 6151330 "NPR Voucher Cue"
     Caption = 'Retail Voucher Cue';
     PageType = CardPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Retail Sales Cue";
 
     layout

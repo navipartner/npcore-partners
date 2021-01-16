@@ -5,6 +5,7 @@ page 6184486 "NPR Pepper Card Type Fees"
     Caption = 'Pepper Card Type Fees';
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Pepper Card Type Fee";
 
     layout

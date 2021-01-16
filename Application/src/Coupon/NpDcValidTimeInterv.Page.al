@@ -5,6 +5,7 @@ page 6151603 "NPR NpDc Valid Time Interv."
     DelayedInsert = true;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR NpDc Valid Time Interval";
 
     layout

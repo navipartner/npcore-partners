@@ -5,6 +5,7 @@ page 6059989 "NPR Weather Activities"
     Caption = 'Weather Activities';
     PageType = CardPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

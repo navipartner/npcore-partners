@@ -4,6 +4,7 @@ page 6150701 "NPR POS Menus"
     PageType = List;
     SourceTable = "NPR POS Menu";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

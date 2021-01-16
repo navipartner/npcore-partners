@@ -5,6 +5,7 @@ page 6151017 "NPR NpRv Sales Lines"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR NpRv Sales Line";
     SourceTableView = SORTING(Type, "Voucher Type", "Voucher No.", "Reference No.");
 

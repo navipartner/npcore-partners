@@ -4,6 +4,7 @@ page 6150657 "NPR POS Posting Setup"
     PageType = List;
     SourceTable = "NPR POS Posting Setup";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

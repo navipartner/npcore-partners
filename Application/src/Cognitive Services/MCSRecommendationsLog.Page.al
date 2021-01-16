@@ -7,6 +7,7 @@ page 6060084 "NPR MCS Recommendations Log"
     PageType = List;
     SourceTable = "NPR MCS Recommendations Log";
     UsageCategory = History;
+    ApplicationArea = All;
 
     layout
     {

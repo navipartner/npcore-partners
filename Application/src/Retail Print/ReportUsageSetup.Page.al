@@ -6,6 +6,7 @@ page 6014487 "NPR Report Usage Setup"
     PageType = Card;
     SourceTable = "NPR Report Usage Setup";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

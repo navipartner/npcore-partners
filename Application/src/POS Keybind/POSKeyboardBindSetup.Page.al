@@ -6,6 +6,7 @@ page 6150721 "NPR POS Keyboard Bind. Setup"
     PageType = List;
     SourceTable = "NPR POS Keyboard Bind. Setup";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

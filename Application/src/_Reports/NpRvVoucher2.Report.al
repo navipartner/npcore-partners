@@ -4,6 +4,7 @@ report 6151014 "NPR NpRv Voucher 2"
     // NPR5.53/MHA /20191211  CASE 380284 Added field 76 "Initial Amount"
     // NPR5.55/MHA /20200427  CASE 402015 Removed "In-use Quantity (External)"
     // NPR5.55/MHA /20200701  CASE 397527 Added "Language Code"
+    UsageCategory = None;
     RDLCLayout = './src/_Reports/layouts/NpRv Voucher 2.rdlc';
     WordLayout = './src/_Reports/layouts/NpRv Voucher 2.docx';
 

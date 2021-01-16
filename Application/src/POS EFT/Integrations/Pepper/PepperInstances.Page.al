@@ -6,6 +6,7 @@ page 6184492 "NPR Pepper Instances"
     PageType = List;
     SourceTable = "NPR Pepper Instance";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

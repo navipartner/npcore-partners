@@ -4,6 +4,7 @@ page 6150714 "NPR POS Stargate Pckg Method"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR POS Stargate Pckg. Method";
 
     layout

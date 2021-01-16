@@ -1,5 +1,6 @@
 page 6014406 "NPR Register Card"
 {
+    UsageCategory = None;
     Caption = 'Cash Register Setup';
     RefreshOnActivate = true;
     SourceTable = "NPR Register";

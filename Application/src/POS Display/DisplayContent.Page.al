@@ -5,6 +5,7 @@ page 6059951 "NPR Display Content"
     Caption = 'Display Content';
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     RefreshOnActivate = true;
     SourceTable = "NPR Display Content";
 

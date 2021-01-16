@@ -5,6 +5,7 @@ page 6150695 "NPR NPRE Serv. Flow Prof. Card"
     Caption = 'Rest. Service Flow Profile Card';
     PageType = Card;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR NPRE Serv.Flow Profile";
 
     layout

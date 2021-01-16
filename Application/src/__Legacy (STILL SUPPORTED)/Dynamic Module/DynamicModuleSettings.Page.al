@@ -7,6 +7,7 @@ page 6014500 "NPR Dynamic Module Settings"
     LinksAllowed = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     ShowFilter = false;
     SourceTable = "NPR Dynamic Module Setting";
     SourceTableTemporary = true;

@@ -7,6 +7,7 @@ page 6014458 "NPR Alternative Number"
     Editable = true;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Alternative No.";
 
     layout

@@ -10,6 +10,7 @@ page 6184494 "NPR Pepper Terminal List"
     PageType = List;
     SourceTable = "NPR Pepper Terminal";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

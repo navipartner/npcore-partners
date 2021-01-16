@@ -7,6 +7,7 @@ page 6059998 "NPR Scanner Service Log Card"
     Caption = 'Scanner Service Log Card';
     PageType = Card;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Scanner Service Log";
 
     layout

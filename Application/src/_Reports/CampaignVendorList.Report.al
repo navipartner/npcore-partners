@@ -7,6 +7,7 @@ report 6014497 "NPR Campaign Vendor List"
     //                                   Hide not calculated variables from rdlc
     // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
     // NPR5.40/BHR /20180301  CASE 299276 Remove closing Date from calcfields property, Change layout to A4 portrait. add field Photo
+    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Campaign Vendor List.rdlc';
 

@@ -6,6 +6,7 @@ page 6059953 "NPR Disp. Content Lines Img"
     LinksAllowed = false;
     PageType = CardPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     ShowFilter = false;
     SourceTable = "NPR Display Content Lines";
 

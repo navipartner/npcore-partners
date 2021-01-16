@@ -2,6 +2,7 @@ report 6014617 "NPR Purchase Order"
 {
     // NPR5.42/JLK /20180521  CASE 313612 Object created adapted to make use of Word Layout
     // NPR5.50/BHR /20190610  CASE 357186 Correct WORD Layout
+    UsageCategory = None;
     RDLCLayout = './src/_Reports/layouts/NP Purchase Order.rdlc';
     WordLayout = './src/_Reports/layouts/NP Purchase Order.docx';
 

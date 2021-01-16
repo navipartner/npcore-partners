@@ -6,6 +6,7 @@ page 6150710 "NPR POS View List"
     PageType = List;
     SourceTable = "NPR POS View";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

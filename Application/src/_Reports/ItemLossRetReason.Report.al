@@ -10,6 +10,7 @@ report 6014544 "NPR Item Loss - Ret. Reason"
 
     Caption = 'Item Loss - Return Reason';
     UsageCategory = ReportsAndAnalysis;
+    ApplicationArea = All;
 
     dataset
     {

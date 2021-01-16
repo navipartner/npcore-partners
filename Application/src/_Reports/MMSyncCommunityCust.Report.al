@@ -3,6 +3,7 @@ report 6060128 "NPR MM Sync. Community Cust."
     // MM1.10/TSA/20160404  CASE 233948 Report to create or update membership to customer
     // MM1.17/TSA/20161121  CASE 258982 Changed how partially created business relations was corrected
 
+    UsageCategory = None;
     Caption = 'Sync. Community Customers';
     ProcessingOnly = true;
 

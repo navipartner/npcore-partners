@@ -3,6 +3,7 @@ report 6060123 "NPR MM Member Card Std Print"
     // NPK1.00/JLK /20170215  CASE 266264 Object created
     // NPK1.01/JLK /20170413  CASE 272077 Barcode Text removed to replace with External Member Card No.
     // NPR5.55/JAKUBV/20200807  CASE 408787 Transport NPR5.55 - 31 July 2020
+    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/MM Member Card Std Print.rdlc';
 

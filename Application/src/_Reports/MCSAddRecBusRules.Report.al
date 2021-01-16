@@ -3,6 +3,7 @@ report 6060080 "NPR MCS Add Rec. Bus. Rules"
     // NPR5.30/BR  /20170220  CASE 252646 Object Created
     // NPR5.48/TJ  /20180102  CASE 340615 Removed Product Group Code from ReqFilterFields property on dataitem Item
 
+    UsageCategory = None;
     Caption = 'MCS Add Rec. Business Rules';
     ProcessingOnly = true;
 

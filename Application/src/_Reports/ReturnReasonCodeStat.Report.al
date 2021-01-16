@@ -7,6 +7,7 @@ report 6014404 "NPR Return Reason Code Stat."
     Caption = 'Return Reason Code Statistics';
     PreviewMode = PrintLayout;
     UsageCategory = ReportsAndAnalysis;
+    ApplicationArea = All;
 
     dataset
     {

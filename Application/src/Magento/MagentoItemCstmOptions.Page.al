@@ -9,6 +9,7 @@ page 6151428 "NPR Magento Item Cstm Options"
     InsertAllowed = false;
     PageType = Card;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Magento Item Custom Option";
     SourceTableTemporary = true;
 

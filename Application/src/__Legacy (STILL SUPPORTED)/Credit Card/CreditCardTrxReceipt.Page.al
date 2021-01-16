@@ -4,6 +4,7 @@ page 6014409 "NPR Credit Card Trx Receipt"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR EFT Receipt";
     SourceTableView = WHERE(Type = FILTER(0 | 3));
 

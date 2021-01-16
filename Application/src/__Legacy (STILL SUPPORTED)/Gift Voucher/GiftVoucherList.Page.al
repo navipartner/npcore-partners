@@ -18,6 +18,7 @@ page 6014431 "NPR Gift Voucher List"
     SourceTable = "NPR Gift Voucher";
     SourceTableView = SORTING("Primary Key Length");
     UsageCategory = Lists;
+    ApplicationArea = All;
 
     layout
     {

@@ -9,6 +9,7 @@ page 6014507 "NPR Used Goods Reg. List"
     PageType = List;
     SourceTable = "NPR Used Goods Registration";
     UsageCategory = Lists;
+    ApplicationArea = All;
 
     layout
     {

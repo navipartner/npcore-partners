@@ -7,6 +7,7 @@ page 6150699 "NPR Retail Data Model Upg.Log"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Data Model Upg. Log Entry";
 
     layout

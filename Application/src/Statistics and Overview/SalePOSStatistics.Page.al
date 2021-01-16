@@ -5,6 +5,7 @@ page 6014410 "NPR Sale POS - Statistics"
     //                                  Removed unused variables
     // NPR5.40/BHR /20180316 CASE 308385 Removed unused function CallSub
 
+    UsageCategory = None;
     Caption = 'Sales Statistics';
     SourceTable = "NPR Sale POS";
 

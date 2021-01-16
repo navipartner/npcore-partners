@@ -1,5 +1,6 @@
 page 6014446 "NPR Create Gift Voucher"
 {
+    UsageCategory = None;
     Caption = 'Create Gift Voucher';
     SourceTable = "NPR Gift Voucher";
 

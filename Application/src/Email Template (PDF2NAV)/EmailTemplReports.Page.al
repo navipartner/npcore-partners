@@ -4,6 +4,7 @@ page 6059798 "NPR E-mail Templ. Reports"
     DelayedInsert = true;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR E-mail Templ. Report";
 
     layout

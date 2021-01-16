@@ -3,6 +3,7 @@ page 6014538 "NPR Insurance Companies"
     Caption = 'Insurance - Companies';
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Insurance Companies";
 
     layout

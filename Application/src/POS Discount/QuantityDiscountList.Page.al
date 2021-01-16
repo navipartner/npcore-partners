@@ -10,6 +10,7 @@ page 6014467 "NPR Quantity Discount List"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Quantity Discount Header";
 
     layout

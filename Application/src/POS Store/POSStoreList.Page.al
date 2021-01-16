@@ -7,6 +7,7 @@ page 6150614 "NPR POS Store List"
     PageType = List;
     SourceTable = "NPR POS Store";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

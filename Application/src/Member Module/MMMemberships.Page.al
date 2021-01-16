@@ -10,6 +10,7 @@ page 6060127 "NPR MM Memberships"
     PromotedActionCategories = 'New,Process,Report,History,Raptor';
     SourceTable = "NPR MM Membership";
     UsageCategory = Lists;
+    ApplicationArea = All;
 
     layout
     {

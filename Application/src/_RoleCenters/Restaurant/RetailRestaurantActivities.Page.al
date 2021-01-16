@@ -3,6 +3,7 @@ page 6151335 "NPR Restaurant Activities"
     Caption = 'Activities';
     PageType = CardPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     RefreshOnActivate = true;
     SourceTable = "NPR Restaurant Cue";
 

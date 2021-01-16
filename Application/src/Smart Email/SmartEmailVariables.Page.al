@@ -3,6 +3,7 @@ page 6059823 "NPR Smart Email Variables"
     // NPR5.38/THRO/20171018 CASE 286713 Object created
     // NPR5.55/THRO/20200511 CASE 343266 Added "Variable Type"
 
+    UsageCategory = None;
     Caption = 'Smart Email Variables';
     PageType = ListPart;
     SourceTable = "NPR Smart Email Variable";

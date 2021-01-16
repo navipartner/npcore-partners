@@ -7,6 +7,7 @@ page 6059795 "NPR E-mail Templates"
     PageType = List;
     SourceTable = "NPR E-mail Template Header";
     UsageCategory = Lists;
+    ApplicationArea = All;
 
     layout
     {

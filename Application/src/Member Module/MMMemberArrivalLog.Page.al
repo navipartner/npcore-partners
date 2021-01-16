@@ -7,6 +7,7 @@ page 6060088 "NPR MM Member Arrival Log"
     ModifyAllowed = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR MM Member Arr. Log Entry";
 
     layout

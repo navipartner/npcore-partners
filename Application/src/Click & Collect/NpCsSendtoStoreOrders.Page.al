@@ -8,6 +8,7 @@ page 6151204 "NPR NpCs Send to Store Orders"
                       WHERE(Type = CONST("Send to Store"),
                             "Document Type" = CONST(Order));
     UsageCategory = Lists;
+    ApplicationArea = All;
 
     layout
     {

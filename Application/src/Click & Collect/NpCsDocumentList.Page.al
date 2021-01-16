@@ -4,6 +4,7 @@ page 6151200 "NPR NpCs Document List"
     InsertAllowed = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR NpCs Document";
 
     layout

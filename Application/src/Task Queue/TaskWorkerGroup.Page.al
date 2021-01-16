@@ -6,6 +6,7 @@ page 6059906 "NPR Task Worker Group"
     PageType = List;
     SourceTable = "NPR Task Worker Group";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

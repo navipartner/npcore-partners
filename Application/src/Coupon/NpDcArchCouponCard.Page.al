@@ -6,6 +6,7 @@ page 6151600 "NPR NpDc Arch. Coupon Card"
     InsertAllowed = false;
     PageType = Card;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR NpDc Arch. Coupon";
 
     layout

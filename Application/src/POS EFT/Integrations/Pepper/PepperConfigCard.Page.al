@@ -11,6 +11,7 @@ page 6184490 "NPR Pepper Config. Card"
     Caption = 'Pepper Configuration Card';
     PageType = Card;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Pepper Config.";
 
     layout

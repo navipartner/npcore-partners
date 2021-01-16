@@ -8,6 +8,7 @@ page 6014459 "NPR Item Group List"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Item Group";
 
     layout

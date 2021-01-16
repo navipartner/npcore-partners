@@ -11,6 +11,7 @@ page 6151426 "NPR Magento Custom Option List"
     PageType = List;
     SourceTable = "NPR Magento Custom Option";
     UsageCategory = Lists;
+    ApplicationArea = All;
 
     layout
     {

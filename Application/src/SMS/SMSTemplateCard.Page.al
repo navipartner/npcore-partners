@@ -1,5 +1,6 @@
 page 6059941 "NPR SMS Template Card"
 {
+    UsageCategory = None;
     Caption = 'SMS Template Card';
     PromotedActionCategories = 'New,Process,Report,Functions';
     SourceTable = "NPR SMS Template Header";

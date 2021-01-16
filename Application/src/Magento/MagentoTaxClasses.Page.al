@@ -10,6 +10,7 @@ page 6151407 "NPR Magento Tax Classes"
     PageType = List;
     SourceTable = "NPR Magento Tax Class";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

@@ -3,6 +3,7 @@ report 6060111 "NPR Check Duplicate Cust."
     // NPR4.18\JLK\20151119 CASE 227394 - Report to find matching customers based on Name, Address and Phone No.
     // NPR5.38/JLK /20180124  CASE 300892 Removed AL Error on ControlContainer Caption in Request Page
     // NPR5.38/JLK /20180125  CASE 303595 Added ENU object caption
+    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Check Duplicate Customers.rdlc';
 

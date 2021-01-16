@@ -6,6 +6,7 @@ page 6014495 "NPR Audit Roll Backup List"
     Permissions = TableData "NPR Audit Roll" = rimd;
     SourceTable = "NPR Audit Roll Backup";
     UsageCategory = History;
+    ApplicationArea = All;
 
     layout
     {

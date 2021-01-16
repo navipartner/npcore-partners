@@ -6,6 +6,7 @@ page 6150736 "NPR POS Theme Dependencies"
     Caption = 'POS Theme Dependencies';
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR POS Theme Dependency";
 
     layout

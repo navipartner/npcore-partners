@@ -30,6 +30,7 @@ page 6151502 "NPR Nc Task List"
     ShowFilter = true;
     SourceTable = "NPR Nc Task";
     UsageCategory = Tasks;
+    ApplicationArea = All;
 
     layout
     {

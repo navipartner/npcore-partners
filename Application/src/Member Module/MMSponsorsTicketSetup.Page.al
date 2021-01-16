@@ -5,6 +5,7 @@ page 6151185 "NPR MM Sponsors. Ticket Setup"
     DelayedInsert = true;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR MM Sponsors. Ticket Setup";
 
     layout

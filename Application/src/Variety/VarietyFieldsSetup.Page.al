@@ -9,6 +9,7 @@ page 6059975 "NPR Variety Fields Setup"
     PageType = List;
     SourceTable = "NPR Variety Field Setup";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

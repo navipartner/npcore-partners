@@ -6,6 +6,7 @@ page 6151057 "NPR Distribution Header"
     Caption = 'Distribution Group Setup';
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Distribution Headers";
 
     layout

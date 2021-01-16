@@ -1,5 +1,6 @@
 page 6014433 "NPR Payment Type - Card"
 {
+    UsageCategory = None;
     Caption = 'Payment Type Card';
     PromotedActionCategories = 'New,Process,Prints,Master Data,Test5,Test6,Test7,Test8';
     SourceTable = "NPR Payment Type POS";

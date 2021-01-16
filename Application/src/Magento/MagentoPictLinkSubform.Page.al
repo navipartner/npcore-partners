@@ -21,6 +21,7 @@ page 6151412 "NPR Magento Pict. Link Subform"
     DelayedInsert = true;
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     RefreshOnActivate = true;
     ShowFilter = false;
     SourceTable = "NPR Magento Picture Link";

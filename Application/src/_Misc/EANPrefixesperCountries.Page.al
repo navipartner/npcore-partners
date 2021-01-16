@@ -8,6 +8,7 @@ page 6060064 "NPR EAN Prefixes per Countries"
     SourceTable = "NPR EAN Prefix per Country";
     SourceTableView = SORTING("Country Code");
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

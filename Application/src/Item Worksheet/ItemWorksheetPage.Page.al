@@ -32,6 +32,7 @@ page 6060042 "NPR Item Worksheet Page"
     SaveValues = true;
     SourceTable = "NPR Item Worksheet Line";
     UsageCategory = Tasks;
+    ApplicationArea = All;
 
     layout
     {

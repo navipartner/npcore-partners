@@ -9,6 +9,7 @@ page 6059966 "NPR MPOS Nets Trx List"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR MPOS Nets Transactions";
 
     layout

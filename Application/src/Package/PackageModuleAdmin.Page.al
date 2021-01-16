@@ -8,6 +8,7 @@ page 6014648 "NPR Package Module Admin"
     Caption = 'Package Module Admin';
     SourceTable = "NPR Package Module Config.";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

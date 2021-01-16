@@ -5,6 +5,7 @@ page 6151040 "NPR Notification Dialog"
     Caption = 'Notification Dialog';
     PageType = StandardDialog;
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

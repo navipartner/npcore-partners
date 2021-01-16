@@ -4,6 +4,7 @@ page 6150670 "NPR POS Balancing Line"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR POS Balancing Line";
 
     layout

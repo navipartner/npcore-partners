@@ -7,6 +7,7 @@ report 6014460 "NPR Balancing Report A4"
     // NPR5.55/ZESO/20200511 CASE 394936 Removed Duplicate Tax Section and move correct one below Discount section
     // NPR5.55/BHR /20200525 CASE 404681 Replace POSEntry."POS Store Code" with POSEntry."POS Unit No."
     // NPR5.55/ZESO/20200724 CASE 416046 Display both POS Store Code and POS Unit No.
+    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Balancing Report -A4 - NEW.rdlc';
 

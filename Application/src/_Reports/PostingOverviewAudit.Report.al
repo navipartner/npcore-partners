@@ -9,6 +9,7 @@ report 6014429 "NPR Posting Overview Audit"
 
     Caption = 'Posting Overview Audit';
     UsageCategory = ReportsAndAnalysis;
+    ApplicationArea = All;
 
     dataset
     {

@@ -8,6 +8,7 @@ page 6059991 "NPR Item Repair"
     InsertAllowed = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Item Repair";
 
     layout

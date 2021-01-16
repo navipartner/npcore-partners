@@ -7,6 +7,7 @@ page 6150629 "NPR POS Workshift Checkpoints"
     ModifyAllowed = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR POS Workshift Checkpoint";
     SourceTableView = SORTING("Entry No.")
                       ORDER(Descending);

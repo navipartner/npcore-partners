@@ -3,6 +3,7 @@ page 6014536 "NPR Scanner: Field Setup"
     Caption = 'Scanner - Field Setup';
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Scanner: Field Setup";
 
     layout

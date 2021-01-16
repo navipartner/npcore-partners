@@ -6,6 +6,7 @@ page 6151026 "NPR NpRv Partners"
     PageType = List;
     SourceTable = "NPR NpRv Partner";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

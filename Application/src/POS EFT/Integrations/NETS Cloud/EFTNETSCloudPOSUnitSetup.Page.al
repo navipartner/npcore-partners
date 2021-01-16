@@ -5,6 +5,7 @@ page 6184515 "NPR EFT NETSCloud POSUnitSetup"
     Caption = 'EFT NETS Cloud POS Unit Setup';
     PageType = Card;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR EFT NETSCloud Unit Setup";
 
     layout

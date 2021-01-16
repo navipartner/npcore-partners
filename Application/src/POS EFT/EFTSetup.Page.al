@@ -8,6 +8,7 @@ page 6184481 "NPR EFT Setup"
     PageType = List;
     SourceTable = "NPR EFT Setup";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

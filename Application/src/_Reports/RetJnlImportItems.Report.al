@@ -6,6 +6,7 @@ report 6014424 "NPR Ret. Jnl. - Import Items"
     // NPR5.49/BHR /20190115  CASE 341969 Corrections as per OMA Guidelines
     // NPR5.51/ZESO/20190705  CASE 361139 Print Item Variants
 
+    UsageCategory = None;
     Caption = 'Import Items';
     ProcessingOnly = true;
 

@@ -13,6 +13,7 @@ page 6059950 "NPR Display Setup"
     PageType = List;
     SourceTable = "NPR Display Setup";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

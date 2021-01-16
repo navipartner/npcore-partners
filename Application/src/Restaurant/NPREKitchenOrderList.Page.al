@@ -9,6 +9,7 @@ page 6150688 "NPR NPRE Kitchen Order List"
     PageType = List;
     SourceTable = "NPR NPRE Kitchen Order";
     UsageCategory = Lists;
+    ApplicationArea = All;
 
     layout
     {

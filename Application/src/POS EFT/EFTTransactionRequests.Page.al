@@ -24,6 +24,7 @@ page 6184498 "NPR EFT Transaction Requests"
     SourceTableView = SORTING("Entry No.")
                       ORDER(Descending);
     UsageCategory = History;
+    ApplicationArea = All;
 
     layout
     {

@@ -13,6 +13,7 @@ page 6150632 "NPR POS Audit Profiles"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR POS Audit Profile";
 
     layout

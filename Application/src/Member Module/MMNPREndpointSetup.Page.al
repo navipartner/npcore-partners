@@ -4,6 +4,7 @@ page 6060072 "NPR MM NPR Endpoint Setup"
     Caption = 'NPR Endpoint Setup';
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR MM NPR Remote Endp. Setup";
 
     layout

@@ -8,6 +8,7 @@ page 6060139 "NPR MM Create Membership"
     PageType = List;
     SourceTable = "NPR MM Members. Sales Setup";
     UsageCategory = Tasks;
+    ApplicationArea = All;
 
     layout
     {

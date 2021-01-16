@@ -5,6 +5,7 @@ page 6184509 "NPR EFT NETS BAXI Paym. Setup"
     Caption = 'EFT NETS BAXI Payment Setup';
     PageType = Card;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR EFT NETS BAXI Paym. Setup";
 
     layout

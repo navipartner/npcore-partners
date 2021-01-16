@@ -4,6 +4,7 @@ report 6151590 "NPR NpDc Request Coupon Qty."
     // NPR5.36/MHA /20170921  CASE 291016 Renamed object
     // NPR5.38/JLK /20180124  CASE 300892 Removed AL Error on ControlContainer Caption in Request Page
 
+    UsageCategory = None;
     Caption = 'Request Coupon Qty.';
     ProcessingOnly = true;
 

@@ -4,6 +4,7 @@ page 6151005 "NPR POS Quote Lines"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR POS Quote Line";
 
     layout

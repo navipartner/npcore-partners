@@ -5,6 +5,7 @@ page 6014510 "NPR Accessory List"
     Caption = 'Accessories List';
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Accessory/Spare Part";
 
     layout

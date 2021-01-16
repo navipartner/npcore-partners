@@ -8,6 +8,7 @@ page 6151300 "NPR NpEc Stores"
     PageType = List;
     SourceTable = "NPR NpEc Store";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

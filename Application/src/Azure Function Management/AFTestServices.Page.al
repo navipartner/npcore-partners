@@ -7,6 +7,7 @@ page 6151572 "NPR AF Test Services"
     Caption = 'AF Test Services';
     PageType = Card;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR AF Args: Spire Barcode";
     SourceTableTemporary = true;
 

@@ -4,6 +4,7 @@ page 6151023 "NPR NpRv Arch. Voucher Entries"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR NpRv Arch. Voucher Entry";
 
     layout

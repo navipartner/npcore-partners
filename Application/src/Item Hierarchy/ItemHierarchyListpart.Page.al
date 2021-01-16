@@ -7,6 +7,7 @@ page 6151052 "NPR Item Hierarchy Listpart"
     DelayedInsert = true;
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Item Hierarchy Level";
 
     layout

@@ -6,6 +6,7 @@ page 6151043 "NPR POS Paym. View Log Entries"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR POS Paym. View Log Entry";
 
     layout

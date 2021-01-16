@@ -7,6 +7,7 @@ page 6151092 "NPR Nc RapidConnect Subform"
     DelayedInsert = true;
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     RefreshOnActivate = true;
     SourceTable = "NPR Nc RapidConnect Trig.Table";
 

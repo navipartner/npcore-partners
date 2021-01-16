@@ -3,6 +3,7 @@ page 6060150 "NPR Event Card"
     Caption = 'Event Card';
     PageType = Card;
     UsageCategory = Administration;
+    ApplicationArea = All;
     PromotedActionCategories = 'New,Process,Report,Prices,Tickets';
     RefreshOnActivate = true;
     SourceTable = Job;

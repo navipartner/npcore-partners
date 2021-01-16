@@ -4,6 +4,7 @@ page 6150645 "NPR POS Info Look. Field Setup"
     DelayedInsert = true;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR POS Info Lookup Setup";
     SourceTableTemporary = true;
 

@@ -5,6 +5,7 @@ page 6060143 "NPR MM Membership Notific."
     InsertAllowed = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR MM Membership Notific.";
 
     layout

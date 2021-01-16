@@ -4,6 +4,7 @@ page 6060107 "NPR MM Loy. Item Point Setup"
     Caption = 'Loyalty Item Point Setup';
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR MM Loy. Item Point Setup";
 
     layout

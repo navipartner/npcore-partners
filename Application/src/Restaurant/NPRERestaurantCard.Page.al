@@ -7,6 +7,7 @@ page 6150684 "NPR NPRE Restaurant Card"
     Caption = 'Restaurant Card';
     PageType = Card;
     UsageCategory = Administration;
+    ApplicationArea = All;
     PromotedActionCategories = 'New,Process,Report,Kitchen,Layout';
     SourceTable = "NPR NPRE Restaurant";
 

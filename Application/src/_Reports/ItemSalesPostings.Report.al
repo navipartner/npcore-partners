@@ -18,6 +18,7 @@ report 6014439 "NPR Item Sales Postings"
 
     Caption = 'Item Sales Postings';
     UsageCategory = ReportsAndAnalysis;
+    ApplicationArea = All;
     UseSystemPrinter = true;
 
     dataset

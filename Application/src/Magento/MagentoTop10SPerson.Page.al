@@ -10,6 +10,7 @@ page 6151485 "NPR Magento Top 10 S.Person"
     Editable = false;
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "Salesperson/Purchaser";
     SourceTableTemporary = true;
     SourceTableView = SORTING("Search E-Mail")

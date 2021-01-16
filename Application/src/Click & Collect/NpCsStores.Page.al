@@ -6,6 +6,7 @@ page 6151195 "NPR NpCs Stores"
     PageType = List;
     SourceTable = "NPR NpCs Store";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

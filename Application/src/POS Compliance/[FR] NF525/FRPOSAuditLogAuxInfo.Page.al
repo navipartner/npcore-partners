@@ -9,6 +9,7 @@ page 6184852 "NPR FR POS Audit Log Aux. Info"
     ModifyAllowed = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR FR POS Audit Log Aux. Info";
 
     layout

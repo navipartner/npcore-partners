@@ -3,6 +3,7 @@ page 6014616 "NPR Display Groups WP"
     Caption = 'Display Groups';
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Magento Display Group";
     SourceTableTemporary = true;
     DelayedInsert = true;

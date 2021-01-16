@@ -9,6 +9,7 @@ page 6060097 "NPR Ean Box Events"
     PageType = List;
     SourceTable = "NPR Ean Box Event";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

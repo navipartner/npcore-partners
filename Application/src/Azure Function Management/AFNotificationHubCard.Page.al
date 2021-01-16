@@ -8,6 +8,7 @@ page 6151574 "NPR AF Notification Hub Card"
     ModifyAllowed = false;
     PageType = Card;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR AF Notification Hub";
 
     layout

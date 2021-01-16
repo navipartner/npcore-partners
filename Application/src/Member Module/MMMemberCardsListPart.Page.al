@@ -7,6 +7,7 @@ page 6060131 "NPR MM Member Cards ListPart"
     InsertAllowed = false;
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR MM Member Card";
 
     layout

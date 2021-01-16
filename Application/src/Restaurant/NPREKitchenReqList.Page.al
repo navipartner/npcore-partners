@@ -8,6 +8,7 @@ page 6150691 "NPR NPRE Kitchen Req. List"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR NPRE Kitchen Request";
 
     layout

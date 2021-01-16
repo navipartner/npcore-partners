@@ -6,6 +6,7 @@ page 6060070 "NPR MM Members. AutoRenew List"
     PageType = List;
     SourceTable = "NPR MM Membership Auto Renew";
     UsageCategory = Tasks;
+    ApplicationArea = All;
 
     layout
     {

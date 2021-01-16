@@ -12,6 +12,7 @@ report 6014418 "NPR Item Group Stat M/Y"
     Caption = 'Item Group Statistic M/Y';
     PreviewMode = PrintLayout;
     UsageCategory = ReportsAndAnalysis;
+    ApplicationArea = All;
 
     dataset
     {

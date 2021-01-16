@@ -9,6 +9,7 @@ page 6059959 "NPR MCS Faces"
     PageType = List;
     SourceTable = "NPR MCS Faces";
     UsageCategory = Lists;
+    ApplicationArea = All;
 
     layout
     {

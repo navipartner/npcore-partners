@@ -11,6 +11,7 @@ page 6059767 "NPR NaviDocs Setup"
     InsertAllowed = false;
     SourceTable = "NPR NaviDocs Setup";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

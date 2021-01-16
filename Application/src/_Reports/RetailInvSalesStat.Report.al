@@ -1,5 +1,6 @@
 report 6014662 "NPR Retail Inv.: Sales Stat."
 {
+    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Retail Inventory - Sales Stat..rdlc';
 

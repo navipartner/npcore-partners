@@ -6,6 +6,7 @@ page 6060136 "NPR MM Member Card"
     InsertAllowed = false;
     PageType = Document;
     UsageCategory = Administration;
+    ApplicationArea = All;
     PromotedActionCategories = 'New,Process,Report,History,Raptor';
     SourceTable = "NPR MM Member";
 

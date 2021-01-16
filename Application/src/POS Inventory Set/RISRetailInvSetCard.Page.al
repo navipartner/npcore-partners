@@ -1,5 +1,6 @@
 page 6151086 "NPR RIS Retail Inv. Set Card"
 {
+    UsageCategory = None;
     Caption = 'Retail Inventory Set Card';
     PageType = Card;
     SourceTable = "NPR RIS Retail Inv. Set";

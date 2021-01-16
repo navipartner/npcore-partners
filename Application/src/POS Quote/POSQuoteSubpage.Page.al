@@ -4,6 +4,7 @@ page 6151004 "NPR POS Quote Subpage"
     DelayedInsert = true;
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR POS Quote Line";
 
     layout

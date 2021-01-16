@@ -9,6 +9,7 @@ page 6151404 "NPR Magento Website List"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Magento Website";
 
     layout

@@ -7,6 +7,7 @@ report 6014428 "NPR Shelf Labels"
     // NPR5.50/ZESO/201905006 CASE 353382 Remove Reference to Wrapper Codeunit
     // NPR5.53/ANPA/20191029  CASE 374286 Made the report able to print more than one of each label
     // NPR5.54/SARA/20200114  CASE 384891 Added option to print 'Item Unit Price' or 'Campaign Unit Price'
+    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Shelf Labels.rdlc';
 

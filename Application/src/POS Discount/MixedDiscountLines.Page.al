@@ -12,6 +12,7 @@ page 6014451 "NPR Mixed Discount Lines"
     DelayedInsert = true;
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Mixed Discount Line";
 
     layout

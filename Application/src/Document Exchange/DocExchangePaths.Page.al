@@ -8,6 +8,7 @@ page 6059933 "NPR Doc. Exchange Paths"
     PageType = List;
     SourceTable = "NPR Doc. Exchange Path";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

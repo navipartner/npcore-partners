@@ -1,5 +1,6 @@
 report 6014564 "NPR Credit Voucher A5"
 {
+    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Credit Voucher A5.rdlc';
 

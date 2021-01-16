@@ -46,6 +46,7 @@ page 6014456 "NPR Table Export Wizard"
                       ORDER(Ascending)
                       WHERE("Object Type" = CONST(Table));
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

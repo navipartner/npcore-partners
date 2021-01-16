@@ -8,6 +8,7 @@ page 6060048 "NPR Reg. ItemWsht Var.Subpage"
     Editable = false;
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Reg. Item Wsht Var. Line";
     SourceTableView = SORTING("Registered Worksheet No.", "Registered Worksheet Line No.", "Variety 1 Value", "Variety 2 Value", "Variety 3 Value", "Variety 4 Value")
                       ORDER(Ascending);

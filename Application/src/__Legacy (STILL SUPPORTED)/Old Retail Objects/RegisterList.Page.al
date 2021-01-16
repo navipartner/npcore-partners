@@ -19,6 +19,7 @@ page 6014405 "NPR Register List"
     PageType = List;
     SourceTable = "NPR Register";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

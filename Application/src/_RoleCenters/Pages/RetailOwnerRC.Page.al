@@ -3,6 +3,7 @@ page 6151259 "NPR Retail Owner RC"
     Caption = 'NP Retail Owner RC';
     PageType = RoleCenter;
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

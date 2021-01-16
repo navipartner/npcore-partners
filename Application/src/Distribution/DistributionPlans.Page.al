@@ -8,6 +8,7 @@ page 6151063 "NPR Distribution Plans"
     PageType = List;
     SourceTable = "NPR Distribution Headers";
     UsageCategory = Lists;
+    ApplicationArea = All;
 
     layout
     {

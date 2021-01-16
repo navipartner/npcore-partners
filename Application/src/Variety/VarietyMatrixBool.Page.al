@@ -14,6 +14,7 @@ page 6059978 "NPR Variety Matrix Bool"
     LinksAllowed = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Variety Buffer";
     SourceTableTemporary = true;
     SourceTableView = SORTING("Variety 1 Sort Order", "Variety 2 Sort Order", "Variety 3 Sort Order", "Variety 4 Sort Order");

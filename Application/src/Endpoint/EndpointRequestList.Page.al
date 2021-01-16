@@ -8,6 +8,7 @@ page 6014678 "NPR Endpoint Request List"
     PageType = List;
     SourceTable = "NPR Endpoint Request";
     UsageCategory = Lists;
+    ApplicationArea = All;
 
     layout
     {

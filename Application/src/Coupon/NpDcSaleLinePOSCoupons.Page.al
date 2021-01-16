@@ -4,6 +4,7 @@ page 6151598 "NPR NpDc SaleLinePOS Coupons"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     PopulateAllFields = true;
     SourceTable = "NPR NpDc SaleLinePOS Coupon";
 

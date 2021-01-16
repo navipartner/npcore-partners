@@ -11,6 +11,7 @@ page 6150615 "NPR POS Store Card"
     // NPR5.53/ALPO/20191021 CASE 371956 Dimensions: POS Store & POS Unit integration
     // NPR5.55/ALPO/20200730 CASE 414938 POS Store/POS Unit - Restaurant link (added "POS Restaurant Profile")
 
+    UsageCategory = None;
     Caption = 'POS Store Card';
     RefreshOnActivate = true;
     SourceTable = "NPR POS Store";

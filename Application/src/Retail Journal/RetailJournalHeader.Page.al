@@ -30,6 +30,7 @@ page 6014490 "NPR Retail Journal Header"
     Caption = 'Retail Journal';
     PageType = Card;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Retail Journal Header";
 
     layout

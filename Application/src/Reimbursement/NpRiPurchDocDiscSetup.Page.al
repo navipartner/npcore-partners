@@ -1,6 +1,6 @@
 page 6151107 "NPR NpRi Purch.Doc.Disc. Setup"
 {
-
+    UsageCategory = None;
     Caption = 'Purchase Document Discount Reimbursement Setup';
     DeleteAllowed = false;
     InsertAllowed = false;

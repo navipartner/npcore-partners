@@ -8,6 +8,7 @@ page 6151570 "NPR AF Setup"
     Caption = 'AF Setup';
     PageType = Card;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR AF Setup";
 
     layout

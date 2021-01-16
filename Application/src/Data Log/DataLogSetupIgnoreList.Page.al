@@ -1,5 +1,6 @@
 page 6059895 "NPR Data Log Setup Ignore List"
 {
+    UsageCategory = None;
     Caption = 'Data Log Setup Ignore List';
     DataCaptionExpression = PageCaption;
     DeleteAllowed = false;

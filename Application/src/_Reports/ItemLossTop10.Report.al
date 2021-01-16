@@ -4,6 +4,7 @@ report 6014543 "NPR Item - Loss - Top 10"
     // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
     // NPR5.48/TJ  /20180102  CASE 340615 Removed Product Group Code from ReqFilterFields property on dataitem Item
     // NPR5.48/BHR /20190111  CASE 341976 Comment Code as per OMA
+    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Item - Loss - Top 10.rdlc';
 

@@ -5,6 +5,7 @@ report 6014504 "NPR Customer Note"
     // NPR5.36/JLK /20170921  CASE 286803 Increased length variable CompanyAddr to [50]
     // TM1.39/THRO/20181126  CASE 334644 Replaced Coudeunit 1 by Wrapper Codeunit
     // NPR5.50/ZESO/201905006 CASE 353382 Remove Reference to Wrapper Codeunit
+    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Customer Note.rdlc';
 

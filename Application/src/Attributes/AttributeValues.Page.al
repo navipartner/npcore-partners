@@ -5,6 +5,7 @@ page 6014608 "NPR Attribute Values"
     Caption = 'Client Attribute Values';
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Attribute Value Set";
 
     layout

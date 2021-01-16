@@ -7,6 +7,7 @@ page 6059972 "NPR Variety Table"
     Caption = 'Variety Table';
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Variety Table";
 
     layout

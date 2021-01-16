@@ -11,6 +11,7 @@ report 6014529 "NPR Vendor/Salesperson"
 
     Caption = 'Vendor/Salesperson';
     UsageCategory = ReportsAndAnalysis;
+    ApplicationArea = All;
 
     dataset
     {

@@ -6,6 +6,7 @@ page 6014631 "NPR RP Template Archive List"
     ModifyAllowed = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR RP Template Archive";
 
     layout

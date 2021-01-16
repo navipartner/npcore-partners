@@ -5,6 +5,7 @@ page 6059947 "NPR Sales Price Maint. Groups"
     Caption = 'Sales Price Maintenance Groups';
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Sales Price Maint. Groups";
 
     layout

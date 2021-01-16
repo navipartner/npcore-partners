@@ -14,6 +14,7 @@ page 6014428 "NPR Salesperson Card"
     // NPR5.42/TS  /20180509 CASE 313970 Added Masjked on field Register Password
     // NPR5.53/BHR /20190810 CASE 369354 Removed Fields 'New Customer creation'
 
+    UsageCategory = None;
     Caption = 'Salesperson/Purchaser Card';
     SourceTable = "Salesperson/Purchaser";
 

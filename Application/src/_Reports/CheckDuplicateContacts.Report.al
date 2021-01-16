@@ -4,6 +4,7 @@ report 6060112 "NPR Check Duplicate Contacts"
     // NPR5.38/JLK /20180124  CASE 300892 Removed AL Error on ControlContainer Caption in Request Page
     // NPR5.38/JLK /20180125  CASE 303595 Added ENU object caption
     // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
+    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Check Duplicate Contacts.rdlc';
 

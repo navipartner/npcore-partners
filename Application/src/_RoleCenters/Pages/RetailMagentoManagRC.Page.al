@@ -10,6 +10,7 @@ page 6151244 "NPR Retail Magento Manag. RC"
     Caption = 'NP Retail Magento Manag. Role Center';
     PageType = RoleCenter;
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

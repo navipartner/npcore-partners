@@ -7,6 +7,7 @@ page 6014644 "NPR Tax Free POS Units"
     PageType = List;
     SourceTable = "NPR Tax Free POS Unit";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

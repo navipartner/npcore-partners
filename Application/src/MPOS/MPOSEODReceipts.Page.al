@@ -6,6 +6,7 @@ page 6059962 "NPR MPOS EOD Receipts"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR MPOS EOD Recipts";
 
     layout

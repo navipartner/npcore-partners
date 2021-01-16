@@ -21,6 +21,7 @@ report 6014409 "NPR Sales Ticket Stat."
 
     Caption = 'Sale Statistics';
     UsageCategory = ReportsAndAnalysis;
+    ApplicationArea = All;
 
     dataset
     {

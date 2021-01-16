@@ -4,6 +4,7 @@ page 6151602 "NPR NpDc Coupon Setup"
     PageType = Card;
     SourceTable = "NPR NpDc Coupon Setup";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

@@ -6,6 +6,7 @@ page 6014442 "NPR Item - Series Number"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "Item Ledger Entry";
 
     layout

@@ -6,6 +6,7 @@ page 6151139 "NPR TM Admis. Forecast Lines"
     Editable = false;
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR TM Admis. Schedule Lines";
     SourceTableTemporary = true;
 

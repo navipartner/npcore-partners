@@ -12,6 +12,7 @@ page 6151400 "NPR Magento Gen. Setup Buffer"
     InsertAllowed = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Magento Gen. Setup Buffer";
     SourceTableTemporary = true;
 

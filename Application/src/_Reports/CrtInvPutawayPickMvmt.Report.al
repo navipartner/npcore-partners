@@ -2,6 +2,7 @@ report 6151599 "NPR Crt Inv Put-away/Pick/Mvmt"
 {
     // NPR5.55/ALST/20200716 CASE 404660 new object created for the task queue
 
+    UsageCategory = None;
     Caption = 'Create Invt. Put-away/Pick/Movement';
     ProcessingOnly = true;
 

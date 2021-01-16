@@ -8,6 +8,7 @@ page 6151585 "NPR Event Statistics"
     LinksAllowed = false;
     PageType = Card;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = Job;
 
     layout

@@ -12,6 +12,7 @@ page 6059970 "NPR Variety Setup"
     PromotedActionCategories = 'New,Process,Report,View,Update';
     SourceTable = "NPR Variety Setup";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

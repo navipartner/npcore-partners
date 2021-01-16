@@ -4,6 +4,7 @@ page 6014622 "NPR POS Web Fonts"
     PageType = List;
     SourceTable = "NPR POS Web Font";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

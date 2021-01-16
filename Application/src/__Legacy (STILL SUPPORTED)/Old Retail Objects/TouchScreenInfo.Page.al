@@ -9,6 +9,7 @@ page 6014530 "NPR Touch Screen - Info"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR TEMP Buffer";
 
     layout

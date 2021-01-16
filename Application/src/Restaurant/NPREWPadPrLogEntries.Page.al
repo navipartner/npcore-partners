@@ -9,6 +9,7 @@ page 6150682 "NPR NPRE W.Pad Pr.Log Entries"
     PageType = List;
     SourceTable = "NPR NPRE W.Pad Prnt LogEntry";
     UsageCategory = History;
+    ApplicationArea = All;
 
     layout
     {

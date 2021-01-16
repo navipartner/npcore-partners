@@ -1,5 +1,6 @@
 page 6014563 "NPR TouchScreen: TicketReserv."
 {
+    UsageCategory = None;
     Caption = 'Touch Screen - Ticket Reserv.';
     SourceTable = "NPR Ticket Access Cap. Slots";
     SourceTableTemporary = true;

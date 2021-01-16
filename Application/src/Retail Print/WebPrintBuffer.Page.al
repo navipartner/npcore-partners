@@ -6,6 +6,7 @@ page 6014581 "NPR Web Print Buffer"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Web Print Buffer";
 
     layout

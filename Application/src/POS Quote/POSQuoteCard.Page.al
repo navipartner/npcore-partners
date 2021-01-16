@@ -1,5 +1,6 @@
 page 6151003 "NPR POS Quote Card"
 {
+    UsageCategory = None;
     Caption = 'POS Quote Card';
     InsertAllowed = false;
     ModifyAllowed = false;

@@ -6,6 +6,7 @@ page 6060075 "NPR MM Members. Auto-Renew Log"
     ModifyAllowed = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR MM Member Info Capture";
 
     layout

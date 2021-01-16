@@ -9,6 +9,7 @@ page 6059821 "NPR Smart Email List"
     PageType = List;
     SourceTable = "NPR Smart Email";
     UsageCategory = Lists;
+    ApplicationArea = All;
 
     layout
     {

@@ -7,6 +7,7 @@ page 6151002 "NPR POS Quotes"
     PageType = Document;
     SourceTable = "NPR POS Quote Entry";
     UsageCategory = Lists;
+    ApplicationArea = All;
 
     layout
     {

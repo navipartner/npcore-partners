@@ -5,6 +5,7 @@ page 6060066 "NPR Items by Location Overview"
     Caption = 'Items by Location Overview';
     PageType = ListPlus;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SaveValues = true;
 
     layout

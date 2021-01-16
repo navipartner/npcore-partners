@@ -7,6 +7,7 @@ page 6151123 "NPR GDPR Agreement Card"
     DelayedInsert = true;
     PageType = Card;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR GDPR Agreement";
 
     layout

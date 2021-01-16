@@ -6,6 +6,7 @@ page 6151022 "NPR NpRv Arch. Vouchers"
     PageType = List;
     SourceTable = "NPR NpRv Arch. Voucher";
     UsageCategory = History;
+    ApplicationArea = All;
 
     layout
     {

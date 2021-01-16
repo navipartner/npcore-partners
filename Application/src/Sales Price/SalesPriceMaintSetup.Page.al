@@ -6,6 +6,7 @@ page 6014685 "NPR Sales Price Maint. Setup"
     Caption = 'Sales Price Maintenance Setup';
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Sales Price Maint. Setup";
 
     layout

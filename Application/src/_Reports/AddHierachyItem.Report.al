@@ -2,6 +2,7 @@ report 6151050 "NPR Add Hierachy Item"
 {
     // #289017/JKL /20171222  CASE 289017 Object created - Replenishment Module
 
+    UsageCategory = None;
     Caption = 'Add Hierachy Item';
     ProcessingOnly = true;
 

@@ -19,6 +19,7 @@ page 6014503 "NPR Customer Repair Card"
     // NPR5.52/ANPA/20190920  CASE 369594 Removed page actions input and delete from section pictures from actiongroup <Action6150715>
     // NPR5.52/ANPA/20190920  CASE 369595 Removed Fax No. field
 
+    UsageCategory = None;
     Caption = 'Customer Repair Card';
     PromotedActionCategories = 'New,Process,Reports,Pictures,Tasks';
     SourceTable = "NPR Customer Repair";

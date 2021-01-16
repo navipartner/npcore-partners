@@ -11,6 +11,7 @@ page 6184496 "NPR Pepper Version List"
     PageType = List;
     SourceTable = "NPR Pepper Version";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

@@ -8,6 +8,7 @@ page 6060130 "NPR MM Member Card List"
     PageType = List;
     SourceTable = "NPR MM Member Card";
     UsageCategory = Lists;
+    ApplicationArea = All;
 
     layout
     {

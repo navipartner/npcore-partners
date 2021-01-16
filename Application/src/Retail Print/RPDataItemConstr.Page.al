@@ -4,6 +4,7 @@ page 6014642 "NPR RP Data Item Constr."
     Caption = 'Data Item Constraints';
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     ShowFilter = false;
     SourceTable = "NPR RP Data Item Constr.";
 

@@ -3,6 +3,7 @@ page 6151198 "NPR NpCs Workflow Card"
     Caption = 'Collect Workflow Card';
     PageType = Card;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR NpCs Workflow";
 
     layout

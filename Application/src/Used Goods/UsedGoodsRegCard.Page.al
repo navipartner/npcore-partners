@@ -6,6 +6,7 @@ page 6014506 "NPR Used Goods Reg. Card"
     // NPR5.41/TS  /20180105 CASE 300893 Removed Caption on ActionContainer
     // NPR5.54/MITH/20200304 CASE 394335 Added button to print label after creating item from used goods.
 
+    UsageCategory = None;
     Caption = 'Used Item Registration Card';
     SourceTable = "NPR Used Goods Registration";
 

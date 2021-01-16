@@ -7,6 +7,7 @@ report 6014437 "NPR Item Group Listing M/Y"
     Caption = 'Item Group Listing M/Y';
     PreviewMode = PrintLayout;
     UsageCategory = ReportsAndAnalysis;
+    ApplicationArea = All;
 
     dataset
     {

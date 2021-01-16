@@ -11,6 +11,7 @@ page 6150667 "NPR NPRE Seating Location"
     PromotedActionCategories = 'New,Process,Report,Layout';
     SourceTable = "NPR NPRE Seating Location";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

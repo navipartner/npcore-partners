@@ -6,6 +6,7 @@ page 6014497 "NPR Retail Journal List"
     PageType = List;
     SourceTable = "NPR Retail Journal Header";
     UsageCategory = Lists;
+    ApplicationArea = All;
 
     layout
     {

@@ -4,6 +4,7 @@ page 6059790 "NPR Pdf2Nav Posting Setup"
     PageType = Card;
     SourceTable = "NPR SalesPost Pdf2Nav Setup";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

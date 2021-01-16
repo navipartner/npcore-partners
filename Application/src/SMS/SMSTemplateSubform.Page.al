@@ -4,6 +4,7 @@ page 6059942 "NPR SMS Template Subform"
     Caption = 'Lines';
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR SMS Template Line";
 
     layout

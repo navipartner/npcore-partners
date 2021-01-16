@@ -8,6 +8,7 @@ page 6059834 "NPR Event Comment Sheet"
     MultipleNewLines = true;
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "Comment Line";
 
     layout

@@ -8,6 +8,7 @@ page 6150741 "NPR POS Admin. Template List"
     PageType = List;
     SourceTable = "NPR POS Admin. Template";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

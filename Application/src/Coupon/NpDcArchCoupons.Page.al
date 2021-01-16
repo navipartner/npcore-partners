@@ -7,6 +7,7 @@ page 6151599 "NPR NpDc Arch. Coupons"
     PopulateAllFields = true;
     SourceTable = "NPR NpDc Arch. Coupon";
     UsageCategory = History;
+    ApplicationArea = All;
 
     layout
     {

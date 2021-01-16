@@ -2,7 +2,7 @@ page 6151249 "NPR Entertainment RC"
 {
     Caption = 'Entertainment RC', Comment = '{Dependency=Match,"ProfileDescription_PRESIDENT-SMALLBUSINESS"}';
     PageType = RoleCenter;
-    UsageCategory = Administration;
+    UsageCategory = None;
 
     layout
     {

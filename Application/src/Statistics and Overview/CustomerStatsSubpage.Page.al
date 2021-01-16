@@ -8,6 +8,7 @@ page 6014589 "NPR Customer Stats Subpage"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = Customer;
 
     layout

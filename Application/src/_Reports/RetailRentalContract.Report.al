@@ -9,6 +9,7 @@ report 6014436 "NPR Retail Rental Contract"
     Caption = 'Retail Rental Contract';
     PreviewMode = PrintLayout;
     UsageCategory = Documents;
+    ApplicationArea = All;
 
     dataset
     {

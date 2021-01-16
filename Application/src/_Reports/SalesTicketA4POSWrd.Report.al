@@ -2,6 +2,7 @@ report 6150616 "NPR Sales Ticket A4 - POS Wrd"
 {
     // NPR5.41/JLK /20180403  CASE 308435 Object created for Word Layout
     // NPR5.42/JLK /20180522  CASE 315964 Identified format issue
+    UsageCategory = None;
     RDLCLayout = './src/_Reports/layouts/Sales Ticket A4 - POS Wrd.rdlc';
     WordLayout = './src/_Reports/layouts/Sales Ticket A4 - POS Wrd.docx';
 
@@ -417,7 +418,7 @@ report 6150616 "NPR Sales Ticket A4 - POS Wrd"
         TotalAmountInclVATCaption: Label 'Total %1 Incl. VAT';
         ContactNoCaption: Label 'Contact No.';
 
-        CustPhoneNo : text [30];
+        CustPhoneNo: text[30];
 
     local procedure GetVATText(EntryNo: Integer): Text
     var

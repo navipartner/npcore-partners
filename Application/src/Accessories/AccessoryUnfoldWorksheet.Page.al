@@ -7,6 +7,7 @@ page 6014502 "NPR Accessory Unfold Worksheet"
     PageType = Worksheet;
     SourceTable = "NPR Accessory Unfold Worksheet";
     UsageCategory = Tasks;
+    ApplicationArea = All;
 
     layout
     {

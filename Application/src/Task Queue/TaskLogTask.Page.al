@@ -11,6 +11,7 @@ page 6059904 "NPR Task Log (Task)"
     SourceTableView = SORTING("Entry No.")
                       ORDER(Descending);
     UsageCategory = History;
+    ApplicationArea = All;
 
     layout
     {

@@ -9,6 +9,7 @@ page 6151535 "NPR Nc Coll. Create Outg. Req."
     SourceTable = "NPR Nc Collector Request";
     SourceTableTemporary = true;
     UsageCategory = Tasks;
+    ApplicationArea = All;
 
     layout
     {

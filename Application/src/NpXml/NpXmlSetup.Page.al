@@ -9,6 +9,7 @@ page 6151550 "NPR NpXml Setup"
     InsertAllowed = false;
     SourceTable = "NPR NpXml Setup";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

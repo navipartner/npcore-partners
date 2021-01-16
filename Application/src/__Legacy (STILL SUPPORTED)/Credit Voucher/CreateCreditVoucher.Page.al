@@ -1,5 +1,6 @@
 page 6014445 "NPR Create Credit Voucher"
 {
+    UsageCategory = None;
     Caption = 'Create Credit Voucher';
     SourceTable = "NPR Credit Voucher";
 

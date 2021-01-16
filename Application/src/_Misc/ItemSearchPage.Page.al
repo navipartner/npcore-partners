@@ -2,6 +2,7 @@ page 6060045 "NPR Item Search Page"
 {
     // NPR4.18\BR\20160209  CASE 182391 Object Created
 
+    UsageCategory = None;
     Caption = 'Item Search Page';
 
     layout

@@ -12,6 +12,7 @@ page 6151415 "NPR Magento Category List"
     ModifyAllowed = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Magento Category";
     SourceTableView = SORTING(Path);
 

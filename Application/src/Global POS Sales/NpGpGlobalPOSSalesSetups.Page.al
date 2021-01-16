@@ -6,6 +6,7 @@ page 6151171 "NPR NpGp Global POSSalesSetups"
     PageType = List;
     SourceTable = "NPR NpGp POS Sales Setup";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

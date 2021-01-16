@@ -16,6 +16,7 @@ report 6014405 "NPR Salesperson/Item Group Top"
 
     Caption = 'Salesperson/Item Group Top';
     UsageCategory = ReportsAndAnalysis;
+    ApplicationArea = All;
 
     dataset
     {

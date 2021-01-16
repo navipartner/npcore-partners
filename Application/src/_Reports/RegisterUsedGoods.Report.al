@@ -2,6 +2,7 @@ report 6014500 "NPR Register Used Goods"
 {
     // NPR5.29/JLK /20161124  CASE 259090 Object created
     // NPR5.29/JLK /20170109  CASE 246761 Correcyed RDLC Header Issue
+    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Register Used Goods.rdlc';
 

@@ -6,6 +6,7 @@ page 6184880 "NPR FTP Setup"
     Caption = 'FTP Setup';
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR FTP Setup";
 
     layout

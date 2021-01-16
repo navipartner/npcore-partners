@@ -6,6 +6,7 @@ page 6151566 "NPR NpXml Api Headers"
     DelayedInsert = true;
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR NpXml Api Header";
 
     layout

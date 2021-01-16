@@ -5,6 +5,7 @@ page 6150651 "NPR POS Period Register List"
     PageType = List;
     SourceTable = "NPR POS Period Register";
     UsageCategory = History;
+    ApplicationArea = All;
 
     layout
     {

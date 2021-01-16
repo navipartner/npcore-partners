@@ -8,6 +8,7 @@ page 6059770 "NPR NaviDocs Comment Subpage"
     ModifyAllowed = false;
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     RefreshOnActivate = true;
     SourceTable = "Activity Log";
     SourceTableTemporary = true;

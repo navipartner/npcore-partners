@@ -1,5 +1,6 @@
 page 6014534 "NPR TouchScreen: Ret. Reasons"
 {
+    UsageCategory = None;
     Caption = 'Return reasons';
     SourceTable = "Return Reason";
     Editable = false;

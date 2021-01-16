@@ -7,6 +7,7 @@ page 6151580 "NPR Event Exch.Int.Templ. Card"
     Caption = 'Event Exch. Int. Template Card';
     PageType = Card;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Event Exch. Int. Template";
 
     layout

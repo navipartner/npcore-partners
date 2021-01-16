@@ -41,6 +41,7 @@ page 6151504 "NPR Nc Import List"
     SourceTableView = SORTING("Entry No.")
                       ORDER(Descending);
     UsageCategory = Tasks;
+    ApplicationArea = All;
 
     layout
     {

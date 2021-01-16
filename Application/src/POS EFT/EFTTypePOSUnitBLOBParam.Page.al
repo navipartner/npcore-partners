@@ -8,6 +8,7 @@ page 6184477 "NPR EFTType POSUnit BLOB Param"
     LinksAllowed = false;
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     ShowFilter = false;
     SourceTable = "NPR EFTType POSUnit BLOBParam.";
 

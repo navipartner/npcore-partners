@@ -3,6 +3,7 @@ page 6151604 "NPR NpDc Iss.OnSale Setup"
     Caption = 'Issue On-Sale Setup';
     PageType = Card;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR NpDc Iss.OnSale Setup";
 
     layout

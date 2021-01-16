@@ -8,6 +8,7 @@ page 6150724 "NPR POS Localized Table Data"
     InsertAllowed = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR POS Localized Caption";
     SourceTableTemporary = true;
 

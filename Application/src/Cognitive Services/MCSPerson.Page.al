@@ -6,6 +6,7 @@ page 6059958 "NPR MCS Person"
     PageType = List;
     SourceTable = "NPR MCS Person";
     UsageCategory = Lists;
+    ApplicationArea = All;
 
     layout
     {

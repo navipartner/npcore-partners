@@ -18,6 +18,7 @@ report 6014612 "NPR Inventory per Variant/date"
     Description = 'Inventory per Variant at date';
     PreviewMode = Normal;
     UsageCategory = ReportsAndAnalysis;
+    ApplicationArea = All;
 
     dataset
     {

@@ -7,6 +7,7 @@ page 6060046 "NPR Registered Item Worksh."
     PageType = List;
     SourceTable = "NPR Registered Item Works.";
     UsageCategory = History;
+    ApplicationArea = All;
 
     layout
     {

@@ -17,6 +17,7 @@ report 6014407 "NPR Sales Ticket Statistics A4"
 
     Caption = 'Sales Ticket Statistics A4';
     UsageCategory = ReportsAndAnalysis;
+    ApplicationArea = All;
 
     dataset
     {

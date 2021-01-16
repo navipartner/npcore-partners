@@ -8,6 +8,7 @@ page 6151520 "NPR Nc Triggers"
     PageType = List;
     SourceTable = "NPR Nc Trigger";
     UsageCategory = Lists;
+    ApplicationArea = All;
 
     layout
     {

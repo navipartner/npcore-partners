@@ -5,6 +5,7 @@ page 6059773 "NPR Member Card Trx Logs"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Member Card Trx Log";
 
     layout

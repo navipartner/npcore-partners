@@ -8,6 +8,7 @@ page 6151440 "NPR Magento Customer Groups"
     Caption = 'Customer Groups';
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Magento Customer Group";
 
     layout

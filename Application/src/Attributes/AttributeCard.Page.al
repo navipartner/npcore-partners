@@ -8,6 +8,7 @@ page 6014604 "NPR Attribute Card"
     Caption = 'Client Attribute Card';
     PageType = Card;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Attribute";
 
     layout

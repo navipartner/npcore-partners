@@ -7,6 +7,7 @@ page 6059954 "NPR MCS Faces Card"
     ModifyAllowed = false;
     PageType = Card;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR MCS Faces";
 
     layout

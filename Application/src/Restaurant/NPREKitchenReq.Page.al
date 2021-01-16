@@ -12,6 +12,7 @@ page 6150689 "NPR NPRE Kitchen Req."
     SourceTable = "NPR NPRE Kitchen Request";
     SourceTableView = SORTING("Restaurant Code", "Line Status", Priority, "Order ID", "Created Date-Time");
     UsageCategory = Lists;
+    ApplicationArea = All;
 
     layout
     {

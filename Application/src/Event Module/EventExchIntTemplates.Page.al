@@ -10,6 +10,7 @@ page 6151578 "NPR Event Exch. Int. Templates"
     PageType = List;
     SourceTable = "NPR Event Exch. Int. Template";
     UsageCategory = Lists;
+    ApplicationArea = All;
 
     layout
     {

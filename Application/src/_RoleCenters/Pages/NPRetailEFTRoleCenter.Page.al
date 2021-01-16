@@ -5,6 +5,7 @@ page 6059835 "NPR NP Retail EFT Role Center"
     Caption = 'Role Center';
     PageType = RoleCenter;
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

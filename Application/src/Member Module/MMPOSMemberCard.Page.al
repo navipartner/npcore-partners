@@ -3,6 +3,7 @@ page 6060140 "NPR MM POS Member Card"
 
     //                                     - Controls moved to the tab: Picture, Gender, Birthday, "E-Mail News Letter"
 
+    UsageCategory = None;
     Caption = 'Member Details';
     DataCaptionExpression = "External Member No." + ' - ' + "Display Name";
     DeleteAllowed = false;

@@ -9,6 +9,7 @@ page 6184489 "NPR Pepper EFT Result Codes"
     PageType = List;
     SourceTable = "NPR Pepper EFT Result Code";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

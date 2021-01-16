@@ -5,6 +5,7 @@ page 6151217 "NPR NpCs Open.Hour Set S.page"
     DelayedInsert = true;
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR NpCs Open. Hour Entry";
 
     layout

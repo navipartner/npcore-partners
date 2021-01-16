@@ -19,6 +19,7 @@ page 6151411 "NPR Magento Pictures"
     PageType = List;
     SourceTable = "NPR Magento Picture";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

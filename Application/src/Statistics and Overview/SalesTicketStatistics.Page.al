@@ -11,6 +11,7 @@ page 6014468 "NPR Sales Ticket Statistics"
     PageType = List;
     SourceTable = Date;
     UsageCategory = ReportsAndAnalysis;
+    ApplicationArea = All;
 
     layout
     {

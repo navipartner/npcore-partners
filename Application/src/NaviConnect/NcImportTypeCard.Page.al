@@ -3,6 +3,7 @@ page 6151509 "NPR Nc Import Type Card"
     Caption = 'Import Type Card';
     PageType = Card;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Nc Import Type";
 
     layout

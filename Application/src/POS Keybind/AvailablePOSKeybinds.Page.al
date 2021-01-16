@@ -4,6 +4,7 @@ page 6150737 "NPR Available POS Keybinds"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Available POS Keybind";
 
     layout

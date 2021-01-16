@@ -6,6 +6,7 @@ page 6151256 "NPR Retail Top10 Selling Items"
     Editable = true;
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = Item;
     SourceTableTemporary = true;
     SourceTableView = SORTING("Low-Level Code")

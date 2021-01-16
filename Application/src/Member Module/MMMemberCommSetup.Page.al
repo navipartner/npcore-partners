@@ -4,6 +4,7 @@ page 6151187 "NPR MM Member Comm. Setup"
     Caption = 'Member Communication Setup';
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR MM Member Comm. Setup";
 
     layout

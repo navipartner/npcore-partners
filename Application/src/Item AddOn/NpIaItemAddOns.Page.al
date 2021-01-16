@@ -6,6 +6,7 @@ page 6151125 "NPR NpIa Item AddOns"
     PageType = List;
     SourceTable = "NPR NpIa Item AddOn";
     UsageCategory = Lists;
+    ApplicationArea = All;
 
     layout
     {

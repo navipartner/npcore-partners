@@ -6,6 +6,7 @@ page 6014479 "NPR Comment Line - Retail"
     Caption = 'Comment Line - Retail';
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "Comment Line";
 
     layout

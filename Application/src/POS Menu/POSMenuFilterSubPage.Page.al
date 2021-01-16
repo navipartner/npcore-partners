@@ -4,6 +4,7 @@ page 6150717 "NPR POS Menu Filter SubPage"
     Caption = 'Filter Line';
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR POS Menu Filter Line";
 
     layout

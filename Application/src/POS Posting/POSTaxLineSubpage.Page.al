@@ -4,6 +4,7 @@ page 6150722 "NPR POS Tax Line Subpage"
     Editable = false;
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR POS Tax Amount Line";
 
     layout

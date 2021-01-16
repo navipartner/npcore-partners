@@ -1,5 +1,6 @@
 page 6014583 "NPR JS Bridge"
 {
+    UsageCategory = None;
     Caption = 'JS Bridge';
     DeleteAllowed = false;
     Editable = false;

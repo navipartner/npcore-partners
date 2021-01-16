@@ -13,6 +13,7 @@ page 6150620 "NPR POS Payment Bins"
     PageType = List;
     SourceTable = "NPR POS Payment Bin";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

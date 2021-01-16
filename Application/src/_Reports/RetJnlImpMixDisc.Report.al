@@ -3,6 +3,7 @@ report 6014482 "NPR Ret. Jnl. Imp. Mix Disc."
     // NPR5.31/MHA /20170110  CASE 262904 Primary key updated for Mixed Discount Line
     // NPR5.39/MMV /20180212  CASE 303556 Removed manual barcode logic
 
+    UsageCategory = None;
     Caption = 'Import Mixed Discounts';
     ProcessingOnly = true;
 

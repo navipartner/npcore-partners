@@ -5,6 +5,7 @@ page 6014535 "NPR Scanner - Setup"
     // NPR5.29/CLVA/20161122 CASE 252352 Added Group: FTP
     // NPR5.38/NPKNAV/20180126  CASE 299271 Transport NPR5.38 - 26 January 2018
 
+    UsageCategory = None;
     Caption = 'Scanner Card';
     SourceTable = "NPR Scanner - Setup";
 

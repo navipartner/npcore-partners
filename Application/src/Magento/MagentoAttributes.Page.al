@@ -15,6 +15,7 @@ page 6151431 "NPR Magento Attributes"
     PageType = List;
     SourceTable = "NPR Magento Attribute";
     UsageCategory = Lists;
+    ApplicationArea = All;
 
     layout
     {

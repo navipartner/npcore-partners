@@ -5,6 +5,7 @@ page 6150750 "NPR POS (Dragonglass)"
     Caption = 'POS';
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

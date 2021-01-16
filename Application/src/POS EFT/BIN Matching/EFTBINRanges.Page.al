@@ -5,6 +5,7 @@ page 6184514 "NPR EFT BIN Ranges"
     Caption = 'EFT BIN Ranges';
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR EFT BIN Range";
 
     layout

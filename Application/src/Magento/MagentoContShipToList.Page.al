@@ -7,6 +7,7 @@ page 6151459 "NPR Magento Cont. ShipTo List"
     InsertAllowed = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Magento Contact ShipToAdr.";
 
     layout

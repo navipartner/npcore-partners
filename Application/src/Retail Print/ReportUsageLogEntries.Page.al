@@ -7,6 +7,7 @@ page 6014489 "NPR Report Usage Log Entries"
     PageType = List;
     SourceTable = "NPR Report Usage Log Entry";
     UsageCategory = Lists;
+    ApplicationArea = All;
 
     layout
     {

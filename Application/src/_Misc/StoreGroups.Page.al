@@ -6,6 +6,7 @@ page 6014582 "NPR Store Groups"
     PageType = List;
     SourceTable = "NPR Store Group";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

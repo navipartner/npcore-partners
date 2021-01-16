@@ -9,6 +9,7 @@ page 6184488 "NPR Pepper EFT Trans. Types"
     PageType = List;
     SourceTable = "NPR Pepper EFT Trx Type";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

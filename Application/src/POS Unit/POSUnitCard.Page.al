@@ -26,6 +26,7 @@ page 6150617 "NPR POS Unit Card"
     // NPR5.55/ZESO/20200603 CASE 407613 Added "POS Unit Serial No"
     // NPR5.55/ALPO/20200730 CASE 414938 POS Store/POS Unit - Restaurant link (added "POS Restaurant Profile")
 
+    UsageCategory = None;
     Caption = 'POS Unit Card';
     RefreshOnActivate = true;
     SourceTable = "NPR POS Unit";

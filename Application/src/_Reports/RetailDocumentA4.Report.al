@@ -1,5 +1,6 @@
 report 6014486 "NPR Retail Document A4"
 {
+    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Retail Document A4.rdlc';
 

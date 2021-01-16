@@ -5,6 +5,7 @@ page 6184508 "NPR EFT NETS Cloud Paym. Setup"
     Caption = 'EFT NETS Cloud Payment Setup';
     PageType = Card;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR EFT NETS Cloud Paym. Setup";
 
     layout

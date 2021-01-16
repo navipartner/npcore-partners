@@ -9,6 +9,7 @@ page 6014541 "NPR Report Selection: Contract"
     PageType = Card;
     SourceTable = "NPR Report Selection: Contract";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {
