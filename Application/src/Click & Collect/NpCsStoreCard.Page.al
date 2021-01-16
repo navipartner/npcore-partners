@@ -15,23 +15,23 @@ page 6151196 "NPR NpCs Store Card"
                 group(Control6014404)
                 {
                     ShowCaption = false;
-                    field("Code"; Code)
+                    field("Code"; Rec.Code)
                     {
                         ApplicationArea = All;
                         ShowMandatory = true;
                         ToolTip = 'Specifies the value of the Code field';
                     }
-                    field("Company Name"; "Company Name")
+                    field("Company Name"; Rec."Company Name")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Company Name field';
                     }
-                    field(Name; Name)
+                    field(Name; Rec.Name)
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Name field';
                     }
-                    field("Local Store"; "Local Store")
+                    field("Local Store"; Rec."Local Store")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Local Store field';
@@ -41,36 +41,56 @@ page 6151196 "NPR NpCs Store Card"
                             CurrPage.Update(true);
                         end;
                     }
-                    field("Opening Hour Set"; "Opening Hour Set")
+                    field("Opening Hour Set"; Rec."Opening Hour Set")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Opening Hour Set field';
+                    }
+                    field("Magento Description"; Format(Rec."Magento Description".HasValue))
+                    {
+                        ApplicationArea = All;
+                        Caption = 'Magento Description';
+                        ToolTip = 'Specifies the value of the Magento Description field';
+
+                        trigger OnAssistEdit()
+                        var
+                            MagentoFunctions: Codeunit "NPR Magento Functions";
+                            RecRef: RecordRef;
+                            FieldRef: FieldRef;
+                        begin
+                            RecRef.GetTable(Rec);
+                            FieldRef := RecRef.Field(Rec.FieldNo("Magento Description"));
+                            if MagentoFunctions.NaviEditorEditBlob(FieldRef) then begin
+                                RecRef.SetTable(Rec);
+                                Rec.Modify(true);
+                            end;
+                        end;
                     }
                 }
                 group(Control6014405)
                 {
                     ShowCaption = false;
-                    field("Service Url"; "Service Url")
+                    field("Service Url"; Rec."Service Url")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Service Url field';
                     }
-                    field("Service Username"; "Service Username")
+                    field("Service Username"; Rec."Service Username")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Service Username field';
                     }
-                    field("Service Password"; "Service Password")
+                    field("Service Password"; Rec."Service Password")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Service Password field';
                     }
-                    field("Geolocation Latitude"; "Geolocation Latitude")
+                    field("Geolocation Latitude"; Rec."Geolocation Latitude")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Geolocation Latitude field';
                     }
-                    field("Geolocation Longitude"; "Geolocation Longitude")
+                    field("Geolocation Longitude"; Rec."Geolocation Longitude")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Geolocation Longitude field';
@@ -80,22 +100,22 @@ page 6151196 "NPR NpCs Store Card"
             group(Order)
             {
                 Caption = 'Order';
-                field("Salesperson Code"; "Salesperson Code")
+                field("Salesperson Code"; Rec."Salesperson Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Salesperson Code field';
                 }
-                field("Location Code"; "Location Code")
+                field("Location Code"; Rec."Location Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Location Code field';
                 }
-                field("Bill-to Customer No."; "Bill-to Customer No.")
+                field("Bill-to Customer No."; Rec."Bill-to Customer No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Bill-to Customer No. field';
                 }
-                field("Prepayment Account No."; "Prepayment Account No.")
+                field("Prepayment Account No."; Rec."Prepayment Account No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Prepayment Account No. field';
@@ -104,12 +124,12 @@ page 6151196 "NPR NpCs Store Card"
             group("Store Notification")
             {
                 Caption = 'Store Notification';
-                field("E-mail"; "E-mail")
+                field("E-mail"; Rec."E-mail")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the E-mail field';
                 }
-                field("Mobile Phone No."; "Mobile Phone No.")
+                field("Mobile Phone No."; Rec."Mobile Phone No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Mobile Phone No. field';
@@ -118,55 +138,65 @@ page 6151196 "NPR NpCs Store Card"
             group(Contact)
             {
                 Caption = 'Contact';
-                field("Contact Name"; "Contact Name")
+                field("Contact Name"; Rec."Contact Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Contact Name field';
                 }
-                field("Contact Name 2"; "Contact Name 2")
+                field("Contact Name 2"; Rec."Contact Name 2")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Contact Name 2 field';
                 }
-                field("Contact Address"; "Contact Address")
+                field("Contact Address"; Rec."Contact Address")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Contact Address field';
                 }
-                field("Contact Address 2"; "Contact Address 2")
+                field("Contact Address 2"; Rec."Contact Address 2")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Contact Address 2 field';
                 }
-                field("Contact Post Code"; "Contact Post Code")
+                field("Contact Post Code"; Rec."Contact Post Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Contact Post Code field';
                 }
-                field("Contact City"; "Contact City")
+                field("Contact City"; Rec."Contact City")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Contact City field';
                 }
-                field("Contact Country/Region Code"; "Contact Country/Region Code")
+                field("Contact Country/Region Code"; Rec."Contact Country/Region Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Contact Country/Region Code field';
                 }
-                field("Contact County"; "Contact County")
+                field("Contact County"; Rec."Contact County")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Contact County field';
                 }
-                field("Contact Phone No."; "Contact Phone No.")
+                field("Contact Phone No."; Rec."Contact Phone No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Contact Phone No. field';
                 }
-                field("Contact E-mail"; "Contact E-mail")
+                field("Contact E-mail"; Rec."Contact E-mail")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Contact E-mail field';
+                }
+                field("Contact Fax No."; Rec."Contact Fax No.")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Contact Fax No. field';
+                }
+                field("Store Url"; Rec."Store Url")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Store Url field';
                 }
             }
             part(Workflows; "NPR NpCs Store Card Workflows")
@@ -179,7 +209,7 @@ page 6151196 "NPR NpCs Store Card"
             {
                 Caption = 'POS Relations';
                 SubPageLink = "Store Code" = FIELD(Code);
-                Visible = "Local Store";
+                Visible = Rec."Local Store";
                 ApplicationArea = All;
             }
         }
@@ -276,7 +306,7 @@ page 6151196 "NPR NpCs Store Card"
                     NpCsStoresbyDistance: Page "NPR NpCs Stores by Distance";
                 begin
                     Clear(NpCsStoresbyDistance);
-                    NpCsStoresbyDistance.SetFromStoreCode(Code);
+                    NpCsStoresbyDistance.SetFromStoreCode(Rec.Code);
                     NpCsStoresbyDistance.Run;
                 end;
             }
@@ -295,4 +325,3 @@ page 6151196 "NPR NpCs Store Card"
         Text000: Label 'Error in Store Setup\\Close anway?';
         Text001: Label 'Store Setup validated successfully';
 }
-
