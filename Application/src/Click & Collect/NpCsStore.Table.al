@@ -18,8 +18,6 @@ table 6151195 "NPR NpCs Store"
             Caption = 'Company Name';
             DataClassification = CustomerContent;
             TableRelation = Company;
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
 
             trigger OnValidate()
@@ -54,8 +52,6 @@ table 6151195 "NPR NpCs Store"
             DataClassification = CustomerContent;
             Description = 'NPR5.51';
             TableRelation = "NPR NpCs Open. Hour Set";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
 
             trigger OnLookup()
@@ -66,6 +62,16 @@ table 6151195 "NPR NpCs Store"
                 if PAGE.RunModal(0, NpCsOpenHourSet) = ACTION::LookupOK then
                     Validate("Opening Hour Set", NpCsOpenHourSet.Code);
             end;
+        }
+        field(20; "Magento Description"; BLOB)
+        {
+            Caption = 'Magento Description';
+            DataClassification = CustomerContent;
+        }
+        field(25; "Store Url"; Text[250])
+        {
+            Caption = 'Store Url';
+            DataClassification = CustomerContent;
         }
         field(105; "Service Url"; Text[250])
         {
@@ -121,8 +127,6 @@ table 6151195 "NPR NpCs Store"
             Caption = 'Salesperson Code';
             DataClassification = CustomerContent;
             TableRelation = "Salesperson/Purchaser";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
 
             trigger OnLookup()
@@ -139,8 +143,6 @@ table 6151195 "NPR NpCs Store"
             Caption = 'Location Code';
             DataClassification = CustomerContent;
             TableRelation = Location;
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
 
             trigger OnLookup()
@@ -158,8 +160,6 @@ table 6151195 "NPR NpCs Store"
             Caption = 'Bill-to Customer No.';
             DataClassification = CustomerContent;
             TableRelation = Customer;
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
 
             trigger OnLookup()
@@ -176,8 +176,6 @@ table 6151195 "NPR NpCs Store"
             Caption = 'Prepayment Account No.';
             DataClassification = CustomerContent;
             TableRelation = "G/L Account" WHERE("Direct Posting" = CONST(true));
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
 
             trigger OnLookup()
@@ -228,8 +226,6 @@ table 6151195 "NPR NpCs Store"
             TableRelation = IF ("Contact Country/Region Code" = CONST('')) "Post Code".Code
             ELSE
             IF ("Contact Country/Region Code" = FILTER(<> '')) "Post Code".Code WHERE("Country/Region Code" = FIELD("Contact Country/Region Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
 
             trigger OnValidate()
@@ -246,8 +242,6 @@ table 6151195 "NPR NpCs Store"
             TableRelation = IF ("Contact Country/Region Code" = CONST('')) "Post Code".City
             ELSE
             IF ("Contact Country/Region Code" = FILTER(<> '')) "Post Code".City WHERE("Country/Region Code" = FIELD("Contact Country/Region Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
 
             trigger OnValidate()
@@ -277,6 +271,11 @@ table 6151195 "NPR NpCs Store"
         field(445; "Contact E-mail"; Text[80])
         {
             Caption = 'Contact E-mail';
+            DataClassification = CustomerContent;
+        }
+        field(450; "Contact Fax No."; Text[30])
+        {
+            Caption = 'Contact Fax No.';
             DataClassification = CustomerContent;
         }
     }
@@ -325,4 +324,3 @@ table 6151195 "NPR NpCs Store"
         exit(ServiceName);
     end;
 }
-
