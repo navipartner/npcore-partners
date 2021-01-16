@@ -114,6 +114,7 @@ page 6059923 "NPR BTF EndPoints Error Log"
                 ApplicationArea = All;
                 Caption = 'Initiate from Record';
                 ToolTip = 'View which entry initiate web request sending.';
+                Image = ViewDetails;
 
                 trigger OnAction()
                 var
@@ -130,6 +131,7 @@ page 6059923 "NPR BTF EndPoints Error Log"
                 ApplicationArea = Advanced;
                 Caption = 'Show Details';
                 ToolTip = 'Download response content.';
+                Image = Export;
 
                 trigger OnAction();
                 var

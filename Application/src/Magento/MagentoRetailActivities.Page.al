@@ -144,18 +144,6 @@ page 6151481 "NPR Magento Retail Activities"
         }
     }
 
-    actions
-    {
-        area(processing)
-        {
-            action("Action Items")
-            {
-                ApplicationArea = All;
-                ToolTip = 'Executes the Action Items action';
-            }
-        }
-    }
-
     trigger OnOpenPage()
     begin
         Reset;

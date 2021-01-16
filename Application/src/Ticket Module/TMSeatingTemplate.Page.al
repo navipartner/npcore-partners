@@ -138,6 +138,7 @@ page 6151131 "NPR TM Seating Template"
                 ToolTip = 'Add a new top area.';
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Add Root';
+                Image = Add; 
 
 
                 trigger OnAction()
@@ -152,6 +153,7 @@ page 6151131 "NPR TM Seating Template"
                 ToolTip = 'Add a parent area to selected area.';
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Add Parent';
+                Image = Add; 
 
             }
             action("Add Child")
@@ -159,6 +161,7 @@ page 6151131 "NPR TM Seating Template"
                 ToolTip = 'Add a sub area to the selected area.';
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Add Child';
+                Image = Add; 
 
 
                 trigger OnAction()
@@ -172,6 +175,7 @@ page 6151131 "NPR TM Seating Template"
                 ToolTip = 'Add an area on the same level as selected area.';
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Add Sibling';
+                Image = Add;
 
 
                 trigger OnAction()
@@ -182,9 +186,10 @@ page 6151131 "NPR TM Seating Template"
             }
             action("Structure Wizard")
             {
-                ToolTip = 'Start the are create wizard.';
+                ToolTip = 'Start the area create wizard.';
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Structure Wizard';
+                Image = Action; 
 
 
                 trigger OnAction()
@@ -200,6 +205,8 @@ page 6151131 "NPR TM Seating Template"
                 ToolTip = 'Start the seat number wizard.';
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Numbering Wizard';
+                Image = Action; 
+            
 
 
                 trigger OnAction()
@@ -216,6 +223,7 @@ page 6151131 "NPR TM Seating Template"
                 ToolTip = 'Start the area split wizard.';
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Split Wizard';
+                Image = Action; 
 
 
                 trigger OnAction()
@@ -279,6 +287,7 @@ page 6151131 "NPR TM Seating Template"
                     ToolTip = 'Unindent area.';
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Unindent';
+                    Image = DecreaseIndent;
 
 
                     trigger OnAction()
@@ -295,6 +304,7 @@ page 6151131 "NPR TM Seating Template"
                     ToolTip = 'Indent area. ';
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Indent';
+                    Image = Indent; 
 
 
                     trigger OnAction()
