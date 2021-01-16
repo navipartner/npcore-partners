@@ -1,6 +1,6 @@
 page 6060137 "NPR MM Membership Card"
 {
-
+    UsageCategory = None;
     Caption = 'Membership Card';
     DataCaptionExpression = "External Membership No." + ' - ' + "Membership Code";
     InsertAllowed = false;

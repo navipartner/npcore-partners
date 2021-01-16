@@ -8,6 +8,7 @@ page 6014465 "NPR NP Attributes FactBox"
     Caption = 'NP Attributes FactBox';
     PageType = CardPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = Item;
 
     layout

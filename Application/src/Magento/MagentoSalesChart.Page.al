@@ -9,6 +9,7 @@ page 6151482 "NPR Magento Sales Chart"
     Caption = 'Margin/Turnover by Period';
     PageType = CardPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "Business Chart Buffer";
 
     layout

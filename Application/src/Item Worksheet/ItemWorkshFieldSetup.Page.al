@@ -6,6 +6,7 @@ page 6060054 "NPR Item Worksh. Field Setup"
     Caption = 'Item Worksheet Field Setup';
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Item Worksh. Field Setup";
 
     layout

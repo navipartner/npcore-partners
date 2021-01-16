@@ -11,6 +11,7 @@ page 6059896 "NPR Data Log Subscribers"
     PageType = List;
     SourceTable = "NPR Data Log Subscriber";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

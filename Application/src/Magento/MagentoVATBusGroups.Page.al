@@ -11,6 +11,7 @@ page 6151409 "NPR Magento VAT Bus. Groups"
     PageType = List;
     SourceTable = "NPR Magento VAT Bus. Group";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

@@ -8,6 +8,7 @@ page 6150694 "NPR NPRE Service Flow Profiles"
     PageType = List;
     SourceTable = "NPR NPRE Serv.Flow Profile";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

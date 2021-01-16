@@ -7,6 +7,7 @@ page 6151591 "NPR NpDc Coupon Types"
     PopulateAllFields = true;
     SourceTable = "NPR NpDc Coupon Type";
     UsageCategory = Lists;
+    ApplicationArea = All;
 
     layout
     {

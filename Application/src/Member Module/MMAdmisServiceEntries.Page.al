@@ -5,6 +5,7 @@ page 6060091 "NPR MM Admis. Service Entries"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR MM Admis. Service Entry";
 
     layout

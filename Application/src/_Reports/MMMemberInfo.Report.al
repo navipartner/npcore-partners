@@ -1,6 +1,7 @@
 report 6060134 "NPR MM Member Info"
 {
     // MM1.25/BHR/20171120 CASE 296024 Report to show member details
+    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/MM Member Info.rdlc';
 

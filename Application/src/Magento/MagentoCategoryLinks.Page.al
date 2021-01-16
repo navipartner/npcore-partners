@@ -11,6 +11,7 @@ page 6151418 "NPR Magento Category Links"
     LinksAllowed = false;
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     ShowFilter = false;
     SourceTable = "NPR Magento Category Link";
 

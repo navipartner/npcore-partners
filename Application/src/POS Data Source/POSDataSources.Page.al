@@ -4,6 +4,7 @@ page 6150708 "NPR POS Data Sources"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR POS Data Source Discovery";
     SourceTableTemporary = true;
 

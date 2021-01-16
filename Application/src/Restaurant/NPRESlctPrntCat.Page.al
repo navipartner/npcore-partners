@@ -12,6 +12,7 @@ page 6150668 "NPR NPRE Slct Prnt Cat."
     InsertAllowed = false;
     PageType = ListPlus;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR NPRE Print/Prod. Cat.";
 
     layout

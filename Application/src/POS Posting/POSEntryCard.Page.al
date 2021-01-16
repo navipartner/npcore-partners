@@ -5,6 +5,7 @@ page 6150675 "NPR POS Entry Card"
     Editable = false;
     PageType = Document;
     UsageCategory = Administration;
+    ApplicationArea = All;
     RefreshOnActivate = true;
     SourceTable = "NPR POS Entry";
     SourceTableView = SORTING("Entry No.")

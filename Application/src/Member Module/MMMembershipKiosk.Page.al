@@ -7,6 +7,7 @@ page 6060078 "NPR MM Membership Kiosk"
     Caption = 'Membership Kiosk';
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

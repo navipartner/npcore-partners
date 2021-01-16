@@ -3,6 +3,7 @@ page 6151028 "NPR NpRv Partner Relations"
     Caption = 'Retail Voucher Partner Relations';
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR NpRv Partner Relation";
 
     layout

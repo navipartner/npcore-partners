@@ -6,6 +6,7 @@ page 6059897 "NPR Data Log Setup"
     PromotedActionCategories = 'New,Manage,Process,Data Log';
     SourceTable = "NPR Data Log Setup (Table)";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

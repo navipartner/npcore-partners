@@ -7,6 +7,7 @@ page 6151305 "NPR NpEc Customer Mapping"
     PageType = List;
     SourceTable = "NPR NpEc Customer Mapping";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

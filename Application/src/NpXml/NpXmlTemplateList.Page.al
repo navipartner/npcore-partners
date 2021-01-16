@@ -8,6 +8,7 @@ page 6151552 "NPR NpXml Template List"
     PageType = List;
     SourceTable = "NPR NpXml Template";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

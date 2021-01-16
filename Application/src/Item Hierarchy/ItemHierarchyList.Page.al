@@ -7,6 +7,7 @@ page 6151050 "NPR Item Hierarchy List"
     PageType = List;
     SourceTable = "NPR Item Hierarchy";
     UsageCategory = Lists;
+    ApplicationArea = All;
 
     layout
     {

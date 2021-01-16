@@ -3,6 +3,7 @@ page 6151254 "NPR Acc. Payables Act"
     Caption = 'Activities';
     PageType = CardPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     RefreshOnActivate = true;
     SourceTable = "Finance Cue";
 

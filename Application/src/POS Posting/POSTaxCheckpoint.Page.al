@@ -4,6 +4,7 @@ page 6150630 "NPR POS Tax Checkpoint"
     Editable = false;
     PageType = Card;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR POS Worksh. Tax Checkp.";
 
     layout

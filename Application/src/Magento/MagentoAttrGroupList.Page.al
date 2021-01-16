@@ -9,6 +9,7 @@ page 6151458 "NPR Magento Attr. Group List"
     SourceTableView = SORTING("Attribute Group ID")
                       ORDER(Ascending);
     UsageCategory = Lists;
+    ApplicationArea = All;
 
     layout
     {

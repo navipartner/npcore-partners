@@ -17,6 +17,7 @@ report 6014416 "NPR Sale Statistics per Vendor"
 
     Caption = 'Sale Statistics Per Vendor';
     UsageCategory = ReportsAndAnalysis;
+    ApplicationArea = All;
 
     dataset
     {

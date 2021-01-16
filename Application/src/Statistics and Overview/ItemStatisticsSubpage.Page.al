@@ -12,6 +12,7 @@ page 6014588 "NPR Item Statistics Subpage"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = Item;
 
     layout

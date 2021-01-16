@@ -8,6 +8,7 @@ page 6060154 "NPR Event Standard Dialog"
     Caption = 'Event Standard Dialog';
     PageType = StandardDialog;
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

@@ -16,6 +16,7 @@ page 6014476 "NPR Retail Document List"
     SourceTable = "NPR Retail Document Header";
     SourceTableView = SORTING("Primary Key Length");
     UsageCategory = Lists;
+    ApplicationArea = All;
 
     layout
     {

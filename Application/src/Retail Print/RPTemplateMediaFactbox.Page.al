@@ -5,6 +5,7 @@ page 6014629 "NPR RP Template Media Factbox"
     InsertAllowed = false;
     PageType = CardPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR RP Template Media Info";
 
     layout

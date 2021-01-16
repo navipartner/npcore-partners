@@ -6,6 +6,7 @@ page 6060073 "NPR MM Members. Alteration Jnl"
     SourceTable = "NPR MM Member Info Capture";
     SourceTableView = WHERE("Source Type" = CONST(ALTERATION_JNL));
     UsageCategory = Tasks;
+    ApplicationArea = All;
 
     layout
     {

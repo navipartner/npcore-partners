@@ -27,6 +27,7 @@ page 6014423 "NPR Report Selection: Retail"
     SaveValues = true;
     SourceTable = "NPR Report Selection Retail";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

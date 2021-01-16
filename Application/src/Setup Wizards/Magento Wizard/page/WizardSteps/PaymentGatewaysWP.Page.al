@@ -3,6 +3,7 @@ page 6014528 "NPR Payment Gateways WP"
     Caption = 'Payment Gateways';
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Magento Payment Gateway";
     SourceTableTemporary = true;
     DelayedInsert = true;

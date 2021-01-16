@@ -9,6 +9,7 @@ page 6151453 "NPR Magento Payment Gateways"
     PageType = List;
     SourceTable = "NPR Magento Payment Gateway";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

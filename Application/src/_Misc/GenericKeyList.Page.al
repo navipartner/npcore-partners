@@ -6,6 +6,7 @@ page 6014623 "NPR Generic Key List"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "Integer";
 
     layout

@@ -9,6 +9,7 @@ page 6059820 "NPR Trx Email Setup"
     PageType = List;
     SourceTable = "NPR Trx Email Setup";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

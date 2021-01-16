@@ -3,6 +3,7 @@ page 6014523 "NPR Customer Mapping WP"
     Caption = 'Magento Customer Mapping';
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Magento Customer Mapping";
     SourceTableTemporary = true;
     DelayedInsert = true;

@@ -16,6 +16,7 @@ page 6014443 "NPR Customer Repair List"
     PageType = List;
     SourceTable = "NPR Customer Repair";
     UsageCategory = Lists;
+    ApplicationArea = All;
 
     layout
     {

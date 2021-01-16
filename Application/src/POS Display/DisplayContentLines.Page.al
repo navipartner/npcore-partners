@@ -9,6 +9,7 @@ page 6059952 "NPR Display Content Lines"
     MultipleNewLines = true;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Display Content Lines";
 
     layout

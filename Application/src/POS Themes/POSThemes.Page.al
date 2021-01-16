@@ -6,6 +6,7 @@ page 6150735 "NPR POS Themes"
     PageType = List;
     SourceTable = "NPR POS Theme";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

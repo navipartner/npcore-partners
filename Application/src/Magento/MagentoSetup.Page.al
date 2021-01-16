@@ -5,6 +5,7 @@ page 6151401 "NPR Magento Setup"
     RefreshOnActivate = true;
     SourceTable = "NPR Magento Setup";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

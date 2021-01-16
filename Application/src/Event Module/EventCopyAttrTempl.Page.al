@@ -10,6 +10,7 @@ page 6060156 "NPR Event Copy Attr./Templ."
     DataCaptionExpression = PageCaption;
     PageType = StandardDialog;
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

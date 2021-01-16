@@ -7,6 +7,7 @@ page 6150644 "NPR POS Info Audit Roll"
     PageType = List;
     SourceTable = "NPR POS Info Audit Roll";
     UsageCategory = History;
+    ApplicationArea = All;
 
     layout
     {

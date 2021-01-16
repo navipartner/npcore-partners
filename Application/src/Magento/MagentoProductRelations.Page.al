@@ -8,6 +8,7 @@ page 6151421 "NPR Magento Product Relations"
     LinksAllowed = false;
     PageType = CardPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     ShowFilter = false;
     SourceTable = "NPR Magento Product Relation";
 

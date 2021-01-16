@@ -4,6 +4,7 @@ page 6150748 "NPR POS Sale Lines Subpage"
     Editable = false;
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Sale Line POS";
 
     layout

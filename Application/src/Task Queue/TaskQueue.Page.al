@@ -7,6 +7,7 @@ page 6059905 "NPR Task Queue"
     PageType = List;
     SourceTable = "NPR Task Queue";
     UsageCategory = History;
+    ApplicationArea = All;
 
     layout
     {

@@ -5,6 +5,7 @@ page 6151607 "NPR NpDc ExtraItemQty. Subform"
     DelayedInsert = true;
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR NpDc Coupon List Item";
     SourceTableView = SORTING("Coupon Type", "Line No.")
                       WHERE("Line No." = FILTER(>= 0));

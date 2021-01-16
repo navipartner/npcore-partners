@@ -9,6 +9,7 @@ page 6150685 "NPR NPRE Kitchen Stations"
     PageType = List;
     SourceTable = "NPR NPRE Kitchen Station";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

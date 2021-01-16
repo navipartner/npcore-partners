@@ -5,6 +5,7 @@ page 6014549 "NPR Event Planning Lines"
     DataCaptionExpression = Caption;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "Job Planning Line";
 
     layout

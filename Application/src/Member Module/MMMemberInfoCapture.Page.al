@@ -1,6 +1,6 @@
 page 6060134 "NPR MM Member Info Capture"
 {
-
+    UsageCategory = None;
     Caption = 'Member Information';
     DataCaptionExpression = "External Member No";
     InsertAllowed = false;

@@ -6,6 +6,7 @@ page 6151121 "NPR GDPR Agreement List"
     CardPageID = "NPR GDPR Agreement Card";
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR GDPR Agreement";
 
     layout

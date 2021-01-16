@@ -15,6 +15,7 @@ page 6059902 "NPR Task Journal"
     SaveValues = true;
     SourceTable = "NPR Task Line";
     UsageCategory = Tasks;
+    ApplicationArea = All;
 
     layout
     {

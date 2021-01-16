@@ -7,6 +7,7 @@ page 6014602 "NPR Item Variants"
     DataCaptionFields = "Item No.";
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "Item Variant";
 
     layout

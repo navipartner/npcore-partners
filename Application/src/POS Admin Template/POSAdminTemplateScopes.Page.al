@@ -6,6 +6,7 @@ page 6150742 "NPR POS Admin. Template Scopes"
     DelayedInsert = true;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR POS Admin. Template Scope";
 
     layout

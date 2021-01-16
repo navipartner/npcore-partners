@@ -1,5 +1,6 @@
 report 6060151 "NPR Event Team Template"
 {
+    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Event Team Template.rdlc';
 

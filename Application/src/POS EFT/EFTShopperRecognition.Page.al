@@ -10,6 +10,7 @@ page 6184505 "NPR EFT Shopper Recognition"
     PageType = List;
     SourceTable = "NPR EFT Shopper Recognition";
     UsageCategory = Lists;
+    ApplicationArea = All;
 
     layout
     {

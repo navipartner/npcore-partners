@@ -3,6 +3,7 @@ page 6059788 "NPR Ticket Access Reserv. List"
     Caption = 'Ticket Access Reservation';
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Ticket Access Reserv.";
 
     layout

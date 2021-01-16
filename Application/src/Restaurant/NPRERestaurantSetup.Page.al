@@ -4,6 +4,7 @@ page 6150669 "NPR NPRE Restaurant Setup"
     PageType = Card;
     SourceTable = "NPR NPRE Restaurant Setup";
     UsageCategory = Administration;
+    ApplicationArea = All;
     InsertAllowed = false;
     DeleteAllowed = false;
 

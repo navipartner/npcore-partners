@@ -6,6 +6,7 @@ page 6151060 "NPR Distribution Plan"
     Caption = 'Distribution Plan';
     PageType = ListPlus;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Distribution Headers";
 
     layout

@@ -6,6 +6,7 @@ page 6059940 "NPR SMS Template List"
     PageType = List;
     SourceTable = "NPR SMS Template Header";
     UsageCategory = Lists;
+    ApplicationArea = All;
 
     layout
     {

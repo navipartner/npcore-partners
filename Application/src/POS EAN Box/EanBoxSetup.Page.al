@@ -4,6 +4,7 @@ page 6060100 "NPR Ean Box Setup"
     // NPR4.10/JC  /20150422  CASE 207094 Added Description Field
     // NPR5.45/MHA /20180814  CASE 319706 Reworked this unused page "Data Cleanup GCVI" to be included in Ean Box Event Handler
 
+    UsageCategory = None;
     Caption = 'Ean Box Setup';
     SourceTable = "NPR Ean Box Setup";
 

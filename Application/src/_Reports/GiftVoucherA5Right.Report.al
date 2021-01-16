@@ -1,5 +1,6 @@
 report 6014438 "NPR Gift Voucher A5 Right"
 {
+    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Gift Voucher A5 Right.rdlc';
 

@@ -9,6 +9,7 @@ page 6150674 "NPR POS Prepaym. Invoices"
     ModifyAllowed = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "Sales Invoice Header";
 
     layout

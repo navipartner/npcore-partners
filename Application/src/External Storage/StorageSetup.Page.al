@@ -5,6 +5,7 @@ page 6184891 "NPR Storage Setup"
     PageType = List;
     SourceTable = "NPR Storage Setup";
     UsageCategory = Documents;
+    ApplicationArea = All;
 
     layout
     {

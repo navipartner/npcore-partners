@@ -4,6 +4,7 @@ page 6059774 "NPR Member Card Iss. Card"
     Caption = 'Point Card - Issued Card';
     PageType = Card;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Member Card Issued Cards";
 
     layout

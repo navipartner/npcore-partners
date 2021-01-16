@@ -7,6 +7,7 @@ page 6014612 "NPR Retail Campaign Subform"
     DelayedInsert = true;
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Retail Campaign Line";
 
     layout

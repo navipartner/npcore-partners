@@ -6,6 +6,7 @@ page 6059789 "NPR E-mail Setup"
     PageType = Card;
     SourceTable = "NPR E-mail Setup";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

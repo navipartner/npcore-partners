@@ -7,6 +7,7 @@ page 6059899 "NPR Data Log Records Subform"
     Editable = false;
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Data Log Field";
 
     layout

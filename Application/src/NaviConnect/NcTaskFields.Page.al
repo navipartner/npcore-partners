@@ -8,6 +8,7 @@ page 6151503 "NPR Nc Task Fields"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Nc Task Field";
 
     layout

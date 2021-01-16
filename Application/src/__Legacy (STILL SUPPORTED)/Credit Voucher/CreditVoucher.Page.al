@@ -11,6 +11,7 @@ page 6014418 "NPR Credit Voucher"
     InsertAllowed = false;
     PageType = Card;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Credit Voucher";
 
     layout

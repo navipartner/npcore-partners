@@ -8,6 +8,7 @@ page 6184491 "NPR Pepper Config. List"
     PageType = List;
     SourceTable = "NPR Pepper Config.";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

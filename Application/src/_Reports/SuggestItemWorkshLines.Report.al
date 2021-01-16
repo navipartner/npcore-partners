@@ -4,6 +4,7 @@ report 6060040 "NPR Suggest Item Worksh. Lines"
     // NPR4.19\BR\20160302  CASE 182391 Fixed error when updating items
     // NPR5.48/JDH /20181109 CASE 334163 Added Caption to object
 
+    UsageCategory = None;
     Caption = 'Suggest Item Worksheet Lines';
     ProcessingOnly = true;
 

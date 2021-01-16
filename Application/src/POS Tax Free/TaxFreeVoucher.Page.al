@@ -12,6 +12,7 @@ page 6014565 "NPR Tax Free Voucher"
     PageType = List;
     SourceTable = "NPR Tax Free Voucher";
     UsageCategory = Lists;
+    ApplicationArea = All;
 
     layout
     {

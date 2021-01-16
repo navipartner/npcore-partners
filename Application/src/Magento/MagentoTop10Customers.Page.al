@@ -14,6 +14,7 @@ page 6151483 "NPR Magento Top 10 Customers"
     Editable = false;
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = Customer;
     SourceTableTemporary = true;
     SourceTableView = SORTING("Search Name")

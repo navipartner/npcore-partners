@@ -18,6 +18,7 @@ page 6150616 "NPR POS Unit List"
     PageType = List;
     SourceTable = "NPR POS Unit";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

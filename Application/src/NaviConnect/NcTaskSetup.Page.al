@@ -9,6 +9,7 @@ page 6151501 "NPR Nc Task Setup"
     SourceTable = "NPR Nc Task Setup";
     SourceTableView = SORTING("Table No.");
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

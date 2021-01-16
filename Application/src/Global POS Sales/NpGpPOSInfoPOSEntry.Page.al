@@ -4,6 +4,7 @@ page 6151173 "NPR NpGp POS Info POS Entry"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR NpGp POS Info POS Entry";
 
     layout

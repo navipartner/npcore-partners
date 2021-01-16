@@ -15,6 +15,7 @@ page 6014455 "NPR Campaign Discount List"
     SourceTable = "NPR Period Discount";
     SourceTableView = SORTING("Starting Date", "Starting Time", "Ending Date", "Ending Time");
     UsageCategory = Lists;
+    ApplicationArea = All;
 
     layout
     {

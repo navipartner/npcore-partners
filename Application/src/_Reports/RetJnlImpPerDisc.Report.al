@@ -2,6 +2,7 @@ report 6014481 "NPR Ret. Jnl. Imp. Per. Disc."
 {
     // NPR5.39/MMV /20180212  CASE 303556 Removed manual barcode logic
 
+    UsageCategory = None;
     Caption = 'Import Periode Discounts';
     ProcessingOnly = true;
 

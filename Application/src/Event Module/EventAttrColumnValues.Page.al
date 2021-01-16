@@ -7,6 +7,7 @@ page 6060164 "NPR Event Attr. Column Values"
     Caption = 'Attribute Column Values';
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Event Attr. Column Value";
 
     layout

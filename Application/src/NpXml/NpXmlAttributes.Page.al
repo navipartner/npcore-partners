@@ -10,6 +10,7 @@ page 6151555 "NPR NpXml Attributes"
     DelayedInsert = true;
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR NpXml Attribute";
 
     layout

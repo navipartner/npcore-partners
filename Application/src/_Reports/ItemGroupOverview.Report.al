@@ -10,6 +10,7 @@ report 6014408 "NPR Item Group Overview"
 
     Caption = 'Item Group Overview';
     UsageCategory = ReportsAndAnalysis;
+    ApplicationArea = All;
 
     dataset
     {

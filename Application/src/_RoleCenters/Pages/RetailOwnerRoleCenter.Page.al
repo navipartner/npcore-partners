@@ -12,6 +12,7 @@ page 6014559 "NPR Retail - Owner Role Center"
     Caption = 'Role Center';
     PageType = RoleCenter;
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

@@ -5,6 +5,7 @@ page 6060159 "NPR Event Attr. Row Templ."
     Caption = 'Attribute Row Templates';
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Event Att. Row Templ.";
 
     layout

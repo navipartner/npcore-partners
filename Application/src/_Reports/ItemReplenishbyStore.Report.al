@@ -7,6 +7,7 @@ report 6014475 "NPR Item Replenish. by Store"
     Caption = 'Inventory - List';
     PreviewMode = PrintLayout;
     UsageCategory = Tasks;
+    ApplicationArea = All;
 
     dataset
     {

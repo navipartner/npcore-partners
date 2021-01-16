@@ -4,6 +4,7 @@ page 6151209 "NPR NpCs Store Card POSRelat."
     DelayedInsert = true;
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR NpCs Store POS Relation";
 
     layout

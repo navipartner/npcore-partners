@@ -4,6 +4,7 @@ page 6151153 "NPR GDPR Anonymization Req."
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR GDPR Anonymization Request";
 
     layout

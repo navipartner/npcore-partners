@@ -6,6 +6,7 @@ page 6014600 "NPR Health Check Service"
     // Call URL: https://dev90.dynamics-retail.com:7088/NPRetail90_W1_DEV/OData/Company('MMV_test1')/health_check_service?$filter=Number%20eq%2042&$format=json
     // Verify: response JSON contains "Number" : 42.
 
+    UsageCategory = None;
     Caption = 'Health Check Service';
     DeleteAllowed = false;
     InsertAllowed = false;

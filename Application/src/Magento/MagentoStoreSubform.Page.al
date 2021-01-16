@@ -8,6 +8,7 @@ page 6151408 "NPR Magento Store Subform"
     InsertAllowed = false;
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     ShowFilter = false;
     SourceTable = "NPR Magento Store";
 

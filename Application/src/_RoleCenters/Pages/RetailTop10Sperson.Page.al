@@ -14,6 +14,7 @@ page 6059817 "NPR Retail Top 10 S.person"
     Editable = true;
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "Salesperson/Purchaser";
     SourceTableTemporary = true;
     SourceTableView = SORTING("Search E-Mail")

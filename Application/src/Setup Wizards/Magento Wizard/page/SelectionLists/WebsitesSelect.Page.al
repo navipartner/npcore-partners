@@ -3,6 +3,7 @@ page 6014620 "NPR Websites Select"
     Caption = 'Websites';
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Magento Website";
     SourceTableTemporary = true;
 

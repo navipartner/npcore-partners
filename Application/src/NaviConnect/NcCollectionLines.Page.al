@@ -7,6 +7,7 @@ page 6151532 "NPR Nc Collection Lines"
     PageType = List;
     SourceTable = "NPR Nc Collection Line";
     UsageCategory = Lists;
+    ApplicationArea = All;
 
     layout
     {

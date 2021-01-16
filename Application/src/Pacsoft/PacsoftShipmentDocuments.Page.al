@@ -16,6 +16,7 @@ page 6014440 "NPR Pacsoft Shipment Documents"
     SourceTable = "NPR Pacsoft Shipment Document";
     SourceTableView = SORTING("Export Time");
     UsageCategory = Documents;
+    ApplicationArea = All;
 
     layout
     {

@@ -7,6 +7,7 @@ page 6014447 "NPR Mixed Discount Part List"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Mixed Discount";
     SourceTableView = SORTING("Starting date", "Starting time", "Ending date", "Ending time")
                       WHERE("Mix Type" = CONST("Combination Part"));

@@ -5,6 +5,7 @@ page 6014420 "NPR Master No. Input Dialog"
     Caption = 'Master No. Input Dialog';
     PageType = StandardDialog;
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

@@ -4,6 +4,7 @@ page 6151255 "NPR Activities"
     Caption = 'Retail Activities';
     PageType = CardPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Retail Sales Cue";
 
     layout

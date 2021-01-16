@@ -3,6 +3,7 @@ page 6150639 "NPR POS Post. Profile Card"
     Caption = 'POS Posting Profile Card';
     PageType = Card;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR POS Posting Profile";
 
     layout

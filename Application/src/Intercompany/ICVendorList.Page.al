@@ -3,6 +3,7 @@ page 6014595 "NPR IC Vendor List"
     Caption = 'Vendor List';
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = Vendor;
 
     layout

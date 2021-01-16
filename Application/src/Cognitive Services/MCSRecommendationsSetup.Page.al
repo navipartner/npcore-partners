@@ -8,6 +8,7 @@ page 6060080 "NPR MCS Recommendations Setup"
     PageType = Card;
     SourceTable = "NPR MCS Recommendations Setup";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

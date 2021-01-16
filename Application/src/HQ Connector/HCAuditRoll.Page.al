@@ -8,6 +8,7 @@ page 6150900 "NPR HC Audit Roll"
     SourceTableView = SORTING("Sale Date", "Sales Ticket No.", "Line No.")
                       ORDER(Descending);
     UsageCategory = Lists;
+    ApplicationArea = All;
 
     layout
     {

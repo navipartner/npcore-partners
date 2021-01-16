@@ -4,6 +4,7 @@ page 6060087 "NPR MM Membership Lim. Setup"
     Caption = 'Membership Limitation Setup';
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR MM Membership Lim. Setup";
 
     layout

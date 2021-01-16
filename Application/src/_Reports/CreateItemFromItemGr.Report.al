@@ -2,6 +2,7 @@ report 6014610 "NPR Create Item From ItemGr."
 {
     // NPR70.00.00.00/LS/20141218  CASE 201562  : Create report to create items from Item Group
 
+    UsageCategory = None;
     Caption = 'Create Item(s) From Item Group';
     ProcessingOnly = true;
 

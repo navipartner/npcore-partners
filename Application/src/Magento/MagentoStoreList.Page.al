@@ -10,6 +10,7 @@ page 6151438 "NPR Magento Store List"
     PromotedActionCategories = 'New,Process,Reports,Manage';
     SourceTable = "NPR Magento Store";
     UsageCategory = Lists;
+    ApplicationArea = All;
 
     layout
     {

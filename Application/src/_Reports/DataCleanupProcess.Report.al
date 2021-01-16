@@ -2,6 +2,7 @@ report 6060102 "NPR Data Cleanup Process"
 {
     // NPR5.23/JC/20160331  CASE 237816 Changed report to a process report
     // NPR5.48/JDH /20181109 CASE 334163 Added Caption to object
+    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Data Cleanup Process.rdlc';
 

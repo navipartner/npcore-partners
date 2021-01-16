@@ -34,6 +34,7 @@ page 6014469 "NPR Retail Document Header"
     // NPR5.40/TS  /20180321  CASE 308711 Corrected Enu captions Persons
     // NPR5.41/TS  /20180105  CASE 300893 Removed Caption on Name on Action
 
+    UsageCategory = None;
     Caption = 'Retail Document';
     SourceTable = "NPR Retail Document Header";
 

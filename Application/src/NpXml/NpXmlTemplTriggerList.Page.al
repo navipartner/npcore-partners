@@ -14,6 +14,7 @@ page 6151559 "NPR NpXml Templ. Trigger List"
     Editable = false;
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     ShowFilter = false;
     SourceTable = "NPR NpXml Template Trigger";
 

@@ -6,6 +6,7 @@ page 6151422 "NPR Magento Setup Event Subs."
     DelayedInsert = true;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Magento Setup Event Sub.";
 
     layout

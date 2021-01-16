@@ -12,6 +12,7 @@ page 6151558 "NPR NpXml Template Triggers"
     DelayedInsert = true;
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     ShowFilter = false;
     SourceTable = "NPR NpXml Template Trigger";
 

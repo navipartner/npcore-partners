@@ -5,6 +5,7 @@ page 6014621 "NPR All Objects Select"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = AllObj;
     SourceTableTemporary = true;
 

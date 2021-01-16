@@ -9,6 +9,7 @@ page 6150681 "NPR NPRE Item Routing Profiles"
     PageType = List;
     SourceTable = "NPR NPRE Item Routing Profile";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

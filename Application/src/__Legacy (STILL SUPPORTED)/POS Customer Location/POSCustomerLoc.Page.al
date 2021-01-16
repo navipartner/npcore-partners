@@ -6,6 +6,7 @@ page 6014576 "NPR POS Customer Loc."
     PageType = List;
     SourceTable = "NPR POS Customer Location";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

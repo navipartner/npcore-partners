@@ -9,6 +9,7 @@ report 6150660 "NPR NPRE: Rest. Daily Turnover"
 
     Caption = 'Restaurant Daily Turnover';
     UsageCategory = ReportsAndAnalysis;
+    ApplicationArea = All;
 
     dataset
     {

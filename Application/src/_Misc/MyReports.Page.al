@@ -8,6 +8,7 @@ page 6014618 "NPR My Reports"
     Caption = 'My Reports';
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR My Report";
 
     layout

@@ -1,5 +1,6 @@
 page 6151206 "NPR NpCs Coll. StoreOrder Card"
 {
+    UsageCategory = None;
     Caption = 'Collect in Store Order Card';
     SourceTable = "NPR NpCs Document";
     SourceTableView = WHERE(Type = CONST("Collect in Store"));

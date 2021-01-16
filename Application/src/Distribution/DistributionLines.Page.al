@@ -6,6 +6,7 @@ page 6151059 "NPR Distribution Lines"
     Caption = 'Distribution Lines';
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Distribution Lines";
 
     layout

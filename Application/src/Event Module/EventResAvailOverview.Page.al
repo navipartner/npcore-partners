@@ -13,6 +13,7 @@ page 6059833 "NPR Event Res. Avail. Overview"
     SourceTable = "NPR Event Plan. Line Buffer";
     SourceTableTemporary = true;
     UsageCategory = ReportsAndAnalysis;
+    ApplicationArea = All;
 
     layout
     {

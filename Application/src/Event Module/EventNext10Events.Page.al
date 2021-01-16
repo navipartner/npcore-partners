@@ -8,6 +8,7 @@ page 6060166 "NPR Event Next 10 Events"
     Editable = false;
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = Job;
     SourceTableTemporary = true;
 

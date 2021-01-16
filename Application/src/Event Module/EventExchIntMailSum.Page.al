@@ -6,6 +6,7 @@ page 6151584 "NPR Event Exch. Int. Mail Sum."
     Editable = false;
     PageType = Worksheet;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Event Exc.Int.Summ. Buffer";
     SourceTableTemporary = true;
 

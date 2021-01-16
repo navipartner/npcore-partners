@@ -1,5 +1,6 @@
 page 6059921 "NPR BTF Service EndPoints"
 {
+    UsageCategory = None;
     PageType = List;
     SourceTable = "NPR BTF Service EndPoint";
     Caption = 'BTwentyFour Service EndPoints';

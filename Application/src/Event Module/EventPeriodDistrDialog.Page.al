@@ -5,6 +5,7 @@ page 6059831 "NPR Event Period Distr. Dialog"
     Caption = 'Event Period Distr. Dialog';
     PageType = StandardDialog;
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

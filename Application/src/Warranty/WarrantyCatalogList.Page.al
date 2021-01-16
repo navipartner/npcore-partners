@@ -8,6 +8,7 @@ page 6014515 "NPR Warranty Catalog List"
     PageType = List;
     SourceTable = "NPR Warranty Directory";
     UsageCategory = Lists;
+    ApplicationArea = All;
 
     layout
     {

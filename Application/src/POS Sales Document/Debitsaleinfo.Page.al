@@ -2,6 +2,7 @@ page 6014401 "NPR Debit sale info"
 {
     // NPR5.39/TJ  /20180208 CASE 302634 Renamed functions to english
 
+    UsageCategory = None;
     Caption = 'Register/Debit Sale Information';
     SourceTable = "Sales Header";
 

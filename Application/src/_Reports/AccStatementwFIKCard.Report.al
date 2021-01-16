@@ -6,11 +6,12 @@ report 6014545 "NPR Acc. Statement w FIK-Card"
     // NPR5.42/ZESO/20180426  CASE 313027 Displayed Bank Branch No on report.
     // NPR5.49/BHR /20190111  CASE 341976 Comment Code as per OMA
     // NPR5.49/JAKUBV/20190402  CASE 341969 Transport NPR5.49 - 1 April 2019
+    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Acc. Statement w FIK-Card.rdlc';
 
     Caption = 'Acc. Statement w FIK-Card';
-    
+
     dataset
     {
         dataitem(Customer; Customer)

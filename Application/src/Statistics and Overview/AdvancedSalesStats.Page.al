@@ -25,6 +25,7 @@ page 6014585 "NPR Advanced Sales Stats"
     PageType = List;
     SourceTable = Date;
     UsageCategory = ReportsAndAnalysis;
+    ApplicationArea = All;
 
     layout
     {

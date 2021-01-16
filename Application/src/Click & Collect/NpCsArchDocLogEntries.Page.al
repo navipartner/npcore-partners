@@ -4,6 +4,7 @@ page 6151212 "NPR NpCs Arch.Doc.Log Entries"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR NpCs Arch. Doc. Log Entry";
 
     layout

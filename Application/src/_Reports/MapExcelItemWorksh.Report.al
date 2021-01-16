@@ -3,6 +3,7 @@ report 6060044 "NPR Map Excel Item Worksh."
     // NPR5.22\BR\20160321  CASE 182391 Object Created
     // NPR5.48/JDH /20181109 CASE 334163 Added Caption to object
 
+    UsageCategory = None;
     Caption = 'Map Excel Item Worksheet';
     ProcessingOnly = true;
 

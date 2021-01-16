@@ -6,6 +6,7 @@ page 6060057 "NPR Item Worksh. Field Mapping"
     Caption = 'Item Worksheet Field Mapping';
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     PopulateAllFields = true;
     SourceTable = "NPR Item Worksh. Field Mapping";
 

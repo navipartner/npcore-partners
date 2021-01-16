@@ -2,6 +2,7 @@ page 6184475 "NPR EFT Payment Param. Setup"
 {
     // NPR5.46/MMV /20181008 CASE 290734 Created object
 
+    UsageCategory = None;
     Caption = 'EFT Payment Parameter Setup';
     DeleteAllowed = false;
     InsertAllowed = false;

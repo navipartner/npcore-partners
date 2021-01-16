@@ -4,6 +4,7 @@ page 6060135 "NPR MM Members. Admis. Setup"
     Caption = 'Membership Admission Setup';
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR MM Members. Admis. Setup";
 
     layout

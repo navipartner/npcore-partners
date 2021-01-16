@@ -5,6 +5,7 @@ page 6150733 "NPR POS Sales WF Set Card"
     Caption = 'POS Sales Workflow Set Card';
     PageType = Card;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR POS Sales Workflow Set";
 
     layout

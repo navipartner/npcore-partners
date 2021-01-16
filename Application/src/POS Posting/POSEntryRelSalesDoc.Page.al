@@ -10,6 +10,7 @@ page 6151006 "NPR POS Entry Rel. Sales Doc."
     MultipleNewLines = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     ShowFilter = false;
     SourceTable = "NPR POS Entry Sales Doc. Link";
 

@@ -4,6 +4,7 @@ page 6059796 "NPR E-mail Log"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR E-mail Log";
 
     layout

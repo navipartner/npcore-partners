@@ -7,6 +7,7 @@ page 6151041 "NPR Notification List"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR AF Notification Hub";
 
     layout

@@ -6,6 +6,7 @@ page 6151595 "NPR NpDc Coupon Modules"
     PopulateAllFields = true;
     SourceTable = "NPR NpDc Coupon Module";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

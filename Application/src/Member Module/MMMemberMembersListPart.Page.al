@@ -5,6 +5,7 @@ page 6060138 "NPR MM Member Members.ListPart"
     InsertAllowed = false;
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR MM Membership Role";
 
     layout

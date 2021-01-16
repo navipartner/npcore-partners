@@ -20,6 +20,7 @@ page 6014434 "NPR Payment Type - List"
     PageType = List;
     SourceTable = "NPR Payment Type POS";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

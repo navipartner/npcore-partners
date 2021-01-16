@@ -6,6 +6,7 @@ report 6014601 "NPR Update Barcodes"
     // NPR5.36/MMV /20170919   CASE 290792 Made numeric check robust.
     // NPR5.38/JLK /20180124   CASE 300892 Removed AL Error on ControlContainer Caption in Request Page
     // NPR5.39/JLK /20180219   CASE 300892 Renamed Page Label
+    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Update Barcodes.rdlc';
 

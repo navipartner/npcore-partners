@@ -37,6 +37,7 @@ page 6014453 "NPR Campaign Discount"
     Caption = 'Period Discount';
     PageType = Card;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Period Discount";
 
     layout

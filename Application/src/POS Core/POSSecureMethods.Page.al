@@ -5,6 +5,7 @@ page 6150731 "NPR POS Secure Methods"
     Caption = 'POS Secure Methods';
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR POS Secure Method";
     SourceTableTemporary = true;
 

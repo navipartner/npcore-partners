@@ -2,6 +2,7 @@ page 6151457 "NPR Magento Attribute Group"
 {
     // MAG2.18/TS  /20180910  CASE 323934 Attribute Group Created
 
+    UsageCategory = None;
     Caption = 'Attribute Group';
     DelayedInsert = true;
     Editable = false;

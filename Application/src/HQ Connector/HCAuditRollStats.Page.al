@@ -4,6 +4,7 @@ page 6150901 "NPR HC Audit Roll Stats"
     Editable = false;
     PageType = Worksheet;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR HC Audit Roll";
 
     layout

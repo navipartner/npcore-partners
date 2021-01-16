@@ -4,6 +4,7 @@ page 6150631 "NPR POS Paym. Checkp. Subpage"
     Editable = false;
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR POS Payment Bin Checkp.";
 
     layout

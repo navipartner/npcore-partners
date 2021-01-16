@@ -5,6 +5,7 @@ page 6151250 "NPR Retail Enter. Act - Ticket"
     Caption = 'Activities';
     PageType = CardPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     RefreshOnActivate = true;
     SourceTable = "NPR Retail Entertainment Cue";
 

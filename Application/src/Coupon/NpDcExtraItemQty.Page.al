@@ -4,6 +4,7 @@ page 6151606 "NPR NpDc Extra Item Qty."
     Caption = 'Extra Coupon Item';
     PageType = Card;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR NpDc Extra Coupon Item";
 
     layout

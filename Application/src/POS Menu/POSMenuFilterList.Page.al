@@ -7,6 +7,7 @@ page 6150719 "NPR POS Menu Filter List"
     PageType = List;
     SourceTable = "NPR POS Menu Filter";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

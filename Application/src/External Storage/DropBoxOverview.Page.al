@@ -4,6 +4,7 @@ page 6184871 "NPR DropBox Overview"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR DropBox Overview";
 
     layout

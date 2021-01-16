@@ -11,6 +11,7 @@ page 6151410 "NPR Magento VAT Prod. Groups"
     PageType = List;
     SourceTable = "NPR Magento VAT Prod. Group";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

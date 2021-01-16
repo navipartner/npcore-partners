@@ -4,6 +4,7 @@ page 6151081 "NPR ExRv Vouchers"
     DelayedInsert = true;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR ExRv Voucher";
 
     layout

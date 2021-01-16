@@ -10,6 +10,7 @@ page 6014577 "NPR Tax Free GB I2 Serv. List"
     ModifyAllowed = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Tax Free GB I2 Service";
 
     layout

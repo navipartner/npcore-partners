@@ -4,6 +4,7 @@ report 6014611 "NPR Sales Stats w/ Variants"
     // NPR5.38/JLK /20180124  CASE 300892 Removed AL Error on ControlContainer Caption in Request Page
     // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
     // NPR5.55/YAHA/20200610  CASE 394884 Header layout modification
+    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Sales Statistics w Variants.rdlc';
 

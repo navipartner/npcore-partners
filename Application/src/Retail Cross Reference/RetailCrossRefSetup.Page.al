@@ -7,6 +7,7 @@ page 6151181 "NPR Retail Cross Ref. Setup"
     PageType = List;
     SourceTable = "NPR Retail Cross Ref. Setup";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

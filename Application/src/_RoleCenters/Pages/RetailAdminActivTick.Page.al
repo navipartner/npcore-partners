@@ -5,6 +5,7 @@ page 6014692 "NPR Retail Admin Activ. - Tick"
     Caption = 'Retail Admin Activities - Tick';
     PageType = CardPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     RefreshOnActivate = true;
     SourceTable = "NPR Retail Admin Cue";
 

@@ -6,6 +6,7 @@ page 6150726 "NPR POS Action Sequences"
     PageType = List;
     SourceTable = "NPR POS Action Sequence";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

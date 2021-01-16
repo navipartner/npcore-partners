@@ -5,6 +5,7 @@ page 6014464 "NPR Register Period List"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Period";
 
     layout

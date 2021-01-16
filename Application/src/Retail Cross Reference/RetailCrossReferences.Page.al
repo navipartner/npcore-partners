@@ -6,6 +6,7 @@ page 6151180 "NPR Retail Cross References"
     PageType = List;
     SourceTable = "NPR Retail Cross Reference";
     UsageCategory = Lists;
+    ApplicationArea = All;
 
     layout
     {

@@ -12,6 +12,7 @@ page 6184483 "NPR EFT Integration Types"
     SourceTable = "NPR EFT Integration Type";
     SourceTableTemporary = true;
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

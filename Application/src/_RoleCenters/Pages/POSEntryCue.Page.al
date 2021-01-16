@@ -2,6 +2,7 @@ page 6151260 "NPR POS Entry Cue"
 {
     PageType = CardPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR POS Entry Cue.";
 
 

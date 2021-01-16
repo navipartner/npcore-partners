@@ -5,6 +5,7 @@ page 6060132 "NPR MM Member Community"
     PageType = List;
     SourceTable = "NPR MM Member Community";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

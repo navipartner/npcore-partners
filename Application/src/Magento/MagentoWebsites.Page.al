@@ -14,6 +14,7 @@ page 6151403 "NPR Magento Websites"
     PageType = List;
     SourceTable = "NPR Magento Website";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

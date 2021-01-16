@@ -8,6 +8,7 @@ page 6014492 "NPR Retail Comments"
     Caption = 'NPR Comment Sheet';
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Retail Comment";
 
     layout

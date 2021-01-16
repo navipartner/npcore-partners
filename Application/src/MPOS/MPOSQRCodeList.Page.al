@@ -7,6 +7,7 @@ page 6059964 "NPR MPOS QR Code List"
     Caption = 'MPOS QR Code List';
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     ShowFilter = false;
     SourceTable = "NPR MPOS QR Code";
 

@@ -10,6 +10,7 @@ page 6150652 "NPR POS Entry List"
     SourceTableView = SORTING("Entry No.")
                       ORDER(Descending);
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

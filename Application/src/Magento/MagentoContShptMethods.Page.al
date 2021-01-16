@@ -6,6 +6,7 @@ page 6151442 "NPR Magento Cont.Shpt.Methods"
     Caption = 'Contact Shipment Methods';
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Magento Contact Shpt.Meth.";
 
     layout

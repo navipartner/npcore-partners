@@ -1,5 +1,6 @@
 page 6014513 "NPR RP Template Output Log"
 {
+    UsageCategory = None;
     PageType = List;
     Caption = 'Template Output Log';
     Editable = false;

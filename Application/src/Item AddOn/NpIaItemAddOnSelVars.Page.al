@@ -5,6 +5,7 @@ page 6151119 "NPR NpIa ItemAddOn Sel. Vars."
     InsertAllowed = false;
     PageType = Worksheet;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR NpIa Item AddOn Line";
 
     layout

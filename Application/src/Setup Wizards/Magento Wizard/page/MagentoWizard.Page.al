@@ -3,6 +3,7 @@ page 6014400 "NPR Magento Wizard"
     Caption = 'NP Magento Wizard';
     PageType = NavigatePage;
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

@@ -9,6 +9,7 @@ page 6151557 "NPR NpXml Batch Filters"
     DelayedInsert = true;
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     ShowFilter = false;
     SourceTable = "NPR NpXml Filter";
 

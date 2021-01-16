@@ -1,5 +1,6 @@
 report 6014602 "NPR Alt. No. to ICR barcodes"
 {
+    UsageCategory = None;
     Caption = 'Alt. No. to Item Cross Reference barcodes';
     ProcessingOnly = true;
 

@@ -3,6 +3,7 @@ page 6014640 "NPR RP Template Setup"
     Caption = 'Template Setup';
     SourceTable = "NPR RP Template Setup";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

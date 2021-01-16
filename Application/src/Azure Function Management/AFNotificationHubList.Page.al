@@ -10,6 +10,7 @@ page 6151573 "NPR AF Notification Hub List"
     ModifyAllowed = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR AF Notification Hub";
 
     layout

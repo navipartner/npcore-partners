@@ -7,6 +7,7 @@ report 6014450 "NPR Items Received&Not Invoic."
 
     Caption = 'Items Received & Not Invoiced';
     UsageCategory = ReportsAndAnalysis;
+    ApplicationArea = All;
 
     dataset
     {

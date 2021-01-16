@@ -2,6 +2,7 @@ page 6014488 "NPR Credit Card Prefix"
 {
     // NPR5.41/TS  /20180105 CASE 300893 Renamed Function Prefix to Show Prefix
 
+    UsageCategory = None;
     Caption = 'Credit Card Prefix';
     SourceTable = "NPR Payment Type - Prefix";
 

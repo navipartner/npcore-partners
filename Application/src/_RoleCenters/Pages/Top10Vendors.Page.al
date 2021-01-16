@@ -7,6 +7,7 @@ page 6151258 "NPR Top 10 Vendors"
     Editable = true;
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = Vendor;
     SourceTableTemporary = true;
     SourceTableView = SORTING("Search Name")

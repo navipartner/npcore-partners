@@ -13,6 +13,7 @@ page 6014592 "NPR Item Repl. by Store Matrix"
     SourceTable = "NPR Item Repl. by Store";
     SourceTableTemporary = true;
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

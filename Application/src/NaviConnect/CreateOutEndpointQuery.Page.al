@@ -11,6 +11,7 @@ page 6014686 "NPR Create Out. Endpoint Query"
     SourceTable = "NPR Endpoint Query";
     SourceTableTemporary = true;
     UsageCategory = Tasks;
+    ApplicationArea = All;
 
     layout
     {

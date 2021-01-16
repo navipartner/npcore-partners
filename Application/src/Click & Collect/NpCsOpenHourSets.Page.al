@@ -6,6 +6,7 @@ page 6151215 "NPR NpCs Open. Hour Sets"
     PageType = List;
     SourceTable = "NPR NpCs Open. Hour Set";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

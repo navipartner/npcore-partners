@@ -15,6 +15,7 @@ report 6014422 "NPR Issued/Admit. Ticket Stats"
     Caption = 'Issued/Admitted Ticket Statistics';
     PreviewMode = PrintLayout;
     UsageCategory = ReportsAndAnalysis;
+    ApplicationArea = All;
 
     dataset
     {

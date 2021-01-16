@@ -7,6 +7,7 @@ page 6014677 "NPR Endpoint Req. Batch List"
     PageType = List;
     SourceTable = "NPR Endpoint Request Batch";
     UsageCategory = Lists;
+    ApplicationArea = All;
 
     layout
     {

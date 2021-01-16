@@ -10,6 +10,7 @@ page 6150663 "NPR NPRE Waiter Pad List"
     PageType = List;
     SourceTable = "NPR NPRE Waiter Pad";
     UsageCategory = Lists;
+    ApplicationArea = All;
 
     layout
     {

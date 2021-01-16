@@ -4,6 +4,7 @@ page 6151202 "NPR NpCs Store Card Workflows"
     DelayedInsert = true;
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR NpCs Store Workflow Rel.";
 
     layout

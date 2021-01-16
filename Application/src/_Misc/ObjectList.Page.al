@@ -15,6 +15,7 @@ page 6014480 "NPR Object List"
                       ORDER(Ascending)
                       WHERE("Object Type" = FILTER(<> TableData));
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

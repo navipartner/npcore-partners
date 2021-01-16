@@ -3,6 +3,7 @@ page 6014619 "NPR Retail - Sales RC MyReport"
     Caption = 'Role Center';
     PageType = RoleCenter;
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

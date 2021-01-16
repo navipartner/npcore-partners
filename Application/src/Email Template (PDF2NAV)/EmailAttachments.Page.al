@@ -4,6 +4,7 @@ page 6059797 "NPR E-mail Attachments"
     Caption = 'E-mail Attachments';
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     RefreshOnActivate = true;
     SaveValues = true;
     SourceTable = "NPR E-mail Attachment";

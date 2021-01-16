@@ -3,6 +3,7 @@ page 6151140 "NPR Audit Roll - OData"
     Caption = 'Audit Roll - OData';
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Audit Roll";
 
     layout

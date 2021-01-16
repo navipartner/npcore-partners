@@ -8,6 +8,7 @@ page 6184495 "NPR Pepper Terminal Types"
     PageType = List;
     SourceTable = "NPR Pepper Terminal Type";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

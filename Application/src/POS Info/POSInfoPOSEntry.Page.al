@@ -8,6 +8,7 @@ page 6150647 "NPR POS Info POS Entry"
     PageType = List;
     SourceTable = "NPR POS Info POS Entry";
     UsageCategory = Lists;
+    ApplicationArea = All;
 
     layout
     {

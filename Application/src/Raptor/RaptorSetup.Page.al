@@ -13,6 +13,7 @@ page 6151491 "NPR Raptor Setup"
     PageType = Card;
     SourceTable = "NPR Raptor Setup";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

@@ -2,6 +2,7 @@ page 6014573 "NPR Tax Free GB I2 Info Capt."
 {
     // NPR5.40/MMV /20180112 CASE 293106 Refactored tax free module
 
+    UsageCategory = None;
     Caption = 'Tax Free GB I2 Info Capture';
     DeleteAllowed = false;
     InsertAllowed = false;

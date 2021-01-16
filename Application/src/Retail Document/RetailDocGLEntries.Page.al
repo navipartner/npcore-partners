@@ -4,6 +4,7 @@ page 6014593 "NPR Retail Doc. G/L Entries"
     Editable = false;
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "G/L Entry";
 
     layout

@@ -4,6 +4,7 @@ page 6150659 "NPR POS Posting Log Parameters"
     Editable = false;
     PageType = CardPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR POS Posting Log";
 
     layout

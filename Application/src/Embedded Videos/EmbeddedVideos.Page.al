@@ -2,6 +2,7 @@ page 6014697 "NPR Embedded Videos"
 {
     // NPR5.37/MHA /20171009  CASE 289471 Object created - Display Embedded Videos
 
+    UsageCategory = None;
     Caption = 'Retail Demo Video';
     DataCaptionExpression = ModuleName;
     Editable = false;

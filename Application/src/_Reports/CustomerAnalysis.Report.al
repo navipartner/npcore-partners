@@ -11,6 +11,7 @@ report 6014432 "NPR Customer Analysis"
 
     Caption = 'Customer Analysis';
     UsageCategory = ReportsAndAnalysis;
+    ApplicationArea = All;
     UseSystemPrinter = true;
 
     dataset

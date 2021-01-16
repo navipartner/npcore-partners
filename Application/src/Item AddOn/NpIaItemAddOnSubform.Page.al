@@ -5,6 +5,7 @@ page 6151127 "NPR NpIa Item AddOn Subform"
     DelayedInsert = true;
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR NpIa Item AddOn Line";
     layout
     {

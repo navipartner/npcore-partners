@@ -5,6 +5,7 @@ page 6014462 "NPR Invt. Pick Subform Scan 2"
     LinksAllowed = false;
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     ShowFilter = false;
     SourceTable = "Warehouse Activity Line";
     SourceTableView = WHERE("Activity Type" = CONST("Invt. Pick"),

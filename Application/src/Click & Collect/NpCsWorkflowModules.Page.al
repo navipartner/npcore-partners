@@ -5,6 +5,7 @@ page 6151199 "NPR NpCs Workflow Modules"
     PageType = List;
     SourceTable = "NPR NpCs Workflow Module";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

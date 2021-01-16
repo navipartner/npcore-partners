@@ -4,6 +4,7 @@ page 6060077 "NPR MM Recur. Payment Setup"
     Caption = 'Recurring Payment Setup';
     PageType = Card;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR MM Recur. Paym. Setup";
 
     layout

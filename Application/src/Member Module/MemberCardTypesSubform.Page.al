@@ -3,6 +3,7 @@ page 6059776 "NPR Member Card Types Subform"
     Caption = 'Point Card - Types Subform';
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Member Card Setup";
 
     layout

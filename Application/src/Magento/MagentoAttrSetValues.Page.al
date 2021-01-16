@@ -8,6 +8,7 @@ page 6151435 "NPR Magento Attr. Set Values"
     DelayedInsert = true;
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Magento Attr. Set Value";
     SourceTableView = SORTING(Position);
 

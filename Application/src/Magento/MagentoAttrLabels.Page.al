@@ -9,6 +9,7 @@ page 6151432 "NPR Magento Attr. Labels"
     DelayedInsert = true;
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     ShowFilter = false;
     SourceTable = "NPR Magento Attr. Label";
 

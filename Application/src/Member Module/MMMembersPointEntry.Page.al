@@ -5,6 +5,7 @@ page 6060104 "NPR MM Members. Point Entry"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR MM Members. Points Entry";
 
     layout

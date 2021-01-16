@@ -3,6 +3,7 @@ page 6151220 "NPR PrintNode Setup"
     Caption = 'PrintNode Setup';
     PageType = Card;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR PrintNode Setup";
     InsertAllowed = false;
     layout

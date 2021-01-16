@@ -9,6 +9,7 @@ page 6059988 "NPR Sale Stats Activities"
     Caption = 'Sale Statistics';
     PageType = CardPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "Business Chart Buffer";
 
     layout

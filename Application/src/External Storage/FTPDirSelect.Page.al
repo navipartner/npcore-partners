@@ -5,6 +5,7 @@ page 6184882 "NPR FTP Dir. Select"
     Caption = 'Choose Upload Directory';
     PageType = ListPlus;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR FTP Overview";
     SourceTableTemporary = true;
 

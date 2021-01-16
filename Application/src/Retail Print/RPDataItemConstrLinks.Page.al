@@ -7,6 +7,7 @@ page 6014643 "NPR RP Data Item Constr. Links"
     DelayedInsert = true;
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     ShowFilter = false;
     SourceTable = "NPR RP Data Item Constr. Links";
 

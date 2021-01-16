@@ -11,6 +11,7 @@ page 6014496 "NPR Exchange Label"
     PageType = List;
     SourceTable = "NPR Exchange Label";
     UsageCategory = Lists;
+    ApplicationArea = All;
 
     layout
     {

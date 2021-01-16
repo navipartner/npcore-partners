@@ -7,6 +7,7 @@ page 6060067 "NPR Items by Loc.Overv. Matrix"
     LinksAllowed = false;
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Inv. Overview Line";
 
     layout

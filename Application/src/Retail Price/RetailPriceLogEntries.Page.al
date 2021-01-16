@@ -11,6 +11,7 @@ page 6014475 "NPR Retail Price Log Entries"
     SourceTable = "NPR Retail Price Log Entry";
     SourceTableView = SORTING("Date and Time");
     UsageCategory = Lists;
+    ApplicationArea = All;
 
     layout
     {

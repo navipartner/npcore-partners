@@ -4,6 +4,7 @@ page 6150613 "NPR NP Retail Setup"
     Caption = 'NP Retail Setup';
     SourceTable = "NPR NP Retail Setup";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

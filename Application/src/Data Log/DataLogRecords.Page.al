@@ -7,6 +7,7 @@ page 6059898 "NPR Data Log Records"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Data Log Record";
 
     layout

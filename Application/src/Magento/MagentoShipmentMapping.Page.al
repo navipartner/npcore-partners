@@ -10,6 +10,7 @@ page 6151449 "NPR Magento Shipment Mapping"
     PageType = List;
     SourceTable = "NPR Magento Shipment Mapping";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

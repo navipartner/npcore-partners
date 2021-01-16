@@ -6,6 +6,7 @@ page 6014463 "NPR Item List"
     Editable = false;
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     PromotedActionCategories = 'New,Process,Report,Item,History,Special Prices & Discounts,Request Approval,Periodic Activities,Inventory,Attributes';
     QueryCategory = 'Item List';
     RefreshOnActivate = true;
