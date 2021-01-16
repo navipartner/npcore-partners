@@ -52,6 +52,7 @@ page 6151482 "NPR Magento Sales Chart"
                     Caption = 'Day';
                     ApplicationArea = All;
                     ToolTip = 'Executes the Day action';
+                    Image = Calendar;
 
                     trigger OnAction()
                     begin
@@ -65,6 +66,7 @@ page 6151482 "NPR Magento Sales Chart"
                     Caption = 'Week';
                     ApplicationArea = All;
                     ToolTip = 'Executes the Week action';
+                    Image = Calendar;
 
                     trigger OnAction()
                     begin
@@ -78,6 +80,7 @@ page 6151482 "NPR Magento Sales Chart"
                     Caption = 'Month';
                     ApplicationArea = All;
                     ToolTip = 'Executes the Month action';
+                    Image = Calendar;
 
                     trigger OnAction()
                     begin
@@ -91,6 +94,7 @@ page 6151482 "NPR Magento Sales Chart"
                     Caption = 'Quarter';
                     ApplicationArea = All;
                     ToolTip = 'Executes the Quarter action';
+                    Image = Calendar;
 
                     trigger OnAction()
                     begin
@@ -104,6 +108,7 @@ page 6151482 "NPR Magento Sales Chart"
                     Caption = 'Year';
                     ApplicationArea = All;
                     ToolTip = 'Executes the Year action';
+                    Image = Calendar;
 
                     trigger OnAction()
                     begin
