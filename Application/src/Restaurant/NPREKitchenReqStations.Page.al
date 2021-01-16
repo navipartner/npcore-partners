@@ -6,6 +6,7 @@ page 6150692 "NPR NPRE Kitchen Req. Stations"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR NPRE Kitchen Req. Station";
 
     layout

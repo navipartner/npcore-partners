@@ -6,6 +6,7 @@ report 6060041 "NPR Delete Reg. Item Works."
     Caption = 'Delete Reg. Item Worksheets';
     ProcessingOnly = true;
     UsageCategory = Tasks;
+    ApplicationArea = All;
 
     dataset
     {

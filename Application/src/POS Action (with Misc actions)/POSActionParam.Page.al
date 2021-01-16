@@ -4,6 +4,7 @@ page 6150704 "NPR POS Action Param."
     DelayedInsert = true;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR POS Action Parameter";
 
     layout

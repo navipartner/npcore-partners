@@ -6,6 +6,7 @@ page 6059901 "NPR Task Batch"
     Caption = 'Task Batch';
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Task Batch";
 
     layout

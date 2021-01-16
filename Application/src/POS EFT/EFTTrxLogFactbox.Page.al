@@ -8,6 +8,7 @@ page 6184473 "NPR EFT Trx Log Factbox"
     ModifyAllowed = false;
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR EFT Transaction Log";
 
     layout

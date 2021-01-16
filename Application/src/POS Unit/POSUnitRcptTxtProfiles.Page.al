@@ -7,6 +7,7 @@ page 6151264 "NPR POS Unit Rcpt.Txt Profiles"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR POS Unit Rcpt.Txt Profile";
 
     layout

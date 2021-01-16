@@ -10,6 +10,7 @@ page 6151537 "NPR Nc Endpoint Types"
     PageType = List;
     SourceTable = "NPR Nc Endpoint Type";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

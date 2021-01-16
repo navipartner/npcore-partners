@@ -5,6 +5,7 @@ page 6014647 "NPR Tax Free GB I2 Param."
     Caption = 'Tax Free GB I2 Parameters';
     PageType = Card;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Tax Free GB I2 Param.";
 
     layout

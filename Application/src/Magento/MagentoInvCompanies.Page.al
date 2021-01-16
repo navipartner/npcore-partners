@@ -8,6 +8,7 @@ page 6151402 "NPR Magento Inv. Companies"
     DelayedInsert = true;
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Magento Inv. Company";
 
     layout

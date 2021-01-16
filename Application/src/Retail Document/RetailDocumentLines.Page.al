@@ -18,6 +18,7 @@ page 6014470 "NPR Retail Document Lines"
     Editable = true;
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     RefreshOnActivate = true;
     SourceTable = "NPR Retail Document Lines";
     SourceTableView = SORTING("Document Type", "Document No.", "Line No.");

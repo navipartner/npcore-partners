@@ -7,6 +7,7 @@ page 6151563 "NPR NpXml Templ. Chng. History"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR NpXml Template History";
 
     layout

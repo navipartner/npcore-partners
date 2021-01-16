@@ -8,6 +8,7 @@ page 6014426 "NPR Item Group Subpage"
     Caption = 'Item Group Subform';
     PageType = CardPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Item Group";
 
     layout

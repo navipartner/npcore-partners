@@ -9,6 +9,7 @@ page 6014610 "NPR Retail Campaigns"
     PageType = List;
     SourceTable = "NPR Retail Campaign Header";
     UsageCategory = Lists;
+    ApplicationArea = All;
 
     layout
     {

@@ -7,6 +7,7 @@ page 6014634 "NPR GCP Setup"
     PageType = List;
     SourceTable = "NPR GCP Setup";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

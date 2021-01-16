@@ -4,6 +4,7 @@ page 6060105 "NPR MM Loyalty Setup"
     Caption = 'Loyalty Setup';
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR MM Loyalty Setup";
 
     layout

@@ -7,6 +7,7 @@ page 6014505 "NPR Accessory Unfold Entries"
     PageType = List;
     SourceTable = "NPR Accessory Unfold Entry";
     UsageCategory = History;
+    ApplicationArea = All;
 
     layout
     {

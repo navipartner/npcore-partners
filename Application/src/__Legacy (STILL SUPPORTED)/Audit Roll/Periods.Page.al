@@ -5,6 +5,7 @@ page 6014404 "NPR Periods"
     PageType = List;
     SourceTable = "NPR Period";
     UsageCategory = ReportsAndAnalysis;
+    ApplicationArea = All;
 
     layout
     {

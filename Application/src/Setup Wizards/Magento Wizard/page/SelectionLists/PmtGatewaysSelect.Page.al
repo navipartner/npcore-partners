@@ -3,6 +3,7 @@ page 6014624 "NPR Pmt. Gateways Select"
     Caption = 'Payment Gateways';
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Magento Payment Gateway";
     SourceTableTemporary = true;
 

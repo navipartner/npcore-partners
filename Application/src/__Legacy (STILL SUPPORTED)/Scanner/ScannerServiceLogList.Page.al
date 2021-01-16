@@ -8,6 +8,7 @@ page 6059997 "NPR Scanner Service Log List"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Scanner Service Log";
     SourceTableView = SORTING("Request Start")
                       ORDER(Descending);

@@ -7,6 +7,7 @@ page 6014413 "NPR Phone Number Lookup"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Phone Lookup Buffer";
     SourceTableTemporary = true;
 

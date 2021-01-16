@@ -2,6 +2,7 @@ page 6059916 "NPR Person Statistics"
 {
     PageType = CardPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     Caption = ' ';
 
     layout

@@ -1,5 +1,6 @@
 page 6151021 "NPR NpRv Arch. Voucher Card"
 {
+    UsageCategory = None;
     Caption = 'Archived Retail Voucher Card';
     Editable = false;
     SourceTable = "NPR NpRv Arch. Voucher";

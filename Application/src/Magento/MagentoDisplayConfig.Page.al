@@ -14,6 +14,7 @@ page 6151443 "NPR Magento Display Config"
     //SourceTableView = SORTING("No.",Type,"Sales Code","Sales Type","Starting Date","Starting Time","Ending Date","Ending Time")
     //                  WHERE("Sales Type"=FILTER(<>));
     UsageCategory = Lists;
+    ApplicationArea = All;
 
     layout
     {

@@ -10,6 +10,7 @@ page 6151417 "NPR Magento Child Categories"
     DelayedInsert = true;
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Magento Category";
 
     layout

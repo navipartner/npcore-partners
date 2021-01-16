@@ -5,6 +5,7 @@ page 6014416 "NPR Pakke Foreign Shipm. Map."
     Caption = 'Pakke Foreign Shipment Mapping';
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Pakke Foreign Shipm. Map.";
     SourceTableView = SORTING("Country/Region Code", "Base Shipping Agent Code");
 

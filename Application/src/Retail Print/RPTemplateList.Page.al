@@ -6,6 +6,7 @@ page 6014639 "NPR RP Template List"
     PageType = List;
     SourceTable = "NPR RP Template Header";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

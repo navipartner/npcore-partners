@@ -6,6 +6,7 @@ page 6151093 "NPR Nc RapidConnect Endp. Sub."
     DelayedInsert = true;
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Nc RapidConn. Endpoint";
 
     layout

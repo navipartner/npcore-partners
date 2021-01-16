@@ -10,6 +10,7 @@ page 6151524 "NPR Nc Endpoint E-mail List"
     ModifyAllowed = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Nc Endpoint E-mail";
 
     layout

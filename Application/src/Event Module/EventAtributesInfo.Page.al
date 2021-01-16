@@ -6,6 +6,7 @@ page 6151588 "NPR Event Atributes Info"
     InsertAllowed = false;
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Event Attribute";
 
     layout

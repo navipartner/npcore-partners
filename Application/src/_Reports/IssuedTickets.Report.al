@@ -1,6 +1,7 @@
 report 6014413 "NPR Issued Tickets"
 {
     // TM1.17/NPKNAV/20161026  CASE 252175 Transport TM1.17
+    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Issued Tickets.rdlc';
 

@@ -6,6 +6,7 @@ page 6184485 "NPR Pepper Card Types"
     PageType = List;
     SourceTable = "NPR Pepper Card Type";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

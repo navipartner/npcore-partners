@@ -6,6 +6,7 @@ page 6060056 "NPR Item Status"
     Caption = 'Item Status';
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Item Status";
 
     layout

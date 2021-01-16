@@ -12,6 +12,7 @@ report 6014456 "NPR Sales per week year/Last"
     Caption = 'Sales Per Week Year/Last Year';
     PreviewMode = PrintLayout;
     UsageCategory = ReportsAndAnalysis;
+    ApplicationArea = All;
     UseSystemPrinter = true;
 
     dataset

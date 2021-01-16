@@ -4,6 +4,7 @@ page 6150718 "NPR POS Menu Filter"
     DelayedInsert = true;
     PageType = Card;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR POS Menu Filter";
 
     layout

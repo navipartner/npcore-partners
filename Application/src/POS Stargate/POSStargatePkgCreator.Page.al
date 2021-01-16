@@ -1,5 +1,6 @@
 page 6150720 "NPR POS Stargate Pkg Creator"
 {
+    UsageCategory = None;
     Caption = 'POS Stargate Package Creator';
     DataCaptionExpression = AssemblyName;
     DeleteAllowed = true;

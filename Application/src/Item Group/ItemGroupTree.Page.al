@@ -13,6 +13,7 @@ page 6014427 "NPR Item Group Tree"
     SourceTable = "NPR Item Group";
     SourceTableView = SORTING("Sorting-Key");
     UsageCategory = Lists;
+    ApplicationArea = All;
 
     layout
     {

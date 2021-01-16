@@ -9,6 +9,7 @@ page 6014474 "NPR Retail Price Log Setup"
     InsertAllowed = false;
     SourceTable = "NPR Retail Price Log Setup";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

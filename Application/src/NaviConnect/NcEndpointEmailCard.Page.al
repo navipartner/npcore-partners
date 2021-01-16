@@ -7,6 +7,7 @@ page 6151525 "NPR Nc Endpoint E-mail Card"
     InsertAllowed = false;
     PageType = Card;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Nc Endpoint E-mail";
 
     layout

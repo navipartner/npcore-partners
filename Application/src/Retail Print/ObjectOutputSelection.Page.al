@@ -10,6 +10,7 @@ page 6014580 "NPR Object Output Selection"
     PromotedActionCategories = 'New,Process,Reports,Google Cloud Print';
     SourceTable = "NPR Object Output Selection";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

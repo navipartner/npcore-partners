@@ -11,6 +11,7 @@ page 6059968 "NPR MPOS App Setup Card"
     Caption = 'MPOS App Setup Card';
     SourceTable = "NPR MPOS App Setup";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

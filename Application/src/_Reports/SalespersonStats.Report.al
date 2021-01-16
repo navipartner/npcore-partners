@@ -19,6 +19,7 @@ report 6014446 "NPR Salesperson Stats"
 
     Caption = 'Salesperson Statistics';
     UsageCategory = ReportsAndAnalysis;
+    ApplicationArea = All;
 
     dataset
     {

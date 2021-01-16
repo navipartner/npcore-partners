@@ -6,6 +6,7 @@ report 6014445 "NPR Gift Vouchers Listing"
 
     Caption = 'Gift Vouchers Listing';
     UsageCategory = ReportsAndAnalysis;
+    ApplicationArea = All;
 
     dataset
     {

@@ -3,6 +3,7 @@ page 6184860 "NPR Azure Storage Setup"
     Caption = 'Azure Storage Setup';
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Azure Storage API Setup";
 
     layout

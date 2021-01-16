@@ -5,6 +5,7 @@ page 6150641 "NPR POS Info Subform"
     Caption = 'POS Info Subform';
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR POS Info Subcode";
 
     layout

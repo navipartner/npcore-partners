@@ -8,6 +8,7 @@ page 6150747 "NPR Unfinished POS Sale Trx"
     Editable = false;
     PageType = ListPlus;
     UsageCategory = Administration;
+    ApplicationArea = All;
     PromotedActionCategories = 'New,Process,Report,Filter';
     SourceTable = "NPR Sale POS";
 

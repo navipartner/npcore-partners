@@ -3,6 +3,7 @@ page 6014552 "NPR Brands WP"
     Caption = 'Brands';
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Magento Brand";
     SourceTableTemporary = true;
     DelayedInsert = true;

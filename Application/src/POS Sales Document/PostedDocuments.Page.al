@@ -8,6 +8,7 @@ page 6014438 "NPR Posted Documents"
     LinksAllowed = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Posted Doc. Buffer";
 
     layout

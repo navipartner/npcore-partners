@@ -2,6 +2,7 @@ report 6060137 "NPR MM Membership Batch Renew"
 {
     // MM1.43/TSA /20200327 CASE 398329 Initial Version
 
+    UsageCategory = None;
     Caption = 'Membership Batch Renew';
     ProcessingOnly = true;
 

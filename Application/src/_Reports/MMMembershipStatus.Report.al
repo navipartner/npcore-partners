@@ -5,6 +5,7 @@ report 6060132 "NPR MM Membership Status"
 
     Caption = 'Membership Status';
     UsageCategory = ReportsAndAnalysis;
+    ApplicationArea = All;
 
     dataset
     {

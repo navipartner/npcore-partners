@@ -10,6 +10,7 @@ page 6151430 "NPR Magento Attr. List"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Magento Attribute";
 
     layout

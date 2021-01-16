@@ -6,6 +6,7 @@ page 6151533 "NPR Nc Collector Req. Lines"
     PageType = List;
     SourceTable = "NPR Nc Collector Request";
     UsageCategory = Lists;
+    ApplicationArea = All;
 
     layout
     {

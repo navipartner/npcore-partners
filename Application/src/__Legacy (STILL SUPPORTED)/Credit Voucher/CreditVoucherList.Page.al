@@ -19,6 +19,7 @@ page 6014430 "NPR Credit Voucher List"
     SourceTable = "NPR Credit Voucher";
     SourceTableView = SORTING("Primary Key Length");
     UsageCategory = Lists;
+    ApplicationArea = All;
 
     layout
     {

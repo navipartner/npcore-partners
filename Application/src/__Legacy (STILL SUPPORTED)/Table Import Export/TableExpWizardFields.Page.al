@@ -6,6 +6,7 @@ page 6014457 "NPR Table Exp. Wizard Fields"
     DelayedInsert = true;
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "Field";
     SourceTableTemporary = true;
 

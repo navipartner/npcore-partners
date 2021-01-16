@@ -11,6 +11,7 @@ page 6059825 "NPR Trx Email Log"
     PageType = List;
     SourceTable = "NPR Trx Email Log";
     UsageCategory = History;
+    ApplicationArea = All;
 
     layout
     {

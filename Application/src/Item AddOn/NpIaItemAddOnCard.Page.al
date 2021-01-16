@@ -1,5 +1,6 @@
 page 6151126 "NPR NpIa Item AddOn Card"
 {
+    UsageCategory = None;
     Caption = 'Item AddOn Card';
     PageType = Card;
     SourceTable = "NPR NpIa Item AddOn";

@@ -16,6 +16,7 @@ page 6014574 "NPR Pacsoft Setup"
     PageType = Card;
     SourceTable = "NPR Pacsoft Setup";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

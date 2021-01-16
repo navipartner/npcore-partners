@@ -10,6 +10,7 @@ page 6151151 "NPR Customer GDPR Log Entries"
     PageType = List;
     SourceTable = "NPR Customer GDPR Log Entries";
     UsageCategory = History;
+    ApplicationArea = All;
 
     layout
     {

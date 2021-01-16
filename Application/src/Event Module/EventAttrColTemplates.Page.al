@@ -6,6 +6,7 @@ page 6060162 "NPR Event Attr. Col. Templates"
     Caption = 'Attribute Column Templates';
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Event Attr. Col. Template";
 
     layout

@@ -3,6 +3,7 @@ page 6151261 "NPR Purchase Ord Chart"
     Caption = 'Trailing Purchase Orders';
     PageType = CardPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "Business Chart Buffer";
 
     layout

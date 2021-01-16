@@ -6,6 +6,7 @@ report 6060136 "NPR MM Membership Not Renewed"
 
     Caption = 'Membership Not Renewed';
     UsageCategory = ReportsAndAnalysis;
+    ApplicationArea = All;
 
     dataset
     {

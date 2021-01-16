@@ -10,6 +10,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
     DelayedInsert = true;
     PageType = Worksheet;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SaveValues = true;
     SourceTable = "Item Journal Line";
 

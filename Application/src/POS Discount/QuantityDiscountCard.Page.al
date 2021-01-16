@@ -1,5 +1,6 @@
 page 6014466 "NPR Quantity Discount Card"
 {
+    UsageCategory = None;
     Caption = 'Multiple Price Header';
     SourceTable = "NPR Quantity Discount Header";
 

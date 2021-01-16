@@ -9,6 +9,7 @@ page 6150729 "NPR POS Sales Workflows"
     PageType = List;
     SourceTable = "NPR POS Sales Workflow";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

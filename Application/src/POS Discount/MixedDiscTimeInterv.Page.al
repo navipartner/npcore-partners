@@ -9,6 +9,7 @@ page 6014448 "NPR Mixed Disc. Time Interv."
     DelayedInsert = true;
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Mixed Disc. Time Interv.";
 
     layout

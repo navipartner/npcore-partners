@@ -1,5 +1,6 @@
 page 6151024 "NPR NpRv Global Voucher Setup"
 {
+    UsageCategory = None;
     Caption = 'Global Voucher Setup';
     InsertAllowed = false;
     SourceTable = "NPR NpRv Global Vouch. Setup";

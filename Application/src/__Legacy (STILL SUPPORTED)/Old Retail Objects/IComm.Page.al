@@ -14,6 +14,7 @@ page 6014516 "NPR I-Comm"
     // NPR5.47/TS  /20181022 CASE 307097 Removed field  4,7,11,24,74,75,83,85. Fields names are referenced in case
     // NPR5.51/THRO/20190710 CASE 360944 Added SMS Endpoint
 
+    UsageCategory = None;
     Caption = 'I-Comm Setup';
     SourceTable = "NPR I-Comm";
 

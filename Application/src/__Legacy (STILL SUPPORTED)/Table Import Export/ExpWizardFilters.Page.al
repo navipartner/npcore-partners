@@ -7,6 +7,7 @@ page 6014569 "NPR Exp. Wizard Filters"
     MultipleNewLines = true;
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "Table Filter";
     SourceTableTemporary = true;
 

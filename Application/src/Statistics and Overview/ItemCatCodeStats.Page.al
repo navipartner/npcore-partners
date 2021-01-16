@@ -12,6 +12,7 @@ page 6014596 "NPR Item Cat. Code Stats"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = Item;
 
     layout

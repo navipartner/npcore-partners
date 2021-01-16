@@ -4,6 +4,7 @@ page 6150625 "NPR POS NPRE Restaur. Profiles"
 
     PageType = ListPlus;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR POS NPRE Rest. Profile";
 
     layout

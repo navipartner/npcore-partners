@@ -7,6 +7,7 @@ page 6151539 "NPR Nc Endpoints"
     PageType = List;
     SourceTable = "NPR Nc Endpoint";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

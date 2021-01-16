@@ -15,6 +15,7 @@ page 6060040 "NPR Item Worksheet Templates"
     PageType = List;
     SourceTable = "NPR Item Worksh. Template";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

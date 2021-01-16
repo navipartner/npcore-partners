@@ -7,6 +7,7 @@ page 6059908 "NPR Session Log"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Session Log";
 
     layout

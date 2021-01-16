@@ -12,6 +12,7 @@ page 6014419 "NPR Gift Voucher"
     // NPR5.29/TS  /20170117  CASE 263656 Set Promoted to Yes on Action COPY,Deleted Unused Variables
     // MAG2.22/ZESO/20190531  CASE 353585 Display Gift Voucher Message
 
+    UsageCategory = None;
     Caption = 'Gift Voucher';
     DeleteAllowed = false;
     InsertAllowed = false;

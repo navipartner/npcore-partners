@@ -5,6 +5,7 @@ page 6150734 "NPR POS Sales WF Set Entries"
     Caption = 'POS Sales Workflows';
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR POS Sales WF Set Entry";
 
     layout

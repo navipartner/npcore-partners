@@ -7,6 +7,7 @@ page 6060161 "NPR Event Planning Line List"
     PageType = List;
     SourceTable = "Job Planning Line";
     UsageCategory = Lists;
+    ApplicationArea = All;
 
     layout
     {

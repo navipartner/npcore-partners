@@ -16,6 +16,7 @@ report 6060043 "NPR Export Excel Item Worksh."
     // NPR5.50/JAVA/20190429 CASE 353372 Fix ItemWorksheetVariantLine.Action::" " to ItemWorksheetVariantLine.Action::"Undefined"
     //                                   Not documented in the code as this problem was caused probably by incorrect merge only.
 
+    UsageCategory = None;
     Caption = 'Export Excel Item Worksheet';
     ProcessingOnly = true;
     UseRequestPage = false;

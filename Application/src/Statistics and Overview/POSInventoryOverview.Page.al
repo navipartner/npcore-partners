@@ -14,6 +14,7 @@ page 6060059 "NPR POS Inventory Overview"
     ModifyAllowed = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Inv. Overview Line";
     SourceTableTemporary = true;
 

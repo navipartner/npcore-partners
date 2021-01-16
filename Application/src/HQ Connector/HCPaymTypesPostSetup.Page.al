@@ -4,6 +4,7 @@ page 6150905 "NPR HC Paym.Types Post. Setup"
     PageType = List;
     SourceTable = "NPR HC Paym.Type Post.Setup";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

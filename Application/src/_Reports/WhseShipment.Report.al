@@ -1,6 +1,7 @@
 report 6014495 "NPR Whse. - Shipment"
 {
     // NPR5.51/ZESO/20190724 CASE 355486 Object Created
+    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/NP Whse. - Shipment.rdlc';
 

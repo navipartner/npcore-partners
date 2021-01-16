@@ -7,6 +7,7 @@ page 6184482 "NPR Pepper EFT Trx Subtype"
     PageType = List;
     SourceTable = "NPR Pepper EFT Trx Subtype";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

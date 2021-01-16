@@ -1,5 +1,6 @@
 page 6059923 "NPR BTF EndPoints Error Log"
 {
+    UsageCategory = None;
     PageType = List;
     SourceTable = "NPR BTF EndPoint Error Log";
     Caption = 'BTwentyFour EndPoints Error Log';

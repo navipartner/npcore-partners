@@ -12,6 +12,7 @@ report 6014431 "NPR S.Person Trx by Item Gr."
 
     Caption = 'Sales Person Trn. By Item Gr.';
     UsageCategory = ReportsAndAnalysis;
+    ApplicationArea = All;
 
     dataset
     {

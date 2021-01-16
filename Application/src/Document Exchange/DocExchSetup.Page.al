@@ -14,6 +14,7 @@ page 6059931 "NPR Doc. Exch. Setup"
     PageType = Card;
     SourceTable = "NPR Doc. Exch. Setup";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

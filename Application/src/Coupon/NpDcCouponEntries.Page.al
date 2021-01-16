@@ -4,6 +4,7 @@ page 6151594 "NPR NpDc Coupon Entries"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     PopulateAllFields = true;
     SourceTable = "NPR NpDc Coupon Entry";
 

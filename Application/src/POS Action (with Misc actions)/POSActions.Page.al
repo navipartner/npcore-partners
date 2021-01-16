@@ -11,6 +11,7 @@ page 6150703 "NPR POS Actions"
     PageType = List;
     SourceTable = "NPR POS Action";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

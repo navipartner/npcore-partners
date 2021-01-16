@@ -6,6 +6,7 @@ page 6014609 "NPR Attribute Value Lookup"
     DataCaptionFields = "Attribute Code";
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Attribute Lookup Value";
 
     layout

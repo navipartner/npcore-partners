@@ -9,6 +9,7 @@ page 6014566 "NPR Retail Logo Setup"
     PageType = List;
     SourceTable = "NPR Retail Logo";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

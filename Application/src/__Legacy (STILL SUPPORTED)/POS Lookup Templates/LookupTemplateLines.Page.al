@@ -6,6 +6,7 @@ page 6014672 "NPR Lookup Template Lines"
     DelayedInsert = true;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Lookup Template Line";
 
     layout

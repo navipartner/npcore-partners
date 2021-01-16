@@ -9,6 +9,7 @@ report 6014401 "NPR Counter Report A4"
     // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
     // NPR5.41/JLK /20180413  CASE 302573 Changed all Danish Variables/Captions to English
     // NPR5.48/BHR/20181030 CASE 333898 Correct filter on "Payment Type POS"
+    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Counter Report A4.rdlc';
 

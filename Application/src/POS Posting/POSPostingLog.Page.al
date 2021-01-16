@@ -4,6 +4,7 @@ page 6150658 "NPR POS Posting Log"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR POS Posting Log";
 
     layout

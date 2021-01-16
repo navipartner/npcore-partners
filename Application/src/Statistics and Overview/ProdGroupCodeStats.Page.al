@@ -10,6 +10,7 @@ page 6014597 "NPR Prod. Group Code Stats"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = Item;
 
     layout

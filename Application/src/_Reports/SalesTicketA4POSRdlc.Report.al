@@ -4,6 +4,7 @@ report 6150613 "NPR Sales Ticket A4 - POS Rdlc"
     // NPR5.40/JLK /20180314  CASE 307437 Added format on decimals in rdlc layout
     // NPR5.41/JLK /20180504  CASE 307437 Seperated Report to rdlc layout only
     // NPR5.55/ZESO/20200706  CASE 410314 Changed grouping on section Payment Specification
+    UsageCategory = None;
     RDLCLayout = './src/_Reports/layouts/Sales Ticket A4 - POS Rdlc.rdlc';
 
     Caption = 'Sales Ticket A4 - POS Rdlc';

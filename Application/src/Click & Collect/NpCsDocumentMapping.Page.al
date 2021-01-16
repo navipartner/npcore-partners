@@ -5,6 +5,7 @@ page 6151203 "NPR NpCs Document Mapping"
     PageType = List;
     SourceTable = "NPR NpCs Document Mapping";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

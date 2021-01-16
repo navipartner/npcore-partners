@@ -4,6 +4,7 @@ page 6150903 "NPR HC Register List"
     PageType = List;
     SourceTable = "NPR HC Register";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

@@ -3,6 +3,7 @@ report 6014533 "NPR Inventory - flow"
     // NPR70.00.00.00/LS/20141107  CASE 187452 : Convert Report to NAV 2013
     // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
     // NPR5.49/BHR /20190115  CASE 341969 Corrections as per OMA Guidelines
+    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Inventory - flow.rdlc';
 

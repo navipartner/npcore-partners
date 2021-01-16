@@ -11,6 +11,7 @@ page 6014483 "NPR Turnover Stats"
     // NPR5.53/ALPO/20191024 CASE 371955 Rounding related fields moved to POS Posting Profiles
     // NPR5.55/YAHA/20200717 CASE 414769 Adding Date Filter
 
+    UsageCategory = None;
     Caption = 'Turnover';
     DeleteAllowed = false;
     InsertAllowed = false;

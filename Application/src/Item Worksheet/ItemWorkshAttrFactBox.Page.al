@@ -6,6 +6,7 @@ page 6060052 "NPR Item Worksh. Attr. FactBox"
     Caption = 'NP Attributes FactBox';
     PageType = CardPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Item Worksheet Line";
 
     layout

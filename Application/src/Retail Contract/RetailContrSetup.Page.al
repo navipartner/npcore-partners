@@ -6,6 +6,7 @@ page 6014517 "NPR Retail Contr. Setup"
     Caption = 'Retail Contract Setup';
     SourceTable = "NPR Retail Contr. Setup";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

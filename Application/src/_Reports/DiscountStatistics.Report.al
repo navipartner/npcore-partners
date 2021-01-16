@@ -5,6 +5,7 @@ report 6014402 "NPR Discount Statistics"
 
     Caption = 'Discount Statistics';
     UsageCategory = ReportsAndAnalysis;
+    ApplicationArea = All;
     UseSystemPrinter = true;
 
     dataset

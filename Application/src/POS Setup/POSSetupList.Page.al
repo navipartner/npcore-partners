@@ -7,6 +7,7 @@ page 6150738 "NPR POS Setup List"
     CardPageID = "NPR POS Setup";
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR POS Setup";
 
     layout

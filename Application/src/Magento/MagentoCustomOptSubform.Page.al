@@ -9,6 +9,7 @@ page 6151427 "NPR Magento Custom Opt.Subform"
     Caption = 'Magento Custom Option Subform';
     PageType = CardPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Magento Custom Optn. Value";
 
     layout

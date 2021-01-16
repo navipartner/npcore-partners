@@ -1,5 +1,6 @@
 page 6060145 "NPR MM Member Info Cap. Camera"
 {
+    UsageCategory = None;
     Caption = 'Member Info Capture Camera';
     SourceTable = "NPR MM Member Info Capture";
 

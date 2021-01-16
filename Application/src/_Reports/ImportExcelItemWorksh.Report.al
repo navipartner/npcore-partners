@@ -25,6 +25,7 @@ report 6060042 "NPR Import Excel Item Worksh."
     // NPR5.49/BHR /20190213 CASE 343119 Correct report as per OMA standards
     // NPR5.55/ALST/20200521 CASE 402502 added event publisher after item worksheer line is created from excel
 
+    UsageCategory = None;
     Caption = 'Import Excel Item Worksheet';
     ProcessingOnly = true;
 

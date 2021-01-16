@@ -9,6 +9,7 @@ page 6059976 "NPR Variant per Location"
     ModifyAllowed = false;
     PageType = Document;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "Inventory Buffer";
 
     layout

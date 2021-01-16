@@ -5,6 +5,7 @@ page 6151211 "NPR NpCs Arch. Doc. List"
     PageType = List;
     SourceTable = "NPR NpCs Arch. Document";
     UsageCategory = History;
+    ApplicationArea = All;
 
     layout
     {

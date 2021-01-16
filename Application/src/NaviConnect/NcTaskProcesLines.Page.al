@@ -8,6 +8,7 @@ page 6151506 "NPR Nc Task Proces. Lines"
     DelayedInsert = true;
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Nc Task Proces. Line";
 
     layout

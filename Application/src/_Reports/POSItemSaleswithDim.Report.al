@@ -9,6 +9,7 @@ report 6014441 "NPR POS Item Sales with Dim."
 
     Caption = 'POS Item Sales with Dimensions';
     UsageCategory = ReportsAndAnalysis;
+    ApplicationArea = All;
 
     dataset
     {

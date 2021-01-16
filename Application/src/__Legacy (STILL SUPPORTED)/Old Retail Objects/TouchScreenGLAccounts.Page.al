@@ -8,6 +8,7 @@ page 6014527 "NPR TouchScreen: G/L Accounts"
     ModifyAllowed = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "G/L Account";
     SourceTableView = SORTING("Search Name")
                       ORDER(Ascending)

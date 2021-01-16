@@ -3,6 +3,7 @@ page 6014437 "NPR Sale POS: Saved Sale Line"
     Caption = 'Saved Sales Lines';
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Sale Line POS";
 
     layout

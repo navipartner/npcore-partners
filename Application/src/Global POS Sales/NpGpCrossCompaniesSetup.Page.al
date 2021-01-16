@@ -4,6 +4,7 @@ page 6151175 "NPR NpGp Cross Companies Setup"
     PageType = List;
     SourceTable = "NPR NpGp Cross Company Setup";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

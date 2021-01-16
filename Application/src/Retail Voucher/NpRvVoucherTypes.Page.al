@@ -6,6 +6,7 @@ page 6151013 "NPR NpRv Voucher Types"
     PageType = List;
     SourceTable = "NPR NpRv Voucher Type";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

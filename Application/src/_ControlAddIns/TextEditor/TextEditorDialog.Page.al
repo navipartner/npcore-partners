@@ -3,6 +3,7 @@ page 6151450 "NPR Text Editor Dialog"
     Caption = 'Text Editor Dialog';
     PageType = Card;
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

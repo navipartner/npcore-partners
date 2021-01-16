@@ -10,6 +10,7 @@ report 6014421 "NPR POS Menu Buttons/Actions"
     Caption = 'NPR POS Menu Buttons/Actions';
     PreviewMode = PrintLayout;
     UsageCategory = ReportsAndAnalysis;
+    ApplicationArea = All;
 
     dataset
     {

@@ -6,6 +6,7 @@ page 6184487 "NPR Pepper Card Type Group"
     PageType = List;
     SourceTable = "NPR Pepper Card Type Group";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

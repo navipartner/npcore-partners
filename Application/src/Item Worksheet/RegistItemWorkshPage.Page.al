@@ -12,6 +12,7 @@ page 6060047 "NPR Regist. Item Worksh. Page"
     ModifyAllowed = false;
     PageType = Worksheet;
     UsageCategory = Administration;
+    ApplicationArea = All;
     PopulateAllFields = true;
     SaveValues = true;
     SourceTable = "NPR Regist. Item Worksh Line";

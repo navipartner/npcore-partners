@@ -3,6 +3,7 @@ report 6059900 "NPR Analyse Task Queue Usg."
     // TQ1.25/JDH/20150504 CASE ?????? versioned for release     g
     // TQ1.28/RMT/20150825 CASE 185346 Updated by TR and included in release
     // TQ1.32/TJ /20180319 CASE 307717 Replaced hardcoded dates with DMY2DATE structure
+    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Analyse Task Queue Usage.rdlc';
 

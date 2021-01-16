@@ -5,6 +5,7 @@ page 6014560 "NPR RP Template Designer"
     DeleteAllowed = false;
     PageType = Document;
     UsageCategory = Administration;
+    ApplicationArea = All;
     PromotedActionCategories = 'New,Process,Prints,Data';
     SourceTable = "NPR RP Template Header";
 

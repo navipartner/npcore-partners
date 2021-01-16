@@ -4,6 +4,7 @@ page 6060146 "NPR MM Foreign Members. Setup"
     Caption = 'Foreign Membership Setup';
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR MM Foreign Members. Setup";
 
     layout

@@ -10,6 +10,7 @@ page 6014407 "NPR Discount Priority List"
     SourceTable = "NPR Discount Priority";
     SourceTableView = SORTING(Priority);
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

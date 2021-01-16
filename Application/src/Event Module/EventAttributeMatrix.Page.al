@@ -10,6 +10,7 @@ page 6060155 "NPR Event Attribute Matrix"
     InsertAllowed = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Event Attr. Row Value";
 
     layout

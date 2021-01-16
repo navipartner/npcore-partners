@@ -5,6 +5,7 @@ page 6150638 "NPR POS Posting Profiles"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR POS Posting Profile";
 
     layout

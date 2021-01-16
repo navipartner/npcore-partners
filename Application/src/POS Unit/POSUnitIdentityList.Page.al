@@ -7,6 +7,7 @@ page 6150715 "NPR POS Unit Identity List"
     PageType = ListPlus;
     SourceTable = "NPR POS Unit Identity";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

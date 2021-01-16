@@ -7,6 +7,7 @@ page 6184851 "NPR FR Audit No. Series"
     DelayedInsert = true;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR FR Audit No. Series";
 
     layout

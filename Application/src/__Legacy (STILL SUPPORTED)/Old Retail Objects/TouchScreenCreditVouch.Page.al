@@ -17,6 +17,7 @@ page 6014533 "NPR TouchScreen: Credit Vouch."
     ModifyAllowed = false;
     PageType = ListPlus;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Credit Voucher";
 
     layout

@@ -21,6 +21,7 @@ page 6151416 "NPR Magento Categories"
     SourceTable = "NPR Magento Category";
     SourceTableView = SORTING(Path);
     UsageCategory = Lists;
+    ApplicationArea = All;
 
     layout
     {

@@ -10,6 +10,7 @@ page 6060041 "NPR Item Worksheets"
     PageType = List;
     SourceTable = "NPR Item Worksheet";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

@@ -5,6 +5,7 @@ page 6151120 "NPR GDPR Setup"
     Caption = 'GDPR Setup';
     PageType = Card;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR GDPR Setup";
 
     layout

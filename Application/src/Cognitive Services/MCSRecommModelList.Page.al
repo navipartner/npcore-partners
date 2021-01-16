@@ -7,6 +7,7 @@ page 6060081 "NPR MCS Recomm. Model List"
     PageType = List;
     SourceTable = "NPR MCS Recomm. Model";
     UsageCategory = Lists;
+    ApplicationArea = All;
 
     layout
     {

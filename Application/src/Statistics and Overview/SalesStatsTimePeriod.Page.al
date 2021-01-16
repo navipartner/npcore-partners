@@ -6,6 +6,7 @@ page 6014591 "NPR Sales Stats Time Period"
     Caption = 'Sales Statistics by Date Time';
     PageType = Card;
     UsageCategory = ReportsAndAnalysis;
+    ApplicationArea = All;
 
     layout
     {

@@ -6,6 +6,7 @@ page 6151436 "NPR Magento Item Attr."
     // MAG1.21/MHA/20151120  CASE 227734 Field 300 Enabled deleted and function SetVisible() deleted [MAG1.04]
     // MAG2.00/MHA/20160525  CASE 242557 Magento Integration
 
+    UsageCategory = None;
     AutoSplitKey = true;
     Caption = 'Item Attributes';
     DeleteAllowed = false;

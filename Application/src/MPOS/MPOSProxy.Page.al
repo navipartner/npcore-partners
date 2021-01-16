@@ -4,6 +4,7 @@ page 6059965 "NPR MPOS Proxy"
     // NPR5.33/NPKNAV/20170630  CASE 267203 Transport NPR5.33 - 30 June 2017
     // NPR5.34/CLVA/20170703 CASE 280444 Upgrading MPOS functionality to transcendence
 
+    UsageCategory = None;
     Caption = ' ';
     DeleteAllowed = false;
     Editable = false;

@@ -8,6 +8,7 @@ page 6060062 "NPR Item Category Mapping"
     PageType = List;
     SourceTable = "NPR Item Category Mapping";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

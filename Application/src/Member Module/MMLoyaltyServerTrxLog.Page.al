@@ -4,6 +4,7 @@ page 6151161 "NPR MM Loyalty Server Trx Log"
     Caption = 'Loyalty Server Trans. Log';
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR MM Loy. LedgerEntry (Srvr)";
 
     layout

@@ -12,6 +12,7 @@ report 6014443 "NPR Period Discount Stat."
     Caption = 'Period Discount Statistics';
     PreviewMode = PrintLayout;
     UsageCategory = ReportsAndAnalysis;
+    ApplicationArea = All;
 
     dataset
     {

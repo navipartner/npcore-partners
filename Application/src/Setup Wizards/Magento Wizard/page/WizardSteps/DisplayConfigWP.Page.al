@@ -4,6 +4,7 @@ page 6014617 "NPR Display Config WP"
     DelayedInsert = true;
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Magento Display Config";
     SourceTableTemporary = true;
 

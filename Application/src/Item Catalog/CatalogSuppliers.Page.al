@@ -7,6 +7,7 @@ page 6060061 "NPR Catalog Suppliers"
     PageType = List;
     SourceTable = "NPR Catalog Supplier";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

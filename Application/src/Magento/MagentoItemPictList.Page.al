@@ -16,6 +16,7 @@ page 6151413 "NPR Magento Item Pict. List"
     InsertAllowed = false;
     PageType = ListPlus;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "Item Variant";
     SourceTableTemporary = true;
 

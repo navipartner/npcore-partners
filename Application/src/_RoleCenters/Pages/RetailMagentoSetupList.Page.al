@@ -3,6 +3,7 @@ page 6151242 "NPR Retail Magento Setup List"
 {
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Magento Setup";
 
     layout

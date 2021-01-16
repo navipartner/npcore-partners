@@ -7,6 +7,7 @@ page 6059792 "NPR E-mail Field List"
     ModifyAllowed = false;
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     RefreshOnActivate = true;
     ShowFilter = false;
     SourceTable = "Field";

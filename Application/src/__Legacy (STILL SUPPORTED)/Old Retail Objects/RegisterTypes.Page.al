@@ -2,6 +2,7 @@ page 6014575 "NPR Register Types"
 {
     // NPR5.30/TJ  /20170215 CASE 265504 Changed page ENU caption
 
+    UsageCategory = None;
     Caption = 'Cash Register Types';
     SourceTable = "NPR Register Types";
 

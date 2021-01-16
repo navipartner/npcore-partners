@@ -8,6 +8,7 @@ page 6151523 "NPR Nc Endpoint FTP Card"
     InsertAllowed = false;
     PageType = Card;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Nc Endpoint FTP";
 
     layout

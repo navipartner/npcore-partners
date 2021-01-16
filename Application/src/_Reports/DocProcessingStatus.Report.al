@@ -1,6 +1,7 @@
 report 6014463 "NPR Doc. Processing Status"
 {
     // NPR5.39/THRO/20180222 CASE 302597 Report created
+    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Document Processing Status.rdlc';
 

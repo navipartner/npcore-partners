@@ -6,6 +6,7 @@ page 6059956 "NPR MCS Person Group Setup"
     PageType = List;
     SourceTable = "NPR MCS Person Groups Setup";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

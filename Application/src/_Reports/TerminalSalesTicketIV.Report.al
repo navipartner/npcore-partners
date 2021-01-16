@@ -3,6 +3,7 @@ report 6060105 "NPR Terminal Sales Ticket IV"
     // //NPR7.000.000  LS, 05-12-12, CASE150656
     // NPR5.36/TJ /20170927 CASE 286283 Renamed variables with danish specific letters into english letters
     // NPR5.49/BHR /20190115  CASE 341969 Corrections as per OMA Guidelines
+    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Terminal Sales Ticket IV.rdlc';
 

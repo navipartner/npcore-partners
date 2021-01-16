@@ -1,5 +1,6 @@
 report 6014663 "NPR Retail Calc. Inv."
 {
+    UsageCategory = None;
     Caption = 'Retail Calculate Inventory';
     ProcessingOnly = true;
 

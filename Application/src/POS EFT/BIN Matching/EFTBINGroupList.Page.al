@@ -11,6 +11,7 @@ page 6184511 "NPR EFT BIN Group List"
     PageType = List;
     SourceTable = "NPR EFT BIN Group";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

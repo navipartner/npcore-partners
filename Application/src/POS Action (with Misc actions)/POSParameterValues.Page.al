@@ -12,6 +12,7 @@ page 6150705 "NPR POS Parameter Values"
     InsertAllowed = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR POS Parameter Value";
 
     layout

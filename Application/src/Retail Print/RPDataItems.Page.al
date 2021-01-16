@@ -8,6 +8,7 @@ page 6014561 "NPR RP Data Items"
     Caption = 'Data Items';
     PageType = Worksheet;
     UsageCategory = Administration;
+    ApplicationArea = All;
     ShowFilter = false;
     SourceTable = "NPR RP Data Items";
 

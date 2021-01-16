@@ -7,6 +7,7 @@ page 6150746 "NPR Unfinished POS Sale"
     InstructionalText = 'There is an unfinished sale, do you want to resume it?';
     PageType = ConfirmationDialog;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Sale POS";
 
     layout

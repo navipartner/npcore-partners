@@ -10,6 +10,7 @@ page 6151560 "NPR NpXml Templ. Trigger Links"
     DelayedInsert = true;
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR NpXml Templ.Trigger Link";
 
     layout

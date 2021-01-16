@@ -4,6 +4,7 @@ report 6060126 "NPR TM Admission List"
     // #334163/JDH /20181109 CASE 334163 Added Caption to object
     // TM1.39/NPKNAV/20190125  CASE 343941 Transport TM1.39 - 25 January 2019
     // TM1.42/TSA /20190610 CASE 357991 Removed PAGENO field for AL convert
+    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/TM Admission List.rdlc';
 

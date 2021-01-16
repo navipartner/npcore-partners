@@ -4,6 +4,7 @@ report 6014427 "NPR Turnover Rate"
     // NPR5.38/JLK /20180124  CASE 300892 Removed AL Error on obsolite property CurrReport_PAGENO
     // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
     // NPR5.49/BHR /20190207  CASE 343119 Correct Report as per OMA
+    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Turnover Rate.rdlc';
 

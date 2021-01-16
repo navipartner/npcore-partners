@@ -7,6 +7,7 @@ page 6060152 "NPR Event List"
     SourceTableView = WHERE("NPR Event" = CONST(true));
     PromotedActionCategories = 'New,Process,Report,Navigate,Job';
     UsageCategory = Lists;
+    ApplicationArea = All;
     InsertAllowed = false;
     ModifyAllowed = false;
 

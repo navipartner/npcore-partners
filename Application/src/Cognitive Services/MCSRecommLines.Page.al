@@ -6,6 +6,7 @@ page 6060085 "NPR MCS Recomm. Lines"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR MCS Recommendations Line";
 
     layout

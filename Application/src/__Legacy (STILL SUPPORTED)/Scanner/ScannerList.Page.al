@@ -6,6 +6,7 @@ page 6014537 "NPR Scanner - List"
     PageType = List;
     SourceTable = "NPR Scanner - Setup";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

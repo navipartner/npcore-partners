@@ -5,6 +5,7 @@ page 6151571 "NPR AF Test Objects"
     Caption = 'AF Test Objects';
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR AF Test Objects";
 
     layout

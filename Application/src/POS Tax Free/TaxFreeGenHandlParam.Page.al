@@ -9,6 +9,7 @@ page 6014646 "NPR Tax Free Gen. Handl. Param"
     InsertAllowed = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Tax Free Handler Param.";
     SourceTableTemporary = true;
 

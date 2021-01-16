@@ -5,6 +5,7 @@ page 6151336 "NPR Retail Admin Act - Memb"
     Caption = 'NP Retail - Members';
     PageType = CardPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     RefreshOnActivate = true;
     SourceTable = "NPR Retail Admin Cue";
 

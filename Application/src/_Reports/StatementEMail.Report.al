@@ -19,6 +19,7 @@ report 6014550 "NPR Statement E-Mail"
     Caption = 'Statement - Paper/E-Mail';
     ProcessingOnly = true;
     UsageCategory = ReportsAndAnalysis;
+    ApplicationArea = All;
     UseRequestPage = false;
 
     dataset

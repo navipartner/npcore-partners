@@ -7,6 +7,7 @@ page 6151486 "NPR M2 Value Buffer List"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     PopulateAllFields = true;
     SourceTable = "NPR M2 Value Buffer";
     SourceTableTemporary = true;

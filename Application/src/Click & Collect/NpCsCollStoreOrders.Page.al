@@ -10,6 +10,7 @@ page 6151205 "NPR NpCs Coll. Store Orders"
     SourceTableView = WHERE(Type = CONST("Collect in Store"),
                             "Document Type" = FILTER(Order | "Posted Invoice"));
     UsageCategory = Lists;
+    ApplicationArea = All;
 
     layout
     {

@@ -2,6 +2,7 @@ report 6014510 "NPR Purch Return Order"
 {
     // NPR5.38/BHR/20171122 Copy of report 6641
     //                      Added Vendor Item NO
+    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Purch Return Order NP.rdlc';
 

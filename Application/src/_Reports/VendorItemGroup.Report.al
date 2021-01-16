@@ -22,6 +22,7 @@ report 6014435 "NPR Vendor/Item Group"
 
     Caption = 'Vendor/Item Group';
     UsageCategory = ReportsAndAnalysis;
+    ApplicationArea = All;
 
     dataset
     {

@@ -4,6 +4,7 @@ page 6151011 "NPR NpRv Voucher Modules"
     PageType = List;
     SourceTable = "NPR NpRv Voucher Module";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

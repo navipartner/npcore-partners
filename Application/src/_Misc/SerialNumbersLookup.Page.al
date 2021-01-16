@@ -4,6 +4,7 @@ page 6014498 "NPR Serial Numbers Lookup"
     Editable = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "Item Ledger Entry";
 
     layout

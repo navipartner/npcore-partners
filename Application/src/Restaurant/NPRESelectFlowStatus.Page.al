@@ -14,6 +14,7 @@ page 6150633 "NPR NPRE Select Flow Status"
     SourceTable = "NPR NPRE Flow Status";
     SourceTableView = SORTING("Status Object", "Flow Order");
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

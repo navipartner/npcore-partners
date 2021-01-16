@@ -36,6 +36,7 @@ report 6060108 "NPR Balancing Ticket IV"
     // NPR5.39/JC /20171206 CASE Issue with Danish kroner text - set to blank _
     // NPR5.39/JLK /20180219 CASE 305283 Corrected Label Payments_Lbl
     // NPR5.49/BHR /20190115  CASE 341969 Corrections as per OMA Guidelines
+    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Balancing Ticket IV.rdlc';
 

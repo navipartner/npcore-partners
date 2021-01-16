@@ -1,6 +1,7 @@
 report 6150614 "NPR Posting Overview POS"
 {
     // NPR5.40/JLK /20180314 CASE 307437 Object created
+    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Posting Overview POS.rdlc';
 

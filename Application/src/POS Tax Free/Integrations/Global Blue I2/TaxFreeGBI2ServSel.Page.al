@@ -11,6 +11,7 @@ page 6059948 "NPR Tax Free GB I2 Serv. Sel."
     ModifyAllowed = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Tax Free GB I2 Service";
     SourceTableTemporary = true;
 

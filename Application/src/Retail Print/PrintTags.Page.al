@@ -5,6 +5,7 @@ page 6014417 "NPR Print Tags"
     Caption = 'Print Tags';
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Print Tags";
 
     layout

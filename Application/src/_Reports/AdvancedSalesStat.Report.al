@@ -4,6 +4,7 @@ report 6014490 "NPR Advanced Sales Stat."
     // NPR5.38/JLK /20180124  CASE 300892 Removed AL Error on obsolite property CurrReport_PAGENO
     // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
     // NPR5.55/BHR/20200728  CASE 361515 remove Key reference not used in AL
+    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Advanced Sales Statistics.rdlc';
 

@@ -7,6 +7,7 @@ page 6060129 "NPR MM Members. Ledger Entries"
     ModifyAllowed = false;
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR MM Membership Entry";
 
     layout

@@ -5,6 +5,7 @@ page 6150716 "NPR POS Unit Identity Card"
     Caption = 'POS Unit Identity Card';
     PageType = Card;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR POS Unit Identity";
 
     layout

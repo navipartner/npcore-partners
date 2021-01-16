@@ -15,6 +15,7 @@ page 6059814 "NPR Retail Top 10 Customers"
     Editable = true;
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = Customer;
     SourceTableTemporary = true;
     SourceTableView = SORTING("Search Name")

@@ -9,6 +9,7 @@ page 6151586 "NPR Event Exch. Int. E-Mails"
     SourceTable = "NPR Event Exch. Int. E-Mail";
     SourceTableView = SORTING("Search E-Mail");
     UsageCategory = Lists;
+    ApplicationArea = All;
 
     layout
     {

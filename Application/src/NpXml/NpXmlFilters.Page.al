@@ -10,6 +10,7 @@ page 6151556 "NPR NpXml Filters"
     DelayedInsert = true;
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR NpXml Filter";
 
     layout

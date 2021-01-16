@@ -6,6 +6,7 @@ page 6151094 "NPR Nc RapidConnect Trg.Fields"
     DelayedInsert = true;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Nc RapidConnect Trig.Field";
 
     layout

@@ -5,6 +5,7 @@ page 6060141 "NPR MM Membership Alter."
     PageType = List;
     SourceTable = "NPR MM Members. Alter. Setup";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

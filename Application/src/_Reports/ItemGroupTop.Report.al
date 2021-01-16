@@ -13,6 +13,7 @@ report 6014420 "NPR Item Group Top"
 
     Caption = 'Item Group Top';
     UsageCategory = ReportsAndAnalysis;
+    ApplicationArea = All;
 
     dataset
     {

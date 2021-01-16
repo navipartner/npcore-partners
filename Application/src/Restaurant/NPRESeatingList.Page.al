@@ -12,6 +12,7 @@ page 6150664 "NPR NPRE Seating List"
     PageType = List;
     SourceTable = "NPR NPRE Seating";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

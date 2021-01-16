@@ -6,6 +6,7 @@ page 6151122 "NPR GDPR Agreement Versions"
     DelayedInsert = true;
     PageType = ListPart;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR GDPR Agreement Version";
 
     layout

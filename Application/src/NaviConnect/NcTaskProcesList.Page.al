@@ -10,6 +10,7 @@ page 6151508 "NPR Nc Task Proces. List"
     PageType = List;
     SourceTable = "NPR Nc Task Processor";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

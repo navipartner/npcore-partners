@@ -8,6 +8,7 @@ page 6150680 "NPR NPRE Print/Prod. Categ."
     PageType = List;
     SourceTable = "NPR NPRE Print/Prod. Cat.";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

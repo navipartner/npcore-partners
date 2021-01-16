@@ -9,6 +9,7 @@ report 6014449 "NPR Vendor trx by Item group"
 
     Caption = 'Vendor Trn. By Item Group';
     UsageCategory = ReportsAndAnalysis;
+    ApplicationArea = All;
     UseSystemPrinter = true;
 
     dataset

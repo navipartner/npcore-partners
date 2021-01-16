@@ -5,6 +5,7 @@ page 6059967 "NPR MPOS Nets Trans. Card"
     // NPR5.45/CLVA/20180828 CASE 324506 Added receipt data to page
     // NPR5.51/CLVA/20190819 CASE 364011 Added field "EFT Transaction Entry No."
 
+    UsageCategory = None;
     Caption = 'MPOS Nets Transactions Card';
     SourceTable = "NPR MPOS Nets Transactions";
 

@@ -4,6 +4,7 @@ page 6059794 "NPR E-mail Templ. Filters"
     Caption = 'E-mail Template Filters';
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR E-mail Template Filter";
 
     layout

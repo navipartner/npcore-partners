@@ -4,6 +4,7 @@ page 6150706 "NPR POS Action Workflow"
     Caption = 'POS Action Workflow';
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR POS Action Workflow";
 
     layout

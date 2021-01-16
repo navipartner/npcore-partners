@@ -5,6 +5,7 @@ page 6151581 "NPR Event Attr. Temp. Filters"
     Caption = 'Event Attribute Temp. Filters';
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Event Attr. Temp. Filter";
 
     layout

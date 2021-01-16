@@ -7,6 +7,7 @@ page 6150740 "NPR POS Admin. Template Card"
     DataCaptionFields = Id, Name;
     PageType = Card;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR POS Admin. Template";
 
     layout

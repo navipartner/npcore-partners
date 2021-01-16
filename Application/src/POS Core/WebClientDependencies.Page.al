@@ -4,6 +4,7 @@ page 6014659 "NPR Web Client Dependencies"
     PageType = List;
     SourceTable = "NPR Web Client Dependency";
     UsageCategory = Administration;
+    ApplicationArea = All;
 
     layout
     {

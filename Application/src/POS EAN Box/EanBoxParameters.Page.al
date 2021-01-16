@@ -8,6 +8,7 @@ page 6060099 "NPR Ean Box Parameters"
     InsertAllowed = false;
     PageType = List;
     UsageCategory = Administration;
+    ApplicationArea = All;
     SourceTable = "NPR Ean Box Parameter";
 
     layout
