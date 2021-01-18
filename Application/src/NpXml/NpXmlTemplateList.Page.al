@@ -160,6 +160,14 @@ page 6151552 "NPR NpXml Template List"
                     NpXmlTemplateMgt.ImportNpXmlTemplate();
                 end;
             }
+            action("Import Template From Blob Storage")
+            {
+                Caption = 'Import Template From Blob Storage';
+                Image = ImportDatabase;
+                ApplicationArea = All;
+                RunObject = page "NPR NpXml Templ. Dep. From Az.";
+                ToolTip = 'Executes the Import Template action from Azure Blob storage';
+            }
             action("Delete Selected Templates")
             {
                 Caption = 'Delete Selected Templates';

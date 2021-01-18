@@ -483,6 +483,16 @@ page 6151551 "NPR NpXml Template Card"
                     NpXmlTemplateMgt.ImportNpXmlTemplate();
                 end;
             }
+
+            action("Import Template From Blob Storage")
+            {
+                Caption = 'Import Template From Blob Storage';
+                Image = ImportDatabase;
+                ApplicationArea = All;
+                RunObject = page "NPR NpXml Templ. Dep. From Az.";
+                ToolTip = 'Executes the Import Template action from Azure Blob storage';
+            }
+
             action("Run Batch")
             {
                 Caption = 'Run Batch';
