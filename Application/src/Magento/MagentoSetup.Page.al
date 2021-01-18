@@ -614,21 +614,7 @@ page 6151401 "NPR Magento Setup"
                 {
                     Caption = 'Api Integration';
                     Image = SwitchCompanies;
-                    action("Setup NpXml Templates")
-                    {
-                        Caption = 'Setup NpXml Templates';
-                        Image = Setup;
-                        ApplicationArea = All;
-                        ToolTip = 'Executes the Setup NpXml Templates action';
 
-                        trigger OnAction()
-                        var
-                            MagentoSetupMgt: Codeunit "NPR Magento Setup Mgt.";
-                        begin
-                            CurrPage.Update(true);
-                            MagentoSetupMgt.TriggerSetupNpXmlTemplates();
-                        end;
-                    }
                     action("Setup Magento Credentials")
                     {
                         Caption = 'Setup Magento Api Credentials';
