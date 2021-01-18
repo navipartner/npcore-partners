@@ -33,6 +33,7 @@ page 6059963 "NPR MPOS QR Code FactBox"
                 ShortCutKey = 'Return';
                 ApplicationArea = All;
                 ToolTip = 'Executes the Save To Disk action';
+                Image = Save; 
 
                 trigger OnAction()
                 var

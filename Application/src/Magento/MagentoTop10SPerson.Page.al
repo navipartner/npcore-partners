@@ -76,7 +76,8 @@ page 6151485 "NPR Magento Top 10 S.Person"
                 {
                     Caption = 'Day';
                     ApplicationArea = All;
-                    ToolTip = 'Executes the Day action';
+                    ToolTip = 'Filters by day';
+                    Image = Filter; 
 
                     trigger OnAction()
                     begin
@@ -88,7 +89,8 @@ page 6151485 "NPR Magento Top 10 S.Person"
                 {
                     Caption = 'Week';
                     ApplicationArea = All;
-                    ToolTip = 'Executes the Week action';
+                    ToolTip = 'Filters by week';
+                    Image = Filter; 
 
                     trigger OnAction()
                     begin
@@ -100,7 +102,8 @@ page 6151485 "NPR Magento Top 10 S.Person"
                 {
                     Caption = 'Month';
                     ApplicationArea = All;
-                    ToolTip = 'Executes the Month action';
+                    ToolTip = 'Filters by month';
+                    Image = Filter; 
 
                     trigger OnAction()
                     begin
@@ -112,7 +115,8 @@ page 6151485 "NPR Magento Top 10 S.Person"
                 {
                     Caption = 'Quarter';
                     ApplicationArea = All;
-                    ToolTip = 'Executes the Quarter action';
+                    ToolTip = 'Filters by quarter';
+                    Image = Filter; 
 
                     trigger OnAction()
                     begin
@@ -124,7 +128,8 @@ page 6151485 "NPR Magento Top 10 S.Person"
                 {
                     Caption = 'Year';
                     ApplicationArea = All;
-                    ToolTip = 'Executes the Year action';
+                    ToolTip = 'Filters by year';
+                    Image = Filter; 
 
                     trigger OnAction()
                     begin

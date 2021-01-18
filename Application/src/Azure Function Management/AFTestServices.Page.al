@@ -129,6 +129,7 @@ page 6151572 "NPR AF Test Services"
                     RunObject = Page "NPR AF Notification Hub List";
                     ApplicationArea = All;
                     ToolTip = 'Executes the Notifications action';
+                    Image = View;
                 }
             }
             group(ActionGroup6014415)

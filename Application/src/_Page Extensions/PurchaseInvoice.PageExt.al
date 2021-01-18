@@ -37,6 +37,7 @@ pageextension 6014454 "NPR Purchase Invoice" extends "Purchase Invoice"
                 Caption = 'Show Imported File';
                 ApplicationArea = All;
                 ToolTip = 'Executes the Show Imported File action';
+                Image = View; 
 
                 trigger OnAction()
                 var
