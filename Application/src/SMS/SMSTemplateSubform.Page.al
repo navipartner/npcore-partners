@@ -40,6 +40,7 @@ page 6059942 "NPR SMS Template Subform"
                 Enabled = ReportLinkEnabled;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Insert Report Link action';
+                Image = Insert; 
 
                 trigger OnAction()
                 begin

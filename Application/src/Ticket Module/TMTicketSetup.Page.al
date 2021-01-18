@@ -251,6 +251,7 @@ page 6060079 "NPR TM Ticket Setup"
                 Ellipsis = true;
                 RunObject = Page "NPR Ticket App. Area Setup";
                 ToolTip = 'Executes the Ticket Application Area action';
+                Image = SetupList;
             }
 
         }

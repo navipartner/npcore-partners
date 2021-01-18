@@ -105,6 +105,7 @@ page 6151222 "NPR PrintNode Printer Settings"
             {
                 ApplicationArea = All;
                 ToolTip = 'Executes the ActionName action';
+                Image = Action; 
 
                 trigger OnAction()
                 begin

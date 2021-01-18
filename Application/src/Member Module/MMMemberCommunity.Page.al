@@ -177,6 +177,7 @@ page 6060132 "NPR MM Member Community"
                 Caption = 'Create Demo Data';
                 ApplicationArea = All;
                 ToolTip = 'Executes the Create Demo Data action';
+                Image = Action; 
 
                 trigger OnAction()
                 var
