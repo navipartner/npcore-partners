@@ -248,6 +248,7 @@ page 6151070 "NPR Retail Repl. Demand Lines"
                 Caption = 'DeConfirm All';
                 ApplicationArea = All;
                 ToolTip = 'Executes the DeConfirm All action';
+                Image = Cancel; 
 
                 trigger OnAction()
                 begin
@@ -260,6 +261,7 @@ page 6151070 "NPR Retail Repl. Demand Lines"
                 Caption = 'Create Retail Campaign Orders';
                 ApplicationArea = All;
                 ToolTip = 'Executes the Create Retail Campaign Orders action';
+                Image = Order; 
 
                 trigger OnAction()
                 var

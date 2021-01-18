@@ -110,6 +110,7 @@ page 6059817 "NPR Retail Top 10 S.person"
                     Caption = 'Day';
                     ApplicationArea = All;
                     ToolTip = 'Executes the Day action';
+                    Image = Filter; 
 
                     trigger OnAction()
                     begin
@@ -122,6 +123,7 @@ page 6059817 "NPR Retail Top 10 S.person"
                     Caption = 'Week';
                     ApplicationArea = All;
                     ToolTip = 'Executes the Week action';
+                    Image = Filter;
 
                     trigger OnAction()
                     begin
@@ -134,6 +136,7 @@ page 6059817 "NPR Retail Top 10 S.person"
                     Caption = 'Month';
                     ApplicationArea = All;
                     ToolTip = 'Executes the Month action';
+                    Image = Filter;
 
                     trigger OnAction()
                     begin
@@ -146,6 +149,7 @@ page 6059817 "NPR Retail Top 10 S.person"
                     Caption = 'Quarter';
                     ApplicationArea = All;
                     ToolTip = 'Executes the Quarter action';
+                    Image = Filter;
 
                     trigger OnAction()
                     begin
@@ -158,6 +162,7 @@ page 6059817 "NPR Retail Top 10 S.person"
                     Caption = 'Year';
                     ApplicationArea = All;
                     ToolTip = 'Executes the Year action';
+                    Image = Filter;
 
                     trigger OnAction()
                     begin

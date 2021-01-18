@@ -48,6 +48,7 @@ page 6151252 "NPR Activities 1"
                 Caption = 'Action Items';
                 ApplicationArea = All;
                 ToolTip = 'Executes the Action Items action';
+                Image = Action; 
             }
         }
     }

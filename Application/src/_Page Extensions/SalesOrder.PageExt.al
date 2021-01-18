@@ -203,6 +203,7 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
                 Caption = 'Consignor Label';
                 ApplicationArea = All;
                 ToolTip = 'Executes the Consignor Label action';
+                Image = Print; 
             }
             action("NPR PrintShippingLabel")
             {
@@ -249,6 +250,7 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
                     ShortCutKey = 'Ctrl+Alt+V';
                     ApplicationArea = All;
                     ToolTip = 'Executes the Variety action';
+                    Image = Edit; 
 
                     trigger OnAction()
                     var

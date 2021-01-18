@@ -290,6 +290,7 @@ page 6150661 "NPR NPRE Waiter Pad Subform"
                 Visible = false;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Change Quantiy action';
+                Image = ChangeTo; 
 
                 trigger OnAction()
                 begin
@@ -302,6 +303,7 @@ page 6150661 "NPR NPRE Waiter Pad Subform"
                 Visible = false;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Delete Line action';
+                Image = DeleteRow; 
 
                 trigger OnAction()
                 begin

@@ -49,7 +49,8 @@ page 6059813 "NPR Retail Sales Chart"
                 {
                     Caption = 'Day';
                     ApplicationArea = All;
-                    ToolTip = 'Executes the Day action';
+                    ToolTip = 'Filter by day';
+                    Image = Filter; 
 
                     trigger OnAction()
                     begin
@@ -62,7 +63,8 @@ page 6059813 "NPR Retail Sales Chart"
                 {
                     Caption = 'Week';
                     ApplicationArea = All;
-                    ToolTip = 'Executes the Week action';
+                    ToolTip = 'Filter by week';
+                    Image = Filter;
 
                     trigger OnAction()
                     begin
@@ -75,7 +77,8 @@ page 6059813 "NPR Retail Sales Chart"
                 {
                     Caption = 'Month';
                     ApplicationArea = All;
-                    ToolTip = 'Executes the Month action';
+                    ToolTip = 'Filter by month';
+                    Image = Filter;
 
                     trigger OnAction()
                     begin
@@ -88,7 +91,8 @@ page 6059813 "NPR Retail Sales Chart"
                 {
                     Caption = 'Quarter';
                     ApplicationArea = All;
-                    ToolTip = 'Executes the Quarter action';
+                    ToolTip = 'Filter by quarter';
+                    Image = Filter;
 
                     trigger OnAction()
                     begin
@@ -101,7 +105,8 @@ page 6059813 "NPR Retail Sales Chart"
                 {
                     Caption = 'Year';
                     ApplicationArea = All;
-                    ToolTip = 'Executes the Year action';
+                    ToolTip = 'Filter by year';
+                    Image = Filter;
 
                     trigger OnAction()
                     begin

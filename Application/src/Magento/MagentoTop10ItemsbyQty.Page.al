@@ -65,8 +65,8 @@ page 6151484 "NPR Magento Top10 Items by Qty"
                 {
                     Caption = 'Day';
                     ApplicationArea = All;
-                    ToolTip = 'Executes the Day action';
-
+                    ToolTip = 'Filters by day';
+                    Image = Filter; 
                     trigger OnAction()
                     begin
                         PeriodType := PeriodType::Day;
@@ -77,7 +77,8 @@ page 6151484 "NPR Magento Top10 Items by Qty"
                 {
                     Caption = 'Week';
                     ApplicationArea = All;
-                    ToolTip = 'Executes the Week action';
+                    ToolTip = 'Filters by week';
+                    Image = Filter; 
 
                     trigger OnAction()
                     begin
@@ -89,7 +90,8 @@ page 6151484 "NPR Magento Top10 Items by Qty"
                 {
                     Caption = 'Month';
                     ApplicationArea = All;
-                    ToolTip = 'Executes the Month action';
+                    ToolTip = 'Filters by month';
+                    Image = Filter; 
 
                     trigger OnAction()
                     begin
@@ -101,7 +103,8 @@ page 6151484 "NPR Magento Top10 Items by Qty"
                 {
                     Caption = 'Quarter';
                     ApplicationArea = All;
-                    ToolTip = 'Executes the Quarter action';
+                    ToolTip = 'Filters by quarter';
+                    Image = Filter; 
 
                     trigger OnAction()
                     begin
@@ -113,7 +116,8 @@ page 6151484 "NPR Magento Top10 Items by Qty"
                 {
                     Caption = 'Year';
                     ApplicationArea = All;
-                    ToolTip = 'Executes the Year action';
+                    ToolTip = 'Filters by year';
+                    Image = Filter; 
 
                     trigger OnAction()
                     begin

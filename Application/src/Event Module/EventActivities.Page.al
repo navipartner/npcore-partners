@@ -25,7 +25,7 @@ page 6060153 "NPR Event Activities"
                         RunObject = Page "NPR Event Card";
                         RunPageMode = Create;
                         ApplicationArea = All;
-                        ToolTip = 'Executes the New Event action';
+                        ToolTip = 'Creates a new event'; 
                     }
                     action("New Customer")
                     {
@@ -33,7 +33,7 @@ page 6060153 "NPR Event Activities"
                         RunObject = Page "Customer Card";
                         RunPageMode = Create;
                         ApplicationArea = All;
-                        ToolTip = 'Executes the New Customer action';
+                        ToolTip = 'Creates a new customer';
                     }
                 }
             }

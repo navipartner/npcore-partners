@@ -70,6 +70,7 @@ page 6059984 "NPR Web Manager Activ."
                 RunPageMode = Create;
                 ApplicationArea = All;
                 ToolTip = 'Executes the New Credit Memo action';
+                Image = New; 
             }
             action("New Purchase Order")
             {
@@ -77,6 +78,7 @@ page 6059984 "NPR Web Manager Activ."
                 RunObject = Page "Purchase Order";
                 ApplicationArea = All;
                 ToolTip = 'Executes the New Purchase Order action';
+                Image = New; 
             }
         }
     }

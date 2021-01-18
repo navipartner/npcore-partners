@@ -14,6 +14,7 @@ pageextension 6014429 "NPR Req. Worksheet" extends "Req. Worksheet"
                 PromotedCategory = Process;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Read from scanner action';
+                Image = Add; 
             }
         }
     }

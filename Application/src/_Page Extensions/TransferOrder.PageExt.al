@@ -49,6 +49,7 @@ pageextension 6014462 "NPR Transfer Order" extends "Transfer Order"
                 PromotedCategory = Process;
                 ApplicationArea = All;
                 ToolTip = 'Executes the &Read from scanner action';
+                Image = Add; 
             }
         }
         addafter(PostAndPrint)

@@ -918,6 +918,7 @@ page 6151240 "NPR Retail: Manager RoleCenter"
                     RunObject = Page "NPR NP Retail Setup";
                     ApplicationArea = All;
                     ToolTip = 'Executes the NP Retail Setup action';
+                    Image = Setup;
                 }
                 action("Retail Setup")
                 {
@@ -925,6 +926,7 @@ page 6151240 "NPR Retail: Manager RoleCenter"
                     RunObject = page "NPR Retail Setup";
                     ApplicationArea = All;
                     ToolTip = 'Executes the Retail Setup action';
+                    Image = Setup; 
                 }
             }
             group(Reports)

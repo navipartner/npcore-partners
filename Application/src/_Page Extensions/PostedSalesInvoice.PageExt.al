@@ -111,6 +111,7 @@ pageextension 6014405 "NPR Posted Sales Invoice" extends "Posted Sales Invoice"
                 Caption = 'Consignor Label';
                 ApplicationArea = All;
                 ToolTip = 'Executes the Consignor Label action';
+                Image = Print; 
             }
         }
     }
