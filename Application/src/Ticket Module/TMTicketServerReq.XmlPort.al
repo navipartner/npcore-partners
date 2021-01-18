@@ -1,12 +1,5 @@
 xmlport 6060123 "NPR TM Ticket Server Req."
 {
-    // TM1.26/NPKNAV/20171122  CASE 285601-01 Transport TM1.26 - 22 November 2017
-    // TM1.35/TSA /20180712 CASE 320783 Added Elements Valid From and Valid To
-    // TM1.35/TSA /20180712 CASE 320783 Changed to XML date / time format
-    // TM1.43/TSA /20191004 CASE 367471 Refactored and reworked message signatures to be able to return fault reason
-    // TM1.45/TSA /20191118 CASE 352050 Assigned the name field with customer name when customer is assigned
-    // TM1.48/TSA /20200623 CASE 399259 Added ticket_name, ticket_description, ticket_full_description
-
     Caption = 'Ticket TicketServer Request';
     Encoding = UTF8;
     FormatEvaluate = Xml;
@@ -184,9 +177,6 @@ xmlport 6060123 "NPR TM Ticket Server Req."
     begin
 
         TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
-        //-TM1.43 [367471]
-        // IF (NOT TicketReservationRequest.FINDSET ()) THEN
-        //  EXIT;
 
         if (not TicketReservationRequest.FindSet()) then begin
             FailureReason := 'Invalid Token.';
@@ -198,11 +188,9 @@ xmlport 6060123 "NPR TM Ticket Server Req."
             FailureReason := 'Ticket Setup."Default Ticket Language" must not be blank.';
             exit(false);
         end;
-        //-TM1.48 [399259]
-        language := TicketSetup."Default Ticket Language";
 
+        language := TicketSetup."Default Ticket Language";
         GeneralLedgerSetup.Get();
-        //+TM1.48 [399259]
 
         repeat
             TmpTicketReservationRequest.TransferFields(TicketReservationRequest, true);
@@ -213,13 +201,11 @@ xmlport 6060123 "NPR TM Ticket Server Req."
 
                 repeat
                     TmpTicket.TransferFields(Ticket, true);
-                    //-TM1.43 [367471]
                     TicketType.Get(TmpTicket."Ticket Type Code");
                     if (TicketType."DIY Print Layout Code" = '') then begin
                         FailureReason := StrSubstNo('"DIY Print Layout Code" must not blank for "Ticket Type" %1.', TmpTicket."Ticket Type Code");
                         exit(false);
                     end;
-                    //+TM1.43 [367471]
 
                     if (TmpTicket.Insert()) then begin
                         Ticket."Printed Date" := Today;
@@ -231,9 +217,7 @@ xmlport 6060123 "NPR TM Ticket Server Req."
             end;
         until (TicketReservationRequest.Next() = 0);
 
-        //-TM1.43 [367471]
         exit(true);
-        //+TM1.43 [367471]
     end;
 
     local procedure GetDescription(CurrentTicket: Record "NPR TM Ticket"; AdmissionCode: Code[20]; FieldNo: Integer) Description: Text
@@ -248,7 +232,6 @@ xmlport 6060123 "NPR TM Ticket Server Req."
         InStr: InStream;
     begin
 
-        //-TM1.48 [399259]
         case FieldNo of
             TicketSetup.FieldNo("Ticket Title"):
                 DescriptionSelector := TicketSetup."Ticket Title";
@@ -318,7 +301,6 @@ xmlport 6060123 "NPR TM Ticket Server Req."
         end;
 
         exit('');
-        //+TM1.48 [399259]
     end;
 
     local procedure GetPrice(TmpTicket: Record "NPR TM Ticket" temporary): Text
@@ -326,10 +308,9 @@ xmlport 6060123 "NPR TM Ticket Server Req."
         Item: Record Item;
     begin
 
-        //-TM1.48 [399259]
         Item.Get(TmpTicket."Item No.");
         exit(StrSubstNo('%1 %2', Item."Unit Price", GeneralLedgerSetup."LCY Code"));
-        //+TM1.48 [399259]
+
     end;
 }
 
