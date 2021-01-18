@@ -11,8 +11,6 @@ codeunit 6060113 "NPR TM Ticket DIY Ticket Print"
     // 
     //   Ticket Type Code: developer-test
     // ***
-    // TM1.35/TSA/20180725  CASE 320783 Transport TM1.35 - 25 July 2018
-
 
     trigger OnRun()
     var
@@ -27,11 +25,6 @@ codeunit 6060113 "NPR TM Ticket DIY Ticket Print"
     var
         GEN_NOT_ISSUE: Label 'There was a problem creating the notification entry.';
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="TicketNo"></param>
-    /// <returns></returns>
     procedure CheckPublishTicketUrl(TicketNo: Code[20]): Boolean
     var
         Ticket: Record "NPR TM Ticket";
@@ -96,8 +89,8 @@ codeunit 6060113 "NPR TM Ticket DIY Ticket Print"
 
     procedure GenerateTicketPrint(EntryNo: Integer; MarkTicketAsPrinted: Boolean; var FailReasonText: Text): Boolean
     var
-        TicketRequestXml: DotNet "NPRNetXmlDocument";
-        ServiceResponse: DotNet "NPRNetXmlDocument";
+        TicketRequestXml: XmlDocument;
+        ServiceResponse: XmlDocument;
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         ErrorCode: Code[10];
         ErrorText: Text;
@@ -107,16 +100,23 @@ codeunit 6060113 "NPR TM Ticket DIY Ticket Print"
         if (TicketReservationRequest."DIY Print Order Requested") then
             exit(true);
 
-        if (not CreatTicketPrintOrderXml(TicketRequestXml, TicketReservationRequest."Session Token ID", MarkTicketAsPrinted, FailReasonText)) then
+        if (not CreateTicketPrintOrderXml(TicketRequestXml, TicketReservationRequest."Session Token ID", MarkTicketAsPrinted, FailReasonText)) then begin
+            FailReasonText := GetLastErrorText();
             exit(false);
+        end;
 
-        if (WebServiceApi(FailReasonText, TicketRequestXml, ServiceResponse)) then begin
+
+        if (WebServiceApi(TicketRequestXml, ServiceResponse)) then begin
             FailReasonText := '';
             TicketReservationRequest."DIY Print Order At" := CurrentDateTime;
             TicketReservationRequest."DIY Print Order Requested" := true;
             TicketReservationRequest.Modify();
             exit(true);
         end;
+
+#if DEBUG_TICKET
+        message(GetLastErrorText());
+#endif
 
         // Examine fault code - might have been produced already
         if (WebExceptionResponse(ServiceResponse, ErrorCode, ErrorText)) then begin
@@ -130,6 +130,7 @@ codeunit 6060113 "NPR TM Ticket DIY Ticket Print"
             end;
         end;
 
+        FailReasonText := ErrorText;
         exit(false);
     end;
 
@@ -193,26 +194,36 @@ codeunit 6060113 "NPR TM Ticket DIY Ticket Print"
         exit(true);
     end;
 
-    local procedure WebServiceApi(var ReasonText: Text; var XmlDocIn: DotNet "NPRNetXmlDocument"; var XmlDocOut: DotNet "NPRNetXmlDocument"): Boolean
+    [TryFunction]
+    local procedure WebServiceApi(XmlIn: XmlDocument; var XmlOut: XmlDocument)
     var
+
         TicketSetup: Record "NPR TM Ticket Setup";
-        NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
-        Credential: DotNet NPRNetNetworkCredential;
-        Convert: DotNet NPRNetConvert;
-        B64Credential: Text[200];
-        HttpWebRequest: DotNet NPRNetHttpWebRequest;
-        HttpWebResponse: DotNet NPRNetHttpWebResponse;
-        WebException: DotNet NPRNetWebException;
-        WebInnerException: DotNet NPRNetWebException;
-        Url: Text;
-        ErrorMessage: Text;
+
+        Client: HttpClient;
+        Request: HttpRequestMessage;
+        Response: HttpResponseMessage;
+        RequestHeaders: HttpHeaders;
+        Content: HttpContent;
+        ContentHeaders: HttpHeaders;
+        Base64Convert: Codeunit "Base64 Convert";
+        RequestText: Text;
         ResponseText: Text;
-        Exception: DotNet NPRNetException;
-        StatusCode: Code[10];
-        StatusDescription: Text[50];
-        "---": Integer;
-        UserName: Text;
+        Username: Text;
         Password: Text;
+        B64Credential: Text;
+        Url: Text;
+        RequestMethodTok: Label 'POST', Locked = true;
+        UserAgentTok: Label 'User-Agent', Locked = true;
+        UserAgentTxt: Label 'NP Dynamics Retail / Dynamics 365 Business Central', Locked = true;
+        ContentTypeTok: Label 'Content-Type', Locked = true;
+        ContentTypeTxt: Label 'navision/xml', Locked = true;
+        AuthorizationTok: Label 'Authorization', Locked = true;
+        InvalidConnectStringErr: Label 'The URL is expected to contain user and password such as "http://<username>:<password>@online.cleancash.se:8081/xccsp", but url is: %1';
+        ConnectionErr: Label 'Ticket server connection error. (reason: %1)';
+        UnexpectedResponseCodeErr: Label 'Ticket service did not return with a HTTP 200 return code (return code was: %1)';
+        InvalidXmlErr: Label 'Ticket server did not respond with a valid XML document: (response was %1)';
+        XmlErrorTxt: Label '<response><error><code>%1</code><message>%2 - %3</message></error></response>', Locked = true;
     begin
 
         if (not TicketSetup.Get()) then
@@ -221,165 +232,68 @@ codeunit 6060113 "NPR TM Ticket DIY Ticket Print"
         Url := TicketSetup."Print Server Generator URL";
         UserName := TicketSetup."Print Server Gen. Username";
         Password := TicketSetup."Print Server Gen. Password";
+        B64Credential := Base64Convert.ToBase64(StrSubstNo('%1:%2', UserName, Password));
 
-        ReasonText := '';
-        HttpWebRequest := HttpWebRequest.Create(Url);
+        XmlIn.WriteTo(RequestText);
+        Content.WriteFrom(RequestText);
+        Content.GetHeaders(ContentHeaders);
+        if (ContentHeaders.Contains(ContentTypeTok)) then
+            ContentHeaders.Remove(ContentTypeTok);
+        ContentHeaders.Add(ContentTypeTok, ContentTypeTxt);
 
-        HttpWebRequest.Timeout := 10000;
+        Request.Method := RequestMethodTok;
+        Request.SetRequestUri(Url);
+        Request.Content(Content);
+
+        Request.GetHeaders(RequestHeaders);
+        RequestHeaders.Clear();
+        RequestHeaders.Add(UserAgentTok, UserAgentTxt);
+        RequestHeaders.Add(AuthorizationTok, StrSubstNo('Basic %1', B64Credential));
+
+        Client.Timeout := 10000;
         if (TicketSetup."Timeout (ms)" > 0) then
-            HttpWebRequest.Timeout := TicketSetup."Timeout (ms)";
+            Client.Timeout := TicketSetup."Timeout (ms)";
 
-        HttpWebRequest.KeepAlive(false);
+        if (Client.Send(Request, Response)) then begin
 
-        HttpWebRequest.UseDefaultCredentials(false);
-        B64Credential := ToBase64(StrSubstNo('%1:%2', UserName, Password));
-        HttpWebRequest.Headers.Add('Authorization', StrSubstNo('Basic %1', B64Credential));
+            case Response.HttpStatusCode() of
+                200:
+                    begin
+                        Response.Content.ReadAs(ResponseText);
+                        if (not XmlDocument.ReadFrom(ResponseText, XmlOut)) then
+                            Error(InvalidXmlErr, ResponseText);
+                        exit;
+                    end;
+                403:
+                    begin
+                        // Depending on message in 403 response, it could indicate already created -> success
+                        Response.Content.ReadAs(ResponseText);
+                        if (not XmlDocument.ReadFrom(ResponseText, XmlOut)) then
+                            Error(InvalidXmlErr, ResponseText);
+                        Error(UnexpectedResponseCodeErr, Response.HttpStatusCode)
+                    end;
+                else begin
+                        if (not Response.Content.ReadAs(ResponseText)) then
+                            ResponseText := StrSubstNo(XmlErrorTxt, Response.HttpStatusCode(), RequestText, Url);
+                    end;
+            end
+        end else
+            ResponseText := StrSubstNo(XmlErrorTxt, '990', GetLastErrorText(), Url);
 
-        HttpWebRequest.Method := 'POST';
-        HttpWebRequest.ContentType := 'navision/xml';
+        if (not XmlDocument.ReadFrom(ResponseText, XmlOut)) then
+            Error(InvalidXmlErr, ResponseText);
 
-        NpXmlDomMgt.SetTrustedCertificateValidation(HttpWebRequest);
-
-        if (TrySendWebRequest(XmlDocIn, HttpWebRequest, HttpWebResponse)) then begin
-            TryReadResponseText(HttpWebResponse, ResponseText);
-            XmlDocOut := XmlDocOut.XmlDocument;
-            XmlDocOut.LoadXml(ResponseText);
-            exit(true);
-        end;
-
-        ReasonText := StrSubstNo('Error from WebServiceApi: %1\\%2', Url, GetLastErrorText);
-
-        Exception := GetLastErrorObject();
-
-        if ((Format(GetDotNetType(Exception.GetBaseException()))) <> (Format(GetDotNetType(WebException)))) then
-            Error(Exception.ToString());
-
-        WebException := Exception.GetBaseException();
-        TryReadExceptionResponseText(WebException, StatusCode, StatusDescription, ResponseText);
-
-        XmlDocOut := XmlDocOut.XmlDocument;
-        if (StrLen(ResponseText) > 0) then
-            XmlDocOut.LoadXml(ResponseText);
-
-        if (StrLen(ResponseText) = 0) then
-            XmlDocOut.LoadXml(StrSubstNo(
-              '<fault>' +
-                '<code>%1</code>' +
-                '<message>%2 - %3</message>' +
-              '</fault>',
-              StatusCode,
-              StatusDescription,
-              Url
-              ));
-
-        exit(false);
+        Error(ResponseText);
     end;
 
-    [TryFunction]
-    local procedure TrySendWebRequest(var XmlDoc: DotNet "NPRNetXmlDocument"; HttpWebRequest: DotNet NPRNetHttpWebRequest; var HttpWebResponse: DotNet NPRNetHttpWebResponse)
+    local procedure CreateTicketPrintOrderXml(var XmlDoc: XmlDocument; var Token: Text[100]; MarkTicketAsPrinted: Boolean; var FailureReason: Text): Boolean
     var
-        MemoryStream: DotNet NPRNetMemoryStream;
-    begin
-
-        MemoryStream := HttpWebRequest.GetRequestStream;
-        XmlDoc.Save(MemoryStream);
-        MemoryStream.Flush;
-        MemoryStream.Close;
-        Clear(MemoryStream);
-        HttpWebResponse := HttpWebRequest.GetResponse;
-    end;
-
-    [TryFunction]
-    local procedure TryReadResponseText(var HttpWebResponse: DotNet NPRNetHttpWebResponse; var ResponseText: Text)
-    var
-        Stream: DotNet NPRNetStream;
-        StreamReader: DotNet NPRNetStreamReader;
-    begin
-
-        StreamReader := StreamReader.StreamReader(HttpWebResponse.GetResponseStream());
-        ResponseText := StreamReader.ReadToEnd;
-        StreamReader.Close;
-        Clear(StreamReader);
-    end;
-
-    [TryFunction]
-    local procedure TryReadExceptionResponseText(var WebException: DotNet NPRNetWebException; var StatusCode: Code[10]; var StatusDescription: Text; var ResponseXml: Text)
-    var
-        Stream: DotNet NPRNetStream;
-        StreamReader: DotNet NPRNetStreamReader;
-        WebResponse: DotNet NPRNetWebResponse;
-        HttpWebResponse: DotNet NPRNetHttpWebResponse;
-        WebExceptionStatus: DotNet NPRNetWebExceptionStatus;
-        SystemConvert: DotNet NPRNetConvert;
-        StatusCodeInt: Integer;
-        DotNetType: DotNet NPRNetType;
-    begin
-
-        ResponseXml := '';
-
-        // No respone body on time out
-        if (WebException.Status.Equals(WebExceptionStatus.Timeout)) then begin
-            DotNetType := GetDotNetType(StatusCodeInt);
-            StatusCodeInt := SystemConvert.ChangeType(WebExceptionStatus.Timeout, DotNetType);
-            StatusCode := Format(StatusCodeInt);
-            StatusDescription := WebExceptionStatus.Timeout.ToString();
-            exit;
-        end;
-
-        // This happens for unauthorized and server side faults (4xx and 5xx)
-        // The response stream in unauthorized fails in XML transformation later
-        if (WebException.Status.Equals(WebExceptionStatus.ProtocolError)) then begin
-            HttpWebResponse := WebException.Response();
-            DotNetType := GetDotNetType(StatusCodeInt);
-            StatusCodeInt := SystemConvert.ChangeType(HttpWebResponse.StatusCode, DotNetType);
-            StatusCode := Format(StatusCodeInt);
-            StatusDescription := HttpWebResponse.StatusDescription;
-            if ((StatusCode[1] = '4') and (StatusCode <> '400')) then
-                exit;
-        end;
-
-        StreamReader := StreamReader.StreamReader(WebException.Response().GetResponseStream());
-        ResponseXml := StreamReader.ReadToEnd;
-        StreamReader.Close;
-        Clear(StreamReader);
-    end;
-
-    local procedure ToBase64(StringToEncode: Text) B64String: Text
-    var
-        TempBlob: Codeunit "Temp Blob";
-        BinaryReader: DotNet NPRNetBinaryReader;
-        MemoryStream: DotNet NPRNetMemoryStream;
-        Convert: DotNet NPRNetConvert;
-        InStr: InStream;
-        Outstr: OutStream;
-    begin
-
-        Clear(TempBlob);
-        TempBlob.CreateOutStream(Outstr);
-        Outstr.WriteText(StringToEncode);
-
-        TempBlob.CreateInStream(InStr);
-        MemoryStream := InStr;
-        BinaryReader := BinaryReader.BinaryReader(InStr);
-
-        B64String := Convert.ToBase64String(BinaryReader.ReadBytes(MemoryStream.Length));
-
-        MemoryStream.Flush;
-        MemoryStream.Close;
-        Clear(MemoryStream);
-    end;
-
-    local procedure "--"()
-    begin
-    end;
-
-    local procedure CreatTicketPrintOrderXml(var XmlDoc: DotNet "NPRNetXmlDocument"; var Token: Text[100]; MarkTicketAsPrinted: Boolean; var FailureReason: Text): Boolean
-    var
-        XmlText: Text;
+        XmlString: Text;
         TempBlob: Codeunit "Temp Blob";
         OutStr: OutStream;
         TicketTicketServerRequest: XMLport "NPR TM Ticket Server Req.";
         InStr: InStream;
+        TicketRequestMessageFailure: Label 'XML generation failed for token %1';
     begin
         TempBlob.CreateOutStream(OutStr, TEXTENCODING::UTF8);
 
@@ -390,47 +304,47 @@ codeunit 6060113 "NPR TM Ticket DIY Ticket Print"
         TicketTicketServerRequest.Export;
 
         if (not TempBlob.HasValue()) then
-            Error('XML generation failed for token %1', Token);
+            Error(TicketRequestMessageFailure, Token);
 
         TempBlob.CreateInStream(InStr, TEXTENCODING::UTF8);
-        InStr.Read(XmlText);
+        InStr.Read(XmlString);
 
         Clear(XmlDoc);
-        XmlDoc := XmlDoc.XmlDocument;
-        XmlDoc.LoadXml(XmlText);
 
-        if (UserId = 'TSA') then Message(CopyStr(XmlText, 1, 1024));
+        XmlDocument.ReadFrom(XmlString, XmlDoc);
+
+#if DEBUG_TICKET
+        Message(XmlString);
+#endif
 
         exit(true);
     end;
 
-    local procedure WebExceptionResponse(var XmlDoc: DotNet "NPRNetXmlDocument"; var ErrorCode: Code[10]; var ErrorText: Text): Boolean
+    local procedure WebExceptionResponse(var XmlDoc: XmlDocument; var ErrorCode: Code[10]; var ErrorText: Text): Boolean
     var
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
-        XmlElement: DotNet NPRNetXmlElement;
-        XmlElement2: DotNet NPRNetXmlElement;
-        ElementPath: Text;
-        Parameter: Text;
-        Value: Text;
-        FaultSectionFound: Boolean;
+        XmlRoot: XmlElement;
+        XmlTextString: Text;
+        CodePath: Label '//response/error/code', Locked = true;
+        MessagePath: Label '//response/error/message', Locked = true;
     begin
 
-        XmlElement := XmlDoc.DocumentElement;
-        if (IsNull(XmlElement)) then begin
+        if (not XmlDoc.GetRoot(XmlRoot)) then begin
             ErrorCode := '998';
-            ErrorText := StrSubstNo('Invalid XML in error response:', NpXmlDomMgt.PrettyPrintXml(XmlDoc.InnerXml()));
+            ErrorText := GetLastErrorText();
             exit(false);
         end;
 
-        ErrorCode := NpXmlDomMgt.GetXmlText(XmlElement, '//response/error/code', 10, false);
+        ErrorCode := NpXmlDomMgt.GetXmlText(XmlRoot, CodePath, 10, false);
         if (ErrorCode = '') then
             ErrorCode := '999';
 
-        ErrorText := NpXmlDomMgt.GetXmlText(XmlElement, '//response/error/message', 1024, false);
+        ErrorText := NpXmlDomMgt.GetXmlText(XmlRoot, MessagePath, 0, false);
         if (ErrorText = '') then
-            ErrorText := GetLastErrorText;
+            ErrorText := GetLastErrorText();
 
         exit(true);
     end;
+
 }
 
