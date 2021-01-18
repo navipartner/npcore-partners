@@ -1,14 +1,10 @@
 page 6060055 "NPR Item Worksh. Field Changes"
 {
-    // NPR5.25\BR  \20160720  CASE 246088 Object Created
-    // NPR5.48/JDH /20181109 CASE 334163 Added Caption to Object
-
     Caption = 'Item Worksheet Field Changes';
     Editable = false;
     PageType = List;
-    UsageCategory = Administration;
-    ApplicationArea = All;
     SourceTable = "NPR Item Worksh. Field Change";
+    UsageCategory = Administration;
 
     layout
     {
@@ -16,100 +12,97 @@ page 6060055 "NPR Item Worksh. Field Changes"
         {
             repeater(Group)
             {
-                field("Worksheet Template Name"; "Worksheet Template Name")
+                field("Worksheet Template Name"; Rec."Worksheet Template Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Journal Template Name field.';
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Journal Template Name field';
                 }
-                field("Worksheet Name"; "Worksheet Name")
+                field("Worksheet Name"; Rec."Worksheet Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Name field.';
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Name field';
                 }
-                field("Worksheet Line No."; "Worksheet Line No.")
+                field("Worksheet Line No."; Rec."Worksheet Line No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Worksheet Line No. field.';
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Worksheet Line No. field';
                 }
-                field("Table No."; "Table No.")
+                field("Table No."; Rec."Table No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Table No. field.';
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Table No. field';
                 }
-                field("Field Number"; "Field Number")
+                field("Field Number"; Rec."Field Number")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Field Number field.';
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Field Number field';
                 }
-                field("Field Name"; "Field Name")
+                field("Field Name"; Rec."Field Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Field Name field.';
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Field Name field';
                 }
-                field("Field Caption"; "Field Caption")
+                field("Field Caption"; Rec."Field Caption")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Field Caption field';
+                    ToolTip = 'Specifies the value of the Field Caption field.';
                 }
-                field("Target Table No. Update"; "Target Table No. Update")
+                field("Target Table No. Update"; Rec."Target Table No. Update")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Target Table No. Update field.';
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Target Table No. Update field';
                 }
-                field("Target Field Number Update"; "Target Field Number Update")
+                field("Target Field Number Update"; Rec."Target Field Number Update")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Target Field Number Update field.';
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Target Field Number Update field';
                 }
-                field("Target Field Name Update"; "Target Field Name Update")
+                field("Target Field Name Update"; Rec."Target Field Name Update")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Target Field Name Update field.';
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Target Field Name Update field';
                 }
-                field("Target Field Caption Update"; "Target Field Caption Update")
+                field("Target Field Caption Update"; Rec."Target Field Caption Update")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Target Field Caption Update field';
+                    ToolTip = 'Specifies the value of the Target Field Caption Update field.';
                 }
-                field("Current Value"; "Current Value")
+                field("Current Value"; Rec."Current Value")
                 {
                     ApplicationArea = All;
                     Style = Unfavorable;
                     StyleExpr = Warning;
-                    ToolTip = 'Specifies the value of the Current Value field';
+                    ToolTip = 'Specifies the value of the Current Value field.';
                 }
-                field("New Value"; "New Value")
+                field("New Value"; Rec."New Value")
                 {
                     ApplicationArea = All;
                     Style = Unfavorable;
                     StyleExpr = Warning;
-                    ToolTip = 'Specifies the value of the New Value field';
+                    ToolTip = 'Specifies the value of the New Value field.';
                 }
-                field(Warning; Warning)
+                field(Warning; Rec.Warning)
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Warning field';
+                    ToolTip = 'Specifies the value of the Warning field.';
                 }
-                field(Process; Process)
+                field(Process; Rec.Process)
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Process field';
+                    ToolTip = 'Specifies the value of the Process field.';
                 }
             }
         }
     }
 
-    actions
-    {
-    }
 }
 

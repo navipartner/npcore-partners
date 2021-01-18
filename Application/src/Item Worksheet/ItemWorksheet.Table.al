@@ -1,21 +1,10 @@
 table 6060041 "NPR Item Worksheet"
 {
-    // NPR4.18/BR  /20160209  CASE 182391 Object Created
-    // NPR5.22/BR  /20160321  CASE 182391 Added support for mapping an Excel file
-    // NPR5.22/BR  /20160323  CASE 182391 Added support for Recommended Retail Price
-    // NPR5.22/BR  /20160405  CASE 238374 Fix attributes not being deleted when deleteing
-    // NPR5.23/BR  /20160602  CASE 240330 Added field Item No. Prefix and Prefix Code
-    // NPR5.25/BR  /20160707  CASE 246088 Delete setup and any change fields
-    // NPR5.25/BR  /20160708  CASE 246088 Added setup option
-    // NPR5.25/BR  /20160718  CASE 246088 Added Parameter to CheckLines
-    // NPR5.51/MHA /20190819  CASE 365377 Removed field 160 "GIM Import Document No."
-
     Caption = 'Item Worksheet Batch';
-    DataClassification = CustomerContent;
     DataCaptionFields = Name, Description;
+    DataClassification = CustomerContent;
     DrillDownPageID = "NPR Item Worksheets";
     LookupPageID = "NPR Item Worksheets";
-
     fields
     {
         field(1; "Item Template Name"; Code[10])
@@ -65,8 +54,8 @@ table 6060041 "NPR Item Worksheet"
 
             trigger OnValidate()
             var
-                PurchLine: Record "Purchase Line";
                 Currency: Record Currency;
+                PurchLine: Record "Purchase Line";
                 RecalculatePrice: Boolean;
             begin
             end;
@@ -84,10 +73,8 @@ table 6060041 "NPR Item Worksheet"
 
             trigger OnValidate()
             begin
-                //-NPR5.23
                 ItemWorksheetTemplate.Get("Item Template Name");
                 ItemWorksheetTemplate.TestField("Item No. Prefix", ItemWorksheetTemplate."Item No. Prefix"::"From Worksheet");
-                //+NPR5.23
             end;
         }
         field(97; "No. Series"; Code[10])
@@ -153,10 +140,6 @@ table 6060041 "NPR Item Worksheet"
         }
     }
 
-    fieldgroups
-    {
-    }
-
     trigger OnDelete()
     var
         NPRAttributeKey: Record "NPR Attribute Key";
@@ -170,14 +153,11 @@ table 6060041 "NPR Item Worksheet"
         ItemWorksheetVarietyValue.SetRange("Worksheet Template Name", "Item Template Name");
         ItemWorksheetVarietyValue.SetRange("Worksheet Name", Name);
         ItemWorksheetVarietyValue.DeleteAll;
-        //-NPR5.22
         NPRAttributeKey.SetCurrentKey("Table ID", "MDR Code PK", "MDR Line PK", "MDR Option PK");
         NPRAttributeKey.SetRange("Table ID", DATABASE::"NPR Item Worksheet Line");
         NPRAttributeKey.SetRange("MDR Code PK", "Item Template Name");
         NPRAttributeKey.SetRange("MDR Code 2 PK", Name);
         NPRAttributeKey.DeleteAll(true);
-        //+NPR5.22
-        //-NPR5.25 [246088]
         ItemWorksheetExcelColumn.SetRange("Worksheet Template Name", "Item Template Name");
         ItemWorksheetExcelColumn.SetRange("Worksheet Name", Name);
         ItemWorksheetExcelColumn.DeleteAll;
@@ -190,7 +170,6 @@ table 6060041 "NPR Item Worksheet"
         ItemWorksheetFieldMapping.SetRange("Worksheet Template Name", Name);
         ItemWorksheetFieldMapping.SetRange("Worksheet Name", Name);
         ItemWorksheetFieldMapping.DeleteAll;
-        //+NPR5.25 [246088]
     end;
 
     trigger OnInsert()
@@ -200,18 +179,16 @@ table 6060041 "NPR Item Worksheet"
     end;
 
     var
-        Text000: Label 'Only the %1 field can be filled in on recurring journals.';
-        Text001: Label 'must not be %1';
-        ItemWorksheetTemplate: Record "NPR Item Worksh. Template";
-        ItemWorksheetLine: Record "NPR Item Worksheet Line";
-        ItemWorksheetVariantLine: Record "NPR Item Worksh. Variant Line";
-        Text1002: Label 'Checking lines        #2######';
-        ItemWorksheetVarietyValue: Record "NPR Item Worksh. Variety Value";
-        ItemWorksheetManagement: Codeunit "NPR Item Worksheet Mgt.";
         ItemWorksheetExcelColumn: Record "NPR Item Worksh. Excel Column";
-        ItemWorksheetFieldSetup: Record "NPR Item Worksh. Field Setup";
         ItemWorksheetFieldChange: Record "NPR Item Worksh. Field Change";
         ItemWorksheetFieldMapping: Record "NPR Item Worksh. Field Mapping";
+        ItemWorksheetFieldSetup: Record "NPR Item Worksh. Field Setup";
+        ItemWorksheetTemplate: Record "NPR Item Worksh. Template";
+        ItemWorksheetVariantLine: Record "NPR Item Worksh. Variant Line";
+        ItemWorksheetVarietyValue: Record "NPR Item Worksh. Variety Value";
+        ItemWorksheetLine: Record "NPR Item Worksheet Line";
+        ItemWorksheetManagement: Codeunit "NPR Item Worksheet Mgt.";
+        CheckingLinesLbl: Label 'Checking lines        #2######';
 
     procedure SetupNewBatch()
     begin
@@ -235,15 +212,15 @@ table 6060041 "NPR Item Worksheet"
     procedure CheckLines(ItemWorksheetLine: Record "NPR Item Worksheet Line")
     var
         ItemWorksheetLine2: Record "NPR Item Worksheet Line";
+        ItemWkshCheckLine: Codeunit "NPR Item Wsht.-Check Line";
         Window: Dialog;
         LineCount: Integer;
-        ItemWkshCheckLine: Codeunit "NPR Item Wsht.-Check Line";
     begin
         if ItemWorksheetLine.IsEmpty then
             exit;
 
         if GuiAllowed then
-            Window.Open(Text1002);
+            Window.Open(CheckingLinesLbl);
         LineCount := 0;
         ItemWorksheetTemplate.Get(ItemWorksheetLine."Worksheet Template Name");
         ItemWorksheetLine2.Reset;
@@ -255,20 +232,12 @@ table 6060041 "NPR Item Worksheet"
                 if GuiAllowed then
                     Window.Update(2, LineCount);
                 case ItemWorksheetTemplate."Error Handling" of
-                    //-NPR5.25 [246088]
-                    // ItemWorksheetTemplate."Error Handling" :: StopOnFirst :
-                    //  ItemWkshCheckLine.RunCheck(ItemWorksheetLine2,TRUE);
-                    // ItemWorksheetTemplate."Error Handling" :: SkipItem :
-                    //  ItemWkshCheckLine.RunCheck(ItemWorksheetLine2,FALSE);
-                    // ItemWorksheetTemplate."Error Handling" :: SkipVariant :
-                    //  ItemWkshCheckLine.RunCheck(ItemWorksheetLine2,FALSE);
                     ItemWorksheetTemplate."Error Handling"::StopOnFirst:
                         ItemWkshCheckLine.RunCheck(ItemWorksheetLine2, true, false);
                     ItemWorksheetTemplate."Error Handling"::SkipItem:
                         ItemWkshCheckLine.RunCheck(ItemWorksheetLine2, false, false);
                     ItemWorksheetTemplate."Error Handling"::SkipVariant:
                         ItemWkshCheckLine.RunCheck(ItemWorksheetLine2, false, false);
-                //+NPR5.25 [246088]
                 end;
             until ItemWorksheetLine2.Next = 0;
 
@@ -278,7 +247,6 @@ table 6060041 "NPR Item Worksheet"
 
     procedure UpdateSalesPriceAllLinesWithRRP()
     begin
-        //-NPR5.22
         ItemWorksheetLine.Reset;
         ItemWorksheetLine.SetRange("Worksheet Template Name", "Item Template Name");
         ItemWorksheetLine.SetRange("Worksheet Name", Name);
@@ -287,20 +255,17 @@ table 6060041 "NPR Item Worksheet"
                 ItemWorksheetLine.UpdateSalesPriceWithRRP;
                 ItemWorksheetLine.Modify;
             until ItemWorksheetLine.Next = 0;
-        //+NPR5.22
     end;
 
     procedure InsertDefaultFieldSetup()
     var
         ItemWorksheetManagement: Codeunit "NPR Item Worksheet Mgt.";
     begin
-        //-NPR5.25 [246088]
         ItemWorksheetLine.Reset;
         ItemWorksheetLine.Init;
         ItemWorksheetLine."Worksheet Template Name" := "Item Template Name";
         ItemWorksheetLine."Worksheet Name" := Name;
         ItemWorksheetManagement.SetDefaultFieldSetupLines(ItemWorksheetLine, 2);
-        //+NPR5.25 [246088]
     end;
 }
 

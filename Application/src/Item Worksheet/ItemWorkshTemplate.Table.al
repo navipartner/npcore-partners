@@ -1,22 +1,5 @@
 table 6060040 "NPR Item Worksh. Template"
 {
-    // NPR4.18\BR\20160209  CASE 182391 Object Created
-    // NPR5.22\BR\20160325  CASE 237658 Added field "Allow Web Service Update"
-    // NPR5.22\BR\20160405  CASE 238374 Fix attributes not being deleted when deleteing
-    // NPR5.23\BR\20160602  CASE 240330 Added field Item No. Prefix and Prefix Code
-    // NPR5.23\BR\20160525  CASE 242498 Added Options Item+Date and  Item+Variant+Date to price handling
-    // NPR5.23\BR\20160525  CASE 242498 Added Field Combine Variants to Item by
-    // NPR5.23\BR\20160525  CASE 242498 Added Field Create Vendor Barcodes
-    // NPR5.25\BR \20160704 CASE 246088 Delete Any old line after import
-    // NPR5.25\BR \20160707 CASE 246088 Added function InsertDefaultFieldSetup
-    // NPR5.25\BR \20160707 CASE 246088 Delete setup and any change fields
-    // NPR5.25\BR \20160718 CASE 246088 Added field Test Validation
-    // NPR5.25\BR \20160718 CASE 234602 Created Item Info fields
-    // NPR5.29\BR \20161215 CASE 261123 Added field "Match by Item No. Only"
-    // NPR5.37\BR \20170821 CASE 268786 Added field "Leave Skipped line on Register"
-    // NPR5.42/RA/20180507  CASE 310681 Added fiedl 301
-    // NPR5.46/BHR /20180824  CASE 322752 Replace record Object to Allobj -field 5
-
     Caption = 'Item Worksheet Template';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR Item Worksheet Templates";
@@ -52,10 +35,8 @@ table 6060040 "NPR Item Worksh. Template"
 
             trigger OnValidate()
             begin
-                //-NPR5.37 [268786]
                 if (not "Delete Processed Lines") and "Leave Skipped Line on Register" then
                     Validate("Leave Skipped Line on Register", false);
-                //+NPR5.37 [268786]
             end;
         }
         field(76; "Leave Skipped Line on Register"; Boolean)
@@ -81,18 +62,17 @@ table 6060040 "NPR Item Worksh. Template"
 
             trigger OnValidate()
             var
-                TxtClearAllWorksheetPrefixes: Label 'This will clear all Prefixes on the associated Worksheets.';
-                TxtStopped: Label 'Stopped on account of the warning.';
+                StoppedErr: Label 'Stopped on account of the warning.';
+                ClearAllWorksheetPrefixesQst: Label 'This will clear all Prefixes on the associated Worksheets.';
             begin
-                //-NPR5.23
                 if "Item No. Prefix" <> "Item No. Prefix"::"From Worksheet" then begin
                     "Prefix Code" := '';
                     ItemWorksheet.Reset;
                     ItemWorksheet.SetRange("Item Template Name", Name);
                     ItemWorksheet.SetFilter("Prefix Code", '<>%1', '');
                     if ItemWorksheet.Count > 1 then begin
-                        if not Confirm(TxtClearAllWorksheetPrefixes) then
-                            Error(TxtStopped)
+                        if not Confirm(ClearAllWorksheetPrefixesQst) then
+                            Error(StoppedErr)
                         else begin
                             if ItemWorksheet.FindSet then
                                 repeat
@@ -105,7 +85,6 @@ table 6060040 "NPR Item Worksh. Template"
                 if "Item No. Prefix" <> "Item No. Prefix"::"From Template" then begin
                     "Prefix Code" := '';
                 end;
-                //+NPR5.23
             end;
         }
         field(96; "Prefix Code"; Code[3])
@@ -116,9 +95,7 @@ table 6060040 "NPR Item Worksh. Template"
 
             trigger OnValidate()
             begin
-                //-NPR5.23
                 TestField("Item No. Prefix", "Item No. Prefix"::"From Template");
-                //+NPR5.23
             end;
         }
         field(97; "No. Series"; Code[10])
@@ -137,7 +114,7 @@ table 6060040 "NPR Item Worksh. Template"
             trigger OnValidate()
             begin
                 if "Error Handling" = "Error Handling"::SkipVariant then
-                    Error(TextNotImplemented);
+                    Error(NotImplementedErr);
             end;
         }
         field(105; "Test Validation"; Option)
@@ -197,18 +174,15 @@ table 6060040 "NPR Item Worksh. Template"
             trigger OnValidate()
             var
                 ItemWorksheetTemplate: Record "NPR Item Worksh. Template";
-                TextWebServiceTemplateExists: Label '%1 is already activated on %2. Only one %3 can be active.';
+                WebServiceTemplateExistsErr: Label '%1 is already activated on %2. Only one %3 can be active.';
             begin
-                //-NPR5.22
                 if "Allow Web Service Update" then begin
                     ItemWorksheetTemplate.Reset;
                     ItemWorksheetTemplate.SetRange("Allow Web Service Update", true);
                     ItemWorksheetTemplate.SetFilter(Name, '<>%1', Name);
                     if ItemWorksheetTemplate.FindFirst then
-                        Error(TextWebServiceTemplateExists, FieldCaption("Allow Web Service Update"), ItemWorksheetTemplate.Description, TableCaption);
+                        Error(WebServiceTemplateExistsErr, FieldCaption("Allow Web Service Update"), ItemWorksheetTemplate.Description, TableCaption);
                 end;
-
-                //+NPR5.22
             end;
         }
         field(210; "Item Info Query Name"; Text[30])
@@ -252,61 +226,51 @@ table 6060040 "NPR Item Worksh. Template"
         }
     }
 
-    fieldgroups
-    {
-    }
-
     trigger OnDelete()
     var
         NPRAttributeKey: Record "NPR Attribute Key";
     begin
         ItemWorksheet.SetRange("Item Template Name", Name);
-        ItemWorksheet.DeleteAll;
+        ItemWorksheet.DeleteAll();
         ItemWorksheetLine.SetRange("Worksheet Template Name", Name);
-        ItemWorksheetLine.DeleteAll;
+        ItemWorksheetLine.DeleteAll();
         ItemWorksheetVariantLine.SetRange("Worksheet Template Name", Name);
-        ItemWorksheetVariantLine.DeleteAll;
+        ItemWorksheetVariantLine.DeleteAll();
         ItemWorksheetVarietyValue.SetRange("Worksheet Template Name", Name);
-        ItemWorksheetVarietyValue.DeleteAll;
-        //-NPR5.22
+        ItemWorksheetVarietyValue.DeleteAll();
         NPRAttributeKey.SetCurrentKey("Table ID", "MDR Code PK", "MDR Line PK", "MDR Option PK");
         NPRAttributeKey.SetRange("Table ID", DATABASE::"NPR Item Worksheet Line");
         NPRAttributeKey.SetRange("MDR Code PK", Name);
         NPRAttributeKey.DeleteAll(true);
-        //+NPR5.22
-        //-NPR5.25 [246088]
         ItemWorksheetExcelColumn.SetRange("Worksheet Template Name", Name);
-        ItemWorksheetExcelColumn.DeleteAll;
+        ItemWorksheetExcelColumn.DeleteAll();
         ItemWorksheetFieldSetup.SetRange("Worksheet Template Name", Name);
-        ItemWorksheetFieldSetup.DeleteAll;
+        ItemWorksheetFieldSetup.DeleteAll();
         ItemWorksheetFieldChange.SetRange("Worksheet Template Name", Name);
-        ItemWorksheetFieldChange.DeleteAll;
+        ItemWorksheetFieldChange.DeleteAll();
         ItemWorksheetFieldMapping.SetRange("Worksheet Template Name", Name);
-        ItemWorksheetFieldMapping.DeleteAll;
-        //+NPR5.25 [246088]
+        ItemWorksheetFieldMapping.DeleteAll();
     end;
 
     var
-        ItemWorksheet: Record "NPR Item Worksheet";
-        ItemWorksheetLine: Record "NPR Item Worksheet Line";
-        ItemWorksheetVariantLine: Record "NPR Item Worksh. Variant Line";
-        ItemWorksheetVarietyValue: Record "NPR Item Worksh. Variety Value";
-        TextNotImplemented: Label 'This feature is not implemented yet.';
         ItemWorksheetExcelColumn: Record "NPR Item Worksh. Excel Column";
-        ItemWorksheetFieldSetup: Record "NPR Item Worksh. Field Setup";
         ItemWorksheetFieldChange: Record "NPR Item Worksh. Field Change";
         ItemWorksheetFieldMapping: Record "NPR Item Worksh. Field Mapping";
+        ItemWorksheetFieldSetup: Record "NPR Item Worksh. Field Setup";
+        ItemWorksheetVariantLine: Record "NPR Item Worksh. Variant Line";
+        ItemWorksheetVarietyValue: Record "NPR Item Worksh. Variety Value";
+        ItemWorksheet: Record "NPR Item Worksheet";
+        ItemWorksheetLine: Record "NPR Item Worksheet Line";
+        NotImplementedErr: Label 'This feature is not implemented yet.';
 
     procedure InsertDefaultFieldSetup()
     var
         ItemWorksheetManagement: Codeunit "NPR Item Worksheet Mgt.";
     begin
-        //-NPR5.25 [246088]
-        ItemWorksheetLine.Reset;
-        ItemWorksheetLine.Init;
+        ItemWorksheetLine.Reset();
+        ItemWorksheetLine.Init();
         ItemWorksheetLine."Worksheet Template Name" := Name;
         ItemWorksheetManagement.SetDefaultFieldSetupLines(ItemWorksheetLine, 1);
-        //+NPR5.25 [246088]
     end;
 }
 

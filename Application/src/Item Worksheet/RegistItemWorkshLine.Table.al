@@ -1309,24 +1309,20 @@ table 6060046 "NPR Regist. Item Worksh Line"
         }
     }
 
-    fieldgroups
-    {
-    }
-
     trigger OnDelete()
     var
         ItemWorksheetVar: Record "NPR Item Worksh. Variant Line";
         ItemWorksheetVrtValue: Record "NPR Item Worksh. Variety Value";
     begin
-        RegItemWshtVariantLine.Reset;
+        RegItemWshtVariantLine.Reset();
         RegItemWshtVariantLine.SetRange("Registered Worksheet No.", "Registered Worksheet No.");
         RegItemWshtVariantLine.SetRange("Registered Worksheet Line No.", "Line No.");
-        RegItemWshtVariantLine.DeleteAll;
+        RegItemWshtVariantLine.DeleteAll();
 
-        RegItemWshtVarietyValue.Reset;
+        RegItemWshtVarietyValue.Reset();
         RegItemWshtVarietyValue.SetRange("Registered Worksheet No.", "Registered Worksheet No.");
         RegItemWshtVarietyValue.SetRange("Registered Worksheet Line No.", "Line No.");
-        RegItemWshtVarietyValue.DeleteAll;
+        RegItemWshtVarietyValue.DeleteAll();
     end;
 
     var

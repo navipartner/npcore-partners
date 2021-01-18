@@ -1,14 +1,8 @@
 page 6060052 "NPR Item Worksh. Attr. FactBox"
 {
-    // NPR4.19\BR\20160311  CASE 182391 Object Created
-    // NPR5.33/ANEN/20170427 CASE 273989 Extending to 40 attributes
-
     Caption = 'NP Attributes FactBox';
     PageType = CardPart;
-    UsageCategory = Administration;
-    ApplicationArea = All;
     SourceTable = "NPR Item Worksheet Line";
-
     layout
     {
         area(content)
@@ -18,12 +12,14 @@ page 6060052 "NPR Item Worksh. Attr. FactBox"
                 ApplicationArea = All;
                 CaptionClass = '6014555,27,1,2';
                 Editable = NPRAttrEditable;
+                ToolTip = 'Specifies the value of the NPRAttrTextArray[1] field.';
                 Visible = NPRAttrVisible01;
-                ToolTip = 'Specifies the value of the NPRAttrTextArray[1] field';
 
                 trigger OnValidate()
                 begin
-                    NPRAttrManagement.SetWorksheetLineAttributeValue(DATABASE::"NPR Item Worksheet Line", 1, "Worksheet Template Name", "Worksheet Name", "Line No.", NPRAttrTextArray[1]);
+                    NPRAttrManagement.SetWorksheetLineAttributeValue(
+                        DATABASE::"NPR Item Worksheet Line", 1, "Worksheet Template Name",
+                        "Worksheet Name", "Line No.", NPRAttrTextArray[1]);
                 end;
             }
             field(NPRExItemAttrTextArray_01; NPRExItemAttrTextArray[1])
@@ -33,20 +29,22 @@ page 6060052 "NPR Item Worksh. Attr. FactBox"
                 Editable = false;
                 Style = Attention;
                 StyleExpr = TRUE;
+                ToolTip = 'Specifies the value of the NPRExItemAttrTextArray[1] field.';
                 Visible = NPRAttrVisible01;
-                ToolTip = 'Specifies the value of the NPRExItemAttrTextArray[1] field';
             }
             field(NPRAttrTextArray_02; NPRAttrTextArray[2])
             {
                 ApplicationArea = All;
                 CaptionClass = '6014555,27,2,2';
                 Editable = NPRAttrEditable;
+                ToolTip = 'Specifies the value of the NPRAttrTextArray[2] field.';
                 Visible = NPRAttrVisible02;
-                ToolTip = 'Specifies the value of the NPRAttrTextArray[2] field';
 
                 trigger OnValidate()
                 begin
-                    NPRAttrManagement.SetWorksheetLineAttributeValue(DATABASE::"NPR Item Worksheet Line", 2, "Worksheet Template Name", "Worksheet Name", "Line No.", NPRAttrTextArray[2]);
+                    NPRAttrManagement.SetWorksheetLineAttributeValue(
+                        DATABASE::"NPR Item Worksheet Line", 2, "Worksheet Template Name",
+                        "Worksheet Name", "Line No.", NPRAttrTextArray[2]);
                 end;
             }
             field(NPRExItemAttrTextArray_02; NPRExItemAttrTextArray[2])
@@ -56,20 +54,22 @@ page 6060052 "NPR Item Worksh. Attr. FactBox"
                 Editable = false;
                 Style = Attention;
                 StyleExpr = TRUE;
+                ToolTip = 'Specifies the value of the NPRExItemAttrTextArray[2] field.';
                 Visible = NPRAttrVisible02;
-                ToolTip = 'Specifies the value of the NPRExItemAttrTextArray[2] field';
             }
             field(NPRAttrTextArray_03; NPRAttrTextArray[3])
             {
                 ApplicationArea = All;
                 CaptionClass = '6014555,27,3,2';
                 Editable = NPRAttrEditable;
+                ToolTip = 'Specifies the value of the NPRAttrTextArray[3] field.';
                 Visible = NPRAttrVisible03;
-                ToolTip = 'Specifies the value of the NPRAttrTextArray[3] field';
 
                 trigger OnValidate()
                 begin
-                    NPRAttrManagement.SetWorksheetLineAttributeValue(DATABASE::"NPR Item Worksheet Line", 3, "Worksheet Template Name", "Worksheet Name", "Line No.", NPRAttrTextArray[3]);
+                    NPRAttrManagement.SetWorksheetLineAttributeValue(
+                        DATABASE::"NPR Item Worksheet Line", 3, "Worksheet Template Name",
+                        "Worksheet Name", "Line No.", NPRAttrTextArray[3]);
                 end;
             }
             field(NPRExItemAttrTextArray_03; NPRExItemAttrTextArray[3])
@@ -79,20 +79,22 @@ page 6060052 "NPR Item Worksh. Attr. FactBox"
                 Editable = false;
                 Style = Attention;
                 StyleExpr = TRUE;
+                ToolTip = 'Specifies the value of the NPRExItemAttrTextArray[3] field.';
                 Visible = NPRAttrVisible03;
-                ToolTip = 'Specifies the value of the NPRExItemAttrTextArray[3] field';
             }
             field(NPRAttrTextArray_04; NPRAttrTextArray[4])
             {
                 ApplicationArea = All;
                 CaptionClass = '6014555,27,4,2';
                 Editable = NPRAttrEditable;
+                ToolTip = 'Specifies the value of the NPRAttrTextArray[4] field.';
                 Visible = NPRAttrVisible04;
-                ToolTip = 'Specifies the value of the NPRAttrTextArray[4] field';
 
                 trigger OnValidate()
                 begin
-                    NPRAttrManagement.SetWorksheetLineAttributeValue(DATABASE::"NPR Item Worksheet Line", 4, "Worksheet Template Name", "Worksheet Name", "Line No.", NPRAttrTextArray[4]);
+                    NPRAttrManagement.SetWorksheetLineAttributeValue(
+                        DATABASE::"NPR Item Worksheet Line", 4, "Worksheet Template Name",
+                        "Worksheet Name", "Line No.", NPRAttrTextArray[4]);
                 end;
             }
             field(NPRExItemAttrTextArray_04; NPRExItemAttrTextArray[4])
@@ -102,20 +104,22 @@ page 6060052 "NPR Item Worksh. Attr. FactBox"
                 Editable = false;
                 Style = Attention;
                 StyleExpr = TRUE;
+                ToolTip = 'Specifies the value of the NPRExItemAttrTextArray[4] field.';
                 Visible = NPRAttrVisible04;
-                ToolTip = 'Specifies the value of the NPRExItemAttrTextArray[4] field';
             }
             field(NPRAttrTextArray_05; NPRAttrTextArray[5])
             {
                 ApplicationArea = All;
                 CaptionClass = '6014555,27,5,2';
                 Editable = NPRAttrEditable;
+                ToolTip = 'Specifies the value of the NPRAttrTextArray[5] field.';
                 Visible = NPRAttrVisible05;
-                ToolTip = 'Specifies the value of the NPRAttrTextArray[5] field';
 
                 trigger OnValidate()
                 begin
-                    NPRAttrManagement.SetWorksheetLineAttributeValue(DATABASE::"NPR Item Worksheet Line", 5, "Worksheet Template Name", "Worksheet Name", "Line No.", NPRAttrTextArray[5]);
+                    NPRAttrManagement.SetWorksheetLineAttributeValue(
+                        DATABASE::"NPR Item Worksheet Line", 5, "Worksheet Template Name",
+                        "Worksheet Name", "Line No.", NPRAttrTextArray[5]);
                 end;
             }
             field(NPRExItemAttrTextArray_05; NPRExItemAttrTextArray[5])
@@ -125,20 +129,22 @@ page 6060052 "NPR Item Worksh. Attr. FactBox"
                 Editable = false;
                 Style = Attention;
                 StyleExpr = TRUE;
+                ToolTip = 'Specifies the value of the NPRExItemAttrTextArray[5] field.';
                 Visible = NPRAttrVisible05;
-                ToolTip = 'Specifies the value of the NPRExItemAttrTextArray[5] field';
             }
             field(NPRAttrTextArray_06; NPRAttrTextArray[6])
             {
                 ApplicationArea = All;
                 CaptionClass = '6014555,27,6,2';
                 Editable = NPRAttrEditable;
+                ToolTip = 'Specifies the value of the NPRAttrTextArray[6] field.';
                 Visible = NPRAttrVisible06;
-                ToolTip = 'Specifies the value of the NPRAttrTextArray[6] field';
 
                 trigger OnValidate()
                 begin
-                    NPRAttrManagement.SetWorksheetLineAttributeValue(DATABASE::"NPR Item Worksheet Line", 6, "Worksheet Template Name", "Worksheet Name", "Line No.", NPRAttrTextArray[6]);
+                    NPRAttrManagement.SetWorksheetLineAttributeValue(
+                        DATABASE::"NPR Item Worksheet Line", 6, "Worksheet Template Name",
+                        "Worksheet Name", "Line No.", NPRAttrTextArray[6]);
                 end;
             }
             field(NPRExItemAttrTextArray_06; NPRExItemAttrTextArray[6])
@@ -148,20 +154,22 @@ page 6060052 "NPR Item Worksh. Attr. FactBox"
                 Editable = false;
                 Style = Attention;
                 StyleExpr = TRUE;
+                ToolTip = 'Specifies the value of the NPRExItemAttrTextArray[6] field.';
                 Visible = NPRAttrVisible06;
-                ToolTip = 'Specifies the value of the NPRExItemAttrTextArray[6] field';
             }
             field(NPRAttrTextArray_07; NPRAttrTextArray[7])
             {
                 ApplicationArea = All;
                 CaptionClass = '6014555,27,7,2';
                 Editable = NPRAttrEditable;
+                ToolTip = 'Specifies the value of the NPRAttrTextArray[7] field.';
                 Visible = NPRAttrVisible07;
-                ToolTip = 'Specifies the value of the NPRAttrTextArray[7] field';
 
                 trigger OnValidate()
                 begin
-                    NPRAttrManagement.SetWorksheetLineAttributeValue(DATABASE::"NPR Item Worksheet Line", 7, "Worksheet Template Name", "Worksheet Name", "Line No.", NPRAttrTextArray[7]);
+                    NPRAttrManagement.SetWorksheetLineAttributeValue(
+                        DATABASE::"NPR Item Worksheet Line", 7, "Worksheet Template Name",
+                        "Worksheet Name", "Line No.", NPRAttrTextArray[7]);
                 end;
             }
             field(NPRExItemAttrTextArray_07; NPRExItemAttrTextArray[7])
@@ -171,20 +179,22 @@ page 6060052 "NPR Item Worksh. Attr. FactBox"
                 Editable = false;
                 Style = Attention;
                 StyleExpr = TRUE;
+                ToolTip = 'Specifies the value of the NPRExItemAttrTextArray[7] field.';
                 Visible = NPRAttrVisible07;
-                ToolTip = 'Specifies the value of the NPRExItemAttrTextArray[7] field';
             }
             field(NPRAttrTextArray_08; NPRAttrTextArray[8])
             {
                 ApplicationArea = All;
                 CaptionClass = '6014555,27,8,2';
                 Editable = NPRAttrEditable;
+                ToolTip = 'Specifies the value of the NPRAttrTextArray[8] field.';
                 Visible = NPRAttrVisible08;
-                ToolTip = 'Specifies the value of the NPRAttrTextArray[8] field';
 
                 trigger OnValidate()
                 begin
-                    NPRAttrManagement.SetWorksheetLineAttributeValue(DATABASE::"NPR Item Worksheet Line", 8, "Worksheet Template Name", "Worksheet Name", "Line No.", NPRAttrTextArray[8]);
+                    NPRAttrManagement.SetWorksheetLineAttributeValue(
+                        DATABASE::"NPR Item Worksheet Line", 8, "Worksheet Template Name",
+                        "Worksheet Name", "Line No.", NPRAttrTextArray[8]);
                 end;
             }
             field(NPRExItemAttrTextArray_08; NPRExItemAttrTextArray[8])
@@ -194,20 +204,22 @@ page 6060052 "NPR Item Worksh. Attr. FactBox"
                 Editable = false;
                 Style = Attention;
                 StyleExpr = TRUE;
+                ToolTip = 'Specifies the value of the NPRExItemAttrTextArray[8] field.';
                 Visible = NPRAttrVisible08;
-                ToolTip = 'Specifies the value of the NPRExItemAttrTextArray[8] field';
             }
             field(NPRAttrTextArray_09; NPRAttrTextArray[9])
             {
                 ApplicationArea = All;
                 CaptionClass = '6014555,27,9,2';
                 Editable = NPRAttrEditable;
+                ToolTip = 'Specifies the value of the NPRAttrTextArray[9] field.';
                 Visible = NPRAttrVisible09;
-                ToolTip = 'Specifies the value of the NPRAttrTextArray[9] field';
 
                 trigger OnValidate()
                 begin
-                    NPRAttrManagement.SetWorksheetLineAttributeValue(DATABASE::"NPR Item Worksheet Line", 9, "Worksheet Template Name", "Worksheet Name", "Line No.", NPRAttrTextArray[9]);
+                    NPRAttrManagement.SetWorksheetLineAttributeValue(
+                        DATABASE::"NPR Item Worksheet Line", 9, "Worksheet Template Name",
+                        "Worksheet Name", "Line No.", NPRAttrTextArray[9]);
                 end;
             }
             field(NPRExItemAttrTextArray_09; NPRExItemAttrTextArray[9])
@@ -217,20 +229,22 @@ page 6060052 "NPR Item Worksh. Attr. FactBox"
                 Editable = false;
                 Style = Attention;
                 StyleExpr = TRUE;
+                ToolTip = 'Specifies the value of the NPRExItemAttrTextArray[9] field.';
                 Visible = NPRAttrVisible09;
-                ToolTip = 'Specifies the value of the NPRExItemAttrTextArray[9] field';
             }
             field(NPRAttrTextArray_10; NPRAttrTextArray[10])
             {
                 ApplicationArea = All;
                 CaptionClass = '6014555,27,10,2';
                 Editable = NPRAttrEditable;
+                ToolTip = 'Specifies the value of the NPRAttrTextArray[10] field.';
                 Visible = NPRAttrVisible10;
-                ToolTip = 'Specifies the value of the NPRAttrTextArray[10] field';
 
                 trigger OnValidate()
                 begin
-                    NPRAttrManagement.SetWorksheetLineAttributeValue(DATABASE::"NPR Item Worksheet Line", 10, "Worksheet Template Name", "Worksheet Name", "Line No.", NPRAttrTextArray[10]);
+                    NPRAttrManagement.SetWorksheetLineAttributeValue(
+                        DATABASE::"NPR Item Worksheet Line", 10, "Worksheet Template Name",
+                        "Worksheet Name", "Line No.", NPRAttrTextArray[10]);
                 end;
             }
             field(NPRExItemAttrTextArray_10; NPRExItemAttrTextArray[10])
@@ -240,31 +254,30 @@ page 6060052 "NPR Item Worksh. Attr. FactBox"
                 Editable = false;
                 Style = Attention;
                 StyleExpr = TRUE;
+                ToolTip = 'Specifies the value of the NPRExItemAttrTextArray[10] field.';
                 Visible = NPRAttrVisible10;
-                ToolTip = 'Specifies the value of the NPRExItemAttrTextArray[10] field';
             }
         }
     }
 
-    actions
-    {
-    }
 
     trigger OnAfterGetRecord()
     var
         i: Integer;
-        CaptionTextExItem: Label 'Existing Item:';
+        ExItemLbl: Label 'Existing Item:';
     begin
-        NPRAttrManagement.GetWorksheetLineAttributeValue(NPRAttrTextArray, DATABASE::"NPR Item Worksheet Line", "Worksheet Template Name", "Worksheet Name", "Line No.");
+        NPRAttrManagement.GetWorksheetLineAttributeValue(
+            NPRAttrTextArray, DATABASE::"NPR Item Worksheet Line",
+            "Worksheet Template Name", "Worksheet Name", "Line No.");
         if ("Existing Item No." <> '') then
             NPRAttrManagement.GetMasterDataAttributeValue(NPRExItemAttrTextArray, DATABASE::Item, "Existing Item No.")
         else
             Clear(NPRExItemAttrTextArray);
 
         for i := 1 to 10 do begin
-            if (NPRExItemAttrTextArray[i] <> NPRAttrTextArray[i]) and ("Existing Item No." <> '') then begin
-                ExItemCaptionDim[i] := CaptionTextExItem;
-            end else begin
+            if (NPRExItemAttrTextArray[i] <> NPRAttrTextArray[i]) and ("Existing Item No." <> '') then
+                ExItemCaptionDim[i] := ExItemLbl
+            else begin
                 NPRExItemAttrTextArray[i] := '';
                 ExItemCaptionDim[i] := '';
             end
@@ -291,12 +304,8 @@ page 6060052 "NPR Item Worksh. Attr. FactBox"
     end;
 
     var
-        NPRAttrTextArray: array[40] of Text[100];
-        NPRExItemAttrTextArray: array[40] of Text[100];
         NPRAttrManagement: Codeunit "NPR Attribute Management";
         NPRAttrEditable: Boolean;
-        NPRAttrVisibleArray: array[40] of Boolean;
-        NPRItemAttrVisibleArray: array[40] of Boolean;
         NPRAttrVisible01: Boolean;
         NPRAttrVisible02: Boolean;
         NPRAttrVisible03: Boolean;
@@ -307,7 +316,11 @@ page 6060052 "NPR Item Worksh. Attr. FactBox"
         NPRAttrVisible08: Boolean;
         NPRAttrVisible09: Boolean;
         NPRAttrVisible10: Boolean;
+        NPRAttrVisibleArray: array[40] of Boolean;
+        NPRItemAttrVisibleArray: array[40] of Boolean;
         ExItemCaptionDim: array[20] of Text[20];
+        NPRAttrTextArray: array[40] of Text[100];
+        NPRExItemAttrTextArray: array[40] of Text[100];
 
     procedure ShowDetails()
     begin

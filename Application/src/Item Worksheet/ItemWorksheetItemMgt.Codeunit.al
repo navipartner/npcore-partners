@@ -1,30 +1,20 @@
 codeunit 6060041 "NPR Item Worksheet Item Mgt."
 {
-    // NPR4.18\BR\20160209  CASE 182391 Object Created
-    // NPR5.29\BR\20161215  CASE 261123 Added support for only matching by item No.
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         ItemNumberManagement: Codeunit "NPR Item Number Mgt.";
 
     procedure MatchItemNo(var ItemWorksheetLine: Record "NPR Item Worksheet Line")
     var
+        ItemWorksheetTemplate: Record "NPR Item Worksh. Template";
         ItemNo: Code[20];
         VendorNo: Code[20];
         CodeVar: Code[30];
-        ItemWorksheetTemplate: Record "NPR Item Worksh. Template";
     begin
         if ItemWorksheetLine."Existing Item No." <> '' then
             exit;
-        //-NPR5.29 [261123]
         ItemWorksheetTemplate.Get(ItemWorksheetLine."Worksheet Template Name");
         if ItemWorksheetTemplate."Match by Item No. Only" then
             exit;
-        //+NPR5.29 [261123]
         ItemNo := '';
         VendorNo := ItemWorksheetLine."Vendor No.";
         if not ItemNumberManagement.FindItemInfo(ItemWorksheetLine."Vendor Item No.", 1, true, CodeVar, VendorNo, ItemNo, CodeVar) then         // Unblocked items Vendor Item No.
@@ -36,12 +26,10 @@ codeunit 6060041 "NPR Item Worksheet Item Mgt."
                                 if not ItemNumberManagement.FindItemInfo(ItemWorksheetLine."Vendor Item No.", 0, false, CodeVar, VendorNo, ItemNo, CodeVar) then// All places vendor item no.
                                     if not ItemNumberManagement.FindItemInfo(ItemWorksheetLine."Internal Bar Code", 0, false, CodeVar, VendorNo, ItemNo, CodeVar) then        // All places Barcode
                                         exit;
-        if VendorNo <> '' then begin
+        if VendorNo <> '' then
             ItemWorksheetLine.Validate("Vendor No.", VendorNo);
-        end;
-        if ItemNo <> '' then begin
+        if ItemNo <> '' then
             ItemWorksheetLine.Validate("Existing Item No.", ItemNo);
-        end;
     end;
 
     local procedure GetItemNo(VendorsBarCode: Code[20]; VendorsItemNo: Code[20]; OurBarCode: Code[20]; OurItemNo: Code[20])
@@ -58,23 +46,22 @@ codeunit 6060041 "NPR Item Worksheet Item Mgt."
 
     procedure UpdateItemNo(var ItemWorksheetLine: Record "NPR Item Worksheet Line")
     var
-        ItemNo: Code[20];
         VarCode: Code[10];
+        ItemNo: Code[20];
     begin
-        with ItemWorksheetLine do begin
-            if FindItemNo("Vendors Bar Code", "Internal Bar Code", "Vendor Item No.", "Vendor No.", ItemNo, VarCode) then begin
-                Validate("Item No.", ItemNo);
-            end else begin
-                Validate("Item No.", '');
-            end;
-        end;
+        if FindItemNo(
+            ItemWorksheetLine."Vendors Bar Code", ItemWorksheetLine."Internal Bar Code",
+            ItemWorksheetLine."Vendor Item No.", ItemWorksheetLine."Vendor No.", ItemNo, VarCode) then
+            ItemWorksheetLine.Validate("Item No.", ItemNo)
+        else
+            ItemWorksheetLine.Validate("Item No.", '');
     end;
 
     local procedure FindItemNo(ItemCrossRefNo: Code[20]; AltNo: Code[20]; VendorsItemNo: Code[20]; OurVendorNo: Code[20]; var OurItemNo: Code[20]; var OurVariantCode: Code[20]) found: Boolean
     var
+        Item: Record Item;
         ItemCrossRef: Record "Item Cross Reference";
         AlternativeNo: Record "NPR Alternative No.";
-        Item: Record Item;
     begin
         //first item cross reference
         if ItemCrossRefNo <> '' then begin
@@ -114,67 +101,70 @@ codeunit 6060041 "NPR Item Worksheet Item Mgt."
 
     procedure CheckDuplicateLine(ItemWorksheetLine: Record "NPR Item Worksheet Line")
     var
-        ItemWorksheetLine2: Record "NPR Item Worksheet Line";
-        Text001: Label 'Item No %1 already exists in %2 %3';
         ItemWorksheet: Record "NPR Item Worksheet";
+        ItemWorksheetLine2: Record "NPR Item Worksheet Line";
     begin
-        with ItemWorksheetLine do begin
-            //only check inside current Worksheet
-            ItemWorksheetLine2.SetRange("Worksheet Template Name", "Worksheet Template Name");
-            ItemWorksheetLine2.SetRange("Worksheet Name", "Worksheet Name");
-            ItemWorksheetLine2.SetFilter("Line No.", '<>%1', "Line No.");
+        //only check inside current Worksheet
+        ItemWorksheetLine2.SetRange("Worksheet Template Name", ItemWorksheetLine."Worksheet Template Name");
+        ItemWorksheetLine2.SetRange("Worksheet Name", ItemWorksheetLine."Worksheet Name");
+        ItemWorksheetLine2.SetFilter("Line No.", '<>%1', ItemWorksheetLine."Line No.");
 
-            //duplicate Item No
-            if "Item No." <> '' then begin
-                ItemWorksheetLine2.SetRange("Item No.", "Item No.");
-                if not ItemWorksheetLine2.IsEmpty then
-                    GenerateDuplicateError(ItemWorksheetLine, FieldCaption("Item No."), "Item No.", ItemWorksheet.TableCaption, "Worksheet Name");
-                ItemWorksheetLine2.SetRange("Item No.");
-            end;
+        //duplicate Item No
+        if ItemWorksheetLine."Item No." <> '' then begin
+            ItemWorksheetLine2.SetRange("Item No.", ItemWorksheetLine."Item No.");
+            if not ItemWorksheetLine2.IsEmpty() then
+                GenerateDuplicateError(
+                    ItemWorksheetLine, ItemWorksheetLine.FieldCaption("Item No."),
+                    ItemWorksheetLine."Item No.", ItemWorksheet.TableCaption, ItemWorksheetLine."Worksheet Name");
+            ItemWorksheetLine2.SetRange("Item No.");
+        end;
 
-            //Duplicate Vendor Item no
-            if "Vendor Item No." <> '' then begin
-                ItemWorksheetLine2.SetRange("Vendor Item No.", "Vendor Item No.");
-                if not ItemWorksheetLine2.IsEmpty then
-                    GenerateDuplicateError(ItemWorksheetLine, FieldCaption("Vendor Item No."), "Vendor Item No.", ItemWorksheet.TableCaption, "Worksheet Name");
-                ItemWorksheetLine2.SetRange("Vendor Item No.");
-            end;
+        //Duplicate Vendor Item no
+        if ItemWorksheetLine."Vendor Item No." <> '' then begin
+            ItemWorksheetLine2.SetRange("Vendor Item No.", ItemWorksheetLine."Vendor Item No.");
+            if not ItemWorksheetLine2.IsEmpty() then
+                GenerateDuplicateError(
+                    ItemWorksheetLine, ItemWorksheetLine.FieldCaption("Vendor Item No."),
+                    ItemWorksheetLine."Vendor Item No.", ItemWorksheet.TableCaption, ItemWorksheetLine."Worksheet Name");
+            ItemWorksheetLine2.SetRange("Vendor Item No.");
+        end;
 
-            //Duplicate Barcode
-            if "Internal Bar Code" <> '' then begin
-                ItemWorksheetLine2.SetRange("Internal Bar Code", "Internal Bar Code");
-                if not ItemWorksheetLine2.IsEmpty then
-                    GenerateDuplicateError(ItemWorksheetLine, FieldCaption("Internal Bar Code"), "Internal Bar Code", ItemWorksheet.TableCaption, "Worksheet Name");
-                ItemWorksheetLine2.SetRange("Internal Bar Code");
-            end;
+        //Duplicate Barcode
+        if ItemWorksheetLine."Internal Bar Code" <> '' then begin
+            ItemWorksheetLine2.SetRange("Internal Bar Code", ItemWorksheetLine."Internal Bar Code");
+            if not ItemWorksheetLine2.IsEmpty() then
+                GenerateDuplicateError(
+                    ItemWorksheetLine, ItemWorksheetLine.FieldCaption("Internal Bar Code"),
+                    ItemWorksheetLine."Internal Bar Code", ItemWorksheet.TableCaption, ItemWorksheetLine."Worksheet Name");
+            ItemWorksheetLine2.SetRange("Internal Bar Code");
+        end;
 
-            //Duplicate vendor Barcode
-            if "Vendors Bar Code" <> '' then begin
-                ItemWorksheetLine2.SetRange("Vendors Bar Code", "Vendors Bar Code");
-                if not ItemWorksheetLine2.IsEmpty then
-                    GenerateDuplicateError(ItemWorksheetLine, FieldCaption("Vendors Bar Code"), "Vendors Bar Code", ItemWorksheet.TableCaption, "Worksheet Name");
-                ItemWorksheetLine2.SetRange("Vendors Bar Code");
-            end;
+        //Duplicate vendor Barcode
+        if ItemWorksheetLine."Vendors Bar Code" <> '' then begin
+            ItemWorksheetLine2.SetRange("Vendors Bar Code", ItemWorksheetLine."Vendors Bar Code");
+            if not ItemWorksheetLine2.IsEmpty() then
+                GenerateDuplicateError(
+                    ItemWorksheetLine, ItemWorksheetLine.FieldCaption("Vendors Bar Code"),
+                    ItemWorksheetLine."Vendors Bar Code", ItemWorksheet.TableCaption, ItemWorksheetLine."Worksheet Name");
+            ItemWorksheetLine2.SetRange("Vendors Bar Code");
         end;
     end;
 
     local procedure GenerateDuplicateError(ItemWorksheetLine: Record "NPR Item Worksheet Line"; ErrorText1: Text[50]; ErrorText2: Text[50]; ErrorText3: Text[50]; ErrorText4: Text[50])
     var
-        Text001: Label '%1 %2 already exists in %3 %4.';
         ItemWorksheetTemplate: Record "NPR Item Worksh. Template";
+        AlreadyExistErr: Label '%1 %2 already exists in %3 %4.', Comment = '%1 = Error Text 1; %2 = Error Text 2; %3 = Error Text 3; %4 = Error Text 4';
         FullErrortext: Text[512];
     begin
-        FullErrortext := StrSubstNo(Text001, ErrorText1, ErrorText2, ErrorText3, ErrorText4);
+        FullErrortext := StrSubstNo(AlreadyExistErr, ErrorText1, ErrorText2, ErrorText3, ErrorText4);
         ItemWorksheetTemplate.Get(ItemWorksheetLine."Worksheet Template Name");
         case ItemWorksheetTemplate."Error Handling" of
             ItemWorksheetTemplate."Error Handling"::StopOnFirst:
                 Error(FullErrortext);
         end;
-        with ItemWorksheetLine do begin
-            Status := Status::Error;
-            "Status Comment" := CopyStr(FullErrortext, 1, MaxStrLen("Status Comment"));
-            Modify;
-        end;
+        ItemWorksheetLine.Status := ItemWorksheetLine.Status::Error;
+        ItemWorksheetLine."Status Comment" := CopyStr(FullErrortext, 1, MaxStrLen(ItemWorksheetLine."Status Comment"));
+        ItemWorksheetLine.Modify();
     end;
 
     procedure ItemVariantExists(ItemNo: Code[20]): Boolean

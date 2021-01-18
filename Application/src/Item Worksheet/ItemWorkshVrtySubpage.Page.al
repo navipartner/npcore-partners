@@ -1,49 +1,40 @@
 page 6060043 "NPR Item Worksh. Vrty. Subpage"
 {
-    // NPR4.18\BR\20160209  CASE 182391 Object Created
-    // NPR4.19\BR\20160308  CASE 182391 Fixed update behaviour, expand/collapase on the web client
-    // NPR5.22\BR\20160323  CASE 182391 Added field Recommended Retail Price
-    // NPR5.33\BR\20170627  CASE 282211 Made Fields Variety value non-editable
-    // NPR5.37/BR/20170922  CASE 268786 Made Variety Value Editable
-
     AutoSplitKey = true;
     Caption = 'Item Worksheet Variety Subpage';
     PageType = ListPart;
-    UsageCategory = Administration;
-    ApplicationArea = All;
     SourceTable = "NPR Item Worksh. Variant Line";
     SourceTableView = SORTING("Worksheet Template Name", "Worksheet Name", "Worksheet Line No.", "Variety 1 Value", "Variety 2 Value", "Variety 3 Value", "Variety 4 Value")
                       ORDER(Ascending);
-
     layout
     {
         area(content)
         {
             repeater(Group)
             {
-                IndentationColumn = Level;
+                IndentationColumn = Rec.Level;
                 ShowAsTree = true;
-                field(Level; Level)
+                field(Level; Rec.Level)
                 {
                     ApplicationArea = All;
                     AutoFormatType = 2;
                     BlankNumbers = BlankZeroAndPos;
                     Editable = false;
-                    ToolTip = 'Specifies the value of the Level field';
+                    ToolTip = 'Specifies the value of the Level field.';
                 }
-                field("Heading Text"; "Heading Text")
+                field("Heading Text"; Rec."Heading Text")
                 {
                     ApplicationArea = All;
                     Editable = false;
-                    ToolTip = 'Specifies the value of the Heading Text field';
+                    ToolTip = 'Specifies the value of the Heading Text field.';
                 }
-                field("Variety 1 Value"; "Variety 1 Value")
+                field("Variety 1 Value"; Rec."Variety 1 Value")
                 {
                     ApplicationArea = All;
                     CaptionClass = '3,' + FieldCaptionNew[1];
                     Editable = true;
+                    ToolTip = 'Specifies the value of the Variety 1 Value field.';
                     Visible = Variety1InUse;
-                    ToolTip = 'Specifies the value of the Variety 1 Value field';
 
                     trigger OnValidate()
                     begin
@@ -54,142 +45,140 @@ page 6060043 "NPR Item Worksh. Vrty. Subpage"
                         CurrPage.Update(false);
                     end;
                 }
-                field("Variety 2 Value"; "Variety 2 Value")
+                field("Variety 2 Value"; Rec."Variety 2 Value")
                 {
                     ApplicationArea = All;
                     CaptionClass = '3,' + FieldCaptionNew[2];
                     Editable = true;
+                    ToolTip = 'Specifies the value of the Variety 2 Value field.';
                     Visible = Variety2InUse;
-                    ToolTip = 'Specifies the value of the Variety 2 Value field';
 
                     trigger OnValidate()
                     begin
-                        if "Variety 2 Value" <> xRec."Variety 2 Value" then
-                            Modify(true);
+                        if Rec."Variety 2 Value" <> xRec."Variety 2 Value" then
+                            Rec.Modify(true);
                         ItemWorksheetLine.UpdateVarietyHeadingText;
                         Commit;
                         CurrPage.Update(false);
                     end;
                 }
-                field("Variety 3 Value"; "Variety 3 Value")
+                field("Variety 3 Value"; Rec."Variety 3 Value")
                 {
                     ApplicationArea = All;
                     CaptionClass = '3,' + FieldCaptionNew[3];
                     Editable = true;
+                    ToolTip = 'Specifies the value of the Variety 3 Value field.';
                     Visible = Variety3InUse;
-                    ToolTip = 'Specifies the value of the Variety 3 Value field';
 
                     trigger OnValidate()
                     begin
-                        if "Variety 3 Value" <> xRec."Variety 3 Value" then
-                            Modify(true);
+                        if Rec."Variety 3 Value" <> xRec."Variety 3 Value" then
+                            Rec.Modify(true);
                         ItemWorksheetLine.UpdateVarietyHeadingText;
                         Commit;
                         CurrPage.Update(false);
                     end;
                 }
-                field("Variety 4 Value"; "Variety 4 Value")
+                field("Variety 4 Value"; Rec."Variety 4 Value")
                 {
                     ApplicationArea = All;
                     CaptionClass = '3,' + FieldCaptionNew[4];
                     Editable = true;
+                    ToolTip = 'Specifies the value of the Variety 4 Value field.';
                     Visible = Variety4InUse;
-                    ToolTip = 'Specifies the value of the Variety 4 Value field';
 
                     trigger OnValidate()
                     begin
-                        if "Variety 4 Value" <> xRec."Variety 4 Value" then
-                            Modify(true);
+                        if Rec."Variety 4 Value" <> xRec."Variety 4 Value" then
+                            Rec.Modify(true);
                         ItemWorksheetLine.UpdateVarietyHeadingText;
                         Commit;
                         CurrPage.Update(false);
                     end;
                 }
-                field("Action"; Action)
+                field("Action"; Rec.Action)
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Action field';
+                    ToolTip = 'Specifies the value of the Action field.';
 
                     trigger OnValidate()
                     begin
-                        if (Action <> xRec.Action) and ("Heading Text" = '') then begin
-                            Modify(true);
-                            ItemWorksheetLine.UpdateVarietyHeadingText;
+                        if (Rec.Action <> xRec.Action) and (Rec."Heading Text" = '') then begin
+                            Rec.Modify(true);
+                            ItemWorksheetLine.UpdateVarietyHeadingText();
                         end;
-                        Commit;
+                        Commit();
                         CurrPage.Update(false);
                     end;
                 }
-                field("Variant Code"; "Variant Code")
+                field("Variant Code"; Rec."Variant Code")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Variant Code field';
+                    ToolTip = 'Specifies the value of the Variant Code field.';
 
                     trigger OnValidate()
                     begin
-                        if ("Variant Code" <> xRec."Variant Code") and ("Heading Text" = '') then
-                            Modify(true);
+                        if (Rec."Variant Code" <> xRec."Variant Code") and (Rec."Heading Text" = '') then
+                            Rec.Modify(true);
                         CurrPage.Update(false);
                     end;
                 }
-                field("Existing Variant Code"; "Existing Variant Code")
+                field("Existing Variant Code"; Rec."Existing Variant Code")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Existing Variant Code field';
+                    ToolTip = 'Specifies the value of the Existing Variant Code field.';
 
                     trigger OnValidate()
                     begin
-                        if ("Existing Variant Code" <> xRec."Existing Variant Code") and ("Heading Text" = '') then
-                            Modify(true);
+                        if (Rec."Existing Variant Code" <> xRec."Existing Variant Code") and (Rec."Heading Text" = '') then
+                            Rec.Modify(true);
                         CurrPage.Update(false);
                     end;
                 }
-                field("Existing Variant Blocked"; "Existing Variant Blocked")
+                field("Existing Variant Blocked"; Rec."Existing Variant Blocked")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Existing Variant Blocked field';
+                    ToolTip = 'Specifies the value of the Existing Variant Blocked field.';
                 }
-                field("Internal Bar Code"; "Internal Bar Code")
+                field("Internal Bar Code"; Rec."Internal Bar Code")
                 {
                     ApplicationArea = All;
                     Editable = AltNoEditable;
-                    ToolTip = 'Specifies the value of the Internal Bar Code field';
+                    ToolTip = 'Specifies the value of the Internal Bar Code field.';
 
                     trigger OnValidate()
                     begin
-                        if ("Internal Bar Code" <> xRec."Internal Bar Code") and ("Heading Text" = '') then
-                            Modify(true);
+                        if (Rec."Internal Bar Code" <> xRec."Internal Bar Code") and (Rec."Heading Text" = '') then
+                            Rec.Modify(true);
                         CurrPage.Update(false);
                     end;
                 }
-                field("Vendors Bar Code"; "Vendors Bar Code")
+                field("Vendors Bar Code"; Rec."Vendors Bar Code")
                 {
                     ApplicationArea = All;
                     Editable = CrossRefEditable;
-                    ToolTip = 'Specifies the value of the Vendors Bar Code field';
+                    ToolTip = 'Specifies the value of the Vendors Bar Code field.';
 
                     trigger OnValidate()
                     begin
-                        if ("Vendors Bar Code" <> xRec."Vendors Bar Code") and ("Heading Text" = '') then
-                            Modify(true);
+                        if (Rec."Vendors Bar Code" <> xRec."Vendors Bar Code") and (Rec."Heading Text" = '') then
+                            Rec.Modify(true);
                         CurrPage.Update(false);
                     end;
                 }
-                field("Recommended Retail Price"; "Recommended Retail Price")
+                field("Recommended Retail Price"; Rec."Recommended Retail Price")
                 {
                     ApplicationArea = All;
                     Enabled = false;
+                    ToolTip = 'Specifies the value of the Recommended Retail Price field.';
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Recommended Retail Price field';
 
                     trigger OnValidate()
                     begin
-                        //-NPR5.22
-                        if ("Recommended Retail Price" <> xRec."Recommended Retail Price") and ("Heading Text" = '') then
-                            Modify(true);
+                        if (Rec."Recommended Retail Price" <> xRec."Recommended Retail Price") and (Rec."Heading Text" = '') then
+                            Rec.Modify(true);
                         CurrPage.Update(false);
-                        RefreshRRPText;
-                        //+NPR5.22
+                        RefreshRRPText();
                     end;
                 }
                 field(RRPText; RecommendedRetailPriceText)
@@ -198,37 +187,35 @@ page 6060043 "NPR Item Worksh. Vrty. Subpage"
                     Caption = 'Recommended Retail Price';
                     Style = StandardAccent;
                     StyleExpr = RecommendedRetailPriceBold;
-                    ToolTip = 'Specifies the value of the Recommended Retail Price field';
+                    ToolTip = 'Specifies the value of the Recommended Retail Price field.';
 
                     trigger OnValidate()
                     begin
-                        //-NPR5.22
                         if RecommendedRetailPriceText = '' then
                             RecommendedRetailPriceText := '0';
-                        Evaluate("Recommended Retail Price", RecommendedRetailPriceText);
-                        if "Recommended Retail Price" <> ItemWorksheetLine."Recommended Retail Price" then
-                            Validate("Recommended Retail Price")
+                        Evaluate(Rec."Recommended Retail Price", RecommendedRetailPriceText);
+                        if Rec."Recommended Retail Price" <> ItemWorksheetLine."Recommended Retail Price" then
+                            Rec.Validate("Recommended Retail Price")
                         else
-                            Validate("Recommended Retail Price", 0);
-                        Modify(true);
-                        RefreshRRPText;
+                            Rec.Validate("Recommended Retail Price", 0);
+                        Rec.Modify(true);
+                        RefreshRRPText();
                         CurrPage.Update(false);
-                        //+NPR5.22
                     end;
                 }
-                field("Sales Price"; "Sales Price")
+                field("Sales Price"; Rec."Sales Price")
                 {
                     ApplicationArea = All;
                     Enabled = false;
+                    ToolTip = 'Specifies the value of the Sales Price field.';
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Sales Price field';
 
                     trigger OnValidate()
                     begin
-                        if ("Sales Price" <> xRec."Sales Price") and ("Heading Text" = '') then
-                            Modify(true);
+                        if (Rec."Sales Price" <> xRec."Sales Price") and (Rec."Heading Text" = '') then
+                            Rec.Modify(true);
                         CurrPage.Update(false);
-                        RefreshSalesPriceText;
+                        RefreshSalesPriceText();
                     end;
                 }
                 field("Unit Price"; SalesPriceText)
@@ -236,34 +223,34 @@ page 6060043 "NPR Item Worksh. Vrty. Subpage"
                     ApplicationArea = All;
                     Style = StandardAccent;
                     StyleExpr = SalesPriceBold;
-                    ToolTip = 'Specifies the value of the SalesPriceText field';
+                    ToolTip = 'Specifies the value of the SalesPriceText field.';
 
                     trigger OnValidate()
                     begin
                         if SalesPriceText = '' then
                             SalesPriceText := '0';
-                        Evaluate("Sales Price", SalesPriceText);
-                        if "Sales Price" <> ItemWorksheetLine."Sales Price" then
-                            Validate("Sales Price")
+                        Evaluate(Rec."Sales Price", SalesPriceText);
+                        if Rec."Sales Price" <> ItemWorksheetLine."Sales Price" then
+                            Rec.Validate("Sales Price")
                         else
-                            Validate("Sales Price", 0);
-                        Modify(true);
-                        RefreshSalesPriceText;
+                            Rec.Validate("Sales Price", 0);
+                        Rec.Modify(true);
+                        RefreshSalesPriceText();
                         CurrPage.Update(false);
                     end;
                 }
-                field("Direct Unit Cost"; "Direct Unit Cost")
+                field("Direct Unit Cost"; Rec."Direct Unit Cost")
                 {
                     ApplicationArea = All;
                     Enabled = false;
+                    ToolTip = 'Specifies the value of the Direct Unit Cost field.';
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Direct Unit Cost field';
 
                     trigger OnValidate()
                     begin
 
-                        if ("Direct Unit Cost" <> xRec."Direct Unit Cost") and ("Heading Text" = '') then
-                            Modify(true);
+                        if (Rec."Direct Unit Cost" <> xRec."Direct Unit Cost") and (Rec."Heading Text" = '') then
+                            Rec.Modify(true);
                         CurrPage.Update(false);
                     end;
                 }
@@ -272,43 +259,43 @@ page 6060043 "NPR Item Worksh. Vrty. Subpage"
                     ApplicationArea = All;
                     Style = StandardAccent;
                     StyleExpr = PurchasePriceBold;
-                    ToolTip = 'Specifies the value of the PurchasePriceText field';
+                    ToolTip = 'Specifies the value of the PurchasePriceText field.';
 
                     trigger OnValidate()
                     begin
                         if PurchasePriceText = '' then
                             PurchasePriceText := '0';
-                        Evaluate("Direct Unit Cost", PurchasePriceText);
-                        if "Direct Unit Cost" <> ItemWorksheetLine."Direct Unit Cost" then
-                            Validate("Direct Unit Cost")
+                        Evaluate(Rec."Direct Unit Cost", PurchasePriceText);
+                        if Rec."Direct Unit Cost" <> ItemWorksheetLine."Direct Unit Cost" then
+                            Rec.Validate("Direct Unit Cost")
                         else
-                            Validate("Direct Unit Cost", 0);
-                        Modify(true);
-                        RefreshPurchasePriceText;
+                            Rec.Validate("Direct Unit Cost", 0);
+                        Rec.Modify(true);
+                        RefreshPurchasePriceText();
                         CurrPage.Update(false);
                     end;
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Description field';
+                    ToolTip = 'Specifies the value of the Description field.';
 
                     trigger OnValidate()
                     begin
-                        if (Description <> xRec.Description) and ("Heading Text" = '') then
-                            Modify(true);
+                        if (Rec.Description <> xRec.Description) and (Rec."Heading Text" = '') then
+                            Rec.Modify(true);
                         CurrPage.Update(false);
                     end;
                 }
-                field(Blocked; Blocked)
+                field(Blocked; Rec.Blocked)
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Blocked field';
+                    ToolTip = 'Specifies the value of the Blocked field.';
 
                     trigger OnValidate()
                     begin
-                        if ("Heading Text" = '') then
-                            Modify(true);
+                        if (Rec."Heading Text" = '') then
+                            Rec.Modify(true);
                         CurrPage.Update(false);
                     end;
                 }
@@ -322,18 +309,16 @@ page 6060043 "NPR Item Worksh. Vrty. Subpage"
 
     trigger OnAfterGetRecord()
     begin
-        RefreshSalesPriceText;
-        RefreshPurchasePriceText;
-        //-NPR5.22
-        RefreshRRPText;
-        //+NPR5.22
+        RefreshSalesPriceText();
+        RefreshPurchasePriceText();
+        RefreshRRPText();
     end;
 
     trigger OnInsertRecord(BelowxRec: Boolean): Boolean
     begin
-        "Worksheet Template Name" := ItemWorksheetLine."Worksheet Template Name";
-        "Worksheet Name" := ItemWorksheetLine."Worksheet Name";
-        "Worksheet Line No." := ItemWorksheetLine."Line No.";
+        Rec."Worksheet Template Name" := ItemWorksheetLine."Worksheet Template Name";
+        Rec."Worksheet Name" := ItemWorksheetLine."Worksheet Name";
+        Rec."Worksheet Line No." := ItemWorksheetLine."Line No.";
     end;
 
     trigger OnOpenPage()
@@ -345,8 +330,14 @@ page 6060043 "NPR Item Worksh. Vrty. Subpage"
     end;
 
     var
-        FieldCaptionNew: array[4] of Text;
         ItemWorksheetLine: Record "NPR Item Worksheet Line";
+        VarietySetup: Record "NPR Variety Setup";
+        AutoFormatManagement: Codeunit "Auto Format";
+        AltNoEditable: Boolean;
+        CrossRefEditable: Boolean;
+        PurchasePriceBold: Boolean;
+        RecommendedRetailPriceBold: Boolean;
+        SalesPriceBold: Boolean;
         [InDataSet]
         Variety1InUse: Boolean;
         [InDataSet]
@@ -355,16 +346,10 @@ page 6060043 "NPR Item Worksh. Vrty. Subpage"
         Variety3InUse: Boolean;
         [InDataSet]
         Variety4InUse: Boolean;
-        RecommendedRetailPriceText: Text[20];
-        RecommendedRetailPriceBold: Boolean;
-        SalesPriceText: Text[20];
-        SalesPriceBold: Boolean;
+        FieldCaptionNew: array[4] of Text;
         PurchasePriceText: Text[20];
-        PurchasePriceBold: Boolean;
-        AutoFormatManagement: Codeunit "Auto Format";
-        VarietySetup: Record "NPR Variety Setup";
-        AltNoEditable: Boolean;
-        CrossRefEditable: Boolean;
+        RecommendedRetailPriceText: Text[20];
+        SalesPriceText: Text[20];
 
     procedure SetRecFromIW(ItemWorksheetLineHere: Record "NPR Item Worksheet Line")
     var
@@ -372,29 +357,31 @@ page 6060043 "NPR Item Worksh. Vrty. Subpage"
     begin
         ItemWorksheetLine := ItemWorksheetLineHere;
 
-        FilterGroup := 2;
-        SetRange("Worksheet Template Name", ItemWorksheetLine."Worksheet Template Name");
-        SetRange("Worksheet Line No.", ItemWorksheetLine."Line No.");
-        FilterGroup := 0;
+        Rec.FilterGroup := 2;
+        Rec.SetRange("Worksheet Template Name", ItemWorksheetLine."Worksheet Template Name");
+        Rec.SetRange("Worksheet Line No.", ItemWorksheetLine."Line No.");
+        Rec.FilterGroup := 0;
 
         MakeCaptions();
-
-        //-NPR4.19
         if CurrentClientType <> CLIENTTYPE::Windows then begin
             if LocRecItemWorksheet.Get(ItemWorksheetLine."Worksheet Template Name", ItemWorksheetLine."Worksheet Name") then begin
                 case LocRecItemWorksheet."Show Variety Level" of
                     LocRecItemWorksheet."Show Variety Level"::"Variety 1+2+3+4":
-                        SetRange(Level, 0, 3);
+                        Rec.SetRange(Level, 0, 3);
                     LocRecItemWorksheet."Show Variety Level"::"Variety 1+2+3":
-                        SetRange(Level, 0, 2);
+                        Rec.SetRange(Level, 0, 2);
                     LocRecItemWorksheet."Show Variety Level"::"Variety 1+2":
-                        SetRange(Level, 0, 1);
+                        Rec.SetRange(Level, 0, 1);
                     LocRecItemWorksheet."Show Variety Level"::"Variety 1":
-                        SetRange(Level, 0, 0);
+                        Rec.SetRange(Level, 0, 0);
                 end;
             end;
         end;
-        //+NPR4.19
+    end;
+
+    procedure UpdateSubPage()
+    begin
+        CurrPage.Update(false);
     end;
 
     local procedure MakeCaptions()
@@ -416,50 +403,44 @@ page 6060043 "NPR Item Worksh. Vrty. Subpage"
             FieldCaptionNew[4] := ItemWorksheetLine."Variety 4" + '; ' + ItemWorksheetLine."Variety 4 Table (New)";
     end;
 
-    procedure UpdateSubPage()
-    begin
-        CurrPage.Update(false);
-    end;
 
     local procedure RefreshSalesPriceText()
     begin
-        GetLine;
-        if "Heading Text" <> '' then
+        Rec.GetLine();
+        if Rec."Heading Text" <> '' then
             SalesPriceText := ''
         else
-            if "Sales Price" = 0 then
+            if Rec."Sales Price" = 0 then
                 SalesPriceText := StrSubstNo('( %1 )', Format(ItemWorksheetLine."Sales Price", 0, AutoFormatManagement.ResolveAutoFormat(Enum::"Auto Format".FromInteger(2), '')))
             else
-                SalesPriceText := StrSubstNo('%1', Format("Sales Price", 0, AutoFormatManagement.ResolveAutoFormat(Enum::"Auto Format".FromInteger(2), '')));
-        SalesPriceBold := "Sales Price" > 0;
+                SalesPriceText := StrSubstNo('%1', Format(Rec."Sales Price", 0, AutoFormatManagement.ResolveAutoFormat(Enum::"Auto Format".FromInteger(2), '')));
+        SalesPriceBold := Rec."Sales Price" > 0;
     end;
 
     local procedure RefreshPurchasePriceText()
     begin
-        GetLine;
-        if "Heading Text" <> '' then
+        Rec.GetLine();
+        if Rec."Heading Text" <> '' then
             PurchasePriceText := ''
         else
-            if "Direct Unit Cost" = 0 then
+            if Rec."Direct Unit Cost" = 0 then
                 PurchasePriceText := StrSubstNo('( %1 )', Format(ItemWorksheetLine."Direct Unit Cost", 0, AutoFormatManagement.ResolveAutoFormat(Enum::"Auto Format".FromInteger(2), '')))
             else
-                PurchasePriceText := StrSubstNo('%1', Format("Direct Unit Cost", 0, AutoFormatManagement.ResolveAutoFormat(Enum::"Auto Format".FromInteger(2), '')));
-        PurchasePriceBold := "Direct Unit Cost" > 0;
+                PurchasePriceText := StrSubstNo('%1', Format(Rec."Direct Unit Cost", 0, AutoFormatManagement.ResolveAutoFormat(Enum::"Auto Format".FromInteger(2), '')));
+        PurchasePriceBold := Rec."Direct Unit Cost" > 0;
     end;
 
     local procedure RefreshRRPText()
     begin
-        //-NPR5.22
-        GetLine;
-        if "Heading Text" <> '' then
+        Rec.GetLine();
+        if Rec."Heading Text" <> '' then
             RecommendedRetailPriceText := ''
         else
-            if "Recommended Retail Price" = 0 then
+            if Rec."Recommended Retail Price" = 0 then
                 RecommendedRetailPriceText := StrSubstNo('( %1 )', Format(ItemWorksheetLine."Recommended Retail Price", 0, AutoFormatManagement.ResolveAutoFormat(Enum::"Auto Format".FromInteger(2), '')))
             else
-                RecommendedRetailPriceText := StrSubstNo('%1', Format("Recommended Retail Price", 0, AutoFormatManagement.ResolveAutoFormat(Enum::"Auto Format".FromInteger(2), '')));
-        RecommendedRetailPriceBold := "Recommended Retail Price" > 0;
-        //+NPR5.22
+                RecommendedRetailPriceText := StrSubstNo('%1', Format(Rec."Recommended Retail Price", 0, AutoFormatManagement.ResolveAutoFormat(Enum::"Auto Format".FromInteger(2), '')));
+        RecommendedRetailPriceBold := Rec."Recommended Retail Price" > 0;
     end;
 }
 

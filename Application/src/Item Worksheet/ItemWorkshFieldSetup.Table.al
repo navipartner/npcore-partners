@@ -1,10 +1,7 @@
 table 6060052 "NPR Item Worksh. Field Setup"
 {
-    // NPR5.25\BR  \20160720  CASE 246088 Object Created
-
     Caption = 'Item Worksheet Field Setup';
     DataClassification = CustomerContent;
-
     fields
     {
         field(1; "Worksheet Template Name"; Code[10])
@@ -36,8 +33,6 @@ table 6060052 "NPR Item Worksh. Field Setup"
             end;
 
             trigger OnValidate()
-            var
-                WarnDataTypeExample: Label 'Warning: the imported example fields could not be evaluated ro datatype %1.';
             begin
 
                 if RecField.Get("Table No.", "Field Number") then begin
@@ -72,8 +67,7 @@ table 6060052 "NPR Item Worksh. Field Setup"
 
             trigger OnValidate()
             begin
-
-                RecField.Reset;
+                RecField.Reset();
                 RecField.SetRange(TableNo, "Table No.");
                 RecField.SetRange(FieldName, "Field Name");
                 if RecField.FindFirst then
@@ -94,8 +88,7 @@ table 6060052 "NPR Item Worksh. Field Setup"
 
             trigger OnValidate()
             begin
-
-                RecField.Reset;
+                RecField.Reset();
                 RecField.SetRange(TableNo, "Table No.");
                 RecField.SetRange("Field Caption", "Field Caption");
                 if RecField.FindFirst then
@@ -138,8 +131,7 @@ table 6060052 "NPR Item Worksh. Field Setup"
 
             trigger OnValidate()
             begin
-
-                RecField.Reset;
+                RecField.Reset();
                 RecField.SetRange(TableNo, "Target Table No. Create");
                 RecField.SetRange(FieldName, "Target Field Name Create");
                 if RecField.FindFirst then
@@ -160,8 +152,7 @@ table 6060052 "NPR Item Worksh. Field Setup"
 
             trigger OnValidate()
             begin
-
-                RecField.Reset;
+                RecField.Reset();
                 RecField.SetRange(TableNo, "Target Table No. Create");
                 RecField.SetRange("Field Caption", "Target Field Caption Create");
                 if RecField.FindFirst then
@@ -204,8 +195,7 @@ table 6060052 "NPR Item Worksh. Field Setup"
 
             trigger OnValidate()
             begin
-
-                RecField.Reset;
+                RecField.Reset();
                 RecField.SetRange(TableNo, "Target Table No. Update");
                 RecField.SetRange(FieldName, "Target Field Name Update");
                 if RecField.FindFirst then
@@ -226,8 +216,7 @@ table 6060052 "NPR Item Worksh. Field Setup"
 
             trigger OnValidate()
             begin
-
-                RecField.Reset;
+                RecField.Reset();
                 RecField.SetRange(TableNo, "Target Table No. Update");
                 RecField.SetRange("Field Caption", "Target Field Caption Update");
                 if RecField.FindFirst then
@@ -259,7 +248,7 @@ table 6060052 "NPR Item Worksh. Field Setup"
         }
         field(150; "Mapped Values"; Integer)
         {
-            CalcFormula = Count ("NPR Item Worksh. Field Mapping" WHERE("Worksheet Template Name" = FIELD("Worksheet Template Name"),
+            CalcFormula = Count("NPR Item Worksh. Field Mapping" WHERE("Worksheet Template Name" = FIELD("Worksheet Template Name"),
                                                                       "Worksheet Name" = FIELD("Worksheet Name"),
                                                                       "Table No." = FIELD("Table No."),
                                                                       "Field Number" = FIELD("Field Number")));
@@ -276,20 +265,16 @@ table 6060052 "NPR Item Worksh. Field Setup"
         }
     }
 
-    fieldgroups
-    {
-    }
-
     var
         RecField: Record "Field";
         ItemWorksheetManagement: Codeunit "NPR Item Worksheet Mgt.";
 
     local procedure LookupField(OptType: Option Source,TargetCreate,TargetUpdate)
     var
-        FieldLookup: Page "NPR Field Lookup";
-        NPRAttributeIDs: Page "NPR Attribute IDs";
         RecTempField: Record "Field" temporary;
         ItemWorksheetLine: Record "NPR Item Worksheet Line";
+        NPRAttributeIDs: Page "NPR Attribute IDs";
+        FieldLookup: Page "NPR Field Lookup";
         I: Integer;
         FieldNumberFilter: Text;
     begin

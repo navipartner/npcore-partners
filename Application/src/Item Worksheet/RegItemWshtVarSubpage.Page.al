@@ -1,109 +1,103 @@
 page 6060048 "NPR Reg. ItemWsht Var.Subpage"
 {
-    // NPR4.18\BR\20160209  CASE 182391 Object Created
-    // NPR5.29\BR \20161209 CASE 260757 Added description
-
     AutoSplitKey = true;
     Caption = 'Reg. Item Wsht Variety Subpage';
     Editable = false;
     PageType = ListPart;
-    UsageCategory = Administration;
-    ApplicationArea = All;
     SourceTable = "NPR Reg. Item Wsht Var. Line";
     SourceTableView = SORTING("Registered Worksheet No.", "Registered Worksheet Line No.", "Variety 1 Value", "Variety 2 Value", "Variety 3 Value", "Variety 4 Value")
                       ORDER(Ascending);
-
     layout
     {
         area(content)
         {
             repeater(Group)
             {
-                IndentationColumn = Level;
+                IndentationColumn = Rec.Level;
                 ShowAsTree = true;
-                field(Level; Level)
+                field(Level; Rec.Level)
                 {
                     ApplicationArea = All;
                     AutoFormatType = 2;
                     Editable = false;
-                    Visible = false;
                     ToolTip = 'Specifies the value of the Level field';
+                    Visible = false;
                 }
-                field("Heading Text"; "Heading Text")
+                field("Heading Text"; Rec."Heading Text")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Heading Text field';
                 }
-                field("Variety 1 Value"; "Variety 1 Value")
+                field("Variety 1 Value"; Rec."Variety 1 Value")
                 {
                     ApplicationArea = All;
                     CaptionClass = '3,' + FieldCaptionNew[1];
-                    Visible = Variety1InUse;
                     ToolTip = 'Specifies the value of the Variety 1 Value field';
+                    Visible = Variety1InUse;
                 }
-                field("Variety 2 Value"; "Variety 2 Value")
+                field("Variety 2 Value"; Rec."Variety 2 Value")
                 {
                     ApplicationArea = All;
                     CaptionClass = '3,' + FieldCaptionNew[2];
-                    Visible = Variety2InUse;
                     ToolTip = 'Specifies the value of the Variety 2 Value field';
+                    Visible = Variety2InUse;
                 }
-                field("Variety 3 Value"; "Variety 3 Value")
+                field("Variety 3 Value"; Rec."Variety 3 Value")
                 {
                     ApplicationArea = All;
                     CaptionClass = '3,' + FieldCaptionNew[3];
-                    Visible = Variety3InUse;
                     ToolTip = 'Specifies the value of the Variety 3 Value field';
+                    Visible = Variety3InUse;
                 }
-                field("Variety 4 Value"; "Variety 4 Value")
+                field("Variety 4 Value"; Rec."Variety 4 Value")
                 {
                     ApplicationArea = All;
                     CaptionClass = '3,' + FieldCaptionNew[4];
-                    Visible = Variety4InUse;
                     ToolTip = 'Specifies the value of the Variety 4 Value field';
+                    Visible = Variety4InUse;
                 }
-                field("Action"; Action)
+                field("Action"; Rec.Action)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Action field';
                 }
-                field("Variant Code"; "Variant Code")
+                field("Variant Code"; Rec."Variant Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Variant Code field';
                 }
-                field("Existing Variant Code"; "Existing Variant Code")
+                field("Existing Variant Code"; Rec."Existing Variant Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Existing Variant Code field';
                 }
-                field("Existing Variant Blocked"; "Existing Variant Blocked")
+                field("Existing Variant Blocked"; Rec."Existing Variant Blocked")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Existing Variant Blocked field';
                 }
-                field("Internal Bar Code"; "Internal Bar Code")
+                field("Internal Bar Code"; Rec."Internal Bar Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Internal Bar Code field';
                 }
-                field("Vendors Bar Code"; "Vendors Bar Code")
+                field("Vendors Bar Code"; Rec."Vendors Bar Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Vendors Bar Code field';
                 }
-                field("Sales Price"; "Sales Price")
+                field("Sales Price"; Rec."Sales Price")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Sales Price field';
                 }
-                field("Direct Unit Cost"; "Direct Unit Cost")
+                field("Direct Unit Cost"; Rec."Direct Unit Cost")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Direct Unit Cost field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
@@ -112,12 +106,7 @@ page 6060048 "NPR Reg. ItemWsht Var.Subpage"
         }
     }
 
-    actions
-    {
-    }
-
     var
-        FieldCaptionNew: array[4] of Text;
         RegItemWorksheetLine: Record "NPR Regist. Item Worksh Line";
         [InDataSet]
         Variety1InUse: Boolean;
@@ -127,15 +116,16 @@ page 6060048 "NPR Reg. ItemWsht Var.Subpage"
         Variety3InUse: Boolean;
         [InDataSet]
         Variety4InUse: Boolean;
+        FieldCaptionNew: array[4] of Text;
 
     procedure SetRecFromIW(RegItemWorksheetLineHere: Record "NPR Regist. Item Worksh Line")
     begin
         RegItemWorksheetLine := RegItemWorksheetLineHere;
 
-        FilterGroup := 2;
-        SetRange("Registered Worksheet No.", RegItemWorksheetLine."Registered Worksheet No.");
-        SetRange("Registered Worksheet Line No.", RegItemWorksheetLine."Line No.");
-        FilterGroup := 0;
+        Rec.FilterGroup := 2;
+        Rec.SetRange("Registered Worksheet No.", RegItemWorksheetLine."Registered Worksheet No.");
+        Rec.SetRange("Registered Worksheet Line No.", RegItemWorksheetLine."Line No.");
+        Rec.FilterGroup := 0;
 
         MakeCaptions();
     end;

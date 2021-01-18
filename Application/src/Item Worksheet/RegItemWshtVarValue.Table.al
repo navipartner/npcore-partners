@@ -1,7 +1,5 @@
 table 6060048 "NPR Reg. Item Wsht Var. Value"
 {
-    // NPR4.18\BR\20160209  CASE 182391 Object Created
-
     Caption = 'Reg. Item Wsht Variety Value';
     DataClassification = CustomerContent;
 
@@ -71,15 +69,7 @@ table 6060048 "NPR Reg. Item Wsht Var. Value"
         }
     }
 
-    fieldgroups
-    {
-    }
 
-    trigger OnDelete()
-    var
-        VRTCheck: Codeunit "NPR Variety Check";
-    begin
-    end;
 
     procedure GetDecimalSeperator(): Text[1]
     var

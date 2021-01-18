@@ -1,11 +1,5 @@
 page 6060041 "NPR Item Worksheets"
 {
-    // NPR4.18/BR  /20160209  CASE 182391 Object Created
-    // NPR5.23/BR  /20160602  CASE 240330 Added field Item No. Prefix and Prefix Code
-    // NPR5.25/BR  /20160707  CASE 246088 Added Action Field Setup
-    // NPR5.48/JDH /20181109  CASE 334163 Added Caption to Action
-    // NPR5.51/MHA /20190819  CASE 365377 Removed field 160 "GIM Import Document No."
-
     Caption = 'Item Worksheets';
     PageType = List;
     SourceTable = "NPR Item Worksheet";
@@ -18,40 +12,40 @@ page 6060041 "NPR Item Worksheets"
         {
             repeater(Group)
             {
-                field("Item Template Name"; "Item Template Name")
+                field("Item Template Name"; Rec."Item Template Name")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Item Template Name field';
+                    ToolTip = 'Specifies the value of the Item Template Name field.';
                 }
-                field(Name; Name)
+                field(Name; Rec.Name)
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Name field';
+                    ToolTip = 'Specifies the value of the Name field.';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Description field';
+                    ToolTip = 'Specifies the value of the Description field.';
                 }
-                field("Vendor No."; "Vendor No.")
+                field("Vendor No."; Rec."Vendor No.")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Vendor No. field';
+                    ToolTip = 'Specifies the value of the Vendor No. field.';
                 }
-                field("Prefix Code"; "Prefix Code")
+                field("Prefix Code"; Rec."Prefix Code")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Prefix Code field';
+                    ToolTip = 'Specifies the value of the Prefix Code field.';
                 }
-                field("No. Series"; "No. Series")
+                field("No. Series"; Rec."No. Series")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the No. Series field';
+                    ToolTip = 'Specifies the value of the No. Series field.';
                 }
-                field("Item Group"; "Item Group")
+                field("Item Group"; Rec."Item Group")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Item Group field';
+                    ToolTip = 'Specifies the value of the Item Group field.';
                 }
             }
         }
@@ -63,13 +57,13 @@ page 6060041 "NPR Item Worksheets"
         {
             action("Edit Item Worksheet")
             {
+                ApplicationArea = All;
                 Caption = 'Edit Item Worksheet';
                 Image = Worksheet;
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = All;
-                ToolTip = 'Executes the Edit Item Worksheet action';
+                ToolTip = 'Executes the Edit Item Worksheet action.';
 
                 trigger OnAction()
                 begin
@@ -78,6 +72,7 @@ page 6060041 "NPR Item Worksheets"
             }
             action("Registered Worksheets")
             {
+                ApplicationArea = All;
                 Caption = 'Registered Worksheets';
                 Image = Registered;
                 RunObject = Page "NPR Registered Item Worksh.";
@@ -85,32 +80,28 @@ page 6060041 "NPR Item Worksheets"
                               "Item Worksheet Template" = FIELD("Item Template Name");
                 RunPageView = SORTING("No.")
                               ORDER(Ascending);
-                ApplicationArea = All;
-                ToolTip = 'Executes the Registered Worksheets action';
+                ToolTip = 'Executes the Registered Worksheets action.';
             }
         }
         area(processing)
         {
             action("Field Setup")
             {
+                ApplicationArea = All;
                 Caption = 'Field Setup';
                 Image = MapAccounts;
-                ApplicationArea = All;
-                ToolTip = 'Executes the Field Setup action';
+                ToolTip = 'Executes the Field Setup action.';
 
                 trigger OnAction()
                 var
                     ItemWorksheetFieldSetup: Record "NPR Item Worksh. Field Setup";
                     ItemWorksheetFieldSetupPage: Page "NPR Item Worksh. Field Setup";
                 begin
-                    //-NPR5.25 [246088]
-                    InsertDefaultFieldSetup;
-                    ItemWorksheetFieldSetup.Reset;
+                    InsertDefaultFieldSetup();
                     ItemWorksheetFieldSetup.SetFilter(ItemWorksheetFieldSetup."Worksheet Template Name", "Item Template Name");
                     ItemWorksheetFieldSetup.SetFilter("Worksheet Name", Name);
                     ItemWorksheetFieldSetupPage.SetTableView(ItemWorksheetFieldSetup);
-                    ItemWorksheetFieldSetupPage.Run;
-                    //+NPR5.25 [246088]
+                    ItemWorksheetFieldSetupPage.Run();
                 end;
             }
         }

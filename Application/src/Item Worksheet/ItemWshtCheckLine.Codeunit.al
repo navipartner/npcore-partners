@@ -1,72 +1,55 @@
 codeunit 6060045 "NPR Item Wsht.-Check Line"
 {
-    // NPR4.18\BR\20160209  CASE 182391 Object Created
-    // NPR4.19\BR\20160216  CASE 182391 Added Support for Tariff No.
-    // NPR5.22\BR\20160316  CASE 182391 Fix check
-    // NPR5.23\BR\20160513  CASE 241073 Added check on Item No. as alternative item no on create
-    // NPR5.25\BR \20160705 CASE 246088 Added validations, andded parameter CalledFromRegister
-    // NPR5.29\BR \20161229 CASE 262068 Moved barcode checks from validate on line
-    // NPR5.29\TJ \20170119 CASE 263917 Changed how to call function GetFromVariety in function CheckItemWorksheetVariantLine
-    // NPR5.35\BR \20170810  CASE 268786 Prevent errors with blank Variety values
-    // NPR5.38/BR /20180112 CASE 268786 Only Create Item Worksheet Variety Value lines with "Create New" Item Worksheet Variant Lines
-    // NPR5.50/THRO/20190515 CASE 355172 Removed error on internal/external barcode
-    // NPR5.52/THRO/20191018 CASE 373596 Change error message for missing item. Added Line No. to error message when StopOnError
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
-        ItemworksheetVarietyValue: Record "NPR Item Worksh. Variety Value";
-        ItemWorksheetVariantLine: Record "NPR Item Worksh. Variant Line";
-        Text100: Label 'Field %1 on the table %2 record %3 %4 %5 %6 does not match the corresponding Item Worksheet Line record.';
-        Text101: Label 'Field %1 on the table %2 record %3 %4 %5 %6 is not valid.';
-        Text102: Label '%1 %2 %3 not found.';
-        Text103: Label '%1 %2 %3 is locked. A copy needs to be created or the Variety value added manually. ';
-        Text104: Label 'Field %1 must be filled.';
-        Text105: Label 'Cannot create item %1 because item already exists';
-        Text106: Label 'A Variant cannot be created because one already exists for the combination of Varieties: %1: %2, %3: %4, %5: %6, %7: %8.';
         ItemWorksheetTemplate: Record "NPR Item Worksh. Template";
-        Text107: Label 'Item No. should be specified in the worksheet line.';
-        Text108: Label 'No. Series should be set up when creating items.';
-        Text109: Label 'An Item  number must be specified or a No. Series must be manual when processing item no.''s';
-        Text110: Label 'The Sales Price Currency Code does not match the Local Currency on line %1. Please set up sales prices on Item+Variant level on the Item Worksheet Template.';
-        Text111: Label 'Please specify the Vendor No. for the purchase price registration on line %1.';
-        Text112: Label 'Item Group should be specified for item to be created in line %1.';
-        Text113: Label 'Description must be filled for all updates and create lines.';
-        Text114: Label 'There are multiple Variety lines in the worksheet line with the combination of Varieties: %1: %2, %3: %4, %5: %6, %7: %8.';
-        Text115: Label 'There are multiple Variety lines in the worksheet line with Vendors Barcode %1.';
-        Text116: Label 'There are multiple Variety lines in the worksheet line with Internal Barcode %1.';
-        Text118: Label 'The Purchase Price Currency Code does not match the Local Currency on line %1. Please set up purchase prices on Item+Variant level on the Item Worksheet Template.';
-        Text119: Label 'Item Category not found';
-        Text120: Label 'Product Group not found';
-        Text121: Label 'Variety %1: %2 not specified.';
-        Text122: Label 'Variety %2 specifed but not defined in Variety %1. ';
-        Text123: Label 'Existing Item No. must be specified for updating.';
-        Text124: Label 'Variety %1 does not match setup on item %1. Variety cannot be updated from the worksheet.';
-        Text125: Label 'Variety Table %1 does not match setup on item %1. Variety Table cannot be updated from the worksheet.';
-        Text126: Label 'Variety tables cannot be copied for existing items from the worksheet.';
-        Text127: Label 'Field %1 could not be found in related table. ';
+        ItemWorksheetVariantLine: Record "NPR Item Worksh. Variant Line";
+        ItemworksheetVarietyValue: Record "NPR Item Worksh. Variety Value";
         TariffNumber: Record "Tariff Number";
-        Text128: Label 'Item No. %1 is already used as a Barcode/Alternative No. for item %2. ';
-        Text130: Label 'Internal Barcodes must start with 2.';
-        TExt131: Label 'Vendor Barcodes must not start with 2.';
+        Text103: Label '%1 %2 %3 is locked. A copy needs to be created or the Variety value added manually. ';
+        Text102: Label '%1 %2 %3 not found.';
         Text132: Label '%1 %2 not found.';
         Text133: Label ' - %1: %2';
+        Text109: Label 'An Item  number must be specified or a No. Series must be manual when processing item no.''s';
+        Text106: Label 'A Variant cannot be created because one already exists for the combination of Varieties: %1: %2, %3: %4, %5: %6, %7: %8.';
+        Text105: Label 'Cannot create item %1 because item already exists';
+        Text113: Label 'Description must be filled for all updates and create lines.';
+        Text123: Label 'Existing Item No. must be specified for updating.';
+        Text127: Label 'Field %1 could not be found in related table. ';
+        Text104: Label 'Field %1 must be filled.';
+        Text100: Label 'Field %1 on the table %2 record %3 %4 %5 %6 does not match the corresponding Item Worksheet Line record.';
+        Text101: Label 'Field %1 on the table %2 record %3 %4 %5 %6 is not valid.';
+        Text130: Label 'Internal Barcodes must start with 2.';
+        Text119: Label 'Item Category not found';
+        Text112: Label 'Item Group should be specified for item to be created in line %1.';
+        Text128: Label 'Item No. %1 is already used as a Barcode/Alternative No. for item %2. ';
+        Text107: Label 'Item No. should be specified in the worksheet line.';
+        Text108: Label 'No. Series should be set up when creating items.';
+        Text111: Label 'Please specify the Vendor No. for the purchase price registration on line %1.';
+        Text120: Label 'Product Group not found';
+        Text118: Label 'The Purchase Price Currency Code does not match the Local Currency on line %1. Please set up purchase prices on Item+Variant level on the Item Worksheet Template.';
+        Text116: Label 'There are multiple Variety lines in the worksheet line with Internal Barcode %1.';
+        Text114: Label 'There are multiple Variety lines in the worksheet line with the combination of Varieties: %1: %2, %3: %4, %5: %6, %7: %8.';
+        Text115: Label 'There are multiple Variety lines in the worksheet line with Vendors Barcode %1.';
+        Text110: Label 'The Sales Price Currency Code does not match the Local Currency on line %1. Please set up sales prices on Item+Variant level on the Item Worksheet Template.';
+        Text121: Label 'Variety %1: %2 not specified.';
+        Text124: Label 'Variety %1 does not match setup on item %1. Variety cannot be updated from the worksheet.';
+        Text122: Label 'Variety %2 specifed but not defined in Variety %1. ';
+        Text125: Label 'Variety Table %1 does not match setup on item %1. Variety Table cannot be updated from the worksheet.';
+        Text126: Label 'Variety tables cannot be copied for existing items from the worksheet.';
+        TExt131: Label 'Vendor Barcodes must not start with 2.';
 
     procedure RunCheck(ItemWkshtLine: Record "NPR Item Worksheet Line"; StopOnError: Boolean; CalledFromRegister: Boolean)
     var
         RecItem: Record Item;
-        NoSeries: Record "No. Series";
-        DefaultNoSeries: Code[10];
         ItemCategory: Record "Item Category";
+        NoSeries: Record "No. Series";
         AlternativeNo: Record "NPR Alternative No.";
-        ItemWkshtValidateTestRnr: Codeunit "NPR Item Wksht.Valid.Test Rnr.";
-        ErrorText: Text;
-        ItemWshtRegisterLine: Codeunit "NPR Item Wsht.Register Line";
         ItemWorksheetVariantLineToCreate: Record "NPR Item Worksh. Variant Line";
+        ItemWkshtValidateTestRnr: Codeunit "NPR Item Wksht.Valid.Test Rnr.";
+        ItemWshtRegisterLine: Codeunit "NPR Item Wsht.Register Line";
         IsUpdated: Boolean;
+        DefaultNoSeries: Code[10];
+        ErrorText: Text;
     begin
         with ItemWkshtLine do begin
             if IsEmpty then
@@ -89,13 +72,9 @@ codeunit 6060045 "NPR Item Wsht.-Check Line"
                                 if "Item No." = '' then begin
                                     case ItemWorksheetTemplate."Item No. Creation by" of
                                         ItemWorksheetTemplate."Item No. Creation by"::VendorItemNo:
-                                            begin
-                                                ProcessError(ItemWkshtLine, Text107, StopOnError);
-                                            end;
+                                            ProcessError(ItemWkshtLine, Text107, StopOnError);
                                         ItemWorksheetTemplate."Item No. Creation by"::NoSeriesInWorksheet:
-                                            begin
-                                                ProcessError(ItemWkshtLine, Text107, StopOnError);
-                                            end;
+                                            ProcessError(ItemWkshtLine, Text107, StopOnError);
                                         ItemWorksheetTemplate."Item No. Creation by"::NoSeriesOnProcessing:
                                             begin
                                                 if not NoSeries."Default Nos." then
@@ -103,9 +82,9 @@ codeunit 6060045 "NPR Item Wsht.-Check Line"
                                             end;
                                     end;
                                 end else begin
-                                    if RecItem.Get("Item No.") then begin
-                                        ProcessError(ItemWkshtLine, StrSubstNo(Text105, "Item No."), StopOnError);
-                                    end else begin
+                                    if RecItem.Get("Item No.") then
+                                        ProcessError(ItemWkshtLine, StrSubstNo(Text105, "Item No."), StopOnError)
+                                    else begin
                                         case ItemWorksheetTemplate."Item No. Creation by" of
                                             ItemWorksheetTemplate."Item No. Creation by"::VendorItemNo:
                                                 begin
@@ -121,22 +100,15 @@ codeunit 6060045 "NPR Item Wsht.-Check Line"
                                     end;
                                 end;
                             end;
-                            //-NPR5.29
-                            if Status <> Status::Error then
-                                CheckWorksheetLineBarcodes(ItemWkshtLine, StopOnError);
-                            //+NPR5.29
                             if Status <> Status::Error then
                                 if "Item Category Code" <> '' then
                                     if not ItemCategory.Get("Item Category Code") then
                                         ProcessError(ItemWkshtLine, Text119, StopOnError);
-                            //-NPR4.19
                             if Status <> Status::Error then
                                 if "Tariff No." <> '' then
                                     if not TariffNumber.Get("Tariff No.") then
                                         ProcessError(ItemWkshtLine, StrSubstNo(Text127, FieldCaption("Tariff No.")), StopOnError);
-                            //+NPR4.19
                         end;
-                        //-NPR5.23
                         if Status <> Status::Error then begin
                             if "Item No." <> '' then
                                 AlternativeNo.Reset;
@@ -144,7 +116,6 @@ codeunit 6060045 "NPR Item Wsht.-Check Line"
                             if AlternativeNo.FindFirst then
                                 ProcessError(ItemWkshtLine, StrSubstNo(Text128, "Item No.", AlternativeNo.Code), StopOnError);
                         end;
-                        //-NPR5.23
                         if Status <> Status::Error then
                             if Description = '' then
                                 ProcessError(ItemWkshtLine, StrSubstNo(Text113), StopOnError);
@@ -156,10 +127,6 @@ codeunit 6060045 "NPR Item Wsht.-Check Line"
 
                 Action::UpdateOnly, Action::UpdateAndCreateVariants:
                     begin
-                        //-NPR5.29
-                        if Status <> Status::Error then
-                            CheckWorksheetLineBarcodes(ItemWkshtLine, StopOnError);
-                        //+NPR5.29
                         if Status <> Status::Error then
                             CheckWorkSheetLinePrices(ItemWkshtLine, StopOnError);
                         if Status <> Status::Error then
@@ -189,39 +156,19 @@ codeunit 6060045 "NPR Item Wsht.-Check Line"
                                "Create Copy of Variety 3 Table" or
                                "Create Copy of Variety 4 Table" then
                                 ProcessError(ItemWkshtLine, Text126, StopOnError);
-                            //-NPR5.22
-                            //IF "Variety 1 Table (Base)" <>  RecItem."Variety 1 Table" THEN
-                            //  ProcessError(ItemWkshtLine,STRSUBSTNO(Text125,1),StopOnError);
-                            // IF "Variety 2 Table (Base)" <>  RecItem."Variety 2 Table" THEN
-                            //   ProcessError(ItemWkshtLine,STRSUBSTNO(Text125,1),StopOnError);
-                            // IF "Variety 3 Table (Base)" <>  RecItem."Variety 3 Table" THEN
-                            //   ProcessError(ItemWkshtLine,STRSUBSTNO(Text125,1),StopOnError);
-                            // IF "Variety 4 Table (Base)" <>  RecItem."Variety 4 Table" THEN
-                            //   ProcessError(ItemWkshtLine,STRSUBSTNO(Text125,1),StopOnError);
-                            // IF "Create Copy of Variety 1 Table" OR
-                            //    "Create Copy of Variety 2 Table" OR
-                            //    "Create Copy of Variety 3 Table" OR
-                            //    "Create Copy of Variety 4 Table" THEN
-                            //  ProcessError(ItemWkshtLine,Text126,StopOnError);
-                            //+NPR5.22
-                            //-NPR4.19
                             if Status <> Status::Error then
                                 if "Tariff No." <> '' then
                                     if not TariffNumber.Get("Tariff No.") then
                                         ProcessError(ItemWkshtLine, StrSubstNo(Text127, FieldCaption("Tariff No.")), StopOnError);
-                            //+NPR4.19
                         end else begin
-                            //-NPR5.52 [373596]
                             if "Existing Item No." <> '' then
                                 ProcessError(ItemWkshtLine, StrSubstNo(Text132, RecItem.TableCaption, "Existing Item No."), StopOnError)
                             else
-                                //-NPR5.52 [373596]
                                 ProcessError(ItemWkshtLine, StrSubstNo(Text123), StopOnError);
                         end;
                     end;
 
             end;
-            //-NPR5.25 [246088]
             if Action in [Action::UpdateAndCreateVariants, Action::UpdateOnly] then
                 ItemWshtRegisterLine.InsertChangeRecords(ItemWkshtLine);
             if ((CalledFromRegister = false) and (ItemWorksheetTemplate."Test Validation" = ItemWorksheetTemplate."Test Validation"::"On Check"))
@@ -234,8 +181,7 @@ codeunit 6060045 "NPR Item Wsht.-Check Line"
                     ProcessError(ItemWkshtLine, ErrorText, StopOnError);
                 end;
             end;
-            //+NPR5.25 [246088]
-            ItemWorksheetVariantLine.Reset;
+            ItemWorksheetVariantLine.Reset();
             ItemWorksheetVariantLine.SetRange("Worksheet Template Name", "Worksheet Template Name");
             ItemWorksheetVariantLine.SetRange("Worksheet Name", "Worksheet Name");
             ItemWorksheetVariantLine.SetRange("Worksheet Line No.", "Line No.");
@@ -243,22 +189,20 @@ codeunit 6060045 "NPR Item Wsht.-Check Line"
             if ItemWorksheetVariantLine.FindSet then
                 repeat
                     CheckItemWorksheetVariantLine(ItemWorksheetVariantLine, ItemWkshtLine, StopOnError);
-                until ItemWorksheetVariantLine.Next = 0;
+                until ItemWorksheetVariantLine.Next() = 0;
 
-            ItemworksheetVarietyValue.Reset;
+            ItemworksheetVarietyValue.Reset();
             ItemworksheetVarietyValue.SetRange("Worksheet Template Name", "Worksheet Template Name");
             ItemworksheetVarietyValue.SetRange("Worksheet Name", "Worksheet Name");
             ItemworksheetVarietyValue.SetRange("Worksheet Line No.", "Line No.");
             if ItemworksheetVarietyValue.FindSet then
                 repeat
-                    //-#NPR5.38 [268786]
-                    //CheckItemWorksheetVarietyLine(ItemworksheetVarietyValue,ItemWkshtLine,StopOnError);
                     IsUpdated := false;
                     ItemWorksheetVariantLineToCreate.SetRange("Worksheet Template Name", ItemWkshtLine."Worksheet Template Name");
                     ItemWorksheetVariantLineToCreate.SetRange("Worksheet Name", ItemWkshtLine."Worksheet Name");
                     ItemWorksheetVariantLineToCreate.SetRange("Worksheet Line No.", ItemWkshtLine."Line No.");
                     ItemWorksheetVariantLineToCreate.SetRange(Action, ItemWorksheetVariantLineToCreate.Action::CreateNew);
-                    if ItemWorksheetVariantLineToCreate.FindSet then
+                    if ItemWorksheetVariantLineToCreate.FindSet() then
                         repeat
                             if ((ItemWorksheetVariantLineToCreate."Variety 1" = ItemworksheetVarietyValue.Type) and
                                 (ItemWorksheetVariantLineToCreate."Variety 1 Value" = ItemworksheetVarietyValue.Value)) or
@@ -272,21 +216,20 @@ codeunit 6060045 "NPR Item Wsht.-Check Line"
                         until (ItemWorksheetVariantLineToCreate.Next = 0) or IsUpdated;
                     if IsUpdated then
                         CheckItemWorksheetVarietyLine(ItemworksheetVarietyValue, ItemWkshtLine, StopOnError);
-                //+NPR5.38 [268786]
-                until ItemworksheetVarietyValue.Next = 0;
+                until ItemworksheetVarietyValue.Next() = 0;
 
             if Status = Status::Unvalidated then
                 Status := Status::Validated;
-            Modify;
+            Modify();
         end;
     end;
 
     local procedure CheckItemWorksheetVariantLine(ItemWorksheetVariantLine: Record "NPR Item Worksh. Variant Line"; var ItemWkshtLine: Record "NPR Item Worksheet Line"; StopOnError: Boolean)
     var
+        Item: Record Item;
+        ItemVariant: Record "Item Variant";
         ItemWorksheetVariantLine2: Record "NPR Item Worksh. Variant Line";
         VarietyTable: Record "NPR Variety Table";
-        ItemVariant: Record "Item Variant";
-        Item: Record Item;
         ItemNumberManagement: Codeunit "NPR Item Number Mgt.";
         VarietyCloneData: Codeunit "NPR Variety Clone Data";
     begin
@@ -301,10 +244,7 @@ codeunit 6060045 "NPR Item Wsht.-Check Line"
                     ProcessError(ItemWkshtLine, StrSubstNo(Text101, FieldCaption("Item No."), TableCaption, "Worksheet Template Name", "Worksheet Name", "Worksheet Line No.", "Line No."), StopOnError);
 
             if Action = Action::CreateNew then
-                //-NPR5.29 [263917]
-                //IF ItemVariant.GetFromVariety("Item No.", "Variety 1 Value",
                 if VarietyCloneData.GetFromVariety(ItemVariant, "Item No.", "Variety 1 Value",
-                                     //+263917 [263917]
                                      "Variety 2 Value", "Variety 3 Value",
                                      "Variety 4 Value") then
                     ProcessError(ItemWkshtLine, StrSubstNo(Text106,
@@ -368,33 +308,18 @@ codeunit 6060045 "NPR Item Wsht.-Check Line"
                 if ("Variety 4 Value" <> '') and ("Variety 4" = '') then
                     ProcessError(ItemWkshtLine, StrSubstNo(Text122, 4, "Variety 4 Value"), StopOnError);
             end;
-            //-NPR5.29 [262068]
-            //-NPR5.50 [355172]
-            //IF (ItemWkshtLine.Status <> ItemWkshtLine.Status::Error) AND ("Internal Bar Code" <> '') THEN  BEGIN
-            //  IF NOT ItemNumberManagement.IsInternalBarcode("Internal Bar Code") THEN
-            //    ProcessError(ItemWkshtLine,Text130,StopOnError);
-            //END;
-            //IF (ItemWkshtLine.Status <> ItemWkshtLine.Status::Error) AND ("Vendors Bar Code" <> '') THEN  BEGIN
-            //  IF ItemNumberManagement.IsInternalBarcode("Vendors Bar Code") THEN
-            //    ProcessError(ItemWkshtLine,TExt131,StopOnError);
-            //END;
-            //+NPR5.50 [355172]
-            //+NPR5.29 [262068]
         end;
     end;
 
     local procedure CheckItemWorksheetVarietyLine(ItemWorksheetVarietyLine: Record "NPR Item Worksh. Variety Value"; var ItemWkshtLine: Record "NPR Item Worksheet Line"; StopOnError: Boolean)
     var
+        Item: Record Item;
+        ItemVariant: Record "Item Variant";
         VarietyTable: Record "NPR Variety Table";
         VarietyValue: Record "NPR Variety Value";
-        ItemVariant: Record "Item Variant";
-        Item: Record Item;
     begin
         with ItemWorksheetVarietyLine do begin
-            //-NPR5.35 [268786]
-            //IF Type <>'' THEN BEGIN
             if (Type <> '') and (Table <> '') and (Value <> '') then begin
-                //-NPR5.35 [268786]
                 if not VarietyValue.Get(Type, Table, Value) then begin
                     if not VarietyTable.Get(Type, Table) then begin
                         ProcessError(ItemWkshtLine, StrSubstNo(Text102, VarietyTable.TableCaption, Type, Value), StopOnError)
@@ -435,6 +360,7 @@ codeunit 6060045 "NPR Item Wsht.-Check Line"
     begin
         if ItemWorksheetTemplate."Sales Price Handling" = ItemWorksheetTemplate."Sales Price Handling"::Item then begin
             if ItemWkshtLine."Sales Price Currency Code" <> '' then begin
+                GLSetup.Get();
                 if GLSetup."LCY Code" <> ItemWkshtLine."Currency Code" then begin
                     ProcessError(ItemWkshtLine, StrSubstNo(Text110, ItemWkshtLine."Currency Code"), StopOnError);
                 end;
@@ -448,6 +374,7 @@ codeunit 6060045 "NPR Item Wsht.-Check Line"
     begin
         if ItemWorksheetTemplate."Purchase Price Handling" = ItemWorksheetTemplate."Purchase Price Handling"::Item then begin
             if (ItemWkshtLine."Purchase Price Currency Code" <> '') and (ItemWkshtLine."Direct Unit Cost" <> 0) then begin
+                GLSetup.Get();
                 if GLSetup."LCY Code" <> ItemWkshtLine."Purchase Price Currency Code" then begin
                     ProcessError(ItemWkshtLine, StrSubstNo(Text118, ItemWkshtLine."Line No."), StopOnError);
                 end;
@@ -458,13 +385,13 @@ codeunit 6060045 "NPR Item Wsht.-Check Line"
                 if ItemWkshtLine."Direct Unit Cost" <> 0 then begin
                     ProcessError(ItemWkshtLine, StrSubstNo(Text111, ItemWkshtLine."Line No."), StopOnError);
                 end else begin
-                    ItemWorksheetVariantLine.Reset;
+                    ItemWorksheetVariantLine.Reset();
                     ItemWorksheetVariantLine.SetRange("Worksheet Template Name", ItemWkshtLine."Worksheet Template Name");
                     ItemWorksheetVariantLine.SetRange("Worksheet Name", ItemWkshtLine."Worksheet Name");
                     ItemWorksheetVariantLine.SetRange("Worksheet Line No.", ItemWkshtLine."Line No.");
                     ItemWorksheetVariantLine.SetFilter(Action, '<>%1', ItemWkshtLine.Action::Skip);
                     ItemWorksheetVariantLine.SetFilter("Direct Unit Cost", '<>0');
-                    if ItemWorksheetVariantLine.FindFirst then begin
+                    if ItemWorksheetVariantLine.FindFirst() then begin
                         ProcessError(ItemWkshtLine, StrSubstNo(Text111, ItemWkshtLine."Line No."), StopOnError);
                     end;
                 end;
@@ -472,31 +399,12 @@ codeunit 6060045 "NPR Item Wsht.-Check Line"
         end;
     end;
 
-    local procedure CheckWorksheetLineBarcodes(var ItemWkshtLine: Record "NPR Item Worksheet Line"; StopOnError: Boolean)
-    var
-        ItemNumberManagement: Codeunit "NPR Item Number Mgt.";
-    begin
-        //-NPR5.29 [262068]
-        //-NPR5.50 [355172]
-        //IF (ItemWkshtLine.Status <> ItemWkshtLine.Status::Error) AND (ItemWkshtLine."Internal Bar Code" <> '') THEN  BEGIN
-        //  IF NOT ItemNumberManagement.IsInternalBarcode(ItemWkshtLine."Internal Bar Code") THEN
-        //    ProcessError(ItemWkshtLine,Text130,StopOnError);
-        //END;
-        //IF (ItemWkshtLine.Status <> ItemWkshtLine.Status::Error) AND (ItemWkshtLine."Vendors Bar Code" <> '') THEN  BEGIN
-        //  IF ItemNumberManagement.IsInternalBarcode(ItemWkshtLine."Vendors Bar Code") THEN
-        //    ProcessError(ItemWkshtLine,TExt131,StopOnError);
-        //END;
-        //+NPR5.50 [355172]
-        //+NPR5.29 [262068]
-    end;
 
     local procedure ProcessError(var ItemWkshtLine: Record "NPR Item Worksheet Line"; ErrorText: Text[1024]; StopOnError: Boolean)
     begin
         if StopOnError then begin
-            //-NPR5.52 [373596]
             if ItemWkshtLine."Line No." <> 0 then
                 ErrorText += StrSubstNo(Text133, ItemWkshtLine.FieldCaption("Line No."), ItemWkshtLine."Line No.");
-            //+NPR5.52 [373596]
             Error(ErrorText)
         end else begin
             if ItemWkshtLine.Status = ItemWkshtLine.Status::Error then begin
@@ -505,7 +413,6 @@ codeunit 6060045 "NPR Item Wsht.-Check Line"
                 ItemWkshtLine.Status := ItemWkshtLine.Status::Error;
                 ItemWkshtLine."Status Comment" := CopyStr(ErrorText, 1, MaxStrLen(ItemWkshtLine."Status Comment"));
             end;
-            //ItemWkshtLine.MODIFY;
         end;
     end;
 }
