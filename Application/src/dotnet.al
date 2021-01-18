@@ -443,22 +443,6 @@ dotnet
         {
         }
 
-        type("NaviPartner.Retail.Nav.Classes.Json.Font"; "NPRNetFont")
-        {
-        }
-
-        type("NaviPartner.Retail.Nav.Classes.Json.Dialog.Error"; "NPRNetError")
-        {
-        }
-
-        type("NaviPartner.Retail.Nav.Classes.Json.Dialog.Lookup"; "NPRNetLookup")
-        {
-        }
-
-        type("NaviPartner.Retail.Nav.Classes.Json.Dialog.Response.Response"; "NPRNetResponse")
-        {
-        }
-
         type("NaviPartner.Retail.Nav.ObjectModel.Control"; "NPRNetControl")
         {
         }
@@ -472,10 +456,6 @@ dotnet
         }
 
         type("NaviPartner.Retail.Nav.ObjectModel.Label"; "NPRNetLabel")
-        {
-        }
-
-        type("NaviPartner.Retail.Nav.Classes.Json.Dialog.Dialog"; "NPRNetDialog")
         {
         }
     }
