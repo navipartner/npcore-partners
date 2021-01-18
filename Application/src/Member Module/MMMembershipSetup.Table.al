@@ -301,6 +301,7 @@ table 6060124 "NPR MM Membership Setup"
             DataClassification = CustomerContent;
             OptionCaption = 'Date Formula,Synchronized,Not Applicable';
             OptionMembers = DATEFORMULA,SYNCHRONIZED,NA;
+            InitValue = NA;
         }
         field(140; "Auto-Renew Model"; Option)
         {
