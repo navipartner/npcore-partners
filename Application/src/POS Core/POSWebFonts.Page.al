@@ -170,10 +170,8 @@ page 6014622 "NPR POS Web Fonts"
                     Image = Export;
                     ApplicationArea = All;
                     ToolTip = 'Executes the Export Font Configuration action';
-                    //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                    //PromotedCategory = Process;
-                    //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
-                    //PromotedIsBig = true;
+                    PromotedCategory = Process;
+                    Promoted = true;
 
                     trigger OnAction()
                     begin
@@ -186,10 +184,8 @@ page 6014622 "NPR POS Web Fonts"
                     Image = Import;
                     ApplicationArea = All;
                     ToolTip = 'Executes the Import Font Configuration action';
-                    //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                    //PromotedCategory = Process;
-                    //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
-                    //PromotedIsBig = true;
+                    PromotedCategory = Process;
+                    Promoted = true;
 
                     trigger OnAction()
                     begin
@@ -246,8 +242,8 @@ page 6014622 "NPR POS Web Fonts"
 
     local procedure UpdateWoffCss()
     begin
-        WoffHasValue := Woff.HasValue;
-        CssHasValue := Css.HasValue;
+        WoffHasValue := Rec.Woff.HasValue;
+        CssHasValue := Rec.Css.HasValue;
     end;
 
     local procedure ImportFont()
@@ -255,10 +251,10 @@ page 6014622 "NPR POS Web Fonts"
         TempBLOB: Codeunit "Temp Blob";
         RecRef: RecordRef;
     begin
-        TempBLOB.FromRecord(Rec, FieldNo(Woff));
-        if ImportWithDialog(TempBLOB, Woff.HasValue, FieldCaption(Woff), Text004, 'woff') then begin
+        TempBLOB.FromRecord(Rec, Rec.FieldNo(Woff));
+        if ImportWithDialog(TempBLOB, Rec.Woff.HasValue, Rec.FieldCaption(Woff), Text004, 'woff') then begin
             RecRef.GetTable(Rec);
-            TempBlob.ToRecordRef(RecRef, FieldNo(Woff));
+            TempBlob.ToRecordRef(RecRef, Rec.FieldNo(Woff));
             RecRef.SetTable(Rec);
             CurrPage.Update(true);
         end;
@@ -268,13 +264,13 @@ page 6014622 "NPR POS Web Fonts"
     var
         TempBLOB: Codeunit "Temp Blob";
     begin
-        TempBLOB.FromRecord(Rec, FieldNo(Woff));
-        ExportWithDialog(TempBLOB, Woff.HasValue, FieldCaption(Woff), 'woff');
+        TempBLOB.FromRecord(Rec, Rec.FieldNo(Woff));
+        ExportWithDialog(TempBLOB, Rec.Woff.HasValue, Rec.FieldCaption(Woff), 'woff');
     end;
 
     local procedure RemoveFont()
     begin
-        Clear(Woff);
+        Clear(Rec.Woff);
         CurrPage.Update(true);
     end;
 
@@ -283,10 +279,10 @@ page 6014622 "NPR POS Web Fonts"
         TempBLOB: Codeunit "Temp Blob";
         RecRef: RecordRef;
     begin
-        TempBLOB.FromRecord(Rec, FieldNo(Css));
-        if ImportWithDialog(TempBLOB, Css.HasValue, FieldCaption(Css), Text005, 'css') then begin
+        TempBLOB.FromRecord(Rec, Rec.FieldNo(Css));
+        if ImportWithDialog(TempBLOB, Rec.Css.HasValue, Rec.FieldCaption(Css), Text005, 'css') then begin
             RecRef.GetTable(Rec);
-            TempBlob.ToRecordRef(RecRef, FieldNo(Css));
+            TempBlob.ToRecordRef(RecRef, Rec.FieldNo(Css));
             RecRef.SetTable(Rec);
             CurrPage.Update(true);
         end;
@@ -296,28 +292,25 @@ page 6014622 "NPR POS Web Fonts"
     var
         TempBLOB: Codeunit "Temp Blob";
     begin
-        TempBLOB.FromRecord(Rec, FieldNo(Css));
-        ExportWithDialog(TempBLOB, Css.HasValue, FieldCaption(Css), 'css');
+        TempBLOB.FromRecord(Rec, Rec.FieldNo(Css));
+        ExportWithDialog(TempBLOB, Rec.Css.HasValue, Rec.FieldCaption(Css), 'css');
     end;
 
     local procedure RemoveCss()
     begin
-        Clear(Css);
+        Clear(Rec.Css);
         CurrPage.Update(true);
     end;
 
     local procedure ExportConfiguration()
     var
         TempBlob: Codeunit "Temp Blob";
-        Font: DotNet NPRNetFont;
-        JsonSerializer: DotNet NPRNetDataContractJsonSerializer;
+        Font: Codeunit "NPR Web Font";
         OutStr: OutStream;
     begin
-        GetFontDotNet_Obsolete(Font);
-        JsonSerializer := JsonSerializer.DataContractJsonSerializer(GetDotNetType(Font));
-
+        Rec.GetWebFont(Font);
         TempBlob.CreateOutStream(OutStr);
-        JsonSerializer.WriteObject(OutStr, Font);
+        Font.GetJson().WriteTo(OutStr);
 
         ExportWithDialog(TempBlob, true, Text008, 'npfont');
     end;
@@ -326,31 +319,28 @@ page 6014622 "NPR POS Web Fonts"
     var
         WebFont: Record "NPR POS Web Font";
         TempBlob: Codeunit "Temp Blob";
-        Font: DotNet NPRNetFont;
-        JsonSerializer: DotNet NPRNetDataContractJsonSerializer;
+        Font: Codeunit "NPR Web Font";
         InStr: InStream;
         Choice: Integer;
     begin
-        if ImportWithDialog(TempBlob, Css.HasValue or Woff.HasValue, TableCaption, Text008, 'npfont') then begin
-            JsonSerializer := JsonSerializer.DataContractJsonSerializer(GetDotNetType(Font));
-
+        if ImportWithDialog(TempBlob, Rec.Css.HasValue() or Rec.Woff.HasValue(), Rec.TableCaption, Text008, 'npfont') then begin
             TempBlob.CreateInStream(InStr);
-            Font := JsonSerializer.ReadObject(InStr);
+            Font.Initialize(InStr);
 
             case true of
-                not Find():
+                not Rec.Find():
                     begin
-                        Init;
-                        Code := Font.Code;
-                        Insert(true);
+                        Rec.Init;
+                        Rec.Code := Font.Code;
+                        Rec.Insert(true);
                     end;
-                (Code = '') and (Font.Code = ''):
-                    FieldError(Code);
-                (Code = '') and (Font.Code <> ''):
-                    Code := Font.Code;
-                (Code <> '') and (Font.Code <> '') and (Font.Code <> Code):
+                (Rec.Code = '') and (Font.Code = ''):
+                    Rec.FieldError(Code);
+                (Rec.Code = '') and (Font.Code <> ''):
+                    Rec.Code := Font.Code;
+                (Rec.Code <> '') and (Font.Code <> '') and (Font.Code <> Rec.Code):
                     begin
-                        Choice := StrMenu(StrSubstNo(Text010, Font.Code, Font.Name, Code, Name), 1, Text009);
+                        Choice := StrMenu(StrSubstNo(Text010, Font.Code, Font.Name, Rec.Code, Rec.Name), 1, Text009);
                         if Choice <= 1 then
                             exit;
                         if Choice = 2 then begin
@@ -368,7 +358,7 @@ page 6014622 "NPR POS Web Fonts"
         end;
     end;
 
-    local procedure SaveFontConfiguration(WebFont: Record "NPR POS Web Font"; Font: DotNet NPRNetFont)
+    local procedure SaveFontConfiguration(WebFont: Record "NPR POS Web Font"; Font: Interface "NPR Font Definition")
     var
         OutStr: OutStream;
     begin
@@ -377,9 +367,11 @@ page 6014622 "NPR POS Web Fonts"
         WebFont.Prefix := Font.Prefix;
 
         WebFont.Woff.CreateOutStream(OutStr);
-        Font.CopyWoffToStream(OutStr);
+        Font.GetWoffStream(OutStr);
+
+        Clear(OutStr);
         WebFont.Css.CreateOutStream(OutStr);
-        Font.CopyCssToStream(OutStr);
+        Font.GetCssStream(OutStr);
         WebFont.Modify(true);
     end;
 
@@ -408,7 +400,6 @@ page 6014622 "NPR POS Web Fonts"
             exit;
         end;
 
-        FileManagement.BLOBExport(TempBLOB, Name + '.' + FileExt, true);
+        FileManagement.BLOBExport(TempBLOB, Rec.Name + '.' + FileExt, true);
     end;
 }
-
