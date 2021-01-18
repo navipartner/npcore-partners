@@ -1,38 +1,13 @@
 page 6060042 "NPR Item Worksheet Page"
 {
-    // NPR4.18/BR  /20160209  CASE 182391 Object Created
-    // NPR4.19/BR  /20160216  CASE 182391 Added Export to Excel Action, added field Tariff No.,Changed Functions Caption, added NPR Attribute support
-    // NPR5.22/BR  /20160316  CASE 182391 added fields 500,510,520
-    // NPR5.22/BR  /20160321  CASE 182391 Added support for mapping an Excel file
-    // NPR5.22/BR  /20160323  CASE 182391 Added field Recommended Retail Price, Actions Set Sales Price to RRP
-    // NPR5.22/BR  /20160420  CASE 182391 Added more actions for all lines in Worksheet
-    // NPR5.23/BR  /20160525  CASE 242498 Added field Net Weight and Gross Weight
-    // NPR5.25/BR  /20160708  CASE 246088 Added fields No. of Changes and No. of Warnings
-    // NPR5.25/BR  /20160708  CASE 246088 Added Action Field Setup
-    // NPR5.25/BR  /20160803  CASE 234602 Added Action Request Extra Item Information
-    // NPR5.31/JLK /20170331  CASE 268274 Changed ENU Caption
-    // NPR5.32/BR  /20170504  CASE 274473 Added function OpenFilteredView
-    // NPR5.33/ANEN/20170427  CASE 273989 Extending to 40 attributes
-    // NPR5.37/BR  /20170910  CASE 268786 Added Action Vendor Variety Mapping
-    // NPR5.38/BR  /20171124  CASE 297587 Added fields Sales Price Start Date and Purchase Price Start Date
-    // NPR5.41/JKL /20180424  CASE 310223  changed visibility parameter on client attributtte 1 to NPRAttrVisible01 + added field units pr. parcel
-    // NPR5.48/TS  /20181206  CASE 338656 Added Missing Picture to Action
-    // NPR5.50/THRO/20190526  CASE 356260 Removed FieldsVisible and ShowAllInfo variables - Let user deside which fields to see. Field hidden by the variables set to visible=false
-    // NPR5.51/MHA /20190819  CASE 365377 Removed action "GIM import document"
-    // NPR5.52/SARA/20190906  CASE 366969 Added action 'Shelf Label' and 'Price Label'
-    // NPR5.54/ZESO/20200225  CASE 385388 Added fields Magento Item, Profit % and Description2
-
     AutoSplitKey = true;
     Caption = 'Item Worksheet Page';
     DelayedInsert = false;
-    //PageType = Worksheet;
     PageType = Document;
     PopulateAllFields = true;
     RefreshOnActivate = true;
     SaveValues = true;
     SourceTable = "NPR Item Worksheet Line";
-    UsageCategory = Tasks;
-    ApplicationArea = All;
 
     layout
     {
@@ -45,11 +20,11 @@ page 6060042 "NPR Item Worksheet Page"
                 {
                     ApplicationArea = All;
                     Caption = 'Batch Name';
-                    ToolTip = 'Specifies the value of the Batch Name field';
+                    ToolTip = 'Specifies the value of the Batch Name field.';
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        CurrPage.SaveRecord;
+                        CurrPage.SaveRecord();
                         ItemWorksheetMgt.LookupName(CurrentWorksheetName, Rec);
                         CurrPage.Update(false);
                     end;
@@ -57,22 +32,22 @@ page 6060042 "NPR Item Worksheet Page"
                     trigger OnValidate()
                     begin
                         ItemWorksheetMgt.CheckName(CurrentWorksheetName, Rec);
-                        CurrentJnlBatchNameOnAfterVali;
+                        CurrentJnlBatchNameOnAfterVali();
                     end;
                 }
                 field("Show Variety Level"; ShowExpanded)
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the ShowExpanded field';
+                    ToolTip = 'Specifies the value of the ShowExpanded field.';
 
                     trigger OnValidate()
                     begin
                         if ItemWorksheet.Get("Worksheet Template Name", CurrentWorksheetName) then begin
                             ItemWorksheet."Show Variety Level" := ShowExpanded;
-                            ItemWorksheet.Modify;
+                            ItemWorksheet.Modify();
                             ItemWorksheet.Validate("Show Variety Level");
                             CurrPage.ItemWorksheetVarSubpage.PAGE.UpdateSubPage;
-                            CurrPage.Update;
+                            CurrPage.Update();
                         end;
                     end;
                 }
@@ -80,374 +55,374 @@ page 6060042 "NPR Item Worksheet Page"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Worksheet Template Name"; "Worksheet Template Name")
+                field("Worksheet Template Name"; Rec."Worksheet Template Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Worksheet Template Name field.';
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Worksheet Template Name field';
                 }
-                field("Worksheet Name"; "Worksheet Name")
+                field("Worksheet Name"; Rec."Worksheet Name")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Worksheet Name field.';
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Worksheet Name field';
                 }
-                field("Line No."; "Line No.")
+                field("Line No."; Rec."Line No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Line No. field.';
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Line No. field';
                 }
-                field("Action"; Action)
+                field("Action"; Rec.Action)
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Action field';
+                    ToolTip = 'Specifies the value of the Action field.';
                 }
-                field("Vendor No."; "Vendor No.")
+                field("Vendor No."; Rec."Vendor No.")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Vendor No. field';
+                    ToolTip = 'Specifies the value of the Vendor No. field.';
                 }
-                field("Vendor Item No."; "Vendor Item No.")
+                field("Vendor Item No."; Rec."Vendor Item No.")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Vendor Item No. field';
+                    ToolTip = 'Specifies the value of the Vendor Item No. field.';
                 }
-                field("Internal Bar Code"; "Internal Bar Code")
+                field("Internal Bar Code"; Rec."Internal Bar Code")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Internal Bar Code field';
+                    ToolTip = 'Specifies the value of the Internal Bar Code field.';
                 }
-                field("Vendors Bar Code"; "Vendors Bar Code")
+                field("Vendors Bar Code"; Rec."Vendors Bar Code")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Vendors Bar Code field';
+                    ToolTip = 'Specifies the value of the Vendors Bar Code field.';
                 }
-                field("Item No."; "Item No.")
+                field("Item No."; Rec."Item No.")
                 {
                     ApplicationArea = All;
                     Editable = FieldsEditable;
-                    ToolTip = 'Specifies the value of the Item No. field';
+                    ToolTip = 'Specifies the value of the Item No. field.';
                 }
-                field("Existing Item No."; "Existing Item No.")
+                field("Existing Item No."; Rec."Existing Item No.")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Existing Item No. field';
+                    ToolTip = 'Specifies the value of the Existing Item No. field.';
                 }
-                field("Item Group"; "Item Group")
+                field("Item Group"; Rec."Item Group")
                 {
                     ApplicationArea = All;
                     Editable = FieldsEditable;
-                    ToolTip = 'Specifies the value of the Item Group field';
+                    ToolTip = 'Specifies the value of the Item Group field.';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Description field';
+                    ToolTip = 'Specifies the value of the Description field.';
                 }
-                field("Description 2"; "Description 2")
+                field("Description 2"; Rec."Description 2")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Description 2 field';
+                    ToolTip = 'Specifies the value of the Description 2 field.';
                 }
-                field("Profit %"; "Profit %")
+                field("Profit %"; Rec."Profit %")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Profit % field';
+                    ToolTip = 'Specifies the value of the Percent of Profit field.';
                 }
-                field("Magento Item"; "Magento Item")
+                field("Magento Item"; Rec."Magento Item")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Magento Item field';
+                    ToolTip = 'Specifies the value of the Magento Item field.';
                 }
-                field(Status; Status)
+                field(Status; Rec.Status)
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Status field';
+                    ToolTip = 'Specifies the value of the Status field.';
                 }
-                field("Status Comment"; "Status Comment")
+                field("Status Comment"; Rec."Status Comment")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Status Comment field';
+                    ToolTip = 'Specifies the value of the Status Comment field.';
                 }
-                field("No. of Changes"; "No. of Changes")
+                field("No. of Changes"; Rec."No. of Changes")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the No. of Changes field';
+                    ToolTip = 'Specifies the value of the No. of Changes field.';
                 }
-                field("No. of Warnings"; "No. of Warnings")
+                field("No. of Warnings"; Rec."No. of Warnings")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the No. of Warnings field';
+                    ToolTip = 'Specifies the value of the No. of Warnings field.';
                 }
-                field("Recommended Retail Price"; "Recommended Retail Price")
+                field("Recommended Retail Price"; Rec."Recommended Retail Price")
                 {
                     ApplicationArea = All;
                     Style = Attention;
                     StyleExpr = RRPDiff;
-                    ToolTip = 'Specifies the value of the Recommended Retail Price field';
+                    ToolTip = 'Specifies the value of the Recommended Retail Price field.';
                 }
-                field("Sales Price"; "Sales Price")
+                field("Sales Price"; Rec."Sales Price")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Unit Price field';
+                    ToolTip = 'Specifies the value of the Unit Price field.';
                 }
-                field("Sales Price Currency Code"; "Sales Price Currency Code")
+                field("Sales Price Currency Code"; Rec."Sales Price Currency Code")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Sales Price Currency Code field';
+                    ToolTip = 'Specifies the value of the Sales Price Currency Code field.';
                 }
-                field("Sales Price Start Date"; "Sales Price Start Date")
+                field("Sales Price Start Date"; Rec."Sales Price Start Date")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Sales Price Start Date field';
+                    ToolTip = 'Specifies the value of the Sales Price Start Date field.';
                 }
-                field("Direct Unit Cost"; "Direct Unit Cost")
+                field("Direct Unit Cost"; Rec."Direct Unit Cost")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Direct Unit Cost field';
+                    ToolTip = 'Specifies the value of the Direct Unit Cost field.';
                 }
-                field("Purchase Price Currency Code"; "Purchase Price Currency Code")
+                field("Purchase Price Currency Code"; Rec."Purchase Price Currency Code")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Purchase Price Currency Code field';
+                    ToolTip = 'Specifies the value of the Purchase Price Currency Code field.';
                 }
-                field("Purchase Price Start Date"; "Purchase Price Start Date")
+                field("Purchase Price Start Date"; Rec."Purchase Price Start Date")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Purchase Price Start Date field';
+                    ToolTip = 'Specifies the value of the Purchase Price Start Date field.';
                 }
-                field("Use Variant"; "Use Variant")
+                field("Use Variant"; Rec."Use Variant")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Use Variant field';
+                    ToolTip = 'Specifies the value of the Use Variant field.';
                 }
-                field("Tariff No."; "Tariff No.")
+                field("Tariff No."; Rec."Tariff No.")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Tariff No. field';
+                    ToolTip = 'Specifies the value of the Tariff No. field.';
                 }
-                field("Base Unit of Measure"; "Base Unit of Measure")
+                field("Base Unit of Measure"; Rec."Base Unit of Measure")
                 {
                     ApplicationArea = All;
                     Editable = FieldsEditable;
+                    ToolTip = 'Specifies the value of the Base Unit of Measure field.';
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Base Unit of Measure field';
                 }
-                field("Inventory Posting Group"; "Inventory Posting Group")
+                field("Inventory Posting Group"; Rec."Inventory Posting Group")
                 {
                     ApplicationArea = All;
                     Editable = FieldsEditable;
+                    ToolTip = 'Specifies the value of the Inventory Posting Group field.';
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Inventory Posting Group field';
                 }
-                field("Costing Method"; "Costing Method")
+                field("Costing Method"; Rec."Costing Method")
                 {
                     ApplicationArea = All;
                     Editable = FieldsEditable;
+                    ToolTip = 'Specifies the value of the Costing Method field.';
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Costing Method field';
                 }
-                field("VAT Bus. Posting Group"; "VAT Bus. Posting Group")
+                field("VAT Bus. Posting Group"; Rec."VAT Bus. Posting Group")
                 {
                     ApplicationArea = All;
                     Editable = FieldsEditable;
+                    ToolTip = 'Specifies the value of the VAT Bus. Posting Group field.';
                     Visible = false;
-                    ToolTip = 'Specifies the value of the VAT Bus. Posting Group field';
                 }
-                field("VAT Bus. Posting Gr. (Price)"; "VAT Bus. Posting Gr. (Price)")
+                field("VAT Bus. Posting Gr. (Price)"; Rec."VAT Bus. Posting Gr. (Price)")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the VAT Bus. Posting Gr. (Price) field.';
                     Visible = false;
-                    ToolTip = 'Specifies the value of the VAT Bus. Posting Gr. (Price) field';
                 }
-                field("Gen. Prod. Posting Group"; "Gen. Prod. Posting Group")
+                field("Gen. Prod. Posting Group"; Rec."Gen. Prod. Posting Group")
                 {
                     ApplicationArea = All;
                     Editable = FieldsEditable;
-                    ToolTip = 'Specifies the value of the Gen. Prod. Posting Group field';
+                    ToolTip = 'Specifies the value of the Gen. Prod. Posting Group field.';
                 }
-                field("No. Series"; "No. Series")
+                field("No. Series"; Rec."No. Series")
                 {
                     ApplicationArea = All;
                     Editable = FieldsEditable;
-                    ToolTip = 'Specifies the value of the No. Series field';
+                    ToolTip = 'Specifies the value of the No. Series field.';
                 }
-                field("Tax Group Code"; "Tax Group Code")
+                field("Tax Group Code"; Rec."Tax Group Code")
                 {
                     ApplicationArea = All;
                     Editable = FieldsEditable;
-                    ToolTip = 'Specifies the value of the Tax Group Code field';
+                    ToolTip = 'Specifies the value of the Tax Group Code field.';
                 }
-                field("VAT Prod. Posting Group"; "VAT Prod. Posting Group")
+                field("VAT Prod. Posting Group"; Rec."VAT Prod. Posting Group")
                 {
                     ApplicationArea = All;
                     Editable = FieldsEditable;
-                    ToolTip = 'Specifies the value of the VAT Prod. Posting Group field';
+                    ToolTip = 'Specifies the value of the VAT Prod. Posting Group field.';
                 }
-                field("Global Dimension 1 Code"; "Global Dimension 1 Code")
+                field("Global Dimension 1 Code"; Rec."Global Dimension 1 Code")
                 {
                     ApplicationArea = All;
                     Editable = FieldsEditable;
+                    ToolTip = 'Specifies the value of the Global Dimension 1 Code field.';
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Global Dimension 1 Code field';
                 }
-                field("<Global Dimension 2 Code>s"; "Global Dimension 2 Code")
+                field("<Global Dimension 2 Code>s"; Rec."Global Dimension 2 Code")
                 {
                     ApplicationArea = All;
                     Editable = FieldsEditable;
+                    ToolTip = 'Specifies the value of the Global Dimension 2 Code field.';
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Global Dimension 2 Code field';
                 }
-                field("Sales Unit of Measure"; "Sales Unit of Measure")
+                field("Sales Unit of Measure"; Rec."Sales Unit of Measure")
                 {
                     ApplicationArea = All;
                     Editable = FieldsEditable;
+                    ToolTip = 'Specifies the value of the Sales Unit of Measure field.';
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Sales Unit of Measure field';
                 }
-                field("Purch. Unit of Measure"; "Purch. Unit of Measure")
+                field("Purch. Unit of Measure"; Rec."Purch. Unit of Measure")
                 {
                     ApplicationArea = All;
                     Editable = FieldsEditable;
+                    ToolTip = 'Specifies the value of the Purch. Unit of Measure field.';
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Purch. Unit of Measure field';
                 }
-                field("Manufacturer Code"; "Manufacturer Code")
+                field("Manufacturer Code"; Rec."Manufacturer Code")
                 {
                     ApplicationArea = All;
                     Editable = FieldsEditable;
+                    ToolTip = 'Specifies the value of the Manufacturer Code field.';
                     Visible = false;
-                    ToolTip = 'Specifies the value of the Manufacturer Code field';
                 }
-                field("Item Category Code"; "Item Category Code")
+                field("Item Category Code"; Rec."Item Category Code")
                 {
                     ApplicationArea = All;
                     Editable = FieldsEditable;
-                    ToolTip = 'Specifies the value of the Item Category Code field';
+                    ToolTip = 'Specifies the value of the Item Category Code field.';
                 }
-                field("Product Group Code"; "Product Group Code")
+                field("Product Group Code"; Rec."Product Group Code")
                 {
                     ApplicationArea = All;
                     Editable = FieldsEditable;
-                    ToolTip = 'Specifies the value of the Product Group Code field';
+                    ToolTip = 'Specifies the value of the Product Group Code field.';
                 }
-                field("Gross Weight"; "Gross Weight")
+                field("Gross Weight"; Rec."Gross Weight")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Gross Weight field';
+                    ToolTip = 'Specifies the value of the Gross Weight field.';
                 }
-                field("Net Weight"; "Net Weight")
+                field("Net Weight"; Rec."Net Weight")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Net Weight field';
+                    ToolTip = 'Specifies the value of the Net Weight field.';
                 }
-                field("Units per Parcel"; "Units per Parcel")
+                field("Units per Parcel"; Rec."Units per Parcel")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Units per Parcel field';
+                    ToolTip = 'Specifies the value of the Units per Parcel field.';
                 }
-                field("Variety Group"; "Variety Group")
+                field("Variety Group"; Rec."Variety Group")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Variety Group field';
+                    ToolTip = 'Specifies the value of the Variety Group field.';
                 }
-                field("Variety 1"; "Variety 1")
+                field("Variety 1"; Rec."Variety 1")
                 {
                     ApplicationArea = All;
                     Editable = false;
-                    ToolTip = 'Specifies the value of the Variety 1 field';
+                    ToolTip = 'Specifies the value of the Variety 1 field.';
                 }
-                field("Variety 1 Table (Base)"; "Variety 1 Table (Base)")
+                field("Variety 1 Table (Base)"; Rec."Variety 1 Table (Base)")
                 {
                     ApplicationArea = All;
                     Editable = false;
-                    ToolTip = 'Specifies the value of the Variety 1 Table field';
+                    ToolTip = 'Specifies the value of the Variety 1 Table field.';
                 }
-                field("Create Copy of Variety 1 Table"; "Create Copy of Variety 1 Table")
+                field("Create Copy of Variety 1 Table"; Rec."Create Copy of Variety 1 Table")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Create Copy of Variety 1 Table field';
+                    ToolTip = 'Specifies the value of the Create Copy of Variety 1 Table field.';
                 }
-                field("Variety 2"; "Variety 2")
-                {
-                    ApplicationArea = All;
-                    Editable = false;
-                    ToolTip = 'Specifies the value of the Variety 2 field';
-                }
-                field("Variety 2 Table (Base)"; "Variety 2 Table (Base)")
+                field("Variety 2"; Rec."Variety 2")
                 {
                     ApplicationArea = All;
                     Editable = false;
-                    ToolTip = 'Specifies the value of the Variety 2 Table field';
+                    ToolTip = 'Specifies the value of the Variety 2 field.';
                 }
-                field("Create Copy of Variety 2 Table"; "Create Copy of Variety 2 Table")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Create Copy of Variety 2 Table field';
-                }
-                field("Variety 3"; "Variety 3")
+                field("Variety 2 Table (Base)"; Rec."Variety 2 Table (Base)")
                 {
                     ApplicationArea = All;
                     Editable = false;
-                    ToolTip = 'Specifies the value of the Variety 3 field';
+                    ToolTip = 'Specifies the value of the Variety 2 Table field.';
                 }
-                field("Variety 3 Table (Base)"; "Variety 3 Table (Base)")
+                field("Create Copy of Variety 2 Table"; Rec."Create Copy of Variety 2 Table")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Create Copy of Variety 2 Table field.';
+                }
+                field("Variety 3"; Rec."Variety 3")
                 {
                     ApplicationArea = All;
                     Editable = false;
-                    ToolTip = 'Specifies the value of the Variety 3 Table field';
+                    ToolTip = 'Specifies the value of the Variety 3 field.';
                 }
-                field("Create Copy of Variety 3 Table"; "Create Copy of Variety 3 Table")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Create Copy of Variety 3 Table field';
-                }
-                field("Variety 4"; "Variety 4")
+                field("Variety 3 Table (Base)"; Rec."Variety 3 Table (Base)")
                 {
                     ApplicationArea = All;
                     Editable = false;
-                    ToolTip = 'Specifies the value of the Variety 4 field';
+                    ToolTip = 'Specifies the value of the Variety 3 Table field.';
                 }
-                field("Variety 4 Table (Base)"; "Variety 4 Table (Base)")
+                field("Create Copy of Variety 3 Table"; Rec."Create Copy of Variety 3 Table")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Create Copy of Variety 3 Table field.';
+                }
+                field("Variety 4"; Rec."Variety 4")
                 {
                     ApplicationArea = All;
                     Editable = false;
-                    ToolTip = 'Specifies the value of the Variety 4 Table field';
+                    ToolTip = 'Specifies the value of the Variety 4 field.';
                 }
-                field("Create Copy of Variety 4 Table"; "Create Copy of Variety 4 Table")
+                field("Variety 4 Table (Base)"; Rec."Variety 4 Table (Base)")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Create Copy of Variety 4 Table field';
+                    Editable = false;
+                    ToolTip = 'Specifies the value of the Variety 4 Table field.';
                 }
-                field("Variety Lines to Skip"; "Variety Lines to Skip")
+                field("Create Copy of Variety 4 Table"; Rec."Create Copy of Variety 4 Table")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Variety Lines to Skip field';
+                    ToolTip = 'Specifies the value of the Create Copy of Variety 4 Table field.';
                 }
-                field("Variety Lines to Update"; "Variety Lines to Update")
+                field("Variety Lines to Skip"; Rec."Variety Lines to Skip")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Variety Lines to Update field';
+                    ToolTip = 'Specifies the value of the Variety Lines to Skip field.';
                 }
-                field("Variety Lines to Create"; "Variety Lines to Create")
+                field("Variety Lines to Update"; Rec."Variety Lines to Update")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Variety Lines to Create field';
+                    ToolTip = 'Specifies the value of the Variety Lines to Update field.';
+                }
+                field("Variety Lines to Create"; Rec."Variety Lines to Create")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Variety Lines to Create field.';
                 }
                 field(NPRAttrTextArray_01; NPRAttrTextArray[1])
                 {
                     ApplicationArea = All;
                     CaptionClass = '6014555,27,1,2';
                     Editable = NPRAttrEditable;
+                    ToolTip = 'Specifies the value of the NPRAttrTextArray[1] field.';
                     Visible = NPRAttrVisible01;
-                    ToolTip = 'Specifies the value of the NPRAttrTextArray[1] field';
 
                     trigger OnValidate()
                     begin
-                        //-NPR4.19
-                        NPRAttrManagement.SetWorksheetLineAttributeValue(DATABASE::"NPR Item Worksheet Line", 1, "Worksheet Template Name", "Worksheet Name", "Line No.", NPRAttrTextArray[1]);
-                        //+NPR4.19
+                        NPRAttrManagement.SetWorksheetLineAttributeValue(
+                            DATABASE::"NPR Item Worksheet Line", 1, "Worksheet Template Name",
+                            "Worksheet Name", "Line No.", NPRAttrTextArray[1]);
                     end;
                 }
                 field(NPRAttrTextArray_02; NPRAttrTextArray[2])
@@ -455,14 +430,14 @@ page 6060042 "NPR Item Worksheet Page"
                     ApplicationArea = All;
                     CaptionClass = '6014555,27,2,2';
                     Editable = NPRAttrEditable;
+                    ToolTip = 'Specifies the value of the NPRAttrTextArray[2] field.';
                     Visible = NPRAttrVisible02;
-                    ToolTip = 'Specifies the value of the NPRAttrTextArray[2] field';
 
                     trigger OnValidate()
                     begin
-                        //-NPR4.19
-                        NPRAttrManagement.SetWorksheetLineAttributeValue(DATABASE::"NPR Item Worksheet Line", 2, "Worksheet Template Name", "Worksheet Name", "Line No.", NPRAttrTextArray[2]);
-                        //+NPR4.19
+                        NPRAttrManagement.SetWorksheetLineAttributeValue(
+                            DATABASE::"NPR Item Worksheet Line", 2, "Worksheet Template Name",
+                            "Worksheet Name", "Line No.", NPRAttrTextArray[2]);
                     end;
                 }
                 field(NPRAttrTextArray_03; NPRAttrTextArray[3])
@@ -470,14 +445,14 @@ page 6060042 "NPR Item Worksheet Page"
                     ApplicationArea = All;
                     CaptionClass = '6014555,27,3,2';
                     Editable = NPRAttrEditable;
+                    ToolTip = 'Specifies the value of the NPRAttrTextArray[3] field.';
                     Visible = NPRAttrVisible03;
-                    ToolTip = 'Specifies the value of the NPRAttrTextArray[3] field';
 
                     trigger OnValidate()
                     begin
-                        //-NPR4.19
-                        NPRAttrManagement.SetWorksheetLineAttributeValue(DATABASE::"NPR Item Worksheet Line", 3, "Worksheet Template Name", "Worksheet Name", "Line No.", NPRAttrTextArray[3]);
-                        //+NPR4.19
+                        NPRAttrManagement.SetWorksheetLineAttributeValue(
+                            DATABASE::"NPR Item Worksheet Line", 3, "Worksheet Template Name",
+                            "Worksheet Name", "Line No.", NPRAttrTextArray[3]);
                     end;
                 }
                 field(NPRAttrTextArray_04; NPRAttrTextArray[4])
@@ -485,14 +460,14 @@ page 6060042 "NPR Item Worksheet Page"
                     ApplicationArea = All;
                     CaptionClass = '6014555,27,4,2';
                     Editable = NPRAttrEditable;
+                    ToolTip = 'Specifies the value of the NPRAttrTextArray[4] field.';
                     Visible = NPRAttrVisible04;
-                    ToolTip = 'Specifies the value of the NPRAttrTextArray[4] field';
 
                     trigger OnValidate()
                     begin
-                        //-NPR4.19
-                        NPRAttrManagement.SetWorksheetLineAttributeValue(DATABASE::"NPR Item Worksheet Line", 4, "Worksheet Template Name", "Worksheet Name", "Line No.", NPRAttrTextArray[4]);
-                        //+NPR4.19
+                        NPRAttrManagement.SetWorksheetLineAttributeValue(
+                            DATABASE::"NPR Item Worksheet Line", 4, "Worksheet Template Name",
+                            "Worksheet Name", "Line No.", NPRAttrTextArray[4]);
                     end;
                 }
                 field(NPRAttrTextArray_05; NPRAttrTextArray[5])
@@ -500,14 +475,14 @@ page 6060042 "NPR Item Worksheet Page"
                     ApplicationArea = All;
                     CaptionClass = '6014555,27,5,2';
                     Editable = NPRAttrEditable;
+                    ToolTip = 'Specifies the value of the NPRAttrTextArray[5] field.';
                     Visible = NPRAttrVisible05;
-                    ToolTip = 'Specifies the value of the NPRAttrTextArray[5] field';
 
                     trigger OnValidate()
                     begin
-                        //-NPR4.19
-                        NPRAttrManagement.SetWorksheetLineAttributeValue(DATABASE::"NPR Item Worksheet Line", 5, "Worksheet Template Name", "Worksheet Name", "Line No.", NPRAttrTextArray[5]);
-                        //+NPR4.19
+                        NPRAttrManagement.SetWorksheetLineAttributeValue(
+                            DATABASE::"NPR Item Worksheet Line", 5, "Worksheet Template Name",
+                            "Worksheet Name", "Line No.", NPRAttrTextArray[5]);
                     end;
                 }
                 field(NPRAttrTextArray_06; NPRAttrTextArray[6])
@@ -515,14 +490,14 @@ page 6060042 "NPR Item Worksheet Page"
                     ApplicationArea = All;
                     CaptionClass = '6014555,27,6,2';
                     Editable = NPRAttrEditable;
+                    ToolTip = 'Specifies the value of the NPRAttrTextArray[6] field.';
                     Visible = NPRAttrVisible06;
-                    ToolTip = 'Specifies the value of the NPRAttrTextArray[6] field';
 
                     trigger OnValidate()
                     begin
-                        //-NPR4.19
-                        NPRAttrManagement.SetWorksheetLineAttributeValue(DATABASE::"NPR Item Worksheet Line", 6, "Worksheet Template Name", "Worksheet Name", "Line No.", NPRAttrTextArray[6]);
-                        //+NPR4.19
+                        NPRAttrManagement.SetWorksheetLineAttributeValue(
+                            DATABASE::"NPR Item Worksheet Line", 6, "Worksheet Template Name",
+                            "Worksheet Name", "Line No.", NPRAttrTextArray[6]);
                     end;
                 }
                 field(NPRAttrTextArray_07; NPRAttrTextArray[7])
@@ -530,14 +505,14 @@ page 6060042 "NPR Item Worksheet Page"
                     ApplicationArea = All;
                     CaptionClass = '6014555,27,7,2';
                     Editable = NPRAttrEditable;
+                    ToolTip = 'Specifies the value of the NPRAttrTextArray[7] field.';
                     Visible = NPRAttrVisible07;
-                    ToolTip = 'Specifies the value of the NPRAttrTextArray[7] field';
 
                     trigger OnValidate()
                     begin
-                        //-NPR4.19
-                        NPRAttrManagement.SetWorksheetLineAttributeValue(DATABASE::"NPR Item Worksheet Line", 7, "Worksheet Template Name", "Worksheet Name", "Line No.", NPRAttrTextArray[7]);
-                        //+NPR4.19
+                        NPRAttrManagement.SetWorksheetLineAttributeValue(
+                            DATABASE::"NPR Item Worksheet Line", 7, "Worksheet Template Name",
+                            "Worksheet Name", "Line No.", NPRAttrTextArray[7]);
                     end;
                 }
                 field(NPRAttrTextArray_08; NPRAttrTextArray[8])
@@ -545,14 +520,14 @@ page 6060042 "NPR Item Worksheet Page"
                     ApplicationArea = All;
                     CaptionClass = '6014555,27,8,2';
                     Editable = NPRAttrEditable;
+                    ToolTip = 'Specifies the value of the NPRAttrTextArray[8] field.';
                     Visible = NPRAttrVisible08;
-                    ToolTip = 'Specifies the value of the NPRAttrTextArray[8] field';
 
                     trigger OnValidate()
                     begin
-                        //-NPR4.19
-                        NPRAttrManagement.SetWorksheetLineAttributeValue(DATABASE::"NPR Item Worksheet Line", 8, "Worksheet Template Name", "Worksheet Name", "Line No.", NPRAttrTextArray[8]);
-                        //+NPR4.19
+                        NPRAttrManagement.SetWorksheetLineAttributeValue(
+                            DATABASE::"NPR Item Worksheet Line", 8, "Worksheet Template Name",
+                            "Worksheet Name", "Line No.", NPRAttrTextArray[8]);
                     end;
                 }
                 field(NPRAttrTextArray_09; NPRAttrTextArray[9])
@@ -560,14 +535,14 @@ page 6060042 "NPR Item Worksheet Page"
                     ApplicationArea = All;
                     CaptionClass = '6014555,27,9,2';
                     Editable = NPRAttrEditable;
+                    ToolTip = 'Specifies the value of the NPRAttrTextArray[9] field.';
                     Visible = NPRAttrVisible09;
-                    ToolTip = 'Specifies the value of the NPRAttrTextArray[9] field';
 
                     trigger OnValidate()
                     begin
-                        //-NPR4.19
-                        NPRAttrManagement.SetWorksheetLineAttributeValue(DATABASE::"NPR Item Worksheet Line", 9, "Worksheet Template Name", "Worksheet Name", "Line No.", NPRAttrTextArray[9]);
-                        //+NPR4.19
+                        NPRAttrManagement.SetWorksheetLineAttributeValue(
+                            DATABASE::"NPR Item Worksheet Line", 9, "Worksheet Template Name",
+                            "Worksheet Name", "Line No.", NPRAttrTextArray[9]);
                     end;
                 }
                 field(NPRAttrTextArray_10; NPRAttrTextArray[10])
@@ -575,19 +550,20 @@ page 6060042 "NPR Item Worksheet Page"
                     ApplicationArea = All;
                     CaptionClass = '6014555,27,10,2';
                     Editable = NPRAttrEditable;
+                    ToolTip = 'Specifies the value of the NPRAttrTextArray[10] field.';
                     Visible = NPRAttrVisible10;
-                    ToolTip = 'Specifies the value of the NPRAttrTextArray[10] field';
 
                     trigger OnValidate()
                     begin
-                        //-NPR4.19
-                        NPRAttrManagement.SetWorksheetLineAttributeValue(DATABASE::"NPR Item Worksheet Line", 10, "Worksheet Template Name", "Worksheet Name", "Line No.", NPRAttrTextArray[10]);
-                        //+NPR4.19
+                        NPRAttrManagement.SetWorksheetLineAttributeValue(
+                            DATABASE::"NPR Item Worksheet Line", 10, "Worksheet Template Name",
+                            "Worksheet Name", "Line No.", NPRAttrTextArray[10]);
                     end;
                 }
             }
             part(ItemWorksheetVarSubpage; "NPR Item Worksh. Vrty. Subpage")
             {
+                ApplicationArea = All;
                 ShowFilter = false;
                 SubPageLink = "Worksheet Template Name" = FIELD("Worksheet Template Name"),
                               "Worksheet Name" = FIELD("Worksheet Name"),
@@ -595,21 +571,21 @@ page 6060042 "NPR Item Worksheet Page"
                 SubPageView = SORTING("Worksheet Template Name", "Worksheet Name", "Worksheet Line No.", "Variety 1 Value", "Variety 2 Value", "Variety 3 Value", "Variety 4 Value")
                               ORDER(Ascending);
                 UpdatePropagation = SubPart;
-                ApplicationArea = All;
             }
         }
         area(factboxes)
         {
             part(ItemWorksheetFactBox; "NPR Item Worksheet FactBox")
             {
+                ApplicationArea = All;
                 SubPageLink = "Worksheet Template Name" = FIELD("Worksheet Template Name"),
                               "Worksheet Name" = FIELD("Worksheet Name"),
                               "Line No." = FIELD("Line No.");
                 Visible = true;
-                ApplicationArea = All;
             }
             part(NPAttribFactBox; "NPR Item Worksh. Attr. FactBox")
             {
+                ApplicationArea = All;
                 Caption = 'Attributes';
                 SubPageLink = "Worksheet Template Name" = FIELD("Worksheet Template Name"),
                               "Worksheet Name" = FIELD("Worksheet Name"),
@@ -617,7 +593,6 @@ page 6060042 "NPR Item Worksheet Page"
                 SubPageView = SORTING("No. Series")
                               ORDER(Ascending);
                 Visible = true;
-                ApplicationArea = All;
             }
         }
     }
@@ -628,14 +603,14 @@ page 6060042 "NPR Item Worksheet Page"
         {
             action("Existing Item")
             {
+                ApplicationArea = All;
                 Caption = 'Existing Item';
                 Image = Item;
                 RunObject = Page "Item Card";
                 RunPageLink = "No." = FIELD("Existing Item No.");
                 RunPageView = SORTING("No.")
                               ORDER(Ascending);
-                ApplicationArea = All;
-                ToolTip = 'Executes the Existing Item action';
+                ToolTip = 'Executes the Existing Item action.';
             }
         }
         area(processing)
@@ -645,45 +620,45 @@ page 6060042 "NPR Item Worksheet Page"
                 Caption = 'Variant';
                 action(Create)
                 {
+                    ApplicationArea = All;
                     Caption = 'Create';
                     Image = CreateForm;
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Create action';
+                    ToolTip = 'Executes the Create action.';
                 }
                 action("Variant Code")
                 {
+                    ApplicationArea = All;
                     Caption = 'Variant code';
                     Image = ItemVariant;
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Variant code action';
+                    ToolTip = 'Executes the Variant code action.';
                 }
                 action(Barcodes)
                 {
+                    ApplicationArea = All;
                     Caption = 'Barcode';
                     Image = BarCode;
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Barcode action';
+                    ToolTip = 'Executes the Barcode action.';
                 }
                 action(SalesPrice)
                 {
+                    ApplicationArea = All;
                     Caption = 'Sales Prices';
                     Image = SalesPrices;
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Sales Prices action';
+                    ToolTip = 'Executes the Sales Prices action.';
                 }
                 action("Purchase Price")
                 {
+                    ApplicationArea = All;
                     Caption = 'Purchase Price';
                     Image = Price;
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Purchase Price action';
+                    ToolTip = 'Executes the Purchase Price action.';
                 }
                 action("Supplier barcode")
                 {
+                    ApplicationArea = All;
                     Caption = 'Supplier Barcode';
                     Image = "Action";
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Supplier Barcode action';
+                    ToolTip = 'Executes the Supplier Barcode action.';
                 }
             }
             group(Functions)
@@ -691,42 +666,42 @@ page 6060042 "NPR Item Worksheet Page"
                 Caption = 'Functions';
                 action("Suggest Worksheet Lines")
                 {
+                    ApplicationArea = All;
                     Caption = 'Suggest Worksheet Lines';
                     Image = ItemWorksheet;
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Suggest Worksheet Lines action';
+                    ToolTip = 'Executes the Suggest Worksheet Lines action.';
 
                     trigger OnAction()
                     begin
                         Clear(SuggestItemWorksheetLines);
-                        ItemWorksheet.Reset;
+                        ItemWorksheet.Reset();
                         ItemWorksheet.SetRange("Item Template Name", "Worksheet Template Name");
                         ItemWorksheet.SetRange(Name, "Worksheet Name");
                         SuggestItemWorksheetLines.SetTableView(ItemWorksheet);
-                        SuggestItemWorksheetLines.RunModal;
-                        CurrPage.Update;
+                        SuggestItemWorksheetLines.RunModal();
+                        CurrPage.Update();
                     end;
                 }
                 action(CreateItems)
                 {
+                    ApplicationArea = All;
                     Caption = 'Create Items';
                     Image = Create;
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Create Items action';
+                    ToolTip = 'Executes the Create Items action.';
                 }
                 action(Controller)
                 {
+                    ApplicationArea = All;
                     Caption = 'Controller';
                     Image = "Action";
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Controller action';
+                    ToolTip = 'Executes the Controller action.';
                 }
                 action("Import from Buffer")
                 {
+                    ApplicationArea = All;
                     Caption = 'Import from Buffer';
                     Image = Import;
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Import from Buffer action';
+                    ToolTip = 'Executes the Import from Buffer action.';
                 }
             }
             group("Worksheet Line")
@@ -734,154 +709,144 @@ page 6060042 "NPR Item Worksheet Page"
                 Caption = 'Worksheet Line';
                 action(QueryItemInfo)
                 {
+                    ApplicationArea = All;
                     Caption = 'Request Extra Item Info';
                     Image = CoupledItem;
                     Promoted = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Request Extra Item Info action';
+                    ToolTip = 'Executes the Request Extra Item Info action.';
 
                     trigger OnAction()
                     begin
-                        //-NPR5.25 [234602]
                         CreateQueryItemInformation(false);
-                        //+NPR5.25 [234602]
                     end;
                 }
                 action("Combine Varieties")
                 {
+                    ApplicationArea = All;
                     Caption = 'Combine Varieties';
                     Image = BankAccountRec;
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Combine Varieties action';
+                    ToolTip = 'Executes the Combine Varieties action.';
 
                     trigger OnAction()
                     begin
                         ItemWorksheetMgt.CombineLine(Rec, 0);
-                        //-NPR4.19
-                        Commit;
+                        Commit();
                         RefreshVariants(0, true);
-                        //-NPR4.19
-                        CurrPage.Update;
+                        CurrPage.Update();
                     end;
                 }
                 action("Refresh Headers")
                 {
+                    ApplicationArea = All;
                     Caption = 'Refresh Headers';
                     Image = UpdateDescription;
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Refresh Headers action';
+                    ToolTip = 'Executes the Refresh Headers action.';
 
                     trigger OnAction()
                     begin
                         RefreshVariants(0, true);
-                        CurrPage.Update;
+                        CurrPage.Update();
                     end;
                 }
                 action("Vendor Variety Value Mapping")
                 {
+                    ApplicationArea = All;
                     Caption = 'Vendor Variety Value Mapping';
                     Image = MapAccounts;
                     RunObject = Page "NPR Item Worksh. Vrty. Mapping";
                     RunPageLink = "Vendor No." = FIELD("Vendor No.");
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Vendor Variety Value Mapping action';
+                    ToolTip = 'Executes the Vendor Variety Value Mapping action.';
                 }
                 action("Suggest Existing Variants")
                 {
+                    ApplicationArea = All;
                     Caption = 'Suggest Existing Variants';
                     Image = SKU;
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Suggest Existing Variants action';
+                    ToolTip = 'Executes the Suggest Existing Variants action.';
 
                     trigger OnAction()
                     begin
                         RefreshVariants(1, true);
-                        CurrPage.Update;
+                        CurrPage.Update();
                     end;
                 }
                 action("Suggest Varieties Without Variants")
                 {
+                    ApplicationArea = All;
                     Caption = 'Suggest Varieties Without Variants';
                     Image = CreateSKU;
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Suggest Varieties Without Variants action';
+                    ToolTip = 'Executes the Suggest Varieties Without Variants action.';
 
                     trigger OnAction()
                     begin
                         RefreshVariants(2, true);
-                        CurrPage.Update;
+                        CurrPage.Update();
                     end;
                 }
                 action("Suggest all Varieties")
                 {
+                    ApplicationArea = All;
                     Caption = 'Suggest all Varieties';
                     Image = ItemVariant;
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Suggest all Varieties action';
+                    ToolTip = 'Executes the Suggest all Varieties action.';
 
                     trigger OnAction()
                     begin
                         RefreshVariants(3, true);
-                        CurrPage.Update;
+                        CurrPage.Update();
                     end;
                 }
                 action(SetRRP)
                 {
+                    ApplicationArea = All;
                     Caption = 'Set Sales Price to RRP';
                     Image = TransferFunds;
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Set Sales Price to RRP action';
+                    ToolTip = 'Executes the Set Sales Price to RRP action.';
 
                     trigger OnAction()
                     begin
-                        //-NPR5.22
-                        UpdateSalesPriceWithRRP;
-                        //+NPR5.22
+                        UpdateSalesPriceWithRRP();
                     end;
                 }
                 action("Shelf Label")
                 {
+                    ApplicationArea = All;
                     Caption = 'Shelf Label';
                     Image = BinContent;
                     Promoted = true;
                     PromotedCategory = "Report";
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Shelf Label action';
+                    ToolTip = 'Executes the Shelf Label action.';
 
                     trigger OnAction()
                     var
                         ReportSelectionRetail: Record "NPR Report Selection Retail";
                         RecRef: RecordRef;
                     begin
-                        //-NPR5.52 [366969]
                         RecRef.GetTable(Rec);
                         LabelLibrary.ToggleLine(RecRef);
                         LabelLibrary.PrintSelection(ReportSelectionRetail."Report Type"::"Shelf Label");
-                        //+NPR5.52 [366969]
                     end;
                 }
                 action("Price Label")
                 {
+                    ApplicationArea = All;
                     Caption = 'Price Label';
                     Image = BinLedger;
                     Promoted = true;
                     PromotedCategory = "Report";
                     ShortCutKey = 'Ctrl+Alt+L';
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Price Label action';
+                    ToolTip = 'Executes the Price Label action.';
 
                     trigger OnAction()
                     var
                         ReportSelectionRetail: Record "NPR Report Selection Retail";
                         RecRef: RecordRef;
                     begin
-                        //-NPR5.52 [366969]
                         RecRef.GetTable(Rec);
                         LabelLibrary.ToggleLine(RecRef);
                         LabelLibrary.PrintSelection(ReportSelectionRetail."Report Type"::"Price Label");
-                        //+NPR5.52 [366969]
                     end;
                 }
             }
@@ -890,126 +855,113 @@ page 6060042 "NPR Item Worksheet Page"
                 Caption = 'Worksheet';
                 action("Combine All Varietes")
                 {
+                    ApplicationArea = All;
                     Caption = 'Combine All Varieties';
                     Image = BankAccountRec;
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Combine All Varieties action';
+                    ToolTip = 'Executes the Combine All Varieties action.';
 
                     trigger OnAction()
                     begin
-                        GetCurrentWorksheet;
-                        //-NPR5.23 [242498]
+                        GetCurrentWorksheet();
                         ItemWorksheetMgt.CombineLines(ItemWorksheet);
-                        //ItemWorksheetMgt.CombineLines(ItemWorksheet,0);
-                        //+NPR5.23 [242498]
-                        //-NPR4.19
-                        Commit;
-                        ItemWorksheetLine.Reset;
+                        Commit();
+                        ItemWorksheetLine.Reset();
                         ItemWorksheetLine.SetRange("Worksheet Template Name", "Worksheet Template Name");
                         ItemWorksheetLine.SetRange("Worksheet Name", "Worksheet Name");
-                        if ItemWorksheetLine.FindSet then
+                        if ItemWorksheetLine.FindSet() then
                             repeat
                                 ItemWorksheetLine.RefreshVariants(0, true);
                             until ItemWorksheetLine.Next = 0;
-                        //-NPR4.19
-                        CurrPage.Update;
+                        CurrPage.Update();
                     end;
                 }
                 action("Refresh All Headers")
                 {
+                    ApplicationArea = All;
                     Caption = 'Refresh All Headers';
                     Image = UpdateDescription;
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Refresh All Headers action';
+                    ToolTip = 'Executes the Refresh All Headers action.';
 
                     trigger OnAction()
                     begin
-                        ItemWorksheetLine.Reset;
+                        ItemWorksheetLine.Reset();
                         ItemWorksheetLine.SetRange("Worksheet Template Name", "Worksheet Template Name");
                         ItemWorksheetLine.SetRange("Worksheet Name", "Worksheet Name");
-                        if ItemWorksheetLine.FindSet then
+                        if ItemWorksheetLine.FindSet() then
                             repeat
                                 ItemWorksheetLine.RefreshVariants(0, true);
                             until ItemWorksheetLine.Next = 0;
-                        CurrPage.Update;
+                        CurrPage.Update();
                     end;
                 }
                 action("Suggest All Existing Variants")
                 {
+                    ApplicationArea = All;
                     Caption = 'Suggest All Existing Variants';
                     Image = SKU;
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Suggest All Existing Variants action';
+                    ToolTip = 'Executes the Suggest All Existing Variants action.';
 
                     trigger OnAction()
                     begin
-                        //-NPR5.22
-                        ItemWorksheetLine.Reset;
+                        ItemWorksheetLine.Reset();
                         ItemWorksheetLine.SetRange("Worksheet Template Name", "Worksheet Template Name");
                         ItemWorksheetLine.SetRange("Worksheet Name", "Worksheet Name");
-                        if ItemWorksheetLine.FindSet then
+                        if ItemWorksheetLine.FindSet() then
                             repeat
                                 ItemWorksheetLine.RefreshVariants(1, true);
                             until ItemWorksheetLine.Next = 0;
-                        CurrPage.Update;
-                        //+NPR5.22
+                        CurrPage.Update();
                     end;
                 }
                 action("Suggest All Varieties Without Variants")
                 {
+                    ApplicationArea = All;
                     Caption = 'Suggest All Varieties Without Variants';
                     Image = CreateSKU;
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Suggest All Varieties Without Variants action';
+                    ToolTip = 'Executes the Suggest All Varieties Without Variants action.';
 
                     trigger OnAction()
                     begin
-                        //-NPR5.22
-                        ItemWorksheetLine.Reset;
+                        ItemWorksheetLine.Reset();
                         ItemWorksheetLine.SetRange("Worksheet Template Name", "Worksheet Template Name");
                         ItemWorksheetLine.SetRange("Worksheet Name", "Worksheet Name");
-                        if ItemWorksheetLine.FindSet then
+                        if ItemWorksheetLine.FindSet() then
                             repeat
                                 ItemWorksheetLine.RefreshVariants(2, true);
                             until ItemWorksheetLine.Next = 0;
-                        CurrPage.Update;
-                        //+NPR5.22
+                        CurrPage.Update();
                     end;
                 }
                 action("Suggest All Varieties in Worksheet")
                 {
+                    ApplicationArea = All;
                     Caption = 'Suggest All Varieties in Worksheet';
                     Image = ItemVariant;
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Suggest All Varieties in Worksheet action';
+                    ToolTip = 'Executes the Suggest All Varieties in Worksheet action.';
 
                     trigger OnAction()
                     begin
-                        //-NPR5.22
-                        ItemWorksheetLine.Reset;
+                        ItemWorksheetLine.Reset();
                         ItemWorksheetLine.SetRange("Worksheet Template Name", "Worksheet Template Name");
                         ItemWorksheetLine.SetRange("Worksheet Name", "Worksheet Name");
-                        if ItemWorksheetLine.FindSet then
+                        if ItemWorksheetLine.FindSet() then
                             repeat
                                 ItemWorksheetLine.RefreshVariants(3, true);
                             until ItemWorksheetLine.Next = 0;
-                        CurrPage.Update;
-                        //+NPR5.22
+                        CurrPage.Update();
                     end;
                 }
                 action(SetRRPAll)
                 {
+                    ApplicationArea = All;
                     Caption = 'Set All Sales Prices to RRP';
                     Image = TransferFunds;
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Set All Sales Prices to RRP action';
+                    ToolTip = 'Executes the Set All Sales Prices to RRP action.';
 
                     trigger OnAction()
                     begin
-                        //-NPR5.22
-                        GetCurrentWorksheet;
-                        ItemWorksheet.UpdateSalesPriceAllLinesWithRRP;
-                        //+NPR5.22
+                        GetCurrentWorksheet();
+                        ItemWorksheet.UpdateSalesPriceAllLinesWithRRP();
                     end;
                 }
             }
@@ -1018,53 +970,48 @@ page 6060042 "NPR Item Worksheet Page"
                 Caption = 'Register';
                 action("Field Setup")
                 {
+                    ApplicationArea = All;
                     Caption = 'Field Setup';
                     Image = MapAccounts;
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Field Setup action';
+                    ToolTip = 'Executes the Field Setup action.';
 
                     trigger OnAction()
                     var
                         ItemWorksheetFieldSetup: Record "NPR Item Worksh. Field Setup";
                         ItemWorksheetFieldSetupPage: Page "NPR Item Worksh. Field Setup";
                     begin
-                        //-NPR5.25 [246088]
-                        GetCurrentWorksheet;
-                        ItemWorksheet.InsertDefaultFieldSetup;
-                        ItemWorksheetFieldSetup.Reset;
+                        GetCurrentWorksheet();
+                        ItemWorksheet.InsertDefaultFieldSetup();
                         ItemWorksheetFieldSetup.SetFilter(ItemWorksheetFieldSetup."Worksheet Template Name", ItemWorksheet."Item Template Name");
                         ItemWorksheetFieldSetup.SetFilter("Worksheet Name", ItemWorksheet.Name);
                         ItemWorksheetFieldSetupPage.SetTableView(ItemWorksheetFieldSetup);
-                        ItemWorksheetFieldSetupPage.Run;
-                        //+NPR5.25 [246088]
+                        ItemWorksheetFieldSetupPage.Run();
                     end;
                 }
                 action("Check Lines")
                 {
+                    ApplicationArea = All;
                     Caption = 'Check Lines';
                     Image = CheckList;
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Check Lines action';
+                    ToolTip = 'Executes the Check Lines action.';
 
                     trigger OnAction()
                     begin
-                        //-NPR5.25 [246088]
-                        GetCurrentWorksheet;
-                        //+NPR5.25 [246088]
+                        GetCurrentWorksheet();
                         ItemWorksheet.CheckLines(Rec);
                         CurrPage.Update(false);
                     end;
                 }
                 action(Register)
                 {
+                    ApplicationArea = All;
                     Caption = 'Register';
                     Image = Approve;
                     Promoted = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ShortCutKey = 'F9';
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Register action';
+                    ToolTip = 'Executes the Register action.';
 
                     trigger OnAction()
                     begin
@@ -1078,36 +1025,34 @@ page 6060042 "NPR Item Worksheet Page"
                 Caption = 'Import/Export';
                 action("Map Excelsheet")
                 {
+                    ApplicationArea = All;
                     Caption = 'Map Excelsheet';
                     Image = MapAccounts;
                     RunObject = Page "NPR Item Works. Excel Column";
                     RunPageLink = "Worksheet Template Name" = FIELD("Worksheet Template Name"),
                                   "Worksheet Name" = FIELD("Worksheet Name");
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Map Excelsheet action';
+                    ToolTip = 'Executes the Map Excelsheet action.';
                 }
                 action("Export Excel")
                 {
+                    ApplicationArea = All;
                     Caption = 'Export Excel';
                     Image = ExportToExcel;
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Export Excel action';
+                    ToolTip = 'Executes the Export Excel action.';
 
                     trigger OnAction()
                     var
                         ItemWorksheetLine: Record "NPR Item Worksheet Line";
                     begin
-                        //-NPR4.19
                         REPORT.Run(REPORT::"NPR Export Excel Item Worksh.", false, true, Rec);
-                        //+NPR4.19
                     end;
                 }
                 action("Import Excel")
                 {
+                    ApplicationArea = All;
                     Caption = 'Import Excel';
                     Image = ImportExcel;
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Import Excel action';
+                    ToolTip = 'Executes the Import Excel action.';
 
                     trigger OnAction()
                     begin
@@ -1117,22 +1062,22 @@ page 6060042 "NPR Item Worksheet Page"
                 }
                 action("Import XML")
                 {
+                    ApplicationArea = All;
                     Caption = 'Import XML';
                     Image = Import;
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Import XML action';
+                    ToolTip = 'Executes the Import XML action.';
 
                     trigger OnAction()
                     begin
-                        ItemWshtImpExpMgt.Import;
+                        ItemWshtImpExpMgt.Import();
                     end;
                 }
                 action("Export XML")
                 {
+                    ApplicationArea = All;
                     Caption = 'Export XML';
                     Image = Export;
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Export XML action';
+                    ToolTip = 'Executes the Export XML action.';
 
                     trigger OnAction()
                     begin
@@ -1145,16 +1090,14 @@ page 6060042 "NPR Item Worksheet Page"
 
     trigger OnAfterGetCurrRecord()
     begin
-        SetFieldEditable;
-        SetVisibleFields;
+        SetFieldEditable();
+        SetVisibleFields();
     end;
 
     trigger OnAfterGetRecord()
     begin
-        //-NPR4.19
         NPRAttrManagement.GetWorksheetLineAttributeValue(NPRAttrTextArray, DATABASE::"NPR Item Worksheet Line", "Worksheet Template Name", "Worksheet Name", "Line No.");
         NPRAttrEditable := CurrPage.Editable();
-        //+NPR4.19
     end;
 
     trigger OnClosePage()
@@ -1164,22 +1107,19 @@ page 6060042 "NPR Item Worksheet Page"
 
     trigger OnModifyRecord(): Boolean
     begin
-        //-NPR5.25 [246088]
-        CheckManualValidation;
-        //+NPR5.25 [246088]
-        SetVisibleFields;
+        CheckManualValidation();
+        SetVisibleFields();
         exit(true);
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
         SetUpNewLine(xRec);
-        SetFieldEditable;
+        SetFieldEditable();
     end;
 
     trigger OnOpenPage()
     begin
-        //-NPR4.19
         NPRAttrManagement.GetAttributeVisibility(DATABASE::"NPR Item Worksheet Line", NPRAttrVisibleArray);
         NPRAttrVisible01 := NPRAttrVisibleArray[1];
         NPRAttrVisible02 := NPRAttrVisibleArray[2];
@@ -1193,14 +1133,10 @@ page 6060042 "NPR Item Worksheet Page"
         NPRAttrVisible10 := NPRAttrVisibleArray[10];
 
         NPRAttrEditable := CurrPage.Editable();
-        //+NPR4.19
-
-        //-NPR5.32 [274473]
         if OpenedFromFilteredView then begin
             CopyFilters(ItemWorksheetLine);
             exit;
         end;
-        //+NPR5.32 [274473]
 
         OpenedFromWorksheet := ("Worksheet Name" <> '') and ("Worksheet Template Name" = '');
         if OpenedFromWorksheet then begin
@@ -1212,34 +1148,21 @@ page 6060042 "NPR Item Worksheet Page"
         if not WorksheetSelected then
             Error('');
         ItemWorksheetMgt.OpenJnl(CurrentWorksheetName, Rec);
-        //GetCurrentWorksheet;
-        //SetVisibleFields;
     end;
 
     var
         ItemWorksheetTemplate: Record "NPR Item Worksh. Template";
-        ItemWorksheetMgt: Codeunit "NPR Item Worksheet Mgt.";
-        LabelLibrary: Codeunit "NPR Label Library";
-        OpenedFromWorksheet: Boolean;
-        CurrentWorksheetName: Code[10];
-        WorksheetSelected: Boolean;
         ItemWorksheet: Record "NPR Item Worksheet";
         ItemWorksheetLine: Record "NPR Item Worksheet Line";
-        InvoiceNo: Code[20];
-        InvoiceDate: Date;
-        Freight: Decimal;
-        [InDataSet]
-        VendorItemNoEditable: Boolean;
+        NPRAttrManagement: Codeunit "NPR Attribute Management";
+        ItemWorksheetMgt: Codeunit "NPR Item Worksheet Mgt.";
+        ItemWshtImpExpMgt: Codeunit "NPR Item Wsht. Imp. Exp.";
+        LabelLibrary: Codeunit "NPR Label Library";
+        SuggestItemWorksheetLines: Report "NPR Suggest Item Worksh. Lines";
         [InDataSet]
         FieldsEditable: Boolean;
-        ShowExpanded: Option "Variety 1","Variety 1+2","Variety 1+2+3","Variety 1+2+3+4";
-        SuggestItemWorksheetLines: Report "NPR Suggest Item Worksh. Lines";
-        ItemWshtImpExpMgt: Codeunit "NPR Item Wsht. Imp. Exp.";
-        NPRAttrTextArray: array[40] of Text;
-        NPRAttrManagement: Codeunit "NPR Attribute Management";
         [InDataSet]
         NPRAttrEditable: Boolean;
-        NPRAttrVisibleArray: array[40] of Boolean;
         [InDataSet]
         NPRAttrVisible01: Boolean;
         [InDataSet]
@@ -1260,15 +1183,22 @@ page 6060042 "NPR Item Worksheet Page"
         NPRAttrVisible09: Boolean;
         [InDataSet]
         NPRAttrVisible10: Boolean;
-        RRPDiff: Boolean;
+        NPRAttrVisibleArray: array[40] of Boolean;
         OpenedFromFilteredView: Boolean;
+        OpenedFromWorksheet: Boolean;
+        RRPDiff: Boolean;
+        [InDataSet]
+        VendorItemNoEditable: Boolean;
+        WorksheetSelected: Boolean;
+        CurrentWorksheetName: Code[10];
+        InvoiceNo: Code[20];
+        InvoiceDate: Date;
+        Freight: Decimal;
+        ShowExpanded: Option "Variety 1","Variety 1+2","Variety 1+2+3","Variety 1+2+3+4";
+        NPRAttrTextArray: array[40] of Text;
 
     procedure SetFieldEditable()
     begin
-        //IF VendorItemNoEditable = ("Existing Item No." <> '') THEN
-        //  EXIT;
-
-
         FieldsEditable := ("Existing Item No." = '');
     end;
 
@@ -1280,41 +1210,31 @@ page 6060042 "NPR Item Worksheet Page"
 
     procedure SetVisibleFields()
     begin
-        //-NPR5.50 [356260]
-        //FieldsVisible:=ShowAllInfo;
-        //+NPR5.50 [356260]
-        //CurrPage.UPDATE(FALSE);
         CurrPage.ItemWorksheetVarSubpage.PAGE.SetRecFromIW(Rec);
         CurrPage.ItemWorksheetVarSubpage.PAGE.UpdateSubPage;
-        //-NPR4.19
-        UpdateFactBoxes;
-        //+NPR4.19
-        //-NPR5.22
+        UpdateFactBoxes();
         RRPDiff := ("Recommended Retail Price" <> 0) and ("Sales Price" <> 0) and ("Recommended Retail Price" <> "Sales Price");
-        //+NPR5.22
     end;
 
     local procedure CurrentJnlBatchNameOnAfterVali()
     begin
-        CurrPage.SaveRecord;
+        CurrPage.SaveRecord();
         ItemWorksheetMgt.SetName(CurrentWorksheetName, Rec);
         CurrPage.Update(false);
     end;
 
     local procedure UpdateFactBoxes()
     begin
-        CurrPage.ItemWorksheetFactBox.PAGE.Update;
-        CurrPage.NPAttribFactBox.PAGE.Update;
+        CurrPage.ItemWorksheetFactBox.PAGE.Update();
+        CurrPage.NPAttribFactBox.PAGE.Update();
     end;
 
     procedure OpenFilteredView(var VarItemWorksheetLine: Record "NPR Item Worksheet Line")
     begin
-        //-NPR5.32 [274473]
         ItemWorksheetLine.CopyFilters(VarItemWorksheetLine);
-        ItemWorksheetLine.FindFirst;
+        ItemWorksheetLine.FindFirst();
         CurrentWorksheetName := VarItemWorksheetLine."Worksheet Name";
         OpenedFromFilteredView := true;
-        //+NPR5.32 [274473]
     end;
 }
 

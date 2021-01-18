@@ -1,14 +1,11 @@
 codeunit 6060058 "NPR Item Wksht. TaskQueue Mgt."
 {
-    // NPR5.43/MHA /20180605  CASE 316948 Object created - Register Item Worksheet with Task Queue NAS
-
     TableNo = "NPR Task Line";
-
     trigger OnRun()
     var
-        TemplateName: Text;
-        BatchName: Text;
         Register: Boolean;
+        BatchName: Text;
+        TemplateName: Text;
     begin
         TemplateName := UpperCase(GetParameterText('TEMPLATE_NAME'));
         BatchName := UpperCase(GetParameterText('BATCH_NAME'));

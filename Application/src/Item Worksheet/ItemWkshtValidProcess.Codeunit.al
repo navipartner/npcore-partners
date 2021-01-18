@@ -1,7 +1,5 @@
 codeunit 6060051 "NPR Item Wksht.Valid. Process"
 {
-    // NPR5.25\BR \20160707 CASE 246088 New Codeunit
-
     Subtype = Test;
 
     trigger OnRun()
@@ -26,8 +24,8 @@ codeunit 6060051 "NPR Item Wksht.Valid. Process"
 
     procedure ValidateRegisterLine()
     var
-        ItemWshtRegisterLine: Codeunit "NPR Item Wsht.Register Line";
         ItemWkshLine: Record "NPR Item Worksheet Line";
+        ItemWshtRegisterLine: Codeunit "NPR Item Wsht.Register Line";
     begin
         ItemWkshLine := GlobalItemWorksheetLine;
         ItemWshtRegisterLine.SetCalledFromTest(true);

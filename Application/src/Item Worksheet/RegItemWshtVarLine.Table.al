@@ -1,8 +1,5 @@
 table 6060047 "NPR Reg. Item Wsht Var. Line"
 {
-    // NPR4.18\BR\20160209  CASE 182391 Object Created
-    // NPR5.48/BHR /20190111 CASE 341967 remove blank space from options
-
     Caption = 'Reg. Item Wsht Variant Line';
     DataClassification = CustomerContent;
 
@@ -86,7 +83,7 @@ table 6060047 "NPR Reg. Item Wsht Var. Line"
         }
         field(170; "Existing Variant Blocked"; Boolean)
         {
-            CalcFormula = Lookup ("Item Variant"."NPR Blocked" WHERE("Item No." = FIELD("Existing Item No."),
+            CalcFormula = Lookup("Item Variant"."NPR Blocked" WHERE("Item No." = FIELD("Existing Item No."),
                                                                Code = FIELD("Existing Variant Code")));
             Caption = 'Existing Variant Blocked';
             Editable = false;
@@ -104,7 +101,7 @@ table 6060047 "NPR Reg. Item Wsht Var. Line"
         }
         field(6059980; "Variety 1"; Code[10])
         {
-            CalcFormula = Lookup ("NPR Regist. Item Worksh Line"."Variety 1" WHERE("Registered Worksheet No." = FIELD("Registered Worksheet No."),
+            CalcFormula = Lookup("NPR Regist. Item Worksh Line"."Variety 1" WHERE("Registered Worksheet No." = FIELD("Registered Worksheet No."),
                                                                                      "Line No." = FIELD("Registered Worksheet Line No.")));
             Caption = 'Variety 1';
             Description = 'CASE220397';
@@ -113,7 +110,7 @@ table 6060047 "NPR Reg. Item Wsht Var. Line"
         }
         field(6059981; "Variety 1 Table"; Code[20])
         {
-            CalcFormula = Lookup ("NPR Regist. Item Worksh Line"."Variety 1 Table (New)" WHERE("Registered Worksheet No." = FIELD("Registered Worksheet No."),
+            CalcFormula = Lookup("NPR Regist. Item Worksh Line"."Variety 1 Table (New)" WHERE("Registered Worksheet No." = FIELD("Registered Worksheet No."),
                                                                                                  "Line No." = FIELD("Registered Worksheet Line No.")));
             Caption = 'Variety 1 Table';
             Description = 'CASE220397';
@@ -125,14 +122,10 @@ table 6060047 "NPR Reg. Item Wsht Var. Line"
             Caption = 'Variety 1 Value';
             DataClassification = CustomerContent;
             Description = 'CASE220397';
-            //This property is currently not supported
-            //TestTableRelation = false;
-            //The property 'ValidateTableRelation' can only be set if the property 'TableRelation' is set
-            //ValidateTableRelation = false;
         }
         field(6059983; "Variety 2"; Code[10])
         {
-            CalcFormula = Lookup ("NPR Regist. Item Worksh Line"."Variety 2" WHERE("Registered Worksheet No." = FIELD("Registered Worksheet No."),
+            CalcFormula = Lookup("NPR Regist. Item Worksh Line"."Variety 2" WHERE("Registered Worksheet No." = FIELD("Registered Worksheet No."),
                                                                                      "Line No." = FIELD("Registered Worksheet Line No.")));
             Caption = 'Variety 2';
             Description = 'CASE220397';
@@ -141,7 +134,7 @@ table 6060047 "NPR Reg. Item Wsht Var. Line"
         }
         field(6059984; "Variety 2 Table"; Code[20])
         {
-            CalcFormula = Lookup ("NPR Regist. Item Worksh Line"."Variety 2 Table (New)" WHERE("Registered Worksheet No." = FIELD("Registered Worksheet No."),
+            CalcFormula = Lookup("NPR Regist. Item Worksh Line"."Variety 2 Table (New)" WHERE("Registered Worksheet No." = FIELD("Registered Worksheet No."),
                                                                                                  "Line No." = FIELD("Registered Worksheet Line No.")));
             Caption = 'Variety 2 Table';
             Description = 'CASE220397';
@@ -153,14 +146,10 @@ table 6060047 "NPR Reg. Item Wsht Var. Line"
             Caption = 'Variety 2 Value';
             DataClassification = CustomerContent;
             Description = 'CASE220397';
-            //This property is currently not supported
-            //TestTableRelation = false;
-            //The property 'ValidateTableRelation' can only be set if the property 'TableRelation' is set
-            //ValidateTableRelation = false;
         }
         field(6059986; "Variety 3"; Code[10])
         {
-            CalcFormula = Lookup ("NPR Regist. Item Worksh Line"."Variety 3" WHERE("Registered Worksheet No." = FIELD("Registered Worksheet No."),
+            CalcFormula = Lookup("NPR Regist. Item Worksh Line"."Variety 3" WHERE("Registered Worksheet No." = FIELD("Registered Worksheet No."),
                                                                                      "Line No." = FIELD("Registered Worksheet Line No.")));
             Caption = 'Variety 3';
             Description = 'CASE220397';
@@ -169,7 +158,7 @@ table 6060047 "NPR Reg. Item Wsht Var. Line"
         }
         field(6059987; "Variety 3 Table"; Code[20])
         {
-            CalcFormula = Lookup ("NPR Regist. Item Worksh Line"."Variety 3 Table (New)" WHERE("Registered Worksheet No." = FIELD("Registered Worksheet No."),
+            CalcFormula = Lookup("NPR Regist. Item Worksh Line"."Variety 3 Table (New)" WHERE("Registered Worksheet No." = FIELD("Registered Worksheet No."),
                                                                                                  "Line No." = FIELD("Registered Worksheet Line No.")));
             Caption = 'Variety 3 Table';
             Description = 'CASE220397';
@@ -181,10 +170,6 @@ table 6060047 "NPR Reg. Item Wsht Var. Line"
             Caption = 'Variety 3 Value';
             DataClassification = CustomerContent;
             Description = 'CASE220397';
-            //This property is currently not supported
-            //TestTableRelation = false;
-            //The property 'ValidateTableRelation' can only be set if the property 'TableRelation' is set
-            //ValidateTableRelation = false;
 
             trigger OnLookup()
             var
@@ -194,7 +179,7 @@ table 6060047 "NPR Reg. Item Wsht Var. Line"
         }
         field(6059989; "Variety 4"; Code[10])
         {
-            CalcFormula = Lookup ("NPR Regist. Item Worksh Line"."Variety 4" WHERE("Registered Worksheet No." = FIELD("Registered Worksheet No."),
+            CalcFormula = Lookup("NPR Regist. Item Worksh Line"."Variety 4" WHERE("Registered Worksheet No." = FIELD("Registered Worksheet No."),
                                                                                      "Line No." = FIELD("Registered Worksheet Line No.")));
             Caption = 'Variety 4';
             Description = 'CASE220397';
@@ -203,7 +188,7 @@ table 6060047 "NPR Reg. Item Wsht Var. Line"
         }
         field(6059990; "Variety 4 Table"; Code[20])
         {
-            CalcFormula = Lookup ("NPR Regist. Item Worksh Line"."Variety 4 Table (New)" WHERE("Registered Worksheet No." = FIELD("Registered Worksheet No."),
+            CalcFormula = Lookup("NPR Regist. Item Worksh Line"."Variety 4 Table (New)" WHERE("Registered Worksheet No." = FIELD("Registered Worksheet No."),
                                                                                                  "Line No." = FIELD("Registered Worksheet Line No.")));
             Caption = 'Variety 4 Table';
             Description = 'CASE220397';
@@ -215,10 +200,6 @@ table 6060047 "NPR Reg. Item Wsht Var. Line"
             Caption = 'Variety 4 Value';
             DataClassification = CustomerContent;
             Description = 'CASE220397';
-            //This property is currently not supported
-            //TestTableRelation = false;
-            //The property 'ValidateTableRelation' can only be set if the property 'TableRelation' is set
-            //ValidateTableRelation = false;
 
             trigger OnLookup()
             var
@@ -237,15 +218,5 @@ table 6060047 "NPR Reg. Item Wsht Var. Line"
         {
         }
     }
-
-    fieldgroups
-    {
-    }
-
-    var
-        Text001: Label 'Text001';
-        Text002: Label '%1 is not part of predefined variety set %2 %3. Do you still want to add it? Adding it will make a copy of variety table %3.';
-        Text003: Label 'Variety %1 Value %2 will be added to table copy.';
-        Text004: Label 'Variety %1 Value %2 will be added to unlocked table.';
 }
 

@@ -1,9 +1,6 @@
 xmlport 6060040 "NPR Item Worksh. Import/Export"
 {
-    // NPR4.18\BR\20160209  CASE 182391 Object Created
-
     Caption = 'Item Worksheet Import/Export';
-
     schema
     {
         textelement(Root)
@@ -293,13 +290,6 @@ xmlport 6060040 "NPR Item Worksh. Import/Export"
     {
         Caption = 'Item Worksheet Import/Export';
 
-        layout
-        {
-        }
-
-        actions
-        {
-        }
     }
 }
 

@@ -1,7 +1,5 @@
 table 6060055 "NPR Item Worksh. Field Mapping"
 {
-    // NPR5.25\BR  \20160729  CASE 246088 Object Created
-
     Caption = 'Item Worksheet Field Mapping';
     DataClassification = CustomerContent;
 
@@ -30,10 +28,7 @@ table 6060055 "NPR Item Worksh. Field Mapping"
             DataClassification = CustomerContent;
 
             trigger OnValidate()
-            var
-                WarnDataTypeExample: Label 'Warning: the imported example fields could not be evaluated ro datatype %1.';
             begin
-
                 if RecField.Get("Table No.", "Field Number") then begin
                     "Field Name" := RecField.FieldName;
                     "Field Caption" := RecField."Field Caption";
@@ -61,8 +56,7 @@ table 6060055 "NPR Item Worksh. Field Mapping"
 
             trigger OnValidate()
             begin
-
-                RecField.Reset;
+                RecField.Reset();
                 RecField.SetRange(TableNo, "Table No.");
                 RecField.SetRange(FieldName, "Field Name");
                 if RecField.FindFirst then
@@ -78,8 +72,7 @@ table 6060055 "NPR Item Worksh. Field Mapping"
 
             trigger OnValidate()
             begin
-
-                RecField.Reset;
+                RecField.Reset();
                 RecField.SetRange(TableNo, "Table No.");
                 RecField.SetRange("Field Caption", "Field Caption");
                 if RecField.FindFirst then
@@ -108,11 +101,6 @@ table 6060055 "NPR Item Worksh. Field Mapping"
         {
         }
     }
-
-    fieldgroups
-    {
-    }
-
     var
         RecField: Record "Field";
 }

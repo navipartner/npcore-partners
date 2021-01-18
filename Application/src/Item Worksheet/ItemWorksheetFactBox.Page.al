@@ -1,38 +1,32 @@
 page 6060051 "NPR Item Worksheet FactBox"
 {
-    // NPR4.19\BR\20160311  CASE 182391 Object Created
-    // NPR5.22\BR\20160316  CASE 182391 added fields 500,510,520
-
     Caption = 'Item Worksheet FactBox';
     PageType = CardPart;
-    UsageCategory = Administration;
-    ApplicationArea = All;
     RefreshOnActivate = true;
     SourceTable = "NPR Item Worksheet Line";
-
     layout
     {
         area(content)
         {
-            field("Item No."; "Item No.")
+            field("Item No."; Rec."Item No.")
             {
                 ApplicationArea = All;
-                ToolTip = 'Specifies the value of the Item No. field';
+                ToolTip = 'Specifies the value of the Item No. field.';
             }
-            field("Existing Item No."; "Existing Item No.")
+            field("Existing Item No."; Rec."Existing Item No.")
             {
                 ApplicationArea = All;
-                ToolTip = 'Specifies the value of the Existing Item No. field';
+                ToolTip = 'Specifies the value of the Existing Item No. field.';
             }
             field(Inventory; RecExItem.Inventory)
             {
                 ApplicationArea = All;
-                ToolTip = 'Specifies the value of the RecExItem.Inventory field';
+                ToolTip = 'Specifies the value of the RecExItem.Inventory field.';
             }
-            field(Description; Description)
+            field(Description; Rec.Description)
             {
                 ApplicationArea = All;
-                ToolTip = 'Specifies the value of the Description field';
+                ToolTip = 'Specifies the value of the Description field.';
             }
             field(ItemDescription; RecTempItem.Description)
             {
@@ -40,12 +34,12 @@ page 6060051 "NPR Item Worksheet FactBox"
                 CaptionClass = ExItemDescription;
                 Style = Attention;
                 StyleExpr = TRUE;
-                ToolTip = 'Specifies the value of the RecTempItem.Description field';
+                ToolTip = 'Specifies the value of the RecTempItem.Description field.';
             }
-            field("Sales Price"; "Sales Price")
+            field("Sales Price"; Rec."Sales Price")
             {
                 ApplicationArea = All;
-                ToolTip = 'Specifies the value of the Unit Price field';
+                ToolTip = 'Specifies the value of the Unit Price field.';
             }
             field("RecTempItem.""Unit Price"""; RecTempItem."Unit Price")
             {
@@ -55,12 +49,12 @@ page 6060051 "NPR Item Worksheet FactBox"
                 ShowCaption = false;
                 Style = Attention;
                 StyleExpr = TRUE;
-                ToolTip = 'Specifies the value of the RecTempItem.Unit Price field';
+                ToolTip = 'Specifies the value of the RecTempItem.Unit Price field.';
             }
-            field("Direct Unit Cost"; "Direct Unit Cost")
+            field("Direct Unit Cost"; Rec."Direct Unit Cost")
             {
                 ApplicationArea = All;
-                ToolTip = 'Specifies the value of the Direct Unit Cost field';
+                ToolTip = 'Specifies the value of the Direct Unit Cost field.';
             }
             field("Last unit cost"; RecTempItem."Last Direct Cost")
             {
@@ -69,44 +63,40 @@ page 6060051 "NPR Item Worksheet FactBox"
                 CaptionClass = ExItemUnitCost;
                 Style = Attention;
                 StyleExpr = TRUE;
-                ToolTip = 'Specifies the value of the RecTempItem.Last Direct Cost field';
+                ToolTip = 'Specifies the value of the RecTempItem.Last Direct Cost field.';
             }
-            field("Variety Lines to Skip"; "Variety Lines to Skip")
+            field("Variety Lines to Skip"; Rec."Variety Lines to Skip")
             {
                 ApplicationArea = All;
-                ToolTip = 'Specifies the value of the Variety Lines to Skip field';
+                ToolTip = 'Specifies the value of the Variety Lines to Skip field.';
             }
-            field("Variety Lines to Update"; "Variety Lines to Update")
+            field("Variety Lines to Update"; Rec."Variety Lines to Update")
             {
                 ApplicationArea = All;
-                ToolTip = 'Specifies the value of the Variety Lines to Update field';
+                ToolTip = 'Specifies the value of the Variety Lines to Update field.';
             }
-            field("Variety Lines to Create"; "Variety Lines to Create")
+            field("Variety Lines to Create"; Rec."Variety Lines to Create")
             {
                 ApplicationArea = All;
-                ToolTip = 'Specifies the value of the Variety Lines to Create field';
+                ToolTip = 'Specifies the value of the Variety Lines to Create field.';
             }
-            field("No. of Changes"; "No. of Changes")
+            field("No. of Changes"; Rec."No. of Changes")
             {
                 ApplicationArea = All;
                 BlankZero = true;
                 CaptionClass = ExNoOfChanges;
-                ToolTip = 'Specifies the value of the No. of Changes field';
+                ToolTip = 'Specifies the value of the No. of Changes field.';
             }
-            field("No. of Warnings"; "No. of Warnings")
+            field("No. of Warnings"; Rec."No. of Warnings")
             {
                 ApplicationArea = All;
                 BlankZero = true;
                 CaptionClass = ExNoOfWarnings;
                 Style = Attention;
                 StyleExpr = TRUE;
-                ToolTip = 'Specifies the value of the No. of Warnings field';
+                ToolTip = 'Specifies the value of the No. of Warnings field.';
             }
         }
-    }
-
-    actions
-    {
     }
 
     trigger OnAfterGetCurrRecord()
@@ -131,8 +121,8 @@ page 6060051 "NPR Item Worksheet FactBox"
         RecTempItem: Record Item temporary;
         ItemWorksheetLine: Record "NPR Item Worksheet Line" temporary;
         ExItemDescription: Text;
-        ExItemUnitPrice: Text;
         ExItemUnitCost: Text;
+        ExItemUnitPrice: Text;
         [InDataSet]
         ExNoOfChanges: Text;
         [InDataSet]
@@ -140,32 +130,29 @@ page 6060051 "NPR Item Worksheet FactBox"
 
     local procedure BuildCaptions()
     var
-        TextDescription: Label 'Existing item:';
-        TextUnitPrice: Label 'Existing item:';
-        TextUnitCost: Label 'Last Direct Unit Cost:';
+        DescriptionLbl: Label 'Existing item:';
+        UnitPriceLbl: Label 'Existing item:';
+        UnitCostLbl: Label 'Last Direct Unit Cost:';
     begin
         ExItemDescription := '';
         ExItemUnitPrice := '';
         ExItemUnitCost := '';
-        //-NPR5.25 [246088]
         CalcFields("No. of Changes", "No. of Warnings");
         ExNoOfChanges := '';
         ExNoOfWarnings := '';
-        //+NPR5.25 [246088]
         if ("Existing Item No." <> '') then begin
             if Description <> RecTempItem.Description then
-                ExItemDescription := TextDescription
+                ExItemDescription := DescriptionLbl
             else
                 RecTempItem.Description := '';
             if "Sales Price" <> RecTempItem."Unit Price" then
-                ExItemUnitPrice := TextUnitPrice
+                ExItemUnitPrice := UnitPriceLbl
             else
                 RecTempItem."Unit Price" := 0;
             if "Direct Unit Cost" <> RecTempItem."Last Direct Cost" then
-                ExItemUnitCost := TextUnitCost
+                ExItemUnitCost := UnitCostLbl
             else
                 RecTempItem."Last Direct Cost" := 0;
-            //-NPR5.25 [246088]
             CalcFields("No. of Changes", "No. of Warnings");
             if "No. of Changes" <> 0 then begin
                 ExNoOfChanges := FieldCaption("No. of Changes");
@@ -173,7 +160,6 @@ page 6060051 "NPR Item Worksheet FactBox"
             if "No. of Warnings" <> 0 then begin
                 ExNoOfWarnings := FieldCaption("No. of Warnings");
             end;
-            //+NPR5.25 [246088]
         end;
     end;
 }

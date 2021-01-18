@@ -1,12 +1,9 @@
 table 6060053 "NPR Item Worksh. Field Change"
 {
-    // NPR5.25\BR  \20160720  CASE 246088 Object Created
-
     Caption = 'Item Worksheet Field Change';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR Item Worksh. Field Changes";
     LookupPageID = "NPR Item Worksh. Field Changes";
-
     fields
     {
         field(1; "Worksheet Template Name"; Code[10])
@@ -43,8 +40,6 @@ table 6060053 "NPR Item Worksh. Field Change"
             DataClassification = CustomerContent;
 
             trigger OnValidate()
-            var
-                WarnDataTypeExample: Label 'Warning: the imported example fields could not be evaluated ro datatype %1.';
             begin
                 if RecField.Get("Table No.", "Field Number") then begin
                     "Field Name" := RecField.FieldName;
@@ -135,10 +130,6 @@ table 6060053 "NPR Item Worksh. Field Change"
         key(Key1; "Worksheet Template Name", "Worksheet Name", "Worksheet Line No.", "Worksheet Variant Line No.", "Table No.", "Field Number")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 
     var
