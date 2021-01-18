@@ -1,10 +1,8 @@
 codeunit 6060053 "NPR Item Wksht. Wf Events"
 {
-    // NPR5.25\BR  \20160720  CASE 246088 Object Created
-
-
-    trigger OnRun()
+    local procedure ItemStatusChanged(): Code[128]
     begin
+        exit('ItemStatusChanged');
     end;
 
     local procedure NewItemWorksheetLineInserted(): Code[128]
@@ -12,23 +10,22 @@ codeunit 6060053 "NPR Item Wksht. Wf Events"
         exit('NewItemWorksheetLineInserted');
     end;
 
-    local procedure ItemStatusChanged(): Code[128]
-    begin
-        exit('ItemStatusChanged');
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, 1520, 'OnAddWorkflowEventsToLibrary', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Workflow Event Handling", 'OnAddWorkflowEventsToLibrary', '', true, true)]
     local procedure AddItemWorksheetEventsToLibrary()
     var
         WorkflowEventHandling: Codeunit "Workflow Event Handling";
-        TextDescrNewItemWorksheetLineInserted: Label 'A new Item Worksheet Line is inserted in the Item Worksheet.';
-        TextDescrItemStatusChanged: Label 'The status of an Item was changed';
+        DescrNewItemWorksheetLineInsertedTxt: Label 'A new Item Worksheet Line is inserted in the Item Worksheet.';
+        DescrItemStatusChangedTxt: Label 'The status of an Item was changed.';
     begin
-        WorkflowEventHandling.AddEventToLibrary(NewItemWorksheetLineInserted, DATABASE::"NPR Item Worksheet Line", TextDescrNewItemWorksheetLineInserted, 0, false);
-        WorkflowEventHandling.AddEventToLibrary(ItemStatusChanged, DATABASE::Item, TextDescrItemStatusChanged, 0, false);
+        WorkflowEventHandling.AddEventToLibrary(
+            NewItemWorksheetLineInserted, DATABASE::"NPR Item Worksheet Line",
+            DescrNewItemWorksheetLineInsertedTxt, 0, false);
+        WorkflowEventHandling.AddEventToLibrary(
+            ItemStatusChanged, DATABASE::Item,
+            DescrItemStatusChangedTxt, 0, false);
     end;
 
-    [EventSubscriber(ObjectType::Table, 6060042, 'OnAfterInsertEvent', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR Item Worksheet Line", 'OnAfterInsertEvent', '', false, false)]
     local procedure RunWorkflowOnAfterInsertWorksheeLine(var Rec: Record "NPR Item Worksheet Line"; RunTrigger: Boolean)
     var
         WorkflowManagement: Codeunit "Workflow Management";
@@ -36,7 +33,7 @@ codeunit 6060053 "NPR Item Wksht. Wf Events"
         WorkflowManagement.HandleEvent(NewItemWorksheetLineInserted, Rec);
     end;
 
-    [EventSubscriber(ObjectType::Table, 27, 'OnAfterModifyEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::Item, 'OnAfterModifyEvent', '', true, true)]
     local procedure RunWorkflowOnAfterModifyItemStatus(var Rec: Record Item; var xRec: Record Item; RunTrigger: Boolean)
     var
         WorkflowManagement: Codeunit "Workflow Management";

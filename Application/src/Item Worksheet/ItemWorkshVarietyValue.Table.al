@@ -1,14 +1,9 @@
 table 6060044 "NPR Item Worksh. Variety Value"
 {
-    // NPR4.18\BR\20160209  CASE 182391 Object Created
-    // NPR5.25\BR\20160804  CASE 246088 Added Key
-    // NPR5.29\BR\20162128  CASE 262068 Fixed TableRelation Name and Line No.
-
     Caption = 'Item Worksheet Variety Value';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR Item Worksh.Vrty. Values";
     LookupPageID = "NPR Item Worksh.Vrty. Values";
-
     fields
     {
         field(1; "Worksheet Template Name"; Code[10])
@@ -107,10 +102,10 @@ table 6060044 "NPR Item Worksh. Variety Value"
     procedure AssignSortOrder()
     var
         VRTValue: Record "NPR Item Worksh. Variety Value";
+        Value2: Code[20];
         Dec: Decimal;
         NewSortOrder: Integer;
         DecSep: Text[1];
-        Value2: Code[20];
     begin
         if Evaluate(Dec, Value) then begin
             //its a number. take the sort order from here (if possible)
@@ -137,7 +132,7 @@ table 6060044 "NPR Item Worksh. Variety Value"
             VRTValue.SetCurrentKey("Worksheet Template Name", "Worksheet Name", "Sort Order");
             VRTValue.SetRange("Worksheet Template Name", "Worksheet Template Name");
             VRTValue.SetRange("Worksheet Name", "Worksheet Name");
-            if VRTValue.FindLast then begin
+            if VRTValue.FindLast() then begin
                 NewSortOrder := Round(VRTValue."Sort Order", 10, '<');
                 NewSortOrder += 10;
             end else

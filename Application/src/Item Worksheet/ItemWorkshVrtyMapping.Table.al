@@ -1,11 +1,5 @@
 table 6060057 "NPR Item Worksh. Vrty Mapping"
 {
-    // NPR5.37/BR  /20170922  CASE 268786 Added Mapping option to import
-    // NPR5.37/BR  /20171016  CASE 268786 Added Variety Value Description flowfield, fixed tablerelation Variety Value
-    // NPR5.43/JKL /20180524 CASE 314287  Added new fields Item Wksh. Maping Field, Item Wksh. Maping Field Name, Item Wksh. Maping Fiels Value + added these to primary key
-    // NPR5.46/JKL /20180927 CASE 314287  added custom lookup for Item Wksh. Maping Field Value "item group"
-    // NPR5.49/BHR /20190218 CASE 341465 Increase size of Variety Tables from code 20 to code 40
-
     Caption = 'Item Worksheet Variety Mapping';
     DataClassification = CustomerContent;
 
@@ -28,8 +22,6 @@ table 6060057 "NPR Item Worksh. Vrty Mapping"
             Caption = 'Vendor No.';
             DataClassification = CustomerContent;
             TableRelation = Vendor;
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(10; Variety; Code[10])
@@ -55,13 +47,11 @@ table 6060057 "NPR Item Worksh. Vrty Mapping"
             DataClassification = CustomerContent;
             TableRelation = "NPR Variety Value".Value WHERE(Type = FIELD(Variety),
                                                          Table = FIELD("Variety Table"));
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(20; "Variety Value Description"; Text[30])
         {
-            CalcFormula = Lookup ("NPR Variety Value".Description WHERE(Type = FIELD(Variety),
+            CalcFormula = Lookup("NPR Variety Value".Description WHERE(Type = FIELD(Variety),
                                                                     Table = FIELD("Variety Table"),
                                                                     Value = FIELD("Variety Value")));
             Caption = 'Variety Value Description';
@@ -71,14 +61,14 @@ table 6060057 "NPR Item Worksh. Vrty Mapping"
         }
         field(30; "Item Wksh. Maping Field"; Integer)
         {
-            Caption = 'Item Worksheet Mapipng Field';
+            Caption = 'Item Worksheet Mapping Field';
             DataClassification = CustomerContent;
             Description = 'NPR5.43';
             TableRelation = "NPR Item Worksh. Field Setup"."Field Number";
         }
         field(31; "Item Wksh. Maping Field Name"; Text[80])
         {
-            CalcFormula = Lookup ("NPR Item Worksh. Field Setup"."Field Caption" WHERE("Field Number" = FIELD("Item Wksh. Maping Field")));
+            CalcFormula = Lookup("NPR Item Worksh. Field Setup"."Field Caption" WHERE("Field Number" = FIELD("Item Wksh. Maping Field")));
             Caption = 'Item Worksheet Mapping Field Name';
             Editable = false;
             FieldClass = FlowField;
@@ -91,12 +81,11 @@ table 6060057 "NPR Item Worksh. Vrty Mapping"
 
             trigger OnLookup()
             var
+                ItemWorksheetFieldSetup: Record "NPR Item Worksh. Field Setup";
                 RecRef: RecordRef;
                 Fldref: FieldRef;
                 Variant: Variant;
-                ItemWorksheetFieldSetup: Record "NPR Item Worksh. Field Setup";
             begin
-                //-NPR5.46 [314287]
                 case "Item Wksh. Maping Field" of
                     6014400:
                         begin
@@ -119,8 +108,5 @@ table 6060057 "NPR Item Worksh. Vrty Mapping"
         }
     }
 
-    fieldgroups
-    {
-    }
 }
 

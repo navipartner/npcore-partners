@@ -1,13 +1,5 @@
 table 6060051 "NPR Item Worksh. Excel Column"
 {
-    // NPR5.22\BR\20160321  CASE 182391 Object Created
-    // NPR5.22\BR\20160324  CASE 182391 Added Support for Attributes
-    // NPR5.23\BR\20160524  CASE 242329 Added Support for Vendor Barcode
-    // NPR5.23\BR\20160525  CASE 242498 Added field 41 and 42 to filter
-    // NPR5.25\BR \20160705 CASE 246088 Added many extra fileds from the Item Table
-    // NPR5.25\BR \20160707 CASE 246088 Fill Heading Text
-    // NPR5.25\BR \20160801 CASE 246088 changed lookup
-
     Caption = 'Item Worksheet Excel Column';
     DataClassification = CustomerContent;
 
@@ -30,10 +22,10 @@ table 6060051 "NPR Item Worksh. Excel Column"
 
             trigger OnValidate()
             var
-                x: Integer;
-                i: Integer;
-                y: Integer;
                 c: Char;
+                i: Integer;
+                x: Integer;
+                y: Integer;
                 t: Text[30];
             begin
                 "Excel Column" := '';
@@ -59,8 +51,8 @@ table 6060051 "NPR Item Worksh. Excel Column"
         field(40; "Excel Column"; Code[3])
         {
             Caption = 'Excel Column';
-            DataClassification = CustomerContent;
             CharAllowed = 'AZ';
+            DataClassification = CustomerContent;
 
             trigger OnValidate()
             var
@@ -88,9 +80,7 @@ table 6060051 "NPR Item Worksh. Excel Column"
             begin
                 case "Process as" of
                     "Process as"::Skip:
-                        begin
-                            Validate("Map to Table No.", 0);
-                        end;
+                        Validate("Map to Table No.", 0);
                     "Process as"::Item:
                         begin
                             Validate("Map to Table No.", DATABASE::"NPR Item Worksheet Line");
@@ -131,13 +121,13 @@ table 6060051 "NPR Item Worksh. Excel Column"
 
             trigger OnValidate()
             var
-                TestDateTime: DateTime;
-                TestDate: Date;
-                TestInteger: Integer;
-                TestTime: Time;
-                TestDecimal: Decimal;
-                WarnDataTypeExample: Label 'Warning: the imported example fields could not be evaluated ro datatype %1.';
                 TestBoolean: Boolean;
+                TestDate: Date;
+                TestDateTime: DateTime;
+                TestDecimal: Decimal;
+                TestInteger: Integer;
+                WarnDataTypeExampleMsg: Label 'Warning: the imported example fields could not be evaluated to datatype %1.', Comment = '%1 = Field type';
+                TestTime: Time;
             begin
                 if "Process as" in ["Process as"::Item, "Process as"::"Item Variant"] then begin
                     if RecField.Get("Map to Table No.", "Map to Field Number") then begin
@@ -149,42 +139,42 @@ table 6060051 "NPR Item Worksh. Excel Column"
                                     if not ((Evaluate(TestDateTime, "Sample Data Row 1") or ("Sample Data Row 1" = '')) and
                                             (Evaluate(TestDateTime, "Sample Data Row 2") or ("Sample Data Row 2" = '')) and
                                             (Evaluate(TestDateTime, "Sample Data Row 3") or ("Sample Data Row 3" = ''))) then
-                                        Message(WarnDataTypeExample, RecField.Type);
+                                        Message(WarnDataTypeExampleMsg, RecField.Type);
                                 end;
                             RecField.Type::Date:
                                 begin
                                     if not ((Evaluate(TestDate, "Sample Data Row 1") or ("Sample Data Row 1" = '')) and
                                             (Evaluate(TestDate, "Sample Data Row 2") or ("Sample Data Row 2" = '')) and
                                             (Evaluate(TestDate, "Sample Data Row 3") or ("Sample Data Row 3" = ''))) then
-                                        Message(WarnDataTypeExample, RecField.Type);
+                                        Message(WarnDataTypeExampleMsg, RecField.Type);
                                 end;
                             RecField.Type::Time:
                                 begin
                                     if not ((Evaluate(TestTime, "Sample Data Row 1") or ("Sample Data Row 1" = '')) and
                                             (Evaluate(TestTime, "Sample Data Row 2") or ("Sample Data Row 2" = '')) and
                                             (Evaluate(TestTime, "Sample Data Row 3") or ("Sample Data Row 3" = ''))) then
-                                        Message(WarnDataTypeExample, RecField.Type);
+                                        Message(WarnDataTypeExampleMsg, RecField.Type);
                                 end;
                             RecField.Type::Integer:
                                 begin
                                     if not ((Evaluate(TestInteger, "Sample Data Row 1") or ("Sample Data Row 1" = '')) and
                                             (Evaluate(TestInteger, "Sample Data Row 2") or ("Sample Data Row 2" = '')) and
                                             (Evaluate(TestInteger, "Sample Data Row 3") or ("Sample Data Row 3" = ''))) then
-                                        Message(WarnDataTypeExample, RecField.Type);
+                                        Message(WarnDataTypeExampleMsg, RecField.Type);
                                 end;
                             RecField.Type::Decimal:
                                 begin
                                     if not ((Evaluate(TestDecimal, "Sample Data Row 1") or ("Sample Data Row 1" = '')) and
                                             (Evaluate(TestDecimal, "Sample Data Row 2") or ("Sample Data Row 2" = '')) and
                                             (Evaluate(TestDecimal, "Sample Data Row 3") or ("Sample Data Row 3" = ''))) then
-                                        Message(WarnDataTypeExample, RecField.Type);
+                                        Message(WarnDataTypeExampleMsg, RecField.Type);
                                 end;
                             RecField.Type::Boolean:
                                 begin
                                     if not ((Evaluate(TestBoolean, "Sample Data Row 1") or ("Sample Data Row 1" = '')) and
                                             (Evaluate(TestBoolean, "Sample Data Row 2") or ("Sample Data Row 2" = '')) and
                                             (Evaluate(TestBoolean, "Sample Data Row 3") or ("Sample Data Row 3" = ''))) then
-                                        Message(WarnDataTypeExample, RecField.Type);
+                                        Message(WarnDataTypeExampleMsg, RecField.Type);
                                 end;
 
                         end;
@@ -195,17 +185,12 @@ table 6060051 "NPR Item Worksh. Excel Column"
                     end;
                 end;
 
-                //-NPR5.23 [242329]
                 if "Process as" = "Process as"::Other then begin
                     "Map to Field Name" := TempFieldName("Map to Field Number");
                     "Map to Caption" := TempFieldName("Map to Field Number");
                 end;
-                //+NPR5.23 [242329]
-
-                //-NPR5.25 [246088]
                 if "Excel Header Text" = '' then
                     "Excel Header Text" := "Map to Caption";
-                //+NPR5.25 [246088]
             end;
         }
         field(80; "Map to Field Name"; Text[30])
@@ -261,12 +246,10 @@ table 6060051 "NPR Item Worksh. Excel Column"
                             else
                                 Validate("Map to Field Number", 0);
                         end;
-                    //-NPR5.23 [242329]
                     "Process as"::Other:
                         begin
                             Validate("Map to Field Number");
                         end;
-                //+NPR5.23 [242329]
                 end;
                 if "Excel Header Text" = '' then
                     "Excel Header Text" := "Map to Caption";
@@ -318,14 +301,13 @@ table 6060051 "NPR Item Worksh. Excel Column"
     var
         RecField: Record "Field";
         NPRAttributeID: Record "NPR Attribute ID";
-        ItemWorksheetManagement: Codeunit "NPR Item Worksheet Mgt.";
 
     local procedure LookupItemWorksheetField()
     var
-        FieldLookup: Page "NPR Field Lookup";
-        NPRAttributeIDs: Page "NPR Attribute IDs";
         RecTempField: Record "Field" temporary;
         ItemWorksheetLine: Record "NPR Item Worksheet Line";
+        NPRAttributeIDs: Page "NPR Attribute IDs";
+        FieldLookup: Page "NPR Field Lookup";
         I: Integer;
     begin
         case "Process as" of
@@ -356,13 +338,6 @@ table 6060051 "NPR Item Worksh. Excel Column"
                             FieldLookup.SetRecord(RecField);
                         RecField.SetRange("No.");
                     end;
-                    //-NPR5.25 [246088]
-                    //      CASE "Map to Table No."  OF
-                    //        DATABASE::"Item Worksheet Line":
-                    //          RecField.SETFILTER("No.",LookupFilterItem);
-                    //        DATABASE::"Item Worksheet Variant Line":
-                    //          RecField.SETFILTER("No.",LookupFilterItemVariant);
-                    //      END;
                     Clear(FieldLookup);
                     FieldLookup.SetTableView(RecField);
                     if "Map to Field Number" <> 0 then begin
@@ -372,9 +347,7 @@ table 6060051 "NPR Item Worksh. Excel Column"
                         RecField.SetRange("No.");
                     end;
                     RecField.SetRange(Class, RecField.Class::Normal);
-                    //RecField.SETFILTER("No.",ItemWorksheetManagement.CreateLookupFilter("Map to Table No."));
                     FieldLookup.SetTableView(RecField);
-                    //+NPR5.25 [246088]
                     FieldLookup.LookupMode := true;
                     if FieldLookup.RunModal = ACTION::LookupOK then
                         FieldLookup.GetRecord(RecField)
@@ -382,7 +355,6 @@ table 6060051 "NPR Item Worksh. Excel Column"
                         exit;
                     Validate("Map to Field Number", RecField."No.");
                 end;
-            //-NPR5.23 [242329]
             "Process as"::Other:
                 begin
                     if RecTempField.IsTemporary then begin
@@ -400,7 +372,6 @@ table 6060051 "NPR Item Worksh. Excel Column"
                             Validate("Map to Field Number", 0);
                     end;
                 end;
-        //-NPR5.23 [242329]
         end;
     end;
 
@@ -408,7 +379,6 @@ table 6060051 "NPR Item Worksh. Excel Column"
     var
         ItemWorksheetLine: Record "NPR Item Worksheet Line";
     begin
-        //-NPR5.23 [242329]
         case FieldNumber of
             1:
                 exit('');
@@ -416,7 +386,6 @@ table 6060051 "NPR Item Worksh. Excel Column"
                 exit('');
         end;
         exit('');
-        //+NPR5.23 [242329]
     end;
 }
 

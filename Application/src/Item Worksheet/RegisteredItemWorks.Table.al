@@ -1,7 +1,5 @@
 table 6060045 "NPR Registered Item Works."
 {
-    // NPR4.18\BR\20160209  CASE 182391 Object Created
-
     Caption = 'Item Worksheet Batch';
     DataClassification = CustomerContent;
     DataCaptionFields = "No.", "Worksheet Name", Description;
@@ -85,20 +83,12 @@ table 6060045 "NPR Registered Item Works."
             Caption = 'Registered by User ID';
             DataClassification = CustomerContent;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(6014400; "Item Group"; Code[10])
         {
             Caption = 'Item Group';
             DataClassification = CustomerContent;
             TableRelation = "NPR Item Group" WHERE(Blocked = CONST(false));
-
-            trigger OnValidate()
-            var
-                ItemGroup: Record "NPR Item Group";
-            begin
-            end;
         }
     }
 
@@ -109,23 +99,19 @@ table 6060045 "NPR Registered Item Works."
         }
     }
 
-    fieldgroups
-    {
-    }
-
     trigger OnDelete()
     begin
-        RegisteredItemWorksheetLine.Reset;
+        RegisteredItemWorksheetLine.Reset();
         RegisteredItemWorksheetLine.SetRange("Registered Worksheet No.", "No.");
-        RegisteredItemWorksheetLine.DeleteAll;
+        RegisteredItemWorksheetLine.DeleteAll();
 
-        RegItemWshtVariantLine.Reset;
+        RegItemWshtVariantLine.Reset();
         RegItemWshtVariantLine.SetRange("Registered Worksheet No.", "No.");
-        RegItemWshtVariantLine.DeleteAll;
+        RegItemWshtVariantLine.DeleteAll();
 
-        RegItemWshtVarietyValue.Reset;
+        RegItemWshtVarietyValue.Reset();
         RegItemWshtVarietyValue.SetRange("Registered Worksheet No.", "No.");
-        RegItemWshtVarietyValue.DeleteAll;
+        RegItemWshtVarietyValue.DeleteAll();
     end;
 
     var

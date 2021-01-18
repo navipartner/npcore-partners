@@ -1,8 +1,5 @@
 codeunit 6060052 "NPR Item Wksht.Valid.Test Rnr."
 {
-    // NPR5.25\BR \20160707 CASE 246088 New Codeunit
-    // NPR5.29/BR /20161124 CASE 259274 Added FunctionTestPermissions to Function OnBeforeTestRun and OnAfterTestRun for NAV 2017
-
     Subtype = TestRunner;
     TestIsolation = Codeunit;
 
@@ -13,21 +10,11 @@ codeunit 6060052 "NPR Item Wksht.Valid.Test Rnr."
     end;
 
     var
-        ItemWkshtValidateFields: Codeunit "NPR Item Wksht.Valid. Process";
         ItemWorksheetLine: Record "NPR Item Worksheet Line";
+        ItemWkshtValidateFields: Codeunit "NPR Item Wksht.Valid. Process";
+        Testrunno: Integer;
         Errormessage: Text;
         StartTime: Time;
-        Testrunno: Integer;
-
-    procedure SetItemWorksheetLine(ParItemWorksheetLine: Record "NPR Item Worksheet Line")
-    begin
-        ItemWorksheetLine := ParItemWorksheetLine;
-    end;
-
-    procedure GetErrormessage(): Text
-    begin
-        exit(Errormessage)
-    end;
 
     trigger OnBeforeTestRun(CodeunitID: Integer; CodeunitName: Text; FunctionName: Text; FunctionTestPermissions: TestPermissions): Boolean
     var
@@ -36,8 +23,6 @@ codeunit 6060052 "NPR Item Wksht.Valid.Test Rnr."
         if FunctionName = '' then
             exit(true);
         ClearLastError;
-        //Testresult.Initialize(Testrunno,CodeunitID,FunctionName,CURRENTDATETIME);
-
         exit(true)
     end;
 
@@ -47,10 +32,19 @@ codeunit 6060052 "NPR Item Wksht.Valid.Test Rnr."
     begin
         if FunctionName = '' then
             exit;
-        if (FunctionName = 'OnRun') and Success then begin
+        if (FunctionName = 'OnRun') and Success then
             exit;
-        end;
         Errormessage := GetLastErrorText;
+    end;
+
+    procedure GetErrormessage(): Text
+    begin
+        exit(Errormessage)
+    end;
+
+    procedure SetItemWorksheetLine(ParItemWorksheetLine: Record "NPR Item Worksheet Line")
+    begin
+        ItemWorksheetLine := ParItemWorksheetLine;
     end;
 }
 

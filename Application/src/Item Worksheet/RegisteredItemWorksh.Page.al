@@ -1,7 +1,5 @@
 page 6060046 "NPR Registered Item Worksh."
 {
-    // NPR4.18\BR\20160209  CASE 182391 Object Created
-
     Caption = 'Registered Item Worksheets';
     Editable = false;
     PageType = List;
@@ -15,37 +13,37 @@ page 6060046 "NPR Registered Item Worksh."
         {
             repeater(Group)
             {
-                field("No."; "No.")
+                field("No."; Rec."No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the No. field';
                 }
-                field("Worksheet Name"; "Worksheet Name")
+                field("Worksheet Name"; Rec."Worksheet Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Name field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Vendor No."; "Vendor No.")
+                field("Vendor No."; Rec."Vendor No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Vendor No. field';
                 }
-                field("Item Worksheet Template"; "Item Worksheet Template")
+                field("Item Worksheet Template"; Rec."Item Worksheet Template")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Item Worksheet Template field';
                 }
-                field("Registered Date Time"; "Registered Date Time")
+                field("Registered Date Time"; Rec."Registered Date Time")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Registered Date Time field';
                 }
-                field("Registered by User ID"; "Registered by User ID")
+                field("Registered by User ID"; Rec."Registered by User ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Registered by User ID field';
@@ -60,22 +58,20 @@ page 6060046 "NPR Registered Item Worksh."
         {
             action("View Registered Item Worksheet")
             {
+                ApplicationArea = All;
                 Caption = 'View Registered Item Worksheet';
                 Image = Worksheet;
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                PromotedOnly = true;
                 RunObject = Page "NPR Regist. Item Worksh. Page";
                 RunPageLink = "Registered Worksheet No." = FIELD("No.");
                 RunPageView = SORTING("Registered Worksheet No.", "Line No.")
                               ORDER(Ascending);
-                ApplicationArea = All;
                 ToolTip = 'Executes the View Registered Item Worksheet action';
             }
         }
     }
-
-    var
-        ItemWorksheetManagement: Codeunit "NPR Item Worksheet Mgt.";
 }
 

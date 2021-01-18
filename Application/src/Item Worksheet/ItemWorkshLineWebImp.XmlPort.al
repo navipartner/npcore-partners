@@ -1,20 +1,11 @@
 xmlport 6060041 "NPR Item Worksh. Line Web Imp."
 {
-    // NPR5.22/BR  /20160323  CASE 182391 Object Created
-    // NPR5.25/BR  /20160429  CASE 237658 Lowercased all tags (conform NPXML export). Changed attributes to elements
-    // NPR5.25/BR  /20160704  CASE 246088 Added many extra fileds from the Item Table
-    // NPR5.27/BR  /20161013  CASE 253672 Added fields InternalBarcode and VendorsBarcode
-    // NPR5.33/BR  /20170607  CASE 279610 Deleted fields: Properties, Item Sales Prize, Program No., Assortment, Auto, Out of Stock Print, Print Quantity, Labels per item, ISBN, Label Date, Open quarry unit cost, Hand Out Item No., Model, Basis Number, It
-    // NPR5.33/BR  /20170629  CASE 280329 Compy to Guidelines
-    // NPR5.38/BR  /20171113  CASE 296276 Added field "Description 2"
-    // NPR5.38/BR  /20171124  CASE 297587 Added fields Sales Price Start Date and Purchase Price Start Date
-    // NPR5.39/BR  /20180209  CASE 304980 Added fields
-    // NPR5.40/TJ  /20180326  CASE 309220 Changed MinOccurs property from Once to Zero for reported fields
-    //                                    Node CustomPrice4 was not named uniquelly and was causing service crash, so renamed it to CustomPrice5
-    // NPR5.43/MHA /20180530  CASE 312958 Added Attributes element to support import of NPR Attributes independent of Shortcut Id's
-
     Caption = 'Item Worksheet Line Web Import';
+    DefaultNamespace = 'urn:microsoft-dynamics-nav/xmlports/InsertItemWorksheetLine';
     UseDefaultNamespace = true;
+    Encoding = UTF8;
+    FormatEvaluate = Xml;
+    PreserveWhiteSpace = true;
 
     schema
     {
@@ -49,8 +40,8 @@ xmlport 6060041 "NPR Item Worksh. Line Web Imp."
                 tableelement("Item Worksheet Line"; "NPR Item Worksheet Line")
                 {
                     MinOccurs = Zero;
-                    XmlName = 'ItemWorksheetLine';
                     UseTemporary = true;
+                    XmlName = 'ItemWorksheetLine';
                     fieldelement(ItemNo; "Item Worksheet Line"."Item No.")
                     {
                         MinOccurs = Zero;
@@ -186,8 +177,8 @@ xmlport 6060041 "NPR Item Worksh. Line Web Imp."
                         tableelement(tempattributelookupvalue; "NPR Attribute Lookup Value")
                         {
                             MinOccurs = Zero;
-                            XmlName = 'Attribute';
                             UseTemporary = true;
+                            XmlName = 'Attribute';
                             fieldattribute(Code; TempAttributeLookupValue."Attribute Code")
                             {
                             }
@@ -515,13 +506,6 @@ xmlport 6060041 "NPR Item Worksh. Line Web Imp."
                     textelement(Auto)
                     {
                         MinOccurs = Zero;
-
-                        trigger OnAfterAssignVariable()
-                        begin
-                            //-NPR5.33 [279610]
-                            //"Item Worksheet Line".Auto := FindBooleanOptionValue(Auto);
-                            //+NPR5.33 [279610]
-                        end;
                     }
                     textelement(Outofstock)
                     {
@@ -556,13 +540,6 @@ xmlport 6060041 "NPR Item Worksh. Line Web Imp."
                     textelement(ISBN)
                     {
                         MinOccurs = Zero;
-
-                        trigger OnAfterAssignVariable()
-                        begin
-                            //-NPR5.33 [279610]
-                            //"Item Worksheet Line".ISBN := FindBooleanOptionValue(ISBN);
-                            //+NPR5.33 [279610]
-                        end;
                     }
                     textelement(Cannoteditunitprice)
                     {
@@ -869,8 +846,8 @@ xmlport 6060041 "NPR Item Worksh. Line Web Imp."
                 AutoUpdate = false;
                 MaxOccurs = Once;
                 MinOccurs = Zero;
-                XmlName = 'return';
                 SourceTableView = SORTING(Number) ORDER(Ascending) WHERE(Number = CONST(1));
+                XmlName = 'return';
                 textelement(ReturnValue)
                 {
                     MaxOccurs = Once;
@@ -883,14 +860,6 @@ xmlport 6060041 "NPR Item Worksh. Line Web Imp."
     requestpage
     {
         Caption = 'Item Worksheet Line Web Import';
-
-        layout
-        {
-        }
-
-        actions
-        {
-        }
     }
 
     trigger OnPreXmlPort()
@@ -908,7 +877,6 @@ xmlport 6060041 "NPR Item Worksh. Line Web Imp."
 
     procedure GetSummary(): Text[30]
     begin
-        //EXIT (STRSUBSTNO ('%1-%2', Testfile, QtySum));
         exit('Testfile');
     end;
 
@@ -916,15 +884,6 @@ xmlport 6060041 "NPR Item Worksh. Line Web Imp."
     var
         TicketReservationResponse: Record "NPR TM Ticket Reserv. Resp.";
     begin
-        //tmpTicketReservationResponse.DELETEALL ();
-        //TicketReservationResponse.SETFILTER ("Session Token ID", '=%1', DocumentID);
-        //TicketReservationResponse.FINDLAST ();
-
-        //tmpTicketReservationResponse.TRANSFERFIELDS (TicketReservationResponse, TRUE);
-        //tmpTicketReservationResponse.INSERT ();
-        //tmpTicketReservationResponse.RESET ();
-        //COMMIT;
-
         ReturnValue := ParReturnValue;
     end;
 
