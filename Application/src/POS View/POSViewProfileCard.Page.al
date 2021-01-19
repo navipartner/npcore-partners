@@ -2,8 +2,6 @@ page 6150636 "NPR POS View Profile Card"
 {
     Caption = 'POS View Profile Card';
     PageType = Card;
-    UsageCategory = Administration;
-    ApplicationArea = All;
     SourceTable = "NPR POS View Profile";
 
     layout
@@ -12,33 +10,33 @@ page 6150636 "NPR POS View Profile Card"
         {
             group(General)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Control6014403; Picture)
+                field(Control6014403; Rec.Picture)
                 {
                     ApplicationArea = All;
                     ShowCaption = false;
                     ToolTip = 'Specifies the value of the Picture field';
                 }
-                field("POS Theme Code"; "POS Theme Code")
+                field("POS Theme Code"; Rec."POS Theme Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Theme Code field';
                 }
-                field("Line Order on Screen"; "Line Order on Screen")
+                field("Line Order on Screen"; Rec."Line Order on Screen")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Line Order on Screen field';
                 }
-                field("Initial Sales View"; "Initial Sales View")
+                field("Initial Sales View"; Rec."Initial Sales View")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Initial Sales View field';
                 }
-                field("After End-of-Sale View"; "After End-of-Sale View")
+                field("After End-of-Sale View"; Rec."After End-of-Sale View")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the After End-of-Sale View field';
@@ -46,22 +44,22 @@ page 6150636 "NPR POS View Profile Card"
             }
             group("Number and Date Formatting")
             {
-                field("Client Formatting Culture ID"; "Client Formatting Culture ID")
+                field("Client Formatting Culture ID"; Rec."Client Formatting Culture ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Client Formatting Culture ID field';
                 }
-                field("Client Decimal Separator"; "Client Decimal Separator")
+                field("Client Decimal Separator"; Rec."Client Decimal Separator")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Client Decimal Separator field';
                 }
-                field("Client Thousands Separator"; "Client Thousands Separator")
+                field("Client Thousands Separator"; Rec."Client Thousands Separator")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Client Thousands Separator field';
                 }
-                field("Client Date Separator"; "Client Date Separator")
+                field("Client Date Separator"; Rec."Client Date Separator")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Client Date Separator field';
@@ -89,7 +87,7 @@ page 6150636 "NPR POS View Profile Card"
 
                     trigger OnAction()
                     begin
-                        DetectDecimalThousandsSeparator();
+                        Rec.DetectDecimalThousandsSeparator();
                         CurrPage.Update(true);
                     end;
                 }
@@ -114,13 +112,13 @@ page 6150636 "NPR POS View Profile Card"
                         TextName: Text[200];
                         RecRef: RecordRef;
                     begin
-                        PictureExists := Picture.HasValue;
+                        PictureExists := Rec.Picture.HasValue;
 
                         Clear(TempBlob);
                         Name := FileMgt.BLOBImport(TempBlob, TextName);
 
                         RecRef.GetTable(Rec);
-                        TempBlob.ToRecordRef(RecRef, FieldNo(Picture));
+                        TempBlob.ToRecordRef(RecRef, Rec.FieldNo(Picture));
                         RecRef.SetTable(Rec);
 
                         if Name = '' then
@@ -144,9 +142,9 @@ page 6150636 "NPR POS View Profile Card"
                         FileMgt: Codeunit "File Management";
                         TempBlob: Codeunit "Temp Blob";
                     begin
-                        if Picture.HasValue then begin
-                            CalcFields(Picture);
-                            TempBlob.FromRecord(Rec, FieldNo(Picture));
+                        if Rec.Picture.HasValue then begin
+                            Rec.CalcFields(Picture);
+                            TempBlob.FromRecord(Rec, Rec.FieldNo(Picture));
                             FileMgt.BLOBExport(TempBlob, '*.bmp', true);
                         end;
                     end;
@@ -162,9 +160,9 @@ page 6150636 "NPR POS View Profile Card"
                     var
                         PicConfDelete: Label 'Delete the picture?';
                     begin
-                        if Picture.HasValue then
+                        if Rec.Picture.HasValue then
                             if Confirm(PicConfDelete, false) then begin
-                                Clear(Picture);
+                                Clear(Rec.Picture);
                                 CurrPage.SaveRecord;
                             end;
                     end;

@@ -1,7 +1,5 @@
 table 6150711 "NPR POS Default View"
 {
-    // NPR5.30/TJ  /20170215 CASE 265504 Changed ENU captions on fields with word Register in their name
-
     Caption = 'POS Default View';
     DataClassification = CustomerContent;
 
@@ -97,9 +95,4 @@ table 6150711 "NPR POS Default View"
         {
         }
     }
-
-    fieldgroups
-    {
-    }
 }
-

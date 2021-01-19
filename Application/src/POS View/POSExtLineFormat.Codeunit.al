@@ -1,13 +1,13 @@
 codeunit 6150853 "NPR POS Ext.: Line Format."
 {
-    [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnDiscoverDataSourceExtensions', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnDiscoverDataSourceExtensions', '', false, false)]
     local procedure OnDiscover(DataSourceName: Text; Extensions: List of [Text])
     begin
         if DataSourceName = 'BUILTIN_SALELINE' then
             Extensions.Add('LineFormat');
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnGetDataSourceExtension', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnGetDataSourceExtension', '', false, false)]
     local procedure OnGetExtension(DataSourceName: Text; ExtensionName: Text; var DataSource: Codeunit "NPR Data Source"; var Handled: Boolean; Setup: Codeunit "NPR POS Setup")
     var
         DataType: Enum "NPR Data Type";
@@ -22,7 +22,7 @@ codeunit 6150853 "NPR POS Ext.: Line Format."
         DataSource.AddColumn('Style', 'Font style', DataType::String, false);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnDataSourceExtensionReadData', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnDataSourceExtensionReadData', '', false, false)]
     local procedure OnReadData(DataSourceName: Text; ExtensionName: Text; var RecRef: RecordRef; DataRow: Codeunit "NPR Data Row"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         SaleLine: Record "NPR Sale Line POS";

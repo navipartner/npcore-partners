@@ -1,8 +1,5 @@
 page 6150635 "NPR POS View Profiles"
 {
-    // NPR5.49/TJ  /20190201 CASE 335739 New object
-    // NPR5.55/TSA /20200527 CASE 406862 Added "Initial Sales View", "After End-of-Sale View"
-
     Caption = 'POS View Profiles';
     CardPageID = "NPR POS View Profile Card";
     PageType = List;
@@ -16,47 +13,47 @@ page 6150635 "NPR POS View Profiles"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field("Client Formatting Culture ID"; "Client Formatting Culture ID")
+                field("Client Formatting Culture ID"; Rec."Client Formatting Culture ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Client Formatting Culture ID field';
                 }
-                field("Client Decimal Separator"; "Client Decimal Separator")
+                field("Client Decimal Separator"; Rec."Client Decimal Separator")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Client Decimal Separator field';
                 }
-                field("Client Thousands Separator"; "Client Thousands Separator")
+                field("Client Thousands Separator"; Rec."Client Thousands Separator")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Client Thousands Separator field';
                 }
-                field("Client Date Separator"; "Client Date Separator")
+                field("Client Date Separator"; Rec."Client Date Separator")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Client Date Separator field';
                 }
-                field("POS Theme Code"; "POS Theme Code")
+                field("POS Theme Code"; Rec."POS Theme Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Theme Code field';
                 }
-                field("Line Order on Screen"; "Line Order on Screen")
+                field("Line Order on Screen"; Rec."Line Order on Screen")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Line Order on Screen field';
                 }
-                field("Initial Sales View"; "Initial Sales View")
+                field("Initial Sales View"; Rec."Initial Sales View")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Initial Sales View field';
                 }
-                field("After End-of-Sale View"; "After End-of-Sale View")
+                field("After End-of-Sale View"; Rec."After End-of-Sale View")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the After End-of-Sale View field';
@@ -64,9 +61,4 @@ page 6150635 "NPR POS View Profiles"
             }
         }
     }
-
-    actions
-    {
-    }
 }
-
