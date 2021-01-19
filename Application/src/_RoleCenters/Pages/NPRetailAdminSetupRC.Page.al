@@ -1,6 +1,5 @@
 page 6151245 "NPR NP Retail Admin Setup RC"
 {
-    // #343621/ZESO/20190725  CASE 343621 New Role Centre Page
 
     Caption = 'NP Retail Admin Setup';
     PageType = RoleCenter;
@@ -135,7 +134,6 @@ page 6151245 "NPR NP Retail Admin Setup RC"
                     Caption = 'POS Admin. Template List';
                     ApplicationArea = All;
                     ToolTip = 'Executes the POS Admin. Template List action';
-                    // RunObject = Page "POS Admin. Template List";
                 }
                 action("Cash Registers")
                 {
@@ -358,7 +356,6 @@ page 6151245 "NPR NP Retail Admin Setup RC"
                     Caption = 'Cross Companies Setup';
                     ApplicationArea = All;
                     ToolTip = 'Executes the Cross Companies Setup action';
-                    // RunObject = Page "NpGp Cross Companies Setup";
 
                 }
             }
@@ -384,7 +381,6 @@ page 6151245 "NPR NP Retail Admin Setup RC"
                     Caption = 'Store Opening Hours Setup';
                     ApplicationArea = All;
                     ToolTip = 'Executes the Store Opening Hours Setup action';
-                    //  RunObject = Page "NpCs Store Opening Hours Setup";
                 }
                 action("Collect Workflow Modules")
                 {
@@ -452,7 +448,6 @@ page 6151245 "NPR NP Retail Admin Setup RC"
                     Caption = 'Report Selection - Retail';
                     ApplicationArea = All;
                     ToolTip = 'Executes the Report Selection - Retail action';
-                    //RunObject = page "Report Selection - Retail";
                 }
 
                 action("SMS Template List")
@@ -668,7 +663,6 @@ page 6151245 "NPR NP Retail Admin Setup RC"
                     Caption = 'Retail Price Log Setup';
                     ApplicationArea = All;
                     ToolTip = 'Executes the Retail Price Log Setup action';
-                    //RunObject = page "Retail Price Log Setup";
                 }
 
             }
@@ -791,7 +785,6 @@ page 6151245 "NPR NP Retail Admin Setup RC"
                     Caption = 'Default Dimension Prorities';
                     ApplicationArea = All;
                     ToolTip = 'Executes the Default Dimension Prorities action';
-                    //RunObject = page "Default Dimension Priorities";
                 }
 
                 action(DimensionsList)
@@ -840,6 +833,7 @@ page 6151245 "NPR NP Retail Admin Setup RC"
                     RunObject = page "NPR AF Setup";
                     ApplicationArea = All;
                     ToolTip = 'Executes the AF Setup action';
+                    Image = Setup;
                 }
             }
 

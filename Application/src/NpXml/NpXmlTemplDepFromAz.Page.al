@@ -70,6 +70,7 @@ page 6151554 "NPR NpXml Templ. Dep. From Az."
                 Caption = 'Finish';
                 InFooterBar = true;
                 ToolTip = 'Executes the Finish action';
+                Image = Action; 
 
                 trigger OnAction()
                 var

@@ -75,6 +75,8 @@ page 6184500 "NPR CleanCash Setup List"
                 Promoted = true;
                 ApplicationArea = All;
                 ToolTip = 'Request the CleanCash Unit Identity from CleanCash Server. This will also confirm that your setup is correct.';
+                Image = Start; 
+
                 trigger OnAction()
                 var
                     RequestType: Enum "NPR CleanCash Request Type";
@@ -89,6 +91,8 @@ page 6184500 "NPR CleanCash Setup List"
                 Promoted = true;
                 ApplicationArea = All;
                 ToolTip = 'Request the CleanCash Status from CleanCash Server. This will also confirm that your setup is correct.';
+                Image = Start; 
+
                 trigger OnAction()
                 var
                     RequestType: Enum "NPR CleanCash Request Type";
