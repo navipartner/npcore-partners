@@ -220,8 +220,8 @@ table 6151504 "NPR Nc Import Entry"
 
     procedure LoadXmlDoc(var Document: XmlDocument): Boolean
     var
-        InStr: InStream;
         XmlDomManagement: Codeunit "XML DOM Management";
+        InStr: InStream;
         BufferText: Text;
         XML: Text;
     begin

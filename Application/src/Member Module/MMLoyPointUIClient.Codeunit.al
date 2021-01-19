@@ -1,6 +1,11 @@
 codeunit 6151163 "NPR MM Loy. Point UI (Client)"
 {
+
     SingleInstance = true;
+
+    trigger OnRun()
+    begin
+    end;
 
     var
         Model: DotNet NPRNetModel;
