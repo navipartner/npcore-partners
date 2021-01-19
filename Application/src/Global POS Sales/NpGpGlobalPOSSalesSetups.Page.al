@@ -29,11 +29,6 @@ page 6151171 "NPR NpGp Global POSSalesSetups"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Service Url field';
                 }
-                field("Sync POS Sales Immediately"; "Sync POS Sales Immediately")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Sync POS Sales Immediately field';
-                }
             }
         }
     }
