@@ -2,8 +2,6 @@ page 6150711 "NPR POS View Card"
 {
     Caption = 'POS View Card';
     PageType = Card;
-    UsageCategory = Administration;
-    ApplicationArea = All;
     SourceTable = "NPR POS View";
 
     layout
@@ -12,12 +10,12 @@ page 6150711 "NPR POS View Card"
         {
             group(General)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
@@ -28,7 +26,7 @@ page 6150711 "NPR POS View Card"
                 ApplicationArea = All;
                 trigger OnControlReady();
                 begin
-                    CurrPage.Editor.Invoke('setJson', GetMarkup());
+                    CurrPage.Editor.Invoke('setJson', Rec.GetMarkup());
                     Initialized := true;
                 end;
 
@@ -39,7 +37,7 @@ page 6150711 "NPR POS View Card"
                             begin
                                 if (format(EventContent) = '{}') then
                                     eventContent := '';
-                                SetMarkup(EventContent);
+                                Rec.SetMarkup(EventContent);
                                 CurrPage.SaveRecord();
                             end;
                         'retrieve':
@@ -52,16 +50,12 @@ page 6150711 "NPR POS View Card"
         }
     }
 
-    actions
-    {
-    }
-
     trigger OnAfterGetCurrRecord()
     begin
         if not Initialized then
             exit;
 
-        CurrPage.Editor.Invoke('setJson', GetMarkup());
+        CurrPage.Editor.Invoke('setJson', Rec.GetMarkup());
     end;
 
     trigger OnAfterGetRecord()
@@ -69,7 +63,7 @@ page 6150711 "NPR POS View Card"
         if not Initialized then
             exit;
 
-        CurrPage.Editor.Invoke('setJson', GetMarkup());
+        CurrPage.Editor.Invoke('setJson', Rec.GetMarkup());
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
@@ -114,4 +108,3 @@ page 6150711 "NPR POS View Card"
     var
         Initialized: Boolean;
 }
-

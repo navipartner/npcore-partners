@@ -1,8 +1,5 @@
 table 6150710 "NPR POS View"
 {
-    // NPR5.36/VB /20170911  CASE 289188 Fixing issue with register/salesperson default selection not working.
-    // NPR5.36/VB /20170912  CASE 289011 Implementing specific view layout during change view operation.
-
     Caption = 'POS View';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR POS View List";
@@ -34,10 +31,6 @@ table 6150710 "NPR POS View"
         }
     }
 
-    fieldgroups
-    {
-    }
-
     trigger OnDelete()
     var
         DefaultView: Record "NPR POS Default View";
@@ -54,28 +47,22 @@ table 6150710 "NPR POS View"
     procedure GetMarkup() Text: Text
     var
         InStream: InStream;
-        StreamReader: DotNet NPRNetStreamReader;
     begin
         if not Markup.HasValue then
             exit;
 
         CalcFields(Markup);
         Markup.CreateInStream(InStream);
-        StreamReader := StreamReader.StreamReader(InStream);
-        Text := StreamReader.ReadToEnd();
-        StreamReader.Close();
+        InStream.Read(Text);
     end;
 
     procedure SetMarkup(Text: Text)
     var
         OutStream: OutStream;
-        StreamWriter: DotNet NPRNetStreamWriter;
     begin
         Clear(Markup);
         Markup.CreateOutStream(OutStream);
-        StreamWriter := StreamWriter.StreamWriter(OutStream);
-        StreamWriter.Write(Text);
-        StreamWriter.Close();
+        OutStream.Write(Text);
     end;
 
     procedure FindViewByType(ViewType: Option; SalespersonCode: Code[10]; RegisterCode: Code[10]): Boolean
@@ -83,13 +70,11 @@ table 6150710 "NPR POS View"
         DefaultView: Record "NPR POS Default View";
         DefaultUserView: Record "NPR POS Default User View";
     begin
-        //-NPR5.36 [289011]
         // User has an overridden default view
         if DefaultUserView.GetDefault(ViewType, RegisterCode) and (DefaultUserView."POS View Code" <> '') then begin
             if Get(DefaultUserView."POS View Code") then
                 exit(true);
         end;
-        //+NPR5.36 [289011]
 
         DefaultView.SetRange(Type, ViewType);
         DefaultView.SetFilter("Starting Date", '%1|<=%2', 0D, WorkDate);
@@ -112,32 +97,6 @@ table 6150710 "NPR POS View"
         end;
         if DefaultView.IsEmpty then
             exit(false);
-
-        // Searching for the most specific view
-
-        //-NPR5.36 [289188]
-        //DefaultView.SETRANGE("Salesperson Filter",SalespersonCode);
-        //DefaultView.SETRANGE("Register Filter",RegisterCode);
-        //IF FindApplicableView(DefaultView) THEN
-        //  EXIT(TRUE);
-        //
-        //DefaultView.SETFILTER("Register Filter",'<>%1','');
-        //IF FilterApplicableView(DefaultView,SalespersonCode,RegisterCode) THEN
-        //  EXIT(TRUE);
-        //
-        //DefaultView.SETFILTER("Salesperson Filter",'<>%1','');
-        //IF FilterApplicableView(DefaultView,SalespersonCode,RegisterCode) THEN
-        //  EXIT(TRUE);
-        //
-        //DefaultView.SETRANGE("Register Filter");
-        //IF FilterApplicableView(DefaultView,SalespersonCode,RegisterCode) THEN
-        //  EXIT(TRUE);
-        //
-        //DefaultView.SETRANGE("Salesperson Filter");
-        //IF FilterApplicableView(DefaultView,SalespersonCode,RegisterCode) THEN
-        //  EXIT(TRUE);
-        //
-        //EXIT(FALSE);
 
         // Both salesperson and register explicitly set to exact value
         if (SalespersonCode <> '') and (RegisterCode <> '') then begin
@@ -194,7 +153,6 @@ table 6150710 "NPR POS View"
             exit(true);
 
         exit(false);
-        //+NPR5.36 [289188]
     end;
 
     local procedure FindApplicableView(var DefaultView: Record "NPR POS Default View"): Boolean
@@ -214,36 +172,6 @@ table 6150710 "NPR POS View"
         RegisterTemp: Record "NPR Register" temporary;
         SalespersonTemp: Record "Salesperson/Purchaser" temporary;
     begin
-        //-NPR5.36 [289188]
-        //IF RegisterCode <> '' THEN BEGIN
-        //  Register.FILTERGROUP(2);
-        //  Register.SETRANGE("Register No.",RegisterCode);
-        //  Register.FILTERGROUP(0);
-        //END;
-        //
-        //IF SalespersonCode <> '' THEN BEGIN
-        //  Salesperson.FILTERGROUP(2);
-        //  Salesperson.SETRANGE(Code,SalespersonCode);
-        //  Salesperson.FILTERGROUP(0);
-        //END;
-        //
-        //IF DefaultView.FINDSET THEN
-        //  REPEAT
-        //    Register.RESET();
-        //    Salesperson.RESET();
-        //
-        //    IF DefaultView."Register Filter" <> '' THEN
-        //      Register.SETFILTER("Register No.",DefaultView."Register Filter");
-        //    IF DefaultView."Salesperson Filter" <> '' THEN
-        //      Salesperson.SETFILTER(Code,DefaultView."Salesperson Filter");
-        //
-        //    IF (NOT Register.ISEMPTY) AND (NOT Salesperson.ISEMPTY) THEN BEGIN
-        //      DefaultView.TESTFIELD("POS View Code");
-        //      GET(DefaultView."POS View Code");
-        //      EXIT(TRUE);
-        //    END;
-        //  UNTIL DefaultView.NEXT = 0;
-
         if RegisterCode <> '' then begin
             if Register.Get(RegisterCode) then begin
                 RegisterTemp := Register;
@@ -271,7 +199,5 @@ table 6150710 "NPR POS View"
                     exit(true);
                 end;
             until DefaultView.Next = 0;
-        //+NPR5.36 [289188]
     end;
 }
-

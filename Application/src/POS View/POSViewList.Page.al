@@ -14,12 +14,12 @@ page 6150710 "NPR POS View List"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
@@ -27,9 +27,4 @@ page 6150710 "NPR POS View List"
             }
         }
     }
-
-    actions
-    {
-    }
 }
-

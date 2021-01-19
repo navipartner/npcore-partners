@@ -1,10 +1,5 @@
 codeunit 6150728 "NPR POS View Change WF Mgt."
 {
-    // NPR5.43/MHA /20180613  CASE 318395 Object created
-    // NPR5.45/MHA /20180820  CASE 321266 Extended POS Sales Workflow with Set functionality
-    // NPR5.49/MHA /20190206  CASE 343617 Added OnAfterLogin Workflow
-    // NPR5.49/MHA /20190301  CASE 347382 Added function SetupSalesItem() to skip Non Inventory Items
-
     TableNo = "NPR POS Sales Workflow Step";
 
     trigger OnRun()
@@ -24,13 +19,11 @@ codeunit 6150728 "NPR POS View Change WF Mgt."
 
     // Discovery
 
-    [EventSubscriber(ObjectType::Table, 6150729, 'OnDiscoverPOSSalesWorkflows', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Sales Workflow", 'OnDiscoverPOSSalesWorkflows', '', true, true)]
     local procedure OnDiscoverPOSWorkflows(var Sender: Record "NPR POS Sales Workflow")
     begin
         Sender.DiscoverPOSSalesWorkflow(OnPaymentViewCode(), Text000, CurrCodeunitId(), 'OnPaymentView');
-        //-NPR5.49 [343617]
         Sender.DiscoverPOSSalesWorkflow(OnAfterLoginCode(), Text003, CurrCodeunitId(), 'OnAfterLogin');
-        //+NPR5.49 [343617]
     end;
 
     local procedure CurrCodeunitId(): Integer
@@ -58,13 +51,11 @@ codeunit 6150728 "NPR POS View Change WF Mgt."
         StartTime := CurrentDateTime;
 
         POSSalesWorkflowStep.SetCurrentKey("Sequence No.");
-        //-NPR5.45 [321266]
         POSSalesWorkflowStep.SetFilter("Set Code", '=%1', '');
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
         if POSUnit.Get(SalePOS."Register No.") and (POSUnit."POS Sales Workflow Set" <> '') and POSSalesWorkflowSetEntry.Get(POSUnit."POS Sales Workflow Set", OnPaymentViewCode()) then
             POSSalesWorkflowStep.SetRange("Set Code", POSSalesWorkflowSetEntry."Set Code");
-        //+NPR5.45 [321266]
         POSSalesWorkflowStep.SetRange("Workflow Code", OnPaymentViewCode());
         POSSalesWorkflowStep.SetRange(Enabled, true);
         if not POSSalesWorkflowStep.FindSet then
@@ -87,9 +78,7 @@ codeunit 6150728 "NPR POS View Change WF Mgt."
 
     local procedure OnAfterLoginCode(): Code[20]
     begin
-        //-NPR5.49 [343617]
         exit('AFTER_LOGIN');
-        //+NPR5.49 [343617]
     end;
 
     local procedure OnAfterLogin_OnRun(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; POSSession: Codeunit "NPR POS Session")
@@ -108,7 +97,6 @@ codeunit 6150728 "NPR POS View Change WF Mgt."
         POSSale: Codeunit "NPR POS Sale";
         FrontEnd: Codeunit "NPR POS Front End Management";
     begin
-        //-NPR5.49 [343617]
         StartTime := CurrentDateTime;
 
         POSSalesWorkflowStep.SetCurrentKey("Sequence No.");
@@ -127,19 +115,16 @@ codeunit 6150728 "NPR POS View Change WF Mgt."
         until POSSalesWorkflowStep.Next = 0;
 
         POSSession.AddServerStopwatch('AFTER_LOGIN_WORKFLOWS', CurrentDateTime - StartTime);
-        //+NPR5.49 [343617]
     end;
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterLogin(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; var POSSession: Codeunit "NPR POS Session")
     begin
-        //-NPR5.49 [343617]
-        //+NPR5.49 [343617]
     end;
 
     // Test Item Inventory
 
-    [EventSubscriber(ObjectType::Table, 6150730, 'OnBeforeInsertEvent', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Sales Workflow Step", 'OnBeforeInsertEvent', '', true, true)]
     local procedure OnBeforeInsertWorkflowStep(var Rec: Record "NPR POS Sales Workflow Step"; RunTrigger: Boolean)
     begin
         if Rec."Subscriber Codeunit ID" <> CurrCodeunitId() then
@@ -155,7 +140,7 @@ codeunit 6150728 "NPR POS View Change WF Mgt."
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150728, 'OnPaymentView', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS View Change WF Mgt.", 'OnPaymentView', '', true, true)]
     local procedure TestItemInventory(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; var POSSession: Codeunit "NPR POS Session")
     var
         TempSaleLinePOS: Record "NPR Sale Line POS" temporary;
@@ -227,21 +212,7 @@ codeunit 6150728 "NPR POS View Change WF Mgt."
 
         SaleLinePOS.FindSet;
         repeat
-            //-NPR5.49 [347382]
-            // TempSaleLinePOS.SETRANGE("No.",SaleLinePOS."No.");
-            // TempSaleLinePOS.SETRANGE("Variant Code",SaleLinePOS."Variant Code");
-            // TempSaleLinePOS.SETRANGE("Location Code",SaleLinePOS."Location Code");
-            // IF TempSaleLinePOS.FINDFIRST THEN BEGIN
-            //  TempSaleLinePOS.Quantity += SaleLinePOS.Quantity;
-            //  TempSaleLinePOS."Quantity (Base)" += SaleLinePOS."Quantity (Base)";
-            //  TempSaleLinePOS.MODIFY;
-            // END ELSE BEGIN
-            //  TempSaleLinePOS.INIT;
-            //  TempSaleLinePOS := SaleLinePOS;
-            //  TempSaleLinePOS.INSERT;
-            // END;
             SetupSalesItem(SaleLinePOS, TempSaleLinePOS);
-        //+NPR5.49 [347382]
         until SaleLinePOS.Next = 0;
         TempSaleLinePOS.Reset;
 
@@ -252,7 +223,6 @@ codeunit 6150728 "NPR POS View Change WF Mgt."
     var
         Item: Record Item;
     begin
-        //-NPR5.49 [347382]
         if SaleLinePOS.Type <> SaleLinePOS.Type::Item then
             exit;
         if not Item.Get(SaleLinePOS."No.") then
@@ -274,7 +244,6 @@ codeunit 6150728 "NPR POS View Change WF Mgt."
             TempSaleLinePOS := SaleLinePOS;
             TempSaleLinePOS.Insert;
         end;
-        //+NPR5.49 [347382]
     end;
 
     local procedure GetInventoryErrorMessage(var TempSaleLinePOS: Record "NPR Sale Line POS" temporary) ErrorMessage: Text
@@ -299,4 +268,3 @@ codeunit 6150728 "NPR POS View Change WF Mgt."
         exit(CRLF);
     end;
 }
-
