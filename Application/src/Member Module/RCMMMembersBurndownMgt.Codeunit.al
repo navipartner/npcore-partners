@@ -1,5 +1,10 @@
 codeunit 6060149 "NPR RC MM Members.Burndown Mgt"
 {
+
+    trigger OnRun()
+    begin
+    end;
+
     var
         MembershipBurndownSetup: Record "NPR RC Members. Burndown Setup";
         MembershipEntry: Record "NPR MM Membership Entry";
