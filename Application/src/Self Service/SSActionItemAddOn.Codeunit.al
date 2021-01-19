@@ -1,13 +1,5 @@
 codeunit 6151285 "NPR SS Action - Item AddOn"
 {
-    // 
-    // NPR5.54/TSA /20200205 CASE 387912 Initial Version
-    // NPR5.55/TSA /20200424 CASE 387912 Adjusted the workflow, added title to popup
-
-
-    trigger OnRun()
-    begin
-    end;
 
     var
         ActionDescription: Label 'This built in function sets the item addon values';
@@ -26,29 +18,27 @@ codeunit 6151285 "NPR SS Action - Item AddOn"
         exit('2.3');
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
+        if Sender.DiscoverAction20(
+          ActionCode(),
+          ActionDescription,
+          ActionVersion())
+        then begin
+            Sender.RegisterWorkflow20(
+              'let addonJson = await workflow.respond("GetSalesLineAddonConfigJson");' +
+              'let addonConfig = JSON.parse (addonJson);' +
+              '$context.userSelectedAddons = await popup.configuration (addonConfig);' +
+              'if ($context.userSelectedAddons) {await workflow.respond ("SetItemAddons")};'
+              );
 
-        with Sender do
-            if DiscoverAction20(
-              ActionCode(),
-              ActionDescription,
-              ActionVersion())
-            then begin
-                RegisterWorkflow20(
-                  'let addonJson = await workflow.respond("GetSalesLineAddonConfigJson");' +
-                  'let addonConfig = JSON.parse (addonJson);' +
-                  '$context.userSelectedAddons = await popup.configuration (addonConfig);' +
-                  'if ($context.userSelectedAddons) {await workflow.respond ("SetItemAddons")};'
-                  );
-
-                RegisterTextParameter('ItemAddOnNo', '');
-                SetWorkflowTypeUnattended();
-            end;
+            Sender.RegisterTextParameter('ItemAddOnNo', '');
+            Sender.SetWorkflowTypeUnattended();
+        end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150733, 'OnAction', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Workflows 2.0", 'OnAction', '', false, false)]
     local procedure OnAction20("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; State: Codeunit "NPR POS WF 2.0: State"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     begin
         if not Action.IsThisAction(ActionCode) then
@@ -68,10 +58,10 @@ codeunit 6151285 "NPR SS Action - Item AddOn"
 
     procedure GetAddonConfigJson(POSSession: Codeunit "NPR POS Session"; Context: Codeunit "NPR POS JSON Management") JsonText: Text
     var
-        SalePOS: Record "NPR Sale POS";
-        SaleLinePOS: Record "NPR Sale Line POS";
-        ItemAddOn: Record "NPR NpIa Item AddOn";
         Item: Record Item;
+        ItemAddOn: Record "NPR NpIa Item AddOn";
+        SaleLinePOS: Record "NPR Sale Line POS";
+        SalePOS: Record "NPR Sale POS";
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
     begin
@@ -92,37 +82,8 @@ codeunit 6151285 "NPR SS Action - Item AddOn"
         end;
 
         JsonText := GenerateAddonConfigJson(POSSale, SaleLinePOS, ItemAddOn);
-        //IF (USERID = 'TSA') THEN MESSAGE(JsonText);
-        exit(JsonText);
 
-        // Debug
-        // JsonText :=
-        //  '{"caption":"Hello - Please, specify the following configuration settings","title":"Item configuration","settings":['+
-        //  '  {"caption":"Burger configuration","type":"group","settings":['+
-        //  '    {"type":"plusminus","id":"burgers","caption":"Burgers","value":7.00,"minvalue":1.1,"maxvalue":3.2},'+
-        //  '    {"type":"switch","id":"xl","caption":"Extra large"},'+
-        //  '    {"type":"text","id":"text2_value","caption":"Enter some text"},'+
-        //  '    {"type":"switch","id":"cheese","caption":"Slice of cheese","value":true}'+
-        //  '  ]},'+
-        //  '  {"caption":"Sauces","type":"group","settings":['+
-        //  '    {"type":"plusminus","id":"ketchup","caption":"Ketchup","value":0},'+
-        //  '    {"type":"plusminus","id":"mayo","caption":"Mayonnaise","value":0},'+
-        //  '    {"type":"radio","id":"sauce","caption":"Special sauce", "value":"bbq", "options":['+
-        //  '      {"caption":"None","value":"none"},'+
-        //  '      {"caption":"Barbecue","value":"bbq"},'+
-        //  '      {"caption":"Bernaise","value":"bernaise"},'+
-        //  '      {"caption":"Mushroom","value":"mushroom"}'+
-        //  '    ]}'+
-        //  '  ]},'+
-        //  '  {"type":"switch","id":"takeaway","caption":"To take away"},'+
-        //  '  {"type":"plusminus","id":"napkins","caption":"Extra napkins","minvalue":1,"maxvalue":10},'+
-        //  '  {"type":"text","id":"text_value","caption":"Enter some text"},'+
-        //  '  {"type":"decimal","id":"decimal_value","caption":"Enter a decimal number"},'+
-        //  '  {"type":"integer","id":"integer_value","caption":"Enter an integer number"}'+
-        //  ']}';
-        //
-        // MESSAGE ('%1', JsonText);
-        // EXIT (JsonText);
+        exit(JsonText);
     end;
 
     local procedure GenerateAddonConfigJson(POSSale: Codeunit "NPR POS Sale"; MasterSaleLinePOS: Record "NPR Sale Line POS"; ItemAddOn: Record "NPR NpIa Item AddOn") JsonString: Text
@@ -135,10 +96,7 @@ codeunit 6151285 "NPR SS Action - Item AddOn"
         Value: Text;
     begin
 
-        //-NPR5.55 [387912]
-        //JsonString := STRSUBSTNO ('{"caption":"%1","title":"%2","settings":[', FormatJson (ItemAddOn.Description), '');
         JsonString := StrSubstNo('{"caption":"%1","title":"%2","settings":[', FormatJson(ItemAddOn.Description), FormatJson(PopupTitle));
-        //+NPR5.55 [387912]
 
         ItemAddOnLine.SetRange("AddOn No.", ItemAddOn."No.");
         if (ItemAddOnLine.FindSet()) then begin
@@ -206,13 +164,11 @@ codeunit 6151285 "NPR SS Action - Item AddOn"
 
     local procedure FormatJson(Value: Text) JsonValue: Text
     var
-        JsonConvert: DotNet NPRNetJsonConvert;
-        Formatting: DotNet NPRNetFormatting;
+        JsonVal: JsonValue;
     begin
-
-        JsonValue := JsonConvert.SerializeObject(Value, Formatting.None);
-        JsonValue := CopyStr(JsonValue, 2);
-        JsonValue := DelStr(JsonValue, StrLen(JsonValue));
+        JsonVal.SetValue(JsonValue);
+        JsonValue := Format(JsonVal);
+        JsonValue := CopyStr(JsonValue, 2, StrLen(JsonValue) - 2);
         exit(JsonValue);
     end;
 
@@ -333,7 +289,7 @@ codeunit 6151285 "NPR SS Action - Item AddOn"
     var
         SaleLinePOS: Record "NPR Sale Line POS";
         ItemAddOnLineOption: Record "NPR NpIa ItemAddOn Line Opt.";
-        SelectionValue: DotNet NPRNetJToken;
+        SelectionValue: JsonToken;
         ItemNo: Code[20];
         VariantCode: Code[10];
     begin
@@ -341,7 +297,7 @@ codeunit 6151285 "NPR SS Action - Item AddOn"
         if (Value = '') then
             exit;
 
-        SelectionValue := SelectionValue.Parse(Value);
+        SelectionValue.ReadFrom(Value);
         ItemNo := GetValueAsString(SelectionValue, 'item');
         VariantCode := GetValueAsString(SelectionValue, 'variant');
 
@@ -372,8 +328,6 @@ codeunit 6151285 "NPR SS Action - Item AddOn"
 
             InsertAddOn(SaleLinePOS, NpIaItemAddOnLine, MasterLineNumber);
         end;
-
-        //BeforeInsertPOSAddOnLine(SalePOS,AppliesToLineNo,NpIaItemAddOnLine);
 
         SaleLinePOS.Type := SaleLinePOS.Type::Item;
         SaleLinePOS."Variant Code" := ItemAddOnLineOption."Variant Code";
@@ -495,15 +449,12 @@ codeunit 6151285 "NPR SS Action - Item AddOn"
         SaleLinePOSAddOn.Insert(true);
     end;
 
-    local procedure GetValueAsString(JToken: DotNet NPRNetJToken; JPath: Text): Text
-    var
-        JToken2: DotNet NPRNetJToken;
+    local procedure GetValueAsString(JToken: JsonToken; JPath: Text): Text
     begin
-        JToken2 := JToken.SelectToken(JPath);
-        if IsNull(JToken2) then
+        if not JToken.AsObject().SelectToken(JPath, JToken) then
             exit('');
 
-        exit(Format(JToken2));
+        exit(Format(JToken.AsValue().AsText()));
     end;
 }
 

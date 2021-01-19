@@ -244,14 +244,14 @@ codeunit 6151125 "NPR NpIa Item AddOn Mgt."
         exit(Script);
     end;
 
-    local procedure FormatJson(Input: Text) Output: Text
+    local procedure FormatJson(Value: Text) JsonValue: Text
     var
-        JToken: JsonToken;
+        JsonVal: JsonValue;
     begin
-        JToken.ReadFrom(Input);
-        Output := JToken.AsValue().AsText();
-        Output := CopyStr(Output, 2);
-        Output := DelStr(Output, StrLen(Output));
+        JsonVal.SetValue(JsonValue);
+        JsonValue := Format(JsonVal);
+        JsonValue := CopyStr(JsonValue, 2, StrLen(JsonValue) - 2);
+        exit(JsonValue);
     end;
 
     local procedure WebDepCode(): Code[10]
@@ -267,7 +267,7 @@ codeunit 6151125 "NPR NpIa Item AddOn Mgt."
         if WebClientDependency.Get(WebClientDependency.Type::CSS, WebDepCode()) and WebClientDependency.BLOB.HasValue then begin
             WebClientDependency.CalcFields(BLOB);
             WebClientDependency.BLOB.CreateInStream(InStr);
-            InStr.ReadText(Css);
+            InStr.Read(Css);
         end;
     end;
 
@@ -279,7 +279,7 @@ codeunit 6151125 "NPR NpIa Item AddOn Mgt."
         if WebClientDependency.Get(WebClientDependency.Type::HTML, WebDepCode()) and WebClientDependency.BLOB.HasValue then begin
             WebClientDependency.CalcFields(BLOB);
             WebClientDependency.BLOB.CreateInStream(InStr);
-            InStr.ReadText(Html);
+            InStr.Read(Html);
         end;
     end;
 

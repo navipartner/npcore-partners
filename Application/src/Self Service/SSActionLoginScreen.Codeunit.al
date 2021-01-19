@@ -1,14 +1,5 @@
 codeunit 6151283 "NPR SS Action: Login Screen"
 {
-    // NPR5.54/TSA /20200205 CASE 387912 Initial Version
-    // NPR5.55/TSA /20200424 CASE 387912 Adjusted the workflow
-    // NPR5.55/TSA /20200429 CASE 402078 Bug fix, changed method to switch view. POS Sale is not correctly initialized after record delete.
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         ActionDescription: Label 'This built in function locks the POS';
         ConfirmTitle: Label 'We need your confirmation...';
@@ -29,29 +20,27 @@ codeunit 6151283 "NPR SS Action: Login Screen"
         exit('1.2');
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
-
-        with Sender do
-            if DiscoverAction20(
-              ActionCode(),
-              ActionDescription,
-              ActionVersion())
-            then begin
-                RegisterWorkflow20(
-                    'let result = await popup.confirm ({title: $captions.ConfirmTitle, caption: $captions.ConfirmMessage});' +
-                    'if (result) {' +
-                      'let responseJson = await workflow.respond();' +
-                      'let response = JSON.parse (responseJson);' +
-                      'if (response.message) {await popup.message (response.message);}' +
-                    '};'
-                   );
-                SetWorkflowTypeUnattended();
-            end;
+        if Sender.DiscoverAction20(
+          ActionCode(),
+          ActionDescription,
+          ActionVersion())
+        then begin
+            Sender.RegisterWorkflow20(
+                'let result = await popup.confirm ({title: $captions.ConfirmTitle, caption: $captions.ConfirmMessage});' +
+                'if (result) {' +
+                  'let responseJson = await workflow.respond();' +
+                  'let response = JSON.parse (responseJson);' +
+                  'if (response.message) {await popup.message (response.message);}' +
+                '};'
+               );
+            Sender.SetWorkflowTypeUnattended();
+        end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS UI Management", 'OnInitializeCaptions', '', true, true)]
     local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
     var
         UI: Codeunit "NPR POS UI Management";
@@ -60,7 +49,7 @@ codeunit 6151283 "NPR SS Action: Login Screen"
         Captions.AddActionCaption(ActionCode(), 'ConfirmMessage', ConfirmMessage);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150733, 'OnAction', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Workflows 2.0", 'OnAction', '', false, false)]
     local procedure OnAction20("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; State: Codeunit "NPR POS WF 2.0: State"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         WorkflowResponseJson: Text;
@@ -106,11 +95,7 @@ codeunit 6151283 "NPR SS Action: Login Screen"
             ResponseMessage := StrSubstNo(REQUIRES_ATTENTION, POSQuoteEntry."Sales Ticket No.");
             WorkflowResponseJson := StrSubstNo('{"message" : {"title":"%1", "caption":"%2"}}', SAVE_SALE, ResponseMessage);
         end;
-
-        //-NPR5.55 [402078]
-        //POSSession.ChangeViewLogin();
         POSSession.StartPOSSession();
-        //+NPR5.55 [402078]
     end;
 
     procedure IsOkToCancel(POSSession: Codeunit "NPR POS Session"): Boolean

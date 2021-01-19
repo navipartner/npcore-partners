@@ -1,12 +1,5 @@
 codeunit 6184544 "NPR SS Action - Adyen Unatt."
 {
-    // NPR5.55/JAKUBV/20200807  CASE 386254 Transport NPR5.55 - 31 July 2020
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         ActionDescription: Label 'Adyen Cloud Unattended Transaction';
         DIALOG_CAPTION: Label 'Continue on terminal';
@@ -21,48 +14,48 @@ codeunit 6184544 "NPR SS Action - Adyen Unatt."
         exit('1.4');
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
-        with Sender do
-            if DiscoverAction20(
-              ActionCode(),
-              ActionDescription,
-              ActionVersion())
-            then begin
-                RegisterWorkflow20(
-                  'let test = await workflow.respond("StartTrx");' +
 
-                  'workflow.keepAlive();' +
+        if Sender.DiscoverAction20(
+          ActionCode(),
+          ActionDescription,
+          ActionVersion())
+        then begin
+            Sender.RegisterWorkflow20(
+              'let test = await workflow.respond("StartTrx");' +
 
-                  'let dialog = popup.open({' +
-                      'title: "Payment",' +
-                      'ui: [' +
-                          '{' +
-                              'type: "label",' +
-                              'id: "label1",' +
-                              'caption: "' + GetDialogCaption() + '"' +
-                          '}' +
-                      '],' +
-                      'buttons: []' +
-                  '});' +
+              'workflow.keepAlive();' +
 
-                  'async function checkResponse() {' +
-                    'let trxDone = await workflow.respond("CheckResponse");' +
-                    'if (trxDone) {' +
-                      'dialog.close(true);' +
-                      'workflow.complete()' +
-                    '} else {' +
-                      'setTimeout(async () => { await checkResponse(); }, 1000);' +
-                    '}' +
-                  '};' +
+              'let dialog = popup.open({' +
+                  'title: "Payment",' +
+                  'ui: [' +
+                      '{' +
+                          'type: "label",' +
+                          'id: "label1",' +
+                          'caption: "' + GetDialogCaption() + '"' +
+                      '}' +
+                  '],' +
+                  'buttons: []' +
+              '});' +
 
-                  'await checkResponse();'
-                );
-            end;
+              'async function checkResponse() {' +
+                'let trxDone = await workflow.respond("CheckResponse");' +
+                'if (trxDone) {' +
+                  'dialog.close(true);' +
+                  'workflow.complete()' +
+                '} else {' +
+                  'setTimeout(async () => { await checkResponse(); }, 1000);' +
+                '}' +
+              '};' +
+
+              'await checkResponse();'
+            );
+        end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150733, 'OnAction', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Workflows 2.0", 'OnAction', '', false, false)]
     local procedure OnAction20("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; State: Codeunit "NPR POS WF 2.0: State"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     begin
         if not Action.IsThisAction(ActionCode) then
@@ -77,7 +70,7 @@ codeunit 6184544 "NPR SS Action - Adyen Unatt."
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnGetIntegrationRequestWorkflow', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnGetIntegrationRequestWorkflow', '', false, false)]
     local procedure OnGetIntegrationRequestWorkflow(EFTTransactionRequest: Record "NPR EFT Transaction Request"; var IntegrationWorkflow: Text)
     var
         EFTAdyenCloudIntegration: Codeunit "NPR EFT Adyen Cloud Integ.";
