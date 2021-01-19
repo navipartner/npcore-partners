@@ -58,6 +58,7 @@ page 6014615 "NPR RapidStart Base Data Imp."
             {
                 ApplicationArea = All;
                 ToolTip = 'Executes the ActionName action';
+                Image = Action; 
 
                 trigger OnAction()
                 begin
@@ -71,6 +72,7 @@ page 6014615 "NPR RapidStart Base Data Imp."
                 Caption = 'Back';
                 InFooterBar = true;
                 ToolTip = 'Executes the Back action';
+                Image = PreviousRecord;
             }
 
             action(ActionNext)
@@ -79,6 +81,7 @@ page 6014615 "NPR RapidStart Base Data Imp."
                 Caption = 'Next';
                 InFooterBar = true;
                 ToolTip = 'Executes the Next action';
+                Image = NextRecord;
             }
 
             action(ActionFinish)
@@ -87,6 +90,7 @@ page 6014615 "NPR RapidStart Base Data Imp."
                 Caption = 'Finish';
                 InFooterBar = true;
                 ToolTip = 'Executes the Finish action';
+                Image = Action; 
 
                 trigger OnAction()
                 var

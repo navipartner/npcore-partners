@@ -1,7 +1,5 @@
 page 6151576 "NPR Event Resource Overview"
 {
-    // NPR5.31/NPKNAV/20170502  CASE 269162 Transport NPR5.31 - 2 May 2017
-    // NPR5.32/TJ  /20170523 CASE 277397 Added View action
 
     Caption = 'Event Resource Overview';
     Editable = false;
@@ -100,7 +98,8 @@ page 6151576 "NPR Event Resource Overview"
                 {
                     Caption = 'Day';
                     ApplicationArea = All;
-                    ToolTip = 'Executes the Day action';
+                    ToolTip = 'Filters by day';
+                    Image = Filter; 
 
                     trigger OnAction()
                     begin
@@ -112,7 +111,8 @@ page 6151576 "NPR Event Resource Overview"
                 {
                     Caption = 'Week';
                     ApplicationArea = All;
-                    ToolTip = 'Executes the Week action';
+                    ToolTip = 'Filters by week';
+                    Image = Filter;
 
                     trigger OnAction()
                     begin
@@ -124,7 +124,8 @@ page 6151576 "NPR Event Resource Overview"
                 {
                     Caption = 'Month';
                     ApplicationArea = All;
-                    ToolTip = 'Executes the Month action';
+                    ToolTip = 'Filters by month';
+                    Image = Filter;
 
                     trigger OnAction()
                     begin
@@ -136,7 +137,8 @@ page 6151576 "NPR Event Resource Overview"
                 {
                     Caption = 'Quarter';
                     ApplicationArea = All;
-                    ToolTip = 'Executes the Quarter action';
+                    ToolTip = 'Filters by quarter';
+                    Image = Filter;
 
                     trigger OnAction()
                     begin
@@ -148,7 +150,8 @@ page 6151576 "NPR Event Resource Overview"
                 {
                     Caption = 'Year';
                     ApplicationArea = All;
-                    ToolTip = 'Executes the Year action';
+                    ToolTip = 'Filters by year';
+                    Image = Filter;
 
                     trigger OnAction()
                     begin

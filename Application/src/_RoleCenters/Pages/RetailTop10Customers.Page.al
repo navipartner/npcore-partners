@@ -1,14 +1,5 @@
 page 6059814 "NPR Retail Top 10 Customers"
 {
-    // NC1.17/BHR/20150406 CASE 212983  TOP 10 CUSTOMERS
-    // NC1.17/MH/20150619  CASE 216793 Changed pagename
-    // NC1.17/BHR/20150619 CASE 216856 Sort the top 10 cust
-    // NC1.19/BHR/20150720 CASE 218963 Change caption of Actions and property of Sales(LCY)
-    // NC1.20/BHR/20150805 CASE 218620 Applied datefilter
-    // NC1.22/JLK/20151215 CASE 229520 Phone No. moved 1 field up
-    // NC1.22/BHR/20160107 CASE 227440 format "search name" to enable prober sorting of code.
-    // NPR5.23.03/MHA/20160726  CASE 242557 Object renamed and re-versioned from NC1.22 to NPR5.23.03
-    // NPR5.29/BHR /20170116 CASE 262956 code to Filter on Specific date
 
     Caption = 'Top 10 Customers';
     CardPageID = "Customer Card";
@@ -36,9 +27,7 @@ page 6059814 "NPR Retail Top 10 Customers"
 
                     trigger OnValidate()
                     begin
-                        //-NPR5.29 [262956]
                         ExecuteQuery;
-                        //+NPR5.29 [262956]
                     end;
                 }
                 field(Enddate; Enddate)
@@ -49,9 +38,7 @@ page 6059814 "NPR Retail Top 10 Customers"
 
                     trigger OnValidate()
                     begin
-                        //-NPR5.29 [262956]
                         ExecuteQuery;
-                        //+NPR5.29 [262956]
                     end;
                 }
             }
@@ -68,10 +55,8 @@ page 6059814 "NPR Retail Top 10 Customers"
 
                         trigger OnDrillDown()
                         begin
-                            //-NC1.22
                             Cust.Get("No.");
                             PAGE.Run(PAGE::"Customer Card", Cust);
-                            //+NC1.22
                         end;
                     }
                     field(Name; Name)
@@ -113,6 +98,7 @@ page 6059814 "NPR Retail Top 10 Customers"
                     Caption = 'Day';
                     ApplicationArea = All;
                     ToolTip = 'Executes the Day action';
+                    Image = Filter; 
 
                     trigger OnAction()
                     begin
@@ -125,6 +111,7 @@ page 6059814 "NPR Retail Top 10 Customers"
                     Caption = 'Week';
                     ApplicationArea = All;
                     ToolTip = 'Executes the Week action';
+                    Image = Filter;
 
                     trigger OnAction()
                     begin
@@ -137,6 +124,7 @@ page 6059814 "NPR Retail Top 10 Customers"
                     Caption = 'Month';
                     ApplicationArea = All;
                     ToolTip = 'Executes the Month action';
+                    Image = Filter;
 
                     trigger OnAction()
                     begin
@@ -149,6 +137,7 @@ page 6059814 "NPR Retail Top 10 Customers"
                     Caption = 'Quarter';
                     ApplicationArea = All;
                     ToolTip = 'Executes the Quarter action';
+                    Image = Filter;
 
                     trigger OnAction()
                     begin
@@ -161,6 +150,7 @@ page 6059814 "NPR Retail Top 10 Customers"
                     Caption = 'Year';
                     ApplicationArea = All;
                     ToolTip = 'Executes the Year action';
+                    Image = Filter;
 
                     trigger OnAction()
                     begin
@@ -191,18 +181,12 @@ page 6059814 "NPR Retail Top 10 Customers"
 
     local procedure UpdateList()
     begin
-        //-NPR5.29 [262956]
-        //DELETEALL;
-        //+NPR5.29 [262956]
         Setdate;
-        //-NPR5.29 [262956]
         ExecuteQuery;
-        //+NPR5.29 [262956]
     end;
 
     local procedure ExecuteQuery()
     begin
-        //-NPR5.29 [262956]
         DeleteAll;
         Query1.SetFilter(Posting_Date, '%1..%2', StartDate, Enddate);
         Query1.Open;
@@ -210,30 +194,16 @@ page 6059814 "NPR Retail Top 10 Customers"
             if Cust.Get(Query1.Source_No) then begin
                 TransferFields(Cust);
                 if not Insert then;
-                //-NC1.20
                 SetFilter("Date Filter", '%1..%2', StartDate, Enddate);
-                //+NC1.20
-                //-NC1.17
-                //-NC1.20
-                //  Cust.CALCFIELDS("Sales (LCY)");
-                //  "Search Name" := FORMAT(Cust."Sales (LCY)");
-                //  "Search Name" := PADSTR('',15 - STRLEN("Search Name"),'0') + "Search Name";
 
                 CalcFields("Sales (LCY)");
-                //-NC1.22
-                //"Search Name" := FORMAT("Sales (LCY)");
                 "Search Name" := Format(-"Sales (LCY)" * 100, 20, 1);
-                //+NC1.22
-                //  "Search Name" := FORMAT("Sales (LCY)");
                 "Search Name" := PadStr('', 15 - StrLen("Search Name"), '0') + "Search Name";
                 Modify;
-                //+NC1.20
-                //+NC1.17
 
             end;
         end;
         Query1.Close;
-        //-NPR5.29 [262956]
     end;
 
     local procedure Setdate()

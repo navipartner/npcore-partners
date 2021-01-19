@@ -137,6 +137,7 @@ page 6059812 "NPR Retail Activities"
                 Caption = 'Action Items';
                 ApplicationArea = All;
                 ToolTip = 'Executes the Action Items action';
+                Image = Action;
             }
         }
     }
