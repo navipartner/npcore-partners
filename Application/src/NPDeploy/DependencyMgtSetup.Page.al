@@ -1,9 +1,5 @@
 page 6014670 "NPR Dependency Mgt. Setup"
 {
-    // NPR5.01/VB/20160215 CASE 234462 Object created to support managed dependency deployment
-    // #243906/JDH/20160706 CASE 243906 Added setup + download actions
-    // NPR5.26/MMV /20160905 CASE 242977 Added field 17
-
     Caption = 'Dependency Management Setup';
     PageType = Card;
     SourceTable = "NPR Dependency Mgt. Setup";
@@ -105,9 +101,7 @@ page 6014670 "NPR Dependency Mgt. Setup"
 
                 trigger OnAction()
                 begin
-                    //-NPR5.01
                     ValidateManagedDependencySetup();
-                    //+NPR5.01
                 end;
             }
             action("Setup Managed Dependecy")
@@ -123,9 +117,7 @@ page 6014670 "NPR Dependency Mgt. Setup"
                 var
                     InstallDependencies: Codeunit "NPR Install Mng. Dependencies";
                 begin
-                    //-243906
                     InstallDependencies.InsertBaseData;
-                    //+243906
                 end;
             }
             action("Download Managed Dependencies")
@@ -141,9 +133,7 @@ page 6014670 "NPR Dependency Mgt. Setup"
                 var
                     InstallDependencies: Codeunit "NPR Install Mng. Dependencies";
                 begin
-                    //-243906
                     InstallDependencies.DownloadManagedDependecies;
-                    //+243906
                 end;
             }
         }
