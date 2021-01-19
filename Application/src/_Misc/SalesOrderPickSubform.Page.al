@@ -953,7 +953,8 @@ page 6014519 "NPR Sales Order Pick Subform"
                     AccessByPermission = TableData "Item Charge" = R;
                     Caption = 'Item Charge &Assignment';
                     ApplicationArea = All;
-                    ToolTip = 'Executes the Item Charge &Assignment action';
+                    ToolTip = 'Record additional direct costs, for example for freight. This action is available only for Charge (item) line types.';
+                    Image = ItemCosts;
 
                     trigger OnAction()
                     begin
@@ -983,6 +984,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                         Caption = 'Assemble-to-Order Lines';
                         ApplicationArea = All;
                         ToolTip = 'Executes the Assemble-to-Order Lines action';
+                        Image = AssemblyOrder;
 
                         trigger OnAction()
                         begin
@@ -996,6 +998,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                         Ellipsis = true;
                         ApplicationArea = All;
                         ToolTip = 'Executes the Roll Up &Price action';
+                        Image = RollUpCosts; 
 
                         trigger OnAction()
                         begin
@@ -1009,6 +1012,7 @@ page 6014519 "NPR Sales Order Pick Subform"
                         Ellipsis = true;
                         ApplicationArea = All;
                         ToolTip = 'Executes the Roll Up &Cost action';
+                        Image = RollUpCosts; 
 
                         trigger OnAction()
                         begin

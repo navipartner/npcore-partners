@@ -370,14 +370,13 @@ page 6150613 "NPR NP Retail Setup"
                         Caption = 'Upgrade Audit Roll to POS Entry';
                         ApplicationArea = All;
                         ToolTip = 'Executes the Upgrade Audit Roll to POS Entry action';
+                        Image = Action; 
 
                         trigger OnAction()
                         var
                             RetailDataModelARUpgrade: Codeunit "NPR RetailDataModel AR Upgr.";
                         begin
-                            //-NPR5.48 [334335]
                             RetailDataModelARUpgrade.UpgradeSetupsBalancingV3;
-                            //+NPR5.48 [334335]
                         end;
                     }
                 }
@@ -777,10 +776,8 @@ page 6150613 "NPR NP Retail Setup"
                         var
                             LastErrorString: Text;
                         begin
-                            //-NPR5.50 [355848]
                             LastErrorString := StrSubstNo('%1\\%2', Format(GetLastErrorText), GetLastErrorCallstack);
                             Message(LastErrorString);
-                            //+NPR5.50 [355848]
                         end;
                     }
                 }
@@ -1360,15 +1357,11 @@ page 6150613 "NPR NP Retail Setup"
 
     trigger OnOpenPage()
     begin
-        //-NPR5.31 [263473]
         ActiveSession.Get(ServiceInstanceId, SessionId);
-        //+NPR5.31 [263473]
-        //-NPR5.38 [294723]
         if not InventorySetup.Get then
             InventorySetup.Init;
         PostToGLAfterItemPostingEditable := (not InventorySetup."Automatic Cost Posting");
         AdjCostAfterItemPostingEditable := (InventorySetup."Automatic Cost Adjustment" < InventorySetup."Automatic Cost Adjustment"::Day);
-        //+NPR5.38 [294723]
     end;
 
     var

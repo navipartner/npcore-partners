@@ -190,6 +190,8 @@ page 6014543 "NPR CleanCash Transaction Card"
                 ApplicationArea = All;
                 Caption = 'Send Request';
                 ToolTip = 'If the request does not have status COMPLETE as request status, it can be resent to CleanCash.';
+                Image = SendTo;
+
                 trigger OnAction()
                 var
                     CleanCash: Codeunit "NPR CleanCash XCCSP Protocol";
