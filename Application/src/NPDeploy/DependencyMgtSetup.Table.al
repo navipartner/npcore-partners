@@ -65,36 +65,23 @@ table 6014625 "NPR Dependency Mgt. Setup"
         }
     }
 
-    fieldgroups
-    {
-    }
-
     procedure StoreManagedDependencyPassword(Pwd: Text)
     var
-        Convert: DotNet NPRNetConvert;
-        Encoding: DotNet NPRNetEncoding;
-        MemStream: DotNet NPRNetMemoryStream;
-        OutStream: OutStream;
+        OutStr: OutStream;
     begin
-        Password.CreateOutStream(OutStream);
-        MemStream := MemStream.MemoryStream(Encoding.UTF8.GetBytes(Pwd));
-        CopyStream(OutStream, MemStream);
+        Password.CreateOutStream(OutStr, TextEncoding::UTF8);
+        OutStr.Write(Pwd);
     end;
 
     [NonDebuggable]
     procedure GetManagedDependencyPassword() Pwd: Text
     var
-        Convert: DotNet NPRNetConvert;
-        Encoding: DotNet NPRNetEncoding;
-        MemStream: DotNet NPRNetMemoryStream;
-        InStream: InStream;
+        InStr: InStream;
     begin
         if Password.HasValue then begin
             CalcFields(Password);
-            Password.CreateInStream(InStream);
-            MemStream := MemStream.MemoryStream();
-            CopyStream(MemStream, InStream);
-            Pwd := Encoding.UTF8.GetString(MemStream.ToArray());
+            Password.CreateInStream(InStr, TextEncoding::UTF8);
+            InStr.Read(Pwd);
         end;
     end;
 }

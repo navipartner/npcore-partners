@@ -1,10 +1,5 @@
 codeunit 6014689 "NPR Setup NPDeploy Task"
 {
-    // NPR5.37/MMV /20171006 CASE 286149 Created object
-    // NPR5.44/MMV /20180705 CASE 311268 Seperated code into function
-    // NPR5.45/MMV /20180810 CASE 311268 Created function SetupNPDeployCredentials()
-
-
     trigger OnRun()
     begin
         if not Confirm('Setup NPDeploy callback in Task Queue for the current tenant?\\(This should only be done on the default tenant of a multi tenant database.)') then
@@ -92,9 +87,7 @@ codeunit 6014689 "NPR Setup NPDeploy Task"
     var
         InstallManagedDependencies: Codeunit "NPR Install Mng. Dependencies";
     begin
-        //-NPR5.45 [311268]
         InstallManagedDependencies.InsertSetup();
-        //+NPR5.45 [311268]
     end;
 }
 
