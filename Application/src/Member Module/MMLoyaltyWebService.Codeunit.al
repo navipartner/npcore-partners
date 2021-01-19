@@ -1,5 +1,10 @@
 codeunit 6060141 "NPR MM Loyalty WebService"
 {
+
+    trigger OnRun()
+    begin
+    end;
+
     var
         SETUP_MISSING: Label 'Setup is missing for %1.';
 
@@ -728,17 +733,28 @@ codeunit 6060141 "NPR MM Loyalty WebService"
     local procedure GetBase64(Filename: Text) Value: Text
     var
         TempBlob: Codeunit "Temp Blob";
+        BinaryReader: DotNet NPRNetBinaryReader;
+        MemoryStream: DotNet NPRNetMemoryStream;
+        Convert: DotNet NPRNetConvert;
         FieldRef: FieldRef;
         InStr: InStream;
         f: File;
-        Base64Convert: Codeunit "Base64 Convert";
     begin
+
         Value := '';
+
         f.Open(Filename);
         f.CreateInStream(InStr);
-        Value := Base64Convert.ToBase64(InStr);
+        MemoryStream := InStr;
+        BinaryReader := BinaryReader.BinaryReader(InStr);
+
+        Value := Convert.ToBase64String(BinaryReader.ReadBytes(MemoryStream.Length));
+
+        MemoryStream.Dispose;
+        Clear(MemoryStream);
         f.Close;
         exit(Value);
+
     end;
 }
 

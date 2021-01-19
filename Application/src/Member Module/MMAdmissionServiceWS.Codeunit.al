@@ -474,17 +474,13 @@ codeunit 6060093 "NPR MM Admission Service WS"
 
                 if MMAdmissionScannerStations."Turnstile Default Image".HasValue then begin
                     MMAdmissionScannerStations."Turnstile Default Image".CreateInStream(InStrDefault);
-                    GetImageContent(InStrDefault, PictureBase64Default);
-                    MMAdmissionScannerStations."Turnstile Default Image".CreateInStream(InStrDefault);
-                    GetImageExtension(InStrDefault, PictureExtensionDefault);
+                    GetImageContentAndExtension(InStrDefault, PictureBase64Default, PictureExtensionDefault);
                     Clear(InStrDefault);
                 end;
 
                 if MMAdmissionScannerStations."Turnstile Error Image".HasValue then begin
                     MMAdmissionScannerStations."Turnstile Error Image".CreateInStream(InStrError);
-                    GetImageContent(InStrError, PictureBase64Error);
-                    MMAdmissionScannerStations."Turnstile Error Image".CreateInStream(InStrError);
-                    GetImageExtension(InStrError, PictureExtensionError);
+                    GetImageContentAndExtension(InStrError, PictureBase64Error, PictureExtensionError);
                     Clear(InStrError);
                 end;
             end;
@@ -496,17 +492,13 @@ codeunit 6060093 "NPR MM Admission Service WS"
 
         if MMAdmissionServiceSetup."Turnstile Default Image".HasValue and (PictureBase64Default = '') then begin
             MMAdmissionServiceSetup."Turnstile Default Image".CreateInStream(InStrDefault);
-            GetImageContent(InStrDefault, PictureBase64Default);
-            MMAdmissionServiceSetup."Turnstile Default Image".CreateInStream(InStrDefault);
-            GetImageExtension(InStrDefault, PictureExtensionDefault);
+            GetImageContentAndExtension(InStrDefault, PictureBase64Default, PictureExtensionDefault);
             Clear(InStrDefault);
         end;
 
         if MMAdmissionServiceSetup."Turnstile Error Image".HasValue and (PictureBase64Error = '') then begin
             MMAdmissionServiceSetup."Turnstile Error Image".CreateInStream(InStrError);
-            GetImageContent(InStrError, PictureBase64Error);
-            MMAdmissionServiceSetup."Turnstile Error Image".CreateInStream(InStrError);
-            GetImageExtension(InStrError, PictureExtensionError);
+            GetImageContentAndExtension(InStrError, PictureBase64Error, PictureExtensionError);
             Clear(InStrError);
         end;
 
@@ -526,28 +518,46 @@ codeunit 6060093 "NPR MM Admission Service WS"
     local procedure GetAvatarImage(var MMAdmissionServiceSetup: Record "NPR MM Admis. Service Setup"; var Base64StringImage: Text) Success: Boolean
     var
         Member: Record "NPR MM Member";
+        BinaryReader: DotNet NPRNetBinaryReader;
+        MemoryStream: DotNet NPRNetMemoryStream;
+        Convert: DotNet NPRNetConvert;
         InStr: InStream;
-        Base64Convert: Codeunit "Base64 Convert";
     begin
         MMAdmissionServiceSetup.CalcFields("Guest Avatar");
         MMAdmissionServiceSetup."Guest Avatar".CreateInStream(InStr);
-        Base64StringImage := Base64Convert.ToBase64(InStr);
+        MemoryStream := InStr;
+        BinaryReader := BinaryReader.BinaryReader(InStr);
+
+        Base64StringImage := Convert.ToBase64String(BinaryReader.ReadBytes(MemoryStream.Length));
+
+        MemoryStream.Dispose;
+        Clear(MemoryStream);
+
         exit(true);
     end;
 
     local procedure GetAvatarImageV2(var MMAdmissionServiceSetup: Record "NPR MM Admis. Service Setup"; var Base64StringImage: Text; ScannerStationId: Code[10]) Success: Boolean
     var
         Member: Record "NPR MM Member";
+        BinaryReader: DotNet NPRNetBinaryReader;
+        MemoryStream: DotNet NPRNetMemoryStream;
+        Convert: DotNet NPRNetConvert;
         InStr: InStream;
         MMAdmissionScannerStations: Record "NPR MM Admis. Scanner Stations";
-        Base64Convert: Codeunit "Base64 Convert";
     begin
         if MMAdmissionScannerStations.Get(ScannerStationId) then begin
             if MMAdmissionScannerStations.Activated then begin
                 MMAdmissionScannerStations.CalcFields("Guest Avatar");
                 if MMAdmissionScannerStations."Guest Avatar".HasValue then begin
                     MMAdmissionScannerStations."Guest Avatar".CreateInStream(InStr);
-                    Base64StringImage := Base64Convert.ToBase64(InStr);
+                    MemoryStream := InStr;
+                    BinaryReader := BinaryReader.BinaryReader(InStr);
+
+                    Base64StringImage := Convert.ToBase64String(BinaryReader.ReadBytes(MemoryStream.Length));
+
+                    MemoryStream.Dispose;
+                    Clear(MemoryStream);
+
                     exit(true);
                 end;
             end;
@@ -555,155 +565,67 @@ codeunit 6060093 "NPR MM Admission Service WS"
 
         MMAdmissionServiceSetup.CalcFields("Guest Avatar");
         MMAdmissionServiceSetup."Guest Avatar".CreateInStream(InStr);
-        Base64StringImage := Base64Convert.ToBase64(InStr);
+        MemoryStream := InStr;
+        BinaryReader := BinaryReader.BinaryReader(InStr);
+
+        Base64StringImage := Convert.ToBase64String(BinaryReader.ReadBytes(MemoryStream.Length));
+
+        MemoryStream.Dispose;
+        Clear(MemoryStream);
+
         exit(true);
     end;
 
-    local procedure ToHex(ByteValue: Byte): Text;
+    local procedure GetImageContentAndExtension(InS: InStream; var Base64: Text; var Extension: Text[10])
     var
-        a: byte;
-        b: byte;
-        left: Text;
-        right: Text;
+        Convert: DotNet NPRNetConvert;
+        Bytes: DotNet NPRNetArray;
+        MemoryStream: DotNet NPRNetMemoryStream;
+        Image: DotNet NPRNetImage;
+        ImageFormat: DotNet NPRNetImageFormat;
+        Converter: DotNet NPRNetImageConverter;
     begin
-        a := ByteValue DIV 16;
-        b := ByteValue MOD 16;
+        MemoryStream := MemoryStream.MemoryStream();
+        CopyStream(MemoryStream, InS);
 
-        case a of
-            0:
-                left := '0';
-            1:
-                left := '1';
-            2:
-                left := '2';
-            3:
-                left := '3';
-            4:
-                left := '4';
-            5:
-                left := '5';
-            6:
-                left := '6';
-            7:
-                left := '7';
-            8:
-                left := '8';
-            9:
-                left := '9';
-            10:
-                left := 'A';
-            11:
-                left := 'B';
-            12:
-                left := 'C';
-            13:
-                left := 'D';
-            14:
-                left := 'E';
-            15:
-                left := 'F';
-        end;
+        Bytes := MemoryStream.ToArray();
 
-        case b of
-            0:
-                right := '0';
-            1:
-                right := '1';
-            2:
-                right := '2';
-            3:
-                right := '3';
-            4:
-                right := '4';
-            5:
-                right := '5';
-            6:
-                right := '6';
-            7:
-                right := '7';
-            8:
-                right := '8';
-            9:
-                right := '9';
-            10:
-                right := 'A';
-            11:
-                right := 'B';
-            12:
-                right := 'C';
-            13:
-                right := 'D';
-            14:
-                right := 'E';
-            15:
-                right := 'F';
-        end;
-        exit(left + right);
-    end;
+        Converter := Converter.ImageConverter;
+        Image := Converter.ConvertFrom(Bytes);
 
-    local procedure GetSignature(SignatureBytes: array[10] of Byte; NoOfBytes: integer): Text;
-    var
-        i: Integer;
-        Result: text;
-    begin
-        for i := 1 to NoOfBytes do
-            Result := Result + ToHex(SignatureBytes[i]);
-        exit(Result);
-    end;
+        if (ImageFormat.Jpeg.Equals(Image.RawFormat)) then
+            Extension := 'jpeg'
+        else
+            if (ImageFormat.Png.Equals(Image.RawFormat)) then
+                Extension := 'png'
+            else
+                if (ImageFormat.Gif.Equals(Image.RawFormat)) then
+                    Extension := 'gif'
+                else
+                    if (ImageFormat.Bmp.Equals(Image.RawFormat)) then
+                        Extension := 'bmp'
+                    else
+                        if (ImageFormat.Tiff.Equals(Image.RawFormat)) then
+                            Extension := 'tiff'
+                        else
+                            if (ImageFormat.Emf.Equals(Image.RawFormat)) then
+                                Extension := 'emf'
+                            else
+                                if (ImageFormat.Icon.Equals(Image.RawFormat)) then
+                                    Extension := 'icon'
+                                else
+                                    if (ImageFormat.Exif.Equals(Image.RawFormat)) then
+                                        Extension := 'exif'
+                                    else
+                                        if (ImageFormat.Wmf.Equals(Image.RawFormat)) then
+                                            Extension := 'wmf';
 
-    local procedure GetImageExtensionFromHeader(InS: InStream): Text;
-    var
-        SignatureBytes: array[10] of Byte;
-        c: Char;
-        i: Integer;
-        UnknownImageFormatErr: Label 'Unknown/unrecognized image format.';
-    begin
-        for i := 1 to ArrayLen(SignatureBytes) do begin
-            InS.Read(c);
-            SignatureBytes[i] := c;
-        end;
+        Base64 := Convert.ToBase64String(Bytes);
 
-        //File signatues:
-        //  https://en.wikipedia.org/wiki/List_of_file_signatures
-
-        //FF D8 FF DB - jpeg
-        //FF D8 FF E0 - jpeg
-        //FF D8 FF EE - jpeg
-        //FF D8 FF E1 - jpeg
-        if GetSignature(SignatureBytes, 4) = 'FFD8FFDB' then exit('jpeg');
-        if GetSignature(SignatureBytes, 4) = 'FFD8FFE0' then exit('jpeg');
-        if GetSignature(SignatureBytes, 4) = 'FFD8FFEE' then exit('jpeg');
-        if GetSignature(SignatureBytes, 4) = 'FFD8FFE1' then exit('jpeg');
-        //89 50 4E 47 - png
-        if GetSignature(SignatureBytes, 4) = '89504E47' then exit('png');
-        //42 4D - bmp
-        if GetSignature(SignatureBytes, 2) = '424D' then exit('bmp');
-        //47 49 46 38 37 61 - gif
-        //47 49 46 38 39 61 - gif
-        if GetSignature(SignatureBytes, 6) = '474946383761' then exit('gif');
-        if GetSignature(SignatureBytes, 6) = '474946383961' then exit('gif');
-        //49 49 2A 00 - tiff
-        //4D 4D 00 2A - tiff
-        if GetSignature(SignatureBytes, 4) = '49492A00' then exit('tiff');
-        if GetSignature(SignatureBytes, 4) = '4D4D002A' then exit('tiff');
-        //00 00 01 00 - ico
-        if GetSignature(SignatureBytes, 4) = '00000100' then exit('ico');
-        //D7 CD C6 9A - wmf
-        if GetSignature(SignatureBytes, 4) = 'D7CDC69A' then exit('wmf');
-
-        Error(UnknownImageFormatErr);
-    end;
-
-    local procedure GetImageContent(InS: InStream; var Base64: Text)
-    var
-        Base64Convert: Codeunit "Base64 Convert";
-    begin
-        Base64 := Base64Convert.ToBase64(InS);
-    end;
-
-    local procedure GetImageExtension(InS: InStream; var Extension: Text[10])
-    begin
-        Extension := GetImageExtensionFromHeader(InS);
+        MemoryStream.Dispose;
+        Clear(MemoryStream);
+        Clear(Bytes);
+        Clear(InS);
     end;
 
     procedure GuestValidationV2(Barcode: Text[50]; ScannerStationId: Code[10]; var No: Code[20]; var Token: Code[50]; var ErrorNumber: Code[10]; var ErrorDescription: Text; var LightColor: Text[30]): Boolean
@@ -806,7 +728,10 @@ codeunit 6060093 "NPR MM Admission Service WS"
                 end;
             end;
             if MMAdmissionServiceSetup."Validate Tickes" and not AdmissionIsValid then begin
+
+                //IF TMTicketWebService.ValidateTicketArrival('',Barcode,ScannerStationId,MessageText) THEN BEGIN
                 if TMTicketWebService.ValidateTicketArrival(AdmissionCode, Barcode, ScannerStationId, MessageText) then begin
+
                     MMAdmissionServiceLog."Response No" := Barcode;
                     MMAdmissionServiceLog."Response Token" := CreateToken();
                     No := MMAdmissionServiceLog."Response No";
@@ -824,12 +749,17 @@ codeunit 6060093 "NPR MM Admission Service WS"
                     MMAdmissionServiceEntry."External Ticket No." := TMTicket."External Ticket No.";
                     MMAdmissionServiceEntry."External Card No." := TMTicket."External Member Card No.";
 
+                    //      IF TMTicketType.GET(TMTicket."Ticket Type Code") THEN BEGIN
+                    //        MMAdmissionServiceEntry."Ticket Type Code" := TMTicketType.Code;
+                    //        MMAdmissionServiceEntry."Ticket Type Description" := TMTicketType.Description;
+                    //      END;
                     if Item.Get(TMTicket."Item No.") then begin
                         MMAdmissionServiceEntry."Ticket Type Code" := Item."No.";
                         if StrLen(Item.Description) > MaxStrLen(MMAdmissionServiceEntry."Ticket Type Description") then
                             MMAdmissionServiceEntry."Ticket Type Description" := CopyStr(Item.Description, 1, MaxStrLen(MMAdmissionServiceEntry."Ticket Type Description"))
                         else
                             MMAdmissionServiceEntry."Ticket Type Description" := Item.Description;
+                        //MMAdmissionServiceEntry."Ticket Type Description" := Item.Description;
                     end;
 
                     MemberCard.SetCurrentKey("External Card No.");
@@ -890,3 +820,4 @@ codeunit 6060093 "NPR MM Admission Service WS"
         exit(MMAdmissionServiceLog."Return Value");
     end;
 }
+

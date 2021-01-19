@@ -1,5 +1,8 @@
 codeunit 6060132 "NPR MM Import Members"
 {
+
+    // #xxx/TSA /20180316 CASE xxx Added iComm setup warning
+
     trigger OnRun()
     var
         FileManagement: Codeunit "File Management";
@@ -845,11 +848,19 @@ codeunit 6060132 "NPR MM Import Members"
     var
         RecordLink: Record "Record Link";
         OutStr: OutStream;
+        BinaryWriter: DotNet NPRNetBinaryWriter;
+        Encoding: DotNet NPRNetEncoding;
     begin
+
         RecordLink.Get(Member.AddLink('', 'Notes'));
+
         RecordLink.Type := RecordLink.Type::Note;
-        RecordLink.Note.CreateOutStream(OutStr, TextEncoding::UTF8);
-        OutStr.WriteText(CommentText);
+        RecordLink.Note.CreateOutStream(OutStr);
+
+        Encoding := Encoding.UTF8;
+        BinaryWriter := BinaryWriter.BinaryWriter(OutStr, Encoding);
+        BinaryWriter.Write(CommentText);
+
         RecordLink.Modify();
     end;
 
