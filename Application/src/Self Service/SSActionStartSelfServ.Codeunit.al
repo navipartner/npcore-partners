@@ -1,13 +1,5 @@
 codeunit 6151286 "NPR SS Action: Start SelfServ."
 {
-    // NPR5.54/TSA /20200212 CASE 390370 Initial Version
-    // NPR5.55/TSA /20200520 CASE 405186 Added localization support
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         ActionDescription: Label 'This built in actions starts the POS in SelfService mode';
 
@@ -23,28 +15,25 @@ codeunit 6151286 "NPR SS Action: Start SelfServ."
         exit('1.2');
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
 
-        with Sender do
-            if DiscoverAction20(
-              ActionCode(),
-              ActionDescription,
-              ActionVersion())
-            then begin
-                RegisterWorkflow20('await workflow.respond();');
+        if Sender.DiscoverAction20(
+          ActionCode(),
+          ActionDescription,
+          ActionVersion())
+        then begin
+            Sender.RegisterWorkflow20('await workflow.respond();');
 
-                RegisterTextParameter('SalespersonCode', '');
-                //-NPR5.55 [405186]
-                RegisterTextParameter('LanguageCode', '');
-                //+NPR5.55 [405186]
+            Sender.RegisterTextParameter('SalespersonCode', '');
+            Sender.RegisterTextParameter('LanguageCode', '');
 
-                SetWorkflowTypeUnattended();
-            end;
+            Sender.SetWorkflowTypeUnattended();
+        end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150733, 'OnAction', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Workflows 2.0", 'OnAction', '', false, false)]
     local procedure OnAction20("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; State: Codeunit "NPR POS WF 2.0: State"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         SalesPersonCode: Code[10];
@@ -57,12 +46,8 @@ codeunit 6151286 "NPR SS Action: Start SelfServ."
 
         SalesPersonCode := Context.GetStringParameter('SalespersonCode', true);
 
-        //-NPR5.55 [405186]
-        //StartSelfService (POSSession, SalesPersonCode);
-
         LanguageCode := Context.GetStringParameter('LanguageCode', false);
         StartSelfService(POSSession, SalesPersonCode, LanguageCode);
-        //+NPR5.55 [405186]
     end;
 
     procedure StartSelfService(POSSession: Codeunit "NPR POS Session"; SalespersonCode: Code[10]; LanguageCode: Code[10])
@@ -86,7 +71,7 @@ codeunit 6151286 "NPR SS Action: Start SelfServ."
         HostName: Text;
     begin
 
-        DATABASE.SelectLatestVersion(); //-+NPR5.55 [405186]
+        DATABASE.SelectLatestVersion();
         POSSession.GetSetup(POSSetup);
 
         POSSession.GetSessionId(HardwareId, SessionName, HostName);
@@ -103,7 +88,7 @@ codeunit 6151286 "NPR SS Action: Start SelfServ."
 
         POSSetup.GetPOSUnit(POSUnit);
 
-        //-NPR5.55 [405186] possetup might have a stale version
+        // possetup might have a stale version
         POSUnit.Get(POSUnit."No.");
         POSSetup.SetPOSUnit(POSUnit);
         //+NPR5.55 [405186]
@@ -128,13 +113,11 @@ codeunit 6151286 "NPR SS Action: Start SelfServ."
 
         POSCreateEntry.InsertUnitLoginEntry(POSSetup.Register, POSSetup.Salesperson);
 
-        //-NPR5.55 [405186]
         if (Language.Get(LanguageCode)) then begin
             if (Language."Windows Language ID" > 0) then
                 GlobalLanguage(Language."Windows Language ID");
             POSUIManagement.InitializeCaptions();
         end;
-        //+NPR5.55 [405186]
 
         POSSession.StartTransaction();
         POSSession.GetSale(POSSale);
@@ -161,12 +144,10 @@ codeunit 6151286 "NPR SS Action: Start SelfServ."
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150700, 'OnInitializationComplete', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Session", 'OnInitializationComplete', '', false, false)]
     local procedure OnInitializationComplete(FrontEnd: Codeunit "NPR POS Front End Management")
     begin
-        //-NPR5.55 [398235]
         //Invoke POSResume codeunit to check if last exists, with manually bound subscriber?
-        //+NPR5.55 [398235]
     end;
 }
 

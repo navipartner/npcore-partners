@@ -1,22 +1,22 @@
 codeunit 6151289 "NPR SS Action: Insert Item"
 {
     var
-        ActionDescription: Label 'This is a built-in action for self-service, inserting an item line into the current transaction';
-        TEXTitemTracking_title: Label 'Enter Serial Number';
-        TEXTitemTracking_lead: Label 'This item requires serial number, enter serial number.';
         Setup: Codeunit "NPR POS Setup";
-        TEXTitemTracking_instructions: Label 'Enter serial number now and press OK. Press Cancel to enter serial number later.';
         TEXTActive: Label 'active';
-        TEXTSaved: Label 'saved';
-        TEXTWrongSerialOnILE: Label 'Serial number %1 for item %2 - %3 can not be used since it can not be found as received. \Press OK to re-enter serial number now. \Press Cancel to enter serial number later.\';
-        TEXTWrongSerialOnSLP: Label 'Serial number %1 for item %2 - %3 can not be used since it is already on %4 sale %5 on register %6. \Press OK to re-enter serial number now. \Press Cancel to enter serial number later.\''';
-        UnitPriceCaption: Label 'This is item is an item group. Specify the unit price for item.';
-        UnitPriceTitle: Label 'Unit price is required';
-        TEXTeditDesc_lead: Label 'Line description';
         TEXTeditDesc_title: Label 'Add or change description.';
         ERROR_ITEMSEARCH: Label 'Could not find a matching item for input %1';
         EnterQuantityCaption: Label 'Enter Quantity';
+        TEXTitemTracking_title: Label 'Enter Serial Number';
+        TEXTitemTracking_instructions: Label 'Enter serial number now and press OK. Press Cancel to enter serial number later.';
+        TEXTeditDesc_lead: Label 'Line description';
+        TEXTSaved: Label 'saved';
+        TEXTWrongSerialOnILE: Label 'Serial number %1 for item %2 - %3 can not be used since it can not be found as received. \Press OK to re-enter serial number now. \Press Cancel to enter serial number later.\';
+        TEXTWrongSerialOnSLP: Label 'Serial number %1 for item %2 - %3 can not be used since it is already on %4 sale %5 on register %6. \Press OK to re-enter serial number now. \Press Cancel to enter serial number later.\''';
         ValidRangeText: Label 'The valid range is %1 to %2.';
+        ActionDescription: Label 'This is a built-in action for self-service, inserting an item line into the current transaction';
+        UnitPriceCaption: Label 'This is item is an item group. Specify the unit price for item.';
+        TEXTitemTracking_lead: Label 'This item requires serial number, enter serial number.';
+        UnitPriceTitle: Label 'Unit price is required';
 
     local procedure ActionCode(): Text
     begin
@@ -29,63 +29,62 @@ codeunit 6151289 "NPR SS Action: Insert Item"
         exit('2.5');
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     var
         itemTrackingCode: Text;
     begin
 
-        with Sender do
-            if DiscoverAction20(
-              ActionCode,
-              ActionDescription,
-              ActionVersion())
-            then begin
+        if Sender.DiscoverAction20(
+          ActionCode,
+          ActionDescription,
+          ActionVersion())
+        then begin
 
-                RegisterWorkflow20(
-                  'let workflowstep = "AddSalesLine";' +
-                  'let qtyDialogThreshold = 9;' +
-                  'let qtyMax = 100;' +
-                  'let qtyMin = 1;' +
+            Sender.RegisterWorkflow20(
+              'let workflowstep = "AddSalesLine";' +
+              'let qtyDialogThreshold = 9;' +
+              'let qtyMax = 100;' +
+              'let qtyMin = 1;' +
 
-                  'if ($context.hasOwnProperty ("_additionalContext")) {' +
-                  '  if ($context._additionalContext.hasOwnProperty("plusMinus"))' +
-                  '    workflowstep = ($context._additionalContext.quantity > 0) ? "IncreaseQuantity" : "DecreaseQuantity";' +
+              'if ($context.hasOwnProperty ("_additionalContext")) {' +
+              '  if ($context._additionalContext.hasOwnProperty("plusMinus"))' +
+              '    workflowstep = ($context._additionalContext.quantity > 0) ? "IncreaseQuantity" : "DecreaseQuantity";' +
 
-                  '  const salesline = runtime.getData("BUILTIN_SALELINE");' +
-                  '  let row = salesline.find(r => r[6] === $parameters.itemNo) || null;' +
-                  '  console.log ("Searching for item: " +$parameters.itemNo+" found row: "+ JSON.stringify (row));' +
-                  '  if ((row != null) &&' +
-                  '      ((row[12] >= qtyDialogThreshold) && ($context._additionalContext.quantity > 0) ||' +
-                  '       (row[12] >  qtyDialogThreshold) && ($context._additionalContext.quantity < 0))' +
-                  '     ) {' +
-                  '     let quantity = ($context._additionalContext.quantity > 0) ? row[12] + 1 : row[12] - 1;' +
-                  '     $context.specificQuantity = await popup.intpad ({title: $captions.EnterQuantityCaption, caption: $captions.EnterQuantityCaption, value: quantity});' +
-                  '     if ($context.specificQuantity === null) {return;} ' +
-                  '     if (parseInt ($context.specificQuantity) > qtyMax || parseInt ($context.specificQuantity) < qtyMin) {' +
-                  '       await popup.message ({title: $captions.EnterQuantityCaption, caption: $captions.ValidRangeText.substitute (qtyMin, qtyMax)});' +
-                  '       return;' +
-                  '     } ' +
-                  '     workflowstep = "SetSpecificQuantity";' +
-                  '  }' +
+              '  const salesline = runtime.getData("BUILTIN_SALELINE");' +
+              '  let row = salesline.find(r => r[6] === $parameters.itemNo) || null;' +
+              '  console.log ("Searching for item: " +$parameters.itemNo+" found row: "+ JSON.stringify (row));' +
+              '  if ((row != null) &&' +
+              '      ((row[12] >= qtyDialogThreshold) && ($context._additionalContext.quantity > 0) ||' +
+              '       (row[12] >  qtyDialogThreshold) && ($context._additionalContext.quantity < 0))' +
+              '     ) {' +
+              '     let quantity = ($context._additionalContext.quantity > 0) ? row[12] + 1 : row[12] - 1;' +
+              '     $context.specificQuantity = await popup.intpad ({title: $captions.EnterQuantityCaption, caption: $captions.EnterQuantityCaption, value: quantity});' +
+              '     if ($context.specificQuantity === null) {return;} ' +
+              '     if (parseInt ($context.specificQuantity) > qtyMax || parseInt ($context.specificQuantity) < qtyMin) {' +
+              '       await popup.message ({title: $captions.EnterQuantityCaption, caption: $captions.ValidRangeText.substitute (qtyMin, qtyMax)});' +
+              '       return;' +
+              '     } ' +
+              '     workflowstep = "SetSpecificQuantity";' +
+              '  }' +
 
-                  '}' +
+              '}' +
 
-                  'await (workflow.respond (workflowstep));'
-                  );
+              'await (workflow.respond (workflowstep));'
+              );
 
-                RegisterOptionParameter('itemIdentifyerType', 'ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference', 'ItemNo');
-                RegisterTextParameter('itemNo', '');
-                RegisterDecimalParameter('itemQuantity', 1);
-                RegisterBooleanParameter('descriptionEdit', false);
-                RegisterBooleanParameter('usePreSetUnitPrice', false);
-                RegisterDecimalParameter('preSetUnitPrice', 0);
-                RegisterBlockingUI(false);
-                SetWorkflowTypeUnattended();
-            end;
+            Sender.RegisterOptionParameter('itemIdentifyerType', 'ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference', 'ItemNo');
+            Sender.RegisterTextParameter('itemNo', '');
+            Sender.RegisterDecimalParameter('itemQuantity', 1);
+            Sender.RegisterBooleanParameter('descriptionEdit', false);
+            Sender.RegisterBooleanParameter('usePreSetUnitPrice', false);
+            Sender.RegisterDecimalParameter('preSetUnitPrice', 0);
+            Sender.RegisterBlockingUI(false);
+            Sender.SetWorkflowTypeUnattended();
+        end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150733, 'OnAction', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Workflows 2.0", 'OnAction', '', false, false)]
     local procedure OnAction20("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; State: Codeunit "NPR POS WF 2.0: State"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     begin
         if not Action.IsThisAction(ActionCode) then
@@ -110,7 +109,7 @@ codeunit 6151289 "NPR SS Action: Insert Item"
         POSSession.RequestRefreshData();
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS UI Management", 'OnInitializeCaptions', '', false, false)]
     local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
     var
         UI: Codeunit "NPR POS UI Management";
@@ -121,22 +120,20 @@ codeunit 6151289 "NPR SS Action: Insert Item"
 
     local procedure Step_AddSalesLine(JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
-        UseSpecificTracking: Boolean;
-        InputSerial: Code[20];
-        UnitPrice: Decimal;
-        ItemIdentifier: Text;
-        ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch;
         Item: Record Item;
         ItemCrossReference: Record "Item Cross Reference";
-        ItemQuantity: Decimal;
-        HasPrompted: Boolean;
-        UsePresetUnitPrice: Boolean;
-        PresetUnitPrice: Decimal;
         DialogContext: Codeunit "NPR POS JSON Management";
         DialogPrompt: Boolean;
+        HasPrompted: Boolean;
+        UsePresetUnitPrice: Boolean;
+        UseSpecificTracking: Boolean;
+        InputSerial: Code[20];
+        ItemQuantity: Decimal;
+        PresetUnitPrice: Decimal;
+        UnitPrice: Decimal;
+        ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch;
+        ItemIdentifier: Text;
     begin
-
-
         HasPrompted := JSON.GetBoolean('promptPrice', false) or JSON.GetBoolean('promptSerial', false);
 
         JSON.SetScope('parameters', true);
@@ -198,9 +195,9 @@ codeunit 6151289 "NPR SS Action: Insert Item"
     var
         Item: Record Item;
         ItemCrossReference: Record "Item Cross Reference";
-        ItemIdentifier: Text;
-        ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch;
         ItemQuantity: Decimal;
+        ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch;
+        ItemIdentifier: Text;
     begin
         JSON.SetScope('parameters', true);
         ItemIdentifier := JSON.GetString('itemNo', true);
@@ -218,9 +215,9 @@ codeunit 6151289 "NPR SS Action: Insert Item"
     var
         Item: Record Item;
         ItemCrossReference: Record "Item Cross Reference";
-        ItemIdentifier: Text;
-        ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch;
         ItemQuantity: Decimal;
+        ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch;
+        ItemIdentifier: Text;
     begin
 
         JSON.SetScope('parameters', true);
@@ -262,9 +259,7 @@ codeunit 6151289 "NPR SS Action: Insert Item"
 
     end;
 
-    local procedure "-- Various support functions"()
-    begin
-    end;
+    #region Various support functions
 
     local procedure GetItem(var Item: Record Item; var ItemCrossReference: Record "Item Cross Reference"; ItemIdentifier: Text; ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference)
     var
@@ -321,14 +316,14 @@ codeunit 6151289 "NPR SS Action: Insert Item"
     local procedure AddItemLine(Item: Record Item; ItemCrossReference: Record "Item Cross Reference"; ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference; ItemQuantity: Decimal; UsePresetUnitPrice: Boolean; PresetUnitPrice: Decimal; JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         Line: Record "NPR Sale Line POS";
+        SaleLinePOS: Record "NPR Sale Line POS";
         SaleLine: Codeunit "NPR POS Sale Line";
-        ValidatedSerialNumber: Code[20];
+        SetUnitPrice: Boolean;
         UseSpecificTracking: Boolean;
         InputSerial: Code[20];
+        ValidatedSerialNumber: Code[20];
         UnitPrice: Decimal;
         CustomDescription: Text;
-        SetUnitPrice: Boolean;
-        SaleLinePOS: Record "NPR Sale Line POS";
     begin
 
         JSON.SetScope('/', true);
@@ -413,7 +408,7 @@ codeunit 6151289 "NPR SS Action: Insert Item"
         SaleLine.InsertLine(Line);
         AddAccessories(Item, SaleLine);
         AutoExplodeBOM(Item, SaleLine);
-        AddItemAddOns(FrontEnd, Item, Line."Line No.");  //NPR5.54 [388951]
+        AddItemAddOns(FrontEnd, Item, Line."Line No.");
 
         POSSession.RequestRefreshData();
     end;
@@ -448,12 +443,12 @@ codeunit 6151289 "NPR SS Action: Insert Item"
 
     procedure RemoveQuantityFromItemLine(Item: Record Item; ItemCrossReference: Record "Item Cross Reference"; ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference; ItemQuantity: Decimal; JSON: Codeunit "NPR POS JSON Management"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
-        SalePOS: Record "NPR Sale POS";
         SaleLinePOS: Record "NPR Sale Line POS";
+        SalePOS: Record "NPR Sale POS";
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
-        SSActionQtyDecrease: Codeunit "NPR SS Action - Qty Decrease";
         SSActionDeletePOSLine: Codeunit "NPR SS Action: Delete POS Line";
+        SSActionQtyDecrease: Codeunit "NPR SS Action - Qty Decrease";
     begin
 
         POSSession.GetSale(POSSale);
@@ -620,10 +615,8 @@ codeunit 6151289 "NPR SS Action: Insert Item"
         POSAction.Get('SS-ITEM-ADDON');
         POSFrontEnd.InvokeWorkflow(POSAction);
     end;
-
-    local procedure "-- Serial number support functions"()
-    begin
-    end;
+    #endregion
+    #region Serial number support functions
 
     local procedure ItemRequiresSerialNumberOnSale(Item: Record Item; var UseSpecificTracking: Boolean) SerialNoRequired: Boolean
     var
@@ -697,9 +690,9 @@ codeunit 6151289 "NPR SS Action: Insert Item"
 
         exit(CanBeUsed);
     end;
-
+    #endregion
     #region Ean Box Event Handling
-    [EventSubscriber(ObjectType::Codeunit, 6060105, 'DiscoverEanBoxEvents', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Ean Box Setup Mgt.", 'DiscoverEanBoxEvents', '', true, true)]
     local procedure DiscoverEanBoxEvents(var EanBoxEvent: Record "NPR Ean Box Event")
     var
         Item: Record Item;
@@ -750,7 +743,7 @@ codeunit 6151289 "NPR SS Action: Insert Item"
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6060105, 'OnInitEanBoxParameters', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Ean Box Setup Mgt.", 'OnInitEanBoxParameters', '', true, true)]
     local procedure OnInitEanBoxParameters(var Sender: Codeunit "NPR Ean Box Setup Mgt."; EanBoxEvent: Record "NPR Ean Box Event")
     begin
         case EanBoxEvent.Code of
@@ -777,7 +770,7 @@ codeunit 6151289 "NPR SS Action: Insert Item"
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6060107, 'SetEanBoxEventInScope', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Ean Box Event Handler", 'SetEanBoxEventInScope', '', true, true)]
     local procedure SetEanBoxEventInScopeItemNo(EanBoxSetupEvent: Record "NPR Ean Box Setup Event"; EanBoxValue: Text; var InScope: Boolean)
     var
         Item: Record Item;
@@ -791,7 +784,7 @@ codeunit 6151289 "NPR SS Action: Insert Item"
             InScope := true;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6060107, 'SetEanBoxEventInScope', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Ean Box Event Handler", 'SetEanBoxEventInScope', '', true, true)]
     local procedure SetEanBoxEventInScopeItemCrossRef(EanBoxSetupEvent: Record "NPR Ean Box Setup Event"; EanBoxValue: Text; var InScope: Boolean)
     var
         ItemCrossReference: Record "Item Cross Reference";
@@ -809,7 +802,7 @@ codeunit 6151289 "NPR SS Action: Insert Item"
             InScope := true;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6060107, 'SetEanBoxEventInScope', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Ean Box Event Handler", 'SetEanBoxEventInScope', '', true, true)]
     local procedure SetEanBoxEventInScopeItemSearch(EanBoxSetupEvent: Record "NPR Ean Box Setup Event"; EanBoxValue: Text; var InScope: Boolean)
     var
         Item: Record Item;
