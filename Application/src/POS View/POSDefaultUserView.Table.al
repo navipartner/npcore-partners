@@ -1,7 +1,5 @@
 table 6150712 "NPR POS Default User View"
 {
-    // NPR5.36/NPKNAV/20171003  CASE 289011 Transport NPR5.36 - 3 October 2017
-
     Caption = 'POS Default User View';
     DataClassification = CustomerContent;
 
@@ -47,10 +45,6 @@ table 6150712 "NPR POS Default User View"
         }
     }
 
-    fieldgroups
-    {
-    }
-
     procedure SetDefault(Type: Option Login,Sale,Payment,Balance,Locked; RegisterNo: Code[10]; ViewCode: Code[10])
     var
         DefaultView: Record "NPR POS Default User View";
@@ -89,4 +83,3 @@ table 6150712 "NPR POS Default User View"
         end;
     end;
 }
-

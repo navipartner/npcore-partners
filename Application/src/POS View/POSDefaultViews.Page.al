@@ -12,74 +12,74 @@ page 6150712 "NPR POS Default Views"
         {
             repeater(Group)
             {
-                field(Type; Type)
+                field(Type; Rec.Type)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Type field';
                 }
-                field("Salesperson Filter"; "Salesperson Filter")
+                field("Salesperson Filter"; Rec."Salesperson Filter")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Salesperson Filter field';
                 }
-                field("Register Filter"; "Register Filter")
+                field("Register Filter"; Rec."Register Filter")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Cash Register No. Filter field';
                 }
-                field("Starting Date"; "Starting Date")
+                field("Starting Date"; Rec."Starting Date")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Starting Date field';
                 }
-                field("Ending Date"; "Ending Date")
+                field("Ending Date"; Rec."Ending Date")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Ending Date field';
                 }
-                field(Monday; Monday)
+                field(Monday; Rec.Monday)
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Monday field';
                 }
-                field(Tuesday; Tuesday)
+                field(Tuesday; Rec.Tuesday)
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Tuesday field';
                 }
-                field(Wednesday; Wednesday)
+                field(Wednesday; Rec.Wednesday)
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Wednesday field';
                 }
-                field(Thursday; Thursday)
+                field(Thursday; Rec.Thursday)
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Thursday field';
                 }
-                field(Friday; Friday)
+                field(Friday; Rec.Friday)
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Friday field';
                 }
-                field(Saturday; Saturday)
+                field(Saturday; Rec.Saturday)
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Saturday field';
                 }
-                field(Sunday; Sunday)
+                field(Sunday; Rec.Sunday)
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Sunday field';
                 }
-                field("POS View Code"; "POS View Code")
+                field("POS View Code"; Rec."POS View Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS View Code field';
@@ -87,9 +87,4 @@ page 6150712 "NPR POS Default Views"
             }
         }
     }
-
-    actions
-    {
-    }
 }
-
