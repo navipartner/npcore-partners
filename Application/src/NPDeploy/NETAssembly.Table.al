@@ -40,9 +40,5 @@ table 6014623 "NPR .NET Assembly"
         {
         }
     }
-
-    fieldgroups
-    {
-    }
 }
 
