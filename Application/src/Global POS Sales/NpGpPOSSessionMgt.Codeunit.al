@@ -38,8 +38,6 @@ codeunit 6151165 "NPR NpGp POS Session Mgt."
         if not InsertNcTask(TaskProcessorCode, POSEntry, POSEntry."Document No.", NcTask) then
             exit;
 
-        if NpGpPOSSalesSetup."Sync POS Sales Immediately" then
-            ScheduleTaskProcessing(NcTask);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014407, 'OnAfterDebitSalePostEvent', '', true, true)]
@@ -71,8 +69,7 @@ codeunit 6151165 "NPR NpGp POS Session Mgt."
         if not InsertNcTask(TaskProcessorCode, POSEntry, POSEntry."Document No.", NcTask) then
             exit;
 
-        if NpGpPOSSalesSetup."Sync POS Sales Immediately" then
-            ScheduleTaskProcessing(NcTask);
+
     end;
 
     local procedure FindPosEntry(SalePOS: Record "NPR Sale POS"; var POSEntry: Record "NPR POS Entry"): Boolean

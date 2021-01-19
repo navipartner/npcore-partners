@@ -54,6 +54,8 @@ table 6151170 "NPR NpGp POS Sales Setup"
         {
             Caption = 'Sync POS Sales Immediately';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'Discontinued in BC17';
         }
     }
 

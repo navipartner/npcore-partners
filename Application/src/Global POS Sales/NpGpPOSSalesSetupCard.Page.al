@@ -53,11 +53,7 @@ page 6151172 "NPR NpGp POS Sales Setup Card"
                             //+NPR5.51 [337539]
                         end;
                     }
-                    field("Sync POS Sales Immediately"; "Sync POS Sales Immediately")
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the Sync POS Sales Immediately field';
-                    }
+
                 }
             }
         }
