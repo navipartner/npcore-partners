@@ -123,28 +123,11 @@ page 6059784 "NPR TM Ticket Type"
     {
         area(processing)
         {
-            action("Edit Pass Template")
-            {
-                ToolTip = 'Define information sent to wallet.';
-                ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
-                Caption = 'Edit Pass Template';
-                Image = Template;
-                Promoted = true;
-                PromotedIsBig = true;
-                Visible = not WebClient;
-
-                trigger OnAction()
-                begin
-                    EditPassTemplate();
-                end;
-            }
-
             action("Export Wallet Template File")
             {
                 Caption = 'Export Wallet Template File';
                 ToolTip = 'Exports the default or current template used to send information to wallet.';
                 Image = ExportAttachment;
-                Visible = WebClient;
                 ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
 
                 trigger OnAction()
@@ -177,7 +160,6 @@ page 6059784 "NPR TM Ticket Type"
                 Caption = 'Import Wallet Template File';
                 ToolTip = 'Define information sent to wallet.';
                 Image = ImportCodes;
-                Visible = WebClient;
                 ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
 
                 trigger OnAction()
@@ -296,13 +278,6 @@ page 6059784 "NPR TM Ticket Type"
     procedure HideTickets()
     begin
         SetRange("Is Ticket", false);
-    end;
-
-    local procedure EditPassTemplate()
-    begin
-
-        Rec.EditPassTemplate();
-        CurrPage.Update(true);
     end;
 
     local procedure IsWebClient(): Boolean
