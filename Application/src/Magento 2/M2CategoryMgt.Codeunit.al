@@ -23,6 +23,7 @@ codeunit 6151464 "NPR M2 Category Mgt."
         Element: DotNet NPRNetXmlElement;
         CategoryId: Code[20];
         PrevRec: Text;
+        TypeHelper: Codeunit "Type Helper";
     begin
         MagentoSetup.Get;
         if not MagentoSetup."Magento Enabled" then
@@ -42,6 +43,7 @@ codeunit 6151464 "NPR M2 Category Mgt."
             PrevRec := Format(MagentoCategory);
 
             MagentoCategory.Name := NpXmlDomMgt.GetElementText(Element, 'name', MaxStrLen(MagentoCategory.Name), false);
+            MagentoCategory.Name := TypeHelper.HtmlDecode(MagentoCategory.Name);
             MagentoCategory."Parent Category Id" := NpXmlDomMgt.GetElementCode(Element, 'parent', MaxStrLen(MagentoCategory."Parent Category Id"), false);
             MagentoCategory.Level := NpXmlDomMgt.GetElementInt(Element, 'level', false);
             MagentoCategory.Path := NpXmlDomMgt.GetElementText(Element, 'path', MaxStrLen(MagentoCategory.Path), false);
@@ -60,13 +62,8 @@ codeunit 6151464 "NPR M2 Category Mgt."
                 TempMagentoCategory.Insert;
             end;
         end;
-        DataLogMgt.DisableDataLog(false);
 
-        if TempMagentoCategory.IsEmpty then
-            exit;
-
-        DataLogMgt.DisableDataLog(true);
-        Clear(MagentoCategory);
+        MagentoCategory.Reset();
         if MagentoCategory.FindSet then
             repeat
                 if not TempMagentoCategory.Get(MagentoCategory.Id) then
