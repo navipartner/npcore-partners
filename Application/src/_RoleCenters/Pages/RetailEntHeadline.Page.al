@@ -2,11 +2,9 @@ page 6151332 "NPR Retail Ent Headline"
 {
     Caption = 'Headline';
     PageType = HeadlinePart;
-    UsageCategory = Administration;
-    ApplicationArea = All;
     RefreshOnActivate = true;
     SourceTable = "NPR Retail Entertainment Cue";
-
+    UsageCategory = None;
     layout
     {
         area(content)
@@ -25,8 +23,6 @@ page 6151332 "NPR Retail Ent Headline"
 
                 }
             }
-
-
             group(Control5)
             {
                 ShowCaption = false;
@@ -64,10 +60,6 @@ page 6151332 "NPR Retail Ent Headline"
 
         }
     }
-    actions
-    {
-    }
-
     trigger OnAfterGetRecord()
     begin
         ComputeDefaultFieldsVisibility;
@@ -77,16 +69,15 @@ page 6151332 "NPR Retail Ent Headline"
     var
         Uninitialized: Boolean;
     begin
-        if not Get then
-            if WritePermission then begin
-                Init;
-                Insert;
+        if not Rec.Get then
+            if Rec.WritePermission then begin
+                Rec.Init;
+                Rec.Insert;
             end else
                 Uninitialized := true;
 
-        if not Uninitialized and WritePermission then begin
-            //"Workdate for computations" := WorkDate;
-            Modify;
+        if not Uninitialized and Rec.WritePermission then begin
+            Rec.Modify;
             HeadlineManagement.ScheduleTask(Codeunit::"RC Headlines Executor");
         end;
 

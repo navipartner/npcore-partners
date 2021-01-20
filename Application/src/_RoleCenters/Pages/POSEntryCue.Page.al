@@ -1,10 +1,8 @@
 page 6151260 "NPR POS Entry Cue"
 {
     PageType = CardPart;
-    UsageCategory = Administration;
-    ApplicationArea = All;
     SourceTable = "NPR POS Entry Cue.";
-
+    UsageCategory = None;
 
     layout
     {
@@ -13,22 +11,22 @@ page 6151260 "NPR POS Entry Cue"
             cuegroup("POS ENTRY POSTING")
             {
                 ShowCaption = false;
-                field("Failed G/L Posting Trans."; "Failed G/L Posting Trans.")
+                field("Failed G/L Posting Trans."; Rec."Failed G/L Posting Trans.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Failed G/L Posting Trans. field';
                 }
-                field("Unposted Item Trans."; "Unposted Item Trans.")
+                field("Unposted Item Trans."; Rec."Unposted Item Trans.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Unposted Item Trans. field';
                 }
-                field("Unposted G/L Trans."; "Unposted G/L Trans.")
+                field("Unposted G/L Trans."; Rec."Unposted G/L Trans.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Unposted G/L Trans. field';
                 }
-                field("Failed Item Transaction."; "Failed Item Transaction.")
+                field("Failed Item Transaction."; Rec."Failed Item Transaction.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Failed Item Transaction. field';
@@ -37,7 +35,7 @@ page 6151260 "NPR POS Entry Cue"
 
             cuegroup("Active Discounts, Coupons & Vouchers")
             {
-                field("Campaign Discount"; "Campaign Discount List")
+                field("Campaign Discount"; Rec."Campaign Discount List")
                 {
                     Caption = 'Campaign Discount';
                     ApplicationArea = Basic, Suite;
@@ -45,21 +43,21 @@ page 6151260 "NPR POS Entry Cue"
                     ToolTip = 'Specifies the value of the Campaign Discount field';
 
                 }
-                field("Mix Discount"; "Mix Discount List")
+                field("Mix Discount"; Rec."Mix Discount List")
                 {
                     Caption = 'Mix Discount';
                     ApplicationArea = Basic, Suite;
                     DrillDownPageID = "NPR Mixed Discount List";
                     ToolTip = 'Specifies the value of the Mix Discount field';
                 }
-                field(Voucher; "Voucher List")
+                field(Voucher; Rec."Voucher List")
                 {
                     Caption = 'Voucher';
                     ApplicationArea = Basic, Suite;
                     DrillDownPageID = "NPR NpRv Vouchers";
                     ToolTip = 'Specifies the value of the Voucher field';
                 }
-                field(Coupon; "Coupon List")
+                field(Coupon; Rec."Coupon List")
 
                 {
                     Caption = 'Coupon';
@@ -71,16 +69,12 @@ page 6151260 "NPR POS Entry Cue"
         }
     }
 
-    actions
-    {
-    }
-
     trigger OnOpenPage()
     begin
-        Reset;
-        if not Get then begin
-            Init;
-            Insert;
+        Rec.Reset;
+        if not Rec.Get then begin
+            Rec.Init;
+            Rec.Insert;
         end;
     end;
 }

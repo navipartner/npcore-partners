@@ -12,7 +12,7 @@ table 6059987 "NPR Discount Cue"
         }
         field(2; "Mixed Discounts Active"; Integer)
         {
-            CalcFormula = Count ("NPR Mixed Discount" WHERE(Status = CONST(Active),
+            CalcFormula = Count("NPR Mixed Discount" WHERE(Status = CONST(Active),
                                                         "Starting date" = FIELD("Start Date Filter"),
                                                         "Ending date" = FIELD("End Date Filter")));
             Caption = 'Mixed Discounts Active';
@@ -20,14 +20,14 @@ table 6059987 "NPR Discount Cue"
         }
         field(3; "Period Discounts Active"; Integer)
         {
-            CalcFormula = Count ("NPR Period Discount" WHERE("Starting Date" = FIELD("Start Date Filter"),
+            CalcFormula = Count("NPR Period Discount" WHERE("Starting Date" = FIELD("Start Date Filter"),
                                                          "Ending Date" = FIELD("End Date Filter")));
             Caption = 'Period Discounts Active';
             FieldClass = FlowField;
         }
         field(4; "Quantity Discounts Active"; Integer)
         {
-            CalcFormula = Count ("NPR Quantity Discount Header" WHERE(Status = CONST(Active),
+            CalcFormula = Count("NPR Quantity Discount Header" WHERE(Status = CONST(Active),
                                                                   "Starting Date" = FIELD("Start Date Filter"),
                                                                   "Closing Date" = FIELD("End Date Filter")));
             Caption = 'Quantity Discounts Active';
@@ -50,10 +50,6 @@ table 6059987 "NPR Discount Cue"
         key(Key1; "Primary Key")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 

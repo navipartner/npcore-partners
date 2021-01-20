@@ -1,8 +1,5 @@
 query 6151482 "NPR Top 10 Cust. Sales"
 {
-    // MAG1.17/BHR/20150528  CASE 212983 Navishop rolecenter layout
-    // MAG1.17/BHR/20150528  CASE 216856 Build query on Value entry instead of Cust ledger entry
-    // MAG2.00/MHA/20160525  CASE 242557 Magento Integration
 
     Caption = 'Top 10 Customer Sales';
     OrderBy = Descending(Sum_Sales_Amount_Actual);

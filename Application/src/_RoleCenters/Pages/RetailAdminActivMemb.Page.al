@@ -1,13 +1,10 @@
 page 6014691 "NPR Retail Admin Activ. - Memb"
 {
-    // NPR5.51/ZESO/20190725  CASE 343621 Object created.
-
     Caption = 'Retail Admin Activities - Memb';
     PageType = CardPart;
-    UsageCategory = Administration;
-    ApplicationArea = All;
     RefreshOnActivate = true;
     SourceTable = "NPR Retail Admin Cue";
+    UsageCategory = None;
 
     layout
     {
@@ -16,22 +13,22 @@ page 6014691 "NPR Retail Admin Activ. - Memb"
             cuegroup(Members)
             {
                 Caption = 'Members';
-                field("Membership Setup"; "Membership Setup")
+                field("Membership Setup"; Rec."Membership Setup")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Membership Setup field';
                 }
-                field("Membership Sales Setup"; "Membership Sales Setup")
+                field("Membership Sales Setup"; Rec."Membership Sales Setup")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Membership Sales Setup field';
                 }
-                field("Member Alteration"; "Member Alteration")
+                field("Member Alteration"; Rec."Member Alteration")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Member Alteration field';
                 }
-                field("Member Community"; "Member Community")
+                field("Member Community"; Rec."Member Community")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Member Community field';
@@ -40,16 +37,12 @@ page 6014691 "NPR Retail Admin Activ. - Memb"
         }
     }
 
-    actions
-    {
-    }
-
     trigger OnOpenPage()
     begin
-        Reset;
-        if not Get then begin
-            Init;
-            Insert;
+        Rec.Reset;
+        if not Rec.Get then begin
+            Rec.Init;
+            Rec.Insert;
         end;
     end;
 }

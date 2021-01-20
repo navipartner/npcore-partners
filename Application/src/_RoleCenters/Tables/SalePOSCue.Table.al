@@ -1,7 +1,5 @@
 table 6059986 "NPR Sale POS Cue"
 {
-    // NPR5.30/TJ  /20170215 CASE 265504 Changed ENU captions on fields with word Register in their name
-
     Caption = 'Sale POS Cue';
     DataClassification = CustomerContent;
 
@@ -14,7 +12,7 @@ table 6059986 "NPR Sale POS Cue"
         }
         field(2; "Saved Sales"; Integer)
         {
-            CalcFormula = Count ("NPR Sale POS" WHERE("Saved Sale" = CONST(true),
+            CalcFormula = Count("NPR Sale POS" WHERE("Saved Sale" = CONST(true),
                                                   "Register No." = FIELD("Register Filter"),
                                                   "Salesperson Code" = FIELD("Salesperson Filter"),
                                                   Date = FIELD("Date Filter")));
@@ -37,16 +35,11 @@ table 6059986 "NPR Sale POS Cue"
             FieldClass = FlowFilter;
         }
     }
-
     keys
     {
         key(Key1; "Primary Key")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 

@@ -1,13 +1,9 @@
 page 6059984 "NPR Web Manager Activ."
 {
-    // NPR5.40/MHA /20180319  CASE 308396 ActionContainer ActionItems added to "New Credit Memo" and "New Purchase Order"
-
     Caption = 'Web Order Activities';
     PageType = CardPart;
-    UsageCategory = Administration;
-    ApplicationArea = All;
     SourceTable = "NPR Retail Order Cue";
-
+    UsageCategory = None;
     layout
     {
         area(content)
@@ -15,19 +11,19 @@ page 6059984 "NPR Web Manager Activ."
             cuegroup("Open Orders")
             {
                 Caption = 'Open Orders';
-                field("Open Web Sales Orders"; "Open Web Sales Orders")
+                field("Open Web Sales Orders"; Rec."Open Web Sales Orders")
                 {
                     ApplicationArea = All;
                     DrillDownPageID = "Sales Order List";
                     ToolTip = 'Specifies the value of the Open Web Sales Orders field';
                 }
-                field("Open Credit Memos"; "Open Credit Memos")
+                field("Open Credit Memos"; Rec."Open Credit Memos")
                 {
                     ApplicationArea = All;
                     DrillDownPageID = "Sales Credit Memos";
                     ToolTip = 'Specifies the value of the Open Credit Memos field';
                 }
-                field("Open Purchase Orders"; "Open Purchase Orders")
+                field("Open Purchase Orders"; Rec."Open Purchase Orders")
                 {
                     ApplicationArea = All;
                     DrillDownPageID = "Purchase Order List";
@@ -37,19 +33,19 @@ page 6059984 "NPR Web Manager Activ."
             cuegroup("Processed Orders")
             {
                 Caption = 'Processed Orders';
-                field("Posted Web Sales Orders"; "Posted Web Sales Orders")
+                field("Posted Web Sales Orders"; Rec."Posted Web Sales Orders")
                 {
                     ApplicationArea = All;
                     DrillDownPageID = "Sales Invoice List";
                     ToolTip = 'Specifies the value of the Posted Web Sales Orders field';
                 }
-                field("Posted Credit Memos"; "Posted Credit Memos")
+                field("Posted Credit Memos"; Rec."Posted Credit Memos")
                 {
                     ApplicationArea = All;
                     DrillDownPageID = "Posted Sales Credit Memos";
                     ToolTip = 'Specifies the value of the Posted Credit Memos field';
                 }
-                field("Posted Purchase Orders"; "Posted Purchase Orders")
+                field("Posted Purchase Orders"; Rec."Posted Purchase Orders")
                 {
                     ApplicationArea = All;
                     DrillDownPageID = "Posted Purchase Invoices";
@@ -85,10 +81,10 @@ page 6059984 "NPR Web Manager Activ."
 
     trigger OnOpenPage()
     begin
-        Reset;
-        if not Get then begin
-            Init;
-            Insert;
+        Rec.Reset;
+        if not Rec.Get then begin
+            Rec.Init;
+            Rec.Insert;
         end;
     end;
 }

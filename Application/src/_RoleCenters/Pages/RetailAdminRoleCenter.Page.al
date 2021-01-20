@@ -1,11 +1,8 @@
 page 6014556 "NPR Retail Admin Role Center"
 {
-    // NPR5.51/ZESO/20190725  CASE 343621 New Role Centre Page
-
     Caption = 'Role Center';
     PageType = RoleCenter;
-    UsageCategory = Administration;
-    ApplicationArea = All;
+    UsageCategory = None;
 
     layout
     {
@@ -58,9 +55,6 @@ page 6014556 "NPR Retail Admin Role Center"
 
     actions
     {
-        area(reporting)
-        {
-        }
         area(embedding)
         {
             ToolTip = 'Set up users and cross-product values, such as number series and post codes.';

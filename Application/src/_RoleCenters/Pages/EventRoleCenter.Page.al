@@ -1,11 +1,8 @@
 page 6060165 "NPR Event Role Center"
 {
-
     Caption = 'Event Role Center';
     PageType = RoleCenter;
-    UsageCategory = Administration;
-    ApplicationArea = All;
-
+    UsageCategory = None;
     layout
     {
         area(rolecenter)

@@ -2,8 +2,7 @@ page 6151240 "NPR Retail: Manager RoleCenter"
 {
     Caption = 'NP Retail - Manager Role Center';
     PageType = RoleCenter;
-    UsageCategory = Administration;
-    ApplicationArea = All;
+    UsageCategory = None;
 
     layout
     {
@@ -13,13 +12,8 @@ page 6151240 "NPR Retail: Manager RoleCenter"
             part(Control7; "Headline RC Order Processor")
             {
                 ApplicationArea = All;
-                // ApplicationArea = Basic, Suite;
             }
 
-            /*
-            group(Cue)
-            {
-                */
             part(Control6150616; "NPR Activities")
             {
                 ApplicationArea = All;
@@ -48,48 +42,32 @@ page 6151240 "NPR Retail: Manager RoleCenter"
             {
                 ApplicationArea = Basic, Suite;
             }
-
-
-
-
-
             part(Control2; "NPR Purchase Ord Chart")
             {
                 ApplicationArea = Basic, Suite;
             }
-
-
             part(Control6150614; "NPR Retail 10 Items by Qty.")
             {
                 ApplicationArea = All;
             }
-
-
             part(Control6150613; "NPR Retail Top 10 S.person")
             {
                 ApplicationArea = All;
-
             }
-
             part(Control6150615; "NPR Retail Top 10 Customers")
             {
                 ApplicationArea = All;
-
             }
             part(Top10vendors; "NPR Top 10 Vendors")
             {
                 ApplicationArea = All;
-
             }
             part("MyReports"; "NPR My Reports")
             {
                 ApplicationArea = All;
             }
-
-
         }
     }
-
     actions
     {
         area(sections)
@@ -139,16 +117,13 @@ page 6151240 "NPR Retail: Manager RoleCenter"
                     RunObject = Page "Item List";
                     ToolTip = 'View or edit detailed information for the products that you trade in. The item card can be of type Inventory or Service to specify if the item is a physical unit or a labor time unit. Here you also define if items in inventory or on incoming orders are automatically reserved for outbound documents and whether order tracking links are created between demand and supply to reflect planning actions.';
                 }
-
                 action("Item Group Tree")
                 {
                     ApplicationArea = Suite;
                     Caption = 'Item Group Tree';
                     RunObject = page "NPR Item Group Tree";
                     ToolTip = 'Executes the Item Group Tree action';
-
                 }
-
                 action("Stockkeeping Unit List")
                 {
                     ApplicationArea = Suite;
@@ -164,8 +139,6 @@ page 6151240 "NPR Retail: Manager RoleCenter"
                     ToolTip = 'View a list of your sales people and your purchasers.';
                 }
             }
-
-
             group(Item)
             {
                 Caption = 'Item & Prices';
@@ -242,40 +215,12 @@ page 6151240 "NPR Retail: Manager RoleCenter"
                     ApplicationArea = All;
                     ToolTip = 'Executes the Locations action';
                 }
-
-                /*
-                action("Mix Discounts")
-                {
-                    Caption = 'Mix Discounts List';
-                    RunObject = page "Mixed Discount List";
-                }
-
-                action("Period Discounts")
-                {
-                    Caption = 'Period Discounts List';
-                    RunObject = page "Campaign Discount List";
-                }
-
-                action("Retail Campaigns")
-                {
-                    Caption = 'Retail Campaigns List';
-                    RunObject = page "Retail Campaigns";
-                }
-
-                action("Discount Priority List")
-                {
-                    Caption = 'Discount Priority List';
-                    RunObject = page "Discount Priority List";
-                }
-                */
-
             }
 
             group(POS)
             {
                 Caption = 'POS';
                 Image = Reconcile;
-
                 action("Cash Registers")
                 {
                     Caption = 'Cash Registers';
@@ -283,7 +228,6 @@ page 6151240 "NPR Retail: Manager RoleCenter"
                     ApplicationArea = All;
                     ToolTip = 'Executes the Cash Registers action';
                 }
-
                 action("Payment Type")
                 {
                     Caption = 'Payment Type';
@@ -299,26 +243,6 @@ page 6151240 "NPR Retail: Manager RoleCenter"
                     ApplicationArea = All;
                     ToolTip = 'Executes the POS Menus action';
                 }
-                /*
-                 action("Default Views")
-                 {
-                     Caption = 'Default Views';
-                     Image = View;
-                     RunObject = Page "POS Default Views";
-                 }
-                 action("POS Actions")
-                 {
-                     Caption = 'POS Actions';
-                     Image = "Action";
-                     RunObject = Page "POS Actions";
-                 }
-                 action("View List")
-                 {
-                     Caption = 'View List';
-                     Image = ViewDocumentLine;
-                     RunObject = Page "POS View List";
-                 }
-                 */
                 action("POS Sales Workflows")
                 {
                     Caption = 'POS Sales Workflows';
@@ -362,13 +286,6 @@ page 6151240 "NPR Retail: Manager RoleCenter"
                     ApplicationArea = All;
                     ToolTip = 'Executes the POS Payment Bins action';
                 }
-                /*
-                  action("POS Themes")
-                  {
-                      Caption = 'POS Themes';
-                      RunObject = Page "POS Themes";
-                  }
-              */
                 action("POS Info List")
                 {
                     Caption = 'POS Info List';
@@ -383,14 +300,6 @@ page 6151240 "NPR Retail: Manager RoleCenter"
                     ApplicationArea = All;
                     ToolTip = 'Executes the POS Customer Location action';
                 }
-                /*
-                 action("POS Admin. Template List")
-                 {
-                     Caption = 'POS Admin. Template List';
-                     // RunObject = Page "POS Admin. Template List";
-                 }
-                */
-
                 action("Display Setup")
                 {
                     Caption = 'Display Setup';
@@ -434,15 +343,6 @@ page 6151240 "NPR Retail: Manager RoleCenter"
                     RunObject = Page "NPR Ean Box Setups";
                     ApplicationArea = All;
                     ToolTip = 'Executes the Ean Box Setups action';
-                }
-                action("POS Unit Identity")
-                {
-                    Caption = 'POS Unit Identity';
-                    Image = List;
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the POS Unit Identity action';
-                    // RunObject = page "POS Unit Identity List";
-
                 }
             }
             group("Posted Documents")
@@ -527,7 +427,6 @@ page 6151240 "NPR Retail: Manager RoleCenter"
                     ToolTip = 'Executes the Warranty Catalog List action';
                 }
             }
-
             group(Journals)
             {
                 Caption = 'Journals';
@@ -568,8 +467,6 @@ page 6151240 "NPR Retail: Manager RoleCenter"
                     ApplicationArea = All;
                     ToolTip = 'Executes the Item Worksheet action';
                 }
-
-
             }
             group("Discount, Coupons & Vouchers")
             {
@@ -596,17 +493,13 @@ page 6151240 "NPR Retail: Manager RoleCenter"
                     ApplicationArea = All;
                     ToolTip = 'Executes the Discount Priority List action';
                 }
-
-
                 action("Coupon Types")
                 {
                     Caption = 'Coupon Types';
                     RunObject = page "NPR NpDc Coupon Types";
                     ApplicationArea = All;
                     ToolTip = 'Executes the Coupon Types action';
-
                 }
-
                 action("Coupon List")
                 {
                     Caption = 'Coupon List';
@@ -629,7 +522,6 @@ page 6151240 "NPR Retail: Manager RoleCenter"
                     ToolTip = 'Executes the Voucher List action';
                 }
             }
-
             group("Global Setup")
             {
                 Caption = 'Global Setup';
@@ -639,14 +531,6 @@ page 6151240 "NPR Retail: Manager RoleCenter"
                     RunObject = Page "NPR NpGp Global POSSalesSetups";
                     ApplicationArea = All;
                     ToolTip = 'Executes the Global POS Sales Setups action';
-                }
-                action("Cross Companies Setup")
-                {
-                    Caption = 'Cross Companies Setup';
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Cross Companies Setup action';
-                    // RunObject = Page "NpGp Cross Companies Setup";
-
                 }
             }
             group("Collect in Store")
@@ -665,13 +549,6 @@ page 6151240 "NPR Retail: Manager RoleCenter"
                     RunObject = Page "NPR NpCs Workflows";
                     ApplicationArea = All;
                     ToolTip = 'Executes the Collect Workflows action';
-                }
-                action("Store Opening Hours Setup")
-                {
-                    Caption = 'Store Opening Hours Setup';
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Store Opening Hours Setup action';
-                    //  RunObject = Page "NpCs Store Opening Hours Setup";
                 }
                 action("Collect Workflow Modules")
                 {
@@ -733,15 +610,6 @@ page 6151240 "NPR Retail: Manager RoleCenter"
                     ApplicationArea = All;
                     ToolTip = 'Executes the E-mail Templates action';
                 }
-
-                action("Report Selection - Retail")
-                {
-                    Caption = 'Report Selection - Retail';
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Report Selection - Retail action';
-                    //RunObject = page "Report Selection - Retail";
-                }
-
                 action("SMS Template List")
                 {
                     Caption = 'SMS Template List';
@@ -755,18 +623,14 @@ page 6151240 "NPR Retail: Manager RoleCenter"
                     Caption = 'Report Selection - Contract';
                     ApplicationArea = All;
                     ToolTip = 'Executes the Report Selection - Contract action';
-
                 }
             }
-
-
         }
         area(Reporting)
         {
             group(Receivables)
             {
                 Caption = 'Receivables';
-
                 action(Customer)
                 {
                     Caption = 'Customer';
@@ -813,7 +677,6 @@ page 6151240 "NPR Retail: Manager RoleCenter"
                 }
 
             }
-
             group(Payables)
             {
                 Caption = 'Payables';
@@ -824,7 +687,6 @@ page 6151240 "NPR Retail: Manager RoleCenter"
                     Image = Vendor;
                     RunObject = Page "Vendor List";
                     ToolTip = 'Executes the Vendor action';
-
                 }
                 action("Vendor Payment Journal")
                 {
@@ -834,7 +696,6 @@ page 6151240 "NPR Retail: Manager RoleCenter"
                     Image = VendorPaymentJournal;
                     RunObject = Page "Payment Journal";
                     ToolTip = 'Pay your vendors by filling the payment journal automatically according to payments due, and potentially export all payment to your bank for automatic processing.';
-
                 }
                 action("Purchase Order")
                 {
@@ -842,15 +703,12 @@ page 6151240 "NPR Retail: Manager RoleCenter"
                     ApplicationArea = Basic, Suite;
                     Caption = '&Purchase Order';
                     Image = Document;
-                    Promoted = false;
-                    //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                    //PromotedCategory = Process;
+                    Promoted = true;
+                    PromotedCategory = Process;
                     RunObject = Page "Purchase Order";
                     RunPageMode = Create;
                     ToolTip = 'Purchase goods or services from a vendor.';
                 }
-
-
             }
 
             group(Bank)
@@ -897,7 +755,6 @@ page 6151240 "NPR Retail: Manager RoleCenter"
                     RunObject = Page "Sales Line Discounts";
                     ToolTip = 'View the sales line discounts that are available. These discount agreements can be for individual customers, for a group of customers, for all customers or for a campaign.';
                 }
-
                 action("Adjust Item Costs Prices")
                 {
                     ApplicationArea = Basic, Suite;
@@ -906,8 +763,6 @@ page 6151240 "NPR Retail: Manager RoleCenter"
                     RunObject = Report "Adjust Item Costs/Prices";
                     ToolTip = 'Adjusts the Last Direct Cost, Standard Cost, Unit Price, Profit %, and Indirect Cost % fields on the item or stockkeeping unit cards. For example, you can change Last Direct Cost by 5% on all items from a specific vendor. The changes are processed immediately when the batch job is started. The fields on the item card that are dependent on the adjusted field are also changed.';
                 }
-
-
             }
             group(RetailSetup)
             {
@@ -1056,8 +911,6 @@ page 6151240 "NPR Retail: Manager RoleCenter"
                         RunObject = Report "Aged Accounts Receivable";
                         ToolTip = 'View an overview of when your receivables from customers are due or overdue (divided into four periods). You must specify the date you want aging calculated from and the length of the period that each column will contain data for.';
                     }
-
-
                 }
                 group(FinanceReport)
                 {
@@ -1086,7 +939,6 @@ page 6151240 "NPR Retail: Manager RoleCenter"
                         RunObject = Report "Closing Trial Balance";
                         ToolTip = 'View this year''s and last year''s figures as an ordinary trial balance. For income statement accounts, the balances are shown without closing entries. Closing entries are listed on a fictitious date that falls between the last day of one fiscal year and the first day of the next one. The closing of the income statement accounts is posted at the end of a fiscal year. The report can be used in connection with closing a fiscal year.';
                     }
-
                     separator(Separator53)
                     {
                     }
@@ -1122,13 +974,9 @@ page 6151240 "NPR Retail: Manager RoleCenter"
                         Image = "Report";
                         RunObject = Report "Reconcile Cust. and Vend. Accs";
                         ToolTip = 'Executes the Reconcile Cust. and Vend. Accs action';
-
                     }
-
                 }
             }
-
-
         }
     }
 }

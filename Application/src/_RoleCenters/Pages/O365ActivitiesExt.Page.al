@@ -2,11 +2,10 @@ page 6151333 "NPR O365 Activities Ext"
 {
     Caption = 'Activities';
     PageType = CardPart;
-    UsageCategory = Administration;
-    ApplicationArea = All;
     RefreshOnActivate = true;
     ShowFilter = false;
     SourceTable = "Activities Cue";
+    UsageCategory = None;
 
     layout
     {
@@ -16,7 +15,7 @@ page 6151333 "NPR O365 Activities Ext"
             {
                 CueGroupLayout = Wide;
                 ShowCaption = false;
-                field("Sales This Month"; "NPR Sales This Month ILE")
+                field("Sales This Month"; Rec."NPR Sales This Month ILE")
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the sum of sales in the current month.';
@@ -26,7 +25,6 @@ page 6151333 "NPR O365 Activities Ext"
                         DrillDownSalesThisMonth;
                     end;
                 }
-
 
             }
 
@@ -63,8 +61,8 @@ page 6151333 "NPR O365 Activities Ext"
 
                 trigger OnAction()
                 begin
-                    "Last Date/Time Modified" := 0DT;
-                    Modify;
+                    Rec."Last Date/Time Modified" := 0DT;
+                    Rec.Modify;
 
                     CODEUNIT.Run(CODEUNIT::"Activities Mgt.");
                     CurrPage.Update(false);
@@ -93,8 +91,6 @@ page 6151333 "NPR O365 Activities Ext"
         SetActivityGroupVisibility;
     end;
 
-
-
     trigger OnOpenPage()
     var
         CRMConnectionSetup: Record "CRM Connection Setup";
@@ -106,25 +102,15 @@ page 6151333 "NPR O365 Activities Ext"
         ActivitiesMgt: Codeunit "NPR Activities Mgt.";
         HeadlineMan: Codeunit "NPR NP Retail Headline Mgt.";
     begin
-        Reset;
-        if not Get then begin
-            Init;
-            Insert;
+        Rec.Reset;
+        if not Rec.Get then begin
+            Rec.Init;
+            Rec.Insert;
             Commit;
             NewRecord := true;
         end;
 
-        SETFILTER("User ID Filter", USERID);
-
-        // PrepareOnLoadDialog;
-
-        /*
-         IF PageNotifier.IsAvailable THEN BEGIN
-             PageNotifier := PageNotifier.Create;
-             PageNotifier.NotifyPageReady;
-         END;
-         */
-
+        Rec.SETFILTER("User ID Filter", USERID);
 
         ShowAwaitingIncomingDoc := OCRServiceMgt.OcrServiceIsEnable;
         ShowIntercompanyActivities := false;

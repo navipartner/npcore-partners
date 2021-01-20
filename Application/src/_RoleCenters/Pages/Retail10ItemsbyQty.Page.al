@@ -5,12 +5,11 @@ page 6059815 "NPR Retail 10 Items by Qty."
     CardPageID = "Item Card";
     Editable = true;
     PageType = ListPart;
-    UsageCategory = Administration;
-    ApplicationArea = All;
     SourceTable = Item;
     SourceTableTemporary = true;
     SourceTableView = SORTING("Low-Level Code")
                       ORDER(Descending);
+    UsageCategory = None;
 
     layout
     {
@@ -47,23 +46,23 @@ page 6059815 "NPR Retail 10 Items by Qty."
                 ShowCaption = false;
                 repeater(Group)
                 {
-                    field("No."; "No.")
+                    field("No."; Rec."No.")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the No. field';
 
                         trigger OnDrillDown()
                         begin
-                            Item.Get("No.");
+                            Item.Get(Rec."No.");
                             PAGE.Run(PAGE::"Item Card", Item);
                         end;
                     }
-                    field(Description; Description)
+                    field(Description; Rec.Description)
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Description field';
                     }
-                    field("Sales (Qty.)"; "Sales (Qty.)")
+                    field("Sales (Qty.)"; Rec."Sales (Qty.)")
                     {
                         ApplicationArea = All;
                         BlankZero = true;
@@ -89,7 +88,6 @@ page 6059815 "NPR Retail 10 Items by Qty."
                     Caption = 'Day';
                     ApplicationArea = All;
                     ToolTip = 'Executes the Day action';
-                    Image = Filter; 
 
                     trigger OnAction()
                     begin
@@ -102,7 +100,6 @@ page 6059815 "NPR Retail 10 Items by Qty."
                     Caption = 'Week';
                     ApplicationArea = All;
                     ToolTip = 'Executes the Week action';
-                    Image = Filter;
 
                     trigger OnAction()
                     begin
@@ -115,7 +112,6 @@ page 6059815 "NPR Retail 10 Items by Qty."
                     Caption = 'Month';
                     ApplicationArea = All;
                     ToolTip = 'Executes the Month action';
-                    Image = Filter;
 
                     trigger OnAction()
                     begin
@@ -128,7 +124,6 @@ page 6059815 "NPR Retail 10 Items by Qty."
                     Caption = 'Quarter';
                     ApplicationArea = All;
                     ToolTip = 'Executes the Quarter action';
-                    Image = Filter;
 
                     trigger OnAction()
                     begin
@@ -141,7 +136,6 @@ page 6059815 "NPR Retail 10 Items by Qty."
                     Caption = 'Year';
                     ApplicationArea = All;
                     ToolTip = 'Executes the Year action';
-                    Image = Filter;
 
                     trigger OnAction()
                     begin
@@ -152,12 +146,6 @@ page 6059815 "NPR Retail 10 Items by Qty."
             }
         }
     }
-
-    trigger OnAfterGetRecord()
-    var
-        Str: Text[11];
-    begin
-    end;
 
     trigger OnOpenPage()
     begin
@@ -184,18 +172,19 @@ page 6059815 "NPR Retail 10 Items by Qty."
 
     local procedure ExecuteQuery()
     begin
-        DeleteAll;
+        Rec.DeleteAll;
         Query1.SetFilter(Posting_Date, '%1..%2', StartDate, Enddate);
         Query1.SetFilter(Item_Ledger_Entry_Type, 'Sale');
         Query1.Open;
         while Query1.Read do begin
             if Item.Get(Query1.Item_No) then begin
-                TransferFields(Item);
-                if Insert then
-                    SetFilter("Date Filter", '%1..%2', StartDate, Enddate);
-                CalcFields("Sales (Qty.)");
-                "Low-Level Code" := Round("Sales (Qty.)", 0.01) * 100;
-                Modify;
+                Rec.TransferFields(Item);
+                if Rec.Insert then
+                    Rec.SetFilter("Date Filter", '%1..%2', StartDate, Enddate);
+
+                Rec.CalcFields("Sales (Qty.)");
+                Rec."Low-Level Code" := Round(Rec."Sales (Qty.)", 0.01) * 100;
+                Rec.Modify;
             end;
 
         end;

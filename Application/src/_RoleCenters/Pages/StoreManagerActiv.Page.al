@@ -1,27 +1,23 @@
 page 6059983 "NPR Store Manager Activ."
 {
-    // NPR5.41/TS  /20180105 CASE 300893 ControlContainers cannot have captions
-    // NPR5.43/JDH /20180604 CASE 317971 Changed captions to ENU
 
     Caption = 'Order Processing';
     PageType = ListPart;
-    UsageCategory = Administration;
-    ApplicationArea = All;
     SourceTable = "NPR Retail Order Cue";
-
+    UsageCategory = None;
     layout
     {
         area(content)
         {
             cuegroup("Open Documents")
             {
-                field("Open Sales Orders"; "Open Sales Orders")
+                field("Open Sales Orders"; Rec."Open Sales Orders")
                 {
                     ApplicationArea = All;
                     DrillDownPageID = "Sales Orders";
                     ToolTip = 'Specifies the value of the Open Sales Orders field';
                 }
-                field("Open Purchase Orders"; "Open Purchase Orders")
+                field("Open Purchase Orders"; Rec."Open Purchase Orders")
                 {
                     ApplicationArea = All;
                     DrillDownPageID = "Purchase Orders";
@@ -50,13 +46,13 @@ page 6059983 "NPR Store Manager Activ."
             }
             cuegroup("Posted Documents")
             {
-                field("Posted Sales Invoices"; "Posted Sales Invoices")
+                field("Posted Sales Invoices"; Rec."Posted Sales Invoices")
                 {
                     ApplicationArea = All;
                     DrillDownPageID = "Posted Sales Invoices";
                     ToolTip = 'Specifies the value of the Posted Sales Invoices field';
                 }
-                field("Posted Purchase Orders"; "Posted Purchase Orders")
+                field("Posted Purchase Orders"; Rec."Posted Purchase Orders")
                 {
                     ApplicationArea = All;
                     DrillDownPageID = "Posted Purchase Invoices";
@@ -64,10 +60,6 @@ page 6059983 "NPR Store Manager Activ."
                 }
             }
         }
-    }
-
-    actions
-    {
     }
 }
 

@@ -14,14 +14,14 @@ table 6151251 "NPR Restaurant Cue"
             Caption = 'Waiter Pads - Open';
             Editable = false;
             FieldClass = FlowField;
-            CalcFormula = count ("NPR NPRE Waiter Pad" where(Closed = const(false)));
+            CalcFormula = count("NPR NPRE Waiter Pad" where(Closed = const(false)));
         }
         field(11; "Kitchen Requests - Open"; Integer)
         {
             Caption = 'Kitchen Requests - Open';
             Editable = false;
             FieldClass = FlowField;
-            CalcFormula = count ("NPR NPRE Kitchen Request" where("Line Status" = filter("Ready for Serving" | "Serving Requested" | Planned)));
+            CalcFormula = count("NPR NPRE Kitchen Request" where("Line Status" = filter("Ready for Serving" | "Serving Requested" | Planned)));
         }
         field(20; "Turnover (LCY)"; Decimal)
         {
@@ -53,28 +53,28 @@ table 6151251 "NPR Restaurant Cue"
             Caption = 'Available';
             Editable = false;
             FieldClass = FlowField;
-            CalcFormula = count ("NPR NPRE Seating" where("Seating Location" = field("Seating Location Filter"), Status = field("Ready Seating Status Filter")));
+            CalcFormula = count("NPR NPRE Seating" where("Seating Location" = field("Seating Location Filter"), Status = field("Ready Seating Status Filter")));
         }
         field(31; "Seatings: Occupied"; Integer)
         {
             Caption = 'Occupied';
             Editable = false;
             FieldClass = FlowField;
-            CalcFormula = count ("NPR NPRE Seating" where("Seating Location" = field("Seating Location Filter"), Status = field("Occupied Seating Status Filter")));
+            CalcFormula = count("NPR NPRE Seating" where("Seating Location" = field("Seating Location Filter"), Status = field("Occupied Seating Status Filter")));
         }
         field(32; "Seatings: Cleaning Required"; Integer)
         {
             Caption = 'Cleaning Required';
             Editable = false;
             FieldClass = FlowField;
-            CalcFormula = count ("NPR NPRE Seating" where("Seating Location" = field("Seating Location Filter"), Status = field("Cleaning R. Seat.Status Filter")));
+            CalcFormula = count("NPR NPRE Seating" where("Seating Location" = field("Seating Location Filter"), Status = field("Cleaning R. Seat.Status Filter")));
         }
         field(33; "Seatings: Reserved"; Integer)
         {
             Caption = 'Reserved';
             Editable = false;
             FieldClass = FlowField;
-            CalcFormula = count ("NPR NPRE Seating" where("Seating Location" = field("Seating Location Filter"), Status = field("Reserved Seating Status Filter")));
+            CalcFormula = count("NPR NPRE Seating" where("Seating Location" = field("Seating Location Filter"), Status = field("Reserved Seating Status Filter")));
         }
         field(40; "Inhouse Guests"; Integer)
         {
@@ -86,7 +86,7 @@ table 6151251 "NPR Restaurant Cue"
             Caption = 'Available Seats';
             Editable = false;
             FieldClass = FlowField;
-            CalcFormula = sum ("NPR NPRE Seating".Capacity where("Seating Location" = field("Seating Location Filter"), Status = field("Ready Seating Status Filter")));
+            CalcFormula = sum("NPR NPRE Seating".Capacity where("Seating Location" = field("Seating Location Filter"), Status = field("Ready Seating Status Filter")));
         }
         field(50; "Pending Reservations"; Integer)
         {

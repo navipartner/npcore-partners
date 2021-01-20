@@ -2,10 +2,9 @@ page 6151335 "NPR Restaurant Activities"
 {
     Caption = 'Activities';
     PageType = CardPart;
-    UsageCategory = Administration;
-    ApplicationArea = All;
     RefreshOnActivate = true;
     SourceTable = "NPR Restaurant Cue";
+    UsageCategory = None;
 
     layout
     {
@@ -15,17 +14,17 @@ page 6151335 "NPR Restaurant Activities"
             {
                 Caption = 'Outstanding';
                 CuegroupLayout = Wide;
-                field("Waiter Pads - Open"; "Waiter Pads - Open")
+                field("Waiter Pads - Open"; Rec."Waiter Pads - Open")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Waiter Pads - Open field';
                 }
-                field("Kitchen Requests - Open"; "Kitchen Requests - Open")
+                field("Kitchen Requests - Open"; Rec."Kitchen Requests - Open")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Kitchen Requests - Open field';
                 }
-                field("Pending Reservations"; "Pending Reservations")
+                field("Pending Reservations"; Rec."Pending Reservations")
                 {
                     ApplicationArea = All;
                     Caption = 'Pending Reservations';
@@ -39,22 +38,22 @@ page 6151335 "NPR Restaurant Activities"
             cuegroup(TableStatus)
             {
                 Caption = 'Current Table Status';
-                field("Seatings: Ready"; "Seatings: Ready")
+                field("Seatings: Ready"; Rec."Seatings: Ready")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Available field';
                 }
-                field("Seatings: Occupied"; "Seatings: Occupied")
+                field("Seatings: Occupied"; Rec."Seatings: Occupied")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Occupied field';
                 }
-                field("Seatings: Reserved"; "Seatings: Reserved")
+                field("Seatings: Reserved"; Rec."Seatings: Reserved")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Reserved field';
                 }
-                field("Seatings: Cleaning Required"; "Seatings: Cleaning Required")
+                field("Seatings: Cleaning Required"; Rec."Seatings: Cleaning Required")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Cleaning Required field';
@@ -63,12 +62,12 @@ page 6151335 "NPR Restaurant Activities"
             cuegroup(SeatStatus)
             {
                 Caption = 'Seats';
-                field("Available seats"; "Available seats")
+                field("Available seats"; Rec."Available seats")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Available Seats field';
                 }
-                field("Inhouse Guests"; "Inhouse Guests")
+                field("Inhouse Guests"; Rec."Inhouse Guests")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Inhouse Guests field';
@@ -96,7 +95,7 @@ page 6151335 "NPR Restaurant Activities"
             cuegroup(TodaySummary)
             {
                 Caption = 'Today''s Summary';
-                field("Turnover (LCY)"; "Turnover (LCY)")
+                field("Turnover (LCY)"; Rec."Turnover (LCY)")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Turnover field';
@@ -106,7 +105,7 @@ page 6151335 "NPR Restaurant Activities"
                         DrillDownTurnover();
                     end;
                 }
-                field("No. of Sales"; "No. of Sales")
+                field("No. of Sales"; Rec."No. of Sales")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the No. of Sales field';
@@ -116,17 +115,17 @@ page 6151335 "NPR Restaurant Activities"
                         DrillDownTurnover();
                     end;
                 }
-                field("Total No. of Guests"; "Total No. of Guests")
+                field("Total No. of Guests"; Rec."Total No. of Guests")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Total No. of Guests field';
                 }
-                field("Average per Sale (LCY)"; "Average per Sale (LCY)")
+                field("Average per Sale (LCY)"; Rec."Average per Sale (LCY)")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Average per Sale field';
                 }
-                field("Average per Guest (LCY)"; "Average per Guest (LCY)")
+                field("Average per Guest (LCY)"; Rec."Average per Guest (LCY)")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Average per Guest field';
@@ -135,17 +134,17 @@ page 6151335 "NPR Restaurant Activities"
             cuegroup(Reservations)
             {
                 Caption = 'Reservations';
-                field("Completed Reservations"; "Completed Reservations")
+                field("Completed Reservations"; Rec."Completed Reservations")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Completed field';
                 }
-                field("No-Shows"; "No-Shows")
+                field("No-Shows"; Rec."No-Shows")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the No-Shows field';
                 }
-                field("Cancelled Reservations"; "Cancelled Reservations")
+                field("Cancelled Reservations"; Rec."Cancelled Reservations")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Cancelled field';
@@ -212,14 +211,14 @@ page 6151335 "NPR Restaurant Activities"
         ConfPersonalizationMgt: Codeunit "Conf./Personalization Mgt.";
         RoleCenterNotificationMgt: Codeunit "Role Center Notification Mgt.";
     begin
-        Reset;
-        if not Get then begin
-            Init;
-            Insert;
+        Rec.Reset;
+        if not Rec.Get then begin
+            Rec.Init;
+            Rec.Insert;
         end;
 
-        SetRange("Date Filter", WorkDate());
-        SetRange("User ID Filter", UserId);
+        Rec.SetRange("Date Filter", WorkDate());
+        Rec.SetRange("User ID Filter", UserId);
 
         if UserSetup.get(UserId) then
             if UserSetup."NPR Backoffice Restaurant Code" <> '' then
@@ -228,10 +227,10 @@ page 6151335 "NPR Restaurant Activities"
 
         if not RestaurantSetup.get() then
             clear(RestaurantSetup);
-        SetRange("Ready Seating Status Filter", RestaurantSetup."Seat.Status: Ready");
-        SetRange("Occupied Seating Status Filter", RestaurantSetup."Seat.Status: Occupied");
-        SetRange("Cleaning R. Seat.Status Filter", RestaurantSetup."Seat.Status: Cleaning Required");
-        SetRange("Reserved Seating Status Filter", RestaurantSetup."Seat.Status: Reserved");
+        Rec.SetRange("Ready Seating Status Filter", RestaurantSetup."Seat.Status: Ready");
+        Rec.SetRange("Occupied Seating Status Filter", RestaurantSetup."Seat.Status: Occupied");
+        Rec.SetRange("Cleaning R. Seat.Status Filter", RestaurantSetup."Seat.Status: Cleaning Required");
+        Rec.SetRange("Reserved Seating Status Filter", RestaurantSetup."Seat.Status: Reserved");
 
         RoleCenterNotificationMgt.ShowNotifications;
         ConfPersonalizationMgt.RaiseOnOpenRoleCenterEvent;
@@ -247,11 +246,11 @@ page 6151335 "NPR Restaurant Activities"
         RecRef: RecordRef;
     begin
         if Restaurant.GetFilters() = '' then begin
-            SetRange("Restaurant Filter");
-            SetRange("Seating Location Filter");
+            Rec.SetRange("Restaurant Filter");
+            Rec.SetRange("Seating Location Filter");
         end else begin
             RecRef.GetTable(Restaurant);
-            SetFilter("Restaurant Filter", SelectionFilterMgt.GetSelectionFilter(RecRef, Restaurant.FieldNo(Code)));
+            Rec.SetFilter("Restaurant Filter", SelectionFilterMgt.GetSelectionFilter(RecRef, Restaurant.FieldNo(Code)));
 
             SeatingLocation.Reset();
             if Restaurant.FindSet() then
@@ -266,7 +265,7 @@ page 6151335 "NPR Restaurant Activities"
             SeatingLocation.SetRange(Code);
             SeatingLocation.MarkedOnly(true);
             RecRef.GetTable(SeatingLocation);
-            SetFilter("Seating Location Filter", SelectionFilterMgt.GetSelectionFilter(RecRef, SeatingLocation.FieldNo(Code)));
+            Rec.SetFilter("Seating Location Filter", SelectionFilterMgt.GetSelectionFilter(RecRef, SeatingLocation.FieldNo(Code)));
         end;
 
         POSUnit.reset;
@@ -294,11 +293,11 @@ page 6151335 "NPR Restaurant Activities"
         TotalNoOfPOSUnits: Integer;
     begin
         if POSUnit.Count = POSUnit2.Count then begin
-            SetRange("POS Unit Filter");
+            Rec.SetRange("POS Unit Filter");
             exit;
         end;
         RecRef.GetTable(POSUnit);
-        SetFilter("POS Unit Filter", SelectionFilterMgt.GetSelectionFilter(RecRef, POSUnit.FieldNo("No.")));
+        Rec.SetFilter("POS Unit Filter", SelectionFilterMgt.GetSelectionFilter(RecRef, POSUnit.FieldNo("No.")));
     end;
 
     local procedure RecalculateCues()
@@ -308,48 +307,48 @@ page 6151335 "NPR Restaurant Activities"
         POSEntryQry: Query "NPR POS Entry with Sales Lines";
         SeatingWPLinkQry: Query "NPR NPRE Seating - W/Pad Link";
     begin
-        "Turnover (LCY)" := 0;
-        "No. of Sales" := 0;
-        "Total No. of Guests" := 0;
+        Rec."Turnover (LCY)" := 0;
+        Rec."No. of Sales" := 0;
+        Rec."Total No. of Guests" := 0;
 
-        if GetFilter("Date Filter") <> '' then
-            POSEntryQry.SetFilter(Posting_Date, GetFilter("Date Filter"));
-        if GetFilter("POS Unit Filter") <> '' then
-            POSEntryQry.SetFilter(POS_Unit_No, GetFilter("POS Unit Filter"));
+        if Rec.GetFilter("Date Filter") <> '' then
+            POSEntryQry.SetFilter(Posting_Date, Rec.GetFilter("Date Filter"));
+        if Rec.GetFilter("POS Unit Filter") <> '' then
+            POSEntryQry.SetFilter(POS_Unit_No, Rec.GetFilter("POS Unit Filter"));
         POSEntryQry.SetRange(Type, POSSalesLine.Type::Item);
         POSEntryQry.Open();
         while POSEntryQry.Read() do
             if POSSalesLine.Get(POSEntryQry.POS_Entry_No, POSEntryQry.Line_No) then begin
-                "Turnover (LCY)" += POSSalesLine."Amount Excl. VAT (LCY)";
+                Rec."Turnover (LCY)" += POSSalesLine."Amount Excl. VAT (LCY)";
                 if POSEntry.Get(POSSalesLine."POS Entry No.") then
                     if not POSEntry.Mark then begin
                         POSEntry.Mark(true);
-                        "No. of Sales" += 1;
-                        "Total No. of Guests" += POSEntry."NPRE Number of Guests";
+                        Rec."No. of Sales" += 1;
+                        Rec."Total No. of Guests" += POSEntry."NPRE Number of Guests";
                     end;
             end;
         POSEntryQry.Close();
 
-        if "Total No. of Guests" <> 0 then
-            "Average per Guest (LCY)" := Round("Turnover (LCY)" / "Total No. of Guests")
+        if Rec."Total No. of Guests" <> 0 then
+            Rec."Average per Guest (LCY)" := Round("Turnover (LCY)" / "Total No. of Guests")
         else
-            "Average per Guest (LCY)" := 0;
-        if "No. of Sales" <> 0 then
-            "Average per Sale (LCY)" := Round("Turnover (LCY)" / "No. of Sales")
+            Rec."Average per Guest (LCY)" := 0;
+        if Rec."No. of Sales" <> 0 then
+            Rec."Average per Sale (LCY)" := Round("Turnover (LCY)" / "No. of Sales")
         else
-            "Average per Sale (LCY)" := 0;
+            Rec."Average per Sale (LCY)" := 0;
 
         //Calc inhouse number of guests
-        "Inhouse Guests" := 0;
-        if GetFilter("Seating Location Filter") <> '' then
-            SeatingWPLinkQry.setfilter(SeatingLocation, GetFilter("Seating Location Filter"));
+        Rec."Inhouse Guests" := 0;
+        if Rec.GetFilter("Seating Location Filter") <> '' then
+            SeatingWPLinkQry.setfilter(SeatingLocation, Rec.GetFilter("Seating Location Filter"));
         SeatingWPLinkQry.SetRange(SeatingClosed, false);
         SeatingWPLinkQry.Open();
         while SeatingWPLinkQry.Read() do
-            "Inhouse Guests" += SeatingWPLinkQry.NumberOfGuests;
+            Rec."Inhouse Guests" += SeatingWPLinkQry.NumberOfGuests;
         SeatingWPLinkQry.Close();
 
-        Modify();
+        Rec.Modify();
     end;
 
     local procedure DrillDownTurnover()
@@ -358,7 +357,7 @@ page 6151335 "NPR Restaurant Activities"
     begin
         POSEntry.SetRange("Entry Date", WorkDate());
         POSEntry.SetRange("Entry Type", POSEntry."Entry Type"::"Direct Sale");  //?
-        CopyFilter("POS Unit Filter", POSEntry."POS Unit No.");
+        Rec.CopyFilter("POS Unit Filter", POSEntry."POS Unit No.");
         Page.run(Page::"NPR POS Entries", POSEntry);
     end;
 

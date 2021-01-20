@@ -1,22 +1,17 @@
 page 6059986 "NPR Sale POS Activities"
 {
-    // NPR4.10/VB/20150602 CASE 213003 Support for Web Client (JavaScript) client
-    // NPR4.16/MHA/20151105 CASE 226711 Moved Control Action to Empty CueGroup to support Web Client
-
     Caption = 'Sale Activities';
     PageType = CardPart;
-    UsageCategory = Administration;
-    ApplicationArea = All;
     SourceTable = "NPR Sale POS Cue";
-
+UsageCategory = None;
     layout
     {
         area(content)
         {
             cuegroup(Cues)
             {
-                Caption = ' ';
-                field("Saved Sales"; "Saved Sales")
+                ShowCaption = false;
+                field("Saved Sales"; Rec."Saved Sales")
                 {
                     ApplicationArea = All;
                     DrillDownPageID = "NPR TouchScreen: Saved sales";
@@ -24,10 +19,6 @@ page 6059986 "NPR Sale POS Activities"
                 }
             }
         }
-    }
-
-    actions
-    {
     }
 
     trigger OnOpenPage()
@@ -38,21 +29,21 @@ page 6059986 "NPR Sale POS Activities"
             RetailConfiguration."Show saved expeditions"::All:
                 ;
             RetailConfiguration."Show saved expeditions"::Register:
-                SetFilter("Register Filter", RetailFormCode.FetchRegisterNumber);
+                Rec.SetFilter("Register Filter", RetailFormCode.FetchRegisterNumber);
             RetailConfiguration."Show saved expeditions"::Salesperson:
                 // Fix for salesperson
                 ;
             RetailConfiguration."Show saved expeditions"::"Register+Salesperson":
                 begin
                     // Fix for salesperson
-                    SetFilter("Register Filter", RetailFormCode.FetchRegisterNumber);
+                    Rec.SetFilter("Register Filter", RetailFormCode.FetchRegisterNumber);
                 end;
         end;
 
-        Reset;
-        if not Get then begin
-            Init;
-            Insert;
+        Rec.Reset;
+        if not Rec.Get then begin
+            Rec.Init;
+            Rec.Insert;
         end;
     end;
 

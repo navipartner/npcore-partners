@@ -2,8 +2,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
 {
     Caption = 'Retail Salesperson';
     PageType = RoleCenter;
-    UsageCategory = Administration;
-    ApplicationArea = All;
+    UsageCategory = None;
 
     layout
     {
@@ -992,9 +991,8 @@ page 6014557 "NPR POS: SalesPerson R.Center"
             {
                 Caption = 'Sales &Order';
                 Image = Document;
-                Promoted = false;
-                //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                //PromotedCategory = Process;
+                Promoted = true;
+                PromotedCategory = Process;
                 RunObject = Page "Sales Order";
                 RunPageMode = Create;
                 ApplicationArea = All;
@@ -1013,9 +1011,8 @@ page 6014557 "NPR POS: SalesPerson R.Center"
             {
                 Caption = 'Sales Credit &Memo';
                 Image = CreditMemo;
-                Promoted = false;
-                //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                //PromotedCategory = Process;
+                Promoted = true;
+                PromotedCategory = Process;
                 RunObject = Page "Sales Credit Memo";
                 RunPageMode = Create;
                 ApplicationArea = All;
@@ -1025,8 +1022,6 @@ page 6014557 "NPR POS: SalesPerson R.Center"
             {
                 Caption = '&Transfer Order';
                 Image = TransferOrder;
-                //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                //PromotedCategory = Process;
                 RunObject = Page "Transfer Order";
                 RunPageMode = Create;
                 ApplicationArea = All;
@@ -1039,9 +1034,8 @@ page 6014557 "NPR POS: SalesPerson R.Center"
             {
                 Caption = '&Purchase Order';
                 Image = Document;
-                Promoted = false;
-                //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                //PromotedCategory = Process;
+                Promoted = true;
+                PromotedCategory = Process;
                 RunObject = Page "Purchase Order";
                 RunPageMode = Create;
                 ApplicationArea = All;
@@ -1383,4 +1377,3 @@ page 6014557 "NPR POS: SalesPerson R.Center"
         }
     }
 }
-

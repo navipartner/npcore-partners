@@ -2,9 +2,7 @@ page 6014619 "NPR Retail - Sales RC MyReport"
 {
     Caption = 'Role Center';
     PageType = RoleCenter;
-    UsageCategory = Administration;
-    ApplicationArea = All;
-
+    UsageCategory = None;
     layout
     {
         area(rolecenter)
@@ -804,9 +802,8 @@ page 6014619 "NPR Retail - Sales RC MyReport"
             {
                 Caption = 'C&ustomer';
                 Image = Customer;
-                Promoted = false;
-                //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                //PromotedCategory = Process;
+                Promoted = true;
+                PromotedCategory = Process;
                 RunObject = Page "Customer Card";
                 RunPageMode = Create;
                 ApplicationArea = All;
@@ -816,9 +813,8 @@ page 6014619 "NPR Retail - Sales RC MyReport"
             {
                 Caption = 'Sales &Order';
                 Image = Document;
-                Promoted = false;
-                //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                //PromotedCategory = Process;
+                Promoted = true;
+                PromotedCategory = Process;
                 RunObject = Page "Sales Order";
                 RunPageMode = Create;
                 ApplicationArea = All;
@@ -828,9 +824,8 @@ page 6014619 "NPR Retail - Sales RC MyReport"
             {
                 Caption = 'Sales Credit &Memo';
                 Image = CreditMemo;
-                Promoted = false;
-                //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                //PromotedCategory = Process;
+                Promoted = true;
+                PromotedCategory = Process;
                 RunObject = Page "Sales Credit Memo";
                 RunPageMode = Create;
                 ApplicationArea = All;
@@ -840,9 +835,8 @@ page 6014619 "NPR Retail - Sales RC MyReport"
             {
                 Caption = '&Sales Reminder';
                 Image = Reminder;
-                Promoted = false;
-                //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                //PromotedCategory = Process;
+                Promoted = true;
+                PromotedCategory = Process;
                 RunObject = Page Reminder;
                 RunPageMode = Create;
                 ApplicationArea = All;
@@ -855,9 +849,8 @@ page 6014619 "NPR Retail - Sales RC MyReport"
             {
                 Caption = '&Vendor';
                 Image = Vendor;
-                Promoted = false;
-                //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                //PromotedCategory = Process;
+                Promoted = true;
+                PromotedCategory = Process;
                 RunObject = Page "Vendor Card";
                 RunPageMode = Create;
                 ApplicationArea = All;
@@ -867,9 +860,8 @@ page 6014619 "NPR Retail - Sales RC MyReport"
             {
                 Caption = '&Purchase Order';
                 Image = Document;
-                Promoted = false;
-                //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                //PromotedCategory = Process;
+                Promoted = true;
+                PromotedCategory = Process;
                 RunObject = Page "Purchase Order";
                 RunPageMode = Create;
                 ApplicationArea = All;
@@ -922,46 +914,6 @@ page 6014619 "NPR Retail - Sales RC MyReport"
                 RunObject = Page "Sales Line Discounts";
                 ApplicationArea = All;
                 ToolTip = 'Executes the Sales &Line Discounts action';
-            }
-            action("Create Electronic Credit Memos")
-            {
-                Caption = 'Create Electronic Credit Memos';
-                Image = ElectronicDoc;
-                ApplicationArea = All;
-                ToolTip = 'Executes the Create Electronic Credit Memos action';
-                //RunObject = Report Report13601;
-            }
-            action("Create Electronic Reminders")
-            {
-                Caption = 'Create Electronic Reminders';
-                Image = "Report";
-                ApplicationArea = All;
-                ToolTip = 'Executes the Create Electronic Reminders action';
-                //RunObject = Report Report13602;
-            }
-            action("Create Electronic Fin. Chrg. Memos")
-            {
-                Caption = 'Create Electronic Fin. Chrg. Memos';
-                Image = ElectronicDoc;
-                ApplicationArea = All;
-                ToolTip = 'Executes the Create Electronic Fin. Chrg. Memos action';
-                //RunObject = Report Report13603;
-            }
-            action("Create Electronic Service Invoices")
-            {
-                Caption = 'Create Electronic Service Invoices';
-                Image = ElectronicDoc;
-                ApplicationArea = All;
-                ToolTip = 'Executes the Create Electronic Service Invoices action';
-                //RunObject = Report Report13604;
-            }
-            action("Create Electronic Service Credit Memos")
-            {
-                Caption = 'Create Electronic Service Credit Memos';
-                Image = ElectronicDoc;
-                ApplicationArea = All;
-                ToolTip = 'Executes the Create Electronic Service Credit Memos action';
-                //RunObject = Report Report13605;
             }
             separator(Separator6150682)
             {
@@ -1062,4 +1014,3 @@ page 6014619 "NPR Retail - Sales RC MyReport"
         }
     }
 }
-

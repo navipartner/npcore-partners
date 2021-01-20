@@ -12,12 +12,7 @@ page 6151249 "NPR Entertainment RC"
             part(Control7; "NPR Retail Ent Headline")
             {
                 ApplicationArea = All;
-                // ApplicationArea = Basic, Suite;
             }
-
-
-
-
             part(Control2; "NPR Retail Enter. Act - Ticket")
             {
                 ApplicationArea = All;
@@ -31,32 +26,22 @@ page 6151249 "NPR Entertainment RC"
                 ApplicationArea = All;
 
             }
-
             part(RetailActivities; "NPR Retail Activities")
             {
                 Caption = 'ACTIVITIES';
                 ApplicationArea = All;
             }
-
-
-
             part(RetailSalesChart; "NPR Retail Sales Chart")
             {
                 ApplicationArea = All;
-
             }
-
-
             part(MyJobQueue; "My Job Queue")
             {
                 ApplicationArea = All;
-
             }
             part(MyReports; "NPR My Reports")
             {
                 ApplicationArea = All;
-
-
             }
             part(PowerBi; "Power BI Report Spinner Part")
             {
@@ -68,12 +53,6 @@ page 6151249 "NPR Entertainment RC"
 
     actions
     {
-        area(reporting)
-        {
-        }
-        area(embedding)
-        {
-        }
         area(sections)
         {
             group(Member)
@@ -107,13 +86,6 @@ page 6151249 "NPR Entertainment RC"
                     RunObject = Page "NPR MM Membership Alter.";
                     ApplicationArea = All;
                     ToolTip = 'Executes the Membership Alteration action';
-                }
-                action("Sponsorship Ticket Setup")
-                {
-                    Caption = 'Sponsorship Ticket Setup';
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Sponsorship Ticket Setup action';
-                    //RunObject = Page "MM Sponsorship Ticket Setup";
                 }
                 action("Member Notification Setup")
                 {
@@ -174,13 +146,6 @@ page 6151249 "NPR Entertainment RC"
                     Caption = 'Loyalty Item Point Setup';
                     RunObject = Page "NPR MM Loy. Item Point Setup";
                     ToolTip = 'Executes the Loyalty Item Point Setup action';
-                }
-                action("Loyalty Alter Membership")
-                {
-                    ApplicationArea = Basic, Suite;
-                    Caption = 'Loyalty Alter Membership';
-                    ToolTip = 'Executes the Loyalty Alter Membership action';
-                    //RunObject = Page "MM Loyalty Alter Membership";
                 }
                 action("Loyalty Store Setup Server")
                 {

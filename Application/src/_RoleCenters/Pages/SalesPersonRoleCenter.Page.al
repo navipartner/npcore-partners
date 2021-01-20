@@ -1,13 +1,8 @@
 page 6059980 "NPR Sales Person Role Center"
 {
-    // NPR70.00.00.03/TS/20150130  CASE 205255 Removed Page Part Weather Activities
-    // NPR5.31/TS  /20170328  CASE 270740 My Reports added
-    // NPR5.38/BR  /20180118  CASE 302790 Added POS Entry List
-
     Caption = 'Role Center';
     PageType = RoleCenter;
-    UsageCategory = Administration;
-    ApplicationArea = All;
+    UsageCategory = None;
 
     layout
     {
@@ -62,9 +57,6 @@ page 6059980 "NPR Sales Person Role Center"
 
     actions
     {
-        area(reporting)
-        {
-        }
         area(embedding)
         {
             action("Item List")
@@ -169,4 +161,3 @@ page 6059980 "NPR Sales Person Role Center"
         }
     }
 }
-

@@ -1,13 +1,10 @@
 page 6014694 "NPR Retail Admin Activ. - POS"
 {
-    // NPR5.51/ZESO/20190725  CASE 343621 Object created.
-
     Caption = 'Retail Admin Activities - POS';
     PageType = CardPart;
-    UsageCategory = Administration;
-    ApplicationArea = All;
     RefreshOnActivate = true;
     SourceTable = "NPR Retail Admin Cue";
+    UsageCategory = None;
 
     layout
     {
@@ -16,42 +13,42 @@ page 6014694 "NPR Retail Admin Activ. - POS"
             cuegroup(POS)
             {
                 Caption = 'POS';
-                field("User Setups"; "User Setups")
+                field("User Setups"; Rec."User Setups")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the User Setups field';
                 }
-                field(Salespersons; Salespersons)
+                field(Salespersons; Rec.Salespersons)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Salespersons field';
                 }
-                field("POS Stores"; "POS Stores")
+                field("POS Stores"; Rec."POS Stores")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Stores field';
                 }
-                field("POS Units"; "POS Units")
+                field("POS Units"; Rec."POS Units")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Units field';
                 }
-                field("Cash Registers"; "Cash Registers")
+                field("Cash Registers"; Rec."Cash Registers")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Cash Registers field';
                 }
-                field("POS Payment Bins"; "POS Payment Bins")
+                field("POS Payment Bins"; Rec."POS Payment Bins")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Payment Bins field';
                 }
-                field("POS Payment Methods"; "POS Payment Methods")
+                field("POS Payment Methods"; Rec."POS Payment Methods")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Payment Methods field';
                 }
-                field("POS Posting Setups"; "POS Posting Setups")
+                field("POS Posting Setups"; Rec."POS Posting Setups")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Posting Setups field';
@@ -59,17 +56,12 @@ page 6014694 "NPR Retail Admin Activ. - POS"
             }
         }
     }
-
-    actions
-    {
-    }
-
     trigger OnOpenPage()
     begin
-        Reset;
-        if not Get then begin
-            Init;
-            Insert;
+        Rec.Reset;
+        if not Rec.Get then begin
+            Rec.Init;
+            Rec.Insert;
         end;
     end;
 }

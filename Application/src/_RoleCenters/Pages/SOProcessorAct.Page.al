@@ -2,11 +2,9 @@ page 6151340 "NPR SO Processor Act"
 {
     Caption = 'Activities';
     PageType = CardPart;
-    UsageCategory = Administration;
-    ApplicationArea = All;
     RefreshOnActivate = true;
     SourceTable = "Sales Cue";
-
+    UsageCategory = None;
     layout
     {
         area(content)
@@ -15,7 +13,7 @@ page 6151340 "NPR SO Processor Act"
             {
                 Caption = 'For Release';
                 CueGroupLayout = Wide;
-                field("NPRC Sales This Month"; "NPR Sales This Month")
+                field("NPRC Sales This Month"; Rec."NPR Sales This Month")
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the sum of sales in the current month.';
@@ -26,7 +24,7 @@ page 6151340 "NPR SO Processor Act"
                         DrillDownSalesThisMonth;
                     end;
                 }
-                field("NPRC Sales This Month Lst Year"; "NPR Sales This Month Lst Year")
+                field("NPRC Sales This Month Lst Year"; Rec."NPR Sales This Month Lst Year")
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the sum of sales in the current month of last year.';
@@ -37,10 +35,7 @@ page 6151340 "NPR SO Processor Act"
                         DrillDownSalesThisMonthLastYear;
                     end;
                 }
-
-
             }
-
         }
     }
 
@@ -73,25 +68,23 @@ page 6151340 "NPR SO Processor Act"
         RoleCenterNotificationMgt.HideEvaluationNotificationAfterStartingTrial;
     end;
 
-
-
     trigger OnOpenPage()
     var
         RoleCenterNotificationMgt: Codeunit "Role Center Notification Mgt.";
         ConfPersonalizationMgt: Codeunit "Conf./Personalization Mgt.";
     begin
-        Reset;
-        if not Get then begin
-            Init;
-            Insert;
+        Rec.Reset;
+        if not Rec.Get then begin
+            Rec.Init;
+            Rec.Insert;
         end;
 
-        SetRespCenterFilter;
-        SetRange("Date Filter", 0D, WorkDate - 1);
-        SetFilter("Date Filter2", '>=%1', WorkDate);
-        SetFilter("User ID Filter", UserId);
-        SetFilter("NPR Date Filter Lst Year", '%1..%2', CalcDate('<-CM-1Y>', Today), CalcDate('<CM-1Y>', Today));
-        SetFilter("NPR Date Filter", '%1..%2', CalcDate('<-CM>', Today), Today);
+        Rec.SetRespCenterFilter;
+        Rec.SetRange("Date Filter", 0D, WorkDate - 1);
+        Rec.SetFilter("Date Filter2", '>=%1', WorkDate);
+        Rec.SetFilter("User ID Filter", UserId);
+        Rec.SetFilter("NPR Date Filter Lst Year", '%1..%2', CalcDate('<-CM-1Y>', Today), CalcDate('<CM-1Y>', Today));
+        Rec.SetFilter("NPR Date Filter", '%1..%2', CalcDate('<-CM>', Today), Today);
         RoleCenterNotificationMgt.ShowNotifications;
         ConfPersonalizationMgt.RaiseOnOpenRoleCenterEvent;
 
@@ -101,9 +94,6 @@ page 6151340 "NPR SO Processor Act"
         CueAndKPIs: Codeunit "Cues And KPIs";
         UserTaskManagement: Codeunit "User Task Management";
         ShowDocumentsPendingDodExchService: Boolean;
-
-
-
 
     procedure DrillDownSalesThisMonthLastYear()
     var
@@ -123,6 +113,4 @@ page 6151340 "NPR SO Processor Act"
         ItemLedgerEntry.SetRange("Posting Date", CalcDate('<-CM>', Today), Today);
         PAGE.Run(PAGE::"Item Ledger Entries", ItemLedgerEntry);
     end;
-
 }
-

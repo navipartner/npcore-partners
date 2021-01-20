@@ -5,13 +5,11 @@ page 6151256 "NPR Retail Top10 Selling Items"
     CardPageID = "Item Card";
     Editable = true;
     PageType = ListPart;
-    UsageCategory = Administration;
-    ApplicationArea = All;
     SourceTable = Item;
     SourceTableTemporary = true;
     SourceTableView = SORTING("Low-Level Code")
                       ORDER(Descending);
-
+    UsageCategory = None;
     layout
     {
         area(content)
@@ -27,9 +25,7 @@ page 6151256 "NPR Retail Top10 Selling Items"
 
                     trigger OnValidate()
                     begin
-                        //-NPR5.29 [262956]
                         ExecuteQuery;
-                        //+NPR5.29 [262956]
                     end;
                 }
                 field(Enddate; Enddate)
@@ -40,9 +36,7 @@ page 6151256 "NPR Retail Top10 Selling Items"
 
                     trigger OnValidate()
                     begin
-                        //-NPR5.29 [262956]
                         ExecuteQuery;
-                        //+NPR5.29 [262956]
                     end;
                 }
             }
@@ -51,7 +45,7 @@ page 6151256 "NPR Retail Top10 Selling Items"
                 ShowCaption = false;
                 repeater(Group)
                 {
-                    field("No."; "No.")
+                    field("No."; Rec."No.")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the No. field';
@@ -67,7 +61,7 @@ page 6151256 "NPR Retail Top10 Selling Items"
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Description field';
                     }
-                    field("Sales (Qty.)"; "Sales (Qty.)")
+                    field("Sales (Qty.)"; Rec."Sales (Qty.)")
                     {
                         BlankZero = true;
                         Caption = 'Sales (Qty.)';
@@ -157,12 +151,6 @@ page 6151256 "NPR Retail Top10 Selling Items"
         }
     }
 
-    trigger OnAfterGetRecord()
-    var
-        Str: Text[11];
-    begin
-    end;
-
     trigger OnOpenPage()
     begin
         PeriodType := PeriodType::Year;
@@ -182,38 +170,24 @@ page 6151256 "NPR Retail Top10 Selling Items"
 
     local procedure UpdateList()
     begin
-        //-NPR5.29 [262956]
-        //DELETEALL;
-        //+NPR5.29 [262956]
         Setdate;
-        //-NPR5.29 [262956]
         ExecuteQuery;
-        //+NPR5.29 [262956]
     end;
 
     local procedure ExecuteQuery()
     begin
-        //+NPR5.29 [262956]
-        DeleteAll;
+        Rec.DeleteAll;
         Query1.SetFilter(Posting_Date, '%1..%2', StartDate, Enddate);
         Query1.SetFilter(Item_Ledger_Entry_Type, 'Sale');
         Query1.Open;
         while Query1.Read do begin
             if Item.Get(Query1.Item_No) then begin
-                TransferFields(Item);
-                if Insert then
-                    //-NC1.20
-                    SetFilter("Date Filter", '%1..%2', StartDate, Enddate);
-                //+NC1.20
-                //-NC1.17
-                //-NC1.20
-                //Item.CALCFIELDS("Sales (Qty.)");
-                //"Low-Level Code" := ROUND(Item."Sales (Qty.)",0.01) * 100;
-                CalcFields("Sales (Qty.)");
-                "Low-Level Code" := Round("Sales (Qty.)", 0.01) * 100;
-                //+NC1.20
-                //+NC1.17
-                Modify;
+                Rec.TransferFields(Item);
+                if Rec.Insert then
+                    Rec.SetFilter("Date Filter", '%1..%2', StartDate, Enddate);
+                Rec.CalcFields("Sales (Qty.)");
+                Rec."Low-Level Code" := Round(Rec."Sales (Qty.)", 0.01) * 100;
+                Rec.Modify;
             end;
 
         end;

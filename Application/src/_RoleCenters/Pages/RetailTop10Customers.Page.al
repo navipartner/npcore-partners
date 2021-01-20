@@ -5,13 +5,11 @@ page 6059814 "NPR Retail Top 10 Customers"
     CardPageID = "Customer Card";
     Editable = true;
     PageType = ListPart;
-    UsageCategory = Administration;
-    ApplicationArea = All;
     SourceTable = Customer;
     SourceTableTemporary = true;
     SourceTableView = SORTING("Search Name")
                       ORDER(Descending);
-
+    UsageCategory = None;
     layout
     {
         area(content)
@@ -47,7 +45,7 @@ page 6059814 "NPR Retail Top 10 Customers"
                 ShowCaption = false;
                 repeater(Group)
                 {
-                    field("No."; "No.")
+                    field("No."; Rec."No.")
                     {
                         ApplicationArea = All;
                         Editable = false;
@@ -55,23 +53,23 @@ page 6059814 "NPR Retail Top 10 Customers"
 
                         trigger OnDrillDown()
                         begin
-                            Cust.Get("No.");
+                            Cust.Get(Rec."No.");
                             PAGE.Run(PAGE::"Customer Card", Cust);
                         end;
                     }
-                    field(Name; Name)
+                    field(Name; Rec.Name)
                     {
                         ApplicationArea = All;
                         Editable = false;
                         ToolTip = 'Specifies the value of the Name field';
                     }
-                    field("Phone No."; "Phone No.")
+                    field("Phone No."; Rec."Phone No.")
                     {
                         ApplicationArea = All;
                         Editable = false;
                         ToolTip = 'Specifies the value of the Phone No. field';
                     }
-                    field("Sales (LCY)"; "Sales (LCY)")
+                    field("Sales (LCY)"; Rec."Sales (LCY)")
                     {
                         ApplicationArea = All;
                         BlankZero = true;
@@ -98,7 +96,6 @@ page 6059814 "NPR Retail Top 10 Customers"
                     Caption = 'Day';
                     ApplicationArea = All;
                     ToolTip = 'Executes the Day action';
-                    Image = Filter; 
 
                     trigger OnAction()
                     begin
@@ -111,7 +108,6 @@ page 6059814 "NPR Retail Top 10 Customers"
                     Caption = 'Week';
                     ApplicationArea = All;
                     ToolTip = 'Executes the Week action';
-                    Image = Filter;
 
                     trigger OnAction()
                     begin
@@ -124,7 +120,6 @@ page 6059814 "NPR Retail Top 10 Customers"
                     Caption = 'Month';
                     ApplicationArea = All;
                     ToolTip = 'Executes the Month action';
-                    Image = Filter;
 
                     trigger OnAction()
                     begin
@@ -137,7 +132,6 @@ page 6059814 "NPR Retail Top 10 Customers"
                     Caption = 'Quarter';
                     ApplicationArea = All;
                     ToolTip = 'Executes the Quarter action';
-                    Image = Filter;
 
                     trigger OnAction()
                     begin
@@ -150,7 +144,6 @@ page 6059814 "NPR Retail Top 10 Customers"
                     Caption = 'Year';
                     ApplicationArea = All;
                     ToolTip = 'Executes the Year action';
-                    Image = Filter;
 
                     trigger OnAction()
                     begin
@@ -187,20 +180,18 @@ page 6059814 "NPR Retail Top 10 Customers"
 
     local procedure ExecuteQuery()
     begin
-        DeleteAll;
+        Rec.DeleteAll;
         Query1.SetFilter(Posting_Date, '%1..%2', StartDate, Enddate);
         Query1.Open;
         while Query1.Read do begin
             if Cust.Get(Query1.Source_No) then begin
-                TransferFields(Cust);
-                if not Insert then;
-                SetFilter("Date Filter", '%1..%2', StartDate, Enddate);
-
-                CalcFields("Sales (LCY)");
-                "Search Name" := Format(-"Sales (LCY)" * 100, 20, 1);
-                "Search Name" := PadStr('', 15 - StrLen("Search Name"), '0') + "Search Name";
-                Modify;
-
+                Rec.TransferFields(Cust);
+                if not Rec.Insert then;
+                Rec.SetFilter("Date Filter", '%1..%2', StartDate, Enddate);
+                Rec.CalcFields("Sales (LCY)");
+                Rec."Search Name" := Format(-Rec."Sales (LCY)" * 100, 20, 1);
+                Rec."Search Name" := PadStr('', 15 - StrLen(Rec."Search Name"), '0') + Rec."Search Name";
+                Rec.Modify;
             end;
         end;
         Query1.Close;
@@ -239,4 +230,3 @@ page 6059814 "NPR Retail Top 10 Customers"
         end;
     end;
 }
-

@@ -18,9 +18,5 @@ table 6059989 "NPR Cue Reservation 5"
         {
         }
     }
-
-    fieldgroups
-    {
-    }
 }
 

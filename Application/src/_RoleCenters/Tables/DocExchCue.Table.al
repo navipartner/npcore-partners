@@ -1,8 +1,5 @@
 table 6059932 "NPR Doc. Exch. Cue"
 {
-    // NPR5.25/BR /20160804 CASE 244303 Object Created
-    // NPR5.48/JDH /20181109 CASE 334163 Added Captions
-
     Caption = 'Doc. Exch. Cue';
     DataClassification = CustomerContent;
 
@@ -15,7 +12,7 @@ table 6059932 "NPR Doc. Exch. Cue"
         }
         field(2; "Requests to Approve"; Integer)
         {
-            CalcFormula = Count ("Approval Entry" WHERE(Status = CONST(Open),
+            CalcFormula = Count("Approval Entry" WHERE(Status = CONST(Open),
                                                         "Approver ID" = CONST('USERID')));
             Caption = 'Requests to Approve';
             Editable = false;
@@ -23,63 +20,63 @@ table 6059932 "NPR Doc. Exch. Cue"
         }
         field(4; "Ongoing Sales Invoices"; Integer)
         {
-            CalcFormula = Count ("Sales Header" WHERE("Document Type" = FILTER(Invoice)));
+            CalcFormula = Count("Sales Header" WHERE("Document Type" = FILTER(Invoice)));
             Caption = 'Ongoing Sales Invoices';
             Editable = false;
             FieldClass = FlowField;
         }
         field(5; "Incoming Documents"; Integer)
         {
-            CalcFormula = Count ("Incoming Document");
+            CalcFormula = Count("Incoming Document");
             Caption = 'My Incoming Documents';
             Editable = false;
             FieldClass = FlowField;
         }
         field(6; "Incoming Documents New"; Integer)
         {
-            CalcFormula = Count ("Incoming Document" WHERE(Status = CONST(New)));
+            CalcFormula = Count("Incoming Document" WHERE(Status = CONST(New)));
             Caption = 'Incoming Documents New';
             Editable = false;
             FieldClass = FlowField;
         }
         field(7; "Incoming Documents Failed"; Integer)
         {
-            CalcFormula = Count ("Incoming Document" WHERE(Status = CONST(Failed)));
+            CalcFormula = Count("Incoming Document" WHERE(Status = CONST(Failed)));
             Caption = 'Incoming Documents Failed';
             Editable = false;
             FieldClass = FlowField;
         }
         field(8; "Incoming Documents Created"; Integer)
         {
-            CalcFormula = Count ("Incoming Document" WHERE(Status = CONST(Created)));
+            CalcFormula = Count("Incoming Document" WHERE(Status = CONST(Created)));
             Caption = 'Incoming Documents Created';
             Editable = false;
             FieldClass = FlowField;
         }
         field(9; "Incoming Documents Released"; Integer)
         {
-            CalcFormula = Count ("Incoming Document" WHERE(Status = CONST(Released)));
+            CalcFormula = Count("Incoming Document" WHERE(Status = CONST(Released)));
             Caption = 'Incoming Documents Released';
             Editable = false;
             FieldClass = FlowField;
         }
         field(10; "Incoming Documents Rejected"; Integer)
         {
-            CalcFormula = Count ("Incoming Document" WHERE(Status = CONST(Rejected)));
+            CalcFormula = Count("Incoming Document" WHERE(Status = CONST(Rejected)));
             Caption = 'Incoming Documents Rejected';
             Editable = false;
             FieldClass = FlowField;
         }
         field(11; "Incoming Documents Pending Ap."; Integer)
         {
-            CalcFormula = Count ("Incoming Document" WHERE(Status = CONST("Pending Approval")));
+            CalcFormula = Count("Incoming Document" WHERE(Status = CONST("Pending Approval")));
             Caption = 'Incoming Documents Pending Ap.';
             Editable = false;
             FieldClass = FlowField;
         }
         field(15; "Ongoing Purchase Invoices"; Integer)
         {
-            CalcFormula = Count ("Purchase Header" WHERE("Document Type" = FILTER(Invoice)));
+            CalcFormula = Count("Purchase Header" WHERE("Document Type" = FILTER(Invoice)));
             Caption = 'Ongoing Purchase Invoices';
             Editable = false;
             FieldClass = FlowField;
@@ -108,10 +105,6 @@ table 6059932 "NPR Doc. Exch. Cue"
         key(Key1; "Primary Key")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 
