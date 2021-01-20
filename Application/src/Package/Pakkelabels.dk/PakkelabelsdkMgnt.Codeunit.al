@@ -559,10 +559,11 @@ codeunit 6014490 "NPR Pakkelabels.dk Mgnt"
 
     local procedure GetExceptionMessageFromReasonPhrase(Silent: Boolean; ReasonPhrase: Text)
     begin
-        if Silent then
-            ErrorTextFound := GetValue('message', ReasonPhrase)
-        else
-            Error(GetValue('message', ReasonPhrase));
+        ErrorTextFound := GetValue('message', ReasonPhrase);
+        if ErrorTextFound = '' then
+            ErrorTextFound := ReasonPhrase;
+        if not Silent then
+            Error(ErrorTextFound);
     end;
 
     local procedure ValidateShipmentMethodCode(Rec: Record "Sales Header")
@@ -897,6 +898,9 @@ codeunit 6014490 "NPR Pakkelabels.dk Mgnt"
         ShippingAgentServicesCode: Code[10];
         DocFound: Boolean;
     begin
+
+        if not InitPackageProvider() then
+            exit;
         ResponseMessage := '';
 
         ShipmentDocument.SetRange("Table No.", RecRef.Number());
@@ -1063,6 +1067,7 @@ codeunit 6014490 "NPR Pakkelabels.dk Mgnt"
             end;
         end;
         Commit();
+
         if PackageProviderSetup."Send Package Doc. Immediately" then begin
             if PackageProviderSetup."Skip Own Agreement" then
                 CreateShipment(ShipmentDocument, Silent)
