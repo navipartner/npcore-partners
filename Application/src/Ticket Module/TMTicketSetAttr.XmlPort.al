@@ -1,12 +1,9 @@
 xmlport 6060121 "NPR TM Ticket Set Attr."
 {
-    // TM1.23/TSA /20170724 CASE 284752 Initial Version
-    // #334163/JDH /20181108 CASE 334163 Adding missing Captions
-    // TM1.39/NPKNAV/20190125  CASE 343941 Transport TM1.39 - 25 January 2019
-
     Caption = 'TM Ticket Set Attributes';
     FormatEvaluate = Xml;
     UseDefaultNamespace = true;
+    Encoding = UTF8;
 
     schema
     {
