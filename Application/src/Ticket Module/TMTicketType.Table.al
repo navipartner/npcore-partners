@@ -1,19 +1,5 @@
 table 6059784 "NPR TM Ticket Type"
 {
-    // NPR4.16/TSA/20150803/TM1.00 CASE xxxxx Brought fields from 6.2 forward
-    // NPR4.16/TSA/20150803/TM1.00 CASE xxxxx Added new field "Defer Revenue" to control how revenue should be posted when sales != admission date
-    // TM1.03/TSA/20160113  CASE 231260 - Added option "Admission Registration" Individual/Group to handle single ticket admission for groups
-    // TM1.11/TSA/20160324  CASE 234960 - Added "Not Blank" property on primary key
-    // TM1.10/TSA/20160329  CASE 237661 - Change primary key length from 20 to 10
-    // TM1.12/TSA/20160407  CASE 230600 Added DAN Captions
-    // TM1.15/TSA/20160530  CASE 240831 Field 40 default true, hidden
-    // TM1.16/TSA/20160628  CASE 245455 Added option to have greater control on ticket valid from / to
-    // TM1.18/TSA/20161220  CASE 261405 Added field Membership Sales Item No.
-    // TM1.26/TSA /20171103 CASE 285601 Added DIY Ticket Layout Code for specifying ticket layou on ticket server
-    // TM1.27/TSA /20171211 CASE 269456 Added print template support fields
-    // TM1.38/TSA /20181012 CASE 332109 Adding NP-Pass for tickets
-    // TM1.42/TSA /20190722 CASE 362783 Removed RunCmdModal(), added RunProcess() to use interop
-
     Caption = 'Ticket Type';
     LookupPageID = "NPR TM Ticket Type";
     DataClassification = CustomerContent;
@@ -52,7 +38,7 @@ table 6059784 "NPR TM Ticket Type"
         }
         field(22; "Print Object Type"; Option)
         {
-            Caption = 'Print Objekt Type';
+            Caption = 'Print Object Type';
             InitValue = TEMPLATE;
             OptionCaption = 'Codeunit,Report,Template';
             OptionMembers = "CODEUNIT","REPORT",TEMPLATE;
@@ -156,19 +142,19 @@ table 6059784 "NPR TM Ticket Type"
         field(200; "eTicket Template"; BLOB)
         {
             Caption = 'eTicket Template';
-            Description = '//-TM1.38 [332109]';
+            Description = '';
             DataClassification = CustomerContent;
         }
         field(210; "eTicket Type Code"; Text[30])
         {
             Caption = 'eTicket Type Code';
-            Description = '//-TM1.38 [332109]';
+            Description = '';
             DataClassification = CustomerContent;
         }
         field(220; "eTicket Activated"; Boolean)
         {
             Caption = 'eTicket Activated';
-            Description = '//-TM1.38 [332109]';
+            Description = '';
             DataClassification = CustomerContent;
 
             trigger OnValidate()
@@ -202,102 +188,5 @@ table 6059784 "NPR TM Ticket Type"
     }
 
     var
-        ErrNonUniqueItem: Label 'Error. Item No. %1 is allready used.';
-        FileManagement: Codeunit "File Management";
-
-    procedure EditPassTemplate()
-    var
-        Path: Text[1024];
-    begin
-
-        Path := ExportPassTemplate(false);
-        RunPassTemplateEditor(Path, FieldCaption("eTicket Template"));
-        ImportPassTemplate(Path, false);
-        FileManagement.DeleteClientFile(Path);
-    end;
-
-    local procedure ExportPassTemplate(UseDialog: Boolean) Path: Text[1024]
-    var
-        TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
-        outstream: OutStream;
-        instream: InStream;
-        PassData: Text;
-        ToFile: Text;
-        IsDownloaded: Boolean;
-    begin
-
-        CalcFields("eTicket Template");
-        if (not "eTicket Template".HasValue()) then begin
-            PassData := TicketRequestManager.GetDefaultTemplate();
-            "eTicket Template".CreateOutStream(outstream);
-            outstream.Write(PassData);
-            Modify();
-            CalcFields("eTicket Template");
-        end;
-
-        "eTicket Template".CreateInStream(instream);
-
-        if (not UseDialog) then begin
-            ToFile := FileManagement.ClientTempFileName('json');
-        end else begin
-            ToFile := 'template.json';
-        end;
-
-        IsDownloaded := DownloadFromStream(instream, 'Export', '', '', ToFile);
-        if (IsDownloaded) then
-            exit(ToFile);
-
-        Error('Export failed.');
-    end;
-
-    local procedure ImportPassTemplate(Path: Text[1024]; UseDialog: Boolean)
-    var
-        TempBlob: Codeunit "Temp Blob";
-        outstream: OutStream;
-        instream: InStream;
-    begin
-
-        if (UseDialog) then begin
-            FileManagement.BLOBImport(TempBlob, '*.json');
-        end else begin
-            FileManagement.BLOBImport(TempBlob, Path);
-        end;
-
-        TempBlob.CreateInStream(instream);
-        "eTicket Template".CreateOutStream(outstream, TEXTENCODING::UTF8);
-        CopyStream(outstream, instream);
-
-        Modify(true);
-    end;
-
-    local procedure RunPassTemplateEditor(Path: Text[1024]; desc: Text[100])
-    var
-        ret: Integer;
-        f: File;
-        extra: Text[30];
-    begin
-
-        //-TM1.42 [362783]
-        // RunCmdModal('"notepad.exe" "'+ Path + '"');
-        RunProcess(Path, '', true);
-        //+TM1.42 [362783]
-    end;
-
-    procedure RunProcess(Filename: Text; Arguments: Text; Modal: Boolean)
-    var
-        [RunOnClient]
-        Process: DotNet NPRNetProcess;
-        [RunOnClient]
-        ProcessStartInfo: DotNet NPRNetProcessStartInfo;
-    begin
-
-        //-TM1.42 [362783]
-        ProcessStartInfo := ProcessStartInfo.ProcessStartInfo(Filename, Arguments);
-        Process := Process.Start(ProcessStartInfo);
-        if Modal then
-            Process.WaitForExit();
-
-        //+TM1.42 [362783]
-    end;
 }
 
