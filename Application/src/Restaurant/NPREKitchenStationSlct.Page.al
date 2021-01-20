@@ -1,7 +1,5 @@
 page 6150687 "NPR NPRE Kitchen Station Slct."
 {
-    // NPR5.54/ALPO/20200401 CASE 382428 Kitchen Display System (KDS) for NP Restaurant
-
     Caption = 'Kitchen Station Selection Setup';
     DataCaptionExpression = '';
     DelayedInsert = true;
@@ -16,32 +14,32 @@ page 6150687 "NPR NPRE Kitchen Station Slct."
         {
             repeater(Group)
             {
-                field("Restaurant Code"; "Restaurant Code")
+                field("Restaurant Code"; Rec."Restaurant Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Restaurant Code field';
                 }
-                field("Seating Location"; "Seating Location")
+                field("Seating Location"; Rec."Seating Location")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Seating Location field';
                 }
-                field("Serving Step"; "Serving Step")
+                field("Serving Step"; Rec."Serving Step")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Serving Step field';
                 }
-                field("Print Category Code"; "Print Category Code")
+                field("Print Category Code"; Rec."Print Category Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Print Category Code field';
                 }
-                field("Production Restaurant Code"; "Production Restaurant Code")
+                field("Production Restaurant Code"; Rec."Production Restaurant Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Production Restaurant Code field';
                 }
-                field("Kitchen Station"; "Kitchen Station")
+                field("Kitchen Station"; Rec."Kitchen Station")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Kitchen Station field';
@@ -62,9 +60,4 @@ page 6150687 "NPR NPRE Kitchen Station Slct."
             }
         }
     }
-
-    actions
-    {
-    }
 }
-

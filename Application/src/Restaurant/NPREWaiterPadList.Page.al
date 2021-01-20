@@ -1,10 +1,5 @@
 page 6150663 "NPR NPRE Waiter Pad List"
 {
-    // NPR5.34/ANEN/2017012  CASE 270255 Object Created for Hospitality - Version 1.0
-    // NPR5.35/ANEN/20170821 CASE 283376 Solution rename to NP Restaurant
-    // NPR5.50/TJ  /20190502 CASE 346387 Added print pre receipt action
-    // NPR5.55/ALPO/20200615 CASE 399170 Restaurant flow change: support for waiter pad related manipulations directly inside a POS sale
-
     Caption = 'Waiter Pad List';
     CardPageID = "NPR NPRE Waiter Pad";
     PageType = List;
@@ -18,60 +13,60 @@ page 6150663 "NPR NPRE Waiter Pad List"
         {
             repeater(Group)
             {
-                field("No."; "No.")
+                field("No."; Rec."No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the No. field';
                 }
-                field("Start Date"; "Start Date")
+                field("Start Date"; Rec."Start Date")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Start Date field';
                 }
-                field("Start Time"; "Start Time")
+                field("Start Time"; Rec."Start Time")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Start Time field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Current Seating Description"; "Current Seating Description")
+                field("Current Seating Description"; Rec."Current Seating Description")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Seating Description field';
                 }
-                field("Current Seating FF"; "Current Seating FF")
+                field("Current Seating FF"; Rec."Current Seating FF")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Current Seating field';
                 }
-                field("Multiple Seating FF"; "Multiple Seating FF")
+                field("Multiple Seating FF"; Rec."Multiple Seating FF")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Multiple Seating field';
                 }
-                field("Pre-receipt Printed"; "Pre-receipt Printed")
+                field("Pre-receipt Printed"; Rec."Pre-receipt Printed")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Pre-receipt Printed field';
                 }
-                field(Closed; Closed)
+                field(Closed; Rec.Closed)
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Closed field';
                 }
-                field("Close Date"; "Close Date")
+                field("Close Date"; Rec."Close Date")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Close Date field';
                 }
-                field("Close Time"; "Close Time")
+                field("Close Time"; Rec."Close Time")
                 {
                     ApplicationArea = All;
                     Visible = false;
@@ -108,10 +103,9 @@ page 6150663 "NPR NPRE Waiter Pad List"
 
     trigger OnAfterGetRecord()
     begin
-        UpdateCurrentSeatingDescription;
+        Rec.UpdateCurrentSeatingDescription;
     end;
 
     var
         HospitalityPrint: Codeunit "NPR NPRE Restaurant Print";
 }
-

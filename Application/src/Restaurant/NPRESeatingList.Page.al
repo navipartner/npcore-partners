@@ -1,11 +1,5 @@
 page 6150664 "NPR NPRE Seating List"
 {
-    // NPR5.34/ANEN/2017012  CASE 270255 Object Created for Hospitality - Version 1.0
-    // NPR5.35/ANEN/20170821 CASE 283376 Solution rename to NP Restaurant
-    // NPR5.36/ANEN/20170918 CASE 290639 Adding column seating location
-    // NPR5.53/ALPO/20191210 CASE 380609 Dimensions: NPRE Seating integration
-    // NPR5.55/ALPO/20200615 CASE 399170 Restaurant flow change: support for waiter pad related manipulations directly inside a POS sale
-
     Caption = 'Seating List';
     CardPageID = "NPR NPRE Seating";
     Editable = false;
@@ -20,52 +14,52 @@ page 6150664 "NPR NPRE Seating List"
         {
             repeater(Group)
             {
-                field(Status; Status)
+                field(Status; Rec.Status)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Status field';
                 }
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field(Blocked; Blocked)
+                field(Blocked; Rec.Blocked)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Blocked field';
                 }
-                field("Seating Location"; "Seating Location")
+                field("Seating Location"; Rec."Seating Location")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Seating Location field';
                 }
-                field(Capacity; Capacity)
+                field(Capacity; Rec.Capacity)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Capacity field';
                 }
-                field("Fixed Capasity"; "Fixed Capasity")
+                field("Fixed Capasity"; Rec."Fixed Capasity")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Fixed Capasity field';
                 }
-                field("Current Waiter Pad FF"; "Current Waiter Pad FF")
+                field("Current Waiter Pad FF"; Rec."Current Waiter Pad FF")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Current Waiter Pad field';
                 }
-                field("Current Waiter Pad Description"; "Current Waiter Pad Description")
+                field("Current Waiter Pad Description"; Rec."Current Waiter Pad Description")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Waiter Pad Description field';
                 }
-                field("Multiple Waiter Pad FF"; "Multiple Waiter Pad FF")
+                field("Multiple Waiter Pad FF"; Rec."Multiple Waiter Pad FF")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Multiple Waiter Pad field';
@@ -109,11 +103,9 @@ page 6150664 "NPR NPRE Seating List"
                             NPRESeating: Record "NPR NPRE Seating";
                             DefaultDimMultiple: Page "Default Dimensions-Multiple";
                         begin
-                            //-NPR5.53 [380609]
                             CurrPage.SetSelectionFilter(NPRESeating);
-                            DefaultDimMultiple.SetMultiRecord(NPRESeating, FieldNo(Code));
+                            DefaultDimMultiple.SetMultiRecord(NPRESeating, Rec.FieldNo(Code));
                             DefaultDimMultiple.RunModal;
-                            //-NPR5.53 [380609]
                         end;
                     }
                 }
@@ -123,7 +115,6 @@ page 6150664 "NPR NPRE Seating List"
 
     trigger OnAfterGetRecord()
     begin
-        UpdateCurrentWaiterPadDescription;
+        Rec.UpdateCurrentWaiterPadDescription;
     end;
 }
-

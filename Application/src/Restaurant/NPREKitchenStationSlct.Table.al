@@ -1,8 +1,5 @@
 table 6150683 "NPR NPRE Kitchen Station Slct."
 {
-    // NPR5.54/ALPO/20200401 CASE 382428 Kitchen Display System (KDS) for NP Restaurant
-    // NPR5.55/ALPO/20200708 CASE 382428 Kitchen Display System (KDS) for NP Restaurant (further enhancements)
-
     Caption = 'Kitchen Station Selection';
     DataClassification = CustomerContent;
 
@@ -53,9 +50,4 @@ table 6150683 "NPR NPRE Kitchen Station Slct."
         {
         }
     }
-
-    fieldgroups
-    {
-    }
 }
-

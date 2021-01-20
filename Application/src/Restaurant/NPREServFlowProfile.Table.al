@@ -1,7 +1,5 @@
 table 6150673 "NPR NPRE Serv.Flow Profile"
 {
-    // NPR5.55/ALPO/20200615 CASE 399170 Restaurant flow change: support for waiter pad related manipulations directly inside a POS sale
-
     Caption = 'Rest. Service Flow Profile';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR NPRE Service Flow Profiles";
@@ -67,11 +65,6 @@ table 6150673 "NPR NPRE Serv.Flow Profile"
         }
     }
 
-    fieldgroups
-    {
-    }
-
     var
         AvailableWithKDS: Label 'The option is only available in KDS enabled environments. Please make sure you have KDS installed and enabled.';
 }
-

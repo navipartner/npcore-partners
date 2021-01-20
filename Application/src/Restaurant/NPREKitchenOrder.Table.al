@@ -1,7 +1,5 @@
 table 6150677 "NPR NPRE Kitchen Order"
 {
-    // NPR5.54/ALPO/20200401 CASE 382428 Kitchen Display System (KDS) for NP Restaurant
-
     Caption = 'Kitchen Order';
     DataClassification = CustomerContent;
 
@@ -56,7 +54,7 @@ table 6150677 "NPR NPRE Kitchen Order"
         }
         field(600; "Applicable for Kitchen Station"; Boolean)
         {
-            CalcFormula = Exist ("NPR NPRE Kitchen Req. Station" WHERE("Order ID" = FIELD("Order ID"),
+            CalcFormula = Exist("NPR NPRE Kitchen Req. Station" WHERE("Order ID" = FIELD("Order ID"),
                                                                       "Production Restaurant Code" = FIELD("Production Restaurant Filter"),
                                                                       "Kitchen Station" = FIELD("Kitchen Station Filter")));
             Caption = 'Applicable for Kitchen Station';
@@ -75,10 +73,6 @@ table 6150677 "NPR NPRE Kitchen Order"
         }
     }
 
-    fieldgroups
-    {
-    }
-
     trigger OnDelete()
     var
         KitchenOrderLine: Record "NPR NPRE Kitchen Request";
@@ -88,4 +82,3 @@ table 6150677 "NPR NPRE Kitchen Order"
             KitchenOrderLine.DeleteAll(true);
     end;
 }
-

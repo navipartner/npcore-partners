@@ -1,7 +1,5 @@
 page 6150625 "NPR POS NPRE Restaur. Profiles"
 {
-    // NPR5.55/ALPO/20200730 CASE 414938 POS Store/POS Unit - Restaurant link
-
     PageType = ListPlus;
     UsageCategory = Administration;
     ApplicationArea = All;
@@ -13,17 +11,17 @@ page 6150625 "NPR POS NPRE Restaur. Profiles"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Restaurant Code"; "Restaurant Code")
+                field("Restaurant Code"; Rec."Restaurant Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Restaurant Code field';
@@ -44,9 +42,4 @@ page 6150625 "NPR POS NPRE Restaur. Profiles"
             }
         }
     }
-
-    actions
-    {
-    }
 }
-

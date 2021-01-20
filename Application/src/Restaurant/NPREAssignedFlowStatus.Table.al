@@ -1,7 +1,5 @@
 table 6150674 "NPR NPRE Assigned Flow Status"
 {
-    // NPR5.55/ALPO/20200708 CASE 382428 Kitchen Display System (KDS) for NP Restaurant
-
     Caption = 'Assigned Flow Status';
     DataClassification = CustomerContent;
 
@@ -38,9 +36,4 @@ table 6150674 "NPR NPRE Assigned Flow Status"
         {
         }
     }
-
-    fieldgroups
-    {
-    }
 }
-

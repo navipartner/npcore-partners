@@ -1,18 +1,5 @@
 codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
 {
-    // NPR5.34/ANEN/2017012  CASE 270255 Object Created for Hospitality - Version 1.0
-    // NPR5.35/ANEN/20170821 CASE 283376 Solution rename to NP Restaurant
-    // NPR5.53/ALPO/20200102 CASE 360258 Possibility to send to kitchen only selected waiter pad lines or lines of specific print category
-    // NPR5.53/ALPO/20200108 CASE 380918 Post Seating Code and Number of Guests to POS Entries (for further sales analysis breakedown)
-    // NPR5.55/ALPO/20200422 CASE 360258 More user friendly print category selection using multi-selection mode
-    // NPR5.55/ALPO/20200708 CASE 382428 Kitchen Display System (KDS) for NP Restaurant (further enhancements)
-    // NPR5.55/ALPO/20200615 CASE 399170 Restaurant flow change: support for waiter pad related manipulations directly inside a POS sale
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         WaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
         InQuotes: Label '''%1''', Comment = '{Fixed}';
@@ -41,7 +28,7 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
             SeatingWaiterPadLink.Init;
             SeatingWaiterPadLink."Seating Code" := Seating.Code;
             SeatingWaiterPadLink."Waiter Pad No." := WaiterPad."No.";
-            SeatingWaiterPadLink.Closed := WaiterPad.Closed;  //NPR5.55 [399170]
+            SeatingWaiterPadLink.Closed := WaiterPad.Closed;
             SeatingWaiterPadLink.Insert(true);
             exit(true);
         end;
@@ -80,11 +67,9 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
             SeatingWaiterPadLink.FindFirst;
             SeatingWaiterPadLink.Rename(SeatingCodeNew, WaiterPadNo);
 
-            //-NPR5.55 [399170]
             if not SeatingWaiterPadLink.Closed then
                 SeatingMgt.SetSeatingIsOccupied(SeatingCodeNew);
             SeatingMgt.TrySetSeatingIsCleared(SeatingCode, SetupProxy);
-            //+NPR5.55 [399170]
 
             exit(true);
         end;
@@ -128,7 +113,6 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
         Seating: Record "NPR NPRE Seating";
         SeatingMgt: Codeunit "NPR NPRE Seating Mgt.";
     begin
-        //-NPR5.55 [399170] (Function moved from CU6150660)
         Seating.Get(SeatingCode);
         if WaiterPad."No." = '' then
             InsertWaiterPad(WaiterPad, true);
@@ -141,7 +125,6 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
         SeatingMgt.SetSeatingIsOccupied(Seating.Code);
 
         exit(true);
-        //+NPR5.55 [399170]
     end;
 
     procedure DuplicateWaiterPadHdr(FromWaiterPad: Record "NPR NPRE Waiter Pad"; var NewWaiterPad: Record "NPR NPRE Waiter Pad")
@@ -149,7 +132,6 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
         SeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink";
         SeatingWaiterPadLink2: Record "NPR NPRE Seat.: WaiterPadLink";
     begin
-        //-NPR5.55 [399170]
         NewWaiterPad."No." := '';
         InsertWaiterPad(NewWaiterPad, false);
         NewWaiterPad.TransferFields(FromWaiterPad, false);
@@ -172,7 +154,6 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
         NewWaiterPad.Insert(true);
 
         WaiterPadPOSMgt.CopyPOSInfoWPad2WPad(FromWaiterPad, 0, NewWaiterPad, 0);
-        //+NPR5.55 [399170]
     end;
 
     procedure MergeWaiterPad(var WaiterPad: Record "NPR NPRE Waiter Pad"; var MergeToWaiterPad: Record "NPR NPRE Waiter Pad") OK: Boolean
@@ -180,7 +161,6 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
         WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
         NPHWaiterPadPOSManagement: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
     begin
-        //-NPR5.55 [399170]
         MergeToWaiterPad."Number of Guests" := MergeToWaiterPad."Number of Guests" + WaiterPad."Number of Guests";
         MergeToWaiterPad."Billed Number of Guests" := MergeToWaiterPad."Billed Number of Guests" + WaiterPad."Billed Number of Guests";
         MergeToWaiterPad."Pre-receipt Printed" := false;
@@ -190,89 +170,16 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
         WaiterPad."Billed Number of Guests" := 0;
         WaiterPad."Pre-receipt Printed" := false;
         WaiterPad.Modify;
-        //+NPR5.55 [399170]
 
         WaiterPadLine.Reset;
         WaiterPadLine.SetRange("Waiter Pad No.", WaiterPad."No.");
         if WaiterPadLine.FindSet then begin
             repeat
-                NPHWaiterPadPOSManagement.SplitWaiterPadLine(WaiterPad, WaiterPadLine, WaiterPadLine.Quantity, MergeToWaiterPad);  //NPR5.55 [399170]
-                                                                                                                                   //-NPR5.55 [399170]-revoked
-                                                                                                                                   /*
-                                                                                                                                   MergeToWaiterPadLine.INIT;
-                                                                                                                                   MergeToWaiterPadLine.VALIDATE("Waiter Pad No.", MergeToWaiterPad."No.");
-                                                                                                                                   MergeToWaiterPadLine.INSERT(TRUE);
-
-                                                                                                                                   //-NPR5.53 [360258]-revoked
-                                                                                                                                   //MergeToWaiterPadLine."Sent To. Kitchen Print" := WaiterPadLine."Sent To. Kitchen Print";
-                                                                                                                                   //MergeToWaiterPadLine."Print Category" := WaiterPadLine."Print Category";
-                                                                                                                                   //+NPR5.53 [360258]-revoked
-                                                                                                                                   MergeToWaiterPadLine."Register No." := WaiterPadLine."Register No.";
-                                                                                                                                   MergeToWaiterPadLine."Start Date" := WaiterPadLine."Start Date";
-                                                                                                                                   MergeToWaiterPadLine."Start Time" := WaiterPadLine."Start Time";
-                                                                                                                                   MergeToWaiterPadLine.Type := WaiterPadLine.Type;
-                                                                                                                                   MergeToWaiterPadLine."No." := WaiterPadLine."No.";
-                                                                                                                                   MergeToWaiterPadLine.Description := WaiterPadLine.Description;
-                                                                                                                                   MergeToWaiterPadLine.Quantity := WaiterPadLine.Quantity;
-                                                                                                                                   MergeToWaiterPadLine."Sale Type" := WaiterPadLine."Sale Type";
-                                                                                                                                   MergeToWaiterPadLine."Description 2" := WaiterPadLine."Description 2";
-                                                                                                                                   MergeToWaiterPadLine."Variant Code" := WaiterPadLine."Variant Code";
-                                                                                                                                   MergeToWaiterPadLine."Order No. from Web" := WaiterPadLine."Order No. from Web";
-                                                                                                                                   MergeToWaiterPadLine."Order Line No. from Web" := WaiterPadLine."Order Line No. from Web";
-                                                                                                                                   MergeToWaiterPadLine."Unit Price" := WaiterPadLine."Unit Price";
-                                                                                                                                   MergeToWaiterPadLine."Discount Type" := WaiterPadLine."Discount Type";
-                                                                                                                                   MergeToWaiterPadLine."Discount Code" := WaiterPadLine."Discount Code";
-                                                                                                                                   MergeToWaiterPadLine."Allow Invoice Discount" := WaiterPadLine."Allow Invoice Discount";
-                                                                                                                                   MergeToWaiterPadLine."Allow Line Discount" := WaiterPadLine."Allow Line Discount";
-                                                                                                                                   MergeToWaiterPadLine."Discount %" := WaiterPadLine."Discount %";
-                                                                                                                                   MergeToWaiterPadLine."Discount Amount" := WaiterPadLine."Discount Amount";
-                                                                                                                                   MergeToWaiterPadLine."Invoice Discount Amount" := WaiterPadLine."Invoice Discount Amount";
-                                                                                                                                   MergeToWaiterPadLine."Currency Code" := WaiterPadLine."Currency Code";
-                                                                                                                                   MergeToWaiterPadLine."Unit of Measure Code" := WaiterPadLine."Unit of Measure Code";
-
-                                                                                                                                   MergeToWaiterPadLine.MODIFY(TRUE);
-
-                                                                                                                                   //-NPR5.53 [360258]
-                                                                                                                                   WPadLinePrintCategory.SETRANGE("Waiter Pad No.",WaiterPadLine."Waiter Pad No.");
-                                                                                                                                   WPadLinePrintCategory.SETRANGE("Waiter Pad Line No.",WaiterPadLine."Line No.");
-                                                                                                                                   IF WPadLinePrintCategory.FINDSET THEN
-                                                                                                                                     REPEAT
-                                                                                                                                       WPadLinePrintCategory2 := WPadLinePrintCategory;
-                                                                                                                                       WPadLinePrintCategory2."Waiter Pad No." := MergeToWaiterPadLine."Waiter Pad No.";
-                                                                                                                                       WPadLinePrintCategory2."Waiter Pad Line No." := MergeToWaiterPadLine."Line No.";
-                                                                                                                                       WPadLinePrintCategory2.INSERT;
-                                                                                                                                     UNTIL WPadLinePrintCategory.NEXT = 0;
-
-                                                                                                                                   WPadLinePrntLogEntry.SETCURRENTKEY("Waiter Pad No.","Waiter Pad Line No.");
-                                                                                                                                   WPadLinePrntLogEntry.SETRANGE("Waiter Pad No.",WaiterPadLine."Waiter Pad No.");
-                                                                                                                                   WPadLinePrntLogEntry.SETRANGE("Waiter Pad Line No.",WaiterPadLine."Line No.");
-                                                                                                                                   IF WPadLinePrntLogEntry.FINDSET THEN
-                                                                                                                                     REPEAT
-                                                                                                                                       WPadLinePrntLogEntry2 := WPadLinePrntLogEntry;
-                                                                                                                                       WPadLinePrntLogEntry2."Waiter Pad No." := MergeToWaiterPadLine."Waiter Pad No.";
-                                                                                                                                       WPadLinePrntLogEntry2."Waiter Pad Line No." := MergeToWaiterPadLine."Line No.";
-                                                                                                                                       WPadLinePrntLogEntry2.MODIFY;
-                                                                                                                                     UNTIL WPadLinePrntLogEntry.NEXT = 0;
-                                                                                                                                   //+NPR5.53 [360258]
-
-                                                                                                                                   WaiterPadLine.DELETE(TRUE);
-                                                                                                                                   */
-                                                                                                                                   //+NPR5.55 [399170]-revoked
+                NPHWaiterPadPOSManagement.SplitWaiterPadLine(WaiterPad, WaiterPadLine, WaiterPadLine.Quantity, MergeToWaiterPad);
             until (0 = WaiterPadLine.Next);
         end;
 
-        //-NPR5.55 [399170]-revoked
-        /*
-        //-NPR5.53 [380918]
-        WaiterPad."Number of Guests" := 0;
-        WaiterPad."Billed Number of Guests" := 0;
-        WaiterPad.MODIFY;
-        //+NPR5.53 [380918]
-        
-        NPHWaiterPadPOSManagement.CloseWaiterPad(WaiterPad);
-        */
-        //+NPR5.55 [399170]-revoked
-        CloseWaiterPad(WaiterPad, false);  //NPR5.55 [399170]
+        CloseWaiterPad(WaiterPad, false);
         exit(true);
 
     end;
@@ -283,7 +190,6 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
         Handled: Boolean;
         OK: Boolean;
     begin
-        //-NPR5.55 [399170]/[384923] (Function moved from CU6150660)
         SetupProxy.InitializeUsingWaiterPad(WaiterPad);
 
         OnBeforeCloseWaiterPad(WaiterPad, SetupProxy, ForceClose, Handled);
@@ -309,7 +215,6 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
 
         if OK then
             OnAfterCloseWaiterPad(WaiterPad);
-        //+NPR5.55 [399170]/[384923]
     end;
 
     procedure CloseWaiterPadSeatings(var WaiterPad: Record "NPR NPRE Waiter Pad"; SetupProxy: Codeunit "NPR NPRE Restaur. Setup Proxy")
@@ -317,7 +222,6 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
         SeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink";
         SeatingWaiterPadLink2: Record "NPR NPRE Seat.: WaiterPadLink";
     begin
-        //-NPR5.55 [399170]/[384923]
         SeatingWaiterPadLink.Reset;
         SeatingWaiterPadLink.SetRange("Waiter Pad No.", WaiterPad."No.");
         SeatingWaiterPadLink.SetRange(Closed, false);
@@ -325,7 +229,6 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
             repeat
                 CloseWaiterPadSeatingLink(SeatingWaiterPadLink, SetupProxy);
             until SeatingWaiterPadLink.Next = 0;
-        //+NPR5.55 [399170]/[384923]
     end;
 
     local procedure CloseWaiterPadSeatingLink(SeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink"; SetupProxy: Codeunit "NPR NPRE Restaur. Setup Proxy")
@@ -333,13 +236,11 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
         SeatingWaiterPadLink2: Record "NPR NPRE Seat.: WaiterPadLink";
         SeatingMgt: Codeunit "NPR NPRE Seating Mgt.";
     begin
-        //-NPR5.55 [399170]/[384923]
         SeatingWaiterPadLink2 := SeatingWaiterPadLink;
         SeatingWaiterPadLink2.Closed := true;
         SeatingWaiterPadLink2.Modify;
 
         SeatingMgt.TrySetSeatingIsCleared(SeatingWaiterPadLink2."Seating Code", SetupProxy);
-        //+NPR5.55 [399170]/[384923]
     end;
 
     local procedure CleanupWaiterPad(var WaiterPad: Record "NPR NPRE Waiter Pad")
@@ -347,7 +248,6 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
         WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
         POSInfoWaiterPadLink: Record "NPR POS Info NPRE Waiter Pad";
     begin
-        //-NPR5.55 [399170] (Function moved from CU6150660)
         WaiterPadLine.Reset;
         WaiterPadLine.SetRange("Waiter Pad No.", WaiterPad."No.");
         WaiterPadLine.SetFilter(Type, '<>%1', WaiterPadLine.Type::Comment);
@@ -362,14 +262,12 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
         POSInfoWaiterPadLink.DeleteAll;
 
         OnAfterWaiterPadCleanup(WaiterPad);
-        //+NPR5.55 [399170]
     end;
 
     local procedure WaiterPadCanBeClosed(WaiterPad: Record "NPR NPRE Waiter Pad"; SetupProxy: Codeunit "NPR NPRE Restaur. Setup Proxy"): Boolean
     var
         ServiceFlowProfile: Record "NPR NPRE Serv.Flow Profile";
     begin
-        //-NPR5.55 [399170]/[384923]
         SetupProxy.GetServiceFlowProfile(ServiceFlowProfile);
         case ServiceFlowProfile."Close Waiter Pad On" of
             ServiceFlowProfile."Close Waiter Pad On"::"Pre-Receipt":
@@ -388,14 +286,12 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
         end;
 
         exit(false);
-        //+NPR5.55 [399170]/[384923]
     end;
 
     local procedure WaiterPadSeatingsCanBeClosed(WaiterPad: Record "NPR NPRE Waiter Pad"; SetupProxy: Codeunit "NPR NPRE Restaur. Setup Proxy"): Boolean
     var
         ServiceFlowProfile: Record "NPR NPRE Serv.Flow Profile";
     begin
-        //-NPR5.55 [399170]/[384923]
         SetupProxy.GetServiceFlowProfile(ServiceFlowProfile);
         case ServiceFlowProfile."Clear Seating On" of
             ServiceFlowProfile."Clear Seating On"::"Waiter Pad Close":
@@ -410,14 +306,12 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
         end;
 
         exit(false);
-        //+NPR5.55 [399170]/[384923]
     end;
 
     local procedure WPIsPaid(WaiterPad: Record "NPR NPRE Waiter Pad"): Boolean
     var
         WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
     begin
-        //-NPR5.55 [399170]
         WaiterPadLine.SetRange("Waiter Pad No.", WaiterPad."No.");
         if WaiterPadLine.FindSet then
             repeat
@@ -426,7 +320,6 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
             until WaiterPadLine.Next = 0;
 
         exit(true);
-        //+NPR5.55 [399170]
     end;
 
     local procedure WPIsServed(WaiterPad: Record "NPR NPRE Waiter Pad"; SetupProxy: Codeunit "NPR NPRE Restaur. Setup Proxy"): Boolean
@@ -441,7 +334,6 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
         KitchenOrderMgt: Codeunit "NPR NPRE Kitchen Order Mgt.";
         RestPrint: Codeunit "NPR NPRE Restaurant Print";
     begin
-        //-#NPR5.55 [384923]
         if not SetupProxy.KDSActivated() then
             exit(true);
 
@@ -475,12 +367,10 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
             until WPadLineBuffer.Next = 0;
 
         exit(true);
-        //+NPR5.55 [384923]
     end;
 
     procedure MoveNumberOfGuests(var FromWaiterPad: Record "NPR NPRE Waiter Pad"; var ToWaiterPad: Record "NPR NPRE Waiter Pad"; NumberOfGuests: Integer)
     begin
-        //-NPR5.55 [399170]
         ToWaiterPad."Number of Guests" := NumberOfGuests;
         if ToWaiterPad."Number of Guests" < 0 then
             ToWaiterPad."Number of Guests" := 0;
@@ -496,7 +386,6 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
         if FromWaiterPad."Billed Number of Guests" < 0 then
             FromWaiterPad."Billed Number of Guests" := 0;
         FromWaiterPad.Modify;
-        //+NPR5.55 [399170]
     end;
 
     procedure AssignedPrintCategoriesAsFilterString(AppliesToRecID: RecordID; OnlyForServingStepFilter: Text): Text
@@ -506,7 +395,6 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
         AssignedPrintCategories: Text;
         Include: Boolean;
     begin
-        //-NPR5.55 [382428]
         FilterAssignedPrintCategories(AppliesToRecID, AssignedPrintCategory);
         AssignedPrintCategory.SetFilter("Print/Prod. Category Code", '<>%1', '');
         if not AssignedPrintCategory.FindSet then
@@ -531,23 +419,19 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
             end;
         until AssignedPrintCategory.Next = 0;
         exit(AssignedPrintCategories);
-        //+NPR5.55 [382428]
     end;
 
     procedure FilterAssignedPrintCategories(AppliesToRecID: RecordID; var AssignedPrintCategory: Record "NPR NPRE Assign. Print Cat.")
     begin
-        //-NPR5.55 [382428]
         AssignedPrintCategory.Reset;
         AssignedPrintCategory.SetRange("Table No.", AppliesToRecID.TableNo);
         AssignedPrintCategory.SetRange("Record ID", AppliesToRecID);
-        //+NPR5.55 [382428]
     end;
 
     procedure AssignedFlowStatusesAsFilterString(AppliesToRecID: RecordID; StatusObject: Option; var AssignedFlowStatus: Record "NPR NPRE Assigned Flow Status"): Text
     var
         AssignedFlowStatuses: Text;
     begin
-        //-NPR5.55 [382428]
         FilterAssignedFlowStatuses(AppliesToRecID, StatusObject, AssignedFlowStatus);
         AssignedFlowStatus.SetFilter("Flow Status Code", '<>%1', '');
         if not AssignedFlowStatus.FindSet then
@@ -559,17 +443,14 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
             AssignedFlowStatuses := AssignedFlowStatuses + StrSubstNo(InQuotes, AssignedFlowStatus."Flow Status Code");
         until AssignedFlowStatus.Next = 0;
         exit(AssignedFlowStatuses);
-        //+NPR5.55 [382428]
     end;
 
     procedure FilterAssignedFlowStatuses(AppliesToRecID: RecordID; StatusObject: Option; var AssignedFlowStatus: Record "NPR NPRE Assigned Flow Status")
     begin
-        //-NPR5.55 [382428]
         AssignedFlowStatus.Reset;
         AssignedFlowStatus.SetRange("Table No.", AppliesToRecID.TableNo);
         AssignedFlowStatus.SetRange("Record ID", AppliesToRecID);
         AssignedFlowStatus.SetRange("Flow Status Object", StatusObject);
-        //+NPR5.55 [382428]
     end;
 
     procedure SelectPrintCategories(AppliesToRecID: RecordID)
@@ -581,7 +462,6 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
         PrintCategoryList: Page "NPR NPRE Slct Prnt Cat.";
         Handled: Boolean;
     begin
-        //-NPR5.55 [360258]/[382428]
         PrintCategory.Reset;
 
         FilterAssignedPrintCategories(AppliesToRecID, AssignedPrintCategory);
@@ -640,7 +520,6 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
 
         AssignedFlowStatusTmp.Reset;
         AssignedFlowStatusTmp.DeleteAll;
-        //+NPR5.55 [360258]/[382428]
     end;
 
     procedure AssignWPadLinePrintCategories(WaiterPadLine: Record "NPR NPRE Waiter Pad Line"; RemoveExisting: Boolean)
@@ -654,8 +533,6 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
         SetupProxy: Codeunit "NPR NPRE Restaur. Setup Proxy";
         Handled: Boolean;
     begin
-        //-NPR5.55 [399170]/[382428]
-        //(Moved from CU6150660)
         OnBeforeAssignWPadLinePrintCategories(WaiterPadLine, RemoveExisting, Handled);
         if Handled then
             exit;
@@ -688,32 +565,25 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
                     CopyAssignedFlowStatuses(ItemRoutingProfile.RecordId, WaiterPadLine.RecordId, FlowStatus."Status Object"::WaiterPadLineMealFlow);
                 end;
         end;
-        //+NPR5.55 [399170]/[382428]
     end;
 
     procedure AddAssignedPrintCategory(AppliesToRecID: RecordID; PrintCategory: Record "NPR NPRE Print/Prod. Cat."; var NewAssignedPrintCategory: Record "NPR NPRE Assign. Print Cat.")
     begin
-        //-NPR5.55 [399170]/[382428]
-        //(Moved from CU6150660)
         NewAssignedPrintCategory.Init;
         NewAssignedPrintCategory."Table No." := AppliesToRecID.TableNo;
         NewAssignedPrintCategory."Record ID" := AppliesToRecID;
         NewAssignedPrintCategory."Print/Prod. Category Code" := PrintCategory.Code;
         if not NewAssignedPrintCategory.Find then
             NewAssignedPrintCategory.Insert;
-        //+NPR5.55 [399170]/[382428]
     end;
 
     procedure ClearAssignedPrintCategories(AppliesToRecID: RecordID)
     var
         AssignedPrintCategory: Record "NPR NPRE Assign. Print Cat.";
     begin
-        //-NPR5.55 [399170]/[382428]
-        //(Moved from CU6150660)
         FilterAssignedPrintCategories(AppliesToRecID, AssignedPrintCategory);
         if not AssignedPrintCategory.IsEmpty then
             AssignedPrintCategory.DeleteAll(true);
-        //+NPR5.55 [399170]/[382428]
     end;
 
     procedure CopyAssignedPrintCategories(FromRecID: RecordID; ToRecID: RecordID)
@@ -724,7 +594,6 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
         FlowStatus: Record "NPR NPRE Flow Status";
         PrintCategory: Record "NPR NPRE Print/Prod. Cat.";
     begin
-        //-NPR5.55 [399170]/[382428]
         ClearAssignedPrintCategories(ToRecID);
         FilterAssignedPrintCategories(FromRecID, AssignedPrintCategory);
         if AssignedPrintCategory.FindSet then
@@ -740,15 +609,12 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
                         until AssignedFlowStatus.Next = 0;
                 end;
             until AssignedPrintCategory.Next = 0;
-        //+NPR5.55 [399170]/[382428]
     end;
 
     procedure MoveAssignedPrintCategories(FromRecId: RecordID; ToRecId: RecordID)
     begin
-        //-NPR5.55 [382428]
         CopyAssignedPrintCategories(FromRecId, ToRecId);
         ClearAssignedPrintCategories(FromRecId);
-        //+NPR5.55 [382428]
     end;
 
     procedure SelectFlowStatuses(AppliesToRecID: RecordID; StatusObject: Option; var AssignedFlowStatus: Record "NPR NPRE Assigned Flow Status")
@@ -757,7 +623,6 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
         FlowStatusList: Page "NPR NPRE Select Flow Status";
         Handled: Boolean;
     begin
-        //-NPR5.55 [382428]
         FlowStatus.Reset;
         FlowStatus.FilterGroup(2);
         FlowStatus.SetRange("Status Object", StatusObject);
@@ -809,7 +674,6 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
         end;
 
         OnAfterSelectFlowStatuses(AppliesToRecID, StatusObject, FlowStatus, Handled);
-        //+NPR5.55 [382428]
     end;
 
     procedure AssignWPadLineServingStepsFromPrintCategories(WaiterPadLine: Record "NPR NPRE Waiter Pad Line"; RemoveExisting: Boolean)
@@ -818,7 +682,6 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
         FlowStatus: Record "NPR NPRE Flow Status";
         Handled: Boolean;
     begin
-        //-NPR5.55 [382428]
         if RemoveExisting then
             ClearAssignedFlowStatuses(WaiterPadLine.RecordId, FlowStatus."Status Object"::WaiterPadLineMealFlow);
 
@@ -837,14 +700,12 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
                     until AssignedPrintCategory.Next = 0;
                 end;
             until FlowStatus.Next = 0;
-        //+NPR5.55 [382428]
     end;
 
     procedure AddAssignedFlowStatus(AppliesToRecID: RecordID; FlowStatus: Record "NPR NPRE Flow Status")
     var
         AssignedFlowStatus: Record "NPR NPRE Assigned Flow Status";
     begin
-        //-NPR5.55 [382428]
         AssignedFlowStatus.Init;
         AssignedFlowStatus."Table No." := AppliesToRecID.TableNo;
         AssignedFlowStatus."Record ID" := AppliesToRecID;
@@ -852,18 +713,15 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
         AssignedFlowStatus."Flow Status Code" := FlowStatus.Code;
         if not AssignedFlowStatus.Find then
             AssignedFlowStatus.Insert;
-        //+NPR5.55 [382428]
     end;
 
     procedure ClearAssignedFlowStatuses(AppliesToRecID: RecordID; StatusObject: Option)
     var
         AssignedFlowStatus: Record "NPR NPRE Assigned Flow Status";
     begin
-        //-NPR5.55 [382428]
         FilterAssignedFlowStatuses(AppliesToRecID, StatusObject, AssignedFlowStatus);
         if not AssignedFlowStatus.IsEmpty then
             AssignedFlowStatus.DeleteAll(true);
-        //+NPR5.55 [382428]
     end;
 
     procedure CopyAssignedFlowStatuses(FromRecId: RecordID; ToRecId: RecordID; StatusObject: Option)
@@ -871,7 +729,6 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
         FlowStatus: Record "NPR NPRE Flow Status";
         AssignedFlowStatus: Record "NPR NPRE Assigned Flow Status";
     begin
-        //-NPR5.55 [382428]
         ClearAssignedFlowStatuses(ToRecId, StatusObject);
         FilterAssignedFlowStatuses(FromRecId, StatusObject, AssignedFlowStatus);
         if AssignedFlowStatus.FindSet then
@@ -879,63 +736,51 @@ codeunit 6150663 "NPR NPRE Waiter Pad Mgt."
                 if FlowStatus.Get(AssignedFlowStatus."Flow Status Code", AssignedFlowStatus."Flow Status Object") then
                     AddAssignedFlowStatus(ToRecId, FlowStatus);
             until AssignedFlowStatus.Next = 0;
-        //+NPR5.55 [382428]
     end;
 
     procedure MoveAssignedFlowStatuses(FromRecId: RecordID; ToRecId: RecordID; StatusObject: Option)
     begin
-        //-NPR5.55 [382428]
         CopyAssignedFlowStatuses(FromRecId, ToRecId, StatusObject);
         ClearAssignedFlowStatuses(FromRecId, StatusObject);
-        //+NPR5.55 [382428]
     end;
 
     [IntegrationEvent(TRUE, false)]
     procedure OnBeforeAssignWPadLinePrintCategories(var WaiterPadLine: Record "NPR NPRE Waiter Pad Line"; RemoveExisting: Boolean; var Handled: Boolean)
     begin
-        //NPR5.55 [399170] (Moved from CU6150660)
     end;
 
     [IntegrationEvent(false, false)]
     procedure OnBeforeSelectPrintCategories(AppliesToRecID: RecordID; var PrintCategory: Record "NPR NPRE Print/Prod. Cat."; var Handled: Boolean)
     begin
-        //NPR5.55 [360258]
     end;
 
     [IntegrationEvent(false, false)]
     procedure OnAfterSelectPrintCategories(AppliesToRecID: RecordID; var PrintCategory: Record "NPR NPRE Print/Prod. Cat."; var Handled: Boolean)
     begin
-        //NPR5.55 [360258]
     end;
 
     [IntegrationEvent(false, false)]
     procedure OnBeforeSelectFlowStatuses(AppliesToRecID: RecordID; StatusObject: Option; var FlowStatus: Record "NPR NPRE Flow Status"; var Handled: Boolean)
     begin
-        //NPR5.55 [382428]
     end;
 
     [IntegrationEvent(false, false)]
     procedure OnAfterSelectFlowStatuses(AppliesToRecID: RecordID; StatusObject: Option; var FlowStatus: Record "NPR NPRE Flow Status"; var Handled: Boolean)
     begin
-        //NPR5.55 [382428]
     end;
 
     [IntegrationEvent(false, false)]
     procedure OnBeforeCloseWaiterPad(var WaiterPad: Record "NPR NPRE Waiter Pad"; SetupProxy: Codeunit "NPR NPRE Restaur. Setup Proxy"; var ForceClose: Boolean; var Handled: Boolean)
     begin
-        //NPR5.55 [399170]
     end;
 
     [IntegrationEvent(false, false)]
     procedure OnAfterCloseWaiterPad(var WaiterPad: Record "NPR NPRE Waiter Pad")
     begin
-        //NPR5.55 [399170]
     end;
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterWaiterPadCleanup(var WaiterPad: Record "NPR NPRE Waiter Pad")
     begin
-        //NPR5.55 [399170]
     end;
 }
-

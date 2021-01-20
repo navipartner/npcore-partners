@@ -1,11 +1,5 @@
 table 6150665 "NPR NPRE Seating"
 {
-    // NPR5.34/ANEN/2017012  CASE 270255 Object Created for Hospitality - Version 1.0
-    // NPR5.34/ANEN/20170717 CASE 262628 Added support for status (fld "Status", "Status Description")
-    // NPR5.35/ANEN/20170821 CASE 283376 Solution rename to NP Restaurant
-    // NPR5.53/ALPO/20191210 CASE 380609 Dimensions: NPRE Seating integration
-    // NPR5.55/ALPO/20200615 CASE 399170 Restaurant flow change: support for waiter pad related manipulations directly inside a POS sale
-
     Caption = 'Seating';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR NPRE Seating List";
@@ -47,7 +41,7 @@ table 6150665 "NPR NPRE Seating"
         }
         field(31; "Status Description FF"; Text[50])
         {
-            CalcFormula = Lookup ("NPR NPRE Flow Status".Description WHERE(Code = FIELD(Status)));
+            CalcFormula = Lookup("NPR NPRE Flow Status".Description WHERE(Code = FIELD(Status)));
             Caption = 'Status Description';
             FieldClass = FlowField;
         }
@@ -60,7 +54,7 @@ table 6150665 "NPR NPRE Seating"
 
             trigger OnValidate()
             begin
-                ValidateShortcutDimCode(1, "Global Dimension 1 Code");  //NPR5.53 [380609]
+                ValidateShortcutDimCode(1, "Global Dimension 1 Code");
             end;
         }
         field(41; "Global Dimension 2 Code"; Code[20])
@@ -72,7 +66,7 @@ table 6150665 "NPR NPRE Seating"
 
             trigger OnValidate()
             begin
-                ValidateShortcutDimCode(2, "Global Dimension 2 Code");  //NPR5.53 [380609]
+                ValidateShortcutDimCode(2, "Global Dimension 2 Code");
             end;
         }
         field(50; Blocked; Boolean)
@@ -89,14 +83,14 @@ table 6150665 "NPR NPRE Seating"
         }
         field(100; "Current Waiter Pad FF"; Code[20])
         {
-            CalcFormula = Lookup ("NPR NPRE Seat.: WaiterPadLink"."Waiter Pad No." WHERE("Seating Code" = FIELD(Code),
+            CalcFormula = Lookup("NPR NPRE Seat.: WaiterPadLink"."Waiter Pad No." WHERE("Seating Code" = FIELD(Code),
                                                                                           Closed = CONST(false)));
             Caption = 'Current Waiter Pad';
             FieldClass = FlowField;
         }
         field(101; "Multiple Waiter Pad FF"; Integer)
         {
-            CalcFormula = Count ("NPR NPRE Seat.: WaiterPadLink" WHERE("Seating Code" = FIELD(Code),
+            CalcFormula = Count("NPR NPRE Seat.: WaiterPadLink" WHERE("Seating Code" = FIELD(Code),
                                                                         Closed = CONST(false)));
             Caption = 'Multiple Waiter Pad';
             FieldClass = FlowField;
@@ -115,23 +109,17 @@ table 6150665 "NPR NPRE Seating"
         }
     }
 
-    fieldgroups
-    {
-    }
-
     trigger OnDelete()
     begin
-        DimMgt.DeleteDefaultDim(DATABASE::"NPR NPRE Seating", Code);  //NPR5.53 [380609]
+        DimMgt.DeleteDefaultDim(DATABASE::"NPR NPRE Seating", Code);
     end;
 
     trigger OnInsert()
     begin
         UpdateCurrentWaiterPadDescription;
-        //-NPR5.53 [380609]
         DimMgt.UpdateDefaultDim(
           DATABASE::"NPR NPRE Seating", Code,
           "Global Dimension 1 Code", "Global Dimension 2 Code");
-        //+NPR5.53 [380609]
     end;
 
     trigger OnModify()
@@ -157,11 +145,8 @@ table 6150665 "NPR NPRE Seating"
 
     local procedure ValidateShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
     begin
-        //-NPR5.53 [380609]
         DimMgt.ValidateDimValueCode(FieldNumber, ShortcutDimCode);
         DimMgt.SaveDefaultDim(DATABASE::"NPR NPRE Seating", Code, FieldNumber, ShortcutDimCode);
         Modify;
-        //+NPR5.53 [380609]
     end;
 }
-

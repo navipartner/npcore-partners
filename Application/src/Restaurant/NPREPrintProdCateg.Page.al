@@ -1,7 +1,5 @@
 page 6150680 "NPR NPRE Print/Prod. Categ."
 {
-    // NPR5.55/ALPO/20200708 CASE 382428 Kitchen Display System (KDS) for NP Restaurant (further enhancements)
-
     Caption = 'Print/Prod. Categories';
     DataCaptionExpression = '';
     DelayedInsert = true;
@@ -16,17 +14,17 @@ page 6150680 "NPR NPRE Print/Prod. Categ."
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Print Tag"; "Print Tag")
+                field("Print Tag"; Rec."Print Tag")
                 {
                     ApplicationArea = All;
                     Visible = ShowPrintTags;
@@ -34,10 +32,6 @@ page 6150680 "NPR NPRE Print/Prod. Categ."
                 }
             }
         }
-    }
-
-    actions
-    {
     }
 
     trigger OnOpenPage()
@@ -52,4 +46,3 @@ page 6150680 "NPR NPRE Print/Prod. Categ."
     var
         ShowPrintTags: Boolean;
 }
-

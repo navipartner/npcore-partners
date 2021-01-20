@@ -1,9 +1,5 @@
 table 6150672 "NPR NPRE W.Pad.Line Outp.Buf."
 {
-    // NPR5.53/ALPO/20200102 CASE 360258 Possibility to send to kitchen only selected waiter pad lines or lines of specific print category
-    // NPR5.55/ALPO/20200708 CASE 382428 Kitchen Display System (KDS) for NP Restaurant (further enhancements)
-    //                                   - fields Output Type, "Serving Step" added to primary key
-
     Caption = 'Waiter Pad Line Output Buffer';
     DataClassification = CustomerContent;
 
@@ -56,9 +52,4 @@ table 6150672 "NPR NPRE W.Pad.Line Outp.Buf."
         {
         }
     }
-
-    fieldgroups
-    {
-    }
 }
-

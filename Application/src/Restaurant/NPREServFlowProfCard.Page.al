@@ -1,12 +1,9 @@
 page 6150695 "NPR NPRE Serv. Flow Prof. Card"
 {
-    // NPR5.55/ALPO/20200615 CASE 399170 Restaurant flow change: support for waiter pad related manipulations directly inside a POS sale
-
     Caption = 'Rest. Service Flow Profile Card';
     PageType = Card;
-    UsageCategory = Administration;
-    ApplicationArea = All;
     SourceTable = "NPR NPRE Serv.Flow Profile";
+    UsageCategory = None;
 
     layout
     {
@@ -15,27 +12,27 @@ page 6150695 "NPR NPRE Serv. Flow Prof. Card"
             group(General)
             {
                 Caption = 'General';
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Close Waiter Pad On"; "Close Waiter Pad On")
+                field("Close Waiter Pad On"; Rec."Close Waiter Pad On")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Close Waiter Pad On field';
                 }
-                field("Clear Seating On"; "Clear Seating On")
+                field("Clear Seating On"; Rec."Clear Seating On")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Clear Seating On field';
                 }
-                field("Seating Status after Clearing"; "Seating Status after Clearing")
+                field("Seating Status after Clearing"; Rec."Seating Status after Clearing")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Seating Status after Clearing field';
@@ -55,9 +52,4 @@ page 6150695 "NPR NPRE Serv. Flow Prof. Card"
             }
         }
     }
-
-    actions
-    {
-    }
 }
-

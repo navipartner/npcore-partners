@@ -18,70 +18,68 @@ codeunit 6150665 "NPR NPRE POSAction: New Wa."
         exit('1.1');
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
-        with Sender do begin
-            if DiscoverAction(
-              ActionCode(),
-              Text000,
-              ActionVersion(),
-              Type::Generic,
-              "Subscriber Instances Allowed"::Multiple)
-            then begin
-                RegisterWorkflowStep('addPresetValuesToContext', 'respond();');
-                RegisterWorkflowStep('seatingInput',
-                  'if (param.FixedSeatingCode) {' +
-                  '  context.seatingCode = param.FixedSeatingCode;' +
-                  '  respond();' +
-                  '} else {' +
-                  '  switch(param.InputType + "") {' +
-                  '    case "0":' +
-                  '      stringpad(labels["InputTypeLabel"]).respond("seatingCode").cancel(abort);' +
-                  '      break;' +
-                  '    case "1":' +
-                  '      intpad(labels["InputTypeLabel"]).respond("seatingCode").cancel(abort);' +
-                  '      break;' +
-                  '    case "2":' +
-                  '      respond();' +
-                  '      break;' +
-                  '  }' +
-                  '}'
-                );
-                RegisterWorkflowStep('confirmNewWaiterPad',
-                  'if (context.confirmString) {' +
-                    'confirm(labels["ConfirmLabel"], context.confirmString, true, true).no(abort);' +
-                  '}'
-                );
-                RegisterWorkflowStep('SetNumberOfGuests',
-                  'if (param.AskForNumberOfGuests) {' +
-                  '  intpad(labels["NumberOfGuestsLabel"]).respond("numberOfGuests").cancel(abort);' +
-                  '}'
-                );
-                RegisterWorkflowStep('newWaiterPad',
-                  'if (context.seatingCode) {' +
-                  '  respond();' +
-                  '}'
-                );
-                RegisterWorkflowStep('actionMessage',
-                  'if (context.actionMessage) {' +
-                  '  message(labels["ActionMessageLabel"], context.actionMessage);' +
-                  '}'
-                );
-                RegisterWorkflow(false);
-                RegisterDataSourceBinding(ThisDataSource);
+        if Sender.DiscoverAction(
+          ActionCode(),
+          Text000,
+          ActionVersion(),
+          Sender.Type::Generic,
+          Sender."Subscriber Instances Allowed"::Multiple)
+        then begin
+            Sender.RegisterWorkflowStep('addPresetValuesToContext', 'respond();');
+            Sender.RegisterWorkflowStep('seatingInput',
+              'if (param.FixedSeatingCode) {' +
+              '  context.seatingCode = param.FixedSeatingCode;' +
+              '  respond();' +
+              '} else {' +
+              '  switch(param.InputType + "") {' +
+              '    case "0":' +
+              '      stringpad(labels["InputTypeLabel"]).respond("seatingCode").cancel(abort);' +
+              '      break;' +
+              '    case "1":' +
+              '      intpad(labels["InputTypeLabel"]).respond("seatingCode").cancel(abort);' +
+              '      break;' +
+              '    case "2":' +
+              '      respond();' +
+              '      break;' +
+              '  }' +
+              '}'
+            );
+            Sender.RegisterWorkflowStep('confirmNewWaiterPad',
+              'if (context.confirmString) {' +
+                'confirm(labels["ConfirmLabel"], context.confirmString, true, true).no(abort);' +
+              '}'
+            );
+            Sender.RegisterWorkflowStep('SetNumberOfGuests',
+              'if (param.AskForNumberOfGuests) {' +
+              '  intpad(labels["NumberOfGuestsLabel"]).respond("numberOfGuests").cancel(abort);' +
+              '}'
+            );
+            Sender.RegisterWorkflowStep('newWaiterPad',
+              'if (context.seatingCode) {' +
+              '  respond();' +
+              '}'
+            );
+            Sender.RegisterWorkflowStep('actionMessage',
+              'if (context.actionMessage) {' +
+              '  message(labels["ActionMessageLabel"], context.actionMessage);' +
+              '}'
+            );
+            Sender.RegisterWorkflow(false);
+            Sender.RegisterDataSourceBinding(ThisDataSource);
 
-                RegisterOptionParameter('InputType', 'stringPad,intPad,List', 'stringPad');
-                RegisterTextParameter('FixedSeatingCode', '');
-                RegisterTextParameter('SeatingFilter', '');
-                RegisterTextParameter('LocationFilter', '');
-                RegisterBooleanParameter('OpenWaiterPad', false);
-                RegisterBooleanParameter('AskForNumberOfGuests', false);
-            end;
+            Sender.RegisterOptionParameter('InputType', 'stringPad,intPad,List', 'stringPad');
+            Sender.RegisterTextParameter('FixedSeatingCode', '');
+            Sender.RegisterTextParameter('SeatingFilter', '');
+            Sender.RegisterTextParameter('LocationFilter', '');
+            Sender.RegisterBooleanParameter('OpenWaiterPad', false);
+            Sender.RegisterBooleanParameter('AskForNumberOfGuests', false);
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS UI Management", 'OnInitializeCaptions', '', true, true)]
     local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
     var
         NPRESeating: Record "NPR NPRE Seating";
@@ -92,7 +90,7 @@ codeunit 6150665 "NPR NPRE POSAction: New Wa."
         Captions.AddActionCaption(ActionCode(), 'NumberOfGuestsLabel', NumberOfGuestsLbl);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', false, false)]
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         JSON: Codeunit "NPR POS JSON Management";
@@ -213,10 +211,6 @@ codeunit 6150665 "NPR NPRE POSAction: New Wa."
         exit(ConfirmString);
     end;
 
-    procedure "//Data Source Extension"()
-    begin
-    end;
-
     local procedure ThisDataSource(): Text
     begin
         exit('BUILTIN_SALE');
@@ -227,7 +221,7 @@ codeunit 6150665 "NPR NPRE POSAction: New Wa."
         exit('NPRE');
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnDiscoverDataSourceExtensions', '', true, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnDiscoverDataSourceExtensions', '', true, false)]
     local procedure OnDiscoverDataSourceExtension(DataSourceName: Text; Extensions: List of [Text])
     begin
         if ThisDataSource <> DataSourceName then
@@ -236,7 +230,7 @@ codeunit 6150665 "NPR NPRE POSAction: New Wa."
         Extensions.Add(ThisExtension);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnGetDataSourceExtension', '', true, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnGetDataSourceExtension', '', true, false)]
     local procedure OnGetDataSourceExtension(DataSourceName: Text; ExtensionName: Text; var DataSource: Codeunit "NPR Data Source"; var Handled: Boolean; Setup: Codeunit "NPR POS Setup")
     var
         DataType: Enum "NPR Data Type";
@@ -250,7 +244,7 @@ codeunit 6150665 "NPR NPRE POSAction: New Wa."
         DataSource.AddColumn('WaiterPadNo', 'Pre-selected Waiter Pad No.', DataType::String, true);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnDataSourceExtensionReadData', '', true, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnDataSourceExtensionReadData', '', true, false)]
     local procedure OnDataSourceExtensionReadData(DataSourceName: Text; ExtensionName: Text; var RecRef: RecordRef; DataRow: Codeunit "NPR Data Row"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         SalePOS: Record "NPR Sale POS";

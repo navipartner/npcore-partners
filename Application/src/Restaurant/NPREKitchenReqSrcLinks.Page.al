@@ -1,6 +1,5 @@
 page 6150697 "NPR NPRE Kitchen Req.Src.Links"
 {
-    // NPR5.55/ALPO/20200708 CASE 382428 Kitchen Display System (KDS) for NP Restaurant (further enhancements)
 
     Caption = 'Kitchen Request Source Links';
     Editable = false;
@@ -15,59 +14,59 @@ page 6150697 "NPR NPRE Kitchen Req.Src.Links"
         {
             repeater(Group)
             {
-                field("Request No."; "Request No.")
+                field("Request No."; Rec."Request No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Request No. field';
                 }
-                field("Source Document Type"; "Source Document Type")
+                field("Source Document Type"; Rec."Source Document Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Source Document Type field';
                 }
-                field("Source Document Subtype"; "Source Document Subtype")
+                field("Source Document Subtype"; Rec."Source Document Subtype")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Source Document Subtype field';
                 }
-                field("Source Document No."; "Source Document No.")
+                field("Source Document No."; Rec."Source Document No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Source Document No. field';
                 }
-                field("Source Document Line No."; "Source Document Line No.")
+                field("Source Document Line No."; Rec."Source Document Line No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Source Document Line No. field';
                 }
-                field(Quantity; Quantity)
+                field(Quantity; Rec.Quantity)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Quantity field';
                 }
-                field("Quantity (Base)"; "Quantity (Base)")
+                field("Quantity (Base)"; Rec."Quantity (Base)")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Quantity (Base) field';
                 }
-                field(Context; Context)
+                field(Context; Rec.Context)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Context field';
                 }
-                field("Serving Step"; "Serving Step")
+                field("Serving Step"; Rec."Serving Step")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Serving Step field';
                 }
-                field("Created Date-Time"; "Created Date-Time")
+                field("Created Date-Time"; Rec."Created Date-Time")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Created Date-Time field';
                 }
-                field("Entry No."; "Entry No.")
+                field("Entry No."; Rec."Entry No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Entry No. field';
@@ -75,9 +74,4 @@ page 6150697 "NPR NPRE Kitchen Req.Src.Links"
             }
         }
     }
-
-    actions
-    {
-    }
 }
-

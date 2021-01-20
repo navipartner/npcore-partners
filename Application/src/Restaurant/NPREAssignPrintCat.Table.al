@@ -1,7 +1,5 @@
 table 6150670 "NPR NPRE Assign. Print Cat."
 {
-    // NPR5.55/ALPO/20200708 CASE 382428 Kitchen Display System (KDS) for NP Restaurant (further enhancements)
-
     Caption = 'Assigned Print Category';
     DataClassification = CustomerContent;
 
@@ -33,10 +31,6 @@ table 6150670 "NPR NPRE Assign. Print Cat."
         }
     }
 
-    fieldgroups
-    {
-    }
-
     trigger OnDelete()
     begin
         WaiterPadMgt.ClearAssignedFlowStatuses(RecordId, FlowStatus."Status Object"::WaiterPadLineMealFlow);
@@ -51,4 +45,3 @@ table 6150670 "NPR NPRE Assign. Print Cat."
         FlowStatus: Record "NPR NPRE Flow Status";
         WaiterPadMgt: Codeunit "NPR NPRE Waiter Pad Mgt.";
 }
-
