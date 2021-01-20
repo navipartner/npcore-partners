@@ -46,7 +46,7 @@ table 6151249 "NPR Trail. Purch. Orders Setup"
         field(7; "Latest Order Document Date"; Date)
         {
             AccessByPermission = TableData "Sales Shipment Header" = R;
-            CalcFormula = Max ("Sales Header"."Document Date" WHERE("Document Type" = CONST(Order)));
+            CalcFormula = Max("Sales Header"."Document Date" WHERE("Document Type" = CONST(Order)));
             Caption = 'Latest Order Document Date';
             FieldClass = FlowField;
         }
@@ -57,10 +57,6 @@ table 6151249 "NPR Trail. Purch. Orders Setup"
         key(Key1; "User ID")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 
     var

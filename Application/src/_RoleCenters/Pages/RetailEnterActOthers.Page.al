@@ -1,13 +1,10 @@
 page 6151251 "NPR Retail Enter. Act: Others"
 {
-    // #343621/ZESO/20190725  CASE 343621 Object created.
-
     Caption = 'Activities';
     PageType = CardPart;
-    UsageCategory = Administration;
-    ApplicationArea = All;
     RefreshOnActivate = true;
     SourceTable = "NPR Retail Entertainment Cue";
+    UsageCategory = None;
 
     layout
     {
@@ -16,17 +13,17 @@ page 6151251 "NPR Retail Enter. Act: Others"
             cuegroup("Master Data")
             {
                 Caption = 'Master Data';
-                field(Items; Items)
+                field(Items; Rec.Items)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Items field';
                 }
-                field(Contacts; Contacts)
+                field(Contacts; Rec.Contacts)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Contacts field';
                 }
-                field(Customers; Customers)
+                field(Customers; Rec.Customers)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Customers field';
@@ -35,16 +32,12 @@ page 6151251 "NPR Retail Enter. Act: Others"
         }
     }
 
-    actions
-    {
-    }
-
     trigger OnOpenPage()
     begin
-        Reset;
-        if not Get then begin
-            Init;
-            Insert;
+        Rec.Reset;
+        if not Rec.Get then begin
+            Rec.Init;
+            Rec.Insert;
         end;
     end;
 }

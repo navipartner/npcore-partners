@@ -1,18 +1,14 @@
 page 6151258 "NPR Top 10 Vendors"
 {
-    // #369128/YAHA/20191113 CASE 369128 Created page Top 10 Vendors
-
     Caption = 'Top 10 Vendors';
     CardPageID = "Vendor Card";
     Editable = true;
     PageType = ListPart;
-    UsageCategory = Administration;
-    ApplicationArea = All;
     SourceTable = Vendor;
     SourceTableTemporary = true;
     SourceTableView = SORTING("Search Name")
                       ORDER(Descending);
-
+    UsageCategory = None;
     layout
     {
         area(content)
@@ -48,7 +44,7 @@ page 6151258 "NPR Top 10 Vendors"
                 ShowCaption = false;
                 repeater(Group)
                 {
-                    field("No."; "No.")
+                    field("No."; Rec."No.")
                     {
                         ApplicationArea = All;
                         Editable = false;
@@ -60,19 +56,19 @@ page 6151258 "NPR Top 10 Vendors"
                             PAGE.Run(PAGE::"Customer Card", Cust);
                         end;
                     }
-                    field(Name; Name)
+                    field(Name; Rec.Name)
                     {
                         ApplicationArea = All;
                         Editable = false;
                         ToolTip = 'Specifies the value of the Name field';
                     }
-                    field("Phone No."; "Phone No.")
+                    field("Phone No."; Rec."Phone No.")
                     {
                         ApplicationArea = All;
                         Editable = false;
                         ToolTip = 'Specifies the value of the Phone No. field';
                     }
-                    field("Sales (LCY)"; "NPR Sales (LCY)")
+                    field("Sales (LCY)"; Rec."NPR Sales (LCY)")
                     {
                         ApplicationArea = All;
                         BlankZero = true;
@@ -188,18 +184,18 @@ page 6151258 "NPR Top 10 Vendors"
 
     local procedure ExecuteQuery()
     begin
-        DeleteAll;
+        Rec.DeleteAll;
         Query1.SetFilter(Posting_Date, '%1..%2', StartDate, Enddate);
         Query1.Open;
         while Query1.Read do begin
             if Cust.Get(Query1.Source_No) then begin
-                TransferFields(Cust);
-                if not Insert then;
-                SetFilter("Date Filter", '%1..%2', StartDate, Enddate);
-                CalcFields("NPR Sales (LCY)");
-                "Search Name" := Format(-"NPR Sales (LCY)" * 100, 20, 1);
-                "Search Name" := PadStr('', 15 - StrLen("Search Name"), '0') + "Search Name";
-                Modify;
+                Rec.TransferFields(Cust);
+                if not Rec.Insert then;
+                Rec.SetFilter("Date Filter", '%1..%2', StartDate, Enddate);
+                Rec.CalcFields("NPR Sales (LCY)");
+                Rec."Search Name" := Format(-Rec."NPR Sales (LCY)" * 100, 20, 1);
+                Rec."Search Name" := PadStr('', 15 - StrLen(Rec."Search Name"), '0') + Rec."Search Name";
+                Rec.Modify;
 
 
             end;
@@ -240,4 +236,3 @@ page 6151258 "NPR Top 10 Vendors"
         end;
     end;
 }
-

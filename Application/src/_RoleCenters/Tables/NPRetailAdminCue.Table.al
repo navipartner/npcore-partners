@@ -1,7 +1,6 @@
 table 6151248 "NPR NP Retail Admin Cue"
 {
     DataClassification = CustomerContent;
-
     fields
     {
         field(1; "Primary key"; Code[10])
@@ -149,11 +148,6 @@ table 6151248 "NPR NP Retail Admin Cue"
         {
         }
     }
-
-    fieldgroups
-    {
-    }
-
     Procedure GetAmountFormat(): Text
 
     var
@@ -194,9 +188,7 @@ table 6151248 "NPR NP Retail Admin Cue"
     Procedure GetDefaultAmountFormat(): Text
 
     begin
-
         exit('<Precision,0:0><Standard Format,0>');
-
     end;
 }
 

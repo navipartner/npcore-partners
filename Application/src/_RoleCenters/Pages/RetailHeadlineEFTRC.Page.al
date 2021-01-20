@@ -2,10 +2,8 @@ page 6151257 "NPR Retail Headline EFT RC"
 {
     UsageCategory = None;
     Caption = 'Headline';
-    // PageType = HeadlinePart;
     RefreshOnActivate = true;
     SourceTable = "RC Headlines User Data";
-
     layout
     {
         area(content)
@@ -68,13 +66,7 @@ page 6151257 "NPR Retail Headline EFT RC"
                     ToolTip = 'Specifies the value of the Away Pick Text field';
                 }
             }
-
-
         }
-    }
-
-    actions
-    {
     }
 
     trigger OnAfterGetRecord()
@@ -86,16 +78,16 @@ page 6151257 "NPR Retail Headline EFT RC"
     var
         Uninitialized: Boolean;
     begin
-        if not Get then
-            if WritePermission then begin
-                Init;
-                Insert;
+        if not Rec.Get then
+            if Rec.WritePermission then begin
+                Rec.Init;
+                Rec.Insert;
             end else
                 Uninitialized := true;
 
-        if not Uninitialized and WritePermission then begin
-            "User workdate" := WorkDate;
-            Modify;
+        if not Uninitialized and Rec.WritePermission then begin
+            Rec."User workdate" := WorkDate;
+            Rec.Modify;
             HeadlineManagement.ScheduleTask(Codeunit::"Headlines");
         end;
 
@@ -110,9 +102,7 @@ page 6151257 "NPR Retail Headline EFT RC"
         HeadlineManagement.GetTopSalesToday(MyPickText);
 
         MyPickText := 'My Picks is ' + MyPickText;
-        // + ' ' +MyPickText;
         AwayPickText := 'Put Aways is ' + AwayPickText;
-        // + ' ' + AwayPickText;
 
         if Uninitialized then
             // table is uninitialized because of permission issues. OnAfterGetRecord won't be called

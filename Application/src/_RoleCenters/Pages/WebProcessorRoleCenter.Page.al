@@ -1,13 +1,8 @@
 page 6059982 "NPR Web Processor Role Center"
 {
-    // NPR5.23.03/MHA/20160726  CASE 242557 Invalid PagePart removed: VisitorStatistics
-    // NPR5.31/TS  /20170328  CASE 270740 My Reports added
-    // NPR5.38/BR  /20180118  CASE 302790 Added POS Entry List
-
     Caption = 'Role Center';
     PageType = RoleCenter;
-    UsageCategory = Administration;
-    ApplicationArea = All;
+    UsageCategory = None;
 
     layout
     {
@@ -196,14 +191,6 @@ page 6059982 "NPR Web Processor Role Center"
                 RunObject = Page "Customer List";
                 ApplicationArea = All;
                 ToolTip = 'Executes the Customer List action';
-            }
-        }
-        area(sections)
-        {
-            group(Statistics)
-            {
-                Caption = 'Statistics';
-                Image = Statistics;
             }
         }
     }

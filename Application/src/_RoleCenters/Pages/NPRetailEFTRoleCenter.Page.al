@@ -1,12 +1,8 @@
 page 6059835 "NPR NP Retail EFT Role Center"
 {
-    // NPR5.54/YAHA/20200218 CASE 383626 Newly created Role Center
-
     Caption = 'Role Center';
     PageType = RoleCenter;
-    UsageCategory = Administration;
-    ApplicationArea = All;
-
+    UsageCategory = None;
     layout
     {
         area(rolecenter)

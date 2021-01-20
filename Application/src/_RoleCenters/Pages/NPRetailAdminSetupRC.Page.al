@@ -1,11 +1,8 @@
 page 6151245 "NPR NP Retail Admin Setup RC"
 {
-
     Caption = 'NP Retail Admin Setup';
     PageType = RoleCenter;
-    UsageCategory = Administration;
-    ApplicationArea = All;
-
+    UsageCategory = None;
     layout
     {
         area(rolecenter)
@@ -134,6 +131,7 @@ page 6151245 "NPR NP Retail Admin Setup RC"
                     Caption = 'POS Admin. Template List';
                     ApplicationArea = All;
                     ToolTip = 'Executes the POS Admin. Template List action';
+                    // RunObject = Page "POS Admin. Template List";
                 }
                 action("Cash Registers")
                 {
@@ -351,13 +349,6 @@ page 6151245 "NPR NP Retail Admin Setup RC"
                     ApplicationArea = All;
                     ToolTip = 'Executes the Global POS Sales Setups action';
                 }
-                action("Cross Companies Setup")
-                {
-                    Caption = 'Cross Companies Setup';
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Cross Companies Setup action';
-
-                }
             }
             group("Collect in Store")
             {
@@ -375,12 +366,6 @@ page 6151245 "NPR NP Retail Admin Setup RC"
                     RunObject = Page "NPR NpCs Workflows";
                     ApplicationArea = All;
                     ToolTip = 'Executes the Collect Workflows action';
-                }
-                action("Store Opening Hours Setup")
-                {
-                    Caption = 'Store Opening Hours Setup';
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Store Opening Hours Setup action';
                 }
                 action("Collect Workflow Modules")
                 {
@@ -441,13 +426,6 @@ page 6151245 "NPR NP Retail Admin Setup RC"
                     RunObject = Page "NPR E-mail Templates";
                     ApplicationArea = All;
                     ToolTip = 'Executes the E-mail Templates action';
-                }
-
-                action("Report Selection - Retail")
-                {
-                    Caption = 'Report Selection - Retail';
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Report Selection - Retail action';
                 }
 
                 action("SMS Template List")
@@ -560,9 +538,6 @@ page 6151245 "NPR NP Retail Admin Setup RC"
                     ApplicationArea = All;
                     ToolTip = 'Executes the Retail Replenisment Setup action';
                 }
-
-
-
             }
 
 
@@ -656,13 +631,6 @@ page 6151245 "NPR NP Retail Admin Setup RC"
                     RunObject = page "NPR Discount Priority List";
                     ApplicationArea = All;
                     ToolTip = 'Executes the Discount Priority List action';
-                }
-
-                action("Retail Price Log Setup")
-                {
-                    Caption = 'Retail Price Log Setup';
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Retail Price Log Setup action';
                 }
 
             }
@@ -779,14 +747,6 @@ page 6151245 "NPR NP Retail Admin Setup RC"
                     ApplicationArea = All;
                     ToolTip = 'Executes the Inventory Setup action';
                 }
-
-                action("Default Dimension Prorities")
-                {
-                    Caption = 'Default Dimension Prorities';
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Default Dimension Prorities action';
-                }
-
                 action(DimensionsList)
                 {
                     Caption = 'Dimensions List';
@@ -825,21 +785,15 @@ page 6151245 "NPR NP Retail Admin Setup RC"
             group("CS Setup")
             {
                 Caption = 'Setup';
-
-
                 action("AF Setup")
                 {
                     Caption = 'AF Setup';
                     RunObject = page "NPR AF Setup";
                     ApplicationArea = All;
                     ToolTip = 'Executes the AF Setup action';
-                    Image = Setup;
                 }
             }
-
-
         }
     }
-
 }
 

@@ -2,8 +2,7 @@ page 6151263 "NPR Retail Ticket Role Center"
 {
     Caption = 'Role Center';
     PageType = RoleCenter;
-    UsageCategory = Administration;
-    ApplicationArea = All;
+    UsageCategory = None;
 
     layout
     {
@@ -40,11 +39,8 @@ page 6151263 "NPR Retail Ticket Role Center"
             {
                 ApplicationArea = All;
             }
-
-
         }
     }
-
     actions
     {
         area(reporting)
@@ -283,10 +279,9 @@ page 6151263 "NPR Retail Ticket Role Center"
                     Caption = 'Foreign Membership Setup';
                     Ellipsis = true;
                     Image = ElectronicBanking;
-                    //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                    //PromotedCategory = Process;
-                    //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
-                    //PromotedIsBig = true;
+                    Promoted = true;
+                    PromotedCategory = Process;
+                    PromotedIsBig = true;
                     RunObject = Page "NPR MM Foreign Members. Setup";
                     ApplicationArea = All;
                     ToolTip = 'Executes the Foreign Membership Setup action';
@@ -376,4 +371,3 @@ page 6151263 "NPR Retail Ticket Role Center"
         }
     }
 }
-

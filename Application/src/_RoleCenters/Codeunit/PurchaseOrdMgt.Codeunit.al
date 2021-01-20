@@ -1,26 +1,20 @@
 codeunit 6151241 "NPR Purchase Ord Mgt"
 {
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         TrailingPurchOrdersSetup: Record "NPR Trail. Purch. Orders Setup";
         PurchHeader: Record "Purchase Header";
 
     procedure OnOpenPage(var TrailingPurchOrdersSetup: Record "NPR Trail. Purch. Orders Setup")
     begin
-        with TrailingPurchOrdersSetup do
-            if not Get(UserId) then begin
-                LockTable;
-                "User ID" := UserId;
-                "Use Work Date as Base" := true;
-                "Period Length" := "Period Length"::Month;
-                "Value to Calculate" := "Value to Calculate"::"No. of Orders";
-                "Chart Type" := "Chart Type"::"Stacked Column";
-                Insert;
-            end;
+        if not TrailingPurchOrdersSetup.Get(UserId) then begin
+            TrailingPurchOrdersSetup.LockTable;
+            TrailingPurchOrdersSetup."User ID" := UserId;
+            TrailingPurchOrdersSetup."Use Work Date as Base" := true;
+            TrailingPurchOrdersSetup."Period Length" := TrailingPurchOrdersSetup."Period Length"::Month;
+            TrailingPurchOrdersSetup."Value to Calculate" := TrailingPurchOrdersSetup."Value to Calculate"::"No. of Orders";
+            TrailingPurchOrdersSetup."Chart Type" := TrailingPurchOrdersSetup."Chart Type"::"Stacked Column";
+            TrailingPurchOrdersSetup.Insert;
+        end;
     end;
 
     procedure DrillDown(var BusChartBuf: Record "Business Chart Buffer")
@@ -55,30 +49,28 @@ codeunit 6151241 "NPR Purchase Ord Mgt"
         PurchHeaderStatus: Integer;
     begin
         TrailingPurchOrdersSetup.Get(UserId);
-        with BusChartBuf do begin
-            Initialize;
-            "Period Length" := TrailingPurchOrdersSetup."Period Length";
-            SetPeriodXAxis;
+        BusChartBuf.Initialize;
+        BusChartBuf."Period Length" := TrailingPurchOrdersSetup."Period Length";
+        BusChartBuf.SetPeriodXAxis;
 
-            CreateMap(ChartToStatusMap);
+        CreateMap(ChartToStatusMap);
+        for PurchHeaderStatus := 1 to ArrayLen(ChartToStatusMap) do begin
+            PurchHeader.Status := ChartToStatusMap[PurchHeaderStatus];
+            BusChartBuf.AddMeasure(Format(PurchHeader.Status), PurchHeader.Status, BusChartBuf."Data Type"::Decimal, TrailingPurchOrdersSetup.GetChartType);
+        end;
+
+        if CalcPeriods(FromDate, ToDate, BusChartBuf) then begin
+            BusChartBuf.AddPeriods(ToDate[1], ToDate[ArrayLen(ToDate)]);
+
             for PurchHeaderStatus := 1 to ArrayLen(ChartToStatusMap) do begin
-                PurchHeader.Status := ChartToStatusMap[PurchHeaderStatus];
-                AddMeasure(Format(PurchHeader.Status), PurchHeader.Status, "Data Type"::Decimal, TrailingPurchOrdersSetup.GetChartType);
-            end;
-
-            if CalcPeriods(FromDate, ToDate, BusChartBuf) then begin
-                AddPeriods(ToDate[1], ToDate[ArrayLen(ToDate)]);
-
-                for PurchHeaderStatus := 1 to ArrayLen(ChartToStatusMap) do begin
-                    TotalValue := 0;
-                    for ColumnNo := 1 to ArrayLen(ToDate) do begin
-                        Value := GetPurchOrderValue(ChartToStatusMap[PurchHeaderStatus], FromDate[ColumnNo], ToDate[ColumnNo]);
-                        if ColumnNo = 1 then
-                            TotalValue := Value
-                        else
-                            TotalValue += Value;
-                        SetValueByIndex(PurchHeaderStatus - 1, ColumnNo - 1, TotalValue);
-                    end;
+                TotalValue := 0;
+                for ColumnNo := 1 to ArrayLen(ToDate) do begin
+                    Value := GetPurchOrderValue(ChartToStatusMap[PurchHeaderStatus], FromDate[ColumnNo], ToDate[ColumnNo]);
+                    if ColumnNo = 1 then
+                        TotalValue := Value
+                    else
+                        TotalValue += Value;
+                    BusChartBuf.SetValueByIndex(PurchHeaderStatus - 1, ColumnNo - 1, TotalValue);
                 end;
             end;
         end;

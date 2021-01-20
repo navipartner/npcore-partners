@@ -1,7 +1,5 @@
 table 6060158 "NPR Event Cue"
 {
-    // NPR5.31/NPKNAV/20170502  CASE 269162 Transport NPR5.31 - 2 May 2017
-
     Caption = 'Event Cue';
     DataClassification = CustomerContent;
 
@@ -45,10 +43,6 @@ table 6060158 "NPR Event Cue"
         key(Key1; "Primary Key")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 

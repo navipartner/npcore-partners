@@ -1,23 +1,19 @@
 page 6151247 "NPR Retail Admin Act - WFs"
 {
-    // #343621/ZESO/20190725  CASE 343621 Object created.
-
     Caption = 'NP Retail - POS Workflow Setups';
     PageType = CardPart;
-    UsageCategory = Administration;
-    ApplicationArea = All;
     RefreshOnActivate = true;
     SourceTable = "NPR NP Retail Admin Cue";
+    UsageCategory = None;
 
     layout
     {
         area(content)
         {
-            cuegroup(" ")
+            cuegroup(Cue)
             {
-                Caption = ' ';
                 ShowCaption = false;
-                field("NPR POS Sales Workflow"; "NPR POS Sales Workflow")
+                field("NPR POS Sales Workflow"; Rec."NPR POS Sales Workflow")
                 {
                     ApplicationArea = All;
                     Caption = 'POS Sales Workflows';
@@ -25,7 +21,7 @@ page 6151247 "NPR Retail Admin Act - WFs"
                     ToolTip = 'Specifies the value of the POS Sales Workflows field';
                 }
 
-                field("EAN SETUPr"; "EAN SETUP")
+                field("EAN SETUPr"; Rec."EAN SETUP")
                 {
                     ApplicationArea = All;
                     Caption = 'EAN BOX SETUP';
@@ -38,16 +34,12 @@ page 6151247 "NPR Retail Admin Act - WFs"
         }
     }
 
-    actions
-    {
-    }
-
     trigger OnOpenPage()
     begin
-        Reset;
-        if not Get then begin
-            Init;
-            Insert;
+        Rec.Reset;
+        if not Rec.Get then begin
+            Rec.Init;
+            Rec.Insert;
         end;
     end;
 }

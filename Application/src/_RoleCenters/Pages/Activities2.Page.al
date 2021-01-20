@@ -3,31 +3,29 @@ page 6151253 "NPR Activities 2"
 
     Caption = 'Retail Activities';
     PageType = CardPart;
-    UsageCategory = Administration;
-    ApplicationArea = All;
     SourceTable = "NPR Retail Sales Cue";
-
+    UsageCategory = None;
     layout
     {
         area(content)
         {
-            cuegroup("")
+            cuegroup(Cue)
             {
 
                 ShowCaption = false;
 
-                field("Pending Inc. Documents"; "Pending Inc. Documents")
+                field("Pending Inc. Documents"; Rec."Pending Inc. Documents")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Pending Inc. Documents field';
                 }
-                field("Processed Error Tasks"; "Processed Error Tasks")
+                field("Processed Error Tasks"; Rec."Processed Error Tasks")
                 {
                     ApplicationArea = All;
                     DrillDownPageID = "NPR Nc Task List";
                     ToolTip = 'Specifies the value of the Processed Error Tasks field';
                 }
-                field("Failed Webshop Payments"; "Failed Webshop Payments")
+                field("Failed Webshop Payments"; Rec."Failed Webshop Payments")
                 {
                     ApplicationArea = All;
                     DrillDownPageID = "NPR Magento Payment Line List";
@@ -38,28 +36,14 @@ page 6151253 "NPR Activities 2"
         }
     }
 
-    actions
-    {
-        area(processing)
-        {
-            action("Action Items")
-            {
-                Caption = 'Action Items';
-                ApplicationArea = All;
-                ToolTip = 'Executes the Action Items action';
-                Image = Action;
-            }
-        }
-    }
-
     trigger OnOpenPage()
     begin
         Reset;
-        if not Get then begin
-            Init;
-            Insert;
+        if not Rec.Get then begin
+            Rec.Init;
+            Rec.Insert;
         end;
-        SetFilter("Date Filter", '=%1', WorkDate);
+        Rec.SetFilter("Date Filter", '=%1', WorkDate);
     end;
 
     var

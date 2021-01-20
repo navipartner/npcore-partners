@@ -3,7 +3,6 @@ codeunit 6151242 "NPR Activities Mgt."
 
     trigger OnRun()
     begin
-
         RefreshActivitiesCueData;
     end;
 

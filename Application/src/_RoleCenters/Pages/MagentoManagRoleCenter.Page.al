@@ -1,17 +1,8 @@
 page 6151480 "NPR Magento Manag. Role Center"
 {
-    // MAG1.17/MH/20150423  CASE 212263 Created NaviConnect Role Center
-    // MAG1.17/BHR/20150428 CASE 212069 Removed "retail Document Activities
-    // MAG1.20/BHR/20150925 CASE 223709 Added part 'NaviConnect Top 10 SalesPerson'
-    // MAG2.00/MHA/20160525  CASE 242557 Magento Integration
-    // MAG2.00/TS/20160627 CASE 245496 Removed Part Sale POS Activities
-    // MAG2.00/TS/20160715 CASE 246438 Added Rss Activities
-
     Caption = 'Role Center';
     PageType = RoleCenter;
-    UsageCategory = Administration;
-    ApplicationArea = All;
-
+    UsageCategory = None;
     layout
     {
         area(rolecenter)

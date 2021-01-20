@@ -196,13 +196,13 @@ codeunit 6151240 "NPR NP Retail Headline Mgt."
     begin
     end;
 
-    [EventSubscriber(ObjectType::Page, 9176, 'OnBeforeLanguageChange', '', true, true)]
+    [EventSubscriber(ObjectType::Page, Page::"My Settings", 'OnBeforeLanguageChange', '', true, true)]
     local procedure OnBeforeUpdateLanguage(OldLanguageId: Integer; NewLanguageId: Integer)
     begin
         OnInvalidateHeadlines;
     end;
 
-    [EventSubscriber(ObjectType::Page, 9176, 'OnBeforeWorkdateChange', '', true, true)]
+    [EventSubscriber(ObjectType::Page, Page::"My Settings", 'OnBeforeWorkdateChange', '', true, true)]
     local procedure OnBeforeUpdateWorkdate(OldWorkdate: Date; NewWorkdate: Date)
     begin
         OnInvalidateHeadlines;
@@ -219,12 +219,8 @@ codeunit 6151240 "NPR NP Retail Headline Mgt."
         POSEntry: Record "NPR POS Entry";
         SalesAmt: Decimal;
     begin
-        //IF User.GET(USERSECURITYID) THEN;
-        //GetUserGreetingTextInternal(User."Full Name",GetTimeOfDay,GreetingText);
-
         POSEntry.Reset;
         POSEntry.SetFilter("Entry Date", '=%1', Today);
-        //POSEntry.cc("Sales Amount");
         if POSEntry.FindSet then begin
             SalesAmt := POSEntry."Item Sales (LCY)";
             repeat
@@ -243,7 +239,6 @@ codeunit 6151240 "NPR NP Retail Headline Mgt."
     begin
         SalesAmt := 0;
         SalesPerson.Reset;
-        //SalesPerson.SETFILTER("Sales (Qty.)",'>%1',0);
         if SalesPerson.FindSet then begin
             SalesPerson.CalcFields("NPR Sales (LCY)");
             SalesAmt := SalesPerson."NPR Sales (LCY)";
@@ -428,6 +423,5 @@ codeunit 6151240 "NPR NP Retail Headline Mgt."
           ILE."Document Type"::"Sales Invoice", ILE."Document Type"::"Sales Credit Memo");
 
         ILE.SetRange("Posting Date", CalcDate('<-CY>', Today), Today)
-
     end;
 }

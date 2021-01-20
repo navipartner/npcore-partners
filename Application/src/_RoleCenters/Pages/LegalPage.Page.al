@@ -11,19 +11,19 @@ page 6151331 "NPR Legal Page"
         {
             repeater(Group)
             {
-                field("Standard Conditions"; "Standard Conditions")
+                field("Standard Conditions"; Rec."Standard Conditions")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Standard Conditions field';
 
                 }
-                field("License Agreement"; "License Agreement")
+                field("License Agreement"; Rec."License Agreement")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the License Agreement field';
 
                 }
-                field(Privacy; Privacy)
+                field(Privacy; Rec.Privacy)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Privacy field';

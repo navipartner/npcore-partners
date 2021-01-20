@@ -1,13 +1,10 @@
 page 6014693 "NPR Retail Admin Activ. - WFs"
 {
-    // NPR5.51/ZESO/20190725  CASE 343621 Object created.
-
     Caption = 'Retail Admin Activities - WFs';
     PageType = CardPart;
-    UsageCategory = Administration;
-    ApplicationArea = All;
     RefreshOnActivate = true;
     SourceTable = "NPR Retail Admin Cue";
+    UsageCategory = None;
 
     layout
     {
@@ -16,12 +13,12 @@ page 6014693 "NPR Retail Admin Activ. - WFs"
             cuegroup("POS Sales Workflow Steps")
             {
                 Caption = 'POS Sales Workflow Steps';
-                field("Workflow Steps Enabled"; "Workflow Steps Enabled")
+                field("Workflow Steps Enabled"; Rec."Workflow Steps Enabled")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Workflow Steps Enabled field';
                 }
-                field("Workflow Steps Not Enabled"; "Workflow Steps Not Enabled")
+                field("Workflow Steps Not Enabled"; Rec."Workflow Steps Not Enabled")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Workflow Steps Not Enabled field';
@@ -29,17 +26,12 @@ page 6014693 "NPR Retail Admin Activ. - WFs"
             }
         }
     }
-
-    actions
-    {
-    }
-
     trigger OnOpenPage()
     begin
-        Reset;
-        if not Get then begin
-            Init;
-            Insert;
+        Rec.Reset;
+        if not Rec.Get then begin
+            Rec.Init;
+            Rec.Insert;
         end;
     end;
 }
