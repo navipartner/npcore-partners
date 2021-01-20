@@ -23,6 +23,7 @@ codeunit 6151465 "NPR M2 Brand Mgt."
         Element: DotNet NPRNetXmlElement;
         BrandId: Code[20];
         PrevRec: Text;
+        TypeHelper: Codeunit "Type Helper";
     begin
         MagentoSetup.Get;
         if not MagentoSetup."Magento Enabled" then
@@ -41,6 +42,7 @@ codeunit 6151465 "NPR M2 Brand Mgt."
             PrevRec := Format(MagentoBrand);
 
             MagentoBrand.Name := NpXmlDomMgt.GetElementText(Element, 'name', MaxStrLen(MagentoBrand.Name), false);
+            MagentoBrand.Name := TypeHelper.HtmlDecode(MagentoBrand.Name);
             MagentoBrand.Sorting := NpXmlDomMgt.GetElementInt(Element, 'sort_order', false);
 
             if PrevRec <> Format(MagentoBrand) then
@@ -52,13 +54,8 @@ codeunit 6151465 "NPR M2 Brand Mgt."
                 TempMagentoBrand.Insert;
             end;
         end;
-        DataLogMgt.DisableDataLog(false);
 
-        if TempMagentoBrand.IsEmpty then
-            exit;
-
-        DataLogMgt.DisableDataLog(true);
-        Clear(MagentoBrand);
+        MagentoBrand.Reset();
         if MagentoBrand.FindSet then
             repeat
                 if not TempMagentoBrand.Get(MagentoBrand.Id) then
