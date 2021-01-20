@@ -2,11 +2,9 @@ page 6151254 "NPR Acc. Payables Act"
 {
     Caption = 'Activities';
     PageType = CardPart;
-    UsageCategory = Administration;
-    ApplicationArea = All;
     RefreshOnActivate = true;
     SourceTable = "Finance Cue";
-
+    UsageCategory = None;
     layout
     {
         area(content)
@@ -15,7 +13,7 @@ page 6151254 "NPR Acc. Payables Act"
 
             {
                 Caption = 'Payments';
-                field("NP Purchase Order"; "NPR Purchase Order")
+                field("NP Purchase Order"; Rec."NPR Purchase Order")
                 {
                     Caption = 'Purchase Order';
                     ApplicationArea = Basic, Suite;
@@ -23,25 +21,25 @@ page 6151254 "NPR Acc. Payables Act"
                     ToolTip = 'Specifies the number of purchase.';
                 }
 
-                field("Purchase Return Orders"; "Purchase Return Orders")
+                field("Purchase Return Orders"; Rec."Purchase Return Orders")
                 {
                     ApplicationArea = PurchReturnOrder;
                     DrillDownPageID = "Purchase Return Order List";
                     ToolTip = 'Specifies the number of purchase return orders that are displayed in the Finance Cue on the Role Center. The documents are filtered by today''s date.';
                 }
-                field("Outstanding Vendor Invoices"; "Outstanding Vendor Invoices")
+                field("Outstanding Vendor Invoices"; Rec."Outstanding Vendor Invoices")
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the number of invoices from your vendors that have not been paid yet.';
                 }
 
-                field("Pending Inc. Documents"; "NPR Pending Inc. Documents")
+                field("Pending Inc. Documents"; Rec."NPR Pending Inc. Documents")
                 {
                     ApplicationArea = All;
                     DrillDownPageId = "Incoming Documents";
                     ToolTip = 'Specifies the value of the NPR Pending Inc. Documents field';
                 }
-                field("Posted Purchase order"; "NPR Posted Purchase order")
+                field("Posted Purchase order"; Rec."NPR Posted Purchase order")
                 {
                     ApplicationArea = All;
                     Caption = 'Posted Purchase Invoices';
@@ -112,25 +110,19 @@ page 6151254 "NPR Acc. Payables Act"
                     end;
                 }
             }
-
-
         }
-    }
-
-    actions
-    {
     }
 
     trigger OnOpenPage()
     begin
-        Reset;
-        if not Get then begin
-            Init;
-            Insert;
+        Rec.Reset;
+        if not Rec.Get then begin
+            Rec.Init;
+            Rec.Insert;
         end;
 
-        SetFilter("Due Date Filter", '<=%1', WorkDate);
-        SetFilter("User ID Filter", UserId);
+        Rec.SetFilter("Due Date Filter", '<=%1', WorkDate);
+        Rec.SetFilter("User ID Filter", UserId);
     end;
 
     var

@@ -2,9 +2,8 @@ page 6151337 "NPR Restaurant Headline RC"
 {
     Caption = 'Headline';
     PageType = HeadlinePart;
-    UsageCategory = Administration;
-    ApplicationArea = All;
     RefreshOnActivate = true;
+    UsageCategory = None;
 
     layout
     {
@@ -46,7 +45,7 @@ page 6151337 "NPR Restaurant Headline RC"
     trigger OnOpenPage()
     begin
         RCHeadlinesPageCommon.HeadlineOnOpenPage(Page::"NPR Restaurant Headline RC");
-        DefaultFieldsVisible := false; //RCHeadlinesPageCommon.AreDefaultFieldsVisible();
+        DefaultFieldsVisible := false;
         UserGreetingVisible := RCHeadlinesPageCommon.IsUserGreetingVisible();
     end;
 

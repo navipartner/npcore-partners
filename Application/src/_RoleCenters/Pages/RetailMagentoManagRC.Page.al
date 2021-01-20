@@ -1,24 +1,13 @@
 page 6151244 "NPR Retail Magento Manag. RC"
 {
-    // MAG1.17/MH/20150423  CASE 212263 Created NaviConnect Role Center
-    // MAG1.17/BHR/20150428 CASE 212069 Removed "retail Document Activities
-    // MAG1.20/BHR/20150925 CASE 223709 Added part 'NaviConnect Top 10 SalesPerson'
-    // MAG2.00/MHA/20160525  CASE 242557 Magento Integration
-    // MAG2.00/TS/20160627 CASE 245496 Removed Part Sale POS Activities
-    // MAG2.00/TS/20160715 CASE 246438 Added Rss Activities
-
     Caption = 'NP Retail Magento Manag. Role Center';
     PageType = RoleCenter;
-    UsageCategory = Administration;
-    ApplicationArea = All;
+    UsageCategory = None;
 
     layout
     {
         area(rolecenter)
         {
-
-
-
             part(Control7; "Headline RC Order Processor")
             {
                 ApplicationArea = Basic, Suite;
@@ -29,14 +18,10 @@ page 6151244 "NPR Retail Magento Manag. RC"
                 ApplicationArea = All;
 
             }
-
-
             part(NPRETAILACTIVITIES; "NPR Activities")
             {
                 ApplicationArea = All;
             }
-
-
             part(Control6151403; "NPR Magento Top10 Items by Qty")
             {
                 ApplicationArea = Basic, Suite;
@@ -51,43 +36,28 @@ page 6151244 "NPR Retail Magento Manag. RC"
                 AccessByPermission = TableData "Report Inbox" = R;
                 ApplicationArea = Suite;
             }
-
-
             part(Control6014400; "NPR My Reports")
             {
                 ApplicationArea = All;
             }
-
-
             part(Control6150616; "NPR Web Manager Activ.")
             {
                 Visible = false;
                 ApplicationArea = All;
-
             }
-
             systempart(Control1901377608; MyNotes)
             {
                 ApplicationArea = Basic, Suite;
             }
-
             part(PowerBi; "Power BI Report Spinner Part")
             {
                 ApplicationArea = All;
-
             }
-
-
         }
     }
 
     actions
     {
-
-
-
-
-
         area(reporting)
         {
             group("Report")
@@ -242,19 +212,6 @@ page 6151244 "NPR Retail Magento Manag. RC"
                 }
             }
 
-            /*
-            group(Departments)
-            {
-                action(MagentoSetup)
-                {
-                    Caption = 'Magento Setup';
-                    Image = List;
-                    RunObject = page "Magento Setup";
-                }
-            }
-            */
-
-
             group(Content)
             {
                 Caption = 'Content';
@@ -339,47 +296,6 @@ page 6151244 "NPR Retail Magento Manag. RC"
                         ToolTip = 'Executes the Display Config action';
                     }
                 }
-                /*
-                group(ContentSetup)
-                {
-                    Caption = 'Setup';
-                    action(WebshopsContent)
-                    {
-                        Caption = 'Webshops';
-                        Image = List;
-                        RunObject = page "Magento Store List";
-                    }
-
-                }
-                
-                group(ContentTasks)
-                {
-                    Caption = 'Tasks';
-                    action(TasKList)
-                    {
-                        Caption = 'Task List';
-                        Image = List;
-                        RunObject = page "Nc Task List";
-                    }
-                }
-                group(ContentAdministration)
-                {
-                    Caption = 'Administration';
-
-                    action(Website)
-                    {
-                        Caption = 'Websites';
-                        Image = List;
-                        RunObject = page "Magento Websites";
-                    }
-                    action(ContentPictures)
-                    {
-                        Caption = 'Pictures';
-                        Image = List;
-                        RunObject = page "Magento Pictures";
-                    }
-                }
-                */
             }
 
             Group(Sales)
@@ -461,9 +377,6 @@ page 6151244 "NPR Retail Magento Manag. RC"
                         ApplicationArea = All;
                         ToolTip = 'Executes the Unprocessed Task List action';
                     }
-
-
-
                 }
                 group(Archive)
                 {
@@ -484,9 +397,7 @@ page 6151244 "NPR Retail Magento Manag. RC"
                         ToolTip = 'Executes the Posted Sales Shipments action';
                     }
                 }
-
             }
-
             Group(NaviConnectSetup)
             {
                 Caption = 'NaviConnect Setup';
@@ -515,7 +426,6 @@ page 6151244 "NPR Retail Magento Manag. RC"
                     ApplicationArea = All;
                     ToolTip = 'Executes the Task Processors action';
                 }
-
                 action(TaskSetup)
                 {
                     Caption = 'Task Setup';
@@ -534,9 +444,7 @@ page 6151244 "NPR Retail Magento Manag. RC"
                 }
 
             }
-
         }
-
         area(embedding)
         {
             action("Item List")
@@ -592,15 +500,6 @@ page 6151244 "NPR Retail Magento Manag. RC"
                 ToolTip = 'Executes the Xml Templates action';
             }
         }
-        area(sections)
-        {
-            group(Statistics)
-            {
-                Caption = 'Statistics';
-                Image = Statistics;
-            }
-        }
-
     }
 }
 

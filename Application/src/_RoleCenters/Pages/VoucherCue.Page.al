@@ -2,9 +2,8 @@ page 6151330 "NPR Voucher Cue"
 {
     Caption = 'Retail Voucher Cue';
     PageType = CardPart;
-    UsageCategory = Administration;
-    ApplicationArea = All;
     SourceTable = "NPR Retail Sales Cue";
+    UsageCategory = None;
 
     layout
     {
@@ -17,30 +16,26 @@ page 6151330 "NPR Voucher Cue"
                 Caption = 'SALES';
                 ShowCaption = true;
 
-                field("Retail Voucher"; "Retail Vouchers")
+                field("Retail Voucher"; Rec."Retail Vouchers")
                 {
                     ApplicationArea = All;
                     DrillDownPageId = "NPR NpRv Vouchers";
                     ToolTip = 'Specifies the value of the Retail Vouchers field';
-                    //Visible = VisibilityRetailVoucher;
-
                 }
 
-                field("Gift Voucher"; "Gift Vouchers")
+                field("Gift Voucher"; Rec."Gift Vouchers")
                 {
                     ApplicationArea = All;
                     DrillDownPageId = "NPR Gift Voucher List";
                     ToolTip = 'Specifies the value of the Gift Vouchers field';
-                    //Visible = VisibilityGiftVoucher;
                 }
 
-                field("Credit Voucher"; "Credit Vouchers")
+                field("Credit Voucher"; Rec."Credit Vouchers")
                 {
                     ApplicationArea = All;
                     DrillDownPageId = "NPR Credit Voucher List";
                     Visible = VisibilityCreditVoucher;
                     ToolTip = 'Specifies the value of the Credit Vouchers field';
-                    //Visible = false;
                 }
 
             }

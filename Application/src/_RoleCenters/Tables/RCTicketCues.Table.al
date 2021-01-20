@@ -1,7 +1,5 @@
 table 6060112 "NPR RC Ticket Cues"
 {
-    // TM1.30/TSA /20180409 CASE 310669 Fixed calculation of MaxCapacity
-
     Caption = 'RC Ticket Cues';
     DataClassification = CustomerContent;
 
@@ -80,10 +78,6 @@ table 6060112 "NPR RC Ticket Cues"
         }
     }
 
-    fieldgroups
-    {
-    }
-
     procedure CalculateCues()
     var
         EventDate: Date;
@@ -125,23 +119,16 @@ table 6060112 "NPR RC Ticket Cues"
                         AdmissionScheduleEntry.CalcFields("Open Reservations", "Open Admitted", Departed);
 
                         EventCount += 1;
-                        //-#310669 [310669]
+
                         Capacity := 0;
                         TicketManagement.GetAdmissionCapacity(AdmissionScheduleEntry."Admission Code", AdmissionScheduleEntry."Schedule Code", AdmissionScheduleEntry."Entry No.", Capacity, CapacityControl);
                         MaxCapacity += Capacity;
                         if (Capacity = 0) then
                             Capacity := 1;
-                        //MaxCapacity := AdmissionScheduleLine."Max Capacity Per Sch. Entry";
-                        //+#310669 [310669]
-
                         OpenReservations += AdmissionScheduleEntry."Open Reservations";
                         Admitted += AdmissionScheduleEntry."Open Admitted";
                         if (AdmissionScheduleLine."Max Capacity Per Sch. Entry" > 0) then
-                            //-#310669 [310669]
-                            //Utilization += (AdmissionScheduleEntry."Open Reservations" + AdmissionScheduleEntry."Open Admitted" + AdmissionScheduleEntry.Departed) / AdmissionScheduleLine."Max Capacity Per Sch. Entry";
                             Utilization += (AdmissionScheduleEntry."Open Reservations" + AdmissionScheduleEntry."Open Admitted" + AdmissionScheduleEntry.Departed) / Capacity;
-                        //+#310669 [310669]
-
                     end;
                 end;
             end;
@@ -151,4 +138,3 @@ table 6060112 "NPR RC Ticket Cues"
             Utilization := (Utilization / EventCount) * 100;
     end;
 }
-

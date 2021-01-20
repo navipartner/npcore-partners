@@ -6,22 +6,22 @@ table 6151246 "NPR Web Sales"
     {
         field(1; "Campaign Discount List"; Integer)
         {
-            CalcFormula = Count ("NPR Period Discount");
+            CalcFormula = Count("NPR Period Discount");
             FieldClass = FlowField;
         }
         field(2; "Mix Discount List"; Integer)
         {
-            CalcFormula = Count ("NPR Mixed Discount" WHERE("Mix Type" = FILTER(Standard | Combination)));
+            CalcFormula = Count("NPR Mixed Discount" WHERE("Mix Type" = FILTER(Standard | Combination)));
             FieldClass = FlowField;
         }
         field(3; "Voucher List"; Integer)
         {
-            CalcFormula = Count ("NPR NpRv Voucher");
+            CalcFormula = Count("NPR NpRv Voucher");
             FieldClass = FlowField;
         }
         field(4; "Coupon List"; Integer)
         {
-            CalcFormula = Count ("NPR NpDc Coupon");
+            CalcFormula = Count("NPR NpDc Coupon");
             FieldClass = FlowField;
         }
         field(5; No; Integer)
@@ -30,16 +30,11 @@ table 6151246 "NPR Web Sales"
             DataClassification = CustomerContent;
         }
     }
-
     keys
     {
         key(Key1; No)
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 

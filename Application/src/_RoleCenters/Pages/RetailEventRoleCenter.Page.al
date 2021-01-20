@@ -1,26 +1,13 @@
 page 6151243 "NPR Retail Event Role Center"
 {
-    // NPR5.31/NPKNAV/20170502  CASE 269162 Transport NPR5.31 - 2 May 2017
-    // NPR5.33/NPKNAV/20170630  CASE 277946 Transport NPR5.33 - 30 June 2017
-    // NPR5.34/TJ  /20170728  CASE 277938 Added action Exch. Int. Templates
-    // NPR5.38/TJ  /20171027  CASE 285194 Added action Exch. Int. E-mails
-    // NPR5.38/TJ  /20171110  CASE 296146 Added system part MyNotes
-
     Caption = 'NP Retail Event Role Center';
     PageType = RoleCenter;
-    UsageCategory = Administration;
-    ApplicationArea = All;
-
+    UsageCategory = None;
     layout
     {
         area(rolecenter)
         {
 
-            /* part(Control7; "Headline RC Order Processor")
-             {
-                 // ApplicationArea = Basic, Suite;
-             }
-         */
             part(Control6014402; "NPR Event Activities")
             {
                 ApplicationArea = All;
@@ -107,4 +94,3 @@ page 6151243 "NPR Retail Event Role Center"
         }
     }
 }
-

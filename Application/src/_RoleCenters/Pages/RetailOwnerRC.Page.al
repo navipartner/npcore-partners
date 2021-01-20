@@ -2,19 +2,16 @@ page 6151259 "NPR Retail Owner RC"
 {
     Caption = 'NP Retail Owner RC';
     PageType = RoleCenter;
-    UsageCategory = Administration;
-    ApplicationArea = All;
+    UsageCategory = None;
 
     layout
     {
         area(rolecenter)
         {
-
             part(Control6150616; "NPR Activities")
             {
                 ApplicationArea = All;
             }
-
             part(Control16; "NPR Retail 10 Items by Qty.")
             {
                 ApplicationArea = All;
@@ -37,7 +34,6 @@ page 6151259 "NPR Retail Owner RC"
                 Caption = 'Purchase Activities';
                 ApplicationArea = All;
             }
-
             part(Top10vendors; "NPR Top 10 Vendors")
             {
                 ApplicationArea = All;
@@ -107,105 +103,11 @@ page 6151259 "NPR Retail Owner RC"
             {
                 ApplicationArea = All;
             }
-
         }
     }
 
     actions
     {
-        /*area(reporting)
-        {
-            separator(Separator75)
-            {
-            }
-            action("Salesperson - Sales &Statistics")
-            {
-                ApplicationArea = Suite;
-                Caption = 'Salesperson - Sales &Statistics';
-                Image = "Report";
-                RunObject = Report "Salesperson - Sales Statistics";
-                ToolTip = 'View amounts for sales, profit, invoice discount, and payment discount, as well as profit percentage, for each salesperson for a selected period. The report also shows the adjusted profit and adjusted profit percentage, which reflect any changes to the original costs of the items in the sales.';
-            }
-            action("Price &List")
-            {
-                ApplicationArea = Basic, Suite;
-                Caption = 'Price &List';
-                Image = "Report";
-                RunObject = Report "Price List";
-                ToolTip = 'View a list of your items and their prices, for example, to send to customers. You can create the list for specific customers, campaigns, currencies, or other criteria.';
-            }
-            separator(Separator93)
-            {
-            }
-            action("Inventory - Sales &Back Orders")
-            {
-                ApplicationArea = Basic, Suite;
-                Caption = 'Inventory - Sales &Back Orders';
-                Image = "Report";
-                RunObject = Report "Inventory - Sales Back Orders";
-                ToolTip = 'View a list with the order lines whose shipment date has been exceeded. The following information is shown for the individual orders for each item: number, customer name, customer''s telephone number, shipment date, order quantity and quantity on back order. The report also shows whether there are other items for the customer on back order.';
-            }
-            separator(Separator129)
-            {
-            }
-
-        }
-        */
-        area(embedding)
-        {
-            /*
-               action("Sales Quotes")
-               {
-                   ApplicationArea = Basic, Suite;
-                   Caption = 'Sales Quotes';
-                   Image = Quote;
-                   RunObject = Page "Sales Quotes";
-                   ToolTip = 'Make offers to customers to sell certain products on certain delivery and payment terms. While you negotiate with a customer, you can change and resend the sales quote as much as needed. When the customer accepts the offer, you convert the sales quote to a sales invoice or a sales order in which you process the sale.';
-               }
-               action("Sales Orders")
-               {
-                   ApplicationArea = Basic, Suite;
-                   Caption = 'Sales Orders';
-                   Image = "Order";
-                   RunObject = Page "Sales Order List";
-                   ToolTip = 'Record your agreements with customers to sell certain products on certain delivery and payment terms. Sales orders, unlike sales invoices, allow you to ship partially, deliver directly from your vendor to your customer, initiate warehouse handling, and print various customer-facing documents. Sales invoicing is integrated in the sales order process.';
-               }
-               action("Sales Orders - Microsoft Dynamics 365 for Sales")
-               {
-                   ApplicationArea = Suite;
-                   Caption = 'Sales Orders - Microsoft Dynamics 365 for Sales';
-                   RunObject = Page "CRM Sales Order List";
-                   RunPageView = WHERE (StateCode = FILTER (Submitted),
-                                       LastBackofficeSubmit = FILTER (0D));
-                   ToolTip = 'View sales orders in Dynamics 365 for Sales that are coupled with sales orders in Business Central.';
-               }
-               action(CustomersBalance)
-               {
-                   ApplicationArea = Basic, Suite;
-                   Caption = 'Balance';
-                   Image = Balance;
-                   RunObject = Page "Customer List";
-                   RunPageView = WHERE ("Balance (LCY)" = FILTER (<> 0));
-                   ToolTip = 'View a summary of the bank account balance in different periods.';
-               }
-               action("Purchase Orders")
-               {
-                   ApplicationArea = Basic, Suite;
-                   Caption = 'Purchase Orders';
-                   RunObject = Page "Purchase Order List";
-                   ToolTip = 'Create purchase orders to mirror sales documents that vendors send to you. This enables you to record the cost of purchases and to track accounts payable. Posting purchase orders dynamically updates inventory levels so that you can minimize inventory costs and provide better customer service. Purchase orders allow partial receipts, unlike with purchase invoices, and enable drop shipment directly from your vendor to your customer. Purchase orders can be created automatically from PDF or image files from your vendors by using the Incoming Documents feature.';
-               }
-               action(VendorsBalance)
-               {
-                   ApplicationArea = Basic, Suite;
-                   Caption = 'Balance';
-                   Image = Balance;
-                   RunObject = Page "Vendor List";
-                   RunPageView = WHERE ("Balance (LCY)" = FILTER (<> 0));
-                   ToolTip = 'View a summary of the bank account balance in different periods.';
-               }
-               */
-        }
         area(sections)
         {
             group("Reference Data")
@@ -236,14 +138,6 @@ page 6151259 "NPR Retail Owner RC"
                     RunObject = Page "Vendor List";
                     ToolTip = 'View or edit detailed information for the vendors that you trade with. From each vendor card, you can open related information, such as purchase statistics and ongoing orders, and you can define special prices and line discounts that the vendor grants you if certain conditions are met.';
                 }
-                /*
-                action("POS Entry List")
-                {
-                    ApplicationArea = Basic, Suite;
-                    Image = List;
-                    RunObject = Page "POS Entry List";
-                }
-                */
                 action("Retail Item List")
                 {
                     ApplicationArea = Basic, Suite;
@@ -463,12 +357,8 @@ page 6151259 "NPR Retail Owner RC"
                 }
             }
         }
-
         area(Reporting)
         {
-
-
-
             group(Receivables)
             {
                 Caption = 'Receivables';
@@ -517,9 +407,7 @@ page 6151259 "NPR Retail Owner RC"
                     RunObject = Page "Posted Sales Credit Memos";
                     ToolTip = 'Open the list of posted sales credit memos.';
                 }
-
             }
-
             group(Payables)
             {
                 Caption = 'Payables';
@@ -548,17 +436,13 @@ page 6151259 "NPR Retail Owner RC"
                     ApplicationArea = Basic, Suite;
                     Caption = '&Purchase Order';
                     Image = Document;
-                    Promoted = false;
-                    //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                    //PromotedCategory = Process;
+                    Promoted = true;
+                    PromotedCategory = Process;
                     RunObject = Page "Purchase Order";
                     RunPageMode = Create;
                     ToolTip = 'Purchase goods or services from a vendor.';
                 }
-
-
             }
-
             group(Bank)
             {
                 Caption = 'Bank';
@@ -572,7 +456,6 @@ page 6151259 "NPR Retail Owner RC"
                 }
 
             }
-
             group("Prices/Discounts")
             {
                 Caption = 'Prices/Discounts';
@@ -585,7 +468,6 @@ page 6151259 "NPR Retail Owner RC"
                     RunObject = Page "Sales Price Worksheet";
                     ToolTip = 'Manage sales prices for individual customers, for a group of customers, for all customers, or for a campaign.';
                 }
-
                 action("Sales Prices")
                 {
                     ApplicationArea = Basic, Suite;
@@ -612,13 +494,9 @@ page 6151259 "NPR Retail Owner RC"
                     RunObject = Report "Adjust Item Costs/Prices";
                     ToolTip = 'Adjusts the Last Direct Cost, Standard Cost, Unit Price, Profit %, and Indirect Cost % fields on the item or stockkeeping unit cards. For example, you can change Last Direct Cost by 5% on all items from a specific vendor. The changes are processed immediately when the batch job is started. The fields on the item card that are dependent on the adjusted field are also changed.';
                 }
-
-
             }
-
             group(Reports)
             {
-
                 Caption = 'Reports';
                 group(RetailReport)
                 {
@@ -681,11 +559,9 @@ page 6151259 "NPR Retail Owner RC"
                         ToolTip = 'Executes the Discount Statistics action';
                     }
                 }
-
                 group(ItemPricesReport)
                 {
                     Caption = 'Item & Prices';
-
                     action("Item Sales Statistics")
                     {
                         Caption = 'Item Sales Statistics';
@@ -818,13 +694,9 @@ page 6151259 "NPR Retail Owner RC"
                         Image = "Report";
                         RunObject = Report "Reconcile Cust. and Vend. Accs";
                         ToolTip = 'Executes the Reconcile Cust. and Vend. Accs action';
-
                     }
-
                 }
-
             }
-
         }
     }
 }

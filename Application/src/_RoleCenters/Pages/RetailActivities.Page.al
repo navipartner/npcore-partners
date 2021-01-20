@@ -2,10 +2,8 @@ page 6059812 "NPR Retail Activities"
 {
     Caption = 'Retail Activities';
     PageType = CardPart;
-    UsageCategory = Administration;
-    ApplicationArea = All;
     SourceTable = "NPR Retail Sales Cue";
-
+    UsageCategory = None;
     layout
     {
         area(content)
@@ -13,21 +11,21 @@ page 6059812 "NPR Retail Activities"
             cuegroup(Control6150623)
             {
                 ShowCaption = false;
-                field("Sales Orders"; "Sales Orders")
+                field("Sales Orders"; Rec."Sales Orders")
                 {
                     ApplicationArea = All;
                     DrillDownPageID = "Sales Order List";
                     Image = "Document";
                     ToolTip = 'Specifies the value of the Sales Orders field';
                 }
-                field("Daily Sales Orders"; "Daily Sales Orders")
+                field("Daily Sales Orders"; Rec."Daily Sales Orders")
                 {
                     ApplicationArea = All;
                     DrillDownPageID = "Sales Order List";
                     Image = "Document";
                     ToolTip = 'Specifies the value of the Daily Sales Orders field';
                 }
-                field("Import Pending"; "Import Pending")
+                field("Import Pending"; Rec."Import Pending")
                 {
                     ApplicationArea = All;
                     DrillDownPageID = "NPR Nc Import List";
@@ -58,20 +56,20 @@ page 6059812 "NPR Retail Activities"
             cuegroup(Control6150622)
             {
                 ShowCaption = false;
-                field("Pending Inc. Documents"; "Pending Inc. Documents")
+                field("Pending Inc. Documents"; Rec."Pending Inc. Documents")
                 {
                     ApplicationArea = All;
                     Image = "Document";
                     ToolTip = 'Specifies the value of the Pending Inc. Documents field';
                 }
-                field("Processed Error Tasks"; "Processed Error Tasks")
+                field("Processed Error Tasks"; Rec."Processed Error Tasks")
                 {
                     ApplicationArea = All;
                     DrillDownPageID = "NPR Nc Task List";
                     Image = "Document";
                     ToolTip = 'Specifies the value of the Processed Error Tasks field';
                 }
-                field("Failed Webshop Payments"; "Failed Webshop Payments")
+                field("Failed Webshop Payments"; Rec."Failed Webshop Payments")
                 {
                     ApplicationArea = All;
                     DrillDownPageID = "NPR Magento Payment Line List";
@@ -83,7 +81,7 @@ page 6059812 "NPR Retail Activities"
             {
                 Caption = 'Depreciated';
                 Visible = false;
-                field("Sales Quotes"; "Sales Quotes")
+                field("Sales Quotes"; Rec."Sales Quotes")
                 {
                     ApplicationArea = All;
                     DrillDownPageID = "Sales Quotes";
@@ -91,7 +89,7 @@ page 6059812 "NPR Retail Activities"
                     Visible = false;
                     ToolTip = 'Specifies the value of the Sales Quotes field';
                 }
-                field("Sales Return Orders"; "Sales Return Orders")
+                field("Sales Return Orders"; Rec."Sales Return Orders")
                 {
                     ApplicationArea = All;
                     DrillDownPageID = "Sales Return Order List";
@@ -99,7 +97,7 @@ page 6059812 "NPR Retail Activities"
                     Visible = false;
                     ToolTip = 'Specifies the value of the Sales Return Orders field';
                 }
-                field("Magento Orders"; "Magento Orders")
+                field("Magento Orders"; Rec."Magento Orders")
                 {
                     ApplicationArea = All;
                     DrillDownPageID = "Sales Order List";
@@ -107,7 +105,7 @@ page 6059812 "NPR Retail Activities"
                     Visible = false;
                     ToolTip = 'Specifies the value of the Magento Orders field';
                 }
-                field("Daily Sales Invoices"; "Daily Sales Invoices")
+                field("Daily Sales Invoices"; Rec."Daily Sales Invoices")
                 {
                     ApplicationArea = All;
                     Caption = 'Daily Sales Invoices';
@@ -116,7 +114,7 @@ page 6059812 "NPR Retail Activities"
                     Visible = false;
                     ToolTip = 'Specifies the value of the Daily Sales Invoices field';
                 }
-                field("Tasks Unprocessed"; "Tasks Unprocessed")
+                field("Tasks Unprocessed"; Rec."Tasks Unprocessed")
                 {
                     ApplicationArea = All;
                     DrillDownPageID = "NPR Nc Task List";
@@ -128,27 +126,13 @@ page 6059812 "NPR Retail Activities"
         }
     }
 
-    actions
-    {
-        area(processing)
-        {
-            action("Action Items")
-            {
-                Caption = 'Action Items';
-                ApplicationArea = All;
-                ToolTip = 'Executes the Action Items action';
-                Image = Action;
-            }
-        }
-    }
-
     trigger OnOpenPage()
     begin
-        Reset;
-        if not Get then begin
-            Init;
-            Insert;
+        Rec.Reset;
+        if not Rec.Get then begin
+            Rec.Init;
+            Rec.Insert;
         end;
-        SetFilter("Date Filter", '=%1', WorkDate);
+        Rec.SetFilter("Date Filter", '=%1', WorkDate);
     end;
 }

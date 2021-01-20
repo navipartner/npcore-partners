@@ -1,13 +1,10 @@
 page 6014570 "NPR Retail Admin Activities"
 {
-    // NPR5.51/ZESO/20190725  CASE 343621 Object created.
-
     Caption = 'Retail Admin Activities';
     PageType = CardPart;
-    UsageCategory = Administration;
-    ApplicationArea = All;
     RefreshOnActivate = true;
     SourceTable = "NPR Retail Admin Cue";
+    UsageCategory = None;
 
     layout
     {
@@ -16,42 +13,42 @@ page 6014570 "NPR Retail Admin Activities"
             cuegroup(POS)
             {
                 Caption = 'POS';
-                field("User Setups"; "User Setups")
+                field("User Setups"; Rec."User Setups")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the User Setups field';
                 }
-                field(Salespersons; Salespersons)
+                field(Salespersons; Rec.Salespersons)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Salespersons field';
                 }
-                field("POS Stores"; "POS Stores")
+                field("POS Stores"; Rec."POS Stores")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Stores field';
                 }
-                field("POS Units"; "POS Units")
+                field("POS Units"; Rec."POS Units")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Units field';
                 }
-                field("Cash Registers"; "Cash Registers")
+                field("Cash Registers"; Rec."Cash Registers")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Cash Registers field';
                 }
-                field("POS Payment Bins"; "POS Payment Bins")
+                field("POS Payment Bins"; Rec."POS Payment Bins")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Payment Bins field';
                 }
-                field("POS Payment Methods"; "POS Payment Methods")
+                field("POS Payment Methods"; Rec."POS Payment Methods")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Payment Methods field';
                 }
-                field("POS Posting Setups"; "POS Posting Setups")
+                field("POS Posting Setups"; Rec."POS Posting Setups")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the POS Posting Setups field';
@@ -60,22 +57,22 @@ page 6014570 "NPR Retail Admin Activities"
             cuegroup(Tickets)
             {
                 Caption = 'Tickets';
-                field("Ticket Types"; "Ticket Types")
+                field("Ticket Types"; Rec."Ticket Types")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Ticket Types field';
                 }
-                field("Ticket Admission BOMs"; "Ticket Admission BOMs")
+                field("Ticket Admission BOMs"; Rec."Ticket Admission BOMs")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Ticket Admission BOMs field';
                 }
-                field("Ticket Schedules"; "Ticket Schedules")
+                field("Ticket Schedules"; Rec."Ticket Schedules")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Ticket Schedules field';
                 }
-                field("Ticket Admissions"; "Ticket Admissions")
+                field("Ticket Admissions"; Rec."Ticket Admissions")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Ticket Admissions field';
@@ -84,22 +81,22 @@ page 6014570 "NPR Retail Admin Activities"
             cuegroup(Members)
             {
                 Caption = 'Members';
-                field("Membership Setup"; "Membership Setup")
+                field("Membership Setup"; Rec."Membership Setup")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Membership Setup field';
                 }
-                field("Membership Sales Setup"; "Membership Sales Setup")
+                field("Membership Sales Setup"; Rec."Membership Sales Setup")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Membership Sales Setup field';
                 }
-                field("Member Alteration"; "Member Alteration")
+                field("Member Alteration"; Rec."Member Alteration")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Member Alteration field';
                 }
-                field("Member Community"; "Member Community")
+                field("Member Community"; Rec."Member Community")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Member Community field';
@@ -107,17 +104,12 @@ page 6014570 "NPR Retail Admin Activities"
             }
         }
     }
-
-    actions
-    {
-    }
-
     trigger OnOpenPage()
     begin
-        Reset;
-        if not Get then begin
-            Init;
-            Insert;
+        Rec.Reset;
+        if not Rec.Get then begin
+            Rec.Init;
+            Rec.Insert;
         end;
     end;
 }

@@ -1,14 +1,9 @@
 page 6059981 "NPR Store Manager Role Center"
 {
-    // NPR4.10/JDH/20150515 CASE 213618 Removed weather widget, since it created problems with ClickOnce deployments
-    // NPR5.31/TS  /20170328  CASE 270740 My Reports added
-    // NPR5.38/BR  /20180118  CASE 302790 Added POS Entry List
 
     Caption = 'Role Center';
     PageType = RoleCenter;
-    UsageCategory = Administration;
-    ApplicationArea = All;
-
+    UsageCategory = None;
     layout
     {
         area(rolecenter)
@@ -209,14 +204,6 @@ page 6059981 "NPR Store Manager Role Center"
                 RunObject = Page "NPR Campaign Discount List";
                 ApplicationArea = All;
                 ToolTip = 'Executes the Period Discounts action';
-            }
-        }
-        area(sections)
-        {
-            group(Statistics)
-            {
-                Caption = 'Statistics';
-                Image = Statistics;
             }
         }
     }

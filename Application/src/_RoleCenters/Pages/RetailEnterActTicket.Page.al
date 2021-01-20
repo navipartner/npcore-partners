@@ -1,14 +1,10 @@
 page 6151250 "NPR Retail Enter. Act - Ticket"
 {
-    // #343621/ZESO/20190725  CASE 343621 Object created.
-
     Caption = 'Activities';
     PageType = CardPart;
-    UsageCategory = Administration;
-    ApplicationArea = All;
     RefreshOnActivate = true;
     SourceTable = "NPR Retail Entertainment Cue";
-
+    UsageCategory = None;
     layout
     {
         area(content)
@@ -16,24 +12,24 @@ page 6151250 "NPR Retail Enter. Act - Ticket"
             cuegroup(Tickets)
             {
                 Caption = 'Tickets';
-                field("Issued Tickets"; "Issued Tickets")
+                field("Issued Tickets"; Rec."Issued Tickets")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Issued Tickets field';
                 }
-                field("Ticket Requests"; "Ticket Requests")
+                field("Ticket Requests"; Rec."Ticket Requests")
                 {
                     ApplicationArea = All;
                     DrillDownPageID = "NPR TM Ticket Request";
                     ToolTip = 'Specifies the value of the Ticket Requests field';
                 }
-                field("Ticket Schedules"; "Ticket Schedules")
+                field("Ticket Schedules"; Rec."Ticket Schedules")
                 {
                     ApplicationArea = All;
                     DrillDownPageID = "NPR TM Ticket Schedules";
                     ToolTip = 'Specifies the value of the Ticket Schedules field';
                 }
-                field("Ticket Admissions"; "Ticket Admissions")
+                field("Ticket Admissions"; Rec."Ticket Admissions")
                 {
                     ApplicationArea = All;
                     DrillDownPageID = "NPR TM Ticket Admissions";
@@ -43,18 +39,18 @@ page 6151250 "NPR Retail Enter. Act - Ticket"
             cuegroup(Members)
             {
                 Caption = 'Members';
-                field(Control6; Members)
+                field(Control6; Rec.Members)
                 {
                     ApplicationArea = All;
                     ShowCaption = false;
                     ToolTip = 'Specifies the value of the Members field';
                 }
-                field(Memberships; Memberships)
+                field(Memberships; Rec.Memberships)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Memberships field';
                 }
-                field(Membercards; Membercards)
+                field(Membercards; Rec.Membercards)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Membercards field';
@@ -64,17 +60,17 @@ page 6151250 "NPR Retail Enter. Act - Ticket"
             cuegroup(Master)
             {
                 Caption = 'Master';
-                field(Items; Items)
+                field(Items; Rec.Items)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Items field';
                 }
-                field(Contacts; Contacts)
+                field(Contacts; Rec.Contacts)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Contacts field';
                 }
-                field(Customers; Customers)
+                field(Customers; Rec.Customers)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Customers field';
@@ -83,17 +79,12 @@ page 6151250 "NPR Retail Enter. Act - Ticket"
             }
         }
     }
-
-    actions
-    {
-    }
-
     trigger OnOpenPage()
     begin
-        Reset;
-        if not Get then begin
-            Init;
-            Insert;
+        Rec.Reset;
+        if not Rec.Get then begin
+            Rec.Init;
+            Rec.Insert;
         end;
     end;
 }
