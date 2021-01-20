@@ -1,16 +1,9 @@
 page 6150665 "NPR NPRE Seating"
 {
-    // NPR5.34/ANEN/2017012  CASE 270255 Object Created for Hospitality - Version 1.0
-    // NPR5.34/ANEN/20170717 CASE 262628 Added support for status (fld "Status", "Status Description")
-    // NPR5.35/ANEN/20170821 CASE 283376 Solution rename to NP Restaurant
-    // NPR5.53/ALPO/20191210 CASE 380609 Dimensions: NPRE Seating integration
-    // NPR5.55/ALPO/20200615 CASE 399170 Restaurant flow change: support for waiter pad related manipulations directly inside a POS sale
-
     Caption = 'Seating';
     PageType = Card;
-    UsageCategory = Administration;
-    ApplicationArea = All;
     SourceTable = "NPR NPRE Seating";
+    UsageCategory = None;
 
     layout
     {
@@ -19,27 +12,27 @@ page 6150665 "NPR NPRE Seating"
             group(General)
             {
                 Caption = 'General';
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Seating Location"; "Seating Location")
+                field("Seating Location"; Rec."Seating Location")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Seating Location field';
                 }
-                field(Blocked; Blocked)
+                field(Blocked; Rec.Blocked)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Blocked field';
                 }
-                field("Blocking Reason"; "Blocking Reason")
+                field("Blocking Reason"; Rec."Blocking Reason")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Blocking Reason field';
@@ -48,12 +41,12 @@ page 6150665 "NPR NPRE Seating"
             group("Capasity Tab")
             {
                 Caption = 'Capasity';
-                field("Fixed Capasity"; "Fixed Capasity")
+                field("Fixed Capasity"; Rec."Fixed Capasity")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Fixed Capasity field';
                 }
-                field(Capacity; Capacity)
+                field(Capacity; Rec.Capacity)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Capacity field';
@@ -62,12 +55,12 @@ page 6150665 "NPR NPRE Seating"
             group(StatusGr)
             {
                 Caption = 'Status';
-                field(Status; Status)
+                field(Status; Rec.Status)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Status field';
                 }
-                field("Status Description FF"; "Status Description FF")
+                field("Status Description FF"; Rec."Status Description FF")
                 {
                     ApplicationArea = All;
                     Editable = false;
@@ -77,13 +70,13 @@ page 6150665 "NPR NPRE Seating"
             group("Current Acvtivity")
             {
                 Caption = 'Current Acvtivity';
-                field("Current Waiter Pad FF"; "Current Waiter Pad FF")
+                field("Current Waiter Pad FF"; Rec."Current Waiter Pad FF")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Current Waiter Pad field';
                 }
-                field("Multiple Waiter Pad FF"; "Multiple Waiter Pad FF")
+                field("Multiple Waiter Pad FF"; Rec."Multiple Waiter Pad FF")
                 {
                     ApplicationArea = All;
                     Editable = false;
@@ -146,4 +139,3 @@ page 6150665 "NPR NPRE Seating"
         end;
     end;
 }
-

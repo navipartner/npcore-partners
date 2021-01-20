@@ -1,7 +1,6 @@
 page 6150681 "NPR NPRE Item Routing Profiles"
 {
-    // NPR5.55/ALPO/20200708 CASE 382428 Kitchen Display System (KDS) for NP Restaurant (further enhancements)
-    // !TO DO: Show assigned print/prod categories and serving steps
+    //TODO: Show assigned print/prod categories and serving steps
 
     Caption = 'Rest. Item Routing Profiles';
     DelayedInsert = true;
@@ -17,17 +16,17 @@ page 6150681 "NPR NPRE Item Routing Profiles"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field(AssignedFlowStatuses; AssignedFlowStatusesAsString(FlowStatus."Status Object"::WaiterPadLineMealFlow))
+                field(AssignedFlowStatuses; Rec.AssignedFlowStatusesAsString(FlowStatus."Status Object"::WaiterPadLineMealFlow))
                 {
                     ApplicationArea = All;
                     Caption = 'Serving Steps';
@@ -36,10 +35,10 @@ page 6150681 "NPR NPRE Item Routing Profiles"
 
                     trigger OnDrillDown()
                     begin
-                        ShowFlowStatuses(FlowStatus."Status Object"::WaiterPadLineMealFlow);
+                        Rec.ShowFlowStatuses(FlowStatus."Status Object"::WaiterPadLineMealFlow);
                     end;
                 }
-                field(AssignedPrintCategories; AssignedPrintCategoriesAsString())
+                field(AssignedPrintCategories; Rec.AssignedPrintCategoriesAsString())
                 {
                     ApplicationArea = All;
                     Caption = 'Print/Prod. Categories';
@@ -48,7 +47,7 @@ page 6150681 "NPR NPRE Item Routing Profiles"
 
                     trigger OnDrillDown()
                     begin
-                        ShowPrintCategories();
+                        Rec.ShowPrintCategories();
                     end;
                 }
             }
@@ -76,7 +75,7 @@ page 6150681 "NPR NPRE Item Routing Profiles"
                     var
                         FlowStatus: Record "NPR NPRE Flow Status";
                     begin
-                        ShowFlowStatuses(FlowStatus."Status Object"::WaiterPadLineMealFlow);
+                        Rec.ShowFlowStatuses(FlowStatus."Status Object"::WaiterPadLineMealFlow);
                     end;
                 }
                 action(PrintCategories)
@@ -92,7 +91,7 @@ page 6150681 "NPR NPRE Item Routing Profiles"
 
                     trigger OnAction()
                     begin
-                        ShowPrintCategories();
+                        Rec.ShowPrintCategories();
                     end;
                 }
             }
@@ -101,11 +100,10 @@ page 6150681 "NPR NPRE Item Routing Profiles"
 
     trigger OnAfterGetRecord()
     begin
-        RelatedInfoIsEnabled := Code <> '';
+        RelatedInfoIsEnabled := Rec.Code <> '';
     end;
 
     var
         FlowStatus: Record "NPR NPRE Flow Status";
         RelatedInfoIsEnabled: Boolean;
 }
-

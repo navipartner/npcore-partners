@@ -1,15 +1,11 @@
 page 6150690 "NPR NPRE Kitchen Req. Subpage"
 {
-    // NPR5.54/ALPO/20200401 CASE 382428 Kitchen Display System (KDS) for NP Restaurant
-    // NPR5.55/ALPO/20200803 CASE 382428 Kitchen Display System (KDS) for NP Restaurant (further enhancements)
-
     Caption = 'Kitchen Request Stations';
     Editable = false;
     PageType = ListPart;
-    UsageCategory = Administration;
-    ApplicationArea = All;
     ShowFilter = false;
     SourceTable = "NPR NPRE Kitchen Req. Station";
+    UsageCategory = None;
 
     layout
     {
@@ -17,49 +13,49 @@ page 6150690 "NPR NPRE Kitchen Req. Subpage"
         {
             repeater(Group)
             {
-                field("Request No."; "Request No.")
+                field("Request No."; Rec."Request No.")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Request No. field';
                 }
-                field("Line No."; "Line No.")
+                field("Line No."; Rec."Line No.")
                 {
                     ApplicationArea = All;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Line No. field';
                 }
-                field("Production Restaurant Code"; "Production Restaurant Code")
+                field("Production Restaurant Code"; Rec."Production Restaurant Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Production Restaurant Code field';
                 }
-                field("Kitchen Station"; "Kitchen Station")
+                field("Kitchen Station"; Rec."Kitchen Station")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Kitchen Station field';
                 }
-                field("Production Status"; "Production Status")
+                field("Production Status"; Rec."Production Status")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Production Status field';
                 }
-                field("Start Date-Time"; "Start Date-Time")
+                field("Start Date-Time"; Rec."Start Date-Time")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Start Date-Time field';
                 }
-                field("End Date-Time"; "End Date-Time")
+                field("End Date-Time"; Rec."End Date-Time")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the End Date-Time field';
                 }
-                field("Qty. Change Not Accepted"; "Qty. Change Not Accepted")
+                field("Qty. Change Not Accepted"; Rec."Qty. Change Not Accepted")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Qty. Change Not Accepted field';
                 }
-                field("Last Qty. Change Accepted"; "Last Qty. Change Accepted")
+                field("Last Qty. Change Accepted"; Rec."Last Qty. Change Accepted")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Last Qty. Change Accepted field';
@@ -132,4 +128,3 @@ page 6150690 "NPR NPRE Kitchen Req. Subpage"
         ViewMode := NewViewMode;
     end;
 }
-

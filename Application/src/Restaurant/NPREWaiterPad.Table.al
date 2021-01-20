@@ -1,15 +1,5 @@
 table 6150660 "NPR NPRE Waiter Pad"
 {
-    // NPR5.34/ANEN/2017012  CASE 270255 Object Created for Hospitality - Version 1.0
-    // NPR5.34/ANEN/20170717 CASE 262628 Added support for status (fld "Status", "Status Description")
-    // NPR5.34/MMV /20170726 CASE 285002 Added field 100.
-    // NPR5.35/ANEN/20170821 CASE 283376 Solution rename to NP Restaurant
-    // NPR5.53/ALPO/20191210 CASE 380609 Store number of guests on waiter pad
-    // NPR5.53/ALPO/20200102 CASE 360258 Possibility to send to kitchen only selected waiter pad lines or lines of specific print category
-    // NPR5.53/ALPO/20200108 CASE 380918 Post Seating Code and Number of Guests to POS Entries (for further sales analysis breakedown)
-    // NPR5.55/ALPO/20200708 CASE 382428 Kitchen Display System (KDS) for NP Restaurant (further enhancements)
-    // NPR5.55/ALPO/20200615 CASE 399170 Restaurant flow change: support for waiter pad related manipulations directly inside a POS sale
-
     Caption = 'Waiter Pad';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR NPRE Waiter Pad List";
@@ -39,14 +29,14 @@ table 6150660 "NPR NPRE Waiter Pad"
         }
         field(16; "Current Seating FF"; Code[10])
         {
-            CalcFormula = Lookup ("NPR NPRE Seat.: WaiterPadLink"."Seating Code" WHERE("Waiter Pad No." = FIELD("No.")));
+            CalcFormula = Lookup("NPR NPRE Seat.: WaiterPadLink"."Seating Code" WHERE("Waiter Pad No." = FIELD("No.")));
             Caption = 'Current Seating';
             Editable = false;
             FieldClass = FlowField;
         }
         field(17; "Multiple Seating FF"; Integer)
         {
-            CalcFormula = Count ("NPR NPRE Seat.: WaiterPadLink" WHERE("Waiter Pad No." = FIELD("No."),
+            CalcFormula = Count("NPR NPRE Seat.: WaiterPadLink" WHERE("Waiter Pad No." = FIELD("No."),
                                                                         Closed = FIELD(Closed)));
             Caption = 'Multiple Seating';
             Editable = false;
@@ -80,7 +70,7 @@ table 6150660 "NPR NPRE Waiter Pad"
         }
         field(31; "Status Description FF"; Text[50])
         {
-            CalcFormula = Lookup ("NPR NPRE Flow Status".Description WHERE(Code = FIELD(Status)));
+            CalcFormula = Lookup("NPR NPRE Flow Status".Description WHERE(Code = FIELD(Status)));
             Caption = 'Status Description';
             Editable = false;
             FieldClass = FlowField;
@@ -99,7 +89,7 @@ table 6150660 "NPR NPRE Waiter Pad"
         }
         field(42; "No. of Guests on POS Sales"; Integer)
         {
-            CalcFormula = Sum ("NPR Sale POS"."NPRE Number of Guests" WHERE("NPRE Pre-Set Waiter Pad No." = FIELD("No.")));
+            CalcFormula = Sum("NPR Sale POS"."NPRE Number of Guests" WHERE("NPRE Pre-Set Waiter Pad No." = FIELD("No.")));
             Caption = 'No. of Guests on POS Sales';
             Description = 'NPR5.55';
             Editable = false;
@@ -114,7 +104,7 @@ table 6150660 "NPR NPRE Waiter Pad"
         }
         field(51; "Serving Step Description"; Text[50])
         {
-            CalcFormula = Lookup ("NPR NPRE Flow Status".Description WHERE(Code = FIELD("Serving Step Code")));
+            CalcFormula = Lookup("NPR NPRE Flow Status".Description WHERE(Code = FIELD("Serving Step Code")));
             Caption = 'Serving Step Description';
             Description = 'NPR5.53';
             Editable = false;
@@ -129,7 +119,7 @@ table 6150660 "NPR NPRE Waiter Pad"
         }
         field(53; "Last Req. Serving Step Descr."; Text[50])
         {
-            CalcFormula = Lookup ("NPR NPRE Flow Status".Description WHERE(Code = FIELD("Last Req. Serving Step Code")));
+            CalcFormula = Lookup("NPR NPRE Flow Status".Description WHERE(Code = FIELD("Last Req. Serving Step Code")));
             Caption = 'Last Req. Serving Step Descr.';
             Description = 'NPR5.53';
             Editable = false;
@@ -138,7 +128,7 @@ table 6150660 "NPR NPRE Waiter Pad"
         field(60; "Sum Unit Price"; Decimal)
         {
             AutoFormatType = 2;
-            CalcFormula = Sum ("NPR NPRE Waiter Pad Line"."Unit Price" WHERE("Waiter Pad No." = FIELD("No.")));
+            CalcFormula = Sum("NPR NPRE Waiter Pad Line"."Unit Price" WHERE("Waiter Pad No." = FIELD("No.")));
             Caption = 'Sum Unit Price';
             DecimalPlaces = 2 : 2;
             Editable = true;
@@ -164,10 +154,6 @@ table 6150660 "NPR NPRE Waiter Pad"
         key(Key1; "No.")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 
     trigger OnDelete()
@@ -209,25 +195,16 @@ table 6150660 "NPR NPRE Waiter Pad"
         if not (NPHWaiterPad."No." <> '') then exit;
 
         NPHWaiterPadLine.Reset;
-        //-NPR5.53 [360258]-revoked
-        //NPHWaiterPadLine.SETFILTER("Waiter Pad No.", '=%1', NPHWaiterPad."No.");
-        //IF NOT NPHWaiterPadLine.ISEMPTY THEN NPHWaiterPadLine.DELETEALL;
-        //+NPR5.53 [360258]-revoked
-        //-NPR5.53 [360258]
         NPHWaiterPadLine.SetRange("Waiter Pad No.", NPHWaiterPad."No.");
         if not NPHWaiterPadLine.IsEmpty then
             NPHWaiterPadLine.DeleteAll(true);
-        //+NPR5.53 [360258]
 
         NPHSeatingWaiterPadLink.Reset;
         NPHSeatingWaiterPadLink.SetFilter("Waiter Pad No.", '=%1', NPHWaiterPad."No.");
         if not NPHSeatingWaiterPadLink.IsEmpty then NPHSeatingWaiterPadLink.DeleteAll;
 
-        //-NPR5.55 [399170]
         POSInfoWaiterPadLink.SetRange("Waiter Pad No.", NPHWaiterPad."No.");
         if not POSInfoWaiterPadLink.IsEmpty then
             POSInfoWaiterPadLink.DeleteAll;
-        //+NPR5.55 [399170]
     end;
 }
-

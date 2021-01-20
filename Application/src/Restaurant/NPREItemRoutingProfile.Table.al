@@ -1,7 +1,5 @@
 table 6150668 "NPR NPRE Item Routing Profile"
 {
-    // NPR5.55/ALPO/20200708 CASE 382428 Kitchen Display System (KDS) for NP Restaurant (further enhancements)
-
     Caption = 'Rest. Item Routing Profile';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR NPRE Item Routing Profiles";
@@ -26,10 +24,6 @@ table 6150668 "NPR NPRE Item Routing Profile"
         key(Key1; "Code")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 
     trigger OnDelete()
@@ -74,4 +68,3 @@ table 6150668 "NPR NPRE Item Routing Profile"
         WaiterPadMgt.SelectFlowStatuses(RecordId, StatusObject, AssignedFlowStatus);
     end;
 }
-

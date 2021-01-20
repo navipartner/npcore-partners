@@ -1,13 +1,9 @@
 page 6150686 "NPR NPRE Kitchen Station Card"
 {
-    // NPR5.54/ALPO/20200401 CASE 382428 Kitchen Display System (KDS) for NP Restaurant
-    // NPR5.55/ALPO/20200803 CASE 382428 Kitchen Display System (KDS) for NP Restaurant (further enhancements)
-
     Caption = 'Restaurant Kitchen Station Card';
     PageType = Card;
-    UsageCategory = Administration;
-    ApplicationArea = All;
     SourceTable = "NPR NPRE Kitchen Station";
+    UsageCategory = None;
 
     layout
     {
@@ -15,22 +11,22 @@ page 6150686 "NPR NPRE Kitchen Station Card"
         {
             group(General)
             {
-                field("Restaurant Code"; "Restaurant Code")
+                field("Restaurant Code"; Rec."Restaurant Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Restaurant Code field';
                 }
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Description 2"; "Description 2")
+                field("Description 2"; Rec."Description 2")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description 2 field';
@@ -90,4 +86,3 @@ page 6150686 "NPR NPRE Kitchen Station Card"
         }
     }
 }
-

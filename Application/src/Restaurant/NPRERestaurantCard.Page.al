@@ -1,13 +1,8 @@
 page 6150684 "NPR NPRE Restaurant Card"
 {
-    // NPR5.54/ALPO/20200401 CASE 382428 Kitchen Display System (KDS) for NP Restaurant
-    // NPR5.55/ALPO/20200615 CASE 399170 Restaurant flow change: support for waiter pad related manipulations directly inside a POS sale
-    // NPR5.55/ALPO/20200803 CASE 382428 Kitchen Display System (KDS) for NP Restaurant (further enhancements)
-
     Caption = 'Restaurant Card';
     PageType = Card;
-    UsageCategory = Administration;
-    ApplicationArea = All;
+    UsageCategory = None;
     PromotedActionCategories = 'New,Process,Report,Kitchen,Layout';
     SourceTable = "NPR NPRE Restaurant";
 
@@ -18,22 +13,22 @@ page 6150684 "NPR NPRE Restaurant Card"
             group(General)
             {
                 Caption = 'General';
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Name; Name)
+                field(Name; Rec.Name)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Name field';
                 }
-                field("Name 2"; "Name 2")
+                field("Name 2"; Rec."Name 2")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Name 2 field';
                 }
-                field("Service Flow Profile"; "Service Flow Profile")
+                field("Service Flow Profile"; Rec."Service Flow Profile")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Service Flow Profile field';
@@ -42,12 +37,12 @@ page 6150684 "NPR NPRE Restaurant Card"
             group("Kitchen Integration")
             {
                 Caption = 'Kitchen Integration';
-                field("Auto Send Kitchen Order"; "Auto Send Kitchen Order")
+                field("Auto Send Kitchen Order"; Rec."Auto Send Kitchen Order")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Auto Send Kitchen Order field';
                 }
-                field("Resend All On New Lines"; "Resend All On New Lines")
+                field("Resend All On New Lines"; Rec."Resend All On New Lines")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Resend All On New Lines field';
@@ -55,7 +50,7 @@ page 6150684 "NPR NPRE Restaurant Card"
                 group(Print)
                 {
                     Caption = 'Print';
-                    field("Kitchen Printing Active"; "Kitchen Printing Active")
+                    field("Kitchen Printing Active"; Rec."Kitchen Printing Active")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Kitchen Printing Active field';
@@ -65,12 +60,12 @@ page 6150684 "NPR NPRE Restaurant Card"
                 {
                     Caption = 'KDS';
                     Visible = ShowKDS;
-                    field("KDS Active"; "KDS Active")
+                    field("KDS Active"; Rec."KDS Active")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the KDS Active field';
                     }
-                    field("Order ID Assign. Method"; "Order ID Assign. Method")
+                    field("Order ID Assign. Method"; Rec."Order ID Assign. Method")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Order ID Assign. Method field';
@@ -139,7 +134,7 @@ page 6150684 "NPR NPRE Restaurant Card"
                         KitchenRequest: Record "NPR NPRE Kitchen Request";
                         KitchenRequests: Page "NPR NPRE Kitchen Req.";
                     begin
-                        Rec.ShowKitchenRequests();  //NPR5.55 [382428]
+                        Rec.ShowKitchenRequests();
                     end;
                 }
             }
@@ -161,7 +156,7 @@ page 6150684 "NPR NPRE Restaurant Card"
                 action(Seatings)
                 {
                     Caption = 'Seatings';
-                    Enabled = (Code <> '');
+                    Enabled = (Rec.Code <> '');
                     Image = Lot;
                     Promoted = true;
                     PromotedCategory = Category5;
@@ -174,11 +169,9 @@ page 6150684 "NPR NPRE Restaurant Card"
                         Seating: Record "NPR NPRE Seating";
                         SeatingMgt: Codeunit "NPR NPRE Seating Mgt.";
                     begin
-                        //-NPR5.55 [382428]
-                        TestField(Code);
-                        Seating.SetFilter("Seating Location", SeatingMgt.RestaurantSeatingLocationFilter(Code));
+                        Rec.TestField(Code);
+                        Seating.SetFilter("Seating Location", SeatingMgt.RestaurantSeatingLocationFilter(Rec.Code));
                         PAGE.Run(0, Seating);
-                        //+NPR5.55 [382428]
                     end;
                 }
             }
@@ -195,4 +188,3 @@ page 6150684 "NPR NPRE Restaurant Card"
     var
         ShowKDS: Boolean;
 }
-

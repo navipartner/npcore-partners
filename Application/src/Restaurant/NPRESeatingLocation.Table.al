@@ -1,11 +1,5 @@
 table 6150666 "NPR NPRE Seating Location"
 {
-    // NPR5.34/ANEN/2017012  CASE 270255 Object Created for Hospitality - Version 1.0
-    // NPR5.35/ANEN/20170821 CASE 283376 Solution rename to NP Restaurant
-    // NPR5.52/ALPO/20190813 CASE 360258 Location specific setting of 'Auto print kintchen order'
-    // NPR5.53/ALPO/20200102 CASE 360258 Possibility to send to kitchen only selected waiter pad lines or lines of specific print category
-    // NPR5.54/ALPO/20200401 CASE 382428 Kitchen Display System (KDS) for NP Restaurant
-
     Caption = 'Seating Location';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR NPRE Seating Location";
@@ -32,13 +26,13 @@ table 6150666 "NPR NPRE Seating Location"
         }
         field(10; Seatings; Integer)
         {
-            CalcFormula = Count ("NPR NPRE Seating" WHERE("Seating Location" = FIELD(Code)));
+            CalcFormula = Count("NPR NPRE Seating" WHERE("Seating Location" = FIELD(Code)));
             Caption = 'Seatings';
             FieldClass = FlowField;
         }
         field(11; Seats; Integer)
         {
-            CalcFormula = Sum ("NPR NPRE Seating".Capacity WHERE("Seating Location" = FIELD(Code)));
+            CalcFormula = Sum("NPR NPRE Seating".Capacity WHERE("Seating Location" = FIELD(Code)));
             Caption = 'Seats';
             FieldClass = FlowField;
         }
@@ -78,9 +72,4 @@ table 6150666 "NPR NPRE Seating Location"
         {
         }
     }
-
-    fieldgroups
-    {
-    }
 }
-
