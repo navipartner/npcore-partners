@@ -1950,6 +1950,7 @@ codeunit 6060119 "NPR TM Ticket Request Manager"
             TicketNotificationEntry."Failed With Message" := CopyStr(ResponseMessage, 1, MaxStrLen(TicketNotificationEntry."Failed With Message"));
             TicketNotificationEntry."Notification Send Status" := TicketNotificationEntry."Notification Send Status"::FAILED;
             TicketNotificationEntry.Modify();
+            Commit();
             exit(false);
         end;
 
@@ -1959,6 +1960,7 @@ codeunit 6060119 "NPR TM Ticket Request Manager"
                     TicketNotificationEntry."Failed With Message" := CopyStr(ResponseMessage, 1, MaxStrLen(TicketNotificationEntry."Failed With Message"));
                     TicketNotificationEntry."Notification Send Status" := TicketNotificationEntry."Notification Send Status"::FAILED;
                     TicketNotificationEntry.Modify();
+                    Commit();
                     exit(false);
                 end;
             end;
@@ -1986,9 +1988,11 @@ codeunit 6060119 "NPR TM Ticket Request Manager"
             if (TicketSetup."Show Message Body (Debug)") then
                 Message('Pass Data %1', CopyStr(PassData, 1, 2048));
 
-        if (CreatePass(TicketNotificationEntry, PassData, ReasonMessage)) then
-            if (not SetPassUrl(TicketNotificationEntry, ReasonMessage)) then
-                exit(false);
+        if (not CreatePass(TicketNotificationEntry, PassData, ReasonMessage)) then
+            exit(false);
+
+        if (not SetPassUrl(TicketNotificationEntry, ReasonMessage)) then
+            exit(false);
 
         exit(true);
     end;
@@ -2038,7 +2042,8 @@ codeunit 6060119 "NPR TM Ticket Request Manager"
     var
         JSONResult: Text;
         FailReason: Text;
-        JObject: DotNet JObject;
+        JObject: JsonObject;
+
     begin
 
         if not (NPPassServerInvokeApi('GET', TicketNotificationEntry, ReasonMessage, '', JSONResult)) then
@@ -2047,7 +2052,8 @@ codeunit 6060119 "NPR TM Ticket Request Manager"
         if (JSONResult = '') then
             exit(false);
 
-        JObject := JObject.Parse(JSONResult);
+        JObject.ReadFrom(JSONResult);
+
         TicketNotificationEntry."eTicket Pass Default URL" := GetStringValue(JObject, 'public_url.default');
         TicketNotificationEntry."eTicket Pass Andriod URL" := GetStringValue(JObject, 'public_url.android');
         TicketNotificationEntry."eTicket Pass Landing URL" := GetStringValue(JObject, 'public_url.landing');
@@ -2055,16 +2061,15 @@ codeunit 6060119 "NPR TM Ticket Request Manager"
         exit(true);
     end;
 
-    local procedure GetStringValue(JObject: DotNet JObject; "Key": Text): Text
+    local procedure GetStringValue(JObject: JsonObject; JKey: Text) JValue: Text
     var
-        JToken: DotNet JToken;
+        JToken: JsonToken;
     begin
 
-        JToken := JObject.SelectToken(Key, false);
-        if (IsNull(JToken)) then
+        if (not JObject.SelectToken(JKey, JToken)) then
             exit('');
 
-        exit(JToken.ToString());
+        JToken.WriteTo(JValue);
     end;
 
     procedure AssignDataToPassTemplate(var RecRef: RecordRef; Line: Text) NewLine: Text
@@ -2191,146 +2196,79 @@ codeunit 6060119 "NPR TM Ticket Request Manager"
         exit(ResponseMessage = '');
     end;
 
-    procedure NPPassServerInvokeApi(Method: Code[10]; TicketNotificationEntry: Record "NPR TM Ticket Notif. Entry"; var ReasonText: Text; JSONIn: Text; var JSONOut: Text): Boolean
+    [TryFunction]
+    procedure NPPassServerInvokeApi(RequestMethod: Code[10]; TicketNotificationEntry: Record "NPR TM Ticket Notif. Entry"; var ReasonText: Text; JSONIn: Text; var JSONOut: Text)
     var
         TicketSetup: Record "NPR TM Ticket Setup";
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
-        HttpWebRequest: DotNet NPRNetHttpWebRequest;
-        HttpWebResponse: DotNet NPRNetHttpWebResponse;
-        WebException: DotNet NPRNetWebException;
+        Client: HttpClient;
+        Content: HttpContent;
+        ContentHeaders: HttpHeaders;
+        RequestHeaders: HttpHeaders;
+        Request: HttpRequestMessage;
+        Response: HttpResponseMessage;
+        AcceptTok: Label 'Accept', Locked = true;
+        ContentTypeTxt: Label 'application/json', Locked = true;
+        AuthorizationTok: Label 'Authorization', Locked = true;
+        ContentTypeTok: Label 'Content-Type', Locked = true;
+        UserAgentTxt: Label 'NP Dynamics Retail / Dynamics 365 Business Central', Locked = true;
+        ConnectErrorTxt: Label 'NP Pass Service connection error. (HTTP Reason Code: %1)';
+        GenericErrorTxt: Label 'NP Pass Service connection error. (Reason: %1)';
+        ServerErrorTxt: Label 'NP Pass Service encountered an error processing the request: %1, %2';
+        UserAgentTok: Label 'User-Agent', Locked = true;
+        RequestOk: Boolean;
         Url: Text;
-        ResponseText: Text;
-        Exception: DotNet NPRNetException;
-        StatusCode: Code[10];
-        StatusDescription: Text[50];
     begin
 
         TicketSetup.Get();
 
         ReasonText := '';
+        JSONOut := '';
+        ClearLastError();
+
         Url := StrSubstNo('%1%2?sync=%3', TicketSetup."NP-Pass Server Base URL",
                                            StrSubstNo(TicketSetup."NP-Pass API", TicketNotificationEntry."eTicket Type Code", TicketNotificationEntry."eTicket Pass Id"),
                                            Format(TicketSetup."NP-Pass Notification Method", 0, 9));
 
-        HttpWebRequest := HttpWebRequest.Create(Url);
-        HttpWebRequest.Timeout := 10000;
-        HttpWebRequest.KeepAlive(true);
+        Content.WriteFrom(JSONIn);
+        Content.GetHeaders(ContentHeaders);
+        if (ContentHeaders.Contains(ContentTypeTok)) then
+            ContentHeaders.Remove(ContentTypeTok);
+        ContentHeaders.Add(ContentTypeTok, ContentTypeTxt);
 
-        HttpWebRequest.Method := Method;
-        HttpWebRequest.ContentType := 'application/json';
-        HttpWebRequest.Accept := 'application/json';
-        HttpWebRequest.UseDefaultCredentials(false);
-        HttpWebRequest.Headers.Add('Authorization', StrSubstNo('Bearer %1', TicketSetup."NP-Pass Token"));
+        RequestHeaders := Client.DefaultRequestHeaders();
+        RequestHeaders.Clear();
+        RequestHeaders.Add(UserAgentTok, UserAgentTxt);
+        RequestHeaders.Add(AcceptTok, ContentTypeTxt);
+        RequestHeaders.Add(AuthorizationTok, StrSubstNo('Bearer %1', TicketSetup."NP-Pass Token"));
 
-        NpXmlDomMgt.SetTrustedCertificateValidation(HttpWebRequest);
+        Client.Timeout := 10000;
+        if (TicketSetup."Timeout (ms)" > 0) then
+            Client.Timeout := TicketSetup."Timeout (ms)";
 
-        if (TrySendWebRequest(JSONIn, HttpWebRequest, HttpWebResponse)) then begin
-            TryReadResponseText(HttpWebResponse, ResponseText);
-            JSONOut := ResponseText;
-            exit(true);
-        end;
+        if (RequestMethod = 'PUT') then
+            RequestOk := Client.Put(Url, Content, Response);
 
-        ReasonText := StrSubstNo('Error from API %1\\%2', GetLastErrorText, Url);
+        if (RequestMethod = 'GET') then
+            RequestOk := Client.Get(Url, Response);
 
-        Exception := GetLastErrorObject();
-        if ((Format(GetDotNetType(Exception.GetBaseException()))) <> (Format(GetDotNetType(WebException)))) then
-            Error(Exception.ToString());
-
-        WebException := Exception.GetBaseException();
-        TryReadExceptionResponseText(WebException, StatusCode, StatusDescription, ResponseText);
-
-        if (StrLen(ResponseText) > 0) then
-            Error(ResponseText);
-
-        if (StrLen(ResponseText) = 0) then
-            Error(StrSubstNo(
-              '<Fault>' +
-                '<faultstatus>%1</faultstatus>' +
-                '<faultstring>%2 - %3</faultstring>' +
-              '</Fault>',
-              StatusCode,
-              StatusDescription,
-              Url));
-
-        exit(false);
-    end;
-
-    [TryFunction]
-    local procedure TrySendWebRequest(JSON: Text; HttpWebRequest: DotNet NPRNetHttpWebRequest; var HttpWebResponse: DotNet NPRNetHttpWebResponse)
-    var
-        MemoryStreamOut: DotNet NPRNetMemoryStream;
-        MemoryStreamIn: DotNet NPRNetMemoryStream;
-        Encoding: DotNet NPRNetEncoding;
-    begin
-
-        if (StrLen(JSON) > 0) then begin
-            MemoryStreamIn := MemoryStreamIn.MemoryStream(Encoding.UTF8.GetBytes(JSON));
-            MemoryStreamOut := HttpWebRequest.GetRequestStream();
-
-            MemoryStreamIn.WriteTo(MemoryStreamOut);
-
-            MemoryStreamOut.Flush;
-            MemoryStreamOut.Close;
-            Clear(MemoryStreamOut);
-
-            MemoryStreamIn.Close();
-            Clear(MemoryStreamIn);
-        end;
-        HttpWebResponse := HttpWebRequest.GetResponse;
-    end;
-
-    [TryFunction]
-    local procedure TryReadResponseText(var HttpWebResponse: DotNet NPRNetHttpWebResponse; var ResponseText: Text)
-    var
-        StreamReader: DotNet NPRNetStreamReader;
-    begin
-
-        StreamReader := StreamReader.StreamReader(HttpWebResponse.GetResponseStream());
-        ResponseText := StreamReader.ReadToEnd;
-
-        StreamReader.Close;
-        Clear(StreamReader);
-    end;
-
-    [TryFunction]
-    local procedure TryReadExceptionResponseText(var WebException: DotNet NPRNetWebException; var StatusCode: Code[10]; var StatusDescription: Text; var ResponseXml: Text)
-    var
-        StreamReader: DotNet NPRNetStreamReader;
-        HttpWebResponse: DotNet NPRNetHttpWebResponse;
-        WebExceptionStatus: DotNet NPRNetWebExceptionStatus;
-        SystemConvert: DotNet NPRNetConvert;
-        StatusCodeInt: Integer;
-        DotNetType: DotNet NPRNetType;
-    begin
-
-        ResponseXml := '';
-
-        // No response body on time out
-        if (WebException.Status.Equals(WebExceptionStatus.Timeout)) then begin
-            DotNetType := GetDotNetType(StatusCodeInt);
-            StatusCodeInt := SystemConvert.ChangeType(WebExceptionStatus.Timeout, DotNetType);
-            StatusCode := Format(StatusCodeInt);
-            StatusDescription := WebExceptionStatus.Timeout.ToString();
-            exit;
-        end;
-
-        // This happens for unauthorized and server side faults (4xx and 5xx)
-        // The response stream in unauthorized fails in XML transformation later
-        if (WebException.Status.Equals(WebExceptionStatus.ProtocolError)) then begin
-            HttpWebResponse := WebException.Response();
-            DotNetType := GetDotNetType(StatusCodeInt);
-            StatusCodeInt := SystemConvert.ChangeType(HttpWebResponse.StatusCode, DotNetType);
-            StatusCode := Format(StatusCodeInt);
-            StatusDescription := HttpWebResponse.StatusDescription;
-            if (StatusCode[1] = '4') then // 4xx messages
+        if (RequestOk) then begin
+            if (Response.IsSuccessStatusCode()) then begin
+                Response.Content.ReadAs(JSONOut);
                 exit;
+            end;
+
+            if (Response.Content.ReadAs(ReasonText)) then
+                Error(ReasonText);
+
+            ReasonText := StrSubstNo(ConnectErrorTxt, Response.HttpStatusCode());
+            Error(ReasonText);
         end;
 
-        StreamReader := StreamReader.StreamReader(WebException.Response().GetResponseStream());
-        ResponseXml := StreamReader.ReadToEnd;
+        ReasonText := GetLastErrorText();
+        Error(ReasonText);
 
-        StreamReader.Close;
-        Clear(StreamReader);
     end;
+
 }
 
