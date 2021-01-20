@@ -1,10 +1,5 @@
 table 6150662 "NPR NPRE Seat.: WaiterPadLink"
 {
-    // NPR5.34/ANEN/2017012  CASE 270255 Object Created for Hospitality - Version 1.0
-    // NPR5.35/ANEN/20170821 CASE 283376 Solution rename to NP Restaurant
-    // NPR5.35/JDH /20170828 CASE 288314 Seating Code changed to code 10
-    // NPR5.55/ALPO/20200615 CASE 399170 Restaurant flow change: support for waiter pad related manipulations directly inside a POS sale
-
     Caption = 'Seating - Waiter Pad Link';
     DataClassification = CustomerContent;
 
@@ -36,13 +31,13 @@ table 6150662 "NPR NPRE Seat.: WaiterPadLink"
         }
         field(12; "Seating Description FF"; Text[50])
         {
-            CalcFormula = Lookup ("NPR NPRE Seating".Description WHERE(Code = FIELD("Seating Code")));
+            CalcFormula = Lookup("NPR NPRE Seating".Description WHERE(Code = FIELD("Seating Code")));
             Caption = 'Seating Description';
             FieldClass = FlowField;
         }
         field(13; "Waiter Pad Description FF"; Text[50])
         {
-            CalcFormula = Lookup ("NPR NPRE Waiter Pad".Description WHERE("No." = FIELD("Waiter Pad No.")));
+            CalcFormula = Lookup("NPR NPRE Waiter Pad".Description WHERE("No." = FIELD("Waiter Pad No.")));
             Caption = 'Waiter Pad Description';
             FieldClass = FlowField;
         }
@@ -63,9 +58,4 @@ table 6150662 "NPR NPRE Seat.: WaiterPadLink"
         {
         }
     }
-
-    fieldgroups
-    {
-    }
 }
-

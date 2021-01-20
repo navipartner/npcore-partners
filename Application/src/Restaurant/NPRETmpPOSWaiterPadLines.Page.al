@@ -1,9 +1,5 @@
 page 6150666 "NPR NPRE Tmp POSWaiterPadLines"
 {
-    // NPR5.34/ANEN/2017012  CASE 270255 Object Created for Hospitality - Version 1.0
-    // NPR5.35/ANEN/20170821 CASE 283376 Solution rename to NP Restaurant
-    // NPR5.55/ALPO/20200615 CASE 399170 Restaurant flow change: support for waiter pad related manipulations directly inside a POS sale
-
     Caption = 'Add lines to ticket';
     DeleteAllowed = false;
     InsertAllowed = false;
@@ -21,33 +17,33 @@ page 6150666 "NPR NPRE Tmp POSWaiterPadLines"
             repeater(Control6014408)
             {
                 ShowCaption = false;
-                field(Marked; Marked)
+                field(Marked; Rec.Marked)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Marked field';
                 }
-                field("Waiter Pad No."; "Waiter Pad No.")
+                field("Waiter Pad No."; Rec."Waiter Pad No.")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Waiter Pad No. field';
                 }
-                field("Line No."; "Line No.")
+                field("Line No."; Rec."Line No.")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Line No. field';
                 }
-                field(Type; Type)
+                field(Type; Rec.Type)
                 {
                     ApplicationArea = All;
                     Editable = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Type field';
                 }
-                field("No."; "No.")
+                field("No."; Rec."No.")
                 {
                     ApplicationArea = All;
                     Editable = false;
@@ -55,14 +51,14 @@ page 6150666 "NPR NPRE Tmp POSWaiterPadLines"
                     Visible = false;
                     ToolTip = 'Specifies the value of the No. field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     Editable = false;
                     StyleExpr = StyleTxt;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field(Quanity; RemainingQtyToBill)
+                field(Quanity; Rec.RemainingQtyToBill)
                 {
                     ApplicationArea = All;
                     Caption = 'Quantity';
@@ -70,13 +66,13 @@ page 6150666 "NPR NPRE Tmp POSWaiterPadLines"
                     StyleExpr = StyleTxt;
                     ToolTip = 'Specifies the value of the Quantity field';
                 }
-                field("Marked Qty"; "Marked Qty")
+                field("Marked Qty"; Rec."Marked Qty")
                 {
                     ApplicationArea = All;
                     StyleExpr = StyleTxt;
                     ToolTip = 'Specifies the value of the Qty. to ticket field';
                 }
-                field("Variant Code"; "Variant Code")
+                field("Variant Code"; Rec."Variant Code")
                 {
                     ApplicationArea = All;
                     StyleExpr = StyleTxt;
@@ -120,34 +116,26 @@ page 6150666 "NPR NPRE Tmp POSWaiterPadLines"
 
         if FirstOpen then begin
             FirstOpen := false;
-            Marked := false;
+            Rec.Marked := false;
         end else begin
-            Marked := not Marked;
-            //-NPR5.55 [399170]-revoked
-            //IF ( (Quantity <> 1) AND (Quantity > 0) ) THEN BEGIN
-            //  IF NOT WaiterPadPOSManagement.GetQtyUI(Quantity, Description, ChosenQty) THEN BEGIN
-            //+NPR5.55 [399170]-revoked
-            //-NPR5.55 [399170]
-            if RemainingQtyToBill() > 1 then begin
-                if not WaiterPadPOSManagement.GetQtyUI(RemainingQtyToBill(), Description, ChosenQty) then begin
-                    //+NPR5.55 [399170]
-                    Marked := false;
+            Rec.Marked := not Rec.Marked;
+            if Rec.RemainingQtyToBill() > 1 then begin
+                if not WaiterPadPOSManagement.GetQtyUI(Rec.RemainingQtyToBill(), Rec.Description, ChosenQty) then begin
+                    Rec.Marked := false;
                     StyleTxt := '';
                     exit;
                 end;
                 if ChosenQty = 0 then Error(ERRQTYZERO);
-                //IF ChosenQty > Quantity THEN ERROR(ERRQTYTOHIGH, Quantity);  //NPR5.55 [399170]-revoked
-                if ChosenQty > RemainingQtyToBill() then Error(ERRQTYTOHIGH, RemainingQtyToBill());  //NPR5.55 [399170]
-                "Marked Qty" := ChosenQty;
+                if ChosenQty > Rec.RemainingQtyToBill() then Error(ERRQTYTOHIGH, Rec.RemainingQtyToBill());
+                Rec."Marked Qty" := ChosenQty;
             end else begin
-                //"Marked Qty" := Quantity;  //NPR5.55 [399170]-revoked
-                "Marked Qty" := RemainingQtyToBill();  //NPR5.55 [399170]
+                Rec."Marked Qty" := Rec.RemainingQtyToBill();
             end;
         end;
 
-        if not Marked then "Marked Qty" := 0;
+        if not Rec.Marked then Rec."Marked Qty" := 0;
 
-        Modify;
+        Rec.Modify;
 
         StyleTxt := GetStyle;
     end;
@@ -156,7 +144,7 @@ page 6150666 "NPR NPRE Tmp POSWaiterPadLines"
     begin
         OKLines := false;
         FirstOpen := true;
-        FindFirst;
+        Rec.FindFirst;
     end;
 
     var
@@ -175,20 +163,7 @@ page 6150666 "NPR NPRE Tmp POSWaiterPadLines"
 
     procedure fnSetLines(var TMPWaiterPadLine: Record "NPR NPRE Waiter Pad Line" temporary)
     begin
-        Copy(TMPWaiterPadLine, true);
-        //-NPR5.55 [399170]-revoked
-        /*
-        Rec.DELETEALL;
-        TMPWaiterPadLine.FINDSET;
-        
-        REPEAT
-          Rec.INIT;
-          Rec.TRANSFERFIELDS(TMPWaiterPadLine);
-          Rec.INSERT;
-        UNTIL (0 = TMPWaiterPadLine.NEXT);
-        */
-        //+NPR5.55 [399170]-revoked
-
+        Rec.Copy(TMPWaiterPadLine, true);
     end;
 
     procedure fnGetLines(var TMPWaiterPadLine: Record "NPR NPRE Waiter Pad Line" temporary)
@@ -211,11 +186,10 @@ page 6150666 "NPR NPRE Tmp POSWaiterPadLines"
 
     local procedure GetStyle(): Text
     begin
-        if Marked then begin
+        if Rec.Marked then begin
             exit('Attention');
         end else begin
             exit('');
         end;
     end;
 }
-

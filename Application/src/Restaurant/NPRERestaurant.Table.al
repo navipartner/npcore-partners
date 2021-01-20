@@ -1,9 +1,5 @@
 table 6150681 "NPR NPRE Restaurant"
 {
-    // NPR5.54/ALPO/20200401 CASE 382428 Kitchen Display System (KDS) for NP Restaurant
-    // NPR5.55/ALPO/20200420 CASE 382428 Fixed primary key (changed from Name to Code)
-    // NPR5.55/ALPO/20200615 CASE 399170 Restaurant flow change: support for waiter pad related manipulations directly inside a POS sale
-
     Caption = 'Restaurant';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR NPRE Restaurants";
@@ -79,10 +75,6 @@ table 6150681 "NPR NPRE Restaurant"
         }
     }
 
-    fieldgroups
-    {
-    }
-
     procedure ShowKitchenRequests()
     var
         KitchenRequest: Record "NPR NPRE Kitchen Request";
@@ -98,4 +90,3 @@ table 6150681 "NPR NPRE Restaurant"
         KitchenRequests.Run;
     end;
 }
-

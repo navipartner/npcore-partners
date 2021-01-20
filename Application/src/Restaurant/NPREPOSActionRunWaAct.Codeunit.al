@@ -1,12 +1,5 @@
 codeunit 6150676 "NPR NPRE POSAction: Run Wa.Act"
 {
-    // NPR5.55/ALPO/20200615 CASE 399170 Restaurant flow change: support for waiter pad related manipulations directly inside a POS sale
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         ActionDescription: Label 'An action to run Waiter Pad functions';
         WPadNotSelectedErr: Label 'Please select a waiter pad first.';
@@ -21,29 +14,28 @@ codeunit 6150676 "NPR NPRE POSAction: Run Wa.Act"
         exit('1.1');
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', true, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', true, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
-        with Sender do
-            if DiscoverAction(
-                ActionCode(),
-                ActionDescription,
-                ActionVersion,
-                Type::Generic,
-                "Subscriber Instances Allowed"::Multiple)
-            then begin
-                RegisterWorkflowStep('RunWorkflowSteps', 'respond();');
-                RegisterWorkflow(false);
+        if Sender.DiscoverAction(
+            ActionCode(),
+            ActionDescription,
+            ActionVersion,
+            Sender.Type::Generic,
+            Sender."Subscriber Instances Allowed"::Multiple)
+        then begin
+            Sender.RegisterWorkflowStep('RunWorkflowSteps', 'respond();');
+            Sender.RegisterWorkflow(false);
 
-                RegisterOptionParameter('WaiterPadAction', 'Print Pre-Receipt,Send Kitchen Order,Request Next Serving,Request Specific Serving,Merge Waiter Pad,Close w/out Saving', 'Print Pre-Receipt');
-                RegisterOptionParameter('LinesToSend', 'New/Updated,All', 'New/Updated');
-                RegisterTextParameter('ServingStep', '');
-                RegisterBooleanParameter('MoveSaleToWPadOnFinish', false);
-                RegisterBooleanParameter('ReturnToDefaultView', false);
-            end;
+            Sender.RegisterOptionParameter('WaiterPadAction', 'Print Pre-Receipt,Send Kitchen Order,Request Next Serving,Request Specific Serving,Merge Waiter Pad,Close w/out Saving', 'Print Pre-Receipt');
+            Sender.RegisterOptionParameter('LinesToSend', 'New/Updated,All', 'New/Updated');
+            Sender.RegisterTextParameter('ServingStep', '');
+            Sender.RegisterBooleanParameter('MoveSaleToWPadOnFinish', false);
+            Sender.RegisterBooleanParameter('ReturnToDefaultView', false);
+        end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', true, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', true, false)]
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         SalePOS: Record "NPR Sale POS";
@@ -142,7 +134,7 @@ codeunit 6150676 "NPR NPRE POSAction: Run Wa.Act"
         end;
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150705, 'OnLookupValue', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnLookupValue', '', false, false)]
     local procedure OnLookupValue(var POSParameterValue: Record "NPR POS Parameter Value"; Handled: Boolean)
     var
         SelectedServingStep: Code[10];
@@ -160,7 +152,7 @@ codeunit 6150676 "NPR NPRE POSAction: Run Wa.Act"
         end;
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150705, 'OnValidateValue', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnValidateValue', '', false, false)]
     local procedure OnValidateValue(var POSParameterValue: Record "NPR POS Parameter Value")
     var
         FlowStatus: Record "NPR NPRE Flow Status";
@@ -185,7 +177,7 @@ codeunit 6150676 "NPR NPRE POSAction: Run Wa.Act"
         end;
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterNameCaption', '', true, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnGetParameterNameCaption', '', true, false)]
     local procedure OnGetParameterNameCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     var
         CaptionLinesToSend: Label 'Lines to Send to Kitchen';
@@ -211,7 +203,7 @@ codeunit 6150676 "NPR NPRE POSAction: Run Wa.Act"
         end;
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterDescriptionCaption', '', true, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnGetParameterDescriptionCaption', '', true, false)]
     local procedure OnGetParameterDescriptionCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     var
         DescLinesToSend: Label 'Defines which waiter pad lines are to be sent to kitchen, if ''Send Kitchen Order'' is selected as Waiter Pad Action';
@@ -237,7 +229,7 @@ codeunit 6150676 "NPR NPRE POSAction: Run Wa.Act"
         end;
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterOptionStringCaption', '', true, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnGetParameterOptionStringCaption', '', true, false)]
     local procedure OnGetParameterOptionStringCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     var
         OptionLinesToSend: Label 'New/Updated,All';
@@ -273,4 +265,3 @@ codeunit 6150676 "NPR NPRE POSAction: Run Wa.Act"
         exit(false);
     end;
 }
-

@@ -1,16 +1,5 @@
 codeunit 6150666 "NPR NPRE POSAction: Save2Wa."
 {
-    // NPR5.45/MHA /20180827 CASE 318369 Object created
-    // NPR5.50/TJ  /20190530 CASE 346384 New parameter added
-    // NPR5.53/ALPO/20191211 CASE 380609 NPRE: New guest arrival procedure. Use preselected Waiterpad No. and Seating Code as well as Number of Guests
-    // NPR5.55/ALPO/20200623 CASE 399170 Restaurant flow change: support for waiter pad related manipulations directly inside a POS sale
-    // NPR5.55/ALPO/20200730 CASE 414938 POS Store/POS Unit - Restaurant link (filter seatings by restaurant)
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         Text000: Label 'Save POS Sale to Waiter Pad';
         Text001: Label 'No Water Pad exists on %1\Create new Water Pad?';
@@ -22,80 +11,71 @@ codeunit 6150666 "NPR NPRE POSAction: Save2Wa."
 
     local procedure ActionVersion(): Text
     begin
-        exit('1.2');  //NPR5.55 [399170]
-        exit('1.1');
+        exit('1.2');
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
-        with Sender do begin
-            if DiscoverAction(
-              ActionCode(),
-              Text000,
-              ActionVersion(),
-              Type::Generic,
-              "Subscriber Instances Allowed"::Multiple)
-            then begin
-                //-NPR5.53 [380609]
-                RegisterWorkflowStep('addPresetValuesToContext', 'respond();');
-                //+NPR5.53 [380609]
-                RegisterWorkflowStep('seatingInput',
-                  'if (!context.seatingCode) {' +  //NPR5.53 [380609]
-                    'if (param.FixedSeatingCode) {' +
-                    '  context.seatingCode = param.FixedSeatingCode;' +
-                    '  respond();' +
-                    '} else {' +
-                    '  switch(param.InputType + "") {' +
-                    '    case "0":' +
-                    //'      stringpad(labels["InputTypeLabel"]).respond("seatingCode");' +  //NPR5.53 [380609]-revoked
-                    '      stringpad(labels["InputTypeLabel"]).respond("seatingCode").cancel(abort);' +  //NPR5.53 [380609]
-                    '      break;' +
-                    '    case "1":' +
-                    //'      intpad(labels["InputTypeLabel"]).respond("seatingCode");' +  //NPR5.53 [380609]-revoked
-                    '      intpad(labels["InputTypeLabel"]).respond("seatingCode").cancel(abort);' +  //NPR5.53 [380609]
-                    '      break;' +
-                    '    case "2":' +
-                    '      respond();' +
-                    '      break;' +
-                    '  }' +
-                    '}' +  //NPR5.53 [380609]
-                  '}'
-                );
-                RegisterWorkflowStep('createNewWaiterPad',
-                  'if ((context.seatingCode) && (context.confirmString)) {' +
-                  '  confirm(" ", context.confirmString, true, true).no(abort).yes(respond);' +
-                  '}'
-                );
-                RegisterWorkflowStep('selectWaiterPad',
-                  'if (!context.waiterPadNo) {' +  //NPR5.53 [380609]
-                    'if (context.seatingCode) {' +
-                    '  respond();' +
-                    '}' +  //NPR5.53 [380609]
-                  '}'
-                );
-                RegisterWorkflowStep('saveSale2Pad',
-                  'if (context.waiterPadNo) {' +
-                  '  respond();' +
-                  '}'
-                );
-                RegisterWorkflow(false);
-                RegisterDataSourceBinding('BUILTIN_SALELINE');
+        if Sender.DiscoverAction(
+          ActionCode(),
+          Text000,
+          ActionVersion(),
+          Sender.Type::Generic,
+          Sender."Subscriber Instances Allowed"::Multiple)
+        then begin
+            Sender.RegisterWorkflowStep('addPresetValuesToContext', 'respond();');
+            Sender.RegisterWorkflowStep('seatingInput',
+              'if (!context.seatingCode) {' +
+                'if (param.FixedSeatingCode) {' +
+                '  context.seatingCode = param.FixedSeatingCode;' +
+                '  respond();' +
+                '} else {' +
+                '  switch(param.InputType + "") {' +
+                '    case "0":' +
+                '      stringpad(labels["InputTypeLabel"]).respond("seatingCode").cancel(abort);' +
+                '      break;' +
+                '    case "1":' +
+                '      intpad(labels["InputTypeLabel"]).respond("seatingCode").cancel(abort);' +
+                '      break;' +
+                '    case "2":' +
+                '      respond();' +
+                '      break;' +
+                '  }' +
+                '}' +
+              '}'
+            );
+            Sender.RegisterWorkflowStep('createNewWaiterPad',
+              'if ((context.seatingCode) && (context.confirmString)) {' +
+              '  confirm(" ", context.confirmString, true, true).no(abort).yes(respond);' +
+              '}'
+            );
+            Sender.RegisterWorkflowStep('selectWaiterPad',
+              'if (!context.waiterPadNo) {' +
+                'if (context.seatingCode) {' +
+                '  respond();' +
+                '}' +
+              '}'
+            );
+            Sender.RegisterWorkflowStep('saveSale2Pad',
+              'if (context.waiterPadNo) {' +
+              '  respond();' +
+              '}'
+            );
+            Sender.RegisterWorkflow(false);
+            Sender.RegisterDataSourceBinding('BUILTIN_SALELINE');
 
-                RegisterOptionParameter('InputType', 'stringPad,intPad,List', 'stringPad');
-                RegisterTextParameter('FixedSeatingCode', '');
-                RegisterTextParameter('SeatingFilter', '');
-                RegisterTextParameter('LocationFilter', '');
-                RegisterBooleanParameter('OpenWaiterPad', false);
-                //-NPR5.50 [346384]
-                RegisterBooleanParameter('ShowOnlyActiveWaiPad', false);
-                //+NPR5.50 [346384]
-                RegisterBooleanParameter('ReturnToDefaultView', false);  //NPR5.55 [399170]
-            end;
+            Sender.RegisterOptionParameter('InputType', 'stringPad,intPad,List', 'stringPad');
+            Sender.RegisterTextParameter('FixedSeatingCode', '');
+            Sender.RegisterTextParameter('SeatingFilter', '');
+            Sender.RegisterTextParameter('LocationFilter', '');
+            Sender.RegisterBooleanParameter('OpenWaiterPad', false);
+            Sender.RegisterBooleanParameter('ShowOnlyActiveWaiPad', false);
+            Sender.RegisterBooleanParameter('ReturnToDefaultView', false);
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS UI Management", 'OnInitializeCaptions', '', true, true)]
     local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
     var
         NPRESeating: Record "NPR NPRE Seating";
@@ -103,7 +83,7 @@ codeunit 6150666 "NPR NPRE POSAction: Save2Wa."
         Captions.AddActionCaption(ActionCode(), 'InputTypeLabel', NPRESeating.TableCaption);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', false, false)]
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         JSON: Codeunit "NPR POS JSON Management";
@@ -113,10 +93,8 @@ codeunit 6150666 "NPR NPRE POSAction: Save2Wa."
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
         case WorkflowStep of
-            //-NPR5.53 [380609]
             'addPresetValuesToContext':
                 OnActionAddPresetValuesToContext(JSON, FrontEnd, POSSession);
-            //+NPR5.53 [380609]
             'seatingInput':
                 OnActionSeatingInput(JSON, FrontEnd);
             'createNewWaiterPad':
@@ -141,14 +119,11 @@ codeunit 6150666 "NPR NPRE POSAction: Save2Wa."
         POSSetup: Codeunit "NPR POS Setup";
         ConfirmString: Text;
     begin
-        //-NPR5.53 [380609]
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
-        //-NPR5.55 [414938]
         POSSession.GetSetup(POSSetup);
 
         JSON.SetContext('restaurantCode', POSSetup.RestaurantCode());
-        //+NPR5.55 [414938]
 
         if SalePOS."NPRE Pre-Set Seating Code" <> '' then begin
             NPRESeating.Get(SalePOS."NPRE Pre-Set Seating Code");
@@ -165,13 +140,11 @@ codeunit 6150666 "NPR NPRE POSAction: Save2Wa."
             NPREWaiterPad.Get(SalePOS."NPRE Pre-Set Waiter Pad No.");
             if SalePOS."NPRE Pre-Set Seating Code" <> '' then
                 if not NPRESeatingWaiterPadLink.Get(NPRESeating.Code, NPREWaiterPad."No.") then
-                    //NPREWaiterPadPOSMgt.AddNewWaiterPadForSeating(NPRESeating.Code,NPREWaiterPad,NPRESeatingWaiterPadLink);  //NPR5.55 [399170]-revoked
-                    WaiterPadMgt.AddNewWaiterPadForSeating(NPRESeating.Code, NPREWaiterPad, NPRESeatingWaiterPadLink);  //NPR5.55 [399170]
+                    WaiterPadMgt.AddNewWaiterPadForSeating(NPRESeating.Code, NPREWaiterPad, NPRESeatingWaiterPadLink);
             JSON.SetContext('waiterPadNo', SalePOS."NPRE Pre-Set Waiter Pad No.");
         end;
 
         FrontEnd.SetActionContext(ActionCode(), JSON);
-        //+NPR5.53 [380609]
     end;
 
     local procedure OnActionSeatingInput(JSON: Codeunit "NPR POS JSON Management"; FrontEnd: Codeunit "NPR POS Front End Management")
@@ -199,8 +172,7 @@ codeunit 6150666 "NPR NPRE POSAction: Save2Wa."
         WaiterPadMgt: Codeunit "NPR NPRE Waiter Pad Mgt.";
     begin
         NPREWaiterPadPOSMgt.FindSeating(JSON, NPRESeating);
-        //NPREWaiterPadPOSMgt.AddNewWaiterPadForSeating(NPRESeating.Code,NPREWaiterPad,NPRESeatingWaiterPadLink);  //NPR5.55 [399170]-revoked
-        WaiterPadMgt.AddNewWaiterPadForSeating(NPRESeating.Code, NPREWaiterPad, NPRESeatingWaiterPadLink);  //NPR5.55 [399170]
+        WaiterPadMgt.AddNewWaiterPadForSeating(NPRESeating.Code, NPREWaiterPad, NPRESeatingWaiterPadLink);
     end;
 
     local procedure OnActionSelectWaiterPad(JSON: Codeunit "NPR POS JSON Management"; FrontEnd: Codeunit "NPR POS Front End Management")
@@ -235,23 +207,14 @@ codeunit 6150666 "NPR NPRE POSAction: Save2Wa."
         NPREWaiterPad.Get(WaiterPadNo);
 
         OpenWaiterPad := JSON.GetBooleanParameter('OpenWaiterPad', false);
-        ReturnToDefaultView := JSON.GetBooleanParameter('ReturnToDefaultView', false);  //NPR5.55 [399170]
+        ReturnToDefaultView := JSON.GetBooleanParameter('ReturnToDefaultView', false);
 
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
 
-        //-NPR5.55 [399170]-revoked
-        /*
-        NPREWaiterPadPOSMgt.MoveSaleFromPOSToWaiterPad(SalePOS,NPREWaiterPad);
-        //-NPR5.53 [380609]
-        SalePOS.FIND;
-        NPREWaiterPadPOSMgt.ClearSaleHdrNPREPresetFields(SalePOS,FALSE);
-        */
-        //+NPR5.55 [399170]-revoked
-        NPREWaiterPadPOSMgt.MoveSaleFromPOSToWaiterPad(SalePOS, NPREWaiterPad, true);  //NPR5.55 [399170]
+        NPREWaiterPadPOSMgt.MoveSaleFromPOSToWaiterPad(SalePOS, NPREWaiterPad, true);
         POSSale.Refresh(SalePOS);
         POSSale.Modify(true, false);
-        //+NPR5.53 [380609]
 
         Commit;
         POSSession.RequestRefreshData();
@@ -259,21 +222,16 @@ codeunit 6150666 "NPR NPRE POSAction: Save2Wa."
         if OpenWaiterPad then
             NPREWaiterPadPOSMgt.UIShowWaiterPad(NPREWaiterPad);
 
-        //-NPR5.55 [399170]
         if ReturnToDefaultView then
             POSSale.SelectViewForEndOfSale(POSSession);
-        //+NPR5.55 [399170]
-
     end;
 
     local procedure GetConfirmString(NPRESeating: Record "NPR NPRE Seating") ConfirmString: Text
     var
         NPRESeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink";
     begin
-        //+NPR5.55 [399170]
         NPRESeatingWaiterPadLink.SetCurrentKey(Closed);
         NPRESeatingWaiterPadLink.SetRange(Closed, false);
-        //+NPR5.55 [399170]
         NPRESeatingWaiterPadLink.SetRange("Seating Code", NPRESeating.Code);
         if NPRESeatingWaiterPadLink.FindFirst then
             exit('');
@@ -282,12 +240,11 @@ codeunit 6150666 "NPR NPRE POSAction: Save2Wa."
         exit(ConfirmString);
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterNameCaption', '', true, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnGetParameterNameCaption', '', true, false)]
     local procedure OnGetParameterNameCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     var
         CaptionReturnToDefaultView: Label 'Return to Default View on Finish';
     begin
-        //-NPR5.55 [399170]
         if POSParameterValue."Action Code" <> ActionCode then
             exit;
 
@@ -295,15 +252,13 @@ codeunit 6150666 "NPR NPRE POSAction: Save2Wa."
             'ReturnToDefaultView':
                 Caption := CaptionReturnToDefaultView;
         end;
-        //+NPR5.55 [399170]
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterDescriptionCaption', '', true, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnGetParameterDescriptionCaption', '', true, false)]
     local procedure OnGetParameterDescriptionCaption(POSParameterValue: Record "NPR POS Parameter Value"; var Caption: Text)
     var
         DescReturnToDefaultView: Label 'Switch to the default view defined for the POS Unit after the Waiter Pad Action has completed';
     begin
-        //-NPR5.55 [399170]
         if POSParameterValue."Action Code" <> ActionCode then
             exit;
 
@@ -311,7 +266,5 @@ codeunit 6150666 "NPR NPRE POSAction: Save2Wa."
             'ReturnToDefaultView':
                 Caption := DescReturnToDefaultView;
         end;
-        //+NPR5.55 [399170]
     end;
 }
-

@@ -1,11 +1,5 @@
 page 6150633 "NPR NPRE Select Flow Status"
 {
-    // NPR5.34/NPKNAV/20170801 CASE 283328 Transport NPR5.34 - 1 August 2017
-    // NPR5.35/ANEN/20170821 CASE 283376 Solution rename to NP Restaurant
-    // NPR5.53/ALPO/20200102 CASE 360258 Possibility to send to kitchen only selected waiter pad lines or lines of specific print category
-    // NPR5.55/ALPO/20200422 CASE 360258 More user friendly print category selection using multi-selection mode
-    // NPR5.55/ALPO/20200708 CASE 382428 Kitchen Display System (KDS) for NP Restaurant (further enhancements)
-
     Caption = 'Select Flow Status';
     DataCaptionExpression = GetDataCaptionExpr();
     DeleteAllowed = false;
@@ -32,16 +26,16 @@ page 6150633 "NPR NPRE Select Flow Status"
 
                     trigger OnValidate()
                     begin
-                        Mark(Selected);  //NPR5.55 [382428]
+                        Rec.Mark(Selected);
                     end;
                 }
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field("Status Object"; "Status Object")
+                field("Status Object"; Rec."Status Object")
                 {
                     ApplicationArea = All;
                     Editable = false;
@@ -49,19 +43,19 @@ page 6150633 "NPR NPRE Select Flow Status"
                     Visible = StatusObjectVisible;
                     ToolTip = 'Specifies the value of the Status Object field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Flow Order"; "Flow Order")
+                field("Flow Order"; Rec."Flow Order")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Flow Order field';
                 }
-                field(AssignedPrintCategories; AssignedPrintCategoriesAsFilterString())
+                field(AssignedPrintCategories; Rec.AssignedPrintCategoriesAsFilterString())
                 {
                     ApplicationArea = All;
                     Caption = 'Print/Prod. Categories';
@@ -71,16 +65,7 @@ page 6150633 "NPR NPRE Select Flow Status"
 
                     trigger OnDrillDown()
                     begin
-                        //-NPR5.55 [360258]-revoked
-                        //-NPR5.53 [360258]
-                        //TESTFIELD("Status Object","Status Object"::WaiterPadLineMealFlow);
-                        //TESTFIELD(Code);
-                        //FlowStatusPrCategory.SETRANGE("Flow Status Object","Status Object");
-                        //FlowStatusPrCategory.SETRANGE("Flow Status Code",Code);
-                        //PAGE.RUN(0,FlowStatusPrCategory);
-                        //+NPR5.53 [360258]
-                        //+NPR5.55 [360258]-revoked
-                        AssignPrintCategories;  //NPR5.55 [360258]
+                        AssignPrintCategories;
                     end;
                 }
             }
@@ -107,7 +92,7 @@ page 6150633 "NPR NPRE Select Flow Status"
 
                     trigger OnAction()
                     begin
-                        AssignPrintCategories;  //NPR5.55 [360258]
+                        AssignPrintCategories;
                     end;
                 }
             }
@@ -116,17 +101,14 @@ page 6150633 "NPR NPRE Select Flow Status"
 
     trigger OnAfterGetCurrRecord()
     begin
-        //ShowPrintCategories := "Status Object" = "Status Object"::WaiterPadLineMealFlow;  //#391678 [391678]-revoked
-        //-NPR5.55 [382428]
         ShowPrintCategories :=
-          ("Status Object" = "Status Object"::WaiterPadLineMealFlow) and (ServingStepDiscoveryMethod = 0);
-        //+NPR5.55 [382428]
-        PrintCategoriesEnabled := ShowPrintCategories and (Code <> '');  //NPR5.55 [360258]
+          (Rec."Status Object" = Rec."Status Object"::WaiterPadLineMealFlow) and (ServingStepDiscoveryMethod = 0);
+        PrintCategoriesEnabled := ShowPrintCategories and (Rec.Code <> '');
     end;
 
     trigger OnAfterGetRecord()
     begin
-        Selected := Mark;  //NPR5.55 [382428]
+        Selected := Rec.Mark;
     end;
 
     trigger OnOpenPage()
@@ -139,20 +121,18 @@ page 6150633 "NPR NPRE Select Flow Status"
         end else begin
             StatusObjectVisible := true;
         end;
-        ShowPrintCategories := GetFilter("Status Object") = Format("Status Object"::WaiterPadLineMealFlow);  //NPR5.53 [360258]
-        //-NPR5.55 [382428]
+        ShowPrintCategories := Rec.GetFilter("Status Object") = Format(Rec."Status Object"::WaiterPadLineMealFlow);
         if not ShowPrintCategories then begin
-            CurrFilterGr := FilterGroup;
+            CurrFilterGr := Rec.FilterGroup;
             if CurrFilterGr <> 2 then begin
-                FilterGroup(2);
-                ShowPrintCategories := GetFilter("Status Object") = Format("Status Object"::WaiterPadLineMealFlow);
-                FilterGroup(CurrFilterGr);
+                Rec.FilterGroup(2);
+                ShowPrintCategories := Rec.GetFilter("Status Object") = Format(Rec."Status Object"::WaiterPadLineMealFlow);
+                Rec.FilterGroup(CurrFilterGr);
             end;
         end;
         ServingStepDiscoveryMethod := SetupProxy.ServingStepDiscoveryMethod();
         if ShowPrintCategories then
             ShowPrintCategories := ServingStepDiscoveryMethod = 0;
-        //+NPR5.55 [382428]
     end;
 
     var
@@ -168,25 +148,19 @@ page 6150633 "NPR NPRE Select Flow Status"
     var
         WaiterPadMgt: Codeunit "NPR NPRE Waiter Pad Mgt.";
     begin
-        //-NPR5.55 [382428]
-        TestField("Status Object", "Status Object"::WaiterPadLineMealFlow);
-        TestField(Code);
-        WaiterPadMgt.SelectPrintCategories(RecordId);
-        //+NPR5.55 [382428]
+        Rec.TestField("Status Object", Rec."Status Object"::WaiterPadLineMealFlow);
+        Rec.TestField(Code);
+        WaiterPadMgt.SelectPrintCategories(Rec.RecordId);
     end;
 
     procedure SetMultiSelectionMode(Set: Boolean)
     begin
-        //-NPR5.55 [382428]
         IsMultiSelectionMode := Set;
-        //+NPR5.55 [382428]
     end;
 
     procedure SetDataset(var FlowStatus: Record "NPR NPRE Flow Status")
     begin
-        //-NPR5.55 [382428]
-        Copy(FlowStatus);
-        //+NPR5.55 [382428]
+        Rec.Copy(FlowStatus);
     end;
 
     procedure GetDataset(var FlowStatus: Record "NPR NPRE Flow Status")
@@ -195,7 +169,6 @@ page 6150633 "NPR NPRE Select Flow Status"
         FldRef: FieldRef;
         i: Integer;
     begin
-        //-NPR5.55 [382428]
         FlowStatus.Copy(Rec);
         if FlowStatus.GetFilters <> '' then begin
             RecRef.GetTable(FlowStatus);
@@ -205,19 +178,15 @@ page 6150633 "NPR NPRE Select Flow Status"
                     FldRef.SetRange();
             end;
         end;
-        //+NPR5.55 [382428]
     end;
 
     local procedure GetDataCaptionExpr(): Text
     begin
-        //-NPR5.55 [382428]
-        case "Status Object" of
-            "Status Object"::WaiterPadLineMealFlow:
+        case Rec."Status Object" of
+            Rec."Status Object"::WaiterPadLineMealFlow:
                 exit(ServStepsLb);
             else
-                exit(Format("Status Object"));
+                exit(Format(Rec."Status Object"));
         end;
-        //+NPR5.55 [382428]
     end;
 }
-

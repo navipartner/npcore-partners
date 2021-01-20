@@ -1,13 +1,5 @@
 table 6150669 "NPR NPRE Restaurant Setup"
 {
-    // NPR5.34/ANEN/2017012  CASE 270255 Object Created for Hospitality - Version 1.0
-    // NPR5.35/ANEN/20170821 CASE 283376 Solution rename to NP Restaurant
-    // NPR5.52/ALPO/20190813 CASE 360258 Location specific setting of 'Auto print kintchen order'
-    //                                   Field 'Auto print kintchen order' type changed from boolean to option
-    // NPR5.54/ALPO/20200401 CASE 382428 Kitchen Display System (KDS) for NP Restaurant
-    // NPR5.55/ALPO/20200615 CASE 399170 Restaurant flow change: support for waiter pad related manipulations directly inside a POS sale
-    // NPR5.55/ALPO/20200708 CASE 382428 Kitchen Display System (KDS) for NP Restaurant (further enhancements)
-
     Caption = 'Restaurant Setup';
     DataClassification = CustomerContent;
 
@@ -125,9 +117,4 @@ table 6150669 "NPR NPRE Restaurant Setup"
         {
         }
     }
-
-    fieldgroups
-    {
-    }
 }
-

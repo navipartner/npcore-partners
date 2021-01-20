@@ -1,8 +1,5 @@
 page 6150688 "NPR NPRE Kitchen Order List"
 {
-    // NPR5.54/ALPO/20200401 CASE 382428 Kitchen Display System (KDS) for NP Restaurant
-    // NPR5.55/ALPO/20200708 CASE 382428 Kitchen Display System (KDS) for NP Restaurant (further enhancements)
-
     Caption = 'Kitchen Order List';
     CardPageID = "NPR NPRE Kitchen Order Card";
     Editable = false;
@@ -17,27 +14,27 @@ page 6150688 "NPR NPRE Kitchen Order List"
         {
             repeater(Group)
             {
-                field("Order ID"; "Order ID")
+                field("Order ID"; Rec."Order ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Order ID field';
                 }
-                field("Restaurant Code"; "Restaurant Code")
+                field("Restaurant Code"; Rec."Restaurant Code")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Restaurant Code field';
                 }
-                field(Status; Status)
+                field(Status; Rec.Status)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Status field';
                 }
-                field(Priority; Priority)
+                field(Priority; Rec.Priority)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Priority field';
                 }
-                field("Created Date-Time"; "Created Date-Time")
+                field("Created Date-Time"; Rec."Created Date-Time")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Created Date-Time field';
@@ -79,4 +76,3 @@ page 6150688 "NPR NPRE Kitchen Order List"
         }
     }
 }
-

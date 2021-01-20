@@ -1,7 +1,5 @@
 table 6150655 "NPR POS NPRE Rest. Profile"
 {
-    // NPR5.55/ALPO/20200730 CASE 414938 POS Store/POS Unit - Restaurant link
-
     Caption = 'POS Restaurant Profile';
     DataClassification = CustomerContent;
     LookupPageID = "NPR POS NPRE Restaur. Profiles";
@@ -33,9 +31,4 @@ table 6150655 "NPR POS NPRE Rest. Profile"
         {
         }
     }
-
-    fieldgroups
-    {
-    }
 }
-

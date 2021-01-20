@@ -15,12 +15,12 @@ page 6150669 "NPR NPRE Restaurant Setup"
             group(General)
             {
                 Caption = 'General';
-                field("Waiter Pad No. Serie"; "Waiter Pad No. Serie")
+                field("Waiter Pad No. Serie"; Rec."Waiter Pad No. Serie")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Waiter Pad No. Serie field';
                 }
-                field("Default Service Flow Profile"; "Default Service Flow Profile")
+                field("Default Service Flow Profile"; Rec."Default Service Flow Profile")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Default Service Flow Profile field';
@@ -32,25 +32,25 @@ page 6150669 "NPR NPRE Restaurant Setup"
                 group(Statuses)
                 {
                     Caption = 'Statuses';
-                    field("Seat.Status: Ready"; "Seat.Status: Ready")
+                    field("Seat.Status: Ready"; Rec."Seat.Status: Ready")
                     {
                         ApplicationArea = All;
                         Caption = 'Ready for New Guests';
                         ToolTip = 'Specifies the value of the Ready for New Guests field';
                     }
-                    field("Seat.Status: Occupied"; "Seat.Status: Occupied")
+                    field("Seat.Status: Occupied"; Rec."Seat.Status: Occupied")
                     {
                         ApplicationArea = All;
                         Caption = 'Occupied';
                         ToolTip = 'Specifies the value of the Occupied field';
                     }
-                    field("Seat.Status: Reserved"; "Seat.Status: Reserved")
+                    field("Seat.Status: Reserved"; Rec."Seat.Status: Reserved")
                     {
                         ApplicationArea = All;
                         Caption = 'Reserved';
                         ToolTip = 'Specifies the value of the Reserved field';
                     }
-                    field("Seat.Status: Cleaning Required"; "Seat.Status: Cleaning Required")
+                    field("Seat.Status: Cleaning Required"; Rec."Seat.Status: Cleaning Required")
                     {
                         ApplicationArea = All;
                         Caption = 'Cleaning Required';
@@ -61,17 +61,17 @@ page 6150669 "NPR NPRE Restaurant Setup"
             group(KitchenInegration)
             {
                 Caption = 'Kitchen Integration';
-                field("Auto Send Kitchen Order"; "Auto Send Kitchen Order")
+                field("Auto Send Kitchen Order"; Rec."Auto Send Kitchen Order")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Auto Send Kitchen Order field';
                 }
-                field("Resend All On New Lines"; "Resend All On New Lines")
+                field("Resend All On New Lines"; Rec."Resend All On New Lines")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Resend All On New Lines field';
                 }
-                field("Serving Step Discovery Method"; "Serving Step Discovery Method")
+                field("Serving Step Discovery Method"; Rec."Serving Step Discovery Method")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Serving Step Discovery Method field';
@@ -79,7 +79,7 @@ page 6150669 "NPR NPRE Restaurant Setup"
                 group(Print)
                 {
                     Caption = 'Print';
-                    field("Kitchen Printing Active"; "Kitchen Printing Active")
+                    field("Kitchen Printing Active"; Rec."Kitchen Printing Active")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Kitchen Printing Active field';
@@ -89,12 +89,12 @@ page 6150669 "NPR NPRE Restaurant Setup"
                 {
                     Caption = 'KDS';
                     Visible = ShowKDS;
-                    field("KDS Active"; "KDS Active")
+                    field("KDS Active"; Rec."KDS Active")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the KDS Active field';
                     }
-                    field("Order ID Assign. Method"; "Order ID Assign. Method")
+                    field("Order ID Assign. Method"; Rec."Order ID Assign. Method")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Order ID Assign. Method field';
@@ -161,8 +161,8 @@ page 6150669 "NPR NPRE Restaurant Setup"
     var
         KitchenOrderMgt: Codeunit "NPR NPRE Kitchen Order Mgt.";
     begin
-        if not Get() then
-            Insert();
+        if not Rec.Get() then
+            Rec.Insert();
 
         ShowKDS := KitchenOrderMgt.KDSAvailable();
     end;

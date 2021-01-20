@@ -1,8 +1,5 @@
 table 6150675 "NPR NPRE Kitchen Req.Src. Link"
 {
-    // NPR5.55/ALPO/20200615 CASE 399170 Restaurant flow change: support for waiter pad related manipulations directly inside a POS sale
-    // NPR5.55/ALPO/20200708 CASE 382428 Kitchen Display System (KDS) for NP Restaurant (further enhancements)
-
     Caption = 'Kitchen Request Source Link';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR NPRE Kitchen Req.Src.Links";
@@ -112,10 +109,6 @@ table 6150675 "NPR NPRE Kitchen Req.Src. Link"
         }
     }
 
-    fieldgroups
-    {
-    }
-
     var
         UnsupportedSourceRec: Label 'Unsupported source record %1. This is a critical programming error. Please contact system vendor.';
         KitchenRequest: Record "NPR NPRE Kitchen Request";
@@ -156,4 +149,3 @@ table 6150675 "NPR NPRE Kitchen Req.Src. Link"
         KitchenRequest.Get("Request No.");
     end;
 }
-

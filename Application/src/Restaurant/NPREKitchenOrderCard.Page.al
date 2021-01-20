@@ -1,14 +1,11 @@
 page 6150696 "NPR NPRE Kitchen Order Card"
 {
-    // NPR5.55/ALPO/20200708 CASE 382428 Kitchen Display System (KDS) for NP Restaurant (further enhancements)
-
     Caption = 'Kitchen Order Card';
     DeleteAllowed = false;
     InsertAllowed = false;
     PageType = Card;
-    UsageCategory = Administration;
-    ApplicationArea = All;
     SourceTable = "NPR NPRE Kitchen Order";
+    UsageCategory = None;
 
     layout
     {
@@ -16,36 +13,36 @@ page 6150696 "NPR NPRE Kitchen Order Card"
         {
             group(General)
             {
-                field("Order ID"; "Order ID")
+                field("Order ID"; Rec."Order ID")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Order ID field';
                 }
-                field("Restaurant Code"; "Restaurant Code")
+                field("Restaurant Code"; Rec."Restaurant Code")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Restaurant Code field';
                 }
-                field("Created Date-Time"; "Created Date-Time")
+                field("Created Date-Time"; Rec."Created Date-Time")
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Created Date-Time field';
                 }
-                field(Status; Status)
+                field(Status; Rec.Status)
                 {
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Status field';
                 }
-                field(Priority; Priority)
+                field(Priority; Rec.Priority)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Priority field';
                 }
-                field("On Hold"; "On Hold")
+                field("On Hold"; Rec."On Hold")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the On Hold field';
@@ -87,4 +84,3 @@ page 6150696 "NPR NPRE Kitchen Order Card"
         }
     }
 }
-

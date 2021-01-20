@@ -1,15 +1,6 @@
 codeunit 6150670 "NPR NPRE POS Action: SplitBill"
 {
-    // NPR5.47/MHA /20181026 CASE 326640 Object created - Hospitality Split Bill with Html UI
-    // NPR5.48/MHA /20181120 CASE 326640 Bumped version list to 1.0
-    // NPR5.55/ALPO/20200615 CASE 399170 Restaurant flow change: support for waiter pad related manipulations directly inside a POS sale
-    // NPR5.55/ALPO/20200730 CASE 414938 POS Store/POS Unit - Restaurant link (filter seatings by restaurant)
-
     SingleInstance = true;
-
-    trigger OnRun()
-    begin
-    end;
 
     var
         Text000: Label 'Split Bill (Waiter Pad) into multiple Bills';
@@ -33,63 +24,59 @@ codeunit 6150670 "NPR NPRE POS Action: SplitBill"
         exit('1.0');
     end;
 
-    [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")
     begin
-        with Sender do begin
-            if DiscoverAction(
-              ActionCode(),
-              Text000,
-              ActionVersion(),
-              Type::Generic,
-              "Subscriber Instances Allowed"::Multiple)
-            then begin
-                RegisterWorkflowStep('addPresetValuesToContext', 'respond();');  //NPR5.55 [399170]
-                RegisterWorkflowStep('seatingInput',
-              'if (!context.seatingCode) {' +  //NPR5.55 [399170]
-              '  if (param.FixedSeatingCode) {' +
-              '    context.seatingCode = param.FixedSeatingCode;' +
+        if Sender.DiscoverAction(
+          ActionCode(),
+          Text000,
+          ActionVersion(),
+          Sender.Type::Generic,
+          Sender."Subscriber Instances Allowed"::Multiple)
+        then begin
+            Sender.RegisterWorkflowStep('addPresetValuesToContext', 'respond();');
+            Sender.RegisterWorkflowStep('seatingInput',
+          'if (!context.seatingCode) {' +
+          '  if (param.FixedSeatingCode) {' +
+          '    context.seatingCode = param.FixedSeatingCode;' +
+          '    respond();' +
+          '  } else {' +
+          '    switch(param.InputType + "") {' +
+          '      case "0":' +
+          '        stringpad(labels["InputTypeLabel"]).respond("seatingCode").cancel(abort);' +
+          '        break;' +
+          '      case "1":' +
+          '        intpad(labels["InputTypeLabel"]).respond("seatingCode").cancel(abort);' +
+          '        break;' +
+          '      case "2":' +
+          '        respond();' +
+          '        break;' +
+          '    }' +
+          '  }' +
+          '}'
+        );
+            Sender.RegisterWorkflowStep('selectWaiterPad',
+              'if (!context.waiterPadNo) {' +
+              '  if (context.seatingCode) {' +
               '    respond();' +
-              '  } else {' +
-              '    switch(param.InputType + "") {' +
-              '      case "0":' +
-              //'      stringpad(labels["InputTypeLabel"]).respond("seatingCode");' +  //NPR5.55 [399170]-revoked
-              '        stringpad(labels["InputTypeLabel"]).respond("seatingCode").cancel(abort);' +  //NPR5.55 [399170]
-              '        break;' +
-              '      case "1":' +
-              //'      intpad(labels["InputTypeLabel"]).respond("seatingCode");' +  //NPR5.55 [399170]-revoked
-              '        intpad(labels["InputTypeLabel"]).respond("seatingCode").cancel(abort);' +  //NPR5.55 [399170]
-              '        break;' +
-              '      case "2":' +
-              '        respond();' +
-              '        break;' +
-              '    }' +
-              '  }' +  //NPR5.55 [399170]
+              '  }' +
               '}'
             );
-                RegisterWorkflowStep('selectWaiterPad',
-                  'if (!context.waiterPadNo) {' +  //NPR5.55 [399170]
-                  '  if (context.seatingCode) {' +
-                  '    respond();' +
-                  '  }' +  //NPR5.55 [399170]
-                  '}'
-                );
-                RegisterWorkflowStep('splitWaiterPad',
-                  'if (context.waiterPadNo) {' +
-                  '  respond();' +
-                  '}'
-                );
-                RegisterWorkflow(false);
+            Sender.RegisterWorkflowStep('splitWaiterPad',
+              'if (context.waiterPadNo) {' +
+              '  respond();' +
+              '}'
+            );
+            Sender.RegisterWorkflow(false);
 
-                RegisterOptionParameter('InputType', 'stringPad,intPad,List', 'stringPad');
-                RegisterTextParameter('FixedSeatingCode', '');
-                RegisterTextParameter('SeatingFilter', '');
-                RegisterTextParameter('LocationFilter', '');
-            end;
+            Sender.RegisterOptionParameter('InputType', 'stringPad,intPad,List', 'stringPad');
+            Sender.RegisterTextParameter('FixedSeatingCode', '');
+            Sender.RegisterTextParameter('SeatingFilter', '');
+            Sender.RegisterTextParameter('LocationFilter', '');
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS UI Management", 'OnInitializeCaptions', '', true, true)]
     local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
     var
         NPRESeating: Record "NPR NPRE Seating";
@@ -97,7 +84,7 @@ codeunit 6150670 "NPR NPRE POS Action: SplitBill"
         Captions.AddActionCaption(ActionCode(), 'InputTypeLabel', NPRESeating.TableCaption);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnAction', '', false, false)]
     local procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     var
         JSON: Codeunit "NPR POS JSON Management";
@@ -107,10 +94,8 @@ codeunit 6150670 "NPR NPRE POS Action: SplitBill"
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
         case WorkflowStep of
-            //-NPR5.55 [399170]
             'addPresetValuesToContext':
                 OnActionAddPresetValuesToContext(JSON, FrontEnd, POSSession);
-            //+NPR5.55 [399170]
             'seatingInput':
                 OnActionSeatingInput(JSON, FrontEnd);
             'selectWaiterPad':
@@ -134,14 +119,11 @@ codeunit 6150670 "NPR NPRE POS Action: SplitBill"
         POSSetup: Codeunit "NPR POS Setup";
         ConfirmString: Text;
     begin
-        //-NPR5.55 [399170]
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
-        //-NPR5.55 [414938]
         POSSession.GetSetup(POSSetup);
 
         JSON.SetContext('restaurantCode', POSSetup.RestaurantCode());
-        //+NPR5.55 [414938]
 
         if SalePOS."NPRE Pre-Set Seating Code" <> '' then begin
             NPRESeating.Get(SalePOS."NPRE Pre-Set Seating Code");
@@ -158,7 +140,6 @@ codeunit 6150670 "NPR NPRE POS Action: SplitBill"
         end;
 
         FrontEnd.SetActionContext(ActionCode(), JSON);
-        //+NPR5.55 [399170]
     end;
 
     local procedure OnActionSeatingInput(JSON: Codeunit "NPR POS JSON Management"; FrontEnd: Codeunit "NPR POS Front End Management")
@@ -204,10 +185,6 @@ codeunit 6150670 "NPR NPRE POS Action: SplitBill"
         ActiveModelID := FrontEnd.ShowModel(Model);
     end;
 
-    local procedure "--- UI"()
-    begin
-    end;
-
     local procedure CreateUserInterface(NPREWaiterPad: Record "NPR NPRE Waiter Pad")
     begin
         CurrNPREWaiterPad := NPREWaiterPad;
@@ -219,21 +196,15 @@ codeunit 6150670 "NPR NPRE POS Action: SplitBill"
         Model.AddScript(InitScript());
     end;
 
-    local procedure "--- Init"()
-    begin
-    end;
-
     local procedure InitCss() Css: Text
     var
         WebClientDependency: Record "NPR Web Client Dependency";
-        StreamReader: DotNet NPRNetStreamReader;
         InStr: InStream;
     begin
         if WebClientDependency.Get(WebClientDependency.Type::CSS, ActionCode()) and WebClientDependency.BLOB.HasValue then begin
             WebClientDependency.CalcFields(BLOB);
             WebClientDependency.BLOB.CreateInStream(InStr);
-            StreamReader := StreamReader.StreamReader(InStr);
-            Css := StreamReader.ReadToEnd;
+            InStr.Read(Css);
 
             exit(Css);
         end;
@@ -242,14 +213,12 @@ codeunit 6150670 "NPR NPRE POS Action: SplitBill"
     local procedure InitHtml() Html: Text
     var
         WebClientDependency: Record "NPR Web Client Dependency";
-        StreamReader: DotNet NPRNetStreamReader;
         InStr: InStream;
     begin
         if WebClientDependency.Get(WebClientDependency.Type::HTML, ActionCode()) and WebClientDependency.BLOB.HasValue then begin
             WebClientDependency.CalcFields(BLOB);
             WebClientDependency.BLOB.CreateInStream(InStr);
-            StreamReader := StreamReader.StreamReader(InStr);
-            Html := StreamReader.ReadToEnd;
+            InStr.Read(Html);
 
             exit(Html);
         end;
@@ -294,11 +263,8 @@ codeunit 6150670 "NPR NPRE POS Action: SplitBill"
         NPREWaiterPadLine.SetRange("Waiter Pad No.", CurrNPREWaiterPad."No.");
         if NPREWaiterPadLine.FindSet then
             repeat
-                //FOR i := 1 TO NPREWaiterPadLine.Quantity DO BEGIN  //NPR5.55 [399170]-revoked
-                //-NPR5.55 [399170]
                 if NPREWaiterPadLine.RemainingQtyToBill > 0 then
                     for i := 1 to NPREWaiterPadLine.RemainingQtyToBill do begin
-                        //+NPR5.55 [399170]
                         BillLine := '{ bill_id: 1';
                         BillLine += ', array_index: ' + Format(ArrayIndex);
                         BillLine += ', line_no: ' + Format(NPREWaiterPadLine."Line No.");
@@ -333,11 +299,7 @@ codeunit 6150670 "NPR NPRE POS Action: SplitBill"
         exit(Script);
     end;
 
-    local procedure "--- Approve"()
-    begin
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnProtocolUIResponse', '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnProtocolUIResponse', '', true, true)]
     local procedure OnProtocolUIResponse(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; ModelID: Guid; Sender: Text; EventName: Text; var Handled: Boolean)
     begin
         if ModelID <> ActiveModelID then
@@ -369,23 +331,24 @@ codeunit 6150670 "NPR NPRE POS Action: SplitBill"
         POSSaleLine: Codeunit "NPR POS Sale Line";
         POSSession: Codeunit "NPR POS Session";
         POSJavaScriptInterface: Codeunit "NPR POS JavaScript Interface";
-        BillLines: DotNet JToken;
-        BillLine: DotNet JToken;
-        BillLineList: DotNet NPRNetIList;
-        NetConvHelper: Variant;
+        BillLines: JsonToken;
+        BillLine: JsonToken;
+        BillLine2: JsonToken;
+        BillLineList: JsonArray;
+        JObject: JsonObject;
     begin
-        BillLines := BillLines.Parse(JsonText);
-        NetConvHelper := BillLines.SelectTokens('$[?(@[''bill_id''] > 1)]');
-        BillLineList := NetConvHelper;
-        foreach BillLine in BillLineList do begin
-            FindBill(BillLine, TempNPREWaiterPad, NPREWaiterPad);
-            ApproveBillLine(BillLine, NPREWaiterPad);
+        BillLines.ReadFrom(JsonText);
+        BillLineList := BillLines.AsArray();
+        JObject := BillLine.AsObject();
+        if JObject.Get('bill_id', BillLine2) and (BillLine2.AsValue().AsInteger() > 1) then begin
+            foreach BillLine in BillLineList do begin
+                FindBill(BillLine, TempNPREWaiterPad, NPREWaiterPad);
+                ApproveBillLine(BillLine, NPREWaiterPad);
+            end;
         end;
 
         FrontEnd.GetSession(POSSession);
         POSSession.GetSaleLine(POSSaleLine);
-        //NPREWaiterPadPOSMgt.GetSaleFromWaiterPadToPOS(CurrNPREWaiterPad,POSSaleLine);  //NPR5.55 [399170]-revoked
-        //-NPR5.55 [399170]
         POSSaleLine.DeleteAll;
 
         POSSession.GetSale(POSSale);
@@ -397,12 +360,11 @@ codeunit 6150670 "NPR NPRE POS Action: SplitBill"
         WaiterPadMgt.CloseWaiterPad(CurrNPREWaiterPad, false);
         if not CurrNPREWaiterPad.Closed then
             WaiterPadPOSMgt.GetSaleFromWaiterPadToPOS(CurrNPREWaiterPad, POSSession);
-        //+NPR5.55 [399170]
         POSSession.RequestRefreshData();
         POSJavaScriptInterface.RefreshData(POSSession, FrontEnd);
     end;
 
-    local procedure ApproveBillLine(BillLine: DotNet JToken; NPREWaiterPad: Record "NPR NPRE Waiter Pad")
+    local procedure ApproveBillLine(BillLine: JsonToken; NPREWaiterPad: Record "NPR NPRE Waiter Pad")
     var
         NPREWaiterPadLine: Record "NPR NPRE Waiter Pad Line";
         WaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
@@ -415,43 +377,9 @@ codeunit 6150670 "NPR NPRE POS Action: SplitBill"
         Qty := GetValueAsDec(BillLine, 'qty');
 
         WaiterPadPOSMgt.SplitWaiterPadLine(CurrNPREWaiterPad, NPREWaiterPadLine, Qty, NPREWaiterPad);
-        //-NPR5.55 [399170]-revoked
-        /*
-        IF Qty > NPREWaiterPadLine.Quantity THEN
-          Qty := NPREWaiterPadLine.Quantity;
-        
-        IF Qty = 0 THEN BEGIN
-          NPREWaiterPadLine.DELETE(TRUE);
-          EXIT;
-        END;
-        
-        IF NOT NPREWaiterPadLine2.GET(NPREWaiterPad."No.",LineNo) THEN BEGIN
-          NPREWaiterPadLine2.INIT;
-          NPREWaiterPadLine2 := NPREWaiterPadLine;
-          NPREWaiterPadLine2."Waiter Pad No." := NPREWaiterPad."No.";
-          NPREWaiterPadLine2.Quantity := 0;
-          NPREWaiterPadLine2."Amount Incl. VAT" := 0;
-          NPREWaiterPadLine2."Amount Excl. VAT" := 0;
-          NPREWaiterPadLine2."Discount Amount" := 0;
-          NPREWaiterPadLine2.INSERT;
-        END;
-        
-        NPREWaiterPadLine2.Quantity += Qty;
-        NPREWaiterPadLine2.VALIDATE(Quantity);
-        NPREWaiterPadLine2.MODIFY(TRUE);
-        
-        NPREWaiterPadLine.Quantity -= Qty;
-        IF NPREWaiterPadLine.Quantity = 0 THEN
-          NPREWaiterPadLine.DELETE(TRUE)
-        ELSE
-          NPREWaiterPadLine.MODIFY(TRUE);
-        EXIT;
-        */
-        //+NPR5.55 [399170]-revoked
-
     end;
 
-    local procedure FindBill(BillLine: DotNet JToken; var TempNPREWaiterPad: Record "NPR NPRE Waiter Pad" temporary; var NPREWaiterPad: Record "NPR NPRE Waiter Pad")
+    local procedure FindBill(BillLine: JsonToken; var TempNPREWaiterPad: Record "NPR NPRE Waiter Pad" temporary; var NPREWaiterPad: Record "NPR NPRE Waiter Pad")
     var
         SeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink";
         WaiterPadMgt: Codeunit "NPR NPRE Waiter Pad Mgt.";
@@ -464,38 +392,31 @@ codeunit 6150670 "NPR NPRE POS Action: SplitBill"
         end;
 
         Clear(NPREWaiterPad);
-        //WaiterPadPOSManagement.AddNewWaiterPadForSeating(CurrNPREWaiterPad."Current Seating FF",NPREWaiterPad,SeatingWaiterPadLink);  //NPR5.55 [399170]-revoked
-        //-NPR5.55 [399170]
         WaiterPadMgt.DuplicateWaiterPadHdr(CurrNPREWaiterPad, NPREWaiterPad);
         WaiterPadMgt.MoveNumberOfGuests(CurrNPREWaiterPad, NPREWaiterPad, 1);
-        //+NPR5.55 [399170]
         TempNPREWaiterPad.Init;
         TempNPREWaiterPad."No." := BillId;
         TempNPREWaiterPad.Description := NPREWaiterPad."No.";
         TempNPREWaiterPad.Insert;
     end;
 
-    local procedure "--- Json Mgt"()
-    begin
-    end;
-
-    local procedure GetValueAsString(JToken: DotNet JToken; JPath: Text): Text
+    local procedure GetValueAsString(JToken: JsonToken; JPath: Text): Text
     var
-        JToken2: DotNet JToken;
+        JToken2: JsonToken;
     begin
-        JToken2 := JToken.SelectToken(JPath);
-        if IsNull(JToken2) then
+        JToken.SelectToken(JPath, JToken2);
+        if JToken2.AsValue().IsNull() then
             exit('');
 
         exit(Format(JToken2));
     end;
 
-    local procedure GetValueAsInt(JToken: DotNet JToken; JPath: Text) IntValue: Integer
+    local procedure GetValueAsInt(JToken: JsonToken; JPath: Text) IntValue: Integer
     var
-        JToken2: DotNet JToken;
+        JToken2: JsonToken;
     begin
-        JToken2 := JToken.SelectToken(JPath);
-        if IsNull(JToken2) then
+        JToken.SelectToken(JPath, JToken2);
+        if JToken2.AsValue().IsNull() then
             exit(0);
 
         if not Evaluate(IntValue, Format(JToken2), 9) then
@@ -504,22 +425,18 @@ codeunit 6150670 "NPR NPRE POS Action: SplitBill"
         exit(IntValue);
     end;
 
-    local procedure GetValueAsDec(JToken: DotNet JToken; JPath: Text) DecValue: Decimal
+    local procedure GetValueAsDec(JToken: JsonToken; JPath: Text) DecValue: Decimal
     var
-        JToken2: DotNet JToken;
+        JToken2: JsonToken;
     begin
-        JToken2 := JToken.SelectToken(JPath);
-        if IsNull(JToken2) then
+        JToken.SelectToken(JPath, JToken2);
+        if JToken2.AsValue().IsNull() then
             exit(0);
 
         if not Evaluate(DecValue, Format(JToken2), 9) then
             exit(0);
 
         exit(DecValue);
-    end;
-
-    local procedure "--- Aux"()
-    begin
     end;
 
     local procedure GetAddOnQty(SaleLinePOS: Record "NPR Sale Line POS"; ItemAddOnLine: Record "NPR NpIa Item AddOn Line") Qty: Decimal
@@ -558,6 +475,4 @@ codeunit 6150670 "NPR NPRE POS Action: SplitBill"
 
         exit(LineNo);
     end;
-
 }
-

@@ -1,8 +1,5 @@
 table 6150679 "NPR NPRE Kitchen Req. Station"
 {
-    // NPR5.54/ALPO/20200401 CASE 382428 Kitchen Display System (KDS) for NP Restaurant
-    // NPR5.55/ALPO/20200803 CASE 382428 Kitchen Display System (KDS) for NP Restaurant (further enhancements)
-
     Caption = 'Kitchen Order Line Station';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR NPRE Kitchen Req. Stations";
@@ -84,9 +81,4 @@ table 6150679 "NPR NPRE Kitchen Req. Station"
         {
         }
     }
-
-    fieldgroups
-    {
-    }
 }
-

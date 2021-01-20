@@ -1,16 +1,6 @@
 codeunit 6150675 "NPR NPRE Restaur. Setup Proxy"
 {
     // The purpose of this codeunit is to abstract retrieval of setup.
-    // 
-    // NPR5.54/ALPO/20200401 CASE 382428 Kitchen Display System (KDS) for NP Restaurant
-    // NPR5.55/ALPO/20200708 CASE 382428 Kitchen Display System (KDS) for NP Restaurant (further enhancements)
-    // NPR5.55/ALPO/20200615 CASE 399170 Restaurant flow change: support for waiter pad related manipulations directly inside a POS sale
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         NPRESetup: Record "NPR NPRE Restaurant Setup";
         Restaurant: Record "NPR NPRE Restaurant";
@@ -163,4 +153,3 @@ codeunit 6150675 "NPR NPRE Restaur. Setup Proxy"
         exit(NPRESetup."Serving Step Discovery Method");
     end;
 }
-

@@ -1,9 +1,5 @@
 table 6150678 "NPR NPRE Kitchen Request"
 {
-    // NPR5.54/ALPO/20200401 CASE 382428 Kitchen Display System (KDS) for NP Restaurant
-    // NPR5.55/ALPO/20200420 CASE 382428 Kitchen Display System (KDS) for NP Restaurant (further enhancements)
-    // NPR5.55/ALPO/20200615 CASE 399170 Restaurant flow change: support for waiter pad related manipulations directly inside a POS sale
-
     Caption = 'Kitchen Request';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR NPRE Kitchen Req. List";
@@ -95,10 +91,6 @@ table 6150678 "NPR NPRE Kitchen Request"
                     "No." := KitchenOrderLine."No.";
                     if "No." = '' then
                         exit;
-                    //-NPR5.55 [399170]-revoked
-                    //IF Type <> Type::Comment THEN
-                    //  Quantity := KitchenOrderLine.Quantity;
-                    //+NPR5.55 [399170]-revoked
                 end;
 
                 case Type of
@@ -126,16 +118,11 @@ table 6150678 "NPR NPRE Kitchen Request"
         }
         field(130; Quantity; Decimal)
         {
-            CalcFormula = Sum ("NPR NPRE Kitchen Req.Src. Link".Quantity WHERE("Request No." = FIELD("Request No.")));
+            CalcFormula = Sum("NPR NPRE Kitchen Req.Src. Link".Quantity WHERE("Request No." = FIELD("Request No.")));
             Caption = 'Quantity';
             DecimalPlaces = 0 : 5;
             Editable = false;
             FieldClass = FlowField;
-
-            trigger OnValidate()
-            begin
-                //"Quantity (Base)" := CalcBaseQty(Quantity);  //NPR5.55 [399170]-revoked
-            end;
         }
         field(140; "Unit of Measure Code"; Code[10])
         {
@@ -157,7 +144,6 @@ table 6150678 "NPR NPRE Kitchen Request"
                     else
                         "Qty. per Unit of Measure" := 1;
                 end;
-                //VALIDATE(Quantity); //NPR5.55 [399170]-revoked
             end;
         }
         field(150; "Qty. per Unit of Measure"; Decimal)
@@ -170,19 +156,11 @@ table 6150678 "NPR NPRE Kitchen Request"
         }
         field(160; "Quantity (Base)"; Decimal)
         {
-            CalcFormula = Sum ("NPR NPRE Kitchen Req.Src. Link"."Quantity (Base)" WHERE("Request No." = FIELD("Request No.")));
+            CalcFormula = Sum("NPR NPRE Kitchen Req.Src. Link"."Quantity (Base)" WHERE("Request No." = FIELD("Request No.")));
             Caption = 'Quantity (Base)';
             DecimalPlaces = 0 : 5;
             Editable = false;
             FieldClass = FlowField;
-
-            trigger OnValidate()
-            begin
-                //-NPR5.55 [399170]-revoked
-                //TESTFIELD("Qty. per Unit of Measure",1);
-                //VALIDATE(Quantity,"Quantity (Base)");
-                //+NPR5.55 [399170]-revoked
-            end;
         }
         field(170; "On Hold"; Boolean)
         {
@@ -203,7 +181,7 @@ table 6150678 "NPR NPRE Kitchen Request"
         }
         field(1100; "Applicable for Kitchen Station"; Boolean)
         {
-            CalcFormula = Exist ("NPR NPRE Kitchen Req. Station" WHERE("Request No." = FIELD("Request No."),
+            CalcFormula = Exist("NPR NPRE Kitchen Req. Station" WHERE("Request No." = FIELD("Request No."),
                                                                       "Production Restaurant Code" = FIELD("Production Restaurant Filter"),
                                                                       "Kitchen Station" = FIELD("Kitchen Station Filter")));
             Caption = 'Applicable for Kitchen Station';
@@ -212,14 +190,14 @@ table 6150678 "NPR NPRE Kitchen Request"
         }
         field(1110; "No. of Kitchen Stations"; Integer)
         {
-            CalcFormula = Count ("NPR NPRE Kitchen Req. Station" WHERE("Request No." = FIELD("Request No.")));
+            CalcFormula = Count("NPR NPRE Kitchen Req. Station" WHERE("Request No." = FIELD("Request No.")));
             Caption = 'No. of Kitchen Stations';
             Editable = false;
             FieldClass = FlowField;
         }
         field(1120; "Qty. Changed"; Boolean)
         {
-            CalcFormula = Exist ("NPR NPRE Kitchen Req. Station" WHERE("Request No." = FIELD("Request No."),
+            CalcFormula = Exist("NPR NPRE Kitchen Req. Station" WHERE("Request No." = FIELD("Request No."),
                                                                       "Production Restaurant Code" = FIELD("Production Restaurant Filter"),
                                                                       "Kitchen Station" = FIELD("Kitchen Station Filter"),
                                                                       "Qty. Change Not Accepted" = CONST(true)));
@@ -242,10 +220,6 @@ table 6150678 "NPR NPRE Kitchen Request"
         }
     }
 
-    fieldgroups
-    {
-    }
-
     trigger OnDelete()
     var
         KitchenReqStation: Record "NPR NPRE Kitchen Req. Station";
@@ -254,7 +228,7 @@ table 6150678 "NPR NPRE Kitchen Request"
         if not KitchenReqStation.IsEmpty then
             KitchenReqStation.DeleteAll;
 
-        DeleteSourceLinks();  //NPR5.55 [399170]
+        DeleteSourceLinks();
     end;
 
     var
@@ -277,12 +251,6 @@ table 6150678 "NPR NPRE Kitchen Request"
     begin
         KitchenOrderLine := Rec;
         Init;
-        //-NPR5.55 [399170]-revoked
-        //"Source Document Type" := KitchenOrderLine."Source Document Type";
-        //"Source Document Subtype" := KitchenOrderLine."Source Document Subtype";
-        //"Source Document No." := KitchenOrderLine."Source Document No.";
-        //"Source Document Line No." := KitchenOrderLine."Source Document Line No.";
-        //+NPR5.55 [399170]-revoked
         "Restaurant Code" := KitchenOrderLine."Restaurant Code";
         Type := KitchenOrderLine.Type;
     end;
@@ -309,24 +277,12 @@ table 6150678 "NPR NPRE Kitchen Request"
     begin
         Init;
         "Request No." := 0;
-        //-NPR5.55 [399170]-revoked
-        //"Source Document Type" := "Source Document Type"::"1";
-        //"Source Document Subtype" := 0;
-        //"Source Document No." := WaiterPadLine."Waiter Pad No.";
-        //"Source Document Line No." := WaiterPadLine."Line No.";
-        //+NPR5.55 [399170]-revoked
         Type := WaiterPadLine.Type;
         "No." := WaiterPadLine."No.";
         "Variant Code" := WaiterPadLine."Variant Code";
         Description := WaiterPadLine.Description;
-        //-NPR5.55 [399170]-revoked
-        //Quantity := WaiterPadLine.Quantity;
-        //VALIDATE("Unit of Measure Code",WaiterPadLine."Unit of Measure Code");
-        //+NPR5.55 [399170]-revoked
-        //-NPR5.55 [399170]
         "Unit of Measure Code" := WaiterPadLine."Unit of Measure Code";
         "Qty. per Unit of Measure" := WaiterPadLine."Qty. per Unit of Measure";
-        //+NPR5.55 [399170]
     end;
 
     procedure SeatingCode(): Code[10]
@@ -334,41 +290,28 @@ table 6150678 "NPR NPRE Kitchen Request"
         SeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink";
         KitchenReqSourceLink: Record "NPR NPRE Kitchen Req.Src. Link";
     begin
-        //-NPR5.55 [399170]
-        with KitchenReqSourceLink do begin
-            SetCurrentKey("Request No.");
-            SetRange("Request No.", Rec."Request No.");
-            if FindLast then
-                //+NPR5.55 [399170]
-                case "Source Document Type" of
-                    "Source Document Type"::"Waiter Pad":
-                        begin
-                            SeatingWaiterPadLink.SetRange("Waiter Pad No.", "Source Document No.");
-                            if not SeatingWaiterPadLink.FindFirst then
-                                SeatingWaiterPadLink."Seating Code" := '';
-                            exit(SeatingWaiterPadLink."Seating Code");
-                        end;
-                //-NPR5.55 [399170]-revoked
-                //      ELSE
-                //        EXIT('');
-                //+NPR5.55 [399170]-revoked
-                end;
-            //-NPR5.55 [399170]
-        end;
+        KitchenReqSourceLink.SetCurrentKey("Request No.");
+        KitchenReqSourceLink.SetRange("Request No.", Rec."Request No.");
+        if FindLast then
+            case KitchenReqSourceLink."Source Document Type" of
+                KitchenReqSourceLink."Source Document Type"::"Waiter Pad":
+                    begin
+                        SeatingWaiterPadLink.SetRange("Waiter Pad No.", KitchenReqSourceLink."Source Document No.");
+                        if not SeatingWaiterPadLink.FindFirst then
+                            SeatingWaiterPadLink."Seating Code" := '';
+                        exit(SeatingWaiterPadLink."Seating Code");
+                    end;
+            end;
         exit('');
-        //+NPR5.55 [399170]
     end;
 
     local procedure DeleteSourceLinks()
     var
         KitchenReqSourceLink: Record "NPR NPRE Kitchen Req.Src. Link";
     begin
-        //-NPR5.55 [399170]
         KitchenReqSourceLink.SetCurrentKey("Request No.");
         KitchenReqSourceLink.SetRange("Request No.", "Request No.");
         if not KitchenReqSourceLink.IsEmpty then
             KitchenReqSourceLink.DeleteAll;
-        //+NPR5.55 [399170]
     end;
 }
-

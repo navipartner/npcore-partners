@@ -1,8 +1,5 @@
 page 6150683 "NPR NPRE Restaurants"
 {
-    // NPR5.54/ALPO/20200401 CASE 382428 Kitchen Display System (KDS) for NP Restaurant
-    // NPR5.55/ALPO/20200803 CASE 382428 Kitchen Display System (KDS) for NP Restaurant (further enhancements)
-
     Caption = 'Restaurants';
     CardPageID = "NPR NPRE Restaurant Card";
     Editable = false;
@@ -17,17 +14,17 @@ page 6150683 "NPR NPRE Restaurants"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Name; Name)
+                field(Name; Rec.Name)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Name field';
                 }
-                field("Name 2"; "Name 2")
+                field("Name 2"; Rec."Name 2")
                 {
                     ApplicationArea = All;
                     Visible = false;
@@ -92,7 +89,7 @@ page 6150683 "NPR NPRE Restaurants"
                         KitchenRequest: Record "NPR NPRE Kitchen Request";
                         KitchenRequests: Page "NPR NPRE Kitchen Req.";
                     begin
-                        Rec.ShowKitchenRequests();  //NPR5.55 [382428]
+                        Rec.ShowKitchenRequests();
                     end;
                 }
             }
@@ -120,11 +117,9 @@ page 6150683 "NPR NPRE Restaurants"
                         Seating: Record "NPR NPRE Seating";
                         SeatingMgt: Codeunit "NPR NPRE Seating Mgt.";
                     begin
-                        //-NPR5.55 [382428]
-                        TestField(Code);
-                        Seating.SetFilter("Seating Location", SeatingMgt.RestaurantSeatingLocationFilter(Code));
+                        Rec.TestField(Code);
+                        Seating.SetFilter("Seating Location", SeatingMgt.RestaurantSeatingLocationFilter(Rec.Code));
                         PAGE.Run(0, Seating);
-                        //+NPR5.55 [382428]
                     end;
                 }
             }
@@ -133,10 +128,9 @@ page 6150683 "NPR NPRE Restaurants"
 
     trigger OnOpenPage()
     begin
-        ShowRequests := not CurrPage.LookupMode;  //NPR5.55 [382428]
+        ShowRequests := not CurrPage.LookupMode;
     end;
 
     var
         ShowRequests: Boolean;
 }
-

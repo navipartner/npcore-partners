@@ -1,8 +1,5 @@
 query 6150660 "NPR NPRE Kitchen Req. w Source"
 {
-    // NPR5.55/ALPO/20200615 CASE 399170 Restaurant flow change: support for waiter pad related manipulations directly inside a POS sale
-
-
     elements
     {
         dataitem(KitchenOrder; "NPR NPRE Kitchen Order")
@@ -50,4 +47,3 @@ query 6150660 "NPR NPRE Kitchen Req. w Source"
         }
     }
 }
-

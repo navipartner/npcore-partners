@@ -1,7 +1,5 @@
 page 6150694 "NPR NPRE Service Flow Profiles"
 {
-    // NPR5.55/ALPO/20200615 CASE 399170 Restaurant flow change: support for waiter pad related manipulations directly inside a POS sale
-
     Caption = 'Rest. Service Flow Profiles';
     CardPageID = "NPR NPRE Serv. Flow Prof. Card";
     Editable = false;
@@ -16,12 +14,12 @@ page 6150694 "NPR NPRE Service Flow Profiles"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
@@ -42,9 +40,4 @@ page 6150694 "NPR NPRE Service Flow Profiles"
             }
         }
     }
-
-    actions
-    {
-    }
 }
-

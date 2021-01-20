@@ -1,9 +1,5 @@
 table 6150671 "NPR NPRE W.Pad Prnt LogEntry"
 {
-    // NPR5.53/ALPO/20200102 CASE 360258 Possibility to send to kitchen only selected waiter pad lines or lines of specific print category
-    // NPR5.54/ALPO/20200401 CASE 382428 Kitchen Display System (KDS) for NP Restaurant
-    // NPR5.55/ALPO/20200615 CASE 399170 Restaurant flow change: support for waiter pad related manipulations directly inside a POS sale
-
     Caption = 'W. Pad Line Send Log Entry';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR NPRE W.Pad Pr.Log Entries";
@@ -95,9 +91,4 @@ table 6150671 "NPR NPRE W.Pad Prnt LogEntry"
             SumIndexFields = "Sent Quanity (Base)";
         }
     }
-
-    fieldgroups
-    {
-    }
 }
-
