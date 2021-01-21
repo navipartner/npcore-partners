@@ -392,6 +392,7 @@ page 6014432 "NPR Audit Roll"
                     Caption = 'Receipt';
                     Image = Sales;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = "Report";
                     PromotedIsBig = false;
                     ApplicationArea = All;
@@ -420,6 +421,7 @@ page 6014432 "NPR Audit Roll"
                     Caption = 'A4 Sales Ticket';
                     Image = Sales;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = "Report";
                     ApplicationArea = All;
                     ToolTip = 'Executes the A4 Sales Ticket action';
@@ -469,6 +471,7 @@ page 6014432 "NPR Audit Roll"
                     Caption = 'Debit Receipt';
                     Image = Receipt;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = "Report";
                     ApplicationArea = All;
                     ToolTip = 'Executes the Debit Receipt action';
@@ -527,6 +530,7 @@ page 6014432 "NPR Audit Roll"
                     Caption = 'Register Report';
                     Image = Report2;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = "Report";
                     PromotedIsBig = false;
                     ApplicationArea = All;
@@ -544,6 +548,7 @@ page 6014432 "NPR Audit Roll"
                     Caption = 'Tax Free';
                     Image = TaxDetail;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = "Report";
                     PromotedIsBig = false;
                     Visible = true;
@@ -586,6 +591,7 @@ page 6014432 "NPR Audit Roll"
                     Caption = 'EFT Receipt';
                     Image = Print;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = "Report";
                     ApplicationArea = All;
                     ToolTip = 'Executes the EFT Receipt action';
@@ -672,6 +678,7 @@ page 6014432 "NPR Audit Roll"
                     Caption = 'Post Sales Ticket';
                     Image = Post;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category4;
                     ShortCutKey = 'Shift+F11';
                     ApplicationArea = All;

@@ -128,6 +128,7 @@ page 6060040 "NPR Item Worksheet Templates"
                 Caption = 'Worksheets';
                 Image = Worksheet;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR Item Worksheets";

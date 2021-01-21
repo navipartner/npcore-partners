@@ -40,6 +40,7 @@ page 6014499 "NPR Dynamic Modules"
                 Caption = 'Load Modules';
                 Image = Import;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -56,6 +57,7 @@ page 6014499 "NPR Dynamic Modules"
                 Caption = 'Show Module Settings';
                 Image = ShowSelected;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -71,6 +73,7 @@ page 6014499 "NPR Dynamic Modules"
                 Caption = 'Show All Settings';
                 Image = ShowList;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

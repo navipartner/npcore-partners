@@ -98,6 +98,7 @@ page 6059897 "NPR Data Log Setup"
                 Caption = 'Clean Data Log';
                 Image = ClearLog;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Clean Data Log action';
@@ -112,6 +113,7 @@ page 6059897 "NPR Data Log Setup"
                 Caption = 'Add Records to Data Log';
                 Image = AddAction;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -127,6 +129,7 @@ page 6059897 "NPR Data Log Setup"
                 Caption = 'Set Ignored Fields';
                 Image = MaintenanceRegistrations;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -145,6 +148,7 @@ page 6059897 "NPR Data Log Setup"
                 Caption = 'Data Log Subscribers';
                 Image = ContactPerson;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Category4;
                 PromotedIsBig = true;
                 RunObject = Page "NPR Data Log Subscribers";
@@ -157,6 +161,7 @@ page 6059897 "NPR Data Log Setup"
                 Caption = 'Data Log';
                 Image = Log;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Category4;
                 PromotedIsBig = true;
                 RunObject = Page "NPR Data Log Records";

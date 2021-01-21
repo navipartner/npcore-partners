@@ -86,6 +86,7 @@ page 6151403 "NPR Magento Websites"
                 Caption = 'Setup Websites';
                 Image = Setup;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

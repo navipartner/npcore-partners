@@ -190,6 +190,7 @@ page 6060109 "NPR TM Ticket Particpt. Wks."
                 Caption = 'Send Notification';
                 Image = SendTo;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
 

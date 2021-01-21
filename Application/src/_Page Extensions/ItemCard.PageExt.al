@@ -922,6 +922,7 @@ pageextension 6014430 "NPR Item Card Extension" extends "Item Card"
         modify(ItemsByLocation)
         {
             Promoted = true;
+			PromotedOnly = true;
             PromotedCategory = Process;
         }
         addafter("Va&riants")
@@ -972,6 +973,7 @@ pageextension 6014430 "NPR Item Card Extension" extends "Item Card"
                 Caption = 'Retail Item Journal';
                 Image = Journals;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 RunObject = Page 6014402;
                 ApplicationArea = All;
@@ -983,6 +985,7 @@ pageextension 6014430 "NPR Item Card Extension" extends "Item Card"
                 Caption = 'Retail Item Reclassification Journal';
                 Image = Journals;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 RunObject = Page 6014403;
                 ApplicationArea = All;
@@ -1067,6 +1070,7 @@ pageextension 6014430 "NPR Item Card Extension" extends "Item Card"
                 {
                     Caption = 'Price Label';
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category5;
                     Image = BinLedger;
                     ShortcutKey = 'Shift+F8';
@@ -1093,6 +1097,7 @@ pageextension 6014430 "NPR Item Card Extension" extends "Item Card"
                 {
                     Caption = 'Variety Matrix';
                     Promoted = True;
+				    PromotedOnly = true;
                     PromotedIsBig = true;
                     PromotedCategory = Category5;
                     Image = ItemVariant;
@@ -1112,6 +1117,7 @@ pageextension 6014430 "NPR Item Card Extension" extends "Item Card"
                 {
                     Caption = 'Variety Maintenance';
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category5;
                     Image = ItemVariant;
                     ApplicationArea = All;
@@ -1129,6 +1135,7 @@ pageextension 6014430 "NPR Item Card Extension" extends "Item Card"
                 {
                     Caption = 'Add missing Barcode(s)';
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedIsBig = true;
                     Image = BarCode;
                     ApplicationArea = All;
@@ -1247,6 +1254,7 @@ pageextension 6014430 "NPR Item Card Extension" extends "Item Card"
                 {
                     Caption = 'Pictures';
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category6;
                     Visible = MagentoEnabled;
                     Image = Picture;
@@ -1269,6 +1277,7 @@ pageextension 6014430 "NPR Item Card Extension" extends "Item Card"
                 {
                     Caption = 'Videos';
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category6;
                     Image = Camera;
                     RunObject = page 6151455;
@@ -1281,6 +1290,7 @@ pageextension 6014430 "NPR Item Card Extension" extends "Item Card"
                 {
                     Caption = 'Webshops';
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category6;
                     Visible = MagentoEnabled and MagentoEnabledMultistore;
                     Image = Web;
@@ -1305,6 +1315,7 @@ pageextension 6014430 "NPR Item Card Extension" extends "Item Card"
                 {
                     Caption = 'Display Config';
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category6;
                     Visible = MagentoEnabled AND MagentoEnabledDisplayConfig;
                     Image = ViewPage;

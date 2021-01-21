@@ -201,6 +201,7 @@ page 6151200 "NPR NpCs Document List"
                 Caption = 'New';
                 Image = NewDocument;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = New;
                 PromotedIsBig = true;
                 ShortCutKey = 'Ctrl+Insert';

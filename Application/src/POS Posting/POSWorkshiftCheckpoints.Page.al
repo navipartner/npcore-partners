@@ -472,6 +472,7 @@ page 6150629 "NPR POS Workshift Checkpoints"
                 Ellipsis = true;
                 Image = Sales;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR POS Workshift Checkp. Card";

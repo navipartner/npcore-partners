@@ -356,6 +356,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                     Caption = 'POS Entry List';
                     Image = RegisteredDocs;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     RunObject = page "NPR POS Entry List";
                     ToolTip = 'View POS Entry that have been done.';
@@ -367,6 +368,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                     Caption = 'POS Quotes';
                     Image = RegisteredDocs;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     RunObject = page "NPR POS Quotes";
                     ToolTip = 'View POS Quotes that have been done.';
@@ -378,6 +380,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                     Caption = 'Posted Sales Invoices List';
                     Image = RegisteredDocs;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     RunObject = Page "Posted Sales Invoices";
                     ToolTip = 'View Sales Invoices that have been done.';
@@ -389,6 +392,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                     Caption = 'Posted Sales Credit Memos List';
                     Image = RegisteredDocs;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     RunObject = Page "Posted Sales Credit Memos";
                     ToolTip = 'View Sales Credit Memos that have been done.';
@@ -399,6 +403,7 @@ page 6151241 "NPR Retail POS- Sales Person R"
                     Caption = 'Repair Document List';
                     Image = RegisteredDocs;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     RunObject = Page "NPR Customer Repair List";
                     ToolTip = 'View the list of Repair List.';

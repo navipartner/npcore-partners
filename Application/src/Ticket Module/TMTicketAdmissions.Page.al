@@ -175,6 +175,7 @@ page 6060120 "NPR TM Ticket Admissions"
                 Caption = 'Ticket Admission BOM';
                 Image = BOM;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 RunObject = Page "NPR TM Ticket BOM";
                 RunPageLink = "Admission Code" = FIELD("Admission Code");
@@ -187,6 +188,7 @@ page 6060120 "NPR TM Ticket Admissions"
                 Caption = 'Schedules';
                 Image = Workdays;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR TM Ticket Schedules";
@@ -199,6 +201,7 @@ page 6060120 "NPR TM Ticket Admissions"
                 Caption = 'Admission Schedules';
                 Image = CalendarWorkcenter;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 RunObject = Page "NPR TM Admis. Schedule Lines";
                 RunPageLink = "Admission Code" = FIELD("Admission Code");
@@ -274,6 +277,7 @@ page 6060120 "NPR TM Ticket Admissions"
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Image = Forecast;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = "Report";
                 PromotedIsBig = true;
 

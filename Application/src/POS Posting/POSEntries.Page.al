@@ -180,6 +180,7 @@ page 6150650 "NPR POS Entries"
                 Caption = '&Navigate';
                 Image = Navigate;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -198,6 +199,7 @@ page 6150650 "NPR POS Entries"
                 Caption = 'Post Entry';
                 Image = Post;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -224,6 +226,7 @@ page 6150650 "NPR POS Entries"
                 Caption = 'Post Range';
                 Image = PostBatch;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -295,6 +298,7 @@ page 6150650 "NPR POS Entries"
                     Caption = 'Sales Receipt';
                     Image = PrintCheck;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = "Report";
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -321,6 +325,7 @@ page 6150650 "NPR POS Entries"
                     Caption = 'Large Sales Receipt';
                     Image = PrintCover;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = "Report";
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -343,6 +348,7 @@ page 6150650 "NPR POS Entries"
                     Caption = 'Balancing';
                     Image = PrintReport;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = "Report";
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -370,6 +376,7 @@ page 6150650 "NPR POS Entries"
                     Caption = 'EFT Receipt';
                     Image = PrintCheck;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = "Report";
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -412,6 +419,7 @@ page 6150650 "NPR POS Entries"
                     Caption = 'Send as PDF';
                     Image = SendEmailPDF;
                     Promoted = true;
+				    PromotedOnly = true;
                     ApplicationArea = All;
                     ToolTip = 'Executes the Send as PDF action';
                 }

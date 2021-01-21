@@ -100,6 +100,7 @@ page 6150618 "NPR POS Payment Method List"
                 Caption = 'POS Posting Setup';
                 Image = GeneralPostingSetup;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR POS Posting Setup";
@@ -115,6 +116,7 @@ page 6150618 "NPR POS Payment Method List"
                     Caption = 'POS Payment Lines';
                     Image = LedgerEntries;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     RunObject = Page "NPR POS Payment Line List";

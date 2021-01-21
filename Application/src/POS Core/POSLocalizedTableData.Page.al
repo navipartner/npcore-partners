@@ -56,6 +56,7 @@ page 6150724 "NPR POS Localized Table Data"
                 Caption = 'Insert Language';
                 Image = Language;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -71,6 +72,7 @@ page 6150724 "NPR POS Localized Table Data"
                 Caption = 'Delete Localization';
                 Image = Delete;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -86,6 +88,7 @@ page 6150724 "NPR POS Localized Table Data"
                 Caption = 'Apply Localization';
                 Image = Apply;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

@@ -173,6 +173,7 @@ page 6151204 "NPR NpCs Send to Store Orders"
                 Caption = 'New';
                 Image = NewDocument;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = New;
                 PromotedIsBig = true;
                 ShortCutKey = 'Ctrl+Insert';

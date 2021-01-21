@@ -125,6 +125,7 @@ page 6151574 "NPR AF Notification Hub Card"
                 Caption = 'Re-Send Messages';
                 Image = "Action";
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

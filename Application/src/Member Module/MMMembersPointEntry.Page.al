@@ -122,6 +122,7 @@ page 6060104 "NPR MM Members. Point Entry"
                 Caption = '&Navigate';
                 Image = Navigate;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 ApplicationArea = All;
                 ToolTip = 'Executes the &Navigate action';

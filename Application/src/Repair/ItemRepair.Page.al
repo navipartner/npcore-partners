@@ -301,6 +301,7 @@ page 6059991 "NPR Item Repair"
                     Caption = 'Delete Test Data';
                     Image = Delete;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -316,6 +317,7 @@ page 6059991 "NPR Item Repair"
                     Caption = 'Insert Test Data';
                     Image = Add;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -331,6 +333,7 @@ page 6059991 "NPR Item Repair"
                     Caption = 'Test Data (All)';
                     Image = "Action";
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -361,6 +364,7 @@ page 6059991 "NPR Item Repair"
                     Caption = 'Suggest Actions (All)';
                     Image = SuggestLines;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;

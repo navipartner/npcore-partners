@@ -992,6 +992,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                 Caption = 'Sales &Order';
                 Image = Document;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 RunObject = Page "Sales Order";
                 RunPageMode = Create;
@@ -1012,6 +1013,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                 Caption = 'Sales Credit &Memo';
                 Image = CreditMemo;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 RunObject = Page "Sales Credit Memo";
                 RunPageMode = Create;
@@ -1035,6 +1037,7 @@ page 6014557 "NPR POS: SalesPerson R.Center"
                 Caption = '&Purchase Order';
                 Image = Document;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 RunObject = Page "Purchase Order";
                 RunPageMode = Create;

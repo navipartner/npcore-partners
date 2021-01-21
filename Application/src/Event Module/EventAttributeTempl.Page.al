@@ -48,6 +48,7 @@ page 6060160 "NPR Event Attribute Templ."
                 Caption = 'Default Values';
                 Image = BulletList;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -66,6 +67,7 @@ page 6060160 "NPR Event Attribute Templ."
                 Caption = 'Template Filters';
                 Image = "Filter";
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR Event Attr. Temp. Filters";

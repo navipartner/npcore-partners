@@ -94,6 +94,7 @@ page 6014670 "NPR Dependency Mgt. Setup"
                 Caption = 'Validate Managed Dependencies';
                 Image = TestDatabase;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -109,6 +110,7 @@ page 6014670 "NPR Dependency Mgt. Setup"
                 Caption = 'Setup Managed Dependecy';
                 Image = Setup;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedIsBig = true;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Setup Managed Dependecy action';
@@ -125,6 +127,7 @@ page 6014670 "NPR Dependency Mgt. Setup"
                 Caption = 'Download Managed Dependencies';
                 Image = ImportCodes;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedIsBig = true;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Download Managed Dependencies action';

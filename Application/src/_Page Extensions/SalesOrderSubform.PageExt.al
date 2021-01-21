@@ -46,6 +46,7 @@ pageextension 6014447 "NPR Sales Order Subform" extends "Sales Order Subform"
                 Caption = 'Variety';
                 Image = ItemVariant;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedIsBig = true;
                 ShortCutKey = 'Ctrl+Alt+V';
                 ApplicationArea = All;

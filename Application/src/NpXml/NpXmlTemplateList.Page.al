@@ -98,6 +98,7 @@ page 6151552 "NPR NpXml Template List"
                 Caption = 'Edit Field Mapping';
                 Image = EditLines;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR NpXml Elements";
@@ -111,6 +112,7 @@ page 6151552 "NPR NpXml Template List"
                 Caption = 'View Field Mapping';
                 Image = Grid;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR NpXml Elements";
@@ -127,6 +129,7 @@ page 6151552 "NPR NpXml Template List"
                 Caption = 'Run Batch';
                 Image = Start;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Run Batch action';

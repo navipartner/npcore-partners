@@ -123,6 +123,7 @@ page 6014502 "NPR Accessory Unfold Worksheet"
                 Caption = 'Generate Unfold Lines';
                 Image = CalculatePlan;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -140,6 +141,7 @@ page 6014502 "NPR Accessory Unfold Worksheet"
                 Caption = 'Post';
                 Image = PostOrder;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ShortCutKey = 'F9';

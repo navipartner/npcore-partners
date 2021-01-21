@@ -372,6 +372,7 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
                 Caption = 'Update Statistics';
                 Image = Refresh;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedIsBig = true;
 
 
@@ -394,6 +395,7 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
                     Caption = 'Next Period';
                     Image = NextRecord;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
 
 
@@ -414,6 +416,7 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
                     Caption = 'Previous Period';
                     Image = PreviousRecord;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
 
 
@@ -433,6 +436,7 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
                     Caption = 'Previous Set';
                     Image = PreviousSet;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ToolTip = 'Previous Set';
@@ -450,6 +454,7 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
                     Caption = 'Previous Column';
                     Image = PreviousRecord;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ToolTip = 'Previous Set';
@@ -467,6 +472,7 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
                     Caption = 'Next Column';
                     Image = NextRecord;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ToolTip = 'Next Set';
@@ -484,6 +490,7 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
                     Caption = 'Next Set';
                     Image = NextSet;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ToolTip = 'Next Set';
@@ -507,6 +514,7 @@ page 6060116 "NPR TM Ticket Acc. Stat. Mtrx"
                 Ellipsis = true;
                 Image = Forecast;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = "Report";
                 PromotedIsBig = true;
                 RunObject = Page "NPR TM Admis. Forecast Matrix";

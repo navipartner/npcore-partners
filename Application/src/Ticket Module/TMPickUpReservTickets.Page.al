@@ -226,6 +226,7 @@ page 6060095 "NPR TM Pick-Up Reserv. Tickets"
                 Caption = 'Confirm & Print';
                 Image = Confirm;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
 
@@ -244,6 +245,7 @@ page 6060095 "NPR TM Pick-Up Reserv. Tickets"
                 Ellipsis = true;
                 Image = Payment;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
 
@@ -261,6 +263,7 @@ page 6060095 "NPR TM Pick-Up Reserv. Tickets"
                 Caption = 'Print';
                 Image = Print;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
 
@@ -281,6 +284,7 @@ page 6060095 "NPR TM Pick-Up Reserv. Tickets"
                 Caption = 'Ticket';
                 Image = Navigate;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedIsBig = true;
                 RunObject = Page "NPR TM Ticket List";
                 RunPageLink = "Ticket Reservation Entry No." = FIELD("Entry No.");

@@ -31,8 +31,8 @@ page 6151220 "NPR PrintNode Setup"
                 Image = Confirm;
                 ApplicationArea = All;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
-                PromotedOnly = true;
                 ToolTip = 'Executes the Test Connection action';
 
                 trigger OnAction()

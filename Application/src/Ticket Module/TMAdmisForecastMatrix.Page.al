@@ -77,6 +77,7 @@ page 6151135 "NPR TM Admis. Forecast Matrix"
                 Caption = 'Previous Set';
                 Image = PreviousSet;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ToolTip = 'Previous Set';
@@ -95,6 +96,7 @@ page 6151135 "NPR TM Admis. Forecast Matrix"
                 Caption = 'Previous Column';
                 Image = PreviousRecord;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ToolTip = 'Previous Set';
@@ -113,6 +115,7 @@ page 6151135 "NPR TM Admis. Forecast Matrix"
                 Caption = 'Next Column';
                 Image = NextRecord;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ToolTip = 'Next Set';
@@ -131,6 +134,7 @@ page 6151135 "NPR TM Admis. Forecast Matrix"
                 Caption = 'Next Set';
                 Image = NextSet;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ToolTip = 'Next Set';
@@ -153,6 +157,7 @@ page 6151135 "NPR TM Admis. Forecast Matrix"
                 Ellipsis = true;
                 Image = Statistics;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = "Report";
                 PromotedIsBig = true;
                 RunObject = Page "NPR TM Ticket Acc. Stat. Mtrx";

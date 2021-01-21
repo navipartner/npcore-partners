@@ -225,6 +225,7 @@ page 6151196 "NPR NpCs Store Card"
                 Caption = 'Validate Store Setup';
                 Image = Approve;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -245,6 +246,7 @@ page 6151196 "NPR NpCs Store Card"
                 Caption = 'Update Contact Information';
                 Image = User;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -263,6 +265,7 @@ page 6151196 "NPR NpCs Store Card"
                 Caption = 'Show Address';
                 Image = Map;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -280,6 +283,7 @@ page 6151196 "NPR NpCs Store Card"
                 Caption = 'Show Geolocation';
                 Image = Map;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

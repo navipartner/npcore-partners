@@ -225,6 +225,7 @@ page 6151070 "NPR Retail Repl. Demand Lines"
                 Caption = 'Requisition Journal';
                 Image = CalculatePlan;
                 Promoted = true;
+				PromotedOnly = true;
                 RunObject = Page "Req. Worksheet";
                 ApplicationArea = All;
                 ToolTip = 'Executes the Requisition Journal action';
@@ -234,6 +235,7 @@ page 6151070 "NPR Retail Repl. Demand Lines"
                 Caption = 'Confirm All';
                 Image = Confirm;
                 Promoted = true;
+				PromotedOnly = true;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Confirm All action';
 

@@ -55,6 +55,7 @@ page 6059820 "NPR Trx Email Setup"
                 Caption = 'Test Connection';
                 Image = Link;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Test Connection action';

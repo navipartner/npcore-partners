@@ -195,6 +195,7 @@ page 6059784 "NPR TM Ticket Type"
                 Caption = 'Ticket Setup';
                 Image = Setup;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR TM Ticket Setup";
@@ -207,6 +208,7 @@ page 6059784 "NPR TM Ticket Type"
                 Caption = 'Items';
                 Image = ItemLines;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 RunObject = Page "Item List";
                 RunPageLink = "NPR Ticket Type" = FIELD(Code);
@@ -219,6 +221,7 @@ page 6059784 "NPR TM Ticket Type"
                 Caption = 'Admissions';
                 Image = WorkCenter;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 RunObject = Page "NPR TM Ticket Admissions";
 
@@ -230,6 +233,7 @@ page 6059784 "NPR TM Ticket Type"
                 Caption = 'Ticket Admission BOM';
                 Image = BOM;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 RunObject = Page "NPR TM Ticket BOM";
 
@@ -244,6 +248,7 @@ page 6059784 "NPR TM Ticket Type"
                 Caption = 'E-Mail Templates';
                 Image = InteractionTemplate;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedIsBig = true;
                 RunObject = Page "NPR E-mail Templates";
                 RunPageView = WHERE("Table No." = CONST(6060110));
@@ -256,6 +261,7 @@ page 6059784 "NPR TM Ticket Type"
                 Caption = 'SMS Template';
                 Image = InteractionTemplate;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedIsBig = true;
                 RunObject = Page "NPR SMS Template List";
                 RunPageView = WHERE("Table No." = CONST(6060110));

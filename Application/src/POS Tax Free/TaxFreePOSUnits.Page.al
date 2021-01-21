@@ -63,6 +63,7 @@ page 6014644 "NPR Tax Free POS Units"
                 Caption = 'Set Parameters';
                 Image = Answers;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -81,6 +82,7 @@ page 6014644 "NPR Tax Free POS Units"
                 Caption = 'Test Connection';
                 Image = Process;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -98,6 +100,7 @@ page 6014644 "NPR Tax Free POS Units"
                 Caption = 'Auto Configure';
                 Image = TestDatabase;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -115,6 +118,7 @@ page 6014644 "NPR Tax Free POS Units"
                 Caption = 'View Log';
                 Image = Log;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR Tax Free Requests";

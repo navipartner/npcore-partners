@@ -42,6 +42,7 @@ page 6151571 "NPR AF Test Objects"
                 Caption = 'Run Test';
                 Image = TaskList;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

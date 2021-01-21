@@ -253,6 +253,7 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
                     Caption = 'Alternative No.';
                     Image = "Action";
                     Promoted = true;
+				    PromotedOnly = true;
                     ApplicationArea = All;
                     ToolTip = 'Executes the Alternative No. action';
                 }

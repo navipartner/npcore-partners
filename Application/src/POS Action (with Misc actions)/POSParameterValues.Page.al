@@ -82,6 +82,7 @@ page 6150705 "NPR POS Parameter Values"
                 Caption = 'Reset Values';
                 Image = UpdateDescription;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

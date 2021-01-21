@@ -106,6 +106,7 @@ page 6060123 "NPR TM Det. Ticket AccessEntry"
                 Ellipsis = true;
                 Image = WorkCenterLoad;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR TM Admis. Schedule Entry";
@@ -120,6 +121,7 @@ page 6060123 "NPR TM Det. Ticket AccessEntry"
                 Ellipsis = true;
                 Image = Navigate;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
 

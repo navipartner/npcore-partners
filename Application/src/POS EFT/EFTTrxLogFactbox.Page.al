@@ -46,6 +46,7 @@ page 6184473 "NPR EFT Trx Log Factbox"
                 Caption = 'Download';
                 Image = CreateXMLFile;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

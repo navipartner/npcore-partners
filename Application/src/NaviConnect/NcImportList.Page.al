@@ -193,6 +193,7 @@ page 6151504 "NPR Nc Import List"
                 Caption = 'Import Selected';
                 Image = Start;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ShortCutKey = 'Ctrl+F9';
@@ -240,6 +241,7 @@ page 6151504 "NPR Nc Import List"
                 Caption = 'Show Document Source';
                 Image = XMLFile;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Show Document Source action';
@@ -257,6 +259,7 @@ page 6151504 "NPR Nc Import List"
                 Caption = 'Show Formatted Source';
                 Image = XMLFile;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Show Formatted Source action';
@@ -357,6 +360,7 @@ page 6151504 "NPR Nc Import List"
                 Caption = 'Documents';
                 Image = EditLines;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 ShortCutKey = 'Shift+F7';
                 ApplicationArea = All;

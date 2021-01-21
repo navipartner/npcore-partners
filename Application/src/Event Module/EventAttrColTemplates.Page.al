@@ -38,6 +38,7 @@ page 6060162 "NPR Event Attr. Col. Templates"
                 Caption = 'Values';
                 Image = BulletList;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR Event Attr. Column Values";

@@ -65,6 +65,7 @@ page 6151060 "NPR Distribution Plan"
                 Caption = 'Create Distribution';
                 Image = CalculateInventory;
                 Promoted = true;
+				PromotedOnly = true;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Create Distribution action';
 
@@ -84,6 +85,7 @@ page 6151060 "NPR Distribution Plan"
                 Caption = 'Create Distribution Orders';
                 Image = CreateDocument;
                 Promoted = true;
+				PromotedOnly = true;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Create Distribution Orders action';
 
@@ -105,6 +107,7 @@ page 6151060 "NPR Distribution Plan"
                 Caption = 'View Documents';
                 Image = CreateDocument;
                 Promoted = true;
+				PromotedOnly = true;
                 RunObject = Page "NPR Distribution Orders";
                 RunPageLink = "Distribution Id" = FIELD("Distribution Id"),
                               "Distribution Item" = CONST('<>'''),
@@ -117,6 +120,7 @@ page 6151060 "NPR Distribution Plan"
                 Caption = 'Import Demands';
                 Image = ImportDatabase;
                 Promoted = true;
+				PromotedOnly = true;
                 Visible = false;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Import Demands action';
@@ -136,6 +140,7 @@ page 6151060 "NPR Distribution Plan"
                     Caption = 'Previous Set';
                     Image = PreviousSet;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ToolTip = 'Previous Set';
@@ -160,6 +165,7 @@ page 6151060 "NPR Distribution Plan"
                     Caption = 'Previous Column';
                     Image = PreviousRecord;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ToolTip = 'Previous Set';
@@ -184,6 +190,7 @@ page 6151060 "NPR Distribution Plan"
                     Caption = 'Next Column';
                     Image = NextRecord;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ToolTip = 'Next Set';
@@ -210,6 +217,7 @@ page 6151060 "NPR Distribution Plan"
                     Caption = 'Next Set';
                     Image = NextSet;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ToolTip = 'Next Set';

@@ -49,6 +49,7 @@ page 6014634 "NPR GCP Setup"
                 Caption = 'Change Print Settings';
                 Image = PrintAttachment;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -68,6 +69,7 @@ page 6014634 "NPR GCP Setup"
                 Caption = 'Setup Account';
                 Image = PrintAcknowledgement;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -88,6 +90,7 @@ page 6014634 "NPR GCP Setup"
                 Caption = 'View Printer Info';
                 Image = PrintCheck;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

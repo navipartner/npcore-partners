@@ -158,6 +158,7 @@ page 6151510 "NPR Nc Task Output List"
                 Caption = 'Show Output';
                 Image = XMLFile;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Category4;
                 PromotedIsBig = true;
                 ApplicationArea = All;

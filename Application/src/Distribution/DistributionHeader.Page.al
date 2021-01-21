@@ -48,6 +48,7 @@ page 6151057 "NPR Distribution Header"
                 Caption = 'Distribution Lines';
                 Image = List;
                 Promoted = true;
+				PromotedOnly = true;
                 RunObject = Page "NPR Distribution Lines";
                 RunPageLink = "Distribution Id" = FIELD("Distribution Id");
                 ApplicationArea = All;

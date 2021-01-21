@@ -68,6 +68,7 @@ page 6014474 "NPR Retail Price Log Setup"
                 Caption = 'Activate Price Log';
                 Image = Approve;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Visible = "Price Log Activated";

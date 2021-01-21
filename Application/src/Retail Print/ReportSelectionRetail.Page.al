@@ -157,6 +157,7 @@ page 6014423 "NPR Report Selection: Retail"
                     Caption = '&List';
                     Image = Report2;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     RunObject = Page "NPR Retail Report Select. List";

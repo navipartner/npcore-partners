@@ -53,6 +53,7 @@ page 6151058 "NPR Distrib. Grp Memb Listpart"
                 Caption = 'Distribution Items';
                 Image = SKU;
                 Promoted = true;
+				PromotedOnly = true;
                 RunObject = Page "NPR Retail Replenish. SKU List";
                 RunPageLink = "Location Code" = FIELD(Location);
                 ApplicationArea = All;
@@ -63,6 +64,7 @@ page 6151058 "NPR Distrib. Grp Memb Listpart"
                 Caption = 'Distribution Lines';
                 Image = ItemAvailbyLoc;
                 Promoted = true;
+				PromotedOnly = true;
                 RunObject = Page "NPR Distribution Lines";
                 ApplicationArea = All;
                 ToolTip = 'Executes the Distribution Lines action';
@@ -73,6 +75,7 @@ page 6151058 "NPR Distrib. Grp Memb Listpart"
             {
                 Image = ItemAvailability;
                 Promoted = true;
+				PromotedOnly = true;
                 RunObject = Page "NPR Retail Repl. Demand Lines";
                 RunPageLink = "Location Code" = FIELD(Location);
                 ApplicationArea = All;

@@ -122,6 +122,7 @@ page 6151454 "NPR Magento Payment Line List"
                 Caption = 'Capture Payment';
                 Image = Payment;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Visible = CaptureEnabled;
@@ -160,6 +161,7 @@ page 6151454 "NPR Magento Payment Line List"
                 Caption = 'Refund Payment';
                 Image = Payment;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Visible = RefundEnabled;
@@ -193,6 +195,7 @@ page 6151454 "NPR Magento Payment Line List"
                 Caption = 'Post Payment';
                 Image = Post;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Visible = ("Document Table No." = 112) AND ("Account No." <> '') AND (NOT Posted);
@@ -218,6 +221,7 @@ page 6151454 "NPR Magento Payment Line List"
                 Caption = '&Navigate';
                 Image = Navigate;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Visible = ("Document Table No." = 112) OR ("Document Table No." = 114);
@@ -237,6 +241,7 @@ page 6151454 "NPR Magento Payment Line List"
                 Caption = 'Document Card';
                 Image = Document;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

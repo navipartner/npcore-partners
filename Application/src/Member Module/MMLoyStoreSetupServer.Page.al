@@ -112,6 +112,7 @@ page 6151160 "NPR MM Loy. Store Setup Server"
                 Caption = 'Transaction Entries';
                 Image = EntriesList;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = "Report";
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Loyalty Server Trx Log";
@@ -129,6 +130,7 @@ page 6151160 "NPR MM Loy. Store Setup Server"
                 Caption = 'Reconcile All Stores';
                 Image = IssueFinanceCharge;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -147,6 +149,7 @@ page 6151160 "NPR MM Loy. Store Setup Server"
                 Caption = 'Reconcile Selected Store';
                 Image = IssueFinanceCharge;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

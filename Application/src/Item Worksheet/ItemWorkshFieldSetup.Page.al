@@ -100,9 +100,9 @@ page 6060054 "NPR Item Worksh. Field Setup"
                 Caption = 'Field Value Map';
                 Image = MapDimensions;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                PromotedOnly = true;
                 RunObject = Page "NPR Item Worksh. Field Mapping";
                 RunPageLink = "Worksheet Template Name" = FIELD("Worksheet Template Name"),
                               "Worksheet Name" = FIELD("Worksheet Name"),

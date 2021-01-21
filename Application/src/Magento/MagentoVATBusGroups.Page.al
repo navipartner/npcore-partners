@@ -47,6 +47,7 @@ page 6151409 "NPR Magento VAT Bus. Groups"
                 Caption = 'Setup VAT Business Posting Groups';
                 Image = Setup;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

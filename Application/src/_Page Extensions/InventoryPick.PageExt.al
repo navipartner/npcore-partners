@@ -22,6 +22,7 @@ pageextension 6014480 "NPR Inventory Pick" extends "Inventory Pick"
                 Caption = 'Scan';
                 Image = BarCode;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR Inventory Pick Scan";

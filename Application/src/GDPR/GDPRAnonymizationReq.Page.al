@@ -67,6 +67,7 @@ page 6151153 "NPR GDPR Anonymization Req."
                 Ellipsis = true;
                 Image = ChangeLog;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = "Report";
                 RunObject = Page "NPR Customer GDPR Log Entries";
                 RunPageLink = "Customer No" = FIELD("Customer No.");
@@ -81,6 +82,7 @@ page 6151153 "NPR GDPR Anonymization Req."
                 Caption = 'Anonymize';
                 Image = Absence;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Anonymize action';

@@ -63,6 +63,7 @@ page 6151586 "NPR Event Exch. Int. E-Mails"
                 Ellipsis = true;
                 Image = EncryptionKeys;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -78,6 +79,7 @@ page 6151586 "NPR Event Exch. Int. E-Mails"
                 Caption = 'Test Server Connection';
                 Image = Link;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

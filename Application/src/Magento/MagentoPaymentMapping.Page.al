@@ -63,6 +63,7 @@ page 6151448 "NPR Magento Payment Mapping"
                 Caption = 'Setup Payment Methods';
                 Image = Setup;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

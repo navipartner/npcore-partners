@@ -194,6 +194,7 @@ page 6060105 "NPR MM Loyalty Setup"
                 Ellipsis = true;
                 Image = LineDiscount;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Loyalty Point Setup";
                 RunPageLink = Code = FIELD(Code);
@@ -206,6 +207,7 @@ page 6060105 "NPR MM Loyalty Setup"
                 Ellipsis = true;
                 Image = CalculateInvoiceDiscount;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Loy. Item Point Setup";
                 RunPageLink = Code = FIELD(Code);
@@ -220,6 +222,7 @@ page 6060105 "NPR MM Loyalty Setup"
                 Caption = 'Auto Upgrade Threshold';
                 Image = UserCertificate;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Loyalty Alter Members.";
                 RunPageLink = "Loyalty Code" = FIELD(Code);

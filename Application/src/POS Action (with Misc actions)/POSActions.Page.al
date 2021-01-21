@@ -85,6 +85,7 @@ page 6150703 "NPR POS Actions"
                 Caption = 'Refresh Workflow';
                 Image = RefreshLines;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -103,6 +104,7 @@ page 6150703 "NPR POS Actions"
                 Caption = 'Parameters';
                 Image = Answers;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR POS Action Param.";
@@ -116,6 +118,7 @@ page 6150703 "NPR POS Actions"
                 Ellipsis = true;
                 Image = Debug;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR POS Action Workflow";

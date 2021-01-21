@@ -399,6 +399,7 @@ page 6060136 "NPR MM Member Card"
                 Ellipsis = true;
                 Image = PrintCheck;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Print Member Account Card action';
@@ -416,6 +417,7 @@ page 6060136 "NPR MM Member Card"
                 Ellipsis = true;
                 Image = PrintVoucher;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -439,6 +441,7 @@ page 6060136 "NPR MM Member Card"
                 Caption = 'Generate New Card';
                 Image = PostedPayableVoucher;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -491,6 +494,7 @@ page 6060136 "NPR MM Member Card"
                 Caption = 'Take Picture';
                 Image = Camera;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -508,6 +512,7 @@ page 6060136 "NPR MM Member Card"
                 Caption = 'Import Picture';
                 Image = Import;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -547,6 +552,7 @@ page 6060136 "NPR MM Member Card"
                 Caption = 'Create Welcome Notification';
                 Image = Interaction;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Create Welcome Notification action';
@@ -578,6 +584,7 @@ page 6060136 "NPR MM Member Card"
                 Caption = 'Send Wallet Notification';
                 Image = Interaction;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 ApplicationArea = All;
                 ToolTip = 'Creates a wallet notification message and sends it when processing method is set to inline';
@@ -686,6 +693,7 @@ page 6060136 "NPR MM Member Card"
                 Caption = 'Issued Tickets';
                 Image = ShowList;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = "Report";
                 PromotedIsBig = true;
                 RunObject = Page "NPR TM Ticket List";
@@ -699,6 +707,7 @@ page 6060136 "NPR MM Member Card"
                 Ellipsis = true;
                 Image = ChangeDimensions;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Member Communication";
@@ -723,6 +732,7 @@ page 6060136 "NPR MM Member Card"
                 Ellipsis = true;
                 Image = Log;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Member Arrival Log";
@@ -739,6 +749,7 @@ page 6060136 "NPR MM Member Card"
                     Caption = 'Ledger E&ntries';
                     Image = CustomerLedger;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category4;
                     ShortCutKey = 'Ctrl+F7';
                     ApplicationArea = All;
@@ -768,6 +779,7 @@ page 6060136 "NPR MM Member Card"
                     Caption = 'Item Ledger Entries';
                     Image = ItemLedger;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category4;
                     ApplicationArea = All;
                     ToolTip = 'Executes the Item Ledger Entries action';
@@ -796,6 +808,7 @@ page 6060136 "NPR MM Member Card"
                     Caption = 'Statistics';
                     Image = Statistics;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category4;
                     ShortCutKey = 'F7';
                     ApplicationArea = All;
@@ -827,6 +840,7 @@ page 6060136 "NPR MM Member Card"
                     Enabled = RaptorEnabled;
                     Image = ViewRegisteredOrder;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category5;
                     Visible = RaptorEnabled;
                     ApplicationArea = All;
@@ -851,6 +865,7 @@ page 6060136 "NPR MM Member Card"
                     Enabled = RaptorEnabled;
                     Image = SuggestElectronicDocument;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category5;
                     Visible = RaptorEnabled;
                     ApplicationArea = All;

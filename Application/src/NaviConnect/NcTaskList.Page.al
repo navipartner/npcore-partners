@@ -190,6 +190,7 @@ page 6151502 "NPR Nc Task List"
                 Caption = 'Import new Tasks';
                 Image = GetEntries;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ShortCutKey = 'Ctrl+F5';
@@ -206,6 +207,7 @@ page 6151502 "NPR Nc Task List"
                 Caption = 'Process Manually';
                 Image = Start;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ShortCutKey = 'Ctrl+F9';
@@ -251,6 +253,7 @@ page 6151502 "NPR Nc Task List"
                 Caption = 'Show Output';
                 Image = XMLFile;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Category4;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -266,6 +269,7 @@ page 6151502 "NPR Nc Task List"
                 Caption = 'Source Card';
                 Image = Item;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Category4;
                 PromotedIsBig = true;
                 ShortCutKey = 'Shift+F7';
@@ -285,6 +289,7 @@ page 6151502 "NPR Nc Task List"
                 Caption = 'Output';
                 Image = List;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Category4;
                 PromotedIsBig = true;
                 RunObject = Page "NPR Nc Task Output List";

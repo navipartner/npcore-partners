@@ -243,6 +243,7 @@ page 6060127 "NPR MM Memberships"
                 Ellipsis = true;
                 Image = CustomerList;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Membership Card";
@@ -266,6 +267,7 @@ page 6060127 "NPR MM Memberships"
                 Ellipsis = true;
                 Image = Log;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Member Arrival Log";
@@ -278,6 +280,7 @@ page 6060127 "NPR MM Memberships"
                 Caption = 'Open Coupons';
                 Image = Voucher;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR NpDc Coupons";
@@ -294,6 +297,7 @@ page 6060127 "NPR MM Memberships"
                     Enabled = RaptorEnabled;
                     Image = ViewRegisteredOrder;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category5;
                     Visible = RaptorEnabled;
                     ApplicationArea = All;
@@ -317,6 +321,7 @@ page 6060127 "NPR MM Memberships"
                     Enabled = RaptorEnabled;
                     Image = SuggestElectronicDocument;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category5;
                     Visible = RaptorEnabled;
                     ApplicationArea = All;
@@ -384,6 +389,7 @@ page 6060127 "NPR MM Memberships"
                 Caption = 'Set Client Attribute Filter';
                 Image = "Filter";
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = "Report";
                 PromotedIsBig = true;
                 Visible = NPRAttrVisible01 OR NPRAttrVisible02 OR NPRAttrVisible03 OR NPRAttrVisible04 OR NPRAttrVisible05 OR NPRAttrVisible06 OR NPRAttrVisible07 OR NPRAttrVisible08 OR NPRAttrVisible09 OR NPRAttrVisible10;

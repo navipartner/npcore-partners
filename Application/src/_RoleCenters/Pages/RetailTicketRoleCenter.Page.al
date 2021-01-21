@@ -253,6 +253,7 @@ page 6151263 "NPR Retail Ticket Role Center"
                     Ellipsis = true;
                     Image = Lock;
                     Promoted = true;
+				    PromotedOnly = true;
                     RunObject = Page "NPR MM Membership Lim. Setup";
                     ApplicationArea = All;
                     ToolTip = 'Executes the Membership Limitation Setup action';
@@ -262,6 +263,7 @@ page 6151263 "NPR Retail Ticket Role Center"
                     Caption = 'Membership Loyalty Setup';
                     Image = SalesLineDisc;
                     Promoted = true;
+				    PromotedOnly = true;
                     RunObject = Page "NPR MM Loyalty Setup";
                     ApplicationArea = All;
                     ToolTip = 'Executes the Membership Loyalty Setup action';
@@ -280,6 +282,7 @@ page 6151263 "NPR Retail Ticket Role Center"
                     Ellipsis = true;
                     Image = ElectronicBanking;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     RunObject = Page "NPR MM Foreign Members. Setup";
@@ -294,6 +297,7 @@ page 6151263 "NPR Retail Ticket Role Center"
                     Caption = 'Ticket Setup';
                     Image = Setup;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     RunObject = Page "NPR TM Ticket Setup";

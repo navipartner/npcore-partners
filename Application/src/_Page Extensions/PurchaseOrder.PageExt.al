@@ -103,6 +103,7 @@ pageextension 6014451 "NPR Purchase Order" extends "Purchase Order"
                 Caption = 'Import from scanner';
                 Image = Import;
                 Promoted = true;
+				PromotedOnly = true;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Import from scanner action';
 
@@ -122,6 +123,7 @@ pageextension 6014451 "NPR Purchase Order" extends "Purchase Order"
                 Ellipsis = true;
                 Image = BinContent;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Retail Print action';
@@ -131,6 +133,7 @@ pageextension 6014451 "NPR Purchase Order" extends "Purchase Order"
                 Caption = 'Price Label';
                 Image = BinContent;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ShortCutKey = 'Shift+Ctrl+L';

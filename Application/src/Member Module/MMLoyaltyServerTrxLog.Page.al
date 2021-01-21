@@ -101,6 +101,7 @@ page 6151161 "NPR MM Loyalty Server Trx Log"
                 Caption = '&Navigate';
                 Image = Navigate;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = "Report";
                 PromotedIsBig = true;
                 ApplicationArea = All;

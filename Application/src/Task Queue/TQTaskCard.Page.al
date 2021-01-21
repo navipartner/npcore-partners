@@ -290,6 +290,7 @@ page 6059903 "NPR TQ Task Card"
                     Caption = 'Task Log';
                     Image = Log;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     RunObject = Page "NPR Task Log (Task)";
                     RunPageLink = "Journal Template Name" = FIELD("Journal Template Name"),
@@ -313,6 +314,7 @@ page 6059903 "NPR TQ Task Card"
                     Caption = 'Run Task';
                     Image = Migration;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ShortCutKey = 'F9';
@@ -338,6 +340,7 @@ page 6059903 "NPR TQ Task Card"
                     Caption = 'Report Request Page';
                     Image = "Report";
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = "Report";
                     ApplicationArea = All;
                     ToolTip = 'Executes the Report Request Page action';

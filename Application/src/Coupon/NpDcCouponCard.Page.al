@@ -197,6 +197,7 @@ page 6151592 "NPR NpDc Coupon Card"
                     Caption = 'Print';
                     Image = Print;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;

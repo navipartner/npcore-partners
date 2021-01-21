@@ -141,6 +141,7 @@ page 6150903 "NPR HC Register List"
                 Caption = 'Default Dimension';
                 Image = DefaultDimension;
                 Promoted = true;
+				PromotedOnly = true;
                 RunObject = Page "Default Dimensions";
                 RunPageLink = "Table ID" = CONST(6150902),
                               "No." = FIELD("Register No.");

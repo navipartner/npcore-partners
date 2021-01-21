@@ -91,6 +91,7 @@ page 6060130 "NPR MM Member Card List"
                 Ellipsis = true;
                 Image = CustomerList;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Membership Card";
@@ -104,6 +105,7 @@ page 6060130 "NPR MM Member Card List"
                 Ellipsis = true;
                 Image = Customer;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Member Card";
@@ -120,6 +122,7 @@ page 6060130 "NPR MM Member Card List"
                 Ellipsis = true;
                 Image = Log;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Member Arrival Log";

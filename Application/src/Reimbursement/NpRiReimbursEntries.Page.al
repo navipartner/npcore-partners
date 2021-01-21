@@ -191,6 +191,7 @@ page 6151103 "NPR NpRi Reimburs. Entries"
                 Caption = 'Show Source';
                 Image = Item;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ShortCutKey = 'Shift+F7';
@@ -209,6 +210,7 @@ page 6151103 "NPR NpRi Reimburs. Entries"
                 Caption = '&Navigate';
                 Image = Navigate;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 Scope = Repeater;
                 ApplicationArea = All;

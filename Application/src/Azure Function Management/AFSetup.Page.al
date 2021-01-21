@@ -214,6 +214,7 @@ page 6151570 "NPR AF Setup"
                 Caption = 'Test';
                 Image = Task;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR AF Test Services";
@@ -225,6 +226,7 @@ page 6151570 "NPR AF Setup"
                 Caption = 'Enable Webservice';
                 Image = "Action";
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Codeunit "NPR AF API WebService";

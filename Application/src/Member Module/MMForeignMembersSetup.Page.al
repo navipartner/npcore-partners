@@ -72,6 +72,7 @@ page 6060146 "NPR MM Foreign Members. Setup"
                 Ellipsis = true;
                 Image = Setup;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedIsBig = true;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Show Setup action';
@@ -87,6 +88,7 @@ page 6060146 "NPR MM Foreign Members. Setup"
                 Ellipsis = true;
                 Image = Statistics;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

@@ -389,6 +389,7 @@ page 6151206 "NPR NpCs Coll. StoreOrder Card"
                     Caption = 'Print Order';
                     Image = ConfirmAndPrint;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     Visible = "Processing Print Template" <> '';
@@ -408,6 +409,7 @@ page 6151206 "NPR NpCs Coll. StoreOrder Card"
                     Ellipsis = true;
                     Image = PrintReport;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     Visible = "Document Type" = "Document Type"::Order;
@@ -429,6 +431,7 @@ page 6151206 "NPR NpCs Coll. StoreOrder Card"
                     Caption = 'Print Delivery';
                     Image = Print;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     Visible = ("Delivery Status" = "Delivery Status"::Delivered) AND ((("Bill via" = "Bill via"::POS) AND ("Delivery Print Template (POS)" <> '')) OR (("Bill via" = "Bill via"::"Sales Document") AND ("Delivery Print Template (S.)" <> '')));
@@ -451,6 +454,7 @@ page 6151206 "NPR NpCs Coll. StoreOrder Card"
                     Caption = 'Confirm Order';
                     Image = Approve;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     Visible = (("Processing Status" = 0) OR ("Processing Status" = 1)) AND ("Delivery Status" = 0);
@@ -472,6 +476,7 @@ page 6151206 "NPR NpCs Coll. StoreOrder Card"
                     Caption = 'Reject Order';
                     Image = Reject;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     Visible = (("Processing Status" = 0) OR ("Processing Status" = 1)) AND ("Delivery Status" = 0) AND ("Store Stock");
@@ -493,6 +498,7 @@ page 6151206 "NPR NpCs Coll. StoreOrder Card"
                     Caption = 'Send Notification to Customer';
                     Image = SendTo;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     Visible = "Send Notification from Store";
@@ -515,6 +521,7 @@ page 6151206 "NPR NpCs Coll. StoreOrder Card"
                 Caption = 'Document';
                 Image = Document;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedIsBig = true;
                 ShortCutKey = 'Shift+F7';
                 ApplicationArea = All;
@@ -532,6 +539,7 @@ page 6151206 "NPR NpCs Coll. StoreOrder Card"
                 Caption = 'Log Entries';
                 Image = Log;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedIsBig = true;
                 ShortCutKey = 'Ctrl+F7';
                 ApplicationArea = All;

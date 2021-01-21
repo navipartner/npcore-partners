@@ -306,6 +306,7 @@ page 6150675 "NPR POS Entry Card"
                 Caption = 'POS Posting Log';
                 Image = Log;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR POS Posting Log";
@@ -594,6 +595,7 @@ page 6150675 "NPR POS Entry Card"
                 Caption = 'Post Entry';
                 Image = Post;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -620,6 +622,7 @@ page 6150675 "NPR POS Entry Card"
                 Caption = 'Post Range';
                 Image = PostBatch;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -754,6 +757,7 @@ page 6150675 "NPR POS Entry Card"
                 Caption = '&Navigate';
                 Image = Navigate;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 ApplicationArea = All;
                 ToolTip = 'Executes the &Navigate action';
@@ -781,6 +785,7 @@ page 6150675 "NPR POS Entry Card"
                     Caption = 'Print Entry';
                     Image = PrintCheck;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = "Report";
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -798,6 +803,7 @@ page 6150675 "NPR POS Entry Card"
                     Caption = 'Print Entry Large';
                     Image = PrintCover;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = "Report";
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -815,6 +821,7 @@ page 6150675 "NPR POS Entry Card"
                     Caption = 'EFT Receipt';
                     Image = PrintCheck;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = "Report";
                     PromotedIsBig = true;
                     ApplicationArea = All;

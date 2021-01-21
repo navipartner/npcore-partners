@@ -117,6 +117,7 @@ page 6060070 "NPR MM Members. AutoRenew List"
                 Caption = 'Start Auto-Renew';
                 Image = Start;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -135,6 +136,7 @@ page 6060070 "NPR MM Members. AutoRenew List"
                 Caption = 'Auto-Renew Log';
                 Image = Log;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Members. Auto-Renew Log";

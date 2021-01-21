@@ -81,6 +81,7 @@ page 6150636 "NPR POS View Profile Card"
                     Image = SuggestNumber;
                     ApplicationArea = All;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ToolTip = 'Executes the Detect Decimal and Thousands Separators action';

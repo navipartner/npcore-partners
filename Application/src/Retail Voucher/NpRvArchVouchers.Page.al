@@ -122,6 +122,7 @@ page 6151022 "NPR NpRv Arch. Vouchers"
                 ShortCutKey = 'Ctrl+F7';
                 ApplicationArea = All;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedIsBig = true;
                 PromotedCategory = Process;
                 ToolTip = 'Executes the Archived Voucher Entries action';

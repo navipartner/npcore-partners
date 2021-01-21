@@ -327,6 +327,7 @@ page 6014419 "NPR Gift Voucher"
                     Caption = 'Copy';
                     Image = PrintVoucher;
                     Promoted = true;
+				    PromotedOnly = true;
                     ApplicationArea = All;
                     ToolTip = 'Executes the Copy action';
 
