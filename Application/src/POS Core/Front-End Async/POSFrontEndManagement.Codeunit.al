@@ -20,12 +20,13 @@ codeunit 6150704 "NPR POS Front End Management"
         PausedWorkflowID: Integer;
         Text009: Label 'A request was made to pause workflow ID %1 while a workflow ID %2 is already paused. This is a critical back-end error which will reset the back-end state. You may be able to retry the same action again, and you may even be able to conitnue with the current transaction; however, the safest way to proceed would be to start a new sale transaction if possible.';
         Text010: Label 'A request was made to resume a paused workflow (ID %1) from within the context of another workflow (ID %2). This is a critical back-end error which will reset the back-end state. You may be able to retry the same action again, and you may even be able to conitnue with the current transaction; however, the safest way to proceed would be to start a new sale transaction if possible.';
-        WorkflowID: Integer;
+        Workflow20ID: Integer;
         StepToContinueAt: Text;
         Text011: Label 'A request was made to continue current workflow at step %1, while no workflow is currently running.';
         Text012: Label 'A request was made to resume a workflow, while no workflow is currently in the paused state.';
         Text013: Label 'A method call was made on an uninitialized instance of the POS Front End Management codeunit, that requires an active and initialized instance to succeed.';
         Text015: Label 'A function that requires Workflow 2.0 engine to be initialized has been invoked from a Workflow 1.0 action.';
+        ErrorDoNotCallSetActionContext: Label 'You have invoked SetActionContext from within a Workflows 2.0 action. This is an invalid operation.\\If you want to pass context to front end from a Workflows 2.0 action, it is enough to write to the Context object. In Workflows 2.0, context is automatically synchronized between AL and JavaScript.';
 
     procedure Initialize(FrameworkIn: Interface "NPR Framework Interface"; SessionIn: Codeunit "NPR POS Session")
     begin
@@ -64,7 +65,7 @@ codeunit 6150704 "NPR POS Front End Management"
         SessionOut := POSSession;
     end;
 
-    //#region Workflows 1.0 Coordination
+    #region Workflows 1.0 Coordination
 
     procedure WorkflowBackEndStepBegin(WorkflowId: Integer; ActionId: Integer)
     begin
@@ -133,9 +134,9 @@ codeunit 6150704 "NPR POS Front End Management"
         exit(PausedWorkflowID > 0);
     end;
 
-    //#endregion
+    #endregion
 
-    //#region Workflows 2.0 Coordination
+    #region Workflows 2.0 Coordination
 
     procedure CloneForWorkflow20(WorkflowIDIn: Integer; var FrontEndIn: Codeunit "NPR POS Front End Management")
     begin
@@ -145,10 +146,10 @@ codeunit 6150704 "NPR POS Front End Management"
 
     procedure SetWorkflowID(WorkflowIDIn: Integer)
     begin
-        WorkflowID := WorkflowIDIn;
+        Workflow20ID := WorkflowIDIn;
     end;
 
-    //#endregion
+    #endregion
 
     local procedure MakeSureFrameworkIsAvailable(WithError: Boolean): Boolean
     begin
@@ -167,7 +168,7 @@ codeunit 6150704 "NPR POS Front End Management"
 
     local procedure MakeSureFrameworkIsAvailableIn20(WithError: Boolean): Boolean
     begin
-        if WorkflowID = 0 then begin
+        if Workflow20ID = 0 then begin
             if WithError then
                 Error(GetBugErrorMessage(Text015))
             else
@@ -209,7 +210,7 @@ codeunit 6150704 "NPR POS Front End Management"
         ConfigureReusableWorkflow(WorkflowAction);
     end;
 
-    //#region Setting View
+    #region Setting View
 
     procedure LoginView(Setup: Codeunit "NPR POS Setup")
     var
@@ -353,7 +354,7 @@ codeunit 6150704 "NPR POS Front End Management"
         POSSession.SetView(RequestView);
     end;
 
-    //#endregion
+    #endregion
 
 
     local procedure InvokeFrontEndAsync(Request: Interface "NPR Front-End Async Request")
@@ -833,7 +834,7 @@ codeunit 6150704 "NPR POS Front End Management"
         InvokeFrontEndAsync(Request);
     end;
 
-    //#region Model UI - TODO: refactor into Dragonglass!
+    #region Model UI - TODO: refactor into Dragonglass!
 
     procedure ShowModel(Model: DotNet NPRNetModel) ModelID: Guid
     var
@@ -886,7 +887,7 @@ codeunit 6150704 "NPR POS Front End Management"
         InvokeFrontEndAsync(Request);
     end;
 
-    //#endregion
+    #endregion
 
     procedure StartTransaction(Sale: Record "NPR Sale POS")
     var
@@ -901,6 +902,9 @@ codeunit 6150704 "NPR POS Front End Management"
     var
         Request: Codeunit "NPR Front-End: ProvideContext";
     begin
+        if Workflow20ID > 0 then
+            Error(ErrorDoNotCallSetActionContext);
+
         Request.Initialize(CurrentWorkflowID(), Action);
         Request.StoreContext(Context.GetContextObject());
         InvokeFrontEndAsync(Request);
@@ -909,7 +913,7 @@ codeunit 6150704 "NPR POS Front End Management"
     procedure WorkflowCallCompleted(Request: Codeunit "NPR Front-End: WkfCallCompl.")
     begin
         MakeSureFrameworkIsInitialized();
-        if WorkflowID > 0 then begin
+        if Workflow20ID > 0 then begin
             if HasWorkflowResponse then begin
                 HasWorkflowResponse := false;
                 Request.SetWorkflowResponse(WorkflowResponseContent);
@@ -933,7 +937,7 @@ codeunit 6150704 "NPR POS Front End Management"
         QueuedWorkflows.Add(StrSubstNo('%1;%2', ActionCode, Context));
     end;
 
-    //#region Tracing
+    #region Tracing
     local procedure PrepareTraceObject(Request: Interface "NPR Front-End Async Request"; TraceKey: Text) TraceObject: JsonObject;
     var
         TraceToken: JsonToken;
@@ -957,9 +961,9 @@ codeunit 6150704 "NPR POS Front End Management"
         PrepareTraceObject(Request, TraceKey).Add(TraceKey, TraceValue);
     end;
 
-    //#endregion
+    #endregion
 
-    //#region Event Publishers
+    #region Event Publishers
 
     [IntegrationEvent(false, false)]
     local procedure OnDetectFramework(var FrameworkOut: Interface "NPR Framework Interface"; var POSSessionOut: Codeunit "NPR POS Session"; var Handled: Boolean)
@@ -996,5 +1000,5 @@ codeunit 6150704 "NPR POS Front End Management"
     begin
     end;
 
-    //#endregion
+    #endregion
 }

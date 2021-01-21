@@ -10,10 +10,9 @@ controladdin "NPR Dragonglass"
         'src/_ControlAddins/Dragonglass/Scripts/datepicker.es.js',
         'src/_ControlAddins/Dragonglass/Scripts/datepicker.fr.js',
         'src/_ControlAddins/Dragonglass/Scripts/datepicker.nl.js',
-        'src/_ControlAddins/Dragonglass/Scripts/bundle.6.1.2209.6.js',
+        'src/_ControlAddins/Dragonglass/Scripts/bundle.6.1.2211.7.js',
         'src/_ControlAddins/Dragonglass/Scripts/moment.min.js',
-        'src/_ControlAddins/Dragonglass/Scripts/no-ie.js',
-        'src/_ControlAddins/Dragonglass/Scripts/NaviPartner.Transcendence.min.js';
+        'src/_ControlAddins/Dragonglass/Scripts/no-ie.js';
 
     StyleSheets =
         'src/_ControlAddins/Dragonglass/Stylesheets/datepicker.css',
@@ -22,7 +21,7 @@ controladdin "NPR Dragonglass"
         'src/_ControlAddins/Dragonglass/Stylesheets/themeLight.css';
 
     Images =
-        'src/_ControlAddins/Dragonglass/Scripts/bundle.6.1.2209.6.js.map',
+        'src/_ControlAddins/Dragonglass/Scripts/bundle.6.1.2211.7.js.map',
         'src/_ControlAddins/Dragonglass/Images/npretaillogo_med.png',
         'src/_ControlAddins/Dragonglass/Images/dragonglass.woff',
         'src/_ControlAddins/Dragonglass/Images/spinner-100-R.png',
