@@ -37,6 +37,7 @@ page 6151581 "NPR Event Attr. Temp. Filters"
                 Caption = 'Values';
                 Image = BulletList;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Values action';
@@ -55,6 +56,7 @@ page 6151581 "NPR Event Attr. Temp. Filters"
                 Caption = 'Show Events in Attribute Filter';
                 Image = ShowList;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

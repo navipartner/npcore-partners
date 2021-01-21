@@ -803,6 +803,7 @@ page 6014619 "NPR Retail - Sales RC MyReport"
                 Caption = 'C&ustomer';
                 Image = Customer;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 RunObject = Page "Customer Card";
                 RunPageMode = Create;
@@ -814,6 +815,7 @@ page 6014619 "NPR Retail - Sales RC MyReport"
                 Caption = 'Sales &Order';
                 Image = Document;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 RunObject = Page "Sales Order";
                 RunPageMode = Create;
@@ -825,6 +827,7 @@ page 6014619 "NPR Retail - Sales RC MyReport"
                 Caption = 'Sales Credit &Memo';
                 Image = CreditMemo;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 RunObject = Page "Sales Credit Memo";
                 RunPageMode = Create;
@@ -836,6 +839,7 @@ page 6014619 "NPR Retail - Sales RC MyReport"
                 Caption = '&Sales Reminder';
                 Image = Reminder;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 RunObject = Page Reminder;
                 RunPageMode = Create;
@@ -850,6 +854,7 @@ page 6014619 "NPR Retail - Sales RC MyReport"
                 Caption = '&Vendor';
                 Image = Vendor;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 RunObject = Page "Vendor Card";
                 RunPageMode = Create;
@@ -861,6 +866,7 @@ page 6014619 "NPR Retail - Sales RC MyReport"
                 Caption = '&Purchase Order';
                 Image = Document;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 RunObject = Page "Purchase Order";
                 RunPageMode = Create;

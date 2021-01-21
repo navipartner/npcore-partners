@@ -111,6 +111,7 @@ page 6060074 "NPR MM Membership Print Jnl"
                 Ellipsis = true;
                 Image = PrintCheck;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = "Report";
                 ApplicationArea = All;
                 ToolTip = 'Executes the Member Account Card action';
@@ -134,6 +135,7 @@ page 6060074 "NPR MM Membership Print Jnl"
                 Ellipsis = true;
                 Image = PrintVoucher;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = "Report";
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -157,6 +159,7 @@ page 6060074 "NPR MM Membership Print Jnl"
                 Caption = 'Card Owner';
                 Image = PrintAttachment;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = "Report";
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -184,6 +187,7 @@ page 6060074 "NPR MM Membership Print Jnl"
                 Ellipsis = true;
                 Image = CustomerList;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Membership Card";
@@ -206,6 +210,7 @@ page 6060074 "NPR MM Membership Print Jnl"
                 Caption = 'Shipment';
                 Image = Shipment;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

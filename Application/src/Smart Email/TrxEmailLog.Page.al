@@ -87,6 +87,7 @@ page 6059825 "NPR Trx Email Log"
                 Caption = 'Update Details';
                 Image = Process;
                 Promoted = true;
+				PromotedOnly = true;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Update Details action';
 

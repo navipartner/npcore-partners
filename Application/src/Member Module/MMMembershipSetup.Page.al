@@ -287,6 +287,7 @@ page 6060124 "NPR MM Membership Setup"
                 Caption = 'Membership Sales Setup';
                 Image = SetupList;
                 Promoted = true;
+				PromotedOnly = true;
                 RunObject = Page "NPR MM Membership Sales Setup";
                 RunPageLink = "Membership Code" = FIELD(Code);
                 ApplicationArea = All;
@@ -297,6 +298,7 @@ page 6060124 "NPR MM Membership Setup"
                 Caption = 'Membership Alteration';
                 Image = SetupList;
                 Promoted = true;
+				PromotedOnly = true;
                 RunObject = Page "NPR MM Membership Alter.";
                 RunPageLink = "From Membership Code" = FIELD(Code);
                 ApplicationArea = All;
@@ -307,6 +309,7 @@ page 6060124 "NPR MM Membership Setup"
                 Caption = 'Member Communication Setup';
                 Image = ChangeDimensions;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Member Comm. Setup";
@@ -332,6 +335,7 @@ page 6060124 "NPR MM Membership Setup"
                 Ellipsis = true;
                 Image = Lock;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Membership Lim. Setup";
@@ -380,6 +384,7 @@ page 6060124 "NPR MM Membership Setup"
                 Ellipsis = true;
                 Image = BarCode;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Admission Service Setup";
@@ -395,6 +400,7 @@ page 6060124 "NPR MM Membership Setup"
                 Ellipsis = true;
                 Image = Interaction;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -412,6 +418,7 @@ page 6060124 "NPR MM Membership Setup"
                 Ellipsis = true;
                 Image = Interaction;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

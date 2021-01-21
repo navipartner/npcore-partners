@@ -109,6 +109,7 @@ page 6014611 "NPR Retail Campaign"
                 Caption = 'Planning Items';
                 Image = ItemLines;
                 Promoted = true;
+				PromotedOnly = true;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Planning Items action';
 
@@ -159,6 +160,7 @@ page 6014611 "NPR Retail Campaign"
                 Caption = 'Distribution Setup';
                 Image = SetupList;
                 Promoted = true;
+				PromotedOnly = true;
                 RunObject = Page "NPR Distribution Setup";
                 RunPageLink = "Item Hiearachy" = FIELD(Code);
                 ApplicationArea = All;

@@ -10,6 +10,7 @@ pageextension 6014418 "NPR Posted Purchase Invoices" extends "Posted Purchase In
                 Caption = 'Show Imported File';
                 Image = DocInBrowser;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Show Imported File action';

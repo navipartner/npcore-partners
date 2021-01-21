@@ -41,6 +41,7 @@ page 6059996 "NPR Scanner Service Setup"
                 Caption = 'Setup Webservice';
                 Image = Setup;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 RunObject = Codeunit "NPR Scanner Service WS";
                 ApplicationArea = All;

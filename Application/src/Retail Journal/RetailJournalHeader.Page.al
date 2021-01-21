@@ -263,6 +263,7 @@ page 6014490 "NPR Retail Journal Header"
                     Caption = 'Shelf Label';
                     Image = BinContent;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = "Report";
                     ApplicationArea = All;
                     ToolTip = 'Executes the Shelf Label action';
@@ -279,6 +280,7 @@ page 6014490 "NPR Retail Journal Header"
                     Caption = 'Price Label';
                     Image = BinLedger;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = "Report";
                     ShortCutKey = 'Ctrl+Alt+L';
                     ApplicationArea = All;
@@ -296,6 +298,7 @@ page 6014490 "NPR Retail Journal Header"
                     Caption = 'Sign Print';
                     Image = Bin;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = "Report";
                     ApplicationArea = All;
                     ToolTip = 'Executes the Sign Print action';
@@ -312,6 +315,7 @@ page 6014490 "NPR Retail Journal Header"
                     Caption = 'Invert selection';
                     Image = Change;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = "Report";
                     ApplicationArea = All;
                     ToolTip = 'Executes the Invert selection action';
@@ -343,6 +347,7 @@ page 6014490 "NPR Retail Journal Header"
                     Caption = 'List';
                     Image = "Report";
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = "Report";
                     ApplicationArea = All;
                     ToolTip = 'Executes the List action';

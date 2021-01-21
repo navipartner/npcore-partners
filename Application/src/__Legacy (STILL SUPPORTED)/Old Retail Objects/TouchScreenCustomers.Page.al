@@ -75,6 +75,7 @@ page 6014526 "NPR Touch Screen: Customers"
                 Caption = 'New';
                 Image = NewCustomer;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = New;
                 ApplicationArea = All;
                 ToolTip = 'Executes the New action';

@@ -178,6 +178,7 @@ page 6059902 "NPR Task Journal"
                     Caption = 'Card';
                     Image = EditLines;
                     Promoted = true;
+				    PromotedOnly = true;
                     RunObject = Page "NPR TQ Task Card";
                     RunPageLink = "Journal Template Name" = FIELD("Journal Template Name"),
                                   "Journal Batch Name" = FIELD("Journal Batch Name"),
@@ -191,6 +192,7 @@ page 6059902 "NPR Task Journal"
                     Caption = 'Task Log';
                     Image = Log;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     RunObject = Page "NPR Task Log (Task)";
@@ -214,6 +216,7 @@ page 6059902 "NPR Task Journal"
                     Caption = 'Decrease';
                     Image = PreviousRecord;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -231,6 +234,7 @@ page 6059902 "NPR Task Journal"
                     Caption = 'Increase';
                     Image = NextRecord;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -252,6 +256,7 @@ page 6059902 "NPR Task Journal"
                     Caption = 'Run Task';
                     Image = Migration;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;

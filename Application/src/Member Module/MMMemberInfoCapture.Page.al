@@ -875,6 +875,7 @@ page 6060134 "NPR MM Member Info Capture"
                 Caption = 'Import Members';
                 Image = ImportCodes;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Visible = ShowImportMemberAction;
@@ -891,6 +892,7 @@ page 6060134 "NPR MM Member Info Capture"
                 Caption = 'Take Picture';
                 Image = Camera;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

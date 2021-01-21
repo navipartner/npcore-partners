@@ -67,6 +67,7 @@ page 6150667 "NPR NPRE Seating Location"
                     Caption = 'Seatings';
                     Image = Lot;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     RunObject = Page "NPR NPRE Seating List";

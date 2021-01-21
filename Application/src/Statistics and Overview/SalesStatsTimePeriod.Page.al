@@ -94,6 +94,7 @@ page 6014591 "NPR Sales Stats Time Period"
                 Caption = 'Get Data';
                 Image = Calculate;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

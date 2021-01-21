@@ -163,6 +163,7 @@ page 6060152 "NPR Event List"
                     Caption = 'Event Task &Lines';
                     Image = TaskList;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     RunObject = Page "NPR Event Task Lines";
@@ -211,6 +212,7 @@ page 6060152 "NPR Event List"
                     Caption = '&Statistics';
                     Image = Statistics;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     RunObject = Page "NPR Event Statistics";
                     RunPageLink = "No." = FIELD("No.");
@@ -223,6 +225,7 @@ page 6060152 "NPR Event List"
                     Caption = 'Sales &Documents';
                     Image = GetSourceDoc;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     ApplicationArea = All;
                     ToolTip = 'View sales documents that are related to the selected event.';
@@ -250,6 +253,7 @@ page 6060152 "NPR Event List"
                     Caption = 'Activity Log';
                     Image = Log;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     ApplicationArea = All;
                     ToolTip = 'View more details about potential errors/actions that occur on this event.';
@@ -266,6 +270,7 @@ page 6060152 "NPR Event List"
                     Caption = 'Attributes';
                     Image = BulletList;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     RunObject = Page "NPR Event Attributes";
                     RunPageLink = "Job No." = FIELD("No.");
@@ -277,6 +282,7 @@ page 6060152 "NPR Event List"
                     Caption = 'Word Layouts';
                     Image = Quote;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     ApplicationArea = All;
                     ToolTip = 'View or add a word document with specific layout/data for this event.';
@@ -294,6 +300,7 @@ page 6060152 "NPR Event List"
                     Caption = 'Exch. Int. Templates';
                     Image = InteractionTemplate;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -314,6 +321,7 @@ page 6060152 "NPR Event List"
                     Caption = 'Exch. Int. E-mail Summary';
                     Image = ValidateEmailLoggingSetup;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     ApplicationArea = All;
                     ToolTip = 'View a summary that shows a nice overview of who the sender and receipients are when using Microsoft Exchange integration. Removes the uncertainty of not knowing to whom the e-mail or a meeting request will be send to.';
@@ -335,6 +343,7 @@ page 6060152 "NPR Event List"
                     Caption = 'Sales Price Lists (Prices)';
                     Image = Price;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     ToolTip = 'View or set up different prices for products that you sell to the customer. A product price is automatically granted on invoice lines when the specified criteria are met, such as customer, quantity, or ending date.';
@@ -354,6 +363,7 @@ page 6060152 "NPR Event List"
                     Caption = 'Sales Price Lists (Discounts)';
                     Image = LineDiscount;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     ToolTip = 'View or set up different discounts for products that you sell to the customer. A product line discount is automatically granted on invoice lines when the specified criteria are met, such as customer, quantity, or ending date.';
@@ -373,6 +383,7 @@ page 6060152 "NPR Event List"
                     Caption = 'Purchase Price Lists (Prices)';
                     Image = Price;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     ToolTip = 'View or set up different prices for products that you buy from the vendor. An product price is automatically granted on invoice lines when the specified criteria are met, such as vendor, quantity, or ending date.';
@@ -392,6 +403,7 @@ page 6060152 "NPR Event List"
                     Caption = 'Purchase Price Lists (Discounts)';
                     Image = LineDiscount;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     ToolTip = 'View or set up different discounts for products that you buy from the vendor. An product discount is automatically granted on invoice lines when the specified criteria are met, such as vendor, quantity, or ending date.';
@@ -436,6 +448,7 @@ page 6060152 "NPR Event List"
                     Caption = 'Ledger E&ntries';
                     Image = CustomerLedger;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     RunObject = Page "Job Ledger Entries";
                     RunPageLink = "Job No." = FIELD("No.");
@@ -474,6 +487,7 @@ page 6060152 "NPR Event List"
                     Ellipsis = true;
                     Image = CopyFromTask;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -499,6 +513,7 @@ page 6060152 "NPR Event List"
                     Caption = 'Create Job &Sales Invoice';
                     Image = CreateJobSalesInvoice;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     ApplicationArea = All;
                     ToolTip = 'Use a batch job to help you create event sales invoices for the involved event planning lines.';
@@ -519,6 +534,7 @@ page 6060152 "NPR Event List"
                     Ellipsis = true;
                     Image = Copy;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;

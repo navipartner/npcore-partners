@@ -124,6 +124,7 @@ page 6151131 "NPR TM Seating Template"
                 Caption = 'Delete';
                 Image = Delete;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedIsBig = true;
 
 
@@ -246,6 +247,7 @@ page 6151131 "NPR TM Seating Template"
                     Enabled = MoveUpEnabled;
                     Image = MoveUp;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
                     ShortCutKey = 'Shift+Ctrl+Up';
@@ -266,6 +268,7 @@ page 6151131 "NPR TM Seating Template"
                     Enabled = MoveDownEnabled;
                     Image = MoveDown;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
                     ShortCutKey = 'Shift+Ctrl+Down';

@@ -49,6 +49,7 @@ page 6151130 "NPR TM Seating Setup"
                 Caption = 'Seating Template';
                 Image = Template;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedIsBig = true;
 
 

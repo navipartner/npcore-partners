@@ -503,6 +503,7 @@ page 6014503 "NPR Customer Repair Card"
                     Caption = 'Repair Label';
                     Image = BinContent;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = "Report";
                     ApplicationArea = All;
                     ToolTip = 'Executes the Repair Label action';
@@ -532,6 +533,7 @@ page 6014503 "NPR Customer Repair Card"
                     Caption = '&Repair Offer';
                     Image = "Report";
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = "Report";
                     ApplicationArea = All;
                     ToolTip = 'Executes the &Repair Offer action';
@@ -577,6 +579,7 @@ page 6014503 "NPR Customer Repair Card"
                     Caption = 'Repair Do&ne';
                     Image = "Report";
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = "Report";
                     ApplicationArea = All;
                     ToolTip = 'Executes the Repair Do&ne action';
@@ -621,6 +624,7 @@ page 6014503 "NPR Customer Repair Card"
                     Caption = 'Repair &Guarantee';
                     Image = "Report";
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = "Report";
                     ApplicationArea = All;
                     ToolTip = 'Executes the Repair &Guarantee action';
@@ -665,6 +669,7 @@ page 6014503 "NPR Customer Repair Card"
                     Caption = 'Customernote';
                     Image = "Report";
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = "Report";
                     ApplicationArea = All;
                     ToolTip = 'Executes the Customernote action';
@@ -708,6 +713,7 @@ page 6014503 "NPR Customer Repair Card"
                     Caption = 'De&livery Note';
                     Image = "Report";
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = "Report";
                     ApplicationArea = All;
                     ToolTip = 'Executes the De&livery Note action';
@@ -758,6 +764,7 @@ page 6014503 "NPR Customer Repair Card"
                         Caption = '&Input';
                         Image = Import;
                         Promoted = true;
+				        PromotedOnly = true;
                         PromotedCategory = Category4;
                         ApplicationArea = All;
                         ToolTip = 'Executes the &Input action';
@@ -795,6 +802,7 @@ page 6014503 "NPR Customer Repair Card"
                         Caption = 'O&utput';
                         Image = Export;
                         Promoted = true;
+				        PromotedOnly = true;
                         PromotedCategory = Category4;
                         ApplicationArea = All;
                         ToolTip = 'Executes the O&utput action';
@@ -825,6 +833,7 @@ page 6014503 "NPR Customer Repair Card"
                         Caption = '&Delete';
                         Image = Delete;
                         Promoted = true;
+				        PromotedOnly = true;
                         PromotedCategory = Category4;
                         ApplicationArea = All;
                         ToolTip = 'Executes the &Delete action';
@@ -848,6 +857,7 @@ page 6014503 "NPR Customer Repair Card"
                         Caption = 'O&utput';
                         Image = Export;
                         Promoted = true;
+				        PromotedOnly = true;
                         PromotedCategory = Category4;
                         ApplicationArea = All;
                         ToolTip = 'Executes the O&utput action';
@@ -906,6 +916,7 @@ page 6014503 "NPR Customer Repair Card"
                     Caption = 'Finalize Repair';
                     Image = Close;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category5;
                     ApplicationArea = All;
                     ToolTip = 'Executes the Finalize Repair action';
@@ -923,6 +934,7 @@ page 6014503 "NPR Customer Repair Card"
                     Caption = 'Post Items';
                     Image = Post;
                     Promoted = true;
+				    PromotedOnly = true;
                     ApplicationArea = All;
                     ToolTip = 'Executes the Post Items action';
 
@@ -938,6 +950,7 @@ page 6014503 "NPR Customer Repair Card"
                     Caption = 'Finalize Repair and Print';
                     Image = Close;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category5;
                     ApplicationArea = All;
                     ToolTip = 'Executes the Finalize Repair and Print action';
@@ -959,6 +972,7 @@ page 6014503 "NPR Customer Repair Card"
                     Caption = 'Send Status Sms';
                     Image = SendElectronicDocument;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category5;
                     ApplicationArea = All;
                     ToolTip = 'Executes the Send Status Sms action';
@@ -986,6 +1000,7 @@ page 6014503 "NPR Customer Repair Card"
                     Caption = 'Create Invoice';
                     Image = CreateDocument;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category5;
                     ApplicationArea = All;
                     ToolTip = 'Executes the Create Invoice action';
@@ -1000,6 +1015,7 @@ page 6014503 "NPR Customer Repair Card"
                     Caption = 'Create Sales Order';
                     Image = CreateDocument;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category5;
                     ApplicationArea = All;
                     ToolTip = 'Executes the Create Sales Order action';

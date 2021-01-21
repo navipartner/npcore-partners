@@ -113,6 +113,7 @@ page 6014565 "NPR Tax Free Voucher"
                 Caption = 'Void Voucher';
                 Image = VoidCheck;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -133,6 +134,7 @@ page 6014565 "NPR Tax Free Voucher"
                 Caption = 'Print Voucher';
                 Image = PrintCheck;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -153,6 +155,7 @@ page 6014565 "NPR Tax Free Voucher"
                 Caption = 'Reissue Voucher';
                 Image = StaleCheck;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -173,6 +176,7 @@ page 6014565 "NPR Tax Free Voucher"
                 Caption = 'Search Sale Links';
                 Image = SplitChecks;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

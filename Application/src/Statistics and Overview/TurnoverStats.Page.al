@@ -225,6 +225,7 @@ page 6014483 "NPR Turnover Stats"
                     Caption = '&Local Cash Register';
                     Image = Register;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     ApplicationArea = All;
                     ToolTip = 'Executes the &Local Cash Register action';
@@ -246,6 +247,7 @@ page 6014483 "NPR Turnover Stats"
                     Caption = 'Select Cash Register';
                     Image = SelectField;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     ShortCutKey = 'Shift+F9';
                     ApplicationArea = All;
@@ -271,6 +273,7 @@ page 6014483 "NPR Turnover Stats"
                     Caption = 'All Cash Registers';
                     Image = Register;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     ShortCutKey = 'Shift+F8';
                     ApplicationArea = All;

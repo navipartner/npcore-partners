@@ -46,6 +46,7 @@ page 6014659 "NPR Web Client Dependencies"
                 Caption = 'Import File...';
                 Image = ImportDatabase;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -61,6 +62,7 @@ page 6014659 "NPR Web Client Dependencies"
                 Caption = 'Export Managed Dependency Manifest';
                 Image = ExportElectronicDocument;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

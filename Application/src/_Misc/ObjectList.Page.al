@@ -55,6 +55,7 @@ page 6014480 "NPR Object List"
                     Caption = 'Table';
                     Image = "Table";
                     Promoted = true;
+				    PromotedOnly = true;
                     ShortCutKey = 'Ctrl+Alt+b';
                     ApplicationArea = All;
                     ToolTip = 'Executes the Table action';
@@ -69,6 +70,7 @@ page 6014480 "NPR Object List"
                     Caption = 'CodeUnit';
                     Image = ExplodeBOM;
                     Promoted = true;
+				    PromotedOnly = true;
                     ShortCutKey = 'Ctrl+Alt+c';
                     ApplicationArea = All;
                     ToolTip = 'Executes the CodeUnit action';
@@ -83,6 +85,7 @@ page 6014480 "NPR Object List"
                     Caption = 'Report';
                     Image = "Report";
                     Promoted = true;
+				    PromotedOnly = true;
                     ShortCutKey = 'Ctrl+Alt+p';
                     ApplicationArea = All;
                     ToolTip = 'Executes the Report action';
@@ -97,6 +100,7 @@ page 6014480 "NPR Object List"
                     Caption = 'Page';
                     Image = VendorLedger;
                     Promoted = true;
+				    PromotedOnly = true;
                     ShortCutKey = 'Ctrl+Alt+g';
                     ApplicationArea = All;
                     ToolTip = 'Executes the Page action';
@@ -111,6 +115,7 @@ page 6014480 "NPR Object List"
                     Caption = 'XMLPort';
                     Image = Export;
                     Promoted = true;
+				    PromotedOnly = true;
                     ShortCutKey = 'Ctrl+Alt+x';
                     ApplicationArea = All;
                     ToolTip = 'Executes the XMLPort action';
@@ -125,6 +130,7 @@ page 6014480 "NPR Object List"
                     Caption = 'All';
                     Image = AllLines;
                     Promoted = true;
+				    PromotedOnly = true;
                     ShortCutKey = 'Ctrl+Alt+a';
                     ApplicationArea = All;
                     ToolTip = 'Executes the All action';
@@ -140,6 +146,7 @@ page 6014480 "NPR Object List"
                 Caption = 'Run';
                 Image = Start;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ShortCutKey = 'Ctrl+r';

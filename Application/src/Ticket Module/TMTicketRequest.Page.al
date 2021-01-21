@@ -199,6 +199,7 @@ page 6060103 "NPR TM Ticket Request"
                 Caption = 'Issued Tickets';
                 Image = Navigate;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR TM Ticket List";
@@ -212,6 +213,7 @@ page 6060103 "NPR TM Ticket Request"
                 Caption = 'View Online Ticket';
                 Image = Web;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
 
 
@@ -250,6 +252,7 @@ page 6060103 "NPR TM Ticket Request"
                 Ellipsis = true;
                 Image = PostApplication;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedIsBig = true;
 
 

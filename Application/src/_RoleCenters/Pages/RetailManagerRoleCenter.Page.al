@@ -704,6 +704,7 @@ page 6151240 "NPR Retail: Manager RoleCenter"
                     Caption = '&Purchase Order';
                     Image = Document;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     RunObject = Page "Purchase Order";
                     RunPageMode = Create;

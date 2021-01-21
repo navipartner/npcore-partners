@@ -288,6 +288,7 @@ page 6151014 "NPR NpRv Voucher Card"
                     Caption = 'Send Voucher';
                     Image = SendTo;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;

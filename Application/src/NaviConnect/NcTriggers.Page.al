@@ -97,6 +97,7 @@ page 6151520 "NPR Nc Triggers"
                 Caption = 'Task List';
                 Image = TaskList;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR Nc Task List";

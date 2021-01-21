@@ -50,8 +50,8 @@ page 6014513 "NPR RP Template Output Log"
                 Caption = 'Download Output';
                 Image = Save;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
-                PromotedOnly = true;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Download Output action';
                 trigger OnAction()

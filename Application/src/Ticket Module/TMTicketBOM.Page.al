@@ -202,6 +202,7 @@ page 6060121 "NPR TM Ticket BOM"
                 Caption = 'Admissions';
                 Image = WorkCenter;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR TM Ticket Admissions";
@@ -214,6 +215,7 @@ page 6060121 "NPR TM Ticket BOM"
                 Caption = 'Ticket Setup';
                 Image = Setup;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR TM Ticket Setup";

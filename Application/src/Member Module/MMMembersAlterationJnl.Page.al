@@ -107,6 +107,7 @@ page 6060073 "NPR MM Members. Alteration Jnl"
                 Caption = 'Check';
                 Image = TestReport;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -124,6 +125,7 @@ page 6060073 "NPR MM Members. Alteration Jnl"
                 Ellipsis = true;
                 Image = PostBatch;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -188,6 +190,7 @@ page 6060073 "NPR MM Members. Alteration Jnl"
                 Caption = 'Membership Setup';
                 Image = Setup;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Membership Setup";
                 RunPageLink = Code = FIELD("Membership Code");
@@ -199,6 +202,7 @@ page 6060073 "NPR MM Members. Alteration Jnl"
                 Caption = 'Membership Card';
                 Image = Customer;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Membership Card";
                 RunPageLink = "Entry No." = FIELD("Membership Entry No.");

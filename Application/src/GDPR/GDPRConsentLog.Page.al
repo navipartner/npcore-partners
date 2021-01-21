@@ -70,6 +70,7 @@ page 6151124 "NPR GDPR Consent Log"
                 Caption = 'Accept';
                 Image = Approval;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -93,6 +94,7 @@ page 6151124 "NPR GDPR Consent Log"
                 Caption = 'Reject';
                 Image = Reject;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -117,6 +119,7 @@ page 6151124 "NPR GDPR Consent Log"
                 Caption = 'Pending';
                 Image = Questionaire;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

@@ -109,6 +109,7 @@ page 6060143 "NPR MM Membership Notific."
                 Caption = 'View Members Notified';
                 Image = InteractionLog;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Member Notific. Entry";
                 RunPageLink = "Notification Entry No." = FIELD("Entry No.");
@@ -123,6 +124,7 @@ page 6060143 "NPR MM Membership Notific."
                 Caption = 'Send Notifications';
                 Image = SendTo;
                 Promoted = true;
+				PromotedOnly = true;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Send Notifications action';
 

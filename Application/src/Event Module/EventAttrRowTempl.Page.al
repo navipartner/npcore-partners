@@ -37,6 +37,7 @@ page 6060159 "NPR Event Attr. Row Templ."
                 Caption = 'Values';
                 Image = BulletList;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR Event Attr. Row Values";

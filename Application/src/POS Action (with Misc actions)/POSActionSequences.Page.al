@@ -74,6 +74,7 @@ page 6150726 "NPR POS Action Sequences"
                 Caption = 'Discover Sequences';
                 Image = CopyBOM;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

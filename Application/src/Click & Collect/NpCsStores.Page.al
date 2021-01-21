@@ -48,6 +48,7 @@ page 6151195 "NPR NpCs Stores"
                 Caption = 'Show Address';
                 Image = Map;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -65,6 +66,7 @@ page 6151195 "NPR NpCs Stores"
                 Caption = 'Show Geolocation';
                 Image = Map;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

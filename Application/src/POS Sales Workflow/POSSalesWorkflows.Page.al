@@ -61,6 +61,7 @@ page 6150729 "NPR POS Sales Workflows"
                 Caption = 'Workflow Steps';
                 Image = List;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR POS Sales WF Steps";
@@ -75,6 +76,7 @@ page 6150729 "NPR POS Sales Workflows"
                 Ellipsis = true;
                 Image = AddAction;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

@@ -180,6 +180,7 @@ page 6014431 "NPR Gift Voucher List"
                     Caption = 'Copy';
                     Image = PrintVoucher;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = "Report";
                     PromotedIsBig = true;
                     ApplicationArea = All;

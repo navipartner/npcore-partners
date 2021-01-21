@@ -65,6 +65,7 @@ page 6150701 "NPR POS Menus"
                 Caption = 'Buttons';
                 Image = Hierarchy;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR POS Menu Buttons";

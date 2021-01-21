@@ -713,6 +713,7 @@ page 6060042 "NPR Item Worksheet Page"
                     Caption = 'Request Extra Item Info';
                     Image = CoupledItem;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ToolTip = 'Executes the Request Extra Item Info action.';
@@ -816,6 +817,7 @@ page 6060042 "NPR Item Worksheet Page"
                     Caption = 'Shelf Label';
                     Image = BinContent;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = "Report";
                     ToolTip = 'Executes the Shelf Label action.';
 
@@ -835,6 +837,7 @@ page 6060042 "NPR Item Worksheet Page"
                     Caption = 'Price Label';
                     Image = BinLedger;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = "Report";
                     ShortCutKey = 'Ctrl+Alt+L';
                     ToolTip = 'Executes the Price Label action.';
@@ -1008,6 +1011,7 @@ page 6060042 "NPR Item Worksheet Page"
                     Caption = 'Register';
                     Image = Approve;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ShortCutKey = 'F9';

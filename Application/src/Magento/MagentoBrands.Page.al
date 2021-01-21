@@ -56,6 +56,7 @@ page 6151420 "NPR Magento Brands"
                 Caption = 'Setup Brands';
                 Image = Setup;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Visible = HasSetupBrands;

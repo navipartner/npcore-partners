@@ -95,6 +95,7 @@ page 6150666 "NPR NPRE Tmp POSWaiterPadLines"
                     Image = Add;
                     InFooterBar = true;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;

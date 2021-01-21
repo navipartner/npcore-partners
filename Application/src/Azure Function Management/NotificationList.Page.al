@@ -49,6 +49,7 @@ page 6151041 "NPR Notification List"
                 Caption = 'Complete';
                 Image = Close;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -65,6 +66,7 @@ page 6151041 "NPR Notification List"
                 Caption = 'Cancel';
                 Image = Cancel;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

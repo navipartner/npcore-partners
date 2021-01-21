@@ -94,6 +94,7 @@ page 6151505 "NPR Nc Import Types"
                 Caption = 'Download Ftp';
                 Image = Start;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Visible = "Ftp Enabled";
@@ -112,6 +113,7 @@ page 6151505 "NPR Nc Import Types"
                 Caption = 'Download Server File';
                 Image = Save;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Visible = "Server File Enabled";
@@ -130,6 +132,7 @@ page 6151505 "NPR Nc Import Types"
                 Caption = 'Send Test Error E-mail';
                 Image = SendMail;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Visible = ("Send E-mail on Error");
@@ -149,9 +152,9 @@ page 6151505 "NPR Nc Import Types"
                 Caption = 'Show Setup Page';
                 Image = Setup;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                PromotedOnly = true;
                 ApplicationArea = All;
                 ToolTip = 'Shows setup page for the update handler, which will be used for getting new entries into import list';
 

@@ -77,6 +77,7 @@ page 6150683 "NPR NPRE Restaurants"
                     Caption = 'Kitchen Requests (Expedite View)';
                     Image = BlanketOrder;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     Scope = Repeater;

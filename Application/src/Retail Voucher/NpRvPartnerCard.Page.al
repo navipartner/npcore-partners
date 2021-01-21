@@ -62,6 +62,7 @@ page 6151027 "NPR NpRv Partner Card"
                 Caption = 'Validate Partner Setup';
                 Image = Approve;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

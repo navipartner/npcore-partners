@@ -213,6 +213,7 @@ page 6059931 "NPR Doc. Exch. Setup"
                 Caption = 'Run Document Exchange';
                 Image = Start;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

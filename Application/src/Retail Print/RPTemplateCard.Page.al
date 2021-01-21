@@ -239,6 +239,7 @@ page 6014638 "NPR RP Template Card"
                 Caption = 'Edit Data Items';
                 Image = Splitlines;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR RP Data Items";
@@ -251,6 +252,7 @@ page 6014638 "NPR RP Template Card"
                 Caption = 'Edit Layout';
                 Image = EditLines;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR RP Template Designer";
@@ -263,6 +265,7 @@ page 6014638 "NPR RP Template Card"
                 Caption = 'Edit Device Settings';
                 Image = SetupLines;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR RP Device Settings";
@@ -275,6 +278,7 @@ page 6014638 "NPR RP Template Card"
                 Caption = 'New Version';
                 Image = Add;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -294,6 +298,7 @@ page 6014638 "NPR RP Template Card"
                 Caption = 'Archive';
                 Image = Archive;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -312,6 +317,7 @@ page 6014638 "NPR RP Template Card"
                 Caption = 'Show Log';
                 Image = Log;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -324,6 +330,7 @@ page 6014638 "NPR RP Template Card"
                 Caption = 'View Archived Versions';
                 Image = Versions;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR RP Template Archive List";

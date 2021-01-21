@@ -64,6 +64,7 @@ page 6151607 "NPR NpDc ExtraItemQty. Subform"
                 Caption = 'Add Items';
                 Image = Add;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

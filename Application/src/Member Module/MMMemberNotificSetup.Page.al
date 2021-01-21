@@ -134,6 +134,7 @@ page 6060142 "NPR MM Member Notific. Setup"
                 Caption = 'E-Mail Templates';
                 Image = InteractionTemplate;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedIsBig = true;
                 RunObject = Page "NPR E-mail Templates";
                 RunPageView = WHERE("Table No." = CONST(6060139));
@@ -145,6 +146,7 @@ page 6060142 "NPR MM Member Notific. Setup"
                 Caption = 'SMS Template';
                 Image = InteractionTemplate;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedIsBig = true;
                 RunObject = Page "NPR SMS Template List";
                 RunPageView = WHERE("Table No." = CONST(6060139));
@@ -158,6 +160,7 @@ page 6060142 "NPR MM Member Notific. Setup"
                 Ellipsis = true;
                 Image = Note;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 RunObject = Page "NPR MM Membership Notific.";
                 RunPageLink = "Notification Trigger" = CONST(RENEWAL);
@@ -235,6 +238,7 @@ page 6060142 "NPR MM Member Notific. Setup"
                 Caption = 'Refresh Renew Notification';
                 Image = Recalculate;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Refresh Renew Notification action';

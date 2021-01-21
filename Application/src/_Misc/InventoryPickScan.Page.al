@@ -299,6 +299,7 @@ page 6014460 "NPR Inventory Pick Scan"
                     Ellipsis = true;
                     Image = GetSourceDoc;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     ShortCutKey = 'Ctrl+F7';
                     ApplicationArea = All;
@@ -347,6 +348,7 @@ page 6014460 "NPR Inventory Pick Scan"
                     Ellipsis = true;
                     Image = PostOrder;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ShortCutKey = 'F9';
@@ -364,6 +366,7 @@ page 6014460 "NPR Inventory Pick Scan"
                     Ellipsis = true;
                     Image = PostPrint;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ShortCutKey = 'Shift+F9';
@@ -382,6 +385,7 @@ page 6014460 "NPR Inventory Pick Scan"
                 Ellipsis = true;
                 Image = Print;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 ApplicationArea = All;
                 ToolTip = 'Executes the &Print action';

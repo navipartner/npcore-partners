@@ -98,6 +98,7 @@ page 6059968 "NPR MPOS App Setup Card"
                 Caption = 'Transactions';
                 Image = Log;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

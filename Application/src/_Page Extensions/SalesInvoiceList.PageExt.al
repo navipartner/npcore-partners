@@ -10,6 +10,7 @@ pageextension 6014484 "NPR Sales Invoice List" extends "Sales Invoice List"
                 Caption = 'Post and Pdf2Nav';
                 Image = PostSendTo;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Category5;
                 PromotedIsBig = true;
                 ToolTip = 'Post and handle as set up in ''Document Processing''';

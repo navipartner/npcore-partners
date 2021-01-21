@@ -60,6 +60,7 @@ page 6151221 "NPR PrintNode Printer List"
 
                 Image = PrintAttachment;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 ToolTip = 'Executes the Change Print Settings action';
                 trigger OnAction()

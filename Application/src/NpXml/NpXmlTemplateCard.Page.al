@@ -393,6 +393,7 @@ page 6151551 "NPR NpXml Template Card"
                 Enabled = true;
                 Image = EditLines;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR NpXml Elements";
@@ -405,6 +406,7 @@ page 6151551 "NPR NpXml Template Card"
                 Caption = 'Preview Xml';
                 Image = XMLFile;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Category4;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -422,6 +424,7 @@ page 6151551 "NPR NpXml Template Card"
                 Caption = 'Template History';
                 Image = History;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Category5;
                 PromotedIsBig = true;
                 RunObject = Page "NPR NpXml Templ. Chng. History";
@@ -434,6 +437,7 @@ page 6151551 "NPR NpXml Template Card"
                 Caption = 'Archived Versions';
                 Image = Versions;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Category5;
                 PromotedIsBig = true;
                 RunObject = Page "NPR NpXml Templ. Arch. List";
@@ -449,6 +453,7 @@ page 6151551 "NPR NpXml Template Card"
                 Caption = 'Init New Version';
                 Image = Add;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Category5;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -498,6 +503,7 @@ page 6151551 "NPR NpXml Template Card"
                 Caption = 'Run Batch';
                 Image = Start;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Run Batch action';
@@ -532,6 +538,7 @@ page 6151551 "NPR NpXml Template Card"
                 Caption = 'Archive Template';
                 Image = Archive;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Category5;
                 PromotedIsBig = true;
                 ApplicationArea = All;

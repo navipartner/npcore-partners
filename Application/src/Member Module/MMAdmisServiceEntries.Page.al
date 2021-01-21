@@ -140,6 +140,7 @@ page 6060091 "NPR MM Admis. Service Entries"
                 Caption = 'Log';
                 Image = Setup;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 RunObject = Page "NPR MM Admission Service Log";
                 RunPageLink = "Entry No." = FIELD("Entry No.");

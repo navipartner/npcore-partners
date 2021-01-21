@@ -1205,6 +1205,7 @@ page 6060150 "NPR Event Card"
                     Caption = 'Event &Task Lines';
                     Image = TaskList;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     RunObject = Page "NPR Event Task Lines";
@@ -1229,6 +1230,7 @@ page 6060150 "NPR Event Card"
                     Caption = '&Statistics';
                     Image = Statistics;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     RunObject = Page "NPR Event Statistics";
                     RunPageLink = "No." = FIELD("No.");
@@ -1241,6 +1243,7 @@ page 6060150 "NPR Event Card"
                     Caption = 'Sales &Documents';
                     Image = GetSourceDoc;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     ApplicationArea = All;
                     ToolTip = 'View sales documents that are related to the selected event.';
@@ -1283,6 +1286,7 @@ page 6060150 "NPR Event Card"
                     Caption = 'Activity Log';
                     Image = Log;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     ApplicationArea = All;
                     ToolTip = 'View more details about potential errors/actions that occur on this event.';
@@ -1299,6 +1303,7 @@ page 6060150 "NPR Event Card"
                     Caption = 'Attributes';
                     Image = BulletList;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     RunObject = Page "NPR Event Attributes";
                     RunPageLink = "Job No." = FIELD("No.");
@@ -1310,6 +1315,7 @@ page 6060150 "NPR Event Card"
                     Caption = 'Word Layouts';
                     Image = Quote;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     ApplicationArea = All;
                     ToolTip = 'View or add a word document with specific layout/data for this event.';
@@ -1327,6 +1333,7 @@ page 6060150 "NPR Event Card"
                     Caption = 'Exch. Int. Templates';
                     Image = InteractionTemplate;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -1347,6 +1354,7 @@ page 6060150 "NPR Event Card"
                     Caption = 'Exch. Int. E-mail Summary';
                     Image = ValidateEmailLoggingSetup;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     ApplicationArea = All;
                     ToolTip = 'View a summary that shows a nice overview of who the sender and receipients are when using Microsoft Exchange integration. Removes the uncertainty of not knowing to whom the e-mail or a meeting request will be send to.';
@@ -1366,6 +1374,7 @@ page 6060150 "NPR Event Card"
                     Caption = 'Sales Price Lists (Prices)';
                     Image = Price;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     ToolTip = 'View or set up different prices for products that you sell to the customer. A product price is automatically granted on invoice lines when the specified criteria are met, such as customer, quantity, or ending date.';
@@ -1385,6 +1394,7 @@ page 6060150 "NPR Event Card"
                     Caption = 'Sales Price Lists (Discounts)';
                     Image = LineDiscount;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     ToolTip = 'View or set up different discounts for products that you sell to the customer. A product line discount is automatically granted on invoice lines when the specified criteria are met, such as customer, quantity, or ending date.';
@@ -1404,6 +1414,7 @@ page 6060150 "NPR Event Card"
                     Caption = 'Purchase Price Lists (Prices)';
                     Image = Price;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     ToolTip = 'View or set up different prices for products that you buy from the vendor. A product price is automatically granted on invoice lines when the specified criteria are met, such as vendor, quantity, or ending date.';
@@ -1423,6 +1434,7 @@ page 6060150 "NPR Event Card"
                     Caption = 'Purchase Price Lists (Discounts)';
                     Image = LineDiscount;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     ToolTip = 'View or set up different discounts for products that you buy from the vendor. A product discount is automatically granted on invoice lines when the specified criteria are met, such as vendor, quantity, or ending date.';
@@ -1466,6 +1478,7 @@ page 6060150 "NPR Event Card"
                     Caption = 'Ticket Schedules';
                     Image = Workdays;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
                     RunObject = Page "NPR TM Ticket Schedules";
@@ -1477,6 +1490,7 @@ page 6060150 "NPR Event Card"
                     Caption = 'Ticket Admissions';
                     Image = WorkCenter;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -1499,6 +1513,7 @@ page 6060150 "NPR Event Card"
                     Caption = 'Admission Schedule Lines';
                     Image = CalendarWorkcenter;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -1521,6 +1536,7 @@ page 6060150 "NPR Event Card"
                     Caption = 'Admission Schedule Entry';
                     Image = WorkCenterLoad;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
                     RunObject = Page "NPR TM Admis. Schedule Entry";
@@ -1538,6 +1554,7 @@ page 6060150 "NPR Event Card"
                     Caption = 'Ledger E&ntries';
                     Image = JobLedger;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     RunObject = Page "Job Ledger Entries";
                     RunPageLink = "Job No." = FIELD("No.");
@@ -1577,6 +1594,7 @@ page 6060150 "NPR Event Card"
                     Ellipsis = true;
                     Image = CopyToTask;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -1596,6 +1614,7 @@ page 6060150 "NPR Event Card"
                     Ellipsis = true;
                     Image = CopyFromTask;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -1615,6 +1634,7 @@ page 6060150 "NPR Event Card"
                     Ellipsis = true;
                     Image = Copy;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -1720,6 +1740,7 @@ page 6060150 "NPR Event Card"
                 Caption = 'Job Analysis';
                 Image = "Report";
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = "Report";
                 RunObject = Report "Job Analysis";
                 ApplicationArea = All;
@@ -1730,6 +1751,7 @@ page 6060150 "NPR Event Card"
                 Caption = 'Job - Planning Lines';
                 Image = "Report";
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = "Report";
                 RunObject = Report "Job - Planning Lines";
                 ApplicationArea = All;

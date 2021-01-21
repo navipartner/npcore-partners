@@ -204,6 +204,7 @@ page 6150670 "NPR POS Balancing Line"
                     Caption = 'POS Entry Card';
                     Image = List;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category4;
                     RunObject = Page "NPR POS Entry Card";
                     RunPageLink = "Entry No." = FIELD("POS Entry No.");

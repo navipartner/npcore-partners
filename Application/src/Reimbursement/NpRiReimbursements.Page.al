@@ -123,6 +123,7 @@ page 6151102 "NPR NpRi Reimbursements"
                 Caption = 'Run Data Collection';
                 Image = ExecuteBatch;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -143,6 +144,7 @@ page 6151102 "NPR NpRi Reimbursements"
                 Caption = 'Run Reimbursement';
                 Image = ExecuteAndPostBatch;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

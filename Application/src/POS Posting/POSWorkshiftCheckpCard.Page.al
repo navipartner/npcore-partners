@@ -376,6 +376,7 @@ page 6150627 "NPR POS Workshift Checkp. Card"
                 Ellipsis = true;
                 Image = Balance;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -414,6 +415,7 @@ page 6150627 "NPR POS Workshift Checkp. Card"
                 Caption = 'Tax & VAT Summary';
                 Image = VATLedger;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Tax & VAT Summary action';
@@ -436,6 +438,7 @@ page 6150627 "NPR POS Workshift Checkp. Card"
                 Caption = 'X-Report';
                 Image = PrintVAT;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = "Report";
                 ApplicationArea = All;
                 ToolTip = 'Executes the X-Report action';

@@ -68,6 +68,7 @@ page 6151172 "NPR NpGp POS Sales Setup Card"
                 Caption = 'Validate Global POS Sales Setup';
                 Image = Approve;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

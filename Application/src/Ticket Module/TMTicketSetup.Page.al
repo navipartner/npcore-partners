@@ -265,6 +265,7 @@ page 6060079 "NPR TM Ticket Setup"
                 Ellipsis = true;
                 Image = Action;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 trigger OnAction()
                 var

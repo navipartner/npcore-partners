@@ -139,6 +139,7 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
                 Caption = 'Import From Scanner';
                 Image = Import;
                 Promoted = true;
+				PromotedOnly = true;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Import From Scanner action';
             }
@@ -190,6 +191,7 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
                 Caption = 'Post and Pdf2Nav';
                 Image = PostSendTo;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ToolTip = 'Post and handle as set up in ''Document Processing''';

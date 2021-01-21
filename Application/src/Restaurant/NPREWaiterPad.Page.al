@@ -148,6 +148,7 @@ page 6150660 "NPR NPRE Waiter Pad"
                         Caption = 'Send Full Order';
                         Image = AllLines;
                         Promoted = true;
+				        PromotedOnly = true;
                         PromotedCategory = Category4;
                         PromotedIsBig = true;
                         ToolTip = 'Notify kitchen of all ordered items regardless of serving step and print categories';
@@ -163,6 +164,7 @@ page 6150660 "NPR NPRE Waiter Pad"
                         Caption = 'Request Next Serving';
                         Image = SuggestLines;
                         Promoted = true;
+				        PromotedOnly = true;
                         PromotedCategory = Category4;
                         PromotedIsBig = true;
                         ToolTip = 'Ask kitchen to prepare next set of items based on current serving step and print categories';
@@ -178,6 +180,7 @@ page 6150660 "NPR NPRE Waiter Pad"
                         Caption = 'Request Serving Step';
                         Image = CalculateLines;
                         Promoted = true;
+				        PromotedOnly = true;
                         PromotedCategory = Category4;
                         PromotedIsBig = true;
                         ToolTip = 'Ask kitchen to prepare set of items belonging to a specific serving step';
@@ -193,6 +196,7 @@ page 6150660 "NPR NPRE Waiter Pad"
                         Caption = 'Request Selected Lines';
                         Image = SelectLineToApply;
                         Promoted = true;
+				        PromotedOnly = true;
                         PromotedCategory = Category4;
                         PromotedIsBig = true;
                         ToolTip = 'Ask kitchen to prepare selected waiter pad lines regardless of serving step and print categories';
@@ -219,6 +223,7 @@ page 6150660 "NPR NPRE Waiter Pad"
                     Caption = 'Print Pre Receipt';
                     Image = PrintCheck;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = "Report";
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -241,6 +246,7 @@ page 6150660 "NPR NPRE Waiter Pad"
                     Caption = 'Move seating';
                     Image = Change;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -256,6 +262,7 @@ page 6150660 "NPR NPRE Waiter Pad"
                     Caption = 'Merge waiter pad';
                     Image = ChangeBatch;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;

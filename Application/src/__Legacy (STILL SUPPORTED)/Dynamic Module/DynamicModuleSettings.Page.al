@@ -50,6 +50,7 @@ page 6014500 "NPR Dynamic Module Settings"
                 Caption = 'Edit Setting';
                 Image = Edit;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -66,6 +67,7 @@ page 6014500 "NPR Dynamic Module Settings"
                 Ellipsis = true;
                 Image = Restore;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

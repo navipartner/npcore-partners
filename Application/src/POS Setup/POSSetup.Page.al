@@ -243,6 +243,7 @@ page 6150707 "NPR POS Setup"
                 Enabled = RefreshEnabled;
                 Image = RefreshText;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

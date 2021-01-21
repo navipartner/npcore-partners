@@ -201,6 +201,7 @@ page 6151012 "NPR NpRv Voucher Type Card"
                     Caption = 'Setup Send Voucher';
                     Image = VoucherGroup;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
                     Visible = HasIssueVoucherSetup;
@@ -219,6 +220,7 @@ page 6151012 "NPR NpRv Voucher Type Card"
                     Caption = 'Setup Validate Voucher';
                     Image = RefreshVoucher;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
                     Visible = HasValidateVoucherSetup;
@@ -237,6 +239,7 @@ page 6151012 "NPR NpRv Voucher Type Card"
                     Caption = 'Setup Apply Payment';
                     Image = Voucher;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
                     Visible = HasApplyPaymentSetup;

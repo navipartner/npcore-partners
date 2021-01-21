@@ -84,6 +84,7 @@ page 6150633 "NPR NPRE Select Flow Status"
                     Enabled = PrintCategoriesEnabled;
                     Image = CoupledOrder;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     Visible = ShowPrintCategories;

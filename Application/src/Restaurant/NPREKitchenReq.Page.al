@@ -132,6 +132,7 @@ page 6150689 "NPR NPRE Kitchen Req."
                     Caption = 'Set Served';
                     Image = Approve;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     Visible = IsExpediteMode;
@@ -152,6 +153,7 @@ page 6150689 "NPR NPRE Kitchen Req."
                     Caption = 'Start Production';
                     Image = Start;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     Visible = NOT IsExpediteMode;
@@ -168,6 +170,7 @@ page 6150689 "NPR NPRE Kitchen Req."
                     Caption = 'End Production';
                     Image = Stop;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     Visible = NOT IsExpediteMode;
@@ -188,6 +191,7 @@ page 6150689 "NPR NPRE Kitchen Req."
                     Caption = 'Accept Qty. Change';
                     Image = Approve;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     Visible = NOT IsExpediteMode;
@@ -208,6 +212,7 @@ page 6150689 "NPR NPRE Kitchen Req."
                     Caption = 'Show/Hide Finished';
                     Image = FilterLines;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     Visible = NOT IsExpediteMode;
@@ -229,6 +234,7 @@ page 6150689 "NPR NPRE Kitchen Req."
                     Caption = 'Show/Hide Served';
                     Image = FilterLines;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     Visible = IsExpediteMode;

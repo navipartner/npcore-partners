@@ -150,6 +150,7 @@ page 6150616 "NPR POS Unit List"
                     Caption = 'POS Period Registers';
                     Image = Register;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     RunObject = Page "NPR POS Period Register List";
@@ -162,6 +163,7 @@ page 6150616 "NPR POS Unit List"
                     Caption = 'POS Entries';
                     Image = LedgerEntries;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     RunObject = Page "NPR POS Entry List";
@@ -184,6 +186,7 @@ page 6150616 "NPR POS Unit List"
                     Ellipsis = true;
                     Image = Sales;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     RunObject = Page "NPR POS Workshift Checkpoints";
@@ -201,6 +204,7 @@ page 6150616 "NPR POS Unit List"
                 Ellipsis = true;
                 Image = Sales;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedIsBig = true;
                 ApplicationArea = All;
                 ToolTip = 'Executes the End Workshift (Prel) action';

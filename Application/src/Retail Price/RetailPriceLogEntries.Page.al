@@ -106,6 +106,7 @@ page 6014475 "NPR Retail Price Log Entries"
                 Caption = 'Update Price Log';
                 Image = RefreshLines;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

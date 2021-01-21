@@ -240,6 +240,7 @@ page 6151018 "NPR NpRv Sales Line Card"
                 Caption = 'References';
                 Image = BarCode;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

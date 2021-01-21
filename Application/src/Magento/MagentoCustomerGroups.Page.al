@@ -40,6 +40,7 @@ page 6151440 "NPR Magento Customer Groups"
                 Caption = 'Setup Customer Groups';
                 Image = Setup;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

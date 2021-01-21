@@ -10,6 +10,7 @@ pageextension 6014485 "NPR Sales Credit Memos" extends "Sales Credit Memos"
                 Caption = 'Post and Pdf2Nav';
                 Image = PostSendTo;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Category5;
                 PromotedIsBig = true;
                 ToolTip = 'Post and handle as set up in ''Document Processing''';

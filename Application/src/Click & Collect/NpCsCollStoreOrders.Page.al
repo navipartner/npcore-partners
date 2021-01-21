@@ -219,6 +219,7 @@ page 6151205 "NPR NpCs Coll. Store Orders"
                     Caption = 'Print Order';
                     Image = ConfirmAndPrint;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     Visible = "Processing Print Template" <> '';
@@ -238,6 +239,7 @@ page 6151205 "NPR NpCs Coll. Store Orders"
                     Ellipsis = true;
                     Image = PrintReport;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     Visible = "Document Type" = "Document Type"::Order;
@@ -260,6 +262,7 @@ page 6151205 "NPR NpCs Coll. Store Orders"
                     Caption = 'Print Delivery';
                     Image = Print;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     Visible = ("Delivery Status" = "Delivery Status"::Delivered) AND ((("Bill via" = "Bill via"::POS) AND ("Delivery Print Template (POS)" <> '')) OR (("Bill via" = "Bill via"::"Sales Document") AND ("Delivery Print Template (S.)" <> '')));
@@ -282,6 +285,7 @@ page 6151205 "NPR NpCs Coll. Store Orders"
                     Caption = 'Confirm Order';
                     Image = Approve;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     Visible = (("Processing Status" = 0) OR ("Processing Status" = 1)) AND ("Delivery Status" = 0);
@@ -303,6 +307,7 @@ page 6151205 "NPR NpCs Coll. Store Orders"
                     Caption = 'Reject Order';
                     Image = Reject;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     Visible = (("Processing Status" = 0) OR ("Processing Status" = 1)) AND ("Delivery Status" = 0) AND ("Store Stock");
@@ -324,6 +329,7 @@ page 6151205 "NPR NpCs Coll. Store Orders"
                     Caption = 'Send Notification to Customer';
                     Image = SendTo;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     Visible = "Send Notification from Store";

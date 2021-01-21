@@ -122,6 +122,7 @@ page 6060082 "NPR MCS Recomm. Model Card"
                     Caption = 'Catalog';
                     Image = PreviewChecks;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = "Report";
                     ApplicationArea = All;
                     ToolTip = 'Executes the Catalog action';
@@ -138,6 +139,7 @@ page 6060082 "NPR MCS Recomm. Model Card"
                     Caption = 'Sales History';
                     Image = ViewWorksheet;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = "Report";
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -247,6 +249,7 @@ page 6060082 "NPR MCS Recomm. Model Card"
                 Caption = 'Business Rules';
                 Image = DefaultFault;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 RunObject = Page "NPR MCS Rec. Business Rules";
                 RunPageLink = "Model No." = FIELD(Code);

@@ -94,6 +94,7 @@ page 6151137 "NPR TM Waiting List Setup"
                 Caption = 'E-Mail Templates';
                 Image = InteractionTemplate;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedIsBig = true;
                 RunObject = Page "NPR E-mail Templates";
                 RunPageView = WHERE("Table No." = CONST(6060110));
@@ -106,6 +107,7 @@ page 6151137 "NPR TM Waiting List Setup"
                 Caption = 'SMS Template';
                 Image = InteractionTemplate;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedIsBig = true;
                 RunObject = Page "NPR SMS Template List";
                 RunPageView = WHERE("Table No." = CONST(6060110));

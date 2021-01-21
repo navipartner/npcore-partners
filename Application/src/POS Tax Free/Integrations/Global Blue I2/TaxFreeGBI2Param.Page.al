@@ -162,6 +162,7 @@ page 6014647 "NPR Tax Free GB I2 Param."
                 Caption = 'Services';
                 Image = ServiceLedger;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR Tax Free GB I2 Serv. List";

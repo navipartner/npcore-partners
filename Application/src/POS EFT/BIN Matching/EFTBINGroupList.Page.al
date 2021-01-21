@@ -47,6 +47,7 @@ page 6184511 "NPR EFT BIN Group List"
                 Caption = 'Import File';
                 Image = Import;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = XMLport "NPR EFT BIN Import";

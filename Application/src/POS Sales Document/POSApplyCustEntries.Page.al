@@ -418,6 +418,7 @@ page 6014493 "NPR POS Apply Cust. Entries"
                     Caption = 'Set Applies-to ID';
                     Image = SelectLineToApply;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ShortCutKey = 'Shift+F11';
@@ -468,6 +469,7 @@ page 6014493 "NPR POS Apply Cust. Entries"
                 Caption = '&Navigate';
                 Image = Navigate;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 ApplicationArea = All;
                 ToolTip = 'Executes the &Navigate action';

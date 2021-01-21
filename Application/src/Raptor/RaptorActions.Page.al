@@ -83,6 +83,7 @@ page 6151493 "NPR Raptor Actions"
                 Caption = 'Add Default Actions';
                 Image = AddAction;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

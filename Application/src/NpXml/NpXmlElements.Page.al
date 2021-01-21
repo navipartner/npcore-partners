@@ -236,6 +236,7 @@ page 6151553 "NPR NpXml Elements"
                     Caption = 'New Element (Sibling)';
                     Image = New;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedIsBig = true;
                     ShortCutKey = 'Ctrl+Insert';
                     ApplicationArea = All;
@@ -253,6 +254,7 @@ page 6151553 "NPR NpXml Elements"
                     Caption = 'New Element (Child)';
                     Image = New;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedIsBig = true;
                     ShortCutKey = 'Shift+Ctrl+Insert';
                     ApplicationArea = All;
@@ -270,6 +272,7 @@ page 6151553 "NPR NpXml Elements"
                     Caption = 'New Element (Parent)';
                     Image = New;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedIsBig = true;
                     ShortCutKey = 'Alt+Insert';
                     ApplicationArea = All;
@@ -287,6 +290,7 @@ page 6151553 "NPR NpXml Elements"
                     Caption = 'Delete';
                     Image = Delete;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     ShortCutKey = 'Ctrl+Delete';
@@ -332,6 +336,7 @@ page 6151553 "NPR NpXml Elements"
                     Caption = 'Preview Xml';
                     Image = XMLFile;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -372,6 +377,7 @@ page 6151553 "NPR NpXml Elements"
                     Caption = 'Move Up';
                     Image = MoveUp;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -389,6 +395,7 @@ page 6151553 "NPR NpXml Elements"
                     Caption = 'Move Down';
                     Image = MoveDown;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -406,6 +413,7 @@ page 6151553 "NPR NpXml Elements"
                     Caption = 'Decrement Level';
                     Image = PreviousRecord;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -421,6 +429,7 @@ page 6151553 "NPR NpXml Elements"
                     Caption = 'Increment Level';
                     Image = NextRecord;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     ApplicationArea = All;

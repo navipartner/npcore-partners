@@ -243,6 +243,7 @@ page 6060118 "NPR TM Ticket Schedules"
                 Caption = 'Admission';
                 Image = WorkCenter;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
 
@@ -254,6 +255,7 @@ page 6060118 "NPR TM Ticket Schedules"
                 Caption = 'Admission Schedules';
                 Image = CalendarWorkcenter;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR TM Admis. Schedule Lines";

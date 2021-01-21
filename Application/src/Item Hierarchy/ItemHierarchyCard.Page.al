@@ -55,6 +55,7 @@ page 6151051 "NPR Item Hierarchy Card"
                 Caption = 'Hierarchy Lines';
                 Image = ItemLines;
                 Promoted = true;
+				PromotedOnly = true;
                 RunObject = Page "NPR Item Hierarchy Lines";
                 RunPageLink = "Item Hierarchy Code" = FIELD("Hierarchy Code");
                 RunPageView = SORTING("Item Hierarchy Code", "Item Hierarchy Line No.");
@@ -66,6 +67,7 @@ page 6151051 "NPR Item Hierarchy Card"
                 Caption = 'Demand Lines';
                 Image = ItemAvailability;
                 Promoted = true;
+				PromotedOnly = true;
                 RunObject = Page "NPR Retail Repl. Demand Lines";
                 RunPageLink = "Item Hierachy" = FIELD("Hierarchy Code");
                 ApplicationArea = All;
@@ -76,6 +78,7 @@ page 6151051 "NPR Item Hierarchy Card"
                 Caption = 'Distribution lines';
                 Image = ItemAvailbyLoc;
                 Promoted = true;
+				PromotedOnly = true;
                 RunObject = Page "NPR Distribution Lines";
                 RunPageLink = "Item Hiearachy" = FIELD("Hierarchy Code");
                 ApplicationArea = All;

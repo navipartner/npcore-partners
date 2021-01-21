@@ -68,6 +68,7 @@ page 6014524 "NPR Touch Screen: CRM Contacts"
                 Caption = 'New';
                 Image = NewCustomer;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = New;
                 ApplicationArea = All;
                 ToolTip = 'Executes the New action';

@@ -16,6 +16,7 @@ pageextension 6014475 "NPR Sales Price" extends "Sales Prices"
                 Caption = 'Variety';
                 Image = ItemVariant;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ShortCutKey = 'Ctrl+Alt+V';

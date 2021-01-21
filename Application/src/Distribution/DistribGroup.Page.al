@@ -57,6 +57,7 @@ page 6151056 "NPR Distrib. Group"
                 Caption = 'Distribution setup';
                 Image = Setup;
                 Promoted = true;
+				PromotedOnly = true;
                 RunObject = Page "NPR Distribution Setup";
                 RunPageLink = "Distribution Group" = FIELD(Code);
                 ApplicationArea = All;

@@ -1571,6 +1571,7 @@ page 6059978 "NPR Variety Matrix Bool"
                 Caption = 'Create Table Copy';
                 Image = CopyFixedAssets;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = New;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -1589,6 +1590,7 @@ page 6059978 "NPR Variety Matrix Bool"
                 Caption = 'Previous Set';
                 Image = PreviousSet;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ToolTip = 'Previous Set';
@@ -1607,6 +1609,7 @@ page 6059978 "NPR Variety Matrix Bool"
                 Caption = 'Next Set';
                 Image = NextSet;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ToolTip = 'Next Set';
@@ -1625,6 +1628,7 @@ page 6059978 "NPR Variety Matrix Bool"
                 Caption = 'Select All';
                 Image = "Table";
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -1643,6 +1647,7 @@ page 6059978 "NPR Variety Matrix Bool"
                 Caption = 'Select Active Row';
                 Image = Line;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

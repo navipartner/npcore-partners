@@ -77,6 +77,7 @@ page 6151593 "NPR NpDc Coupons"
                     Caption = 'Print';
                     Image = Print;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;

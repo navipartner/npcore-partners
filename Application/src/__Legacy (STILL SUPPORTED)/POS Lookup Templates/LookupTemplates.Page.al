@@ -71,6 +71,7 @@ page 6014671 "NPR Lookup Templates"
                 Caption = 'Fields';
                 Image = Splitlines;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR Lookup Template Lines";
@@ -83,6 +84,7 @@ page 6014671 "NPR Lookup Templates"
                 Caption = 'Export Managed Dependency Manifest';
                 Image = ExportElectronicDocument;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

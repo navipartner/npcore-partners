@@ -127,6 +127,7 @@ page 6150718 "NPR POS Menu Filter"
                 Caption = 'Test & Activate';
                 Image = ApprovalSetup;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -142,6 +143,7 @@ page 6150718 "NPR POS Menu Filter"
                 Caption = 'Deactivate';
                 Image = Cancel;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -157,6 +159,7 @@ page 6150718 "NPR POS Menu Filter"
                 Caption = 'Table Filter';
                 Image = EditFilter;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Visible = false;
@@ -173,6 +176,7 @@ page 6150718 "NPR POS Menu Filter"
                 Caption = 'Generic Filter';
                 Image = EditFilter;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

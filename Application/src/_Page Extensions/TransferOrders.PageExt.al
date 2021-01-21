@@ -13,6 +13,7 @@ pageextension 6014464 "NPR Transfer Orders" extends "Transfer Orders"
                 Caption = 'POS Post and &Print';
                 Image = PostPrint;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ShortCutKey = 'Shift+F9';

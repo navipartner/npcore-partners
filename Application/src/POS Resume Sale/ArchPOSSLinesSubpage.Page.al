@@ -71,6 +71,7 @@ page 6150745 "NPR Arch. POS S. Lines Subpage"
                 Caption = 'Show Document';
                 Image = ViewDetails;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

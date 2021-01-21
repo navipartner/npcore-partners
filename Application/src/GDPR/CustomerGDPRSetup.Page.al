@@ -65,6 +65,7 @@ page 6151150 "NPR Customer GDPR Setup"
                 Caption = 'Extract Customers';
                 Image = Customer;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -176,6 +177,7 @@ page 6151150 "NPR Customer GDPR Setup"
                 Ellipsis = true;
                 Image = AbsenceCategory;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 RunObject = Page "NPR GDPR Anonymization Req.";
                 ApplicationArea = All;

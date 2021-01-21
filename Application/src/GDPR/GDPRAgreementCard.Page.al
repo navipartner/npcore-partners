@@ -53,6 +53,7 @@ page 6151123 "NPR GDPR Agreement Card"
                 Caption = 'Push Consent Request';
                 Image = Apply;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

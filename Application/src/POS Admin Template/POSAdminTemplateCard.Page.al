@@ -96,6 +96,7 @@ page 6150740 "NPR POS Admin. Template Card"
                 Caption = 'Scopes';
                 Image = UserInterface;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR POS Admin. Template Scopes";

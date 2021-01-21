@@ -110,6 +110,7 @@ page 6150656 "NPR POS Payment Line List"
                     Caption = 'POS Entry Card';
                     Image = List;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category4;
                     RunObject = Page "NPR POS Entry Card";
                     RunPageLink = "Entry No." = FIELD("POS Entry No.");

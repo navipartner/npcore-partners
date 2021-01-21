@@ -93,6 +93,7 @@ page 6151491 "NPR Raptor Setup"
                 Caption = 'Set up Raptor Actions';
                 Image = XMLSetup;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR Raptor Actions";
@@ -117,6 +118,7 @@ page 6151491 "NPR Raptor Setup"
                 Enabled = "Send Data to Raptor";
                 Image = JobListSetup;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 ToolTip = 'View or edit the job that sends tracking data to Raptor. For example, you can see the status or change when and how often the data is sent.';
                 ApplicationArea = All;

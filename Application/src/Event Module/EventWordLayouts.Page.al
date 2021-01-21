@@ -57,6 +57,7 @@ page 6060157 "NPR Event Word Layouts"
                 Caption = 'Copy';
                 Image = CopyDocument;
                 Promoted = true;
+				PromotedOnly = true;
                 ApplicationArea = All;
                 ToolTip = 'Make a copy of a layout.';
 
@@ -73,6 +74,7 @@ page 6060157 "NPR Event Word Layouts"
                 Caption = 'Import Layout';
                 Image = Import;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 ApplicationArea = All;
                 ToolTip = 'Import a layout Word file.';
@@ -87,6 +89,7 @@ page 6060157 "NPR Event Word Layouts"
                 Caption = 'Export Layout';
                 Image = Export;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 ApplicationArea = All;
                 ToolTip = 'Export a layout to a Word file.';
@@ -101,6 +104,7 @@ page 6060157 "NPR Event Word Layouts"
                 Caption = 'Edit Layout';
                 Image = EditReminder;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 Visible = CanEdit;
                 ApplicationArea = All;
@@ -134,6 +138,7 @@ page 6060157 "NPR Event Word Layouts"
                 Caption = 'Preview Report';
                 Image = "Report";
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = "Report";
                 ApplicationArea = All;
                 ToolTip = 'Preview the report as pdf.';
@@ -148,6 +153,7 @@ page 6060157 "NPR Event Word Layouts"
                 Caption = 'Request Page';
                 Image = "Report";
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = "Report";
                 ApplicationArea = All;
                 ToolTip = 'View or set filters to be applied to the report.';

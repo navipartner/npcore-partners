@@ -85,6 +85,7 @@ page 6060090 "NPR MM Admission Service Setup"
                 Caption = 'Published Webservice';
                 Image = Setup;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 RunObject = Codeunit "NPR MM Admission Service WS";
                 ApplicationArea = All;
@@ -95,6 +96,7 @@ page 6060090 "NPR MM Admission Service Setup"
                 Caption = 'Entries';
                 Image = Setup;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 RunObject = Page "NPR MM Admis. Service Entries";
                 ApplicationArea = All;

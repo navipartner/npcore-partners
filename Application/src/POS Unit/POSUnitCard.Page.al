@@ -201,6 +201,7 @@ page 6150617 "NPR POS Unit Card"
                 Caption = 'POS Period Registers';
                 Image = Register;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR POS Period Register List";
@@ -213,6 +214,7 @@ page 6150617 "NPR POS Unit Card"
                 Caption = 'POS Entries';
                 Image = LedgerEntries;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR POS Entry List";

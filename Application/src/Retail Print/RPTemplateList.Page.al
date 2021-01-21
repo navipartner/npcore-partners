@@ -66,6 +66,7 @@ page 6014639 "NPR RP Template List"
                 Caption = 'Create Copy';
                 Image = Copy;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -85,6 +86,7 @@ page 6014639 "NPR RP Template List"
                 Caption = 'Export Package (Selected)';
                 Image = Export;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -104,6 +106,7 @@ page 6014639 "NPR RP Template List"
                 Caption = 'Export Package (All)';
                 Image = Export;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -123,6 +126,7 @@ page 6014639 "NPR RP Template List"
                 Caption = 'Import Package File';
                 Image = Import;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -140,6 +144,7 @@ page 6014639 "NPR RP Template List"
                 Caption = 'Deploy Package';
                 Image = ImportDatabase;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

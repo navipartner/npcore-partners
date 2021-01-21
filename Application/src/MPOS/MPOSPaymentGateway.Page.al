@@ -58,6 +58,7 @@ page 6059994 "NPR MPOS Payment Gateway"
                 Caption = 'Transactions';
                 Image = Log;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

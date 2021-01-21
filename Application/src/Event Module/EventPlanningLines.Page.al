@@ -524,6 +524,7 @@ page 6014549 "NPR Event Planning Lines"
                     Caption = 'Event &Task Lines';
                     Image = TaskList;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     RunObject = Page "NPR Event Task Lines";
@@ -796,6 +797,7 @@ page 6014549 "NPR Event Planning Lines"
                     Caption = 'Create Job &Journal Lines';
                     Image = PostOrder;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -829,6 +831,7 @@ page 6014549 "NPR Event Planning Lines"
                     Caption = '&Open Job Journal';
                     Image = Journals;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     RunObject = Page "Job Journal";
                     RunPageLink = "Job No." = FIELD("Job No."),
@@ -845,6 +848,7 @@ page 6014549 "NPR Event Planning Lines"
                     Ellipsis = true;
                     Image = Invoice;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -861,6 +865,7 @@ page 6014549 "NPR Event Planning Lines"
                     Ellipsis = true;
                     Image = CreditMemo;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     ApplicationArea = All;
                     ToolTip = 'Executes the Create Sales &Credit Memo action';
@@ -876,6 +881,7 @@ page 6014549 "NPR Event Planning Lines"
                     Ellipsis = true;
                     Image = GetSourceDoc;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     ApplicationArea = All;
                     ToolTip = 'Executes the Sales &Documents action';

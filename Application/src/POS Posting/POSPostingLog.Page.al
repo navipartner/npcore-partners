@@ -74,6 +74,7 @@ page 6150658 "NPR POS Posting Log"
                 Caption = 'Repost';
                 Image = PostBatch;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Repost action';
@@ -94,6 +95,7 @@ page 6150658 "NPR POS Posting Log"
                 Caption = 'POS Entries';
                 Image = LedgerEntries;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR POS Entry List";

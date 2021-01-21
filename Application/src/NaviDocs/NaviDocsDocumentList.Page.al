@@ -141,6 +141,7 @@ page 6059769 "NPR NaviDocs Document List"
                     Caption = 'Handle';
                     Image = Start;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ShortCutKey = 'F9';
@@ -158,6 +159,7 @@ page 6059769 "NPR NaviDocs Document List"
                     Caption = 'Handle marked';
                     Image = Start;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ShortCutKey = 'Shift+F9';
@@ -179,6 +181,7 @@ page 6059769 "NPR NaviDocs Document List"
                     Caption = 'Show unhandled';
                     Image = FilterLines;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ShortCutKey = 'Ctrl+U';
@@ -200,6 +203,7 @@ page 6059769 "NPR NaviDocs Document List"
                     Caption = 'Update Status of Marked';
                     Image = GetSourceDoc;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -218,6 +222,7 @@ page 6059769 "NPR NaviDocs Document List"
                     Caption = 'Set Status = Unhandled';
                     Image = ChangeStatus;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category6;
                     ApplicationArea = All;
                     ToolTip = 'Executes the Set Status = Unhandled action';
@@ -234,6 +239,7 @@ page 6059769 "NPR NaviDocs Document List"
                     Caption = 'Set Status = Error';
                     Image = ChangeStatus;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category6;
                     ApplicationArea = All;
                     ToolTip = 'Executes the Set Status = Error action';
@@ -250,6 +256,7 @@ page 6059769 "NPR NaviDocs Document List"
                     Caption = 'Set Status = Handled';
                     Image = ChangeStatus;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category6;
                     ApplicationArea = All;
                     ToolTip = 'Executes the Set Status = Handled action';
@@ -288,6 +295,7 @@ page 6059769 "NPR NaviDocs Document List"
                 Caption = 'Document Card';
                 Image = GetSourceDoc;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Category4;
                 ShortCutKey = 'Shift+F5';
                 ApplicationArea = All;
@@ -303,6 +311,7 @@ page 6059769 "NPR NaviDocs Document List"
                 Caption = 'Master Card';
                 Image = GetSourceDoc;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Category4;
                 ShortCutKey = 'Ctrl+F5';
                 ApplicationArea = All;
@@ -318,6 +327,7 @@ page 6059769 "NPR NaviDocs Document List"
                 Caption = 'Template';
                 Image = MailAttachment;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Category4;
                 ShortCutKey = 'Ctrl+M';
                 ApplicationArea = All;

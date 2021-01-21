@@ -38,6 +38,7 @@ pageextension 6014444 "NPR Sales Credit Memo" extends "Sales Credit Memo"
                 Caption = 'Import from scanner';
                 Image = Import;
                 Promoted = true;
+				PromotedOnly = true;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Import from scanner action';
 
@@ -55,6 +56,7 @@ pageextension 6014444 "NPR Sales Credit Memo" extends "Sales Credit Memo"
                 Caption = 'Post and Pdf2Nav';
                 Image = PostSendTo;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Category6;
                 PromotedIsBig = true;
                 ToolTip = 'Post and handle as set up in ''Document Processing''';

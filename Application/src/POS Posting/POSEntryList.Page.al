@@ -303,6 +303,7 @@ page 6150652 "NPR POS Entry List"
                 Caption = 'POS Posting Log';
                 Image = Log;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR POS Posting Log";
@@ -595,6 +596,7 @@ page 6150652 "NPR POS Entry List"
                     Caption = 'Sales Line List';
                     Image = Sales;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     RunObject = Page "NPR POS Sales Line List";
@@ -606,6 +608,7 @@ page 6150652 "NPR POS Entry List"
                     Caption = 'Payment Line List';
                     Image = Payment;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     RunObject = Page "NPR POS Payment Line List";
@@ -617,6 +620,7 @@ page 6150652 "NPR POS Entry List"
                     Caption = 'Tax Line List';
                     Image = TaxDetail;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     RunObject = Page "NPR POS Tax Line List";
@@ -628,6 +632,7 @@ page 6150652 "NPR POS Entry List"
                     Caption = 'Balancing Line List';
                     Image = Balance;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     RunObject = Page "NPR POS Balancing Line";
@@ -639,6 +644,7 @@ page 6150652 "NPR POS Entry List"
                     Caption = 'POS Period Register List';
                     Image = PeriodEntries;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     RunObject = Page "NPR POS Period Register List";
@@ -654,6 +660,7 @@ page 6150652 "NPR POS Entry List"
                     Caption = 'Failed Item Posting List';
                     Image = ErrorLog;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
                     RunObject = Page "NPR POS Entries";
@@ -667,6 +674,7 @@ page 6150652 "NPR POS Entry List"
                     Caption = 'Failed G/L Posting List';
                     Image = ErrorLog;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
                     RunObject = Page "NPR POS Entries";
@@ -680,6 +688,7 @@ page 6150652 "NPR POS Entry List"
                     Caption = 'Unposted Item List';
                     Image = Pause;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
                     RunObject = Page "NPR POS Entries";
@@ -693,6 +702,7 @@ page 6150652 "NPR POS Entry List"
                     Caption = 'Unposted G/L List';
                     Image = Pause;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
                     RunObject = Page "NPR POS Entries";
@@ -710,6 +720,7 @@ page 6150652 "NPR POS Entry List"
                     Caption = '&Navigate';
                     Image = Navigate;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category6;
                     ApplicationArea = All;
                     ToolTip = 'Executes the &Navigate action';
@@ -737,6 +748,7 @@ page 6150652 "NPR POS Entry List"
                 Caption = 'Post Entry';
                 Image = Post;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -763,6 +775,7 @@ page 6150652 "NPR POS Entry List"
                 Caption = 'Post Range';
                 Image = PostBatch;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -899,6 +912,7 @@ page 6150652 "NPR POS Entry List"
                 Caption = '&Navigate';
                 Image = Navigate;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Visible = false;
@@ -928,6 +942,7 @@ page 6150652 "NPR POS Entry List"
                     Caption = 'Print Entry';
                     Image = PrintCheck;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = "Report";
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -945,6 +960,7 @@ page 6150652 "NPR POS Entry List"
                     Caption = 'Print Entry Large';
                     Image = PrintCover;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = "Report";
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -962,6 +978,7 @@ page 6150652 "NPR POS Entry List"
                     Caption = 'EFT Receipt';
                     Image = PrintCheck;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = "Report";
                     PromotedIsBig = true;
                     ApplicationArea = All;

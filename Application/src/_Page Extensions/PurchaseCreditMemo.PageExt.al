@@ -13,6 +13,7 @@ pageextension 6014456 "NPR Purchase Credit Memo" extends "Purchase Credit Memo"
                 Caption = 'Import From Scanner File';
                 Image = Import;
                 Promoted = true;
+				PromotedOnly = true;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Import From Scanner File action';
             }

@@ -209,6 +209,7 @@ page 6014427 "NPR Item Group Tree"
                     Caption = 'Indent Item Groups';
                     Image = IndentChartOfAccounts;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;

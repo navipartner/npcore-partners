@@ -219,6 +219,7 @@ page 6014456 "NPR Table Export Wizard"
                 Caption = 'Run';
                 Image = Export;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Category4;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Run action';
@@ -233,6 +234,7 @@ page 6014456 "NPR Table Export Wizard"
                 Caption = 'Delete All';
                 Image = DeleteQtyToHandle;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Category6;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Delete All action';
@@ -253,6 +255,7 @@ page 6014456 "NPR Table Export Wizard"
                     Caption = 'Save';
                     Image = Export;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category7;
                     ApplicationArea = All;
                     ToolTip = 'Executes the Save action';
@@ -269,6 +272,7 @@ page 6014456 "NPR Table Export Wizard"
                     Caption = 'Load';
                     Image = Import;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category7;
                     ApplicationArea = All;
                     ToolTip = 'Executes the Load action';

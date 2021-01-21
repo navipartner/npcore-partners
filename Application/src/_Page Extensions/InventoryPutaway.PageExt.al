@@ -23,6 +23,7 @@ pageextension 6014479 "NPR Inventory Put-away" extends "Inventory Put-away"
                 Ellipsis = true;
                 Image = BinContent;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Retail Print action';
@@ -37,6 +38,7 @@ pageextension 6014479 "NPR Inventory Put-away" extends "Inventory Put-away"
                 Caption = 'Price Label';
                 Image = BinContent;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ShortCutKey = 'Shift+Ctrl+L';

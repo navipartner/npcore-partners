@@ -78,6 +78,7 @@ page 6059786 "NPR TM Ticket AccessEntry List"
                 Caption = 'Detailed Access Entries';
                 Image = LedgerEntries;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
 
                 trigger OnAction()

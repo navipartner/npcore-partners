@@ -126,6 +126,7 @@ page 6150669 "NPR NPRE Restaurant Setup"
                 Caption = 'Restaurants';
                 Image = NewBranch;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR NPRE Restaurants";

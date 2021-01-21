@@ -87,6 +87,7 @@ page 6151587 "NPR Event Invoices"
                     Ellipsis = true;
                     Image = GetSourceDoc;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;

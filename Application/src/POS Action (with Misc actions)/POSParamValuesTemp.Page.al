@@ -52,6 +52,7 @@ page 6150727 "NPR POS Param. Values Temp."
                 Caption = 'Reset Values';
                 Image = UpdateDescription;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

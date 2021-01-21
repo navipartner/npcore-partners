@@ -437,6 +437,7 @@ page 6151259 "NPR Retail Owner RC"
                     Caption = '&Purchase Order';
                     Image = Document;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     RunObject = Page "Purchase Order";
                     RunPageMode = Create;

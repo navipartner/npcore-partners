@@ -211,6 +211,7 @@ page 6151590 "NPR NpDc Coupon Type Card"
                 Caption = 'Issue Coupons';
                 Image = PostedVoucherGroup;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -233,6 +234,7 @@ page 6151590 "NPR NpDc Coupon Type Card"
                     Caption = 'Setup Issue Coupon';
                     Image = VoucherGroup;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
                     Visible = HasIssueCouponSetup;
@@ -251,6 +253,7 @@ page 6151590 "NPR NpDc Coupon Type Card"
                     Caption = 'Setup Validate Coupon';
                     Image = RefreshVoucher;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
                     Visible = HasValidateCouponSetup;
@@ -269,6 +272,7 @@ page 6151590 "NPR NpDc Coupon Type Card"
                     Caption = 'Setup Apply Discount';
                     Image = Voucher;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
                     Visible = HasApplyDiscountSetup;

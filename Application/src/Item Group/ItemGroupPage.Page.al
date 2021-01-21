@@ -473,6 +473,7 @@ page 6014421 "NPR Item Group Page"
                     Caption = '&Item Ledger Entries';
                     Image = Form;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category4;
                     RunObject = Page "Item Ledger Entries";
                     RunPageLink = "NPR Item Group No." = FIELD("No.");

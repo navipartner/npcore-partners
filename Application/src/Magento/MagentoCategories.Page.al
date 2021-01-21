@@ -72,6 +72,7 @@ page 6151416 "NPR Magento Categories"
                 Caption = 'Setup Categories';
                 Image = Setup;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Visible = HasSetupCategories;

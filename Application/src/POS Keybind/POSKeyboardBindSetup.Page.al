@@ -56,6 +56,7 @@ page 6150721 "NPR POS Keyboard Bind. Setup"
                 Ellipsis = true;
                 Image = Restore;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

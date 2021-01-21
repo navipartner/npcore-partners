@@ -90,6 +90,7 @@ page 6151185 "NPR MM Sponsors. Ticket Setup"
                 Ellipsis = true;
                 Image = InteractionTemplate;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR E-mail Templates";
@@ -103,6 +104,7 @@ page 6151185 "NPR MM Sponsors. Ticket Setup"
                 Ellipsis = true;
                 Image = InteractionTemplate;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR SMS Template List";
@@ -119,6 +121,7 @@ page 6151185 "NPR MM Sponsors. Ticket Setup"
                 Ellipsis = true;
                 Image = SendElectronicDocument;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

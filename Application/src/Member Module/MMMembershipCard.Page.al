@@ -408,6 +408,7 @@ page 6060137 "NPR MM Membership Card"
                 Enabled = NeedsActivation;
                 Image = Start;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Activate Membership action';
@@ -425,6 +426,7 @@ page 6060137 "NPR MM Membership Card"
                 Ellipsis = true;
                 Image = NewCustomer;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedIsBig = true;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Add Member action';
@@ -441,6 +443,7 @@ page 6060137 "NPR MM Membership Card"
                 Ellipsis = true;
                 Image = ChangeCustomer;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedIsBig = true;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Add Guardian action';
@@ -472,6 +475,7 @@ page 6060137 "NPR MM Membership Card"
                 Caption = 'Redeem Points';
                 Image = PostedVoucherGroup;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -488,6 +492,7 @@ page 6060137 "NPR MM Membership Card"
                 Caption = 'Auto-Renew';
                 Image = Invoice;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -558,6 +563,7 @@ page 6060137 "NPR MM Membership Card"
                 Caption = 'Notifications';
                 Image = Interaction;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 RunObject = Page "NPR MM Membership Notific.";
                 RunPageLink = "Membership Entry No." = FIELD("Entry No.");
@@ -582,6 +588,7 @@ page 6060137 "NPR MM Membership Card"
                 Ellipsis = true;
                 Image = Log;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Member Arrival Log";
@@ -598,6 +605,7 @@ page 6060137 "NPR MM Membership Card"
                     Caption = 'Ledger E&ntries';
                     Image = CustomerLedger;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category4;
                     RunObject = Page "Customer Ledger Entries";
                     RunPageLink = "Customer No." = FIELD("Customer No.");
@@ -611,6 +619,7 @@ page 6060137 "NPR MM Membership Card"
                     Caption = 'Item Ledger Entries';
                     Image = ItemLedger;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category4;
                     RunObject = Page "Item Ledger Entries";
                     RunPageLink = "Source No." = FIELD("Customer No.");
@@ -625,6 +634,7 @@ page 6060137 "NPR MM Membership Card"
                     Caption = 'Statistics';
                     Image = Statistics;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category4;
                     RunObject = Page "Customer Statistics";
                     RunPageLink = "No." = FIELD("Customer No.");
@@ -642,6 +652,7 @@ page 6060137 "NPR MM Membership Card"
                     Enabled = RaptorEnabled;
                     Image = ViewRegisteredOrder;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category5;
                     Visible = RaptorEnabled;
                     ApplicationArea = All;
@@ -665,6 +676,7 @@ page 6060137 "NPR MM Membership Card"
                     Enabled = RaptorEnabled;
                     Image = SuggestElectronicDocument;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category5;
                     Visible = RaptorEnabled;
                     ApplicationArea = All;

@@ -41,6 +41,7 @@ page 6184891 "NPR Storage Setup"
                 Caption = 'Operations';
                 Image = DataEntry;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

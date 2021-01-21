@@ -42,6 +42,7 @@ page 6014571 "NPR Tax Free Consolidation"
                 Caption = 'Add Receipt';
                 Image = Add;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -87,6 +88,7 @@ page 6014571 "NPR Tax Free Consolidation"
                 Caption = 'Remove Receipt';
                 Image = Delete;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -103,6 +105,7 @@ page 6014571 "NPR Tax Free Consolidation"
                 Caption = 'Consolidate Receipts';
                 Image = Approve;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

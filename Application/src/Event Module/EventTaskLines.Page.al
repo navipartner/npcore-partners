@@ -258,6 +258,7 @@ page 6151589 "NPR Event Task Lines"
                     Caption = 'Event &Planning Lines';
                     Image = JobLines;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ShortCutKey = 'Shift+Ctrl+P';
@@ -352,6 +353,7 @@ page 6151589 "NPR Event Task Lines"
                     Caption = 'Sales &Documents';
                     Image = GetSourceDoc;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     ApplicationArea = All;
                     ToolTip = 'Executes the Sales &Documents action';
@@ -450,6 +452,7 @@ page 6151589 "NPR Event Task Lines"
                     Ellipsis = true;
                     Image = Splitlines;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     ApplicationArea = All;
                     ToolTip = 'Executes the Split &Planning Lines action';
@@ -514,6 +517,7 @@ page 6151589 "NPR Event Task Lines"
                         Ellipsis = true;
                         Image = CopyToTask;
                         Promoted = true;
+				        PromotedOnly = true;
                         PromotedCategory = Process;
                         ApplicationArea = All;
                         ToolTip = 'Executes the Copy Job Planning Lines &from... action';
@@ -533,6 +537,7 @@ page 6151589 "NPR Event Task Lines"
                         Ellipsis = true;
                         Image = CopyFromTask;
                         Promoted = true;
+				        PromotedOnly = true;
                         PromotedCategory = Process;
                         ApplicationArea = All;
                         ToolTip = 'Executes the Copy Job Planning Lines &to... action';

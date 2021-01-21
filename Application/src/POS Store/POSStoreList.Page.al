@@ -143,6 +143,7 @@ page 6150614 "NPR POS Store List"
                     Caption = 'POS Posting Setup';
                     Image = GeneralPostingSetup;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     RunObject = Page "NPR POS Posting Setup";
@@ -155,6 +156,7 @@ page 6150614 "NPR POS Store List"
                     Caption = 'POS Period Registers';
                     Image = Register;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     RunObject = Page "NPR POS Period Register List";
@@ -167,6 +169,7 @@ page 6150614 "NPR POS Store List"
                     Caption = 'POS Entries';
                     Image = LedgerEntries;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     RunObject = Page "NPR POS Entry List";

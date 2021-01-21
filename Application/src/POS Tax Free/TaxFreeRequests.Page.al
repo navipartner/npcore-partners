@@ -109,6 +109,7 @@ page 6014645 "NPR Tax Free Requests"
                 Caption = 'Download Request';
                 Image = CreateXMLFile;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -134,6 +135,7 @@ page 6014645 "NPR Tax Free Requests"
                 Caption = 'Download Response';
                 Image = CreateXMLFile;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

@@ -64,6 +64,7 @@ page 6150620 "NPR POS Payment Bins"
                 Caption = 'POS Posting Setup';
                 Image = GeneralPostingSetup;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR POS Posting Setup";
@@ -76,6 +77,7 @@ page 6150620 "NPR POS Payment Bins"
                 Caption = 'Eject Method Parameters';
                 Image = Answers;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -99,6 +101,7 @@ page 6150620 "NPR POS Payment Bins"
                 Ellipsis = true;
                 Image = TransferFunds;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 Visible = false;
                 ApplicationArea = All;
@@ -114,6 +117,7 @@ page 6150620 "NPR POS Payment Bins"
                 Caption = 'Insert Initial Float';
                 Image = TransferFunds;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

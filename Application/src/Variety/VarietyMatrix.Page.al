@@ -947,6 +947,7 @@ page 6059974 "NPR Variety Matrix"
                 Caption = 'Create Table Copy';
                 Image = CopyFixedAssets;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedIsBig = true;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Create Table Copy action';
@@ -966,6 +967,7 @@ page 6059974 "NPR Variety Matrix"
                 Caption = 'Previous Set';
                 Image = PreviousSet;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ToolTip = 'Previous Set';
@@ -984,6 +986,7 @@ page 6059974 "NPR Variety Matrix"
                 Caption = 'Next Set';
                 Image = NextSet;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ToolTip = 'Next Set';

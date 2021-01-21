@@ -53,6 +53,7 @@ page 6059971 "NPR Variety"
                 Caption = 'Variety Tabel';
                 Image = "Table";
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR Variety Table";

@@ -72,6 +72,7 @@ page 6151500 "NPR Nc Setup"
                 Caption = 'Setup Task Queue';
                 Image = Setup;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

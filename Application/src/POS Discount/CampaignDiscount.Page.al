@@ -263,6 +263,7 @@ page 6014453 "NPR Campaign Discount"
                     Ellipsis = true;
                     Image = BinContent;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -273,6 +274,7 @@ page 6014453 "NPR Campaign Discount"
                     Caption = 'Price Label';
                     Image = BinContent;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;

@@ -136,6 +136,7 @@ page 6150747 "NPR Unfinished POS Sale Trx"
                     Caption = 'Park Sale';
                     Image = TransferToGeneralJournal;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     Visible = false;
@@ -155,6 +156,7 @@ page 6150747 "NPR Unfinished POS Sale Trx"
                     Caption = 'Cancel Sale';
                     Image = CancelAllLines;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     Visible = false;
@@ -177,6 +179,7 @@ page 6150747 "NPR Unfinished POS Sale Trx"
                     Caption = 'All For Register';
                     Image = GetLines;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     ToolTip = 'Show all unfinished sale transactions for current cash register';

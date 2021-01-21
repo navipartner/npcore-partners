@@ -107,6 +107,7 @@ page 6151573 "NPR AF Notification Hub List"
                 Caption = 'Re-Send Messages';
                 Image = "Action";
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

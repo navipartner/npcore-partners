@@ -67,6 +67,7 @@ page 6150651 "NPR POS Period Register List"
                 Caption = 'POS Entries';
                 Image = LedgerEntries;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR POS Entry List";
@@ -111,6 +112,7 @@ page 6150651 "NPR POS Period Register List"
                 Caption = 'Post Ledger Register';
                 Image = Post;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -177,6 +179,7 @@ page 6150651 "NPR POS Period Register List"
                 Caption = '&Navigate';
                 Image = Navigate;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 ApplicationArea = All;
                 ToolTip = 'Executes the &Navigate action';

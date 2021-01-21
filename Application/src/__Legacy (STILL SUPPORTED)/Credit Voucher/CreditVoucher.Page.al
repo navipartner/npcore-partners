@@ -303,6 +303,7 @@ page 6014418 "NPR Credit Voucher"
                     Caption = 'Copy';
                     Image = PrintVoucher;
                     Promoted = true;
+				    PromotedOnly = true;
                     ApplicationArea = All;
                     ToolTip = 'Executes the Copy action';
 

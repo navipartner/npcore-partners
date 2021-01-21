@@ -52,6 +52,7 @@ page 6151562 "NPR NpXml Templ. Arch. List"
                 Caption = 'Restore Template Version';
                 Image = Restore;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -79,6 +80,7 @@ page 6151562 "NPR NpXml Templ. Arch. List"
                 Caption = 'Export Template Version';
                 Image = Export;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

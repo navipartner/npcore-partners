@@ -105,6 +105,7 @@ page 6059941 "NPR SMS Template Card"
                     Caption = 'Send SMS';
                     Image = SendTo;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category4;
                     ApplicationArea = All;
                     ToolTip = 'Executes the Send SMS action';
@@ -140,6 +141,7 @@ page 6059941 "NPR SMS Template Card"
                     Enabled = TableFiltersEnabled;
                     Image = UseFilters;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category4;
                     ApplicationArea = All;
                     ToolTip = 'Executes the Table Filters action';
