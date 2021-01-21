@@ -301,7 +301,7 @@ page 6150628 "NPR POS Payment Bin Checkpoint"
                 Ellipsis = true;
                 Image = CalculateRemainingUsage;
                 Promoted = true;
-                PromotedOnly = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
