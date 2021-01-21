@@ -5275,7 +5275,9 @@ body {
       justify-content: center;
       align-items: center; } }
   .transcendence .dialog__body span {
-    color: #fff; }
+    color: var(--popup-body-text-color); }
+    .transcendence .dialog__body span .caption {
+      color: #fff; }
 
 .transcendence .dialog__buttons {
   background: var(--popup-button-bg);
@@ -5505,7 +5507,7 @@ body {
         overflow-y: auto; }
     .transcendence .dialog-host .dialog__container.dialog__container--lookup .dialog__body span {
       display: block;
-      color: var(--text-color); }
+      color: var(--popup-body-text-color); }
     .transcendence .dialog-host .dialog__container.dialog__container--lookup .dialog__body .lookup-loading {
       display: flex;
       flex: 1 1 auto;
@@ -5574,7 +5576,7 @@ body {
 
 .transcendence .dialog-host .dialog__container.dialog__container--message .dialog__body span, .transcendence .dialog-host .dialog__container.dialog__container--confirm .dialog__body span, .transcendence .dialog-host .dialog__container.dialog__container--error .dialog__body span {
   display: block;
-  color: var(--text-color);
+  color: var(--popup-body-text-color);
   text-align: center; }
 
 .transcendence .dialog-host .dialog__container.dialog__container--numpad {
@@ -7032,7 +7034,7 @@ body {
   position: relative; }
 
 .transcendence .input--with-caption {
-  background-color: var(--button-bg);
+  background-color: var(--input-with-caption-bg);
   padding: 0.5em 1em 1em 1em;
   border-radius: var(--border-radius); }
 

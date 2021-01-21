@@ -45,6 +45,7 @@
   --login-bg: #ffffff;
   --login-button-grid-padding: 0;
   --login-padding: 0;
+  --input-with-caption-bg: #6388ae;
   --view-padding: 1.5em;
   --container--space: 1.5em;
   --button-space: 0.3em;
@@ -86,6 +87,7 @@
   --popup-button-bg: #ffffff;
   --popup-button-height: 100px;
   --popup-button-width: 115px;
+  --popup-body-text-color: #494949;
   --date-picker-height: 300px;
   --statusbar-color: #eee;
   --statusbar-shadow: none;
