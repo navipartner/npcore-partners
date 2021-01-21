@@ -135,6 +135,7 @@ page 6151597 "NPR NpDc Coupon List Items"
                 Caption = 'Add Items';
                 Image = Add;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -152,6 +153,7 @@ page 6151597 "NPR NpDc Coupon List Items"
                 Caption = 'Set Priorities';
                 Image = SetPriorities;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

@@ -197,6 +197,7 @@ page 6059975 "NPR Variety Fields Setup"
                 Caption = 'Insert Default Setup';
                 Image = Import;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

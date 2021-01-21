@@ -101,6 +101,7 @@ page 6060132 "NPR MM Member Community"
                 Caption = 'Loyalty Setup';
                 Image = SalesLineDisc;
                 Promoted = true;
+				PromotedOnly = true;
                 RunObject = Page "NPR MM Loyalty Setup";
                 ApplicationArea = All;
                 ToolTip = 'Executes the Loyalty Setup action';

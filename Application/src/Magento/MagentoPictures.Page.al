@@ -100,6 +100,7 @@ page 6151411 "NPR Magento Pictures"
                 Caption = 'Show Invalid Pictures';
                 Image = TestFile;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

@@ -203,6 +203,7 @@ page 6060119 "NPR TM Admis. Schedule Lines"
                 Caption = 'Calculate Schedule Entries';
                 Image = CalcWorkCenterCalendar;
                 Promoted = true;
+				PromotedOnly = true;
 
 
                 trigger OnAction()
@@ -241,6 +242,7 @@ page 6060119 "NPR TM Admis. Schedule Lines"
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Image = WorkCenter;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 RunObject = Page "NPR TM Ticket Admissions";
                 RunPageLink = "Admission Code" = FIELD("Admission Code");
@@ -253,6 +255,7 @@ page 6060119 "NPR TM Admis. Schedule Lines"
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Image = Workdays;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR TM Ticket Schedules";
@@ -266,6 +269,7 @@ page 6060119 "NPR TM Admis. Schedule Lines"
                 Caption = 'Schedule Entries';
                 Image = WorkCenterLoad;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR TM Admis. Schedule Entry";

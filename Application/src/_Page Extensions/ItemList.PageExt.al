@@ -347,6 +347,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
                     Caption = 'Pictures';
                     Image = Picture;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category6;
                     Visible = MagentoEnabled;
                     ApplicationArea = All;
@@ -369,6 +370,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
                     Caption = 'Webshops';
                     Image = Web;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category6;
                     Visible = MagentoEnabled AND MagentoEnabledMultistore;
                     ApplicationArea = All;
@@ -391,6 +393,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
                     Caption = 'Display Config';
                     Image = ViewPage;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category6;
                     Visible = MagentoEnabled AND MagentoEnabledDisplayConfig;
                     ApplicationArea = All;
@@ -421,6 +424,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
                     Caption = 'Price Label';
                     Image = BinLedger;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category5;
                     ShortCutKey = 'Ctrl+Alt+L';
                     ApplicationArea = All;
@@ -442,6 +446,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
                     Caption = 'Shelf Label';
                     Image = BinLedger;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category5;
                     ShortCutKey = 'Ctrl+Alt+L';
                     ApplicationArea = All;
@@ -573,6 +578,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
                 Caption = 'Set Client Attribute Filter';
                 Image = "Filter";
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Category5;
                 PromotedIsBig = true;
                 Visible = NPRAttrVisible01 OR NPRAttrVisible02 OR NPRAttrVisible03 OR NPRAttrVisible04 OR NPRAttrVisible05 OR NPRAttrVisible06 OR NPRAttrVisible07 OR NPRAttrVisible08 OR NPRAttrVisible09 OR NPRAttrVisible10;

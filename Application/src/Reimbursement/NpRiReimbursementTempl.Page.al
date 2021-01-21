@@ -82,6 +82,7 @@ page 6151101 "NPR NpRi Reimbursement Templ."
                 Caption = 'Data Collection Filters';
                 Image = EditFilter;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Visible = HasDataCollectionFilters;
@@ -100,6 +101,7 @@ page 6151101 "NPR NpRi Reimbursement Templ."
                 Caption = 'Reimbursement Parameters';
                 Image = SetupPayment;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Visible = HasReimbursementParameters;

@@ -114,6 +114,7 @@ page 6059832 "NPR Event Plan. Line Buffer"
                 Caption = 'Check Capacity/Availability';
                 Image = ItemAvailability;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

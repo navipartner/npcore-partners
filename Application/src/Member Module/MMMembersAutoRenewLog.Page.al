@@ -59,6 +59,7 @@ page 6060075 "NPR MM Members. Auto-Renew Log"
                 Caption = 'Membership';
                 Image = CustomerList;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Membership Card";

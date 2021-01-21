@@ -41,6 +41,7 @@ page 6014560 "NPR RP Template Designer"
                 Caption = 'Unindent';
                 Image = PreviousRecord;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Visible = Rec."Printer Type" = Rec."Printer Type"::Line;
@@ -57,6 +58,7 @@ page 6014560 "NPR RP Template Designer"
                 Caption = 'Indent';
                 Image = NextRecord;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Visible = Rec."Printer Type" = Rec."Printer Type"::Line;
@@ -73,6 +75,7 @@ page 6014560 "NPR RP Template Designer"
                 Caption = 'Test Print';
                 Image = Start;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = "Report";
                 PromotedIsBig = true;
                 ShortCutKey = 'Shift+F8';
@@ -108,6 +111,7 @@ page 6014560 "NPR RP Template Designer"
                 Caption = 'Set Test Print Filter';
                 Image = EditFilter;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = "Report";
                 PromotedIsBig = true;
                 ShortCutKey = 'Shift+F7';

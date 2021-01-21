@@ -76,6 +76,7 @@ page 6151188 "NPR MM Member Communication"
                 Caption = 'Create Defaults';
                 Image = Default;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedIsBig = true;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Create Defaults action';

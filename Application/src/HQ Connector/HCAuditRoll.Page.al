@@ -381,6 +381,7 @@ page 6150900 "NPR HC Audit Roll"
                     Caption = 'Post Sales Ticket';
                     Image = Post;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category4;
                     ShortCutKey = 'Shift+F11';
                     ApplicationArea = All;

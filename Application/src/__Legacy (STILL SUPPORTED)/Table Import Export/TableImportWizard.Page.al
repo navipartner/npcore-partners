@@ -189,6 +189,7 @@ page 6014485 "NPR Table Import Wizard"
                 Caption = 'Run';
                 Image = Export;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Category4;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Run action';
@@ -203,6 +204,7 @@ page 6014485 "NPR Table Import Wizard"
                 Caption = 'Delete All';
                 Image = DeleteQtyToHandle;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Category5;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Delete All action';

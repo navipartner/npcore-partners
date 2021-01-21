@@ -62,6 +62,7 @@ page 6150699 "NPR Retail Data Model Upg.Log"
                     Caption = 'Re-run Build Step';
                     Image = Reuse;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     RunPageMode = View;
                     ApplicationArea = All;

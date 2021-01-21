@@ -126,6 +126,7 @@ page 6014412 "NPR Phone No lookup"
                 Caption = 'Lookup Phone';
                 Image = GetEntries;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ShortCutKey = 'Shift+F6';
@@ -142,6 +143,7 @@ page 6014412 "NPR Phone No lookup"
                 Caption = 'Create';
                 Image = New;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ShortCutKey = 'Shift+F3';

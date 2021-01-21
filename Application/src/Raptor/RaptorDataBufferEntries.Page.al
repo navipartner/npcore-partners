@@ -63,6 +63,7 @@ page 6151492 "NPR Raptor Data Buffer Entries"
                 Caption = 'Show Item Card';
                 Image = Item;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 RunObject = Page "Item Card";
                 RunPageLink = "No." = FIELD("Item No.");

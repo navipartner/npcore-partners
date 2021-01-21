@@ -132,6 +132,7 @@ page 6060125 "NPR MM Membership Sales Setup"
                 Ellipsis = true;
                 Image = NewCustomer;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedIsBig = true;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Create Membership action';

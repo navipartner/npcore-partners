@@ -103,6 +103,7 @@ page 6151080 "NPR ExRv Voucher Types"
                 Caption = 'Vouchers';
                 Image = Voucher;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR ExRv Vouchers";

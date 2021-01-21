@@ -86,6 +86,7 @@ page 6059964 "NPR MPOS QR Code List"
                 Caption = 'Set Defaults';
                 Image = Add;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -101,6 +102,7 @@ page 6059964 "NPR MPOS QR Code List"
                 Caption = 'Create QR Code';
                 Image = "Action";
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

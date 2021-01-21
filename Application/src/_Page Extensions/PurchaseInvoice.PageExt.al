@@ -61,6 +61,7 @@ pageextension 6014454 "NPR Purchase Invoice" extends "Purchase Invoice"
                     Ellipsis = true;
                     Image = BinContent;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     ApplicationArea = All;
                     ToolTip = 'Executes the Retail Print action';
@@ -70,6 +71,7 @@ pageextension 6014454 "NPR Purchase Invoice" extends "Purchase Invoice"
                     Caption = 'Price Label';
                     Image = BinContent;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;

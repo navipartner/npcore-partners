@@ -666,6 +666,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                     Caption = 'P&ost';
                     Image = PostOrder;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ShortCutKey = 'F9';
@@ -684,6 +685,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                     Caption = 'Post and &Print';
                     Image = PostPrint;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ShortCutKey = 'Shift+F9';
@@ -704,6 +706,7 @@ page 6014403 "NPR Retail ItemReclass.Journal"
                 Ellipsis = true;
                 Image = Print;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 ApplicationArea = All;
                 ToolTip = 'Executes the &Print action';

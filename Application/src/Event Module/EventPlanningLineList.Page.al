@@ -104,6 +104,7 @@ page 6060161 "NPR Event Planning Line List"
                     Caption = 'Card';
                     Image = EditLines;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     RunObject = Page "NPR Event Card";

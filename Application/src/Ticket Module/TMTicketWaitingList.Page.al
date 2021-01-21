@@ -106,6 +106,7 @@ page 6151138 "NPR TM Ticket Waiting List"
                 Ellipsis = true;
                 Image = ElectronicNumber;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR TM Ticket Notif. Entry";
@@ -119,6 +120,7 @@ page 6151138 "NPR TM Ticket Waiting List"
                 Caption = 'Notify Now';
                 Image = Interaction;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
 

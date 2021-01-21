@@ -61,6 +61,7 @@ page 6060041 "NPR Item Worksheets"
                 Caption = 'Edit Item Worksheet';
                 Image = Worksheet;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ToolTip = 'Executes the Edit Item Worksheet action.';

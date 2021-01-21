@@ -10,6 +10,7 @@ pageextension 6014437 "NPR Item Reclass. Journal" extends "Item Reclass. Journal
                 Caption = 'Variety';
                 Image = ItemVariant;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedIsBig = true;
                 ShortCutKey = 'Ctrl+Alt+V';
                 ApplicationArea = All;

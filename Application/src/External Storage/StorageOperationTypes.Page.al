@@ -42,6 +42,7 @@ page 6184893 "NPR Storage Operation Types"
                 Caption = 'Run';
                 Image = Continue;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -66,6 +67,7 @@ page 6184893 "NPR Storage Operation Types"
                 Caption = 'Parameters';
                 Image = SelectEntries;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -90,6 +92,7 @@ page 6184893 "NPR Storage Operation Types"
                 Caption = 'Create & Copy Job Parameter';
                 Image = SelectEntries;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

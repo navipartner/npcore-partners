@@ -49,6 +49,7 @@ page 6151024 "NPR NpRv Global Voucher Setup"
                 Caption = 'Validate Global Voucher Setup';
                 Image = Approve;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

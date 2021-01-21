@@ -87,6 +87,7 @@ page 6150663 "NPR NPRE Waiter Pad List"
                     Caption = 'Print Pre Receipt';
                     Image = PrintCheck;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;

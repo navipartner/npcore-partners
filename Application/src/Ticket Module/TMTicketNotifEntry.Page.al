@@ -234,6 +234,7 @@ page 6060065 "NPR TM Ticket Notif. Entry"
                 Caption = 'Recreate eTicket';
                 Image = ElectronicNumber;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
 
@@ -257,6 +258,7 @@ page 6060065 "NPR TM Ticket Notif. Entry"
                 Caption = 'Resend eTicket';
                 Image = SendElectronicDocument;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
 
 
@@ -307,6 +309,7 @@ page 6060065 "NPR TM Ticket Notif. Entry"
                 Caption = 'Send Notification';
                 Image = SendElectronicDocument;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
 
 

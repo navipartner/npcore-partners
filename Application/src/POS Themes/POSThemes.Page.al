@@ -42,6 +42,7 @@ page 6150735 "NPR POS Themes"
                 Caption = 'Theme Dependencies';
                 Image = StyleSheet;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR POS Theme Dependencies";

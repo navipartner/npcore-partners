@@ -154,6 +154,7 @@ page 6059785 "NPR TM Ticket List"
                 Caption = 'Create eTicket';
                 Image = ElectronicNumber;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedIsBig = true;
 
 
@@ -200,6 +201,7 @@ page 6059785 "NPR TM Ticket List"
                 Ellipsis = true;
                 Image = Reserve;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedIsBig = true;
                 trigger OnAction()
                 begin
@@ -217,6 +219,7 @@ page 6059785 "NPR TM Ticket List"
                 Ellipsis = true;
                 Image = EntriesList;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR TM Ticket AccessEntry List";
@@ -231,6 +234,7 @@ page 6059785 "NPR TM Ticket List"
                 Ellipsis = true;
                 Image = WIPEntries;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
 
 
@@ -247,6 +251,7 @@ page 6059785 "NPR TM Ticket List"
                 Ellipsis = true;
                 Image = Navigate;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
 
                 trigger OnAction()
@@ -266,6 +271,7 @@ page 6059785 "NPR TM Ticket List"
                 Caption = 'View Online Ticket';
                 Image = Web;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
 
 
@@ -298,6 +304,7 @@ page 6059785 "NPR TM Ticket List"
                 Caption = 'Print Selected Tickets';
                 Image = Print;
                 Promoted = true;
+				PromotedOnly = true;
                 ShortCutKey = 'Shift+Ctrl+P';
 
 

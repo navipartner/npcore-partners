@@ -117,6 +117,7 @@ page 6060092 "NPR MM Admission Service Log"
                 Caption = 'Test';
                 Image = TestFile;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

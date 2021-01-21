@@ -262,6 +262,7 @@ page 6060126 "NPR MM Members"
                 Ellipsis = true;
                 Image = NewCustomer;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedIsBig = true;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Create Membership action';
@@ -290,6 +291,7 @@ page 6060126 "NPR MM Members"
                 Caption = 'Register Arrival';
                 Image = Approve;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -327,6 +329,7 @@ page 6060126 "NPR MM Members"
                 Caption = 'Set Client Attribute Filter';
                 Image = "Filter";
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = "Report";
                 PromotedIsBig = true;
                 Visible = NPRAttrVisible01 OR NPRAttrVisible02 OR NPRAttrVisible03 OR NPRAttrVisible04 OR NPRAttrVisible05 OR NPRAttrVisible06 OR NPRAttrVisible07 OR NPRAttrVisible08 OR NPRAttrVisible09 OR NPRAttrVisible10;
@@ -447,6 +450,7 @@ page 6060126 "NPR MM Members"
                 Ellipsis = true;
                 Image = ChangeDimensions;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Member Communication";
@@ -460,6 +464,7 @@ page 6060126 "NPR MM Members"
                 Ellipsis = true;
                 Image = Log;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR MM Member Arrival Log";
@@ -476,6 +481,7 @@ page 6060126 "NPR MM Members"
                     Enabled = RaptorEnabled;
                     Image = ViewRegisteredOrder;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category5;
                     Visible = RaptorEnabled;
                     ApplicationArea = All;
@@ -500,6 +506,7 @@ page 6060126 "NPR MM Members"
                     Enabled = RaptorEnabled;
                     Image = SuggestElectronicDocument;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category5;
                     Visible = RaptorEnabled;
                     ApplicationArea = All;

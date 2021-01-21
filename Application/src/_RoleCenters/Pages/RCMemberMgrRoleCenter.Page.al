@@ -260,6 +260,7 @@ page 6060149 "NPR RC Member Mgr RoleCenter"
                     Ellipsis = true;
                     Image = Lock;
                     Promoted = true;
+				    PromotedOnly = true;
                     RunObject = Page "NPR MM Membership Lim. Setup";
                     ApplicationArea = All;
                     ToolTip = 'Executes the Membership Limitation Setup action';
@@ -269,6 +270,7 @@ page 6060149 "NPR RC Member Mgr RoleCenter"
                     Caption = 'Membership Loyalty Setup';
                     Image = SalesLineDisc;
                     Promoted = true;
+				    PromotedOnly = true;
                     RunObject = Page "NPR MM Loyalty Setup";
                     ApplicationArea = All;
                     ToolTip = 'Executes the Membership Loyalty Setup action';
@@ -287,6 +289,7 @@ page 6060149 "NPR RC Member Mgr RoleCenter"
                     Ellipsis = true;
                     Image = ElectronicBanking;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     RunObject = Page "NPR MM Foreign Members. Setup";
@@ -301,6 +304,7 @@ page 6060149 "NPR RC Member Mgr RoleCenter"
                     Caption = 'Ticket Setup';
                     Image = Setup;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     RunObject = Page "NPR TM Ticket Setup";
@@ -313,6 +317,7 @@ page 6060149 "NPR RC Member Mgr RoleCenter"
                     Ellipsis = true;
                     Image = "Action";
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedIsBig = true;
                     RunObject = Codeunit "NPR TM Ticket Wizard";
                     ApplicationArea = All;

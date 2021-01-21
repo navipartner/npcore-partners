@@ -182,6 +182,7 @@ page 6151186 "NPR MM Sponsor. Ticket Entry"
                 Caption = 'Resend Notification';
                 Image = SendTo;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -201,6 +202,7 @@ page 6151186 "NPR MM Sponsor. Ticket Entry"
                 Ellipsis = true;
                 Image = Navigate;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 RunObject = Page "NPR TM Ticket Request";
                 RunPageLink = "Session Token ID" = FIELD("Ticket Token");

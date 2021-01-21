@@ -69,6 +69,7 @@ page 6060083 "NPR MCS Rec. Business Rules"
                 Caption = 'Batch insert rules for items';
                 Image = AddAction;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

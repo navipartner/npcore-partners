@@ -61,6 +61,7 @@ page 6151449 "NPR Magento Shipment Mapping"
                 Caption = 'Setup Shipment Methods';
                 Image = Setup;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

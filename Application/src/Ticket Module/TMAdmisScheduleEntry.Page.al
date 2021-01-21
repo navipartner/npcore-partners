@@ -206,6 +206,7 @@ page 6060122 "NPR TM Admis. Schedule Entry"
                 Ellipsis = true;
                 Image = WIPEntries;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
 
@@ -239,6 +240,7 @@ page 6060122 "NPR TM Admis. Schedule Entry"
                 Ellipsis = true;
                 Image = Open;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 RunObject = Page "NPR TM Ticket Waiting List";
                 RunPageLink = "External Schedule Entry No." = FIELD("External Schedule Entry No.");

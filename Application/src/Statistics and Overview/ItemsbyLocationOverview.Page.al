@@ -153,6 +153,7 @@ page 6060066 "NPR Items by Location Overview"
                 Caption = 'Previous Set';
                 Image = PreviousSet;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ToolTip = 'Previous Set';
@@ -170,6 +171,7 @@ page 6060066 "NPR Items by Location Overview"
                 Caption = 'Previous Column';
                 Image = PreviousRecord;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ToolTip = 'Previous Set';
@@ -185,6 +187,7 @@ page 6060066 "NPR Items by Location Overview"
                 Caption = 'Next Column';
                 Image = NextRecord;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ToolTip = 'Next Set';
@@ -200,6 +203,7 @@ page 6060066 "NPR Items by Location Overview"
                 Caption = 'Next Set';
                 Image = NextSet;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ToolTip = 'Next Set';

@@ -96,6 +96,7 @@ page 6150720 "NPR POS Stargate Pkg Creator"
                 Ellipsis = true;
                 Image = ViewDocumentLine;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -112,6 +113,7 @@ page 6150720 "NPR POS Stargate Pkg Creator"
                 Ellipsis = true;
                 Image = Add;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -128,6 +130,7 @@ page 6150720 "NPR POS Stargate Pkg Creator"
                 Ellipsis = true;
                 Image = NewItem;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

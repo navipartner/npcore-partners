@@ -56,6 +56,7 @@ page 6151042 "NPR Notification Card"
                 Caption = 'Complete';
                 Image = Close;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -72,6 +73,7 @@ page 6151042 "NPR Notification Card"
                 Caption = 'Cancel';
                 Image = Cancel;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

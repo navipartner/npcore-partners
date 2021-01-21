@@ -99,6 +99,7 @@ page 6150684 "NPR NPRE Restaurant Card"
                     Caption = 'Stations';
                     Image = Departments;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     RunObject = Page "NPR NPRE Kitchen Stations";
@@ -111,6 +112,7 @@ page 6150684 "NPR NPRE Restaurant Card"
                     Caption = 'Station Selection Setup';
                     Image = Troubleshoot;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     RunObject = Page "NPR NPRE Kitchen Station Slct.";
@@ -123,6 +125,7 @@ page 6150684 "NPR NPRE Restaurant Card"
                     Caption = 'Kitchen Requests (Expedite View)';
                     Image = BlanketOrder;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     Scope = Repeater;
@@ -146,6 +149,7 @@ page 6150684 "NPR NPRE Restaurant Card"
                     Caption = 'Locations';
                     Image = Zones;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
                     RunObject = Page "NPR NPRE Seating Location";
@@ -159,6 +163,7 @@ page 6150684 "NPR NPRE Restaurant Card"
                     Enabled = (Rec.Code <> '');
                     Image = Lot;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
                     ApplicationArea = All;

@@ -48,6 +48,7 @@ page 6014584 "NPR TouchScreen: Valid. Ticket"
                 Ellipsis = true;
                 Image = Close;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

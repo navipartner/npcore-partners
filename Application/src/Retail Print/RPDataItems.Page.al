@@ -91,6 +91,7 @@ page 6014561 "NPR RP Data Items"
                 Caption = 'Unindent';
                 Image = PreviousRecord;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -106,6 +107,7 @@ page 6014561 "NPR RP Data Items"
                 Caption = 'Indent';
                 Image = NextRecord;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -121,6 +123,7 @@ page 6014561 "NPR RP Data Items"
                 Caption = 'Constraints';
                 Image = FilterLines;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR RP Data Item Constr.";

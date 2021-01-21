@@ -70,6 +70,7 @@ page 6014566 "NPR Retail Logo Setup"
                 Caption = 'Import Logo';
                 Image = Picture;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -88,6 +89,7 @@ page 6014566 "NPR Retail Logo Setup"
                 Caption = 'Export Logo';
                 Image = ExportToDo;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

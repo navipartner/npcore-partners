@@ -71,6 +71,7 @@ page 6150748 "NPR POS Sale Lines Subpage"
                 Caption = 'Show Document';
                 Image = ViewDetails;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

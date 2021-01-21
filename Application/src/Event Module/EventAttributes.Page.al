@@ -37,6 +37,7 @@ page 6151583 "NPR Event Attributes"
                 Caption = 'Attributes Matrix';
                 Image = ShowMatrix;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

@@ -11,6 +11,7 @@ pageextension 6014429 "NPR Req. Worksheet" extends "Req. Worksheet"
             {
                 Caption = 'Read from scanner';
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Read from scanner action';

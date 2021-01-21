@@ -299,6 +299,7 @@ page 6014592 "NPR Item Repl. by Store Matrix"
                 Caption = 'Variety';
                 Image = ItemVariant;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ShortCutKey = 'Ctrl+Alt+V';

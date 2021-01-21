@@ -58,6 +58,7 @@ page 6151539 "NPR Nc Endpoints"
                 Caption = 'Setup';
                 Image = InteractionTemplateSetup;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -73,6 +74,7 @@ page 6151539 "NPR Nc Endpoints"
                 Caption = 'Trigger Links';
                 Image = Links;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR Nc Endpoint Trigger Links";
@@ -87,6 +89,7 @@ page 6151539 "NPR Nc Endpoints"
                 Caption = 'Init Endpoint';
                 Image = Setup;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Visible = EndpointHasInit;

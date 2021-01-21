@@ -150,6 +150,7 @@ page 6059970 "NPR Variety Setup"
                     Caption = 'EAN13 Internal';
                     Image = BarCode;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = New;
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -167,6 +168,7 @@ page 6059970 "NPR Variety Setup"
                     Caption = 'EAN13 External';
                     Image = BarCode;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = New;
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -220,6 +222,7 @@ page 6059970 "NPR Variety Setup"
                     Caption = 'Alternative No.';
                     Image = BarCode;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category4;
                     RunObject = Page "NPR Alternative Number";
                     RunPageView = SORTING("Alt. No.", Type);
@@ -231,6 +234,7 @@ page 6059970 "NPR Variety Setup"
                     Caption = 'Item Cross Reference';
                     Image = BarCode;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category4;
                     RunObject = Page "Item Cross Reference Entries";
                     RunPageView = SORTING("Cross-Reference Type", "Cross-Reference No.");
@@ -246,6 +250,7 @@ page 6059970 "NPR Variety Setup"
                     Caption = 'Item Variant Descriptions';
                     Image = UpdateDescription;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -265,6 +270,7 @@ page 6059970 "NPR Variety Setup"
                     Caption = 'Item Cross Reference Descriptions';
                     Image = UpdateDescription;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -284,6 +290,7 @@ page 6059970 "NPR Variety Setup"
                     Caption = 'Barcodes';
                     Image = BarCode;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
                     RunObject = Report "NPR Update Barcodes";
@@ -299,6 +306,7 @@ page 6059970 "NPR Variety Setup"
                     Caption = 'Alt. No. to Item Cross Reference';
                     Image = BarCode;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
                     RunObject = Report "NPR Alt. No. to ICR barcodes";
@@ -310,6 +318,7 @@ page 6059970 "NPR Variety Setup"
                     Caption = 'Item Cross Reference to Alt. No.';
                     Image = BarCode;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
                     RunObject = Report "NPR ICR to Alt. No. barcodes";
@@ -329,6 +338,7 @@ page 6059970 "NPR Variety Setup"
                     Caption = 'Variety';
                     Image = ChangeLog;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     RunObject = Page "NPR Variety";
                     ApplicationArea = All;
@@ -339,6 +349,7 @@ page 6059970 "NPR Variety Setup"
                     Caption = 'Field Setup';
                     Image = Column;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     RunObject = Page "NPR Variety Fields Setup";
                     ApplicationArea = All;
@@ -349,6 +360,7 @@ page 6059970 "NPR Variety Setup"
                     Caption = 'Groups';
                     Image = Allocations;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     RunObject = Page "NPR Variety Group";
                     ApplicationArea = All;

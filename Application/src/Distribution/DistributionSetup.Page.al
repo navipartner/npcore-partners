@@ -61,6 +61,7 @@ page 6151062 "NPR Distribution Setup"
                 Caption = 'Create SKUs';
                 Image = SKU;
                 Promoted = true;
+				PromotedOnly = true;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Create SKUs action';
             }
@@ -69,6 +70,7 @@ page 6151062 "NPR Distribution Setup"
                 Caption = 'Create Demands';
                 Image = CreateLinesFromJob;
                 Promoted = true;
+				PromotedOnly = true;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Create Demands action';
 
@@ -85,6 +87,7 @@ page 6151062 "NPR Distribution Setup"
                 Caption = 'Demand Lines';
                 Image = Line;
                 Promoted = true;
+				PromotedOnly = true;
                 RunObject = Page "NPR Retail Repl. Demand Lines";
                 RunPageLink = "Item Hierachy" = FIELD("Item Hiearachy"),
                               "Distribution Group" = FIELD("Distribution Group");

@@ -36,6 +36,7 @@ page 6151537 "NPR Nc Endpoint Types"
                 Caption = 'Endpoints';
                 Image = Export;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR Nc Endpoints";

@@ -79,6 +79,7 @@ page 6014636 "NPR Send SMS"
                 Caption = 'Reset';
                 Image = "Action";
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedIsBig = false;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Reset action';
@@ -98,6 +99,7 @@ page 6014636 "NPR Send SMS"
                 Caption = 'Close';
                 Image = "Action";
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedIsBig = false;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Close action';
@@ -112,6 +114,7 @@ page 6014636 "NPR Send SMS"
                 Caption = 'Send';
                 Image = SendTo;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedIsBig = false;
                 ApplicationArea = All;
                 ToolTip = 'Executes the Send action';

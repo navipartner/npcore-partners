@@ -564,6 +564,7 @@ page 6014518 "NPR Sales Order Pick"
                     Caption = 'Re&lease';
                     Image = ReleaseDoc;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     ShortCutKey = 'Ctrl+F9';
                     ApplicationArea = All;
@@ -581,6 +582,7 @@ page 6014518 "NPR Sales Order Pick"
                     Caption = 'Re&open';
                     Image = ReOpen;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     ApplicationArea = All;
                     ToolTip = 'Executes the Re&open action';
@@ -602,6 +604,7 @@ page 6014518 "NPR Sales Order Pick"
                     Caption = 'Quantity to Ship 0';
                     Image = Shipment;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ApplicationArea = All;
@@ -619,6 +622,7 @@ page 6014518 "NPR Sales Order Pick"
                     Ellipsis = true;
                     Image = PostOrder;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ShortCutKey = 'F9';
@@ -636,6 +640,7 @@ page 6014518 "NPR Sales Order Pick"
                     Ellipsis = true;
                     Image = PostPrint;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ShortCutKey = 'Shift+F9';
@@ -667,6 +672,7 @@ page 6014518 "NPR Sales Order Pick"
                     Caption = 'Post and Pdf2Nav';
                     Image = PostSendTo;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     ToolTip = 'Post and handle as set up in ''Document Processing''';

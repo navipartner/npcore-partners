@@ -47,6 +47,7 @@ page 6151407 "NPR Magento Tax Classes"
                 Caption = 'Setup Tax Classes';
                 Image = Setup;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

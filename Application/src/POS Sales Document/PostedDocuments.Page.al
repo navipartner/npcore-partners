@@ -99,6 +99,7 @@ page 6014438 "NPR Posted Documents"
                 Caption = 'Card';
                 Image = EditLines;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ShortCutKey = 'Shift+F7';
@@ -115,6 +116,7 @@ page 6014438 "NPR Posted Documents"
                 Caption = '&Navigate';
                 Image = Navigate;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

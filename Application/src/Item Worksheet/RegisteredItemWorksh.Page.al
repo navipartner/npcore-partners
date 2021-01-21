@@ -62,9 +62,9 @@ page 6060046 "NPR Registered Item Worksh."
                 Caption = 'View Registered Item Worksheet';
                 Image = Worksheet;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                PromotedOnly = true;
                 RunObject = Page "NPR Regist. Item Worksh. Page";
                 RunPageLink = "Registered Worksheet No." = FIELD("No.");
                 RunPageView = SORTING("Registered Worksheet No.", "Line No.")

@@ -43,6 +43,7 @@ page 6150734 "NPR POS Sales WF Set Entries"
                 Caption = 'Workflow Steps';
                 Image = List;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR POS Sales WF Steps";

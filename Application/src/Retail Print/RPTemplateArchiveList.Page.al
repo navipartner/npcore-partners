@@ -59,6 +59,7 @@ page 6014631 "NPR RP Template Archive List"
                 Caption = 'Restore Version';
                 Image = Restore;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -77,6 +78,7 @@ page 6014631 "NPR RP Template Archive List"
                 Caption = 'Export Version';
                 Image = Export;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

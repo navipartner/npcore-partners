@@ -44,6 +44,7 @@ page 6184481 "NPR EFT Setup"
                 Caption = 'POS Unit Parameters';
                 Image = Setup;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -62,6 +63,7 @@ page 6184481 "NPR EFT Setup"
                 Caption = 'Payment Type Parameters';
                 Image = Setup;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

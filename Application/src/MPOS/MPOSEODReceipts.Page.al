@@ -58,6 +58,7 @@ page 6059962 "NPR MPOS EOD Receipts"
                 Caption = 'Receipt';
                 Image = CashFlow;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -81,6 +82,7 @@ page 6059962 "NPR MPOS EOD Receipts"
                 Caption = 'Response';
                 Image = XMLFile;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

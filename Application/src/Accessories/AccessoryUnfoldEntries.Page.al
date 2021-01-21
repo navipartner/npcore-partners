@@ -123,6 +123,7 @@ page 6014505 "NPR Accessory Unfold Entries"
                 Caption = '&Navigate';
                 Image = Navigate;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 ApplicationArea = All;
                 ToolTip = 'Executes the &Navigate action';

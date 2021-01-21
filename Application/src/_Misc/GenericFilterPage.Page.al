@@ -193,6 +193,7 @@ page 6014649 "NPR Generic Filter Page"
                 Caption = 'Show All Fields';
                 Image = AllLines;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -208,6 +209,7 @@ page 6014649 "NPR Generic Filter Page"
                 Caption = 'Show Filtered Fields';
                 Image = FilterLines;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -223,6 +225,7 @@ page 6014649 "NPR Generic Filter Page"
                 Caption = 'Remove All Filters';
                 Image = RemoveFilterLines;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

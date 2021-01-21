@@ -79,6 +79,7 @@ page 6060045 "NPR Item Search Page"
                 Caption = 'Search';
                 Image = "Action";
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

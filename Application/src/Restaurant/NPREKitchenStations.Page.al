@@ -71,6 +71,7 @@ page 6150685 "NPR NPRE Kitchen Stations"
                 Caption = 'Kitchen Requests';
                 Image = BlanketOrder;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Scope = Repeater;

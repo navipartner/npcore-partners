@@ -192,6 +192,7 @@ page 6059833 "NPR Event Res. Avail. Overview"
                 Caption = 'Show';
                 Image = ShowMatrix;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -208,6 +209,7 @@ page 6059833 "NPR Event Res. Avail. Overview"
                 Enabled = PreviousSetEnabled;
                 Image = PreviousSet;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -224,6 +226,7 @@ page 6059833 "NPR Event Res. Avail. Overview"
                 Enabled = NextSetEnabled;
                 Image = NextSet;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

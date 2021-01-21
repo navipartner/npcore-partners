@@ -169,6 +169,7 @@ page 6014430 "NPR Credit Voucher List"
                     Caption = 'Copy';
                     Image = PrintVoucher;
                     Promoted = true;
+				    PromotedOnly = true;
                     PromotedCategory = "Report";
                     PromotedIsBig = true;
                     ApplicationArea = All;

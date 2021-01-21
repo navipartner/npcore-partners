@@ -665,6 +665,7 @@ page 6151401 "NPR Magento Setup"
                         Caption = 'Setup Categories';
                         Image = Setup;
                         Promoted = true;
+				        PromotedOnly = true;
                         PromotedCategory = Process;
                         PromotedIsBig = true;
                         Visible = HasSetupCategories;
@@ -684,6 +685,7 @@ page 6151401 "NPR Magento Setup"
                         Caption = 'Setup Brands';
                         Image = Setup;
                         Promoted = true;
+				        PromotedOnly = true;
                         PromotedCategory = Process;
                         PromotedIsBig = true;
                         Visible = HasSetupBrands;
@@ -814,6 +816,7 @@ page 6151401 "NPR Magento Setup"
                 Caption = 'Setup Import Types';
                 Image = Setup;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;
@@ -831,6 +834,7 @@ page 6151401 "NPR Magento Setup"
                 Caption = 'Setup Control Add-ins';
                 Image = Setup;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ApplicationArea = All;

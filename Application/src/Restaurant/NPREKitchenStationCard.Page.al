@@ -56,6 +56,7 @@ page 6150686 "NPR NPRE Kitchen Station Card"
                 Caption = 'Station Selection Setup';
                 Image = Troubleshoot;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR NPRE Kitchen Station Slct.";
@@ -69,6 +70,7 @@ page 6150686 "NPR NPRE Kitchen Station Card"
                 Caption = 'Kitchen Requests';
                 Image = BlanketOrder;
                 Promoted = true;
+				PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Scope = Repeater;
