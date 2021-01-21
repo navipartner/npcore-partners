@@ -5214,7 +5214,7 @@ body {
   pointer-events: none; }
   .transcendence .dialog-host .button > div {
     background-color: var(--button-bg);
-    color: var(--text-color); }
+    color: var(--button-text-color); }
     .transcendence .dialog-host .button > div.button--selected {
       background-color: var(--color-primary-hover); }
     .transcendence .dialog-host .button > div:hover {
@@ -5247,7 +5247,7 @@ body {
 .transcendence .dialog__titlebar {
   background-color: var(--popup-title-bg);
   border: 0;
-  color: var(--text-color);
+  color: var(--popup-title-color);
   font-size: var(--popup-title-font-size);
   min-height: var(--popup-title-height);
   text-align: left;
@@ -5267,17 +5267,14 @@ body {
   min-height: 20vh;
   padding: var(--view-padding);
   width: 100%;
-  background-color: var(--popup-body-bg); }
+  background-color: var(--popup-body-bg);
+  color: var(--popup-body-text-color); }
   @media (min-width: 320px) and (max-width: 768px) {
     .transcendence .dialog__body {
       min-height: calc(100% - 140px);
       display: flex;
       justify-content: center;
       align-items: center; } }
-  .transcendence .dialog__body span {
-    color: var(--popup-body-text-color); }
-    .transcendence .dialog__body span .caption {
-      color: #fff; }
 
 .transcendence .dialog__buttons {
   background: var(--popup-button-bg);
@@ -5339,8 +5336,6 @@ body {
   .transcendence .dialog__container--configuration .dialog__body {
     padding: 0;
     min-height: 45vh; }
-    .transcendence .dialog__container--configuration .dialog__body span {
-      color: var(--grid-text-color); }
 
 .transcendence .dialog__settings__body {
   height: calc(100% - 20px);
@@ -5369,14 +5364,16 @@ body {
 .transcendence .dialog-configuration__group__caption {
   position: relative;
   padding: 10px;
-  background: var(--button-bg);
+  background: var(--color-primary);
   cursor: pointer;
-  color: var(--text-color);
+  color: var(--button-text-color);
   transition: all 0.3s ease-out;
   border: none;
   border-radius: var(--border-radius); }
   .transcendence .dialog-configuration__group__caption:hover {
     background-color: var(--button-bg-hover); }
+  .transcendence .dialog-configuration__group__caption span.toggle-icon {
+    color: var(--button-text-color); }
 
 .transcendence .dialog-configuration__group__content {
   transition: all 0.3s ease-in-out;
@@ -6004,7 +6001,7 @@ body {
     background-color: var(--button-bg);
     border-radius: var(--border-radius);
     border: none;
-    color: var(--text-color);
+    color: var(--button-text-color);
     cursor: pointer;
     height: 100%;
     outline: none;
@@ -6906,7 +6903,7 @@ body {
         width: var(--grid-first-column-width); }
     .transcendence .grid__table table thead {
       background-color: var(--color-primary);
-      color: var(--text-color); }
+      color: var(--grid-head-color); }
       .transcendence .grid__table table thead th {
         font-weight: 600;
         height: 2em;
@@ -6951,7 +6948,7 @@ body {
   align-items: flex-start; }
 
 .transcendence .subtotal {
-  color: var(--text-color);
+  color: var(--subtotal-color);
   flex: 0 0 auto;
   margin: 0;
   text-align: right;
@@ -7040,7 +7037,7 @@ body {
 
 .transcendence .input__label {
   background-color: var(--label-bg-color);
-  color: var(--text-color);
+  color: var(--label-color);
   margin: 0 auto 8px;
   padding: var(--label-padding);
   width: 100%;
@@ -7062,7 +7059,7 @@ body {
 .transcendence .input__erase {
   background: var(--input-erase-bg);
   border: 1px solid var(--input-erase-bg);
-  color: var(--text-color);
+  color: var(--button-text-color);
   cursor: pointer;
   padding: 5px 10px;
   position: absolute;
@@ -7094,15 +7091,15 @@ body {
   margin: 0;
   outline: none;
   color: var(--input-text-color);
-  background-color: var(--text-color); }
+  background-color: var(--input-bg); }
   .transcendence .input__textbox.error {
     border-color: var(--danger);
     background-color: #ffede8; }
   .transcendence .input__textbox.filteredinputactive {
     color: #7ba1c4; }
   .transcendence .input__textbox::selection {
-    background-color: #434343;
-    color: var(--text-color); }
+    background-color: var(--input-selection-bg);
+    color: var(--input-selection-color); }
 
 .transcendence .text-enter {
   position: absolute;
@@ -7603,7 +7600,7 @@ body {
   flex: 0 0 60%; }
 
 .caption {
-  color: var(--text-color); }
+  color: var(--button-text-color); }
 
 .transcendence .loginpad {
   display: flex;
@@ -7746,9 +7743,9 @@ body {
   border-radius: 20px; }
   .transcendence .plus-minus-editor__buttons .subtract,
   .transcendence .plus-minus-editor__buttons .add {
-    background: var(--button-bg);
+    background: var(--color-primary);
     border-radius: 20px 0 0 20px;
-    color: var(--text-color);
+    color: var(--button-text-color);
     cursor: pointer;
     font-size: 20px;
     padding: 5px 0;
@@ -7781,7 +7778,7 @@ body {
     display: flex;
     align-items: center;
     padding: 0 15px;
-    background-color: var(--text-color); }
+    background-color: var(--input-bg); }
     .transcendence .plus-minus-editor__buttons .value span {
       color: var(--input-text-color) !important; }
   .transcendence .plus-minus-editor__buttons .remove {
