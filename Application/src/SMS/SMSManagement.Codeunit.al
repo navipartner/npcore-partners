@@ -846,19 +846,20 @@ codeunit 6059940 "NPR SMS Management"
             Headers.Remove('Authorization');
         Headers.Add('Authorization', 'Basic ' + GetBasicAuthInfo(AzureKeyVaultMgt.GetSecret('SMSMgtUsername'), AzureKeyVaultMgt.GetSecret('SMSMgtPassword')));
 
+        RequestMessage.Content.WriteFrom(RequestString);
         RequestMessage.Content.GetHeaders(ContentHeaders);
         if ContentHeaders.Contains('Content-Type') then
             ContentHeaders.Remove('Content-Type');
         ContentHeaders.Add('Content-Type', 'application/json;charset=utf-8');
 
-        RequestMessage.Content.WriteFrom(RequestString);
-
         WebClient.Send(RequestMessage, ResponseMessage);
 
-        ResponseMessage.Content.ReadAs(ResponseString);
         if not ResponseMessage.IsSuccessStatusCode then
-            Error('%1 - %2 - %3',
-                ResponseMessage.HttpStatusCode, ResponseMessage.ReasonPhrase, ResponseString);
+            Error('%1 - %2',
+                ResponseMessage.HttpStatusCode, ResponseMessage.ReasonPhrase);
+
+        if not ResponseMessage.Content.ReadAs(ResponseString) then
+            ResponseString := '';
     end;
 
     procedure GetBasicAuthInfo(Username: Text; Password: Text): Text
