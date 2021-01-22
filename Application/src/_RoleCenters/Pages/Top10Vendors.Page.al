@@ -24,7 +24,7 @@ page 6151258 "NPR Top 10 Vendors"
 
                     trigger OnValidate()
                     begin
-                        ExecuteQuery;
+                        ExecuteQuery();
                     end;
                 }
                 field(Enddate; Enddate)
@@ -35,7 +35,7 @@ page 6151258 "NPR Top 10 Vendors"
 
                     trigger OnValidate()
                     begin
-                        ExecuteQuery;
+                        ExecuteQuery();
                     end;
                 }
             }
@@ -52,7 +52,7 @@ page 6151258 "NPR Top 10 Vendors"
 
                         trigger OnDrillDown()
                         begin
-                            Cust.Get("No.");
+                            Cust.Get(Rec."No.");
                             PAGE.Run(PAGE::"Customer Card", Cust);
                         end;
                     }
@@ -95,12 +95,12 @@ page 6151258 "NPR Top 10 Vendors"
                     Caption = 'Day';
                     ApplicationArea = All;
                     ToolTip = 'Filters by day';
-                    Image = Filter; 
+                    Image = Filter;
 
                     trigger OnAction()
                     begin
                         PeriodType := PeriodType::Day;
-                        UpdateList;
+                        UpdateList();
                     end;
                 }
                 action(Week)
@@ -108,12 +108,12 @@ page 6151258 "NPR Top 10 Vendors"
                     Caption = 'Week';
                     ApplicationArea = All;
                     ToolTip = 'Filters by week';
-                    Image = Filter; 
+                    Image = Filter;
 
                     trigger OnAction()
                     begin
                         PeriodType := PeriodType::Week;
-                        UpdateList;
+                        UpdateList();
                     end;
                 }
                 action(Month)
@@ -126,7 +126,7 @@ page 6151258 "NPR Top 10 Vendors"
                     trigger OnAction()
                     begin
                         PeriodType := PeriodType::Month;
-                        UpdateList;
+                        UpdateList();
                     end;
                 }
                 action(Quarter)
@@ -139,7 +139,7 @@ page 6151258 "NPR Top 10 Vendors"
                     trigger OnAction()
                     begin
                         PeriodType := PeriodType::Quarter;
-                        UpdateList;
+                        UpdateList();
                     end;
                 }
                 action(Year)
@@ -152,7 +152,7 @@ page 6151258 "NPR Top 10 Vendors"
                     trigger OnAction()
                     begin
                         PeriodType := PeriodType::Year;
-                        UpdateList;
+                        UpdateList();
                     end;
                 }
             }
@@ -163,44 +163,43 @@ page 6151258 "NPR Top 10 Vendors"
     begin
         PeriodType := PeriodType::Year;
         CurrDate := Today;
-        UpdateList;
+        UpdateList();
     end;
 
     var
-        Query1: Query "NPR Top 10 Vendor";
         Cust: Record Customer;
-        StartDate: Date;
-        Enddate: Date;
-        Err000: Label 'End Date should be after Start Date';
-        PeriodType: Option Day,Week,Month,Quarter,Year,"Accounting Period",Period;
+        TopTenVendorsQuery: Query "NPR Top 10 Vendor";
         CurrDate: Date;
+        Enddate: Date;
+        StartDate: Date;
         sales: Decimal;
+        PeriodType: Option Day,Week,Month,Quarter,Year,"Accounting Period",Period;
 
     local procedure UpdateList()
     begin
-        Setdate;
-        ExecuteQuery;
+        Setdate();
+        ExecuteQuery();
     end;
 
     local procedure ExecuteQuery()
     begin
-        Rec.DeleteAll;
-        Query1.SetFilter(Posting_Date, '%1..%2', StartDate, Enddate);
-        Query1.Open;
-        while Query1.Read do begin
-            if Cust.Get(Query1.Source_No) then begin
-                Rec.TransferFields(Cust);
-                if not Rec.Insert then;
+        Rec.DeleteAll();
+        TopTenVendorsQuery.SetFilter(Posting_Date, '%1..%2', StartDate, Enddate);
+        TopTenVendorsQuery.Open();
+        while TopTenVendorsQuery.Read() do begin
+            if Cust.Get(TopTenVendorsQuery.Source_No) then begin
+                Rec."No." := Cust."No.";
+                Rec.Name := Cust.Name;
+                Rec."Phone No." := Cust."Phone No.";
+                if not Rec.Insert() then;
                 Rec.SetFilter("Date Filter", '%1..%2', StartDate, Enddate);
                 Rec.CalcFields("NPR Sales (LCY)");
                 Rec."Search Name" := Format(-Rec."NPR Sales (LCY)" * 100, 20, 1);
                 Rec."Search Name" := PadStr('', 15 - StrLen(Rec."Search Name"), '0') + Rec."Search Name";
-                Rec.Modify;
-
-
+                Rec.Modify();
             end;
         end;
-        Query1.Close;
+        TopTenVendorsQuery.Close();
     end;
 
     local procedure Setdate()
