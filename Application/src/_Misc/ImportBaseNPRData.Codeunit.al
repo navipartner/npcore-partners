@@ -24,7 +24,7 @@ codeunit 6014602 "NPR Import Base NPR Data"
         Secret := AzureKeyVaultMgt.GetSecret('NpRetailBaseDataSecret');
 
         rapidStartBaseDataMgt.ImportPackage(
-                        BaseUri + '/pos-test-data/' + package + '?sv=2019-10-10&ss=b&srt=co&sp=rlx&se=2050-06-23T00:45:22Z&st=2020-06-22T16:45:22Z&spr=https&sig=' + Secret, packageName);
+                        BaseUri + '/pos-test-data/' + package + '?sv=2019-10-10&ss=b&srt=co&sp=rlx&se=2050-06-23T00:45:22Z&st=2020-06-22T16:45:22Z&spr=https&sig=' + Secret, packageName, false);
 
         autoRapidstartImportLog."Package Name" := packageName;
         autoRapidstartImportLog.Insert();

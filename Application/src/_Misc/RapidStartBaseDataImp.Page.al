@@ -47,6 +47,12 @@ page 6014615 "NPR RapidStart Base Data Imp."
                     exit(true);
                 end;
             }
+            field("Adjust Table Names"; AdjustTableNames)
+            {
+                ApplicationArea = All;
+                Caption = 'Adjust Table Names';
+                ToolTip = 'Specifies whether table names in the package should be adjusted. The option should be enabled if the package contains NPRetail tables, and it was created in NAV/BC version prior to BC16';
+            }
         }
     }
 
@@ -58,7 +64,7 @@ page 6014615 "NPR RapidStart Base Data Imp."
             {
                 ApplicationArea = All;
                 ToolTip = 'Executes the ActionName action';
-                Image = Action; 
+                Image = Action;
 
                 trigger OnAction()
                 begin
@@ -90,7 +96,7 @@ page 6014615 "NPR RapidStart Base Data Imp."
                 Caption = 'Finish';
                 InFooterBar = true;
                 ToolTip = 'Executes the Finish action';
-                Image = Action; 
+                Image = Action;
 
                 trigger OnAction()
                 var
@@ -106,7 +112,7 @@ page 6014615 "NPR RapidStart Base Data Imp."
 
                     rapidstartBaseDataMgt.ImportPackage(
                         BaseUri + '/pos-test-data/' + package
-                        + '?sv=2019-10-10&ss=b&srt=co&sp=rlx&se=2050-06-23T00:45:22Z&st=2020-06-22T16:45:22Z&spr=https&sig=' + Secret, packageName);
+                        + '?sv=2019-10-10&ss=b&srt=co&sp=rlx&se=2050-06-23T00:45:22Z&st=2020-06-22T16:45:22Z&spr=https&sig=' + Secret, packageName, AdjustTableNames);
 
                     CurrPage.Close();
                 end;
@@ -132,7 +138,7 @@ page 6014615 "NPR RapidStart Base Data Imp."
         ActionFinishAllowed: Boolean;
         ActionNextAllowed: Boolean;
         ActionBackAllowed: Boolean;
+        AdjustTableNames: Boolean;
         currentStep: Integer;
         package: Text;
-
 }
