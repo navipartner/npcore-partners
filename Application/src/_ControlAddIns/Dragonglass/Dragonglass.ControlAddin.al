@@ -10,20 +10,29 @@ controladdin "NPR Dragonglass"
         'src/_ControlAddins/Dragonglass/Scripts/datepicker.es.js',
         'src/_ControlAddins/Dragonglass/Scripts/datepicker.fr.js',
         'src/_ControlAddins/Dragonglass/Scripts/datepicker.nl.js',
-        'src/_ControlAddins/Dragonglass/Scripts/bundle.6.1.2211.7.js',
+        'src/_ControlAddins/Dragonglass/Scripts/bundle.6.1.2212.8.js',
         'src/_ControlAddins/Dragonglass/Scripts/moment.min.js',
         'src/_ControlAddins/Dragonglass/Scripts/no-ie.js';
 
     StyleSheets =
+        // Font Awesome
+        'src/_ControlAddins/Dragonglass/Fonts/fontawesome/css/all.min.css',
+
         'src/_ControlAddins/Dragonglass/Stylesheets/datepicker.css',
-        'src/_ControlAddins/Dragonglass/Stylesheets/dragonglass.icons.min.css',
-        'src/_ControlAddins/Dragonglass/Stylesheets/bundle.css',
-        'src/_ControlAddins/Dragonglass/Stylesheets/themeLight.css';
+        'src/_ControlAddins/Dragonglass/Stylesheets/themeFresh.css',
+        'src/_ControlAddins/Dragonglass/Stylesheets/bundle.css';
 
     Images =
-        'src/_ControlAddins/Dragonglass/Scripts/bundle.6.1.2211.7.js.map',
+        // Font Awesome
+        'src/_ControlAddins/Dragonglass/Fonts/fontawesome/webfonts/fa-brands-400.woff2',
+        'src/_ControlAddins/Dragonglass/Fonts/fontawesome/webfonts/fa-duotone-900.woff2',
+        'src/_ControlAddins/Dragonglass/Fonts/fontawesome/webfonts/fa-light-300.woff2',
+        'src/_ControlAddins/Dragonglass/Fonts/fontawesome/webfonts/fa-regular-400.woff2',
+        'src/_ControlAddins/Dragonglass/Fonts/fontawesome/webfonts/fa-solid-900.woff2',
+        'src/_ControlAddins/Dragonglass/Fonts/fontawesome/webfonts/fa-thin-100.woff2',
+
+        'src/_ControlAddins/Dragonglass/Scripts/bundle.6.1.2212.8.js.map',
         'src/_ControlAddins/Dragonglass/Images/npretaillogo_med.png',
-        'src/_ControlAddins/Dragonglass/Images/dragonglass.woff',
         'src/_ControlAddins/Dragonglass/Images/spinner-100-R.png',
         'src/_ControlAddins/Dragonglass/Images/mobilepay_logo_inverted_small.png',
         'src/_ControlAddins/Dragonglass/Images/mobilepay_logo_small.png';
