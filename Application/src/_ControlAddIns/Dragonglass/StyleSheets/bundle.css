@@ -325,10 +325,6 @@
   display: block;
   padding-bottom: 0; }
 
-.transcendence [class^="fa-"],
-.transcendence [class*=" fa-"] {
-  font-family: var(--default-icon-font); }
-
 .transcendence .button__icon--size-16:before {
   font-size: 1em; }
 
@@ -351,6 +347,30 @@
   font-size: 96px; }
 
 .transcendence .button__icon--size-128:before {
+  font-size: 128px; }
+
+.transcendence .button__icon--size-16:after {
+  font-size: 1em; }
+
+.transcendence .button__icon--size-24:after {
+  font-size: 1.5em; }
+
+.transcendence .button__icon--size-32:after {
+  font-size: 2em; }
+
+.transcendence .button__icon--size-48:after {
+  font-size: 48px; }
+
+.transcendence .button__icon--size-64:after {
+  font-size: 64px; }
+
+.transcendence .button__icon--size-80:after {
+  font-size: 80px; }
+
+.transcendence .button__icon--size-96:after {
+  font-size: 96px; }
+
+.transcendence .button__icon--size-128after {
   font-size: 128px; }
 
 .transcendence .input-with-binding, .transcendence .plus-minus-editor, .transcendence .switch {
