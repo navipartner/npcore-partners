@@ -48314,39 +48314,17 @@ var App = /*#__PURE__*/function (_Component) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DragonglassManager", function() { return DragonglassManager; });
-/* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/classCallCheck */ "./node_modules/.pnpm/@babel/runtime@7.11.2/node_modules/@babel/runtime/helpers/classCallCheck.js");
-/* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @babel/runtime/helpers/createClass */ "./node_modules/.pnpm/@babel/runtime@7.11.2/node_modules/@babel/runtime/helpers/createClass.js");
-/* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @babel/runtime/helpers/inherits */ "./node_modules/.pnpm/@babel/runtime@7.11.2/node_modules/@babel/runtime/helpers/inherits.js");
-/* harmony import */ var _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @babel/runtime/helpers/possibleConstructorReturn */ "./node_modules/.pnpm/@babel/runtime@7.11.2/node_modules/@babel/runtime/helpers/possibleConstructorReturn.js");
-/* harmony import */ var _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @babel/runtime/helpers/getPrototypeOf */ "./node_modules/.pnpm/@babel/runtime@7.11.2/node_modules/@babel/runtime/helpers/getPrototypeOf.js");
-/* harmony import */ var _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_4__);
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! react */ "./node_modules/.pnpm/react@16.13.1/node_modules/react/index.js");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_5__);
-/* harmony import */ var _dragonglass_popup_PopupHost__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./dragonglass-popup/PopupHost */ "./packages/dragonglass-react/src/dragonglass-popup/PopupHost.js");
-/* harmony import */ var _components_FormatManager__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./components/FormatManager */ "./packages/dragonglass-react/src/components/FormatManager.js");
-/* harmony import */ var _components_LocalizationManager__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./components/LocalizationManager */ "./packages/dragonglass-react/src/components/LocalizationManager.js");
-/* harmony import */ var _dragonglass_themes_ThemeStylesheetHost__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./dragonglass-themes/ThemeStylesheetHost */ "./packages/dragonglass-react/src/dragonglass-themes/ThemeStylesheetHost.js");
-/* harmony import */ var _components_ChromeStealUsernamePassword__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./components/ChromeStealUsernamePassword */ "./packages/dragonglass-react/src/components/ChromeStealUsernamePassword.js");
-/* harmony import */ var _components_DragonglassIconFont__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./components/DragonglassIconFont */ "./packages/dragonglass-react/src/components/DragonglassIconFont.js");
-/* harmony import */ var _components_WebFontManager__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./components/WebFontManager */ "./packages/dragonglass-react/src/components/WebFontManager.js");
-/* harmony import */ var _components_Watermark__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./components/Watermark */ "./packages/dragonglass-react/src/components/Watermark.js");
-/* harmony import */ var _dragonglass_notifications_NotificationsPanel__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./dragonglass-notifications/NotificationsPanel */ "./packages/dragonglass-react/src/dragonglass-notifications/NotificationsPanel.js");
-/* harmony import */ var _dragonglass_notifications_NotificationsHost__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./dragonglass-notifications/NotificationsHost */ "./packages/dragonglass-react/src/dragonglass-notifications/NotificationsHost.js");
-/* harmony import */ var dragonglass_nav__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! dragonglass-nav */ "./packages/dragonglass-nav/dist/index.js");
-/* harmony import */ var dragonglass_nav__WEBPACK_IMPORTED_MODULE_16___default = /*#__PURE__*/__webpack_require__.n(dragonglass_nav__WEBPACK_IMPORTED_MODULE_16__);
-
-
-
-
-
-
-function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_4___default()(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_4___default()(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_3___default()(this, result); }; }
-
-function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/.pnpm/react@16.13.1/node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _dragonglass_popup_PopupHost__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./dragonglass-popup/PopupHost */ "./packages/dragonglass-react/src/dragonglass-popup/PopupHost.js");
+/* harmony import */ var _components_FormatManager__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./components/FormatManager */ "./packages/dragonglass-react/src/components/FormatManager.js");
+/* harmony import */ var _components_LocalizationManager__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./components/LocalizationManager */ "./packages/dragonglass-react/src/components/LocalizationManager.js");
+/* harmony import */ var _dragonglass_themes_ThemeStylesheetHost__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./dragonglass-themes/ThemeStylesheetHost */ "./packages/dragonglass-react/src/dragonglass-themes/ThemeStylesheetHost.js");
+/* harmony import */ var _components_ChromeStealUsernamePassword__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./components/ChromeStealUsernamePassword */ "./packages/dragonglass-react/src/components/ChromeStealUsernamePassword.js");
+/* harmony import */ var _components_WebFontManager__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./components/WebFontManager */ "./packages/dragonglass-react/src/components/WebFontManager.js");
+/* harmony import */ var _components_Watermark__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./components/Watermark */ "./packages/dragonglass-react/src/components/Watermark.js");
+/* harmony import */ var _dragonglass_notifications_NotificationsPanel__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./dragonglass-notifications/NotificationsPanel */ "./packages/dragonglass-react/src/dragonglass-notifications/NotificationsPanel.js");
+/* harmony import */ var _dragonglass_notifications_NotificationsHost__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./dragonglass-notifications/NotificationsHost */ "./packages/dragonglass-react/src/dragonglass-notifications/NotificationsHost.js");
 
 
 
@@ -48356,31 +48334,11 @@ function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Re
 
 
 
+ // TODO: those here that return null and only serve to maintain some global internal redux substate should be taken out and should use StateStore.subscribeSelector
 
-
-
-
-var DragonglassManager = /*#__PURE__*/function (_Component) {
-  _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_2___default()(DragonglassManager, _Component);
-
-  var _super = _createSuper(DragonglassManager);
-
-  function DragonglassManager(props) {
-    _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default()(this, DragonglassManager);
-
-    return _super.call(this, props);
-  } // TODO: those here that return null and only serve to maintain some global internal redux substate should be taken out and should use StateStore.subscribeSelector
-
-
-  _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1___default()(DragonglassManager, [{
-    key: "render",
-    value: function render() {
-      return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_5___default.a.Fragment, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement(_components_ChromeStealUsernamePassword__WEBPACK_IMPORTED_MODULE_10__["StealUsernamePassword"], null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement(_components_DragonglassIconFont__WEBPACK_IMPORTED_MODULE_11__["DragonglassIconFont"], null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement(_dragonglass_popup_PopupHost__WEBPACK_IMPORTED_MODULE_6__["PopupHost"], null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement(_components_FormatManager__WEBPACK_IMPORTED_MODULE_7__["default"], null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement(_components_LocalizationManager__WEBPACK_IMPORTED_MODULE_8__["default"], null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement(_dragonglass_themes_ThemeStylesheetHost__WEBPACK_IMPORTED_MODULE_9__["default"], null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement(_components_Watermark__WEBPACK_IMPORTED_MODULE_13__["Watermark"], null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement(_components_WebFontManager__WEBPACK_IMPORTED_MODULE_12__["WebFontManager"], null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement(_dragonglass_notifications_NotificationsHost__WEBPACK_IMPORTED_MODULE_15__["NotificationsHost"], null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement(_dragonglass_notifications_NotificationsPanel__WEBPACK_IMPORTED_MODULE_14__["NotificationsPanel"], null));
-    }
-  }]);
-
-  return DragonglassManager;
-}(react__WEBPACK_IMPORTED_MODULE_5__["Component"]);
+var DragonglassManager = function DragonglassManager() {
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_components_ChromeStealUsernamePassword__WEBPACK_IMPORTED_MODULE_5__["StealUsernamePassword"], null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_dragonglass_popup_PopupHost__WEBPACK_IMPORTED_MODULE_1__["PopupHost"], null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_components_FormatManager__WEBPACK_IMPORTED_MODULE_2__["default"], null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_components_LocalizationManager__WEBPACK_IMPORTED_MODULE_3__["default"], null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_dragonglass_themes_ThemeStylesheetHost__WEBPACK_IMPORTED_MODULE_4__["default"], null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_components_Watermark__WEBPACK_IMPORTED_MODULE_7__["Watermark"], null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_components_WebFontManager__WEBPACK_IMPORTED_MODULE_6__["WebFontManager"], null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_dragonglass_notifications_NotificationsHost__WEBPACK_IMPORTED_MODULE_9__["NotificationsHost"], null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_dragonglass_notifications_NotificationsPanel__WEBPACK_IMPORTED_MODULE_8__["NotificationsPanel"], null));
+};
 
 /***/ }),
 
@@ -49298,7 +49256,7 @@ function getMenu(menu, rows, columns, state, parent) {
       caption: Object(_components_LocalizationManager__WEBPACK_IMPORTED_MODULE_3__["localize"])("Global_Back"),
       enabled: true,
       backgroundColor: "red",
-      iconClass: "fa-backward",
+      iconClass: "fad fa-backward",
       widthFactor: 1,
       action: {
         Type: _enums_ActionType__WEBPACK_IMPORTED_MODULE_2__["ActionType"].Back
@@ -49334,7 +49292,9 @@ var MenuButtonInfo = function MenuButtonInfo(button, parent, x, y) {
   this.bold = button.Bold;
   this["class"] = button.Class;
   this.color = button.Color, this.fontSize = button.FontSize;
-  this.iconClass = button.IconClass;
+  this.iconClass = button.IconClass; // Backward-compatibility support for Transcendence setup and Font Awesome icons
+
+  if ((this.iconClass || "").startsWith("fa-")) this.iconClass = "fad ".concat(this.iconClass);
   this.tooltip = button.Tooltip;
   this.content = button.Content;
   this.positionReference = {
@@ -51430,7 +51390,7 @@ var CollapsibleGroup = /*#__PURE__*/function (_Component) {
         },
         className: "dialog-configuration__group__caption"
       }, caption, " ", /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement("span", {
-        className: expanded ? "toggle-icon dg-chevron-down" : "toggle-icon dg-chevron-up"
+        className: expanded ? "toggle-icon fa fa-chevron-down" : "toggle-icon fa fa-chevron-up"
       })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement("div", {
         className: "dialog-configuration__group__content"
       }, children));
@@ -51587,72 +51547,6 @@ var DataBoundLabel = function DataBoundLabel(props) {
 };
 
 /* harmony default export */ __webpack_exports__["default"] = (DataBoundLabel);
-
-/***/ }),
-
-/***/ "./packages/dragonglass-react/src/components/DragonglassIconFont.js":
-/*!**************************************************************************!*\
-  !*** ./packages/dragonglass-react/src/components/DragonglassIconFont.js ***!
-  \**************************************************************************/
-/*! exports provided: DragonglassIconFont */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DragonglassIconFont", function() { return DragonglassIconFont; });
-/* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/classCallCheck */ "./node_modules/.pnpm/@babel/runtime@7.11.2/node_modules/@babel/runtime/helpers/classCallCheck.js");
-/* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @babel/runtime/helpers/createClass */ "./node_modules/.pnpm/@babel/runtime@7.11.2/node_modules/@babel/runtime/helpers/createClass.js");
-/* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @babel/runtime/helpers/inherits */ "./node_modules/.pnpm/@babel/runtime@7.11.2/node_modules/@babel/runtime/helpers/inherits.js");
-/* harmony import */ var _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @babel/runtime/helpers/possibleConstructorReturn */ "./node_modules/.pnpm/@babel/runtime@7.11.2/node_modules/@babel/runtime/helpers/possibleConstructorReturn.js");
-/* harmony import */ var _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @babel/runtime/helpers/getPrototypeOf */ "./node_modules/.pnpm/@babel/runtime@7.11.2/node_modules/@babel/runtime/helpers/getPrototypeOf.js");
-/* harmony import */ var _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_4__);
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! react */ "./node_modules/.pnpm/react@16.13.1/node_modules/react/index.js");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_5__);
-/* harmony import */ var dragonglass_nav__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! dragonglass-nav */ "./packages/dragonglass-nav/dist/index.js");
-/* harmony import */ var dragonglass_nav__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(dragonglass_nav__WEBPACK_IMPORTED_MODULE_6__);
-/* harmony import */ var _WebFont__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./WebFont */ "./packages/dragonglass-react/src/components/WebFont.js");
-
-
-
-
-
-
-function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_4___default()(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_4___default()(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_3___default()(this, result); }; }
-
-function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
-
-
-
- // TODO: function component
-
-var DragonglassIconFont = /*#__PURE__*/function (_Component) {
-  _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_2___default()(DragonglassIconFont, _Component);
-
-  var _super = _createSuper(DragonglassIconFont);
-
-  function DragonglassIconFont() {
-    _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default()(this, DragonglassIconFont);
-
-    return _super.apply(this, arguments);
-  }
-
-  _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1___default()(DragonglassIconFont, [{
-    key: "render",
-    value: function render() {
-      return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement(_WebFont__WEBPACK_IMPORTED_MODULE_7__["WebFont"], {
-        family: "dragonglass",
-        prefix: "dg-",
-        url: dragonglass_nav__WEBPACK_IMPORTED_MODULE_6__["NAV"].instance.mapPath("Images/dragonglass.woff")
-      });
-    }
-  }]);
-
-  return DragonglassIconFont;
-}(react__WEBPACK_IMPORTED_MODULE_5__["Component"]);
 
 /***/ }),
 
@@ -53047,7 +52941,7 @@ var Input = /*#__PURE__*/function (_Component) {
         },
         className: "input__erase"
       }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement("i", {
-        className: "dg-cross"
+        className: "fal fa-xmark"
       }))), typeof textEnter === "function" ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement(_dragonglass_textenter_TextEnterHost__WEBPACK_IMPORTED_MODULE_9__["default"], {
         id: id
       }) : null, this.props.simple ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement("div", {
@@ -54825,7 +54719,7 @@ var RestaurantSelection = /*#__PURE__*/function (_PureComponent) {
           return _this2.click(e);
         }
       }, restaurant && restaurant.caption, allowSelection ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement("span", {
-        className: "fa-angle-down"
+        className: "fat fa-angle-down"
       }) : null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement("div", {
         className: "restaurant__selection__list"
       }, restaurants.map(function (restaurant, id) {
@@ -56112,7 +56006,7 @@ var NumberOfGuestsAtTable = /*#__PURE__*/function (_PureComponent) {
       return numberOfGuests ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement("div", {
         className: "number-of-guests"
       }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement("span", {
-        className: "fa-user"
+        className: "fa fa-user"
       }), " ", this.props.numberOfGuests) : null;
     }
   }]);
@@ -57053,7 +56947,7 @@ var NotificationBusy = /*#__PURE__*/function (_Component) {
       var busy = this.props.busy;
       return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement("div", {
         title: Object(_LocalizationManager__WEBPACK_IMPORTED_MODULE_6__["localize"])(busy ? _LocalizationManager__WEBPACK_IMPORTED_MODULE_6__["GlobalCaption"].NotificationTooltips.BusyState.Busy : _LocalizationManager__WEBPACK_IMPORTED_MODULE_6__["GlobalCaption"].NotificationTooltips.BusyState.Idle),
-        className: "".concat(busy ? "is-busy" : "", " dg-cog-solid")
+        className: "".concat(busy ? "is-busy" : "", " fas fa-gear")
       });
     }
   }]);
@@ -57122,7 +57016,7 @@ var NotificationMessagesUnbound = /*#__PURE__*/function (_Component) {
       var any = !!notifications.length;
       return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement("div", {
         title: Object(_LocalizationManager__WEBPACK_IMPORTED_MODULE_6__["localize"])(any ? _LocalizationManager__WEBPACK_IMPORTED_MODULE_6__["GlobalCaption"].NotificationTooltips.Messages.MessagesAvailable : _LocalizationManager__WEBPACK_IMPORTED_MODULE_6__["GlobalCaption"].NotificationTooltips.Messages.NoMessages).replace(/\{0\}/gi, notifications.length.toString()),
-        className: "".concat(notifications.length ? "has-notifications dg-comment-solid" : "dg-comment"),
+        className: "".concat(notifications.length ? "has-notifications fas fa-comment" : "far fa-comment"),
         onClick: function onClick() {
           return showPanel(!panelVisible);
         }
@@ -57198,7 +57092,7 @@ var StatusBar = /*#__PURE__*/function (_Component) {
       return statusBar ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement("div", {
         id: id,
         className: "statusbar"
-      }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_5___default.a.Fragment, null, _statusBarHelper__WEBPACK_IMPORTED_MODULE_6__["populateSections"].call(this, statusBar, id, statusBar.dataSource))) : null;
+      }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_5___default.a.Fragment, null, _statusBarHelper__WEBPACK_IMPORTED_MODULE_6__["populateSections"].call(this, statusBar, id, statusBar.dataSource)), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement(_StatusBarNotifications__WEBPACK_IMPORTED_MODULE_8__["StatusBarNotifications"], null)) : null;
     }
   }]);
 
@@ -62250,7 +62144,7 @@ var NotificationEntry = /*#__PURE__*/function (_Component) {
       return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement("div", {
         className: "notification__entry"
       }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement("div", {
-        className: "dg-cross close",
+        className: "fal fa-xmark close",
         onClick: function onClick() {
           return _redux_StateStore__WEBPACK_IMPORTED_MODULE_6__["StateStore"].dispatch(Object(_redux_actions_notificationActions__WEBPACK_IMPORTED_MODULE_7__["closeNotification"])(notification.id));
         }
@@ -62337,7 +62231,7 @@ var NotificationToast = /*#__PURE__*/function (_Component) {
       return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement("div", {
         className: "notification-toast ".concat(additionalClass)
       }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement("div", {
-        className: "dg-cross close",
+        className: "fal fa-xmark close",
         onClick: function onClick() {
           return _redux_StateStore__WEBPACK_IMPORTED_MODULE_6__["StateStore"].dispatch(Object(_redux_actions_notificationActions__WEBPACK_IMPORTED_MODULE_7__["closeNotification"])(notification.id));
         }
@@ -64986,7 +64880,7 @@ var ToggleButton = function ToggleButton(props) {
     /*#__PURE__*/
     // props.expanded says in which state the toggle button is
     react__WEBPACK_IMPORTED_MODULE_7___default.a.createElement("span", {
-      className: props.expanded ? "toggle-icon dg-chevron-down" : "toggle-icon dg-chevron-up",
+      className: props.expanded ? "toggle-icon fa fa-chevron-down" : "toggle-icon fa fa-chevron-up",
       onClick: function onClick() {
         return props.click();
       }
@@ -68586,12 +68480,12 @@ var SeatingSetupLocations = /*#__PURE__*/function (_Component) {
         }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement("span", null, location.caption), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement("div", {
           className: "seating-setup-locations__buttons"
         }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement(_SeatingSetupMenuButton__WEBPACK_IMPORTED_MODULE_6__["SeatingSetupMenuButton"], {
-          icon: "fa-trash",
+          icon: "fa fa-trash",
           onClick: function onClick() {
             return _this.props.action("delete", location.id);
           }
         }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement(_SeatingSetupMenuButton__WEBPACK_IMPORTED_MODULE_6__["SeatingSetupMenuButton"], {
-          icon: "fa-pencil",
+          icon: "fa fa-pencil",
           onClick: function onClick() {
             return _this.props.action("edit", location);
           }
@@ -80287,4 +80181,4 @@ exports.reducer = dragonglass_redux_1.createReducer(workflows_initial_state_1.in
 /***/ })
 
 /******/ });
-//# sourceMappingURL=bundle.6.1.2211.7.js.map
+//# sourceMappingURL=bundle.6.1.2212.8.js.map

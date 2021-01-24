@@ -1,5 +1,5 @@
 :root {
-  --color-primary: #6388ae;
+  --color-primary: #549ad3;
   --color-secondary: #ffffff;
   --green: #5eb267;
   --red: #db3439;
@@ -45,27 +45,26 @@
   --login-bg: #ffffff;
   --login-button-grid-padding: 0;
   --login-padding: 0;
-  --input-with-caption-bg: #6388ae;
-  --view-padding: 1.5em;
-  --container--space: 1.5em;
+  --input-with-caption-bg: #549ad3;
+  --view-padding: 1em;
+  --container--space: 1.25em;
   --button-space: 0.3em;
   --button-padding: 0.5em;
-  --button-bg-disabled: #c1cddd;
+  --button-bg-disabled: #caddf0;
   --button-text-color: #ffffff;
   --button-color-disabled: #ffffff;
   --button-shadow: none;
   --button-shadow-disabled: none;
-  --button-bg: #6388ae;
-  --button-bg-hover: #4d7399;
+  --button-bg: #549ad3;
+  --button-bg-hover: #21659c;
   --button-switch-bg: #d8d8d8;
-  --default-icon-font: "Font Awesome 5 Pro";
   --label-bg-color: inherit;
   --label-padding: 0;
   --label-color: #ffffff;
   --input-border: none;
-  --input-erase-bg: #6388ae;
+  --input-erase-bg: #549ad3;
   --input-bg: #ffffff;
-  --input-selection-bg: #6388ae;
+  --input-selection-bg: #549ad3;
   --input-selection-color: #ffffff;
   --info-box-title-height: 2.25em;
   --info-box-caption-height: 1.17em;
@@ -79,20 +78,20 @@
   --grid-column-width: 11%;
   --grid-first-column-width: 45%;
   --grid-row-border: 1px solid #f1f4fa;
-  --grid-row-highlight-bg: #cee5f9;
+  --grid-row-highlight-bg: #a3d5fd;
   --grid-text-color: #444;
   --subtotal-color: #ffffff;
   --subtotal-padding: 5px;
   --popup-max-height: 75%;
   --popup-max-width: 60%;
   --popup-min-width: 40%;
-  --popup-shadow: none;
-  --popup-title-bg: #309ce6;
+  --popup-shadow: 0 0 30px 0 rgba(0, 0, 0, 0.47);
+  --popup-title-bg: #dfdfdf;
   --popup-title-height: 40px;
-  --popup-title-color: #ffffff;
-  --popup-title-font-size: 20px;
-  --popup-body-bg: #ffffff;
-  --popup-button-bg: #ffffff;
+  --popup-title-color: #6f6f6f;
+  --popup-title-font-size: 1.5em;
+  --popup-body-bg: #f3f3f3;
+  --popup-button-bg: #e4e4e4;
   --popup-button-height: 100px;
   --popup-button-width: 115px;
   --popup-body-text-color: #494949;
@@ -114,5 +113,44 @@
   --lookup-row-text-dark: #626262;
   --lookup-row-text-light: #868686; }
 
+.transcendence .input__holder {
+  border-radius: 6px !important;
+  box-shadow: 1px 1px 3px 0px rgba(0, 0, 0, 0.25) !important; }
 
-/*# sourceMappingURL=themeLight.css.map*/
+.transcendence .grid {
+  background-color: #e5ecf3 !important;
+  border-radius: 6px !important; }
+
+.transcendence .grid__table table tbody tr.tr-highlight {
+  border-bottom: 1px solid #a2d1f8 !important;
+  background-color: #bce1ff !important;
+  box-shadow: 1px 1px 3px 0px rgba(0, 0, 0, 0.15) !important; }
+
+.transcendence .grid__table table tbody tr.tr-highlight td {
+  color: #1e374b !important; }
+
+.transcendence .dialog__body .input__holder {
+  border: 0;
+  box-shadow: 1px 1px 4px 1px rgba(0, 0, 0, 0.25) !important; }
+
+.transcendence .dialog__container {
+  border-radius: 8px !important; }
+
+.transcendence .notifications-panel {
+  background-color: #3c79ab !important; }
+
+.transcendence .notification__entry {
+  background-color: #1f425e !important;
+  color: #dddddd !important;
+  border-radius: 6px;
+  box-shadow: none !important; }
+
+.transcendence .notification-toast {
+  background-color: #1f425e !important;
+  color: #dddddd !important;
+  border-radius: 6px;
+  box-shadow: 1px 1px 4px 1px rgba(0, 0, 0, 0.25) !important;
+  margin: 0.5em 1em !important; }
+
+
+/*# sourceMappingURL=themeFresh.css.map*/

@@ -1,9 +1,7 @@
 codeunit 6014627 "NPR Managed Dependency Mgt."
 {
-    Permissions = TableData "NPR POS Web Font" = rimd,
-                  TableData "NPR .NET Assembly" = rimd,
-                  TableData "NPR Web Client Dependency" = rimd,
-                  TableData "Add-in" = rimd;
+    Permissions = TableData "NPR .NET Assembly" = rimd,
+                  TableData "NPR Web Client Dependency" = rimd;
 
     trigger OnRun()
     begin
@@ -339,20 +337,11 @@ codeunit 6014627 "NPR Managed Dependency Mgt."
 
     local procedure GetTypeNameVersionFromRecordRef(RecRef: RecordRef; var FileType: Text; var Name: Text; var FileVersion: Text)
     var
-        AddIn: Record "Add-in";
         DotNetLibrary: Record "NPR .NET Assembly";
         WebClientDependency: Record "NPR Web Client Dependency";
-        WebFont: Record "NPR POS Web Font";
         StargatePackage: Record "NPR POS Stargate Package";
     begin
         case RecRef.Number() of
-            DATABASE::"Add-in":
-                begin
-                    RecRef.SetTable(AddIn);
-                    FileType := 'Control Add-in';
-                    Name := AddIn."Add-in Name";
-                    FileVersion := AddIn.Version;
-                end;
             DATABASE::"NPR .NET Assembly":
                 begin
                     RecRef.SetTable(DotNetLibrary);
@@ -365,13 +354,6 @@ codeunit 6014627 "NPR Managed Dependency Mgt."
                     RecRef.SetTable(WebClientDependency);
                     FileType := 'Web Client Dependency';
                     Name := StrSubstNo('%1 %2', WebClientDependency.Type, WebClientDependency.Code);
-                    FileVersion := '1.0';
-                end;
-            DATABASE::"NPR POS Web Font":
-                begin
-                    RecRef.SetTable(WebFont);
-                    FileType := 'Web Font';
-                    Name := WebFont.Name;
                     FileVersion := '1.0';
                 end;
             DATABASE::"NPR POS Stargate Package":
