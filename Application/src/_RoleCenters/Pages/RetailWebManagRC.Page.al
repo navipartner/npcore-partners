@@ -1,6 +1,6 @@
-page 6151244 "NPR Retail Magento Manag. RC"
+page 6151244 "NPR Retail Web Manager RC"
 {
-    Caption = 'NP Retail Magento Manag. Role Center';
+    Caption = 'NP Retail Web Manag. Role Center';
     PageType = RoleCenter;
     UsageCategory = None;
 
