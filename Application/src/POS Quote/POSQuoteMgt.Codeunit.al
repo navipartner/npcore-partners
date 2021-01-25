@@ -611,7 +611,7 @@ codeunit 6151006 "NPR POS Quote Mgt."
             exit;
 
         repeat
-            if Element.SelectSingleNode('fields/field[@field_no = ' + Format(TempField."No.", 0, 9) + ']', FieldNode) then
+            if Element.SelectSingleNode('Fields/field[@field_no = ' + Format(TempField."No.", 0, 9) + ']', FieldNode) then
                 Xml2Field(FieldNode.AsXmlElement(), TempField, RecRef);
         until TempField.Next = 0;
     end;
