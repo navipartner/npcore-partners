@@ -373,14 +373,11 @@ codeunit 6184861 "NPR Azure Storage API Mgt."
 
         WebRequest.SetRequestUri('https://' + StorageServiceName + '.search.windows.net/indexes/' + IndexName + '/docs/search?api-version=' + StoregeApiVersion);
         WebRequest.Method := 'POST';
-        RequestManagement.AddOrReplaceContentHeader(WebRequest, 'Content-Type', 'application/json');
+
         RequestManagement.AddOrReplaceRequestHeader(WebRequest, 'api-key', AzureStorageAPISetup.GetAdminKey());
 
-        TempBlob.CreateOutStream(OutStr);
-        OutStr.Write(Arguments);
-
-        CopyStream(OutStr, InStrm);
-        WebRequest.Content.WriteFrom(InStrm);
+        WebRequest.Content.ReadAs(Arguments);
+        RequestManagement.AddOrReplaceContentHeader(WebRequest, 'Content-Type', 'application/json');
 
         if not WebClient.Send(WebRequest, WebResponse) then
             exit;
@@ -437,9 +434,6 @@ codeunit 6184861 "NPR Azure Storage API Mgt."
         WebRequest.SetRequestUri('https://' + StorageAccountName + '.blob.core.windows.net/' + StorageConatainerName + '/' + FileName);
         WebRequest.Method := 'PUT';
 
-        RequestManagement.AddOrReplaceContentHeader(WebRequest, 'Content-Type', MIMEType);
-        RequestManagement.AddOrReplaceContentHeader(WebRequest, 'Content-Length', Format(RequestManagement.BlobLenght(TempBlob)));
-
         StringToSign := WebRequest.Method +
             LineFeed + LineFeed + LineFeed +
             Format(RequestManagement.BlobLenght(TempBlob)) +
@@ -463,6 +457,8 @@ codeunit 6184861 "NPR Azure Storage API Mgt."
 
         TempBlob.CreateInStream(InStrm);
         WebRequest.Content.WriteFrom(InStrm);
+        RequestManagement.AddOrReplaceContentHeader(WebRequest, 'Content-Type', MIMEType);
+        RequestManagement.AddOrReplaceContentHeader(WebRequest, 'Content-Length', Format(RequestManagement.BlobLenght(TempBlob)));
 
         if not WebClient.Send(WebRequest, WebResponse) then
             exit;
@@ -780,10 +776,11 @@ codeunit 6184861 "NPR Azure Storage API Mgt."
         WebRequest.SetRequestUri('https://' + StorageServiceName + '.search.windows.net/datasources/' + DataSourceName + '?api-version=' + StoregeApiVersion);
         WebRequest.Method := 'PUT';
         WebClient.Timeout := AzureStorageAPISetup.Timeout;
-        RequestManagement.AddOrReplaceContentHeader(WebRequest, 'Content-Type', 'application/json');
+
         RequestManagement.AddOrReplaceRequestHeader(WebRequest, 'api-key', AzureStorageAPISetup.GetAdminKey());
 
         WebRequest.Content.WriteFrom(Arguments);
+        RequestManagement.AddOrReplaceContentHeader(WebRequest, 'Content-Type', 'application/json');
 
         WebClient.Send(WebRequest, WebResponse);
 
@@ -840,10 +837,11 @@ codeunit 6184861 "NPR Azure Storage API Mgt."
         WebRequest.SetRequestUri('https://' + StorageServiceName + '.search.windows.net/indexes/' + StorageIndexName + '?api-version=' + StoregeApiVersion);
         WebRequest.Method := 'PUT';
         WebClient.Timeout := AzureStorageAPISetup.Timeout;
-        RequestManagement.AddOrReplaceContentHeader(WebRequest, 'Content-Type', 'application/json');
+
         RequestManagement.AddOrReplaceRequestHeader(WebRequest, 'api-key', AzureStorageAPISetup.GetAdminKey());
 
         WebRequest.Content.WriteFrom(Arguments);
+        RequestManagement.AddOrReplaceContentHeader(WebRequest, 'Content-Type', 'application/json');
 
         WebClient.Send(WebRequest, WebResponse);
         if not WebResponse.IsSuccessStatusCode then
@@ -892,6 +890,7 @@ codeunit 6184861 "NPR Azure Storage API Mgt."
         WebRequest.SetRequestUri('https://' + StorageServiceName + '.search.windows.net/indexes/' + StorageIndexName + '?api-version=' + StoregeApiVersion);
         WebRequest.Method := 'DELETE';
         WebClient.Timeout := AzureStorageAPISetup.Timeout;
+
         RequestManagement.AddOrReplaceContentHeader(WebRequest, 'Content-Type', 'application/json');
         RequestManagement.AddOrReplaceRequestHeader(WebRequest, 'api-key', AzureStorageAPISetup.GetAdminKey());
 
@@ -957,10 +956,11 @@ codeunit 6184861 "NPR Azure Storage API Mgt."
             StorageIndexerName + '?api-version=' + StoregeApiVersion);
         WebRequest.Method := 'PUT';
         WebClient.Timeout := AzureStorageAPISetup.Timeout;
-        RequestManagement.AddOrReplaceContentHeader(WebRequest, 'Content-Type', 'application/json');
+
         RequestManagement.AddOrReplaceRequestHeader(WebRequest, 'api-key', AzureStorageAPISetup.GetAdminKey());
 
         WebRequest.Content.WriteFrom(Arguments);
+        RequestManagement.AddOrReplaceContentHeader(WebRequest, 'Content-Type', 'application/json');
 
         WebClient.Send(WebRequest, WebResponse);
         exit(WebResponse.IsSuccessStatusCode);

@@ -199,11 +199,12 @@ codeunit 6184860 "NPR Dropbox API Mgt."
         WebRequest.SetRequestUri('https://api.dropboxapi.com/2/files/list_folder/continue');
         WebRequest.Method := 'POST';
         WebClient.Timeout := DropBoxSetup.Timeout;
-        RequestManagement.AddOrReplaceContentHeader(WebRequest, 'Content-Type', 'application/json');
+
         RequestManagement.AddOrReplaceRequestHeader(WebRequest, 'Authorization', 'Bearer ' + DropBoxSetup.GetToken());
 
         ArgumentsJson.WriteTo(Arguments);
         WebRequest.Content.WriteFrom(Arguments);
+        RequestManagement.AddOrReplaceContentHeader(WebRequest, 'Content-Type', 'application/json');
 
         WebClient.Send(WebRequest, WebResponse);
         if not WebResponse.IsSuccessStatusCode then
@@ -270,10 +271,11 @@ codeunit 6184860 "NPR Dropbox API Mgt."
         WebRequest.SetRequestUri('https://api.dropboxapi.com/2/files/list_folder');
         WebRequest.Method := 'POST';
         WebClient.Timeout := DropBoxSetup.Timeout;
-        RequestManagement.AddOrReplaceContentHeader(WebRequest, 'Content-Type', 'application/json');
+
         RequestManagement.AddOrReplaceRequestHeader(WebRequest, 'Authorization', 'Bearer ' + DropBoxSetup.GetToken());
 
         WebRequest.Content.WriteFrom(Arguments);
+        RequestManagement.AddOrReplaceContentHeader(WebRequest, 'Content-Type', 'application/json');
 
         WebClient.Send(WebRequest, WebResponse);
         if not WebResponse.IsSuccessStatusCode then
@@ -332,11 +334,12 @@ codeunit 6184860 "NPR Dropbox API Mgt."
         WebRequest.SetRequestUri('https://api.dropboxapi.com/2/files/search_v2');
         WebRequest.Method := 'POST';
         WebClient.Timeout := DropBoxSetup.Timeout;
-        RequestManagement.AddOrReplaceContentHeader(WebRequest, 'Content-Type', 'application/json');
+
         RequestManagement.AddOrReplaceRequestHeader(WebRequest, 'User-Agent', 'api-explorer-client');
         RequestManagement.AddOrReplaceRequestHeader(WebRequest, 'Authorization', 'Bearer ' + DropBoxSetup.GetToken());
 
         WebRequest.Content.WriteFrom(Arguments);
+        RequestManagement.AddOrReplaceContentHeader(WebRequest, 'Content-Type', 'application/json');
 
         WebClient.Send(WebRequest, WebResponse);
         if not WebResponse.IsSuccessStatusCode then
@@ -386,14 +389,15 @@ codeunit 6184860 "NPR Dropbox API Mgt."
         WebRequest.SetRequestUri('https://content.dropboxapi.com/2/files/upload');
         WebRequest.Method := 'POST';
         WebClient.Timeout := DropBoxSetup.Timeout;
-        RequestManagement.AddOrReplaceContentHeader(WebRequest, 'Content-Type', 'application/octet-stream');
-        RequestManagement.AddOrReplaceContentHeader(WebRequest, 'Content-Length', FORMAT(RequestManagement.BlobLenght(TempBlob)));
+
         RequestManagement.AddOrReplaceRequestHeader(WebRequest, 'User-Agent', 'api-explorer-client');
         RequestManagement.AddOrReplaceRequestHeader(WebRequest, 'Authorization', 'Bearer ' + DropBoxSetup.GetToken());
         RequestManagement.AddOrReplaceRequestHeader(WebRequest, 'Dropbox-API-Arg', Arguments);
 
         TempBlob.CreateInStream(InStrm);
         WebRequest.Content.WriteFrom(InStrm);
+        RequestManagement.AddOrReplaceContentHeader(WebRequest, 'Content-Type', 'application/octet-stream');
+        RequestManagement.AddOrReplaceContentHeader(WebRequest, 'Content-Length', FORMAT(RequestManagement.BlobLenght(TempBlob)));
 
         WebClient.Send(WebRequest, WebResponse);
         if not WebResponse.IsSuccessStatusCode then
@@ -475,10 +479,11 @@ codeunit 6184860 "NPR Dropbox API Mgt."
         WebRequest.SetRequestUri('https://api.dropboxapi.com/2/files/delete_v2');
         WebRequest.Method := 'POST';
         WebClient.Timeout := DropBoxSetup.Timeout;
-        RequestManagement.AddOrReplaceContentHeader(WebRequest, 'Content-Type', 'application/json');
+
         RequestManagement.AddOrReplaceRequestHeader(WebRequest, 'Authorization', 'Bearer ' + DropBoxSetup.GetToken());
 
         WebRequest.Content.WriteFrom(Arguments);
+        RequestManagement.AddOrReplaceContentHeader(WebRequest, 'Content-Type', 'application/json');
 
         WebClient.Send(WebRequest, WebResponse);
         if not WebResponse.IsSuccessStatusCode then
@@ -522,10 +527,11 @@ codeunit 6184860 "NPR Dropbox API Mgt."
         WebRequest.SetRequestUri('https://api.dropboxapi.com/2/files/copy_v2');
         WebRequest.Method := 'POST';
         WebClient.Timeout := DropBoxSetup.Timeout;
-        RequestManagement.AddOrReplaceContentHeader(WebRequest, 'Content-Type', 'application/json');
+
         RequestManagement.AddOrReplaceRequestHeader(WebRequest, 'Authorization', 'Bearer ' + DropBoxSetup.GetToken());
 
         WebRequest.Content.WriteFrom(Arguments);
+        RequestManagement.AddOrReplaceContentHeader(WebRequest, 'Content-Type', 'application/json');
 
         WebClient.Send(WebRequest, WebResponse);
         if not WebResponse.IsSuccessStatusCode then
