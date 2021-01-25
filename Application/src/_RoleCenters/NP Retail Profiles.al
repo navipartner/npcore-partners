@@ -16,12 +16,12 @@ profile "NPR ADMIN"
     Enabled = true;
     Promoted = false;
 }
-profile "NPR MAGENTO MANAGER"
+profile "NPR WEB MANAGER"
 {
-    Description = 'NP Retail Magento Manager';
-    Caption = 'NP Retail Magento Manager';
+    Description = 'NP Retail Web Manager';
+    Caption = 'NP Retail Web Manager';
     ProfileDescription = '';
-    RoleCenter = "NPR Retail Magento Manag. RC";
+    RoleCenter = "NPR Retail Web Manager RC";
     Enabled = true;
     Promoted = false;
 }
