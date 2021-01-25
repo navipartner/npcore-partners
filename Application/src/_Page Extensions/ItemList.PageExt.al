@@ -337,7 +337,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
             }
         }
 
-        addafter("Skilled R&esources")
+        addafter(Resources)
         {
             group(NPR_Magento)
             {
@@ -624,6 +624,8 @@ pageextension 6014433 "NPR Item List" extends "Item List"
         NPRAttrVisible10 := NPRAttrVisibleArray[10];
 
         RetailInventoryEnabled := RetailInventorySetMgt.GetRetailInventoryEnabled();
+
+        NPR_SetMagentoEnabled();
     end;
 
     local procedure GetVendorName()
