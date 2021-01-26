@@ -204,7 +204,8 @@ table 6014410 "NPR Item Group"
                                                                    "NPR Vendor No." = FIELD("Vendor Filter"),
                                                                    "Posting Date" = FIELD("Date Filter"),
                                                                    "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                   "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter")));
+                                                                   "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
+                                                                   "Location Code" = field("Location Filter")));
             Caption = 'Sales (Qty.)';
             FieldClass = FlowField;
         }
@@ -216,7 +217,8 @@ table 6014410 "NPR Item Group"
                                                                            "Posting Date" = FIELD("Date Filter"),
                                                                            "NPR Vendor No." = FIELD("Vendor Filter"),
                                                                            "Salespers./Purch. Code" = FIELD("Salesperson Filter"),
-                                                                           "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter")));
+                                                                           "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
+                                                                           "Location Code" = field("Location Filter")));
             Caption = 'Sales (LCY)';
             FieldClass = FlowField;
         }
@@ -247,7 +249,8 @@ table 6014410 "NPR Item Group"
                                                                            "Posting Date" = FIELD("Date Filter"),
                                                                            "NPR Vendor No." = FIELD("Vendor Filter"),
                                                                            "Salespers./Purch. Code" = FIELD("Salesperson Filter"),
-                                                                           "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter")));
+                                                                           "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
+                                                                           "Location Code" = field("Location Filter")));
             Caption = 'Consumption (Amount)';
             FieldClass = FlowField;
         }
@@ -321,7 +324,8 @@ table 6014410 "NPR Item Group"
                                                                   "NPR Vendor No." = FIELD("Vendor Filter"),
                                                                   "Posting Date" = FIELD("Date Filter"),
                                                                   "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                  "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter")));
+                                                                  "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
+                                                                  "Location Code" = field("Location Filter")));
             Caption = 'Movement';
             FieldClass = FlowField;
         }
@@ -332,7 +336,8 @@ table 6014410 "NPR Item Group"
                                                                   "NPR Vendor No." = FIELD("Vendor Filter"),
                                                                   "Posting Date" = FIELD("Date Filter"),
                                                                   "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                  "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter")));
+                                                                  "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
+                                                                  "Location Code" = field("Location Filter")));
             Caption = 'Purchases (Qty.)';
             FieldClass = FlowField;
         }
@@ -344,7 +349,8 @@ table 6014410 "NPR Item Group"
                                                                           "Posting Date" = FIELD("Date Filter"),
                                                                           "NPR Vendor No." = FIELD("Vendor Filter"),
                                                                           "Salespers./Purch. Code" = FIELD("Salesperson Filter"),
-                                                                          "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter")));
+                                                                          "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
+                                                                          "Location Code" = field("Location Filter")));
             Caption = 'Purchases (LCY)';
             FieldClass = FlowField;
         }
@@ -401,7 +407,8 @@ table 6014410 "NPR Item Group"
                                                                           "NPR Vendor No." = FIELD("Vendor Filter"),
                                                                           "Posting Date" = FIELD("Date Filter"),
                                                                           "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                          "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter")));
+                                                                          "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
+                                                                          "Location Code" = field("Location Filter")));
             Caption = 'Inventory Value';
             Description = 'Lagerværdi';
             FieldClass = FlowField;
@@ -418,7 +425,7 @@ table 6014410 "NPR Item Group"
             Caption = 'Location Code';
             DataClassification = CustomerContent;
             Description = 'NPR5.48';
-            TableRelation = Location;
+            TableRelation = Location.code;
         }
         field(316; "Global Dimension 1 Code"; Code[20])
         {
@@ -467,6 +474,15 @@ table 6014410 "NPR Item Group"
             Description = 'NPR5.48';
             TableRelation = "Tariff Number";
         }
+
+        field(330; "Location Filter"; code[10])
+        {
+            Caption = 'Location Filter';
+            FieldClass = FlowFilter;
+            TableRelation = Location;
+
+        }
+
         field(500; "Used Goods Group"; Boolean)
         {
             Caption = 'Used Goods Group';
@@ -690,7 +706,6 @@ table 6014410 "NPR Item Group"
         NoSeriesLine: Record "No. Series Line";
         Text0001: Label 'NoSeries for itemgroup';
     begin
-        //OpretNrSerie
         RetailSetup.Get;
         if RetailSetup."Itemgroup Pre No. Serie" = '' then
             exit;
@@ -783,7 +798,6 @@ table 6014410 "NPR Item Group"
     var
         ItemGroup2: Record "NPR Item Group";
     begin
-        //Update Me
         ItemGroup."Main Item Group" := (ItemGroup."Parent Item Group No." = '');
         if ItemGroup."Main Item Group" then begin
             ItemGroup.Level := 0;
@@ -799,7 +813,6 @@ table 6014410 "NPR Item Group"
         end;
         ItemGroup.Modify;
 
-        //Update Children
         ItemGroup2.SetCurrentKey("Parent Item Group No.");
         ItemGroup2.SetRange("Parent Item Group No.", ItemGroup."No.");
         if ItemGroup2.FindSet then
