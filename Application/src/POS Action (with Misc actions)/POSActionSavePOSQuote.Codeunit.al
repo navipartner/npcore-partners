@@ -1,5 +1,20 @@
 codeunit 6151004 "NPR POS Action: SavePOSQuote"
 {
+    // NPR5.47/MHA /20181011  CASE 302636 Object created - POS Quote (Saved POS Sale)
+    // NPR5.48/MHA /20181129  CASE 336498 Added Customer Info
+    // NPR5.48/MHA /20181130  CASE 338208 Added POS Sales Data (.xml) functionality to fully back/restore POS Sale
+    // NPR5.48/MHA /20181206  CASE 338537 Added Publisher OnBeforeSaveAsQuote() in OnActionSaveAsQuote()
+    // NPR5.50/MHA /20190520  CASE 354507 Some Sale Line POS fields should be reset before delete is possible
+    // NPR5.51/MMV /20190820  CASE 364694 Handle EFT approvals
+    // NPR5.54/ALPO/20200203  CASE 364658 Part of the code moved from OnActionSaveAsQuote() to a separate global function CreatePOSQuote() to be able to call it from outside of the object
+    // NPR5.54/MMV /20200320 CASE 364340 Added explicit "Retail ID" fields
+    // NPR5.55/ALPO/20200720 CASE 391678 Record a cancelled sales ticket to POS Entry on Sale POS park
+
+
+    trigger OnRun()
+    begin
+    end;
+
     var
         Text000: Label 'Save POS Sale as POS Quote';
         Text001: Label 'POS Quote';
@@ -42,7 +57,9 @@ codeunit 6151004 "NPR POS Action: SavePOSQuote"
             Sender.RegisterTextParameter('ConfirmText', Text002);
             Sender.RegisterBooleanParameter('PrintAfterSave', false);
             Sender.RegisterTextParameter('PrintTemplate', '');
+            //-NPR5.48 [338208]
             Sender.RegisterBooleanParameter('FullBackup', false);
+            //+NPR5.48 [338208]
         end;
     end;
 
@@ -106,13 +123,40 @@ codeunit 6151004 "NPR POS Action: SavePOSQuote"
         POSSale.GetCurrentSale(SalePOS);
         SalePOS.Find;
 
-        CreatePOSQuote(SalePOS, POSQuoteEntry);
+        //-NPR5.54 [364658]-revoked
+        /*
+        //-NPR5.48 [338537]
+        OnBeforeSaveAsQuote(SalePOS);
+        //+NPR5.48 [338537]
+        InsertPOSQuoteEntry(SalePOS,POSQuoteEntry);
+        
+        SaleLinePOS.SETRANGE("Register No.",SalePOS."Register No.");
+        SaleLinePOS.SETRANGE("Sales Ticket No.",SalePOS."Sales Ticket No.");
+        IF SaleLinePOS.FINDSET THEN
+          REPEAT
+            InsertPOSQuoteLine(SaleLinePOS,POSQuoteEntry,LineNo);
+            //-NPR5.50 [354507]
+            IF SaleLinePOS."EFT Approved" OR SaleLinePOS."From Selection" THEN BEGIN
+              SaleLinePOS."EFT Approved" := FALSE;
+              SaleLinePOS."From Selection" := FALSE;
+              SaleLinePOS.MODIFY;
+            END;
+            //+NPR5.50 [354507]
+            SaleLinePOS.DELETE(TRUE);
+          UNTIL SaleLinePOS.NEXT = 0;
+        
+        SalePOS.DELETE(TRUE);
+        */
+        //+NPR5.54 [364658]-revoked
+        CreatePOSQuote(SalePOS, POSQuoteEntry);  //NPR5.54 [364658]
 
+        //-NPR5.55 [391678]
         Commit;
         Clear(POSActionCancelSale);
         POSActionCancelSale.SetAlternativeDescription(StrSubstNo(SaleWasParkedTxt, CurrentDateTime));
         if not POSActionCancelSale.CancelSale(POSSession) then
             Error(ErrorCancelling);
+        //+NPR5.55 [391678]
 
         Commit;
         POSSale.SelectViewForEndOfSale(POSSession);
@@ -138,6 +182,7 @@ codeunit 6151004 "NPR POS Action: SavePOSQuote"
         SaleLinePOS: Record "NPR Sale Line POS";
         LineNo: Integer;
     begin
+        //-NPR5.54 [364658]
         OnBeforeSaveAsQuote(SalePOS);
 
         InsertPOSQuoteEntry(SalePOS, POSQuoteEntry);
@@ -154,6 +199,9 @@ codeunit 6151004 "NPR POS Action: SavePOSQuote"
                 end;
                 SaleLinePOS.Delete(true);
             until SaleLinePOS.Next = 0;
+
+        //SalePOS.DELETE(TRUE);  //NPR5.55 [391678]-revoked
+        //+NPR5.54 [364658]
     end;
 
     local procedure InsertPOSQuoteEntry(SalePOS: Record "NPR Sale POS"; var POSQuoteEntry: Record "NPR POS Quote Entry")
@@ -169,16 +217,22 @@ codeunit 6151004 "NPR POS Action: SavePOSQuote"
         POSQuoteEntry."Register No." := SalePOS."Register No.";
         POSQuoteEntry."Sales Ticket No." := SalePOS."Sales Ticket No.";
         POSQuoteEntry."Salesperson Code" := SalePOS."Salesperson Code";
+        //-NPR5.48 [336498]
         POSQuoteEntry."Customer Type" := SalePOS."Customer Type";
         POSQuoteEntry."Customer No." := SalePOS."Customer No.";
         POSQuoteEntry."Customer Price Group" := SalePOS."Customer Price Group";
         POSQuoteEntry."Customer Disc. Group" := SalePOS."Customer Disc. Group";
         POSQuoteEntry.Attention := SalePOS."Contact No.";
         POSQuoteEntry.Reference := SalePOS.Reference;
+        //-NPR5.54 [364340]
         POSQuoteEntry."Retail ID" := SalePOS."Retail ID";
+        //+NPR5.54 [364340]
+        //+NPR5.48 [336498]
+        //-NPR5.48 [338208]
         POSQuoteMgt.POSSale2Xml(SalePOS, XmlDoc);
         POSQuoteEntry."POS Sales Data".CreateOutStream(OutStr, TEXTENCODING::UTF8);
         XmlDoc.WriteTo(OutStr);
+        //+NPR5.48 [338208]
         POSQuoteEntry.Insert(true);
     end;
 
@@ -191,9 +245,11 @@ codeunit 6151004 "NPR POS Action: SavePOSQuote"
         POSQuoteLine.Init;
         POSQuoteLine."Quote Entry No." := POSQuoteEntry."Entry No.";
         POSQuoteLine."Line No." := LineNo;
+        //-NPR5.48 [338208]
         POSQuoteLine."Sale Line No." := SaleLinePOS."Line No.";
         POSQuoteLine."Sale Date" := SaleLinePOS.Date;
         POSQuoteLine."Sale Type" := SaleLinePOS."Sale Type";
+        //+NPR5.48 [338208]
         POSQuoteLine.Type := SaleLinePOS.Type;
         POSQuoteLine."No." := SaleLinePOS."No.";
         POSQuoteLine."Variant Code" := SaleLinePOS."Variant Code";
@@ -205,14 +261,20 @@ codeunit 6151004 "NPR POS Action: SavePOSQuote"
         POSQuoteLine."Unit Price" := SaleLinePOS."Unit Price";
         POSQuoteLine.Amount := SaleLinePOS.Amount;
         POSQuoteLine."Amount Including VAT" := SaleLinePOS."Amount Including VAT";
+        //-NPR5.48 [336498]
         POSQuoteLine."Customer Price Group" := SaleLinePOS."Customer Price Group";
+        //+NPR5.48 [336498]
         POSQuoteLine."Discount Type" := SaleLinePOS."Discount Type";
         POSQuoteLine."Discount %" := SaleLinePOS."Discount %";
         POSQuoteLine."Discount Amount" := SaleLinePOS."Discount Amount";
         POSQuoteLine."Discount Code" := SaleLinePOS."Discount Code";
         POSQuoteLine."Discount Authorised by" := SaleLinePOS."Discount Authorised by";
+        //-NPR5.51 [364694]
         POSQuoteLine."EFT Approved" := SaleLinePOS."EFT Approved";
+        //+NPR5.51 [364694]
+        //-NPR5.54 [364340]
         POSQuoteLine."Line Retail ID" := SaleLinePOS."Retail ID";
+        //+NPR5.54 [364340]
         POSQuoteLine.Insert(true);
     end;
 
