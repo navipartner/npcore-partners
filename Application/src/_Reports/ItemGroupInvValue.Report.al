@@ -1,12 +1,5 @@
 report 6014448 "NPR Item Group Inv. Value"
 {
-    // NPK1.00/20140415/TR Case 176200 : Report converted. Copied from retail 12.
-    // NOTE : I changed the textbox test to PurchaseQuantity since it is being used in textbox96 's expressions
-    //         + report expression for textbox98 to SaleQty instead of SalesQty
-    //         + report exp for textbox 105 from test to PurchaseQuantity
-    // NPR5.29/JLK /20161206  CASE 251757 Report variables and text constents changed for ENU wordings
-    //                                    Cleared unused variables and Labels
-    // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Item Group Inventory Value.rdlc';
 
@@ -19,7 +12,7 @@ report 6014448 "NPR Item Group Inv. Value"
         dataitem("Item Group"; "NPR Item Group")
         {
             CalcFields = "Sales (LCY)", "Consumption (Amount)";
-            RequestFilterFields = "No.", "Date Filter", "Vendor Filter", "Global Dimension 1 Filter";
+            RequestFilterFields = "No.", "Date Filter", "Vendor Filter", "Global Dimension 1 Filter", "Location Filter";
             column(CompanyInfoName; CompanyInfo.Name)
             {
             }
@@ -85,6 +78,7 @@ report 6014448 "NPR Item Group Inv. Value"
                 ItemGroupLast.SetFilter("Date Filter", '..%1', GetRangeMax("Date Filter"));
                 ItemGroupLast.SetFilter("Global Dimension 1 Filter", GetFilter("Global Dimension 1 Filter"));
                 ItemGroupLast.SetFilter("Vendor Filter", GetFilter("Vendor Filter"));
+                ItemGroupLast.SETFILTER("Location Filter", GETFILTER("Location Filter"));
                 ItemGroupLast.CalcFields(Movement, "Inventory Value");
                 ItemGroupMovementAtEndOf := ItemGroupLast.Movement;
                 ItemGroupInventoryAtEndOf := ItemGroupLast."Inventory Value";
@@ -93,6 +87,7 @@ report 6014448 "NPR Item Group Inv. Value"
                 ItemGroupFirst.SetFilter("Date Filter", '..%1', GetRangeMin("Date Filter") - 1);
                 ItemGroupFirst.SetFilter("Global Dimension 1 Filter", GetFilter("Global Dimension 1 Filter"));
                 ItemGroupFirst.SetFilter("Vendor Filter", GetFilter("Vendor Filter"));
+                ItemGroupFirst.SETFILTER("Location Filter", GETFILTER("Location Filter"));
                 ItemGroupFirst.CalcFields(Movement, "Inventory Value");
                 ItemGroupMovementAtStartOf := ItemGroupFirst.Movement;
                 ItemGroupInventoryAtStartOf := ItemGroupFirst."Inventory Value";
@@ -137,14 +132,7 @@ report 6014448 "NPR Item Group Inv. Value"
     begin
         CompanyInfo.Get;
         CompanyInfo.CalcFields(Picture);
-        //-NPR5.39
-        // Object.SETRANGE(ID, 6014448);
-        // Object.SETRANGE(Type, 3);
-        // Object.FIND('-');
-        //+NPR5.39
-        //-NPR5.29
         GeneralLedgerSetup.Get;
-        //+NPR5.29
     end;
 
     var
