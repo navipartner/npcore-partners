@@ -1,8 +1,5 @@
 page 6014627 "NPR Hardware Connector"
 {
-    // NPR5.51/MMV /20190731 CASE 360975 Created object
-    // NPR5.53/MMV /20191111 CASE 375532 Added caption
-
     Caption = 'Hardware Connector';
     Editable = false;
     PageType = StandardDialog;
@@ -45,18 +42,14 @@ page 6014627 "NPR Hardware Connector"
         }
     }
 
-    actions
-    {
-    }
-
     var
         JavaScriptBridgeManagement: Codeunit "NPR JavaScript Bridge Mgt.";
-        html: Text;
+        AutoClosed: Boolean;
+        contentGlobal: JsonObject;
         css: Text;
+        html: Text;
         js: Text;
         methodGlobal: Text;
-        contentGlobal: JsonObject;
-        AutoClosed: Boolean;
         PageCaption: Text;
 
     procedure SetModule(htmlIn: Text; cssIn: Text; jsIn: Text; caption: Text)
@@ -64,9 +57,7 @@ page 6014627 "NPR Hardware Connector"
         html := htmlIn;
         css := cssIn;
         js := jsIn;
-        //-NPR5.53 [375532]
         PageCaption := caption;
-        //+NPR5.53 [375532]
     end;
 
     procedure GetResponse(var methodOut: Text; var contentOut: JsonObject)
