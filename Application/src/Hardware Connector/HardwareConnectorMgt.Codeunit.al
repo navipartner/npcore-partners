@@ -8,18 +8,17 @@ codeunit 6014587 "NPR Hardware Connector Mgt."
     // https://navipartner.visualstudio.com/Hardware%20Connector
     // 
     // TODO: Move the modal flow to a simple custom add-in in AL with the javascript nicely bundled inside, instead of using the bridge (which includes jquery) and minified js in a string.
-
     var
-        PAGE_CLOSED: Label 'The hardware connector page does not work if you manually close it. Please try again and keep it open.';
-        SOCKET_ERROR: Label 'Connection failure with hardware connector on the local machine.\Please verify that it is running and try again.';
-        PRINT_CAPTION: Label 'Printing...';
+        SocketErr: Label 'Connection failure with hardware connector on the local machine.\Please verify that it is running and try again.';
+        PrintLbl: Label 'Printing...';
+        ClosedPageErr: Label 'The hardware connector page does not work if you manually close it. Please try again and keep it open.';
 
     procedure SendRawPrintRequest(PrinterName: Text; PrintBytes: Text; TargetCodepage: Integer)
     var
-        Content: JsonObject;
-        Success: Boolean;
-        Encoding: TextEncoding;
         Base64: Codeunit "Base64 Convert";
+        Success: Boolean;
+        Content: JsonObject;
+        Encoding: TextEncoding;
     begin
         PrintBytes := Base64.ToBase64(PrintBytes, TextEncoding::Windows, TargetCodepage);
 
@@ -27,28 +26,27 @@ codeunit 6014587 "NPR Hardware Connector Mgt."
         Content.Add('PrintJob', PrintBytes);
 
         //Open modal dialog page using JS bridge to invoke socket client.
-        Commit;
+        Commit();
 
-        if not TrySendGenericRequest('RawPrint', Content, PRINT_CAPTION) then
+        if not TrySendGenericRequest('RawPrint', Content, PrintLbl) then
             Message(GetLastErrorText);
     end;
 
     procedure SendRawBytesPrintRequest(PrinterName: Text; var TempBlob: Codeunit "Temp Blob")
     var
-        Content: JsonObject;
+        Base64: Codeunit "Base64 Convert";
         Success: Boolean;
         InStream: InStream;
+        Content: JsonObject;
         PrintBytes: Text;
-        Base64: Codeunit "Base64 Convert";
     begin
-        //-NPR5.53 [349793]
         TempBlob.CreateInStream(InStream);
         PrintBytes := Base64.ToBase64(InStream);
 
         Content.Add('PrinterName', PrinterName);
         Content.Add('PrintJob', PrintBytes);
 
-        if not TrySendGenericRequest('RawPrint', Content, PRINT_CAPTION) then
+        if not TrySendGenericRequest('RawPrint', Content, PrintLbl) then
             Message(GetLastErrorText);
     end;
 
@@ -72,14 +70,13 @@ codeunit 6014587 "NPR Hardware Connector Mgt."
         if not TrySendGenericRequest(RequestType, Content, WindowCaption) then
             Message(GetLastErrorText);
     end;
-
     // Auxilliary functions
 
     [TryFunction]
     local procedure TrySendGenericRequest(Handler: Text; JsonContent: JsonObject; Caption: Text)
     var
-        POSSession: Codeunit "NPR POS Session";
         POSActionHardwareConnect: Codeunit "NPR POS Action: HardwareConn.";
+        POSSession: Codeunit "NPR POS Session";
         Content: Text;
     begin
         JsonContent.WriteTo(Content);
@@ -95,10 +92,10 @@ codeunit 6014587 "NPR Hardware Connector Mgt."
     local procedure SendRequestOutsidePOS(Handler: Text; Content: Text; Caption: Text)
     var
         HardwareConnector: Page "NPR Hardware Connector";
-        ResponseMethod: Text;
         Success: Boolean;
         ResponseOut: JsonObject;
         DummyJsonToken: JsonToken;
+        ResponseMethod: Text;
     begin
         HardwareConnector.SetModule('', '',
           GetSocketClientScript() +
@@ -116,9 +113,9 @@ codeunit 6014587 "NPR Hardware Connector Mgt."
             HardwareConnector.GetResponse(ResponseMethod, ResponseOut);
 
             if ResponseMethod = 'error' then
-                Error(SOCKET_ERROR);
+                Error(SocketErr);
         end else begin
-            Error(PAGE_CLOSED);
+            Error(ClosedPageErr);
         end;
 
         Success := (ResponseOut.Get('success', DummyJsonToken));
@@ -126,13 +123,6 @@ codeunit 6014587 "NPR Hardware Connector Mgt."
             ResponseOut.Get('errorText', DummyJsonToken);
             Error(DummyJsonToken.AsValue().AsText());
         end;
-    end;
-
-    local procedure EscapeJSON(Value: Text): Text
-    var
-        JValue: DotNet NPRNetJValue;
-    begin
-        exit(JValue.JValue(Value).ToString());
     end;
 
     procedure GetSocketClientScript(): Text
