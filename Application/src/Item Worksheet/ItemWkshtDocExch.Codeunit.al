@@ -1,40 +1,5 @@
 codeunit 6060056 "NPR Item Wksht. Doc. Exch."
 {
-    procedure GetItemWorksheetDocExchange(VendorNo: Code[20]; var ItemWorksheet: Record "NPR Item Worksheet"; var AutomProcess: Boolean; var AutomQuery: Boolean): Boolean
-    var
-        DocExchSetup: Record "NPR Doc. Exch. Setup";
-        DocExchPath: Record "NPR Doc. Exchange Path";
-    begin
-        DocExchPath.SetRange(Direction, DocExchPath.Direction::Import);
-        DocExchPath.SetRange(Type, DocExchPath.Type::Vendor);
-        DocExchPath.SetRange("No.", VendorNo);
-        if DocExchPath.FindFirst then
-            if ItemWorksheet.Get(DocExchPath."Unmatched Items Wsht. Template", DocExchPath."Unmatched Items Wsht. Name") then begin
-                AutomProcess := DocExchPath."Autom. Create Unmatched Items";
-                AutomQuery := DocExchPath."Autom. Query Item Information";
-                exit(true);
-            end;
-
-        DocExchPath.Reset;
-        DocExchPath.SetRange(Direction, DocExchPath.Direction::Import);
-        DocExchPath.SetRange(Type, DocExchPath.Type::All);
-        if DocExchPath.FindFirst then
-            if ItemWorksheet.Get(DocExchPath."Unmatched Items Wsht. Template", DocExchPath."Unmatched Items Wsht. Name") then begin
-                AutomProcess := DocExchPath."Autom. Create Unmatched Items";
-                AutomQuery := DocExchPath."Autom. Query Item Information";
-                exit(true);
-            end;
-
-        if not DocExchSetup.Get then
-            exit(false);
-        if ItemWorksheet.Get(DocExchSetup."Unmatched Items Wsht. Template", DocExchSetup."Unmatched Items Wsht. Name") then begin
-            AutomProcess := DocExchSetup."Autom. Create Unmatched Items";
-            AutomQuery := DocExchSetup."Autom. Query Item Information";
-            exit(true);
-        end;
-        exit(false);
-    end;
-
     procedure InsertItemWorksheetLine(ItemWorksheet: Record "NPR Item Worksheet"; var ItemWorksheetLine: Record "NPR Item Worksheet Line"; VendorNo: Code[20]; VendorItemNo: Text; VendorItemDescription: Text; ItemGroupText: Text; DirectUnitCost: Decimal)
     var
         ItemGroup: Record "NPR Item Group";
@@ -210,60 +175,6 @@ codeunit 6060056 "NPR Item Wksht. Doc. Exch."
                             end;
                         end;
                     until ErrorMessage2.Next = 0;
-                if GetItemWorksheetDocExchange(VendorNo, ItemWorksheet, AutomaticProcessing, AutomaticQuery) then begin
-                    if not ItemWorksheetExists(ItemWorksheet, ItemWorksheetLine, VendorNo, VendorItemNo) then begin
-                        InsertItemWorksheetLine(
-                            ItemWorksheet, ItemWorksheetLine, VendorNo, VendorItemNo, VendorItemDescription, ItemGroupText, DirectUnitCost);
-                        ItemWorksheetLine.Get(
-                            ItemWorksheetLine."Worksheet Template Name", ItemWorksheetLine."Worksheet Name", ItemWorksheetLine."Line No.");
-                        ErrorMessage2.Reset;
-                        ErrorMessage2.SetRange("Context Record ID", IncomingDocument.RecordId);
-                        if ErrorMessage2.FindSet then
-                            repeat
-                                if Format(ErrorMessage2."Record ID") = Format(ErrorMessage."Record ID") then begin
-                                    case ErrorMessage2."Table Number" of
-                                        DATABASE::"NPR Item Worksheet Line":
-                                            begin
-                                                RecRef.Get(ItemWorksheetLine.RecordId);
-                                                FldRef := RecRef.Field(ErrorMessage2."Field Number");
-                                                if ConfigValidateMgt.EvaluateValue(FldRef, ErrorMessage2.Description, false) = '' then
-                                                    RecRef.Modify;
-                                            end;
-                                    end;
-                                end;
-                            until ErrorMessage2.Next = 0;
-                        InsertItemWorksheetAttributeValues(ItemWorksheetLine);
-                        InsertItemWorksheetVariantLine(IncomingDocument, ItemWorksheetLine);
-                        if AutomaticQuery then
-                            ItemWorksheetLine.CreateQueryItemInformation(false);
-                        if AutomaticProcessing then begin
-                            ItemWorksheetLine.Get(
-                                ItemWorksheetLine."Worksheet Template Name",
-                                ItemWorksheetLine."Worksheet Name",
-                                ItemWorksheetLine."Line No.");
-                            ItemNo := ItemWorksheetLine."Item No.";
-                            ItemWorksheetLine.SetRecFilter;
-                            Clear(ItemWshtRegisterBatch);
-                            ItemWshtRegisterBatch.Run(ItemWorksheetLine);
-                            if ItemWshtRegisterBatch.Run(ItemWorksheetLine) then begin
-                                ErrorMessage.Validate(Description,
-                                    StrSubstNo(ItemsCreatedErr, ItemWorksheetLine.FieldCaption("Vendor Item No."), VendorItemNo, ItemNo));
-                                if Item.Get(ItemNo) then begin
-                                    ErrorMessage.Validate("Record ID", Item.RecordId);
-                                    ErrorMessage.Validate("Message Type", ErrorMessage."Message Type"::Warning);
-                                end;
-                            end else begin
-                                ErrorMessage.Validate(Description, StrSubstNo(ItemCouldNotBeMatchedErr, ItemWorksheetLine.FieldCaption("Vendor Item No."), VendorItemNo, ItemWorksheetLine."Worksheet Template Name", ItemWorksheetLine."Worksheet Name"));
-                            end;
-                        end else begin
-                            ErrorMessage.Validate(Description, StrSubstNo(ItemCouldNotBeMatchedErr, ItemWorksheetLine.FieldCaption("Vendor Item No."), VendorItemNo, ItemWorksheetLine."Worksheet Template Name", ItemWorksheetLine."Worksheet Name"));
-                        end;
-                    end else begin
-                        ErrorMessage.Validate(Description, StrSubstNo(ItemWSLineAlreadyCreatedErr, ItemWorksheetLine.FieldCaption("Vendor Item No."), VendorItemNo, ItemWorksheetLine."Worksheet Template Name", ItemWorksheetLine."Worksheet Name"));
-                    end;
-                end else begin
-                    ErrorMessage.Validate(Description, StrSubstNo(ItemWSLinesNotCreatedErr, ItemWorksheetLine.FieldCaption("Vendor Item No."), VendorItemNo, ItemWorksheetLine."Worksheet Template Name", ItemWorksheetLine."Worksheet Name"));
-                end;
                 ErrorMessage.Modify(true);
             until ErrorMessage.Next = 0;
         ErrorMessage.Reset;

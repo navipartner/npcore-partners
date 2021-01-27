@@ -489,13 +489,6 @@ page 6151245 "NPR NP Retail Admin Setup RC"
                     ApplicationArea = All;
                     ToolTip = 'Executes the Lookup Templates action';
                 }
-                action("Doc. Exchange Paths")
-                {
-                    Caption = 'Doc. Exchange Paths';
-                    RunObject = Page "NPR Doc. Exchange Paths";
-                    ApplicationArea = All;
-                    ToolTip = 'Executes the Doc. Exchange Paths action';
-                }
                 action("POS Stargate Packages")
                 {
                     Caption = 'POS Stargate Packages';
