@@ -793,7 +793,7 @@ codeunit 6151413 "NPR Magento Sales Order Mgt."
                 end;
         end;
 
-        if SalesLine.Get(SalesHeader."Document Type", LineNo) then
+        if SalesLine.Get(SalesHeader."Document Type", SalesHeader."No.", LineNo) then
             OnAfterInsertSalesLine(CurrImportType, CurrImportEntry, XmlElement, SalesHeader, SalesLine);
     end;
 
