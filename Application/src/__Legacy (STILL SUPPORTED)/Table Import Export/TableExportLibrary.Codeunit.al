@@ -147,7 +147,6 @@ codeunit 6014448 "NPR Table Export Library"
         IsDialogOpen: Boolean;
         FileMgt: Codeunit "File Management";
         ToFile: Text;
-        Envfunc: Codeunit "NPR Environment Mgt.";
         ServerFile: Text;
         FieldStartDelimiterSet: Boolean;
         FieldEndDelimiterSet: Boolean;
@@ -367,38 +366,11 @@ codeunit 6014448 "NPR Table Export Library"
     end;
 
     procedure OpenDotNetStream()
-    var
-        Environment: Codeunit "NPR Environment Mgt.";
     begin
-        //ServerFile :=FileMgt.ServerTempFileName('txt');
-        //OutFile.CREATE( ServerFile);
-        //OutFile.CREATEOUTSTREAM(OStream);
-
-
-        //IF FILE.ERASE(FileName) THEN;
-        //FileName :=  FileMgt.ServerTempFileName('txt') ;
-        //OutFile.TEXTMODE(FALSE);
-        ///OutFile.CREATE(FileName);
-        //OutFile.CREATEOUTSTREAM(OStream);
-
-
-        //-NPR5.26 [248465]
-        //DotNetFilePath := 'C:\temp\TempExport.txt';
         DotNetFilePath := FileMgt.ServerTempFileName('txt');
-        //-NPR5.26 [248465]
-
-
         SetDefaultValues;
-
         DotNetEncoding := DotNetEncoding.GetEncoding(OutputEncoding);
-
         DotNetStream := DotNetStream.StreamWriter(DotNetFilePath, false, DotNetEncoding);
-
-
-
-        //OutFile.CLOSE();
-
-        //FileMgt.DownloadToFile(FileName ,DotNetFilePath);
     end;
 
     local procedure CloseFileForExport()

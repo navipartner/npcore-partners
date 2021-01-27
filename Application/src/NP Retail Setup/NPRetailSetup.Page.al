@@ -63,99 +63,6 @@ page 6150613 "NPR NP Retail Setup"
                     ToolTip = 'Specifies the value of the Default POS Posting Profile field';
                 }
             }
-            group(Environment)
-            {
-                Caption = 'Environment';
-                grid(Control6014418)
-                {
-                    Editable = false;
-                    GridLayout = Rows;
-                    ShowCaption = false;
-                    group("Database Name")
-                    {
-                        Caption = 'Database Name';
-                        field("Environment Database Name"; "Environment Database Name")
-                        {
-                            ApplicationArea = All;
-                            Caption = 'Stored';
-                            Editable = false;
-                            ToolTip = 'Specifies the value of the Stored field';
-                        }
-                        field("ActiveSession.""Database Name"""; ActiveSession."Database Name")
-                        {
-                            ApplicationArea = All;
-                            Caption = 'Current';
-                            Editable = false;
-                            ToolTip = 'Specifies the value of the Current field';
-                        }
-                    }
-                    group("Company Name")
-                    {
-                        Caption = 'Company Name';
-                        field("Environment Company Name"; "Environment Company Name")
-                        {
-                            ApplicationArea = All;
-                            Caption = 'Stored';
-                            Editable = false;
-                            ShowCaption = false;
-                            ToolTip = 'Specifies the value of the Stored field';
-                        }
-                        field(CURRENTCOMPANY; CurrentCompany)
-                        {
-                            ApplicationArea = All;
-                            Caption = 'Current';
-                            Editable = false;
-                            ShowCaption = false;
-                            ToolTip = 'Specifies the value of the Current field';
-                        }
-                    }
-                    group("Tenant Name")
-                    {
-                        Caption = 'Tenant Name';
-                        field("Environment Tenant Name"; "Environment Tenant Name")
-                        {
-                            ApplicationArea = All;
-                            Caption = 'Stored';
-                            Editable = false;
-                            ShowCaption = false;
-                            ToolTip = 'Specifies the value of the Stored field';
-                        }
-                        field(TENANTID; TenantId)
-                        {
-                            ApplicationArea = All;
-                            Caption = 'Current';
-                            Editable = false;
-                            ShowCaption = false;
-                            ToolTip = 'Specifies the value of the Current field';
-                        }
-                    }
-                }
-                group(Settings)
-                {
-                    Caption = 'Settings';
-                    field("Environment Type"; "Environment Type")
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the Environment Type field';
-                    }
-                    field("Environment Verified"; "Environment Verified")
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the Environment Verified field';
-                    }
-                    field("Environment Template"; "Environment Template")
-                    {
-                        ApplicationArea = All;
-                        Importance = Additional;
-                        ToolTip = 'Specifies the value of the Environment Template field';
-                    }
-                    field("Enable Client Diagnostics"; "Enable Client Diagnostics")
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the Enable Client Diagnostics field';
-                    }
-                }
-            }
             group(Legal)
             {
                 field("Standard Conditions"; "Standard Conditions")
@@ -370,7 +277,7 @@ page 6150613 "NPR NP Retail Setup"
                         Caption = 'Upgrade Audit Roll to POS Entry';
                         ApplicationArea = All;
                         ToolTip = 'Executes the Upgrade Audit Roll to POS Entry action';
-                        Image = Action; 
+                        Image = Action;
 
                         trigger OnAction()
                         var

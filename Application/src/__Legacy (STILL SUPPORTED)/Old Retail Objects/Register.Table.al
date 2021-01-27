@@ -920,7 +920,6 @@ table 6014401 "NPR Register"
     var
         Text1060003: Label 'Register %1 cannot be renamed!';
         RetailSetup: Record "NPR Retail Setup";
-        Environment: Codeunit "NPR Environment Mgt.";
         DimMgt: Codeunit DimensionManagement;
         PostCode: Record "Post Code";
         Text1060006: Label 'Acount No. %1 is used for  %2.';

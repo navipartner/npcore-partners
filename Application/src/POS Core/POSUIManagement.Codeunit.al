@@ -174,34 +174,6 @@ codeunit 6150702 "NPR POS UI Management"
             MenuButtonObj.Content.Add('filterRegister', MenuButton."Register No.");
     end;
 
-    procedure InitializeWatermark()
-    var
-        NPRetailSetup: Record "NPR NP Retail Setup";
-        ActiveSession: Record "Active Session";
-    begin
-        // a) the first parameter is a watermark image, you can set one the same way logo is set
-        // b) the second parameter is a watermark text, you can pass whatever you want
-        // If image is present, text won't be shown.
-
-        if (not NPRetailSetup.Get()) then
-            exit;
-
-        case NPRetailSetup."Environment Type" of
-            NPRetailSetup."Environment Type"::DEMO:
-                FrontEnd.ConfigureWatermark('', WaterMarkDemo);
-            NPRetailSetup."Environment Type"::DEV:
-                begin
-                    ActiveSession.SetFilter("Session ID", '=%1', SessionId);
-                    if (ActiveSession.FindFirst()) then
-                        FrontEnd.ConfigureWatermark('', ConvertStr(ActiveSession."Database Name", '_', ' '));
-                end;
-            NPRetailSetup."Environment Type"::TEST:
-                FrontEnd.ConfigureWatermark('', WaterMarkTest);
-            NPRetailSetup."Environment Type"::PROD:
-                ;
-        end;
-    end;
-
     procedure InitializeTheme(Register: Record "NPR Register")
     var
         POSTheme: Record "NPR POS Theme";
