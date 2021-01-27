@@ -908,7 +908,7 @@ codeunit 6014464 "NPR E-mail Doc. Mgt."
             exit;
 
         POSEntry.SetRange("Document No.", SalePOS."Sales Ticket No.");
-        POSEntry.SetFilter("Entry Type", '%1|%2', POSEntry."Entry Type"::"Direct Sale", POSEntry."Entry Type"::"Credit Sale");
+        POSEntry.SetFilter("Entry Type", '%1|%2|%3', POSEntry."Entry Type"::"Direct Sale", POSEntry."Entry Type"::"Credit Sale", POSEntry."Entry Type"::Other);
         if not POSEntry.FindFirst() then
             exit;
 
