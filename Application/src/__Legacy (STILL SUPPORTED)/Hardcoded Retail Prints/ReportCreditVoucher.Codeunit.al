@@ -157,7 +157,6 @@ codeunit 6014563 "NPR Report - Credit Voucher"
         Printer.AddTextField(2, 2, Format(POSStore."Phone No."));
         Printer.AddTextField(1, 0, Text10600003);
         Printer.AddTextField(2, 2, Format(POSStore."Fax No."));
-        Printer.AddLine(Text10600001 + Format(Register."VAT No."));
 
         Printer.SetFont('B21');
         Printer.SetBold(true);

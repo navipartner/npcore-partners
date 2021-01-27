@@ -307,6 +307,9 @@ table 6014401 "NPR Register"
         {
             Caption = 'Connected to Server';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(256; Name; Text[50])
         {
@@ -362,31 +365,49 @@ table 6014401 "NPR Register"
         {
             Caption = 'Giro No.';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(263; "Bank Name"; Text[50])
         {
             Caption = 'Bank Name';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(264; "Bank Registration No."; Text[20])
         {
             Caption = 'Bank Registration No.';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(265; "Bank Account No."; Text[30])
         {
             Caption = 'Bank Account No.';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(266; "Automatic Payment No."; Text[20])
         {
             Caption = 'Automatic Payment No.';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(267; "VAT No."; Text[20])
         {
             Caption = 'VAT No.';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(268; "E-mail"; Text[80])
         {
@@ -434,51 +455,81 @@ table 6014401 "NPR Register"
             DataClassification = CustomerContent;
             OptionCaption = 'NP Config,Register,Comment Line';
             OptionMembers = "NP Config",Register,Comment;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(301; "Sales Ticket Line Text1"; Code[50])
         {
             Caption = 'Sales Ticket Line Text1';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(302; "Sales Ticket Line Text2"; Code[50])
         {
             Caption = 'Sales Ticket Line Text2';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(303; "Sales Ticket Line Text3"; Code[50])
         {
             Caption = 'Sales Ticket Line Text3';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(304; "Sales Ticket Line Text4"; Code[50])
         {
             Caption = 'Sales Ticket Line Text 4';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(305; "Sales Ticket Line Text5"; Code[50])
         {
             Caption = 'Sales Ticket Line Text 5';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(306; "Sales Ticket Line Text6"; Code[50])
         {
             Caption = 'Sales Ticket Line Text6';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(307; "Sales Ticket Line Text7"; Code[50])
         {
             Caption = 'Sales Ticket Line Text7';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(308; "Sales Ticket Line Text8"; Code[50])
         {
             Caption = 'Sales Ticket Line Text8';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(309; "Sales Ticket Line Text9"; Code[50])
         {
             Caption = 'Sales Ticket Line Text9';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(316; "Global Dimension 1 Code"; Code[20])
         {
@@ -761,6 +812,9 @@ table 6014401 "NPR Register"
             Caption = 'Skip Infobox Update in Sale';
             DataClassification = CustomerContent;
             Description = 'NPR5.28';
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(850; "VAT Customer No."; Code[20])
         {
@@ -776,6 +830,9 @@ table 6014401 "NPR Register"
             DataClassification = CustomerContent;
             OptionCaption = 'Automatic,Quick Buttons,Normal Numeric,Never';
             OptionMembers = Automatic,Quick,"Normal Numeric",Never;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(860; "Touch Screen Customerclub"; Option)
         {
@@ -783,6 +840,9 @@ table 6014401 "NPR Register"
             DataClassification = CustomerContent;
             OptionCaption = 'Functions,Invoice Customer,Contact';
             OptionMembers = Functions,"Invoice Customer",Contact;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(865; "Touch Screen Connected"; Boolean)
         {
@@ -799,11 +859,17 @@ table 6014401 "NPR Register"
         {
             Caption = 'Touch Screen Auto Unwrap If Single';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(880; "Touch Screen Login autopopup"; Boolean)
         {
             Caption = 'Login - Auto popup';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(885; "Touch Screen Terminal Offline"; Code[10])
         {
@@ -908,8 +974,6 @@ table 6014401 "NPR Register"
         RetailTableCode: Codeunit "NPR Retail Table Code";
     begin
         RetailTableCode.RegisterCheckNo("Register No.");
-
-        "Connected To Server" := true;
     end;
 
     trigger OnRename()
@@ -1022,14 +1086,6 @@ table 6014401 "NPR Register"
         Register."Register No." := RegNo;
         Register."Closing Cash" := Primo;
         Register."Opening Cash" := Primo;
-        if CompInf.Get then begin
-            Register."Giro No." := CompInf."Giro No.";
-            Register."Bank Name" := CompInf."Bank Name";
-            Register."Bank Registration No." := CompInf."Bank Branch No.";
-            Register."Bank Account No." := CompInf."Bank Account No.";
-            Register."Automatic Payment No." := CompInf."Payment Routing No.";
-            Register."VAT No." := CompInf."VAT Registration No.";
-        end;
 
         RetailSetup.Get();
         if RetailSetup."Payment Type By Register" then

@@ -158,7 +158,6 @@ codeunit 6014561 "NPR Report - Gift Voucher"
         Printer.AddLine(POSStore."Post Code" + ' ' + POSStore.City);
         Printer.AddLine(Text10600001 + Format(POSStore."Phone No."));
         Printer.AddLine(Text10600012 + Format(POSStore."E-mail"));
-        Printer.AddLine(Text10600003 + Format(Register."VAT No."));
 
         Printer.SetFont('B21');
         Printer.SetBold(true);

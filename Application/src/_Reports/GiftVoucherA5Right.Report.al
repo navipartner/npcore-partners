@@ -37,9 +37,6 @@ report 6014438 "NPR Gift Voucher A5 Right"
                 column(FaxText; FaxText)
                 {
                 }
-                column(VAT_Register; Format(Register."VAT No."))
-                {
-                }
                 column(Email_Register; POSStore."E-mail")
                 {
                 }

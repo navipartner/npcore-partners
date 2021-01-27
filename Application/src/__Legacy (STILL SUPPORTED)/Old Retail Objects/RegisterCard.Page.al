@@ -58,11 +58,6 @@ page 6014406 "NPR Register Card"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Return Payment Type field';
                 }
-                field("Connected To Server"; Rec."Connected To Server")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Connected to Server field';
-                }
                 field(Status; Rec.Status)
                 {
                     ApplicationArea = All;
@@ -105,137 +100,6 @@ page 6014406 "NPR Register Card"
                         ApplicationArea = All;
                         Editable = FieldDisplay2;
                         ToolTip = 'Specifies the value of the Display 2 field';
-                    }
-                }
-            }
-            group(Contact)
-            {
-                Caption = 'Contact';
-                group(Control6150669)
-                {
-                    ShowCaption = false;
-                    field("Bank Name"; Rec."Bank Name")
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the Bank Name field';
-                    }
-                    field("Bank Registration No."; Rec."Bank Registration No.")
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the Bank Registration No. field';
-                    }
-                    field("Bank Account No."; Rec."Bank Account No.")
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the Bank Account No. field';
-                    }
-                    field("Automatic Payment No."; Rec."Automatic Payment No.")
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the Automatic Payment No. field';
-                    }
-                    field("VAT No."; Rec."VAT No.")
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the VAT No. field';
-                    }
-                }
-            }
-            group(Receipt)
-            {
-                Caption = 'Receipt';
-                field("Sales Ticket Line Text off"; Rec."Sales Ticket Line Text off")
-                {
-                    ApplicationArea = All;
-                    Importance = Promoted;
-                    ToolTip = 'Specifies the value of the Sales Ticket Line Text off field';
-
-                    trigger OnAssistEdit()
-                    var
-                        RetailComment: Record "NPR Retail Comment";
-                    begin
-                        RetailComment.SetRange("Table ID", DATABASE::"NPR Register");
-                        RetailComment.SetRange("No.", Rec."Register No.");
-                        RetailComment.SetRange(Integer, 300);
-                        PAGE.RunModal(PAGE::"NPR Retail Comments", RetailComment)
-                    end;
-                }
-                field("Sales Ticket Line Text1"; Rec."Sales Ticket Line Text1")
-                {
-                    ApplicationArea = All;
-                    Importance = Promoted;
-                    ToolTip = 'Specifies the value of the Sales Ticket Line Text1 field';
-                }
-                field("Sales Ticket Line Text2"; Rec."Sales Ticket Line Text2")
-                {
-                    ApplicationArea = All;
-                    Importance = Promoted;
-                    ToolTip = 'Specifies the value of the Sales Ticket Line Text2 field';
-                }
-                field("Sales Ticket Line Text3"; Rec."Sales Ticket Line Text3")
-                {
-                    ApplicationArea = All;
-                    Importance = Promoted;
-                    ToolTip = 'Specifies the value of the Sales Ticket Line Text3 field';
-                }
-                field("Sales Ticket Line Text4"; Rec."Sales Ticket Line Text4")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Sales Ticket Line Text 4 field';
-                }
-                field("Sales Ticket Line Text5"; Rec."Sales Ticket Line Text5")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Sales Ticket Line Text 5 field';
-                }
-                field("Sales Ticket Line Text6"; Rec."Sales Ticket Line Text6")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Sales Ticket Line Text6 field';
-                }
-                field("Sales Ticket Line Text7"; Rec."Sales Ticket Line Text7")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Sales Ticket Line Text7 field';
-                }
-                field(BonText; BonText)
-                {
-                    ApplicationArea = All;
-                    Caption = 'Show Ticket Line Text';
-                    Width = 2500;
-                    ToolTip = 'Specifies the value of the Show Ticket Line Text field';
-                }
-            }
-            group("Touch Screen")
-            {
-                Caption = 'Touch Screen';
-                group(Control6150695)
-                {
-                    ShowCaption = false;
-                    field("Touch Screen Login autopopup"; Rec."Touch Screen Login autopopup")
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the Login - Auto popup field';
-                    }
-                    field("Touch Screen Extended info"; Rec."Touch Screen Extended info")
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the Touch Screen Auto Unwrap If Single field';
-                    }
-                    field("Touch Screen Customerclub"; Rec."Touch Screen Customerclub")
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the Touch Screen Customerclub field';
-                    }
-                    field("Touch Screen Login Type"; Rec."Touch Screen Login Type")
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the Login Type field';
-                    }
-                    field("Skip Infobox Update in Sale"; Rec."Skip Infobox Update in Sale")
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the Skip Infobox Update in Sale field';
                     }
                 }
             }
@@ -517,13 +381,6 @@ page 6014406 "NPR Register Card"
             FieldDisplay1 := false;
             FieldDisplay2 := false;
         end;
-
-        UpdateBonTxt();
-    end;
-
-    trigger OnModifyRecord(): Boolean
-    begin
-        UpdateBonTxt();
     end;
 
     trigger OnOpenPage()
@@ -534,10 +391,7 @@ page 6014406 "NPR Register Card"
     end;
 
     var
-        RetailSetup: Record "NPR Retail Setup";
         RetailFormCode: Codeunit "NPR Retail Form Code";
-        BonText: Text[1024];
-        Text10600005: Label '[more...]';
         Text10600007: Label 'Saldo Inicial';
         [InDataSet]
         FieldDisplay1: Boolean;
@@ -549,82 +403,5 @@ page 6014406 "NPR Register Card"
         FieldDisplayPort: Boolean;
         [InDataSet]
         FieldDisplayTxtPath: Boolean;
-
-    procedure UpdateBonTxt()
-    var
-        RetailComment: Record "NPR Retail Comment";
-        i: Integer;
-    begin
-        Clear(BonText);
-        case Rec."Sales Ticket Line Text off" of
-            Rec."Sales Ticket Line Text off"::Comment:
-                begin
-                    RetailComment.SetRange("Table ID", 6014401);
-                    RetailComment.SetRange("No.", Rec."Register No.");
-                    RetailComment.SetRange(Integer, 300);
-                    RetailComment.SetRange("Hide on printout", false);
-                    i := 1;
-                    if RetailComment.Find('-') then begin
-                        repeat
-                            BonText += RetailComment.Comment + ' \';
-                            i += 1;
-                            if (i = 18) then
-                                BonText += StrSubstNo(Text10600005, 17, RetailComment.Count);
-                        until ((RetailComment.Next = 0) or (i >= 18));
-                    end;
-                end;
-            Rec."Sales Ticket Line Text off"::"NP Config":
-                begin
-                    RetailSetup.Get;
-                    BonText += RetailSetup."Sales Ticket Line Text1";
-                    if (RetailSetup."Sales Ticket Line Text2" <> '') then
-                        BonText += '\';
-                    BonText += RetailSetup."Sales Ticket Line Text2";
-                    if (RetailSetup."Sales Ticket Line Text3" <> '') then
-                        BonText += '\';
-                    BonText += RetailSetup."Sales Ticket Line Text3";
-                    if (RetailSetup."Sales Ticket Line Text4" <> '') then
-                        BonText += '\';
-                    BonText += RetailSetup."Sales Ticket Line Text4";
-                    if (RetailSetup."Sales Ticket Line Text5" <> '') then
-                        BonText += '\';
-                    BonText += RetailSetup."Sales Ticket Line Text5";
-                    if (RetailSetup."Sales Ticket Line Text6" <> '') then
-                        BonText += '\';
-                    BonText += RetailSetup."Sales Ticket Line Text6";
-                    if (RetailSetup."Sales Ticket Line Text7" <> '') then
-                        BonText += '\';
-                    BonText += RetailSetup."Sales Ticket Line Text7";
-                end;
-            Rec."Sales Ticket Line Text off"::Register:
-                begin
-                    BonText += Rec."Sales Ticket Line Text1";
-                    if ("Sales Ticket Line Text2" <> '') then
-                        BonText += '\';
-                    BonText += Rec."Sales Ticket Line Text2";
-                    if ("Sales Ticket Line Text3" <> '') then
-                        BonText += '\';
-                    BonText += Rec."Sales Ticket Line Text3";
-                    if ("Sales Ticket Line Text4" <> '') then
-                        BonText += '\';
-                    BonText += Rec."Sales Ticket Line Text4";
-                    if ("Sales Ticket Line Text5" <> '') then
-                        BonText += '\';
-                    BonText += Rec."Sales Ticket Line Text5";
-                    if ("Sales Ticket Line Text6" <> '') then
-                        BonText += '\';
-                    BonText += Rec."Sales Ticket Line Text6";
-                    if ("Sales Ticket Line Text7" <> '') then
-                        BonText += '\';
-                    BonText += Rec."Sales Ticket Line Text7";
-                    if ("Sales Ticket Line Text8" <> '') then
-                        BonText += '\';
-                    BonText += Rec."Sales Ticket Line Text8";
-                    if ("Sales Ticket Line Text9" <> '') then
-                        BonText += '\';
-                    BonText += Rec."Sales Ticket Line Text9";
-                end;
-        end;
-    end;
 }
 

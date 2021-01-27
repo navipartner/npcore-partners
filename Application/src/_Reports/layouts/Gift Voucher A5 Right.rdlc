@@ -2430,9 +2430,6 @@ End Function
         <Field Name="FaxText">
           <DataField>FaxText</DataField>
         </Field>
-        <Field Name="VAT_Register">
-          <DataField>VAT_Register</DataField>
-        </Field>
         <Field Name="Email_Register">
           <DataField>Email_Register</DataField>
         </Field>

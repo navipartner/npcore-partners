@@ -160,55 +160,27 @@ codeunit 6184490 "NPR Pepper Config. Mgt."
     var
         Utility: Codeunit "NPR Utility";
         RetailComment: Record "NPR Retail Comment" temporary;
+        POSUnit: Record "NPR POS Unit";
         TextToPrint: Text;
         Separator: Char;
     begin
         TextToPrint := '';
         Separator := 10;
         case PrintType of
-            PrintType::Transaction:
-                case TextType of
-                    TextType::Header:
-                        begin
-                            Utility.GetTicketText(RetailComment, Register);
-                            if RetailComment.FindSet then
-                                repeat
-                                    if TextToPrint <> '' then
-                                        TextToPrint := TextToPrint + Format(Separator);
-                                    TextToPrint := TextToPrint + RetailComment.Comment;
-                                until RetailComment.Next = 0;
-                        end;
-                    TextType::Footer:
-                        begin
-                        end;
-                end;
-            PrintType::"Transaction CC":
-                case TextType of
-                    TextType::Header:
-                        begin
-                            Utility.GetTicketText(RetailComment, Register);
-                            if RetailComment.FindSet then
-                                repeat
-                                    if TextToPrint <> '' then
-                                        TextToPrint := TextToPrint + Format(Separator);
-                                    TextToPrint := TextToPrint + RetailComment.Comment;
-                                until RetailComment.Next = 0;
-                        end;
-                    TextType::Footer:
-                        begin
-                        end;
-                end;
+            PrintType::Transaction,
+            PrintType::"Transaction CC",
             PrintType::Administration:
                 case TextType of
                     TextType::Header:
                         begin
-                            Utility.GetTicketText(RetailComment, Register);
-                            if RetailComment.FindSet then
+                            POSUnit.get(Register."Register No.");
+                            Utility.GetPOSUnitTicketText(RetailComment, POSUnit);
+                            if RetailComment.FindSet() then
                                 repeat
                                     if TextToPrint <> '' then
                                         TextToPrint := TextToPrint + Format(Separator);
                                     TextToPrint := TextToPrint + RetailComment.Comment;
-                                until RetailComment.Next = 0;
+                                until RetailComment.Next() = 0;
                         end;
                     TextType::Footer:
                         begin
@@ -216,7 +188,7 @@ codeunit 6184490 "NPR Pepper Config. Mgt."
                 end;
         end;
         exit(TextToPrint);
-    end;
+        end;
 
     procedure GetReceiptText(PepperTransactionRequest: Record "NPR EFT Transaction Request"; ReceiptNo: Integer; AddBackSlash: Boolean): Text
     var
