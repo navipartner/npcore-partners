@@ -248,17 +248,9 @@ codeunit 6150697 "NPR RetailDataModel AR Upgr."
     begin
         NPRetailSetup.Get;
         NPRetailSetup.TestField("Advanced POS Entries Activated", false);
-        //-NPR5.36 [279551]
-        //-NPR5.39 [305590]
-        //IF NPRetailSetup."Environment Type" = NPRetailSetup."Environment Type"::PROD THEN
-        //  NPRetailSetup.FIELDERROR("Environment Type");
-        //+NPR5.39 [305590]
-        if not NPRetailSetup."Environment Verified" then
-            NPRetailSetup.FieldError("Environment Verified");
         if not Confirm('This will trigger Step 1 in the Upgrade to POS Entries. Do you wish to continue?') then
             Error('');
         UpgradeAuditRollStep1;
-        //+NPR5.36 [279551]
     end;
 
     procedure DeactivatePoseidonPOSEntries()

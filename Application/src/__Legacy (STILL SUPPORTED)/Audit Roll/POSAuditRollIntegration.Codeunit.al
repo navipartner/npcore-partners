@@ -284,7 +284,7 @@ codeunit 6150617 "NPR POS-Audit Roll Integration"
         if not NPRetailSetup."Advanced POS Entries Activated" then
             exit;
         Sender.GetCurrentSale(SalePOS);
-        TryCreateSalePOS(SalePOS, NPRetailSetup."Environment Type" <> NPRetailSetup."Environment Type"::PROD);
+        TryCreateSalePOS(SalePOS, false);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014505, 'OnBeforeRegisterOpen', '', true, true)]

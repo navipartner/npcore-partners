@@ -12,8 +12,6 @@ codeunit 6059984 "NPR MPOS Helper Functions"
         ActiveSession: Record "Active Session";
 
     procedure GetUsername(): Text
-    var
-        Environment: Codeunit "NPR Environment Mgt.";
     begin
         FindMySession;
         exit(ActiveSession."User ID");
