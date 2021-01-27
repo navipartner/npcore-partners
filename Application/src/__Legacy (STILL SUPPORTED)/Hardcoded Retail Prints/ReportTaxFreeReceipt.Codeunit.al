@@ -261,9 +261,7 @@ codeunit 6014577 "NPR Report: TaxFree Receipt"
             faxText := Text10600003 else
             faxText := '';
 
-        if (kasse."VAT No." <> '') then
-            cvrText := 'CVR:' else
-            cvrText := '';
+        cvrText := '';
 
         BonDato := Salgslinie."Sale Date";
 
@@ -287,7 +285,6 @@ codeunit 6014577 "NPR Report: TaxFree Receipt"
         Printer.AddTextField(2, 2, faxText + Format(POSStore."Fax No."));
         Printer.AddTextField(1, 0, POSStore."E-mail");
         Printer.AddTextField(1, 0, POSStore."Home Page");
-        Printer.AddTextField(1, 0, cvrText + Format(kasse."VAT No."));
     end;
 
     procedure PrintIntegerLoop()

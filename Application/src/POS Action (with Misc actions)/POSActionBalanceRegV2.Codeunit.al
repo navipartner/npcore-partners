@@ -324,7 +324,6 @@ codeunit 6150832 "NPR POS Action: BalanceReg V2"
                 AuditRoll."Sale Date" := Today();
 
                 AuditRoll.Balancing := true;
-                AuditRoll.Offline := not Register."Connected To Server";
                 AuditRoll."Sales Ticket No." := SalePOS."Sales Ticket No.";
 
                 if SalespersonPurchaser.Get(SalePOS."Salesperson Code") then

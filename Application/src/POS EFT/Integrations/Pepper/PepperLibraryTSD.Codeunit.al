@@ -1639,6 +1639,7 @@ codeunit 6184487 "NPR Pepper Library TSD"
         CreditCardTransaction: Record "NPR EFT Receipt";
         RetailComment: Record "NPR Retail Comment";
         Register: Record "NPR Register";
+        POSUnit: Record "NPR POS Unit";
         Utility: Codeunit "NPR Utility";
         ReceiptLineText: Text;
         Encoding: TextEncoding;
@@ -1648,6 +1649,7 @@ codeunit 6184487 "NPR Pepper Library TSD"
     begin
 
         Register.Get(EFTTransactionRequest."Register No.");
+        POSUnit.Get(Register."Register No.");
 
         CreditCardTransaction."Register No." := EFTTransactionRequest."Register No.";
         CreditCardTransaction."Sales Ticket No." := EFTTransactionRequest."Sales Ticket No.";
@@ -1660,7 +1662,7 @@ codeunit 6184487 "NPR Pepper Library TSD"
         CreditCardTransaction."Receipt No." := ReceiptType;
 
         if (PepperConfiguration."Header and Footer Handling" = PepperConfiguration."Header and Footer Handling"::"Add Headers and Footers at Printing") then begin
-            Utility.GetTicketText(RetailComment, Register);
+            Utility.GetPOSUnitTicketText(RetailComment, POSUnit);
             if RetailComment.FindSet then
                 repeat
                     EntryNo := EntryNo + 1;

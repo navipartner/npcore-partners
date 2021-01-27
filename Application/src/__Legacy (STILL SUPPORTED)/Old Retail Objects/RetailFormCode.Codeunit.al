@@ -217,9 +217,6 @@ codeunit 6014435 "NPR Retail Form Code"
         AuditRoll."Cancelled Amount On Ticket" := SaleLinePOS."Amount Including VAT";
 
         Register.Get(SalePOS."Register No.");
-        if not Register."Connected To Server" then begin
-            AuditRoll.Offline := true;
-        end;
 
         AuditRoll."Offline receipt no." := SalePOS."Sales Ticket No.";
         AuditRoll.Insert(true);
@@ -829,12 +826,6 @@ codeunit 6014435 "NPR Retail Form Code"
                     else
                         Revisionsrulle."Customer Post Code" := Sale."Post Code";
 
-                    if Kasse.Get(Revisionsrulle."Register No.") then
-                        if not Kasse."Connected To Server" then begin
-                            Revisionsrulle.Offline := true;
-                            Revisionsrulle."Offline receipt no." := Ekspeditionslinie."Sales Ticket No.";
-                        end;
-
                     /* CANCEL GIFT VOUCHER WHEN RETURN SALES TICKET */
 
                     if (Ekspeditionslinie."Return Sale Register No." <> '') then begin
@@ -1270,7 +1261,6 @@ codeunit 6014435 "NPR Retail Form Code"
                     Revisionsrulle."Line No." := LineNo;
                     Revisionsrulle."Salesperson Code" := "Salesperson Code";
                     Revisionsrulle.Type := Revisionsrulle.Type::Payment;
-                    Revisionsrulle.Offline := not Kasse."Connected To Server";
                     Revisionsrulle."Offline receipt no." := Sale."Sales Ticket No.";
                     //-NPR5.38 [302761]
                     if not RetailSetupGlobal."Create POS Entries Only" then
@@ -1567,9 +1557,6 @@ codeunit 6014435 "NPR Retail Form Code"
             AuditRoll."Starting Time" := "Start Time";
             AuditRoll."Closing Time" := Time;
             AuditRoll.Posted := true;
-
-            if Register.Get("Register No.") then
-                AuditRoll.Offline := not Register."Connected To Server";
 
             AuditRoll."Offline receipt no." := SalePOS."Sales Ticket No.";
             AuditRoll.Insert(true);

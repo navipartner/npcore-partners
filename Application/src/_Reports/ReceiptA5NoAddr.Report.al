@@ -80,19 +80,15 @@ report 6014563 "NPR Receipt A5 - No Addr."
 
                 trigger OnAfterGetRecord()
                 begin
-                    //-NPR4.18
                     if Number = 1 then
-                        TempRetailComment.FindFirst
+                        TempRetailComment.FindFirst()
                     else
-                        TempRetailComment.Next;
-                    //-NPR4.18
+                        TempRetailComment.Next();
                 end;
 
                 trigger OnPreDataItem()
                 begin
-                    //-NPR4.18
                     SetRange(Number, 1, TempRetailComment.Count());
-                    //-NPR4.18
                 end;
             }
             dataitem("Gift/credit voucher"; "NPR Audit Roll")
@@ -574,14 +570,10 @@ report 6014563 "NPR Receipt A5 - No Addr."
                 BarcodeLib.GenerateBarcode("Sales Ticket No.", TempBlob);
                 BlobBuffer.GetFromTempBlob(TempBlob, 1);
 
-                //-NPR4.18
                 Register.Get("Register No.");
-                Utility.GetTicketText(TempRetailComment, Register);
-                //-NPR4.18
-                //-NPR5.53 [371955]
                 POSUnit.Get("Register No.");
                 POSSetup.SetPOSUnit(POSUnit);
-                //+NPR5.53 [371955]
+                Utility.GetPOSUnitTicketText(TempRetailComment, POSUnit);
             end;
 
             trigger OnPreDataItem()

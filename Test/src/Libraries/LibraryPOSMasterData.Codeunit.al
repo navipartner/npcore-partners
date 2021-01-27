@@ -209,7 +209,6 @@ codeunit 85002 "NPR Library - POS Master Data"
             Register."Register No." := POSUnit."No.";
             Register.Insert;
         end;
-        Register."Touch Screen Login Type" := Register."Touch Screen Login Type"::"Normal Numeric";
         Register."Primary Payment Type" := PrimaryPaymentType;
         Register."Return Payment Type" := ReturnPaymentType;
         Register.Modify;

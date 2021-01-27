@@ -175,12 +175,6 @@ codeunit 6014567 "NPR Report - Debet Receipt"
         Printer.AddLine(POSStore."Post Code" + ' ' + POSStore.City);
         if StrLen(POSStore."Phone No.") > 0 then
             Printer.AddLine(POSStore.FieldCaption("Phone No.") + ' ' + POSStore."Phone No.");
-        if StrLen(Register."Bank Registration No.") > 0 then
-            Printer.AddTextField(1, 0, Text0015 + Register."Bank Registration No.");
-        if StrLen(Register."Bank Account No.") > 0 then
-            Printer.AddTextField(2, 0, Text0014 + Register."Bank Account No.");
-        if StrLen(Register."VAT No.") > 0 then
-            Printer.AddLine(Register.FieldCaption("VAT No.") + ' ' + Register."VAT No.");
         if StrLen(POSStore."E-mail") > 0 then
             Printer.AddLine(POSStore.FieldCaption("E-mail") + ' ' + POSStore."E-mail");
         if StrLen(POSStore."Home Page") > 0 then
