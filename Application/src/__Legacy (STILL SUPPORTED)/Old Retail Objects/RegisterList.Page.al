@@ -1,18 +1,5 @@
 page 6014405 "NPR Register List"
 {
-    // 
-    // NPK, MIM 26-07-07: Rettet design til at overholde GUI Guide retningslinjer.
-    // 
-    // NPR4.21/RMT/20160210 CASE 234145 make sure register no is always an integer
-    // 
-    // NPR5.29/CLVA/20160822 CASE 244944 Added Action CashKeeper Setup
-    // NPR5.29/CLVA/20161123 CASE 256153 Added Action 2nd Display Setup
-    // NPR5.29/TJ  /20170123 CASE 263787 Commented out code under action Dimensions-Multiple and set Visible property to FALSE
-    // NPR5.30/TJ  /20170215 CASE 265504 Changed page ENU caption
-    // NPR5.31/CLVA/20161205 CASE 251884 Added Action mPos Setup
-    // NPR5.46/MMV /20180918 CASE 290734 Removed deprecated fields, most from standard POS
-    // NPR5.53/ALPO/20191025 CASE 371956 Dimensions: POS Store & POS Unit integration; discontinue dimensions on Cash Register
-
     Caption = 'Cash Register List';
     CardPageID = "NPR Register Card";
     Editable = false;
@@ -67,11 +54,6 @@ page 6014405 "NPR Register List"
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Closing Cash field';
-                }
-                field(Balanced; Balanced)
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Balanced field';
                 }
                 field("Customer Display"; "Customer Display")
                 {
