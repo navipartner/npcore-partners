@@ -433,6 +433,7 @@ codeunit 6151006 "NPR POS Quote Mgt."
         RetailCrossReferenceNode: XmlNode;
         NewDiscountCouponNodes: XmlNodeList;
         NewDiscountCouponNode: XmlNode;
+        xSalePOS: Record "NPR Sale POS";
     begin
         if not XmlDoc.GetRoot(Root) then
             exit;
@@ -474,12 +475,18 @@ codeunit 6151006 "NPR POS Quote Mgt."
         RecRef.GetTable(RetailCrossReference);
         FindFields(RecRef, false, RetailCrossReferenceFieldBuffer);
 
+        xSalePOS := SalePOS;
         RecRef.GetTable(SalePOS);
         PrevRec := Format(RecRef);
         Xml2RecRef(Root, SalePOSFieldBuffer, RecRef);
         if PrevRec <> Format(RecRef) then
             RecRef.Modify(true);
         RecRef.SetTable(SalePOS);
+
+        SalePOS.Date := xSalePOS.Date;
+        SalePOS."Start Time" := xSalePOS."Start Time";
+        SalePOS.Modify();
+
         Root.SelectNodes('pos_info_transactions/pos_info_transaction', POSInfoTransactionNodes);
         foreach POSInfoTransactionNode in POSInfoTransactionNodes do begin
             Element := POSInfoTransactionNode.AsXmlElement();
