@@ -943,8 +943,6 @@ codeunit 6060075 "NPR Pre-map Incoming Purch Doc"
     begin
         if not Vendor.Get(VendorNo) then
             exit(false);
-        if not ItemWkshtDocExchange.GetItemWorksheetDocExchange(VendorNo, ItemWorksheet, AutomaticRegistering, DummyBool) then
-            exit(false);
         with IntermediateDataImport do begin
             if FindEntry(EntryNo, DATABASE::"Purchase Line", PurchaseLine.FieldNo("Cross-Reference No."), HeaderRecordNo, RecordNo) then begin
                 //Insert item worksheet lines

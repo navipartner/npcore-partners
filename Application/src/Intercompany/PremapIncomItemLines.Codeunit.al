@@ -1075,8 +1075,6 @@ codeunit 6060070 "NPR Premap Incom. Item Lines"
         //-NPR5.25 [246088]
         if not Vendor.Get(VendorNo) then
             exit(false);
-        if not ItemWkshtDocExchange.GetItemWorksheetDocExchange(VendorNo, ItemWorksheet, AutomaticRegistering, DummyBool) then
-            exit(false);
         with IntermediateDataImport do begin
             if FindEntry(EntryNo, DATABASE::"Purchase Line", PurchaseLine.FieldNo("Cross-Reference No."), HeaderRecordNo, RecordNo) then begin
                 //Insert item worksheet lines
