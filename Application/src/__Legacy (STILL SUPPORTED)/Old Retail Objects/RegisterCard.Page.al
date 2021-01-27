@@ -12,18 +12,18 @@ page 6014406 "NPR Register Card"
             group(Register)
             {
                 Caption = 'Register';
-                field("Register No."; "Register No.")
+                field("Register No."; Rec."Register No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the No. field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     Importance = Promoted;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field("Logon-User Name"; "Logon-User Name")
+                field("Logon-User Name"; Rec."Logon-User Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Logon-User Name field';
@@ -33,42 +33,37 @@ page 6014406 "NPR Register Card"
                         RetailFormCode.RegisterLogonnameAutofill(Rec);
                     end;
                 }
-                field("Register Type"; "Register Type")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Register Type field';
-                }
-                field("Shop id"; "Shop id")
+                field("Shop id"; Rec."Shop id")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Shop id field';
                 }
-                field("Sales Ticket Print Output"; "Sales Ticket Print Output")
+                field("Sales Ticket Print Output"; Rec."Sales Ticket Print Output")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Sales Ticket Print-Out field';
                 }
-                field("Sales Ticket Email Output"; "Sales Ticket Email Output")
+                field("Sales Ticket Email Output"; Rec."Sales Ticket Email Output")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Sales Ticket Email Output field';
                 }
-                field("Primary Payment Type"; "Primary Payment Type")
+                field("Primary Payment Type"; Rec."Primary Payment Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Primary Payment Type field';
                 }
-                field("Return Payment Type"; "Return Payment Type")
+                field("Return Payment Type"; Rec."Return Payment Type")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Return Payment Type field';
                 }
-                field("Connected To Server"; "Connected To Server")
+                field("Connected To Server"; Rec."Connected To Server")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Connected to Server field';
                 }
-                field(Status; Status)
+                field(Status; Rec.Status)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Status field';
@@ -80,7 +75,7 @@ page 6014406 "NPR Register Card"
                 group(Control6150627)
                 {
                     ShowCaption = false;
-                    field("Customer Display"; "Customer Display")
+                    field("Customer Display"; Rec."Customer Display")
                     {
                         ApplicationArea = All;
                         Importance = Promoted;
@@ -88,7 +83,7 @@ page 6014406 "NPR Register Card"
 
                         trigger OnValidate()
                         begin
-                            if "Customer Display" then begin
+                            if Rec."Customer Display" then begin
                                 FieldDisplay1 := true;
                                 FieldDisplay2 := true;
                                 FieldDisplayMetode := true;
@@ -99,13 +94,13 @@ page 6014406 "NPR Register Card"
                             end;
                         end;
                     }
-                    field("Display 1"; "Display 1")
+                    field("Display 1"; Rec."Display 1")
                     {
                         ApplicationArea = All;
                         Editable = FieldDisplay1;
                         ToolTip = 'Specifies the value of the Display 1 field';
                     }
-                    field("Display 2"; "Display 2")
+                    field("Display 2"; Rec."Display 2")
                     {
                         ApplicationArea = All;
                         Editable = FieldDisplay2;
@@ -119,27 +114,27 @@ page 6014406 "NPR Register Card"
                 group(Control6150669)
                 {
                     ShowCaption = false;
-                    field("Bank Name"; "Bank Name")
+                    field("Bank Name"; Rec."Bank Name")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Bank Name field';
                     }
-                    field("Bank Registration No."; "Bank Registration No.")
+                    field("Bank Registration No."; Rec."Bank Registration No.")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Bank Registration No. field';
                     }
-                    field("Bank Account No."; "Bank Account No.")
+                    field("Bank Account No."; Rec."Bank Account No.")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Bank Account No. field';
                     }
-                    field("Automatic Payment No."; "Automatic Payment No.")
+                    field("Automatic Payment No."; Rec."Automatic Payment No.")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Automatic Payment No. field';
                     }
-                    field("VAT No."; "VAT No.")
+                    field("VAT No."; Rec."VAT No.")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the VAT No. field';
@@ -149,7 +144,7 @@ page 6014406 "NPR Register Card"
             group(Receipt)
             {
                 Caption = 'Receipt';
-                field("Sales Ticket Line Text off"; "Sales Ticket Line Text off")
+                field("Sales Ticket Line Text off"; Rec."Sales Ticket Line Text off")
                 {
                     ApplicationArea = All;
                     Importance = Promoted;
@@ -160,45 +155,45 @@ page 6014406 "NPR Register Card"
                         RetailComment: Record "NPR Retail Comment";
                     begin
                         RetailComment.SetRange("Table ID", DATABASE::"NPR Register");
-                        RetailComment.SetRange("No.", "Register No.");
+                        RetailComment.SetRange("No.", Rec."Register No.");
                         RetailComment.SetRange(Integer, 300);
                         PAGE.RunModal(PAGE::"NPR Retail Comments", RetailComment)
                     end;
                 }
-                field("Sales Ticket Line Text1"; "Sales Ticket Line Text1")
+                field("Sales Ticket Line Text1"; Rec."Sales Ticket Line Text1")
                 {
                     ApplicationArea = All;
                     Importance = Promoted;
                     ToolTip = 'Specifies the value of the Sales Ticket Line Text1 field';
                 }
-                field("Sales Ticket Line Text2"; "Sales Ticket Line Text2")
+                field("Sales Ticket Line Text2"; Rec."Sales Ticket Line Text2")
                 {
                     ApplicationArea = All;
                     Importance = Promoted;
                     ToolTip = 'Specifies the value of the Sales Ticket Line Text2 field';
                 }
-                field("Sales Ticket Line Text3"; "Sales Ticket Line Text3")
+                field("Sales Ticket Line Text3"; Rec."Sales Ticket Line Text3")
                 {
                     ApplicationArea = All;
                     Importance = Promoted;
                     ToolTip = 'Specifies the value of the Sales Ticket Line Text3 field';
                 }
-                field("Sales Ticket Line Text4"; "Sales Ticket Line Text4")
+                field("Sales Ticket Line Text4"; Rec."Sales Ticket Line Text4")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Sales Ticket Line Text 4 field';
                 }
-                field("Sales Ticket Line Text5"; "Sales Ticket Line Text5")
+                field("Sales Ticket Line Text5"; Rec."Sales Ticket Line Text5")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Sales Ticket Line Text 5 field';
                 }
-                field("Sales Ticket Line Text6"; "Sales Ticket Line Text6")
+                field("Sales Ticket Line Text6"; Rec."Sales Ticket Line Text6")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Sales Ticket Line Text6 field';
                 }
-                field("Sales Ticket Line Text7"; "Sales Ticket Line Text7")
+                field("Sales Ticket Line Text7"; Rec."Sales Ticket Line Text7")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Sales Ticket Line Text7 field';
@@ -217,27 +212,27 @@ page 6014406 "NPR Register Card"
                 group(Control6150695)
                 {
                     ShowCaption = false;
-                    field("Touch Screen Login autopopup"; "Touch Screen Login autopopup")
+                    field("Touch Screen Login autopopup"; Rec."Touch Screen Login autopopup")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Login - Auto popup field';
                     }
-                    field("Touch Screen Extended info"; "Touch Screen Extended info")
+                    field("Touch Screen Extended info"; Rec."Touch Screen Extended info")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Touch Screen Auto Unwrap If Single field';
                     }
-                    field("Touch Screen Customerclub"; "Touch Screen Customerclub")
+                    field("Touch Screen Customerclub"; Rec."Touch Screen Customerclub")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Touch Screen Customerclub field';
                     }
-                    field("Touch Screen Login Type"; "Touch Screen Login Type")
+                    field("Touch Screen Login Type"; Rec."Touch Screen Login Type")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Login Type field';
                     }
-                    field("Skip Infobox Update in Sale"; "Skip Infobox Update in Sale")
+                    field("Skip Infobox Update in Sale"; Rec."Skip Infobox Update in Sale")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Skip Infobox Update in Sale field';
@@ -250,59 +245,59 @@ page 6014406 "NPR Register Card"
                 group(Control6150705)
                 {
                     ShowCaption = false;
-                    field(Account; Account)
+                    field(Account; Rec.Account)
                     {
                         Style = Strong;
                         StyleExpr = TRUE;
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Account field';
                     }
-                    field("Gift Voucher Account"; "Gift Voucher Account")
+                    field("Gift Voucher Account"; Rec."Gift Voucher Account")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Gift Voucher Account field';
                     }
-                    field("Gift Voucher Discount Account"; "Gift Voucher Discount Account")
+                    field("Gift Voucher Discount Account"; Rec."Gift Voucher Discount Account")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Gift Voucher Discount Account field';
                     }
-                    field("City Gift Voucher Account"; "City Gift Voucher Account")
+                    field("City Gift Voucher Account"; Rec."City Gift Voucher Account")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the City gift voucher account field';
                     }
-                    field("City Gift Voucher Discount"; "City Gift Voucher Discount")
+                    field("City Gift Voucher Discount"; Rec."City Gift Voucher Discount")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the City Gift Voucher Discount field';
                     }
-                    field("Credit Voucher Account"; "Credit Voucher Account")
+                    field("Credit Voucher Account"; Rec."Credit Voucher Account")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Credit Voucher Account field';
                     }
-                    field("Difference Account"; "Difference Account")
+                    field("Difference Account"; Rec."Difference Account")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Difference Account field';
                     }
-                    field("Difference Account - Neg."; "Difference Account - Neg.")
+                    field("Difference Account - Neg."; Rec."Difference Account - Neg.")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Difference Account - Neg. field';
                     }
-                    field("Register Change Account"; "Register Change Account")
+                    field("Register Change Account"; Rec."Register Change Account")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Register Change Account field';
                     }
-                    field("Location Code"; "Location Code")
+                    field("Location Code"; Rec."Location Code")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Location Code field';
                     }
-                    field("VAT Customer No."; "VAT Customer No.")
+                    field("VAT Customer No."; Rec."VAT Customer No.")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the VAT Customer No. field';
@@ -320,24 +315,24 @@ page 6014406 "NPR Register Card"
                         StyleExpr = TRUE;
                         ToolTip = 'Specifies the value of the End of Day Balancing field';
                     }
-                    field("Balancing every"; "Balancing every")
+                    field("Balancing every"; Rec."Balancing every")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Registerstatement field';
                     }
-                    field("Balanced Type"; "Balanced Type")
+                    field("Balanced Type"; Rec."Balanced Type")
                     {
                         ApplicationArea = All;
                         Importance = Promoted;
                         ToolTip = 'Specifies the value of the Balanced Type field';
                     }
-                    field("Balance Account"; "Balance Account")
+                    field("Balance Account"; Rec."Balance Account")
                     {
                         ApplicationArea = All;
                         Importance = Promoted;
                         ToolTip = 'Specifies the value of the Balance Account field';
                     }
-                    field("End of day - Exchange Amount"; "End of day - Exchange Amount")
+                    field("End of day - Exchange Amount"; Rec."End of day - Exchange Amount")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Exchange Amount field';
@@ -347,38 +342,38 @@ page 6014406 "NPR Register Card"
             group(Sale)
             {
                 Caption = 'Sale';
-                field("Customer Price Group"; "Customer Price Group")
+                field("Customer Price Group"; Rec."Customer Price Group")
                 {
                     ApplicationArea = All;
                     Importance = Promoted;
                     ToolTip = 'Specifies the value of the Item price group field';
                 }
-                field("Customer Disc. Group"; "Customer Disc. Group")
+                field("Customer Disc. Group"; Rec."Customer Disc. Group")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Customer Disc. Group field';
                 }
-                field("Customer No. auto debit sale"; "Customer No. auto debit sale")
+                field("Customer No. auto debit sale"; Rec."Customer No. auto debit sale")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Ask for customer field';
                 }
-                field("Exchange Label Exchange Period"; "Exchange Label Exchange Period")
+                field("Exchange Label Exchange Period"; Rec."Exchange Label Exchange Period")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Exchange Label Exchange Period field';
                 }
-                field("Lock Register To Salesperson"; "Lock Register To Salesperson")
+                field("Lock Register To Salesperson"; Rec."Lock Register To Salesperson")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Lock Register To Salesperson field';
                 }
-                field("Use Sales Statistics"; "Use Sales Statistics")
+                field("Use Sales Statistics"; Rec."Use Sales Statistics")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Use Sales Statistics field';
                 }
-                field("Active Event No."; "Active Event No.")
+                field("Active Event No."; Rec."Active Event No.")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Active Event No. field';
@@ -390,7 +385,7 @@ page 6014406 "NPR Register Card"
                 group(mPos)
                 {
                     Caption = 'mPos';
-                    field("mPos Payment Type"; "mPos Payment Type")
+                    field("mPos Payment Type"; Rec."mPos Payment Type")
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the mPos Payment Type field';
@@ -412,7 +407,7 @@ page 6014406 "NPR Register Card"
                     Caption = 'Autofill';
                     Image = Interaction;
                     Promoted = true;
-				    PromotedOnly = true;
+                    PromotedOnly = true;
                     PromotedIsBig = true;
                     ApplicationArea = All;
                     ToolTip = 'Executes the Autofill action';
@@ -506,7 +501,7 @@ page 6014406 "NPR Register Card"
 
                     trigger OnAction()
                     begin
-                        DimsAreDiscontinuedOnRegister;
+                        Rec.DimsAreDiscontinuedOnRegister();
                     end;
                 }
             }
@@ -515,7 +510,7 @@ page 6014406 "NPR Register Card"
 
     trigger OnAfterGetCurrRecord()
     begin
-        if "Customer Display" then begin
+        if Rec."Customer Display" then begin
             FieldDisplay1 := true;
             FieldDisplay2 := true;
         end else begin
@@ -523,12 +518,12 @@ page 6014406 "NPR Register Card"
             FieldDisplay2 := false;
         end;
 
-        UpdateBonTxt;
+        UpdateBonTxt();
     end;
 
     trigger OnModifyRecord(): Boolean
     begin
-        UpdateBonTxt;
+        UpdateBonTxt();
     end;
 
     trigger OnOpenPage()
@@ -561,11 +556,11 @@ page 6014406 "NPR Register Card"
         i: Integer;
     begin
         Clear(BonText);
-        case "Sales Ticket Line Text off" of
-            "Sales Ticket Line Text off"::Comment:
+        case Rec."Sales Ticket Line Text off" of
+            Rec."Sales Ticket Line Text off"::Comment:
                 begin
                     RetailComment.SetRange("Table ID", 6014401);
-                    RetailComment.SetRange("No.", "Register No.");
+                    RetailComment.SetRange("No.", Rec."Register No.");
                     RetailComment.SetRange(Integer, 300);
                     RetailComment.SetRange("Hide on printout", false);
                     i := 1;
@@ -578,7 +573,7 @@ page 6014406 "NPR Register Card"
                         until ((RetailComment.Next = 0) or (i >= 18));
                     end;
                 end;
-            "Sales Ticket Line Text off"::"NP Config":
+            Rec."Sales Ticket Line Text off"::"NP Config":
                 begin
                     RetailSetup.Get;
                     BonText += RetailSetup."Sales Ticket Line Text1";
@@ -601,33 +596,33 @@ page 6014406 "NPR Register Card"
                         BonText += '\';
                     BonText += RetailSetup."Sales Ticket Line Text7";
                 end;
-            "Sales Ticket Line Text off"::Register:
+            Rec."Sales Ticket Line Text off"::Register:
                 begin
-                    BonText += "Sales Ticket Line Text1";
+                    BonText += Rec."Sales Ticket Line Text1";
                     if ("Sales Ticket Line Text2" <> '') then
                         BonText += '\';
-                    BonText += "Sales Ticket Line Text2";
+                    BonText += Rec."Sales Ticket Line Text2";
                     if ("Sales Ticket Line Text3" <> '') then
                         BonText += '\';
-                    BonText += "Sales Ticket Line Text3";
+                    BonText += Rec."Sales Ticket Line Text3";
                     if ("Sales Ticket Line Text4" <> '') then
                         BonText += '\';
-                    BonText += "Sales Ticket Line Text4";
+                    BonText += Rec."Sales Ticket Line Text4";
                     if ("Sales Ticket Line Text5" <> '') then
                         BonText += '\';
-                    BonText += "Sales Ticket Line Text5";
+                    BonText += Rec."Sales Ticket Line Text5";
                     if ("Sales Ticket Line Text6" <> '') then
                         BonText += '\';
-                    BonText += "Sales Ticket Line Text6";
+                    BonText += Rec."Sales Ticket Line Text6";
                     if ("Sales Ticket Line Text7" <> '') then
                         BonText += '\';
-                    BonText += "Sales Ticket Line Text7";
+                    BonText += Rec."Sales Ticket Line Text7";
                     if ("Sales Ticket Line Text8" <> '') then
                         BonText += '\';
-                    BonText += "Sales Ticket Line Text8";
+                    BonText += Rec."Sales Ticket Line Text8";
                     if ("Sales Ticket Line Text9" <> '') then
                         BonText += '\';
-                    BonText += "Sales Ticket Line Text9";
+                    BonText += Rec."Sales Ticket Line Text9";
                 end;
         end;
     end;

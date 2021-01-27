@@ -1,8 +1,5 @@
 table 6014401 "NPR Register"
 {
-    // //-NPR-Dankort1.0c ved Nikolai Pedersen
-    //   Credit Card Solution - tilf¢jet Sagem terminal
-
     Caption = 'Cash Register';
     DataClassification = CustomerContent;
     LookupPageID = "NPR Register List";
@@ -46,11 +43,17 @@ table 6014401 "NPR Register"
         {
             Caption = 'Balanced';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register to NPR POS Store';
         }
         field(6; "Balanced on Sales Ticket"; Code[20])
         {
             Caption = 'Balanced on Sales Ticket';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register to NPR POS Store';
         }
         field(7; "Opened Date"; Date)
         {
@@ -67,7 +70,9 @@ table 6014401 "NPR Register"
         {
             Caption = 'Register Type';
             DataClassification = CustomerContent;
-            TableRelation = "NPR Register Types";
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore';
+            ObsoleteTag = 'NPR Register Types to NPR POS View Profile';
         }
         field(11; Account; Code[20])
         {
@@ -162,12 +167,18 @@ table 6014401 "NPR Register"
             Caption = 'Gen. Business Posting Group';
             DataClassification = CustomerContent;
             TableRelation = "Gen. Business Posting Group";
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register to NPR POS Store';
         }
         field(19; "VAT Gen. Business Post.Gr"; Code[10])
         {
             Caption = 'VAT Gen. Business Posting Group (Price)';
             DataClassification = CustomerContent;
             TableRelation = "VAT Business Posting Group";
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register to NPR POS Store';
         }
         field(22; "Status Set By Sales Ticket"; Code[20])
         {

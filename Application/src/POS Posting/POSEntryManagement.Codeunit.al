@@ -48,105 +48,103 @@ codeunit 6150629 "NPR POS Entry Management"
         CalcTotalAmountInclVAT: Decimal;
         CalcTotalPaymentAmountLCY: Decimal;
         DifferenceAmount: Decimal;
-        NoOfSalesLines: Integer;
         CalcTotalAmountInclVATInclRounding: Decimal;
         CalcItemReturnsAmount: Decimal;
+        NoOfSalesLines: Integer;
     begin
         if POSEntry."Post Entry Status" >= POSEntry."Post Entry Status"::Posted then
             exit;
         POSTaxCalculation.RefreshPOSTaxLines(POSEntry);
 
-        with POSEntry do begin
-            POSSalesLine.SetRange("POS Entry No.", "Entry No.");
-            POSSalesLine.SetRange("Exclude from Posting", false);
-            POSSalesLine.SetRange("Exclude from Posting", false);
-            if POSSalesLine.FindSet then
-                repeat
-                    CalcTotalAmountInclVATInclRounding += POSSalesLine."Amount Incl. VAT";
+        POSSalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
+        POSSalesLine.SetRange("Exclude from Posting", false);
+        POSSalesLine.SetRange("Exclude from Posting", false);
+        if POSSalesLine.FindSet() then
+            repeat
+                CalcTotalAmountInclVATInclRounding += POSSalesLine."Amount Incl. VAT";
 
-                    if POSSalesLine.Type <> POSSalesLine.Type::Rounding then begin
-                        CalcTotalAmount += POSSalesLine."Amount Excl. VAT";
-                        CalcTotalAmountInclVAT += POSSalesLine."Amount Incl. VAT";
-                        NoOfSalesLines += 1;
+                if POSSalesLine.Type <> POSSalesLine.Type::Rounding then begin
+                    CalcTotalAmount += POSSalesLine."Amount Excl. VAT";
+                    CalcTotalAmountInclVAT += POSSalesLine."Amount Incl. VAT";
+                    NoOfSalesLines += 1;
 
-                        if POSSalesLine.Type = POSSalesLine.Type::Item then begin
-                            if POSSalesLine.Quantity > 0 then
-                                CalcItemSalesAmount += POSSalesLine."Amount Incl. VAT (LCY)";
-                            if POSSalesLine.Quantity < 0 then
-                                CalcItemReturnsAmount += POSSalesLine."Amount Incl. VAT (LCY)";
-                        end;
-
-                        if POSSalesLine.Type in [POSSalesLine.Type::Item, POSSalesLine.Type::"G/L Account"] then begin
-                            if POSSalesLine.Quantity > 0 then
-                                CalcSalesQty += POSSalesLine.Quantity
-                            else
-                                CalcReturnSalesQty += POSSalesLine.Quantity;
-                        end;
-                        CalcDiscountAmount += POSSalesLine."Line Discount Amount Excl. VAT";
+                    if POSSalesLine.Type = POSSalesLine.Type::Item then begin
+                        if POSSalesLine.Quantity > 0 then
+                            CalcItemSalesAmount += POSSalesLine."Amount Incl. VAT (LCY)";
+                        if POSSalesLine.Quantity < 0 then
+                            CalcItemReturnsAmount += POSSalesLine."Amount Incl. VAT (LCY)";
                     end;
-                until POSSalesLine.Next = 0;
 
-            POSTaxAmountLine.Reset;
-            POSTaxAmountLine.SetRange("POS Entry No.", "Entry No.");
-            if POSTaxAmountLine.FindSet then
-                repeat
-                    CalcTotalVATAmount := CalcTotalVATAmount + POSTaxAmountLine."Tax Amount";
-                until POSTaxAmountLine.Next = 0;
-
-            POSPaymentLine.Reset;
-            POSPaymentLine.SetRange("POS Entry No.", "Entry No.");
-            if POSPaymentLine.FindSet then
-                repeat
-                    CalcTotalPaymentAmountLCY := CalcTotalPaymentAmountLCY + POSPaymentLine."Amount (LCY)";
-                until POSPaymentLine.Next = 0;
-
-            if (CalcItemSalesAmount <> "Item Sales (LCY)") then begin
-                Validate("Item Sales (LCY)", CalcItemSalesAmount);
-                EntryModified := true;
-            end;
-            if (CalcDiscountAmount <> "Discount Amount") then begin
-                Validate("Discount Amount", CalcDiscountAmount);
-                EntryModified := true;
-            end;
-            if (CalcSalesQty <> "Sales Quantity") then begin
-                Validate("Sales Quantity", CalcSalesQty);
-                EntryModified := true;
-            end;
-            if (CalcReturnSalesQty <> "Return Sales Quantity") then begin
-                Validate("Return Sales Quantity", CalcReturnSalesQty);
-                EntryModified := true;
-            end;
-            if (CalcTotalAmount <> "Amount Excl. Tax") then begin
-                Validate("Amount Excl. Tax", CalcTotalAmount);
-                EntryModified := true;
-            end;
-            if (CalcTotalVATAmount <> "Tax Amount") then begin
-                Validate("Tax Amount", CalcTotalVATAmount);
-                EntryModified := true;
-            end;
-            if (CalcTotalAmountInclVAT <> "Amount Incl. Tax") then begin
-                Validate("Amount Incl. Tax", CalcTotalAmountInclVAT);
-                EntryModified := true;
-            end;
-            if "Entry Type" <> "Entry Type"::"Credit Sale" then begin
-                DifferenceAmount := CalcTotalPaymentAmountLCY - CalcTotalAmountInclVAT;
-                if (DifferenceAmount <> "Rounding Amount (LCY)") then begin
-                    Validate("Rounding Amount (LCY)", DifferenceAmount);
-                    EntryModified := true;
+                    if POSSalesLine.Type in [POSSalesLine.Type::Item, POSSalesLine.Type::"G/L Account"] then begin
+                        if POSSalesLine.Quantity > 0 then
+                            CalcSalesQty += POSSalesLine.Quantity
+                        else
+                            CalcReturnSalesQty += POSSalesLine.Quantity;
+                    end;
+                    CalcDiscountAmount += POSSalesLine."Line Discount Amount Excl. VAT";
                 end;
-            end;
-            if NoOfSalesLines <> "No. of Sales Lines" then begin
-                Validate("No. of Sales Lines", NoOfSalesLines);
+            until POSSalesLine.Next() = 0;
+
+        POSTaxAmountLine.Reset();
+        POSTaxAmountLine.SetRange("POS Entry No.", POSEntry."Entry No.");
+        if POSTaxAmountLine.FindSet then
+            repeat
+                CalcTotalVATAmount := CalcTotalVATAmount + POSTaxAmountLine."Tax Amount";
+            until POSTaxAmountLine.Next() = 0;
+
+        POSPaymentLine.Reset();
+        POSPaymentLine.SetRange("POS Entry No.", POSEntry."Entry No.");
+        if POSPaymentLine.FindSet then
+            repeat
+                CalcTotalPaymentAmountLCY := CalcTotalPaymentAmountLCY + POSPaymentLine."Amount (LCY)";
+            until POSPaymentLine.Next() = 0;
+
+        if (CalcItemSalesAmount <> POSEntry."Item Sales (LCY)") then begin
+            POSEntry.Validate("Item Sales (LCY)", CalcItemSalesAmount);
+            EntryModified := true;
+        end;
+        if (CalcDiscountAmount <> POSEntry."Discount Amount") then begin
+            POSEntry.Validate("Discount Amount", CalcDiscountAmount);
+            EntryModified := true;
+        end;
+        if (CalcSalesQty <> POSEntry."Sales Quantity") then begin
+            POSEntry.Validate("Sales Quantity", CalcSalesQty);
+            EntryModified := true;
+        end;
+        if (CalcReturnSalesQty <> POSEntry."Return Sales Quantity") then begin
+            POSEntry.Validate("Return Sales Quantity", CalcReturnSalesQty);
+            EntryModified := true;
+        end;
+        if (CalcTotalAmount <> POSEntry."Amount Excl. Tax") then begin
+            POSEntry.Validate("Amount Excl. Tax", CalcTotalAmount);
+            EntryModified := true;
+        end;
+        if (CalcTotalVATAmount <> POSEntry."Tax Amount") then begin
+            POSEntry.Validate("Tax Amount", CalcTotalVATAmount);
+            EntryModified := true;
+        end;
+        if (CalcTotalAmountInclVAT <> POSEntry."Amount Incl. Tax") then begin
+            POSEntry.Validate("Amount Incl. Tax", CalcTotalAmountInclVAT);
+            EntryModified := true;
+        end;
+        if POSEntry."Entry Type" <> POSEntry."Entry Type"::"Credit Sale" then begin
+            DifferenceAmount := CalcTotalPaymentAmountLCY - CalcTotalAmountInclVAT;
+            if (DifferenceAmount <> POSEntry."Rounding Amount (LCY)") then begin
+                POSEntry.Validate("Rounding Amount (LCY)", DifferenceAmount);
                 EntryModified := true;
             end;
-            if CalcTotalAmountInclVATInclRounding <> "Amount Incl. Tax & Round" then begin
-                Validate("Amount Incl. Tax & Round", CalcTotalAmountInclVATInclRounding);
-                EntryModified := true;
-            end;
-            if CalcItemReturnsAmount <> "Item Returns (LCY)" then begin
-                Validate("Item Returns (LCY)", CalcItemReturnsAmount);
-                EntryModified := true;
-            end;
+        end;
+        if NoOfSalesLines <> POSEntry."No. of Sales Lines" then begin
+            POSEntry.Validate("No. of Sales Lines", NoOfSalesLines);
+            EntryModified := true;
+        end;
+        if CalcTotalAmountInclVATInclRounding <> POSEntry."Amount Incl. Tax & Round" then begin
+            POSEntry.Validate("Amount Incl. Tax & Round", CalcTotalAmountInclVATInclRounding);
+            EntryModified := true;
+        end;
+        if CalcItemReturnsAmount <> POSEntry."Item Returns (LCY)" then begin
+            POSEntry.Validate("Item Returns (LCY)", CalcItemReturnsAmount);
+            EntryModified := true;
         end;
     end;
 
@@ -154,26 +152,24 @@ codeunit 6150629 "NPR POS Entry Management"
     var
         POSPostingSetup: Record "NPR POS Posting Setup";
     begin
-        if POSPostingSetup.FindSet then
+        if POSPostingSetup.FindSet() then
             repeat
                 CheckPostingSetupLine(POSPostingSetup);
-            until POSPostingSetup.Next = 0;
+            until POSPostingSetup.Next() = 0;
     end;
 
     procedure CheckPostingSetupLine(POSPostingSetup: Record "NPR POS Posting Setup")
     begin
-        with POSPostingSetup do begin
-            if "Account Type" = "Account Type"::"Bank Account" then begin
-                TestField("Account No.");
-                CheckBankPaymentMethodConsistent("Account No.", "POS Payment Method Code");
-            end;
+        if POSPostingSetup."Account Type" = POSPostingSetup."Account Type"::"Bank Account" then begin
+            POSPostingSetup.TestField("Account No.");
+            CheckBankPaymentMethodConsistent(POSPostingSetup."Account No.", POSPostingSetup."POS Payment Method Code");
+        end;
 
-            if "Difference Account Type" = "Difference Account Type"::"Bank Account" then begin
-                TestField("Difference Acc. No.");
-                TestField("Difference Acc. No. (Neg)");
-                CheckBankPaymentMethodConsistent("Difference Acc. No.", "POS Payment Method Code");
-                CheckBankPaymentMethodConsistent("Difference Acc. No. (Neg)", "POS Payment Method Code");
-            end;
+        if POSPostingSetup."Difference Account Type" = POSPostingSetup."Difference Account Type"::"Bank Account" then begin
+            POSPostingSetup.TestField("Difference Acc. No.");
+            POSPostingSetup.TestField("Difference Acc. No. (Neg)");
+            CheckBankPaymentMethodConsistent(POSPostingSetup."Difference Acc. No.", POSPostingSetup."POS Payment Method Code");
+            CheckBankPaymentMethodConsistent(POSPostingSetup."Difference Acc. No. (Neg)", POSPostingSetup."POS Payment Method Code");
         end;
     end;
 
@@ -209,7 +205,7 @@ codeunit 6150629 "NPR POS Entry Management"
         POSPaymentBin: Record "NPR POS Payment Bin";
         Register: Record "NPR Register";
     begin
-        POSUnit.Init;
+        POSUnit.Init();
         Register.Get(POSUnitCode);
         POSUnit."No." := Register."Register No.";
         if not POSStore.Get(POSUnitCode) then
@@ -225,14 +221,12 @@ codeunit 6150629 "NPR POS Entry Management"
     var
         POSStore: Record "NPR POS Store";
     begin
-        POSStore.Init;
+        POSStore.Init();
         POSStore.Code := POSUnit."No.";
         POSStore.Validate("Location Code", Register."Location Code");
         POSStore.Validate("VAT Registration No.", Register."VAT No.");
         POSStore.Validate("Global Dimension 1 Code", POSUnit."Global Dimension 1 Code");
         POSStore.Validate("Global Dimension 2 Code", POSUnit."Global Dimension 2 Code");
-        POSStore.Validate("Gen. Bus. Posting Group", Register."Gen. Business Posting Group");
-        POSStore.Validate("VAT Bus. Posting Group", Register."VAT Gen. Business Post.Gr");
         POSStore.Validate("Default POS Posting Setup", POSStore."Default POS Posting Setup"::Customer);
         POSStore.Insert(true);
     end;
@@ -242,7 +236,7 @@ codeunit 6150629 "NPR POS Entry Management"
         POSPaymentBin: Record "NPR POS Payment Bin";
         POSUnittoBinRelation: Record "NPR POS Unit to Bin Relation";
     begin
-        POSPaymentBin.Init;
+        POSPaymentBin.Init();
         POSPaymentBin."No." := POSUnit."No.";
         POSPaymentBin."POS Store Code" := POSStore.Code;
         POSPaymentBin."Attached to POS Unit No." := POSUnit."No.";
@@ -320,7 +314,7 @@ codeunit 6150629 "NPR POS Entry Management"
         //DocumentNo = Unique, volatile front end no. (=SalePOS."Sales Ticket No.")
         Clear(POSEntryOut);
         POSEntryOut.SetRange("Document No.", DocumentNo);
-        exit(POSEntryOut.FindFirst);
+        exit(POSEntryOut.FindFirst());
     end;
 
     procedure FindPOSEntryViaFiscalNo(FiscalNo: Code[20]; var POSEntryOut: Record "NPR POS Entry"): Boolean
@@ -328,7 +322,7 @@ codeunit 6150629 "NPR POS Entry Management"
         //FiscalNo = Back end no. - Can be different from DocumentNo
         Clear(POSEntryOut);
         POSEntryOut.SetRange("Fiscal No.", FiscalNo);
-        exit(POSEntryOut.FindFirst);
+        exit(POSEntryOut.FindFirst());
     end;
 
     procedure FindPOSEntryViaPOSSaleID(POSSaleID: Integer; var POSEntryOut: Record "NPR POS Entry"): Boolean
@@ -336,30 +330,30 @@ codeunit 6150629 "NPR POS Entry Management"
         //POSSaleID = Unique, constant front end no. (=SalePOS."POS Sale ID")
         Clear(POSEntryOut);
         POSEntryOut.SetRange("POS Sale ID", POSSaleID);
-        exit(POSEntryOut.FindFirst);
+        exit(POSEntryOut.FindFirst());
     end;
 
     procedure PrintEntry(POSEntry: Record "NPR POS Entry"; Large: Boolean)
     var
-        RecRef: RecordRef;
-        RetailReportSelectionMgt: Codeunit "NPR Retail Report Select. Mgt.";
         POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint";
         ReportSelectionRetail: Record "NPR Report Selection Retail";
         POSEntryOutputLog: Record "NPR POS Entry Output Log";
         POSAuditProfile: Record "NPR POS Audit Profile";
         POSUnit: Record "NPR POS Unit";
+        RetailReportSelectionMgt: Codeunit "NPR Retail Report Select. Mgt.";
+        RecRef: RecordRef;
         IsReprint: Boolean;
     begin
         POSEntryOutputLog.SetRange("POS Entry No.", POSEntry."Entry No.");
         POSEntryOutputLog.SetRange("Output Method", POSEntryOutputLog."Output Method"::Print);
         POSEntryOutputLog.SetFilter("Output Type", '=%1|=%2', POSEntryOutputLog."Output Type"::SalesReceipt, POSEntryOutputLog."Output Type"::LargeSalesReceipt);
-        IsReprint := not POSEntryOutputLog.IsEmpty;
+        IsReprint := not POSEntryOutputLog.IsEmpty();
 
         if IsReprint then begin
             POSEntry.TestField("POS Unit No.");
             POSUnit.Get(POSEntry."POS Unit No.");
             if not POSAuditProfile.Get(POSUnit."POS Audit Profile") then
-                POSAuditProfile.Init;
+                POSAuditProfile.Init();
             if (POSAuditProfile."Allow Printing Receipt Copy" = POSAuditProfile."Allow Printing Receipt Copy"::Never)
                or
                ((POSAuditProfile."Allow Printing Receipt Copy" = POSAuditProfile."Allow Printing Receipt Copy"::"Only Once") and (POSEntryOutputLog.Count > 1))
@@ -369,7 +363,7 @@ codeunit 6150629 "NPR POS Entry Management"
 
         OnBeforePrintEntry(POSEntry, IsReprint);
 
-        POSEntry.SetRecFilter;
+        POSEntry.SetRecFilter();
         RecRef.GetTable(POSEntry);
         RetailReportSelectionMgt.SetRegisterNo(POSEntry."POS Unit No.");
         case POSEntry."Entry Type" of
@@ -401,8 +395,8 @@ codeunit 6150629 "NPR POS Entry Management"
 
     procedure DeObfuscateTicketNo(ObfucationMethod: Option "None",MI; var SalesTicketNo: Code[20])
     var
-        MyBigInt: BigInteger;
         RPAuxMiscLibrary: Codeunit "NPR RP Aux - Misc. Library";
+        MyBigInt: BigInteger;
     begin
         case ObfucationMethod of
             ObfucationMethod::MI:  //Multiplicative Inverse

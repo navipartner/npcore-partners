@@ -1,10 +1,11 @@
 table 6014459 "NPR Register Types"
 {
-    // NPR5.30/TJ  /20170215 CASE 265504 Changed table ENU caption
-
     Caption = 'Cash Register Type';
     LookupPageID = "NPR Register Types";
     DataClassification = CustomerContent;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'This table won''t be used anymore';
+    ObsoleteTag = 'NPR Register Types to NPR POS View Profile';
 
     fields
     {

@@ -1,7 +1,5 @@
 page 6014575 "NPR Register Types"
 {
-    // NPR5.30/TJ  /20170215 CASE 265504 Changed page ENU caption
-
     UsageCategory = None;
     Caption = 'Cash Register Types';
     SourceTable = "NPR Register Types";
@@ -13,22 +11,18 @@ page 6014575 "NPR Register Types"
             repeater(Control6150613)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Code field';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
             }
         }
-    }
-
-    actions
-    {
     }
 }
 

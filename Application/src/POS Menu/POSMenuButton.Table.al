@@ -221,11 +221,11 @@ table 6150701 "NPR POS Menu Button"
                     TestField("Action Type", "Action Type"::Item);
             end;
         }
-        field(41; "Register Type"; Code[10])
+        field(41; "Register Type"; Code[20])
         {
-            Caption = 'Cash Register Type';
+            Caption = 'POS View Profile';
             DataClassification = CustomerContent;
-            TableRelation = "NPR Register Types";
+            TableRelation = "NPR POS View Profile";
         }
         field(42; "Register No."; Code[10])
         {

@@ -1,71 +1,6 @@
 // TODO: CTRLUPGRADE - uses old Standard code; must be removed or refactored
 codeunit 6014505 "NPR Touch Screen - Func."
 {
-    // VRT1.00/JDH/20150305 CASE 201022 Lookup of Variants is now based on table 5401 instead of VariaX table
-    // NPR4.10/VB/20150602  CASE 213003 Support for Web Client (JavaScript) client
-    // NPR4.11/VB/20150629  CASE 213003 Support for Web Client (JavaScript) client - additional changes
-    // NPR4.12/VB/20150708  CASE 213003 Fix for variant lookup under .NET client
-    // NPR4.14/RMT/20150817 CASE 219385 Include "Indbetaling" in total sale info on screen
-    // NPR4.14/VB/20150908  CASE 220185 Fixed text constants
-    // NPR4.14/VB/20150909  CASE 222602 Version increase for NaviPartner.POS.Web assembly reference(s)
-    // NPR4.14/VB/20150925  CASE 222938 Version increase for NaviPartner.POS.Web assembly reference(s), due to refactoring of QUANTITY_POS and QUANTITY_NEG functions.
-    // NPR4.15/VB/20150930  CASE 224237 Version increase for NaviPartner.POS.Web assembly reference(s)
-    // NPR4.16/JDH/20151110 CASE 225285 Removed Color and Size references
-    // NPR4.17/VB/20150104  CASE 225607 Changed references for compiling under NAV 2016
-    // NPR4.18/MMV/20160122 CASE 232343 Print receipt even when no payment line is present.
-    // NPR4.18/RMT/20160128 CASE 233094 test for serial numbers if applicable
-    // NPR5.00/VB/20151221  CASE 229375 Limiting search box to 50 characters
-    // NPR5.00/VB/20160105  CASE 230373 Refactoring due to client-side formatting of decimal and date/time values
-    // NPR5.00/VB/20160106  CASE 231100 Update .NET version from 1.9.1.305 to 1.9.1.369
-    // NPR5.00.03/VB/20160202 CASE 233204 Replacing Touch Customer page with touch lookup template
-    // NPR5.00.03/VB/20160106 CASE 231100 Update .NET version from 1.9.1.369 to 5.0.398.0
-    // NPR5.20/BR  /20160217  CASE  231481 Extended terminal integration, added parameter AuxFunctionNo to function CallTerminal
-    // NPR5.20/VB  /20160304  CASE 235863 Support for more advanced lookup dialog.
-    // NPR5.22/JDH /20160331  CASE 237986
-    // NPR5.22/MHA /20160405  CASE 238459 Added Preemptive filter on Lookup
-    // NPR5.22/BR  /20160412  CASE  231481 Added support for turning the terminal on/offline
-    // NPR5.22/BR  /20160422  CASE  231481 Added support for Pepper installation
-    // NPR5.23/VB  /20160505  CASE 238378 Clearing of EanBoxText after lookup.
-    // NPR5.23/JDH /20160512  CASE 240916 removed reference to old Variant Solution
-    // NPR5.23/MMV /20160512  CASE 240211 Send all retail journal lines when printing.
-    // NPR5.23/MMV /20160519  CASE 241549 Moved manual lookup in report selection to mgt. codeunit.
-    // NPR5.23/MMV /20160527  CASE 237189 Removed deprecated function - Write2Display()
-    // NPR5.23/JDH /20160531  CASE 241098 Blocked variants wont be shown on the POS
-    // NPR5.23/MMV /20160608  CASE 241990 Add Register No. when printing labels from POS.
-    //                                    Support for Variety when attempting to print a variant item with empty variant code.
-    // NPR5.23.01/BR  /20160620 CASE 244575 Optionally Use standard NAV Lookup in POS to increase performace
-    // NPR5.26/MMV /20160818  CASE 248666 Added filter on TODAY in PrintLastReceipt(). Updated caption: ErrNoBon.
-    // NPR5.26/MHA /20160831  CASE 250709 Restructured LookupCustomer() and SaleDebit() - SetupTempCustomerStaff() added
-    // NPR5.26/BHR /20160907  CASE 248675 Display inventory on item variant lookup
-    // NPR5.27/JC  /20160929  CASE 253347 Only use Item Tracking if Serial No. is created
-    // NPR5.27/BHR /20161018  CASE 253261 skip filtering of dimension on Itemledger for Serialno.
-    // NPR5.27/MHA /20161025  CASE 255580 Unused function deleted: CompareInsurrance()
-    // NPR5.28/MMV /20161107  CASE 254575 Added function ReceiptEmailPrompt().
-    // NPR5.28/TSA /20161110  CASE 248043 (Re)Added Support for Steria AUX functions SteriaAuxFunctions()
-    // NPR5.28/VB  /20161122  CASE 259086 Removing last remnants of the .NET Control Add-in
-    // NPR5.29/JDH /20161210  CASE 256289 Calling new Creditlimit CU to adapt to 2017 Zero footprint
-    // NPR5.29/MMV /20161214  CASE 254575 Bugfix in ReceiptEmailPrompt()
-    // NPR5.29/AP  /20170119  CASE 257938 Fixing dimension issues. Dimension Set not propagated correctly from header to line and with proper priority.
-    // NPR5.31/MHA /20170110  CASE 262904 Deleted unused functions: HasDiscounts(),HasQuantityDiscount(),HasMixDiscount(),HasCampaign() and renamed Mixex Discount variables to English
-    // NPR5.31/JLK /20170331  CASE 268274 Changed ENU Caption
-    // NPR5.31/MMV /20170313  CASE 268865 Bugfix in ReceiptEmailPrompt()
-    // NPR5.33/MHA /20170614  CASE 275728 Added Publisher function OnBeforeRegisterOpen() and cleaned up function RegisterOpen()
-    // NPR5.35/JC  /20170727  CASE 278757 Created function PrintWarrantyCertificate() to print warranty from POS
-    // NPR5.35/BR  /20170815  CASE 284379 Added support for Cashback
-    // NPR5.36/TJ  /20170907  CASE 286283 Renamed variables/function into english and into proper naming terminology
-    //                                    Removed unused variables
-    // NPR5.36/JC  /20170908  CASE 286989 Revalidate qty on sales line after setting customer with regards to discount in saledebit()
-    // NPR5.36/TJ  /20170920  CASE 241650 Applied hotfix from MarianneDulong to BalanceRegisterEntries
-    // NPR5.37/MMV /20171024  CASE 294353 Fixed wrong use of report selection, added in NPR5.35.
-    // NPR5.38/BR  /20180118  CASE 302761 Added functionality to skip Audit Roll creation if "Create POS Entries Only"
-    // NPR5.40/TS  /20180308  CASE 307432 Removed reference to MSP Dankort
-    // NPR5.40/JDH /20180320  CASE 308647 Deleted a lot of functions that wasnt used any more
-    // NPR5.41/JDH /20180426 CASE 312644  Added indirect permissions to table Audit roll
-    // NPR5.45/MHA /20180821 CASE 324395 SaleLinePOS."Unit Price (LCY)" Renamed to "Unit Cost (LCY)"
-    // NPR5.46/MMV /20181001 CASE 290734 EFT Framework refactoring
-    // NPR5.53/ALPO/20191025 CASE 371956 Dimensions: POS Store & POS Unit integration; discontinue dimensions on Cash Register
-    // NPR5.53/BHR /20191004 CASE 369361 Removed connection checks
-
     Permissions = TableData "NPR Audit Roll" = rimd;
 
     var
@@ -277,8 +212,6 @@ codeunit 6014505 "NPR Touch Screen - Func."
         RoundingPrecision := Round(PaymentTypePOS."Rounding Precision" / 2, 0.001, '=');
     end;
 
-    //RetailSetupGlobal.CheckOnline;
-    //+NPR5.53 [369361]
     procedure DeleteCustomerLine(var SalePOS: Record "NPR Sale POS")
     var
         SaleLinePOS: Record "NPR Sale Line POS";
@@ -326,8 +259,7 @@ codeunit 6014505 "NPR Touch Screen - Func."
         //hentVisOmsStat
         Clear(TurnoverStatistics);
         Clear(NPRTempBuffer);
-        //formOmsStat.SETRECORD(Eksp);              s
-        TurnoverStatistics.Init;
+        TurnoverStatistics.Init();
         TurnoverStatistics.GetTurnoverStat(NPRTempBuffer);
         HeadingText := Txt001;
     end;
@@ -515,23 +447,6 @@ codeunit 6014505 "NPR Touch Screen - Func."
                     i += 1;
                     BufferInit(NPRTempBuffer, TemplateCode, i, 1, Contact.FieldCaption(Contact."Phone No."), true, 0, false, 0);
                     BufferInit(NPRTempBuffer, TemplateCode, i, 2, Contact."Phone No.", false, 0, false, 0);
-
-                    /*
-                    { COMMENTS }
-                    i += 1;
-                    bufferInit( Buffer, code50, i, 1, t002, TRUE, 0, TRUE, 0);
-
-                    comment.RESET;
-                    comment.SETRANGE("Table Name", comment."Table Name"::Customer);
-                    comment.SETRANGE("No.", cust."No.");
-                    ret := FALSE;
-                    IF comment.FIND('-') THEN REPEAT
-                      i += 1;
-                      bufferInit( Buffer, code50, i, 1, comment.Comment, FALSE, 0, FALSE, 0);
-                      bufferInit( Buffer, code50, i, 2, FORMAT(comment.Date), FALSE, 0, FALSE, 0);
-                      ret := TRUE;
-                    UNTIL (comment.NEXT = 0);
-                    */
                 end;
         end;
 
@@ -546,23 +461,13 @@ codeunit 6014505 "NPR Touch Screen - Func."
         if SourceNo = '' then
             Error(Txt001);
 
-        //ItemLedgerEntry.SETCURRENTKEY("Source Type", "Source No.", "Entry Type", "Item No.", "Variant Code", "Posting Date");
-        //itemledgerentry.SETRANGE( "Source Type", itemledgerentry."Source Type"::Item);
-        //CASE "Source Type" OF
-        //  "Source Type"::Customer : ItemLedgerEntry.SETRANGE( "Source Type" );
-        //  "Source Type"::"Cash Customer" : ItemLedgerEntry.SETRANGE( "Source Type" );
-        //END;
         ItemLedgerEntry.SetRange("Source No.", SourceNo);
         PAGE.RunModal(PAGE::"Item Ledger Entries", ItemLedgerEntry);
-        //Cust.SETFILTER("No.", '%1', "Source No.");
-        //REPORT.RUNMODAL(113, TRUE, FALSE, Cust);
     end;
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeRegisterOpen(Register: Record "NPR Register")
     begin
-        //-NPR5.33 [275728]
-        //+NPR5.33 [275728]
     end;
 
     procedure Round2Payment(PaymentTypePOS: Record "NPR Payment Type POS"; Amount: Decimal): Decimal
@@ -582,13 +487,9 @@ codeunit 6014505 "NPR Touch Screen - Func."
         AuditRoll: Record "NPR Audit Roll";
         RetailSetup: Record "NPR Retail Setup";
     begin
-        //register_open() : Boolean
         Register.Get(SalePOS."Register No.");
-        //-NPR5.33 [275728]
         OnBeforeRegisterOpen(Register);
-        //+NPR5.33 [275728]
         Register.LockTable;
-        Register.Balanced := 0D;
         Register."Opened Date" := Today;
         Register.Status := Register.Status::Ekspedition;
         Register."Opening Cash" := Register."Closing Cash";
@@ -597,23 +498,13 @@ codeunit 6014505 "NPR Touch Screen - Func."
         Register.Modify;
 
         AuditRoll.Init;
-        //-NPR5.33 [275728]
-        ////Forny hvis vi åbner på en gammel bon.
-        //AuditRollCheck.SETFILTER("Sales Ticket No.",'>%1',SalePOS."Sales Ticket No.");
-        //IF AuditRollCheck.FIND('+') THEN
-        //  AuditRoll."Sales Ticket No." := FormCode.FetchSalesTicketNumber(SalePOS."Register No.")
-        //ELSE
-        //  AuditRoll."Sales Ticket No."    := SalePOS."Sales Ticket No.";
-        //+NPR5.33 [275728]
         AuditRoll."Sales Ticket No." := SalePOS."Sales Ticket No.";
 
         Register."Opened on Sales Ticket" := AuditRoll."Sales Ticket No.";
         Register.Modify;
 
-        //-NPR5.38 [302761]
         RetailSetup.Get;
         if not RetailSetup."Create POS Entries Only" then begin
-            //+NPR5.38 [302761]
             AuditRoll."Register No." := SalePOS."Register No.";
             AuditRoll.Type := AuditRoll.Type::"Open/Close";
             AuditRoll."Sale Type" := AuditRoll."Sale Type"::Comment;
@@ -626,13 +517,7 @@ codeunit 6014505 "NPR Touch Screen - Func."
             AuditRoll.Posted := true;
             AuditRoll."Offline receipt no." := SalePOS."Sales Ticket No.";
             AuditRoll.Insert;
-            //-NPR5.38 [302761]
         end;
-        //+NPR5.38 [302761]
-        //-NPR5.40
-        //IF Register."Auto Open/Close Terminal" THEN
-        //  MSPDankort.OpenTerminal;
-        //+NPR5.40
 
         if SalePOS.Delete then;
         exit(true);
@@ -661,10 +546,7 @@ codeunit 6014505 "NPR Touch Screen - Func."
         if RetailSetup."Customer Credit Level Warning" then begin
             RetailFormCodeGlobal.CreateSalesHeader(SalePOS, SalesHeader);
             Commit;
-            //-NPR5.29 [256289]
-            //IF NOT CustCheckCreditLimit.SalesHeaderPOSCheck(SalesHeader) THEN BEGIN
             if not POSCheckCrLimit.SalesHeaderPOSCheck(SalesHeader) then begin
-                //+NPR5.29 [256289]
                 DeleteCustomerLine(SalePOS);
                 SalePOS."Customer No." := '';
                 RetailFormCodeGlobal.CreateSalesHeader(SalePOS, SalesHeader);
@@ -679,7 +561,6 @@ codeunit 6014505 "NPR Touch Screen - Func."
 
         SalePOS.Modify;
         ValidationText := '';
-        //-NPR5.36 [286989]
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
         SaleLinePOS.SetRange(Type, SaleLinePOS.Type::Item);
@@ -689,7 +570,6 @@ codeunit 6014505 "NPR Touch Screen - Func."
                 SaleLinePOS.Validate(Quantity);
                 SaleLinePOS.Modify(true);
             until SaleLinePOS.Next = 0;
-        //+NPR5.36
         exit(true);
     end;
 
@@ -758,7 +638,6 @@ codeunit 6014505 "NPR Touch Screen - Func."
     begin
         //testkasseregistrering()
 
-        //COMMIT;
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
         if SaleLinePOS.Find('-') then
@@ -769,11 +648,6 @@ codeunit 6014505 "NPR Touch Screen - Func."
                     if Item."Costing Method" = Item."Costing Method"::Specific then
                         if SaleLinePOS."Serial No." = '' then
                             Error(Txt001, SaleLinePOS.Description);
-                    //-NPR5.23 [240916]
-                    // IF Vare."Size Group" <> '' THEN
-                    //   IF (Ekspl.Color = '') AND (Ekspl.Size = '') THEN
-                    //     ERROR(t002, Ekspl.Description);
-                    //+NPR5.23 [240916]
                 end;
             until SaleLinePOS.Next = 0;
         SaleLinePOS.Reset;
@@ -786,7 +660,6 @@ codeunit 6014505 "NPR Touch Screen - Func."
     begin
         //TjekdatoEKSPEDITION
         if WorkDate <> Today then begin
-            //MESSAGE(t001);
             WorkDate := Today;
         end;
         AuditRoll.Init;
@@ -803,7 +676,6 @@ codeunit 6014505 "NPR Touch Screen - Func."
         LookupTemplate: Record "NPR Lookup Template";
         LookupTemplateLine: Record "NPR Lookup Template Line";
     begin
-        //-NPR5.22
         TempField.DeleteAll;
 
         LookupTemplateLine.SetRange("Lookup Template Table No.", TableId);
@@ -846,7 +718,6 @@ codeunit 6014505 "NPR Touch Screen - Func."
                     TempField.Insert;
                 end;
         end;
-        //+NPR5.22
     end;
 
     procedure SetupTempCustomer(SearchString: Text; var TempCustomer: Record Customer temporary): Boolean
@@ -856,7 +727,6 @@ codeunit 6014505 "NPR Touch Screen - Func."
         RecRef: RecordRef;
         FieldRef: FieldRef;
     begin
-        //-NPR5.22
         if SearchString = '' then
             exit(false);
 
@@ -882,7 +752,6 @@ codeunit 6014505 "NPR Touch Screen - Func."
         until TempField.Next = 0;
 
         exit(true);
-        //+NPR5.22
     end;
 
     local procedure SetupTempCustomerStaff(var TempCust: Record Customer temporary)
@@ -891,7 +760,6 @@ codeunit 6014505 "NPR Touch Screen - Func."
         RetailSetup: Record "NPR Retail Setup";
         RecRef: RecordRef;
     begin
-        //-NPR5.26 [250709]
         RecRef.GetTable(TempCust);
         if not RecRef.IsTemporary then
             exit;
@@ -923,7 +791,6 @@ codeunit 6014505 "NPR Touch Screen - Func."
                     TempCust.Insert;
                 end;
             until Cust.Next = 0;
-        //+NPR5.26 [250709]
     end;
 
     procedure GetLastSaleInfo("Register No.": Code[10]; var Total: Decimal; var PaymentAmountTotal: Decimal; var LastSaleDate: Text[30]; var ReturnAmountTotal: Decimal; var ReceiptNo: Text[30]): Boolean
@@ -934,15 +801,10 @@ codeunit 6014505 "NPR Touch Screen - Func."
         AuditRoll.SetRange("Register No.", "Register No.");
         AuditRoll.SetFilter("Sale Type", '<>%1', AuditRoll."Sale Type"::"Open/Close");
         AuditRoll.SetFilter(Type, '<>%1', AuditRoll.Type::Cancelled);
-        //-NPR5.22
         AuditRoll.SetRange("Sale Date", Today);
-        //+NPR5.22
         if AuditRoll.FindLast() then begin
             AuditRoll.SetRange(Type);
-            //-NPR4.14
-            //Eksp.SETRANGE("Sale Type",Eksp."Sale Type"::Salg);
             AuditRoll.SetFilter("Sale Type", '%1|%2', AuditRoll."Sale Type"::Sale, AuditRoll."Sale Type"::Deposit);
-            //+NPR4.14
             AuditRoll.SetRange("Sales Ticket No.", AuditRoll."Sales Ticket No.");
             if AuditRoll.FindSet() then
                 repeat
