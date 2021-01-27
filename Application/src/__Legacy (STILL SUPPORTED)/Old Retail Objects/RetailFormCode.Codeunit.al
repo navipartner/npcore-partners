@@ -1408,7 +1408,6 @@ codeunit 6014435 "NPR Retail Form Code"
     var
         Register: Record "NPR Register";
         UserSetup: Record "User Setup";
-        EnvironmentMgt: Codeunit "NPR Environment Mgt.";
         RegisterNo: Code[10];
         SystemSetupFile: File;
         Decimal: Decimal;
@@ -1657,7 +1656,6 @@ codeunit 6014435 "NPR Retail Form Code"
     procedure RegisterLogonnameAutofill(var Reg: Record "NPR Register")
     var
         UserSetup: Record "User Setup";
-        Environment: Codeunit "NPR Environment Mgt.";
     begin
         RetailSetupGlobal.Get;
 

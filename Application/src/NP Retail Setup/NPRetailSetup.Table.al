@@ -182,16 +182,22 @@ table 6150613 "NPR NP Retail Setup"
         {
             Caption = 'Environment Database Name';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'NPR Environment module is obsolete and will be removed';
         }
         field(20001; "Environment Company Name"; Text[250])
         {
             Caption = 'Environment Company Name';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'NPR Environment module is obsolete and will be removed';
         }
         field(20002; "Environment Tenant Name"; Text[250])
         {
             Caption = 'Environment Tenant Name';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'NPR Environment module is obsolete and will be removed';
         }
         field(20003; "Environment Type"; Option)
         {
@@ -199,31 +205,22 @@ table 6150613 "NPR NP Retail Setup"
             DataClassification = CustomerContent;
             OptionCaption = 'PROD,DEMO,TEST,DEV';
             OptionMembers = PROD,DEMO,TEST,DEV;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'NPR Environment module is obsolete and will be removed';
         }
         field(20004; "Environment Verified"; Boolean)
         {
             Caption = 'Environment Verified';
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            var
-                ActiveSession: Record "Active Session";
-            begin
-                //-NPR5.31 [263473]
-                if "Environment Verified" then begin
-                    ActiveSession.Get(ServiceInstanceId, SessionId);
-                    "Environment Database Name" := ActiveSession."Database Name";
-                    "Environment Company Name" := CompanyName;
-                    "Environment Tenant Name" := TenantId;
-                    Modify;
-                end;
-                //+NPR5.31 [263473]
-            end;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'NPR Environment module is obsolete and will be removed';
         }
         field(20005; "Environment Template"; Boolean)
         {
             Caption = 'Environment Template';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'NPR Environment module is obsolete and will be removed';
         }
         field(30000; "Enable Client Diagnostics"; Boolean)
         {
@@ -231,6 +228,8 @@ table 6150613 "NPR NP Retail Setup"
             DataClassification = CustomerContent;
             Description = 'NPR5.38,NPR5.40';
             InitValue = true;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'NPR Environment module is obsolete and will be removed';
         }
     }
 

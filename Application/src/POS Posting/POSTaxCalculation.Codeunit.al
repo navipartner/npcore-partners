@@ -29,7 +29,6 @@ codeunit 6150633 "NPR POS Tax Calculation"
     var
         PersistentPOSTaxAmountLine: Record "NPR POS Tax Amount Line";
         POSPostEntries: Codeunit "NPR POS Post Entries";
-        NPRetailSetup: Record "NPR NP Retail Setup";
     begin
         OnBeforeRefreshTaxPOSEntry(POSEntryIn);
         if POSEntryIn."Post Entry Status" >= POSEntryIn."Post Entry Status"::Posted then
@@ -50,14 +49,8 @@ codeunit 6150633 "NPR POS Tax Calculation"
             PersistVATAmountLines(POSEntryIn, TempVATAmountLine);
         end;
 
-        NPRetailSetup.Get;
-        if NPRetailSetup."Environment Type" <> NPRetailSetup."Environment Type"::PROD then begin
-            if not POSPostEntries.CheckPOSTaxAmountLines(POSEntryIn, false) then
-                if not Confirm(TextTaxError) then
-                    Error(GetLastErrorText);
-        end else
-            if not POSPostEntries.CheckPOSTaxAmountLines(POSEntryIn, false) then
-                Message(GetLastErrorText);
+        if not POSPostEntries.CheckPOSTaxAmountLines(POSEntryIn, false) then
+            Message(GetLastErrorText);
 
         OnAfterRefreshTaxPOSEntry(POSEntryIn);
     end;

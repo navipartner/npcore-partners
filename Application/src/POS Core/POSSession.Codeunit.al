@@ -101,8 +101,6 @@ codeunit 6150700 "NPR POS Session"
         UI.InitializeNumberAndDateFormat(Register);
         DebugWithTimestamp('UI.InitializeLogo');
         UI.InitializeLogo(Register);
-        DebugWithTimestamp('UI.InitializeWatermark');
-        UI.InitializeWatermark();
         DebugWithTimestamp('UI.ConfigureFonts');
         UI.ConfigureFonts();
         DebugWithTimestamp('UI.InitializeMenus');

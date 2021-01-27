@@ -4,7 +4,6 @@ codeunit 6014502 "NPR SMS"
         ServiceCalc: Codeunit "NPR Service Calculation";
         IComm: Record "NPR I-Comm";
         ErrEmpty: Label 'Sms message and/or Phone No. is blank';
-        Envfunc: Codeunit "NPR Environment Mgt.";
         SendFailedErr: Label 'Upload to Endpoint %1 failed.';
 
     procedure SendSMS(Tlf: Code[20]; SMSMessage: Text[250])

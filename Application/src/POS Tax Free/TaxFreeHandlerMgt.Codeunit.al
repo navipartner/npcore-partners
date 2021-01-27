@@ -59,7 +59,6 @@ codeunit 6014610 "NPR Tax Free Handler Mgt."
         Caption_Void: Label 'Void existing voucher';
         Caption_Reissue: Label 'Reissue existing voucher';
         Caption_VoidSucces: Label 'Voucher %1 was voided successfully';
-        Caption_EnvironmentWarning: Label 'WARNING:\The current environment is not set to production, but this tax free operation will impact an external service running in production!\Continue?';
         Caption_Workflow: Label 'Issue Tax Free Voucher';
 
         // Replacing assert error
@@ -712,14 +711,7 @@ codeunit 6014610 "NPR Tax Free Handler Mgt."
     end;
 
     local procedure CheckEnvironment(TaxFreeUnit: Record "NPR Tax Free POS Unit"): Boolean
-    var
-        NPRetailSetup: Record "NPR NP Retail Setup";
     begin
-        if TaxFreeUnit.Mode = TaxFreeUnit.Mode::PROD then
-            if NPRetailSetup.Get then
-                if NPRetailSetup."Environment Type" <> NPRetailSetup."Environment Type"::PROD then
-                    exit(Confirm(Caption_EnvironmentWarning, false));
-
         exit(true);
     end;
 
