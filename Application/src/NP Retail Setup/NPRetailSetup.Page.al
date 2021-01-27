@@ -1237,27 +1237,6 @@ page 6150613 "NPR NP Retail Setup"
                         ToolTip = 'Executes the Package Module Admin action';
                     }
                 }
-                group(DocExchange)
-                {
-                    Caption = 'Doc. Exchange';
-                    Image = ExportElectronicDocument;
-                    action(Action6014427)
-                    {
-                        Caption = 'Setup';
-                        Image = Setup;
-                        RunObject = Page "NPR Doc. Exch. Setup";
-                        ApplicationArea = All;
-                        ToolTip = 'Executes the Setup action';
-                    }
-                    action(Paths)
-                    {
-                        Caption = 'Paths';
-                        Image = List;
-                        RunObject = Page "NPR Doc. Exchange Paths";
-                        ApplicationArea = All;
-                        ToolTip = 'Executes the Paths action';
-                    }
-                }
             }
         }
     }
