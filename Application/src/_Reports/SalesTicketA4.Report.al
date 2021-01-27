@@ -53,9 +53,6 @@ report 6014410 "NPR Sales Ticket A4"
             column(Website_Register; POSStore."Home Page")
             {
             }
-            column(VATNo_Register; Register."VAT No.")
-            {
-            }
             column(ContactNo; ContactNo)
             {
             }

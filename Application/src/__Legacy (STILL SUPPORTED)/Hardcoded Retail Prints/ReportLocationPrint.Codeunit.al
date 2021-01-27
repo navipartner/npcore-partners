@@ -29,8 +29,6 @@ codeunit 6014573 "NPR Report: Location Print"
                     until SaleLinePOS.Next = 0;
 
                 PrintTotals();
-
-                PrintFooter();
             until SalePOS.Next = 0;
     end;
 
@@ -85,8 +83,6 @@ codeunit 6014573 "NPR Report: Location Print"
         Printer.AddLine(POSStore."Post Code" + ' ' + POSStore.City);
         if POSStore."Phone No." <> '' then
             Printer.AddLine(POSStore.FieldCaption("Phone No.") + ' ' + POSStore."Phone No.");
-        if Register."VAT No." <> '' then
-            Printer.AddLine(Register.FieldCaption("VAT No.") + ' ' + Register."VAT No.");
         if POSStore."E-mail" <> '' then
             Printer.AddLine(POSStore.FieldCaption("E-mail") + ' ' + POSStore."E-mail");
         if POSStore."Home Page" <> '' then
@@ -208,46 +204,6 @@ codeunit 6014573 "NPR Report: Location Print"
             end;
         end;
     end;
-
-    local procedure PrintFooter()
-    var
-        TempRetailComments: Record "NPR Retail Comment" temporary;
-        Utility: Codeunit "NPR Utility";
-        BonInfoTxt: Text;
-        BonInfoTxt2: Text;
-        Salesperson: Record "Salesperson/Purchaser";
-        POSCustomerLocation: Record "NPR POS Customer Location";
-    begin
-        Printer.SetFont('A11');
-        Printer.AddLine('');
-
-        Utility.GetTicketText(TempRetailComments, Register);
-        if TempRetailComments.FindSet then
-            repeat
-                Printer.AddTextField(1, 1, TempRetailComments.Comment)
-until TempRetailComments.Next = 0;
-
-        Printer.SetFont('A11');
-        BonInfoTxt := StrSubstNo(Text10600012, SalePOS."Sales Ticket No.",
-                                 Format(Today), Format(Time), SalePOS."Register No.");
-
-        if RetailSetup."Salesperson on Sales Ticket" and
-           Salesperson.Get(SalePOS."Salesperson Code") then begin
-            BonInfoTxt2 := Text0009 + StrSubstNo(CopyStr(Salesperson.Name, 1, 30))
-        end else
-            BonInfoTxt2 := Text0009 + StrSubstNo(CopyStr(SalePOS."Salesperson Code", 1, 30));
-
-        Printer.AddLine('');
-        Printer.AddTextField(1, 1, BonInfoTxt);
-        Printer.AddTextField(1, 1, BonInfoTxt2);
-        if (SalePOS."Customer Location No." <> '') and POSCustomerLocation.Get(SalePOS."Customer Location No.") then
-            Printer.AddTextField(1, 1, POSCustomerLocation.Description);
-
-        Printer.SetFont('Control');
-        Printer.AddLine('P');
-    end;
-
-    //Aux
 
     local procedure PrintItemAmountLine()
     var

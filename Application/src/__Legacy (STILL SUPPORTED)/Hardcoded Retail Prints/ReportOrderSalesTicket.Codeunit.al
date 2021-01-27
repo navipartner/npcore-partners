@@ -29,8 +29,6 @@ codeunit 6014570 "NPR Report: Order Sales Ticket"
             PrintRetailDocumentHeader;
 
             PrintRetailDocumentLines;
-
-            PrintFooter;
         end;
 
         Printer.SetFont('A11');
@@ -87,8 +85,6 @@ codeunit 6014570 "NPR Report: Order Sales Ticket"
         Printer.AddLine(POSStore."Post Code" + ' ' + POSStore.City);
         if POSStore."Phone No." <> '' then
             Printer.AddLine(POSStore.FieldCaption("Phone No.") + ' ' + POSStore."Phone No.");
-        if Register."VAT No." <> '' then
-            Printer.AddLine(Register.FieldCaption("VAT No.") + ' ' + Register."VAT No.");
         if POSStore."E-mail" <> '' then
             Printer.AddLine(POSStore.FieldCaption("E-mail") + ' ' + POSStore."E-mail");
         if POSStore."Home Page" <> '' then
@@ -167,28 +163,6 @@ codeunit 6014570 "NPR Report: Order Sales Ticket"
                 Printer.AddTextField(1, 0, ' ' + CommentLine2.Comment);
             until CommentLine2.Next = 0;
     end;
-
-    procedure PrintFooter()
-    var
-        TempRetailComments: Record "NPR Retail Comment" temporary;
-        Utility: Codeunit "NPR Utility";
-    begin
-        if RetailSetup."Bar Code on Sales Ticket Print" and (Register."Receipt Printer Type" = Register."Receipt Printer Type"::"TM-T88") then begin
-            Printer.AddLine('');
-            Printer.AddBarcode('Code39', RetailDocumentHeader."No.", 4);
-            Printer.AddLine('');
-        end;
-
-        Printer.SetFont('A11');
-        Utility.GetTicketText(TempRetailComments, Register);
-        if TempRetailComments.FindSet then
-            repeat
-                Printer.AddTextField(1, 1, TempRetailComments.Comment)
-            until TempRetailComments.Next = 0;
-    end;
-
-    //Record Triggers
-    //Init
 
     procedure GetRecords()
     var

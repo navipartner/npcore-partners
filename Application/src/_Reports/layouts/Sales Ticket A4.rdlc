@@ -10823,9 +10823,6 @@ End Function
         <Field Name="Website_Register">
           <DataField>Website_Register</DataField>
         </Field>
-        <Field Name="VATNo_Register">
-          <DataField>VATNo_Register</DataField>
-        </Field>
         <Field Name="ContactNo">
           <DataField>ContactNo</DataField>
         </Field>

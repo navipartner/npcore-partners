@@ -99,7 +99,6 @@ report 6014564 "NPR Credit Voucher A5"
                         end;
                         RegisterPhoneText := StrSubstNo(Text1002, POSStore."Phone No.");
                         RegisterPostCodeAndCityText := POSStore."Post Code" + ' ' + POSStore.City;
-                        RegisterVatNoText := StrSubstNo(Text1003, Register."VAT No.");
                     end;
                 }
 

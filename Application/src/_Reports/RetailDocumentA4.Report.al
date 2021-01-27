@@ -366,11 +366,9 @@ report 6014486 "NPR Retail Document A4"
                 Firmanavn[5] := POSStore.FieldCaption("Phone No.") + ': ' + POSStore."Phone No.";
                 if POSStore."Fax No." <> '' then
                     Firmanavn[6] := POSStore.FieldCaption("Fax No.") + ': ' + POSStore."Fax No.";
-                if Kasse."VAT No." <> '' then
-                    Firmanavn[7] := Kasse.FieldCaption("VAT No.") + ': ' + Kasse."VAT No.";
                 Firmanavn[8] := POSStore."Home Page";
                 Firmanavn[9] := POSStore."E-mail";
-                Firmanavn[10] := Kasse.FieldCaption("Bank Account No.") + ' ' + Kasse."Bank Account No.";
+                Firmanavn[10] := Firmaoplysninger.FieldCaption("Bank Account No.") + ' ' + Firmaoplysninger."Bank Account No.";
                 CompressArray(Firmanavn);
 
                 if Resource.Get("Resource Ship-by Car") then;

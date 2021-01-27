@@ -59,7 +59,6 @@ codeunit 6014560 "NPR Report - Sales Ticket"
             PrintAuditRollFinance;
             PrintAuditRollPayments;
             PrintBarCode;
-            PrintFooter;
         end;
     end;
 
@@ -159,8 +158,6 @@ codeunit 6014560 "NPR Report - Sales Ticket"
         Printer.AddLine(POSStore."Post Code" + ' ' + POSStore.City);
         if POSStore."Phone No." <> '' then
             Printer.AddLine(POSStore.FieldCaption("Phone No.") + ' ' + POSStore."Phone No.");
-        if Register."VAT No." <> '' then
-            Printer.AddLine(Register.FieldCaption("VAT No.") + ' ' + Register."VAT No.");
         if POSStore."E-mail" <> '' then
             Printer.AddLine(POSStore.FieldCaption("E-mail") + ' ' + POSStore."E-mail");
         if POSStore."Home Page" <> '' then
@@ -547,80 +544,6 @@ codeunit 6014560 "NPR Report - Sales Ticket"
             Printer.AddBarcode('Code39', AuditRoll."Sales Ticket No.", 4);
         end;
     end;
-
-    procedure PrintFooter()
-    var
-        TempRetailComments: Record "NPR Retail Comment" temporary;
-        Utility: Codeunit "NPR Utility";
-        Text10600019: Label 'Ticket for payoyt';
-        Text10600020: Label 'Ticket for  cash receipt';
-        BonInfoTxt: Text[100];
-        BonInfoTxt2: Text[100];
-    begin
-        Printer.AddLine('');
-
-        Utility.GetTicketText(TempRetailComments, Register);
-        if TempRetailComments.FindSet then
-            repeat
-                Printer.AddTextField(1, 1, TempRetailComments.Comment)
-            until TempRetailComments.Next = 0;
-
-        Printer.NewLine;
-
-        if (CurrPageNo = 2) and (FlagReturnSale) and (not FlagCreditVoucher) then begin
-            Printer.AddLine('');
-            Printer.SetPadChar('_');
-            Printer.AddLine(Text0006);
-            Printer.SetPadChar('');
-            Printer.NewLine;
-            Printer.AddLine('');
-            Printer.SetPadChar('_');
-            Printer.AddLine(Text0007);
-            Printer.SetPadChar('');
-            Printer.NewLine;
-            Printer.AddLine('');
-            Printer.SetPadChar('_');
-            Printer.AddLine('');
-            Printer.SetPadChar('');
-        end;
-
-        if ((FlagCreditVoucher or FlagCustomerPayment or FlagGiftVoucher) and (CurrPageNo = 2)) or
-           ((CurrPageNo = 1) and FlagOutPayment) or
-           ((FlagReturnSale) and (RetailConfiguration."Signature for Return") and (CurrPageNo = 2)) then begin
-            if FlagCustomerPayment then
-                Printer.AddTextField(1, 1, Text10600020)
-            else
-                Printer.AddTextField(1, 1, Text10600019);
-
-            Printer.AddDateField(1, 2, Today);
-            Printer.AddLine('');
-            Printer.AddLine('');
-            Printer.SetPadChar('-');
-            Printer.AddLine('');
-            Printer.SetPadChar('');
-        end;
-
-        // Info Footer Text
-        BonInfoTxt := StrSubstNo(Text10600012, AuditRoll."Sales Ticket No.",
-                                 Format(AuditRoll."Sale Date"), Format(AuditRoll."Closing Time"), AuditRoll."Register No.");
-
-        if RetailConfiguration."Salesperson on Sales Ticket" and
-           Salesperson.Get(AuditRoll."Salesperson Code") then begin
-            BonInfoTxt2 := Text0009 + StrSubstNo(CopyStr(Salesperson.Name, 1, 30))
-        end else
-            BonInfoTxt2 := Text0009 + StrSubstNo(CopyStr(AuditRoll."Salesperson Code", 1, 30));
-
-        Printer.AddLine('');
-        Printer.AddTextField(1, 1, BonInfoTxt);
-        Printer.AddTextField(1, 1, BonInfoTxt2);
-
-        OnPrintCleanCash(Printer, AuditRoll);
-
-        Printer.SetFont('Control');
-        Printer.AddLine('P');
-    end;
-
-    //Record Triggers
 
     procedure AuditRollSalesOnAfterGetRecord(var AuditRollSales: Record "NPR Audit Roll") DoNotSkip: Boolean
     begin

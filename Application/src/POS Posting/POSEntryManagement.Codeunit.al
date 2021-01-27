@@ -224,7 +224,6 @@ codeunit 6150629 "NPR POS Entry Management"
         POSStore.Init();
         POSStore.Code := POSUnit."No.";
         POSStore.Validate("Location Code", Register."Location Code");
-        POSStore.Validate("VAT Registration No.", Register."VAT No.");
         POSStore.Validate("Global Dimension 1 Code", POSUnit."Global Dimension 1 Code");
         POSStore.Validate("Global Dimension 2 Code", POSUnit."Global Dimension 2 Code");
         POSStore.Validate("Default POS Posting Setup", POSStore."Default POS Posting Setup"::Customer);

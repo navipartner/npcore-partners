@@ -14,8 +14,6 @@ codeunit 6014568 "NPR Rental Contract S.Ticket"
 
         for CurrPageNo := 1 to 1 do begin
             PrintRetailDocumentHeader;
-            PrintSalesTicketText;
-
         end;
 
         RPLinePrintMgt.SetFont('A11');
@@ -94,7 +92,6 @@ codeunit 6014568 "NPR Rental Contract S.Ticket"
             RPLinePrintMgt.AddTextField(1, 0, POSStore."Post Code" + ' ' + POSStore.City);
             RPLinePrintMgt.AddTextField(1, 0, 'Telefon: ' + Format(POSStore."Phone No."));
             RPLinePrintMgt.AddTextField(1, 0, 'Fax: ' + Format(POSStore."Fax No."));
-            RPLinePrintMgt.AddTextField(1, 0, 'CVR: ' + Format(Register."VAT No."));
         end;
 
         // Retail Document Header, Header (4) - OnPreSection()
@@ -314,39 +311,6 @@ codeunit 6014568 "NPR Rental Contract S.Ticket"
                     RPLinePrintMgt.AddDecimalField(4, 0, RetailDocumentLines."Line discount amount");
                 end;
             until RetailDocumentLines.Next = 0;
-        end;
-    end;
-
-    procedure PrintSalesTicketText()
-    begin
-        // Bontekst - Properties
-        SalesTicketTextCounter.SetCurrentKey(Number);
-        SalesTicketTextCounter.Ascending(true);
-        SalesTicketTextCounter.SetFilter(Number, '1..');
-
-        // Bontekst - OnPreDataItem()
-        Utility.GetTicketText(RetailComment, Register);
-        RetailComment.SetFilter(Comment, '<>""');
-        if RetailComment.Find('-') then;
-
-        RetailComment2.SetRange("No.", RetailDocumentHeader."No.");
-        if RetailComment2.Find('-') then begin
-        end;
-
-        if SalesTicketTextCounter.FindSet then begin
-            repeat
-                // Bontekst - OnAfterGetRecord()
-                if SalesTicketTextCounter.Number > 1 then
-                    //BonLinjer.NEXT;
-                    RetailComment2.Next;
-                // Bontekst, Body (1)
-                RPLinePrintMgt.SetFont('A11');
-                RPLinePrintMgt.AddTextField(1, 1, RetailComment2.Comment);
-            until (SalesTicketTextCounter.Next = 0) or (SalesTicketTextCounter.Number > RetailComment2.Count);
-            // Bontekst, Footer (2)
-            RPLinePrintMgt.SetFont('A11');
-            RPLinePrintMgt.AddLine(BonInfo);
-            RPLinePrintMgt.AddLine(BonInfo2);
         end;
     end;
 

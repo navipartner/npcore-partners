@@ -475,20 +475,11 @@ report 6014447 "NPR Sales Invoice A4 (Retail)"
                     CompressArray(Companyaddr);
                 end;
 
-                if Register.Get(Retailformcode.FetchRegisterNumber) then begin
-                    Banknavn := Register."Bank Name";
-                    Bankbranch := Register."Bank Registration No.";
-                    Bankkontonr := Register."Bank Account No.";
-                    VatNo := Register."VAT No.";
-                    GiroNo := Register."Giro No.";
-
-                end else begin
-                    Banknavn := FirmaOplysninger."Bank Name";
-                    Bankbranch := FirmaOplysninger."Bank Branch No.";
-                    Bankkontonr := FirmaOplysninger."Bank Account No.";
-                    VatNo := FirmaOplysninger."VAT Registration No.";
-                    GiroNo := FirmaOplysninger."Giro No.";
-                end;
+                Banknavn := FirmaOplysninger."Bank Name";
+                Bankbranch := FirmaOplysninger."Bank Branch No.";
+                Bankkontonr := FirmaOplysninger."Bank Account No.";
+                VatNo := FirmaOplysninger."VAT Registration No.";
+                GiroNo := FirmaOplysninger."Giro No.";
 
                 PaidDeposit := 0;
                 if "NPR Sales Ticket No." <> '' then begin

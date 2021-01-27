@@ -1,32 +1,5 @@
 codeunit 6014550 "NPR RP Aux - Misc. Library"
 {
-    // NPR4.10/MMV/20150506 CASE 167059 New method DecToInt
-    // NPR4.10/MMV/20150527 CASE 213523 Fixed method ApplyExchangeDeadline
-    // NPR4.16/MMV/20151029 CASE 226091 Added function ID 'ROUNDTO1DECIMAL'
-    // NPR5.23/JDH /20160513 CASE 240916 Removed old VariaX functionality
-    // NPR5.26/MMV /20160905 CASE 251044 Added function ID 'FORMAT_THOUSANDSEP'.
-    //                                   Removed VariaX.
-    // NPR5.27/MMV /20161004 CASE 249733 Added function ID 'DECTOINT_WITHSEP';
-    // NPR5.30/MMV /20170208 CASE 265858 Fixed ParseAsDecimal regional bug.
-    // NPR5.32/MMV /20170501 CASE 241995 Retail Print 2.0
-    // NPR5.38/MMV /20171108 CASE 295865 Added function ID 'CIPHERCODE_WITHDECIMALS'
-    // NPR5.40/MMV /20180208 CASE 301032 Added function 'NEGATE_DECIMAL';
-    // NPR5.40/MMV /20180208 CASE 304639 Removed non-functional 'VAT_BREAKDOWN'
-    // NPR5.41/MMV /20180416 CASE 308701 Renamed number formatting functions for clarity.
-    // NPR5.42/MMV /20180516 CASE 305852 Added more date functionality
-    // NPR5.44/MMV /20180706 CASE 315362 Pull receipt text from specific register if possible.
-    // NPR5.48/MITH/20181112 CASE 314067 Added auxiliary functions for date and datetime
-    //                                   to return formatted month.
-    // NPR5.48/MMV /20181206 CASE 327107 Added hex conversions
-    // NPR5.49/TSA /20190218 CASE 342244 Added functions MultiplicativeInverseEncode() and MultiplicativeInverseDecode() to obfuscation of numbers (receipt number)
-    // NPR5.51/MMV /20190712 CASE 360972 Added date formula functions
-    // NPR5.54/BHR /20200219 CASE 389444 Allow print Text from POS Unit
-
-
-    trigger OnRun()
-    begin
-    end;
-
     procedure ApplyCipher(var "Proccesing Value": Text[30]; HandleDecimals: Boolean) CifferCodeValue: Code[10]
     var
         RetailConfiguration: Record "NPR Retail Setup";
@@ -107,10 +80,8 @@ codeunit 6014550 "NPR RP Aux - Misc. Library"
 
     local procedure FormatNumberTwoDecimal(var ProcessingValue: Text)
     begin
-        //-NPR5.41 [308701]
         if ProcessingValue <> '' then
             ProcessingValue := Format(ParseAsDecimal(ProcessingValue), 0, '<Precision,2:2><Standard Format,2>');
-        //+NPR5.41 [308701]
     end;
 
     procedure FormatNumberSeparator(var ProcessingValue: Text)
@@ -122,20 +93,15 @@ codeunit 6014550 "NPR RP Aux - Misc. Library"
     procedure FormatNumberSeperatorAndRound(var ProcessingValue: Text)
     begin
         if ProcessingValue <> '' then
-            //-NPR5.41 [308701]
-            //  ProcessingValue := FORMAT(ParseAsDecimal(ProcessingValue),0,'<Precision,0:2><Standard Format,0>');
             ProcessingValue := Format(ParseAsDecimal(ProcessingValue), 0, '<Precision,0:5><Standard Format,0>');
-        //+NPR5.41 [308701]
     end;
 
     local procedure NegateDecimal(var ProcessingValue: Text)
     var
         Decimal: Decimal;
     begin
-        //-NPR5.40 [301032]
         if ProcessingValue <> '' then
             ProcessingValue := Format(ParseAsDecimal(ProcessingValue) * -1);
-        //+NPR5.40 [301032]
     end;
 
     local procedure PrintReceiptText(var TemplateLine: Record "NPR RP Template Line"; RecordID: RecordID)
@@ -150,8 +116,6 @@ codeunit 6014550 "NPR RP Aux - Misc. Library"
         POSEntry: Record "NPR POS Entry";
         POSUnit: Record "NPR POS Unit";
     begin
-        //-NPR5.44 [315362]
-        //Register.GET(RetailFormCode.FetchRegisterNumber());
         case RecordID.TableNo of
             DATABASE::"NPR Audit Roll":
                 begin
@@ -159,41 +123,16 @@ codeunit 6014550 "NPR RP Aux - Misc. Library"
                     RecRef.SetTable(AuditRoll);
                     AuditRoll.Find;
                     Register.Get(AuditRoll."Register No.");
-                    //-NPR5.54 [389444]
-                    Utility.GetTicketText(tmpRetailComment, Register);
-                    //+NPR5.54 [389444]
                 end;
             DATABASE::"NPR POS Entry":
                 begin
                     RecRef := RecordID.GetRecord();
                     RecRef.SetTable(POSEntry);
                     POSEntry.Find;
-                    //-NPR5.54 [389444]
-                    //Register.GET(POSEntry."POS Unit No.");
                     POSUnit.Get(POSEntry."POS Unit No.");
                     Utility.GetPOSUnitTicketText(tmpRetailComment, POSUnit);
-                    if not tmpRetailComment.FindFirst then begin
-                        Register.Get(POSEntry."POS Unit No.");
-                        Utility.GetTicketText(tmpRetailComment, Register);
-                    end;
-                    //+NPR5.54 [389444]
-
                 end;
-            //-NPR5.54 [389444]
-            //ELSE
-            else begin
-                    //-NPR5.54 [389444]
-                    Register.Get(RetailFormCode.FetchRegisterNumber());
-                    //-NPR5.54 [389444]
-                    Utility.GetTicketText(tmpRetailComment, Register);
-                end;
-        //+NPR5.54 [389444]
         end;
-        //+NPR5.44 [315362]
-
-        //-NPR5.54 [389444]
-        //  Utility.GetTicketText(tmpRetailComment, Register);
-        //-NPR5.54 [389444]
         LinePrintMgt.SetFont(TemplateLine."Type Option");
         if tmpRetailComment.FindSet then
             repeat
@@ -203,32 +142,26 @@ codeunit 6014550 "NPR RP Aux - Misc. Library"
 
     procedure FormatMonthFromDate(ProcessingDate: Date) FormattedMonth: Text
     begin
-        //-NPR5.48 [314067]
         if ProcessingDate <> 0D then
             exit(Format(ProcessingDate, 0, '<Month Text>'));
-        //+NPR5.48 [314067]
     end;
 
     procedure FormatMonthFromDatetime(ProcessingDateTime: DateTime) FormattedMonth: Text
     var
         tmpProcessingDate: Date;
     begin
-        //-NPR5.48 [314067]
         if ProcessingDateTime <> 0DT then begin
             tmpProcessingDate := DT2Date(ProcessingDateTime);
             exit(Format(tmpProcessingDate, 0, '<Month Text>'));
         end;
-        //+NPR5.48 [314067]
     end;
 
     procedure IntToHex(BigInt: BigInteger): Text
     var
         IntPtr: DotNet NPRNetIntPtr;
     begin
-        //-NPR5.48 [327107]
         IntPtr := IntPtr.IntPtr(BigInt);
         exit(IntPtr.ToString('X'));
-        //+NPR5.48 [327107]
     end;
 
     procedure StringToHex(Text: Text): Text
@@ -238,9 +171,7 @@ codeunit 6014550 "NPR RP Aux - Misc. Library"
         BitConverter: DotNet NPRNetBitConverter;
         Regex: DotNet NPRNetRegex;
     begin
-        //-NPR5.48 [327107]
         exit(Regex.Replace(BitConverter.ToString(Encoding.Unicode.GetBytes(Text)), '-', ''));
-        //+NPR5.48 [327107]
     end;
 
     procedure MultiplicativeInverseEncode(plain: Integer) encoded: BigInteger
@@ -248,8 +179,6 @@ codeunit 6014550 "NPR RP Aux - Misc. Library"
         m: BigInteger;
         x: BigInteger;
     begin
-
-        //-NPR5.49 [342244]
         // OBFUSCATION of an integer number using modular math
         // (x * y * plain) MOD m == plain MOD m when plain > 0
 
@@ -265,8 +194,6 @@ codeunit 6014550 "NPR RP Aux - Misc. Library"
         // a number ending in a 9 cannot be dividable by 2 or 5
         x := 487620189;
         encoded := plain * x mod m;
-
-        //+NPR5.49 [342244]
     end;
 
     procedure MultiplicativeInverseDecode(encoded: BigInteger) plain: Integer
@@ -274,8 +201,6 @@ codeunit 6014550 "NPR RP Aux - Misc. Library"
         m: BigInteger;
         y: BigInteger;
     begin
-
-        //-NPR5.49 [342244]
         // OBFUSCATION of an integer number using modular math
         // (x * y * plain) MOD m == plain MOD m when plain > 0
 
@@ -289,22 +214,14 @@ codeunit 6014550 "NPR RP Aux - Misc. Library"
         // (487620189 * 959774709) MOD 1000000000 == 1
         y := 959774709;
         plain := encoded * y mod m;
-
-        //+NPR5.49 [342244]
     end;
 
     local procedure CalculateDate(FormattedDate: Text; DateFormula: Text): Text
     var
         Date: Date;
     begin
-        //-NPR5.51 [360972]
         Evaluate(Date, FormattedDate);
         exit(Format(CalcDate('<' + DateFormula + '>', Date)));
-        //+NPR5.51 [360972]
-    end;
-
-    procedure "// Locals"()
-    begin
     end;
 
     local procedure ParseAsDecimal(Value: Text[30]) DecimalValue: Decimal
@@ -314,23 +231,17 @@ codeunit 6014550 "NPR RP Aux - Misc. Library"
 
     local procedure ParseAsDate(Value: Text) DateValue: Date
     begin
-        //-NPR5.42 [305852]
         Evaluate(DateValue, Value);
-        //+NPR5.42 [305852]
     end;
 
     local procedure ParseAsDateTime(Value: Text) DateTimeValue: DateTime
     begin
-        //-NPR5.48 [314067]
         Evaluate(DateTimeValue, Value);
-        //+NPR5.48 [314067]
     end;
 
     local procedure ParseAsBigInteger(Value: Text) BigIntValue: BigInteger
     begin
-        //-NPR5.48 [327107]
         Evaluate(BigIntValue, Value);
-        //+NPR5.48 [327107]
     end;
 
     local procedure FormatDecimal(DecimalValue: Decimal): Text
@@ -349,19 +260,14 @@ codeunit 6014550 "NPR RP Aux - Misc. Library"
     var
         ValueLength: Integer;
     begin
-        //-NPR5.42 [305852]
         ValueLength := StrLen(Value);
 
         if ValueLength >= Length then
             exit(Value);
 
         exit(PadStr('', Length - ValueLength, PadChar) + Value);
-        //+NPR5.42 [305852]
     end;
 
-    local procedure "// Event Subscribers"()
-    begin
-    end;
 
     [EventSubscriber(ObjectType::Table, 6014445, 'OnBuildFunctionCodeunitList', '', false, false)]
     local procedure OnBuildFunctionCodeunitList(var tmpAllObj: Record AllObj temporary)
@@ -391,20 +297,13 @@ codeunit 6014550 "NPR RP Aux - Misc. Library"
         AddFunction(tmpRetailList, 'CONVERT SEK');
         AddFunction(tmpRetailList, 'CIPHERCODE_WITHDECIMALS');
         AddFunction(tmpRetailList, 'NEGATE_DECIMAL');
-        //-NPR5.41 [308701]
-        // AddFunction(tmpRetailList, 'DECTOINT');
-        // AddFunction(tmpRetailList, 'DECTOINT_WITHSEP');
-        // AddFunction(tmpRetailList, 'ROUNDTO1DECIMAL');
-        // AddFunction(tmpRetailList, 'FORMAT_THOUSANDSEP');
 
         AddFunction(tmpRetailList, 'NUMBER_NO_DECIMAL');
         AddFunction(tmpRetailList, 'NUMBER_ONE_DECIMAL');
         AddFunction(tmpRetailList, 'NUMBER_TWO_DECIMAL');
         AddFunction(tmpRetailList, 'NUMBER_SEPARATOR_TWO_DECIMAL');
         AddFunction(tmpRetailList, 'NUMBER_SEPARATOR_ROUND');
-        //+NPR5.41 [308701]
 
-        //-NPR5.42 [305852]
         AddFunction(tmpRetailList, 'CURRENTDAY');
         AddFunction(tmpRetailList, 'CURRENTMONTH');
         AddFunction(tmpRetailList, 'CURRENTYEAR');
@@ -413,25 +312,16 @@ codeunit 6014550 "NPR RP Aux - Misc. Library"
         AddFunction(tmpRetailList, 'DATE_MONTH');
         AddFunction(tmpRetailList, 'DATE_YEAR');
         AddFunction(tmpRetailList, 'DATE_YEAR_SHORT');
-        //+NPR5.42 [305852]
 
-        //-NPR5.48 [314067]
         AddFunction(tmpRetailList, 'FORMAT_MONTH_FROM_DATE');
         AddFunction(tmpRetailList, 'FORMAT_MONTH_FROM_DATETIME');
-        //+NPR5.48 [314067]
 
-        //-NPR5.48 [327107]
         AddFunction(tmpRetailList, 'INT_TO_HEX');
         AddFunction(tmpRetailList, 'STRING_TO_HEX');
-        //+NPR5.48 [327107]
 
-        //-NPR5.49 [342244]
         AddFunction(tmpRetailList, 'OBFUSCATE_MI');
-        //+NPR5.49 [342244]
 
-        //-NPR5.51 [360972]
         AddFunction(tmpRetailList, 'CALC_DATE');
-        //+NPR5.51 [360972]
     end;
 
     [EventSubscriber(ObjectType::Table, 6014445, 'OnFunction', '', false, false)]
@@ -451,7 +341,6 @@ codeunit 6014550 "NPR RP Aux - Misc. Library"
                     "Processing Value" := Format(Today);
                 'CURRENTTIME':
                     "Processing Value" := Format(Time);
-                //-NPR5.42 [305852]
                 'CURRENTDAY':
                     "Processing Value" := PadLeft(Format(Date2DMY(Today, 1)), '0', 2);
                 'CURRENTMONTH':
@@ -460,16 +349,8 @@ codeunit 6014550 "NPR RP Aux - Misc. Library"
                     "Processing Value" := Format(Date2DMY(Today, 3));
                 'CURRENTYEAR_SHORT':
                     "Processing Value" := CopyStr(Format(Date2DMY(Today, 3)), 3, 2);
-                //+NPR5.42 [305852]
-
-                //Custom sections
-                //-NPR5.44 [315362]
-                //'RECEIPT_TEXT' : PrintReceiptText(TemplateLine);
                 'RECEIPT_TEXT':
                     PrintReceiptText(TemplateLine, RecID);
-                //+NPR5.44 [315362]
-
-                //-NPR5.42 [305852]
                 //Date formatting
                 'DATE_DAY':
                     "Processing Value" := PadLeft(Format(Date2DMY(ParseAsDate("Processing Value"), 1)), '0', 2);
@@ -479,16 +360,10 @@ codeunit 6014550 "NPR RP Aux - Misc. Library"
                     "Processing Value" := Format(Date2DMY(ParseAsDate("Processing Value"), 3));
                 'DATE_YEAR_SHORT':
                     "Processing Value" := CopyStr(Format(Date2DMY(ParseAsDate("Processing Value"), 3)), 3, 2);
-                //+NPR5.42 [305852]
-                //-NPR5.48 [314067]
                 'FORMAT_MONTH_FROM_DATE':
                     "Processing Value" := FormatMonthFromDate(ParseAsDate("Processing Value"));
                 'FORMAT_MONTH_FROM_DATETIME':
                     "Processing Value" := FormatMonthFromDatetime(ParseAsDateTime("Processing Value"));
-                //+NPR5.48 [314067]
-
-                //Number formatting
-                //-NPR5.41 [308701]
                 'NUMBER_NO_DECIMAL':
                     FormatNumberNoDecimal("Processing Value");
                 'NUMBER_ONE_DECIMAL':
@@ -499,9 +374,6 @@ codeunit 6014550 "NPR RP Aux - Misc. Library"
                     FormatNumberSeparator("Processing Value");
                 'NUMBER_SEPARATOR_ROUND':
                     FormatNumberSeperatorAndRound("Processing Value");
-                //+NPR5.41 [308701]
-
-                //Conversions
                 'CIFFERCODE':
                     ApplyCipher("Processing Value", false);
                 'CIPHERCODE_WITHDECIMALS':
@@ -510,24 +382,14 @@ codeunit 6014550 "NPR RP Aux - Misc. Library"
                     ApplyExchangeDeadline("Processing Value");
                 'NEGATE_DECIMAL':
                     NegateDecimal("Processing Value");
-                //-NPR5.48 [327107]
                 'INT_TO_HEX':
                     "Processing Value" := IntToHex(ParseAsBigInteger("Processing Value"));
                 'STRING_TO_HEX':
                     "Processing Value" := StringToHex("Processing Value");
-                //+NPR5.48 [327107]
-
-                //-NPR5.49 [342244]
                 'OBFUSCATE_MI':
                     "Processing Value" := Format(MultiplicativeInverseEncode(ParseAsBigInteger("Processing Value")), 0, 9);
-                //+NPR5.49 [342244]
-
-                //-NPR5.51 [360972]
                 'CALC_DATE':
                     "Processing Value" := CalculateDate("Processing Value", "Processing Function Parameter");
-                //+NPR5.51 [360972]
-
-                //Legacy syntax (can no longer be selected on the list)
                 'DECTOINT':
                     FormatNumberNoDecimal("Processing Value");
                 'ROUNDTO1DECIMAL':
@@ -536,7 +398,6 @@ codeunit 6014550 "NPR RP Aux - Misc. Library"
                     FormatNumberSeparator("Processing Value");
                 'DECTOINT_WITHSEP':
                     FormatNumberSeperatorAndRound("Processing Value");
-
                 else
                     case true of
                         CopyStr("Processing Function ID", 1, 7) = 'CONVERT':
