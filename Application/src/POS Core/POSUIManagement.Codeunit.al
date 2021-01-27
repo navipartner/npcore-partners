@@ -65,27 +65,30 @@ codeunit 6150702 "NPR POS UI Management"
     procedure InitializeMenus(Register: Record "NPR Register"; Salesperson: Record "Salesperson/Purchaser"; POSSession: Codeunit "NPR POS Session")
     var
         Menu: Record "NPR POS Menu";
-        Menus: JsonArray;
-        MenuObj: Codeunit "NPR POS Menu";
         tmpPOSParameterValue: Record "NPR POS Parameter Value" temporary;
+        POSUnit: Record "NPR POS Unit";
+        POSViewProfile: Record "NPR POS View Profile";
+        MenuObj: Codeunit "NPR POS Menu";
+        Menus: JsonArray;
     begin
+        if (not POSUnit.Get(Register."Register No.")) or (not POSViewProfile.Get(POSUnit."POS View Profile")) then
+            Clear(POSViewProfile);
+
         PreloadParameters(tmpPOSParameterValue);
 
-        with Menu do begin
-            SetRange(Blocked, false);
-            SetFilter("Register Type", '%1|%2', Register."Register Type", '');
-            SetFilter("Register No.", '%1|%2', Register."Register No.", '');
-            SetFilter("Salesperson Code", '%1|%2', Salesperson.Code, '');
-            SetRange("Available on Desktop", true);                // TODO: fix this after developing app stuff
+        Menu.SetRange(Blocked, false);
+        Menu.SetFilter("Register Type", '%1|%2', POSViewProfile.Code, '');
+        Menu.SetFilter("Register No.", '%1|%2', Register."Register No.", '');
+        Menu.SetFilter("Salesperson Code", '%1|%2', Salesperson.Code, '');
+        Menu.SetRange("Available on Desktop", true);                // TODO: fix this after developing app stuff
 
-            if FindSet then
-                repeat
-                    Clear(MenuObj);
-                    InitializeMenu(Menu, MenuObj, POSSession, tmpPOSParameterValue);
-                    Menus.Add(MenuObj.GetJson);
-                until Next = 0;
-            FrontEnd.ConfigureMenu(Menus);
-        end;
+        if Menu.FindSet() then
+            repeat
+                Clear(MenuObj);
+                InitializeMenu(Menu, MenuObj, POSSession, tmpPOSParameterValue);
+                Menus.Add(MenuObj.GetJson);
+            until Menu.Next() = 0;
+        FrontEnd.ConfigureMenu(Menus);
     end;
 
     local procedure InitializeMenu(var Menu: Record "NPR POS Menu"; MenuObj: Codeunit "NPR POS Menu"; POSSession: Codeunit "NPR POS Session"; var tmpPOSParameterValue: Record "NPR POS Parameter Value" temporary)
@@ -95,83 +98,72 @@ codeunit 6150702 "NPR POS UI Management"
         POSSession.DebugWithTimestamp('Initializing menu [' + Menu.Code + ']');
         InitializeMenuObject(Menu, MenuObj);
 
-        with MenuButton do begin
-            SetRange("Menu Code", Menu.Code);
-            SetRange(Blocked, false);
-            Menu.CopyFilter("Register Type", "Register Type");
-            Menu.CopyFilter("Register No.", "Register No.");
-            Menu.CopyFilter("Available in App", "Available in App");
-            Menu.CopyFilter("Available on Desktop", "Available on Desktop");
-            SetRange("Parent ID", 0);
+        MenuButton.SetRange("Menu Code", Menu.Code);
+        MenuButton.SetRange(Blocked, false);
+        Menu.CopyFilter("Register Type", MenuButton."Register Type");
+        Menu.CopyFilter("Register No.", MenuButton."Register No.");
+        Menu.CopyFilter("Available in App", MenuButton."Available in App");
+        Menu.CopyFilter("Available on Desktop", MenuButton."Available on Desktop");
+        MenuButton.SetRange("Parent ID", 0);
 
-            InitializeMenuButtons(MenuButton, MenuObj, POSSession, tmpPOSParameterValue);
-        end;
+        InitializeMenuButtons(MenuButton, MenuObj, POSSession, tmpPOSParameterValue);
     end;
 
     local procedure InitializeMenuObject(Menu: Record "NPR POS Menu"; MenuObj: Codeunit "NPR POS Menu")
     begin
-        with Menu do begin
-            MenuObj.SetId(Code);
-            MenuObj.SetCaption(Caption);
-            MenuObj.SetTooltip(Tooltip);
-            MenuObj.SetClass("Custom Class Attribute");
-        end;
+        MenuObj.SetId(Menu.Code);
+        MenuObj.SetCaption(Menu.Caption);
+        MenuObj.SetTooltip(Menu.Tooltip);
+        MenuObj.SetClass(Menu."Custom Class Attribute");
     end;
 
     local procedure InitializeSubmenu(var MenuButton: Record "NPR POS Menu Button"; ISubMenu: Interface "NPR ISubMenu"; POSSession: Codeunit "NPR POS Session"; var tmpPOSParameterValue: Record "NPR POS Parameter Value" temporary)
     var
         SubMenuButton: Record "NPR POS Menu Button";
     begin
-        with SubMenuButton do begin
-            CopyFilters(MenuButton);
-            SetRange("Parent ID", MenuButton.ID);
-
-            InitializeMenuButtons(SubMenuButton, ISubMenu, POSSession, tmpPOSParameterValue);
-        end;
+        SubMenuButton.CopyFilters(MenuButton);
+        SubMenuButton.SetRange("Parent ID", MenuButton.ID);
+        InitializeMenuButtons(SubMenuButton, ISubMenu, POSSession, tmpPOSParameterValue);
     end;
 
     local procedure InitializeMenuButtons(var SubMenuButton: Record "NPR POS Menu Button"; ISubMenu: Interface "NPR ISubMenu"; POSSession: Codeunit "NPR POS Session"; var tmpPOSParameterValue: Record "NPR POS Parameter Value" temporary)
     var
         MenuButtonObj: Codeunit "NPR POS Menu Button";
     begin
-        with SubMenuButton do begin
-            if FindSet then
-                repeat
-                    InitializeMenuButtonObject(SubMenuButton, MenuButtonObj, POSSession, tmpPOSParameterValue);
-                    ISubMenu.AddMenuButton(MenuButtonObj);
-                    if "Action Type" = "Action Type"::Submenu then
-                        InitializeSubmenu(SubMenuButton, MenuButtonObj, POSSession, tmpPOSParameterValue);
-                until Next = 0;
-        end;
+        if SubMenuButton.FindSet() then
+            repeat
+                InitializeMenuButtonObject(SubMenuButton, MenuButtonObj, POSSession, tmpPOSParameterValue);
+                ISubMenu.AddMenuButton(MenuButtonObj);
+                if SubMenuButton."Action Type" = SubMenuButton."Action Type"::Submenu then
+                    InitializeSubmenu(SubMenuButton, MenuButtonObj, POSSession, tmpPOSParameterValue);
+            until SubMenuButton.Next() = 0;
     end;
 
     local procedure InitializeMenuButtonObject(MenuButton: Record "NPR POS Menu Button"; var MenuButtonObj: Codeunit "NPR POS Menu Button"; POSSession: Codeunit "NPR POS Session"; var tmpPOSParameterValue: Record "NPR POS Parameter Value" temporary)
     var
         ActionObj: Interface "NPR IAction";
     begin
-        with MenuButton do begin
-            Clear(MenuButtonObj);
-            MenuButtonObj.SetCaption(MenuButton.GetLocalizedCaption(FieldNo(Caption)));
-            MenuButtonObj.SetTooltip(Tooltip);
-            MenuButtonObj.SetBackgroundColor("Background Color");
-            MenuButtonObj.SetColor("Foreground Color");
-            MenuButtonObj.SetIconClass("Icon Class");
-            MenuButtonObj.SetClass("Custom Class Attribute");
-            MenuButtonObj.SetBold(Bold);
-            MenuButtonObj.SetRow("Position Y");
-            MenuButtonObj.SetColumn("Position X");
-            MenuButtonObj.SetFontSize("Font Size");
-            MenuButtonObj.SetEnabledState(Enabled);
-            MenuButtonObj.Content.Add('keyMenu', "Menu Code");
-            MenuButtonObj.Content.Add('keyId', ID);
+        Clear(MenuButtonObj);
+        MenuButtonObj.SetCaption(MenuButton.GetLocalizedCaption(MenuButton.FieldNo(Caption)));
+        MenuButtonObj.SetTooltip(MenuButton.Tooltip);
+        MenuButtonObj.SetBackgroundColor(MenuButton."Background Color");
+        MenuButtonObj.SetColor(MenuButton."Foreground Color");
+        MenuButtonObj.SetIconClass(MenuButton."Icon Class");
+        MenuButtonObj.SetClass(MenuButton."Custom Class Attribute");
+        MenuButtonObj.SetBold(MenuButton.Bold);
+        MenuButtonObj.SetRow(MenuButton."Position Y");
+        MenuButtonObj.SetColumn(MenuButton."Position X");
+        MenuButtonObj.SetFontSize(MenuButton."Font Size");
+        MenuButtonObj.SetEnabledState(MenuButton.Enabled);
+        MenuButtonObj.Content.Add('keyMenu', MenuButton."Menu Code");
+        MenuButtonObj.Content.Add('keyId', MenuButton.ID);
 
-            InitializeMenuButtonObjectFilters(MenuButton, MenuButtonObj);
+        InitializeMenuButtonObjectFilters(MenuButton, MenuButtonObj);
 
-            if GetAction(ActionObj, POSSession, StrSubstNo('%1 [%2, %3]', MenuButton.TableCaption, "Menu Code", Caption), tmpPOSParameterValue) then
-                MenuButtonObj.SetAction(ActionObj);
+        if MenuButton.GetAction(ActionObj, POSSession, StrSubstNo('%1 [%2, %3]', MenuButton.TableCaption, MenuButton."Menu Code", MenuButton.Caption), tmpPOSParameterValue) then
+            MenuButtonObj.SetAction(ActionObj);
 
-            StoreButtonConfiguration(MenuButtonObj);
-        end;
+        MenuButton.StoreButtonConfiguration(MenuButtonObj);
     end;
 
     local procedure InitializeMenuButtonObjectFilters(MenuButton: Record "NPR POS Menu Button"; MenuButtonObj: Codeunit "NPR POS Menu Button")
@@ -215,11 +207,11 @@ codeunit 6150702 "NPR POS UI Management"
         POSTheme: Record "NPR POS Theme";
         ThemeDep: Record "NPR POS Theme Dependency";
         WebClientDep: Record "NPR Web Client Dependency";
+        POSUnit: Record "NPR POS Unit";
+        POSViewProfile: Record "NPR POS View Profile";
         ThemeLine: JsonObject;
         Theme: JsonArray;
         DependencyContent: Text;
-        POSUnit: Record "NPR POS Unit";
-        POSViewProfile: Record "NPR POS View Profile";
     begin
         if (not POSUnit.Get(Register."Register No.")) or (not POSViewProfile.Get(POSUnit."POS View Profile")) or (not POSTheme.Get(POSViewProfile."POS Theme Code")) or POSTheme.Blocked then
             exit;
@@ -608,32 +600,30 @@ codeunit 6150702 "NPR POS UI Management"
     procedure ConfigureReusableWorkflow("Action": Record "NPR POS Action"; POSSession: Codeunit "NPR POS Session"; Source: Text; FieldNumber: Integer)
     var
         Button: Record "NPR POS Menu Button";
-        WorkflowAction: Codeunit "NPR Workflow Action";
         POSParameterValue: Record "NPR POS Parameter Value" temporary;
-        POSSetup: Codeunit "NPR POS Setup";
         POSUnit: Record "NPR POS Unit";
+        WorkflowAction: Codeunit "NPR Workflow Action";
+        POSSetup: Codeunit "NPR POS Setup";
     begin
         POSSession.GetSetup(POSSetup);
         POSSetup.GetPOSUnit(POSUnit);
 
-        with Button do begin
-            "Action Type" := "Action Type"::Action;
-            "Action Code" := Action.Code;
+        Button."Action Type" := Button."Action Type"::Action;
+        Button."Action Code" := Action.Code;
 
-            RetrieveReusableWorkflowParameters(FieldNumber, POSUnit."POS Named Actions Profile", POSParameterValue);
-            WorkflowAction.ConfigureFromMenuButton(Button, POSSession, WorkflowAction);
+        RetrieveReusableWorkflowParameters(FieldNumber, POSUnit."POS Named Actions Profile", POSParameterValue);
+        WorkflowAction.ConfigureFromMenuButton(Button, POSSession, WorkflowAction);
 
-            POSParameterValue.Reset();
-            FrontEnd.ConfigureReusableWorkflow(WorkflowAction);
-        end;
+        POSParameterValue.Reset();
+        FrontEnd.ConfigureReusableWorkflow(WorkflowAction);
     end;
 
     procedure SetOptions(Setup: Codeunit "NPR POS Setup")
     var
-        Options: JsonObject;
         POSSetup: Record "NPR POS Setup";
         POSActionParameterMgt: Codeunit "NPR POS Action Param. Mgt.";
         LicenseInformation: Codeunit "NPR License Information";
+        Options: JsonObject;
     begin
         Options.Add('itemWorkflow', Setup.ActionCode_Item);
         Options.Add('paymentWorkflow', Setup.ActionCode_Payment);

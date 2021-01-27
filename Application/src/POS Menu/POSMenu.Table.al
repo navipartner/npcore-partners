@@ -37,11 +37,11 @@ table 6150700 "NPR POS Menu"
             Caption = 'Custom Class Attribute';
             DataClassification = CustomerContent;
         }
-        field(41; "Register Type"; Code[10])
+        field(41; "Register Type"; Code[20])
         {
-            Caption = 'Cash Register Type';
+            Caption = 'POS View Profile';
             DataClassification = CustomerContent;
-            TableRelation = "NPR Register Types";
+            TableRelation = "NPR POS View Profile";
         }
         field(42; "Register No."; Code[10])
         {
@@ -54,8 +54,6 @@ table 6150700 "NPR POS Menu"
             Caption = 'Salesperson Code';
             DataClassification = CustomerContent;
             TableRelation = "Salesperson/Purchaser".Code;
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(44; "Available on Desktop"; Boolean)
@@ -88,19 +86,14 @@ table 6150700 "NPR POS Menu"
         POSMenuButton: Record "NPR POS Menu Button";
         POSParameterValue: Record "NPR POS Parameter Value";
     begin
-        //-NPR5.45 [324677]
         POSParameterValue.SetRange("Table No.", DATABASE::"NPR POS Menu Button");
         POSParameterValue.SetRange(Code, Code);
-        if POSParameterValue.FindFirst then
-            POSParameterValue.DeleteAll;
+        if POSParameterValue.FindFirst() then
+            POSParameterValue.DeleteAll();
 
         POSMenuButton.SetRange("Menu Code", Code);
-        if POSMenuButton.FindFirst then
-            POSMenuButton.DeleteAll;
-        //+NPR5.45 [324677]
+        if POSMenuButton.FindFirst() then
+            POSMenuButton.DeleteAll();
     end;
-
-    var
-        Text001: Label 'The value for %1 you provided (%1) is not in the correct format. It has been automatically corrected.';
 }
 
