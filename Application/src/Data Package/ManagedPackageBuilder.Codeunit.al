@@ -41,10 +41,6 @@ codeunit 6014629 "NPR Managed Package Builder"
         Total := RecRef.Count;
         GlobalRecCount += Total;
 
-
-        if GlobalRecCount > 5000 then
-            Error(Error_TooLarge);
-
         GlobalTableListTmp."Object Type" := GlobalTableListTmp."Object Type"::Table;
         GlobalTableListTmp."Object ID" := RecRef.Number;
         if GlobalTableListTmp.Insert then;
