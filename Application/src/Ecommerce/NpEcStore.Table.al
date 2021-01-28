@@ -1,9 +1,6 @@
 table 6151300 "NPR NpEc Store"
 {
-    // NPR5.53/MHA /20191205  CASE 380837 Object created - NaviPartner General E-Commerce
-    // NPR5.54/MHA /20200129  CASE 367842 Added fields 160 "Allow Create Customers", 170 "Update Customers from Sales Order"
-
-    Caption = 'Np E-commerce Store';
+    Caption = 'E-commerce Store';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR NpEc Stores";
     LookupPageID = "NPR NpEc Stores";

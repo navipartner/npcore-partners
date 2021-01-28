@@ -1,8 +1,5 @@
 codeunit 6151326 "NPR NpEc P.Invoice Look."
 {
-    // NPR5.53/MHA /20191205  CASE 380837 Object created - NaviPartner General E-Commerce
-    // NPR5.54/MHA /20200417  CASE 390380 Updated functions for finding purchase invoices
-
     TableNo = "NPR Nc Import Entry";
 
     trigger OnRun()
@@ -24,59 +21,55 @@ codeunit 6151326 "NPR NpEc P.Invoice Look."
     procedure GetInvoiceDocuments(ImportEntry: Record "NPR Nc Import Entry"; var TempPurchHeader: Record "Purchase Header" temporary; var TempPurchInvHeader: Record "Purch. Inv. Header" temporary): Boolean
     var
         PurchHeader: Record "Purchase Header";
-        NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
         NpEcPurchDocImportMgt: Codeunit "NPR NpEc Purch.Doc.Import Mgt.";
-        XmlDoc: DotNet "NPRNetXmlDocument";
-        XmlElement: DotNet NPRNetXmlElement;
-        XmlNodeList: DotNet NPRNetXmlNodeList;
-        i: Integer;
+        Document: XmlDocument;
+        Element: XmlElement;
+        NodeList: XmlNodeList;
+        Node: XmlNode;
     begin
-        //-NPR5.54 [390380]
-        if not TempPurchHeader.IsTemporary then
-            exit(false);
+        if not TempPurchHeader.IsTemporary() then
+            exit;
 
-        if not TempPurchInvHeader.IsTemporary then
-            exit(false);
-        //+NPR5.54 [390380]
+        if not TempPurchInvHeader.IsTemporary() then
+            exit;
 
-        TempPurchHeader.DeleteAll;
-        TempPurchInvHeader.DeleteAll;
+        TempPurchHeader.DeleteAll();
+        TempPurchInvHeader.DeleteAll();
 
-        if not ImportEntry.LoadXmlDoc(XmlDoc) then
-            exit(false);
+        if not Load(ImportEntry, Document) then
+            exit;
+        if not Document.GetRoot(Element) then
+            exit;
 
-        XmlElement := XmlDoc.DocumentElement;
-        if not NpXmlDomMgt.FindNodes(XmlElement, 'purchase_invoice', XmlNodeList) then
-            exit(false);
+        if not Element.SelectNodes('//purchase_invoice', NodeList) then
+            exit;
 
-        for i := 0 to XmlNodeList.Count - 1 do begin
-            XmlElement := XmlNodeList.ItemOf(i);
-            //-NPR5.54 [390380]
-            if NpEcPurchDocImportMgt.FindInvoice(XmlElement, PurchHeader) and not TempPurchHeader.Get(PurchHeader."Document Type", PurchHeader."No.") then begin
-                TempPurchHeader.Init;
+        foreach Node in NodeList do begin
+            Element := Node.AsXmlElement();
+            if NpEcPurchDocImportMgt.FindInvoice(Element, PurchHeader) and not TempPurchHeader.Get(PurchHeader."Document Type", PurchHeader."No.") then begin
+                TempPurchHeader.Init();
                 TempPurchHeader := PurchHeader;
-                TempPurchHeader.Insert;
+                TempPurchHeader.Insert();
             end;
 
-            NpEcPurchDocImportMgt.FindPostedInvoices(XmlElement, TempPurchInvHeader);
-            //+NPR5.54 [390380]
+            NpEcPurchDocImportMgt.FindPostedInvoices(Element, TempPurchInvHeader);
         end;
 
-        exit(TempPurchHeader.FindSet or TempPurchInvHeader.FindSet);
+        exit(TempPurchHeader.FindSet() or TempPurchInvHeader.FindSet());
     end;
 
     procedure RunPagePurchInvoice(var TempPurchHeader: Record "Purchase Header" temporary): Boolean
     var
         PurchHeader: Record "Purchase Header";
     begin
-        case TempPurchHeader.Count of
+        case TempPurchHeader.Count() of
             0:
                 begin
                     exit(false);
                 end;
             1:
                 begin
-                    TempPurchHeader.FindFirst;
+                    TempPurchHeader.FindFirst();
                     PurchHeader.Get(TempPurchHeader."Document Type", TempPurchHeader."No.");
                     PAGE.Run(PAGE::"Purchase Invoice", PurchHeader);
                 end;
@@ -91,14 +84,14 @@ codeunit 6151326 "NPR NpEc P.Invoice Look."
     var
         PurchInvHeader: Record "Purch. Inv. Header";
     begin
-        case TempPurchInvHeader.Count of
+        case TempPurchInvHeader.Count() of
             0:
                 begin
                     exit(false);
                 end;
             1:
                 begin
-                    TempPurchInvHeader.FindFirst;
+                    TempPurchInvHeader.FindFirst();
                     PurchInvHeader.Get(TempPurchInvHeader."No.");
                     PAGE.Run(PAGE::"Posted Purchase Invoice", PurchInvHeader);
                 end;
@@ -106,6 +99,23 @@ codeunit 6151326 "NPR NpEc P.Invoice Look."
                 PAGE.Run(PAGE::"Posted Purchase Invoices", TempPurchInvHeader);
         end;
 
+        exit(true);
+    end;
+
+    local procedure Load(Rec: Record "NPR Nc Import Entry"; var Document: XmlDocument): Boolean
+    var
+        XmlDomMgt: Codeunit "XML DOM Management";
+        InStr: InStream;
+        DocumentSource: Text;
+    begin
+        Rec.CalcFields("Document Source");
+        if not Rec."Document Source".HasValue() then
+            exit(false);
+        Rec."Document Source".CreateInStream(InStr);
+        XmlDocument.ReadFrom(InStr, Document);
+        Document.WriteTo(DocumentSource);
+        DocumentSource := XmlDomMgt.RemoveNamespaces(DocumentSource);
+        XmlDocument.ReadFrom(DocumentSource, Document);
         exit(true);
     end;
 }

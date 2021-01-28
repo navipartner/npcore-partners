@@ -1,52 +1,49 @@
 codeunit 6151300 "NPR NpEc Webservice"
 {
-    // NPR5.53/MHA /20191205  CASE 380837 Object created - NaviPartner General E-Commerce
-
-
-    trigger OnRun()
-    begin
-    end;
-
     var
-        Text000: Label 'Create Sales Order';
-        Text001: Label 'Post Sales Order';
-        Text002: Label 'Delete Sales Order';
+        CreateSalesOrderDescLbl: Label 'Create Sales Order';
+        CreatePurchOrderDescLbl: Label 'Create Purchase Order';
+        PostSalesOrderDescLbl: Label 'Post Sales Order';
+        DeleteSalesOrderDescLbl: Label 'Delete Sales Order';
 
     procedure CreateSalesOrder(var sales_orders: XMLport "NPR NpEc Sales Order Import")
     var
         ImportEntry: Record "NPR Nc Import Entry";
-        NcSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
-        NcImportMgt: Codeunit "NPR Nc Import Mgt.";
-        OutStr: OutStream;
         NcImportType: Record "NPR Nc Import Type";
+        OutStr: OutStream;
     begin
-        InitImportType('CreateSalesOrder', 'CREATE_SALES_ORDER', Text000, CODEUNIT::"NPR NpEc S.Order Import Create", CODEUNIT::"NPR NpEc S.Order Lookup", NcImportType);
+        InitImportType('CreateSalesOrder', 'CREATE_SALES_ORDER', CreateSalesOrderDescLbl, CODEUNIT::"NPR NpEc S.Order Import Create", CODEUNIT::"NPR NpEc S.Order Lookup", NcImportType);
 
-        sales_orders.Import;
         InsertImportEntry(NcImportType, ImportEntry);
+        sales_orders.Import();
         ImportEntry."Document Name" := sales_orders.GetOrderNo() + '.xml';
         ImportEntry."Document Source".CreateOutStream(OutStr);
         sales_orders.SetDestination(OutStr);
-        sales_orders.Export;
+        sales_orders.Export();
         ImportEntry.Modify(true);
-        Commit;
+        Commit();
 
+        ProcessImportEntry(ImportEntry);
+    end;
+
+    procedure ProcessImportEntry(ImportEntry: Record "NPR Nc Import Entry")
+    var
+        NcSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
+        NcImportMgt: Codeunit "NPR Nc Import Mgt.";
+    begin
         NcSyncMgt.ProcessImportEntry(ImportEntry);
-        Commit;
-        if ImportEntry.Find and not ImportEntry.Imported then
+        Commit();
+        if ImportEntry.Find() and not ImportEntry.Imported then
             Error(NcImportMgt.GetErrorMessage(ImportEntry, false));
     end;
 
     procedure PostSalesOrder(var sales_orders: XMLport "NPR NpEc Sales Order Import")
     var
         ImportEntry: Record "NPR Nc Import Entry";
-        NcSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
-        NcImportMgt: Codeunit "NPR Nc Import Mgt.";
-        OutStr: OutStream;
         NcImportType: Record "NPR Nc Import Type";
-        NcSetupMgt: Codeunit "NPR Nc Setup Mgt.";
+        OutStr: OutStream;
     begin
-        InitImportType('PostSalesOrder', 'POST_SALES_ORDER', Text001, CODEUNIT::"NPR NpEc S.Order Import (Post)", CODEUNIT::"NPR NpEc S.Order Lookup", NcImportType);
+        InitImportType('PostSalesOrder', 'POST_SALES_ORDER', PostSalesOrderDescLbl, CODEUNIT::"NPR NpEc S.Order Import (Post)", CODEUNIT::"NPR NpEc S.Order Lookup", NcImportType);
 
         sales_orders.Import;
         InsertImportEntry(NcImportType, ImportEntry);
@@ -55,24 +52,18 @@ codeunit 6151300 "NPR NpEc Webservice"
         sales_orders.SetDestination(OutStr);
         sales_orders.Export;
         ImportEntry.Modify(true);
-        Commit;
+        Commit();
 
-        NcSyncMgt.ProcessImportEntry(ImportEntry);
-        Commit;
-        if ImportEntry.Find and not ImportEntry.Imported then
-            Error(NcImportMgt.GetErrorMessage(ImportEntry, false));
+        ProcessImportEntry(ImportEntry);
     end;
 
     procedure DeleteSalesOrder(var sales_orders: XMLport "NPR NpEc Sales Order Import")
     var
         ImportEntry: Record "NPR Nc Import Entry";
-        NcSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
-        NcImportMgt: Codeunit "NPR Nc Import Mgt.";
-        OutStr: OutStream;
         NcImportType: Record "NPR Nc Import Type";
-        NcSetupMgt: Codeunit "NPR Nc Setup Mgt.";
+        OutStr: OutStream;
     begin
-        InitImportType('DeleteSalesOrder', 'DELETE_SALES_ORDER', Text002, CODEUNIT::"NPR NpEc S.Order Imp. Delete", CODEUNIT::"NPR NpEc S.Order Lookup", NcImportType);
+        InitImportType('DeleteSalesOrder', 'DELETE_SALES_ORDER', DeleteSalesOrderDescLbl, CODEUNIT::"NPR NpEc S.Order Imp. Delete", CODEUNIT::"NPR NpEc S.Order Lookup", NcImportType);
 
         sales_orders.Import;
         InsertImportEntry(NcImportType, ImportEntry);
@@ -81,42 +72,34 @@ codeunit 6151300 "NPR NpEc Webservice"
         sales_orders.SetDestination(OutStr);
         sales_orders.Export;
         ImportEntry.Modify(true);
-        Commit;
+        Commit();
 
-        NcSyncMgt.ProcessImportEntry(ImportEntry);
-        Commit;
-        if ImportEntry.Find and not ImportEntry.Imported then
-            Error(NcImportMgt.GetErrorMessage(ImportEntry, false));
+        ProcessImportEntry(ImportEntry);
     end;
 
     procedure CreatePurchaseInvoice(var purchase_invoices: XMLport "NPR NpEc Purch. Invoice Import")
     var
         ImportEntry: Record "NPR Nc Import Entry";
         NcImportType: Record "NPR Nc Import Type";
-        NcSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
-        NcImportMgt: Codeunit "NPR Nc Import Mgt.";
         OutStr: OutStream;
     begin
-        InitImportType('CreatePurchaseInvoice', 'CREATE_PURCH_ORDER', Text000, CODEUNIT::"NPR NpEc P.Invoice Imp. Create", CODEUNIT::"NPR NpEc P.Invoice Look.", NcImportType);
+        InitImportType('CreatePurchaseInvoice', 'CREATE_PURCH_ORDER', CreatePurchOrderDescLbl, CODEUNIT::"NPR NpEc P.Invoice Imp. Create", CODEUNIT::"NPR NpEc P.Invoice Look.", NcImportType);
 
         purchase_invoices.Import;
         InsertImportEntry(NcImportType, ImportEntry);
         ImportEntry."Document Name" := purchase_invoices.GetInvoiceNo() + '.xml';
         ImportEntry."Document Source".CreateOutStream(OutStr);
         purchase_invoices.SetDestination(OutStr);
-        purchase_invoices.Export;
+        purchase_invoices.Export();
         ImportEntry.Modify(true);
-        Commit;
+        Commit();
 
-        NcSyncMgt.ProcessImportEntry(ImportEntry);
-        Commit;
-        if ImportEntry.Find and not ImportEntry.Imported then
-            Error(NcImportMgt.GetErrorMessage(ImportEntry, false));
+        ProcessImportEntry(ImportEntry);
     end;
 
-    local procedure InsertImportEntry(NcImportType: Record "NPR Nc Import Type"; var ImportEntry: Record "NPR Nc Import Entry")
+    procedure InsertImportEntry(NcImportType: Record "NPR Nc Import Type"; var ImportEntry: Record "NPR Nc Import Entry")
     begin
-        ImportEntry.Init;
+        ImportEntry.Init();
         ImportEntry."Entry No." := 0;
         ImportEntry."Import Type" := NcImportType.Code;
         ImportEntry.Date := CurrentDateTime;
@@ -126,7 +109,7 @@ codeunit 6151300 "NPR NpEc Webservice"
         ImportEntry.Insert(true);
     end;
 
-    local procedure InitImportType(WebserviceFunction: Text; ImportTypeCode: Code[20]; ImportTypeDescription: Text; ImportCodeunitID: Integer; LookupCodeunitID: Integer; var NcImportType: Record "NPR Nc Import Type")
+    procedure InitImportType(WebserviceFunction: Text; ImportTypeCode: Code[20]; ImportTypeDescription: Text; ImportCodeunitID: Integer; LookupCodeunitID: Integer; var NcImportType: Record "NPR Nc Import Type")
     var
         NcSetupMgt: Codeunit "NPR Nc Setup Mgt.";
     begin
@@ -140,7 +123,7 @@ codeunit 6151300 "NPR NpEc Webservice"
                 ImportTypeCode := IncStr(ImportTypeCode);
         end;
 
-        NcImportType.Init;
+        NcImportType.Init();
         NcImportType.Code := ImportTypeCode;
         NcImportType.Description := CopyStr(ImportTypeDescription, 1, MaxStrLen(ImportTypeCode));
         NcImportType."Import Codeunit ID" := ImportCodeunitID;
