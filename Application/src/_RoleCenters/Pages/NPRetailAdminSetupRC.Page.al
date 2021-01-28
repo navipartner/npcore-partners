@@ -782,6 +782,7 @@ page 6151245 "NPR NP Retail Admin Setup RC"
                 {
                     Caption = 'AF Setup';
                     RunObject = page "NPR AF Setup";
+                    Image = Setup;
                     ApplicationArea = All;
                     ToolTip = 'Executes the AF Setup action';
                 }
