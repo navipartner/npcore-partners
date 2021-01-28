@@ -1,8 +1,5 @@
 codeunit 6151302 "NPR NpEc S.Order Lookup"
 {
-    // NPR5.53/MHA /20191205  CASE 380837 Object created - NaviPartner General E-Commerce
-    // NPR5.54/MHA /20200417  CASE 390380 Updated functions for finding sales invoices
-
     TableNo = "NPR Nc Import Entry";
 
     trigger OnRun()
@@ -25,42 +22,38 @@ codeunit 6151302 "NPR NpEc S.Order Lookup"
     procedure GetOrderDocuments(ImportEntry: Record "NPR Nc Import Entry"; var TempSalesHeader: Record "Sales Header" temporary; var TempSalesInvHeader: Record "Sales Invoice Header" temporary): Boolean
     var
         SalesHeader: Record "Sales Header";
-        NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
         NpEcSalesDocImportMgt: Codeunit "NPR NpEc Sales Doc. Imp. Mgt.";
-        XmlDoc: DotNet "NPRNetXmlDocument";
-        XmlElement: DotNet NPRNetXmlElement;
-        XmlNodeList: DotNet NPRNetXmlNodeList;
-        i: Integer;
+        Document: XmlDocument;
+        Element: XmlElement;
+        NodeList: XmlNodeList;
+        Node: XmlNode;
     begin
-        //-NPR5.54 [390380]
-        if not TempSalesHeader.IsTemporary then
+        if not TempSalesHeader.IsTemporary() then
             exit(false);
 
-        if not TempSalesInvHeader.IsTemporary then
-            exit(false);
-        //+NPR5.54 [390380]
-
-        TempSalesHeader.DeleteAll;
-        TempSalesInvHeader.DeleteAll;
-
-        if not ImportEntry.LoadXmlDoc(XmlDoc) then
+        if not TempSalesInvHeader.IsTemporary() then
             exit(false);
 
-        XmlElement := XmlDoc.DocumentElement;
-        if not NpXmlDomMgt.FindNodes(XmlElement, 'sales_order', XmlNodeList) then
-            exit(false);
+        TempSalesHeader.DeleteAll();
+        TempSalesInvHeader.DeleteAll();
 
-        for i := 0 to XmlNodeList.Count - 1 do begin
-            XmlElement := XmlNodeList.ItemOf(i);
-            //-NPR5.54 [390380]
-            if NpEcSalesDocImportMgt.FindOrder(XmlElement, SalesHeader) and not TempSalesHeader.Get(SalesHeader."Document Type", SalesHeader."No.") then begin
+        if not Load(ImportEntry, Document) then
+            exit;
+        if not Document.GetRoot(Element) then
+            exit;
+
+        if not Element.SelectNodes('//sales_order', NodeList) then
+            exit;
+
+        foreach Node in NodeList do begin
+            Element := Node.AsXmlElement();
+            if NpEcSalesDocImportMgt.FindOrder(Element, SalesHeader) and not TempSalesHeader.Get(SalesHeader."Document Type", SalesHeader."No.") then begin
                 TempSalesHeader.Init;
                 TempSalesHeader := SalesHeader;
                 TempSalesHeader.Insert;
             end;
 
-            NpEcSalesDocImportMgt.FindPostedInvoices(XmlElement, TempSalesInvHeader);
-            //+NPR5.54 [390380]
+            NpEcSalesDocImportMgt.FindPostedInvoices(Element, TempSalesInvHeader);
         end;
 
         exit(TempSalesHeader.FindSet or TempSalesInvHeader.FindSet);
@@ -107,6 +100,23 @@ codeunit 6151302 "NPR NpEc S.Order Lookup"
                 PAGE.Run(PAGE::"Posted Sales Invoices", TempSalesInvHeader);
         end;
 
+        exit(true);
+    end;
+
+    local procedure Load(Rec: Record "NPR Nc Import Entry"; var Document: XmlDocument): Boolean
+    var
+        XmlDomMgt: Codeunit "XML DOM Management";
+        InStr: InStream;
+        DocumentSource: Text;
+    begin
+        Rec.CalcFields("Document Source");
+        if not Rec."Document Source".HasValue() then
+            exit(false);
+        Rec."Document Source".CreateInStream(InStr);
+        XmlDocument.ReadFrom(InStr, Document);
+        Document.WriteTo(DocumentSource);
+        DocumentSource := XmlDomMgt.RemoveNamespaces(DocumentSource);
+        XmlDocument.ReadFrom(DocumentSource, Document);
         exit(true);
     end;
 }

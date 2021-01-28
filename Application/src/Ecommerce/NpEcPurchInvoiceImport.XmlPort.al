@@ -1,7 +1,5 @@
 xmlport 6151306 "NPR NpEc Purch. Invoice Import"
 {
-    // NPR5.53/MHA /20191205  CASE 380837 Object created - NaviPartner General E-Commerce
-
     Caption = 'Magento Purchase Invoice Import';
     DefaultNamespace = 'urn:microsoft-dynamics-nav/xmlports/purchase_invoice';
     Encoding = UTF8;

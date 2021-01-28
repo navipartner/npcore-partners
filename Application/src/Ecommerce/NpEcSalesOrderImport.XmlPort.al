@@ -1,7 +1,5 @@
 xmlport 6151300 "NPR NpEc Sales Order Import"
 {
-    // NPR5.53/MHA /20191205  CASE 380837 Object created - NaviPartner General E-Commerce
-
     Caption = 'Magento Sales Order Import';
     DefaultNamespace = 'urn:microsoft-dynamics-nav/xmlports/sales_order';
     Encoding = UTF8;

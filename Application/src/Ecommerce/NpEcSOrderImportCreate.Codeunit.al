@@ -1,54 +1,64 @@
 codeunit 6151303 "NPR NpEc S.Order Import Create"
 {
-    // NPR5.53/MHA /20191205  CASE 380837 Object created - NaviPartner General E-Commerce
-
     TableNo = "NPR Nc Import Entry";
 
     trigger OnRun()
     var
-        XmlDoc: DotNet "NPRNetXmlDocument";
+        Document: XmlDocument;
     begin
-        if LoadXmlDoc(XmlDoc) then
-            ImportSalesOrders(XmlDoc);
+        if Load(Rec, Document) then
+            ImportSalesOrders(Document);
     end;
 
-    local procedure ImportSalesOrders(XmlDoc: DotNet "NPRNetXmlDocument")
+    local procedure ImportSalesOrders(Document: XmlDocument)
     var
-        NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
-        XmlElement: DotNet NPRNetXmlElement;
-        XmlNodeList: DotNet NPRNetXmlNodeList;
-        i: Integer;
+        Element: XmlElement;
+        NodeList: XmlNodeList;
+        Node: XmlNode;
     begin
-        if IsNull(XmlDoc) then
+        if not Document.GetRoot(Element) then
             exit;
-        XmlElement := XmlDoc.DocumentElement;
-        if IsNull(XmlElement) then
+
+        if not Element.SelectNodes('//sales_order', NodeList) then
             exit;
-        if not NpXmlDomMgt.FindNodes(XmlElement, 'sales_order', XmlNodeList) then
-            exit;
-        for i := 0 to XmlNodeList.Count - 1 do begin
-            XmlElement := XmlNodeList.ItemOf(i);
-            ImportSalesOrder(XmlElement);
+
+        foreach Node in NodeList do begin
+            Element := Node.AsXmlElement();
+            ImportSalesOrder(Element);
         end;
     end;
 
-    local procedure ImportSalesOrder(XmlElement: DotNet NPRNetXmlElement) Imported: Boolean
+    local procedure ImportSalesOrder(Element: XmlElement): Boolean
     var
-        MagentoSetup: Record "NPR Magento Setup";
         SalesHeader: Record "Sales Header";
-        ReleaseSalesDoc: Codeunit "Release Sales Document";
         NpEcSalesDocImportMgt: Codeunit "NPR NpEc Sales Doc. Imp. Mgt.";
     begin
-        if IsNull(XmlElement) then
-            exit(false);
-        if NpEcSalesDocImportMgt.OrderExists(XmlElement) then
+
+        if NpEcSalesDocImportMgt.OrderExists(Element) then
             exit(false);
 
-        NpEcSalesDocImportMgt.InsertOrderHeader(XmlElement, SalesHeader);
-        NpEcSalesDocImportMgt.InsertOrderLines(XmlElement, SalesHeader);
-        NpEcSalesDocImportMgt.InsertPaymentLines(XmlElement, SalesHeader);
-        NpEcSalesDocImportMgt.InsertNote(XmlElement, SalesHeader);
+        NpEcSalesDocImportMgt.InsertOrderHeader(Element, SalesHeader);
+        NpEcSalesDocImportMgt.InsertOrderLines(Element, SalesHeader);
+        NpEcSalesDocImportMgt.InsertPaymentLines(Element, SalesHeader);
+        NpEcSalesDocImportMgt.InsertNote(Element, SalesHeader);
 
+        exit(true);
+    end;
+
+    local procedure Load(Rec: Record "NPR Nc Import Entry"; var Document: XmlDocument): Boolean
+    var
+        XmlDomMgt: Codeunit "XML DOM Management";
+        InStr: InStream;
+        DocumentSource: Text;
+    begin
+        Rec.CalcFields("Document Source");
+        if not Rec."Document Source".HasValue() then
+            exit(false);
+        Rec."Document Source".CreateInStream(InStr);
+        XmlDocument.ReadFrom(InStr, Document);
+        Document.WriteTo(DocumentSource);
+        DocumentSource := XmlDomMgt.RemoveNamespaces(DocumentSource);
+        XmlDocument.ReadFrom(DocumentSource, Document);
         exit(true);
     end;
 }
