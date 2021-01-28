@@ -373,10 +373,7 @@ codeunit 6014543 "NPR RP Epson V Device Lib."
         RetailFormCode: Codeunit "NPR Retail Form Code";
     begin
         Register.Get(RetailFormCode.FetchRegisterNumber);
-        if Register."Send Receipt Logo from NAV" then
-            PrintBitmapFromKeyword('RECEIPT', Register."Register No.")
-        else
-            PrintNVGraphicsDataNew(6, 0, 48, 69, 48, 48, 1, 1);
+        PrintNVGraphicsDataNew(6, 0, 48, 69, 48, 48, 1, 1);
     end;
 
     local procedure PrintControlChar(Char: Text[1])

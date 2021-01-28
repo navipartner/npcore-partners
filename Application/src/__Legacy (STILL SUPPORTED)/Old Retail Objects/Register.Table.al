@@ -141,6 +141,9 @@ table 6014401 "NPR Register"
             TableRelation = IF ("Balanced Type" = CONST(Finans)) "G/L Account"
             ELSE
             IF ("Balanced Type" = CONST(Bank)) "Bank Account";
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore';
+            ObsoleteTag = 'NPR Register';
         }
         field(16; "Difference Account - Neg."; Code[20])
         {
@@ -204,22 +207,34 @@ table 6014401 "NPR Register"
             Caption = 'City gift voucher account';
             DataClassification = CustomerContent;
             TableRelation = "G/L Account";
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(28; "City Gift Voucher Discount"; Code[20])
         {
             Caption = 'City Gift Voucher Discount';
             DataClassification = CustomerContent;
             TableRelation = "G/L Account";
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(47; "Change Register"; Decimal)
         {
             Caption = 'Change Register';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(79; "Opened By Salesperson"; Code[20])
         {
             Caption = 'Opened By Salesperson';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(80; "Opened on Sales Ticket"; Code[20])
         {
@@ -230,6 +245,9 @@ table 6014401 "NPR Register"
         {
             Caption = 'Use Sales Statistics';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(90; "Date Filter"; Date)
         {
@@ -242,6 +260,9 @@ table 6014401 "NPR Register"
             Caption = 'Global Dimension 1 Filter';
             FieldClass = FlowFilter;
             TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(92; "Global Dimension 2 Filter"; Code[20])
         {
@@ -249,6 +270,9 @@ table 6014401 "NPR Register"
             Caption = 'Global Dimension 2 Filter';
             FieldClass = FlowFilter;
             TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(100; "Customer Display"; Boolean)
         {
@@ -268,6 +292,9 @@ table 6014401 "NPR Register"
         {
             Caption = 'Credit Card';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(103; "Credit Card Solution"; Option)
         {
@@ -275,6 +302,9 @@ table 6014401 "NPR Register"
             DataClassification = CustomerContent;
             OptionCaption = ' ,01,02,03,04,05,06 - POINT,07,08,Steria,10 - SAGEM Flexiterm .NET,SAGEM Flexiterm JavaScript,Pepper';
             OptionMembers = " ","MSP DOS","MSP Navision",OCC,"SAGEM Flexiterminal","SAGEM Flexiterm via console",POINT,TPOS3,"SAGEM Flexitermina from server",Steria,"SAGEM Flexiterm .NET","SAGEM Flexiterm JavaScript",Pepper;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(150; "Primary Payment Type"; Code[10])
         {
@@ -292,16 +322,25 @@ table 6014401 "NPR Register"
         {
             Caption = 'Display 1';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(251; "Display 2"; Text[20])
         {
             Caption = 'Display 2';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(252; Touchscreen; Boolean)
         {
             Caption = 'Touch Screen';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(255; "Connected To Server"; Boolean)
         {
@@ -448,6 +487,9 @@ table 6014401 "NPR Register"
         {
             Caption = 'Close Terminal at Register Balance';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(300; "Sales Ticket Line Text off"; Option)
         {
@@ -533,27 +575,23 @@ table 6014401 "NPR Register"
         }
         field(316; "Global Dimension 1 Code"; Code[20])
         {
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
             CaptionClass = '1,2,1';
             Caption = 'Global Dimension 1 Code';
             DataClassification = CustomerContent;
             TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
-
-            trigger OnValidate()
-            begin
-                ValidateShortcutDimCode(1, "Global Dimension 1 Code");
-            end;
         }
         field(317; "Global Dimension 2 Code"; Code[20])
         {
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
             CaptionClass = '1,2,2';
             Caption = 'Global Dimension 2 Code';
             DataClassification = CustomerContent;
             TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
-
-            trigger OnValidate()
-            begin
-                ValidateShortcutDimCode(2, "Global Dimension 2 Code");
-            end;
         }
         field(325; "Customer Disc. Group"; Code[20])
         {
@@ -574,12 +612,6 @@ table 6014401 "NPR Register"
             DataClassification = CustomerContent;
             OptionCaption = 'Finance,Bank';
             OptionMembers = Finans,Bank;
-
-            trigger OnValidate()
-            begin
-                if "Balanced Type" <> xRec."Balanced Type" then
-                    "Balance Account" := '';
-            end;
         }
         field(330; "Receipt Printer Type"; Option)
         {
@@ -592,70 +624,76 @@ table 6014401 "NPR Register"
         {
             Caption = 'Send Receipt Logo from NAV';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(402; "Attendance Count in Audit Roll"; Integer)
         {
             CalcFormula = Count("NPR Audit Roll" WHERE("Register No." = FIELD("Register No."),
-                                                    "Sales Ticket No." = FIELD("Sales Ticket Filter"),
                                                     "Sale Type" = CONST(Sale),
                                                     "Line No." = CONST(1),
-                                                    "Sale Date" = FIELD("Date Filter"),
-                                                    "Salesperson Code" = FIELD("Sales Person Filter"),
-                                                    "Shortcut Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                    "Shortcut Dimension 2 Code" = FIELD("Global Dimension 2 Filter")));
+                                                    "Sale Date" = FIELD("Date Filter")));
             Caption = 'Attendance Count in Audit Roll';
             FieldClass = FlowField;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(403; "Normal Sales in Audit Roll"; Decimal)
         {
             CalcFormula = Sum("NPR Audit Roll"."Amount Including VAT" WHERE("Sale Date" = FIELD("Date Filter"),
                                                                          "Register No." = FIELD("Register No."),
                                                                          "Sale Type" = CONST(Sale),
-                                                                         Type = CONST(Item),
-                                                                         "Salesperson Code" = FIELD("Sales Person Filter"),
-                                                                         "Shortcut Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                         "Shortcut Dimension 2 Code" = FIELD("Global Dimension 2 Filter")));
+                                                                         Type = CONST(Item)));
             Caption = 'Normal Sales in Audit Roll';
             FieldClass = FlowField;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(404; "Debit Sales in Audit Roll"; Decimal)
         {
             CalcFormula = Sum("NPR Audit Roll"."Amount Including VAT" WHERE("Sale Date" = FIELD("Date Filter"),
                                                                          "Register No." = FIELD("Register No."),
                                                                          "Sale Type" = CONST("Debit Sale"),
-                                                                         "Gift voucher ref." = FILTER(= ''),
-                                                                         "Salesperson Code" = FIELD("Sales Person Filter"),
-                                                                         "Shortcut Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                         "Shortcut Dimension 2 Code" = FIELD("Global Dimension 2 Filter")));
+                                                                         "Gift voucher ref." = FILTER(= '')));
             Caption = 'Dabit Sales in Audit Roll';
             Description = 'Calcformula rettet';
             FieldClass = FlowField;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(410; "Item Count in Audit Roll Debit"; Integer)
         {
             CalcFormula = Count("NPR Audit Roll" WHERE("Register No." = FIELD("Register No."),
-                                                    "Sales Ticket No." = FIELD("Sales Ticket Filter"),
                                                     Type = CONST("Debit Sale"),
                                                     "Line No." = CONST(2),
                                                     "Gift voucher ref." = FILTER(= ''),
-                                                    "No." = FIELD("Sales Ticket Filter"),
-                                                    "Sale Date" = FIELD("Date Filter"),
-                                                    "Salesperson Code" = FIELD("Sales Person Filter"),
-                                                    "Shortcut Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                    "Shortcut Dimension 2 Code" = FIELD("Global Dimension 2 Filter")));
+                                                    "Sale Date" = FIELD("Date Filter")));
             Caption = 'Item Count in Audit Debit Roll';
             Description = 'Calcformula rettet';
             FieldClass = FlowField;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(411; "Sales Ticket Filter"; Code[20])
         {
             Caption = 'Sales Ticket Filter';
             FieldClass = FlowFilter;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(412; "Sales Person Filter"; Code[20])
         {
             Caption = 'Sales Person Filter';
             FieldClass = FlowFilter;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(414; Description; Text[30])
         {
@@ -673,30 +711,33 @@ table 6014401 "NPR Register"
         {
             CalcFormula = Sum("NPR Audit Roll"."Amount Including VAT" WHERE("Sale Date" = FIELD("Date Filter"),
                                                                          "Sale Type" = CONST(Sale),
-                                                                         Type = CONST(Item),
-                                                                         "Salesperson Code" = FIELD("Sales Person Filter"),
-                                                                         "Shortcut Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                         "Shortcut Dimension 2 Code" = FIELD("Global Dimension 2 Filter")));
+                                                                         Type = CONST(Item)));
             Caption = 'Normal Sales in Audit Roll';
             FieldClass = FlowField;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(504; "All Debit Sales in Audit Roll"; Decimal)
         {
             CalcFormula = Sum("NPR Audit Roll"."Amount Including VAT" WHERE("Sale Date" = FIELD("Date Filter"),
                                                                          "Sale Type" = CONST("Debit Sale"),
                                                                          Type = CONST(Item),
-                                                                         "Gift voucher ref." = FILTER(= ''),
-                                                                         "Salesperson Code" = FIELD("Sales Person Filter"),
-                                                                         "Shortcut Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                         "Shortcut Dimension 2 Code" = FIELD("Global Dimension 2 Filter")));
+                                                                         "Gift voucher ref." = FILTER(= '')));
             Caption = 'Dabit Sales in Audit Roll';
             Description = 'Calcformula rettet';
             FieldClass = FlowField;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(512; "End of day - Exchange Amount"; Boolean)
         {
             Caption = 'Exchange Amount';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(513; "Customer No. auto debit sale"; Option)
         {
@@ -710,21 +751,33 @@ table 6014401 "NPR Register"
             Caption = 'Money drawer attached';
             DataClassification = CustomerContent;
             InitValue = true;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(520; "Lock Register To Salesperson"; Boolean)
         {
             Caption = 'Lock Register To Salesperson';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(604; "Use Fee"; Boolean)
         {
             Caption = 'Use fee';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(605; "Confirm Fee"; Boolean)
         {
             Caption = 'Confirm Fee';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(609; "Gen. Business Posting Override"; Option)
         {
@@ -732,80 +785,124 @@ table 6014401 "NPR Register"
             DataClassification = CustomerContent;
             OptionCaption = 'Customer,Register';
             OptionMembers = Register,Customer;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(610; "Terminal Auto Print"; Boolean)
         {
             Caption = 'Terminal Auto Print';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(611; "Money drawer - open on special"; Boolean)
         {
             Caption = 'Money drawer at debit/credit card';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(620; "Exchange Label Exchange Period"; DateFormula)
         {
             Caption = 'Exchange Label Exchange Period';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(630; "Enable Contactless"; Boolean)
         {
             Caption = 'Enable Contactless';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(700; "Tax Free Enabled"; Boolean)
         {
             Caption = 'Tax Free Enabled';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(701; "Tax Free Merchant ID"; Text[20])
         {
             Caption = 'Tax Free Merchant ID';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(702; "Tax Free VAT Number"; Text[20])
         {
             Caption = 'Tax Free VAT Number';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(703; "Tax Free Country Code"; Text[3])
         {
             Caption = 'Tax Free Country Code';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(704; "Tax Free Amount Threshold"; Decimal)
         {
             Caption = 'Tax Free Amount Threshold';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(705; "Tax Free Check Terminal Prefix"; Boolean)
         {
             Caption = 'Tax Free Check Terminal Prefix';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(790; "Register Layout"; Code[20])
         {
             Caption = 'Register Layout';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(830; "Encrypt Protocol Data"; Boolean)
         {
             Caption = 'Encrypt Protocol Data';
             DataClassification = CustomerContent;
             Description = 'CASE 226832';
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(831; "Secure Protocol Data"; Boolean)
         {
             Caption = 'Secure Protocol Data';
             DataClassification = CustomerContent;
             Description = 'CASE 226832';
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(832; "Install Client-side Assemblies"; Boolean)
         {
             Caption = 'Install Client-side Assemblies';
             DataClassification = CustomerContent;
             Description = 'CASE 226832';
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(834; "Skip Infobox Update in Sale"; Boolean)
         {
@@ -848,12 +945,18 @@ table 6014401 "NPR Register"
         {
             Caption = 'Touch screen connection';
             DataClassification = CustomerContent;
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(870; "Touch Screen Credit Card"; Code[10])
         {
             Caption = 'Credit card button';
             DataClassification = CustomerContent;
             TableRelation = "NPR Payment Type POS";
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(875; "Touch Screen Extended info"; Boolean)
         {
@@ -876,6 +979,9 @@ table 6014401 "NPR Register"
             Caption = 'Credit card offline';
             DataClassification = CustomerContent;
             TableRelation = "NPR Payment Type POS";
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(890; "Shop id"; Code[20])
         {
@@ -895,36 +1001,54 @@ table 6014401 "NPR Register"
             DataClassification = CustomerContent;
             Description = 'MbP1.80';
             TableRelation = "NPR Payment Type POS";
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(6184472; "MobilePay Location ID"; Code[20])
         {
             Caption = 'MobilePay Location ID';
             DataClassification = CustomerContent;
             Description = 'MbP1.80';
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(6184473; "MobilePay PoS ID"; Text[50])
         {
             Caption = 'MobilePay PoS ID';
             DataClassification = CustomerContent;
             Description = 'MbP1.80';
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(6184474; "MobilePay PoS Unit ID"; Code[20])
         {
             Caption = 'MobilePay PoS Unit ID';
             DataClassification = CustomerContent;
             Description = 'MbP1.80';
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(6184475; "MobilePay PoS Registered"; Boolean)
         {
             Caption = 'MobilePay PoS Registered';
             DataClassification = CustomerContent;
             Description = 'MbP1.80';
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(6184476; "MobilePay PoS Unit Assigned"; Boolean)
         {
             Caption = 'MobilePay PoS Unit Assigned';
             DataClassification = CustomerContent;
             Description = 'MbP1.80';
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This table won''t be used anymore.';
+            ObsoleteTag = 'NPR Register';
         }
         field(6184491; "mPos Payment Type"; Code[10])
         {
@@ -946,6 +1070,7 @@ table 6014401 "NPR Register"
         }
         key(Key3; Status)
         {
+
         }
     }
 
@@ -1108,7 +1233,6 @@ table 6014401 "NPR Register"
             Error(Text10600008);
 
         Register."Credit Voucher Account" := PaymentTypePOS."G/L Account No.";
-        Register.Status := Register.Status::Ekspedition;
         Register.Insert;
     end;
 

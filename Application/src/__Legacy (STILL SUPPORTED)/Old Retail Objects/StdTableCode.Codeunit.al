@@ -257,22 +257,6 @@ codeunit 6014426 "NPR Std. Table Code"
         end;
     end;
 
-    procedure UpdateRegisterGlobalDimCode(GlobalDimCodeNo: Integer; RegisterNo: Code[20]; NewDimValue: Code[20])
-    var
-        Register: Record "NPR Register";
-    begin
-        exit;  //NPR5.53 [371956]
-        if Register.Get(RegisterNo) then begin
-            case GlobalDimCodeNo of
-                1:
-                    Register."Global Dimension 1 Code" := NewDimValue;
-                2:
-                    Register."Global Dimension 2 Code" := NewDimValue;
-            end;
-            Register.Modify(true);
-        end;
-    end;
-
     procedure UpdatePaymentTypePOSGlobalDimCode(GlobalDimCodeNo: Integer; PaymentTypeNo: Code[20]; NewDimValue: Code[20])
     var
         PaymentTypePOS: Record "NPR Payment Type POS";
@@ -379,31 +363,6 @@ codeunit 6014426 "NPR Std. Table Code"
             end;
             POSUnit.Modify(true);
         end;
-        //+NPR5.53 [371956]
-    end;
-
-    [EventSubscriber(ObjectType::Table, 6150615, 'OnAfterModifyEvent', '', true, false)]
-    local procedure UpdateCashRegFieldsOnPOSUnitModify(var Rec: Record "NPR POS Unit"; var xRec: Record "NPR POS Unit"; RunTrigger: Boolean)
-    var
-        CashRegister: Record "NPR Register";
-    begin
-        //-NPR5.53 [371956]
-        with Rec do
-            //-NPR5.54 [394528]-revoked
-            //IF ("Global Dimension 1 Code" <> xRec."Global Dimension 1 Code") OR
-            //   ("Global Dimension 2 Code" <> xRec."Global Dimension 2 Code")
-            //+NPR5.54 [394528]-revoked
-            //-NPR5.54 [394528]
-            if CashRegister.Get("No.") then
-                if ("Global Dimension 1 Code" <> CashRegister."Global Dimension 1 Code") or
-                   ("Global Dimension 2 Code" <> CashRegister."Global Dimension 2 Code")
-                //+NPR5.54 [394528]
-                then begin
-                    //CashRegister.GET("No.");  //NPR5.54 [394528]-revoked
-                    CashRegister."Global Dimension 1 Code" := "Global Dimension 1 Code";
-                    CashRegister."Global Dimension 2 Code" := "Global Dimension 2 Code";
-                    CashRegister.Modify;
-                end;
         //+NPR5.53 [371956]
     end;
 

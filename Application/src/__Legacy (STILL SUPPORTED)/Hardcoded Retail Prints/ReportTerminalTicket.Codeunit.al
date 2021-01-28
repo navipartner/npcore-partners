@@ -68,13 +68,8 @@ codeunit 6014562 "NPR Report: Terminal Ticket"
             Printer.AddLine('P');
         end;
 
-        if Register."Credit Card Solution" = Register."Credit Card Solution"::Pepper then begin
-            Printer.SetFont('A11');
-            CopyCaption := txtCopyCentred;
-        end else begin
-            Printer.SetFont('B21');
-            CopyCaption := txtCopy;
-        end;
+        Printer.SetFont('B21');
+        CopyCaption := txtCopy;
 
         //-NPR5.46 [290734]
         //IF (CreditCardTransaction."No. Printed" > 0) AND (NewSlip OR (First AND NOT NotFirst)) THEN BEGIN

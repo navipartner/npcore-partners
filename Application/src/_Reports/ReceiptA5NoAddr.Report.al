@@ -469,23 +469,22 @@ report 6014563 "NPR Receipt A5 - No Addr."
                     flgOpenDrawer := true;
 
                     /** If "open on special" is set, always open the drawer **/
-                    if not Register."Money drawer - open on special" then begin
-                        flgOpenDrawer := false;
-                        if "Audit Roll"."Copy No." < 1 then begin
-                            AuditTemp.SetRange("Sales Ticket No.", "Audit Roll"."Sales Ticket No.");
-                            AuditTemp.SetRange(Description);
-                            AuditTemp.SetRange("Sale Type");
-                            PaymentTypePos.SetFilter("Processing Type", '%1|%2',
-                                                     PaymentTypePos."Processing Type"::Cash,
-                                                     PaymentTypePos."Processing Type"::"Foreign Currency");
-                            if PaymentTypePos.FindSet() then
-                                repeat
-                                    AuditTemp.SetRange("No.", PaymentTypePos."No.");
-                                    if AuditTemp.Count > 0 then
-                                        flgOpenDrawer := true;
-                                until (PaymentTypePos.Next() = 0) or flgOpenDrawer;
-                        end;
+                    flgOpenDrawer := false;
+                    if "Audit Roll"."Copy No." < 1 then begin
+                        AuditTemp.SetRange("Sales Ticket No.", "Audit Roll"."Sales Ticket No.");
+                        AuditTemp.SetRange(Description);
+                        AuditTemp.SetRange("Sale Type");
+                        PaymentTypePos.SetFilter("Processing Type", '%1|%2',
+                                                 PaymentTypePos."Processing Type"::Cash,
+                                                 PaymentTypePos."Processing Type"::"Foreign Currency");
+                        if PaymentTypePos.FindSet then
+                            repeat
+                                AuditTemp.SetRange("No.", PaymentTypePos."No.");
+                                if AuditTemp.Count > 0 then
+                                    flgOpenDrawer := true;
+                            until (PaymentTypePos.Next = 0) or flgOpenDrawer;
                     end;
+
 
                     if Pageloop.Number = 2 then begin
                         ShowPageTwo := flgRetursalg;

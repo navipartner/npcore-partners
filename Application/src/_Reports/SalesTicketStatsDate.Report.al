@@ -24,15 +24,6 @@ report 6014452 "NPR Sales Ticket Stats/Date"
             column(PeriodName_Date; Date."Period Name")
             {
             }
-            column(Balance_Due_LCY; Kassedata."All Normal Sales in Audit Roll")
-            {
-            }
-            column(Purchase_LCY; Kassedata."All Debit Sales in Audit Roll")
-            {
-            }
-            column(Total; Kassedata."All Normal Sales in Audit Roll" + Kassedata."All Debit Sales in Audit Roll")
-            {
-            }
             column(totalCount; totalCount)
             {
             }
@@ -78,8 +69,6 @@ report 6014452 "NPR Sales Ticket Stats/Date"
                 AuditRoll.Reset();
                 SetDateFilter();
                 SetDimensionFilters();
-
-                Kassedata.CalcFields("All Normal Sales in Audit Roll", "All Debit Sales in Audit Roll");
 
                 CalcAverage();
                 URLBalanceDue := '';
@@ -219,8 +208,6 @@ report 6014452 "NPR Sales Ticket Stats/Date"
         totalCount := AuditRoll.GetNoOfSales();
         AuditRoll.SetRange("Sale Type");
 
-        totalAmount := Kassedata."All Normal Sales in Audit Roll";
-
         if totalCount <> 0 then
             Average := totalAmount / totalCount
         else
@@ -229,17 +216,6 @@ report 6014452 "NPR Sales Ticket Stats/Date"
 
     procedure SetDimensionFilters()
     begin
-        if Dim1Filter <> '' then
-            Kassedata.SetRange("Global Dimension 1 Filter", Dim1Filter)
-        else
-            Kassedata.SetRange("Global Dimension 1 Filter");
-
-        if Dim2Filter <> '' then
-            Kassedata.SetFilter("Global Dimension 2 Filter", Dim2Filter)
-        else
-            Kassedata.SetRange("Global Dimension 2 Filter");
-
-
         if Dim1Filter <> '' then
             AuditRoll.SetRange("Shortcut Dimension 1 Code", Dim1Filter)
         else
