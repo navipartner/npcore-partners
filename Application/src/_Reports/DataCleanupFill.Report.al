@@ -1,12 +1,8 @@
 report 6060100 "NPR Data Cleanup Fill"
 {
-    // NPR4.02/JC/20150318  CASE 207094 Data Cleanup for Customer, Vendor and Item
-    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Data Cleanup Fill.rdlc';
-
     Caption = 'Data Cleanup Customer';
-
     dataset
     {
         dataitem("Integer"; "Integer")
@@ -55,44 +51,13 @@ report 6060100 "NPR Data Cleanup Fill"
 
                 trigger OnAfterGetRecord()
                 begin
-                    /*
-                    IF FillTable AND Deleteable THEN BEGIN
-                      IF NOT DataCleanupCVI.GET(DataCleanupCVI.Type::Customer, Customer."No.") THEN BEGIN
-                        DataCleanupCVI.Type := DataCleanupCVI.Type::Customer;
-                        DataCleanupCVI."No." := Customer."No.";
-                        DataCleanupCVI.Status := 'INSERTED';
-                        DataCleanupCVI."Last Entry Date" := "Cust. Ledger Entry"."Posting Date";
-                        DataCleanupCVI.INSERT(TRUE);
-                    
-                        RecordsIns := RecordsIns + 1;
-                      END;
-                    END;
-                    */
-
                     Func_LedgerOnAfterGetRec();
-
-                    CurrReport.Break;
+                    CurrReport.Break();
 
                 end;
 
                 trigger OnPreDataItem()
                 begin
-                    /*
-                    LedgerCnt := "Cust. Ledger Entry".COUNT;
-                    IF FillTable AND Deleteable THEN BEGIN
-                      IF "Cust. Ledger Entry".COUNT = 0 THEN
-                        IF NOT DataCleanupCVI.GET(DataCleanupCVI.Type::Customer, Customer."No.") THEN BEGIN
-                          DataCleanupCVI.Type := DataCleanupCVI.Type::Customer;
-                          DataCleanupCVI."No." := Customer."No.";
-                          DataCleanupCVI.Status := 'INSERTED';
-                          DataCleanupCVI."Last Entry Date" := "Cust. Ledger Entry"."Posting Date";
-                          DataCleanupCVI.INSERT(TRUE);
-                    
-                          RecordsIns := RecordsIns + 1;
-                        END;
-                    END;
-                    */
-
                     Func_LedgerOnPreDataItem();
 
                 end;
@@ -130,53 +95,22 @@ report 6060100 "NPR Data Cleanup Fill"
 
                 trigger OnAfterGetRecord()
                 begin
-                    /*
-                    IF FillTable AND Deleteable THEN BEGIN
-                      IF NOT DataCleanupCVI.GET(DataCleanupCVI.Type::Vendor, Vendor."No.") THEN BEGIN
-                        DataCleanupCVI.Type := DataCleanupCVI.Type::Vendor;
-                        DataCleanupCVI."No." := Vendor."No.";
-                        DataCleanupCVI.Status := 'INSERTED';
-                        DataCleanupCVI."Last Entry Date" := "Vendor Ledger Entry"."Posting Date";
-                        DataCleanupCVI.INSERT(TRUE);
-                    
-                        RecordsIns := RecordsIns + 1;
-                      END;
-                    END;
-                    */
-
                     Func_LedgerOnAfterGetRec();
 
-                    CurrReport.Break;
+                    CurrReport.Break();
 
                 end;
 
                 trigger OnPreDataItem()
                 begin
-                    /*
-                    LedgerCnt := "Vendor Ledger Entry".COUNT;
-                    IF FillTable AND Deleteable THEN BEGIN
-                      IF "Vendor Ledger Entry".COUNT = 0 THEN
-                        IF NOT DataCleanupCVI.GET(DataCleanupCVI.Type::Vendor, Vendor."No.") THEN BEGIN
-                          DataCleanupCVI.Type := DataCleanupCVI.Type::Vendor;
-                          DataCleanupCVI."No." := Vendor."No.";
-                          DataCleanupCVI.Status := 'INSERTED';
-                          DataCleanupCVI."Last Entry Date" := "Vendor Ledger Entry"."Posting Date";
-                          DataCleanupCVI.INSERT(TRUE);
-                    
-                          RecordsIns := RecordsIns + 1;
-                        END;
-                    END;
-                    */
-
                     Func_LedgerOnPreDataItem();
-
                 end;
             }
 
             trigger OnAfterGetRecord()
             begin
                 if TableOption <> TableOption::Vendor then
-                    CurrReport.Skip;
+                    CurrReport.Skip();
 
                 Func_OnAfterGetRec();
             end;
@@ -205,53 +139,21 @@ report 6060100 "NPR Data Cleanup Fill"
 
                 trigger OnAfterGetRecord()
                 begin
-                    /*
-                    IF FillTable AND Deleteable THEN BEGIN
-                      IF NOT DataCleanupCVI.GET(DataCleanupCVI.Type::Item, Item."No.") THEN BEGIN
-                        DataCleanupCVI.Type := DataCleanupCVI.Type::Item;
-                        DataCleanupCVI."No." := Item."No.";
-                        DataCleanupCVI.Status := 'INSERTED';
-                        DataCleanupCVI."Last Entry Date" := "Item Ledger Entry"."Posting Date";
-                        DataCleanupCVI.INSERT(TRUE);
-                    
-                        RecordsIns := RecordsIns + 1;
-                      END;
-                    END;
-                    */
-
                     Func_LedgerOnAfterGetRec();
-
-                    CurrReport.Break;
+                    CurrReport.Break();
 
                 end;
 
                 trigger OnPreDataItem()
                 begin
-                    /*
-                    LedgerCnt := "Item Ledger Entry".COUNT;
-                    IF FillTable AND Deleteable THEN BEGIN
-                      IF "Item Ledger Entry".COUNT = 0 THEN
-                        IF NOT DataCleanupCVI.GET(DataCleanupCVI.Type::Item, Item."No.") THEN BEGIN
-                          DataCleanupCVI.Type := DataCleanupCVI.Type::Item;
-                          DataCleanupCVI."No." := Item."No.";
-                          DataCleanupCVI.Status := 'INSERTED';
-                          DataCleanupCVI."Last Entry Date" := "Item Ledger Entry"."Posting Date";
-                          DataCleanupCVI.INSERT(TRUE);
-                    
-                          RecordsIns := RecordsIns + 1;
-                        END;
-                    END;
-                    */
-
                     Func_LedgerOnPreDataItem();
-
                 end;
             }
 
             trigger OnAfterGetRecord()
             begin
                 if TableOption <> TableOption::Item then
-                    CurrReport.Skip;
+                    CurrReport.Skip();
 
                 Func_OnAfterGetRec();
             end;
@@ -280,46 +182,14 @@ report 6060100 "NPR Data Cleanup Fill"
 
                 trigger OnAfterGetRecord()
                 begin
-                    /*
-                    IF FillTable AND Deleteable THEN BEGIN
-                      IF NOT DataCleanupCVI.GET(DataCleanupCVI.Type::"G/L Account", "G/L Account"."No.") THEN BEGIN
-                        DataCleanupCVI.Type := DataCleanupCVI.Type::"G/L Account";
-                        DataCleanupCVI."No." := "G/L Account"."No.";
-                        DataCleanupCVI.Status := 'INSERTED';
-                        DataCleanupCVI."Last Entry Date" := "G/L Entry"."Posting Date";
-                        DataCleanupCVI.INSERT(TRUE);
-                    
-                        RecordsIns := RecordsIns + 1;
-                      END;
-                    END;
-                    */
-
                     Func_LedgerOnAfterGetRec();
-
-                    CurrReport.Break;
+                    CurrReport.Break();
 
                 end;
 
                 trigger OnPreDataItem()
                 begin
-                    /*
-                    LedgerCnt := "G/L Entry".COUNT;
-                    IF FillTable AND Deleteable THEN BEGIN
-                      IF "G/L Entry".COUNT = 0 THEN
-                        IF NOT DataCleanupCVI.GET(DataCleanupCVI.Type::"G/L Account", "G/L Account"."No.") THEN BEGIN
-                          DataCleanupCVI.Type := DataCleanupCVI.Type::"G/L Account";
-                          DataCleanupCVI."No." := "G/L Account"."No.";
-                          DataCleanupCVI.Status := 'INSERTED';
-                          DataCleanupCVI."Last Entry Date" := "G/L Entry"."Posting Date";
-                          DataCleanupCVI.INSERT(TRUE);
-                    
-                          RecordsIns := RecordsIns + 1;
-                        END;
-                    END;
-                    */
-
                     Func_LedgerOnPreDataItem();
-
                 end;
             }
 
@@ -367,14 +237,8 @@ report 6060100 "NPR Data Cleanup Fill"
             }
         }
 
-        actions
-        {
-        }
     }
 
-    labels
-    {
-    }
 
     trigger OnPostReport()
     begin
@@ -391,19 +255,19 @@ report 6060100 "NPR Data Cleanup Fill"
 
     var
         DataCleanupCVI: Record "NPR Data Cleanup GCVI";
+        DataCleanupCVILine: Codeunit "NPR Data Cleanup GCVI Line";
+        Deleteable: Boolean;
         FillTable: Boolean;
+        LedgerCnt: Integer;
         RecordsIns: Integer;
         RecInsTxt: Label 'Records have been inserted.';
-        Deleteable: Boolean;
-        LedgerCnt: Integer;
-        CleanupAction: Option Delete,Rename;
-        TableOption: Option Customer,Vendor,Item,GLAccount;
-        CustFilter: Text;
-        VendorFilter: Text;
-        ItemFilter: Text;
-        GLFilter: Text;
         ItemRenameOption: Option " ","Vendor Item No.","Vendor + Vendor Item No.";
-        DataCleanupCVILine: Codeunit "NPR Data Cleanup GCVI Line";
+        TableOption: Option Customer,Vendor,Item,GLAccount;
+        CleanupAction: Option Delete,Rename;
+        CustFilter: Text;
+        GLFilter: Text;
+        ItemFilter: Text;
+        VendorFilter: Text;
 
     local procedure Func_OnAfterGetRec()
     begin
@@ -433,9 +297,8 @@ report 6060100 "NPR Data Cleanup Fill"
                 end;
             TableOption::Item:
                 begin
-                    if CleanupAction = CleanupAction::Delete then begin
+                    if CleanupAction = CleanupAction::Delete then
                         Deleteable := DataCleanupCVILine.MoveItemEntriesTest(Item);
-                    end;
                     if CleanupAction = CleanupAction::Rename then begin
                         if FillTable then
                             if not DataCleanupCVI.Get(DataCleanupCVI."Cleanup Action"::Rename, DataCleanupCVI.Type::Item, Item."No.") then begin
@@ -443,16 +306,13 @@ report 6060100 "NPR Data Cleanup Fill"
                                     InsertCVIRec(DataCleanupCVI."Cleanup Action"::Rename, DataCleanupCVI.Type::Item, Item."No.", 0D, Item."Vendor Item No.");
                                 if ItemRenameOption = ItemRenameOption::"Vendor + Vendor Item No." then
                                     InsertCVIRec(DataCleanupCVI."Cleanup Action"::Rename, DataCleanupCVI.Type::Item, Item."No.", 0D, Item."Vendor No." + '-' + Item."Vendor Item No.");
-
                             end;
-
                     end;
                 end;
             TableOption::GLAccount:
                 begin
-                    if CleanupAction = CleanupAction::Delete then begin
+                    if CleanupAction = CleanupAction::Delete then
                         Deleteable := DataCleanupCVILine.MoveGLEntriesTest("G/L Account");
-                    end;
                     if CleanupAction = CleanupAction::Rename then begin
                         if FillTable then
                             if not DataCleanupCVI.Get(DataCleanupCVI."Cleanup Action"::Rename, DataCleanupCVI.Type::"G/L Account", "G/L Account"."No.") then
@@ -505,9 +365,6 @@ report 6060100 "NPR Data Cleanup Fill"
                     end;
             end;
         end;
-
-        if CleanupAction = CleanupAction::Rename then begin
-        end;
     end;
 
     local procedure Func_LedgerOnAfterGetRec()
@@ -544,17 +401,16 @@ report 6060100 "NPR Data Cleanup Fill"
                     end;
             end;
         end;
-
-        if CleanupAction = CleanupAction::Rename then begin
-        end;
     end;
 
     local procedure InsertCVIRec(CleanupAction: Option " ","None",Delete,Rename; Type: Option Customer,Vendor,Item,GLAccount; No: Code[250]; LastEntryDate: Date; NewNo: Code[20])
+    var
+        InsertedLbl: Label 'INSERTED';
     begin
         DataCleanupCVI."Cleanup Action" := CleanupAction;
         DataCleanupCVI.Type := Type;
         DataCleanupCVI."No." := No;
-        DataCleanupCVI.Status := 'INSERTED';
+        DataCleanupCVI.Status := InsertedLbl;
         DataCleanupCVI."Last Entry Date" := LastEntryDate;
         if DataCleanupCVI."Cleanup Action" = DataCleanupCVI."Cleanup Action"::Rename then begin
             DataCleanupCVI."NewNo." := NewNo;

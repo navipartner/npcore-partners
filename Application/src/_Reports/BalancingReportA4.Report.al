@@ -1,16 +1,7 @@
 report 6014460 "NPR Balancing Report A4"
 {
-    // NPR5.42/ZESO/20180518  CASE 310459 Object Created
-    // NPR5.48/JDH /20181109 CASE 334163 Added Object Caption
-    // NPR5.50/JAKUBV/20190603  CASE 345706 Transport NPR5.50 - 3 June 2019
-    // NPR5.51/ZESO/20190717 CASE 360693 Corrected visibility property of EFT, Set All Print Options to Yes on running report
-    // NPR5.55/ZESO/20200511 CASE 394936 Removed Duplicate Tax Section and move correct one below Discount section
-    // NPR5.55/BHR /20200525 CASE 404681 Replace POSEntry."POS Store Code" with POSEntry."POS Unit No."
-    // NPR5.55/ZESO/20200724 CASE 416046 Display both POS Store Code and POS Unit No.
-    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Balancing Report -A4 - NEW.rdlc';
-
     Caption = 'Balancing Report -A4 - POS';
 
     dataset
@@ -862,13 +853,8 @@ report 6014460 "NPR Balancing Report A4"
             }
         }
 
-        actions
-        {
-        }
-
         trigger OnOpenPage()
         begin
-            //-NPR5.51 [360693]
             PrintTurnOver := true;
             PrintDiscount := true;
             PrintVAT := true;
@@ -878,81 +864,76 @@ report 6014460 "NPR Balancing Report A4"
             PrintCountedAmtInclFloat := true;
             PrintClosing := true;
             PrintAttachedBins := true;
-            //+NPR5.51 [360693]
         end;
-    }
-
-    labels
-    {
     }
 
     trigger OnPreReport()
     begin
-        if CompanyInfo.Get then;
+        if CompanyInfo.Get() then;
         CompanyInfo.CalcFields(Picture);
     end;
 
     var
-        VarTax: Integer;
-        VarMain: Integer;
-        VarBin: Integer;
+        CompanyInfo: Record "Company Information";
         POSEntry: Record "NPR POS Entry";
-        StoreLbl: Label 'POS Store';
-        SalesTicketNoLbl: Label 'Sales Ticket No';
-        OpeningHrsLbl: Label 'Opening Hours';
-        ClosingDatelbl: Label 'Closing Date';
-        BalancedByLbl: Label 'Register Balanced By';
         Salesperson: Record "Salesperson/Purchaser";
-        VarBalancedBy: Text;
-        WithLbl: Label 'With';
-        VarReportTitle: Text;
-        LblXReport: Label 'X-Report';
-        LblZReport: Label 'Z-Report';
-        SignatureLbl: Label 'Signature';
-        VarAttachedBin: Integer;
-        PrintSales: Boolean;
-        PrintReceipts: Boolean;
-        PrintTerminals: Boolean;
-        PrintVouchers: Boolean;
-        PrintTurnOver: Boolean;
+        PrintAttachedBins: Boolean;
+        PrintClosing: Boolean;
+        PrintCountedAmtInclFloat: Boolean;
+        PrintCounting: Boolean;
+        PrintDiscount: Boolean;
         PrintDiscountAmt: Boolean;
         PrintDiscountPerc: Boolean;
         PrintDiscountTotal: Boolean;
-        PrintCounting: Boolean;
-        PrintClosing: Boolean;
-        PrintVAT: Boolean;
-        PrintAttachedBins: Boolean;
+        PrintEFT: Boolean;
         PrintEmptyLines: Boolean;
-        Saleslbl: Label 'Sales';
-        Receiptslbl: Label 'Receipts';
-        Terminalslbl: Label 'Terminals';
-        Voucherslbl: Label 'Vouchers';
-        Turnoverlbl: Label 'Turnover (LCY)';
+        PrintNetTurnover: Boolean;
+        PrintReceipts: Boolean;
+        PrintSales: Boolean;
+        PrintTerminals: Boolean;
+        PrintTurnOver: Boolean;
+        PrintVAT: Boolean;
+        PrintVouchers: Boolean;
+        VarPrintAmt: Boolean;
+        VarPrintPerc: Boolean;
+        VarPrintTotal: Boolean;
+        VarAttachedBin: Integer;
+        VarBin: Integer;
+        VarDenomination: Integer;
+        VarMain: Integer;
+        VarTax: Integer;
+        AttachedPaymentBinslbl: Label 'Attached Payment Bins';
+        Closinglbl: Label 'Closing';
+        ClosingDatelbl: Label 'Closing Date';
+        CountedAmtInclFloatlbl: Label 'Counted Amount Incl Float';
+        Countinglbl: Label 'Counting';
+        DirectTurnoverlbl: Label 'Direct Turnover (LCY)';
         Discountlbl: Label 'Discount';
         DiscountAmtlbl: Label 'Discount Amount';
         DiscountPerclbl: Label 'Discount Percentage';
         DiscountTotallbl: Label 'Discount Total';
-        Countinglbl: Label 'Counting';
-        Closinglbl: Label 'Closing';
-        VATTaxSummarylbl: Label 'VAT & TAX Summary';
-        AttachedPaymentBinslbl: Label 'Attached Payment Bins';
-        VarPrintAmt: Boolean;
-        VarPrintPerc: Boolean;
-        VarPrintTotal: Boolean;
-        Text000: Label 'You need to select Print Discount first.';
-        CustomerPaymentLbl: Label 'Payment';
-        PrintDiscountlbl: Label 'Print Discount';
-        Workshiftlbl: Label 'Workshift';
-        CompanyInfo: Record "Company Information";
-        DirectTurnoverlbl: Label 'Direct Turnover (LCY)';
-        VarDenomination: Integer;
-        NetTurnoverlbl: Label 'Net Turnover';
         EFTlbl: Label 'EFT';
-        CountedAmtInclFloatlbl: Label 'Counted Amount Incl Float';
-        PrintNetTurnover: Boolean;
-        PrintDiscount: Boolean;
-        PrintCountedAmtInclFloat: Boolean;
-        PrintEFT: Boolean;
+        NetTurnoverlbl: Label 'Net Turnover';
+        OpeningHrsLbl: Label 'Opening Hours';
+        CustomerPaymentLbl: Label 'Payment';
+        StoreLbl: Label 'POS Store';
         POSUnitLbl: Label 'POS Unit';
+        PrintDiscountlbl: Label 'Print Discount';
+        Receiptslbl: Label 'Receipts';
+        BalancedByLbl: Label 'Register Balanced By';
+        Saleslbl: Label 'Sales';
+        SalesTicketNoLbl: Label 'Sales Ticket No';
+        SignatureLbl: Label 'Signature';
+        Terminalslbl: Label 'Terminals';
+        Turnoverlbl: Label 'Turnover (LCY)';
+        VATTaxSummarylbl: Label 'VAT & TAX Summary';
+        Voucherslbl: Label 'Vouchers';
+        WithLbl: Label 'With';
+        Workshiftlbl: Label 'Workshift';
+        LblXReport: Label 'X-Report';
+        Text000: Label 'You need to select Print Discount first.';
+        LblZReport: Label 'Z-Report';
+        VarBalancedBy: Text;
+        VarReportTitle: Text;
 }
 

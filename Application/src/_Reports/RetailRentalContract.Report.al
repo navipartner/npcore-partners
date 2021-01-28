@@ -1,16 +1,11 @@
 report 6014436 "NPR Retail Rental Contract"
 {
-    // NPR70.00.00.00/LS/20150128  CASE 202874  Convert Report to 7.1
-    // NPR4.14/TR/20150824 CASE 202874 Report footer inserted.
-    // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Retail Rental Contract.rdlc';
-
     Caption = 'Retail Rental Contract';
     PreviewMode = PrintLayout;
     UsageCategory = Documents;
     ApplicationArea = All;
-
     dataset
     {
         dataitem("Retail Document Header"; "NPR Retail Document Header")
@@ -113,18 +108,6 @@ report 6014436 "NPR Retail Rental Contract"
         }
     }
 
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
-        }
-    }
-
     labels
     {
         Report_Caption = 'Rent Contract';
@@ -155,15 +138,8 @@ report 6014436 "NPR Retail Rental Contract"
 
     trigger OnInitReport()
     begin
-        CompanyInformation.Get;
+        CompanyInformation.Get();
         CompanyInformation.CalcFields(Picture);
-
-        //-NPR5.39
-        // Object.SETRANGE(ID, 6014436);
-        // Object.SETRANGE(Type, 3);
-        // Object.FIND('-');
-        //-NPR5.39
-
         TotalAmount := 0;
     end;
 

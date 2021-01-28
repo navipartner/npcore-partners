@@ -1,16 +1,7 @@
 report 6014497 "NPR Campaign Vendor List"
 {
-    // NPK1.01/20130603/TR CASE : 176941 - Copied from nyeste.
-    // NPR4.14/KN/20150818 CASE 220291 Added label, CampaignTotalLbl, to replace hardcoded text in textbox.
-    // NPR4.14/KN/20150821 CASE 221165 Added two labels, ChosenVendorLbl and PeriodLbl, to replace hardcoded text in textboxes.
-    // NPR5.25/JLK /20160726 CASE 247117 Corrected Net Change
-    //                                   Hide not calculated variables from rdlc
-    // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
-    // NPR5.40/BHR /20180301  CASE 299276 Remove closing Date from calcfields property, Change layout to A4 portrait. add field Photo
-    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Campaign Vendor List.rdlc';
-
     Caption = 'Inventory Campaign Stat.';
     PreviewMode = PrintLayout;
 
@@ -107,7 +98,7 @@ report 6014497 "NPR Campaign Vendor List"
                     trigger OnAfterGetRecord()
                     begin
                         if "Retail Comment"."Hide on printout" then
-                            CurrReport.Skip;
+                            CurrReport.Skip();
                     end;
                 }
 
@@ -203,9 +194,6 @@ report 6014497 "NPR Campaign Vendor List"
             }
         }
 
-        actions
-        {
-        }
     }
 
     labels
@@ -227,22 +215,17 @@ report 6014497 "NPR Campaign Vendor List"
 
     trigger OnInitReport()
     begin
-        CompanyInfo.Get;
-        //-NPR5.39
-        // Object.SETRANGE(ID,6014499);
-        // Object.SETRANGE(Type,3);
-        // Object.FIND('-');
-        //+NPR5.39
+        CompanyInfo.Get();
     end;
 
     var
         CompanyInfo: Record "Company Information";
+        Item: Record Item;
+        Vendor1: Record Vendor;
         VendorNo: Code[20];
         VendorName: Text[50];
         VendorFilter: Text[100];
-        Vendor1: Record Vendor;
-        Item: Record Item;
-        LocationFilter: Text[200];
         Dimension1Filter: Text[200];
+        LocationFilter: Text[200];
 }
 

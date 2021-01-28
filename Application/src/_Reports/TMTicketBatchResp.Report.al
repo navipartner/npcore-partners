@@ -1,13 +1,8 @@
 report 6060124 "NPR TM Ticket Batch Resp."
 {
-    // TM1.22/NPKNAV/20170612  CASE 278142 Transport T0007 - 12 June 2017
-    // TM1.26/TSA /20171103 CASE 285601 Added Ticket URL
-    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/TM Ticket Batch Response.rdlc';
-
     Caption = 'Ticket Batch Response';
-
     dataset
     {
         dataitem(ReservationRequest; "NPR TM Ticket Reservation Req.")
@@ -66,18 +61,6 @@ report 6060124 "NPR TM Ticket Batch Resp."
                         TicketURL := StrSubstNo('%1%2', TicketSetup."Print Server Ticket URL", Ticket."External Ticket No.");
                 end;
             }
-        }
-    }
-
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
         }
     }
 

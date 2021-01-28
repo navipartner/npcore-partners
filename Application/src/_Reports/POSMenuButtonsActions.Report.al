@@ -1,12 +1,7 @@
 report 6014421 "NPR POS Menu Buttons/Actions"
 {
-    // NPK1.00/JLK /20170605  CASE 279362 Object created
-    // NPR5.33/NPKNAV/20170630  CASE 279362 Transport NPR5.33 - 30 June 2017
-    // NPR5.38/JLK /20180124  CASE 300892 Removed AL Error on ControlContainer Caption in Request Page
-    // NPR5.40/VB  /20180301  CASE 306347 Updated report to reflect the change from BLOB-based temporary-table parameters to physical-table parameters.
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/POS Menu ButtonsActions.rdlc';
-
     Caption = 'NPR POS Menu Buttons/Actions';
     PreviewMode = PrintLayout;
     UsageCategory = ReportsAndAnalysis;
@@ -79,20 +74,6 @@ report 6014421 "NPR POS Menu Buttons/Actions"
                     end;
                 }
 
-                trigger OnAfterGetRecord()
-                var
-                    RecRef: RecordRef;
-                    FieldRef: FieldRef;
-                begin
-                    //-NPR5.40 [306347]
-                    //RecRef.GETTABLE("POS Menu Button");
-                    //FieldRef := RecRef.FIELD(FIELDNO(Parameters));
-                    //TempParam.DELETEALL;
-                    //
-                    //IF ShowParameters THEN
-                    //  LoadFromField(FieldRef,TempParam);
-                    //+NPR5.40 [306347]
-                end;
             }
         }
     }
@@ -115,10 +96,6 @@ report 6014421 "NPR POS Menu Buttons/Actions"
                     }
                 }
             }
-        }
-
-        actions
-        {
         }
 
         trigger OnOpenPage()
@@ -162,15 +139,18 @@ report 6014421 "NPR POS Menu Buttons/Actions"
     end;
 
     var
-        FiltersTxt: Text;
         ShowParameters: Boolean;
+        FiltersTxt: Text;
 
     local procedure GetBooleanText(Bool: Boolean): Text
+    var
+        YesLbl: Label 'Yes';
+        NoLbl: Label 'No';
     begin
         if Bool = true then
-            exit('Yes');
+            exit(YesLbl);
 
-        exit('No');
+        exit(NoLbl);
     end;
 }
 

@@ -1,18 +1,11 @@
 report 6014419 "NPR Vendor Sales Stat"
 {
-    // NPR5.29/TR  /20161118  CASE 247166 Report Created
-    // NPR5.33/JLK /20170619  CASE 280879 Changed SalesQty and PurchaseQty to Decimal
-    // NPR5.38/JLK /20180124  CASE 300892 Removed AL Error on ControlContainer Caption in Request Page
-    // NPR5.53/ANPA/20191227  CASE 370940 Changed caption on request page
-    // NPR5.55/ANPA/20200608  CASE 402935 Changed layout to match layout of report 6014417
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Vendor Sales Stat.rdlc';
-
     Caption = 'Vendor Sales Statistics';
     PreviewMode = PrintLayout;
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
-
     dataset
     {
         dataitem(Vendor; Vendor)
@@ -215,10 +208,6 @@ report 6014419 "NPR Vendor Sales Stat"
                     ToolTip = 'Specifies the value of the End Date field';
                 }
             }
-        }
-
-        actions
-        {
         }
     }
 

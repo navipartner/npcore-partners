@@ -1,12 +1,8 @@
 report 6014463 "NPR Doc. Processing Status"
 {
-    // NPR5.39/THRO/20180222 CASE 302597 Report created
-    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Document Processing Status.rdlc';
-
     Caption = 'Document Processing Status';
-
     dataset
     {
         dataitem(SalesInvoiceHeader; "Sales Invoice Header")
@@ -71,7 +67,7 @@ report 6014463 "NPR Doc. Processing Status"
                         end;
                     2:
                         begin
-                            NPRDocLocalizationProxy.T112_GetFieldValue(SalesInvoiceHeader, 'Electronic Invoice Created', VariantVal);
+                            NPRDocLocalizationProxy.T112_GetFieldValue(SalesInvoiceHeader, InvoiceCreatedLbl, VariantVal);
                             if VariantVal.IsBoolean then
                                 IsSent := VariantVal;
                         end;
@@ -100,7 +96,7 @@ report 6014463 "NPR Doc. Processing Status"
                 end;
 
                 if IsSent and ShowOnlyNotSent then
-                    CurrReport.Skip;
+                    CurrReport.Skip();
             end;
         }
         dataitem("Sales Cr.Memo Header"; "Sales Cr.Memo Header")
@@ -127,7 +123,7 @@ report 6014463 "NPR Doc. Processing Status"
             trigger OnAfterGetRecord()
             begin
                 if not IncludeCrMemo then
-                    CurrReport.Break;
+                    CurrReport.Break();
                 StatusMsg := '';
                 IsSent := false;
 
@@ -150,7 +146,7 @@ report 6014463 "NPR Doc. Processing Status"
                         end;
                     2:
                         begin
-                            NPRDocLocalizationProxy.T114_GetFieldValue("Sales Cr.Memo Header", 'Electronic Invoice Created', VariantVal);
+                            NPRDocLocalizationProxy.T114_GetFieldValue("Sales Cr.Memo Header", InvoiceCreatedLbl, VariantVal);
                             if VariantVal.IsBoolean then
                                 IsSent := VariantVal;
                         end;
@@ -179,13 +175,13 @@ report 6014463 "NPR Doc. Processing Status"
                 end;
 
                 if IsSent and ShowOnlyNotSent then
-                    CurrReport.Skip;
+                    CurrReport.Skip();
             end;
 
             trigger OnPreDataItem()
             begin
                 if not IncludeCrMemo then
-                    CurrReport.Break;
+                    CurrReport.Break();
             end;
         }
     }
@@ -217,9 +213,6 @@ report 6014463 "NPR Doc. Processing Status"
             }
         }
 
-        actions
-        {
-        }
     }
 
     labels
@@ -241,8 +234,9 @@ report 6014463 "NPR Doc. Processing Status"
         EmailStatusTxt: Label 'Mail sent %1 to %2.';
         NoEmailSentTxt: Label 'No Mail sent.';
         TotalIsZeroTxt: Label 'Total Amount is 0. Deleted document?';
-        VariantVal: Variant;
         StatusMsgCaptionTxt: Label 'Status';
         IsSentCaptionTxt: Label 'Document is sent';
+        VariantVal: Variant;
+        InvoiceCreatedLbl: Label 'Electronic Invoice Created';
 }
 

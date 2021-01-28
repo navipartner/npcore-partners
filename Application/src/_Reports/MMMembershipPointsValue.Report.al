@@ -1,13 +1,9 @@
 report 6060130 "NPR MM Membership Points Value"
 {
-    // MM1.17/JLK /20170123  CASE 243075 Object created
-    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/MM Membership Points Value.rdlc';
-
     Caption = 'Membership Points Summary';
     PreviewMode = PrintLayout;
-
     dataset
     {
         dataitem("MM Membership"; "NPR MM Membership")
@@ -74,18 +70,18 @@ report 6060130 "NPR MM Membership Points Value"
 
                         trigger OnAfterGetRecord()
                         begin
-                            TempSortedLoyaltyPoints.Init;
+                            TempSortedLoyaltyPoints.Init();
                             TempSortedLoyaltyPoints.Template := Code;
                             TempSortedLoyaltyPoints."Line No." := "Line No.";
                             TempSortedLoyaltyPoints.Indent := "Points Threshold";
                             TempSortedLoyaltyPoints.Description := Description;
                             TempSortedLoyaltyPoints."Decimal 1" := "Amount LCY";
-                            TempSortedLoyaltyPoints.Insert;
+                            TempSortedLoyaltyPoints.Insert();
                         end;
 
                         trigger OnPreDataItem()
                         begin
-                            TempSortedLoyaltyPoints.DeleteAll;
+                            TempSortedLoyaltyPoints.DeleteAll();
                         end;
                     }
                     dataitem(TempSortedLoyaltyPoints; "NPR TEMP Buffer")
@@ -124,13 +120,13 @@ report 6060130 "NPR MM Membership Points Value"
                         begin
 
                             if (TotalPoints - Indent) < 0 then
-                                CurrReport.Skip;
+                                CurrReport.Skip();
 
                             PerPointDistributionCount := 0;
                             PointDistribution := 0;
                             LoopCount := (TotalPoints div Indent);
                             if LoopCount = 0 then
-                                CurrReport.Skip;
+                                CurrReport.Skip();
 
                             for i := 1 to LoopCount do begin
                                 TotalPoints := TotalPoints - Indent;
@@ -145,20 +141,20 @@ report 6060130 "NPR MM Membership Points Value"
                             if TempLoyaltyPointsPerMembership.Get(TempSortedLoyaltyPoints.Template, TempSortedLoyaltyPoints."Line No.") then begin
                                 TempLoyaltyPointsPerMembership.Indent += PointDistribution;
                                 TempLoyaltyPointsPerMembership."Decimal 1" += PerPointDistributionValue;
-                                TempLoyaltyPointsPerMembership.Modify;
+                                TempLoyaltyPointsPerMembership.Modify();
                             end else begin
-                                TempLoyaltyPointsPerMembership.Init;
+                                TempLoyaltyPointsPerMembership.Init();
                                 TempLoyaltyPointsPerMembership.TransferFields(TempSortedLoyaltyPoints);
                                 TempLoyaltyPointsPerMembership.Indent := PointDistribution;
                                 TempLoyaltyPointsPerMembership."Decimal 1" := PerPointDistributionValue;
-                                TempLoyaltyPointsPerMembership.Insert;
+                                TempLoyaltyPointsPerMembership.Insert();
                             end;
                         end;
 
                         trigger OnPreDataItem()
                         begin
-                            if TempSortedLoyaltyPoints.IsEmpty then
-                                CurrReport.Break;
+                            if TempSortedLoyaltyPoints.IsEmpty() then
+                                CurrReport.Break();
 
                             TotalPoints := "MM Membership"."Remaining Points";
                         end;
@@ -167,7 +163,7 @@ report 6060130 "NPR MM Membership Points Value"
                     trigger OnAfterGetRecord()
                     begin
                         if "MM Loyalty Setup"."Voucher Point Threshold" > "MM Membership"."Remaining Points" then
-                            CurrReport.Break;
+                            CurrReport.Break();
                     end;
                 }
             }
@@ -240,14 +236,6 @@ report 6060130 "NPR MM Membership Points Value"
     requestpage
     {
 
-        layout
-        {
-        }
-
-        actions
-        {
-        }
-
         trigger OnOpenPage()
         begin
             "MM Membership".SetFilter("Date Filter", '..%2', Today);
@@ -261,23 +249,23 @@ report 6060130 "NPR MM Membership Points Value"
 
     var
         Customer: Record Customer;
-        CustomerName: Text;
-        PageCaption: Label 'Page %1 of %2';
-        PointDistribution: Decimal;
-        TotalPoints: Decimal;
-        PointsToRedeem: Decimal;
         PerPointDistributionCount: Decimal;
         PerPointDistributionValue: Decimal;
-        TotalPointDistributionValue: Decimal;
-        PointsToRedeemCaption: Label 'Points to Redeem';
-        PointDistributionCaption: Label 'Point Distribution';
-        DescriptionCaption: Label 'Description';
-        ValueCaption: Label 'Value';
-        TotalValueCaption: Label 'Total Value';
-        TotalPointsCaption: Label 'Total Points';
-        SumRemainingPoints: Decimal;
-        SumPointsToRedeem: Decimal;
+        PointDistribution: Decimal;
+        PointsToRedeem: Decimal;
         SumPointDistributionValue: Decimal;
+        SumPointsToRedeem: Decimal;
+        SumRemainingPoints: Decimal;
+        TotalPointDistributionValue: Decimal;
+        TotalPoints: Decimal;
+        DescriptionCaption: Label 'Description';
         MembershipNoCaption: Label 'Membership';
+        PageCaption: Label 'Page %1 of %2';
+        PointDistributionCaption: Label 'Point Distribution';
+        PointsToRedeemCaption: Label 'Points to Redeem';
+        TotalPointsCaption: Label 'Total Points';
+        TotalValueCaption: Label 'Total Value';
+        ValueCaption: Label 'Value';
+        CustomerName: Text;
 }
 

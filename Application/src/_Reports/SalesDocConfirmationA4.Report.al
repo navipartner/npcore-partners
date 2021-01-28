@@ -1,12 +1,9 @@
 report 6014440 "NPR Sales Doc Confirmation A4"
 {
-    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Sales Doc Confirmation A4.rdlc';
-
     Caption = 'Sales Doc Confirmation A4';
     PreviewMode = PrintLayout;
-
     dataset
     {
         dataitem("Audit Roll"; "NPR Audit Roll")
@@ -167,8 +164,8 @@ report 6014440 "NPR Sales Doc Confirmation A4"
             trigger OnAfterGetRecord()
             var
                 POSUnit: Record "NPR POS Unit";
-                POSSession: Codeunit "NPR POS Session";
                 POSFrontEnd: Codeunit "NPR POS Front End Management";
+                POSSession: Codeunit "NPR POS Session";
                 POSSetup: Codeunit "NPR POS Setup";
                 QueryVATTotals: Query "NPR VAT Totals";
                 varLineNo: Integer;
@@ -183,7 +180,7 @@ report 6014440 "NPR Sales Doc Confirmation A4"
                     if POSUnit.get(Register."Register No.") then
                         POSStore.get(POSUnit."POS Store Code");
                 end;
-                RetailSetup.Get;
+                RetailSetup.Get();
                 if SalespersonPurchaser.Get("Audit Roll"."Salesperson Code") then;
                 Clear(AuditRollTotals);
                 AuditRollTotals."Amount Including VAT" := 0;
@@ -191,13 +188,13 @@ report 6014440 "NPR Sales Doc Confirmation A4"
                 AuditRollTotals."Line Discount Amount" := 0;
 
                 if Customer.Get("Customer No.") and ("Customer Type" = "Customer Type"::"Ord.") then
-                    PrintCustomerInfo
+                    PrintCustomerInfo()
                 else
                     if Contact.Get("Customer No.") and ("Customer Type" = "Customer Type"::Cash) then
-                        PrintContactInfo
+                        PrintContactInfo()
                     else
                         if Customer.Get("Customer No.") and ("Customer Type" = "Customer Type"::"Ord.") then
-                            PrintStaffSaleInfo;
+                            PrintStaffSaleInfo();
             end;
         }
         dataitem("Integer"; "Integer")
@@ -247,18 +244,6 @@ report 6014440 "NPR Sales Doc Confirmation A4"
         }
     }
 
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
-        }
-    }
-
     labels
     {
         ContactNo_Lbl = 'Customer No. ';
@@ -299,63 +284,59 @@ report 6014440 "NPR Sales Doc Confirmation A4"
 
     trigger OnInitReport()
     begin
-        CompanyInformation.Get;
+        CompanyInformation.Get();
         CompanyInformation.CalcFields(Picture);
     end;
 
     var
-        AuditRollTotals: Record "NPR Audit Roll" temporary;
         CompanyInformation: Record "Company Information";
         Contact: Record Contact;
         Customer: Record Customer;
         GeneralLedgerSetup: Record "General Ledger Setup";
         Item: Record Item;
+        AuditRollTotals: Record "NPR Audit Roll" temporary;
+        POSStore: Record "NPR POS Store";
         Register: Record "NPR Register";
         RetailSetup: Record "NPR Retail Setup";
         SalespersonPurchaser: Record "Salesperson/Purchaser";
-        ContactNo: Text;
-        ContactName: Text;
+        FlagReturnSale: Boolean;
+        IsItem: Boolean;
+        ShowAdditionalInfo: Boolean;
+        ShowAmountInclVatPayment: Boolean;
+        ShowDeposit: Boolean;
+        ShowOutPayment: Boolean;
+        UnitOfMeasure: Code[10];
+        AmountLine: Decimal;
+        AmountPaymentLine: Decimal;
+        LineDiscountPct: Decimal;
+        SubCurrencyGL: Decimal;
+        SerialNoTxt: Label 'Serial No.';
+        Text0001: Label 'Staff Purchase';
+        Total: Label 'Total %1';
+        TotalDiscount: Label 'Total Discount';
+        TotalEuro: Label 'Total euro';
+        Text0002: Label 'Unit List Price : %1';
+        TotalVAT: Label 'VAT Amount';
+        Text0003: Label 'Vend. Item No.: %1';
         ContactAddress: Text;
         ContactCity: Text;
+        ContactName: Text;
+        ContactNo: Text;
         ContactPostCode: Text;
-        Text0001: Label 'Staff Purchase';
-        Text0002: Label 'Unit List Price : %1';
-        Text0003: Label 'Vend. Item No.: %1';
-        AmountLine: Decimal;
         DescriptionLine: Text;
         DescriptionLine2: Text;
-        UnitOfMeasure: Code[10];
+        DescriptionPaymentLine: Text;
+        FinansDescriptionLine: Text;
         ItemInfo: Text;
         ItemInfo2: Text;
         ItemNo: Text;
-        LineDiscountPct: Decimal;
         LineDiscountPctLine: Text;
         QuantityLine: Text;
-        ShowOutPayment: Boolean;
-        ShowDeposit: Boolean;
+        TotalDiscountPct: Text;
+        UnitPriceExclDiscountLine: Text;
         UnitPriceInclDiscountLine: Text;
         VariantCode: Text;
-        FinansDescriptionLine: Text;
-        DescriptionPaymentLine: Text;
-        AmountPaymentLine: Decimal;
-        ShowAmountInclVatPayment: Boolean;
-        ShowAdditionalInfo: Boolean;
         VariantDesc: Text[50];
-        FlagReturnSale: Boolean;
-        SubCurrencyGL: Decimal;
-        Total: Label 'Total %1';
-        TotalDiscount: Label 'Total Discount';
-        TotalVAT: Label 'VAT Amount';
-        TotalEuro: Label 'Total euro';
-        SerialNoTxt: Label 'Serial No.';
-        TotalDiscountPct: Text;
-        IsItem: Boolean;
-        UnitPriceExclDiscountLine: Text;
-        POSStore: Record "NPR POS Store";
-
-    local procedure "--ContactInfo"()
-    begin
-    end;
 
     procedure PrintCustomerInfo()
     begin
@@ -391,15 +372,13 @@ report 6014440 "NPR Sales Doc Confirmation A4"
     var
         ItemVariant: Record "Item Variant";
     begin
-        with AuditRoll do begin
-            //Variety
-            if ItemVariant.Get("No.", "Variant Code") and
-               ((ItemVariant."NPR Variety 1" <> '') or
-                (ItemVariant."NPR Variety 2" <> '') or
-                (ItemVariant."NPR Variety 3" <> '') or
-                (ItemVariant."NPR Variety 4" <> '')) then begin
-                VariantDesc := ItemVariant.Description;
-            end;
+        //Variety
+        if ItemVariant.Get(AuditRoll."No.", AuditRoll."Variant Code") and
+           ((ItemVariant."NPR Variety 1" <> '') or
+            (ItemVariant."NPR Variety 2" <> '') or
+            (ItemVariant."NPR Variety 3" <> '') or
+            (ItemVariant."NPR Variety 4" <> '')) then begin
+            VariantDesc := ItemVariant.Description;
         end;
     end;
 
@@ -414,10 +393,6 @@ report 6014440 "NPR Sales Doc Confirmation A4"
         VariantCode := '';
     end;
 
-    procedure "--AuxFunctions--"()
-    begin
-    end;
-
     local procedure CalcSaleLineTotals(var AuditRoll: Record "NPR Audit Roll")
     begin
         AuditRollTotals."Amount Including VAT" += AuditRoll."Amount Including VAT";
@@ -427,14 +402,12 @@ report 6014440 "NPR Sales Doc Confirmation A4"
 
     procedure AuditRollSalesOnAfterGetRecord(var AuditRollSales: Record "NPR Audit Roll") DoNotSkip: Boolean
     begin
-        with AuditRollSales do begin
-            if (Type = Type::Item) and Item.Get("No.") and Item."NPR No Print on Reciept" then
-                exit(false);
+        if (AuditRollSales.Type = AuditRollSales.Type::Item) and Item.Get(AuditRollSales."No.") and Item."NPR No Print on Reciept" then
+            exit(false);
 
-            //* If there is a returned item, display the return receipt *
-            if Quantity < 0 then
-                FlagReturnSale := true;
-        end;
+        //* If there is a returned item, display the return receipt *
+        if AuditRollSales.Quantity < 0 then
+            FlagReturnSale := true;
 
         CalcSaleLineTotals(AuditRollSales);
     end;

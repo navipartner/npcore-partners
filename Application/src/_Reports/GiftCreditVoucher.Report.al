@@ -1,12 +1,7 @@
 report 6014415 "NPR Gift/Credit Voucher"
 {
-    // NPR70.00.00.00/LS/071112 CASE 143263 : Convert Report to 2013
-    // NPR4.21/LS/20151125  CASE 221799 Correcting the report/Layout/headings/codes
-    // NPR5.38/JLK /20180124  CASE 300892 Removed AL Error on obsolite property CurrReport_PAGENO
-    // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Gift VoucherCredit Voucher.rdlc';
-
     Caption = 'Gift Voucher/Credit Voucher';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
@@ -139,16 +134,14 @@ report 6014415 "NPR Gift/Credit Voucher"
 
                 Location := GetFilter("Location Code");
 
-                //-NPR70.00.00.00
                 if Location <> '' then
                     SetFilter("Location Code", '%1', Location);
-                //+NPR70.00.00.00
 
                 if "Gift Voucher".GetFilter("Cashed Date") = '' then
-                    CurrReport.Break;
+                    CurrReport.Break();
 
                 if ShowCreditOnly and not ShowGiftOnly then
-                    CurrReport.Break;
+                    CurrReport.Break();
             end;
         }
         dataitem("Credit Voucher"; "NPR Credit Voucher")
@@ -181,18 +174,16 @@ report 6014415 "NPR Gift/Credit Voucher"
                 "Gift Voucher".CopyFilter("Issue Date", "Credit Voucher"."Issue Date");
                 "Gift Voucher".CopyFilter("Cashed Date", "Credit Voucher"."Cashed Date");
 
-                //-NPR70.00.00.00
                 if Location <> '' then
                     SetFilter("Location Code", '%1', Location);
-                //+NPR70.00.00.00
 
                 "Gift Voucher".CopyFilter("External Gift Voucher", "Credit Voucher"."External Credit Voucher");
 
                 if ShowGiftOnly and not ShowCreditOnly then
-                    CurrReport.Break;
+                    CurrReport.Break();
 
                 if "Gift Voucher".GetFilter("Cashed Date") = '' then
-                    CurrReport.Break;
+                    CurrReport.Break();
             end;
         }
         dataitem(GiftVoucherCashed; "NPR Gift Voucher")
@@ -223,12 +214,12 @@ report 6014415 "NPR Gift/Credit Voucher"
             trigger OnPreDataItem()
             begin
                 if ShowCreditOnly and not ShowGiftOnly then
-                    CurrReport.Break;
+                    CurrReport.Break();
 
                 GiftVoucherCashed.CopyFilters("Gift Voucher");
 
                 if "Gift Voucher".GetFilter("Cashed Date") <> '' then
-                    CurrReport.Break;
+                    CurrReport.Break();
             end;
         }
         dataitem(Integer_GiftVoucher; "Integer")
@@ -263,45 +254,32 @@ report 6014415 "NPR Gift/Credit Voucher"
             trigger OnAfterGetRecord()
             begin
                 GiftVoucher2.SetCurrentKey(Status, "Issue Date", "Cashed Date", "External Gift Voucher", "Location Code");
-
-                //-NPR4.21
-                //IF "Gift Voucher"."Issue Date" <> 0D THEN
                 if "Gift Voucher".GetFilter("Issue Date") <> '' then
-                    //+NPR4.21
                     "Gift Voucher".CopyFilter("Issue Date", GiftVoucher2."Issue Date");
-
                 GiftVoucher2.SetRange(Status, GiftVoucher2.Status::Cashed);
                 GiftVoucher2.SetFilter("External Gift Voucher", '=%1', false);
-                //-NPR4.21
                 if Location <> '' then
-                    //+NPR4.21
                     GiftVoucher2.SetRange("Location Code", Location);
                 GiftVoucher2.CalcSums(Amount);
                 TotalRedeemedGV := GiftVoucher2.Amount;
 
                 GiftVoucher2.SetRange(Status, GiftVoucher2.Status::Cancelled);
                 GiftVoucher2.SetFilter("External Gift Voucher", '=%1', false);
-                //-NPR4.21
                 if Location <> '' then
-                    //+NPR4.21
                     GiftVoucher2.SetRange("Location Code", Location);
                 GiftVoucher2.CalcSums(Amount);
                 TotalCancelledGV := GiftVoucher2.Amount;
 
                 GiftVoucher2.SetRange(Status, GiftVoucher2.Status::Open);
                 GiftVoucher2.SetFilter("External Gift Voucher", '=%1', false);
-                //-NPR4.21
                 if Location <> '' then
                     GiftVoucher2.SetRange("Location Code", Location);
-                //+NPR4.21
                 GiftVoucher2.CalcSums(Amount);
                 TotalOpenGV := GiftVoucher2.Amount;
 
                 GiftVoucher2.SetRange(Status);
-                //-NPR4.21
                 if Location <> '' then
                     GiftVoucher2.SetRange("Location Code", Location);
-                //+NPR4.21
                 GiftVoucher2.CalcSums(Amount);
                 TotalAmtGV := GiftVoucher2.Amount;
 
@@ -315,10 +293,10 @@ report 6014415 "NPR Gift/Credit Voucher"
             trigger OnPreDataItem()
             begin
                 if ShowCreditOnly and not ShowGiftOnly then
-                    CurrReport.Break;
+                    CurrReport.Break();
 
                 if "Gift Voucher".GetFilter("Cashed Date") <> '' then
-                    CurrReport.Break;
+                    CurrReport.Break();
             end;
         }
         dataitem(CreditVoucherCashed; "NPR Credit Voucher")
@@ -349,20 +327,18 @@ report 6014415 "NPR Gift/Credit Voucher"
             trigger OnPreDataItem()
             begin
                 if ShowGiftOnly and not ShowCreditOnly then
-                    CurrReport.Break;
+                    CurrReport.Break();
 
                 if "Gift Voucher".GetFilter("Cashed Date") <> '' then
-                    CurrReport.Break;
+                    CurrReport.Break();
 
                 "Gift Voucher".CopyFilter("Issue Date", CreditVoucherCashed."Issue Date");
                 "Gift Voucher".CopyFilter("Cashed Date", CreditVoucherCashed."Cashed Date");
                 "Gift Voucher".CopyFilter(Status, CreditVoucherCashed.Status);
                 "Gift Voucher".CopyFilter("External Gift Voucher", CreditVoucherCashed."External Credit Voucher");
 
-                //-NPR70.00.00.00
                 if Location <> '' then
                     SetFilter("Location Code", '%1', Location);
-                //+NPR70.00.00.00
             end;
         }
         dataitem(Integer_CreditVoucher; "Integer")
@@ -394,43 +370,32 @@ report 6014415 "NPR Gift/Credit Voucher"
             trigger OnAfterGetRecord()
             begin
                 CreditVoucher2.SetCurrentKey(Status, "Issue Date", "Cashed Date", "External Credit Voucher", "Location Code");
-                //-NPR4.21
-                //IF "Gift Voucher"."Issue Date" <> 0D THEN
                 if "Gift Voucher".GetFilter("Issue Date") <> '' then
-                    //+NPR4.21
                     "Gift Voucher".CopyFilter("Issue Date", CreditVoucher2."Issue Date");
 
                 CreditVoucher2.SetRange(Status, CreditVoucher2.Status::Cashed);
-                //-NPR4.21
                 if Location <> '' then
-                    //+NPR4.21
                     CreditVoucher2.SetRange("Location Code", Location);
                 CreditVoucher2.SetFilter("External Credit Voucher", '=%1', false);
                 CreditVoucher2.CalcSums(Amount);
                 TotalRedeemedCV := CreditVoucher2.Amount;
 
                 CreditVoucher2.SetRange(Status, CreditVoucher2.Status::Cancelled);
-                //-NPR4.21
                 if Location <> '' then
-                    //+NPR4.21
                     CreditVoucher2.SetRange("Location Code", Location);
                 CreditVoucher2.SetFilter("External Credit Voucher", '=%1', false);
                 CreditVoucher2.CalcSums(Amount);
                 TotalCancelledCV := CreditVoucher2.Amount;
 
                 CreditVoucher2.SetRange(Status, CreditVoucher2.Status::Open);
-                //-NPR4.21
                 if Location <> '' then
-                    //+NPR4.21
                     CreditVoucher2.SetRange("Location Code", Location);
                 CreditVoucher2.SetFilter("External Credit Voucher", '=%1', false);
                 CreditVoucher2.CalcSums(Amount);
                 TotalOpenCV := CreditVoucher2.Amount;
 
                 CreditVoucher2.SetRange(Status);
-                //-NPR4.21
                 if Location <> '' then
-                    //+NPR4.21
                     CreditVoucher2.SetRange("Location Code", Location);
                 CreditVoucher2.CalcSums(Amount);
                 TotalAmtCV := CreditVoucher2.Amount;
@@ -445,10 +410,10 @@ report 6014415 "NPR Gift/Credit Voucher"
             trigger OnPreDataItem()
             begin
                 if ShowGiftOnly and not ShowCreditOnly then
-                    CurrReport.Break;
+                    CurrReport.Break();
 
                 if "Gift Voucher".GetFilter("Cashed Date") <> '' then
-                    CurrReport.Break;
+                    CurrReport.Break();
             end;
         }
         dataitem(Integer2_CreditVoucher; "Integer")
@@ -485,15 +450,14 @@ report 6014415 "NPR Gift/Credit Voucher"
 
             trigger OnAfterGetRecord()
             begin
-                //-NPR70.00.00.00
                 if "Gift Voucher".GetFilter("Cashed Date") <> '' then
-                    CurrReport.Break;
+                    CurrReport.Break();
 
                 if ShowCreditOnly and not ShowGiftOnly then
-                    CurrReport.Break;
+                    CurrReport.Break();
 
                 if ShowGiftOnly and not ShowCreditOnly then
-                    CurrReport.Break;
+                    CurrReport.Break();
 
                 TotalOpenAmt := TotalOpenGV + TotalOpenCV;
                 TotalRedeemedAmt := TotalRedeemedGV + TotalRedeemedCV;
@@ -511,7 +475,6 @@ report 6014415 "NPR Gift/Credit Voucher"
 
                 if TotalAmount <> 0 then
                     TotalRedeemedPctCV := 100 * (TotalAmtCV / TotalAmount);
-                //+NPR70.00.00.00
             end;
         }
         dataitem("G/L Account"; "G/L Account")
@@ -538,23 +501,14 @@ report 6014415 "NPR Gift/Credit Voucher"
 
             trigger OnPreDataItem()
             begin
-                //-NPR4.21
-                //Register.FIND('-');
                 Register.FindFirst;
-                //+NPR4.21
                 "Credit Voucher".CopyFilter("Issue Date", "Date Filter");
-                //-NPR4.21
-                //GET(Register."Gift Voucher Account");
                 if Get(Register."Gift Voucher Account") then
                     GVAccountNo := '(' + Register."Gift Voucher Account" + ')';
-                //+NPR4.21
                 CalcFields("Net Change");
                 SalesGV := "Net Change";
-                //-NPR4.21
-                //GET(Register."Credit Voucher Account");
                 if Get(Register."Credit Voucher Account") then
                     CVAccountNo := '(' + Register."Credit Voucher Account" + ')';
-                //+NPR4.21
                 CalcFields("Net Change");
                 SalesCV := "Net Change";
             end;
@@ -592,10 +546,6 @@ report 6014415 "NPR Gift/Credit Voucher"
                 }
             }
         }
-
-        actions
-        {
-        }
     }
 
     labels
@@ -608,15 +558,7 @@ report 6014415 "NPR Gift/Credit Voucher"
         CompanyInfo.Get();
         CompanyInfo.CalcFields(Picture);
 
-        //-NPR5.39
-        // Object.SETRANGE(ID, 6014415);
-        // Object.SETRANGE(Type, 3);
-        // Object.FIND('-');
-        //+NPR5.39
-
         GV_Filters := Format("Gift Voucher".GetFilters);
-
-        //-NPR4.21
         AddFilters := '';
         if ShowGiftOnly then
             AddFilters += ' ' + TextShowGV + '  ';
@@ -626,74 +568,73 @@ report 6014415 "NPR Gift/Credit Voucher"
 
         if ShowPosting then
             AddFilters += ' ' + TextShowPosting;
-        //+NPR4.21
     end;
 
     var
-        ShowGiftOnly: Boolean;
-        ShowCreditOnly: Boolean;
-        TotalAmtGV: Decimal;
-        GiftVoucher2: Record "NPR Gift Voucher";
-        TotalRedeemedGV: Decimal;
-        TotalOpenGV: Decimal;
+        CompanyInfo: Record "Company Information";
         CreditVoucher2: Record "NPR Credit Voucher";
-        TotalRedeemedCV: Decimal;
-        TotalOpenCV: Decimal;
-        TotalAmtCV: Decimal;
-        TotalRedeemedAmt: Decimal;
-        TotalOpenAmt: Decimal;
-        TotalAmount: Decimal;
-        Counter: Integer;
+        GiftVoucher2: Record "NPR Gift Voucher";
+        Register: Record "NPR Register";
+        ShowCreditOnly: Boolean;
+        ShowGiftOnly: Boolean;
         ShowPosting: Boolean;
-        PercentGV: Decimal;
-        PercentGVDiff: Decimal;
+        Location: Code[10];
+        CVAccountNo: Code[20];
+        GVAccountNo: Code[20];
         PercentCV: Decimal;
         PercentCVDiff: Decimal;
-        Counter2: Integer;
-        Counter3: Integer;
+        PercentGV: Decimal;
+        PercentGVDiff: Decimal;
         PercentOpen: Decimal;
         PercentRedeemed: Decimal;
-        CompanyInfo: Record "Company Information";
-        TotalRedeemedPctGV: Decimal;
-        TotalRedeemedPctCV: Decimal;
-        "Filter": Text[100];
-        Register: Record "NPR Register";
-        SalesGV: Decimal;
         SalesCV: Decimal;
-        Location: Code[10];
-        TotalCancelledGV: Decimal;
-        TotalCancelledCV: Decimal;
-        TotalCancelled: Decimal;
-        PageNoCaptionLbl: Label 'Page';
-        Report_Caption_Lbl: Label 'Gift Voucher/Credit Voucher';
-        ObjectDetails: Text[100];
-        Gift_Voucher_Caption_Lbl: Label 'Gift Voucher';
-        No_Caption_Lbl: Label 'No.';
-        Sales_Ticket_No_Caption_Lbl: Label 'Sales Ticket No.';
-        Issue_Date_Caption_Lbl: Label 'Issue Date';
-        Cashed_Date_Caption_Lbl: Label 'Cashed Date';
-        Status_Caption_Lbl: Label 'Status';
-        Amount_Caption_Lbl: Label 'Amount';
-        Gift_Voucher_Total_Caption_Lbl: Label 'Gift Voucher total';
-        Credit_Voucher_Caption_Lbl: Label 'Credit Voucher';
-        Credit_Voucher_Total_Caption_Lbl: Label 'Credit Voucher total';
-        Total_Caption_Lbl: Label 'Total';
-        Pct_Caption_Lbl: Label '%';
-        Cashed_Caption_Lbl: Label 'Cashed';
-        Open_Caption_Lbl: Label 'Open';
-        Key_Figures_Caption_Lbl: Label 'Key Figures';
-        Total_GL_Accounts_Caption_Lbl: Label 'Total Posted to G/L';
-        Gift_Vouchers_Caption_Lbl: Label 'Gift Vouchers';
-        Credit_Vouchers_Caption_Lbl: Label 'Credit Vouchers';
-        GV_Filters: Text[300];
-        Cancelled_Caption_Lbl: Label 'Cancelled';
+        SalesGV: Decimal;
         TestVar: Decimal;
-        Gift_Credit_Total_Caption_Lbl: Label 'Total Gift Vouchers & Credit Vouchers';
-        GVAccountNo: Code[20];
-        CVAccountNo: Code[20];
-        AddFilters: Text;
-        TextShowGV: Label 'Show Gift Voucher';
+        TotalAmount: Decimal;
+        TotalAmtCV: Decimal;
+        TotalAmtGV: Decimal;
+        TotalCancelled: Decimal;
+        TotalCancelledCV: Decimal;
+        TotalCancelledGV: Decimal;
+        TotalOpenAmt: Decimal;
+        TotalOpenCV: Decimal;
+        TotalOpenGV: Decimal;
+        TotalRedeemedAmt: Decimal;
+        TotalRedeemedCV: Decimal;
+        TotalRedeemedGV: Decimal;
+        TotalRedeemedPctCV: Decimal;
+        TotalRedeemedPctGV: Decimal;
+        Counter: Integer;
+        Counter2: Integer;
+        Counter3: Integer;
+        Pct_Caption_Lbl: Label '%';
+        Amount_Caption_Lbl: Label 'Amount';
+        Cancelled_Caption_Lbl: Label 'Cancelled';
+        Cashed_Caption_Lbl: Label 'Cashed';
+        Cashed_Date_Caption_Lbl: Label 'Cashed Date';
+        Credit_Voucher_Caption_Lbl: Label 'Credit Voucher';
+        Credit_Vouchers_Caption_Lbl: Label 'Credit Vouchers';
+        Credit_Voucher_Total_Caption_Lbl: Label 'Credit Voucher total';
+        Gift_Voucher_Caption_Lbl: Label 'Gift Voucher';
+        Report_Caption_Lbl: Label 'Gift Voucher/Credit Voucher';
+        Gift_Vouchers_Caption_Lbl: Label 'Gift Vouchers';
+        Gift_Voucher_Total_Caption_Lbl: Label 'Gift Voucher total';
+        Issue_Date_Caption_Lbl: Label 'Issue Date';
+        Key_Figures_Caption_Lbl: Label 'Key Figures';
+        No_Caption_Lbl: Label 'No.';
+        Open_Caption_Lbl: Label 'Open';
+        PageNoCaptionLbl: Label 'Page';
+        Sales_Ticket_No_Caption_Lbl: Label 'Sales Ticket No.';
         TextShowCV: Label 'Show Credit Voucher';
+        TextShowGV: Label 'Show Gift Voucher';
         TextShowPosting: Label 'Show Ledger Entries';
+        Status_Caption_Lbl: Label 'Status';
+        Total_Caption_Lbl: Label 'Total';
+        Gift_Credit_Total_Caption_Lbl: Label 'Total Gift Vouchers & Credit Vouchers';
+        Total_GL_Accounts_Caption_Lbl: Label 'Total Posted to G/L';
+        AddFilters: Text;
+        "Filter": Text[100];
+        ObjectDetails: Text[100];
+        GV_Filters: Text[300];
 }
 

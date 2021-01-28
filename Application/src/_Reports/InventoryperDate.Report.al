@@ -1,30 +1,10 @@
 report 6014417 "NPR Inventory per Date"
 {
-    // NPR70.00.00.00/LS/19-07-2013 CASE 159375  : Conversion of report to NAV 2013
-    // NPR4.04/TR/20150330  CASE 208265 Option value SelectCalcMethod did not work descently. This has been corrected.
-    // NPR4.10/KN/20150511 CASE  213056  Condition for showing zero qty inventory changed
-    //                                   Changed expression of total profits field in report layout to avoid print of #ERROR
-    // NPR4.15/KN/20150910 CASE 221390   Added posibility in req page to sort items by Item Group (controlled by expression in sorting property in Details-group)
-    //                                   Added "Item Group"-group as parent to "Details" in layout
-    // NPR5.23/JDH /20160512 CASE 240916 Removed old color size solution from req filters
-    // NPR5.23/KN/20160609 CASE 243968 Increased width of "Vendor Item No." field and decreased width of "No." field
-    // NPR5.36/KENU/20170919 CASE 290588 Added header "Last Direct Cost" and "Recent Purchase" column
-    // NPR5.38/JLK /20180124  CASE 300892 Removed AL Error on obsolite property CurrReport_PAGENO
-    // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
-    // NPR5.40/TJ  /20180319  CASE 307717 Replaced hardcoded dates with DMY2DATE structure
-    // NPR5.51/ANPA/20190712  CASE 361236 The headlines have been changed so that they carry on to the next page
-    // NPR5.53/TILA/20191003 CASE 371374 Layout update - EAN no. column expanded
-    // NPR5.53/TILA/20191022 CASE 371374 Layout update - Expanded description column, removed "Last Inv. Cost" and "Total Profit" columns
-    // NPR5.54/YAHA/20200309 CASE 394927 Added Last Direct Cost
-    // NPR5.54/YAHA/20200309 CASE 394927 Added Sales Price caption and changed remove unit price labal to be replaced by Sales Price
-    // NPR5.54/ANPA/20200326  CASE 384505 Changed labels such that there is a danish caption for 'Last Cost Price' and 'Sales Price' and made it possible to select SelectCaltMethod.
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Inventory per Date.rdlc';
-
     Caption = 'Inventory per Date';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
-
     dataset
     {
         dataitem(Item; Item)
@@ -91,32 +71,31 @@ report 6014417 "NPR Inventory per Date"
             }
 
             trigger OnAfterGetRecord()
+            var
+                ChooseErr: Label 'Choose either';
             begin
                 if IncludeItemStock then begin
                     if not ("Net Change" <> 0) then
-                        CurrReport.Skip;
+                        CurrReport.Skip();
                 end;
 
                 if ShowItemNegativeInventory and not NegativVolumeShow then begin
                     if ("Net Change" < 0) then
-                        CurrReport.Skip;
+                        CurrReport.Skip();
                 end
                 else
                     if NegativVolumeShow and not ShowItemNegativeInventory then begin
                         if ("Net Change" >= 0) then
-                            CurrReport.Skip;
+                            CurrReport.Skip();
                     end
                     else
                         if ShowZeroInventory then begin
-                            //-NPR4.10
-                            //  IF "Net Change" = 0 THEN
                             if "Net Change" <> 0 then
-                                //+NPR4.10
-                                CurrReport.Skip;
+                                CurrReport.Skip();
                         end
                         else
                             if ShowItemNegativeInventory and NegativVolumeShow then begin
-                                Error('Choose either');
+                                Error(ChooseErr);
                             end;
 
                 if ShowNoInventory then Item."Net Change" := 0;
@@ -125,13 +104,13 @@ report 6014417 "NPR Inventory per Date"
                     SelectCalcMethod::"Sidste Kostpris":
                         begin
                             CostValuation := ("Net Change" * "Last Direct Cost");
-                            CalcMethod := Text001;
+                            CalcMethod := LastDirectCostLbl;
                             "Last Direct Cost" := Round("Last Direct Cost", 0.01);
                         end;
                     SelectCalcMethod::Kostpris:
                         begin
                             CostValuation := ("Net Change" * "Unit Cost");
-                            CalcMethod := Text002;
+                            CalcMethod := UnitCostLbl;
                             "Last Direct Cost" := Round("Unit Cost", 0.01);
                         end;
                 end;
@@ -169,21 +148,13 @@ report 6014417 "NPR Inventory per Date"
                 else
                     GrossAvg := 0;
 
-                //-NPR70.00.00.00
                 if NotUnitPrice then
                     "Unit Price" := 0;
-                //+NPR70.00.00.00
             end;
 
             trigger OnPreDataItem()
             begin
-                //-NPR5.39
-                //CurrReport.CREATETOTALS(CostValuation, ActualSales);
-                //+NPR5.39
-                //-NPR5.40 [307717]
-                //SETRANGE("Date Filter", 010180D, EndDate);
                 SetRange("Date Filter", DMY2Date(1, 1, 1980), EndDate);
-                //+NPR5.40 [307717]
             end;
         }
     }
@@ -253,9 +224,6 @@ report 6014417 "NPR Inventory per Date"
             }
         }
 
-        actions
-        {
-        }
     }
 
     labels
@@ -280,24 +248,14 @@ report 6014417 "NPR Inventory per Date"
     trigger OnInitReport()
     begin
         EndDate := Today();
-        //-NPR5.54 [384505]
-        //SelectCalcMethod := SelectCalcMethod::"Sidste Kostpris";
-        //+NPR5.54 [384505]
     end;
 
     trigger OnPreReport()
     begin
         CompanyInfo.Get();
         CompanyInfo.CalcFields(Picture);
-
-        //-NPR5.39
-        // Object.SETRANGE(ID, 6014417);
-        // Object.SETRANGE(Type, 3);
-        // Object.FIND('-');
-        //+NPR5.39
-
         if EndDate = 0D then
-            Error(Text10600000);
+            Error(DateErr);
 
         Itemfilter := Item.GetFilters;
     end;
@@ -305,25 +263,25 @@ report 6014417 "NPR Inventory per Date"
     var
         CompanyInfo: Record "Company Information";
         ItemLedgerEntry: Record "Item Ledger Entry";
-        CostValuation: Decimal;
-        ActualSales: Decimal;
-        GrossAvg: Decimal;
-        LatestSalesDate: Date;
-        LatestPurchaseDate: Date;
-        EndDate: Date;
+        VATPostingSetup: Record "VAT Posting Setup";
+        GroupByItemGroup: Boolean;
         IncludeItemStock: Boolean;
+        NegativVolumeShow: Boolean;
         NotUnitPrice: Boolean;
         ShowItemNegativeInventory: Boolean;
-        ShowZeroInventory: Boolean;
-        VATPostingSetup: Record "VAT Posting Setup";
         ShowNoInventory: Boolean;
-        NegativVolumeShow: Boolean;
-        Itemfilter: Text[100];
+        ShowZeroInventory: Boolean;
+        EndDate: Date;
+        LatestPurchaseDate: Date;
+        LatestSalesDate: Date;
+        ActualSales: Decimal;
+        CostValuation: Decimal;
+        GrossAvg: Decimal;
+        DateErr: Label 'Date has to be filled';
+        LastDirectCostLbl: Label 'Last Direct Cost';
+        UnitCostLbl: Label 'Unit cost';
         SelectCalcMethod: Option "Sidste Kostpris",Kostpris;
         CalcMethod: Text[50];
-        Text10600000: Label 'Date has to be filled';
-        Text001: Label 'Last Direct Cost';
-        Text002: Label 'Unit cost';
-        GroupByItemGroup: Boolean;
+        Itemfilter: Text[100];
 }
 

@@ -2,12 +2,10 @@ report 6014402 "NPR Discount Statistics"
 {
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Discount Statistics.rdlc';
-
     Caption = 'Discount Statistics';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
     UseSystemPrinter = true;
-
     dataset
     {
         dataitem(Item; Item)
@@ -231,10 +229,6 @@ report 6014402 "NPR Discount Statistics"
                 }
             }
         }
-
-        actions
-        {
-        }
     }
 
     labels
@@ -247,7 +241,7 @@ report 6014402 "NPR Discount Statistics"
 
     trigger OnPreReport()
     begin
-        CompanyInformation.Get;
+        CompanyInformation.Get();
         CompanyInformation.CalcFields(Picture);
 
         SalesPersonFilter := "Salesperson/Purchaser".GetFilter(Code);
@@ -260,33 +254,33 @@ report 6014402 "NPR Discount Statistics"
 
     var
         CompanyInformation: Record "Company Information";
-        RegisterFilter: Code[50];
-        DateFilter: Code[50];
-        ItemNoFilter: Code[50];
-        DiscountFilter: Code[50];
-        SalesPersonFilter: Code[50];
         ShowItemLedger: Boolean;
+        DateFilter: Code[50];
+        DiscountFilter: Code[50];
+        ItemNoFilter: Code[50];
+        RegisterFilter: Code[50];
+        SalesPersonFilter: Code[50];
         SupplierFilter: Code[50];
-        PageNoCaptionLbl: Label 'Page';
-        Report_Caption_Lbl: Label 'Discount Sale Statistics';
-        Register_Filter_Caption_Lbl: Label 'Register Filter';
-        Date_Filter_Caption_Lbl: Label 'Date Filter';
-        Item_No_Caption_Lbl: Label 'Item No. Filter';
-        Disc_Structure_Caption_Lbl: Label 'Disc. Structure';
-        Salesperson_Filter_Caption_Lbl: Label 'Salesperson/purchaser';
-        Vendor_Filter_Caption_Lbl: Label 'Vendor filter';
-        Description_Caption_Lbl: Label 'Description';
-        Quantity_Caption_Lbl: Label 'Quantity';
-        Sales_Amount_Caption_Lbl: Label 'Sales Amount';
-        Discount_Amount_Caption_Lbl: Label 'Discount Amount';
-        Entry_No_Caption_Lbl: Label 'Entry No.';
-        Total_Caption_Lbl: Label 'Total';
-        Salesperson_Caption_Lbl: Label 'Salesperson:';
-        Total_Salesperson_Caption_Lbl: Label 'Total for Salesperson';
+        SalesLCY: Decimal;
+        Total_VE_Discount_Amt: Decimal;
         Total_VE_Qty: Decimal;
         Total_VE_Sales_Amt: Decimal;
-        Total_VE_Discount_Amt: Decimal;
-        SalesLCY: Decimal;
+        Date_Filter_Caption_Lbl: Label 'Date Filter';
+        Description_Caption_Lbl: Label 'Description';
+        Disc_Structure_Caption_Lbl: Label 'Disc. Structure';
+        Discount_Amount_Caption_Lbl: Label 'Discount Amount';
+        Report_Caption_Lbl: Label 'Discount Sale Statistics';
+        Entry_No_Caption_Lbl: Label 'Entry No.';
+        Item_No_Caption_Lbl: Label 'Item No. Filter';
         CurrReportPageNoCaptionLbl: Label 'Page';
+        PageNoCaptionLbl: Label 'Page';
+        Quantity_Caption_Lbl: Label 'Quantity';
+        Register_Filter_Caption_Lbl: Label 'Register Filter';
+        Sales_Amount_Caption_Lbl: Label 'Sales Amount';
+        Salesperson_Filter_Caption_Lbl: Label 'Salesperson/purchaser';
+        Salesperson_Caption_Lbl: Label 'Salesperson:';
+        Total_Caption_Lbl: Label 'Total';
+        Total_Salesperson_Caption_Lbl: Label 'Total for Salesperson';
+        Vendor_Filter_Caption_Lbl: Label 'Vendor filter';
 }
 

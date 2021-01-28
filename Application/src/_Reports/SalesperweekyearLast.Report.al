@@ -1,20 +1,12 @@
 report 6014456 "NPR Sales per week year/Last"
 {
-    // NPR70.00.00.00/LS/280613  CASE 176191 : Convert Report 6014456 to Nav 2013
-    //                                         +
-    //                                         Changed Danish Variables/codes to English + Proper indentation
-    // NPR4.14/TR/20150807 CASE 220169 Report captions and layout alignment corrected.
-    // NPR5.38/JLK /20180124  CASE 300892 Removed AL Error on obsolite property CurrReport_PAGENO
-    // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Sales per week yearLast year.rdlc';
-
     Caption = 'Sales Per Week Year/Last Year';
     PreviewMode = PrintLayout;
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
     UseSystemPrinter = true;
-
     dataset
     {
         dataitem("Integer"; "Integer")
@@ -84,7 +76,7 @@ report 6014456 "NPR Sales per week year/Last"
             trigger OnAfterGetRecord()
             begin
                 if CurrentDate = EndDate then
-                    CurrReport.Break;
+                    CurrReport.Break();
 
                 if FirstRun then
                     FirstRun := false
@@ -100,7 +92,7 @@ report 6014456 "NPR Sales per week year/Last"
                     repeat
                         SalesPersonPurchaser.CalcFields("NPR Sales (LCY)");
                         SalesAllPersons := SalesAllPersons + SalesPersonPurchaser."NPR Sales (LCY)";
-                    until SalesPersonPurchaser.Next = 0;
+                    until SalesPersonPurchaser.Next() = 0;
                 end;
 
                 SalesAllPersons := SalesAllPersons * Multiplier;
@@ -119,15 +111,13 @@ report 6014456 "NPR Sales per week year/Last"
                     repeat
                         SalesPersonPurchaser.CalcFields("NPR Sales (LCY)");
                         SalesAllPersonsLastYear := SalesAllPersonsLastYear + SalesPersonPurchaser."NPR Sales (LCY)";
-                    until SalesPersonPurchaser.Next = 0;
+                    until SalesPersonPurchaser.Next() = 0;
                 end;
                 SalesAllPersonsLastYear := SalesAllPersonsLastYear * Multiplier;
 
                 WeekTotalLastYear := WeekTotalLastYear + SalesAllPersonsLastYear;
                 MonthTotalLastYear := MonthTotalLastYear + SalesAllPersonsLastYear;
 
-
-                //-NPR70.00.00.00/LS/280613
                 IsDisplay := false;
                 if (Format(CurrentDate, 0, '<Weekday Text>') = 'mandag') or (CurrentDate = StartDate) then
                     IsDisplay := true
@@ -154,7 +144,6 @@ report 6014456 "NPR Sales per week year/Last"
                 end;
 
                 GrandTotal += TotalOutput;
-                //+NPR70.00.00.00/LS/280613
             end;
 
             trigger OnPreDataItem()
@@ -242,9 +231,6 @@ report 6014456 "NPR Sales per week year/Last"
             }
         }
 
-        actions
-        {
-        }
     }
 
     labels
@@ -271,14 +257,6 @@ report 6014456 "NPR Sales per week year/Last"
     begin
         firmaoplysninger.Get();
         firmaoplysninger.CalcFields(Picture);
-        //-NPR5.39
-        // objectTxt := CurrReport.OBJECTID(FALSE);
-        // objectTxt := COPYSTR(objectTxt,7);
-        // IF EVALUATE(objectInt,objectTxt) THEN;
-        // Object.SETFILTER(Type,'Report');
-        // Object.SETFILTER(ID,FORMAT(objectInt));
-        // IF Object.FINDFIRST THEN ;
-        //+NPR5.39
 
         StartDate := DMY2Date(1, Month, Year);
         EndDate := CalcDate('<-1D>', CalcDate('<1M>', StartDate));
@@ -306,39 +284,39 @@ report 6014456 "NPR Sales per week year/Last"
     end;
 
     var
+        firmaoplysninger: Record "Company Information";
+        "Dimension Value": Record "Dimension Value";
         SalesPersonPurchaser: Record "Salesperson/Purchaser";
-        Month: Integer;
-        Year: Integer;
-        StartDate: Date;
-        EndDate: Date;
-        CurrentDate: Date;
-        StartDateLastYear: Date;
-        EndDateLastYear: Date;
-        CurrentDateLastYear: Date;
+        DateComparison: Boolean;
         FirstRun: Boolean;
+        IsDisplay: Boolean;
+        Nearest: Boolean;
+        CurrentDate: Date;
+        CurrentDateLastYear: Date;
+        EndDate: Date;
+        EndDateLastYear: Date;
+        StartDate: Date;
+        StartDateLastYear: Date;
+        GrandTotal: Decimal;
+        Index: Decimal;
         MonthTotal: Decimal;
-        WeekTotal: Decimal;
         MonthTotalLastYear: Decimal;
-        WeekTotalLastYear: Decimal;
-        TotalOutput: Decimal;
-        TotalOutputLastYear: Decimal;
+        Multiplier: Decimal;
         SalesAllPersons: Decimal;
         SalesAllPersonsLastYear: Decimal;
-        firmaoplysninger: Record "Company Information";
-        Index: Decimal;
-        "Dimension Value": Record "Dimension Value";
-        DateComparison: Boolean;
-        Title: Text[50];
-        Nearest: Boolean;
-        Multiplier: Decimal;
-        LastWeekText: Text[50];
+        TotalOutput: Decimal;
+        TotalOutputLastYear: Decimal;
+        WeekTotal: Decimal;
+        WeekTotalLastYear: Decimal;
+        Month: Integer;
+        Year: Integer;
+        text3: Label '(Prices not included tax)';
+        text5: Label 'Selected Department: %1';
+        text4: Label 'Selected month/year: %1/%2';
         text1: Label 'Time Report';
         text2: Label 'Time report';
-        text3: Label '(Prices not included tax)';
-        IsDisplay: Boolean;
-        GrandTotal: Decimal;
-        text4: Label 'Selected month/year: %1/%2';
-        text5: Label 'Selected Department: %1';
         text6: Label 'Week %1';
+        LastWeekText: Text[50];
+        Title: Text[50];
 }
 

@@ -1,16 +1,9 @@
 report 6014503 "NPR Repair Guarantee"
 {
-    // NPK1.00/JLK /20160801  CASE 242555 Object Created
-    // NPR5.36/JLK /20170921  CASE 286803 Increased length variable CompanyAddr to [50]
-    // TM1.39/THRO/20181126  CASE 334644 Replaced Coudeunit 1 by Wrapper Codeunit
-    // NPR5.50/ZESO/201905006 CASE 353382 Remove Reference to Wrapper Codeunit
-    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Repair Guarantee.rdlc';
-
     Caption = 'Repair Guarantee';
     PreviewMode = PrintLayout;
-
     dataset
     {
         dataitem("Customer Repair"; "NPR Customer Repair")
@@ -171,12 +164,7 @@ report 6014503 "NPR Repair Guarantee"
             begin
                 Clear(GlobalDimension1Desc);
                 if ("Customer Repair"."Global Dimension 1 Code") <> '' then
-                    //-#[353382] [353382]
-                    //-TM1.39 [334644]
-                    //GlobalDimension1Desc := SystemEventWrapper.CaptionClassTranslate(CurrReport.LANGUAGE,'1,1,1,,');
-                    //+TM1.39 [334644]
                     GlobalDimension1Desc := CaptionClassTranslate('1,1,1,,');
-                //+#[353382] [353382]
                 TelephoneText := '';
                 if "Phone No." <> '' then
                     TelephoneText := Text005;
@@ -213,18 +201,6 @@ report 6014503 "NPR Repair Guarantee"
         }
     }
 
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
-        }
-    }
-
     labels
     {
         ItemNo = 'Item No.';
@@ -237,36 +213,36 @@ report 6014503 "NPR Repair Guarantee"
     end;
 
     var
-        Text001: Label 'Repair No.:';
-        Text002: Label 'Repair no. %1';
-        Text003: Label 'E-mail: ';
-        Text004: Label 'CVR No.: ';
-        Text005: Label 'Telephone: ';
-        Text006: Label 'Fax No.: ';
-        Text007: Label 'Phone:';
-        Text009: Label 'Yours sincerely, ';
-        Text010: Label 'Repair Guarantee';
-        Text011: Label 'Item';
-        Text012: Label 'Price Incl. VAT';
-        Text013: Label 'Handed In';
-        Text014: Label 'Returned';
-        Text016: Label 'Item No. %1';
-        Text017: Label 'Defect Description';
-        Text018: Label 'Repair Description';
-        Text019: Label 'We give one year guarantee on all new parts and all adjustments. In case there are any problems we ask you to contact us immediately with presentation of this guarantee card';
         CompanyInformation: Record "Company Information";
         FormAdr: Codeunit "Format Address";
-        CustAddress: array[8] of Text[50];
-        AddrLine: Text[100];
-        AddrLineCounter: Integer;
-        CompanyAddr: array[8] of Text[50];
-        GlobalDimension1Desc: Text[80];
         DefectFound: Boolean;
         RepairFound: Boolean;
-        TelephoneText: Text;
-        MobileText: Text;
+        AddrLineCounter: Integer;
+        Text004: Label 'CVR No.: ';
+        Text017: Label 'Defect Description';
+        Text003: Label 'E-mail: ';
+        Text006: Label 'Fax No.: ';
+        Text013: Label 'Handed In';
+        Text011: Label 'Item';
+        Text016: Label 'Item No. %1';
         Text020: Label 'Mobile:';
+        Text007: Label 'Phone:';
+        Text012: Label 'Price Incl. VAT';
+        Text018: Label 'Repair Description';
+        Text010: Label 'Repair Guarantee';
+        Text002: Label 'Repair no. %1';
+        Text001: Label 'Repair No.:';
+        Text014: Label 'Returned';
+        Text005: Label 'Telephone: ';
+        Text019: Label 'We give one year guarantee on all new parts and all adjustments. In case there are any problems we ask you to contact us immediately with presentation of this guarantee card';
+        Text009: Label 'Yours sincerely, ';
         DotDisplay: Text;
+        MobileText: Text;
         StarDisplay: Text;
+        TelephoneText: Text;
+        CompanyAddr: array[8] of Text[50];
+        CustAddress: array[8] of Text[50];
+        GlobalDimension1Desc: Text[80];
+        AddrLine: Text[100];
 }
 

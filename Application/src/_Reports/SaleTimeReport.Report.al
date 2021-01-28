@@ -1,33 +1,10 @@
 report 6014411 "NPR Sale Time Report"
 {
-    // NPK7/LS/250414 CASE 176190 : Convert report to Nav 2013
-    //    The print shows for each of the specified time intervals:
-    //    1) The number of goods Expeditions.
-    //    2) The average number of lines per. expedition.
-    //    3) The amount sold.
-    //    4) The returned amount.
-    //    5) The cast off.
-    //    6) The number of interrupted operations (Interrupted and parked).
-    //    7) The number of other expeditions (gift certificates, payments etc..
-    //    Requires the following key in the audit roll:
-    //    Handling date, Expedition mode, type "Gift certificate Ref", Box Number, End Time, Seller Code, Bontype
-    // 
-    // NPR4.21/TS/20150917 CASE 222728 Corrected Text Constant
-    // NPR4.21/LS/20151124  CASE 221773 Correcting report layout
-    // NPR5.31/JLK /20170414  CASE 269893 Added filter on audit roll for sale and debit sale only
-    // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
-    // NPR5.43/EMGO/20180619  CASE 318293 Make Time Filter editable in Request Page + SaveValues set to Yes
-    // NPR5.46/ZESO/20181001  CASE 327839 Fix bug where Cash Register No Filter was not being applied to data.
-    // NPR5.49/BHR /20190115  CASE 341969 Corrections as per OMA Guidelines
-    // NPR5.55/ZESO/20200601  CASE 403608 Format TidNumber and TidNumberPlus1 in dataset to text.
-    // NPR5.55/YAHA/20200807  CASE 412334 Corrections to make field Sales Amount and Net Sales with Excl VAT
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Sale Time Report.rdlc';
-
     Caption = 'Sale Time Report';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
-
     dataset
     {
         dataitem("Audit Roll"; "NPR Audit Roll")
@@ -170,7 +147,7 @@ report 6014411 "NPR Sale Time Report"
             trigger OnAfterGetRecord()
             begin
                 if Number > Interval + 1 then
-                    CurrReport.Break;
+                    CurrReport.Break();
 
                 if Values[Number] [1] <> 0 then
                     Values[Number] [2] := Values[Number] [2] / Values[Number] [1];
@@ -184,17 +161,15 @@ report 6014411 "NPR Sale Time Report"
                 else
                     Values[Number] [3] := 0;
 
-                //-NPK7.0
                 if Number = 13 then begin
                     Divider_14_3 := Values[14] [3];
                     Divider_14_1 := Values[14] [1];
                 end;
-                //+NPK7.0
             end;
 
             trigger OnPreDataItem()
             begin
-                Calc;
+                Calc();
             end;
         }
     }
@@ -348,10 +323,6 @@ report 6014411 "NPR Sale Time Report"
             }
         }
 
-        actions
-        {
-        }
-
         trigger OnQueryClosePage(CloseAction: Action): Boolean
         begin
             if "Audit Roll"."Sale Date" = 0D then
@@ -389,12 +360,6 @@ report 6014411 "NPR Sale Time Report"
 
         CompanyInfo.Get;
         CompanyInfo.CalcFields(Picture);
-        //-NPR5.39
-        // Object.SETRANGE(ID, 6014411);
-        // Object.SETRANGE(Type, 3);
-        // Object.FIND('-');
-        // ObjectDetails := FORMAT(Object.ID)+', '+FORMAT(Object."Version List");
-        //+NPR5.39
     end;
 
     trigger OnPreReport()
@@ -441,73 +406,73 @@ report 6014411 "NPR Sale Time Report"
 
     var
         CompanyInfo: Record "Company Information";
+        Date: Record Date;
         AuditRoll1: Record "NPR Audit Roll";
         AuditRoll2: Record "NPR Audit Roll";
-        TimeArray: array[15] of Time;
-        DayArray: array[7] of Boolean;
-        Date: Record Date;
-        DayFilter: Boolean;
-        ItemAmt: Decimal;
-        Lines: Decimal;
-        DiscountAmt: Decimal;
-        OtherAmt: Decimal;
-        InterruptedAmt: Decimal;
-        Interval: Integer;
-        DateFilter: Text[50];
-        WeekDay: Text[100];
-        j: Text[30];
-        DebitAmt: Decimal;
-        SalesReturnAmt: Decimal;
-        ReturnChangeAmt: Decimal;
-        ExchangedItemAmt: Decimal;
-        CorrectedAmt: Decimal;
-        AuditRollAmt: Decimal;
-        Register: Record "NPR Register";
         PaymentTypePOS: Record "NPR Payment Type POS";
-        NetSalesAmt: Decimal;
-        ItemSalesAmt: Decimal;
-        db: Decimal;
-        NetSalesExcVAT: Decimal;
+        Register: Record "NPR Register";
+        DayArray: array[7] of Boolean;
+        DayFilter: Boolean;
+        AuditRollAmt: Decimal;
+        CorrectedAmt: Decimal;
         CostAmt: Decimal;
-        DebitExcVat: Decimal;
+        db: Decimal;
+        DebitAmt: Decimal;
         DebitCostAmt: Decimal;
+        DebitExcVat: Decimal;
+        DiscountAmt: Decimal;
+        Divider_14_1: Decimal;
+        Divider_14_3: Decimal;
+        ExchangedItemAmt: Decimal;
+        InterruptedAmt: Decimal;
+        ItemAmt: Decimal;
+        ItemSalesAmt: Decimal;
+        Lines: Decimal;
+        NetSalesAmt: Decimal;
+        NetSalesExcVAT: Decimal;
+        OtherAmt: Decimal;
+        ReturnChangeAmt: Decimal;
+        SalesReturnAmt: Decimal;
         Values: array[14, 12] of Decimal;
-        Text10600000: Label 'The Time in File %1 is less than %2';
-        Text10600001: Label 'Monday,';
-        Text10600002: Label 'Tuesday,';
-        Text10600003: Label 'Wednesday,';
-        Text10600004: Label 'Thursday,';
+        Interval: Integer;
+        TextAvgLines: Label 'Average Lines';
+        TextCancelled: Label 'Cancelled';
+        TextDebit: Label 'Debit Sales Amt';
+        TextDg: Label 'Dg';
+        TextDiscount: Label 'Discount Amt';
         Text10600005: Label 'Friday,';
+        TextFrom: Label 'From';
+        TextItemExpedition: Label 'Item Sales';
+        TextDb: Label 'Margin %';
+        Text10600001: Label 'Monday,';
+        TextNetSales: Label 'Net Sales';
+        TextExpedition: Label 'No. of Sales';
+        Text10600010: Label 'Note : All figures are exclusive of VAT';
+        TextOther: Label 'Other';
+        Page_Caption: Label 'Page ';
+        Text10600008: Label 'Period Overview ';
+        TextReturn: Label 'Return Amt';
+        TextSalesAmt: Label 'Sales Amt';
+        Report_Caption: Label 'Sale Time Report';
         Text10600006: Label 'Saturday,';
         Text10600007: Label 'Sunday';
-        Text10600008: Label 'Period Overview ';
-        Divider_14_3: Decimal;
-        Divider_14_1: Decimal;
-        Text10600010: Label 'Note : All figures are exclusive of VAT';
-        Report_Caption: Label 'Sale Time Report';
-        Page_Caption: Label 'Page ';
+        Text10600000: Label 'The Time in File %1 is less than %2';
+        Text10600004: Label 'Thursday,';
         TextTime: Label 'Time';
-        TextItemExpedition: Label 'Item Sales';
-        TextExpedition: Label 'No. of Sales';
-        TextFrom: Label 'From';
         TextTo: Label 'To';
-        TextAvgLines: Label 'Average Lines';
+        Text10600002: Label 'Tuesday,';
         TextSaleExp: Label 'Turn/Exp.';
-        TextReturn: Label 'Return Amt';
-        TextNetSales: Label 'Net Sales';
-        TextDiscount: Label 'Discount Amt';
-        TextDebit: Label 'Debit Sales Amt';
-        TextDb: Label 'Margin %';
-        TextDg: Label 'Dg';
-        TextCancelled: Label 'Cancelled';
-        TextOther: Label 'Other';
-        TextSalesAmt: Label 'Sales Amt';
+        Text10600003: Label 'Wednesday,';
+        j: Text[30];
+        DateFilter: Text[50];
+        WeekDay: Text[100];
+        TimeArray: array[15] of Time;
 
     procedure Calc()
     var
-        MinDato: Date;
-        MaxDato: Date;
         FilterArray: array[2] of Date;
+        MaxDato: Date;
+        MinDato: Date;
     begin
         AuditRoll1.CopyFilters("Audit Roll");
         if AuditRoll1.GetFilter("Sale Date") = '' then
@@ -562,7 +527,7 @@ report 6014411 "NPR Sale Time Report"
         AuditRoll1.CopyFilters("Audit Roll");
 
         if AuditRoll1.GetFilter("Register No.") = '' then begin
-            if Register.FindFirst then;
+            if Register.FindFirst() then;
         end else
             if Register.Get(AuditRoll1.GetFilter("Register No.")) then;
 
@@ -575,26 +540,15 @@ report 6014411 "NPR Sale Time Report"
         for I := 1 to Interval do begin
             AuditRoll1.SetFilter("Closing Time", '>=%1&<%2', TimeArray[I], TimeArray[I + 1]);
             PaymentTypePOS.SetFilter("End Time Filter", '>=%1&<%2', TimeArray[I], TimeArray[I + 1]);
-            //-NPR5.46 [327839]
             PaymentTypePOS.SetFilter("Register Filter", AuditRoll1.GetFilter("Register No."));
-            //+NPR5.46 [327839]
             PaymentTypePOS.CalcFields("Normal Sale in Audit Roll", "Debit Sale in Audit Roll", "Norm. Sales in Audit Excl. VAT", "Cost Amount in Audit Roll",
              "Debit Sales in Audit Excl. VAT", "Debit Cost Amount Audit Roll", "No. of Sales in Audit Roll", "No. of Deb. Sales in Aud. Roll", "No. of Sale Lines in Aud. Roll", "No. of Item Lines in Aud. Deb.");
 
-            //-NPR5.55 [412334]
-            //NetSalesAmt := PaymentTypePOS."Normal Sale in Audit Roll";
             NetSalesAmt := PaymentTypePOS."Norm. Sales in Audit Excl. VAT";
-            //+NPR5.55 [412334]
             NetSalesExcVAT := PaymentTypePOS."Norm. Sales in Audit Excl. VAT";
-            //-NPR5.55 [412334]
-            //DebitAmt := PaymentTypePOS."Debit Sale in Audit Roll";
             DebitAmt := PaymentTypePOS."Debit Sales in Audit Excl. VAT";
-            //+NPR5.55 [412334]
             CostAmt := PaymentTypePOS."Cost Amount in Audit Roll";
-            //-NPR5.55 [412334]
-            //DebitCostAmt := PaymentTypePOS."Debit Cost Amount Audit Roll";
             DebitCostAmt := PaymentTypePOS."Debit Sales in Audit Excl. VAT";
-            //+NPR5.55 [412334]
             DebitExcVat := PaymentTypePOS."Debit Sales in Audit Excl. VAT";
 
             db := (NetSalesExcVAT + DebitExcVat) - (CostAmt + DebitCostAmt);
@@ -649,10 +603,10 @@ report 6014411 "NPR Sale Time Report"
             AuditRoll1.SetRange("Sale Type", AuditRoll1."Sale Type"::Deposit);
             AuditRoll1.SetRange("No.", Format(Register."Credit Voucher Account"));
             Clear(AuditRollAmt);
-            if AuditRoll1.FindFirst then begin
+            if AuditRoll1.FindFirst() then begin
                 repeat
                     AuditRollAmt += Abs(AuditRoll1.Amount);
-                until AuditRoll1.Next = 0;
+                until AuditRoll1.Next() = 0;
             end;
 
             SalesReturnAmt := ReturnChangeAmt + ExchangedItemAmt + CorrectedAmt + AuditRollAmt;

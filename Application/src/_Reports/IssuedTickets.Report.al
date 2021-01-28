@@ -1,12 +1,8 @@
 report 6014413 "NPR Issued Tickets"
 {
-    // TM1.17/NPKNAV/20161026  CASE 252175 Transport TM1.17
-    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Issued Tickets.rdlc';
-
     Caption = 'Issued Tickets';
-
     dataset
     {
         dataitem("TM Ticket"; "NPR TM Ticket")
@@ -51,18 +47,6 @@ report 6014413 "NPR Issued Tickets"
             column(GetFilters_TMTicket; "TM Ticket".GetFilters)
             {
             }
-        }
-    }
-
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
         }
     }
 

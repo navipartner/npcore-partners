@@ -1,15 +1,7 @@
 report 6014545 "NPR Acc. Statement w FIK-Card"
 {
-    // NPR5.40/JLK /20180305  CASE 304195 Object created
-    //                                    Added Report Option to select which custom layout to run the report
-    // 
-    // NPR5.42/ZESO/20180426  CASE 313027 Displayed Bank Branch No on report.
-    // NPR5.49/BHR /20190111  CASE 341976 Comment Code as per OMA
-    // NPR5.49/JAKUBV/20190402  CASE 341969 Transport NPR5.49 - 1 April 2019
-    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Acc. Statement w FIK-Card.rdlc';
-
     Caption = 'Acc. Statement w FIK-Card';
 
     dataset
@@ -286,7 +278,7 @@ report 6014545 "NPR Acc. Statement w FIK-Card"
                             trigger OnAfterGetRecord()
                             begin
                                 if SkipReversedUnapplied(DtldCustLedgEntries) then
-                                    CurrReport.Skip;
+                                    CurrReport.Skip();
                                 "Remaining Amount" := 0;
                                 PrintLine := true;
                                 case "Entry Type" of
@@ -308,7 +300,7 @@ report 6014545 "NPR Acc. Statement w FIK-Card"
                                             DtldCustLedgEntries2.SetRange("Entry Type", "Entry Type"::Application);
                                             DtldCustLedgEntries2.SetRange("Transaction No.", "Transaction No.");
                                             DtldCustLedgEntries2.SetFilter("Currency Code", '<>%1', DtldCustLedgEntries."Currency Code");
-                                            if DtldCustLedgEntries2.FindFirst then begin
+                                            if DtldCustLedgEntries2.FindFirst() then begin
                                                 Description := Text005;
                                                 "Due Date" := 0D;
                                             end else
@@ -456,18 +448,18 @@ report 6014545 "NPR Acc. Statement w FIK-Card"
                         begin
                             if IncludeAgingBand then
                                 if ("Posting Date" > EndDate) and ("Due Date" >= EndDate) then
-                                    CurrReport.Skip;
+                                    CurrReport.Skip();
                             CustLedgEntry := CustLedgEntry2;
                             CustLedgEntry.SetRange("Date Filter", 0D, EndDate);
                             CustLedgEntry.CalcFields("Remaining Amount");
                             "Remaining Amount" := CustLedgEntry."Remaining Amount";
                             if CustLedgEntry."Remaining Amount" = 0 then
-                                CurrReport.Skip;
+                                CurrReport.Skip();
 
                             if IncludeAgingBand and ("Posting Date" <= EndDate) then
                                 UpdateBuffer(Currency2.Code, GetDate("Posting Date", "Due Date"), "Remaining Amount");
                             if ("Due Date" >= EndDate) or ("Remaining Amount" < 0) then
-                                CurrReport.Skip;
+                                CurrReport.Skip();
                         end;
 
                         trigger OnPreDataItem()
@@ -478,17 +470,17 @@ report 6014545 "NPR Acc. Statement w FIK-Card"
                             end;
                             SetRange("Currency Code", Currency2.Code);
                             if (not PrintEntriesDue) and (not IncludeAgingBand) then
-                                CurrReport.Break;
+                                CurrReport.Break();
                         end;
                     }
 
                     trigger OnAfterGetRecord()
                     begin
                         if Number = 1 then
-                            Currency2.FindFirst
+                            Currency2.FindFirst()
                         else
-                            if Currency2.Next = 0 then
-                                CurrReport.Break;
+                            if Currency2.Next() = 0 then
+                                CurrReport.Break();
 
                         Cust2 := Customer;
                         Cust2.SetRange("Date Filter", 0D, StartDate - 1);
@@ -500,7 +492,7 @@ report 6014545 "NPR Acc. Statement w FIK-Card"
                         "Cust. Ledger Entry".SetRange("Customer No.", Customer."No.");
                         "Cust. Ledger Entry".SetRange("Posting Date", StartDate, EndDate);
                         "Cust. Ledger Entry".SetRange("Currency Code", Currency2.Code);
-                        EntriesExists := "Cust. Ledger Entry".FindFirst;
+                        EntriesExists := "Cust. Ledger Entry".FindFirst();
                     end;
 
                     trigger OnPreDataItem()
@@ -576,11 +568,11 @@ report 6014545 "NPR Acc. Statement w FIK-Card"
                     trigger OnAfterGetRecord()
                     begin
                         if Number = 1 then begin
-                            if not AgingBandBuf.FindFirst then
-                                CurrReport.Break;
+                            if not AgingBandBuf.FindFirst() then
+                                CurrReport.Break();
                         end else
-                            if AgingBandBuf.Next = 0 then
-                                CurrReport.Break;
+                            if AgingBandBuf.Next() = 0 then
+                                CurrReport.Break();
                         AgingBandCurrencyCode := AgingBandBuf."Currency Code";
                         if AgingBandCurrencyCode = '' then
                             AgingBandCurrencyCode := GLSetup."LCY Code";
@@ -589,7 +581,7 @@ report 6014545 "NPR Acc. Statement w FIK-Card"
                     trigger OnPreDataItem()
                     begin
                         if not IncludeAgingBand then
-                            CurrReport.Break;
+                            CurrReport.Break();
                     end;
                 }
             }
@@ -604,13 +596,13 @@ report 6014545 "NPR Acc. Statement w FIK-Card"
                 Cust2 := Customer;
                 CopyFilter("Currency Filter", Currency2.Code);
                 if PrintAllHavingBal then begin
-                    if Currency2.FindFirst then
+                    if Currency2.FindFirst() then
                         repeat
                             Cust2.SetRange("Date Filter", 0D, EndDate);
                             Cust2.SetRange("Currency Filter", Currency2.Code);
                             Cust2.CalcFields("Net Change");
                             PrintLine := Cust2."Net Change" <> 0;
-                        until (Currency2.Next = 0) or PrintLine;
+                        until (Currency2.Next() = 0) or PrintLine;
                 end;
                 if (not PrintLine) and PrintAllHavingEntry then begin
                     "Cust. Ledger Entry".Reset;
@@ -618,24 +610,24 @@ report 6014545 "NPR Acc. Statement w FIK-Card"
                     "Cust. Ledger Entry".SetRange("Customer No.", Customer."No.");
                     "Cust. Ledger Entry".SetRange("Posting Date", StartDate, EndDate);
                     Customer.CopyFilter("Currency Filter", "Cust. Ledger Entry"."Currency Code");
-                    PrintLine := "Cust. Ledger Entry".FindFirst;
+                    PrintLine := "Cust. Ledger Entry".FindFirst();
                 end;
                 if not PrintLine then
-                    CurrReport.Skip;
+                    CurrReport.Skip();
 
                 FormatAddr.Customer(CustAddr, Customer);
 
-                if not CurrReport.Preview then begin
-                    Customer.LockTable;
-                    Customer.Find;
+                if not CurrReport.Preview() then begin
+                    Customer.LockTable();
+                    Customer.Find();
                     Customer."Last Statement No." := Customer."Last Statement No." + 1;
-                    Customer.Modify;
-                    Commit;
+                    Customer.Modify();
+                    Commit();
                 end else
                     Customer."Last Statement No." := Customer."Last Statement No." + 1;
 
                 if LogInteraction then
-                    if not CurrReport.Preview then
+                    if not CurrReport.Preview() then
                         SegManagement.LogDocument(
                           7, Format(Customer."Last Statement No."), 0, 0, DATABASE::Customer, "No.", "Salesperson Code", '',
                           Text003 + Format(Customer."Last Statement No."), '');
@@ -651,19 +643,19 @@ report 6014545 "NPR Acc. Statement w FIK-Card"
                 StartDate := GetRangeMin("Date Filter");
                 EndDate := GetRangeMax("Date Filter");
                 AgingBandEndingDate := EndDate;
-                CalcAgingBandDates;
+                CalcAgingBandDates();
 
-                CompanyInfo.Get;
+                CompanyInfo.Get();
                 FormatAddr.Company(CompanyAddr, CompanyInfo);
 
                 Currency2.Code := '';
-                Currency2.Insert;
+                Currency2.Insert();
                 CopyFilter("Currency Filter", Currency.Code);
-                if Currency.FindFirst then
+                if Currency.FindFirst() then
                     repeat
                         Currency2 := Currency;
-                        Currency2.Insert;
-                    until Currency.Next = 0;
+                        Currency2.Insert();
+                    until Currency.Next() = 0;
             end;
         }
     }
@@ -804,10 +796,6 @@ report 6014545 "NPR Acc. Statement w FIK-Card"
             }
         }
 
-        actions
-        {
-        }
-
         trigger OnInit()
         begin
             LogInteractionEnable := true;
@@ -826,102 +814,99 @@ report 6014545 "NPR Acc. Statement w FIK-Card"
         end;
     }
 
-    labels
-    {
-    }
 
     trigger OnInitReport()
     begin
-        GLSetup.Get;
+        GLSetup.Get();
     end;
 
     var
-        Text000: Label 'Page';
-        Text001: Label 'Entries %1';
-        Text002: Label 'Overdue Entries %1';
-        Text003: Label 'Statement ';
-        GLSetup: Record "General Ledger Setup";
+        AgingBandBuf: Record "Aging Band Buffer" temporary;
         CompanyInfo: Record "Company Information";
-        Cust2: Record Customer;
         Currency: Record Currency;
         Currency2: Record Currency temporary;
-        Language: Codeunit Language;
         "Cust. Ledger Entry": Record "Cust. Ledger Entry";
+        Cust2: Record Customer;
         DtldCustLedgEntries2: Record "Detailed Cust. Ledg. Entry";
-        AgingBandBuf: Record "Aging Band Buffer" temporary;
-        PrintAllHavingEntry: Boolean;
-        PrintAllHavingBal: Boolean;
-        PrintEntriesDue: Boolean;
-        PrintUnappliedEntries: Boolean;
-        PrintReversedEntries: Boolean;
-        PrintLine: Boolean;
-        LogInteraction: Boolean;
-        EntriesExists: Boolean;
-        StartDate: Date;
-        EndDate: Date;
-        "Due Date": Date;
-        CustAddr: array[8] of Text[50];
-        CompanyAddr: array[8] of Text[50];
-        Description: Text[50];
-        StartBalance: Decimal;
-        CustBalance: Decimal;
-        "Remaining Amount": Decimal;
+        GLSetup: Record "General Ledger Setup";
+        RetailSetup: Record "NPR Retail Setup";
         FormatAddr: Codeunit "Format Address";
+        Language: Codeunit Language;
         SegManagement: Codeunit SegManagement;
-        CurrencyCode3: Code[10];
-        Text005: Label 'Multicurrency Application';
-        Text006: Label 'Payment Discount';
-        Text007: Label 'Rounding';
         PeriodLength: DateFormula;
         PeriodLength2: DateFormula;
-        DateChoice: Option "Due Date","Posting Date";
-        AgingDate: array[5] of Date;
-        Text008: Label 'You must specify the Aging Band Period Length.';
-        AgingBandEndingDate: Date;
-        Text010: Label 'You must specify Aging Band Ending Date.';
-        Text011: Label 'Aged Summary by %1 (%2 by %3)';
+        EntriesExists: Boolean;
         IncludeAgingBand: Boolean;
-        Text012: Label 'Period Length is out of range.';
-        AgingBandCurrencyCode: Code[10];
-        Text013: Label 'Due Date,Posting Date';
-        Text014: Label 'Application Writeoffs';
+        LogInteraction: Boolean;
         [InDataSet]
         LogInteractionEnable: Boolean;
-        StatementCaptionLbl: Label 'Statement';
-        CompanyInfo__Phone_No__CaptionLbl: Label 'Phone No.';
-        CompanyInfo__Fax_No__CaptionLbl: Label 'Fax No.';
-        CompanyInfo__VAT_Registration_No__CaptionLbl: Label 'VAT Reg. No.';
-        CompanyInfo__Giro_No__CaptionLbl: Label 'Giro No.';
-        CompanyInfo__Bank_Name_CaptionLbl: Label 'Bank';
-        CompanyInfo__Bank_Account_No__CaptionLbl: Label 'Account No.';
-        Customer__No__CaptionLbl: Label 'Customer No.';
-        StartDateCaptionLbl: Label 'Starting Date';
-        EndDateCaptionLbl: Label 'Ending Date';
-        Customer__Last_Statement_No__CaptionLbl: Label 'Statement No.';
-        DtldCustLedgEntries__Posting_Date_CaptionLbl: Label 'Posting Date';
-        CustLedgEntry2__Due_Date_CaptionLbl: Label 'Due Date';
-        CustBalanceCaptionLbl: Label 'Balance';
-        CompanyInfo__IBAN__PM__CaptionLbl: Label 'IBAN';
-        Please_use_the_following_reference_upon_payment_CaptionLbl: Label 'Please use the following reference upon payment:';
-        Card_TypeCaptionLbl: Label 'Card Type';
-        Payment_IdentificationCaptionLbl: Label 'Payment Identification';
-        Vendor_No_CaptionLbl: Label 'Vendor No.';
-        CustBalance___AmountCaptionLbl: Label 'Continued';
-        CustBalance___Amount_Control75CaptionLbl: Label 'Continued';
-        CustBalance_Control71CaptionLbl: Label 'Total';
-        CustLedgEntry2__Remaining_Amount_CaptionLbl: Label 'Continued';
-        CustLedgEntry2__Remaining_Amount__Control64CaptionLbl: Label 'Continued';
-        CustLedgEntry2__Remaining_Amount__Control66CaptionLbl: Label 'Total';
-        BeforeCaptionLbl: Label '..before';
-        Payment_ID: Text;
-        IK_Card_Type: Text;
-        RetailSetup: Record "NPR Retail Setup";
-        Giro_No: Text;
-        SupportedOutputMethod: Option Print,Preview,PDF,Email,Excel,XML;
-        ChosenOutputMethod: Integer;
+        PrintAllHavingBal: Boolean;
+        PrintAllHavingEntry: Boolean;
+        PrintEntriesDue: Boolean;
+        PrintLine: Boolean;
+        PrintRemaining: Boolean;
+        PrintReversedEntries: Boolean;
+        PrintUnappliedEntries: Boolean;
         [InDataSet]
         ShowPrintRemaining: Boolean;
-        PrintRemaining: Boolean;
+        AgingBandCurrencyCode: Code[10];
+        CurrencyCode3: Code[10];
+        AgingBandEndingDate: Date;
+        AgingDate: array[5] of Date;
+        "Due Date": Date;
+        EndDate: Date;
+        StartDate: Date;
+        CustBalance: Decimal;
+        "Remaining Amount": Decimal;
+        StartBalance: Decimal;
+        ChosenOutputMethod: Integer;
+        BeforeCaptionLbl: Label '..before';
+        CompanyInfo__Bank_Account_No__CaptionLbl: Label 'Account No.';
+        Text011: Label 'Aged Summary by %1 (%2 by %3)';
+        Text014: Label 'Application Writeoffs';
+        CustBalanceCaptionLbl: Label 'Balance';
+        CompanyInfo__Bank_Name_CaptionLbl: Label 'Bank';
+        Card_TypeCaptionLbl: Label 'Card Type';
+        CustBalance___Amount_Control75CaptionLbl: Label 'Continued';
+        CustBalance___AmountCaptionLbl: Label 'Continued';
+        CustLedgEntry2__Remaining_Amount__Control64CaptionLbl: Label 'Continued';
+        CustLedgEntry2__Remaining_Amount_CaptionLbl: Label 'Continued';
+        Customer__No__CaptionLbl: Label 'Customer No.';
+        CustLedgEntry2__Due_Date_CaptionLbl: Label 'Due Date';
+        Text013: Label 'Due Date,Posting Date';
+        EndDateCaptionLbl: Label 'Ending Date';
+        Text001: Label 'Entries %1';
+        CompanyInfo__Fax_No__CaptionLbl: Label 'Fax No.';
+        CompanyInfo__Giro_No__CaptionLbl: Label 'Giro No.';
+        CompanyInfo__IBAN__PM__CaptionLbl: Label 'IBAN';
+        Text005: Label 'Multicurrency Application';
+        Text002: Label 'Overdue Entries %1';
+        Text000: Label 'Page';
+        Text006: Label 'Payment Discount';
+        Payment_IdentificationCaptionLbl: Label 'Payment Identification';
+        Text012: Label 'Period Length is out of range.';
+        CompanyInfo__Phone_No__CaptionLbl: Label 'Phone No.';
+        Please_use_the_following_reference_upon_payment_CaptionLbl: Label 'Please use the following reference upon payment:';
+        DtldCustLedgEntries__Posting_Date_CaptionLbl: Label 'Posting Date';
+        Text007: Label 'Rounding';
+        StartDateCaptionLbl: Label 'Starting Date';
+        StatementCaptionLbl: Label 'Statement';
+        Text003: Label 'Statement ';
+        Customer__Last_Statement_No__CaptionLbl: Label 'Statement No.';
+        CustBalance_Control71CaptionLbl: Label 'Total';
+        CustLedgEntry2__Remaining_Amount__Control66CaptionLbl: Label 'Total';
+        CompanyInfo__VAT_Registration_No__CaptionLbl: Label 'VAT Reg. No.';
+        Vendor_No_CaptionLbl: Label 'Vendor No.';
+        Text010: Label 'You must specify Aging Band Ending Date.';
+        Text008: Label 'You must specify the Aging Band Period Length.';
+        DateChoice: Option "Due Date","Posting Date";
+        SupportedOutputMethod: Option Print,Preview,PDF,Email,Excel,XML;
+        Giro_No: Text;
+        IK_Card_Type: Text;
+        Payment_ID: Text;
+        CompanyAddr: array[8] of Text[50];
+        CustAddr: array[8] of Text[50];
+        Description: Text[50];
 
     local procedure GetDate(PostingDate: Date; DueDate: Date): Date
     begin
@@ -951,13 +936,13 @@ report 6014545 "NPR Acc. Statement w FIK-Card"
 
     local procedure UpdateBuffer(CurrencyCode: Code[10]; Date: Date; Amount: Decimal)
     var
-        I: Integer;
         GoOn: Boolean;
+        I: Integer;
     begin
-        AgingBandBuf.Init;
+        AgingBandBuf.Init();
         AgingBandBuf."Currency Code" := CurrencyCode;
-        if not AgingBandBuf.Find then
-            AgingBandBuf.Insert;
+        if not AgingBandBuf.Find() then
+            AgingBandBuf.Insert();
         I := 1;
         GoOn := true;
         while (I <= 5) and GoOn do begin
@@ -988,7 +973,7 @@ report 6014545 "NPR Acc. Statement w FIK-Card"
                 end;
             I := I + 1;
         end;
-        AgingBandBuf.Modify;
+        AgingBandBuf.Modify();
     end;
 
     procedure SkipReversedUnapplied(var DtldCustLedgEntries: Record "Detailed Cust. Ledg. Entry"): Boolean
@@ -1010,8 +995,8 @@ report 6014545 "NPR Acc. Statement w FIK-Card"
 
     procedure Modulus10(TestNumber: Code[16]): Code[16]
     var
-        Counter: Integer;
         Accumulator: Integer;
+        Counter: Integer;
         WeightNo: Integer;
         SumStr: Text[30];
     begin
@@ -1041,10 +1026,11 @@ report 6014545 "NPR Acc. Statement w FIK-Card"
     local procedure GenerateFIKCode(Cust: Record Customer)
     var
         StringLen: Integer;
+        NumbersLbl: Label '0123456789';
     begin
         StringLen := 15;
 
-        if DelChr(Format(Cust."No."), '=', '0123456789') <> '' then
+        if DelChr(Format(Cust."No."), '=', NumbersLbl) <> '' then
             exit;
 
         if not RetailSetup.Get then

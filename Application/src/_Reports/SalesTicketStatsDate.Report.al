@@ -1,13 +1,9 @@
 report 6014452 "NPR Sales Ticket Stats/Date"
 {
-    // NPR5.50/BHR /20190524 CASE 348464 Alternative to Page 6014468
-    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Sales Ticket StatisticsDate.rdlc';
-
     Caption = 'Sales Ticket Statistics/Date';
     EnableHyperlinks = true;
-
     dataset
     {
         dataitem(Date; Date)
@@ -78,10 +74,10 @@ report 6014452 "NPR Sales Ticket Stats/Date"
             var
                 Cust: Record Customer;
             begin
-                Kassedata.Reset;
-                AuditRoll.Reset;
-                SetDateFilter;
-                SetDimensionFilters;
+                Kassedata.Reset();
+                AuditRoll.Reset();
+                SetDateFilter();
+                SetDimensionFilters();
 
                 Kassedata.CalcFields("All Normal Sales in Audit Roll", "All Debit Sales in Audit Roll");
 
@@ -89,10 +85,8 @@ report 6014452 "NPR Sales Ticket Stats/Date"
                 URLBalanceDue := '';
                 URLPurchase := '';
 
-
                 URLBalanceDue := GetUrl(CurrentClientType, CompanyName, OBJECTTYPE::Page, 6014432);
                 URLBalanceDue += StrSubstNo(Url1, "Period Start", Date."Period End", AuditRoll."Sale Type"::Sale, AuditRoll.Type::Item);
-
 
                 URLPurchase := GetUrl(CurrentClientType, CompanyName, OBJECTTYPE::Page, 6014432);
                 URLPurchase += StrSubstNo(Url1, "Period Start", Date."Period End", AuditRoll."Sale Type"::"Debit Sale", AuditRoll.Type::Item);
@@ -103,7 +97,7 @@ report 6014452 "NPR Sales Ticket Stats/Date"
 
                 Date.SetRange("Period Type", PeriodType);
                 Date.SetRange("Period Start", FromDate, ToDate);
-                Filters := Date.GetFilters;
+                Filters := Date.GetFilters();
             end;
         }
     }
@@ -175,36 +169,32 @@ report 6014452 "NPR Sales Ticket Stats/Date"
         end;
     }
 
-    labels
-    {
-    }
-
     var
+        AuditRoll: Record "NPR Audit Roll";
+        AuditRoll2: Record "NPR Audit Roll";
+        Kassedata: Record "NPR Register";
         PeriodFormMgt: Codeunit PeriodFormManagement;
         AuditRollForm: Page "NPR Audit Roll";
-        VendPeriodLength: Option Day,Week,Month,Quarter,Year,Period;
-        AmountType: Option "Net Change","Balance at Date";
-        Kassedata: Record "NPR Register";
-        Tidsvalg: Integer;
         Dim1Filter: Code[20];
         Dim2Filter: Code[20];
-        PeriodType: Option Day,Week,Month,Quarter,Year;
-        AuditRoll: Record "NPR Audit Roll";
-        totalCount: Decimal;
         FromDate: Date;
         ToDate: Date;
         "Average": Decimal;
-        AuditRoll2: Record "NPR Audit Roll";
+        totalCount: Decimal;
+        Tidsvalg: Integer;
+        Url1: Label '&$filter=''Sale Date''%20IS%20''%1..%2''%20AND%20''Sale Type''%20IS%20''%3''%20AND%20''Type''%20IS%20''%4''';
+        BalanceDueCap: Label 'Balance Due (LCY)';
         Err1: Label 'From Date should be filled in';
+        NumberExpCap: Label 'Number of Exp.';
+        PurchasesCap: Label 'Purchases (LCY)';
+        StayExpeditionCap: Label 'Stay Expedition';
+        TotalCap: Label 'Total';
+        PeriodType: Option Day,Week,Month,Quarter,Year;
+        VendPeriodLength: Option Day,Week,Month,Quarter,Year,Period;
+        AmountType: Option "Net Change","Balance at Date";
+        Filters: Text;
         URLBalanceDue: Text;
         URLPurchase: Text;
-        BalanceDueCap: Label 'Balance Due (LCY)';
-        PurchasesCap: Label 'Purchases (LCY)';
-        TotalCap: Label 'Total';
-        NumberExpCap: Label 'Number of Exp.';
-        StayExpeditionCap: Label 'Stay Expedition';
-        Filters: Text;
-        Url1: Label '&$filter=''Sale Date''%20IS%20''%1..%2''%20AND%20''Sale Type''%20IS%20''%3''%20AND%20''Type''%20IS%20''%4''';
 
     local procedure SetDateFilter()
     begin
@@ -230,7 +220,6 @@ report 6014452 "NPR Sales Ticket Stats/Date"
         AuditRoll.SetRange("Sale Type");
 
         totalAmount := Kassedata."All Normal Sales in Audit Roll";
-
 
         if totalCount <> 0 then
             Average := totalAmount / totalCount

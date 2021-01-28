@@ -1,19 +1,11 @@
 report 6014432 "NPR Customer Analysis"
 {
-    // NPR70.00.00.00/LS/190514  CASE 176117 : Convert Report to Nav 2013
-    // NPR4.14/KN/20150818 CASE  220283 Updated OptionCaptions to Control6150615 in request page
-    // NPR4.21/LS/20151125 CASE 221808 Re writing codes/danish variables,use of FIND('-'),FIND('+') , changing Report name/label
-    // NPR5.38/JLK /20180124  CASE 300892 Removed AL Error on obsolite property CurrReport_PAGENO
-    // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
-    // NPR5.49/BHR /20190115  CASE 341969 Corrections as per OMA Guidelines
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Customer Analysis.rdlc';
-
     Caption = 'Customer Analysis';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
     UseSystemPrinter = true;
-
     dataset
     {
         dataitem(Customer; Customer)
@@ -29,8 +21,8 @@ report 6014432 "NPR Customer Analysis"
 
                 CalcFields("Sales (LCY)", "Balance (LCY)", "Profit (LCY)");
                 if ("Sales (LCY)" = 0) and ("Balance (LCY)" = 0) and ("Profit (LCY)" = 0) then
-                    CurrReport.Skip;
-                CustomerAmountTemp.Init;
+                    CurrReport.Skip();
+                CustomerAmountTemp.Init();
                 CustomerAmountTemp."Customer No." := "No.";
 
                 if Sorting = Sorting::Maximum then
@@ -56,36 +48,31 @@ report 6014432 "NPR Customer Analysis"
                         end;
                 end;
 
-                CustomerAmountTemp.Insert;
+                CustomerAmountTemp.Insert();
                 if (ShowQty = 0) or (i < ShowQty) then
                     i := i + 1
                 else begin
-                    CustomerAmountTemp.FindLast;
-                    CustomerAmountTemp.Delete;
+                    CustomerAmountTemp.FindLast();
+                    CustomerAmountTemp.Delete();
                 end;
 
-                //-NPR70.00.00.00/LS/190514
                 CustomerSalesTotal += "Sales (LCY)";
                 CustomerProfitTotal += "Profit (LCY)";
                 CustomerBalanceTotal += "Balance (LCY)";
-                //+NPR70.00.00.00/LS/190514
             end;
 
             trigger OnPreDataItem()
             begin
-                Window.Open(Text10600000 +
+                Window.Open(CustSortedLbl +
                             '@2@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\' +
-                            Text10600001 +
+                            CreatingComparisonLbl +
                             '@4@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\' +
-                            Text10600002 +
+                            SortingDataLbl +
                             '@5@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
 
-                DebCount := Customer.Count;
+                DebCount := Customer.Count();
                 i := 0;
-                CustomerAmountTemp.DeleteAll;
-                //-NPR5.39
-                //CurrReport.CREATETOTALS("Sales (LCY)","Balance (LCY)","Profit (LCY)");
-                //+NPR5.39
+                CustomerAmountTemp.DeleteAll();
             end;
         }
         dataitem(Integer1; "Integer")
@@ -95,19 +82,18 @@ report 6014432 "NPR Customer Analysis"
             trigger OnAfterGetRecord()
             begin
                 if Number = 1 then begin
-                    if not Customer1.FindFirst then
-                        CurrReport.Break;
+                    if not Customer1.FindFirst() then
+                        CurrReport.Break();
                 end else
-                    if Customer1.Next = 0 then begin
-                        CurrReport.Break;
-                    end;
+                    if Customer1.Next() = 0 then
+                        CurrReport.Break();
                 CustomerCount += 1;
                 Window.Update(4, (100 * Round(CustomerCount * 100 / DebCount, 1)));
                 Customer1.CalcFields("Sales (LCY)", "Balance (LCY)", "Profit (LCY)");
 
                 if (Customer1."Sales (LCY)" = 0) and (Customer1."Balance (LCY)" = 0) and (Customer1."Profit (LCY)" = 0) then
-                    CurrReport.Skip;
-                CustomerAmountTemp2.Init;
+                    CurrReport.Skip();
+                CustomerAmountTemp2.Init();
                 CustomerAmountTemp2."Customer No." := Customer1."No.";
                 if Sorting = Sorting::Maximum then
                     Multipl := -1
@@ -134,15 +120,13 @@ report 6014432 "NPR Customer Analysis"
                             CustomerAmountTemp2."NPR Amount 3 (LCY)" := Multipl * Customer1."Balance (LCY)";
                         end;
                 end;
-                CustomerAmountTemp2.Insert;
+                CustomerAmountTemp2.Insert();
 
                 i += 1;
 
-                //-NPR70.00.00.00/LS/190514
                 Customer1SalesTotal += Customer1."Sales (LCY)";
                 Customer1ProfitTotal += Customer1."Profit (LCY)";
                 Customer1BalanceTotal += Customer1."Balance (LCY)";
-                //+NPR70.00.00.00/LS/190514
             end;
 
             trigger OnPreDataItem()
@@ -157,9 +141,6 @@ report 6014432 "NPR Customer Analysis"
                     MaxDate := CalcDate('<-1Y>', MaxDate);
                     Customer1.SetFilter("Date Filter", '%1..%2', MinDate, MaxDate);
                 end;
-                //-NPR5.39
-                //CurrReport.CREATETOTALS(Customer1."Sales (LCY)",Customer1."Balance (LCY)",Customer1."Profit (LCY)");
-                //+NPR5.39
             end;
         }
         dataitem(IntegerSorting; "Integer")
@@ -169,11 +150,11 @@ report 6014432 "NPR Customer Analysis"
             trigger OnAfterGetRecord()
             begin
                 if Number = 1 then begin
-                    if not CustomerAmountTemp2.FindFirst then
-                        CurrReport.Break;
+                    if not CustomerAmountTemp2.FindFirst() then
+                        CurrReport.Break();
                 end else
-                    if CustomerAmountTemp2.Next = 0 then begin
-                        CurrReport.Break;
+                    if CustomerAmountTemp2.Next() = 0 then begin
+                        CurrReport.Break();
                     end;
 
                 if Number <= ShowQty then
@@ -199,7 +180,7 @@ report 6014432 "NPR Customer Analysis"
                     end;
 
                 CustomerAmountTemp2."NPR Location" := Number;
-                CustomerAmountTemp2.Modify;
+                CustomerAmountTemp2.Modify();
                 Window.Update(5, (100 * Round(Number * 100 / DebCount, 1)));
             end;
         }
@@ -212,10 +193,10 @@ report 6014432 "NPR Customer Analysis"
             column(COMPANYNAME; CompanyName)
             {
             }
-            column(PeriodFilter; StrSubstNo(Text10600003, CustomerDateFilter))
+            column(PeriodFilter; StrSubstNo(CustDateLbl, CustomerDateFilter))
             {
             }
-            column(SequenceFilter; StrSubstNo(Text10600004, ShowType, ShowQty))
+            column(SequenceFilter; StrSubstNo(SequenceLbl, ShowType, ShowQty))
             {
             }
             column(CustomerFilter; Customer.TableCaption + ': ' + CustomerFilter)
@@ -296,7 +277,7 @@ report 6014432 "NPR Customer Analysis"
             column(PlacingLastYrCaption; PlacingLastYrCaptionLbl)
             {
             }
-            column(DebVarBelCaption; StrSubstNo(Text10600005, ShowType))
+            column(DebVarBelCaption; StrSubstNo(LastYearLbl, ShowType))
             {
             }
             column(IndexCaption; IndexCaptionLbl)
@@ -402,26 +383,23 @@ report 6014432 "NPR Customer Analysis"
                     Greyed := true;
 
                 if Number = 1 then begin
-                    if not CustomerAmountTemp.FindFirst then
-                        CurrReport.Break;
+                    if not CustomerAmountTemp.FindFirst() then
+                        CurrReport.Break();
                 end else
-                    if CustomerAmountTemp.Next = 0 then
-                        CurrReport.Break;
+                    if CustomerAmountTemp.Next() = 0 then
+                        CurrReport.Break();
 
                 CustomerAmountTemp."Amount (LCY)" := Multipl * CustomerAmountTemp."Amount (LCY)";
 
                 Customer.Get(CustomerAmountTemp."Customer No.");
                 Customer.CalcFields("Sales (LCY)", "Balance (LCY)", "Profit (LCY)");
 
-                //-NPR70.00.00.00/LS/190514
                 //Added Because createtotals no more supported
                 CustSalesDKK += Customer."Sales (LCY)";
                 CustBalanceDKK += Customer."Balance (LCY)";
                 CustProfitDKK += Customer."Profit (LCY)";
 
                 DebSaldoDKKFooter += CustBalanceDKK;
-                //+NPR70.00.00.00/LS/190514
-
                 AvancePct := "Pct."(Customer."Profit (LCY)", Customer."Sales (LCY)");
 
                 if (Sorting = Sorting::Minimum) and (Number = 1) then begin
@@ -435,7 +413,7 @@ report 6014432 "NPR Customer Analysis"
                 end;
 
                 CustomerAmountTemp2.SetRange("Customer No.", Customer."No.");
-                if CustomerAmountTemp2.FindFirst then
+                if CustomerAmountTemp2.FindFirst() then
                     LastLocation := CustomerAmountTemp2."NPR Location"
                 else begin
                     CustomerAmountTemp2."Amount (LCY)" := 0;
@@ -471,13 +449,7 @@ report 6014432 "NPR Customer Analysis"
 
             trigger OnPreDataItem()
             begin
-                Window.Close;
-                //-NPR5.39
-                //CurrReport.CREATETOTALS(Customer."Sales (LCY)",Customer."Balance (LCY)",Customer."Profit (LCY)");
-                //+NPR5.39
-                //-NPR5.49 [341969]
-                //CustomerAmountTemp2.SETCURRENTKEY("Customer No.");
-                //+NPR5.49 [341969]
+                Window.Close();
             end;
         }
     }
@@ -516,25 +488,13 @@ report 6014432 "NPR Customer Analysis"
             }
         }
 
-        actions
-        {
-        }
     }
 
-    labels
-    {
-    }
 
     trigger OnInitReport()
     begin
         CompanyInfo.Get();
         CompanyInfo.CalcFields(Picture);
-
-        //-NPR5.39
-        // Object.SETRANGE(ID, 6014432);
-        // Object.SETRANGE(Type, 3);
-        // Object.FIND('-');
-        //+NPR5.39
         ShowQty := 10;
     end;
 
@@ -545,76 +505,76 @@ report 6014432 "NPR Customer Analysis"
     end;
 
     var
-        Window: Dialog;
         CompanyInfo: Record "Company Information";
+        Customer1: Record Customer;
         CustomerAmountTemp: Record "Customer Amount" temporary;
         CustomerAmountTemp2: Record "Customer Amount" temporary;
-        Customer1: Record Customer;
-        DebCount: Integer;
-        CustomerCount: Integer;
-        CustomerFilter: Text[250];
-        CustomerDateFilter: Text[30];
-        ShowType: Option Sales,Balance,Margin;
-        Sorting: Option Maximum,Minimum;
-        ShowQty: Integer;
-        CustSalesDKK: Decimal;
-        CustBalanceDKK: Decimal;
-        CustProfitDKK: Decimal;
-        CustSalesDKK1: Decimal;
-        CustBalanceDKK1: Decimal;
-        CustProfitDKK1: Decimal;
-        MaxAmount: Decimal;
-        Share: Decimal;
-        i: Integer;
-        Multipl: Integer;
-        TotalPct: Decimal;
-        Index: Decimal;
-        Counter: Integer;
         Greyed: Boolean;
-        MinDate: Date;
         MaxDate: Date;
-        LastLocation: Integer;
-        SalesPct1: Decimal;
-        AvancePct1: Decimal;
+        MinDate: Date;
         AvancePct: Decimal;
+        AvancePct1: Decimal;
         BalancePct: Decimal;
-        SalesPct: Decimal;
-        IndexSales: array[2] of Decimal;
-        IndexDB: array[2] of Decimal;
+        CustBalanceDKK: Decimal;
+        CustBalanceDKK1: Decimal;
+        Customer1BalanceTotal: Decimal;
+        Customer1ProfitTotal: Decimal;
+        Customer1SalesTotal: Decimal;
+        CustomerBalanceTotal: Decimal;
+        CustomerProfitTotal: Decimal;
+        CustomerSalesTotal: Decimal;
+        CustProfitDKK: Decimal;
+        CustProfitDKK1: Decimal;
+        CustSalesDKK: Decimal;
+        CustSalesDKK1: Decimal;
         CustVarAmt: Decimal;
-        Text10600000: Label 'Customers Sorted: #1#########\';
-        Text10600001: Label 'Creating Comparison...\';
-        Text10600002: Label 'Sorting Data...\';
-        Text10600003: Label 'Period: %1';
-        Text10600004: Label 'Sequence after %1 top %2';
-        Text10600005: Label 'Last Year %1';
-        Report_Caption_Lbl: Label 'Customer Analysis';
-        SequenceCaption_Lbl: Label 'Sequence';
-        NoCaptionLbl: Label 'No.';
-        NameCaptionLbl: Label 'Name';
-        SaleCaptionLbl: Label 'Sale';
-        BalanceCaptionLbl: Label 'Balance';
-        ProfitCaptionLbl: Label 'Profit (LCY)';
-        ProfitPctCaptionLbl: Label 'Profit %';
+        DebSaldoDKKFooter: Decimal;
+        Index: Decimal;
+        IndexDB: array[2] of Decimal;
+        IndexSales: array[2] of Decimal;
+        MaxAmount: Decimal;
+        SalesPct: Decimal;
+        SalesPct1: Decimal;
+        Share: Decimal;
+        TotalPct: Decimal;
+        Window: Dialog;
+        Counter: Integer;
+        CustomerCount: Integer;
+        DebCount: Integer;
+        i: Integer;
+        LastLocation: Integer;
+        Multipl: Integer;
+        ShowQty: Integer;
         LargestPctCaptionLbl: Label '% of Largest';
-        ShareTotalCaptionLbl: Label 'Share of Total';
-        PlacingLastYrCaptionLbl: Label 'Placing Last Year';
+        BalanceCaptionLbl: Label 'Balance';
+        CreatingComparisonLbl: Label 'Creating Comparison...\';
+        Report_Caption_Lbl: Label 'Customer Analysis';
+        CustSortedLbl: Label 'Customers Sorted: #1#########\';
         IndexCaptionLbl: Label 'Index';
-        LastYearCaptionLbl: Label 'Last Year';
-        IndexSaleCaptionLbl: Label 'Index Sale';
         IndexProfitCaptionLbl: Label 'Index Profit (LCY)';
+        IndexSaleCaptionLbl: Label 'Index Sale';
+        LastYearCaptionLbl: Label 'Last Year';
+        LastYearLbl: Label 'Last Year %1', Comment = '%1 = Last Year';
+        NameCaptionLbl: Label 'Name';
+        NoCaptionLbl: Label 'No.';
+        PageCaptionLbl: Label 'Page';
+        CustDateLbl: Label 'Period: %1', Comment = '%1 = Customer Date filter';
+        PlacingLastYrCaptionLbl: Label 'Placing Last Year';
+        ProfitPctCaptionLbl: Label 'Profit %';
+        ProfitCaptionLbl: Label 'Profit (LCY)';
+        SaleCaptionLbl: Label 'Sale';
+        SaleTotalCaptionLbl: Label 'Sale Total';
+        SequenceCaption_Lbl: Label 'Sequence';
+        SequenceLbl: Label 'Sequence after %1 top %2', Comment = '%1 = Show Type, %2 = Show Quantity';
+        SharePctCaptionLbl: Label 'Share %';
+        ShareTotalCaptionLbl: Label 'Share of Total';
+        SortingDataLbl: Label 'Sorting Data...\';
         ThisYearCaptionLbl: Label 'This Year';
         TotalCaptionLbl: Label 'Total';
-        SaleTotalCaptionLbl: Label 'Sale Total';
-        SharePctCaptionLbl: Label 'Share %';
-        PageCaptionLbl: Label 'Page';
-        Customer1SalesTotal: Decimal;
-        Customer1ProfitTotal: Decimal;
-        Customer1BalanceTotal: Decimal;
-        CustomerSalesTotal: Decimal;
-        CustomerProfitTotal: Decimal;
-        CustomerBalanceTotal: Decimal;
-        DebSaldoDKKFooter: Decimal;
+        Sorting: Option Maximum,Minimum;
+        ShowType: Option Sales,Balance,Margin;
+        CustomerDateFilter: Text[30];
+        CustomerFilter: Text[250];
 
     local procedure "Pct."(Tal1: Decimal; Tal2: Decimal): Decimal
     begin

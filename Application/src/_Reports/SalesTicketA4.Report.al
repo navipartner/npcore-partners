@@ -1,12 +1,9 @@
 report 6014410 "NPR Sales Ticket A4"
 {
-    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Sales Ticket A4.rdlc';
-
     Caption = 'Sales Ticket A4';
     PreviewMode = PrintLayout;
-
     dataset
     {
         dataitem("Audit Roll"; "NPR Audit Roll")
@@ -144,7 +141,7 @@ report 6014410 "NPR Sales Ticket A4"
 
                 trigger OnAfterGetRecord()
                 begin
-                    ResetVariables;
+                    ResetVariables();
                     AuditRollSalesOnAfterGetRecord(AuditRollSale);
                     DescriptionLine := Description;
                     if (Type = Type::Customer) or ((Type = Type::"G/L") and not ("No." = Register."Credit Voucher Account")) then begin
@@ -189,7 +186,6 @@ report 6014410 "NPR Sales Ticket A4"
                         LineDiscountPct := AuditRollSale."Line Discount %";
                         LineDiscountPctNew := '-' + Format(AuditRollSale."Line Discount %", 0, '<Precision,2:2><Standard Format,0>') + '%';
                         LineDiscountAmount := '-' + Format(AuditRollSale."Line Discount Amount", 0, '<Precision,2:2><Standard Format,0>');
-
                     end;
 
                     PrintLineVariantDesc(AuditRollSale);
@@ -307,8 +303,8 @@ report 6014410 "NPR Sales Ticket A4"
             trigger OnAfterGetRecord()
             var
                 POSUnit: Record "NPR POS Unit";
-                POSSession: Codeunit "NPR POS Session";
                 POSFrontEnd: Codeunit "NPR POS Front End Management";
+                POSSession: Codeunit "NPR POS Session";
                 POSSetup: Codeunit "NPR POS Setup";
                 QueryVATTotals: Query "NPR VAT Totals";
                 varLineNo: Integer;
@@ -316,7 +312,7 @@ report 6014410 "NPR Sales Ticket A4"
                 Register.Get("Audit Roll"."Register No.");
                 POSUnit.Get("Register No.");
                 POSSetup.SetPOSUnit(POSUnit);
-                RetailSetup.Get;
+                RetailSetup.Get();
                 if SalespersonPurchaser.Get("Audit Roll"."Salesperson Code") then;
                 clear(POSStore);
                 if POSSession.IsActiveSession(POSFrontEnd) then begin
@@ -344,11 +340,11 @@ report 6014410 "NPR Sales Ticket A4"
                 AuditRollFinance.CopyFilters("Audit Roll");
                 AuditRollFinance.SetFilter("Sale Type", '%1', AuditRollFinance."Sale Type"::Deposit);
                 AuditRollFinance.SetFilter(Type, '%1', AuditRollFinance.Type::"G/L");
-                SetGiftCreditVoucherFlags;
+                SetGiftCreditVoucherFlags();
                 Clear(AuditRollFinance);
 
                 if not "Audit Roll Group VAT Totals".FindFirst then begin
-                    "Audit Roll Group VAT Totals".DeleteAll;
+                    "Audit Roll Group VAT Totals".DeleteAll();
                     varLineNo := 1;
                     QueryVATTotals.SetFilter(Sales_Ticket_No, '%1', "Audit Roll"."Sales Ticket No.");
                     QueryVATTotals.Open;
@@ -449,18 +445,6 @@ report 6014410 "NPR Sales Ticket A4"
         }
     }
 
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
-        }
-    }
-
     labels
     {
         ContactNo_Lbl = 'Customer No. ';
@@ -498,73 +482,69 @@ report 6014410 "NPR Sales Ticket A4"
 
     trigger OnInitReport()
     begin
-        CompanyInformation.Get;
+        CompanyInformation.Get();
         CompanyInformation.CalcFields(Picture);
     end;
 
     var
-        AuditRollTotals: Record "NPR Audit Roll" temporary;
         CompanyInformation: Record "Company Information";
         Contact: Record Contact;
         Customer: Record Customer;
         GeneralLedgerSetup: Record "General Ledger Setup";
         Item: Record Item;
+        AuditRollTotals: Record "NPR Audit Roll" temporary;
+        POSStore: Record "NPR POS Store";
         POSUnit: Record "NPR POS Unit";
         Register: Record "NPR Register";
         RetailSetup: Record "NPR Retail Setup";
         SalespersonPurchaser: Record "Salesperson/Purchaser";
         POSSetup: Codeunit "NPR POS Setup";
-        ContactNo: Text;
-        ContactName: Text;
+        FlagCreditVoucher: Boolean;
+        FlagCustomerPayment: Boolean;
+        FlagDepositPayment: Boolean;
+        FlagGiftVoucher: Boolean;
+        FlagOutPayment: Boolean;
+        FlagReturnSale: Boolean;
+        IsItem: Boolean;
+        ShowAdditionalInfo: Boolean;
+        ShowAmountInclVatPayment: Boolean;
+        ShowDeposit: Boolean;
+        ShowOutPayment: Boolean;
+        AmountLine: Decimal;
+        AmountPaymentLine: Decimal;
+        LineDiscountPct: Decimal;
+        SubCurrencyGL: Decimal;
+        TotalEuroAmount: Decimal;
+        UnitPriceInlcDiscountLine: Decimal;
+        varTotalVat: Decimal;
+        SerialNoTxt: Label 'Serial No.';
+        Text0001: Label 'Staff Purchase';
+        Total: Label 'Total %1';
+        TotalDiscount: Label 'Total Discount';
+        TotalEuro: Label 'Total euro';
+        Text0002: Label 'Unit List Price : %1';
+        TotalVAT: Label 'VAT Amount';
+        Text0003: Label 'Vend. Item No.: %1';
         ContactAddress: Text;
         ContactCity: Text;
+        ContactName: Text;
+        ContactNo: Text;
         ContactPostCode: Text;
-        Text0001: Label 'Staff Purchase';
-        Text0002: Label 'Unit List Price : %1';
-        Text0003: Label 'Vend. Item No.: %1';
-        AmountLine: Decimal;
         DescriptionLine: Text;
         DescriptionLine2: Text;
+        DescriptionPaymentLine: Text;
+        FinansDescriptionLine: Text;
         ItemInfo: Text;
         ItemInfo2: Text;
         ItemNo: Text;
         LineDiscountAmount: Text;
-        LineDiscountPct: Decimal;
         LineDiscountPctNew: Text;
         QuantityAmountLine: Text;
         QuantityLine: Text;
-        ShowOutPayment: Boolean;
-        ShowDeposit: Boolean;
-        UnitPriceInlcDiscountLine: Decimal;
-        VariantCode: Text;
-        FinansDescriptionLine: Text;
-        DescriptionPaymentLine: Text;
-        AmountPaymentLine: Decimal;
-        ShowAmountInclVatPayment: Boolean;
-        ShowAdditionalInfo: Boolean;
-        VariantDesc: Text[50];
-        FlagCreditVoucher: Boolean;
-        FlagCustomerPayment: Boolean;
-        FlagReturnSale: Boolean;
-        FlagGiftVoucher: Boolean;
-        FlagOutPayment: Boolean;
-        FlagDepositPayment: Boolean;
-        SubCurrencyGL: Decimal;
-        Total: Label 'Total %1';
-        TotalDiscount: Label 'Total Discount';
-        TotalVAT: Label 'VAT Amount';
-        TotalEuro: Label 'Total euro';
-        SerialNoTxt: Label 'Serial No.';
         TotalDiscountPct: Text;
-        TotalEuroAmount: Decimal;
-        IsItem: Boolean;
         UnitPriceExclDiscountLine: Text;
-        varTotalVat: Decimal;
-        POSStore: Record "NPR POS Store";
-
-    local procedure "--ContactInfo"()
-    begin
-    end;
+        VariantCode: Text;
+        VariantDesc: Text[50];
 
     procedure PrintCustomerInfo()
     begin
@@ -628,10 +608,6 @@ report 6014410 "NPR Sales Ticket A4"
         VariantCode := '';
     end;
 
-    procedure "--AuxFunctions--"()
-    begin
-    end;
-
     local procedure CalcSaleLineTotals(var AuditRoll: Record "NPR Audit Roll")
     begin
         AuditRollTotals."Amount Including VAT" += AuditRoll."Amount Including VAT";
@@ -641,51 +617,44 @@ report 6014410 "NPR Sales Ticket A4"
 
     procedure AuditRollSalesOnAfterGetRecord(var AuditRollSales: Record "NPR Audit Roll") DoNotSkip: Boolean
     begin
-        with AuditRollSales do begin
-            DoNotSkip := true;
-            if (Type = Type::Item) and Item.Get("No.") and Item."NPR No Print on Reciept" then
-                exit(false);
+        DoNotSkip := true;
+        if (AuditRollSales.Type = AuditRollSales.Type::Item) and Item.Get(AuditRollSales."No.") and Item."NPR No Print on Reciept" then
+            exit(false);
 
-            if ("Amount Including VAT" <> 0) and (Type = Type::"G/L") and ("No." = POSSetup.RoundingAccount(true)) then begin
-                SubCurrencyGL := "Amount Including VAT";
-                exit(false);
-            end;
+        if (AuditRollSales."Amount Including VAT" <> 0) and (AuditRollSales.Type = AuditRollSales.Type::"G/L") and (AuditRollSales."No." = POSSetup.RoundingAccount(true)) then begin
+            SubCurrencyGL := AuditRollSales."Amount Including VAT";
+            exit(false);
+        end;
 
-            if Quantity < 0 then
-                FlagReturnSale := true;
+        if AuditRollSales.Quantity < 0 then
+            FlagReturnSale := true;
 
-            if "Sale Type" = "Sale Type"::"Out payment" then begin
-                "Unit Price" *= -1;
-                "Amount Including VAT" *= -1;
-                Amount *= -1;
-                FlagOutPayment := true;
-            end;
+        if AuditRollSales."Sale Type" = AuditRollSales."Sale Type"::"Out payment" then begin
+            AuditRollSales."Unit Price" *= -1;
+            AuditRollSales."Amount Including VAT" *= -1;
+            AuditRollSales.Amount *= -1;
+            FlagOutPayment := true;
+        end;
 
-            if ("Sale Type" = "Sale Type"::Deposit) and (Type = Type::Customer) then begin
-                FlagCustomerPayment := true;
-                if "Sales Document Prepayment" then
-                    SetDepositPaymentFlag;
-            end;
+        if (AuditRollSales."Sale Type" = AuditRollSales."Sale Type"::Deposit) and (AuditRollSales.Type = AuditRollSales.Type::Customer) then begin
+            FlagCustomerPayment := true;
+            if AuditRollSales."Sales Document Prepayment" then
+                SetDepositPaymentFlag;
         end;
 
         CalcSaleLineTotals(AuditRollSales);
     end;
 
-    local procedure "--FlagFunctions"()
-    begin
-    end;
-
     local procedure SetGiftCreditVoucherFlags()
     var
-        GiftVoucher: Record "NPR Gift Voucher";
         CreditVoucher: Record "NPR Credit Voucher";
+        GiftVoucher: Record "NPR Gift Voucher";
     begin
-        with AuditRollFinance do
-            if FindSet then
-                repeat
-                    FlagGiftVoucher := ("No." = Register."Gift Voucher Account") and GiftVoucher.Get("Gift voucher ref.");
-                    FlagCreditVoucher := ("No." = Register."Credit Voucher Account") and CreditVoucher.Get("Credit voucher ref.");
-                until (Next = 0) or (FlagGiftVoucher and FlagCreditVoucher);
+        if AuditRollFinance.FindSet() then
+            repeat
+                FlagGiftVoucher := (AuditRollFinance."No." = Register."Gift Voucher Account") and GiftVoucher.Get(AuditRollFinance."Gift voucher ref.");
+                FlagCreditVoucher := (AuditRollFinance."No." = Register."Credit Voucher Account") and CreditVoucher.Get(AuditRollFinance."Credit voucher ref.");
+            until (AuditRollFinance.Next() = 0) or (FlagGiftVoucher and FlagCreditVoucher);
     end;
 
     local procedure SetDepositPaymentFlag()

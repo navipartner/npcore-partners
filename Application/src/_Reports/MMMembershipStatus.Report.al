@@ -2,11 +2,9 @@ report 6060132 "NPR MM Membership Status"
 {
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/MM Membership Status.rdlc';
-
     Caption = 'Membership Status';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
-
     dataset
     {
         dataitem("MM Membership Setup"; "NPR MM Membership Setup")
@@ -18,8 +16,6 @@ report 6060132 "NPR MM Membership Status"
                 RequestFilterFields = "Company Name", "Community Code", "Membership Code", "Customer No.";
                 dataitem("MM Membership Role"; "NPR MM Membership Role")
                 {
-                    //The property 'DataItemTableView' shouldn't have an empty value.
-                    //DataItemTableView = '';
                     RequestFilterFields = "Member Role";
                     dataitem("MM Member"; "NPR MM Member")
                     {
@@ -30,32 +26,25 @@ report 6060132 "NPR MM Membership Status"
                         var
                             BarcodeLib: Codeunit "NPR Barcode Library";
                         begin
-                            TempMembers.Init;
+                            TempMembers.Init();
                             TempMembers.Template := "MM Membership Setup".Code;
                             TempMembers."Line No." := "MM Member"."Entry No.";
                             TempMembers.Description := Format(MemberDate);
                             TempMembers.Color := "MM Membership"."Entry No.";
-
                             TempMembers."Code 1" := "MM Membership"."External Membership No.";
                             TempMembers."Description 2" := Format("MM Membership"."Issued Date");
-
                             TempMembers."Code 3" := Format(ValidUntilDate);
                             TempMembers."Code 4" := Format(ValidFromDate);
-
                             TempMembers.Insert();
                         end;
                     }
 
                     trigger OnPreDataItem()
                     begin
-
-                        //"MM Membership Role".SetFilter ("Member Role", '=%1|=%2', "MM Membership Role"."Member Role"::ADMIN, "MM Membership Role"."Member Role"::MEMBER);
-
                         "MM Membership Role".FilterGroup(2);
                         "MM Membership Role".SetFilter("Membership Entry No.", '=%1', "MM Membership"."Entry No.");
                         "MM Membership Role".SetFilter("Member Role", '=%1|=%2', "MM Membership Role"."Member Role"::ADMIN, "MM Membership Role"."Member Role"::MEMBER);
                         "MM Membership Role".FilterGroup(0);
-
                     end;
                 }
 
@@ -63,8 +52,8 @@ report 6060132 "NPR MM Membership Status"
                 var
                     Item: Record Item;
                     MembershipManagement: Codeunit "NPR MM Membership Mgt.";
-                    ValidForReferenceDate: Boolean;
                     KeepMembership: Boolean;
+                    ValidForReferenceDate: Boolean;
                     NewRefDate: Date;
                 begin
 
@@ -73,14 +62,12 @@ report 6060132 "NPR MM Membership Status"
                     case MembershipStatus of
                         MembershipStatus::Active:
                             begin
-
                                 if (not ValidForReferenceDate) then
-                                    CurrReport.Skip;
+                                    CurrReport.Skip();
 
                                 if (Format(ExpiresWithinDateformula) <> '') then
                                     if (CalcDate(ExpiresWithinDateformula, ReferenceDate) < ValidUntilDate) then
-                                        CurrReport.Skip;
-
+                                        CurrReport.Skip();
                             end;
 
                         MembershipStatus::"Active and Renewed",
@@ -88,11 +75,11 @@ report 6060132 "NPR MM Membership Status"
                             begin
 
                                 if (not ValidForReferenceDate) then
-                                    CurrReport.Skip;
+                                    CurrReport.Skip();
 
                                 if (Format(ExpiresWithinDateformula) <> '') then
                                     if (CalcDate(ExpiresWithinDateformula, ReferenceDate) < ValidUntilDate) then
-                                        CurrReport.Skip;
+                                        CurrReport.Skip();
 
                                 NewRefDate := CalcDate('<+1D>', ValidUntilDate); // default renew is back-to-back
                                 if (Format(RenewedWithin) <> '') then
@@ -101,16 +88,15 @@ report 6060132 "NPR MM Membership Status"
                                 ValidForReferenceDate := MembershipManagement.GetMembershipValidDate("MM Membership"."Entry No.", NewRefDate, ValidFromDate, ValidUntilDate);
 
                                 if (ValidForReferenceDate) and (MembershipStatus = MembershipStatus::"Active and Not Renewed") then
-                                    CurrReport.Skip;
+                                    CurrReport.Skip();
 
                                 if (not ValidForReferenceDate) and (MembershipStatus = MembershipStatus::"Active and Renewed") then
-                                    CurrReport.Skip;
-
+                                    CurrReport.Skip();
                             end;
 
                         MembershipStatus::"Not Active":
                             if (ValidForReferenceDate) then
-                                CurrReport.Skip;
+                                CurrReport.Skip();
                     end;
                 end;
             }
@@ -219,10 +205,8 @@ report 6060132 "NPR MM Membership Status"
             begin
                 Evaluate(ConvValidDate, Description);
                 Evaluate(MMMembershipIssueDate, "Description 2");
-
                 Evaluate(ValidUntilDate, TempMembers."Code 3");
                 Evaluate(ValidFromDate, TempMembers."Code 4");
-
                 if (MMMember2.Get("Line No.")) then;
             end;
         }
@@ -267,15 +251,6 @@ report 6060132 "NPR MM Membership Status"
                 }
             }
         }
-
-        actions
-        {
-        }
-
-        trigger OnOpenPage()
-        begin
-
-        end;
     }
 
     labels
@@ -302,43 +277,39 @@ report 6060132 "NPR MM Membership Status"
     end;
 
     var
-        MemberName: Text;
-        MemberDate: Date;
         CompanyInformation: Record "Company Information";
-        MMMembershipEntry: Record "NPR MM Membership Entry";
-        MMMemberCard: Record "NPR MM Member Card";
-        MemberItem: Text;
-        MembershipStatus: Option Active,"Active and Renewed","Active and Not Renewed","Not Active";
         MMMember2: Record "NPR MM Member";
-        PageCaption: Label 'Page %1 of %2';
-        ReportCaption: Label 'Membership Status';
-        MemberEntryNoCaption: Label 'Entry No.';
-        DateCaption: Label 'From Date';
-        ConvValidDate: Date;
-        Filters: Text;
-        Date2Caption: Label 'Until Date';
-        MembershipStatusCaption: Label 'Membership Status:';
-        DateFilterCaption: Label 'Date:';
-        FilterCaption: Label 'Filters';
-        MMMembershipIssueDate: Date;
-        ExternalMemberNoCaption: Label 'Ext. Member No.';
-        ExternalMembershipNoCaption: Label 'Ext. Membership No.';
-        MembershipIssuedDateCaption: Label 'Membership Issue Date';
-        ReferenceDate: Date;
+        MMMemberCard: Record "NPR MM Member Card";
+        MMMembershipEntry: Record "NPR MM Membership Entry";
         ExpiresWithinDateformula: DateFormula;
+        RenewedWithin: DateFormula;
+        ShowActiveMemberships: Boolean;
+        ConvValidDate: Date;
+        MemberDate: Date;
+        MMMembershipIssueDate: Date;
+        ReferenceDate: Date;
         ValidFromDate: Date;
         ValidUntilDate: Date;
-        ExpireWithinCaption: Label 'Expires Within:';
-        ShowActiveMemberships: Boolean;
-        RenewedWithin: DateFormula;
-        RenewedWithinCaption: Label 'Renewed Within:';
         City_Caption: Label 'City';
-        ZipCode_Caption: Label 'Postcode';
         Country_Caption: Label 'Country';
+        DateFilterCaption: Label 'Date:';
+        MemberEntryNoCaption: Label 'Entry No.';
+        ExpireWithinCaption: Label 'Expires Within:';
+        ExternalMemberNoCaption: Label 'Ext. Member No.';
+        ExternalMembershipNoCaption: Label 'Ext. Membership No.';
+        FilterCaption: Label 'Filters';
+        DateCaption: Label 'From Date';
+        MembershipIssuedDateCaption: Label 'Membership Issue Date';
+        ReportCaption: Label 'Membership Status';
+        MembershipStatusCaption: Label 'Membership Status:';
+        PageCaption: Label 'Page %1 of %2';
+        ZipCode_Caption: Label 'Postcode';
+        RenewedWithinCaption: Label 'Renewed Within:';
         MembershipType_Caption: Label 'Type';
-
-    local procedure CheckForSkip()
-    begin
-    end;
+        Date2Caption: Label 'Until Date';
+        MembershipStatus: Option Active,"Active and Renewed","Active and Not Renewed","Not Active";
+        Filters: Text;
+        MemberItem: Text;
+        MemberName: Text;
 }
 

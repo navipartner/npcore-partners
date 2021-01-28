@@ -1,13 +1,9 @@
 report 6060131 "NPR MM Membership Points Det."
 {
-    // MM1.17/JLK /20170123  CASE 243075 Object created
-    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/MM Membership Points Detail.rdlc';
-
     Caption = 'Membership Points Detail';
     PreviewMode = PrintLayout;
-
     dataset
     {
         dataitem("MM Membership"; "NPR MM Membership")
@@ -110,15 +106,15 @@ report 6060131 "NPR MM Membership Points Det."
 
             trigger OnAfterGetRecord()
             var
-                MMMembership: Record "NPR MM Membership";
                 MMMembershipPointsEntry: Record "NPR MM Members. Points Entry";
+                MMMembership: Record "NPR MM Membership";
             begin
                 BalanceBefore := 0;
 
                 MMMembershipPointsEntry.SetRange("Membership Entry No.", "Entry No.");
                 MMMembershipPointsEntry.SetFilter("Posting Date", GetFilter("Date Filter"));
-                if not MMMembershipPointsEntry.FindFirst then
-                    CurrReport.Skip;
+                if not MMMembershipPointsEntry.FindFirst() then
+                    CurrReport.Skip();
 
                 MMMembership.SetRange("Entry No.", "Entry No.");
                 MMMembership.SetFilter("Date Filter", '..%1', "MM Membership".GetRangeMin("Date Filter"));
@@ -134,32 +130,20 @@ report 6060131 "NPR MM Membership Points Det."
         }
     }
 
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
-        }
-    }
-
     labels
     {
         ReportLbl = 'Membership Points Detail';
     }
 
     var
-        PageCaption: Label 'Page %1 of %2';
-        BalanceBefore: Decimal;
         Customer: Record Customer;
-        CustomerName: Text;
-        PostingDateCaption: Label 'Posting Date';
-        MembershipNoCaption: Label 'Membership';
-        BalanceBeforeCaption: Label 'Balance Before';
+        BalanceBefore: Decimal;
         BalanceAfterCaption: Label 'Balance After';
+        BalanceBeforeCaption: Label 'Balance Before';
         CustomerNameCaption: Label 'Customer Name';
+        MembershipNoCaption: Label 'Membership';
+        PageCaption: Label 'Page %1 of %2';
+        PostingDateCaption: Label 'Posting Date';
+        CustomerName: Text;
 }
 

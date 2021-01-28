@@ -1,11 +1,8 @@
 report 6060151 "NPR Event Team Template"
 {
-    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Event Team Template.rdlc';
-
     Caption = 'Event Team Template';
-
     dataset
     {
         dataitem(Job; Job)
@@ -288,13 +285,13 @@ report 6060151 "NPR Event Team Template"
                         ItemLineTotal.SetRange("Job No.", Job."No.");
                         ItemLineTotal.SetRange("Job Task No.", "Job Task"."Job Task No.");
                         ItemLineTotal.SetRange(Type, ItemLineTotal.Type::Item);
-                        if ItemLineTotal.FindSet then
+                        if ItemLineTotal.FindSet() then
                             repeat
                                 if ItemLineTotal."Contract Line" then begin
                                     TotalAmount += ItemLineTotal."Line Amount";
                                     EstTotalAmtInclVAT += ItemLineTotal."NPR Est. Line Amount Incl. VAT";
                                 end;
-                            until ItemLineTotal.Next = 0;
+                            until ItemLineTotal.Next() = 0;
                     end;
                 }
                 trigger OnPreDataItem()
@@ -347,15 +344,15 @@ report 6060151 "NPR Event Team Template"
 
                 trigger OnAfterGetRecord()
                 var
-                    i: Integer;
                     SkipRow: Boolean;
+                    i: Integer;
                 begin
                     EventAttrMgt.EventTemplateReportEventAttributeSetOnAfterGetRecord("Event Attribute Set 1", AttributeValue, ColumnCaption, Job."No.");
                     SkipRow := true;
                     for i := 1 to ArrayLen(AttributeValue) do
                         SkipRow := SkipRow and (AttributeValue[i] = '');
                     if SkipRow then
-                        CurrReport.Skip;
+                        CurrReport.Skip();
                 end;
 
                 trigger OnPreDataItem()
@@ -364,7 +361,7 @@ report 6060151 "NPR Event Team Template"
                     Clear(ColumnCaption);
                     Clear(EventAttrMgt);
                     if not EventAttrMgt.EventTemplateReportEventAttributeSetOnPreDataItem(EventAttributeTempName1, "Event Attribute Set 1") then
-                        CurrReport.Break;
+                        CurrReport.Break();
                 end;
             }
             dataitem("Event Attribute Set 2"; "NPR Event Attr. Row Value")
@@ -406,16 +403,15 @@ report 6060151 "NPR Event Team Template"
 
                 trigger OnAfterGetRecord()
                 var
-                    i: Integer;
                     SkipRow: Boolean;
+                    i: Integer;
                 begin
-                    //-NPR5.33 [277972]
                     EventAttrMgt.EventTemplateReportEventAttributeSetOnAfterGetRecord("Event Attribute Set 2", AttributeValue, ColumnCaption, Job."No.");
                     SkipRow := true;
                     for i := 1 to ArrayLen(AttributeValue) do
                         SkipRow := SkipRow and (AttributeValue[i] = '');
                     if SkipRow then
-                        CurrReport.Skip;
+                        CurrReport.Skip();
                 end;
 
                 trigger OnPreDataItem()
@@ -424,7 +420,7 @@ report 6060151 "NPR Event Team Template"
                     Clear(ColumnCaption);
                     Clear(EventAttrMgt);
                     if not EventAttrMgt.EventTemplateReportEventAttributeSetOnPreDataItem(EventAttributeTempName2, "Event Attribute Set 2") then
-                        CurrReport.Break;
+                        CurrReport.Break();
                 end;
             }
             dataitem("Record Link"; "Record Link")
@@ -439,9 +435,9 @@ report 6060151 "NPR Event Team Template"
 
                 trigger OnAfterGetRecord()
                 var
-                    NoteInStream: InStream;
                     BinaryReader: DotNet NPRNetBinaryReader;
                     MemoryStream: DotNet NPRNetMemoryStream;
+                    NoteInStream: InStream;
                 begin
                     Clear(NoteText);
                     FromTo := '';
@@ -452,7 +448,7 @@ report 6060151 "NPR Event Team Template"
                         MemoryStream := NoteInStream;
                         BinaryReader := BinaryReader.BinaryReader(MemoryStream);
                         NoteText.AddText(BinaryReader.ReadString);
-                        FromTo := StrSubstNo(FromToText, GetUserName("User ID"), GetUserName("To User ID"));
+                        FromTo := StrSubstNo(FromToLbl, GetUserName("User ID"), GetUserName("To User ID"));
                     end;
 
                 end;
@@ -482,7 +478,7 @@ report 6060151 "NPR Event Team Template"
                     Clear(Resource);
                 EventAttribute.SetRange("Job No.", "No.");
                 EventAttribute.SetRange(Promote, true);
-                if EventAttribute.FindSet then
+                if EventAttribute.FindSet() then
                     EventAttributeTempName1 := EventAttribute."Template Name";
                 if EventAttribute.Next <> 0 then
                     EventAttributeTempName2 := EventAttribute."Template Name";
@@ -490,53 +486,37 @@ report 6060151 "NPR Event Team Template"
         }
     }
 
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
-        }
-    }
-
-    labels
-    {
-    }
-
     var
         Customer: Record Customer;
-        SalespersonPurchaser: Record "Salesperson/Purchaser";
-        Resource: Record Resource;
-        NoteText: BigText;
-        FromTo: Text;
-        FromToText: Label 'From %1 to %2: ';
-        TotalAmount: Decimal;
         ItemLineTotal: Record "Job Planning Line";
-        EventAttrMgt: Codeunit "NPR Event Attribute Mgt.";
-        AttributeValue: array[5] of Text;
-        ColumnCaption: array[5] of Text;
         EventAttribute: Record "NPR Event Attribute";
+        Resource: Record Resource;
+        SalespersonPurchaser: Record "Salesperson/Purchaser";
+        EventAttrMgt: Codeunit "NPR Event Attribute Mgt.";
+        NoteText: BigText;
         EventAttributeTempName1: Code[20];
         EventAttributeTempName2: Code[20];
         EstTotalAmtInclVAT: Decimal;
-        JobTaskView: Text;
-        TextLineView: Text;
-        ResourceLineView: Text;
+        TotalAmount: Decimal;
+        FromToLbl: Label 'From %1 to %2: ', Comment = '%1 = From User ID, %2 = To User ID';
+        AttributeValue: array[5] of Text;
+        ColumnCaption: array[5] of Text;
+        FromTo: Text;
         ItemLineView: Text;
+        JobTaskView: Text;
+        ResourceLineView: Text;
+        TextLineView: Text;
 
     local procedure GetUserName(UserID: Text): Text
     var
         User: Record User;
-        EveryoneText: Label 'Everyone';
+        EveryoneLbl: Label 'Everyone';
     begin
         User.SetRange("User Name", UserID);
         if User.FindFirst and (User."Full Name" <> '') then
             exit(User."Full Name");
         if UserID = '' then
-            exit(EveryoneText);
+            exit(EveryoneLbl);
         exit(UserID);
     end;
 
@@ -558,25 +538,38 @@ report 6060151 "NPR Event Team Template"
 
     procedure SetParameters(XmlParameters: Text)
     var
-        XmlDoc: DotNet XmlDocument;
-        XmlNode: DotNet XmlNode;
-        XmlNodeList: DotNet XmlNodeList;
-        XmlAttribute: DotNet XmlAttribute;
+        NpXmlDomMgt: codeunit "NPR NpXml Dom Mgt.";
+        Element: XmlElement;
+        XmlDoc: XmlDocument;
+        Node: XmlNode;
+        NodeList: XmlNodeList;
+        name: Text;
     begin
-        XmlDoc := XmlDoc.XmlDocument();
-        XmlDoc.LoadXml(XmlParameters);
-        XmlNodeList := XmlDoc.SelectNodes('//DataItem');
-        foreach XmlNode in XmlNodeList do begin
-            XMLAttribute := XmlNode.Attributes.GetNamedItem('name');
-            case XMLAttribute.Value of
+        XmlDocument.ReadFrom(XmlParameters, XmlDoc);
+        if not XmlDoc.GetRoot(Element) then
+            exit;
+
+        if Element.IsEmpty() then
+            exit;
+
+        if not Element.SelectNodes('//DataItem', NodeList) then
+            exit;
+
+        foreach Node in NodeList do begin
+            Element := Node.AsXmlElement();
+            name := NpXmlDomMgt.GetXmlAttributeText(Element, 'name', true);
+            if name = '' then
+                exit;
+
+            case name of
                 'Job Task':
-                    JobTaskView := XmlNode.InnerText;
+                    JobTaskView := Element.InnerText;
                 'TextLine':
-                    TextLineView := XmlNode.InnerText;
+                    TextLineView := Element.InnerText;
                 'ResourceLine':
-                    ResourceLineView := XmlNode.InnerText;
+                    ResourceLineView := Element.InnerText;
                 'ItemLine':
-                    ItemLineView := XmlNode.InnerText;
+                    ItemLineView := Element.InnerText;
             end;
         end;
     end;

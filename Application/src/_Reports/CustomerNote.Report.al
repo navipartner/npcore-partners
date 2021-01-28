@@ -1,17 +1,9 @@
 report 6014504 "NPR Customer Note"
 {
-    // NPR4.14/TR/20150811  CASE 183284 Output modifications made on report.
-    // NPR5.27/JLK /20161019  CASE 255020 Changes made in rdlc layout and variables changed to be descriptive in ENU
-    // NPR5.36/JLK /20170921  CASE 286803 Increased length variable CompanyAddr to [50]
-    // TM1.39/THRO/20181126  CASE 334644 Replaced Coudeunit 1 by Wrapper Codeunit
-    // NPR5.50/ZESO/201905006 CASE 353382 Remove Reference to Wrapper Codeunit
-    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Customer Note.rdlc';
-
     Caption = 'Customer Note';
     PreviewMode = PrintLayout;
-
     dataset
     {
         dataitem("Customer Repair"; "NPR Customer Repair")
@@ -127,12 +119,7 @@ report 6014504 "NPR Customer Note"
             begin
                 Clear(GlobalDimension1Desc);
                 if ("Customer Repair"."Global Dimension 1 Code") <> '' then
-                    //-#[353382] [353382]
-                    //-TM1.39 [334644]
-                    //GlobalDimension1Desc := SystemEventWrapper.CaptionClassTranslate(CurrReport.LANGUAGE,'1,1,1,,');
-                    //+TM1.39 [334644]
                     GlobalDimension1Desc := CaptionClassTranslate('1,1,1,,');
-                //+#[353382] [353382]
 
                 TelephoneText := '';
                 if "Phone No." <> '' then
@@ -172,24 +159,11 @@ report 6014504 "NPR Customer Note"
 
             trigger OnPreDataItem()
             begin
-                CompanyInformation.Get;
+                CompanyInformation.Get();
                 CompanyInformation.CalcFields(Picture);
             end;
         }
     }
-
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
-        }
-    }
-
     labels
     {
         SerieNoLbl = 'Serial No.:';
@@ -205,35 +179,35 @@ report 6014504 "NPR Customer Note"
     end;
 
     var
-        ReportCap: Label 'Customer Note';
-        Text001: Label 'Repair No.: %1';
-        Text002: Label 'E-mail: ';
-        Text003: Label 'CVR No.: ';
-        Text004: Label 'Telephone: ';
-        Text005: Label 'Fax No.: ';
-        Text006: Label 'Price Incl. VAT';
-        Text007: Label 'Yours sincerely, ';
-        Text008: Label 'Handed In:';
-        Text009: Label 'Est. Completion:';
-        Text010: Label 'Sales Person';
         CompanyInformation: Record "Company Information";
-        FormAdr: Codeunit "Format Address";
-        DebAddress: array[8] of Text[50];
-        AdresseLine: Text[100];
-        AdresseLineCounter: Integer;
-        CompanyAddr: array[8] of Text[50];
-        PriceNotAccepted: Text[100];
         SalesPerson: Record "Salesperson/Purchaser";
-        PriceText: Text[30];
-        GlobalDimension1Desc: Text[80];
-        DotDisplay: Text;
-        StarDisplay: Text;
-        Text012: Label 'For complaints regarding your product, it will be sent for examination by a specialist workshop. Errors will be corrected at no cost for you unless the product shows signs of abuse, shock, moisture damage or excessive wear. You will be notified if any of the above is found.';
-        Text013: Label 'In case of faults/damage caused by misuse or shock/moisture you will be presented with an offer for repair. If you do not want the product repaired, you must pay the cost of the price estimate.';
+        FormAdr: Codeunit "Format Address";
+        AdresseLineCounter: Integer;
+        ReportCap: Label 'Customer Note';
+        Text003: Label 'CVR No.: ';
+        Text002: Label 'E-mail: ';
+        Text009: Label 'Est. Completion:';
+        Text005: Label 'Fax No.: ';
         Text014: Label 'Finished repairs are stored 6 months from arrival';
+        Text012: Label 'For complaints regarding your product, it will be sent for examination by a specialist workshop. Errors will be corrected at no cost for you unless the product shows signs of abuse, shock, moisture damage or excessive wear. You will be notified if any of the above is found.';
         Text015: Label 'For questions regarding your repair you can contact us on %1 or E-mail %2';
-        TelephoneText: Text;
+        Text008: Label 'Handed In:';
+        Text013: Label 'In case of faults/damage caused by misuse or shock/moisture you will be presented with an offer for repair. If you do not want the product repaired, you must pay the cost of the price estimate.';
         Text016: Label 'Mobile:';
+        Text006: Label 'Price Incl. VAT';
+        Text001: Label 'Repair No.: %1';
+        Text010: Label 'Sales Person';
+        Text004: Label 'Telephone: ';
+        Text007: Label 'Yours sincerely, ';
+        DotDisplay: Text;
         MobileText: Text;
+        StarDisplay: Text;
+        TelephoneText: Text;
+        PriceText: Text[30];
+        CompanyAddr: array[8] of Text[50];
+        DebAddress: array[8] of Text[50];
+        GlobalDimension1Desc: Text[80];
+        AdresseLine: Text[100];
+        PriceNotAccepted: Text[100];
 }
 

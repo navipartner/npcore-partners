@@ -1,11 +1,7 @@
 report 6151599 "NPR Crt Inv Put-away/Pick/Mvmt"
 {
-    // NPR5.55/ALST/20200716 CASE 404660 new object created for the task queue
-
-    UsageCategory = None;
     Caption = 'Create Invt. Put-away/Pick/Movement';
     ProcessingOnly = true;
-
     dataset
     {
         dataitem("Warehouse Request"; "Warehouse Request")
@@ -32,7 +28,7 @@ report 6151599 "NPR Crt Inv Put-away/Pick/Mvmt"
                 end;
 
                 if CheckWhseRequest("Warehouse Request") then
-                    CurrReport.Skip;
+                    CurrReport.Skip();
 
                 if ((Type = Type::Inbound) and (WhseActivHeader.Type <> WhseActivHeader.Type::"Invt. Put-away")) or
                    ((Type = Type::Outbound) and ((WhseActivHeader.Type <> WhseActivHeader.Type::"Invt. Pick") and
@@ -45,12 +41,12 @@ report 6151599 "NPR Crt Inv Put-away/Pick/Mvmt"
                     case Type of
                         Type::Inbound:
                             if not CreateInvtPutAway.CheckSourceDoc("Warehouse Request") then
-                                CurrReport.Skip;
+                                CurrReport.Skip();
                         Type::Outbound:
                             if not CreateInvtPickMovement.CheckSourceDoc("Warehouse Request") then
-                                CurrReport.Skip;
+                                CurrReport.Skip();
                     end;
-                    InitWhseActivHeader;
+                    InitWhseActivHeader();
                 end;
 
                 case Type of
@@ -83,35 +79,35 @@ report 6151599 "NPR Crt Inv Put-away/Pick/Mvmt"
                     end;
                     if PrintDocument then
                         InsertTempWhseActivHdr;
-                    Commit;
+                    Commit();
                 end;
             end;
 
             trigger OnPostDataItem()
             var
-                ExpiredItemMessageText: Text[100];
                 Msg: Text;
+                ExpiredItemMessageText: Text[100];
             begin
                 ExpiredItemMessageText := CreateInvtPickMovement.GetExpiredItemMessage;
                 if TempWhseActivHdr.Find('-') then
-                    PrintNewDocuments;
+                    PrintNewDocuments();
 
                 Window.Close;
                 if not SuppressMessagesState then
                     if DocumentCreated then begin
                         if PutAwayCounter > 0 then
-                            AddToText(Msg, StrSubstNo(Text005, WhseActivHeader.Type::"Invt. Put-away", PutAwayCounter, TotalPutAwayCounter));
+                            AddToText(Msg, StrSubstNo(CreatedActivitiesLbl, WhseActivHeader.Type::"Invt. Put-away", PutAwayCounter, TotalPutAwayCounter));
                         if PickCounter > 0 then
-                            AddToText(Msg, StrSubstNo(Text005, WhseActivHeader.Type::"Invt. Pick", PickCounter, TotalPickCounter));
+                            AddToText(Msg, StrSubstNo(CreatedActivitiesLbl, WhseActivHeader.Type::"Invt. Pick", PickCounter, TotalPickCounter));
                         if MovementCounter > 0 then
-                            AddToText(Msg, StrSubstNo(Text005, WhseActivHeader.Type::"Invt. Movement", MovementCounter, TotalMovementCounter));
+                            AddToText(Msg, StrSubstNo(CreatedActivitiesLbl, WhseActivHeader.Type::"Invt. Movement", MovementCounter, TotalMovementCounter));
 
                         if CreatePutAway or CreatePick then
                             Msg += ExpiredItemMessageText;
 
                         Message(Msg);
                     end else begin
-                        Msg := Text004 + ' ' + ExpiredItemMessageText;
+                        Msg := NothingCreatedLbl + ' ' + ExpiredItemMessageText;
                         Message(Msg);
                     end;
             end;
@@ -124,9 +120,9 @@ report 6151599 "NPR Crt Inv Put-away/Pick/Mvmt"
                     SetRange(Type, Type::Outbound);
 
                 Window.Open(
-                  Text001 +
-                  Text002 +
-                  Text003);
+                  CreatingActivitiesLbl +
+                  SourceTypeLbl +
+                  SourceNoLbl);
 
                 DocumentCreated := false;
 
@@ -164,8 +160,8 @@ report 6151599 "NPR Crt Inv Put-away/Pick/Mvmt"
                         trigger OnValidate()
                         begin
                             if CreatePick and CreateMovement then
-                                Error(Text009);
-                            EnableFieldsInPage;
+                                Error(SelectionErr);
+                            EnableFieldsInPage();
                         end;
                     }
                     field(CInvtMvmt; CreateMovement)
@@ -179,8 +175,8 @@ report 6151599 "NPR Crt Inv Put-away/Pick/Mvmt"
                         trigger OnValidate()
                         begin
                             if CreatePick and CreateMovement then
-                                Error(Text009);
-                            EnableFieldsInPage;
+                                Error(SelectionErr);
+                            EnableFieldsInPage();
                         end;
                     }
                     field(PrintDocument; PrintDocument)
@@ -199,10 +195,6 @@ report 6151599 "NPR Crt Inv Put-away/Pick/Mvmt"
             }
         }
 
-        actions
-        {
-        }
-
         trigger OnInit()
         begin
             CreatePickEditable := true;
@@ -211,13 +203,10 @@ report 6151599 "NPR Crt Inv Put-away/Pick/Mvmt"
 
         trigger OnOpenPage()
         begin
-            EnableFieldsInPage;
+            EnableFieldsInPage();
         end;
     }
 
-    labels
-    {
-    }
 
     trigger OnInitReport()
     begin
@@ -232,84 +221,80 @@ report 6151599 "NPR Crt Inv Put-away/Pick/Mvmt"
     trigger OnPreReport()
     begin
         if not CreatePutAway and not (CreatePick or CreateMovement) then
-            Error(Text008);
+            Error(SelectErr);
 
         CreateInvtPickMovement.SetInvtMovement(CreateMovement);
     end;
 
     var
-        WhseActivHeader: Record "Warehouse Activity Header";
         TempWhseActivHdr: Record "Warehouse Activity Header" temporary;
-        CreateInvtPutAway: Codeunit "Create Inventory Put-away";
+        WhseActivHeader: Record "Warehouse Activity Header";
         CreateInvtPickMovement: Codeunit "Create Inventory Pick/Movement";
+        CreateInvtPutAway: Codeunit "Create Inventory Put-away";
         WhseDocPrint: Codeunit "Warehouse Document-Print";
-        Window: Dialog;
-        CreatePutAway: Boolean;
-        CreatePick: Boolean;
-        Text001: Label 'Creating Inventory Activities...\\';
-        Text002: Label 'Source Type     #1##########\';
-        Text003: Label 'Source No.      #2##########';
         CreateMovement: Boolean;
-        DocumentCreated: Boolean;
-        PrintDocument: Boolean;
-        PutAwayCounter: Integer;
-        PickCounter: Integer;
-        MovementCounter: Integer;
-        Text004: Label 'There is nothing to create.';
-        Text005: Label 'Number of %1 activities created: %2 out of a total of %3.';
-        Text006: Label '%1\\%2', Comment = 'No translation needed. Only a new line separator.';
-        Text008: Label 'You must select Create Invt. Put-away, Create Invt. Pick, or Create Invt. Movement.';
-        TotalPutAwayCounter: Integer;
-        TotalPickCounter: Integer;
-        TotalMovementCounter: Integer;
-        ShowError: Boolean;
-        Text009: Label 'You can select either Create Invt. Pick or Create Invt. Movement.';
-        [InDataSet]
-        CreatePickEditable: Boolean;
         [InDataSet]
         CreateMovementEditable: Boolean;
+        CreatePick: Boolean;
+        [InDataSet]
+        CreatePickEditable: Boolean;
+        CreatePutAway: Boolean;
+        DocumentCreated: Boolean;
+        PrintDocument: Boolean;
+        ShowError: Boolean;
         SuppressMessagesState: Boolean;
+        Window: Dialog;
+        MovementCounter: Integer;
+        PickCounter: Integer;
+        PutAwayCounter: Integer;
+        TotalMovementCounter: Integer;
+        TotalPickCounter: Integer;
+        TotalPutAwayCounter: Integer;
+        TextLbl: Label '%1\\%2', Comment = 'No translation needed. Only a new line separator.';
+        CreatingActivitiesLbl: Label 'Creating Inventory Activities...\\';
+        CreatedActivitiesLbl: Label 'Number of %1 activities created: %2 out of a total of %3.', Comment = '%1 = Type of Activities, %2 = Created Activities, %3 = Total Activities';
+        SourceNoLbl: Label 'Source No.      #2##########';
+        SourceTypeLbl: Label 'Source Type     #1##########\';
+        NothingCreatedLbl: Label 'There is nothing to create.';
+        SelectionErr: Label 'You can select either Create Invt. Pick or Create Invt. Movement.';
+        SelectErr: Label 'You must select Create Invt. Put-away, Create Invt. Pick, or Create Invt. Movement.';
 
     local procedure InitWhseActivHeader()
     begin
-        with WhseActivHeader do begin
-            Init;
-            case "Warehouse Request".Type of
-                "Warehouse Request".Type::Inbound:
-                    Type := Type::"Invt. Put-away";
-                "Warehouse Request".Type::Outbound:
-                    if CreatePick then
-                        Type := Type::"Invt. Pick"
-                    else
-                        Type := Type::"Invt. Movement";
-            end;
-            "No." := '';
-            "Location Code" := "Warehouse Request"."Location Code";
+        WhseActivHeader.Init();
+        case "Warehouse Request".Type of
+            "Warehouse Request".Type::Inbound:
+                WhseActivHeader.Type := WhseActivHeader.Type::"Invt. Put-away";
+            "Warehouse Request".Type::Outbound:
+                if CreatePick then
+                    WhseActivHeader.Type := WhseActivHeader.Type::"Invt. Pick"
+                else
+                    WhseActivHeader.Type := WhseActivHeader.Type::"Invt. Movement";
         end;
+        WhseActivHeader."No." := '';
+        WhseActivHeader."Location Code" := "Warehouse Request"."Location Code";
     end;
 
     local procedure InsertTempWhseActivHdr()
     begin
-        TempWhseActivHdr.Init;
+        TempWhseActivHdr.Init();
         TempWhseActivHdr := WhseActivHeader;
-        TempWhseActivHdr.Insert;
+        TempWhseActivHdr.Insert();
     end;
 
     local procedure PrintNewDocuments()
     begin
-        with TempWhseActivHdr do begin
-            repeat
-                case Type of
-                    Type::"Invt. Put-away":
-                        WhseDocPrint.PrintInvtPutAwayHeader(TempWhseActivHdr, true);
-                    Type::"Invt. Pick":
-                        if CreatePick then
-                            WhseDocPrint.PrintInvtPickHeader(TempWhseActivHdr, true)
-                        else
-                            WhseDocPrint.PrintInvtMovementHeader(TempWhseActivHdr, true);
-                end;
-            until Next = 0;
-        end;
+        repeat
+            case TempWhseActivHdr.Type of
+                TempWhseActivHdr.Type::"Invt. Put-away":
+                    WhseDocPrint.PrintInvtPutAwayHeader(TempWhseActivHdr, true);
+                TempWhseActivHdr.Type::"Invt. Pick":
+                    if CreatePick then
+                        WhseDocPrint.PrintInvtPickHeader(TempWhseActivHdr, true)
+                    else
+                        WhseDocPrint.PrintInvtMovementHeader(TempWhseActivHdr, true);
+            end;
+        until TempWhseActivHdr.Next() = 0;
     end;
 
     local procedure CheckWhseRequest(WhseRequest: Record "Warehouse Request"): Boolean
@@ -362,7 +347,7 @@ report 6151599 "NPR Crt Inv Put-away/Pick/Mvmt"
         if OrigText = '' then
             OrigText := Addendum
         else
-            OrigText := StrSubstNo(Text006, OrigText, Addendum);
+            OrigText := StrSubstNo(TextLbl, OrigText, Addendum);
     end;
 
     procedure GetMovementCounters(var MovementsCreated: Integer; var TotalMovementsToBeCreated: Integer)

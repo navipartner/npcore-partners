@@ -1,17 +1,11 @@
 report 6014449 "NPR Vendor trx by Item group"
 {
-    // NPR70.00.00.00/LS  CASE 159377 : Convert Report to NAV 2013
-    // NPR5.38/JLK /20180124  CASE 300892 Removed AL Error on obsolite property CurrReport_PAGENO
-    // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
-    // NPR5.55/BHR /20200219 CASE 361515 Change Key as it's not supported in extension
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Vendor trn. by Item group.rdlc';
-
     Caption = 'Vendor Trn. By Item Group';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
     UseSystemPrinter = true;
-
     dataset
     {
         dataitem(vg; "NPR Item Group")
@@ -160,7 +154,6 @@ report 6014449 "NPR Vendor trx by Item group"
                 if totalsalg <> 0 then
                     pcttot := ("Sales (LCY)" / totalsalg) * 100;
 
-                //-NPR70.00.00.00
                 TotalPurchaseLCY += "Purchases (LCY)";
                 TotalPurchaseQty += "Purchases (Qty.)";
                 TotalSaleLCY += "Sales (LCY)";
@@ -168,7 +161,6 @@ report 6014449 "NPR Vendor trx by Item group"
                 TotalConsumptionAmt += "Consumption (Amount)";
                 TotalProfitLCY := (TotalSaleLCY - TotalConsumptionAmt);
                 Totaldg := ((TotalSaleLCY - TotalConsumptionAmt) / TotalSaleLCY) * 100;
-                //+NPR70.00.00.00
             end;
 
             trigger OnPreDataItem()
@@ -177,12 +169,7 @@ report 6014449 "NPR Vendor trx by Item group"
                 CopyFilter("Date Filter", valueentry."Posting Date");
 
                 CopyFilter("Vendor Filter", valueentry."NPR Vendor No.");
-                //-NPR5.55 [361515]
-                //valueentry.SETCURRENTKEY("Item No.","Posting Date","Item Ledger Entry Type","Entry Type","Item Charge No.",
-                //"Location Code","Variant Code","Global Dimension 1 Code",
-                //"Global Dimension 2 Code","Vendor No.");
                 valueentry.SetCurrentKey("Item No.", "Posting Date", "Item Ledger Entry Type", "Entry Type", "Variance Type", "Item Charge No.", "Location Code", "Variant Code");
-                //+NPR5.55 [361515]
                 CopyFilter("Date Filter", valueentry."Posting Date");
                 valueentry.SetRange("Item Ledger Entry Type", valueentry."Item Ledger Entry Type"::Sale);
                 valueentry.CalcSums("Sales Amount (Actual)");
@@ -195,10 +182,6 @@ report 6014449 "NPR Vendor trx by Item group"
                     slutdato := CalcDate('<-1Y>', vg.GetRangeMax("Date Filter"));
                     varegruppefjor.SetRange("Date Filter", startdato, slutdato);
                 end;
-
-                //-NPR5.39
-                //CurrReport.CREATETOTALS("Sales (Qty.)","Purchases (LCY)");
-                //+NPR5.39
             end;
         }
         dataitem(Totals; "Integer")
@@ -251,9 +234,6 @@ report 6014449 "NPR Vendor trx by Item group"
             }
         }
 
-        actions
-        {
-        }
     }
 
     labels
@@ -278,40 +258,34 @@ report 6014449 "NPR Vendor trx by Item group"
 
     trigger OnInitReport()
     begin
-        firmaoplysninger.Get;
+        firmaoplysninger.Get();
         firmaoplysninger.CalcFields(Picture);
         visudensalg := false;
-
-        //-NPR5.39
-        // objekt.SETRANGE(ID, 6014449);
-        // objekt.SETRANGE(Type, 3);
-        // objekt.FIND('-');
-        //+NPR5.39
     end;
 
     var
         firmaoplysninger: Record "Company Information";
-        dg: Decimal;
-        visudensalg: Boolean;
-        valueentry: Record "Value Entry";
-        totalsalg: Decimal;
-        pcttot: Decimal;
-        varegruppefjor: Record "NPR Item Group";
-        startdato: Date;
-        slutdato: Date;
-        varesalgfjor: Decimal;
-        pctvaresalgfjor: Decimal;
         vareposter: Record "Item Ledger Entry";
-        negatedQuantity: Decimal;
+        varegruppefjor: Record "NPR Item Group";
         vgvendor: Record "NPR Item Group";
-        varekobfjor: Decimal;
+        valueentry: Record "Value Entry";
+        visudensalg: Boolean;
+        slutdato: Date;
+        startdato: Date;
+        dg: Decimal;
         dgItemGrp: Decimal;
+        negatedQuantity: Decimal;
+        pcttot: Decimal;
+        pctvaresalgfjor: Decimal;
+        TotalConsumptionAmt: Decimal;
+        Totaldg: Decimal;
+        TotalProfitLCY: Decimal;
         TotalPurchaseLCY: Decimal;
         TotalPurchaseQty: Decimal;
         TotalSaleLCY: Decimal;
         TotalSaleQty: Decimal;
-        TotalConsumptionAmt: Decimal;
-        TotalProfitLCY: Decimal;
-        Totaldg: Decimal;
+        totalsalg: Decimal;
+        varekobfjor: Decimal;
+        varesalgfjor: Decimal;
 }
 

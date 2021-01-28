@@ -1,15 +1,8 @@
 report 6060126 "NPR TM Admission List"
 {
-    // TM1.13/BRI/20160419 CASE 239055 Initial Version of Attendance Report
-    // #334163/JDH /20181109 CASE 334163 Added Caption to object
-    // TM1.39/NPKNAV/20190125  CASE 343941 Transport TM1.39 - 25 January 2019
-    // TM1.42/TSA /20190610 CASE 357991 Removed PAGENO field for AL convert
-    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/TM Admission List.rdlc';
-
     Caption = 'TM Admission List';
-
     dataset
     {
         dataitem("TM Admission"; "NPR TM Admission")
@@ -88,7 +81,7 @@ report 6060126 "NPR TM Admission List"
                             if not ((ShowOpenReservations and (Type = Type::RESERVATION) and Open) or
                               (ShowOpenAdmitted and (Type = Type::ADMITTED) and Open) or
                               (ShowDeparted and (Type = Type::DEPARTED) and (not Open))) then
-                                CurrReport.Skip;
+                                CurrReport.Skip();
                             AccessName := TxtUnknown;
                             AccessEmail := TxtUnknown;
                             AccessPhone := TxtUnknown;
@@ -99,19 +92,19 @@ report 6060126 "NPR TM Admission List"
                                     //Member found
                                     if ShowEachMemberOnce then begin
                                         if TempMMMember.Get(MMMember."Entry No.") then
-                                            CurrReport.Skip;
+                                            CurrReport.Skip();
                                         TempMMMember."Entry No." := MMMember."Entry No.";
-                                        TempMMMember.Insert;
+                                        TempMMMember.Insert();
                                     end;
                                     AccessName := StrSubstNo('%3, %1 %2', MMMember."First Name", MMMember."Middle Name", MMMember."Last Name");
                                     AccessEmail := MMMember."E-Mail Address";
                                     AccessPhone := MMMember."Phone No.";
                                 end else
                                     if not ShowTicketsWithoutMembers then
-                                        CurrReport.Skip;
+                                        CurrReport.Skip();
                             end else
                                 if not ShowTicketsWithoutMembers then
-                                    CurrReport.Skip;
+                                    CurrReport.Skip();
                         end;
                     }
 
@@ -170,32 +163,24 @@ report 6060126 "NPR TM Admission List"
                 }
             }
         }
-
-        actions
-        {
-        }
-    }
-
-    labels
-    {
     }
 
     var
+        MMMember: Record "NPR MM Member";
         TempMMMember: Record "NPR MM Member" temporary;
         TMTicket: Record "NPR TM Ticket";
-        MMMember: Record "NPR MM Member";
-        ShowOpenReservations: Boolean;
-        ShowOpenAdmitted: Boolean;
         ShowDeparted: Boolean;
-        ShowTicketsWithoutMembers: Boolean;
         ShowEachMemberOnce: Boolean;
-        AccessName: Text;
-        AccessEmail: Text;
-        AccessPhone: Text;
+        ShowOpenAdmitted: Boolean;
+        ShowOpenReservations: Boolean;
+        ShowTicketsWithoutMembers: Boolean;
+        EndDateTime: DateTime;
+        StartDateTime: DateTime;
         Admissions___ListCaptionLbl: Label 'Admissions - List';
         CurrReport_PAGENOCaptionLbl: Label 'Page';
         TxtUnknown: Label 'Unknown';
-        StartDateTime: DateTime;
-        EndDateTime: DateTime;
+        AccessEmail: Text;
+        AccessName: Text;
+        AccessPhone: Text;
 }
 

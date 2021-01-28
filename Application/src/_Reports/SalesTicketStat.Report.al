@@ -1,28 +1,10 @@
 report 6014409 "NPR Sales Ticket Stat."
 {
-    // NPR70.00.00.00/LS CASE 156110 : Convert Report to NAV 2013
-    // NPR4.16/TR/20140723  CASE 184250 : Report layout edited such that it fits a receip (epson 4). Report created for previewing - but does also fit receip size if printed on epson.
-    // NPR4.16/TS/20151020  CASE 222088 Changed Layout on Reports
-    // NPR5.26/LS/20151202  CASE 224592 : Corrected Report + Layout/Figures/labels
-    //                                       Changed Report name/caption/label name from Sale Statistics to Sales Ticket Statistics
-    //                                       This is the receipt Layout
-    // NPR5.30/JLK /20170127  CASE 228985 Modified Item Lines, Item Lines/Sales Qty and Percentage calculation
-    // NPR5.31/JLK /20170411  CASE 271517 Added Register Filter
-    // NPR5.35/KENU/20170803  CASE 285732 Used "Register Filter" instead of "Register No."
-    // NPR5.35/KENU/20170824  CASE 287897 Modified calculation
-    // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
-    // NPR5.40/TSA /20180327 CASE 301544 Dereferenced cu 6014452 from OnInitReport and OnPreReport
-    // NPR5.42/BHR /20180516 CASE 315147 Set datefilter to curent workdate
-    // NPR5.55/YAHA/20191129 CASE 376369 Addnig a new section called Adjust Cost
-    // NPR5.55/ZESO/20200505 CASE 398134 Calculate Click and Collect Sales + Remove from Debit Sale Value
-    // NPR5.55/ANPA/20200505 CASE 402923 Removed ':' from ProfitExcVat_Caption
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/NPR Sales Ticket Statistics.rdlc';
-
     Caption = 'Sale Statistics';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
-
     dataset
     {
         dataitem(PaymentTypePeriod; "NPR Payment Type POS")
@@ -165,42 +147,19 @@ report 6014409 "NPR Sales Ticket Stat."
 
                 trigger OnAfterGetRecord()
                 begin
-                    //-NPK1.01
-                    //Profit_LCY2_Amt := "Pct."((PaymentLastYr."Norm sales in audit ex VAT"+PaymentLastYr."Debit sales in audit ex VAT")-(PaymentLastYr."Cost amount in audit roll"+PaymentLastYr."Debit cost amount audit roll")
-                    //,(PaymentLastYr."Norm sales in audit ex VAT"+PaymentLastYr."Debit sales in audit ex VAT"));
-
                     Profit_LCY2_Amt := (PaymentLastYr."Norm. Sales in Audit Excl. VAT" + PaymentLastYr."Debit Sales in Audit Excl. VAT") - (PaymentLastYr."Cost Amount in Audit Roll" + PaymentLastYr."Debit Cost Amount Audit Roll");
-                    //-NPR5.55 [376369]
                     Profit_LCY3_Amt := (PaymentLastYr."Norm. Sales in Audit Excl. VAT" + PaymentLastYr."Debit Sales in Audit Excl. VAT") - (PaymentLastYr."Cost Amount in Audit Roll" + PaymentLastYr."Debit Cost Amount Audit Roll");
-                    //+NPR5.55 [376369]
-
-
                     Profit_LCY2_Pct := "Pct."((PaymentLastYr."Norm. Sales in Audit Excl. VAT" + PaymentLastYr."Debit Sales in Audit Excl. VAT") - (PaymentLastYr."Cost Amount in Audit Roll" + PaymentLastYr."Debit Cost Amount Audit Roll")
                     , (PaymentLastYr."Norm. Sales in Audit Excl. VAT" + PaymentLastYr."Debit Sales in Audit Excl. VAT"));
-
-                    //-NPR5.55 [376369]
                     Profit_LCY3_Amt := "Pct."((PaymentLastYr."Norm. Sales in Audit Excl. VAT" + PaymentLastYr."Debit Sales in Audit Excl. VAT") - (PaymentLastYr."Cost Amount in Audit Roll" + PaymentLastYr."Debit Cost Amount Audit Roll")
                     , (PaymentLastYr."Norm. Sales in Audit Excl. VAT" + PaymentLastYr."Debit Sales in Audit Excl. VAT"));
-                    //+NPR5.55 [376369]
-
-
 
                     SalesExVatLYr := (PaymentLastYr."Norm. Sales in Audit Excl. VAT" + PaymentLastYr."Debit Sales in Audit Excl. VAT");
-                    //+NPK1.01
-
-                    //-NPR5.30
                     Clear(NoOfItemsInAuditRollLastYr);
                     AuditRollLastYr.SetFilter("Sale Date", GetFilter("Date Filter"));
-                    //-NPR5.31
-                    //AuditRollLastYr.SETFILTER("Register No.","Register No.");
-                    //-NPR5.32
                     AuditRollLastYr.SetFilter("Register No.", GetFilter("Register Filter"));
-                    //+NPR5.32
-                    //-NPR5.31
                     AuditRollLastYr.SetRange(Type, AuditRoll.Type::Item);
                     NoOfItemsInAuditRollLastYr := AuditRollLastYr.Count;
-                    //+NPR5.30
-                    //-NPR5.55 [398134]
                     varDebitSalesLastYr := 0;
 
                     DebitAmtQuery.SetRange(Sale_Date_Filter, StartDate, EndDate);
@@ -213,17 +172,14 @@ report 6014409 "NPR Sales Ticket Stat."
                     DebitAmtQuery.SetFilter(Shortcut_Dim_1_Code_Filter, GetFilter("Global Dimension Code 1 Filter"));
                     DebitAmtQuery.SetFilter(Shortcut_Dim_2_Code_Filter, GetFilter("Global Dimension Code 2 Filter"));
                     DebitAmtQuery.SetFilter(Sales_Ticket_No_Filter, GetFilter("Receipt Filter"));
-
-
                     DebitAmtQuery.Open;
                     while DebitAmtQuery.Read do begin
-                        ArchDocument.Reset;
+                        ArchDocument.Reset();
                         ArchDocument.SetRange("Delivery Document Type", ArchDocument."Delivery Document Type"::"POS Entry");
                         ArchDocument.SetRange("Delivery Document No.", DebitAmtQuery.Sales_Ticket_No);
-                        if ArchDocument.FindFirst then
+                        if ArchDocument.FindFirst() then
                             varDebitSalesLastYr += DebitAmtQuery.Amount_Including_VAT;
                     end;
-                    //-NPR5.55 [398134]
                 end;
 
                 trigger OnPreDataItem()
@@ -255,17 +211,11 @@ report 6014409 "NPR Sales Ticket Stat."
 
             trigger OnAfterGetRecord()
             begin
-
-                //-NPR5.30
                 Clear(NoOfItemsInAuditRoll);
                 AuditRoll.SetFilter("Sale Date", GetFilter("Date Filter"));
-                //-NPR5.31
                 AuditRoll.SetFilter("Register No.", GetFilter("Register Filter"));
-                //-NPR5.31
                 AuditRoll.SetRange(Type, AuditRoll.Type::Item);
                 NoOfItemsInAuditRoll := AuditRoll.Count;
-                //+NPR5.30
-                //-NPR5.55 [398134]
                 varDebitSales := 0;
                 if PaymentTypePeriod.GetFilter("Date Filter") = '' then
                     DebitAmtQuery.SetFilter(Sale_Date_Filter, '%1', WorkDate)
@@ -280,42 +230,32 @@ report 6014409 "NPR Sales Ticket Stat."
                 DebitAmtQuery.SetFilter(Shortcut_Dim_1_Code_Filter, GetFilter("Global Dimension Code 1 Filter"));
                 DebitAmtQuery.SetFilter(Shortcut_Dim_2_Code_Filter, GetFilter("Global Dimension Code 2 Filter"));
                 DebitAmtQuery.SetFilter(Sales_Ticket_No_Filter, GetFilter("Receipt Filter"));
-
-
                 DebitAmtQuery.Open;
                 while DebitAmtQuery.Read do begin
-                    ArchDocument.Reset;
+                    ArchDocument.Reset();
                     ArchDocument.SetRange("Delivery Document Type", ArchDocument."Delivery Document Type"::"POS Entry");
                     ArchDocument.SetRange("Delivery Document No.", DebitAmtQuery.Sales_Ticket_No);
                     if ArchDocument.FindFirst then
                         varDebitSales += DebitAmtQuery.Amount_Including_VAT;
                 end;
-                //-NPR5.55 [398134]
             end;
 
             trigger OnPreDataItem()
             begin
                 if PaymentTypePeriod.GetFilter("Date Filter") = '' then
-                    //-NPR5.42 [315147]
-                    //ERROR(Trans0001);
                     PaymentTypePeriod.SetFilter("Date Filter", '%1', WorkDate);
-                //+NPR5.42 [315147]
-
-                //-NPR5.55 [376369]
                 StartDateAdj := (PaymentTypePeriod.GetRangeMin("Date Filter"));
                 EndDate := (PaymentTypePeriod.GetRangeMax("Date Filter"));
 
                 ILEntry.SetFilter("Posting Date", '%1..%2', PaymentTypePeriod.GetRangeMin("Date Filter"), PaymentTypePeriod.GetRangeMax("Date Filter"));
                 ILEntry.SetRange("Entry Type", ILEntry."Entry Type"::Sale);
                 ILEntry.SetRange("Document Type", ILEntry."Document Type"::" ");
-
-                if ILEntry.FindSet then begin
+                if ILEntry.FindSet() then begin
                     repeat
                         ILEntry.CalcFields("Cost Amount (Actual)");
                         SumOfILELineCurrentYear += ILEntry."Cost Amount (Actual)";
-                    until ILEntry.Next = 0;
+                    until ILEntry.Next() = 0;
                 end;
-                //+NPR5.55 [376369]
             end;
         }
         dataitem("Salesperson/Purchaser"; "Salesperson/Purchaser")
@@ -385,9 +325,6 @@ report 6014409 "NPR Sales Ticket Stat."
                 DebitAmt := PaymentTypePOS."Debit Sale in Audit Roll";
                 Total := OrdinarySale + DebitAmt;
                 ekspTotal := (PaymentTypePOS."No. of Sales in Audit Roll" + PaymentTypePOS."No. of Deb. Sales in Aud. Roll");
-
-
-                //-NPR70.00.00.00/LS
                 Eksp1 := 0;
                 Debit1 := 0;
                 Sale1 := 0;
@@ -395,19 +332,15 @@ report 6014409 "NPR Sales Ticket Stat."
                 Debit1 := PaymentTypePOS."Debit Sale in Audit Roll";
                 Sale1 := PaymentTypePOS."Normal Sale in Audit Roll";
 
-                if PaymentTypePOS."No. of Sales in Audit Roll" <> 0 then begin
-                    //-NPR5.35
-                    //AverageAmt := PaymentTypePOS."Normal Sale in Audit Roll" / PaymentTypePOS."No. of Sales in Audit Roll";
+                if PaymentTypePOS."No. of Sales in Audit Roll" <> 0 then
                     AverageAmt := Total / Eksp1;
-                    //+NPR5.35
-                end;
 
                 NormalSaleWithoutSalesperson := 0;
                 DebitSaleWithoutSalesperson := 0;
                 TotalSaleWithoutSalesperson := 0;
                 ekspWithoutSalesperson := 0;
 
-                PaymentTypePOSTotal.Reset;
+                PaymentTypePOSTotal.Reset();
                 Clear(PaymentTypePOSTotal);
 
                 PaymentTypePOSTotal.SetRange("Salesperson Filter", '');
@@ -420,16 +353,12 @@ report 6014409 "NPR Sales Ticket Stat."
                 Eksp3 := ekspWithoutSalesperson + ekspTotal;
                 Sale3 := OrdinarySale + NormalSaleWithoutSalesperson;
                 Credit3 := DebitAmt + DebitSaleWithoutSalesperson;
-                //+NPR70.00.00.00/LS
             end;
 
             trigger OnPreDataItem()
             begin
                 PaymentTypePeriod.CopyFilter("Date Filter", PaymentTypePOS."Date Filter");
                 PaymentTypePeriod.CopyFilter("Register Filter", PaymentTypePOS."Register Filter");
-                //-NPR5.39
-                //CurrReport.CREATETOTALS(OrdinarySale,DebitAmt,Total,ekspTotal);
-                //+CNPR5.39
                 Clear(Total);
                 Clear(OrdinarySale);
                 Clear(DebitAmt);
@@ -686,10 +615,6 @@ report 6014409 "NPR Sales Ticket Stat."
                 }
             }
         }
-
-        actions
-        {
-        }
     }
 
     labels
@@ -743,83 +668,68 @@ report 6014409 "NPR Sales Ticket Stat."
 
     trigger OnInitReport()
     begin
-        //-NPR5.55 [376369]
         ShowAdj := false;
-        //+NPR5.55 [376369]
     end;
 
     trigger OnPreReport()
     begin
-        //-NPR5.42 [315147]
-        //IF PaymentTypePeriod.GETFILTER("Date Filter")='' THEN
-        //    ERROR(Trans0001);
-        //+NPR5.42 [315147]
         CompanyInformation.Get();
         CompanyInformation.CalcFields(Picture);
-
-        //-NPR5.39
-        // Object.SETRANGE(ID, 6014409);
-        // Object.SETRANGE(Type, 3);
-        // Object.FIND('-');
-        //+NPR5.39
     end;
 
     var
         CompanyInformation: Record "Company Information";
-        StartDate: Date;
-        EndDate: Date;
+        ILEntry: Record "Item Ledger Entry";
+        AuditRoll: Record "NPR Audit Roll";
+        AuditRollLastYr: Record "NPR Audit Roll";
+        ArchDocument: Record "NPR NpCs Arch. Document";
         PaymentTypePOS: Record "NPR Payment Type POS";
-        Total: Decimal;
-        DebitAmt: Decimal;
-        OrdinarySale: Decimal;
-        NormalSaleWithoutSalesperson: Decimal;
-        DebitSaleWithoutSalesperson: Decimal;
-        TotalSaleWithoutSalesperson: Decimal;
-        ekspWithoutSalesperson: Decimal;
-        ekspTotal: Decimal;
+        PaymentTypePOSTotal: Record "NPR Payment Type POS";
+        DebitAmtQuery: Query "NPR ClickNCollectSales_Stats";
         CompareDay: Boolean;
         CompareNearestDate: Boolean;
-        WeekDay: Integer;
-        Week: Integer;
-        Year: Integer;
+        ShowAdj: Boolean;
+        EndDate: Date;
+        EndDateAdj: Date;
+        StartDate: Date;
+        StartDateAdj: Date;
         AverageAmt: Decimal;
-        Eksp1: Decimal;
-        Debit1: Decimal;
-        Sale1: Decimal;
-        Eksp3: Decimal;
-        Sale3: Decimal;
         Credit3: Decimal;
-        PaymentTypePOSTotal: Record "NPR Payment Type POS";
+        Debit1: Decimal;
+        DebitAmt: Decimal;
+        DebitSaleWithoutSalesperson: Decimal;
+        Eksp1: Decimal;
+        Eksp3: Decimal;
+        ekspTotal: Decimal;
+        ekspWithoutSalesperson: Decimal;
+        NoOfItemsInAuditRoll: Decimal;
+        NoOfItemsInAuditRollLastYr: Decimal;
+        NormalSaleWithoutSalesperson: Decimal;
+        OrdinarySale: Decimal;
         Profit_LCY2_Amt: Decimal;
         Profit_LCY2_Pct: Decimal;
-        SalesExVatLYr: Decimal;
-        NoOfItemsInAuditRoll: Decimal;
-        AuditRoll: Record "NPR Audit Roll";
-        NoOfItemsInAuditRollLastYr: Decimal;
-        AuditRollLastYr: Record "NPR Audit Roll";
-        ILEntry: Record "Item Ledger Entry";
-        SumOfILECost: Decimal;
-        SumOfILELineCurrentYear: Decimal;
-        SumOfILELinePreviousYear: Integer;
         Profit_LCY3_Amt: Decimal;
         Profit_LCY3_Pct: Decimal;
-        ShowAdj: Boolean;
-        StartDateAdj: Date;
-        EndDateAdj: Date;
-        DebitAmtQuery: Query "NPR ClickNCollectSales_Stats";
+        Sale1: Decimal;
+        Sale3: Decimal;
+        SalesExVatLYr: Decimal;
+        SumOfILECost: Decimal;
+        SumOfILELineCurrentYear: Decimal;
+        Total: Decimal;
+        TotalSaleWithoutSalesperson: Decimal;
         varDebitSales: Decimal;
-        ArchDocument: Record "NPR NpCs Arch. Document";
         varDebitSalesLastYr: Decimal;
+        SumOfILELinePreviousYear: Integer;
+        Week: Integer;
+        WeekDay: Integer;
+        Year: Integer;
         Trans0001: Label 'Please specify date range!';
 
     local procedure "Pct."(Tal1: Decimal; Tal2: Decimal): Decimal
     begin
         if Tal2 = 0 then
             exit(0);
-        //-NPR5.30
-        //EXIT(ROUND(Tal1 / Tal2 * 100,0.1));
         exit(Tal1 / Tal2 * 100);
-        //+NPR5.30
     end;
 
     procedure Divider("Tal 1": Decimal; "Tal 2": Decimal): Decimal

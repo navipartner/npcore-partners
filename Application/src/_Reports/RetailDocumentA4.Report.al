@@ -1,13 +1,10 @@
 report 6014486 "NPR Retail Document A4"
 {
-    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Retail Document A4.rdlc';
-
     Caption = 'Retail Document A4';
     UseRequestPage = true;
     UseSystemPrinter = true;
-
     dataset
     {
         dataitem("Retail Document Header"; "NPR Retail Document Header")
@@ -274,19 +271,19 @@ report 6014486 "NPR Retail Document A4"
             trigger OnAfterGetRecord()
             var
                 Country: Record "Country/Region";
-                ShipmentMethod: Record "Shipment Method";
-                Retailcomments: Record "NPR Retail Comment";
                 POSStore: Record "NPR POS Store";
                 POSUnit: Record "NPR POS Unit";
-                POSSession: Codeunit "NPR POS Session";
+                Retailcomments: Record "NPR Retail Comment";
+                ShipmentMethod: Record "Shipment Method";
                 POSFrontEnd: Codeunit "NPR POS Front End Management";
+                POSSession: Codeunit "NPR POS Session";
                 POSSetup: Codeunit "NPR POS Setup";
                 i: Integer;
-                t001: Label 'Week';
-                t002: Label 'Prices are incl. VAT';
-                t003: Label 'Prices are ex. VAT';
-                t004: Label 'Att.';
                 t005: Label '(Cashed)';
+                t004: Label 'Att.';
+                t003: Label 'Prices are ex. VAT';
+                t002: Label 'Prices are incl. VAT';
+                t001: Label 'Week';
             begin
                 DocType := (Format("Retail Document Header"."Document Type"));
 
@@ -294,7 +291,6 @@ report 6014486 "NPR Retail Document A4"
                 TotalVAT := 0;
 
                 // SHIPPING
-
                 Debadr[1] := "Ship-to Name";
                 Debadr[2] := "Ship-to Address";
                 Debadr[3] := "Ship-to Address 2";
@@ -308,7 +304,6 @@ report 6014486 "NPR Retail Document A4"
                 CompressArray(Debadr);
 
                 // INVOICING
-
                 InvoiceCustomer[1] := Name;
                 InvoiceCustomer[2] := Address;
                 InvoiceCustomer[3] := "Address 2";
@@ -452,18 +447,6 @@ report 6014486 "NPR Retail Document A4"
         }
     }
 
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
-        }
-    }
-
     labels
     {
         Customer_Caption = 'Customer No.';
@@ -506,57 +489,57 @@ report 6014486 "NPR Retail Document A4"
 
     trigger OnPreReport()
     begin
-        if NPK.Get then;
+        if NPK.Get() then;
         Udbetaling_check := false;
-        Firmaoplysninger.Get;
+        Firmaoplysninger.Get();
         Firmaoplysninger.CalcFields(Picture);
     end;
 
     var
-        Udbetaling_check: Boolean;
-        DeliveryItem: Boolean;
+        Firmaoplysninger: Record "Company Information";
+        GLSetup: Record "General Ledger Setup";
+        Language: Record Language;
+        Kasse: Record "NPR Register";
+        NPK: Record "NPR Retail Setup";
+        PaymentTerms: Record "Payment Terms";
+        Resource: Record Resource;
+        SalesPerson: Record "Salesperson/Purchaser";
+        Vendor: Record Vendor;
         RetailFormCode: Codeunit "NPR Retail Form Code";
-        Depositactual: Decimal;
-        TotalVAT: Decimal;
+        DeliveryItem: Boolean;
+        ShowBody2: Boolean;
+        Udbetaling_check: Boolean;
         DeliveryTotal: Decimal;
+        Depositactual: Decimal;
         TotalAmount: Decimal;
         TotalAmountVAT: Decimal;
-        TotalVATBaseAmount: Decimal;
-        TotalPaidVAT: Decimal;
         TotalPaidCash: Decimal;
         TotalPaidDebit: Decimal;
-        NPK: Record "NPR Retail Setup";
-        Kasse: Record "NPR Register";
-        SalesPerson: Record "Salesperson/Purchaser";
-        Firmaoplysninger: Record "Company Information";
-        Resource: Record Resource;
-        PaymentTerms: Record "Payment Terms";
-        GLSetup: Record "General Ledger Setup";
-        Vendor: Record Vendor;
-        Language: Record Language;
-        TotalInclVATText: Text[30];
-        TotalExclVATText: Text[30];
-        InvoiceCustomer: array[8] of Text[30];
-        TxtShipmentCode: Text[100];
-        TxtInclVAT: Text[100];
-        DocType: Text[50];
-        TxtDiscountPct: Text[30];
-        Firmanavn: array[10] of Text[30];
-        Debadr: array[8] of Text[30];
-        Dow: Text[10];
-        TxtWoy: Text[30];
-        TxtDeliveryType: Text[50];
-        Bem: array[10] of Text[50];
-        TxtCashed: Text[30];
-        MonTXT: Label 'Monday';
-        TueTXT: Label 'Tuesday';
-        WedTXT: Label 'Wednesday';
-        ThuTXT: Label 'Thursday';
+        TotalPaidVAT: Decimal;
+        TotalVAT: Decimal;
+        TotalVATBaseAmount: Decimal;
         FriTXT: Label 'Friday';
+        MonTXT: Label 'Monday';
         SatTXT: Label 'Saturday';
         SunTXT: Label 'Saturday';
-        Text002: Label 'Total %1 Incl. VAT';
+        ThuTXT: Label 'Thursday';
         Text006: Label 'Total %1 Excl. VAT';
-        ShowBody2: Boolean;
+        Text002: Label 'Total %1 Incl. VAT';
+        TueTXT: Label 'Tuesday';
+        WedTXT: Label 'Wednesday';
+        Dow: Text[10];
+        Debadr: array[8] of Text[30];
+        Firmanavn: array[10] of Text[30];
+        InvoiceCustomer: array[8] of Text[30];
+        TotalExclVATText: Text[30];
+        TotalInclVATText: Text[30];
+        TxtCashed: Text[30];
+        TxtDiscountPct: Text[30];
+        TxtWoy: Text[30];
+        Bem: array[10] of Text[50];
+        DocType: Text[50];
+        TxtDeliveryType: Text[50];
+        TxtInclVAT: Text[100];
+        TxtShipmentCode: Text[100];
 }
 
