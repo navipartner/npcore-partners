@@ -1,14 +1,7 @@
 report 6014418 "NPR Item Group Stat M/Y"
 {
-    // NPR5.29/TR  /20161104  CASE 247166 Report Created
-    // NPR5.43/EMGO/20180628  CASE 320173 Add FILTERGROUP to SubItemGroup, to be able to sort by No in Request page.
-    // NPR5.45/EMGO/20180808  CASE 320911 Changed the sorting of the SubItemGroups
-    // NPR5.45/MITH/20180828  CASE 320911 Modified the layout and toggled the "PrintOnlyIfDetails" for the two Item Groups
-    // NPR5.48/ZESO/20181211  CASE 336370 Added Salesperson Code filter.
-    // NPR5.48/TS  /20190122  CASE 343216 Added Date Filter
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Item Group Stat MY.rdlc';
-
     Caption = 'Item Group Statistic M/Y';
     PreviewMode = PrintLayout;
     UsageCategory = ReportsAndAnalysis;
@@ -113,22 +106,20 @@ report 6014418 "NPR Item Group Stat M/Y"
                             if Quantity > 0 then begin
                                 ShowMainItemGroup := true;
                                 LastYearDBDKK := (Amount - Cost);
-                                TMPItem.Init;
+                                TMPItem.Init();
                                 TMPItem."No." := "Sales Ticket No.";
                                 TMPItem."NPR Item Group" := "Item Group";
                                 if TMPItem.Insert then
                                     EkspeditLastYear := 1;
                             end else
-                                CurrReport.Skip;
+                                CurrReport.Skip();
                         end;
 
                         trigger OnPreDataItem()
                         begin
                             SetRange("Item Group", ItemGroupNo);
                             SetFilter("Sale Date", '%1..%2', StartDateLastYear, EndDateLastYear);
-                            //-NPR5.48 [336370]
                             SetFilter("Salesperson Code", Salesperson.Code);
-                            //+NPR5.48 [336370]
                         end;
                     }
                     dataitem(CurrentYearAuditRoll_sub; "NPR Audit Roll")
@@ -161,29 +152,27 @@ report 6014418 "NPR Item Group Stat M/Y"
                             if Quantity > 0 then begin
                                 ShowMainItemGroup := true;
                                 CurrentYearDBDKK := (Amount - Cost);
-                                TMPItem2.Init;
+                                TMPItem2.Init();
                                 TMPItem2."No." := "Sales Ticket No.";
                                 TMPItem2."NPR Item Group" := "Item Group";
-                                if TMPItem2.Insert then
+                                if TMPItem2.Insert() then
                                     EkspeditCurrentYear := 1;
                             end else
-                                CurrReport.Skip;
+                                CurrReport.Skip();
                         end;
 
                         trigger OnPreDataItem()
                         begin
                             SetRange("Item Group", ItemGroupNo);
                             SetFilter("Sale Date", '%1..%2', StartDate, EndDate);
-                            //-NPR5.48 [336370]
                             SetFilter("Salesperson Code", Salesperson.Code);
-                            //+NPR5.48 [336370]
                         end;
                     }
 
                     trigger OnAfterGetRecord()
                     begin
                         if ("No." <> MainItemGroup."No.") and (Level = 1) then
-                            CurrReport.Break;
+                            CurrReport.Break();
                         ShowItemGroup := MainItemGroup."No." <> "No.";
                         ItemGroupNo := "No.";
                     end;
@@ -191,9 +180,7 @@ report 6014418 "NPR Item Group Stat M/Y"
                     trigger OnPreDataItem()
                     begin
                         SetCurrentKey("No.");
-                        //-NPR5.43 [320173]
                         SubItemGroup.FilterGroup(10);
-                        //+NPR5.43 [320173]
                         SetFilter("No.", '>=%1', MainItemGroup."No.");
                     end;
                 }
@@ -206,7 +193,7 @@ report 6014418 "NPR Item Group Stat M/Y"
 
             trigger OnPreDataItem()
             begin
-                CompanyInfo.Get;
+                CompanyInfo.Get();
             end;
         }
     }
@@ -247,10 +234,6 @@ report 6014418 "NPR Item Group Stat M/Y"
                     }
                 }
             }
-        }
-
-        actions
-        {
         }
     }
 
@@ -303,34 +286,30 @@ report 6014418 "NPR Item Group Stat M/Y"
     end;
 
     var
-        Month: Integer;
-        Year: Integer;
-        StartDate: Date;
-        EndDate: Date;
-        DateComparison: Boolean;
-        StartDateLastYear: Date;
-        EndDateLastYear: Date;
-        EkspeditLastYear: Decimal;
-        EkspeditCurrentYear: Decimal;
+        CompanyInfo: Record "Company Information";
         TMPItem: Record Item temporary;
         TMPItem2: Record Item temporary;
-        LastYearDBDKK: Decimal;
-        CurrentYearDBDKK: Decimal;
-        LastYearDBPercent: Decimal;
-        CurrentYearDBPercent: Decimal;
-        ReportName: Label 'Item Group Statistics';
-        PageNo: Label 'Page No';
-        CompanyInfo: Record "Company Information";
-        ShowSubGroups: Boolean;
+        Salesperson: Record "Salesperson/Purchaser";
+        DateComparison: Boolean;
         EndDateCalculated: Boolean;
-        TotalSales: Label 'Total Sales';
-        ItemGroupNo: Code[20];
         ShowItemGroup: Boolean;
         ShowMainItemGroup: Boolean;
-        Salesperson: Record "Salesperson/Purchaser";
-
-    local procedure ClearTotals()
-    begin
-    end;
+        ShowSubGroups: Boolean;
+        ItemGroupNo: Code[20];
+        EndDate: Date;
+        EndDateLastYear: Date;
+        StartDate: Date;
+        StartDateLastYear: Date;
+        CurrentYearDBDKK: Decimal;
+        CurrentYearDBPercent: Decimal;
+        EkspeditCurrentYear: Decimal;
+        EkspeditLastYear: Decimal;
+        LastYearDBDKK: Decimal;
+        LastYearDBPercent: Decimal;
+        Month: Integer;
+        Year: Integer;
+        ReportName: Label 'Item Group Statistics';
+        PageNo: Label 'Page No';
+        TotalSales: Label 'Total Sales';
 }
 

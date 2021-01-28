@@ -1,11 +1,7 @@
 report 6014403 "NPR Cashed Gift Vouchers"
 {
-    // NPR5.23/JLK/20160517  CASE 239487 Report created
-    // NPR5.38/JLK /20180124  CASE 300892 Removed AL Error on ControlContainer Caption in Request Page
-    // NPR5.38/JLK /20180125  CASE 303595 Added ENU object caption
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Cashed Gift Vouchers.rdlc';
-
     Caption = 'Cashed Gift Vouchers';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
@@ -50,10 +46,10 @@ report 6014403 "NPR Cashed Gift Vouchers"
             column(COMPANYNAME; CompanyName)
             {
             }
-            column(CreatedStringFilter; StrSubstNo(Text0003, CreatedStringFilter))
+            column(CreatedStringFilter; StrSubstNo(CreatedStringFilterLbl, CreatedStringFilter))
             {
             }
-            column(CashedStringFilter; StrSubstNo(Text0002, CashedStringFilter))
+            column(CashedStringFilter; StrSubstNo(CashedInLbl, CashedStringFilter))
             {
             }
             column(ReportNameLbl; ReportNameLbl)
@@ -76,7 +72,7 @@ report 6014403 "NPR Cashed Gift Vouchers"
             begin
 
                 if (StrPos(CreatedStringFilter, "Created in Company") = 0) or (StrPos(CashedStringFilter, "Cashed in Store") = 0) or ("Cashed in Store" = '') or ("Created in Company" = '') then
-                    CurrReport.Skip;
+                    CurrReport.Skip();
             end;
 
             trigger OnPreDataItem()
@@ -362,32 +358,25 @@ report 6014403 "NPR Cashed Gift Vouchers"
             }
         }
 
-        actions
-        {
-        }
-    }
-
-    labels
-    {
     }
 
     trigger OnInitReport()
     var
         Company: Record Company;
-        Counter: Integer;
         RetailSetup: Record "NPR Retail Setup";
+        Counter: Integer;
     begin
         Counter := 1;
-        if Company.FindSet then
+        if Company.FindSet() then
             repeat
                 RetailSetup.ChangeCompany(Company.Name);
                 if (RetailSetup.Get) and (RetailSetup."Company No." <> '') then begin
-                    TMPBuffer.Init;
+                    TMPBuffer.Init();
                     TMPBuffer.Template := Format(Counter);
                     TMPBuffer."Line No." := Counter;
                     TMPBuffer.Description := Company.Name;
                     TMPBuffer."Short Code 1" := RetailSetup."Company No.";
-                    if TMPBuffer.Insert then begin
+                    if TMPBuffer.Insert() then begin
                         CompanyListName[Counter] := Company.Name;
                         case Counter of
                             1:
@@ -410,7 +399,7 @@ report 6014403 "NPR Cashed Gift Vouchers"
                         Counter := Counter + 1;
                     end;
                 end;
-            until Company.Next = 0;
+            until Company.Next() = 0;
 
         ShowDetails := true;
 
@@ -429,7 +418,7 @@ report 6014403 "NPR Cashed Gift Vouchers"
         for i := 1 to 8 do begin
             if CompanyList[i] then begin
                 CompanyName2 := CompanyListName[i];
-                TMPBuffer.Reset;
+                TMPBuffer.Reset();
                 TMPBuffer.SetRange(Description, CompanyName2);
                 if TMPBuffer.FindFirst then begin
                     if CreatedStringFilter <> '' then
@@ -443,7 +432,7 @@ report 6014403 "NPR Cashed Gift Vouchers"
         for i := 1 to 8 do begin
             if CompanyList2[i] then begin
                 CompanyName2 := CompanyListName[i];
-                TMPBuffer.Reset;
+                TMPBuffer.Reset();
                 TMPBuffer.SetRange(Description, CompanyName2);
                 if TMPBuffer.FindFirst then begin
                     if CashedStringFilter <> '' then
@@ -458,22 +447,7 @@ report 6014403 "NPR Cashed Gift Vouchers"
     var
         TMPBuffer: Record "NPR TEMP Buffer" temporary;
         CompanyList: array[8] of Boolean;
-        CompanyListName: array[8] of Text[30];
         CompanyList2: array[8] of Boolean;
-        i: Integer;
-        CreatedStringFilter: Text[30];
-        CashedStringFilter: Text[30];
-        Text0001: Label 'Created in %1 (%2)';
-        Text0002: Label 'Cashed in %1';
-        ShowDetails: Boolean;
-        Text0003: Label 'Created in %1';
-        ReportNameLbl: Label 'Cashed Gift Voucher';
-        ShowDetailsLbl: Label 'Show Details: ';
-        PageLbl: Label 'Page';
-        GVFilters: Text[100];
-        GVFiltersLbl: Label 'Filters: %1';
-        TotalLbl: Label 'Total';
-        TotalForCompanyLbl: Label 'Total for %1';
         [InDataSet]
         CompanyVisible1: Boolean;
         [InDataSet]
@@ -490,28 +464,43 @@ report 6014403 "NPR Cashed Gift Vouchers"
         CompanyVisible7: Boolean;
         [InDataSet]
         CompanyVisible8: Boolean;
+        ShowDetails: Boolean;
+        i: Integer;
+        ReportNameLbl: Label 'Cashed Gift Voucher';
+        CashedInLbl: Label 'Cashed in %1', Comment = '%1 = Cashed description';
+        CreatedStringFilterLbl: Label 'Created in %1', Comment = '%1 = Created filter';
+        CreatedInLbl: Label 'Created in %1 (%2)', Comment = '%1 = Description, %2 = Short Code 1';
+        GVFiltersLbl: Label 'Filters: %1', Comment = '%1 = Filters';
+        PageLbl: Label 'Page';
+        ShowDetailsLbl: Label 'Show Details: ';
+        TotalLbl: Label 'Total';
+        TotalForCompanyLbl: Label 'Total for %1', Comment = '%1 = Created in Company';
+        CashedStringFilter: Text[30];
+        CompanyListName: array[8] of Text[30];
         CompanyName2: Text[30];
+        CreatedStringFilter: Text[30];
+        GVFilters: Text[100];
 
     local procedure ConvertCreatedCompanyNoToName(CompanyNo: Text): Text
     begin
-        TMPBuffer.Reset;
-        if TMPBuffer.FindSet then
+        TMPBuffer.Reset();
+        if TMPBuffer.FindSet() then
             repeat
                 if CompanyNo = TMPBuffer."Short Code 1" then
-                    exit(StrSubstNo(Text0001, TMPBuffer.Description, TMPBuffer."Short Code 1"));
-            until TMPBuffer.Next = 0;
+                    exit(StrSubstNo(CreatedInLbl, TMPBuffer.Description, TMPBuffer."Short Code 1"));
+            until TMPBuffer.Next() = 0;
 
         exit('');
     end;
 
     local procedure ConvertCashedCompanyNoToName(CompanyNo: Text): Text
     begin
-        TMPBuffer.Reset;
-        if TMPBuffer.FindSet then
+        TMPBuffer.Reset();
+        if TMPBuffer.FindSet() then
             repeat
                 if CompanyNo = TMPBuffer."Short Code 1" then
-                    exit(StrSubstNo(Text0002, TMPBuffer.Description));
-            until TMPBuffer.Next = 0;
+                    exit(StrSubstNo(CashedInLbl, TMPBuffer.Description));
+            until TMPBuffer.Next() = 0;
 
         exit('');
     end;

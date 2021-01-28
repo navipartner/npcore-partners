@@ -1,16 +1,6 @@
 report 6014420 "NPR Item Group Top"
 {
-    // NPR70.00.00.00/LS Convert Report to Nav 2013
-    // NPR5.25/JLK /20160726  CASE 247111 Commented and changed code for Sorting in a more efficient/readable way
-    //                                     Corrected the ShowQty and rdlc layout
-    // NPR5.38/JLK /20180124  CASE 300892 Removed AL Error on obsolite property CurrReport_PAGENO
-    // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
-    // NPR5.54/YAHA/20200324  CASE 394883 Removed footer NaviPartner  text
-    // NPR5.55/BHR /20200720  CASE 361515 Rework Report to Exclude Flowfields not used in AL
-    // NPR5.55/ANPA/20200506  CASE 401593 Limit item on 'date filter'
-    DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Item Group Top.rdlc';
-
     Caption = 'Item Group Top';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
@@ -29,26 +19,22 @@ report 6014420 "NPR Item Group Top"
 
                 trigger OnAfterGetRecord()
                 begin
-                    //-NPR5.55 [361515]
-
                     IleSalesQty := 0;
                     IleSalesLCY := 0;
                     IleCostAmtActual := 0;
-
-                    ItemLedgerEntry.Reset;
+                    ItemLedgerEntry.Reset();
                     ItemLedgerEntry.SetRange("NPR Item Group No.", "No.");
                     ItemLedgerEntry.SetRange("Entry Type", ItemLedgerEntry."Entry Type"::Sale);
                     ItemLedgerEntry.SetFilter("NPR Vendor No.", "Item Group".GetFilter("Vendor Filter"));
                     ItemLedgerEntry.SetFilter("Posting Date", "Item Group".GetFilter("Date Filter"));
                     ItemLedgerEntry.SetFilter("Global Dimension 1 Code", "Item Group".GetFilter("Global Dimension 1 Filter"));
                     ItemLedgerEntry.SetFilter("Global Dimension 2 Code", "Item Group".GetFilter("Global Dimension 2 Filter"));
-                    if ItemLedgerEntry.FindSet then
+                    if ItemLedgerEntry.FindSet() then
                         repeat
                             IleSalesQty += -ItemLedgerEntry.Quantity;
-                        until ItemLedgerEntry.Next = 0;
+                        until ItemLedgerEntry.Next() = 0;
 
-
-                    ValueEntry.Reset;
+                    ValueEntry.Reset();
                     ValueEntry.SetRange("NPR Item Group No.", "No.");
                     ValueEntry.SetRange("Item Ledger Entry Type", ValueEntry."Item Ledger Entry Type"::Sale);
                     ValueEntry.SetFilter("NPR Vendor No.", "Item Group".GetFilter("Vendor Filter"));
@@ -56,40 +42,23 @@ report 6014420 "NPR Item Group Top"
                     ValueEntry.SetFilter("Global Dimension 1 Code", "Item Group".GetFilter("Global Dimension 1 Filter"));
                     ValueEntry.SetFilter("Global Dimension 2 Code", "Item Group".GetFilter("Global Dimension 2 Filter"));
                     ValueEntry.SetFilter("Salespers./Purch. Code", "Item Group".GetFilter("Salesperson Filter"));
-
-                    if ValueEntry.FindSet then
+                    if ValueEntry.FindSet() then
                         repeat
                             IleSalesLCY += ValueEntry."Sales Amount (Actual)";
                             IleCostAmtActual += -ValueEntry."Cost Amount (Actual)";
-                        until ValueEntry.Next = 0;
-
-                    //+NPR5.55 [361515]
-
-
-                    //CALCFIELDS("Sales (Qty.)", "Sales (LCY)", "Consumption (Amount)");
-                    //db := "Sales (LCY)" - "Consumption (Amount)";
-
-                    //IF "Sales (LCY)" <> 0 THEN
-                    // dg := (db/"Sales (LCY)") * 100
-                    //ELSE
-                    // dg := 0;
-
+                        until ValueEntry.Next() = 0;
                     db := IleSalesLCY - IleCostAmtActual;
 
                     if IleSalesLCY <> 0 then
                         dg := (db / IleSalesLCY) * 100
                     else
                         dg := 0;
-                    //+NPR5.25
-
-                    //+#397617 [397617]
-                    TempNPRBufferSort.Init;
+                    TempNPRBufferSort.Init();
                     TempNPRBufferSort.Template := "No.";
                     TempNPRBufferSort."Line No." := 0;
                     case SortType of
                         SortType::ant:
                             begin
-                                //TempNPRBufferSort."Decimal 1" := "Sales (Qty.)";
                                 TempNPRBufferSort."Decimal 1" := IleSalesQty;
                             end;
                         SortType::sal:
@@ -106,35 +75,26 @@ report 6014420 "NPR Item Group Top"
                             end;
                     end;
 
-                    TempNPRBufferSort.Insert;
-                    //-NPR5.25
+                    TempNPRBufferSort.Insert();
                 end;
 
                 trigger OnPreDataItem()
                 begin
-                    TempNPRBufferSort.DeleteAll;
-                    //+NPR5.25
-                    //i := 0;
+                    TempNPRBufferSort.DeleteAll();
                     TempNPRBufferSort.SetCurrentKey("Decimal 1", "Short Code 1");
 
                     if Sorting = Sorting::st then
                         TempNPRBufferSort.Ascending(false);
-                    //-NPR5.25
                     "Item Group".SetFilter("Item Group"."Global Dimension 1 Filter", "Dimension Value".Code);
-
-                    //-NPR5.55 [401593]
                     "Item Group".CopyFilter("Date Filter", Item."Date Filter");
-                    //+NPR5.55 [401593]
-
                     Item.SetFilter("Global Dimension 1 Filter", "Dimension Value".Code);
-
                     Item.SetRange("NPR Item Group", '');
                     if Item.Find('-') then
                         repeat
                             Item.CalcFields("Sales (Qty.)", "Sales (LCY)");
                             QtyOutside += Item."Sales (Qty.)";
                             SalesOutside += Item."Sales (LCY)";
-                        until Item.Next = 0;
+                        until Item.Next() = 0;
                 end;
             }
             dataitem("Integer"; "Integer")
@@ -188,54 +148,38 @@ report 6014420 "NPR Item Group Top"
 
                 trigger OnAfterGetRecord()
                 begin
-                    //+NPR5.25
-                    //IF Number = 1 THEN BEGIN
-                    //  IF NOT ItemGroupTemp.FIND('-') THEN
-                    //    CurrReport.BREAK;
-                    //END
-                    //ELSE IF ItemGroupTemp.NEXT = 0 THEN
-                    //  CurrReport.BREAK;
-
                     if Number = 1 then begin
                         if not TempNPRBufferSort.Find('-') then
-                            CurrReport.Break;
+                            CurrReport.Break();
                     end
                     else
-                        if TempNPRBufferSort.Next = 0 then
-                            CurrReport.Break;
+                        if TempNPRBufferSort.Next() = 0 then
+                            CurrReport.Break();
 
                     if i > ShowQty then
-                        CurrReport.Break;
+                        CurrReport.Break();
 
                     i += 1;
-                    //-NPR5.25
-
-
 
                     "Item Group".SetFilter("Item Group"."Global Dimension 1 Filter", "Dimension Value".Code);
                     if "Item Group".Get(TempNPRBufferSort.Template) then begin
-                        //"Item Group".CALCFIELDS("Sales (Qty.)","Sales (LCY)", "Consumption (Amount)");
-                        //-NPR5.55 [361515]
-
                         IleSalesQty := 0;
                         IleSalesLCY := 0;
                         IleCostAmtActual := 0;
 
-                        ItemLedgerEntry.Reset;
+                        ItemLedgerEntry.Reset();
                         ItemLedgerEntry.SetRange("NPR Item Group No.", "Item Group"."No.");
                         ItemLedgerEntry.SetRange("Entry Type", ItemLedgerEntry."Entry Type"::Sale);
                         ItemLedgerEntry.SetFilter("NPR Vendor No.", "Item Group".GetFilter("Vendor Filter"));
                         ItemLedgerEntry.SetFilter("Posting Date", "Item Group".GetFilter("Date Filter"));
                         ItemLedgerEntry.SetFilter("Global Dimension 1 Code", "Item Group".GetFilter("Global Dimension 1 Filter"));
                         ItemLedgerEntry.SetFilter("Global Dimension 2 Code", "Item Group".GetFilter("Global Dimension 2 Filter"));
-
-                        if ItemLedgerEntry.FindSet then
+                        if ItemLedgerEntry.FindSet() then
                             repeat
                                 IleSalesQty += -ItemLedgerEntry.Quantity;
-                            until ItemLedgerEntry.Next = 0;
+                            until ItemLedgerEntry.Next() = 0;
 
-
-                        ValueEntry.Reset;
+                        ValueEntry.Reset();
                         ValueEntry.SetRange("NPR Item Group No.", "Item Group"."No.");
                         ValueEntry.SetRange("Item Ledger Entry Type", ValueEntry."Item Ledger Entry Type"::Sale);
                         ValueEntry.SetFilter("NPR Vendor No.", "Item Group".GetFilter("Vendor Filter"));
@@ -243,21 +187,12 @@ report 6014420 "NPR Item Group Top"
                         ValueEntry.SetFilter("Global Dimension 1 Code", "Item Group".GetFilter("Global Dimension 1 Filter"));
                         ValueEntry.SetFilter("Global Dimension 2 Code", "Item Group".GetFilter("Global Dimension 2 Filter"));
                         ValueEntry.SetFilter("Salespers./Purch. Code", "Item Group".GetFilter("Salesperson Filter"));
-
-                        if ValueEntry.FindSet then
+                        if ValueEntry.FindSet() then
                             repeat
                                 IleSalesLCY += ValueEntry."Sales Amount (Actual)";
                                 IleCostAmtActual += -ValueEntry."Cost Amount (Actual)";
-                            until ValueEntry.Next = 0;
-                        //-#397617 [397617]
-
+                            until ValueEntry.Next() = 0;
                     end;
-
-                    // db := "Item Group"."Sales (LCY)" - "Item Group"."Consumption (Amount)";
-                    // IF "Item Group"."Sales (LCY)" <> 0 THEN
-                    //  dg := (db/"Item Group"."Sales (LCY)") * 100
-                    // ELSE
-                    //  dg := 0;
 
                     db := IleSalesLCY - IleCostAmtActual;
                     if IleSalesLCY <> 0 then
@@ -267,23 +202,16 @@ report 6014420 "NPR Item Group Top"
 
                     j := IncStr(j);
 
-                    //+NPR5.25
                     if "Dimension Value".Code <> PreviousDimValueCode then begin
                         Clear(CountDimValue);
                         PreviousDimValueCode := "Dimension Value".Code;
                     end;
                     CountDimValue += 1;
-                    //-NPR5.25
                 end;
 
                 trigger OnPreDataItem()
                 begin
-                    //-NPR5.39
-                    //CurrReport.CREATETOTALS(db,"Item Group"."Sales (LCY)", "Item Group"."Sales (Qty.)");
-                    //+NPR5.39
-                    //+NPR5.25
                     i := 1;
-                    //-NPR5.25
                 end;
             }
 
@@ -296,7 +224,7 @@ report 6014420 "NPR Item Group Top"
 
                 if Dim1Filter <> '' then begin
                     if "Dimension Value".Code <> Dim1Filter then
-                        CurrReport.Skip;
+                        CurrReport.Skip();
                 end;
             end;
         }
@@ -335,10 +263,6 @@ report 6014420 "NPR Item Group Top"
                 }
             }
         }
-
-        actions
-        {
-        }
     }
 
     labels
@@ -361,12 +285,6 @@ report 6014420 "NPR Item Group Top"
         SortType := SortType::ant;
         ShowQty := 20;
         Sorting := Sorting::st;
-
-        //-NPR5.39
-        // Object.SETRANGE(ID, 6014420);
-        // Object.SETRANGE(Type, 3);
-        // Object.FIND('-');
-        //+NPR5.39
     end;
 
     trigger OnPreReport()
@@ -381,35 +299,35 @@ report 6014420 "NPR Item Group Top"
     end;
 
     var
-        i: Integer;
-        SortType: Option ant,sal,db,dg;
-        window: Dialog;
-        ShowQty: Integer;
         CompanyInformation: Record "Company Information";
+        Item: Record Item;
+        ItemLedgerEntry: Record "Item Ledger Entry";
+        TempNPRBufferSort: Record "NPR TEMP Buffer" temporary;
+        ValueEntry: Record "Value Entry";
+        PreviousDimValueCode: Code[20];
         db: Decimal;
         dg: Decimal;
-        Sorting: Option st,mi;
-        j: Text[30];
-        Item: Record Item;
+        IleCostAmtActual: Decimal;
+        IleSalesLCY: Decimal;
+        IleSalesQty: Decimal;
         QtyOutside: Decimal;
         SalesOutside: Decimal;
+        TotalProfit: Decimal;
         TotalQty: Decimal;
         TotalSale: Decimal;
-        TotalProfit: Decimal;
-        Dim1Filter: Text[30];
+        window: Dialog;
+        CountDimValue: Integer;
+        i: Integer;
+        ShowQty: Integer;
         Text10600000: Label 'ant';
-        Text10600001: Label 'st';
+        Text10600004: Label 'db';
         Text10600002: Label 'Itemgroups Sorted by #1##########';
         Text10600003: Label 'sal';
-        Text10600004: Label 'db';
-        PreviousDimValueCode: Code[20];
-        CountDimValue: Integer;
-        TempNPRBufferSort: Record "NPR TEMP Buffer" temporary;
+        Text10600001: Label 'st';
+        SortType: Option ant,sal,db,dg;
+        Sorting: Option st,mi;
         FiltersDimValue: Text;
-        ItemLedgerEntry: Record "Item Ledger Entry";
-        ValueEntry: Record "Value Entry";
-        IleSalesQty: Decimal;
-        IleSalesLCY: Decimal;
-        IleCostAmtActual: Decimal;
+        Dim1Filter: Text[30];
+        j: Text[30];
 }
 

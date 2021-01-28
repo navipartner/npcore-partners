@@ -2,11 +2,9 @@ report 6014448 "NPR Item Group Inv. Value"
 {
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Item Group Inventory Value.rdlc';
-
     Caption = 'Item Group Inventory Value';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
-
     dataset
     {
         dataitem("Item Group"; "NPR Item Group")
@@ -102,18 +100,6 @@ report 6014448 "NPR Item Group Inv. Value"
         }
     }
 
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
-        }
-    }
-
     labels
     {
         ReportCap = 'Item Group Inventory Value';
@@ -130,25 +116,25 @@ report 6014448 "NPR Item Group Inv. Value"
 
     trigger OnInitReport()
     begin
-        CompanyInfo.Get;
+        CompanyInfo.Get();
         CompanyInfo.CalcFields(Picture);
-        GeneralLedgerSetup.Get;
+        GeneralLedgerSetup.Get();
     end;
 
     var
-        ItemGroupMovementAtStartOf: Decimal;
-        ItemGroupMovementAtEndOf: Decimal;
-        Profit: Decimal;
-        Dg: Decimal;
         CompanyInfo: Record "Company Information";
+        GeneralLedgerSetup: Record "General Ledger Setup";
         ItemGroupFirst: Record "NPR Item Group";
         ItemGroupLast: Record "NPR Item Group";
-        ItemGroupInventoryAtStartOf: Decimal;
+        Dg: Decimal;
         ItemGroupInventoryAtEndOf: Decimal;
-        StartOf: Label '------- Start of %1 -------';
+        ItemGroupInventoryAtStartOf: Decimal;
+        ItemGroupMovementAtEndOf: Decimal;
+        ItemGroupMovementAtStartOf: Decimal;
+        Profit: Decimal;
         EndOf: Label '------- End of %1 -------';
-        SaleLbl: Label 'Sales (%1)';
         PurchaseLbl: Label 'Purchases (%1)';
-        GeneralLedgerSetup: Record "General Ledger Setup";
+        SaleLbl: Label 'Sales (%1)';
+        StartOf: Label '------- Start of %1 -------';
 }
 

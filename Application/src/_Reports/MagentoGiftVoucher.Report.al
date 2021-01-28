@@ -1,19 +1,9 @@
 report 6151406 "NPR Magento Gift Voucher"
 {
-    // NC/20160427  NaviConnect
-    // MAG2.00/MHA/20160525  CASE 242557 Magento Integration
-    // MAG2.17/JDH /20181112 CASE 334163 Added Caption to Object
-    // MAG2.22/MHA /20190619  CASE 357825 Added Data Items to be used with Word Layout
-    // MAG14.00.2.22/MHA/20190717  CASE 362262 Removed DotNet Print functionality
-    // MAG2.23/ZESO/20190911  CASE 365692 Display special danish characters correctly.
-
-    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Magento Gift Voucher.rdlc';
-
     Caption = 'Magento Gift Voucher';
     PreviewMode = PrintLayout;
-
     dataset
     {
         dataitem("Gift Voucher"; "NPR Gift Voucher")
@@ -222,21 +212,15 @@ report 6151406 "NPR Magento Gift Voucher"
 
             trigger OnAfterGetRecord()
             var
-                InStream: InStream;
-                StreamReader: DotNet NPRNetStreamReader;
                 MagentoBarcodeLibrary: Codeunit "NPR Magento Barcode Library";
                 NulChr: Char;
+                InStream: InStream;
             begin
-                //-MAG2.22 [357825]
                 GiftVoucherMessage := '';
                 if "Gift Voucher Message".HasValue then begin
                     CalcFields("Gift Voucher Message");
                     "Gift Voucher Message".CreateInStream(InStream);
-                    //-MAG2.23 [365692]
-                    //StreamReader := StreamReader.StreamReader(InStream);
-                    //GiftVoucherMessage := StreamReader.ReadToEnd();
                     InStream.ReadText(GiftVoucherMessage);
-                    //+MAG2.23 [365692]
                     NulChr := 0;
                     GiftVoucherMessage := DelChr(GiftVoucherMessage, '=', Format(NulChr));
                 end;
@@ -245,36 +229,12 @@ report 6151406 "NPR Magento Gift Voucher"
                 MagentoBarcodeLibrary.SetDpiY(600);
                 MagentoBarcodeLibrary.GenerateBarcode("No.", TempBlobBarcode);
                 BlobBuffer.GetFromTempBlob(TempBlobBarcode, 1);
-                //+MAG2.22 [357825]
             end;
         }
     }
-
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
-        }
-    }
-
-    labels
-    {
-    }
-
-    trigger OnPreReport()
     var
-        Language: Record Language;
-    begin
-    end;
-
-    var
+        BlobBuffer: Record "NPR BLOB buffer" temporary;
         TempBlobBarcode: Codeunit "Temp Blob";
         GiftVoucherMessage: Text;
-        BlobBuffer: Record "NPR BLOB buffer" temporary;
 }
 

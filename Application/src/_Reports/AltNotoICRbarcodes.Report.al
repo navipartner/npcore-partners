@@ -1,9 +1,7 @@
 report 6014602 "NPR Alt. No. to ICR barcodes"
 {
-    UsageCategory = None;
     Caption = 'Alt. No. to Item Cross Reference barcodes';
     ProcessingOnly = true;
-
     dataset
     {
         dataitem("Alternative No."; "NPR Alternative No.")
@@ -12,20 +10,19 @@ report 6014602 "NPR Alt. No. to ICR barcodes"
 
             trigger OnAfterGetRecord()
             var
-                ICR: Record "Item Cross Reference";
                 Item: Record Item;
+                ICR: Record "Item Cross Reference";
                 ItemVariant: Record "Item Variant";
             begin
                 ICR.SetRange("Cross-Reference Type", ICR."Cross-Reference Type"::"Bar Code");
                 ICR.SetRange("Cross-Reference No.", "Alt. No.");
                 ICR.SetFilter("Item No.", '<>%1', Code);
                 ICR.SetFilter("Variant Code", '<>%1', "Variant Code");
-                if not ICR.IsEmpty then
+                if not ICR.IsEmpty() then
                     Error(Error_Clash, "Alt. No.", Code);
 
-                ICR.Reset;
-
-                ICR.Init;
+                ICR.Reset();
+                ICR.Init();
                 ICR."Item No." := Code;
                 ICR."Variant Code" := "Variant Code";
                 ICR."Unit of Measure" := "Base Unit of Measure";
@@ -59,7 +56,7 @@ report 6014602 "NPR Alt. No. to ICR barcodes"
                     end;
                 end;
 
-                if ICR.Insert then //Don't fail on barcodes that have already been moved.
+                if ICR.Insert() then //Don't fail on barcodes that have already been moved.
                     AddCounter += 1;
 
                 Delete;
@@ -82,56 +79,38 @@ report 6014602 "NPR Alt. No. to ICR barcodes"
         }
     }
 
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
-        }
-    }
-
-    labels
-    {
-    }
-
     trigger OnInitReport()
     begin
-        if not Confirm(Txt_Warning) then
+        if not Confirm(WarningQst) then
             exit;
 
-        VRTSetup.Get;
+        VRTSetup.Get();
     end;
 
     trigger OnPostReport()
     begin
-        Message(Txt_Success, AddCounter);
+        Message(SuccessMsg, AddCounter);
     end;
 
     var
-        Txt_Warning: Label 'Warning:\This report will move all barcodes from alternative numbers to item cross references.This can take a long time depending on the data size and will lock the tables in the meantime.\\Are you sure you want to continue?';
-        Txt_Success: Label '%1 barcodes were moved successfully to item cross reference table.';
-        Error_Clash: Label 'Alt No. barcode %1 for item %2 already exists in ICR on a different item. Please resolve this conflict manually and run again. No changes were made.';
-        AddCounter: Integer;
         VRTSetup: Record "NPR Variety Setup";
         IsDialogOpen: Boolean;
-        DialogValues: array[2] of Integer;
         ProgressDialog: Dialog;
+        AddCounter: Integer;
+        DialogValues: array[2] of Integer;
         Itt: Integer;
         Total: Integer;
-
-    local procedure "// Dialog"()
-    begin
-    end;
+        SuccessMsg: Label '%1 barcodes were moved successfully to item cross reference table.', Comment = '%1 = Barcodes';
+        Error_Clash: Label 'Alt No. barcode %1 for item %2 already exists in ICR on a different item. Please resolve this conflict manually and run again. No changes were made.', Comment = '%1 = Barcode, %2 = Item';
+        WarningQst: Label 'Warning:\This report will move all barcodes from alternative numbers to item cross references.This can take a long time depending on the data size and will lock the tables in the meantime.\\Are you sure you want to continue?';
 
     local procedure OpenDialog()
+    var
+        ProgressLbl: Label 'Table ##1######\@@2@@@@@@@@@@@@@@@@@';
     begin
         if GuiAllowed then
             if not IsDialogOpen then begin
-                ProgressDialog.Open('Table ##1######\@@2@@@@@@@@@@@@@@@@@');
+                ProgressDialog.Open(ProgressLbl);
                 IsDialogOpen := true;
             end;
     end;
@@ -156,7 +135,7 @@ report 6014602 "NPR Alt. No. to ICR barcodes"
     local procedure CloseDialog()
     begin
         if GuiAllowed then
-            ProgressDialog.Close;
+            ProgressDialog.Close();
 
         IsDialogOpen := false;
     end;

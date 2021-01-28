@@ -1,20 +1,9 @@
 report 6151405 "NPR Magento Credit Voucher"
 {
-    // MAG1.06/TS/20150225  CASE 201682 Object Created
-    // MAG1.12/TS/20150410  CASE 210753 Added code to pick up Report Language
-    // MAG1.17/TR/20150618 CASE 210183 Gift Voucher Blob is sent to Layout as Base64String.
-    //                                    Handling of image data moved from Layout to Navision.
-    // MAG2.00/MHA/20160525  CASE 242557 Magento Integration
-    // MAG2.22/MHA /20190619  CASE 357825 Added Data Items to be used with Word Layout
-    // MAG14.00.2.22/MHA/20190717  CASE 362262 Removed DotNet Print functionality
-
-    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Magento Credit Voucher.rdlc';
-
     Caption = 'Magento - Credit Voucher';
     PreviewMode = PrintLayout;
-
     dataset
     {
         dataitem("Credit Voucher"; "NPR Credit Voucher")
@@ -219,40 +208,16 @@ report 6151405 "NPR Magento Credit Voucher"
             var
                 MagentoBarcodeLibrary: Codeunit "NPR Magento Barcode Library";
             begin
-                //-MAG2.22 [357825]
                 MagentoBarcodeLibrary.SetDpiX(600);
                 MagentoBarcodeLibrary.SetDpiY(600);
                 MagentoBarcodeLibrary.GenerateBarcode("No.", TempBlobBarcode);
                 BlobBuffer.GetFromTempBlob(TempBlobBarcode, 1);
-                //+MAG2.22 [357825]
             end;
         }
     }
 
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
-        }
-    }
-
-    labels
-    {
-    }
-
-    trigger OnPreReport()
     var
-        Language: Record Language;
-    begin
-    end;
-
-    var
-        TempBlobBarcode: Codeunit "Temp Blob";
         BlobBuffer: Record "NPR BLOB buffer" temporary;
+        TempBlobBarcode: Codeunit "Temp Blob";
 }
 

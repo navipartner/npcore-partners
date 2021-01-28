@@ -1,25 +1,12 @@
 report 6014612 "NPR Inventory per Variant/date"
 {
-    // NPR70.00.00.00/LS/280613 CASE  143458 : COnvert Report to NAV 2013 report
-    // NPR5.25/JLK /20160801 CASE 241520 VariaX removed to replace by Item Variants
-    //                                   Corrected Report Totals and Fields: Inventory, Sale Date
-    //                                   Changed Gross Profit Caption to Exp Gross Profit
-    //                                   Uncommented and made necessary corrections to display Quantity for Location Code per Variants
-    // NPR5.32/KENU/20170502 CASE 274094 Changed filter
-    // NPR5.38/JLK /20180124 CASE 300892 Corrected AL Error on ReqFilterFields property referencing invalid field6014600, field6014604 and field6014605
-    // NPR5.39/TJ  /20180208 CASE 302634 Removed unused variables
-    // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
-    // NPR5.40/TJ  /20180319  CASE 307717 Replaced hardcoded dates with DMY2DATE structure
-    // NPR5.51/ZESO/20190827  CASE 360802 Option Show Blank Location Code added + Changed Orientation to Landscape.
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Inventory per Variant at date.rdlc';
-
     Caption = 'Inventory Per Date';
     Description = 'Inventory per Variant at date';
     PreviewMode = Normal;
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
-
     dataset
     {
         dataitem(ReportHdr; "Integer")
@@ -214,15 +201,12 @@ report 6014612 "NPR Inventory per Variant/date"
                     Item1.Get(Item."No.");
                     Item1.CopyFilters(Item);
                     Item1.SetRange("Variant Filter", Code);
-                    //-NPR5.51 [360802]
                     if not ShowBlankLocation then
                         Item1.SetFilter("Location Filter", '<>%1', '');
-                    //-NPR5.51 [360802]
                     Item1.CalcFields("NPR Has Variants", "Net Change");
-
                     if Varermedbeholdning then begin
                         if Item1."Net Change" = 0 then
-                            CurrReport.Skip;
+                            CurrReport.Skip();
                     end;
 
                     i := 1;
@@ -234,17 +218,13 @@ report 6014612 "NPR Inventory per Variant/date"
                     ItemLedgEntry.Reset;
                     ItemLedgEntry.SetRange("Item No.", Item."No.");
                     ItemLedgEntry.SetRange("Variant Code", Code);
-                    //-NPR5.32
                     ItemLedgEntry.SetFilter("Posting Date", Item1.GetFilter("Date Filter"));
-                    //+NPR5.32
-
-                    //-NPR5.51 [360802]
                     if ShowBlankLocation then begin
                         ItemLedgEntry.SetRange("Location Code", '');
-                        if ItemLedgEntry.FindSet then
+                        if ItemLedgEntry.FindSet() then
                             repeat
                                 TempQuantity += ItemLedgEntry.Quantity;
-                            until ItemLedgEntry.Next = 0;
+                            until ItemLedgEntry.Next() = 0;
 
                         if TempQuantity <> 0 then begin
                             InventoryLocation[i] := '';
@@ -253,16 +233,15 @@ report 6014612 "NPR Inventory per Variant/date"
                             TempQuantity := 0;
                         end;
                     end;
-                    //+NPR5.51 [360802]
 
-                    if Location.FindSet then
+                    if Location.FindSet() then
                         repeat
                             ItemLedgEntry.SetRange("Location Code");
                             ItemLedgEntry.SetRange("Location Code", Location.Code);
-                            if ItemLedgEntry.FindSet then
+                            if ItemLedgEntry.FindSet() then
                                 repeat
                                     TempQuantity += ItemLedgEntry.Quantity;
-                                until ItemLedgEntry.Next = 0;
+                                until ItemLedgEntry.Next() = 0;
 
                             if TempQuantity <> 0 then begin
                                 InventoryLocation[i] := Location.Code;
@@ -270,7 +249,7 @@ report 6014612 "NPR Inventory per Variant/date"
                                 i += 1;
                                 TempQuantity := 0;
                             end;
-                        until Location.Next = 0;
+                        until Location.Next() = 0;
 
                     LocationText := '';
                     if InventoryQty[1] <> 0 then
@@ -307,28 +286,30 @@ report 6014612 "NPR Inventory per Variant/date"
             }
 
             trigger OnAfterGetRecord()
+            var
+                ChooseErr: Label 'Choose either';
             begin
 
                 if Negativbeh and not NegativVolumeShow then begin
                     if ("Net Change" < 0) then
-                        CurrReport.Skip;
+                        CurrReport.Skip();
                 end
                 else
                     if NegativVolumeShow and not Negativbeh then begin
                         if ("Net Change" >= 0) then
-                            CurrReport.Skip;
+                            CurrReport.Skip();
                     end
                     else
                         if Negativbeh and NegativVolumeShow then
-                            Error('Choose either');
+                            Error(ChooseErr);
 
                 if Varermedbeholdning then begin
                     if not "NPR Has Variants" then begin
                         if "Net Change" = 0 then
-                            CurrReport.Skip;
+                            CurrReport.Skip();
                     end else begin
                         if not CheckInventory(Item) and ("Net Change" = 0) then
-                            CurrReport.Skip;
+                            CurrReport.Skip();
                     end;
                 end;
 
@@ -344,10 +325,8 @@ report 6014612 "NPR Inventory per Variant/date"
                 ItemLedgEntry.SetCurrentKey("Item No.", "Entry Type", "Posting Date");
                 ItemLedgEntry.SetRange("Entry Type", 1);
                 ItemLedgEntry.SetFilter(ItemLedgEntry."Item No.", '%1', "No.");
-                //-NPR5.32
                 ItemLedgEntry.SetFilter("Posting Date", Item.GetFilter("Date Filter"));
-                //+NPR5.32
-                if ItemLedgEntry.FindLast then
+                if ItemLedgEntry.FindLast() then
                     SaleDate := ItemLedgEntry."Posting Date"
                 else
                     SaleDate := 0D;
@@ -378,14 +357,8 @@ report 6014612 "NPR Inventory per Variant/date"
 
             trigger OnPreDataItem()
             begin
-                //-NPR5.39
-                //CurrReport.CREATETOTALS("Net Change","Unit Price","Last Direct Cost",CostValue, SalesValue);
-                //+NPR5.39
-
-                //-NPR5.51 [360802]
                 if not ShowBlankLocation then
                     Item.SetFilter("Location Filter", '<>%1', '');
-                //-NPR5.51 [360802]
             end;
         }
     }
@@ -442,21 +415,9 @@ report 6014612 "NPR Inventory per Variant/date"
             }
         }
 
-        actions
-        {
-        }
-
         trigger OnOpenPage()
         begin
-            //-NPR5.40 [307717]
-            /*
-            //-NPR5.32
-            Item.SETFILTER("Date Filter",'%1..%2',010180D,(Tildato));
-            //+NPR5.32
-            */
             Item.SetFilter("Date Filter", '%1..%2', DMY2Date(1, 1, 1980), (Tildato));
-            //+NPR5.40 [307717]
-
         end;
     }
 
@@ -476,76 +437,69 @@ report 6014612 "NPR Inventory per Variant/date"
     begin
         CompanyInfo.Get();
         CompanyInfo.CalcFields(Picture);
-
-        //-NPR5.39
-        // ObjectR.SETRANGE(ID, 6014612);
-        // ObjectR.SETRANGE(Type, 3);
-        // ObjectR.FIND('-');
-        // ObjectInfo := FORMAT(ObjectR.ID)+', '+FORMAT(ObjectR."Version List");
-        //+NPR5.39
-
-        if Tildato = 0D then Error(Txt001);
+        if Tildato = 0D then
+            Error(Txt001);
 
         Itemfilter := Item.GetFilters;
     end;
 
     var
         CompanyInfo: Record "Company Information";
-        Location: Record Location;
+        Item1: Record Item;
         ItemLedgEntry: Record "Item Ledger Entry";
-        CostValue: Decimal;
-        CostValueVariant: Decimal;
-        SalesValue: Decimal;
-        SalesValueVariant: Decimal;
-        GrossVariant: Decimal;
-        Gross: Decimal;
-        TempQuantity: Decimal;
-        InventoryLocation: array[10] of Code[30];
-        InventoryQty: array[10] of Decimal;
-        SaleDateVariant: Date;
-        SaleDate: Date;
-        Tildato: Date;
-        Bruttoavialt: Decimal;
+        Location: Record Location;
+        Vatpostingsetup: Record "VAT Posting Setup";
+        Negativbeh: Boolean;
+        NegativVolumeShow: Boolean;
+        ShowBlankLocation: Boolean;
+        ShowLocation: Boolean;
+        ShowNoInventory: Boolean;
         Varermedbeholdning: Boolean;
         ViewSalesPrice: Boolean;
-        Negativbeh: Boolean;
-        Vatpostingsetup: Record "VAT Posting Setup";
-        ShowNoInventory: Boolean;
-        NegativVolumeShow: Boolean;
-        Itemfilter: Text[100];
-        i: Integer;
-        Item1: Record Item;
-        Txt001: Label 'Date is required';
-        Txt003: Label 'Total';
-        Txt004: Label 'ˆNAVIPARTNER Copenhagen 2002';
-        Report_Caption: Label 'Item stock acc. date';
-        Date_Caption: Label 'Date';
-        No_Caption: Label 'Number';
-        Desc_Caption: Label 'Description';
-        NetChange_Caption: Label 'Inventory ';
-        ItemVendorItemNo_Caption: Label 'Vendor item no.';
-        UnitPrice_Caption: Label 'Sales price';
-        DirCost_Caption: Label 'Last cost price';
-        InvValue_Caption: Label 'Inventory value';
-        Gross_Caption: Label 'Gross';
-        SalesDate_Caption: Label 'Recent sales';
-        LocationCaption: Label 'Location Code';
-        LocationText: Text;
-        ShowLocation: Boolean;
-        ItemTotalNetChange: Decimal;
+        InventoryLocation: array[10] of Code[30];
+        SaleDate: Date;
+        SaleDateVariant: Date;
+        Tildato: Date;
+        Bruttoavialt: Decimal;
+        CostValue: Decimal;
+        CostValueVariant: Decimal;
+        Gross: Decimal;
+        GrossVariant: Decimal;
+        InventoryQty: array[10] of Decimal;
+        ItemSalesValue: Decimal;
         ItemTotalCostValue: Decimal;
+        ItemTotalNetChange: Decimal;
         NetChangeItem: Decimal;
         NetChangeItemVariant: Decimal;
-        ItemSalesValue: Decimal;
-        ShowBlankLocation: Boolean;
+        SalesValue: Decimal;
+        SalesValueVariant: Decimal;
+        TempQuantity: Decimal;
+        i: Integer;
+        Txt004: Label 'ˆNAVIPARTNER Copenhagen 2002';
+        Date_Caption: Label 'Date';
+        Txt001: Label 'Date is required';
+        Desc_Caption: Label 'Description';
+        Gross_Caption: Label 'Gross';
+        NetChange_Caption: Label 'Inventory ';
+        InvValue_Caption: Label 'Inventory value';
+        Report_Caption: Label 'Item stock acc. date';
+        DirCost_Caption: Label 'Last cost price';
+        LocationCaption: Label 'Location Code';
+        No_Caption: Label 'Number';
+        SalesDate_Caption: Label 'Recent sales';
+        UnitPrice_Caption: Label 'Sales price';
+        Txt003: Label 'Total';
+        ItemVendorItemNo_Caption: Label 'Vendor item no.';
+        LocationText: Text;
+        Itemfilter: Text[100];
 
     procedure CheckInventory(var localItem: Record Item): Boolean
     var
-        localVariant: Record "Item Variant";
         localItem1: Record Item;
+        localVariant: Record "Item Variant";
     begin
         localVariant.SetRange("Item No.", localItem."No.");
-        if localVariant.FindFirst then begin
+        if localVariant.FindFirst() then begin
             localItem1.Get(localItem."No.");
             localItem1.CopyFilters(localItem);
             localItem1.SetRange("Variant Filter", localVariant.Code);

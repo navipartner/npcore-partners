@@ -1,12 +1,7 @@
 report 6014482 "NPR Ret. Jnl. Imp. Mix Disc."
 {
-    // NPR5.31/MHA /20170110  CASE 262904 Primary key updated for Mixed Discount Line
-    // NPR5.39/MMV /20180212  CASE 303556 Removed manual barcode logic
-
-    UsageCategory = None;
     Caption = 'Import Mixed Discounts';
     ProcessingOnly = true;
-
     dataset
     {
         dataitem(RetailJournalHeader; "NPR Retail Journal Header")
@@ -22,10 +17,9 @@ report 6014482 "NPR Ret. Jnl. Imp. Mix Disc."
 
                     trigger OnAfterGetRecord()
                     var
-                        RetailJournalLine: Record "NPR Retail Journal Line";
                         Item: Record Item;
+                        RetailJournalLine: Record "NPR Retail Journal Line";
                     begin
-
                         Item.Get(MixedDiscountLine."No.");
 
                         RetailJournalLine.SetRange("No.", RetailJournalHeader."No.");
@@ -37,16 +31,13 @@ report 6014482 "NPR Ret. Jnl. Imp. Mix Disc."
                         RetailJournalLine.Init();
                         RetailJournalLine.Validate("No.", RetailJournalHeader."No.");
                         RetailJournalLine.Validate("Item No.", Item."No.");
-                        RetailJournalLine.Insert;
+                        RetailJournalLine.Insert();
                         RetailJournalLine.Validate("Quantity to Print", 1);
                         RetailJournalLine.Validate(Description, Item.Description);
                         RetailJournalLine.Validate("Vendor No.", Item."Vendor No.");
                         RetailJournalLine.Validate("Vendor Item No.", Item."Vendor Item No.");
                         RetailJournalLine.Validate("Discount Price Incl. Vat", MixedDiscountLine."Unit price");
                         RetailJournalLine.Validate("Last Direct Cost", MixedDiscountLine."Unit cost");
-                        //-NPR5.39 [303556]
-                        //RetailJournalLine.VALIDATE(Barcode,Item."Label Barcode");
-                        //+NPR5.39 [303556]
                         RetailJournalLine.Validate("Mixed Discount", MixedDiscount.Code);
                         RetailJournalLine.Modify();
                     end;
@@ -55,20 +46,5 @@ report 6014482 "NPR Ret. Jnl. Imp. Mix Disc."
         }
     }
 
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
-        }
-    }
-
-    labels
-    {
-    }
 }
 

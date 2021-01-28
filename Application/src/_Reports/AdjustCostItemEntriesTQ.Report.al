@@ -1,9 +1,5 @@
 report 6059905 "NPR Adjust Cost: ItemEntriesTQ"
 {
-    // TQ1.28.02/JDH/20161013 CASE 242568 Possible to run in 1.28 version (and before) of TQ
-    // NPR5.31/BR  /20170428  CASE 271478 Added option Skip Various Items
-    // TQ1.31/MHA /20171218  CASE 271126 Data Log Disabled during Report Run
-
     Caption = 'Adjust Cost - Item Entries';
     Permissions = TableData "Item Ledger Entry" = rimd,
                   TableData "Item Application Entry" = r,
@@ -21,9 +17,7 @@ report 6059905 "NPR Adjust Cost: ItemEntriesTQ"
 
             trigger OnPreDataItem()
             begin
-                //-TQ1.28.02
-                CurrReport.Break;
-                //+TQ1.28.02
+                CurrReport.Break();
             end;
         }
     }
@@ -82,112 +76,94 @@ report 6059905 "NPR Adjust Cost: ItemEntriesTQ"
             }
         }
 
-        actions
-        {
-        }
-
         trigger OnInit()
         begin
             FilterItemCategoryEditable := true;
             FilterItemNoEditable := true;
             PostEnable := true;
-            //-NPR5.31 [271478]
             SkipVariousItems := true;
-            //+NPR5.31 [271478]
         end;
 
         trigger OnOpenPage()
         begin
-            InvtSetup.Get;
+            InvtSetup.Get();
             PostToGL := InvtSetup."Automatic Cost Posting";
             PostEnable := PostToGL;
         end;
     }
 
-    labels
-    {
-    }
-
     trigger OnPostReport()
     begin
-        //-TQ1.31 [271126]
         DataLogMgt.DisableDataLog(false);
-        //+TQ1.31 [271126]
     end;
 
     trigger OnPreReport()
     var
-        ItemLedgEntry: Record "Item Ledger Entry";
-        ValueEntry: Record "Value Entry";
-        ItemApplnEntry: Record "Item Application Entry";
         AvgCostAdjmtEntryPoint: Record "Avg. Cost Adjmt. Entry Point";
         Item: Record Item;
+        ItemApplnEntry: Record "Item Application Entry";
+        ItemLedgEntry: Record "Item Ledger Entry";
+        ValueEntry: Record "Value Entry";
         UpdateItemAnalysisView: Codeunit "Update Item Analysis View";
+        ItemNoFilterLbl: Label 'ITEMNOFILTER';
+        ItemCategoryFilterLbl: Label 'ITEMCATEGORYFILTER';
+        PostToGLLbl: Label 'POSTTOGL';
+        SkipVariousItemsLbl: Label 'SKIPVARIOUSITEMS';
     begin
-        //-TQ1.31 [271126]
         DataLogMgt.DisableDataLog(true);
-        //+TQ1.31 [271126]
         ItemApplnEntry.LockTable;
-        if not ItemApplnEntry.FindLast then
+        if not ItemApplnEntry.FindLast() then
             exit;
         ItemLedgEntry.LockTable;
-        if not ItemLedgEntry.FindLast then
+        if not ItemLedgEntry.FindLast() then
             exit;
-        AvgCostAdjmtEntryPoint.LockTable;
-        if AvgCostAdjmtEntryPoint.FindLast then;
-        ValueEntry.LockTable;
-        if not ValueEntry.FindLast then
+        AvgCostAdjmtEntryPoint.LockTable();
+        if AvgCostAdjmtEntryPoint.FindLast() then;
+        ValueEntry.LockTable();
+        if not ValueEntry.FindLast() then
             exit;
 
-        //-TQ1.28.02
-        with "Task Line" do begin
-            if GetFilters <> '' then
-                if Find('-') then
-                    if not CurrReport.UseRequestPage then begin
-                        ItemNoFilter := GetParameterText('ITEMNOFILTER');
-                        ItemCategoryFilter := GetParameterText('ITEMCATEGORYFILTER');
-                        PostToGL := GetParameterBool('POSTTOGL');
-                        //-NPR5.31 [271478]
-                        SkipVariousItems := GetParameterBool('SKIPVARIOUSITEMS');
-                        //+NPR5.31 [271478]
-                    end;
-        end;
-        //+TQ1.28.02
+        if "Task Line".GetFilters <> '' then
+            if "Task Line".Find('-') then
+                if not CurrReport.UseRequestPage() then begin
+                    ItemNoFilter := "Task Line".GetParameterText(ItemNoFilterLbl);
+                    ItemCategoryFilter := "Task Line".GetParameterText(ItemCategoryFilterLbl);
+                    PostToGL := "Task Line".GetParameterBool(PostToGLLbl);
+                    SkipVariousItems := "Task Line".GetParameterBool(SkipVariousItemsLbl);
+                end;
 
         if (ItemNoFilter <> '') and (ItemCategoryFilter <> '') then
-            Error(Text005);
+            Error(ItemNoAndCategoryErr);
 
         if ItemNoFilter <> '' then
             Item.SetFilter("No.", ItemNoFilter);
         if ItemCategoryFilter <> '' then
             Item.SetFilter("Item Category Code", ItemCategoryFilter);
-        //-NPR5.31 [271478]
         if SkipVariousItems then
             Item.SetRange("NPR Group sale", false);
-        //+NPR5.31 [271478]
         InvtAdjmt.SetProperties(false, PostToGL);
         InvtAdjmt.SetFilterItem(Item);
-        InvtAdjmt.MakeMultiLevelAdjmt;
+        InvtAdjmt.MakeMultiLevelAdjmt();
 
         UpdateItemAnalysisView.UpdateAll(0, true);
     end;
 
     var
-        ResynchronizeInfoMsg: Label 'Your general and item ledgers will no longer be synchronized after running the cost adjustment. You must run the %1 report to synchronize them again.';
         InvtSetup: Record "Inventory Setup";
         InvtAdjmt: Codeunit "Inventory Adjustment";
-        ItemNoFilter: Text[250];
-        ItemCategoryFilter: Text[250];
-        Text005: Label 'You must not use Item No. Filter and Item Category Filter at the same time.';
-        PostToGL: Boolean;
+        DataLogMgt: Codeunit "NPR Data Log Management";
         [InDataSet]
-        PostEnable: Boolean;
+        FilterItemCategoryEditable: Boolean;
         [InDataSet]
         FilterItemNoEditable: Boolean;
         [InDataSet]
-        FilterItemCategoryEditable: Boolean;
+        PostEnable: Boolean;
+        PostToGL: Boolean;
         SkipVariousItems: Boolean;
-        DataLogMgt: Codeunit "NPR Data Log Management";
+        ItemNoAndCategoryErr: Label 'You must not use Item No. Filter and Item Category Filter at the same time.';
+        ResynchronizeInfoMsg: Label 'Your general and item ledgers will no longer be synchronized after running the cost adjustment. You must run the %1 report to synchronize them again.', Comment = '%1 = Report';
+        ItemCategoryFilter: Text[250];
+        ItemNoFilter: Text[250];
 
     procedure InitializeRequest(NewItemNoFilter: Text[250]; NewItemCategoryFilter: Text[250])
     begin

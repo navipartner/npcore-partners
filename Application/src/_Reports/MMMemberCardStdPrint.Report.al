@@ -1,12 +1,7 @@
 report 6060123 "NPR MM Member Card Std Print"
 {
-    // NPK1.00/JLK /20170215  CASE 266264 Object created
-    // NPK1.01/JLK /20170413  CASE 272077 Barcode Text removed to replace with External Member Card No.
-    // NPR5.55/JAKUBV/20200807  CASE 408787 Transport NPR5.55 - 31 July 2020
-    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/MM Member Card Std Print.rdlc';
-
     PreviewMode = PrintLayout;
 
     dataset
@@ -77,19 +72,20 @@ report 6060123 "NPR MM Member Card Std Print"
 
             trigger OnAfterGetRecord()
             var
-                BarcodeLib: Codeunit "NPR Barcode Library";
                 Item: Record Item;
-                MMMembershipRole: Record "NPR MM Membership Role";
-                MMMembership: Record "NPR MM Membership";
                 MMMembershipSalesSetup: Record "NPR MM Members. Sales Setup";
+                MMMembership: Record "NPR MM Membership";
+                MMMembershipRole: Record "NPR MM Membership Role";
                 MMMembershipSetup: Record "NPR MM Membership Setup";
+                BarcodeLib: Codeunit "NPR Barcode Library";
                 PointTo: Integer;
+                Code128Lbl: Label 'CODE128';
             begin
 
                 CalcFields("External Member No.");
                 BarcodeLib.SetAntiAliasing(false);
                 BarcodeLib.SetShowText(false);
-                BarcodeLib.SetBarcodeType('CODE128');
+                BarcodeLib.SetBarcodeType(Code128Lbl);
                 BarcodeLib.GenerateBarcode("MM Member Card"."External Card No.", TmpBarcode);
 
                 Clear(ImageMemoryBuffer);
@@ -103,7 +99,7 @@ report 6060123 "NPR MM Member Card Std Print"
                 Clear(CardCustomerType);
                 MMMembershipEntry.SetRange("Membership Entry No.", "Membership Entry No.");
                 MMMembershipEntry.SetRange(Blocked, false);
-                if MMMembershipEntry.FindLast then begin
+                if MMMembershipEntry.FindLast() then begin
                     MemberDate := Format(MMMembershipEntry."Valid Until Date", 0, '<Closing><Day,2>-<Month,2>-<Year4>');
                     Clear(MemberType);
                     if MMMembership.Get(MMMembershipEntry."Membership Entry No.") then
@@ -121,45 +117,23 @@ report 6060123 "NPR MM Member Card Std Print"
                     end;
                 end;
             end;
-
-            trigger OnPreDataItem()
-            var
-                RetailFormCode: Codeunit "NPR Retail Form Code";
-            begin
-            end;
         }
-    }
-
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
-        }
-    }
-
-    labels
-    {
     }
 
     var
-        MemberCardNoCaption: Label 'Member No.:';
-        ExpiryDateCaption: Label 'Expiry date: ';
-        MemberName: Text;
-        MemberDate: Text;
-        TmpBarcode: Codeunit "Temp Blob";
-        ImageMemoryBuffer: Record "NPR NpXml Custom Val. Buffer" temporary;
-        ImageMemoryRecRef: RecordRef;
         CompanyInformation: Record "Company Information";
         MMMembershipEntry: Record "NPR MM Membership Entry";
-        MemberItem: Text;
+        ImageMemoryBuffer: Record "NPR NpXml Custom Val. Buffer" temporary;
+        TmpBarcode: Codeunit "Temp Blob";
+        ImageMemoryRecRef: RecordRef;
+        ExpiryDateCaption: Label 'Expiry date: ';
+        MemberCardNoCaption: Label 'Member No.:';
         MemberNameCaption: Label 'Name: ';
-        MemberType: Text;
-        CardType: Text;
         CardCustomerType: Text;
+        CardType: Text;
+        MemberDate: Text;
+        MemberItem: Text;
+        MemberName: Text;
+        MemberType: Text;
 }
 

@@ -1,12 +1,7 @@
 report 6014459 "NPR Balancing Report A4 POS"
 {
-    // NPR5.42/ZESO/20180518  CASE 310459 Object Created
-    // NPR5.48/JDH /20181109 CASE 334163 Added Object Caption
-    // NPR5.55/BHR /20200525 CASE 404681 Replace POSEntry."POS Store Code" with POSEntry."POS Unit No."
-    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Balancing Report -A4 - POS.rdlc';
-
     Caption = 'Balancing Report -A4 - POS';
 
     dataset
@@ -734,12 +729,6 @@ report 6014459 "NPR Balancing Report A4 POS"
                             Caption = '        Print Discount Amount';
                             ApplicationArea = All;
                             ToolTip = 'Specifies the value of the         Print Discount Amount field';
-
-                            trigger OnValidate()
-                            begin
-                                //IF (PrintDiscountAmt) AND (PrintDiscount = FALSE) THEN
-                                //ERROR(Text000);
-                            end;
                         }
                         field(PrintDiscountPerc; PrintDiscountPerc)
                         {
@@ -747,11 +736,6 @@ report 6014459 "NPR Balancing Report A4 POS"
                             ApplicationArea = All;
                             ToolTip = 'Specifies the value of the         Print Discount % field';
 
-                            trigger OnValidate()
-                            begin
-                                //IF (PrintDiscountPerc) AND (PrintDiscount = FALSE) THEN
-                                //ERROR(Text000);
-                            end;
                         }
                         field(PrintDiscountTotal; PrintDiscountTotal)
                         {
@@ -759,11 +743,6 @@ report 6014459 "NPR Balancing Report A4 POS"
                             ApplicationArea = All;
                             ToolTip = 'Specifies the value of the         Print Discount Total field';
 
-                            trigger OnValidate()
-                            begin
-                                //IF (PrintDiscountTotal) AND (PrintDiscount = FALSE) THEN
-                                //ERROR(Text000);
-                            end;
                         }
                     }
                     field(PrintCounting; PrintCounting)
@@ -799,19 +778,10 @@ report 6014459 "NPR Balancing Report A4 POS"
                 }
             }
         }
-
-        actions
-        {
-        }
     }
-
-    labels
-    {
-    }
-
     trigger OnPreReport()
     begin
-        if CompanyInfo.Get then;
+        if CompanyInfo.Get() then;
         CompanyInfo.CalcFields(Picture);
     end;
 
@@ -868,4 +838,3 @@ report 6014459 "NPR Balancing Report A4 POS"
         Workshiftlbl: Label 'Workshift';
         CompanyInfo: Record "Company Information";
 }
-

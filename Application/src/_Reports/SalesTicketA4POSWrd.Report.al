@@ -1,15 +1,10 @@
 report 6150616 "NPR Sales Ticket A4 - POS Wrd"
 {
-    // NPR5.41/JLK /20180403  CASE 308435 Object created for Word Layout
-    // NPR5.42/JLK /20180522  CASE 315964 Identified format issue
-    UsageCategory = None;
     RDLCLayout = './src/_Reports/layouts/Sales Ticket A4 - POS Wrd.rdlc';
     WordLayout = './src/_Reports/layouts/Sales Ticket A4 - POS Wrd.docx';
-
     Caption = 'Sales Ticket A4 - POS Wrd';
     DefaultLayout = Word;
     PreviewMode = PrintLayout;
-
     dataset
     {
         dataitem(POS_Entry; "NPR POS Entry")
@@ -142,8 +137,6 @@ report 6150616 "NPR Sales Ticket A4 - POS Wrd"
             column(Customer_PhoneNo; Customer."Phone No.")
             {
             }
-
-
             dataitem(POS_Sales_Line; "NPR POS Sales Line")
             {
                 DataItemLink = "POS Entry No." = FIELD("Entry No.");
@@ -358,20 +351,8 @@ report 6150616 "NPR Sales Ticket A4 - POS Wrd"
 
             trigger OnPreDataItem()
             begin
-                GeneralLedgerSetup.Get;
+                GeneralLedgerSetup.Get();
             end;
-        }
-    }
-
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
         }
     }
 
@@ -397,43 +378,40 @@ report 6150616 "NPR Sales Ticket A4 - POS Wrd"
 
     trigger OnPreReport()
     begin
-        CompanyInformation.Get;
+        CompanyInformation.Get();
     end;
 
     var
-        TotalTaxText: Text;
-        StoreAddr: array[8] of Text;
-        CustAddr: array[8] of Text;
         CompanyInformation: Record "Company Information";
-        CustomerNoCaption: Label 'Customer No.';
-        GeneralLedgerSetup: Record "General Ledger Setup";
-        POSStore: Record "NPR POS Store";
-        Customer: Record Customer;
         Contact: Record Contact;
-        SalespersonPurchaser: Record "Salesperson/Purchaser";
+        Customer: Record Customer;
+        GeneralLedgerSetup: Record "General Ledger Setup";
         ItemVariant: Record "Item Variant";
-        TotalAmountCaption: Label 'Total %1 Excl. VAT';
+        POSStore: Record "NPR POS Store";
+        SalespersonPurchaser: Record "Salesperson/Purchaser";
         TotalTaxAmountCaption: Label '%1 VAT';
-        TotalTaxAmountCaptionBlank: Label 'VAT Amount';
-        TotalAmountInclVATCaption: Label 'Total %1 Incl. VAT';
         ContactNoCaption: Label 'Contact No.';
-
+        CustomerNoCaption: Label 'Customer No.';
+        TotalAmountCaption: Label 'Total %1 Excl. VAT';
+        TotalAmountInclVATCaption: Label 'Total %1 Incl. VAT';
+        TotalTaxAmountCaptionBlank: Label 'VAT Amount';
+        CustAddr: array[8] of Text;
+        StoreAddr: array[8] of Text;
+        TotalTaxText: Text;
         CustPhoneNo: text[30];
 
     local procedure GetVATText(EntryNo: Integer): Text
     var
         POSTaxAmountLine: Record "NPR POS Tax Amount Line";
     begin
-        with POSTaxAmountLine do begin
-            SetRange("POS Entry No.", EntryNo);
-            if Count > 1 then
-                exit('');
-
-            if FindFirst then
-                exit(Format("Tax %") + '%');
-
+        POSTaxAmountLine.SetRange("POS Entry No.", EntryNo);
+        if POSTaxAmountLine.Count() > 1 then
             exit('');
-        end;
+
+        if POSTaxAmountLine.FindFirst() then
+            exit(Format(POSTaxAmountLine."Tax %") + '%');
+
+        exit('');
     end;
 
     local procedure BlankZero(DecimalValue: Decimal): Text
@@ -441,10 +419,7 @@ report 6150616 "NPR Sales Ticket A4 - POS Wrd"
         if DecimalValue = 0 then
             exit('');
 
-        //-NPR5.42
-        //EXIT(FORMAT(DecimalValue,0,'<Precision,2:2><Standard Format,2>'));
         exit(Format(DecimalValue, 0, '<Sign><Integer Thousand><Decimals,3>'));
-        //+NPR5.42
     end;
 }
 

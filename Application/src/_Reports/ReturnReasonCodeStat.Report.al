@@ -1,14 +1,11 @@
 report 6014404 "NPR Return Reason Code Stat."
 {
-    // NPR5.31/JLK /20170314  CASE 260767 Object created
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Return Reason Code Statistics.rdlc';
-
     Caption = 'Return Reason Code Statistics';
     PreviewMode = PrintLayout;
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
-
     dataset
     {
         dataitem("Return Reason"; "Return Reason")
@@ -145,31 +142,14 @@ report 6014404 "NPR Return Reason Code Stat."
 
                 ExistItemLedgEntry := false;
                 ItemLedgerEntry.SetRange("Return Reason Code", Code);
-                if ItemLedgerEntry.FindFirst then
+                if ItemLedgerEntry.FindFirst() then
                     ExistItemLedgEntry := true;
             end;
         }
     }
 
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
-        }
-    }
-
-    labels
-    {
-    }
-
     trigger OnPreReport()
     begin
-
         if "Return Reason".GetFilters <> '' then
             ReturnReasonFilters := "Return Reason".TableCaption + ' ' + "Return Reason".GetFilters;
 
@@ -178,23 +158,23 @@ report 6014404 "NPR Return Reason Code Stat."
     end;
 
     var
-        ReturnType: Text;
-        CustomerNo: Text;
-        CostAmount: Decimal;
-        ReturnOrderCaption: Label 'Return Order';
-        ItemDescription: Text;
         Item: Record Item;
-        ReturnTypeCaption: Label 'Type';
-        SalesTicketNumberCaption: Label 'Sales Ticket No.';
-        PostingDateCaption: Label 'Posting Date';
-        CustomerCaption: Label 'Customer';
+        ExistItemLedgEntry: Boolean;
+        CostAmount: Decimal;
         BaseUOMCaption: Label 'Base UOM';
         CostAmountCaption: Label 'Cost Amount';
-        SalesAmountCaption: Label 'Sales Amount';
+        CustomerCaption: Label 'Customer';
         PageCaption: Label 'Page %1 of %2 ';
+        PostingDateCaption: Label 'Posting Date';
+        ReturnOrderCaption: Label 'Return Order';
         ReportCaption: Label 'Return Reason Code Statistics';
-        ReturnReasonFilters: Text;
+        SalesAmountCaption: Label 'Sales Amount';
+        SalesTicketNumberCaption: Label 'Sales Ticket No.';
+        ReturnTypeCaption: Label 'Type';
+        CustomerNo: Text;
+        ItemDescription: Text;
         ItemLedgerEntryFilters: Text;
-        ExistItemLedgEntry: Boolean;
+        ReturnReasonFilters: Text;
+        ReturnType: Text;
 }
 

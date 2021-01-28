@@ -1,13 +1,9 @@
 report 6060135 "NPR MM Member Card Owner"
 {
-    // MM1.25/NPKNAV/20180122  CASE 299537 Transport MM1.25 - 22 January 2018
-    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/MM Member Card Owner.rdlc';
-
     Caption = 'Member Card Owner';
     ShowPrintStatus = false;
-
     dataset
     {
         dataitem("MM Member Card"; "NPR MM Member Card")
@@ -49,20 +45,5 @@ report 6060135 "NPR MM Member Card Owner"
         }
     }
 
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
-        }
-    }
-
-    labels
-    {
-    }
 }
 

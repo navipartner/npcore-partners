@@ -5,25 +5,5 @@ report 6060051 "NPR List of Sales Invoices"
     Caption = 'List of Sales Invoices';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
-
-    dataset
-    {
-    }
-
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
-        }
-    }
-
-    labels
-    {
-    }
 }
 

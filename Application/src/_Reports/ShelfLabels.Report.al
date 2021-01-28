@@ -1,20 +1,10 @@
 report 6014428 "NPR Shelf Labels"
 {
-    // NPR5.40 /JLK /20180307  CASE 307145 Object created
-    //                                     Report copied from Vaersgo NPK1.03
-    // NPR5.41/BHR /20180410 CASE 302733 Remove field Status from Autocalcfields
-    // TM1.39/THRO/20181126 CASE 334644 Replaced Coudeunit 1 by Wrapper Codeunit
-    // NPR5.50/ZESO/201905006 CASE 353382 Remove Reference to Wrapper Codeunit
-    // NPR5.53/ANPA/20191029  CASE 374286 Made the report able to print more than one of each label
-    // NPR5.54/SARA/20200114  CASE 384891 Added option to print 'Item Unit Price' or 'Campaign Unit Price'
-    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Shelf Labels.rdlc';
-
     Caption = 'Shelf Labels';
     PreviewMode = PrintLayout;
     UseSystemPrinter = true;
-
     dataset
     {
         dataitem(Retail_Journal_Line; "NPR Retail Journal Line")
@@ -26,17 +16,13 @@ report 6014428 "NPR Shelf Labels"
                 j: Integer;
             begin
                 if Retail_Journal_Line."Quantity to Print" > 0 then begin
-                    //-NPR5.53 [374286]
                     for k := 1 to Retail_Journal_Line."Quantity to Print" do begin
-                        //+NPR5.53 [374286]
-                        TMPRetail_Journal_Line_Col1.Init;
+                        TMPRetail_Journal_Line_Col1.Init();
                         TMPRetail_Journal_Line_Col1.TransferFields(Retail_Journal_Line);
                         TMPRetail_Journal_Line_Col1."Line No." := LineNo;
-                        TMPRetail_Journal_Line_Col1.Insert;
+                        TMPRetail_Journal_Line_Col1.Insert();
                         LineNo := LineNo + 1;
-                        //-NPR5.53 [374286]
                     end;
-                    //+NPR5.53 [374286]
                 end;
             end;
         }
@@ -122,23 +108,19 @@ report 6014428 "NPR Shelf Labels"
                     TMPItemGroup := ItemGroup.Description;
 
                 TMPBeforeUnitPrice := TMPRetail_Journal_Line_Col1."Discount Price Incl. Vat";
-                //-NPR5.54 [384891]
                 TMPUnitPriceCard := Item."Unit Price";
                 TMPRetailLineDiscount := TMPRetail_Journal_Line_Col1."Discount Price Incl. Vat";
-                //+NPR5.54 [384891]
                 if (TMPRetail_Journal_Line_Col1."Discount Type" = TMPRetail_Journal_Line_Col1."Discount Type"::Campaign) and (TMPRetail_Journal_Line_Col1."Discount Code" <> '') then
                     CalculatePriceCampaign("Item No.", TMPBeforeUnitPrice, TMPUnitPrice)
                 else
                     CalculatePrice("Item No.", TMPBeforeUnitPrice, TMPUnitPrice);
 
-                //-NPR5.54 [384891]
                 case UnitPriceOption of
                     UnitPriceOption::"Use Retail Journal Line Prices":
                         TMPUnitPrice := TMPRetailLineDiscount;
                     UnitPriceOption::"Use Item Card Unit Prices":
                         TMPUnitPrice := TMPUnitPriceCard;
                 end;
-                //+NPR5.54 [384891]
 
                 BeforeCaptionTxt := '';
                 if TMPUnitPrice <> TMPBeforeUnitPrice then
@@ -181,14 +163,6 @@ report 6014428 "NPR Shelf Labels"
                 }
             }
         }
-
-        actions
-        {
-        }
-    }
-
-    labels
-    {
     }
 
     trigger OnPreReport()
@@ -202,49 +176,44 @@ report 6014428 "NPR Shelf Labels"
     end;
 
     var
-        BarcodeLib: Codeunit "NPR Barcode Library";
-        TempBlobCol1: Codeunit "Temp Blob";
-        i: Integer;
         Item: Record Item;
+        ItemVariant: Record "Item Variant";
+        BlobBuffer: Record "NPR BLOB buffer" temporary;
         ItemGroup: Record "NPR Item Group";
+        BarcodeLib: Codeunit "NPR Barcode Library";
+        StringLibrary: Codeunit "NPR String Library";
+        TempBlobCol1: Codeunit "Temp Blob";
         CurrencyChar: Char;
-        LineNo: Integer;
-        TMPItemGroup: Text;
-        BeforeCaptionLbl: Label 'Before';
-        NowCaptionLbl: Label 'Now';
-        TMPUnitPriceWhole: Text;
-        TMPUnitPriceDecimal: Text;
+        TMPBeforeUnitPrice: Decimal;
+        TMPRetailLineDiscount: Decimal;
         TMPUnitPrice: Decimal;
         TMPUnitPriceCard: Decimal;
-        TMPRetailLineDiscount: Decimal;
-        StringLibrary: Codeunit "NPR String Library";
+        i: Integer;
+        k: Integer;
+        LineNo: Integer;
+        TextCaptionClass: Label '6014555,27,%1,2';
+        TextAttrNotDefined: Label 'Attribute %1 is not defined';
+        BeforeCaptionLbl: Label 'Before';
+        NowCaptionLbl: Label 'Now';
+        UnitPriceOption: Option "Use Retail Journal Line Prices","Use Item Card Unit Prices","Use Campaign Unit Prices";
+        BeforeCaptionTxt: Text;
+        TMPItemGroup: Text;
+        TMPUnitPriceDecimal: Text;
+        TMPUnitPriceWhole: Text;
         NPRAtrributeTextArray: array[20] of Text[50];
         NPRAttributeTextArrayText: array[20] of Text[50];
-        TextAttrNotDefined: Label 'Attribute %1 is not defined';
-        TextCaptionClass: Label '6014555,27,%1,2';
-        TMPBeforeUnitPrice: Decimal;
-        BeforeCaptionTxt: Text;
-        ItemVariant: Record "Item Variant";
-        k: Integer;
-        UnitPriceOption: Option "Use Retail Journal Line Prices","Use Item Card Unit Prices","Use Campaign Unit Prices";
-        BlobBuffer: Record "NPR BLOB buffer" temporary;
 
     local procedure GetItemNPRAttr(ItemRec: Record Item)
     var
+        NPRAttributeMgr: Codeunit "NPR Attribute Management";
         NPRAttrCount: Integer;
         NPRAttrPosition: Integer;
-        NPRAttributeMgr: Codeunit "NPR Attribute Management";
     begin
         Clear(NPRAtrributeTextArray);
         Clear(NPRAttributeTextArrayText);
         NPRAttributeMgr.GetMasterDataAttributeValue(NPRAtrributeTextArray, DATABASE::Item, ItemRec."No.");
         for NPRAttrCount := 1 to 1 do begin
-            //-#[353382] [353382]
-            //-TM1.39 [334644]
-            //NPRAttributeTextArrayText[NPRAttrCount] := SystemEventWrapper.CaptionClassTranslate(CurrReport.LANGUAGE,STRSUBSTNO(TextCaptionClass,FORMAT(NPRAttrCount)));
-            //-TM1.39 [334644]
             NPRAttributeTextArrayText[NPRAttrCount] := CaptionClassTranslate(StrSubstNo(TextCaptionClass, Format(NPRAttrCount)));
-            //+#[353382] [353382]
             NPRAttrPosition := StrPos(NPRAtrributeTextArray[NPRAttrCount], '-');
             if NPRAttrPosition > 0 then
                 NPRAtrributeTextArray[NPRAttrCount] := CopyStr(NPRAtrributeTextArray[NPRAttrCount], NPRAttrPosition + 1);
@@ -255,26 +224,23 @@ report 6014428 "NPR Shelf Labels"
 
     local procedure CalculatePrice(ItemNo: Code[20]; var TMPBeforeUnitPrice: Decimal; var TMPUnitPrice: Decimal)
     var
+        PeriodDisc: Record "NPR Period Discount";
         PeriodDiscountLine: Record "NPR Period Discount Line";
         StatusOptionString: Option Await,Active,Balanced;
-        PeriodDisc: Record "NPR Period Discount";
     begin
-        PeriodDiscountLine.Reset;
+        PeriodDiscountLine.Reset();
         PeriodDiscountLine.SetRange("Item No.", ItemNo);
         PeriodDiscountLine.SetFilter("Starting Date", '%1|<=%2', 0D, Today);
         PeriodDiscountLine.SetFilter("Ending Date", '%1|>=%2', 0D, Today);
-        //-NPR5.41 [302733]
-        //PeriodDiscountLine.SETAUTOCALCFIELDS(Status, "Unit Price");
         PeriodDiscountLine.SetAutoCalcFields("Unit Price");
-        //+NPR5.41 [302733]
-        if PeriodDiscountLine.FindSet then
+        if PeriodDiscountLine.FindSet() then
             repeat
                 if PeriodDiscountLine.Status = StatusOptionString::Active then begin
                     TMPUnitPrice := PeriodDiscountLine."Campaign Unit Price";
                     TMPBeforeUnitPrice := PeriodDiscountLine."Unit Price";
                     exit;
                 end;
-            until PeriodDiscountLine.Next = 0;
+            until PeriodDiscountLine.Next() = 0;
 
         TMPUnitPrice := TMPRetail_Journal_Line_Col1."Discount Price Incl. Vat";
         exit;
@@ -282,23 +248,20 @@ report 6014428 "NPR Shelf Labels"
 
     local procedure CalculatePriceCampaign(ItemNo: Code[20]; var TMPBeforeUnitPrice: Decimal; var TMPUnitPrice: Decimal)
     var
+        PeriodDisc: Record "NPR Period Discount";
         PeriodDiscountLine: Record "NPR Period Discount Line";
         StatusOptionString: Option Await,Active,Balanced;
-        PeriodDisc: Record "NPR Period Discount";
     begin
-        PeriodDiscountLine.Reset;
+        PeriodDiscountLine.Reset();
         PeriodDiscountLine.SetRange(Code, TMPRetail_Journal_Line_Col1."Discount Code");
         PeriodDiscountLine.SetRange("Item No.", ItemNo);
-        //-NPR5.41 [302733]
-        //PeriodDiscountLine.SETAUTOCALCFIELDS(Status, "Unit Price");
         PeriodDiscountLine.SetAutoCalcFields("Unit Price");
-        //+NPR5.41 [302733]
-        if PeriodDiscountLine.FindSet then
+        if PeriodDiscountLine.FindSet() then
             repeat
                 TMPUnitPrice := PeriodDiscountLine."Campaign Unit Price";
                 TMPBeforeUnitPrice := PeriodDiscountLine."Unit Price";
                 exit;
-            until PeriodDiscountLine.Next = 0;
+            until PeriodDiscountLine.Next() = 0;
 
         TMPUnitPrice := TMPRetail_Journal_Line_Col1."Discount Price Incl. Vat";
         exit;

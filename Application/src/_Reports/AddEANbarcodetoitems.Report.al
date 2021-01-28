@@ -1,11 +1,5 @@
 report 6060110 "NPR Add EAN barcode to items"
 {
-    // NPR4.18/MMV/20153011 CASE 228269 Created report
-    // 
-    // Report does not handle barcodes for any of our current variant systems at this moment!
-    // NPR5.36/TJ /20170927 CASE 286283 Renamed variables into english and into proper naming terminology
-
-    UsageCategory = None;
     Caption = 'Add EAN barcode to all items';
     ProcessingOnly = true;
     UseRequestPage = false;
@@ -18,13 +12,12 @@ report 6060110 "NPR Add EAN barcode to items"
             trigger OnAfterGetRecord()
             var
                 AltNo: Record "NPR Alternative No.";
+                RetailFormCode: Codeunit "NPR Retail Form Code";
                 FoundValid: Boolean;
                 Itt: Integer;
-                RetailFormCode: Codeunit "NPR Retail Form Code";
             begin
                 //Does item already have a valid 'Label Barcode'
                 if not (CheckBarcodeValid(Item."NPR Label Barcode")) then begin
-
                     //Check alt no for valid EAN
                     AltNo.SetRange(Type, AltNo.Type::Item);
                     AltNo.SetRange(AltNo.Code, Item."No.");
@@ -34,15 +27,15 @@ report 6060110 "NPR Add EAN barcode to items"
                         repeat
                             if CheckBarcodeValid(AltNo."Alt. No.") then begin
                                 Item."NPR Label Barcode" := AltNo."Alt. No.";
-                                Item.Modify;
+                                Item.Modify();
                                 FoundValid := true;
                             end;
-                        until ((AltNo.Next = 0) or (FoundValid = true));
+                        until ((AltNo.Next() = 0) or (FoundValid = true));
 
                     //Generate new EAN
                     if not FoundValid then
                         if not CreateNewBarcode(Item, '*', '') then
-                            Error(Text1000001);
+                            Error(CreateBarcodeErr);
 
                 end;
                 Itt += 1;
@@ -53,60 +46,46 @@ report 6060110 "NPR Add EAN barcode to items"
 
             trigger OnPostDataItem()
             begin
-                ProgressDialog.Close;
-                Message(Text1000004);
+                ProgressDialog.Close();
+                Message(UpdatedItemsMsg);
             end;
 
             trigger OnPreDataItem()
+            var
+                ProgressLbl: Label 'Progress : @@1@@@@@@@@@@';
             begin
                 Total := Item.Count;
-                ProgressDialog.Open('Progress : @@1@@@@@@@@@@');
+                ProgressDialog.Open(ProgressLbl);
             end;
         }
-    }
-
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
-        }
-    }
-
-    labels
-    {
     }
 
     trigger OnPreReport()
     begin
-        if not Confirm(Text1000002) then
-            CurrReport.Quit;
+        if not Confirm(CheckItemsQst) then
+            CurrReport.Quit();
 
-        if Confirm(Text1000003) then
-            ExportAllBarcodes;
+        if Confirm(ExportItemsQst) then
+            ExportAllBarcodes();
     end;
 
     var
-        Total: Integer;
-        Itt: Integer;
         ProgressDialog: Dialog;
-        Text1000001: Label 'Error when creating new barcode';
-        Text1000002: Label 'Do you want to check all items for valid EAN barcodes and generate new ones where needed?';
-        Text1000003: Label 'Do you want to export all item barcodes and associated alternative numbers first?';
-        Text1000004: Label 'All items are now updated with EAN barcodes';
+        Itt: Integer;
+        Total: Integer;
+        UpdatedItemsMsg: Label 'All items are now updated with EAN barcodes';
+        CheckItemsQst: Label 'Do you want to check all items for valid EAN barcodes and generate new ones where needed?';
+        ExportItemsQst: Label 'Do you want to export all item barcodes and associated alternative numbers first?';
+        CreateBarcodeErr: Label 'Error when creating new barcode';
 
     local procedure CheckBarcodeValid(barcode: Code[20]): Boolean
     var
-        InputDialog: Page "NPR Input Dialog";
-        NrSerieStyring: Codeunit NoSeriesManagement;
-        Internnr: Code[10];
-        Intereankode: Code[10];
         Vare: Record Item;
         "alt.varenummer": Record "NPR Alternative No.";
+        NrSerieStyring: Codeunit NoSeriesManagement;
+        InputDialog: Page "NPR Input Dialog";
+        Intereankode: Code[10];
+        Internnr: Code[10];
     begin
         //EAN13 check
         if StrLen(barcode) <> 13 then
@@ -117,22 +96,21 @@ report 6060110 "NPR Add EAN barcode to items"
 
     local procedure CreateNewBarcode(var Rec: Record Item; AltNo: Code[20]; VariantCode: Code[10]): Boolean
     var
-        InputDialog: Page "NPR Input Dialog";
+        Item2: Record Item;
+        AlternativeNo: Record "NPR Alternative No.";
         RetailSetup: Record "NPR Retail Setup";
         NoSeriesMgt: Codeunit NoSeriesManagement;
-        InternNo: Code[10];
+        InputDialog: Page "NPR Input Dialog";
         InterEANCode: Code[10];
-        Text10600006: Label 'Chack digits are incorrect on EAN no.';
-        Text10600007: Label 'Item No. #1###';
-        Item2: Record Item;
-        Text10600008: Label 'Item %1 exists already!';
-        Text10600009: Label 'No. %1 exists already on item %2!';
-        AlternativeNo: Record "NPR Alternative No.";
+        InternNo: Code[10];
+        IncorrectDigitsErr: Label 'Chack digits are incorrect on EAN no.';
+        ItemExistErr: Label 'Item %1 exists already!', Comment = '%1 = Item No.';
+        AlternativeNoExistErr: Label 'No. %1 exists already on item %2!', Comment = '%1 = Alternative No., %2 = Item No.';
     begin
         //Copied from Retail Form Code (CU 6014435) CreateNewAltItem() but removed xrec
 
         if AltNo = '*' then begin
-            RetailSetup.Get;
+            RetailSetup.Get();
             RetailSetup.TestField("Internal EAN No. Management");
             NoSeriesMgt.InitSeries(RetailSetup."Internal EAN No. Management", '', 0D, InternNo, Rec."No. Series");
 
@@ -140,33 +118,33 @@ report 6060110 "NPR Add EAN barcode to items"
             AltNo := InterEANCode + PadStr('', 10 - StrLen(Format(InternNo)), '0') + Format(InternNo);
             AltNo := AltNo + Format(StrCheckSum(AltNo, '131313131313'));
             if StrCheckSum(AltNo, '1313131313131') <> 0 then
-                Error(Text10600006);
+                Error(IncorrectDigitsErr);
         end;
 
         if Item2.Get(AltNo) then
-            Error(Text10600008, Item2."No.");
+            Error(ItemExistErr, Item2."No.");
 
         AlternativeNo.SetCurrentKey("Alt. No.");
         AlternativeNo.SetRange("Alt. No.", AltNo);
         if AlternativeNo.Find('-') then
-            Error(Text10600009, AltNo, AlternativeNo.Code);
+            Error(AlternativeNoExistErr, AltNo, AlternativeNo.Code);
 
-        AlternativeNo.Reset;
+        AlternativeNo.Reset();
         AlternativeNo.Type := AlternativeNo.Type::Item;
         AlternativeNo.Code := Rec."No.";
         AlternativeNo."Alt. No." := AltNo;
         AlternativeNo."Variant Code" := VariantCode;
         AlternativeNo.Insert(true);
         Rec."NPR Label Barcode" := AlternativeNo."Alt. No.";
-        Rec.Modify;
+        Rec.Modify();
 
         exit(true);
     end;
 
     local procedure ExportAllBarcodes()
     var
-        TableExportLibrary: Codeunit "NPR Table Export Library";
         AltNo: Record "NPR Alternative No.";
+        TableExportLibrary: Codeunit "NPR Table Export Library";
     begin
         TableExportLibrary.SetFileModeDotNetStream();
         TableExportLibrary.SetShowStatus(true);
@@ -175,11 +153,9 @@ report 6060110 "NPR Add EAN barcode to items"
         TableExportLibrary.AddTableForExport(DATABASE::Item);
         TableExportLibrary.AddFieldForExport(DATABASE::Item, 1);
         TableExportLibrary.AddFieldForExport(DATABASE::Item, 6014410);
-
         TableExportLibrary.AddTableForExport(DATABASE::"NPR Alternative No.");
         AltNo.SetRange(Type, AltNo.Type::Item);
         TableExportLibrary.SetTableView(DATABASE::"NPR Alternative No.", AltNo.GetView(false));
-
         TableExportLibrary.ExportTableBatch();
     end;
 }

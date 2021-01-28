@@ -1,11 +1,7 @@
 report 6014610 "NPR Create Item From ItemGr."
 {
-    // NPR70.00.00.00/LS/20141218  CASE 201562  : Create report to create items from Item Group
-
-    UsageCategory = None;
     Caption = 'Create Item(s) From Item Group';
     ProcessingOnly = true;
-
     dataset
     {
         dataitem("Item Group"; "NPR Item Group")
@@ -15,10 +11,9 @@ report 6014610 "NPR Create Item From ItemGr."
 
             trigger OnAfterGetRecord()
             begin
-                //-NPR70.00.00.00
                 if not Item.Get("No.") then begin
-                    Item.Reset;
-                    Item.Init;
+                    Item.Reset();
+                    Item.Init();
                     Item."No." := "No.";
                     Item.Insert(true);
                     Item."NPR Item Group" := "No.";
@@ -30,16 +25,15 @@ report 6014610 "NPR Create Item From ItemGr."
                     if (ProfitPct <> 0) then
                         Item.Validate("Profit %", ProfitPct);
                     Item.Validate(Description, Description);
-                    Item.Modify;
+                    Item.Modify();
 
                     Counter += 1;
                 end;
-                //+NPR70.00.00.00
             end;
 
             trigger OnPostDataItem()
             begin
-                Message(Text001, Counter);
+                Message(ItemsCreatedMsg, Counter);
             end;
         }
     }
@@ -60,20 +54,14 @@ report 6014610 "NPR Create Item From ItemGr."
             }
         }
 
-        actions
-        {
-        }
     }
 
-    labels
-    {
-    }
 
     var
-        ProfitPct: Decimal;
         Item: Record Item;
-        Counter: Integer;
-        Text001: Label '%1 Item(s) has been created.';
         StdTableCode: Codeunit "NPR Std. Table Code";
+        ProfitPct: Decimal;
+        Counter: Integer;
+        ItemsCreatedMsg: Label '%1 Item(s) has been created.', Comment = '%1 = Number of Items';
 }
 

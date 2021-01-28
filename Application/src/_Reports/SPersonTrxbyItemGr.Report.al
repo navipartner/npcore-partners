@@ -1,19 +1,10 @@
 report 6014431 "NPR S.Person Trx by Item Gr."
 {
-    // NPR70.00.00.00/LS Convert to RTC
-    // NPR5.29/JLK /20161122  CASE 254245  Added Filter to SKIP empty Part of Product Line since CALCFIELDS of Turnover filters on No.
-    //                                     Variables changed to ENU
-    // NPR5.38/JLK /20180124  CASE 300892 Removed AL Error on ControlContainer Caption in Request Page
-    // NPR5.39/TJ  /20180212  CASE 302634 Renamed Name property of controls Sort and SortBy to english
-    // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
-    // NPR5.55/BHR /20200219 CASE 361515 Change Key as it's not supported in extension
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Sales Person Trn. by Item Gr..rdlc';
-
     Caption = 'Sales Person Trn. By Item Gr.';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
-
     dataset
     {
         dataitem("Item Group"; "NPR Item Group")
@@ -101,7 +92,7 @@ report 6014431 "NPR S.Person Trx by Item Gr."
                         Dg := (("NPR Sales (LCY)" - "NPR COGS (LCY)") / "NPR Sales (LCY)") * 100;
 
                     if SortSalesPerson then begin
-                        TempVendorAmount.Init;
+                        TempVendorAmount.Init();
                         TempVendorAmount."Vendor No." := Code;
 
                         case Sort of
@@ -119,7 +110,7 @@ report 6014431 "NPR S.Person Trx by Item Gr."
                             SortBy::DB:
                                 TempVendorAmount."Amount (LCY)" := Multpl * ("NPR Sales (LCY)" - "NPR COGS (LCY)");
                         end;
-                        TempVendorAmount.Insert;
+                        TempVendorAmount.Insert();
                     end;
 
                     Clear(PercentItemGroupSale);
@@ -129,7 +120,7 @@ report 6014431 "NPR S.Person Trx by Item Gr."
 
                 trigger OnPreDataItem()
                 begin
-                    TempVendorAmount.DeleteAll;
+                    TempVendorAmount.DeleteAll();
                 end;
             }
             dataitem("Integer"; "Integer")
@@ -168,10 +159,10 @@ report 6014431 "NPR S.Person Trx by Item Gr."
                 begin
                     if Number = 1 then begin
                         if not TempVendorAmount.Find('-') then
-                            CurrReport.Break;
+                            CurrReport.Break();
                     end else
                         if TempVendorAmount.Next = 0 then
-                            CurrReport.Break;
+                            CurrReport.Break();
 
                     "Salesperson/Purchaser".Get(TempVendorAmount."Vendor No.");
                     "Salesperson/Purchaser".CalcFields("NPR Sales (Qty.)", "NPR Sales (LCY)", "NPR COGS (LCY)");
@@ -187,7 +178,8 @@ report 6014431 "NPR S.Person Trx by Item Gr."
 
                 trigger OnPreDataItem()
                 begin
-                    if (not SortSalesPerson) then CurrReport.Break;
+                    if (not SortSalesPerson) then
+                        CurrReport.Break();
                 end;
             }
 
@@ -195,7 +187,7 @@ report 6014431 "NPR S.Person Trx by Item Gr."
             begin
                 if not ShowItemsGrpWithoutSale then begin
                     if "Sales (Qty.)" = 0 then
-                        CurrReport.Skip;
+                        CurrReport.Skip();
                 end;
 
                 Clear(Dg);
@@ -210,15 +202,9 @@ report 6014431 "NPR S.Person Trx by Item Gr."
             trigger OnPreDataItem()
             begin
                 CopyFilter("Date Filter", ValueEntry."Posting Date");
-                //-NPR5.55 [361515]
-                //ValueEntry.SETCURRENTKEY(
-                //"Item No.","Posting Date","Item Ledger Entry Type","Entry Type","Item Charge No.","Location Code","Variant Code");
                 ValueEntry.SetCurrentKey("Item No.", "Posting Date", "Item Ledger Entry Type", "Entry Type", "Variance Type", "Item Charge No.", "Location Code", "Variant Code");
-                //+NPR5.55 [361515]
                 ValueEntry.SetRange("Item Ledger Entry Type", ValueEntry."Item Ledger Entry Type"::Sale);
-                //-NPR5.29
                 ValueEntry.SetFilter(ValueEntry."NPR Item Group No.", '<>%1', '');
-                //+NPR5.29
                 ValueEntry.CalcSums("Sales Amount (Actual)");
                 TotalSale := ValueEntry."Sales Amount (Actual)";
             end;
@@ -262,10 +248,6 @@ report 6014431 "NPR S.Person Trx by Item Gr."
                 }
             }
         }
-
-        actions
-        {
-        }
     }
 
     labels
@@ -291,27 +273,21 @@ report 6014431 "NPR S.Person Trx by Item Gr."
         SortSalesPerson := false;
         Sort := Sort::Highest;
         SortBy := SortBy::Quantity;
-
-        //-NPR5.39
-        // Object.SETRANGE(ID, 6014431);
-        // Object.SETRANGE(Type, 3);
-        // Object.FIND('-');
-        //+NPR5.39
     end;
 
     var
         CompanyInformation: Record "Company Information";
-        Dg: Decimal;
-        ShowItemsGrpWithoutSale: Boolean;
+        ValueEntry: Record "Value Entry";
         TempVendorAmount: Record "Vendor Amount" temporary;
+        ShowItemsGrpWithoutSale: Boolean;
         [InDataSet]
         SortSalesPerson: Boolean;
-        SortBy: Option Quantity,Turnover,DB;
-        Sort: Option Highest,Lowest;
-        Multpl: Integer;
-        PercentItemGroupSale: Text[30];
-        TotalSale: Decimal;
+        Dg: Decimal;
         PercentTotalSale: Decimal;
-        ValueEntry: Record "Value Entry";
+        TotalSale: Decimal;
+        Multpl: Integer;
+        Sort: Option Highest,Lowest;
+        SortBy: Option Quantity,Turnover,DB;
+        PercentItemGroupSale: Text[30];
 }
 

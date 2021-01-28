@@ -1,20 +1,8 @@
 report 6014401 "NPR Counter Report A4"
 {
-    // NPR7.00/LS  /100713    CASE 147801 : Creation of 2013 version of Report
-    // NPR4.02/TR  /20150227  CASE 207878 Calculation of expedition counts moved from report on post section to "Audit Roll" section.
-    //   The report can be run from every date and not only on posting date. Code has been outcommented onPreReport().
-    // NPR5.31/JLK /20170403  CASE 270671 Replaced old Payment Type Counting
-    // NPR5.36/TJ  /20170927  CASE 286283 Renamed variables with danish specific letters into english letters
-    // NPR5.39/JC  /20180122  CASE 303086 Fixed variables LastTicketNo, fraBon & tilBon length from 10 to 20
-    // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
-    // NPR5.41/JLK /20180413  CASE 302573 Changed all Danish Variables/Captions to English
-    // NPR5.48/BHR/20181030 CASE 333898 Correct filter on "Payment Type POS"
-    UsageCategory = None;
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Counter Report A4.rdlc';
-
     Caption = 'Counter Report A4';
-
     dataset
     {
         dataitem("Audit Roll"; "NPR Audit Roll")
@@ -194,21 +182,21 @@ report 6014401 "NPR Counter Report A4"
             begin
                 GlobalPeriod.SetRange("Register No.", "Register No.");
                 GlobalPeriod.SetRange("Sales Ticket No.", "Sales Ticket No.");
-                GlobalPeriod.FindLast;
+                GlobalPeriod.FindLast();
 
                 AuditRoll1.SetCurrentKey("Sale Date", "Sale Type");
                 AuditRoll1.SetRange("Sale Date", "Audit Roll"."Sale Date");
                 AuditRoll1.SetRange("Sale Type", AuditRoll1."Sale Type"::Sale);
-                if AuditRoll1.FindFirst then
+                if AuditRoll1.FindFirst() then
                     Opentime := AuditRoll1."Starting Time";
-                if AuditRoll1.FindLast then
+                if AuditRoll1.FindLast() then
                     Closetime := AuditRoll1."Closing Time";
-                if AuditRoll1.FindSet then
+                if AuditRoll1.FindSet() then
                     repeat
                         if Sidstebon <> AuditRoll1."Sales Ticket No." then
                             Ekspeditionstaeller += 1;
                         Sidstebon := AuditRoll1."Sales Ticket No.";
-                    until AuditRoll1.Next = 0;
+                    until AuditRoll1.Next() = 0;
                 AuditRoll1.SetRange("Sale Date");
                 AuditRoll1.SetRange("Sale Type");
 
@@ -229,8 +217,8 @@ report 6014401 "NPR Counter Report A4"
 
                     if Calc then begin
                         AuditRollCalc2.SetCurrentKey("Register No.", "Sales Ticket No.", "Sale Type", Type);
-                        Register.FindFirst;
-                        RegisterLast.FindLast;
+                        Register.FindFirst();
+                        RegisterLast.FindLast();
                         AuditRollCalc2.SetFilter("Register No.", '%1..%2', Register."Register No.", RegisterLast."Register No.");
 
                         AuditRollCalc2.SetFilter("Sales Ticket No.", '%1..%2', AuditRollCalc1."Sales Ticket No.", "Audit Roll"."Sales Ticket No.");
@@ -244,7 +232,7 @@ report 6014401 "NPR Counter Report A4"
                         TotalDiscount := AuditRollCalc2."Line Discount Amount";
                         AuditRollCalc2.CalcSums(Cost);
                         ItemCost := AuditRollCalc2.Cost;
-                        if AuditRollCalc2.FindSet then
+                        if AuditRollCalc2.FindSet() then
                             repeat
                                 case AuditRollCalc2."Discount Type" of
                                     AuditRollCalc2."Discount Type"::Campaign:
@@ -256,7 +244,7 @@ report 6014401 "NPR Counter Report A4"
                                     AuditRollCalc2."Discount Type"::Manual:
                                         ManualDiscount := ManualDiscount + AuditRollCalc2."Line Discount Amount";
                                 end;
-                            until AuditRollCalc2.Next = 0;
+                            until AuditRollCalc2.Next() = 0;
                         if NetTurnover <> 0 then
                             CoverageAmt := (NetTurnover - ItemCost) * 100 / NetTurnover;
 
@@ -287,7 +275,7 @@ report 6014401 "NPR Counter Report A4"
                     TotalDiscount := AuditRollCalc2."Line Discount Amount";
                     AuditRollCalc2.CalcSums(Cost);
                     ItemCost := AuditRollCalc2.Cost;
-                    if AuditRollCalc2.FindSet then
+                    if AuditRollCalc2.FindSet() then
                         repeat
                             case AuditRollCalc2."Discount Type" of
                                 AuditRollCalc2."Discount Type"::Campaign:
@@ -299,7 +287,7 @@ report 6014401 "NPR Counter Report A4"
                                 AuditRollCalc2."Discount Type"::Manual:
                                     ManualDiscount := ManualDiscount + AuditRollCalc2."Line Discount Amount";
                             end;
-                        until AuditRollCalc2.Next = 0;
+                        until AuditRollCalc2.Next() = 0;
                     if NetTurnover <> 0 then
                         CoverageAmt := (NetTurnover - ItemCost) * 100 / NetTurnover;
 
@@ -316,7 +304,7 @@ report 6014401 "NPR Counter Report A4"
                 end;
 
                 DebitSale := 0;
-                AuditRollCalc2.Reset;
+                AuditRollCalc2.Reset();
                 AuditRollCalc2.SetCurrentKey("Register No.", "Sales Ticket No.", "Sale Type", Type);
                 AuditRollCalc2.SetRange("Register No.", "Register No.");
                 AuditRollCalc2.SetFilter("Sales Ticket No.", '%1..%2', AuditRollCalc1."Sales Ticket No.", "Audit Roll"."Sales Ticket No.");
@@ -326,7 +314,7 @@ report 6014401 "NPR Counter Report A4"
                 DebitSale := AuditRollCalc2."Amount Including VAT";
 
                 CustomerDeposits := 0;
-                AuditRollCalc2.Reset;
+                AuditRollCalc2.Reset();
                 AuditRollCalc2.SetCurrentKey("Register No.", "Sales Ticket No.", "Sale Type", Type);
                 AuditRollCalc2.SetRange("Register No.", "Register No.");
                 AuditRollCalc2.SetFilter("Sales Ticket No.", '%1..%2', AuditRollCalc1."Sales Ticket No.", "Audit Roll"."Sales Ticket No.");
@@ -361,18 +349,15 @@ report 6014401 "NPR Counter Report A4"
                                     2:
                                         begin
                                             Evaluate(RegisterMovement, CodeConvert);
-                                            if RegisterMovement > 0 then begin
-                                                BalanceUpdate(RegisterMovement, true);
-                                            end
+                                            if RegisterMovement > 0 then
+                                                BalanceUpdate(RegisterMovement, true)
                                             else begin
                                                 RegisterMovementNeg := RegisterMovement;
                                                 BalanceUpdate(RegisterMovement, false);
                                             end;
                                         end;
                                     3:
-                                        begin
-                                            Evaluate(CreditVoucherMovement, CodeConvert);
-                                        end;
+                                        Evaluate(CreditVoucherMovement, CodeConvert);
                                     4:
                                         begin
                                             Evaluate(GiftVoucherMovement, CodeConvert);
@@ -440,7 +425,6 @@ report 6014401 "NPR Counter Report A4"
                 if CashDifference < 0 then begin
                     BalancePos := MovementPos + (-CashDifference);
                     BalanceNeg := MovementNeg + TransferToBank + "Closing Cash";
-                    ;
                 end else begin
                     BalancePos := MovementPos;
                     BalanceNeg := MovementNeg + TransferToBank + CashDifference + "Closing Cash";
@@ -454,13 +438,13 @@ report 6014401 "NPR Counter Report A4"
                 AuditRollCreditVoucher.SetRange("Sale Date", "Audit Roll"."Sale Date");
                 AuditRollCreditVoucher.SetFilter(Description, '%1', '*Tilgodebevis*');
 
-                if AuditRollCreditVoucher.FindSet then
+                if AuditRollCreditVoucher.FindSet() then
                     repeat
                         if (AuditRollCreditVoucher."Sale Type" = AuditRollCreditVoucher."Sale Type"::Deposit) then
                             CreditVoucherIn := AuditRollCreditVoucher."Amount Including VAT"
                         else
                             CreditVoucherOut := AuditRollCreditVoucher."Amount Including VAT";
-                    until AuditRollCreditVoucher.Next = 0;
+                    until AuditRollCreditVoucher.Next() = 0;
 
                 if (CreditVoucherIn - CreditVoucherOut) > 0 then
                     BalanceUpdate(CreditVoucherIn - CreditVoucherOut, true)
@@ -518,19 +502,15 @@ report 6014401 "NPR Counter Report A4"
             begin
                 if (RetailSetup."Balancing Posting Type" = RetailSetup."Balancing Posting Type"::TOTAL) then begin
                     "Payment Type POS".SetRange("Date Filter", AuditRollCalc2."Sale Date");
-                    Register.FindFirst;
-                    RegisterLast.FindLast;
+                    Register.FindFirst();
+                    RegisterLast.FindLast();
                     "Payment Type POS".SetRange("Register Filter", Register."Register No.", RegisterLast."Register No.");
                     "Payment Type POS".CalcFields("Amount in Audit Roll");
                 end;
 
                 if (RetailSetup."Balancing Posting Type" = RetailSetup."Balancing Posting Type"::"PER REGISTER") then begin
-                    //-NPR5.48 [333898]
-                    //"Payment Type POS".SETRANGE("Date Filter",AuditRollCalc2."Sale Date");
-                    //"Payment Type POS".SETRANGE("Register Filter",AuditRollCalc2."Register No.");
                     "Payment Type POS".SetRange("Date Filter", AuditRollCalc1."Sale Date");
                     "Payment Type POS".SetRange("Register Filter", AuditRollCalc1."Register No.");
-                    //+NPR5.48 [333898]
                     "Payment Type POS".CalcFields("Amount in Audit Roll");
                 end;
 
@@ -556,7 +536,6 @@ report 6014401 "NPR Counter Report A4"
 
             trigger OnAfterGetRecord()
             begin
-                //-NPR5.48 [333898]
                 if (RetailSetup."Balancing Posting Type" = RetailSetup."Balancing Posting Type"::TOTAL) then begin
                     "G/L Account".SetRange("Date Filter", AuditRollCalc2."Sale Date");
                     "G/L Account".SetRange("G/L Account"."NPR Register Filter", AuditRollCalc2."Register No.");
@@ -566,13 +545,7 @@ report 6014401 "NPR Counter Report A4"
                     "G/L Account".SetRange("Date Filter", AuditRollCalc1."Sale Date");
                     "G/L Account".SetRange("G/L Account"."NPR Register Filter", AuditRollCalc1."Register No.");
                 end;
-
-                //SETRANGE("Date Filter",AuditRollCalc2."Sale Date");
-                //+NPR5.48 [333898]
                 SetRange("NPR Retail Payment", true);
-                //-NPR5.48 [333898]
-                //SETRANGE("Register Filter",AuditRollCalc2."Register No.");
-                //+NPR5.48 [333898]
                 CalcFields("NPR G/L Entry in Audit Roll");
             end;
         }
@@ -646,20 +619,8 @@ report 6014401 "NPR Counter Report A4"
             trigger OnAfterGetRecord()
             begin
                 if not RetailSetup."Show Counting on Counter Rep." then
-                    CurrReport.Skip;
+                    CurrReport.Skip();
             end;
-        }
-    }
-
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
         }
     }
 
@@ -739,79 +700,79 @@ report 6014401 "NPR Counter Report A4"
 
     var
         CompanyInformation: Record "Company Information";
-        GlobalPeriod: Record "NPR Period";
+        AuditRoll1: Record "NPR Audit Roll";
         AuditRollCalc1: Record "NPR Audit Roll";
         AuditRollCalc2: Record "NPR Audit Roll";
-        RetailSetup: Record "NPR Retail Setup";
-        CodeConvert: Code[50];
-        NumCount: Integer;
-        StartPos: Integer;
-        EndPos: Integer;
-        i: Integer;
-        OpeningCash: Decimal;
-        RegisterMovement: Decimal;
-        RegisterMovementNeg: Decimal;
-        TerminalCardMovement: Decimal;
-        TerminalCardMovementNeg: Decimal;
-        CreditMovement: Decimal;
-        CreditMovementNeg: Decimal;
-        OtherCardNetChange: Decimal;
-        OtherCardNetChangeNegative: Decimal;
-        UnknownCCMovement: Decimal;
-        UnknownCCMovementNeg: Decimal;
-        GiftVoucherMovement: Decimal;
-        GiftVoucherMovementNeg: Decimal;
-        CreditVoucherMovement: Decimal;
-        TransferToBank: Decimal;
-        CashDifference: Decimal;
-        MovementPos: Decimal;
-        MovementNeg: Decimal;
-        BalancePos: Decimal;
-        BalanceNeg: Decimal;
-        CreditCardBalance: Decimal;
-        CreditCardBalanceNeg: Decimal;
-        GrossTurnover: Decimal;
-        NetTurnover: Decimal;
-        ItemCost: Decimal;
-        TotalDiscount: Decimal;
-        CoverageAmt: Decimal;
-        TotalDiscountPct: Decimal;
-        ManualDiscount: Decimal;
-        QuantityDiscount: Decimal;
-        MixDiscount: Decimal;
-        CampaignDiscount: Decimal;
-        ManualDiscountPct: Decimal;
-        QuantityDiscountPct: Decimal;
-        MixDiscountPct: Decimal;
-        CampaignDiscountPct: Decimal;
-        Calc: Boolean;
-        DebitSale: Decimal;
-        RegisterReportText: Text[50];
-        RegisterFilterText: Text[50];
+        AuditRollCreditVoucher: Record "NPR Audit Roll";
+        GlobalPeriod: Record "NPR Period";
         Register: Record "NPR Register";
         RegisterLast: Record "NPR Register";
-        AuditRoll1: Record "NPR Audit Roll";
-        Sidstebon: Code[30];
-        Ekspeditionstaeller: Integer;
-        Opentime: Time;
-        Closetime: Time;
-        AuditRollCreditVoucher: Record "NPR Audit Roll";
-        CreditVoucherIn: Decimal;
-        CreditVoucherOut: Decimal;
-        ReturnAmountTotal: Decimal;
-        ReturnTicketTotal: Integer;
-        LastTicketNo: Code[20];
+        RetailSetup: Record "NPR Retail Setup";
+        Calc: Boolean;
         FromTicket: Code[20];
+        LastTicketNo: Code[20];
         ToTicket: Code[20];
+        Sidstebon: Code[30];
+        CodeConvert: Code[50];
+        BalanceNeg: Decimal;
+        BalancePos: Decimal;
+        CampaignDiscount: Decimal;
+        CampaignDiscountPct: Decimal;
+        CashDifference: Decimal;
         CountTotalOut: array[15] of Decimal;
         CountUnitsOut: array[15] of Decimal;
+        CoverageAmt: Decimal;
+        CreditCardBalance: Decimal;
+        CreditCardBalanceNeg: Decimal;
+        CreditMovement: Decimal;
+        CreditMovementNeg: Decimal;
+        CreditVoucherIn: Decimal;
+        CreditVoucherMovement: Decimal;
+        CreditVoucherOut: Decimal;
         CustomerDeposits: Decimal;
-        Text10600000: Label 'Register Report (per register)';
-        Text10600001: Label 'Register Report (overall)';
-        Text10600002: Label 'Register filter:';
+        DebitSale: Decimal;
+        GiftVoucherMovement: Decimal;
+        GiftVoucherMovementNeg: Decimal;
+        GrossTurnover: Decimal;
+        ItemCost: Decimal;
+        ManualDiscount: Decimal;
+        ManualDiscountPct: Decimal;
+        MixDiscount: Decimal;
+        MixDiscountPct: Decimal;
+        MovementNeg: Decimal;
+        MovementPos: Decimal;
+        NetTurnover: Decimal;
+        OpeningCash: Decimal;
+        OtherCardNetChange: Decimal;
+        OtherCardNetChangeNegative: Decimal;
+        QuantityDiscount: Decimal;
+        QuantityDiscountPct: Decimal;
+        RegisterMovement: Decimal;
+        RegisterMovementNeg: Decimal;
+        ReturnAmountTotal: Decimal;
+        TerminalCardMovement: Decimal;
+        TerminalCardMovementNeg: Decimal;
+        TotalDiscount: Decimal;
+        TotalDiscountPct: Decimal;
+        TransferToBank: Decimal;
+        UnknownCCMovement: Decimal;
+        UnknownCCMovementNeg: Decimal;
+        Ekspeditionstaeller: Integer;
+        EndPos: Integer;
+        i: Integer;
+        NumCount: Integer;
+        ReturnTicketTotal: Integer;
+        StartPos: Integer;
         Text10600004: Label 'Debit Sales';
         Text10600005: Label 'Payments';
+        Text10600002: Label 'Register filter:';
+        Text10600001: Label 'Register Report (overall)';
+        Text10600000: Label 'Register Report (per register)';
         Text10600006: Label 'Withdrawals';
+        RegisterFilterText: Text[50];
+        RegisterReportText: Text[50];
+        Closetime: Time;
+        Opentime: Time;
 
     procedure BalanceUpdate(Amt: Decimal; Pos: Boolean)
     begin
@@ -823,11 +784,11 @@ report 6014401 "NPR Counter Report A4"
 
     procedure GetCountAmount(BalanceAmountText: Text[200])
     var
+        BPos: Integer;
+        CntPnt: Integer;
+        EPos: Integer;
         NpkCountUnits: Text[200];
         Tmp2: array[30] of Text[250];
-        BPos: Integer;
-        EPos: Integer;
-        CntPnt: Integer;
     begin
         i := 1;
         EPos := 1;

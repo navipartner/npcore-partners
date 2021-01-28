@@ -1,16 +1,10 @@
 report 6150660 "NPR NPRE: Rest. Daily Turnover"
 {
-    // NPR5.53/ALPO/20191217 CASE 380918 New report to get turnover and average turnover per table/per guest broken down by period and selected dimensions
-    // NPR5.54/ALPO/20200212 CASE 390673 Fixed incorrect filter
-    // NPR5.54/ALPO/20200309 CASE 392052 Include into report POS Sales Lines marked with "Exclude from Posting" checkmark
-    // NPR5.54/ALPO/20200327 CASe 380918 Some formatting adjustments: column name changes, hide empty columns, hide division by zero errors in cells
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/NPRE - Rest. Daily Turnover.rdlc';
-
     Caption = 'Restaurant Daily Turnover';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
-
     dataset
     {
         dataitem("POS Entry"; "NPR POS Entry")
@@ -25,13 +19,13 @@ report 6150660 "NPR NPRE: Rest. Daily Turnover"
 
                 trigger OnPreDataItem()
                 begin
-                    CurrReport.Break;
+                    CurrReport.Break();
                 end;
             }
 
             trigger OnPreDataItem()
             begin
-                CurrReport.Break;
+                CurrReport.Break();
             end;
         }
         dataitem(ReportDataGenerationLoop; "Integer")
@@ -43,10 +37,10 @@ report 6150660 "NPR NPRE: Rest. Daily Turnover"
 
             trigger OnAfterGetRecord()
             var
+                TempDimBuf: Record "Dimension Buffer" temporary;
                 DimSetEntry: Record "Dimension Set Entry";
                 POSEntry2: Record "NPR POS Entry";
                 POSSalesLine2: Record "NPR POS Sales Line";
-                TempDimBuf: Record "Dimension Buffer" temporary;
                 POSEntryQry: Query "NPR POS Entry with Sales Lines";
                 DimensionBufferID: Integer;
             begin
@@ -63,30 +57,28 @@ report 6150660 "NPR NPRE: Rest. Daily Turnover"
                     POSEntryQry.SetFilter(No, "POS Sales Line".GetFilter("No."));
                 if "POS Sales Line".GetFilter("Location Code") <> '' then
                     POSEntryQry.SetFilter(Location_Code, "POS Sales Line".GetFilter("Location Code"));
-                //POSEntryQry.SETRANGE(Exclude_from_Posting,"POS Sales Line"."Exclude from Posting"::"0");  //NPR5.54 [390673]-revoked
-                //POSEntryQry.SETRANGE(Exclude_from_Posting,FALSE);  //NPR5.54 [390673]  //NPR5.54 [392052]-revoked
                 if DimSetFilter <> '' then
                     POSEntryQry.SetFilter(Dimension_Set_ID, DimSetFilter);
-                POSEntryQry.Open;
+                POSEntryQry.Open();
                 while POSEntryQry.Read do begin
                     POSSalesLine2.Get(POSEntryQry.POS_Entry_No, POSEntryQry.Line_No);
-                    TempDimBuf.DeleteAll;
-                    if TempSelectedDim.FindSet then
+                    TempDimBuf.DeleteAll();
+                    if TempSelectedDim.FindSet() then
                         repeat
-                            TempDimBuf.Init;
+                            TempDimBuf.Init();
                             TempDimBuf."Table ID" := DATABASE::"NPR POS Sales Line";
                             TempDimBuf."Dimension Code" := TempSelectedDim."Dimension Code";
                             if DimSetEntry.Get(POSSalesLine2."Dimension Set ID", TempSelectedDim."Dimension Code") then
                                 TempDimBuf."Dimension Value Code" := DimSetEntry."Dimension Value Code";
-                            TempDimBuf.Insert;
-                        until TempSelectedDim.Next = 0;
+                            TempDimBuf.Insert();
+                        until TempSelectedDim.Next() = 0;
                     DimensionBufferID := DimBufMgt.GetDimensionId(TempDimBuf);
 
                     POSSalesLineCons.SetRange("Planned Delivery Date", POSEntryQry.Posting_Date);
                     POSSalesLineCons.SetRange("Dimension Set ID", DimensionBufferID);
                     if ShowTableNo then
                         POSSalesLineCons.SetRange("NPRE Seating Code", POSSalesLine2."NPRE Seating Code");
-                    if not POSSalesLineCons.FindFirst then begin
+                    if not POSSalesLineCons.FindFirst() then begin
                         POSSalesLineCons := POSSalesLine2;
                         if not ShowTableNo then
                             POSSalesLineCons."NPRE Seating Code" := '';
@@ -94,7 +86,7 @@ report 6150660 "NPR NPRE: Rest. Daily Turnover"
                         POSSalesLineCons."Dimension Set ID" := DimensionBufferID;
                         POSSalesLineCons."POS Period Register No." := 0;  //For number of guests running total
                         POSSalesLineCons."Item Entry No." := 0;  //For number of tables running total
-                        POSSalesLineCons.Insert;
+                        POSSalesLineCons.Insert();
                     end else begin
                         POSSalesLineCons."Quantity (Base)" := POSSalesLineCons."Quantity (Base)" + POSSalesLine2."Quantity (Base)";
                         POSSalesLineCons."Amount Excl. VAT (LCY)" := POSSalesLineCons."Amount Excl. VAT (LCY)" + POSSalesLine2."Amount Excl. VAT (LCY)";
@@ -107,14 +99,14 @@ report 6150660 "NPR NPRE: Rest. Daily Turnover"
                         POSEntry2.Mark := true;
                         POSSalesLineCons."POS Period Register No." := POSSalesLineCons."POS Period Register No." + POSEntry2."NPRE Number of Guests";
                     end;
-                    TableCounterBuf.Init;
+                    TableCounterBuf.Init();
                     TableCounterBuf."Business Unit Code" := POSSalesLine2."NPRE Seating Code";
                     TableCounterBuf."Entry No." := POSSalesLine2."POS Entry No.";
-                    if not TableCounterBuf.Find then begin
-                        TableCounterBuf.Insert;
+                    if not TableCounterBuf.Find() then begin
+                        TableCounterBuf.Insert();
                         POSSalesLineCons."Item Entry No." += 1;
                     end;
-                    POSSalesLineCons.Modify;
+                    POSSalesLineCons.Modify();
                 end;
             end;
         }
@@ -131,9 +123,9 @@ report 6150660 "NPR NPRE: Rest. Daily Turnover"
             trigger OnAfterGetRecord()
             begin
                 if Number = 1 then
-                    AppliedFilterBuffer.FindSet
+                    AppliedFilterBuffer.FindSet()
                 else
-                    AppliedFilterBuffer.Next;
+                    AppliedFilterBuffer.Next();
             end;
 
             trigger OnPreDataItem()
@@ -247,10 +239,6 @@ report 6150660 "NPR NPRE: Rest. Daily Turnover"
             }
         }
 
-        actions
-        {
-        }
-
         trigger OnOpenPage()
         begin
             ColumnDim := DimSelectionBuf.GetDimSelectionText(3, REPORT::"NPR NPRE: Rest. Daily Turnover", '');
@@ -271,31 +259,31 @@ report 6150660 "NPR NPRE: Rest. Daily Turnover"
 
     trigger OnPreReport()
     begin
-        Currency.InitRoundingPrecision;
+        Currency.InitRoundingPrecision();
         SelectedDim.GetSelectedDim(UserId, 3, REPORT::"NPR NPRE: Rest. Daily Turnover", '', TempSelectedDim);
-        GenerateDimSetIDFilter;
-        GenerateAppliedFilterBuffer;
+        GenerateDimSetIDFilter();
+        GenerateAppliedFilterBuffer();
     end;
 
     var
-        AppliedFilterBuffer: Record "Name/Value Buffer" temporary;
         Currency: Record Currency;
         Dim: Record Dimension;
         DimSelectionBuf: Record "Dimension Selection Buffer";
-        DimValue: Record "Dimension Value";
-        SelectedDim: Record "Selected Dimension";
-        TableCounterBuf: Record "Entry No. Amount Buffer" temporary;
         TempDimSetEntryBuffer: Record "Dimension Set Entry" temporary;
+        DimValue: Record "Dimension Value";
+        TableCounterBuf: Record "Entry No. Amount Buffer" temporary;
+        AppliedFilterBuffer: Record "Name/Value Buffer" temporary;
+        SelectedDim: Record "Selected Dimension";
         TempSelectedDim: Record "Selected Dimension" temporary;
         DimBufMgt: Codeunit "Dimension Buffer Management";
         DimMgt: Codeunit DimensionManagement;
-        ColumnDim: Text;
-        DimSetFilter: Text;
+        ShowTableNo: Boolean;
         LineNo: Integer;
-        FilterIsNotSupported: Label 'You cannot set filter for field "%1" of table "%2" in this report.\Please contact system vendor if you want the report to support such filter.';
         DimFilterTxt: Label 'Dimension: %1';
         NoEntriesWithinFilter: Label 'There are no entries within applied dimension filters.';
-        ShowTableNo: Boolean;
+        FilterIsNotSupported: Label 'You cannot set filter for field "%1" of table "%2" in this report.\Please contact system vendor if you want the report to support such filter.';
+        ColumnDim: Text;
+        DimSetFilter: Text;
 
     local procedure GenerateDimSetIDFilter()
     var
@@ -304,31 +292,31 @@ report 6150660 "NPR NPRE: Rest. Daily Turnover"
         FilterForBlankIncluded: Boolean;
     begin
         TempSelectedDim.SetFilter("Dimension Value Filter", '<>%1', '');
-        if TempSelectedDim.FindSet then begin
+        if TempSelectedDim.FindSet() then begin
             DimMgt.GetDimSetIDsForFilter(TempSelectedDim."Dimension Code", TempSelectedDim."Dimension Value Filter");
             DimMgt.GetTempDimSetEntry(TempDimSetEntryBuffer);
-            while not TempDimSetEntryBuffer.IsEmpty and (TempSelectedDim.Next <> 0) do begin
+            while not TempDimSetEntryBuffer.IsEmpty() and (TempSelectedDim.Next <> 0) do begin
                 FilterForBlankIncluded := FilterIncludesBlank(TempSelectedDim."Dimension Code", TempSelectedDim."Dimension Value Filter");
                 DimSetEntry.SetRange("Dimension Code", TempSelectedDim."Dimension Code");
                 DimSetEntry.SetFilter("Dimension Value Code", TempSelectedDim."Dimension Value Filter");
                 DimSetEntry."Dimension Code" := TempSelectedDim."Dimension Code";
                 DimSetEntry2.SetRange("Dimension Code", TempSelectedDim."Dimension Code");
-                TempDimSetEntryBuffer.FindSet;
+                TempDimSetEntryBuffer.FindSet();
                 repeat
                     DimSetEntry."Dimension Set ID" := TempDimSetEntryBuffer."Dimension Set ID";
-                    if not DimSetEntry.Find then begin
+                    if not DimSetEntry.Find() then begin
                         DimSetEntry2 := DimSetEntry;
                         if not FilterForBlankIncluded or (FilterForBlankIncluded and DimSetEntry2.Find) then
-                            TempDimSetEntryBuffer.Delete;
+                            TempDimSetEntryBuffer.Delete();
                     end;
-                until TempDimSetEntryBuffer.Next = 0;
+                until TempDimSetEntryBuffer.Next() = 0;
             end;
 
-            if TempDimSetEntryBuffer.IsEmpty then
+            if TempDimSetEntryBuffer.IsEmpty() then
                 Error(NoEntriesWithinFilter);
         end;
         TempSelectedDim.SetRange("Dimension Value Filter");
-        GetDimSetFilter;
+        GetDimSetFilter();
     end;
 
     local procedure FilterIncludesBlank(DimCode: Code[20]; DimValueFilter: Text[250]): Boolean
@@ -337,9 +325,9 @@ report 6150660 "NPR NPRE: Rest. Daily Turnover"
     begin
         TempDimSetEntry."Dimension Code" := DimCode;
         TempDimSetEntry."Dimension Value Code" := '';
-        TempDimSetEntry.Insert;
+        TempDimSetEntry.Insert();
         TempDimSetEntry.SetFilter("Dimension Value Code", DimValueFilter);
-        exit(not TempDimSetEntry.IsEmpty);
+        exit(not TempDimSetEntry.IsEmpty());
     end;
 
     local procedure GetDimSetFilter()
@@ -348,10 +336,10 @@ report 6150660 "NPR NPRE: Rest. Daily Turnover"
         if not TempDimSetEntryBuffer.FindSet then
             exit;
         DimSetFilter := Format(TempDimSetEntryBuffer."Dimension Set ID");
-        if TempDimSetEntryBuffer.Next <> 0 then
+        if TempDimSetEntryBuffer.Next() <> 0 then
             repeat
                 DimSetFilter += '|' + Format(TempDimSetEntryBuffer."Dimension Set ID");
-            until TempDimSetEntryBuffer.Next = 0;
+            until TempDimSetEntryBuffer.Next() = 0;
     end;
 
     local procedure GenerateAppliedFilterBuffer()
@@ -359,7 +347,7 @@ report 6150660 "NPR NPRE: Rest. Daily Turnover"
         RecRef: RecordRef;
         FilterNo: Integer;
     begin
-        AppliedFilterBuffer.DeleteAll;
+        AppliedFilterBuffer.DeleteAll();
         FilterNo := 100;
         RecRef.GetTable("POS Entry");
         CheckAndAddRecFiltersToBuffer(RecRef, FilterNo);
@@ -367,10 +355,10 @@ report 6150660 "NPR NPRE: Rest. Daily Turnover"
         CheckAndAddRecFiltersToBuffer(RecRef, FilterNo);
 
         TempSelectedDim.SetFilter("Dimension Value Filter", '<>%1', '');
-        if TempSelectedDim.FindSet then
+        if TempSelectedDim.FindSet() then
             repeat
                 AddFilterToBuffer(StrSubstNo(DimFilterTxt, TempSelectedDim."Dimension Code"), TempSelectedDim."Dimension Value Filter", FilterNo);
-            until TempSelectedDim.Next = 0;
+            until TempSelectedDim.Next() = 0;
         TempSelectedDim.SetRange("Dimension Value Filter");
     end;
 
@@ -402,31 +390,31 @@ report 6150660 "NPR NPRE: Rest. Daily Turnover"
     begin
         if AppliedFilter = '' then
             exit;
-        AppliedFilterBuffer.Init;
+        AppliedFilterBuffer.Init();
         AppliedFilterBuffer.ID := FilterNo;
         AppliedFilterBuffer.Name := CopyStr(FieldName, 1, MaxStrLen(AppliedFilterBuffer.Name));
         AppliedFilterBuffer.Value := CopyStr(AppliedFilter, 1, MaxStrLen(AppliedFilterBuffer.Value));
-        AppliedFilterBuffer.Insert;
+        AppliedFilterBuffer.Insert();
         FilterNo += 1;
     end;
 
     local procedure SetDimSelectionMultiple(ObjectType: Integer; ObjectID: Integer; var SelectedDimText: Text[250])
     var
-        SelectedDim: Record "Selected Dimension";
         Dim: Record Dimension;
         TempDimSelectionBuf: Record "Dimension Selection Buffer" temporary;
+        SelectedDim: Record "Selected Dimension";
         DimSelectionMultiple: Page "NPR Dim. Select.Mul.w.Filter";
         Selected: Boolean;
     begin
         Clear(DimSelectionMultiple);
-        if Dim.FindSet then
+        if Dim.FindSet() then
             repeat
                 Selected := SelectedDim.Get(UserId, ObjectType, ObjectID, '', Dim.Code);
                 if not Selected then
-                    SelectedDim.Init;
+                    SelectedDim.Init();
                 DimSelectionMultiple.InsertDimSelBuf(
                   Selected, Dim.Code, Dim.GetMLName(GlobalLanguage), SelectedDim."Dimension Value Filter");
-            until Dim.Next = 0;
+            until Dim.Next() = 0;
 
         if DimSelectionMultiple.RunModal = ACTION::OK then begin
             DimSelectionMultiple.GetDimSelBuf(TempDimSelectionBuf);

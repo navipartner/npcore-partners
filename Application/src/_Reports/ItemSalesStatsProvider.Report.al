@@ -1,29 +1,10 @@
 report 6014430 "NPR Item Sales Stats/Provider"
 {
-    // NPR4.12/TSA/2015-06-30/217683 - Removed trailing CRLF on global text variable Text1060008
-    // NPR4.16/TS/20151028  CASE 226008 Changed Report Caption
-    // NPR5.25/LS/20160129  CASE 226251 Changed formatting codes/Dataset names/Variables name
-    //                                  Changed Report caption from DAN=Saelger oms pr. varegruppe;ENU=Sales Person Trn. by Item Gr.;NOR=Saelger oms pr. varegruppe
-    //                                                        to DAN=Vare salgsstatistik/leverand¢ropdelt;ENU=Item sales statistics/provider split
-    // NPR5.25/JLK /20160627 CASE 226251 Removed field "Belong to item gr no."
-    //                                   Adjusted fields "Sales Qty" to contain decimal places and moved Total to left
-    //                                   Changed Qty_cap from DAN=Forventet tilgang;ENU=Anticipated acces to DAN=Antal i k¢bsordre;ENU=Qty. on Purch. Order
-    //                                   Corrected Total Issue
-    // NPR5.38/JLK /20180124  CASE 300892 Removed AL Error on ControlContainer in Request Page
-    // NPR5.38/JLK /20180125  CASE 303595 Removed Spaced on Request Page Caption
-    // NPR5.39/TJ  /20180206  CASE 302684 Changed Name property of request page control ValueMethod to english version
-    // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
-    // NPR5.49/BHR /20190212  CASE 345313 Correct Report As per OMA
-    // NPR5.54/LS  /20200206  CASE 389134 Correct Report Caption from 'Sales Person Trn. by Item Gr.' to 'Item Sales Statistics/Provider'
-    // NPR5.54/YAHA/20200324  CASE 394872 Removed Company Logo
-    // NPR5.55/YAHA/20200610  CASE 394884 Header layout modification
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Item Sales StatisticsProvider.rdlc';
-
     Caption = 'Item Sales Statistics/Provider';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
-
     dataset
     {
         dataitem("Integer"; "Integer")
@@ -175,7 +156,7 @@ report 6014430 "NPR Item Sales Stats/Provider"
                     begin
                         ItemFooterDesc := Text10600005 + Varegruppe."No." + ' ' + Varegruppe.Description;
                         if ShowItemWithSales and ("Sales (Qty.)" = 0) then
-                            CurrReport.Skip;
+                            CurrReport.Skip();
 
                         Clear(PurchPrice);
                         Clear(StockValue);
@@ -214,13 +195,7 @@ report 6014430 "NPR Item Sales Stats/Provider"
 
                         //Omsaetningshastighed
                         for x := 0 to Antalmdr do
-                            //-NPR5.39
-                            //ItemInventory += Beregn("No.",0D,CALCDATE('-'+FORMAT(x)+Text10600003,EndDate));
-                            //-NPR5.49 [343119]
-                            //ItemInventory += Beregn(0D,CALCDATE('-' + FORMAT(x) + Text10600003,EndDate));
                             ItemInventory += Beregn(0D, CalcDate('<-' + Format(x) + Text10600003 + '>', EndDate));
-                        //+NPR5.49 [343119]
-                        //+NPR5.39
 
                         GnsBeholdningKpris := (ItemInventory / (Antalmdr + 1));
 
@@ -237,11 +212,6 @@ report 6014430 "NPR Item Sales Stats/Provider"
                     trigger OnPreDataItem()
                     begin
                         SetRange("Vendor No.", Vendor."No.");
-                        //-NPR5.39
-                        // CurrReport.CREATETOTALS("Sales (Qty.)","Sales (LCY)","Qty. on Purch. Order","COGS (LCY)","Purchases (Qty.)");
-                        // CurrReport.CREATETOTALS(db,StockValue,SalesCost,Item2."Net Change",GnsBeholdningKpris);
-                        //+NPR5.39
-
                         StartDate := GetRangeMin("Date Filter");
                         EndDate := GetRangeMax("Date Filter");
                         Antalmdr := (Date2DMY(EndDate, 3) - Date2DMY(StartDate, 3)) * 12 + (Date2DMY(EndDate, 2) - Date2DMY(StartDate, 2));
@@ -256,27 +226,10 @@ report 6014430 "NPR Item Sales Stats/Provider"
 
                 trigger OnPreDataItem()
                 begin
-                    //-NPR5.39
-                    // CurrReport.CREATETOTALS(db,StockValue,Item."Sales (Qty.)",Item."Sales (LCY)",Item."Qty. on Purch. Order",Item2."Net Change"
-                    // ,Item."Sales (LCY)",Item."COGS (LCY)",GnsBeholdningKpris,SalesCost);
-                    // CurrReport.CREATETOTALS(Item."Purchases (Qty.)");
-                    //+NPR5.39
-
                     FilterDesc := Text10600001 + GetFilter("No.") + Text10600007 + Item.GetFilter("Global Dimension 1 Filter");
                     InventoryValueDesc := StrSubstNo(Text10600008, ValueDate, ValueMethod);
-                    //DateFilter := Text10600002+' '+FORMAT(Item.GETFILTER("Date Filter"));
                 end;
             }
-
-            trigger OnPreDataItem()
-            begin
-                //-NPR5.39
-                //CurrReport.CREATETOTALS(db,StockValue,Item."Sales (Qty.)",Item."Sales (LCY)",Item."Qty. on Purch. Order",Item2."Net Change"
-                //,Item."Sales (LCY)",Item."COGS (LCY)",GnsBeholdningKpris,SalesCost);
-                //CurrReport.CREATETOTALS(Item."Purchases (Qty.)");
-                //ObjectDetails := FORMAT(Object.ID)+', '+FORMAT(Object."Version List");
-                //+NPR5.39
-            end;
         }
     }
 
@@ -323,10 +276,6 @@ report 6014430 "NPR Item Sales Stats/Provider"
                 }
             }
         }
-
-        actions
-        {
-        }
     }
 
     labels
@@ -353,62 +302,53 @@ report 6014430 "NPR Item Sales Stats/Provider"
 
     trigger OnPreReport()
     begin
-        CompanyInformation.Get;
+        CompanyInformation.Get();
         CompanyInformation.CalcFields(Picture);
-
-        //-NPR5.39
-        // Object.SETRANGE(ID, 6014430);
-        // Object.SETRANGE(Type, 3);
-        // //-NPR5.25
-        // //Object.FIND('-');
-        // Object.FINDFIRST;
-        // //+NPR5.25
-        //+NPR5.39
 
         if ValueDate = 0D then
             ValueDate := Today;
     end;
 
     var
-        Item1: Record Item;
         CompanyInformation: Record "Company Information";
-        ShowItemWithSales: Boolean;
-        ShowItem: Boolean;
-        TurnoverRate: Decimal;
-        ShowItemGroup: Boolean;
-        ValueDate: Date;
-        PurchPrice: Decimal;
-        Hjemtagelsesomk: Decimal;
-        StockValue: Decimal;
-        PeriodSales: Decimal;
+        Item1: Record Item;
         Item2: Record Item;
+        ItemCostMgt: Codeunit ItemCostManagement;
+        ShowItem: Boolean;
+        ShowItemGroup: Boolean;
+        ShowItemWithSales: Boolean;
+        EndDate: Date;
+        StartDate: Date;
+        ValueDate: Date;
         Db: Decimal;
         Dg: Decimal;
-        ItemCostMgt: Codeunit ItemCostManagement;
+        Forpct: Decimal;
+        GnsBeholdningKpris: Decimal;
         GNSCostPrice: Decimal;
-        ValueMethod: Option "sidste koebspris","kostpris (gns.)";
-        StartDate: Date;
-        EndDate: Date;
+        Hjemtagelsesomk: Decimal;
+        ItemInventory: Decimal;
+        PeriodSales: Decimal;
+        PurchPrice: Decimal;
+        SalesCost: Decimal;
+        StockValue: Decimal;
+        TurnoverRate: Decimal;
         Antalmdr: Integer;
         x: Integer;
-        ItemInventory: Decimal;
-        GnsBeholdningKpris: Decimal;
-        Forpct: Decimal;
-        SalesCost: Decimal;
+        Text10600001: Label 'Chosen Vendors';
+        Text10600007: Label 'Department';
+        Text10600002: Label 'For the period';
+        Text10600008: Label 'Inventory is equal to inventories per %1 * %2 + delivery costs';
+        Text10600004: Label 'Item group';
+        Text10600003: Label 'M';
+        Text10600006: Label 'Total ';
+        Text10600005: Label 'Total for the item group';
+        ValueMethod: Option "sidste koebspris","kostpris (gns.)";
+        DateFilter: Text[100];
         FilterDesc: Text[200];
         InventoryValueDesc: Text[200];
-        ItemGroupDesc: Text[200];
-        DateFilter: Text[100];
         ItemFooterDesc: Text[200];
+        ItemGroupDesc: Text[200];
         ItemGroupFooterDesc: Text[200];
-        Text10600001: Label 'Chosen Vendors';
-        Text10600002: Label 'For the period';
-        Text10600003: Label 'M';
-        Text10600005: Label 'Total for the item group';
-        Text10600004: Label 'Item group';
-        Text10600006: Label 'Total ';
-        Text10600007: Label 'Department';
-        Text10600008: Label 'Inventory is equal to inventories per %1 * %2 + delivery costs';
 
     procedure Beregn(DateFrom: Date; DateTo: Date) vaerdibeh: Decimal
     begin

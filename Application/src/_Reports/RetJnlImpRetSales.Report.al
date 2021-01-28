@@ -1,9 +1,7 @@
 report 6014574 "NPR Ret. Jnl.: Imp. Ret. Sales"
 {
-    UsageCategory = None;
     Caption = 'Import Return Sales';
     ProcessingOnly = true;
-
     dataset
     {
         dataitem(RetailJournalHeader; "NPR Retail Journal Header")
@@ -45,30 +43,13 @@ report 6014574 "NPR Ret. Jnl.: Imp. Ret. Sales"
 
                     RetailJournalLine.SetCurrentKey("No.", "Line No.");
                     RetailJournalLine.SetRange("No.", RetailJournalHeader."No.");
-
-                    if RetailJournalLine.FindLast then
+                    if RetailJournalLine.FindLast() then
                         NextNo := RetailJournalLine."Line No." + 10000
                     else
                         NextNo := 10000;
                 end;
             }
         }
-    }
-
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
-        }
-    }
-
-    labels
-    {
     }
 
     var

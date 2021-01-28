@@ -1,13 +1,10 @@
 report 6014455 "NPR Item Barcode Status Sheet"
 {
-    // NPR5.29/MMV /20161213 CASE 252307 Created report
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Item Barcode Status Sheet.rdlc';
-
     Caption = 'Item Barcode Status Sheet';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
-
     dataset
     {
         dataitem(Item; Item)
@@ -156,10 +153,6 @@ report 6014455 "NPR Item Barcode Status Sheet"
                 }
             }
         }
-
-        actions
-        {
-        }
     }
 
     labels
@@ -202,11 +195,10 @@ report 6014455 "NPR Item Barcode Status Sheet"
     local procedure AddToBuffer(ItemNo: Code[20]; VariantCode: Code[10])
     begin
         //Quantity field in RJL is used to store the inventory value.
-
         case i of
             1:
                 begin
-                    TMPRetail_Journal_Line_Col1.Init;
+                    TMPRetail_Journal_Line_Col1.Init();
                     TMPRetail_Journal_Line_Col1."No." := 'temp';
                     TMPRetail_Journal_Line_Col1."Line No." := LineNo;
                     TMPRetail_Journal_Line_Col1.Validate("Item No.", ItemNo);
@@ -217,11 +209,11 @@ report 6014455 "NPR Item Barcode Status Sheet"
                     end else
                         TMPRetail_Journal_Line_Col1."Quantity to Print" := Item.Inventory;
 
-                    TMPRetail_Journal_Line_Col1.Insert;
+                    TMPRetail_Journal_Line_Col1.Insert();
                 end;
             2:
                 begin
-                    TMPRetail_Journal_Line_Col2.Init;
+                    TMPRetail_Journal_Line_Col2.Init();
                     TMPRetail_Journal_Line_Col2."No." := 'temp';
                     TMPRetail_Journal_Line_Col2."Line No." := LineNo;
                     TMPRetail_Journal_Line_Col2.Validate("Item No.", ItemNo);
@@ -232,11 +224,11 @@ report 6014455 "NPR Item Barcode Status Sheet"
                     end else
                         TMPRetail_Journal_Line_Col2."Quantity to Print" := Item.Inventory;
 
-                    TMPRetail_Journal_Line_Col2.Insert;
+                    TMPRetail_Journal_Line_Col2.Insert();
                 end;
             3:
                 begin
-                    TMPRetail_Journal_Line_Col3.Init;
+                    TMPRetail_Journal_Line_Col3.Init();
                     TMPRetail_Journal_Line_Col3."No." := 'temp';
                     TMPRetail_Journal_Line_Col3."Line No." := LineNo;
                     TMPRetail_Journal_Line_Col3.Validate("Item No.", ItemNo);
@@ -247,7 +239,7 @@ report 6014455 "NPR Item Barcode Status Sheet"
                     end else
                         TMPRetail_Journal_Line_Col3."Quantity to Print" := Item.Inventory;
 
-                    TMPRetail_Journal_Line_Col3.Insert;
+                    TMPRetail_Journal_Line_Col3.Insert();
                     i := 0;
                 end;
         end;

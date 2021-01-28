@@ -1,17 +1,10 @@
 report 6014544 "NPR Item Loss - Ret. Reason"
 {
-    // NPR6.000.000/LS/100214 : UnderConstruction
-    // NPR5.31/JLK /20170331  CASE 268274 Changed ENU Caption
-    // NPR5.48/TJ  /20180102  CASE 340615 Removed Product Group Code from ReqFilterFields property on dataitem Item
-    // NPR5.48/BHR /20190111  CASE 341976 Comment Code as per OMA
-    // NPR5.54/SARA/20200216  CASE 387978 Increment 'Line No.' in NPR - TEMP Buffer table
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Item Loss - Return Reason.rdlc';
-
     Caption = 'Item Loss - Return Reason';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
-
     dataset
     {
         dataitem(Item; Item)
@@ -27,11 +20,6 @@ report 6014544 "NPR Item Loss - Ret. Reason"
             trigger OnPreDataItem()
             begin
                 SetCurrentKey("No.");
-                //-NPR5.48 [341976]
-                // IF Item.GETFILTER(Item."Item Category Code") <> '' THEN
-                //  Item.SETCURRENTKEY(Item."Item Category Code")
-                // ELSE
-                //+NPR5.48 [341976]
                 if Item.GetFilter("Vendor No.") <> '' then
                     Item.SetCurrentKey("Vendor No.");
 
@@ -43,12 +31,6 @@ report 6014544 "NPR Item Loss - Ret. Reason"
                         ReportFilters := Text001;
                     ReportFilters += SourceCodeFilter;
                 end;
-
-                // TmpReportSorting.RESET;
-                // TmpReportSorting.SETCURRENTKEY(Template,"Line No.");
-                // TmpReportSorting.SETRANGE(Template,"No.");
-                // TmpReportSorting.SETRANGE("Line No.",1);
-                // TmpReportSorting.DELETEALL;
 
                 CostAmountTotal := 0;
                 SalesAmountTotal := 0;
@@ -175,7 +157,7 @@ report 6014544 "NPR Item Loss - Ret. Reason"
                 begin
                     IntY := 1;
                     if Integer.Number > 2 then
-                        CurrReport.Skip;
+                        CurrReport.Skip();
                 end;
             }
 
@@ -184,13 +166,6 @@ report 6014544 "NPR Item Loss - Ret. Reason"
                 CostAmount := 0;
                 SalesAmount := 0;
                 Qty := 0;
-            end;
-
-            trigger OnPreDataItem()
-            begin
-                //-NPR6.000.000/LS/100214 : UnderConstruction
-                //Reason_Code.SETRANGE(Group,gIMSetupRec."Shrinkage Reason Group");
-                //+NPR6.000.000/LS/100214 : UnderConstruction
             end;
         }
         dataitem(Total; "Integer")
@@ -237,65 +212,53 @@ report 6014544 "NPR Item Loss - Ret. Reason"
                 }
             }
         }
-
-        actions
-        {
-        }
-    }
-
-    labels
-    {
     }
 
     var
-        CostAmount: Decimal;
-        SalesAmount: Decimal;
-        Qty: Decimal;
-        CostAmountTotal: Decimal;
-        SalesAmountTotal: Decimal;
-        QtyTotal: Decimal;
         Item1: Record Item;
-        IntY: Integer;
         SourceCodeFilter: Code[10];
-        Text001: Label 'Source Code Filter:  ';
-        Text002: Label 'Reason Code Total';
-        ReportFilters: Text[250];
-        Item_NoCaptionLbl: Label 'Item No.';
-        Item_DescriptionCaptionLbl: Label 'Description';
-        QuantityCaptionLbl: Label 'Quantity';
-        FilterCaptionLbl: Label 'Filter';
-        Cost_AmountCaptionLbl: Label 'Cost Amount';
-        Sales_AmountCaptionLbl: Label 'Sales Amount';
-        Scrinkage___Reason_Code___ItemCaptionLbl: Label 'Item Loss - Reason Code';
-        Page_CaptionLbl: Label 'Page.';
-        Reason_Code_TotalCaptionLbl: Label 'Reason Code Total';
-        TotalCaptionLbl: Label 'Total';
+        CostAmount: Decimal;
+        CostAmountTotal: Decimal;
+        Qty: Decimal;
+        QtyTotal: Decimal;
+        SalesAmount: Decimal;
+        SalesAmountTotal: Decimal;
+        IntY: Integer;
         ReasonCodeCount: Integer;
+        Cost_AmountCaptionLbl: Label 'Cost Amount';
+        Item_DescriptionCaptionLbl: Label 'Description';
+        FilterCaptionLbl: Label 'Filter';
+        Scrinkage___Reason_Code___ItemCaptionLbl: Label 'Item Loss - Reason Code';
+        Item_NoCaptionLbl: Label 'Item No.';
+        Page_CaptionLbl: Label 'Page.';
+        QuantityCaptionLbl: Label 'Quantity';
+        Reason_Code_TotalCaptionLbl: Label 'Reason Code Total';
+        Text002: Label 'Reason Code Total';
+        Sales_AmountCaptionLbl: Label 'Sales Amount';
+        Text001: Label 'Source Code Filter:  ';
+        TotalCaptionLbl: Label 'Total';
+        ReportFilters: Text[250];
 
     procedure CalculateShrinkage()
     var
         lItemEntryRec: Record "Item Ledger Entry";
-        lValueEntryRec: Record "Value Entry";
         lReasonCodeRec: Record "Reason Code";
+        lValueEntryRec: Record "Value Entry";
         lOK: Boolean;
     begin
         lItemEntryRec.SetCurrentKey("Item No.", "Entry Type", "Variant Code", "Drop Shipment", "Location Code", "Posting Date");
-
         lItemEntryRec.SetRange("Item No.", Item."No.");
         lItemEntryRec.SetRange("Entry Type", lItemEntryRec."Entry Type"::"Negative Adjmt.");
-
         if Item.GetFilter("Date Filter") <> '' then
             lItemEntryRec.SetRange("Posting Date", Item.GetRangeMin("Date Filter"),
                                   Item.GetRangeMax("Date Filter"));
-
         if Item.GetFilter("Location Filter") <> '' then
             lItemEntryRec.SetRange("Location Code", Item.GetRangeMin("Location Filter"),
                                   Item.GetRangeMax("Location Filter"));
-
-        if lItemEntryRec.FindFirst then
+        if lItemEntryRec.FindFirst() then
             repeat
                 lOK := false;
-                lValueEntryRec.Reset;
+                lValueEntryRec.Reset();
                 lValueEntryRec.SetCurrentKey("Item Ledger Entry No.");
                 lValueEntryRec.SetRange("Item Ledger Entry No.", lItemEntryRec."Entry No.");
                 if lValueEntryRec.FindFirst then
@@ -307,12 +270,9 @@ report 6014544 "NPR Item Loss - Ret. Reason"
                 if lOK then begin
                     lItemEntryRec.CalcFields("Cost Amount (Actual)");
 
-                    TmpReportSorting.Init;
+                    TmpReportSorting.Init();
                     TmpReportSorting.Template := lItemEntryRec."Item No.";
-                    //-NPR5.54 [387978]
-                    //TmpReportSorting."Line No."        := 1;
                     TmpReportSorting."Line No." += 1;
-                    //+NPR5.54 [387978]
                     TmpReportSorting."Short Code 1" := lItemEntryRec."Item No.";
                     TmpReportSorting."Decimal 3" := -lItemEntryRec.Quantity;
                     TmpReportSorting."Code 1" := lValueEntryRec."Reason Code";
@@ -321,7 +281,7 @@ report 6014544 "NPR Item Loss - Ret. Reason"
                     TmpReportSorting.Insert(true);
                 end;
 
-            until lItemEntryRec.Next = 0;
+            until lItemEntryRec.Next() = 0;
     end;
 }
 

@@ -1,17 +1,11 @@
 report 6060125 "NPR TM Visiting Report"
 {
-    // TM1.19/KENU/2010202 CASE 264689 Object Created
-    // TM1.37/ZESO/20180925 CASE 329455 Added Columns Post Code and City.
-    // #334163/JDH /20181109 CASE 334163 Added Caption to object
-    // TM1.39/NPKNAV/20190125  CASE 343941 Transport TM1.39 - 25 January 2019
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/TM Visiting Report.rdlc';
-
     Caption = 'TM Visiting Report';
     PreviewMode = PrintLayout;
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
-
     dataset
     {
         dataitem("TM Admission Schedule Entry"; "NPR TM Admis. Schedule Entry")
@@ -104,7 +98,7 @@ report 6060125 "NPR TM Visiting Report"
                             begin
                                 Clear(MembershipCompanyName);
                                 Membership.SetRange("Customer No.", "Bill-to Customer No.");
-                                if Membership.FindFirst then
+                                if Membership.FindFirst() then
                                     MembershipCompanyName := Membership."Company Name"
                                 else
                                     MembershipCompanyName := '';
@@ -113,18 +107,6 @@ report 6060125 "NPR TM Visiting Report"
                     }
                 }
             }
-        }
-    }
-
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
         }
     }
 

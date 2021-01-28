@@ -1,20 +1,10 @@
 report 6014400 "NPR Inventory by age"
 {
-    // NPR7.000.000/LS Convert to NAV2013
-    // NPR4.14/KN/20150815 CASE 221152 Missing initialization of ObjectDetails added
-    // NPR5.29/LS  /20170116 CASE 263448 Modified Layout for Group footers not displaying correctly + code
-    //                                    Changed functions Beregnpct to CalculationPct, Beregn to Calculation
-    // NPR5.38/JLK /20170221 CASE 263448 Rdlc report modified completely for new grouping and layout
-    // NPR5.38/JLK /20180124 CASE 300892 Corrected AL Error on Caption name
-    // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
-    // NPR5.40/TJ  /20180319  CASE 307717 Replaced hardcoded dates with DMY2DATE structure
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Inventory by age.rdlc';
-
     Caption = 'Inventory By Age';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
-
     dataset
     {
         dataitem(ItemGroupHeader; "NPR Item Group")
@@ -553,7 +543,7 @@ report 6014400 "NPR Inventory by age"
 
                                     if not ShowZeroLines then
                                         if ((TotalRemaingAmt[5] = 0) and (TotalAmtCalc[5] = 0)) then
-                                            CurrReport.Skip;
+                                            CurrReport.Skip();
 
                                     ExistNonZeroItemRecords[5] := true;
                                 end;
@@ -574,14 +564,14 @@ report 6014400 "NPR Inventory by age"
                             trigger OnAfterGetRecord()
                             begin
                                 if (not (ItemGrpLevel >= 5)) then
-                                    CurrReport.Skip;
+                                    CurrReport.Skip();
 
                                 Clear(ItemFound);
                                 Clear(ExistItemGrpSub);
 
                                 if "No." <> '' then begin
                                     CheckItem.SetRange("NPR Item Group", "No.");
-                                    if CheckItem.FindFirst then
+                                    if CheckItem.FindFirst() then
                                         ItemFound[5] := true
                                     else
                                         ItemFound[5] := false;
@@ -600,15 +590,15 @@ report 6014400 "NPR Inventory by age"
                         trigger OnAfterGetRecord()
                         begin
                             if (not (ItemGrpLevel >= 4)) then
-                                CurrReport.Skip;
+                                CurrReport.Skip();
 
                             Clear(ItemFound);
                             Clear(ExistItemGrpSub);
-                            CheckItem.Reset;
+                            CheckItem.Reset();
 
                             if "No." <> '' then begin
                                 CheckItem.SetRange("NPR Item Group", "No.");
-                                if CheckItem.FindFirst then
+                                if CheckItem.FindFirst() then
                                     ItemFound[4] := true
                                 else
                                     ItemFound[4] := false;
@@ -627,15 +617,15 @@ report 6014400 "NPR Inventory by age"
                     trigger OnAfterGetRecord()
                     begin
                         if (not (ItemGrpLevel >= 3)) then
-                            CurrReport.Skip;
+                            CurrReport.Skip();
 
                         Clear(ItemFound);
                         Clear(ExistItemGrpSub);
-                        CheckItem.Reset;
+                        CheckItem.Reset();
 
                         if "No." <> '' then begin
                             CheckItem.SetRange("NPR Item Group", "No.");
-                            if CheckItem.FindFirst then
+                            if CheckItem.FindFirst() then
                                 ItemFound[3] := true
                             else
                                 ItemFound[3] := false;
@@ -654,15 +644,15 @@ report 6014400 "NPR Inventory by age"
                 trigger OnAfterGetRecord()
                 begin
                     if (not (ItemGrpLevel >= 2)) then
-                        CurrReport.Skip;
+                        CurrReport.Skip();
 
                     Clear(ItemFound);
                     Clear(ExistItemGrpSub);
-                    CheckItem.Reset;
+                    CheckItem.Reset();
 
                     if "No." <> '' then begin
                         CheckItem.SetRange("NPR Item Group", "No.");
-                        if CheckItem.FindFirst then
+                        if CheckItem.FindFirst() then
                             ItemFound[2] := true
                         else
                             ItemFound[2] := false;
@@ -683,11 +673,11 @@ report 6014400 "NPR Inventory by age"
 
                 Clear(ItemFound);
                 Clear(ExistItemGrpSub);
-                CheckItem.Reset;
+                CheckItem.Reset();
 
                 if "No." <> '' then begin
                     CheckItem.SetRange("NPR Item Group", "No.");
-                    if CheckItem.FindFirst then
+                    if CheckItem.FindFirst() then
                         ItemFound[1] := true
                     else
                         ItemFound[1] := false;
@@ -743,9 +733,6 @@ report 6014400 "NPR Inventory by age"
             }
         }
 
-        actions
-        {
-        }
 
         trigger OnOpenPage()
         begin
@@ -767,13 +754,6 @@ report 6014400 "NPR Inventory by age"
         CompanyInformation.Get;
         CompanyInformation.CalcFields(Picture);
 
-        //-NPR5.39
-        // Object.SETRANGE(ID, 6014400);
-        // Object.SETRANGE(Type, 3);
-        // Object.FINDFIRST;
-        // ObjectDetails := STRSUBSTNO('%1, %2', Object.ID, Object."Version List");
-        //+NPR5.39
-
         if PeriodStartDato[2] = 0D then
             PeriodStartDato[2] := WorkDate;
         if PeriodLength = '' then
@@ -786,10 +766,7 @@ report 6014400 "NPR Inventory by age"
     begin
         for i := 2 to 4 do
             PeriodStartDato[i + 1] := CalcDate(PeriodLength, PeriodStartDato[i]);
-        //-NPR5.40 [307717]
-        //PeriodStartDato[6] := 31129999D;
         PeriodStartDato[6] := DMY2Date(31, 12, 9999);
-        //+NPR5.40 [307717]
 
         if ShowItem then
             RequestPageFilters += TxtShowItem;
