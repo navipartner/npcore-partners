@@ -1,51 +1,63 @@
 codeunit 6151327 "NPR NpEc P.Invoice Imp. Create"
 {
-    // NPR5.53/MHA /20191205  CASE 380837 Object created - NaviPartner General E-Commerce
-
     TableNo = "NPR Nc Import Entry";
 
     trigger OnRun()
     var
-        XmlDoc: DotNet "NPRNetXmlDocument";
+        Document: XmlDocument;
     begin
-        if LoadXmlDoc(XmlDoc) then
-            ImportPurchInvoices(XmlDoc);
+        if Load(Rec, Document) then
+            ImportPurchInvoices(Document);
     end;
 
-    local procedure ImportPurchInvoices(XmlDoc: DotNet "NPRNetXmlDocument")
+    local procedure ImportPurchInvoices(Document: XmlDocument)
     var
-        NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
-        XmlElement: DotNet NPRNetXmlElement;
-        XmlNodeList: DotNet NPRNetXmlNodeList;
-        i: Integer;
+        Element: XmlElement;
+        NodeList: XmlNodeList;
+        Node: XmlNode;
     begin
-        if IsNull(XmlDoc) then
+        if not Document.GetRoot(Element) then
             exit;
-        XmlElement := XmlDoc.DocumentElement;
-        if IsNull(XmlElement) then
+
+        if not Element.SelectNodes('//purchase_invoice', NodeList) then
             exit;
-        if not NpXmlDomMgt.FindNodes(XmlElement, 'purchase_invoice', XmlNodeList) then
-            exit;
-        for i := 0 to XmlNodeList.Count - 1 do begin
-            XmlElement := XmlNodeList.ItemOf(i);
-            ImportPurchInvoice(XmlElement);
+
+        foreach Node in NodeList do begin
+            Element := Node.AsXmlElement();
+            ImportPurchInvoice(Element);
         end;
     end;
 
-    local procedure ImportPurchInvoice(XmlElement: DotNet NPRNetXmlElement) Imported: Boolean
+    local procedure ImportPurchInvoice(Element: XmlElement): Boolean
     var
         PurchHeader: Record "Purchase Header";
         NpEcPurchDocImportMgt: Codeunit "NPR NpEc Purch.Doc.Import Mgt.";
     begin
-        if IsNull(XmlElement) then
-            exit(false);
-        if NpEcPurchDocImportMgt.InvoiceExists(XmlElement) then
+
+        if NpEcPurchDocImportMgt.InvoiceExists(Element) then
             exit(false);
 
-        NpEcPurchDocImportMgt.InsertInvoiceHeader(XmlElement, PurchHeader);
-        NpEcPurchDocImportMgt.InsertInvoiceLines(XmlElement, PurchHeader);
-        NpEcPurchDocImportMgt.InsertNote(XmlElement, PurchHeader);
+        NpEcPurchDocImportMgt.InsertInvoiceHeader(Element, PurchHeader);
+        NpEcPurchDocImportMgt.InsertInvoiceLines(Element, PurchHeader);
+        NpEcPurchDocImportMgt.InsertNote(Element, PurchHeader);
 
+        exit(true);
+    end;
+
+    local procedure Load(var Rec: Record "NPR Nc Import Entry"; var Document: XmlDocument): Boolean
+    var
+        XmlDomMgt: Codeunit "XML DOM Management";
+        InStr: InStream;
+        DocumentSource: Text;
+    begin
+        Rec.CalcFields("Document Source");
+        if not Rec."Document Source".HasValue() then
+            exit(false);
+        Rec."Document Source".CreateInStream(InStr);
+        XmlDocument.ReadFrom(InStr, Document);
+        Document.WriteTo(DocumentSource);
+        DocumentSource := XmlDomMgt.RemoveNamespaces(DocumentSource);
+        XmlDocument.ReadFrom(DocumentSource, Document);
         exit(true);
     end;
 }

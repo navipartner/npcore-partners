@@ -1,10 +1,7 @@
 table 6151310 "NPR NpEc Document"
 {
-    // NPR5.54/MHA /20200311  CASE 390380 Object created - Contains E-commerce information related to documents
-
-    Caption = 'NpEc Document';
+    Caption = 'E-Commerce Document';
     DataClassification = CustomerContent;
-
     fields
     {
         field(1; "Entry No."; Integer)

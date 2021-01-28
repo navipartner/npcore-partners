@@ -1,12 +1,9 @@
 table 6151305 "NPR NpEc Customer Mapping"
 {
-    // NPR5.53/MHA /20191205  CASE 380837 Object created - NaviPartner General E-Commerce
-
     Caption = 'Customer Mapping';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR NpEc Customer Mapping";
     LookupPageID = "NPR NpEc Customer Mapping";
-
     fields
     {
         field(1; "Store Code"; Code[20])
@@ -26,11 +23,8 @@ table 6151305 "NPR NpEc Customer Mapping"
         {
             Caption = 'Post Code';
             DataClassification = CustomerContent;
-            TableRelation = IF ("Country/Region Code" = CONST('')) "Post Code"
-            ELSE
+            TableRelation = IF ("Country/Region Code" = CONST('')) "Post Code" ELSE
             IF ("Country/Region Code" = FILTER(<> '')) "Post Code" WHERE("Country/Region Code" = FIELD("Country/Region Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(30; "Config. Template Code"; Code[10])
@@ -41,14 +35,14 @@ table 6151305 "NPR NpEc Customer Mapping"
         }
         field(40; "Country/Region Name"; Text[50])
         {
-            CalcFormula = Lookup ("Country/Region".Name WHERE(Code = FIELD("Country/Region Code")));
+            CalcFormula = Lookup("Country/Region".Name WHERE(Code = FIELD("Country/Region Code")));
             Caption = 'Country/Region Code';
             Editable = false;
             FieldClass = FlowField;
         }
         field(50; City; Text[30])
         {
-            CalcFormula = Min ("Post Code".City WHERE(Code = FIELD("Post Code")));
+            CalcFormula = Min("Post Code".City WHERE(Code = FIELD("Post Code")));
             Caption = 'City';
             Editable = false;
             FieldClass = FlowField;

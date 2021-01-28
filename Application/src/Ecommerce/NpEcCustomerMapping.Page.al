@@ -1,57 +1,48 @@
 page 6151305 "NPR NpEc Customer Mapping"
 {
-    // NPR5.53/MHA /20191205  CASE 380837 Object created - NaviPartner General E-Commerce
-
     Caption = 'Np E-commerce Customer Mapping';
     DelayedInsert = true;
     PageType = List;
     SourceTable = "NPR NpEc Customer Mapping";
     UsageCategory = Administration;
-    ApplicationArea = All;
-
     layout
     {
         area(content)
         {
             repeater(Group)
             {
-                field("Store Code"; "Store Code")
+                field("Store Code"; Rec."Store Code")
                 {
                     ApplicationArea = All;
                     ShowMandatory = true;
-                    ToolTip = 'Specifies the value of the Store Code field';
+                    ToolTip = 'Specifies E-Commerce Store Code.';
                 }
-                field("Country/Region Code"; "Country/Region Code")
+                field("Country/Region Code"; Rec."Country/Region Code")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Country/Region Code field';
+                    ToolTip = 'Specifies the customer''s country/region.';
                 }
-                field("Post Code"; "Post Code")
+                field("Post Code"; Rec."Post Code")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Post Code field';
+                    ToolTip = 'Specifies the postal code.';
                 }
-                field("Config. Template Code"; "Config. Template Code")
+                field("Config. Template Code"; Rec."Config. Template Code")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Config. Template Code field';
+                    ToolTip = 'Specifies Configuration Template Code.';
                 }
-                field("Country/Region Name"; "Country/Region Name")
+                field("Country/Region Name"; Rec."Country/Region Name")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Country/Region Code field';
+                    ToolTip = 'Specifies the country or region name.';
                 }
-                field(City; City)
+                field(City; Rec.City)
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the City field';
+                    ToolTip = 'Specifies the city of the customer.';
                 }
             }
         }
     }
-
-    actions
-    {
-    }
 }
-
