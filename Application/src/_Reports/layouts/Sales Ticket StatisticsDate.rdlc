@@ -706,24 +706,6 @@ End Function
         <Field Name="PeriodName_Date">
           <DataField>PeriodName_Date</DataField>
         </Field>
-        <Field Name="Balance_Due_LCY">
-          <DataField>Balance_Due_LCY</DataField>
-        </Field>
-        <Field Name="Balance_Due_LCYFormat">
-          <DataField>Balance_Due_LCYFormat</DataField>
-        </Field>
-        <Field Name="Purchase_LCY">
-          <DataField>Purchase_LCY</DataField>
-        </Field>
-        <Field Name="Purchase_LCYFormat">
-          <DataField>Purchase_LCYFormat</DataField>
-        </Field>
-        <Field Name="Total">
-          <DataField>Total</DataField>
-        </Field>
-        <Field Name="TotalFormat">
-          <DataField>TotalFormat</DataField>
-        </Field>
         <Field Name="totalCount">
           <DataField>totalCount</DataField>
         </Field>

@@ -857,7 +857,6 @@ codeunit 6014414 "NPR Post Temp Audit Roll"
 
             FinKldLinie."External Document No." := Period."Money bag no.";
 
-            FinKldLinie.Validate("Account No.", Kasse."Balance Account");
             FinKldLinie.Validate(Amount, Rec."Transferred to Balance Account");
 
             FinKldLinie.Validate("Bal. Account No.", Kasse.Account);

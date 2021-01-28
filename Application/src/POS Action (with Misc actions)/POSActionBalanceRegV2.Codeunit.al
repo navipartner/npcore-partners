@@ -301,13 +301,11 @@ codeunit 6150832 "NPR POS Action: BalanceReg V2"
                 Register.Validate(Status, Register.Status::Afsluttet);
                 Register."Status Set By Sales Ticket" := SalePOS."Sales Ticket No.";
                 Register."Closing Cash" := Period."Closing Cash";
-                Register."Change Register" := Period."Change Register";
                 Register.TestField(Account);
                 Register.TestField("Gift Voucher Account");
                 Register.TestField("Credit Voucher Account");
                 Register.TestField("Difference Account");
                 Register.TestField("Difference Account - Neg.");
-                Register.TestField("Balance Account");
 
                 AuditRoll.Init;
                 AuditRoll."Register No." := Register."Register No.";

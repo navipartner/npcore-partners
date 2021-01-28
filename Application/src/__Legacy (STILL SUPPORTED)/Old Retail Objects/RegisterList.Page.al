@@ -25,21 +25,6 @@ page 6014405 "NPR Register List"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Description field';
                 }
-                field(Status; Status)
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Status field';
-                }
-                field("Global Dimension 1 Code"; "Global Dimension 1 Code")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Global Dimension 1 Code field';
-                }
-                field("Global Dimension 2 Code"; "Global Dimension 2 Code")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Global Dimension 2 Code field';
-                }
                 field("Location Code"; "Location Code")
                 {
                     ApplicationArea = All;

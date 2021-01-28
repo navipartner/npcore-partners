@@ -1130,7 +1130,6 @@ codeunit 6150697 "NPR RetailDataModel AR Upgr."
                                     Register."Balanced Type"::Finans:
                                         POSPostingSetup."Account Type" := POSPostingSetup."Account Type"::"G/L Account";
                                 end;
-                                POSPostingSetup."Account No." := Register."Balance Account";
                             end;
                             POSPostingSetup."Difference Account Type" := POSPostingSetup."Difference Account Type"::"G/L Account";
                             POSPostingSetup."Difference Acc. No." := Register."Difference Account";

@@ -58,11 +58,6 @@ page 6014406 "NPR Register Card"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Return Payment Type field';
                 }
-                field(Status; Rec.Status)
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Status field';
-                }
             }
             group(Accessories)
             {
@@ -89,18 +84,6 @@ page 6014406 "NPR Register Card"
                             end;
                         end;
                     }
-                    field("Display 1"; Rec."Display 1")
-                    {
-                        ApplicationArea = All;
-                        Editable = FieldDisplay1;
-                        ToolTip = 'Specifies the value of the Display 1 field';
-                    }
-                    field("Display 2"; Rec."Display 2")
-                    {
-                        ApplicationArea = All;
-                        Editable = FieldDisplay2;
-                        ToolTip = 'Specifies the value of the Display 2 field';
-                    }
                 }
             }
             group(Posting)
@@ -125,16 +108,6 @@ page 6014406 "NPR Register Card"
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies the value of the Gift Voucher Discount Account field';
-                    }
-                    field("City Gift Voucher Account"; Rec."City Gift Voucher Account")
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the City gift voucher account field';
-                    }
-                    field("City Gift Voucher Discount"; Rec."City Gift Voucher Discount")
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the City Gift Voucher Discount field';
                     }
                     field("Credit Voucher Account"; Rec."Credit Voucher Account")
                     {
@@ -190,17 +163,6 @@ page 6014406 "NPR Register Card"
                         Importance = Promoted;
                         ToolTip = 'Specifies the value of the Balanced Type field';
                     }
-                    field("Balance Account"; Rec."Balance Account")
-                    {
-                        ApplicationArea = All;
-                        Importance = Promoted;
-                        ToolTip = 'Specifies the value of the Balance Account field';
-                    }
-                    field("End of day - Exchange Amount"; Rec."End of day - Exchange Amount")
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the value of the Exchange Amount field';
-                    }
                 }
             }
             group(Sale)
@@ -221,21 +183,6 @@ page 6014406 "NPR Register Card"
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Ask for customer field';
-                }
-                field("Exchange Label Exchange Period"; Rec."Exchange Label Exchange Period")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Exchange Label Exchange Period field';
-                }
-                field("Lock Register To Salesperson"; Rec."Lock Register To Salesperson")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Lock Register To Salesperson field';
-                }
-                field("Use Sales Statistics"; Rec."Use Sales Statistics")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Use Sales Statistics field';
                 }
                 field("Active Event No."; Rec."Active Event No.")
                 {

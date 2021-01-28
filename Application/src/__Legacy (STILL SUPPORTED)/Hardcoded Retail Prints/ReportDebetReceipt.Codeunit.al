@@ -138,8 +138,7 @@ codeunit 6014567 "NPR Report - Debet Receipt"
 
         Printer.SetFont('Control');
 
-        if Register."Money drawer attached" and Register."Money drawer - open on special" and
-        (Register."Receipt Printer Type" = Register."Receipt Printer Type"::Samsung) then begin
+        if (Register."Receipt Printer Type" = Register."Receipt Printer Type"::Samsung) then begin
             Printer.AddLine('A');
         end;
 
@@ -148,8 +147,7 @@ codeunit 6014567 "NPR Report - Debet Receipt"
             Printer.AddLine('G');
         end;
 
-        if Register."Money drawer attached" and Register."Money drawer - open on special" and
-        (Register."Receipt Printer Type" = Register."Receipt Printer Type"::"TM-T88") then begin
+        if (Register."Receipt Printer Type" = Register."Receipt Printer Type"::"TM-T88") then begin
             Printer.AddLine('A');
         end;
 
